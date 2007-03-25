@@ -37,7 +37,7 @@ import framework.core as core
 #############################################################################
 def usage():
 	USAGE = """\
-Usage: %(progName)s [options] [profile.tests] [profile.results]
+Usage: %(progName)s [options] [profile.tests] [results]
 
 Options:
   -h, --help                Show this message
@@ -47,13 +47,13 @@ Options:
   -n name, --name=name      Name of the testrun
 
 Example:
-  %(progName)s tests/all.tests results/all.results
-         Run all tests, store the results in results/all.results
+  %(progName)s tests/all.tests results/all
+         Run all tests, store the results in the directory results/all
 
-  %(progName)s -t basic tests/all.tests results/all.results
+  %(progName)s -t basic tests/all.tests results/all
          Run all tests whose path contains the word 'basic'
 
-  %(progName)s -t ^glean/ -t tex tests/all.tests results/all.results
+  %(progName)s -t ^glean/ -t tex tests/all.tests results/all
          Run all tests that are in the 'glean' group or whose path contains
 		 the substring 'tex'
 """
@@ -84,16 +84,13 @@ def main():
 		usage()
 
 	profileFilename = args[0]
-	resultsFilename = args[1]
+	resultsDir = args[1]
 
-	core.checkDir(os.path.dirname(resultsFilename), False)
+	core.checkDir(resultsDir, False)
 
 	profile = core.loadTestProfile(profileFilename)
-	env.file = open(resultsFilename, "w")
-	print >>env.file, """
-testrun = TestrunResult()
-testrun.name = %(name)s
-""" % { 'name': repr(OptionName) }
+	env.file = open(resultsDir + '/main', "w")
+	print >>env.file, "name: %(name)s" % { 'name': core.encode(OptionName) }
 	profile.run(env)
 	env.file.close()
 

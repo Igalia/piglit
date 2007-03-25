@@ -26,6 +26,7 @@
 import errno
 import os
 import re
+import stat
 import subprocess
 import sys
 import traceback
@@ -34,7 +35,6 @@ __all__ = [
 	'Environment',
 	'checkDir',
 	'loadTestProfile',
-	'testPathToResultName',
 	'TestrunResult',
 	'GroupResult',
 	'TestResult',
@@ -68,10 +68,25 @@ def checkDir(dirname, failifexists):
 		if e.errno != errno.EEXIST:
 			raise
 
-def testPathToResultName(path):
-	elems = filter(lambda s: len(s) > 0, path.split('/'))
-	pyname = 'testrun.results' + "".join(map(lambda s: "['"+s+"']", elems))
-	return pyname
+# Encode a string
+def encode(text):
+	r = text.__repr__()
+	if r[0] == '"':
+		# String surrounded by " returned, need to escape '
+		r = r[1:-1].replace("'", "\\'")
+	else:
+		# String surrounded by ' returned, need to escape "
+		r = r[1:-1].replace('"', '\\"')
+	return r
+
+def decode(text):
+	# Unescape then reescape " and ' to make sure no unescaped
+	# instances remain
+	text = text.replace("\\'", "'")
+	text = text.replace('\\"', '"')
+	text = text.replace("'", "\\'")
+	text = text.replace('"', '\\"')
+	return eval('"' + text + '"')
 
 testBinDir = os.path.dirname(__file__) + '/../bin/'
 
@@ -100,6 +115,19 @@ class TestResult(dict):
 			'dict': dict.__repr__(self)
 		}
 
+	def write(self,file,path):
+		print >>file, "@test: " + encode(path)
+		for k in self:
+			v = self[k]
+			if type(v) == list:
+				print >>file, k + "!"
+				for s in v:
+					print >>file, " " + encode(str(s))
+				print >>file, "!"
+			else:
+				print >>file, k + ": " + encode(str(v))
+		print >>file, "!"
+
 
 class GroupResult(dict):
 	def __init__(self, *args):
@@ -125,6 +153,69 @@ class TestrunResult:
 	def __init__(self, *args):
 		self.name = ''
 		self.results = GroupResult()
+
+	def parse(self, path):
+		def arrayparser(a):
+			def cb(line):
+				if line == '!':
+					del stack[-1]
+				else:
+					a.append(line[1:])
+			return cb
+
+		def dictparser(d):
+			def cb(line):
+				if line == '!':
+					del stack[-1]
+					return
+
+				colon = line.find(':')
+				if colon < 0:
+					excl = line.find('!')
+					if excl < 0:
+						raise Exception("Line %(linenr)d: Bad format" % locals())
+
+					key = line[:excl]
+					d[key] = []
+					stack.append(arrayparser(d[key]))
+					return
+
+				key = line[:colon]
+				value = decode(line[colon+2:])
+				d[key] = value
+			return cb
+
+		def toplevel(line):
+			colon = line.find(':')
+			if colon < 0:
+				raise Exception("Line %(linenr)d: Bad format" % locals())
+
+			key = line[:colon]
+			value = decode(line[colon+2:])
+			if key == 'name':
+				self.name = value
+			elif key == '@test':
+				comp = value.split('/')
+				group = self.results
+				for name in comp[:-1]:
+					if name not in group:
+						group[name] = GroupResult()
+					group = group[name]
+
+				result = TestResult()
+				group[comp[-1]] = result
+
+				stack.append(dictparser(result))
+			else:
+				raise Exception("Line %(linenr)d: Unknown key" % locals())
+
+		main = open(path + '/main', 'r')
+		stack = [toplevel]
+		linenr = 1
+		for line in main:
+			if line[-1] == '\n':
+				stack[-1](line[0:-1])
+			linenr = linenr + 1
 
 
 
@@ -170,8 +261,7 @@ class Test:
 
 			print "    result: %(result)s" % { 'result': result['result'] }
 
-			varname = testPathToResultName(path)
-			print >>env.file, "%(varname)s = %(result)s" % locals()
+			result.write(env.file,path)
 		else:
 			print "Dry-run: %(path)s" % locals()
 
@@ -202,7 +292,6 @@ class Test:
 
 class Group(dict):
 	def doRun(self, env, path):
-		print >>env.file, "%s = GroupResult()" % (testPathToResultName(path))
 		for sub in self:
 			spath = sub
 			if len(path) > 0:
@@ -232,28 +321,37 @@ def loadTestProfile(filename):
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
 
-def loadTestResults(filename):
+def loadTestResults(path):
 	try:
-		ns = {
-			'__file__': filename,
-			'GroupResult': GroupResult,
-			'TestResult': TestResult,
-			'TestrunResult': TestrunResult
-		}
-		execfile(filename, ns)
-
-		# BACKWARDS COMPATIBILITY
-		if 'testrun' not in ns:
+		mode = os.stat(path)[stat.ST_MODE]
+		if stat.S_ISDIR(mode):
 			testrun = TestrunResult()
-			testrun.results.update(ns['results'])
-			if 'name' in ns:
-				testrun.name = ns['name']
-			ns['testrun'] = testrun
-		# END BACKWARDS COMPATIBILITY
+			testrun.parse(path)
+		else:
+			# BACKWARDS COMPATIBILITY
+			ns = {
+				'__file__': filename,
+				'GroupResult': GroupResult,
+				'TestResult': TestResult,
+				'TestrunResult': TestrunResult
+			}
+			execfile(filename, ns)
 
-		testrun = ns['testrun']
+			if 'testrun' not in ns:
+				testrun = TestrunResult()
+				testrun.results.update(ns['results'])
+				if 'name' in ns:
+					testrun.name = ns['name']
+				ns['testrun'] = testrun
+
+			testrun = ns['testrun']
+			# END BACKWARDS COMPATIBILITY
+
 		if len(testrun.name) == 0:
-			testrun.name = filename
+			if path[-1] == '/':
+				testrun.name = os.path.basename(path[0:-1])
+			else:
+				testrun.name = os.path.basename(path)
 
 		return testrun
 	except:
