@@ -1,0 +1,10 @@
+#!/usr/bin/python
+#
+# Minimal tests to check whether the installation is working
+#
+
+glean = Group()
+glean['basic'] = GleanTest('basic')
+
+tests = Group()
+tests['glean'] = glean

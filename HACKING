@@ -1,0 +1,85 @@
+
+
+\ Initial design decisions
+ -------------------------
+
+Before I started working on Piglit, I asked around for OpenGL testing methods.
+There were basically two kinds of tests:
+
+1. Glean, which is fully automatic and intends to test the letter of the
+   OpenGL specification (at least partially).
+
+2. Manual tests using Mesa samples or third-party software.
+
+The weakness of Glean is that it is not flexible, not pragmatic enough for
+driver development. For example, it tests for precision requirements in
+blending, where a driver just cannot reasonably improve on what the hardware
+delivers. As a driver developer, one wants to consider a test successful
+when it reaches the optimal results that the hardware can give, even when
+these results may be non-compliant.
+
+Manual tests are not well repeatable. They require a considerable amount of
+work on the part of the developer, so most of the time they aren't done at all.
+On the other hand, those manual tests have sometimes been created to test for
+a particular weakness in implementations, so they may be very suitable to
+detect future, similar weaknesses.
+
+Due to these weaknesses, the test coverage of open source OpenGL drivers
+is suboptimal at best. My goal for Piglit is to create a useful test system
+that helps driver developers in improving driver quality.
+
+With that in mind, my sub-goals are:
+
+1. Combine the strengths of the two kinds of tests (Glean, manual tests)
+   into a single framework.
+
+2. Provide concise, human readable summaries of the test results, with the
+   option to increase the detail of the report when desired.
+
+3. Allow easy visualization of regressions.
+
+4. Allow easy detection of performance regressions.
+
+I briefly considered extending Glean, but then decided for creating an
+entirely new project. The most important reasons are:
+
+1. I do not want to pollute the very clean philosophy behind Glean.
+
+2. The model behind Glean is that one process runs all the tests.
+   During driver development, one often gets bugs that cause tests to crash.
+   This means that one failed test can disrupt the entire test batch.
+   I want to use a more robust model, where each test runs in its own process.
+   This model does not easily fit onto Glean.
+
+3. The amount of code duplication and forking overhead is minimal because
+ a) I can use Glean as a "subroutine", so no code is actually duplicated,
+    there's just a tiny amount of additional Python glue code.
+ b) It's unlikely that this project makes significant changes to Glean
+    that need to be merged upstream.
+
+4. While it remains reasonable to use C++ for the actual OpenGL tests,
+   it is easier to use a higher level language like Python for the framework
+   (summary processing etc.)
+
+
+
+
+\ Ugly Things (or: Coding style)
+ -------------------------------
+
+As a rule of thumb, coding style should be preserved in test code taken from
+other projects, as long as that code is self-contained.
+
+Apart from that, the following rules are cast in stone:
+
+1. Use tabulators for indentation
+2. Use spaces for alignment
+3. No whitespace at the end of a line
+
+See http://electroly.com/mt/archives/000002.html for a well-written rationale.
+
+Use whatever tabulator size you want:
+If you adhere to the rules above, the tab size does not matter. Tab size 4
+is recommended because it keeps the line lengths reasonable, but in the end,
+that's purely a matter of personal taste.
+

@@ -1,0 +1,97 @@
+#!/usr/bin/python
+# All tests that come with piglit, using default settings
+
+import re
+import subprocess
+
+######
+# Glean sub-tests
+glean_fragprog1 = Group()
+
+out,err = subprocess.Popen(
+	[gleanExecutable(), "-t", "+fragProg1", "--listdetails"],
+	stdout=subprocess.PIPE
+).communicate()
+
+st = 0
+for line in out.split('\n'):
+	if st == 0:
+		if line == "DETAILS for fragProg1":
+			st = 1
+	elif st == 1:
+		if line == "END DETAILS":
+			break
+
+		line = line.strip()
+		line = filter(lambda s: s.isalnum() or s in ' ()-_', line)
+
+		t = GleanTest('fragProg1')
+		t.env['GLEAN_FRAGPROG'] = line
+		glean_fragprog1[line] = t
+
+
+######
+# Collecting all tests
+glean = Group()
+glean['basic'] = GleanTest('basic')
+glean['makeCurrent'] = GleanTest('makeCurrent')
+glean['blendFunc'] = GleanTest('blendFunc')
+glean['depthStencil'] = GleanTest('depthStencil')
+glean['fpexceptions'] = GleanTest('fpexceptions')
+glean['fragProg1'] = GleanTest('fragProg1') # also add entire tests, because of interdependency bugs that only occur when several different FPs are used
+glean['getString'] = GleanTest('getString')
+glean['logicOp'] = GleanTest('logicOp')
+glean['maskedClear'] = GleanTest('maskedClear')
+glean['orthoPosRandTris'] = GleanTest('orthoPosRandTris')
+glean['orthoPosRandRects'] = GleanTest('orthoPosRandRects')
+glean['orthoPosTinyQuads'] = GleanTest('orthoPosTinyQuads')
+glean['orthoPosHLines'] = GleanTest('orthoPosHLines')
+glean['orthoPosVLines'] = GleanTest('orthoPosVLines')
+glean['orthoPosPoints'] = GleanTest('orthoPosPoints')
+glean['paths'] = GleanTest('paths')
+glean['polygonOffset'] = GleanTest('polygonOffset')
+glean['pixelFormats'] = GleanTest('pixelFormats')
+glean['pointAtten'] = GleanTest('pointAtten')
+glean['exactRGBA'] = GleanTest('exactRGBA')
+glean['readPixSanity'] = GleanTest('readPixSanity')
+glean['rgbTriStrip'] = GleanTest('rgbTriStrip')
+glean['scissor'] = GleanTest('scissor')
+glean['teapot'] = GleanTest('teapot')
+glean['texCombine'] = GleanTest('texCombine')
+glean['texCube'] = GleanTest('texCube')
+glean['texEnv'] = GleanTest('texEnv')
+glean['texgen'] = GleanTest('texgen')
+glean['texRect'] = GleanTest('texRect')
+glean['texture_srgb'] = GleanTest('texture_srgb')
+glean['vertattrib'] = GleanTest('vertattrib')
+glean['vertProg1'] = GleanTest('vertProg1')
+
+mesa = Group()
+mesa['crossbar'] = PlainExecTest([__dir__ + '/mesa/tests/crossbar', '-auto'])
+
+shaders = Group()
+shaders['trinity-fp1'] = PlainExecTest([__dir__ + '/shaders/trinity-fp1', '-auto'])
+shaders['fp-lit-mask'] = PlainExecTest([__dir__ + '/shaders/fp-lit-mask', '-auto'])
+shaders['fp-fragment-position'] = PlainExecTest([__dir__ + '/shaders/fp-fragment-position', '-auto'])
+shaders['fp-kil'] = PlainExecTest([__dir__ + '/shaders/fp-kil', '-auto'])
+shaders['fp-incomplete-tex'] = PlainExecTest([__dir__ + '/shaders/fp-incomplete-tex', '-auto'])
+shaders['glean-fragProg1'] = glean_fragprog1
+
+bugs = Group()
+bugs['fdo9833'] = PlainExecTest([__dir__ + '/bugs/fdo9833', '-auto'])
+bugs['fdo10370'] = PlainExecTest([__dir__ + '/bugs/fdo10370', '-auto'])
+
+tests = Group()
+tests['bugs'] = bugs
+tests['glean'] = glean
+tests['mesa'] = mesa
+tests['shaders'] = shaders
+
+#############
+# Some Mesa diagnostic messages that we should probably ignore
+Test.ignoreErrors.append("couldn't open libtxc_dxtn.so")
+Test.ignoreErrors.append(re.compile("Mesa: .*build"))
+Test.ignoreErrors.append(re.compile("Mesa: CPU.*"))
+Test.ignoreErrors.append(re.compile("Mesa: .*cpu detected."))
+Test.ignoreErrors.append(re.compile("Mesa: Test.*"))
+Test.ignoreErrors.append(re.compile("Mesa: Yes.*"))

@@ -1,0 +1,146 @@
+
+Piglit
+------
+1. About
+2. Setup
+3. How to run tests
+4. How to write tests
+5. Todo
+
+
+1. About
+--------
+
+Piglit is a collection of automated tests for OpenGL implementations.
+
+The goal of Piglit is to help improve the quality of open source
+OpenGL drivers by providing developers with a simple means to
+perform regression tests.
+
+The original tests have been taken from
+- Glean ( http://glean.sf.net/ ) and
+- Mesa ( http://www.mesa3d.org/ )
+
+
+2. Setup
+--------
+
+First of all, you need to make sure that the following are installed:
+
+  - Python 2.4 or greater
+  - cmake (http://www.cmake.org)
+  - GL, glu and glut libraries and development packages (i.e. headers)
+  - X11 libraries and development packages (i.e. headers)
+  - libtiff
+
+Now configure the build system:
+
+  $ ccmake .
+
+This will start cmake's configuration tool, just follow the onscreen
+instructions. The default settings should be fine, but I recommend you:
+ - Press 'c' once (this will also check for dependencies) and then
+ - Set "CMAKE_BUILD_TYPE" to "Debug"
+Now you can press 'c' again and then 'g' to generate the build system.
+Now build everything:
+
+  $ make
+
+
+
+3. How to run tests
+-------------------
+
+Make sure that everything is set up correctly:
+
+  $ ./piglit-run.py tests/sanity.tests results/sanity.results
+
+This will run some minimal tests. Use
+
+  $ ./piglit-run.py
+
+to learn more about the command's syntax. Have a look into the tests/
+directory to see what test profiles are available:
+
+  $ cd tests
+  $ ls *.tests
+     ...
+  $ cd ..
+
+To create some nice formatted test summaries, run
+
+  $ ./piglit-summary-html.py summary/sanity results/sanity.results
+
+Hint: You can combine multiple test results into a single summary.
+      During development, you can use this to watch for regressions:
+
+  $ ./piglit-summary-html.py summary/compare results/baseline.results results/current.results
+
+      You can combine as many testruns as you want this way(in theory;
+      the HTML layout becomes awkward when the number of testruns increases)
+
+Have a look at the results with a browser:
+
+  $ xdg-open summary/sanity/index.html
+
+The summary shows the 'status' of a test:
+
+ pass  This test has completed successfully.
+
+ warn  The test completed successfully, but something unexpected happened.
+       Look at the details for more information.
+
+ fail  The test failed.
+
+ skip  The test was skipped.
+
+[Note: Once performance tests are implemented, 'fail' will mean that the test
+       rendered incorrectly or didn't complete, while 'warn' will indicate a
+       performance regression]
+[Note: For performance tests, result and status will be different concepts.
+       While status is always restricted to one of the four values above,
+       the result can contain a performance number like frames per second]
+
+
+4. How to write tests
+---------------------
+
+Every test is run as a separate process. This minimizes the impact that
+severe bugs like memory corruption have on the testing process.
+
+Therefore, tests can be implemented in an arbitrary standalone language.
+I recommend C, C++ and Python, as these are the languages that are already
+used in Piglit.
+
+All new tests must be added to the all.tests profile. The test profiles
+are simply Python scripts. There are currently two supported test types:
+
+ PlainExecTest
+   This test starts a new process and watches the process output (stdout and
+   stderr). Lines that start with "PIGLIT:" are collected and interpreted as
+   a Python dictionary that contains test result details.
+
+ GleanTest
+   This is a test that is only used to integrate Glean tests
+
+Additional test types (e.g. for automatic image comparison) would have to
+be added to core.py.
+
+Rules of thumb:
+  Test process that exit with a nonzero returncode are considered to have
+  failed.
+
+  Output on stderr causes a warning.
+
+
+5. Todo
+-------
+
+ Get automated tests into widespread use ;)
+
+ Automate and integrate tests and demos from Mesa
+   Add code that automatically tests whether the test has rendered correctly
+
+ Performance regression tests
+   Ideally, this should be done by summarizing / comparing a history of
+   test results

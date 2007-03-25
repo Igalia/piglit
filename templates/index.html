@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>Result summary </title>
+		<link rel="stylesheet" href="index.css"/>
+	</head>
+	<body>
+		<h1>Result summary</h1>
+		<p>
+			Currently showing: %(showcurrent)s
+		</p>
+		<p>
+			Show: %(showlinks)s
+		</p>
+		<table width="95%%">
+			<colgroup>
+				<!-- 9 columns for indent -->
+				<col width="5pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+				<col width="20pt" />
+
+				<!-- remaining name column -->
+				<col />
+
+				<!-- status column -->
+				%(testruns)s
+			</colgroup>
+			<tr>
+				<td colspan="10" />
+				%(testrunsb)s
+			</tr>
+			%(group)s
+		</table>
+	</body>
+</html>

@@ -1,0 +1,89 @@
+
+table {
+	border: 0pt;
+	border-collapse: collapse;
+}
+
+tr {
+	padding: 4pt;
+}
+
+td {
+	padding: 4pt;
+}
+
+.title {
+	background-color: #c8c838;
+}
+
+.head {
+	background-color: #c8c838
+}
+
+.a {
+	background-color: #ffff95
+}
+
+.b {
+	background-color: #e1e183
+}
+
+.skip {
+	text-align: right;
+	background-color: #b0b0b0;
+}
+
+.warn {
+	text-align: right;
+	background-color: #ff9020;
+}
+
+.fail {
+	text-align: right;
+	background-color: #ff2020;
+}
+
+.pass {
+	text-align: right;
+	background-color: #20ff20;
+}
+
+.skipa {
+	text-align: right;
+	background-color: #d0d0d0;
+}
+
+.warna {
+	text-align: right;
+	background-color: #ffc050;
+}
+
+.faila {
+	text-align: right;
+	background-color: #ff5050;
+}
+
+.passa {
+	text-align: right;
+	background-color: #50ff50;
+}
+
+.skipb {
+	text-align: right;
+	background-color: #c0c0c0;
+}
+
+.warnb {
+	text-align: right;
+	background-color: #ffa040;
+}
+
+.failb {
+	text-align: right;
+	background-color: #ff4040;
+}
+
+.passb {
+	text-align: right;
+	background-color: #40ff40;
+}

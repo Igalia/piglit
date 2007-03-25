@@ -1,0 +1,21 @@
+
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	${GLUT_INCLUDE_DIR}
+	${piglit_SOURCE_DIR}/tests/mesa/util
+)
+
+link_directories (
+	${piglit_SOURCE_DIR}/tests/mesa/util
+)
+
+link_libraries (
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+	${GLUT_glut_LIBRARY}
+	${TIFF_LIBRARY}
+	mesautil
+)
+
+add_executable (fdo9833 fdo9833.c)
+add_executable (fdo10370 fdo10370.c)
