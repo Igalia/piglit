@@ -4,11 +4,13 @@
 import re
 import subprocess
 
+from framework.core import *
+from framework.exectest import *
+from framework.gleantest import *
+
 ######
 # Glean sub-tests
 glean_fragprog1 = Group()
-
-print gleanExecutable()
 
 out,err = subprocess.Popen(
 	[gleanExecutable(), "-t", "+fragProg1", "--listdetails"],
@@ -34,6 +36,8 @@ for line in out.split('\n'):
 
 ######
 # Collecting all tests
+profile = TestProfile()
+
 glean = Group()
 glean['basic'] = GleanTest('basic')
 glean['makeCurrent'] = GleanTest('makeCurrent')
@@ -69,25 +73,24 @@ glean['vertattrib'] = GleanTest('vertattrib')
 glean['vertProg1'] = GleanTest('vertProg1')
 
 mesa = Group()
-mesa['crossbar'] = PlainExecTest([testbin + 'crossbar', '-auto'])
+mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
 shaders = Group()
-shaders['trinity-fp1'] = PlainExecTest([testbin + 'trinity-fp1', '-auto'])
-shaders['fp-lit-mask'] = PlainExecTest([testbin + 'fp-lit-mask', '-auto'])
-shaders['fp-fragment-position'] = PlainExecTest([testbin + 'fp-fragment-position', '-auto'])
-shaders['fp-kil'] = PlainExecTest([testbin + 'fp-kil', '-auto'])
-shaders['fp-incomplete-tex'] = PlainExecTest([testbin + 'fp-incomplete-tex', '-auto'])
+shaders['trinity-fp1'] = PlainExecTest([testBinDir + 'trinity-fp1', '-auto'])
+shaders['fp-lit-mask'] = PlainExecTest([testBinDir + 'fp-lit-mask', '-auto'])
+shaders['fp-fragment-position'] = PlainExecTest([testBinDir + 'fp-fragment-position', '-auto'])
+shaders['fp-kil'] = PlainExecTest([testBinDir + 'fp-kil', '-auto'])
+shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', '-auto'])
 shaders['glean-fragProg1'] = glean_fragprog1
 
 bugs = Group()
-bugs['fdo9833'] = PlainExecTest([testbin + 'fdo9833', '-auto'])
-bugs['fdo10370'] = PlainExecTest([testbin + 'fdo10370', '-auto'])
+bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
+bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])
 
-tests = Group()
-tests['bugs'] = bugs
-tests['glean'] = glean
-tests['mesa'] = mesa
-tests['shaders'] = shaders
+profile.tests['bugs'] = bugs
+profile.tests['glean'] = glean
+profile.tests['mesa'] = mesa
+profile.tests['shaders'] = shaders
 
 #############
 # Some Mesa diagnostic messages that we should probably ignore

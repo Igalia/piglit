@@ -32,10 +32,16 @@ import traceback
 
 __all__ = [
 	'Environment',
+	'checkDir',
 	'loadTestProfile',
 	'testPathToResultName',
+	'TestrunResult',
 	'GroupResult',
-	'TestResult'
+	'TestResult',
+	'TestProfile',
+	'Group',
+	'Test',
+	'testBinDir'
 ]
 
 
@@ -67,12 +73,12 @@ def testPathToResultName(path):
 	pyname = 'testrun.results' + "".join(map(lambda s: "['"+s+"']", elems))
 	return pyname
 
-testbin = os.path.dirname(__file__) + '/../bin/'
+testBinDir = os.path.dirname(__file__) + '/../bin/'
+
 
 #############################################################################
 ##### Result classes
 #############################################################################
-
 
 class TestResult(dict):
 	def __init__(self, *args):
@@ -132,8 +138,12 @@ class Environment:
 		self.execute = True
 		self.filter = []
 
+
 class Test:
 	ignoreErrors = []
+
+	def __init__(self):
+		pass
 
 	def doRun(self, env, path):
 		# Filter
@@ -205,101 +215,13 @@ class Group(dict):
 				spath = path + '/' + spath
 			self[sub].doRun(env, spath)
 
-#############################################################################
-##### PlainExecTest: Simply run an executable
-##### Expect one line prefixed PIGLIT: in the output, which contains a
-##### result dictionary. The plain output is appended to this dictionary
-#############################################################################
-class PlainExecTest(Test):
-	def __init__(self, command):
-		self.command = command
 
-	def run(self):
-		proc = subprocess.Popen(
-			self.command,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE
-		)
-		out,err = proc.communicate()
+class TestProfile:
+	def __init__(self):
+		self.tests = Group()
 
-		outlines = out.split('\n')
-		outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
-
-		results = TestResult()
-
-		if len(outpiglit) > 0:
-			try:
-				results.update(eval(''.join(outpiglit), {}))
-				out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
-			except:
-				results['result'] = 'fail'
-				results['note'] = 'Failed to parse result string'
-
-		if 'result' not in results:
-			results['result'] = 'fail'
-
-		if proc.returncode != 0:
-			results['result'] = 'fail'
-			results['note'] = 'Returncode was %d' % (proc.returncode)
-
-		self.handleErr(results, err)
-
-		results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
-		results['returncode'] = proc.returncode
-
-		return results
-
-
-
-#############################################################################
-##### GleanTest: Execute a sub-test of Glean
-#############################################################################
-def gleanExecutable():
-	return testbin + 'glean'
-
-def gleanResultDir():
-	return "./results/glean/"
-
-class GleanTest(Test):
-	globalParams = []
-
-	def __init__(self, name):
-		self.name = name
-		self.env = {}
-
-	def run(self):
-		results = TestResult()
-
-		fullenv = os.environ.copy()
-		for e in self.env:
-			fullenv[e] = str(self.env[e])
-
-		checkDir(gleanResultDir()+self.name, False)
-
-		glean = subprocess.Popen(
-			[gleanExecutable(), "-o", "-r", gleanResultDir()+self.name,
-			"--ignore-prereqs",
-			"-v", "-v", "-v",
-			"-t", "+"+self.name] + GleanTest.globalParams,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE,
-			env=fullenv
-		)
-
-		out, err = glean.communicate()
-
-		results['result'] = 'pass'
-		if glean.returncode != 0 or out.find('FAIL') >= 0:
-			results['result'] = 'fail'
-
-		results['returncode'] = glean.returncode
-
-		self.handleErr(results, err)
-
-		results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (glean.returncode, err, out)
-
-		return results
-
+	def run(self, env):
+		self.tests.doRun(env, '')
 
 #############################################################################
 ##### Loaders
@@ -309,16 +231,9 @@ def loadTestProfile(filename):
 	try:
 		ns = {
 			'__file__': filename,
-			'__dir__': os.path.dirname(filename),
-			'testbin': testbin,
-			'Test': Test,
-			'Group': Group,
-			'GleanTest': GleanTest,
-			'gleanExecutable': gleanExecutable,
-			'PlainExecTest': PlainExecTest
 		}
 		execfile(filename, ns)
-		return ns['tests']
+		return ns['profile']
 	except:
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
@@ -326,7 +241,7 @@ def loadTestProfile(filename):
 def loadTestResults(filename):
 	try:
 		ns = {
-			'__file__': filename,
+#			'__file__': filename,
 			'GroupResult': GroupResult,
 			'TestResult': TestResult,
 			'TestrunResult': TestrunResult

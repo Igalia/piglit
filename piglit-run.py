@@ -94,7 +94,7 @@ def main():
 testrun = TestrunResult()
 testrun.name = %(name)s
 """ % { 'name': repr(OptionName) }
-	profile.doRun(env, '')
+	profile.run(env)
 	env.file.close()
 
 if __name__ == "__main__":
