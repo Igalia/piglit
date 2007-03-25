@@ -8,6 +8,8 @@ import subprocess
 # Glean sub-tests
 glean_fragprog1 = Group()
 
+print gleanExecutable()
+
 out,err = subprocess.Popen(
 	[gleanExecutable(), "-t", "+fragProg1", "--listdetails"],
 	stdout=subprocess.PIPE
@@ -67,19 +69,19 @@ glean['vertattrib'] = GleanTest('vertattrib')
 glean['vertProg1'] = GleanTest('vertProg1')
 
 mesa = Group()
-mesa['crossbar'] = PlainExecTest([__dir__ + '/mesa/tests/crossbar', '-auto'])
+mesa['crossbar'] = PlainExecTest([testbin + 'crossbar', '-auto'])
 
 shaders = Group()
-shaders['trinity-fp1'] = PlainExecTest([__dir__ + '/shaders/trinity-fp1', '-auto'])
-shaders['fp-lit-mask'] = PlainExecTest([__dir__ + '/shaders/fp-lit-mask', '-auto'])
-shaders['fp-fragment-position'] = PlainExecTest([__dir__ + '/shaders/fp-fragment-position', '-auto'])
-shaders['fp-kil'] = PlainExecTest([__dir__ + '/shaders/fp-kil', '-auto'])
-shaders['fp-incomplete-tex'] = PlainExecTest([__dir__ + '/shaders/fp-incomplete-tex', '-auto'])
+shaders['trinity-fp1'] = PlainExecTest([testbin + 'trinity-fp1', '-auto'])
+shaders['fp-lit-mask'] = PlainExecTest([testbin + 'fp-lit-mask', '-auto'])
+shaders['fp-fragment-position'] = PlainExecTest([testbin + 'fp-fragment-position', '-auto'])
+shaders['fp-kil'] = PlainExecTest([testbin + 'fp-kil', '-auto'])
+shaders['fp-incomplete-tex'] = PlainExecTest([testbin + 'fp-incomplete-tex', '-auto'])
 shaders['glean-fragProg1'] = glean_fragprog1
 
 bugs = Group()
-bugs['fdo9833'] = PlainExecTest([__dir__ + '/bugs/fdo9833', '-auto'])
-bugs['fdo10370'] = PlainExecTest([__dir__ + '/bugs/fdo10370', '-auto'])
+bugs['fdo9833'] = PlainExecTest([testbin + 'fdo9833', '-auto'])
+bugs['fdo10370'] = PlainExecTest([testbin + 'fdo10370', '-auto'])
 
 tests = Group()
 tests['bugs'] = bugs

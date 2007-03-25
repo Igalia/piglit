@@ -67,6 +67,7 @@ def testPathToResultName(path):
 	pyname = 'testrun.results' + "".join(map(lambda s: "['"+s+"']", elems))
 	return pyname
 
+testbin = os.path.dirname(__file__) + '/../bin/'
 
 #############################################################################
 ##### Result classes
@@ -254,7 +255,7 @@ class PlainExecTest(Test):
 ##### GleanTest: Execute a sub-test of Glean
 #############################################################################
 def gleanExecutable():
-	return "./tests/glean/glean"
+	return testbin + 'glean'
 
 def gleanResultDir():
 	return "./results/glean/"
@@ -309,6 +310,7 @@ def loadTestProfile(filename):
 		ns = {
 			'__file__': filename,
 			'__dir__': os.path.dirname(filename),
+			'testbin': testbin,
 			'Test': Test,
 			'Group': Group,
 			'GleanTest': GleanTest,
@@ -319,7 +321,7 @@ def loadTestProfile(filename):
 		return ns['tests']
 	except:
 		traceback.print_exc()
-		raise FatalError('Could not read tests profile')
+		raise Exception('Could not read tests profile')
 
 def loadTestResults(filename):
 	try:
@@ -347,4 +349,4 @@ def loadTestResults(filename):
 		return testrun
 	except:
 		traceback.print_exc()
-		raise FatalError('Could not read tests results')
+		raise Exception('Could not read tests results')
