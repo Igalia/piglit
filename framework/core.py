@@ -80,10 +80,12 @@ def encode(text):
 	return r
 
 def decode(text):
-	# Unescape then reescape " and ' to make sure no unescaped
-	# instances remain
+	# Unescape then reescape ", ' and \ to make sure no unescaped
+	# instances remain (that could break out of eval())
+	text = text.replace("\\\\", "\\")
 	text = text.replace("\\'", "'")
 	text = text.replace('\\"', '"')
+	text = text.replace("\\", "\\\\")
 	text = text.replace("'", "\\'")
 	text = text.replace('"', '\\"')
 	return eval('"' + text + '"')
