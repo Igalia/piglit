@@ -28,6 +28,7 @@ import sys
 
 import framework.core as core
 
+
 #############################################################################
 ##### Auxiliary functions
 #############################################################################
@@ -184,20 +185,21 @@ def writefile(filename, text):
 	f.write(text)
 	f.close()
 
-Result = readfile('templates/result.html')
-ResultDetail = readfile('templates/result_detail.html')
-ResultList = readfile('templates/result_list.html')
-ResultListItem = readfile('templates/result_listitem.html')
-ResultMString = readfile('templates/result_mstring.html')
+templatedir = os.path.dirname(__file__) + '/templates/'
+Result = readfile(templatedir + 'result.html')
+ResultDetail = readfile(templatedir + 'result_detail.html')
+ResultList = readfile(templatedir + 'result_list.html')
+ResultListItem = readfile(templatedir + 'result_listitem.html')
+ResultMString = readfile(templatedir + 'result_mstring.html')
 
-Index = readfile('templates/index.html')
-IndexTestrun = readfile('templates/index_testrun.html')
-IndexTestrunB = readfile('templates/index_testrunb.html')
-IndexGroup = readfile('templates/index_group.html')
-IndexGroupTestrun = readfile('templates/index_group_testrun.html')
-IndexGroupGroup = readfile('templates/index_groupgroup.html')
-IndexTest = readfile('templates/index_test.html')
-IndexTestTestrun = readfile('templates/index_test_testrun.html')
+Index = readfile(templatedir + 'index.html')
+IndexTestrun = readfile(templatedir + 'index_testrun.html')
+IndexTestrunB = readfile(templatedir + 'index_testrunb.html')
+IndexGroup = readfile(templatedir + 'index_group.html')
+IndexGroupTestrun = readfile(templatedir + 'index_group_testrun.html')
+IndexGroupGroup = readfile(templatedir + 'index_groupgroup.html')
+IndexTest = readfile(templatedir + 'index_test.html')
+IndexTestTestrun = readfile(templatedir + 'index_test_testrun.html')
 
 SummaryPages = {
 	'all': 'index.html',
@@ -403,8 +405,8 @@ def main():
 		core.checkDir(summaryDir + '/' + r.codename, False)
 		recursiveWriteResultHtml(r.results, summaryDir + '/' + r.codename)
 
-	writefile(summaryDir + '/result.css', readfile('templates/result.css'))
-	writefile(summaryDir + '/index.css', readfile('templates/index.css'))
+	writefile(summaryDir + '/result.css', readfile(templatedir + 'result.css'))
+	writefile(summaryDir + '/index.css', readfile(templatedir + 'index.css'))
 	writeSummaryHtml(results, summaryDir, 'all')
 	writeSummaryHtml(results, summaryDir, 'problems')
 	writeSummaryHtml(results, summaryDir, 'changes')
