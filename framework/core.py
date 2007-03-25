@@ -330,12 +330,12 @@ def loadTestResults(path):
 		else:
 			# BACKWARDS COMPATIBILITY
 			ns = {
-				'__file__': filename,
+				'__file__': path,
 				'GroupResult': GroupResult,
 				'TestResult': TestResult,
 				'TestrunResult': TestrunResult
 			}
-			execfile(filename, ns)
+			execfile(path, ns)
 
 			if 'testrun' not in ns:
 				testrun = TestrunResult()
