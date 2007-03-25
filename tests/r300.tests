@@ -4,6 +4,7 @@
 #
 
 import os
+import re
 
 execfile(os.path.dirname(__file__) + '/all.tests')
 
@@ -14,10 +15,10 @@ from framework.gleantest import *
 
 # Potentially serious problem, but workaround for now
 GleanTest.globalParams += [ '--visuals', 'id != 0x4b' ]
-Test.ignoreErrors.append('3D driver claims to not support')
+Test.ignoreErrors.append(re.compile('3D driver claims to not support'))
 
 # Debug info
-Test.ignoreErrors.append('Try R300_SPAN_DISABLE_LOCKING env var if this hangs.')
+Test.ignoreErrors.append(re.compile('Try R300_SPAN_DISABLE_LOCKING env var if this hangs.'))
 
 
 # glean/blendFunc

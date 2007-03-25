@@ -175,25 +175,19 @@ class Test:
 		else:
 			print "Dry-run: %(path)s" % locals()
 
+	# Returns True iff the given error message should be ignored
+	def isIgnored(self, error):
+		for pattern in Test.ignoreErrors:
+			if pattern.search(error):
+				return True
+
+		return False
+
 	# Default handling for stderr messages
 	def handleErr(self, results, err):
 		errors = filter(lambda s: len(s) > 0, map(lambda s: s.strip(), err.split('\n')))
 
-		ignored = []
-		for s in errors:
-			ignore = False
-			for pattern in Test.ignoreErrors:
-				if type(pattern) == str:
-					if s.find(pattern) >= 0:
-						ignore = True
-						break
-				else:
-					if pattern.search(s):
-						ignore = True
-						break
-			if ignore:
-				ignored.append(s)
-
+		ignored = [s for s in errors if self.isIgnored(s)]
 		errors = [s for s in errors if s not in ignored]
 
 		if len(errors) > 0:
@@ -241,7 +235,7 @@ def loadTestProfile(filename):
 def loadTestResults(filename):
 	try:
 		ns = {
-#			'__file__': filename,
+			'__file__': filename,
 			'GroupResult': GroupResult,
 			'TestResult': TestResult,
 			'TestrunResult': TestrunResult
