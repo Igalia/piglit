@@ -373,7 +373,7 @@ Example:
   %(progName)s summary/mysum results/all.results
 """
 	print USAGE % {'progName': sys.argv[0]}
-	exit(1)
+	sys.exit(1)
 
 
 def main():

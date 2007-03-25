@@ -58,7 +58,7 @@ Example:
 		 the substring 'tex'
 """
 	print USAGE % {'progName': sys.argv[0]}
-	exit(1)
+	sys.exit(1)
 
 def main():
 	env = core.Environment()
