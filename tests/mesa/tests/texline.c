@@ -14,256 +14,180 @@
 #include <GL/glut.h>
 #include "../util/readtex.c"   /* I know, this is a hack. */
 
-#define TEXTURE_FILE "../images/girl.rgb"
+#define TEXTURE_FILE "./tests/data/girl.rgb"
 
-static GLboolean Antialias = GL_FALSE;
-static GLboolean Animate = GL_FALSE;
-static GLint Texture = 1;
-static GLboolean Stipple = GL_FALSE;
-static GLfloat LineWidth = 1.0;
+static int Width = 400, Height = 300;
 
-static GLfloat Xrot = -60.0, Yrot = 0.0, Zrot = 0.0;
-static GLfloat DYrot = 1.0;
-static GLboolean Points = GL_FALSE;
-static GLfloat Scale = 1.0;
 
-static void Idle( void )
+static void DoStar(int texture)
 {
-   if (Animate) {
-      Zrot += DYrot;
-      glutPostRedisplay();
-   }
+	int l;
+
+	glPushMatrix();
+	glScalef(0.5, 0.5, 1.0);
+	glTranslatef(1.0, 1.0, 0.0);
+
+	glBegin(GL_LINES);
+		for(l = 0; l < 30; ++l) {
+			double rad = l*M_PI/15.0;
+			double dx = cos(rad);
+			double dy = sin(rad);
+
+			if (texture >= 1)
+				glTexCoord2f(l/30.0, 0.0);
+			if (texture >= 2)
+			glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0, l/30.0);
+			if (texture == 0)
+				glColor3f(0, 1, 0);
+			glVertex2f(dx*0.2, dy*0.2);
+
+			if (texture >= 1)
+				glTexCoord2f(l/30.0, 1.0);
+			if (texture >= 2)
+			glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0, l/30.0);
+			if (texture == 0)
+				glColor3f(1, 0, 1);
+			glVertex2f(dx*0.8, dy*0.8);
+		}
+	glEnd();
+	glColor3f(1,1,1);
+
+	glPopMatrix();
+}
+
+static void Display(void)
+{
+	int texture;
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	for(texture = 0; texture < 3; ++texture) {
+		glPushMatrix();
+		glTranslatef(0, texture, 0);
+
+		if (texture == 0) {
+			glActiveTextureARB(GL_TEXTURE0_ARB);
+			glDisable(GL_TEXTURE_2D);
+			glActiveTextureARB(GL_TEXTURE1_ARB);
+			glDisable(GL_TEXTURE_2D);
+		}
+		else if (texture == 1) {
+			glActiveTextureARB(GL_TEXTURE0_ARB);
+			glEnable(GL_TEXTURE_2D);
+			glActiveTextureARB(GL_TEXTURE1_ARB);
+			glDisable(GL_TEXTURE_2D);
+		}
+		else {
+			glActiveTextureARB(GL_TEXTURE0_ARB);
+			glEnable(GL_TEXTURE_2D);
+			glActiveTextureARB(GL_TEXTURE1_ARB);
+			glEnable(GL_TEXTURE_2D);
+		}
+
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_BLEND);
+		glDisable(GL_LINE_STIPPLE);
+		DoStar(texture);
+
+		glTranslatef(1, 0, 0);
+		glEnable(GL_LINE_STIPPLE);
+		DoStar(texture);
+
+		glTranslatef(1, 0, 0);
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LINE_STIPPLE);
+		DoStar(texture);
+
+		glTranslatef(1, 0, 0);
+		glEnable(GL_LINE_STIPPLE);
+		DoStar(texture);
+
+		glPopMatrix();
+	}
+
+	glutSwapBuffers();
 }
 
 
-static void Display( void )
+static void Reshape(int width, int height)
 {
-   GLfloat x, y, s, t;
-
-   glClear( GL_COLOR_BUFFER_BIT );
-
-   glPushMatrix();
-   glRotatef(Xrot, 1.0, 0.0, 0.0);
-   glRotatef(Yrot, 0.0, 1.0, 0.0);
-   glRotatef(Zrot, 0.0, 0.0, 1.0);
-   glScalef(Scale, Scale, Scale);
-
-   if (Texture)
-      glColor3f(1, 1, 1);
-
-   if (Points) {
-      glBegin(GL_POINTS);
-      for (t = 0.0; t <= 1.0; t += 0.025) {
-         for (s = 0.0; s <= 1.0; s += 0.025) {
-            x = s * 2.0 - 1.0;
-            y = t * 2.0 - 1.0;
-            if (!Texture)
-               glColor3f(1, 0, 1);
-            glMultiTexCoord2fARB(GL_TEXTURE1_ARB, t, s);
-            glTexCoord2f(s, t);
-            glVertex2f(x, y);
-         }
-      }
-      glEnd();
-   }
-   else {
-      glBegin(GL_LINES);
-      for (t = 0.0; t <= 1.0; t += 0.025) {
-         x = t * 2.0 - 1.0;
-         if (!Texture)
-            glColor3f(1, 0, 1);
-         glTexCoord2f(t, 0.0);
-         glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 0.0, t);
-         glVertex2f(x, -1.0);
-         if (!Texture)
-            glColor3f(0, 1, 0);
-         glTexCoord2f(t, 1.0);
-         glMultiTexCoord2fARB(GL_TEXTURE1_ARB, 1.0, t);
-         glVertex2f(x, 1.0);
-      }
-      glEnd();
-   }
-
-   glPopMatrix();
-
-   glutSwapBuffers();
-}
-
-
-static void Reshape( int width, int height )
-{
-   GLfloat ar = (float) width / height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, 10.0, 100.0 );
-   glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-   glTranslatef( 0.0, 0.0, -12.0 );
+	Width = width;
+	Height = height;
+	glViewport(0, 0, Width, Height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, 4.0, 0.0, 3.0, -1.0, 1.0);
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
 }
 
 
 static void Key( unsigned char key, int x, int y )
 {
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 'a':
-         Antialias = !Antialias;
-         if (Antialias) {
-            glEnable(GL_LINE_SMOOTH);
-            glEnable(GL_POINT_SMOOTH);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-         }
-         else {
-            glDisable(GL_LINE_SMOOTH);
-            glDisable(GL_POINT_SMOOTH);
-            glDisable(GL_BLEND);
-         }
-         break;
-      case 't':
-         Texture++;
-         if (Texture > 2)
-            Texture = 0;
-         if (Texture == 0) {
-            glActiveTextureARB(GL_TEXTURE0_ARB);
-            glDisable(GL_TEXTURE_2D);
-            glActiveTextureARB(GL_TEXTURE1_ARB);
-            glDisable(GL_TEXTURE_2D);
-         }
-         else if (Texture == 1) {
-            glActiveTextureARB(GL_TEXTURE0_ARB);
-            glEnable(GL_TEXTURE_2D);
-            glActiveTextureARB(GL_TEXTURE1_ARB);
-            glDisable(GL_TEXTURE_2D);
-         }
-         else {
-            glActiveTextureARB(GL_TEXTURE0_ARB);
-            glEnable(GL_TEXTURE_2D);
-            glActiveTextureARB(GL_TEXTURE1_ARB);
-            glEnable(GL_TEXTURE_2D);
-         }
-         break;
-      case 'w':
-         LineWidth -= 0.25;
-         if (LineWidth < 0.25)
-            LineWidth = 0.25;
-         glLineWidth(LineWidth);
-         glPointSize(LineWidth);
-         break;
-      case 'W':
-         LineWidth += 0.25;
-         if (LineWidth > 8.0)
-            LineWidth = 8.0;
-         glLineWidth(LineWidth);
-         glPointSize(LineWidth);
-         break;
-      case 'p':
-         Points = !Points;
-         break;
-      case 's':
-         Stipple = !Stipple;
-         if (Stipple)
-            glEnable(GL_LINE_STIPPLE);
-         else
-            glDisable(GL_LINE_STIPPLE);
-         break;
-      case ' ':
-         Animate = !Animate;
-         if (Animate)
-            glutIdleFunc(Idle);
-         else
-            glutIdleFunc(NULL);
-         break;
-      case 27:
-         exit(0);
-         break;
-   }
-   printf("LineWidth, PointSize = %f\n", LineWidth);
-   glutPostRedisplay();
-}
-
-
-static void SpecialKey( int key, int x, int y )
-{
-   float step = 3.0;
-   (void) x;
-   (void) y;
-
-   switch (key) {
-      case GLUT_KEY_UP:
-         Xrot += step;
-         break;
-      case GLUT_KEY_DOWN:
-         Xrot -= step;
-         break;
-      case GLUT_KEY_LEFT:
-         Yrot += step;
-         break;
-      case GLUT_KEY_RIGHT:
-         Yrot -= step;
-         break;
-   }
-   glutPostRedisplay();
+	(void) x;
+	(void) y;
+	switch (key) {
+		case 27:
+			exit(0);
+			break;
+	}
 }
 
 
 static void Init( int argc, char *argv[] )
 {
-   GLuint u;
-   for (u = 0; u < 2; u++) {
-      glActiveTextureARB(GL_TEXTURE0_ARB + u);
-      glBindTexture(GL_TEXTURE_2D, 10+u);
-      if (u == 0)
-         glEnable(GL_TEXTURE_2D);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	GLuint u;
+	for (u = 0; u < 2; u++) {
+		glActiveTextureARB(GL_TEXTURE0_ARB + u);
+		glBindTexture(GL_TEXTURE_2D, 10+u);
+		if (u == 0)
+			glEnable(GL_TEXTURE_2D);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-      if (u == 0)
-         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      else
-         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
+		if (u == 0)
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		else
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 
-      glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-      if (!LoadRGBMipmaps(TEXTURE_FILE, GL_RGB)) {
-         printf("Error: couldn't load texture image\n");
-         exit(1);
-      }
-   }
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		if (!LoadRGBMipmaps(TEXTURE_FILE, GL_RGB)) {
+			printf("Error: couldn't load texture image\n");
+			exit(1);
+		}
+	}
 
-   glLineStipple(1, 0xff);
+	glLineStipple(1, 0xff);
 
-   if (argc > 1 && strcmp(argv[1], "-info")==0) {
-      printf("GL_RENDERER   = %s\n", (char *) glGetString(GL_RENDERER));
-      printf("GL_VERSION    = %s\n", (char *) glGetString(GL_VERSION));
-      printf("GL_VENDOR     = %s\n", (char *) glGetString(GL_VENDOR));
-      printf("GL_EXTENSIONS = %s\n", (char *) glGetString(GL_EXTENSIONS));
-   }
+	printf("GL_RENDERER   = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION    = %s\n", (char *) glGetString(GL_VERSION));
+	printf("GL_VENDOR     = %s\n", (char *) glGetString(GL_VENDOR));
+	printf("GL_EXTENSIONS = %s\n", (char *) glGetString(GL_EXTENSIONS));
+
+	Reshape(Width, Height);
 }
 
 
 int main( int argc, char *argv[] )
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition(0, 0);
-   glutInitWindowSize( 400, 300 );
+	glutInit( &argc, argv );
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
 
-   glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE );
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 
-   glutCreateWindow(argv[0] );
+	glutCreateWindow("texline");
 
-   Init(argc, argv);
+	Init(argc, argv);
 
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutSpecialFunc( SpecialKey );
-   glutDisplayFunc( Display );
-   if (Animate)
-      glutIdleFunc( Idle );
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
 
-   glutMainLoop();
-   return 0;
+	glutMainLoop();
+	return 0;
 }
