@@ -10,14 +10,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <GL/glut.h>
-#include "../util/readtex.c"   /* I know, this is a hack. */
+#include "../util/readtex.h"
+#include "../util/writeimg.h"
 
-#define TEXTURE_FILE "./tests/data/girl.rgb"
+#define TEXTURE_FILE "mesa/girl.rgb"
 
 static int Width = 400, Height = 300;
-
+static int Automatic = 0;
+static const char* ScreenshotFile = 0;
 
 static void DoStar(int texture)
 {
@@ -55,7 +58,7 @@ static void DoStar(int texture)
 	glPopMatrix();
 }
 
-static void Display(void)
+static void DoFrame(void)
 {
 	int texture;
 
@@ -96,7 +99,6 @@ static void Display(void)
 
 		glTranslatef(1, 0, 0);
 		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POINT_SMOOTH);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_LINE_STIPPLE);
@@ -110,6 +112,26 @@ static void Display(void)
 	}
 
 	glutSwapBuffers();
+}
+
+static void Screenshot(void)
+{
+	GLubyte shot[400][300][3];
+
+	glReadBuffer(GL_FRONT);
+	glReadPixels(0, 0, 400, 300, GL_RGB, GL_UNSIGNED_BYTE, shot);
+
+	WritePNGImage(ScreenshotFile, GL_RGB, 400, 300, (GLubyte*)shot, 1);
+}
+
+static void Display(void)
+{
+	DoFrame();
+	if (Automatic) {
+		Screenshot();
+		printf("PIGLIT: { }\n");
+		exit(0);
+	}
 }
 
 
@@ -142,6 +164,8 @@ static void Init( int argc, char *argv[] )
 {
 	GLuint u;
 	for (u = 0; u < 2; u++) {
+		char filename[256];
+
 		glActiveTextureARB(GL_TEXTURE0_ARB + u);
 		glBindTexture(GL_TEXTURE_2D, 10+u);
 		if (u == 0)
@@ -155,8 +179,16 @@ static void Init( int argc, char *argv[] )
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		if (!LoadRGBMipmaps(TEXTURE_FILE, GL_RGB)) {
+
+		if (getenv("DATADIR"))
+			snprintf(filename, sizeof(filename), "%s/%s",
+					getenv("DATADIR"), TEXTURE_FILE);
+		else
+			strcpy(filename, TEXTURE_FILE);
+		if (!LoadRGBMipmaps(filename, GL_RGB)) {
 			printf("Error: couldn't load texture image\n");
+			if (Automatic)
+				printf("PIGLIT: {'result': 'fail' }\n");
 			exit(1);
 		}
 	}
@@ -175,6 +207,10 @@ static void Init( int argc, char *argv[] )
 int main( int argc, char *argv[] )
 {
 	glutInit( &argc, argv );
+	if (argc == 3 && !strcmp(argv[1], "-auto")) {
+		Automatic = 1;
+		ScreenshotFile = argv[2];
+	}
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(Width, Height);
 

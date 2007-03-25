@@ -1,9 +1,16 @@
 
-include_directories( ${OPENGL_INCLUDE_PATH} )
+include_directories (
+	${OPENGL_INCLUDE_PATH}
+	${PNG_INCLUDE_DIR}
+)
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${TIFF_LIBRARY}
+	${PNG_LIBRARIES}
+)
+add_definitions (
+	${PNG_DEFINITIONS}
 )
 
 add_library (mesautil
@@ -18,4 +25,5 @@ add_library (mesautil
 	imagesgi.cpp
 	showbuffer.c
 	winpos.c
+	writeimg.c
 )
