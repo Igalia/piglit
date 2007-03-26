@@ -22,6 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 from getopt import getopt, GetoptError
+import cgi
 import errno
 import os
 import sys
@@ -216,9 +217,9 @@ def buildDetailValue(detail):
 
 		return ResultList % { 'items': items }
 	elif type(detail) == str and detail[0:3] == '@@@':
-		return ResultMString % { 'detail': detail[3:] }
+		return ResultMString % { 'detail': cgi.escape(detail[3:]) }
 
-	return str(detail)
+	return cgi.escape(str(detail))
 
 
 def buildDetails(testResult):
