@@ -70,25 +70,10 @@ def checkDir(dirname, failifexists):
 
 # Encode a string
 def encode(text):
-	r = text.__repr__()
-	if r[0] == '"':
-		# String surrounded by " returned, need to escape '
-		r = r[1:-1].replace("'", "\\'")
-	else:
-		# String surrounded by ' returned, need to escape "
-		r = r[1:-1].replace('"', '\\"')
-	return r
+	return text.encode("string_escape")
 
 def decode(text):
-	# Unescape then reescape ", ' and \ to make sure no unescaped
-	# instances remain (that could break out of eval())
-	text = text.replace("\\\\", "\\")
-	text = text.replace("\\'", "'")
-	text = text.replace('\\"', '"')
-	text = text.replace("\\", "\\\\")
-	text = text.replace("'", "\\'")
-	text = text.replace('"', '\\"')
-	return eval('"' + text + '"')
+	return text.decode("string_escape")
 
 testBinDir = os.path.dirname(__file__) + '/../bin/'
 
