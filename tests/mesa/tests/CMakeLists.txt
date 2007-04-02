@@ -4,6 +4,7 @@
 include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
+	${PNG_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
 )
 
@@ -15,8 +16,13 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
+	${PNG_LIBRARIES}
 	${TIFF_LIBRARY}
 	mesautil
+)
+
+add_definitions (
+	${PNG_DEFINITIONS}
 )
 
 add_executable (crossbar crossbar.c)
