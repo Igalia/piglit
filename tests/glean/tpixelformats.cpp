@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 
@@ -1118,8 +1118,8 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[3] = testChan == 1 ? 255 : 0;
 			break;
 		case GL_RGB:
-			exp[0] = 
-			exp[1] = 
+			exp[0] =
+			exp[1] =
 			exp[2] = testChan == 0 ? 255 : 0;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
@@ -1130,8 +1130,8 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[3] = testChan == 1 ? 255 : 0;
 			break;
 		case GL_LUMINANCE:
-			exp[0] = 
-			exp[1] = 
+			exp[0] =
+			exp[1] =
 			exp[2] = testChan == 0 ? 255 : 0;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
@@ -1201,7 +1201,7 @@ PixelFormatsTest::CheckRendering(int width, int height, int comp,
 			sprintf(msg, "  Expected: 0x%02x 0x%02x 0x%02x 0x%02x\n",
 					expected[0], expected[1], expected[2], expected[3]);
 			env->log << msg;
-			sprintf(msg, "  Found:    0x%02x 0x%02x 0x%02x 0x%02x\n", 
+			sprintf(msg, "  Found:    0x%02x 0x%02x 0x%02x 0x%02x\n",
 					image[i + 0], image[i + 1], image[i + 2], image[i + 3]);
 			env->log << msg;
 			ok = false;
