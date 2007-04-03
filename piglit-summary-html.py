@@ -28,6 +28,7 @@ import os
 import sys
 
 import framework.core as core
+import framework.summary
 
 
 #############################################################################
@@ -36,139 +37,6 @@ import framework.core as core
 
 def testPathToHtmlFilename(path):
 	return filter(lambda s: s.isalnum() or s == '_', path.replace('/', '__')) + '.html'
-
-
-#############################################################################
-##### Annotation preprocessing
-#############################################################################
-
-class PassVector:
-	def __init__(self,p,w,f,s):
-		self.passnr = p
-		self.warnnr = w
-		self.failnr = f
-		self.skipnr = s
-
-	def add(self,o):
-		self.passnr += o.passnr
-		self.warnnr += o.warnnr
-		self.failnr += o.failnr
-		self.skipnr += o.skipnr
-
-def annotateOneTest(path, results):
-	"""\
-Result is an array containing one test result.
-"""
-	result = ''
-	if 'result' in results:
-		result = results['result']
-
-	vectormap = {
-		'pass': PassVector(1,0,0,0),
-		'warn': PassVector(0,1,0,0),
-		'fail': PassVector(0,0,1,0),
-		'skip': PassVector(0,0,0,1)
-	}
-
-	if result not in vectormap:
-		result = 'warn'
-
-	results.status = result
-	results.passvector = vectormap[result]
-	results.path = path
-
-	return results
-
-
-def annotateTest(path, results):
-	"""\
-Result is an array containing corresponding test results, one per test run
-"""
-	for j in range(len(results)):
-		results[j] = annotateOneTest(path, results[j])
-
-	stati = set([r.status for r in results])
-	changes = len(stati) > 1
-	problems = len(stati - set(['pass', 'skip'])) > 0
-	for r in results:
-		r.changes = changes
-		r.problems = problems
-
-
-def annotateGroup(path, results):
-	"""\
-Result is an array containing corresponding GroupResults, one per test run
-"""
-	groupnames = set()
-	testnames = set()
-
-	changes = False
-	problems = False
-
-	for r in results:
-		r.passvector = PassVector(0,0,0,0)
-		r.path = path
-
-		for name in r:
-			if type(name) != str:
-				continue
-
-			if isinstance(r[name], core.GroupResult):
-				groupnames.add(name)
-			else:
-				testnames.add(name)
-
-	for name in groupnames:
-		children = []
-
-		for r in results:
-			if name not in r:
-				r[name] = core.GroupResult()
-
-			children.append(r[name])
-
-		spath = name
-		if len(path) > 0:
-			spath = path + '/' + spath
-
-		annotateGroup(spath, children)
-
-		changes = changes or results[0][name].changes
-		problems = problems or results[0][name].problems
-
-		for r in results:
-			r.passvector.add(r[name].passvector)
-
-
-	for name in testnames:
-		children = []
-
-		for r in results:
-			if name not in r:
-				r[name] = core.TestResult({}, { 'result': 'skip' })
-
-			# BACKWARDS COMPATIBILITY
-			if not isinstance(r[name], core.TestResult):
-				r[name] = core.TestResult({}, r[name])
-			# END BACKWARDS COMPATIBILITY
-
-			children.append(r[name])
-
-		spath = name
-		if len(path) > 0:
-			spath = path + '/' + spath
-
-		annotateTest(spath, children)
-
-		changes = changes or results[0][name].changes
-		problems = problems or results[0][name].problems
-
-		for r in results:
-			r.passvector.add(r[name].passvector)
-
-	for r in results:
-		r.changes = changes
-		r.problems = problems
 
 
 #############################################################################
@@ -246,9 +114,9 @@ def buildDetails(testResult):
 	return text
 
 
-def writeResultHtml(testResult, filename):
-	path = testResult.path
-	name = testResult.path.split('/')[-1]
+def writeResultHtml(test, testResult, filename):
+	path = test.path
+	name = test.name
 	status = testResult.status
 
 	if 'result' in testResult:
@@ -261,33 +129,24 @@ def writeResultHtml(testResult, filename):
 	writefile(filename, Result % locals())
 
 
-def recursiveWriteResultHtml(results, summaryDir):
-	for n in results:
-		if type(n) != str:
-			continue
-
-		if isinstance(results[n], core.GroupResult):
-			recursiveWriteResultHtml(results[n], summaryDir)
-		else:
-			writeResultHtml(results[n], summaryDir + '/' + testPathToHtmlFilename(results[n].path))
-
-
-def buildTestSummary(indent, alternate, name, test):
+def buildTestSummary(indent, alternate, testsummary):
 	tenindent = 10 - indent
+	path = testsummary.path
+	name = testsummary.name
 	testruns = "".join([IndexTestTestrun % {
 		'alternate': alternate,
-		'status': t.status,
-		'link': r.codename + '/' + testPathToHtmlFilename(t.path)
-	} for r,t in test])
+		'status': result.status,
+		'link': result.testrun.codename + '/' + testPathToHtmlFilename(path)
+	} for result in testsummary.results])
 
 	return IndexTest % locals()
 
 
-def buildGroupSummaryTestrun(results, group):
-	passnr = group.passvector.passnr
-	warnnr = group.passvector.warnnr
-	failnr = group.passvector.failnr
-	skipnr = group.passvector.skipnr
+def buildGroupSummaryTestrun(groupresult):
+	passnr = groupresult.passvector.passnr
+	warnnr = groupresult.passvector.warnnr
+	failnr = groupresult.passvector.failnr
+	skipnr = groupresult.passvector.skipnr
 	totalnr = passnr + warnnr + failnr # do not count skips
 
 	if failnr > 0:
@@ -302,42 +161,42 @@ def buildGroupSummaryTestrun(results, group):
 	return IndexGroupTestrun % locals()
 
 
-def buildGroupSummary(indent, name, results, showcurrent):
-	"""\
-testruns is an array of pairs (results,group), where results is the
-entire testrun record and group is the group we're currently printing.
-"""
+def buildGroupSummary(indent, groupsummary, showcurrent):
 	tenindent = 10 - indent
 
 	items = ''
 	alternate = 'a'
-	names = filter(lambda k: type(k) == str, results[0][1])
+	path = groupsummary.path
+	name = groupsummary.name
+	names = groupsummary.children.keys()
 
 	if showcurrent == 'changes':
-		names = filter(lambda n: results[0][1][n].changes, names)
+		names = filter(lambda n: groupsummary.children[n].changes, names)
 	elif showcurrent == 'problems':
-		names = filter(lambda n: results[0][1][n].problems, names)
+		names = filter(lambda n: groupsummary.children[n].problems, names)
 
 	names.sort()
 	for n in names:
-		if isinstance(results[0][1][n], core.GroupResult):
+		child = groupsummary.children[n]
+		if isinstance(child, framework.summary.GroupSummary):
 			items = items + IndexGroupGroup % {
-				'group': buildGroupSummary(indent+1, n, [(r,g[n]) for r,g in results], showcurrent)
+				'group': buildGroupSummary(indent+1, child, showcurrent)
 			}
 		else:
-			items = items + buildTestSummary(indent+1, alternate, n, [(r,g[n]) for r,g in results])
+			items = items + buildTestSummary(indent+1, alternate, child)
 
 		if alternate == 'a':
 			alternate = 'b'
 		else:
 			alternate = 'a'
 
-	testruns = "".join([buildGroupSummaryTestrun(r,g) for r,g in results])
+	testruns = "".join([buildGroupSummaryTestrun(result)
+			for result in groupsummary.results])
 
 	return IndexGroup % locals()
 
 
-def writeSummaryHtml(results, summaryDir, showcurrent):
+def writeSummaryHtml(summary, summaryDir, showcurrent):
 	"""\
 results is an array containing the top-level results dictionarys.
 """
@@ -348,9 +207,9 @@ results is an array containing the top-level results dictionarys.
 			page = SummaryPages[to]
 			return '<a href="%(page)s">%(to)s</a>' % locals()
 
-	group = buildGroupSummary(1, 'Total', [(r,r.results) for r in results], showcurrent)
-	testruns = "".join([IndexTestrun % r.__dict__ for r in results])
-	testrunsb = "".join([IndexTestrunB % r.__dict__ for r in results])
+	group = buildGroupSummary(1, summary.root, showcurrent)
+	testruns = "".join([IndexTestrun % tr.__dict__ for tr in summary.testruns])
+	testrunsb = "".join([IndexTestrunB % tr.__dict__ for tr in summary.testruns])
 
 	tolist = SummaryPages.keys()
 	tolist.sort()
@@ -400,17 +259,21 @@ def main():
 
 	results = [core.loadTestResults(name) for name in resultFilenames]
 
-	annotateGroup('', [r.results for r in results])
-	for r in results:
-		r.codename = filter(lambda s: s.isalnum(), r.name)
-		core.checkDir(summaryDir + '/' + r.codename, False)
-		recursiveWriteResultHtml(r.results, summaryDir + '/' + r.codename)
+	summary = framework.summary.Summary(results)
+	for j in range(len(summary.testruns)):
+		tr = summary.testruns[j]
+		tr.codename = filter(lambda s: s.isalnum(), tr.name)
+		dirname = summaryDir + '/' + tr.codename
+		core.checkDir(dirname, False)
+		for test in summary.allTests():
+			filename = dirname + testPathToHtmlFilename(test.path)
+			writeResultHtml(test, test.results[j], filename)
 
 	writefile(summaryDir + '/result.css', readfile(templatedir + 'result.css'))
 	writefile(summaryDir + '/index.css', readfile(templatedir + 'index.css'))
-	writeSummaryHtml(results, summaryDir, 'all')
-	writeSummaryHtml(results, summaryDir, 'problems')
-	writeSummaryHtml(results, summaryDir, 'changes')
+	writeSummaryHtml(summary, summaryDir, 'all')
+	writeSummaryHtml(summary, summaryDir, 'problems')
+	writeSummaryHtml(summary, summaryDir, 'changes')
 
 
 if __name__ == "__main__":
