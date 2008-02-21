@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <GL/glut.h>
+#include "piglit-util.h"
 
 static void CheckFail(const char* cond);
 
@@ -316,18 +317,6 @@ static void Key(unsigned char key, int x, int y)
 			break;
 	}
 	glutPostRedisplay();
-}
-
-
-/* A helper for finding errors in program strings */
-static int FindLine(const char *program, int position)
-{
-	int i, line = 1;
-	for (i = 0; i < position; i++) {
-		if (program[i] == '\n')
-			line++;
-	}
-	return line;
 }
 
 

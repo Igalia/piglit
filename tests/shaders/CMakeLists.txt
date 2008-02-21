@@ -3,10 +3,12 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
+	${piglit_SOURCE_DIR}/tests/util
 )
 
 link_directories (
 	${piglit_SOURCE_DIR}/tests/mesa/util
+	${piglit_SOURCE_DIR}/tests/util
 )
 
 link_libraries (
@@ -15,6 +17,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 	mesautil
+	piglitutil
 )
 
 add_executable (trinity-fp1 trinity-fp1.c)

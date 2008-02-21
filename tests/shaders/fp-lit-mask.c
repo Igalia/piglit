@@ -166,18 +166,6 @@ static void Key(unsigned char key, int x, int y)
 }
 
 
-/* A helper for finding errors in program strings */
-static int FindLine(const char *program, int position)
-{
-   int i, line = 1;
-   for (i = 0; i < position; i++) {
-      if (program[i] == '\n')
-         line++;
-   }
-   return line;
-}
-
-
 static void Init(void)
 {
 	int mask;
