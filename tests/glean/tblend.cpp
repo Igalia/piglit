@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,20 +23,32 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 // tblend.cpp:  Test blending functions.
 
+#include <assert.h>
 #include "tblend.h"
 #include "rand.h"
 #include "image.h"
 #include <cmath>
 
-namespace {
+#define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
-struct factorNameMapping {GLenum factor; char* name;};
-factorNameMapping factorNames[] = {
+static PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_func = NULL;
+static PFNGLBLENDCOLORPROC glBlendColor_func = NULL;
+static PFNGLBLENDEQUATIONPROC glBlendEquation_func = NULL;
+static PFNGLBLENDEQUATIONSEPARATEPROC glBlendEquationSeparate_func = NULL;
+
+//namespace {
+
+struct enumNameMapping {
+	GLenum token;
+	char* name;
+};
+
+enumNameMapping factorNames[] = {
 	{GL_DST_ALPHA,			"GL_DST_ALPHA"},
 	{GL_DST_COLOR,			"GL_DST_COLOR"},
 	{GL_ONE,			"GL_ONE"},
@@ -47,33 +59,73 @@ factorNameMapping factorNames[] = {
 	{GL_SRC_ALPHA,			"GL_SRC_ALPHA"},
 	{GL_SRC_ALPHA_SATURATE,		"GL_SRC_ALPHA_SATURATE"},
 	{GL_SRC_COLOR,			"GL_SRC_COLOR"},
-	{GL_ZERO,			"GL_ZERO"}
+	{GL_ZERO,			"GL_ZERO"},
+	{GL_CONSTANT_COLOR,		"GL_CONSTANT_COLOR"},
+	{GL_ONE_MINUS_CONSTANT_COLOR,	"GL_ONE_MINUS_CONSTANT_COLOR"},
+	{GL_CONSTANT_ALPHA,		"GL_CONSTANT_ALPHA"},
+	{GL_ONE_MINUS_CONSTANT_ALPHA,	"GL_ONE_MINUS_CONSTANT_ALPHA"}
 };
+
+// aka blend "equation"
+enumNameMapping blendopNames[] = {
+	{GL_FUNC_ADD,			"GL_FUNC_ADD"},
+	{GL_FUNC_SUBTRACT,		"GL_FUNC_SUBTRACT"},
+	{GL_FUNC_REVERSE_SUBTRACT,	"GL_FUNC_REVERSE_SUBTRACT"},
+	{GL_MIN,			"GL_MIN"},
+	{GL_MAX,			"GL_MAX"}
+};
+
 
 char*
 factorToName(GLenum factor) {
-	for (unsigned int i = 0;
-	    i < sizeof(factorNames) / sizeof(factorNames[0]);
-	    ++i)
-		if (factorNames[i].factor == factor)
+	for (unsigned int i = 0; i < ELEMENTS(factorNames); ++i)
+		if (factorNames[i].token == factor)
 			return factorNames[i].name;
 	return 0;
 } // factorToName
 
 GLenum
 nameToFactor(string& name) {
-	for (unsigned int i = 0;
-	    i < sizeof(factorNames) / sizeof(factorNames[0]);
-	    ++i)
+	for (unsigned int i = 0; i < ELEMENTS(factorNames); ++i)
 		if (factorNames[i].name == name)
-			return factorNames[i].factor;
+			return factorNames[i].token;
 	return GL_ZERO;
 } // nameToFactor
+
+char *
+opToName(GLenum op) {
+	for (unsigned int i = 0; i < ELEMENTS(blendopNames); ++i)
+		if (blendopNames[i].token == op)
+			return blendopNames[i].name;
+	return 0;
+} // opToName
+
+GLenum
+nameToOp(string& name) {
+	for (unsigned int i = 0; i < ELEMENTS(blendopNames); ++i)
+		if (blendopNames[i].name == name)
+			return blendopNames[i].token;
+	return GL_ZERO;
+} // nameToOp
+
 
 bool
 needsDstAlpha(const GLenum func) {
 	return func == GL_DST_ALPHA || func == GL_ONE_MINUS_DST_ALPHA
 		|| func == GL_SRC_ALPHA_SATURATE;
+}
+
+bool
+needsBlendColor(const GLenum func) {
+	switch (func) {
+	case GL_CONSTANT_COLOR:
+	case GL_ONE_MINUS_CONSTANT_COLOR:
+	case GL_CONSTANT_ALPHA:
+	case GL_ONE_MINUS_CONSTANT_ALPHA:
+		return true;
+	default:
+		return false;
+	}
 }
 
 void
@@ -88,7 +140,7 @@ makeRGBA(GLEAN::RandomBitsDouble& rRand,
 	rgba[3] = aRand.next();
 } // makeRGBA
 
-void
+void 
 drawQuad(const int x, const int y, const float* color) {
 	glColor4fv(color);
 	glBegin(GL_QUADS);
@@ -109,101 +161,295 @@ clamp(float f) {
 		return f;
 } // clamp
 
-void
-applyBlend(GLenum srcFactor, GLenum dstFactor, float* dst, float* src) {
-	// XXX Currently we don't test any of the const-color blend factors.
-	// It would be a good idea to do so as soon as we have access to an
-	// implementation that supports the OpenGL 1.2 imaging extensions.
+static void
+applyBlend(GLenum srcFactorRGB, GLenum srcFactorA,
+	   GLenum dstFactorRGB, GLenum dstFactorA,
+	   GLenum opRGB, GLenum opA,
+	   float* dst, const float* src,
+	   const GLfloat constantColor[4])
+{
+	float sf[4], df[4];
 
-	float sf[4];
-	switch (srcFactor) {
-	case GL_ZERO:
-		sf[0] = sf[1] = sf[2] = sf[3] = 0.0;
-		break;
-	case GL_ONE:
-		sf[0] = sf[1] = sf[2] = sf[3] = 1.0;
-		break;
-	case GL_DST_COLOR:
-		sf[0] = dst[0]; sf[1] = dst[1]; sf[2] = dst[2]; sf[3] = dst[3];
-		break;
-	case GL_ONE_MINUS_DST_COLOR:
-		sf[0] = 1.0 - dst[0]; sf[1] = 1.0 - dst[1];
-		sf[2] = 1.0 - dst[2]; sf[3] = 1.0 - dst[3];
-		break;
-	case GL_SRC_ALPHA:
-		sf[0] = sf[1] = sf[2] = sf[3] = src[3];
-		break;
-	case GL_ONE_MINUS_SRC_ALPHA:
-		sf[0] = sf[1] = sf[2] = sf[3] = 1.0 - src[3];
-		break;
-	case GL_DST_ALPHA:
-		sf[0] = sf[1] = sf[2] = sf[3] = dst[3];
-		break;
-	case GL_ONE_MINUS_DST_ALPHA:
-		sf[0] = sf[1] = sf[2] = sf[3] = 1.0 - dst[3];
-		break;
-	case GL_SRC_ALPHA_SATURATE: {
-		float f = 1.0 - dst[3];
-		if (src[3] < f)
-			f = src[3];
-		sf[0] = sf[1] = sf[2] = f; sf[3] = 1.0;
+	if (opRGB != GL_MIN && opRGB != GL_MAX) {
+		// Src RGB term
+		switch (srcFactorRGB) {
+		case GL_ZERO:
+			sf[0] = sf[1] = sf[2] = 0.0;
+			break;
+		case GL_ONE:
+			sf[0] = sf[1] = sf[2] = 1.0;
+			break;
+		case GL_DST_COLOR:
+			sf[0] = dst[0];
+			sf[1] = dst[1];
+			sf[2] = dst[2];
+			break;
+		case GL_ONE_MINUS_DST_COLOR:
+			sf[0] = 1.0 - dst[0];
+			sf[1] = 1.0 - dst[1];
+			sf[2] = 1.0 - dst[2];
+			break;
+		case GL_SRC_ALPHA:
+			sf[0] = sf[1] = sf[2] = src[3];
+			break;
+		case GL_ONE_MINUS_SRC_ALPHA:
+			sf[0] = sf[1] = sf[2] = 1.0 - src[3];
+			break;
+		case GL_DST_ALPHA:
+			sf[0] = sf[1] = sf[2] = dst[3];
+			break;
+		case GL_ONE_MINUS_DST_ALPHA:
+			sf[0] = sf[1] = sf[2] = 1.0 - dst[3];
+			break;
+		case GL_SRC_ALPHA_SATURATE: {
+			float f = 1.0 - dst[3];
+			if (src[3] < f)
+				f = src[3];
+			sf[0] = sf[1] = sf[2] = f;
+			}
+			break;
+		case GL_CONSTANT_COLOR:
+			sf[0] = constantColor[0];
+			sf[1] = constantColor[1];
+			sf[2] = constantColor[2];
+			break;
+		case GL_ONE_MINUS_CONSTANT_COLOR:
+			sf[0] = 1.0 - constantColor[0];
+			sf[1] = 1.0 - constantColor[1];
+			sf[2] = 1.0 - constantColor[2];
+			break;
+		case GL_CONSTANT_ALPHA:
+			sf[0] =
+			sf[1] =
+			sf[2] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_ALPHA:
+			sf[0] =
+			sf[1] =
+			sf[2] = 1.0 - constantColor[3];
+			break;
+		default:
+			sf[0] = sf[1] = sf[2] = 0.0;
+			abort();
+			break;
 		}
-		break;
-	default:
-		sf[0] = sf[1] = sf[2] = sf[3] = 0.0;
-		break;
+
+		// Dest RGB term
+		switch (dstFactorRGB) {
+		case GL_ZERO:
+			df[0] = df[1] = df[2] = 0.0;
+			break;
+		case GL_ONE:
+			df[0] = df[1] = df[2] = 1.0;
+			break;
+		case GL_SRC_COLOR:
+			df[0] = src[0];
+			df[1] = src[1];
+			df[2] = src[2];
+			break;
+		case GL_ONE_MINUS_SRC_COLOR:
+			df[0] = 1.0 - src[0];
+			df[1] = 1.0 - src[1];
+			df[2] = 1.0 - src[2];
+			break;
+		case GL_SRC_ALPHA:
+			df[0] = df[1] = df[2] = src[3];
+			break;
+		case GL_ONE_MINUS_SRC_ALPHA:
+			df[0] = df[1] = df[2] = 1.0 - src[3];
+			break;
+		case GL_DST_ALPHA:
+			df[0] = df[1] = df[2] = dst[3];
+			break;
+		case GL_ONE_MINUS_DST_ALPHA:
+			df[0] = df[1] = df[2] = 1.0 - dst[3];
+			break;
+		case GL_CONSTANT_COLOR:
+			df[0] = constantColor[0];
+			df[1] = constantColor[1];
+			df[2] = constantColor[2];
+			break;
+		case GL_ONE_MINUS_CONSTANT_COLOR:
+			df[0] = 1.0 - constantColor[0];
+			df[1] = 1.0 - constantColor[1];
+			df[2] = 1.0 - constantColor[2];
+			break;
+		case GL_CONSTANT_ALPHA:
+			df[0] =
+			df[1] =
+			df[2] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_ALPHA:
+			df[0] =
+			df[1] =
+			df[2] = 1.0 - constantColor[3];
+			break;
+		default:
+			df[0] = df[1] = df[2] = 0.0;
+			abort();
+			break;
+		}
 	}
 
-	float df[4];
-	switch (dstFactor) {
-	case GL_ZERO:
-		df[0] = df[1] = df[2] = df[3] = 0.0;
-		break;
-	case GL_ONE:
-		df[0] = df[1] = df[2] = df[3] = 1.0;
-		break;
-	case GL_SRC_COLOR:
-		df[0] = src[0]; df[1] = src[1]; df[2] = src[2]; df[3] = src[3];
-		break;
-	case GL_ONE_MINUS_SRC_COLOR:
-		df[0] = 1.0 - src[0]; df[1] = 1.0 - src[1];
-		df[2] = 1.0 - src[2]; df[3] = 1.0 - src[3];
-		break;
-	case GL_SRC_ALPHA:
-		df[0] = df[1] = df[2] = df[3] = src[3];
-		break;
-	case GL_ONE_MINUS_SRC_ALPHA:
-		df[0] = df[1] = df[2] = df[3] = 1.0 - src[3];
-		break;
-	case GL_DST_ALPHA:
-		df[0] = df[1] = df[2] = df[3] = dst[3];
-		break;
-	case GL_ONE_MINUS_DST_ALPHA:
-		df[0] = df[1] = df[2] = df[3] = 1.0 - dst[3];
-		break;
-	default:
-		df[0] = df[1] = df[2] = df[3] = 0.0;
-		break;
+	if (opA != GL_MIN && opA != GL_MAX) {
+		// Src Alpha term
+		switch (srcFactorA) {
+		case GL_ZERO:
+			sf[3] = 0.0;
+			break;
+		case GL_ONE:
+			sf[3] = 1.0;
+			break;
+		case GL_DST_COLOR:
+			sf[3] = dst[3];
+			break;
+		case GL_ONE_MINUS_DST_COLOR:
+			sf[3] = 1.0 - dst[3];
+			break;
+		case GL_SRC_ALPHA:
+			sf[3] = src[3];
+			break;
+		case GL_ONE_MINUS_SRC_ALPHA:
+			sf[3] = 1.0 - src[3];
+			break;
+		case GL_DST_ALPHA:
+			sf[3] = dst[3];
+			break;
+		case GL_ONE_MINUS_DST_ALPHA:
+			sf[3] = 1.0 - dst[3];
+			break;
+		case GL_SRC_ALPHA_SATURATE:
+			sf[3] = 1.0;
+			break;
+		case GL_CONSTANT_COLOR:
+			sf[3] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_COLOR:
+			sf[3] = 1.0 - constantColor[3];
+			break;
+		case GL_CONSTANT_ALPHA:
+			sf[3] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_ALPHA:
+			sf[3] = 1.0 - constantColor[3];
+			break;
+		default:
+			sf[3] = 0.0;
+			abort();
+			break;
+		}
+
+		// Dst Alpha term
+		switch (dstFactorA) {
+		case GL_ZERO:
+			df[3] = 0.0;
+			break;
+		case GL_ONE:
+			df[3] = 1.0;
+			break;
+		case GL_SRC_COLOR:
+			df[3] = src[3];
+			break;
+		case GL_ONE_MINUS_SRC_COLOR:
+			df[3] = 1.0 - src[3];
+			break;
+		case GL_SRC_ALPHA:
+			df[3] = src[3];
+			break;
+		case GL_ONE_MINUS_SRC_ALPHA:
+			df[3] = 1.0 - src[3];
+			break;
+		case GL_DST_ALPHA:
+			df[3] = dst[3];
+			break;
+		case GL_ONE_MINUS_DST_ALPHA:
+			df[3] = 1.0 - dst[3];
+			break;
+		case GL_CONSTANT_COLOR:
+			df[3] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_COLOR:
+			df[3] = 1.0 - constantColor[3];
+			break;
+		case GL_CONSTANT_ALPHA:
+			df[3] = constantColor[3];
+			break;
+		case GL_ONE_MINUS_CONSTANT_ALPHA:
+			df[3] = 1.0 - constantColor[3];
+			break;
+		default:
+			df[3] = 0.0;
+			abort();
+			break;
+		}
 	}
 
-	dst[0] = clamp(src[0] * sf[0] + dst[0] * df[0]);
-	dst[1] = clamp(src[1] * sf[1] + dst[1] * df[1]);
-	dst[2] = clamp(src[2] * sf[2] + dst[2] * df[2]);
-	dst[3] = clamp(src[3] * sf[3] + dst[3] * df[3]);
+	switch (opRGB) {
+	case GL_FUNC_ADD:
+		dst[0] = clamp(src[0] * sf[0] + dst[0] * df[0]);
+		dst[1] = clamp(src[1] * sf[1] + dst[1] * df[1]);
+		dst[2] = clamp(src[2] * sf[2] + dst[2] * df[2]);
+		break;
+	case GL_FUNC_SUBTRACT:
+		dst[0] = clamp(src[0] * sf[0] - dst[0] * df[0]);
+		dst[1] = clamp(src[1] * sf[1] - dst[1] * df[1]);
+		dst[2] = clamp(src[2] * sf[2] - dst[2] * df[2]);
+		break;
+	case GL_FUNC_REVERSE_SUBTRACT:
+		dst[0] = clamp(dst[0] * df[0] - src[0] * sf[0]);
+		dst[1] = clamp(dst[1] * df[1] - src[1] * sf[1]);
+		dst[2] = clamp(dst[2] * df[2] - src[2] * sf[2]);
+		break;
+	case GL_MIN:
+		dst[0] = min(src[0], dst[0]);
+		dst[1] = min(src[1], dst[1]);
+		dst[2] = min(src[2], dst[2]);
+		break;
+	case GL_MAX:
+		dst[0] = max(src[0], dst[0]);
+		dst[1] = max(src[1], dst[1]);
+		dst[2] = max(src[2], dst[2]);
+		break;
+        default:
+		abort();
+        }
+
+	switch (opA) {
+	case GL_FUNC_ADD:
+		dst[3] = clamp(src[3] * sf[3] + dst[3] * df[3]);
+		break;
+	case GL_FUNC_SUBTRACT:
+		dst[3] = clamp(src[3] * sf[3] - dst[3] * df[3]);
+		break;
+	case GL_FUNC_REVERSE_SUBTRACT:
+		dst[3] = clamp(dst[3] * df[3] - src[3] * sf[3]);
+		break;
+	case GL_MIN:
+		dst[3] = min(src[3], dst[3]);
+		break;
+	case GL_MAX:
+		dst[3] = max(src[3], dst[3]);
+		break;
+        default:
+		abort();
+        }
+
 } // applyBlend
 
-struct runFactorsResult {
-	float readbackErrorBits;
-	float blendRGBErrorBits;
-	float blendAlphaErrorBits;
-};
 
-runFactorsResult
-runFactors(GLenum srcFactor, GLenum dstFactor,
-    GLEAN::DrawingSurfaceConfig& config, GLEAN::Environment& env,
-    float rgbTolerance, float alphaTolerance) {
+namespace GLEAN {
+
+
+BlendFuncTest::runFactorsResult
+BlendFuncTest::runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
+			  GLenum dstFactorRGB, GLenum dstFactorA,
+			  GLenum opRGB, GLenum opA,
+			  const GLfloat constantColor[4],
+			  GLEAN::DrawingSurfaceConfig& config,
+			  GLEAN::Environment& env)
+{
 	using namespace GLEAN;
-
+	
 	runFactorsResult result;
 	int y;
 
@@ -262,7 +508,17 @@ runFactors(GLenum srcFactor, GLenum dstFactor,
 	Image src(drawingSize, drawingSize, GL_RGBA, GL_FLOAT);
 	RandomBitsDouble srcARand(16, 42);
 
-	glBlendFunc(srcFactor, dstFactor);
+	if (haveSepFunc)
+		glBlendFuncSeparate_func(srcFactorRGB, dstFactorRGB,
+					 srcFactorA, dstFactorA);
+	else
+		glBlendFunc(srcFactorRGB, dstFactorRGB);
+
+	if (haveBlendEquationSep)
+		glBlendEquationSeparate_func(opRGB, opA);
+	else if (haveBlendEquation)
+		glBlendEquation_func(opRGB);
+
 	glEnable(GL_BLEND);
 
 	dRow = expected.pixels();
@@ -278,7 +534,10 @@ runFactors(GLenum srcFactor, GLenum dstFactor,
 			sPix[2] = rgba[2];
 			sPix[3] = rgba[3];
 			drawQuad(x + 1, y + 1, rgba);
-			applyBlend(srcFactor, dstFactor, pix, rgba);
+			applyBlend(srcFactorRGB, srcFactorA,
+				   dstFactorRGB, dstFactorA,
+				   opRGB, opA,
+				   pix, rgba, constantColor);
 			pix += 4;
 			sPix += 4;
 		}
@@ -294,8 +553,7 @@ runFactors(GLenum srcFactor, GLenum dstFactor,
 	// maximum error encountered.
 	Image actual(drawingSize, drawingSize, GL_RGBA, GL_FLOAT);
 	actual.read(1, 1);
-	result.blendRGBErrorBits = 0.0;
-	result.blendAlphaErrorBits = 0.0;
+	result.blendErrorBits = 0.0;
 	sRow = actual.pixels();
 	dRow = expected.pixels();
 	for (/*int */y = 0; y < drawingSize; ++y) {
@@ -306,15 +564,13 @@ runFactors(GLenum srcFactor, GLenum dstFactor,
 			float gError = fabs(aPix[1] - ePix[1]);
 			float bError = fabs(aPix[2] - ePix[2]);
 			float aError = fabs(aPix[3] - ePix[3]);
-			result.blendRGBErrorBits =
-				max(static_cast<double>(result.blendRGBErrorBits),
+			result.blendErrorBits =
+				max(static_cast<double>(result.blendErrorBits),
 				max(ErrorBits(rError, config.r),
 				max(ErrorBits(gError, config.g),
-				    ErrorBits(bError, config.b))));
-			result.blendAlphaErrorBits =
-			    max(static_cast<double>(result.blendAlphaErrorBits),
-				    ErrorBits(aError, config.a));
-			if (result.blendRGBErrorBits > rgbTolerance || result.blendAlphaErrorBits > alphaTolerance) {
+				max(ErrorBits(bError, config.b),
+				    ErrorBits(aError, config.a)))));
+			if (result.blendErrorBits > 1.0) {
 				if (env.options.verbosity) {
 float* sPix = reinterpret_cast<float*>(src.pixels()
 	+ y * src.rowSizeInBytes() + x * 4 * sizeof(float));
@@ -345,9 +601,44 @@ env.log << '\n'
 	return result;
 } // runOneSet
 
-} // anonymous namespace
 
-namespace GLEAN {
+bool
+BlendFuncTest::runCombo(BlendFuncResult& r, Window& w,
+			BlendFuncResult::PartialResult p,
+			GLEAN::Environment& env)
+{
+	runFactorsResult res(runFactors(p.srcRGB, p.srcA, p.dstRGB, p.dstA,
+					p.opRGB, p.opA, p.constColor,
+					*(r.config), env));
+	w.swap();
+
+	p.rbErr = res.readbackErrorBits;
+	p.blErr = res.blendErrorBits;
+	r.results.push_back(p);
+
+	if (p.rbErr > 1.0 || p.blErr > 1.0) {
+		env.log << name << ":  FAIL "
+			<< r.config->conciseDescription() << '\n'
+			<< "\tsource factor RGB = " << factorToName(p.srcRGB)
+			<< ", source factor A = " << factorToName(p.srcA)
+			<< "\n\tdest factor RGB = " << factorToName(p.dstRGB)
+			<< ", dest factor A = " << factorToName(p.dstA)
+			<< "\n\tequation RGB = " << opToName(p.opRGB)
+			<< ", equation A = " << opToName(p.opA)
+			<< "\n\tconst color = { "
+			<< p.constColor[0] << ", "
+			<< p.constColor[1] << ", "
+			<< p.constColor[2] << ", "
+			<< p.constColor[3] << " }"
+			<< "\n\tReadback had " << p.rbErr
+			<< " bits in error; blending had "
+			<< p.blErr << " bits in error.\n";
+		return false;
+	}
+	return true;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // runOne:  Run a single test case
@@ -365,7 +656,11 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 		GL_ONE_MINUS_SRC_ALPHA,
 		GL_DST_ALPHA,
 		GL_ONE_MINUS_DST_ALPHA,
-		GL_SRC_ALPHA_SATURATE
+		GL_SRC_ALPHA_SATURATE,
+		GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR,
+		GL_CONSTANT_ALPHA,
+		GL_ONE_MINUS_CONSTANT_ALPHA
 	};
 	static GLenum dstFactors[] = {
 		GL_ZERO,
@@ -375,64 +670,170 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 		GL_SRC_ALPHA,
 		GL_ONE_MINUS_SRC_ALPHA,
 		GL_DST_ALPHA,
-		GL_ONE_MINUS_DST_ALPHA
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR,
+		GL_CONSTANT_ALPHA,
+		GL_ONE_MINUS_CONSTANT_ALPHA
+	};
+	static GLenum operators[] = {
+		GL_FUNC_ADD,
+		GL_FUNC_SUBTRACT,
+		GL_FUNC_REVERSE_SUBTRACT,
+		GL_MIN,
+		GL_MAX
 	};
 
-	// Hack: Make driver tests on incorrect hardware feasible
-	// by adjusting the error tolerance to whatever the hardware can do
-	float rgbTolerance = 1.0;
-	float alphaTolerance = 1.0;
-	const char* s;
-
-	s = getenv("GLEAN_BLEND_RGB_TOLERANCE");
-	if (s) {
-		rgbTolerance = atof(s);
-		env->log << "Note: RGB tolerance adjusted to " << rgbTolerance << "\n";
-	}
-	s = getenv("GLEAN_BLEND_ALPHA_TOLERANCE");
-	if (s) {
-		alphaTolerance = atof(s);
-		env->log << "Note: Alpha tolerance adjusted to " << alphaTolerance << "\n";
-	}
-
+	unsigned numSrcFactorsSep, numDstFactorsSep;
+	unsigned numOperatorsRGB, numOperatorsA;
+	BlendFuncResult::PartialResult p;
 	bool allPassed = true;
-	for (unsigned int sf = 0; sf < sizeof(srcFactors)/sizeof(srcFactors[0]);
-	    ++sf)
 
-		for (unsigned int df = 0;
-		    df < sizeof(dstFactors)/sizeof(dstFactors[0]); ++df) {
+	// test for features, get function pointers
+	if (GLUtils::getVersion() >= 1.4) {
+		haveSepFunc = true;
+		glBlendFuncSeparate_func = (PFNGLBLENDFUNCSEPARATEPROC)
+			GLUtils::getProcAddress("glBlendFuncSeparate");
+	}
+	else if (GLUtils::haveExtension("GL_EXT_blend_func_separate")) {
+		haveSepFunc = true;
+		glBlendFuncSeparate_func = (PFNGLBLENDFUNCSEPARATEPROC)
+			GLUtils::getProcAddress("glBlendFuncSeparateEXT");
+	}
 
-			BlendFuncResult::PartialResult p;
-			p.src = srcFactors[sf];
-			p.dst = dstFactors[df];
+	if (GLUtils::getVersion() >= 1.4) {
+		haveBlendColor = true;
+		glBlendColor_func = (PFNGLBLENDCOLORPROC)
+			GLUtils::getProcAddress("glBlendColor");
+	}
+	else if (GLUtils::haveExtension("GL_EXT_blend_color")) {
+		haveBlendColor = true;
+		glBlendColor_func = (PFNGLBLENDCOLORPROC)
+			GLUtils::getProcAddress("glBlendColorEXT");
+	}
 
-			if ((needsDstAlpha(p.src) || needsDstAlpha(p.dst))
-			    && (r.config->a == 0))
-				continue;
+	if (GLUtils::getVersion() >= 1.4) {
+		haveBlendEquation = true;
+		glBlendEquation_func = (PFNGLBLENDEQUATIONPROC)
+			GLUtils::getProcAddress("glBlendEquation");
+	}
+	else if (GLUtils::haveExtension("GL_EXT_blend_subtract") &&
+		 GLUtils::haveExtension("GL_EXT_blend_min_max")) {
+		haveBlendEquation = true;
+		glBlendEquation_func = (PFNGLBLENDEQUATIONPROC)
+			GLUtils::getProcAddress("glBlendEquationEXT");
+	}
 
-			runFactorsResult res(runFactors(p.src, p.dst,
-				*(r.config), *env, rgbTolerance, alphaTolerance));
-			w.swap();
+	if (GLUtils::getVersion() >= 2.0) {
+		haveBlendEquationSep = true;
+		glBlendEquationSeparate_func = (PFNGLBLENDEQUATIONSEPARATEPROC)
+			GLUtils::getProcAddress("glBlendEquationSeparate");
+	}
+	else if (GLUtils::haveExtension("GL_EXT_blend_equation_separate")) {
+		haveBlendEquationSep = true;
+		glBlendEquationSeparate_func = (PFNGLBLENDEQUATIONSEPARATEPROC)
+			GLUtils::getProcAddress("glBlendEquationSeparateEXT");
+	}
 
-			p.rbErr = res.readbackErrorBits;
-			p.blRGBErr = res.blendRGBErrorBits;
-			p.blAErr = res.blendAlphaErrorBits;
-			r.results.push_back(p);
+	if (haveBlendColor) {
+		// Just one blend color setting for all tests
+		p.constColor[0] = 0.25;
+		p.constColor[1] = 0.0;
+		p.constColor[2] = 1.0;
+		p.constColor[3] = 0.75;
+		glBlendColor_func(p.constColor[0], p.constColor[1],
+				  p.constColor[2], p.constColor[3]);
+	}
 
-			if (p.rbErr > 1.0 || p.blRGBErr > rgbTolerance || p.blAErr > alphaTolerance) {
-				env->log << name << ":  FAIL "
-					<< r.config->conciseDescription()<< '\n'
-					<< "\tsource factor = "
-					<< factorToName(p.src)
-					<< ", dest factor = "
-					<< factorToName(p.dst)
-					<< "\n\tReadback had " << p.rbErr
-					<< " bits in error; RGB blending had "
-					<< p.blRGBErr << " bits in error, Alpha blending had "
-					<< p.blAErr << " bits in error.\n";
-				allPassed = false;
+	if (haveSepFunc) {
+		numSrcFactorsSep = ELEMENTS(srcFactors);
+		numDstFactorsSep = ELEMENTS(dstFactors);
+	}
+	else {
+		numSrcFactorsSep = 1;
+		numDstFactorsSep = 1;
+	}
+
+	if (haveBlendEquation) {
+		numOperatorsRGB = ELEMENTS(operators);
+		numOperatorsA = ELEMENTS(operators);
+	}
+	else {
+		numOperatorsRGB = 1; // just ADD
+		numOperatorsA = 1; // just ADD
+	}
+
+#if 0
+	// use this to test a single combination:
+	p.srcRGB = p.srcA = GL_SRC_ALPHA;
+	p.dstRGB = p.dstA = GL_ONE_MINUS_SRC_ALPHA;
+	p.opRGB = GL_FUNC_ADD;
+	p.opA = GL_FUNC_ADD;
+	allPassed = runCombo(r, w, p, *env);
+#else
+	for (unsigned int op = 0; op < numOperatorsRGB; ++op) {
+		p.opRGB = operators[op];
+
+		for (unsigned int opa = 0; opa < numOperatorsA; ++opa) {
+			p.opA = operators[opa];
+
+			unsigned int step;
+			if (p.opRGB == GL_FUNC_ADD && p.opA == GL_FUNC_ADD) {
+				// test _all_ blend term combinations
+				step = 1;
+			}
+			else if (p.opRGB == GL_MIN || p.opRGB == GL_MAX ||
+				 p.opA == GL_MIN || p.opA == GL_MAX) {
+				// blend terms are N/A so only do one iteration of loops
+				step = 1000;
+			}
+			else {
+				// subtract modes: do every 3rd blend term for speed
+				step = 3;
+			}
+
+			for (unsigned int sf = 0; sf < ELEMENTS(srcFactors); sf += step) {
+				for (unsigned int sfa = 0; sfa < numSrcFactorsSep; sfa += step) {
+					for (unsigned int df = 0; df < ELEMENTS(dstFactors); df += step) {
+						for (unsigned int dfa = 0; dfa < numDstFactorsSep; dfa += step) {
+
+							if (haveSepFunc) {
+								p.srcRGB = srcFactors[sf];
+								p.srcA = srcFactors[sfa];
+								p.dstRGB = dstFactors[df];
+								p.dstA = dstFactors[dfa];
+							}
+							else {
+								p.srcRGB = p.srcA = srcFactors[sf];
+								p.dstRGB = p.dstA = dstFactors[df];
+							}
+
+							// skip test if it depends on non-existant alpha channel
+							if ((r.config->a == 0)
+								&& (needsDstAlpha(p.srcRGB) ||
+									needsDstAlpha(p.srcA) ||
+									needsDstAlpha(p.dstRGB) ||
+									needsDstAlpha(p.dstA)))
+								continue;
+
+							// skip test if blend color used, but not supported.
+							if (!haveBlendColor
+								&& (needsBlendColor(p.srcRGB) ||
+									needsBlendColor(p.srcA) ||
+									needsBlendColor(p.dstRGB) ||
+									needsBlendColor(p.dstA)))
+								continue;
+
+							if (!runCombo(r, w, p, *env)) {
+								allPassed = false;
+							}
+						}
+					}
+				}
 			}
 		}
+	}
+#endif
 
 	r.pass = allPassed;
 } // BlendFuncTest::runOne
@@ -449,6 +850,37 @@ BlendFuncTest::logOne(BlendFuncResult& r) {
 }
 
 
+bool
+BlendFuncTest::equalMode(const BlendFuncResult::PartialResult &r1,
+			 const BlendFuncResult::PartialResult &r2) const
+{
+	return (r1.srcRGB == r2.srcRGB &&
+		r1.srcA == r2.srcA &&
+		r1.dstRGB == r2.dstRGB &&
+		r1.dstA == r2.dstA &&
+		r1.opRGB == r2.opRGB &&
+		r1.opA == r2.opA);
+}
+
+
+void
+BlendFuncTest::printMode(const BlendFuncResult::PartialResult &r) const
+{
+	env->log << "\t\t"
+		 << factorToName(r.srcRGB)
+		 << ' '
+		 << factorToName(r.srcA)
+		 << ' '
+		 << factorToName(r.dstRGB)
+		 << ' '
+		 << factorToName(r.dstA)
+		 << ' '
+		 << opToName(r.opRGB)
+		 << ' '
+		 << opToName(r.opA)
+		 << '\n';
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // compareOne:  Compare results for a single test case
 ///////////////////////////////////////////////////////////////////////////////
@@ -463,15 +895,14 @@ BlendFuncTest::compareOne(BlendFuncResult& oldR, BlendFuncResult& newR) {
 	for (np = newR.results.begin(); np != newR.results.end(); ++np)
 		// Find the matching case, if any, in the old results:
 		for (op = oldR.results.begin(); op != oldR.results.end(); ++op)
-			if (np->src == op->src && np->dst == op->dst) {
+			if (equalMode(*np, *op)) {
 				readbackStats.sample(np->rbErr - op->rbErr);
-				blendStats.sample(np->blRGBErr - op->blRGBErr);
-				blendStats.sample(np->blAErr - op->blAErr);
+				blendStats.sample(np->blErr - op->blErr);
 			}
 
 	if (readbackStats.n() == static_cast<int>(newR.results.size())
-	 && newR.results.size() == oldR.results.size()
-	 && readbackStats.mean() == 0.0 && blendStats.mean() == 0.0) {
+	    && newR.results.size() == oldR.results.size()
+	    && readbackStats.mean() == 0.0 && blendStats.mean() == 0.0) {
 		if (env->options.verbosity)
 			env->log << name << ": SAME "
 				<< newR.config->conciseDescription() << '\n';
@@ -501,15 +932,10 @@ BlendFuncTest::compareOne(BlendFuncResult& oldR, BlendFuncResult& newR) {
 			    np != newR.results.end(); ++np) {
 				for (op = oldR.results.begin();
 				    op != oldR.results.end(); ++op)
-					if (np->src == op->src
-					 && np->dst == op->dst)
+					if (equalMode(*np, *op))
 						break;
 				if (op == oldR.results.end())
-					env->log << "\t\t"
-						<< factorToName(np->src)
-						<< ' '
-						<< factorToName(np->dst)
-						<< '\n';
+					printMode(*np);
 			}
 		}
 		if (readbackStats.n() != static_cast<int>(oldR.results.size())){
@@ -522,15 +948,10 @@ BlendFuncTest::compareOne(BlendFuncResult& oldR, BlendFuncResult& newR) {
 			    op != oldR.results.end(); ++op) {
 				for (np = newR.results.begin();
 				    np != newR.results.end(); ++np)
-					if (op->src == np->src
-					 && op->dst == np->dst)
+					if (equalMode(*op, *np))
 						break;
 				if (np == newR.results.end())
-					env->log << "\t\t"
-						<< factorToName(op->src)
-						<< ' '
-						<< factorToName(op->dst)
-						<< '\n';
+					printMode(*op);
 			}
 		}
 		if (env->options.verbosity) {
@@ -543,15 +964,10 @@ BlendFuncTest::compareOne(BlendFuncResult& oldR, BlendFuncResult& newR) {
 			    np != newR.results.end(); ++np){
 				for (op = oldR.results.begin();
 				    op != oldR.results.end(); ++op)
-					if (np->src == op->src
-					  && np->dst == op->dst)
+					if (equalMode(*op, *np))
 						break;
 				if (op != oldR.results.end())
-					env->log << "\t\t"
-						<< factorToName(np->src)
-						<< ' '
-						<< factorToName(np->dst)
-						<< '\n';
+					printMode(*op);
 			}
 		}
 	}
@@ -565,9 +981,13 @@ BlendFuncResult::putresults(ostream& s) const {
 	s << results.size() << '\n';
 	for (vector<PartialResult>::const_iterator p = results.begin();
 	     p != results.end(); ++p)
-		s << factorToName(p->src) << ' '
-		  << factorToName(p->dst) << ' '
-		  << p->rbErr << ' ' << p->blRGBErr << ' ' << p->blAErr << '\n';
+		s << factorToName(p->srcRGB) << ' '
+		  << factorToName(p->srcA) << ' '
+		  << factorToName(p->dstRGB) << ' '
+		  << factorToName(p->dstA) << ' '
+		  << opToName(p->opRGB) << ' '
+		  << opToName(p->opA) << ' '
+		  << p->rbErr << ' ' << p->blErr << '\n';
 } // BlendFuncResult::put
 
 bool
@@ -576,11 +996,16 @@ BlendFuncResult::getresults(istream& s) {
 	s >> n;
 	for (int i = 0; i < n; ++i) {
 		PartialResult p;
-		string src;
-		string dst;
-		s >> src >> dst >> p.rbErr >> p.blRGBErr >> p.blAErr;
-		p.src = nameToFactor(src);
-		p.dst = nameToFactor(dst);
+		string srcRGB, srcA;
+		string dstRGB, dstA;
+		string opRGB, opA;
+		s >> srcRGB >> srcA >> dstRGB >> dstA >> opRGB >> opA >> p.rbErr >> p.blErr;
+		p.srcRGB = nameToFactor(srcRGB);
+		p.srcA = nameToFactor(srcA);
+		p.srcRGB = nameToFactor(srcRGB);
+		p.dstA = nameToFactor(dstA);
+		p.opRGB = nameToFactor(opRGB);
+		p.opA = nameToFactor(opA);
 		results.push_back(p);
 	}
 

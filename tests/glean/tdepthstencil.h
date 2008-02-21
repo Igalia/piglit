@@ -47,6 +47,8 @@ public:
 	double readDepthUintRate;  // pixels/second
 	double readDepthUshortRate;  // pixels/second
 
+        DepthStencilResult();
+
 	virtual void putresults(ostream& s) const;
 	virtual bool getresults(istream& s);
 };

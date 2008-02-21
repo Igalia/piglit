@@ -16,6 +16,7 @@ add_executable (glean
 	misc.cpp
 	options.cpp
 	rc.cpp
+	tapi2.cpp
 	tbasic.cpp
 	tbasicperf.cpp
 	tbinding.cpp
@@ -26,14 +27,18 @@ add_executable (glean
 	tfpexceptions.cpp
 	tfragprog1.cpp
 	tgetstr.cpp
+	tglsl1.cpp
 	tlogicop.cpp
 	tmaskedclear.cpp
 	tmultitest.cpp
+	toccluqry.cpp
 	torthpos.cpp
 	tpaths.cpp
+	tpbo.cpp
 	tpgos.cpp
 	tpixelformats.cpp
 	tpointatten.cpp
+	tpointsprite.cpp
 	treadpix.cpp
 	treadpixperf.cpp
 	trgbtris.cpp

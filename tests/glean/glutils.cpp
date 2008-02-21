@@ -99,6 +99,16 @@ haveExtensions(const char* required) {
 	return haveAll;
 } // haveExtensions
 
+
+float
+getVersion()
+{
+   const GLubyte *version = glGetString(GL_VERSION);
+   // we rely on atof() stopping parsing at whitespace
+   return atof((const char *) version);
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // getProcAddress: Get address of an OpenGL or window-system-binding function.
 //	This belongs here, rather than as a member of RenderingContext, because
