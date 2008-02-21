@@ -266,7 +266,7 @@ def main():
 		dirname = summaryDir + '/' + tr.codename
 		core.checkDir(dirname, False)
 		for test in summary.allTests():
-			filename = dirname + testPathToHtmlFilename(test.path)
+			filename = dirname + '/' + testPathToHtmlFilename(test.path)
 			writeResultHtml(test, test.results[j], filename)
 
 	writefile(summaryDir + '/result.css', readfile(templatedir + 'result.css'))
