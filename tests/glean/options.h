@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 
@@ -38,7 +38,7 @@
 
 // We collect this information for two reasons.  First, it allows the
 // (relatively) large number of parameters needed for creating an
-// Environment to be passed cleanly to Environment's constructor.
+// Environment to be passed cleanly to Environment's constructor. 
 // Second, it allows the process of gathering parameters (by parsing a
 // command line, running a set of GUI dialogs, etc.) to be separated
 // from the creation of the Environment.
@@ -57,7 +57,7 @@ namespace GLEAN {
 
 class Options {
     public:
-	typedef enum {notSet, run, compare, listtests, listdetails} RunMode;
+	typedef enum {notSet, run, compare, listtests} RunMode;
 	RunMode mode;		// Indicates whether we're generating
 				// results, or comparing two previous runs.
 
@@ -82,7 +82,6 @@ class Options {
 				// Sorted list of tests to be executed.
 
 	bool overwrite;		// overwrite old results database if exists
-	bool ignorePrereqs; // ignore prerequisite tests
 #if defined(__X11__)
 	string dpyName;		// Name of the X11 display providing the
 				// OpenGL implementation to be tested.

@@ -44,6 +44,15 @@ namespace GLEAN {
 static PFNGLWINDOWPOS2IARBPROC WindowPos2i = NULL;
 
 
+DepthStencilResult::DepthStencilResult()
+{
+	pass = false;
+	readDepthStencilRate = 0;
+	readDepthUintRate = 0;
+	readDepthUshortRate = 0;
+}
+
+
 bool
 DepthStencilTest::checkError(const char *where)
 {

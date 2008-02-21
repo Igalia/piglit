@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 2001  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 
@@ -77,7 +77,7 @@ public:
 			= expectedRGBA[3] = 0.0;
 		actualRGBA[0] = actualRGBA[1] = actualRGBA[2]
 			= actualRGBA[3] = 0.0;
-
+			
 		passDepth = true;
 		xDepth = yDepth = 0;
 		errDepth = 0.0;
@@ -94,7 +94,7 @@ public:
 		expectedIndex = 0;
 		actualIndex = 0;
 	}
-
+	
 	void putresults(ostream& s) const {
 		s
 		  << pass << '\n'
@@ -125,7 +125,7 @@ public:
 		  << actualIndex << '\n'
 		  ;
 	}
-
+	
 	bool getresults(istream& s) {
 		s >> pass
 
@@ -184,8 +184,6 @@ public:
 		GLuint err;
 		GLuint expected[4];
 		GLuint actual[4];
-		GLuint written[4];
-		GLuint read[4];
 
 		bool operator== (const Flavor& f) const {
 			return pass == f.pass
@@ -200,14 +198,6 @@ public:
 				&& actual[1] == f.actual[1]
 				&& actual[2] == f.actual[2]
 				&& actual[3] == f.actual[3]
-				&& written[0] == f.written[0]
-				&& written[1] == f.written[1]
-				&& written[2] == f.written[2]
-				&& written[3] == f.written[3]
-				&& read[0] == f.read[0]
-				&& read[1] == f.read[1]
-				&& read[2] == f.read[2]
-				&& read[3] == f.read[3]
 				;
 		}
 
@@ -218,8 +208,6 @@ public:
 			expected[0] = expected[1] = expected[2]
 				= expected[3] = 0;
 			actual[0] = actual[1] = actual[2] = actual[3] = 0;
-			written[0] = written[1] = written[2] = written[3] = 0;
-			read[0] = read[1] = read[2] = read[3] = 0;
 		}
 
 		void put(ostream& s) const {
@@ -235,14 +223,6 @@ public:
 			  	<< actual[1] << ' '
 				<< actual[2] << ' '
 				<< actual[3] << '\n'
-			  << written[0] << ' '
-			  	<< written[1] << ' '
-				<< written[2] << ' '
-				<< written[3] << '\n'
-			  << read[0] << ' '
-			  	<< read[1] << ' '
-				<< read[2] << ' '
-				<< read[3] << '\n'
 			  ;
 		}
 		void get(istream& s) {
@@ -258,14 +238,6 @@ public:
 			  	>> actual[1]
 				>> actual[2]
 				>> actual[3]
-			  >> written[0]
-			  	>> written[1]
-				>> written[2]
-				>> written[3]
-			  >> read[0]
-			  	>> read[1]
-				>> read[2]
-				>> read[3]
 			  ;
 		}
 	};
@@ -281,7 +253,7 @@ public:
 		skipped = false;
 		pass = true;
 	}
-
+	
 	void putresults(ostream& s) const {
 		s
 		  << skipped << '\n'
@@ -291,7 +263,7 @@ public:
 		us.put(s);
 		ui.put(s);
 	}
-
+	
 	bool getresults(istream& s) {
 		s
 		  >> skipped

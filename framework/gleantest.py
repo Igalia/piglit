@@ -54,8 +54,8 @@ class GleanTest(Test):
 		checkDir(gleanResultDir()+self.name, False)
 
 		glean = subprocess.Popen(
-			[gleanExecutable(), "-o", "-r", gleanResultDir()+self.name,
-			"--ignore-prereqs",
+			[gleanExecutable(), "-r", gleanResultDir()+self.name,
+			"-o",
 			"-v", "-v", "-v",
 			"-t", "+"+self.name] + GleanTest.globalParams,
 			stdout=subprocess.PIPE,

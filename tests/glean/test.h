@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 
@@ -43,7 +43,7 @@
 // vary depending on the drawing surface configuration or the
 // particular type of drawing surface used).
 
-// It is possible to derive test classes directly from this class.
+// It is possible to derive test classes directly from this class. 
 // Most people will find it more convenient to use the BaseTest
 // template class.  See tbase.h for more information.
 
@@ -90,7 +90,7 @@ class Test {
 	Test** prereqs;		// Pointer to array of prerequisite tests.
 				// These will always be run before the
 				// current test.
-
+	
 	bool hasRun;		// True if test has been run.
 
 	Environment* env;	// Environment in which runs or comparisons
@@ -99,8 +99,6 @@ class Test {
 	virtual void run(Environment& env) = 0;	// Run test, save results.
 
 	virtual void compare(Environment& env) = 0;
-
-	virtual void details(Environment& env) = 0;
 				// Compare two previous runs.
 
 	// Exceptions:

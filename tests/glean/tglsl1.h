@@ -26,48 +26,38 @@
 // 
 // END_COPYRIGHT
 
-// tfragprog.h:  Test GL_ARB_fragment_program extension.
-// Brian Paul  22 October 2005
+// tglsl1.h:  Test OpenGL shading language
+// Brian Paul  6 March 2007
 
-#ifndef __tfragprog_h__
-#define __tfragprog_h__
-
-// If DEVEL_MODE==1 we generate a tall window of color swatches, one per
-// fragment program, which can be eyeballed against a reference image.
-// Use this if glReadPixels functionality is not working yet.
-#undef windowWidth
-#undef windowHeight
-#define DEVEL_MODE 0
-#if DEVEL_MODE
-#define windowWidth 200
-#define windowHeight 850
-#else
-#define windowWidth 100
-#define windowHeight 100
-#endif
-
+#ifndef __tglsl1_h__
+#define __tglsl1_h__
 
 #include "tmultitest.h"
 
 namespace GLEAN {
 
+#define windowSize 100
 
-class FragmentProgram
+
+class ShaderProgram
 {
 public:
 	const char *name;
-	const char *progString;
+	const char *vertShaderString;
+	const char *fragShaderString;
 	GLfloat expectedColor[4];
 	GLfloat expectedZ;
+	int flags;
 };
 
 
-class FragmentProgramTest: public MultiTest
+
+class GLSLTest: public MultiTest
 {
 public:
-	FragmentProgramTest(const char* testName, const char* filter,
-			    const char *extensions, const char* description)
-		: MultiTest(testName, filter, extensions, description)
+	GLSLTest(const char* testName, const char* filter,
+                 const char *extensions, const char* description):
+		MultiTest(testName, filter, extensions, description)
 	{
 	}
 
@@ -75,17 +65,26 @@ public:
 
 private:
 	GLfloat tolerance[5];
-	void setup(void);
-	bool equalColors(const GLfloat a[4], const GLfloat b[4]) const;
+	GLfloat looseTolerance[5];
+        GLfloat version21;   // OpenGL 2.1 or higher supported?
+        bool getFunctions(void);
+        void setupTextures(void);
+        void setupTextureMatrix1(void);
+	bool setup(void);
+	bool equalColors(const GLfloat a[4], const GLfloat b[4], int flags) const;
 	bool equalDepth(GLfloat z0, GLfloat z1) const;
-	bool testProgram(const FragmentProgram &p);
+        GLuint loadAndCompileShader(GLenum target, const char *str);
+        bool checkCompileStatus(GLenum target, GLuint shader,
+                                const ShaderProgram &p);
+	bool testProgram(const ShaderProgram &p);
 	void reportFailure(const char *programName,
                            const GLfloat expectedColor[4],
                            const GLfloat actualColor[4] ) const;
 	void reportZFailure(const char *programName,
 			    GLfloat expectedZ, GLfloat actualZ) const;
+
 };
 
 } // namespace GLEAN
 
-#endif // __tfragprog_h__
+#endif // __tglsl1_h__
