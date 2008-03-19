@@ -66,10 +66,14 @@ bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
 bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])
 bugs['fdo14575'] = PlainExecTest([testBinDir + 'fdo14575', '-auto'])
 
+texturing = Group()
+texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
+
 profile.tests['bugs'] = bugs
 profile.tests['glean'] = glean
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
+profile.tests['texturing'] = bugs
 
 #############
 # Some Mesa diagnostic messages that we should probably ignore

@@ -22,3 +22,5 @@
  */
 
 int FindLine(const char *program, int position);
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
