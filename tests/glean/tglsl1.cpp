@@ -82,7 +82,8 @@ static PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv_func = NULL;
 #define FLAG_ILLEGAL_SHADER 0x2  // the shader test should not compile
 #define FLAG_ILLEGAL_LINK   0x4  // the shaders should not link
 #define FLAG_VERSION_2_1    0x8  // OpenGL 2.1 test (or GLSL 1.20)
-#define FLAG_WINDING_CW    0x10  // clockwise-winding polygon
+#define FLAG_WINDING_CW     0x10  // clockwise-winding polygon
+#define FLAG_VERTEX_TEXTURE 0x20
 
 #define DONT_CARE_Z -1.0
 
@@ -1706,7 +1707,7 @@ static const ShaderProgram Programs[] = {
 		NO_FRAGMENT_SHADER,
 		{ 0.25, 0.0, 0.0, 0.25 },
 		DONT_CARE_Z,
-		FLAG_NONE
+		FLAG_VERTEX_TEXTURE
 	},
 
 	{
@@ -3229,6 +3230,17 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	}
 
 	glUseProgram_func(program);
+
+        if (p.flags & FLAG_VERTEX_TEXTURE) {
+		// check if vertex texture units are available
+		GLint n;
+		glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, &n);
+		if (n == 0) {
+			// can't run the test
+			retVal = true;
+			goto cleanup;
+		}
+        }
 
 	// load uniform vars
 	u1 = glGetUniformLocation_func(program, "uniform1");
