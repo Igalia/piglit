@@ -193,10 +193,14 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 	int x1 = x + size / 4, x2 = x + size * 3 / 4;
 	int y1 = y + size / 4, y2 = y + size * 3 / 4;
 
-	pass = pass && probe_pixel(x1, y1, color2);
-	pass = pass && probe_pixel(x2, y1, color1);
-	pass = pass && probe_pixel(x2, y2, color1);
-	pass = pass && probe_pixel(x1, y2, color1);
+	if (size == 1) {
+		pass = pass && probe_pixel(x1, y1, color1);
+	} else {
+		pass = pass && probe_pixel(x1, y1, color2);
+		pass = pass && probe_pixel(x2, y1, color1);
+		pass = pass && probe_pixel(x2, y2, color1);
+		pass = pass && probe_pixel(x1, y2, color1);
+	}
 
 	if (!pass) {
 		printf("Cube map failed at size %dx%d, level %d, face %s%s\n",
