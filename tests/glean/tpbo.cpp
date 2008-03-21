@@ -480,8 +480,10 @@ bool PBOTest::testBitmap(void)
          if (usePackBuffer) {
             glGenBuffersARB(1, pb_pack);
             glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, pb_pack[0]);
-            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, TEXSIZE * TEXSIZE, NULL,
-                         GL_STREAM_DRAW);
+            glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT,
+                            windowSize * windowSize * 4 * sizeof(GLfloat),
+                            NULL,
+                            GL_STREAM_DRAW);
             glReadPixels(0, 0, windowSize, windowSize, GL_RGB, GL_FLOAT,
                          NULL);
             pboPackMem =
@@ -1030,7 +1032,7 @@ bool PBOTest::testErrorHandling(void)
    glBindBufferARB(GL_PIXEL_PACK_BUFFER_EXT, 0);
 
    if (usePBO) {
-      //handle exceed memory size
+      /* test that glDrawPixels from too small of buffer raises error */
       glGenBuffersARB(1, fbs);
       glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, fbs[0]);
       glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_EXT, 32 * 32 * 4, NULL,
@@ -1042,6 +1044,7 @@ bool PBOTest::testErrorHandling(void)
       glDeleteBuffersARB(1, fbs);
       glBindBufferARB(GL_PIXEL_UNPACK_BUFFER, 0);
 
+      /* test that glReadPixels into too small of buffer raises error */
       glGenBuffersARB(1, fbs);
       glBindBufferARB(GL_PIXEL_PACK_BUFFER, fbs[0]);
       glBufferDataARB(GL_PIXEL_PACK_BUFFER_EXT, 32 * 32 * 4, NULL,
@@ -1122,7 +1125,7 @@ bool PBOTest::testPerformance(MultiTestResult & r)
       }
       glGenTextures(1, textures);
       glBindTexture(GL_TEXTURE_2D, textures[0]);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_BGRA, TEXSIZE1,
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TEXSIZE1,
                    TEXSIZE1, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

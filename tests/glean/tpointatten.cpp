@@ -151,9 +151,8 @@ bool
 PointAttenuationTest::testPointRendering(GLboolean smooth)
 {
 	// epsilon is the allowed size difference in pixels between the
-	// expected and actual rendering.  We should use something tighter
-	// than 1.2 but 1.2 allows NVIDIA's driver to pass.
-	const GLfloat epsilon = 1.2;
+	// expected and actual rendering.
+	const GLfloat epsilon = smooth ? 1.5 : 1.0;
 	GLfloat atten[3];
 	int count = 0;
 
