@@ -21,6 +21,15 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-int FindLine(const char *program, int position);
-
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
+enum piglit_result {
+	PIGLIT_SUCCESS,
+	PIGLIT_FAILURE,
+	PIGLIT_SKIP
+};
+
+int FindLine(const char *program, int position);
+void piglit_report_result(enum piglit_result result);
+void piglit_require_extension(const char *name);
+

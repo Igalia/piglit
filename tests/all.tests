@@ -60,6 +60,7 @@ shaders['fp-lit-mask'] = PlainExecTest([testBinDir + 'fp-lit-mask', '-auto'])
 shaders['fp-fragment-position'] = PlainExecTest([testBinDir + 'fp-fragment-position', '-auto'])
 shaders['fp-kil'] = PlainExecTest([testBinDir + 'fp-kil', '-auto'])
 shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', '-auto'])
+shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
 
 bugs = Group()
 bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])

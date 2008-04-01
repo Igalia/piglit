@@ -21,6 +21,10 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "piglit-util.h"
+
 /** Returns the line in the program string given the character position. */
 int FindLine(const char *program, int position)
 {
@@ -30,4 +34,28 @@ int FindLine(const char *program, int position)
 			line++;
 	}
 	return line;
+}
+
+void
+piglit_report_result(enum piglit_result result)
+{
+	/* Currently we have no way of reporting the "skip" (required extension
+	 * not supported) result.
+	 */
+
+	if (result == PIGLIT_SUCCESS) {
+		printf("PIGLIT: {'result': 'pass' }\n");
+		exit(0);
+	} else {
+		printf("PIGLIT: {'result': 'fail' }\n");
+		exit(1);
+	}
+}
+
+void piglit_require_extension(const char *name)
+{
+	if (!glutExtensionSupported(name)) {
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
 }
