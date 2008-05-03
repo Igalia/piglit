@@ -34,7 +34,7 @@
 #include "tvertprog1.h"
 #include <cassert>
 #include <cmath>
-#include <math.h>
+#include <cstring>
 
 
 namespace GLEAN {

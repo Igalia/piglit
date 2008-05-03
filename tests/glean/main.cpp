@@ -37,6 +37,7 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstring>
 #include <algorithm>
 #include "options.h"
 #include "environ.h"

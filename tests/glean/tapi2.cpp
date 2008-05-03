@@ -33,7 +33,9 @@
 
 #include "tapi2.h"
 #include <cassert>
-#include <math.h>
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
 
 
 namespace GLEAN {

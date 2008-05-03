@@ -45,7 +45,8 @@
 // Author: Brian Paul (brian.paul a t tungstengraphics.com)  October 2004
 
 
-#include <math.h>
+#include <cmath>
+#include <cstdlib>
 #include "tvertattrib.h"
 #include "glutils.h"
 #include <cassert>

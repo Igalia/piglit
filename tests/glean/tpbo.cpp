@@ -36,7 +36,9 @@
 #define GL_GLEXT_PROTOTYPES
 #include "tpbo.h"
 #include <cassert>
-#include <math.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include "timer.h"
 namespace GLEAN
 {

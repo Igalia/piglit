@@ -36,6 +36,8 @@
 #include "image.h"
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef GL_EXT_packed_depth_stencil
 

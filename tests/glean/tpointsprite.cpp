@@ -43,7 +43,9 @@
 #include "tpointsprite.h"
 #include <cassert>
 #include <cmath>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 namespace GLEAN {
 

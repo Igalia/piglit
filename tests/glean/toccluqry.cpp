@@ -35,7 +35,9 @@
 #define GL_GLEXT_PROTOTYPES
 #include "toccluqry.h"
 #include <cassert>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <cmath>
 
 
