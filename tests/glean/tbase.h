@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999-2000  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 /*
@@ -67,7 +67,7 @@ constructing a test:
 	contexts that support all the listed extensions.  Extension
 	names in the string may be separated with non alphanumerics;
 	whitespace and commas are used by convention.
-	
+
 	A description string.  This will be printed in the test log to
 	describe the test.
 
@@ -89,7 +89,7 @@ Your new test will need a few common declarations (such as
 constructors).  To simplify writing them, this file provides a few
 helper macros.  GLEAN_CLASS(TEST,RESULT) handles the declarations for
 a test class named TEST and a result class named RESULT, using the
-default values for window width and height and the run-once flag. 
+default values for window width and height and the run-once flag.
 GLEAN_CLASS_WH() and GLEAN_CLASS_WHO() allow you to specify the width,
 height, and run-once flag if you choose.
 
@@ -170,12 +170,12 @@ public:
 
 	virtual void putresults(ostream& s) const = 0;
 	virtual bool getresults(istream& s) = 0;
-	
+
 	virtual void put(ostream& s) const {
 		s << config->canonicalDescription() << '\n';
 		putresults(s);
 	}
-	
+
 	virtual bool get(istream& s) {
 		SkipWhitespace(s);
 		string configDesc;
@@ -194,7 +194,7 @@ public:
 		description = aDescription;
 		fWidth      = 258;
 		fHeight     = 258;
-		testOne     = false; 
+		testOne     = false;
 	}
 	BaseTest(const char* aName, const char* aFilter, Test** thePrereqs,
 		 const char* aDescription):
@@ -204,7 +204,7 @@ public:
 		description = aDescription;
 		fWidth      = 258;
 		fHeight     = 258;
-		testOne     = false; 
+		testOne     = false;
 	}
 	BaseTest(const char* aName, const char* aFilter,
 		 const char* anExtensionList,
@@ -217,7 +217,12 @@ public:
 		testOne     = false;
 	}
 
-	virtual ~BaseTest() {}
+	virtual ~BaseTest() {
+		for (typename vector<ResultType*>::iterator result = results.begin();
+		     result != results.end();
+		     ++result)
+			delete *result;
+	}
 
 	const char*         filter;	 // Drawing surface config filter.
 	const char*         extensions;  // Required extensions.
@@ -243,7 +248,7 @@ public:
 		}
 		return v;
 	}
-	
+
 	virtual void logDescription() {
 		if (env->options.verbosity)
 			env->log <<
@@ -289,7 +294,7 @@ public:
 				r->config = *p;
 				runOne(*r, w);
 				logOne(*r);
-				
+
 				// Save the result
 				results.push_back(r);
 				r->put(os);
@@ -309,10 +314,10 @@ public:
 			env->log << "Could not create a rendering context\n";
 		}
 		env->log << '\n';
-		
+
 		hasRun = true;	// Note that we've completed the run
 	}
-	
+
 	virtual void compare(Environment& environment) {
 		env = &environment; // Save the environment
 		logDescription();
