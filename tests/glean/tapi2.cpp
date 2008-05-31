@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 // tapi2.h:  Test OpenGL 2.x API functions/features
@@ -104,7 +104,7 @@ static PFNGLDRAWBUFFERSPROC glDrawBuffers_func = NULL;
 // \param errorFunc  returns name of API function in case of error
 // \return true for success, false for error
 bool
-API2Test::getFunctions_2_0(char **errorFunc)
+API2Test::getFunctions_2_0(const char **errorFunc)
 {
 #define GET(PTR, TYPE, STR)                          \
 	PTR  = (TYPE) GLUtils::getProcAddress(STR);  \
@@ -187,7 +187,7 @@ API2Test::setup(void)
 		return false;
 	}
 
-	char *errorFunc;
+	const char *errorFunc;
 	if (!getFunctions_2_0(&errorFunc)) {
 		env->log << "Unable to get pointer to OpenGL 2.0 function '"
 			 << errorFunc
@@ -205,7 +205,7 @@ API2Test::setup(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glDrawBuffer(GL_FRONT);
-	glReadBuffer(GL_FRONT); 
+	glReadBuffer(GL_FRONT);
 
 	// compute error tolerances (may need fine-tuning)
 	int bufferBits[5];
