@@ -35,7 +35,7 @@
 
 namespace {
 
-struct factorNameMapping {GLenum factor; char* name;};
+struct factorNameMapping {GLenum factor; const char* name;};
 factorNameMapping factorNames[] = {
 	{GL_DST_ALPHA,			"GL_DST_ALPHA"},
 	{GL_DST_COLOR,			"GL_DST_COLOR"},
@@ -50,7 +50,7 @@ factorNameMapping factorNames[] = {
 	{GL_ZERO,			"GL_ZERO"}
 };
 
-char*
+const char*
 factorToName(GLenum factor) {
 	for (unsigned int i = 0;
 	    i < sizeof(factorNames) / sizeof(factorNames[0]);

@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,14 +23,14 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 
 // dsconfig.cpp:  Implementation of drawing surface configuration utilities
 #include "dsconfig.h"
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <cstring>
 #include <map>
 #include <climits>
@@ -118,7 +118,8 @@ typedef enum {		// These variable tags are used as array indices,
 	V_LAST
 } CanonVar;
 
-struct {CanonVar var; char* name;} varNames[] = {
+struct CanonVarMapping {CanonVar var; const char* name;};
+CanonVarMapping varNames[] = {
 	{VID,			"id"},
 	{VFBCID,		"fbcID"},
 	{VCANRGBA,		"canRGBA"},
@@ -155,7 +156,7 @@ struct {CanonVar var; char* name;} varNames[] = {
 	{VTRANSI,		"transI"}
 };
 
-char* mapVarToName[V_LAST];
+const char* mapVarToName[V_LAST];
 map<string, CanonVar> mapNameToVar;
 bool mapsInitialized = false;
 
@@ -298,9 +299,9 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 
 	pfd = ppfd;
 	pfdID = id;
-	
-	canRGBA = pfd->iPixelType == PFD_TYPE_RGBA;			
-	canCI = pfd->iPixelType == PFD_TYPE_COLORINDEX;			
+
+	canRGBA = pfd->iPixelType == PFD_TYPE_RGBA;
+	canCI = pfd->iPixelType == PFD_TYPE_COLORINDEX;
 
 	bufSize = pfd->cColorBits + pfd->cAlphaBits;
 
@@ -329,9 +330,9 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 	accB = pfd->cAccumBlueBits;
 	accA = pfd->cAccumAlphaBits;
 
-	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;			
+	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;
 
-	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;		
+	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;
 
 	if (pfd->dwFlags & PFD_GENERIC_FORMAT)
 	{
@@ -340,20 +341,20 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 			// it's an MCD - at least it has some acceleration
 			fast = true;
 		}
-		else 
+		else
 		{
-			// it's software 
+			// it's software
 			fast = false;
 		}
 	}
-	else 
+	else
 	{
-		// it's an ICD 
+		// it's an ICD
 		fast = true;
 	}
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;		
+	conformant = true;
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -379,14 +380,14 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 	accA = 32;
 
 
-	canWindow = 1;			
-	canWinSysRender = 1;		
+	canWindow = 1;
+	canWinSysRender = 1;
 
 	// This is a software-mode assumption
 	fast = false;
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;		
+	conformant = true;
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -398,18 +399,18 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 {
 	long			i;
-	
+
 	if (!mapsInitialized)
 		initializeMaps();
 
 	pf = pfd;
-	
+
 	if (aglDescribePixelFormat( pf, AGL_RGBA, &i))
 		canRGBA = (i == GL_TRUE);
-	canCI = (i == GL_FALSE);			
+	canCI = (i == GL_FALSE);
 
 	if (aglDescribePixelFormat( pf, AGL_BUFFER_SIZE, &i))
-		bufSize = i;			
+		bufSize = i;
 
 	level = 0;
 
@@ -452,7 +453,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 	fast = i;
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;		
+	conformant = true;
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -627,10 +628,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 string
 DrawingSurfaceConfig::canonicalDescription() {
 
-	// Would rather use ostringstream, but it's not available in
-	// egcs 1.1.2.
-	char buf[1024];
-	ostrstream s(buf, sizeof(buf));
+	ostringstream s;
 
 #	if defined(__X11__)
 	    s << mapVarToName[VID] << ' ' << visID;
@@ -638,7 +636,7 @@ DrawingSurfaceConfig::canonicalDescription() {
 		s << ' ' << mapVarToName[VFBCID] << ' ' << fbcID;
 #	    endif
 #	elif defined(__WIN__)
-		s << mapVarToName[VID] << ' ' << pfdID;	    
+		s << mapVarToName[VID] << ' ' << pfdID;
 #	endif
 
 	s << ' ' << mapVarToName[VCANRGBA] << ' ' << canRGBA;
@@ -705,8 +703,7 @@ DrawingSurfaceConfig::canonicalDescription() {
 ///////////////////////////////////////////////////////////////////////////////
 string
 DrawingSurfaceConfig::conciseDescription() {
-	char buf[1024];
-	ostrstream s(buf, sizeof(buf));
+	ostringstream s;
 
 	if (canRGBA && canCI)
 		s << "dual ";

@@ -382,7 +382,7 @@ ReadPixSanityTest::compareOne(ReadPixSanityResult& oldR, ReadPixSanityResult& ne
 } // ReadPixSanityTest::compareOne
 
 void
-ReadPixSanityTest::summarize(char* label, bool oldPass, bool newPass) {
+ReadPixSanityTest::summarize(const char* label, bool oldPass, bool newPass) {
 	if (oldPass == newPass) {
 		if (env->options.verbosity)
 			env->log << "\t"

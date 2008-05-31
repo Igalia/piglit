@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 // tlogicop.cpp:  Test RGBA logic op functions.
@@ -37,7 +37,7 @@
 
 namespace {
 
-struct logicopNameMapping {GLenum op; char* name;};
+struct logicopNameMapping {GLenum op; const char* name;};
 logicopNameMapping logicopNames[] = {
 	{GL_CLEAR,		"GL_CLEAR"},
 	{GL_SET,		"GL_SET"},
@@ -57,7 +57,7 @@ logicopNameMapping logicopNames[] = {
 	{GL_OR_INVERTED,	"GL_OR_INVERTED"}
 };
 
-char*
+const char*
 logicopToName(GLenum op) {
 	for (unsigned int i = 0;
 	    i < sizeof(logicopNames) / sizeof(logicopNames[0]); ++i) {
@@ -89,7 +89,7 @@ makeRGBA(GLEAN::RandomBits& rRand,
 	rgba[3] = aRand.next() & 0xff;
 } // makeRGBA
 
-void 
+void
 drawQuad(const int x, const int y, const GLubyte* color) {
 	glColor4ubv(color);
 	glBegin(GL_QUADS);
@@ -232,7 +232,7 @@ static runResult
 runTest(GLenum logicop,
     GLEAN::DrawingSurfaceConfig& config, GLEAN::Environment& env) {
 	using namespace GLEAN;
-	
+
 	runResult result;
 	int y;
 
