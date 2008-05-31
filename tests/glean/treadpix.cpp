@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 2001  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 // treadpix.cpp:  implementation of ReadPixels tests
@@ -269,7 +269,7 @@ ReadPixSanityTest::runOne(ReadPixSanityResult& r, GLEAN::Window& w) {
 		checkDepth(r, w);
 	if (r.config->s)
 		checkStencil(r, w);
-
+	
 	r.pass = r.passRGBA & r.passDepth & r.passStencil & r.passIndex;
 } // ReadPixSanityTest::runOne
 
@@ -500,7 +500,7 @@ namespace {
 template<class T>
 void
 check(GLEAN::ExactRGBAResult::Flavor& r, GLEAN::DrawingSurfaceConfig& config,
-    GLenum type, int roundingMode) {
+    GLenum type) {
 	unsigned size = EXACT_RGBA_WIN_SIZE - 2;
 	unsigned nPixels = size * size;
 	unsigned nComponents = 4 * nPixels;
@@ -563,18 +563,15 @@ check(GLEAN::ExactRGBAResult::Flavor& r, GLEAN::DrawingSurfaceConfig& config,
 			hostBits = 32;
 			break;
 	}
-	T Mask[4];
-
-	Mask[0] = static_cast<T>(-1) << (hostBits - min(hostBits, config.r));
-	Mask[1] = static_cast<T>(-1) << (hostBits - min(hostBits, config.g));
-	Mask[2] = static_cast<T>(-1) << (hostBits - min(hostBits, config.b));
-	Mask[3] = static_cast<T>(-1) << (hostBits - min(hostBits, config.a));
-
+	T rMask = static_cast<T>(-1) << (hostBits - min(hostBits, config.r));
+	T gMask = static_cast<T>(-1) << (hostBits - min(hostBits, config.g));
+	T bMask = static_cast<T>(-1) << (hostBits - min(hostBits, config.b));
+	T aMask = static_cast<T>(-1) << (hostBits - min(hostBits, config.a));
 	// Patch up arithmetic for RGB drawing surfaces.  All other nasty cases
 	// are eliminated by the drawing surface filter, which requires
 	// nonzero R, G, and B.
-	if (config.a == 0)
-		Mask[3] = 0;
+	if (aMask == static_cast<T>(-1))
+		aMask = 0;
 
 	// Compare masked actual and expected values, and record the
 	// worst-case error location and magnitude.
@@ -584,35 +581,18 @@ check(GLEAN::ExactRGBAResult::Flavor& r, GLEAN::DrawingSurfaceConfig& config,
 	for (y = 0; y < size; ++y)
 		for (x = 0; x < size; ++x) {
 			T e[4];
+			e[0] = p[0] & rMask;
+			e[1] = p[1] & gMask;
+			e[2] = p[2] & bMask;
+			e[3] = p[3] & aMask;
 			T a[4];
-			if (roundingMode == 1) {
-				e[0] = p[0];
-				e[1] = p[1];
-				e[2] = p[2];
-				e[3] = p[3];
-				a[0] = q[0];
-				a[1] = q[1];
-				a[2] = q[2];
-				a[3] = q[3];
-				if (config.a == 0) {
-					e[3] = a[3] = 0;
-				}
-			} else {
-				e[0] = p[0] & Mask[0];
-				e[1] = p[1] & Mask[1];
-				e[2] = p[2] & Mask[2];
-				e[3] = p[3] & Mask[3];
-				a[0] = q[0] & Mask[0];
-				a[1] = q[1] & Mask[1];
-				a[2] = q[2] & Mask[2];
-				a[3] = q[3] & Mask[3];
-			}
+			a[0] = q[0] & rMask;
+			a[1] = q[1] & gMask;
+			a[2] = q[2] & bMask;
+			a[3] = q[3] & aMask;
 			for (unsigned i = 0; i < 4; ++i) {
-				GLuint err = max(e[i], a[i]) - min(e[i], a[i]);
-				if (roundingMode == 1) {
-					if (err < ~Mask[i] / 2)
-						err = 0;
-				}
+				GLuint err =
+					max(e[i], a[i]) - min(e[i], a[i]);
 				if (err > r.err) {
 					r.x = x;
 					r.y = y;
@@ -620,8 +600,6 @@ check(GLEAN::ExactRGBAResult::Flavor& r, GLEAN::DrawingSurfaceConfig& config,
 					for (unsigned j = 0; j < 4; ++j) {
 						r.expected[j] = e[j];
 						r.actual[j] = a[j];
-						r.written[j] = p[j];
-						r.read[j] = q[j];
 					}
 				}
 			}
@@ -673,18 +651,16 @@ ExactRGBATest::runOne(ExactRGBAResult& r, GLEAN::Window& w) {
 
 	// Don't bother running if the ReadPixels sanity test for this
 	// display surface configuration failed:
-	if (!env->options.ignorePrereqs) {
-		vector<ReadPixSanityResult*>::const_iterator rpsRes;
-		for (rpsRes = readPixSanityTest.results.begin();
-			rpsRes != readPixSanityTest.results.end();
-			++rpsRes)
-			if ((*rpsRes)->config == r.config)
-				break;
-		if (rpsRes == readPixSanityTest.results.end() || !(*rpsRes)->pass) {
-			r.skipped = true;
-			r.pass = false;
-			return;
-		}
+	vector<ReadPixSanityResult*>::const_iterator rpsRes;
+	for (rpsRes = readPixSanityTest.results.begin();
+	    rpsRes != readPixSanityTest.results.end();
+	    ++rpsRes)
+		if ((*rpsRes)->config == r.config)
+			break;
+	if (rpsRes == readPixSanityTest.results.end() || !(*rpsRes)->pass) {
+		r.skipped = true;
+		r.pass = false;
+		return;
 	}
 
 	// Much of this state should already be set, if the defaults are
@@ -751,25 +727,11 @@ ExactRGBATest::runOne(ExactRGBAResult& r, GLEAN::Window& w) {
 	glPixelTransferf(GL_ALPHA_BIAS, 0.0);
 	glPixelTransferf(GL_DEPTH_BIAS, 0.0);
 
-	// Hack: Make hardware driver tests feasible
-	// The OpenGL spec apparently requires insane behaviour on the part
-	// of the implementation: On the one hand, implementations should round
-	// color values to the nearest representable color value, while on the
-	// other hand it has to truncate. Silly...
-	int roundingMode = 0;
-	const char* s;
-
-	s = getenv("GLEAN_EXACTRGBA_ROUNDING");
-	if (s) {
-		roundingMode = atoi(s);
-		env->log << "Note: Rounding mode changed to " << roundingMode << "\n";
-	}
-
-	check<GLubyte>(r.ub, *(r.config), GL_UNSIGNED_BYTE, roundingMode);
+	check<GLubyte>(r.ub, *(r.config), GL_UNSIGNED_BYTE);
 	w.swap();
-	check<GLushort>(r.us, *(r.config), GL_UNSIGNED_SHORT, roundingMode);
+	check<GLushort>(r.us, *(r.config), GL_UNSIGNED_SHORT);
 	w.swap();
-	check<GLuint>(r.ui, *(r.config), GL_UNSIGNED_INT, roundingMode);
+	check<GLuint>(r.ui, *(r.config), GL_UNSIGNED_INT);
 	w.swap();
 	r.pass = r.ub.pass && r.us.pass && r.ui.pass;
 	r.skipped = false;
@@ -908,15 +870,7 @@ ExactRGBATest::logFlavor(const char* label, const ExactRGBAResult::Flavor& r) {
 			<< r.actual[0] << ", 0x"
 			<< r.actual[1] << ", 0x"
 			<< r.actual[2] << ", 0x"
-			<< r.actual[3] << ")\n\t\twrote (0x"
-			<< r.written[0] << ", 0x"
-			<< r.written[1] << ", 0x"
-			<< r.written[2] << ", 0x"
-			<< r.written[3] << ")\n\t\tread (0x"
-			<< r.read[0] << ", 0x"
-			<< r.read[1] << ", 0x"
-			<< r.read[2] << ", 0x"
-			<< r.read[3] << ")\n"
+			<< r.actual[3] << ")\n"
 			<< dec
 			;
 	}

@@ -26,66 +26,62 @@
 // 
 // END_COPYRIGHT
 
-// tfragprog.h:  Test GL_ARB_fragment_program extension.
-// Brian Paul  22 October 2005
+// tapi2.h:  Test OpenGL 2.x API functions/features
+// Brian Paul  9 March 2007
 
-#ifndef __tfragprog_h__
-#define __tfragprog_h__
-
-// If DEVEL_MODE==1 we generate a tall window of color swatches, one per
-// fragment program, which can be eyeballed against a reference image.
-// Use this if glReadPixels functionality is not working yet.
-#undef windowWidth
-#undef windowHeight
-#define DEVEL_MODE 0
-#if DEVEL_MODE
-#define windowWidth 200
-#define windowHeight 850
-#else
-#define windowWidth 100
-#define windowHeight 100
-#endif
-
+#ifndef __tapi2_h__
+#define __tapi2_h__
 
 #include "tmultitest.h"
 
 namespace GLEAN {
 
+#define windowSize 100
 
-class FragmentProgram
+
+class API2Test: public MultiTest
 {
 public:
-	const char *name;
-	const char *progString;
-	GLfloat expectedColor[4];
-	GLfloat expectedZ;
-};
-
-
-class FragmentProgramTest: public MultiTest
-{
-public:
-	FragmentProgramTest(const char* testName, const char* filter,
-			    const char *extensions, const char* description)
-		: MultiTest(testName, filter, extensions, description)
+	API2Test(const char* testName, const char* filter,
+                 const char *extensions, const char* description):
+		MultiTest(testName, filter, extensions, description)
 	{
 	}
 
 	virtual void runOne(MultiTestResult &r, Window &w);
 
 private:
+        typedef bool (API2Test::*TestFunc)(void);
+
 	GLfloat tolerance[5];
-	void setup(void);
+        bool getFunctions_2_0(char **errorFunc);
+
+        GLuint loadAndCompileShader(GLenum target, const char *str);
+        GLuint createProgram(GLuint vertShader, GLuint fragShader);
+
+        void renderQuad(GLfloat *pixel) const;
+        void renderQuadWithArrays(GLint attr, const GLfloat value[4],
+                                  GLfloat *pixel) const;
+
+        bool testStencilFuncSeparate(void);
+        bool testStencilOpSeparate(void);
+        bool testStencilMaskSeparate(void);
+        bool testBlendEquationSeparate(void);
+        bool testDrawBuffers(void);
+        bool testShaderObjectFuncs(void);
+        bool testUniformfFuncs(void);
+        bool testUniformiFuncs(void);
+        bool testShaderAttribs(void);
+
+        void runSubTests(MultiTestResult &r);
+
+	bool setup(void);
 	bool equalColors(const GLfloat a[4], const GLfloat b[4]) const;
-	bool equalDepth(GLfloat z0, GLfloat z1) const;
-	bool testProgram(const FragmentProgram &p);
-	void reportFailure(const char *programName,
-                           const GLfloat expectedColor[4],
-                           const GLfloat actualColor[4] ) const;
-	void reportZFailure(const char *programName,
-			    GLfloat expectedZ, GLfloat actualZ) const;
+
+	void reportFailure(const char *msg, int line) const;
+	void reportFailure(const char *msg, GLenum target, int line) const;
 };
 
 } // namespace GLEAN
 
-#endif // __tfragprog_h__
+#endif // __tglsl1_h__

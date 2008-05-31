@@ -71,11 +71,19 @@ MultiTest::runOne(MultiTestResult &r, Window &)
 void
 MultiTest::logOne(MultiTestResult &r)
 {
-	logPassFail(r);
-	logConcise(r);
-	env->log << "\t"
-			 << r.numPassed << " tests passed, "
-			 << r.numFailed << " tests failed.\n";
+	if (r.numPassed == 0 && r.numFailed == 0) {
+		// non-applicable test
+		env->log << name << ":  NOTE ";
+		logConcise(r);
+		env->log << "\tTest skipped/non-applicable\n";
+	}
+	else {
+		logPassFail(r);
+		logConcise(r);
+		env->log << "\t"
+				 << r.numPassed << " tests passed, "
+				 << r.numFailed << " tests failed.\n";
+	}
 }
 
 

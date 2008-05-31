@@ -63,7 +63,7 @@ PointAttenuationTest::setup(void)
 	glGetFloatv(GL_SMOOTH_POINT_SIZE_RANGE, smoothLimits);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -10.0, 10.0);
+	glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -120,20 +120,22 @@ PointAttenuationTest::expectedSize(GLfloat initSize,
 		size = CLAMP(size, smoothLimits[0], smoothLimits[1]);
 	else
 		size = CLAMP(size, aliasedLimits[0], aliasedLimits[1]);
-
 	return size;
 }
 
 
-// measure size of rendered point
+// measure size of rendered point at yPos (in model coords)
 GLfloat
-PointAttenuationTest::measureSize() const
+PointAttenuationTest::measureSize(GLfloat yPos) const
 {
+	assert(yPos >= -10.0);
+	assert(yPos <= 10.0);
+	float yNdc = (yPos + 10.0) / 20.0;  // See glOrtho above
 	int x = 0;
-	int y = windowSize / 2;
-	int w = windowSize;
+	int y = (int) (yNdc * windowHeight);
+	int w = windowWidth;
 	int h = 1;
-	GLfloat image[windowSize * 3];
+	GLfloat image[windowWidth * 3];
 	// Read row of pixels and add up colors, which should be white
 	// or shades of gray if smoothing is enabled.
 	glReadPixels(x, y, w, h, GL_RGB, GL_FLOAT, image);
@@ -149,9 +151,8 @@ bool
 PointAttenuationTest::testPointRendering(GLboolean smooth)
 {
 	// epsilon is the allowed size difference in pixels between the
-	// expected and actual rendering.  We should use something tighter
-	// than 1.2 but 1.2 allows NVIDIA's driver to pass.
-	const GLfloat epsilon = 1.2;
+	// expected and actual rendering.
+	const GLfloat epsilon = smooth ? 1.5 : 1.0;
 	GLfloat atten[3];
 	int count = 0;
 
@@ -182,16 +183,22 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 						PointParameterfARB(GL_POINT_SIZE_MAX_ARB, max);
 						for (float size = 1.0; size < MAX_SIZE; size += 4) {
 							glPointSize(size);
-							for (float z = -8.0; z <= 8.0; z += 1.0) {
-								glClear(GL_COLOR_BUFFER_BIT);
-								glBegin(GL_POINTS);
-								glVertex3f(0, 0, z);
-								glEnd();
+
+							// draw column of points
+							glClear(GL_COLOR_BUFFER_BIT);
+							glBegin(GL_POINTS);
+							for (float z = -6.0; z <= 6.0; z += 1.0) {
+								glVertex3f(0, z, z);
+							}
+							glEnd();
+
+							// test the column of points
+							for (float z = -6.0; z <= 6.0; z += 1.0) {
 								count++;
 								float expected
 									= expectedSize(size, atten, min, max,
 												   z, smooth);
-								float actual = measureSize();
+								float actual = measureSize(z);
 								if (fabs(expected - actual) > epsilon) {
 									reportFailure(size, atten, min, max,
 												  z, smooth,
@@ -243,8 +250,8 @@ PointAttenuationTest::PointAttenuationTest(const char *testName,
 					   const char *description)
 	: BasicTest(testName, filter, extensions, description)
 {
-	fWidth  = windowSize;
-	fHeight = windowSize;
+	fWidth  = windowWidth;
+	fHeight = windowHeight;
 }
 
 

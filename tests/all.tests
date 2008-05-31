@@ -9,45 +9,22 @@ from framework.exectest import *
 from framework.gleantest import *
 
 ######
-# Glean sub-tests
-glean_fragprog1 = Group()
-
-out,err = subprocess.Popen(
-	[gleanExecutable(), "-t", "+fragProg1", "--listdetails"],
-	stdout=subprocess.PIPE
-).communicate()
-
-st = 0
-for line in out.split('\n'):
-	if st == 0:
-		if line == "DETAILS for fragProg1":
-			st = 1
-	elif st == 1:
-		if line == "END DETAILS":
-			break
-
-		line = line.strip()
-		line = filter(lambda s: s.isalnum() or s in ' ()-_', line)
-
-		t = GleanTest('fragProg1')
-		t.env['GLEAN_FRAGPROG'] = line
-		glean_fragprog1[line] = t
-
-
-######
 # Collecting all tests
 profile = TestProfile()
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
+glean['api2'] = GleanTest('api2')
 glean['makeCurrent'] = GleanTest('makeCurrent')
 glean['blendFunc'] = GleanTest('blendFunc')
 glean['depthStencil'] = GleanTest('depthStencil')
 glean['fpexceptions'] = GleanTest('fpexceptions')
-glean['fragProg1'] = GleanTest('fragProg1') # also add entire tests, because of interdependency bugs that only occur when several different FPs are used
+glean['fragProg1'] = GleanTest('fragProg1')
 glean['getString'] = GleanTest('getString')
+glean['glsl1'] = GleanTest('glsl1')
 glean['logicOp'] = GleanTest('logicOp')
 glean['maskedClear'] = GleanTest('maskedClear')
+glean['occluquery'] = GleanTest('occluQry')
 glean['orthoPosRandTris'] = GleanTest('orthoPosRandTris')
 glean['orthoPosRandRects'] = GleanTest('orthoPosRandRects')
 glean['orthoPosTinyQuads'] = GleanTest('orthoPosTinyQuads')
@@ -55,9 +32,11 @@ glean['orthoPosHLines'] = GleanTest('orthoPosHLines')
 glean['orthoPosVLines'] = GleanTest('orthoPosVLines')
 glean['orthoPosPoints'] = GleanTest('orthoPosPoints')
 glean['paths'] = GleanTest('paths')
+glean['pbo'] = GleanTest('pbo')
 glean['polygonOffset'] = GleanTest('polygonOffset')
 glean['pixelFormats'] = GleanTest('pixelFormats')
 glean['pointAtten'] = GleanTest('pointAtten')
+glean['pointSprite'] = GleanTest('pointSprite')
 glean['exactRGBA'] = GleanTest('exactRGBA')
 glean['readPixSanity'] = GleanTest('readPixSanity')
 glean['rgbTriStrip'] = GleanTest('rgbTriStrip')
@@ -81,16 +60,21 @@ shaders['fp-lit-mask'] = PlainExecTest([testBinDir + 'fp-lit-mask', '-auto'])
 shaders['fp-fragment-position'] = PlainExecTest([testBinDir + 'fp-fragment-position', '-auto'])
 shaders['fp-kil'] = PlainExecTest([testBinDir + 'fp-kil', '-auto'])
 shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', '-auto'])
-shaders['glean-fragProg1'] = glean_fragprog1
+shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
 
 bugs = Group()
 bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
 bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])
+bugs['fdo14575'] = PlainExecTest([testBinDir + 'fdo14575', '-auto'])
+
+texturing = Group()
+texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
 
 profile.tests['bugs'] = bugs
 profile.tests['glean'] = glean
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
+profile.tests['texturing'] = bugs
 
 #############
 # Some Mesa diagnostic messages that we should probably ignore
@@ -100,3 +84,9 @@ Test.ignoreErrors.append(re.compile("Mesa: CPU.*"))
 Test.ignoreErrors.append(re.compile("Mesa: .*cpu detected."))
 Test.ignoreErrors.append(re.compile("Mesa: Test.*"))
 Test.ignoreErrors.append(re.compile("Mesa: Yes.*"))
+Test.ignoreErrors.append(re.compile("libGL: XF86DRIGetClientDriverName.*"))
+Test.ignoreErrors.append(re.compile("libGL: OpenDriver: trying.*"))
+Test.ignoreErrors.append(re.compile("drmOpen.*"))
+Test.ignoreErrors.append(re.compile("Mesa: Not testing OS support.*"))
+Test.ignoreErrors.append(re.compile("Mesa: User error:.*"))
+

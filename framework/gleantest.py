@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -54,8 +54,8 @@ class GleanTest(Test):
 		checkDir(gleanResultDir()+self.name, False)
 
 		glean = subprocess.Popen(
-			[gleanExecutable(), "-o", "-r", gleanResultDir()+self.name,
-			"--ignore-prereqs",
+			[gleanExecutable(), "-r", gleanResultDir()+self.name,
+			"-o",
 			"-v", "-v", "-v",
 			"-t", "+"+self.name] + GleanTest.globalParams,
 			stdout=subprocess.PIPE,

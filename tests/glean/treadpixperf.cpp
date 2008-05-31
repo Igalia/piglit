@@ -467,9 +467,9 @@ ReadpixPerfTest::compareOne(ReadpixPerfResult &oldR,
 					 << descrip
 					 << "' changed by "
 					 << diff
-					 << " percent (old: "
+					 << " percent (new: "
 					 << newres.rate
-					 << " new: "
+					 << " old: "
 					 << oldres.rate
 					 << " MPixels/sec)\n";
 			}

@@ -36,8 +36,8 @@
 
 namespace GLEAN {
 
-#define drawingSize 101   // yes, odd
-#define windowSize (drawingSize + 2)
+#define windowWidth 100
+#define windowHeight 503   // yes, odd
 
 
 class PointAttenuationTest: public BasicTest
@@ -69,7 +69,7 @@ private:
 			     const GLfloat attenuation[3],
 			     GLfloat min, GLfloat max,
 			     GLfloat eyeZ, GLboolean smooth) const;
-	GLfloat measureSize() const;
+	GLfloat measureSize(GLfloat yPos) const;
 };
 
 } // namespace GLEAN

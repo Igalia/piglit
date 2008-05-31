@@ -59,6 +59,9 @@ inline bool haveExtension(const char* name) {
 // RenderingContext.
 void (*getProcAddress(const char* name))();
 
+// Return GL renderer version as a float (1.1, 2.0, etc)
+float getVersion();
+
 // Check for OpenGL errors and log any that have occurred:
 void logGLErrors(Environment& env);
 

@@ -142,10 +142,8 @@ TexRectTest::runOne(BasicResult& r, Window& w)
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
-	if (w.config->db) {
-		glDrawBuffer(GL_BACK);
-		glReadBuffer(GL_BACK);
-	}
+	glDrawBuffer(GL_BACK);
+	glReadBuffer(GL_BACK);
 
 	r.pass = true;
 
