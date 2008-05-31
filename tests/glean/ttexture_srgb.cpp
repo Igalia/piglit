@@ -34,6 +34,7 @@
 #include "rand.h"
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 #ifdef GL_EXT_texture_sRGB
 

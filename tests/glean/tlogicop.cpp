@@ -34,6 +34,7 @@
 #include "rand.h"
 #include "image.h"
 #include <cmath>
+#include <cstdlib>
 
 namespace {
 

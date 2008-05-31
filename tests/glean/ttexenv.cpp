@@ -42,7 +42,8 @@
 
 #include "ttexenv.h"
 #include <cassert>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cmath>
 
 namespace GLEAN {

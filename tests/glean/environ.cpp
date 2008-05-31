@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdlib.h>
 #elif defined(__MS__)
 
 #include <sys/stat.h>

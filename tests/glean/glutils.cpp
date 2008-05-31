@@ -36,6 +36,7 @@
 #include "environ.h"
 #include "lex.h"
 #include "glutils.h"
+#include <cstdlib>
 #if defined(__X11__)
 #   include <dlfcn.h>
 #endif

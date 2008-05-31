@@ -33,6 +33,7 @@
 #include "rand.h"
 #include "image.h"
 #include <cmath>
+#include <cstdlib>
 
 #define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 

@@ -33,7 +33,8 @@
 
 #include "tglsl1.h"
 #include <cassert>
-#include <math.h>
+#include <cstring>
+#include <cmath>
 
 
 namespace GLEAN {

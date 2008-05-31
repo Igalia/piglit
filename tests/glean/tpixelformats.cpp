@@ -30,6 +30,7 @@
 #include "tpixelformats.h"
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
 
 
 // Set to 1 to help debug test failures:

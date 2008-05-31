@@ -41,6 +41,7 @@
 
 #include "tfragprog1.h"
 #include <cassert>
+#include <cstring>
 #include <cmath>
 #include <math.h>
 
