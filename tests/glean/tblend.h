@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 // tblend.h:  Test blending functions.
@@ -54,7 +54,7 @@ public:
 		float blErr;	// Max blend error, in bits.
 	};
 	vector<PartialResult> results;
-	
+
 	virtual void putresults(ostream& s) const;
 	virtual bool getresults(istream& s);
 };
@@ -67,7 +67,8 @@ public:
 private:
 	struct runFactorsResult {
 		float readbackErrorBits;
-		float blendErrorBits;
+		float blendRGBErrorBits;
+		float blendAlphaErrorBits;
 	};
 
 	runFactorsResult runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
@@ -75,11 +76,13 @@ private:
 				    GLenum opRGB, GLenum opA,
 				    const GLfloat constantColor[4],
 				    GLEAN::DrawingSurfaceConfig& config,
-				    GLEAN::Environment& env);
+				    GLEAN::Environment& env,
+				    float rgbTolerance, float alphaTolerance);
 
 	bool runCombo(BlendFuncResult& r, Window& w,
 		      BlendFuncResult::PartialResult p,
-		      GLEAN::Environment& env);
+		      GLEAN::Environment& env,
+		      float rgbTolerance, float alphaTolerance);
 
 	bool equalMode(const BlendFuncResult::PartialResult &r1,
 		       const BlendFuncResult::PartialResult &r2) const;

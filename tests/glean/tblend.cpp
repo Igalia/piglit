@@ -447,7 +447,8 @@ BlendFuncTest::runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
 			  GLenum opRGB, GLenum opA,
 			  const GLfloat constantColor[4],
 			  GLEAN::DrawingSurfaceConfig& config,
-			  GLEAN::Environment& env)
+			  GLEAN::Environment& env,
+			  float rgbTolerance, float alphaTolerance)
 {
 	using namespace GLEAN;
 
@@ -554,7 +555,8 @@ BlendFuncTest::runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
 	// maximum error encountered.
 	Image actual(drawingSize, drawingSize, GL_RGBA, GL_FLOAT);
 	actual.read(1, 1);
-	result.blendErrorBits = 0.0;
+	result.blendRGBErrorBits = 0.0;
+	result.blendAlphaErrorBits = 0.0;
 	sRow = actual.pixels();
 	dRow = expected.pixels();
 	for (/*int */y = 0; y < drawingSize; ++y) {
@@ -565,13 +567,15 @@ BlendFuncTest::runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
 			float gError = fabs(aPix[1] - ePix[1]);
 			float bError = fabs(aPix[2] - ePix[2]);
 			float aError = fabs(aPix[3] - ePix[3]);
-			result.blendErrorBits =
-				max(static_cast<double>(result.blendErrorBits),
+			result.blendRGBErrorBits =
+				max(static_cast<double>(result.blendRGBErrorBits),
 				max(ErrorBits(rError, config.r),
 				max(ErrorBits(gError, config.g),
-				max(ErrorBits(bError, config.b),
-				    ErrorBits(aError, config.a)))));
-			if (result.blendErrorBits > 1.0) {
+				    ErrorBits(bError, config.b))));
+			result.blendAlphaErrorBits =
+				max(static_cast<double>(result.blendAlphaErrorBits),
+				    ErrorBits(aError, config.a));
+			if (result.blendRGBErrorBits > rgbTolerance || result.blendAlphaErrorBits > alphaTolerance) {
 				if (env.options.verbosity) {
 float* sPix = reinterpret_cast<float*>(src.pixels()
 	+ y * src.rowSizeInBytes() + x * 4 * sizeof(float));
@@ -606,18 +610,19 @@ env.log << '\n'
 bool
 BlendFuncTest::runCombo(BlendFuncResult& r, Window& w,
 			BlendFuncResult::PartialResult p,
-			GLEAN::Environment& env)
+			GLEAN::Environment& env,
+			float rgbTolerance, float alphaTolerance)
 {
 	runFactorsResult res(runFactors(p.srcRGB, p.srcA, p.dstRGB, p.dstA,
 					p.opRGB, p.opA, p.constColor,
-					*(r.config), env));
+					*(r.config), env, rgbTolerance, alphaTolerance));
 	w.swap();
 
 	p.rbErr = res.readbackErrorBits;
-	p.blErr = res.blendErrorBits;
+	p.blErr = max(res.blendRGBErrorBits, res.blendAlphaErrorBits);
 	r.results.push_back(p);
 
-	if (p.rbErr > 1.0 || p.blErr > 1.0) {
+	if (p.rbErr > 1.0 || res.blendRGBErrorBits > rgbTolerance || res.blendAlphaErrorBits > alphaTolerance) {
 		env.log << name << ":  FAIL "
 			<< r.config->conciseDescription() << '\n'
 			<< "\tsource factor RGB = " << factorToName(p.srcRGB)
@@ -684,6 +689,24 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 		GL_MIN,
 		GL_MAX
 	};
+
+	// Hack: Make driver tests on incorrect hardware feasible
+	// We want to be able to perform meaningful tests
+	// even when the blend unit of a GPU simply doesn't have
+	// sufficient precision.
+	float rgbTolerance = 1.0;
+	float alphaTolerance = 1.0;
+
+	const char* s = getenv("GLEAN_BLEND_RGB_TOLERANCE");
+	if (s) {
+		rgbTolerance = atof(s);
+		env->log << "Note: RGB tolerance changed to " << rgbTolerance << "\n";
+	}
+	s = getenv("GLEAN_BLEND_ALPHA_TOLERANCE");
+	if (s) {
+		alphaTolerance = atof(s);
+		env->log << "Note: Alpha tolerance changed to " << alphaTolerance << "\n";
+	}
 
 	unsigned numSrcFactorsSep, numDstFactorsSep;
 	unsigned numOperatorsRGB, numOperatorsA;
@@ -825,7 +848,7 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 									needsBlendColor(p.dstA)))
 								continue;
 
-							if (!runCombo(r, w, p, *env)) {
+							if (!runCombo(r, w, p, *env, rgbTolerance, alphaTolerance)) {
 								allPassed = false;
 							}
 						}
