@@ -15,6 +15,8 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 	mesautil
+	piglitutil
 )
 
 add_executable (cubemap cubemap.c)
+add_executable (texrect-many texrect-many.c)

@@ -69,6 +69,7 @@ bugs['fdo14575'] = PlainExecTest([testBinDir + 'fdo14575', '-auto'])
 
 texturing = Group()
 texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
+texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
 
 profile.tests['bugs'] = bugs
 profile.tests['glean'] = glean
