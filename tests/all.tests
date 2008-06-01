@@ -74,7 +74,7 @@ profile.tests['bugs'] = bugs
 profile.tests['glean'] = glean
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
-profile.tests['texturing'] = bugs
+profile.tests['texturing'] = texturing
 
 #############
 # Some Mesa diagnostic messages that we should probably ignore
