@@ -91,6 +91,7 @@ def main():
 	profile = core.loadTestProfile(profileFilename)
 	env.file = open(resultsDir + '/main', "w")
 	print >>env.file, "name: %(name)s" % { 'name': core.encode(OptionName) }
+	env.collectData()
 	profile.run(env)
 	env.file.close()
 

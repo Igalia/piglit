@@ -179,8 +179,8 @@ class TestrunResult:
 
 			key = line[:colon]
 			value = decode(line[colon+2:])
-			if key == 'name':
-				self.name = value
+			if key in ['name', 'glxinfo', 'lspci']:
+				self.__dict__[key] = value
 			elif key == '@test':
 				comp = value.split('/')
 				group = self.results
@@ -215,6 +215,17 @@ class Environment:
 		self.file = sys.stdout
 		self.execute = True
 		self.filter = []
+
+	def run(self,command):
+		p = subprocess.Popen(
+			command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		(stdout,stderr) = p.communicate();
+		return stderr+stdout
+		print >>self.file, "glxinfo:", encode(stderr+stdout)
+
+	def collectData(self):
+		print >>self.file, "glxinfo:", encode(self.run('glxinfo'))
+		print >>self.file, "lspci:", encode(self.run('lspci'))
 
 
 class Test:
