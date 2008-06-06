@@ -41,6 +41,9 @@ static GLboolean Automatic = GL_FALSE;
 #define WIN_WIDTH	(MAX_SIZE * 6 + PAD * 7)
 #define WIN_HEIGHT	(10 * PAD + MAX_SIZE * 2)
 
+static int demoDimension = MAX_SIZE;
+static int demoMipmapped = GL_FALSE;
+
 static const GLenum face_targets[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
@@ -337,9 +340,31 @@ static void display()
 
 		exit(pass ? 0 : 1);
 	} else {
-		/* Demo mode: MAX_SIZE and mipmapped. */
-		draw_at_size(MAX_SIZE, GL_FALSE);
+		/* Demo mode: Dimension and mipmapping controlled by keystrokes. */
+		draw_at_size(demoDimension, demoMipmapped);
 	}
+}
+
+static void Key(unsigned char key, int x, int y)
+{
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 'm':
+		demoMipmapped = !demoMipmapped;
+		break;
+	case 'd':
+		demoDimension = demoDimension/2;
+		if (demoDimension <= 0)
+			demoDimension = MAX_SIZE;
+		break;
+	case 27:
+		exit(0);
+		break;
+	}
+	printf("Demo display of dimension %i%s\n",
+		demoDimension, demoMipmapped ? " mipmapped" : "");
+	glutPostRedisplay();
 }
 
 static void init()
@@ -376,5 +401,9 @@ int main(int argc, char**argv)
 	glutCreateWindow ("cubemap");
 	init();
 	glutDisplayFunc(display);
+	if (!Automatic) {
+		printf("Press 'd' or 'm' to change demo mode; Escape to quit\n");
+		glutKeyboardFunc(Key);
+	}
 	glutMainLoop();
 }
