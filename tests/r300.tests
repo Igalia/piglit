@@ -32,3 +32,13 @@ env['GLEAN_BLEND_ALPHA_TOLERANCE'] = 2.0
 env = profile.tests['glean']['exactRGBA'].env
 env['GLEAN_EXACTRGBA_ROUNDING'] = 1
 
+
+# Tests specific to r300
+r300 = Group()
+# Apparently, LOD calculations are off a little for small MIP levels.
+# This test is a relaxed variant of the texturing/cubemap test.
+# Its only purpose is to catch major regressions in cubemapping as long as we
+# fail the real texturing/cubemap test.
+r300['cubemap-relax'] = PlainExecTest([testBinDir + 'cubemap', '-auto', '-r300relax'])
+
+profile.tests['r300'] = r300

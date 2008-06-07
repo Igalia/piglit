@@ -34,6 +34,7 @@
 #include "piglit-util.h"
 
 static GLboolean Automatic = GL_FALSE;
+static GLboolean Hack_r300Relax = GL_FALSE;
 
 #define MAX_SIZE	64
 #define PAD		5
@@ -289,7 +290,7 @@ draw_at_size(int size, GLboolean mipmapped)
 
 			glEnd();
 
-			if (Automatic) {
+			if (Automatic && (dim > 2 || !Hack_r300Relax)) {
 				pass = test_results(base_x, base_y,
 						    dim, level, face,
 						    mipmapped,
@@ -392,9 +393,16 @@ static void init()
 
 int main(int argc, char**argv)
 {
+	int i;
 	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
+	for(i = 1; i < argc; ++i) {
+		if (!strcmp(argv[i], "-auto"))
+			Automatic = 1;
+		else if (!strcmp(argv[i], "-r300relax"))
+			Hack_r300Relax = 1;
+		else
+			printf("Unknown option: %s\n", argv[i]);
+	}
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition (100, 100);
