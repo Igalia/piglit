@@ -3,6 +3,7 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
+	${piglit_SOURCE_DIR}/tests/util
 )
 
 link_directories (
@@ -15,8 +16,10 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 	mesautil
+	piglitutil
 )
 
 add_executable (fdo9833 fdo9833.c)
 add_executable (fdo10370 fdo10370.c)
 add_executable (fdo14575 fdo14575.c)
+add_executable (r300-readcache r300-readcache.c)
