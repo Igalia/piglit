@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <iomanip>
+#include <cstdlib>
 #include "misc.h"
 #include "rand.h"
 #include "treadpix.h"
