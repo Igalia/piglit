@@ -102,6 +102,9 @@ class TestResult(dict):
 			'dict': dict.__repr__(self)
 		}
 
+	def allTestResults(self,name):
+		return {name: self}
+
 	def write(self,file,path):
 		print >>file, "@test: " + encode(path)
 		for k in self:
@@ -136,12 +139,42 @@ class GroupResult(dict):
 			'dict': dict.__repr__(self)
 		}
 
+	def allTestResults(self, groupName):
+		collection = {}
+		for name,sub in self.items():
+			subfullname = name
+			if len(groupName) > 0:
+				subfullname = groupName + '/' + subfullname
+			collection.update(sub.allTestResults(subfullname))
+		return collection
+
+	def write(self, file, groupName):
+		for name,sub in self.items():
+			subfullname = name
+			if len(groupName) > 0:
+				subfullname = groupName + '/' + subfullname
+			sub.write(file, subfullname)
+
+
 class TestrunResult:
 	def __init__(self, *args):
 		self.name = ''
+		self.globalkeys = ['name', 'glxinfo', 'lspci']
 		self.results = GroupResult()
 
-	def parse(self, path):
+	def allTestResults(self):
+		'''Return a dictionary containing (name: TestResult) mappings.
+		Note that writing to this dictionary has no effect.'''
+		return self.results.allTestResults('')
+
+	def write(self, file):
+		for key in self.globalkeys:
+			if key in self.__dict__:
+				print >>file, "%s: %s" % (key, encode(self.__dict__[key]))
+
+		self.results.write(file,'')
+
+	def parse(self, path, PreferSummary):
 		def arrayparser(a):
 			def cb(line):
 				if line == '!':
@@ -179,7 +212,7 @@ class TestrunResult:
 
 			key = line[:colon]
 			value = decode(line[colon+2:])
-			if key in ['name', 'glxinfo', 'lspci']:
+			if key in self.globalkeys:
 				self.__dict__[key] = value
 			elif key == '@test':
 				comp = value.split('/')
@@ -194,15 +227,27 @@ class TestrunResult:
 
 				stack.append(dictparser(result))
 			else:
-				raise Exception("Line %(linenr)d: Unknown key" % locals())
+				raise Exception("Line %d: Unknown key %s" % (linenr, key))
 
-		main = open(path + '/main', 'r')
+		main = None
+		filelist = [path + '/main', path + '/summary']
+		if PreferSummary:
+			filelist[:0] = [path + '/summary']
+		for filename in filelist:
+			try:
+				main = open(filename, 'r')
+				break
+			except:
+				pass
+		if not main:
+			raise Exception("Failed to open %(path)s" % locals())
 		stack = [toplevel]
 		linenr = 1
 		for line in main:
 			if line[-1] == '\n':
 				stack[-1](line[0:-1])
 			linenr = linenr + 1
+		main.close()
 
 
 
@@ -319,12 +364,12 @@ def loadTestProfile(filename):
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
 
-def loadTestResults(path):
+def loadTestResults(path,PreferSummary=False):
 	try:
 		mode = os.stat(path)[stat.ST_MODE]
 		if stat.S_ISDIR(mode):
 			testrun = TestrunResult()
-			testrun.parse(path)
+			testrun.parse(path,PreferSummary)
 		else:
 			# BACKWARDS COMPATIBILITY
 			ns = {

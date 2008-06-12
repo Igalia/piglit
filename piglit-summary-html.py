@@ -226,6 +226,7 @@ def usage():
 Usage: %(progName)s [options] [summary-dir] [test.results]...
 
 Options:
+  -f, --full            Prefer the full results over the
   -h, --help            Show this message
   -o, --overwrite       Overwrite existing directories
 
@@ -238,16 +239,19 @@ Example:
 
 def main():
 	try:
-		options, args = getopt(sys.argv[1:], "ho", [ "help", "overwrite" ])
+		options, args = getopt(sys.argv[1:], "hof", [ "help", "overwrite", "full" ])
 	except GetoptError:
 		usage()
 
 	OptionOverwrite = False
+	OptionPreferSummary = True
 	for name,value in options:
 		if name == "-h" or name == "--help":
 			usage()
 		elif name == "-o" or name == "--overwrite":
 			OptionOverwrite = True
+		elif name == "-f" or name == "--full":
+			OptionPreferSummary = False
 
 	if len(args) < 2:
 		usage()
@@ -257,7 +261,7 @@ def main():
 
 	core.checkDir(summaryDir, not OptionOverwrite)
 
-	results = [core.loadTestResults(name) for name in resultFilenames]
+	results = [core.loadTestResults(name, OptionPreferSummary) for name in resultFilenames]
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):

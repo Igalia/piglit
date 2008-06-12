@@ -95,5 +95,20 @@ def main():
 	profile.run(env)
 	env.file.close()
 
+	print "Writing summary file..."
+	results = core.loadTestResults(resultsDir)
+	for testname,result in results.allTestResults().items():
+		if 'info' in result:
+			if len(result['info']) > 4096:
+				result['info'] = result['info'][0:4096]
+	file = open(resultsDir + '/summary', "w")
+	results.write(file)
+	file.close()
+
+	print
+	print 'Thank you for running Piglit!'
+	print 'Summary for submission has been written to ' + resultsDir + '/summary'
+
+
 if __name__ == "__main__":
 	main()
