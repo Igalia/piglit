@@ -70,6 +70,7 @@ bugs['r300-readcache'] = PlainExecTest([testBinDir + 'r300-readcache'])
 
 texturing = Group()
 texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
+texturing['texdepth'] = PlainExecTest([testBinDir + 'texdepth', '-auto'])
 texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
 
 profile.tests['bugs'] = bugs

@@ -32,4 +32,4 @@ enum piglit_result {
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
-
+int piglit_probe_pixel_rgba(int x, int y, const float* expected);
