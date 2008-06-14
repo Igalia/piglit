@@ -20,6 +20,12 @@ Test.ignoreErrors.append(re.compile('3D driver claims to not support'))
 # Debug info
 Test.ignoreErrors.append(re.compile('Try R300_SPAN_DISABLE_LOCKING env var if this hangs.'))
 
+# Some window managers can be confusing for some of the tests because they
+# send resize / move events that invalidate frame buffer contents.
+# It would be nice to fix these things in a reliable way, but for now
+# this workaround of waiting between tests helps...
+Test.sleep = 0.2
+
 
 # glean/blendFunc
 #   R300 blending hardware appears to be bad
@@ -31,7 +37,6 @@ env['GLEAN_BLEND_ALPHA_TOLERANCE'] = 2.0
 #   insane OpenGL spec requirements
 env = profile.tests['glean']['exactRGBA'].env
 env['GLEAN_EXACTRGBA_ROUNDING'] = 1
-
 
 # Tests specific to r300
 r300 = Group()

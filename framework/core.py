@@ -29,6 +29,7 @@ import re
 import stat
 import subprocess
 import sys
+import time
 import traceback
 
 __all__ = [
@@ -275,6 +276,7 @@ class Environment:
 
 class Test:
 	ignoreErrors = []
+	sleep = 0
 
 	def __init__(self):
 		pass
@@ -305,6 +307,8 @@ class Test:
 			print "    result: %(result)s" % { 'result': result['result'] }
 
 			result.write(env.file,path)
+			if Test.sleep:
+				time.sleep(Test.sleep)
 		else:
 			print "Dry-run: %(path)s" % locals()
 
@@ -345,6 +349,7 @@ class Group(dict):
 class TestProfile:
 	def __init__(self):
 		self.tests = Group()
+		self.sleep = 0
 
 	def run(self, env):
 		self.tests.doRun(env, '')
@@ -356,7 +361,7 @@ class TestProfile:
 def loadTestProfile(filename):
 	try:
 		ns = {
-			'__file__': filename,
+			'__file__': filename
 		}
 		execfile(filename, ns)
 		return ns['profile']
