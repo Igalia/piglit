@@ -284,6 +284,8 @@ static void Init( void )
    glVertex2f(-1,  1);
    glEnd();
    glEndList();
+
+   Reshape(Width, Height);
 }
 
 
