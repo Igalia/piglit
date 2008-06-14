@@ -62,6 +62,12 @@ shaders['fp-kil'] = PlainExecTest([testBinDir + 'fp-kil', '-auto'])
 shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', '-auto'])
 shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
 
+fpgeneric = Group()
+def make_fpgeneric(name):
+	return PlainExecTest([testBinDir + 'fp-generic', testBinDir + '../tests/shaders/generic/' + name])
+fpgeneric['dph'] = make_fpgeneric('dph.fp')
+shaders['fp-generic'] = fpgeneric
+
 bugs = Group()
 bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
 bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])

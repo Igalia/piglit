@@ -23,6 +23,7 @@ link_libraries (
 add_executable (trinity-fp1 trinity-fp1.c)
 add_executable (fp-lit-mask fp-lit-mask.c)
 add_executable (fp-fragment-position fp-fragment-position.c)
+add_executable (fp-generic fp-generic.c)
 add_executable (fp-kil fp-kil.c)
 add_executable (fp-incomplete-tex fp-incomplete-tex.c)
 add_executable (vp-bad-program vp-bad-program.c)
