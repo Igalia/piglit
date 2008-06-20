@@ -51,6 +51,7 @@ static int automatic = 0;
 #define WIN_HEIGHT 128
 
 static PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
+static PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
 
 static void
 display(void)
@@ -86,8 +87,11 @@ display(void)
 	}
 
 	/* Check that we correctly produce GL_INVALID_OPERATION when rendering
-	 * with the bad program string.
+	 * with an invalid/non-existant program.
 	 */
+        pglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 99);
+        glEnable(GL_VERTEX_PROGRAM_ARB);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBegin(GL_POLYGON);
 	glTexCoord2f(0, 0);  glVertex2f(-0.25, -0.25);
@@ -108,7 +112,7 @@ display(void)
 	}
 
 	/* Check that we correctly produce GL_INVALID_OPERATION when doing
-	 * glDrawArrays with the bad program string.
+	 * glDrawArrays with an invalid/non-existant program.
 	 */
 
 	glVertexPointer(3, GL_FLOAT, 0, vertcoords);
@@ -153,6 +157,9 @@ main(int argc, char**argv)
 
 	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
 	assert(pglProgramStringARB);
+
+	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
+	assert(pglBindProgramARB);
 
 	glutMainLoop();
 	return 0;

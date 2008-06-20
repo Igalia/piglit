@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
 		Automatic = 1;
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(Key);

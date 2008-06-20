@@ -43,11 +43,13 @@ static void CheckFail(const char* cond);
 static GLuint FragProg[NUM_PROGRAMS];
 
 static const char* const ProgramText[NUM_PROGRAMS] = {
+		/* Color = fragment pos * scale factor */
 		"!!ARBfp1.0\n"
 		"PARAM factor = { 0.01, 0.01, 1.0, 0.2 };\n"
 		"MUL result.color, fragment.position, factor;\n"
 		"END",
 
+		/* Color = dependent 2D texture read */
 		"!!ARBfp1.0\n"
 		"TEMP r0;\n"
 		"ALIAS scaled = r0;\n"
@@ -55,12 +57,17 @@ static const char* const ProgramText[NUM_PROGRAMS] = {
 		"TEX result.color, scaled, texture[1], 2D;\n"
 		"END",
 
+		/* Color = RECT texture color at fragment pos */
 		"!!ARBfp1.0\n"
 		"TEX result.color, fragment.position, texture[0], RECT;\n"
 		"END",
 
+		/* Color = 2D texture color at fragment pos */
 		"!!ARBfp1.0\n"
-		"TEX result.color, fragment.position, texture[1], 2D;\n"
+		"PARAM scale = { 0.01, 0.01, 1.0, 1.0 };\n"
+		"TEMP tc;\n"
+		"MUL tc, fragment.position, scale;\n"
+		"TEX result.color, tc, texture[1], 2D;\n"
 		"MOV result.color.w, 0.5;\n"
 		"END",
 };
@@ -79,6 +86,19 @@ static PFNGLISPROGRAMARBPROC pglIsProgramARB;
 static PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
 
 
+/**
+ * Draw four quadrilaterals, one for each fragment program:
+ *  +--------+--------+
+ *  |        |        |
+ *  | Prog 1 | Prog 3 |
+ *  |        |        |
+ *  +--------+--------+
+ *  |        |        |
+ *  | Prog 0 | Prog 2 |
+ *  |        |        |
+ *  +--------+--------+
+ * Each quad is about 100x100 pixels in size.
+ */
 static void DoFrame(void)
 {
 	int mask;
@@ -208,22 +228,22 @@ static const struct {
 	{
 		"tex2d unscaled #1",
 		1.2, 1.2,
-		{ 1.0, 0.5, 0.5, 0.5 }
+		{ 0.8, 0.2, 0.2, 0.5 }
 	},
 	{
 		"tex2d unscaled #2",
 		1.8, 1.2,
-		{ 1.0, 0.5, 0.5, 0.5 }
+		{ 0.2, 0.2, 0.8, 0.5 }
 	},
 	{
 		"tex2d unscaled #3",
 		1.8, 1.8,
-		{ 1.0, 0.5, 0.5, 0.5 }
+		{ 0.2, 0.8, 0.8, 0.5 }
 	},
 	{
 		"tex2d unscaled #4",
 		1.2, 1.8,
-		{ 1.0, 0.5, 0.5, 0.5 }
+		{ 0.8, 0.8, 0.2, 0.5 }
 	},
 
 	// Sentinel!
@@ -248,6 +268,12 @@ static int DoTest( void )
 		GLfloat delta[4];
 		int i;
 
+		/*
+                printf("ReadPixels at %d, %d\n", 
+                       (int)(Probes[idx].x*Width/2),
+                       (int)(Probes[idx].y*Height/2));
+		*/
+           
 		glReadPixels((int)(Probes[idx].x*Width/2),
 		             (int)(Probes[idx].y*Height/2),
 		             1, 1,
@@ -410,7 +436,7 @@ static void Init(void)
 	}
 
 	/*
-	 * Textures
+	 * Texture unit 0: 200x200 RECTANGLE texture
 	 */
 	for(y = 0; y < 200; ++y) {
 		for(x = 0; x < 200; ++x) {
@@ -426,6 +452,9 @@ static void Init(void)
 	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA, 200, 200, 0,
 	             GL_RGBA, GL_UNSIGNED_BYTE, rectangle);
 
+	/*
+	 * Texture unit 1: 256x256 2D texture
+	 */
 	for(y = 0; y < 256; ++y) {
 		for(x = 0; x < 256; ++x) {
 			tex[256*y+x][0] = 255-x;

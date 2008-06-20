@@ -196,7 +196,7 @@ int main(int argc, char**argv)
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 	glutInitWindowSize(Width, Height);
 	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);

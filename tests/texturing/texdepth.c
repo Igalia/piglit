@@ -65,6 +65,7 @@ static void CreateRenderedTexture()
 static int probe_cell_depth_mode(int cellx, int celly, int depth_texture_mode, float value)
 {
 	float expected[4] = { 1.0, 1.0, 1.0, 1.0 };
+        int res;
 
 	switch(depth_texture_mode) {
 	case GL_INTENSITY:
@@ -83,9 +84,13 @@ static int probe_cell_depth_mode(int cellx, int celly, int depth_texture_mode, f
 		break;
 	}
 
-	return piglit_probe_pixel_rgba(
+	res = piglit_probe_pixel_rgba(
 		cellx*CellWidth + (CellWidth/2), celly*CellHeight + (CellHeight/2),
 		expected);
+
+        printf("%s(%d, %d, 0x%x, %f) = %d\n",
+               __FUNCTION__, cellx, celly, depth_texture_mode, value, res);
+        return res;
 }
 
 
@@ -408,7 +413,7 @@ int main(int argc, char**argv)
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
 	glutInitWindowSize(Width, Height);
 	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
