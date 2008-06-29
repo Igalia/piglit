@@ -175,7 +175,7 @@ class TestrunResult:
 
 		self.results.write(file,'')
 
-	def parse(self, path, PreferSummary):
+	def parseFile(self, file):
 		def arrayparser(a):
 			def cb(line):
 				if line == '!':
@@ -230,6 +230,14 @@ class TestrunResult:
 			else:
 				raise Exception("Line %d: Unknown key %s" % (linenr, key))
 
+		stack = [toplevel]
+		linenr = 1
+		for line in file:
+			if line[-1] == '\n':
+				stack[-1](line[0:-1])
+			linenr = linenr + 1
+
+	def parseDir(self,path,PreferSummary):
 		main = None
 		filelist = [path + '/main', path + '/summary']
 		if PreferSummary:
@@ -242,14 +250,8 @@ class TestrunResult:
 				pass
 		if not main:
 			raise Exception("Failed to open %(path)s" % locals())
-		stack = [toplevel]
-		linenr = 1
-		for line in main:
-			if line[-1] == '\n':
-				stack[-1](line[0:-1])
-			linenr = linenr + 1
+		self.parseFile(main)
 		main.close()
-
 
 
 #############################################################################
@@ -372,28 +374,13 @@ def loadTestProfile(filename):
 def loadTestResults(path,PreferSummary=False):
 	try:
 		mode = os.stat(path)[stat.ST_MODE]
+		testrun = TestrunResult()
 		if stat.S_ISDIR(mode):
-			testrun = TestrunResult()
-			testrun.parse(path,PreferSummary)
+			testrun.parseDir(path,PreferSummary)
 		else:
-			# BACKWARDS COMPATIBILITY
-			ns = {
-				'__file__': path,
-				'GroupResult': GroupResult,
-				'TestResult': TestResult,
-				'TestrunResult': TestrunResult
-			}
-			execfile(path, ns)
-
-			if 'testrun' not in ns:
-				testrun = TestrunResult()
-				testrun.results.update(ns['results'])
-				if 'name' in ns:
-					testrun.name = ns['name']
-				ns['testrun'] = testrun
-
-			testrun = ns['testrun']
-			# END BACKWARDS COMPATIBILITY
+			file = open(path, 'r')
+			testrun.parseFile(file)
+			file.close()
 
 		if len(testrun.name) == 0:
 			if path[-1] == '/':
