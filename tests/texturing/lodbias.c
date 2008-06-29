@@ -34,6 +34,10 @@
  *  2. LOD bias is applied *before* clamping.
  *  3. The supported bias range must be reported correctly.
  *
+ * @todo
+ * Check per-texture object LOD bias (support for this was added in OpenGL 1.4).
+ * In particular, check interaction of per-texture and per-TexUnit bias.
+ * Check clamping behaviour.
  */
 
 #include <assert.h>
@@ -249,6 +253,8 @@ static void Init(void)
 	piglit_require_extension("GL_EXT_texture_lod_bias");
 
 	glGetIntegerv(GL_MAX_TEXTURE_LOD_BIAS_EXT, &MaxTextureLodBias);
+	if (!Automatic)
+		printf("MAX_TEXTURE_LOD_BIAS_EXT = %i\n", MaxTextureLodBias);
 
 	glGenTextures(2, Textures);
 
