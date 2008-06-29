@@ -76,6 +76,7 @@ bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
 bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])
 bugs['fdo14575'] = PlainExecTest([testBinDir + 'fdo14575', '-auto'])
 bugs['r300-readcache'] = PlainExecTest([testBinDir + 'r300-readcache'])
+bugs['tex1d-2dborder'] = PlainExecTest([testBinDir + 'tex1d-2dborder', '-auto'])
 
 texturing = Group()
 texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
