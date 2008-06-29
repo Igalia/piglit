@@ -19,5 +19,6 @@ link_libraries (
 )
 
 add_executable (cubemap cubemap.c)
+add_executable (lodbias lodbias.c)
 add_executable (texdepth texdepth.c)
 add_executable (texrect-many texrect-many.c)
