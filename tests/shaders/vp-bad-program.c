@@ -50,9 +50,6 @@ static int automatic = 0;
 #define WIN_WIDTH 128
 #define WIN_HEIGHT 128
 
-static PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
-static PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
-
 static void
 display(void)
 {
@@ -153,13 +150,7 @@ main(int argc, char**argv)
 	glutCreateWindow("vp-bad-program");
 	glutDisplayFunc(display);
 
-	piglit_require_extension("GL_ARB_vertex_program");
-
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
-	assert(pglProgramStringARB);
-
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
-	assert(pglBindProgramARB);
+	piglit_require_vertex_program();
 
 	glutMainLoop();
 	return 0;

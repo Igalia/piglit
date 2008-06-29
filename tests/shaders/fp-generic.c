@@ -154,12 +154,6 @@ static struct testcase Testcase;
 static GLuint FragProg;
 
 
-static PFNGLGENPROGRAMSARBPROC pglGenProgramsARB;
-static PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
-static PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
-static PFNGLISPROGRAMARBPROC pglIsProgramARB;
-static PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
-
 
 static void TestInstance(struct testinstance* instance)
 {
@@ -224,25 +218,7 @@ static void Reshape(int width, int height)
 
 static void Init(void)
 {
-	piglit_require_extension("GL_ARB_fragment_program");
-
-	/*
-	 * Get extension function pointers.
-	 */
-	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
-	assert(pglGenProgramsARB);
-
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
-	assert(pglProgramStringARB);
-
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
-	assert(pglBindProgramARB);
-
-	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) glutGetProcAddress("glIsProgramARB");
-	assert(pglIsProgramARB);
-
-	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) glutGetProcAddress("glDeleteProgramsARB");
-	assert(pglDeleteProgramsARB);
+	piglit_require_fragment_program();
 
 	/*
 	 * Fragment programs

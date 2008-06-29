@@ -33,6 +33,8 @@
 #include <math.h>
 #include <GL/glut.h>
 
+#include "piglit-util.h"
+
 static void CheckFail(const char* cond);
 
 #define check(cond) do { if (!(cond)) CheckFail(#cond); } while(0)
@@ -67,16 +69,6 @@ static const char* const ProgramText[NUM_PROGRAMS] = {
 static int Automatic = 0;
 
 static int Width = 300, Height = 200;
-
-static PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB;
-static PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB;
-static PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
-static PFNGLGENPROGRAMSARBPROC pglGenProgramsARB;
-static PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
-static PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
-static PFNGLISPROGRAMARBPROC pglIsProgramARB;
-static PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
-
 
 static void DoFrame(void)
 {
@@ -244,39 +236,7 @@ static void Init(void)
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
-	if (!glutExtensionSupported("GL_ARB_fragment_program")) {
-		fprintf(stderr, "Sorry, this demo requires GL_ARB_fragment_program\n");
-		if (Automatic)
-			printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
-	}
-
-	/*
-	* Get extension function pointers.
-	*/
-	pglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) glutGetProcAddress("glProgramLocalParameter4fvARB");
-	assert(pglProgramLocalParameter4fvARB);
-
-	pglProgramLocalParameter4dARB = (PFNGLPROGRAMLOCALPARAMETER4DARBPROC) glutGetProcAddress("glProgramLocalParameter4dARB");
-	assert(pglProgramLocalParameter4dARB);
-
-	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) glutGetProcAddress("glGetProgramLocalParameterdvARB");
-	assert(pglGetProgramLocalParameterdvARB);
-
-	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
-	assert(pglGenProgramsARB);
-
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
-	assert(pglProgramStringARB);
-
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
-	assert(pglBindProgramARB);
-
-	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) glutGetProcAddress("glIsProgramARB");
-	assert(pglIsProgramARB);
-
-	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) glutGetProcAddress("glDeleteProgramsARB");
-	assert(pglDeleteProgramsARB);
+	piglit_require_fragment_program();
 
 	/*
 	 * Fragment programs

@@ -32,4 +32,20 @@ enum piglit_result {
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
+int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
+
+extern PFNGLGENPROGRAMSARBPROC pglGenProgramsARB;
+extern PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
+extern PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
+extern PFNGLISPROGRAMARBPROC pglIsProgramARB;
+extern PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
+extern PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB;
+extern PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB;
+extern PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
+
+int piglit_use_fragment_program();
+int piglit_use_vertex_program();
+void piglit_require_fragment_program();
+void piglit_require_vertex_program();
+GLuint piglit_compile_program(GLenum target, const char* text);
