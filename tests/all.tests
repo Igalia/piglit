@@ -54,6 +54,9 @@ glean['vertProg1'] = GleanTest('vertProg1')
 mesa = Group()
 mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
+general = Group()
+general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
+
 shaders = Group()
 shaders['trinity-fp1'] = PlainExecTest([testBinDir + 'trinity-fp1', '-auto'])
 shaders['fp-lit-mask'] = PlainExecTest([testBinDir + 'fp-lit-mask', '-auto'])
@@ -80,6 +83,7 @@ texturing['texdepth'] = PlainExecTest([testBinDir + 'texdepth', '-auto'])
 texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
 
 profile.tests['bugs'] = bugs
+profile.tests['general'] = general
 profile.tests['glean'] = glean
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
