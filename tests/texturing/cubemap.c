@@ -370,13 +370,7 @@ static void Key(unsigned char key, int x, int y)
 
 static void init()
 {
-	if (!glutExtensionSupported("GL_ARB_texture_cube_map")) {
-		fprintf(stderr,
-			"Sorry, this demo requires GL_ARB_texture_cube_map\n");
-		if (Automatic)
-			printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
-	}
+	piglit_require_extension("GL_ARB_texture_cube_map");
 
 	/* Set up projection matrix so we can just draw using window
 	 * coordinates.

@@ -238,50 +238,8 @@ static void Init(void)
 
 	piglit_require_fragment_program();
 
-	/*
-	 * Fragment programs
-	 */
-	pglGenProgramsARB(NUM_PROGRAMS, FragProg);
-
-	for(i = 0; i < NUM_PROGRAMS; ++i) {
-		GLint errorPos;
-
-		check(FragProg[i]);
-
-		pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[i]);
-		pglProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
-		                    strlen(ProgramText[i]),
-		                     (const GLubyte *)ProgramText[i]);
-		glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
-		if (glGetError() != GL_NO_ERROR || errorPos != -1) {
-			int l = FindLine(ProgramText[i], errorPos);
-			int a;
-
-			fprintf(stderr, "%i: Fragment Program Error (pos=%d line=%d): %s\n",
-			        i, errorPos, l,
-			        (char *)glGetString(GL_PROGRAM_ERROR_STRING_ARB));
-
-			for (a=-10; a<10; a++)
-			{
-				if (errorPos+a < 0)
-					continue;
-				if (errorPos+a >= strlen(ProgramText[i]))
-					break;
-				fprintf(stderr, "%c", ProgramText[i][errorPos+a]);
-			}
-			fprintf(stderr, "\n");
-
-			if (Automatic)
-				printf("PIGLIT: {'result': 'fail' }\n");
-			exit(1);
-		}
-		if (!pglIsProgramARB(FragProg[i])) {
-			fprintf(stderr, "pglIsProgramARB failed\n");
-			if (Automatic)
-				printf("PIGLIT: {'result': 'fail' }\n");
-			exit(1);
-		}
-	}
+	for(i = 0; i < NUM_PROGRAMS; ++i)
+		FragProg[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, ProgramText[i]);
 
 	Reshape(Width,Height);
 }

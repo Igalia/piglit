@@ -32,6 +32,7 @@
 #include <math.h>
 #include <GL/glut.h>
 
+#include "piglit-util.h"
 
 static GLuint FragProg[15];
 
@@ -48,23 +49,14 @@ static int Automatic = 0;
 
 static int Width = 200, Height = 200;
 
-static PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB;
-static PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB;
-static PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
-static PFNGLGENPROGRAMSARBPROC pglGenProgramsARB;
-static PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
-static PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
-static PFNGLISPROGRAMARBPROC pglIsProgramARB;
-static PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
-
 
 static void DoFrame(void)
 {
 	int mask;
-	
+
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	
+
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 	for(mask = 1; mask < 16; ++mask) {
@@ -89,10 +81,10 @@ static int DoTest( void )
 {
 	int mask;
 	GLfloat dmax;
-	
+
 	glReadBuffer( GL_FRONT );
 	dmax = 0;
-	
+
 	for(mask = 1; mask < 16; ++mask) {
 		GLfloat probe[4];
 		GLfloat delta[4];
@@ -100,19 +92,19 @@ static int DoTest( void )
 
 		glReadPixels(Width*(2*(mask%4)+1)/8, Height*(2*(mask/4)+1)/8, 1, 1,
 				GL_RGBA, GL_FLOAT, probe);
-		
+
 		printf("Probe %i: %f,%f,%f,%f\n", mask, probe[0], probe[1], probe[2], probe[3]);
-		
+
 		for(i = 0; i < 4; ++i) {
 			if (mask & (1 << i))
 				delta[i] = probe[i] - LitExpected[i];
 			else
 				delta[i] = probe[i] - 0.8;
-			
+
 			if (delta[i] > dmax) dmax = delta[i];
 			else if (-delta[i] > dmax) dmax = -delta[i];
 		}
-	
+
 		printf("   Delta: %f,%f,%f,%f\n", delta[0], delta[1], delta[2], delta[3]);
 	}
 
@@ -128,10 +120,10 @@ static int DoTest( void )
 static void Redisplay(void)
 {
 	int succ;
-	
+
 	DoFrame();
 	succ = DoTest();
-	
+
 	if (Automatic) {
 		printf("\nPIGLIT: { 'result': '%s' }\n", succ ? "pass" : "fail");
 		exit(0);
@@ -169,84 +161,29 @@ static void Key(unsigned char key, int x, int y)
 static void Init(void)
 {
 	int mask;
-	
-	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-	
-	if (!glutExtensionSupported("GL_ARB_fragment_program")) {
-		fprintf(stderr, "Sorry, this demo requires GL_ARB_fragment_program\n");
-		if (Automatic)
-			printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
-	}
 
-	/*
-	 * Get extension function pointers.
-	 */
-	pglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) glutGetProcAddress("glProgramLocalParameter4fvARB");
-	assert(pglProgramLocalParameter4fvARB);
-	
-	pglProgramLocalParameter4dARB = (PFNGLPROGRAMLOCALPARAMETER4DARBPROC) glutGetProcAddress("glProgramLocalParameter4dARB");
-	assert(pglProgramLocalParameter4dARB);
-	
-	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) glutGetProcAddress("glGetProgramLocalParameterdvARB");
-	assert(pglGetProgramLocalParameterdvARB);
-	
-	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
-	assert(pglGenProgramsARB);
-	
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
-	assert(pglProgramStringARB);
-	
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
-	assert(pglBindProgramARB);
-	
-	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) glutGetProcAddress("glIsProgramARB");
-	assert(pglIsProgramARB);
-	
-	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) glutGetProcAddress("glDeleteProgramsARB");
-	assert(pglDeleteProgramsARB);
-	
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+
+	piglit_require_fragment_program();
+
 	/*
 	 * Fragment programs
 	 */
-	pglGenProgramsARB(15, FragProg);
-	
 	for(mask = 1; mask < 16; ++mask) {
 		GLint errorPos;
 		char programText[1024];
 		char maskstring[5];
-		
+
 		maskstring[0] = 0;
 		if (mask & 1) strcat(maskstring, "x");
 		if (mask & 2) strcat(maskstring, "y");
 		if (mask & 4) strcat(maskstring, "z");
 		if (mask & 8) strcat(maskstring, "w");
 		sprintf(programText, fragProgramTemplate, maskstring);
-		
-		assert(FragProg[mask-1] > 0);
-		pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[mask-1]);
-		pglProgramStringARB(
-				GL_FRAGMENT_PROGRAM_ARB,
-				GL_PROGRAM_FORMAT_ASCII_ARB,
-				strlen(programText),
-				(const GLubyte *)programText);
-		glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
-		if (glGetError() != GL_NO_ERROR || errorPos != -1) {
-			int l = FindLine(programText, errorPos);
-			fprintf(stderr, "Fragment Program Error (pos=%d line=%d): %s\n", errorPos, l,
-					(char *) glGetString(GL_PROGRAM_ERROR_STRING_ARB));
-			if (Automatic)
-				printf("PIGLIT: {'result': 'fail' }\n");
-			exit(1);
-		}
-		if (!pglIsProgramARB(FragProg[mask-1])) {
-			fprintf(stderr, "pglIsProgramARB failed\n");
-			if (Automatic)
-				printf("PIGLIT: {'result': 'fail' }\n");
-			exit(1);
-		}
+
+		FragProg[mask-1] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, programText);
 	}
-	
+
 	Reshape(Width,Height);
 }
 

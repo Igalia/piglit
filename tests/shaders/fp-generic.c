@@ -219,33 +219,7 @@ static void Reshape(int width, int height)
 static void Init(void)
 {
 	piglit_require_fragment_program();
-
-	/*
-	 * Fragment programs
-	 */
-	pglGenProgramsARB(1, &FragProg);
-
-	GLint errorPos;
-
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg);
-	pglProgramStringARB(
-			GL_FRAGMENT_PROGRAM_ARB,
-			GL_PROGRAM_FORMAT_ASCII_ARB,
-			strlen(Testcase.programtext),
-			(const GLubyte *)Testcase.programtext);
-	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
-	if (glGetError() != GL_NO_ERROR || errorPos != -1) {
-		int l = FindLine(Testcase.programtext, errorPos);
-		fprintf(stderr, "Fragment Program Error (pos=%d line=%d): %s\n", errorPos, l,
-				(char *) glGetString(GL_PROGRAM_ERROR_STRING_ARB));
-		printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
-	}
-	if (!pglIsProgramARB(FragProg)) {
-		fprintf(stderr, "pglIsProgramARB failed\n");
-		printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
-	}
+	FragProg = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, Testcase.programtext);
 
 	Reshape(Width,Height);
 }
