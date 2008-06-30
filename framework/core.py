@@ -160,7 +160,7 @@ class GroupResult(dict):
 class TestrunResult:
 	def __init__(self, *args):
 		self.name = ''
-		self.globalkeys = ['name', 'glxinfo', 'lspci']
+		self.globalkeys = ['name', 'href', 'glxinfo', 'lspci']
 		self.results = GroupResult()
 
 	def allTestResults(self):

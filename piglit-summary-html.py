@@ -64,6 +64,7 @@ ResultMString = readfile(templatedir + 'result_mstring.html')
 Index = readfile(templatedir + 'index.html')
 IndexTestrun = readfile(templatedir + 'index_testrun.html')
 IndexTestrunB = readfile(templatedir + 'index_testrunb.html')
+IndexTestrunBHref = readfile(templatedir + 'index_testrunb_href.html')
 IndexGroup = readfile(templatedir + 'index_group.html')
 IndexGroupTestrun = readfile(templatedir + 'index_group_testrun.html')
 IndexGroupGroup = readfile(templatedir + 'index_groupgroup.html')
@@ -207,9 +208,15 @@ results is an array containing the top-level results dictionarys.
 			page = SummaryPages[to]
 			return '<a href="%(page)s">%(to)s</a>' % locals()
 
+	def testrunb(tr):
+		if 'href' in tr.__dict__:
+			return IndexTestrunBHref % tr.__dict__
+		else:
+			return IndexTestrunB % tr.__dict__
+
 	group = buildGroupSummary(1, summary.root, showcurrent)
 	testruns = "".join([IndexTestrun % tr.__dict__ for tr in summary.testruns])
-	testrunsb = "".join([IndexTestrunB % tr.__dict__ for tr in summary.testruns])
+	testrunsb = "".join([testrunb(tr) for tr in summary.testruns])
 
 	tolist = SummaryPages.keys()
 	tolist.sort()
@@ -229,22 +236,42 @@ Options:
   -f, --full            Prefer the full results over the
   -h, --help            Show this message
   -o, --overwrite       Overwrite existing directories
+  -l, --list=listfile   Use test results from a list file
 
 Example:
   %(progName)s summary/mysum results/all.results
+
+Example list file:
+[
+	[ 'test.result', { name: 'override-name' } ],
+	[ 'other.result' ]
+]
 """
 	print USAGE % {'progName': sys.argv[0]}
 	sys.exit(1)
 
 
+def parse_listfile(filename):
+	file = open(filename, "r")
+	code = "".join([s for s in file])
+	file.close()
+	return eval(code)
+
+def loadresult(descr,OptionPreferSummary):
+	result = core.loadTestResults(descr[0], OptionPreferSummary)
+	if len(descr) > 1:
+		result.__dict__.update(descr[1])
+	return result
+
 def main():
 	try:
-		options, args = getopt(sys.argv[1:], "hof", [ "help", "overwrite", "full" ])
+		options, args = getopt(sys.argv[1:], "hofl:", [ "help", "overwrite", "full", "list" ])
 	except GetoptError:
 		usage()
 
 	OptionOverwrite = False
 	OptionPreferSummary = True
+	OptionList = []
 	for name,value in options:
 		if name == "-h" or name == "--help":
 			usage()
@@ -252,16 +279,18 @@ def main():
 			OptionOverwrite = True
 		elif name == "-f" or name == "--full":
 			OptionPreferSummary = False
+		elif name == "-l" or name == "--list":
+			OptionList += parse_listfile(value)
 
-	if len(args) < 2:
+	OptionList += [[name] for name in args[1:]]
+
+	if len(args) < 1 or len(OptionList) == 0:
 		usage()
 
 	summaryDir = args[0]
-	resultFilenames = args[1:]
-
 	core.checkDir(summaryDir, not OptionOverwrite)
 
-	results = [core.loadTestResults(name, OptionPreferSummary) for name in resultFilenames]
+	results = [loadresult(descr,OptionPreferSummary) for descr in OptionList]
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):
