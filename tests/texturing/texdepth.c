@@ -88,9 +88,7 @@ static int probe_cell_depth_mode(int cellx, int celly, int depth_texture_mode, f
 		cellx*CellWidth + (CellWidth/2), celly*CellHeight + (CellHeight/2),
 		expected);
 
-        printf("%s(%d, %d, 0x%x, %f) = %d\n",
-               __FUNCTION__, cellx, celly, depth_texture_mode, value, res);
-        return res;
+	return res;
 }
 
 
@@ -176,7 +174,7 @@ static float texture_compare(int comparefunc, float r, float texture, float ambi
 	return test ? 1.0 : ambient;
 }
 
-static int test_worker(int comparefunc, float ambient)
+static int test_worker(int comparefunc, float ambient, float w)
 {
 	int succ;
 
@@ -195,13 +193,13 @@ static int test_worker(int comparefunc, float ambient)
 	if (ambient > 0.0)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FAIL_VALUE_ARB, ambient);
 	glBegin(GL_QUADS);
-		glTexCoord3f(0,0,0.6);
+		glTexCoord4f(w*0,w*0,w*0.6,w);
 		glVertex2f(0,0);
-		glTexCoord3f(1,0,0.6);
+		glTexCoord4f(w*1,w*0,w*0.6,w);
 		glVertex2f(4,0);
-		glTexCoord3f(1,1,0.6);
+		glTexCoord4f(w*1,w*1,w*0.6,w);
 		glVertex2f(4,4);
-		glTexCoord3f(0,1,0.6);
+		glTexCoord4f(w*0,w*1,w*0.6,w);
 		glVertex2f(0,4);
 	glEnd();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
@@ -214,31 +212,31 @@ static int test_worker(int comparefunc, float ambient)
 	if (ambient > 0.0)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FAIL_VALUE_ARB, ambient);
 	glBegin(GL_QUADS);
-		glTexCoord3f(0.0,0.0,0.2);
+		glTexCoord4f(w*0.0,w*0.0,w*0.2,w);
 		glVertex2f(4,0);
-		glTexCoord3f(0.5,0.0,0.2);
+		glTexCoord4f(w*0.5,w*0.0,w*0.2,w);
 		glVertex2f(6,0);
-		glTexCoord3f(0.5,0.5,0.2);
+		glTexCoord4f(w*0.5,w*0.5,w*0.2,w);
 		glVertex2f(6,2);
-		glTexCoord3f(0.0,0.5,0.2);
+		glTexCoord4f(w*0.0,w*0.5,w*0.2,w);
 		glVertex2f(4,2);
 
-		glTexCoord3f(0.5,0.0,0.5);
+		glTexCoord4f(w*0.5,w*0.0,w*0.5,w);
 		glVertex2f(6,0);
-		glTexCoord3f(1.0,0.0,0.5);
+		glTexCoord4f(w*1.0,w*0.0,w*0.5,w);
 		glVertex2f(8,0);
-		glTexCoord3f(1.0,0.5,0.5);
+		glTexCoord4f(w*1.0,w*0.5,w*0.5,w);
 		glVertex2f(8,2);
-		glTexCoord3f(0.5,0.5,0.5);
+		glTexCoord4f(w*0.5,w*0.5,w*0.5,w);
 		glVertex2f(6,2);
 
-		glTexCoord3f(0.0,0.5,0.8);
+		glTexCoord4f(w*0.0,w*0.5,w*0.8,w);
 		glVertex2f(4,2);
-		glTexCoord3f(0.5,0.5,0.8);
+		glTexCoord4f(w*0.5,w*0.5,w*0.8,w);
 		glVertex2f(6,2);
-		glTexCoord3f(0.5,1.0,0.8);
+		glTexCoord4f(w*0.5,w*1.0,w*0.8,w);
 		glVertex2f(6,4);
-		glTexCoord3f(0.0,1.0,0.8);
+		glTexCoord4f(w*0.0,w*1.0,w*0.8,w);
 		glVertex2f(4,4);
 	glEnd();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE);
@@ -266,14 +264,20 @@ static int test_worker(int comparefunc, float ambient)
 
 static int test_BasicShadow(int comparefunc)
 {
-	return test_worker(comparefunc, 0.0);
+	return test_worker(comparefunc, 0.0, 1.0);
 }
 
 static int test_AmbientShadow(int comparefunc)
 {
-	return test_worker(comparefunc, 0.4);
+	return test_worker(comparefunc, 0.4, 1.0);
 }
 
+static int test_Homogenous(int comparefunc)
+{
+	int succ = test_worker(comparefunc, 0.0, 3.3);
+	succ = succ && test_worker(comparefunc, 0.4, 3.3);
+	return succ;
+}
 
 struct test_step {
 	int (*func)(int);
@@ -299,6 +303,13 @@ static struct test_step Tests[] = {
 	{ test_AmbientShadow, GL_GEQUAL, "Ambient + ARB_shadow: GL_GEQUAL" },
 	{ test_AmbientShadow, GL_GREATER, "Ambient + EXT_shadow_func: GL_GREATER" },
 	{ test_AmbientShadow, GL_ALWAYS, "Ambient + EXT_shadow_func: GL_ALWAYS" },
+	{ test_Homogenous, GL_NEVER, "homogenous: GL_NEVER" },
+	{ test_Homogenous, GL_LESS, "homogenous: GL_LESS" },
+	{ test_Homogenous, GL_LEQUAL, "homogenous: GL_LEQUAL" },
+	/* don't test GL_EQUAL and GL_NOTEQUAL: they're bound to be unreliable due to precision problems */
+	{ test_Homogenous, GL_GEQUAL, "homogenous: GL_GEQUAL" },
+	{ test_Homogenous, GL_GREATER, "homogenous: GL_GREATER" },
+	{ test_Homogenous, GL_ALWAYS, "homogenous: GL_ALWAYS" },
 };
 #define NumTests (ARRAY_SIZE(Tests))
 
