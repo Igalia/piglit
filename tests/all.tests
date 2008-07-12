@@ -69,6 +69,7 @@ fpgeneric = Group()
 def make_fpgeneric(name):
 	return PlainExecTest([testBinDir + 'fp-generic', testBinDir + '../tests/shaders/generic/' + name])
 fpgeneric['dph'] = make_fpgeneric('dph.fp')
+fpgeneric['lrp_sat'] = make_fpgeneric('lrp_sat.fp')
 shaders['fp-generic'] = fpgeneric
 
 bugs = Group()
