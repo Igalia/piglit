@@ -55,6 +55,7 @@ mesa = Group()
 mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
 general = Group()
+general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
 
 shaders = Group()

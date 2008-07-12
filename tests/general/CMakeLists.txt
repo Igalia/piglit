@@ -18,4 +18,5 @@ link_libraries (
 	piglitutil
 )
 
+add_executable (linestipple linestipple.c)
 add_executable (texgen texgen.c)
