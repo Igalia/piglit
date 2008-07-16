@@ -18,6 +18,7 @@ link_libraries (
 	piglitutil
 )
 
+add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
 add_executable (lodbias lodbias.c)
 add_executable (texdepth texdepth.c)
