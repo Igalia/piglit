@@ -186,8 +186,6 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 
 							// draw column of points
 							glClear(GL_COLOR_BUFFER_BIT);
-							printf("atten: %f %f %f  min/max: %f %f  size: %f\n",
-								atten[0], atten[1], atten[2], min, max, size);
 							glBegin(GL_POINTS);
 							for (float z = -6.0; z <= 6.0; z += 1.0) {
 								glVertex3f(0, z, z);
@@ -230,8 +228,6 @@ PointAttenuationTest::runOne(BasicResult &r, Window &w)
 
 	if (r.pass)
 		r.pass = testPointRendering(GL_FALSE);
-									w.swap();
-									sleep(10);
 	if (r.pass)
 		r.pass = testPointRendering(GL_TRUE);
 }
