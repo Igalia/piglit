@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-// 
+//
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// 
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // END_COPYRIGHT
 
 // tpointatten.h:  Test GL_ARB_point_parameters extension.
@@ -186,6 +186,8 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 
 							// draw column of points
 							glClear(GL_COLOR_BUFFER_BIT);
+							printf("atten: %f %f %f  min/max: %f %f  size: %f\n",
+								atten[0], atten[1], atten[2], min, max, size);
 							glBegin(GL_POINTS);
 							for (float z = -6.0; z <= 6.0; z += 1.0) {
 								glVertex3f(0, z, z);
@@ -228,6 +230,8 @@ PointAttenuationTest::runOne(BasicResult &r, Window &w)
 
 	if (r.pass)
 		r.pass = testPointRendering(GL_FALSE);
+									w.swap();
+									sleep(10);
 	if (r.pass)
 		r.pass = testPointRendering(GL_TRUE);
 }

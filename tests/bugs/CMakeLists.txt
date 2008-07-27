@@ -19,6 +19,7 @@ link_libraries (
 	piglitutil
 )
 
+add_executable (crash-texparameter-before-teximage crash-texparameter-before-teximage.c)
 add_executable (fdo9833 fdo9833.c)
 add_executable (fdo10370 fdo10370.c)
 add_executable (fdo14575 fdo14575.c)
