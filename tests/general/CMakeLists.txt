@@ -20,3 +20,4 @@ link_libraries (
 
 add_executable (linestipple linestipple.c)
 add_executable (texgen texgen.c)
+add_executable (windowoverlap windowoverlap.c)

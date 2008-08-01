@@ -57,6 +57,7 @@ mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 general = Group()
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
+general['windowoverlap'] = PlainExecTest([testBinDir + 'windowoverlap', '-auto'])
 
 shaders = Group()
 shaders['trinity-fp1'] = PlainExecTest([testBinDir + 'trinity-fp1', '-auto'])
