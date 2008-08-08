@@ -89,6 +89,7 @@ texturing['cubemap'] = PlainExecTest([testBinDir + 'cubemap', '-auto'])
 texturing['lodbias'] = PlainExecTest([testBinDir + 'lodbias', '-auto'])
 texturing['texdepth'] = PlainExecTest([testBinDir + 'texdepth', '-auto'])
 texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
+texturing['texredefine'] = PlainExecTest([testBinDir + 'texredefine', '-auto'])
 
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
