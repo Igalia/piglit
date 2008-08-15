@@ -21,6 +21,7 @@ link_libraries (
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
 add_executable (lodbias lodbias.c)
+add_executable (tex3d tex3d.c)
 add_executable (texdepth texdepth.c)
 add_executable (texrect-many texrect-many.c)
 add_executable (texredefine texredefine.c)
