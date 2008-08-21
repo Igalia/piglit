@@ -63,44 +63,14 @@ static void display_mipmaps(int start_x, int start_y)
 	}
 }
 
-/**
- * Returns whether the pixel at the coordinates matches the referenced color.
- *
- * Only the RGB channels are considered.
- */
-static GLboolean
-probe_pixel(int x, int y, const GLfloat *color)
-{
-	GLfloat probe[4], delta[3];
-	GLfloat dmax = 0;
-	int i;
-
-	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, probe);
-	for (i = 0; i < 3; i++) {
-		delta[i] = probe[i] - color[i];
-
-		if (dmax < fabs(delta[i]))
-			dmax = fabs(delta[i]);
-	}
-
-	if (dmax > .02) {
-		printf("Expected at (%d,%d): %f,%f,%f\n",
-		       x, y, color[0], color[1], color[2]);
-		printf("Probed at   (%d,%d): %f,%f,%f\n",
-		       x, y, probe[0], probe[1], probe[2]);
-		return GL_FALSE;
-	}
-
-	return GL_TRUE;
-}
-
 static GLboolean check_resulting_mipmaps(int x, int y, const GLfloat *color)
 {
 	GLboolean pass = GL_TRUE;
 	int i;
 
 	for (i = 256; i > 4; i /= 2) {
-		pass = pass && probe_pixel(x + i / 2, y + i / 2, color);
+		pass = pass && piglit_probe_pixel_rgb(x + i / 2, y + i / 2,
+						      color);
 		x += i;
 	}
 
@@ -175,7 +145,6 @@ static void display()
 		if (Automatic)
 			printf("PIGLIT: {'result': '%s' }\n",
 			       pass ? "pass" : "fail");
-		sleep(5);
 		exit(pass ? 0 : 1);
 	}
 }
