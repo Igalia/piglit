@@ -20,6 +20,7 @@ link_libraries (
 
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
+add_executable (gen-teximage gen-teximage.c)
 add_executable (gen-texsubimage gen-texsubimage.c)
 add_executable (lodbias lodbias.c)
 add_executable (tex3d tex3d.c)
