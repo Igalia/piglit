@@ -269,11 +269,10 @@ class Environment:
 			command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(stdout,stderr) = p.communicate();
 		return stderr+stdout
-		print >>self.file, "glxinfo:", encode(stderr+stdout)
 
 	def collectData(self):
-		print >>self.file, "glxinfo:", encode(self.run('glxinfo'))
-		print >>self.file, "lspci:", encode(self.run('lspci'))
+		print >>self.file, "glxinfo:", '@@@' + encode(self.run('glxinfo'))
+		print >>self.file, "lspci:", '@@@' + encode(self.run('lspci'))
 
 
 class Test:

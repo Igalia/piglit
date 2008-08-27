@@ -36,7 +36,7 @@ import framework.summary
 #############################################################################
 
 def testPathToHtmlFilename(path):
-	return filter(lambda s: s.isalnum() or s == '_', path.replace('/', '__')) + '.html'
+	return 'test_' + filter(lambda s: s.isalnum() or s == '_', path.replace('/', '__')) + '.html'
 
 
 #############################################################################
@@ -70,6 +70,8 @@ IndexGroupTestrun = readfile(templatedir + 'index_group_testrun.html')
 IndexGroupGroup = readfile(templatedir + 'index_groupgroup.html')
 IndexTest = readfile(templatedir + 'index_test.html')
 IndexTestTestrun = readfile(templatedir + 'index_test_testrun.html')
+
+Testrun = readfile(templatedir + 'testrun.html')
 
 SummaryPages = {
 	'all': 'index.html',
@@ -129,6 +131,13 @@ def writeResultHtml(test, testResult, filename):
 
 	writefile(filename, Result % locals())
 
+def writeTestrunHtml(testrun, filename):
+	detaildict = dict(filter(lambda item: item[0] in testrun.globalkeys, testrun.__dict__.items()))
+	details = buildDetails(detaildict)
+	name = testrun.name
+	codename = testrun.codename
+
+	writefile(filename, Testrun % locals())
 
 def buildTestSummary(indent, alternate, testsummary):
 	tenindent = 10 - indent
@@ -298,6 +307,7 @@ def main():
 		tr.codename = filter(lambda s: s.isalnum(), tr.name)
 		dirname = summaryDir + '/' + tr.codename
 		core.checkDir(dirname, False)
+		writeTestrunHtml(tr, dirname + '/index.html')
 		for test in summary.allTests():
 			filename = dirname + '/' + testPathToHtmlFilename(test.path)
 			writeResultHtml(test, test.results[j], filename)
