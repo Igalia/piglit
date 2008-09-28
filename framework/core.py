@@ -160,7 +160,7 @@ class GroupResult(dict):
 class TestrunResult:
 	def __init__(self, *args):
 		self.name = ''
-		self.globalkeys = ['name', 'href', 'glxinfo', 'lspci']
+		self.globalkeys = ['name', 'href', 'glxinfo', 'lspci', 'time']
 		self.results = GroupResult()
 
 	def allTestResults(self):
@@ -292,7 +292,11 @@ class Test:
 		if env.execute:
 			try:
 				print "Test: %(path)s" % locals()
+				time_start = time.time()
 				result = self.run()
+				time_end = time.time()
+				if 'time' not in result:
+					result['time'] = time_end - time_start
 				if 'result' not in result:
 					result['result'] = 'fail'
 				if not isinstance(result, TestResult):
@@ -353,7 +357,10 @@ class TestProfile:
 		self.sleep = 0
 
 	def run(self, env):
+		time_start = time.time()
 		self.tests.doRun(env, '')
+		time_end = time.time()
+		print >>env.file, "time:",(time_end-time_start)
 
 #############################################################################
 ##### Loaders
