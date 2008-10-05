@@ -140,6 +140,7 @@ PFNGLISPROGRAMARBPROC pglIsProgramARB = 0;
 PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB = 0;
 PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB = 0;
 PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB = 0;
+PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB = 0;
 PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
 
 static void get_program_functions()
@@ -167,6 +168,9 @@ static void get_program_functions()
 
 	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) glutGetProcAddress("glGetProgramLocalParameterdvARB");
 	assert(pglGetProgramLocalParameterdvARB);
+
+	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) glutGetProcAddress("glGetProgramivARB");
+	assert(pglGetProgramivARB);
 }
 
 int piglit_use_fragment_program()

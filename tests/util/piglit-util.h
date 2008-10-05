@@ -43,6 +43,7 @@ extern PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
 extern PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB;
 extern PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB;
 extern PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
+extern PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB;
 
 int piglit_use_fragment_program();
 int piglit_use_vertex_program();
