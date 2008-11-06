@@ -46,6 +46,9 @@
 
 
 #include <cmath>
+#ifdef __CYGWIN__
+#undef log2
+#endif
 #include <cstdlib>
 #include "tvertattrib.h"
 #include "glutils.h"

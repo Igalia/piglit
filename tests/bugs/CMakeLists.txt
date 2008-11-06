@@ -11,12 +11,12 @@ link_directories (
 )
 
 link_libraries (
+	mesautil
+	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
-	mesautil
-	piglitutil
 )
 
 add_executable (crash-texparameter-before-teximage crash-texparameter-before-teximage.c)

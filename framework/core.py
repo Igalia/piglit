@@ -272,7 +272,8 @@ class Environment:
 
 	def collectData(self):
 		print >>self.file, "glxinfo:", '@@@' + encode(self.run('glxinfo'))
-		print >>self.file, "lspci:", '@@@' + encode(self.run('lspci'))
+		if sys.platform != 'cygwin':
+			print >>self.file, "lspci:", '@@@' + encode(self.run('lspci'))
 
 
 class Test:

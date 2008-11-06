@@ -69,6 +69,7 @@ add_executable (glean
 target_link_libraries (glean
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
+	${X11_X11_LIB}
 	${TIFF_LIBRARY}
 )
 

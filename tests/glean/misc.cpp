@@ -33,6 +33,9 @@
 
 #include <cctype>
 #include <cmath>
+#ifdef __CYGWIN__
+#undef log2
+#endif
 #include "misc.h"
 
 namespace GLEAN {

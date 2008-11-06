@@ -12,12 +12,12 @@ link_directories (
 )
 
 link_libraries (
+	mesautil
+	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
-	mesautil
-	piglitutil
 )
 
 add_executable (trinity-fp1 trinity-fp1.c)

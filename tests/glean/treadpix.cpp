@@ -29,6 +29,9 @@
 // treadpix.cpp:  implementation of ReadPixels tests
 
 #include <cmath>
+#ifdef __CYGWIN__
+#undef log2
+#endif
 #include <iomanip>
 #include <cstdlib>
 #include "misc.h"
