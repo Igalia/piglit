@@ -52,12 +52,58 @@ static GLboolean inrect(int x, int y, int x1, int y1, int x2, int y2)
 		return GL_FALSE;
 }
 
+static GLboolean
+check_results(int dstx, int dsty, int w, int h)
+{
+	GLfloat results[w * h][4];
+	GLboolean pass = GL_TRUE;
+	int x, y;
+
+	/* Check the results */
+	glReadPixels(dstx, dsty, w, h, GL_RGBA, GL_FLOAT, results);
+	for (y = 0; y < h; y++) {
+		for (x = 0; x < w; x++) {
+			GLfloat expected[3];
+
+			if (inrect(x, y, 5, h/2, w - 5, h - 5)) {
+				expected[0] = 0.0;
+				expected[1] = 0.0;
+				expected[2] = 1.0;
+			} else if (inrect(x, y, 5, 5, w - 5, h/2)) {
+				expected[0] = 0.0;
+				expected[1] = 1.0;
+				expected[2] = 0.0;
+			} else {
+				expected[0] = 1.0;
+				expected[1] = 0.0;
+				expected[2] = 0.0;
+			}
+
+			if (results[y * w + x][0] != expected[0] ||
+			    results[y * w + x][1] != expected[1] ||
+			    results[y * w + x][2] != expected[2]) {
+				printf("Expected at (%d,%d): %f,%f,%f\n",
+				       x, y,
+				       expected[0], expected[1], expected[2]);
+				printf("Probed at   (%d,%d): %f,%f,%f\n",
+				       x, y,
+				       results[y * w + x][0],
+				       results[y * w + x][1],
+				       results[y * w + x][2]);
+				pass = GL_FALSE;
+			}
+		}
+	}
+
+	return pass;
+}
+
 static void display()
 {
 	int srcx = 20, srcy = 20, srcw = 32, srch = 32;
 	int dstx = 80, dsty = 20;
+	int dstx2 = 140, dsty2 = 20;
 	int texname, x, y;
-	GLfloat results[srcw * srch][4];
 	GLboolean pass = GL_TRUE;
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
@@ -94,44 +140,37 @@ static void display()
 	glTexCoord2f(1.0, 0.0); glVertex2f(dstx + srcw, dsty);
 	glEnd();
 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, srcw, srch, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
+			    0, 0, /* offset in image */
+			    srcx, srcy, /* offset in readbuffer */
+			    srcw / 2, srch / 2);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
+			    srcw / 2, 0, /* offset in image */
+			    srcx + srcw / 2, srcy, /* offset in readbuffer */
+			    srcw / 2, srch / 2);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
+			    0, srch / 2, /* offset in image */
+			    srcx, srcy + srch / 2, /* offset in readbuffer */
+			    srcw / 2, srch / 2);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
+			    srcw / 2, srch / 2, /* offset in image */
+			    srcx + srcw / 2, srcy + srch / 2, /* offset in readbuffer */
+			    srcw / 2, srch / 2);
+
+	/* Draw the texture image out */
+	glBegin(GL_POLYGON);
+	glTexCoord2f(0.0, 0.0); glVertex2f(dstx2, dsty2);
+	glTexCoord2f(0.0, 1.0); glVertex2f(dstx2, dsty2 + srch);
+	glTexCoord2f(1.0, 1.0); glVertex2f(dstx2 + srcw, dsty2 + srch);
+	glTexCoord2f(1.0, 0.0); glVertex2f(dstx2 + srcw, dsty2);
+	glEnd();
+
 	glDisable(GL_TEXTURE_2D);
 	glDeleteTextures(1, &texname);
-
-	/* Check the results */
-	glReadPixels(dstx, dsty, srcw, srch, GL_RGBA, GL_FLOAT, results);
-	for (y = 0; y < srch; y++) {
-		for (x = 0; x < srcw; x++) {
-			GLfloat expected[3];
-
-			if (inrect(x, y, 5, srch/2, srcw - 5, srch - 5)) {
-				expected[0] = 0.0;
-				expected[1] = 0.0;
-				expected[2] = 1.0;
-			} else if (inrect(x, y, 5, 5, srcw - 5, srch/2)) {
-				expected[0] = 0.0;
-				expected[1] = 1.0;
-				expected[2] = 0.0;
-			} else {
-				expected[0] = 1.0;
-				expected[1] = 0.0;
-				expected[2] = 0.0;
-			}
-
-			if (results[y * srcw + x][0] != expected[0] ||
-			    results[y * srcw + x][1] != expected[1] ||
-			    results[y * srcw + x][2] != expected[2]) {
-				printf("Expected at (%d,%d): %f,%f,%f\n",
-				       x, y,
-				       expected[0], expected[1], expected[2]);
-				printf("Probed at   (%d,%d): %f,%f,%f\n",
-				       x, y,
-				       results[y * srcw + x][0],
-				       results[y * srcw + x][1],
-				       results[y * srcw + x][2]);
-				pass = GL_FALSE;
-			}
-		}
-	}
+	pass &= check_results(dstx, dsty, srcw, srch);
+	pass &= check_results(dstx2, dsty2, srcw, srch);
 
 	if (Automatic) {
 		printf("PIGLIT: {'result': '%s' }\n",
