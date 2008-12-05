@@ -1,5 +1,6 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
+// Copyrigth (C) 2007  Intel Corporation
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
@@ -25,12 +26,14 @@
 // DEALINGS IN THE SOFTWARE.
 // 
 // END_COPYRIGHT
+//
+// Authors:
+//  Shuang He <shuang.he@intel.com>
+//
+// tfbo.h:  Test OpenGL Extension GL_EXT_framebuffer_objec
 
-// tvertprog.h:  Test GL_ARB_vertex_program extension.
-// Brian Paul  22 October 2005
-
-#ifndef __tvertprog_h__
-#define __tvertprog_h__
+#ifndef __tfbo_h__
+#define __tfbo_h__
 
 #include "tmultitest.h"
 
@@ -38,27 +41,12 @@ namespace GLEAN {
 
 #define windowSize 100
 
-// to indicate a looser tolerance test is needed
-#define FLAG_NONE   0
-#define FLAG_LOOSE  1
 
-class VertexProgram
+class FBOTest: public MultiTest
 {
 public:
-	const char *name;
-	const char *progString;
-	GLfloat expectedColor[4];
-	GLfloat expectedZ;
-	int flags;
-};
-
-
-
-class VertexProgramTest: public MultiTest
-{
-public:
-	VertexProgramTest(const char* testName, const char* filter,
-			  const char *extensions, const char* description):
+	FBOTest(const char* testName, const char* filter,
+                 const char *extensions, const char* description):
 		MultiTest(testName, filter, extensions, description)
 	{
 	}
@@ -66,21 +54,31 @@ public:
 	virtual void runOne(MultiTestResult &r, Window &w);
 
 private:
-	GLfloat tolerance[5];
-	GLfloat looseTolerance[5];
-	void setup(void);
-	bool equalColors(const GLfloat a[4], const GLfloat b[4], int flags) const;
-	bool equalDepth(GLfloat z0, GLfloat z1) const;
-	bool testProgram(const VertexProgram &p);
-	void testBadProgram(MultiTestResult &result);
-	void reportFailure(const char *programName,
-                           const GLfloat expectedColor[4],
-                           const GLfloat actualColor[4] ) const;
-	void reportZFailure(const char *programName,
-			    GLfloat expectedZ, GLfloat actualZ) const;
+	typedef bool (FBOTest::*TestFunc)(MultiTestResult &r);
+	typedef bool (FBOTest::*SubTestFunc)(void);
 
+	GLfloat tolerance[5];
+	void reset(void);
+        bool testFunctionality(MultiTestResult &r);
+	bool testPerformance(MultiTestResult &r);
+        bool testSanity(void);
+	bool testRender2SingleTexture(void);
+	bool testRender2MultiTexture(void);
+	bool testRender2depthTexture(void);
+	bool testRender2MipmapTexture(void);
+	bool testErrorHandling(void);
+
+
+	void runSubTests(MultiTestResult &r);
+
+	bool setup(void);
+	bool checkResult(const GLfloat exp[4], const int depth, const int stencil) const;
+	bool equalColors(const GLfloat a[4], const GLfloat b[4]) const;
+
+	void reportFailure(const char *msg, int line) const;
+	void reportFailure(const char *msg, GLenum target, int line) const;
 };
 
 } // namespace GLEAN
 
-#endif // __tvertprog_h__
+#endif // __tfbo_h__

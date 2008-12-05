@@ -573,7 +573,9 @@ API2Test::testUniformfFuncs(void)
 	renderQuad(pixel);
 	if (!equalColors(pixel, expected)) {
 		REPORT_FAILURE("glUniform[1234]f failed");
-		printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+		//printf("found:    %f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+		//printf("expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
+
 		return false;
 	}
 
@@ -661,7 +663,7 @@ API2Test::testUniformiFuncs(void)
 	GLfloat pixel[4], expected[4];
 	GLint expectedInt[4];
 
-	// Test glUniform[1234]f()
+	// Test glUniform[1234]i()
 	expectedInt[0] = 1;
 	expectedInt[1] = 2;
 	expectedInt[2] = 3;
@@ -677,11 +679,11 @@ API2Test::testUniformiFuncs(void)
 	renderQuad(pixel);
 	if (!equalColors(pixel, expected)) {
 		REPORT_FAILURE("glUniform[1234]i failed");
-		printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+		//printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
 		return false;
 	}
 
-	// Test glUniform[1234]fv()
+	// Test glUniform[1234]iv()
 	GLint u[4];
 	expectedInt[0] = 9;
 	expectedInt[1] = 8;
@@ -702,7 +704,7 @@ API2Test::testUniformiFuncs(void)
 	renderQuad(pixel);
 	if (!equalColors(pixel, expected)) {
 		REPORT_FAILURE("glUniform[1234]i failed");
-		printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+		//printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
 		return false;
 	}
 
