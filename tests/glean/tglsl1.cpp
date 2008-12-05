@@ -913,7 +913,7 @@ static const ShaderProgram Programs[] = {
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   float x = 1.0; \n"
-		"   if (x) { \n"
+		"   if (x != 0.0) { \n"
 		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
 		"   } \n"
 		"} \n",
@@ -993,7 +993,7 @@ static const ShaderProgram Programs[] = {
 		"      sum += 0.1; \n"
 		"      if (sum >= 0.499999) \n"
 		"         break; \n"
-		"   } while (1); \n"
+		"   } while (true); \n"
 		"   gl_FragColor = vec4(sum); \n"
 		"} \n",
 		{ 0.5, 0.5, 0.5, 0.5 },
@@ -1011,7 +1011,7 @@ static const ShaderProgram Programs[] = {
 		"      if (sum < 0.499999) \n"
 		"         continue; \n"
 		"      break; \n"
-		"   } while (1); \n"
+		"   } while (true); \n"
 		"   gl_FragColor = vec4(sum); \n"
 		"} \n",
 		{ 0.5, 0.5, 0.5, 0.5 },
@@ -1087,6 +1087,22 @@ static const ShaderProgram Programs[] = {
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
+
+#if 0 // XXX enable someday
+	{
+		"vector subscript *=",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+		"   vec4 c = vec4(0.25, 0.5, 0.1, 0.1); \n"
+		"   c[0] *= 4.0; \n"
+		"   c[1] *= 2.0; \n"
+		"   gl_FragColor = c; \n"
+		"} \n",
+		{ 1.0, 1.0, 0.1, 0.1 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+#endif
 
 	// Equality/inequality tests==========================================
 	{
@@ -1350,7 +1366,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   float x = 0.75; \n"
 		"   // this should always be false \n"
-		"   if (x <= 0.5 && ++x) { \n"
+		"   if (x <= 0.5 && ++x > 0.0) { \n"
 		"      x += 0.1; \n"
 		"   } \n"
 		"   gl_FragColor = vec4(x); \n"
@@ -1395,7 +1411,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   float x = 0.75; \n"
 		"   // this should always be true \n"
-		"   if (x >= 0.5 || ++x) { \n"
+		"   if (x >= 0.5 || ++x >= 0.0) { \n"
 		"      x += 0.1; \n"
 		"   } \n"
 		"   gl_FragColor = vec4(x); \n"
@@ -2172,10 +2188,10 @@ static const ShaderProgram Programs[] = {
 		"   vec2 c = vec2( 3.0, 2.0); \n"
 		"   bvec2 b1 = equal(a, b); \n"
 		"   bvec2 b2 = notEqual(b, c); \n"
-		"   gl_FragColor.x = b1.x; \n"
-		"   gl_FragColor.y = b1.y; \n"
-		"   gl_FragColor.z = b2.x; \n"
-		"   gl_FragColor.w = b2.y; \n"
+		"   gl_FragColor.x = float(b1.x); \n"
+		"   gl_FragColor.y = float(b1.y); \n"
+		"   gl_FragColor.z = float(b2.x); \n"
+		"   gl_FragColor.w = float(b2.y); \n"
 		"} \n",
 		{ 1.0, 0.0, 1.0, 0.0 },
 		DONT_CARE_Z,
@@ -3370,7 +3386,7 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 	}
 
 	// If you just want to run a single sub-test, assign the name to singleTest.
-	const char *singleTest = NULL;
+	const char *singleTest = getenv("GLSL_TEST");
 	if (singleTest) {
 		for (int i = 0; Programs[i].name; i++) {
 			if (strcmp(Programs[i].name, singleTest) == 0) {

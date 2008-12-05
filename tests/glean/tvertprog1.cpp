@@ -1014,19 +1014,117 @@ VertexProgramTest::testProgram(const VertexProgram &p)
 }
 
 void
+VertexProgramTest::testBadProgram(MultiTestResult &result)
+{
+	const GLfloat r = 0.25;
+	GLenum err;
+
+	{
+		static const char *badprog =
+			"!!ARBvp1.0\n"
+			"NOTANOPCODE;\n"
+			"MOV result.position, vertex.position;\n";
+
+		glProgramStringARB_func(GL_VERTEX_PROGRAM_ARB,
+					GL_PROGRAM_FORMAT_ASCII_ARB,
+					strlen(badprog),
+					(const GLubyte *) badprog);
+
+		/* Test that an invalid program raises an error */
+		err = glGetError();
+		if (err != GL_INVALID_OPERATION) {
+			env->log << "Unexpected OpenGL error state " << (int) err <<
+				" with bad vertex program.\n";
+			env->log << "Expected: " << GL_INVALID_OPERATION << "\n";
+			result.numFailed++;
+
+			while (err != 0)
+				err = glGetError();
+		} else {
+			result.numPassed++;
+		}
+	}
+
+
+	/* Check that we correctly produce GL_INVALID_OPERATION when rendering
+	 * with an invalid (non-existant in this case) program.
+	 */
+	{
+		glBindProgramARB_func(GL_VERTEX_PROGRAM_ARB, 99);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glBegin(GL_POLYGON);
+		glTexCoord2f(0, 0);  glVertex2f(-r, -r);
+		glTexCoord2f(1, 0);  glVertex2f( r, -r);
+		glTexCoord2f(1, 1);  glVertex2f( r,  r);
+		glTexCoord2f(0, 1);  glVertex2f(-r,  r);
+		glEnd();
+		err = glGetError();
+
+		if (err != GL_INVALID_OPERATION) {
+			env->log << "Unexpected OpenGL error state " << (int) err <<
+				" in glBegin() with bad vertex program.\n";
+			env->log << "Expected: " << GL_INVALID_OPERATION << "\n";
+			result.numFailed++;
+
+			while (err != 0)
+				err = glGetError();
+		} else {
+			result.numPassed++;
+		}
+	}
+
+	/* Similarly, test that glDrawArrays raises GL_INVALID_OPERATION
+	 */
+	{
+		static const GLfloat vertcoords[4][3] = {
+			{ -r, -r, 0 }, {  r, -r, 0 }, {  r,  r, 0 }, { -r,  r, 0 }
+		};
+
+		glVertexPointer(3, GL_FLOAT, 0, vertcoords);
+		glEnable(GL_VERTEX_ARRAY);
+		glDrawArrays(GL_POLYGON, 0, 4);
+		err = glGetError();
+		glDisable(GL_VERTEX_ARRAY);
+
+		if (err != GL_INVALID_OPERATION) {
+			env->log << "Unexpected OpenGL error state " << (int) err <<
+				" in glDrawArrays() with bad vertex program.\n";
+			env->log << "Expected: " << GL_INVALID_OPERATION << "\n";
+			result.numFailed++;
+
+			while (err != 0)
+				glGetError();
+		} else {
+			result.numPassed++;
+		}
+	}
+}
+
+void
 VertexProgramTest::runOne(MultiTestResult &r, Window &w)
 {
+	// to test a single sub-test, set the name here:
+	const char *single = NULL;
+
 	(void) w;
 	setup();
 
 	for (int i = 0; Programs[i].name; i++) {
-		if (!testProgram(Programs[i])) {
-			r.numFailed++;
-		}
-		else {
-			r.numPassed++;
+
+		if (!single || strcmp(single, Programs[i].name) == 0) {
+
+			if (!testProgram(Programs[i])) {
+				r.numFailed++;
+			}
+			else {
+				r.numPassed++;
+			}
 		}
 	}
+
+	testBadProgram(r);
+
 	r.pass = (r.numFailed == 0);
 }
 

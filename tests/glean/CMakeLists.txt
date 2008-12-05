@@ -24,6 +24,7 @@ add_executable (glean
 	tchgperf.cpp
 	tdepthstencil.cpp
 	test.cpp
+	tfbo.cpp
 	tfpexceptions.cpp
 	tfragprog1.cpp
 	tgetstr.cpp

@@ -982,6 +982,9 @@ FragmentProgramTest::testProgram(const FragmentProgram &p)
 void
 FragmentProgramTest::runOne(MultiTestResult &r, Window &w)
 {
+	// to test a single sub-test, set the name here:
+	const char *single = NULL;
+
 	(void) w;
 	setup();
 
@@ -989,14 +992,18 @@ FragmentProgramTest::runOne(MultiTestResult &r, Window &w)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #endif
 	for (int i = 0; Programs[i].name; i++) {
+
+		if (!single || strcmp(single, Programs[i].name) == 0) {
+
 #if DEVEL_MODE
-		glViewport(0, i * 20, windowWidth, 20);
+			glViewport(0, i * 20, windowWidth, 20);
 #endif
-		if (!testProgram(Programs[i])) {
-			r.numFailed++;
-		}
-		else {
-			r.numPassed++;
+			if (!testProgram(Programs[i])) {
+				r.numFailed++;
+			}
+			else {
+				r.numPassed++;
+			}
 		}
 	}
 
