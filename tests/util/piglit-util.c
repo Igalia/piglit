@@ -126,8 +126,8 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 		return 1;
 
 	printf("Probe at (%i,%i)\n", x, y);
-	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2]);
-	printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2]);
+	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
+	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
 
 	return 0;
 }
