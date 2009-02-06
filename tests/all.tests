@@ -106,6 +106,7 @@ profile.tests['texturing'] = texturing
 #############
 # Some Mesa diagnostic messages that we should probably ignore
 Test.ignoreErrors.append(re.compile("couldn't open libtxc_dxtn.so"))
+Test.ignoreErrors.append(re.compile("compression/decompression available"))
 Test.ignoreErrors.append(re.compile("Mesa: .*build"))
 Test.ignoreErrors.append(re.compile("Mesa: CPU.*"))
 Test.ignoreErrors.append(re.compile("Mesa: .*cpu detected."))
