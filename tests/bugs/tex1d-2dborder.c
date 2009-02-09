@@ -71,7 +71,7 @@ static void test(GLenum wrapt, int cellx, int celly)
 			int y = (celly*5 + sy + 1)*Height/10;
 
 			if (!piglit_probe_pixel_rgb(x, y, TextureColor)) {
-				fprintf(stderr, "Fail in cell %i,%i\n", cellx, celly);
+				fprintf(stderr, "Fail in cell %i,%i (texwrap % = 0x%x)\n", cellx, celly, wrapt);
 
 				if (Automatic)
 					piglit_report_result(PIGLIT_FAILURE);
@@ -87,6 +87,9 @@ static void Redisplay(void)
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+        /* Draw eight tiles, each with a different tex wrap mode.
+         * They should all look the same.
+         */
 	test(GL_REPEAT, 0, 0);
 	test(GL_CLAMP, 1, 0);
 	test(GL_CLAMP_TO_EDGE, 2, 0);
