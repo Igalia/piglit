@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 // tfragprog.cpp:  Test GL_ARB_fragment_program extension.
@@ -39,11 +39,11 @@
 // unique programs work correctly.
 
 
-#include "tfragprog1.h"
-#include <cassert>
 #include <cstring>
+#include <cassert>
 #include <cmath>
 #include <math.h>
+#include "tfragprog1.h"
 
 
 namespace GLEAN {
@@ -104,7 +104,6 @@ static const FragmentProgram Programs[] = {
 		  ABS(Param2[3])
 		},
 		DONT_CARE_Z,
-		0
 	},
 	{
 		"ADD test",
@@ -117,8 +116,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(FragColor[2] + Param1[2]),
 		  CLAMP01(FragColor[3] + Param1[3])
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"CMP test",
@@ -129,8 +127,7 @@ static const FragmentProgram Programs[] = {
 		"CMP result.color, p2, zero, p1; \n"
 		"END \n",
 		{ Param0[0], Param1[1], Param1[2], Param0[3] },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"COS test",
@@ -146,8 +143,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(0.8775),
 		  CLAMP01(0.5403)
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"COS test 2",
@@ -163,8 +159,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(1.0),
 		  CLAMP01(0.8775)
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"DP3 test",
@@ -176,8 +171,7 @@ static const FragmentProgram Programs[] = {
                                 Param1[1] * FragColor[1] +
                                 Param1[2] * FragColor[2]))
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"DP4 test",
@@ -190,8 +184,7 @@ static const FragmentProgram Programs[] = {
                                 Param1[2] * FragColor[2] +
                                 Param1[3] * FragColor[3]))
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"DPH test",
@@ -207,8 +200,7 @@ static const FragmentProgram Programs[] = {
                                  Param1[2] * FragColor[2] +
                                  FragColor[3]) * 0.1))
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"DST test",
@@ -223,8 +215,7 @@ static const FragmentProgram Programs[] = {
 		  0.16,          // v1.z
 		  CLAMP01(2.5)   // v2.w
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"EX2 test",
@@ -242,8 +233,7 @@ static const FragmentProgram Programs[] = {
                    2.0 * 0.01,
                   16.0 * 0.01,
                   0.25 * 0.01 },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"FLR test",
@@ -259,8 +249,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(-0.1),
 		  0.1
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"FRC test",
@@ -269,8 +258,7 @@ static const FragmentProgram Programs[] = {
 		"FRC result.color, values; \n"
 		"END \n",
 		{ 0.9, 0.1, 0.8, 0.4 },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"LG2 test",
@@ -289,8 +277,7 @@ static const FragmentProgram Programs[] = {
 		  0.49,
 		  0.2
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"LIT test 1",
@@ -303,8 +290,7 @@ static const FragmentProgram Programs[] = {
 		  0.433,   // roughly Pow(values.y, values.w)
 		  1.0
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"LIT test 2 (degenerate case: 0 ^ 0 -> 1)",
@@ -317,8 +303,7 @@ static const FragmentProgram Programs[] = {
 		  1.0,     // 0^0
 		  1.0
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"LIT test 3 (case x < 0)",
@@ -331,8 +316,7 @@ static const FragmentProgram Programs[] = {
 		  0.0,
 		  1.0
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
         {
 		"LRP test",
@@ -346,8 +330,7 @@ static const FragmentProgram Programs[] = {
 		  1.0 * FragColor[2] + (1.0 - 1.0) * Param1[2],
 		  0.0 * FragColor[3] + (1.0 - 0.0) * Param1[3]
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"MAD test",
@@ -361,8 +344,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(FragColor[2] * Param1[2] + Param2[2]),
 		  CLAMP01(FragColor[3] * Param1[3] + Param2[3])
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"MAX test",
@@ -376,8 +358,7 @@ static const FragmentProgram Programs[] = {
 		  MAX(Param1[2], Param2[2]),
 		  MAX(Param1[3], Param2[3]),
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"MIN test",
@@ -390,8 +371,7 @@ static const FragmentProgram Programs[] = {
 		  MIN(Param1[2], FragColor[2]),
 		  MIN(Param1[3], FragColor[3]),
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"MOV test",
@@ -400,7 +380,6 @@ static const FragmentProgram Programs[] = {
 		"END \n",
 		FRAGCOLOR,
 		DONT_CARE_Z,
-		0
 	},
 	{
 		"MUL test",
@@ -413,8 +392,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(FragColor[2] * Param1[2]),
 		  CLAMP01(FragColor[3] * Param1[3])
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"masked MUL test",
@@ -429,8 +407,7 @@ static const FragmentProgram Programs[] = {
 		  0.0,
 		  0.0
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"POW test (exponentiation)",
@@ -445,8 +422,7 @@ static const FragmentProgram Programs[] = {
 		  0.5 * 0.5 * 0.5,
 		  0.5 * 0.5 * 0.5 * 0.5,
 		  CLAMP01(2.0) },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"RCP test (reciprocal)",
@@ -458,8 +434,7 @@ static const FragmentProgram Programs[] = {
 		"RCP result.color.w, values.w; \n"
 		"END \n",
 		{ 1.0 / 8.0, CLAMP01(1.0 / -10.0), 1, 1.0 / 12.0 },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"RSQ test 1 (reciprocal square root)",
@@ -471,8 +446,7 @@ static const FragmentProgram Programs[] = {
 		"RSQ result.color.w, values.w; \n"
 		"END \n",
 		{ 1.0, 0.5, 0.3333, 0.1 },
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"RSQ test 2 (reciprocal square root of negative value)",
@@ -488,8 +462,7 @@ static const FragmentProgram Programs[] = {
 		  0.447,
 		  1.0,
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SCS test",
@@ -503,8 +476,7 @@ static const FragmentProgram Programs[] = {
 		  DONT_CARE_COLOR,
 		  DONT_CARE_COLOR,
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SGE test",
@@ -518,8 +490,7 @@ static const FragmentProgram Programs[] = {
 		  Param2[2] >= Param0[2] ? 1.0 : 0.0,
 		  Param2[3] >= Param0[3] ? 1.0 : 0.0,
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SIN test",
@@ -535,8 +506,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(0.4794),
 		  CLAMP01(0.8414)
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SIN test 2",
@@ -552,8 +522,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(0.4794),
 		  CLAMP01(0.4794)
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SLT test",
@@ -566,8 +535,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] < Param1[2] ? 1.0 : 0.0,
 		  FragColor[3] < Param1[3] ? 1.0 : 0.0,
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SUB test (with swizzle)",
@@ -580,8 +548,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(Param1[3] - FragColor[3]),
 		  CLAMP01(Param1[2] - FragColor[2])
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"SWZ test",
@@ -594,8 +561,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(Param1[2]),
 		  CLAMP01(0.0)
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"XPD test 1",
@@ -609,8 +575,7 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(Param1[0] * Param2[1] - Param1[1] * Param2[0]),
 		  DONT_CARE_COLOR
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"Z-write test",
@@ -624,8 +589,7 @@ static const FragmentProgram Programs[] = {
 		  Param1[2],
 		  Param1[3]
 		},
-		Param1[1],
-		0
+		Param1[1]
 	},
 
 	// ============= Numeric stress tests =================================
@@ -645,8 +609,7 @@ static const FragmentProgram Programs[] = {
 		  DONT_CARE_COLOR,
 		  DONT_CARE_COLOR
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 	{
 		"Infinity / nan test",
@@ -660,8 +623,7 @@ static const FragmentProgram Programs[] = {
 		  DONT_CARE_COLOR,
 		  DONT_CARE_COLOR
 		},
-		DONT_CARE_Z,
-		0
+		DONT_CARE_Z
 	},
 
 	// ============= Fog tests ============================================
@@ -678,8 +640,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
 		  FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 	{
 		"Computed fog linear test",
@@ -703,8 +664,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
 		  FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 #undef FOG_FACT
 
@@ -721,8 +681,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
 		  FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 #undef FOG_FACT
 #define FOG_FACT 0.3535   // = ex2(-Density * Coord)
@@ -749,8 +708,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
                   FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 #undef FOG_FACT
 
@@ -767,8 +725,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
 		  FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 #undef FOG_FACT
 #define FOG_FACT 0.2102   // = ex2(-(Density * Coord)^2)
@@ -796,8 +753,7 @@ static const FragmentProgram Programs[] = {
 		  FragColor[2] * FOG_FACT + FogColor[2] * (1.0 - FOG_FACT),
 		  FragColor[3]
 		},
-		DONT_CARE_Z,
-		FragmentProgram::NeedsFogCoord
+		DONT_CARE_Z
 	},
 #undef FOG_FACT
 
@@ -843,13 +799,8 @@ FragmentProgramTest::setup(void)
 	glGetProgramivARB_func = (PFNGLGETPROGRAMIVARBPROC) GLUtils::getProcAddress("glGetProgramivARB");
 	assert(glGetProgramivARB_func);
 
-	if (GLUtils::haveExtensions("GL_EXT_fog_coord")) {
-		glFogCoordf_func = (PFNGLFOGCOORDFPROC) GLUtils::getProcAddress("glFogCoordf");
-		assert(glFogCoordf_func);
-	} else {
-		glFogCoordf_func = 0;
-		env->log << "Note: EXT_fog_coord not available, skipping some tests\n";
-	}
+	glFogCoordf_func = (PFNGLFOGCOORDFPROC) GLUtils::getProcAddress("glFogCoordf");
+	assert(glFogCoordf_func);
 
 	GLuint progID;
 	glGenProgramsARB_func(1, &progID);
@@ -877,17 +828,15 @@ FragmentProgramTest::setup(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glDrawBuffer(GL_FRONT);
-	glReadBuffer(GL_FRONT);
+	glReadBuffer(GL_FRONT); 
 
 	// other GL state
-	if (glFogCoordf_func) {
-		glFogf(GL_FOG_START, FogStart);
-		glFogf(GL_FOG_END, FogEnd);
-		glFogf(GL_FOG_DENSITY, FogDensity);
-		glFogfv(GL_FOG_COLOR, FogColor);
-		glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
-		glFogCoordf_func(FogCoord);
-	}
+	glFogf(GL_FOG_START, FogStart);
+	glFogf(GL_FOG_END, FogEnd);
+	glFogf(GL_FOG_DENSITY, FogDensity);
+	glFogfv(GL_FOG_COLOR, FogColor);
+	glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
+	glFogCoordf_func(FogCoord);
 
 	// compute error tolerances (may need fine-tuning)
 	int bufferBits[5];
@@ -1010,7 +959,7 @@ FragmentProgramTest::testProgram(const FragmentProgram &p)
            printf("%s: Expect: %.3f %.3f %.3f %.3f  found: %.3f %.3f %.3f %.3f\n",
                   p.name,
                   p.expectedColor[0], p.expectedColor[1],
-                  p.expectedColor[2], p.expectedColor[3],
+                  p.expectedColor[2], p.expectedColor[3], 
                   pixel[0], pixel[1], pixel[2], pixel[3]);
 
 	if (!equalColors(pixel, p.expectedColor)) {
@@ -1044,12 +993,8 @@ FragmentProgramTest::runOne(MultiTestResult &r, Window &w)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #endif
 	for (int i = 0; Programs[i].name; i++) {
+
 		if (!single || strcmp(single, Programs[i].name) == 0) {
-			if (Programs[i].flags &&
-			    FragmentProgram::NeedsFogCoord) {
-				if (!glFogCoordf_func)
-					continue;
-			}
 
 #if DEVEL_MODE
 			glViewport(0, i * 20, windowWidth, 20);

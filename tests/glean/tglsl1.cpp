@@ -1,6 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
+// Copyright (C) 2008  VMWare, Inc.  All Rights Reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -33,9 +34,8 @@
 
 #include "tglsl1.h"
 #include <cassert>
-#include <cstring>
-#include <cmath>
-#include <cstdlib>
+#include <math.h>
+
 
 namespace GLEAN {
 
@@ -82,7 +82,7 @@ static PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv_func = NULL;
 #define FLAG_LOOSE  0x1 // to indicate a looser tolerance test is needed
 #define FLAG_ILLEGAL_SHADER 0x2  // the shader test should not compile
 #define FLAG_ILLEGAL_LINK   0x4  // the shaders should not link
-#define FLAG_VERSION_2_1    0x8  // OpenGL 2.1 test (or GLSL 1.20)
+#define FLAG_VERSION_1_20   0x8  // GLSL 1.20 test
 #define FLAG_WINDING_CW     0x10  // clockwise-winding polygon
 #define FLAG_VERTEX_TEXTURE 0x20
 
@@ -2070,7 +2070,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 1.0, 0.0, 0.2, 0.5); \n"
 		"   vec4 b = vec4( 1.0, 3.0, 0.0, 0.5); \n"
-		"   gl_FragColor = equal(a, b); \n"
+		"   gl_FragColor = vec4(equal(a, b)); \n"
 		"} \n",
 		{ 1.0, 0.0, 0.0, 1.0 },
 		DONT_CARE_Z,
@@ -2083,7 +2083,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 1.0, 0.0, 0.2, 0.5); \n"
 		"   vec4 b = vec4( 1.0, 3.0, 0.0, 0.5); \n"
-		"   gl_FragColor = notEqual(a, b); \n"
+		"   gl_FragColor = vec4(notEqual(a, b)); \n"
 		"} \n",
 		{ 0.0, 1.0, 1.0, 0.0 },
 		DONT_CARE_Z,
@@ -2096,7 +2096,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 0.5, 1.0, 0.4, 0.0); \n"
 		"   vec4 b = vec4( 1.0, 0.2, 0.4, 0.0); \n"
-		"   gl_FragColor = lessThanEqual(a, b); \n"
+		"   gl_FragColor = vec4(lessThanEqual(a, b)); \n"
 		"} \n",
 		{ 1.0, 0.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -2109,7 +2109,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 0.5, 1.0, 0.4, 0.0); \n"
 		"   vec4 b = vec4( 1.0, 0.2, 0.4, 0.0); \n"
-		"   gl_FragColor = greaterThanEqual(a, b); \n"
+		"   gl_FragColor = vec4(greaterThanEqual(a, b)); \n"
 		"} \n",
 		{ 0.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -2122,7 +2122,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 0.5, 1.0, 0.4, 0.0); \n"
 		"   vec4 b = vec4( 1.0, 0.2, 0.4, 0.0); \n"
-		"   gl_FragColor = lessThan(a, b); \n"
+		"   gl_FragColor = vec4(lessThan(a, b)); \n"
 		"} \n",
 		{ 1.0, 0.0, 0.0, 0.0 },
 		DONT_CARE_Z,
@@ -2135,7 +2135,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   vec4 a = vec4( 0.5, 1.0, 0.4, 0.0); \n"
 		"   vec4 b = vec4( 1.0, 0.2, 0.4, 0.0); \n"
-		"   gl_FragColor = greaterThan(a, b); \n"
+		"   gl_FragColor = vec4(greaterThan(a, b)); \n"
 		"} \n",
 		{ 0.0, 1.0, 0.0, 0.0 },
 		DONT_CARE_Z,
@@ -2231,6 +2231,93 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor.w = 0.0; \n"
 		"} \n",
 		{ 0.0, 1.0, 0.0, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"struct (1)",
+		NO_VERTEX_SHADER,
+                "struct s1 { \n"
+                "  float f1; \n"
+                "  vec4 v4; \n"
+                "}; \n"
+                "\n"
+		"void main() { \n"
+                "   s1 a, b; \n"
+                "   a.v4 = vec4(0.25, 0.5, 0.75, 1.0); \n"
+                "   a.f1 = 0.0; \n"
+                "   b = a; \n"
+                "   gl_FragColor = b.v4; \n"
+		"} \n",
+		{ 0.25, 0.5, 0.75, 1.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"struct (2)",
+		NO_VERTEX_SHADER,
+                "struct s1 { \n"
+                "  float f1; \n"
+                "  vec4 v4; \n"
+                "}; \n"
+                "\n"
+		"void main() { \n"
+                "   s1 a[2]; \n"
+                "   a[0].v4 = vec4(0.25, 0.5, 0.75, 1.0); \n"
+                "   a[0].f1 = 0.0; \n"
+                "   a[1] = a[0]; \n"
+                "   gl_FragColor = a[1].v4; \n"
+		"} \n",
+		{ 0.25, 0.5, 0.75, 1.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"struct (3)",
+		NO_VERTEX_SHADER,
+                "struct s1 { \n"
+                "  float f1; \n"
+                "  vec4 v4; \n"
+                "}; \n"
+                "\n"
+		"void main() { \n"
+                "   vec4 scale = vec4(0.5); \n"
+                "   vec4 bias = vec4(0.1); \n"
+                "   s1 a; \n"
+                "   a.v4 = vec4(0.25, 0.5, 0.75, 1.0); \n"
+                "   a.f1 = 0.0; \n"
+                "   gl_FragColor = a.v4 * scale + bias; \n"
+		"} \n",
+		{ 0.225, 0.35, 0.475, 0.6 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"struct (4)",
+		NO_VERTEX_SHADER,
+                "struct s1 { \n"
+                "  float foo; \n"
+                "  vec4 v4; \n"
+                "}; \n"
+                "struct s2 { \n"
+                "  float bar; \n"
+                "  s1 s; \n"
+                "  float baz; \n"
+                "}; \n"
+                "\n"
+		"void main() { \n"
+                "   s2 a; \n"
+                "   a.s.v4 = vec4(0.25, 0.5, 0.75, 1.0); \n"
+                "   a.bar = 0.0; \n"
+                "   a.baz = 0.0; \n"
+                "   a.s.foo = 0.0; \n"
+                "   gl_FragColor = a.s.v4; \n"
+		"} \n",
+		{ 0.25, 0.5, 0.75, 1.0 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -2392,7 +2479,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.5, 0.6, 0.7, 0.8 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"mat4x2 construct",
@@ -2408,7 +2495,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.3, 0.4, 0.5, 0.6 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"mat2x3 construct",
@@ -2422,7 +2509,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.4, 0.5, 0.6, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"mat3x2 construct",
@@ -2437,7 +2524,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.3, 0.4, 0.5, 0.6 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"mat4x3 construct",
@@ -2453,7 +2540,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.4, 0.5, 0.6, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"mat3x4 construct",
@@ -2467,7 +2554,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.5, 0.6, 0.7, 0.8 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -2487,7 +2574,7 @@ static const ShaderProgram Programs[] = {
 		  0.2 * 0.9 + -0.2 * 1.0 + 0.4 * 0.0 + 0.1 * 1.0,
 		  1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -2509,7 +2596,7 @@ static const ShaderProgram Programs[] = {
 		  0.0
 		},
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -2535,7 +2622,7 @@ static const ShaderProgram Programs[] = {
 		  (0.2 * 0.5 + 0.4 * 0.4 + 0.6 * 0.3 + 0.8 * 0.2) * 0.5
 		},
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -2555,7 +2642,7 @@ static const ShaderProgram Programs[] = {
 		  0.2 * 0.5 + 0.5 * 0.6,
 		  0.2 * 0.7 + 0.5 * 0.8 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"vec3 * mat4x3 multiply",
@@ -2574,7 +2661,7 @@ static const ShaderProgram Programs[] = {
 		  0.2 * 0.7 + 0.5 * 0.8 + 0.1 * 0.9,
 		  0.2 * 1.0 + 0.5 * 0.1 + 0.1 * 0.2 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -2587,7 +2674,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.0, 0.1, 0.2, 0.3 },  // first column of 2x4 matrix
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"uniform matrix 2x4, transposed",
@@ -2599,7 +2686,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.0, 0.2, 0.4, 0.6 },  // first row of 4x2 matrix
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"uniform matrix 4x3",
@@ -2612,7 +2699,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.3, 0.4, 0.5, 1.0 },  // second column of 4x3 matrix
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 	{
 		"uniform matrix 4x3, transposed",
@@ -2625,10 +2712,161 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.1, 0.5, 0.9, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_2_1
+		FLAG_VERSION_1_20
 	},
 
-	// Illegal link test ===================================================
+	// Tests for GLSL 1.20 new array features
+	{
+		"GLSL 1.20 arrays",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"float [2] x; \n"
+		"void main() { \n"
+                "   x[0] = 1.0; \n"
+                "   x[1] = 2.0; \n"
+		"   gl_FragColor.x = x[0]; \n"
+		"   gl_FragColor.y = 0.25 * x[1]; \n"
+		"   gl_FragColor.z = 0.1 * (x[0] + x[1]); \n"
+		"   gl_FragColor.w = 1.0; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.3, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 1",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"float [2] x = float[2](1.0, 2.0); \n"
+		"void main() { \n"
+		"   gl_FragColor.x = x[0]; \n"
+		"   gl_FragColor.y = 0.25 * x[1]; \n"
+		"   gl_FragColor.z = 0.1 * (x[0] + x[1]); \n"
+		"   gl_FragColor.w = 1.0; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.3, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 2",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 [2] colors = vec4[2](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                          vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 const array constructor 1",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"const float [2] x = float[2](1.0, 2.0); \n"
+		"void main() { \n"
+		"   gl_FragColor.x = x[0]; \n"
+		"   gl_FragColor.y = 0.25 * x[1]; \n"
+		"   gl_FragColor.z = 0.1 * (x[0] + x[1]); \n"
+		"   gl_FragColor.w = 1.0; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.3, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 const array constructor 2",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"const vec4 [2] colors = vec4[2](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                                vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 uniform array constructor",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"uniform float [2] x = float[2](1.0, 2.0); \n"
+		"void main() { \n"
+		"   gl_FragColor.x = x[0]; \n"
+		"   gl_FragColor.y = 0.25 * x[1]; \n"
+		"   gl_FragColor.z = 0.1 * (x[0] + x[1]); \n"
+		"   gl_FragColor.w = 1.0; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.3, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array.length()",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"const float [2] x = float[2](1.0, 2.0); \n"
+		"void main() { \n"
+                "   int l = x.length(); \n"
+		"   gl_FragColor = vec4(l * 0.25); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array error check",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+                "// Note array size disagreement here: \n"
+		"const float [2] x = float[3](1.0, 2.0); \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(1); \n"
+		"} \n",
+		{ 1.0, 1.0, 1.0, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20 | FLAG_ILLEGAL_SHADER
+	},
+
+	// Other new GLSL 1.20 features (just parse/compile tests)
+	{
+		"GLSL 1.20 precision qualifiers",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"highp float f1; \n"
+		"mediump float f2; \n"
+		"lowp float f3; \n"
+		"precision mediump float; \n"
+		"precision lowp int; \n"
+		"precision highp float; \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(1); \n"
+		"} \n",
+		{ 1.0, 1.0, 1.0, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 invariant, centroid qualifiers",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"invariant varying vec4 v1; \n"
+		"centroid varying vec4 v2; \n"
+		"invariant centroid varying vec4 v3; \n"
+		"varying vec4 v4; \n"
+		"invariant v4; \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(1); \n"
+		"} \n",
+		{ 1.0, 1.0, 1.0, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+
+	// Illegal link test ==================================================
 	{
 		"gl_Position not written check",
 		"void main() { \n"
@@ -2971,10 +3209,18 @@ GLSLTest::setup(void)
 		//env->log << "OpenGL 2.x not supported\n";
 		return false;
 	}
-	if (verString[2] >= '1')
-		version21 = GL_TRUE;  // update when needed
-	else
-		version21 = GL_FALSE;  // play it safe
+
+	// check GLSL version
+#ifdef GL_SHADING_LANGUAGE_VERSION
+	const char *glslVersion = (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION);
+#else
+	const char *glslVersion = NULL;
+#endif
+	if (!glslVersion || glslVersion[0] != '1') {
+		env->log << "GLSL 1.x not supported\n";
+		return false;
+	}
+	glsl_120 = (verString[2] >= '2');
 
 	if (!getFunctions()) {
 		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
@@ -3400,7 +3646,7 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 	else {
 		// loop over all tests
 		for (int i = 0; Programs[i].name; i++) {
-			if ((Programs[i].flags & FLAG_VERSION_2_1) && !version21)
+			if ((Programs[i].flags & FLAG_VERSION_1_20) && !glsl_120)
 				continue; // skip non-applicable tests
 			if (testProgram(Programs[i])) {
 				r.numPassed++;

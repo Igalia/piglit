@@ -31,10 +31,11 @@
 //
 // See tfragprog.cpp for comments (this test is very similar).
 
-#include "tvertprog1.h"
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <math.h>
+#include "tvertprog1.h"
 
 
 namespace GLEAN {
