@@ -32,9 +32,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include "tglsl1.h"
+#include <stdlib.h>
 #include <cassert>
+#include <cstring>
 #include <math.h>
+#include "tglsl1.h"
 
 
 namespace GLEAN {
