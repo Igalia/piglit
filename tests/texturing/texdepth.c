@@ -176,7 +176,7 @@ static float texture_compare(int comparefunc, float r, float texture, float ambi
 
 static int test_worker(int comparefunc, float ambient, float w)
 {
-	int succ;
+	int succ = 1;
 
 	if (!HaveShadow)
 		return 1;
