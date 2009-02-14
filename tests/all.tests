@@ -78,6 +78,7 @@ fpgeneric['lrp_sat'] = make_fpgeneric('lrp_sat.fp')
 shaders['fp-generic'] = fpgeneric
 
 bugs = Group()
+bugs['crash-cubemap-order'] = PlainExecTest([testBinDir + 'crash-cubemap-order'])
 bugs['crash-texparameter-before-teximage'] = PlainExecTest([testBinDir + 'crash-texparameter-before-teximage', '-auto'])
 bugs['fdo9833'] = PlainExecTest([testBinDir + 'fdo9833', '-auto'])
 bugs['fdo10370'] = PlainExecTest([testBinDir + 'fdo10370', '-auto'])

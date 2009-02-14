@@ -19,6 +19,7 @@ link_libraries (
 	${TIFF_LIBRARY}
 )
 
+add_executable (crash-cubemap-order crash-cubemap-order.c)
 add_executable (crash-texparameter-before-teximage crash-texparameter-before-teximage.c)
 add_executable (fdo9833 fdo9833.c)
 add_executable (fdo10370 fdo10370.c)
