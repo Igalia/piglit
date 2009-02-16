@@ -1,7 +1,6 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
-// Copyrigth (C) 2007  Intel Corporation
-// Copyright (C) 1999  Allen Akin   All Rights Reserved.
+// Copyright (C) 2008  VMware, Inc.  All rights reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -26,14 +25,10 @@
 // DEALINGS IN THE SOFTWARE.
 // 
 // END_COPYRIGHT
-//
-// Authors:
-//  Shuang He <shuang.he@intel.com>
-//
-// tfbo.h:  Test OpenGL Extension GL_EXT_framebuffer_objec
 
-#ifndef __tfbo_h__
-#define __tfbo_h__
+
+#ifndef __ttexunits_h__
+#define __ttexunits_h__
 
 #include "tmultitest.h"
 
@@ -42,10 +37,10 @@ namespace GLEAN {
 #define windowSize 100
 
 
-class FBOTest: public MultiTest
+class TexUnitsTest: public MultiTest
 {
 public:
-	FBOTest(const char* testName, const char* filter,
+	TexUnitsTest(const char* testName, const char* filter,
                  const char *extensions, const char* description):
 		MultiTest(testName, filter, extensions, description)
 	{
@@ -54,32 +49,22 @@ public:
 	virtual void runOne(MultiTestResult &r, Window &w);
 
 private:
-	typedef bool (FBOTest::*TestFunc)(MultiTestResult &r);
-	typedef bool (FBOTest::*SubTestFunc)(void);
+        GLint maxImageUnits;
+        GLint maxCoordUnits;
+        GLint maxUnits;
 
-	GLboolean haveARBfbo;  // GL_ARB_framebuffer_object supported?
-	GLfloat tolerance[5];
-	void reset(void);
-        bool testFunctionality(MultiTestResult &r);
-	bool testPerformance(MultiTestResult &r);
-        bool testSanity(void);
-	bool testRender2SingleTexture(void);
-	bool testRender2MultiTexture(void);
-	bool testRender2depthTexture(void);
-	bool testRender2MipmapTexture(void);
-	bool testErrorHandling(void);
+	void reportFailure(const char *msg) const;
+	void reportFailure(const char *msg, GLint unit) const;
 
-
-	void runSubTests(MultiTestResult &r);
-
-	bool setup(void);
-	bool checkResult(const GLfloat exp[4], const int depth, const int stencil) const;
-	bool equalColors(const GLfloat a[4], const GLfloat b[4]) const;
-
-	void reportFailure(const char *msg, int line) const;
-	void reportFailure(const char *msg, GLenum target, int line) const;
+        bool setup(void);
+        bool testLimits(void);
+        bool testActiveTexture(void);
+        bool testTextureMatrices(void);
+        bool testTextureCoordGen(void);
+        bool testTexcoordArrays(void);
 };
+
 
 } // namespace GLEAN
 
-#endif // __tfbo_h__
+#endif // __ttexunits_h__

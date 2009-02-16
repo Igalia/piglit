@@ -131,6 +131,32 @@ Image::~Image() {
 		delete[] _pixels;
 }
 
+
+// Test if two images are identical
+bool Image::operator==(const Image &img) const
+{
+	// cast away const because of rowSizeInBytes()
+	Image &img1 = const_cast<Image&>(*this);
+	Image &img2 = const_cast<Image&>(img);
+
+	if (img1.width() != img2.width() ||
+	    img1.height() != img2.height() ||
+	    img1.format() != img2.format() ||
+	    img1.type() != img2.type() ||
+	    img1.alignment() != img2.alignment() ||
+	    img1.rowSizeInBytes() != img2.rowSizeInBytes())
+		return false;
+
+	const char *p1 = img1.pixels();
+	const char *p2 = img2.pixels();
+	const int n = img1.rowSizeInBytes() * img1.height();
+	if (memcmp(p1, p2, n) != 0)
+		return false;
+
+	return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // pixels - set pointer to pixel array
 ///////////////////////////////////////////////////////////////////////////////

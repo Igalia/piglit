@@ -40,10 +40,12 @@
 //   post-texture alpha value is correct.
 //      
 
-#include "ttexenv.h"
+#include <stdlib.h>
 #include <cassert>
 #include <stdio.h>
 #include <cmath>
+#include "ttexenv.h"
+
 
 namespace GLEAN {
 

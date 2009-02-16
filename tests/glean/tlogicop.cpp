@@ -30,10 +30,11 @@
 // Based on Allen's blendFunc test.
 // Brian Paul  10 May 2001
 
+#include <stdlib.h>
+#include <cmath>
 #include "tlogicop.h"
 #include "rand.h"
 #include "image.h"
-#include <cmath>
 
 namespace {
 

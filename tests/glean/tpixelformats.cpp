@@ -27,9 +27,10 @@
 // END_COPYRIGHT
 
 
-#include "tpixelformats.h"
+#include <stdlib.h>
 #include <cassert>
 #include <cmath>
+#include "tpixelformats.h"
 
 
 // Set to 1 to help debug test failures:

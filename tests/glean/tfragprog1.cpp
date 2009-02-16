@@ -39,10 +39,11 @@
 // unique programs work correctly.
 
 
-#include "tfragprog1.h"
+#include <cstring>
 #include <cassert>
 #include <cmath>
 #include <math.h>
+#include "tfragprog1.h"
 
 
 namespace GLEAN {
@@ -436,6 +437,17 @@ static const FragmentProgram Programs[] = {
 		DONT_CARE_Z
 	},
 	{
+		/* check that RCP result is replicated across XYZW */
+		"RCP test 2 (reciprocal)",
+		"!!ARBfp1.0\n"
+		"PARAM values = {8, -10, 1, 12 }; \n"
+		"MOV result.color, values; \n"
+		"RCP result.color, values.x; \n"
+		"END \n",
+		{ 1.0 / 8.0, 1.0 / 8.0, 1.0 / 8.0, 1.0 / 8.0 },
+		DONT_CARE_Z
+	},
+	{
 		"RSQ test 1 (reciprocal square root)",
 		"!!ARBfp1.0\n"
 		"PARAM values = {1, 4, 9, 100 }; \n"
@@ -560,6 +572,18 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(Param1[2]),
 		  CLAMP01(0.0)
 		},
+		DONT_CARE_Z
+	},
+	{
+		"swizzled move test",
+		"!!ARBfp1.0\n"
+		"TEMP t; \n"
+		"PARAM p = program.local[1]; \n"
+		"MOV t, p; \n"
+		"MOV t, t.yxwz; \n"  // "in-place" swizzle
+		"MOV result.color, t; \n"
+		"END \n",
+		{ Param1[1], Param1[0], Param1[3], Param1[2] },
 		DONT_CARE_Z
 	},
 	{

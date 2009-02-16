@@ -30,10 +30,12 @@
 // Brian Paul  August 2006
 
 
+#include <cassert>
+#include <cstring>
+#include <cmath>
 #include "ttexture_srgb.h"
 #include "rand.h"
-#include <cassert>
-#include <cmath>
+
 
 #ifdef GL_EXT_texture_sRGB
 

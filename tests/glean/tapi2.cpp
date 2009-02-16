@@ -31,9 +31,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include "tapi2.h"
+#include <stdlib.h>
+#include <cstring>
 #include <cassert>
 #include <math.h>
+#include "tapi2.h"
 
 
 namespace GLEAN {
@@ -281,7 +283,7 @@ API2Test::renderQuad(GLfloat *pixel) const
 	glTexCoord2f(0, 1);  glVertex2f(-r,  r);
 	glEnd();
 
-	// read a pixel from lower-left corder of rendered quad
+	// read a pixel from lower-left corner of rendered quad
 	glReadPixels(windowSize / 2 - 2, windowSize / 2 - 2, 1, 1,
 		     GL_RGBA, GL_FLOAT, pixel);
 }
@@ -319,7 +321,7 @@ API2Test::renderQuadWithArrays(GLint attr, const GLfloat value[4],
 	glDisable(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray_func(attr);
 
-	// read a pixel from lower-left corder of rendered quad
+	// read a pixel from lower-left corner of rendered quad
 	glReadPixels(windowSize / 2 - 2, windowSize / 2 - 2, 1, 1,
 		     GL_RGBA, GL_FLOAT, pixel);
 }
@@ -702,7 +704,12 @@ API2Test::testUniformiFuncs(void)
 	renderQuad(pixel);
 	if (!equalColors(pixel, expected)) {
 		REPORT_FAILURE("glUniform[1234]i failed");
-		//printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+#if 0
+		printf("Expected color %f %f %f %f\n",
+                       expected[0], expected[1], expected[2], expected[3]);
+		printf("Found color %f %f %f %f\n",
+                       pixel[0], pixel[1], pixel[2], pixel[3]);
+#endif
 		return false;
 	}
 
@@ -748,6 +755,14 @@ API2Test::testShaderAttribs(void)
 		GLfloat pixel[4];
 		renderQuadWithArrays(attr, testColors[i], pixel);
 		if (!equalColors(pixel, testColors[i])) {
+#if 0
+                   printf("Expected color %f %f %f\n",
+                          testColors[i][0],
+                          testColors[i][1],
+                          testColors[i][2]);
+                   printf("Found color %f %f %f\n",
+                          pixel[0], pixel[1], pixel[2]);
+#endif
 			REPORT_FAILURE("Vertex array test failed");
 			return false;
 		}

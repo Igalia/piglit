@@ -81,15 +81,21 @@ FBOTest::setup(void)
                 tolerance[4] = 1.0;
 
         // Check if GL_EXT_framebuffer_object is supported
-        if (!strstr((char *) glGetString(GL_EXTENSIONS), "GL_EXT_framebuffer_object")) {
+        if (GLUtils::haveExtension("GL_EXT_framebuffer_object")) {
+                printf("GL_EXT_framebuffer_object is supported\n");
+                useFramebuffer = 1;
+        }
+        else {
                 printf("GL_EXT_framebuffer_object is not supported\n");
                 useFramebuffer = 0;
  		return false;
         }
-        else {
-                printf("GL_EXT_framebuffer_object is supported\n");
-                useFramebuffer = 1;
-        }
+
+	haveARBfbo = GLUtils::haveExtension("GL_ARB_framebuffer_object");
+	if (haveARBfbo)
+		printf("GL_ARB_framebuffer_object is supported\n");
+	else
+		printf("GL_ARB_framebuffer_object is not supported\n");
 
         return true;
 }
@@ -1217,7 +1223,8 @@ FBOTest::testErrorHandling(void)
                         return false;
                 }
 
-                // All attached images have the same width and height
+                // All attached images have the same width and height,
+		// unless GL_ARB_framebuffer object is supported.
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glGenTextures(2, textures);
@@ -1238,15 +1245,16 @@ FBOTest::testErrorHandling(void)
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT(1, fbs);
                 glDeleteTextures(2, textures);
-                if (status != GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT) {
+                if (!haveARBfbo &&
+		    status != GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT) {
                         REPORT_FAILURE
-                                ("If no image is attached to framebuffer, status should be GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
+                                ("If renderbuffer sizes don't all match, status should be GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
                         return false;
                 }
 
                 // All images attached to the attachment points
-                // COLOR_ATTACHMENT0_EXT through COLOR_ATTACHMENTn_EXT must have
-                // the same internal format.
+                // COLOR_ATTACHMENT0_EXT through COLOR_ATTACHMENTn_EXT must
+                // have the same internal format, unless ARB_fbo is supported.
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glGenTextures(2, textures);
@@ -1267,15 +1275,17 @@ FBOTest::testErrorHandling(void)
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT(1, fbs);
                 glDeleteTextures(2, textures);
-                if (status != GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT) {
+                if (!haveARBfbo &&
+		    status != GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT) {
                         REPORT_FAILURE
-                                ("If no image is attached to framebuffer, status should be GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
+                                ("All color renderbuffers must be of same format, status should be GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
                         return false;
                 }
 
 
-                // The value of FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not be
-                // NONE for any color attachment point(s) named by DRAW_BUFFERi
+                // The value of FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not
+                // be NONE for any color attachment point(s) named by
+		// DRAW_BUFFERi.
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT +
@@ -1285,13 +1295,13 @@ FBOTest::testErrorHandling(void)
                 glDeleteFramebuffersEXT(1, fbs);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT) {
                         REPORT_FAILURE
-                                ("If no image is attached to framebuffer, status should be GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
+                                ("All any buffer named by glDrawBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
                         return false;
                 }
 
                 // If READ_BUFFER is not NONE, then the value of
-                // FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not be NONE for the
-                // color attachment point named by READ_BUFFER.
+                // FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not be NONE for
+                // the color attachment point named by READ_BUFFER.
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_NONE);
@@ -1302,7 +1312,7 @@ FBOTest::testErrorHandling(void)
                 glDeleteFramebuffersEXT(1, fbs);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT) {
                         REPORT_FAILURE
-                                ("If no image is attached to framebuffer, status should be GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
+                                ("If buffer named by glReadBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
                         return false;
                 }
         }

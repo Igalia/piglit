@@ -34,6 +34,7 @@
 using namespace std;
 
 #include <cassert>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>

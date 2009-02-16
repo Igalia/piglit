@@ -2,6 +2,8 @@
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
 // 
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -31,9 +33,9 @@
 #include "dsconfig.h"
 #include <iostream>
 #include <strstream>
-#include <cstring>
+#include <string.h>
 #include <map>
-#include <climits>
+#include <limits.h>
 
 #ifdef __WIN__
 // disable the annoying warning : "forcing value to bool 'true' or 'false' (performance warning)"
@@ -100,6 +102,7 @@ typedef enum {		// These variable tags are used as array indices,
 	VACCUMG,
 	VACCUMB,
 	VACCUMA,
+        VSAMPLES,
 	VCANWINDOW,
 	VCANPIXMAP,
 	VCANPBUFFER,
@@ -138,6 +141,7 @@ struct {CanonVar var; char* name;} varNames[] = {
 	{VACCUMG,		"accumG"},
 	{VACCUMB,		"accumB"},
 	{VACCUMA,		"accumA"},
+        {VSAMPLES,              "multisample"},
 	{VCANWINDOW,		"window"},
 	{VCANPIXMAP,		"pixmap"},
 	{VCANPBUFFER,		"pBuffer"},
@@ -227,6 +231,18 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(::Display* dpy, ::XVisualInfo* pvi) {
 		glXGetConfig(dpy, vi, GLX_ACCUM_ALPHA_SIZE, &accA);
 	} else
 		accR = accG = accB = accA = 0;
+
+	// Note that samples=0 means no multisampling!
+	// One might think that one sample per pixel means non-multisampling
+	// but that's not the convention used here.
+	samples = 0;
+	if (canRGBA) {
+		int sampBuf = 0;
+		glXGetConfig(dpy, vi, GLX_SAMPLE_BUFFERS, &sampBuf);
+		if (sampBuf) {
+			glXGetConfig(dpy, vi, GLX_SAMPLES, &samples);
+		}
+	}
 
 	canWindow = canPixmap = true;
 		// Only guaranteed in early versions of GLX.
@@ -329,6 +345,8 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 	accB = pfd->cAccumBlueBits;
 	accA = pfd->cAccumAlphaBits;
 
+	samples = 0; // XXX implement properly for Windows!
+
 	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;			
 
 	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;		
@@ -378,6 +396,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 	accB = 32;
 	accA = 32;
 
+	samples = 0;
 
 	canWindow = 1;			
 	canWinSysRender = 1;		
@@ -435,6 +454,8 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 	}
 	else
 		r = g = b = a = 0;
+
+	samples = 0; // XXX implement properly for AGL
 
 	aglDescribePixelFormat( pf, AGL_DEPTH_SIZE, (long *)& z);
 	aglDescribePixelFormat( pf, AGL_STENCIL_SIZE, (long *)& s);
@@ -543,6 +564,9 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 				break;
 			case VACCUMA:
 				accA = lex.iValue;
+				break;
+			case VSAMPLES:
+				samples = lex.iValue;
 				break;
 			case VCANWINDOW:
 				canWindow = lex.iValue;
@@ -668,6 +692,8 @@ DrawingSurfaceConfig::canonicalDescription() {
 	  << ' ' << mapVarToName[VACCUMB] << ' ' << accB
 	  << ' ' << mapVarToName[VACCUMA] << ' ' << accA;
 
+	s << ' ' << mapVarToName[VSAMPLES] << ' ' << samples;
+
 	s << ' ' << mapVarToName[VCANWINDOW] << ' ' << canWindow;
 
 #	if defined(__X11__)
@@ -766,6 +792,10 @@ DrawingSurfaceConfig::conciseDescription() {
 				s << ", accr" << accR << "g" << accG
 				  << "b" << accB;
 		}
+	}
+
+	if (samples) {
+		s << ", samples" << samples;
 	}
 
 	{
@@ -868,6 +898,10 @@ DrawingSurfaceConfig::match(vector<DrawingSurfaceConfig*>& choices) {
 			error += abs(accB - c.accB);
 		if (accA && c.accA)
 			error += abs(accA - c.accA);
+		// Use a huge error value for multisample mismatch.
+		// Not sure this is the best solution.
+		if (samples != c.samples)
+			error += 1000;
 
 		if (error < bestError) {
 			bestError = error;

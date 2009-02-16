@@ -41,6 +41,7 @@
 //
 // Author: Brian Paul (brianp@valinux.com)  November 2000
 
+#include <stdlib.h>
 #include "tpaths.h"
 
 namespace GLEAN {

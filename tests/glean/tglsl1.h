@@ -59,14 +59,17 @@ public:
                  const char *extensions, const char* description):
 		MultiTest(testName, filter, extensions, description)
 	{
+		testOne = true;  // test with just one surface config
 	}
+
+	bool isApplicable() const;
 
 	virtual void runOne(MultiTestResult &r, Window &w);
 
 private:
 	GLfloat tolerance[5];
 	GLfloat looseTolerance[5];
-        GLfloat version21;   // OpenGL 2.1 or higher supported?
+        GLfloat glsl_120;   // GLSL 1.20 or higher supported?
         bool getFunctions(void);
         void setupTextures(void);
         void setupTextureMatrix1(void);

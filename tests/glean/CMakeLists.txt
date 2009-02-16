@@ -46,11 +46,15 @@ add_executable (glean
 	tscissor.cpp
 	tteapot.cpp
 	ttexcombine.cpp
+	ttexcombine4.cpp
 	ttexcube.cpp
 	ttexenv.cpp
 	ttexgen.cpp
 	ttexrect.cpp
+	ttexswizzle.cpp
 	ttexture_srgb.cpp
+	ttexunits.cpp
+	tvertarraybgra.cpp
 	tvertattrib.cpp
 	tvertprog1.cpp
 	tvtxperf.cpp

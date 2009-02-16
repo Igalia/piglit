@@ -45,10 +45,11 @@
 // Author: Brian Paul (brian.paul a t tungstengraphics.com)  October 2004
 
 
+#include <stdlib.h>
+#include <cassert>
 #include <math.h>
 #include "tvertattrib.h"
 #include "glutils.h"
-#include <cassert>
 
 namespace GLEAN {
 

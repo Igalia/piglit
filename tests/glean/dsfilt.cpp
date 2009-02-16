@@ -2,6 +2,8 @@
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
 // 
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -214,6 +216,7 @@ DrawingSurfaceFilter::InitVarTable() {
 	varTable["accuma"] =		VAR_ACCUM_A;
 	varTable["accumrgb"] =		VAR_ACCUM_RGB;
 	varTable["accumrgba"] =		VAR_ACCUM_RGBA;
+	varTable["samples"] =		VAR_SAMPLES;
 	varTable["aux"] =		VAR_AUX;
 	varTable["db"] =		VAR_DB;
 	varTable["sb"] =		VAR_SB;
@@ -282,6 +285,9 @@ DrawingSurfaceFilter::FetchVariable(const DrawingSurfaceConfig& c, Token v) {
 		return min(c.accR, min(c.accG, c.accB));
 	case VAR_ACCUM_RGBA:
 		return min(c.accR, min(c.accG, min(c.accB, c.accA)));
+
+	case VAR_SAMPLES:
+		return c.samples;
 
 	case VAR_AUX:
 		return c.aux;

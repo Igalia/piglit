@@ -223,7 +223,10 @@ class Image {
 		BasicStats stats[4];	// stats for absolute error in
 					// R, G, B, and A
 	};
-	Registration reg(Image& ref);
+	Registration reg(Image& img);
+
+        // test if images are identical
+        bool operator==(const Image &ref) const;
 
 	// Image arithmetic
 	// XXX type and format conversions, with appropriate scaling.

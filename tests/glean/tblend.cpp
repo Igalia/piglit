@@ -29,6 +29,7 @@
 // tblend.cpp:  Test blending functions.
 
 #include <assert.h>
+#include <stdlib.h>
 #include "tblend.h"
 #include "rand.h"
 #include "image.h"
