@@ -83,3 +83,29 @@ If you adhere to the rules above, the tab size does not matter. Tab size 4
 is recommended because it keeps the line lengths reasonable, but in the end,
 that's purely a matter of personal taste.
 
+
+
+\ Release Philosophy
+ -------------------
+
+Since Piglit is a test suite, it is "production software" at all times.
+Test case might be incorrect, but despite that it is not useful to speak of
+"stable" and "unstable" versions of a test suite, especially one that sees
+a relatively small rate of change like Piglit.
+
+For this reason, developers of OpenGL drivers and related software, and even
+testers are encouraged to follow the git repository on freedesktop.org at all
+times. A web interface to this repository can be found here:
+
+       http://cgit.freedesktop.org/piglit
+
+Nevertheless, for purposes of marking a specific point in time for packaging
+in an environment where non-developers do tests on a wide range of hardware,
+it has been pointed out that it would be useful to have official releases.
+
+For this reason, we will occasionally bump the version number in the file
+RELEASE and create an appropriate tag in the git repository.
+
+This tag is the official way of marking a release, so the tarballs provided
+automatically by the cgit frontend are official release tarballs.
+
