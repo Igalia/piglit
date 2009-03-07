@@ -59,7 +59,10 @@ public:
                  const char *extensions, const char* description):
 		MultiTest(testName, filter, extensions, description)
 	{
+		testOne = true;  // test with just one surface config
 	}
+
+	bool isApplicable() const;
 
 	virtual void runOne(MultiTestResult &r, Window &w);
 

@@ -45,14 +45,11 @@
 // Author: Brian Paul (brian.paul a t tungstengraphics.com)  October 2004
 
 
-#include <cmath>
-#ifdef __CYGWIN__
-#undef log2
-#endif
-#include <cstdlib>
+#include <stdlib.h>
+#include <cassert>
+#include <math.h>
 #include "tvertattrib.h"
 #include "glutils.h"
-#include <cassert>
 
 namespace GLEAN {
 

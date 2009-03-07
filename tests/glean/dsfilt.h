@@ -2,6 +2,8 @@
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
 // 
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
+//
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -174,6 +176,8 @@ class DrawingSurfaceFilter {
 		VAR_ACCUM_A,	// accum buf alpha channel size
 		VAR_ACCUM_RGB,	// min(accum r, accum g, accum b)
 		VAR_ACCUM_RGBA,	// min(accum r, accum g, accum b, accum a)
+
+		VAR_SAMPLES,    // number of samples per pixel
 
 		VAR_AUX,	// number of aux color buffers
 

@@ -336,6 +336,47 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
+        {
+		"Swizzled expression",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   vec4 a = vec4(1, 1, 1, 1); \n"
+                "   vec4 b = vec4(0.5, 0.2, 0.1, 0.8); \n"
+                "   vec4 c = (a * b).wzyx; \n"
+		"   gl_FragColor = c; \n"
+		"} \n",
+		{ 0.8, 0.1, 0.2, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+        },
+
+        {
+		"Swizzled swizzle",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   vec4 a = vec4(0.1, 0.2, 0.3, 0.4); \n"
+                "   vec4 b = a.wzyx.yxwz; \n"
+		"   gl_FragColor = b; \n"
+		"} \n",
+		{ 0.3, 0.4, 0.1, 0.2 },
+		DONT_CARE_Z,
+		FLAG_NONE
+        },
+
+        {
+		"Swizzled swizzled swizzle",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   vec4 a = vec4(0.1, 0.2, 0.3, 0.4); \n"
+                "   vec4 b = a.wzyx.yxwz.xxyz; \n"
+		"   gl_FragColor = b; \n"
+		"} \n",
+		{ 0.3, 0.3, 0.4, 0.1 },
+		DONT_CARE_Z,
+		FLAG_NONE
+        },
+
+
 	// Z-write ============================================================
 	{
 		"gl_FragDepth writing",
@@ -1060,6 +1101,19 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"conditional expression (2)",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+		"   gl_FragColor = vec4(0.0); \n"
+                "   bool b = true; \n"
+                "   gl_FragColor.y = b ? 1.0 : 0.5; \n"
+		"} \n",
+		{ 0.0, 1.0, 0.0, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
 		"sequence (comma) operator",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -1087,6 +1141,45 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor.w = ar[3]; \n"
 		"} \n",
 		{ 0.5, 1.0, 0.25, 0.2 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"array with variable indexing",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   float ar[4]; \n"
+		"   ar[0] = 0.0; \n"
+		"   ar[1] = 0.1; \n"
+		"   ar[2] = 0.5; \n"
+		"   ar[3] = 0.7; \n"
+                "   int indx = int(uniform1.y * 8.0);  // should be 2 \n"
+		"   gl_FragColor = vec4(ar[indx]); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"array with swizzled variable indexing",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   float ar[4]; \n"
+		"   ar[0] = 0.0; \n"
+		"   ar[1] = 0.8; \n"
+		"   ar[2] = 0.5; \n"
+		"   ar[3] = 0.7; \n"
+                "   ivec2 indx; \n"
+                "   indx.x = 1; \n"
+                "   indx.y = int(uniform1.y * 8.0);  // should be 2 \n"
+                "   float p = ar[indx.x] * ar[indx.y]; \n"
+		"   gl_FragColor = vec4(p); \n"
+		"} \n",
+		{ 0.4, 0.4, 0.4, 0.4 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -2898,6 +2991,42 @@ static const ShaderProgram Programs[] = {
 		FLAG_ILLEGAL_LINK
 	},
 
+	{
+		"varying read but not written",
+		// vert shader:
+		"varying vec4 foo; \n"
+		"void main() { \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		// frag shader:
+		"varying vec4 foo; \n"
+		"void main() { \n"
+		"   gl_FragColor = foo; \n"
+		"} \n",
+		{ 0.0, 0.0, 0.0, 0.0 },
+		DONT_CARE_Z,
+		FLAG_ILLEGAL_LINK
+	},
+
+	{
+		"texcoord varying",
+                // Does the linker correctly recognize that texcoord[1] is
+                // written by the vertex shader and read by the fragment shader?
+		// vert shader:
+		"void main() { \n"
+                "   int i = 1; \n"
+                "   gl_TexCoord[i] = vec4(0.5, 0, 0, 0); \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		// frag shader:
+		"void main() { \n"
+		"   gl_FragColor = gl_TexCoord[1]; \n"
+		"} \n",
+		{ 0.5, 0.0, 0.0, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
 	{ NULL, NULL, NULL, {0,0,0,0}, 0, FLAG_NONE } // end of list sentinal
 };
 
@@ -3205,13 +3334,6 @@ GLSLTest::setupTextureMatrix1(void)
 bool
 GLSLTest::setup(void)
 {
-	// check that we have OpenGL 2.0
-	const char *verString = (const char *) glGetString(GL_VERSION);
-	if (verString[0] != '2' || verString[1] != '.') {
-		//env->log << "OpenGL 2.x not supported\n";
-		return false;
-	}
-
 	// check GLSL version
 #ifdef GL_SHADING_LANGUAGE_VERSION
 	const char *glslVersion = (const char *) glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -3222,7 +3344,7 @@ GLSLTest::setup(void)
 		env->log << "GLSL 1.x not supported\n";
 		return false;
 	}
-	glsl_120 = (verString[2] >= '2');
+	glsl_120 = (glslVersion[2] >= '2');
 
 	if (!getFunctions()) {
 		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
@@ -3662,9 +3784,27 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 }
 
 
+// We need OpenGL 2.0, 2.1 or 3.0
+bool
+GLSLTest::isApplicable() const
+{
+	const char *version = (const char *) glGetString(GL_VERSION);
+	if (strncmp(version, "2.0", 3) == 0 ||
+		strncmp(version, "2.1", 3) == 0 ||
+		strncmp(version, "3.0", 3) == 0) {
+		return true;
+	}
+	else {
+		env->log << name
+				 << ":  skipped.  Requires GL 2.0, 2.1 or 3.0.\n";
+		return false;
+	}
+}
+
+
 // The test object itself:
 GLSLTest glslTest("glsl1", "window, rgb, z",
-		  "",  // no extension filter (we'll test for version 2.x during setup)
+		  "",  // no extension filter but see isApplicable()
 		  "GLSL test 1: test basic Shading Language functionality.\n"
 		  );
 

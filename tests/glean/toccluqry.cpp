@@ -33,12 +33,12 @@
  */
 
 #define GL_GLEXT_PROTOTYPES
-#include "toccluqry.h"
+#include <stdlib.h>
 #include <cassert>
-#include <cstdlib>
-#include <cstdio>
 #include <cstring>
+#include <stdio.h>
 #include <cmath>
+#include "toccluqry.h"
 
 
 #define START_QUERY(id)\
@@ -86,7 +86,7 @@ GLuint OccluQryTest::find_unused_id()
 
 	while (1) {
 		/* assuming that at least 2^32-1 <id> can be generated */
-		id = random() % ((unsigned long)1 << 32 - 1);
+		id = random() % (((unsigned long) 1 << 32) - 1);
 		if (id != 0 && glIsQueryARB(id) == GL_FALSE)
 			return id;
 		if (++ counter >= MAX_FIND_ID_ROUND) {

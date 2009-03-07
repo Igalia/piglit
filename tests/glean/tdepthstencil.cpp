@@ -30,14 +30,13 @@
 // Brian Paul  1 October 2005
 
 
+#include <cassert>
+#include <cmath>
+#include <cstring>
 #include "tdepthstencil.h"
 #include "rand.h"
 #include "timer.h"
 #include "image.h"
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
 
 #ifdef GL_EXT_packed_depth_stencil
 

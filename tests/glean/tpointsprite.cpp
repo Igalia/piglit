@@ -40,12 +40,13 @@
  */
 
 #define GL_GLEXT_PROTOTYPES
-#include "tpointsprite.h"
+
+#include <stdlib.h>
 #include <cassert>
 #include <cmath>
-#include <cstring>
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include "tpointsprite.h"
+
 
 namespace GLEAN {
 

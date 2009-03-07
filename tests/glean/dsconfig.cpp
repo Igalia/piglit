@@ -1,6 +1,8 @@
 // BEGIN_COPYRIGHT
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
+// 
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -10,11 +12,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,17 +25,17 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 
 // dsconfig.cpp:  Implementation of drawing surface configuration utilities
 #include "dsconfig.h"
 #include <iostream>
-#include <sstream>
-#include <cstring>
+#include <strstream>
+#include <string.h>
 #include <map>
-#include <climits>
+#include <limits.h>
 
 #ifdef __WIN__
 // disable the annoying warning : "forcing value to bool 'true' or 'false' (performance warning)"
@@ -100,6 +102,7 @@ typedef enum {		// These variable tags are used as array indices,
 	VACCUMG,
 	VACCUMB,
 	VACCUMA,
+        VSAMPLES,
 	VCANWINDOW,
 	VCANPIXMAP,
 	VCANPBUFFER,
@@ -118,8 +121,7 @@ typedef enum {		// These variable tags are used as array indices,
 	V_LAST
 } CanonVar;
 
-struct CanonVarMapping {CanonVar var; const char* name;};
-CanonVarMapping varNames[] = {
+struct {CanonVar var; char* name;} varNames[] = {
 	{VID,			"id"},
 	{VFBCID,		"fbcID"},
 	{VCANRGBA,		"canRGBA"},
@@ -139,6 +141,7 @@ CanonVarMapping varNames[] = {
 	{VACCUMG,		"accumG"},
 	{VACCUMB,		"accumB"},
 	{VACCUMA,		"accumA"},
+        {VSAMPLES,              "multisample"},
 	{VCANWINDOW,		"window"},
 	{VCANPIXMAP,		"pixmap"},
 	{VCANPBUFFER,		"pBuffer"},
@@ -156,7 +159,7 @@ CanonVarMapping varNames[] = {
 	{VTRANSI,		"transI"}
 };
 
-const char* mapVarToName[V_LAST];
+char* mapVarToName[V_LAST];
 map<string, CanonVar> mapNameToVar;
 bool mapsInitialized = false;
 
@@ -229,6 +232,18 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(::Display* dpy, ::XVisualInfo* pvi) {
 	} else
 		accR = accG = accB = accA = 0;
 
+	// Note that samples=0 means no multisampling!
+	// One might think that one sample per pixel means non-multisampling
+	// but that's not the convention used here.
+	samples = 0;
+	if (canRGBA) {
+		int sampBuf = 0;
+		glXGetConfig(dpy, vi, GLX_SAMPLE_BUFFERS, &sampBuf);
+		if (sampBuf) {
+			glXGetConfig(dpy, vi, GLX_SAMPLES, &samples);
+		}
+	}
+
 	canWindow = canPixmap = true;
 		// Only guaranteed in early versions of GLX.
 
@@ -299,9 +314,9 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 
 	pfd = ppfd;
 	pfdID = id;
-
-	canRGBA = pfd->iPixelType == PFD_TYPE_RGBA;
-	canCI = pfd->iPixelType == PFD_TYPE_COLORINDEX;
+	
+	canRGBA = pfd->iPixelType == PFD_TYPE_RGBA;			
+	canCI = pfd->iPixelType == PFD_TYPE_COLORINDEX;			
 
 	bufSize = pfd->cColorBits + pfd->cAlphaBits;
 
@@ -330,9 +345,11 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 	accB = pfd->cAccumBlueBits;
 	accA = pfd->cAccumAlphaBits;
 
-	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;
+	samples = 0; // XXX implement properly for Windows!
 
-	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;
+	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;			
+
+	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;		
 
 	if (pfd->dwFlags & PFD_GENERIC_FORMAT)
 	{
@@ -341,20 +358,20 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 			// it's an MCD - at least it has some acceleration
 			fast = true;
 		}
-		else
+		else 
 		{
-			// it's software
+			// it's software 
 			fast = false;
 		}
 	}
-	else
+	else 
 	{
-		// it's an ICD
+		// it's an ICD 
 		fast = true;
 	}
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;
+	conformant = true;		
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -379,15 +396,16 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 	accB = 32;
 	accA = 32;
 
+	samples = 0;
 
-	canWindow = 1;
-	canWinSysRender = 1;
+	canWindow = 1;			
+	canWinSysRender = 1;		
 
 	// This is a software-mode assumption
 	fast = false;
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;
+	conformant = true;		
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -399,18 +417,18 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 {
 	long			i;
-
+	
 	if (!mapsInitialized)
 		initializeMaps();
 
 	pf = pfd;
-
+	
 	if (aglDescribePixelFormat( pf, AGL_RGBA, &i))
 		canRGBA = (i == GL_TRUE);
-	canCI = (i == GL_FALSE);
+	canCI = (i == GL_FALSE);			
 
 	if (aglDescribePixelFormat( pf, AGL_BUFFER_SIZE, &i))
-		bufSize = i;
+		bufSize = i;			
 
 	level = 0;
 
@@ -437,6 +455,8 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 	else
 		r = g = b = a = 0;
 
+	samples = 0; // XXX implement properly for AGL
+
 	aglDescribePixelFormat( pf, AGL_DEPTH_SIZE, (long *)& z);
 	aglDescribePixelFormat( pf, AGL_STENCIL_SIZE, (long *)& s);
 
@@ -453,7 +473,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 	fast = i;
 
 	// we'll assume that the OpenGL implementation thinks it is conformant
-	conformant = true;
+	conformant = true;		
 
 	// chromakeying isn't supported
 	transparent = false;
@@ -545,6 +565,9 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 			case VACCUMA:
 				accA = lex.iValue;
 				break;
+			case VSAMPLES:
+				samples = lex.iValue;
+				break;
 			case VCANWINDOW:
 				canWindow = lex.iValue;
 				break;
@@ -628,7 +651,10 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 string
 DrawingSurfaceConfig::canonicalDescription() {
 
-	ostringstream s;
+	// Would rather use ostringstream, but it's not available in
+	// egcs 1.1.2.
+	char buf[1024];
+	ostrstream s(buf, sizeof(buf));
 
 #	if defined(__X11__)
 	    s << mapVarToName[VID] << ' ' << visID;
@@ -636,7 +662,7 @@ DrawingSurfaceConfig::canonicalDescription() {
 		s << ' ' << mapVarToName[VFBCID] << ' ' << fbcID;
 #	    endif
 #	elif defined(__WIN__)
-		s << mapVarToName[VID] << ' ' << pfdID;
+		s << mapVarToName[VID] << ' ' << pfdID;	    
 #	endif
 
 	s << ' ' << mapVarToName[VCANRGBA] << ' ' << canRGBA;
@@ -665,6 +691,8 @@ DrawingSurfaceConfig::canonicalDescription() {
 	  << ' ' << mapVarToName[VACCUMG] << ' ' << accG
 	  << ' ' << mapVarToName[VACCUMB] << ' ' << accB
 	  << ' ' << mapVarToName[VACCUMA] << ' ' << accA;
+
+	s << ' ' << mapVarToName[VSAMPLES] << ' ' << samples;
 
 	s << ' ' << mapVarToName[VCANWINDOW] << ' ' << canWindow;
 
@@ -703,7 +731,8 @@ DrawingSurfaceConfig::canonicalDescription() {
 ///////////////////////////////////////////////////////////////////////////////
 string
 DrawingSurfaceConfig::conciseDescription() {
-	ostringstream s;
+	char buf[1024];
+	ostrstream s(buf, sizeof(buf));
 
 	if (canRGBA && canCI)
 		s << "dual ";
@@ -763,6 +792,10 @@ DrawingSurfaceConfig::conciseDescription() {
 				s << ", accr" << accR << "g" << accG
 				  << "b" << accB;
 		}
+	}
+
+	if (samples) {
+		s << ", samples" << samples;
 	}
 
 	{
@@ -865,6 +898,10 @@ DrawingSurfaceConfig::match(vector<DrawingSurfaceConfig*>& choices) {
 			error += abs(accB - c.accB);
 		if (accA && c.accA)
 			error += abs(accA - c.accA);
+		// Use a huge error value for multisample mismatch.
+		// Not sure this is the best solution.
+		if (samples != c.samples)
+			error += 1000;
 
 		if (error < bestError) {
 			bestError = error;

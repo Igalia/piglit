@@ -1,6 +1,8 @@
 // BEGIN_COPYRIGHT
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
+//
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -134,6 +136,9 @@ class DrawingSurfaceConfig {
 	int accB;			// Depth of accum buf blue channel.
 
 	int accA;			// Depth of accum buf alpha channel.
+
+	int samples;                    // Number of samples per pixel.
+					// Zero indicates a non-ms config.
 
 	bool canWindow;			// True if can be used for windows.
 

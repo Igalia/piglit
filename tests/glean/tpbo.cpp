@@ -34,12 +34,15 @@
 
 
 #define GL_GLEXT_PROTOTYPES
-#include "tpbo.h"
-#include <cassert>
-#include <cmath>
-#include <cstdlib>
+
+#include <stdlib.h>
 #include <cstring>
+#include <cassert>
+#include <math.h>
+#include "tpbo.h"
 #include "timer.h"
+
+
 namespace GLEAN
 {
 
@@ -81,12 +84,12 @@ bool PBOTest::setup(void)
 
    // Check if GL_ARB_pixel_buffer_object is supported
    if (!strstr((char *) glGetString(GL_EXTENSIONS), "GL_ARB_pixel_buffer_object")) {
-      printf("GL_ARB_pixel_buffer_object is not supported\n");
+      //printf("GL_ARB_pixel_buffer_object is not supported\n");
       usePBO = 0;
       return false;
    }
    else {
-      printf("GL_ARB_pixel_buffer_object is supported\n");
+      //printf("GL_ARB_pixel_buffer_object is supported\n");
       usePBO = 1;
    }
 

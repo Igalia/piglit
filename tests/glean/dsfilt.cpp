@@ -1,6 +1,8 @@
 // BEGIN_COPYRIGHT
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
+// 
+// multisample changes: Copyright (c) 2008 VMware, Inc.  All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -10,11 +12,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +25,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 
@@ -32,6 +34,7 @@
 // dsfilt.cpp:  Implementation of drawing surface configuration filtering
 
 #include <iostream>
+#include <strstream>
 #include <ctype.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -213,6 +216,7 @@ DrawingSurfaceFilter::InitVarTable() {
 	varTable["accuma"] =		VAR_ACCUM_A;
 	varTable["accumrgb"] =		VAR_ACCUM_RGB;
 	varTable["accumrgba"] =		VAR_ACCUM_RGBA;
+	varTable["samples"] =		VAR_SAMPLES;
 	varTable["aux"] =		VAR_AUX;
 	varTable["db"] =		VAR_DB;
 	varTable["sb"] =		VAR_SB;
@@ -282,6 +286,9 @@ DrawingSurfaceFilter::FetchVariable(const DrawingSurfaceConfig& c, Token v) {
 	case VAR_ACCUM_RGBA:
 		return min(c.accR, min(c.accG, min(c.accB, c.accA)));
 
+	case VAR_SAMPLES:
+		return c.samples;
+
 	case VAR_AUX:
 		return c.aux;
 
@@ -302,7 +309,7 @@ DrawingSurfaceFilter::FetchVariable(const DrawingSurfaceConfig& c, Token v) {
 #		else
 			return 0;
 #		endif
-
+	
 	case VAR_LEVEL:
 		return c.level;
 	case VAR_MAIN:

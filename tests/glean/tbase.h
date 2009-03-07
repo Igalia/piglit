@@ -125,6 +125,8 @@ and tbasic.cpp.
 
 class GLEAN::DrawingSurfaceConfig;		// Forward reference.
 
+
+// Macro for constructor for Glean test taking width, height and one config flag
 #define GLEAN_CLASS_WHO(TEST, RESULT, WIDTH, HEIGHT, ONE)                     \
 	TEST(const char* aName, const char* aFilter,                          \
 	     const char* aDescription):                                       \
@@ -146,6 +148,7 @@ class GLEAN::DrawingSurfaceConfig;		// Forward reference.
 		BaseTest<RESULT>(aName, aFilter, anExtensionList, aDescription) {     \
                 fWidth  = WIDTH;                                              \
                 fHeight = HEIGHT;                                             \
+                testOne = ONE;                                                \
 	}                                                                     \
 	virtual ~TEST() {}                                                    \
                                                                               \
@@ -153,11 +156,15 @@ class GLEAN::DrawingSurfaceConfig;		// Forward reference.
 	virtual void compareOne(RESULT& oldR, RESULT& newR);                  \
 	virtual void logOne(RESULT& r)
 
+// Macro for constructor for Glean test taking width, height
 #define GLEAN_CLASS_WH(TEST, RESULT, WIDTH, HEIGHT) \
         GLEAN_CLASS_WHO(TEST, RESULT, WIDTH, HEIGHT, false)
 
+// Macro for constructor for Glean test taking only test class and result class
 #define GLEAN_CLASS(TEST, RESULT) \
         GLEAN_CLASS_WHO(TEST, RESULT, 258, 258, false)
+
+
 
 namespace GLEAN {
 
@@ -185,6 +192,8 @@ public:
 	}
 };
 
+
+// The BaseTest class is a templatized class taking a ResultType as a parameter
 template <class ResultType> class BaseTest: public Test {
 public:
 	BaseTest(const char* aName, const char* aFilter,
@@ -257,14 +266,23 @@ public:
 				 << '\n';
 	}
 
+	// This method allows a test to indicate that it's not applicable.
+	// For example, the GL version is too low.
+	virtual bool isApplicable() const {
+		return true;
+	}
+
 	virtual void run(Environment& environment) {
-		if (hasRun) return; // no multiple invocations
+		if (hasRun)
+			return; // no multiple invocations
+
 		// Invoke the prerequisite tests, if any:
 		for (Test** t = prereqs; t != 0 && *t != 0; ++t)
 			(*t)->run(environment);
 		env = &environment; // make environment available
 		logDescription();   // log invocation
 		WindowSystem& ws = env->winSys;
+
 		try {
 			OutputStream os(*this);	// open results file
 
@@ -280,8 +298,13 @@ public:
 			     ++p) {
 				Window w(ws, **p, fWidth, fHeight);
 				RenderingContext rc(ws, **p);
-				if (!ws.makeCurrent(rc, w))
-					; // XXX need to throw exception here
+				if (!ws.makeCurrent(rc, w)) {
+					// XXX need to throw exception here
+				}
+
+				// Check if test is applicable to this context
+				if (!isApplicable())
+					continue;
 
 				// Check for all prerequisite extensions.  Note
 				// that this must be done after the rendering
@@ -298,7 +321,10 @@ public:
 				// Save the result
 				results.push_back(r);
 				r->put(os);
-				if (testOne) break;
+
+				// if testOne, skip remaining surface configs
+				if (testOne)
+					break;
 			}
 		}
 		catch (DrawingSurfaceFilter::Syntax e) {

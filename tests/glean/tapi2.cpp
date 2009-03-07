@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
-//
+// 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-//
+// 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
 // files (the "Software"), to deal in the Software without
@@ -10,11 +10,11 @@
 // sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following
 // conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the
 // Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -23,7 +23,7 @@
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-//
+// 
 // END_COPYRIGHT
 
 // tapi2.h:  Test OpenGL 2.x API functions/features
@@ -31,11 +31,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include "tapi2.h"
-#include <cassert>
+#include <stdlib.h>
 #include <cstring>
-#include <cstdlib>
-#include <cmath>
+#include <cassert>
+#include <math.h>
+#include "tapi2.h"
 
 
 namespace GLEAN {
@@ -205,7 +205,7 @@ API2Test::setup(void)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glDrawBuffer(GL_FRONT);
-	glReadBuffer(GL_FRONT);
+	glReadBuffer(GL_FRONT); 
 
 	// compute error tolerances (may need fine-tuning)
 	int bufferBits[5];
@@ -283,7 +283,7 @@ API2Test::renderQuad(GLfloat *pixel) const
 	glTexCoord2f(0, 1);  glVertex2f(-r,  r);
 	glEnd();
 
-	// read a pixel from lower-left corder of rendered quad
+	// read a pixel from lower-left corner of rendered quad
 	glReadPixels(windowSize / 2 - 2, windowSize / 2 - 2, 1, 1,
 		     GL_RGBA, GL_FLOAT, pixel);
 }
@@ -321,7 +321,7 @@ API2Test::renderQuadWithArrays(GLint attr, const GLfloat value[4],
 	glDisable(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray_func(attr);
 
-	// read a pixel from lower-left corder of rendered quad
+	// read a pixel from lower-left corner of rendered quad
 	glReadPixels(windowSize / 2 - 2, windowSize / 2 - 2, 1, 1,
 		     GL_RGBA, GL_FLOAT, pixel);
 }
@@ -704,7 +704,12 @@ API2Test::testUniformiFuncs(void)
 	renderQuad(pixel);
 	if (!equalColors(pixel, expected)) {
 		REPORT_FAILURE("glUniform[1234]i failed");
-		//printf("%f %f %f %f\n", pixel[0], pixel[1], pixel[2], pixel[3]);
+#if 0
+		printf("Expected color %f %f %f %f\n",
+                       expected[0], expected[1], expected[2], expected[3]);
+		printf("Found color %f %f %f %f\n",
+                       pixel[0], pixel[1], pixel[2], pixel[3]);
+#endif
 		return false;
 	}
 
@@ -750,6 +755,14 @@ API2Test::testShaderAttribs(void)
 		GLfloat pixel[4];
 		renderQuadWithArrays(attr, testColors[i], pixel);
 		if (!equalColors(pixel, testColors[i])) {
+#if 0
+                   printf("Expected color %f %f %f\n",
+                          testColors[i][0],
+                          testColors[i][1],
+                          testColors[i][2]);
+                   printf("Found color %f %f %f\n",
+                          pixel[0], pixel[1], pixel[2]);
+#endif
 			REPORT_FAILURE("Vertex array test failed");
 			return false;
 		}

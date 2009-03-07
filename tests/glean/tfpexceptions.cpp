@@ -480,7 +480,7 @@ FPExceptionsTest::testOverflow(void)
 	GLdouble mat[16];
 	for (int i = 0; i < 15; i++)
 		mat[i] = 0.0;
-	mat[0] = mat[5] = mat[10] = mat[15] = 1.0e500;
+	mat[0] = mat[5] = mat[10] = mat[15] = 1.0e100;
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
