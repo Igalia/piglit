@@ -1,9 +1,17 @@
+FIND_LIBRARY( GLEW_glew_LIBRARY GLEW
+	/usr/lib
+)
+
+FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
+      /usr/include/GL
+)
 
 include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
 	${piglit_SOURCE_DIR}/tests/util
+	${GLEW_INCLUDE_DIR}
 )
 
 link_directories (
@@ -17,6 +25,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
+	${GLEW_glew_LIBRARY}
 )
 
 add_executable (crash-cubemap-order crash-cubemap-order.c)
@@ -26,3 +35,4 @@ add_executable (fdo10370 fdo10370.c)
 add_executable (fdo14575 fdo14575.c)
 add_executable (r300-readcache r300-readcache.c)
 add_executable (tex1d-2dborder tex1d-2dborder.c)
+add_executable (fdo20701 fdo20701.c)
