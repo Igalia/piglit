@@ -46,6 +46,7 @@ static GLuint occ_queries[MAX_QUERIES];
 static PFNGLGENQUERIESPROC gen_queries = NULL;
 static PFNGLBEGINQUERYPROC begin_query = NULL;
 static PFNGLENDQUERYPROC end_query = NULL;
+static PFNGLGETQUERYIVPROC get_queryiv = NULL;
 static PFNGLGETQUERYOBJECTIVPROC get_query_objectiv = NULL;
 
 
@@ -171,6 +172,9 @@ static void Reshape(int width, int height)
 
 static void Init(void)
 {
+	GLint query_bits;
+
+
 	glewInit();
 
 	Reshape(Width,Height);
@@ -186,16 +190,31 @@ static void Init(void)
 		gen_queries = GLEW_GET_FUN(__glewGenQueries);
 		begin_query = GLEW_GET_FUN(__glewBeginQuery);
 		end_query = GLEW_GET_FUN(__glewEndQuery);
+		get_queryiv = GLEW_GET_FUN(__glewGetQueryiv);
 		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectiv);
 	} else if (GLEW_ARB_occlusion_query) {
 		gen_queries = GLEW_GET_FUN(__glewGenQueriesARB);
 		begin_query = GLEW_GET_FUN(__glewBeginQueryARB);
 		end_query = GLEW_GET_FUN(__glewEndQueryARB);
+		get_queryiv = GLEW_GET_FUN(__glewGetQueryivARB);
 		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectivARB);
 	} else {
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
+
+
+	/* It is legal for a driver to support the query API but not have
+	 * any query bits.  I wonder how many applications actually check for
+	 * this case...
+	 */
+	(*get_queryiv)(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS,
+		       & query_bits);
+	if (query_bits == 0) {
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+
 
 	(*gen_queries)(MAX_QUERIES, occ_queries);
 }
