@@ -1,10 +1,3 @@
-FIND_LIBRARY( GLEW_glew_LIBRARY GLEW
-	/usr/lib
-)
-
-FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
-      /usr/include/GL
-)
 
 include_directories(
 	${OPENGL_INCLUDE_PATH}
