@@ -102,6 +102,7 @@ texturing['tex3d'] = PlainExecTest([testBinDir + 'tex3d'])
 texturing['texdepth'] = PlainExecTest([testBinDir + 'texdepth', '-auto'])
 texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
 texturing['texredefine'] = PlainExecTest([testBinDir + 'texredefine', '-auto'])
+texturing['tfp'] = PlainExecTest([testBinDir + 'tfp', '-auto'])
 
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
