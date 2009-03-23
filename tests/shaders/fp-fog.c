@@ -86,8 +86,6 @@ static void Redisplay(void)
 	glVertex2f(1, 1);
 	glEnd();
 
-	glutSwapBuffers();
-
 	static const struct {
 		float x, y, r;
 	}
@@ -112,6 +110,8 @@ static void Redisplay(void)
 						probes[i].y * Height / 2,
 						expected_color);
 	}
+
+	glutSwapBuffers();
 
 	if (Automatic) {
 		printf("\nPIGLIT: { 'result': '%s' }\n",
@@ -172,7 +172,6 @@ static void Init(void)
 
 	glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
 
-	glReadBuffer(GL_FRONT);
 	Reshape(Width, Height);
 }
 
