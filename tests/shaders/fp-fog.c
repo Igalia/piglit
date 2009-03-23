@@ -101,25 +101,16 @@ static void Redisplay(void)
 	unsigned i;
 
 	for (i = 0; i < 4; i++) {
-		float result_color[4];
-		glReadPixels((int)(probes[i].x * Width / 2),
-		             (int)(probes[i].y * Height / 2),
-		             1, 1,
-		             GL_RGBA, GL_FLOAT, result_color);
-		printf("%3.1f, %3.1f => { %f %f %f %f }\n",
-		       probes[i].x, probes[i].y,
-		       result_color[0], result_color[1],
-		       result_color[2], result_color[3]);
+		float expected_color[4];
 
-		if ((result_color[1] != 0.0f)
-		    || (result_color[2] != 0.0f)
-		    || (result_color[3] != 1.0f)) {
-			pass = 0;
-		}
+		expected_color[0] = probes[i].r;
+		expected_color[1] = 0.0;
+		expected_color[2] = 0.0;
+		expected_color[3] = 1.0;
 
-		if (fabs(result_color[0] - probes[i].r) > 0.01) {
-			pass = 0;
-		}
+		pass &= piglit_probe_pixel_rgba(probes[i].x * Width / 2,
+						probes[i].y * Height / 2,
+						expected_color);
 	}
 
 	if (Automatic) {
