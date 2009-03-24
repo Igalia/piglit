@@ -213,7 +213,10 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 
 	glDisable(target);
 	glDeleteTextures(1, &texname);
+
+	printf("Checking 0x%04x, rect 1:\n", target);
 	pass &= check_results(dstx, dsty, srcw, srch);
+	printf("Checking 0x%04x, rect 2:\n", target);
 	pass &= check_results(dstx2, dsty2, srcw, srch);
 
 	return pass;
