@@ -25,6 +25,7 @@
 
 import errno
 import os
+import platform
 import re
 import stat
 import subprocess
@@ -271,8 +272,9 @@ class Environment:
 		return stderr+stdout
 
 	def collectData(self):
-		print >>self.file, "glxinfo:", '@@@' + encode(self.run('glxinfo'))
-		if sys.platform != 'cygwin':
+		if platform.system() != 'Windows':
+			print >>self.file, "glxinfo:", '@@@' + encode(self.run('glxinfo'))
+		if platform.system() == 'Linux':
 			print >>self.file, "lspci:", '@@@' + encode(self.run('lspci'))
 
 
