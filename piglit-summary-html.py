@@ -54,24 +54,24 @@ def writefile(filename, text):
 	f.write(text)
 	f.close()
 
-templatedir = os.path.dirname(__file__) + '/templates/'
-Result = readfile(templatedir + 'result.html')
-ResultDetail = readfile(templatedir + 'result_detail.html')
-ResultList = readfile(templatedir + 'result_list.html')
-ResultListItem = readfile(templatedir + 'result_listitem.html')
-ResultMString = readfile(templatedir + 'result_mstring.html')
+templatedir = os.path.join(os.path.dirname(__file__), 'templates')
+Result = readfile(os.path.join(templatedir, 'result.html'))
+ResultDetail = readfile(os.path.join(templatedir, 'result_detail.html'))
+ResultList = readfile(os.path.join(templatedir, 'result_list.html'))
+ResultListItem = readfile(os.path.join(templatedir, 'result_listitem.html'))
+ResultMString = readfile(os.path.join(templatedir, 'result_mstring.html'))
 
-Index = readfile(templatedir + 'index.html')
-IndexTestrun = readfile(templatedir + 'index_testrun.html')
-IndexTestrunB = readfile(templatedir + 'index_testrunb.html')
-IndexTestrunBHref = readfile(templatedir + 'index_testrunb_href.html')
-IndexGroup = readfile(templatedir + 'index_group.html')
-IndexGroupTestrun = readfile(templatedir + 'index_group_testrun.html')
-IndexGroupGroup = readfile(templatedir + 'index_groupgroup.html')
-IndexTest = readfile(templatedir + 'index_test.html')
-IndexTestTestrun = readfile(templatedir + 'index_test_testrun.html')
+Index = readfile(os.path.join(templatedir, 'index.html'))
+IndexTestrun = readfile(os.path.join(templatedir, 'index_testrun.html'))
+IndexTestrunB = readfile(os.path.join(templatedir, 'index_testrunb.html'))
+IndexTestrunBHref = readfile(os.path.join(templatedir, 'index_testrunb_href.html'))
+IndexGroup = readfile(os.path.join(templatedir, 'index_group.html'))
+IndexGroupTestrun = readfile(os.path.join(templatedir, 'index_group_testrun.html'))
+IndexGroupGroup = readfile(os.path.join(templatedir, 'index_groupgroup.html'))
+IndexTest = readfile(os.path.join(templatedir, 'index_test.html'))
+IndexTestTestrun = readfile(os.path.join(templatedir, 'index_test_testrun.html'))
 
-Testrun = readfile(templatedir + 'testrun.html')
+Testrun = readfile(os.path.join(templatedir, 'testrun.html'))
 
 SummaryPages = {
 	'all': 'index.html',
@@ -312,8 +312,8 @@ def main():
 			filename = dirname + '/' + testPathToHtmlFilename(test.path)
 			writeResultHtml(test, test.results[j], filename)
 
-	writefile(summaryDir + '/result.css', readfile(templatedir + 'result.css'))
-	writefile(summaryDir + '/index.css', readfile(templatedir + 'index.css'))
+	writefile(os.path.join(summaryDir, 'result.css'), readfile(os.path.join(templatedir, 'result.css')))
+	writefile(os.path.join(summaryDir, 'index.css'), readfile(os.path.join(templatedir, 'index.css')))
 	writeSummaryHtml(summary, summaryDir, 'all')
 	writeSummaryHtml(summary, summaryDir, 'problems')
 	writeSummaryHtml(summary, summaryDir, 'changes')
