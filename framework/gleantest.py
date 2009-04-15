@@ -34,7 +34,7 @@ def gleanExecutable():
 	return testBinDir + 'glean'
 
 def gleanResultDir():
-	return "./results/glean/"
+	return os.path.join('.', 'results', 'glean')
 
 class GleanTest(Test):
 	globalParams = []
@@ -51,10 +51,10 @@ class GleanTest(Test):
 		for e in self.env:
 			fullenv[e] = str(self.env[e])
 
-		checkDir(gleanResultDir()+self.name, False)
+		checkDir(os.path.join(gleanResultDir(), self.name), False)
 
 		glean = subprocess.Popen(
-			[gleanExecutable(), "-r", gleanResultDir()+self.name,
+			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), self.name),
 			"-o",
 			"-v", "-v", "-v",
 			"-t", "+"+self.name] + GleanTest.globalParams,
