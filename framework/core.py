@@ -245,7 +245,7 @@ class TestrunResult:
 			filelist[:0] = [path + '/summary']
 		for filename in filelist:
 			try:
-				main = open(filename, 'r')
+				main = open(filename, 'U')
 				break
 			except:
 				pass

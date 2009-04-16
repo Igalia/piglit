@@ -60,7 +60,8 @@ class GleanTest(Test):
 			"-t", "+"+self.name] + GleanTest.globalParams,
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
-			env=fullenv
+			env=fullenv,
+			universal_newlines=True
 		)
 
 		out, err = glean.communicate()
