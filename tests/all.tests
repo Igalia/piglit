@@ -61,6 +61,7 @@ mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
 general = Group()
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
+general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])
 general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
 general['varray-disabled'] = PlainExecTest([testBinDir + 'varray-disabled', '-auto'])
 general['windowoverlap'] = PlainExecTest([testBinDir + 'windowoverlap', '-auto'])
