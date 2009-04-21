@@ -5,7 +5,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 static int Automatic = 0;
 
