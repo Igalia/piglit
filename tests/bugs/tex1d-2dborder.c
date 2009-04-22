@@ -75,7 +75,7 @@ static void test(GLenum wrapt, int cellx, int celly)
 			int y = (celly*5 + sy + 1)*Height/10;
 
 			if (!piglit_probe_pixel_rgb(x, y, TextureColor)) {
-				fprintf(stderr, "Fail in cell %i,%i (texwrap % = 0x%x)\n", cellx, celly, wrapt);
+				fprintf(stderr, "Fail in cell %i,%i (texwrap = 0x%x)\n", cellx, celly, wrapt);
 
 				if (Automatic)
 					piglit_report_result(PIGLIT_FAILURE);
