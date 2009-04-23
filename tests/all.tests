@@ -60,6 +60,7 @@ mesa = Group()
 mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
 fbo = Group()
+fbo['fbo-3d'] = PlainExecTest([testBinDir + 'fbo-3d', '-auto'])
 fbo['fbo-cubemap'] = PlainExecTest([testBinDir + 'fbo-cubemap', '-auto'])
 fbo['fbo-readpixels'] = PlainExecTest([testBinDir + 'fbo-readpixels', '-auto'])
 

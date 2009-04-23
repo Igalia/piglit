@@ -20,5 +20,6 @@ link_libraries (
 	${TIFF_LIBRARY}
 )
 
+add_executable (fbo-3d fbo-3d.c)
 add_executable (fbo-readpixels fbo-readpixels.c)
 add_executable (fbo-cubemap fbo-cubemap.c)
