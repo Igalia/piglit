@@ -47,18 +47,19 @@
 
 static GLboolean Automatic = GL_FALSE;
 
-float face_color[6][4] = {
+float face_color[7][4] = {
 	{1.0, 0.0, 0.0, 0.0},
 	{0.0, 1.0, 0.0, 0.0},
 	{0.0, 0.0, 1.0, 0.0},
 	{1.0, 0.0, 1.0, 0.0},
 	{1.0, 1.0, 0.0, 0.0},
 	{0.0, 1.0, 1.0, 0.0},
+	{1.0, 1.0, 1.0, 0.0},
 };
 
 static float *get_face_color(int face, int level)
 {
-	return face_color[(face + level) % 6];
+	return face_color[(face + 2 * level) % 7];
 }
 
 static void rect(int x1, int y1, int x2, int y2)
@@ -210,7 +211,7 @@ display()
 	GLboolean pass = GL_TRUE;
 	int face, tex, dim;
 
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	tex = create_cube_fbo();
