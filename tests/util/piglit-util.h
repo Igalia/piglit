@@ -62,3 +62,7 @@ int piglit_use_vertex_program();
 void piglit_require_fragment_program();
 void piglit_require_vertex_program();
 GLuint piglit_compile_program(GLenum target, const char* text);
+
+extern GLfloat cube_face_texcoords[6][4][3];
+extern const char *cube_face_names[6];
+extern const GLenum cube_face_targets[6];

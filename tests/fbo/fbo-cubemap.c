@@ -1,0 +1,236 @@
+/*
+ * Copyright © 2009 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * Authors:
+ *    Eric Anholt <eric@anholt.net>
+ *
+ */
+
+/** @file fbo-cubemap.c
+ *
+ * Tests that drawing to each face of a cube map FBO and then drawing views
+ * of those faces to the window system framebuffer succeeds.
+ */
+
+#define GL_GLEXT_PROTOTYPES
+#include "GL/glut.h"
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "piglit-util.h"
+
+#define BUF_WIDTH 32
+#define BUF_HEIGHT 32
+#define WIN_WIDTH 200
+#define WIN_HEIGHT 100
+
+static GLboolean Automatic = GL_FALSE;
+
+float face_color[6][4] = {
+	{1.0, 0.0, 0.0, 0.0},
+	{0.0, 1.0, 0.0, 0.0},
+	{0.0, 0.0, 1.0, 0.0},
+	{1.0, 0.0, 1.0, 0.0},
+	{1.0, 1.0, 0.0, 0.0},
+	{0.0, 1.0, 1.0, 0.0},
+};
+
+static void rect(int x1, int y1, int x2, int y2)
+{
+	glBegin(GL_POLYGON);
+	glVertex2f(x1, y1);
+	glVertex2f(x1, y2);
+	glVertex2f(x2, y2);
+	glVertex2f(x2, y1);
+	glEnd();
+}
+
+static void
+report_fail(char *name, char *method, int x, int y,
+	    GLfloat *results, GLfloat *expected)
+{
+	printf("%s vs %s: expected at (%d,%d): %f,%f,%f\n",
+	       name, method, x, y, expected[0], expected[1], expected[2]);
+	printf("%s vs %s: results at (%d,%d): %f,%f,%f\n",
+	       name, method, x, y,
+	       results[0], results[1], results[2]);
+}
+
+static int
+create_cube_fbo(void)
+{
+	GLuint tex, fb, rb;
+	GLenum status;
+	GLboolean pass = GL_TRUE;
+	int subrect_w = BUF_WIDTH / 5;
+	int subrect_h = BUF_HEIGHT / 5;
+	int x, y;
+	int rbits, gbits, bbits, abits;
+	int face;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+
+	for (face = 0; face < 6; face++) {
+		glTexImage2D(cube_face_targets[face], 0, GL_RGBA,
+			     BUF_WIDTH, BUF_HEIGHT,
+			     0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	}
+	assert(glGetError() == 0);
+
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+
+	for (face = 0; face < 6; face++) {
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+					  GL_COLOR_ATTACHMENT0_EXT,
+					  cube_face_targets[face],
+					  tex,
+					  0);
+
+		assert(glGetError() == 0);
+
+		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+			fprintf(stderr, "FBO incomplete\n");
+			goto done;
+		}
+
+		glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, BUF_WIDTH, 0, BUF_HEIGHT, -1, 1);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		glColor4fv(face_color[face]);
+		/* Draw a little outside the bounds to make sure clipping's
+		 * working.
+		 */
+		rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
+	}
+
+
+done:
+	glDeleteFramebuffersEXT(1, &fb);
+
+	return tex;
+}
+
+static GLboolean
+draw_face(int x, int y, int face)
+{
+	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glBegin(GL_QUADS);
+
+	glTexCoord3fv(cube_face_texcoords[face][0]);
+	glVertex2f(x, y);
+
+	glTexCoord3fv(cube_face_texcoords[face][1]);
+	glVertex2f(x + BUF_WIDTH, y);
+
+	glTexCoord3fv(cube_face_texcoords[face][2]);
+	glVertex2f(x + BUF_WIDTH, y + BUF_HEIGHT);
+
+	glTexCoord3fv(cube_face_texcoords[face][3]);
+	glVertex2f(x, y + BUF_HEIGHT);
+
+	glEnd();
+}
+
+static GLboolean test_face_drawing(int start_x, int start_y, float *expected)
+{
+	GLboolean pass = GL_TRUE;
+	int x, y;
+
+	for (y = start_y; y < start_y + BUF_HEIGHT; y++) {
+		for (x = start_x; x < start_x + BUF_WIDTH; x++) {
+			pass &= piglit_probe_pixel_rgb(x, y, expected);
+		}
+	}
+}
+
+static void
+display()
+{
+	GLboolean pass = GL_TRUE;
+	int face, tex;
+
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	tex = create_cube_fbo();
+
+	for (face = 0; face < 6; face++) {
+		int x = 1 + face * (BUF_WIDTH + 1);
+		int y = 1;
+		pass &= draw_face(x, y, face);
+	}
+
+	for (face = 0; face < 6; face++) {
+		int x = 1 + face * (BUF_WIDTH + 1);
+		int y = 1;
+		pass &= test_face_drawing(x, y, face_color[face]);
+	}
+
+	glDeleteTextures(1, &tex);
+
+	glutSwapBuffers();
+
+	if (Automatic) {
+		printf("PIGLIT: {'result': '%s' }\n",
+		       pass ? "pass" : "fail");
+		exit(pass ? 0 : 1);
+	}
+}
+
+int main(int argc, char**argv)
+{
+	glutInit(&argc, argv);
+	if (argc == 2 && !strcmp(argv[1], "-auto"))
+		Automatic = 1;
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
+	glutCreateWindow("buffer_sync");
+	glutDisplayFunc(display);
+
+	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_texture_cube_map");
+
+	glutMainLoop();
+}

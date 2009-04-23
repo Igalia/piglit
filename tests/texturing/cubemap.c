@@ -45,68 +45,6 @@ static GLboolean Hack_r300Relax = GL_FALSE;
 static int demoDimension = MAX_SIZE;
 static int demoMipmapped = GL_FALSE;
 
-static const GLenum face_targets[6] = {
-	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-};
-
-static const char *face_names[6] = {
-	"POSITIVE_X",
-	"POSITIVE_Y",
-	"POSITIVE_Z",
-	"NEGATIVE_X",
-	"NEGATIVE_Y",
-	"NEGATIVE_Z",
-};
-
-/* These texture coordinates should have 1 or -1 in the major axis selecting
- * the face, and a nearly-1-or-negative-1 value in the other two coordinates
- * which will be used to produce the s,t values used to sample that face's
- * image.
- */
-static GLfloat face_texcoords[6][4][3] = {
-	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_X */
-		{1.0,  0.99,  0.99},
-		{1.0,  0.99, -0.99},
-		{1.0, -0.99, -0.99},
-		{1.0, -0.99,  0.99},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */
-		{-0.99, 1.0, -0.99},
-		{ 0.99, 1.0, -0.99},
-		{ 0.99, 1.0,  0.99},
-		{-0.99, 1.0,  0.99},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */
-		{-0.99,  0.99, 1.0},
-		{-0.99, -0.99, 1.0},
-		{ 0.99, -0.99, 1.0},
-		{ 0.99,  0.99, 1.0},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */
-		{-1.0,  0.99, -0.99},
-		{-1.0,  0.99,  0.99},
-		{-1.0, -0.99,  0.99},
-		{-1.0, -0.99, -0.99},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */
-		{-0.99, -1.0,  0.99},
-		{-0.99, -1.0, -0.99},
-		{ 0.99, -1.0, -0.99},
-		{ 0.99, -1.0,  0.99},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */
-		{ 0.99,  0.99, -1.0},
-		{-0.99,  0.99, -1.0},
-		{-0.99, -0.99, -1.0},
-		{ 0.99, -0.99, -1.0},
-	},
-};
-
 static GLfloat colors[][3] = {
 	{1.0, 1.0, 1.0},
 	{1.0, 1.0, 0.0},
@@ -208,7 +146,7 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 
 	if (!pass) {
 		printf("Cube map failed at size %dx%d, level %d, face %s%s\n",
-		       size, size, level, face_names[face],
+		       size, size, level, cube_face_names[face],
 		       mipmapped ? ", mipmapped" : "");
 	}
 
@@ -250,7 +188,8 @@ draw_at_size(int size, GLboolean mipmapped)
 	/* Fill in faces on each level */
 	for (dim = size; dim > 0; dim /= 2) {
 		for (face = 0; face < 6; face++) {
-			set_face_image(level, face_targets[face], dim, color);
+			set_face_image(level, cube_face_targets[face],
+				       dim, color);
 			color = (color + 1) % ARRAY_SIZE(colors);
 		}
 		if (!mipmapped)
@@ -276,16 +215,16 @@ draw_at_size(int size, GLboolean mipmapped)
 
 			glBegin(GL_QUADS);
 
-			glTexCoord3fv(face_texcoords[face][0]);
+			glTexCoord3fv(cube_face_texcoords[face][0]);
 			glVertex2f(base_x, base_y);
 
-			glTexCoord3fv(face_texcoords[face][1]);
+			glTexCoord3fv(cube_face_texcoords[face][1]);
 			glVertex2f(base_x + dim, base_y);
 
-			glTexCoord3fv(face_texcoords[face][2]);
+			glTexCoord3fv(cube_face_texcoords[face][2]);
 			glVertex2f(base_x + dim, base_y + dim);
 
-			glTexCoord3fv(face_texcoords[face][3]);
+			glTexCoord3fv(cube_face_texcoords[face][3]);
 			glVertex2f(base_x, base_y + dim);
 
 			glEnd();

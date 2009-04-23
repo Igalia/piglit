@@ -21,3 +21,4 @@ link_libraries (
 )
 
 add_executable (fbo-readpixels fbo-readpixels.c)
+add_executable (fbo-cubemap fbo-cubemap.c)
