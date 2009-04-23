@@ -59,6 +59,9 @@ glean['vertProg1'] = GleanTest('vertProg1')
 mesa = Group()
 mesa['crossbar'] = PlainExecTest([testBinDir + 'crossbar', '-auto'])
 
+fbo = Group()
+fbo['fbo-readpixels'] = PlainExecTest([testBinDir + 'fbo-readpixels', '-auto'])
+
 general = Group()
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])
@@ -108,6 +111,7 @@ texturing['tfp'] = PlainExecTest([testBinDir + 'tfp', '-auto'])
 
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
+profile.tests['fbo'] = fbo
 profile.tests['glean'] = glean
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
