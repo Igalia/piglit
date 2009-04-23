@@ -33,7 +33,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 #include "piglit-util.h"
 
 static GLint prog = 0;
@@ -48,7 +52,11 @@ static int Automatic = 0;
 
 static int Width = 50, Height = 50;
 
+#if defined(__APPLE__)
+static void (*pglFogCoordf)(GLfloat coord) = NULL;
+#else
 static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
+#endif
 
 static void Redisplay(void)
 {
@@ -155,11 +163,19 @@ static void Init(void)
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 
 	if (atof((const char *) glGetString(GL_VERSION)) >= 1.4) {
+#if defined(__APPLE__)
+		pglFogCoordf = &glFogCoordf;
+#else
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			glutGetProcAddress("glFogCoordf");
+#endif
 	} else if (glutExtensionSupported("GL_EXT_fog_coord")) {
+#if defined(__APPLE__)
+		pglFogCoordf = &glFogCoordfEXT;
+#else
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			glutGetProcAddress("glFogCoordfEXT");
+#endif
 	} else {
 		piglit_report_result(PIGLIT_SKIP);
 	}
