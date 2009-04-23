@@ -56,6 +56,11 @@ float face_color[6][4] = {
 	{0.0, 1.0, 1.0, 0.0},
 };
 
+static float *get_face_color(int face, int level)
+{
+	return face_color[(face + level) % 6];
+}
+
 static void rect(int x1, int y1, int x2, int y2)
 {
 	glBegin(GL_POLYGON);
@@ -87,16 +92,21 @@ create_cube_fbo(void)
 	int subrect_h = BUF_HEIGHT / 5;
 	int x, y;
 	int rbits, gbits, bbits, abits;
-	int face;
+	int face, dim, i;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
 
 	for (face = 0; face < 6; face++) {
-		glTexImage2D(cube_face_targets[face], 0, GL_RGBA,
-			     BUF_WIDTH, BUF_HEIGHT,
-			     0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		int level = 0;
+
+		for (dim = BUF_WIDTH; dim > 0; dim /= 2) {
+			glTexImage2D(cube_face_targets[face], level, GL_RGBA,
+				     dim, dim,
+				     0,
+				     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			level++;
+		}
 	}
 	assert(glGetError() == 0);
 
@@ -104,33 +114,39 @@ create_cube_fbo(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
 	for (face = 0; face < 6; face++) {
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-					  GL_COLOR_ATTACHMENT0_EXT,
-					  cube_face_targets[face],
-					  tex,
-					  0);
+		int level = 0;
 
-		assert(glGetError() == 0);
+		for (dim = BUF_WIDTH; dim > 0; dim /= 2) {
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+						  GL_COLOR_ATTACHMENT0_EXT,
+						  cube_face_targets[face],
+						  tex,
+						  level);
 
-		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
-		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-			fprintf(stderr, "FBO incomplete\n");
-			goto done;
-		}
+			assert(glGetError() == 0);
 
-		glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, BUF_WIDTH, 0, BUF_HEIGHT, -1, 1);
+			status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+			if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+				fprintf(stderr, "FBO incomplete\n");
+				goto done;
+			}
 
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+			glViewport(0, 0, dim, dim);
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			glOrtho(0, dim, 0, dim, -1, 1);
 
-		glColor4fv(face_color[face]);
-		/* Draw a little outside the bounds to make sure clipping's
-		 * working.
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+
+			glColor4fv(get_face_color(face, level));
+			/* Draw a little outside the bounds to make sure clipping's
+			 * working.
 		 */
-		rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
+			rect(-2, -2, dim + 2, dim + 2);
+
+			level++;
+		}
 	}
 
 
@@ -141,7 +157,7 @@ done:
 }
 
 static GLboolean
-draw_face(int x, int y, int face)
+draw_face(int x, int y, int dim, int face)
 {
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 
@@ -153,7 +169,7 @@ draw_face(int x, int y, int face)
 
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glBegin(GL_QUADS);
@@ -162,24 +178,27 @@ draw_face(int x, int y, int face)
 	glVertex2f(x, y);
 
 	glTexCoord3fv(cube_face_texcoords[face][1]);
-	glVertex2f(x + BUF_WIDTH, y);
+	glVertex2f(x + dim, y);
 
 	glTexCoord3fv(cube_face_texcoords[face][2]);
-	glVertex2f(x + BUF_WIDTH, y + BUF_HEIGHT);
+	glVertex2f(x + dim, y + dim);
 
 	glTexCoord3fv(cube_face_texcoords[face][3]);
-	glVertex2f(x, y + BUF_HEIGHT);
+	glVertex2f(x, y + dim);
 
 	glEnd();
+
+	glDisable(GL_TEXTURE_CUBE_MAP);
 }
 
-static GLboolean test_face_drawing(int start_x, int start_y, float *expected)
+static GLboolean test_face_drawing(int start_x, int start_y, int dim,
+				   float *expected)
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;
 
-	for (y = start_y; y < start_y + BUF_HEIGHT; y++) {
-		for (x = start_x; x < start_x + BUF_WIDTH; x++) {
+	for (y = start_y; y < start_y + dim; y++) {
+		for (x = start_x; x < start_x + dim; x++) {
 			pass &= piglit_probe_pixel_rgb(x, y, expected);
 		}
 	}
@@ -189,7 +208,7 @@ static void
 display()
 {
 	GLboolean pass = GL_TRUE;
-	int face, tex;
+	int face, tex, dim;
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -199,13 +218,24 @@ display()
 	for (face = 0; face < 6; face++) {
 		int x = 1 + face * (BUF_WIDTH + 1);
 		int y = 1;
-		pass &= draw_face(x, y, face);
+
+		for (dim = BUF_WIDTH; dim > 0; dim /= 2) {
+			pass &= draw_face(x, y, dim, face);
+			y += dim + 1;
+		}
 	}
 
 	for (face = 0; face < 6; face++) {
 		int x = 1 + face * (BUF_WIDTH + 1);
 		int y = 1;
-		pass &= test_face_drawing(x, y, face_color[face]);
+		int level = 0;
+
+		for (dim = BUF_WIDTH; dim > 0; dim >>= 1) {
+			pass &= test_face_drawing(x, y, dim,
+						  get_face_color(face, level));
+			y += dim + 1;
+			level++;
+		}
 	}
 
 	glDeleteTextures(1, &tex);
