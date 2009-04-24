@@ -33,7 +33,11 @@
  * in bug #17077.
  */
 
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
 #include "GL/glut.h"
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
