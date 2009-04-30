@@ -131,8 +131,6 @@ static GLboolean
 test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 	     int color)
 {
-	GLfloat pix[4];
-	GLfloat probe[4];
 	GLfloat *color1 = colors[color];
 	GLfloat *color2 = colors[(color + 1) % ARRAY_SIZE(colors)];
 	GLboolean pass = GL_TRUE;
@@ -163,7 +161,7 @@ draw_at_size(int size, GLboolean mipmapped)
 	GLfloat row_y = PAD;
 	int dim, face;
 	int color = 0, level = 0;
-	GLint texname;
+	GLuint texname;
 	GLboolean pass = GL_TRUE;
 
 	/* Create the texture. */
@@ -351,4 +349,6 @@ int main(int argc, char**argv)
 		glutKeyboardFunc(Key);
 	}
 	glutMainLoop();
+
+	return 0;
 }

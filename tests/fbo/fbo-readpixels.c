@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "piglit-util.h"
+
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
 #define WIN_WIDTH 100
@@ -59,22 +61,11 @@ static void rect(int x1, int y1, int x2, int y2)
 	glEnd();
 }
 
-static void
-report_fail(char *name, char *method, int x, int y,
-	    GLfloat *results, GLfloat *expected)
-{
-	printf("%s vs %s: expected at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y, expected[0], expected[1], expected[2]);
-	printf("%s vs %s: results at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y,
-	       results[0], results[1], results[2]);
-}
-
 static GLboolean
 test_with_format(GLenum internal_format, GLenum format, GLenum type,
 		 float results_x, float results_y)
 {
-	GLuint tex, fb, rb;
+	GLuint tex, fb;
 	GLenum status;
 	GLboolean pass = GL_TRUE;
 	int subrect_w = BUF_WIDTH / 5;
@@ -257,4 +248,6 @@ int main(int argc, char**argv)
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
 	glutMainLoop();
+
+	return 0;
 }

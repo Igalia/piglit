@@ -240,7 +240,6 @@ static void Init(void)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(Width, Height);

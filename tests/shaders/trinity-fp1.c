@@ -203,7 +203,6 @@ static void Key(unsigned char key, int x, int y)
 
 static void Init(void)
 {
-	GLint errorPos;
 	GLubyte data[256][256][4];
 	int x,y;
 

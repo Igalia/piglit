@@ -76,28 +76,12 @@ static void rect(int x1, int y1, int x2, int y2)
 	glEnd();
 }
 
-static void
-report_fail(char *name, char *method, int x, int y,
-	    GLfloat *results, GLfloat *expected)
-{
-	printf("%s vs %s: expected at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y, expected[0], expected[1], expected[2]);
-	printf("%s vs %s: results at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y,
-	       results[0], results[1], results[2]);
-}
-
 static int
 create_cube_fbo(void)
 {
-	GLuint tex, fb, rb;
+	GLuint tex, fb;
 	GLenum status;
-	GLboolean pass = GL_TRUE;
-	int subrect_w = BUF_WIDTH / 5;
-	int subrect_h = BUF_HEIGHT / 5;
-	int x, y;
-	int rbits, gbits, bbits, abits;
-	int face, dim, i;
+	int face, dim;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
@@ -161,7 +145,7 @@ done:
 	return tex;
 }
 
-static GLboolean
+static void
 draw_face(int x, int y, int dim, int face)
 {
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
@@ -207,13 +191,16 @@ static GLboolean test_face_drawing(int start_x, int start_y, int dim,
 			pass &= piglit_probe_pixel_rgb(x, y, expected);
 		}
 	}
+
+	return pass;
 }
 
 static void
 display()
 {
 	GLboolean pass = GL_TRUE;
-	int face, tex, dim;
+	int face, dim;
+	GLuint tex;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -225,7 +212,7 @@ display()
 		int y = 1;
 
 		for (dim = BUF_WIDTH; dim > 0; dim /= 2) {
-			pass &= draw_face(x, y, dim, face);
+			draw_face(x, y, dim, face);
 			y += dim + 1;
 		}
 	}
@@ -268,4 +255,6 @@ int main(int argc, char**argv)
 	piglit_require_extension("GL_ARB_texture_cube_map");
 
 	glutMainLoop();
+
+	return 0;
 }

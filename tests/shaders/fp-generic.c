@@ -112,8 +112,6 @@ static void readTestcase(struct testcase* tc, const char* filename)
 
 	for(i = 0; i < tc->nrInstances; ++i) {
 		struct testinstance* inst = tc->instances + i;
-		char buffer[41];
-		int j;
 
 		expect(filp, "tc");
 		inst->texcoords = readfloatarray(filp, tc->nrTexCoords*4);

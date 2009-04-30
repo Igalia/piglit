@@ -174,7 +174,6 @@ static void Init(void)
 	 * Fragment programs
 	 */
 	for(mask = 1; mask < 16; ++mask) {
-		GLint errorPos;
 		char programText[1024];
 		char maskstring[5];
 

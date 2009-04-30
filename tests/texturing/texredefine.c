@@ -43,7 +43,6 @@
 
 static int Width = 128, Height = 128;
 static int Automatic = 0;
-static int CurrentTest = 0;
 
 static const int CellSize = 8; /* see cell_coords */
 
@@ -240,7 +239,6 @@ static void Key(unsigned char key, int x, int y)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;

@@ -37,11 +37,6 @@
 #endif
 #include "piglit-util.h"
 
-static void CheckFail(const char* cond);
-
-#define check(cond) do { if (!(cond)) CheckFail(#cond); } while(0)
-
-
 #define NUM_PROGRAMS 4
 
 static GLuint FragProg[NUM_PROGRAMS];
@@ -96,8 +91,6 @@ static int Width = 200, Height = 200;
  */
 static void DoFrame(void)
 {
-	int mask;
-
 	printf("rgba: %i %i %i %i\n",
 	       glutGet(GLUT_WINDOW_RED_SIZE),
 	       glutGet(GLUT_WINDOW_GREEN_SIZE),
@@ -405,14 +398,6 @@ static void Init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	Reshape(Width,Height);
-}
-
-static void CheckFail(const char* cond)
-{
-	fprintf(stderr, "Check failed: %s\n", cond);
-	if (Automatic)
-		printf("PIGLIT: {'result': 'fail' }\n");
-	abort();
 }
 
 int main(int argc, char *argv[])

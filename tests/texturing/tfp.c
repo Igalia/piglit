@@ -94,12 +94,14 @@ check_results(GLboolean has_alpha, int x, int y, int w, int h)
 			    x + w * 1 / 4, y + h * 3 / 4);
 	pass &= check_pixel(has_alpha, tex_data[3],
 			    x + w * 3 / 4, y + h * 3 / 4);
+
+	return pass;
 }
 
 static void
 draw_pixmap(GLXPixmap pixmap, int x, int y, int w, int h)
 {
-	GLint texname;
+	GLuint texname;
 	GLfloat tex_coords[] = {
 		0.0f, 0.0f,
 		1.0f, 0.0f,
@@ -353,7 +355,6 @@ event_loop ()
 
 int main(int argc, char**argv)
 {
-	XSetWindowAttributes attr;
 	unsigned long mask;
 	XVisualInfo *visinfo;
 	int attrib[] = {
@@ -367,6 +368,7 @@ int main(int argc, char**argv)
 	XSetWindowAttributes window_attr;
 	GLXContext ctx;
 	int i;
+	const char *glx_extension_list;
 	const GLubyte *extension_list;
 	int screen;
 	Window root_win;
@@ -420,14 +422,15 @@ int main(int argc, char**argv)
 	/* This is a bogus way of checking for the extension.
 	 * Needs more GLEW.
 	 */
-	extension_list = glXQueryExtensionsString(dpy, screen);
-	if (strstr(extension_list, "GLX_EXT_texture_from_pixmap") == NULL) {
+	glx_extension_list = glXQueryExtensionsString(dpy, screen);
+	if (strstr(glx_extension_list, "GLX_EXT_texture_from_pixmap") == NULL) {
 		fprintf(stderr, "Test requires GLX_EXT_texture_from_pixmap\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
 	extension_list = glGetString(GL_EXTENSIONS);
-	if (strstr(extension_list, "GL_ARB_texture_env_combine") == NULL) {
+	if (strstr((const char *)extension_list,
+		   "GL_ARB_texture_env_combine") == NULL) {
 		fprintf(stderr, "Test requires GL_ARB_texture_env_combine\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
@@ -453,4 +456,6 @@ int main(int argc, char**argv)
 	}
 
 	event_loop();
+
+	return 0;
 }

@@ -86,8 +86,6 @@ static void test(GLenum wrapt, int cellx, int celly)
 
 static void Redisplay(void)
 {
-	int x, y;
-
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -150,7 +148,6 @@ static void Key(unsigned char key, int x, int y)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;

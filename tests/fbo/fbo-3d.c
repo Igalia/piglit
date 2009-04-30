@@ -71,27 +71,11 @@ static void rect(int x1, int y1, int x2, int y2)
 	glEnd();
 }
 
-static void
-report_fail(char *name, char *method, int x, int y,
-	    GLfloat *results, GLfloat *expected)
-{
-	printf("%s vs %s: expected at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y, expected[0], expected[1], expected[2]);
-	printf("%s vs %s: results at (%d,%d): %f,%f,%f\n",
-	       name, method, x, y,
-	       results[0], results[1], results[2]);
-}
-
 static int
 create_3d_fbo(void)
 {
-	GLuint tex, fb, rb;
+	GLuint tex, fb;
 	GLenum status;
-	GLboolean pass = GL_TRUE;
-	int subrect_w = BUF_WIDTH / 5;
-	int subrect_h = BUF_HEIGHT / 5;
-	int x, y;
-	int rbits, gbits, bbits, abits;
 	int depth;
 
 	glGenTextures(1, &tex);
@@ -141,7 +125,7 @@ done:
 	return tex;
 }
 
-static GLboolean
+static void
 draw_depth(int x, int y, int depth)
 {
 	float depth_coord = (float)depth / (NUM_DEPTHS - 1);
@@ -189,13 +173,16 @@ static GLboolean test_depth_drawing(int start_x, int start_y, float *expected)
 			pass &= piglit_probe_pixel_rgb(x, y, expected);
 		}
 	}
+
+	return pass;
 }
 
 static void
 display()
 {
 	GLboolean pass = GL_TRUE;
-	int depth, tex;
+	int depth;
+	GLuint tex;
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -205,7 +192,7 @@ display()
 	for (depth = 0; depth < NUM_DEPTHS; depth++) {
 		int x = 1 + depth * (BUF_WIDTH + 1);
 		int y = 1;
-		pass &= draw_depth(x, y, depth);
+		draw_depth(x, y, depth);
 	}
 
 	for (depth = 0; depth < NUM_DEPTHS; depth++) {
@@ -238,4 +225,6 @@ int main(int argc, char**argv)
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
 	glutMainLoop();
+
+	return 0;
 }

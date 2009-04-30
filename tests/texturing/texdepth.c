@@ -386,7 +386,6 @@ static void Key(unsigned char key, int x, int y)
 static void init()
 {
 	GLfloat texbuf[4];
-	int i;
 
 	piglit_require_extension("GL_ARB_depth_texture");
 	HaveShadow = glutExtensionSupported("GL_ARB_shadow");

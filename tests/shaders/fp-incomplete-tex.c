@@ -39,11 +39,6 @@
 
 #include "piglit-util.h"
 
-static void CheckFail(const char* cond);
-
-#define check(cond) do { if (!(cond)) CheckFail(#cond); } while(0)
-
-
 #define NUM_PROGRAMS 5
 
 static GLuint FragProg[NUM_PROGRAMS];
@@ -76,7 +71,6 @@ static int Width = 300, Height = 200;
 
 static void DoFrame(void)
 {
-	int mask;
 	int i;
 
 	glClearColor(0.3, 0.3, 0.3, 0.3);
@@ -234,9 +228,7 @@ static void Key(unsigned char key, int x, int y)
 
 static void Init(void)
 {
-	int i, x, y;
-	GLubyte rectangle[200][200][4];
-	GLubyte tex[256][256][4];
+	int i;
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
@@ -246,14 +238,6 @@ static void Init(void)
 		FragProg[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, ProgramText[i]);
 
 	Reshape(Width,Height);
-}
-
-static void CheckFail(const char* cond)
-{
-	fprintf(stderr, "Check failed: %s\n", cond);
-	if (Automatic)
-		printf("PIGLIT: {'result': 'fail' }\n");
-	abort();
 }
 
 int main(int argc, char *argv[])

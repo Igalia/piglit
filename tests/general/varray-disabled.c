@@ -131,8 +131,6 @@ static void Redisplay(void)
 	pass &= piglit_probe_pixel_rgb(Width * 3 / 6, Height / 2, black);
 	pass &= piglit_probe_pixel_rgb(Width * 5 / 6, Height / 2, blue);
 	if (Automatic) {
-		int i;
-
 		if (pass)
 			piglit_report_result(PIGLIT_SUCCESS);
 		else
@@ -168,7 +166,6 @@ static void Key(unsigned char key, int x, int y)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;

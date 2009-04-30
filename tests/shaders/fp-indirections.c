@@ -121,12 +121,12 @@ static char *gen_temporary_source_indirections(int sample_count,
 	char *pre =
 		"!!ARBfp1.0\n"
 		"TEMP val, val2, sample, sample2;\n"
-		"MOV val, fragment.color;\n";
+		"MOV val, fragment.color;\n"
 		"MOV val2, fragment.color;\n";
 	char *sample =
 		"TEX sample, val, texture[0], 2D;\n"
 		"TEX sample2, val2, texture[1], 2D;\n"
-		"MUL val, sample, sample2;\n";
+		"MUL val, sample, sample2;\n"
 		"MUL val2, val2, val;\n";
 	char *post =
 		"MOV result.color, val;\n"
@@ -274,8 +274,6 @@ void display(void)
 
 void init(void)
 {
-	GLboolean pass = GL_FALSE;
-
 	piglit_require_fragment_program();
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);

@@ -86,7 +86,7 @@ static void display()
 	GLfloat *data;
 	const GLfloat red[4] = {1.0, 0.0, 0.0, 0.0};
 	const GLfloat blue[4] = {0.0, 0.0, 1.0, 0.0};
-	GLint texture;
+	GLuint texture;
 	int i;
 
 	glClearColor(0, 0, 0, 0);
@@ -140,7 +140,6 @@ static void display()
 	glFlush();
 
 	if (Automatic) {
-		int dim;
 		GLboolean pass = GL_TRUE;
 
 		pass = pass && check_resulting_mipmaps(0, 0, blue);
@@ -189,4 +188,6 @@ int main(int argc, char**argv)
 	init();
 	glutDisplayFunc(display);
 	glutMainLoop();
+
+	return 0;
 }

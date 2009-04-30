@@ -53,7 +53,7 @@ int main(int argc, char**argv)
 {
 	GLfloat data = 1.0;
 	GLfloat *v;
-	int buf;
+	GLuint buf;
 
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))

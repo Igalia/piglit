@@ -49,7 +49,6 @@ static const int SubX = 32, SubY = 32;
 static const int SubWidth = 64, SubHeight = 64;
 
 static int Automatic = 0;
-static int CurrentTest = 0;
 static int MainWindow;
 static int SubWindow;
 
@@ -187,7 +186,6 @@ static void Key(unsigned char key, int x, int y)
 
 int main(int argc, char *argv[])
 {
-	int i;
 	glutInit(&argc, argv);
 	if (argc == 2 && !strcmp(argv[1], "-auto"))
 		Automatic = 1;

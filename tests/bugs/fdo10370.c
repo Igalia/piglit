@@ -31,8 +31,6 @@ static GLuint tex_name;
 
 void init()
 {
-	int i, j;
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glTranslatef(-1.0, -1.0, 0.0);
@@ -66,7 +64,6 @@ void init()
 void display()
 {
 	int i, j, k, col, pixel;
-	GLubyte zero_data = 0;
 	GLfloat expected[4];
 	float dmax = 0.0;
 
@@ -179,4 +176,6 @@ int main(int argc, char**argv)
 	init();
 	glutDisplayFunc(display);
 	glutMainLoop();
+
+	return 0;
 }
