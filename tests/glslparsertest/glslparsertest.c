@@ -118,7 +118,6 @@ display()
 	} else {
 		info = "(no compiler output)";
 	}
-	printf("%d %s\n", size, info);
 
 	if (!ok) {
 		fprintf(out, "Failed to compile %s shader %s: %s\n",
