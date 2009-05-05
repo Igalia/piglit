@@ -93,37 +93,6 @@ set_face_image(int level, GLenum face, int size, int color)
 }
 
 /**
- * Returns whether the pixel at the coordinates matches the referenced color.
- *
- * Only the RGB channels are considered.
- */
-static GLboolean
-probe_pixel(int x, int y, GLfloat *color)
-{
-	GLfloat probe[4], delta[3];
-	GLfloat dmax = 0;
-	int i;
-
-	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, probe);
-	for (i = 0; i < 3; i++) {
-		delta[i] = probe[i] - color[i];
-
-		if (dmax < fabs(delta[i]))
-			dmax = fabs(delta[i]);
-	}
-
-	if (dmax > .02) {
-		printf("Expected at (%d,%d): %f,%f,%f\n",
-		       x, y, color[0], color[1], color[2]);
-		printf("Probed at   (%d,%d): %f,%f,%f\n",
-		       x, y, probe[0], probe[1], probe[2]);
-		return GL_FALSE;
-	}
-
-	return GL_TRUE;
-}
-
-/**
  * Tests that the mipmap drawn at (x,y)-(x+size,y+size) has the majority color,
  * with color+1 in bottom left.
  */
@@ -138,12 +107,12 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 	int y1 = y + size / 4, y2 = y + size * 3 / 4;
 
 	if (size == 1) {
-		pass = pass && probe_pixel(x1, y1, color1);
+		pass = pass && piglit_probe_pixel_rgb(x1, y1, color1);
 	} else {
-		pass = pass && probe_pixel(x1, y1, color2);
-		pass = pass && probe_pixel(x2, y1, color1);
-		pass = pass && probe_pixel(x2, y2, color1);
-		pass = pass && probe_pixel(x1, y2, color1);
+		pass = pass && piglit_probe_pixel_rgb(x1, y1, color2);
+		pass = pass && piglit_probe_pixel_rgb(x2, y1, color1);
+		pass = pass && piglit_probe_pixel_rgb(x2, y2, color1);
+		pass = pass && piglit_probe_pixel_rgb(x1, y2, color1);
 	}
 
 	if (!pass) {
