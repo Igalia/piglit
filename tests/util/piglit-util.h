@@ -62,6 +62,9 @@ int piglit_use_vertex_program();
 void piglit_require_fragment_program();
 void piglit_require_vertex_program();
 GLuint piglit_compile_program(GLenum target, const char* text);
+GLint piglit_compile_shader(GLenum target, char *filename);
+GLint piglit_link_simple_program(GLint vs, GLint fs);
+GLvoid piglit_draw_rect(float x, float y, float w, float h);
 
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];

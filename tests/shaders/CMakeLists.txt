@@ -4,6 +4,7 @@ include_directories(
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
 	${piglit_SOURCE_DIR}/tests/util
+	${GLEW_INCLUDE_DIR}
 )
 
 link_directories (
@@ -18,6 +19,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
+	${GLEW_glew_LIBRARY}
 )
 
 add_executable (trinity-fp1 trinity-fp1.c)
@@ -28,4 +30,5 @@ add_executable (fp-generic fp-generic.c)
 add_executable (fp-kil fp-kil.c)
 add_executable (fp-incomplete-tex fp-incomplete-tex.c)
 add_executable (fp-indirections fp-indirections.c)
+add_executable (glsl-uniform-update glsl-uniform-update.c)
 add_executable (vp-bad-program vp-bad-program.c)

@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <GL/glew.h>
 
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
@@ -339,3 +342,116 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 	return program;
 }
 
+/**
+ * Convenience function to compile a GLSL shader from a file.
+ */
+GLint
+piglit_compile_shader(GLenum target, char *filename)
+{
+	GLint prog;
+	GLint ok;
+	struct stat st;
+	int err;
+	GLchar *prog_string;
+	FILE *f;
+
+	err = stat(filename, &st);
+	if (err == -1) {
+		fprintf(stderr, "Couldn't stat program: %s\n", strerror(errno));
+		exit(1);
+	}
+
+	prog_string = malloc(st.st_size + 1);
+	if (prog_string == NULL) {
+		fprintf(stderr, "malloc\n");
+		exit(1);
+	}
+
+	f = fopen(filename, "ro");
+	if (f == NULL) {
+		fprintf(stderr, "Couldn't open program: %s\n", strerror(errno));
+		exit(1);
+	}
+	fread(prog_string, 1, st.st_size, f);
+	prog_string[st.st_size] = '\0';
+	fclose(f);
+
+	prog = glCreateShader(target);
+	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
+	glCompileShader(prog);
+	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
+	if (!ok) {
+		GLchar *info;
+		GLint size;
+
+		glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetShaderInfoLog(prog, size, NULL, info);
+		fprintf(stderr, "Failed to compile %s: %s\n",
+			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
+			info);
+	}
+
+	free(prog_string);
+
+	return prog;
+}
+
+GLint piglit_link_simple_program(GLint vs, GLint fs)
+{
+	GLint prog, ok;
+
+	prog = glCreateProgram();
+	glAttachShader(prog, fs);
+	glAttachShader(prog, vs);
+	glLinkProgram(prog);
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	if (!ok) {
+		GLchar *info;
+		GLint size;
+
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetProgramInfoLog(prog, size, NULL, info);
+		fprintf(stderr, "Failed to link: %s\n", info);
+
+		free(info);
+	}
+
+	return prog;
+}
+
+/**
+ * Convenience function to draw an axis-aligned rectangle.
+ */
+GLvoid
+piglit_draw_rect(float x, float y, float w, float h)
+{
+	float verts[4][4];
+
+	verts[0][0] = x;
+	verts[0][1] = y;
+	verts[0][2] = 0.0;
+	verts[0][3] = 1.0;
+	verts[1][0] = x + w;
+	verts[1][1] = y;
+	verts[1][2] = 0.0;
+	verts[1][3] = 1.0;
+	verts[2][0] = x + w;
+	verts[2][1] = y + h;
+	verts[2][2] = 0.0;
+	verts[2][3] = 1.0;
+	verts[3][0] = x;
+	verts[3][1] = y + h;
+	verts[3][2] = 0.0;
+	verts[3][3] = 1.0;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glEnable(GL_VERTEX_ARRAY);
+
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	glDisable(GL_VERTEX_ARRAY);
+}
