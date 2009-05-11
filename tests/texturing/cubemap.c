@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008 Intel Corporation
+ * Copyright © 2008-2009 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,11 +43,8 @@ static GLboolean Hack_r300Relax = GL_FALSE;
 #define MAX_SIZE	64
 #define PAD		5
 
-#define WIN_WIDTH	(MAX_SIZE * 6 + PAD * 7)
-#define WIN_HEIGHT	(10 * PAD + MAX_SIZE * 2)
-
-static int demoDimension = MAX_SIZE;
-static int demoMipmapped = GL_FALSE;
+#define WIN_WIDTH	((MAX_SIZE * 6 + PAD * 9) * 2)
+#define WIN_HEIGHT	400
 
 static GLfloat colors[][3] = {
 	{1.0, 1.0, 1.0},
@@ -125,9 +122,9 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 }
 
 static GLboolean
-draw_at_size(int size, GLboolean mipmapped)
+draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 {
-	GLfloat row_y = PAD;
+	GLfloat row_y = PAD + y_offset;
 	int dim, face;
 	int color = 0, level = 0;
 	GLuint texname;
@@ -171,14 +168,10 @@ draw_at_size(int size, GLboolean mipmapped)
 
 	glEnable(GL_TEXTURE_CUBE_MAP_ARB);
 
-	/* Clear background to gray */
-	glClearColor(0.5, 0.5, 0.5, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	color = 0;
 	level = 0;
 	for (dim = size; dim > 0; dim /= 2) {
-		GLfloat row_x = PAD;
+		GLfloat row_x = PAD + x_offset;
 
 		for (face = 0; face < 6; face++) {
 			GLfloat base_x = row_x + face * (MAX_SIZE + PAD);
@@ -200,7 +193,7 @@ draw_at_size(int size, GLboolean mipmapped)
 
 			glEnd();
 
-			if (Automatic && (dim > 2 || !Hack_r300Relax)) {
+			if (dim > 2 || !Hack_r300Relax) {
 				pass = test_results(base_x, base_y,
 						    dim, level, face,
 						    mipmapped,
@@ -217,8 +210,6 @@ draw_at_size(int size, GLboolean mipmapped)
 		level++;
 	}
 
-	glutSwapBuffers();
-
 	glDeleteTextures(1, &texname);
 
 	return pass;
@@ -227,33 +218,45 @@ draw_at_size(int size, GLboolean mipmapped)
 
 static void display()
 {
-	if (Automatic) {
-		int dim;
-		GLboolean pass = GL_TRUE;
+	int dim;
+	GLboolean pass = GL_TRUE;
+	int i = 0, y_offset = 0;
+	int row_dim = 0;
 
-		/* First, do each size from MAX_SIZExMAX_SIZE to 1x1 as a
-		 * single texture level.
-		 */
-		for (dim = MAX_SIZE; dim > 0; dim /= 2) {
-			pass = draw_at_size(dim, GL_FALSE) && pass;
-		}
+	/* Clear background to gray */
+	glClearColor(0.5, 0.5, 0.5, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-		/* Next, do each size with mipmaps from MAX_SIZExMAX_SIZE
-		 * to 1x1.
-		 */
-		for (dim = MAX_SIZE; dim > 0; dim /= 2) {
-			pass = draw_at_size(dim, GL_TRUE) && pass;
-		}
-
-		if (Automatic)
-			printf("PIGLIT: {'result': '%s' }\n",
-			       pass ? "pass" : "fail");
-
-		exit(pass ? 0 : 1);
-	} else {
-		/* Demo mode: Dimension and mipmapping controlled by keystrokes. */
-		draw_at_size(demoDimension, demoMipmapped);
+	/* First, do each size from MAX_SIZExMAX_SIZE to 1x1 as a
+	 * single texture level.
+	 */
+	y_offset = 0;
+	for (dim = MAX_SIZE; dim > 0; dim /= 2) {
+		pass = draw_at_size(dim, 0, y_offset, GL_FALSE) && pass;
+		y_offset += dim + PAD;
 	}
+
+	/* Next, do each size with mipmaps from MAX_SIZExMAX_SIZE
+	 * to 1x1.
+	 */
+	y_offset = 0;
+	for (dim = MAX_SIZE; dim > 0; dim /= 2) {
+		int x_offset = (i % 2 == 1) ? 0 : WIN_WIDTH / 2;
+
+		row_dim = (row_dim < dim) ? dim : row_dim;
+
+		pass &= draw_at_size(dim, x_offset, y_offset, GL_TRUE);
+		if (i % 2 == 0) {
+			y_offset += row_dim * 2 + (ffs(dim) + 3) * PAD;
+			row_dim = 0;
+		}
+		i++;
+	}
+
+	glutSwapBuffers();
+
+	if (Automatic)
+		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
 
 static void Key(unsigned char key, int x, int y)
@@ -261,20 +264,10 @@ static void Key(unsigned char key, int x, int y)
 	(void) x;
 	(void) y;
 	switch (key) {
-	case 'm':
-		demoMipmapped = !demoMipmapped;
-		break;
-	case 'd':
-		demoDimension = demoDimension/2;
-		if (demoDimension <= 0)
-			demoDimension = MAX_SIZE;
-		break;
 	case 27:
 		exit(0);
 		break;
 	}
-	printf("Demo display of dimension %i%s\n",
-		demoDimension, demoMipmapped ? " mipmapped" : "");
 	glutPostRedisplay();
 }
 
