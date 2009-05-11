@@ -113,8 +113,10 @@ test_results(int x, int y, int size, int level, int face, GLboolean mipmapped,
 	}
 
 	if (!pass) {
-		printf("Cube map failed at size %dx%d, level %d, face %s%s\n",
-		       size, size, level, cube_face_names[face],
+		int base_size = size * (1 << level);
+		printf("Cube map failed at size %dx%d, level %d (%dx%d), face %s%s\n",
+		       base_size, base_size, level, size, size,
+		       cube_face_names[face],
 		       mipmapped ? ", mipmapped" : "");
 	}
 
