@@ -110,9 +110,9 @@ static void init()
 	glLoadIdentity();
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
-				   "glsl-uniform-update.vert");
+				   SOURCE_DIR "tests/shaders/glsl-uniform-update.vert");
 	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
-				   "glsl-uniform-update.frag");
+				   SOURCE_DIR "tests/shaders/glsl-uniform-update.frag");
 
 	prog = piglit_link_simple_program(vs, fs);
 

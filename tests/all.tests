@@ -81,6 +81,7 @@ shaders['fp-fragment-position'] = PlainExecTest([testBinDir + 'fp-fragment-posit
 shaders['fp-kil'] = PlainExecTest([testBinDir + 'fp-kil', '-auto'])
 shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', '-auto'])
 shaders['fp-indirections'] = PlainExecTest([testBinDir + 'fp-indirections', '-auto'])
+shaders['glsl-uniform-update'] = PlainExecTest([testBinDir + 'glsl-uniform-update', '-auto'])
 shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
 
 fpgeneric = Group()

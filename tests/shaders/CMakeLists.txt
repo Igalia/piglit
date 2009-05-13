@@ -22,6 +22,8 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_definitions ( -DSOURCE_DIR="\\\"${piglit_SOURCE_DIR}/\\\"" )
+
 add_executable (trinity-fp1 trinity-fp1.c)
 add_executable (fp-lit-mask fp-lit-mask.c)
 add_executable (fp-fog fp-fog.c)
