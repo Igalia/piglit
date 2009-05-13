@@ -65,6 +65,7 @@ GLuint piglit_compile_program(GLenum target, const char* text);
 GLint piglit_compile_shader(GLenum target, char *filename);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
+void piglit_escape_exit_key(unsigned char key, int x, int y);
 
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];

@@ -20,6 +20,7 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (linestipple linestipple.c)
 add_executable (texgen texgen.c)
 add_executable (varray-disabled varray-disabled.c)

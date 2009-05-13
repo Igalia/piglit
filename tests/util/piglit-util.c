@@ -423,6 +423,19 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 	return prog;
 }
 
+void
+piglit_escape_exit_key(unsigned char key, int x, int y)
+{
+	(void) x;
+	(void) y;
+	switch (key) {
+		case 27:
+			exit(0);
+			break;
+	}
+	glutPostRedisplay();
+}
+
 /**
  * Convenience function to draw an axis-aligned rectangle.
  */
