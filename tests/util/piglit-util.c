@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else

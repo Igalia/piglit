@@ -1,3 +1,10 @@
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	${GLUT_INCLUDE_DIR}
+	${piglit_SOURCE_DIR}/tests/util
+	${GLEW_INCLUDE_DIR}
+)
+
 add_library (piglitutil
 	    piglit-util.c
 )
