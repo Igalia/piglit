@@ -202,17 +202,6 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 }
 
 
-#if defined(__APPLE__)
-void (*pglGenProgramsARB)(GLsizei n, GLuint *programs) = 0;
-void (*pglProgramStringARB)(GLenum target, GLenum format, GLsizei len, const GLvoid *string) = 0;
-void (*pglBindProgramARB)(GLenum target, GLuint program) = 0;
-GLboolean (*pglIsProgramARB)(GLuint program) = 0;
-void (*pglDeleteProgramsARB)(GLsizei n, const GLuint *programs) = 0;
-void (*pglProgramLocalParameter4fvARB)(GLenum target, GLuint index, const GLfloat *params) = 0;
-void (*pglProgramLocalParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w) = 0;
-void (*pglGetProgramivARB)(GLenum target, GLenum pname, GLint *params) = 0;
-void (*pglGetProgramLocalParameterdvARB)(GLenum target, GLuint index, GLdouble *params) = 0;
-#else
 PFNGLGENPROGRAMSARBPROC pglGenProgramsARB = 0;
 PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB = 0;
 PFNGLBINDPROGRAMARBPROC pglBindProgramARB = 0;
@@ -222,21 +211,9 @@ PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB = 0;
 PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB = 0;
 PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB = 0;
 PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
-#endif
 
 static void get_program_functions()
 {
-#if defined(__APPLE__)
-	pglGenProgramsARB = &glGenProgramsARB;
-	pglProgramStringARB = &glProgramStringARB;
-	pglBindProgramARB = &glBindProgramARB;
-	pglIsProgramARB = &glIsProgramARB;
-	pglDeleteProgramsARB = &glDeleteProgramsARB;
-	pglProgramLocalParameter4fvARB = &glProgramLocalParameter4fvARB;
-	pglProgramLocalParameter4dARB = &glProgramLocalParameter4dARB;
-	pglGetProgramLocalParameterdvARB = &glGetProgramLocalParameterdvARB;
-	pglGetProgramivARB = &glGetProgramivARB;
-#else
 	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
 	assert(pglGenProgramsARB);
 
@@ -263,7 +240,6 @@ static void get_program_functions()
 
 	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) glutGetProcAddress("glGetProgramivARB");
 	assert(pglGetProgramivARB);
-#endif
 }
 
 int piglit_use_fragment_program()
