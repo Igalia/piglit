@@ -44,6 +44,8 @@ add_executable (glean
 	treadpixperf.cpp
 	trgbtris.cpp
 	tscissor.cpp
+	tshaderapi.cpp
+	tstencil2.cpp
 	tteapot.cpp
 	ttexcombine.cpp
 	ttexcombine4.cpp
