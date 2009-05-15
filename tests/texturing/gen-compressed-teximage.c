@@ -26,11 +26,11 @@
  *
  */
 
-/** @file gen-teximage.c
+/** @file gen-compressed-teximage.c
  *
  * Tests that:
  * - The full mipmap tree is generated when level 0 is set in a new
- *   texture object.
+ *   S3TC texture object.
  * - Changing GL_GENERATE_MIPMAP state flushes previous vertices.
  * - The full mipmap tree is regenerated when level 0 is updated in an
  *   existing texture.
@@ -85,7 +85,8 @@ static void fill_level(int level, const GLfloat *color)
 		data[i + 2] = color[2];
 		data[i + 3] = color[3];
 	}
-        glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, size, size, 0,
+        glTexImage2D(GL_TEXTURE_2D, level, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
+		     size, size, 0,
 		     GL_RGBA, GL_FLOAT, data);
 	free(data);
 }
@@ -95,7 +96,7 @@ static GLboolean check_resulting_mipmaps(int x, int y, const GLfloat *color)
 	GLboolean pass = GL_TRUE;
 	int i;
 
-	for (i = SIZE; i > 4; i /= 2) {
+	for (i = SIZE; i > 0; i /= 2) {
 		pass = pass && piglit_probe_pixel_rgb(x + i / 2, y + i / 2,
 						      color);
 		x += i;
@@ -110,6 +111,7 @@ static void display()
 	const GLfloat blue[4] = {0.0, 0.0, 1.0, 0.0};
 	GLuint texture;
 	int i;
+	GLboolean pass = GL_TRUE;
 
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -156,26 +158,21 @@ static void display()
 
 	glDeleteTextures(1, &texture);
 
+	pass = pass && check_resulting_mipmaps(0, 0, red);
+	pass = pass && check_resulting_mipmaps(0, SIZE, blue);
+	pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
+
 	glutSwapBuffers();
 	glFlush();
 
-	if (Automatic) {
-		GLboolean pass = GL_TRUE;
-
-		pass = pass && check_resulting_mipmaps(0, 0, red);
-		pass = pass && check_resulting_mipmaps(0, SIZE, blue);
-		pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
-
-		if (Automatic)
-			printf("PIGLIT: {'result': '%s' }\n",
-			       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	if (Automatic)
+		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
 
 static void init()
 {
 	piglit_require_extension("GL_SGIS_generate_mipmap");
+	piglit_require_extension("GL_EXT_texture_compression_s3tc");
 
 	/* Set up projection matrix so we can just draw using window
 	 * coordinates.
@@ -205,9 +202,10 @@ int main(int argc, char**argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("gen-teximage");
+	glutCreateWindow("gen-compressed-teximage");
 	init();
 	glutDisplayFunc(display);
+
 	glutMainLoop();
 
 	return 0;
