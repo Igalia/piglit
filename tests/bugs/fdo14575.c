@@ -41,7 +41,6 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 static int Automatic = 0;
