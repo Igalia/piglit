@@ -212,7 +212,7 @@ PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB = 0;
 PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB = 0;
 PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
 
-static void get_program_functions()
+static void get_program_functions(void)
 {
 	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
 	assert(pglGenProgramsARB);
@@ -242,7 +242,7 @@ static void get_program_functions()
 	assert(pglGetProgramivARB);
 }
 
-int piglit_use_fragment_program()
+int piglit_use_fragment_program(void)
 {
 	if (!glutExtensionSupported("GL_ARB_fragment_program"))
 		return 0;
@@ -251,7 +251,7 @@ int piglit_use_fragment_program()
 	return 1;
 }
 
-void piglit_require_fragment_program()
+void piglit_require_fragment_program(void)
 {
 	if (!piglit_use_fragment_program()) {
 		printf("GL_ARB_fragment_program not supported.\n");
@@ -260,7 +260,7 @@ void piglit_require_fragment_program()
 	}
 }
 
-int piglit_use_vertex_program()
+int piglit_use_vertex_program(void)
 {
 	if (!glutExtensionSupported("GL_ARB_vertex_program"))
 		return 0;
@@ -269,7 +269,7 @@ int piglit_use_vertex_program()
 	return 1;
 }
 
-void piglit_require_vertex_program()
+void piglit_require_vertex_program(void)
 {
 	if (!piglit_use_vertex_program()) {
 		printf("GL_ARB_vertex_program not supported.\n");

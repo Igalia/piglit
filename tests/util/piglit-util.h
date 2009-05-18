@@ -57,10 +57,10 @@ extern PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
 extern PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB;
 #endif
 
-int piglit_use_fragment_program();
-int piglit_use_vertex_program();
-void piglit_require_fragment_program();
-void piglit_require_vertex_program();
+int piglit_use_fragment_program(void);
+int piglit_use_vertex_program(void);
+void piglit_require_fragment_program(void);
+void piglit_require_vertex_program(void);
 GLuint piglit_compile_program(GLenum target, const char* text);
 GLint piglit_compile_shader(GLenum target, char *filename);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
