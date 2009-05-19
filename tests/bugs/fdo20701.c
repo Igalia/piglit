@@ -111,7 +111,7 @@ init(void)
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		printf("%s:%u: framebuffer status = 0x%04x\n",
-			   __func__, __LINE__, status);
+			   __FUNCTION__, __LINE__, status);
 		printf("PIGLIT: {'result': 'fail' }\n");
 		exit(1);
 	}
