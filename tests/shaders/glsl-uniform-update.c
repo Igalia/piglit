@@ -36,7 +36,11 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glew.h>
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
 #include "GL/glut.h"
+#endif
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
