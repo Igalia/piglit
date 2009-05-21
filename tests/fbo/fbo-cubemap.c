@@ -31,16 +31,16 @@
  * of those faces to the window system framebuffer succeeds.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #define GL_GLEXT_PROTOTYPES
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "piglit-util.h"
 
