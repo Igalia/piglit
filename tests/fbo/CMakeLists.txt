@@ -22,6 +22,7 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_executable (fbo-1d fbo-1d.c)
 add_executable (fbo-3d fbo-3d.c)
 add_executable (fbo-generatemipmap fbo-generatemipmap.c)
 add_executable (fbo-readpixels fbo-readpixels.c)
