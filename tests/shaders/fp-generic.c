@@ -128,9 +128,10 @@ static void readTestcase(struct testcase* tc, const char* filename)
 	/* Yeah, this is not especially efficient... */
 	tc->programtext = strdup("");
 	while(fgets(buf, sizeof(buf), filp)) {
+		int newlen;
 		if (!*tc->programtext && buf[0] != '!')
 			continue;
-		int newlen = tc->programtext ? strlen(tc->programtext) : 0;
+		newlen = tc->programtext ? strlen(tc->programtext) : 0;
 		newlen += strlen(buf);
 		tc->programtext = (char*)realloc(tc->programtext, newlen+1);
 		strcat(tc->programtext, buf);

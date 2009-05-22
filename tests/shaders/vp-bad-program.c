@@ -34,6 +34,11 @@
  * Wine likes to do that to us to see how strict we are on the VP language.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define GL_GLEXT_PROTOTYPES
 
 #if defined(__APPLE__)
@@ -41,11 +46,6 @@
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 
 #include "piglit-util.h"
 

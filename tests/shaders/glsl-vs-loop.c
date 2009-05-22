@@ -37,6 +37,12 @@
  * This was conceived as a test case for freedesktop.org bug #20171.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/stat.h>
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glew.h>
 #if defined(__APPLE__)
@@ -44,12 +50,6 @@
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/stat.h>
 
 #include "piglit-util.h"
 
@@ -67,11 +67,12 @@ display(void)
 
 	float color[] = {1.0, 0.0, 0.0, 0.0};
 
+	unsigned i;
+	unsigned j;
+
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	unsigned i;
-	unsigned j;
 	for (i = 0; i < 3; i++) {
 		float temp;
 		float line_color[4];

@@ -34,6 +34,12 @@
  * conditional in the fragment shader is required to trigger brw_wm_glsl.c.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/stat.h>
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glew.h>
 #if defined(__APPLE__)
@@ -41,12 +47,6 @@
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/stat.h>
 
 #include "piglit-util.h"
 

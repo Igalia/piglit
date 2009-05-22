@@ -34,6 +34,12 @@
  * catches a bug found in the 965 driver in an app I was writing.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <sys/stat.h>
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glew.h>
 #if defined(__APPLE__)
@@ -41,12 +47,6 @@
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/stat.h>
 
 #include "piglit-util.h"
 

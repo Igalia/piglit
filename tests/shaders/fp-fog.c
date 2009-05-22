@@ -60,6 +60,18 @@ static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
 
 static void Redisplay(void)
 {
+	static const struct {
+		float x, y, r;
+	}
+	probes[4] = {
+		{ 0.5, 1.5, 0.3 },
+		{ 1.5, 1.5, 0.6 },
+		{ 0.5, 0.5, 0.8 },
+		{ 1.5, 0.5, 0.4 },
+	};
+	int pass = 1;
+	unsigned i;
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	pglFogCoordf(0.3);
@@ -93,18 +105,6 @@ static void Redisplay(void)
 	glVertex2f(2, 1);
 	glVertex2f(1, 1);
 	glEnd();
-
-	static const struct {
-		float x, y, r;
-	}
-	probes[4] = {
-		{ 0.5, 1.5, 0.3 },
-		{ 1.5, 1.5, 0.6 },
-		{ 0.5, 0.5, 0.8 },
-		{ 1.5, 0.5, 0.4 },
-	};
-	int pass = 1;
-	unsigned i;
 
 	for (i = 0; i < 4; i++) {
 		float expected_color[4];
