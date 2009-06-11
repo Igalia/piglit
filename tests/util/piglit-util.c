@@ -118,11 +118,15 @@ piglit_report_result(enum piglit_result result)
 	 * not supported) result.
 	 */
 
+	fflush(stderr);
+
 	if (result == PIGLIT_SUCCESS) {
 		printf("PIGLIT: {'result': 'pass' }\n");
+		fflush(stdout);
 		exit(0);
 	} else {
 		printf("PIGLIT: {'result': 'fail' }\n");
+		fflush(stdout);
 		exit(1);
 	}
 }
