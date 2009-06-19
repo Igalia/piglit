@@ -23,6 +23,7 @@ link_libraries (
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (linestipple linestipple.c)
 add_executable (scissor-copypixels scissor-copypixels.c)
+add_executable (scissor-depth-clear scissor-depth-clear.c)
 add_executable (scissor-stencil-clear scissor-stencil-clear.c)
 add_executable (texgen texgen.c)
 add_executable (varray-disabled varray-disabled.c)
