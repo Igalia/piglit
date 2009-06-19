@@ -25,9 +25,11 @@
  *
  */
 
-/** @file scissor-copypixels.c
+/** @file dlist-clear.c
  *
- * Tests that glScissor properly affects glCopyPixels().
+ * Tests that clears and primitives get stored properly in a
+ * COMPILE_AND_EXECUTE display list.  Caught a regression in the intel driver
+ * with the new metaops clear code.
  */
 
 #include "GL/glut.h"
@@ -48,42 +50,46 @@ static void display()
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;
+	static float red[]   = {1.0, 0.0, 0.0, 0.0};
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
 	static float blue[]  = {0.0, 0.0, 1.0, 0.0};
 
-	/* whole window green -- depth fail will be this. */
-	glClearColor(0.0, 1.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.5, 0.0, 0.0, 0.0);
+	glColor4fv(red);
 
-	/* Clear depth to 0 (fail) */
-	glClearDepth(0.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	/* Clear depth quad at 10, 10 to be drawn blue. */
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(10, 10, 10, 10);
-	glClearDepth(1.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	/* Clear a 0x0 depth quad a 10, 30 that shouldn't be drawn. */
-	glScissor(10, 30, 0, 0);
-	glClearDepth(1.0);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	/* Now draw a quad midway between 0.0 and 1.0 depth so only that
-	 * scissored depth clear will get rasterized.
+	/* Make a list containing a clear and a rectangle.  It'll draw
+	 * colors we don't expect to see, due to COMPILE_AND_EXECUTE.
 	 */
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_SCISSOR_TEST);
-	glDepthFunc(GL_LESS);
+	glNewList(1, GL_COMPILE_AND_EXECUTE);
+	/* Even though we don't use depth, GL_DEPTH_BUFFER_BIT is what
+	 * triggered the metaops clear path which messed up the display list.
+	 */
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBegin(GL_QUADS);
+		glVertex2f(10, 10);
+		glVertex2f(20, 10);
+		glVertex2f(20, 20);
+		glVertex2f(10, 20);
+	glEnd();
+	glEndList();
+
+	/* Now, set up our expected colors, translate the dlist's rectangle
+	 * over a little, and do the draw we actually expect to see.
+	 */
+	glClearColor(0.0, 1.0, 0.0, 0.0);
 	glColor4fv(blue);
-	piglit_draw_rect(0, 0, win_width, win_height);
+
+	glMatrixMode(GL_MODELVIEW_MATRIX);
+	glLoadIdentity();
+	glTranslatef(20, 0, 0);
+
+	glCallList(1);
 
 	for (y = 0; y < win_height; y++) {
 		for (x = 0; x < win_width; x++) {
 			float *expected;
 
-			if (x >= 10 && x < 20 && y >= 10 && y < 20)
+			if (x >= 30 && x < 40 && y >= 10 && y < 20)
 				expected = blue;
 			else
 				expected = green;
@@ -132,10 +138,10 @@ int main(int argc, char**argv)
 			printf("Unknown option: %s\n", argv[i]);
 	}
 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("scissor-depth-clear");
+	glutCreateWindow("dlist-clear");
 	glutKeyboardFunc(piglit_escape_exit_key);
 	init();
 	glutDisplayFunc(display);
