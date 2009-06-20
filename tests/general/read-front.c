@@ -61,8 +61,9 @@ static void display()
 	glColor4fv(green);
 	piglit_draw_rect(win_width / 2, 0, win_width / 2, win_height);
 
-	glutSwapBuffers();
 	glReadBuffer(GL_FRONT);
+
+	glutSwapBuffers();
 
 	for (y = 0; y < win_height; y++) {
 		for (x = 0; x < win_width; x++) {
