@@ -32,8 +32,8 @@
 // dsconfig.cpp:  Implementation of drawing surface configuration utilities
 #include "dsconfig.h"
 #include <iostream>
-#include <strstream>
-#include <string.h>
+#include <sstream>
+#include <cstring>
 #include <map>
 #include <limits.h>
 
@@ -121,7 +121,7 @@ typedef enum {		// These variable tags are used as array indices,
 	V_LAST
 } CanonVar;
 
-struct {CanonVar var; char* name;} varNames[] = {
+static struct {CanonVar var; const char* name;} varNames[] = {
 	{VID,			"id"},
 	{VFBCID,		"fbcID"},
 	{VCANRGBA,		"canRGBA"},
@@ -159,7 +159,7 @@ struct {CanonVar var; char* name;} varNames[] = {
 	{VTRANSI,		"transI"}
 };
 
-char* mapVarToName[V_LAST];
+const char* mapVarToName[V_LAST];
 map<string, CanonVar> mapNameToVar;
 bool mapsInitialized = false;
 
@@ -651,10 +651,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 string
 DrawingSurfaceConfig::canonicalDescription() {
 
-	// Would rather use ostringstream, but it's not available in
-	// egcs 1.1.2.
-	char buf[1024];
-	ostrstream s(buf, sizeof(buf));
+	ostringstream s;
 
 #	if defined(__X11__)
 	    s << mapVarToName[VID] << ' ' << visID;
@@ -731,8 +728,7 @@ DrawingSurfaceConfig::canonicalDescription() {
 ///////////////////////////////////////////////////////////////////////////////
 string
 DrawingSurfaceConfig::conciseDescription() {
-	char buf[1024];
-	ostrstream s(buf, sizeof(buf));
+	ostringstream s;
 
 	if (canRGBA && canCI)
 		s << "dual ";

@@ -92,7 +92,6 @@ DecomposeProjection( const float *m,
 {
    if (m[15] == 0.0) {
       /* perspective */
-      float p[16];
       const float x = m[0];  /* 2N / (R-L) */
       const float y = m[5];  /* 2N / (T-B) */
       const float a = m[8];  /* (R+L) / (R-L) */

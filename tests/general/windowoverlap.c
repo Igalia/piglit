@@ -55,12 +55,12 @@ static int SubWindow;
 
 static int verify(float mainr, float maing, float mainb, float subr, float subg, float subb, const char* testname)
 {
-	float main[128][128][3];
+	float mainf[128][128][3];
 	float sub[64][64][3];
 	int x, y;
 
 	glutSetWindow(MainWindow);
-	glReadPixels(0, 0, 128, 128, GL_RGB, GL_FLOAT, main);
+	glReadPixels(0, 0, 128, 128, GL_RGB, GL_FLOAT, mainf);
 
 	glutSetWindow(SubWindow);
 	glReadPixels(0, 0, 64, 64, GL_RGB, GL_FLOAT, sub);
@@ -72,11 +72,11 @@ static int verify(float mainr, float maing, float mainb, float subr, float subg,
 			if (x >= 32 && x < 96 && y >= 32 && y < 96)
 				continue;
 
-			delta = fabs(mainr - main[y][x][0]) + fabs(maing - main[y][x][1]) + fabs(mainb - main[y][x][2]);
+			delta = fabs(mainr - mainf[y][x][0]) + fabs(maing - mainf[y][x][1]) + fabs(mainb - mainf[y][x][2]);
 			if (delta > 0.01) {
 				printf("Test %s: Fail at main window pixel %i,%i\n", testname, x, y);
 				printf("  Expected: %5.3f %5.2f %5.3f\n", mainr, maing, mainb);
-				printf("  Actual:   %5.3f %5.2f %5.3f\n", main[y][x][0], main[y][x][1], main[y][x][2]);
+				printf("  Actual:   %5.3f %5.2f %5.3f\n", mainf[y][x][0], mainf[y][x][1], mainf[y][x][2]);
 				return 0;
 			}
 		}
@@ -101,7 +101,7 @@ static int verify(float mainr, float maing, float mainb, float subr, float subg,
 
 static void test()
 {
-	int success;
+	int success = 1;
 
 	glutSetWindow(MainWindow);
 	glClearColor(1, 0, 0, 0);

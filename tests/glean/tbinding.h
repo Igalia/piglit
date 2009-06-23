@@ -37,7 +37,6 @@
 #include "tbasic.h"
 
 class DrawingSurfaceConfig;		// Forward reference.
-class GLEAN::Window;
 
 namespace GLEAN {
 

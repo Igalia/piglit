@@ -34,7 +34,7 @@
 // dsfilt.cpp:  Implementation of drawing surface configuration filtering
 
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <ctype.h>
 #include <stdlib.h>
 #include <algorithm>

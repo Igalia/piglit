@@ -34,6 +34,9 @@
 #include <GLUT/glut.h>
 #else
 #include "GL/glut.h"
+#ifdef FREEGLUT
+#include "GL/freeglut_ext.h"
+#endif
 #endif
 
 #include "piglit-util.h"
