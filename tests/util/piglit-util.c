@@ -117,14 +117,14 @@ int FindLine(const char *program, int position)
 void
 piglit_report_result(enum piglit_result result)
 {
-	/* Currently we have no way of reporting the "skip" (required extension
-	 * not supported) result.
-	 */
-
 	fflush(stderr);
 
 	if (result == PIGLIT_SUCCESS) {
 		printf("PIGLIT: {'result': 'pass' }\n");
+		fflush(stdout);
+		exit(0);
+	} else if (result == PIGLIT_SKIP) {
+		printf("PIGLIT: {'result': 'skip' }\n");
 		fflush(stdout);
 		exit(0);
 	} else {
