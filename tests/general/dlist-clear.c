@@ -32,7 +32,11 @@
  * with the new metaops clear code.
  */
 
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
 #include "GL/glut.h"
+#endif
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
