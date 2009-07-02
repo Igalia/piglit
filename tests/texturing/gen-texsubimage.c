@@ -33,15 +33,15 @@
  * in bug #17077.
  */
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include "GL/glut.h"
 #endif
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include "piglit-util.h"
 
 #define WIN_WIDTH 512
