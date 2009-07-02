@@ -37,6 +37,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
@@ -61,6 +62,8 @@ int main(int argc, char**argv)
 	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition (100, 100);
 	glutCreateWindow ("fdo10370");
+
+	glewInit();
 
 	glGenBuffersARB(1, &buf);
 
