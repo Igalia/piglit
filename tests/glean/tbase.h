@@ -123,9 +123,6 @@ and tbasic.cpp.
 
 #include "test.h"
 
-class GLEAN::DrawingSurfaceConfig;		// Forward reference.
-
-
 // Macro for constructor for Glean test taking width, height and one config flag
 #define GLEAN_CLASS_WHO(TEST, RESULT, WIDTH, HEIGHT, ONE)                     \
 	TEST(const char* aName, const char* aFilter,                          \
@@ -167,6 +164,8 @@ class GLEAN::DrawingSurfaceConfig;		// Forward reference.
 
 
 namespace GLEAN {
+
+class DrawingSurfaceConfig;		// Forward reference.
 
 class BaseResult : public Result {
 	// Class for a single test result.  All basic tests have a

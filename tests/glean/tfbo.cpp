@@ -43,8 +43,33 @@
 namespace GLEAN
 {
 
-static int useFramebuffer;
+// GL_VERSION_1_2
+static PFNGLTEXIMAGE3DPROC glTexImage3D_func = NULL;
+static PFNGLCOPYTEXSUBIMAGE3DPROC glCopyTexSubImage3D_func = NULL;
 
+// GL_VERSION_1_3
+static PFNGLACTIVETEXTUREPROC glActiveTexture_func = NULL;
+static PFNGLMULTITEXCOORD2FPROC glMultiTexCoord2f_func = NULL;
+
+// GL_EXT_framebuffer_object
+static PFNGLISRENDERBUFFEREXTPROC glIsRenderbufferEXT_func = NULL;
+static PFNGLBINDRENDERBUFFEREXTPROC glBindRenderbufferEXT_func = NULL;
+static PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT_func = NULL;
+static PFNGLGENRENDERBUFFERSEXTPROC glGenRenderbuffersEXT_func = NULL;
+static PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorageEXT_func = NULL;
+static PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC glGetRenderbufferParameterivEXT_func = NULL;
+static PFNGLISFRAMEBUFFEREXTPROC glIsFramebufferEXT_func = NULL;
+static PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT_func = NULL;
+static PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT_func = NULL;
+static PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT_func = NULL;
+static PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT_func = NULL;
+static PFNGLFRAMEBUFFERTEXTURE1DEXTPROC glFramebufferTexture1DEXT_func = NULL;
+static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT_func = NULL;
+static PFNGLFRAMEBUFFERTEXTURE3DEXTPROC glFramebufferTexture3DEXT_func = NULL;
+static PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT_func = NULL;
+static PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC glGetFramebufferAttachmentParameterivEXT_func = NULL;
+
+static int useFramebuffer;
 
 bool
 FBOTest::setup(void)
@@ -96,6 +121,49 @@ FBOTest::setup(void)
 		printf("GL_ARB_framebuffer_object is supported\n");
 	else
 		printf("GL_ARB_framebuffer_object is not supported\n");
+
+        glTexImage3D_func = (PFNGLTEXIMAGE3DPROC) GLUtils::getProcAddress("glTexImage3D");
+        assert(glTexImage3D_func);
+        glCopyTexSubImage3D_func = (PFNGLCOPYTEXSUBIMAGE3DPROC) GLUtils::getProcAddress("glCopyTexSubImage3D");
+        assert(glCopyTexSubImage3D_func);
+
+        glActiveTexture_func = (PFNGLACTIVETEXTUREPROC) GLUtils::getProcAddress("glActiveTexture");
+        assert(glActiveTexture_func);
+        glMultiTexCoord2f_func = (PFNGLMULTITEXCOORD2FPROC) GLUtils::getProcAddress("glMultiTexCoord2f");
+        assert(glMultiTexCoord2f_func);
+
+        glIsRenderbufferEXT_func = (PFNGLISRENDERBUFFEREXTPROC) GLUtils::getProcAddress("glIsRenderbufferEXT");
+        assert(glIsRenderbufferEXT_func);
+        glBindRenderbufferEXT_func = (PFNGLBINDRENDERBUFFEREXTPROC) GLUtils::getProcAddress("glBindRenderbufferEXT");
+        assert(glBindRenderbufferEXT_func);
+        glDeleteRenderbuffersEXT_func = (PFNGLDELETERENDERBUFFERSEXTPROC) GLUtils::getProcAddress("glDeleteRenderbuffersEXT");
+        assert(glDeleteRenderbuffersEXT_func);
+        glGenRenderbuffersEXT_func = (PFNGLGENRENDERBUFFERSEXTPROC) GLUtils::getProcAddress("glGenRenderbuffersEXT");
+        assert(glGenRenderbuffersEXT_func);
+        glRenderbufferStorageEXT_func = (PFNGLRENDERBUFFERSTORAGEEXTPROC) GLUtils::getProcAddress("glRenderbufferStorageEXT");
+        assert(glRenderbufferStorageEXT_func);
+        glGetRenderbufferParameterivEXT_func = (PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC) GLUtils::getProcAddress("glGetRenderbufferParameterivEXT");
+        assert(glGetRenderbufferParameterivEXT_func);
+        glIsFramebufferEXT_func = (PFNGLISFRAMEBUFFEREXTPROC) GLUtils::getProcAddress("glIsFramebufferEXT");
+        assert(glIsFramebufferEXT_func);
+        glBindFramebufferEXT_func = (PFNGLBINDFRAMEBUFFEREXTPROC) GLUtils::getProcAddress("glBindFramebufferEXT");
+        assert(glBindFramebufferEXT_func);
+        glDeleteFramebuffersEXT_func = (PFNGLDELETEFRAMEBUFFERSEXTPROC) GLUtils::getProcAddress("glDeleteFramebuffersEXT");
+        assert(glDeleteFramebuffersEXT_func);
+        glGenFramebuffersEXT_func = (PFNGLGENFRAMEBUFFERSEXTPROC) GLUtils::getProcAddress("glGenFramebuffersEXT");
+        assert(glGenFramebuffersEXT_func);
+        glCheckFramebufferStatusEXT_func = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) GLUtils::getProcAddress("glCheckFramebufferStatusEXT");
+        assert(glCheckFramebufferStatusEXT_func);
+        glFramebufferTexture1DEXT_func = (PFNGLFRAMEBUFFERTEXTURE1DEXTPROC) GLUtils::getProcAddress("glFramebufferTexture1DEXT");
+        assert(glFramebufferTexture1DEXT_func);
+        glFramebufferTexture2DEXT_func = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) GLUtils::getProcAddress("glFramebufferTexture2DEXT");
+        assert(glFramebufferTexture2DEXT_func);
+        glFramebufferTexture3DEXT_func = (PFNGLFRAMEBUFFERTEXTURE3DEXTPROC) GLUtils::getProcAddress("glFramebufferTexture3DEXT");
+        assert(glFramebufferTexture3DEXT_func);
+        glFramebufferRenderbufferEXT_func = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC) GLUtils::getProcAddress("glFramebufferRenderbufferEXT");
+        assert(glFramebufferRenderbufferEXT_func);
+        glGetFramebufferAttachmentParameterivEXT_func = (PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC) GLUtils::getProcAddress("glGetFramebufferAttachmentParameterivEXT");
+        assert(glGetFramebufferAttachmentParameterivEXT_func);
 
         return true;
 }
@@ -177,41 +245,45 @@ FBOTest::checkResult(const GLfloat color[4], const int depth,
 }
 
 
-#define CHECK_FRAMEBUFFER_STATUS(func)                            \
-{                                                           \
-        GLenum status;                                            \
-        status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT); \
-        switch(status) {                                          \
-          case GL_FRAMEBUFFER_COMPLETE_EXT:                       \
-            /*printf("  (%s:%d)GL_FRAMEBUFFER_COMPLETE_EXT\n", func, __LINE__);*/          \
-            break;                                                \
-          case GL_FRAMEBUFFER_UNSUPPORTED_EXT:                    \
-            printf("  (%s:%d)GL_FRAMEBUFFER_UNSUPPORTED_EXT\n", func, __LINE__);           \
-            /* choose different formats */                        \
-            break;                                                \
-          case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:          \
-            printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT\n", func, __LINE__); \
-            break;                                                \
-          case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:          \
-            printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT\n", func, __LINE__); \
-            break;                                                \
-          case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:             \
-            printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT\n", func, __LINE__);    \
-            break;                                                \
-          case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:         \
-            printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT\n", func, __LINE__);\
-            break;                                                \
-          case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:         \
-            printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT\n", func, __LINE__);\
-            break;                                                \
-	  case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:  \
-	    printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT\n", func, __LINE__);\
-	    break;						   \
-          default:                                                \
-            /* programming error; will fail on all hardware */    \
-            printf("  (%s:%d)programming error\n", func, __LINE__);                        \
-            break;                                                \
-        }                                                         \
+// Check FB status, print unexpected results to stdout.
+static GLenum
+CheckFramebufferStatus(const char *func, int line)
+{
+	GLenum status;
+	status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+
+	switch(status) {
+	case GL_FRAMEBUFFER_COMPLETE_EXT:
+		/*printf("  (%s:%d)GL_FRAMEBUFFER_COMPLETE_EXT\n", func, line);*/
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_UNSUPPORTED_EXT\n", func, line);
+		/* choose different formats */
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT\n", func, line);
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT\n", func, line);
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT\n", func, line);
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT\n", func, line);
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+		printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT\n", func, line);
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+	    printf("  (%s:%d)GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT\n", func, line);
+	    break;
+	default:
+		/* programming error; will fail on all hardware */
+		printf("  (%s:%d)programming error\n", func, line);
+		break;
+	}
+	return status;
 }
 
 
@@ -255,23 +327,23 @@ FBOTest::testSanity(void)
                 return false;
         }
 
-        glGenFramebuffersEXT(1, fbs);
+        glGenFramebuffersEXT_func(1, fbs);
 
 
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
         glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, (GLint *) & fb_binding);
         if (fb_binding != fbs[0]) {
                 printf("  fb_binding = %d\n", fb_binding);
                 REPORT_FAILURE("Binding framebuffer failed");
                 return false;
         }
-	if (glIsFramebufferEXT(fbs[0]) != GL_TRUE)
+	if (glIsFramebufferEXT_func(fbs[0]) != GL_TRUE)
 	{
                 REPORT_FAILURE("Call glIsFramebufferEXT failed");
                 return false;
 	}
 
-        glDeleteFramebuffersEXT(1, fbs);
+        glDeleteFramebuffersEXT_func(1, fbs);
 
         GLint maxRenderbufferSize;
 
@@ -290,7 +362,7 @@ FBOTest::testSanity(void)
 void
 FBOTest::reset(void)
 {                                        
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
 }
@@ -309,7 +381,7 @@ FBOTest::testRender2SingleTexture(void)
         GLuint textures[1];
         int mode;
 	int maxzoffset = -1;
-
+	GLenum status;
 
 	glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxzoffset);
 	if (maxzoffset > 16)
@@ -318,15 +390,15 @@ FBOTest::testRender2SingleTexture(void)
         for (depthBuffer = 0; depthBuffer < 2; depthBuffer++) {
                 for (stencilBuffer = 0; stencilBuffer < 2; stencilBuffer++) {
                         for (mode = 0; mode < 4; mode++) {
-				if (mode == 2&&maxzoffset <= 0)
+
+				//
+				// Setup state to test
+				//
+				if (mode == 2 && maxzoffset <= 0)
 					continue;
-                                glClearColor(0.0, 0.0, 0.0, 1.0);
-                                glClear(GL_COLOR_BUFFER_BIT |
-                                        GL_DEPTH_BUFFER_BIT |
-                                        GL_STENCIL_BUFFER_BIT);
 
                                 if (useFramebuffer)
-                                        glGenFramebuffersEXT(1, fbs);
+                                        glGenFramebuffersEXT_func(1, fbs);
                                 glGenTextures(1, textures);
 
                                 glBindTexture(textureModes[mode],
@@ -353,7 +425,7 @@ FBOTest::testRender2SingleTexture(void)
                                                      GL_RGB, GL_INT, NULL);
                                         break;
                                 case GL_TEXTURE_3D:
-                                        glTexImage3D(GL_TEXTURE_3D,
+                                        glTexImage3D_func(GL_TEXTURE_3D,
                                                      0, GL_RGB,
                                                      TEXSIZE,
                                                      TEXSIZE,
@@ -396,7 +468,7 @@ FBOTest::testRender2SingleTexture(void)
 
 
                                 if (useFramebuffer) {
-                                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                                         int height = TEXSIZE;
 
                                         if (textureModes[mode] == GL_TEXTURE_1D)
@@ -405,28 +477,28 @@ FBOTest::testRender2SingleTexture(void)
                                         if (depthBuffer) {
                                                 int params;
 
-                                                glGenRenderbuffersEXT(1, depth_rb);
+                                                glGenRenderbuffersEXT_func(1, depth_rb);
 
 					
-                                                glBindRenderbufferEXT
+                                                glBindRenderbufferEXT_func
                                                         (GL_RENDERBUFFER_EXT,
                                                          depth_rb[0]);
-						if (glIsRenderbufferEXT(depth_rb[0]) != GL_TRUE)
+						if (glIsRenderbufferEXT_func(depth_rb[0]) != GL_TRUE)
 						{
                 					REPORT_FAILURE("Call glIsRenderbufferEXT failed\n");
                 					return false;
 						}
 
-                                                glRenderbufferStorageEXT
+                                                glRenderbufferStorageEXT_func
                                                         (GL_RENDERBUFFER_EXT,
                                                          GL_DEPTH_COMPONENT,
                                                          TEXSIZE, height);
-                                                glFramebufferRenderbufferEXT
+                                                glFramebufferRenderbufferEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_DEPTH_ATTACHMENT_EXT,
                                                          GL_RENDERBUFFER_EXT,
                                                          depth_rb[0]);
-                                                glGetRenderbufferParameterivEXT
+                                                glGetRenderbufferParameterivEXT_func
                                                         (GL_RENDERBUFFER_EXT,
                                                          GL_RENDERBUFFER_WIDTH_EXT,
                                                          &params);
@@ -436,7 +508,7 @@ FBOTest::testRender2SingleTexture(void)
                                                         printf("width = %d\n", params);
                                                         return false;
                                                 }
-                                                glGetRenderbufferParameterivEXT
+                                                glGetRenderbufferParameterivEXT_func
                                                         (GL_RENDERBUFFER_EXT,
                                                          GL_RENDERBUFFER_HEIGHT_EXT,
                                                          &params);
@@ -451,18 +523,18 @@ FBOTest::testRender2SingleTexture(void)
                                                 int type;
 
                                                 type = -1;
-                                                glGenRenderbuffersEXT(1, stencil_rb);
-                                                glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, stencil_rb[0]);
-                                                glRenderbufferStorageEXT
+                                                glGenRenderbuffersEXT_func(1, stencil_rb);
+                                                glBindRenderbufferEXT_func(GL_RENDERBUFFER_EXT, stencil_rb[0]);
+                                                glRenderbufferStorageEXT_func
                                                         (GL_RENDERBUFFER_EXT,
                                                          GL_STENCIL_INDEX,
                                                          TEXSIZE, height);
-                                                glFramebufferRenderbufferEXT
+                                                glFramebufferRenderbufferEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_STENCIL_ATTACHMENT_EXT,
                                                          GL_RENDERBUFFER_EXT,
                                                          stencil_rb[0]);
-                                                glGetFramebufferAttachmentParameterivEXT
+                                                glGetFramebufferAttachmentParameterivEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_STENCIL_ATTACHMENT_EXT,
                                                          GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT,
@@ -475,18 +547,17 @@ FBOTest::testRender2SingleTexture(void)
                                                 }
                                         }
 
-
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
                                                 int name;
 
                                                 name = -1;
-                                                glFramebufferTexture1DEXT
+                                                glFramebufferTexture1DEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_TEXTURE_1D,
                                                          textures[0], 0);
-                                                glGetFramebufferAttachmentParameterivEXT
+                                                glGetFramebufferAttachmentParameterivEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT,
@@ -503,12 +574,12 @@ FBOTest::testRender2SingleTexture(void)
                                                 int level;
 
                                                 level = -1;
-                                                glFramebufferTexture2DEXT
+                                                glFramebufferTexture2DEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_TEXTURE_2D,
                                                          textures[0], 0);
-                                                glGetFramebufferAttachmentParameterivEXT
+                                                glGetFramebufferAttachmentParameterivEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT,
@@ -525,7 +596,7 @@ FBOTest::testRender2SingleTexture(void)
                                                 int zoffset;
 
                                                 zoffset = -1;
-                                                glFramebufferTexture3DEXT
+                                                glFramebufferTexture3DEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_TEXTURE_3D,
@@ -533,7 +604,7 @@ FBOTest::testRender2SingleTexture(void)
 							 0,
                                                          maxzoffset-1);
 
-                                                glGetFramebufferAttachmentParameterivEXT
+                                                glGetFramebufferAttachmentParameterivEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT,
@@ -549,12 +620,12 @@ FBOTest::testRender2SingleTexture(void)
                                         case GL_TEXTURE_CUBE_MAP:
                                                 int face = 0;
 
-                                                glFramebufferTexture2DEXT
+                                                glFramebufferTexture2DEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                                                          textures[0], 0);
-                                                glGetFramebufferAttachmentParameterivEXT
+                                                glGetFramebufferAttachmentParameterivEXT_func
                                                         (GL_FRAMEBUFFER_EXT,
                                                          GL_COLOR_ATTACHMENT0_EXT,
                                                          GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT,
@@ -571,9 +642,20 @@ FBOTest::testRender2SingleTexture(void)
                                                 break;
                                         }
 
-                                        CHECK_FRAMEBUFFER_STATUS("FBOTest::testRender2SingleTexture");
+                                        status = CheckFramebufferStatus("FBOTest::testRender2SingleTexture", __LINE__);
                                 }
+				else {
+					status = GL_FRAMEBUFFER_COMPLETE_EXT;
+				}
 
+
+				if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+					continue;
+
+
+				//
+				// Render, test the results
+				//
 
                                 if (depthBuffer) {
                                         glClear(GL_DEPTH_BUFFER_BIT);
@@ -665,7 +747,7 @@ FBOTest::testRender2SingleTexture(void)
                                 glBindTexture(textureModes[mode],
                                               textures[0]);
                                 if (useFramebuffer) {
-                                        glBindFramebufferEXT
+                                        glBindFramebufferEXT_func
                                                 (GL_FRAMEBUFFER_EXT, 0);
                                         glBindTexture(textureModes
                                                       [mode], textures[0]);
@@ -687,7 +769,7 @@ FBOTest::testRender2SingleTexture(void)
                                                          TEXSIZE, 0);
                                                 break;
                                         case GL_TEXTURE_3D:
-                                                glCopyTexSubImage3D
+                                                glCopyTexSubImage3D_func
                                                         (GL_TEXTURE_3D,
                                                          0, 0, 0,
                                                          0, 0, 0,
@@ -747,11 +829,11 @@ FBOTest::testRender2SingleTexture(void)
 
                                 glDeleteTextures(1, textures);
                                 if (useFramebuffer)
-                                        glDeleteFramebuffersEXT(1, fbs);
+                                        glDeleteFramebuffersEXT_func(1, fbs);
                                 if (depthBuffer)
-                                        glDeleteRenderbuffersEXT(1, depth_rb);
+                                        glDeleteRenderbuffersEXT_func(1, depth_rb);
                                 if (stencilBuffer)
-                                        glDeleteRenderbuffersEXT(1, stencil_rb);
+                                        glDeleteRenderbuffersEXT_func(1, stencil_rb);
 
 //					getchar();
                                 if (checkResult(colors[RED], depthBuffer, stencilBuffer) == false) {
@@ -801,7 +883,7 @@ FBOTest::testRender2MultiTexture(void)
                         numFBO = 1;
 
                 if (useFramebuffer)
-                        glGenFramebuffersEXT(numFBO, fbs);
+                        glGenFramebuffersEXT_func(numFBO, fbs);
 
                 GLint maxTexUnits;
 
@@ -817,7 +899,7 @@ FBOTest::testRender2MultiTexture(void)
                         else
                                 idx = i;
 
-                        glActiveTexture(GL_TEXTURE0 + idx);
+                        glActiveTexture_func(GL_TEXTURE0 + idx);
                         glBindTexture(GL_TEXTURE_2D, textures[idx]);
                         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
                                      TEXSIZE, TEXSIZE, 0, GL_RGB,
@@ -825,18 +907,18 @@ FBOTest::testRender2MultiTexture(void)
 
                         if (useFramebuffer) {
                                 if (mode == MULTI_FBO)
-                                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[i]);
+                                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[i]);
                                 else
-                                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
 
                                 if (mode != SINGLE_COLOR_ATTACH)
-                                        glFramebufferTexture2DEXT
+                                        glFramebufferTexture2DEXT_func
                                                 (GL_FRAMEBUFFER_EXT,
                                                  GL_COLOR_ATTACHMENT0_EXT + i,
                                                  GL_TEXTURE_2D,
                                                  textures[idx], 0);
                                 else
-                                        glFramebufferTexture2DEXT
+                                        glFramebufferTexture2DEXT_func
                                                 (GL_FRAMEBUFFER_EXT,
                                                  GL_COLOR_ATTACHMENT0_EXT,
                                                  GL_TEXTURE_2D,
@@ -849,7 +931,7 @@ FBOTest::testRender2MultiTexture(void)
                                         glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
                                         glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
                                 }
-                                CHECK_FRAMEBUFFER_STATUS("FBOTest::testRender2MultiTexture");
+                                CheckFramebufferStatus("FBOTest::testRender2MultiTexture", __LINE__);
                         }
                 }
 
@@ -866,18 +948,18 @@ FBOTest::testRender2MultiTexture(void)
 
                         if (useFramebuffer) {
                                 if (mode == MULTI_FBO)
-                                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[i]);
+                                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[i]);
                                 else
-                                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
 
                                 if (mode == MULTI_COLOR_ATTACH) {
                                         glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT + idx);
                                         glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + idx);
                                 }
 
-                                CHECK_FRAMEBUFFER_STATUS("FBOTest::testRender2MultiTexture");
+                                CheckFramebufferStatus("FBOTest::testRender2MultiTexture", __LINE__);
                                 if (mode == SINGLE_COLOR_ATTACH) {
-                                        glFramebufferTexture2DEXT
+                                        glFramebufferTexture2DEXT_func
                                                 (GL_FRAMEBUFFER_EXT,
                                                  GL_COLOR_ATTACHMENT0_EXT,
                                                  GL_TEXTURE_2D,
@@ -903,7 +985,7 @@ FBOTest::testRender2MultiTexture(void)
 
                         glEnable(GL_TEXTURE_2D);
                         if (useFramebuffer) {
-                                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
                                 glBindTexture(GL_TEXTURE_2D, textures[idx]);
                         }
                         else {
@@ -916,7 +998,7 @@ FBOTest::testRender2MultiTexture(void)
                 }
                 // Clean up
                 if (useFramebuffer)
-                        glDeleteFramebuffersEXT(numFBO, fbs);
+                        glDeleteFramebuffersEXT_func(numFBO, fbs);
 
 
                 // Render to the window
@@ -928,7 +1010,7 @@ FBOTest::testRender2MultiTexture(void)
                         else
                                 idx = i;
 
-                        glActiveTexture(GL_TEXTURE0 + idx);
+                        glActiveTexture_func(GL_TEXTURE0 + idx);
                         glEnable(GL_TEXTURE_2D);
                         glTexParameteri(GL_TEXTURE_2D,
                                         GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -941,13 +1023,13 @@ FBOTest::testRender2MultiTexture(void)
                         glClearColor(0.0, 0.0, 0.0, 0.0);
                         glClear(GL_COLOR_BUFFER_BIT);
                         glBegin(GL_POLYGON);
-                        glMultiTexCoord2f(GL_TEXTURE0 + idx, 0, 0);
+                        glMultiTexCoord2f_func(GL_TEXTURE0 + idx, 0, 0);
                         glVertex3f(0, 0, 1);
-                        glMultiTexCoord2f(GL_TEXTURE0 + idx, 1, 0);
+                        glMultiTexCoord2f_func(GL_TEXTURE0 + idx, 1, 0);
                         glVertex3f(TEXSIZE, 0, 1);
-                        glMultiTexCoord2f(GL_TEXTURE0 + idx, 1, 1);
+                        glMultiTexCoord2f_func(GL_TEXTURE0 + idx, 1, 1);
                         glVertex3f(TEXSIZE, TEXSIZE, 1);
-                        glMultiTexCoord2f(GL_TEXTURE0 + idx, 0, 1);
+                        glMultiTexCoord2f_func(GL_TEXTURE0 + idx, 0, 1);
                         glVertex3f(0, TEXSIZE, 1);
                         glEnd();
 
@@ -962,7 +1044,7 @@ FBOTest::testRender2MultiTexture(void)
                         }
 
                         glDisable(GL_TEXTURE_2D);
-                        glActiveTexture(GL_TEXTURE0);
+                        glActiveTexture_func(GL_TEXTURE0);
                 }
 
                 glDeleteTextures(maxTexUnits, textures);
@@ -980,7 +1062,7 @@ FBOTest::testRender2depthTexture(void)
 
 	reset();
         if (useFramebuffer)
-                glGenFramebuffersEXT(1, fbs);
+                glGenFramebuffersEXT_func(1, fbs);
 
         glGenTextures(1, textures);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -988,14 +1070,14 @@ FBOTest::testRender2depthTexture(void)
                      TEXSIZE, 0, GL_DEPTH_COMPONENT, GL_INT, NULL);
 
         if (useFramebuffer) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glFramebufferTexture2DEXT_func(GL_FRAMEBUFFER_EXT,
                                           GL_DEPTH_ATTACHMENT_EXT,
                                           GL_TEXTURE_2D, textures[0], 0);
                 glDrawBuffer(GL_NONE);
                 glReadBuffer(GL_NONE);
 
-                CHECK_FRAMEBUFFER_STATUS("FBOTest::testRender2depthTexture");
+                CheckFramebufferStatus("FBOTest::testRender2depthTexture", __LINE__);
         }
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -1014,7 +1096,7 @@ FBOTest::testRender2depthTexture(void)
         glEnd();
 
         if (useFramebuffer) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
                 glBindTexture(GL_TEXTURE_2D, textures[0]);
         }
         else {
@@ -1055,7 +1137,7 @@ FBOTest::testRender2depthTexture(void)
 
         // Clean up
         if (useFramebuffer)
-                glDeleteFramebuffersEXT(1, fbs);
+                glDeleteFramebuffersEXT_func(1, fbs);
         glDeleteTextures(1, textures);
 
         // Check result
@@ -1079,13 +1161,13 @@ FBOTest::testRender2MipmapTexture(void)
 
 	reset();
         if (useFramebuffer)
-                glGenFramebuffersEXT(1, fbs);
+                glGenFramebuffersEXT_func(1, fbs);
 
         glGenTextures(1, textures);
         glBindTexture(GL_TEXTURE_2D, textures[0]);
 
         if (useFramebuffer)
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
 
         glDisable(GL_TEXTURE_2D);
 
@@ -1095,11 +1177,11 @@ FBOTest::testRender2MipmapTexture(void)
                 if (useFramebuffer) {
                         glTexImage2D(GL_TEXTURE_2D, level, GL_RGB,
                                      i, i, 0, GL_RGB, GL_INT, NULL);
-                        glFramebufferTexture2DEXT
+                        glFramebufferTexture2DEXT_func
                                 (GL_FRAMEBUFFER_EXT,
                                  GL_COLOR_ATTACHMENT0_EXT,
                                  GL_TEXTURE_2D, textures[0], level);
-                        CHECK_FRAMEBUFFER_STATUS("FBOTest::testRender2MipmapTexture");
+                        CheckFramebufferStatus("FBOTest::testRender2MipmapTexture", __LINE__);
 
                         glColor4fv(colors[RED + (level % (WHITE - RED))]);
                         glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -1133,7 +1215,7 @@ FBOTest::testRender2MipmapTexture(void)
         }
 
         if (useFramebuffer) {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
                 glBindTexture(GL_TEXTURE_2D, textures[0]);
         }
         glEnable(GL_TEXTURE_2D);
@@ -1167,7 +1249,7 @@ FBOTest::testRender2MipmapTexture(void)
 
         // Clean up
         if (useFramebuffer)
-                glDeleteFramebuffersEXT(1, fbs);
+                glDeleteFramebuffersEXT_func(1, fbs);
         glDeleteTextures(1, textures);
 
         // Check result
@@ -1209,13 +1291,13 @@ FBOTest::testErrorHandling(void)
 
 
                 // At least one image attached to the framebuffer
-                glGenFramebuffersEXT(1, fbs);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glGenFramebuffersEXT_func(1, fbs);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_NONE);
                 glReadBuffer(GL_NONE);
-                status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                glDeleteFramebuffersEXT(1, fbs);
+                status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
+                glDeleteFramebuffersEXT_func(1, fbs);
                 if (status !=
                     GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT) {
                         REPORT_FAILURE
@@ -1225,25 +1307,25 @@ FBOTest::testErrorHandling(void)
 
                 // All attached images have the same width and height,
 		// unless GL_ARB_framebuffer object is supported.
-                glGenFramebuffersEXT(1, fbs);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glGenFramebuffersEXT_func(1, fbs);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glGenTextures(2, textures);
                 glBindTexture(GL_TEXTURE_2D, textures[0]);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXSIZE,
                              TEXSIZE, 0, GL_RGB, GL_INT, NULL);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                glFramebufferTexture2DEXT_func(GL_FRAMEBUFFER_EXT,
                                           GL_COLOR_ATTACHMENT0_EXT,
                                           GL_TEXTURE_2D, textures[0], 0);
                 glBindTexture(GL_TEXTURE_2D, textures[1]);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXSIZE / 2,
                              TEXSIZE / 2, 0, GL_RGB, GL_INT, NULL);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                glFramebufferTexture2DEXT_func(GL_FRAMEBUFFER_EXT,
                                           GL_COLOR_ATTACHMENT0_EXT
                                           + maxColorAttachment - 1,
                                           GL_TEXTURE_2D, textures[1], 0);
-                status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                glDeleteFramebuffersEXT(1, fbs);
+                status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
+                glDeleteFramebuffersEXT_func(1, fbs);
                 glDeleteTextures(2, textures);
                 if (!haveARBfbo &&
 		    status != GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT) {
@@ -1255,25 +1337,25 @@ FBOTest::testErrorHandling(void)
                 // All images attached to the attachment points
                 // COLOR_ATTACHMENT0_EXT through COLOR_ATTACHMENTn_EXT must
                 // have the same internal format, unless ARB_fbo is supported.
-                glGenFramebuffersEXT(1, fbs);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glGenFramebuffersEXT_func(1, fbs);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glGenTextures(2, textures);
                 glBindTexture(GL_TEXTURE_2D, textures[0]);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXSIZE,
                              TEXSIZE, 0, GL_RGB, GL_INT, NULL);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                glFramebufferTexture2DEXT_func(GL_FRAMEBUFFER_EXT,
                                           GL_COLOR_ATTACHMENT0_EXT,
                                           GL_TEXTURE_2D, textures[0], 0);
                 glBindTexture(GL_TEXTURE_2D, textures[1]);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TEXSIZE,
                              TEXSIZE, 0, GL_RGBA, GL_INT, NULL);
-                glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+                glFramebufferTexture2DEXT_func(GL_FRAMEBUFFER_EXT,
                                           GL_COLOR_ATTACHMENT0_EXT
                                           + maxColorAttachment - 1,
                                           GL_TEXTURE_2D, textures[1], 0);
-                status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                glDeleteFramebuffersEXT(1, fbs);
+                status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
+                glDeleteFramebuffersEXT_func(1, fbs);
                 glDeleteTextures(2, textures);
                 if (!haveARBfbo &&
 		    status != GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT) {
@@ -1286,13 +1368,13 @@ FBOTest::testErrorHandling(void)
                 // The value of FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not
                 // be NONE for any color attachment point(s) named by
 		// DRAW_BUFFERi.
-                glGenFramebuffersEXT(1, fbs);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glGenFramebuffersEXT_func(1, fbs);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT +
                              maxColorAttachment - 1);
-                status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                glDeleteFramebuffersEXT(1, fbs);
+                status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
+                glDeleteFramebuffersEXT_func(1, fbs);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT) {
                         REPORT_FAILURE
                                 ("All any buffer named by glDrawBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
@@ -1302,14 +1384,14 @@ FBOTest::testErrorHandling(void)
                 // If READ_BUFFER is not NONE, then the value of
                 // FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not be NONE for
                 // the color attachment point named by READ_BUFFER.
-                glGenFramebuffersEXT(1, fbs);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
+                glGenFramebuffersEXT_func(1, fbs);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_NONE);
                 glReadBuffer(GL_COLOR_ATTACHMENT0_EXT +
                              maxColorAttachment - 1);
-                status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-                glDeleteFramebuffersEXT(1, fbs);
+                status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
+                glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
+                glDeleteFramebuffersEXT_func(1, fbs);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT) {
                         REPORT_FAILURE
                                 ("If buffer named by glReadBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
@@ -1358,7 +1440,7 @@ FBOTest::testPerformance(MultiTestResult & r)
                 glClearColor(0.0, 0.0, 0.0, 1.0);
                 glClear(GL_COLOR_BUFFER_BIT);
                 if (mode)
-                        glGenFramebuffersEXT(1, fbs);
+                        glGenFramebuffersEXT_func(1, fbs);
                 glGenTextures(1, textures);
 
                 glBindTexture(GL_TEXTURE_2D, textures[0]);
@@ -1371,19 +1453,19 @@ FBOTest::testPerformance(MultiTestResult & r)
                              TEXSIZE, 0, GL_RGB, GL_INT, NULL);
 
                 if (mode) {
-                        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
-                        glFramebufferTexture2DEXT
+                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
+                        glFramebufferTexture2DEXT_func
                                 (GL_FRAMEBUFFER_EXT,
                                  GL_COLOR_ATTACHMENT0_EXT,
                                  GL_TEXTURE_2D, textures[0], 0);
-                        CHECK_FRAMEBUFFER_STATUS("FBOTest::testPerformance");
+                        CheckFramebufferStatus("FBOTest::testPerformance", __LINE__);
                 }
 
                 int i;
 
                 for (i = 0; i < 1024; i++) {
                         if (mode)
-                                glBindFramebufferEXT
+                                glBindFramebufferEXT_func
                                         (GL_FRAMEBUFFER_EXT, fbs[0]);
 
                         // Render to the texture
@@ -1403,7 +1485,7 @@ FBOTest::testPerformance(MultiTestResult & r)
 
                         // Render to the window
                         if (mode) {
-                                glBindFramebufferEXT
+                                glBindFramebufferEXT_func
                                         (GL_FRAMEBUFFER_EXT, 0);
                                 glBindTexture(GL_TEXTURE_2D, textures[0]);
                         }
@@ -1432,7 +1514,7 @@ FBOTest::testPerformance(MultiTestResult & r)
                 t1 = t.getClock();
                 glDeleteTextures(1, textures);
                 if (mode)
-                        glDeleteFramebuffersEXT(1, fbs);
+                        glDeleteFramebuffersEXT_func(1, fbs);
 
                 perf[mode] =
                         (double) TEXSIZE *TEXSIZE * 3 / 1024 / (t1 - t0);

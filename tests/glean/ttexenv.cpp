@@ -499,8 +499,10 @@ TexEnvTest::MatrixTest(GLenum envMode, GLenum texFormat,
 	}
 	glEnd();
 
-	GLfloat image[256][256][4];
-	glReadPixels(0, 0, 256, 256, GL_RGBA, GL_FLOAT, image);
+	const GLsizei width = 256;
+	const GLsizei height = 256;
+	GLfloat *image = new GLfloat[width*height*4];
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_FLOAT, image);
 
 	w.swap(); // lets us watch the progress
 
@@ -517,7 +519,7 @@ TexEnvTest::MatrixTest(GLenum envMode, GLenum texFormat,
 			// fetch actual pixel
 			int x = col * 3 + 1;
 			int y = row * 3 + 1;
-			const GLfloat *actual = image[y][x];
+			const GLfloat *actual = image + y*width*4 + x*4;
 
 			// compare
 			if (!TestColor(expected, actual)) {
@@ -559,10 +561,12 @@ TexEnvTest::MatrixTest(GLenum envMode, GLenum texFormat,
 					 << actual[1] << ", "
 					 << actual[2] << ", "
 					 << actual[3] << ")\n";
+				delete[] image;
 				return false;
 			}
 		}
 	}
+	delete[] image;
 	return true;
 }
 

@@ -31,8 +31,6 @@
 
 // main.cpp:  main program for Glean
 
-using namespace std;
-
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -45,6 +43,8 @@ using namespace std;
 #include "version.h"
 #include "lex.h"
 #include "dsfilt.h"
+
+using namespace std;
 
 using namespace GLEAN;
 
@@ -81,6 +81,8 @@ main(int argc, char* argv[]) {
 		} else if (!strcmp(argv[i], "-o")
 		    || !strcmp(argv[i], "--overwrite")) {
 			o.overwrite = true;
+		} else if (!strcmp(argv[i], "--quick")) {
+			o.quick = true;
 		} else if (!strcmp(argv[i], "-c")
 		    || !strcmp(argv[i], "--compare")) {
 			o.mode = Options::compare;
@@ -322,6 +324,7 @@ usage(char* command) {
 "       --visuals 'filter-string'  # select subset of visuals (FBConfigs,\n"
 "                                  # pixel formats) to test\n"
 "       (-t|--tests) {(+|-)test}   # choose tests to include (+) or exclude (-)\n"
+"       --quick                    # run fewer tests to reduce test time\n"
 "       --listtests                # list test names and exit\n"
 "       --help                     # display usage information\n"
 #if defined(__X11__)

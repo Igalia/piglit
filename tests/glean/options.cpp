@@ -48,6 +48,7 @@ Options::Options() {
 	visFilter = "1";
 	selectedTests.resize(0);
 	overwrite = false;
+	quick = false;
 #   if defined(__X11__)
 	{
 	char* display = getenv("DISPLAY");

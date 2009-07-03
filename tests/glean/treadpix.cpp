@@ -382,7 +382,7 @@ ReadPixSanityTest::compareOne(ReadPixSanityResult& oldR, ReadPixSanityResult& ne
 } // ReadPixSanityTest::compareOne
 
 void
-ReadPixSanityTest::summarize(char* label, bool oldPass, bool newPass) {
+ReadPixSanityTest::summarize(const char* label, bool oldPass, bool newPass) {
 	if (oldPass == newPass) {
 		if (env->options.verbosity)
 			env->log << "\t"
@@ -496,6 +496,11 @@ readPixSanityTest("readPixSanity", "1",
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace {
+
+// Mac OS header file AssertMacros.h defines check as a macro. 
+#ifdef check
+#undef check
+#endif
 
 template<class T>
 void

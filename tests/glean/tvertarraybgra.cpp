@@ -63,6 +63,11 @@ VertArrayBGRATest::reportError(const char *msg)
 bool
 VertArrayBGRATest::testAPI(void)
 {
+	// Get glSecondaryColorPointer() functon
+	PFNGLSECONDARYCOLORPOINTERPROC SecondaryColorPointer = NULL;
+	SecondaryColorPointer = (PFNGLSECONDARYCOLORPOINTERPROC)
+			GLUtils::getProcAddress("glSecondaryColorPointer");
+
 	// Get glVertexAttrib() function
 	PFNGLVERTEXATTRIBPOINTERARBPROC VertexAttribPointer = NULL;
 	const char *version = (const char *) glGetString(GL_VERSION);
@@ -84,10 +89,12 @@ VertArrayBGRATest::testAPI(void)
 		return false;
 	}
 
-	glSecondaryColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, array);
-	if (glGetError()) {
-		reportError("glSecondaryColorPointer(size=GL_BGRA) generated an error.");
-		return false;
+	if (SecondaryColorPointer) {
+		SecondaryColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, array);
+		if (glGetError()) {
+			reportError("glSecondaryColorPointer(size=GL_BGRA) generated an error.");
+			return false;
+		}
 	}
 
 	if (VertexAttribPointer) {

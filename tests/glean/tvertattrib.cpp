@@ -79,7 +79,7 @@ namespace GLEAN {
 #define NUM_2_0_ATTRIB_FUNCS 36
 
 static const char *
-AttribFuncNames[NUM_NV_ATTRIB_FUNCS + NUM_ARB_ATTRIB_FUNCS + NUM_2_0_ATTRIB_FUNCS] = {
+AttribFuncNames[] = {
 	"glVertexAttrib1fNV",
 	"glVertexAttrib2fNV",
 	"glVertexAttrib3fNV",
@@ -168,7 +168,7 @@ AttribFuncNames[NUM_NV_ATTRIB_FUNCS + NUM_ARB_ATTRIB_FUNCS + NUM_2_0_ATTRIB_FUNC
 	"glVertexAttrib2sv",
 	"glVertexAttrib3sv",
 	"glVertexAttrib4sv",
-	"glVertexAttrib4Nsv"
+	"glVertexAttrib4Nsv",
 	"glVertexAttrib4Nub",
 	"glVertexAttrib4Nubv",
 	"glVertexAttrib4ubv",
@@ -1546,7 +1546,7 @@ void
 VertAttribTest::runOne(VertAttribResult& r, Window&)
 {
 
-	assert(sizeof(AttribFuncNames) / sizeof(char *) ==
+	assert(sizeof(AttribFuncNames) / sizeof(AttribFuncNames[0]) ==
 	       NUM_NV_ATTRIB_FUNCS + NUM_ARB_ATTRIB_FUNCS + NUM_2_0_ATTRIB_FUNCS);
 
 	r.pass = true;

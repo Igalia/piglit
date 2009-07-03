@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <cstdio>
 #elif defined(__MS__)
 
 #include <sys/stat.h>
@@ -89,8 +90,13 @@ Environment::Environment(Options& opt):
 	// Refuse to overwrite one that already exists.
 	if (opt.mode == Options::run) {
 		if (opt.overwrite) {
-			// XXX a Windows programmer needs to complete this
-			abort();
+			char cmd[1000];
+#if defined(_MSC_VER)
+			_snprintf(cmd, 999, "rd /s /q %s", opt.db1Name.c_str());
+#else
+			snprintf(cmd, 999, "rd /s /q %s", opt.db1Name.c_str());
+#endif
+			system(cmd);
 		}
 		if (!CreateDirectory(opt.db1Name.c_str(),0)) {
 			if (GetLastError() == ERROR_ALREADY_EXISTS)

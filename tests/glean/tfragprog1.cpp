@@ -575,6 +575,7 @@ static const FragmentProgram Programs[] = {
 		DONT_CARE_Z
 	},
 	{
+		// this test checks that SOA execution is handled correctly
 		"swizzled move test",
 		"!!ARBfp1.0\n"
 		"TEMP t; \n"
@@ -584,6 +585,22 @@ static const FragmentProgram Programs[] = {
 		"MOV result.color, t; \n"
 		"END \n",
 		{ Param1[1], Param1[0], Param1[3], Param1[2] },
+		DONT_CARE_Z
+	},
+	{
+		// this test checks that SOA execution is handled correctly
+		"swizzled add test",
+		"!!ARBfp1.0\n"
+		"TEMP t; \n"
+		"PARAM p = program.local[1]; \n"
+		"MOV t, p; \n"
+		"ADD t, t, t.yxwz; \n"  // "in-place" swizzled add
+		"MOV result.color, t; \n"
+		"END \n",
+		{ CLAMP01(Param1[0] + Param1[1]),
+		  CLAMP01(Param1[1] + Param1[0]),
+		  CLAMP01(Param1[2] + Param1[3]),
+		  CLAMP01(Param1[3] + Param1[2]) },
 		DONT_CARE_Z
 	},
 	{

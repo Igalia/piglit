@@ -104,7 +104,7 @@ static PFNGLDRAWBUFFERSPROC glDrawBuffers_func = NULL;
 // \param errorFunc  returns name of API function in case of error
 // \return true for success, false for error
 bool
-API2Test::getFunctions_2_0(char **errorFunc)
+API2Test::getFunctions_2_0(const char **errorFunc)
 {
 #define GET(PTR, TYPE, STR)                          \
 	PTR  = (TYPE) GLUtils::getProcAddress(STR);  \
@@ -187,7 +187,7 @@ API2Test::setup(void)
 		return false;
 	}
 
-	char *errorFunc;
+	const char *errorFunc;
 	if (!getFunctions_2_0(&errorFunc)) {
 		env->log << "Unable to get pointer to OpenGL 2.0 function '"
 			 << errorFunc

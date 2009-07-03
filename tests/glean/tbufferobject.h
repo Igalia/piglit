@@ -1,6 +1,6 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
-// Copyright (C) 2000  Allen Akin   All Rights Reserved.
+// Copyright (C) 2009  VMware, Inc. All Rights Reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -18,7 +18,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-// PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL ALLEN AKIN BE
+// PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL VMWARE BE
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
 // AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 // OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -26,48 +26,51 @@
 // 
 // END_COPYRIGHT
 
+#ifndef __tbufferobject_h__
+#define __tbufferobject_h__
 
-
-
-// tbinding.h:  Test functions in the window-system binding
-
-#ifndef __tbinding_h__
-#define __tbinding_h__
-
-#include "tbasic.h"
+#include "tbase.h"
+#include "rand.h"
 
 namespace GLEAN {
 
-class DrawingSurfaceConfig;		// Forward reference.
-class Window;
+#define windowSize 100
 
-#define drawingSize 64
-
-class MakeCurrentResult: public BaseResult {
+class BufferObjectResult: public BaseResult
+{
 public:
-	bool pass;
-	// Short descriptions of the rendering contexts:
-	vector<const char*> descriptions;
-	// Complete record of rendering contexts made "current" during
-	// the test:
-	vector<int> testSequence;
+   bool pass;
 
-	void putresults(ostream& s) const {
-		s << pass << '\n';
-	}
-	
-	bool getresults(istream& s) {
-		s >> pass;
-		return s.good();
-	}
+   BufferObjectResult();
+
+   virtual void putresults(ostream& s) const;
+   virtual bool getresults(istream& s);
 };
 
-class MakeCurrentTest: public BaseTest<MakeCurrentResult> {
+
+class BufferObjectTest: public BaseTest<BufferObjectResult>
+{
 public:
-	GLEAN_CLASS_WH(MakeCurrentTest, MakeCurrentResult,
-		       drawingSize, drawingSize);
-}; // class MakeCurrentTest
+   GLEAN_CLASS_WH(BufferObjectTest, BufferObjectResult,
+                  windowSize, windowSize);
+
+private:
+   bool have_ARB_vertex_buffer_object;
+   bool have_ARB_pixel_buffer_object;
+   bool have_ARB_copy_buffer;
+   bool have_ARB_map_buffer_range;
+
+   GLenum target1, target2;
+
+   RandomBase rand;
+
+   bool setup(void);
+
+   bool testCopyBuffer(void);
+   bool testMapBufferRange(void);
+};
 
 } // namespace GLEAN
 
-#endif // __tbinding_h__
+#endif // __tbufferobject_h__
+

@@ -88,7 +88,6 @@ MakeCurrentTest::runOne(MakeCurrentResult& r, Window& w) {
 
 	// The rendering contexts to be used:
 	vector<RenderingContext*> rcs;
-	// Short descriptions of the rendering contexts:
 
 	RandomBitsDouble rRand(config.r, 712105);
 	RandomBitsDouble gRand(config.g, 63230);
@@ -153,8 +152,24 @@ failed:
 	r.pass = false;
 cleanup:
 	for (i = 0; i < static_cast<int>(rcs.size()); ++i)
-		if (rcs[i])
+		if (rcs[i]) {
+			// We need to make sure that no GL commands are
+			// pending when the window is destroyed, or we
+			// risk a GLXBadCurrentWindow error at some
+			// indeterminate time in the future when
+			// glXMakeCurrent() is executed.
+			// In theory, if glReadPixels() is the last
+			// command executed by a test, then an implicit
+			// flush has occurred, and the command queue is
+			// empty.  In practice, we have to protect
+			// against the possibility that the implicit
+			// flush is not enough to avoid the error.
+			ws.makeCurrent(*rcs[i], w);
+			glFinish();
+			ws.makeCurrent();
+
 			delete rcs[i];
+		}
 } // MakeCurrentTest::runOne
 
 ///////////////////////////////////////////////////////////////////////////////

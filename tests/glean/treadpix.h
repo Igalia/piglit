@@ -168,7 +168,7 @@ public:
 	void checkDepth(ReadPixSanityResult& r, Window& w);
 	void checkStencil(ReadPixSanityResult& r, Window& w);
 	void checkIndex(ReadPixSanityResult& r, Window& w);
-	void summarize(char* label, bool oldPass, bool newPass);
+	void summarize(const char* label, bool oldPass, bool newPass);
 }; // class ReadPixSanityTest
 extern ReadPixSanityTest readPixSanityTest;
 

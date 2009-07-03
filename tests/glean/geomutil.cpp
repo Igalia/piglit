@@ -30,8 +30,6 @@
 
 // geomutil.cpp:  frequently-used geometric operations
 
-using namespace std;
-
 #include "geomutil.h"
 #include "rand.h"
 #include <cassert>
@@ -39,6 +37,8 @@ using namespace std;
 #include <cmath>
 #include <float.h>
 #include <stdio.h>
+
+using namespace std;
 
 namespace GLEAN {
 

@@ -26,6 +26,7 @@
 // 
 // END_COPYRIGHT
 
+#include <cstring>
 #include "tmultitest.h"
 
 namespace GLEAN {
@@ -41,16 +42,28 @@ MultiTestResult::MultiTestResult()
 void
 MultiTestResult::putresults(ostream &s) const
 {
-	s << pass;
-	s << numPassed;
-	s << numFailed;
+	if (pass) {
+		s << "PASS\n";
+	}
+	else {
+		s << "FAIL\n";
+	}
+	s << numPassed << '\n';
+	s << numFailed << '\n';
 }
 
 
 bool
 MultiTestResult::getresults(istream &s)
 {
-	s >> pass;
+	char result[1000];
+	s >> result;
+	if (strcmp(result, "FAIL") == 0) {
+		pass = false;
+	}
+	else {
+		pass = true;
+	}
 	s >> numPassed;
 	s >> numFailed;
 	return s.good();

@@ -37,16 +37,18 @@
 
 #define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
+namespace GLEAN {
 static PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_func = NULL;
 static PFNGLBLENDCOLORPROC glBlendColor_func = NULL;
 static PFNGLBLENDEQUATIONPROC glBlendEquation_func = NULL;
 static PFNGLBLENDEQUATIONSEPARATEPROC glBlendEquationSeparate_func = NULL;
+}
 
 //namespace {
 
 struct enumNameMapping {
 	GLenum token;
-	char* name;
+	const char* name;
 };
 
 enumNameMapping factorNames[] = {
@@ -77,7 +79,7 @@ enumNameMapping blendopNames[] = {
 };
 
 
-char*
+const char*
 factorToName(GLenum factor) {
 	for (unsigned int i = 0; i < ELEMENTS(factorNames); ++i)
 		if (factorNames[i].token == factor)
@@ -93,7 +95,7 @@ nameToFactor(string& name) {
 	return GL_ZERO;
 } // nameToFactor
 
-char *
+const char *
 opToName(GLenum op) {
 	for (unsigned int i = 0; i < ELEMENTS(blendopNames); ++i)
 		if (blendopNames[i].token == op)

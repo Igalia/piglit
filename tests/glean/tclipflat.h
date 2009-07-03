@@ -26,9 +26,10 @@
 // 
 // END_COPYRIGHT
 
+// tclipflat.h:  Test clipping and flat shading
 
-#ifndef __tshaderapi_h__
-#define __tshaderapi_h__
+#ifndef __tclipflat_h__
+#define __tclipflat_h__
 
 #include "tbase.h"
 
@@ -36,59 +37,41 @@ namespace GLEAN {
 
 #define windowSize 100
 
-
-class ShaderAPIResult: public BaseResult
+class ClipFlatResult: public BaseResult
 {
 public:
 	bool pass;
 
-	ShaderAPIResult();
+        ClipFlatResult();
 
 	virtual void putresults(ostream& s) const;
 	virtual bool getresults(istream& s);
 };
 
 
-class ShaderAPITest: public BaseTest<ShaderAPIResult>
+class ClipFlatTest: public BaseTest<ClipFlatResult>
 {
 public:
-	// "WHO" = width, height and one config flag
-	GLEAN_CLASS_WHO(ShaderAPITest, ShaderAPIResult,
-					windowSize, windowSize, true);
-
-	virtual bool isApplicable() const;
+	GLEAN_CLASS_WH(ClipFlatTest, ClipFlatResult,
+		       windowSize, windowSize);
 
 private:
-	bool error;
+        bool provoking_vertex_first;
+        bool quads_follows_pv_convention;
+        bool testing_first_pv;
 
-	void assert_test(const char *file, int line, int cond, const char *msg);
-	void assert_no_error_test(const char *file, int line);
-	void assert_error_test(const char *file, int line, GLenum expect);
+        void drawArrays(GLenum mode, const GLfloat *verts, GLuint count);
+        void drawBeginEnd(GLenum mode, const GLfloat *verts, GLuint count);
+        bool testPositions(Window &w, GLenum mode,
+                           const GLfloat *verts, GLuint count);
+        void reportFailure(GLenum mode, GLuint arrayMode, GLuint facing,
+                           const GLfloat badColor[3]);
+        bool checkResult(Window &w, GLfloat badColor[3]);
 
-	void check_status(GLuint id, GLenum pname, void (APIENTRY *query)(GLuint, GLenum, GLint *));
-	void check_compile_status(GLuint id);
-	void check_link_status(GLuint id);
-
-	GLuint make_shader(GLenum type, const char *src);
-	GLuint make_program(const char *vs_src, const char *fs_src);
-
-	void test_uniform_size_type1(const char *glslType, GLenum glType, const char *el);
-	void test_attrib_size_type1(const char *glslType, GLenum glType, const char *el);
-
-	void test_uniform_size_type(void);
-	void test_attrib_size_type(void);
-	void test_uniform_array_overflow(void);
-	void test_uniform_scalar_count(void);
-	void test_uniform_query_matrix(void);
-	void test_uniform_neg_location(void);
-	void test_uniform_bool_conversion(void);
-	void test_uniform_multiple_samplers(void);
-	void run_tests(void);
-
-	void get_ext_procs(void);
+        void setup(void);
 };
 
 } // namespace GLEAN
 
-#endif // __tshaderapi_h__
+#endif // __tclipflat_h__
 

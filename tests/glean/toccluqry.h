@@ -64,6 +64,7 @@ class OccluQryTest: public MultiTest {
 	void gen_box(GLfloat left, GLfloat right, GLfloat top, GLfloat btm);
 	GLuint find_unused_id();
 	bool chk_ext();
+	void setup();
 	void reportPassFail(MultiTestResult &r, bool pass, const char *msg) const;
 };
 

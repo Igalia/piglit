@@ -878,7 +878,7 @@ TexCombineTest::CountTestCombinations(const test_param testParams[]) const {
 		}
 		numTests *= values;
 	}
-	return numTests;
+	return numTests / testStride;
 }
 
 
@@ -1116,7 +1116,7 @@ TexCombineTest::RunSingleTextureTest(glmachine &machine,
 	const int numTests = CountTestCombinations(testParams);
 	//printf("Testing %d combinations\n", numTests);
 
-	for (int test = 0; test < numTests; test++) {
+	for (int test = 0; test < numTests; test += testStride) {
 		// 0. Setup state
 		ResetMachine(machine);
 		SetupTestEnv(machine, 0, test, testParams);
@@ -1194,7 +1194,7 @@ TexCombineTest::CountMultiTextureTestCombinations(const glmachine &machine) cons
 	for (int i = 0; i < numUnits; i++)
 		numTests *= (haveDot3 ? 7 : 5);
 
-	return numTests;
+	return numTests / testStride;
 }
 
 
@@ -1224,7 +1224,7 @@ TexCombineTest::RunMultiTextureTest(glmachine &machine, BasicResult &r,
 	//printf("Testing %d multitexture combinations\n", numTests);
 
 	SetupColors(machine);
-	for (int testNum = 0; testNum < numTests; testNum++) {
+	for (int testNum = 0; testNum < numTests; testNum += testStride) {
 		// 0. Set up texture units
 		ResetMachine(machine);
 		int divisor = 1;
@@ -1494,6 +1494,12 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 
 	ResetMachine(Machine);
 	Machine.NumTexUnits = 1;
+
+	// If quick mode, run fewer tests
+	if (env->options.quick)
+		testStride = 11;  // a prime number
+	else
+		testStride = 1;
 
 	// Do single texture unit tests first.
 	bool passed = RunSingleTextureTest(Machine, ReplaceParams, r, w);

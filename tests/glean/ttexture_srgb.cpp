@@ -37,8 +37,6 @@
 #include "rand.h"
 
 
-#ifdef GL_EXT_texture_sRGB
-
 namespace GLEAN {
 
 
@@ -371,5 +369,3 @@ TextureSRGBTest srgbTest("texture_srgb", "window, rgb",
 
 
 } // namespace GLEAN
-
-#endif // GL_EXT_texture_sRGB

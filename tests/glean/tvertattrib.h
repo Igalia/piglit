@@ -32,6 +32,9 @@
 
 #include "tbase.h"
 
+// Avoid name collision on Windows
+#undef OPTIONAL
+
 namespace GLEAN {
 
 

@@ -38,7 +38,7 @@
 
 namespace {
 
-struct logicopNameMapping {GLenum op; char* name;};
+struct logicopNameMapping {GLenum op; const char* name;};
 logicopNameMapping logicopNames[] = {
 	{GL_CLEAR,		"GL_CLEAR"},
 	{GL_SET,		"GL_SET"},
@@ -58,7 +58,7 @@ logicopNameMapping logicopNames[] = {
 	{GL_OR_INVERTED,	"GL_OR_INVERTED"}
 };
 
-char*
+const char*
 logicopToName(GLenum op) {
 	for (unsigned int i = 0;
 	    i < sizeof(logicopNames) / sizeof(logicopNames[0]); ++i) {
