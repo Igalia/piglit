@@ -31,16 +31,18 @@
  * succeeds.
  */
 
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "piglit-util.h"
 
@@ -196,6 +198,8 @@ int main(int argc, char**argv)
 	glutCreateWindow("fbo-1d");
 	glutDisplayFunc(display);
 	glutKeyboardFunc(piglit_escape_exit_key);
+
+	glewInit();
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
