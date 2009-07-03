@@ -37,9 +37,9 @@
 
 #include "tbase.h"
 
-class DrawingSurfaceConfig;		// Forward reference.
-
 namespace GLEAN {
+
+class DrawingSurfaceConfig;		// Forward reference.
 
 class GetStringResult: public BaseResult {
 public:

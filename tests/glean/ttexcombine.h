@@ -104,6 +104,7 @@ class TexCombineTest: public BasicTest {
 	bool haveCrossbar;
 	GLfloat mTolerance[4];
 	GLuint mTextures[MAX_TEX_UNITS];
+	int testStride;
 
 	void ResetMachine(glmachine &machine);
 	void ComputeTexCombine(const glmachine &machine, int texUnit,

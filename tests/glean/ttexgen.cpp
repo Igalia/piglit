@@ -339,16 +339,19 @@ TexgenTest::logOne(BasicResult& r) {
 void
 TexgenTest::renderSphere(int retainedMode, GeomRenderer& sphereRenderer)
 {
+    bool result;
     if (retainedMode)
     {
         GLint displayList;
-        assert(sphereRenderer.generateDisplayList(GL_TRIANGLES, displayList));
+        result = sphereRenderer.generateDisplayList(GL_TRIANGLES, displayList);
+        assert(result);
         glCallList(displayList);
         glDeleteLists(displayList, 1);
     }
     else
     {
-        assert(sphereRenderer.renderPrimitives(GL_TRIANGLES)); 
+        result = sphereRenderer.renderPrimitives(GL_TRIANGLES);
+        assert(result);
     }
 } // TexgenTest::renderSphere
     

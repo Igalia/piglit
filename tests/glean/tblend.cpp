@@ -38,10 +38,12 @@
 
 #define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
+namespace GLEAN {
 static PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_func = NULL;
 static PFNGLBLENDCOLORPROC glBlendColor_func = NULL;
 static PFNGLBLENDEQUATIONPROC glBlendEquation_func = NULL;
 static PFNGLBLENDEQUATIONSEPARATEPROC glBlendEquationSeparate_func = NULL;
+}
 
 //namespace {
 

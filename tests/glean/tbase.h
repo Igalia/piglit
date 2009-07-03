@@ -165,6 +165,8 @@ and tbasic.cpp.
 
 namespace GLEAN {
 
+class DrawingSurfaceConfig;		// Forward reference.
+
 class BaseResult : public Result {
 	// Class for a single test result.  All basic tests have a
 	// drawing surface configuration, plus other information

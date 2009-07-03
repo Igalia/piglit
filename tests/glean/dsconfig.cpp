@@ -416,7 +416,7 @@ DrawingSurfaceConfig::DrawingSurfaceConfig() {
 
 DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 {
-	long			i;
+	int			i;
 	
 	if (!mapsInitialized)
 		initializeMaps();
@@ -440,10 +440,10 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 		aux = i;
 
 	if (canRGBA)	{
-		aglDescribePixelFormat( pf, AGL_RED_SIZE, 	(long *)&r);
-		aglDescribePixelFormat( pf, AGL_GREEN_SIZE, (long *)&g);
-		aglDescribePixelFormat( pf, AGL_BLUE_SIZE, 	(long *)&b);
-		aglDescribePixelFormat( pf, AGL_ALPHA_SIZE, (long *)&a);
+		aglDescribePixelFormat( pf, AGL_RED_SIZE,   &r);
+		aglDescribePixelFormat( pf, AGL_GREEN_SIZE, &g);
+		aglDescribePixelFormat( pf, AGL_BLUE_SIZE,  &b);
+		aglDescribePixelFormat( pf, AGL_ALPHA_SIZE, &a);
 
 		//this is a workaround for some versions of AGL
 		if (r == 10)
@@ -457,13 +457,13 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::AGLPixelFormat pfd)
 
 	samples = 0; // XXX implement properly for AGL
 
-	aglDescribePixelFormat( pf, AGL_DEPTH_SIZE, (long *)& z);
-	aglDescribePixelFormat( pf, AGL_STENCIL_SIZE, (long *)& s);
+	aglDescribePixelFormat( pf, AGL_DEPTH_SIZE,   & z);
+	aglDescribePixelFormat( pf, AGL_STENCIL_SIZE, & s);
 
-	aglDescribePixelFormat( pf, AGL_ACCUM_RED_SIZE, (long *)& accR);
-	aglDescribePixelFormat( pf, AGL_ACCUM_GREEN_SIZE, (long *)& accG);
-	aglDescribePixelFormat( pf, AGL_ACCUM_BLUE_SIZE, (long *)& accB);
-	aglDescribePixelFormat( pf, AGL_ACCUM_ALPHA_SIZE, (long *)& accA);
+	aglDescribePixelFormat( pf, AGL_ACCUM_RED_SIZE,   & accR);
+	aglDescribePixelFormat( pf, AGL_ACCUM_GREEN_SIZE, & accG);
+	aglDescribePixelFormat( pf, AGL_ACCUM_BLUE_SIZE,  & accB);
+	aglDescribePixelFormat( pf, AGL_ACCUM_ALPHA_SIZE, & accA);
 
 	aglDescribePixelFormat( pf, AGL_WINDOW, &i);
 	canWindow = i;
@@ -650,7 +650,6 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(string& str) {
 ///////////////////////////////////////////////////////////////////////////////
 string
 DrawingSurfaceConfig::canonicalDescription() {
-
 	ostringstream s;
 
 #	if defined(__X11__)
@@ -718,7 +717,6 @@ DrawingSurfaceConfig::canonicalDescription() {
 	  << ' ' << mapVarToName[VTRANSA] << ' ' << transA
 	  << ' ' << mapVarToName[VTRANSI] << ' ' << transI;
 
-	s << '\0';
 	return s.str();
 } // DrawingSurfaceConfig::canonicalDescription
 
@@ -844,7 +842,6 @@ DrawingSurfaceConfig::conciseDescription() {
 			s << ", id " << pfdID;
 #	endif
 
-	s << '\0';
 	return s.str();
 } // DrawingSurfaceConfig::conciseDescription
 

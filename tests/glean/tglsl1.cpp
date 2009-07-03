@@ -41,6 +41,13 @@
 
 namespace GLEAN {
 
+static PFNGLTEXIMAGE3DPROC glTexImage3D_func = NULL;
+
+static PFNGLACTIVETEXTUREPROC glActiveTexture_func = NULL;
+
+static PFNGLPOINTPARAMETERFPROC glPointParameterf_func = NULL;
+static PFNGLPOINTPARAMETERFVPROC glPointParameterfv_func = NULL;
+static PFNGLSECONDARYCOLOR3FVPROC glSecondaryColor3fv_func = NULL;
 
 static PFNGLATTACHSHADERPROC glAttachShader_func = NULL;
 static PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation_func = NULL;
@@ -134,6 +141,7 @@ static const GLfloat MatDiffuse[4] = MAT_DIFFUSE;
 static const GLfloat LightDiffuse[4] = LIGHT_DIFFUSE;
 
 static const GLfloat Uniform1[4] = UNIFORM1;
+static const GLfloat UniformArray[4] = { 0.1, 0.25, 0.5, 0.75 };
 
 static const GLfloat PointAtten[3] = { PSIZE_ATTEN0, PSIZE_ATTEN1, PSIZE_ATTEN2 };
 static const GLfloat FogColor[4] = { FOG_R, FOG_G, FOG_B, FOG_A };
@@ -939,7 +947,7 @@ static const ShaderProgram Programs[] = {
 
 	// Flow Control ======================================================
 	{
-		"simple if statement",
+		"simple if statement, fragment shader",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   // this should always be true \n"
@@ -947,6 +955,23 @@ static const ShaderProgram Programs[] = {
 		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
 		"   } \n"
 		"} \n",
+		{ 0.5, 0.0, 0.5, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"simple if statement, vertex shader",
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   gl_Position = ftransform(); \n"
+		"   gl_FrontColor = vec4(0.0); \n"
+		"   // this should always be true \n"
+		"   if (uniform1.x >= 0.0) { \n"
+		"      gl_FrontColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
+		"   } \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
 		{ 0.5, 0.0, 0.5, 0.0 },
 		DONT_CARE_Z,
 		FLAG_NONE
@@ -967,7 +992,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"simple if/else statement",
+		"simple if/else statement, fragment shader",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   // this should always be false \n"
@@ -978,6 +1003,24 @@ static const ShaderProgram Programs[] = {
 		"   } \n"
 		"} \n",
 		{ 0.5, 0.25, 0.5, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"simple if/else statement, vertex shader",
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   gl_Position = ftransform(); \n"
+		"   // this should always be true \n"
+		"   if (uniform1.x >= 0.0) { \n"
+		"      gl_FrontColor = vec4(0.0, 1.0, 0.0, 0.0); \n"
+		"   } else { \n"
+		"      gl_FrontColor = vec4(1.0, 0.0, 0.0, 0.0); \n"
+		"   } \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.0, 1.0, 0.0, 0.0 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -1022,6 +1065,43 @@ static const ShaderProgram Programs[] = {
 		"      sum += vec4(0.1); \n"
 		"   } \n"
 		"   gl_FragColor = sum; \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"while-loop with continue",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   int i = 0; \n"
+		"   float sum = 0.0; \n"
+		"   while (i < 20) { \n"
+                "      ++i; \n"
+                "      if (i > 5) \n"
+                "         continue; \n"
+                "      sum += 0.1; \n"
+		"   } \n"
+		"   gl_FragColor = vec4(sum); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"for-loop with continue",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   int i; \n"
+		"   float sum = 0.0; \n"
+		"   for (i = 0; i < 20; ++i) { \n"
+                "      if (i > 4) \n"
+                "         continue; \n"
+                "      sum += 0.1; \n"
+		"   } \n"
+		"   gl_FragColor = vec4(sum); \n"
 		"} \n",
 		{ 0.5, 0.5, 0.5, 0.5 },
 		DONT_CARE_Z,
@@ -1090,6 +1170,23 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"discard statement in for loop",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+		"   gl_FragColor = vec4(1.0); \n"
+		"   int i; \n"
+		"   for (i = 0; i < 1000; i++) { \n"
+		"      if (i == 9) { \n"
+		"         discard; \n"
+		"      } \n"
+		"   } \n"
+		"} \n",
+		{ 0.0, 0.0, 0.0, 0.0 },  // glClear color
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
 		"conditional expression",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -1127,7 +1224,23 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"array with constant indexing",
+		"constant array with constant indexing, fragment shader",
+		NO_VERTEX_SHADER,
+                "uniform float uniformArray[4]; \n"
+		"void main() { \n"
+		"   gl_FragColor.x = uniformArray[0]; \n"
+		"   gl_FragColor.y = uniformArray[1]; \n"
+		"   gl_FragColor.z = uniformArray[2]; \n"
+		"   gl_FragColor.w = uniformArray[3]; \n"
+		"} \n",
+		{ UniformArray[0], UniformArray[1],
+                  UniformArray[2], UniformArray[3] },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"temp array with constant indexing, fragment shader",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   float ar[4]; \n"
@@ -1146,7 +1259,45 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"array with variable indexing",
+		"constant array with constant indexing, vertex shader",
+                "uniform float uniformArray[4]; \n"
+		"void main() { \n"
+		"   gl_FrontColor.x = uniformArray[0]; \n"
+		"   gl_FrontColor.y = uniformArray[1]; \n"
+		"   gl_FrontColor.z = uniformArray[2]; \n"
+		"   gl_FrontColor.w = uniformArray[3]; \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ UniformArray[0], UniformArray[1],
+                  UniformArray[2], UniformArray[3] },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"temp array with constant indexing, vertex shader",
+		"void main() { \n"
+		"   float ar[4]; \n"
+		"   ar[0] = 0.5; \n"
+		"   ar[1] = 1.0; \n"
+		"   ar[2] = 0.25; \n"
+		"   ar[3] = 0.2; \n"
+		"   gl_FrontColor.x = ar[0]; \n"
+		"   gl_FrontColor.y = ar[1]; \n"
+		"   gl_FrontColor.z = ar[2]; \n"
+		"   gl_FrontColor.w = ar[3]; \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.5, 1.0, 0.25, 0.2 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+#if 0
+	{
+		"temp array with variable indexing, fragment shader",
 		NO_VERTEX_SHADER,
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
@@ -1164,7 +1315,63 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"array with swizzled variable indexing",
+		"temp array with variable indexing, vertex shader",
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   float ar[4]; \n"
+		"   ar[0] = 0.0; \n"
+		"   ar[1] = 0.1; \n"
+		"   ar[2] = 0.5; \n"
+		"   ar[3] = 0.7; \n"
+                "   int indx = int(uniform1.y * 8.0);  // should be 2 \n"
+		"   gl_FrontColor = vec4(ar[indx]); \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+#endif
+	{
+		"constant array with variable indexing, vertex shader",
+                "uniform float uniformArray[4]; \n"
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+                "   int indx = int(uniform1.y * 8.0);  // should be 2 \n"
+		"   gl_FrontColor = vec4(uniformArray[indx]); \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		// This one tests that a different array index per vertex
+		// works as expected.  The left edge of the polygon should
+		// have a gray value = uniformArray[2] while the right
+		// edge of the polygon should have a gray value =
+		// uniformArray[3].
+		"constant array with variable indexing, vertex shader (2)",
+                "uniform float uniformArray[4]; \n"
+		"void main() { \n"
+                "   int indx = int(gl_MultiTexCoord0.x + 2.0);  // 2 or 3 \n"
+		"   gl_FrontColor = vec4(uniformArray[indx]); \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+                // If we read the center pixel we'd get the average of
+                // the Uniform[2] and Uniform[3] values here.  But we read
+                // an off-center pixel so this result was found emperically.
+                { 0.6, 0.6, 0.6, 0.6 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"temp array with swizzled variable indexing",
 		NO_VERTEX_SHADER,
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
@@ -1993,7 +2200,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"function with early return",
+		"function with early return (1)",
 		NO_VERTEX_SHADER,
 		"float minimum(in float x, in float y) { \n"
 		"   if (x < y) \n"
@@ -2007,6 +2214,44 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor = vec4(z); \n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"function with early return (2)",  // reverse case of above
+		NO_VERTEX_SHADER,
+		"float minimum(in float x, in float y) { \n"
+		"   if (x < y) \n"
+		"      return x; \n"
+		"   return y; \n"
+		"} \n"
+		"\n"
+		"void main() { \n"
+		"   float a = 0.25; \n"
+		"   float z = minimum(a, 0.5); \n"
+		"   gl_FragColor = vec4(z); \n"
+		"} \n",
+		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"function with early return (3)",
+		NO_VERTEX_SHADER,
+                "float val = 0.5; \n"
+		"void sub(in float x) { \n"
+		"   if (x > 0.0) \n"
+		"      return; \n"
+		"   val = 1.0; \n"
+		"} \n"
+		"\n"
+		"void main() { \n"
+		"   sub(1.0); \n"
+		"   gl_FragColor = vec4(val); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -2464,6 +2709,69 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
+	{
+		"Preprocessor test (4)",
+		NO_VERTEX_SHADER,
+		"#if 1 \n"
+		"#define FOO(x) x \n"
+		"#else \n"
+		"#define FOO(x) (0.5 * (x)) \n"
+		"#endif \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(FOO(0.25)); \n"
+		"} \n",
+		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"Preprocessor test (5)",
+		NO_VERTEX_SHADER,
+		"#define BAR(x) x \n"
+		"#if 1 \n"
+		"#define FOO(x) BAR(x) \n"
+		"#else \n"
+		"#define FOO(x) (BAR(x) + BAR(x)) \n"
+		"#endif \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(FOO(0.25)); \n"
+		"} \n",
+		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"Preprocessor test (6)",
+		NO_VERTEX_SHADER,
+		"#define BAR(x) x \n"
+		"#if 0 \n"
+		"#define FOO(x) BAR(x) \n"
+		"#else \n"
+		"#define FOO(x) (BAR(x) + BAR(x)) \n"
+		"#endif \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(FOO(0.25)); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"Preprocessor test (7)",
+		NO_VERTEX_SHADER,
+		"#define FOO(x) \\\n"
+                " ((x) + (x)) \n"
+		"void main() { \n"
+		"   gl_FragColor = vec4(FOO(0.25)); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
 	// Illegal shaders ==================================================
 	{
 		"undefined variable",
@@ -2556,6 +2864,17 @@ static const ShaderProgram Programs[] = {
 		"main() { \n"
 		"   float x = 1.0 2.0; \n"
 		"   gl_FragColor = vec4(0.5); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_ILLEGAL_SHADER
+	},
+
+	{
+		"TIntermediate::addUnaryMath",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+		"   -vec4(x ? 1.0 : -1.0); \n"
 		"} \n",
 		{ 0.5, 0.5, 0.5, 0.5 },
 		DONT_CARE_Z,
@@ -3032,10 +3351,25 @@ static const ShaderProgram Programs[] = {
 
 
 
-// Get ptrs to 2.0 API functions.
+// Get ptrs to API functions.
 bool
 GLSLTest::getFunctions(void)
 {
+	glTexImage3D_func = (PFNGLTEXIMAGE3DPROC) GLUtils::getProcAddress("glTexImage3D");
+	if (!glTexImage3D_func)
+		return false;
+	glActiveTexture_func = (PFNGLACTIVETEXTUREPROC) GLUtils::getProcAddress("glActiveTexture");
+	if (!glActiveTexture_func)
+		return false;
+	glPointParameterf_func = (PFNGLPOINTPARAMETERFPROC) GLUtils::getProcAddress("glPointParameterf");
+	if (!glPointParameterf_func)
+		return false;
+	glPointParameterfv_func = (PFNGLPOINTPARAMETERFVPROC) GLUtils::getProcAddress("glPointParameterfv");
+	if (!glPointParameterfv_func)
+		return false;
+	glSecondaryColor3fv_func = (PFNGLSECONDARYCOLOR3FVPROC) GLUtils::getProcAddress("glSecondaryColor3fv");
+	if (!glSecondaryColor3fv_func)
+		return false;
 	glAttachShader_func = (PFNGLATTACHSHADERPROC) GLUtils::getProcAddress("glAttachShader");
 	if (!glAttachShader_func)
 		return false;
@@ -3164,7 +3498,7 @@ GLSLTest::setupTextures(void)
 	glGenTextures(1, &obj3D);
 	glGenTextures(1, &objZ);
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture_func(GL_TEXTURE0);
 
 	//
 	// 2D texture, w/ mipmap
@@ -3283,7 +3617,7 @@ GLSLTest::setupTextures(void)
 		}
 	}
 	glBindTexture(GL_TEXTURE_3D, obj3D);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 16, 16, 16, 0,
+	glTexImage3D_func(GL_TEXTURE_3D, 0, GL_RGBA, 16, 16, 16, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, teximage3D);
 
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -3300,7 +3634,7 @@ GLSLTest::setupTextures(void)
 				teximageZ[i][j] = 0.75;
 		}
 	}
-	glActiveTexture(GL_TEXTURE1); // NOTE: Unit 1
+	glActiveTexture_func(GL_TEXTURE1); // NOTE: Unit 1
 	glBindTexture(GL_TEXTURE_2D, objZ);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 16, 16, 0,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, teximageZ);
@@ -3309,7 +3643,7 @@ GLSLTest::setupTextures(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB,
 					GL_COMPARE_R_TO_TEXTURE_ARB);
 	
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture_func(GL_TEXTURE0);
 }
 
 
@@ -3324,9 +3658,9 @@ GLSLTest::setupTextureMatrix1(void)
 		0.1, 0.2, 0.3, 1.0   // col 3
 	};
 	glMatrixMode(GL_TEXTURE);
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture_func(GL_TEXTURE1);
 	glLoadMatrixf(m);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture_func(GL_TEXTURE0);
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -3356,17 +3690,17 @@ GLSLTest::setup(void)
 
 	// load program inputs
 	glColor4fv(PrimaryColor);
-	glSecondaryColor3fv(SecondaryColor);
+	glSecondaryColor3fv_func(SecondaryColor);
 
 	// other GL state
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MatDiffuse);
 	glPointSize(PSIZE);
-	glPointParameterf(GL_POINT_SIZE_MIN, PSIZE_MIN);
-	glPointParameterf(GL_POINT_SIZE_MAX, PSIZE_MAX);
-	glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, PSIZE_THRESH);
-	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, PointAtten);
+	glPointParameterf_func(GL_POINT_SIZE_MIN, PSIZE_MIN);
+	glPointParameterf_func(GL_POINT_SIZE_MAX, PSIZE_MAX);
+	glPointParameterf_func(GL_POINT_FADE_THRESHOLD_SIZE, PSIZE_THRESH);
+	glPointParameterfv_func(GL_POINT_DISTANCE_ATTENUATION, PointAtten);
 	glFogf(GL_FOG_START, FOG_START);
 	glFogf(GL_FOG_END, FOG_END);
 	glFogfv(GL_FOG_COLOR, FogColor);
@@ -3542,7 +3876,7 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	};
 	const GLfloat r = 0.62; // XXX draw 16x16 pixel quad
 	GLuint fragShader = 0, vertShader = 0, program = 0;
-	GLint u1, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
+	GLint u1, uArray, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
 	GLint umat2x4, umat2x4t, umat4x3, umat4x3t;
 	bool retVal = false;
 
@@ -3633,6 +3967,10 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	u1 = glGetUniformLocation_func(program, "uniform1");
 	if (u1 >= 0)
 		glUniform4fv_func(u1, 1, Uniform1);
+
+	uArray = glGetUniformLocation_func(program, "uniformArray");
+	if (uArray >= 0)
+		glUniform1fv_func(uArray, 4, UniformArray);
 
 	utex1d = glGetUniformLocation_func(program, "tex1d");
 	if (utex1d >= 0)
@@ -3759,6 +4097,7 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 	// If you just want to run a single sub-test, assign the name to singleTest.
 	const char *singleTest = getenv("GLSL_TEST");
 	if (singleTest) {
+		env->log << "glsl1: Running single test: " << singleTest << "\n";
 		for (int i = 0; Programs[i].name; i++) {
 			if (strcmp(Programs[i].name, singleTest) == 0) {
 				r.numPassed = testProgram(Programs[i]);

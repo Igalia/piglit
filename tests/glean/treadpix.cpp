@@ -501,6 +501,11 @@ readPixSanityTest("readPixSanity", "1",
 
 namespace {
 
+// Mac OS header file AssertMacros.h defines check as a macro. 
+#ifdef check
+#undef check
+#endif
+
 template<class T>
 void
 check(GLEAN::ExactRGBAResult::Flavor& r, GLEAN::DrawingSurfaceConfig& config,

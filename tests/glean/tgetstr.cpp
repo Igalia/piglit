@@ -28,10 +28,10 @@
 
 // tgetstr.cpp:  implementation of OpenGL glGetString() tests
 
-using namespace std;
-
 #include "tgetstr.h"
 #include <algorithm>
+
+using namespace std;
 
 namespace GLEAN {
 

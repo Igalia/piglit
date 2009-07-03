@@ -31,8 +31,6 @@
 
 // winsys.cpp:  implementation of window-system services class
 
-using namespace std;
-
 #include <iostream>
 #include "options.h"
 #include "winsys.h"
@@ -40,6 +38,8 @@ using namespace std;
 #include "dsfilt.h"
 #include "dsurf.h"
 #include "rc.h"
+
+using namespace std;
 
 namespace GLEAN {
 
