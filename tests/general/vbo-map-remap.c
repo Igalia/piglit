@@ -60,15 +60,14 @@ init()
 }
 
 static void
-vbo_write_floats_mapped(float *varray, int count)
+vbo_write_floats_mapped(const float *varray, size_t count)
 {
 	float *ptr = glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
-	int i;
 
-	for (i = 0; i < count; ++i) {
-		*ptr = varray[i];
-		++ptr;
-	}
+	if (ptr == NULL)
+		piglit_report_result(PIGLIT_FAILURE);
+
+	memcpy(ptr, varray, count * sizeof(GLfloat));
 
 	if (!glUnmapBufferARB(GL_ARRAY_BUFFER_ARB))
 		piglit_report_result(PIGLIT_FAILURE);
