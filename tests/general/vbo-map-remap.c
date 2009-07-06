@@ -53,8 +53,6 @@ init()
 	glPushMatrix();
 	glLoadIdentity();
 
-	glEnable(GL_VERTEX_ARRAY);
-
 	glGenBuffersARB(1, &vbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 12 * sizeof(GLfloat),
