@@ -110,8 +110,6 @@ static void display()
 
 	if (Automatic) {
 		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		printf("PIGLIT: {'result': '%s' }\n", pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
 	}
 }
 
