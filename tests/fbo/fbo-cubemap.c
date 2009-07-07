@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
@@ -250,6 +251,8 @@ int main(int argc, char**argv)
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("buffer_sync");
 	glutDisplayFunc(display);
+
+	glewInit();
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_cube_map");
