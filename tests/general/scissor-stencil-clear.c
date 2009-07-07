@@ -25,9 +25,9 @@
  *
  */
 
-/** @file scissor-copypixels.c
+/** @file scissor-stencil-clear.c
  *
- * Tests that glScissor properly affects glCopyPixels().
+ * Tests that glScissor properly affects glClear of the stencil buffer.
  */
 
 #include <string.h>
