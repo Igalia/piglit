@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
@@ -249,6 +250,7 @@ int main(int argc, char *argv[])
 	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
 	glutDisplayFunc(Redisplay);
+	glewInit();
 	Init();
 	glutMainLoop();
 	return 0;
