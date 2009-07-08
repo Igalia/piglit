@@ -25,14 +25,15 @@
  *
  */
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
+#include <GL/glext.h>
 #endif
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #define WIN_WIDTH 200
 #define WIN_HEIGHT 200
@@ -65,9 +66,11 @@ static GLboolean inrect(int x, int y, int x1, int y1, int x2, int y2)
 static GLboolean
 check_results(int dstx, int dsty, int w, int h)
 {
-	GLfloat results[w * h][4];
+	GLfloat *results;
 	GLboolean pass = GL_TRUE;
 	int x, y;
+
+	results = malloc(w * h * 4 * sizeof(GLfloat));
 
 	/* Check the results */
 	glReadPixels(dstx, dsty, w, h, GL_RGBA, GL_FLOAT, results);
@@ -89,17 +92,17 @@ check_results(int dstx, int dsty, int w, int h)
 				expected[2] = 0.0;
 			}
 
-			if (results[y * w + x][0] != expected[0] ||
-			    results[y * w + x][1] != expected[1] ||
-			    results[y * w + x][2] != expected[2]) {
+			if (results[(y * w + x) * 4 + 0] != expected[0] ||
+			    results[(y * w + x) * 4 + 1] != expected[1] ||
+			    results[(y * w + x) * 4 + 2] != expected[2]) {
 				printf("Expected at (%d,%d): %f,%f,%f\n",
 				       x, y,
 				       expected[0], expected[1], expected[2]);
 				printf("Probed at   (%d,%d): %f,%f,%f\n",
 				       x, y,
-				       results[y * w + x][0],
-				       results[y * w + x][1],
-				       results[y * w + x][2]);
+				       results[(y * w + x) * 4 + 0],
+				       results[(y * w + x) * 4 + 1],
+				       results[(y * w + x) * 4 + 2]);
 				pass = GL_FALSE;
 			}
 		}
