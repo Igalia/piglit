@@ -108,6 +108,7 @@ check_results(int dstx, int dsty, int w, int h)
 		}
 	}
 
+	free(results);
 	return pass;
 }
 
