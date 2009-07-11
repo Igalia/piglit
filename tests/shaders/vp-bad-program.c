@@ -84,7 +84,7 @@ display(void)
 		failed++;
 
 		while (err != 0)
-			glGetError();
+			err = glGetError();
 	}
 
 	/* Check that we correctly produce GL_INVALID_OPERATION when rendering
@@ -109,7 +109,7 @@ display(void)
 		failed++;
 
 		while (err != 0)
-			glGetError();
+			err = glGetError();
 	}
 
 	/* Check that we correctly produce GL_INVALID_OPERATION when doing
@@ -129,7 +129,7 @@ display(void)
 		failed++;
 
 		while (err != 0)
-			glGetError();
+			err = glGetError();
 	}
 
 	if (automatic) {
