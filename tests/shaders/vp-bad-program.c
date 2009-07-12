@@ -117,10 +117,10 @@ display(void)
 	 */
 
 	glVertexPointer(3, GL_FLOAT, 0, vertcoords);
-	glEnable(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	glDrawArrays(GL_POLYGON, 0, 4);
 	err = glGetError();
-	glDisable(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 
 	if (err != GL_INVALID_OPERATION) {
 		printf("Unexpected OpenGL error state %d in glDrawArrays() "
