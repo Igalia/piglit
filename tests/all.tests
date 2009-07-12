@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 # All tests that come with piglit, using default settings
 
 import re
@@ -105,6 +106,14 @@ fpgeneric['dph'] = make_fpgeneric('dph.fp')
 fpgeneric['kil-swizzle'] = make_fpgeneric('kil-swizzle.fp')
 fpgeneric['lrp_sat'] = make_fpgeneric('lrp_sat.fp')
 shaders['fp-generic'] = fpgeneric
+
+vpfpgeneric = Group()
+def make_vpfpgeneric(name):
+	return PlainExecTest([testBinDir + 'vpfp-generic', testBinDir + '../tests/shaders/generic/' + name])
+vpfpgeneric['fogcoord-dp3'] = make_fpgeneric('fogcoord-dp3.vpfp')
+vpfpgeneric['fogcoord-dph'] = make_fpgeneric('fogcoord-dph.vpfp')
+vpfpgeneric['fogcoord-dp4'] = make_fpgeneric('fogcoord-dp4.vpfp')
+shaders['vpfp-generic'] = vpfpgeneric
 
 bugs = Group()
 bugs['crash-cubemap-order'] = PlainExecTest([testBinDir + 'crash-cubemap-order'])
