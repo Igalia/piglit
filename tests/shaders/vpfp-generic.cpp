@@ -162,7 +162,6 @@ bool Test::run()
 	for(vector<TestParameter*>::iterator pparm = parameters.begin(); pparm != parameters.end(); ++pparm)
 		(*pparm)->teardown();
 
-	glReadBuffer(GL_BACK);
 	if (!piglit_probe_pixel_rgba(Width/2, Height/2, expected)) {
 		fprintf(stderr, "Test %s failed\n", name.c_str());
 		return false;
