@@ -160,6 +160,7 @@ texturing['texdepth'] = PlainExecTest([testBinDir + 'texdepth', '-auto'])
 texturing['texrect-many'] = PlainExecTest([testBinDir + 'texrect-many', '-auto'])
 texturing['texredefine'] = PlainExecTest([testBinDir + 'texredefine', '-auto'])
 texturing['tfp'] = PlainExecTest([testBinDir + 'tfp', '-auto'])
+texturing['depth-tex-modes'] = PlainExecTest([testBinDir + 'depth-tex-modes', '-auto'])
 
 glslparsertest = Group()
 glslparsertest['CorrectBuiltInOveride.frag'] = PlainExecTest([testBinDir + 'glslparsertest', 'tests/glslparsertest/shaders/CorrectBuiltInOveride.frag', 'pass'])
