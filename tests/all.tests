@@ -73,6 +73,7 @@ fbo['fbo-readpixels'] = PlainExecTest([testBinDir + 'fbo-readpixels', '-auto'])
 
 general = Group()
 general['clear-varray-2.0'] = PlainExecTest([testBinDir + 'clear-varray-2.0', '-auto'])
+general['depthrange-clear'] = PlainExecTest([testBinDir + 'depthrange-clear', '-auto'])
 general['dlist-clear'] = PlainExecTest([testBinDir + 'dlist-clear', '-auto'])
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])

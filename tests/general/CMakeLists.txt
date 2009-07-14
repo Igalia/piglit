@@ -22,6 +22,7 @@ link_libraries (
 
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (dlist-clear dlist-clear.c)
+add_executable (depthrange-clear depthrange-clear.c)
 add_executable (linestipple linestipple.c)
 add_executable (read-front read-front.c)
 add_executable (scissor-copypixels scissor-copypixels.c)
