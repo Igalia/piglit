@@ -74,11 +74,11 @@ draw_rect(float x, float y, float w, float h, float d)
 	verts[3][3] = 1.0;
 
 	glVertexPointer(4, GL_FLOAT, 0, verts);
-	glEnable(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 
 	glDrawArrays(GL_QUADS, 0, 4);
 
-	glDisable(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 static void
