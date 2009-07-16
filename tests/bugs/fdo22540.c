@@ -39,8 +39,6 @@
 static GLboolean Automatic = GL_FALSE;
 static GLuint vBuffer;
 
-extern void *glutGetProcAddress(const GLubyte *);
-
 static void
 Init(void)
 {
