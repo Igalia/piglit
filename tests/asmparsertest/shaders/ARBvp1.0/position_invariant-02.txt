@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# Writing to result.position with ARB_position_invariant
+	OPTION	ARB_position_invariant;
+
+	MOV	result.position, program.env[0];
+	END

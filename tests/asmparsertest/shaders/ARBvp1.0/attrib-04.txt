@@ -1,0 +1,10 @@
+!!ARBvp1.0
+# FAIL
+# Access to fixed-function and generic version of same attribute
+
+	ATTRIB	a = vertex.normal;
+	ATTRIB	b = vertex.attrib[2];
+
+
+	MOV	result.position, vertex.position;
+	END

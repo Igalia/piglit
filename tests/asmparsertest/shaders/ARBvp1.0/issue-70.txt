@@ -1,0 +1,12 @@
+!!ARBvp1.0
+	ATTRIB  pos = vertex.position;
+	TEMP    res, temp;
+	PARAM   mat[4] = { state.matrix.modelview };
+
+	DP4     res.w, pos, mat[3];
+	DP4     res.x, pos, mat[0];
+	DP4     res.y, pos, mat[1];
+	DP4     res.z, pos, mat[2];
+	RCP     temp.w, res.w;
+	MUL     res, res, temp.w;
+	END

@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Array / non-array mismatch
+
+	PARAM	cc = state.matrix.texture.row[0].transpose;
+	END

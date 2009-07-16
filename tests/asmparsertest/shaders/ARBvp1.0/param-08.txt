@@ -1,0 +1,10 @@
+!!ARBvp1.0
+# FAIL
+# Parameter multiply bound in relative-addressed arrays
+
+	PARAM	a[2] = { program.env[0], program.env[0] };
+	ADDRESS	A0;
+
+	ARL	A0.x, vertex.position.w;
+	MOV	result.position, a[A0.x];
+	END

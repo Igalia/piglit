@@ -1,0 +1,10 @@
+!!ARBvp1.0
+# FAIL
+# Invalid array index
+	ADDRESS	A0;
+	TEMP	R0, R1;
+	PARAM   M[] = { program.local[ 0 .. 3 ] };
+
+	ARL	A0.x, R0.x;
+	MOV	R0, M[ R1.x ];
+	END

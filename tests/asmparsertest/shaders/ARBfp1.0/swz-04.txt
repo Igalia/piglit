@@ -1,0 +1,7 @@
+!!ARBfp1.0
+# FAIL
+# invalid extended swizzle selector
+	TEMP	R0;
+
+	SWZ	R0, fragment.color, xcellent, y, z, w;
+	END

@@ -1,0 +1,32 @@
+!!ARBvp1.0
+	TEMP	R0;
+
+	# These should be okay.
+	MOV	R0, 1.0;
+	MOV	R0, .1;
+	MOV	R0, 1.;
+
+	MOV	R0, 1E2;
+	MOV	R0, 1E+2;
+	MOV	R0, 1E-2;
+
+	MOV	R0, 1.1E2;
+	MOV	R0, 1.1E+2;
+	MOV	R0, 1.1E-2;
+
+	MOV	R0, .1E2;
+	MOV	R0, .1E+2;
+	MOV	R0, .1E-2;
+
+	MOV	R0, 1e2;
+	MOV	R0, 1e+2;
+	MOV	R0, 1e-2;
+
+	MOV	R0, 1.1e2;
+	MOV	R0, 1.1e+2;
+	MOV	R0, 1.1e-2;
+
+	MOV	R0, .1e2;
+	MOV	R0, .1e+2;
+	MOV	R0, .1e-2;
+	END

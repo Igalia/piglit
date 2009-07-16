@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Invalid array subrange
+
+	PARAM	aa[] = { state.matrix.texture[0..3].row[0] };
+	END

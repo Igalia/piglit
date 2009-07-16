@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# R1 undefined
+	TEMP	R0;
+	ALIAS	R1p = R1;
+
+	END

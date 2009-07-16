@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL
+# invalid address writemask
+	ADDRESS	A0;
+	TEMP	R0;
+
+	ARL	A0.y, R0.x;
+	END

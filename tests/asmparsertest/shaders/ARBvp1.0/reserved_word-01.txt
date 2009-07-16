@@ -1,0 +1,4 @@
+!!ARBvp1.0
+# FAIL
+	TEMP	vertex;
+	END

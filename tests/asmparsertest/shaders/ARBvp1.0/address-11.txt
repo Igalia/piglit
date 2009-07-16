@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# FAIL
+# Out of bounds array access
+	TEMP	R0;
+	PARAM   M[] = { program.local[ 0 .. 3 ] };
+
+	# These lines should be okay.
+	MOV	R0, M[4];
+	END

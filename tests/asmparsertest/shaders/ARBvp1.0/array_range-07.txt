@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# FAIL
+# Can't subrange state structures
+	PARAM	g[] = { state.light[ 0 .. 7 ].diffuse };
+	END

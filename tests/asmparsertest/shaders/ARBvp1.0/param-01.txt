@@ -1,0 +1,18 @@
+!!ARBvp1.0
+
+	# These should be okay.
+	PARAM	a = 1.0;
+	PARAM	b = { 1.0, 2.0, 3.0, 4.0 };
+	PARAM	c = state.material.diffuse;
+	PARAM	d = program.local[0];
+	PARAM	e = program.env[0];
+	PARAM	f[] = { program.env[0] };
+	PARAM	g[1] = { program.env[0] };
+	PARAM	h[] = { program.env[0..3] };
+	PARAM	i[4] = { program.env[0..3] };
+	PARAM	j[8] = { program.env[0..3], program.local[4..7] };
+
+	TEMP	R0;
+
+	MOV	R0, j[4];
+	END

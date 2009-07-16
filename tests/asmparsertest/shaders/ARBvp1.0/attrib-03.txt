@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# Access to fixed-function and generic version of same attribute
+
+	MOV	result.position, vertex.normal;
+	MOV	result.texcoord[0], vertex.attrib[2];
+	END

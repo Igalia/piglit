@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL
+# Array access to non-PARAM
+
+	TEMP	R0, R1;
+
+	MOV	R0, R1[0];
+	END

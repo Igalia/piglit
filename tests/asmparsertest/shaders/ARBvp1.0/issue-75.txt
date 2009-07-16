@@ -1,0 +1,27 @@
+!!ARBvp1.0
+#
+# Program environment parameters:
+# c[0].xyz = normalized light direction in object-space
+#
+# outputs diffuse illumination for color and perturbed position
+#
+	ATTRIB iPos         = vertex.position;
+	ATTRIB iNormal      = vertex.normal;
+	PARAM  mvp[4]       = { state.matrix.mvp };
+	PARAM  lightDir     = program.env[0];
+	PARAM  diffuseCol   = { 1, 1, 0, 1 };
+	TEMP   temp;
+	OUTPUT oPos         = result.position;
+	OUTPUT oColor       = result.color;
+
+	DP3   temp, lightDir, iNormal;
+	MUL   oColor.xyz, temp, diffuseCol;
+	MAX   temp, temp, 0;            # clamp dot product to zero
+	MUL   temp, temp, iNormal;      # align in direction of normal
+	MUL   temp, temp, 0.125;        # scale displacement by 1/8
+	SUB   temp, temp, iPos;         # perturb
+	DP4   oPos.x, mvp[0], temp;     # xform using perturbed position
+	DP4   oPos.y, mvp[1], temp;
+	DP4   oPos.z, mvp[2], temp;
+	DP4   oPos.w, mvp[3], temp;
+	END

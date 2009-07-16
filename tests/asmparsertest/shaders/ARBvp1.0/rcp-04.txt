@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# Vector source
+	TEMP	R0, R1;
+
+	RCP	R0, R1.xxxx;
+	END

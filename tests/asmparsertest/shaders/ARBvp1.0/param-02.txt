@@ -1,0 +1,10 @@
+!!ARBvp1.0
+# FAIL
+# Array access to non-array parameter
+
+	PARAM	diff = state.material.diffuse;
+	TEMP	R0;
+	ADDRESS	A0;
+
+	MOV	R0, diff[0];
+	END

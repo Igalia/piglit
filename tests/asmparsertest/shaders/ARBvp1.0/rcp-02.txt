@@ -1,0 +1,13 @@
+!!ARBvp1.0
+	TEMP	R0, R1;
+
+	# These should be okay.
+#	RCP	R0, R1.x;
+#	RCP	R0, R1.y;
+#	RCP	R0, R1.z;
+#	RCP	R0, R1.w;
+#	RCP	R0.w, R1.x;
+	RCP	R0.xy, R1.y;
+#	RCP	R0.x, R1.z;
+#	RCP	R0.yw, R1.w;
+	END

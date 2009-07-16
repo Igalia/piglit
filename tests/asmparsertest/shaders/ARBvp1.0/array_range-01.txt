@@ -1,0 +1,11 @@
+!!ARBvp1.0
+	PARAM	a[2] = { 1.0, 2.0 };
+	PARAM	b[1] = { 1.0 };
+	PARAM	c[4] = { state.matrix.mvp };
+	PARAM	d[1] = { state.matrix.mvp.row[0] };
+	PARAM	e[2] = { state.matrix.mvp.row[1 .. 2] };
+	PARAM	f[8] = { program.local[0 .. 7] };
+	PARAM	h[4] = { state.matrix.texture[0].row[0..3] };
+	PARAM	i[4] = { state.matrix.texture.inverse.row[0..3] };
+	PARAM	j = state.matrix.texture.inverse.row[0];
+	END

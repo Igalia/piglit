@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Not a param
+
+	PARAM	aa = vertex.color;
+	END

@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# First index is greater than second
+
+	PARAM	a[] = { state.matrix.modelview.row[ 3 .. 0 ];
+	END

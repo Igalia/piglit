@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# invalid extended swizzle selector
+	TEMP	R0;
+
+	SWZ	R0, vertex.color, xcellent, y, z, w;
+	END

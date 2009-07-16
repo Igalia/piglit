@@ -1,0 +1,3 @@
+!!ARBvp1.0
+	OUTPUT	a = result.color;
+	END

@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Array size mismatch
+
+	PARAM	bb[4] = { state.matrix.texture.inverse.transpose.row[0..3] };
+	END

@@ -1,0 +1,11 @@
+!!ARBvp1.0
+# FAIL
+# invalid address component selector
+
+	ADDRESS	A0;
+	TEMP	R0;
+	PARAM   M[] = { program.local[ 0 .. 3 ] };
+
+	ARL	A0.x, R0.x;
+	MOV	R0, M[ A0.xxxx ];
+	END

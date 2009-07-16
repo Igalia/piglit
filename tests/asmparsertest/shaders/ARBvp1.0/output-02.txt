@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# FAIL
+# Not an output
+	OUTPUT	aa = vertex.color;
+	END

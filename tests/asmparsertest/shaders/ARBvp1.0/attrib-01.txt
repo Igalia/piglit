@@ -1,0 +1,9 @@
+!!ARBvp1.0
+	ATTRIB	a = vertex.position;
+	ATTRIB	b = vertex.normal;
+	ATTRIB	c = vertex.color.primary;
+	ATTRIB	d = vertex.color.secondary;
+	ATTRIB	e = vertex.fogcoord;
+	ATTRIB	f = vertex.texcoord;
+
+	END

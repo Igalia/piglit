@@ -1,0 +1,7 @@
+!!ARBvp1.0
+	# Should compile successfully
+	ADDRESS	A0;
+	TEMP	R0;
+
+	ARL	A0.x, R0.x;
+	END

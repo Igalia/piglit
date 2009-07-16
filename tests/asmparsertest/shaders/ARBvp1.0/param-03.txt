@@ -1,0 +1,10 @@
+!!ARBvp1.0
+# FAIL
+# Access to undeclared variable
+
+	PARAM	diff[1] = { state.material.diffuse };
+	TEMP	R0;
+	ADDRESS	A0;
+
+	MOV	R0, spec[0];
+	END

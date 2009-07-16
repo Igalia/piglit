@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL
+# due to variable redeclaration
+	ADDRESS	A0;
+	TEMP	A0, R0;
+
+	ARL	A0.x, R0.x;
+	END

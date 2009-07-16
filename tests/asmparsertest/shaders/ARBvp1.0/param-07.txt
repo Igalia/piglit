@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL
+# Non-array access to array param
+
+	PARAM	a[1] = { program.env[0] };
+
+	MOV	result.position, a;
+	END

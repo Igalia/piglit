@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Invalid local parameter
+	TEMP	R0;
+	MOV	R0, program.local[100000];
+	END

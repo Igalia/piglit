@@ -1,0 +1,5 @@
+!!ARBfp1.0
+# FAIL
+	TEMP	R0;
+	MOV	result.texcoord[1], R0;
+	END

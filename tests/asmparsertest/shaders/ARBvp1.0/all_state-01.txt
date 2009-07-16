@@ -1,0 +1,59 @@
+!!ARBvp1.0
+	TEMP	r0 ;
+	ADDRESS	a0 ;
+	MOV	r0, state.material.ambient ;
+	MOV	r0, state.material.diffuse ;
+	MOV	r0, state.material.specular ;
+	MOV	r0, state.material.emission ;
+	MOV	r0, state.material.shininess ;
+
+	MOV	r0, state.material.front.ambient ;
+	MOV	r0, state.material.front.diffuse ;
+	MOV	r0, state.material.front.specular ;
+	MOV	r0, state.material.front.emission ;
+	MOV	r0, state.material.front.shininess ;
+
+	MOV	r0, state.material.back.ambient ;
+	MOV	r0, state.material.back.diffuse ;
+	MOV	r0, state.material.back.specular ;
+	MOV	r0, state.material.back.emission ;
+	MOV	r0, state.material.back.shininess ;
+
+	MOV	r0, state.light[0].ambient ;
+	MOV	r0, state.light[0].diffuse ;
+	MOV	r0, state.light[0].specular ;
+	MOV	r0, state.light[0].position ;
+	MOV	r0, state.light[0].attenuation ;
+	MOV	r0, state.light[0].spot.direction ;
+	MOV	r0, state.light[0].half ;
+
+	MOV	r0, state.lightmodel.ambient ;
+	MOV	r0, state.lightmodel.scenecolor ;
+	MOV	r0, state.lightmodel.front.scenecolor ;
+	MOV	r0, state.lightmodel.back.scenecolor ;
+
+	# Do state.lightprod[n] here.
+
+	MOV	r0, state.lightprod[0].ambient ;
+	MOV	r0, state.lightprod[0].diffuse ;
+	MOV	r0, state.lightprod[0].specular ;
+	MOV	r0, state.lightprod[0].front.ambient ;
+	MOV	r0, state.lightprod[0].front.diffuse ;
+	MOV	r0, state.lightprod[0].front.specular ;
+	MOV	r0, state.lightprod[0].back.ambient ;
+	MOV	r0, state.lightprod[0].back.diffuse ;
+	MOV	r0, state.lightprod[0].back.specular ;
+
+	# Do state.texture[n].texgen here.
+
+	MOV	r0, state.fog.color ;
+	MOV	r0, state.fog.params ;
+
+	# Do state.clip[n] here.
+
+	MOV	r0, state.point.size ;
+	MOV	r0, state.point.attenuation ;
+
+	# Do state.matrix here.
+
+	END

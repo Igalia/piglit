@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Invalid array size
+
+	PARAM	cc[0] = { program.env[0] };
+	END

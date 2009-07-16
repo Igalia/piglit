@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL
+# Invalid state
+
+	MOV	r0, state.lightprod.front.specular ;
+	END
