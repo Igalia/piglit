@@ -7,4 +7,5 @@ include_directories(
 
 add_library (piglitutil
 	    piglit-util.c
+	    shader-load.c
 )
