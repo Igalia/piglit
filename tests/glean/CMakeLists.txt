@@ -21,7 +21,9 @@ add_executable (glean
 	tbasicperf.cpp
 	tbinding.cpp
 	tblend.cpp
+	tbufferobject.cpp
 	tchgperf.cpp
+	tclipflat.cpp
 	tdepthstencil.cpp
 	test.cpp
 	tfbo.cpp
