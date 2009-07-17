@@ -13,7 +13,6 @@ link_directories (
 )
 
 link_libraries (
-	mesautil
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
