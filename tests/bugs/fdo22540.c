@@ -81,6 +81,9 @@ vboMap(void)
 static void
 display(void)
 {
+	GLfloat gray[3] = {0.5, 0.5, 0.5};
+	GLboolean pass;
+
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vBuffer);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0 ,0);
@@ -89,9 +92,7 @@ display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	GLfloat gray[3] = {0.5, 0.5, 0.5};
-
-	GLboolean pass = vboMap();
+	pass = vboMap();
 	pass = pass && piglit_probe_pixel_rgb(200, 150, gray);
 
 	glFinish();
