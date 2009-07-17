@@ -133,8 +133,8 @@ display(void)
 static void
 loadTex(void)
 {
-	const int height = 2;
-	const int width = 2;
+	#define height 2
+	#define width 2
 	int i, j;
 
 	GLfloat texData[width][height][4];
