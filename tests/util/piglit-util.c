@@ -350,7 +350,7 @@ piglit_compile_shader(GLenum target, char *filename)
 		exit(1);
 	}
 
-	f = fopen(filename, "ro");
+	f = fopen(filename, "r");
 	if (f == NULL) {
 		fprintf(stderr, "Couldn't open program: %s\n", strerror(errno));
 		exit(1);

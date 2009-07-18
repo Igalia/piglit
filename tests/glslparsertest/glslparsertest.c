@@ -92,7 +92,7 @@ display()
 		exit(1);
 	}
 
-	f = fopen(filename, "ro");
+	f = fopen(filename, "r");
 	if (f == NULL) {
 		fprintf(stderr, "Couldn't open program %s: %s\n",
 			filename, strerror(errno));
