@@ -6,17 +6,18 @@
  * (Prompted by a bug in R300 where the driver ran out of indirections).
  */
 
-#define GL_GLEXT_PROTOTYPES
+#include <assert.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include "GL/glut.h"
 #endif
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "piglit-util.h"
 
@@ -81,6 +82,7 @@ static int DoTest(void)
 			GLfloat probe[4];
 			GLfloat delta[4];
 			int i;
+			int clr;
 
 			glReadPixels((2*x+1)*Width/32, (2*y+1)*Height/22,
 				1, 1, GL_RGBA, GL_FLOAT, probe);
@@ -88,7 +90,7 @@ static int DoTest(void)
 			printf("   %i/%i: %f,%f,%f,%f", x, y,
 				probe[0], probe[1], probe[2], probe[3]);
 
-			int clr = (x+y)%7;
+			clr = (x+y)%7;
 			for(i = 0; i < 4; ++i) {
 				delta[i] = probe[i] - colors[clr][i]/255.0;
 
@@ -151,10 +153,10 @@ static void Key(unsigned char key, int x, int y)
 static void init()
 {
 	int i;
+	int maxtextures;
 
 	piglit_require_extension("GL_ARB_texture_rectangle");
 
-	int maxtextures;
 	glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxtextures);
 	if (maxtextures < NumTextures)
 		NumTextures = maxtextures;
@@ -205,6 +207,7 @@ int main(int argc, char**argv)
 	glutReshapeFunc(Reshape);
 	glutKeyboardFunc(Key);
 	glutDisplayFunc(Display);
+	glewInit();
 	init();
 	glutMainLoop();
 	return 0;
