@@ -41,7 +41,8 @@ class PlainExecTest(Test):
 		proc = subprocess.Popen(
 			self.command,
 			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE
+			stderr=subprocess.PIPE,
+			universal_newlines=True
 		)
 		out,err = proc.communicate()
 
