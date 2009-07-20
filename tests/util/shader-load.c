@@ -40,6 +40,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 char *piglit_load_text_file(const char *file_name, unsigned *size)
