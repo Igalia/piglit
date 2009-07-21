@@ -168,6 +168,9 @@ static void Init(void)
 	if (atof((const char *) glGetString(GL_VERSION)) >= 1.4) {
 #if defined(__APPLE__)
 		pglFogCoordf = &glFogCoordf;
+#elif defined(_MSC_VER)
+		pglFogCoordf = (PFNGLFOGCOORDFPROC)
+			wglGetProcAddress("glFogCoordf");
 #else
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			glutGetProcAddress("glFogCoordf");
@@ -175,6 +178,9 @@ static void Init(void)
 	} else if (glutExtensionSupported("GL_EXT_fog_coord")) {
 #if defined(__APPLE__)
 		pglFogCoordf = &glFogCoordfEXT;
+#elif defined(_MSC_VER)
+		pglFogCoordf = (PFNGLFOGCOORDFPROC)
+			wglGetProcAddress("glFogCoordfEXT");
 #else
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			glutGetProcAddress("glFogCoordfEXT");
