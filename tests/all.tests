@@ -77,6 +77,7 @@ general['depthrange-clear'] = PlainExecTest([testBinDir + 'depthrange-clear', '-
 general['dlist-clear'] = PlainExecTest([testBinDir + 'dlist-clear', '-auto'])
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])
+general['provoking-vertex'] = PlainExecTest([testBinDir + 'provoking-vertex', '-auto'])
 general['read-front'] = PlainExecTest([testBinDir + 'read-front', '-auto'])
 general['scissor-copypixels'] = PlainExecTest([testBinDir + 'scissor-copypixels', '-auto'])
 general['scissor-depth-clear'] = PlainExecTest([testBinDir + 'scissor-depth-clear', '-auto'])
