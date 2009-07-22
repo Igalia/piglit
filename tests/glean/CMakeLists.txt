@@ -1,7 +1,13 @@
+if (MSVC)
+	add_definitions ( -D__WIN__ -D__MS__ )
+ELSE ()
+	add_definitions ( -D__X11__ -D__UNIX__ )
+ENDIF ()
 
-add_definitions ( -D__X11__ -D__UNIX__ )
-
-include_directories( ${OPENGL_INCLUDE_PATH} )
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	${TIFF_INCLUDE_DIR}
+)
 
 add_executable (glean
 	codedid.cpp
