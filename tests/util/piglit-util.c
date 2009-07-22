@@ -21,6 +21,10 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -221,6 +225,10 @@ PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
 
 static void get_program_functions(void)
 {
+#if defined(_MSC_VER)
+#define glutGetProcAddress wglGetProcAddress
+#endif
+
 	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
 	assert(pglGenProgramsARB);
 
@@ -247,6 +255,10 @@ static void get_program_functions(void)
 
 	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) glutGetProcAddress("glGetProgramivARB");
 	assert(pglGetProgramivARB);
+
+#if defined(_MSC_VER)
+#undef glutGetProcAddress
+#endif
 }
 
 int piglit_use_fragment_program(void)

@@ -21,6 +21,10 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(_MSC_VER)
+#include <GL/glext.h>
+#endif
+
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 enum piglit_result {
