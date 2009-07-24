@@ -93,6 +93,22 @@ struct ParameterTexcoord : TestParameter {
 	GLfloat texcoords[4];
 };
 
+struct ParameterLocal : TestParameter {
+	ParameterLocal(GLenum _target, int _index, GLfloat v[4]) {
+		target = _target;
+		index = _index;
+		memcpy(data, v, sizeof(GLfloat)*4);
+	}
+
+	void setup() {
+		pglProgramLocalParameter4fvARB(target, index, data);
+	}
+
+	GLenum target;
+	int index;
+	GLfloat data[4];
+};
+
 struct Test {
 	Test(const std::string& _name) : name(_name) {
 		expected[0] = expected[1] = expected[2] = expected[3] = 0;
@@ -229,6 +245,10 @@ void Test::readline(const char* filename, int linenum, char* line)
 		memcpy(expected, params, sizeof(GLfloat)*4);
 	} else if (!strncmp(line, "texcoord[", 9)) {
 		parameters.push_back(new ParameterTexcoord(atoi(line+9), params));
+	} else if (!strncmp(line, "vertex.local[", 13)) {
+		parameters.push_back(new ParameterLocal(GL_VERTEX_PROGRAM_ARB, atoi(line+13), params));
+	} else if (!strncmp(line, "fragment.local[", 15)) {
+		parameters.push_back(new ParameterLocal(GL_FRAGMENT_PROGRAM_ARB, atoi(line+15), params));
 	} else {
 		fprintf(stderr, "%s:%i: unknown parameters %s\n", filename, linenum, line);
 		piglit_report_result(PIGLIT_FAILURE);
