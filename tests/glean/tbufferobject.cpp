@@ -50,6 +50,13 @@ static PFNGLMAPBUFFERARBPROC glMapBufferARB_func = NULL;
 static PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB_func = NULL;
 
 // GL_ARB_copy_buffer
+#ifndef GL_ARB_copy_buffer
+#define GL_ARB_copy_buffer 1
+typedef void (APIENTRYP PFNGLCOPYBUFFERSUBDATAPROC) (GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size);
+#define GL_COPY_READ_BUFFER               0x8F36
+#define GL_COPY_WRITE_BUFFER              0x8F37
+#endif
+
 static PFNGLCOPYBUFFERSUBDATAPROC glCopyBufferSubData_func = NULL;
 
 // GL_ARB_map_buffer_range
