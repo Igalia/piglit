@@ -161,17 +161,17 @@ main(int argc, char **argv)
 
 
 	use_ARB = 1;
-	if (strcmp(argv[1], "ARBvp1.0") == 0) {
+	if (strcmp(argv[i], "ARBvp1.0") == 0) {
 		target = GL_VERTEX_PROGRAM_ARB;
 		piglit_require_extension("GL_ARB_vertex_program");
-	} else if (strcmp(argv[1], "ARBfp1.0") == 0) {
+	} else if (strcmp(argv[i], "ARBfp1.0") == 0) {
 		target = GL_FRAGMENT_PROGRAM_ARB;
 		piglit_require_extension("GL_ARB_fragment_program");
-	} else if (strcmp(argv[1], "NVvp1.0") == 0) {
+	} else if (strcmp(argv[i], "NVvp1.0") == 0) {
 		target = GL_VERTEX_PROGRAM_NV;
 		piglit_require_extension("GL_NV_vertex_program");
 		use_ARB = 0;
-	} else if (strcmp(argv[1], "NVfp1.0") == 0) {
+	} else if (strcmp(argv[i], "NVfp1.0") == 0) {
 		target = GL_FRAGMENT_PROGRAM_NV;
 		piglit_require_extension("GL_NV_fragment_program");
 		use_ARB = 0;
@@ -179,7 +179,7 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 
-	for (i = 2; i < argc; i++) {
+	for (i++; i < argc; i++) {
 		compile(argv[i], target, use_ARB);
 	}
 
