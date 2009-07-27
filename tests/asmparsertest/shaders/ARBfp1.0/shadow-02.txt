@@ -1,0 +1,8 @@
+!!ARBfp1.0
+# REQUIRE GL_ARB_fragment_program_shadow
+# FAIL
+	OPTION	ARB_fragment_program_shadow;
+
+	TEX	result.color.rgb, fragment.texcoord[0], texture[0], 2D;
+	TEX	result.color.a, fragment.texcoord[1], texture[0], SHADOW2D;
+	END
