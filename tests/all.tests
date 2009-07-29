@@ -97,6 +97,7 @@ shaders['fp-incomplete-tex'] = PlainExecTest([testBinDir + 'fp-incomplete-tex', 
 shaders['fp-indirections'] = PlainExecTest([testBinDir + 'fp-indirections', '-auto'])
 shaders['glsl-uniform-update'] = PlainExecTest([testBinDir + 'glsl-uniform-update', '-auto'])
 shaders['glsl-unused-varying'] = PlainExecTest([testBinDir + 'glsl-unused-varying', '-auto'])
+shaders['glsl-fs-exp2'] = PlainExecTest([testBinDir + 'glsl-fs-exp2', '-auto'])
 shaders['glsl-vs-loop'] = PlainExecTest([testBinDir + 'glsl-vs-loop', '-auto'])
 shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
 
