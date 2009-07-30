@@ -332,6 +332,7 @@ glslparsertest['TernaryOp.frag'] = PlainExecTest([testBinDir + 'glslparsertest',
 
 asmparsertest = Group()
 asmparsertest['ARBfp1.0/abs.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/abs.txt'])
+asmparsertest['ARBfp1.0/depth_range-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/depth_range-01.txt'])
 asmparsertest['ARBfp1.0/fog-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/fog-01.txt'])
 asmparsertest['ARBfp1.0/fog-02.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/fog-02.txt'])
 asmparsertest['ARBfp1.0/fog-03.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/fog-03.txt'])
