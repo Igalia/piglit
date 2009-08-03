@@ -20,6 +20,7 @@ link_libraries (
 )
 
 add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
+add_executable (bgra-sec-color-pointer bgra-sec-color-pointer.c)
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (dlist-clear dlist-clear.c)
 add_executable (depthrange-clear depthrange-clear.c)

@@ -72,6 +72,7 @@ fbo['fbo-generatemipmap'] = PlainExecTest([testBinDir + 'fbo-generatemipmap', '-
 fbo['fbo-readpixels'] = PlainExecTest([testBinDir + 'fbo-readpixels', '-auto'])
 
 general = Group()
+general['bgra-sec-color-pointer'] = PlainExecTest([testBinDir + 'bgra-sec-color-pointer', '-auto'])
 general['bgra-vert-attrib-pointer'] = PlainExecTest([testBinDir + 'bgra-vert-attrib-pointer', '-auto'])
 general['clear-varray-2.0'] = PlainExecTest([testBinDir + 'clear-varray-2.0', '-auto'])
 general['depthrange-clear'] = PlainExecTest([testBinDir + 'depthrange-clear', '-auto'])
