@@ -19,6 +19,7 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (dlist-clear dlist-clear.c)
 add_executable (depthrange-clear depthrange-clear.c)
