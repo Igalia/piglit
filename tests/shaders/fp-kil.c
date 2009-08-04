@@ -288,20 +288,6 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
 static void Init(void)
 {
 	int i, x, y;
@@ -351,7 +337,7 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
+	glutKeyboardFunc(piglit_escape_exit_key);
 	glutDisplayFunc(Redisplay);
 	glewInit();
 	Init();

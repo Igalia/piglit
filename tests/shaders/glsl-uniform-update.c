@@ -84,19 +84,6 @@ display(void)
 	}
 }
 
-static void key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-		case 27:
-			exit(0);
-			break;
-	}
-	glutPostRedisplay();
-}
-
-
 static void init()
 {
 	GLint vs, fs;
@@ -141,7 +128,7 @@ int main(int argc, char**argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("glsl-uniform-update");
-	glutKeyboardFunc(key);
+	glutKeyboardFunc(piglit_escape_exit_key);
 	glutDisplayFunc(display);
 	glewInit();
 
