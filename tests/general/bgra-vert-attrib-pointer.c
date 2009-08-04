@@ -120,6 +120,12 @@ Init()
 
 	glewInit();
 
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+	piglit_require_extension("GL_EXT_vertex_array_bgra");
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
