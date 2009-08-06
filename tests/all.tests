@@ -102,6 +102,7 @@ shaders['glsl-bug-22603'] = PlainExecTest([testBinDir + 'glsl-bug-22603', '-auto
 shaders['glsl-uniform-update'] = PlainExecTest([testBinDir + 'glsl-uniform-update', '-auto'])
 shaders['glsl-unused-varying'] = PlainExecTest([testBinDir + 'glsl-unused-varying', '-auto'])
 shaders['glsl-fs-exp2'] = PlainExecTest([testBinDir + 'glsl-fs-exp2', '-auto'])
+shaders['glsl-fs-fragcoord'] = PlainExecTest([testBinDir + 'glsl-fs-fragcoord', '-auto'])
 shaders['glsl-fs-log2'] = PlainExecTest([testBinDir + 'glsl-fs-log2', '-auto'])
 shaders['glsl-vs-if'] = PlainExecTest([testBinDir + 'glsl-vs-if', '-auto'])
 shaders['glsl-vs-if-bool'] = PlainExecTest([testBinDir + 'glsl-vs-if-bool', '-auto'])
