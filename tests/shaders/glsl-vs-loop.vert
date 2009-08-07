@@ -2,7 +2,7 @@ void main()
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
-	const int count = int(gl_Color.w);
+	int count = int(gl_Color.w);
 	vec3 c = gl_Color.xyz;
 	int i;
 
