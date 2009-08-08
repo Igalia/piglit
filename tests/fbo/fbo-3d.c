@@ -226,6 +226,7 @@ int main(int argc, char**argv)
 	glewInit();
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_texture_non_power_of_two");
 
 	glutMainLoop();
 
