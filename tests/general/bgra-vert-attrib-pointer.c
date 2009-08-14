@@ -144,6 +144,12 @@ Init()
 static void
 display()
 {
+	GLboolean pass = GL_TRUE;
+	GLfloat red[3]={1.0, 0.0, 0.0};
+	GLfloat blue[3]={0.0, 0.0, 1.0};
+	GLfloat greyRed[3]={1.0, 0.6, 0.6};
+	GLfloat greyBlue[3]={0.6, 0.6, 1.0};
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDisableVertexAttribArray(1);
@@ -190,12 +196,6 @@ display()
 
 	glPopMatrix();
 	glPopMatrix();
-
-	GLboolean pass = GL_TRUE;
-	GLfloat red[3]={1.0, 0.0, 0.0};
-	GLfloat blue[3]={0.0, 0.0, 1.0};
-	GLfloat greyRed[3]={1.0, 0.6, 0.6};
-	GLfloat greyBlue[3]={0.6, 0.6, 1.0};
 
 	pass = pass && piglit_probe_pixel_rgb(200, 200, red);
 	pass = pass && piglit_probe_pixel_rgb(275, 200, blue);
