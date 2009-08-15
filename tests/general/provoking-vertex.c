@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
@@ -67,10 +66,13 @@ static void
 Init()
 {
 
-	glewInit();
 	piglit_require_extension("GL_EXT_provoking_vertex");
 	pglProvokingVertexEXT = (PFNGLPROVOKINGVERTEXEXTPROC)
+#if defined(_MSC_VER)
+		wglGetProcAddress("glProvokingVertexEXT");
+#else
 		glutGetProcAddress("glProvokingVertexEXT");
+#endif
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
@@ -89,6 +91,10 @@ Init()
 static void
 display()
 {
+	float red[3] = {1.0, 0.0, 0.0};
+	float blue[3] = {0.0, 0.0, 1.0};
+	GLboolean pass = GL_TRUE;
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	pglProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
 	glBegin(GL_TRIANGLES);
@@ -110,9 +116,6 @@ display()
 		glVertex3i(225, 150, 0);
 	glEnd();
 
-	float red[3] = {1.0, 0.0, 0.0};
-	float blue[3] = {0.0, 0.0, 1.0};
-	GLboolean pass = GL_TRUE;
 	pass = pass && piglit_probe_pixel_rgb(150, 130, red);
 	pass = pass && piglit_probe_pixel_rgb(225, 130, blue);
 	if (Automatic)
