@@ -220,7 +220,7 @@ int main(int argc, char**argv)
 		Automatic = 1;
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("buffer_sync");
+	glutCreateWindow("fbo-3d");
 	glutDisplayFunc(display);
 
 	glewInit();
