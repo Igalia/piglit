@@ -245,6 +245,7 @@ int main(int argc, char**argv)
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("fbo-readpixels");
 	glutDisplayFunc(display);
+	glutKeyboardFunc(piglit_escape_exit_key);
 
 	glewInit();
 

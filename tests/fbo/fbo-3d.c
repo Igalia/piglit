@@ -222,6 +222,7 @@ int main(int argc, char**argv)
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("fbo-3d");
 	glutDisplayFunc(display);
+	glutKeyboardFunc(piglit_escape_exit_key);
 
 	glewInit();
 
