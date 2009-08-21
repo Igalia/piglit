@@ -359,6 +359,13 @@ int main(int argc, char *argv[])
 	glutKeyboardFunc(Key);
 	glutDisplayFunc(Redisplay);
 	glewInit();
+
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+
 	Init();
 	glutMainLoop();
 	return 0;
