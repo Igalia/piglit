@@ -23,7 +23,6 @@
 
 from getopt import getopt, GetoptError
 import cgi
-import errno
 import os
 import sys
 

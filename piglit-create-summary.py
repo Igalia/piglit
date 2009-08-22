@@ -23,9 +23,6 @@
 
 
 from getopt import getopt, GetoptError
-import os
-import os.path
-import re
 import sys
 
 import framework.core as core

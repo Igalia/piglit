@@ -26,7 +26,6 @@
 import errno
 import os
 import platform
-import re
 import stat
 import subprocess
 import sys
