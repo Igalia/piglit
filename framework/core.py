@@ -285,6 +285,9 @@ class Test:
 	def __init__(self):
 		pass
 
+	def run(self):
+		raise NotImplementedError
+
 	def doRun(self, env, path):
 		# Filter
 		if len(env.filter) > 0:
