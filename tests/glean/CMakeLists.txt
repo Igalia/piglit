@@ -1,5 +1,7 @@
 if (MSVC)
 	add_definitions ( -D__WIN__ -D__MS__ )
+ELSEIF (APPLE)
+	add_definitions ( -D__AGL__ -D__UNIX__ )
 ELSE ()
 	add_definitions ( -D__X11__ -D__UNIX__ )
 ENDIF ()
@@ -84,7 +86,9 @@ add_executable (glean
 target_link_libraries (glean
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
+	${GLUT_glut_LIBRARY}
 	${X11_X11_LIB}
 	${TIFF_LIBRARY}
+	${CARBON_LIBRARY}
 )
 
