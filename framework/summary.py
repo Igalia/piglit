@@ -28,13 +28,13 @@ import core
 ##### Vector indicating the number of subtests that have passed/failed/etc.
 #############################################################################
 class PassVector:
-	def __init__(self,p,w,f,s):
+	def __init__(self, p, w, f, s):
 		self.passnr = p
 		self.warnnr = w
 		self.failnr = f
 		self.skipnr = s
 
-	def add(self,o):
+	def add(self, o):
 		self.passnr += o.passnr
 		self.warnnr += o.warnnr
 		self.failnr += o.failnr
@@ -106,7 +106,7 @@ results is an array of GroupResult instances, one per testrun
 		# Perform some initial annotations
 		for j in range(len(self.results)):
 			result = self.results[j]
-			result.passvector = PassVector(0,0,0,0)
+			result.passvector = PassVector(0, 0, 0, 0)
 			result.testrun = self.summary.testruns[j]
 
 		# Collect, create and annotate children

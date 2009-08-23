@@ -44,7 +44,7 @@ class PlainExecTest(Test):
 			stderr=subprocess.PIPE,
 			universal_newlines=True
 		)
-		out,err = proc.communicate()
+		out, err = proc.communicate()
 
 		outlines = out.split('\n')
 		outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))

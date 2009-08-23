@@ -103,10 +103,10 @@ class TestResult(dict):
 			'dict': dict.__repr__(self)
 		}
 
-	def allTestResults(self,name):
+	def allTestResults(self, name):
 		return {name: self}
 
-	def write(self,file,path):
+	def write(self, file, path):
 		print >>file, "@test: " + encode(path)
 		for k in self:
 			v = self[k]
@@ -142,7 +142,7 @@ class GroupResult(dict):
 
 	def allTestResults(self, groupName):
 		collection = {}
-		for name,sub in self.items():
+		for name, sub in self.items():
 			subfullname = name
 			if len(groupName) > 0:
 				subfullname = groupName + '/' + subfullname
@@ -150,7 +150,7 @@ class GroupResult(dict):
 		return collection
 
 	def write(self, file, groupName):
-		for name,sub in self.items():
+		for name, sub in self.items():
 			subfullname = name
 			if len(groupName) > 0:
 				subfullname = groupName + '/' + subfullname
@@ -237,7 +237,7 @@ class TestrunResult:
 				stack[-1](line[0:-1])
 			linenr = linenr + 1
 
-	def parseDir(self,path,PreferSummary):
+	def parseDir(self, path, PreferSummary):
 		main = None
 		filelist = [path + '/main', path + '/summary']
 		if PreferSummary:
@@ -264,10 +264,10 @@ class Environment:
 		self.execute = True
 		self.filter = []
 
-	def run(self,command):
+	def run(self, command):
 		p = subprocess.Popen(
 			command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		(stdout,stderr) = p.communicate();
+		(stdout, stderr) = p.communicate();
 		return stderr+stdout
 
 	def collectData(self):
@@ -316,7 +316,7 @@ class Test:
 
 			print "    result: %(result)s" % { 'result': result['result'] }
 
-			result.write(env.file,path)
+			result.write(env.file, path)
 			if Test.sleep:
 				time.sleep(Test.sleep)
 		else:
@@ -382,12 +382,12 @@ def loadTestProfile(filename):
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
 
-def loadTestResults(path,PreferSummary=False):
+def loadTestResults(path, PreferSummary=False):
 	try:
 		mode = os.stat(path)[stat.ST_MODE]
 		testrun = TestrunResult()
 		if stat.S_ISDIR(mode):
-			testrun.parseDir(path,PreferSummary)
+			testrun.parseDir(path, PreferSummary)
 		else:
 			file = open(path, 'r')
 			testrun.parseFile(file)

@@ -68,7 +68,7 @@ def main():
 
 	OptionName = ''
 
-	for name,value in options:
+	for name, value in options:
 		if name in ('-h', '--help'):
 			usage()
 		elif name in ('-d', '--dry-run'):
@@ -95,7 +95,7 @@ def main():
 
 	print "Writing summary file..."
 	results = core.loadTestResults(resultsDir)
-	for testname,result in results.allTestResults().items():
+	for testname, result in results.allTestResults().items():
 		if 'info' in result:
 			if len(result['info']) > 4096:
 				result['info'] = result['info'][0:4096]

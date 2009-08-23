@@ -99,13 +99,13 @@ def buildDetails(testResult):
 			continue
 
 		value = buildDetailValue(testResult[name])
-		details += [(name,value)]
+		details += [(name, value)]
 
-	details.sort(lambda a,b: len(a[1])-len(b[1]))
+	details.sort(lambda a, b: len(a[1])-len(b[1]))
 
 	text = ''
 	alternate = 'a'
-	for name,value in details:
+	for name, value in details:
 		text += ResultDetail % locals()
 
 		if alternate == 'a':
@@ -265,7 +265,7 @@ def parse_listfile(filename):
 	file.close()
 	return eval(code)
 
-def loadresult(descr,OptionPreferSummary):
+def loadresult(descr, OptionPreferSummary):
 	result = core.loadTestResults(descr[0], OptionPreferSummary)
 	if len(descr) > 1:
 		result.__dict__.update(descr[1])
@@ -280,7 +280,7 @@ def main():
 	OptionOverwrite = False
 	OptionPreferSummary = True
 	OptionList = []
-	for name,value in options:
+	for name, value in options:
 		if name == "-h" or name == "--help":
 			usage()
 		elif name == "-o" or name == "--overwrite":
@@ -298,7 +298,7 @@ def main():
 	summaryDir = args[0]
 	core.checkDir(summaryDir, not OptionOverwrite)
 
-	results = [loadresult(descr,OptionPreferSummary) for descr in OptionList]
+	results = [loadresult(descr, OptionPreferSummary) for descr in OptionList]
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):
