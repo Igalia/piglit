@@ -267,7 +267,7 @@ class Environment:
 	def run(self, command):
 		p = subprocess.Popen(
 			command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		(stdout, stderr) = p.communicate();
+		(stdout, stderr) = p.communicate()
 		return stderr+stdout
 
 	def collectData(self):
