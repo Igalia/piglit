@@ -23,9 +23,8 @@
 
 import os
 import subprocess
-import sys
 
-from core import *
+from core import checkDir, testBinDir, Test, TestResult
 
 #############################################################################
 ##### GleanTest: Execute a sub-test of Glean

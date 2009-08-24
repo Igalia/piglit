@@ -21,11 +21,9 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import os
 import subprocess
-import sys
 
-from core import *
+from core import Test, TestResult
 
 #############################################################################
 ##### PlainExecTest: Simply run an executable
