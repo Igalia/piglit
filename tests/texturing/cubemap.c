@@ -238,7 +238,7 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 }
 
 
-static void display()
+static void display(void)
 {
 	int dim;
 	GLboolean pass = GL_TRUE;
@@ -293,7 +293,7 @@ static void Key(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-static void init()
+static void init(void)
 {
 	piglit_require_extension("GL_ARB_texture_cube_map");
 

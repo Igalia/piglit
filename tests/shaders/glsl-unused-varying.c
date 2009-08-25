@@ -88,7 +88,7 @@ display(void)
 	}
 }
 
-static void init()
+static void init(void)
 {
 	GLint vs, fs;
 

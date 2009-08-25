@@ -90,7 +90,7 @@ draw_rect_set(int y)
 	draw_rect(70, y, 10, 10,  .75);
 }
 
-static void display()
+static void display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;

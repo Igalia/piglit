@@ -302,7 +302,7 @@ create_pixmap(GLenum format)
 	return glx_pixmap;
 }
 
-static void init()
+static void init(void)
 {
 	/* Set up projection matrix so we can just draw using window
 	 * coordinates.
@@ -322,7 +322,7 @@ static void init()
 
 
 static void
-event_loop ()
+event_loop(void)
 {
 	for (;;) {
 		XEvent event;

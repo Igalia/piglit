@@ -104,7 +104,7 @@ static GLboolean check_resulting_mipmaps(int x, int y, const GLfloat *color)
 	return pass;
 }
 
-static void display()
+static void display(void)
 {
 	const GLfloat red[4] = {1.0, 0.0, 0.0, 0.0};
 	const GLfloat blue[4] = {0.0, 0.0, 1.0, 0.0};
@@ -168,7 +168,7 @@ static void display()
 		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
 
-static void init()
+static void init(void)
 {
 	piglit_require_extension("GL_SGIS_generate_mipmap");
 	piglit_require_extension("GL_EXT_texture_compression_s3tc");

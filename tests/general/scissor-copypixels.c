@@ -73,7 +73,7 @@ check_red_box_surrounded_by_green(int x, int y, int w, int h)
 	return pass;
 }
 
-static void display()
+static void display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int dst_x = win_width / 2 + 10, dst_y;

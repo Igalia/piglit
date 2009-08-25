@@ -177,7 +177,7 @@ test_mipmap_drawing(int start_x, int start_y, int dim)
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int dim;

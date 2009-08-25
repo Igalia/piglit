@@ -58,7 +58,7 @@ static GLubyte colors[16] = {255, 0, 0, 127,
 
 
 static void
-Init()
+Init(void)
 {
 
 	glewInit();
@@ -82,7 +82,7 @@ Init()
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLfloat red[3]={1.0, 0.0, 0.0};

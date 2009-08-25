@@ -179,7 +179,7 @@ static GLboolean test_depth_drawing(int start_x, int start_y, float *expected)
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int depth;

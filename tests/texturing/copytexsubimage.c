@@ -227,7 +227,7 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 }
 
 
-static void display()
+static void display(void)
 {
 	GLboolean pass;
 	int srcy = 5;
@@ -270,7 +270,7 @@ static void display()
 	glutSwapBuffers();
 }
 
-static void init()
+static void init(void)
 {
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();

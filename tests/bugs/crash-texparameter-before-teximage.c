@@ -28,7 +28,7 @@ static void Display(void)
 	piglit_report_result(PIGLIT_SUCCESS);
 }
 
-static void init()
+static void init(void)
 {
 	glViewport(0, 0, Width, Height);
 

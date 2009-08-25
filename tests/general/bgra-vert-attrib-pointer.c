@@ -79,7 +79,7 @@ static const char *fragShaderText =
 
 
 static void
-compileLinkProg()
+compileLinkProg(void)
 {
 	GLint stat;
 
@@ -115,7 +115,7 @@ compileLinkProg()
 
 
 static void
-Init()
+Init(void)
 {
 
 	glewInit();
@@ -142,7 +142,7 @@ Init()
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLfloat red[3]={1.0, 0.0, 0.0};

@@ -47,7 +47,7 @@
 static GLboolean Automatic = GL_FALSE;
 static int win_width, win_height;
 
-static void display()
+static void display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;

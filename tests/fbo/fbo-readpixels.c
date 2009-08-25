@@ -208,7 +208,7 @@ done:
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 

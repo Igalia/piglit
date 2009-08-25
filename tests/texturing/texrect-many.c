@@ -150,7 +150,7 @@ static void Key(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-static void init()
+static void init(void)
 {
 	int i;
 	int maxtextures;

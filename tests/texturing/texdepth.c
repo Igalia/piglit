@@ -36,7 +36,7 @@ static int HaveShadowFuncs = 0;
 static GLuint Textures[2]; /* tex0: loaded via TexImage; tex1: loaded via CopyTexImage */
 
 
-static void CreateRenderedTexture()
+static void CreateRenderedTexture(void)
 {
 	glViewport(0, 0, COLS*4, ROWS*4);
 	glClearColor(0.5, 0.5, 0.0, 0.25);
@@ -382,7 +382,7 @@ static void Key(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-static void init()
+static void init(void)
 {
 	GLfloat texbuf[4];
 

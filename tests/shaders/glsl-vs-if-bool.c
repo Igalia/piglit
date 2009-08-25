@@ -91,7 +91,7 @@ static void key(unsigned char key, int x, int y)
 }
 
 
-static void init()
+static void init(void)
 {
 	GLint vs, fs;
 

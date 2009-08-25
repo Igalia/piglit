@@ -80,7 +80,7 @@ static GLboolean check_resulting_mipmaps(int x, int y, const GLfloat *color)
 	return pass;
 }
 
-static void display()
+static void display(void)
 {
 	GLfloat *data;
 	const GLfloat red[4] = {1.0, 0.0, 0.0, 0.0};
@@ -151,7 +151,7 @@ static void display()
 	}
 }
 
-static void init()
+static void init(void)
 {
 	piglit_require_extension("GL_SGIS_generate_mipmap");
 

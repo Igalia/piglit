@@ -75,7 +75,7 @@ static void probe_cell(const char* testname, int x, int y, const float* expected
 /**
  * Sanity test whether the texture is rendered correctly at all.
  */
-static void test_sanity()
+static void test_sanity(void)
 {
 	int x, y;
 
@@ -162,12 +162,12 @@ static void do_test_texgen_eye(const char* testname)
 	}
 }
 
-static void test_texgen_eye()
+static void test_texgen_eye(void)
 {
 	do_test_texgen_eye("test_texgen_eye");
 }
 
-static void test_texgen_eye_fp()
+static void test_texgen_eye_fp(void)
 {
 	if (UseFragmentProgram) {
 		glEnable(GL_FRAGMENT_PROGRAM_ARB);
@@ -178,7 +178,7 @@ static void test_texgen_eye_fp()
 
 static struct {
 	const char* name;
-	void (*function)();
+	void (*function)(void);
 } Tests[] = {
 	{ "sanity", &test_sanity },
 	{ "texgen_eye", &test_texgen_eye },

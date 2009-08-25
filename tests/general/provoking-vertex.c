@@ -63,7 +63,7 @@ static PFNGLPROVOKINGVERTEXEXTPROC pglProvokingVertexEXT = 0;
 static GLboolean Automatic = GL_FALSE;
 
 static void
-Init()
+Init(void)
 {
 
 	piglit_require_extension("GL_EXT_provoking_vertex");
@@ -89,7 +89,7 @@ Init()
 }
 
 static void
-display()
+display(void)
 {
 	float red[3] = {1.0, 0.0, 0.0};
 	float blue[3] = {0.0, 0.0, 1.0};

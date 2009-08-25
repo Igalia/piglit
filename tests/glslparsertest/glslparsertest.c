@@ -54,7 +54,7 @@ static char *filename;
 static int expected_pass;
 
 static void
-display()
+display(void)
 {
 	GLint prog;
 	GLint ok;

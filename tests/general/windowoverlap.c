@@ -99,7 +99,7 @@ static int verify(float mainr, float maing, float mainb, float subr, float subg,
 	return 1;
 }
 
-static void test()
+static void test(void)
 {
 	int success = 1;
 

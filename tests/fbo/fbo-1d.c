@@ -155,7 +155,7 @@ draw_fbo_1d(int x, int y)
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float red[] = {1,0,0,0};

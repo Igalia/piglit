@@ -28,7 +28,7 @@ static int Automatic = 0;
 static int Width = 100, Height = 100;
 static GLubyte data[4096]; /* 64*16*4 */
 
-static int test_getteximage()
+static int test_getteximage(void)
 {
 	GLubyte compare[4096];
 	int i;
@@ -103,7 +103,7 @@ static void Key(unsigned char key, int x, int y)
 
 
 
-static void init()
+static void init(void)
 {
 	int i;
 

@@ -172,7 +172,7 @@ static struct stipple_line Lines[] = {
 	}
 };
 
-static void test()
+static void test(void)
 {
 	int i;
 

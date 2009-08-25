@@ -28,7 +28,7 @@ static GLubyte data[] = { 0x8f, 0xff, 0x7f, 0x70 };
 
 static GLuint tex_name;
 
-void init()
+void init(void)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -60,7 +60,7 @@ void init()
 
 
 
-void display()
+void display(void)
 {
 	int i, j, k, col, pixel;
 	GLfloat expected[4];

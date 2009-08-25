@@ -40,7 +40,7 @@ static GLboolean Automatic = GL_FALSE;
 static GLuint vbo;
 
 static void
-init()
+init(void)
 {
 
 	glewInit();
@@ -74,7 +74,7 @@ vbo_write_floats_mapped(const float *varray, size_t count)
 }
 
 static void
-display()
+display(void)
 {
 	GLfloat white[4] = {1.0, 1.0, 1.0, 0.0};
 	GLboolean pass = GL_TRUE;
