@@ -76,6 +76,7 @@ general['bgra-sec-color-pointer'] = PlainExecTest([testBinDir + 'bgra-sec-color-
 general['bgra-vert-attrib-pointer'] = PlainExecTest([testBinDir + 'bgra-vert-attrib-pointer', '-auto'])
 general['clear-varray-2.0'] = PlainExecTest([testBinDir + 'clear-varray-2.0', '-auto'])
 general['depthrange-clear'] = PlainExecTest([testBinDir + 'depthrange-clear', '-auto'])
+general['depth_clamp'] = PlainExecTest([testBinDir + 'depth_clamp', '-auto'])
 general['dlist-clear'] = PlainExecTest([testBinDir + 'dlist-clear', '-auto'])
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])
