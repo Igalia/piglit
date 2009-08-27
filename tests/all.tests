@@ -78,6 +78,7 @@ general['clear-varray-2.0'] = PlainExecTest([testBinDir + 'clear-varray-2.0', '-
 general['depthrange-clear'] = PlainExecTest([testBinDir + 'depthrange-clear', '-auto'])
 general['depth_clamp'] = PlainExecTest([testBinDir + 'depth_clamp', '-auto'])
 general['dlist-clear'] = PlainExecTest([testBinDir + 'dlist-clear', '-auto'])
+general['draw-elements-base-vertex'] = PlainExecTest([testBinDir + 'draw-elements-base-vertex', '-auto'])
 general['linestipple'] = PlainExecTest([testBinDir + 'linestipple', '-auto'])
 general['occlusion_query'] = PlainExecTest([testBinDir + 'occlusion_query', '-auto'])
 general['provoking-vertex'] = PlainExecTest([testBinDir + 'provoking-vertex', '-auto'])
