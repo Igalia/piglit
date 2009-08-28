@@ -30,6 +30,10 @@
  * index buffers.
  */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
