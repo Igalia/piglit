@@ -83,7 +83,7 @@ display(void)
 		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
 
-static void init()
+static void init(void)
 {
 	GLint vs, fs;
 

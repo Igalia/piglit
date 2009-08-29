@@ -75,7 +75,7 @@ static GLboolean Automatic = GL_FALSE;
 static GLuint ib_offset;
 
 static void
-init()
+init(void)
 {
 	GLfloat *vb;
 	GLuint *ib;
@@ -130,7 +130,7 @@ init()
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float white[3] = {1.0, 1.0, 1.0};

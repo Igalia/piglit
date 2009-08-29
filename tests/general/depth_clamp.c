@@ -56,7 +56,7 @@ static GLboolean Automatic = GL_FALSE;
 #define WIN_HEIGHT 150
 
 static void
-init()
+init(void)
 {
 	glewInit();
 	piglit_require_extension("GL_ARB_depth_clamp");
@@ -72,7 +72,7 @@ init()
 }
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float white[3] = {1.0, 1.0, 1.0};
