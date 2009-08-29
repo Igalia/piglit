@@ -37,6 +37,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#if !defined(_MSC_VER)
+#include <stdint.h>
+#endif
+
 #include <GL/glew.h>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
