@@ -1,0 +1,5 @@
+!!ARBfp1.0
+# FAIL
+
+	OPTION	frickin_idiots;
+	END
