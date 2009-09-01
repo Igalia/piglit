@@ -1,0 +1,5 @@
+!!ARBfp1.0
+# FAIL - requires 'OPTION NV_fragment_program'
+
+	TXD	result.color, fragment.texcoord[0], fragment.texcoord[1], fragment.texcoord[2], texture[0], 2D;
+	END

@@ -1,0 +1,7 @@
+!!ARBfp1.0
+# REQUIRE GL_NV_fragment_program_option
+
+	OPTION	NV_fragment_program;
+
+	DDY	result.color, fragment.texcoord[0];
+	END

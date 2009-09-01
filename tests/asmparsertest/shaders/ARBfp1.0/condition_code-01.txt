@@ -1,0 +1,9 @@
+!!ARBfp1.0
+# REQUIRE GL_NV_fragment_program_option
+
+	OPTION	NV_fragment_program;
+
+	# The condition code names are *not* reserved as keywords
+	TEMP	EQ, FL, LE, LT, GE, GT, NE, TR;
+
+	END

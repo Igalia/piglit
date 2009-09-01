@@ -1,0 +1,5 @@
+!!ARBfp1.0
+# FAIL - requires 'OPTION NV_fragment_program'
+
+	DDX	result.color, fragment.texcoord[0];
+	END
