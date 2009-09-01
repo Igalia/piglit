@@ -82,7 +82,7 @@ static void display(void)
 	glClearColor(0.0, 1.0, 0.0, 0.0);
 	glColor4fv(blue);
 
-	glMatrixMode(GL_MODELVIEW_MATRIX);
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef(20, 0, 0);
 
