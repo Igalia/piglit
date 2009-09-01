@@ -91,6 +91,7 @@ general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
 general['varray-disabled'] = PlainExecTest([testBinDir + 'varray-disabled', '-auto'])
 general['vbo-map-remap'] = PlainExecTest([testBinDir + 'vbo-map-remap', '-auto'])
 general['windowoverlap'] = PlainExecTest([testBinDir + 'windowoverlap', '-auto'])
+general['sync_api'] = PlainExecTest([testBinDir + 'sync_api', '-auto'])
 
 shaders = Group()
 shaders['trinity-fp1'] = PlainExecTest([testBinDir + 'trinity-fp1', '-auto'])
