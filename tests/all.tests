@@ -140,6 +140,7 @@ bugs['r300-readcache'] = PlainExecTest([testBinDir + 'r300-readcache'])
 bugs['tex1d-2dborder'] = PlainExecTest([testBinDir + 'tex1d-2dborder', '-auto'])
 bugs['point-sprite'] = PlainExecTest([testBinDir + 'point-sprite', '-auto'])
 bugs['fdo22540'] = PlainExecTest([testBinDir + 'fdo22540', '-auto'])
+bugs['fdo23489'] = PlainExecTest([testBinDir + 'fdo23489', '-auto'])
 
 texturing = Group()
 texturing['copytexsubimage'] = PlainExecTest([testBinDir + 'copytexsubimage', '-auto'])
