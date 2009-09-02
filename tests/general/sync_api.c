@@ -31,6 +31,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#if !defined(_MSC_VER)
+#include <stdint.h>
+#endif
+
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
@@ -52,6 +56,13 @@
 			goto done;					\
 		}							\
 	} while (0)
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+#ifndef APIENTRYP
+#define APIENTRYP APIENTRY *
+#endif
 
 #ifndef GL_ARB_sync
 #define GL_ARB_sync 1
