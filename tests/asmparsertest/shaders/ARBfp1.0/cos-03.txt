@@ -1,0 +1,5 @@
+!!ARBfp1.0
+# FAIL
+
+	COS	result.color, 3.14159;
+	END

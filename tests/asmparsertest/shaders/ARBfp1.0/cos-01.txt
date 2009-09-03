@@ -1,0 +1,4 @@
+!!ARBfp1.0
+
+	COS	result.color, fragment.texcoord[0].x;
+	END
