@@ -1,0 +1,8 @@
+!!ARBfp1.0
+# REQUIRE GL_NV_fragment_program_option
+
+	OPTION	NV_fragment_program;
+	TEMP	R0;
+	ADD	R0, {0.5}.r, fragment.color;
+	MOV	result.color, |R0|;
+	END
