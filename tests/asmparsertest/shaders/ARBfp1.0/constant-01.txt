@@ -1,4 +1,0 @@
-!!ARBfp1.0
-# FAIL - ARB spec requires a (wortless!) .x suffix on the constant
-	MOV	result.color, 0.5;
-	END
