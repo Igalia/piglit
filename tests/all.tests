@@ -345,7 +345,7 @@ glslparsertest['while2.frag'] = PlainExecTest([testBinDir + 'glslparsertest', 't
 glslparsertest['TernaryOp.frag'] = PlainExecTest([testBinDir + 'glslparsertest', 'tests/glslparsertest/shaders/TernaryOp.frag', 'fail'])
 
 asmparsertest = Group()
-asmparsertest['ARBfp1.0/abs.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/abs.txt'])
+asmparsertest['ARBfp1.0/abs-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/abs-01.txt'])
 asmparsertest['ARBfp1.0/condition_code-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/condition_code-01.txt'])
 asmparsertest['ARBfp1.0/cos-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/cos-01.txt'])
 asmparsertest['ARBfp1.0/cos-02.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/cos-02.txt'])
