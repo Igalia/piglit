@@ -1,0 +1,8 @@
+!!ARBfp1.0
+# REQUIRE GL_NV_fragment_program_option
+
+	OPTION	NV_fragment_program;
+SHORT	OUTPUT	col = result.color;
+
+	MOV	col, fragment.texcoord[0];
+	END

@@ -1,0 +1,44 @@
+!!ARBfp1.0
+# REQUIRE GL_NV_fragment_program_option
+
+	OPTION	NV_fragment_program;
+	TEMP	R0;
+
+	COS	R0, fragment.texcoord[0].x;
+	COSR	R0, fragment.texcoord[0].x;
+	COSH	R0, fragment.texcoord[0].x;
+	DDX	R0, fragment.texcoord[0];
+	DDXR	R0, fragment.texcoord[0];
+	DDXH	R0, fragment.texcoord[0];
+	DDY	R0, fragment.texcoord[0];
+	DDYR	R0, fragment.texcoord[0];
+	DDYH	R0, fragment.texcoord[0];
+	DST	R0, fragment.texcoord[0], fragment.texcoord[1];
+	DSTR	R0, fragment.texcoord[0], fragment.texcoord[1];
+	DSTH	R0, fragment.texcoord[0], fragment.texcoord[1];
+	LG2	R0, fragment.texcoord[0].x;
+	LG2R	R0, fragment.texcoord[0].x;
+	LG2H	R0, fragment.texcoord[0].x;
+	LIT	R0, fragment.texcoord[0];
+	LITR	R0, fragment.texcoord[0];
+	LITH	R0, fragment.texcoord[0];
+	POW	R0, fragment.texcoord[0].x, fragment.texcoord[0].y;
+	POWR	R0, fragment.texcoord[0].x, fragment.texcoord[0].y;
+	POWH	R0, fragment.texcoord[0].x, fragment.texcoord[0].y;
+	RCP	R0, fragment.texcoord[0].x;
+	RCPR	R0, fragment.texcoord[0].x;
+	RCPH	R0, fragment.texcoord[0].x;
+	RFL	R0, fragment.texcoord[0], fragment.texcoord[1];
+	RFLR	R0, fragment.texcoord[0], fragment.texcoord[1];
+	RFLH	R0, fragment.texcoord[0], fragment.texcoord[1];
+	RSQ	R0, fragment.texcoord[0].x;
+	RSQR	R0, fragment.texcoord[0].x;
+	RSQH	R0, fragment.texcoord[0].x;
+	SIN	R0, fragment.texcoord[0].x;
+	SINR	R0, fragment.texcoord[0].x;
+	SINH	R0, fragment.texcoord[0].x;
+	X2D	R0, fragment.texcoord[0], fragment.texcoord[1], fragment.texcoord[2];
+	X2DR	R0, fragment.texcoord[0], fragment.texcoord[1], fragment.texcoord[2];
+	X2DH	R0, fragment.texcoord[0], fragment.texcoord[1], fragment.texcoord[2];
+
+	END

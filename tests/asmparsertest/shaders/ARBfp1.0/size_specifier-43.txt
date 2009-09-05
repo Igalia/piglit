@@ -1,0 +1,4 @@
+!!ARBfp1.0
+# FAIL
+MOVX	R0, fragment.texcoord[0];
+END

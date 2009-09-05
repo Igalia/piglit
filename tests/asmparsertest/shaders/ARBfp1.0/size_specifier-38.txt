@@ -1,0 +1,4 @@
+!!ARBfp1.0
+# FAIL
+MINR	R0, fragment.texcoord[0], fragment.texcoord[1];
+END
