@@ -111,6 +111,7 @@ shaders['glsl-vs-if'] = PlainExecTest([testBinDir + 'glsl-vs-if', '-auto'])
 shaders['glsl-vs-if-bool'] = PlainExecTest([testBinDir + 'glsl-vs-if-bool', '-auto'])
 shaders['glsl-vs-loop'] = PlainExecTest([testBinDir + 'glsl-vs-loop', '-auto'])
 shaders['vp-bad-program'] = PlainExecTest([testBinDir + 'vp-bad-program', '-auto'])
+shaders['glsl-derivs'] = PlainExecTest([testBinDir + 'glsl-derivs', '-auto'])
 
 fpgeneric = Group()
 def make_fpgeneric(name):
