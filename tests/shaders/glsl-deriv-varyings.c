@@ -50,9 +50,9 @@ static GLint fs2;
 
 
 static GLfloat verts[12] = {175.0, 125.0, 0.0,
-				175.0, 175.0, 0.0,
-				125.0, 125.0, 0.0,
-				125.0, 175.0, 0.0};
+			    175.0, 225.0, 0.0,
+			    125.0, 125.0, 0.0,
+			    125.0, 225.0, 0.0};
 
 static GLfloat texCoords[8] = {1.0, 0.0,
 				1.0, 1.0,
@@ -82,7 +82,9 @@ static const char *fragShaderText2 =
 	"varying vec2 texCoords;\n"
 	"void main()\n"
 	"{ \n"
-	"gl_FragColor = vec4(dFdx(texCoords.x), dFdy(texCoords.y),0.0,1.0);\n"
+	"	gl_FragColor = vec4(dFdx(texCoords.x) * 40.0,\n"
+	"			    dFdy(texCoords.y) * 40.0,\n"
+	"			    0.0, 1.0);\n"
 	"} \n";
 
 
@@ -228,11 +230,11 @@ display()
 
 	GLboolean pass = GL_TRUE;
 
-	float mostlyBlack[3] = {0.019608, 0.019608, 0.0};
+	float deriv[3] = {0.8, 0.4, 0.0};
 	float green[3] = {0, 1, 0};
 
 	pass = pass && piglit_probe_pixel_rgb(132, 125, green);
-	pass = pass && piglit_probe_pixel_rgb(205, 125, mostlyBlack);
+	pass = pass && piglit_probe_pixel_rgb(205, 125, deriv);
 
 	if(Automatic) {
 		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
