@@ -69,8 +69,6 @@ static void compileLinkProg();
 static void
 Init()
 {
-
-        glewInit();
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
@@ -157,6 +155,13 @@ int main(int argc, char **argv)
 	glutCreateWindow("vp-ignore-inputs");
 	glutDisplayFunc(display);
 	glutKeyboardFunc(piglit_escape_exit_key);
+	glewInit();
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
 
 	Init();
 
