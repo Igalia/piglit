@@ -82,7 +82,7 @@ static const char *fragShaderText2 =
 	"varying vec2 texCoords;\n"
 	"void main()\n"
 	"{ \n"
-	" vec2 num = texCoords * 40;\n"
+	" vec2 num = texCoords * 40.0;\n"
 	" gl_FragColor = vec4(dFdx(num.x), dFdy(num.y),0.0,1.0);\n"
 	"} \n";
 
