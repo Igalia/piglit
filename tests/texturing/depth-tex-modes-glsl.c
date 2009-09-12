@@ -145,8 +145,8 @@ compileLinkProg()
 static void
 loadTex()
 {
-	int height = 2;
-	int width = 2;
+	#define height 2
+	#define width 2
 	int i, j;
 
 	GLfloat texDepthData[width][height];
@@ -200,7 +200,8 @@ loadTex()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
 			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
 
-
+	#undef height
+	#undef width
 }
 
 
@@ -208,6 +209,14 @@ static void
 display()
 {
 	GLint loc1, loc2;
+
+	GLboolean pass = GL_TRUE;
+
+	GLfloat pink[3] = {1.0, 0.0, 1.0};
+	GLfloat black[3] = {0.0, 0.0, 0.0};
+
+	GLenum err;
+
 	loc1 = glGetUniformLocation(prog, "depthTex2d");
 	loc2 = glGetUniformLocation(prog, "colorOrAlpha");
 
@@ -255,11 +264,6 @@ display()
 
 	glPopMatrix();
 
-	GLboolean pass = GL_TRUE;
-
-	GLfloat pink[3] = {1.0, 0.0, 1.0};
-	GLfloat black[3] = {0.0, 0.0, 0.0};
-
 	pass = piglit_probe_pixel_rgb(110, 135, black);
 	pass = pass && piglit_probe_pixel_rgb(140, 135, pink);
 	pass = pass && piglit_probe_pixel_rgb(185, 135, black);
@@ -274,7 +278,7 @@ display()
 	pass = pass && piglit_probe_pixel_rgb(260, 210, black);
 	pass = pass && piglit_probe_pixel_rgb(290, 210, pink);
 
-	GLenum err = glGetError();
+	err = glGetError();
 	switch (err)
 	{
 	case GL_INVALID_ENUM:
