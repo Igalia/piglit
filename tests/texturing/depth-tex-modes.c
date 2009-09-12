@@ -64,11 +64,13 @@ Init()
 static void
 loadTex()
 {
-	int height = 2;
-        int width = 2;
+	#define height 2
+	#define width 2
         int i, j;
 
 	GLfloat texDepthData[width][height];
+	const GLfloat color[4] = {1.0, 0.0, 1.0, 1.0};
+
 	for (i=0; i < width; ++i) {
 		for (j=0; j < height; ++j) {
 			if ((i+j) & 1) {
@@ -164,21 +166,27 @@ loadTex()
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_CONSTANT);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_CONSTANT);
 
-	const GLfloat color[4] = {1.0, 0.0, 1.0, 1.0};
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color);
 
-
+	#undef height
+	#undef width
 }
 
 
 static void
 display()
 {
+	const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
+	const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
+
+	GLboolean pass = GL_TRUE;
+
+	GLfloat pink[3] = {1.0, 0.0, 1.0};
+	GLfloat green[3] = {0.0, 1.0, 0.0};
+	GLfloat black[3] = {0.0, 0.0, 0.0};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
-	const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color1);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
@@ -355,12 +363,6 @@ display()
 		glVertex3f(100, 150, 0);
 	glEnd();
 
-
-	GLboolean pass = GL_TRUE;
-
-	GLfloat pink[3] = {1.0, 0.0, 1.0};
-	GLfloat green[3] = {0.0, 1.0, 0.0};
-	GLfloat black[3] = {0.0, 0.0, 0.0};
 
 	pass = piglit_probe_pixel_rgb(110, 180, black);
 	pass = pass && piglit_probe_pixel_rgb(140, 180, black);
