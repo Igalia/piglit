@@ -172,8 +172,8 @@ compileLinkProg()
 static void
 loadTex()
 {
-	int height = 2;
-	int width = 2;
+	#define height 2
+	#define width 2
 	int i, j;
 
 	GLfloat texData[width][height][4];
@@ -205,12 +205,18 @@ loadTex()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
 			GL_RGBA, GL_FLOAT, texData);
 
+	#undef height
+	#undef width
 }
 
 
 static void
 display()
 {
+	GLboolean pass = GL_TRUE;
+
+	float mostlyBlack[3] = {0.019608, 0.019608, 0.0};
+	float green[3] = {0, 1, 0};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -225,11 +231,6 @@ display()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glPopMatrix();
-
-	GLboolean pass = GL_TRUE;
-
-	float mostlyBlack[3] = {0.019608, 0.019608, 0.0};
-	float green[3] = {0, 1, 0};
 
 	pass = pass && piglit_probe_pixel_rgb(132, 125, green);
 	pass = pass && piglit_probe_pixel_rgb(205, 125, mostlyBlack);
