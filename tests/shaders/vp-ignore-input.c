@@ -121,6 +121,7 @@ compileLinkProg()
 static void
 display()
 {
+	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -132,8 +133,6 @@ display()
 	glDrawArrays(GL_POINTS, 0, 4);
 
 	glPopMatrix();
-
-	GLboolean pass = GL_TRUE;
 
 	if(Automatic) {
 		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
