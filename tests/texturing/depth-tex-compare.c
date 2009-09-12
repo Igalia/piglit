@@ -70,8 +70,8 @@ Init()
 static void
 loadTex()
 {
-	int height = 2;
-	int width = 2;
+	#define height 2
+	#define width 2
 	int i, j;
 
 	GLfloat texDepthData[width][height];
@@ -128,12 +128,20 @@ loadTex()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
 			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
 
+	#undef height
+	#undef width
 }
 
 
 static void
 display()
 {
+	GLboolean pass = GL_TRUE;
+
+	GLfloat pink[3] = {1.0, 0.0, 1.0};
+	GLfloat white[3] = {1.0, 1.0, 1.0};
+	GLfloat black[3] = {0.0, 0.0, 0.0};
+	GLfloat green[3] = {0.0, 1.0, 0.0};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -456,13 +464,6 @@ display()
 		glVertex3f(150, 55, 0);
 	glEnd();
 
-
-	GLboolean pass = GL_TRUE;
-
-	GLfloat pink[3] = {1.0, 0.0, 1.0};
-	GLfloat white[3] = {1.0, 1.0, 1.0};
-	GLfloat black[3] = {0.0, 0.0, 0.0};
-	GLfloat green[3] = {0.0, 1.0, 0.0};
 
 	//less
 	pass = pass && piglit_probe_pixel_rgb(155, 285, pink);
