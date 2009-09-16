@@ -64,10 +64,10 @@ static const char *fragShaderText =
         "       gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);\n"
 	"} \n";
 
-static void compileLinkProg();
+static void compileLinkProg(void);
 
 static void
-Init()
+Init(void)
 {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -84,7 +84,7 @@ Init()
 }
 
 static void
-compileLinkProg()
+compileLinkProg(void)
 {
 	GLint stat;
 
@@ -119,7 +119,7 @@ compileLinkProg()
 
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 

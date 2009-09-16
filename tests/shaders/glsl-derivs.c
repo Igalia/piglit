@@ -89,7 +89,7 @@ static const char *fragShaderText2 =
 
 
 static void
-Init()
+Init(void)
 {
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -105,7 +105,7 @@ Init()
 }
 
 static void
-compileLinkProg()
+compileLinkProg(void)
 {
 	GLint stat;
 
@@ -171,7 +171,7 @@ compileLinkProg()
 }
 
 static void
-loadTex()
+loadTex(void)
 {
 	#define height 2
 	#define width 2
@@ -212,7 +212,7 @@ loadTex()
 
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 

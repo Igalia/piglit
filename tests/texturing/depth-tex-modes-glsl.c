@@ -83,10 +83,10 @@ static const char *fragShaderText =
 	" 	       gl_FragColor = vec4(color.xyz*depth.w, 1.0);\n"
 	"} \n";
 
-static void compileLinkProg();
+static void compileLinkProg(void);
 
 static void
-Init()
+Init(void)
 {
 	piglit_require_extension("GL_ARB_texture_rectangle");
 	glMatrixMode(GL_PROJECTION);
@@ -105,7 +105,7 @@ Init()
 }
 
 static void
-compileLinkProg()
+compileLinkProg(void)
 {
 	GLint stat;
 
@@ -143,7 +143,7 @@ compileLinkProg()
 }
 
 static void
-loadTex()
+loadTex(void)
 {
 	#define height 2
 	#define width 2
@@ -206,7 +206,7 @@ loadTex()
 
 
 static void
-display()
+display(void)
 {
 	GLint loc1, loc2;
 

@@ -44,7 +44,7 @@ static GLboolean Automatic = GL_FALSE;
 static GLuint tex[6];
 
 static void
-Init()
+Init(void)
 {
 
         glewInit();
@@ -62,7 +62,7 @@ Init()
 }
 
 static void
-loadTex()
+loadTex(void)
 {
 	#define height 2
 	#define width 2
@@ -174,7 +174,7 @@ loadTex()
 
 
 static void
-display()
+display(void)
 {
 	const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
 	const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};

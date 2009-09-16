@@ -47,7 +47,7 @@ static GLboolean Automatic = GL_FALSE;
 static GLuint tex[3];
 
 static void
-Init()
+Init(void)
 {
 
 	glewInit();
@@ -68,7 +68,7 @@ Init()
 }
 
 static void
-loadTex()
+loadTex(void)
 {
 	#define height 2
 	#define width 2
@@ -134,7 +134,7 @@ loadTex()
 
 
 static void
-display()
+display(void)
 {
 	GLboolean pass = GL_TRUE;
 
