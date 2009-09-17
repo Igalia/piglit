@@ -95,6 +95,7 @@ general['sync_api'] = PlainExecTest([testBinDir + 'sync_api', '-auto'])
 
 shaders = Group()
 shaders['trinity-fp1'] = PlainExecTest([testBinDir + 'trinity-fp1', '-auto'])
+shaders['fp-condition_codes-01'] = PlainExecTest([testBinDir + 'fp-condition_codes-01', '-auto'])
 shaders['fp-fog'] = PlainExecTest([testBinDir + 'fp-fog', '-auto'])
 shaders['fp-lit-mask'] = PlainExecTest([testBinDir + 'fp-lit-mask', '-auto'])
 shaders['fp-fragment-position'] = PlainExecTest([testBinDir + 'fp-fragment-position', '-auto'])
