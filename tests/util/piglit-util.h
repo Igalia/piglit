@@ -73,6 +73,8 @@ void piglit_escape_exit_key(unsigned char key, int x, int y);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
 
+void piglit_ortho_projection(int w, int h, GLboolean push);
+
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
 extern const GLenum cube_face_targets[6];

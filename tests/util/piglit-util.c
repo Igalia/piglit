@@ -463,3 +463,25 @@ piglit_draw_rect(float x, float y, float w, float h)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
+
+
+/**
+ * Convenience function to configure projection matrix for window coordinates
+ */
+void
+piglit_ortho_projection(int w, int h, GLboolean push)
+{
+        /* Set up projection matrix so we can just draw using window
+         * coordinates.
+         */
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+	if (push)
+		glPushMatrix();
+        glOrtho(0, w, 0, h, -1, 1);
+
+        glMatrixMode(GL_MODELVIEW);
+	if (push)
+		glPushMatrix();
+        glLoadIdentity();
+}
