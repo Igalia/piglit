@@ -377,6 +377,7 @@ asmparsertest['ARBfp1.0/precision_hint-02.txt'] = PlainExecTest([testBinDir + 'a
 asmparsertest['ARBfp1.0/precision_hint-03.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/precision_hint-03.txt'])
 asmparsertest['ARBfp1.0/precision_hint-04.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/precision_hint-04.txt'])
 asmparsertest['ARBfp1.0/precision_hint-05.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/precision_hint-05.txt'])
+asmparsertest['ARBfp1.0/reserved_words-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/reserved_words-01.txt'])
 asmparsertest['ARBfp1.0/result-01.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/result-01.txt'])
 asmparsertest['ARBfp1.0/result-02.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/result-02.txt'])
 asmparsertest['ARBfp1.0/result-03.txt'] = PlainExecTest([testBinDir + 'asmparsertest', 'ARBfp1.0', 'tests/asmparsertest/shaders/ARBfp1.0/result-03.txt'])

@@ -1,0 +1,46 @@
+!!ARBfp1.0
+
+	TEMP	ADDRESS;
+	TEMP	ARL;
+	TEMP	EXP;
+	TEMP	LOG;
+	TEMP	vertex;
+	TEMP	DDX;
+	TEMP	DDY;
+	TEMP	PK2H;
+	TEMP	PK2US;
+	TEMP	PK4B;
+	TEMP	PK4UB;
+	TEMP	SEQ;
+	TEMP	SFL;
+	TEMP	SGT;
+	TEMP	SLE;
+	TEMP	SNE;
+	TEMP	STR;
+	TEMP	TXD;
+	TEMP	UP2H;
+	TEMP	UP2US;
+	TEMP	X2D;
+
+	MOV	ADDRESS, fragment.texcoord[0];
+	MOV	ARL, fragment.texcoord[0];
+	MOV	EXP, fragment.texcoord[0];
+	MOV	LOG, fragment.texcoord[0];
+	MOV	vertex, fragment.texcoord[0];
+	MOV	DDX, fragment.texcoord[0];
+	MOV	DDY, fragment.texcoord[0];
+	MOV	PK2H, fragment.texcoord[0];
+	MOV	PK2US, fragment.texcoord[0];
+	MOV	PK4B, fragment.texcoord[0];
+	MOV	PK4UB, fragment.texcoord[0];
+	MOV	SEQ, fragment.texcoord[0];
+	MOV	SFL, fragment.texcoord[0];
+	MOV	SGT, fragment.texcoord[0];
+	MOV	SLE, fragment.texcoord[0];
+	MOV	SNE, fragment.texcoord[0];
+	MOV	STR, fragment.texcoord[0];
+	MOV	TXD, fragment.texcoord[0];
+	MOV	UP2H, fragment.texcoord[0];
+	MOV	UP2US, fragment.texcoord[0];
+	MOV	X2D, fragment.texcoord[0];
+	END
