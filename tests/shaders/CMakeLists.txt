@@ -24,7 +24,6 @@ link_libraries (
 add_definitions ( -DSOURCE_DIR="\\\"${piglit_SOURCE_DIR}/\\\"" )
 
 add_executable (trinity-fp1 trinity-fp1.c)
-add_executable (fp-condition_codes-01 fp-condition_codes-01.c)
 add_executable (fp-lit-mask fp-lit-mask.c)
 add_executable (fp-fog fp-fog.c)
 add_executable (fp-fragment-position fp-fragment-position.c)
@@ -48,3 +47,4 @@ add_executable (glsl-deriv-varyings glsl-deriv-varyings.c)
 add_executable (glsl-fwidth glsl-fwidth.c)
 add_executable (glsl-lod-bias glsl-lod-bias.c)
 add_executable (vp-ignore-input vp-ignore-input.c)
+add_executable (glsl-empty-vs-no-fs glsl-empty-vs-no-fs.c)
