@@ -34,8 +34,12 @@
 #include <GL/glut.h>
 #endif
 
+#include "piglit-util.h"
+
 #define WIN_WIDTH 100
 #define WIN_HEIGHT 100
+
+static GLboolean Automatic = GL_FALSE;
 
 static void
 init(void)
@@ -55,7 +59,11 @@ display(void)
 {
 	GLubyte stencil_rect[20 * 20];
 	int i;
-	
+	int x, y;
+	GLboolean pass = GL_TRUE;
+	static float red[] = {1.0, 0.0, 0,0, 0.0};
+	static float black[] = {0.0, 0.0, 0,0, 0.0};
+
 	glClearStencil(0);
 	glClearDepth(1.0);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -77,15 +85,38 @@ display(void)
 	glColor3f(1.0, 0.0, 0.0);
 	glRectf(50, 50, 50+20, 50+20);
 	glDisable(GL_STENCIL_TEST);
+
+	for (x = 50; x < 50 + 20; x++) {
+		for (y = 50; y < 50 + 10; y++) {
+			pass &= piglit_probe_pixel_rgb(x, y, red);
+		}
+		for (y = 50 + 10; y < 50 + 20; y++) {
+			pass &= piglit_probe_pixel_rgb(x, y, black);
+		}
+	}
+
 	glutSwapBuffers();
+
+	if (Automatic) {
+		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	}
 }
 
 int main(int argc, char **argv)
 {
+	int i;
+	for(i = 1; i < argc; ++i) {
+		if (!strcmp(argv[i], "-auto"))
+			Automatic = 1;
+		else
+			printf("Unknown option: %s\n", argv[i]);
+	}
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("drawpix_stencil");
+	glutCreateWindow("fdo23670-drawpix_stencil");
+	glutKeyboardFunc(piglit_escape_exit_key);
 	glutDisplayFunc(display);
 
 	init();
