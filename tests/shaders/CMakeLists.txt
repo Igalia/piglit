@@ -24,6 +24,7 @@ link_libraries (
 add_definitions ( -DSOURCE_DIR="\\\"${piglit_SOURCE_DIR}/\\\"" )
 
 add_executable (trinity-fp1 trinity-fp1.c)
+add_executable (fp-condition_codes-01 fp-condition_codes-01.c)
 add_executable (fp-lit-mask fp-lit-mask.c)
 add_executable (fp-fog fp-fog.c)
 add_executable (fp-fragment-position fp-fragment-position.c)
