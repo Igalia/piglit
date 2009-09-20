@@ -136,6 +136,9 @@ vpfpgeneric['dataflow-bug'] = make_vpfpgeneric('dataflow-bug.vpfp')
 vpfpgeneric['fogcoord-dp3'] = make_vpfpgeneric('fogcoord-dp3.vpfp')
 vpfpgeneric['fogcoord-dph'] = make_vpfpgeneric('fogcoord-dph.vpfp')
 vpfpgeneric['fogcoord-dp4'] = make_vpfpgeneric('fogcoord-dp4.vpfp')
+vpfpgeneric['nv-mov'] = make_vpfpgeneric('nv-mov.vpfp')
+vpfpgeneric['nv-add'] = make_vpfpgeneric('nv-add.vpfp')
+vpfpgeneric['nv-arl'] = make_vpfpgeneric('nv-arl.vpfp')
 shaders['vpfp-generic'] = vpfpgeneric
 
 bugs = Group()
