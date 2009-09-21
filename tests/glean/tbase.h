@@ -290,6 +290,9 @@ public:
 			vector<DrawingSurfaceConfig*>
 				configs(f.filter(ws.surfConfigs));
 
+			if (env->options.quick)
+				testOne = true;
+
 			// Test each config
 			for (vector<DrawingSurfaceConfig*>::const_iterator
 				     p = configs.begin();
