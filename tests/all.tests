@@ -139,6 +139,8 @@ vpfpgeneric['fogcoord-dp4'] = make_vpfpgeneric('fogcoord-dp4.vpfp')
 vpfpgeneric['nv-mov'] = make_vpfpgeneric('nv-mov.vpfp')
 vpfpgeneric['nv-add'] = make_vpfpgeneric('nv-add.vpfp')
 vpfpgeneric['nv-arl'] = make_vpfpgeneric('nv-arl.vpfp')
+vpfpgeneric['nv-init-zero-reg'] = make_vpfpgeneric('nv-init-zero-reg.vpfp')
+vpfpgeneric['nv-init-zero-addr'] = make_vpfpgeneric('nv-init-zero-addr.vpfp')
 shaders['vpfp-generic'] = vpfpgeneric
 
 bugs = Group()
