@@ -118,6 +118,12 @@ sanity.tests
 all.tests
     This suite contains all tests.
 
+quick.tests
+    Run all tests, but cut down significantly on their runtime
+    (and thus on the number of problems they can find).
+    In particular, this runs Glean with the --quick option, which
+    reduces the number of visuals and state combinations tested.
+
 radeon.tests
 r300.tests
 r500.tests
