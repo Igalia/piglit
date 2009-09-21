@@ -4,8 +4,9 @@ Piglit
 1. About
 2. Setup
 3. How to run tests
-4. How to write tests
-5. Todo
+4. Available test sets
+5. How to write tests
+6. Todo
 
 
 1. About
@@ -67,6 +68,8 @@ directory to see what test profiles are available:
      ...
   $ cd ..
 
+See also section 4.
+
 To create some nice formatted test summaries, run
 
   $ ./piglit-summary-html.py summary/sanity results/sanity.results
@@ -102,7 +105,27 @@ The summary shows the 'status' of a test:
        the result can contain a performance number like frames per second]
 
 
-4. How to write tests
+4. Available test sets
+----------------------
+
+Test sets are specified as Python scripts in the tests directory.
+The following test sets are currently available:
+
+sanity.tests
+    This suite contains minimal sanity tests. These tests must
+    pass, otherwise the other tests will not generate reliable results.
+
+all.tests
+    This suite contains all tests.
+
+radeon.tests
+r300.tests
+r500.tests
+    These test suites are adaptations of all.tests, with some tweaks
+    to account for hardware limitations in Radeon chips.
+
+
+5. How to write tests
 ---------------------
 
 Every test is run as a separate process. This minimizes the impact that
@@ -133,7 +156,7 @@ Rules of thumb:
   Output on stderr causes a warning.
 
 
-5. Todo
+6. Todo
 -------
 
  Get automated tests into widespread use ;)
@@ -144,3 +167,6 @@ Rules of thumb:
  Performance regression tests
    Ideally, this should be done by summarizing / comparing a history of
    test results
+   Note that while some small artificial micro-benchmark could be added to
+   Piglit, the Phoronix test suite is probably a better place for
+   realistic performance testing.

@@ -8,6 +8,7 @@ from framework.gleantest import *
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
+glean['readPixSanity'] = GleanTest('readPixSanity')
 
 profile = TestProfile()
 profile.tests['glean'] = glean
