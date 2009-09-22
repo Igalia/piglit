@@ -199,7 +199,7 @@ piglit_Display(void)
 	unsigned i = 0;
 	unsigned cc;
 	unsigned mask;
-	int pass = 1;
+	int pass = 0;
 
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -232,7 +232,7 @@ piglit_Display(void)
 					       cc_strings[cc],
 					       mask_strings[mask]);
 
-				pass = 0;
+				pass = 1;
 			}
 		}
 	}
