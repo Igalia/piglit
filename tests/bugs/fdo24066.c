@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2009 Nicolai Hähnle
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * Authors:
+ *    Nicolai Hähnle <nhaehnle@gmail.com>
+ *
+ */
+
+/**
+ * \file
+ * Test for the crash reported in bugs.freedesktop.org bug #24066.
+ * This occured when the native limits of a vertex program are queried
+ * before a fragment program has been setup.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <GL/glew.h>
+#if defined(__APPLE__)
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#include "piglit-util.h"
+#include "piglit-framework.h"
+
+int piglit_WindowMode = GLUT_RGBA;
+int piglit_Width = 16;
+int piglit_Height = 16;
+
+
+int piglit_Display()
+{
+	return PIGLIT_SUCCESS;
+}
+
+
+static const char program_text[] =
+	"!!ARBvp1.0\n"
+	"MOV result.position, vertex.position;\n"
+	"END";
+
+void piglit_Init(int argc, char ** argv)
+{
+	GLuint program_object;
+	GLint result;
+
+	piglit_require_vertex_program();
+
+	program_object = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, program_text);
+
+	pglBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_object);
+
+	printf("Testing whether the following call crashes...\n");
+	pglGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
+
+	piglit_report_result(PIGLIT_SUCCESS);
+}
