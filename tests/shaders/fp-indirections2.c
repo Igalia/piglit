@@ -47,6 +47,10 @@
 
 #define TEXTURE_SIZE 32 /* Note: Hardcoded dependencies in texture_init and texture_follow */
 
+#if defined(_MSC_VER)
+#define snprintf sprintf_s
+#endif
+
 int piglit_WindowMode = GLUT_RGBA;
 int piglit_Width = TEXTURE_SIZE;
 int piglit_Height = TEXTURE_SIZE;
