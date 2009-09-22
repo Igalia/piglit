@@ -107,6 +107,7 @@ shaders['fp-indirections'] = PlainExecTest([testBinDir + 'fp-indirections', '-au
 shaders['fp-indirections2'] = PlainExecTest([testBinDir + 'fp-indirections2', '-auto'])
 shaders['fp-rfl'] = PlainExecTest([testBinDir + 'fp-rfl', '-auto'])
 shaders['fp-set-01'] = PlainExecTest([testBinDir + 'fp-set-01', '-auto'])
+shaders['fp-set-02'] = PlainExecTest([testBinDir + 'fp-set-02', '-auto'])
 shaders['fp-unpack-01'] = PlainExecTest([testBinDir + 'fp-unpack-01', '-auto'])
 shaders['glsl-bug-22603'] = PlainExecTest([testBinDir + 'glsl-bug-22603', '-auto'])
 shaders['glsl-dlist-getattriblocation'] = PlainExecTest([testBinDir + 'glsl-dlist-getattriblocation', '-auto'])
