@@ -44,6 +44,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
+#if defined(_MSC_VER)
+typedef __int32 int32_t;
+#endif
+
 /* There are 128 possible values.  These values a distributed into 3 color
  * components.  Ensure that all of the values are seen at least once.
  */
@@ -102,6 +106,11 @@ static const char reference_shader_source[] =
 static GLint reference_prog;
 static GLint progs[ELEMENTS(types)];
 /*@}*/
+
+
+double round(double x) {
+	return floor(x + 0.5);
+}
 
 
 void
