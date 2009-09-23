@@ -83,6 +83,12 @@ static char *gen_temporary_dest_indirections(int sample_count,
 	prog = malloc(strlen(pre) + strlen(sample) * sample_count +
 		      strlen(post) + 1);
 
+	if (prog == 0) {
+		printf("malloc failed.\n");
+		piglit_report_result(PIGLIT_FAILURE);
+		exit(1);
+	}
+
 	sprintf(prog, pre);
 	for (i = 0; i < sample_count; i++)
 		strcat(prog, sample);
@@ -144,6 +150,12 @@ static char *gen_temporary_source_indirections(int sample_count,
 
 	prog = malloc(strlen(pre) + strlen(sample) * (sample_count - 1) +
 		      strlen(post) + 1);
+
+	if (prog == 0) {
+		printf("malloc failed.\n");
+		piglit_report_result(PIGLIT_FAILURE);
+		exit(1);
+	}
 
 	sprintf(prog, pre);
 	for (i = 0; i < sample_count - 1; i++)
