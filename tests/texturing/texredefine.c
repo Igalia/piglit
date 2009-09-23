@@ -123,7 +123,7 @@ static int cell(int cellnr, int lvl, GLuint basew, GLuint baseh, int colornr,
 				va_start(args, testnamefmt);
 				fprintf(stderr, "Test #%i failed: ", cellnr+1);
 				vfprintf(stderr, testnamefmt, args);
-				fprintf(stderr, "\n  First failing pixel at %ix%i of cell\n", x, y);
+				fprintf(stderr, "\n  First failing pixel %i,%i in cell at %d,%d\n", x, y, cellx, celly);
 				fprintf(stderr, "  Expected: %f %f %f %f\n", color[0], color[1], color[2], color[3]);
 				fprintf(stderr, "  Readback: %f %f %f %f\n", read[0], read[1], read[2], read[3]);
 				va_end(args);
@@ -143,6 +143,7 @@ static int test_size(GLuint basew, GLuint baseh)
 	GLuint w = basew;
 	GLuint h = baseh;
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	teximage2d(0, w, h, testnr);
 	if (!cell(testnr, 0, basew, baseh, testnr,
