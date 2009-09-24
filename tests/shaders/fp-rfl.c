@@ -186,7 +186,7 @@ piglit_Display(void)
 double
 random_float(void)
 {
-	return (double) random() / (double) random();
+	return (double) rand() / (double) rand();
 }
 
 
@@ -231,7 +231,7 @@ piglit_Init(int argc, char **argv)
 	 * direction vector, generate an axis such that the reflection of the
 	 * random vector across the axis is { 0, 1, 0 }.
 	 */
-	srandom(time(NULL));
+	srand(time(NULL));
 	for (i = 0; i < (ELEMENTS(direction) / 4); i++) {
 		const double d[3] = {
 			random_float(),
