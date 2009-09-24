@@ -92,6 +92,7 @@ general['stencil-drawpixels'] = PlainExecTest([testBinDir + 'stencil-drawpixels'
 general['texgen'] = PlainExecTest([testBinDir + 'texgen', '-auto'])
 general['varray-disabled'] = PlainExecTest([testBinDir + 'varray-disabled', '-auto'])
 general['vbo-map-remap'] = PlainExecTest([testBinDir + 'vbo-map-remap', '-auto'])
+general['vbo-subdata-sync'] = PlainExecTest([testBinDir + 'vbo-subdata-sync', '-auto'])
 general['windowoverlap'] = PlainExecTest([testBinDir + 'windowoverlap', '-auto'])
 general['sync_api'] = PlainExecTest([testBinDir + 'sync_api', '-auto'])
 
