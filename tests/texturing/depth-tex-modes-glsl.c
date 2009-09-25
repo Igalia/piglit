@@ -321,7 +321,7 @@ int main(int argc, char **argv)
 		Automatic=GL_TRUE;
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(400, 300);
-	glutCreateWindow("depth-tex-compare");
+	glutCreateWindow("depth-tex-modes-glsl");
 	glutDisplayFunc(display);
 	glutKeyboardFunc(piglit_escape_exit_key);
 	glewInit();
