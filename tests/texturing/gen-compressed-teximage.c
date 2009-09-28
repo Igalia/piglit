@@ -204,6 +204,7 @@ int main(int argc, char**argv)
 	glutCreateWindow("gen-compressed-teximage");
 	init();
 	glutDisplayFunc(display);
+	glutKeyboardFunc(piglit_escape_exit_key);
 
 	glutMainLoop();
 

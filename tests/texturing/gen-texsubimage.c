@@ -186,6 +186,7 @@ int main(int argc, char**argv)
 	glutCreateWindow("gen-texsubimage");
 	init();
 	glutDisplayFunc(display);
+	glutKeyboardFunc(piglit_escape_exit_key);
 	glutMainLoop();
 
 	return 0;
