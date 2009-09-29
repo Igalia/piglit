@@ -31,18 +31,11 @@
 * Second tri using GL_LAST_VERTEX_CONVENTION_EXT.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#if defined(FREEGLUT)
+#include "piglit-util.h"
+
+#if !defined(__APPLE__) && defined(FREEGLUT)
 #include <GL/freeglut_ext.h>
 #endif
-#endif
-#include "piglit-util.h"
 
 
 #ifndef APIENTRY

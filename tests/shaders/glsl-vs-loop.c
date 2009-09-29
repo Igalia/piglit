@@ -37,20 +37,6 @@
  * This was conceived as a test case for freedesktop.org bug #20171.
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/stat.h>
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#endif
-
 #include "piglit-util.h"
 
 #define WIN_WIDTH 100

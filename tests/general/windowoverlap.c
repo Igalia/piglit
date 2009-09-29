@@ -30,19 +30,7 @@
  * This test was prompted by http://bugs.freedesktop.org/show_bug.cgi?id=16123
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "piglit-util.h"
-
 
 static const int MainWidth = 128, MainHeight = 128;
 static const int SubX = 32, SubY = 32;

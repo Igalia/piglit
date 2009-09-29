@@ -24,16 +24,6 @@
  *    Shuang he <shuang.he@intel.com>
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "piglit-util.h"
 
 #define WIN_WIDTH 100

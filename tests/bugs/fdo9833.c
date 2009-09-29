@@ -3,14 +3,7 @@
  * https://bugs.freedesktop.org/show_bug.cgi?id=9833
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
+#include "piglit-util.h"
 
 static int Automatic = 0;
 

@@ -35,12 +35,8 @@
  * Neil Roberts <neil@linux.intel.com>.
  */
 
-#include "GL/glx.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include "piglit-util.h"
+#include "GL/glx.h"
 
 GLfloat tex_data[4][4] = {
 	{ 1.0, 0.0, 0.0, 1.0 },

@@ -29,22 +29,15 @@
  * Simple test of the API for GL_ARB_sync.
  */
 
-#include <stdio.h>
-#include <string.h>
 #if !defined(_MSC_VER)
 #include <stdint.h>
 #endif
 
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#if defined(FREEGLUT)
+#include "piglit-util.h"
+
+#if !defined(__APPLE__) && defined(FREEGLUT)
 #include <GL/freeglut_ext.h>
 #endif
-#endif
-
-#include "piglit-util.h"
 
 #define FAIL_ON_ERROR(string)						\
 	do {								\

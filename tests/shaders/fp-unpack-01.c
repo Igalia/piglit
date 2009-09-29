@@ -28,19 +28,6 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
-#include <assert.h>
-
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
 #include "piglit-util.h"
 #include "piglit-framework.h"
 

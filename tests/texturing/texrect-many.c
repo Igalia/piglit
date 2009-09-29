@@ -6,21 +6,7 @@
  * (Prompted by a bug in R300 where the driver ran out of indirections).
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#endif
-
 #include "piglit-util.h"
-
 
 static int Width = 16*16, Height = 11*16;
 static int Automatic = 0;

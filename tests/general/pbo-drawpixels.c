@@ -31,16 +31,6 @@
  * Caught a bug with the Intel driver with the metaops drawpixels code.
  */
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#endif
 #include "piglit-util.h"
 
 #define WIN_WIDTH 100

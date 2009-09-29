@@ -26,18 +26,6 @@
  * Tests 3D textures.
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "piglit-util.h"
 
 static int Width = 128, Height = 128;

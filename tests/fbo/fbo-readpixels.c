@@ -31,18 +31,6 @@
  * glReadPixels() versus glClear and immediate mode rendering.
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#endif
-
 #include "piglit-util.h"
 
 #define BUF_WIDTH 32

@@ -25,17 +25,6 @@
  * Test fragment.position.
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
 #include "piglit-util.h"
 
 #define NUM_PROGRAMS 4

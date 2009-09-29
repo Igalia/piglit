@@ -30,19 +30,7 @@
  *
  * Tests that the driver doesn't fail when deleting a mapped buffer object.
  */
-
-#define GL_GLEXT_PROTOTYPES
-
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#endif
+#include "piglit-util.h"
 
 static int Automatic = 0;
 

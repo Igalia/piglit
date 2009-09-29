@@ -34,15 +34,6 @@
  * the same operations against the far plane.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
 #include "piglit-util.h"
 
 /* In case the headers have the old enum name but not the new */

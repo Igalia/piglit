@@ -34,21 +34,12 @@
 #include <windows.h>
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #if !defined(_MSC_VER)
 #include <stdint.h>
 #endif
 
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#if defined(FREEGLUT)
+#if !defined(__APPLE__) && defined(FREEGLUT)
 #include <GL/freeglut_ext.h>
-#endif
 #endif
 #include "piglit-util.h"
 

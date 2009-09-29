@@ -28,18 +28,8 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include <assert.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#ifdef FREEGLUT
+#if !defined(__APPLE__) && defined(FREEGLUT)
 #include <GL/freeglut_ext.h>
-#endif
 #endif
 #include "piglit-util.h"
 

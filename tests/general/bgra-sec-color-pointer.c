@@ -30,18 +30,7 @@
  * with alpha blending.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/glut.h>
-#endif
-
 #include "piglit-util.h"
-
 
 static GLboolean Automatic = GL_FALSE;
 
