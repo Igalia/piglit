@@ -46,9 +46,9 @@ typedef __int32 int32_t;
 
 #define BOX_SIZE   16
 
-int piglit_WindowMode = GLUT_DOUBLE;
-int piglit_Width = (((BOX_SIZE+1)*TEST_COLS)+1);
-int piglit_Height = (((BOX_SIZE+1)*TEST_ROWS)+1);
+int piglit_window_mode = GLUT_DOUBLE;
+int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
+int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
 #define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
@@ -256,7 +256,7 @@ pack(float *packed, const float *color, GLenum type)
 
 
 int
-piglit_Display(void)
+piglit_display(void)
 {
 	unsigned i;
 	unsigned j;
@@ -288,7 +288,7 @@ piglit_Display(void)
 			if (!piglit_probe_pixel_rgb(x + (BOX_SIZE / 2),
 						    y + (BOX_SIZE / 2),
 						    colors[i])) {
-				if (!piglit_Automatic)
+				if (!piglit_automatic)
                                         printf("%s failed on color { %f %f %f %f }\n",
 					       opcodes[j],
 					       colors[i][0], colors[i][1],
@@ -331,7 +331,7 @@ void shuffle(float *values, unsigned count)
 
 
 void
-piglit_Init(int argc, char **argv)
+piglit_init(int argc, char **argv)
 {
 	unsigned i;
 	float v[TEST_COLS * 3 ];
@@ -341,7 +341,7 @@ piglit_Init(int argc, char **argv)
 
 	piglit_require_fragment_program();
 	piglit_require_extension("GL_NV_fragment_program_option");
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	reference_prog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 						reference_shader_source);

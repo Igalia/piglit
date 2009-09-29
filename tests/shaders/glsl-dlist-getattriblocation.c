@@ -33,9 +33,9 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_WindowMode = GLUT_RGB;
-int piglit_Width = 100;
-int piglit_Height = 100;
+int piglit_window_mode = GLUT_RGB;
+int piglit_width = 100;
+int piglit_height = 100;
 
 static const GLchar *vertShaderText =
 	"attribute vec4 attrib;\n"
@@ -46,7 +46,7 @@ static const GLchar *vertShaderText =
 
 
 int
-piglit_Display(void)
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLint vs;
@@ -72,7 +72,7 @@ piglit_Display(void)
 	glLinkProgram(prog);
 
 	attrib_loc = glGetAttribLocation(prog, "attrib");
-	if (!piglit_Automatic)
+	if (!piglit_automatic)
 		printf("attrib_loc = %d\n", attrib_loc);
 
 	glNewList(1, GL_COMPILE);
@@ -83,7 +83,7 @@ piglit_Display(void)
 	glBindAttribLocation(prog, 2, "attrib");
 	attrib_loc_in_dlist = glGetAttribLocation(prog, "attrib");
 
-	if (!piglit_Automatic)
+	if (!piglit_automatic)
 		printf("attrib_loc_in_dlist = %d\n", attrib_loc_in_dlist);
 	glEndList();
 
@@ -93,7 +93,7 @@ piglit_Display(void)
 
 
 void
-piglit_Init(int argc, char **argv)
+piglit_init(int argc, char **argv)
 {
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
@@ -101,5 +101,5 @@ piglit_Init(int argc, char **argv)
 		exit(1);
 	}
 
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

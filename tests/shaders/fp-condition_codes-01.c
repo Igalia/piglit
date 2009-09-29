@@ -42,9 +42,9 @@
 
 #define BOX_SIZE   16
 
-int piglit_WindowMode = GLUT_DOUBLE;
-int piglit_Width = (((BOX_SIZE+1)*TEST_ROWS)+1);
-int piglit_Height = (((BOX_SIZE+1)*TEST_COLS)+1);
+int piglit_window_mode = GLUT_DOUBLE;
+int piglit_width = (((BOX_SIZE+1)*TEST_ROWS)+1);
+int piglit_height = (((BOX_SIZE+1)*TEST_COLS)+1);
 
 #define INVERT_MASK(x) (~(x) & 0x0f)
 
@@ -183,7 +183,7 @@ generate_shader(unsigned cc, unsigned good_mask)
 
 
 int
-piglit_Display(void)
+piglit_display(void)
 {
 	static const GLfloat good_color[4] = { 0.9, 0.5, 0.7, 1.0 };
 	static const GLfloat junk_color[4] = { 0.2, 0.2, 0.2, 1.0 };
@@ -218,7 +218,7 @@ piglit_Display(void)
 			if (!piglit_probe_pixel_rgb(x + (BOX_SIZE / 2),
 						    y + (BOX_SIZE / 2),
 						    good_color)) {
-				if (!piglit_Automatic)
+				if (!piglit_automatic)
 					printf("CC %s with mask %s failed.\n",
 					       cc_strings[cc],
 					       mask_strings[mask]);
@@ -234,7 +234,7 @@ piglit_Display(void)
 
 
 void
-piglit_Init(int argc, char **argv)
+piglit_init(int argc, char **argv)
 {
 	unsigned cc;
 	unsigned mask;
@@ -245,7 +245,7 @@ piglit_Init(int argc, char **argv)
 
 	piglit_require_fragment_program();
 	piglit_require_extension("GL_NV_fragment_program_option");
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	reference_prog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 						reference_shader_source);

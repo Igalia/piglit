@@ -40,14 +40,14 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_Automatic = 0;
+int piglit_automatic = 0;
 
 static void
 display(void)
 {
-	const int result = piglit_Display();
+	const int result = piglit_display();
 
-	if (piglit_Automatic)
+	if (piglit_automatic)
 		piglit_report_result(result);
 }
 
@@ -56,17 +56,17 @@ int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
 	if (argc >= 2 && !strcmp(argv[1], "-auto"))
-		piglit_Automatic = 1;
+		piglit_automatic = 1;
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(piglit_Width, piglit_Height);
-	glutInitDisplayMode(piglit_WindowMode);
+	glutInitWindowSize(piglit_width, piglit_height);
+	glutInitDisplayMode(piglit_window_mode);
 	glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
 	glutKeyboardFunc(piglit_escape_exit_key);
 
 	glewInit();
 
-	piglit_Init(argc, argv);
+	piglit_init(argc, argv);
 
 	glutMainLoop();
 	return 0;

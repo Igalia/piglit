@@ -41,9 +41,9 @@
 #define snprintf sprintf_s
 #endif
 
-int piglit_WindowMode = GLUT_RGBA;
-int piglit_Width = TEXTURE_SIZE;
-int piglit_Height = TEXTURE_SIZE;
+int piglit_window_mode = GLUT_RGBA;
+int piglit_width = TEXTURE_SIZE;
+int piglit_height = TEXTURE_SIZE;
 
 unsigned int max_samples;
 unsigned char * texture_data;
@@ -202,13 +202,13 @@ static int test(unsigned int dim, unsigned int samples)
 	return PIGLIT_SUCCESS;
 }
 
-int piglit_Display()
+int piglit_display()
 {
 	int result;
 	unsigned int dim;
 	unsigned int samples;
 
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for(dim = 1; dim <= 3; ++dim) {
@@ -234,7 +234,7 @@ int piglit_Display()
 }
 
 
-void piglit_Init(int argc, char ** argv)
+void piglit_init(int argc, char ** argv)
 {
 	GLint max_native_tex_instructions;
 	GLint max_native_tex_indirections;

@@ -21,11 +21,11 @@
  * IN THE SOFTWARE.
  */
 
-extern int piglit_Automatic;
+extern int piglit_automatic;
 
-extern int piglit_WindowMode;
-extern int piglit_Width;
-extern int piglit_Height;
+extern int piglit_window_mode;
+extern int piglit_width;
+extern int piglit_height;
 
-extern int piglit_Display(void);
-extern void piglit_Init(int argc, char **argv);
+extern int piglit_display(void);
+extern void piglit_init(int argc, char **argv);

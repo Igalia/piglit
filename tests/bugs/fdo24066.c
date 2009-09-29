@@ -35,12 +35,12 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_WindowMode = GLUT_RGBA;
-int piglit_Width = 16;
-int piglit_Height = 16;
+int piglit_window_mode = GLUT_RGBA;
+int piglit_width = 16;
+int piglit_height = 16;
 
 
-int piglit_Display()
+int piglit_display()
 {
 	return PIGLIT_SUCCESS;
 }
@@ -51,7 +51,7 @@ static const char program_text[] =
 	"MOV result.position, vertex.position;\n"
 	"END";
 
-void piglit_Init(int argc, char ** argv)
+void piglit_init(int argc, char ** argv)
 {
 	GLuint program_object;
 	GLint result;

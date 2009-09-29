@@ -37,9 +37,9 @@
 
 #define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
 
-int piglit_WindowMode = GLUT_DOUBLE;
-int piglit_Width = (((BOX_SIZE+1)*TEST_COLS)+1);
-int piglit_Height = (((BOX_SIZE+1)*TEST_ROWS)+1);
+int piglit_window_mode = GLUT_DOUBLE;
+int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
+int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
 
 
@@ -114,7 +114,7 @@ static GLint vert_prog;
 
 
 int
-piglit_Display(void)
+piglit_display(void)
 {
 	static const GLfloat color[4] = { 0.0, 1.0, 0.0, 0.0 };
 	int result = PIGLIT_SUCCESS;
@@ -148,14 +148,14 @@ piglit_Display(void)
 
 
 void
-piglit_Init(int argc, char **argv)
+piglit_init(int argc, char **argv)
 {
 	(void) argc;
 	(void) argv;
 
 	piglit_require_vertex_program();
 	piglit_require_fragment_program();
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	progs[0] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 					  cos_shader_source);

@@ -72,9 +72,9 @@ struct {
 
 #define BOX_SIZE   8
 
-int piglit_WindowMode = GLUT_DOUBLE;
-int piglit_Width = (((BOX_SIZE+1)*TEST_COLS)+1);
-int piglit_Height = (((BOX_SIZE+1)*TEST_ROWS)+1);
+int piglit_window_mode = GLUT_DOUBLE;
+int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
+int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
 
 
@@ -154,7 +154,7 @@ tr_func(float a, float b)
 
 
 int
-piglit_Display(void)
+piglit_display(void)
 {
 	const GLfloat comparitor[4] = { 0.5, 0.5, 0.5, 0.5 };
 	static const float values[3] = { 0.0, 0.5, 1.0 };
@@ -213,7 +213,7 @@ piglit_Display(void)
 			if (!piglit_probe_pixel_rgb(x + (BOX_SIZE / 2),
 						    y + (BOX_SIZE / 2),
 						    color)) {
-				if (!piglit_Automatic)
+				if (!piglit_automatic)
 					printf("%s failed on ref = "
 					       "{ %.01f %.01f %.01f %.01f }\n",
 					       tests[idx].opcode,
@@ -231,7 +231,7 @@ piglit_Display(void)
 
 
 void
-piglit_Init(int argc, char **argv)
+piglit_init(int argc, char **argv)
 {
 	unsigned i;
 
@@ -240,7 +240,7 @@ piglit_Init(int argc, char **argv)
 
 	piglit_require_fragment_program();
 	piglit_require_extension("GL_NV_fragment_program_option");
-	piglit_ortho_projection(piglit_Width, piglit_Height, GL_FALSE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	reference_prog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 						reference_shader_source);
