@@ -12,8 +12,8 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
 static GLubyte data[4096]; /* 64*16*4 */
 
 static int test_getteximage(void)
@@ -36,10 +36,10 @@ static int test_getteximage(void)
 	return 1;
 }
 	
-
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
-	int succ;
+	int pass;
 	
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -57,16 +57,16 @@ static void Display(void)
 	glEnd();
 
 	glutSwapBuffers();
-	
-	succ = test_getteximage();
-	if (Automatic)
-		piglit_report_result(succ ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+
+	pass = test_getteximage();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -76,24 +76,11 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-
-static void init(void)
+void piglit_init(int argc, char **argv)
 {
 	int i;
+
+	glutReshapeFunc(Reshape);
 
 	for(i = 0; i < 4096; ++i)
 		data[i] = rand() & 0xff;
@@ -102,22 +89,5 @@ static void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-	Reshape(Width, Height);
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	init();
-	glutMainLoop();
-	return 0;
+	Reshape(piglit_width, piglit_height);
 }

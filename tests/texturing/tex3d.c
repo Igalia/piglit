@@ -28,7 +28,9 @@
 
 #include "piglit-util.h"
 
-static int Width = 128, Height = 128;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA;
+
 static GLuint Texture;
 
 static int nrcomponents(GLenum format)
@@ -102,7 +104,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 			glVertex2f(x, y+h);
 		glEnd();
 		x += w;
-		if (x >= Width) {
+		if (x >= piglit_width) {
 			y += h;
 			x = 0;
 		}
@@ -114,7 +116,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 	for(layer = 0; layer < d; ++layer) {
 		glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, readback+layer*w*h*4);
 		x += w;
-		if (x >= Width) {
+		if (x >= piglit_width) {
 			y += h;
 			x = 0;
 		}
@@ -190,7 +192,8 @@ static void test_simple(int w, int h, int d, GLenum format)
 	}
 }
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLenum formats[] = { GL_RGBA, GL_RGB, GL_ALPHA };
 	int w, h, d, fmt;
@@ -205,40 +208,25 @@ static void Redisplay(void)
 		}
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	return PIGLIT_SUCCESS;
 }
 
 
 static void Reshape(int width, int height)
 {
-	glViewport(0, 0, Width, Height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, Width, 0.0, Height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
 
-static void Init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	piglit_automatic = GL_TRUE;
+
+	glutReshapeFunc(Reshape);
+
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_3D, Texture);
-	Reshape(Width,Height);
+	Reshape(piglit_width, piglit_height);
 }
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_ALPHA);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	glewInit();
-	Init();
-	glutMainLoop();
-	return 0;
-}
-

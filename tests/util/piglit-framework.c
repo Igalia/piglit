@@ -45,7 +45,7 @@ int piglit_automatic = 0;
 static void
 display(void)
 {
-	const int result = piglit_display();
+	const enum piglit_result result = piglit_display();
 
 	if (piglit_automatic)
 		piglit_report_result(result);

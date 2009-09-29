@@ -32,10 +32,8 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic;
-
-#define WIN_WIDTH 800
-#define WIN_HEIGHT 600
+int piglit_width = 800, piglit_height = 600;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 /* Misbehaviour: first: the quads are not drawn in the correct order
  * (darker equals closer to the viewer), second: the middle one is strangely
@@ -46,8 +44,8 @@ static GLuint vs, fs, prog, shadow_vs, shadow_fs, shadow_prog;
 static GLint shadowMap_location;
 static GLint eye_projection_location, light_projection_location;
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLuint shadow_texture;
 	GLuint fbo;
@@ -156,14 +154,13 @@ display(void)
 	/* check that rect2 where less than rect1 is rendered */
 	pass &= piglit_probe_pixel_rgb(450, 250, rect2_color_bottom_rect1);
 
-	if (Automatic)
-		piglit_report_result (pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-
 	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	const char *vs_source =
 		"uniform mat4 eye_projection;"
@@ -193,6 +190,11 @@ init(void)
 		"	gl_FragDepth = gl_FragCoord.z;"
 		"}";
 
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	vs = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
 	glShaderSourceARB(vs, 1, &vs_source, NULL);
 	glCompileShaderARB(vs);
@@ -216,39 +218,4 @@ init(void)
 	light_projection_location = glGetUniformLocationARB(shadow_prog,
 							    "light_projection");
 	shadowMap_location = glGetUniformLocationARB(shadow_prog, "shadowMap");
-}
-
-int
-main(int argc, char** argv)
-{
-	/* far = 11, near = 1 */
-	int i;
-
-	glutInit(&argc, argv);
-
-	for (i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("glsl-bug-22603");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	init();
-
-	glutMainLoop();
-
-	return 0;
 }

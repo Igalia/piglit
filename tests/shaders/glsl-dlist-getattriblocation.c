@@ -45,7 +45,7 @@ static const GLchar *vertShaderText =
 	"} \n";
 
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;

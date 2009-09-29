@@ -8,8 +8,9 @@
 
 #include "piglit-util.h"
 
-static int Width = 16*16, Height = 11*16;
-static int Automatic = 0;
+int piglit_width = 16 * 16, piglit_height = 11 * 16;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA;
+
 static int NumTextures = 16;
 static GLuint Textures[16];
 
@@ -70,8 +71,9 @@ static int DoTest(void)
 			int i;
 			int clr;
 
-			glReadPixels((2*x+1)*Width/32, (2*y+1)*Height/22,
-				1, 1, GL_RGBA, GL_FLOAT, probe);
+			glReadPixels((2*x+1) * piglit_width / 32,
+				     (2*y+1) * piglit_height / 22,
+				     1, 1, GL_RGBA, GL_FLOAT, probe);
 
 			printf("   %i/%i: %f,%f,%f,%f", x, y,
 				probe[0], probe[1], probe[2], probe[3]);
@@ -97,23 +99,21 @@ static int DoTest(void)
 }
 
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
-	int succ;
+	int pass;
 
 	DoFrame();
-	succ = DoTest();
+	pass = DoTest();
 
-	if (Automatic) {
-		printf("\nPIGLIT: { 'result': '%s' }\n", succ ? "pass" : "fail");
-		exit(0);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -123,23 +123,17 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-static void init(void)
+void piglit_init(int argc, char **argv)
 {
 	int i;
 	int maxtextures;
+
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	glutReshapeFunc(Reshape);
 
 	piglit_require_extension("GL_ARB_texture_rectangle");
 
@@ -178,30 +172,5 @@ static void init(void)
 		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
-	Reshape(Width,Height);
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	glewInit();
-
-	if (!GLEW_VERSION_1_3) {
-		printf("Requires OpenGL 1.3\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	init();
-	glutMainLoop();
-	return 0;
+	Reshape(piglit_width, piglit_height);
 }

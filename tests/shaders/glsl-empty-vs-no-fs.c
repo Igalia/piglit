@@ -35,11 +35,13 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic;
+int piglit_width = 250, piglit_height = 250;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static const char *vs_source = "void main() {}";
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLint vs;
 	GLint prog;
@@ -65,31 +67,14 @@ display(void)
 		glDeleteShader(vs);
 	}
 
-	if (Automatic) {
-		piglit_report_result(PIGLIT_SUCCESS);
-	}
+	return PIGLIT_SUCCESS;
 }
 
-int
-main(int argc, char** argv)
+void
+piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize(250, 250);
-	glutCreateWindow("glsl-empty-vs-no-fs");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-	glewInit();
-
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
-
-	glutMainLoop();
-
-	return 0;
 }

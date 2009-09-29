@@ -27,6 +27,9 @@
 
 #include "piglit-util.h"
 
+int piglit_width = 200, piglit_height = 200;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH;
+
 static GLuint FragProg[15];
 
 static const char fragProgramTemplate[] =
@@ -37,11 +40,6 @@ static const char fragProgramTemplate[] =
 	"LIT result.color.%s, values; \n"
 	"END\n";
 static float LitExpected[4] = { 1.0, 0.65, 0.433, 1.0 };
-
-static int Automatic = 0;
-
-static int Width = 200, Height = 200;
-
 
 static void DoFrame(void)
 {
@@ -83,7 +81,8 @@ static int DoTest( void )
 		GLfloat delta[4];
 		int i;
 
-		glReadPixels(Width*(2*(mask%4)+1)/8, Height*(2*(mask/4)+1)/8, 1, 1,
+		glReadPixels(piglit_width * (2*(mask%4)+1)/8,
+			     piglit_height * (2*(mask/4)+1)/8, 1, 1,
 				GL_RGBA, GL_FLOAT, probe);
 
 		printf("Probe %i: %f,%f,%f,%f\n", mask, probe[0], probe[1], probe[2], probe[3]);
@@ -109,25 +108,22 @@ static int DoTest( void )
 		return 1;
 }
 
-
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-	int succ;
+	int pass;
 
 	DoFrame();
-	succ = DoTest();
+	pass = DoTest();
 
-	if (Automatic) {
-		printf("\nPIGLIT: { 'result': '%s' }\n", succ ? "pass" : "fail");
-		exit(0);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -136,24 +132,11 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-		case 27:
-			pglDeleteProgramsARB(15, FragProg);
-			exit(0);
-			break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
+void piglit_init(int argc, char **argv)
 {
 	int mask;
+
+	glutReshapeFunc(Reshape);
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
@@ -176,24 +159,5 @@ static void Init(void)
 		FragProg[mask-1] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, programText);
 	}
 
-	Reshape(Width,Height);
+	Reshape(piglit_width, piglit_height);
 }
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Redisplay);
-	Init();
-	glutMainLoop();
-	return 0;
-}
-

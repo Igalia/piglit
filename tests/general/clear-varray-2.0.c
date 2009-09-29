@@ -34,8 +34,8 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 200
-#define WIN_HEIGHT 100
+int piglit_width = 200, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
 
 /* apply MVP and set the color to blue. */
 static const GLchar *const vp_code =
@@ -55,10 +55,8 @@ static const GLchar *const fp_code =
 	"END"
 	;
 
-static GLboolean Automatic = GL_FALSE;
-
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float vertices[4][4];
@@ -115,29 +113,29 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 static void reshape(int width, int height)
 {
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, width, 0.0, height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(width, height, GL_FALSE);
 }
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLuint vert_prog, frag_prog;
 
-	reshape(WIN_WIDTH, WIN_HEIGHT);
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	reshape(piglit_width, piglit_height);
+
+	piglit_require_extension("GL_ARB_fragment_program");
+	piglit_require_extension("GL_ARB_vertex_program");
 
 	glGenProgramsARB(1, &vert_prog);
 	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vert_prog);
@@ -151,32 +149,4 @@ init(void)
 
 	glEnable(GL_VERTEX_PROGRAM_ARB);
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-}
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("clear-varray-2.0");
-	glutReshapeFunc(reshape);
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
-	init();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
-	piglit_require_extension("GL_ARB_fragment_program");
-	piglit_require_extension("GL_ARB_vertex_program");
-
-	glutMainLoop();
-
-	return 0;
 }

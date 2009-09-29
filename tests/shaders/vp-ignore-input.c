@@ -30,7 +30,9 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static GLint prog;
 static GLint fs;
 static GLint vs;
@@ -55,8 +57,8 @@ static const char *fragShaderText =
 
 static void compileLinkProg(void);
 
-static void
-Init(void)
+void
+piglit_init(int argc, char **argv)
 {
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -68,6 +70,11 @@ Init(void)
         glLoadIdentity();
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	compileLinkProg();
 }
@@ -107,8 +114,8 @@ compileLinkProg(void)
 }
 
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
@@ -123,37 +130,8 @@ display(void)
 
 	glPopMatrix();
 
-	if(Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
-
 	glFinish();
         glutSwapBuffers();
 
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("vp-ignore-inputs");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	Init();
-
-	glutMainLoop();
-
-	return 0;
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

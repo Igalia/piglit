@@ -139,7 +139,8 @@ GL program
 
 */
 
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA;
 
 static const char* Filename = 0;
 static struct testcase Testcase;
@@ -178,27 +179,27 @@ static void TestInstance(struct testinstance* instance)
 	glutSwapBuffers();
 
 	glReadBuffer(GL_FRONT);
-	if (!piglit_probe_pixel_rgba(Width/2, Height/2, instance->expected)) {
+	if (!piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, instance->expected)) {
 		fprintf(stderr, "Test %s, instance #%i failed\n", Filename, instance-Testcase.instances);
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 }
 
-
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
 	int i;
 	for(i = 0; i < Testcase.nrInstances; ++i)
 		TestInstance(&Testcase.instances[i]);
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	return PIGLIT_SUCCESS;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -208,19 +209,18 @@ static void Reshape(int width, int height)
 }
 
 
-static void Init(void)
-{
-	piglit_require_fragment_program();
-	FragProg = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, Testcase.programtext);
-
-	Reshape(Width,Height);
-}
-
-
-int main(int argc, char *argv[])
+void
+piglit_init(int argc, char **argv)
 {
 	int i;
-	glutInit(&argc, argv);
+
+	piglit_automatic = GL_TRUE;
+
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	for(i = 1; i < argc; ++i) {
 		if (!Filename)
 			Filename = argv[i];
@@ -232,22 +232,10 @@ int main(int argc, char *argv[])
 	}
 	readTestcase(&Testcase, Filename);
 
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA);
-	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	glewInit();
 
-	if (!GLEW_VERSION_1_3) {
-		printf("Requires OpenGL 1.3\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
+	piglit_require_fragment_program();
+	FragProg = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, Testcase.programtext);
 
-	Init();
-	glutMainLoop();
-	return 0;
+	Reshape(piglit_width, piglit_height);
 }
-

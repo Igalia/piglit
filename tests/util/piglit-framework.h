@@ -27,5 +27,5 @@ extern int piglit_window_mode;
 extern int piglit_width;
 extern int piglit_height;
 
-extern int piglit_display(void);
+extern enum piglit_result piglit_display(void);
 extern void piglit_init(int argc, char **argv);

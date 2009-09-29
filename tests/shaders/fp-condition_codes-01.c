@@ -182,7 +182,7 @@ generate_shader(unsigned cc, unsigned good_mask)
 }
 
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	static const GLfloat good_color[4] = { 0.9, 0.5, 0.7, 1.0 };

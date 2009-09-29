@@ -32,13 +32,11 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-static GLboolean Automatic = GL_FALSE;
-static int win_width, win_height;
-
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	static float red[] = {1.0, 0.0, 0.0, 0.0};
@@ -90,53 +88,22 @@ static void display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void reshape(int width, int height)
 {
-	win_width = width;
-	win_height = height;
+	piglit_width = width;
+	piglit_height = height;
 
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	glOrtho(0.0, width, 0.0, height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(width, height, GL_FALSE);
 }
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	reshape(WIN_WIDTH, WIN_HEIGHT);
+	reshape(piglit_width, piglit_height);
 	piglit_require_extension("GL_ARB_pixel_buffer_object");
 	glewInit();
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-	glutInit(&argc, argv);
-
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition(100, 100);
-	glutCreateWindow("pbo-teximage");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	init();
-	glutDisplayFunc(display);
-	glutMainLoop();
-
-	return 0;
 }

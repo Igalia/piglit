@@ -255,7 +255,7 @@ pack(float *packed, const float *color, GLenum type)
 }
 
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	unsigned i;

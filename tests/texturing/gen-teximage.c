@@ -38,11 +38,10 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 512
-#define WIN_HEIGHT 512
-#define SIZE 128
+int piglit_width = 512, piglit_height = 512;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-static GLboolean Automatic = GL_FALSE;
+#define SIZE 128
 
 static void display_mipmaps(int start_x, int start_y)
 {
@@ -94,8 +93,10 @@ static GLboolean check_resulting_mipmaps(int x, int y, const GLfloat *color)
 	return pass;
 }
 
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
+	GLboolean pass = GL_TRUE;
 	const GLfloat red[4] = {1.0, 0.0, 0.0, 0.0};
 	const GLfloat blue[4] = {0.0, 0.0, 1.0, 0.0};
 	GLuint texture;
@@ -149,57 +150,19 @@ static void display(void)
 	glutSwapBuffers();
 	glFlush();
 
-	if (Automatic) {
-		GLboolean pass = GL_TRUE;
+	pass = pass && check_resulting_mipmaps(0, 0, red);
+	pass = pass && check_resulting_mipmaps(0, SIZE, blue);
+	pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
 
-		pass = pass && check_resulting_mipmaps(0, 0, red);
-		pass = pass && check_resulting_mipmaps(0, SIZE, blue);
-		pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
-
-		if (Automatic)
-			printf("PIGLIT: {'result': '%s' }\n",
-			       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_SGIS_generate_mipmap");
 
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glEnable(GL_TEXTURE_2D);
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-	glutInit(&argc, argv);
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition(100, 100);
-	glutCreateWindow("gen-teximage");
-	init();
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutMainLoop();
-
-	return 0;
 }

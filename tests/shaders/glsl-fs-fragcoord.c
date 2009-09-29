@@ -32,14 +32,13 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 256
-#define WIN_HEIGHT 256
+int piglit_width = 256, piglit_height = 256;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static GLint prog;
-static GLboolean Automatic;
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;
@@ -47,10 +46,10 @@ display(void)
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	piglit_draw_rect(0, 0, WIN_WIDTH, WIN_HEIGHT);
+	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	for (y = 0; y < WIN_HEIGHT; y++) {
-		for (x = 0; x < WIN_WIDTH; x++) {
+	for (y = 0; y < piglit_height; y++) {
+		for (x = 0; x < piglit_width; x++) {
 			float color[3];
 
 			color[0] = x / 256.0;
@@ -65,25 +64,20 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLint vs, fs;
 
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   SOURCE_DIR "tests/shaders/glsl-fs-fragcoord.vert");
@@ -93,36 +87,4 @@ static void init(void)
 	prog = piglit_link_simple_program(vs, fs);
 
 	glUseProgram(prog);
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-
-	glutInit(&argc, argv);
-
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("glsl-fs-fragcoord");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-	init();
-
-	glutMainLoop();
-
-	return 0;
 }

@@ -36,13 +36,11 @@
 
 #include "piglit-util.h"
 
-static int automatic = 0;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-#define WIN_WIDTH 128
-#define WIN_HEIGHT 128
-
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	static const char *badprog =
 		"!!ARBvp1.0\n"
@@ -119,30 +117,12 @@ display(void)
 			err = glGetError();
 	}
 
-	if (automatic) {
-		if (failed == 0)
-			piglit_report_result(PIGLIT_SUCCESS);
-		else
-			piglit_report_result(PIGLIT_FAILURE);
-	}
-
-	exit(0);
+	return failed ? PIGLIT_FAILURE : PIGLIT_SUCCESS;
 }
 
-int
-main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("vp-bad-program");
-	glutDisplayFunc(display);
+	piglit_automatic = GL_TRUE;
 
 	piglit_require_vertex_program();
-
-	glutMainLoop();
-	return 0;
 }

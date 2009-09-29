@@ -32,7 +32,8 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static GLfloat verts[12] = {225.0, 175.0, 0.0,
 				225.0, 225.0, 0.0,
@@ -46,23 +47,13 @@ static GLubyte colors[16] = {255, 0, 0, 127,
 				255, 0, 0, 127};
 
 
-static void
-Init(void)
+void
+piglit_init(int argc, char **argv)
 {
-
-	glewInit();
-
 	piglit_require_extension("GL_EXT_secondary_color");
 	piglit_require_extension("GL_EXT_vertex_array_bgra");
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 400, 0, 300, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glEnable(GL_COLOR_SUM);
 	glColor3f(0.0, 0.0, 0.0);
@@ -70,8 +61,8 @@ Init(void)
 	glClearColor(0.6, 0.6, 0.6, 1.0);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLfloat red[3]={1.0, 0.0, 0.0};
@@ -119,35 +110,12 @@ display(void)
 	pass = pass && piglit_probe_pixel_rgb(200, 125, greyRed);
 	pass = pass && piglit_probe_pixel_rgb(275, 125, greyBlue);
 
- 	if(Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
-
 	glFinish();
 	glutSwapBuffers();
 
 	glDisable(GL_BLEND);
 	glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
-
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("bgra-sec-color-pointer");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	Init();
-
-	glutMainLoop();
-
-	return 0;
-}
-

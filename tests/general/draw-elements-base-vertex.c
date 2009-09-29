@@ -61,16 +61,15 @@ typedef void (APIENTRYP PFNGLDRAWELEMENTSBASEVERTEXPROC) (GLenum mode,
 
 static PFNGLDRAWELEMENTSBASEVERTEXPROC pglDrawElementsBaseVertex = NULL;
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 300, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-#define WIN_WIDTH 300
-#define WIN_HEIGHT 300
 #define NUM_QUADS  10
 
 static GLuint ib_offset;
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLfloat *vb;
 	GLuint *ib;
@@ -124,8 +123,8 @@ init(void)
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vbo);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float white[3] = {1.0, 1.0, 1.0};
@@ -140,7 +139,7 @@ display(void)
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+		glOrtho(0, piglit_width, 0, piglit_height, -1, 1);
 		glTranslatef(i * 20, 0, 0);
 
 		pglDrawElementsBaseVertex(GL_QUADS, 8, GL_UNSIGNED_INT,
@@ -166,25 +165,5 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if (argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("draw-elements-base-vertex");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	init();
-
-	glutMainLoop();
-
-	return 0;
-
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

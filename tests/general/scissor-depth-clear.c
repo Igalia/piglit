@@ -32,13 +32,11 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL;
 
-static GLboolean Automatic = GL_FALSE;
-static int win_width, win_height;
-
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int x, y;
@@ -71,10 +69,10 @@ static void display(void)
 	glDisable(GL_SCISSOR_TEST);
 	glDepthFunc(GL_LESS);
 	glColor4fv(blue);
-	piglit_draw_rect(0, 0, win_width, win_height);
+	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	for (y = 0; y < win_height; y++) {
-		for (x = 0; x < win_width; x++) {
+	for (y = 0; y < piglit_height; y++) {
+		for (x = 0; x < piglit_width; x++) {
 			float *expected;
 
 			if (x >= 10 && x < 20 && y >= 10 && y < 20)
@@ -88,16 +86,14 @@ static void display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void reshape(int width, int height)
 {
-	win_width = width;
-	win_height = height;
+	piglit_width = width;
+	piglit_height = height;
 
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
@@ -108,32 +104,8 @@ static void reshape(int width, int height)
 	glLoadIdentity();
 }
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	reshape(WIN_WIDTH, WIN_HEIGHT);
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-	glutInit(&argc, argv);
-
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition(100, 100);
-	glutCreateWindow("scissor-depth-clear");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	init();
-	glutDisplayFunc(display);
-	glutMainLoop();
-
-	return 0;
+	reshape(piglit_width, piglit_height);
 }

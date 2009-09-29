@@ -30,7 +30,9 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static GLuint tex[3];
 static GLint prog;
 static GLint fs;
@@ -73,10 +75,23 @@ static const char *fragShaderText =
 	"} \n";
 
 static void compileLinkProg(void);
+static void loadTex(void);
 
-static void
-Init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (piglit_automatic)
+		printf(" Left to Right: LUMINANCE, INTENSITY, ALPHA\n"
+		       "Lower row: Combined with color\n"
+		       "Upper row: combined with alpha\n");
+
+	loadTex();
+
 	piglit_require_extension("GL_ARB_texture_rectangle");
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -193,9 +208,8 @@ loadTex(void)
 	#undef width
 }
 
-
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLint loc1, loc2;
 
@@ -291,41 +305,9 @@ display(void)
 
 	}
 
-	if(Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
-
 	glFinish();
 	glutSwapBuffers();
 
-	printf(" Left to Right: LUMINANCE, INTENSITY, ALPHA\n Lower row: Combined with color\n Upper row: combined with alpha\n");
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("depth-tex-modes-glsl");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	Init();
-
-	loadTex();
-
-	glutMainLoop();
-
-	return 0;
 }

@@ -36,17 +36,16 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static int do_red_location;
 static int red_location;
 static int green_location;
 static GLint prog;
-static GLboolean Automatic;
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	static const float red[] = {1.0, 0.0, 0.0, 0.0};
 	static const float green[] = {0.0, 1.0, 0.0, 0.0};
@@ -69,26 +68,19 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		piglit_report_result (pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void init(void)
+void piglit_init(int argc, char **argv)
 {
 	GLint vs, fs;
 
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   SOURCE_DIR "tests/shaders/glsl-unused-varying.vert");
@@ -102,36 +94,4 @@ static void init(void)
 	red_location = glGetUniformLocation(prog, "red");
 	green_location = glGetUniformLocation(prog, "green");
 	do_red_location = glGetUniformLocation(prog, "do_red");
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-
-	glutInit(&argc, argv);
-
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("glsl-unused-varying");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-	init();
-
-	glutMainLoop();
-
-	return 0;
 }

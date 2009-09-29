@@ -120,7 +120,7 @@ static GLfloat position[4 * TEST_ROWS * TEST_COLS];
 
 static const float green[4] = { 0.0, 1.0, 0.0, 0.0 };
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	int result = PIGLIT_SUCCESS;

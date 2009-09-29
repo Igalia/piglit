@@ -31,14 +31,15 @@
  */
 
 #include "piglit-util.h"
+#include "piglit-framework.h"
 
-static int Width = 256, Height = 128;
-static int Automatic = 0;
+int piglit_width = 256, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static const GLfloat TextureColor[3] = { 1.0, 0.5, 0.0 };
 
 
-static void test(GLenum wrapt, int cellx, int celly)
+static GLboolean test(GLenum wrapt, int cellx, int celly)
 {
 	int sx, sy;
 
@@ -59,59 +60,48 @@ static void test(GLenum wrapt, int cellx, int celly)
 	/* Take more than one sample, just to be sure */
 	for(sy = 0; sy < 4; ++sy) {
 		for(sx = 0; sx < 4; ++sx) {
-			int x = (cellx*5 + sx + 1)*Width/20;
-			int y = (celly*5 + sy + 1)*Height/10;
+			int x = (cellx*5 + sx + 1)*piglit_width/20;
+			int y = (celly*5 + sy + 1)*piglit_height/10;
 
 			if (!piglit_probe_pixel_rgb(x, y, TextureColor)) {
 				fprintf(stderr, "Fail in cell %i,%i (texwrap = 0x%x)\n", cellx, celly, wrapt);
 
-				if (Automatic)
-					piglit_report_result(PIGLIT_FAILURE);
+				return GL_FALSE;
 			}
 		}
 	}
+
+	return GL_TRUE;
 }
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
+	GLboolean pass = GL_TRUE;
+
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
         /* Draw eight tiles, each with a different tex wrap mode.
          * They should all look the same.
          */
-	test(GL_REPEAT, 0, 0);
-	test(GL_CLAMP, 1, 0);
-	test(GL_CLAMP_TO_EDGE, 2, 0);
-	test(GL_CLAMP_TO_BORDER, 3, 0);
-	test(GL_MIRRORED_REPEAT, 0, 1);
+	pass &= test(GL_REPEAT, 0, 0);
+	pass &= test(GL_CLAMP, 1, 0);
+	pass &= test(GL_CLAMP_TO_EDGE, 2, 0);
+	pass &= test(GL_CLAMP_TO_BORDER, 3, 0);
+	pass &= test(GL_MIRRORED_REPEAT, 0, 1);
 	if (glutExtensionSupported("GL_EXT_texture_mirror_clamp")) {
-		test(GL_MIRROR_CLAMP_EXT, 1, 1);
-		test(GL_MIRROR_CLAMP_TO_EDGE_EXT, 2, 1);
-		test(GL_MIRROR_CLAMP_TO_BORDER_EXT, 3, 1);
+		pass &= test(GL_MIRROR_CLAMP_EXT, 1, 1);
+		pass &= test(GL_MIRROR_CLAMP_TO_EDGE_EXT, 2, 1);
+		pass &= test(GL_MIRROR_CLAMP_TO_BORDER_EXT, 3, 1);
 	}
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(PIGLIT_SUCCESS);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-
-static void Reshape(int width, int height)
-{
-	Width = width;
-	Height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
-static void Init(void)
+void piglit_init(int argc, char **argv)
 {
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -119,38 +109,8 @@ static void Init(void)
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, 1, 0, GL_RGB, GL_FLOAT, TextureColor);
 	glEnable(GL_TEXTURE_1D);
 
-	Reshape(Width,Height);
-}
+	piglit_ortho_projection(1.0, 1.0, GL_FALSE);
 
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	if (!Automatic) {
+	if (!piglit_automatic)
 		printf("You should see a flat orange color\n");
-		glutKeyboardFunc(Key);
-	}
-	Init();
-	glutMainLoop();
-	return 0;
 }
-

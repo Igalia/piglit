@@ -36,8 +36,8 @@
 
 #include "piglit-util.h"
 
-static int Width = 128, Height = 128;
-static int Automatic = 0;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static void
 set_colors(GLfloat *color_array, GLfloat *color)
@@ -52,7 +52,8 @@ set_colors(GLfloat *color_array, GLfloat *color)
 	}
 }
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLfloat vertices[4][2];
 	GLfloat colors[16];
@@ -116,23 +117,21 @@ static void Redisplay(void)
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	glutSwapBuffers();
 
-	pass &= piglit_probe_pixel_rgb(Width * 1 / 6, Height / 2, red);
-	pass &= piglit_probe_pixel_rgb(Width * 3 / 6, Height / 2, black);
-	pass &= piglit_probe_pixel_rgb(Width * 5 / 6, Height / 2, blue);
-	if (Automatic) {
-		if (pass)
-			piglit_report_result(PIGLIT_SUCCESS);
-		else
-			piglit_report_result(PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
+	pass &= piglit_probe_pixel_rgb(piglit_width * 1 / 6,
+				       piglit_height / 2, red);
+	pass &= piglit_probe_pixel_rgb(piglit_width * 3 / 6,
+				       piglit_height / 2, black);
+	pass &= piglit_probe_pixel_rgb(piglit_width * 5 / 6,
+				       piglit_height / 2, blue);
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -141,35 +140,8 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-static void Key(unsigned char key, int x, int y)
+void
+piglit_init(int argc, char *argv[])
 {
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	if (!Automatic) {
-		printf("Escape to quit\n");
-		glutKeyboardFunc(Key);
-	}
-	Reshape(Width,Height);
-	glutMainLoop();
-	return 0;
 }
-

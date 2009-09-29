@@ -27,6 +27,9 @@
 
 #include "piglit-util.h"
 
+int piglit_width = 200, piglit_height = 200;
+int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH;
+
 #define NUM_PROGRAMS 4
 
 static GLuint FragProg[NUM_PROGRAMS];
@@ -60,11 +63,6 @@ static const char* const ProgramText[NUM_PROGRAMS] = {
 		"MOV result.color.w, 0.5;\n"
 		"END",
 };
-
-static int Automatic = 0;
-
-static int Width = 200, Height = 200;
-
 
 /**
  * Draw four quadrilaterals, one for each fragment program:
@@ -248,12 +246,12 @@ static int DoTest( void )
 
 		/*
                 printf("ReadPixels at %d, %d\n",
-                       (int)(Probes[idx].x*Width/2),
-                       (int)(Probes[idx].y*Height/2));
+                       (int)(Probes[idx].x*piglit_width/2),
+                       (int)(Probes[idx].y*piglit_height/2));
 		*/
 
-		glReadPixels((int)(Probes[idx].x*Width/2),
-		             (int)(Probes[idx].y*Height/2),
+		glReadPixels((int)(Probes[idx].x*piglit_width/2),
+		             (int)(Probes[idx].y*piglit_height/2),
 		             1, 1,
 		             GL_RGBA, GL_FLOAT, probe);
 
@@ -283,24 +281,22 @@ static int DoTest( void )
 }
 
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-	int succ;
+	int pass;
 
 	DoFrame();
-	succ = DoTest();
+	pass = DoTest();
 
-	if (Automatic) {
-		printf("\nPIGLIT: { 'result': '%s' }\n", succ ? "pass" : "fail");
-		exit(0);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -310,11 +306,17 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-static void Init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	int i, x, y;
 	GLubyte rectangle[200][200][4];
 	GLubyte tex[256*256][4];
+
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
@@ -373,32 +375,5 @@ static void Init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	Reshape(Width,Height);
+	Reshape(piglit_width, piglit_height);
 }
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(Redisplay);
-	glewInit();
-
-	if (!GLEW_VERSION_1_3) {
-		printf("Requires OpenGL 1.3\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	Init();
-	glutMainLoop();
-	return 0;
-}
-
-

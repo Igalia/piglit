@@ -31,8 +31,8 @@
 
 #include "piglit-util.h"
 
-static int Width = 180, Height = 100;
-static int Automatic = 0;
+int piglit_width = 180, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
 
 #define MAX_QUERIES 5
 static GLuint occ_queries[MAX_QUERIES];
@@ -132,7 +132,8 @@ static int do_test(float x, int all_at_once)
 	return test_pass;
 }
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
 	int test_pass;
 
@@ -143,34 +144,27 @@ static void Redisplay(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		piglit_report_result(test_pass
-				     ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	}
+	return test_pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, width, 0.0, height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(width, height, GL_FALSE);
 }
 
 
-static void Init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLint query_bits;
 
+	glutReshapeFunc(Reshape);
 
-	glewInit();
-
-	Reshape(Width,Height);
+	Reshape(piglit_width, piglit_height);
 
 	glClearColor(0.0, 0.2, 0.3, 0.0);
 	glClearDepth(1.0);
@@ -193,7 +187,6 @@ static void Init(void)
 		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectivARB);
 	} else {
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 
 
@@ -205,41 +198,8 @@ static void Init(void)
 		       & query_bits);
 	if (query_bits == 0) {
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 
 
 	(*gen_queries)(MAX_QUERIES, occ_queries);
 }
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	if (!Automatic)
-		glutKeyboardFunc(Key);
-	Init();
-	glutMainLoop();
-	return 0;
-}
-

@@ -38,13 +38,15 @@
 #include <GL/glext.h>
 #endif
 
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-
 enum piglit_result {
 	PIGLIT_SUCCESS,
 	PIGLIT_FAILURE,
 	PIGLIT_SKIP
 };
+
+#include "piglit-framework.h"
+
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);

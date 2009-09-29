@@ -28,6 +28,9 @@
 
 #include "piglit-util.h"
 
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH;
+
 #define NUM_PROGRAMS 5
 
 static GLuint FragProg[NUM_PROGRAMS];
@@ -53,10 +56,6 @@ static const char* const ProgramText[NUM_PROGRAMS] = {
 		"TEX result.color, fragment.color, texture[0], RECT;\n"
 		"END"
 };
-
-static int Automatic = 0;
-
-static int Width = 300, Height = 200;
 
 static void DoFrame(void)
 {
@@ -143,9 +142,9 @@ static int DoTest( void )
 		GLfloat delta[4];
 		int i;
 
-		glReadPixels((int)(Probes[idx].x*Width/3),
-					  (int)(Probes[idx].y*Height/2),
-					   1, 1,
+		glReadPixels((int)(Probes[idx].x * piglit_width / 3),
+			     (int)(Probes[idx].y * piglit_height / 2),
+			     1, 1,
 		GL_RGBA, GL_FLOAT, probe);
 
 		printf("%20s (%3.1f,%3.1f): %f,%f,%f,%f",
@@ -174,24 +173,22 @@ static int DoTest( void )
 }
 
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-	int succ;
+	int pass;
 
 	DoFrame();
-	succ = DoTest();
+	pass = DoTest();
 
-	if (Automatic) {
-		printf("\nPIGLIT: { 'result': '%s' }\n", succ ? "pass" : "fail");
-		exit(0);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -201,50 +198,20 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-		case 27:
-			exit(0);
-			break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	int i;
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+
+	glutReshapeFunc(Reshape);
 
 	piglit_require_fragment_program();
 
 	for(i = 0; i < NUM_PROGRAMS; ++i)
 		FragProg[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, ProgramText[i]);
 
-	Reshape(Width,Height);
+	Reshape(piglit_width, piglit_height);
 }
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Redisplay);
-	Init();
-	glutMainLoop();
-	return 0;
-}
-
-
 

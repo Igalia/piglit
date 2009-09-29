@@ -153,7 +153,7 @@ tr_func(float a, float b)
 }
 
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	const GLfloat comparitor[4] = { 0.5, 0.5, 0.5, 0.5 };

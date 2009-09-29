@@ -16,8 +16,10 @@
  */
 
 #include "piglit-util.h"
+#include "piglit-framework.h"
 
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
 
 static GLfloat colors[8][3] = {
 	{ 1.0, 1.0, 1.0 },
@@ -30,7 +32,7 @@ static GLfloat colors[8][3] = {
 	{ 0.0, 0.0, 0.0 }
 };
 
-static void Display(void)
+enum piglit_result piglit_display(void)
 {
 	int x, y, color, i, comp;
 	/* x and y range chosen to cover a wide range of memory;
@@ -57,7 +59,7 @@ static void Display(void)
 								x, y, color,
 								colors[color][0], colors[color][1], colors[color][2],
 								result[0], result[1], result[2]);
-							piglit_report_result(PIGLIT_FAILURE);
+							return PIGLIT_FAILURE;
 						}
 					}
 				}
@@ -65,23 +67,12 @@ static void Display(void)
 		}
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	return PIGLIT_SUCCESS;
 }
 
-static void init(void)
+void piglit_init(int argc, char **argv)
 {
-	glViewport(0, 0, Width, Height);
-}
+	piglit_automatic = GL_TRUE;
 
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutDisplayFunc(Display);
-	init();
-	glutMainLoop();
-	return 0;
+	glViewport(0, 0, piglit_width, piglit_height);
 }

@@ -113,7 +113,7 @@ static GLint vert_prog;
 /*@}*/
 
 
-int
+enum piglit_result
 piglit_display(void)
 {
 	static const GLfloat color[4] = { 0.0, 1.0, 0.0, 0.0 };

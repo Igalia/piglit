@@ -202,7 +202,8 @@ static int test(unsigned int dim, unsigned int samples)
 	return PIGLIT_SUCCESS;
 }
 
-int piglit_display()
+enum piglit_result
+piglit_display(void)
 {
 	int result;
 	unsigned int dim;

@@ -29,15 +29,21 @@
  */
 
 #include "piglit-util.h"
+#include "piglit-framework.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+int piglit_width = 400;
+int piglit_height = 300;
+
 static float maxSize = 0.0f;
 static GLuint tex;
 
 static void
-Init(void)
+loadTex(void);
+
+void
+piglit_init(int argc, char **argv)
 {
-	glewInit();
 	piglit_require_extension("GL_ARB_point_sprite");
 
 	glMatrixMode(GL_PROJECTION);
@@ -58,10 +64,11 @@ Init(void)
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glColor3f(1.0, 1.0, 1.0);
 
+	loadTex();
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	static const GLfloat black[3] = {0.0, 0.0, 0.0};
 	GLboolean pass;
@@ -112,11 +119,9 @@ display(void)
 					       white);
 	}
 
-
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-
 	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
@@ -157,24 +162,4 @@ loadTex(void)
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 		     GL_FLOAT, texData);
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1],"-auto",5))
-		Automatic = GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("point_sprite");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	Init();
-
-	loadTex();
-
-	glutMainLoop();
-
-	return 0;
 }

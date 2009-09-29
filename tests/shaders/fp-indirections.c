@@ -27,10 +27,8 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
-
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static int get_program_i(GLenum pname)
 {
@@ -264,17 +262,19 @@ GLboolean test_temporary_source_indirections(void)
 	return pass;
 }
 
-void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
 	pass = test_temporary_dest_indirections() && pass;
 	pass = test_temporary_source_indirections() && pass;
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	exit(0);
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	piglit_require_fragment_program();
 
@@ -288,21 +288,4 @@ void init(void)
 	       get_program_i(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB));
 	printf("Maximum native tex indirections: %d\n",
 	       get_program_i(GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB));
-}
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutInitDisplayMode(GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
-	glutDisplayFunc(display);
-
-	init();
-
-	glutMainLoop();
-	return 0;
 }

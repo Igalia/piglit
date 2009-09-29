@@ -32,29 +32,24 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static GLuint vbo;
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	piglit_require_extension("GL_ARB_vertex_buffer_object");
 
-	glewInit();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 400, 0, 300, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glGenBuffersARB(1, &vbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLfloat white[4] = {1.0, 1.0, 1.0, 0.0};
 	GLboolean pass = GL_TRUE;
@@ -96,29 +91,5 @@ display(void)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1],"-auto"))
-		Automatic = GL_TRUE;
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("vbo-subdata-sync");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	init();
-
-	piglit_require_extension("GL_ARB_vertex_buffer_object");
-
-	glutMainLoop();
-
-	glDeleteBuffersARB(1, &vbo);
-
-	return 0;
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

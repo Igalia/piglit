@@ -30,7 +30,12 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+static void compileLinkProg(void);
+static void loadTex(void);
+
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static GLuint tex[1];
 static GLint prog1;
 static GLint vs1;
@@ -79,17 +84,19 @@ static const char *fragShaderText2 =
 
 
 
-static void
-Init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 400, 0, 300, -1, 1);
+	compileLinkProg();
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	loadTex();
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glEnable(GL_TEXTURE_2D);
 	glClearColor(0.6, 0.6, 0.6, 1.0);
@@ -202,8 +209,8 @@ loadTex(void)
 }
 
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
@@ -227,42 +234,9 @@ display(void)
 	pass = pass && piglit_probe_pixel_rgb(132, 125, green);
 	pass = pass && piglit_probe_pixel_rgb(205, 125, deriv);
 
-	if(Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
-
 	glFinish();
 	glutSwapBuffers();
 
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("glsl-deriv-varyings");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glewInit();
-
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-
-	Init();
-
-	compileLinkProg();
-
-	loadTex();
-
-	glutMainLoop();
-
-	return 0;
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 

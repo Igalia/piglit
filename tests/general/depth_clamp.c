@@ -36,34 +36,24 @@
 
 #include "piglit-util.h"
 
+int piglit_width = 100, piglit_height = 150;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
+
 /* In case the headers have the old enum name but not the new */
 #ifndef GL_DEPTH_CLAMP
 #define GL_DEPTH_CLAMP GL_DEPTH_CLAMP_NV
 #endif
 
-static GLboolean Automatic = GL_FALSE;
-
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 150
-
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	glewInit();
 	piglit_require_extension("GL_ARB_depth_clamp");
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float white[3] = {1.0, 1.0, 1.0};
@@ -160,25 +150,5 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if (argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("depth_clamp");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	init();
-
-	glutMainLoop();
-
-	return 0;
-
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

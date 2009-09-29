@@ -41,9 +41,8 @@ static const char* const program_text =
 	"END\n"
 	;
 
-static int Automatic = 0;
-
-static int Width = 50, Height = 50;
+int piglit_width = 50, piglit_height = 50;
+int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE;
 
 #if defined(__APPLE__)
 static void (*pglFogCoordf)(GLfloat coord) = NULL;
@@ -51,7 +50,8 @@ static void (*pglFogCoordf)(GLfloat coord) = NULL;
 static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
 #endif
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
 	static const struct {
 		float x, y, r;
@@ -107,25 +107,22 @@ static void Redisplay(void)
 		expected_color[2] = 0.0;
 		expected_color[3] = 1.0;
 
-		pass &= piglit_probe_pixel_rgba(probes[i].x * Width / 2,
-						probes[i].y * Height / 2,
+		pass &= piglit_probe_pixel_rgba(probes[i].x * piglit_width / 2,
+						probes[i].y * piglit_height / 2,
 						expected_color);
 	}
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		printf("\nPIGLIT: { 'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(0);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
+
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -135,23 +132,12 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-
-	if (key) {
-		exit(0);
-	}
-
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+
+	glutReshapeFunc(Reshape);
 
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 
@@ -187,26 +173,5 @@ static void Init(void)
 
 	glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
 
-	Reshape(Width, Height);
-}
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-
-	if ((argc > 1) && (strcmp(argv[1], "-auto") == 0)) {
-		Automatic = 1;
-	}
-
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Redisplay);
-	Init();
-	glutMainLoop();
-	return 0;
+	Reshape(piglit_width, piglit_height);
 }
