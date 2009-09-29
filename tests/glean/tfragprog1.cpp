@@ -119,6 +119,21 @@ static const FragmentProgram Programs[] = {
 		DONT_CARE_Z
 	},
 	{
+		"ADD with saturation",
+		"!!ARBfp1.0\n"
+		"PARAM p = program.local[1]; \n"
+                "TEMP t; \n"
+                "ADD t, p, p; \n"
+		"ADD_SAT result.color, t, p; \n"
+		"END \n",
+		{ CLAMP01(Param1[0] + Param1[0] + Param1[0]),
+		  CLAMP01(Param1[1] + Param1[1] + Param1[1]),
+		  CLAMP01(Param1[2] + Param1[2] + Param1[2]),
+		  CLAMP01(Param1[3] + Param1[3] + Param1[3]),
+		},
+		DONT_CARE_Z
+	},
+	{
 		"CMP test",
 		"!!ARBfp1.0\n"
 		"PARAM zero = program.local[0]; \n"
@@ -558,6 +573,22 @@ static const FragmentProgram Programs[] = {
 		  CLAMP01(Param1[0] - FragColor[0]),
 		  CLAMP01(Param1[3] - FragColor[3]),
 		  CLAMP01(Param1[2] - FragColor[2])
+		},
+		DONT_CARE_Z
+	},
+	{
+		"SUB with saturation",
+		"!!ARBfp1.0\n"
+		"PARAM p1 = program.local[1]; \n"
+                "PARAM bias = {0.1, 0.1, 0.1, 0.1}; \n"
+                "TEMP t; \n"
+		"SUB_SAT t, fragment.color, p1; \n"
+                "ADD result.color, t, bias; \n"
+		"END \n",
+		{ CLAMP01(FragColor[0] - Param1[1]) + 0.1,
+		  CLAMP01(FragColor[1] - Param1[1]) + 0.1,
+		  CLAMP01(FragColor[2] - Param1[2]) + 0.1,
+		  CLAMP01(FragColor[3] - Param1[3]) + 0.1
 		},
 		DONT_CARE_Z
 	},

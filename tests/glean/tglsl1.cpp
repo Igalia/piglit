@@ -359,6 +359,21 @@ static const ShaderProgram Programs[] = {
         },
 
         {
+		// This test targets SOA implementations where we have to
+		// check for SOA dependencies.
+		"Swizzle in-place",
+		NO_VERTEX_SHADER,
+		"void main() { \n"
+                "   vec4 a = vec4(0.5, 0.2, 0.1, 0.8); \n"
+                "   a = a.yxwz; \n"
+		"   gl_FragColor = a; \n"
+		"} \n",
+		{ 0.2, 0.5, 0.8, 0.1 },
+		DONT_CARE_Z,
+		FLAG_NONE
+        },
+
+        {
 		"Swizzled swizzle",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -2185,13 +2200,13 @@ static const ShaderProgram Programs[] = {
 	{
 		"function call with in, out params",
 		NO_VERTEX_SHADER,
-		"void half(in float x, out float y) { \n"
+		"void Half(in float x, out float y) { \n"
 		"   y = 0.5 * x; \n"
 		"} \n"
 		"\n"
 		"void main() { \n"
 		"   float a = 0.5, b = 0.1; \n"
-		"   half(a, b); \n"
+		"   Half(a, b); \n"
 		"   gl_FragColor = vec4(b); \n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 0.25 },
@@ -2257,9 +2272,30 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"function with early return (4)",
+		NO_VERTEX_SHADER,
+                "float val = 0.5; \n"
+		"void sub(in float x) { \n"
+		"   if (x >= 0.3) \n"
+		"      if (x >= 0.4) \n"
+		"         return; \n"
+		"   val = 1.0; \n"
+		"} \n"
+		"\n"
+		"void main() { \n"
+		"   sub(gl_TexCoord[0].s); \n"
+		"   gl_FragColor = vec4(val); \n"
+		"} \n",
+		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+
+	{
 		"nested function calls (1)",
 		NO_VERTEX_SHADER,
-		"float half(const in float x) { \n"
+		"float Half(const in float x) { \n"
 		"   return 0.5 * x; \n"
 		"} \n"
 		"\n"
@@ -2269,7 +2305,7 @@ static const ShaderProgram Programs[] = {
 		"\n"
 		"void main() { \n"
 		"   float a = 0.5; \n"
-		"   float b = square(half(1.0)); \n"
+		"   float b = square(Half(1.0)); \n"
 		"   gl_FragColor = vec4(b); \n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 0.25 },
@@ -2280,12 +2316,12 @@ static const ShaderProgram Programs[] = {
 	{
 		"nested function calls (2)",
 		NO_VERTEX_SHADER,
-		"float half(const in float x) { \n"
+		"float Half(const in float x) { \n"
 		"   return 0.5 * x; \n"
 		"} \n"
 		"\n"
 		"float square_half(const in float x) { \n"
-		"   float y = half(x); \n"
+		"   float y = Half(x); \n"
 		"   return y * y; \n"
 		"} \n"
 		"\n"
@@ -2302,13 +2338,13 @@ static const ShaderProgram Programs[] = {
 	{
 		"nested function calls (3)",
 		NO_VERTEX_SHADER,
-		"float half(const in float x) { \n"
+		"float Half(const in float x) { \n"
 		"   return 0.5 * x; \n"
 		"} \n"
 		"\n"
 		"void main() { \n"
 		"   float a = 0.5; \n"
-		"   float b = half(half(a)); \n"
+		"   float b = Half(Half(a)); \n"
 		"   gl_FragColor = vec4(b); \n"
 		"} \n",
 		{ 0.125, 0.125, 0.125, 0.125 },
@@ -3175,6 +3211,86 @@ static const ShaderProgram Programs[] = {
 		DONT_CARE_Z,
 		FLAG_VERSION_1_20
 	},
+#if 0 // not working with Mesa yet
+	{
+		"GLSL 1.20 array constructor 3",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 [] colors = vec4[2](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                        vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 4",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 [2] colors = vec4[](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                         vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 5",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 [] colors = vec4[](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                        vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 6",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 colors[] = vec4[](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                       vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 7",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 colors[2] = vec4[](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                        vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+	{
+		"GLSL 1.20 array constructor 8",
+		NO_VERTEX_SHADER,
+		"#version 120 \n"
+		"vec4 colors[2] = vec4[2](vec4(0.5, 0.4, 0.3, 0.2), \n"
+                "                         vec4(0.7, 0.8, 0.9, 1.0)); \n"
+		"void main() { \n"
+		"   gl_FragColor = colors[1]; \n"
+		"} \n",
+		{ 0.7, 0.8, 0.9, 1.0 },
+		DONT_CARE_Z,
+		FLAG_VERSION_1_20
+	},
+#endif
 	{
 		"GLSL 1.20 const array constructor 1",
 		NO_VERTEX_SHADER,

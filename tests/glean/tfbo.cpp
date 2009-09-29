@@ -664,7 +664,7 @@ FBOTest::testRender2SingleTexture(void)
                                         glDepthFunc(GL_ALWAYS);
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
-                                                glBegin(GL_LINE);
+                                                glBegin(GL_LINES);
                                                 glVertex3f(TEXSIZE / 4, 0, 0.3);
                                                 glVertex3f(TEXSIZE * 5 / 8, 0, 0.3);
                                                 glEnd();
@@ -694,7 +694,7 @@ FBOTest::testRender2SingleTexture(void)
                                                     GL_KEEP, GL_REPLACE);
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
-                                                glBegin(GL_LINE);
+                                                glBegin(GL_LINES);
                                                 glVertex3f(TEXSIZE / 2, 0, 0.3);
                                                 glVertex3f(TEXSIZE * 7 / 8, 0, 0.3);
                                                 glEnd();
@@ -725,7 +725,7 @@ FBOTest::testRender2SingleTexture(void)
 
                                 switch (textureModes[mode]) {
                                 case GL_TEXTURE_1D:
-                                        glBegin(GL_LINE);
+                                        glBegin(GL_LINES);
                                         glVertex3f(0, 0, 0.2);
                                         glVertex3f(TEXSIZE, 0, 0.2);
                                         glEnd();

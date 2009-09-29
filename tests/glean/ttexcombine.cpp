@@ -1441,10 +1441,9 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 
 	// Test the availability of the DOT3 extenstion
 	haveDot3 = GLUtils::haveExtensions("GL_EXT_texture_env_dot3");
-	if (0 == haveDot3)
-		haveDot3 = GLUtils::haveExtensions("GL_ARB_texture_env_dot3");
 
-	haveCrossbar = GLUtils::haveExtensions("GL_ARB_texture_env_crossbar");
+	haveCrossbar = GLUtils::haveExtensions("GL_ARB_texture_env_crossbar")
+		&& GLUtils::haveExtensions("GL_ARB_texture_env_combine");
 
 	// compute RGB error tolerance
 	{

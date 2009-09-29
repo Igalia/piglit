@@ -283,7 +283,7 @@ public:
 			// Select the drawing configurations for testing
 			DrawingSurfaceFilter f(filter);
 			vector<DrawingSurfaceConfig*>
-				configs(f.filter(ws.surfConfigs));
+                           configs(f.filter(ws.surfConfigs, environment.options.maxVisuals));
 
 			// Test each config
 			for (vector<DrawingSurfaceConfig*>::const_iterator

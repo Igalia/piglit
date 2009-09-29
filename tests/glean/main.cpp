@@ -60,6 +60,7 @@ main(int argc, char* argv[]) {
 	// Until someone gets around to writing a fancy GUI front-end,
 	// we'll set options the old-fashioned way.
 	Options o;
+	bool visFilter = false;
 
         vector<string> allTestNames;
         for (Test* t = Test::testList; t; t = t->nextTest)
@@ -91,6 +92,7 @@ main(int argc, char* argv[]) {
 			++i;
 			o.db2Name = mandatoryArg(argc, argv, i);
 		} else if (!strcmp(argv[i], "--visuals")) {
+			visFilter = true;
 			++i;
 			o.visFilter = mandatoryArg(argc, argv, i);
 		} else if (!strcmp(argv[i], "-t")
@@ -116,6 +118,13 @@ main(int argc, char* argv[]) {
 	if (o.mode == Options::listtests) {
 		listTests(Test::testList, o.verbosity);
 		exit(0);
+	}
+
+	if (o.quick && !visFilter) {
+		// If we have --quick but not --visuals then limit testing to
+		// a single RGB, Z, Stencil visual.
+		o.visFilter = "rgb && z>0 && s>0 && conformant";
+		o.maxVisuals = 1;
 	}
 
 	// Create the test environment, then invoke each test to generate

@@ -163,11 +163,23 @@ DrawingSurfaceFilter::matches(DrawingSurfaceConfig& c) {
 ///////////////////////////////////////////////////////////////////////////////
 vector<DrawingSurfaceConfig*>
 DrawingSurfaceFilter::filter(vector<DrawingSurfaceConfig*>& v) {
+	return filter(v, ~0u);
+} // DrawingSurfaceFilter::filter
+
+///////////////////////////////////////////////////////////////////////////////
+// filter - filter as above, but limit number of results
+///////////////////////////////////////////////////////////////////////////////
+vector<DrawingSurfaceConfig*>
+DrawingSurfaceFilter::filter(vector<DrawingSurfaceConfig*>& v,
+							 unsigned int maxConfigs) {
 	vector<DrawingSurfaceConfig*> result;
+	unsigned count = 0;
 	for (vector<DrawingSurfaceConfig*>::const_iterator p = v.begin();
-	    p < v.end(); ++p) {
-	 	if (matches(**p))
+	    p < v.end() && count < maxConfigs; ++p) {
+	 	if (matches(**p)) {
 			result.push_back(*p);
+			count++;
+		}
 	}
 
 	sort(result.begin(), result.end(), ConfigSort(sortKeys));
