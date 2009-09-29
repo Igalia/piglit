@@ -74,8 +74,7 @@ bool PBOTest::setup(void)
    glReadBuffer(GL_FRONT);
 
    // compute error tolerances (may need fine-tuning)
-   int
-      bufferBits[5];
+   int bufferBits[5];
 
    glGetIntegerv(GL_RED_BITS, &bufferBits[0]);
    glGetIntegerv(GL_GREEN_BITS, &bufferBits[1]);
@@ -96,7 +95,7 @@ bool PBOTest::setup(void)
       tolerance[4] = 1.0;
 
    // Check if GL_ARB_pixel_buffer_object is supported
-   if (!strstr((char *) glGetString(GL_EXTENSIONS), "GL_ARB_pixel_buffer_object")) {
+   if (!GLUtils::haveExtension("GL_ARB_pixel_buffer_object")) {
       //printf("GL_ARB_pixel_buffer_object is not supported\n");
       usePBO = 0;
       return false;
@@ -315,8 +314,7 @@ bool PBOTest::testDrawPixels(void)
                exp[2] = j % 256;
 
                if (i < TEXSIZE && j < TEXSIZE) {
-                  if (equalColors1(&pboPackMem[(j * windowSize + i) * 4], exp)
-                      != true) {
+                  if (!equalColors1(&pboPackMem[(j * windowSize + i) * 4], exp)) {
                      REPORT_FAILURE("glDrawPixels failed");
                      printf("  got (%d, %d) = [%d, %d, %d], ", i, j,
                             pboPackMem[(j * windowSize + i) * 4],
@@ -329,8 +327,7 @@ bool PBOTest::testDrawPixels(void)
                   }
                }
                else {
-                  if (equalColors1(&pboPackMem[(j * windowSize + i) * 4],
-                       black) != true) {
+                  if (!equalColors1(&pboPackMem[(j * windowSize + i) * 4], black)) {
                      REPORT_FAILURE("glDrawPixels failed");
                      printf("(%d, %d) = [%d, %d, %d], ", i, j,
                             pboPackMem[(j * windowSize + i) * 4],
@@ -544,8 +541,7 @@ bool PBOTest::testBitmap(void)
                else
                   exp = white;
                if (i < TEXSIZE && j < TEXSIZE) {
-                  if (equalColors(&pboPackMem[(j * windowSize + i) * 3], exp)
-                      != true) {
+                  if (!equalColors(&pboPackMem[(j * windowSize + i) * 3], exp)) {
                      REPORT_FAILURE("glBitmap failed");
                      printf("  got (%d, %d) = [%f, %f, %f], ", i, j,
                             pboPackMem[(j * windowSize + i) * 3],
@@ -558,9 +554,8 @@ bool PBOTest::testBitmap(void)
                   }
                }
                else {
-                  if (equalColors
-                      (&pboPackMem[(j * windowSize + i) * 3],
-                       black) != true) {
+                  if (!equalColors(&pboPackMem[(j * windowSize + i) * 3],
+                                   black)) {
                      REPORT_FAILURE("glBitmap failed");
                      printf("(%d, %d) = [%f, %f, %f], ", i, j,
                             pboPackMem[(j * windowSize + i) * 3],
@@ -719,7 +714,7 @@ bool PBOTest::testTexImage(void)
                for (i = 0; i < TEXSIZE * TEXSIZE; i++) {
                   if (i == 0 && breakCOWTexture && useTexUnpackBuffer) {
                      GLfloat exp[3] = { 0.8, 0.8, 0.8 };
-                     if (equalColors(&pboMem[i * 3], exp) != true) {
+                     if (!equalColors(&pboMem[i * 3], exp)) {
                         REPORT_FAILURE("glGetTexImage failed");
                         printf("  got (%d) = [%f, %f, %f], ", i,
                                pboMem[i * 3],
@@ -732,7 +727,7 @@ bool PBOTest::testTexImage(void)
                   }
                   else {
                      GLfloat exp[3] = { 1.0, 1.0, 0.0 };
-                     if (equalColors(&pboMem[i * 3], exp) != true) {
+                     if (!equalColors(&pboMem[i * 3], exp)) {
                         REPORT_FAILURE("glGetTexImage failed");
                         printf("  got (%d) = [%f, %f, %f], ", i,
                                pboMem[i * 3],
@@ -765,6 +760,7 @@ bool PBOTest::testTexImage(void)
                glTexCoord2f(0, 1);
                glVertex2f(0, TEXSIZE);
                glEnd();
+               glDisable(GL_TEXTURE_2D);
 
                glReadPixels(0, 0, windowSize, windowSize, GL_RGB, GL_FLOAT,
                             buf);
@@ -773,8 +769,7 @@ bool PBOTest::testTexImage(void)
                      if (i == 0 && j == 0 && breakCOWTexture
                          && useTexUnpackBuffer) {
                         GLfloat exp[3] = { 0.8, 0.8, 0.8 };
-                        if (equalColors(&buf[(j * windowSize + i) * 3], exp)
-                            != true) {
+                        if (!equalColors(&buf[(j * windowSize + i) * 3], exp)) {
                            REPORT_FAILURE("glTexImage failed");
                            printf("  got (%d, %d) = [%f, %f, %f], ", i, j,
                                   buf[(j * windowSize + i) * 3],
@@ -787,8 +782,7 @@ bool PBOTest::testTexImage(void)
                         }
                      }
                      else if (i < TEXSIZE && j < TEXSIZE) {
-                        if (equalColors(&buf[(j * windowSize + i) * 3], green)
-                            != true) {
+                        if (!equalColors(&buf[(j * windowSize + i) * 3], green)) {
                            REPORT_FAILURE("glTexImage failed");
                            printf("  got (%d, %d) = [%f, %f, %f], ", i, j,
                                   buf[(j * windowSize + i) * 3],
@@ -801,8 +795,7 @@ bool PBOTest::testTexImage(void)
                         }
                      }
                      else {
-                        if (equalColors(&buf[(j * windowSize + i) * 3], black)
-                            != true) {
+                        if (!equalColors(&buf[(j * windowSize + i) * 3], black)) {
                            REPORT_FAILURE("glTexImage failed");
                            printf("(%d, %d) = [%f, %f, %f], ", i, j,
                                   buf[(j * windowSize + i) * 3],
@@ -897,7 +890,7 @@ bool PBOTest::testTexSubImage(void)
       for (j = 0; j < windowSize; j++) {
          for (i = 0; i < windowSize; i++) {
             if (i < 10 && j < 10) {
-               if (equalColors(&buf[(j * windowSize + i) * 3], green) != true) {
+               if (!equalColors(&buf[(j * windowSize + i) * 3], green)) {
                   REPORT_FAILURE("glTexSubImage failed");
                   printf("  got (%d, %d) = [%f, %f, %f], ", i, j,
                          buf[(j * windowSize + i) * 3],
@@ -910,7 +903,7 @@ bool PBOTest::testTexSubImage(void)
                }
             }
             else {
-               if (equalColors(&buf[(j * windowSize + i) * 3], black) != true) {
+               if (!equalColors(&buf[(j * windowSize + i) * 3], black)) {
                   REPORT_FAILURE("glTexSubImage failed");
                   printf("(%d, %d) = [%f, %f, %f], ", i, j,
                          buf[(j * windowSize + i) * 3],
@@ -1008,6 +1001,7 @@ bool PBOTest::testPolygonStip(void)
          }
 
          glEnable(GL_POLYGON_STIPPLE);
+         glColor4f(1.0, 1.0, 1.0, 0.0);
          glBegin(GL_POLYGON);
          glVertex2f(0, 0);
          glVertex2f(10, 0);
@@ -1030,8 +1024,7 @@ bool PBOTest::testPolygonStip(void)
                else
                   exp = white;
                if (i < 10 && j < 10) {
-                  if (equalColors(&buf[(j * windowSize + i) * 3], exp) !=
-                      true) {
+                  if (!equalColors(&buf[(j * windowSize + i) * 3], exp)) {
                      REPORT_FAILURE("glGetPolygonStipple failed");
                      printf("(%d, %d) = [%f, %f, %f], ", i, j,
                             buf[(j * windowSize + i) * 3],
@@ -1042,8 +1035,7 @@ bool PBOTest::testPolygonStip(void)
                   }
                }
                else {
-                  if (equalColors(&buf[(j * windowSize + i) * 3], black) !=
-                      true) {
+                  if (!equalColors(&buf[(j * windowSize + i) * 3], black)) {
                      REPORT_FAILURE("glGetPolygonStipple failed");
                      printf("(%d, %d) = [%f, %f, %f], ", i, j,
                             buf[(j * windowSize + i) * 3],
@@ -1123,11 +1115,12 @@ bool PBOTest::testFunctionality(MultiTestResult & r)
 }
 
 enum {
-      BLACK,
-      RED,
-      GREEN,
-      BLUE,
-WHITE };
+   BLACK,
+   RED,
+   GREEN,
+   BLUE,
+   WHITE
+};
 
 GLfloat colors1[][4] = {
    {0.0, 0.0, 0.0, 0.0},

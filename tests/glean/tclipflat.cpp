@@ -220,13 +220,13 @@ ClipFlatTest::drawArrays(GLenum mode, const GLfloat *verts, GLuint count)
 {
    glColorPointer(3, GL_FLOAT, 5 * sizeof(GLfloat), verts + 0);
    glVertexPointer(2, GL_FLOAT, 5 * sizeof(GLfloat), verts + 3);
-   glEnable(GL_COLOR_ARRAY);
-   glEnable(GL_VERTEX_ARRAY);
+   glEnableClientState(GL_COLOR_ARRAY);
+   glEnableClientState(GL_VERTEX_ARRAY);
 
    glDrawArrays(mode, 0, count);
 
-   glDisable(GL_COLOR_ARRAY);
-   glDisable(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_COLOR_ARRAY);
+   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 

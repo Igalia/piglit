@@ -311,14 +311,14 @@ API2Test::renderQuadWithArrays(GLint attr, const GLfloat value[4],
 	};
 
 	glVertexPointer(3, GL_FLOAT, 0, vertcoords);
-	glEnable(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexAttribPointer_func(attr, 4, GL_FLOAT, GL_FALSE, 0, values);
 	glEnableVertexAttribArray_func(attr);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_POLYGON, 0, 4);
 
-	glDisable(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray_func(attr);
 
 	// read a pixel from lower-left corner of rendered quad

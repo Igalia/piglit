@@ -93,7 +93,7 @@ WindowSystem::WindowSystem(Options& o) {
 	// constraints provided by the user.  (This makes it convenient
 	// to run tests on just a subset of all available configs.)
 	DrawingSurfaceFilter f(o.visFilter);	// may throw an exception!
-	surfConfigs = f.filter(glxv);
+	surfConfigs = f.filter(glxv, o.maxVisuals);
 } // WindowSystem::WindowSystem
 
 #elif defined(__WIN__)
@@ -135,7 +135,7 @@ WindowSystem::WindowSystem(Options& o) {
 	// constraints provided by the user.  (This makes it convenient
 	// to run tests on just a subset of all available configs.)
 	DrawingSurfaceFilter f(o.visFilter);	// may throw an exception!
-	surfConfigs = f.filter(glpf);
+	surfConfigs = f.filter(glpf, o.maxVisuals);
 }
 
 #elif defined(__BEWIN__)
@@ -150,7 +150,7 @@ WindowSystem::WindowSystem(Options& o) {
 	glconfigs.push_back(new DrawingSurfaceConfig());
 
 	DrawingSurfaceFilter f(o.visFilter);	// may throw an exception!
-	surfConfigs = f.filter(glconfigs);
+	surfConfigs = f.filter(glconfigs, o.maxVisuals);
 
 }
 
@@ -201,7 +201,7 @@ WindowSystem::WindowSystem(Options& o) {
 	// constraints provided by the user.  (This makes it convenient
 	// to run tests on just a subset of all available configs.)
 	DrawingSurfaceFilter f(o.visFilter);	// may throw an exception!
-	surfConfigs = f.filter(glpf);
+	surfConfigs = f.filter(glpf, o.maxVisuals);
 }
 
 #endif

@@ -78,6 +78,8 @@ class Options {
 				// DrawingSurfaceFilter for description of
 				// contents.
 
+	unsigned int maxVisuals;// Max number of visuals to test
+
 	vector<string> selectedTests;
 				// Sorted list of tests to be executed.
 

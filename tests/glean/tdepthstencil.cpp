@@ -261,7 +261,8 @@ DepthStencilTest::readPixelsRate(GLenum format, GLenum type)
 
 	delete [] img;
 
-	double rate = width * height * iterations / elapsedTime;
+	double rate = width * height * (double) iterations / elapsedTime;
+	assert(rate > 0.0);
 	return rate;  // pixels/second
 }
 

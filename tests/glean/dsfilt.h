@@ -119,6 +119,10 @@ class DrawingSurfaceFilter {
 		// match the filter criteria, sorted according to the sorting
 		// criteria.
 
+	vector<DrawingSurfaceConfig*> filter(vector<DrawingSurfaceConfig*>& v,
+						 unsigned int maxConfigs);
+		// As above, but limit number of filter results to given count.
+
     protected:
 
 	typedef enum {

@@ -1083,10 +1083,10 @@ VertexProgramTest::testBadProgram(MultiTestResult &result)
 		};
 
 		glVertexPointer(3, GL_FLOAT, 0, vertcoords);
-		glEnable(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_VERTEX_ARRAY);
 		glDrawArrays(GL_POLYGON, 0, 4);
 		err = glGetError();
-		glDisable(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_VERTEX_ARRAY);
 
 		if (err != GL_INVALID_OPERATION) {
 			env->log << "Unexpected OpenGL error state " << (int) err <<
@@ -1095,7 +1095,7 @@ VertexProgramTest::testBadProgram(MultiTestResult &result)
 			result.numFailed++;
 
 			while (err != 0)
-				glGetError();
+				err = glGetError();
 		} else {
 			result.numPassed++;
 		}

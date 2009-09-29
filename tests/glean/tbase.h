@@ -288,7 +288,7 @@ public:
 			// Select the drawing configurations for testing
 			DrawingSurfaceFilter f(filter);
 			vector<DrawingSurfaceConfig*>
-				configs(f.filter(ws.surfConfigs));
+                           configs(f.filter(ws.surfConfigs, environment.options.maxVisuals));
 
 			if (env->options.quick)
 				testOne = true;
