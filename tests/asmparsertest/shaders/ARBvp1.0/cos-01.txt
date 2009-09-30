@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# ARB_vertex_program does not have the COS instruction.
+# FAIL
+	COS	result.position, vertex.position.x;
+	END

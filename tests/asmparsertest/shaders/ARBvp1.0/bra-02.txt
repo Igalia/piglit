@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+# FAIL - duplicate branch label
+	OPTION	NV_vertex_program2;
+
+label1:	MOVC	result.position, vertex.position;
+label1:
+	BRA	label1 (EQ.xyzw);
+	END

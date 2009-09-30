@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+OPTION	NV_vertex_program2;
+TEMP	R0;
+STR	R0, vertex.attrib[1], vertex.attrib[2];
+END

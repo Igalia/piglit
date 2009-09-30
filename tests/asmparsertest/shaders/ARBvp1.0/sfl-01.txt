@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# FAIL
+TEMP	R0;
+SFL	R0, vertex.attrib[1], vertex.attrib[2];
+END

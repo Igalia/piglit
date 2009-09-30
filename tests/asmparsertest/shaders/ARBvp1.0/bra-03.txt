@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+	OPTION	NV_vertex_program2;
+	TEMP	label1;
+
+	MOV	label1, vertex.color;
+label1:	MOVC	result.position, vertex.position;
+	BRA	label1 (EQ.xyzw);
+	END

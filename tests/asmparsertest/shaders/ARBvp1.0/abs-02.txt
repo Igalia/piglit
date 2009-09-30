@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# FAIL
+# ARB_vertex_program does not support the absolute value operator on operands
+	TEMP	R0;
+	ADD	R0, 0.5, vertex.color;
+	MOV	result.color, |R0|;
+	END

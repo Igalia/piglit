@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+
+	OPTION	NV_vertex_program2;
+	TEMP	R0;
+	ADD	R0, 0.5, vertex.color;
+	MOV	result.color, |R0|;
+	END

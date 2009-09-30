@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+	OPTION	NV_vertex_program2;
+	SIN	result.position, vertex.position.x;
+	END

@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+# FAIL
+	OPTION	NV_vertex_program2;
+
+	# The COS instruction takes a scalar operand.
+	COS	result.position, vertex.position;
+	END
