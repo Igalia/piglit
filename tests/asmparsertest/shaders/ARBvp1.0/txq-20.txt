@@ -1,0 +1,11 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_ARB_fragment_program_shadow
+OPTION	ARB_fragment_program_shadow;
+# REQUIRE GL_ARB_texture_rectangle
+# FAIL - TXQ not supported by GL_NV_vertex_program3
+
+OUTPUT	SHADOWRECT = result.color;
+TXQ	SHADOWRECT, vertex.texcoord[0], texture[0], SHADOWRECT;
+END

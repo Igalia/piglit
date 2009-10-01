@@ -27,18 +27,20 @@
 
 function emit_target_require
 {
-    if [ "$1" = "RECT" ]; then
-	echo "# REQUIRE GL_ARB_texture_rectangle"
-    fi
-    if [ "$1" = "CUBE" ]; then
-	echo "# REQUIRE GL_ARB_texture_cube_map"
-    fi
-    if [ "$1" = "3D" ]; then
-	echo "# REQUIRE GL_EXT_texture3D"
-    fi
-    if [ "$1" = "SHADOW1D" -o "$1" = "SHADOW2D" ]; then
+    t=$1
+    if echo $t | grep -q ^SHADOW ; then
 	echo "# REQUIRE GL_ARB_fragment_program_shadow"
 	echo "OPTION	ARB_fragment_program_shadow;"
+	t=$(echo $t | sed 's/^SHADOW//')
+    fi
+    if [ "$t" = "RECT" ]; then
+	echo "# REQUIRE GL_ARB_texture_rectangle"
+    fi
+    if [ "$t" = "CUBE" ]; then
+	echo "# REQUIRE GL_ARB_texture_cube_map"
+    fi
+    if [ "$t" = "3D" ]; then
+	echo "# REQUIRE GL_EXT_texture3D"
     fi
 }
 
@@ -115,6 +117,22 @@ for inst in TEX TXB TXD TXF TXL TXP TXQ; do
     done
 
     for target in CUBE RECT; do
+	file=$(printf "%s-%02d.txt" $inst_low $i)
+
+	emit_shader_NVvp3_alt $inst $target > $path/$file
+	i=$((i + 1))
+    done
+
+    # Add this set of tests cases here so that the tests from the previous
+    # don't get re-numbered.  This prevents unnecessary churn in the diffs.
+    for target in SHADOWRECT; do
+	file=$(printf "%s-%02d.txt" $inst_low $i)
+
+	emit_shader_NVvp3 $inst $target > $path/$file
+	i=$((i + 1))
+    done
+
+    for target in SHADOW1D SHADOW2D SHADOWRECT; do
 	file=$(printf "%s-%02d.txt" $inst_low $i)
 
 	emit_shader_NVvp3_alt $inst $target > $path/$file
