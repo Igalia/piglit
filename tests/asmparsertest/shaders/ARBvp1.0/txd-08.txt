@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# FAIL - TXD not supported by GL_NV_vertex_program3
+
+TXD	result.color, vertex.texcoord[0], texture[0], 1D;
+END

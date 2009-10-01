@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_ARB_texture_rectangle
+# FAIL - TXF not supported by GL_NV_vertex_program3
+
+OUTPUT	RECT = result.color;
+TXF	RECT, vertex.texcoord[0], texture[0], RECT;
+END

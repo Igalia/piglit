@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# FAIL - TXF not supported by GL_NV_vertex_program3
+
+TXF	result.color, vertex.texcoord[0], texture[0], 2D;
+END

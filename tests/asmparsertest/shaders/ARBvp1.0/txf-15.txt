@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_ARB_texture_cube_map
+# FAIL - TXF not supported by GL_NV_vertex_program3
+
+OUTPUT	CUBE = result.color;
+TXF	CUBE, vertex.texcoord[0], texture[0], CUBE;
+END

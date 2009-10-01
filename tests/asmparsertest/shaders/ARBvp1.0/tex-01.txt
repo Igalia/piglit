@@ -1,0 +1,4 @@
+!!ARBvp1.0
+# FAIL - texture instructions not supported by GL_ARB_vertex_program
+TEX	result.color, vertex.texcoord[0], texture[0], 1D;
+END

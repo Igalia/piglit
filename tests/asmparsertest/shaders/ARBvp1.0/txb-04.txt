@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# REQUIRE GL_ARB_texture_cube_map
+# FAIL - texture instructions not supported by GL_ARB_vertex_program
+TXB	result.color, vertex.texcoord[0], texture[0], CUBE;
+END

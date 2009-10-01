@@ -1,0 +1,5 @@
+!!ARBvp1.0
+# REQUIRE GL_ARB_texture_rectangle
+# FAIL - texture instructions not supported by GL_ARB_vertex_program
+TXP	result.color, vertex.texcoord[0], texture[0], RECT;
+END

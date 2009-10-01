@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+
+TEX	result.color, vertex.texcoord[0], texture[0], 2D;
+END

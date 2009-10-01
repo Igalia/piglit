@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_ARB_fragment_program_shadow
+OPTION	ARB_fragment_program_shadow;
+
+TXP	result.color, vertex.texcoord[0], texture[0], SHADOW1D;
+END

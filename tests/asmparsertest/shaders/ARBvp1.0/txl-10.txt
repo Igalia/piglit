@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_EXT_texture3D
+
+TXL	result.color, vertex.texcoord[0], texture[0], 3D;
+END

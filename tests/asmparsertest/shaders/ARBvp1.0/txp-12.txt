@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+OPTION	NV_vertex_program3;
+# REQUIRE GL_ARB_texture_rectangle
+
+TXP	result.color, vertex.texcoord[0], texture[0], RECT;
+END
