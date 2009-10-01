@@ -35,7 +35,7 @@ function emit_test_list
     find $dir -type f -name '*.txt' | sort |\
     while read f
     do
-	printf "asmparsertest['%s'] = PlainExecTest([testBinDir + 'asmparsertest', '%s', 'tests/asmparsertest/shaders/%s'])\n" "$f" "$subdir" "$f"
+	printf "asmparsertest['%s'] = PlainExecTest([testBinDir + 'asmparsertest', '-auto', '%s', 'tests/asmparsertest/shaders/%s'])\n" "$f" "$subdir" "$f"
     done
 
     cd ..
