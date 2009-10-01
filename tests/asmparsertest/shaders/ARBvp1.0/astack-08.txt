@@ -1,0 +1,12 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program3
+
+	OPTION	NV_vertex_program3;
+	ADDRESS	a0;       
+	TEMP	r0;
+
+	ARL	a0, vertex.color;
+	MOVC	r0, vertex.normal;
+	PUSHA	a0;
+	POPA	a0 (EQ.xxxx);
+	END

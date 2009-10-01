@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL
+	ADDRESS	a0;       
+	TEMP	r0;
+
+	ARL	a0.x, vertex.color.x;
+	PUSHA	a0;
+	END
