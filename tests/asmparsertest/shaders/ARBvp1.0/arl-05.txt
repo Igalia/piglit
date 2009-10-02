@@ -1,0 +1,9 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+	OPTION	NV_vertex_program2;
+	PARAM	a[2] = { program.env[0..1] };
+	ADDRESS	A0;
+
+	ARL	A0, vertex.position;
+	MOV	result.position, a[A0.y];
+	END

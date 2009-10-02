@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# FAIL - source operand to ARL must be scalar
+	PARAM	a[2] = { program.env[0..1] };
+	ADDRESS	A0;
+
+	ARL	A0.x, vertex.position;
+	MOV	result.position, a[A0.x];
+	END

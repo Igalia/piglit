@@ -1,0 +1,7 @@
+!!ARBvp1.0
+	PARAM	a[2] = { program.env[0..1] };
+	ADDRESS	A0;
+
+	ARL	A0.x, vertex.position.w;
+	MOV	result.position, a[A0.x];
+	END
