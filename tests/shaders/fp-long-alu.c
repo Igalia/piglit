@@ -164,10 +164,12 @@ enum piglit_result piglit_display()
 		if (result != PIGLIT_SUCCESS)
 			return result;
 
-		if (alu_depth < 8)
+		if (alu_depth < 8) {
 			alu_depth++;
-		else
-			alu_depth = alu_depth * 2;
+		} else {
+			/* Not quite powers of two to avoid aliasing */
+			alu_depth = (alu_depth * 2) - 5;
+		}
 	}
 
 	return PIGLIT_SUCCESS;
