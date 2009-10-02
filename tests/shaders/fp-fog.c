@@ -41,11 +41,7 @@ static const char* const program_text =
 int piglit_width = 50, piglit_height = 50;
 int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE;
 
-#if defined(__APPLE__)
-static void (*pglFogCoordf)(GLfloat coord) = NULL;
-#else
 static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
-#endif
 
 enum piglit_result
 piglit_display(void)
@@ -139,9 +135,7 @@ piglit_init(int argc, char **argv)
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 
 	if (atof((const char *) glGetString(GL_VERSION)) >= 1.4) {
-#if defined(__APPLE__)
-		pglFogCoordf = &glFogCoordf;
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			wglGetProcAddress("glFogCoordf");
 #else
@@ -149,9 +143,7 @@ piglit_init(int argc, char **argv)
 			glutGetProcAddress("glFogCoordf");
 #endif
 	} else if (glutExtensionSupported("GL_EXT_fog_coord")) {
-#if defined(__APPLE__)
-		pglFogCoordf = &glFogCoordfEXT;
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 		pglFogCoordf = (PFNGLFOGCOORDFPROC)
 			wglGetProcAddress("glFogCoordfEXT");
 #else
