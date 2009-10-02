@@ -38,9 +38,6 @@
 #include <stdint.h>
 #endif
 
-#if !defined(__APPLE__) && defined(FREEGLUT)
-#include <GL/freeglut_ext.h>
-#endif
 #include "piglit-util.h"
 
 /* GLEW hasn't added support for this yet. */

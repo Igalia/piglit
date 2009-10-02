@@ -28,9 +28,6 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#if !defined(__APPLE__) && defined(FREEGLUT)
-#include <GL/freeglut_ext.h>
-#endif
 #include "piglit-util.h"
 
 static GLint prog = 0;

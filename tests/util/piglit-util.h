@@ -32,6 +32,9 @@
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
+#if defined(FREEGLUT)
+#include <GL/freeglut_ext.h>
+#endif
 #endif
 
 #if defined(_MSC_VER)
