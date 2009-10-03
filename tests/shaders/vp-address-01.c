@@ -131,7 +131,7 @@ piglit_init(int argc, char **argv)
 	if (max_address_registers == 0) {
 		if (! piglit_automatic)
 			printf("GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB "
-			       "== 0");
+			       "== 0\n");
 
 		piglit_report_result(PIGLIT_FAILURE);
 	}

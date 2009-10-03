@@ -241,14 +241,14 @@ piglit_init(int argc, char **argv)
 	if (max_address_registers == 0) {
 		if (! piglit_automatic)
 			printf("GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB "
-			       "== 0");
+			       "== 0\n");
 
 		piglit_report_result(PIGLIT_FAILURE);
 	} else 	if (max_address_registers == 1) {
 		if (glutExtensionSupported("GL_NV_vertex_program2_option")) {
 			if (! piglit_automatic)
 				printf("GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB "
-				       "== 1");
+				       "== 1\n");
 
 			piglit_report_result(PIGLIT_FAILURE);
 		} else {
