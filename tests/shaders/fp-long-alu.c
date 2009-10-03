@@ -43,6 +43,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
+#if defined(_MSC_VER)
+#define snprintf sprintf_s
+#endif
+
 int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA;
 int piglit_width = 32;
 int piglit_height = 32;
@@ -81,6 +85,7 @@ static enum piglit_result test(unsigned int alu_depth)
 	char buf[128];
 	GLuint program_object;
 	unsigned int i;
+	float expected[4] = { 0.0, 0.0, 0.0, 0.0 };
 
 	/* Note: This test makes sense up to alu_depth of 65536,
 	 * but current drivers are not exactly efficient with such
@@ -119,7 +124,6 @@ static enum piglit_result test(unsigned int alu_depth)
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 	pglDeleteProgramsARB(1, &program_object);
 
-	float expected[4] = { 0.0, 0.0, 0.0, 0.0 };
 	expected[0] = (alu_depth % 16) * 0.0625;
 	expected[1] = ((alu_depth/16) % 16) * 0.0625;
 	expected[2] = ((alu_depth/256) % 16) * 0.0625;
