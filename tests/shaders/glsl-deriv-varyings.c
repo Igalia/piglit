@@ -87,14 +87,14 @@ static const char *fragShaderText2 =
 void
 piglit_init(int argc, char **argv)
 {
-	compileLinkProg();
-
-	loadTex();
-
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	compileLinkProg();
+
+	loadTex();
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
