@@ -29,7 +29,9 @@
  * Simple test of the API for GL_ARB_sync.
  */
 
-#if !defined(_MSC_VER)
+#if defined(_MSC_VER)
+#include <windows.h>
+#else
 #include <stdint.h>
 #endif
 
@@ -76,8 +78,14 @@
 #define GL_SYNC_FLUSH_COMMANDS_BIT        0x00000001
 #define GL_TIMEOUT_IGNORED                0xFFFFFFFFFFFFFFFFull
 
+#if defined(_MSC_VER)
+typedef __int64 GLint64;
+typedef unsigned __int64 GLuint64;
+#else
 typedef int64_t GLint64;
 typedef uint64_t GLuint64;
+#endif
+
 typedef struct __GLsync *GLsync;
 
 typedef GLsync (APIENTRYP PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
