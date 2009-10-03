@@ -54,7 +54,7 @@ int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 static const char vertex_source_template[] =
 	"!!ARBvp1.0\n"
 	"PARAM	colors[] = { program.env[0..3] };\n"
-	"ADDRESS	A0, A1;\n"
+	"ADDRESS	A0;\n"
 	"\n"
 	"ARL	A0.x, vertex.attrib[1].x;\n"
 	"MOV	result.color, colors[A0.x %c %u];\n"
