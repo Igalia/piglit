@@ -107,6 +107,8 @@ const GLenum cube_face_targets[6] = {
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 };
 
+GLint piglit_ARBfp_pass_through = 0;
+
 /** Returns the line in the program string given the character position. */
 int FindLine(const char *program, int position)
 {
@@ -263,11 +265,21 @@ static void get_program_functions(void)
 
 int piglit_use_fragment_program(void)
 {
+	static const char source[] =
+		"!!ARBfp1.0\n"
+		"MOV	result.color, fragment.color;\n"
+		"END\n"
+		;
+
 	if (!glutExtensionSupported("GL_ARB_fragment_program"))
 		return 0;
 
 	get_program_functions();
-	return 1;
+
+	piglit_ARBfp_pass_through =
+		piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, source);
+
+	return (piglit_ARBfp_pass_through != 0);
 }
 
 void piglit_require_fragment_program(void)

@@ -98,3 +98,24 @@ void piglit_ortho_projection(int w, int h, GLboolean push);
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
 extern const GLenum cube_face_targets[6];
+
+/**
+ * Common vertex program code to perform a model-view-project matrix transform
+ */
+#define PIGLIT_VERTEX_PROGRAM_MVP_TRANSFORM		\
+	"ATTRIB	iPos = vertex.position;\n"		\
+	"OUTPUT	oPos = result.position;\n"		\
+	"PARAM	mvp[4] = { state.matrix.mvp };\n"	\
+	"DP4	oPos.x, mvp[0], iPos;\n"		\
+	"DP4	oPos.y, mvp[1], iPos;\n"		\
+	"DP4	oPos.z, mvp[2], iPos;\n"		\
+	"DP4	oPos.w, mvp[3], iPos;\n"
+
+/**
+ * Handle to a generic fragment program that passes the input color to output
+ *
+ * \note
+ * Either \c piglit_use_fragment_program or \c piglit_require_fragment_program
+ * must be called before using this program handle.
+ */
+extern GLint piglit_ARBfp_pass_through;
