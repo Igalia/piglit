@@ -31,6 +31,10 @@
 * Second tri using GL_LAST_VERTEX_CONVENTION_EXT.
 */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include "piglit-util.h"
 
 #if !defined(__APPLE__) && defined(FREEGLUT)
