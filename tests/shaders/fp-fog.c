@@ -28,6 +28,10 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include "piglit-util.h"
 
 static GLint prog = 0;
