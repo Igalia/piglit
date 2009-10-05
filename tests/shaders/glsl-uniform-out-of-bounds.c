@@ -30,11 +30,23 @@
  * Test that out-of-bound writes to uniform locations are caught properly.
  */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 #include <stdarg.h>
 #include <stdio.h>
 
 #include "piglit-util.h"
 #include "piglit-framework.h"
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
+#if defined(_MSC_VER)
+#define snprintf sprintf_s
+#endif
 
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB;
@@ -121,7 +133,7 @@ static const char fs_vector_template[] =
 
 
 static void test_vector(const char *glsl_type, const char * suffix,
-		void (*uniform)(GLint, GLsizei, const GLfloat*))
+		void (APIENTRY *uniform)(GLint, GLsizei, const GLfloat*))
 {
 	char buffer[2*sizeof(vs_vector_template)];
 	GLuint vs, fs;
