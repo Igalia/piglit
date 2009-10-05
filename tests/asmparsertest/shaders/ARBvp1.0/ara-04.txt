@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+
+	OPTION	NV_vertex_program2;
+	ADDRESS	A0;
+	ARA	A0.xy, A0;
+	END

@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+# FAIL - no swizzle on source of ARA.
+
+	OPTION	NV_vertex_program2;
+	ADDRESS	A0;
+	ARA	A0, A0.xyzw;
+	END

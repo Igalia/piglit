@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL - GL_ARB_vertex_program does not support the ARA instruction
+
+	ADDRESS	A0;
+	ARA	A0, A0;
+	END
