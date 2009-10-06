@@ -152,7 +152,7 @@ static enum piglit_result test(unsigned int alu_depth)
 	return PIGLIT_SUCCESS;
 }
 
-enum piglit_result piglit_display()
+enum piglit_result piglit_display(void)
 {
 	int result;
 	unsigned int alu_depth;

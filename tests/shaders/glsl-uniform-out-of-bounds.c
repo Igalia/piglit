@@ -233,7 +233,7 @@ static const char fs_matrix_template[] =
 "}\n";
 
 
-static void test_matrix()
+static void test_matrix(void)
 {
 	GLuint vs, fs;
 	GLuint program;

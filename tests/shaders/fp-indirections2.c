@@ -51,7 +51,7 @@ unsigned char * texture_data_as_rgba;
 GLuint texture_objects[3];
 
 
-static void texture_init()
+static void texture_init(void)
 {
 	unsigned int x, y, z;
 	unsigned char *p;

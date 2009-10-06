@@ -40,7 +40,7 @@ int piglit_width = 16;
 int piglit_height = 16;
 
 
-enum piglit_result piglit_display()
+enum piglit_result piglit_display(void)
 {
 	return PIGLIT_SUCCESS;
 }
