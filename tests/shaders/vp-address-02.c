@@ -55,6 +55,10 @@ static const GLfloat attrib[] = {
 #define TEST_COLS  (ELEMENTS(attrib) / 2)
 #define BOX_SIZE   32
 
+#if defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
 
 int piglit_window_mode = GLUT_DOUBLE;
 int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
