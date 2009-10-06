@@ -177,7 +177,7 @@ static const struct size sizes[] = {
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;;
+	GLboolean pass = GL_TRUE;
 	int sizeidx;
 
 	testnr = 0;
