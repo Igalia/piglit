@@ -84,7 +84,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 	unsigned char* readback;
 	unsigned char* texp;
 	unsigned char* readp;
-	int ncomp;
+	int ncomp = 0;
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
