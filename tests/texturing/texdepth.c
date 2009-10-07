@@ -151,7 +151,7 @@ static int test_RenderTextures(int param)
 
 static float texture_compare(int comparefunc, float r, float texture, float ambient)
 {
-	int test;
+	int test = 0;
 	switch(comparefunc) {
 	case GL_NEVER: test = 0; break;
 	case GL_LESS: test = r < texture; break;
@@ -161,6 +161,7 @@ static float texture_compare(int comparefunc, float r, float texture, float ambi
 	case GL_GEQUAL: test = r >= texture; break;
 	case GL_GREATER: test = r > texture; break;
 	case GL_ALWAYS: test = 1; break;
+	default: assert(0);
 	}
 	return test ? 1.0 : ambient;
 }
