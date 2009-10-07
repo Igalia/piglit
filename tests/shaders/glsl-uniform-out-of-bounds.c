@@ -34,6 +34,7 @@
 #include <windows.h>
 #endif
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -253,14 +254,6 @@ static void test_matrix(void)
 	printf("locations: a: %i b: %i c: %i b[2]: %i\n", loc_a, loc_b, loc_c, loc_b);
 
 	expect_error(GL_NO_ERROR, "Type %s: Sanity check", glsl_type);
-	glUniformMatrix4fvARB(loc_a, 0, GL_FALSE, lots_of_zeros);
-	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to a", glsl_type);
-	glUniformMatrix4fvARB(loc_a, 1, GL_FALSE, lots_of_zeros);
-	expect_error(GL_NO_ERROR, "Type %s: Write count = 1 to a", glsl_type);
-	glUniformMatrix4fvARB(loc_a, 2, GL_FALSE, lots_of_zeros);
-	expect_error(GL_INVALID_OPERATION, "Type %s: Write count = 2 to a", glsl_type);
-	glUniformMatrix4fvARB(loc_a, 1024, GL_FALSE, lots_of_zeros);
-	expect_error(GL_INVALID_OPERATION, "Type %s: Write count = 1024 to a", glsl_type);
 
 	glUniformMatrix4fvARB(loc_b, 0, GL_FALSE, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to b", glsl_type);
@@ -290,8 +283,17 @@ static void test_matrix(void)
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 2 to b[2]", glsl_type);
 
 	/* Out of bounds; see comment above */
-	glUniformMatrix4fvARB(loc_b2, 1024, GL_FALSE, lots_of_zeros);
+	glUniformMatrix4fvARB(loc_b2, INT_MAX, GL_FALSE, lots_of_zeros);
 	glGetError(); /* Eat generated error, if any */
+
+	glUniformMatrix4fvARB(loc_a, 0, GL_FALSE, lots_of_zeros);
+	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to a", glsl_type);
+	glUniformMatrix4fvARB(loc_a, 1, GL_FALSE, lots_of_zeros);
+	expect_error(GL_NO_ERROR, "Type %s: Write count = 1 to a", glsl_type);
+	glUniformMatrix4fvARB(loc_a, 2, GL_FALSE, lots_of_zeros);
+	expect_error(GL_INVALID_OPERATION, "Type %s: Write count = 2 to a", glsl_type);
+	glUniformMatrix4fvARB(loc_a, INT_MAX, GL_FALSE, lots_of_zeros);
+	expect_error(GL_INVALID_OPERATION, "Type %s: Write count = INT_MAX to a", glsl_type);
 
 	glDeleteObjectARB(fs);
 	glDeleteObjectARB(vs);
@@ -303,12 +305,12 @@ piglit_display(void)
 {
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
+	test_matrix();
+
 	test_vector("float", ", 0, 0, 0", glUniform1fvARB);
 	test_vector("vec2", ", 0, 0", glUniform2fvARB);
 	test_vector("vec3", ", 0", glUniform3fvARB);
 	test_vector("vec4", "", glUniform4fvARB);
-
-	test_matrix();
 
 	return PIGLIT_SUCCESS;
 }
