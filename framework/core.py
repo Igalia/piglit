@@ -265,9 +265,12 @@ class Environment:
 		self.filter = []
 
 	def run(self, command):
-		p = subprocess.Popen(
-			command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		(stdout, stderr) = p.communicate()
+		try:
+			p = subprocess.Popen(
+				command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			(stdout, stderr) = p.communicate()
+		except:
+			return "Failed to run " + command
 		return stderr+stdout
 
 	def collectData(self):
