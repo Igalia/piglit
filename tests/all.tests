@@ -174,6 +174,7 @@ bugs['tex1d-2dborder'] = PlainExecTest([testBinDir + 'tex1d-2dborder', '-auto'])
 bugs['point-sprite'] = PlainExecTest([testBinDir + 'point-sprite', '-auto'])
 bugs['fdo22540'] = PlainExecTest([testBinDir + 'fdo22540', '-auto'])
 bugs['fdo23489'] = PlainExecTest([testBinDir + 'fdo23489', '-auto'])
+bugs['fdo23670-depth_test'] = PlainExecTest([testBinDir + 'fdo23670-depth_test', '-auto'])
 bugs['fdo23670-drawpix_stencil'] = PlainExecTest([testBinDir + 'fdo23670-drawpix_stencil', '-auto'])
 bugs['fdo24066'] = PlainExecTest([testBinDir + 'fdo24066', '-auto'])
 

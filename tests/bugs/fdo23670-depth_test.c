@@ -25,15 +25,13 @@
  */
 
 
-#include <GL/glut.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "piglit-util.h"
 
 
 #define WIN_WIDTH 100
 #define WIN_HEIGHT 100
 
+static GLboolean Automatic = GL_FALSE;
 
 static void
 init(void)
@@ -53,8 +51,8 @@ display(void)
 {
 	static float white[] = {1.0, 1.0, 1.0, 0.0};
 	static float red[] = {1.0, 0.0, 0.0, 0.0};
-	static float green[] = {0.0, 1.0, 0.0, 0.0};
 	static float blue[] = {0.0, 0.0, 1.0, 0.0};
+	GLboolean pass = GL_TRUE;
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glDisable(GL_DITHER);
@@ -73,16 +71,31 @@ display(void)
 	glRasterPos3f(2.0, 0.0, 1.0);
 	glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, blue);
 
+	pass &= piglit_probe_pixel_rgb(0, 0, red);
+	pass &= piglit_probe_pixel_rgb(2, 0, white);
 
 	glutSwapBuffers();
+
+	if (Automatic) {
+		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	}
 }
 
 int main(int argc, char **argv)
 {
+	int i;
+	for(i = 1; i < argc; ++i) {
+		if (!strcmp(argv[i], "-auto"))
+			Automatic = 1;
+		else
+			printf("Unknown option: %s\n", argv[i]);
+	}
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("fdo23670-depth_test");
+	glutKeyboardFunc(piglit_escape_exit_key);
 	glutDisplayFunc(display);
 
 	init();
