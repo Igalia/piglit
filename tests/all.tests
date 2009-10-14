@@ -147,6 +147,7 @@ add_plain_test(shaders, 'glsl-fwidth')
 add_plain_test(shaders, 'glsl-lod-bias')
 add_plain_test(shaders, 'vp-ignore-input')
 add_plain_test(shaders, 'glsl-empty-vs-no-fs')
+add_plain_test(shaders, 'glsl-useprogram-displaylist')
 
 fpgeneric = Group()
 def add_fpgeneric(name):
