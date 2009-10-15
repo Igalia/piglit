@@ -49,6 +49,13 @@
  *  NVparameter[<id>] <x> <y> <z> <w>
  * Note that the model-view-projection matrix is tracked in parameters
  * [0..3].
+ *
+ * Keep in mind that the ARB_vertex_program and NV_vertex_program tokens and
+ * entrypoints largely overlap.  If an implementation supports both, it is
+ * perfectly legal to pass an "VP1.0" program to the ARB entrypoint and an
+ * "ARBvp1.0" program to the NV entrypoint.  On most implementations the
+ * entrypoints alias.  Also notice that \c GL_VERTEX_PROGRAM_NV and
+ * \c GL_VERTEX_PROGRAM_ARB have the same value.
  */
 
 #include <string>
@@ -98,23 +105,22 @@ struct ParameterLocal : TestParameter {
 		glProgramLocalParameter4fvARB(target, index, data);
 	}
 
+protected:
 	GLenum target;
 	int index;
 	GLfloat data[4];
 };
 
-struct ParameterNV : TestParameter {
-	ParameterNV(int _index, GLfloat v[4]) {
-		index = _index;
-		memcpy(data, v, sizeof(GLfloat)*4);
+struct ParameterEnv : ParameterLocal {
+	ParameterEnv(GLenum _target, int _index, GLfloat v[4])
+		: ParameterLocal(_target, _index, v)
+	{
+		/* empty */
 	}
 
 	void setup() {
-		glProgramParameter4fvNV(GL_VERTEX_PROGRAM_NV, index, data);
+		glProgramEnvParameter4fvARB(target, index, data);
 	}
-
-	int index;
-	GLfloat data[4];
 };
 
 struct Test {
@@ -206,45 +212,20 @@ bool TestGroup::run()
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fragprog);
 
-	if (!nv_vertex_program) {
-		GLuint vertprog = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, vertex_program_code.c_str());
+	GLuint vertprog = piglit_compile_program(GL_VERTEX_PROGRAM_ARB,
+						 vertex_program_code.c_str());
 
-		glEnable(GL_VERTEX_PROGRAM_ARB);
-		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vertprog);
-	} else {
-		GLuint vertprog;
+	glEnable(GL_VERTEX_PROGRAM_ARB);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vertprog);
 
-		glGenProgramsNV(1, &vertprog);
-		glLoadProgramNV(GL_VERTEX_PROGRAM_NV, vertprog,
-				vertex_program_code.size(), (const GLubyte*)vertex_program_code.c_str());
-
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR) {
-			GLint errorPos;
-
-			fprintf(stderr, "Error loading program: %u\n", error);
-			glGetIntegerv(GL_PROGRAM_ERROR_POSITION_NV, &errorPos);
-			fprintf(stderr, "Error pos=%d (line=%d) in program:\n%s\n",
-				errorPos,
-				FindLine(vertex_program_code.c_str(), errorPos),
-				vertex_program_code.c_str());
-			piglit_report_result(PIGLIT_FAILURE);
-		}
-
-		glBindProgramNV(GL_VERTEX_PROGRAM_NV, vertprog);
-		glEnable(GL_VERTEX_PROGRAM_NV);
-
+	if (nv_vertex_program) {
 		glTrackMatrixNV(GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV, GL_IDENTITY_NV);
 	}
 
 	for(vector<Test*>::iterator it = tests.begin(); it != tests.end(); ++it)
 		success = (*it)->run() && success;
 
-	if (!nv_vertex_program) {
-		glDisable(GL_VERTEX_PROGRAM_ARB);
-	} else {
-		glDisable(GL_VERTEX_PROGRAM_NV);
-	}
+	glDisable(GL_VERTEX_PROGRAM_ARB);
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
 	return success;
@@ -294,7 +275,7 @@ void Test::readline(const char* filename, int linenum, char* line)
 	} else if (!strncmp(line, "fragment.local[", 15)) {
 		parameters.push_back(new ParameterLocal(GL_FRAGMENT_PROGRAM_ARB, atoi(line+15), params));
 	} else if (!strncmp(line, "NVparameter[", 12)) {
-		parameters.push_back(new ParameterNV(atoi(line+12), params));
+		parameters.push_back(new ParameterEnv(GL_VERTEX_PROGRAM_NV, atoi(line+12), params));
 	} else {
 		fprintf(stderr, "%s:%i: unknown parameters %s\n", filename, linenum, line);
 		piglit_report_result(PIGLIT_FAILURE);
@@ -420,10 +401,9 @@ extern "C" void piglit_init(int argc, char **argv)
 	}
 
 	piglit_require_fragment_program();
+	piglit_require_vertex_program();
 	if (tests.nv_vertex_program)
 		piglit_require_extension("GL_NV_vertex_program");
-	else
-		piglit_require_vertex_program();
 
 	glutReshapeFunc(Reshape);
 	Reshape(piglit_width, piglit_height);
