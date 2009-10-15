@@ -161,7 +161,8 @@ private:
 };
 
 
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA;
 static const char* Filename = 0;
 static TestGroup tests;
 
@@ -189,7 +190,7 @@ bool Test::run()
 	for(vector<TestParameter*>::iterator pparm = parameters.begin(); pparm != parameters.end(); ++pparm)
 		(*pparm)->teardown();
 
-	if (!piglit_probe_pixel_rgba(Width/2, Height/2, expected)) {
+	if (!piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected)) {
 		fprintf(stderr, "Test %s failed\n", name.c_str());
 		return false;
 	}
@@ -379,18 +380,16 @@ void TestGroup::read(const char* filename)
 }
 
 
-static void Redisplay(void)
+extern "C" piglit_result piglit_display(void)
 {
-	bool success = tests.run();
-
-	piglit_report_result(success ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return tests.run() ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -400,22 +399,10 @@ static void Reshape(int width, int height)
 }
 
 
-static void Init(void)
-{
-	piglit_require_fragment_program();
-	if (tests.nv_vertex_program)
-		piglit_require_extension("GL_NV_vertex_program");
-	else
-		piglit_require_vertex_program();
-
-	Reshape(Width,Height);
-}
-
-
-int main(int argc, char *argv[])
+extern "C" void piglit_init(int argc, char **argv)
 {
 	int i;
-	glutInit(&argc, argv);
+
 	for(i = 1; i < argc; ++i) {
 		if (!Filename)
 			Filename = argv[i];
@@ -426,21 +413,18 @@ int main(int argc, char *argv[])
 	}
 	tests.read(Filename);
 
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_ALPHA);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	glewInit();
-
 	if (!GLEW_VERSION_1_3) {
 		printf("Requires OpenGL 1.3\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
 
-	Init();
-	glutMainLoop();
-	return 0;
+	piglit_require_fragment_program();
+	if (tests.nv_vertex_program)
+		piglit_require_extension("GL_NV_vertex_program");
+	else
+		piglit_require_vertex_program();
+
+	glutReshapeFunc(Reshape);
+	Reshape(piglit_width, piglit_height);
 }
