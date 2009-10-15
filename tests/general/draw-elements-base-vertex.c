@@ -30,14 +30,6 @@
  * index buffers.
  */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#endif
-
-#if !defined(_MSC_VER)
-#include <stdint.h>
-#endif
-
 #include "piglit-util.h"
 
 /* GLEW hasn't added support for this yet. */
@@ -74,11 +66,7 @@ piglit_init(int argc, char **argv)
 	int i;
 
 	pglDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)
-#if defined(_MSC_VER)
-		wglGetProcAddress("glDrawElementsBaseVertex");
-#else
-		glutGetProcAddress("glDrawElementsBaseVertex");
-#endif
+		piglit_get_proc_address("glDrawElementsBaseVertex");
 
 	glewInit();
 	piglit_require_extension("GL_ARB_vertex_buffer_object");

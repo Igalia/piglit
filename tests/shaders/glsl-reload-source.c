@@ -30,10 +30,6 @@
  * Test that reloading shader source and relinking programs works correctly.
  */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 #include <stdio.h>
 
 #include "piglit-util.h"
@@ -41,10 +37,6 @@
 
 #ifndef APIENTRY
 #define APIENTRY
-#endif
-
-#if defined(_MSC_VER)
-#define snprintf sprintf_s
 #endif
 
 int piglit_width = 100, piglit_height = 100;

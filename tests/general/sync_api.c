@@ -29,17 +29,7 @@
  * Simple test of the API for GL_ARB_sync.
  */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#else
-#include <stdint.h>
-#endif
-
 #include "piglit-util.h"
-
-#if !defined(__APPLE__) && defined(FREEGLUT)
-#include <GL/freeglut_ext.h>
-#endif
 
 #define FAIL_ON_ERROR(string)						\
 	do {								\
@@ -78,14 +68,8 @@
 #define GL_SYNC_FLUSH_COMMANDS_BIT        0x00000001
 #define GL_TIMEOUT_IGNORED                0xFFFFFFFFFFFFFFFFull
 
-#if defined(_MSC_VER)
-typedef __int64 GLint64;
-typedef unsigned __int64 GLuint64;
-#else
 typedef int64_t GLint64;
 typedef uint64_t GLuint64;
-#endif
-
 typedef struct __GLsync *GLsync;
 
 typedef GLsync (APIENTRYP PFNGLFENCESYNCPROC) (GLenum condition, GLbitfield flags);
@@ -106,13 +90,6 @@ static PFNGLGETINTEGER64VPROC pglGetInteger64v = NULL;
 static PFNGLGETSYNCIVPROC pglGetSynciv = NULL;
 
 
-#if defined(_MSC_VER)
-#define GET_PROC_ADDR(s) wglGetProcAddress(s)
-#else
-
-#define GET_PROC_ADDR(s) glutGetProcAddress(s);
-#endif
-
 static GLboolean Automatic = GL_FALSE;
 
 static void
@@ -120,13 +97,13 @@ init(void)
 {
 	piglit_require_extension("GL_ARB_sync");
 
-	pglFenceSync = (PFNGLFENCESYNCPROC) GET_PROC_ADDR("glFenceSync");
-	pglIsSync = (PFNGLISSYNCPROC) GET_PROC_ADDR("glIsSync");
-	pglDeleteSync = (PFNGLDELETESYNCPROC) GET_PROC_ADDR("glDeleteSync");
-	pglClientWaitSync = (PFNGLCLIENTWAITSYNCPROC) GET_PROC_ADDR("glClientWaitSync");
-	pglWaitSync = (PFNGLWAITSYNCPROC) GET_PROC_ADDR("glWaitSync");
-	pglGetInteger64v = (PFNGLGETINTEGER64VPROC) GET_PROC_ADDR("glGetInteger64v");
-	pglGetSynciv = (PFNGLGETSYNCIVPROC) GET_PROC_ADDR("glGetSynciv");
+	pglFenceSync = (PFNGLFENCESYNCPROC) piglit_get_proc_address("glFenceSync");
+	pglIsSync = (PFNGLISSYNCPROC) piglit_get_proc_address("glIsSync");
+	pglDeleteSync = (PFNGLDELETESYNCPROC) piglit_get_proc_address("glDeleteSync");
+	pglClientWaitSync = (PFNGLCLIENTWAITSYNCPROC) piglit_get_proc_address("glClientWaitSync");
+	pglWaitSync = (PFNGLWAITSYNCPROC) piglit_get_proc_address("glWaitSync");
+	pglGetInteger64v = (PFNGLGETINTEGER64VPROC) piglit_get_proc_address("glGetInteger64v");
+	pglGetSynciv = (PFNGLGETSYNCIVPROC) piglit_get_proc_address("glGetSynciv");
 
 	glClearColor(0.1, 0.1, 0.3, 0.0);
 }

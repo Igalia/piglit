@@ -31,15 +31,7 @@
 * Second tri using GL_LAST_VERTEX_CONVENTION_EXT.
 */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 #include "piglit-util.h"
-
-#if !defined(__APPLE__) && defined(FREEGLUT)
-#include <GL/freeglut_ext.h>
-#endif
 
 int piglit_width = 400, piglit_height = 300;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
@@ -67,11 +59,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_EXT_provoking_vertex");
 	pglProvokingVertexEXT = (PFNGLPROVOKINGVERTEXEXTPROC)
-#if defined(_MSC_VER)
-		wglGetProcAddress("glProvokingVertexEXT");
-#else
-		glutGetProcAddress("glProvokingVertexEXT");
-#endif
+		piglit_get_proc_address("glProvokingVertexEXT");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 

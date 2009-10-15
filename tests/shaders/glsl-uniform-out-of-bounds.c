@@ -30,10 +30,6 @@
  * Test that out-of-bound writes to uniform locations are caught properly.
  */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -43,10 +39,6 @@
 
 #ifndef APIENTRY
 #define APIENTRY
-#endif
-
-#if defined(_MSC_VER)
-#define snprintf sprintf_s
 #endif
 
 int piglit_width = 100, piglit_height = 100;

@@ -28,10 +28,6 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#if defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 #include "piglit-util.h"
 
 static GLint prog = 0;
@@ -132,28 +128,17 @@ static void Reshape(int width, int height)
 void
 piglit_init(int argc, char **argv)
 {
+	glewInit();
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
 	glutReshapeFunc(Reshape);
 
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 
-	if (atof((const char *) glGetString(GL_VERSION)) >= 1.4) {
-#if defined(_MSC_VER)
-		pglFogCoordf = (PFNGLFOGCOORDFPROC)
-			wglGetProcAddress("glFogCoordf");
-#else
-		pglFogCoordf = (PFNGLFOGCOORDFPROC)
-			glutGetProcAddress("glFogCoordf");
-#endif
-	} else if (glutExtensionSupported("GL_EXT_fog_coord")) {
-#if defined(_MSC_VER)
-		pglFogCoordf = (PFNGLFOGCOORDFPROC)
-			wglGetProcAddress("glFogCoordfEXT");
-#else
-		pglFogCoordf = (PFNGLFOGCOORDFPROC)
-			glutGetProcAddress("glFogCoordfEXT");
-#endif
+	if (GLEW_VERSION_1_4) {
+		pglFogCoordf = glFogCoordf;
+	} else if (GLEW_EXT_fog_coord) {
+		pglFogCoordf = glFogCoordfEXT;
 	} else {
 		piglit_report_result(PIGLIT_SKIP);
 	}
@@ -162,7 +147,7 @@ piglit_init(int argc, char **argv)
 	prog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, program_text);
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, prog);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, prog);
 
 	glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
 

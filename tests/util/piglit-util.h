@@ -21,6 +21,16 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(_MSC_VER)
+#include <windows.h>
+
+typedef __int32 int32_t;
+typedef __int64 int64;
+typedef unsigned __int64 uint64;
+#else
+#include <stdint.h>
+#endif
+
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -39,6 +49,12 @@
 
 #if defined(_MSC_VER)
 #include <GL/glext.h>
+
+#define snprintf sprintf_s
+
+#define piglit_get_proc_address(x) wglGetProcAddress(x)
+#else
+#define piglit_get_proc_address(x) glutGetProcAddress(x)
 #endif
 
 enum piglit_result {

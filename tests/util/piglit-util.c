@@ -33,16 +33,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include <GL/glew.h>
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include "GL/glut.h"
-#ifdef FREEGLUT
-#include "GL/freeglut_ext.h"
-#endif
-#endif
-
 #include "piglit-util.h"
 
 /* These texture coordinates should have 1 or -1 in the major axis selecting
@@ -227,40 +217,32 @@ PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
 
 static void get_program_functions(void)
 {
-#if defined(_MSC_VER)
-#define glutGetProcAddress wglGetProcAddress
-#endif
-
-	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) glutGetProcAddress("glGenProgramsARB");
+	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) piglit_get_proc_address("glGenProgramsARB");
 	assert(pglGenProgramsARB);
 
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) glutGetProcAddress("glProgramStringARB");
+	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) piglit_get_proc_address("glProgramStringARB");
 	assert(pglProgramStringARB);
 
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) glutGetProcAddress("glBindProgramARB");
+	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) piglit_get_proc_address("glBindProgramARB");
 	assert(pglBindProgramARB);
 
-	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) glutGetProcAddress("glIsProgramARB");
+	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) piglit_get_proc_address("glIsProgramARB");
 	assert(pglIsProgramARB);
 
-	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) glutGetProcAddress("glDeleteProgramsARB");
+	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) piglit_get_proc_address("glDeleteProgramsARB");
 	assert(pglDeleteProgramsARB);
 
-	pglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) glutGetProcAddress("glProgramLocalParameter4fvARB");
+	pglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) piglit_get_proc_address("glProgramLocalParameter4fvARB");
 	assert(pglProgramLocalParameter4fvARB);
 
-	pglProgramLocalParameter4dARB = (PFNGLPROGRAMLOCALPARAMETER4DARBPROC) glutGetProcAddress("glProgramLocalParameter4dARB");
+	pglProgramLocalParameter4dARB = (PFNGLPROGRAMLOCALPARAMETER4DARBPROC) piglit_get_proc_address("glProgramLocalParameter4dARB");
 	assert(pglProgramLocalParameter4dARB);
 
-	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) glutGetProcAddress("glGetProgramLocalParameterdvARB");
+	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) piglit_get_proc_address("glGetProgramLocalParameterdvARB");
 	assert(pglGetProgramLocalParameterdvARB);
 
-	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) glutGetProcAddress("glGetProgramivARB");
+	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) piglit_get_proc_address("glGetProgramivARB");
 	assert(pglGetProgramivARB);
-
-#if defined(_MSC_VER)
-#undef glutGetProcAddress
-#endif
 }
 
 int piglit_use_fragment_program(void)
