@@ -51,7 +51,7 @@ static void DoFrame(void)
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 	for(mask = 1; mask < 16; ++mask) {
-		pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[mask-1]);
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[mask-1]);
 		glPushMatrix();
 		glTranslatef((mask % 4), (mask / 4), 0.0);
 

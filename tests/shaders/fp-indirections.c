@@ -34,9 +34,7 @@ static int get_program_i(GLenum pname)
 {
 	GLint val;
 
-	pglGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-			   pname,
-			   &val);
+	glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, pname, &val);
 
 	return val;
 }
@@ -92,7 +90,7 @@ static char *gen_temporary_dest_indirections(int sample_count,
 	}
 
 	*progname = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, prog);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, *progname);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, *progname);
 
 	return prog;
 }
@@ -151,7 +149,7 @@ static char *gen_temporary_source_indirections(int sample_count,
 	strcat(prog, post);
 
 	*progname = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, prog);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, *progname);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, *progname);
 
 	return prog;
 }

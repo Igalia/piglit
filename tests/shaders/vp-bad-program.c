@@ -56,10 +56,10 @@ piglit_display(void)
 	GLenum err;
 
 	/* Try the bad vertex program, and make sure we get an error */
-	pglProgramStringARB(GL_VERTEX_PROGRAM_ARB,
-			    GL_PROGRAM_FORMAT_ASCII_ARB,
-			    strlen(badprog),
-			    (const GLubyte *) badprog);
+	glProgramStringARB(GL_VERTEX_PROGRAM_ARB,
+			   GL_PROGRAM_FORMAT_ASCII_ARB,
+			   strlen(badprog),
+			   (const GLubyte *) badprog);
 
 	err = glGetError();
 	if (err != GL_INVALID_OPERATION) {
@@ -75,7 +75,7 @@ piglit_display(void)
 	/* Check that we correctly produce GL_INVALID_OPERATION when rendering
 	 * with an invalid/non-existant program.
 	 */
-        pglBindProgramARB(GL_VERTEX_PROGRAM_ARB, 99);
+        glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 99);
         glEnable(GL_VERTEX_PROGRAM_ARB);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

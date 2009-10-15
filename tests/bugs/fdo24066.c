@@ -60,10 +60,10 @@ void piglit_init(int argc, char ** argv)
 
 	program_object = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, program_text);
 
-	pglBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_object);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_object);
 
 	printf("Testing whether the following call crashes...\n");
-	pglGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
+	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
 
 	piglit_report_result(PIGLIT_SUCCESS);
 }

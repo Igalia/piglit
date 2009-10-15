@@ -132,7 +132,7 @@ piglit_report_result(enum piglit_result result)
 
 void piglit_require_extension(const char *name)
 {
-	if (!glutExtensionSupported(name)) {
+	if (!glewIsSupported(name)) {
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
@@ -205,46 +205,6 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 }
 
 
-PFNGLGENPROGRAMSARBPROC pglGenProgramsARB = 0;
-PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB = 0;
-PFNGLBINDPROGRAMARBPROC pglBindProgramARB = 0;
-PFNGLISPROGRAMARBPROC pglIsProgramARB = 0;
-PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB = 0;
-PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB = 0;
-PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB = 0;
-PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB = 0;
-PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB = 0;
-
-static void get_program_functions(void)
-{
-	pglGenProgramsARB = (PFNGLGENPROGRAMSARBPROC) piglit_get_proc_address("glGenProgramsARB");
-	assert(pglGenProgramsARB);
-
-	pglProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC) piglit_get_proc_address("glProgramStringARB");
-	assert(pglProgramStringARB);
-
-	pglBindProgramARB = (PFNGLBINDPROGRAMARBPROC) piglit_get_proc_address("glBindProgramARB");
-	assert(pglBindProgramARB);
-
-	pglIsProgramARB = (PFNGLISPROGRAMARBPROC) piglit_get_proc_address("glIsProgramARB");
-	assert(pglIsProgramARB);
-
-	pglDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC) piglit_get_proc_address("glDeleteProgramsARB");
-	assert(pglDeleteProgramsARB);
-
-	pglProgramLocalParameter4fvARB = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) piglit_get_proc_address("glProgramLocalParameter4fvARB");
-	assert(pglProgramLocalParameter4fvARB);
-
-	pglProgramLocalParameter4dARB = (PFNGLPROGRAMLOCALPARAMETER4DARBPROC) piglit_get_proc_address("glProgramLocalParameter4dARB");
-	assert(pglProgramLocalParameter4dARB);
-
-	pglGetProgramLocalParameterdvARB = (PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC) piglit_get_proc_address("glGetProgramLocalParameterdvARB");
-	assert(pglGetProgramLocalParameterdvARB);
-
-	pglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC) piglit_get_proc_address("glGetProgramivARB");
-	assert(pglGetProgramivARB);
-}
-
 int piglit_use_fragment_program(void)
 {
 	static const char source[] =
@@ -253,10 +213,8 @@ int piglit_use_fragment_program(void)
 		"END\n"
 		;
 
-	if (!glutExtensionSupported("GL_ARB_fragment_program"))
+	if (!GLEW_ARB_fragment_program)
 		return 0;
-
-	get_program_functions();
 
 	piglit_ARBfp_pass_through =
 		piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, source);
@@ -275,11 +233,7 @@ void piglit_require_fragment_program(void)
 
 int piglit_use_vertex_program(void)
 {
-	if (!glutExtensionSupported("GL_ARB_vertex_program"))
-		return 0;
-
-	get_program_functions();
-	return 1;
+	return GLEW_ARB_vertex_program;
 }
 
 void piglit_require_vertex_program(void)
@@ -296,9 +250,9 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 	GLuint program;
 	GLint errorPos;
 
-	pglGenProgramsARB(1, &program);
-	pglBindProgramARB(target, program);
-	pglProgramStringARB(
+	glGenProgramsARB(1, &program);
+	glBindProgramARB(target, program);
+	glProgramStringARB(
 			target,
 			GL_PROGRAM_FORMAT_ASCII_ARB,
 			strlen(text),
@@ -323,8 +277,8 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 		fprintf(stderr, "\nin program:\n%s", text);
 		piglit_report_result(PIGLIT_FAILURE);
 	}
-	if (!pglIsProgramARB(program)) {
-		fprintf(stderr, "pglIsProgramARB failed\n");
+	if (!glIsProgramARB(program)) {
+		fprintf(stderr, "glIsProgramARB failed\n");
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 

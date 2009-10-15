@@ -156,7 +156,7 @@ static void TestInstance(struct testinstance* instance)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg);
 
 	for(i = 0; i < Testcase.nrTexCoords; ++i)
 		glMultiTexCoord4fv(GL_TEXTURE0+i, instance->texcoords + 4*i);

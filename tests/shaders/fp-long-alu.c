@@ -107,12 +107,12 @@ static enum piglit_result test(unsigned int alu_depth)
 	program_object = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, program_text);
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_object);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_object);
 
 	piglit_draw_rect(0, 0, 32, 32);
 
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
-	pglDeleteProgramsARB(1, &program_object);
+	glDeleteProgramsARB(1, &program_object);
 
 	expected[0] = (alu_depth % 16) * 0.0625;
 	expected[1] = ((alu_depth/16) % 16) * 0.0625;
@@ -174,9 +174,9 @@ void piglit_init(int argc, char ** argv)
 {
 	piglit_require_fragment_program();
 
-	pglGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-	                   GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB,
-	                   &max_alu_instructions);
+	glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
+			  GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB,
+			  &max_alu_instructions);
 
 	printf("Max (native) ALU instructions: %i\n",
 	       max_alu_instructions);

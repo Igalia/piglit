@@ -73,28 +73,6 @@ void piglit_require_extension(const char *name);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
 
-#if defined(__APPLE__)
-extern void (*pglGenProgramsARB)(GLsizei n, GLuint *programs);
-extern void (*pglProgramStringARB)(GLenum target, GLenum format, GLsizei len, const GLvoid *string);
-extern void (*pglBindProgramARB)(GLenum target, GLuint program);
-extern GLboolean (*pglIsProgramARB)(GLuint program);
-extern void (*pglDeleteProgramsARB)(GLsizei n, const GLuint *programs);
-extern void (*pglProgramLocalParameter4fvARB)(GLenum target, GLuint index, const GLfloat *params);
-extern void (*pglProgramLocalParameter4dARB)(GLenum target, GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-extern void (*pglGetProgramivARB)(GLenum target, GLenum pname, GLint *params);
-extern void (*pglGetProgramLocalParameterdvARB)(GLenum target, GLuint index, GLdouble *params);
-#else
-extern PFNGLGENPROGRAMSARBPROC pglGenProgramsARB;
-extern PFNGLPROGRAMSTRINGARBPROC pglProgramStringARB;
-extern PFNGLBINDPROGRAMARBPROC pglBindProgramARB;
-extern PFNGLISPROGRAMARBPROC pglIsProgramARB;
-extern PFNGLDELETEPROGRAMSARBPROC pglDeleteProgramsARB;
-extern PFNGLPROGRAMLOCALPARAMETER4FVARBPROC pglProgramLocalParameter4fvARB;
-extern PFNGLPROGRAMLOCALPARAMETER4DARBPROC pglProgramLocalParameter4dARB;
-extern PFNGLGETPROGRAMLOCALPARAMETERDVARBPROC pglGetProgramLocalParameterdvARB;
-extern PFNGLGETPROGRAMIVARBPROC pglGetProgramivARB;
-#endif
-
 int piglit_use_fragment_program(void);
 int piglit_use_vertex_program(void);
 void piglit_require_fragment_program(void);

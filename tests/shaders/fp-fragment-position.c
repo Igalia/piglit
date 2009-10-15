@@ -90,7 +90,7 @@ static void DoFrame(void)
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[0]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[0]);
 
 	glBegin(GL_QUADS);
 		glVertex3f(0, 0, 0);
@@ -99,7 +99,7 @@ static void DoFrame(void)
 		glVertex3f(0, 1, 1);
 	glEnd();
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[1]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[1]);
 
 	glBegin(GL_QUADS);
 		glVertex2f(0, 1);
@@ -108,7 +108,7 @@ static void DoFrame(void)
 		glVertex2f(0, 2);
 	glEnd();
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[2]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[2]);
 
 	glBegin(GL_QUADS);
 		glVertex2f(1, 0);
@@ -117,7 +117,7 @@ static void DoFrame(void)
 		glVertex2f(1, 1);
 	glEnd();
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[3]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[3]);
 
 	glBegin(GL_QUADS);
 		glVertex2f(1, 1);

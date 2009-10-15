@@ -176,13 +176,13 @@ static int test(unsigned int dim, unsigned int samples)
 	program_object = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, program_text);
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_object);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_object);
 
 	draw_height = TEXTURE_SIZE;
 	piglit_draw_rect_tex(0, 0, TEXTURE_SIZE, draw_height, 0, 0, 1, 1);
 
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
-	pglDeleteProgramsARB(1, &program_object);
+	glDeleteProgramsARB(1, &program_object);
 
 	for(y = 0; y < draw_height; ++y) {
 		for(x = 0; x < TEXTURE_SIZE; ++x) {
@@ -238,12 +238,12 @@ void piglit_init(int argc, char ** argv)
 
 	piglit_require_fragment_program();
 
-	pglGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-	                   GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB,
-	                   &max_native_tex_instructions);
-	pglGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
-	                   GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB,
-	                   &max_native_tex_indirections);
+	glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
+			  GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB,
+			  &max_native_tex_instructions);
+	glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB,
+			  GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB,
+			  &max_native_tex_indirections);
 
 	printf("Max TEX instructions / TEX indirections: %i / %i\n",
 	       max_native_tex_instructions,

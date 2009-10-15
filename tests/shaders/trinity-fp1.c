@@ -88,7 +88,7 @@ static void DoFrame(void)
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	for(i = 0; i < 3; ++i)
-		pglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, Local[i]);
+		glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, Local[i]);
 
 	glBegin(GL_QUADS);
 		glVertex2f(0.75, 0.75);
@@ -99,7 +99,7 @@ static void DoFrame(void)
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	for(i = 0; i < 3; ++i)
-		pglProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, Local2[i]);
+		glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, i, Local2[i]);
 
 	glBegin(GL_QUADS);
 		glVertex2f(1.75, 0.75);

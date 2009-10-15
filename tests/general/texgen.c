@@ -207,7 +207,7 @@ static void Init(void)
 
 	if (piglit_use_fragment_program()) {
 		UseFragmentProgram = 1;
-		pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB,
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB,
 			piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, TextureFP));
 	}
 

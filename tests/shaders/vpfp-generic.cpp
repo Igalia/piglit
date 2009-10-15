@@ -95,7 +95,7 @@ struct ParameterLocal : TestParameter {
 	}
 
 	void setup() {
-		pglProgramLocalParameter4fvARB(target, index, data);
+		glProgramLocalParameter4fvARB(target, index, data);
 	}
 
 	GLenum target;
@@ -203,13 +203,13 @@ bool TestGroup::run()
 	GLuint fragprog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, fragment_program_code.c_str());
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fragprog);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fragprog);
 
 	if (!nv_vertex_program) {
 		GLuint vertprog = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, vertex_program_code.c_str());
 
 		glEnable(GL_VERTEX_PROGRAM_ARB);
-		pglBindProgramARB(GL_VERTEX_PROGRAM_ARB, vertprog);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vertprog);
 	} else {
 		GLuint vertprog;
 

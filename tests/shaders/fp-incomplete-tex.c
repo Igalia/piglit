@@ -67,7 +67,7 @@ static void DoFrame(void)
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 	for(i = 0; i < NUM_PROGRAMS; ++i) {
-		pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[i]);
+		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[i]);
 
 		glPushMatrix();
 		glTranslatef(i/2, i%2, 0);

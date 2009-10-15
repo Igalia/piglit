@@ -56,7 +56,7 @@ static void DoFrame(void)
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[0]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[0]);
 
 	glColor3f(0.0, 1.0, 0.0);
 	glBegin(GL_QUADS);
@@ -70,7 +70,7 @@ static void DoFrame(void)
 		glVertex2f(0, 1);
 	glEnd();
 
-	pglBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[1]);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, FragProg[1]);
 
 	glBegin(GL_QUADS);
 		glTexCoord2f(0, 0);
