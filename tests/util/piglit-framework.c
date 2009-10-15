@@ -50,8 +50,18 @@ display(void)
 int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
-	if (argc >= 2 && !strcmp(argv[1], "-auto"))
+	if (argc >= 2 && !strcmp(argv[1], "-auto")) {
+		int i;
+
 		piglit_automatic = 1;
+		
+		/* Remove "-auto" from the argument vector.
+		 */
+		for (i = 2; i < argc; i++) {
+			argv[i - 1] = argv[i];
+		}
+		argc--;
+	}
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(piglit_width, piglit_height);
 	glutInitDisplayMode(piglit_window_mode);
