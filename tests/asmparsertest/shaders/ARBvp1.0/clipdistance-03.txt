@@ -1,0 +1,6 @@
+!!ARBvp1.0
+# FAIL - result.clip not supported in base ARBvp1.0 environment.
+
+	MOV	result.position, vertex.position;
+	MOV	result.clip[0].x, vertex.texcoord[0];
+	END

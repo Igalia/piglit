@@ -1,0 +1,8 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+# FAIL - result.clip[99] is out of range
+
+	OPTION	NV_vertex_program2;
+	MOV	result.position, vertex.position;
+	MOV	result.clip[99].x, vertex.texcoord[0];
+	END

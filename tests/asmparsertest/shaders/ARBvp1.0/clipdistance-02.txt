@@ -1,0 +1,12 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+
+	OPTION	NV_vertex_program2;
+	MOV	result.position, vertex.position;
+	MOV	result.clip[0].x, vertex.texcoord[0];
+
+	# These are valid, but they do nothing.  Only .x counts.
+	MOV	result.clip[0].y, vertex.texcoord[0];
+	MOV	result.clip[0].z, vertex.texcoord[0];
+	MOV	result.clip[0].w, vertex.texcoord[0];
+	END

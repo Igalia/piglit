@@ -1,0 +1,7 @@
+!!ARBvp1.0
+# REQUIRE GL_NV_vertex_program2_option
+
+	OPTION	NV_vertex_program2;
+	MOV	result.position, vertex.position;
+	MOV	result.clip[0], vertex.texcoord[0];
+	END
