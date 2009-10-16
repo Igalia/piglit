@@ -26,26 +26,18 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
+int piglit_width = 100;
+int piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
 
-static GLboolean Automatic = GL_FALSE;
-
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLubyte stencil_rect[20 * 20];
 	int i;
@@ -87,32 +79,5 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	}
-}
-
-int main(int argc, char **argv)
-{
-	int i;
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fdo23670-drawpix_stencil");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-
-	init();
-
-	glutMainLoop();
-
-	return 0;
-
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

@@ -24,30 +24,30 @@
  *    Shuang he <shuang.he@intel.com>
  */
 
-
 #include "piglit-util.h"
 
+int piglit_width = 100;
+int piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
 
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 100
-
-static GLboolean Automatic = GL_FALSE;
-
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	/* Don't use piglit_ortho_projection!  This uses a non-default
+	 * depth range!
+	 */
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, 2, -2);
+	glOrtho(0, piglit_width, 0, piglit_height, 2, -2);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	static float white[] = {1.0, 1.0, 1.0, 0.0};
 	static float red[] = {1.0, 0.0, 0.0, 0.0};
@@ -76,32 +76,5 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-	}
-}
-
-int main(int argc, char **argv)
-{
-	int i;
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fdo23670-depth_test");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-
-	init();
-
-	glutMainLoop();
-
-	return 0;
-
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
