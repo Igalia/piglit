@@ -157,6 +157,7 @@ shaders['fp-generic'] = fpgeneric
 vpfpgeneric = Group()
 def make_vpfpgeneric(name):
 	return PlainExecTest([testBinDir + 'vpfp-generic', '-auto', testBinDir + '../tests/shaders/generic/' + name])
+vpfpgeneric['arl'] = make_vpfpgeneric('arl.vpfp')
 vpfpgeneric['big-param'] = make_vpfpgeneric('big-param.vpfp')
 vpfpgeneric['dataflow-bug'] = make_vpfpgeneric('dataflow-bug.vpfp')
 vpfpgeneric['fogcoord-dp3'] = make_vpfpgeneric('fogcoord-dp3.vpfp')
