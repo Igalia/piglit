@@ -1,0 +1,32 @@
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+TEMP tmp1, tmp2, tmp3;
+
+# This line causes an assertion failure in the i965 driver in Mesa 7.6.
+# Replacing it with the line below it eliminates the assertion failure.
+PARAM prog_param[1021] = { program.local[0..1020] };
+#PARAM prog_param[1] = { program.local[0] };
+
+MOV tmp1, prog_param[0];
+ABS tmp1, tmp1;
+MOV tmp3, {0, 0, 0, 256.0};
+
+FLR tmp3.x, tmp1.x;
+FRC tmp2.x, tmp1.x;
+MUL tmp2.x, tmp2.x, 256.0;
+FLR tmp3.y, tmp2.x;
+FRC tmp2.x, tmp2.x;
+MUL tmp2.x, tmp2.x, 256.0;
+FLR tmp3.z, tmp2.x;
+
+MUL result.color, tmp3, 0.00390625;
+END
+
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+!!test
+vertex.local[0]   128.250488281 0.0      0.0      0.0
+
+expected          0.5           0.25     0.125    1.0
