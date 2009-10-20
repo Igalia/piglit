@@ -139,6 +139,7 @@ shaders['vp-clipdistance-01'] = PlainExecTest([testBinDir + 'vp-clipdistance-01'
 shaders['vp-clipdistance-02'] = PlainExecTest([testBinDir + 'vp-clipdistance-02', '-auto'])
 shaders['vp-clipdistance-03'] = PlainExecTest([testBinDir + 'vp-clipdistance-03', '-auto'])
 shaders['vp-clipdistance-04'] = PlainExecTest([testBinDir + 'vp-clipdistance-04', '-auto'])
+shaders['vp-max-array'] = PlainExecTest([testBinDir + 'vp-max-array', '-auto'])
 shaders['glsl-derivs'] = PlainExecTest([testBinDir + 'glsl-derivs', '-auto'])
 shaders['glsl-deriv-varyings'] = PlainExecTest([testBinDir + 'glsl-deriv-varyings', '-auto'])
 shaders['glsl-fwidth'] = PlainExecTest([testBinDir + 'glsl-fwidth', '-auto'])
