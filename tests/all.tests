@@ -68,6 +68,7 @@ fbo = Group()
 fbo['fbo-1d'] = PlainExecTest([testBinDir + 'fbo-1d', '-auto'])
 fbo['fbo-3d'] = PlainExecTest([testBinDir + 'fbo-3d', '-auto'])
 fbo['fbo-cubemap'] = PlainExecTest([testBinDir + 'fbo-cubemap', '-auto'])
+fbo['fbo-clearmipmap'] = PlainExecTest([testBinDir + 'fbo-clearmipmap', '-auto'])
 fbo['fbo-generatemipmap'] = PlainExecTest([testBinDir + 'fbo-generatemipmap', '-auto'])
 fbo['fbo-readpixels'] = PlainExecTest([testBinDir + 'fbo-readpixels', '-auto'])
 
@@ -832,7 +833,7 @@ asmparsertest['ARBvp1.0/xpd.txt'] = PlainExecTest([testBinDir + 'asmparsertest',
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
 profile.tests['fbo'] = fbo
-profile.tests['glean'] = glean
+#profile.tests['glean'] = glean
 profile.tests['glslparsertest'] = glslparsertest
 profile.tests['asmparsertest'] = asmparsertest
 profile.tests['mesa'] = mesa
