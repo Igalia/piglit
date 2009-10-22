@@ -132,7 +132,7 @@ piglit_report_result(enum piglit_result result)
 
 void piglit_require_extension(const char *name)
 {
-	if (!glewIsSupported(name)) {
+	if (!glutExtensionSupported(name)) {
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
@@ -213,6 +213,7 @@ int piglit_use_fragment_program(void)
 		"END\n"
 		;
 
+	glewInit();
 	if (!GLEW_ARB_fragment_program)
 		return 0;
 
@@ -233,6 +234,7 @@ void piglit_require_fragment_program(void)
 
 int piglit_use_vertex_program(void)
 {
+	glewInit();
 	return GLEW_ARB_vertex_program;
 }
 
