@@ -25,6 +25,9 @@ import subprocess
 
 from core import Test, testBinDir, TestResult
 
+def add_plain_test(group, name):
+	group[name] = PlainExecTest([name, '-auto'])
+
 #############################################################################
 ##### PlainExecTest: Simply run an executable
 ##### Expect one line prefixed PIGLIT: in the output, which contains a
