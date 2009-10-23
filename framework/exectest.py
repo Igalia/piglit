@@ -23,7 +23,7 @@
 
 import subprocess
 
-from core import Test, TestResult
+from core import Test, testBinDir, TestResult
 
 #############################################################################
 ##### PlainExecTest: Simply run an executable
@@ -34,6 +34,8 @@ class PlainExecTest(Test):
 	def __init__(self, command):
 		Test.__init__(self)
 		self.command = command
+		# Prepend testBinDir to the path.
+		self.command[0] = testBinDir + self.command[0]
 
 	def run(self):
 		proc = subprocess.Popen(

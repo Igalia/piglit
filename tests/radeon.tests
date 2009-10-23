@@ -30,6 +30,6 @@ r300 = Group()
 # This test is a relaxed variant of the texturing/cubemap test.
 # Its only purpose is to catch major regressions in cubemapping as long as we
 # fail the real texturing/cubemap test.
-r300['cubemap-relax'] = PlainExecTest([testBinDir + 'cubemap', '-auto', '-r300relax'])
+r300['cubemap-relax'] = PlainExecTest(['cubemap', '-auto', '-r300relax'])
 
 profile.tests['r300'] = r300
