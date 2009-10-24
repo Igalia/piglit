@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright © 2009 Intel Corporation
  *
@@ -56,8 +58,8 @@ probes();
 static void
 loadTex()
 {
-	int height = 2;
-	int width = 2;
+	#define height 2
+	#define width 2
 	int i, j;
 
 	GLfloat texData[width][height][4];
@@ -87,6 +89,9 @@ loadTex()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 		     GL_FLOAT, texData);
+
+	#undef height
+	#undef width
 }
 
 
@@ -117,6 +122,7 @@ piglit_display(void)
 {
 	GLenum rgba[4] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
 	int i, j, k;
+	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -215,8 +221,6 @@ piglit_display(void)
 	}
 
 	glPopMatrix();
-
-	GLboolean pass = GL_TRUE;
 
 	pass = probes();
 
