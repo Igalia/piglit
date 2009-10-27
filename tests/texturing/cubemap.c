@@ -240,6 +240,8 @@ piglit_display(void)
 	int i = 0, y_offset = 0;
 	int row_dim = 0;
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	/* Clear background to gray */
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -286,16 +288,4 @@ piglit_init(int argc, char **argv)
 		if (!strcmp(argv[i], "-r300relax"))
 			Hack_r300Relax = 1;
 	}
-
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho( 0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1 );
-
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glLoadIdentity();
 }
