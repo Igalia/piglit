@@ -46,6 +46,14 @@ display(void)
 		piglit_report_result(result);
 }
 
+static void
+reshape(int w, int h)
+{
+	piglit_width = w;
+	piglit_height = h;
+
+	glViewport(0, 0, w, h);
+}
 
 int main(int argc, char *argv[])
 {
@@ -67,6 +75,7 @@ int main(int argc, char *argv[])
 	glutInitDisplayMode(piglit_window_mode);
 	glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
 	glutKeyboardFunc(piglit_escape_exit_key);
 
 	glewInit();
