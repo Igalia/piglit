@@ -27,7 +27,6 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
 static GLboolean Hack_r300Relax = GL_FALSE;
 
 #define MAX_SIZE	64
@@ -35,6 +34,10 @@ static GLboolean Hack_r300Relax = GL_FALSE;
 
 #define WIN_WIDTH	((MAX_SIZE * 6 + PAD * 9) * 2)
 #define WIN_HEIGHT	400
+
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+int piglit_width = WIN_WIDTH;
+int piglit_height = WIN_HEIGHT;
 
 static GLfloat colors[][3] = {
 	{1.0, 1.0, 1.0},
@@ -229,7 +232,8 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 }
 
 
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	int dim;
 	GLboolean pass = GL_TRUE;
@@ -268,25 +272,20 @@ static void display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void Key(unsigned char key, int x, int y)
+void
+piglit_init(int argc, char **argv)
 {
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
+	int i;
 
-static void init(void)
-{
 	piglit_require_extension("GL_ARB_texture_cube_map");
+
+	for(i = 1; i < argc; ++i) {
+		if (!strcmp(argv[i], "-r300relax"))
+			Hack_r300Relax = 1;
+	}
 
 	/* Set up projection matrix so we can just draw using window
 	 * coordinates.
@@ -299,31 +298,4 @@ static void init(void)
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
 	glLoadIdentity();
-}
-
-int main(int argc, char**argv)
-{
-	int i;
-	glutInit(&argc, argv);
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
-		else if (!strcmp(argv[i], "-r300relax"))
-			Hack_r300Relax = 1;
-		else
-			printf("Unknown option: %s\n", argv[i]);
-	}
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("cubemap");
-	init();
-	glutDisplayFunc(display);
-	if (!Automatic) {
-		printf("Press 'd' or 'm' to change demo mode; Escape to quit\n");
-		glutKeyboardFunc(Key);
-	}
-	glutMainLoop();
-
-	return 0;
 }
