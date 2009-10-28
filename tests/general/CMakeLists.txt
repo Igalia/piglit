@@ -22,6 +22,7 @@ link_libraries (
 add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
 add_executable (bgra-sec-color-pointer bgra-sec-color-pointer.c)
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
+add_executable (depth-clamp-range depth-clamp-range.c)
 add_executable (dlist-clear dlist-clear.c)
 add_executable (dlist-fdo3129-01 dlist-fdo3129-01.c)
 add_executable (dlist-fdo3129-02 dlist-fdo3129-02.c)
