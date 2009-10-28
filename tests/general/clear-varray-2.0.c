@@ -105,11 +105,11 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	/* The second clear should have made everything green. */
-	piglit_probe_pixel_rgb(30, 30, green);
+	pass = pass && piglit_probe_pixel_rgb(30, 30, green);
 	/* The first rectangle should have been cleared to green. */
-	piglit_probe_pixel_rgb(15, 15, green);
+	pass = pass && piglit_probe_pixel_rgb(15, 15, green);
 	/* The second rectangle should have shown blue. */
-	piglit_probe_pixel_rgb(35, 15, blue);
+	pass = pass && piglit_probe_pixel_rgb(35, 15, blue);
 
 	glutSwapBuffers();
 
