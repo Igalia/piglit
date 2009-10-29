@@ -86,6 +86,7 @@ static char *gen_temporary_dest_indirections(int sample_count,
 		       "%d indirections and %d instructions\n",
 		       get_program_i(GL_MAX_PROGRAM_INSTRUCTIONS_ARB),
 		       sample_count, instr_count);
+		free(prog);
 		return NULL;
 	}
 
