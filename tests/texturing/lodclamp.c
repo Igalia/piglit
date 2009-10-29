@@ -73,8 +73,8 @@ set_level_color(int level, int size, int color)
 }
 
 /**
- * Tests that the mipmap drawn at (x,y)-(x+size,y+size) has the majority color,
- * with color+1 in bottom left.
+ * Tests that the mipmap drawn at (x,y)-(x+size,y+size) has the color for the
+ * clamped level.
  */
 static GLboolean
 test_results(int x, int y, int size, int level, int min_lod, int max_lod)
