@@ -135,7 +135,7 @@ piglit_display(void)
 
 	glPushMatrix();
 
-	glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA_EXT, rgba);
+	glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA_EXT, (GLint *) rgba);
 
 	for(k = 0; k < 4; ++k) {
 		glPushMatrix();
@@ -145,7 +145,7 @@ piglit_display(void)
 				rgba[3] = GL_ALPHA;
 				glTexParameteriv(GL_TEXTURE_2D,
 						 GL_TEXTURE_SWIZZLE_RGBA_EXT,
-						 rgba);
+						 (GLint *) rgba);
 
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -153,7 +153,7 @@ piglit_display(void)
 				rgba[3] = GL_RED;
 				glTexParameteriv(GL_TEXTURE_2D,
 						 GL_TEXTURE_SWIZZLE_RGBA_EXT,
-						 rgba);
+						 (GLint *) rgba);
 
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -161,7 +161,7 @@ piglit_display(void)
 				rgba[3] = GL_GREEN;
 				glTexParameteriv(GL_TEXTURE_2D,
 						 GL_TEXTURE_SWIZZLE_RGBA_EXT,
-						 rgba);
+						 (GLint *) rgba);
 
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -169,7 +169,7 @@ piglit_display(void)
 				rgba[3] = GL_BLUE;
 				glTexParameteriv(GL_TEXTURE_2D,
 						 GL_TEXTURE_SWIZZLE_RGBA_EXT,
-						 rgba);
+						 (GLint *) rgba);
 
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 				glPopMatrix();
