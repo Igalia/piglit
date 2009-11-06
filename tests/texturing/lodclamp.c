@@ -113,7 +113,7 @@ draw_and_test(int x_offset, int y_offset, float min_lod, float max_lod)
 {
 	GLfloat y;
 	int dim;
-	int level, lod;
+	int level;
 	GLboolean pass = GL_TRUE;
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, max_lod);
@@ -134,7 +134,6 @@ draw_and_test(int x_offset, int y_offset, float min_lod, float max_lod)
 					    min_lod, max_lod) && pass;
 
 		y += dim + PAD;
-		lod--;
 	}
 
 	return pass;
