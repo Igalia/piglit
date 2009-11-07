@@ -82,8 +82,10 @@ static enum piglit_result test(unsigned int alu_depth)
 	 * long programs, and if 16k works, then 64k will probably
 	 * work, too ;-)
 	 */
-	if (!alu_depth || alu_depth > 16384 || alu_depth + 1 > max_alu_instructions)
+	if (!alu_depth || alu_depth > 16384 || alu_depth + 1 > max_alu_instructions) {
+		free(program_text);
 		return PIGLIT_SKIP;
+	}
 
 	printf("Testing: alu_depth = %u\n", alu_depth);
 
