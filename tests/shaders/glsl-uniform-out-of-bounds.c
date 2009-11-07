@@ -181,7 +181,7 @@ static void test_vector(const char *glsl_type, const char * suffix,
 	 * out of bounds.
 	 */
 	uniform(loc_b, 5, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	uniform(loc_c, 0, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to c", glsl_type);
@@ -192,7 +192,7 @@ static void test_vector(const char *glsl_type, const char * suffix,
 
 	/* Out of bounds; see comment above */
 	uniform(loc_c, 5, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	uniform(loc_b2, 0, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to b[2]", glsl_type);
@@ -201,7 +201,7 @@ static void test_vector(const char *glsl_type, const char * suffix,
 
 	/* Out of bounds; see comment above */
 	uniform(loc_b2, 1024, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	glDeleteObjectARB(fs);
 	glDeleteObjectARB(vs);
@@ -256,7 +256,7 @@ static void test_matrix(void)
 
 	/* Out of bounds; see comment above */
 	glUniformMatrix4fvARB(loc_b, 5, GL_FALSE, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	glUniformMatrix4fvARB(loc_c, 0, GL_FALSE, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to c", glsl_type);
@@ -267,7 +267,7 @@ static void test_matrix(void)
 
 	/* Out of bounds; see comment above */
 	glUniformMatrix4fvARB(loc_c, 5, GL_FALSE, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	glUniformMatrix4fvARB(loc_b2, 0, GL_FALSE, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to b[2]", glsl_type);
@@ -276,7 +276,7 @@ static void test_matrix(void)
 
 	/* Out of bounds; see comment above */
 	glUniformMatrix4fvARB(loc_b2, INT_MAX, GL_FALSE, lots_of_zeros);
-	glGetError(); /* Eat generated error, if any */
+	(void) glGetError(); /* Eat generated error, if any */
 
 	glUniformMatrix4fvARB(loc_a, 0, GL_FALSE, lots_of_zeros);
 	expect_error(GL_NO_ERROR, "Type %s: Write count = 0 to a", glsl_type);
