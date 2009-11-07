@@ -87,7 +87,10 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 				}
 			} while (total_read < len);
 
-			text[total_read] = '\0';
+			if (text != NULL) {
+				text[total_read] = '\0';
+			}
+
 			if (size != NULL) {
 				*size = total_read;
 			}
