@@ -123,10 +123,10 @@ piglit_display(void)
 	/* Verify that the resulting images are blended between the levels. */
 	y = 10;
 	for (level = 0, dim = MAX_SIZE; dim > 1; level++, dim /= 2) {
-		float expected[4];
+		float expected[3];
 		int i;
 
-		for (i = 0; i < 4; i++) {
+		for (i = 0; i < 3; i++) {
 			expected[i] = (colors[level    ][i] +
 				       colors[level + 1][i]) / 2.0;
 		}
