@@ -33,8 +33,10 @@
 
 #include "piglit-util.h"
 
+#define BOX_SIZE 25
+
 static GLboolean Automatic = GL_FALSE;
-static GLuint tex[3];
+static GLuint tex;
 
 static void
 Init(void)
@@ -76,9 +78,8 @@ loadTex(void)
 		}
 	}
 
-	//depth texture 0 using LUMINANCE
-	glGenTextures(3, tex);
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -89,35 +90,6 @@ loadTex(void)
 			GL_COMPARE_R_TO_TEXTURE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
 			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 1 using INTENSITY
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-			GL_COMPARE_R_TO_TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
-			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 2 using ALPHA
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_ALPHA);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-			GL_COMPARE_R_TO_TEXTURE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
-			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
 	#undef height
 	#undef width
 }
@@ -128,331 +100,59 @@ display(void)
 {
 	GLboolean pass = GL_TRUE;
 
+	static const struct {
+		GLenum compare;
+		float r0;
+		float r1;
+	} tests[] = {
+		{ GL_LESS,     2.0, 0.0 },
+		{ GL_LEQUAL,   2.0, 0.0 },
+		{ GL_GREATER,  2.0, 0.0 },
+		{ GL_GEQUAL,   2.0, 0.0 },
+		{ GL_ALWAYS,   2.0, 0.0 },
+		{ GL_NEVER,    2.0, 0.0 },
+		{ GL_NOTEQUAL, 0.5, 0.5 },
+		{ GL_EQUAL,    0.5, 0.5 },
+	};
+	static const GLenum modes[3] = {
+		GL_ALPHA, GL_LUMINANCE, GL_INTENSITY
+	};
 	GLfloat pink[3] = {1.0, 0.0, 1.0};
 	GLfloat white[3] = {1.0, 1.0, 1.0};
 	GLfloat black[3] = {0.0, 0.0, 0.0};
 	GLfloat green[3] = {0.0, 1.0, 0.0};
+	unsigned row;
+	unsigned col;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glColor3f(1.0, 0.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 275, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 300, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 275, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 300, 0);
-	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 275, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 300, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 275, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 300, 0);
-	glEnd();
+	glBindTexture(GL_TEXTURE_2D, tex);
+	for (row = 0; row < ARRAY_SIZE(tests); row++) {
+		const int y = 275 - (35 * row);
 
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 275, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 300, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 275, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 300, 0);
-	glEnd();
+		for (col = 0; col < 3; col++) {
+			const int x = 150 + (col * 50);
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC,
+					tests[row].compare);
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_DEPTH_TEXTURE_MODE,
+					modes[col]);
 
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 240, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 265, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 240, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 265, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 240, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 265, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 240, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 265, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 240, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 265, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 240, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 265, 0);
-	glEnd();
-
-		glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 205, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 230, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 205, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 230, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 205, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 230, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 205, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 230, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 205, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 230, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 205, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 230, 0);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 170, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 195, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 170, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 195, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 170, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 195, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 170, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 195, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 170, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 195, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 170, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 195, 0);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_ALWAYS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 135, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 160, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 135, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 160, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_ALWAYS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 135, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 160, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 135, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 160, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_ALWAYS);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 135, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 160, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 135, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 160, 0);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(225, 100, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(225, 125, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(200, 100, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(200, 125, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(275, 100, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(275, 125, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(250, 100, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(250, 125, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 2.0);
-		glVertex3f(175, 100, 0);
-		glTexCoord3f(1.0, 1.0, 2.0);
-		glVertex3f(175, 125, 0);
-		glTexCoord3f(0.0, 0.0, 0.0);
-		glVertex3f(150, 100, 0);
-		glTexCoord3f(0.0, 1.0, 0.0);
-		glVertex3f(150, 125, 0);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NOTEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(225, 65, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(225, 90, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(200, 65, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(200, 90, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NOTEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(275, 65, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(275, 90, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(250, 65, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(250, 90, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_NOTEQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(175, 65, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(175, 90, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(150, 65, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(150, 90, 0);
-	glEnd();
-
-
-	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_EQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(225, 30, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(225, 55, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(200, 30, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(200, 55, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_EQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(275, 30, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(275, 55, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(250, 30, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(250, 55, 0);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_EQUAL);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord3f(1.0, 0.0, 0.5);
-		glVertex3f(175, 30, 0);
-		glTexCoord3f(1.0, 1.0, 0.5);
-		glVertex3f(175, 55, 0);
-		glTexCoord3f(0.0, 0.0, 0.5);
-		glVertex3f(150, 30, 0);
-		glTexCoord3f(0.0, 1.0, 0.5);
-		glVertex3f(150, 55, 0);
-	glEnd();
+			glBegin(GL_TRIANGLE_STRIP);
+			glTexCoord3f(1.0, 0.0, tests[row].r0);
+			glVertex2f(x + BOX_SIZE, y);
+			glTexCoord3f(1.0, 1.0, tests[row].r0);
+			glVertex2f(x + BOX_SIZE, y + BOX_SIZE);
+			glTexCoord3f(0.0, 0.0, tests[row].r1);
+			glVertex2f(x,            y);
+			glTexCoord3f(0.0, 1.0, tests[row].r1);
+			glVertex2f(x,            y + BOX_SIZE);
+			glEnd();
+		}
+	}
 
 
 	//less
