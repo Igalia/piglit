@@ -95,8 +95,8 @@ test_with_format(GLenum internal_format, GLenum format, GLenum type,
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		fprintf(stderr, "texture for internalformat 0x%04x. "
 			"format 0x%04x, type 0x%04x is framebuffer "
-			"incomplete\n",
-			internal_format, format, type);
+			"incomplete (status = 0x%04x)\n",
+			internal_format, format, type, status);
 		goto done;
 	}
 
