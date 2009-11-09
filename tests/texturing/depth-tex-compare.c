@@ -42,6 +42,15 @@ int piglit_height = 300;
 
 static GLuint tex;
 
+static const char *const compare_names[8] = {
+	"GL_NEVER", "GL_LESS", "GL_EQUAL", "GL_LEQUAL",
+	"GL_GREATER", "GL_NOTEQUAL", "GL_GEQUAL", "GL_ALWAYS"
+};
+
+static const char *const mode_names[3] = {
+	"GL_ALPHA", "GL_LUMINANCE", "GL_INTENSITY"
+};
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -94,27 +103,87 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
+	static const GLfloat pink[3] = {1.0, 0.0, 1.0};
+	static const GLfloat white[3] = {1.0, 1.0, 1.0};
+	static const GLfloat black[3] = {0.0, 0.0, 0.0};
+	static const GLfloat green[3] = {0.0, 1.0, 0.0};
+
 	static const struct {
 		GLenum compare;
 		float r0;
 		float r1;
+		const GLfloat *probes[9];
 	} tests[] = {
-		{ GL_LESS,     2.0, 0.0 },
-		{ GL_LEQUAL,   2.0, 0.0 },
-		{ GL_GREATER,  2.0, 0.0 },
-		{ GL_GEQUAL,   2.0, 0.0 },
-		{ GL_ALWAYS,   2.0, 0.0 },
-		{ GL_NEVER,    2.0, 0.0 },
-		{ GL_NOTEQUAL, 0.5, 0.5 },
-		{ GL_EQUAL,    0.5, 0.5 },
+		{
+			GL_LESS,     2.0, 0.0,
+			{
+				pink, white, white,
+				pink, black, black,
+				pink, green, green
+			}
+		},
+		{
+			GL_LEQUAL,   2.0, 0.0,
+			{
+				pink, white, white,
+				pink, black, black,
+				pink, green, green,
+			}
+		},
+		{
+			GL_GREATER,  2.0, 0.0,
+			{
+				white, pink, pink,
+				black, pink, pink,
+				green, pink, pink,
+			}
+		},
+		{
+			GL_GEQUAL,   2.0, 0.0,
+			{
+				white, pink, pink,
+				black, pink, pink,
+				green, pink, pink,
+			}
+		},
+		{
+			GL_ALWAYS,   2.0, 0.0,
+			{
+				pink, pink, pink,
+				pink, pink, pink,
+				pink, pink, pink,
+			}
+		},
+		{
+			GL_NEVER,    2.0, 0.0,
+			{
+				white, white, white,
+				black, black, black,
+				green, green, green,
+			}
+		},
+		{
+			GL_NOTEQUAL, 0.5, 0.5,
+			{
+				white, white, pink,
+				black, black, pink,
+				green, green, pink,
+			}
+		},
+		{
+			GL_EQUAL,    0.5, 0.5,
+			{
+				pink, pink, white,
+				pink, pink, black,
+				pink, pink, green,
+			}
+		},
 	};
+
 	static const GLenum modes[3] = {
 		GL_ALPHA, GL_LUMINANCE, GL_INTENSITY
 	};
-	GLfloat pink[3] = {1.0, 0.0, 1.0};
-	GLfloat white[3] = {1.0, 1.0, 1.0};
-	GLfloat black[3] = {0.0, 0.0, 0.0};
-	GLfloat green[3] = {0.0, 1.0, 0.0};
+
 	unsigned row;
 	unsigned col;
 
@@ -125,12 +194,15 @@ piglit_display(void)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	for (row = 0; row < ARRAY_SIZE(tests); row++) {
 		const int y = 275 - (35 * row);
+		const GLenum compare = tests[row].compare;
 
 		for (col = 0; col < 3; col++) {
 			const int x = 150 + (col * 50);
+			unsigned i;
+
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC,
-					tests[row].compare);
+					compare);
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_DEPTH_TEXTURE_MODE,
 					modes[col]);
@@ -145,86 +217,25 @@ piglit_display(void)
 			glTexCoord3f(0.0, 1.0, tests[row].r1);
 			glVertex2f(x,            y + BOX_SIZE);
 			glEnd();
+
+			for (i = 0; i < 3; i++) {
+				const GLfloat *const color =
+					tests[row].probes[(3 * col) + i];
+
+				if (!piglit_probe_pixel_rgb(x + 5 + (i * 5),
+							    y + 10,
+							    color)) {
+					if (!piglit_automatic) {
+						printf("compare = %s, mode = %s\n",
+						       compare_names[compare - GL_NEVER],
+						       mode_names[col]);
+					}
+
+					pass = GL_FALSE;
+				}
+			}
 		}
 	}
-
-
-	//less
-	pass = pass && piglit_probe_pixel_rgb(155, 285, pink);
-	pass = pass && piglit_probe_pixel_rgb(205, 285, pink);
-	pass = pass && piglit_probe_pixel_rgb(255, 285, pink);
-	pass = pass && piglit_probe_pixel_rgb(160, 285, white);
-	pass = pass && piglit_probe_pixel_rgb(210, 285, black);
-	pass = pass && piglit_probe_pixel_rgb(260, 285, green);
-	pass = pass && piglit_probe_pixel_rgb(165, 285, white);
-	pass = pass && piglit_probe_pixel_rgb(215, 285, black);
-	pass = pass && piglit_probe_pixel_rgb(265, 285, green);
-
-	//lequal
-	pass = pass && piglit_probe_pixel_rgb(155, 250, pink);
-	pass = pass && piglit_probe_pixel_rgb(205, 250, pink);
-	pass = pass && piglit_probe_pixel_rgb(255, 250, pink);
-	pass = pass && piglit_probe_pixel_rgb(160, 250, white);
-	pass = pass && piglit_probe_pixel_rgb(210, 250, black);
-	pass = pass && piglit_probe_pixel_rgb(260, 250, green);
-	pass = pass && piglit_probe_pixel_rgb(165, 250, white);
-	pass = pass && piglit_probe_pixel_rgb(215, 250, black);
-	pass = pass && piglit_probe_pixel_rgb(265, 250, green);
-
-	//greater
-	pass = pass && piglit_probe_pixel_rgb(155, 215, white);
-	pass = pass && piglit_probe_pixel_rgb(205, 215, black);
-	pass = pass && piglit_probe_pixel_rgb(255, 215, green);
-	pass = pass && piglit_probe_pixel_rgb(160, 215, pink);
-	pass = pass && piglit_probe_pixel_rgb(210, 215, pink);
-	pass = pass && piglit_probe_pixel_rgb(260, 215, pink);
-	pass = pass && piglit_probe_pixel_rgb(165, 215, pink);
-	pass = pass && piglit_probe_pixel_rgb(215, 215, pink);
-	pass = pass && piglit_probe_pixel_rgb(265, 215, pink);
-
-	//gequal
-	pass = pass && piglit_probe_pixel_rgb(155, 180, white);
-	pass = pass && piglit_probe_pixel_rgb(205, 180, black);
-	pass = pass && piglit_probe_pixel_rgb(255, 180, green);
-	pass = pass && piglit_probe_pixel_rgb(160, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(210, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(260, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(165, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(215, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(265, 180, pink);
-
-	//always
-	pass = pass && piglit_probe_pixel_rgb(155, 145, pink);
-	pass = pass && piglit_probe_pixel_rgb(205, 145, pink);
-	pass = pass && piglit_probe_pixel_rgb(255, 145, pink);
-	pass = pass && piglit_probe_pixel_rgb(165, 145, pink);
-	pass = pass && piglit_probe_pixel_rgb(215, 145, pink);
-	pass = pass && piglit_probe_pixel_rgb(265, 145, pink);
-
-	//never
-	pass = pass && piglit_probe_pixel_rgb(155, 110, white);
-	pass = pass && piglit_probe_pixel_rgb(205, 110, black);
-	pass = pass && piglit_probe_pixel_rgb(255, 110, green);
-	pass = pass && piglit_probe_pixel_rgb(165, 110, white);
-	pass = pass && piglit_probe_pixel_rgb(215, 110, black);
-	pass = pass && piglit_probe_pixel_rgb(265, 110, green);
-
-	//notequal
-	pass = pass && piglit_probe_pixel_rgb(155, 75, white);
-	pass = pass && piglit_probe_pixel_rgb(205, 75, black);
-	pass = pass && piglit_probe_pixel_rgb(255, 75, green);
-	pass = pass && piglit_probe_pixel_rgb(165, 75, pink);
-	pass = pass && piglit_probe_pixel_rgb(215, 75, pink);
-	pass = pass && piglit_probe_pixel_rgb(265, 75, pink);
-
-	//equal
-	pass = pass && piglit_probe_pixel_rgb(155, 40, pink);
-	pass = pass && piglit_probe_pixel_rgb(205, 40, pink);
-	pass = pass && piglit_probe_pixel_rgb(255, 40, pink);
-	pass = pass && piglit_probe_pixel_rgb(165, 40, white);
-	pass = pass && piglit_probe_pixel_rgb(215, 40, black);
-	pass = pass && piglit_probe_pixel_rgb(265, 40, green);
-
 
 	glFinish();
 	glutSwapBuffers();
