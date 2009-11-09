@@ -32,41 +32,35 @@
  */
 
 #include "piglit-util.h"
+#include "piglit-framework.h"
 
 #define BOX_SIZE 25
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+int piglit_width = 400;
+int piglit_height = 300;
+
 static GLuint tex;
 
-static void
-Init(void)
-{
-
-	glewInit();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 400, 0, 300, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor(0.0, 1.0, 0.0, 1.0);
-
-}
-
-static void
-loadTex(void)
+void
+piglit_init(int argc, char **argv)
 {
 	#define height 2
 	#define width 2
 	int i, j;
 
 	GLfloat texDepthData[width][height];
+
+	(void) argc;
+	(void) argv;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0.0, 1.0, 0.0, 1.0);
+
 	for (i=0; i < width; ++i) {
 		for (j=0; j < height; ++j) {
 			if ((i+j) & 1) {
@@ -95,8 +89,8 @@ loadTex(void)
 }
 
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
@@ -232,34 +226,10 @@ display(void)
 	pass = pass && piglit_probe_pixel_rgb(265, 40, green);
 
 
-	if(Automatic) {
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-		exit(pass ? 0 : 1);
-	}
-
 	glFinish();
 	glutSwapBuffers();
 
 	printf(" Left to Right: ALPHA, LUMINANCE, INTENSITY\n Top to Bottom: LESS, LEQUAL, GREATER, GEQUAL, ALWAYS, NEVER, NOTEQUAL, EQUAL\n");
 
-}
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1], "-auto", 5))
-		Automatic=GL_TRUE;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("depth-tex-compare");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	Init();
-
-	loadTex();
-
-	glutMainLoop();
-
-	return 0;
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
