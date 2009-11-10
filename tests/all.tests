@@ -173,6 +173,7 @@ add_vpfpgeneric('nv-add')
 add_vpfpgeneric('nv-arl')
 add_vpfpgeneric('nv-init-zero-reg')
 add_vpfpgeneric('nv-init-zero-addr')
+add_vpfpgeneric('vp-exp-alias')
 add_vpfpgeneric('vp-two-constants')
 shaders['vpfp-generic'] = vpfpgeneric
 
