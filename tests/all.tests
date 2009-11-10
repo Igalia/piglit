@@ -167,11 +167,13 @@ add_vpfpgeneric('dataflow-bug')
 add_vpfpgeneric('fogcoord-dp3')
 add_vpfpgeneric('fogcoord-dph')
 add_vpfpgeneric('fogcoord-dp4')
+add_vpfpgeneric('fp-two-constants')
 add_vpfpgeneric('nv-mov')
 add_vpfpgeneric('nv-add')
 add_vpfpgeneric('nv-arl')
 add_vpfpgeneric('nv-init-zero-reg')
 add_vpfpgeneric('nv-init-zero-addr')
+add_vpfpgeneric('vp-two-constants')
 shaders['vpfp-generic'] = vpfpgeneric
 
 bugs = Group()
