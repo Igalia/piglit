@@ -1,0 +1,19 @@
+; Tests loading of an entry in a constant array.
+
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+PARAM vals[4] = { {0.5, 1.0, 2.0, 0.0},
+      	      	  {1.0, 0.0, 0.8, 0.0},
+		  {1.0, 0.0, 0.5, 0.0},
+		  {0.8, 1.0, 0.0, 0.0}
+		};
+MOV result.color, vals[3];
+END
+
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+!!test
+expected          0.8     1.0      0.0      0.0
+

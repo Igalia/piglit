@@ -272,6 +272,8 @@ void Test::readline(const char* filename, int linenum, char* line)
 		parameters.push_back(new ParameterTexcoord(atoi(line+9), params));
 	} else if (!strncmp(line, "vertex.local[", 13)) {
 		parameters.push_back(new ParameterLocal(GL_VERTEX_PROGRAM_ARB, atoi(line+13), params));
+	} else if (!strncmp(line, "vertex.environment[", 19)) {
+		parameters.push_back(new ParameterEnv(GL_VERTEX_PROGRAM_ARB, atoi(line+19), params));
 	} else if (!strncmp(line, "fragment.local[", 15)) {
 		parameters.push_back(new ParameterLocal(GL_FRAGMENT_PROGRAM_ARB, atoi(line+15), params));
 	} else if (!strncmp(line, "NVparameter[", 12)) {
