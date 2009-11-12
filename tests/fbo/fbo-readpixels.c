@@ -68,6 +68,9 @@ test_with_format(GLenum internal_format, GLenum format,
 		     BUF_WIDTH, BUF_HEIGHT, 0,
 		     format, GL_UNSIGNED_BYTE, NULL);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_RED_SIZE,
 				 &rbits);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_GREEN_SIZE,
@@ -174,8 +177,6 @@ test_with_format(GLenum internal_format, GLenum format,
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glBegin(GL_TRIANGLE_FAN);
 	glTexCoord2f(0.0, 0.0);
