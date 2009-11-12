@@ -51,7 +51,7 @@ static void rect(int x1, int y1, int x2, int y2)
 }
 
 static GLboolean
-test_with_format(GLenum internal_format, GLenum format, GLenum type,
+test_with_format(GLenum internal_format, GLenum format,
 		 float results_x, float results_y)
 {
 	GLuint tex, fb;
@@ -77,9 +77,9 @@ test_with_format(GLenum internal_format, GLenum format, GLenum type,
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_ALPHA_SIZE,
 				 &abits);
 
-	printf("testing with format 0x%04x, 0x%04x, 0x%04x "
+	printf("testing with format 0x%04x, 0x%04x "
 	       "(%d,%d,%d,%d rgba)\n",
-	       internal_format, format, type,
+	       internal_format, format,
 	       rbits, gbits, bbits, abits);
 
 	glGenFramebuffersEXT(1, &fb);
@@ -94,9 +94,9 @@ test_with_format(GLenum internal_format, GLenum format, GLenum type,
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		fprintf(stderr, "texture for internalformat 0x%04x. "
-			"format 0x%04x, type 0x%04x is framebuffer "
+			"format 0x%04x is framebuffer "
 			"incomplete (status = 0x%04x)\n",
-			internal_format, format, type, status);
+			internal_format, format, status);
 		goto done;
 	}
 
@@ -204,16 +204,12 @@ display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	pass &= test_with_format(GL_RGBA8, GL_BGRA,
-				 GL_UNSIGNED_INT_8_8_8_8_REV,
 				 0, 0);
 	pass &= test_with_format(GL_RGB5, GL_RGB,
-				 GL_UNSIGNED_SHORT_5_6_5,
 				 0, BUF_HEIGHT + 1);
 	pass &= test_with_format(GL_RGBA4, GL_BGRA,
-				 GL_UNSIGNED_SHORT_4_4_4_4_REV,
 				 0, (BUF_HEIGHT + 1) * 2);
 	pass &= test_with_format(GL_RGB5_A1, GL_BGRA,
-				 GL_UNSIGNED_SHORT_1_5_5_5_REV,
 				 0, (BUF_HEIGHT + 1) * 3);
 	glutSwapBuffers();
 
