@@ -128,17 +128,17 @@ piglit_display(void)
 		{
 			GL_LEQUAL,   2.0, 0.0,
 			{
-				pink, white, white,
-				pink, black, black,
-				pink, green, green,
+				pink, white, pink,
+				pink, black, pink,
+				pink, green, pink,
 			}
 		},
 		{
 			GL_GREATER,  2.0, 0.0,
 			{
-				white, pink, pink,
-				black, pink, pink,
-				green, pink, pink,
+				white, pink, white,
+				black, pink, black,
+				green, pink, green,
 			}
 		},
 		{
