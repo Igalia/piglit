@@ -43,23 +43,12 @@ static GLint fs2;
 static void loadTex(void);
 static void compileLinkProg(void);
 
-static GLfloat verts[12] = {175.0, 125.0, 0.0,
-				175.0, 175.0, 0.0,
-				125.0, 125.0, 0.0,
-				125.0, 175.0, 0.0};
-
-static GLfloat texCoords[8] = {1.0, 0.0,
-				1.0, 1.0,
-				0.0, 0.0,
-				0.0, 1.0};
-
 static const char *vertShaderText =
-	"attribute vec2 textureCoords;\n"
 	"varying vec2 texCoords;\n"
 	"void main()\n"
 	"{ \n"
 	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	"	texCoords = textureCoords;\n"
+	"	texCoords = gl_MultiTexCoord0;\n"
 	"} \n";
 
 static const char *fragShaderText =
@@ -135,31 +124,14 @@ compileLinkProg(void)
 	prog1 = glCreateProgram();
 	glAttachShader(prog1, vs1);
 	glAttachShader(prog1, fs1);
-	glBindAttribLocation(prog1, 1, "textureCoords");
 	glLinkProgram(prog1);
 	glUseProgram(prog1);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
-                                verts);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),
-				texCoords);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
 
 	prog2 = glCreateProgram();
 	glAttachShader(prog2, vs1);
 	glAttachShader(prog2, fs2);
-	glBindAttribLocation(prog2, 1, "textureCoords");
 	glLinkProgram(prog2);
 	glUseProgram(prog2);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
-                               verts);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),
-				texCoords);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 }
 
 static void
@@ -192,9 +164,9 @@ loadTex(void)
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 			GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
@@ -208,29 +180,23 @@ loadTex(void)
 enum piglit_result
 piglit_display(void)
 {
+	static const float grey[3] = {0.466667, 0.533333, 0.466667};
+	static const float green[3] = {0.0, 1.0, 0.0};
 	GLboolean pass = GL_TRUE;
-
-	float grey[3] = {0.466667, 0.533333, 0.466667};
-	float green[3] = {0, 1, 0};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glPushMatrix();
-
 	glUseProgram(prog1);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glTranslatef(75.0, 0.0, 0.0);
+	piglit_draw_rect_tex(125.0, 125.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	glUseProgram(prog2);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glPopMatrix();
+	piglit_draw_rect_tex(200.0, 125.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	pass = pass && piglit_probe_pixel_rgb(132, 125, grey);
 	pass = pass && piglit_probe_pixel_rgb(205, 125, green);
 
-	glFinish();
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
