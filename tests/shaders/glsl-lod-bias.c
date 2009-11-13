@@ -23,22 +23,33 @@
 
 // author: Ben Holmes
 
-/*
- * This test utilizes a texture sampling function in glsl
- * that specifies a LOD bias.
+/* This test utilizes a texture sampling function in GLSL that specifies a
+ * LOD bias.  Create a texture with a 4x4 checkerboard pattern.  Draw that
+ * texture with all of the positive LOD biases that will result in a mipmap
+ * level greater than or equal to 4x4 (single texel tiles) being used.  Verify
+ * that all the image are the same.
  */
 
 #include "piglit-util.h"
 
-int piglit_width = 400, piglit_height = 300;
+/* Pick the number of LODs to examine and the size of the texture so that the
+ * smallest LOD is the one where each of the 4x4 tiles in the checkerboard
+ * texture is 1x1.
+ */
+#define TEST_COLS 5
+#define BOX_SIZE  (1 << (TEST_COLS + 1))
+
+int piglit_width = (BOX_SIZE + 2) * TEST_COLS + 1;
+int piglit_height = (BOX_SIZE + 1) + 1;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static GLuint tex[1];
-static GLint prog1;
-static GLint vs1;
-static GLint fs1;
-static GLint prog2;
-static GLint fs2;
+static GLint prog;
+static GLint vs;
+static GLint fs;
+static GLint tex_loc;
+static GLint bias_loc;
+
 
 static void loadTex(void);
 static void compileLinkProg(void);
@@ -53,21 +64,17 @@ static const char *vertShaderText =
 
 static const char *fragShaderText =
 	"uniform sampler2D tex2d;\n"
+	"uniform float lodBias;\n"
 	"varying vec2 texCoords;\n"
 	"void main()\n"
 	"{ \n"
-	"	gl_FragColor = texture2D(tex2d, texCoords, 0.0);\n"
-	"} \n";
-
-static const char *fragShaderText2 =
-	"uniform sampler2D tex2d;\n"
-	"varying vec2 texCoords;\n"
-	"void main()\n"
-	"{ \n"
-	"	gl_FragColor = texture2D(tex2d, texCoords, 1.0);\n"
+	"	gl_FragColor = texture2D(tex2d, texCoords, lodBias);\n"
 	"} \n";
 
 
+static const float clear_color[4] = {0.6, 0.6, 0.6, 1.0};
+static const float green[4]       = {0.0, 1.0, 0.0, 1.0};
+static const float pink[4]        = {1.0, 0.0, 1.0, 0.0}; /* Note: 0.0 alpha */
 
 void
 piglit_init(int argc, char **argv)
@@ -82,7 +89,8 @@ piglit_init(int argc, char **argv)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glEnable(GL_TEXTURE_2D);
-	glClearColor(0.6, 0.6, 0.6, 1.0);
+	glClearColor(clear_color[0], clear_color[1],
+		     clear_color[2], clear_color[3]);
 }
 
 static void
@@ -90,71 +98,54 @@ compileLinkProg(void)
 {
 	GLint stat;
 
-	vs1 = glCreateShader(GL_VERTEX_SHADER);
-	fs1 = glCreateShader(GL_FRAGMENT_SHADER);
+	vs = glCreateShader(GL_VERTEX_SHADER);
+	fs = glCreateShader(GL_FRAGMENT_SHADER);
 
-	fs2 = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(vs, 1, (const GLchar **) &vertShaderText, NULL);
+	glShaderSource(fs, 1, (const GLchar **) &fragShaderText, NULL);
 
-	glShaderSource(vs1, 1, (const GLchar **) &vertShaderText, NULL);
-	glShaderSource(fs1, 1, (const GLchar **) &fragShaderText, NULL);
-	glShaderSource(fs2, 1, (const GLchar **) &fragShaderText2, NULL);
-
-	glCompileShader(vs1);
-	glGetShaderiv(vs1, GL_COMPILE_STATUS, &stat);
+	glCompileShader(vs);
+	glGetShaderiv(vs, GL_COMPILE_STATUS, &stat);
 	if (!stat) {
-                printf("error compiling vertex shader1!\n");
+                printf("error compiling vertex shader!\n");
                 exit(1);
         }
 
-	glCompileShader(fs1);
-	glGetShaderiv(fs1, GL_COMPILE_STATUS, &stat);
+	glCompileShader(fs);
+	glGetShaderiv(fs, GL_COMPILE_STATUS, &stat);
 	if (!stat) {
-		printf("error compiling fragment shader1!\n");
-		exit(1);
-	}
-
-	glCompileShader(fs2);
-	glGetShaderiv(fs2, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		printf("error compiling fragment shader2!\n");
+		printf("error compiling fragment shader!\n");
 		exit(1);
 	}
 
 
-	prog1 = glCreateProgram();
-	glAttachShader(prog1, vs1);
-	glAttachShader(prog1, fs1);
-	glLinkProgram(prog1);
-	glUseProgram(prog1);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
+	glLinkProgram(prog);
+	glUseProgram(prog);
 
-	prog2 = glCreateProgram();
-	glAttachShader(prog2, vs1);
-	glAttachShader(prog2, fs2);
-	glLinkProgram(prog2);
-	glUseProgram(prog2);
+	tex_loc = glGetUniformLocation(prog, "tex2d");
+	bias_loc = glGetUniformLocation(prog, "lodBias");
+
+	glUniform1i(tex_loc, 0);
 }
 
 static void
 loadTex(void)
 {
-	#define height 4
-	#define width 4
+	#define height BOX_SIZE
+	#define width BOX_SIZE
 	int i, j;
 
 	GLfloat texData[width][height][4];
 	for (i=0; i < width; ++i) {
 		for (j=0; j < height; ++j) {
-			if ((i+j) & 1) {
-				texData[i][j][0] = 1;
-				texData[i][j][1] = 0;
-				texData[i][j][2] = 1;
-				texData[i][j][3] = 0;
+			if ((i ^ j) & (BOX_SIZE / 4)) {
+				memcpy(texData[i][j], pink, sizeof(pink));
 			}
 			else {
-				texData[i][j][0] = 0;
-				texData[i][j][1] = 1;
-				texData[i][j][2] = 0;
-				texData[i][j][3] = 1;
+				memcpy(texData[i][j], green, sizeof(green));
 			}
 		}
 	}
@@ -172,6 +163,8 @@ loadTex(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
 			GL_RGBA, GL_FLOAT, texData);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	#undef height
 	#undef width
 }
@@ -180,22 +173,32 @@ loadTex(void)
 enum piglit_result
 piglit_display(void)
 {
-	static const float grey[3] = {0.466667, 0.533333, 0.466667};
-	static const float green[3] = {0.0, 1.0, 0.0};
+	const int tile_size = BOX_SIZE / 4;
 	GLboolean pass = GL_TRUE;
+	unsigned i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glUseProgram(prog1);
-	piglit_draw_rect_tex(125.0, 125.0, 50.0, 50.0,
-			     0.0, 0.0, 1.0, 1.0);
+	for (i = 0; i < TEST_COLS; i++) { 
+		const int x = 1 + ((BOX_SIZE + 2) * i);
 
-	glUseProgram(prog2);
-	piglit_draw_rect_tex(200.0, 125.0, 50.0, 50.0,
-			     0.0, 0.0, 1.0, 1.0);
+		glUniform1f(bias_loc, (float) i);
 
-	pass = pass && piglit_probe_pixel_rgb(132, 125, grey);
-	pass = pass && piglit_probe_pixel_rgb(205, 125, green);
+		/* Draw the rectangle the same size as the texture.  This
+		 * guarantees that the unbiased LOD will be 0.0.
+		 */
+		piglit_draw_rect_tex((float) x, 1.0,
+				     BOX_SIZE, BOX_SIZE,
+				     0.0, 0.0, 1.0, 1.0);
+
+		/* The middle of the lower left tile should be green, and the
+		 * middle of the tile next to it should be the clear color.
+		 */
+		if (!piglit_probe_pixel_rgb(x + (3 * tile_size / 2), 2, clear_color)
+		    || !piglit_probe_pixel_rgb(x + (tile_size / 2), 2, green)) {
+			pass = GL_FALSE;
+		}
+	}
 
 	glutSwapBuffers();
 
