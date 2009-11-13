@@ -59,7 +59,7 @@ static const char *vertShaderText =
 	"void main()\n"
 	"{ \n"
 	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	"	texCoords = gl_MultiTexCoord0;\n"
+	"	texCoords = gl_MultiTexCoord0.st;\n"
 	"} \n";
 
 static const char *fragShaderText =
