@@ -120,8 +120,8 @@ piglit_display(void)
 	static const GLenum depth_texture_modes[3] = {
 		GL_ALPHA, GL_LUMINANCE, GL_INTENSITY
 	};
-	const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
-	const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
+	static const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
+	static const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
 
 	GLboolean pass = GL_TRUE;
 
@@ -129,7 +129,19 @@ piglit_display(void)
 	GLfloat green[3] = {0.0, 1.0, 0.0};
 	GLfloat black[3] = {0.0, 0.0, 0.0};
 	unsigned i;
+	unsigned row;
 
+	static const struct {
+		GLenum target;
+		GLenum operand0_rgb;
+		const GLfloat *color;
+		float tex_size;
+	} test_rows[4] = {
+		{ GL_TEXTURE_RECTANGLE_ARB, GL_SRC_COLOR, color2, 2.0 },
+		{ GL_TEXTURE_RECTANGLE_ARB, GL_SRC_ALPHA, color2, 2.0 },
+		{ GL_TEXTURE_2D,            GL_SRC_COLOR, color1, 1.0 },
+		{ GL_TEXTURE_2D,            GL_SRC_ALPHA, color1, 1.0 }
+	};
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -141,63 +153,35 @@ piglit_display(void)
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[1]);
 
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_TEXTURE_RECTANGLE_ARB);
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
-	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+	for (row = 0; row < 4; row++) {
+		const float y = 25.0 + (75.0 * row);
 
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
+		/* Disable both texture targets, then enable just the target
+		 * used in this row.
+		 */
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_TEXTURE_RECTANGLE_ARB);
+		glEnable(test_rows[row].target);
 
-		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB,
-				GL_DEPTH_TEXTURE_MODE,
-				depth_texture_modes[i]);
+		glTexEnvfv(GL_TEXTURE_ENV, 
+			   GL_TEXTURE_ENV_COLOR,
+			   test_rows[row].color);
+		glTexEnvi(GL_TEXTURE_ENV,
+			  GL_OPERAND0_RGB,
+			  test_rows[row].operand0_rgb);
 
-		piglit_draw_rect_tex(x, 25.0, 50.0, 50.0,
-				     0.0, 0.0, 2.0, 2.0);
-	}
+		for (i = 0; i < 3; i++) {
+			const float x = 100.0 + (75.0 * i);
 
-	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_ALPHA);
+			glTexParameteri(test_rows[row].target,
+					GL_DEPTH_TEXTURE_MODE,
+					depth_texture_modes[i]);
 
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
-
-		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB,
-				GL_DEPTH_TEXTURE_MODE,
-				depth_texture_modes[i]);
-
-		piglit_draw_rect_tex(x, 100.0, 50.0, 50.0,
-				     0.0, 0.0, 2.0, 2.0);
-	}
-
-
-	glDisable(GL_TEXTURE_RECTANGLE_ARB);
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color1);
-	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
-
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
-
-		glTexParameteri(GL_TEXTURE_2D,
-				GL_DEPTH_TEXTURE_MODE,
-				depth_texture_modes[i]);
-
-		piglit_draw_rect_tex(x, 175.0, 50.0, 50.0,
-				     0.0, 0.0, 1.0, 1.0);
-	}
-
-	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_ALPHA);
-
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
-
-		glTexParameteri(GL_TEXTURE_2D,
-				GL_DEPTH_TEXTURE_MODE,
-				depth_texture_modes[i]);
-
-		piglit_draw_rect_tex(x, 250.0, 50.0, 50.0,
-				     0.0, 0.0, 1.0, 1.0);
+			piglit_draw_rect_tex(x, y, 50.0, 50.0,
+					     0.0, 0.0, 
+					     test_rows[row].tex_size,
+					     test_rows[row].tex_size);
+		}
 	}
 
 
