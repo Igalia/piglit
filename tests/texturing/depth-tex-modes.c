@@ -35,7 +35,7 @@ int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 int piglit_width = 400;
 int piglit_height = 300;
 
-static GLuint tex[6];
+static GLuint tex[2];
 static void loadTex(void);
 
 void
@@ -75,79 +75,26 @@ loadTex(void)
 		}
 	}
 
-	glGenTextures(6, tex);
+	glGenTextures(2, tex);
 
-	//depth texture 0 using ALPHA
+	// Depth texture 0: 2D
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_ALPHA);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
 			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
 
 
-	//depth texture 1 using LUMINANCE
-	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
-			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 2 using INTENSITY
-	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0,
-			GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 3 rectangle using ALPHA
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3]);
+	// Depth texture 1: rectangle
+	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[1]);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
 			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_DEPTH_TEXTURE_MODE,
-			GL_ALPHA);
-	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, width,
-			height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 4 rectangle using LUMINANCE
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[4]);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_DEPTH_TEXTURE_MODE,
-			GL_LUMINANCE);
-	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, width,
-			height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
-
-
-	//depth texture 5 rectangle using INTENSITY
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[5]);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP, GL_FALSE);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
-			GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_DEPTH_TEXTURE_MODE,
-			GL_INTENSITY);
 	glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_DEPTH_COMPONENT, width,
 			height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, texDepthData);
 
@@ -170,6 +117,9 @@ loadTex(void)
 enum piglit_result
 piglit_display(void)
 {
+	static const GLenum depth_texture_modes[3] = {
+		GL_ALPHA, GL_LUMINANCE, GL_INTENSITY
+	};
 	const GLfloat color2[4] = {0.0, 1.0, 0.0, 1.0};
 	const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
 
@@ -188,6 +138,9 @@ piglit_display(void)
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
 
 
+	glBindTexture(GL_TEXTURE_2D, tex[0]);
+	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[1]);
+
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_TEXTURE_RECTANGLE_ARB);
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
@@ -196,7 +149,10 @@ piglit_display(void)
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
 
-		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3 + i]);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB,
+				GL_DEPTH_TEXTURE_MODE,
+				depth_texture_modes[i]);
+
 		piglit_draw_rect_tex(x, 25.0, 50.0, 50.0,
 				     0.0, 0.0, 2.0, 2.0);
 	}
@@ -206,7 +162,10 @@ piglit_display(void)
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
 
-		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3 + i]);
+		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB,
+				GL_DEPTH_TEXTURE_MODE,
+				depth_texture_modes[i]);
+
 		piglit_draw_rect_tex(x, 100.0, 50.0, 50.0,
 				     0.0, 0.0, 2.0, 2.0);
 	}
@@ -220,7 +179,10 @@ piglit_display(void)
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
 
-		glBindTexture(GL_TEXTURE_2D, tex[i]);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_DEPTH_TEXTURE_MODE,
+				depth_texture_modes[i]);
+
 		piglit_draw_rect_tex(x, 175.0, 50.0, 50.0,
 				     0.0, 0.0, 1.0, 1.0);
 	}
@@ -230,7 +192,10 @@ piglit_display(void)
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
 
-		glBindTexture(GL_TEXTURE_2D, tex[i]);
+		glTexParameteri(GL_TEXTURE_2D,
+				GL_DEPTH_TEXTURE_MODE,
+				depth_texture_modes[i]);
+
 		piglit_draw_rect_tex(x, 250.0, 50.0, 50.0,
 				     0.0, 0.0, 1.0, 1.0);
 	}
