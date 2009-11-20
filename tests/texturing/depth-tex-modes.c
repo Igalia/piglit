@@ -44,6 +44,7 @@ piglit_init(int argc, char **argv)
 	(void) argc;
 	(void) argv;
 
+	piglit_require_extension("GL_ARB_depth_texture");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
         glEnable(GL_TEXTURE_2D);
@@ -62,7 +63,6 @@ loadTex(void)
         int i, j;
 
 	GLfloat texDepthData[width][height];
-	const GLfloat color[4] = {1.0, 0.0, 1.0, 1.0};
 
 	for (i=0; i < width; ++i) {
 		for (j=0; j < height; ++j) {
@@ -79,7 +79,6 @@ loadTex(void)
 
 	// Depth texture 0: 2D
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -90,7 +89,6 @@ loadTex(void)
 
 	// Depth texture 1: rectangle
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[1]);
-	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_GENERATE_MIPMAP, GL_FALSE);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER,
@@ -106,8 +104,6 @@ loadTex(void)
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_TEXTURE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, GL_CONSTANT);
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_CONSTANT);
-
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color);
 
 	#undef height
 	#undef width
