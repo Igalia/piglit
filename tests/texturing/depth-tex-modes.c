@@ -183,29 +183,15 @@ piglit_display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color1);
-
-	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, GL_SRC_COLOR);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
 
-	glDisable(GL_TEXTURE_RECTANGLE_ARB);
-	glEnable(GL_TEXTURE_2D);
-
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
-
-		glBindTexture(GL_TEXTURE_2D, tex[i]);
-		piglit_draw_rect_tex(x, 175.0, 50.0, 50.0,
-				     0.0, 0.0, 1.0, 1.0);
-	}
-
-
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
 
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_TEXTURE_RECTANGLE_ARB);
+	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
 
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
@@ -215,26 +201,7 @@ piglit_display(void)
 				     0.0, 0.0, 2.0, 2.0);
 	}
 
-
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_ALPHA);
-
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color1);
-
-	glDisable(GL_TEXTURE_RECTANGLE_ARB);
-	glEnable(GL_TEXTURE_2D);
-
-	for (i = 0; i < 3; i++) {
-		const float x = 100.0 + (75.0 * i);
-
-		glBindTexture(GL_TEXTURE_2D, tex[i]);
-		piglit_draw_rect_tex(x, 250.0, 50.0, 50.0,
-				     0.0, 0.0, 1.0, 1.0);
-	}
-
-	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
-
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
 	for (i = 0; i < 3; i++) {
 		const float x = 100.0 + (75.0 * i);
@@ -242,6 +209,30 @@ piglit_display(void)
 		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3 + i]);
 		piglit_draw_rect_tex(x, 100.0, 50.0, 50.0,
 				     0.0, 0.0, 2.0, 2.0);
+	}
+
+
+	glDisable(GL_TEXTURE_RECTANGLE_ARB);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color1);
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_COLOR);
+
+	for (i = 0; i < 3; i++) {
+		const float x = 100.0 + (75.0 * i);
+
+		glBindTexture(GL_TEXTURE_2D, tex[i]);
+		piglit_draw_rect_tex(x, 175.0, 50.0, 50.0,
+				     0.0, 0.0, 1.0, 1.0);
+	}
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_ALPHA);
+
+	for (i = 0; i < 3; i++) {
+		const float x = 100.0 + (75.0 * i);
+
+		glBindTexture(GL_TEXTURE_2D, tex[i]);
+		piglit_draw_rect_tex(x, 250.0, 50.0, 50.0,
+				     0.0, 0.0, 1.0, 1.0);
 	}
 
 
