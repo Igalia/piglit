@@ -51,6 +51,7 @@ piglit_init(int argc, char **argv)
 	(void) argv;
 
 	piglit_require_extension("GL_ARB_depth_texture");
+	piglit_require_extension("GL_ARB_texture_rectangle");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
         glEnable(GL_TEXTURE_2D);
