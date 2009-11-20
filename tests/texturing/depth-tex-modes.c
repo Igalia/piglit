@@ -31,9 +31,15 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
+#define BOX_SIZE 64
+#define HALF     (BOX_SIZE / 2)
+#define QUARTER  (BOX_SIZE / 4)
+#define TEST_ROWS 4
+#define TEST_COLS 3
+
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 400;
-int piglit_height = 300;
+int piglit_width = 1 + (TEST_COLS * (BOX_SIZE + 1));
+int piglit_height = 1 + (TEST_ROWS * (BOX_SIZE + 1));
 
 static GLuint tex[2];
 static void loadTex(void);
@@ -52,7 +58,11 @@ piglit_init(int argc, char **argv)
 
 	loadTex();
 
-	printf(" Left to Right: ALPHA, LUMINANCE, INTENSITY\n Lower row: Combined with color\n Upper row: combined with alpha\n pink: TEXTURE_2D green: TEXTURE_RECTANGLE\n");
+	if (!piglit_automatic)
+		printf(" Left to Right: ALPHA, LUMINANCE, INTENSITY\n"
+		       " Lower row: Combined with color\n"
+		       " Upper row: combined with alpha\n"
+		       " pink: TEXTURE_2D green: TEXTURE_RECTANGLE\n");
 }
 
 void
@@ -110,6 +120,40 @@ loadTex(void)
 }
 
 
+static void
+calculate_expected_color(GLenum depth_mode, GLenum operand, 
+			 const float *env_color, float texel,
+			 float *result)
+{
+	float color[3];
+
+	switch (depth_mode) {
+	case GL_ALPHA:
+		color[0] = 0.0;   color[1] = 0.0;   color[2] = 0.0;
+		color[3] = texel;
+		break;
+	case GL_LUMINANCE:
+		color[0] = texel; color[1] = texel; color[2] = texel;
+		color[3] = 1.0;
+		break;
+	case GL_INTENSITY:
+		color[0] = texel; color[1] = texel; color[2] = texel;
+		color[3] = texel;
+		break;
+	}
+
+	if (operand == GL_SRC_ALPHA) {
+		color[0] = color[3];
+		color[1] = color[3];
+		color[2] = color[3];
+	}
+
+	result[0] = color[0] * env_color[0];
+	result[1] = color[1] * env_color[1];
+	result[2] = color[2] * env_color[2];
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
@@ -120,10 +164,6 @@ piglit_display(void)
 	static const GLfloat color1[4] = {1.0, 0.0, 1.0, 1.0};
 
 	GLboolean pass = GL_TRUE;
-
-	GLfloat pink[3] = {1.0, 0.0, 1.0};
-	GLfloat green[3] = {0.0, 1.0, 0.0};
-	GLfloat black[3] = {0.0, 0.0, 0.0};
 	unsigned i;
 	unsigned row;
 
@@ -149,8 +189,8 @@ piglit_display(void)
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[1]);
 
-	for (row = 0; row < 4; row++) {
-		const float y = 25.0 + (75.0 * row);
+	for (row = 0; row < TEST_ROWS; row++) {
+		const float y = 1.0 + ((BOX_SIZE + 1)  * row);
 
 		/* Disable both texture targets, then enable just the target
 		 * used in this row.
@@ -166,48 +206,44 @@ piglit_display(void)
 			  GL_OPERAND0_RGB,
 			  test_rows[row].operand0_rgb);
 
-		for (i = 0; i < 3; i++) {
-			const float x = 100.0 + (75.0 * i);
+		for (i = 0; i < TEST_COLS; i++) {
+			const float x = 1.0 + ((BOX_SIZE + 1) * i);
+			const GLenum mode = depth_texture_modes[i];
+			unsigned j;
 
 			glTexParameteri(test_rows[row].target,
 					GL_DEPTH_TEXTURE_MODE,
-					depth_texture_modes[i]);
+					mode);
 
-			piglit_draw_rect_tex(x, y, 50.0, 50.0,
+			piglit_draw_rect_tex(x, y, BOX_SIZE, BOX_SIZE,
 					     0.0, 0.0, 
 					     test_rows[row].tex_size,
 					     test_rows[row].tex_size);
+
+			for (j = 0; j < 4; j++) {
+				const float tx = x + QUARTER 
+					+ ((j & 1) ? HALF : 0);
+				const float ty = y + QUARTER
+					+ ((j & 2) ? HALF : 0);
+				float tc[3];
+
+				calculate_expected_color(mode,
+							 test_rows[row].operand0_rgb,
+							 test_rows[row].color,
+							 ((j == 0) || (j == 3))
+							 ? 0.0 : 1.0,
+							 tc);
+
+				if (!piglit_probe_pixel_rgb(tx, ty, tc)) {
+					pass = GL_FALSE;
+
+					if (!piglit_automatic)
+						printf("  Mode: 0x%04x\n",
+						       mode);
+				}
+			}
 		}
 	}
-
-
-	pass = piglit_probe_pixel_rgb(110, 180, black);
-	pass = pass && piglit_probe_pixel_rgb(140, 180, black);
-	pass = pass && piglit_probe_pixel_rgb(185, 180, black);
-	pass = pass && piglit_probe_pixel_rgb(215, 180, pink);
-	pass = pass && piglit_probe_pixel_rgb(260, 180, black);
-	pass = pass && piglit_probe_pixel_rgb(290, 180, pink);
-
-	pass = pass && piglit_probe_pixel_rgb(110, 255, black);
-	pass = pass && piglit_probe_pixel_rgb(140, 255, pink);
-	pass = pass && piglit_probe_pixel_rgb(185, 255, pink);
-	pass = pass && piglit_probe_pixel_rgb(215, 255, pink);
-	pass = pass && piglit_probe_pixel_rgb(260, 255, black);
-	pass = pass && piglit_probe_pixel_rgb(290, 255, pink);
-
-	pass = pass && piglit_probe_pixel_rgb(110, 35, black);
-	pass = pass && piglit_probe_pixel_rgb(140, 35, black);
-	pass = pass && piglit_probe_pixel_rgb(185, 35, black);
-	pass = pass && piglit_probe_pixel_rgb(215, 35, green);
-	pass = pass && piglit_probe_pixel_rgb(260, 35, black);
-	pass = pass && piglit_probe_pixel_rgb(290, 35, green);
-
-	pass = pass && piglit_probe_pixel_rgb(110, 110, black);
-	pass = pass && piglit_probe_pixel_rgb(140, 110, green);
-	pass = pass && piglit_probe_pixel_rgb(185, 110, green);
-	pass = pass && piglit_probe_pixel_rgb(215, 110, green);
-	pass = pass && piglit_probe_pixel_rgb(260, 110, black);
-	pass = pass && piglit_probe_pixel_rgb(290, 110, green);
 
 	glFinish();
 	glutSwapBuffers();
