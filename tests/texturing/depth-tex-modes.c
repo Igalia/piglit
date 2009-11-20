@@ -191,40 +191,16 @@ piglit_display(void)
 	glEnable(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(225, 175, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(225, 225, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(175, 175, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(175, 225, 0);
-	glEnd();
+	piglit_draw_rect_tex(175.0, 175.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(300, 175, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(300, 225, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(250, 175, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(250, 225, 0);
-	glEnd();
+	piglit_draw_rect_tex(250.0, 175.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(150, 175, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(150, 225, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(100, 175, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(100, 225, 0);
-	glEnd();
+	piglit_draw_rect_tex(100.0, 175.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
@@ -234,40 +210,16 @@ piglit_display(void)
 
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(225, 25, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(225, 75, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(175, 25, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(175, 75, 0);
-	glEnd();
+	piglit_draw_rect_tex(175.0, 25.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[4]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(300, 25, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(300, 75, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(250, 25, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(250, 75, 0);
-	glEnd();
+	piglit_draw_rect_tex(250.0, 25.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[5]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(150, 25, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(150, 75, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(100, 25, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(100, 75, 0);
-	glEnd();
+	piglit_draw_rect_tex(100.0, 25.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, GL_SRC_ALPHA);
@@ -278,40 +230,16 @@ piglit_display(void)
 	glEnable(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, tex[0]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(225, 250, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(225, 300, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(175, 250, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(175, 300, 0);
-	glEnd();
+	piglit_draw_rect_tex(175.0, 250.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[1]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(300, 250, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(300, 300, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(250, 250, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(250, 300, 0);
-	glEnd();
+	piglit_draw_rect_tex(250.0, 250.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 	glBindTexture(GL_TEXTURE_2D, tex[2]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(1.0, 0.0);
-		glVertex3f(150, 250, 0);
-		glTexCoord2f(1.0, 1.0);
-		glVertex3f(150, 300, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(100, 250, 0);
-		glTexCoord2f(0.0, 1.0);
-		glVertex3f(100, 300, 0);
-	glEnd();
+	piglit_draw_rect_tex(100.0, 250.0, 50.0, 50.0,
+			     0.0, 0.0, 1.0, 1.0);
 
 
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color2);
@@ -321,40 +249,16 @@ piglit_display(void)
 
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[3]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(225, 100, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(225, 150, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(175, 100, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(175, 150, 0);
-	glEnd();
+	piglit_draw_rect_tex(175.0, 100.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[4]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(300, 100, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(300, 150, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(250, 100, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(250, 150, 0);
-	glEnd();
+	piglit_draw_rect_tex(250.0, 100.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex[5]);
-	glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(2.0, 0.0);
-		glVertex3f(150, 100, 0);
-		glTexCoord2f(2.0, 2.0);
-		glVertex3f(150, 150, 0);
-		glTexCoord2f(0.0, 0.0);
-		glVertex3f(100, 100, 0);
-		glTexCoord2f(0.0, 2.0);
-		glVertex3f(100, 150, 0);
-	glEnd();
+	piglit_draw_rect_tex(100.0, 100.0, 50.0, 50.0,
+			     0.0, 0.0, 2.0, 2.0);
 
 
 	pass = piglit_probe_pixel_rgb(110, 180, black);
