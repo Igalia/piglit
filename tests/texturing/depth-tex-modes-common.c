@@ -30,17 +30,13 @@
  */
 
 #include "piglit-util.h"
-
-extern GLuint tex[2];
+#include "depth-tex-modes-common.h"
 
 static void loadTex(void);
 
 void
-depth_tex_init(int argc, char **argv)
+depth_tex_init(void)
 {
-	(void) argc;
-	(void) argv;
-
 	piglit_require_extension("GL_ARB_depth_texture");
 	piglit_require_extension("GL_ARB_texture_rectangle");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

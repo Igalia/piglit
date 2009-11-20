@@ -22,50 +22,23 @@
  */
 
 /**
- * \file depth-tex-modes-rg.c
- * Draws depth textures as RED using both 2d textures and texture rectangles.
+ * \file depth-tex-modes-common.h
+ * Common framework for tests of GL_DEPTH_TEXTURE_MODE.
  *
- * \author Ian Romanick <ian.d.romanick@intel.com>
+ * \author Ben Holmes
+ * \author Ian Romanick
  */
 
-#include "piglit-util.h"
-#include "piglit-framework.h"
-#include "depth-tex-modes-common.h"
+#ifndef DEPTH_TEX_MODES_COMMON_H
+#define DEPTH_TEX_MODES_COMMON_H
 
-static const GLenum depth_texture_modes[] = {
-	GL_RED
-};
+/* Actually in the main test file.
+ */
+extern GLuint tex[2];
 
-#define BOX_SIZE 64
-#define TEST_ROWS 4
-#define TEST_COLS ARRAY_SIZE(depth_texture_modes)
+extern void depth_tex_init(void);
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 1 + (TEST_COLS * (BOX_SIZE + 1));
-int piglit_height = 1 + (TEST_ROWS * (BOX_SIZE + 1));
+extern enum piglit_result depth_tex_display(const GLenum *depth_texture_modes,
+    unsigned num_modes, unsigned box_size);
 
-GLuint tex[2];
-
-void
-piglit_init(int argc, char **argv)
-{
-	(void) argc;
-	(void) argv;
-
-	piglit_require_extension("GL_ARB_texture_rg");
-	depth_tex_init();
-
-	if (!piglit_automatic)
-		printf(" Lower row: Combined with color\n"
-		       " Upper row: combined with alpha\n"
-		       " pink: TEXTURE_2D green: TEXTURE_RECTANGLE\n");
-}
-
-
-enum piglit_result
-piglit_display(void)
-{
-	return depth_tex_display(depth_texture_modes, 
-				 ARRAY_SIZE(depth_texture_modes),
-				 BOX_SIZE);
-}
+#endif /* DEPTH_TEX_MODES_COMMON_H */

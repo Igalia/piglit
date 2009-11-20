@@ -30,6 +30,7 @@
 
 #include "piglit-util.h"
 #include "piglit-framework.h"
+#include "depth-tex-modes-common.h"
 
 static const GLenum depth_texture_modes[] = {
 	GL_ALPHA, GL_LUMINANCE, GL_INTENSITY
