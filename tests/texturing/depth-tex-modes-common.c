@@ -106,7 +106,7 @@ calculate_expected_color(GLenum depth_mode, GLenum operand,
 			 const float *env_color, float texel,
 			 float *result)
 {
-	float color[3];
+	float color[4];
 
 	switch (depth_mode) {
 	case GL_ALPHA:
