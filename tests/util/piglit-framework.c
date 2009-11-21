@@ -36,14 +36,17 @@
 #include "piglit-framework.h"
 
 int piglit_automatic = 0;
+static int piglit_window;
 
 static void
 display(void)
 {
 	const enum piglit_result result = piglit_display();
 
-	if (piglit_automatic)
+	if (piglit_automatic) {
+		glutDestroyWindow(piglit_window);
 		piglit_report_result(result);
+	}
 }
 
 static void
@@ -73,7 +76,7 @@ int main(int argc, char *argv[])
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(piglit_width, piglit_height);
 	glutInitDisplayMode(piglit_window_mode);
-	glutCreateWindow(argv[0]);
+	piglit_window = glutCreateWindow(argv[0]);
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(piglit_escape_exit_key);
