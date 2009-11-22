@@ -224,6 +224,9 @@ add_plain_test(bugs, 'fdo23670-drawpix_stencil')
 add_plain_test(bugs, 'fdo24066')
 add_plain_test(bugs, 'fdo25614-genmipmap')
 
+glx = Group()
+add_plain_test(glx, 'glx-multithread')
+
 texturing = Group()
 add_plain_test(texturing, 'copytexsubimage')
 add_plain_test(texturing, 'cubemap')

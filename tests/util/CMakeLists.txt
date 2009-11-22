@@ -12,3 +12,10 @@ add_library (piglitutil
 	    shader-load.c
 	    piglit-framework.c
 )
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_library (piglitglxutil
+		    piglit-util.c
+		    piglit-glx-util.c
+	)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
