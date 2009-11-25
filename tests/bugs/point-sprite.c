@@ -31,9 +31,13 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
+#define BOX_SIZE 100
+#define TEST_COLS 2
+#define TEST_ROWS 1
+
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 400;
-int piglit_height = 300;
+int piglit_width = 1 + ((BOX_SIZE + 1) * TEST_COLS);
+int piglit_height = 1 + ((BOX_SIZE + 1) * TEST_ROWS);
 
 static float maxSize = 0.0f;
 static GLuint tex;
@@ -46,19 +50,14 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_point_sprite");
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 400, 0, 300, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_POINT_SPRITE_ARB);
 
 	glGetFloatv(GL_POINT_SIZE_MAX, &maxSize);
-	if (maxSize > 100)
-		maxSize = 100;
+	if (maxSize > BOX_SIZE)
+		maxSize = BOX_SIZE;
 	glPointSize(maxSize);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -72,6 +71,8 @@ piglit_display(void)
 {
 	static const GLfloat black[3] = {0.0, 0.0, 0.0};
 	GLboolean pass;
+	float x;
+	float y;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -86,13 +87,14 @@ piglit_display(void)
 	if (GLEW_VERSION_2_0)
 		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
 
+	x = 1 + (BOX_SIZE / 2);
+	y = 1 + (BOX_SIZE / 2);
 	glBegin(GL_POINTS);
-	glVertex2f(10.0f + (maxSize / 2),
-		   10.0f + (maxSize / 2));
+	glVertex2f(x, y);
 	glEnd();
 
-	pass = piglit_probe_pixel_rgb(10.0f + (maxSize / 4),
-				      10.0f + (3 * maxSize / 4),
+	pass = piglit_probe_pixel_rgb(x - (maxSize / 4),
+				      y + (maxSize / 4),
 				      black);
 
 
@@ -108,15 +110,15 @@ piglit_display(void)
 
 		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 
+		x = 1 + (BOX_SIZE / 2) + BOX_SIZE;
 		glBegin(GL_POINTS);
-		glVertex2f(20.0f + maxSize + (maxSize / 2),
-			   10.0f + (maxSize / 2));
+		glVertex2f(x, y);
 		glEnd();
 
-		pass = pass &&
-			piglit_probe_pixel_rgb(20.0f + maxSize + (maxSize / 4),
-					       10.0f + (3 * maxSize / 4),
-					       white);
+		pass = piglit_probe_pixel_rgb(x - (maxSize / 4),
+					      y + (maxSize / 4),
+					      white)
+		  && pass;
 	}
 
 	glutSwapBuffers();
