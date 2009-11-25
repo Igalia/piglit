@@ -111,6 +111,7 @@ piglit_display(void)
 
 			glPointSize(size);
 			glBegin(GL_POINTS);
+			glTexCoord2f(1.5, 1.5);
 			glVertex2f(x, y);
 			glEnd();
 
@@ -146,6 +147,9 @@ piglit_display(void)
 static void
 loadTex(void)
 {
+	static const GLfloat border_color[4] = {
+		1.0, 0.0, 0.0, 1.0
+	};
 	#define height 2
 	#define width 2
 	int i, j;
@@ -175,8 +179,9 @@ loadTex(void)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 		     GL_FLOAT, texData);
