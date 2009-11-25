@@ -31,9 +31,9 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#define BOX_SIZE 100
-#define TEST_COLS 2
-#define TEST_ROWS 1
+#define BOX_SIZE 64
+#define TEST_COLS 6
+#define TEST_ROWS 2
 
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 int piglit_width = 1 + ((BOX_SIZE + 1) * TEST_COLS);
@@ -48,6 +48,8 @@ loadTex(void);
 void
 piglit_init(int argc, char **argv)
 {
+	GLfloat realMaxSize;
+
 	piglit_require_extension("GL_ARB_point_sprite");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -55,70 +57,84 @@ piglit_init(int argc, char **argv)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_POINT_SPRITE_ARB);
 
-	glGetFloatv(GL_POINT_SIZE_MAX, &maxSize);
-	if (maxSize > BOX_SIZE)
-		maxSize = BOX_SIZE;
-	glPointSize(maxSize);
+	glGetFloatv(GL_POINT_SIZE_MAX, &realMaxSize);
+	maxSize = (realMaxSize > BOX_SIZE) ? BOX_SIZE : realMaxSize;
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glColor3f(1.0, 1.0, 1.0);
 
 	loadTex();
+
+	if (!piglit_automatic)
+		printf("Maximum point size is %f, using %f\n", 
+		       realMaxSize, maxSize);
 }
 
 enum piglit_result
 piglit_display(void)
 {
+	static const GLenum origins[2] = { GL_UPPER_LEFT, GL_LOWER_LEFT	};
 	static const GLfloat black[3] = {0.0, 0.0, 0.0};
-	GLboolean pass;
-	float x;
-	float y;
+	static const GLfloat white[3] = {1.0, 1.0, 1.0};
+	const unsigned num_rows = (GLEW_VERSION_2_0) ? 2 : 1;
+	GLboolean pass = GL_TRUE;
+	unsigned i;
+	unsigned j;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
+	for (i = 0; i < num_rows; i++) {
+		const float y = 1 + (BOX_SIZE / 2) + (i * (BOX_SIZE + 1));
+		const float *const upper_left = (origins[i] == GL_UPPER_LEFT)
+			? black : white;
+		const float *const lower_left = (origins[i] == GL_UPPER_LEFT)
+			? white : black;
 
-	/* Make sure the point coordinate origin is set to the default location
-	 * of upper left.
-	 *
-	 * OpenGL version must be at least 2.0 to support modifying
-	 * GL_POINT_SPRITE_COORD_ORIGIN.
-	 */
-	if (GLEW_VERSION_2_0)
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
+		/* OpenGL version must be at least 2.0 to support modifying
+		 * GL_POINT_SPRITE_COORD_ORIGIN.
+		 */
+		if (GLEW_VERSION_2_0)
+			glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN,
+					  origins[i]);
 
-	x = 1 + (BOX_SIZE / 2);
-	y = 1 + (BOX_SIZE / 2);
-	glBegin(GL_POINTS);
-	glVertex2f(x, y);
-	glEnd();
+		for (j = 0; j < TEST_COLS; j++) {
+			const float x = 1 + (BOX_SIZE / 2) 
+				+ (j * (BOX_SIZE + 1));
+			const float size = maxSize / (float) (1 << j);
 
-	pass = piglit_probe_pixel_rgb(x - (maxSize / 4),
-				      y + (maxSize / 4),
-				      black);
+			/* If the point size is too small, there won't be
+			 * enough pixels drawn for the tests (below).
+			 */
+			if (size < 2.0)
+				continue;
 
+			glPointSize(size);
+			glBegin(GL_POINTS);
+			glVertex2f(x, y);
+			glEnd();
 
-	/* Set the point coordinate origin to the lower left and check that the
-	 * image is correctly flipped.
-	 *
-	 * OpenGL version must be at least 2.0 to support modifying
-	 * GL_POINT_SPRITE_COORD_ORIGIN.
-	 */
-	if (GLEW_VERSION_2_0) {
-		static const GLfloat white[3] = {1.0, 1.0, 1.0};
-
-
-		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
-
-		x = 1 + (BOX_SIZE / 2) + BOX_SIZE;
-		glBegin(GL_POINTS);
-		glVertex2f(x, y);
-		glEnd();
-
-		pass = piglit_probe_pixel_rgb(x - (maxSize / 4),
-					      y + (maxSize / 4),
-					      white)
-		  && pass;
+			if (!piglit_probe_pixel_rgb(x - (size / 4),
+						    y + (size / 4),
+						    upper_left)
+			    || !piglit_probe_pixel_rgb(x - (size / 4),
+						       y - (size / 4),
+						       lower_left)
+			    || !piglit_probe_pixel_rgb(x + (size / 4),
+						       y + (size / 4),
+						       lower_left)
+			    || !piglit_probe_pixel_rgb(x + (size / 4),
+						       y - (size / 4),
+						       upper_left)) {
+				if (!piglit_automatic)
+					printf("  size = %.3f, "
+					       "origin = %s left\n",
+					       size,
+					       (origins[i] == GL_UPPER_LEFT)
+					       ? "upper" : "lower");
+				pass = GL_FALSE;
+			}
+		}
 	}
 
 	glutSwapBuffers();
