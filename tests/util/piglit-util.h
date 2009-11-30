@@ -89,6 +89,11 @@ char *piglit_load_text_file(const char *file_name, unsigned *size);
 
 void piglit_ortho_projection(int w, int h, GLboolean push);
 
+GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
+    unsigned width, unsigned height,
+    unsigned horiz_square_size, unsigned vert_square_size,
+    const float *black, const float *white);
+
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
 extern const GLenum cube_face_targets[6];
