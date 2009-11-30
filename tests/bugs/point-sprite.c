@@ -41,9 +41,8 @@ int piglit_height = 1 + ((BOX_SIZE + 1) * TEST_ROWS);
 
 static float maxSize = 0.0f;
 static GLuint tex;
-
-static void
-loadTex(void);
+static const GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
+static const GLfloat white[4] = {1.0, 1.0, 1.0, 1.0};
 
 void
 piglit_init(int argc, char **argv)
@@ -63,7 +62,8 @@ piglit_init(int argc, char **argv)
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glColor3f(1.0, 1.0, 1.0);
 
-	loadTex();
+	tex = piglit_checkerboard_texture(0, 0, 2, 2, 1, 1, black, white);
+	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 
 	if (!piglit_automatic)
 		printf("Maximum point size is %f, using %f\n", 
@@ -74,8 +74,6 @@ enum piglit_result
 piglit_display(void)
 {
 	static const GLenum origins[2] = { GL_UPPER_LEFT, GL_LOWER_LEFT	};
-	static const GLfloat black[3] = {0.0, 0.0, 0.0};
-	static const GLfloat white[3] = {1.0, 1.0, 1.0};
 	const unsigned num_rows = (GLEW_VERSION_2_0) ? 2 : 1;
 	GLboolean pass = GL_TRUE;
 	unsigned i;
@@ -141,48 +139,4 @@ piglit_display(void)
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
-}
-
-
-static void
-loadTex(void)
-{
-	static const GLfloat border_color[4] = {
-		1.0, 0.0, 0.0, 1.0
-	};
-	#define height 2
-	#define width 2
-	int i, j;
-
-	GLfloat texData[width][height][4];
-	for (i = 0; i < width; i++) {
-		for (j = 0; j < height; j++) {
-			if ((i + j) & 1) {
-				/* white */
-				texData[i][j][0] = 1;
-				texData[i][j][1] = 1;
-				texData[i][j][2] = 1;
-				texData[i][j][3] = 1;
-			}
-			else {
-				/* black */
-				texData[i][j][0] = 0;
-				texData[i][j][1] = 0;
-				texData[i][j][2] = 0;
-				texData[i][j][3] = 0;
-			}
-		}
-	}
-
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
-	glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
-		     GL_FLOAT, texData);
 }
