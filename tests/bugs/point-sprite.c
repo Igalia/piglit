@@ -109,7 +109,7 @@ piglit_display(void)
 			if (size < 2.0)
 				continue;
 
-			glPointSize(size);
+			glPointSize(size - 0.2);
 			glBegin(GL_POINTS);
 			glTexCoord2f(1.5, 1.5);
 			glVertex2f(x, y);
