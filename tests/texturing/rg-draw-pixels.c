@@ -56,15 +56,15 @@ piglit_display(void)
 	static const GLfloat red[3] = {1.0, 0.0, 0.0};
 	static const GLfloat rg[3] = {1.0, 1.0, 0.0};
 	static const GLfloat black[3] = {0.0, 0.0, 0.0};
-	const int height = 16;
-	const int width = 16;
+	#define height 16
+	#define width 16
 	int i, j;
+	GLfloat texData[width][height][4];
 	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 
-	GLfloat texData[width][height][4];
 	for (i=0; i < width; ++i) {
 		for (j=0; j < height; ++j) {
 			if ((i+j) & 1) {
@@ -106,4 +106,7 @@ piglit_display(void)
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+
+	#undef height
+	#undef width
 }
