@@ -606,6 +606,39 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		// This test is interesting for sqrt(0) which may be
+		// implemented as 1/rsqrt(x) which would generate Inf values
+		"sqrt(vec4) function",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 u = vec4(0.0, 0.09, 0.25, 1.0); \n"
+                "   u = u * uniform1.xxxx; // mul by 1.0 \n"
+                "   u = sqrt(u); \n"
+		"   gl_FragColor = u; \n"
+		"} \n",
+		{ 0.0, 0.3, 0.5, 1.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"sqrt(vec2) function",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec2 u = vec2(0.0, 0.04); \n"
+                "   u = u * uniform1.xx; // mul by 1.0 \n"
+                "   u = sqrt(u); \n"
+                "   u = u * uniform1.xx; // mul by 1.0 \n"
+		"   gl_FragColor = vec4(u.x, u.y, 0.0, 0.0); \n"
+		"} \n",
+		{ 0.0, 0.2, 0.0, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
 		"clamp() function",
 		NO_VERTEX_SHADER,
 		"uniform vec4 uniform1; \n"
@@ -956,6 +989,41 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor.w = mix(v0, v1, 0.25); \n"
 		"} \n",
 		{ 0.25, 0.75, 0.2, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	// Floating Point Precision ==========================================
+	{
+		"precision exp2",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 vals = vec4(-0.999992, -0.988281, -0.535149, -0.496090); \n"
+		"   vals *= uniform1.xxxx; // multply by one \n"
+		"   vec4 actual = exp2(vals); \n"
+		"   vec4 expected = vec4(0.500003, 0.504078, 0.690087, 0.709026); \n"
+		"   vec4 error = abs((actual - expected) / expected); \n"
+		"   gl_FragColor = vec4(lessThan(error, vec4(1e-04))); \n"
+		"} \n",
+		{ 1.0, 1.0, 1.0, 1.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"precision log2",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 vals = vec4(0.125096, 0.250265, 0.500301, 2.001205); \n"
+		"   vals *= uniform1.xxxx; // multiply by one \n"
+		"   vec4 actual = log2(vals); \n"
+		"   vec4 expected = vec4(-2.998889, -1.998471, -0.999131, 1.000869); \n"
+		"   vec4 error = abs(actual - expected); \n"
+		"   gl_FragColor = vec4(lessThan(error, vec4(1e-05))); \n"
+		"} \n",
+		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},

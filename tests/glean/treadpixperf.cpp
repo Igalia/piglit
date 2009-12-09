@@ -33,6 +33,7 @@
 #include "image.h"
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 namespace GLEAN {
 
@@ -375,9 +376,9 @@ ReadpixPerfTest::runOne(ReadpixPerfResult &r, Window &w)
 		GLint readBuf;
 		glGetIntegerv(GL_READ_BUFFER, &readBuf);
 		if (readBuf == GL_FRONT)
-			res.readBuf = "GL_FRONT";
+			strcpy(res.readBuf, "GL_FRONT");
 		else
-			res.readBuf = "GL_BACK";
+			strcpy(res.readBuf, "GL_BACK");
 	}
 
 	for (res.formatNum = 0; Formats[res.formatNum].Name; res.formatNum++) {
@@ -500,6 +501,7 @@ ReadpixPerfResult::putresults(ostream &s) const
 		s << res.height << '\n';
 		s << res.formatNum << '\n';
 		s << res.pboMode << '\n';
+                s << res.readBuf << '\n';
 		s << res.work << '\n';
 	}
 }
@@ -522,6 +524,7 @@ ReadpixPerfResult::getresults(istream &s)
 		  >> res.height
 		  >> res.formatNum
 		  >> res.pboMode
+		  >> res.readBuf
 		  >> res.work;
 		results.push_back(res);
 	}

@@ -66,6 +66,8 @@ class OccluQryTest: public MultiTest {
 	bool chk_ext();
 	void setup();
 	void reportPassFail(MultiTestResult &r, bool pass, const char *msg) const;
+	void reportError(const char *msg);
+	void reportWarning(const char *msg);
 };
 
 } // namespace GLEAN

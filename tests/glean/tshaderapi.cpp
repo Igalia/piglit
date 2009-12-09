@@ -271,8 +271,6 @@ ShaderAPITest::test_uniform_size_type1(const char *glslType, GLenum glType, cons
 	char buffer[1024];
 	GLuint program;
 	GLint active, i;
-	GLenum type;
-	GLint size;
 
 	//printf("  Running subtest %s\n", glslType);
 	//fflush(stdout);
@@ -283,17 +281,16 @@ ShaderAPITest::test_uniform_size_type1(const char *glslType, GLenum glType, cons
 	glGetProgramiv_func(program, GL_ACTIVE_UNIFORMS, &active);
 	assert_no_error();
 	for (i = 0; i < active; i++) {
-		size = -1;
-		type = 0;
+		GLint size = -1;
+		GLenum type = 0;
 		glGetActiveUniform_func(program, i, sizeof(buffer), NULL,
 								&size, &type, buffer);
 		assert_no_error();
+		assert(type == glType);
+		assert(size == 60);
 		if (strncmp(buffer, "m", 1) == 0)
 			break;
 	}
-	assert(i < active); /* Otherwise the compiler optimised it out */
-	assert(type == glType);
-	assert(size == 60);
 }
 
 
@@ -333,8 +330,6 @@ ShaderAPITest::test_attrib_size_type1(const char *glslType, GLenum glType, const
 	char buffer[1024];
 	GLuint program;
 	GLint active, i;
-	GLenum type;
-	GLint size;
 
 	//printf("  Running subtest %s\n", glslType);
 	//fflush(stdout);
@@ -345,17 +340,17 @@ ShaderAPITest::test_attrib_size_type1(const char *glslType, GLenum glType, const
 	glGetProgramiv_func(program, GL_ACTIVE_ATTRIBUTES, &active);
 	assert_no_error();
 	for (i = 0; i < active; i++) {
-		size = -1;
-		type = -1;
+		GLint size = -1;
+		GLenum type = 0;
 		glGetActiveAttrib_func(program, i, sizeof(buffer), NULL,
 							   &size, &type, buffer);
 		assert_no_error();
+		assert(type == glType);
+		assert(size == 1);
 		if (strncmp(buffer, "m", 1) == 0)
 			break;
 	}
 	assert(i < active); /* Otherwise the compiler optimised it out */
-	assert(type == glType);
-	assert(size == 1);
 }
 
 

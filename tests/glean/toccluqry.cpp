@@ -68,6 +68,20 @@ static PFNGLGETQUERYOBJECTIVARBPROC glGetQueryObjectivARB_func = NULL;
 static PFNGLGETQUERYOBJECTUIVARBPROC glGetQueryObjectuivARB_func = NULL;
 
 
+void
+OccluQryTest::reportError(const char *msg)
+{
+	env->log << name << ": Error: " << msg << "\n";
+}
+
+void
+OccluQryTest::reportWarning(const char *msg)
+{
+	env->log << name << ": Warning: " << msg << "\n";
+}
+
+
+
 /* Generate a box which will be occluded by the occluder */
 void OccluQryTest::gen_box(GLfloat left, GLfloat right,
 			  GLfloat top, GLfloat btm)
@@ -86,7 +100,7 @@ bool OccluQryTest::chk_ext()
 	const char *ext = (const char *) glGetString(GL_EXTENSIONS);
 
 	if (!strstr(ext, "GL_ARB_occlusion_query")) {
-		fprintf(stdout, "W: Extension GL_ARB_occlusion_query is missing.\n");
+		reportWarning("Extension GL_ARB_occlusion_query is missing.");
 		return false;
 	}
 
@@ -133,9 +147,10 @@ GLuint OccluQryTest::find_unused_id()
 		if (id != 0 && glIsQueryARB_func(id) == GL_FALSE)
 			return id;
 		if (++ counter >= MAX_FIND_ID_ROUND) {
-			fprintf(stderr, 
-				"W: Cannot find the unused id after [%d] tries.\n",
-				MAX_FIND_ID_ROUND);
+			char str[1000];
+			sprintf(str, "Cannot find the unused id after [%d] tries.",
+					MAX_FIND_ID_ROUND);
+			reportWarning(str);
 			return 0;
 		}
 	}
@@ -334,7 +349,7 @@ bool OccluQryTest::conformOQ_Begin_unused_id()
 	glBeginQuery_func(GL_SAMPLES_PASSED_ARB, id);
 
 	if (glIsQueryARB_func(id) == GL_FALSE) {
-		fprintf(stderr, "F: Begin with a unused id failed.\n");
+		reportError("Begin with a unused id failed.");
 		pass = false;
 	}
 
@@ -353,8 +368,8 @@ bool OccluQryTest::conformOQ_EndAfter(GLuint id)
 	glEndQueryARB_func(GL_SAMPLES_PASSED_ARB);
 
 	if (glGetError() != GL_INVALID_OPERATION) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
-			"EndQuery when there is no queries.\n");
+		reportError("No GL_INVALID_OPERATION generated if "
+			"EndQuery when there is no queries.");
 		return false;
 	}
 
@@ -372,8 +387,8 @@ bool OccluQryTest::conformOQ_GenIn(GLuint id)
 
 	glGenQueriesARB_func(1, &id);
 	if (glGetError() != GL_INVALID_OPERATION) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
-			"GenQueries in the progress of another.\n");
+		reportError("No GL_INVALID_OPERATION generated if "
+			"GenQueries in the progress of another.");
 		pass = false;
 	}
   
@@ -395,8 +410,8 @@ bool OccluQryTest::conformOQ_DeleteIn(GLuint id)
 		glDeleteQueriesARB_func(1, &id);
 
 		if (glGetError() != GL_INVALID_OPERATION) {
-			fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
-				"DeleteQueries in the progress of another.\n");
+			reportError("No GL_INVALID_OPERATION generated if "
+				"DeleteQueries in the progress of another.");
 			pass = false;
 		}
 	}
@@ -420,8 +435,8 @@ bool OccluQryTest::conformOQ_BeginIn(GLuint id)
 	glBeginQueryARB_func(GL_SAMPLES_PASSED_ARB, id);
 
 	if (glGetError() != GL_INVALID_OPERATION) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
-			"BeginQuery in the progress of another.\n");
+		reportError("No GL_INVALID_OPERATION generated if "
+			"BeginQuery in the progress of another.");
 		pass = false;
 	}
 
@@ -448,9 +463,9 @@ bool OccluQryTest::conformOQ_GetObjAvalIn(GLuint id)
 		pass = false;
 
 	if (pass == false) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
+		reportError("No GL_INVALID_OPERATION generated if "
 			"GetQueryObjectuiv with GL_QUERY_RESULT_AVAILABLE_ARB "
-			"in the active progress.\n");
+			"in the active progress.");
 	}
 	TERM_QUERY();
 
@@ -476,9 +491,9 @@ bool OccluQryTest::conformOQ_GetObjResultIn(GLuint id)
 		pass = false;
 
 	if (pass == false) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
+		reportError("No GL_INVALID_OPERATION generated if "
 			"GetQueryObject[u]iv with GL_QUERY_RESULT_ARB "
-			"in the active progress.\n");
+			"in the active progress.");
 	}
 	TERM_QUERY();
 
@@ -504,9 +519,9 @@ bool OccluQryTest::conformOQ_GetObjivAval(GLuint id)
 	glGetQueryObjectivARB_func(id_tmp, GL_QUERY_RESULT_AVAILABLE_ARB, &param);
 
 	if (glGetError() != GL_INVALID_OPERATION) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
+		reportError("No GL_INVALID_OPERATION generated if "
 			"GetQueryObjectuiv can still query the result"
-			"by an unused query id\n.");
+			"by an unused query id.");
 		return false;
 	}
 
@@ -525,7 +540,11 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 	ids2 = (GLuint *)malloc(id_n * sizeof(GLuint));
 
 	if (!ids1 || !ids2) {
-		fprintf(stderr, "F: Cannot alloc memory to pointer ids[12].\n");
+		reportError("Cannot alloc memory to pointer ids[12].");
+		if (ids1)
+			free(ids1);
+		if (ids2)
+			free(ids2);		
 		return false;
 	}
 
@@ -537,8 +556,9 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 	for (i = 0; i < id_n; i ++) {
 		for (j = 0; j < id_n; j ++) {
 			if (ids1[i] == ids2[j]) {
-				fprintf(stderr, "F: ids1[%d] == ids2[%d] == %u.\n", 
-						i, j, ids1[i]);
+				char str[1000];
+				sprintf(str, "ids1[%d] == ids2[%d] == %u.", i, j, ids1[i]);
+				reportError(str);
 				pass = false;
 			}
 		}
@@ -553,8 +573,9 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 	/* Checkout whether the Query ID just generated is valid */	
 	for (i = 0; i < id_n; i ++) {
 		if (glIsQueryARB_func(ids1[i]) == GL_FALSE) {
-			fprintf(stderr, "F: id [%d] just generated is not valid.\n", 
-				ids1[i]);
+			char str[1000];
+			sprintf(str, "id [%d] just generated is not valid.", ids1[i]);
+			reportError(str);
 			pass = false;
 		}
 	}
@@ -565,8 +586,9 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 	glDeleteQueriesARB_func(id_n, ids1);
 	for (i = 0; i < id_n; i ++) {
 		if (glIsQueryARB_func(ids1[i]) == GL_TRUE) {
-			fprintf(stderr, "F: id [%d] just deleted is still valid.\n", 
-				ids1[i]);
+			char str[1000];
+			sprintf(str, "id [%d] just deleted is still valid.", ids1[i]);
+			reportError(str);
 			pass = false;
 		}
 	}
@@ -588,8 +610,9 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 		glGenQueriesARB_func(1, ids1 + i);
 		for (j = 0; j < i; j ++) {
 			if (ids1[i] == ids1[j]) {
-				fprintf(stderr, "E: duplicated id generated [ %u ]", 
-					ids1[i]);
+				char str[1000];
+				sprintf(str, "duplicated id generated [%u]", ids1[i]);
+				reportError(str);
 				pass = false;
 			}
 		}
@@ -607,8 +630,7 @@ bool OccluQryTest::conformOQ_Gen_Delete(unsigned int id_n)
 bool OccluQryTest::conformOQ_IsIdZero(void)
 {
 	if (glIsQueryARB_func(0) == GL_TRUE) {
-		fprintf(stderr, "F: zero is treated as a valid id by"
-				"IsQueryARB().\n");
+		reportError("zero is treated as a valid id by glIsQueryARB().");
 		return false;
 	}
 	
@@ -622,8 +644,8 @@ bool OccluQryTest::conformOQ_BeginIdZero(void)
 {
 	glBeginQueryARB_func(GL_SAMPLES_PASSED_ARB, 0);
 	if (glGetError() != GL_INVALID_OPERATION) {
-		fprintf(stderr, "F: No GL_INVALID_OPERATION generated if "
-				"BeginQuery with zero ID.\n");
+		reportError("No GL_INVALID_OPERATION generated if "
+				"BeginQuery with zero ID.");
 		return false;
 	}
 

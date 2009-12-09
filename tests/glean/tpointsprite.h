@@ -53,6 +53,7 @@ class PointSpriteTest: public MultiTest
 private:
 	GLfloat *texImages[6];
 	GLfloat mTolerance[3];
+	bool have_2_0;	
 
 	void GenMipmap();
 	void SetupMipmap(GLuint *texID);
@@ -61,7 +62,7 @@ private:
 	GLboolean OutOfPoint(int x, int y, int pSize, int x0, int y0);
 	GLfloat *GetTexColor(int pSize, int dir);
 	GLboolean CompareColor(GLfloat *actual, GLfloat *expected);
-	GLboolean ComparePixels(GLfloat *buf, int pSize, int coordOrigin);
+	GLboolean ComparePixels(GLfloat *buf, int pSize, GLenum coordOrigin);
 }; // class PointSpriteTest
 
 } // namespace GLEAN
