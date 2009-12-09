@@ -50,14 +50,16 @@
 
 namespace GLEAN {
 
-static PFNGLPOINTPARAMETERFPROC glPointParameterf_func = NULL;
+static PFNGLPOINTPARAMETERIPROC glPointParameteri_func = NULL;
 
 //background color
 static GLfloat   bgColor[4] = {0.0, 0.0, 0.0, 0.0};
 
-//mipmap texture's color, every texture partite to upper and lower part that 
-//has different colors
-//for 1x1 texture, only lower part is used
+// Partition each mipmap into two halves.  The top half gets one color, and
+// the bottom half gets a different color.  Use a different pair of colors for
+// each LOD.
+//
+// For the 1x1 LOD, only lower part (second color in the table) is used.
 static GLfloat   texColor[6][2][4] = {
           {{1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0}},  // 32x32
           {{0.0, 0.0, 1.0, 1.0}, {1.0, 1.0, 0.0, 1.0}},  // 16x16
@@ -131,7 +133,7 @@ PointSpriteTest::SetupMipmap(GLuint *texID)
 	glTexImage2D(GL_TEXTURE_2D, 5, GL_RGBA, 1, 1, 0, 
 				GL_RGBA, GL_FLOAT, texImages[5]);
 
-	glTexEnvf(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
+	glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 }
 
 void
@@ -142,18 +144,18 @@ PointSpriteTest::CheckDefaultState(MultiTestResult &r)
 	GLint     coordOrigin;
 
 	// check point sprite status, default is GL_FALSE
-	enable = glIsEnabled(GL_POINT_SPRITE_ARB);
+	enable = glIsEnabled(GL_POINT_SPRITE);
 	if (enable != GL_FALSE)
 	{
 		env->log << name << "subcase FAIL: "
-			 << "PointSprite should be disabled defaultlly\n";
+			 << "PointSprite should be disabled by default\n";
 		r.numFailed++;
 	} else {
 		r.numPassed++;
 	}
 
 	// check coordinate replacement, default is GL_FALSE
-	glGetTexEnviv(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, &coordReplace);
+	glGetTexEnviv(GL_POINT_SPRITE, GL_COORD_REPLACE, &coordReplace);
 
 	if (coordReplace != GL_FALSE)
 	{
@@ -164,19 +166,22 @@ PointSpriteTest::CheckDefaultState(MultiTestResult &r)
 		r.numPassed++;
 	}
 
-	// check coordinate origin, default is UPPER_LEFT
-	glEnable(GL_POINT_SPRITE);
-	glGetIntegerv(GL_POINT_SPRITE_COORD_ORIGIN, &coordOrigin);
-	if (coordOrigin != GL_UPPER_LEFT)
-	{
-		env->log << name << "subcase FAIL: "
-			 << "defult value of COORD_ORIGIN should be GL_UPPER_LEFT\n";
-		r.numFailed++;
-	} else {
-		r.numPassed++;
-	}
+	if (have_2_0) {
+		// check coordinate origin, default is UPPER_LEFT
+		glEnable(GL_POINT_SPRITE);
+		glGetIntegerv(GL_POINT_SPRITE_COORD_ORIGIN, &coordOrigin);
+		if (coordOrigin != GL_UPPER_LEFT)
+		{
+			env->log << name << "subcase FAIL: "
+				"defult value of COORD_ORIGIN "
+				"should be GL_UPPER_LEFT\n";
+			r.numFailed++;
+		} else {
+			r.numPassed++;
+		}
 
-	glDisable(GL_POINT_SPRITE);
+		glDisable(GL_POINT_SPRITE);
+	}
 }
 
 GLboolean
@@ -272,14 +277,14 @@ FindNonBlack(const GLfloat *buf, GLint w, GLint h, GLint *x0, GLint *y0)
  * @param coordOrigin: coordinate origin--UPPER_LEFT or LOWER_LEFT
  */
 GLboolean
-PointSpriteTest::ComparePixels(GLfloat *buf, int pSize, int coordOrigin)
+PointSpriteTest::ComparePixels(GLfloat *buf, int pSize, GLenum coordOrigin)
 {
 	GLfloat *lowerColor,  *upperColor, *expectedColor;
 	GLint  i, j;
 	GLint x0, y0;
 
-	lowerColor = GetTexColor(pSize, coordOrigin ? 0 : 1);
-	upperColor = GetTexColor(pSize, coordOrigin ? 1 : 0);
+	lowerColor = GetTexColor(pSize, (coordOrigin == GL_UPPER_LEFT) ? 0 : 1);
+	upperColor = GetTexColor(pSize, (coordOrigin == GL_UPPER_LEFT) ? 1 : 0);
 
 	// Find first (lower-left) pixel that's not black.
 	// The pixels hit by sprite rasterization may vary from one GL to
@@ -339,8 +344,13 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 
 	(void) w;
 
-	glPointParameterf_func = (PFNGLPOINTPARAMETERFPROC) GLUtils::getProcAddress("glPointParameterf");
-	assert(glPointParameterf_func);
+	have_2_0 = (strtod((const char *) glGetString(GL_VERSION), NULL) > 2.0);
+	if (have_2_0) {
+		glPointParameteri_func = (PFNGLPOINTPARAMETERIPROC)
+			GLUtils::getProcAddress("glPointParameteri");
+
+		assert(glPointParameteri_func);
+	}
 
 	CheckDefaultState(r);
 	
@@ -362,23 +372,31 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 
 	buf = (GLfloat *)malloc(3 * WINSIZE * WINSIZE / 4 * sizeof(GLfloat));
 
-	// enable point_sprite_ARB
-	glEnable(GL_POINT_SPRITE_ARB);
+	// Enable point sprite mode
+	glEnable(GL_POINT_SPRITE);
 
-	glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxPointSize);
+	glGetFloatv(GL_POINT_SIZE_MAX, &maxPointSize);
 	if (maxPointSize > WINSIZE / 2)
 		maxPointSize = WINSIZE / 2;
 
-	//primitive may be point or polygon which mode is GL_POINT
+	// Draw GL_POINTS primitives, and draw GL_POLYGON primitives with the
+	// polygon mode set to GL_POINT.
 	for (primType = 0; primType < 2; primType ++)
 	{
-		for (coordOrigin = 0; coordOrigin < 2; coordOrigin++)
-		{
+		const GLint numOrigin = (have_2_0) ? 2 : 1;
+		static const GLenum origin[2] = {
+			GL_UPPER_LEFT, GL_LOWER_LEFT
+		};
+		static const char *const origin_strings[2] = {
+			"GL_UPPER_LEFT", "GL_LOWER_LEFT"
+		};
 
-			if (coordOrigin)
-				glPointParameterf_func(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
-			else
-				glPointParameterf_func(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+		for (coordOrigin = 0; coordOrigin < numOrigin; coordOrigin++)
+		{
+			if (have_2_0) {
+				glPointParameteri_func(GL_POINT_SPRITE_COORD_ORIGIN,
+						       origin[coordOrigin]);
+			}
 
 			pointSize = 1.85;
 			for (; pointSize <= maxPointSize; pointSize += 2.0)
@@ -405,10 +423,13 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 
 				glReadPixels(0, 0, WINSIZE/2, WINSIZE/2, GL_RGB, GL_FLOAT, buf);
 		
-				if (!ComparePixels(buf, expectedSize, coordOrigin))
+				if (!ComparePixels(buf, expectedSize,
+						   origin[coordOrigin]))
 				{
 					env->log << "\tPrimitive type: " << (primType ? "GL_POLYGON" : "GL_POINTS") << "\n";
-					env->log << "\tCoord Origin at: " << (coordOrigin ? "GL_LOWER_LEFT" : "GL_UPPER_LEFT") << "\n";
+					env->log << "\tCoord Origin at: " <<
+						origin_strings[coordOrigin] <<
+						"\n";
 					env->log << "\tPointSize: " << pointSize << "\n";
 					r.numFailed++;
 					r.numPassed--;
@@ -420,7 +441,7 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 	}
 
 	glDeleteTextures(1, &texID);
-	glDisable(GL_POINT_SPRITE_ARB);
+	glDisable(GL_POINT_SPRITE);
 	free(buf);
 	for (i = 0; i < 6; i++)
 		free(texImages[i]);

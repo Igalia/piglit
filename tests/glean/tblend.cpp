@@ -85,6 +85,7 @@ factorToName(GLenum factor) {
 	for (unsigned int i = 0; i < ELEMENTS(factorNames); ++i)
 		if (factorNames[i].token == factor)
 			return factorNames[i].name;
+	assert(0);
 	return 0;
 } // factorToName
 
@@ -93,6 +94,7 @@ nameToFactor(string& name) {
 	for (unsigned int i = 0; i < ELEMENTS(factorNames); ++i)
 		if (factorNames[i].name == name)
 			return factorNames[i].token;
+	assert(0);
 	return GL_ZERO;
 } // nameToFactor
 
@@ -101,6 +103,7 @@ opToName(GLenum op) {
 	for (unsigned int i = 0; i < ELEMENTS(blendopNames); ++i)
 		if (blendopNames[i].token == op)
 			return blendopNames[i].name;
+	assert(0);
 	return 0;
 } // opToName
 
@@ -109,6 +112,7 @@ nameToOp(string& name) {
 	for (unsigned int i = 0; i < ELEMENTS(blendopNames); ++i)
 		if (blendopNames[i].name == name)
 			return blendopNames[i].token;
+	assert(0);
 	return GL_ZERO;
 } // nameToOp
 
@@ -1005,7 +1009,9 @@ BlendFuncTest::compareOne(BlendFuncResult& oldR, BlendFuncResult& newR) {
 ///////////////////////////////////////////////////////////////////////////////
 void
 BlendFuncResult::putresults(ostream& s) const {
+	// write number of lines first
 	s << results.size() << '\n';
+	// write each result as one line of text
 	for (vector<PartialResult>::const_iterator p = results.begin();
 	     p != results.end(); ++p)
 		s << factorToName(p->srcRGB) << ' '
@@ -1020,7 +1026,9 @@ BlendFuncResult::putresults(ostream& s) const {
 bool
 BlendFuncResult::getresults(istream& s) {
 	int n;
+	// read number of lines
 	s >> n;
+	// parse each line/result
 	for (int i = 0; i < n; ++i) {
 		PartialResult p;
 		string srcRGB, srcA;
@@ -1029,10 +1037,10 @@ BlendFuncResult::getresults(istream& s) {
 		s >> srcRGB >> srcA >> dstRGB >> dstA >> opRGB >> opA >> p.rbErr >> p.blErr;
 		p.srcRGB = nameToFactor(srcRGB);
 		p.srcA = nameToFactor(srcA);
-		p.srcRGB = nameToFactor(srcRGB);
+		p.dstRGB = nameToFactor(dstRGB);
 		p.dstA = nameToFactor(dstA);
-		p.opRGB = nameToFactor(opRGB);
-		p.opA = nameToFactor(opA);
+		p.opRGB = nameToOp(opRGB);
+		p.opA = nameToOp(opA);
 		results.push_back(p);
 	}
 

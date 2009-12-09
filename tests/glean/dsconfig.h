@@ -186,6 +186,8 @@ class DrawingSurfaceConfig {
 
 	// Utilities:
 
+	void zeroFields();
+
 	string canonicalDescription();
 		// Return a string containing all the attributes in a
 		// drawing surface configuration.  This allows the config
@@ -207,6 +209,8 @@ class DrawingSurfaceConfig {
 		// be good enough that test results for configs on one
 		// machine may be compared with test results for
 		// configs on another machine.
+
+        bool equal(const DrawingSurfaceConfig &config) const;
 
 }; // class DrawingSurfaceConfig
 
