@@ -22,6 +22,7 @@ link_libraries (
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
 add_executable (gen-compressed-teximage gen-compressed-teximage.c)
+add_executable (gen-nonzero-unit gen-nonzero-unit.c)
 add_executable (gen-teximage gen-teximage.c)
 add_executable (gen-texsubimage gen-texsubimage.c)
 add_executable (getteximage-simple getteximage-simple.c)
