@@ -205,6 +205,96 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 }
 
 
+/**
+ * Read a texel from the given location and compare its RGBA value to the
+ * given expected values.
+ *
+ * Print a log message if the color value deviates from the expected value.
+ * \return true if the color values match, false otherwise
+ */
+int piglit_probe_texel_rgba(int target, int level, int x, int y,
+			    const float* expected)
+{
+	GLfloat *buffer;
+	GLfloat *probe;
+	GLfloat delta[4];
+	GLfloat deltamax;
+	int i;
+	GLint width;
+	GLint height;
+
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
+	buffer = malloc(width * height * 4 * sizeof(GLfloat));
+
+	glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
+
+	probe = &buffer[4 * ((width * y) + x)];
+	deltamax = 0.0;
+	for(i = 0; i < 4; ++i) {
+		delta[i] = probe[i] - expected[i];
+		if (fabs(delta[i]) > deltamax)
+			deltamax = fabs(delta[i]);
+	}
+
+	if (deltamax < 0.01) {
+		free(buffer);
+		return 1;
+	}
+
+	printf("Probe at (%i,%i)\n", x, y);
+	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
+	printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
+
+	free(buffer);
+	return 0;
+}
+
+/**
+ * Read a texel from the given location and compare its RGBA value to the
+ * given expected values.
+ *
+ * Print a log message if the color value deviates from the expected value.
+ * \return true if the color values match, false otherwise
+ */
+int piglit_probe_texel_rgb(int target, int level, int x, int y,
+			   const float* expected)
+{
+	GLfloat *buffer;
+	GLfloat *probe;
+	GLfloat delta[3];
+	GLfloat deltamax;
+	int i;
+	GLint width;
+	GLint height;
+
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
+	buffer = malloc(width * height * 3 * sizeof(GLfloat));
+
+	glGetTexImage(target, level, GL_RGB, GL_FLOAT, buffer);
+
+	probe = &buffer[3 * ((width * y) + x)];
+	deltamax = 0.0;
+	for(i = 0; i < 3; ++i) {
+		delta[i] = probe[i] - expected[i];
+		if (fabs(delta[i]) > deltamax)
+			deltamax = fabs(delta[i]);
+	}
+
+	if (deltamax < 0.01) {
+		free(buffer);
+		return 1;
+	}
+
+	printf("Probe at (%i,%i)\n", x, y);
+	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
+	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
+
+	free(buffer);
+	return 0;
+}
+
 int piglit_use_fragment_program(void)
 {
 	static const char source[] =

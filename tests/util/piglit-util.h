@@ -72,6 +72,10 @@ void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
+int piglit_probe_texel_rgb(int target, int level, int x, int y,
+			   const float* expected);
+int piglit_probe_texel_rgba(int target, int level, int x, int y,
+			    const float* expected);
 
 int piglit_use_fragment_program(void);
 int piglit_use_vertex_program(void);
