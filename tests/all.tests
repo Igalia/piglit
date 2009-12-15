@@ -207,6 +207,7 @@ add_plain_test(bugs, 'fdo23489')
 add_plain_test(bugs, 'fdo23670-depth_test')
 add_plain_test(bugs, 'fdo23670-drawpix_stencil')
 add_plain_test(bugs, 'fdo24066')
+add_plain_test(bugs, 'fdo25614-genmipmap')
 
 texturing = Group()
 add_plain_test(texturing, 'copytexsubimage')
