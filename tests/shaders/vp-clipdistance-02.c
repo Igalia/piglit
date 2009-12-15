@@ -83,7 +83,6 @@ enum piglit_result
 piglit_display(void)
 {
 	static const GLfloat color[4] = { 0.0, 1.0, 0.0, 1.0 };
-	static const GLfloat bad_color[4] = { 1.0, 0.0, 0.0, 1.0 };
 	int result = PIGLIT_SUCCESS;
 	unsigned i;
 
