@@ -43,18 +43,16 @@ int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB;
 
 static const char vs_one[] =
-"attribute vec4 position;\n"
 "varying vec4 color;\n"
 "void main() {\n"
-"   gl_Position = gl_ModelViewProjectionMatrix * position;\n"
+"   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
 "   color = vec4(0.0, 0.4, 0.0, 1.0);\n"
 "}\n";
 
 static const char vs_two[] =
-"attribute vec4 position;\n"
 "varying vec4 color;\n"
 "void main() {\n"
-"   gl_Position = gl_ModelViewProjectionMatrix * position;\n"
+"   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
 "   color = vec4(0.4, 0.4, 0.0, 1.0);\n"
 "}\n";
 
@@ -119,7 +117,6 @@ static void setup_shaders(const char * vstext, const char * fstext)
 	link_program(program);
 
 	glUseProgramObjectARB(program);
-	glBindAttribLocationARB(program, 0, "position");
 }
 
 enum piglit_result
