@@ -23,6 +23,7 @@ link_libraries (
 
 add_definitions ( -DSOURCE_DIR="\\\"${piglit_SOURCE_DIR}/\\\"" )
 
+add_executable (ati-fs-bad-delete ati-fs-bad-delete.c)
 add_executable (trinity-fp1 trinity-fp1.c)
 add_executable (fp-abs-01 fp-abs-01.c)
 add_executable (fp-abs-02 fp-abs-02.c)

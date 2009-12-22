@@ -104,6 +104,7 @@ add_plain_test(general, 'windowoverlap')
 add_plain_test(general, 'sync_api')
 
 shaders = Group()
+add_plain_test(shaders, 'ati-fs-bad-delete')
 add_plain_test(shaders, 'trinity-fp1')
 add_plain_test(shaders, 'fp-abs-01')
 add_plain_test(shaders, 'fp-abs-02')
