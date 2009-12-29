@@ -34,10 +34,9 @@
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256
-#define WIN_WIDTH 700
-#define WIN_HEIGHT 300
-
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 700;
+int piglit_height = 300;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 static const float red[] =   {1, 0, 0, 0};
 static const float green[] = {0, 1, 0, 0};
@@ -78,12 +77,7 @@ create_fbo(void)
 	}
 
 	glViewport(0, 0, TEX_WIDTH, TEX_HEIGHT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, TEX_WIDTH, 0, TEX_HEIGHT, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
 
 	glColor4fv(red);
 	piglit_draw_rect(0, 0, TEX_WIDTH / 2, TEX_HEIGHT / 2);
@@ -104,11 +98,8 @@ done:
 static void
 draw_mipmap(int x, int y, int dim)
 {
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -117,23 +108,8 @@ draw_mipmap(int x, int y, int dim)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	glBegin(GL_QUADS);
-
-	glTexCoord2f(0, 0);
-	glVertex2f(x, y);
-
-	glTexCoord2f(1, 0);
-	glVertex2f(x + dim, y);
-
-	glTexCoord2f(1, 1);
-	glVertex2f(x + dim, y + dim);
-
-	glTexCoord2f(0, 1);
-	glVertex2f(x, y + dim);
-
-	glEnd();
-
-	glDisable(GL_TEXTURE_2D);
+	piglit_draw_rect_tex(x, y, dim, dim,
+			     0, 0, 1, 1);
 }
 
 static GLboolean
@@ -164,8 +140,8 @@ test_mipmap_drawing(int start_x, int start_y, int dim)
 	return pass;
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int dim;
@@ -193,26 +169,10 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-int main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fbo-generatemipmap");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
 	piglit_require_extension("GL_EXT_framebuffer_object");
-
-	glutMainLoop();
-
-	return 0;
 }

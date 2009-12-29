@@ -35,20 +35,9 @@
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
-#define WIN_WIDTH 100
-#define WIN_HEIGHT 200
-
-static GLboolean Automatic = GL_FALSE;
-
-static void rect(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-	glVertex2f(x1, y1);
-	glVertex2f(x1, y2);
-	glVertex2f(x2, y2);
-	glVertex2f(x2, y1);
-	glEnd();
-}
+int piglit_width = 100;
+int piglit_height = 200;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 static GLboolean
 test_with_format(GLenum internal_format, GLenum format,
@@ -105,31 +94,26 @@ test_with_format(GLenum internal_format, GLenum format,
 
 	/* Set matrices */
 	glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, BUF_WIDTH, 0, BUF_HEIGHT, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(BUF_WIDTH, BUF_HEIGHT, GL_FALSE);
 
 	glClearColor(1.0, 0.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glColor4f(1.0, 0.0, 0.0, 0.0);
-	rect(subrect_w * 1, subrect_h * 1,
-	     subrect_w * 2, subrect_h * 2);
+	piglit_draw_rect(subrect_w * 1, subrect_h * 1,
+			 subrect_w, subrect_h);
 
 	glColor4f(0.0, 1.0, 0.0, 0.0);
-	rect(subrect_w * 3, subrect_h * 1,
-	     subrect_w * 4, subrect_h * 2);
+	piglit_draw_rect(subrect_w * 3, subrect_h * 1,
+			 subrect_w, subrect_h);
 
 	glColor4f(0.0, 0.0, 1.0, 0.0);
-	rect(subrect_w * 1, subrect_h * 3,
-	     subrect_w * 2, subrect_h * 4);
+	piglit_draw_rect(subrect_w * 1, subrect_h * 3,
+			 subrect_w, subrect_h);
 
 	glColor4f(0.0, 0.0, 0.0, 1.0);
-	rect(subrect_w * 3, subrect_h * 3,
-	     subrect_w * 4, subrect_h * 4);
+	piglit_draw_rect(subrect_w * 3, subrect_h * 3,
+			 subrect_w, subrect_h);
 
 	for (y = 0; y < BUF_HEIGHT; y++) {
 		for (x = 0; x < BUF_WIDTH; x++) {
@@ -169,25 +153,15 @@ test_with_format(GLenum internal_format, GLenum format,
 		}
 	}
 
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_TRUE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	glBegin(GL_TRIANGLE_FAN);
-	glTexCoord2f(0.0, 0.0);
-	glVertex2f(results_x, results_y);
-	glTexCoord2f(1.0, 0.0);
-	glVertex2f(results_x + BUF_WIDTH, results_y);
-	glTexCoord2f(1.0, 1.0);
-	glVertex2f(results_x + BUF_WIDTH, results_y + BUF_HEIGHT);
-	glTexCoord2f(0.0, 1.0);
-	glVertex2f(results_x, results_y + BUF_HEIGHT);
-	glEnd();
+	piglit_draw_rect_tex(results_x, results_y, BUF_WIDTH, BUF_HEIGHT,
+			     0, 0, 1, 1);
 	glDisable(GL_TEXTURE_2D);
 
 done:
@@ -196,8 +170,8 @@ done:
 	return pass;
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
@@ -214,29 +188,10 @@ display(void)
 				 0, (BUF_HEIGHT + 1) * 3);
 	glutSwapBuffers();
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-int main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fbo-readpixels");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
 	piglit_require_extension("GL_EXT_framebuffer_object");
-
-	glutMainLoop();
-
-	return 0;
 }

@@ -35,10 +35,9 @@
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
-#define WIN_WIDTH 200
-#define WIN_HEIGHT 100
-
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 200;
+int piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 float face_color[7][4] = {
 	{1.0, 0.0, 0.0, 0.0},
@@ -53,16 +52,6 @@ float face_color[7][4] = {
 static float *get_face_color(int face, int level)
 {
 	return face_color[(face + 2 * level) % 7];
-}
-
-static void rect(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-	glVertex2f(x1, y1);
-	glVertex2f(x1, y2);
-	glVertex2f(x2, y2);
-	glVertex2f(x2, y1);
-	glEnd();
 }
 
 static int
@@ -110,18 +99,13 @@ create_cube_fbo(void)
 			}
 
 			glViewport(0, 0, dim, dim);
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glOrtho(0, dim, 0, dim, -1, 1);
-
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
+			piglit_ortho_projection(dim, dim, GL_FALSE);
 
 			glColor4fv(get_face_color(face, level));
-			/* Draw a little outside the bounds to make sure clipping's
-			 * working.
-		 */
-			rect(-2, -2, dim + 2, dim + 2);
+			/* Draw a little outside the bounds to make
+			 * sure clipping's working.
+			 */
+			piglit_draw_rect(-2, -2, dim + 2, dim + 2);
 
 			level++;
 		}
@@ -137,11 +121,8 @@ done:
 static void
 draw_face(int x, int y, int dim, int face)
 {
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -184,8 +165,8 @@ static GLboolean test_face_drawing(int start_x, int start_y, int dim,
 	return pass;
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int face, dim;
@@ -223,30 +204,11 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-int main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fbo-cubemap");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_cube_map");
-
-	glutMainLoop();
-
-	return 0;
 }

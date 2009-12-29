@@ -35,10 +35,9 @@
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
-#define WIN_WIDTH 200
-#define WIN_HEIGHT 100
-
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 200;
+int piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 #define NUM_DEPTHS	6
 float depth_color[NUM_DEPTHS][4] = {
@@ -49,16 +48,6 @@ float depth_color[NUM_DEPTHS][4] = {
 	{1.0, 1.0, 0.0, 0.0},
 	{0.0, 1.0, 1.0, 0.0},
 };
-
-static void rect(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-	glVertex2f(x1, y1);
-	glVertex2f(x1, y2);
-	glVertex2f(x2, y2);
-	glVertex2f(x2, y1);
-	glEnd();
-}
 
 static int
 create_3d_fbo(void)
@@ -96,15 +85,10 @@ create_3d_fbo(void)
 		}
 
 		glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, BUF_WIDTH, 0, BUF_HEIGHT, -1, 1);
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
+		piglit_ortho_projection(BUF_WIDTH, BUF_HEIGHT, GL_FALSE);
 
 		glColor4fv(depth_color[depth]);
-		rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
+		piglit_draw_rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
 	}
 
 
@@ -119,11 +103,8 @@ draw_depth(int x, int y, int depth)
 {
 	float depth_coord = (float)depth / (NUM_DEPTHS - 1);
 
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_TRUE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -166,8 +147,8 @@ static GLboolean test_depth_drawing(int start_x, int start_y, float *expected)
 	return pass;
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int depth;
@@ -194,30 +175,10 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-int main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fbo-3d");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_ARB_texture_non_power_of_two");
-
-	glutMainLoop();
-
-	return 0;
+	piglit_require_extension("GL_EXT_texture3D");
 }

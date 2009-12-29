@@ -34,20 +34,9 @@
 #include "piglit-util.h"
 
 #define BUF_WIDTH 32
-#define WIN_WIDTH 50
-#define WIN_HEIGHT 20
-
-static GLboolean Automatic = GL_FALSE;
-
-static void rect(int x1, int y1, int x2, int y2)
-{
-	glBegin(GL_POLYGON);
-	glVertex2f(x1, y1);
-	glVertex2f(x1, y2);
-	glVertex2f(x2, y2);
-	glVertex2f(x2, y1);
-	glEnd();
-}
+int piglit_width = 50;
+int piglit_height = 20;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH;
 
 static int
 create_1d_fbo(void)
@@ -82,22 +71,15 @@ create_1d_fbo(void)
 	}
 
 	glViewport(0, 0, BUF_WIDTH, 1);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, BUF_WIDTH, 0, 1, -1, 1);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	piglit_ortho_projection(BUF_WIDTH, 1, GL_FALSE);
 
 	/* left side: red */
 	glColor4f(1.0, 0.0, 0.0, 0.0);
-	rect(0, 0,
-	     BUF_WIDTH / 2, 1);
+	piglit_draw_rect(0, 0, BUF_WIDTH / 2, 1);
 
 	/* right side: green */
 	glColor4f(0.0, 1.0, 0.0, 0.0);
-	rect(BUF_WIDTH / 2, 0,
-	     BUF_WIDTH, 1);
+	piglit_draw_rect(BUF_WIDTH / 2, 0, BUF_WIDTH, 1);
 
 done:
 	glDeleteFramebuffersEXT(1, &fb);
@@ -108,11 +90,8 @@ done:
 static void
 draw_fbo_1d(int x, int y)
 {
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1);
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -124,25 +103,12 @@ draw_fbo_1d(int x, int y)
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glBegin(GL_QUADS);
-
-	glTexCoord2f(0, 0);
-	glVertex2f(x, y);
-
-	glTexCoord2f(1, 0);
-	glVertex2f(x + BUF_WIDTH, y);
-
-	glTexCoord2f(1, 1);
-	glVertex2f(x + BUF_WIDTH, y + 1);
-
-	glTexCoord2f(0, 1);
-	glVertex2f(x, y + 1);
-
-	glEnd();
+	piglit_draw_rect_tex(x, y, BUF_WIDTH, 1,
+			     0, 0, 1, 1);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float red[] = {1,0,0,0};
@@ -171,26 +137,10 @@ display(void)
 
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-int main(int argc, char**argv)
+void piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("fbo-1d");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-	glewInit();
-
 	piglit_require_extension("GL_EXT_framebuffer_object");
-
-	glutMainLoop();
-
-	return 0;
 }
