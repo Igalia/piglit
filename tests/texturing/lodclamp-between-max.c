@@ -26,10 +26,10 @@
  */
 
 /**
- * @file lodclamp-between.c
+ * @file lodclamp-between-max.c
  *
- * Tests that setting LOD clamp to between two texture levels results in
- * appropriate mipmap filtering.
+ * Tests that setting maximum LOD clamp to between two texture levels
+ * results in appropriate mipmap filtering.
  */
 
 #include "piglit-util.h"
@@ -113,12 +113,12 @@ piglit_display(void)
 	for (level = 0, dim = MAX_SIZE; dim > 1; level++, dim /= 2) {
 		float clamp = (float)level + 0.5;
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, clamp);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, clamp);
 
-		piglit_draw_rect_tex(x, y, MAX_SIZE, MAX_SIZE,
+		piglit_draw_rect_tex(x, y, 1, 1,
 				     0.0, 0.0, 1.0, 1.0);
 
-		y += MAX_SIZE + PAD;
+		y += 1 + PAD;
 	}
 
 	/* Verify that the resulting images are blended between the levels. */
@@ -132,11 +132,11 @@ piglit_display(void)
 				       colors[level + 1][i]) / 2.0;
 		}
 
-		pass = piglit_probe_pixel_rgb(x + MAX_SIZE / 2,
-					      y + MAX_SIZE / 2,
+		pass = piglit_probe_pixel_rgb(x,
+					      y,
 					      expected) && pass;
 
-		y += MAX_SIZE + PAD;
+		y += 1 + PAD;
 	}
 
 	glDeleteTextures(1, &tex);
