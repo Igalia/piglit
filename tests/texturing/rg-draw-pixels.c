@@ -38,8 +38,6 @@
 int piglit_width = 40, piglit_height = 30;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-static GLuint tex[2];
-
 void
 piglit_init(int argc, char **argv)
 {
