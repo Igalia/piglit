@@ -75,7 +75,7 @@ static char *gen_temporary_dest_indirections(int sample_count,
 		exit(1);
 	}
 
-	sprintf(prog, pre);
+	sprintf(prog, "%s", pre);
 	for (i = 0; i < sample_count; i++)
 		strcat(prog, sample);
 	strcat(prog, post);
@@ -144,7 +144,7 @@ static char *gen_temporary_source_indirections(int sample_count,
 		exit(1);
 	}
 
-	sprintf(prog, pre);
+	sprintf(prog, "%s", pre);
 	for (i = 0; i < sample_count - 1; i++)
 		strcat(prog, sample);
 	strcat(prog, post);
@@ -159,7 +159,7 @@ void
 print_program_info(char *program)
 {
 	printf("Program:\n");
-	printf(program);
+	printf("%s", program);
 	printf("\n");
 
 	printf("tex instructions: %d\n",
