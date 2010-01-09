@@ -124,10 +124,7 @@ PARAM vals[] =	{
 			{1.0, 0.0, 0.5, 0.0},
 			{0.8, 1.0, 0.0, 0.0}
 		};
-ADDRESS A0;
 
-ARL A0.x, program.local[0].x;
-MOV result.color, vals[A0.x+0];
 MOV result.color, vals[3];
 END
 
