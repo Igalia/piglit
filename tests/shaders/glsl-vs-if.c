@@ -71,9 +71,9 @@ piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
-				   SOURCE_DIR "tests/shaders/glsl-vs-if.vert");
+				   "shaders/glsl-vs-if.vert");
 	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
-				   SOURCE_DIR "tests/shaders/glsl-color.frag");
+				   "shaders/glsl-color.frag");
 
 	prog = piglit_link_simple_program(vs, fs);
 
