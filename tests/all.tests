@@ -201,6 +201,8 @@ add_vpfpgeneric('vp-arl-neg-array-2')
 add_vpfpgeneric('vp-constant-array')
 add_vpfpgeneric('vp-constant-array-huge')
 add_vpfpgeneric('vp-exp-alias')
+add_vpfpgeneric('vp-max')
+add_vpfpgeneric('vp-min')
 add_vpfpgeneric('vp-sge-alias')
 add_vpfpgeneric('vp-two-constants')
 shaders['vpfp-generic'] = vpfpgeneric
