@@ -1,0 +1,24 @@
+; Tests loading of a per-vertex variable entry from a constant array.
+
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+PARAM vals[] =	{
+			{ 0.75,  0.25, 0.0, 0.0},
+			{-0.25,  0.25, 0.0, 0.0},
+			{ 0.75, -0.75, 0.0, 0.0},
+			{-0.25, -0.75, 0.0, 0.0}
+		};
+ADDRESS A0;
+TEMP temp;
+MUL temp.x, vertex.position.y, {2};
+ADD temp.x, temp, vertex.position.x;
+ARL A0.x, temp.x;
+ADD result.color, vals[A0.x], vertex.position.xyzz;
+END
+
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+!!test
+expected          0.75     0.25      0.0      0.0
