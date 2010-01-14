@@ -32,7 +32,6 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
-#include <sys/param.h>
 
 #include "piglit-util.h"
 
@@ -390,11 +389,11 @@ piglit_compile_shader(GLenum target, char *filename)
 	int err;
 	GLchar *prog_string;
 	FILE *f;
-	char filename_with_path[PATH_MAX];
+	char filename_with_path[FILENAME_MAX];
 
-	snprintf(filename_with_path, PATH_MAX - 1,
+	snprintf(filename_with_path, FILENAME_MAX - 1,
 		 "%stests/%s", SOURCE_DIR, filename);
-	filename_with_path[PATH_MAX - 1] = 0;
+	filename_with_path[FILENAME_MAX - 1] = 0;
 
 	err = stat(filename_with_path, &st);
 	if (err == -1) {
