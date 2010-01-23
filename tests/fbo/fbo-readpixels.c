@@ -96,21 +96,26 @@ test_with_format(GLenum internal_format, GLenum format,
 	glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
 	piglit_ortho_projection(BUF_WIDTH, BUF_HEIGHT, GL_FALSE);
 
+	/* clear background to purple */
 	glClearColor(1.0, 0.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	/* lower-left square: red */
 	glColor4f(1.0, 0.0, 0.0, 0.0);
 	piglit_draw_rect(subrect_w * 1, subrect_h * 1,
 			 subrect_w, subrect_h);
 
+	/* lower-right square: green */
 	glColor4f(0.0, 1.0, 0.0, 0.0);
 	piglit_draw_rect(subrect_w * 3, subrect_h * 1,
 			 subrect_w, subrect_h);
 
+	/* upper-left square: blue */
 	glColor4f(0.0, 0.0, 1.0, 0.0);
 	piglit_draw_rect(subrect_w * 1, subrect_h * 3,
 			 subrect_w, subrect_h);
 
+	/* upper-right square: black */
 	glColor4f(0.0, 0.0, 0.0, 1.0);
 	piglit_draw_rect(subrect_w * 3, subrect_h * 3,
 			 subrect_w, subrect_h);
@@ -153,6 +158,7 @@ test_with_format(GLenum internal_format, GLenum format,
 		}
 	}
 
+	/* display the texture by drawing a quad */
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_TRUE);
 
