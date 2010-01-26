@@ -44,7 +44,6 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	int x, y;
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
-	static float blue[]  = {0.0, 0.0, 1.0, 0.0};
 
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
