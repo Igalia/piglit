@@ -385,6 +385,7 @@ static void Reshape(int width, int height)
 extern "C" void piglit_init(int argc, char **argv)
 {
 	int i;
+	const char *fp;
 
 	for(i = 1; i < argc; ++i) {
 		if (!Filename)
@@ -396,10 +397,17 @@ extern "C" void piglit_init(int argc, char **argv)
 	}
 	tests.read(Filename);
 
+	fp = tests.fragment_program_code.c_str();
+
 	if (!GLEW_VERSION_1_3) {
 		printf("Requires OpenGL 1.3\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
+	}
+
+	if (strstr(fp, "OPTION ARB_fragment_coord_origin_upper_left") ||
+	    strstr(fp, "OPTION ARB_fragment_coord_pixel_center_integer")) {
+		piglit_require_extension("GL_ARB_fragment_coord_conventions");
 	}
 
 	piglit_require_fragment_program();
