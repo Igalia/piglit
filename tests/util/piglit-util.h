@@ -68,6 +68,10 @@ enum piglit_result {
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+extern const uint8_t fdo_bitmap[];
+extern const unsigned int fdo_bitmap_width;
+extern const unsigned int fdo_bitmap_height;
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);

@@ -8,6 +8,7 @@ include_directories(
 )
 
 add_library (piglitutil
+	    fdo-bitmap.c
 	    piglit-util.c
 	    shader-load.c
 	    piglit-framework.c
