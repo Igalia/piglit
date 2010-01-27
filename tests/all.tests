@@ -80,6 +80,7 @@ add_plain_test(fbo, 'fbo-generatemipmap-viewport')
 add_plain_test(fbo, 'fbo-nodepth-test')
 add_plain_test(fbo, 'fbo-nostencil-test')
 add_plain_test(fbo, 'fbo-readpixels')
+add_plain_test(fbo, 'fbo-pbo-readpixels-small')
 
 general = Group()
 add_plain_test(general, 'bgra-sec-color-pointer')
