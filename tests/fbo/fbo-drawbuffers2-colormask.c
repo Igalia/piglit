@@ -93,7 +93,7 @@ piglit_display(void)
 	}
 
 	/* Clear to black */
-	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Mask only green in RT 0, blue in RT 1, then try to draw in white */
@@ -104,6 +104,7 @@ piglit_display(void)
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	/* Draw the two textures to halves of the window. */
 	glEnable(GL_TEXTURE_2D);
