@@ -40,6 +40,7 @@ int piglit_height = 100;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 #define NUM_DEPTHS	6
+#define POT_DEPTHS	8
 float depth_color[NUM_DEPTHS][4] = {
 	{1.0, 0.0, 0.0, 0.0},
 	{0.0, 1.0, 0.0, 0.0},
@@ -55,12 +56,14 @@ create_3d_fbo(void)
 	GLuint tex, fb;
 	GLenum status;
 	int depth;
+	int pot_depth = glutExtensionSupported("GL_ARB_texture_non_power_of_two") ?
+		NUM_DEPTHS: POT_DEPTHS;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_3D, tex);
 
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA,
-		     BUF_WIDTH, BUF_HEIGHT, NUM_DEPTHS,
+		     BUF_WIDTH, BUF_HEIGHT, pot_depth,
 		     0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	assert(glGetError() == 0);
