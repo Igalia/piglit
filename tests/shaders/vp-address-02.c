@@ -140,18 +140,19 @@ piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB,
-			  GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB,
+			  GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB,
 			  & max_address_registers);
 	if (max_address_registers == 0) {
+		/* we have to have at least one address register */
 		if (! piglit_automatic)
-			printf("GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB "
-			       "== 0\n");
+			printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB == 0\n");
 
 		piglit_report_result(PIGLIT_FAILURE);
 	} else 	if (max_address_registers == 1) {
 		if (glutExtensionSupported("GL_NV_vertex_program2_option")) {
+			/* this extension requires two address regs */
 			if (! piglit_automatic)
-				printf("GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB "
+				printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB "
 				       "== 1\n");
 
 			piglit_report_result(PIGLIT_FAILURE);
