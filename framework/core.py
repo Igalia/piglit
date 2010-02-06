@@ -317,7 +317,8 @@ class Test:
 				result['exception'] = str(sys.exc_info()[0]) + str(sys.exc_info()[1])
 				result['traceback'] = '@@@' + "".join(traceback.format_tb(sys.exc_info()[2]))
 
-			print "    result: %(result)s" % { 'result': result['result'] }
+			if result['result'] != 'pass':
+				print "    result: %(result)s" % { 'result': result['result'] }
 
 			result.write(env.file, path)
 			if Test.sleep:
