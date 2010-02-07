@@ -27,7 +27,7 @@
 
 /** @file vp-combined-image-units.c
  *
- * Tests that ARB_vertex_program returns a not-impossible result for
+ * Tests that ARB_shader_program returns a not-impossible result for
  * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS.  Catches a regression in wine caused
  * by bug #25518.
  */
@@ -53,15 +53,13 @@ piglit_display(void)
 		pass = GL_FALSE;
 	}
 
-	if (GLEW_ARB_fragment_program) {
-		glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &fragment);
-		if (combined < fragment) {
-			fprintf(stderr,
-				"Max fragment units (%d) > "
-				"combined units (%d)\n",
-				fragment, combined);
-			pass = GL_FALSE;
-		}
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &fragment);
+	if (combined < fragment) {
+		fprintf(stderr,
+			"Max fragment units (%d) > "
+			"combined units (%d)\n",
+			fragment, combined);
+		pass = GL_FALSE;
 	}
 
 	pass = pass && glGetError() == 0;
@@ -74,5 +72,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_extension("GL_ARB_vertex_program");
+	piglit_require_extension("GL_ARB_vertex_shader");
 }
+
