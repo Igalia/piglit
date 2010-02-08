@@ -240,6 +240,7 @@ add_plain_test(bugs, 'fdo25614-genmipmap')
 
 glx = Group()
 add_plain_test(glx, 'glx-multithread')
+add_plain_test(glx, 'glx-swap-exchange')
 
 texturing = Group()
 add_plain_test(texturing, 'copytexsubimage')

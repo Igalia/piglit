@@ -21,4 +21,5 @@ link_libraries (
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-multithread glx-multithread.c)
+	add_executable (glx-swap-exchange glx-swap-exchange.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
