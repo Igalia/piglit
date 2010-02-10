@@ -104,6 +104,8 @@ int FindLine(const char *program, int position)
 {
 	int i, line = 1;
 	for (i = 0; i < position; i++) {
+		if (program[i] == '0')
+			return -1; /* unknown line */
 		if (program[i] == '\n')
 			line++;
 	}
@@ -397,7 +399,7 @@ piglit_compile_shader(GLenum target, char *filename)
 
 	err = stat(filename_with_path, &st);
 	if (err == -1) {
-		fprintf(stderr, "Couldn't stat program: %s\n", strerror(errno));
+		fprintf(stderr, "Couldn't stat program %s: %s\n", filename, strerror(errno));
 		exit(1);
 	}
 
@@ -419,8 +421,10 @@ piglit_compile_shader(GLenum target, char *filename)
 	prog = glCreateShader(target);
 	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
 	glCompileShader(prog);
+
 	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
-	if (!ok) {
+
+	{
 		GLchar *info;
 		GLint size;
 
@@ -428,9 +432,19 @@ piglit_compile_shader(GLenum target, char *filename)
 		info = malloc(size);
 
 		glGetShaderInfoLog(prog, size, NULL, info);
-		fprintf(stderr, "Failed to compile %s: %s\n",
-			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
-			info);
+		if (!ok) {
+			fprintf(stderr, "Failed to compile %s: %s\n",
+				target == GL_FRAGMENT_SHADER ? "FS" : "VS",
+				info);
+		}
+		else if (0) {
+			/* Enable this to get extra compilation info.
+			 * Even if there's no compilation errors, the info
+			 * log may have some remarks.
+			 */
+			fprintf(stderr, "Shader compiler warning: %s\n", info);
+		}
+		free(info);
 	}
 
 	free(prog_string);
@@ -446,8 +460,10 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 	glAttachShader(prog, fs);
 	glAttachShader(prog, vs);
 	glLinkProgram(prog);
+
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	if (!ok) {
+
+	{
 		GLchar *info;
 		GLint size;
 
@@ -455,7 +471,16 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 		info = malloc(size);
 
 		glGetProgramInfoLog(prog, size, NULL, info);
-		fprintf(stderr, "Failed to link: %s\n", info);
+		if (!ok) {
+			fprintf(stderr, "Failed to link: %s\n", info);
+		}
+		else if (0) {
+			/* Enable this to get extra linking info.
+			 * Even if there's no link errors, the info log may
+			 * have some remarks.
+			 */
+			fprintf(stderr, "Linker warning: %s\n", info);
+		}
 
 		free(info);
 	}
