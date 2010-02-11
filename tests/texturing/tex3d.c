@@ -226,6 +226,8 @@ piglit_init(int argc, char **argv)
 
 	glutReshapeFunc(Reshape);
 
+	glDisable(GL_DITHER);
+
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_3D, Texture);
 	Reshape(piglit_width, piglit_height);

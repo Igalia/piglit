@@ -264,6 +264,8 @@ static void display(void)
 
 static void init(void)
 {
+	glDisable(GL_DITHER);
+
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
 	glLoadIdentity();
