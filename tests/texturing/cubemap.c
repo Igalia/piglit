@@ -27,8 +27,6 @@
 
 #include "piglit-util.h"
 
-static GLboolean Hack_r300Relax = GL_FALSE;
-
 #define MAX_SIZE	64
 #define PAD		5
 
@@ -209,7 +207,7 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 
 			glEnd();
 
-			if (dim > 2 || !Hack_r300Relax) {
+			if (dim > 2) {
 				pass = test_results(base_x, base_y,
 						    dim, level, face,
 						    mipmapped,
@@ -283,9 +281,4 @@ piglit_init(int argc, char **argv)
 	int i;
 
 	piglit_require_extension("GL_ARB_texture_cube_map");
-
-	for(i = 1; i < argc; ++i) {
-		if (!strcmp(argv[i], "-r300relax"))
-			Hack_r300Relax = 1;
-	}
 }

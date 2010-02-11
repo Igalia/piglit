@@ -192,7 +192,7 @@ piglit_display(void)
 		int y = 1;
 		int level = 0;
 
-		for (dim = BUF_WIDTH; dim > 0; dim >>= 1) {
+		for (dim = BUF_WIDTH; dim > 2; dim >>= 1) {
 			pass &= test_face_drawing(x, y, dim,
 						  get_face_color(face, level));
 			y += dim + 1;
