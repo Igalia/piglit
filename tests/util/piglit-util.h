@@ -88,7 +88,8 @@ int piglit_use_vertex_program(void);
 void piglit_require_fragment_program(void);
 void piglit_require_vertex_program(void);
 GLuint piglit_compile_program(GLenum target, const char* text);
-GLint piglit_compile_shader(GLenum target, char *filename);
+GLuint piglit_compile_shader(GLenum target, char *filename);
+GLuint piglit_compile_shader_text(GLenum target, const char *text);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
