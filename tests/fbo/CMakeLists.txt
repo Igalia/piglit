@@ -23,6 +23,7 @@ link_libraries (
 
 add_executable (fbo-1d fbo-1d.c)
 add_executable (fbo-3d fbo-3d.c)
+add_executable (fbo-blit fbo-blit.c)
 add_executable (fbo-clearmipmap fbo-clearmipmap.c)
 add_executable (fbo-drawbuffers fbo-drawbuffers.c)
 add_executable (fbo-drawbuffers2-blend fbo-drawbuffers2-blend.c)
