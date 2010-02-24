@@ -293,7 +293,7 @@ int main(int argc, char**argv)
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
 	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("cubemap");
+	glutCreateWindow ("copytexsubimage");
 	init();
 	glutDisplayFunc(display);
 	glutMainLoop();
