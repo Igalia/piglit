@@ -245,6 +245,7 @@ add_plain_test(glx, 'glx-multithread')
 add_plain_test(glx, 'glx-swap-exchange')
 
 texturing = Group()
+add_plain_test(texturing, 'array-texture')
 add_plain_test(texturing, 'copytexsubimage')
 add_plain_test(texturing, 'cubemap')
 add_plain_test(texturing, 'gen-teximage')

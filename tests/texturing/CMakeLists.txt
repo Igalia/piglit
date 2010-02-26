@@ -19,6 +19,7 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_executable (array-texture array-texture.c)
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
 add_executable (gen-compressed-teximage gen-compressed-teximage.c)
