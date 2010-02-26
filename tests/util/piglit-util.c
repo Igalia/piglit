@@ -470,8 +470,10 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 	GLint prog, ok;
 
 	prog = glCreateProgram();
-	glAttachShader(prog, fs);
-	glAttachShader(prog, vs);
+	if (fs)
+		glAttachShader(prog, fs);
+	if (vs)
+		glAttachShader(prog, vs);
 	glLinkProgram(prog);
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
