@@ -131,9 +131,9 @@ test_mipmap_drawing(int start_x, int start_y, int dim)
 			else
 				expected = white;
 
-			pass &= piglit_probe_pixel_rgb(start_x + x,
-						       start_y + y,
-						       expected);
+			pass = pass && piglit_probe_pixel_rgb(start_x + x,
+							      start_y + y,
+							      expected);
 		}
 	}
 
