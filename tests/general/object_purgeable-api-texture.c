@@ -30,58 +30,14 @@
  */
 
 #include "piglit-util.h"
-
-#define FAIL_ON_ERROR(string)					\
-    do {							\
-        const GLenum err = glGetError();			\
-        if (err != GL_NO_ERROR) {				\
-            fprintf(stderr, "%s generated error 0x%04x\n", 	\
-                string, err);                                   \
-                pass = GL_FALSE;				\
-        }							\
-    } while (0)
-
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-
-#ifndef GL_APPLE_object_purgeable
-#define GL_APPLE_object_purgeable 1
-
-#define GL_RELEASED_APPLE                 0x8A19
-#define GL_VOLATILE_APPLE                 0x8A1A
-#define GL_RETAINED_APPLE                 0x8A1B
-#define GL_UNDEFINED_APPLE                0x8A1C
-#define GL_PURGEABLE_APPLE                0x8A1D
-#define GL_BUFFER_OBJECT_APPLE            0x85B3
-
-
-typedef GLenum (APIENTRYP PFNGLOBJECTPURGEABLEAPPLEPROC) (GLenum objectType, GLuint name, GLenum option);
-typedef GLenum (APIENTRYP PFNGLOBJECTUNPURGEABLEAPPLEPROC) (GLenum objectType, GLuint name, GLenum option);
-typedef void (APIENTRYP PFNGLGETOBJECTPARAMETERIVAPPLEPROC) (GLenum objectType, GLuint name, GLenum pname, GLint* params);
-
-#endif
-
-
-static PFNGLOBJECTPURGEABLEAPPLEPROC pglObjectPurgeableAPPLE = NULL;
-static PFNGLOBJECTUNPURGEABLEAPPLEPROC pglObjectUnpurgeableAPPLE = NULL;
-static PFNGLGETOBJECTPARAMETERIVAPPLEPROC pglGetObjectParameterivAPPLE = NULL;
+#include "object_purgeable.h"
 
 static GLboolean Automatic = GL_FALSE;
 
 static void
 init(void)
 {
-    piglit_require_extension("GL_APPLE_object_purgeable");
-
-    pglObjectPurgeableAPPLE = (PFNGLOBJECTPURGEABLEAPPLEPROC) piglit_get_proc_address("glObjectPurgeableAPPLE");
-    pglObjectUnpurgeableAPPLE = (PFNGLOBJECTUNPURGEABLEAPPLEPROC) piglit_get_proc_address("glObjectUnpurgeableAPPLE");
-    pglGetObjectParameterivAPPLE = (PFNGLGETOBJECTPARAMETERIVAPPLEPROC) piglit_get_proc_address("glGetObjectParameterivAPPLE");
-
-    glClearColor(0.1, 0.1, 0.3, 0.0);
+	init_ObjectPurgeableAPI();
 }
 
 
@@ -96,72 +52,6 @@ reshape(int width, int height)
     glMatrixMode(GL_MODELVIEW);
 }
 
-
-GLboolean
-test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
-{
-    GLboolean pass = GL_TRUE;
-    GLenum ret;
-    ret = (*pglObjectPurgeableAPPLE)(objectType, name, option);
-    FAIL_ON_ERROR("pglObjectpurgeableAPPLE");
-    switch (option) {
-    case GL_VOLATILE_APPLE:
-        if (ret != GL_VOLATILE_APPLE) {
-            fprintf(stderr, "GL_VOLATILE_APPLE should be returned when call purgeable with GL_VOLATILE_APPLE\n");
-            pass = GL_FALSE;
-        }
-        break;
-        case GL_RELEASED_APPLE:
-        if (ret != GL_VOLATILE_APPLE && ret != GL_RELEASED_APPLE) {
-            fprintf(stderr, "GL_VOLATILE_APPLE or GL_RELEASED_APPLE should be returned when call purgeable with GL_RELEASED_APPLE\n");
-            pass = GL_FALSE;
-        }
-        break;
-    }
-
-    return pass;
-}
-
-
-GLboolean
-test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
-{
-    GLboolean pass = GL_TRUE;
-    GLenum ret;
-    ret = (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
-    FAIL_ON_ERROR("pglObjectunpurgeableAPPLE");
-    switch (option) {
-    case GL_RETAINED_APPLE:
-        if (ret != GL_RETAINED_APPLE && ret != GL_UNDEFINED_APPLE) {
-            fprintf(stderr, "GL_RETAINED_APPLE or GL_UNDEFINED_APPLE should be returned when call purgeable with GL_RETAINED_APPLE\n");
-            pass = GL_FALSE;
-        }
-        break;
-        case GL_UNDEFINED_APPLE:
-        if (ret != GL_UNDEFINED_APPLE) {
-            fprintf(stderr, "GL_UNDEFINED_APPLE should be returned when call purgeable with GL_UNDEFINED_APPLE\n");
-            pass = GL_FALSE;
-        }
-        break;
-    }
-    return pass;
-}
-
-GLboolean
-test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name, GLenum expect)
-{
-    GLboolean pass = GL_TRUE;
-    GLint param;
-    (*pglGetObjectParameterivAPPLE)(objectType, name, GL_PURGEABLE_APPLE, &param);
-    FAIL_ON_ERROR("glGetObjectParameterivAPPLE");
-
-    if (param != expect) {
-        fprintf(stderr, "GL_PURGEABLE_APPLE state is not set to GL_TRUE for texture object\n");
-        pass = GL_FALSE;
-    }
-
-    return pass;
-}
 
 static void
 display(void)
@@ -247,4 +137,3 @@ int main(int argc, char **argv)
     glutMainLoop();
     return 0;
 }
-
