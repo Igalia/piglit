@@ -172,7 +172,7 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
 		pass = GL_FALSE;
 	}
 
-	if (!test_GetObjectParameterivAPPLE(type, obje) != GL_TRUE) {
+	if (!test_GetObjectParameterivAPPLE(type, object, GL_TRUE)) {
 		fprintf(stderr,
 			"Object marked purgeable is not set to purgeable\n");
 		pass = GL_FALSE;
@@ -192,7 +192,7 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
 		pass = GL_FALSE;
 	}
 
-	if (!test_GetObjectParameterivAPPLE(type, obje) != GL_TRUE) {
+	if (!test_GetObjectParameterivAPPLE(type, object, GL_TRUE)) {
 		fprintf(stderr,
 			"Object marked purgeable is not set to purgeable\n");
 		pass = GL_FALSE;
