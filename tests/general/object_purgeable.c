@@ -42,6 +42,17 @@ PFNGLGETOBJECTPARAMETERIVAPPLEPROC pglGetObjectParameterivAPPLE = NULL;
 		}							\
 	} while (0)
 
+#define EXPECT_AN_ERROR(string, expected)				\
+	do {								\
+		const GLenum err = glGetError();			\
+		if (err != expected) {					\
+			fprintf(stderr, "%s generated error 0x%04x, "	\
+				"but error 0x%04x (%s) was expected\n",	\
+				string, err, expected, # expected);	\
+			pass = GL_FALSE;				\
+		}							\
+	} while (0)
+
 void
 init_ObjectPurgeableAPI(void)
 {
@@ -101,6 +112,9 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		pass = GL_FALSE;
 	}
 
+	(void) (*pglObjectPurgeableAPPLE)(objectType, name, option);
+	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
+
 	return pass;
 }
 
@@ -142,6 +156,9 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 			"unpurgeable\n");
 		pass = GL_FALSE;
 	}
+
+	(void) (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
+	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
 
 	return pass;
 }
