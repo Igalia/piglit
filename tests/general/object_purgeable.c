@@ -118,6 +118,12 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 
 	switch (option) {
 	case GL_VOLATILE_APPLE:
+		/* From the GL_APPLE_object_purgeable spec:
+		 *
+		 *     "If ObjectPurgeableAPPLE is called with an <option> of
+		 *     VOLATILE_APPLE, then ObjectPurgeableAPPLE will also
+		 *     return the value VOLATILE_APPLE."
+		 */
 		if (ret != GL_VOLATILE_APPLE) {
 			fprintf(stderr, expected_fmt,
 				"glObjectPurgeableAPPLE", "GL_VOLATILE_APPLE",
@@ -128,6 +134,13 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		break;
 
 	case GL_RELEASED_APPLE:
+		/* From the GL_APPLE_object_purgeable spec:
+		 *
+		 *     "If ObjectPurgeableAPPLE is called with an <option> of
+		 *     RELEASED_APPLE, then ObjectPurgeableAPPLE may return
+		 *     either the value RELEASED_APPLE or the value
+		 *     VOLATILE_APPLE."
+		 */
 		if (ret != GL_VOLATILE_APPLE && ret != GL_RELEASED_APPLE) {
 			fprintf(stderr, expected_fmt,
 				"glObjectPurgeableAPPLE", "GL_RELEASED_APPLE",
@@ -139,12 +152,22 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		break;
 	}
 
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "Calling ObjectPurgeableAPPLE with either option sets
+	 *     PURGEABLE_APPLE to TRUE..."
+	 */
 	if (!test_GetObjectParameterivAPPLE(objectType, name, GL_TRUE)) {
 		fprintf(stderr,
 			"Object marked purgeable is not set to purgeable\n");
 		pass = GL_FALSE;
 	}
 
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "If ObjectPurgeableAPPLE is called and PURGEABLE_APPLE is
+	 *     already TRUE, the error INVALID_OPERATION is generated."
+	 */
 	(void) (*pglObjectPurgeableAPPLE)(objectType, name, option);
 	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
 
@@ -163,6 +186,13 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 
 	switch (option) {
 	case GL_RETAINED_APPLE:
+		/* From the GL_APPLE_object_purgeable spec:
+		 *
+		 *     "If ObjectUnpurgeableAPPLE is called with an <option> of
+		 *     RETAINED_APPLE, then ObjectPurgeableAPPLE may return
+		 *     either the value RETAINED_APPLE or the value
+		 *     UNDEFINED_APPLE."
+		 */
 		if (ret != GL_RETAINED_APPLE && ret != GL_UNDEFINED_APPLE) {
 			fprintf(stderr, expected_fmt,
 				"glObjectUnpurgeableAPPLE", "GL_RETAINED_APPLE",
@@ -174,6 +204,12 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		break;
 
 	case GL_UNDEFINED_APPLE:
+		/* From the GL_APPLE_object_purgeable spec:
+		 *
+		 *     "If ObjectUnpurgeableAPPLE is called with the <option>
+		 *     set to UNDEFINED_APPLE, then ObjectUnpurgeableAPPLE will
+		 *     return the value UNDEFINED_APPLE."
+		 */
 		if (ret != GL_UNDEFINED_APPLE) {
 			fprintf(stderr, expected_fmt,
 				"glObjectUnpurgeableAPPLE", "GL_UNDEFINED_APPLE",
@@ -184,12 +220,22 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		break;
 	}
 
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "Calling ObjectUnpurgeableAPPLE with either option sets
+	 *     PURGEABLE_APPLE to FALSE..."
+	 */
 	if (!test_GetObjectParameterivAPPLE(objectType, name, GL_FALSE)) {
 		fprintf(stderr, "Object marked unpurgeable is not set to "
 			"unpurgeable\n");
 		pass = GL_FALSE;
 	}
 
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "If ObjectUnpurgeableAPPLE is called and PURGEABLE_APPLE is
+	 *     already FALSE, the error INVALID_OPERATION is returned."
+	 */
 	(void) (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
 	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
 
