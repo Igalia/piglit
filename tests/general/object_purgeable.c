@@ -74,6 +74,39 @@ static const char expected_fmt[] =
 	"%s:%s: expected 0x%04x (%s), got 0x%04x\n";
 
 
+/**
+ * Check the setting and querying purgeability on object 0 generates errors.
+ */
+GLboolean
+test_DefaultObject(GLenum objectType)
+{
+	GLboolean pass = GL_TRUE;
+	GLint param;
+
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "INVALID_VALUE is generated if the <name> parameter of
+	 *      ObjectUnpurgeableAPPLE or ObjectUnpurgeableAPPLE is zero."
+	 */
+	(void) (*pglObjectPurgeableAPPLE)(objectType, 0, GL_VOLATILE_APPLE);
+	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_VALUE);
+
+	(void) (*pglObjectUnpurgeableAPPLE)(objectType, 0, GL_RETAINED_APPLE);
+	EXPECT_AN_ERROR("glObjectUnpurgeableAPPLE", GL_INVALID_VALUE);
+
+	/* From the GL_APPLE_object_purgeable spec:
+	 *
+	 *     "INVALID_VALUE is generated if the <name> parameter of
+	 *      GetObjectParameterivAPPLE is zero."
+	 */
+	(*pglGetObjectParameterivAPPLE)(objectType, 0, GL_PURGEABLE_APPLE,
+					&param);
+	EXPECT_AN_ERROR("glGetObjectParameterivAPPLE", GL_INVALID_VALUE);
+
+	return pass;
+}
+
+
 GLboolean
 test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 {
@@ -191,6 +224,11 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
 	GLboolean pass = GL_TRUE;
 
 	glGetError();
+
+	if (!test_DefaultObject(type)) {
+		fprintf(stderr, "Default object tests failed.\n");
+		pass = GL_FALSE;
+	}
 
 	if (!test_GetObjectParameterivAPPLE(type, object, GL_FALSE)) {
 		fprintf(stderr, "Default state test failed.\n");
