@@ -143,3 +143,58 @@ test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name, GLenum expect)
 
 	return pass;
 }
+
+
+GLboolean test_Purgeable(GLuint object, GLenum type)
+{
+    GLboolean pass = GL_TRUE;
+
+    glGetError();
+
+    if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
+        fprintf(stderr, "Default GL_PURGEABLE_APPLE state should GL_FALSE for texture object\n");
+        pass = GL_FALSE;
+    }
+
+    if (test_ObjectpurgeableAPPLE(type, object, GL_VOLATILE_APPLE) != GL_TRUE) {
+        fprintf(stderr, "Error when mark object %x to purgeable(GL_VOLATILE_APPLE)\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_GetObjectParameterivAPPLE(type, object, GL_TRUE) != GL_TRUE) {
+        fprintf(stderr, "Object %x is not set to purgeable\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_ObjectunpurgeableAPPLE(type, object, GL_RETAINED_APPLE) != GL_TRUE) {
+        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_RETAINED_APPLE)\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
+        fprintf(stderr, "Object %x is not set to unpurgeable\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_ObjectpurgeableAPPLE(type, object, GL_RELEASED_APPLE) != GL_TRUE) {
+        fprintf(stderr, "Error when mark object %x to purgeable(GL_RELEASED_APPLE)\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_GetObjectParameterivAPPLE(type, object, GL_TRUE) != GL_TRUE) {
+        fprintf(stderr, "Object %x is not set to purgeable\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_ObjectunpurgeableAPPLE(type, object, GL_UNDEFINED_APPLE) != GL_TRUE) {
+        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_UNDEFINED_APPLE)\n", object);
+        pass = GL_FALSE;
+    }
+
+    if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
+        fprintf(stderr, "Object %x is not set to unpurgeable\n", object);
+        pass = GL_FALSE;
+    }
+
+    return pass;
+}

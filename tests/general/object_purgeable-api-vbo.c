@@ -44,70 +44,23 @@ piglit_init(int argc, char **argv)
 	init_ObjectPurgeableAPI();
 	piglit_automatic = GL_TRUE;
 
-    piglit_require_extension("GL_ARB_vertex_buffer_object");
+	piglit_require_extension("GL_ARB_vertex_buffer_object");
 }
 
 
 enum piglit_result
 piglit_display(void)
 {
-    GLuint vbo;
-    GLboolean pass = GL_TRUE;
+	GLuint vbo;
+	GLboolean pass;
 
-    glGetError();
+	glGenBuffersARB(1, &vbo);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 100*100, NULL, GL_STATIC_DRAW_ARB);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
-    glGenBuffersARB(1, &vbo);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, 100*100, NULL, GL_STATIC_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	pass = test_Purgeable(vbo, GL_BUFFER_OBJECT_APPLE);
 
-
-    if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Default GL_PURGEABLE_APPLE state should GL_FALSE for texture object\n");
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectpurgeableAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_VOLATILE_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_VOLATILE_APPLE)\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectunpurgeableAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_RETAINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_RETAINED_APPLE)\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectpurgeableAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_RELEASED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_RELEASED_APPLE)\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectunpurgeableAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_UNDEFINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_UNDEFINED_APPLE)\n", vbo);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, vbo, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", vbo);
-        pass = GL_FALSE;
-    }
-
-
-    glDeleteBuffersARB(1, &vbo);
-    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	glDeleteBuffersARB(1, &vbo);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

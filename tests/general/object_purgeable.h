@@ -67,4 +67,6 @@ extern GLboolean test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name,
 extern GLboolean test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name,
 						GLenum expect);
 
+extern GLboolean test_Purgeable(GLuint object, GLenum type);
+
 #endif /* OBJECT_PURGEABLE_H */

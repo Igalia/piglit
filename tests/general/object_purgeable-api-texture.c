@@ -49,61 +49,16 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
-    GLuint texture;
-    GLboolean pass = GL_TRUE;
+	GLuint texture;
+	GLboolean pass;
 
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 100, 100, 0, GL_RGB, GL_INT, NULL);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 100, 100, 0, GL_RGB, GL_INT,
+		     NULL);
 
-    glGetError();
+	pass = test_Purgeable(texture, GL_TEXTURE);
 
-    if (test_GetObjectParameterivAPPLE(GL_TEXTURE, texture, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Default GL_PURGEABLE_APPLE state should GL_FALSE for texture object\n");
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectpurgeableAPPLE(GL_TEXTURE, texture, GL_VOLATILE_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_VOLATILE_APPLE)\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_TEXTURE, texture, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectunpurgeableAPPLE(GL_TEXTURE, texture, GL_RETAINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_RETAINED_APPLE)\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_TEXTURE, texture, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectpurgeableAPPLE(GL_TEXTURE, texture, GL_RELEASED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_RELEASED_APPLE)\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_TEXTURE, texture, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_ObjectunpurgeableAPPLE(GL_TEXTURE, texture, GL_UNDEFINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_UNDEFINED_APPLE)\n", texture);
-        pass = GL_FALSE;
-    }
-
-    if (test_GetObjectParameterivAPPLE(GL_TEXTURE, texture, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", texture);
-        pass = GL_FALSE;
-    }
-
-
-    glDeleteTextures(1, &texture);
-    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	glDeleteTextures(1, &texture);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
