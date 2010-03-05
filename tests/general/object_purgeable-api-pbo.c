@@ -32,57 +32,34 @@
 #include "piglit-util.h"
 #include "object_purgeable.h"
 
-// GL_ARB_vertex_buffer_object GL_ARB_pixel_buffer_object
-static PFNGLBINDBUFFERARBPROC pglBindBufferARB = NULL;
-static PFNGLDELETEBUFFERSARBPROC pglDeleteBuffersARB = NULL;
-static PFNGLGENBUFFERSARBPROC pglGenBuffersARB = NULL;
-static PFNGLBUFFERDATAARBPROC pglBufferDataARB = NULL;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB;
 
-
-static GLboolean Automatic = GL_FALSE;
-
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
+
 	init_ObjectPurgeableAPI();
+	piglit_automatic = GL_TRUE;
 
     piglit_require_extension("GL_ARB_pixel_buffer_object");
-
-    pglGenBuffersARB = (PFNGLGENBUFFERSARBPROC) piglit_get_proc_address("glGenBuffersARB");
-    pglBindBufferARB = (PFNGLBINDBUFFERARBPROC) piglit_get_proc_address("glBindBufferARB");
-    pglDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC) piglit_get_proc_address("glDeleteBuffersARB");
-    pglBufferDataARB = (PFNGLBUFFERDATAARBPROC) piglit_get_proc_address("glBufferDataARB");
-
-    glClearColor(0.1, 0.1, 0.3, 0.0);
 }
 
 
-static void
-reshape(int width, int height)
-{
-    glViewport(0, 0, (GLint) width, (GLint) height);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0);
-    glMatrixMode(GL_MODELVIEW);
-}
-
-
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
     GLuint pbo;
     GLboolean pass = GL_TRUE;
 
-    glClear(GL_COLOR_BUFFER_BIT);
-
     glGetError();
 
-    (*pglGenBuffersARB)(1, &pbo);
-    (*pglBindBufferARB)(GL_PIXEL_PACK_BUFFER_ARB, pbo);
-    (*pglBufferDataARB)(GL_PIXEL_PACK_BUFFER_ARB, 100*100, NULL, GL_STATIC_DRAW_ARB);
-    (*pglBindBufferARB)(GL_PIXEL_PACK_BUFFER_ARB, 0);
+    glGenBuffersARB(1, &pbo);
+    glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, pbo);
+    glBufferDataARB(GL_PIXEL_PACK_BUFFER_ARB, 100*100, NULL, GL_STATIC_DRAW_ARB);
+    glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
 
 
     if (test_GetObjectParameterivAPPLE(GL_BUFFER_OBJECT_APPLE, pbo, GL_FALSE) != GL_TRUE) {
@@ -131,30 +108,6 @@ display(void)
     }
 
 
-    (*pglDeleteBuffersARB)(1, &pbo);
-
-
-    if (Automatic)
-        piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-}
-
-
-int main(int argc, char **argv)
-{
-    glutInit(&argc, argv);
-
-    if (argc == 2 && !strcmp(argv[1], "-auto"))
-        Automatic = GL_TRUE;
-
-    glutInitWindowSize(400, 300);
-    glutInitDisplayMode(GLUT_RGB);
-    glutCreateWindow("GL_APPLE_object_purgeable API test with GL_ARB_pixel_buffer_object");
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(piglit_escape_exit_key);
-    glutDisplayFunc(display);
-
-    init();
-
-    glutMainLoop();
-    return 0;
+    glDeleteBuffersARB(1, &pbo);
+    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

@@ -32,34 +32,26 @@
 #include "piglit-util.h"
 #include "object_purgeable.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB;
 
-static void
-init(void)
+void
+piglit_init(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
+
 	init_ObjectPurgeableAPI();
+	piglit_automatic = GL_TRUE;
 }
 
 
-static void
-reshape(int width, int height)
-{
-    glViewport(0, 0, (GLint) width, (GLint) height);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0);
-    glMatrixMode(GL_MODELVIEW);
-}
-
-
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
     GLuint texture;
     GLboolean pass = GL_TRUE;
 
-    glClear(GL_COLOR_BUFFER_BIT);
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 100, 100, 0, GL_RGB, GL_INT, NULL);
@@ -113,27 +105,5 @@ display(void)
 
 
     glDeleteTextures(1, &texture);
-    if (Automatic)
-        piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
-}
-
-
-int main(int argc, char **argv)
-{
-    glutInit(&argc, argv);
-
-    if (argc == 2 && !strcmp(argv[1], "-auto"))
-        Automatic = GL_TRUE;
-
-    glutInitWindowSize(400, 300);
-    glutInitDisplayMode(GLUT_RGB);
-    glutCreateWindow("GL_APPLE_object_purgeable API test with texture object");
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(piglit_escape_exit_key);
-    glutDisplayFunc(display);
-
-    init();
-
-    glutMainLoop();
-    return 0;
+    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
