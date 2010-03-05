@@ -56,6 +56,13 @@ init_ObjectPurgeableAPI(void)
 }
 
 
+/**
+ * Format for error messages when an unexpected value is received.
+ */
+static const char expected_fmt[] =
+	"%s:%s: expected 0x%04x (%s), got 0x%04x\n";
+
+
 GLboolean
 test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 {
@@ -63,24 +70,26 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	GLenum ret;
 
 	ret = (*pglObjectPurgeableAPPLE)(objectType, name, option);
-	FAIL_ON_ERROR("pglObjectpurgeableAPPLE");
+	FAIL_ON_ERROR("glObjectPurgeableAPPLE");
 
 	switch (option) {
 	case GL_VOLATILE_APPLE:
 		if (ret != GL_VOLATILE_APPLE) {
-			fprintf(stderr,
-				"GL_VOLATILE_APPLE should be returned when "
-				"call purgeable with GL_VOLATILE_APPLE\n");
+			fprintf(stderr, expected_fmt,
+				"glObjectPurgeableAPPLE", "GL_VOLATILE_APPLE",
+				GL_VOLATILE_APPLE, "GL_VOLATILE_APPLE",
+				ret);
 			pass = GL_FALSE;
 		}
 		break;
 
 	case GL_RELEASED_APPLE:
 		if (ret != GL_VOLATILE_APPLE && ret != GL_RELEASED_APPLE) {
-			fprintf(stderr,
-				"GL_VOLATILE_APPLE or GL_RELEASED_APPLE should "
-				"be returned when call purgeable with "
-				"GL_RELEASED_APPLE\n");
+			fprintf(stderr, expected_fmt,
+				"glObjectPurgeableAPPLE", "GL_RELEASED_APPLE",
+				GL_VOLATILE_APPLE,
+				"GL_VOLATILE_APPLE or GL_RELEASED_APPLE",
+				ret);
 			pass = GL_FALSE;
 		}
 		break;
@@ -97,24 +106,26 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	GLenum ret;
 
 	ret = (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
-	FAIL_ON_ERROR("pglObjectunpurgeableAPPLE");
+	FAIL_ON_ERROR("glObjectUnpurgeableAPPLE");
 
 	switch (option) {
 	case GL_RETAINED_APPLE:
 		if (ret != GL_RETAINED_APPLE && ret != GL_UNDEFINED_APPLE) {
-			fprintf(stderr,
-				"GL_RETAINED_APPLE or GL_UNDEFINED_APPLE "
-				"should be returned when call purgeable with "
-				"GL_RETAINED_APPLE\n");
+			fprintf(stderr, expected_fmt,
+				"glObjectUnpurgeableAPPLE", "GL_RETAINED_APPLE",
+				GL_RETAINED_APPLE,
+				"GL_RETAINED_APPLE or GL_UNDEFINED_APPLE",
+				ret);
 			pass = GL_FALSE;
 		}
 		break;
 
 	case GL_UNDEFINED_APPLE:
 		if (ret != GL_UNDEFINED_APPLE) {
-			fprintf(stderr, "GL_UNDEFINED_APPLE should be returned "
-				"when call purgeable with "
-				"GL_UNDEFINED_APPLE\n");
+			fprintf(stderr, expected_fmt,
+				"glObjectUnpurgeableAPPLE", "GL_UNDEFINED_APPLE",
+				GL_UNDEFINED_APPLE, "GL_UNDEFINED_APPLE",
+				ret);
 			pass = GL_FALSE;
 		}
 		break;
@@ -135,9 +146,10 @@ test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name, GLenum expect)
 	FAIL_ON_ERROR("glGetObjectParameterivAPPLE");
 
 	if (param != expect) {
-		fprintf(stderr, "GL_PURGEABLE_APPLE state is 0x%04x, should be "
-			"0x%04x\n",
-			param, expect);
+		fprintf(stderr, expected_fmt,
+			"glGetObjectParameterivAPPLE", "GL_PURGEABLE_APPLE",
+			expect, expect ? "GL_TRUE" : "GL_FALSE",
+			param);
 		pass = GL_FALSE;
 	}
 
@@ -152,47 +164,45 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
     glGetError();
 
     if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Default GL_PURGEABLE_APPLE state should GL_FALSE for texture object\n");
+        fprintf(stderr, "Default state test failed.\n");
         pass = GL_FALSE;
     }
 
     if (test_ObjectpurgeableAPPLE(type, object, GL_VOLATILE_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_VOLATILE_APPLE)\n", object);
         pass = GL_FALSE;
     }
 
     if (test_GetObjectParameterivAPPLE(type, object, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", object);
+        fprintf(stderr, "Object marked purgeable is not set to purgeable\n");
         pass = GL_FALSE;
     }
 
     if (test_ObjectunpurgeableAPPLE(type, object, GL_RETAINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_RETAINED_APPLE)\n", object);
         pass = GL_FALSE;
     }
 
     if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", object);
+        fprintf(stderr, "Object marked unpurgeable is not set to "
+		"unpurgeable\n");
         pass = GL_FALSE;
     }
 
     if (test_ObjectpurgeableAPPLE(type, object, GL_RELEASED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to purgeable(GL_RELEASED_APPLE)\n", object);
         pass = GL_FALSE;
     }
 
     if (test_GetObjectParameterivAPPLE(type, object, GL_TRUE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to purgeable\n", object);
+        fprintf(stderr, "Object marked purgeable is not set to purgeable\n");
         pass = GL_FALSE;
     }
 
     if (test_ObjectunpurgeableAPPLE(type, object, GL_UNDEFINED_APPLE) != GL_TRUE) {
-        fprintf(stderr, "Error when mark object %x to unpurgeable(GL_UNDEFINED_APPLE)\n", object);
         pass = GL_FALSE;
     }
 
     if (test_GetObjectParameterivAPPLE(type, object, GL_FALSE) != GL_TRUE) {
-        fprintf(stderr, "Object %x is not set to unpurgeable\n", object);
+        fprintf(stderr, "Object marked unpurgeable is not set to "
+		"unpurgeable\n");
         pass = GL_FALSE;
     }
 
