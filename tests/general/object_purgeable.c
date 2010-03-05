@@ -95,6 +95,12 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 		break;
 	}
 
+	if (!test_GetObjectParameterivAPPLE(objectType, name, GL_TRUE)) {
+		fprintf(stderr,
+			"Object marked purgeable is not set to purgeable\n");
+		pass = GL_FALSE;
+	}
+
 	return pass;
 }
 
@@ -129,6 +135,12 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 			pass = GL_FALSE;
 		}
 		break;
+	}
+
+	if (!test_GetObjectParameterivAPPLE(objectType, name, GL_FALSE)) {
+		fprintf(stderr, "Object marked unpurgeable is not set to "
+			"unpurgeable\n");
+		pass = GL_FALSE;
 	}
 
 	return pass;
@@ -172,19 +184,7 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
 		pass = GL_FALSE;
 	}
 
-	if (!test_GetObjectParameterivAPPLE(type, object, GL_TRUE)) {
-		fprintf(stderr,
-			"Object marked purgeable is not set to purgeable\n");
-		pass = GL_FALSE;
-	}
-
 	if (!test_ObjectunpurgeableAPPLE(type, object, GL_RETAINED_APPLE)) {
-		pass = GL_FALSE;
-	}
-
-	if (!test_GetObjectParameterivAPPLE(type, object, GL_FALSE)) {
-		fprintf(stderr, "Object marked unpurgeable is not set to "
-			"unpurgeable\n");
 		pass = GL_FALSE;
 	}
 
@@ -192,19 +192,7 @@ GLboolean test_Purgeable(GLuint object, GLenum type)
 		pass = GL_FALSE;
 	}
 
-	if (!test_GetObjectParameterivAPPLE(type, object, GL_TRUE)) {
-		fprintf(stderr,
-			"Object marked purgeable is not set to purgeable\n");
-		pass = GL_FALSE;
-	}
-
 	if (!test_ObjectunpurgeableAPPLE(type, object, GL_UNDEFINED_APPLE)) {
-		pass = GL_FALSE;
-	}
-
-	if (!test_GetObjectParameterivAPPLE(type, object, GL_FALSE)) {
-		fprintf(stderr, "Object marked unpurgeable is not set to "
-			"unpurgeable\n");
 		pass = GL_FALSE;
 	}
 
