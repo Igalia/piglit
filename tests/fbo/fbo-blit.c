@@ -143,8 +143,8 @@ piglit_display(void)
 
 	fb = make_fbo((PAD + SIZE) * 2, (PAD + SIZE) * 2);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fb);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, fbo_width, fbo_height);
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
 	glClearColor(1.0, 0.0, 1.0, 0.0);
@@ -156,8 +156,8 @@ piglit_display(void)
 	/* Now that we have correct samples, blit things around.
 	 * FB -> WIN
 	 */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 	glBlitFramebufferEXT(PAD, PAD,
 			     PAD + SIZE, PAD + SIZE,
 			     PAD, PAD * 2 + SIZE,
@@ -165,8 +165,8 @@ piglit_display(void)
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	/* WIN -> FB */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, fb);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
 	glBlitFramebufferEXT(PAD, PAD,
 			     PAD + SIZE, PAD + SIZE,
 			     PAD, PAD * 2 + SIZE,
@@ -174,15 +174,15 @@ piglit_display(void)
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	/* FB -> WIN back to verify WIN -> FB */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fb);
 	glBlitFramebufferEXT(PAD, PAD * 2 + SIZE,
 			     PAD + SIZE, (PAD * 2 + SIZE) + SIZE,
 			     PAD, PAD * 3 + SIZE * 2,
 			     PAD + SIZE, (PAD * 3 + SIZE * 2) + SIZE,
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	pass = verify_color_rect(PAD, PAD, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, PAD * 2 + SIZE, SIZE, SIZE) && pass;
