@@ -200,4 +200,5 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_EXT_framebuffer_blit");
+	piglit_require_extension("GL_ARB_texture_non_power_of_two");
 }
