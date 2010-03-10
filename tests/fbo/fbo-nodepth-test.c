@@ -33,8 +33,8 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 100;
-int piglit_height = 100;
+int piglit_width = 128;
+int piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 enum piglit_result
