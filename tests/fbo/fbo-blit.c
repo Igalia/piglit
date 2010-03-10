@@ -40,6 +40,10 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 #define PAD 10
 #define SIZE 20
 
+/* size of texture/renderbuffer (power of two) */
+#define FBO_SIZE 64
+
+
 static GLuint
 make_fbo(int w, int h)
 {
@@ -128,9 +132,9 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	GLuint fb;
-	int fbo_width = PAD * 2 + SIZE;
-	int fbo_height = PAD * 3 + SIZE * 2;
+	GLuint fbo;
+	int fbo_width = FBO_SIZE;
+	int fbo_height = FBO_SIZE;
 	int x0 = PAD;
 	int y0 = PAD;
 	int y1 = PAD * 2 + SIZE;
@@ -145,9 +149,9 @@ piglit_display(void)
 	/* Draw the color rect in the window system window */
 	draw_color_rect(x0, y0, SIZE, SIZE);
 
-	fb = make_fbo((PAD + SIZE) * 2, (PAD + SIZE) * 2);
+	fbo = make_fbo(fbo_width, fbo_height);
 
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fb);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, fbo_width, fbo_height);
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
@@ -158,18 +162,18 @@ piglit_display(void)
 	draw_color_rect(x0, y0, SIZE, SIZE);
 
 	/* Now that we have correct samples, blit things around.
-	 * FB(bottom) -> WIN(middle)
+	 * FBO(bottom) -> WIN(middle)
 	 */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fb);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fbo);
 	glBlitFramebufferEXT(x0, y0,
 			     x0 + SIZE, y0 + SIZE,
 			     x0, y1,
 			     x0 + SIZE, y1 + SIZE,
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	/* WIN -> FB */
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fb);
+	/* WIN -> FBO */
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
 	glBlitFramebufferEXT(PAD, PAD,
 			     PAD + SIZE, PAD + SIZE,
@@ -177,9 +181,9 @@ piglit_display(void)
 			     PAD + SIZE, (PAD * 2 + SIZE) + SIZE,
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	/* FB(middle) -> WIN(top) back to verify WIN -> FB */
+	/* FBO(middle) -> WIN(top) back to verify WIN -> FBO */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fb);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fbo);
 	glBlitFramebufferEXT(x0, y1,
 			     x0 + SIZE, y1 + SIZE,
 			     x0, y2,
