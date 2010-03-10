@@ -36,8 +36,8 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 100;
-int piglit_height = 100;
+int piglit_width = 150;
+int piglit_height = 150;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 #define PAD 10
 #define SIZE 20
@@ -60,7 +60,7 @@ method_name(enum copy_method method)
 	case COPY_PIXELS:
 		return "glCopyPixels";
 	case READ_DRAW_PIXELS:
-		return "glReadPixels + glCopyPixels";
+		return "glReadPixels + glDrawPixels";
 	case BLIT_PIXELS:
 		return "glBlitFramebuffer";
 	default:
@@ -233,7 +233,7 @@ run_test(enum copy_method method)
  	     x0, y1, x0 + SIZE, y1 + SIZE,
  	     method);
 
-	/* WIN -> FBO */
+	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
@@ -269,10 +269,8 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
-#if 0 /* enable after fixing some Mesa bugs */
 	pass = pass && run_test(COPY_PIXELS);
 	pass = pass && run_test(READ_DRAW_PIXELS);
-#endif
 	pass = pass && run_test(BLIT_PIXELS);
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
