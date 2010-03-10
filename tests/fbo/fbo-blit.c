@@ -227,8 +227,8 @@ run_test(enum copy_method method)
 	/* Now that we have correct samples, blit things around.
 	 * FBO(bottom) -> WIN(middle)
 	 */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fbo);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
  	     x0, y1, x0 + SIZE, y1 + SIZE,
  	     method);
@@ -241,14 +241,14 @@ run_test(enum copy_method method)
  	     method);
 
 	/* FBO(middle) -> WIN(top) back to verify WIN -> FBO */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER_EXT, fbo);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y1, x0 + SIZE, y1 + SIZE,
  	     x0, y2, x0 + SIZE, y2 + SIZE,
  	     method);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	pass = verify_color_rect(PAD, y0, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;
