@@ -31,7 +31,7 @@
  * FBO objects.  Because FBOs are generally stored inverted relative to
  * window system frambuffers, this could catch flipping failures in blit paths.
  *
- * Brian added testing of glCopy/Read/DrawPixels().
+ * See also fbo-readdrawpix.c and fbo-copypix.c
  */
 
 #include "piglit-util.h"
@@ -45,30 +45,6 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 /* size of texture/renderbuffer (power of two) */
 #define FBO_SIZE 64
 
-
-enum copy_method {
-	COPY_PIXELS,
-	READ_DRAW_PIXELS,
-	BLIT_PIXELS
-};
-
-
-static const char *
-method_name(enum copy_method method)
-{
-	switch (method) {
-	case COPY_PIXELS:
-		return "glCopyPixels";
-	case READ_DRAW_PIXELS:
-		return "glReadPixels + glDrawPixels";
-	case BLIT_PIXELS:
-		return "glBlitFramebuffer";
-	default:
-		assert(0 && "bad copy method");
-		return NULL;
-	}
-}
-			
 
 static GLuint
 make_fbo(int w, int h)
@@ -157,42 +133,16 @@ verify_color_rect(int start_x, int start_y, int w, int h)
 
 static void
 copy(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
-     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
-     enum copy_method method)
+     GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1)
 {
-	if (method == COPY_PIXELS) {
-		GLsizei srcW = srcX1 - srcX0, srcH = srcY1 - srcY0;
-		GLsizei dstW = dstX1 - dstX0, dstH = dstY1 - dstY0;
-		glPixelZoom((float) dstW / (float) srcW,
-			    (float) dstH / (float) srcH);
-		glWindowPos2i(dstX0, dstY0);
-		glCopyPixels(srcX0, srcY0, srcW, srcH, GL_COLOR);
-	}
-	else if (method == READ_DRAW_PIXELS) {
-		GLsizei srcW = srcX1 - srcX0, srcH = srcY1 - srcY0;
-		GLsizei dstW = dstX1 - dstX0, dstH = dstY1 - dstY0;
-		void *buf = malloc(srcW * srcH * 4);
-		glReadPixels(srcX0, srcY0, srcW, srcH,
-			     GL_RGBA, GL_UNSIGNED_BYTE, buf);
-		glPixelZoom((float) dstW / (float) srcW,
-			    (float) dstH / (float) srcH);
-		glWindowPos2i(dstX0, dstY0);
-		glDrawPixels(srcW, srcH, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-		free(buf);
-	}
-	else if (method == BLIT_PIXELS) {
-		glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1,
-				     dstX0, dstY0, dstX1, dstY1,
-				     GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	}
-	else {
-		assert(0 && "invalid copy method");
-	}
+	glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1,
+			     dstX0, dstY0, dstX1, dstY1,
+			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 
 static GLboolean
-run_test(enum copy_method method)
+run_test(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLuint fbo;
@@ -230,22 +180,19 @@ run_test(enum copy_method method)
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
- 	     x0, y1, x0 + SIZE, y1 + SIZE,
- 	     method);
+ 	     x0, y1, x0 + SIZE, y1 + SIZE);
 
 	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
- 	     x0, y1, x0 + SIZE, y1 + SIZE,
- 	     method);
+ 	     x0, y1, x0 + SIZE, y1 + SIZE);
 
 	/* FBO(middle) -> WIN(top) back to verify WIN -> FBO */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y1, x0 + SIZE, y1 + SIZE,
- 	     x0, y2, x0 + SIZE, y2 + SIZE,
- 	     method);
+ 	     x0, y2, x0 + SIZE, y2 + SIZE);
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -253,10 +200,6 @@ run_test(enum copy_method method)
 	pass = verify_color_rect(PAD, y0, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y2, SIZE, SIZE) && pass;
-
-	if (!pass) {
-		printf("fbo-blit: failure for %s\n", method_name(method));
-	}
 
 	glutSwapBuffers();
 
@@ -267,11 +210,7 @@ run_test(enum copy_method method)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;
-
-	pass = pass && run_test(COPY_PIXELS);
-	pass = pass && run_test(READ_DRAW_PIXELS);
-	pass = pass && run_test(BLIT_PIXELS);
+	GLboolean pass = run_test();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
