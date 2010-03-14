@@ -37,7 +37,7 @@ void main()
 	 * Making colour vec4 and doing vec4 multiplication also causes the
 	 * shader to work.
 	 */
-	if (args.a != 0) {
+	if (args.a != 0.0) {
 		colour *= secondary.rgb;
 	}
 
