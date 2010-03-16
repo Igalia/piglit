@@ -27,7 +27,7 @@
 
 /** @file scissor-copypixels.c
  *
- * Tests that glScissor properly affects glCopyPixels().
+ * Tests that glScissor properly affects glClear(GL_DEPTH_BUFFER_BIT).
  */
 
 #include "piglit-util.h"
