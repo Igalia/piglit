@@ -36,8 +36,8 @@
 
 #include "piglit-util.h"
 
-#define BUF_WIDTH 32
-#define BUF_HEIGHT 32
+#define BUF_WIDTH 8
+#define BUF_HEIGHT 8
 int piglit_width = 50;
 int piglit_height = 50;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
