@@ -22,6 +22,7 @@ link_libraries (
 add_executable (array-texture array-texture.c)
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (cubemap cubemap.c)
+add_executable (depth-level-clamp depth-level-clamp.c)
 add_executable (gen-compressed-teximage gen-compressed-teximage.c)
 add_executable (gen-nonzero-unit gen-nonzero-unit.c)
 add_executable (gen-teximage gen-teximage.c)
