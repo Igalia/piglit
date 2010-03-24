@@ -1,0 +1,120 @@
+/*
+ * Copyright © 2010 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * Authors:
+ *    Eric Anholt <eric@anholt.net>
+ *
+ */
+
+/** @file glsl-orangebook-ch06-bump.c
+ *
+ * Tests that the Orange Book's chapter 6 shader for procedural bumpmapping
+ * works correctly.
+ */
+
+#include "piglit-util.h"
+
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+static int bump_density_location, bump_size_location;
+static int specular_factor_location, surface_color_location;
+static int light_position_location, tangent_attrib;
+static GLint prog;
+
+enum piglit_result
+piglit_display(void)
+{
+	GLboolean pass = GL_TRUE;
+	static const float surface_color[3] = {0.7, 0.6, 0.18};
+	static const float specular_highlight[3] = {1.0, 1.0, 0.674};
+	static const float bump_dark[3] = {0.662, 0.568, 0.168};
+	static const float bump_light[3] = {0.937, 0.839, 0.443};
+	float light_position[3] = {0.0, 0.0, 1.0};
+	float w = piglit_width;
+	float h = piglit_height;
+	float bump_x = w * 7 / 8;
+	float bump_y = h * 7 / 8;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	glClearColor(0.5, 0.5, 0.5, 0.5);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUniform1f(bump_density_location, 4);
+	glUniform1f(bump_size_location, 0.15);
+	glUniform1f(specular_factor_location, 0.5);
+	glUniform3fv(surface_color_location, 1, surface_color);
+	glUniform3fv(light_position_location, 1, light_position);
+
+	glTranslatef(0, 0, -0.5);
+	glNormal3f(0.0, 0.0, 1.0);
+	glVertexAttrib3f(tangent_attrib, 1.0, 0.0, 0.0);
+	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height,
+			     0, 0, 1, 1);
+
+	/* Corners of the image: A fully-specular point, and a fully-non-specular point. */
+	pass &= piglit_probe_pixel_rgb(0, 0, specular_highlight);
+	pass &= piglit_probe_pixel_rgb(piglit_width - 1, piglit_height - 1, surface_color);
+
+	/* Look at the top right bump -- does it have a lit part and an unlit part? */
+	pass &= piglit_probe_pixel_rgb(bump_x + w / 16, bump_y + h / 16, bump_dark);
+	pass &= piglit_probe_pixel_rgb(bump_x - w / 16, bump_y - h / 16, bump_light);
+
+	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	GLint vs, fs;
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	vs = piglit_compile_shader(GL_VERTEX_SHADER,
+				   "shaders/glsl-orangebook-ch06-bump.vert");
+	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
+				   "shaders/glsl-orangebook-ch06-bump.frag");
+
+	prog = piglit_link_simple_program(vs, fs);
+
+	glUseProgram(prog);
+
+	bump_density_location = glGetUniformLocation(prog, "BumpDensity");
+	bump_size_location = glGetUniformLocation(prog, "BumpSize");
+	specular_factor_location = glGetUniformLocation(prog, "SpecularFactor");
+	surface_color_location = glGetUniformLocation(prog, "SurfaceColor");
+	light_position_location = glGetUniformLocation(prog, "LightPosition");
+	assert(bump_density_location != -1);
+	assert(bump_size_location != -1);
+	assert(specular_factor_location != -1);
+	assert(surface_color_location != -1);
+	assert(light_position_location != -1);
+
+	tangent_attrib = glGetAttribLocation(prog, "Tangent");
+	assert(tangent_attrib != -1);
+}
