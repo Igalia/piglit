@@ -1,4 +1,4 @@
-add_definitions ( -DSOURCE_DIR="\\\"${piglit_SOURCE_DIR}/\\\"" )
+add_definitions ( -DSOURCE_DIR="${piglit_SOURCE_DIR}/" )
 
 include_directories(
 	${OPENGL_INCLUDE_PATH}
