@@ -60,6 +60,7 @@ static GLfloat colors[NUM_COLORS][3] = {
 
 
 static const char *frag_shader_2d_array_text =
+   "#extension GL_EXT_texture_array : enable \n"
    "uniform sampler2DArray tex; \n"
    "void main() \n"
    "{ \n"
@@ -71,6 +72,7 @@ static GLuint program_2d_array;
 
 
 static const char *frag_shader_1d_array_text =
+   "#extension GL_EXT_texture_array : enable \n"
    "uniform sampler1DArray tex; \n"
    "void main() \n"
    "{ \n"
