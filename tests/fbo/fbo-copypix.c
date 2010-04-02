@@ -153,6 +153,7 @@ run_test(void)
 	int y1 = PAD * 2 + SIZE;
 	int y2 = PAD * 3 + SIZE * 2;
 
+	glDisable(GL_DITHER);
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
