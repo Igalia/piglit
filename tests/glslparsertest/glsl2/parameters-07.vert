@@ -1,4 +1,4 @@
-/* FAIL - cannot have multipl void parameters
+/* FAIL - cannot have multiple void parameters
  */
 float a(void, void);
 
