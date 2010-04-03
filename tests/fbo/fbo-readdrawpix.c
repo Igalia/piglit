@@ -223,6 +223,11 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	if (!GLEW_VERSION_1_4) {
+		printf("Requires OpenGL 1.4\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
