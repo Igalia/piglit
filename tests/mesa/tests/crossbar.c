@@ -117,7 +117,7 @@ static int DoTest( void )
    GLfloat dr, dg, db;
    GLfloat dmax;
 
-   glReadBuffer( GL_FRONT );
+   glReadBuffer( GL_BACK );
 
    dmax = 0;
    for( i = 0; i <= NUM_TESTS; ++i ) {
