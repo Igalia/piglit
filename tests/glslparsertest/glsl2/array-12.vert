@@ -1,5 +1,7 @@
 #version 120
-/* FAIL - array must have an implicit or explicit size */
+/* PASS
+ * The array is implicitly sized by the whole-array assignment.
+ */
 
 void main()
 {
