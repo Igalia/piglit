@@ -89,3 +89,5 @@ add_executable (glsl-preprocessor-comments glsl-preprocessor-comments.c)
 add_executable (vp-ignore-input vp-ignore-input.c)
 add_executable (glsl-empty-vs-no-fs glsl-empty-vs-no-fs.c)
 add_executable (glsl-useprogram-displaylist glsl-useprogram-displaylist.c)
+add_executable (glsl-routing glsl-routing.c)
+
