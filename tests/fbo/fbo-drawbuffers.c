@@ -90,7 +90,7 @@ piglit_display(void)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	/* Clear to black */
+	/* Clear render targets (textures) to red */
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
