@@ -55,7 +55,6 @@ piglit_display(void)
    GLuint prog;
    GLuint vs, fs;
    GLboolean pass = GL_TRUE;
-   int test;
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 

@@ -278,7 +278,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	int i;
-
 	piglit_require_extension("GL_ARB_texture_cube_map");
 }
