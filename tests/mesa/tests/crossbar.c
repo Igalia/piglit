@@ -107,7 +107,6 @@ static void DoFrame( void )
 
    glPopMatrix();
 
-   glutSwapBuffers();
 }
 
 static int DoTest( void )
@@ -147,12 +146,14 @@ static void Display( void )
 {
    if (Interactive) {
       DoFrame();
+      glutSwapBuffers();
    } else {
       int success, retry;
 
       printf("\nFirst frame\n-----------\n");
       DoFrame();
       success = DoTest();
+      glutSwapBuffers();
 
       printf("\nSecond frame\n------------\n");
       glMatrixMode( GL_PROJECTION );
@@ -163,6 +164,7 @@ static void Display( void )
 
       DoFrame();
       retry = DoTest();
+      glutSwapBuffers();
 
       if (retry && success) {
          printf("\nPIGLIT: { 'result': 'pass' }\n");
