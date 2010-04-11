@@ -151,7 +151,7 @@ piglit_display()
 	int center_y_start = (piglit_height - fdo_bitmap_height) / 2;
 	int start_x, start_y;
 	struct probes probes;
-	GLboolean pass;
+	GLboolean pass = GL_TRUE;
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	memset(&probes, 0, sizeof(probes));
