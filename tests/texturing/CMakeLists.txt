@@ -49,4 +49,5 @@ add_executable (tex-swizzle tex-swizzle.c)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (tfp tfp.c)
+	target_link_libraries(tfp X11)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
