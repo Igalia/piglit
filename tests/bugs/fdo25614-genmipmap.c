@@ -57,6 +57,11 @@ piglit_init(int argc, char **argv)
 {
 	GLint alpha_bits;
 
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	loadTex();
 
 	glGetIntegerv(GL_ALPHA_BITS, &alpha_bits);
