@@ -438,6 +438,11 @@ main(int argc, char *argv[])
 
    glewInit();
 
+   if (!GLEW_VERSION_1_3) {
+	   printf("Requires OpenGL 1.3\n");
+	   piglit_report_result(PIGLIT_SKIP);
+   }
+
    glutReshapeFunc(reshape);
    glutDisplayFunc(redisplay);
    if (!Automatic) {
