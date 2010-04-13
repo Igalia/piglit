@@ -76,6 +76,7 @@ extern const unsigned int fdo_bitmap_height;
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
+void piglit_require_not_extension(const char *name);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
 int piglit_probe_texel_rgb(int target, int level, int x, int y,

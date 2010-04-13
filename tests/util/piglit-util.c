@@ -140,6 +140,14 @@ void piglit_require_extension(const char *name)
 	}
 }
 
+void piglit_require_not_extension(const char *name)
+{
+	if (glutExtensionSupported(name)) {
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}
+
 /**
  * Read a pixel from the given location and compare its RGBA value to the
  * given expected values.
