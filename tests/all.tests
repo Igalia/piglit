@@ -612,6 +612,14 @@ add_otherglslparsertest('glsl2/gst-gl-vconv9.vert', 'pass')
 add_otherglslparsertest('glsl2/norsetto-bumptbn_sh_fp.frag', 'pass')
 add_otherglslparsertest('glsl2/norsetto-bumptbn_sh_fp.vert', 'pass')
 
+# All the xreal shaders should pass.
+add_otherglslparsertest('glsl2/xreal-lighting-db-omni.frag', 'pass')
+add_otherglslparsertest('glsl2/xreal-lighting-db-omni.vert', 'pass')
+add_otherglslparsertest('glsl2/xreal-lighting-dbs-omni.frag', 'pass')
+add_otherglslparsertest('glsl2/xreal-lighting-dbs-omni.vert', 'pass')
+add_otherglslparsertest('glsl2/xreal-lighting-d-omni.frag', 'pass')
+add_otherglslparsertest('glsl2/xreal-lighting-d-omni.vert', 'pass')
+
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
 	asmparsertest[group + '/' + shader] = PlainExecTest(['asmparsertest', '-auto', group, 'tests/asmparsertest/shaders/' + group + '/' + shader])
