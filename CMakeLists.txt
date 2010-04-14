@@ -26,3 +26,10 @@ set(EXECUTABLE_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 
 add_subdirectory (tests)
+
+check_function_exists(strchrnul HAVE_STRCHRNUL)
+
+configure_file(
+	"${piglit_SOURCE_DIR}/tests/util/config.h.in"
+	"${piglit_SOURCE_DIR}/tests/util/config.h"
+)

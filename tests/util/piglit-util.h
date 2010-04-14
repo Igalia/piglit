@@ -21,6 +21,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "config.h"
+
 #if defined(_MSC_VER)
 #include <windows.h>
 
@@ -130,3 +132,7 @@ extern const GLenum cube_face_targets[6];
  * must be called before using this program handle.
  */
 extern GLint piglit_ARBfp_pass_through;
+
+#ifndef HAVE_STRCHRNUL
+char *strchrnul(const char *s, int c);
+#endif

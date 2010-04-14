@@ -709,3 +709,13 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
 
 	return tex;
 }
+
+
+#ifndef HAVE_STRCHRNUL
+char *strchrnul(const char *s, int c)
+{
+	char *t = strchr(s, c);
+
+	return (t == NULL) ? (s + strlen(s)) : t;
+}
+#endif
