@@ -12,11 +12,8 @@ void main()
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
 
-[fragment shader]
-void main()
-{
-	gl_FragColor = gl_Color;
-}
+[fragment shader file]
+glsl-color.frag
 
 [test]
 ortho

@@ -2,11 +2,8 @@
 GL >= 2.0
 GLSL >= 1.10
 
-[vertex shader]
-void main()
-{
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-}
+[vertex shader file]
+glsl-mvp.vert
 
 [fragment shader]
 uniform vec4 args1, args2;
