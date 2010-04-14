@@ -432,11 +432,17 @@ piglit_compile_shader(GLenum target, char *filename)
 	return prog;
 }
 
-static GLuint
-compile_shader(GLuint prog, GLenum target)
+/**
+ * Convenience function to compile a GLSL shader.
+ */
+GLuint
+piglit_compile_shader_text(GLenum target, const char *text)
 {
-	GLenum ok;
+	GLuint prog;
+	GLint ok;
 
+	prog = glCreateShader(target);
+	glShaderSource(prog, 1, (const GLchar **) &text, NULL);
 	glCompileShader(prog);
 
 	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
@@ -465,35 +471,6 @@ compile_shader(GLuint prog, GLenum target)
 	}
 
 	return prog;
-}
-
-/**
- * Convenience function to compile a GLSL shader.
- */
-GLuint
-piglit_compile_shader_text_with_length(GLenum target, const char *text,
-				       GLint length)
-{
-	GLuint prog;
-
-	prog = glCreateShader(target);
-	glShaderSource(prog, 1, (const GLchar **) &text, &length);
-
-	return compile_shader(prog, target);
-}
-
-/**
- * Convenience function to compile a GLSL shader.
- */
-GLuint
-piglit_compile_shader_text(GLenum target, const char *text)
-{
-	GLuint prog;
-
-	prog = glCreateShader(target);
-	glShaderSource(prog, 1, (const GLchar **) &text, NULL);
-
-	return compile_shader(prog, target);
 }
 
 GLint piglit_link_simple_program(GLint vs, GLint fs)

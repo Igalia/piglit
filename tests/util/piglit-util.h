@@ -91,8 +91,6 @@ void piglit_require_vertex_program(void);
 GLuint piglit_compile_program(GLenum target, const char* text);
 GLuint piglit_compile_shader(GLenum target, char *filename);
 GLuint piglit_compile_shader_text(GLenum target, const char *text);
-GLuint piglit_compile_shader_text_with_length(GLenum target, const char *text,
-					      GLint length);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
