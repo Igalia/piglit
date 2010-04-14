@@ -33,9 +33,9 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static float gl_version = 0.0;
 static float glsl_version = 0.0;
 
+const char *path = NULL;
 const char *test_start = NULL;
 
-const char *shader_start;
 GLuint vertex_shaders[256];
 unsigned num_vertex_shaders = 0;
 GLuint geometry_shaders[256];
@@ -43,14 +43,27 @@ unsigned num_geometry_shaders = 0;
 GLuint fragment_shaders[256];
 unsigned num_fragment_shaders = 0;
 
+/**
+ * List of strings loaded from files
+ *
+ * Some test script sections, such as "[vertex shader file]", can supply shader
+ * source code from multiple disk files.  This array stores those strings.
+ */
+char *shader_strings[256];
+GLsizei shader_string_sizes[256];
+unsigned num_shader_strings = 0;
+
 enum states {
 	none = 0,
 	requirements,
 	vertex_shader,
+	vertex_shader_file,
 	vertex_program,
 	geometry_shader,
+	geometry_shader_file,
 	geometry_program,
 	fragment_shader,
+	fragment_shader_file,
 	fragment_program,
 	test,
 };
@@ -64,6 +77,59 @@ enum comparison {
 	greater,
 	less_equal
 };
+
+
+void
+compile_glsl(GLenum target, bool release_text)
+{
+	GLuint shader = glCreateShader(target);
+	GLint ok;
+	unsigned i;
+
+	glShaderSource(shader, num_shader_strings,
+		       (const GLchar **) shader_strings, shader_string_sizes);
+
+	glCompileShader(shader);
+
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+
+	if (!ok) {
+		GLchar *info;
+		GLint size;
+
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetShaderInfoLog(shader, size, NULL, info);
+
+		fprintf(stderr, "Failed to compile %s: %s\n",
+			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
+			info);
+
+		free(info);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+
+	if (release_text) {
+		for (i = 0; i < num_shader_strings; i++)
+			free(shader_strings[i]);
+	}
+
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		vertex_shaders[num_vertex_shaders] = shader;
+		num_vertex_shaders++;
+		break;
+	case GL_GEOMETRY_SHADER_ARB:
+		geometry_shaders[num_geometry_shaders] = shader;
+		num_geometry_shaders++;
+		break;
+	case GL_FRAGMENT_SHADER:
+		fragment_shaders[num_fragment_shaders] = shader;
+		num_fragment_shaders++;
+		break;
+	}
+}
 
 
 /**
@@ -128,6 +194,38 @@ comparison_string(enum comparison cmp)
 	}
 
 	assert(!"Should not get here.");
+}
+
+
+void
+load_shader_file(const char *line)
+{
+	GLsizei *const size = &shader_string_sizes[num_shader_strings];
+	char buf[256];
+	char *text;
+
+	strcpy_to_space(buf, line);
+
+	text = piglit_load_text_file(buf, (unsigned *) size);
+	if ((text == NULL) && (path != NULL)) {
+		const size_t len = strlen(path);
+
+		memcpy(buf, path, len);
+		buf[len] = '/';
+		strcpy_to_space(&buf[len + 1], line);
+
+		text = piglit_load_text_file(buf, (unsigned *) size);
+	}
+
+	if (text == NULL) {
+		strcpy_to_space(buf, line);
+
+		printf("could not load file \"%s\"\n", buf);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+
+	shader_strings[num_shader_strings] = text;
+	num_shader_strings++;
 }
 
 
@@ -247,8 +345,6 @@ process_requirement(const char *line)
 void
 leave_state(enum states state, const char *line)
 {
-	GLuint shader;
-
 	switch (state) {
 	case none:
 		break;
@@ -257,11 +353,13 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case vertex_shader:
-		shader = piglit_compile_shader_text_with_length(GL_VERTEX_SHADER,
-								shader_start,
-								line - shader_start);
-		vertex_shaders[num_vertex_shaders] = shader;
-		num_vertex_shaders++;
+		shader_string_sizes[0] = line - shader_strings[0];
+		num_shader_strings = 1;
+		compile_glsl(GL_VERTEX_SHADER, false);
+		break;
+
+	case vertex_shader_file:
+		compile_glsl(GL_VERTEX_SHADER, true);
 		break;
 
 	case vertex_program:
@@ -274,11 +372,13 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case fragment_shader:
-		shader = piglit_compile_shader_text_with_length(GL_FRAGMENT_SHADER,
-								shader_start,
-								line - shader_start);
-		fragment_shaders[num_fragment_shaders] = shader;
-		num_fragment_shaders++;
+		shader_string_sizes[0] = line - shader_strings[0];
+		num_shader_strings = 1;
+		compile_glsl(GL_FRAGMENT_SHADER, false);
+		break;
+
+	case fragment_shader_file:
+		compile_glsl(GL_FRAGMENT_SHADER, true);
 		break;
 
 	case fragment_program:
@@ -286,6 +386,9 @@ leave_state(enum states state, const char *line)
 
 	case test:
 		break;
+
+	default:
+		assert(!"Not yet supported.");
 	}
 }
 
@@ -350,10 +453,18 @@ process_test_script(const char *script_name)
 				state = requirements;
 			} else if (strncmp(line, "[vertex shader]", 15) == 0) {
 				state = vertex_shader;
-				shader_start = NULL;
+				shader_strings[0] = NULL;
+			} else if (strncmp(line, "[vertex shader file]", 20) == 0) {
+				state = vertex_shader_file;
+				shader_strings[0] = NULL;
+				num_shader_strings = 0;
 			} else if (strncmp(line, "[fragment shader]", 17) == 0) {
 				state = fragment_shader;
-				shader_start = NULL;
+				shader_strings[0] = NULL;
+			} else if (strncmp(line, "[fragment shader file]", 22) == 0) {
+				state = fragment_shader_file;
+				shader_strings[0] = NULL;
+				num_shader_strings = 0;
 			} else if (strncmp(line, "[test]", 6) == 0) {
 				test_start = strchrnul(line, '\n');
 				if (test_start[0] != '\0')
@@ -375,8 +486,16 @@ process_test_script(const char *script_name)
 			case geometry_program:
 			case fragment_shader:
 			case fragment_program:
-				if (shader_start == NULL)
-					shader_start = line;
+				if (shader_strings[0] == NULL)
+					shader_strings[0] = (char *) line;
+				break;
+
+			case vertex_shader_file:
+			case geometry_shader_file:
+			case fragment_shader_file:
+				line = eat_whitespace(line);
+				if ((line[0] != '\n') && (line[0] != '#'))
+				    load_shader_file(line);
 				break;
 
 			case test:
@@ -500,6 +619,9 @@ piglit_init(int argc, char **argv)
 		glGetString(GL_SHADING_LANGUAGE_VERSION);
 	glsl_version = (glsl_version_string == NULL)
 		? 0.0 : strtof(glsl_version_string, NULL);
+
+	if (argc > 2)
+		path = argv[2];
 
 	process_test_script(argv[1]);
 	link_and_use_shaders();
