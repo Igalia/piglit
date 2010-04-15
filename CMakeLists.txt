@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE (CheckCCompilerFlag)
+INCLUDE (CheckIncludeFile)
 
 project (piglit)
 
@@ -28,6 +29,12 @@ set(LIBRARY_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 add_subdirectory (tests)
 
 check_function_exists(strchrnul HAVE_STRCHRNUL)
+check_function_exists(fopen_s   HAVE_FOPEN_S)
+
+check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(sys/stat.h  HAVE_SYS_STAT_H)
+check_include_file(unistd.h    HAVE_UNISTD_H)
+check_include_file(fcntl.h     HAVE_FCNTL_H)
 
 configure_file(
 	"${piglit_SOURCE_DIR}/tests/util/config.h.in"
