@@ -1,0 +1,21 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 color;
+void main()
+{
+	gl_FragColor = color - 0.0;
+}
+
+[test]
+uniform vec4 color 0.0 1.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
