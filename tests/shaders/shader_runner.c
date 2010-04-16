@@ -160,6 +160,19 @@ eat_whitespace(const char *src)
 
 
 /**
+ * Skip over non-whitespace upto the end of line
+ */
+const char *
+eat_text(const char *src)
+{
+	while (!isspace(*src) && (*src != '\0'))
+		src++;
+
+	return src;
+}
+
+
+/**
  * Compare two values given a specified comparison operator
  */
 bool
@@ -529,8 +542,12 @@ set_uniform(const char *line)
 	float f[16];
 	GLuint prog;
 	GLint loc;
+	const char *type;
 
 	glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+
+	type = eat_whitespace(line);
+	line = eat_text(type);
 
 	line = strcpy_to_space(name, eat_whitespace(line));
 	loc = glGetUniformLocation(prog, name);
@@ -540,9 +557,8 @@ set_uniform(const char *line)
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 
-	line = eat_whitespace(line);
-	if (strncmp("vec4", line, 4) == 0) {
-		get_floats(line + 4, f, 4);
+	if (strncmp("vec4", type, 4) == 0) {
+		get_floats(line, f, 4);
 		glUniform4fv(loc, 1, f);
 	}
 }
