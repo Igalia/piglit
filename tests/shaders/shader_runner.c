@@ -557,10 +557,32 @@ set_uniform(const char *line)
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 
-	if (strncmp("vec4", type, 4) == 0) {
-		get_floats(line, f, 4);
-		glUniform4fv(loc, 1, f);
+	if (strncmp("float", type, 5) == 0) {
+		get_floats(line, f, 1);
+		glUniform1fv(loc, 1, f);
+		return;
+	} else if (strncmp("vec", type, 3) == 0) {
+		switch (type[3]) {
+		case '2':
+			get_floats(line, f, 2);
+			glUniform2fv(loc, 1, f);
+			return;
+		case '3':
+			get_floats(line, f, 3);
+			glUniform3fv(loc, 1, f);
+			return;
+		case '4':
+			get_floats(line, f, 4);
+			glUniform4fv(loc, 1, f);
+			return;
+		}
 	}
+
+	strcpy_to_space(name, type);
+	printf("unknown uniform type \"%s\"", name);
+	piglit_report_result(PIGLIT_FAILURE);
+
+	return;
 }
 
 
