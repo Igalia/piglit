@@ -129,6 +129,12 @@ add_plain_test(general, 'windowoverlap')
 add_plain_test(general, 'sync_api')
 
 shaders = Group()
+def add_shader_generic(group, name):
+	path = testBinDir + '../tests/shaders/'
+	group[name] = PlainExecTest(['shader_runner', '-auto',
+				     path + name + '.shader_test',
+				     path])
+
 add_plain_test(shaders, 'ati-fs-bad-delete')
 add_plain_test(shaders, 'trinity-fp1')
 add_plain_test(shaders, 'fp-abs-01')
@@ -158,7 +164,7 @@ add_plain_test(shaders, 'glsl-unused-varying')
 add_plain_test(shaders, 'glsl-fs-bug25902')
 add_plain_test(shaders, 'glsl-fs-exp2')
 add_plain_test(shaders, 'glsl-fs-fragcoord')
-add_plain_test(shaders, 'glsl-fs-log2')
+add_shader_generic(shaders, 'glsl-fs-log2')
 add_plain_test(shaders, 'glsl-fs-loop')
 add_plain_test(shaders, 'glsl-fs-loop-nested')
 add_plain_test(shaders, 'glsl-fs-mix')
@@ -170,7 +176,7 @@ add_plain_test(shaders, 'glsl-orangebook-ch06-bump')
 add_plain_test(shaders, 'glsl-routing')
 add_plain_test(shaders, 'glsl-vs-arrays')
 add_plain_test(shaders, 'glsl-vs-functions')
-add_plain_test(shaders, 'glsl-vs-if')
+add_shader_generic(shaders, 'glsl-vs-if')
 add_plain_test(shaders, 'glsl-vs-if-bool')
 add_plain_test(shaders, 'glsl-vs-loop')
 add_plain_test(shaders, 'glsl-vs-loop-nested')
