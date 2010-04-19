@@ -22,7 +22,13 @@
  */
 
 #define _GNU_SOURCE
+#if defined(_MSC_VER)
+#define bool BOOL
+#define true 1
+#define false 0
+#else
 #include <stdbool.h>
+#endif
 #include <string.h>
 #include <ctype.h>
 #include "piglit-util.h"
@@ -325,7 +331,7 @@ process_requirement(const char *line)
 
 		line = process_comparison(line, &cmp);
 
-		version = strtof(line, NULL);
+		version = strtod(line, NULL);
 		if (!compare(version, glsl_version, cmp)) {
 			printf("Test requires GLSL version %s %.1f.  "
 			       "Actual version is %.1f.\n",
@@ -342,7 +348,7 @@ process_requirement(const char *line)
 
 		line = process_comparison(line, &cmp);
 
-		version = strtof(line, NULL);
+		version = strtod(line, NULL);
 		if (!compare(version, gl_version, cmp)) {
 			printf("Test requires GL version %s %.1f.  "
 			       "Actual version is %.1f.\n",
@@ -531,7 +537,7 @@ get_floats(const char *line, float *f, unsigned count)
 	unsigned i;
 
 	for (i = 0; i < count; i++)
-		f[i] = strtof(line, (char **) &line);
+		f[i] = strtod(line, (char **) &line);
 }
 
 
@@ -651,12 +657,12 @@ piglit_init(int argc, char **argv)
 {
 	const char *glsl_version_string;
 
-	gl_version = strtof((char *) glGetString(GL_VERSION), NULL);
+	gl_version = strtod((char *) glGetString(GL_VERSION), NULL);
 
 	glsl_version_string = (char *)
 		glGetString(GL_SHADING_LANGUAGE_VERSION);
 	glsl_version = (glsl_version_string == NULL)
-		? 0.0 : strtof(glsl_version_string, NULL);
+		? 0.0 : strtod(glsl_version_string, NULL);
 
 	if (argc > 2)
 		path = argv[2];
