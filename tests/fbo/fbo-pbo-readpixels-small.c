@@ -139,7 +139,7 @@ piglit_display(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_TRUE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glEnable(GL_TEXTURE_2D);
