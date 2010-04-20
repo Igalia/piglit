@@ -107,7 +107,7 @@ draw_depth(int x, int y, int depth)
 	float depth_coord = (float)depth / (NUM_DEPTHS - 1);
 
 	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_TRUE);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
