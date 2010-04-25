@@ -15,6 +15,7 @@ vec4 color;
 float func()
 {
 	color = vec4(0.0, 1.0, 0.0, 0.0);
+	return 0.0;
 }
 
 void main()
