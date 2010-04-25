@@ -12,7 +12,7 @@ void main()
 uniform vec4 color;
 void main()
 {
-	gl_FragColor = vec4(0.0, pow(color.b, 2), 0.0, 0.0);
+	gl_FragColor = vec4(0.0, pow(color.b, 2.0), 0.0, 0.0);
 }
 
 [test]
