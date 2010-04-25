@@ -17,6 +17,7 @@ vec4 foo(in float x)
    v.y = x;
    v.z = x;
    v.w = x;
+   return v;
 }
 
 void main()
