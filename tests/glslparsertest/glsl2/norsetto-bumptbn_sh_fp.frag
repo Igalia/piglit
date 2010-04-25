@@ -46,7 +46,7 @@ void main()
 
 	offset.y += offset.x;
 	if ( offset.y > 1.1)
-		offset.y = 0;
+		offset.y = 0.0;
 
 	vec4 shadow = (	offset_lookup( shadowMap, gl_TexCoord[1], offset+vec2(-1.5,  0.5) ) +
 			offset_lookup( shadowMap, gl_TexCoord[1], offset+vec2( 0.5,  0.5) ) +
