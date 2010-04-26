@@ -1,0 +1,26 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+/* This shader was reported in bug #27216 to cause an assertion failure
+ * in Mesa's GLSL compiler. If the assignment or function call are removed,
+ * or the assignment moved out of the if, it succeeds.
+ */
+void main()
+{
+	float thing;
+
+	if ((thing = sqrt (5.0)) > 1.0)
+		gl_FragColor = vec4 (0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
