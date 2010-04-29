@@ -449,7 +449,17 @@ link_and_use_shaders(void)
 
 	err = glGetError();
 	if (err) {
+		GLchar *info;
+		GLint size;
+
 		printf("GL error after linking program: 0x%04x\n", err);
+
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetProgramInfoLog(prog, size, NULL, info);
+		fprintf(stderr, "Info log: %s\n", info);
+
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 }
