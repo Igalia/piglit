@@ -610,6 +610,7 @@ piglit_display(void)
 	line = test_start;
 	while (line[0] != '\0') {
 		float c[32];
+		int x, y;
 
 		line = eat_whitespace(line);
 
@@ -636,6 +637,24 @@ piglit_display(void)
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
 				pass = false;
+			}
+		} else if (strncmp("probe all rgba", line, 14) == 0) {
+			get_floats(line + 14, c, 4);
+			for (y = 0; y < piglit_height; y++ ) {
+				for (x = 0; x < piglit_width; x++) {
+					pass = pass &&
+						piglit_probe_pixel_rgba(x, y,
+									c);
+				}
+			}
+		} else if (strncmp("probe all rgb", line, 13) == 0) {
+			get_floats(line + 13, c, 3);
+			for (y = 0; y < piglit_height; y++ ) {
+				for (x = 0; x < piglit_width; x++) {
+					pass = pass &&
+						piglit_probe_pixel_rgb(x, y,
+								       c);
+				}
 			}
 		} else if (strncmp("uniform", line, 7) == 0) {
 			set_uniform(line + 7);
