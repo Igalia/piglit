@@ -23,7 +23,7 @@ vec4 x_adjust(vec4 pos)
 
 vec4 y_adjust(vec4 pos)
 {
-	vec4 x = x_adjust;
+	vec4 x = x_adjust(pos);
 
 	if (pos.y > 0.0)
 		return vec4(0.0, -0.5, 0.5, 0.0) + x;
