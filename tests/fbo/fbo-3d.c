@@ -28,7 +28,7 @@
 /** @file fbo-3d.c
  *
  * Tests that drawing to each depth of a 3D texture FBO and then drawing views
- * of those inidivual depths to the window system framebuffer succeeds.
+ * of those individual depths to the window system framebuffer succeeds.
  */
 
 #include "piglit-util.h"
@@ -62,6 +62,7 @@ create_3d_fbo(void)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_3D, tex);
 
+	/* allocate empty 3D texture */
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA,
 		     BUF_WIDTH, BUF_HEIGHT, pot_depth,
 		     0,
@@ -71,6 +72,7 @@ create_3d_fbo(void)
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
+	/* draw something into each slice of the 3D texture */
 	for (depth = 0; depth < NUM_DEPTHS; depth++) {
 		glFramebufferTexture3DEXT(GL_FRAMEBUFFER_EXT,
 					  GL_COLOR_ATTACHMENT0_EXT,
@@ -90,6 +92,7 @@ create_3d_fbo(void)
 		glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
 		piglit_ortho_projection(BUF_WIDTH, BUF_HEIGHT, GL_FALSE);
 
+		/* solid color quad */
 		glColor4fv(depth_color[depth]);
 		piglit_draw_rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
 	}
@@ -101,6 +104,9 @@ done:
 	return tex;
 }
 
+/* Draw a textured quad, sampling only the given depth/slice of the
+ * 3D texture.
+ */
 static void
 draw_depth(int x, int y, int depth)
 {
