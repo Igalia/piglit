@@ -79,12 +79,12 @@ static void DoFrame(void)
 	glBindTexture(GL_TEXTURE_2D, TexLookup);
 	glEnable(GL_TEXTURE_2D);
 
-	glMultiTexCoord2f(0, 0.0, 0.0);
-	glMultiTexCoord2f(1, 0.0, 0.0);
-	glMultiTexCoord2f(2, 0.0, 0.0);
-	glMultiTexCoord3f(3, 1.0, 0.05, 0.25);
-	glMultiTexCoord3f(4, 4, -3, 0);
-	glMultiTexCoord3f(5, 0, 3, 4);
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0, 0.0);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0, 0.0);
+	glMultiTexCoord2f(GL_TEXTURE2, 0.0, 0.0);
+	glMultiTexCoord3f(GL_TEXTURE3, 0.0, 0.05, 0.25);
+	glMultiTexCoord3f(GL_TEXTURE4, 4, -3, 0);
+	glMultiTexCoord3f(GL_TEXTURE5, 0, 3, 4);
 
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	for(i = 0; i < 3; ++i)
