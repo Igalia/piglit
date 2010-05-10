@@ -398,15 +398,22 @@ piglit_compile_shader(GLenum target, char *filename)
 	int err;
 	GLchar *prog_string;
 	FILE *f;
+	const char *source_dir;
 	char filename_with_path[FILENAME_MAX];
 
+	source_dir = getenv("PIGLIT_SOURCE_DIR");
+	if (source_dir == NULL) {
+		source_dir = SOURCE_DIR;
+	}
+
 	snprintf(filename_with_path, FILENAME_MAX - 1,
-		 "%stests/%s", SOURCE_DIR, filename);
+		 "%s/tests/%s", source_dir, filename);
 	filename_with_path[FILENAME_MAX - 1] = 0;
 
 	err = stat(filename_with_path, &st);
 	if (err == -1) {
 		fprintf(stderr, "Couldn't stat program %s: %s\n", filename, strerror(errno));
+		fprintf(stderr, "You can override the source dir by setting the PIGLIT_SOURCE_DIR environment variable.\n");
 		exit(1);
 	}
 
