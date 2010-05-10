@@ -422,8 +422,7 @@ link_and_use_shaders(void)
 	GLuint prog;
 	unsigned i;
 	GLenum err;
-
-
+	GLint ok;
 
 	if ((num_vertex_shaders == 0)
 	    && (num_fragment_shaders == 0)
@@ -445,6 +444,24 @@ link_and_use_shaders(void)
 	}
 
 	glLinkProgram(prog);
+
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	if (!ok) {
+		GLchar *info;
+		GLint size;
+
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		info = malloc(size);
+
+		glGetProgramInfoLog(prog, size, NULL, info);
+
+		fprintf(stderr, "Failed to link:\n%s\n",
+			info);
+
+		free(info);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+
 	glUseProgram(prog);
 
 	err = glGetError();
