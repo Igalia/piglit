@@ -1,0 +1,26 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform float n;
+void main()
+{
+	for (int i = 0; i < n; i++) {
+		gl_TexCoord[i] = vec4(0.5, 0.5, 0.5, 0.5) * i;
+	}
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform float index;
+void main()
+{
+	gl_FragColor = gl_TexCoord[index];
+}
+
+[test]
+uniform float index 1
+uniform float n 4.0
+draw rect -1 -1 2 2
+probe rgba 1 1 0.5 0.5 0.5 0.5
