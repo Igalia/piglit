@@ -105,12 +105,17 @@ create_texture(GLenum format)
 			}
 		}
 
+		/* Create empty texture */
 		glTexImage2D(GL_TEXTURE_2D, level, format,
 			     size, size, 0,
 			     GL_RGBA, GL_FLOAT, NULL);
+
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, size);
+
+		/* Fill in sub regions of texture */
 		if (size <= 4) {
-			glTexSubImage2D(GL_TEXTURE_2D, level, format,
-					size, size, 0,
+			glTexSubImage2D(GL_TEXTURE_2D, level,
+					0, 0, size, size,
 					GL_RGBA, GL_FLOAT, data);
 		} else {
 			float *reds = data;
@@ -123,7 +128,7 @@ create_texture(GLenum format)
 					size / 2, size / 2,
 					GL_RGBA, GL_FLOAT, reds);
 			glTexSubImage2D(GL_TEXTURE_2D, level,
-					size / size, 0,
+					size / 2, 0,
 					size / 2, size / 2,
 					GL_RGBA, GL_FLOAT, greens);
 			glTexSubImage2D(GL_TEXTURE_2D, level,
