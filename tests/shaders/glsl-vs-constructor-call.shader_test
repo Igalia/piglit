@@ -1,0 +1,35 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+/* this is a test for a bug in constructor handling in glsl2.  It
+ * would evaluate the expression used in the constructor for each
+ * channel it needed to pull out.
+*/
+vec4 color = vec4(0.0);
+
+vec2 get_val()
+{
+	color += vec4(1.0, 1.0, 0.0, 0.0);
+	return vec2(1.0, 0.0);
+}
+
+void main()
+{
+	vec4 val = vec4(get_val(), 0.0, 0.0);
+	val += color;
+
+	/* If the bug is present, val is (3,2,0,0), but it should be
+	 * (2,1,0,0).
+	 */
+	gl_FrontColor = val - vec4(2.0, 0, 0.0, 0.0);
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
