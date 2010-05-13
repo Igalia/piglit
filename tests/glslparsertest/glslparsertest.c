@@ -43,7 +43,7 @@ static char *filename;
 static int expected_pass;
 
 static void
-display(void)
+test(void)
 {
 	GLint prog;
 	GLint ok;
@@ -157,7 +157,6 @@ int main(int argc, char**argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("glslparsertest");
-	glutDisplayFunc(display);
 	glewInit();
 
 	if (!GLEW_VERSION_2_0) {
@@ -166,7 +165,7 @@ int main(int argc, char**argv)
 		exit(1);
 	}
 
-	glutMainLoop();
+	test();
 
 	return 0;
 }
