@@ -24,6 +24,11 @@ FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
       /usr/include/GL
 )
 
+FIND_LIBRARY(OPENGL_egl_LIBRARY
+      NAMES EGL
+      PATHS /usr/lib
+)
+
 set(EXECUTABLE_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 
