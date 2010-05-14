@@ -178,6 +178,14 @@
 #endif
 
 
+#ifndef GL_ARB_provoking_vertex
+#define GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION 0x8E4C
+#define GL_FIRST_VERTEX_CONVENTION    0x8E4D
+#define GL_LAST_VERTEX_CONVENTION     0x8E4E
+#define GL_PROVOKING_VERTEX           0x8E4F
+#endif
+
+
 #ifndef GL_ARB_map_buffer_range
 #define GL_MAP_READ_BIT                   0x0001
 #define GL_MAP_WRITE_BIT                  0x0002
@@ -654,6 +662,9 @@ typedef void (GLAPIENTRY * PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC) (GLe
 
 // GL_EXT_provoking_vertex
 typedef void (GLAPIENTRY * PFNGLPROVOKINGVERTEXEXTPROC) (GLenum mode);
+
+// GL_ARB_provoking_vertex
+typedef void (GLAPIENTRY * PFNGLPROVOKINGVERTEXPROC) (GLenum mode);
 
 // OpenGL 1.2 enumerants, to allow glean to be compiled on OpenGL 1.1 systems.
 // (This odd workaround is needed to handle problems with some copies of

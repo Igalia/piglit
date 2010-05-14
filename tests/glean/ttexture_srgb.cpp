@@ -155,7 +155,7 @@ TextureSRGBTest::testTextureFormat(GLenum intFormat, GLint components,
 
 	glGetIntegerv(GL_RED_BITS, &redBits);
 	glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
-	const float tolerance = 1.0 / ((1 << redBits) - 1);
+	const float tolerance = 1.0 / ((1 << (redBits - 1)) - 1);
 
 	// setup matrices
 	glMatrixMode(GL_PROJECTION);
@@ -171,6 +171,8 @@ TextureSRGBTest::testTextureFormat(GLenum intFormat, GLint components,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glEnable(GL_TEXTURE_2D);
+
+	glDisable(GL_DITHER);
 
 	glDrawBuffer(GL_FRONT);
 	glReadBuffer(GL_FRONT);

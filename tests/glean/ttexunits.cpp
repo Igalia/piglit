@@ -77,6 +77,7 @@ TexUnitsTest::setup(void)
       return false;
    }
 
+   glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxCombinedUnits);
    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxImageUnits);
    glGetIntegerv(GL_MAX_TEXTURE_COORDS, &maxCoordUnits);
    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxUnits);
@@ -109,19 +110,13 @@ bool
 TexUnitsTest::testActiveTexture(void)
 {
    GLint i;
-   GLint maxUnits;
-
-   if (maxImageUnits > maxCoordUnits)
-      maxUnits = maxImageUnits;
-   else
-      maxUnits = maxCoordUnits;
 
    // clear any error state
    while (glGetError())
       ;
 
    // test glActiveTexture()
-   for (i = 0; i < maxUnits; i++) {
+   for (i = 0; i < maxCombinedUnits; i++) {
       glActiveTexture_func(GL_TEXTURE0 + i);
       if (glGetError()) {
          reportFailure("glActiveTexture(GL_TEXTURE%d) failed", i);
@@ -137,10 +132,10 @@ TexUnitsTest::testActiveTexture(void)
    }
 
    // this should fail:
-   glActiveTexture_func(GL_TEXTURE0 + maxUnits);
+   glActiveTexture_func(GL_TEXTURE0 + maxCombinedUnits);
    if (glGetError() != GL_INVALID_ENUM) {
       reportFailure("glActiveTexture(GL_TEXTURE%d) failed to generate an error",
-                    maxUnits);
+                    maxCombinedUnits);
       return false;
    }
 
@@ -162,9 +157,9 @@ TexUnitsTest::testActiveTexture(void)
    }
 
    // this should fail:
-   glClientActiveTexture_func(GL_TEXTURE0 + maxUnits);
+   glClientActiveTexture_func(GL_TEXTURE0 + maxCoordUnits);
    if (glGetError() != GL_INVALID_ENUM) {
-      reportFailure("glClientActiveTexture(GL_TEXTURE%d) failed to generate an error", maxUnits);
+      reportFailure("glClientActiveTexture(GL_TEXTURE%d) failed to generate an error", maxCoordUnits);
       return false;
    }
 
@@ -233,7 +228,7 @@ TexUnitsTest::testTextureCoordGen(void)
    glMatrixMode(GL_TEXTURE);
 
    // test texgen enable/disable
-   for (i = 0; i < maxUnits; i++) {
+   for (i = 0; i < maxCombinedUnits; i++) {
       glActiveTexture_func(GL_TEXTURE0 + i);
 
       glEnable(GL_TEXTURE_GEN_S);

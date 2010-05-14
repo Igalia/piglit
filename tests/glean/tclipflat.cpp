@@ -36,7 +36,7 @@
 //
 // XXX We should also test with two-sided lighting.
 //
-// If GL_EXT_provoking_vertex is supported, that feature is tested as well.
+// If GL_ARB/EXT_provoking_vertex is supported, that feature is tested as well.
 //
 // Author: Brian Paul
 
@@ -48,8 +48,7 @@
 
 namespace GLEAN {
 
-
-static PFNGLPROVOKINGVERTEXEXTPROC ProvokingVertexEXT_func = NULL;
+static PFNGLPROVOKINGVERTEXEXTPROC ProvokingVertex_func = NULL;
 
 
 // Note: all correctly rendered tris/quad/polygons will be green.
@@ -179,6 +178,14 @@ static const GLfloat PolygonVerts[4][5] =
 #define Elements(array) (sizeof(array) / sizeof(array[0]))
 
 
+enum draw_mode {
+   BEGIN_END,
+   DRAW_ARRAYS,
+   DRAW_ELEMENTS,
+   NUM_DRAW_MODES
+};
+
+
 ClipFlatResult::ClipFlatResult()
 {
    pass = false;
@@ -188,6 +195,8 @@ ClipFlatResult::ClipFlatResult()
 void
 ClipFlatTest::setup(void)
 {
+   glDisable(GL_DITHER);
+
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
    glOrtho(-1.25, 1.25, -1.25, 1.25, -1, 1);
@@ -201,12 +210,18 @@ ClipFlatTest::setup(void)
    glCullFace(GL_FRONT);
    glEnable(GL_CULL_FACE);
 
-   provoking_vertex_first = GLUtils::haveExtension("GL_EXT_provoking_vertex");
+   if (GLUtils::haveExtension("GL_ARB_provoking_vertex")) {
+      ProvokingVertex_func = reinterpret_cast<PFNGLPROVOKINGVERTEXPROC>
+         (GLUtils::getProcAddress("glProvokingVertex"));
+      provoking_vertex_first = true;
+   }
+   else if (GLUtils::haveExtension("GL_EXT_provoking_vertex")) {
+      ProvokingVertex_func = reinterpret_cast<PFNGLPROVOKINGVERTEXEXTPROC>
+         (GLUtils::getProcAddress("glProvokingVertexEXT"));
+      provoking_vertex_first = true;
+   }
 
    if (provoking_vertex_first) {
-      ProvokingVertexEXT_func = reinterpret_cast<PFNGLPROVOKINGVERTEXEXTPROC>
-         (GLUtils::getProcAddress("glProvokingVertexEXT"));
-
       GLboolean k;
       glGetBooleanv(GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT, &k);
       quads_follows_pv_convention = k;
@@ -224,6 +239,25 @@ ClipFlatTest::drawArrays(GLenum mode, const GLfloat *verts, GLuint count)
    glEnableClientState(GL_VERTEX_ARRAY);
 
    glDrawArrays(mode, 0, count);
+
+   glDisableClientState(GL_COLOR_ARRAY);
+   glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+
+// Draw with glDrawElements()
+void
+ClipFlatTest::drawElements(GLenum mode, const GLfloat *verts, GLuint count)
+{
+   static const GLuint elements[6] = { 0, 1, 2, 3, 4, 5 };
+   glColorPointer(3, GL_FLOAT, 5 * sizeof(GLfloat), verts + 0);
+   glVertexPointer(2, GL_FLOAT, 5 * sizeof(GLfloat), verts + 3);
+   glEnableClientState(GL_COLOR_ARRAY);
+   glEnableClientState(GL_VERTEX_ARRAY);
+
+   assert(count <= Elements(elements));
+
+   glDrawElements(mode, count, GL_UNSIGNED_INT, elements);
 
    glDisableClientState(GL_COLOR_ARRAY);
    glDisableClientState(GL_VERTEX_ARRAY);
@@ -271,7 +305,7 @@ ClipFlatTest::checkResult(Window &w, GLfloat badColor[3])
             // black - OK
          }
          else if (image[k + 0] == 0 &&
-                  image[k + 1] == 255 &&
+                  image[k + 1] >= 254 &&
                   image[k + 0] == 0) {
             // green - OK
             anyGreen = GL_TRUE;
@@ -291,10 +325,11 @@ ClipFlatTest::checkResult(Window &w, GLfloat badColor[3])
 
 
 void
-ClipFlatTest::reportFailure(GLenum mode, GLuint arrayMode, GLuint facing,
-                            const GLfloat badColor[3])
+ClipFlatTest::reportFailure(GLenum mode, int drawMode, GLuint facing,
+                            GLuint fill,
+                            const GLfloat badColor[3], GLfloat x, GLfloat y)
 {
-   const char *m, *d, *f;
+   const char *m, *d, *f, *p;
 
    switch (mode) {
    case GL_TRIANGLES:
@@ -319,19 +354,35 @@ ClipFlatTest::reportFailure(GLenum mode, GLuint arrayMode, GLuint facing,
       m = "???";
    }
 
-   if (arrayMode)
-      d = "glDrawArrays";
-   else
+   switch (drawMode) {
+   case BEGIN_END:
       d = "glBegin/End";
+      break;
+   case DRAW_ARRAYS:
+      d = "glDrawArrays";
+      break;
+   case DRAW_ELEMENTS:
+      d = "glDrawElements";
+      break;
+   default:
+      assert(0);
+   }
 
    if (facing == 0)
       f = "GL_CCW";
    else
       f = "GL_CW";
 
+   if (fill == 0)
+      p = "GL_FILL";
+   else
+      p = "GL_LINE";
+
    env->log << name << ": Failure for "
-            << d << "(" << m << "), glFrontFace("
-            << f << ")\n";
+            << d << "(" << m << "), glFrontFace(" << f
+            << "), glPolygonMode(" << p << ")\n";
+
+   env->log << "\tTranslation: " << x << ", " << y << "\n";
 
    if (testing_first_pv)
       env->log << "\tGL_EXT_provoking_vertex test: GL_FIRST_VERTEX_CONVENTION_EXT mode\n";
@@ -349,43 +400,64 @@ ClipFlatTest::testPositions(Window &w, GLenum mode,
                             const GLfloat *verts, GLuint count)
 {
    GLfloat x, y;
-   GLuint arrayMode, facing;
+   GLuint facing, fill;
+   int drawMode;
 
-   // glBegin mode and glDrawArrays mode:
-   for (arrayMode = 0; arrayMode < 2; arrayMode++) {
+   // Loop over polygon mode: filled vs. outline
+   for (fill = 0; fill < 2; fill++) {
 
-      // Test CW, CCW winding (should make no difference)
-      for (facing = 0; facing < 2; facing++) {
+      glPolygonMode(GL_FRONT_AND_BACK, fill ? GL_LINE : GL_FILL);
 
-         if (facing == 0) {
-            glFrontFace(GL_CCW);
-            glCullFace(GL_BACK);
-         }
-         else {
-            glFrontFace(GL_CW);
-            glCullFace(GL_FRONT);
-         }
+      // Loop over drawing mode: glBegin/End vs glDrawArrays vs glDrawElements
+      for (drawMode = 0; drawMode < NUM_DRAW_MODES; drawMode++) {
 
-         // Test clipping at 9 locations.
-         // Only the center location will be unclipped.
-         for (y = -1.0; y <= 1.0; y += 1.0) {
-            for (x = -1.0; x <= 1.0; x += 1.0) {
-               glPushMatrix();
-               glTranslatef(x, y, 0.0);
+         // Loop over CW vs. CCW winding (should make no difference)
+         for (facing = 0; facing < 2; facing++) {
 
-               glClear(GL_COLOR_BUFFER_BIT);
+            if (facing == 0) {
+               glFrontFace(GL_CCW);
+               glCullFace(GL_BACK);
+            }
+            else {
+               glFrontFace(GL_CW);
+               glCullFace(GL_FRONT);
+            }
 
-               if (arrayMode)
-                  drawArrays(mode, verts, count);
-               else
-                  drawBeginEnd(mode, verts, count);
+            // Position the geometry at 9 different locations to test
+            // clipping against the left, right, bottom and top edges of
+            // the window.
+            // Only the center location will be unclipped.
+            for (y = -1.0; y <= 1.0; y += 1.0) {
+               for (x = -1.0; x <= 1.0; x += 1.0) {
+                  glPushMatrix();
+                  glTranslatef(x, y, 0.0);
 
-               glPopMatrix();
+                  glClear(GL_COLOR_BUFFER_BIT);
 
-               GLfloat badColor[3];
-               if (!checkResult(w, badColor)) {
-                  reportFailure(mode, arrayMode, facing, badColor);
-                  return false;
+                  switch (drawMode) {
+                  case BEGIN_END:
+                     drawBeginEnd(mode, verts, count);
+                     break;
+                  case DRAW_ARRAYS:
+                     drawArrays(mode, verts, count);
+                     break;
+                  case DRAW_ELEMENTS:
+                     drawElements(mode, verts, count);
+                     break;
+                  default:
+                     assert(0);
+                  }
+
+                  glPopMatrix();
+
+                  GLfloat badColor[3];
+                  if (!checkResult(w, badColor)) {
+                     reportFailure(mode, drawMode, facing, fill, badColor, x, y);
+                     glFlush();
+                     //sleep(25);  // enable for debugging
+                     return false;
+                  }
+                  //usleep(50000);  // enable for debugging
                }
             }
          }
@@ -434,7 +506,7 @@ ClipFlatTest::runOne(ClipFlatResult &r, Window &w)
                              Elements(PolygonVerts));
 
    if (provoking_vertex_first) {
-      ProvokingVertexEXT_func(GL_FIRST_VERTEX_CONVENTION_EXT);
+      ProvokingVertex_func(GL_FIRST_VERTEX_CONVENTION_EXT);
       testing_first_pv = true;
 
       if (r.pass)
