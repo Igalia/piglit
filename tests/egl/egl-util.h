@@ -8,11 +8,28 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 
-struct egl_test {
-	const char **extensions;
-	enum piglit_result (*draw)(EGLDisplay egl_dpy, EGLSurface surf);
+struct egl_state {
+	Display *dpy;
+	Window win;
+	EGLDisplay egl_dpy;
+	EGLConfig cfg;
+	EGLContext ctx;
+	EGLSurface surf;
+	EGLint major, minor;
+	int depth;
+	int width;
+	int height;
 };
 
-int egl_run(const struct egl_test *test, int argc, char *argv[]);
+struct egl_test {
+	const char **extensions;
+	enum piglit_result (*draw)(struct egl_state *state);
+};
+
+EGLSurface
+egl_util_create_pixmap(struct egl_state *state,
+		       int width, int height, const EGLint *attribs);
+
+int egl_util_run(const struct egl_test *test, int argc, char *argv[]);
 
 #endif

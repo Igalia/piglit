@@ -36,7 +36,7 @@
 const char *extensions[] = { "EGL_NOK_swap_region" };
 
 static enum piglit_result
-draw(EGLDisplay egl_dpy, EGLSurface surf)
+draw(struct egl_state *state)
 {
 	EGLint rects[] = { 
 		10, 10, 10, 10, 
@@ -59,10 +59,10 @@ draw(EGLDisplay egl_dpy, EGLSurface surf)
 	/* Clear background to green */
 	glClearColor(0.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	eglSwapBuffers(egl_dpy, surf);
+	eglSwapBuffers(state->egl_dpy, state->surf);
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	swap_buffers_region(egl_dpy, surf, 4, rects);
+	swap_buffers_region(state->egl_dpy, state->surf, 4, rects);
 
 	for (i = 0; i < 16; i += 4)
 		if (!piglit_probe_pixel_rgba(rects[i] + 5,
@@ -80,7 +80,7 @@ static const struct egl_test test = {
 int
 main(int argc, char *argv[])
 {
-	return egl_run(&test, argc, argv);
+	return egl_util_run(&test, argc, argv);
 }
 
 #else
