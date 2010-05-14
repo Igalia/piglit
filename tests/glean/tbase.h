@@ -110,6 +110,11 @@ and tbasic.cpp.
 #include <unistd.h>
 #endif
 
+#ifdef __WIN32__
+#define sleep(__sec) Sleep((__sec)*1000)
+#define usleep(__usec) Sleep(((__usec) + 999)/1000)
+#endif
+
 #include <iostream>
 #include <fstream>
 #include "dsconfig.h"

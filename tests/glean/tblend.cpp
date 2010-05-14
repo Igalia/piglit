@@ -623,7 +623,8 @@ BlendFuncTest::runCombo(BlendFuncResult& r, Window& w,
 	runFactorsResult res(runFactors(p.srcRGB, p.srcA, p.dstRGB, p.dstA,
 					p.opRGB, p.opA, p.constColor,
 					*(r.config), env, rgbTolerance, alphaTolerance));
-	w.swap();
+	if (!env.options.quick)
+		w.swap();
 
 	p.rbErr = res.readbackErrorBits;
 	p.blErr = max(res.blendRGBErrorBits, res.blendAlphaErrorBits);

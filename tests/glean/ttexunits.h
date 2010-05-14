@@ -49,6 +49,7 @@ public:
 	virtual void runOne(MultiTestResult &r, Window &w);
 
 private:
+        GLint maxCombinedUnits;
         GLint maxImageUnits;
         GLint maxCoordUnits;
         GLint maxUnits;

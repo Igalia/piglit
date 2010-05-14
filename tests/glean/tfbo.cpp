@@ -85,6 +85,8 @@ FBOTest::setup(void)
         glDrawBuffer(GL_FRONT);
         glReadBuffer(GL_FRONT);
 
+        glDisable(GL_DITHER);
+
         // compute error tolerances (may need fine-tuning)
         int bufferBits[5];
 
@@ -94,11 +96,11 @@ FBOTest::setup(void)
         glGetIntegerv(GL_ALPHA_BITS, &bufferBits[3]);
         glGetIntegerv(GL_DEPTH_BITS, &bufferBits[4]);
 
-        tolerance[0] = 2.0 / (1 << bufferBits[0]);
-        tolerance[1] = 2.0 / (1 << bufferBits[1]);
-        tolerance[2] = 2.0 / (1 << bufferBits[2]);
+        tolerance[0] = 3.0 / (1 << bufferBits[0]);
+        tolerance[1] = 3.0 / (1 << bufferBits[1]);
+        tolerance[2] = 3.0 / (1 << bufferBits[2]);
         if (bufferBits[3])
-                tolerance[3] = 2.0 / (1 << bufferBits[3]);
+                tolerance[3] = 3.0 / (1 << bufferBits[3]);
         else
                 tolerance[3] = 1.0;
         if (bufferBits[4])

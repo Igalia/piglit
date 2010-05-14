@@ -43,6 +43,7 @@
 #include <cstdio>
 #elif defined(__MS__)
 
+#include <stdio.h>
 #include <sys/stat.h>
 
 #endif

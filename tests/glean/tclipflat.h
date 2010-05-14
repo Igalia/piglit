@@ -61,11 +61,13 @@ private:
         bool testing_first_pv;
 
         void drawArrays(GLenum mode, const GLfloat *verts, GLuint count);
+        void drawElements(GLenum mode, const GLfloat *verts, GLuint count);
         void drawBeginEnd(GLenum mode, const GLfloat *verts, GLuint count);
         bool testPositions(Window &w, GLenum mode,
                            const GLfloat *verts, GLuint count);
-        void reportFailure(GLenum mode, GLuint arrayMode, GLuint facing,
-                           const GLfloat badColor[3]);
+        void reportFailure(GLenum mode, int drawMode, GLuint facing,
+                           GLuint fill,
+                           const GLfloat badColor[3], GLfloat x, GLfloat y);
         bool checkResult(Window &w, GLfloat badColor[3]);
 
         void setup(void);

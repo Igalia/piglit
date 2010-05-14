@@ -919,6 +919,16 @@ int
 DrawingSurfaceConfig::match(vector<DrawingSurfaceConfig*>& choices) {
 	typedef vector<DrawingSurfaceConfig*>::iterator cptr;
 
+	// first try finding an exact match
+	for (cptr p = choices.begin(); p < choices.end(); ++p) {
+		DrawingSurfaceConfig& c = **p;
+		if (equal(c)) {
+			int pos = static_cast<int>(p - choices.begin());
+			return pos;
+		}
+	}
+
+        // next try finding the closest match
 	int best = -1;
 	int bestError = INT_MAX;
 
