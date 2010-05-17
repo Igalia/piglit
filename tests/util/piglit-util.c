@@ -125,6 +125,10 @@ piglit_report_result(enum piglit_result result)
 		printf("PIGLIT: {'result': 'skip' }\n");
 		fflush(stdout);
 		exit(0);
+	} else if (result == PIGLIT_WARN) {
+		printf("PIGLIT: {'result': 'warn' }\n");
+		fflush(stdout);
+		exit(0);
 	} else {
 		printf("PIGLIT: {'result': 'fail' }\n");
 		fflush(stdout);
