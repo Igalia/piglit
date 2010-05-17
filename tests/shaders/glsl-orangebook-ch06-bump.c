@@ -46,16 +46,18 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	static const float surface_color[3] = {0.7, 0.6, 0.18};
-	static const float specular_highlight[3] = {1.0, 1.0, 0.674};
-	static const float bump_dark[3] = {0.662, 0.568, 0.168};
-	static const float bump_light[3] = {0.937, 0.839, 0.443};
-	float light_position[3] = {0.0, 0.0, 1.0};
+	static const float test_specular[3] = {0.976, 0.894, 0.549};
+	static const float test_nonspecular[3] = {0.572, 0.490, 0.145};
+	static const float test_bump_dark[3] = {0.411, 0.352, 0.105};
+	static const float test_bump_light[3] = {1.0, 0.961, 0.557};
+	float light_position[3] = {-1.0, -1.0, 2.0};
 	float w = piglit_width;
 	float h = piglit_height;
-	float bump_x = w * 7 / 8;
-	float bump_y = h * 7 / 8;
+	float bump_x = w * 3 / 8;
+	float bump_y = h * 3 / 8;
+	float x, y;
 
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	piglit_ortho_projection(1, 1, GL_FALSE);
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -69,16 +71,25 @@ piglit_display(void)
 	glTranslatef(0, 0, -0.5);
 	glNormal3f(0.0, 0.0, 1.0);
 	glVertexAttrib3f(tangent_attrib, 1.0, 0.0, 0.0);
-	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height,
-			     0, 0, 1, 1);
+	for (x = 0.0; x < 1.0; x += 0.1) {
+		for (y = 0.0; y < 1.0; y += 0.1) {
+			piglit_draw_rect_tex(x, y, 0.1, 0.1,
+					     x, y, 0.1, 0.1);
+		}
+	}
 
-	/* Corners of the image: A fully-specular point, and a fully-non-specular point. */
-	pass &= piglit_probe_pixel_rgb(0, 0, specular_highlight);
-	pass &= piglit_probe_pixel_rgb(piglit_width - 1, piglit_height - 1, surface_color);
+	/* Corners of the image: A highly specular point, and a
+	 * non-specular point.
+	 */
+	pass &= piglit_probe_pixel_rgb(0, 0, test_specular);
+	pass &= piglit_probe_pixel_rgb(piglit_width - 1, piglit_height - 1,
+				       test_nonspecular);
 
-	/* Look at the top right bump -- does it have a lit part and an unlit part? */
-	pass &= piglit_probe_pixel_rgb(bump_x + w / 16, bump_y + h / 16, bump_dark);
-	pass &= piglit_probe_pixel_rgb(bump_x - w / 16, bump_y - h / 16, bump_light);
+	/* Look at a bump -- does it have a lit part and an unlit part? */
+	pass &= piglit_probe_pixel_rgb(bump_x + w / 16, bump_y + h / 16,
+				       test_bump_dark);
+	pass &= piglit_probe_pixel_rgb(bump_x - w / 16, bump_y - h / 16,
+				       test_bump_light);
 
 	glutSwapBuffers();
 
