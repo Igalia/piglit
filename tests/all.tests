@@ -1163,4 +1163,5 @@ Test.ignoreErrors.append(re.compile("drmOpen.*"))
 Test.ignoreErrors.append(re.compile("Mesa: Not testing OS support.*"))
 Test.ignoreErrors.append(re.compile("Mesa: User error:.*"))
 Test.ignoreErrors.append(re.compile("debug_get_.*"))
+Test.ignoreErrors.append(re.compile("util_cpu_caps.*"))
 
