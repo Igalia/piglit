@@ -684,7 +684,7 @@ add_otherglslparsertest('glsl2/gst-gl-text-upload-yuy2-uyvy.frag', 'pass')
 add_otherglslparsertest('glsl2/gst-gl-texture-interp.frag', 'pass')
 add_otherglslparsertest('glsl2/gst-gl-tunnel.frag', 'pass')
 add_otherglslparsertest('glsl2/gst-gl-twirl.frag', 'pass')
-add_otherglslparsertest('glsl2/gst-gl-vconv9.vert', 'pass')
+add_otherglslparsertest('glsl2/gst-gl-vconv9.frag', 'pass')
 
 # All the norsetto shaders should pass.
 add_otherglslparsertest('glsl2/norsetto-bumptbn_sh_fp.frag', 'pass')
