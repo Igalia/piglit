@@ -23,6 +23,7 @@ link_libraries (
 
 add_executable (fbo-1d fbo-1d.c)
 add_executable (fbo-3d fbo-3d.c)
+add_executable (fbo-alpha fbo-alpha.c)
 add_executable (fbo-blit fbo-blit.c)
 add_executable (fbo-copypix fbo-copypix.c)
 add_executable (fbo-readdrawpix fbo-readdrawpix.c)
