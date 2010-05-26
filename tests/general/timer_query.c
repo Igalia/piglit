@@ -33,6 +33,22 @@
 
 #include "piglit-util.h"
 
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+#ifndef APIENTRYP
+#define APIENTRYP APIENTRY *
+#endif
+#ifndef ARB_sync
+typedef int64_t GLint64;
+typedef uint64_t GLuint64;
+#endif
+#ifndef GL_ARB_timer_query
+#define GL_TIME_ELAPSED 0x88BF
+typedef void (APIENTRYP PFNGLGETQUERYOBJECTI64VPROC) (GLuint id, GLenum pname, GLint64 *params);
+typedef void (APIENTRYP PFNGLGETQUERYOBJECTUI64VPROC) (GLuint id, GLenum pname, GLuint64 *params);
+#endif
+
 int piglit_width = 180, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
 
