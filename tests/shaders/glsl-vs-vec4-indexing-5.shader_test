@@ -7,7 +7,7 @@ uniform vec4 val;
 
 float func(vec4 v)
 {
-	if (v.x > 0)
+	if (v.x > 0.0)
 		return v[3];
 	else
 		return v[2];
