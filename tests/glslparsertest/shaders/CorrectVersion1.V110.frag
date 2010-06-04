@@ -1,8 +1,6 @@
-/* Two version statements are allowed today, in future we may want to raise a 
-   warning or error */
+/* Only one version statement is allowed; two should raise an error. */
 #version 110
 #version 110
-
 
 void main()
 {
