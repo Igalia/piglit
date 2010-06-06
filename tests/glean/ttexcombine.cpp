@@ -208,6 +208,65 @@ TexCombineTest::test_param TexCombineTest::Dot3RGBAParams[] = {
 	{ 0, { 0, 0, 0, 0, 0 } }
 };
 
+TexCombineTest::test_param TexCombineTest::ModulateAddParams[] = {
+	{ GL_COMBINE_RGB_EXT, { GL_MODULATE_ADD_ATI, 0 } },
+	{ GL_COMBINE_ALPHA_EXT, { GL_MODULATE_ADD_ATI, 0 } },
+	{ GL_SOURCE0_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_RGB_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE0_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_ALPHA_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_OPERAND0_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND0_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_RGB_SCALE_EXT, { 1, 4, 0 } },
+	{ GL_ALPHA_SCALE, { 1, 2, 0 } },
+	{ 0, { 0, 0, 0, 0, 0 } }
+};
+
+TexCombineTest::test_param TexCombineTest::ModulateSignedAddParams[] = {
+	{ GL_COMBINE_RGB_EXT, { GL_MODULATE_SIGNED_ADD_ATI, 0 } },
+	{ GL_COMBINE_ALPHA_EXT, { GL_MODULATE_SIGNED_ADD_ATI, 0 } },
+	{ GL_SOURCE0_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_RGB_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE0_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_ALPHA_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_OPERAND0_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND0_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_RGB_SCALE_EXT, { 1, 4, 0 } },
+	{ GL_ALPHA_SCALE, { 1, 2, 0 } },
+	{ 0, { 0, 0, 0, 0, 0 } }
+};
+
+TexCombineTest::test_param TexCombineTest::ModulateSubtractParams[] = {
+	{ GL_COMBINE_RGB_EXT, { GL_MODULATE_SUBTRACT_ATI, 0 } },
+	{ GL_COMBINE_ALPHA_EXT, { GL_MODULATE_SUBTRACT_ATI, 0 } },
+	{ GL_SOURCE0_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_RGB_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_RGB_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE0_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_SOURCE1_ALPHA_EXT, { GL_TEXTURE, GL_CONSTANT_EXT, GL_PRIMARY_COLOR_EXT, GL_PREVIOUS_EXT, 0 } },
+	{ GL_SOURCE2_ALPHA_EXT, { GL_TEXTURE, GL_PRIMARY_COLOR_EXT, 0 } },
+	{ GL_OPERAND0_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_RGB_EXT, { GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND0_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND1_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_OPERAND2_ALPHA_EXT, { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 0 } },
+	{ GL_RGB_SCALE_EXT, { 1, 4, 0 } },
+	{ GL_ALPHA_SCALE, { 1, 2, 0 } },
+	{ 0, { 0, 0, 0, 0, 0 } }
+};
 
 static void
 problem(const char *s) {
@@ -514,10 +573,25 @@ TexCombineTest::ComputeTexCombine(const glmachine &machine, int texUnit,
 	}
 
 	switch (machine.OPERAND2_RGB[texUnit]) {
+	case GL_SRC_COLOR:
+		term2[0] = colorSrc2[0];
+		term2[1] = colorSrc2[1];
+		term2[2] = colorSrc2[2];
+		break;
+	case GL_ONE_MINUS_SRC_COLOR:
+		term2[0] = 1.0 - colorSrc2[0];
+		term2[1] = 1.0 - colorSrc2[1];
+		term2[2] = 1.0 - colorSrc2[2];
+		break;
 	case GL_SRC_ALPHA:
 		term2[0] = colorSrc2[3];
 		term2[1] = colorSrc2[3];
 		term2[2] = colorSrc2[3];
+		break;
+	case GL_ONE_MINUS_SRC_ALPHA:
+		term2[0] = 1.0 - colorSrc2[3];
+		term2[1] = 1.0 - colorSrc2[3];
+		term2[2] = 1.0 - colorSrc2[3];
 		break;
 	default:
 		problem("bad rgbOperand2");
@@ -571,6 +645,21 @@ TexCombineTest::ComputeTexCombine(const glmachine &machine, int texUnit,
 		if (machine.COMBINE_RGB[texUnit] == GL_DOT3_RGBA_EXT)
 			result[3] = dot;
 		break;
+	case GL_MODULATE_ADD_ATI:
+		result[0] = term0[0] * term2[0] + term1[0];
+		result[1] = term0[1] * term2[1] + term1[1];
+		result[2] = term0[2] * term2[2] + term1[2];
+	    break;
+	case GL_MODULATE_SIGNED_ADD_ATI:
+		result[0] = term0[0] * term2[0] + term1[0] - 0.5;
+		result[1] = term0[1] * term2[1] + term1[1] - 0.5;
+		result[2] = term0[2] * term2[2] + term1[2] - 0.5;
+	    break;
+	case GL_MODULATE_SUBTRACT_ATI:
+		result[0] = term0[0] * term2[0] - term1[0];
+		result[1] = term0[1] * term2[1] - term1[1];
+		result[2] = term0[2] * term2[2] - term1[2];
+	    break;
 	default:
 		problem("bad rgbCombine");
 		return;
@@ -591,6 +680,15 @@ TexCombineTest::ComputeTexCombine(const glmachine &machine, int texUnit,
 		break;
 	case GL_INTERPOLATE_EXT:
 		result[3] = term0[3] * term2[3] + term1[3] * (1.0 - term2[3]);
+		break;
+	case GL_MODULATE_ADD_ATI:
+		result[3] = term0[3] * term2[3] + term1[3];
+		break;
+	case GL_MODULATE_SIGNED_ADD_ATI:
+		result[3] = term0[3] * term2[3] + term1[3] - 0.5;
+	    break;
+	case GL_MODULATE_SUBTRACT_ATI:
+		result[3] = term0[3] * term2[3] - term1[3];
 		break;
 	default:
 		problem("bad alphaCombine");
@@ -661,6 +759,12 @@ EnumString(GLenum pname)
 		return "GL_DOT3_RGB_EXT";
 	case GL_DOT3_RGBA_EXT:
 		return "GL_DOT3_RGBA_EXT";
+	case GL_MODULATE_ADD_ATI:
+	    return "GL_MODULATE_ADD_ATI";
+	case GL_MODULATE_SIGNED_ADD_ATI:
+	    return "GL_MODULATE_SIGNED_ADD_ATI";
+	case GL_MODULATE_SUBTRACT_ATI:
+	    return "GL_MODULATE_SUBTRACT_ATI";
 	case GL_TEXTURE:
 		return "GL_TEXTURE";
 	case GL_CONSTANT_EXT:
@@ -1206,16 +1310,19 @@ bool
 TexCombineTest::RunMultiTextureTest(glmachine &machine, BasicResult &r,
     Window& w) {
 
-	static const GLenum combineModes[7] = {
+	static const GLenum combineModes[10] = {
 		GL_REPLACE,
 		GL_ADD,
 		GL_ADD_SIGNED_EXT,
 		GL_MODULATE,
 		GL_INTERPOLATE_EXT,
 		GL_DOT3_RGB_EXT,
-		GL_DOT3_RGBA_EXT
+		GL_DOT3_RGBA_EXT,
+		GL_MODULATE_ADD_ATI,
+		GL_MODULATE_SIGNED_ADD_ATI,
+		GL_MODULATE_SUBTRACT_ATI
 	};
-	static const int numModes = haveDot3 ? 7 : 5;
+	static const int numModes = haveDot3 ? (haveCombine3 ? 10 : 7) : 5;
 
 	// four texture units is enough to test
 	if (machine.NumTexUnits > 4)
@@ -1448,6 +1555,9 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 	haveCrossbar = GLUtils::haveExtensions("GL_ARB_texture_env_crossbar")
 		&& GLUtils::haveExtensions("GL_ARB_texture_env_combine");
 
+	haveCombine3 = GLUtils::haveExtensions("GL_ATI_texture_env_combine3")
+		&& GLUtils::haveExtensions("GL_ARB_texture_env_combine");
+
 	// compute RGB error tolerance
 	{
 		GLint rBits, gBits, bBits, aBits;
@@ -1517,6 +1627,12 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 		passed = RunSingleTextureTest(Machine, Dot3RGBParams, r, w);
 	if (passed && haveDot3)
 		passed = RunSingleTextureTest(Machine, Dot3RGBAParams, r, w);
+	if (passed && haveCombine3)
+		passed = RunSingleTextureTest(Machine, ModulateAddParams, r, w);
+	if (passed && haveCombine3)
+		passed = RunSingleTextureTest(Machine, ModulateSignedAddParams, r, w);
+	if (passed && haveCombine3)
+		passed = RunSingleTextureTest(Machine, ModulateSubtractParams, r, w);
 
 	// Now do some multi-texture tests
 	if (passed) {
@@ -1566,6 +1682,17 @@ TexCombineTest::logOne(BasicResult& r) {
 			env->log << "\tTested "
 				 << CountTestCombinations(Dot3RGBAParams)
 				 << " GL_DOT3_RGBA_EXT combinations\n";
+		}
+		if (haveCombine3) {
+			env->log << "\tTested "
+				 << CountTestCombinations(ModulateAddParams)
+				 << " GL_MODULATE_ADD_ATI combinations\n";
+			env->log << "\tTested "
+				 << CountTestCombinations(ModulateSignedAddParams)
+				 << " GL_MODULATE_SIGNED_ADD_ATI combinations\n";
+			env->log << "\tTested "
+				 << CountTestCombinations(ModulateSubtractParams)
+				 << " GL_MODULATE_SUBTRACT_ATI combinations\n";
 		}
 		env->log << "\tTested "
 			<< CountMultiTextureTestCombinations(Machine)

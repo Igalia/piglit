@@ -98,10 +98,14 @@ class TexCombineTest: public BasicTest {
 	static test_param InterpolateParams[];
 	static test_param Dot3RGBParams[];
 	static test_param Dot3RGBAParams[];
+	static test_param ModulateAddParams[];
+	static test_param ModulateSignedAddParams[];
+	static test_param ModulateSubtractParams[];
 	static test_param MultitexParams[];
 	static test_param CrossbarParams[];
 	bool haveDot3;
 	bool haveCrossbar;
+	bool haveCombine3;
 	GLfloat mTolerance[4];
 	GLuint mTextures[MAX_TEX_UNITS];
 	int testStride;
