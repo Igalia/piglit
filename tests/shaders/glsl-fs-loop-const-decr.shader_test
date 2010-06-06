@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+uniform vec4 color;
+void main()
+{
+	int count = int(color.w);
+	vec3 c = color.xyz;
+	int i;
+
+	for (i = 10.0; i > 0.0; i--) {
+		c.x += 0.1;
+	}
+
+	gl_FragColor = vec4(c, 1.0);
+}
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+draw rect 10 10 10 10
+draw rect 30 10 10 10
+probe rgb 15 15 1.0 0.0 0.0
+probe rgb 35 15 1.0 0.0 0.0
