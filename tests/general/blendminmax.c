@@ -42,170 +42,173 @@ static int Height = 200;
 static const GLfloat Near = 5.0, Far = 25.0;
 
 
-static void Display( void )
+static void Display(void)
 {
-   glClearColor(0.2, 0.2, 0.8, 0);
-   glClear( GL_COLOR_BUFFER_BIT );
+	glClearColor(0.2, 0.2, 0.8, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-   glPushMatrix();
+	glPushMatrix();
 
-   /* This is the "reference" square.
-    */
+	/* This is the "reference" square.
+	 */
 
-   glTranslatef(-4.5, 0, 0);
-   glBlendEquation( GL_FUNC_ADD );
-   glBlendFunc( GL_ONE, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
-
-
-   /* GL_MIN and GL_MAX are supposed to ignore the blend function setting.
-    * To test that, we set the blend function to GL_ZERO for both color and
-    * alpha each time GL_MIN or GL_MAX is used.
-    *
-    * Apple ships an extension called GL_ATI_blend_weighted_minmax (supported
-    * on Mac OS X 10.2 and later).  I believe the difference with that
-    * extension is that it uses the blend function.  However, I have no idea
-    * what the enums are for it.  The extension is listed at Apple's developer
-    * site, but there is no documentation.
-    * 
-    * http://developer.apple.com/opengl/extensions.html
-    */
-
-   glTranslatef(3.0, 0, 0);
-   glBlendEquation( GL_FUNC_ADD );
-   glBlendFunc( GL_ONE, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
-
-   glBlendEquation( GL_MAX );
-   glBlendFunc( GL_ZERO, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.2, 0.2, 0.2 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	glTranslatef(-4.5, 0, 0);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
 
-   glTranslatef(3.0, 0, 0);
-   glBlendEquation( GL_FUNC_ADD );
-   glBlendFunc( GL_ONE, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* GL_MIN and GL_MAX are supposed to ignore the blend function
+	 * setting.  To test that, we set the blend function to
+	 * GL_ZERO for both color and alpha each time GL_MIN or GL_MAX
+	 * is used.
+	 *
+	 * Apple ships an extension called
+	 * GL_ATI_blend_weighted_minmax (supported on Mac OS X 10.2
+	 * and later).  I believe the difference with that extension
+	 * is that it uses the blend function.  However, I have no
+	 * idea what the enums are for it.  The extension is listed at
+	 * Apple's developer site, but there is no documentation.
+	 *
+	 * http://developer.apple.com/opengl/extensions.html
+	 */
 
-   glBlendEquation( GL_MIN );
-   glBlendFunc( GL_ZERO, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.8, 0.8, 0.8 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
+
+	glBlendEquation(GL_MAX);
+	glBlendFunc(GL_ZERO, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.2, 0.2, 0.2);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
 
-   glTranslatef(3.0, 0, 0);
-   glBlendEquation( GL_FUNC_ADD );
-   glBlendFunc( GL_ONE, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.8, 0.8, 0.8 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   glBlendEquation( GL_MIN );
-   glBlendFunc( GL_ZERO, GL_ZERO );
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	glBlendEquation(GL_MIN);
+	glBlendFunc(GL_ZERO, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.8, 0.8, 0.8);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   glPopMatrix();
 
-   glutSwapBuffers();
+	glTranslatef(3.0, 0, 0);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.8, 0.8, 0.8);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
+
+	glBlendEquation(GL_MIN);
+	glBlendFunc(GL_ZERO, GL_ZERO);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f( 1, -1);
+	glVertex2f( 1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
+
+	glPopMatrix();
+
+	glutSwapBuffers();
 }
 
 
-static void Reshape( int width, int height )
+static void Reshape(int width, int height)
 {
-   GLfloat ar = (float) width / (float) height;
-   Width = width;
-   Height = height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, Near, Far );
-   glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-   glTranslatef( 0.0, 0.0, -15.0 );
+	GLfloat ar = (float) width / (float) height;
+	Width = width;
+	Height = height;
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0, 0.0, -15.0);
 }
 
 
-static void Key( unsigned char key, int x, int y )
+static void Key(unsigned char key, int x, int y)
 {
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
 }
 
 
-static void Init( void )
+static void Init(void)
 {
-   const char * const ver_string = (const char *)
-       glGetString( GL_VERSION );
+	const char * const ver_string = (const char *)
+		glGetString(GL_VERSION);
 
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n", ver_string);
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION = %s\n", ver_string);
 
-   if ( !glutExtensionSupported("GL_ARB_imaging") && !glutExtensionSupported("GL_EXT_blend_minmax")) {
-      printf("Sorry, this program requires either GL_ARB_imaging or GL_EXT_blend_minmax.\n");
-      exit(1);
-   }
+	if (!glutExtensionSupported("GL_ARB_imaging") && !glutExtensionSupported("GL_EXT_blend_minmax")) {
+		printf("Sorry, this program requires either GL_ARB_imaging or "
+		       "GL_EXT_blend_minmax.\n");
+		exit(1);
+	}
 
-   printf("\nAll 4 squares should be the same color.\n");
-   glEnable( GL_BLEND );
+	printf("\nAll 4 squares should be the same color.\n");
+	glEnable(GL_BLEND);
 }
 
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE );
-   glutCreateWindow( "GL_EXT_blend_minmax test" );
-   glewInit();
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   Init();
-   glutMainLoop();
-   return 0;
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+	glutCreateWindow("GL_EXT_blend_minmax test");
+	glewInit();
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
+	Init();
+	glutMainLoop();
+	return 0;
 }
