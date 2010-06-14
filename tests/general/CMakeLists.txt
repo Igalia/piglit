@@ -21,6 +21,7 @@ link_libraries (
 
 add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
 add_executable (bgra-sec-color-pointer bgra-sec-color-pointer.c)
+add_executable (blendminmax blendminmax.c)
 add_executable (blendsquare blendsquare.c)
 add_executable (clear-varray-2.0 clear-varray-2.0.c)
 add_executable (depth-clamp-range depth-clamp-range.c)
