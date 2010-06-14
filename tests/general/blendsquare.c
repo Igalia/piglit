@@ -92,7 +92,7 @@ piglit_init(int argc, char **argv)
 	if (!GLEW_VERSION_1_4 && !GLEW_NV_blend_square) {
 		printf("Sorry, this program requires either OpenGL 1.4 or "
 		       "GL_NV_blend_square\n");
-		exit(1);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	printf("\nAll 4 quads should be the same color.  "
