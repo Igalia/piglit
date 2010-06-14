@@ -32,148 +32,77 @@
  * \author Ian Romanick <idr@us.ibm.com>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "piglit-util.h"
 
-static int Width = 400;
-static int Height = 200;
+int piglit_width = 400;
+int piglit_height = 200;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static const GLfloat Near = 5.0, Far = 25.0;
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
+	GLboolean pass = GL_TRUE;
+	int w = (piglit_width - 50) / 4;
+	int h = piglit_height - 20;
+	int start_x = 10;
+	int next_x = 10 + w;
+	float expected[4] = {0.25, 0.25, 0.25, 0.25};
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	glClearColor(0.2, 0.2, 0.8, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glPushMatrix();
-
-	glTranslatef(-4.5, 0, 0);
 	glBlendFunc(GL_ONE, GL_ZERO);
-	glBegin(GL_QUADS);
 	glColor3f(0.5 * 0.5, 0.5 * 0.5, 0.5 * 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(start_x + next_x * 0, 10, w, h);
 
-
-	glTranslatef(3.0, 0, 0);
 	glBlendFunc(GL_ONE, GL_ZERO);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
-
+	piglit_draw_rect(start_x + next_x * 1, 10, w, h);
 	glBlendFunc(GL_DST_COLOR, GL_ZERO);
-	glBegin(GL_QUADS);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(start_x + next_x * 1, 10, w, h);
 
-
-	glTranslatef(3.0, 0, 0);
 	glBlendFunc(GL_SRC_COLOR, GL_ZERO);
-	glBegin(GL_QUADS);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(start_x + next_x * 2, 10, w, h);
 
-
-	glTranslatef(3.0, 0, 0);
 	glBlendFunc(GL_ONE, GL_ZERO);
-	glBegin(GL_QUADS);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
-
+	piglit_draw_rect(start_x + next_x * 3, 10, w, h);
 	glBlendFunc(GL_ZERO, GL_DST_COLOR);
-	glBegin(GL_QUADS);
-	glVertex2f(-1, -1);
-	glVertex2f( 1, -1);
-	glVertex2f( 1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(start_x + next_x * 3, 10, w, h);
 
-	glPopMatrix();
+	pass = piglit_probe_pixel_rgb(15 + next_x * 0, piglit_height / 2,
+				      expected) && pass;
+	pass = piglit_probe_pixel_rgb(15 + next_x * 1, piglit_height / 2,
+				      expected) && pass;
+	pass = piglit_probe_pixel_rgb(15 + next_x * 2, piglit_height / 2,
+				      expected) && pass;
+	pass = piglit_probe_pixel_rgb(15 + next_x * 3, piglit_height / 2,
+				      expected) && pass;
 
 	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-
-static void Reshape(int width, int height)
+void
+piglit_init(int argc, char **argv)
 {
-	GLfloat ar = (float) width / (float) height;
-	Width = width;
-	Height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -15.0);
-}
-
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
-{
-	const char * const ver_string = (const char *)
-		glGetString(GL_VERSION);
-	const double version = strtod(ver_string, NULL);
-
-	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-	printf("GL_VERSION = %s\n", ver_string);
-
-	if ((version < 1.4) && !glutExtensionSupported("GL_NV_blend_square")) {
-		printf("Sorry, this program requires either OpenGL 1.4 or GL_NV_blend_square\n");
+	if (!GLEW_VERSION_1_4 && !GLEW_NV_blend_square) {
+		printf("Sorry, this program requires either OpenGL 1.4 or "
+		       "GL_NV_blend_square\n");
 		exit(1);
 	}
 
-	printf("\nAll 4 squares should be the same color.  The two on the left are drawn\n"
-	       "without NV_blend_square functionality, and the two on the right are drawn\n"
-	       "with NV_blend_square functionality.  If the two on the left are dark, but\n"
-	       "the two on the right are not, then NV_blend_square is broken.\n");
+	printf("\nAll 4 quads should be the same color.  "
+	       "The two on the left are drawn\n"
+	       "without NV_blend_square functionality, and "
+	       "the two on the right are drawn\n"
+	       "with NV_blend_square functionality.  If the "
+	       "two on the left are dark, but\n"
+	       "the two on the right are not, then "
+	       "NV_blend_square is broken.\n");
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
-}
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutCreateWindow("GL_NV_blend_square test");
-	glewInit();
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	Init();
-	glutMainLoop();
-	return 0;
 }
