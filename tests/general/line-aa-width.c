@@ -36,6 +36,9 @@
  * ugly.
  */
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include "piglit-util.h"
 
 int piglit_width = 300, piglit_height = 100;
