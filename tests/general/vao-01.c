@@ -48,111 +48,111 @@ static int Height = 200;
 static const GLfloat Near = 5.0, Far = 25.0;
 
 
-static void Display( void )
+static void Display(void)
 {
 }
 
 
-static void Idle( void )
+static void Idle(void)
 {
 }
 
 
-static void Visible( int vis )
+static void Visible(int vis)
 {
-   if ( vis == GLUT_VISIBLE ) {
-      glutIdleFunc( Idle );
-   }
-   else {
-      glutIdleFunc( NULL );
-   }
+	if (vis == GLUT_VISIBLE) {
+		glutIdleFunc(Idle);
+	}
+	else {
+		glutIdleFunc(NULL);
+	}
 }
-static void Reshape( int width, int height )
+static void Reshape(int width, int height)
 {
-   GLfloat ar = (float) width / (float) height;
-   Width = width;
-   Height = height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, Near, Far );
-}
-
-
-static void Key( unsigned char key, int x, int y )
-{
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
+	GLfloat ar = (float) width / (float) height;
+	Width = width;
+	Height = height;
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
 }
 
 
-static void Init( void )
+static void Key(unsigned char key, int x, int y)
 {
-   const char * const ver_string = (const char *)
-       glGetString( GL_VERSION );
-   GLuint obj;
-   int pass = 1;
-   void * ptr;
-
-
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n\n", ver_string);
-
-   if ( !glutExtensionSupported("GL_APPLE_vertex_array_object") ) {
-      printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
-      exit(2);
-   }
-
-   glGenVertexArraysAPPLE( 1, & obj );
-   glBindVertexArrayAPPLE( obj );
-   glVertexPointer( 4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xDEADBEEF);
-   glEnableClientState( GL_VERTEX_ARRAY );
-
-   glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
-
-   glVertexPointer( 4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xBADDC0DE);
-   glDisableClientState( GL_VERTEX_ARRAY );
-
-   glPopClientAttrib();
-
-   if ( ! glIsEnabled( GL_VERTEX_ARRAY ) ) {
-      printf( "Array state is incorrectly disabled.\n" );
-      pass = 0;
-   }
-
-   glGetPointerv( GL_VERTEX_ARRAY_POINTER, & ptr );
-   if ( ptr != (void *) 0xDEADBEEF ) {
-      printf( "Array pointer is incorrectly set to 0x%p.\n", ptr );
-      pass = 0;
-   }
-
-   if ( ! pass ) {
-      printf( "FAIL!\n" );
-      exit(1);
-   }
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
 }
 
 
-int main( int argc, char *argv[] )
+static void Init(void)
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB );
-   glutCreateWindow( "GL_APPLE_vertex_array_object demo" );
-   glewInit();
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   glutVisibilityFunc( Visible );
+	const char * const ver_string = (const char *)
+		glGetString(GL_VERSION);
+	GLuint obj;
+	int pass = 1;
+	void * ptr;
 
-   Init();
 
-   return 0;
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION = %s\n\n", ver_string);
+
+	if (!glutExtensionSupported("GL_APPLE_vertex_array_object")) {
+		printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
+		exit(2);
+	}
+
+	glGenVertexArraysAPPLE(1, & obj);
+	glBindVertexArrayAPPLE(obj);
+	glVertexPointer(4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xDEADBEEF);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+	glVertexPointer(4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xBADDC0DE);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glPopClientAttrib();
+
+	if (! glIsEnabled(GL_VERTEX_ARRAY)) {
+		printf("Array state is incorrectly disabled.\n");
+		pass = 0;
+	}
+
+	glGetPointerv(GL_VERTEX_ARRAY_POINTER, & ptr);
+	if (ptr != (void *) 0xDEADBEEF) {
+		printf("Array pointer is incorrectly set to 0x%p.\n", ptr);
+		pass = 0;
+	}
+
+	if (! pass) {
+		printf("FAIL!\n");
+		exit(1);
+	}
+}
+
+
+int main(int argc, char *argv[])
+{
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
+	glutInitDisplayMode(GLUT_RGB);
+	glutCreateWindow("GL_APPLE_vertex_array_object demo");
+	glewInit();
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
+	glutVisibilityFunc(Visible);
+
+	Init();
+
+	return 0;
 }
