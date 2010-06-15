@@ -32,20 +32,25 @@
  * \author Ian Romanick <idr@us.ibm.com>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "piglit-util.h"
 
-static int Width = 550;
-static int Height = 200;
-static const GLfloat Near = 5.0, Far = 25.0;
+int piglit_width = 550;
+int piglit_height = 200;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL;
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLint  max_stencil;
 	GLint  stencil_bits;
 	unsigned i;
+	GLboolean pass = GL_TRUE;
+	float expected[4] = {0.5, 0.5, 0.5, 0.5};
+	int w = piglit_width / (5 * 2 + 1);
+	int h = w;
+	int start_y = (piglit_height - h) / 2;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glGetIntegerv(GL_STENCIL_BITS, & stencil_bits);
 	max_stencil = (1U << stencil_bits) - 1;
@@ -57,20 +62,12 @@ static void Display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
 		GL_STENCIL_BUFFER_BIT);
 
-	glPushMatrix();
-
 	/* This is the "reference" square.
 	 */
 
 	glDisable(GL_STENCIL_TEST);
-	glTranslatef(-6.0, 0, 0);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glVertex2f(1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(w * 1, start_y, w, h);
 
 	glEnable(GL_STENCIL_TEST);
 
@@ -81,50 +78,29 @@ static void Display(void)
 	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
-	glTranslatef(3.0, 0, 0);
-	glBegin(GL_QUADS);
 	glColor3f(0.9, 0.9, 0.9);
 
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glVertex2f(1,  1);
-		glVertex2f(-1,  1);
+		piglit_draw_rect(w * 3, start_y, w, h);
 	}
 	glEnd();
 
 	glStencilFunc(GL_EQUAL, max_stencil, ~0);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glVertex2f(1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(w * 3, start_y, w, h);
 
 	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 
-	glTranslatef(3.0, 0, 0);
-	glBegin(GL_QUADS);
 	glColor3f(0.9, 0.9, 0.9);
 
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glVertex2f(1,  1);
-		glVertex2f(-1,  1);
+		piglit_draw_rect(w * 5, start_y, w, h);
 	}
-	glEnd();
 
 	glStencilFunc(GL_EQUAL, 0, ~0);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glVertex2f(1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(w * 5, start_y, w, h);
 
 	/* Draw the last two squares using the two wrap modes.
 	 */
@@ -132,116 +108,49 @@ static void Display(void)
 	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 
-	glTranslatef(3.0, 0, 0);
-	glBegin(GL_QUADS);
 	glColor3f(0.9, 0.9, 0.9);
 
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glVertex2f(1,  1);
-		glVertex2f(-1,  1);
+		piglit_draw_rect(w * 7, start_y, w, h);
 	}
-	glEnd();
 
 	glStencilFunc(GL_EQUAL, 4, ~0);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glVertex2f(1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(w * 7, start_y, w, h);
 
 	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR_WRAP);
 
-	glTranslatef(3.0, 0, 0);
-	glBegin(GL_QUADS);
 	glColor3f(0.9, 0.9, 0.9);
 
 	for (i = 0 ; i < 5 ; i++) {
-		glVertex2f(-1, -1);
-		glVertex2f(1, -1);
-		glVertex2f(1,  1);
-		glVertex2f(-1,  1);
+		piglit_draw_rect(w * 9, start_y, w, h);
 	}
-	glEnd();
 
 	glStencilFunc(GL_EQUAL, (max_stencil - 4), ~0);
-	glBegin(GL_QUADS);
 	glColor3f(0.5, 0.5, 0.5);
-	glVertex2f(-1, -1);
-	glVertex2f(1, -1);
-	glVertex2f(1,  1);
-	glVertex2f(-1,  1);
-	glEnd();
+	piglit_draw_rect(w * 9, start_y, w, h);
 
-	glPopMatrix();
+	pass = piglit_probe_pixel_rgb(w * 1.5, piglit_height / 2, expected);
+	pass = piglit_probe_pixel_rgb(w * 3.5, piglit_height / 2, expected);
+	pass = piglit_probe_pixel_rgb(w * 5.5, piglit_height / 2, expected);
+	pass = piglit_probe_pixel_rgb(w * 7.5, piglit_height / 2, expected);
+	pass = piglit_probe_pixel_rgb(w * 9.5, piglit_height / 2, expected);
 
 	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-
-static void Reshape(int width, int height)
+void
+piglit_init(int argc, char **argv)
 {
-	GLfloat ar = (float) width / (float) height;
-	Width = width;
-	Height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -15.0);
-}
-
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
-{
-	const char * const ver_string = (const char *)
-		glGetString(GL_VERSION);
-
-	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-	printf("GL_VERSION = %s\n", ver_string);
-
-	if (!glutExtensionSupported("GL_EXT_stencil_wrap") 
-	     && (atof(ver_string) < 1.4)) {
-		printf("Sorry, this program requires either GL_EXT_stencil_wrap or OpenGL 1.4.\n");
-		exit(1);
+	if (!GLEW_EXT_stencil_wrap && !GLEW_VERSION_1_4) {
+		printf("Sorry, this program requires either "
+		       "GL_EXT_stencil_wrap or OpenGL 1.4.\n");
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	printf("\nAll 5 squares should be the same color.\n");
 	glEnable(GL_BLEND);
-}
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
-	glutCreateWindow("GL_EXT_stencil_wrap test");
-	glewInit();
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	Init();
-	glutMainLoop();
-	return 0;
 }
