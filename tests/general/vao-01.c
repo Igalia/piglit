@@ -36,77 +36,27 @@
  * \author Ian Romanick <idr@us.ibm.com>
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
+#include "piglit-util.h"
 
+int piglit_width = 400;
+int piglit_height = 200;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-static int Width = 400;
-static int Height = 200;
-static const GLfloat Near = 5.0, Far = 25.0;
-
-
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
+	return PIGLIT_SUCCESS;
 }
 
-
-static void Idle(void)
+void
+piglit_init(int argc, char **argv)
 {
-}
-
-
-static void Visible(int vis)
-{
-	if (vis == GLUT_VISIBLE) {
-		glutIdleFunc(Idle);
-	}
-	else {
-		glutIdleFunc(NULL);
-	}
-}
-static void Reshape(int width, int height)
-{
-	GLfloat ar = (float) width / (float) height;
-	Width = width;
-	Height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
-}
-
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void Init(void)
-{
-	const char * const ver_string = (const char *)
-		glGetString(GL_VERSION);
 	GLuint obj;
-	int pass = 1;
 	void * ptr;
 
-
-	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-	printf("GL_VERSION = %s\n\n", ver_string);
-
-	if (!glutExtensionSupported("GL_APPLE_vertex_array_object")) {
+	if (!GLEW_APPLE_vertex_array_object) {
 		printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
-		exit(2);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	glGenVertexArraysAPPLE(1, & obj);
@@ -123,36 +73,14 @@ static void Init(void)
 
 	if (! glIsEnabled(GL_VERTEX_ARRAY)) {
 		printf("Array state is incorrectly disabled.\n");
-		pass = 0;
+		piglit_report_result(PIGLIT_FAILURE);
 	}
 
 	glGetPointerv(GL_VERTEX_ARRAY_POINTER, & ptr);
 	if (ptr != (void *) 0xDEADBEEF) {
 		printf("Array pointer is incorrectly set to 0x%p.\n", ptr);
-		pass = 0;
+		piglit_report_result(PIGLIT_FAILURE);
 	}
 
-	if (! pass) {
-		printf("FAIL!\n");
-		exit(1);
-	}
-}
-
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB);
-	glutCreateWindow("GL_APPLE_vertex_array_object demo");
-	glewInit();
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	glutVisibilityFunc(Visible);
-
-	Init();
-
-	return 0;
+	piglit_report_result(PIGLIT_SUCCESS);
 }
