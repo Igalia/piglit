@@ -24,7 +24,7 @@
 
 /**
  * \file stencil_wrap.c
- * 
+ *
  * Simple test of GL_EXT_stencil_wrap functionality.  Four squares are drawn
  * with different stencil modes, but all should be rendered with the same
  * final color.
@@ -41,219 +41,207 @@ static int Width = 550;
 static int Height = 200;
 static const GLfloat Near = 5.0, Far = 25.0;
 
-
-static void Display( void )
+static void Display(void)
 {
-   GLint  max_stencil;
-   GLint  stencil_bits;
-   unsigned i;
+	GLint  max_stencil;
+	GLint  stencil_bits;
+	unsigned i;
 
+	glGetIntegerv(GL_STENCIL_BITS, & stencil_bits);
+	max_stencil = (1U << stencil_bits) - 1;
+	printf("Stencil bits = %u, maximum stencil value = 0x%08x\n",
+		stencil_bits, max_stencil);
 
-   glGetIntegerv( GL_STENCIL_BITS, & stencil_bits );
-   max_stencil = (1U << stencil_bits) - 1;
-   printf( "Stencil bits = %u, maximum stencil value = 0x%08x\n",
-	   stencil_bits, max_stencil );
+	glClearStencil(0);
+	glClearColor(0.2, 0.2, 0.8, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+		GL_STENCIL_BUFFER_BIT);
 
-   glClearStencil( 0 );
-   glClearColor( 0.2, 0.2, 0.8, 0 );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT 
-	    | GL_STENCIL_BUFFER_BIT );
+	glPushMatrix();
 
+	/* This is the "reference" square.
+	 */
 
-   glPushMatrix();
+	glDisable(GL_STENCIL_TEST);
+	glTranslatef(-6.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   /* This is the "reference" square.
-    */
+	glEnable(GL_STENCIL_TEST);
 
-   glDisable(GL_STENCIL_TEST);
-   glTranslatef(-6.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* Draw the first two squares using the two non-wrap (i.e., saturate)
+	 * modes.
+	 */
 
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 
-   glEnable(GL_STENCIL_TEST);
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
 
-   /* Draw the first two squares using the two non-wrap (i.e., saturate)
-    * modes.
-    */
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
-   glStencilFunc(GL_ALWAYS, 0, ~0);
-   glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+	glStencilFunc(GL_EQUAL, max_stencil, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
 
-   glStencilFunc(GL_EQUAL, max_stencil, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   glStencilFunc(GL_ALWAYS, 0, ~0);
-   glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
+	/* Draw the last two squares using the two wrap modes.
+	 */
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
 
-   glStencilFunc(GL_EQUAL, 0, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
+	glStencilFunc(GL_EQUAL, 4, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR_WRAP);
 
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
 
-   /* Draw the last two squares using the two wrap modes.
-    */
+	for (i = 0 ; i < 5 ; i++) {
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
-   glStencilFunc(GL_ALWAYS, 0, ~0);
-   glStencilOp(GL_KEEP, GL_KEEP, GL_INCR_WRAP);
+	glStencilFunc(GL_EQUAL, (max_stencil - 4), ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
+	glPopMatrix();
 
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
-
-   glStencilFunc(GL_EQUAL, 4, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
-
-
-   
-   glStencilFunc(GL_ALWAYS, 0, ~0);
-   glStencilOp(GL_KEEP, GL_KEEP, GL_DECR_WRAP);
-
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
-
-   for ( i = 0 ; i < 5 ; i++ ) {
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
-
-   glStencilFunc(GL_EQUAL, (max_stencil - 4), ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
-
-
-
-   glPopMatrix();
-
-   glutSwapBuffers();
+	glutSwapBuffers();
 }
 
 
-static void Reshape( int width, int height )
+static void Reshape(int width, int height)
 {
-   GLfloat ar = (float) width / (float) height;
-   Width = width;
-   Height = height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, Near, Far );
-   glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-   glTranslatef( 0.0, 0.0, -15.0 );
+	GLfloat ar = (float) width / (float) height;
+	Width = width;
+	Height = height;
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0, 0.0, -15.0);
 }
 
 
-static void Key( unsigned char key, int x, int y )
+static void Key(unsigned char key, int x, int y)
 {
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
 }
 
 
-static void Init( void )
+static void Init(void)
 {
-   const char * const ver_string = (const char *)
-       glGetString( GL_VERSION );
+	const char * const ver_string = (const char *)
+		glGetString(GL_VERSION);
 
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n", ver_string);
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION = %s\n", ver_string);
 
-   if ( !glutExtensionSupported("GL_EXT_stencil_wrap") 
-	&& (atof( ver_string ) < 1.4) ) {
-      printf("Sorry, this program requires either GL_EXT_stencil_wrap or OpenGL 1.4.\n");
-      exit(1);
-   }
+	if (!glutExtensionSupported("GL_EXT_stencil_wrap") 
+	     && (atof(ver_string) < 1.4)) {
+		printf("Sorry, this program requires either GL_EXT_stencil_wrap or OpenGL 1.4.\n");
+		exit(1);
+	}
 
-   printf("\nAll 5 squares should be the same color.\n");
-   glEnable( GL_BLEND );
+	printf("\nAll 5 squares should be the same color.\n");
+	glEnable(GL_BLEND);
 }
 
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL );
-   glutCreateWindow( "GL_EXT_stencil_wrap test" );
-   glewInit();
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   Init();
-   glutMainLoop();
-   return 0;
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
+	glutCreateWindow("GL_EXT_stencil_wrap test");
+	glewInit();
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
+	Init();
+	glutMainLoop();
+	return 0;
 }
