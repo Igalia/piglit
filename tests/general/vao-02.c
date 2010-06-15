@@ -29,10 +29,10 @@
  * a VAO, pushed it (via \c glPushClientAttrib), deletes the VAO, then pops
  * it (via \c glPopClientAttrib).  After popping, the state of the VAO is
  * examined.
- * 
+ *
  * According to the APPLE_vertex_array_object spec, the contents of the VAO
  * should be restored to the values that they had when pushed.
- * 
+ *
  * \author Ian Romanick <idr@us.ibm.com>
  */
 
@@ -47,139 +47,139 @@ static int Height = 200;
 static const GLfloat Near = 5.0, Far = 25.0;
 
 
-static void Display( void )
+static void Display(void)
 {
 }
 
 
-static void Idle( void )
+static void Idle(void)
 {
 }
 
 
-static void Visible( int vis )
+static void Visible(int vis)
 {
-   if ( vis == GLUT_VISIBLE ) {
-      glutIdleFunc( Idle );
-   }
-   else {
-      glutIdleFunc( NULL );
-   }
+	if (vis == GLUT_VISIBLE) {
+		glutIdleFunc(Idle);
+	}
+	else {
+		glutIdleFunc(NULL);
+	}
 }
-static void Reshape( int width, int height )
+static void Reshape(int width, int height)
 {
-   GLfloat ar = (float) width / (float) height;
-   Width = width;
-   Height = height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, Near, Far );
-}
-
-
-static void Key( unsigned char key, int x, int y )
-{
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
+	GLfloat ar = (float) width / (float) height;
+	Width = width;
+	Height = height;
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
 }
 
 
-static void Init( void )
+static void Key(unsigned char key, int x, int y)
 {
-   const char * const ver_string = (const char *)
-       glGetString( GL_VERSION );
-   GLuint obj;
-   int pass = 1;
-   void * ptr;
-   GLenum err;
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
+}
 
 
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n\n", ver_string);
+static void Init(void)
+{
+	const char * const ver_string = (const char *)
+		glGetString(GL_VERSION);
+	GLuint obj;
+	int pass = 1;
+	void * ptr;
+	GLenum err;
 
-   if ( !glutExtensionSupported("GL_APPLE_vertex_array_object") ) {
-      printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
-      exit(2);
-   }
 
-   glGenVertexArraysAPPLE( 1, & obj );
-   glBindVertexArrayAPPLE( obj );
-   glVertexPointer( 4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xDEADBEEF);
-   glEnableClientState( GL_VERTEX_ARRAY );
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION = %s\n\n", ver_string);
 
-   glPushClientAttrib( GL_CLIENT_VERTEX_ARRAY_BIT );
+	if (!glutExtensionSupported("GL_APPLE_vertex_array_object")) {
+		printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
+		exit(2);
+	}
 
-   glDeleteVertexArraysAPPLE( 1, & obj );
+	glGenVertexArraysAPPLE(1, & obj);
+	glBindVertexArrayAPPLE(obj);
+	glVertexPointer(4, GL_FLOAT, sizeof(GLfloat) * 4, (void *) 0xDEADBEEF);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+	glDeleteVertexArraysAPPLE(1, & obj);
    
-   err = glGetError();
-   if (err) {
-      printf( "glGetError incorrectly returned 0x%04x.\n", err );
-      pass = 0;
-   }
+	err = glGetError();
+	if (err) {
+		printf("glGetError incorrectly returned 0x%04x.\n", err);
+		pass = 0;
+	}
 
-   if ( (*glIsVertexArrayAPPLE)( obj ) ) {
-      printf( "Array object is incorrectly still valid.\n" );
-      pass = 0;
-   }
+	if ((*glIsVertexArrayAPPLE)(obj)) {
+		printf("Array object is incorrectly still valid.\n");
+		pass = 0;
+	}
 
-   err = glGetError();
-   if (err) {
-      printf( "glGetError incorrectly returned 0x%04x.\n", err );
-      pass = 0;
-   }
+	err = glGetError();
+	if (err) {
+		printf("glGetError incorrectly returned 0x%04x.\n", err);
+		pass = 0;
+	}
 
-   glPopClientAttrib();
+	glPopClientAttrib();
 
-   err = glGetError();
-   if (err) {
-      printf( "glGetError incorrectly returned 0x%04x.\n", err );
-      pass = 0;
-   }
+	err = glGetError();
+	if (err) {
+		printf("glGetError incorrectly returned 0x%04x.\n", err);
+		pass = 0;
+	}
 
-   if ( ! glIsVertexArrayAPPLE( obj ) ) {
-      printf( "Array object is incorrectly invalid.\n" );
-      pass = 0;
-   }
+	if (! glIsVertexArrayAPPLE(obj)) {
+		printf("Array object is incorrectly invalid.\n");
+		pass = 0;
+	}
 
-   if ( ! glIsEnabled( GL_VERTEX_ARRAY ) ) {
-      printf( "Array state is incorrectly disabled.\n" );
-      pass = 0;
-   }
+	if (! glIsEnabled(GL_VERTEX_ARRAY)) {
+		printf("Array state is incorrectly disabled.\n");
+		pass = 0;
+	}
 
-   glGetPointerv( GL_VERTEX_ARRAY_POINTER, & ptr );
-   if ( ptr != (void *) 0xDEADBEEF ) {
-      printf( "Array pointer is incorrectly set to 0x%p.\n", ptr );
-      pass = 0;
-   }
+	glGetPointerv(GL_VERTEX_ARRAY_POINTER, & ptr);
+	if (ptr != (void *) 0xDEADBEEF) {
+		printf("Array pointer is incorrectly set to 0x%p.\n", ptr);
+		pass = 0;
+	}
 
-   if ( ! pass ) {
-      printf( "FAIL!\n" );
-      exit(1);
-   }
+	if (! pass) {
+		printf("FAIL!\n");
+		exit(1);
+	}
 }
 
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB );
-   glutCreateWindow( "GL_APPLE_vertex_array_object demo" );
-   glewInit();
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   glutVisibilityFunc( Visible );
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
+	glutInitDisplayMode(GLUT_RGB);
+	glutCreateWindow("GL_APPLE_vertex_array_object demo");
+	glewInit();
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
+	glutVisibilityFunc(Visible);
 
-   Init();
+	Init();
 
-   return 0;
+	return 0;
 }
