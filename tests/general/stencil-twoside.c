@@ -24,8 +24,10 @@
 
 /**
  * \file stencil_twoside.c
- * 
- * Simple test of GL_ATI_separate_stencil (or the OGL 2.0 equivalent) functionality.
+ *
+ * Simple test of GL_ATI_separate_stencil (or the OGL 2.0 equivalent)
+ * functionality.
+ *
  * Five squares (or six if stencil wrap is available) are drawn
  * with different stencil modes, but all should be rendered with the same
  * final color.
@@ -42,302 +44,290 @@ static int Height = 200;
 static const GLfloat Near = 5.0, Far = 25.0;
 
 
-static void Display( void )
+static void Display(void)
 {
-   GLint  max_stencil;
-   GLint  stencil_bits;
-   unsigned i;
+	GLint  max_stencil;
+	GLint  stencil_bits;
+	unsigned i;
 
 
-   glGetIntegerv( GL_STENCIL_BITS, & stencil_bits );
-   max_stencil = (1U << stencil_bits) - 1;
-   printf( "Stencil bits = %u, maximum stencil value = 0x%08x\n",
-	   stencil_bits, max_stencil );
+	glGetIntegerv(GL_STENCIL_BITS, & stencil_bits);
+	max_stencil = (1U << stencil_bits) - 1;
+	printf("Stencil bits = %u, maximum stencil value = 0x%08x\n",
+		stencil_bits, max_stencil);
 
-   glClearStencil( 1 );
-   glClearColor( 0.2, 0.2, 0.8, 0 );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT 
-	    | GL_STENCIL_BUFFER_BIT );
+	glClearStencil(1);
+	glClearColor(0.2, 0.2, 0.8, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+		 | GL_STENCIL_BUFFER_BIT);
 
+	glPushMatrix();
 
-   glPushMatrix();
-
-   /* This is the "reference" square.
-    */
-
-   glDisable(GL_STENCIL_TEST);
-   glTranslatef(-7.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* This is the "reference" square. */
+	glDisable(GL_STENCIL_TEST);
+	glTranslatef(-7.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
 
-   glEnable(GL_STENCIL_TEST);
+	glEnable(GL_STENCIL_TEST);
 
-   /* Draw the first two squares using incr for the affected face
-    */
+	/* Draw the first two squares using incr for the affected face
+	 */
 
-   /*************************************************************************
-    * 2nd square
-    */
-   if (use20syntax) {
-      glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
-      glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
-   }
-   else {
-      glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
-   }
-   glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
-   glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
+	/* 2nd square */
+	if (use20syntax) {
+		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
+		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+	}
+	else {
+		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+	}
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      /* this should be front facing */
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		/* this should be front facing */
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
-   /* stencil vals should be equal to max_stencil */
-   glStencilFunc(GL_EQUAL, max_stencil, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* stencil vals should be equal to max_stencil */
+	glStencilFunc(GL_EQUAL, max_stencil, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   /*************************************************************************
-    * 3rd square
-    */
-   if (use20syntax) {
-      glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
-      glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
-   }
-   else {
-      glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
-   }
-   glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
-   glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
+	/* 3rd square */
+	if (use20syntax) {
+		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
+		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+	}
+	else {
+		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+	}
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      /* this should be back facing */
-      glVertex2f(-1, -1);
-      glVertex2f(-1,  1);
-      glVertex2f( 1,  1);
-      glVertex2f( 1, -1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		/* this should be back facing */
+		glVertex2f(-1, -1);
+		glVertex2f(-1,  1);
+		glVertex2f(1,  1);
+		glVertex2f(1, -1);
+	}
+	glEnd();
 
-   /* stencil vals should be equal to max_stencil */
-   glStencilFunc(GL_EQUAL, max_stencil, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* stencil vals should be equal to max_stencil */
+	glStencilFunc(GL_EQUAL, max_stencil, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   /*************************************************************************
-    * 4th square
-    */
-   if (use20syntax) {
-      glStencilFuncSeparate(GL_FRONT, GL_NEVER, 0, ~0);
-      glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
-   }
-   else {
-      glStencilFuncSeparateATI(GL_NEVER, GL_ALWAYS, 0, ~0);
-   }
-   glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
-   glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
+	/* 4th square */
+	if (use20syntax) {
+		glStencilFuncSeparate(GL_FRONT, GL_NEVER, 0, ~0);
+		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+	}
+	else {
+		glStencilFuncSeparateATI(GL_NEVER, GL_ALWAYS, 0, ~0);
+	}
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      /* this should be back facing */
-      glVertex2f(-1, -1);
-      glVertex2f(-1,  1);
-      glVertex2f( 1,  1);
-      glVertex2f( 1, -1);
-      /* this should be front facing */
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		/* this should be back facing */
+		glVertex2f(-1, -1);
+		glVertex2f(-1,  1);
+		glVertex2f(1,  1);
+		glVertex2f(1, -1);
+		/* this should be front facing */
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
-   /* stencil vals should be equal to max_stencil */
-   glStencilFunc(GL_EQUAL, max_stencil, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	/* stencil vals should be equal to max_stencil */
+	glStencilFunc(GL_EQUAL, max_stencil, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   /*************************************************************************
-    * 5th square
-    */
-   if (use20syntax) {
-      glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
-      glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
-   }
-   else {
-      glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
-   }
-   glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
-   glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
+	/* 5th square */
+	if (use20syntax) {
+		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
+		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+	}
+	else {
+		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+	}
+	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 
-   glTranslatef(3.0, 0, 0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.9, 0.9, 0.9 );
-   for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-      /* this should be back facing */
-      glVertex2f(-1, -1);
-      glVertex2f(-1,  1);
-      glVertex2f( 1,  1);
-      glVertex2f( 1, -1);
-      /* this should be front facing */
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-   }
-   glEnd();
+	glTranslatef(3.0, 0, 0);
+	glBegin(GL_QUADS);
+	glColor3f(0.9, 0.9, 0.9);
+	for (i = 0 ; i < (max_stencil + 5) ; i++) {
+		/* this should be back facing */
+		glVertex2f(-1, -1);
+		glVertex2f(-1,  1);
+		glVertex2f(1,  1);
+		glVertex2f(1, -1);
+		/* this should be front facing */
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+	}
+	glEnd();
 
-   glStencilFunc(GL_EQUAL, 1, ~0);
-   glBegin(GL_QUADS);
-   glColor3f( 0.5, 0.5, 0.5 );
-   glVertex2f(-1, -1);
-   glVertex2f( 1, -1);
-   glVertex2f( 1,  1);
-   glVertex2f(-1,  1);
-   glEnd();
+	glStencilFunc(GL_EQUAL, 1, ~0);
+	glBegin(GL_QUADS);
+	glColor3f(0.5, 0.5, 0.5);
+	glVertex2f(-1, -1);
+	glVertex2f(1, -1);
+	glVertex2f(1,  1);
+	glVertex2f(-1,  1);
+	glEnd();
 
-   /*************************************************************************
-    * 6th square
-    */
-   if (glutExtensionSupported("GL_EXT_stencil_wrap")) {
-      if (use20syntax) {
-         glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
-         glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
-      }
-      else {
-         glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
-      }
-      glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
-      glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
+	/* 6th square */
+	if (glutExtensionSupported("GL_EXT_stencil_wrap")) {
+		if (use20syntax) {
+			glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
+			glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+		}
+		else {
+			glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+		}
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 
-      glTranslatef(3.0, 0, 0);
-      glBegin(GL_QUADS);
-      glColor3f( 0.9, 0.9, 0.9 );
-      for ( i = 0 ; i < (max_stencil + 5) ; i++ ) {
-         /* this should be back facing */
-         glVertex2f(-1, -1);
-         glVertex2f(-1,  1);
-         glVertex2f( 1,  1);
-         glVertex2f( 1, -1);
-         /* this should be front facing */
-         glVertex2f(-1, -1);
-         glVertex2f( 1, -1);
-         glVertex2f( 1,  1);
-         glVertex2f(-1,  1);
-      }
-      glEnd();
+		glTranslatef(3.0, 0, 0);
+		glBegin(GL_QUADS);
+		glColor3f(0.9, 0.9, 0.9);
+		for (i = 0 ; i < (max_stencil + 5) ; i++) {
+			/* this should be back facing */
+			glVertex2f(-1, -1);
+			glVertex2f(-1,  1);
+			glVertex2f(1,  1);
+			glVertex2f(1, -1);
+			/* this should be front facing */
+			glVertex2f(-1, -1);
+			glVertex2f(1, -1);
+			glVertex2f(1,  1);
+			glVertex2f(-1,  1);
+		}
+		glEnd();
 
-      glStencilFunc(GL_EQUAL, 260 - 255, ~0);
-      glBegin(GL_QUADS);
-      glColor3f( 0.5, 0.5, 0.5 );
-      glVertex2f(-1, -1);
-      glVertex2f( 1, -1);
-      glVertex2f( 1,  1);
-      glVertex2f(-1,  1);
-      glEnd();
-   }
+		glStencilFunc(GL_EQUAL, 260 - 255, ~0);
+		glBegin(GL_QUADS);
+		glColor3f(0.5, 0.5, 0.5);
+		glVertex2f(-1, -1);
+		glVertex2f(1, -1);
+		glVertex2f(1,  1);
+		glVertex2f(-1,  1);
+		glEnd();
+	}
 
-   glPopMatrix();
+	glPopMatrix();
 
-   glutSwapBuffers();
+	glutSwapBuffers();
 }
 
 
-static void Reshape( int width, int height )
+static void Reshape(int width, int height)
 {
-   GLfloat ar = (float) width / (float) height;
-   Width = width;
-   Height = height;
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glFrustum( -ar, ar, -1.0, 1.0, Near, Far );
-   glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-   glTranslatef( 0.0, 0.0, -15.0 );
+	GLfloat ar = (float) width / (float) height;
+	Width = width;
+	Height = height;
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glFrustum(-ar, ar, -1.0, 1.0, Near, Far);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0, 0.0, -15.0);
 }
 
 
-static void Key( unsigned char key, int x, int y )
+static void Key(unsigned char key, int x, int y)
 {
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
 }
 
 
-static void Init( void )
+static void Init(void)
 {
-   const char * const ver_string = (const char *)
-       glGetString( GL_VERSION );
+	const char * const ver_string = (const char *)
+		glGetString(GL_VERSION);
 
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n", ver_string);
+	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
+	printf("GL_VERSION = %s\n", ver_string);
 
-   if ( !glutExtensionSupported("GL_ATI_separate_stencil") 
-	&& (atof( ver_string ) < 2.0) ) {
-      printf("Sorry, this program requires either GL_ATI_separate_stencil or OpenGL 2.0.\n");
-      exit(1);
-   }
-   if (atof( ver_string ) < 2.0) {
-      use20syntax = 0;
-   }
+	if (!glutExtensionSupported("GL_ATI_separate_stencil")
+	     && (atof(ver_string) < 2.0)) {
+		printf("Sorry, this program requires either "
+		       "GL_ATI_separate_stencil or OpenGL 2.0.\n");
+		exit(1);
+	}
+	if (atof(ver_string) < 2.0) {
+		use20syntax = 0;
+	}
 
-   printf("\nAll 5 (or 6) squares should be the same color.\n");
+	printf("\nAll 5 (or 6) squares should be the same color.\n");
 }
 
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
-   glutInit( &argc, argv );
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL );
-   glutCreateWindow( "GL_ATI_separate_stencil test" );
-   glewInit();
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   Init();
-   glutMainLoop();
-   return 0;
+	glutInit(&argc, argv);
+	glutInitWindowPosition(0, 0);
+	glutInitWindowSize(Width, Height);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL);
+	glutCreateWindow("GL_ATI_separate_stencil test");
+	glewInit();
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+	glutDisplayFunc(Display);
+	Init();
+	glutMainLoop();
+	return 0;
 }
