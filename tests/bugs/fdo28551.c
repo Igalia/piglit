@@ -50,6 +50,8 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	piglit_require_extension("GL_ARB_framebuffer_object");
+
 	piglit_ortho_projection(1.0, 1.0, GL_FALSE);
 
 	piglit_automatic = GL_TRUE;
