@@ -25,6 +25,5 @@ add_definitions (
 	${PNG_DEFINITIONS}
 )
 
-add_executable (crossbar crossbar.c)
 add_executable (texline texline.c)
 #add_executable (arbfptest1 arbfptest1.c)
