@@ -676,6 +676,8 @@ add_otherglslparsertest('glsl2/swiz-01.vert', 'pass')
 add_otherglslparsertest('glsl2/swiz-02.vert', 'fail')
 add_otherglslparsertest('glsl2/tex_rect-01.frag', 'pass')
 add_otherglslparsertest('glsl2/tex_rect-02.frag', 'fail')
+add_otherglslparsertest('glsl2/uniform-01.vert', 'pass')
+add_otherglslparsertest('glsl2/uniform-02.vert', 'fail')
 add_otherglslparsertest('glsl2/void-01.vert', 'fail')
 
 # All the GST shaders should pass.
