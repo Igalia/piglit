@@ -52,7 +52,7 @@ these tokens will be ignored
 
 ignore these tokens too
 
-#elif 1 eat these tokens
+#elif 1
 #define f 3.4
 
 #endif
