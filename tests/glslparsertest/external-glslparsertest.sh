@@ -9,7 +9,7 @@ if test "x$2" != "xpass" -a "x$2" != "xfail"; then
     exit 1;
 fi
 
-result=$(./tests/glslparsertest/glslcompiler $type $1)
+result=$(./tests/glslparsertest/glslcompiler $1)
 status=$?
 
 if test "x$2" = xpass; then
