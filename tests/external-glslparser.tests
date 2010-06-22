@@ -1,0 +1,22 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# All tests that come with piglit, using default settings
+
+import os
+import re
+import subprocess
+
+from framework.core import *
+from framework.exectest import *
+from framework.gleantest import *
+
+profile = TestProfile()
+
+def add_glslparsertest(shader, result):
+	glslparsertest[shader] = PlainExecTest(['../tests/glslparsertest/external-glslparsertest.sh', 'tests/glslparsertest/shaders/' + shader, result])
+def add_otherglslparsertest(shader, result):
+	glslparsertest[shader] = PlainExecTest(['../tests/glslparsertest/external-glslparsertest.sh', 'tests/glslparsertest/' + shader, result])
+execfile(os.path.dirname(__file__) + '/glslparser.tests')
+
+profile.tests['glslparsertest'] = glslparsertest
+
