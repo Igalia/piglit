@@ -298,6 +298,7 @@ add_otherglslparsertest('glsl2/tex_rect-02.frag', 'fail')
 add_otherglslparsertest('glsl2/uniform-01.vert', 'pass')
 add_otherglslparsertest('glsl2/uniform-02.vert', 'fail')
 add_otherglslparsertest('glsl2/void-01.vert', 'fail')
+add_otherglslparsertest('glsl2/glsl-pp-elif-no-expression-2.frag', 'fail')
 
 # All the GST shaders should pass.
 add_otherglslparsertest('glsl2/gst-gl-bulge.frag', 'pass')
