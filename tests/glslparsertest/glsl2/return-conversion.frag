@@ -1,5 +1,4 @@
 /* FAIL - no implicit conversions for return values */
-#version 130
 float foo()
 {
    int x = 1;
