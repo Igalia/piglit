@@ -300,6 +300,7 @@ add_otherglslparsertest('glsl2/uniform-02.vert', 'fail')
 add_otherglslparsertest('glsl2/void-01.vert', 'fail')
 add_otherglslparsertest('glsl2/glsl-pp-elif-no-expression-2.frag', 'fail')
 add_otherglslparsertest('glsl2/return-conversion.frag', 'fail')
+add_otherglslparsertest('glsl2/return-conversion-2.frag', 'fail')
 add_otherglslparsertest('glsl2/return-qualifier.frag', 'fail')
 
 # All the GST shaders should pass.
