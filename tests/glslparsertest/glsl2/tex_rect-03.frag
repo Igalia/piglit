@@ -5,3 +5,5 @@
  */
 #extension FAIL: require
 #endif
+
+void main() { }
