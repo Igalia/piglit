@@ -1,0 +1,19 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+uniform vec4 arg0, arg1;
+void main()
+{
+	gl_FragColor = step(arg0, arg1);
+}
+
+[test]
+uniform vec4 arg0 1.0 1.0 0.0 -1.0
+uniform vec4 arg1 1.0 0.0 1.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 1.0 0.0 1.0
