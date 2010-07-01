@@ -83,7 +83,6 @@ piglit_display(void)
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
 		piglit_draw_rect(w * 3, start_y, w, h);
 	}
-	glEnd();
 
 	glStencilFunc(GL_EQUAL, max_stencil, ~0);
 	glColor3f(0.5, 0.5, 0.5);
