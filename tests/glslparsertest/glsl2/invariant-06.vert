@@ -1,0 +1,12 @@
+/* FAIL -
+ *
+ * From page 27 (page 33 of the PDF) of the GLSL 1.20 spec:
+ *
+ *     "Only variables output from a vertex shader can be candidates for
+ *     invariance."
+ */
+#version 120
+
+invariant uniform vec2 x;
+
+void main() { }
