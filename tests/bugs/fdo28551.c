@@ -26,6 +26,13 @@
 
 #include "piglit-util.h"
 
+#ifndef GL_FRAMEBUFFER
+#define GL_FRAMEBUFFER 0x8D40
+#endif
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE
+#define GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE 0x8212
+#endif
+
 int piglit_width = 100;
 int piglit_height = 100;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
