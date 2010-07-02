@@ -646,7 +646,7 @@ piglit_display(void)
 	line = test_start;
 	while (line[0] != '\0') {
 		float c[32];
-		int x, y;
+		int x, y, w, h, tex;
 
 		line = eat_whitespace(line);
 
@@ -712,6 +712,12 @@ piglit_display(void)
 								       c);
 				}
 			}
+		} else if (sscanf(line,
+				  "texture rgbw %d ( %d , %d )",
+				  &tex, &w, &h) == 3) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE);
+			glEnable(GL_TEXTURE_2D);
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
