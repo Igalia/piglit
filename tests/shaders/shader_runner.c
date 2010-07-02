@@ -598,6 +598,10 @@ set_uniform(const char *line)
 		get_floats(line, f, 1);
 		glUniform1fv(loc, 1, f);
 		return;
+	} else if (strncmp("int", type, 3) == 0) {
+		int val = atoi(line);
+		glUniform1i(loc, val);
+		return;
 	} else if (strncmp("vec", type, 3) == 0) {
 		switch (type[3]) {
 		case '2':
