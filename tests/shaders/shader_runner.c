@@ -622,6 +622,11 @@ set_uniform(const char *line)
 	return;
 }
 
+static GLboolean
+string_match(const char *string, const char *line)
+{
+	return (strncmp(string, line, strlen(string)) == 0);
+}
 
 enum piglit_result
 piglit_display(void)
@@ -641,31 +646,31 @@ piglit_display(void)
 
 		line = eat_whitespace(line);
 
-		if (strncmp("clear color", line, 11) == 0) {
+		if (string_match("clear color", line)) {
 			get_floats(line + 11, c, 4);
 			glClearColor(c[0], c[1], c[2], c[3]);
 			clear_bits |= GL_COLOR_BUFFER_BIT;
-		} else if (strncmp("clear", line, 5) == 0) {
+		} else if (string_match("clear", line)) {
 			glClear(clear_bits);
-		} else if (strncmp("draw rect", line, 9) == 0) {
+		} else if (string_match("draw rect", line)) {
 			get_floats(line + 9, c, 4);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
-		} else if (strncmp("ortho", line, 5) == 0) {
+		} else if (string_match("ortho", line)) {
 			piglit_ortho_projection(piglit_width, piglit_height,
 						GL_FALSE);
-		} else if (strncmp("probe rgba", line, 10) == 0) {
+		} else if (string_match("probe rgba", line)) {
 			get_floats(line + 10, c, 6);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
 				pass = false;
 			}
-		} else if (strncmp("probe rgb", line, 9) == 0) {
+		} else if (string_match("probe rgb", line)) {
 			get_floats(line + 9, c, 5);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
 						    & c[2])) {
 				pass = false;
 			}
-		} else if (strncmp("probe all rgba", line, 14) == 0) {
+		} else if (string_match("probe all rgba", line)) {
 			get_floats(line + 14, c, 4);
 			for (y = 0; y < piglit_height; y++ ) {
 				for (x = 0; x < piglit_width; x++) {
@@ -674,7 +679,7 @@ piglit_display(void)
 									c);
 				}
 			}
-		} else if (strncmp("probe all rgb", line, 13) == 0) {
+		} else if (string_match("probe all rgb", line)) {
 			get_floats(line + 13, c, 3);
 			for (y = 0; y < piglit_height; y++ ) {
 				for (x = 0; x < piglit_width; x++) {
@@ -683,7 +688,7 @@ piglit_display(void)
 								       c);
 				}
 			}
-		} else if (strncmp("uniform", line, 7) == 0) {
+		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
