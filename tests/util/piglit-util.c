@@ -721,6 +721,92 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
 	return tex;
 }
 
+/**
+ * Generates a texture with the given internalFormat, w, h with a
+ * teximage of r, g, b w quadrants.
+ *
+ * Note that for compressed teximages, where the blocking would be
+ * problematic, we assign the whole layers at w == 4 to red, w == 2 to
+ * green, and w == 1 to blue.
+ */
+GLuint
+piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip)
+{
+	GLfloat *data;
+	int size, x, y, level;
+	GLuint tex;
+	float red[4]   = {1.0, 0.0, 0.0, 1.0};
+	float green[4] = {0.0, 1.0, 0.0, 1.0};
+	float blue[4]  = {0.0, 0.0, 1.0, 1.0};
+	float white[4] = {1.0, 1.0, 1.0, 1.0};
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (mip) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_NEAREST);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST);
+	}
+	data = malloc(w * h * 4 * sizeof(GLfloat));
+
+	/* XXX: Do we want non-square textures?  Surely some day. */
+	assert(w == h);
+
+	for (level = 0, size = w; size > 0; level++, size >>= 1) {
+		for (y = 0; y < size; y++) {
+			for (x = 0; x < size; x++) {
+				const float *color;
+
+				if (x < size / 2 && y < size / 2)
+					color = red;
+				else if (y < size / 2)
+					color = green;
+				else if (x < size / 2)
+					color = blue;
+				else
+					color = white;
+
+				switch (format) {
+				case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+				case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+				case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+				case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+				case GL_COMPRESSED_RGB_FXT1_3DFX:
+				case GL_COMPRESSED_RGBA_FXT1_3DFX:
+					if (size == 4)
+						color = red;
+					else if (size == 2)
+						color = green;
+					else if (size == 1)
+						color = blue;
+					break;
+				default:
+					break;
+				}
+
+				memcpy(data + (y * size + x) * 4, color,
+				       4 * sizeof(float));
+			}
+		}
+		glTexImage2D(GL_TEXTURE_2D, level,
+			     format,
+			     size, size, 0,
+			     GL_RGBA, GL_FLOAT, data);
+
+		if (!mip)
+			break;
+	}
+	free(data);
+	return tex;
+}
 
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c)
