@@ -64,55 +64,6 @@ display_mipmaps(int start_x, int start_y)
 	}
 }
 
-static GLuint
-create_texture(GLenum format)
-{
-	GLfloat *data;
-	int size, x, y, level;
-	GLuint tex;
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR_MIPMAP_NEAREST);
-	data = malloc(SIZE * SIZE * 4 * sizeof(GLfloat));
-
-	for (level = 0, size = SIZE; size > 0; level++, size >>= 1) {
-		for (y = 0; y < size; y++) {
-			for (x = 0; x < size; x++) {
-				const float *color;
-
-				if (size == 4)
-					color = red;
-				else if (size == 2)
-					color = green;
-				else if (size == 1)
-					color = blue;
-				else if (x < size / 2 && y < size / 2)
-					color = red;
-				else if (y < size / 2)
-					color = green;
-				else if (x < size / 2)
-					color = blue;
-				else
-					color = white;
-
-				memcpy(data + (y * size + x) * 4, color,
-				       4 * sizeof(float));
-			}
-		}
-		glTexImage2D(GL_TEXTURE_2D, level,
-			     format,
-			     size, size, 0,
-			     GL_RGBA, GL_FLOAT, data);
-	}
-	free(data);
-	return tex;
-}
-
 static GLboolean
 check_resulting_mipmaps(int x, int y)
 {
@@ -158,16 +109,20 @@ piglit_display(void)
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	tex = create_texture(GL_COMPRESSED_RGB_S3TC_DXT1_EXT);
+	tex = piglit_rgbw_texture(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, SIZE, SIZE,
+				  GL_TRUE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 0);
 	glDeleteTextures(1, &tex);
-	tex = create_texture(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT);
+	tex = piglit_rgbw_texture(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, SIZE, SIZE,
+				  GL_TRUE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 1);
 	glDeleteTextures(1, &tex);
-	tex = create_texture(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT);
+	tex = piglit_rgbw_texture(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, SIZE, SIZE,
+				  GL_TRUE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 2);
 	glDeleteTextures(1, &tex);
-	tex = create_texture(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT);
+	tex = piglit_rgbw_texture(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, SIZE, SIZE,
+				  GL_TRUE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 3);
 	glDeleteTextures(1, &tex);
 
