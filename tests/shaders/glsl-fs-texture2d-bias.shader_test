@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 texcoords;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	texcoords = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+varying vec4 texcoords;
+uniform sampler2D tex;
+
+void main()
+{
+	gl_FragColor = texture2D(tex, texcoords.xy, 1.0);
+}
+
+[test]
+uniform int tex 0
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (1.0, 0.0, 0.0)
+relative probe rgb (0.75, 0.25) (0.0, 1.0, 0.0)
+relative probe rgb (0.25, 0.75) (0.0, 0.0, 1.0)
+relative probe rgb (0.75, 0.75) (1.0, 1.0, 1.0)
