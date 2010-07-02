@@ -664,9 +664,29 @@ piglit_display(void)
 						    & c[2])) {
 				pass = false;
 			}
+		} else if (sscanf(line,
+				  "relative probe rgba ( %f , %f ) "
+				  "( %f , %f , %f , %f )",
+				  c + 0, c + 1,
+				  c + 2, c + 3, c + 4, c + 5) == 6) {
+			if (!piglit_probe_pixel_rgba((int) (c[0] * piglit_width),
+						    (int) (c[1] * piglit_height),
+						    & c[2])) {
+				pass = false;
+			}
 		} else if (string_match("probe rgb", line)) {
 			get_floats(line + 9, c, 5);
 			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
+						    & c[2])) {
+				pass = false;
+			}
+		} else if (sscanf(line,
+				  "relative probe rgb ( %f , %f ) "
+				  "( %f , %f , %f )",
+				  c + 0, c + 1,
+				  c + 2, c + 3, c + 4) == 5) {
+			if (!piglit_probe_pixel_rgb((int) (c[0] * piglit_width),
+						    (int) (c[1] * piglit_height),
 						    & c[2])) {
 				pass = false;
 			}
