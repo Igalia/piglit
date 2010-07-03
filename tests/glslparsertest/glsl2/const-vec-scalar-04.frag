@@ -1,0 +1,7 @@
+void main()
+{
+   const vec4 c1 = vec4(4.0, 4.0, 4.0, 4.0);
+   const vec4 c2 = 2.0 / c1;
+   const vec4 c3 = c2 / 0.5;
+   gl_FragColor = c3;
+}
