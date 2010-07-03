@@ -14,7 +14,7 @@ profile = TestProfile()
 
 def add_glslparsertest(shader, result):
 	glslparsertest[shader] = PlainExecTest(['../tests/glslparsertest/external-glslparsertest.sh', 'tests/glslparsertest/shaders/' + shader, result])
-def add_otherglslparsertest(shader, result):
+def add_otherglslparsertest(shader, result, min_glsl_version = '1.10'):
 	glslparsertest[shader] = PlainExecTest(['../tests/glslparsertest/external-glslparsertest.sh', 'tests/glslparsertest/' + shader, result])
 execfile(os.path.dirname(__file__) + '/glslparser.tests')
 

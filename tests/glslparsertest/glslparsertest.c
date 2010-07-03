@@ -133,14 +133,19 @@ test(void)
 
 static void usage(char *name)
 {
-	printf("%s <filename.frag|filename.vert> <pass|fail>\n", name);
+	printf("%s <filename.frag|filename.vert> <pass|fail> "
+	       "{minimum GLSL vesion}\n", name);
 	exit(1);
 }
 
 int main(int argc, char**argv)
 {
+	const char *glsl_version_string;
+	float glsl_version;
+	float minimum_version = 1.10;
+
 	glutInit(&argc, argv);
-	if (argc != 3)
+	if ((argc != 3) && (argc != 4))
 		usage(argv[0]);
 
 	if (strlen(argv[1]) < 5)
@@ -154,6 +159,9 @@ int main(int argc, char**argv)
 	else
 		usage(argv[0]);
 
+	if (argc > 3)
+		minimum_version = strtod(argv[3], NULL);
+
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("glslparsertest");
@@ -165,7 +173,16 @@ int main(int argc, char**argv)
 		exit(1);
 	}
 
-	test();
+	glsl_version_string = (char *)
+		glGetString(GL_SHADING_LANGUAGE_VERSION);
+	glsl_version = (glsl_version_string == NULL)
+		? 0.0 : strtod(glsl_version_string, NULL);
+
+	if (glsl_version < minimum_version) {
+		piglit_report_result(PIGLIT_SKIP);
+	} else {
+		test();
+	}
 
 	return 0;
 }

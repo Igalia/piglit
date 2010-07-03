@@ -401,8 +401,8 @@ add_plain_test(texturing, 'depth-tex-compare')
 # Include the glsl parser tests from glslparser.tests.
 def add_glslparsertest(shader, result):
 	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/shaders/' + shader, result])
-def add_otherglslparsertest(shader, result):
-	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/' + shader, result])
+def add_otherglslparsertest(shader, result, min_glsl_version = '1.10'):
+	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/' + shader, result, min_glsl_version])
 execfile(os.path.dirname(__file__) + '/glslparser.tests')
 
 asmparsertest = Group()

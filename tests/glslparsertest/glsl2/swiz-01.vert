@@ -1,6 +1,4 @@
 /* PASS */
-#version 120
-
 void main()
 {
 	float a;
