@@ -1,0 +1,28 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec3 arg0;
+uniform vec3 arg1;
+uniform vec3 zeroes;
+void main()
+{
+	/* try to trigger register aliasing issues */
+	vec3 val = arg0 + zeroes;
+	val = cross(val, arg1);
+	gl_FragColor = vec4(val + zeroes, 0.0);
+}
+
+[test]
+uniform vec3 arg0 0.0 0.0 1.0
+uniform vec3 arg1 1.0 0.0 0.0
+uniform vec3 zeroes 0.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgba 1 1 0.0 1.0 0.0 0.0
