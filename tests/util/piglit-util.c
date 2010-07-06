@@ -484,9 +484,38 @@ piglit_compile_shader_text(GLenum target, const char *text)
 	return prog;
 }
 
+GLboolean
+piglit_link_check_status(GLint prog)
+{
+	GLchar *info;
+	GLint size;
+	GLint ok;
+
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+
+	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+	info = malloc(size);
+
+	glGetProgramInfoLog(prog, size, NULL, info);
+	if (!ok) {
+		fprintf(stderr, "Failed to link: %s\n", info);
+	}
+	else if (0) {
+		/* Enable this to get extra linking info.
+		 * Even if there's no link errors, the info log may
+		 * have some remarks.
+		 */
+		fprintf(stderr, "Linker warning: %s\n", info);
+	}
+
+	free(info);
+
+	return ok;
+}
+
 GLint piglit_link_simple_program(GLint vs, GLint fs)
 {
-	GLint prog, ok;
+	GLint prog;
 
 	prog = glCreateProgram();
 	if (fs)
@@ -495,29 +524,7 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 		glAttachShader(prog, vs);
 	glLinkProgram(prog);
 
-	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-
-	{
-		GLchar *info;
-		GLint size;
-
-		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		info = malloc(size);
-
-		glGetProgramInfoLog(prog, size, NULL, info);
-		if (!ok) {
-			fprintf(stderr, "Failed to link: %s\n", info);
-		}
-		else if (0) {
-			/* Enable this to get extra linking info.
-			 * Even if there's no link errors, the info log may
-			 * have some remarks.
-			 */
-			fprintf(stderr, "Linker warning: %s\n", info);
-		}
-
-		free(info);
-	}
+	piglit_link_check_status(prog);
 
 	return prog;
 }
