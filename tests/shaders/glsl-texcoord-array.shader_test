@@ -1,9 +1,10 @@
 [require]
 GL >= 2.0
-GLSL >= 1.10
+GLSL >= 1.20
 
 [vertex shader]
-uniform float n;
+#version 120
+uniform int n;
 void main()
 {
 	for (int i = 0; i < n; i++) {
@@ -13,14 +14,14 @@ void main()
 }
 
 [fragment shader]
-uniform float index;
+uniform int index;
 void main()
 {
 	gl_FragColor = gl_TexCoord[index];
 }
 
 [test]
-uniform float index 1
-uniform float n 4.0
+uniform int index 1
+uniform int n 4
 draw rect -1 -1 2 2
 probe rgba 1 1 0.5 0.5 0.5 0.5
