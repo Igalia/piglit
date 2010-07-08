@@ -21,6 +21,7 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import os
 import subprocess
 
 from core import Test, testBinDir, TestResult
@@ -39,12 +40,19 @@ class PlainExecTest(Test):
 		self.command = command
 		# Prepend testBinDir to the path.
 		self.command[0] = testBinDir + self.command[0]
+		self.env = {}
 
 	def run(self):
+
+		fullenv = os.environ.copy()
+		for e in self.env:
+			fullenv[e] = str(self.env[e])
+
 		proc = subprocess.Popen(
 			self.command,
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
+			env=fullenv,
 			universal_newlines=True
 		)
 		out, err = proc.communicate()
