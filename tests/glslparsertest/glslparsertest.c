@@ -27,8 +27,8 @@
 
 /** @file glslparsertest.c
  *
- * Tests that drawing to each face of a cube map FBO and then drawing views
- * of those faces to the window system framebuffer succeeds.
+ * Tests that compiling (but not linking or drawing with) a given
+ * shader either succeeds or fails as expected.
  */
 
 #include <errno.h>
@@ -116,10 +116,18 @@ test(void)
 		fprintf(out, "Failed to compile %s shader %s: %s\n",
 			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
 			filename, info);
+		if (expected_pass) {
+			printf("Shader source:\n");
+			printf("%s\n", prog_string);
+		}
 	} else {
 		fprintf(out, "Successfully compiled %s shader %s: %s\n",
 			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
 			filename, info);
+		if (!expected_pass) {
+			printf("Shader source:\n");
+			printf("%s\n", prog_string);
+		}
 	}
 
 	if (size != 0)
