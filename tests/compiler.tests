@@ -1,0 +1,29 @@
+import os
+import re
+
+execfile(os.path.dirname(__file__) + '/quick.tests')
+
+from framework.core import *
+from framework.gleantest import *
+
+# 965 driver fails at some variable array access.
+profile.tests['shaders']['glsl-texcoord-array'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-fs-uniform-array-2'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+
+# 965 driver lacks support for functions calls in the FS and VS.
+profile.tests['shaders']['glsl-fs-raytrace-bug27060'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-vs-raytrace-bug26691'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-fs-functions-2'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-fs-functions-3'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-vs-functions'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-vs-functions-2'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+profile.tests['shaders']['glsl-vs-functions-3'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+# Note that software for the glean tests doesn't help, because swrast_dri.so  reports alpha channel even
+# though it can't actually store to it, so software tests always fail.
+#profile.tests['glean']['glsl1-function with early return (1)'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+#profile.tests['glean']['glsl1-function with early return (2)'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+#profile.tests['glean']['glsl1-function with early return (3)'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+#profile.tests['glean']['glsl1-function with early return (4)'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
+
+# I really thought I'd fixed this.
+profile.tests['shaders']['glsl-fs-pointcoord'].env['LIBGL_ALWAYS_SOFTWARE'] = 1
