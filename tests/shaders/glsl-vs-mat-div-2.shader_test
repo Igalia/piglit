@@ -1,0 +1,33 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec3 arg0;
+varying mat3 mat;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	mat3 m1 = mat3(0.0,        arg0.x, 0.0,
+		       arg0.y,     0.0,    arg0.x,
+		       0.0,        0.0,    arg0.z);
+
+	mat = m1 / 2.0;
+}
+
+[fragment shader]
+uniform vec3 arg1;
+varying mat3 mat;
+
+void main()
+{
+	gl_FragColor = vec4(mat * arg1.xyz, 0.0);
+}
+
+[test]
+uniform vec3 arg0 1.0 1.0 1.0
+uniform vec3 arg1 1.6 0.4 1.0
+draw rect -1 -1 2 2
+probe rgba 1 1 0.2 0.8 0.7 0.0

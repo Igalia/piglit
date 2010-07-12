@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 arg0;
+varying mat4 mat;
+
+void main()
+{
+	/* Like glsl-vs-mat-mul-1.shader_test, but put the result in a
+	 * varying so that we don't reassociate the matrix
+	 * multiplication to produce two mat * vecs instead of mat *
+	 * mat and mat * vec.
+	 */
+	gl_Position = gl_Vertex;
+
+	mat4 scale = mat4(arg0.x);
+	mat4 rot = mat4(0.0,    arg0.y, 0.0, 0.0,
+			arg0.z, 0.0,    0.0, 0.0,
+			0.0,    0.0,    1.0, 0.0,
+			0.0,    0.0,    0.0, 1.0);
+
+	mat = rot * scale;
+}
+
+[fragment shader]
+uniform vec4 arg1;
+varying mat4 mat;
+
+void main()
+{
+	gl_FragColor = mat * arg1;
+}
+
+[test]
+uniform vec4 arg0 2.0 1.0 -1.0 0.0
+uniform vec4 arg1 0.5 -0.25 0.25 0.25
+draw rect -1 -1 2 2
+probe rgba 1 1 0.5 1.0 0.5 0.5
