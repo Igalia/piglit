@@ -1,0 +1,23 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+	/* Test the constant expression handling of cross(). */
+	const vec3 arg0 = vec3(0.0, 0.0, 1.0);
+	const vec3 arg1 = vec3(1.0, 0.0, 0.0);
+
+	gl_FragColor = vec4(cross(arg0, arg1), 0.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 1 1 0.0 1.0 0.0 0.0
