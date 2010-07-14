@@ -1,0 +1,22 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+#version 120
+void main()
+{
+   const vec2 v1 = mod(vec2(5.0, 4.0), 3.0);
+   const vec2 v2 = mod(vec2(5.0, 6.0), vec2(3.0, 5.0));
+   gl_FragColor = vec4(0.0, v1.x - v1.y, 0.0, v2.x - v2.y);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgba 15 15 0.0 1.0 0.0 1.0
