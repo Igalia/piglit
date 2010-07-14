@@ -33,8 +33,10 @@
 
 #include "piglit-util.h"
 
+#define MAX_VARYING 32
+
 /* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
-int piglit_width = (2 + 32 * 12), piglit_height = (2 + 32 * 12);
+int piglit_width = (2 + MAX_VARYING * 12), piglit_height = (2 + MAX_VARYING * 12);
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 /* Generate a VS that writes to num_varyings vec4s, and put
@@ -208,11 +210,13 @@ piglit_display(void)
 	glGetIntegerv(GL_MAX_VARYING_FLOATS, &max_components);
 	max_varyings = max_components / 4;
 
-	if (max_varyings > 32) {
-		printf("test not designed to handle >32 varying vec4s.\n"
+printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
+
+	if (max_varyings > MAX_VARYING) {
+		printf("test not designed to handle >%d varying vec4s.\n"
 		       "(implementation reports %d components)\n",
-		       max_components);
-		max_varyings = 32;
+		       max_components, MAX_VARYING);
+		max_varyings = MAX_VARYING;
 		warned = GL_TRUE;
 	}
 
