@@ -9,7 +9,7 @@ glsl-mvp.vert
 #version 120
 void main() {
    const float x = atan(100.0, 100.0);
-   const float y = atan(1);
+   const float y = atan(1.0);
    if (x == y)
       gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
    else

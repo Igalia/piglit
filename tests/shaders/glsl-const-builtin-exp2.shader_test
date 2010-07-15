@@ -9,7 +9,7 @@ glsl-mvp.vert
 #version 120
 void main()
 {
-    const float one = exp2(16) - 65535;
+    const float one = exp2(16.0) - 65535;
     gl_FragColor = vec4(0.0, one, 0.0, one);
 }
 

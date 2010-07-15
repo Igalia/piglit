@@ -9,7 +9,7 @@ glsl-mvp.vert
 #version 120
 void main() {
    const float zero = acos(1.0);
-   const float zero2 = acos(1);
+   const float zero2 = acos(1.0);
    gl_FragColor = vec4(zero, 1.0, zero2, 1.0);
 }
 
