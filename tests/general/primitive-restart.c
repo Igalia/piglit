@@ -256,14 +256,14 @@ test_draw_elements(GLenum primMode, GLenum indexType)
    assert(glGetError()==0);
    /* Setup prim restart */
    if (TestGL31) {
+#ifdef GL_VERSION_3_1
       glEnable(GL_PRIMITIVE_RESTART);
       glPrimitiveRestartIndex(restart_index);
+#endif
    }
    else {
       glEnableClientState(GL_PRIMITIVE_RESTART_NV);
-   assert(glGetError()==0);
       glPrimitiveRestartIndexNV(restart_index);
-   assert(glGetError()==0);
    }
 
    /* Draw */
@@ -299,10 +299,14 @@ test_draw_elements(GLenum primMode, GLenum indexType)
       }
    }
 
-   if (TestGL31)
+   if (TestGL31) {
+#ifdef GL_VERSION_3_1
       glDisable(GL_PRIMITIVE_RESTART);
-   else
+#endif
+   }
+   else {
       glDisableClientState(GL_PRIMITIVE_RESTART_NV);
+   }
    glDisableClientState(GL_VERTEX_ARRAY);
 
    pass = check_rendering();
@@ -352,7 +356,11 @@ void
 piglit_init(int argc, char **argv)
 {
    Have_NV = glewIsSupported("GL_NV_primitive_restart");
+#ifdef GL_VERSION_3_1
    Have_31 = glewIsSupported("GL_VERSION_3_1");
+#else
+   Have_31 = GL_FALSE;
+#endif
 
    /* Debug */
    /* NOTE!  glew 1.5.2's OpenGL 3.1 detection is broken.  You'll need
