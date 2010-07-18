@@ -86,7 +86,7 @@ static void
 generate_and_display_drawbuffers(int count)
 {
 	GLuint tex[16], fb, fs, vs, prog;
-	GLenum attachments[16], status;
+	GLenum attachments[16], status, error;
 	char *fs_count_source;
 	int i;
 
@@ -120,6 +120,12 @@ generate_and_display_drawbuffers(int count)
 
 	prog = piglit_link_simple_program(vs, fs);
 	glUseProgram(prog);
+
+	error = glGetError();
+	if (error) {
+		fprintf(stderr, "glUseProgram error: 0x%x\n", error);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
 
 	/* Now render to all the color buffers. */
 	piglit_draw_rect(-1, -1, 2, 2);
