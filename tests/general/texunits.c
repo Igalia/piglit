@@ -295,6 +295,11 @@ test_texture_env(void)
    for (i = 0; i < MaxTextureImageUnits; i++) {
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
+      err = glGetError();
+      if (err) {
+         fprintf(stderr, "unit %d glTexEnvfv error: 0x%x\n", i, err);
+         return GL_FALSE;
+      }
    }
 
    /* check per-unit state */
