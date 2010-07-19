@@ -154,6 +154,7 @@ draw_and_test(const char *destination, int drawable_width, int drawable_height)
 	int start_x, start_y;
 	struct probes probes;
 	GLboolean pass = GL_TRUE;
+	GLenum error;
 
 	memset(&probes, 0, sizeof(probes));
 
@@ -172,6 +173,11 @@ draw_and_test(const char *destination, int drawable_width, int drawable_height)
 	/* Clear to black */
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
+	error = glGetError();
+	if (error) {
+		fprintf(stderr, "glClear error: 0x%x\n", error);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
 
 	glColor4fv(red);
 	/* Center: full image */
