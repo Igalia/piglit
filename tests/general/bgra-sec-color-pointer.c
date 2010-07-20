@@ -33,7 +33,7 @@
 #include "piglit-util.h"
 
 int piglit_width = 400, piglit_height = 300;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 static GLfloat verts[12] = {225.0, 175.0, 0.0,
 				225.0, 225.0, 0.0,
@@ -81,6 +81,7 @@ piglit_display(void)
 	glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
 
 	glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, 0, colors);
+	glSecondaryColorPointer(3, GL_UNSIGNED_BYTE, 4, colors);
 	error = glGetError();
 	if (error) {
 		fprintf(stderr, "glSecondaryColorPointer error: 0x%x\n", error);
@@ -104,7 +105,7 @@ piglit_display(void)
 	glPushMatrix();
 	glTranslatef(0.0, -75.0, 0.0);
 
-	glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, 0, colors);
+	glSecondaryColorPointer(3, GL_UNSIGNED_BYTE, 4, colors);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glPushMatrix();
