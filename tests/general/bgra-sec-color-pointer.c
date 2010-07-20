@@ -73,21 +73,13 @@ piglit_display(void)
 	GLfloat blue[3]={0.0, 0.0, 1.0};
 	GLfloat greyRed[3]={1.0, 0.6, 0.6};
 	GLfloat greyBlue[3]={0.6, 0.6, 1.0};
-	GLenum error;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
 
-	glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, 0, colors);
 	glSecondaryColorPointer(3, GL_UNSIGNED_BYTE, 4, colors);
-	error = glGetError();
-	if (error) {
-		fprintf(stderr, "glSecondaryColorPointer error: 0x%x\n", error);
-		piglit_report_result(PIGLIT_FAILURE);
-	}
-
 	glVertexPointer(3, GL_FLOAT, 0, verts);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
