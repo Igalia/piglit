@@ -26,7 +26,6 @@ glean['fbo'] = GleanTest('fbo')
 glean['fpexceptions'] = GleanTest('fpexceptions')
 glean['fragProg1'] = GleanTest('fragProg1')
 glean['getString'] = GleanTest('getString')
-glean['glsl1'] = GleanTest('glsl1')
 glean['logicOp'] = GleanTest('logicOp')
 glean['maskedClear'] = GleanTest('maskedClear')
 glean['occluquery'] = GleanTest('occluQry')
@@ -61,6 +60,13 @@ glean['texUnits'] = GleanTest('texUnits')
 glean['vertArrayBGRA'] = GleanTest('vertArrayBGRA')
 glean['vertattrib'] = GleanTest('vertattrib')
 glean['vertProg1'] = GleanTest('vertProg1')
+
+def add_glsl1(name):
+	strippedname = name.translate(None, " ()")
+	testname = 'glsl1-' + strippedname
+	glean[testname] = GleanTest('glsl1')
+	glean[testname].env['GLSL_TEST'] = name
+execfile(os.path.dirname(__file__) + '/glean-glsl1.tests')
 
 mesa = Group()
 add_plain_test(mesa, 'crossbar')
