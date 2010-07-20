@@ -67,6 +67,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* 1: unclamped quad */
+	glDisable(GL_DEPTH_CLAMP);
 	glColor4fv(white);
 	glBegin(GL_QUADS);
 	glVertex3f(10, 10, 0);
