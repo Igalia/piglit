@@ -62,8 +62,7 @@ glean['vertattrib'] = GleanTest('vertattrib')
 glean['vertProg1'] = GleanTest('vertProg1')
 
 def add_glsl1(name):
-	strippedname = name.translate(None, " ()")
-	testname = 'glsl1-' + strippedname
+	testname = 'glsl1-' + name
 	glean[testname] = GleanTest('glsl1')
 	glean[testname].env['GLSL_TEST'] = name
 execfile(os.path.dirname(__file__) + '/glean-glsl1.tests')
