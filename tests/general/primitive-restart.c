@@ -246,6 +246,8 @@ test_draw_elements(GLenum primMode, GLenum indexType)
          printf("%2d: %d\n", i, elements[i]);
    }
 
+   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
    glClear(GL_COLOR_BUFFER_BIT);
 
    glColor4fv(green);
@@ -268,8 +270,8 @@ test_draw_elements(GLenum primMode, GLenum indexType)
 
    /* Draw */
    if (0) {
-      /* debug */
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 24);
+      /* XXX also test non-indexed drawing someday */
+      glDrawArrays(primMode, 0, NUM_VERTS);
    }
    else {
       switch (indexType) {
