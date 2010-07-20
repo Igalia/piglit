@@ -145,7 +145,7 @@ static void draw_rect(float posX, float posY, int attribIndex,
     }
     if (COLORS > 1) {
         glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
-        glSecondaryColorPointer(4, GL_FLOAT, 0, &attrib[1][0]);
+        glSecondaryColorPointer(3, GL_FLOAT, 4*sizeof(float), &attrib[1][0]);
     }
 
     for (i = 0; i < TEXCOORDS; i++) {
