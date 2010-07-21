@@ -7,16 +7,27 @@ include_directories(
 	${GLEW_INCLUDE_DIR}
 )
 
-add_library (piglitutil
-	    fdo-bitmap.c
-	    piglit-util.c
-	    shader-load.c
-	    piglit-framework.c
+set (UTIL_SOURCES
+	fdo-bitmap.c
+	piglit-util.c
+	shader-load.c
+	piglit-framework.c
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_definitions ( -DUSE_GLX )
 	add_library (piglitglxutil
 		    piglit-util.c
+		    piglit-glx-framework.c
 		    piglit-glx-util.c
 	)
+	set (UTIL_SOURCES
+		${UTIL_SOURCES}
+		piglit-glx-util.c
+	)
+
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+add_library (piglitutil
+	${UTIL_SOURCES}
+)

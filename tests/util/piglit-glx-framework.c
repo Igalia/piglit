@@ -24,12 +24,8 @@
  *    Eric Anholt <eric@anholt.net>
  *
  */
-#include "GL/glx.h"
 
-XVisualInfo * piglit_get_glx_visual(Display *dpy);
-GLXContext piglit_get_glx_context(Display *dpy, XVisualInfo *visinfo);
-Window piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo);
-void piglit_require_glx_extension(Display *dpy, const char *name);
-void piglit_glx_event_loop(Display *dpy,
-			   enum piglit_result (*draw)(Display *dpy));
-void piglit_glx_set_no_input(void);
+#include "piglit-util.h"
+#include "piglit-glx-util.h"
+
+Bool piglit_automatic = GL_FALSE;

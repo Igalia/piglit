@@ -28,8 +28,6 @@
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
 
-Bool piglit_automatic = GL_FALSE;
-
 XVisualInfo *
 piglit_get_glx_visual(Display *dpy)
 {
@@ -134,4 +132,24 @@ piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 				piglit_report_result(result);
 		}
         }
+}
+
+
+void
+piglit_glx_set_no_input(void)
+{
+	Display *d;
+	GLXDrawable win;
+	XWMHints *hints;
+
+	d = glXGetCurrentDisplay();
+	win = glXGetCurrentDrawable();
+
+	hints = XAllocWMHints();
+	hints->flags |= InputHint;
+	hints->input = False;
+
+	XSetWMHints(d, win, hints);
+
+	XFree(hints);
 }

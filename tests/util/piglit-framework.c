@@ -34,6 +34,9 @@
 
 #include "piglit-util.h"
 #include "piglit-framework.h"
+#ifdef USE_GLX
+#include "piglit-glx-util.h"
+#endif
 
 int piglit_automatic = 0;
 static int piglit_window;
@@ -83,6 +86,12 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(piglit_width, piglit_height);
 	glutInitDisplayMode(piglit_window_mode);
 	piglit_window = glutCreateWindow(argv[0]);
+
+#ifdef USE_GLX
+	if (piglit_automatic)
+		piglit_glx_set_no_input();
+#endif
+
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(piglit_escape_exit_key);
