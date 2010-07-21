@@ -138,6 +138,7 @@ piglit_display(void)
 		float avg = 0.0;
 		float min = 100.0;
 		float max = -100.0;
+		char *err = NULL;
 
 		if (x2 > piglit_width - 4)
 			x2 = piglit_width - 4;
@@ -174,13 +175,20 @@ piglit_display(void)
 			avg += col_total / (x2 - x1);
 		}
 
-		if (min < 0.25 ||
-		    avg / min > 2.0 ||
-		    max / avg > 2.0 ||
-		    max > 1.5) {
-			printf("Line from %d,%d-%d,%d had bad thickness:\n",
+		if (min < 0.25)
+			err = "min < 0.25";
+		else if (avg / min > 2.0)
+			err = "avg / min > 2.0";
+		else if (max / avg > 2.0)
+			err = "max / avg > 2.0";
+		else if (max > 1.5)
+			err = "max > 1.5";
+
+		if (err) {
+			printf("Line from %d,%d-%d,%d had bad thickness (%s):\n",
 			       x1 - 2, (int)y_from_x(x1 - 2),
-			       x2 + 2, (int)y_from_x(x2 + 2));
+			       x2 + 2, (int)y_from_x(x2 + 2),
+			       err);
 			printf("min coverage: %f\n", min);
 			printf("avg coverage: %f\n", avg);
 			printf("max coverage: %f\n", max);
