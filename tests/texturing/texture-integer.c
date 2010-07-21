@@ -107,7 +107,11 @@ static const char *FragShaderText =
    "#endif \n"
    "void main() \n"
    "{ \n"
+   "#if GL_EXT_gpu_shader4 \n"
+   "   vec4 t = vec4(texture2D(tex, gl_TexCoord[0].xy)); \n"
+   "#else \n"
    "   vec4 t = texture2D(tex, gl_TexCoord[0].xy); \n"
+   "#endif \n"
    "   gl_FragColor = t + bias; \n"
    "} \n";
 
