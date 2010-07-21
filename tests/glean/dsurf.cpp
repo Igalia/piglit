@@ -87,6 +87,7 @@ legacyMethod:
 
 	// Create the window:
 	XSetWindowAttributes xswa;
+	XWMHints *wmHints;
 	xswa.background_pixmap = None;
 	xswa.border_pixel = 0;
 	xswa.colormap = ChooseColormap(winSys->dpy, config->vi);
@@ -110,6 +111,15 @@ legacyMethod:
 	sizeHints.flags = USSize | USPosition;
 	XSetStandardProperties(winSys->dpy, xWindow, "glean", "glean",
 		None, 0, 0, &sizeHints);
+
+	// Try to prevent test window from stealing focus
+	wmHints = XAllocWMHints();
+	wmHints->flags |= InputHint;
+	wmHints->input = False;
+
+	XSetWMHints(winSys->dpy, xWindow, wmHints);
+
+	XFree(wmHints);
 
 	// Map the window and wait for it to appear:
 	XMapWindow(winSys->dpy, xWindow);
