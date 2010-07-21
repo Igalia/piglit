@@ -1,0 +1,35 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+/* VS array access (read-only) from uniforms using a varying
+ * array index per vert.
+ */
+uniform vec4 colors[4];
+varying vec4 color;
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	int index = int((gl_Vertex.x + 1.0) * 0.5 + (gl_Vertex.y + 1.0));
+	color = vec4(colors[index]);
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform vec4 colors[0] 1.0 0.0 0.0 0.0
+uniform vec4 colors[1] 0.0 1.0 0.0 0.0
+uniform vec4 colors[2] 0.0 0.0 1.0 0.0
+uniform vec4 colors[3] 1.0 0.0 1.0 0.0
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+relative probe rgb (1.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+relative probe rgb (0.0, 1.0) (0.0, 0.0, 1.0, 0.0)
+relative probe rgb (1.0, 1.0) (1.0, 0.0, 1.0, 0.0)
