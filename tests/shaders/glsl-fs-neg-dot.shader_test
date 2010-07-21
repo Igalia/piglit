@@ -1,0 +1,30 @@
+[require]
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec3 vec_a;
+uniform vec3 vec_b;
+
+void main()
+{
+	/* This is just doing some random calculations. This should end up
+	   with tmp_vec = vec_a */
+	vec3 tmp_vec = vec_a * 3.0;
+	tmp_vec /= length (tmp_vec);
+	/* For some reason, tmp_vec here seems to get negated twice and
+	   the wrong value results */
+	float dot_value = dot(-tmp_vec, vec_b);
+	gl_FragColor.xyz = vec3 (dot_value);
+	gl_FragColor.a = 1.0;
+}
+
+[test]
+uniform vec3 vec_a 1.0 0.0 0.0
+uniform vec3 vec_b -1.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 1.0 1.0 1.0
