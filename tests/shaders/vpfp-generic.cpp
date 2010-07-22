@@ -228,6 +228,8 @@ bool TestGroup::run()
 	glDisable(GL_VERTEX_PROGRAM_ARB);
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
+	glFlush();
+
 	return success;
 }
 
