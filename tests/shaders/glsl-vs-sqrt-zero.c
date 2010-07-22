@@ -48,7 +48,7 @@ piglit_display(void)
 
 	piglit_draw_rect(10, 10, 10, 10);
 
-	pass &= piglit_probe_pixel_rgb(15, 15, color);
+	pass &= piglit_probe_pixel_rgb(14, 14, color);
 
 	glutSwapBuffers();
 
