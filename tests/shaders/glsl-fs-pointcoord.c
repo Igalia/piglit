@@ -98,6 +98,11 @@ void piglit_init(int argc, char**argv)
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_limits);
 	point_size = point_size_limits[1];
 
+	if (point_size > piglit_width)
+		point_size = piglit_width;
+	if (point_size > piglit_height)
+		point_size = piglit_height;
+
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   "shaders/glsl-fs-pointcoord.vert");
 	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
