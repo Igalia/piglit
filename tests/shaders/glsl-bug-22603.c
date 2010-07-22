@@ -64,7 +64,6 @@ piglit_display(void)
 	glClearDepth(1.0f);
     	glDepthFunc(GL_LEQUAL);
 
-	glUniform1iARB(shadowMap_location, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &shadow_texture);
 	glBindTexture(GL_TEXTURE_2D, shadow_texture);
@@ -91,6 +90,7 @@ piglit_display(void)
 	glViewport(0, 0, 512, 512);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glUseProgramObjectARB(shadow_prog);
+	glUniform1iARB(shadowMap_location, 0);
 	/* ogl reads in col-vectors, so transform=true */
 	glUniformMatrix4fvARB(light_projection_location,
 			      1, 1, matrix);
