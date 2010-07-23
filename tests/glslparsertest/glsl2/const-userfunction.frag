@@ -1,6 +1,6 @@
 /* FAIL - user functions are not allowed in constant expressions */
 #version 120
-float id(x) {
+float id(float x) {
    return x;
 }
 
