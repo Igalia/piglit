@@ -26,4 +26,8 @@ add_definitions (
 )
 
 add_executable (texline texline.c)
+IF (UNIX)
+       target_link_libraries (texline m)
+ENDIF (UNIX)
+
 #add_executable (arbfptest1 arbfptest1.c)
