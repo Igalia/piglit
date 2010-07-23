@@ -38,17 +38,32 @@
 #include "piglit-glx-util.h"
 #endif
 
+#ifdef FREEGLUT
+#include "GL/freeglut_ext.h"
+#endif
+
 int piglit_automatic = 0;
 static int piglit_window;
+static enum piglit_result result;
 
 static void
 display(void)
 {
-	const enum piglit_result result = piglit_display();
+	result = piglit_display();
 
 	if (piglit_automatic) {
 		glutDestroyWindow(piglit_window);
+#ifdef FREEGLUT
+		/* Tell GLUT to clean up and exit, so that we can
+		 * reasonably valgrind our testcases for memory
+		 * leaks by the GL.
+		 */
+		glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
+			      GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+		glutLeaveMainLoop();
+#else
 		piglit_report_result(result);
+#endif
 	}
 }
 
@@ -101,5 +116,8 @@ int main(int argc, char *argv[])
 	piglit_init(argc, argv);
 
 	glutMainLoop();
+
+	piglit_report_result(result);
+	/* UNREACHED */
 	return 0;
 }
