@@ -64,6 +64,7 @@ piglit_display(void)
 	glClearDepth(1.0f);
     	glDepthFunc(GL_LEQUAL);
 
+	/* Create empty 512x512 depth texture */
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &shadow_texture);
 	glBindTexture(GL_TEXTURE_2D, shadow_texture);
@@ -78,6 +79,7 @@ piglit_display(void)
 
 	glGenFramebuffersEXT(1, &fbo);
 
+	/* Render to the depth texture */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -93,7 +95,7 @@ piglit_display(void)
 	glUniform1iARB(shadowMap_location, 0);
 	/* ogl reads in col-vectors, so transform=true */
 	glUniformMatrix4fvARB(light_projection_location,
-			      1, 1, matrix);
+			      1, GL_TRUE, matrix);
 	glBegin(GL_QUADS);
 		/* rect1 */
 		glVertex3f(-0.4,   0.4,   -2.0);
