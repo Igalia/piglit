@@ -42,13 +42,18 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float color[4] = {0.75, 0.75, 0.75, 0.75};
+	int x, y;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	piglit_draw_rect(10, 10, 10, 10);
 
-	pass &= piglit_probe_pixel_rgb(14, 14, color);
+	for (x = 10; x < 20; x++) {
+		for (y = 10; y < 20; y++) {
+			pass &= piglit_probe_pixel_rgb(x, y, color);
+		}
+	}
 
 	glutSwapBuffers();
 
