@@ -423,6 +423,8 @@ add_plain_test(bugs, 'fdo25614-genmipmap')
 add_plain_test(bugs, 'fdo28551')
 
 glx = Group()
+add_plain_test(glx, 'glx-destroycontext-1')
+add_plain_test(glx, 'glx-destroycontext-2')
 add_plain_test(glx, 'glx-multithread')
 add_plain_test(glx, 'glx-swap-exchange')
 

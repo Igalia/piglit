@@ -20,6 +20,8 @@ link_libraries (
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_executable (glx-destroycontext-1 glx-destroycontext-1.c)
+	add_executable (glx-destroycontext-2 glx-destroycontext-2.c)
 	add_executable (glx-multithread glx-multithread.c)
 	target_link_libraries(glx-multithread pthread X11)
 	add_executable (glx-swap-exchange glx-swap-exchange.c)
