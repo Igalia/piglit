@@ -488,6 +488,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer, float arithmetic",
 		NO_VERTEX_SHADER,
+		"#version 120 \n"
 		"void main() { \n"
 		"   int k = 100; \n"
 		"   gl_FragColor.x = k * 0.01; \n"
@@ -515,6 +516,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer division",
 		NO_VERTEX_SHADER,
+		"#version 120 \n"
 		"void main() { \n"
 		"   int i = 15, j = 6; \n"
 		"   int k = i / j; \n"
@@ -528,6 +530,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer division with uniform var",
 		NO_VERTEX_SHADER,
+		"#version 120 \n"
 		"// as above, but prevent compile-time evaluation \n"
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
