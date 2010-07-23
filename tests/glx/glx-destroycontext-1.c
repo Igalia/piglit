@@ -25,7 +25,7 @@
  *
  */
 
-/** @file glx-destroycontext.c
+/** @file glx-destroycontext-1.c
  *
  * Test that MakeCurrent after destroying a context not bound to the
  * current thread works correctly.
