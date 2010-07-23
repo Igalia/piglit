@@ -28,4 +28,4 @@
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
 
-Bool piglit_automatic = GL_FALSE;
+int piglit_automatic = 0;

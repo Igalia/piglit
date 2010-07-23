@@ -28,6 +28,8 @@
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
 
+int piglit_automatic;
+
 XVisualInfo *
 piglit_get_glx_visual(Display *dpy)
 {
