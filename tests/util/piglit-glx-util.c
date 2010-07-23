@@ -128,6 +128,8 @@ piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 		} else if (event.type == Expose) {
 			enum piglit_result result = draw(dpy);
 
+			XCloseDisplay(dpy);
+
 			if (piglit_automatic)
 				piglit_report_result(result);
 		}

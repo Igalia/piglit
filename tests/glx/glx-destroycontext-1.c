@@ -63,6 +63,10 @@ draw(Display *dpy)
 
 	glXSwapBuffers(dpy, win);
 
+	/* Free our resources when we're done. */
+	glXMakeCurrent(dpy, None, NULL);
+	glXDestroyContext(dpy, ctx);
+
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
