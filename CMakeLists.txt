@@ -10,6 +10,7 @@ include(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
 include(${CMAKE_ROOT}/Modules/FindTIFF.cmake)
 include(${CMAKE_ROOT}/Modules/FindGLUT.cmake)
 include(${CMAKE_ROOT}/Modules/FindPNG.cmake)
+include(${CMAKE_ROOT}/Modules/FindX11.cmake)
 
 CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
 IF (C_COMPILER_FLAG_WALL)

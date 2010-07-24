@@ -17,6 +17,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 	${GLEW_glew_LIBRARY}
+	${X11_X11_LIB}
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

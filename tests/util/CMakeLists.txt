@@ -26,6 +26,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		piglit-glx-util.c
 	)
 
+	link_libraries (${X11_X11_LIB})
+
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_library (piglitutil
