@@ -17,7 +17,6 @@ del profile.tests['asmparsertest']
 # These take too long
 del profile.tests['glean']['blendFunc']     # Passes
 del profile.tests['glean']['depthStencil']  # Passes
-del profile.tests['glean']['glsl1']         # This fails without full GLSL support
 del profile.tests['texturing']['streaming-texture-leak'] # Passes
 
 # This test is nonsense
