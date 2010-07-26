@@ -1,0 +1,29 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 color;
+void main()
+{
+	gl_FragColor = vec4(0.0);
+
+	vec4 vec = color.xzyw + color.w;
+	/* Test for a bug in the Mesa IR optimizer where MOV source
+	 * register channels were considered based on a destination
+	 * channel count basis rather than the positions of the
+	 * channels in the writemask.
+	 */
+	gl_FragColor.y = vec.z;
+}
+
+[test]
+uniform vec4 color 0.0 1.0 0.0 0.0
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
