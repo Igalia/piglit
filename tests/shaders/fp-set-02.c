@@ -160,7 +160,7 @@ piglit_display(void)
 	static const float values[3] = { 0.0, 0.5, 1.0 };
 	unsigned i;
 	unsigned j;
-	int result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_SUCCESS;
 	GLfloat color[4];
 	GLfloat ref[4];
 

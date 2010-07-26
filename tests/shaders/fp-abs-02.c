@@ -139,7 +139,7 @@ enum piglit_result
 piglit_display(void)
 {
 	static const GLfloat color[4] = { 0.0, 1.0, 0.0, 0.0 };
-	int result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_SUCCESS;
 	unsigned i;
 
 	glClear(GL_COLOR_BUFFER_BIT);

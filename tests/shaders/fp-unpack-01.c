@@ -256,7 +256,7 @@ piglit_display(void)
 {
 	unsigned i;
 	unsigned j;
-	int result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_SUCCESS;
 
 
 	glClear(GL_COLOR_BUFFER_BIT);

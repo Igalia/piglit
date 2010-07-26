@@ -146,7 +146,7 @@ static enum piglit_result test(unsigned int alu_depth)
 
 enum piglit_result piglit_display(void)
 {
-	int result;
+	enum piglit_result result;
 	unsigned int alu_depth;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

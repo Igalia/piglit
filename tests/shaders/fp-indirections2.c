@@ -144,7 +144,7 @@ static const char program_Tail[] =
 static const char program_Input[] = "fragment.texcoord[0]";
 static const char program_Output[] = "result.color";
 
-static int test(unsigned int dim, unsigned int samples)
+static enum piglit_result test(unsigned int dim, unsigned int samples)
 {
 	char * program_text = malloc(sizeof(program_Head) +
 	                             (samples + 1)*sizeof(program_TEX) +
@@ -201,7 +201,7 @@ static int test(unsigned int dim, unsigned int samples)
 enum piglit_result
 piglit_display(void)
 {
-	int result;
+	enum piglit_result result;
 	unsigned int dim;
 	unsigned int samples;
 

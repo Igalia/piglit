@@ -83,7 +83,7 @@ piglit_display(void)
 	const GLfloat comparitor[4] = { 0.5, 0.5, 0.5, 0.5 };
 	unsigned i;
 	unsigned j;
-	int result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_SUCCESS;
 
 
 	glClear(GL_COLOR_BUFFER_BIT);
