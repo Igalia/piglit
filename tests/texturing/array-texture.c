@@ -108,7 +108,7 @@ make_2d_array_texture(void)
             img[i][j][k][0] = colors[i][0];
             img[i][j][k][1] = colors[i][1];
             img[i][j][k][2] = colors[i][2];
-            img[i][j][k][3] = colors[i][3];
+            img[i][j][k][3] = 1.0;
          }
       }
    }
@@ -143,7 +143,7 @@ make_1d_array_texture(void)
          img[i][j][0] = colors[i][0];
          img[i][j][1] = colors[i][1];
          img[i][j][2] = colors[i][2];
-         img[i][j][3] = colors[i][3];
+         img[i][j][3] = 1.0;
       }
    }
 
