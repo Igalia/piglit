@@ -65,7 +65,7 @@ enum piglit_result {
 	PIGLIT_SUCCESS,
 	PIGLIT_FAILURE,
 	PIGLIT_SKIP,
-	PIGLIT_WARN,
+	PIGLIT_WARN
 };
 
 #include "piglit-framework.h"
