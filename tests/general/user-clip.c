@@ -50,7 +50,7 @@ piglit_display(void)
 {
 	static const GLfloat green[4] = { 0.0, 1.0, 0.0, 1.0 };
 	static const GLfloat red[4] = { 1.0, 0.0, 0.0, 1.0 };
-	int result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_SUCCESS;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
