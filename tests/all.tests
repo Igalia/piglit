@@ -916,6 +916,7 @@ profile.tests['asmparsertest'] = asmparsertest
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
 profile.tests['texturing'] = texturing
+profile.tests['glx'] = glx
 
 #############
 # Some Mesa diagnostic messages that we should probably ignore
