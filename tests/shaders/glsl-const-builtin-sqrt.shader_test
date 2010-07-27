@@ -9,8 +9,8 @@ glsl-mvp.vert
 #version 120
 void main()
 {
-    const float one = sqrt(16.0) - 3;
-    gl_FragColor = vec4(0.0, one, 0.0, one);
+    const float one_half = sqrt(16.0) - 3.5;
+    gl_FragColor = vec4(0.0, one_half, 0.0, 1.0);
 }
 
 [test]
@@ -18,4 +18,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+probe rgb 15 15 0.0 0.5 0.0

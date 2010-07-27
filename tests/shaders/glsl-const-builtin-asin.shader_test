@@ -9,7 +9,9 @@ glsl-mvp.vert
 #version 120
 void main() {
    const float zero = asin(0.0);
-   gl_FragColor = vec4(zero, 1.0, zero, 1.0);
+   const float pi_over_three = asin(0.866025403784439);
+   const float half_pi = asin(1.0);
+   gl_FragColor = vec4(zero, pi_over_three - 1.0, half_pi - 1.0, 1.0);
 }
 
 [test]
@@ -17,4 +19,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+probe rgb 15 15 0.0 0.0471975511966 0.5707963267949

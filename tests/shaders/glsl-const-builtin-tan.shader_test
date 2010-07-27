@@ -8,8 +8,11 @@ glsl-mvp.vert
 [fragment shader]
 #version 120
 void main() {
-   const float one = tan(0.785398163397448);
-   gl_FragColor = vec4(0, one, 0, one);
+    const float one = tan(0.785398163397448);
+    const float sqrt3 = tan(1.0471975511965976);
+    const float zero = tan(0.0);
+
+    gl_FragColor = vec4(zero, one, sqrt3 - 1.0, 1.0);
 }
 
 [test]
@@ -17,4 +20,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+probe rgb 15 15 0.0 1.0 0.7320508075688772

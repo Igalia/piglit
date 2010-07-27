@@ -1,0 +1,27 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+#version 120
+void main()
+{
+    const vec2 v = normalize(vec2(1.0, 1.0));
+
+    /* Attempt to normalize the zero vector.  The specification is unclear
+     * about the results, but ATI returns the zero vector.  At any rate, the
+     * compiler should not crash.
+     */
+    const vec2 z = normalize(vec2(0.0, 0.0));
+    gl_FragColor = vec4(v.x, z.x, z.y, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.7071067811865475 0.0 0.0

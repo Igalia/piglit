@@ -1,0 +1,26 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+#version 120
+void main()
+{
+    const bvec2 v_true = bvec2(true, true);
+    const bvec2 v_some = bvec2(true, false);
+    const bvec2 v_none = bvec2(false, false);
+    const bool true1 = any(v_true);
+    const bool true2 = any(v_some);
+    const bool false1 = any(v_none);
+    gl_FragColor = vec4(float(true1), float(true2), float(false1), 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 1.0 1.0 0.0

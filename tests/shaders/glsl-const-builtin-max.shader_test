@@ -11,7 +11,7 @@ void main()
 {
     const float x = max(0.25, -5.0);
     const vec2 v = max(vec2(0.5, 0.2), 0.25);
-    gl_FragColor = vec4(0.0, x + v.x + v.y, 0.0, 1.0);
+    gl_FragColor = vec4(x, v, 1.0);
 }
 
 [test]
@@ -19,4 +19,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+probe rgb 15 15 0.25 0.5 0.25

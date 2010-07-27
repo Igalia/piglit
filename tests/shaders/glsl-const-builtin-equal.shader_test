@@ -10,7 +10,7 @@ glsl-mvp.vert
 void main() {
    const vec3 small = vec3(1.0, 2.0, 3.0);
    const vec3 large = vec3(0.5, 2.0, 6.0);
-   const bvec3 result = greaterThan(large, small);
+   const bvec3 result = equal(large, small);
    gl_FragColor = vec4(result, 1.0);
 }
 
@@ -19,4 +19,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 0.0 1.0
+probe rgb 15 15 0.0 1.0 0.0

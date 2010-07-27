@@ -9,9 +9,13 @@ glsl-mvp.vert
 #version 120
 void main()
 {
-    const vec4 q = inversesqrt(vec4(16.0));
-    const float one = q.x + q.y + q.z + q.w;
-    gl_FragColor = vec4(0.0, one, 0.0, one);
+    const vec3 v = inversesqrt(vec3(16.0));
+
+    /* The following values are undefined but the compiler should not crash. */
+    const float undef1 = inversesqrt(0.0);
+    const float undef2 = inversesqrt(-1.0);
+
+    gl_FragColor = vec4(v, undef1 + undef2);
 }
 
 [test]
@@ -19,4 +23,4 @@ clear color 0.0 0.0 0.0 0.0
 clear
 ortho
 draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+probe rgb 15 15 0.25 0.25 0.25

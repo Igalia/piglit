@@ -9,8 +9,10 @@ glsl-mvp.vert
 #version 120
 void main()
 {
-    const vec3 v = log2(vec3(1.0, 8.0, 65536.0));
-    if (v == vec3(0.0, 3.0, 16.0))
+    const mat2 m = mat2(1.0, 2.0, 4.0,  8.0);
+    const mat2 mt = transpose(m);
+    const mat2 mtt = transpose(mt);
+    if (m == mat2(1.0, 4.0, 2.0, 8.0) && mt == mtt)
         gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
     else
         gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
