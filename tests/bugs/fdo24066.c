@@ -56,6 +56,9 @@ void piglit_init(int argc, char ** argv)
 	GLuint program_object;
 	GLint result;
 
+	(void) argc;
+	(void) argv;
+
 	piglit_require_vertex_program();
 
 	program_object = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, program_text);

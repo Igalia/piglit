@@ -33,6 +33,9 @@ int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
 void
 piglit_init(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
