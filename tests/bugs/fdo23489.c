@@ -7,7 +7,7 @@
 
 static int Automatic = 0;
 
-void display(void)
+static void display(void)
 {
 	int i;
 
@@ -22,7 +22,7 @@ void display(void)
 	}
 }
 
-void init(void)
+static void init(void)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
