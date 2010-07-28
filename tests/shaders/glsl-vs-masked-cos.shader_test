@@ -1,0 +1,33 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec2 arg0;
+uniform vec3 arg1;
+varying vec3 color;
+
+void main()
+{
+       gl_Position = gl_Vertex;
+
+       /* try to trigger masked mov for cos */
+       vec3 val = arg1;
+       val.z = cos(arg0.x);
+       color.x = val.z;
+        color.yz = val.xy;
+}
+
+[fragment shader]
+varying vec3 color;
+void main()
+{
+       gl_FragColor = vec4(color, 0.0);
+}
+
+[test]
+uniform vec2 arg0 0.0 0.0
+uniform vec3 arg1 1.0 0.5 1.0
+draw rect -1 -1 2 2
+probe rgba 1 1 1.0 1.0 0.5 0.0
+
