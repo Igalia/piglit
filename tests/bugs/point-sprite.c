@@ -49,6 +49,9 @@ piglit_init(int argc, char **argv)
 {
 	GLfloat realMaxSize;
 
+	(void) argc;
+	(void) argv;
+
 	piglit_require_extension("GL_ARB_point_sprite");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

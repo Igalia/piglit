@@ -72,6 +72,9 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
+
 	piglit_automatic = GL_TRUE;
 
 	glViewport(0, 0, piglit_width, piglit_height);

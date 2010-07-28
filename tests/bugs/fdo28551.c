@@ -57,6 +57,9 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	(void) argc;
+	(void) argv;
+
 	piglit_require_extension("GL_ARB_framebuffer_object");
 
 	piglit_ortho_projection(1.0, 1.0, GL_FALSE);
