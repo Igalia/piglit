@@ -68,7 +68,7 @@ typedef union { GLfloat f; GLint i; } fi_type;
  *
  * Taken over from Mesa.
  */
-unsigned short half(float val)
+static unsigned short half(float val)
 {
    const fi_type fi = {val};
    const int flt_m = fi.i & 0x7fffff;
