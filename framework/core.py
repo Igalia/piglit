@@ -353,7 +353,7 @@ class Test:
 
 class Group(dict):
 	def doRun(self, env, path):
-		for sub in self:
+		for sub in sorted(self):
 			spath = sub
 			if len(path) > 0:
 				spath = path + '/' + spath
