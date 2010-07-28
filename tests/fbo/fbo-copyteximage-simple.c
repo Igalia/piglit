@@ -51,7 +51,6 @@ create_fbo(void)
 {
 	GLuint tex, copied_tex, fb;
 	GLenum status;
-	int i, dim;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
