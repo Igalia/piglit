@@ -172,7 +172,7 @@ piglit_display(void)
 }
 
 
-double
+static double
 random_float(void)
 {
 	return (double) rand() / (double) rand();
