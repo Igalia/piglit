@@ -42,6 +42,8 @@ Options:
   -d, --dry-run             Do not execute the tests
   -t regexp, --tests=regexp Run only matching tests (can be used more
                             than once)
+  -x regexp, --exclude-tests=regexp Excludey matching tests (can be used
+                            more than once)
   -n name, --name=name      Name of the testrun
 
 Example:
@@ -62,7 +64,7 @@ def main():
 	env = core.Environment()
 
 	try:
-		options, args = getopt(sys.argv[1:], "hdt:n:", [ "help", "dry-run", "tests=", "name=" ])
+		options, args = getopt(sys.argv[1:], "hdt:n:x:", [ "help", "dry-run", "tests=", "name=", "exclude-tests=" ])
 	except GetoptError:
 		usage()
 
@@ -75,6 +77,8 @@ def main():
 			env.execute = False
 		elif name in ('-t', '--tests'):
 			env.filter[:0] = [re.compile(value)]
+		elif name in ('-x', '--exclude-tests'):
+			env.exclude_filter[:0] = [re.compile(value)]
 		elif name in ('-n', '--name'):
 			OptionName = value
 

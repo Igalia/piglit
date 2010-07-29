@@ -263,6 +263,7 @@ class Environment:
 		self.file = sys.stdout
 		self.execute = True
 		self.filter = []
+		self.exclude_filter = []
 
 	def run(self, command):
 		try:
@@ -291,11 +292,15 @@ class Test:
 		raise NotImplementedError
 
 	def doRun(self, env, path):
-		# Filter
+		# Exclude tests that don't match the filter regexp
 		if len(env.filter) > 0:
 			if not True in map(lambda f: f.search(path) != None, env.filter):
 				return None
 
+		# And exclude tests that do match the exclude_filter regexp
+		if len(env.exclude_filter) > 0:
+			if True in map(lambda f: f.search(path) != None, env.exclude_filter):
+				return None
 		# Run the test
 		if env.execute:
 			try:
