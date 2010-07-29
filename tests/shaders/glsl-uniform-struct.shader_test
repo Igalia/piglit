@@ -1,0 +1,32 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+struct S {
+       float f;
+       vec4 v;
+};
+
+uniform S color;
+void main()
+{
+	gl_FragColor = color.f * color.v;
+}
+
+[test]
+uniform float color.f 2.0
+uniform vec4 color.v 0.0 0.5 0.0 0.0
+draw rect -1 -1 1 2
+uniform float color.f 3.0
+uniform vec4 color.v 0.0 0.0 0.34 0.0
+draw rect 0 -1 1 2
+relative probe rgb (0.25, 0.5) (0.0, 1.0, 0.0)
+relative probe rgb (0.75, 0.5) (0.0, 0.0, 1.0)
