@@ -949,6 +949,20 @@ profile.tests['shaders'] = shaders
 profile.tests['texturing'] = texturing
 profile.tests['glx'] = glx
 
+class ValgrindExecTest(PlainExecTest):
+	def __init__(self, test):
+		Test.__init__(self)
+		self.command = [os.path.dirname(__file__)+'/valgrind-test/valgrind-test'] + test.command
+		self.env = {}
+
+valgrind = Group()
+for groupname, group in sorted(profile.tests.iteritems()):
+	for testname, test in sorted(group.iteritems()):
+		if issubclass(test.__class__, PlainExecTest):
+			valgrind[groupname+"/"+testname] = ValgrindExecTest(test)
+
+profile.tests['valgrind'] = valgrind
+
 #############
 # Some Mesa diagnostic messages that we should probably ignore
 Test.ignoreErrors.append(re.compile("couldn't open libtxc_dxtn.so"))
