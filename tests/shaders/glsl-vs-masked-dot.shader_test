@@ -14,7 +14,7 @@ void main()
        /* try to trigger masked mov for dp */
        vec3 val = arg0;
        val.y = dot(arg0, arg1);
-       color = val.yxz * 0.25f;
+       color = val.yxz * 0.25;
 }
 
 [fragment shader]
