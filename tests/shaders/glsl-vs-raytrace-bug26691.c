@@ -289,4 +289,6 @@ piglit_init(int argc, char **argv)
   program = piglit_link_simple_program(vs, 0);
 
   assert(glIsProgram(program));
+  if (!piglit_link_check_status(program))
+      piglit_report_result(PIGLIT_FAILURE);
 }
