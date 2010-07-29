@@ -9,7 +9,7 @@ void main()
 }
 
 [fragment shader]
-#version 110
+#version 120
 void main()
 {
 	gl_FragColor = vec4(0.0, float(__VERSION__) / 130.0, 0.0, 0.0);
