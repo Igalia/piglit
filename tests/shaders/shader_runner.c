@@ -38,7 +38,7 @@
 #endif
 
 int piglit_width = 250, piglit_height = 250;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 static float gl_version = 0.0;
 static float glsl_version = 0.0;
