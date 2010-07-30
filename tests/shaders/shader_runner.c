@@ -664,7 +664,7 @@ piglit_display(void)
 						GL_FALSE);
 		} else if (string_match("probe rgba", line)) {
 			get_floats(line + 10, c, 6);
-			if (!piglit_probe_pixel_rgb((int) c[0], (int) c[1],
+			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
 				pass = false;
 			}
