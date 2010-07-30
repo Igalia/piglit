@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying float x;
+void main()
+{
+	gl_Position = gl_Vertex;
+	x = gl_Vertex.x;
+}
+
+[fragment shader]
+varying float x;
+void main()
+{
+	/* The interpolated x at the pixels next to the window bounds will
+	 * be just > 0.0 or < 1.0 by 1/width.  Correct for that.
+	 */
+	float adjusted_x = x * (1.0 + 1.0 / 256.0);
+	gl_FragColor = vec4(asin(adjusted_x) / 3.1415926 + 0.5);
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.0, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.1464, 0.5) (0.25, 0.25, 0.25, 0.25)
+relative probe rgba (0.5, 0.5) (0.5, 0.5, 0.5, 0.5)
+relative probe rgba (0.8535, 0.5) (0.75, 0.75, 0.75, 0.75)
+relative probe rgba (1.0, 0.5) (1.0, 1.0, 1.0, 1.0)
