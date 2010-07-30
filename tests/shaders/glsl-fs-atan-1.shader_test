@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 pos;
+void main()
+{
+	gl_Position = gl_Vertex;
+	pos = gl_Vertex.xy;
+}
+
+[fragment shader]
+varying vec2 pos;
+void main()
+{
+	gl_FragColor = vec4(atan(pos.y, pos.x) / (2.0 * 3.1415926) + 0.5);
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (1.0, 0.5) (0.5, 0.5, 0.5, 0.5)
+relative probe rgba (1.0, 1.0) (0.625, 0.625, 0.625, 0.625)
+relative probe rgba (0.5, 1.0) (0.75, 0.75, 0.75, 0.75)
+relative probe rgba (0.0, 1.0) (0.875, 0.875, 0.875, 0.875)
+# discontinuity here.  See glsl-fs-atan-2 for that.
+# relative probe rgba (0.0, 0.5) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.0, 0.0) (0.125, 0.125, 0.125, 0.125)
+relative probe rgba (0.5, 0.0) (0.25, 0.25, 0.25, 0.25)
+relative probe rgba (1.0, 0.0) (0.375, 0.375, 0.375, 0.375)

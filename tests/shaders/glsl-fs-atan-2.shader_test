@@ -1,0 +1,27 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 y, x;
+void main()
+{
+	/* This test does two things that glsl-fs-atan-1 doesn't: It
+	 * tests behavior at y = 0, x < 0 (the discontinuity), and it
+	 * does so using the vec4 variant with some of the same values
+	 * used in glsl-fs-atan-1.
+	 */
+	gl_FragColor = atan(y, x) / (2.0 * 3.1415926) + 0.5;
+}
+
+[test]
+uniform vec4 y -1.0 -1.0 0.0 1.0
+uniform vec4 x 0.0 -1.0 -1.0 -1.0
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.125 1.0 0.875
