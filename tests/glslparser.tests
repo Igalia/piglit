@@ -394,3 +394,6 @@ add_otherglslparsertest('glsl2/xreal-lighting-dbs-omni.frag', 'pass')
 add_otherglslparsertest('glsl2/xreal-lighting-dbs-omni.vert', 'pass')
 add_otherglslparsertest('glsl2/xreal-lighting-d-omni.frag', 'pass')
 add_otherglslparsertest('glsl2/xreal-lighting-d-omni.vert', 'pass')
+
+# All the xonotic shaders should pass.
+add_otherglslparsertest('glsl2/xonotic-vs-generic-diffuse.vert', 'pass')

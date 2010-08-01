@@ -71,7 +71,8 @@ tests/glslparsertest/glsl2/norsetto-*
  * GNU General Public License for more details.
  */
 
-tests/glslparsertest/xreal-*
+tests/glslparsertest/glsl2/xreal-*
+tests/glslparsertest/glsl2/xonotic-*
 /* Full text of the GPL v2 is included in documentation/GPL-2 */
 /*
 ===========================================================================
