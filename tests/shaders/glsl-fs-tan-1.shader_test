@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying float x;
+void main()
+{
+	gl_Position = gl_Vertex;
+	x = (gl_Vertex.x - 1.0 / 256.0) * 3.1415926;
+}
+
+[fragment shader]
+varying float x;
+void main()
+{
+	gl_FragColor = vec4(tan(x));
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgba (0.0, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.1, 0.5) (0.726, 0.726, 0.726, 0.726)
+relative probe rgba (0.2, 0.5) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.6, 0.5) (0.726, 0.726, 0.726, 0.726)
+relative probe rgba (0.7, 0.5) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.8, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (1.0, 0.5) (0.0, 0.0, 0.0, 0.0)
