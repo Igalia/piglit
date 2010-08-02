@@ -1,0 +1,23 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+
+/* Makes sure that integer uniform initializers get through. */
+uniform ivec4 color = ivec4(0, 1, 0, 0);
+void main()
+{
+	gl_FragColor = vec4(color);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
