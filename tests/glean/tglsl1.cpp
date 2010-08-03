@@ -3878,7 +3878,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_1_20
+		FLAG_VERSION_1_20 | FLAG_ILLEGAL_SHADER
 	},
 	{
 		"GLSL 1.20 invariant, centroid qualifiers",
