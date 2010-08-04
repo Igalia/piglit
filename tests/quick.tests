@@ -13,3 +13,5 @@ from framework.core import *
 from framework.gleantest import *
 
 GleanTest.globalParams += [ "--quick" ]
+
+del profile.tests['valgrind']
