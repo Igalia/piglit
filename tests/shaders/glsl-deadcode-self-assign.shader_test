@@ -1,0 +1,32 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+
+void scale(vec4 in_color, float fact, out vec4 out_color)
+{
+	fact = fact;
+
+	out_color = fact * in_color;
+}
+
+void main(void)
+{
+	vec4 color = vec4(0.0, 1.0, 0.0, 0.0);
+	vec4 out_color;
+
+	scale(color, 1.0, out_color);
+
+	gl_FragColor = out_color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
