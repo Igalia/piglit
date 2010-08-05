@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 color;
+varying vec4 color1;
+varying vec4 color2;
+
+void set_color2(void)
+{
+	color2 = color1;
+}
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	/* Due to a bug in glsl2, this particular assignment followed
+	 * by the function call below would get the expression moved to
+	 * color2 and color1 would be eliminated.
+	 */
+
+	color1 = color * 0.5;
+	set_color2();
+}
+
+[fragment shader]
+varying vec4 color1;
+varying vec4 color2;
+
+void main()
+{
+	gl_FragColor = color1;
+}
+
+[test]
+uniform vec4 color 0.0 1.0 0.0 0.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.5 0.0 0.0
