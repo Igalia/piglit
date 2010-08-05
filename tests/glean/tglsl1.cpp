@@ -3977,7 +3977,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.5, 0.0, 0.0, 0.0 },
 		DONT_CARE_Z,
-		FLAG_NONE
+		FLAG_NONE | FLAG_ILLEGAL_SHADER
 	},
 
 	{ NULL, NULL, NULL, {0,0,0,0}, 0, FLAG_NONE } // end of list sentinal
