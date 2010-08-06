@@ -1,0 +1,41 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 tc1;
+varying vec2 tc2;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	tc1 = (gl_Vertex.xy + 1.0) / 2.0;
+	tc2 = tc1.yx;
+}
+
+[fragment shader]
+varying vec2 tc1;
+varying vec2 tc2;
+uniform sampler2D tex1;
+uniform sampler2D tex2;
+
+vec4 blend_textures(sampler2D t1, vec2 tc1, sampler2D t2, vec2 tc2, float mix)
+{
+	return mix(texture2D(t1, tc1), texture2D(t2, tc2), mix);
+}
+
+void main()
+{
+	gl_FragColor = blend_textures(tex1, tc1, tex2, tc2, 0.5);
+}
+
+[test]
+uniform int tex1 0
+uniform int tex2 1
+texture rgbw 0 (8, 8)
+texture rgbw 1 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (1.0, 0.0, 0.0)
+relative probe rgb (0.75, 0.25) (0.0, 0.5, 0.5)
+relative probe rgb (0.25, 0.75) (0.0, 0.5, 0.5)
+relative probe rgb (0.75, 0.75) (1.0, 1.0, 1.0)
