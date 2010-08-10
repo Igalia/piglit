@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	if (gl_Vertex.x >= 50.0){
+		if (gl_Vertex.x >= 70 ) {
+			gl_FrontColor = vec4(0.0, 0.0, 1.0, 0.0);
+		}
+		else {
+			gl_FrontColor = vec4(1.0, 0.0, 0.0, 0.0);
+		}
+	} else {
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 0.0);
+	}
+
+	if (gl_Vertex.x <= 20) {
+		gl_FrontColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+draw rect 10 10 10 10
+draw rect 30 10 10 10
+draw rect 50 10 10 10
+draw rect 70 10 10 10
+probe rgba 15 15 0.0 0.0 0.0 1.0
+probe rgba 35 15 0.0 1.0 0.0 0.0
+probe rgba 55 15 1.0 0.0 0.0 0.0
+probe rgba 75 15 0.0 0.0 1.0 0.0
