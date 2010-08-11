@@ -11,15 +11,15 @@ void main()
 [fragment shader]
 
 // Function prototype:
-float half(float x);
+float _half(float x);
 
 void main()
 {
-	float c = half(0.8);
+	float c = _half(0.8);
 	gl_FragColor = vec4(c);
 }
 
-float half(float x)
+float _half(float x)
 {
 	return 0.5 * x;
 }
