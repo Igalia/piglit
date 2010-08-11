@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+
+// Function prototype:
+float half(float x);
+
+void main()
+{
+	float c = half(0.8);
+	gl_FragColor = vec4(c);
+}
+
+float half(float x)
+{
+	return 0.5 * x;
+}
+
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 1 1  0.4 0.4 0.4 0.4
