@@ -49,6 +49,7 @@ add_executable (glsl-arb-fragment-coord-conventions glsl-arb-fragment-coord-conv
 add_executable (glsl-arb-fragment-coord-conventions-define glsl-arb-fragment-coord-conventions-define.c)
 add_executable (glsl-bug-22603 glsl-bug-22603.c)
 add_executable (glsl-dlist-getattriblocation glsl-dlist-getattriblocation.c)
+add_executable (glsl-getattriblocation glsl-getattriblocation.c)
 add_executable (glsl-orangebook-ch06-bump glsl-orangebook-ch06-bump.c)
 add_executable (glsl-reload-source glsl-reload-source.c)
 add_executable (glsl-unused-varying glsl-unused-varying.c)
