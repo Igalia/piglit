@@ -200,6 +200,10 @@ run_test(void)
 	pass = verify_color_rect(PAD, y0, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y2, SIZE, SIZE) && pass;
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	pass = verify_color_rect(PAD, y0, SIZE, SIZE) && pass;
+	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	glutSwapBuffers();
 
