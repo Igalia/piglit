@@ -218,6 +218,30 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 	return 0;
 }
 
+/**
+ * Read a pixel from the given location and compare its depth value to the
+ * given expected value.
+ *
+ * Print a log message if the depth value deviates from the expected value.
+ * \return true if the depth value matches, false otherwise
+ */
+int piglit_probe_pixel_depth(int x, int y, float expected)
+{
+	GLfloat probe;
+	GLfloat delta;
+
+	glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &probe);
+
+	delta = probe - expected;
+	if (fabs(delta) < 0.01)
+		return 1;
+
+	printf("Probe at (%i,%i)\n", x, y);
+	printf("  Expected: %f\n", expected);
+	printf("  Observed: %f\n", probe);
+
+	return 0;
+}
 
 /**
  * Read a texel from the given location and compare its RGBA value to the
