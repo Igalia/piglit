@@ -100,11 +100,6 @@ void
 piglit_init(int argc, char **argv)
 {
 
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
-
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_extension("GL_EXT_texture_swizzle");
