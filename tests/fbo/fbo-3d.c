@@ -50,13 +50,15 @@ float depth_color[NUM_DEPTHS][4] = {
 	{0.0, 1.0, 1.0, 0.0},
 };
 
+int pot_depth;
+
 static int
 create_3d_fbo(void)
 {
 	GLuint tex, fb;
 	GLenum status;
 	int depth;
-	int pot_depth = glutExtensionSupported("GL_ARB_texture_non_power_of_two") ?
+	pot_depth = glutExtensionSupported("GL_ARB_texture_non_power_of_two") ?
 		NUM_DEPTHS: POT_DEPTHS;
 
 	glGenTextures(1, &tex);
@@ -110,7 +112,7 @@ done:
 static void
 draw_depth(int x, int y, int depth)
 {
-	float depth_coord = (float)depth / (NUM_DEPTHS - 1);
+	float depth_coord = (float)depth / (pot_depth - 1);
 
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
