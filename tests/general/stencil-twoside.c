@@ -80,12 +80,14 @@ piglit_display(void)
 	if (use20syntax) {
 		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
 		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 	}
 	else {
 		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+		glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 	}
-	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
-	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 
 	glColor3f(0.9, 0.9, 0.9);
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
@@ -102,12 +104,14 @@ piglit_display(void)
 	if (use20syntax) {
 		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
 		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 	}
 	else {
 		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+		glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 	}
-	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
-	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 
 	glColor3f(0.9, 0.9, 0.9);
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
@@ -124,12 +128,14 @@ piglit_display(void)
 	if (use20syntax) {
 		glStencilFuncSeparate(GL_FRONT, GL_NEVER, 0, ~0);
 		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 	}
 	else {
 		glStencilFuncSeparateATI(GL_NEVER, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
+		glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 	}
-	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_DECR);
-	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR);
 
 	glColor3f(0.9, 0.9, 0.9);
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
@@ -148,12 +154,14 @@ piglit_display(void)
 	if (use20syntax) {
 		glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
 		glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 	}
 	else {
 		glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+		glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
+		glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 	}
-	glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_INCR);
-	glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_DECR);
 
 	glColor3f(0.9, 0.9, 0.9);
 	for (i = 0 ; i < (max_stencil + 5) ; i++) {
@@ -172,12 +180,14 @@ piglit_display(void)
 		if (use20syntax) {
 			glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
 			glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
+			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
+			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 		}
 		else {
 			glStencilFuncSeparateATI(GL_ALWAYS, GL_ALWAYS, 0, ~0);
+			glStencilOpSeparateATI(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
+			glStencilOpSeparateATI(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 		}
-		glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
-		glStencilOpSeparate(GL_BACK, GL_KEEP, GL_KEEP, GL_INCR_WRAP);
 
 		glColor3f(0.9, 0.9, 0.9);
 		for (i = 0 ; i < (max_stencil + 5) ; i++) {
