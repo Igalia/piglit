@@ -350,8 +350,8 @@ piglit_display()
 	GLboolean pass = GL_TRUE;
 
 	/* Use different width/height from window to catch mistakes */
-	int fbo_width = piglit_width + 100;
-	int fbo_height = piglit_height + 100;
+	int fbo_width = 512;
+	int fbo_height = 512;
 	GLuint fbo, texture;
 
 	glGenFramebuffersEXT(1, &fbo);
