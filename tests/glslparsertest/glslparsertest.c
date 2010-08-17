@@ -68,6 +68,13 @@ test(void)
 		exit(1);
 	}
 
+	if (!GLEW_VERSION_2_0) {
+		if (type == GL_FRAGMENT_SHADER && !GLEW_ARB_fragment_shader)
+			piglit_report_result(PIGLIT_SKIP);
+		if (type == GL_VERTEX_SHADER && !GLEW_ARB_vertex_shader)
+			piglit_report_result(PIGLIT_SKIP);
+	}
+
 	err = stat(filename, &st);
 	if (err == -1) {
 		fprintf(stderr, "Couldn't stat program %s: %s\n",
@@ -91,11 +98,17 @@ test(void)
 	prog_string[st.st_size] = '\0';
 	fclose(f);
 
-	prog = glCreateShader(type);
-	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
-	glCompileShader(prog);
-	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
-
+	if (GLEW_VERSION_2_0) {
+		prog = glCreateShader(type);
+		glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
+		glCompileShader(prog);
+		glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
+	} else {
+		prog = glCreateShaderObjectARB(type);
+		glShaderSourceARB(prog, 1, (const GLchar **)&prog_string, NULL);
+		glCompileShaderARB(prog);
+		glGetObjectParameterivARB(prog, GL_COMPILE_STATUS, &ok);
+	}
 	pass = (expected_pass == (ok != 0));
 
 	if (pass)
@@ -103,11 +116,18 @@ test(void)
 	else
 		out = stderr;
 
-
-	glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
+	if (GLEW_VERSION_2_0) {
+		glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
+	} else {
+		glGetObjectParameterivARB(prog, GL_INFO_LOG_LENGTH, &size);
+	}
 	if (size != 0) {
 		info = malloc(size);
-		glGetShaderInfoLog(prog, size, NULL, info);
+		if (GLEW_VERSION_2_0) {
+			glGetShaderInfoLog(prog, size, NULL, info);
+		} else {
+			glGetObjectParameterivARB(prog, GL_INFO_LOG_LENGTH, &size);
+		}
 	} else {
 		info = "(no compiler output)";
 	}
@@ -134,7 +154,11 @@ test(void)
 		free(info);
 	free(prog_string);
 
-	glDeleteShader(prog);
+	if (GLEW_VERSION_2_0) {
+		glDeleteShader(prog);
+	} else {
+		glDeleteObjectARB(prog);
+	}
 
 	piglit_report_result (pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
@@ -175,7 +199,7 @@ int main(int argc, char**argv)
 	glutCreateWindow("glslparsertest");
 	glewInit();
 
-	if (!GLEW_VERSION_2_0) {
+	if (!GLEW_VERSION_2_0 && !GL_ARB_shader_objects) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
