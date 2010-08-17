@@ -1,0 +1,33 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+int i = 1;
+uniform ivec2 j = ivec2(2,3);
+ivec3 k = ivec3(4,5,6);
+const ivec4 l = ivec4(7,8,9,10);
+
+void main()
+{
+   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+   mat4x3 m4 = mat4x3(ivec3(i, j), k, ivec3(l[2]), l.gra);
+
+  if (m4 == mat4x3(1.0,2.0,3.0, 4.0,5.0,6.0, 9.0,9.0,9.0, 8.0,7.0,10.0))
+      gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+   else
+      gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
