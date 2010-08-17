@@ -43,7 +43,7 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	static const float args1[4] = {1.0, 0.25, -1.0, 0.0};
+	static const float args1[4] = {1.0, 0.25, 0.0, -1.0};
 	static const float args2[4] = {1.0, 0.0, 0.0, 0.0};
 	static const float result[] = {1.0, 0.5, 0.0, 0.0};
 
