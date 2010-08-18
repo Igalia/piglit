@@ -1,0 +1,24 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+vec4 mix_lighting(gl_LightSourceParameters l)
+{
+	return l.constantAttenuation / 2.0 + l.ambient.xwxx;
+}
+
+void main()
+{
+	gl_FragColor = mix_lighting(gl_LightSource[0]);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.5 1.0 0.5 0.5
