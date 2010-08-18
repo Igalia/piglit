@@ -1,0 +1,31 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 arg0;
+uniform vec4 arg1;
+varying vec4 color;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	color.x = float(arg0 != arg1); /* false */
+	color.y = float(arg0.xxxx != arg1); /* true */
+	color.z = float(arg0.wzyx != arg1.wzyx); /* false */
+	color.w = float(arg0.wwww != arg1); /* true */
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform vec4 arg0 0.0 1.0 2.0 3.0
+uniform vec4 arg1 0.0 1.0 2.0 3.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
