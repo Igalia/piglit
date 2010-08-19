@@ -1,0 +1,36 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 color;
+
+void main()
+{
+	if (gl_Vertex.x < 0.0) {
+		color = vec4(0.0, 1.0, 0.0, 0.0);
+		/* left */
+		for (float f = -2.0; f < gl_Vertex.x; f++) {
+			if (gl_Vertex.z != f) /* always */
+				break;
+			color += vec4(1.0, 0.0, 0.0, 0.0);
+		}
+	} else {
+		/* right */
+		color = vec4(0.0, 1.0, 0.0, 0.0);
+	}
+
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
