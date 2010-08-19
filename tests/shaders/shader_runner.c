@@ -62,6 +62,7 @@ unsigned num_fragment_shaders = 0;
 char *shader_strings[256];
 GLsizei shader_string_sizes[256];
 unsigned num_shader_strings = 0;
+GLuint prog;
 
 enum states {
 	none = 0,
@@ -419,7 +420,6 @@ leave_state(enum states state, const char *line)
 void
 link_and_use_shaders(void)
 {
-	GLuint prog;
 	unsigned i;
 	GLenum err;
 	GLint ok;
@@ -444,6 +444,18 @@ link_and_use_shaders(void)
 	}
 
 	glLinkProgram(prog);
+
+	for (i = 0; i < num_vertex_shaders; i++) {
+		glDeleteShader(vertex_shaders[i]);
+	}
+
+	for (i = 0; i < num_geometry_shaders; i++) {
+		glDeleteShader(geometry_shaders[i]);
+	}
+
+	for (i = 0; i < num_fragment_shaders; i++) {
+		glDeleteShader(fragment_shaders[i]);
+	}
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 	if (!ok) {
@@ -742,6 +754,12 @@ piglit_display(void)
 	}
 
 	glutSwapBuffers();
+
+	if (piglit_automatic) {
+		/* Free our resources, useful for valgrinding. */
+		glDeleteProgram(prog);
+		glUseProgram(0);
+	}
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
