@@ -220,7 +220,7 @@ piglit_init(int argc, char **argv)
 	if (!GLEW_ATI_separate_stencil && !GLEW_VERSION_2_0) {
 		printf("Sorry, this program requires either "
 		       "GL_ATI_separate_stencil or OpenGL 2.0.\n");
-		exit(1);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	if (!GLEW_VERSION_2_0) {
