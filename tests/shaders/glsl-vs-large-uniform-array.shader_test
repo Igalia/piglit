@@ -1,0 +1,26 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 array[500];
+
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_FrontColor = array[0] + array[340] + array[473] - vec4(1, 0, 1, 0);
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+uniform vec4 array[0]   0.2 0.3 0.4 0
+uniform vec4 array[340] 0.5 0.2 0.7 0
+uniform vec4 array[473] 0.6 0.1 0.6 0
+draw rect 10 10 10 10
+probe rgb 15 15 0.3 0.6 0.7
+
