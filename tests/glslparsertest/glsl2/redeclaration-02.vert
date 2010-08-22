@@ -1,4 +1,4 @@
-/* FAIL - variables and functions share the same namespace */
+/* PASS - variables and functions have separate namespaces in 1.10 */
 const float f = 1.0;
 
 float f(float x)

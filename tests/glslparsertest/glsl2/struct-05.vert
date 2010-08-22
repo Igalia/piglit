@@ -1,4 +1,4 @@
-/* PASS */
+/* FAIL - structure name conflicts with variable name in same scope */
 
 uniform vec4 foo;
 
