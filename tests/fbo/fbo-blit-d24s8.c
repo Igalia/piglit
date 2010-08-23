@@ -29,7 +29,7 @@
 /** @file fbo-blit-d24s8.c
  *
  * Tests EXT_framebuffer_blit with various combinations of window system and
- * FBO objects.  Because FBOs are generally stozero inverted relative to
+ * FBO objects.  Because FBOs are generally stored upside down relative to
  * window system frambuffers, this could catch flipping failures in blit paths.
  * The FBOs in this test are of the D24S8 format.
  *
