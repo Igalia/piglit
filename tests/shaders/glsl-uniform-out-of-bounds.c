@@ -114,7 +114,7 @@ static const char vs_vector_template[] =
 "uniform %s c[4];\n"
 "varying %s v;\n"
 "void main() {\n"
-"   v = a + b[0] + c[0] + c[1] + c[2] + c[3];\n"
+"   v = a + b[3] + c[0] + c[1] + c[2] + c[3];\n"
 "   gl_Position = vec4(0,0,0,1);\n"
 "}\n";
 
@@ -214,7 +214,7 @@ static const char vs_matrix_template[] =
 "uniform mat4 c[4];\n"
 "varying vec4 v;\n"
 "void main() {\n"
-"   mat4 m = a + b[0] + c[0] + c[1] + c[2] + c[3];\n"
+"   mat4 m = a + b[3] + c[0] + c[1] + c[2] + c[3];\n"
 "   v = m * vec4(1.0, 1.0, 1.0, 1.0);\n"
 "   gl_Position = vec4(0,0,0,1);\n"
 "}\n";
