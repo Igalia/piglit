@@ -1,0 +1,32 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+
+uniform vec2 args;
+
+void main()
+{
+	bvec2 argsb = bvec2(args);
+
+	bvec2 v_true = bvec2(argsb.xx);
+	bvec2 v_some = bvec2(argsb.xy);
+	bvec2 v_none = bvec2(argsb.yy);
+	bool true1 = any(v_true);
+	bool true2 = any(v_some);
+	bool false1 = any(v_none);
+	gl_FragColor = vec4(float(true1), float(true2), float(false1), 0.0);
+}
+
+[test]
+uniform vec2 args 1.0 0.0
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 0.0 0.0
