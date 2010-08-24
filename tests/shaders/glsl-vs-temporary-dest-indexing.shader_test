@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform int index;
+
+void main()
+{
+    /* Intentionally initialize the array in a non-ascending order. */
+    vec4 array[4];
+    array[2] = vec4(0.1, 0,   0,   0);
+    array[0] = vec4(0,   0.1, 0,   0);
+    array[3] = vec4(0,   0,   0.1, 0);
+    array[1] = vec4(0,   0.1, 0.1, 0);
+    array[index] = vec4(0.5, 0.5, 0.5, 0);
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_FrontColor = array[0] + array[1] + array[2] + array[3];
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+uniform int index 0
+draw rect 10 10 10 10
+probe rgb 15 15 0.6 0.6 0.7
+uniform int index 1
+draw rect 30 10 10 10
+probe rgb 35 15 0.6 0.6 0.6
+uniform int index 2
+draw rect 50 10 10 10
+probe rgb 55 15 0.5 0.7 0.7
+uniform int index 3
+draw rect 70 10 10 10
+probe rgb 75 15 0.6 0.7 0.6
+
