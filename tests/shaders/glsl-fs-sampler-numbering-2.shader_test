@@ -1,0 +1,51 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 texcoords;
+uniform float yoffset;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	texcoords = gl_Vertex.xy + vec2(0.0, yoffset);
+}
+
+[fragment shader]
+varying vec2 texcoords;
+uniform sampler2D left;
+uniform sampler2D right;
+
+void main()
+{
+	if (texcoords.x < 0.0) {
+		gl_FragColor = texture2D(left, texcoords.xy + vec2(1.0, 0.0));
+	} else {
+		gl_FragColor = texture2D(right, texcoords.xy);
+	}
+}
+
+[test]
+texture checkerboard 0 0 (8, 8) (0.0, 0.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texture checkerboard 1 0 (8, 8) (0.0, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+
+uniform int left 0
+uniform int right 1
+uniform float yoffset 1.0
+draw rect -1 -1 2 1
+
+uniform int left 1
+uniform int right 0
+uniform float yoffset 0.0
+draw rect -1 0 2 1
+
+relative probe rgb (0.375, 0.125) (0.0, 1.0, 0.0)
+relative probe rgb (0.125, 0.375) (0.0, 1.0, 0.0)
+relative probe rgb (0.875, 0.625) (0.0, 1.0, 0.0)
+relative probe rgb (0.675, 0.875) (0.0, 1.0, 0.0)
+
+relative probe rgb (0.875, 0.125) (1.0, 0.0, 0.0)
+relative probe rgb (0.625, 0.375) (1.0, 0.0, 0.0)
+relative probe rgb (0.375, 0.625) (1.0, 0.0, 0.0)
+relative probe rgb (0.125, 0.875) (1.0, 0.0, 0.0)

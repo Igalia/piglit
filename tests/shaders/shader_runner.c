@@ -658,7 +658,7 @@ piglit_display(void)
 	line = test_start;
 	while (line[0] != '\0') {
 		float c[32];
-		int x, y, w, h, tex;
+		int x, y, w, h, tex, level;
 
 		line = eat_whitespace(line);
 
@@ -739,6 +739,19 @@ piglit_display(void)
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE);
+			glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line,
+				  "texture checkerboard %d %d ( %d , %d ) "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f , %f )",
+				  &tex, &level, &w, &h,
+				  c + 0, c + 1, c + 2, c + 3,
+				  c + 4, c + 5, c + 6, c + 7) == 12) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_checkerboard_texture(0, level,
+						    w, h,
+						    w / 2, h / 2,
+						    c + 0, c + 4);
 			glEnable(GL_TEXTURE_2D);
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
