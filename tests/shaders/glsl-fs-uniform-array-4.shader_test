@@ -1,0 +1,29 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+
+struct S {
+       float f;
+       vec4 v;
+};
+
+uniform S[3] vals;
+void main()
+{
+	gl_FragColor = vec4(vals[1].v * vals[2].f);
+}
+
+[test]
+uniform vec4 vals[1].v 0.0 0.5 0.0 0.0
+uniform float vals[2].f 2.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
