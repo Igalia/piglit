@@ -22,6 +22,9 @@ one_parameter_110 = [
     "fract",
     "length",
     "normalize",
+    ]
+
+one_parameter_110_fs = [
     "dFdx",
     "dFdy",
     "fwidth",
@@ -164,6 +167,32 @@ def emit_110_tests(f):
     f.write("}\n")
 
 
+def emit_110_fs_tests(f):
+    f.write("/* PASS */\n#version 110\n\n")
+    f.write("uniform float u_float;\n")
+
+
+    for i in [2, 3, 4]:
+        f.write("uniform vec%d u_vec%d;\n" % (i, i))
+
+    f.write("""\nvoid main()
+{
+  gl_FragColor = gl_Color;
+
+  float t_float = float(0.0);\n""")
+
+    for i in [2, 3, 4]:
+        f.write("  vec%d  t_vec%d  = vec%d (0.0);\n" % (i, i, i))
+
+    f.write("\n")
+
+    for name in one_parameter_110_fs:
+        for t in genType:
+            f.write("  t_%s = %s(u_%s);\n" % (t, name, t))
+
+    f.write("}\n")
+
+
 def emit_120_tests(f):
     f.write("/* PASS */\n#version 120\n\n")
 
@@ -221,6 +250,10 @@ def emit_120_tests(f):
 
 f = open("builtin-functions-110.vert", "w")
 emit_110_tests(f)
+f.close()
+
+f = open("builtin-functions-110.frag", "w")
+emit_110_fs_tests(f)
 f.close()
 
 f = open("builtin-functions-120.vert", "w")

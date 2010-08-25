@@ -115,18 +115,6 @@ void main()
   t_vec2 += normalize(u_vec2);
   t_vec3 += normalize(u_vec3);
   t_vec4 += normalize(u_vec4);
-  t_float += dFdx(u_float);
-  t_vec2 += dFdx(u_vec2);
-  t_vec3 += dFdx(u_vec3);
-  t_vec4 += dFdx(u_vec4);
-  t_float += dFdy(u_float);
-  t_vec2 += dFdy(u_vec2);
-  t_vec3 += dFdy(u_vec3);
-  t_vec4 += dFdy(u_vec4);
-  t_float += fwidth(u_float);
-  t_vec2 += fwidth(u_vec2);
-  t_vec3 += fwidth(u_vec3);
-  t_vec4 += fwidth(u_vec4);
 
   t_float += atan(u_float, -u_float);
   t_vec2 += atan(u_vec2, -u_vec2);
