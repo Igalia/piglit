@@ -66,24 +66,17 @@ piglit_init(int argc, char **argv)
 
 	prog = piglit_link_simple_program(vs, fs);
 
-	/* From page 80 (page 88 of the PDF) of the OpenGL 2.1 specification:
+	/* From page 261 (page 275 of the PDF) of the OpenGL 2.1 specification:
 	 *
-	 *     The actual number of characters written into name,
-	 *     excluding the null terminator, is returned in length.
-	 *
-	 * This describes the length outvalue of glGetActiveUniform().
-	 * GL_ACTIVE_UNIFORM_MAX_LENGTH on the following page just
-	 * says:
-	 *
-	 *     The length of the longest uniform name in program is
-	 *     given by ACTIVE UNIFORM MAX LENGTH, which can be
-	 *     queried with GetProgramiv (see section 6.1.14).
+	 *     If pname is ACTIVE UNIFORM MAX LENGTH, the length of
+	 *     the longest active uniform name, including a null
+	 *     terminator, is returned.
 	 */
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_MAX_LENGTH, &len);
-	if (len != strlen("color")) {
+	if (len != strlen("color") + 1) {
 		printf("Unexpected max active uniform length "
-		       "(saw %d, expected %d)\n", len, strlen("color"));
+		       "(saw %d, expected %d)\n", len, strlen("color") + 1);
 		pass = GL_FALSE;
 	}
 
@@ -92,12 +85,12 @@ piglit_init(int argc, char **argv)
 	 *     The actual number of characters written into name,
 	 *     excluding the null terminator, is returned in length.
 	 */
-	name = malloc(len + 1);
+	name = malloc(len);
 	glGetActiveUniform(prog, 0, len + 20, &ret_len, &size, &type, name);
-	if (ret_len != len) {
+	if (ret_len != strlen("color")) {
 		printf("Unexpected active uniform length "
 		       "(saw %d, expected %d) for \"%s\"\n",
-		       ret_len, len, name);
+		       ret_len, strlen("color"), name);
 		pass = GL_FALSE;
 	}
 
