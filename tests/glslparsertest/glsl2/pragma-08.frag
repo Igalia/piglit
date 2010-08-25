@@ -15,6 +15,6 @@ uniform float g_fBloomAddSmoothFactor;
 
 void main()
 {
-  gl_FragColor.xyz = mix(clrAdd, clrAddSmoth, g_fBloomAddSmoothFactor).xyz;
+  gl_FragColor.xyz = mix(clrAdd, clrAddSmooth, g_fBloomAddSmoothFactor).xyz;
   gl_FragColor.w = 1.0;
 }
