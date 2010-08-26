@@ -9,6 +9,7 @@ add_subdirectory (glslparsertest)
 add_subdirectory (asmparsertest)
 add_subdirectory (shaders)
 add_subdirectory (texturing)
+add_subdirectory (spec)
 
 IF(OPENGL_egl_LIBRARY)
 	add_subdirectory (egl)
