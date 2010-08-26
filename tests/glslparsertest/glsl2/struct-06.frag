@@ -11,6 +11,6 @@ void main()
   for (int i = 0; i < 4; ++i)
     s.params[i] = 1.0;
 
-  gl_FragColor = vec4(str.params[0], str.params[1],
-		      str.params[2], str.params[3]);
+  gl_FragColor = vec4(s.params[0], s.params[1],
+		      s.params[2], s.params[3]);
 }
