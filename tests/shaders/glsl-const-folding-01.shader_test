@@ -1,0 +1,99 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+/* This test requires version 1.20 because it depends on the new constant
+ * expression rules added in 1.20.
+ */
+#version 120
+
+/* All references to bad_constant_folding should be optimized away at compile
+ * time.  If not, link errors will be generated, and the test will fail.
+ */
+void bad_constant_folding();
+
+uniform float val;
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+
+	if (false)
+		bad_constant_folding();
+	else if (degrees(0.0) != 0.0)
+		bad_constant_folding();
+	else if (radians(0.0) != 0.0)
+		bad_constant_folding();
+	else if (sqrt(0.0) != 0.0)
+		bad_constant_folding();
+	else if (sqrt(1.0) != 1.0)
+		bad_constant_folding();
+	else if (inversesqrt(1.0) != 1.0)
+		bad_constant_folding();
+	else if (exp(0.0) != 1.0)
+		bad_constant_folding();
+	else if (exp(1.0) <= 2.718)
+		bad_constant_folding();
+	else if (exp(1.0) >= 2.719)
+		bad_constant_folding();
+	else if (exp2(0.0) != 1.0)
+		bad_constant_folding();
+	else if (exp2(1.0) != 2.0)
+		bad_constant_folding();
+	else if (tan(0.0) != 0.0)
+		bad_constant_folding();
+	else if (log(1.0) != 0.0)
+		bad_constant_folding();
+	else if (log2(1.0) != 0.0)
+		bad_constant_folding();
+	else if (sin(0.0) != 0.0)
+		bad_constant_folding();
+	else if (cos(0.0) != 1.0)
+		bad_constant_folding();
+	else if (tan(0.0) != 0.0)
+		bad_constant_folding();
+	else if (asin(0.0) != 0.0)
+		bad_constant_folding();
+	else if (acos(1.0) != 0.0)
+		bad_constant_folding();
+	else if (atan(0.0) != 0.0)
+		bad_constant_folding();
+	else if (atan(1.0) <= (3.1415 / 4.0))
+		bad_constant_folding();
+	else if (atan(1.0) >= (3.1416 / 4.0))
+		bad_constant_folding();
+	else if (abs(1.0) != 1.0)
+		bad_constant_folding();
+	else if (abs(-1.0) != 1.0)
+		bad_constant_folding();
+	else if (sign(42.0) != 1.0)
+		bad_constant_folding();
+	else if (sign(-42.0) != -1.0)
+		bad_constant_folding();
+	else if (sign(0.0) != 0.0)
+		bad_constant_folding();
+#if 0
+	/* The GLSL spec doesn't actually require that these be considered
+	 * constant expressions, but any sensible implementation should
+	 * evaluate them as constants and remove the calls to
+	 * bad_constant_folding.
+	 */
+	else if (pow(val, 0.0) != 1.0)
+		bad_constant_folding();
+	else if (pow(1.0, val) != 1.0)
+		bad_constant_folding();
+#endif
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+clear color 0.3 0.3 0.3 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
