@@ -1,0 +1,80 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 pos;
+void main()
+{
+	gl_Position = gl_Vertex;
+	pos = gl_Vertex.xy;
+}
+
+[fragment shader]
+varying vec2 pos;
+const float pi = 3.14159265358979323846;
+void main()
+{
+	/* Convert input value on [-1,1] to [-pi,pi] */
+	float angle = pi * pos.x;
+
+	float t = tan(angle);
+	if (pos.y < -.667)
+		gl_FragColor = vec4(vec3(pos.x / 2.0 + 0.5), 1.0);
+	else if (pos.y < -.333) {
+		float at = atan(t);
+		gl_FragColor = vec4(vec3((at / (2.0 * pi)) + 0.5), 1.0);
+	} else if (pos.y < 0.0) {
+		float sgn = (abs(angle) > (pi / 2.0)) ? -1.0 : 1.0;
+		float at = atan(sgn * t, sgn);
+
+		gl_FragColor = vec4(vec3((at / (2.0 * pi)) + 0.5), 1.0);
+	} else {
+		gl_FragColor = vec4(vec3((t / 10.0) + 0.5), 1.0);
+	}
+}
+
+[test]
+draw rect -1 -1 2 2
+
+# Everything in the first atan bar should give back the input value
+relative probe rgb  (0.0, 0.4) (0.0, 0.0, 0.0)
+relative probe rgb  (0.1, 0.4) (0.1, 0.1, 0.1)
+relative probe rgb  (0.2, 0.4) (0.2, 0.2, 0.2)
+relative probe rgb  (0.3, 0.4) (0.3, 0.3, 0.3)
+relative probe rgb  (0.4, 0.4) (0.4, 0.4, 0.4)
+relative probe rgb  (0.5, 0.4) (0.5, 0.5, 0.5)
+relative probe rgb  (0.6, 0.4) (0.6, 0.6, 0.6)
+relative probe rgb  (0.7, 0.4) (0.7, 0.7, 0.7)
+relative probe rgb  (0.8, 0.4) (0.8, 0.8, 0.8)
+relative probe rgb  (0.9, 0.4) (0.9, 0.9, 0.9)
+
+# The portion of the second atan bar representing [-pi/2,pi/2] should be the
+# same as the first atan bar.
+relative probe rgb  (0.26, 0.2) (0.26, 0.26, 0.26)
+relative probe rgb  (0.3, 0.2) (0.3, 0.3, 0.3)
+relative probe rgb  (0.4, 0.2) (0.4, 0.4, 0.4)
+relative probe rgb  (0.5, 0.2) (0.5, 0.5, 0.5)
+relative probe rgb  (0.6, 0.2) (0.6, 0.6, 0.6)
+relative probe rgb  (0.7, 0.2) (0.7, 0.7, 0.7)
+relative probe rgb  (0.74, 0.2) (0.74, 0.74, 0.74)
+
+relative probe rgb  (0.0, 0.2) (0.5, 0.5, 0.5)
+relative probe rgb  (0.1, 0.2) (0.6, 0.6, 0.6)
+relative probe rgb  (0.24, 0.2) (0.74, 0.74, 0.74)
+relative probe rgb  (0.76, 0.2) (0.26, 0.26, 0.26)
+relative probe rgb  (0.8, 0.2) (0.3, 0.3, 0.3)
+relative probe rgb  (0.9, 0.2) (0.4, 0.4, 0.4)
+
+# Sanity check by probing the input bar
+relative probe rgb  (0.0, 0.1) (0.0, 0.0, 0.0)
+relative probe rgb  (0.1, 0.1) (0.1, 0.1, 0.1)
+relative probe rgb  (0.2, 0.1) (0.2, 0.2, 0.2)
+relative probe rgb  (0.3, 0.1) (0.3, 0.3, 0.3)
+relative probe rgb  (0.4, 0.1) (0.4, 0.4, 0.4)
+relative probe rgb  (0.5, 0.1) (0.5, 0.5, 0.5)
+relative probe rgb  (0.6, 0.1) (0.6, 0.6, 0.6)
+relative probe rgb  (0.7, 0.1) (0.7, 0.7, 0.7)
+relative probe rgb  (0.8, 0.1) (0.8, 0.8, 0.8)
+relative probe rgb  (0.9, 0.1) (0.9, 0.9, 0.9)
+
