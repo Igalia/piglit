@@ -1,15 +1,14 @@
 [require]
 GL >= 2.0
-GLSL >= 1.20
+GLSL >= 1.10
 
 [vertex shader]
-#version 120
 uniform int n;
 varying vec4 gl_TexCoord[5];
 void main()
 {
 	for (int i = 0; i < n; i++) {
-		gl_TexCoord[i] = vec4(0.5, 0.5, 0.5, 0.5) * i;
+		gl_TexCoord[i] = vec4(0.5, 0.5, 0.5, 0.5) * float(i);
 	}
 	gl_Position = gl_Vertex;
 }
