@@ -1,0 +1,31 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 gl_TexCoord[5];
+void main()
+{
+	/* 0.05, 0.05, 0.10, 0.15, 0.20 */
+	for (int i = 0; i < 5; i++)
+		gl_TexCoord[i] = vec4(float(i) * 0.05);
+
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 gl_TexCoord[5];
+void main()
+{
+	vec4 result = vec4(0.0);
+
+	for (int i = 0; i < 4; i++)
+		result += gl_TexCoord[i];
+
+	/* 0.00 + 0.05 + 0.10 + 0.15 = 0.30 */
+	gl_FragColor = result;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 1 1 0.3 0.3 0.3 0.3
