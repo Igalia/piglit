@@ -132,10 +132,11 @@ static int DoTest( void )
 
 		for(j = 0; j < 3; ++j) {
 			delta[j] = probe[j] - expected[i][j];
-			printf("   Delta: %f,%f,%f\n", delta[0], delta[1], delta[2]);
 			if (delta[j] > dmax) dmax = delta[j];
 			else if (-delta[j] > dmax) dmax = -delta[j];
 		}
+
+		printf("   Delta: %f,%f,%f\n", delta[0], delta[1], delta[2]);
 	}
 
 	printf("Max delta: %f\n", dmax);
