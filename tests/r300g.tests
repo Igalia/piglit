@@ -47,13 +47,3 @@ try:
 except KeyError:
 	pass
 
-# ====================================================================================
-Test.ignoreErrors.append(re.compile("r300:.*"))
-Test.ignoreErrors.append(re.compile("radeon:.*"))
-Test.ignoreErrors.append(re.compile("Warning:.*"))
-Test.ignoreErrors.append(re.compile("0 errors, .*"))
-Test.ignoreErrors.append(re.compile("Mesa.*"))
-Test.ignoreErrors.append(re.compile("no rrb"))
-Test.ignoreErrors.append(re.compile("; ModuleID.*"))
-Test.ignoreErrors.append(re.compile("%.*"))
-
