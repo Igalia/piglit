@@ -74,6 +74,7 @@ test()
 	for(frag_clamp = 0; frag_clamp < 3; ++frag_clamp)
 	{
 		GLboolean cpass = GL_TRUE;
+		GLboolean opass;
 		GLboolean clamped = clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 
 		printf("MRT rendering in %s mode with fragment clamp %s (expecting %sclamping)\n", mrt_mode_strings[mrt_mode], clamp_strings[frag_clamp], clamped ? "" : "no ");
@@ -110,7 +111,7 @@ test()
 			return GL_FALSE;
 		}
 
-		GLboolean opass = cpass;
+		opass = cpass;
 		if(!cpass && nvidia_driver && !fixed && clamped)
 		{
 			printf("nVidia driver ***MAJOR BUG***: they never clamp when using MRT on floating point targets!\n");

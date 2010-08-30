@@ -41,12 +41,12 @@ GLboolean test()
 	for(read_clamp = 0; read_clamp < 3; ++read_clamp)
 	{
 		unsigned clamped = clamp_enums[read_clamp] == GL_TRUE || (clamp_enums[read_clamp] == GL_FIXED_ONLY_ARB && fixed);
+		unsigned x, y;
 		printf("probe_pixel of fbo for float texture with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
 		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
 		expected = (fixed || clamped) ? clamped_pixels : pixels;
 
-		unsigned x, y;
 		for(y = 0; y < 2; ++y)
 			for(x = 0; x < 2; ++x)
 			{

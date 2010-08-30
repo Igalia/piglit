@@ -47,6 +47,7 @@ GLboolean test()
 	for(read_clamp = 0; read_clamp < 3; ++read_clamp)
 	{
 		GLboolean cpass = GL_TRUE;
+		GLboolean opass;
 		unsigned clamped = clamp_enums[read_clamp] == GL_TRUE || (clamp_enums[read_clamp] == GL_FIXED_ONLY_ARB && fixed);
 
 		printf("glReadPixels of fbo for float texture with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
@@ -58,7 +59,7 @@ GLboolean test()
 		expected = (fixed || clamped) ? clamped_pixels : pixels;
 		cpass = compare_arrays(expected, observed, 4);
 
-		GLboolean opass = cpass;
+		opass = cpass;
 		if(!cpass && nvidia_driver && clamped)
 		{
 			printf("nVidia driver known *** MAJOR BUG ***: they ignore the read clamp!\n");

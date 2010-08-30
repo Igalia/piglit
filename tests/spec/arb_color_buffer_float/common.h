@@ -56,7 +56,7 @@ GLenum clamp_enums[] = {GL_TRUE, GL_FIXED_ONLY_ARB, GL_FALSE};
 
 const char* mrt_mode_strings[] = {"single target", "homogeneous framebuffer", "dishomogeneous framebuffer"};
 
-static inline float clamp(float f)
+static float clamp(float f)
 {
 	if(f >= 0.0f && f <= 1.0f)
 		return f;

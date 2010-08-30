@@ -52,6 +52,7 @@ GLboolean test()
 		for(value = 0; value < 6; ++value)
 		{
 			GLboolean cpass = GL_TRUE;
+			GLboolean opass;
 			unsigned clamped = clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 			unsigned comps = 4;
 
@@ -104,7 +105,7 @@ GLboolean test()
 			expected = clamped ? clamped_pixels : pixels;
 			cpass = compare_arrays(expected, observed, comps) && cpass;
 
-			GLboolean opass = cpass;
+			opass = cpass;
 			if(!cpass && !clamped && ati_driver && value == 0)
 			{
 				printf("ATI driver known bug: they always clamp queries for the texture border color!\n");

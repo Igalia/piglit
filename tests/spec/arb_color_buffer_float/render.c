@@ -98,6 +98,7 @@ GLboolean test()
 		unsigned clamped = (semantic == 0 && (clamp_enums[vert_clamp] == GL_TRUE || (clamp_enums[vert_clamp] == GL_FIXED_ONLY_ARB && fixed))) || clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 		float *expected;
 		GLboolean cpass;
+		GLboolean opass;
 
 		if(!fpmode && semantic)
 			continue;
@@ -176,7 +177,7 @@ GLboolean test()
 		else
 			expected = (clamped || fixed) ? clamped_pixels : pixels;
 
-		GLboolean opass = cpass = piglit_probe_pixel_rgba(0, 0, expected);
+		opass = cpass = piglit_probe_pixel_rgba(0, 0, expected);
 
 		if(!cpass && nvidia_driver && clamped && !(semantic == 0 && clamp_enums[vert_clamp] == GL_TRUE) && clamp_enums[frag_clamp] == GL_TRUE && !fixed && fpmode && (!blend || logicop || format == GL_RGBA16F_ARB))
 		{

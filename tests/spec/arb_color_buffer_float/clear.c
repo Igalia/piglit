@@ -50,6 +50,7 @@ GLboolean test()
 		for(frag_clamp = 0; frag_clamp < 3; ++frag_clamp)
 		{
 			GLboolean cpass;
+			GLboolean opass;
 			printf("glClear of fbo for float texture with vertex clamp %s and fragment clamp %s (expecting no clamping)\n", clamp_strings[vert_clamp], clamp_strings[frag_clamp]);
 			glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
 			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
@@ -60,7 +61,7 @@ GLboolean test()
 			expected = fixed ? clamped_pixels : pixels;
 
 			cpass = piglit_probe_pixel_rgba(0, 0, expected);
-			GLboolean opass = cpass;
+			opass = cpass;
 			if(!cpass && ati_driver && format == GL_RGBA16F_ARB)
 			{
 				printf("ATI driver known *** MAJOR BUG ***: they always clamp clears for fp16 targets!\n");
