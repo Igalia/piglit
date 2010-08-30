@@ -6,30 +6,13 @@
 import os
 import re
 
-execfile(os.path.dirname(__file__) + '/all.tests')
+execfile(os.path.dirname(__file__) + '/quick.tests')
 
 from framework.core import *
 from framework.gleantest import *
-
-
-# Some window managers can be confusing for some of the tests because they
-# send resize / move events that invalidate frame buffer contents.
-# It would be nice to fix these things in a reliable way, but for now
-# this workaround of waiting between tests helps...
-Test.sleep = 0.2
-
 
 # glean/exactRGBA
 #   insane OpenGL spec requirements
 env = profile.tests['glean']['exactRGBA'].env
 env['GLEAN_EXACTRGBA_ROUNDING'] = 1
 
-# Tests specific to r300
-r300 = Group()
-# Apparently, LOD calculations are off a little for small MIP levels.
-# This test is a relaxed variant of the texturing/cubemap test.
-# Its only purpose is to catch major regressions in cubemapping as long as we
-# fail the real texturing/cubemap test.
-r300['cubemap-relax'] = PlainExecTest(['cubemap', '-auto', '-r300relax'])
-
-profile.tests['r300'] = r300
