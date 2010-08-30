@@ -32,7 +32,7 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cassert>
 #include <cstring>
 #include <math.h>
@@ -4737,7 +4737,7 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 	}
 
 	// If you just want to run a single sub-test, assign the name to singleTest.
-	const char *singleTest = getenv("GLSL_TEST");
+	const char *singleTest = getenv("PIGLIT_TEST");
 	if (singleTest) {
 		env->log << "glsl1: Running single test: " << singleTest << "\n";
 		for (int i = 0; Programs[i].name; i++) {

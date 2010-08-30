@@ -31,6 +31,7 @@
 //
 // See tfragprog.cpp for comments (this test is very similar).
 
+#include <cstdlib>
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -1106,7 +1107,7 @@ void
 VertexProgramTest::runOne(MultiTestResult &r, Window &w)
 {
 	// to test a single sub-test, set the name here:
-	const char *single = NULL;
+	const char *single = getenv("PIGLIT_TEST");
 
 	(void) w;
 	setup();

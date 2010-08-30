@@ -24,7 +24,6 @@ glean['clipFlat'] = GleanTest('clipFlat')
 glean['depthStencil'] = GleanTest('depthStencil')
 glean['fbo'] = GleanTest('fbo')
 glean['fpexceptions'] = GleanTest('fpexceptions')
-glean['fragProg1'] = GleanTest('fragProg1')
 glean['getString'] = GleanTest('getString')
 glean['logicOp'] = GleanTest('logicOp')
 glean['maskedClear'] = GleanTest('maskedClear')
@@ -59,13 +58,24 @@ glean['texture_srgb'] = GleanTest('texture_srgb')
 glean['texUnits'] = GleanTest('texUnits')
 glean['vertArrayBGRA'] = GleanTest('vertArrayBGRA')
 glean['vertattrib'] = GleanTest('vertattrib')
-glean['vertProg1'] = GleanTest('vertProg1')
 
 def add_glsl1(name):
 	testname = 'glsl1-' + name
 	glean[testname] = GleanTest('glsl1')
-	glean[testname].env['GLSL_TEST'] = name
+	glean[testname].env['PIGLIT_TEST'] = name
 execfile(os.path.dirname(__file__) + '/glean-glsl1.tests')
+
+def add_fp1(name):
+	testname = 'fp1-' + name
+	glean[testname] = GleanTest('fragProg1')
+	glean[testname].env['PIGLIT_TEST'] = name
+execfile(os.path.dirname(__file__) + '/glean-fragProg1.tests')
+
+def add_vp1(name):
+	testname = 'vp1-' + name
+	glean[testname] = GleanTest('vertProg1')
+	glean[testname].env['PIGLIT_TEST'] = name
+execfile(os.path.dirname(__file__) + '/glean-vertProg1.tests')
 
 mesa = Group()
 add_plain_test(mesa, 'crossbar')

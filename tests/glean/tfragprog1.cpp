@@ -38,7 +38,7 @@
 // But this test is good for regression testing to be sure that particular or
 // unique programs work correctly.
 
-
+#include <cstdlib>
 #include <cstring>
 #include <cassert>
 #include <cmath>
@@ -1055,7 +1055,7 @@ void
 FragmentProgramTest::runOne(MultiTestResult &r, Window &w)
 {
 	// to test a single sub-test, set the name here:
-	const char *single = NULL;
+	const char *single = getenv("PIGLIT_TEST");
 
 	(void) w;
 	setup();
