@@ -62,7 +62,7 @@ link_check_status(GLint prog)
 		info = malloc(size);
 
 		glGetProgramInfoLog(prog, size, NULL, info);
-		printf(stderr, "Failed to link: %s\n", info);
+		printf("Failed to link: %s\n", info);
 
 		free(info);
 	}
