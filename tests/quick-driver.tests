@@ -1,0 +1,24 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import re
+import subprocess
+
+from framework.core import *
+from framework.exectest import *
+from framework.gleantest import *
+
+execfile(os.path.dirname(__file__) + '/quick.tests')
+
+# These don't test the driver
+del profile.tests['glslparsertest']
+del profile.tests['asmparsertest']
+
+# These take too long
+del profile.tests['glean']['blendFunc']
+del profile.tests['glean']['depthStencil']
+del profile.tests['texturing']['streaming-texture-leak']
+
+# This test is nonsense
+del profile.tests['glean']['exactRGBA']
+
