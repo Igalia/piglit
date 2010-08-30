@@ -683,7 +683,7 @@ static const FragmentProgram Programs[] = {
 		DONT_CARE_Z
 	},
 	{
-		"Infinity / nan test",
+		"Infinity and nan test",
 		"!!ARBfp1.0\n"
 		"PARAM zero = program.local[0]; \n"
 		"PARAM infNan = program.local[9]; \n"

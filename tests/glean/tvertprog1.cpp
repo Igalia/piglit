@@ -653,7 +653,7 @@ static const VertexProgram Programs[] = {
 		FLAG_NONE
 	},
 	{
-		"XPD test 2 (same src/dst arg)",
+		"XPD test 2 (same src and dst arg)",
 		"!!ARBvp1.0\n"
 		"PARAM p1 = program.local[1]; \n"
 		"PARAM p2 = program.local[2]; \n"
@@ -767,7 +767,7 @@ static const VertexProgram Programs[] = {
 		FLAG_NONE
 	},
 	{
-		"Infinity / nan test",
+		"Infinity and nan test",
 		"!!ARBvp1.0\n"
 		"PARAM zero = program.local[0]; \n"
 		"PARAM infNan = program.local[9]; \n"
