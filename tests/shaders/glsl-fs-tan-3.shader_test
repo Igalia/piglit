@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying float y;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	y = gl_Vertex.y;
+}
+
+[fragment shader]
+varying float y;
+uniform float x;
+
+void main()
+{
+	float retVal = tan(x);
+
+	// expected result, calculated by C program
+	const float expVal = 1255.765592;
+	const float tolerance = 0.001;
+
+	// Top half of the window should be 0.5 gray, and the bottom half
+	// should be green.
+	if (y > 0.0)
+		gl_FragColor = vec4(vec3(retVal / (2.0 * expVal)), 1.0);
+	else
+		gl_FragColor = (abs(retVal - expVal) <= tolerance)
+			? vec4(0.0, 1.0, 0.0, 1.0)   // green
+			: vec4(1.0, 0.0, 0.0, 1.0);  // red
+}
+
+[test]
+uniform float x 1.57
+draw rect -1 -1 2 2
+relative probe rgb (0.1, 0.6) (0.5, 0.5, 0.5)
+relative probe rgb (0.1, 0.1) (0.0, 1.0, 0.0)
