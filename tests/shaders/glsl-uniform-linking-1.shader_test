@@ -1,0 +1,39 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+/* test for a bug in ir_to_mesa's uniform handling.  It relied on the
+ * uniform list having increasing per-shader locations as the shader
+ * program's uniform list was walked.  If multiple uniforms were used
+ * and one of them was shared between shaders, the list would be out
+ * of order.
+ */
+uniform float f1;
+uniform float f2;
+varying vec4 color;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	color = vec4(f1, f2, 0.0, 0.0);
+}
+
+[fragment shader]
+uniform float f2;
+uniform float f1;
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = (0.5 + color);
+	gl_FragColor.y -= f2;
+	gl_FragColor.x -= f1;
+}
+
+[test]
+uniform float f1 0.25
+uniform float f2 0.5
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.5 0.5 0.5
