@@ -185,6 +185,21 @@ int piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	return 0;
 }
 
+int
+piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
+{
+	int i, j;
+
+	for (i = 0; i < w; i++) {
+		for (j = 0; j < h; j++) {
+			if (!piglit_probe_pixel_rgba(i, j, expected))
+				return 1;
+		}
+	}
+
+	return 0;
+}
+
 /**
  * Read a pixel from the given location and compare its RGB value to the
  * given expected values.
@@ -214,6 +229,21 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 	printf("Probe at (%i,%i)\n", x, y);
 	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
 	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
+
+	return 0;
+}
+
+int
+piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
+{
+	int i, j;
+
+	for (i = 0; i < w; i++) {
+		for (j = 0; j < h; j++) {
+			if (!piglit_probe_pixel_rgb(i, j, expected))
+				return 1;
+		}
+	}
 
 	return 0;
 }

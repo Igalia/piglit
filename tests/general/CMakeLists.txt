@@ -78,4 +78,5 @@ add_executable (object_purgeable-api-pbo object_purgeable-api-pbo.c object_purge
 add_executable (object_purgeable-api-texture object_purgeable-api-texture.c object_purgeable.c)
 add_executable (object_purgeable-api-vbo object_purgeable-api-vbo.c object_purgeable.c)
 add_executable (occlusion_query occlusion_query.c)
+add_executable (occlusion-query-discard occlusion-query-discard.c)
 add_executable (quad-invariance quad-invariance.c)
