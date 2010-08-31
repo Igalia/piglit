@@ -630,6 +630,39 @@ piglit_draw_rect(float x, float y, float w, float h)
 }
 
 /**
+ * Convenience function to draw an axis-aligned rectangle.
+ */
+GLvoid
+piglit_draw_rect_z(float z, float x, float y, float w, float h)
+{
+	float verts[4][4];
+
+	verts[0][0] = x;
+	verts[0][1] = y;
+	verts[0][2] = z;
+	verts[0][3] = 1.0;
+	verts[1][0] = x + w;
+	verts[1][1] = y;
+	verts[1][2] = z;
+	verts[1][3] = 1.0;
+	verts[2][0] = x + w;
+	verts[2][1] = y + h;
+	verts[2][2] = z;
+	verts[2][3] = 1.0;
+	verts[3][0] = x;
+	verts[3][1] = y + h;
+	verts[3][2] = z;
+	verts[3][3] = 1.0;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+/**
  * Convenience function to draw an axis-aligned rectangle
  * with texture coordinates.
  */

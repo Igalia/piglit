@@ -100,6 +100,7 @@ GLuint piglit_compile_shader_text(GLenum target, const char *text);
 GLboolean piglit_link_check_status(GLint prog);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
+GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
 void piglit_escape_exit_key(unsigned char key, int x, int y);
