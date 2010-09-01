@@ -1,0 +1,36 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 color;
+
+void main()
+{
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+  bvec4 t1 = bvec4(true, 42.0, gl_Vertex.x > -20000.0, 111);
+
+  float r = (  float(all(bvec4(!t1.x,  t1.y,  t1.z,  t1.w)))
+	     + float(all(bvec4( t1.x, !t1.y,  t1.z,  t1.w)))
+	     + float(all(bvec4( t1.x,  t1.y, !t1.z,  t1.w)))
+	     + float(all(bvec4( t1.x,  t1.y,  t1.z, !t1.w))));
+
+  float g = float(all(t1));
+
+  color = vec4(r, g, 0.0, 1.0);
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
