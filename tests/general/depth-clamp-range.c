@@ -71,7 +71,7 @@ piglit_display(void)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	glColor4fv(white);
+	glColor3fv(white);
 
 	/* Keep in mind that the ortho projection flips near and far's signs,
 	 * so 1.0 to quad()'s z maps to glDepthRange's near, and -1.0 maps to
