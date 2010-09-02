@@ -1,11 +1,13 @@
 
 include_directories (
 	${OPENGL_INCLUDE_PATH}
+	${GLUT_INCLUDE_DIR}
 	${PNG_INCLUDE_DIR}
 )
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
+	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 	${PNG_LIBRARIES}
 )
