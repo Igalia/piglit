@@ -81,13 +81,12 @@ static void test_sanity(void)
 		glVertex2f(0, 1);
 	glEnd();
 
-	glutSwapBuffers();
-	glReadBuffer(GL_FRONT);
-
 	for(y = 0; y < 4; ++y) {
 		for(x = 0; x < 4; ++x)
 			probe_cell("test_sanity", x, y, TextureData[y][x]);
 	}
+
+	glutSwapBuffers();
 }
 
 static void do_test_texgen_eye(const char* testname)
@@ -141,13 +140,12 @@ static void do_test_texgen_eye(const char* testname)
 
 	glDisable(GL_TEXTURE_GEN_S);
 
-	glutSwapBuffers();
-	glReadBuffer(GL_FRONT);
-
 	for(y = 0; y < 2; ++y) {
 		for(x = 0; x < 2; ++x)
 			probe_cell(testname, x, y, TextureData[y+1][x+1]);
 	}
+
+	glutSwapBuffers();
 }
 
 static void test_texgen_eye(void)
