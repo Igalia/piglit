@@ -1,0 +1,45 @@
+// if you unroll all loops with a few iterations, you won't pass this
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+	gl_TexCoord[0] = gl_Position;
+}
+
+[fragment shader]
+
+void main()
+{
+	gl_FragColor = vec4(0.1, 0.2, 0.3, 0.4);
+	if(gl_TexCoord[0].x > 2.0) // this branch is never taken, but the compiler doesn't know this
+	{
+		for(int i0 = 0; i0 < 16; ++i0)
+		for(int i1 = 0; i1 < 16; ++i1)
+		for(int i2 = 0; i2 < 16; ++i2)
+		for(int i3 = 0; i3 < 16; ++i3)
+		for(int i4 = 0; i4 < 16; ++i4)
+		for(int i5 = 0; i5 < 16; ++i5)
+		for(int i6 = 0; i6 < 16; ++i6)
+		for(int i7 = 0; i7 < 16; ++i7)
+		for(int i8 = 0; i8 < 16; ++i8)
+		for(int i9 = 0; i9 < 16; ++i9)
+		for(int i10 = 0; i10 < 16; ++i10)
+		for(int i11 = 0; i11 < 16; ++i11)
+		for(int i12 = 0; i12 < 16; ++i12)
+		for(int i13 = 0; i13 < 16; ++i13)
+		for(int i14 = 0; i14 < 16; ++i14)
+		for(int i15 = 0; i15 < 16; ++i15)
+		{
+			gl_FragColor = exp(gl_FragColor);
+		}
+	}
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.1 0.2 0.3 0.4
+
