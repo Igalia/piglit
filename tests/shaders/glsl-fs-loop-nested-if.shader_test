@@ -1,0 +1,47 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 pos;
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	pos = gl_Vertex.xy;
+}
+
+[fragment shader]
+varying vec2 pos;
+void main()
+{
+	vec3 c = vec3(0.0);
+
+	/* To reproduce bugzilla #30030, the extraneous "&& (pos.x < 57.0)"
+	 * is necessary.
+	 */
+	if ((pos.y < 0.0) && (pos.x < 57.0)) {
+		if (pos.x < 0.0)
+			for (int i = 0; i < 5; i++)
+				c.r += 0.2;
+		else
+			for (int i = 0; i < 5; i++)
+				c.g += 0.2;
+	} else {
+		if (pos.x < 0.0)
+			for (int i = 0; i < 5; i++)
+				c.b += 0.2;
+		else
+			for (int i = 0; i < 5; i++)
+				c += vec3(0.2);
+
+	}
+
+	gl_FragColor = vec4(c, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgb (0.2, 0.2) (1.0, 0.0, 0.0)
+relative probe rgb (0.7, 0.2) (0.0, 1.0, 0.0)
+relative probe rgb (0.2, 0.7) (0.0, 0.0, 1.0)
+relative probe rgb (0.7, 0.7) (1.0, 1.0, 1.0)
