@@ -286,12 +286,11 @@ piglit_display()
 		  fdo_bitmap_width, fdo_bitmap_height * 3 / 4,
 		  0, 0);
 
-	glutSwapBuffers();
-	glFlush();
-
 	for (i = 0; i < probes.n_probes; i++) {
 		pass = pass && verify_bitmap_contents(&probes, i);
 	}
+
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

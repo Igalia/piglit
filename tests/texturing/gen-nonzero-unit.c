@@ -157,14 +157,13 @@ piglit_display(void)
 	fill_level(0, red);
 	display_mipmaps(0, SIZE * 2);
 
-	glDeleteTextures(3, textures);
-
-	glutSwapBuffers();
-	glFlush();
-
 	pass = pass && check_resulting_mipmaps(0, 0, red);
 	pass = pass && check_resulting_mipmaps(0, SIZE, blue);
 	pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
+
+	glutSwapBuffers();
+
+	glDeleteTextures(3, textures);
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

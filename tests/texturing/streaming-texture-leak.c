@@ -70,10 +70,10 @@ piglit_display(void)
 		glDeleteTextures(1, &texture);
 	}
 
-	glutSwapBuffers();
-
 	pass = piglit_probe_pixel_rgb(piglit_width / 2, piglit_height / 2,
 				      expected);
+
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }

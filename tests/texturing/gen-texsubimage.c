@@ -124,13 +124,12 @@ piglit_display(void)
 	/* Display the mipmaps after subimage */
 	display_mipmaps(0, 256);
 
-	glDeleteTextures(1, &texture);
-
-	glutSwapBuffers();
-	glFlush();
-
 	pass = pass && check_resulting_mipmaps(0, 0, blue);
 	pass = pass && check_resulting_mipmaps(0, 256, red);
+
+	glutSwapBuffers();
+
+	glDeleteTextures(1, &texture);
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
