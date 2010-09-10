@@ -10,7 +10,7 @@ void main()
 	ivec4 val = ivec4(0, 01, 010, 04);
 
 	gl_Position = gl_Vertex;
-	color = vec4(val) / vec4(0.0, 2.0, 16.0, 8.0);
+	color = vec4(val) / vec4(1.0, 2.0, 16.0, 8.0);
 }
 
 [fragment shader]
