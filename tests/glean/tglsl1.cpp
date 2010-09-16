@@ -143,6 +143,12 @@ static const GLfloat LightDiffuse[4] = LIGHT_DIFFUSE;
 
 static const GLfloat Uniform1[4] = UNIFORM1;
 static const GLfloat UniformArray[4] = { 0.1, 0.25, 0.5, 0.75 };
+static const GLfloat UniformArray4[4][4] = {
+   { 0.1, 0.2, 0.3, 0.4 },
+   { 0.9, 0.8, 0.7, 0.6 },
+   { 0.5, 0.6, 0.7, 0.5 },
+   { 0.3, 0.4, 0.5, 0.6 }
+};
 
 static const GLfloat PointAtten[3] = { PSIZE_ATTEN0, PSIZE_ATTEN1, PSIZE_ATTEN2 };
 static const GLfloat FogColor[4] = { FOG_R, FOG_G, FOG_B, FOG_A };
@@ -1522,6 +1528,31 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		NO_FRAGMENT_SHADER,
 		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"constant array of vec4 with variable indexing, vertex shader",
+		"uniform vec4 uniform1; \n"
+		"uniform float uniformArray[4]; \n"
+		"uniform vec4 uniformArray4[4]; \n"
+		"void main() { \n"
+		"   int i0 = int(gl_TexCoord[0].x); \n"
+		"   int i1 = int(gl_TexCoord[0].y); \n"
+		"   int i2 = int(gl_TexCoord[0].z); \n"
+		"   int i3 = int(gl_TexCoord[0].w); \n"
+
+		"   int indx0 = int(uniform1.y * 3.0);  // should be 2 \n"
+		"   int indx = int(uniform1.y * 8.0);  // should be 2 \n"
+		"   gl_FrontColor.z = uniformArray4[indx].z; \n"
+		"   gl_FrontColor.x = uniformArray4[indx].x; \n"
+		"   gl_FrontColor.w = uniformArray4[indx].w; \n"
+		"   gl_FrontColor.y = uniformArray4[indx].y; \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.5, 0.6, 0.7, 0.5 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -4510,7 +4541,7 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	};
 	const GLfloat r = 0.62; // XXX draw 16x16 pixel quad
 	GLuint fragShader = 0, vertShader = 0, program = 0;
-	GLint u1, uArray, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
+	GLint u1, uArray, uArray4, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
 	GLint umat2x4, umat2x4t, umat4x3, umat4x3t;
 	bool retVal = false;
 
@@ -4613,6 +4644,10 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	uArray = glGetUniformLocation_func(program, "uniformArray");
 	if (uArray >= 0)
 		glUniform1fv_func(uArray, 4, UniformArray);
+
+	uArray4 = glGetUniformLocation_func(program, "uniformArray4");
+	if (uArray4 >= 0)
+		glUniform4fv_func(uArray4, 4, (float *) UniformArray4);
 
 	utex1d = glGetUniformLocation_func(program, "tex1d");
 	if (utex1d >= 0)
