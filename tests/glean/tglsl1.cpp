@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// Copyright (C) 2008  VMWare, Inc.  All Rights Reserved.
+// Copyright (C) 2008  VMware, Inc.  All Rights Reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
