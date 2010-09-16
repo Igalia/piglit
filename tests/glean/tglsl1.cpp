@@ -481,6 +481,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"chained assignment",
 		NO_VERTEX_SHADER,
+                "#version 120 \n"
 		"void main() { \n"
 		"   float x, y, z; \n"
 		"   x = y = z = 0.25; \n"
@@ -504,7 +505,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 0.5, 0.25, 0.0 },
 		DONT_CARE_Z,
-		FLAG_NONE
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -526,7 +527,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   int i = 15, j = 6; \n"
 		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(k * 0.1); \n"
+		"   gl_FragColor = vec4(float(k) * 0.1); \n"
 		"} \n",
 		{ 0.2, 0.2, 0.2, 0.2 },
 		DONT_CARE_Z,
@@ -540,10 +541,10 @@ static const ShaderProgram Programs[] = {
 		"// as above, but prevent compile-time evaluation \n"
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
-		"   int i = int(15 * uniform1.x); \n"
+		"   int i = int(15.0 * uniform1.x); \n"
 		"   int j = 6; \n"
 		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(k * 0.1); \n"
+		"   gl_FragColor = vec4(float(k) * 0.1); \n"
 		"} \n",
 		{ 0.2, 0.2, 0.2, 0.2 },
 		DONT_CARE_Z,
