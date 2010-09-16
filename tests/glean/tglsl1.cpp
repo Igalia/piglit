@@ -2612,6 +2612,27 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"function prototype",
+		NO_VERTEX_SHADER,
+		"float Half(const in float x); \n"
+		"\n"
+		"void main() { \n"
+		"   float a = 0.5; \n"
+		"   float b = Half(a); \n"
+		"   gl_FragColor = vec4(b); \n"
+		"} \n"
+		"\n"
+		"float Half(const in float x) { \n"
+		"   return 0.5 * x; \n"
+		"} \n"
+		"\n",
+		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+
+	{
 		"TPPStreamCompiler::assignOperands",
 		NO_VERTEX_SHADER,
 		"struct S { \n"
