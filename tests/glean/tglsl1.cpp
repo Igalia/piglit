@@ -92,9 +92,10 @@ static PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv_func = NULL;
 #define FLAG_ILLEGAL_SHADER   0x2  // the shader test should not compile
 #define FLAG_ILLEGAL_LINK     0x4  // the shaders should not link
 #define FLAG_VERSION_1_20     0x8  // GLSL 1.20 test
-#define FLAG_WINDING_CW       0x10  // clockwise-winding polygon
-#define FLAG_VERTEX_TEXTURE   0x20
-#define FLAG_ARB_DRAW_BUFFERS 0x40
+#define FLAG_VERSION_1_30     0x10  // GLSL 1.30 test
+#define FLAG_WINDING_CW       0x20  // clockwise-winding polygon
+#define FLAG_VERTEX_TEXTURE   0x40
+#define FLAG_ARB_DRAW_BUFFERS 0x80
 
 #define DONT_CARE_Z -1.0
 
@@ -3924,11 +3925,11 @@ static const ShaderProgram Programs[] = {
 		FLAG_VERSION_1_20 | FLAG_ILLEGAL_SHADER
 	},
 
-	// Other new GLSL 1.20 features (just parse/compile tests)
+	// Other new GLSL 1.20, 1.30 features (just parse/compile tests)
 	{
-		"GLSL 1.20 precision qualifiers",
+		"GLSL 1.30 precision qualifiers",
 		NO_VERTEX_SHADER,
-		"#version 120 \n"
+		"#version 130 \n"
 		"highp float f1; \n"
 		"mediump float f2; \n"
 		"lowp float f3; \n"
@@ -3956,7 +3957,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_1_20
+		FLAG_VERSION_1_30
 	},
 
 #if 0
@@ -4375,6 +4376,7 @@ GLSLTest::setup(void)
 		return false;
 	}
 	glsl_120 = (glslVersion[2] >= '2');
+	glsl_130 = (glslVersion[2] >= '3');
 
 	if (!getFunctions()) {
 		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
@@ -4818,6 +4820,8 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 		// loop over all tests
 		for (int i = 0; Programs[i].name; i++) {
 			if ((Programs[i].flags & FLAG_VERSION_1_20) && !glsl_120)
+				continue; // skip non-applicable tests
+			if ((Programs[i].flags & FLAG_VERSION_1_30) && !glsl_130)
 				continue; // skip non-applicable tests
 			if (testProgram(Programs[i])) {
 				r.numPassed++;
