@@ -479,6 +479,36 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"Negation",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 a = vec4(0.5,  0.25, 0.0, 0.0); \n"
+		"   vec4 b = uniform1; \n"
+                "   vec4 na = -a; \n"
+                "   vec4 nb = -b; \n"
+                "   vec4 x = na + nb; \n"
+		"   gl_FragColor = -x; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.75, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"Negation2",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 a = -uniform1; \n"
+		"   gl_FragColor = -a; \n"
+		"} \n",
+		UNIFORM1,
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
 		"chained assignment",
 		NO_VERTEX_SHADER,
                 "#version 120 \n"
