@@ -1,0 +1,24 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 var;
+void main()
+{
+	gl_Position = gl_Vertex;
+	var = gl_Vertex.x * vec4(2, 4, 3, 1) * 20.0;
+}
+
+[fragment shader]
+uniform vec4 arg0;
+varying vec4 var;
+void main()
+{
+	gl_FragColor = dFdx(var.ywxz);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe rgba 1 1 0.64 0.16 0.32 0.48
+
