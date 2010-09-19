@@ -790,12 +790,13 @@ GLboolean is_format_supported(struct format *f)
 
 void piglit_init(int argc, char **argv)
 {
+    unsigned i;
+
     texture_target = GL_TEXTURE_2D;
     texture_id = NO_BORDER_TEXTURE;
     texture_npot = 0;
     texture_proj = 0;
     texture_format = &formats[0];
-    unsigned i;
 
     if (argc == 2) {
         printf("Parameter: %s\n", argv[1]);
