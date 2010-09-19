@@ -72,6 +72,13 @@
 
 #include "piglit-util.h"
 
+#ifndef GL_RGBA16F
+#define GL_RGBA16F 0x881A
+#endif
+#ifndef GL_RGBA32F
+#define GL_RGBA32F 0x8814
+#endif
+
 /* Formats. */
 
 struct format {
