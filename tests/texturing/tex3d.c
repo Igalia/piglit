@@ -109,7 +109,6 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 			x = 0;
 		}
 	}
-	glutSwapBuffers();
 
 	readback = (unsigned char*)malloc(w*h*d*4);
 	x = y = 0;
@@ -146,6 +145,8 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 		}
 	}
 	free(readback);
+
+	glutSwapBuffers();
 
 	return 1;
 }
