@@ -40,12 +40,14 @@
  * Check clamping behaviour.
  */
 
+#include "piglit-framework.h"
 #include "piglit-util.h"
 
 #define SquareSize 32
 
-static int Width = 3*SquareSize, Height = 3*SquareSize;
-static int Automatic = 0;
+int piglit_width = 3*SquareSize;
+int piglit_height = 3*SquareSize;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static int CurrentTest = 0;
 static int CurrentBias = 0;
 static int CurrentBias2 = 0;
@@ -65,7 +67,8 @@ static GLfloat TextureData[2][3][3] = {
 	{ { 0.0, 0.0, 0.5 }, { 0.5, 0.5, 0.0 }, { 0.0, 0.5, 0.5 } }
 };
 
-static void probe_cell(const char* testname, int cellx, int celly, const float* expected)
+static GLboolean
+probe_cell(const char* testname, int cellx, int celly, const float* expected)
 {
 	int x, y;
 
@@ -75,11 +78,12 @@ static void probe_cell(const char* testname, int cellx, int celly, const float* 
 			int pixy = (5*celly+y+1)*SquareSize/5;
 			if (!piglit_probe_pixel_rgb(pixx, pixy, expected)) {
 				fprintf(stderr, "%s: %i,%i failed\n", testname, cellx, celly);
-				if (Automatic)
-					piglit_report_result(PIGLIT_FAILURE);
+				return GL_FALSE;
 			}
 		}
 	}
+
+	return GL_TRUE;
 }
 
 static float scale_for_miplevel(int bias, int level)
@@ -91,8 +95,10 @@ static float scale_for_miplevel(int bias, int level)
 		return base*(float)(1<<(-bias));
 }
 
-static void test_simple_texture(int tex, int bias)
+static GLboolean
+test_simple_texture(int tex, int bias)
 {
+	GLboolean pass = GL_TRUE;
 	int level;
 
 	glBindTexture(GL_TEXTURE_2D, Textures[tex]);
@@ -113,29 +119,38 @@ static void test_simple_texture(int tex, int bias)
 		glEnd();
 		glPopMatrix();
 
-		probe_cell("test_simple", level, tex, TextureData[tex][level]);
+		pass = probe_cell("test_simple", level, tex,
+				  TextureData[tex][level]) && pass;
 	}
+
+	return pass;
 }
 
 /**
  * Simple test: Attempt to draw all LOD levels of both textures
  * at the given LOD bias.
  */
-static void test_simple(int bias1, int bias2)
+static GLboolean
+test_simple(int bias1, int bias2)
 {
+	GLboolean pass = GL_TRUE;
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_TEXTURE_2D);
-	test_simple_texture(0, bias1);
-	test_simple_texture(1, bias2);
+	pass = test_simple_texture(0, bias1) && pass;
+	pass = test_simple_texture(1, bias2) && pass;
 	glDisable(GL_TEXTURE_2D);
 
 	glutSwapBuffers();
+
+	return pass;
 }
 
 
-static void test_multitex_combo(int bias1, int level1, int bias2, int level2)
+static GLboolean
+test_multitex_combo(int bias1, int level1, int bias2, int level2)
 {
 	float scale1 = scale_for_miplevel(bias1, level1);
 	float scale2 = scale_for_miplevel(bias2, level2);
@@ -167,15 +182,17 @@ static void test_multitex_combo(int bias1, int level1, int bias2, int level2)
 	glEnd();
 	glPopMatrix();
 
-	probe_cell("multitex", level1, level2, expected);
+	return probe_cell("multitex", level1, level2, expected);
 }
 
 
 /**
  * Test combinations of LOD bias when multitexturing.
  */
-static void test_multitex(int bias1, int bias2)
+static GLboolean
+test_multitex(int bias1, int bias2)
 {
+	GLboolean pass = GL_TRUE;
 	int x, y;
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -194,7 +211,7 @@ static void test_multitex(int bias1, int bias2)
 
 	for(y = 0; y < 3; ++y) {
 		for(x = 0; x < 3; ++x)
-			test_multitex_combo(bias1, x, bias2, y);
+			pass = test_multitex_combo(bias1, x, bias2, y) && pass;
 	}
 
 	glDisable(GL_TEXTURE_2D);
@@ -202,80 +219,36 @@ static void test_multitex(int bias1, int bias2)
 	glDisable(GL_TEXTURE_2D);
 
 	glutSwapBuffers();
+
+	return pass;
 }
 
-
-
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-	if (Automatic) {
+	GLboolean pass = GL_TRUE;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	if (piglit_automatic) {
 		int bias1, bias2;
 		for(bias1 = -MaxTextureLodBias; bias1 <= MaxTextureLodBias; bias1++) {
 			for(bias2 = -MaxTextureLodBias; bias2 <= MaxTextureLodBias; bias2++) {
-				test_simple(bias1, bias2);
-				test_multitex(bias1, bias2);
+				pass = pass && test_simple(bias1, bias2);
+				pass = pass && test_multitex(bias1, bias2);
 			}
 		}
 
 		piglit_report_result(PIGLIT_SUCCESS);
 	} else {
 		if (CurrentTest == 0) {
-			test_simple(CurrentBias, CurrentBias2);
+			pass = test_simple(CurrentBias, CurrentBias2);
 		} else {
-			test_multitex(CurrentBias, CurrentBias2);
-		}
-	}
-}
-
-
-static void Reshape(int width, int height)
-{
-	glViewport(0, 0, Width, Height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, Width, 0.0, Height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
-static void Init(void)
-{
-	int i;
-
-	piglit_require_extension("GL_EXT_texture_lod_bias");
-
-	glGetIntegerv(GL_MAX_TEXTURE_LOD_BIAS_EXT, &MaxTextureLodBias);
-	if (!Automatic)
-		printf("MAX_TEXTURE_LOD_BIAS_EXT = %i\n", MaxTextureLodBias);
-
-	glGenTextures(2, Textures);
-
-	for(i = 0; i < 2; ++i) {
-		int level;
-
-		glBindTexture(GL_TEXTURE_2D, Textures[i]);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		for(level = 0; level < 3; ++level) {
-			GLfloat texdata[16][3];
-			int dim = 4 >> level;
-			int j;
-
-			for(j = 0; j < dim*dim; ++j) {
-				texdata[j][0] = TextureData[i][level][0];
-				texdata[j][1] = TextureData[i][level][1];
-				texdata[j][2] = TextureData[i][level][2];
-			}
-
-			glTexImage2D(GL_TEXTURE_2D, level, GL_RGB, dim, dim, 0, GL_RGB, GL_FLOAT, texdata);
+			pass = test_multitex(CurrentBias, CurrentBias2);
 		}
 	}
 
-	glReadBuffer(GL_BACK);
-	Reshape(Width,Height);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 static void Key(unsigned char key, int x, int y)
@@ -317,18 +290,23 @@ static void Key(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-int main(int argc, char *argv[])
+void
+piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	if (!Automatic) {
+	int i;
+
+	if (!GLEW_VERSION_1_3) {
+		printf("Requires OpenGL 1.3\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_require_extension("GL_EXT_texture_lod_bias");
+
+	glGetIntegerv(GL_MAX_TEXTURE_LOD_BIAS_EXT, &MaxTextureLodBias);
+	if (!piglit_automatic)
+		printf("MAX_TEXTURE_LOD_BIAS_EXT = %i\n", MaxTextureLodBias);
+
+	if (!piglit_automatic) {
 		printf(
 			"Press 't' to switch tests\n"
 			"Press 'b'/'B' to change primary LOD bias\n"
@@ -336,16 +314,31 @@ int main(int argc, char *argv[])
 			"Press 'Escape' to quit\n");
 		glutKeyboardFunc(Key);
 	}
-	glewInit();
 
-	if (!GLEW_VERSION_1_3) {
-		printf("Requires OpenGL 1.3\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
+	glGenTextures(2, Textures);
+
+	for(i = 0; i < 2; ++i) {
+		int level;
+
+		glBindTexture(GL_TEXTURE_2D, Textures[i]);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		for(level = 0; level < 3; ++level) {
+			GLfloat texdata[16][3];
+			int dim = 4 >> level;
+			int j;
+
+			for(j = 0; j < dim*dim; ++j) {
+				texdata[j][0] = TextureData[i][level][0];
+				texdata[j][1] = TextureData[i][level][1];
+				texdata[j][2] = TextureData[i][level][2];
+			}
+
+			glTexImage2D(GL_TEXTURE_2D, level, GL_RGB, dim, dim, 0, GL_RGB, GL_FLOAT, texdata);
+		}
 	}
 
-	Init();
-	glutMainLoop();
-	return 0;
+	glReadBuffer(GL_BACK);
 }
-
