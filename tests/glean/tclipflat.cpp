@@ -293,7 +293,8 @@ ClipFlatTest::checkResult(Window &w, GLfloat badColor[3])
    glReadPixels(0, 0, windowSize, windowSize,
                 GL_RGB, GL_UNSIGNED_BYTE, image);
 
-   w.swap();
+   if (!env->options.quick)
+	   w.swap();
 
    for (i = 0; i < windowSize; i++) {
       for (j = 0; j < windowSize; j++) {
