@@ -1131,7 +1131,8 @@ TexCombineTest::RunSingleTextureTest(glmachine &machine,
 		glVertex2f(-1.0,  1.0);
 		glEnd();
 		glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, renderedResult);
-		w.swap();
+		if (!env->options.quick)
+			w.swap();
 
 		// 2. Compute expected result
 		GLfloat expected[4];
@@ -1270,7 +1271,8 @@ TexCombineTest::RunMultiTextureTest(glmachine &machine, BasicResult &r,
 		glVertex2f(-1.0,  1.0);
 		glEnd();
 		glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, renderedResult);
-		w.swap();
+		if (!env->options.quick)
+			w.swap();
 
 		// 2. Compute expected result
 		GLfloat prevColor[4];
@@ -1390,7 +1392,8 @@ TexCombineTest::RunCrossbarTest(glmachine &machine, BasicResult &r, Window& w) {
 		glVertex2f(-1.0,  1.0);
 		glEnd();
 		glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, renderedResult);
-		w.swap();
+		if (!env->options.quick)
+			w.swap();
 	
 		// 3. Compute expected result
 		GLfloat prevColor[4];
