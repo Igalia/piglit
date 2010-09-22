@@ -193,11 +193,11 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 	for (i = 0; i < w; i++) {
 		for (j = 0; j < h; j++) {
 			if (!piglit_probe_pixel_rgba(i, j, expected))
-				return 1;
+				return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 /**
@@ -241,11 +241,11 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	for (i = 0; i < w; i++) {
 		for (j = 0; j < h; j++) {
 			if (!piglit_probe_pixel_rgb(i, j, expected))
-				return 1;
+				return 0;
 		}
 	}
 
-	return 0;
+	return 1;
 }
 
 /**
