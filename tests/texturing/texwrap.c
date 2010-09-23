@@ -162,7 +162,7 @@ static int texture_size;
 static struct format *texture_format;
 
 /* Image data. */
-static const float borderf[4] = { 0.0, 1.0, 0.0, 1.0 };
+static const float borderf[4] = { 0.0, 1.0, 0.5, 1.0 };
 static float border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
 static float no_border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
 
