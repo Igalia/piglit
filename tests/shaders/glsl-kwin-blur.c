@@ -26,7 +26,8 @@
 
 /** @file glsl-kwin-blur.c
  *
- * Tests the blur effect used by the KWin window manager
+ * Tests the blur effect used by the KWin window manager,
+ * with a 12 pixel blur radius (uses 13 varyings).
  */
 
 #include "piglit-util.h"
@@ -257,6 +258,13 @@ void piglit_init(int argc, char **argv)
 {
     if (!GLEW_VERSION_2_0) {
         printf("Requires OpenGL 2.0\n");
+        piglit_report_result(PIGLIT_SKIP);
+    }
+
+    int value;
+    glGetIntegerv(GL_MAX_VARYING_FLOATS, &value);
+    if (value < (13 * 4)) {
+        printf("Requires at least 13 varyings\n");
         piglit_report_result(PIGLIT_SKIP);
     }
 }
