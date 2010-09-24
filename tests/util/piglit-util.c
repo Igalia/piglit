@@ -903,6 +903,69 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip)
 	return tex;
 }
 
+GLuint
+piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
+{
+	void *data;
+	float *f = NULL;
+	unsigned int  *i = NULL;
+	int size, x, y, level;
+	GLuint tex;
+	GLenum type, format;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (mip) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_NEAREST);
+	} else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST);
+	}
+	data = malloc(w * h * 4 * sizeof(GLfloat));
+
+	/* XXX: Do we want non-square textures?  Surely some day. */
+	assert(w == h);
+
+	if (internalformat == GL_DEPTH_STENCIL_EXT ||
+	    internalformat == GL_DEPTH24_STENCIL8_EXT) {
+		format = GL_DEPTH_STENCIL_EXT;
+		type = GL_UNSIGNED_INT_24_8_EXT;
+		i = data;
+	} else {
+		format = GL_DEPTH_COMPONENT;
+		type = GL_FLOAT;
+		f = data;
+	}
+
+	for (level = 0, size = w; size > 0; level++, size >>= 1) {
+		for (y = 0; y < size; y++) {
+			for (x = 0; x < size; x++) {
+				float val = (float)(x) / (w - 1);
+				if (f)
+					f[y * size + x] = val;
+				else
+					i[y * size + x] = 0xffffff00 * val;
+			}
+		}
+		glTexImage2D(GL_TEXTURE_2D, level,
+			     internalformat,
+			     size, size, 0,
+			     format, type, data);
+
+		if (!mip)
+			break;
+	}
+	free(data);
+	return tex;
+}
+
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c)
 {

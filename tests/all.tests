@@ -77,6 +77,11 @@ def add_vp1(name):
 	glean[testname].env['PIGLIT_TEST'] = name
 execfile(os.path.dirname(__file__) + '/glean-vertProg1.tests')
 
+def add_fbo_generatemipmap_extension(group, extension, name):
+	path = testBinDir + '../tests/shaders/'
+	group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
+				     extension])
+
 mesa = Group()
 add_plain_test(mesa, 'crossbar')
 
@@ -99,6 +104,7 @@ add_plain_test(fbo, 'fbo-drawbuffers2-colormask')
 add_plain_test(fbo, 'fbo-d24s8')
 add_plain_test(fbo, 'fbo-flushing')
 add_plain_test(fbo, 'fbo-generatemipmap')
+add_plain_test(fbo, 'fbo-generatemipmap-formats')
 add_plain_test(fbo, 'fbo-generatemipmap-scissor')
 add_plain_test(fbo, 'fbo-generatemipmap-nonsquare')
 add_plain_test(fbo, 'fbo-generatemipmap-npot')
@@ -732,7 +738,13 @@ add_texwrap_test('border-npot-2d-rgba8')
 add_texwrap_test('border-npot-3d-rgba8')
 
 spec = Group();
+
+tdfx_texture_compression_fxt1 = Group()
+spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
+add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
+
 arb_color_buffer_float = Group()
+spec['ARB_color_buffer_float'] = arb_color_buffer_float
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-getteximage')
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-queries')
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-readpixels')
@@ -741,8 +753,49 @@ add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-drawpixels')
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-clear')
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-render')
 add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-mrt')
-spec['ARB_color_buffer_float'] = arb_color_buffer_float
 
+arb_depth_texture = Group()
+spec['ARB_depth_texture'] = arb_depth_texture
+add_fbo_generatemipmap_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-generatemipmap-formats')
+
+arb_depth_buffer_float = Group()
+spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
+add_fbo_generatemipmap_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-generatemipmap-formats')
+
+arb_texture_compression = Group()
+spec['ARB_texture_compression'] = arb_texture_compression
+add_fbo_generatemipmap_extension(arb_texture_compression, 'GL_ARB_texture_compression', 'fbo-generatemipmap-formats')
+
+ext_packed_depth_stencil = Group()
+spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
+add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
+
+ext_texture_compression_rgtc = Group()
+spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
+add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc', 'fbo-generatemipmap-formats')
+
+ext_texture_compression_s3tc = Group()
+spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
+add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc', 'fbo-generatemipmap-formats')
+
+ext_texture_integer = Group()
+spec['EXT_texture_integer'] = ext_texture_integer
+add_fbo_generatemipmap_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-generatemipmap-formats')
+
+ext_texture_rg = Group()
+spec['EXT_texture_rg'] = ext_texture_rg
+add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg-int', 'fbo-generatemipmap-formats-int')
+add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg-float', 'fbo-generatemipmap-formats-float')
+
+ext_texture_shared_exponent = Group()
+spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
+add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
+
+ext_texture_srgb = Group()
+spec['EXT_texture_sRGB'] = ext_texture_srgb
+add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
 
 # Include the glsl parser tests from glslparser.tests.
 def add_glslparsertest(shader, result):
