@@ -487,7 +487,7 @@ void test_function(const in int in_int, inout int out_int)
     return ;
 }
 
-int test_function1(in int in_int1, inout int , out int)
+int test_function1(in int in_int1, inout int unused1, out int unused2)
 {
    float ff;
    in_int1 = 5;  
