@@ -652,9 +652,16 @@ FBOTest::testRender2SingleTexture(void)
 				}
 
 
-				if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+				if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+					glDeleteTextures(1, textures);
+					if (useFramebuffer)
+						glDeleteFramebuffersEXT_func(1, fbs);
+					if (depthBuffer)
+						glDeleteRenderbuffersEXT_func(1, depth_rb);
+					if (stencilBuffer)
+						glDeleteRenderbuffersEXT_func(1, stencil_rb);
 					continue;
-
+				}
 
 				//
 				// Render, test the results
