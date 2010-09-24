@@ -197,6 +197,10 @@ void piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	vs_text = piglit_load_text_file("glsl-mat-attribute.vert", NULL);
+	if (vs_text == NULL) {
+		printf("Cannot load glsl-mat-attribute.vert.\n");
+		piglit_report_result(PIGLIT_FAILURE);
+	}
 
 	for (i = 0; i < 4; i++) {
 		char buf[64];
