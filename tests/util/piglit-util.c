@@ -139,6 +139,7 @@ piglit_report_result(enum piglit_result result)
 void piglit_require_extension(const char *name)
 {
 	if (!glutExtensionSupported(name)) {
+		printf("Test requires %s\n", name);
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}
