@@ -158,10 +158,13 @@ static GLuint texture_id;
 static GLenum texture_target;
 static GLboolean texture_npot;
 static GLboolean texture_proj;
+static GLboolean texture_swizzle;
 static int texture_size;
 static struct format *texture_format;
+static GLboolean has_texture_swizzle;
 
 /* Image data. */
+static const int swizzle[4] = {2, 0, 1, 3};
 static const float borderf[4] = { 0.0, 1.0, 0.5, 1.0 };
 static float border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
 static float no_border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
@@ -314,8 +317,14 @@ static void sample_nearest(int x, int y, int z,
                         result[i] * (1 - border_factor);
     }
 
-    for (i = 0; i < 4; i++) {
-        pixel[i] = result[i] * 255.1;
+    if (texture_swizzle) {
+        for (i = 0; i < 4; i++) {
+            pixel[i] = result[swizzle[i]] * 255.1;
+        }
+    } else {
+        for (i = 0; i < 4; i++) {
+            pixel[i] = result[i] * 255.1;
+        }
     }
 }
 
@@ -341,6 +350,19 @@ GLboolean probe_pixel_rgba(unsigned char *pixels, unsigned stride,
     printf("  Expected: %i %i %i\n", expected[0], expected[1], expected[2]);
     printf("  Observed: %i %i %i\n", probe[0], probe[1], probe[2]);
     return GL_FALSE;
+}
+
+static void update_swizzle()
+{
+    GLint iden[4] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+    GLint swiz[4] = {iden[swizzle[0]], iden[swizzle[1]], iden[swizzle[2]],
+                     iden[swizzle[3]]};
+    glBindTexture(texture_target, texture_id);
+    if (texture_swizzle) {
+        glTexParameteriv(texture_target, GL_TEXTURE_SWIZZLE_RGBA_EXT, swiz);
+    } else {
+        glTexParameteriv(texture_target, GL_TEXTURE_SWIZZLE_RGBA_EXT, iden);
+    }
 }
 
 static void draw()
@@ -486,9 +508,11 @@ static GLboolean probe_pixels()
             if (!wrap_modes[j].supported)
                 continue;
 
-            printf("Testing %s%s: %s\n",
+            printf("Testing %s%s%s%s: %s\n",
                    sfilter,
                    texture_proj ? " with projective mapping" : "",
+                   texture_swizzle ? (texture_proj ? " and" : " with") : "",
+                   texture_swizzle ? " swizzling" : "",
                    wrap_modes[j].name);
 
             for (b = 0; b < (texture_size + BIAS_INT*2); b++) {
@@ -517,26 +541,50 @@ static GLboolean probe_pixels()
     return pass;
 }
 
-enum piglit_result piglit_display()
+static GLboolean test_simple()
 {
     GLboolean pass;
+    draw();
+    pass = probe_pixels();
+    glutSwapBuffers();
+    return pass;
+}
+
+static GLboolean test_proj()
+{
+    GLboolean pass = GL_TRUE;
+    pass = test_simple() && pass;
+    texture_proj = 1;
+    pass = test_simple() && pass;
+    texture_proj = 0;
+    return pass;
+}
+
+static GLboolean test_swizzle()
+{
+    GLboolean pass = GL_TRUE;
+    pass = test_proj() && pass;
+    if (has_texture_swizzle) {
+        texture_swizzle = 1;
+        update_swizzle();
+        pass = test_proj() && pass;
+        texture_swizzle = 0;
+        update_swizzle();
+    }
+    return pass;
+}
+
+enum piglit_result piglit_display()
+{
+    GLboolean pass = GL_TRUE;
 
     if (piglit_automatic) {
-        texture_proj = 0;
-        draw();
-        pass = probe_pixels();
-        glutSwapBuffers();
-
-        texture_proj = 1;
-        draw();
-        pass = probe_pixels() && pass;
-        glutSwapBuffers();
-
-        texture_proj = 0;
+        pass = test_swizzle();
     } else {
-        draw();
-        pass = probe_pixels();
-        glutSwapBuffers();
+        if (has_texture_swizzle) {
+            update_swizzle();
+        }
+        pass = test_simple();
     }
 
     return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
@@ -561,6 +609,12 @@ static void key_func(unsigned char key, int x, int y)
 
     case 'p':
         texture_proj = !texture_proj;
+        break;
+
+    case 's':
+        texture_swizzle = !texture_swizzle;
+        printf(texture_swizzle ?
+               "Texture swizzle enabled.\n" : "Texture swizzle disabled.\n");
         break;
     }
 
@@ -798,12 +852,18 @@ GLboolean is_format_supported(struct format *f)
 void piglit_init(int argc, char **argv)
 {
     unsigned i;
+    const char *ext_swizzle[] = {
+        "GL_ARB_texture_swizzle",
+        "GL_EXT_texture_swizzle"
+    };
 
     texture_target = GL_TEXTURE_2D;
     texture_id = NO_BORDER_TEXTURE;
     texture_npot = 0;
     texture_proj = 0;
+    texture_swizzle = 0;
     texture_format = &formats[0];
+    has_texture_swizzle = check_support(3.3, ext_swizzle);
 
     if (argc == 2) {
         printf("Parameter: %s\n", argv[1]);
