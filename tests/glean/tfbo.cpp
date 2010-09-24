@@ -675,8 +675,8 @@ FBOTest::testRender2SingleTexture(void)
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
                                                 glBegin(GL_LINES);
-                                                glVertex3f(TEXSIZE / 4, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 5 / 8, 0, 0.3);
+                                                glVertex3f(TEXSIZE / 4, 0.5, 0.3);
+                                                glVertex3f(TEXSIZE * 5 / 8, 0.5, 0.3);
                                                 glEnd();
                                                 break;
                                         case GL_TEXTURE_2D:
@@ -705,8 +705,8 @@ FBOTest::testRender2SingleTexture(void)
                                         switch (textureModes[mode]) {
                                         case GL_TEXTURE_1D:
                                                 glBegin(GL_LINES);
-                                                glVertex3f(TEXSIZE / 2, 0, 0.3);
-                                                glVertex3f(TEXSIZE * 7 / 8, 0, 0.3);
+                                                glVertex3f(TEXSIZE / 2, 0.5, 0.3);
+                                                glVertex3f(TEXSIZE * 7 / 8, 0.5, 0.3);
                                                 glEnd();
                                                 break;
                                         case GL_TEXTURE_2D:
@@ -736,8 +736,8 @@ FBOTest::testRender2SingleTexture(void)
                                 switch (textureModes[mode]) {
                                 case GL_TEXTURE_1D:
                                         glBegin(GL_LINES);
-                                        glVertex3f(0, 0, 0.2);
-                                        glVertex3f(TEXSIZE, 0, 0.2);
+                                        glVertex3f(0, 0.5, 0.2);
+                                        glVertex3f(TEXSIZE, 0.5, 0.2);
                                         glEnd();
                                         break;
                                 case GL_TEXTURE_2D:
