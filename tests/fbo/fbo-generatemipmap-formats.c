@@ -349,7 +349,7 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 
 	if (d_size) {
 		for (x1 = x; x1 < x + dim; x1++) {
-			float val = (float)(x1 - x) / (dim - 1);
+			float val = (x1 - x + 0.5) / (dim);
 			float color[3] = {val, val, val};
 			pass = pass && piglit_probe_rect_rgb(x1, y, 1, dim,
 							     color);
