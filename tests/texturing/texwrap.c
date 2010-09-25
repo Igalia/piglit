@@ -78,6 +78,9 @@
 #ifndef GL_RGBA32F
 #define GL_RGBA32F 0x8814
 #endif
+#ifndef GL_TEXTURE_SWIZZLE_RGBA_EXT
+#define GL_TEXTURE_SWIZZLE_RGBA_EXT 0x8E46
+#endif
 
 /* Formats. */
 
