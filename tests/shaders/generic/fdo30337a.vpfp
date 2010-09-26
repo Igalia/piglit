@@ -1,0 +1,17 @@
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+END
+
+!!ARBfp1.0
+#This tests instructions like: ADD Temp[0], Temp[0], Temp[1] where one of
+#the source registers is the same as the destination register.  These
+#should not be replaced with presubtract operations.
+TEMP color;
+MOV color, {0.1, 0.4, 0.8, 1.0};
+ADD color.x, color.x, color.x;
+ADD color.y, color.x, color.y;
+MOV result.color, color;
+END
+
+!!test
+expected          0.2     0.6      0.8      1.0

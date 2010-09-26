@@ -575,6 +575,8 @@ def add_vpfpgeneric(name):
 add_vpfpgeneric('arl')
 add_vpfpgeneric('big-param')
 add_vpfpgeneric('dataflow-bug')
+add_vpfpgeneric('fdo30337a')
+add_vpfpgeneric('fdo30337b')
 add_vpfpgeneric('fogcoord-dp3')
 add_vpfpgeneric('fogcoord-dph')
 add_vpfpgeneric('fogcoord-dp4')

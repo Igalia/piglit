@@ -1,0 +1,25 @@
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+END
+
+!!ARBfp1.0
+#This test is for instructions that read from more components than the
+#presubtract operation writes.  For example:
+#ADD Temp[0].x Temp[1].x, Temp[2].x
+#MUL Temp[4]x. Temp[0].x, Temp[5].x
+#DP3 Temp[6].x Temp[0].xyz, Temp[0].xyz
+#The ADD instruction can be converted to a presubtract operation and be
+#used by the MUL instruction, but it cannot be used by the DP3 instruction
+#since that instruction reads from more than just the x component of Temp[0].
+#Therefore the ADD instruction should not be removed.
+TEMP color;
+MOV color, {0.1, 0.4, 0.8, 1.0};
+SUB color.x, color.x, color.x;
+ADD color.y, color.x, color.y;
+SUB color.z, color.x, color.x;
+DP3 color.w, color, color;
+MOV result.color, color;
+END
+
+!!test
+expected          0.0     0.4      0.0      0.16
