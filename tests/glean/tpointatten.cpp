@@ -134,16 +134,30 @@ PointAttenuationTest::measureSize(GLfloat yPos) const
 	int x = 0;
 	int y = (int) (yNdc * windowHeight);
 	int w = windowWidth;
-	int h = 1;
-	GLfloat image[windowWidth * 3];
-	// Read row of pixels and add up colors, which should be white
-	// or shades of gray if smoothing is enabled.
-	glReadPixels(x, y, w, h, GL_RGB, GL_FLOAT, image);
-	float sum = 0.0;
-	for (int i = 0; i < w; i++) {
-		sum += (image[i*3+0] + image[i*3+1] + image[i*3+2]) / 3.0;
+	int h = 3;
+	GLfloat image[3 * windowWidth * 3]; // three rows of RGB values
+
+	// Read three row of pixels and add up colors in each row.
+	// Use the row with the greatest sum.  This helps gives us a bit
+	// of leeway in vertical point positioning.
+	// Colors should be white or shades of gray if smoothing is enabled.
+	glReadPixels(x, y - 1, w, h, GL_RGB, GL_FLOAT, image);
+
+	float sum[3] = { 0.0, 0.0, 0.0 };
+	for (int j = 0; j < 3; j++) {
+		for (int i = 0; i < w; i++) {
+			int k = j * 3 * w + i * 3;
+			sum[j] += (image[k+0] + image[k+1] + image[k+2]) / 3.0;
+		}
 	}
-	return sum;
+
+	// find max of the row sums
+	if (sum[0] >= sum[1] && sum[0] >= sum[2])
+		return sum[0];
+	else if (sum[1] >= sum[0] && sum[1] >= sum[2])
+		return sum[1];
+	else
+		return sum[2];
 }
 
 
@@ -152,13 +166,13 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 {
 	// epsilon is the allowed size difference in pixels between the
 	// expected and actual rendering.
-	const GLfloat epsilon = smooth ? 1.5 : 1.0;
+	const GLfloat epsilon = (smooth ? 1.5 : 1.0) + 0.0;
 	GLfloat atten[3];
 	int count = 0;
 
 	// Enable front buffer if you want to see the rendering
-	//glDrawBuffer(GL_FRONT);
-	//glReadBuffer(GL_FRONT);
+	glDrawBuffer(GL_FRONT);
+	glReadBuffer(GL_FRONT);
 
 	if (smooth) {
 		glEnable(GL_POINT_SMOOTH);
@@ -192,6 +206,8 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 							}
 							glEnd();
 
+									glFinish();
+
 							// test the column of points
 							for (float z = -6.0; z <= 6.0; z += 1.0) {
 								count++;
@@ -204,6 +220,10 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 												  z, smooth,
 												  expected, actual);
 									return false;
+								}
+								else if(0){
+									printf("pass z=%f exp=%f act=%f\n",
+										   z, expected, actual);
 								}
 							}
 						}
