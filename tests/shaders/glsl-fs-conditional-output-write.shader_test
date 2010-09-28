@@ -1,0 +1,34 @@
+# Bug #30415
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 coord;
+
+void main()
+{
+    gl_Position = gl_Vertex;
+    gl_TexCoord[0] = coord;
+}
+
+[fragment shader]
+uniform vec4 vecX, vecY;
+uniform int iter;
+
+void main() {
+    gl_FragColor.yw = vec2(0);
+    bool b = (dot(gl_TexCoord[0], gl_TexCoord[0]) < 4.0);
+    gl_FragColor.z = iter == 0 ? vecX.z - vecY.z : 15.0;
+    if(b)
+        gl_FragColor.x = 1.0;
+}
+
+[test]
+uniform vec4 coord 1.0 1.0 1.0 0.0
+uniform vec4 vecX 1.0 1.0 1.0 1.0
+uniform vec4 vecY 0.5 0.5 0.5 1.0
+uniform int iter 0
+draw rect -1 -1 2 2
+probe all rgb 1.0 0.0 0.5
+
