@@ -4050,12 +4050,14 @@ static const ShaderProgram Programs[] = {
 		// Does the linker correctly recognize that texcoord[1] is
 		// written by the vertex shader and read by the fragment shader?
 		// vert shader:
+		"varying vec4 gl_TexCoord[4]; \n"
 		"void main() { \n"
 		"   int i = 1; \n"
 		"   gl_TexCoord[i] = vec4(0.5, 0, 0, 0); \n"
 		"   gl_Position = ftransform(); \n"
 		"} \n",
 		// frag shader:
+		"varying vec4 gl_TexCoord[4]; \n"
 		"void main() { \n"
 		"   gl_FragColor = gl_TexCoord[1]; \n"
 		"} \n",
