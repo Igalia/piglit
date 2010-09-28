@@ -4392,12 +4392,13 @@ GLSLTest::setup(void)
 #else
 	const char *glslVersion = NULL;
 #endif
-	if (!glslVersion || glslVersion[0] != '1') {
+	const float version = atof(glslVersion);
+	if (version < 1.00) {
 		env->log << "GLSL 1.x not supported\n";
 		return false;
 	}
-	glsl_120 = (glslVersion[2] >= '2');
-	glsl_130 = (glslVersion[2] >= '3');
+	glsl_120 = version >= 1.20;
+	glsl_130 = version >= 1.30;
 
 	if (!getFunctions()) {
 		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
@@ -4861,16 +4862,13 @@ bool
 GLSLTest::isApplicable() const
 {
 	const char *version = (const char *) glGetString(GL_VERSION);
-	if (strncmp(version, "2.0", 3) == 0 ||
-		strncmp(version, "2.1", 3) == 0 ||
-		strncmp(version, "3.0", 3) == 0 ||
-		strncmp(version, "3.1", 3) == 0 ||
-		strncmp(version, "3.2", 3) == 0) {
+	const float v = atof(version);
+	if (v >= 2.0) {
 		return true;
 	}
 	else {
 		env->log << name
-				 << ":  skipped.  Requires GL 2.0, 2.1 or 3.0.\n";
+				 << ":  skipped.  Requires GL 2.0 or later.\n";
 		return false;
 	}
 }
