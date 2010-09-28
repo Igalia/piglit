@@ -32,7 +32,7 @@
 
 #define GL_GLEXT_PROTOTYPES
 
-#include <cstdlib>
+#include <stdlib.h>
 #include <cassert>
 #include <cstring>
 #include <math.h>
@@ -512,7 +512,6 @@ static const ShaderProgram Programs[] = {
 	{
 		"chained assignment",
 		NO_VERTEX_SHADER,
-                "#version 120 \n"
 		"void main() { \n"
 		"   float x, y, z; \n"
 		"   x = y = z = 0.25; \n"
@@ -526,7 +525,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer, float arithmetic",
 		NO_VERTEX_SHADER,
-		"#version 120 \n"
+                "#version 120 \n"
 		"void main() { \n"
 		"   int k = 100; \n"
 		"   gl_FragColor.x = k * 0.01; \n"
@@ -554,7 +553,6 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer division",
 		NO_VERTEX_SHADER,
-		"#version 120 \n"
 		"void main() { \n"
 		"   int i = 15, j = 6; \n"
 		"   int k = i / j; \n"
@@ -568,7 +566,6 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer division with uniform var",
 		NO_VERTEX_SHADER,
-		"#version 120 \n"
 		"// as above, but prevent compile-time evaluation \n"
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
@@ -3962,7 +3959,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_1_20 | FLAG_ILLEGAL_SHADER
+		FLAG_VERSION_1_30
 	},
 	{
 		"GLSL 1.20 invariant, centroid qualifiers",
@@ -3978,7 +3975,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_1_30
+		FLAG_VERSION_1_20
 	},
 
 #if 0
@@ -4063,7 +4060,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 0.5, 0.0, 0.0, 0.0 },
 		DONT_CARE_Z,
-		FLAG_NONE | FLAG_ILLEGAL_SHADER
+		FLAG_NONE
 	},
 
 	{ NULL, NULL, NULL, {0,0,0,0}, 0, FLAG_NONE } // end of list sentinal
