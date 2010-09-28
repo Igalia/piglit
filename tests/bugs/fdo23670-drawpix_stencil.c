@@ -44,7 +44,6 @@ piglit_display(void)
 {
 	GLubyte stencil_rect[20 * 20];
 	int i;
-	int x, y;
 	GLboolean pass = GL_TRUE;
 	static float red[] = {1.0, 0.0, 0,0, 0.0};
 	static float black[] = {0.0, 0.0, 0,0, 0.0};
@@ -71,14 +70,8 @@ piglit_display(void)
 	glRectf(50, 50, 50+20, 50+20);
 	glDisable(GL_STENCIL_TEST);
 
-	for (x = 50; x < 50 + 20; x++) {
-		for (y = 50; y < 50 + 10; y++) {
-			pass &= piglit_probe_pixel_rgb(x, y, red);
-		}
-		for (y = 50 + 10; y < 50 + 20; y++) {
-			pass &= piglit_probe_pixel_rgb(x, y, black);
-		}
-	}
+	pass &= piglit_probe_rect_rgb(50, 50, 20, 10, red);
+	pass &= piglit_probe_rect_rgb(50, 60, 20, 10, black);
 
 	glutSwapBuffers();
 
