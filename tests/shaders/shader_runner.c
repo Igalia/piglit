@@ -718,22 +718,14 @@ piglit_display(void)
 			}
 		} else if (string_match("probe all rgba", line)) {
 			get_floats(line + 14, c, 4);
-			for (y = 0; y < piglit_height; y++ ) {
-				for (x = 0; x < piglit_width; x++) {
-					pass = pass &&
-						piglit_probe_pixel_rgba(x, y,
-									c);
-				}
-			}
+			pass = pass &&
+				piglit_probe_rect_rgba(0, 0, piglit_width,
+						       piglit_height, c);
 		} else if (string_match("probe all rgb", line)) {
 			get_floats(line + 13, c, 3);
-			for (y = 0; y < piglit_height; y++ ) {
-				for (x = 0; x < piglit_width; x++) {
-					pass = pass &&
-						piglit_probe_pixel_rgb(x, y,
-								       c);
-				}
-			}
+			pass = pass &&
+				piglit_probe_rect_rgb(0, 0, piglit_width,
+						      piglit_height, c);
 		} else if (sscanf(line,
 				  "texture rgbw %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
