@@ -67,7 +67,6 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	GLuint tex0, tex1, fb;
 	GLenum status;
-	int x, y;
 	float white[] = {1, 1, 1, 1};
 	float green[] = {0, 1, 0, 0};
 	float blue[] = {0, 0, 1, 0};
@@ -122,17 +121,10 @@ piglit_display(void)
 	glDeleteTextures(1, &tex1);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			float *expected;
-			if (x < piglit_width / 2)
-				expected = green;
-			else
-				expected = blue;
-
-			pass = pass && piglit_probe_pixel_rgb(x, y, expected);
-		}
-	}
+	pass = pass && piglit_probe_rect_rgb(0, 0, piglit_width/2,
+					     piglit_height, green);
+	pass = pass && piglit_probe_rect_rgb(piglit_width/2, 0, piglit_width/2,
+					     piglit_height, blue);
 
 	glutSwapBuffers();
 

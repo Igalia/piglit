@@ -153,16 +153,7 @@ draw_face(int x, int y, int dim, int face)
 static GLboolean test_face_drawing(int start_x, int start_y, int dim,
 				   float *expected)
 {
-	GLboolean pass = GL_TRUE;
-	int x, y;
-
-	for (y = start_y; y < start_y + dim; y++) {
-		for (x = start_x; x < start_x + dim; x++) {
-			pass &= piglit_probe_pixel_rgb(x, y, expected);
-		}
-	}
-
-	return pass;
+	return piglit_probe_rect_rgb(start_x, start_y, dim, dim, expected);
 }
 
 enum piglit_result

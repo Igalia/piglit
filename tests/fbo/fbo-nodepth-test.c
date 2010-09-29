@@ -43,7 +43,6 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	GLuint tex, fb;
 	GLenum status;
-	int x, y;
 	float green[] = {0, 1, 0, 0};
 
 	glGenTextures(1, &tex);
@@ -77,11 +76,7 @@ piglit_display(void)
 	glColor4fv(green);
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			pass = pass && piglit_probe_pixel_rgb(x, y, green);
-		}
-	}
+	pass = pass && piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, green);
 
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);

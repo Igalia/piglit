@@ -123,26 +123,15 @@ static GLboolean
 test_mipmap_drawing(int start_x, int start_y, int dim)
 {
 	GLboolean pass = GL_TRUE;
-	int x, y;
 
-	for (y = 0; y < dim; y++) {
-		for (x = 0; x < dim; x++) {
-			const float *expected;
-
-			if (x < dim / 2 && y < dim / 2)
-				expected = red;
-			else if (y < dim / 2)
-				expected = green;
-			else if (x < dim / 2)
-				expected = blue;
-			else
-				expected = white;
-
-			pass = pass && piglit_probe_pixel_rgb(start_x + x,
-							      start_y + y,
-							      expected);
-		}
-	}
+	pass = pass && piglit_probe_rect_rgb(
+			start_x, start_y, dim/2, dim/2, red);
+	pass = pass && piglit_probe_rect_rgb(
+			start_x + dim/2, start_y, dim/2, dim/2, green);
+	pass = pass && piglit_probe_rect_rgb(
+			start_x, start_y + dim/2, dim/2, dim/2, blue);
+	pass = pass && piglit_probe_rect_rgb(
+			start_x + dim/2, start_y + dim/2, dim/2, dim/2, white);
 
 	return pass;
 }

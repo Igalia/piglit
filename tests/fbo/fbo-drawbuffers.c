@@ -67,7 +67,6 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	GLuint tex0, tex1, fb;
 	GLenum status;
-	int x, y;
 	float green[] = {0, 1, 0, 0};
 	const GLenum attachments[] = {
 		GL_COLOR_ATTACHMENT0_EXT,
@@ -115,11 +114,8 @@ piglit_display(void)
 	glDeleteTextures(1, &tex1);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			pass = pass && piglit_probe_pixel_rgb(x, y, green);
-		}
-	}
+	pass = pass && piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height,
+					     green);
 
 	glutSwapBuffers();
 

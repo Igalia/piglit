@@ -146,16 +146,8 @@ draw_depth(int x, int y, int depth)
 
 static GLboolean test_depth_drawing(int start_x, int start_y, float *expected)
 {
-	GLboolean pass = GL_TRUE;
-	int x, y;
-
-	for (y = start_y; y < start_y + BUF_HEIGHT; y++) {
-		for (x = start_x; x < start_x + BUF_WIDTH; x++) {
-			pass &= piglit_probe_pixel_rgb(x, y, expected);
-		}
-	}
-
-	return pass;
+	return piglit_probe_rect_rgb(start_x, start_y, BUF_WIDTH, BUF_HEIGHT,
+				     expected);
 }
 
 enum piglit_result

@@ -117,27 +117,15 @@ verify_depth_rect(int start_x, int start_y, int w, int h)
 	float darkgrey = 0.3;
 	float grey  = 0.6;
 	float one = 1;
-	int x, y;
 
-	for (y = 0; y < h; y++) {
-		for (x = 0; x < w; x++) {
-			float expected;
-
-			if ((y < h / 2) && (x < w / 2))
-				expected = zero;
-			else if (y < h / 2)
-				expected = darkgrey;
-			else if (x < w / 2)
-				expected = grey;
-			else
-				expected = one;
-
-			if (!piglit_probe_pixel_depth(start_x + x, start_y + y,
-						    expected))
-				return GL_FALSE;
-			//fprintf(stderr, "Match: %f\n", expected);
-		}
-	}
+	if (!piglit_probe_rect_depth(start_x, start_y, w / 2, h / 2, zero))
+		return GL_FALSE;
+	if (!piglit_probe_rect_depth(start_x + w/2, start_y, w/2, h/2, darkgrey))
+		return GL_FALSE;
+	if (!piglit_probe_rect_depth(start_x, start_y + h/2, w/2, h/2, grey))
+		return GL_FALSE;
+	if (!piglit_probe_rect_depth(start_x + w/2, start_y + h/2, w/2, h/2, one))
+		return GL_FALSE;
 
 	return GL_TRUE;
 }

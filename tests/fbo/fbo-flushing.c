@@ -49,7 +49,7 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	int y, probe_x, probe_y, size;
+	int y, size;
 	GLuint tex, fb;
 	const float red[] =   {1, 0, 0, 0};
 	const float green[] = {0, 1, 0, 0};
@@ -117,13 +117,7 @@ piglit_display(void)
 
 	y = 0;
 	for (size = TEX_WIDTH; size > 0; size /= 2) {
-		for (probe_y = 0; probe_y < size; probe_y++) {
-			for (probe_x = 0; probe_x < size; probe_x++) {
-				pass = pass && piglit_probe_pixel_rgb(probe_x,
-								      probe_y,
-								      green);
-			}
-		}
+		pass = pass && piglit_probe_rect_rgb(0, y, size, size, green);
 		y += size + 5;
 	}
 

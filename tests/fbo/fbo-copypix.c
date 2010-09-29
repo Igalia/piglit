@@ -103,26 +103,15 @@ verify_color_rect(int start_x, int start_y, int w, int h)
 	float green[] = {0, 1, 0, 0};
 	float blue[] =  {0, 0, 1, 0};
 	float white[] = {1, 1, 1, 0};
-	int x, y;
 
-	for (y = 0; y < h; y++) {
-		for (x = 0; x < w; x++) {
-			float *expected;
-
-			if ((y < h / 2) && (x < w / 2))
-				expected = red;
-			else if (y < h / 2)
-				expected = green;
-			else if (x < w / 2)
-				expected = blue;
-			else
-				expected = white;
-
-			if (!piglit_probe_pixel_rgb(start_x + x, start_y + y,
-						    expected))
-				return GL_FALSE;
-		}
-	}
+	if (!piglit_probe_rect_rgb(start_x, start_y, w / 2, h / 2, red))
+		return GL_FALSE;
+	if (!piglit_probe_rect_rgb(start_x + w/2, start_y, w/2, h/2, green))
+		return GL_FALSE;
+	if (!piglit_probe_rect_rgb(start_x, start_y + h/2, w/2, h/2, blue))
+		return GL_FALSE;
+	if (!piglit_probe_rect_rgb(start_x + w/2, start_y + h/2, w/2, h/2, white))
+		return GL_FALSE;
 
 	return GL_TRUE;
 }

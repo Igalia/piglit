@@ -139,18 +139,7 @@ draw_mipmap(int x, int y, int dim)
 static GLboolean
 test_mipmap_drawing(int start_x, int start_y, int dim, const float *expected)
 {
-	GLboolean pass = GL_TRUE;
-	int x, y;
-
-	for (y = 0; y < dim; y++) {
-		for (x = 0; x < dim; x++) {
-			pass = pass && piglit_probe_pixel_rgb(start_x + x,
-							      start_y + y,
-							      expected);
-		}
-	}
-
-	return pass;
+	return piglit_probe_rect_rgb(start_x, start_y, dim, dim, expected);
 }
 
 enum piglit_result
