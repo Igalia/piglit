@@ -39,7 +39,6 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	int x, y;
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
 	static float blue[]  = {0.0, 0.0, 1.0, 0.0};
 
@@ -53,18 +52,14 @@ piglit_display(void)
 	glClearColor(0.0, 0.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			float *expected;
+	pass &= piglit_probe_rect_rgb(0, 0, piglit_width, 10, green);
 
-			if (x >= 10 && x < 20 && y >= 10 && y < 20)
-				expected = blue;
-			else
-				expected = green;
+	pass &= piglit_probe_rect_rgb(0, 10, 10, 10, green);
+	pass &= piglit_probe_rect_rgb(10, 10, 10, 10, blue);
+	pass &= piglit_probe_rect_rgb(20, 10, piglit_width-20, 10, green);
 
-			pass &= piglit_probe_pixel_rgb(x, y, expected);
-		}
-	}
+	pass &= piglit_probe_rect_rgb(0, 20, piglit_width, piglit_height - 20,
+				      green);
 
 	glutSwapBuffers();
 

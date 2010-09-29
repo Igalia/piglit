@@ -57,11 +57,7 @@ piglit_display(void)
 		}
 	}
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			pass &= piglit_probe_pixel_rgb(x, y, green);
-		}
-	}
+	pass &= piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, green);
 
 	glutSwapBuffers();
 

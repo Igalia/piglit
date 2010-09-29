@@ -44,7 +44,6 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	int x, y;
 	static float red[]   = {1.0, 0.0, 0.0, 0.0};
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
 
@@ -57,18 +56,8 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
-			float *expected;
-
-			if (x >= piglit_width / 2)
-				expected = green;
-			else
-				expected = red;
-
-			pass &= piglit_probe_pixel_rgb(x, y, expected);
-		}
-	}
+	pass &= piglit_probe_rect_rgb(0, 0, piglit_width/2, piglit_height, red);
+	pass &= piglit_probe_rect_rgb(piglit_width/2, 0, piglit_width/2, piglit_height, green);
 
 	glReadBuffer(GL_BACK);
 
