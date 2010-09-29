@@ -308,6 +308,33 @@ int piglit_probe_pixel_depth(int x, int y, float expected)
 	return 0;
 }
 
+int piglit_probe_rect_depth(int x, int y, int w, int h, float expected)
+{
+	int i, j;
+	GLfloat *probe;
+	GLfloat *pixels = malloc(w*h*sizeof(float));
+
+	glReadPixels(x, y, w, h, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			probe = &pixels[j*w+i];
+
+			if (fabs(*probe - expected) >= 0.01) {
+				printf("Probe at (%i,%i)\n", x+i, y+j);
+				printf("  Expected: %f\n", expected);
+				printf("  Observed: %f\n", *probe);
+
+				free(pixels);
+				return 0;
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 /**
  * Read a texel from the given location and compare its RGBA value to the
  * given expected values.
