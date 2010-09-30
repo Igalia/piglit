@@ -126,7 +126,7 @@ test(void)
 		if (GLEW_VERSION_2_0) {
 			glGetShaderInfoLog(prog, size, NULL, info);
 		} else {
-			glGetObjectParameterivARB(prog, GL_INFO_LOG_LENGTH, &size);
+			glGetInfoLogARB(prog, size, NULL, info);
 		}
 	} else {
 		info = "(no compiler output)";
