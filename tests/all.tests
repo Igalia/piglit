@@ -635,6 +635,7 @@ add_plain_test(glx, 'glx-destroycontext-2')
 add_plain_test(glx, 'glx-multithread')
 add_plain_test(glx, 'glx-swap-exchange')
 add_plain_test(glx, 'glx-make-current')
+add_plain_test(glx, 'glx-make-glxdrawable-current')
 
 texturing = Group()
 add_plain_test(texturing, 'array-texture')
