@@ -30,6 +30,7 @@
  * Test that MakeCurrent can successfully switch a single context between
  * different GLXDrawables and back.
  *
+ * https://bugs.freedesktop.org/show_bug.cgi?id=30457
  */
 
 #include "piglit-util.h"
