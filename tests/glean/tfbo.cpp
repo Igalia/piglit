@@ -676,7 +676,7 @@ FBOTest::testRender2SingleTexture(void)
                                         case GL_TEXTURE_1D:
                                                 glBegin(GL_LINES);
                                                 glVertex3f(TEXSIZE / 4, 0.5, 0.3);
-                                                glVertex3f(TEXSIZE * 5 / 8, 0.5, 0.3);
+                                                glVertex3f(TEXSIZE * 5 / 8 + 0.25, 0.5, 0.3);
                                                 glEnd();
                                                 break;
                                         case GL_TEXTURE_2D:
