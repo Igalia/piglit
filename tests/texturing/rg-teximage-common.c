@@ -32,6 +32,9 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include "piglit-framework.h"
 #include "piglit-util.h"
 #include "rg-teximage-common.h"
