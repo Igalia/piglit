@@ -26,6 +26,5 @@
  */
 
 #include "piglit-util.h"
-#include "piglit-glx-util.h"
 
 int piglit_automatic = 0;
