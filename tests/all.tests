@@ -1273,6 +1273,11 @@ for groupname, group in sorted(profile.tests.iteritems()):
 		if issubclass(test.__class__, PlainExecTest):
 			valgrind[groupname+"/"+testname] = ValgrindExecTest(test)
 
+		if issubclass(test.__class__, Group):
+			for subtestname, subtest in sorted(test.iteritems()):
+				if issubclass(subtest.__class__, PlainExecTest):
+					valgrind[groupname+"/"+testname+"/"+subtestname] = ValgrindExecTest(subtest)
+
 profile.tests['valgrind'] = valgrind
 
 #############
