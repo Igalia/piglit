@@ -745,6 +745,23 @@ piglit_display(void)
 						    w / 2, h / 2,
 						    c + 0, c + 4);
 			glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line,
+				  "texture shadow %d ( %d , %d )",
+				  &tex, &w, &h) == 3) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_depth_texture(GL_DEPTH_COMPONENT,
+					     w, h, GL_FALSE);
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_MODE_ARB,
+					GL_COMPARE_R_TO_TEXTURE_ARB);
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GREATER);
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_INTENSITY);
+
+			glEnable(GL_TEXTURE_2D);
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
