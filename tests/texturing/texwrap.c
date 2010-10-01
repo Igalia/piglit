@@ -199,7 +199,7 @@ static void sample_nearest(int x, int y, int z,
     float border_factor = 0;
     int coords[3] = {x, y, z};
     unsigned i;
-    float result[3];
+    float result[4];
 
     /* Zero coords according to the texture target. */
     switch (texture_target) {
