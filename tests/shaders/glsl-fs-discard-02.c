@@ -94,7 +94,7 @@ static GLboolean test()
 
 	assert(glGetError() == 0);
 
-	piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	pass = pass && piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
 	return pass;
 }
