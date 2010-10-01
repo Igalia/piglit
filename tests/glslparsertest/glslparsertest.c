@@ -107,7 +107,7 @@ test(void)
 		prog = glCreateShaderObjectARB(type);
 		glShaderSourceARB(prog, 1, (const GLchar **)&prog_string, NULL);
 		glCompileShaderARB(prog);
-		glGetObjectParameterivARB(prog, GL_COMPILE_STATUS, &ok);
+		glGetObjectParameterivARB(prog, GL_OBJECT_COMPILE_STATUS_ARB, &ok);
 	}
 	pass = (expected_pass == (ok != 0));
 
@@ -119,7 +119,7 @@ test(void)
 	if (GLEW_VERSION_2_0) {
 		glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
 	} else {
-		glGetObjectParameterivARB(prog, GL_INFO_LOG_LENGTH, &size);
+		glGetObjectParameterivARB(prog, GL_OBJECT_INFO_LOG_LENGTH_ARB, &size);
 	}
 	if (size != 0) {
 		info = malloc(size);
