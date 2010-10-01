@@ -85,6 +85,10 @@ def add_fbo_generatemipmap_extension(group, extension, name):
 mesa = Group()
 add_plain_test(mesa, 'crossbar')
 
+def add_fbo_rg(group, format):
+	name = "fbo-rg-" + format
+	group[name] = PlainExecTest(['fbo-rg', '-auto', format])
+
 fbo = Group()
 add_plain_test(fbo, 'fbo-1d')
 add_plain_test(fbo, 'fbo-3d')
@@ -115,6 +119,12 @@ add_plain_test(fbo, 'fbo-readdrawpix')
 add_plain_test(fbo, 'fbo-readpixels')
 add_plain_test(fbo, 'fbo-scissor-bitmap')
 add_plain_test(fbo, 'fbo-pbo-readpixels-small')
+add_fbo_rg(fbo, 'GL_RED')
+add_fbo_rg(fbo, 'GL_R8')
+add_fbo_rg(fbo, 'GL_R16')
+add_fbo_rg(fbo, 'GL_RG')
+add_fbo_rg(fbo, 'GL_RG8')
+add_fbo_rg(fbo, 'GL_RG16')
 
 general = Group()
 add_plain_test(general, 'bgra-sec-color-pointer')
