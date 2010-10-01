@@ -110,7 +110,7 @@ piglit_display(void)
 		pass = GL_FALSE;
 	}
 
-	piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	pass = pass && piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
 	glutSwapBuffers();
 
