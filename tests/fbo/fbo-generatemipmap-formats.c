@@ -438,10 +438,10 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 
 	/* alpha_size == 0 just means alpha reads as 1.0. */
 
-	pass = piglit_probe_rect_rgba(x1, y1, half, half, r) && pass;
-	pass = piglit_probe_rect_rgba(x2, y1, half, half, g) && pass;
-	pass = piglit_probe_rect_rgba(x1, y2, half, half, b) && pass;
-	pass = piglit_probe_rect_rgba(x2, y2, half, half, w) && pass;
+	pass = pass && piglit_probe_rect_rgba(x1, y1, half, half, r);
+	pass = pass && piglit_probe_rect_rgba(x2, y1, half, half, g);
+	pass = pass && piglit_probe_rect_rgba(x1, y2, half, half, b);
+	pass = pass && piglit_probe_rect_rgba(x2, y2, half, half, w);
 
 	return pass;
 }
@@ -460,6 +460,7 @@ piglit_display(void)
 		GLuint tex;
 		int x;
 		int level;
+		GLboolean test_pass = GL_TRUE;
 
 		printf("Testing %s\n", test_set[i].name);
 		tex = create_tex(test_set[i].internalformat);
@@ -473,10 +474,11 @@ piglit_display(void)
 		x = 1;
 		level = 0;
 		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-			pass &= test_mipmap_drawing(x, 1, dim, level);
+			test_pass = test_pass && test_mipmap_drawing(x, 1, dim, level);
 			x += dim + 1;
 			level++;
 		}
+		pass = pass && test_pass;
 
 		glDeleteTextures(1, &tex);
 	}
