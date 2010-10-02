@@ -37,6 +37,15 @@
 
 #include "piglit-util.h"
 
+#ifndef GL_VERSION_3_1
+#define GL_RED_SNORM 0x8F90
+#define GL_RG_SNORM 0x8F91
+#define GL_R8_SNORM 0x8F94
+#define GL_RG8_SNORM 0x8F95
+#define GL_R16_SNORM 0x8F98
+#define GL_RG16_SNORM 0x8F99
+#endif
+
 #define EPSILON (1.0 / 255.0)
 
 static GLuint rgba_tex;
