@@ -804,11 +804,11 @@ ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
 add_fbo_generatemipmap_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-generatemipmap-formats')
 
-ext_texture_rg = Group()
-spec['EXT_texture_rg'] = ext_texture_rg
-add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg', 'fbo-generatemipmap-formats')
-add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg-int', 'fbo-generatemipmap-formats-int')
-add_fbo_generatemipmap_extension(ext_texture_rg, 'GL_EXT_texture_rg-float', 'fbo-generatemipmap-formats-float')
+arb_texture_rg = Group()
+spec['ARB_texture_rg'] = arb_texture_rg
+add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-generatemipmap-formats-int')
+add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
 
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent

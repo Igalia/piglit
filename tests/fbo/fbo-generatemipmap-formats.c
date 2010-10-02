@@ -230,7 +230,7 @@ static const struct format_desc ext_texture_integer[] = {
 	{0, 0}
 };
 
-static const struct format_desc ext_texture_rg[] = {
+static const struct format_desc arb_texture_rg[] = {
 	FORMAT(GL_R8),
 	FORMAT(GL_R16),
 	FORMAT(GL_RG),
@@ -239,7 +239,7 @@ static const struct format_desc ext_texture_rg[] = {
 	{0, 0}
 };
 
-static const struct format_desc ext_texture_rg_int[] = {
+static const struct format_desc arb_texture_rg_int[] = {
 	FORMAT(GL_R8I),
 	FORMAT(GL_R8UI),
 	FORMAT(GL_R16I),
@@ -256,7 +256,7 @@ static const struct format_desc ext_texture_rg_int[] = {
 	{0, 0}
 };
 
-static const struct format_desc ext_texture_rg_float[] = {
+static const struct format_desc arb_texture_rg_float[] = {
 	FORMAT(GL_R16F),
 	FORMAT(GL_R32F),
 	FORMAT(GL_RG16F),
@@ -526,17 +526,17 @@ void piglit_init(int argc, char **argv)
 		} else if (!strcmp(argv[i], "GL_EXT_texture_integer")) {
 			piglit_require_extension("GL_EXT_texture_integer");
 			test_set = ext_texture_integer;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_rg")) {
-			piglit_require_extension("GL_EXT_texture_rg");
-			test_set = ext_texture_rg;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_rg-int")) {
-			piglit_require_extension("GL_EXT_texture_rg");
+		} else if (!strcmp(argv[i], "GL_ARB_texture_rg")) {
+			piglit_require_extension("GL_ARB_texture_rg");
+			test_set = arb_texture_rg;
+		} else if (!strcmp(argv[i], "GL_ARB_texture_rg-int")) {
+			piglit_require_extension("GL_ARB_texture_rg");
 			piglit_require_extension("GL_EXT_texture_integer");
-			test_set = ext_texture_rg_int;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_rg-float")) {
-			piglit_require_extension("GL_EXT_texture_rg");
+			test_set = arb_texture_rg_int;
+		} else if (!strcmp(argv[i], "GL_ARB_texture_rg-float")) {
+			piglit_require_extension("GL_ARB_texture_rg");
 			piglit_require_extension("GL_ARB_texture_float");
-			test_set = ext_texture_rg_float;
+			test_set = arb_texture_rg_float;
 		} else if (!strcmp(argv[i], "GL_EXT_texture_shared_exponent")) {
 			piglit_require_extension("GL_EXT_texture_shared_exponent");
 			test_set = ext_texture_shared_exponent;
