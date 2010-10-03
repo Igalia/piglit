@@ -48,7 +48,7 @@ piglit_display(void)
 	GLuint tex;
 
 	glActiveTexture(GL_TEXTURE1);
-	tex = piglit_rgbw_texture(GL_RGBA, 8, 8, GL_FALSE);
+	tex = piglit_rgbw_texture(GL_RGBA, 8, 8, GL_FALSE, GL_FALSE);
 	glEnable(GL_TEXTURE_2D);
 
 	glMatrixMode(GL_TEXTURE);

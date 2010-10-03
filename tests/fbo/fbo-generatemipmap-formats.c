@@ -412,7 +412,8 @@ create_tex(GLenum internalformat)
 		}
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
-					  TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
+					  TEX_WIDTH, TEX_HEIGHT, GL_FALSE,
+					  GL_FALSE);
 		format = GL_RGBA;
 		type = GL_FLOAT;
 	}

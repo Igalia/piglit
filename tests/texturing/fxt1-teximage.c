@@ -111,11 +111,11 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	tex = piglit_rgbw_texture(GL_COMPRESSED_RGB_FXT1_3DFX, SIZE, SIZE,
-				  GL_TRUE);
+				  GL_TRUE, GL_FALSE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 0);
 	glDeleteTextures(1, &tex);
 	tex = piglit_rgbw_texture(GL_COMPRESSED_RGBA_FXT1_3DFX, SIZE, SIZE,
-				  GL_TRUE);
+				  GL_TRUE, GL_FALSE);
 	display_mipmaps(10, 10 + (10 + SIZE) * 1);
 	glDeleteTextures(1, &tex);
 

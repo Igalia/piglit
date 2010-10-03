@@ -886,15 +886,23 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
  * green, and w == 1 to blue.
  */
 GLuint
-piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip)
+piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
+		    GLboolean alpha)
 {
 	GLfloat *data;
 	int size, x, y, level;
 	GLuint tex;
-	float red[4]   = {1.0, 0.0, 0.0, 1.0};
-	float green[4] = {0.0, 1.0, 0.0, 1.0};
-	float blue[4]  = {0.0, 0.0, 1.0, 1.0};
+	float red[4]   = {1.0, 0.0, 0.0, 0.0};
+	float green[4] = {0.0, 1.0, 0.0, 0.25};
+	float blue[4]  = {0.0, 0.0, 1.0, 0.5};
 	float white[4] = {1.0, 1.0, 1.0, 1.0};
+
+	if (!alpha) {
+		red[3] = 1.0;
+		green[3] = 1.0;
+		blue[3] = 1.0;
+		white[3] = 1.0;
+	}
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
