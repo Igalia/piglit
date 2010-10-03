@@ -485,7 +485,7 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			GL_LINEAR_MIPMAP_NEAREST);
 
-	for (i = 1, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
+	for (i = 1, dim = TEX_WIDTH/2; dim >0; i++, dim /= 2) {
 		glTexImage2D(GL_TEXTURE_2D, i, internalformat,
 			     dim, dim,
 			     0,
