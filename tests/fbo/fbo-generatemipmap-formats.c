@@ -413,7 +413,7 @@ create_tex(GLenum internalformat)
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
 					  TEX_WIDTH, TEX_HEIGHT, GL_FALSE,
-					  GL_FALSE);
+					  GL_TRUE);
 		format = GL_RGBA;
 		type = GL_FLOAT;
 	}
@@ -458,9 +458,9 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 	GLboolean pass = GL_TRUE;
 	int half = dim / 2;
 	int x1 = x, y1 = y, x2 = x + half, y2 = y + half;
-	float r[] = {1, 0, 0, 1};
-	float g[] = {0, 1, 0, 1};
-	float b[] = {0, 0, 1, 1};
+	float r[] = {1, 0, 0, 0};
+	float g[] = {0, 1, 0, 0.25};
+	float b[] = {0, 0, 1, 0.5};
 	float w[] = {1, 1, 1, 1};
 	GLint r_size, g_size, b_size, l_size, a_size, d_size, i_size;
 	GLint compressed;
@@ -509,8 +509,14 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 		b[2] = 0.0;
 
 		if (i_size) {
+			r[3] = 1.0;
 			g[3] = 0.0;
 			b[3] = 0.0;
+		} else if (l_size && !a_size) {
+			r[3] = 1.0;
+			g[3] = 1.0;
+			b[3] = 1.0;
+			w[3] = 1.0;
 		}
 	} else if (a_size && !r_size && !l_size) {
 		r[0] = 1.0;
@@ -537,9 +543,13 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 			b[2] = 0.0;
 			w[2] = 0.0;
 		}
+		if (!a_size) {
+			r[3] = 1.0;
+			g[3] = 1.0;
+			b[3] = 1.0;
+			w[3] = 1.0;
+		}
 	}
-
-	/* alpha_size == 0 just means alpha reads as 1.0. */
 
 	pass = pass && piglit_probe_rect_rgba(x1, y1, half, half, r);
 	pass = pass && piglit_probe_rect_rgba(x2, y1, half, half, g);
