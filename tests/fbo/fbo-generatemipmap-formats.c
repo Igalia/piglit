@@ -392,18 +392,80 @@ static const struct test_desc test_sets[] = {
 };
 
 static const struct test_desc *test_set;
+static int test_index;
+static int format_index;
+
+static GLboolean
+supported(const struct test_desc *test)
+{
+	unsigned i;
+
+	for (i = 0; i < 3; i++) {
+		if (test->ext[i]) {
+			if (!glutExtensionSupported(test->ext[i])) {
+				return GL_FALSE;
+			}
+		}
+	}
+
+	return GL_TRUE;
+}
+
+static void
+key_func(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case 'n': /* next test set */
+		do {
+			test_index++;
+			if (test_index >= Elements(test_sets)) {
+				test_index = 0;
+			}
+		} while (!supported(&test_sets[test_index]));
+		format_index = 0;
+		printf("Using test set: %s\n", test_sets[test_index].param);
+		break;
+
+	case 'N': /* previous test set */
+		do {
+			test_index--;
+			if (test_index < 0) {
+				test_index = Elements(test_sets) - 1;
+			}
+		} while (!supported(&test_sets[test_index]));
+		format_index = 0;
+		printf("Using test set: %s\n", test_sets[test_index].param);
+		break;
+
+	case 'm': /* next format */
+		format_index++;
+		if (format_index >= test_sets[test_index].num_formats) {
+			format_index = 0;
+		}
+		break;
+
+	case 'M': /* previous format */
+		format_index--;
+		if (format_index < 0) {
+			format_index = test_sets[test_index].num_formats - 1;
+		}
+		break;
+	}
+
+	piglit_escape_exit_key(key, x, y);
+}
 
 static int
-create_tex(GLenum internalformat)
+create_tex(GLenum internalformat, GLenum baseformat)
 {
 	GLuint tex;
 	int i, dim;
 	GLenum type, format;
 
-	if ((test_set->base == GL_DEPTH_COMPONENT) || (test_set->base == GL_DEPTH_STENCIL)) {
+	if ((baseformat == GL_DEPTH_COMPONENT) || (baseformat == GL_DEPTH_STENCIL)) {
 		tex = piglit_depth_texture(internalformat,
 					   TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
-		if (test_set->base == GL_DEPTH_COMPONENT) {
+		if (baseformat == GL_DEPTH_COMPONENT) {
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;
 		} else {
@@ -559,6 +621,37 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 	return pass;
 }
 
+static GLboolean
+test_format(const struct format_desc *format, GLenum baseformat)
+{
+	int dim;
+	GLuint tex;
+	int x;
+	int level;
+	GLboolean pass = GL_TRUE;
+
+	printf("Testing %s\n", format->name);
+	tex = create_tex(format->internalformat, baseformat);
+
+	x = 1;
+	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
+		draw_mipmap(x, 1, dim);
+		x += dim + 1;
+	}
+
+	x = 1;
+	level = 0;
+	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
+		pass = pass && test_mipmap_drawing(x, 1, dim, level);
+		x += dim + 1;
+		level++;
+	}
+
+	glDeleteTextures(1, &tex);
+
+	return pass;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -568,32 +661,14 @@ piglit_display(void)
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (i = 0; i < test_set->num_formats; i++) {
-		int dim;
-		GLuint tex;
-		int x;
-		int level;
-		GLboolean test_pass = GL_TRUE;
-
-		printf("Testing %s\n", test_set->format[i].name);
-		tex = create_tex(test_set->format[i].internalformat);
-
-		x = 1;
-		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-			draw_mipmap(x, 1, dim);
-			x += dim + 1;
+	if (piglit_automatic) {
+		for (i = 0; i < test_set->num_formats; i++) {
+			pass = test_format(&test_set->format[i],
+					   test_set->base) && pass;
 		}
-
-		x = 1;
-		level = 0;
-		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-			test_pass = test_pass && test_mipmap_drawing(x, 1, dim, level);
-			x += dim + 1;
-			level++;
-		}
-		pass = pass && test_pass;
-
-		glDeleteTextures(1, &tex);
+	} else {
+		pass = test_format(&test_sets[test_index].format[format_index],
+				   test_sets[test_index].base);
 	}
 
 	glutSwapBuffers();
@@ -605,6 +680,8 @@ piglit_display(void)
 void piglit_init(int argc, char **argv)
 {
 	int i, j, k;
+
+	glutKeyboardFunc(key_func);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
@@ -628,4 +705,13 @@ void piglit_init(int argc, char **argv)
 			exit(1);
 		}
 	}
+
+	if (!piglit_automatic) {
+		printf("    -n   Next test set.\n"
+		       "    -N   Previous test set.\n"
+		       "    -m   Next format in the set.\n"
+		       "    -M   Previous format in the set.\n");
+	}
+
+	printf("Using test set: %s\n", test_set->param);
 }
