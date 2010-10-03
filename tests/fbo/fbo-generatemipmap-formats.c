@@ -127,7 +127,6 @@ static const struct format_desc core[] = {
 	FORMAT(GL_RGB10_A2),
 	FORMAT(GL_RGBA12),
 	FORMAT(GL_RGBA16),
-	{0, 0}
 };
 
 static const struct format_desc arb_depth_texture[] = {
@@ -135,13 +134,11 @@ static const struct format_desc arb_depth_texture[] = {
 	FORMAT(GL_DEPTH_COMPONENT16),
 	FORMAT(GL_DEPTH_COMPONENT24),
 	FORMAT(GL_DEPTH_COMPONENT32),
-	{0, 0}
 };
 
 static const struct format_desc ext_packed_depth_stencil[] = {
 	FORMAT(GL_DEPTH_STENCIL_EXT),
 	FORMAT(GL_DEPTH24_STENCIL8_EXT),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_srgb[] = {
@@ -153,7 +150,6 @@ static const struct format_desc ext_texture_srgb[] = {
 	FORMAT(GL_SLUMINANCE8_ALPHA8_EXT),
 	FORMAT(GL_SLUMINANCE_EXT),
 	FORMAT(GL_SLUMINANCE8_EXT),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_srgb_compressed[] = {
@@ -165,7 +161,6 @@ static const struct format_desc ext_texture_srgb_compressed[] = {
 	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT),
 	FORMAT(GL_COMPRESSED_SLUMINANCE_ALPHA_EXT),
 	FORMAT(GL_COMPRESSED_SLUMINANCE_EXT),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_compression[] = {
@@ -175,13 +170,11 @@ static const struct format_desc ext_texture_compression[] = {
 	FORMAT(GL_COMPRESSED_INTENSITY),
 	FORMAT(GL_COMPRESSED_RGB),
 	FORMAT(GL_COMPRESSED_RGBA),
-	{0, 0}
 };
 
 static const struct format_desc tdfx_texture_compression_fxt1[] = {
 	FORMAT(GL_COMPRESSED_RGB_FXT1_3DFX),
 	FORMAT(GL_COMPRESSED_RGBA_FXT1_3DFX),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_compression_s3tc[] = {
@@ -189,7 +182,6 @@ static const struct format_desc ext_texture_compression_s3tc[] = {
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT),
 	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_integer[] = {
@@ -229,7 +221,6 @@ static const struct format_desc ext_texture_integer[] = {
 	FORMAT(GL_LUMINANCE_ALPHA8I_EXT),
 	FORMAT(GL_LUMINANCE_ALPHA16I_EXT),
 	FORMAT(GL_LUMINANCE_ALPHA32I_EXT),
-	{0, 0}
 };
 
 static const struct format_desc arb_texture_rg[] = {
@@ -238,7 +229,6 @@ static const struct format_desc arb_texture_rg[] = {
 	FORMAT(GL_RG),
 	FORMAT(GL_RG8),
 	FORMAT(GL_RG16),
-	{0, 0}
 };
 
 static const struct format_desc arb_texture_rg_int[] = {
@@ -255,7 +245,6 @@ static const struct format_desc arb_texture_rg_int[] = {
 	FORMAT(GL_RG16UI),
 	FORMAT(GL_RG32I),
 	FORMAT(GL_RG32UI),
-	{0, 0}
 };
 
 static const struct format_desc arb_texture_rg_float[] = {
@@ -263,7 +252,6 @@ static const struct format_desc arb_texture_rg_float[] = {
 	FORMAT(GL_R32F),
 	FORMAT(GL_RG16F),
 	FORMAT(GL_RG32F),
-	{0, 0}
 };
 
 static const struct format_desc ext_texture_shared_exponent[] = {
@@ -290,6 +278,7 @@ static const struct format_desc ext_texture_compression_rgtc[] = {
 
 struct test_desc {
 	const struct format_desc *format;
+	unsigned num_formats;
 	const char *param;
 	const char *ext[3];
 	GLenum base;
@@ -298,44 +287,52 @@ struct test_desc {
 static const struct test_desc test_sets[] = {
 	{
 		core,
+		Elements(core),
 		"Core formats"
 	},
 	{
 		ext_texture_compression,
+		Elements(ext_texture_compression),
 		"GL_ARB_texture_compression",
 		{"GL_ARB_texture_compression"}
 	},
 	{
 		tdfx_texture_compression_fxt1,
+		Elements(tdfx_texture_compression_fxt1),
 		"GL_3DFX_texture_compression_FXT1",
 		{"GL_ARB_texture_compression",
 		 "GL_3DFX_texture_compression_FXT1"},
 	},
 	{
 		ext_texture_compression_s3tc,
+		Elements(ext_texture_compression_s3tc),
 		"GL_EXT_texture_compression_s3tc",
 		{"GL_ARB_texture_compression",
 		 "GL_EXT_texture_compression_s3tc"},
 	},
 	{
 		arb_depth_texture,
+		Elements(arb_depth_texture),
 		"GL_ARB_depth_texture",
 		{"GL_ARB_depth_texture"},
 		GL_DEPTH_COMPONENT,
 	},
 	{
 		ext_packed_depth_stencil,
+		Elements(ext_packed_depth_stencil),
 		"GL_EXT_packed_depth_stencil",
 		{"GL_EXT_packed_depth_stencil"},
 		GL_DEPTH_STENCIL,
 	},
 	{
 		ext_texture_srgb,
+		Elements(ext_texture_srgb),
 		"GL_EXT_texture_sRGB",
 		{"GL_EXT_texture_sRGB"}
 	},
 	{
 		ext_texture_srgb_compressed,
+		Elements(ext_texture_srgb_compressed),
 		"GL_EXT_texture_sRGB-s3tc",
 		{"GL_EXT_texture_sRGB",
 		 "GL_ARB_texture_compression",
@@ -343,44 +340,52 @@ static const struct test_desc test_sets[] = {
 	},
 	{
 		ext_texture_integer,
+		Elements(ext_texture_integer),
 		"GL_EXT_texture_integer",
 		{"GL_EXT_texture_integer"}
 	},
 	{
 		arb_texture_rg,
+		Elements(arb_texture_rg),
 		"GL_ARB_texture_rg",
 		{"GL_ARB_texture_rg"}
 	},
 	{
 		arb_texture_rg_int,
+		Elements(arb_texture_rg_int),
 		"GL_ARB_texture_rg-int",
 		{"GL_ARB_texture_rg",
 		 "GL_EXT_texture_integer"}
 	},
 	{
 		arb_texture_rg_float,
+		Elements(arb_texture_rg_float),
 		"GL_ARB_texture_rg-float",
 		{"GL_ARB_texture_rg",
 		 "GL_ARB_texture_float"}
 	},
 	{
 		ext_texture_shared_exponent,
+		Elements(ext_texture_shared_exponent),
 		"GL_EXT_texture_shared_exponent",
 		{"GL_EXT_texture_shared_exponent"}
 	},
 	{
 		ext_packed_float,
+		Elements(ext_packed_float),
 		"GL_EXT_packed_float",
 		{"GL_EXT_packed_float"}
 	},
 	{
 		arb_depth_buffer_float,
+		Elements(arb_depth_buffer_float),
 		"GL_ARB_depth_buffer_float",
 		{"GL_ARB_depth_buffer_float"},
 		GL_DEPTH_COMPONENT,
 	},
 	{
 		ext_texture_compression_rgtc,
+		Elements(ext_texture_compression_rgtc),
 		"GL_EXT_texture_compression_rgtc",
 		{"GL_EXT_texture_compression_rgtc"}
 	},
@@ -552,7 +557,7 @@ piglit_display(void)
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (i = 0; test_set->format[i].name; i++) {
+	for (i = 0; i < test_set->num_formats; i++) {
 		int dim;
 		GLuint tex;
 		int x;
