@@ -33,6 +33,8 @@
 
 #include "piglit-util.h"
 
+#define Elements(x)  (sizeof(x) / sizeof(x[0]))
+
 #ifndef GL_ARB_depth_buffer_float
 #define GL_DEPTH_COMPONENT32F 0x8CAC
 #define GL_DEPTH32F_STENCIL8 0x8CAD
@@ -286,10 +288,105 @@ static const struct format_desc ext_texture_compression_rgtc[] = {
 	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT),
 };
 
-const struct format_desc *test_set;
+struct test_desc {
+	const struct format_desc *format;
+	const char *param;
+	const char *ext[3];
+	GLenum base;
+};
 
-static GLboolean doing_depth = GL_FALSE;
-static GLboolean doing_depth_stencil = GL_FALSE;
+static const struct test_desc test_sets[] = {
+	{
+		core,
+		"Core formats"
+	},
+	{
+		ext_texture_compression,
+		"GL_ARB_texture_compression",
+		{"GL_ARB_texture_compression"}
+	},
+	{
+		tdfx_texture_compression_fxt1,
+		"GL_3DFX_texture_compression_FXT1",
+		{"GL_ARB_texture_compression",
+		 "GL_3DFX_texture_compression_FXT1"},
+	},
+	{
+		ext_texture_compression_s3tc,
+		"GL_EXT_texture_compression_s3tc",
+		{"GL_ARB_texture_compression",
+		 "GL_EXT_texture_compression_s3tc"},
+	},
+	{
+		arb_depth_texture,
+		"GL_ARB_depth_texture",
+		{"GL_ARB_depth_texture"},
+		GL_DEPTH_COMPONENT,
+	},
+	{
+		ext_packed_depth_stencil,
+		"GL_EXT_packed_depth_stencil",
+		{"GL_EXT_packed_depth_stencil"},
+		GL_DEPTH_STENCIL,
+	},
+	{
+		ext_texture_srgb,
+		"GL_EXT_texture_sRGB",
+		{"GL_EXT_texture_sRGB"}
+	},
+	{
+		ext_texture_srgb_compressed,
+		"GL_EXT_texture_sRGB-s3tc",
+		{"GL_EXT_texture_sRGB",
+		 "GL_ARB_texture_compression",
+		 "GL_EXT_texture_compression_s3tc"},
+	},
+	{
+		ext_texture_integer,
+		"GL_EXT_texture_integer",
+		{"GL_EXT_texture_integer"}
+	},
+	{
+		arb_texture_rg,
+		"GL_ARB_texture_rg",
+		{"GL_ARB_texture_rg"}
+	},
+	{
+		arb_texture_rg_int,
+		"GL_ARB_texture_rg-int",
+		{"GL_ARB_texture_rg",
+		 "GL_EXT_texture_integer"}
+	},
+	{
+		arb_texture_rg_float,
+		"GL_ARB_texture_rg-float",
+		{"GL_ARB_texture_rg",
+		 "GL_ARB_texture_float"}
+	},
+	{
+		ext_texture_shared_exponent,
+		"GL_EXT_texture_shared_exponent",
+		{"GL_EXT_texture_shared_exponent"}
+	},
+	{
+		ext_packed_float,
+		"GL_EXT_packed_float",
+		{"GL_EXT_packed_float"}
+	},
+	{
+		arb_depth_buffer_float,
+		"GL_ARB_depth_buffer_float",
+		{"GL_ARB_depth_buffer_float"},
+		GL_DEPTH_COMPONENT,
+	},
+	{
+		ext_texture_compression_rgtc,
+		"GL_EXT_texture_compression_rgtc",
+		{"GL_EXT_texture_compression_rgtc"}
+	},
+};
+
+static const struct test_desc *test_set;
 
 static int
 create_tex(GLenum internalformat)
@@ -298,10 +395,10 @@ create_tex(GLenum internalformat)
 	int i, dim;
 	GLenum type, format;
 
-	if (doing_depth || doing_depth_stencil) {
+	if ((test_set->base == GL_DEPTH_COMPONENT) || (test_set->base == GL_DEPTH_STENCIL)) {
 		tex = piglit_depth_texture(internalformat,
 					   TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
-		if (doing_depth) {
+		if (test_set->base == GL_DEPTH_COMPONENT) {
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;
 		} else {
@@ -455,15 +552,15 @@ piglit_display(void)
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (i = 0; test_set[i].name; i++) {
+	for (i = 0; test_set->format[i].name; i++) {
 		int dim;
 		GLuint tex;
 		int x;
 		int level;
 		GLboolean test_pass = GL_TRUE;
 
-		printf("Testing %s\n", test_set[i].name);
-		tex = create_tex(test_set[i].internalformat);
+		printf("Testing %s\n", test_set->format[i].name);
+		tex = create_tex(test_set->format[i].internalformat);
 
 		x = 1;
 		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
@@ -491,69 +588,26 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	int i;
+	int i, j, k;
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
-	test_set = core;
+	test_set = &test_sets[0];
 
 	for (i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "GL_ARB_texture_compression")) {
-			piglit_require_extension("GL_ARB_texture_compression");
-			test_set = ext_texture_compression;
-		} else if (!strcmp(argv[i], "GL_3DFX_texture_compression_FXT1")) {
-			piglit_require_extension("GL_ARB_texture_compression");
-			piglit_require_extension("GL_3DFX_texture_compression_FXT1");
-			test_set = tdfx_texture_compression_fxt1;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_compression_s3tc")) {
-			piglit_require_extension("GL_ARB_texture_compression");
-			piglit_require_extension("GL_EXT_texture_compression_s3tc");
-			test_set = ext_texture_compression_s3tc;
-		} else if (!strcmp(argv[i], "GL_ARB_depth_texture")) {
-			piglit_require_extension("GL_ARB_depth_texture");
-			test_set = arb_depth_texture;
-			doing_depth = GL_TRUE;
-		} else if (!strcmp(argv[i], "GL_EXT_packed_depth_stencil")) {
-			piglit_require_extension("GL_EXT_packed_depth_stencil");
-			test_set = ext_packed_depth_stencil;
-			doing_depth_stencil = GL_TRUE;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_sRGB")) {
-			piglit_require_extension("GL_EXT_texture_sRGB");
-			test_set = ext_texture_srgb;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_sRGB-s3tc")) {
-			piglit_require_extension("GL_EXT_texture_sRGB");
-			piglit_require_extension("GL_ARB_texture_compression");
-			piglit_require_extension("GL_EXT_texture_compression_s3tc");
-			test_set = ext_texture_srgb_compressed;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_integer")) {
-			piglit_require_extension("GL_EXT_texture_integer");
-			test_set = ext_texture_integer;
-		} else if (!strcmp(argv[i], "GL_ARB_texture_rg")) {
-			piglit_require_extension("GL_ARB_texture_rg");
-			test_set = arb_texture_rg;
-		} else if (!strcmp(argv[i], "GL_ARB_texture_rg-int")) {
-			piglit_require_extension("GL_ARB_texture_rg");
-			piglit_require_extension("GL_EXT_texture_integer");
-			test_set = arb_texture_rg_int;
-		} else if (!strcmp(argv[i], "GL_ARB_texture_rg-float")) {
-			piglit_require_extension("GL_ARB_texture_rg");
-			piglit_require_extension("GL_ARB_texture_float");
-			test_set = arb_texture_rg_float;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_shared_exponent")) {
-			piglit_require_extension("GL_EXT_texture_shared_exponent");
-			test_set = ext_texture_shared_exponent;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_packed_float")) {
-			piglit_require_extension("GL_EXT_texture_packed_float");
-			test_set = ext_texture_shared_exponent;
-		} else if (!strcmp(argv[i], "GL_ARB_depth_buffer_float")) {
-			piglit_require_extension("GL_ARB_depth_buffer_float");
-			test_set = arb_depth_buffer_float;
-			doing_depth = GL_TRUE;
-		} else if (!strcmp(argv[i], "GL_EXT_texture_compression_rgtc")) {
-			piglit_require_extension("GL_EXT_texture_compression_rgtc");
-			test_set = ext_texture_compression_rgtc;
-		} else if (!strcmp(argv[i], "-auto")) {
-		} else {
+		for (j = 1; j < Elements(test_sets); j++) {
+			if (!strcmp(argv[i], test_sets[j].param)) {
+				for (k = 0; k < 3; k++) {
+					if (test_sets[j].ext[k]) {
+						piglit_require_extension(test_sets[j].ext[k]);
+					}
+				}
+
+				test_set = &test_sets[j];
+				break;
+			}
+		}
+		if (j == Elements(test_sets)) {
 			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
 			exit(1);
 		}
