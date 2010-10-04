@@ -22,7 +22,7 @@
  */
 
 /**
- * \file glsl-link-initializer-05.c
+ * \file glsl-link-initializer-06.c
  * Test variables with complex non-conflicting initializers.
  *
  * Each of the 2 shaders involved in this test have a global variable called
