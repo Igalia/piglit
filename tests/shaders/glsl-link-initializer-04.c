@@ -45,7 +45,7 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	GLint vert[3];
+	GLint vert[2];
 	GLint prog;
 	GLboolean ok;
 

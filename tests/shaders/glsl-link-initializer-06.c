@@ -72,7 +72,7 @@ link_check_status(GLint prog)
 
 void piglit_init(int argc, char **argv)
 {
-	GLint vert[3];
+	GLint vert[2];
 	GLint prog;
 	GLboolean ok;
 
