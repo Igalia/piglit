@@ -35,6 +35,10 @@
 
 #define Elements(x)  (sizeof(x) / sizeof(x[0]))
 
+#ifndef GL_ARB_framebuffer_object
+#define GL_DEPTH_STENCIL 0x84F9
+#endif
+
 #ifndef GL_ARB_depth_buffer_float
 #define GL_DEPTH_COMPONENT32F 0x8CAC
 #define GL_DEPTH32F_STENCIL8 0x8CAD
