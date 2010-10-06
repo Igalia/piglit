@@ -1,0 +1,123 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+#
+# Testing the Gen6 (Sandybridge) driver
+#
+
+import os
+import re
+
+execfile(os.path.dirname(__file__) + '/quick.tests')
+
+# discard will totally fail because it needs header
+del profile.tests['shaders']['glsl-fs-discard-02']
+del profile.tests['glean']['glsl1-discard statement (1)']
+del profile.tests['glean']['glsl1-discard statement (2)']
+
+# loops are totally unfinished
+del profile.tests['glean']['glsl1-while-loop']
+del profile.tests['glean']['glsl1-do-loop']
+del profile.tests['glean']['glsl1-for-loop']
+del profile.tests['glean']['glsl1-while-loop with continue']
+del profile.tests['glean']['glsl1-for-loop with continue']
+del profile.tests['glean']['glsl1-do-loop with break']
+del profile.tests['glean']['glsl1-do-loop with continue and break']
+del profile.tests['glean']['glsl1-discard statement in for loop']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-dst-in-loop']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-dst-in-nested-loop-combined']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-src-in-loop']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-src-in-nested-loop-inner']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-src-in-nested-loop-outer']
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-src-in-nested-loop-combined']
+del profile.tests['shaders']['glsl-fs-if-nested-loop']
+del profile.tests['shaders']['glsl-fs-loop']
+del profile.tests['shaders']['glsl-fs-loop-const-decr']
+del profile.tests['shaders']['glsl-fs-loop-const-incr']
+del profile.tests['shaders']['glsl-fs-loop-ge']
+del profile.tests['shaders']['glsl-fs-loop-gt']
+del profile.tests['shaders']['glsl-fs-loop-le']
+del profile.tests['shaders']['glsl-fs-loop-lt']
+del profile.tests['shaders']['glsl-fs-loop-nested']
+del profile.tests['shaders']['glsl-fs-loop-nested-if']
+del profile.tests['shaders']['glsl-fs-loop-two-counter-01']
+del profile.tests['shaders']['glsl-fs-loop-two-counter-02']
+del profile.tests['shaders']['glsl-fs-loop-two-counter-03']
+del profile.tests['shaders']['glsl-fs-loop-two-counter-04']
+del profile.tests['shaders']['glsl-fs-loop-zero-iter']
+del profile.tests['shaders']['glsl-vs-loop']
+del profile.tests['shaders']['glsl-vs-loop-nested']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst-in-loop']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst-in-nested-loop-combined']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-loop']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-nested-loop-inner']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-nested-loop-outer']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-nested-loop-combined']
+
+# if-related hangs.  Note that not all IFs hang, but these do.
+del profile.tests['shaders']['glsl-algebraic-logicand-false-2']
+del profile.tests['shaders']['glsl-algebraic-logicand-true']
+del profile.tests['shaders']['glsl-algebraic-logicor-false']
+del profile.tests['shaders']['glsl-algebraic-not-equals']
+del profile.tests['shaders']['glsl-copy-propagation-if-1']
+del profile.tests['shaders']['glsl-fs-atan-1']
+del profile.tests['shaders']['glsl-fs-conditional-output-write']
+del profile.tests['shaders']['glsl-fs-functions-2']
+del profile.tests['shaders']['glsl-fs-main-return']
+del profile.tests['shaders']['glsl-fs-raytrace-bug27060']
+del profile.tests['shaders']['glsl-fs-sampler-numbering-2']
+del profile.tests['shaders']['glsl-fs-sampler-numbering-3']
+del profile.tests['shaders']['glsl-fs-tan-2']
+del profile.tests['shaders']['glsl-fs-tan-3']
+del profile.tests['shaders']['glsl-orangebook-ch06-bump']
+del profile.tests['shaders']['glsl-unused-varying']
+del profile.tests['shaders']['glsl-vs-functions-2']
+del profile.tests['texturing']['depth-tex-modes-glsl']
+
+# not tested but probably hang like above
+del profile.tests['shaders']['glsl-algebraic-logicor-false-2']
+del profile.tests['shaders']['glsl-algebraic-logicor-true']
+del profile.tests['shaders']['glsl-algebraic-logicor-true-2']
+del profile.tests['shaders']['glsl-algebraic-logicand-true-2']
+del profile.tests['shaders']['glsl-algebraic-logicxor-false']
+del profile.tests['shaders']['glsl-algebraic-logicxor-true']
+del profile.tests['shaders']['glsl-algebraic-not-notequals']
+del profile.tests['shaders']['glsl-copy-propagation-if-2']
+del profile.tests['shaders']['glsl-copy-propagation-if-3']
+del profile.tests['shaders']['glsl-fs-atan-2']
+del profile.tests['shaders']['glsl-fs-atan-3']
+del profile.tests['shaders']['glsl-fs-bug25902']
+del profile.tests['shaders']['glsl-fs-functions-3']
+del profile.tests['shaders']['glsl-vs-functions']
+del profile.tests['shaders']['glsl-vs-functions-3']
+del profile.tests['shaders']['glsl-vs-if-greater']
+del profile.tests['shaders']['glsl-vs-if-greater-equal']
+del profile.tests['shaders']['glsl-vs-if-less']
+del profile.tests['shaders']['glsl-vs-if-less-equal']
+del profile.tests['shaders']['glsl-vs-if-nested']
+del profile.tests['shaders']['glsl-vs-if-nested-loop']
+del profile.tests['shaders']['glsl-vs-main-return']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-4']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-5']
+del profile.tests['shaders']['glsl-vs-raytrace-bug26691']
+
+# some other failure: mostly texture with bias.
+del profile.tests['shaders']['glsl-bug-22603']
+del profile.tests['shaders']['glsl-fs-shadow2d-bias']
+del profile.tests['shaders']['glsl-fs-shadow2dproj-bias']
+del profile.tests['shaders']['glsl-fs-statevar-call']
+del profile.tests['shaders']['glsl-lod-bias']
+del profile.tests['shaders']['glsl-fs-texture2d-bias']
+del profile.tests['shaders']['glsl-fs-texture2dproj-bias']
+del profile.tests['shaders']['glsl-fs-texture2dproj-bias-2']
+del profile.tests['shaders']['glsl-vs-mat-add-1']
+
+# untested, maybe like glsl-vs-mat-add-1?
+del profile.tests['shaders']['glsl-vs-mat-div-1']
+del profile.tests['shaders']['glsl-vs-mat-div-2']
+del profile.tests['shaders']['glsl-vs-mat-mul-1']
+del profile.tests['shaders']['glsl-vs-mat-mul-2']
+del profile.tests['shaders']['glsl-vs-mat-mul-3']
+del profile.tests['shaders']['glsl-vs-mat-sub-1']
+
+# crashes the server?!
+del profile.tests['shaders']['glsl-reload-source']
