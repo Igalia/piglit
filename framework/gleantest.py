@@ -41,6 +41,11 @@ class GleanTest(Test):
 	def __init__(self, name):
 		Test.__init__(self)
 		self.name = name
+		self.command = \
+			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), self.name),
+			"-o",
+			"-v", "-v", "-v",
+			"-t", "+"+self.name]
 		self.env = {}
 
 	def run(self):
@@ -53,10 +58,7 @@ class GleanTest(Test):
 		checkDir(os.path.join(gleanResultDir(), self.name), False)
 
 		glean = subprocess.Popen(
-			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), self.name),
-			"-o",
-			"-v", "-v", "-v",
-			"-t", "+"+self.name] + GleanTest.globalParams,
+			self.command + GleanTest.globalParams,
 			stdout=subprocess.PIPE,
 			stderr=subprocess.PIPE,
 			env=fullenv,
