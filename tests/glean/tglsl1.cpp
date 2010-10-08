@@ -1205,7 +1205,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"simple if/else statement, fragment shader",
+		"simple if-else statement, fragment shader",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   // this should always be false \n"
@@ -1221,7 +1221,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"simple if/else statement, vertex shader",
+		"simple if-else statement, vertex shader",
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
 		"   gl_Position = ftransform(); \n"
@@ -2101,7 +2101,7 @@ static const ShaderProgram Programs[] = {
 		// Note: var3 = gl_Color
 		// Note: var1 = -var2
 		// Final fragment color should be equal to gl_Color
-		"varying variable read/write",
+		"varying variable read-write",
 		// vertex program:
 		"varying vec4 var1, var2, var3; \n"
 		"void main() { \n"
@@ -3404,7 +3404,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"if (boolean/scalar) check",
+		"if (boolean-scalar) check",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   vec3 v; \n"
