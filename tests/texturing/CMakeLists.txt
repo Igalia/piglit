@@ -21,9 +21,9 @@ link_libraries (
 
 add_executable (array-texture array-texture.c)
 add_executable (copytexsubimage copytexsubimage.c)
-IF(UNIX)
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (crossbar crossbar.c)
-ENDIF(UNIX)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_executable (cubemap cubemap.c)
 add_executable (depth-level-clamp depth-level-clamp.c)
 add_executable (gen-compressed-teximage gen-compressed-teximage.c)
