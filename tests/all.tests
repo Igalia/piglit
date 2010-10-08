@@ -1295,16 +1295,18 @@ class ValgrindExecTest(PlainExecTest):
 		Test.__init__(self)
 		self.command = [os.path.dirname(__file__)+'/valgrind-test/valgrind-test'] + test.command
 		self.env = {}
+		if 'PIGLIT_TEST' in test.env:
+			self.env['PIGLIT_TEST'] = test.env['PIGLIT_TEST']
 
 valgrind = Group()
 for groupname, group in sorted(profile.tests.iteritems()):
 	for testname, test in sorted(group.iteritems()):
-		if issubclass(test.__class__, PlainExecTest):
+		if issubclass(test.__class__, PlainExecTest) or issubclass(test.__class__, GleanTest):
 			valgrind[groupname+"/"+testname] = ValgrindExecTest(test)
 
 		if issubclass(test.__class__, Group):
 			for subtestname, subtest in sorted(test.iteritems()):
-				if issubclass(subtest.__class__, PlainExecTest):
+				if issubclass(subtest.__class__, PlainExecTest) or issubclass(subtest.__class__, GleanTest):
 					valgrind[groupname+"/"+testname+"/"+subtestname] = ValgrindExecTest(subtest)
 
 profile.tests['valgrind'] = valgrind
