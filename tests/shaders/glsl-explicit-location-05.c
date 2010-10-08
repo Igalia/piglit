@@ -22,11 +22,12 @@
  */
 
 /**
- * \file glsl-explicit-attrib-location-03.c
- * Test GL_ARB_explicit_attrib_location with conflicting locations
+ * \file glsl-explicit-attrib-location-05.c
+ * Test GL_ARB_explicit_attrib_location set in only one shader.
  *
- * Link two vertex shaders that specify differing explicit locations for the
- * same attribute.  Verify that a link error is generated.
+ * Link two vertex shaders.  One has an explicit location for an attribute, and
+ * the other does not.  Verify that linking is successful and that the attribute
+ * has the correct location.
  *
  * \author Ian Romanick
  */
@@ -47,6 +48,7 @@ void piglit_init(int argc, char **argv)
 	GLint vert[2];
 	GLint prog;
 	GLboolean ok;
+	GLint loc;
 
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
@@ -80,6 +82,14 @@ void piglit_init(int argc, char **argv)
 	ok = piglit_link_check_status(prog);
 	if (!ok)
 		piglit_report_result(PIGLIT_FAILURE);
+
+	loc = glGetAttribLocation(prog, "vertex");
+	if (loc != 0) {
+		fprintf(stderr,
+			"Expected location of 'vertex' to be 0, got %d "
+			"instead.\n", loc);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
 
 	piglit_report_result(PIGLIT_SUCCESS);
 }
