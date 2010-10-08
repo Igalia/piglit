@@ -55,7 +55,7 @@ static PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform_func = NULL;
 static PFNGLGETATTACHEDSHADERSPROC glGetAttachedShaders_func = NULL;
 static PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_func = NULL;
 static PFNGLGETPROGRAMIVPROC glGetProgramiv_func = NULL;
-static PFNGLGETPROGRAMINFOLOGPROC glGetPrograminfolog_func = NULL;
+static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog_func = NULL;
 static PFNGLGETSHADERIVPROC glGetShaderiv_func = NULL;
 static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog_func = NULL;
 static PFNGLGETSHADERSOURCEPROC glGetShaderSource_func = NULL;
@@ -111,7 +111,7 @@ ShaderAPITest::get_ext_procs(void)
 	glGetAttachedShaders_func = (PFNGLGETATTACHEDSHADERSPROC) GLUtils::getProcAddress("glGetAttachedShaders");
 	glGetAttribLocation_func = (PFNGLGETATTRIBLOCATIONPROC) GLUtils::getProcAddress("glGetAttribLocation");
 	glGetProgramiv_func = (PFNGLGETPROGRAMIVPROC) GLUtils::getProcAddress("glGetProgramiv");
-	glGetPrograminfolog_func = (PFNGLGETPROGRAMINFOLOGPROC) GLUtils::getProcAddress("glGetPrograminfolog");
+	glGetProgramInfoLog_func = (PFNGLGETPROGRAMINFOLOGPROC) GLUtils::getProcAddress("glGetProgramInfoLog");
 	glGetShaderiv_func = (PFNGLGETSHADERIVPROC) GLUtils::getProcAddress("glGetShaderiv");
 	glGetShaderInfoLog_func = (PFNGLGETSHADERINFOLOGPROC) GLUtils::getProcAddress("glGetShaderInfoLog");
 	glGetShaderSource_func = (PFNGLGETSHADERSOURCEPROC) GLUtils::getProcAddress("glGetShaderSource");
@@ -193,7 +193,9 @@ ShaderAPITest::assert_error_test(const char *file, int line, GLenum expect)
 
 
 void
-ShaderAPITest::check_status(GLuint id, GLenum pname, void (APIENTRY *query)(GLuint, GLenum, GLint *))
+ShaderAPITest::check_status(GLuint id, GLenum pname,
+			    void (APIENTRY *query)(GLuint, GLenum, GLint *),
+			    void (APIENTRY *get_log)(GLuint, GLsizei, GLsizei *, GLchar *))
 {
 	GLint status;
 
@@ -202,7 +204,7 @@ ShaderAPITest::check_status(GLuint id, GLenum pname, void (APIENTRY *query)(GLui
 		char info[65536];
 
 		fprintf(stderr, "Compilation/link failure:\n");
-		glGetShaderInfoLog_func(id, sizeof(info), NULL, info);
+		get_log(id, sizeof(info), NULL, info);
 		fprintf(stderr, "%s\n", info);
 
 		error = true;
@@ -213,14 +215,16 @@ ShaderAPITest::check_status(GLuint id, GLenum pname, void (APIENTRY *query)(GLui
 void
 ShaderAPITest::check_compile_status(GLuint id)
 {
-	check_status(id, GL_COMPILE_STATUS, glGetShaderiv_func);
+	check_status(id, GL_COMPILE_STATUS, glGetShaderiv_func,
+		     glGetShaderInfoLog_func);
 }
 
 
 void
 ShaderAPITest::check_link_status(GLuint id)
 {
-	check_status(id, GL_LINK_STATUS, glGetProgramiv_func);
+	check_status(id, GL_LINK_STATUS, glGetProgramiv_func,
+		     glGetProgramInfoLog_func);
 }
 
 

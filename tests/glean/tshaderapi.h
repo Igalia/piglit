@@ -65,7 +65,9 @@ private:
 	void assert_no_error_test(const char *file, int line);
 	void assert_error_test(const char *file, int line, GLenum expect);
 
-	void check_status(GLuint id, GLenum pname, void (APIENTRY *query)(GLuint, GLenum, GLint *));
+	void check_status(GLuint id, GLenum pname,
+			  void (APIENTRY *query)(GLuint, GLenum, GLint *),
+			  void (APIENTRY *get_log)(GLuint, GLsizei, GLsizei *, GLchar *));
 	void check_compile_status(GLuint id);
 	void check_link_status(GLuint id);
 
