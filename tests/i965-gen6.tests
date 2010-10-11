@@ -109,15 +109,6 @@ del profile.tests['shaders']['glsl-lod-bias']
 del profile.tests['shaders']['glsl-fs-texture2d-bias']
 del profile.tests['shaders']['glsl-fs-texture2dproj-bias']
 del profile.tests['shaders']['glsl-fs-texture2dproj-bias-2']
-del profile.tests['shaders']['glsl-vs-mat-add-1']
-
-# untested, maybe like glsl-vs-mat-add-1?
-del profile.tests['shaders']['glsl-vs-mat-div-1']
-del profile.tests['shaders']['glsl-vs-mat-div-2']
-del profile.tests['shaders']['glsl-vs-mat-mul-1']
-del profile.tests['shaders']['glsl-vs-mat-mul-2']
-del profile.tests['shaders']['glsl-vs-mat-mul-3']
-del profile.tests['shaders']['glsl-vs-mat-sub-1']
 
 # crashes the server?!
 del profile.tests['shaders']['glsl-reload-source']
