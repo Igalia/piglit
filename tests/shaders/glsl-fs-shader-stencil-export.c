@@ -40,7 +40,6 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	int x, y;
 	float p[4];
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
