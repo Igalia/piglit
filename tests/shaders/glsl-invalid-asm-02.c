@@ -1,0 +1,110 @@
+/*
+ * Copyright © 2010 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/**
+ * \file glsl-invalid-asm-02.c
+ * Attempting to render with an invalid ARB_vp shader should generate an error.
+ *
+ * Based on code inspection it was found that Mesa does not correctly generate
+ * the draw-time error if a GLSL shader is used with an invalid assembly
+ * (GL_ARB_vertex_program or GL_ARB_fragment_program) program.  This test
+ * attempts to reproduce this failure using an assembly vertex program.
+ */
+#include "piglit-util.h"
+
+static const char fs_text[] =
+	"void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }";
+
+static const char vp_text[] =
+	"this won't compile";
+
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+enum piglit_result
+piglit_display(void)
+{
+	static GLboolean logged = GL_FALSE;
+	GLboolean pass = GL_TRUE;
+	GLenum err;
+
+	glClearColor(0.5, 0.5, 0.5, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	piglit_draw_rect(-1.0, -1.0, 2.0, 2.0);
+
+        err = glGetError();
+        if (err != GL_INVALID_OPERATION) {
+		if (!logged) {
+			printf("Unexpected OpenGL error state 0x%04x with bad "
+			       "vertex program at draw (expected 0x%04x).\n",
+			       err, GL_INVALID_OPERATION);
+			logged = GL_TRUE;
+		}
+
+		pass = GL_FALSE;
+        }
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	GLuint fs;
+	GLuint vp;
+	GLuint prog;
+	GLenum err;
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_require_extension("GL_ARB_vertex_program");
+
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
+	prog = piglit_link_simple_program(fs, 0);
+	glUseProgram(prog);
+
+	glGenProgramsARB(1, &vp);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vp);
+	glProgramStringARB(GL_VERTEX_PROGRAM_ARB,
+                           GL_PROGRAM_FORMAT_ASCII_ARB,
+                           strlen(vp_text),
+                           (const GLubyte *) vp_text);
+
+        err = glGetError();
+        if (err != GL_INVALID_OPERATION) {
+                printf("Unexpected OpenGL error state 0x%04x with bad "
+		       "vertex program (expected 0x%04x).\n",
+		       err, GL_INVALID_OPERATION);
+		piglit_report_result(PIGLIT_FAILURE);
+        }
+
+	glEnable(GL_VERTEX_PROGRAM_ARB);
+
+	/* Clear all GL error state.
+	 */
+	while (glGetError() != 0)
+		/* empty */ ;
+}
