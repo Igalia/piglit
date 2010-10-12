@@ -31,7 +31,7 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 400, piglit_height = 300;
+int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static GLint progr;
@@ -41,15 +41,10 @@ static GLint fsg;
 static GLint vs;
 static GLuint list;
 
-static GLfloat vertices[12] = {150.0, 125.0, 0.0,
-				150.0, 175.0, 0.0,
-				100.0, 125.0, 0.0,
-				100.0, 175.0, 0.0};
-
 static const char *vertShaderText =
 	"void main()\n"
 	"{ \n"
-	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+	"	gl_Position = gl_Vertex;\n"
 	"} \n";
 
 static const char *fragShaderTextRed =
@@ -75,11 +70,6 @@ compileLinkProg(void)
 	progr = piglit_link_simple_program(vs, fsr);
 	progg = piglit_link_simple_program(vs, fsg);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
-				vertices);
-
-	glEnableVertexAttribArray(0);
-
 	list = glGenLists(1);
 	glNewList(list, GL_COMPILE);
 		glUseProgram(progg);
@@ -94,8 +84,6 @@ piglit_init(int argc, char **argv)
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
-
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 
@@ -113,11 +101,10 @@ piglit_display(void)
 	glUseProgram(progr);
 	glCallList(list);
 
-	glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+	piglit_draw_rect(-0.5, -0.5, 1.0, 1.0);
+	pass = piglit_probe_pixel_rgb(piglit_width / 2, piglit_height / 2,
+				      green);
 
-	pass = piglit_probe_pixel_rgb(125, 150, green);
-
-	glFinish();
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
