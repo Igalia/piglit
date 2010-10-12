@@ -22,6 +22,12 @@ if echo "$output" | grep -q '^PIGLIT.*pass'; then
     exit 1
 fi
 
+# Report a valgrind error for glean tests without any failures.
+if echo "$output" | grep -qv 'FAIL'; then
+   echo "PIGLIT: {'result': 'fail' }"
+   exit 1
+fi
+
 # Otherwise, the underlying test failed, so we simply report a piglit
 # skip for this valgrind test.
 echo "$output" | grep -v 'PIGLIT'
