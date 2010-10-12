@@ -36,32 +36,31 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static GLint progr;
 static GLint progg;
-static GLint fsr;
-static GLint fsg;
-static GLint vs;
 static GLuint list;
 
-static const char *vertShaderText =
-	"void main()\n"
-	"{ \n"
-	"	gl_Position = gl_Vertex;\n"
-	"} \n";
+static const char vertShaderText[] =
+	"void main() { gl_Position = gl_Vertex; }";
 
-static const char *fragShaderTextRed =
-	"void main()\n"
-	"{ \n"
-	"	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
-	"} \n";
+static const char fragShaderTextRed[] =
+	"void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }";
 
-static const char *fragShaderTextGreen =
-	"void main()\n"
-	"{ \n"
-	"	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-	"} \n";
+static const char fragShaderTextGreen[] =
+	"void main() { gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0); }";
 
-static void
-compileLinkProg(void)
+void
+piglit_init(int argc, char **argv)
 {
+	GLint fsr;
+	GLint fsg;
+	GLint vs;
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	glClearColor(0.2, 0.2, 0.2, 1.0);
+
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
 	fsr = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderTextRed);
 	fsg =
@@ -74,26 +73,12 @@ compileLinkProg(void)
 	glNewList(list, GL_COMPILE);
 		glUseProgram(progg);
 	glEndList();
-
-}
-
-void
-piglit_init(int argc, char **argv)
-{
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
-
-	glClearColor(0.2, 0.2, 0.2, 1.0);
-
-	compileLinkProg();
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	GLfloat green[3] = {0.0, 1.0, 0.0};
+	static const GLfloat green[3] = {0.0, 1.0, 0.0};
 	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
