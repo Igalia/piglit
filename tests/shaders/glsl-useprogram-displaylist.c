@@ -67,44 +67,13 @@ static const char *fragShaderTextGreen =
 static void
 compileLinkProg(void)
 {
-	GLint stat;
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
+	fsr = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderTextRed);
+	fsg =
+	  piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderTextGreen);
 
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	fsr = glCreateShader(GL_FRAGMENT_SHADER);
-	fsg = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vs, 1, (const GLchar **) &vertShaderText, NULL);
-	glShaderSource(fsr, 1, (const GLchar **) &fragShaderTextRed, NULL);
-	glShaderSource(fsg, 1, (const GLchar **) &fragShaderTextGreen, NULL);
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		printf("error compiling vertex shader!\n");
-		exit(1);
-	}
-	glCompileShader(fsr);
-	glGetShaderiv(fsr, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		printf("error compiling fragment red shader!\n");
-		exit(1);
-	}
-
-	glCompileShader(fsg);
-	glGetShaderiv(fsg, GL_COMPILE_STATUS, &stat);
-	if(!stat) {
-		printf("error compiling fragment green shader!\n");
-		exit(1);
-	}
-
-	progr = glCreateProgram();
-	glAttachShader(progr, vs);
-	glAttachShader(progr, fsr);
-	glLinkProgram(progr);
-
-	progg = glCreateProgram();
-	glAttachShader(progg, vs);
-	glAttachShader(progg, fsg);
-	glLinkProgram(progg);
-
+	progr = piglit_link_simple_program(vs, fsr);
+	progg = piglit_link_simple_program(vs, fsg);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
 				vertices);
