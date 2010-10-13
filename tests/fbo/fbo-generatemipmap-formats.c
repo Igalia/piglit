@@ -617,6 +617,32 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 		}
 	}
 
+	/* Clamp the bits for the framebuffer, except we aren't checking
+	 * the actual framebuffer bits.
+	 */
+	if (l_size > 8)
+		l_size = 8;
+	if (i_size > 8)
+		i_size = 8;
+	if (r_size > 8)
+		r_size = 8;
+	if (g_size > 8)
+		g_size = 8;
+	if (b_size > 8)
+		b_size = 8;
+	if (a_size > 8)
+		a_size = 8;
+
+	if (d_size) {
+		piglit_set_tolerance_for_bits(8, 8, 8, 8);
+	} else if (i_size) {
+		piglit_set_tolerance_for_bits(i_size, i_size, i_size, i_size);
+	} else if (l_size) {
+		piglit_set_tolerance_for_bits(l_size, l_size, l_size, a_size);
+	} else {
+		piglit_set_tolerance_for_bits(r_size, g_size, b_size, a_size);
+	}
+
 	pass = pass && piglit_probe_rect_rgba(x1, y1, half, half, r);
 	pass = pass && piglit_probe_rect_rgba(x2, y1, half, half, g);
 	pass = pass && piglit_probe_rect_rgba(x1, y2, half, half, b);
