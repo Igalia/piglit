@@ -373,6 +373,12 @@ shaders['glsl-fs-texturecube-2'] = PlainExecTest(['glsl-fs-texturecube-2',
 						 '-auto'])
 shaders['glsl-fs-texturecube-2-bias'] = PlainExecTest(['glsl-fs-texturecube-2',
 						      '-auto', '-bias'])
+shaders['glsl-fs-texture2drect'] = PlainExecTest(['glsl-fs-texturerect',
+					       '-auto'])
+shaders['glsl-fs-texture2drect-proj3'] = PlainExecTest(['glsl-fs-texturerect',
+							'-auto', '-proj3'])
+shaders['glsl-fs-texture2drect-proj4'] = PlainExecTest(['glsl-fs-texturerect',
+							'-auto', '-proj4'])
 add_shader_generic(shaders, 'glsl-fs-uniform-array-1')
 add_shader_generic(shaders, 'glsl-fs-uniform-array-2')
 add_shader_generic(shaders, 'glsl-fs-uniform-array-3')
