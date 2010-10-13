@@ -240,7 +240,6 @@ piglit_display(void)
 		}
 	}
 
-	glFinish();
 	glutSwapBuffers();
 
 	printf(" Left to Right: ALPHA, LUMINANCE, INTENSITY\n Top to Bottom: LESS, LEQUAL, GREATER, GEQUAL, ALWAYS, NEVER, NOTEQUAL, EQUAL\n");
