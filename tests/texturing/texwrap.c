@@ -195,7 +195,7 @@ static void sample_nearest(int x, int y, int z,
                            GLenum wrap_mode, GLenum filter,
                            unsigned char pixel[4])
 {
-    unsigned sample_border;
+    unsigned sample_border = 0;
     float border_factor = 0;
     int coords[3] = {x, y, z};
     unsigned i;
