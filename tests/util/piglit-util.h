@@ -117,6 +117,7 @@ GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
 GLuint piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		    GLboolean alpha);
 GLuint piglit_depth_texture(GLenum format, int w, int h, GLboolean mip);
+void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
 
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
