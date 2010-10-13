@@ -21,6 +21,7 @@ link_libraries (
 	${GLEW_glew_LIBRARY}
 )
 
+add_executable (activeprogram-bad-program activeprogram-bad-program.c)
 add_executable (ati-fs-bad-delete ati-fs-bad-delete.c)
 add_executable (trinity-fp1 trinity-fp1.c)
 add_executable (fp-abs-01 fp-abs-01.c)
