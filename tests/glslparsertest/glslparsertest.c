@@ -69,10 +69,14 @@ test(void)
 	}
 
 	if (!GLEW_VERSION_2_0) {
-		if (type == GL_FRAGMENT_SHADER && !GLEW_ARB_fragment_shader)
+		if (type == GL_FRAGMENT_SHADER && !GLEW_ARB_fragment_shader) {
+			fprintf(stderr, "Test requires OpenGL 2.0 or GL_ARB_fragment_shader\n");
 			piglit_report_result(PIGLIT_SKIP);
-		if (type == GL_VERTEX_SHADER && !GLEW_ARB_vertex_shader)
+		}
+		if (type == GL_VERTEX_SHADER && !GLEW_ARB_vertex_shader) {
+			fprintf(stderr, "Test requires OpenGL 2.0 or GL_ARB_vertex_shader\n");
 			piglit_report_result(PIGLIT_SKIP);
+		}
 	}
 
 	err = stat(filename, &st);
@@ -211,6 +215,10 @@ int main(int argc, char**argv)
 		? 0.0 : strtod(glsl_version_string, NULL);
 
 	if (glsl_version < minimum_version) {
+		fprintf(stderr,
+			"GLSL version is %f, but minimum version %f is required\n",
+			glsl_version,
+			minimum_version);
 		piglit_report_result(PIGLIT_SKIP);
 	} else {
 		test();
