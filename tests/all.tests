@@ -595,6 +595,7 @@ add_shader_generic(shaders, 'glsl-override-builtin')
 add_plain_test(shaders, 'glsl-kwin-blur')
 add_plain_test(shaders, 'useprogram-inside-begin')
 add_plain_test(shaders, 'useshaderprogram-bad-type-01')
+add_plain_test(shaders, 'useshaderprogram-bad-type-02')
 
 fpgeneric = Group()
 def add_fpgeneric(name):
