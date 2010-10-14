@@ -1,0 +1,35 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 texcoords;
+
+void main()
+{
+        gl_Position = gl_Vertex;
+        texcoords = (gl_Vertex.xy + 1.0) / 2.0;
+}
+
+[fragment shader]
+uniform sampler2D tex;
+uniform float f;
+varying vec2 texcoords;
+
+void main()
+{
+	float a = texture2D(tex, texcoords).a;
+
+	/* always false */
+	if (f < 0.0)
+		a *= 2.0;
+
+	gl_FragColor = vec4(a);
+}
+
+[test]
+uniform int tex 0
+uniform float f 1.0
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
