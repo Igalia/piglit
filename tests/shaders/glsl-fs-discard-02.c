@@ -75,10 +75,8 @@ static GLuint setup_shaders()
 
 static GLboolean test()
 {
-	GLint prog, location;
+	GLint prog;
 	GLboolean pass = GL_TRUE;
-	int i;
-	float red[4] =   {1, 0, 0, 0};
 	float green[4] = {0, 1, 0, 0};
 
 	prog = setup_shaders();
