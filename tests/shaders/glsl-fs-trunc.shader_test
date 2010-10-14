@@ -1,0 +1,31 @@
+[require]
+GL >= 2.0
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+    /* Divide by 10 to get a decimal part */
+    float x = gl_FragCoord.x / 10.0;
+
+    /* Divide by 25.0 to bring it into the [0, 1] range. */
+    gl_FragColor = vec4(trunc(x) / 25.0, -trunc(-x) / 25.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 0 0 250 250
+probe rgb   1   1 0.00 0.00 0
+probe rgb  63  63 0.24 0.24 0
+probe rgb 125 125 0.48 0.48 0
+probe rgb 249 249 0.96 0.96 0
