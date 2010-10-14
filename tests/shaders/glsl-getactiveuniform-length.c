@@ -76,7 +76,7 @@ piglit_init(int argc, char **argv)
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_MAX_LENGTH, &len);
 	if (len != strlen("color") + 1) {
 		printf("Unexpected max active uniform length "
-		       "(saw %d, expected %d)\n", len, strlen("color") + 1);
+		       "(saw %d, expected %lu)\n", len, (unsigned long) strlen("color") + 1);
 		pass = GL_FALSE;
 	}
 
@@ -89,8 +89,8 @@ piglit_init(int argc, char **argv)
 	glGetActiveUniform(prog, 0, len + 20, &ret_len, &size, &type, name);
 	if (ret_len != strlen("color")) {
 		printf("Unexpected active uniform length "
-		       "(saw %d, expected %d) for \"%s\"\n",
-		       ret_len, strlen("color"), name);
+		       "(saw %d, expected %lu) for \"%s\"\n",
+		       ret_len, (unsigned long) strlen("color"), name);
 		pass = GL_FALSE;
 	}
 
