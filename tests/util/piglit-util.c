@@ -1057,6 +1057,6 @@ char *strchrnul(const char *s, int c)
 {
 	char *t = strchr(s, c);
 
-	return (t == NULL) ? (s + strlen(s)) : t;
+	return (t == NULL) ? ((char *) s + strlen(s)) : t;
 }
 #endif
