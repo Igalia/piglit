@@ -196,6 +196,7 @@ def add_shader_generic(group, name):
 add_plain_test(shaders, 'activeprogram-bad-program')
 add_plain_test(shaders, 'activeprogram-get')
 add_plain_test(shaders, 'ati-fs-bad-delete')
+add_plain_test(shaders, 'createshaderprogram-bad-type')
 add_plain_test(shaders, 'trinity-fp1')
 add_plain_test(shaders, 'fp-abs-01')
 add_plain_test(shaders, 'fp-abs-02')
