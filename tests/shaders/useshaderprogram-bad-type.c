@@ -23,11 +23,11 @@
 
 /**
  * \file useshaderprogram-bad-type-common.c
- * Common code for useshaderprogram-bad-type tests.
+ * Call glUseShaderProgramEXT with various program types, verify results
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
-#include "useshaderprogram-bad-type-common.h"
+#include "piglit-util.h"
 
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
@@ -38,10 +38,10 @@ piglit_display(void)
 	return PIGLIT_FAILURE;
 }
 
-void
-try_UseShaderProgram(GLenum type)
+GLboolean
+try_UseShaderProgram(GLenum type, GLenum expect)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	GLboolean pass = GL_TRUE;
 	GLenum err;
 
 	/* There shouldn't be any GL errors, but clear them all just to be
@@ -56,13 +56,43 @@ try_UseShaderProgram(GLenum type)
 	glUseShaderProgramEXT(type, 0);
 
 	err = glGetError();
-	if (err != GL_INVALID_ENUM) {
+	if (err != expect) {
 		printf("Unexpected OpenGL error state 0x%04x for "
 		       "glUseShaderProgramEXT called with\n"
-		       "an invalid shader target 0x%04x (expected 0x%04x).\n",
-		       err, type, GL_INVALID_ENUM);
-		result = PIGLIT_FAILURE;
+		       "the %sshader target 0x%04x (expected 0x%04x).\n",
+		       err, (expect == 0) ? "" : "invalid ", type, expect);
+		pass = GL_FALSE;
 	}
 
-	piglit_report_result(result);
+	while (glGetError() != 0)
+		/* empty */ ;
+
+	return pass;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	const GLenum expect = (GLEW_ARB_geometry_shader4
+			       || GLEW_EXT_geometry_shader4
+			       || GLEW_NV_geometry_shader4)
+		? 0 : GL_INVALID_ENUM;
+	GLboolean pass;
+
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_require_extension("GL_EXT_separate_shader_objects");
+
+	pass = try_UseShaderProgram(GL_PROXY_TEXTURE_3D, GL_INVALID_ENUM);
+	pass = try_UseShaderProgram(GL_VERTEX_SHADER, 0)
+		&& pass;
+	pass = try_UseShaderProgram(GL_FRAGMENT_SHADER, 0)
+		&& pass;
+	pass = try_UseShaderProgram(GL_GEOMETRY_SHADER_ARB, expect)
+		&& pass;
+
+	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
 }
