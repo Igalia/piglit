@@ -1,0 +1,15 @@
+// Expected: PASS, glsl == 1.30
+//
+// Description: bit-shift-assign with argument type (int, int)
+//
+// From page 50 (page 56 of PDF) of the GLSL 1.30 spec:
+// "the operands must be signed or unsigned integers or integer vectors. [...]
+// In all cases, the resulting type will be the same type as the left
+// operand."
+
+#version 130
+void main() {
+    int x = 4;
+    x <<= 1;
+    x >>= 1;
+}
