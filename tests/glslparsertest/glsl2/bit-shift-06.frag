@@ -26,14 +26,14 @@ void main() {
     // uvecN = uvecN << ivecN -----------------
 
     // uvec2 = uvec2 << ivec2
-    ivec2 v06 = ivec2(0, 1) << uvec2(0, 1);
-    ivec2 v07 = ivec2(0, 1) >> uvec2(0, 1);
+    uvec2 v06 = uvec2(0, 1) << ivec2(0, 1);
+    uvec2 v07 = uvec2(0, 1) >> ivec2(0, 1);
 
     // uvec3 = uvec3 << ivec3
-    ivec3 v08 = ivec3(0, 1, 2) << uvec3(0, 1, 2);
-    ivec3 v09 = ivec3(0, 1, 2) >> uvec3(0, 1, 2);
+    uvec3 v08 = uvec3(0, 1, 2) << ivec3(0, 1, 2);
+    uvec3 v09 = uvec3(0, 1, 2) >> ivec3(0, 1, 2);
 
     // uvec4 = uvec4 << ivec4
-    ivec4 v10 = ivec4(0, 1, 2, 3) << uvec4(0, 1, 2, 3);
-    ivec4 v11 = ivec4(0, 1, 2, 3) >> uvec4(0, 1, 2, 3);
+    uvec4 v10 = uvec4(0, 1, 2, 3) << ivec4(0, 1, 2, 3);
+    uvec4 v11 = uvec4(0, 1, 2, 3) >> ivec4(0, 1, 2, 3);
 }
