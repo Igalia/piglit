@@ -617,34 +617,62 @@ piglit_compile_shader_text(GLenum target, const char *text)
 	return prog;
 }
 
-GLboolean
-piglit_link_check_status(GLint prog)
+static GLboolean
+link_check_status(GLint prog, FILE *output)
 {
-	GLchar *info;
+	GLchar *info = NULL;
 	GLint size;
 	GLint ok;
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 
+	/* Some drivers return a size of 1 for an empty log.  This is the size
+	 * of a log that contains only a terminating NUL character.
+	 */
 	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-	info = malloc(size);
-
-	glGetProgramInfoLog(prog, size, NULL, info);
-	if (!ok) {
-		fprintf(stderr, "Failed to link: %s\n", info);
+	if (size > 1) {
+		info = malloc(size);
+		glGetProgramInfoLog(prog, size, NULL, info);
 	}
-	else if (0) {
+
+	if (!ok) {
+		fprintf(output, "Failed to link: %s\n",
+			(info != NULL) ? info : "<empty log>");
+	}
+	else if (0 && info != NULL) {
 		/* Enable this to get extra linking info.
 		 * Even if there's no link errors, the info log may
 		 * have some remarks.
 		 */
-		fprintf(stderr, "Linker warning: %s\n", info);
+		printf("Linker warning: %s\n", info);
 	}
 
 	free(info);
 
 	return ok;
 }
+
+GLboolean
+piglit_link_check_status(GLint prog)
+{
+	return link_check_status(prog, stderr);
+}
+
+/**
+ * Check link status
+ *
+ * Similar to piglit_link_check_status except it logs error messages
+ * to standard output instead of standard error.  This is useful for
+ * tests that want to produce negative link results.
+ *
+ * \sa piglit_link_check_status
+ */
+GLboolean
+piglit_link_check_status_quiet(GLint prog)
+{
+	return link_check_status(prog, stdout);
+}
+
 
 GLint piglit_link_simple_program(GLint vs, GLint fs)
 {

@@ -42,33 +42,6 @@ piglit_display(void)
 	return PIGLIT_FAILURE;
 }
 
-/**
- * Don't use piglit_link_check_status because it will log a message to stderr
- * when the link fails.  Since this test wants the link to fail, logging an
- * error message will cause the test to be listed as "warn" instead of "pass".
- */
-GLboolean
-link_check_status(GLint prog)
-{
-	GLint ok;
-
-	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	if (!ok) {
-		GLchar *info;
-		GLint size;
-
-		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		info = malloc(size);
-
-		glGetProgramInfoLog(prog, size, NULL, info);
-		printf("Failed to link: %s\n", info);
-
-		free(info);
-	}
-
-	return ok;
-}
-
 void piglit_init(int argc, char **argv)
 {
 	GLint vert[2];
@@ -93,7 +66,7 @@ void piglit_init(int argc, char **argv)
 	glAttachShader(prog, vert[1]);
 	glLinkProgram(prog);
 
-	ok = link_check_status(prog);
+	ok = piglit_link_check_status_quiet(prog);
 	if (ok)
 		fprintf(stderr,
 			"Linking with conflicting explicit locations "
