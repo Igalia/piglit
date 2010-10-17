@@ -72,6 +72,7 @@ piglit_init(int argc, char **argv)
 
 	glBegin(GL_TRIANGLE_STRIP);
 	glUseProgram(0);
+	glEnd();
 
 	err = glGetError();
 	if (err != GL_INVALID_OPERATION) {
@@ -81,8 +82,6 @@ piglit_init(int argc, char **argv)
 		       err, GL_INVALID_OPERATION);
 		result = PIGLIT_FAILURE;
 	}
-
-	glEnd();
 
 	while (glGetError() != 0)
 		/* empty */ ;
@@ -94,6 +93,7 @@ piglit_init(int argc, char **argv)
 
 	glBegin(GL_TRIANGLE_STRIP);
 	glUseProgram(prog);
+	glEnd();
 
 	err = glGetError();
 	if (err != GL_INVALID_OPERATION) {
@@ -103,8 +103,6 @@ piglit_init(int argc, char **argv)
 		       err, GL_INVALID_OPERATION);
 		result = PIGLIT_FAILURE;
 	}
-
-	glEnd();
 
 	piglit_report_result(result);
 }
