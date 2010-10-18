@@ -110,5 +110,7 @@ del profile.tests['shaders']['glsl-fs-texture2d-bias']
 del profile.tests['shaders']['glsl-fs-texture2dproj-bias']
 del profile.tests['shaders']['glsl-fs-texture2dproj-bias-2']
 
-# crashes the server?!
-del profile.tests['shaders']['glsl-reload-source']
+# Z writes hang GPU. bug #30392
+del profile.tests['fbo']['fbo-blit-d24s8']
+del profile.tests['glean']['fp1-Z-write test']
+del profile.tests['glean']['glsl1-gl_FragDepth writing']
