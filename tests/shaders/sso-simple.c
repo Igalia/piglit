@@ -22,7 +22,7 @@
  */
 
 /**
- * \file sso-01.c
+ * \file sso-simple.c
  * Simple GL_EXT_separate_shader_objects rendering test
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
