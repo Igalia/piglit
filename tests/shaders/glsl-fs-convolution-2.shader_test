@@ -1,0 +1,116 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 texcoords;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	texcoords = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+varying vec4 texcoords;
+uniform sampler2D tex;
+
+#define FILTER_SIZE 34
+uniform vec2 o[FILTER_SIZE];
+uniform float c[FILTER_SIZE];
+
+/* Testcase from Owen Taylor of a shader being experimented with in
+ * gnome-shell that failed on i965 due to register allocation.
+*
+* Unlike glsl-fs-convolution-1, this one prevented loop unrolling by
+* using more iterations.
+ */
+void main()
+{
+	vec4 value = vec4(0.0);
+	for (int i = 0; i < FILTER_SIZE; i++) {
+		value += c[i] * texture2D(tex, texcoords.xy + o[i]);
+	}
+
+	gl_FragColor = value;
+}
+
+[test]
+uniform int tex 0
+
+uniform float c[0] 0.0
+uniform float c[1] 0.0
+uniform float c[2] 0.0
+uniform float c[3] 0.0
+uniform float c[4] 0.0
+uniform float c[5] 0.0
+uniform float c[6] 0.0
+uniform float c[7] 0.0
+uniform float c[8] 0.0
+uniform float c[9] 0.0
+uniform float c[10] 0.0
+uniform float c[11] 0.0
+uniform float c[12] 0.0
+uniform float c[13] 0.0
+uniform float c[14] 0.0
+uniform float c[15] 0.0
+uniform float c[16] 0.0
+uniform float c[17] 0.0
+uniform float c[18] 0.0
+uniform float c[19] 0.0
+uniform float c[20] 1.0
+uniform float c[21] 0.0
+uniform float c[22] 0.0
+uniform float c[23] 0.0
+uniform float c[24] 0.0
+uniform float c[25] 0.0
+uniform float c[26] 0.0
+uniform float c[27] 0.0
+uniform float c[28] 0.0
+uniform float c[29] 0.0
+uniform float c[30] 0.0
+uniform float c[31] 0.0
+uniform float c[32] 0.0
+uniform float c[33] 0.0
+
+uniform vec2 o[0] -1.0 1.0
+uniform vec2 o[1] -1.0 1.0
+uniform vec2 o[2] -1.0 1.0
+uniform vec2 o[3] -1.0 1.0
+uniform vec2 o[4] -1.0 1.0
+uniform vec2 o[5] -1.0 1.0
+uniform vec2 o[6] -1.0 1.0
+uniform vec2 o[7] -1.0 1.0
+uniform vec2 o[8] -1.0 1.0
+uniform vec2 o[9] -1.0 1.0
+uniform vec2 o[10] -1.0 1.0
+uniform vec2 o[11] -1.0 1.0
+uniform vec2 o[12] -1.0 1.0
+uniform vec2 o[13] -1.0 1.0
+uniform vec2 o[14] -1.0 1.0
+uniform vec2 o[15] -1.0 1.0
+uniform vec2 o[16] -1.0 1.0
+uniform vec2 o[17] -1.0 1.0
+uniform vec2 o[18] -1.0 1.0
+uniform vec2 o[19] -1.0 1.0
+uniform vec2 o[20] 0.0 0.0
+uniform vec2 o[21] -1.0 1.0
+uniform vec2 o[22] -1.0 1.0
+uniform vec2 o[23] -1.0 1.0
+uniform vec2 o[24] -1.0 1.0
+uniform vec2 o[25] -1.0 1.0
+uniform vec2 o[26] -1.0 1.0
+uniform vec2 o[27] -1.0 1.0
+uniform vec2 o[28] -1.0 1.0
+uniform vec2 o[29] -1.0 1.0
+uniform vec2 o[30] -1.0 1.0
+uniform vec2 o[31] -1.0 1.0
+uniform vec2 o[32] -1.0 1.0
+uniform vec2 o[33] -1.0 1.0
+
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (1.0, 0.0, 0.0)
+relative probe rgb (0.75, 0.25) (0.0, 1.0, 0.0)
+relative probe rgb (0.25, 0.75) (0.0, 0.0, 1.0)
+relative probe rgb (0.75, 0.75) (1.0, 1.0, 1.0)
