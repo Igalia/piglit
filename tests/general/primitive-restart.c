@@ -154,6 +154,36 @@ test_begin_end(GLenum primMode)
 }
 
 
+static void
+enable_restart(GLuint restart_index)
+{
+   if (TestGL31) {
+#ifdef GL_VERSION_3_1
+      glEnable(GL_PRIMITIVE_RESTART);
+      glPrimitiveRestartIndex(restart_index);
+#endif
+   }
+   else {
+      glEnableClientState(GL_PRIMITIVE_RESTART_NV);
+      glPrimitiveRestartIndexNV(restart_index);
+   }
+}
+
+
+static void
+disable_restart(void)
+{
+   if (TestGL31) {
+#ifdef GL_VERSION_3_1
+      glDisable(GL_PRIMITIVE_RESTART);
+#endif
+   }
+   else {
+      glDisableClientState(GL_PRIMITIVE_RESTART_NV);
+   }
+}
+
+
 /**
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
@@ -219,7 +249,6 @@ test_draw_elements(GLenum primMode, GLenum indexType)
 
       glLineWidth(5.0);
 
-
       for (i = 0; i < NUM_VERTS; i++) {
          verts[i][0] = x;
          verts[i][1] = y;
@@ -256,59 +285,36 @@ test_draw_elements(GLenum primMode, GLenum indexType)
    glEnableClientState(GL_VERTEX_ARRAY);
 
    assert(glGetError()==0);
-   /* Setup prim restart */
-   if (TestGL31) {
-#ifdef GL_VERSION_3_1
-      glEnable(GL_PRIMITIVE_RESTART);
-      glPrimitiveRestartIndex(restart_index);
-#endif
-   }
-   else {
-      glEnableClientState(GL_PRIMITIVE_RESTART_NV);
-      glPrimitiveRestartIndexNV(restart_index);
-   }
+   enable_restart(restart_index);
 
    /* Draw */
-   if (0) {
-      /* XXX also test non-indexed drawing someday */
-      glDrawArrays(primMode, 0, NUM_VERTS);
-   }
-   else {
-      switch (indexType) {
-      case GL_UNSIGNED_BYTE:
-         {
-            GLubyte ub_elements[NUM_ELEMS];
-            int i;
-            for (i = 0; i < num_elems; i++)
-               ub_elements[i] = (GLubyte) elements[i];
-            glDrawElements(primMode, num_elems, GL_UNSIGNED_BYTE, ub_elements);
-         }
-         break;
-      case GL_UNSIGNED_SHORT:
-         {
-            GLushort us_elements[NUM_ELEMS];
-            int i;
-            for (i = 0; i < num_elems; i++)
-               us_elements[i] = (GLushort) elements[i];
-            glDrawElements(primMode, num_elems, GL_UNSIGNED_SHORT, us_elements);
-         }
-         break;
-      case GL_UNSIGNED_INT:
-         glDrawElements(primMode, num_elems, GL_UNSIGNED_INT, elements);
-         break;
-      default:
-         assert(0);
+   switch (indexType) {
+   case GL_UNSIGNED_BYTE:
+      {
+         GLubyte ub_elements[NUM_ELEMS];
+         int i;
+         for (i = 0; i < num_elems; i++)
+            ub_elements[i] = (GLubyte) elements[i];
+         glDrawElements(primMode, num_elems, GL_UNSIGNED_BYTE, ub_elements);
       }
+      break;
+   case GL_UNSIGNED_SHORT:
+      {
+         GLushort us_elements[NUM_ELEMS];
+         int i;
+         for (i = 0; i < num_elems; i++)
+            us_elements[i] = (GLushort) elements[i];
+         glDrawElements(primMode, num_elems, GL_UNSIGNED_SHORT, us_elements);
+      }
+      break;
+   case GL_UNSIGNED_INT:
+      glDrawElements(primMode, num_elems, GL_UNSIGNED_INT, elements);
+      break;
+   default:
+      assert(0);
    }
 
-   if (TestGL31) {
-#ifdef GL_VERSION_3_1
-      glDisable(GL_PRIMITIVE_RESTART);
-#endif
-   }
-   else {
-      glDisableClientState(GL_PRIMITIVE_RESTART_NV);
-   }
+   disable_restart();
    glDisableClientState(GL_VERTEX_ARRAY);
 
    pass = check_rendering();
@@ -318,6 +324,112 @@ test_draw_elements(GLenum primMode, GLenum indexType)
    }
 
    glutSwapBuffers();
+
+   return pass;
+#undef NUM_VERTS
+}
+
+
+/**
+ * Test glDrawArrayss() with glPrimitiveRestartIndexNV().
+ * We only test a line strip.
+ */
+static GLboolean
+test_draw_arrays(void)
+{
+#define NUM_VERTS 12
+   GLfloat verts[NUM_VERTS+2][2];
+   GLfloat x, dx;
+   GLuint restart_index;
+   GLboolean pass = GL_TRUE;
+   const char *primStr = "GL_LINE_STRIP";
+   GLuint test;
+   const GLenum primMode = GL_LINE_STRIP;
+
+   x = 0.0;
+   dx = 20.0;
+
+   /* setup vertices */
+   {
+      GLuint i;
+      const GLfloat y = 0.5 * piglit_height;
+
+      glLineWidth(5.0);
+
+      for (i = 0; i < NUM_VERTS; i++) {
+         verts[i][0] = x;
+         verts[i][1] = y;
+         x += dx;
+      }
+   }
+
+   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+   glColor4fv(green);
+
+   glVertexPointer(2, GL_FLOAT, 2*sizeof(GLfloat), verts);
+   glEnableClientState(GL_VERTEX_ARRAY);
+
+   assert(glGetError()==0);
+
+
+   /*
+    * Render and do checks.
+    * Try three different restart indexes at start, end, middle.
+    */
+   for (test = 0; test < 3 && pass; test++) {
+      /* choose the restart index */
+      if (test == 0)
+         restart_index = 0;
+      else if (test == 1)
+         restart_index = NUM_VERTS - 1;
+      else
+         restart_index = NUM_VERTS / 2;
+
+      /* draw */
+      glClear(GL_COLOR_BUFFER_BIT);
+      enable_restart(restart_index);
+      glDrawArrays(primMode, 0, NUM_VERTS);
+      disable_restart();
+      glutSwapBuffers();
+
+      /* check */
+      {
+         const GLfloat x0 = 0.0, dx = 20.0;
+         const GLint iy = piglit_height / 2;
+         GLint i;
+
+         /* probe at midpoint of each line segment */
+         for (i = 0; i < NUM_VERTS - 1 && pass; i++) {
+            const float fx = x0 + 0.5 * dx + i * dx;
+            const int ix = (int) fx;
+
+            /* read pixel */
+            if (restart_index == i || restart_index == i + 1) {
+               /* pixel should NOT be drawn here */
+               if (!piglit_probe_pixel_rgb(ix, iy, black)) {
+                  if (0)
+                     fprintf(stderr, "bad pixel drawn\n");
+                  pass = GL_FALSE;
+               }
+            }
+            else {
+               /* pixel should be drawn here */
+               if (!piglit_probe_pixel_rgb(ix, iy, green)) {
+                  if (0)
+                     fprintf(stderr, "bad pixel drawn\n");
+                  pass = GL_FALSE;
+               }
+            }
+         }
+      }
+   }
+
+   if (!pass) {
+      fprintf(stderr, "%s: failure drawing with glDrawArrays(%s), "
+              "restart index = %u\n",
+              TestName, primStr, restart_index);
+   }
 
    return pass;
 }
@@ -338,6 +450,7 @@ piglit_display(void)
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_arrays();
    }
 
    if (Have_31) {
@@ -348,6 +461,7 @@ piglit_display(void)
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_arrays();
    }
 
    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
