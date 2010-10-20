@@ -153,6 +153,7 @@ run_test(void)
 	int y0 = PAD;
 	int y1 = PAD * 2 + SIZE;
 	int y2 = PAD * 3 + SIZE * 2;
+	GLenum err;
 
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -191,6 +192,12 @@ run_test(void)
 	copy(x0, y0, x0 + SIZE, y0 + SIZE,
 	     x0, y1, x0 + SIZE, y1 + SIZE,
 	     GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		printf("Unexpected GL error state 0x%04x\n", err);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
 
 	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
