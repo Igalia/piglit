@@ -90,6 +90,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_separate_shader_objects");
 
 	glClearColor(0.3, 0.3, 0.3, 0.0);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	prog[0] = glCreateShaderProgramEXT(GL_VERTEX_SHADER, vs_text);
 	prog[1] = glCreateShaderProgramEXT(GL_FRAGMENT_SHADER, fs_text);
