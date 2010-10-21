@@ -60,6 +60,7 @@ add_executable (depth-tex-modes-glsl depth-tex-modes-glsl.c)
 add_executable (depth-tex-compare depth-tex-compare.c)
 add_executable (tex-border-1 tex-border-1.c)
 add_executable (tex-swizzle tex-swizzle.c)
+add_executable (texture-rg texture-rg.c)
 add_executable (texwrap texwrap.c)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
