@@ -27,7 +27,7 @@
  *
  * Specify an RGBA image with a RED internal format.  Read the image back as
  * RGBA.  Verify the red components read back match the source image and the
- * green, blue, and alpha components are 0, 0, and 1, repsectively.
+ * green, blue, and alpha components are 0, 0, and 1, respectively.
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
