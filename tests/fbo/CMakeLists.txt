@@ -47,6 +47,7 @@ add_executable (fbo-getframebufferattachmentparameter-01 fbo-getframebufferattac
 add_executable (fbo-incomplete-texture-01 fbo-incomplete-texture-01.c)
 add_executable (fbo-incomplete-texture-02 fbo-incomplete-texture-02.c)
 add_executable (fbo-incomplete-texture-03 fbo-incomplete-texture-03.c)
+add_executable (fbo-integer fbo-integer.c)
 add_executable (fbo-nodepth-test fbo-nodepth-test.c)
 add_executable (fbo-nostencil-test fbo-nostencil-test.c)
 add_executable (fbo-readpixels fbo-readpixels.c)
