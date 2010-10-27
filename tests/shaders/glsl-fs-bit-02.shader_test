@@ -1,0 +1,32 @@
+[require]
+GL >= 2.0
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform int six;
+uniform int three;
+void main()
+{
+    int two = six & three;
+    int seven = six | three;
+    int five = seven & (~two);
+
+    gl_FragColor = vec4(float(two)/10.0, float(seven)/10.0, float(five)/10.0, 1.0);
+}
+
+[test]
+uniform int six 6
+uniform int three 3
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.2 0.7 0.5
