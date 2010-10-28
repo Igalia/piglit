@@ -134,6 +134,7 @@ piglit_display(void)
 	pass &= piglit_probe_pixel_rgb(x2, y2, white);
 
 	glDeleteTextures(1, &tex);
+	glDisable(GL_TEXTURE_2D);
 
 	glutSwapBuffers();
 
