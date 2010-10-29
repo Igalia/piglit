@@ -37,8 +37,6 @@ static const char *TestName = "texture-integer";
 
 static GLint TexWidth = 256, TexHeight = 256;
 
-static GLint BiasUniform = -1, TexUniform = -1;
-
 struct format_info
 {
    const char *Name;
@@ -67,34 +65,30 @@ static const struct format_info Formats[] = {
 
 #define NUM_FORMATS  (sizeof(Formats) / sizeof(Formats[0]))
 
-
-#if 0
-static const char *FragShaderText =
+/* Need to declare an ivec4-valued output variable for rendering to
+ * an integer-valued color buffer.
+ */
+static const char *SimpleFragShaderText =
+   "#version 130 \n"
    "#extension GL_EXT_gpu_shader4: enable \n"
-   "uniform vec4 bias; \n"
-   "#if GL_EXT_gpu_shader4 \n"
-   "  uniform isampler2D tex; \n"
-   "#else \n"
-   "  uniform sampler2D tex; \n"
-   "#endif \n"
+   "uniform ivec4 value; \n"
+   "out ivec4 out_color; \n"
    "void main() \n"
    "{ \n"
-   "#if GL_EXT_gpu_shader4 \n"
-   "   vec4 t = vec4(texture2D(tex, gl_TexCoord[0].xy)); \n"
-   "#else \n"
-   "   vec4 t = texture2D(tex, gl_TexCoord[0].xy); \n"
-   "#endif \n"
-   "   gl_FragColor = t + bias; \n"
+   "   out_color = value; \n"
    "} \n";
-#endif
 
+static GLuint SimpleFragShader, SimpleProgram;
+
+
+/* For glDrawPixels */
 static const char *PassthroughFragShaderText =
    "void main() \n"
    "{ \n"
    "   gl_FragColor = gl_Color; \n"
    "} \n";
 
-static GLuint FragShader, PassthroughProgram;
+static GLuint PassthroughFragShader, PassthroughProgram;
 
 
 
@@ -186,7 +180,7 @@ check_error(const char *file, int line)
 
 /** \return GL_TRUE for pass, GL_FALSE for fail */
 static GLboolean
-setup_fbo(const struct format_info *info)
+test_fbo(const struct format_info *info)
 {
    const int max = get_max_val(info);
    const int comps = num_components(info->BaseFormat);
@@ -292,6 +286,7 @@ setup_fbo(const struct format_info *info)
       }
 
       glUseProgram(PassthroughProgram);
+      if(0)glUseProgram(SimpleProgram);
 
       glWindowPos2i(1, 1);
       glDrawPixels(W, H, GL_RGBA_INTEGER_EXT, GL_INT, image);
@@ -322,96 +317,56 @@ setup_fbo(const struct format_info *info)
    }
 
    /* Do rendering test */
-   {
+   if (1) {
+      GLint value[4], result[4], loc, w = piglit_width, h = piglit_height;
+      GLint error = 1; /* XXX fix */
 
+      /* choose random value/color for polygon */
+      value[0] = rand() % 100;
+      value[1] = rand() % 100;
+      value[2] = rand() % 100;
+      value[3] = rand() % 100;
 
+      glUseProgram(SimpleProgram);
+      check_error(__FILE__, __LINE__);
 
+      loc = glGetUniformLocation(SimpleProgram, "value");
+      assert(loc >= 0);
+      glUniform4iv(loc, 1, value);
+      check_error(__FILE__, __LINE__);
+
+      loc = glGetFragDataLocationEXT(SimpleProgram, "out_color");
+      assert(loc >= 0);
+
+      glBegin(GL_POLYGON);
+      glVertex2f(0, 0);
+      glVertex2f(w, 0);
+      glVertex2f(w, h);
+      glVertex2f(0, h);
+      glEnd();
+      check_error(__FILE__, __LINE__);
+
+      glReadPixels(w/2, h/2, 1, 1, GL_RGBA_INTEGER, GL_INT, result);
+      check_error(__FILE__, __LINE__);
+
+      if (info->BaseFormat == GL_RGB_INTEGER_EXT) {
+         value[3] = 1;
+      }
+
+      if (abs(result[0] - value[0]) > error ||
+          abs(result[1] - value[1]) > error ||
+          abs(result[2] - value[2]) > error ||
+          abs(result[3] - value[3]) > error) {
+         fprintf(stderr, "%s: failure with format %s:\n", TestName, info->Name);
+         fprintf(stderr, "  input value = %d, %d, %d, %d\n",
+                 value[0], value[1], value[2], value[3]);
+         fprintf(stderr, "  result color = %d, %d, %d, %d\n",
+                 result[0], result[1], result[2], result[3]);
+         return GL_FALSE;
+      }
    }
-
-
-
-#if 0
-   /* setup expected polygon color */
-   expected[0] = 0.25;
-   expected[1] = 0.50;
-   expected[2] = 0.75;
-   expected[3] = 1.00;
-
-   /* need to swizzle things depending on texture format */
-   switch (info->BaseFormat) {
-   case GL_RGBA_INTEGER_EXT:
-      /* nothing */
-      break;
-   case GL_RGB_INTEGER_EXT:
-      expected[3] = 0.0;
-      break;
-   case GL_ALPHA_INTEGER_EXT:
-      expected[0] = expected[1] = expected[2] = 0.0;
-      expected[3] = 0.25;
-      value[3] = value[0];
-      break;
-   case GL_LUMINANCE_INTEGER_EXT:
-      expected[0] = expected[1] = expected[2] = 0.25;
-      expected[3] = 1.0;
-      value[1] = value[2] = value[0];
-      value[3] = 1.0;
-      break;
-   case GL_LUMINANCE_ALPHA_INTEGER_EXT:
-      expected[0] = expected[1] = expected[2] = 0.25;
-      value[3] = value[1];
-      value[1] = value[2] = value[0];
-      break;
-   case GL_RED_INTEGER_EXT:
-      expected[0] = expected[1] = expected[2] = expected[3] = 0.25;
-      value[1] = value[2] = value[3] = value[0];
-      break;
-   default:
-      ;
-   }
-
-   /* compute, set test bias */
-   bias[0] = expected[0] - value[0];
-   bias[1] = expected[1] - value[1];
-   bias[2] = expected[2] - value[2];
-   bias[3] = expected[3] - value[3];
-   glUniform4fv(BiasUniform, 1, bias);
-
-   /* draw */
-   glClearColor(0, 1, 1, 0);
-   glClear(GL_COLOR_BUFFER_BIT);
-   glBegin(GL_POLYGON);
-   glTexCoord2f(0, 0);   glVertex2f(0, 0);
-   glTexCoord2f(1, 0);   glVertex2f(w, 0);
-   glTexCoord2f(1, 1);   glVertex2f(w, h);
-   glTexCoord2f(0, 1);   glVertex2f(0, h);
-   glEnd();
-
-   if (check_error(__FILE__, __LINE__))
-      return GL_FALSE;
-
-   /* test */
-   glReadPixels(w/2, h/2, 1, 1, GL_RGBA, GL_FLOAT, result);
-
-   if (check_error(__FILE__, __LINE__))
-      return GL_FALSE;
-
-   if (fabsf(result[0] - expected[0]) > error ||
-       fabsf(result[1] - expected[1]) > error ||
-       fabsf(result[2] - expected[2]) > error ||
-       fabsf(result[3] - expected[3]) > error) {
-      fprintf(stderr, "%s: failure with format %s:\n", TestName, info->Name);
-      fprintf(stderr, "  texture color = %d, %d, %d, %d\n",
-              value[0], value[1], value[2], value[3]);
-      fprintf(stderr, "  expected color = %g, %g, %g, %g\n",
-              expected[0], expected[1], expected[2], expected[3]);
-      fprintf(stderr, "  result color = %g, %g, %g, %g\n",
-              result[0], result[1], result[2], result[3]);
-      return GL_FALSE;
-   }
-#endif
 
    glutSwapBuffers();
-
 
    glDeleteTextures(1, &texObj);
    glDeleteFramebuffers(1, &fbo);
@@ -425,7 +380,7 @@ piglit_display(void)
 {
    int f;
    for (f = 0; f < NUM_FORMATS; f++) {
-      GLboolean pass = setup_fbo(&Formats[f]);
+      GLboolean pass = test_fbo(&Formats[f]);
       if (!pass)
          return PIGLIT_FAILURE;
    }
@@ -439,19 +394,17 @@ piglit_init(int argc, char **argv)
    piglit_require_extension("GL_EXT_texture_integer");
    piglit_require_extension("GL_EXT_gpu_shader4");
 
-   //FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
-   FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-                                           PassthroughFragShaderText);
-   assert(FragShader);
+   PassthroughFragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+                                                      PassthroughFragShaderText);
+   assert(PassthroughFragShader);
+   PassthroughProgram = piglit_link_simple_program(0, PassthroughFragShader);
 
-   PassthroughProgram = piglit_link_simple_program(0, FragShader);
 
-   glUseProgram(PassthroughProgram);
+   SimpleFragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+                                                 SimpleFragShaderText);
+   assert(SimpleFragShader);
+   SimpleProgram = piglit_link_simple_program(0, SimpleFragShader);
 
-   BiasUniform = glGetUniformLocation(PassthroughProgram, "bias");
-   TexUniform = glGetUniformLocation(PassthroughProgram, "tex");
-
-   glUniform1i(TexUniform, 0);  /* tex unit zero */
 
    (void) check_error(__FILE__, __LINE__);
 
