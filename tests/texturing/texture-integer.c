@@ -29,6 +29,19 @@
 
 #include "piglit-util.h"
 
+/* These are missing in some versions of glext.h */
+#ifndef GL_MIN_PROGRAM_TEXEL_OFFSET_EXT
+#define GL_MIN_PROGRAM_TEXEL_OFFSET_EXT 0x8904
+#endif
+
+#ifndef GL_MAX_PROGRAM_TEXEL_OFFSET_EXT
+#define GL_MAX_PROGRAM_TEXEL_OFFSET_EXT 0x8905
+#endif
+
+
+#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
+
+
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
@@ -381,6 +394,61 @@ test_format(const struct format_info *info)
 }
 
 
+static GLboolean
+test_general_formats(void)
+{
+   int f, i;
+
+   for (f = 0; f < NUM_FORMATS; f++) {
+      for (i = 0; i < 5; i++) {
+         if (!test_format(&Formats[f]))
+            return GL_FALSE;
+      }
+   }
+   return GL_TRUE;
+}
+
+
+static GLboolean
+test_specific_formats(void)
+{
+   /* These format combinations should all work */
+   struct {
+      GLenum intFormat, srcFormat, srcType;
+   } formats[] = {
+      { GL_RGBA8UI_EXT, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE },
+      { GL_RGBA8UI_EXT, GL_RGBA_INTEGER, GL_SHORT },
+      { GL_RGBA8UI_EXT, GL_RGBA_INTEGER, GL_UNSIGNED_INT_8_8_8_8 },
+      { GL_RGBA8UI_EXT, GL_BGRA_INTEGER, GL_UNSIGNED_INT_8_8_8_8 },
+      { GL_LUMINANCE8I_EXT, GL_RGBA_INTEGER, GL_UNSIGNED_INT_8_8_8_8 },
+      { GL_RGB16I_EXT, GL_RGB_INTEGER, GL_UNSIGNED_SHORT_5_6_5 },
+      { GL_RGB32I_EXT, GL_RGB_INTEGER, GL_UNSIGNED_SHORT_5_6_5 }
+   };
+   int i;
+   GLenum err;
+   GLboolean pass = GL_TRUE;
+
+   while (glGetError() != GL_NO_ERROR)
+      ;
+
+   for (i = 0; i < ELEMENTS(formats); i++) {
+      glTexImage2D(GL_TEXTURE_2D, 0, formats[i].intFormat,
+                   16, 16, 0,
+                   formats[i].srcFormat, formats[i].srcType, NULL);
+      err = glGetError();
+      if (err != GL_NO_ERROR) {
+         fprintf(stderr, "%s failure: glTexImage2D(0x%x, 0x%x, 0x%x) generated"
+                 " error 0x%x (case %d)\n",
+                 TestName, formats[i].intFormat,
+                 formats[i].srcFormat, formats[i].srcType, err, i);
+         pass = GL_FALSE;
+      }
+   }
+
+   return pass;
+}
+
+
 /** check that an expected error is actually generated */
 static GLboolean
 verify_error(const char *func, GLenum error)
@@ -474,23 +542,48 @@ test_errors(void)
 }
 
 
+/** test some glGetInteger queries */
+static GLboolean
+test_limits(void)
+{
+   GLint val = 0;
+
+   glGetIntegerv(GL_MIN_PROGRAM_TEXEL_OFFSET_EXT, &val);
+   if (val > -8) {
+      fprintf(stderr,
+              "%s failure: query of GL_MIN_PROGRAM_TEXEL_OFFSET_EXT "
+              "returned %d\n",
+              TestName, val);
+      return GL_FALSE;
+   }
+
+   glGetIntegerv(GL_MAX_PROGRAM_TEXEL_OFFSET_EXT, &val);
+   if (val < 7) {
+      fprintf(stderr,
+              "%s failure: query of GL_MAX_PROGRAM_TEXEL_OFFSET_EXT "
+              "returned %d\n",
+              TestName, val);
+      return GL_FALSE;
+   }
+
+   return GL_TRUE;
+}
+
+
+
 enum piglit_result
 piglit_display(void)
 {
-   if (1) {
-      /* test texture formats */
-      int f, i;
-      for (f = 0; f < NUM_FORMATS; f++) {
-         for (i = 0; i < 5; i++) {
-            GLboolean pass = test_format(&Formats[f]);
-            if (!pass)
-               return PIGLIT_FAILURE;
-         }
-      }
-   }
+   if (!test_general_formats())
+      return PIGLIT_FAILURE;
 
-   /* test error checking */
+   if (!test_specific_formats())
+      return PIGLIT_FAILURE;
+
    if (!test_errors())
+      return PIGLIT_FAILURE;
+
+   if (!test_limits())
       return PIGLIT_FAILURE;
 
    return PIGLIT_SUCCESS;
