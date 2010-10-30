@@ -51,6 +51,11 @@ piglit_init(int argc, char **argv)
 
    glewInit();
 
+   if (!GLEW_VERSION_1_2) {
+      printf("Requires OpenGL 1.2\n");
+      piglit_report_result(PIGLIT_SKIP);
+   }
+
    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, red);
 
    glEnable(GL_DEPTH_TEST);
