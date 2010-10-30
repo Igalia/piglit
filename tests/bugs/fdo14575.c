@@ -53,6 +53,8 @@ int main(int argc, char**argv)
 
 	glewInit();
 
+	piglit_require_extension("GL_ARB_vertex_buffer_object");
+
 	glGenBuffersARB(1, &buf);
 
 	/* First, do a normal buffer create/data/delete */
