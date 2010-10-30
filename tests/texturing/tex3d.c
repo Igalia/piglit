@@ -223,6 +223,11 @@ static void Reshape(int width, int height)
 void
 piglit_init(int argc, char **argv)
 {
+	if (!GLEW_VERSION_1_2) {
+		printf("Requires OpenGL 1.2\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	piglit_automatic = GL_TRUE;
 
 	glutReshapeFunc(Reshape);
