@@ -96,6 +96,8 @@ piglit_display(void)
 
 	make_fbo(&fbo, &tex);
 
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glGenBuffersARB(1, &pbo);
 	glBindBufferARB(GL_PIXEL_PACK_BUFFER, pbo);
 	glBufferDataARB(GL_PIXEL_PACK_BUFFER, 4 * 4, NULL, GL_STREAM_DRAW_ARB);
