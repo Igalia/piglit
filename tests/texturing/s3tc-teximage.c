@@ -34,7 +34,7 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 500, piglit_height = 700;
+int piglit_width = 500, piglit_height = 600;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 #define SIZE 128
