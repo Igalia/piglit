@@ -140,18 +140,18 @@ void
 VertArrayBGRATest::renderPoints(bool useBGRA)
 {
 	glVertexPointer(2, GL_FLOAT, 0, mPos);
-	glEnable(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 
 	if (useBGRA)
 		glColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, mBGRA);
 	else
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, mRGBA);
-	glEnable(GL_COLOR_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
 
 	glDrawArrays(GL_POINTS, 0, NUM_POINTS);
 
-	glDisable(GL_VERTEX_ARRAY);
-	glDisable(GL_COLOR_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
