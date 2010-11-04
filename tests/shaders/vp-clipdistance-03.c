@@ -116,7 +116,7 @@ piglit_init(int argc, char **argv)
 		char shader_source[1024];
 
 		snprintf(shader_source, sizeof(shader_source),
-			 vertex_source_template, i);
+			 vertex_source_template);
 
 		progs[i] = piglit_compile_program(GL_VERTEX_PROGRAM_ARB,
 						  shader_source);
