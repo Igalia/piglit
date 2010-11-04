@@ -175,7 +175,13 @@ Image::pixels(char* p) {
 void
 Image::reserve() {
 	pixels(0);	// deallocate old pixel array
-	pixels(new char[height() * rowSizeInBytes()]);
+
+	const int size = height() * rowSizeInBytes();
+	char * const p = new char[size];
+	for (int i = 0; i < size; i++) {
+		p[i] = 0;
+	}
+	pixels(p);
 } // Image::reserve
 
 ///////////////////////////////////////////////////////////////////////////////
