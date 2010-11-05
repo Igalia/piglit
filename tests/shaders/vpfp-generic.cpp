@@ -234,6 +234,7 @@ bool TestGroup::run()
 }
 
 
+#if 0
 static void expect(FILE* filp, const char* str)
 {
 	char buf[41];
@@ -254,6 +255,7 @@ static GLfloat* readfloatarray(FILE* filp, int count)
 
 	return dest;
 }
+#endif
 
 void Test::readline(const char* filename, int linenum, char* line)
 {
