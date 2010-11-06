@@ -240,8 +240,6 @@ piglit_display(void)
 				pass = pass && test_multitex(bias1, bias2);
 			}
 		}
-
-		piglit_report_result(PIGLIT_SUCCESS);
 	} else {
 		if (CurrentTest == 0) {
 			pass = test_simple(CurrentBias, CurrentBias2);
