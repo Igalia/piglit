@@ -39,10 +39,6 @@
 #ifndef APIENTRYP
 #define APIENTRYP APIENTRY *
 #endif
-#ifndef ARB_sync
-typedef int64_t GLint64;
-typedef uint64_t GLuint64;
-#endif
 #ifndef GL_ARB_timer_query
 #define GL_TIME_ELAPSED 0x88BF
 typedef void (APIENTRYP PFNGLGETQUERYOBJECTI64VPROC) (GLuint id, GLenum pname, GLint64 *params);
