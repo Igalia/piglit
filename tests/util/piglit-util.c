@@ -117,8 +117,6 @@ piglit_report_result(enum piglit_result result)
 {
 	fflush(stderr);
 
-	assert(glGetError() == 0);
-
 	if (result == PIGLIT_SUCCESS) {
 		printf("PIGLIT: {'result': 'pass' }\n");
 		fflush(stdout);
