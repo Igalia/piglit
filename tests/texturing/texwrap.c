@@ -94,7 +94,7 @@ struct format {
 } formats[] = {
     {"GL_RGBA8",    GL_RGBA8,    8, 8, 8, 8,     1,  8,  1.1},
     {"GL_RGBA4",    GL_RGBA4,    4, 4, 4, 4,     17, 17, 1.1},
-    {"GL_RGB565",   GL_RGB5,     5, 6, 5, 0,     9,  9,  1.1},
+    {"GL_RGB5",     GL_RGB5,     5,-1, 5, 0,     9,  9,  1.1},
     {"GL_RGB5_A1",  GL_RGB5_A1,  5, 5, 5, 1,     9,  9,  1.1},
     {"GL_RGB10_A2", GL_RGB10_A2, 10, 10, 10, 2,  1,  8,  1.1},
     {"GL_RGBA16",   GL_RGBA16,   16, 16, 16, 16, 1,  8,  1.1},
@@ -818,7 +818,6 @@ GLboolean is_format_supported(struct format *f)
     GLuint id;
     float p[4] = {0};
     int r, g, b, a, iformat;
-    GLboolean res;
 
     if (!check_support(f->version, f->extensions))
         return GL_FALSE;
@@ -837,18 +836,18 @@ GLboolean is_format_supported(struct format *f)
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &id);
 
-    res = r == f->red && g == f->green && b == f->blue && a == f->alpha &&
-          iformat == f->internalformat;
-
-    printf("%s is R%iG%iB%iA%i. The internal format is 0x%04X.\n",
+    printf("%s has bits R%iG%iB%iA%i. The internal format is 0x%04X.\n",
            f->name, r, g, b, a, iformat);
-    if (!res) {
-        printf("The real format appears to be different from the requested "
-               "format.\n"
-               "Skipping.\n");
+
+    if (r != f->red || (g != f->green && f->green != -1) || b != f->blue ||
+        a != f->alpha || iformat != f->internalformat) {
+        fprintf(stderr,
+                "Warning: The used format appears to be different "
+                "from the requested format.\n"
+                "Is the internal format unsupported?\n");
     }
 
-    return res;
+    return GL_TRUE;
 }
 
 void piglit_init(int argc, char **argv)
