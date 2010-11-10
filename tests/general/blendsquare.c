@@ -104,5 +104,4 @@ piglit_init(int argc, char **argv)
 	       "the two on the right are not, then "
 	       "NV_blend_square is broken.\n");
 	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
 }
