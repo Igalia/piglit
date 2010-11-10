@@ -103,7 +103,7 @@ struct format {
     {"GL_RGBA32F",  GL_RGBA32F,  32, 32, 32, 32, 1,  8,  3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
 
-    {}
+    {0}
 };
 
 /* Wrap modes. */
