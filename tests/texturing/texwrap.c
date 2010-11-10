@@ -53,21 +53,21 @@
  ****************************************************************************
  *
  * Parameters:
- *   One of: 1d, 2d, 3d, rect
+ *   One of: 1D, 2D, 3D, RECT
  *   One of: See the list of formats below.
- *   Any of: npot, border
+ *   Any of: npot border
  *
  * Each parameter must begin with a hyphen and all parameters must be
  * concatenated into one string. The whole string must end with a hyphen
  * as well.
  *
  * Examples:
- *   -3d-rgba8-border-
- *   -2d-rgba16f-npot-
- *   -rect-rgb10a2-
+ *   3D GL_RGBA8 border
+ *   2D GL_RGBA16F npot
+ *   RECT GL_RGB10_A2
  *
  * Default:
- *   -2d-rgba8-
+ *   2D GL_RGBA8
  */
 
 #include "piglit-util.h"
@@ -86,25 +86,24 @@
 
 struct format {
     const char  *name;
-    const char  *option;
     GLenum      internalformat;
     int         red, green, blue, alpha;
     unsigned    nearest_deltamax, linear_deltamax;
     float       version;
     const char  *extensions[2];
 } formats[] = {
-    {"RGBA8",    "-rgba8-",   GL_RGBA8,    8, 8, 8, 8,     1,  8,  1.1},
-    {"RGBA4",    "-rgba4-",   GL_RGBA4,    4, 4, 4, 4,     17, 17, 1.1},
-    {"RGB565",   "-rgb565",   GL_RGB5,     5, 6, 5, 0,     9,  9,  1.1},
-    {"RGB5_A1",  "-rgb5a1-",  GL_RGB5_A1,  5, 5, 5, 1,     9,  9,  1.1},
-    {"RGB10_A2", "-rgb10a2-", GL_RGB10_A2, 10, 10, 10, 2,  1,  8,  1.1},
-    {"RGBA16",   "-rgba16-",  GL_RGBA16,   16, 16, 16, 16, 1,  8,  1.1},
-    {"RGBA16F",  "-rgba16f-", GL_RGBA16F,  16, 16, 16, 16, 1,  8,  3.0,
+    {"GL_RGBA8",    GL_RGBA8,    8, 8, 8, 8,     1,  8,  1.1},
+    {"GL_RGBA4",    GL_RGBA4,    4, 4, 4, 4,     17, 17, 1.1},
+    {"GL_RGB565",   GL_RGB5,     5, 6, 5, 0,     9,  9,  1.1},
+    {"GL_RGB5_A1",  GL_RGB5_A1,  5, 5, 5, 1,     9,  9,  1.1},
+    {"GL_RGB10_A2", GL_RGB10_A2, 10, 10, 10, 2,  1,  8,  1.1},
+    {"GL_RGBA16",   GL_RGBA16,   16, 16, 16, 16, 1,  8,  1.1},
+    {"GL_RGBA16F",  GL_RGBA16F,  16, 16, 16, 16, 1,  8,  3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {"RGBA32F",  "-rgba32f-", GL_RGBA32F,  32, 32, 32, 32, 1,  8,  3.0,
+    {"GL_RGBA32F",  GL_RGBA32F,  32, 32, 32, 32, 1,  8,  3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
 
-    {NULL}
+    {}
 };
 
 /* Wrap modes. */
@@ -854,7 +853,7 @@ GLboolean is_format_supported(struct format *f)
 
 void piglit_init(int argc, char **argv)
 {
-    unsigned i;
+    unsigned i, p;
     const char *ext_swizzle[] = {
         "GL_ARB_texture_swizzle",
         "GL_EXT_texture_swizzle"
@@ -868,59 +867,71 @@ void piglit_init(int argc, char **argv)
     texture_format = &formats[0];
     has_texture_swizzle = check_support(3.3, ext_swizzle);
 
-    if (argc == 2) {
-        printf("Parameter: %s\n", argv[1]);
+    for (p = 1; p < argc; p++) {
+        printf("Parameter: %s\n", argv[p]);
 
         /* Texture targets. */
-        if (strstr(argv[1], "-1d-")) {
+        if (strcmp(argv[p], "1D") == 0) {
             texture_target = GL_TEXTURE_1D;
             printf("Using TEXTURE_1D.\n");
-    
-        } else if (strstr(argv[1], "-3d-")) {
+            continue;
+        }
+        if (strcmp(argv[p], "2D") == 0) {
+            texture_target = GL_TEXTURE_2D;
+            printf("Using TEXTURE_2D.\n");
+            continue;
+        }
+        if (strcmp(argv[p], "3D") == 0) {
             const char *extensions[2] = {"GL_EXT_texture3D", NULL};
             if (!check_support(1.2, extensions))
                 piglit_report_result(PIGLIT_SKIP);
-    
+
             texture_target = GL_TEXTURE_3D;
             printf("Using TEXTURE_3D.\n");
-    
-        } else if (strstr(argv[1], "-rect-")) {
+            continue;
+        }
+        if (strcmp(argv[p], "RECT") == 0) {
             const char *extensions[2] = {"GL_ARB_texture_rectangle",
                                          "GL_NV_texture_rectangle"};
             if (!check_support(3.1, extensions))
                 piglit_report_result(PIGLIT_SKIP);
-    
+
             texture_target = GL_TEXTURE_RECTANGLE_NV;
             texture_npot = GL_TRUE; /* Enforce NPOT dimensions. */
             printf("Using TEXTURE_RECTANGLE.\n");
-    
-        } else {
-            texture_target = GL_TEXTURE_2D;
-            printf("Using TEXTURE_2D.\n");
+            continue;
         }
-    
+
         /* Parameters: npot, border */
-        if (strstr(argv[1], "-npot-")) {
+        if (strcmp(argv[p], "npot") == 0) {
             piglit_require_extension("GL_ARB_texture_non_power_of_two");
             texture_npot = 1;
             printf("Using NPOT dimensions.\n");
+            continue;
         }
-        if (strstr(argv[1], "-border-")) {
+        if (strcmp(argv[p], "border") == 0) {
             assert(texture_target != GL_TEXTURE_RECTANGLE_NV);
             texture_id = BORDER_TEXTURE;
             printf("Using the border.\n");
+            continue;
         }
 
         /* Formats. */
         for (i = 0; formats[i].name; i++) {
-            if (strstr(argv[1], formats[i].option)) {
+            if (strcmp(argv[p], formats[i].name) == 0) {
                 if (!is_format_supported(&formats[i]))
                     piglit_report_result(PIGLIT_SKIP);
 
                 texture_format = &formats[i];
                 printf("Using %s.\n", formats[i].name);
+                goto outer_continue;
             }
         }
+
+        printf("Error: Unknown parameter\n");
+        piglit_report_result(PIGLIT_SKIP);
+
+    outer_continue:;
     }
 
     texture_size = texture_npot ? SIZE_NPOT : SIZE_POT;
