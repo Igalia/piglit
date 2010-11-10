@@ -734,9 +734,14 @@ static void init_textures()
             break;
 
         case GL_TEXTURE_3D:
-            glTexImage3D(texture_target, 0, texture_format->internalformat,
-                         bsize_x, bsize_y, bsize_z, 1,
-                         GL_RGBA, GL_FLOAT, (void *) border_image);
+            if (1.2 <= atof((char *)glGetString(GL_VERSION)))
+                glTexImage3D(texture_target, 0, texture_format->internalformat,
+                             bsize_x, bsize_y, bsize_z, 1,
+                             GL_RGBA, GL_FLOAT, (void *) border_image);
+            else
+                glTexImage3DEXT(texture_target, 0, texture_format->internalformat,
+                                bsize_x, bsize_y, bsize_z, 1,
+                                GL_RGBA, GL_FLOAT, (void *) border_image);
             break;
         }
     }
