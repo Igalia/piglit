@@ -958,4 +958,11 @@ void piglit_init(int argc, char **argv)
     glClearColor(0.5, 0.5, 0.5, 1.0);
 
     init_textures();
+
+    if (!piglit_automatic) {
+        printf("Hotkeys in the interactive mode:\n"
+               "    b  - use 1-pixel texture border (deprecated in GL3)\n"
+               "    p  - use projective texturing\n"
+               "    s  - use texture swizzling (ARB_texture_swizzle)\n");
+    }
 }
