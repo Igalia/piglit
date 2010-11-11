@@ -1,3 +1,12 @@
+// [config]
+// expect_result: pass
+// glsl_version: 1.10
+//
+// # NOTE: Config section was auto-generated from file
+// # NOTE: 'glslparser.tests' at git revision
+// # NOTE: 6cc17ae70b70d150aa1751f8e28db7b2a9bd50f0
+// [end config]
+
 #define t1 2.3333333333333333
 #define t2 (0.978293600-1.0)
 #define t3 .9090909090

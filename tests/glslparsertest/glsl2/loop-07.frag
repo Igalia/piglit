@@ -1,4 +1,8 @@
-/* PASS */
+// [config]
+// expect_result: pass
+// glsl_version: 110
+// [end config]
+
 void main()
 {
 	float a = 0.0;
