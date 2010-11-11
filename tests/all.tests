@@ -3,12 +3,14 @@
 # All tests that come with piglit, using default settings
 
 import os
+import os.path as path
 import re
 import subprocess
 
 from framework.core import *
 from framework.exectest import *
 from framework.gleantest import *
+from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test
 
 ######
 # Collecting all tests
@@ -980,12 +982,18 @@ ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 
-# Include the glsl parser tests from glslparser.tests.
-def add_glslparsertest(shader, result):
-	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/shaders/' + shader, result])
-def add_otherglslparsertest(shader, result, min_glsl_version = '1.10'):
-	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/' + shader, result, min_glsl_version])
-execfile(os.path.dirname(__file__) + '/glslparser.tests')
+# group glslparsertest ------------------------------------------------------
+glslparsertest = Group()
+# Add all shader source files in the directories below.
+for filename in os.listdir('tests/glslparsertest/shaders'):
+	ext = filename.rsplit('.')[-1]
+	if ext in ['vert', 'geo', 'frag']:
+		add_glsl_parser_test(glslparsertest, path.join('tests/glslparsertest/shaders', filename), filename)
+for filename in os.listdir('tests/glslparsertest/glsl2'):
+	ext = filename.rsplit('.')[-1]
+	if ext in ['vert', 'geo', 'frag']:
+		add_glsl_parser_test(glslparsertest, path.join('tests/glslparsertest/glsl2', filename), 'glsl2/' + filename)
+# end group glslparsertest ---------------------------------------------------
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
