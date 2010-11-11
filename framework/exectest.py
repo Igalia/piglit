@@ -48,39 +48,44 @@ class PlainExecTest(Test):
 		for e in self.env:
 			fullenv[e] = str(self.env[e])
 
-		proc = subprocess.Popen(
-			self.command,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE,
-			env=fullenv,
-			universal_newlines=True
-		)
-		out, err = proc.communicate()
+		if self.command is not None:
+			proc = subprocess.Popen(
+				self.command,
+				stdout=subprocess.PIPE,
+				stderr=subprocess.PIPE,
+				env=fullenv,
+				universal_newlines=True
+				)
+			out, err = proc.communicate()
 
-		outlines = out.split('\n')
-		outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
+			outlines = out.split('\n')
+			outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
 
-		results = TestResult()
+			results = TestResult()
 
-		if len(outpiglit) > 0:
-			try:
-				results.update(eval(''.join(outpiglit), {}))
-				out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
-			except:
+			if len(outpiglit) > 0:
+				try:
+					results.update(eval(''.join(outpiglit), {}))
+					out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
+				except:
+					results['result'] = 'fail'
+					results['note'] = 'Failed to parse result string'
+
+			if 'result' not in results:
 				results['result'] = 'fail'
-				results['note'] = 'Failed to parse result string'
 
-		if 'result' not in results:
-			results['result'] = 'fail'
+			if proc.returncode != 0:
+				results['result'] = 'fail'
+				results['note'] = 'Returncode was %d' % (proc.returncode)
 
-		if proc.returncode != 0:
-			results['result'] = 'fail'
-			results['note'] = 'Returncode was %d' % (proc.returncode)
+			self.handleErr(results, err)
 
-		self.handleErr(results, err)
-
-		results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
-		results['returncode'] = proc.returncode
+			results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
+			results['returncode'] = proc.returncode
+		else:
+			results = TestResult()
+			if 'result' not in results:
+				results['result'] = 'skip'
 
 		return results
 
