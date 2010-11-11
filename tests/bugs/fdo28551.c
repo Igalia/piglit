@@ -41,6 +41,7 @@ enum piglit_result
 piglit_display(void)
 {
 	GLint red_bits;
+	GLenum err;
 
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
 					      GL_BACK_LEFT,
@@ -49,8 +50,11 @@ piglit_display(void)
 
 	printf("Red bits: %d\n", red_bits);
 
-	if (glGetError())
+	err = glGetError();
+	if (err) {
+		printf("glGetFramebufferAttachmentParameteriv GL error: 0x%x\n", err);
 		return PIGLIT_FAILURE;
+	}
 
        	return PIGLIT_SUCCESS;
 }
