@@ -1,0 +1,11 @@
+/* PASS */
+void main()
+{
+	float a = 0.0;
+	int k = 0;
+	for (int i = 0; i < 3; ++i)
+		a += 1.0;
+	for ( ; k < 3; ++k)
+		a += 3.0;
+	gl_FragColor = vec4(a);
+}
