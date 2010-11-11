@@ -400,6 +400,7 @@ shaders['glsl-fs-texture2drect-proj3'] = PlainExecTest(['glsl-fs-texture2drect',
 							'-auto', '-proj3'])
 shaders['glsl-fs-texture2drect-proj4'] = PlainExecTest(['glsl-fs-texture2drect',
 							'-auto', '-proj4'])
+shaders['glsl-fs-texturelod-01'] = PlainExecTest(['glsl-fs-texturelod-01'])
 add_shader_generic(shaders, 'glsl-fs-trunc')
 add_shader_generic(shaders, 'glsl-fs-uniform-array-1')
 add_shader_generic(shaders, 'glsl-fs-uniform-array-2')
