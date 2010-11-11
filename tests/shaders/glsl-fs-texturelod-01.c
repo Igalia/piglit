@@ -123,6 +123,8 @@ piglit_display()
 void
 piglit_init(int argc, char **argv)
 {
+	GLint vs, fs, prog;
+
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
@@ -137,11 +139,11 @@ piglit_init(int argc, char **argv)
 	setup_texture();
 
 	// Compile and use program.
-	GLint vs = piglit_compile_shader(GL_VERTEX_SHADER,
+	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 			"shaders/glsl-fs-texturelod-01.vert");
-	GLint fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
+	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
 			"shaders/glsl-fs-texturelod-01.frag");
-	GLint prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_link_simple_program(vs, fs);
 	glUseProgram(prog);
 
 	// Setup uniforms.
