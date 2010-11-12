@@ -849,6 +849,10 @@ spec['EXT_texture_sRGB'] = ext_texture_srgb
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
 
+ati_envmap_bumpmap = Group()
+spec['ATI_envmap_bumpmap'] = ati_envmap_bumpmap
+add_plain_test(ati_envmap_bumpmap, 'ati_envmap_bumpmap-bump')
+
 # Include the glsl parser tests from glslparser.tests.
 def add_glslparsertest(shader, result):
 	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/shaders/' + shader, result])

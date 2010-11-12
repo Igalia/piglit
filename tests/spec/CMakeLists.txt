@@ -1,1 +1,2 @@
 add_subdirectory (arb_color_buffer_float)
+add_subdirectory (ati_envmap_bumpmap)
