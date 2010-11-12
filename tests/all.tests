@@ -1440,10 +1440,19 @@ profile.tests['glx'] = glx
 class ValgrindExecTest(PlainExecTest):
 	def __init__(self, test):
 		Test.__init__(self)
-		self.command = [os.path.dirname(__file__)+'/valgrind-test/valgrind-test'] + test.command
+		self.orig_test = test
 		self.env = {}
 		if 'PIGLIT_TEST' in test.env:
 			self.env['PIGLIT_TEST'] = test.env['PIGLIT_TEST']
+
+	def run(self):
+		orig_command = self.orig_test.command
+		if orig_command is None:
+			assert(self.orig_test.result is not None)
+			assert(self.orig_test.result['result'] == 'fail')
+			return self.orig_test.result
+		self.command = [os.path.dirname(__file__) + '/valgrind-test/valgrind-test'] + orig_command
+		return self.orig_test.run()
 
 valgrind = Group()
 for groupname, group in sorted(profile.tests.iteritems()):
