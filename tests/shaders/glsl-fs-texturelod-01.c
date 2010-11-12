@@ -123,7 +123,7 @@ piglit_display()
 void
 piglit_init(int argc, char **argv)
 {
-	GLint vs, fs, prog;
+	GLint vs, fs, prog, sampler_uniform;
 
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
@@ -147,7 +147,7 @@ piglit_init(int argc, char **argv)
 	glUseProgram(prog);
 
 	// Setup uniforms.
-	GLint sampler_uniform = glGetUniformLocation(prog, "sampler");
+	sampler_uniform = glGetUniformLocation(prog, "sampler");
 	if (sampler_uniform == -1) {
 		printf("error: Unable to get location of uniform 'sampler'\n");
 		piglit_report_result(PIGLIT_FAILURE);
