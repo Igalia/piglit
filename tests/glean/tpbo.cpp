@@ -200,8 +200,8 @@ bool PBOTest::testSanity(void)
 
    glGenBuffersARB_func(1, pbs);
 
-   if (glIsBufferARB_func(pbs[0]) != GL_TRUE) {
-      REPORT_FAILURE("Failed to call glIsBuffersARB");
+   if (glIsBufferARB_func(pbs[0]) != GL_FALSE) {
+      REPORT_FAILURE("glIsBufferARB failed");
       return false;
    }
 
@@ -224,7 +224,7 @@ bool PBOTest::testSanity(void)
    glDeleteBuffersARB_func(1, pbs);
 
    if (glIsBufferARB_func(pbs[0]) == GL_TRUE) {
-      REPORT_FAILURE("Failed to call glIsBuffersARB");
+      REPORT_FAILURE("glIsBufferARB failed");
       return false;
    }
 
@@ -615,8 +615,6 @@ bool PBOTest::testTexImage(void)
                  breakCOWTexture++) {
                if (useTexUnpackBuffer) {
                   glGenBuffersARB_func(1, unpack_pb);
-                  if (glIsBufferARB_func(unpack_pb[0]) == false)
-                     return false;
                   glBindBufferARB_func(GL_PIXEL_UNPACK_BUFFER_ARB, unpack_pb[0]);
                   glBufferDataARB_func(GL_PIXEL_UNPACK_BUFFER_ARB,
                                TEXSIZE * TEXSIZE * 3 * sizeof(GLfloat), NULL,
