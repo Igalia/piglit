@@ -59,6 +59,7 @@ add_executable (depth-tex-modes-rg   depth-tex-modes-rg.c depth-tex-modes-common
 add_executable (depth-tex-modes-glsl depth-tex-modes-glsl.c)
 add_executable (depth-tex-compare depth-tex-compare.c)
 add_executable (tex-border-1 tex-border-1.c)
+add_executable (tex-skipped-unit tex-skipped-unit.c)
 add_executable (tex-swizzle tex-swizzle.c)
 add_executable (texture-rg texture-rg.c)
 add_executable (texwrap texwrap.c)
