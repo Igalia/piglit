@@ -102,6 +102,7 @@ piglit_display(void)
 	float green[4] = {0.0, 1.0, 0.0, 1.0};
 	float blue[4]  = {0.0, 0.0, 1.0, 1.0};
 	float white[4] = {1.0, 1.0, 1.0, 1.0};
+	float bumpdata[TEXSIZE][TEXSIZE][2];
 
 	/* First: the base texture. */
 	tex = piglit_rgbw_texture(GL_RGBA, TEXSIZE, TEXSIZE,
@@ -127,7 +128,6 @@ piglit_display(void)
 	glTexEnvf(GL_TEXTURE_ENV, GL_BUMP_TARGET_ATI, tex_unit);
 
 	/* The bump map we use is going to end up rotating texels CCW. */
-	float bumpdata[TEXSIZE][TEXSIZE][2];
 	for (y = 0; y < TEXSIZE; y++) {
 		for (x = 0; x < TEXSIZE; x++) {
 			if (y < TEXSIZE / 2) {
