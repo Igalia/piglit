@@ -591,9 +591,13 @@ static GLboolean probe_pixels()
                 deltamax[j] = deltamax_lut[texture_format->intensity];
             }
         } else {
-            if (texture_format->luminance || texture_format->depth) {
+            if (texture_format->luminance) {
                 for (j = 0; j < 3; j++) {
                     deltamax[j] = deltamax_lut[texture_format->luminance];
+                }
+            } else if (texture_format->depth) {
+                for (j = 0; j < 3; j++) {
+                    deltamax[j] = deltamax_lut[texture_format->depth];
                 }
             } else {
                 deltamax[0] = deltamax_lut[texture_format->red];
