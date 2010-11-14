@@ -115,11 +115,13 @@ struct format {
     const char  *extensions[2];
 } formats[] = {
     {FORMAT(GL_RGBA8),              8, 8, 8, 8, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGBA4),              4, 4, 4, 4, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB5),               5, 5, 5, 0, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB5_A1),            5, 5, 5, 1, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB10),              10, 10, 10, 0, 0, 0, 0, 0,  1.1},
     {FORMAT(GL_RGB10_A2),           10, 10, 10, 2, 0, 0, 0, 0,  1.1},
+    {FORMAT(GL_RGB16),              16, 16, 16, 0, 0, 0, 0, 0,  1.1},
     {FORMAT(GL_RGBA16),             16, 16, 16, 16, 0, 0, 0, 0, 1.1},
     {FORMAT(GL_ALPHA8),             0, 0, 0, 8, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_ALPHA16),            0, 0, 0, 16, 0, 0, 0, 0,    1.1},
@@ -233,7 +235,7 @@ static GLboolean has_texture_swizzle;
 
 /* Image data. */
 static const int swizzle[4] = {2, 0, 1, 3};
-static const float borderf[4] = { 0.0, 1.0, 0.5, 1.0 };
+static const float borderf[4] = { 0.0, 1.0, 0.5, 0.8 };
 static float borderf_real[4];
 static float border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
 static float no_border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
@@ -582,6 +584,7 @@ static GLboolean probe_pixels()
         GLenum filter = i ? GL_LINEAR : GL_NEAREST;
         const char *sfilter = i ? "LINEAR" : "NEAREST";
         unsigned deltamax[4] = {0};
+        unsigned deltamax_swizzled[4] = {0};
         unsigned *deltamax_lut = i ? linear_deltamax : nearest_deltamax;
         unsigned offset = 0;
 
@@ -605,6 +608,13 @@ static GLboolean probe_pixels()
                 deltamax[2] = deltamax_lut[texture_format->blue];
             }
             deltamax[3] = deltamax_lut[texture_format->alpha];
+        }
+        if (texture_swizzle) {
+            for (j = 0; j < 4; j++) {
+                deltamax_swizzled[j] = deltamax[swizzle[j]];
+            }
+        } else {
+            memcpy(deltamax_swizzled, deltamax, sizeof(deltamax));
         }
 
         /* Loop over all wrap modes. */
@@ -633,7 +643,7 @@ static GLboolean probe_pixels()
                                    0, /* the slices are the same */
                                    wrap_modes[j].mode, filter, expected);
 
-                    if (!probe_pixel_rgba(pixels, piglit_width, deltamax,
+                    if (!probe_pixel_rgba(pixels, piglit_width, deltamax_swizzled,
                                           x, y, expected, a, b)) {
                         pass = GL_FALSE;
                         goto tile_done;
@@ -767,7 +777,7 @@ static void init_textures()
                         colors[x][0] = 1;
                     }
                 } else {
-                    for (x = 0; x < sizeof(colors)/sizeof(colors[0])-1; x++) {
+                    for (x = 0; x < sizeof(colors)/sizeof(colors[0]); x++) {
                         colors[x][0] = 0;
                     }
                 }
@@ -778,7 +788,7 @@ static void init_textures()
                         colors[x][1] = 1;
                     }
                 } else {
-                    for (x = 0; x < sizeof(colors)/sizeof(colors[0])-1; x++) {
+                    for (x = 0; x < sizeof(colors)/sizeof(colors[0]); x++) {
                         colors[x][1] = 0;
                     }
                 }
@@ -789,14 +799,14 @@ static void init_textures()
                         colors[x][2] = 1;
                     }
                 } else {
-                    for (x = 0; x < sizeof(colors)/sizeof(colors[0])-1; x++) {
+                    for (x = 0; x < sizeof(colors)/sizeof(colors[0]); x++) {
                         colors[x][2] = 0;
                     }
                 }
             }
         }
         if (texture_format->alpha == 0) {
-            for (x = 0; x < sizeof(colors)/sizeof(colors[0])-1; x++) {
+            for (x = 0; x < sizeof(colors)/sizeof(colors[0]); x++) {
                 colors[x][3] = 1;
             }
         }

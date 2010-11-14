@@ -766,12 +766,15 @@ def add_texwrap_test3(p1, p2, p3):
 def add_texwrap_test4(p1, p2, p3, p4):
 	texturing['texwrap-' + p1 + '-' + p2 + '-' + p3 + '-' + p4] = PlainExecTest(['texwrap', '-auto', p1, p2, p3, p4])
 
-# Test formats (other than RGBA8)
+# Test formats
 add_texwrap_test2('2D', 'GL_RGBA4')
 add_texwrap_test2('2D', 'GL_RGB5')
 add_texwrap_test2('2D', 'GL_RGB5_A1')
+add_texwrap_test2('2D', 'GL_RGB8')
+add_texwrap_test2('2D', 'GL_RGBA8')
 add_texwrap_test2('2D', 'GL_RGB10')
 add_texwrap_test2('2D', 'GL_RGB10_A2')
+add_texwrap_test2('2D', 'GL_RGB16')
 add_texwrap_test2('2D', 'GL_RGBA16')
 add_texwrap_test2('2D', 'GL_ALPHA8')
 add_texwrap_test2('2D', 'GL_ALPHA16')
@@ -794,7 +797,6 @@ add_texwrap_test2('2D', 'GL_RG16')
 
 # Test various combinations of features
 add_texwrap_test2('1D', 'GL_RGBA8')
-add_texwrap_test2('2D', 'GL_RGBA8')
 add_texwrap_test2('3D', 'GL_RGBA8')
 add_texwrap_test2('RECT', 'GL_RGBA8')
 add_texwrap_test3('npot', '1D', 'GL_RGBA8')
