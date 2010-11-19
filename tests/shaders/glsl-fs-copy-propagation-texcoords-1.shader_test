@@ -1,0 +1,38 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 texcoord;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	texcoord = gl_Vertex.xy + 1.0;
+}
+
+[fragment shader]
+/* Tests for a bug in the 965 fragment shader backend where we would
+ * propagate the MOV of the second texture2D()'s args into the message
+ * register up above the first texture2D() call.
+ */
+
+varying vec2 texcoord;
+uniform sampler2D tex;
+
+void main()
+{
+	vec2 t1 = texcoord * 0.5;
+	vec2 t2 = texcoord * .0000001;
+	gl_FragColor = texture2D(tex, t1) + texture2D(tex, t2);
+}
+
+[test]
+uniform int tex 0
+texture rgbw 0 (8, 8)
+
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0, 1.0)
+relative probe rgb (1.0, 0.0) (1.0, 1.0, 0.0, 1.0)
+relative probe rgb (0.0, 1.0) (1.0, 0.0, 1.0, 1.0)
+relative probe rgb (1.0, 1.0) (1.0, 1.0, 1.0, 1.0)
