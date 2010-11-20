@@ -1,0 +1,40 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 a;
+uniform vec4 b;
+uniform vec4 c;
+uniform vec4 d;
+
+void main()
+{
+   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+   /* This constructor should result in the following matrix (GLSL matrices are
+    * column-major):
+    *
+    *     0.0  a.w  b.z  c.y
+    *     a.x  0.0  b.w  c.z
+    *     a.y  b.x  0.0  c.w
+    *     a.z  b.y  c.x  0.0
+    */
+   mat4 m = mat4(0.0, a, 0.0, b, 0.0, c, 0.0);
+   gl_FrontColor = m * d;
+}
+
+[fragment shader file]
+glsl-color.frag
+
+[test]
+uniform vec4 a 1.0 0.0 0.0 0.3
+uniform vec4 b 1.0 0.0 0.4 0.0
+uniform vec4 c 1.0 0.3 0.0 0.0
+uniform vec4 d 0.8 0.8 0.8 0.8
+
+clear color 0.2 0.2 0.2 1.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.8 0.8 0.8
