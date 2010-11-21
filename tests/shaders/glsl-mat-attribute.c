@@ -186,7 +186,16 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	char *vs_text;
+	static const char * const vs_text =
+		"attribute mat4 color;\n"
+		"attribute vec4 normalization;\n"
+		"void main()\n"
+		"{\n"
+		"   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+		"   gl_FrontColor = color[IDX] * normalization;\n"
+		"}\n"
+	;
+
 	unsigned i;
 
 	if (!GLEW_VERSION_2_0) {
@@ -196,15 +205,9 @@ void piglit_init(int argc, char **argv)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	vs_text = piglit_load_text_file("glsl-mat-attribute.vert", NULL);
-	if (vs_text == NULL) {
-		printf("Cannot load glsl-mat-attribute.vert.\n");
-		piglit_report_result(PIGLIT_FAILURE);
-	}
-
 	for (i = 0; i < 4; i++) {
 		char buf[64];
-		char *sources[2];
+		const char *sources[2];
 		GLint stat;
 		GLuint sh;
 
@@ -214,7 +217,7 @@ void piglit_init(int argc, char **argv)
 
 		sources[0] = buf;
 		sources[1] = vs_text;
-		glShaderSource(sh, 2, (const GLchar **) sources, NULL);
+		glShaderSource(sh, 2, sources, NULL);
 		glCompileShader(sh);
 
 		glGetShaderiv(sh, GL_COMPILE_STATUS, &stat);
