@@ -1085,6 +1085,8 @@ void piglit_init(int argc, char **argv)
     texture_format = &formats[0];
     has_texture_swizzle = check_support(3.3, ext_swizzle);
 
+    piglit_require_extension("GL_ARB_window_pos");
+
     for (p = 1; p < argc; p++) {
         printf("Parameter: %s\n", argv[p]);
 
