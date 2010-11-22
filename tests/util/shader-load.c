@@ -49,7 +49,13 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 	FILE *fp;
 
 # ifdef HAVE_FOPEN_S
-	errno_t err = fopen_s(&fp, file_name, "r");
+	errno_t err;
+
+	if (file_name == NULL) {
+		return NULL;
+	}
+
+	err = fopen_s(&fp, file_name, "r");
 
 	if (err || (fp == NULL)) {
 		return NULL;
