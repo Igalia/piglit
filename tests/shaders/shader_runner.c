@@ -42,6 +42,8 @@ int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 static float gl_version = 0.0;
 static float glsl_version = 0.0;
+static int gl_max_fragment_uniform_components;
+static int gl_max_vertex_uniform_components;
 
 const char *path = NULL;
 const char *test_start = NULL;
@@ -310,19 +312,54 @@ process_requirement(const char *line)
 {
 	char buffer[4096];
 
-	/* There are three types of requirements that a test can currently
+	/* There are four types of requirements that a test can currently
 	 * have:
 	 *
 	 *    * Require that some GL extension be supported
 	 *    * Require some particular versions of GL
 	 *    * Require some particular versions of GLSL
+	 *    * Require some particular number of uniform components
 	 *
 	 * The tests for GL and GLSL versions can be equal, not equal,
 	 * less, less-or-equal, greater, or greater-or-equal.  Extension tests
 	 * can also require that a particular extension not be supported by
 	 * prepending ! to the extension name.
 	 */
-	if (strncmp("GL_", line, 3) == 0) {
+	if (strncmp("GL_MAX_FRAGMENT_UNIFORM_COMPONENTS", line, 34) == 0) {
+		enum comparison cmp;
+		int maxcomp;
+
+		line = eat_whitespace(line + 34);
+
+		line = process_comparison(line, &cmp);
+
+		maxcomp = atoi(line);
+		if (!compare(maxcomp, gl_max_fragment_uniform_components, cmp)) {
+			printf("Test requires max fragment uniform components %s %i.  "
+			       "The driver supports %i.\n",
+			       comparison_string(cmp),
+			       maxcomp,
+			       gl_max_fragment_uniform_components);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	} else if (strncmp("GL_MAX_VERTEX_UNIFORM_COMPONENTS", line, 32) == 0) {
+		enum comparison cmp;
+		int maxcomp;
+
+		line = eat_whitespace(line + 32);
+
+		line = process_comparison(line, &cmp);
+
+		maxcomp = atoi(line);
+		if (!compare(maxcomp, gl_max_vertex_uniform_components, cmp)) {
+			printf("Test requires max vertex uniform components %s %i.  "
+			       "The driver supports %i.\n",
+			       comparison_string(cmp),
+			       maxcomp,
+			       gl_max_vertex_uniform_components);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	} else if (strncmp("GL_", line, 3) == 0) {
 		strcpy_to_space(buffer, line);
 		piglit_require_extension(buffer);
 	} else if (strncmp("!GL_", line, 4) == 0) {
@@ -798,6 +835,11 @@ piglit_init(int argc, char **argv)
 		glGetString(GL_SHADING_LANGUAGE_VERSION);
 	glsl_version = (glsl_version_string == NULL)
 		? 0.0 : strtod(glsl_version_string, NULL);
+
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
+		      &gl_max_fragment_uniform_components);
+	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
+		      &gl_max_vertex_uniform_components);
 
 	if (argc > 2)
 		path = argv[2];
