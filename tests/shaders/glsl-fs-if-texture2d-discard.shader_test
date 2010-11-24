@@ -15,9 +15,6 @@ void main()
 varying vec4 texcoords;
 uniform sampler2D tex;
 
-/* Testcase from Owen Taylor of a shader being experimented with in
- * gnome-shell that failed on i965 due to register allocation.
- */
 void main()
 {
 	if (texture2D(tex, texcoords.xy).x < 0.5)
