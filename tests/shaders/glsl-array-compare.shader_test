@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+#version 120
+/* Verify that two arrays can be directly compared correctly.
+ */
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+
+void main()
+{
+	float ff[2] = float[2](3.3, 3.5);
+	float fff[2] = float[2](3.3, 3.5);
+
+	if (fff != ff)
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
