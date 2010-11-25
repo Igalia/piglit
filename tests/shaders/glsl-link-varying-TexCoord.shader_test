@@ -1,0 +1,26 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+/* varying gl_TexCoord can be declared to different
+   sizes between vertex and fragment shaders.
+   See GLSL Spec v1.10, Section 7.6.
+*/
+
+[vertex shader]
+varying vec4 gl_TexCoord[2];
+void main()
+{
+	gl_Position = ftransform();
+}
+
+[fragment shader]
+varying vec4 gl_TexCoord[1];
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0 ,1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
