@@ -1,0 +1,33 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+/* built-in function could be overriden, but should not impact
+   another shader.
+*/
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+float myfunc(float);
+
+float abs(float f)
+{
+    return f-1.0; 
+}
+
+void main()
+{
+    gl_FragColor = vec4(abs(1.0), myfunc(1.0), 0.0, 1.0);
+}
+
+[fragment shader]
+float myfunc(float f)
+{
+    return abs(f);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
