@@ -1,0 +1,25 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+#version 120
+#pragma STDGL invariant(all)
+varying float var;
+void main()
+{
+	var = 1;
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+invariant varying float var;
+void main()
+{
+	gl_FragColor = vec4(0, var, 0, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
