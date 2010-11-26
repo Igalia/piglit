@@ -31,11 +31,60 @@
 int piglit_width = 128, piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
+static const char *TestName = "tex3d-maxsize";
+
+
+/*
+ * Use proxy texture to find largest possible 3D texture size.
+ */
+static void
+find_max_tex3d_size(GLint initSize, GLint *width, GLint *height, GLint *depth)
+{
+	GLint dim = 0, w, h, d, pw, ph, pd;
+
+	w = h = d = initSize;
+
+	while (w >= 1 && h >= 1 && d >= 1) {
+		/* try proxy image */
+		const int level = 0;
+
+		glTexImage3D(GL_PROXY_TEXTURE_3D, level, GL_RGBA8,
+			     w, h, d, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_3D, level,
+					 GL_TEXTURE_WIDTH, &pw);
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_3D, level,
+					 GL_TEXTURE_HEIGHT, &ph);
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_3D, level,
+					 GL_TEXTURE_DEPTH, &pd);
+
+		if (pw == w && ph == h && pd == d) {
+			/* success! */
+			*width = w;
+			*height = h;
+			*depth = d;
+			return;
+		}
+
+		/* halve one of the dimensions and try again */
+		if (dim == 0)
+			w /= 2;
+		else if (dim == 1)
+			h /= 2;
+		else
+			d /= 2;
+
+		dim = (dim + 1) % 3;
+	}
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
 	GLuint tex;
-	GLint maxsize;
+	GLint maxsize, width, height, depth;
+	GLenum err;
 	char *data;
 	int i, j;
 	GLboolean pass = GL_TRUE;
@@ -53,26 +102,57 @@ piglit_display(void)
 		return PIGLIT_FAILURE;
 
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, maxsize, maxsize, maxsize, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	if (glGetError() == GL_OUT_OF_MEMORY) {
-		glDeleteTextures(1, &tex);
-		printf("Got GL_OUT_OF_MEMORY.\n");
-		return PIGLIT_SUCCESS;
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	err = glGetError();
+
+	if (err == GL_OUT_OF_MEMORY) {
+
+		/* use proxy texture to find working max texture size */
+		find_max_tex3d_size(maxsize, &width, &height, &depth);
+#ifdef NVIDIA_HACK
+		/* XXX NVIDIA's proxy texture mechanism is broken.
+		 * If this code is enabled, a smaller texture is used and
+		 * the test passes.  Only halving the texture size isn't enough:
+		 * we try to allocate a gigantic texture which typically brings
+		 * the machine to its knees, swapping, then dying.
+		 */
+		width /= 4;
+		height /= 4;
+		depth /= 4;
+#endif
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height, depth, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		err = glGetError();
+	}
+	else {
+		/* the max 3D texture size actually worked */
+		width = height = depth = maxsize;
 	}
 
+	if (err != GL_NO_ERROR) {
+		printf("%s: unexpected glTexImage3D error: 0x%x\n",
+		       TestName, err);
+		return PIGLIT_FAILURE;
+	}
+
+	if (0)
+		printf("max 3D texture size = %d x %d x %d\n",
+		       width, height, depth);
+
 	/* Set its pixels, slice by slice. */
-	data = malloc(maxsize*maxsize*4);
-	for (j = 0; j < maxsize; j++)
-		for (i = 0; i < maxsize; i++) {
-			int a = (j*maxsize+i)*4;
-			data[a+0] = (i*255)/(maxsize-1);
-			data[a+1] = (i*255)/(maxsize-1);
-			data[a+2] = (i*255)/(maxsize-1);
-			data[a+3] = (i*255)/(maxsize-1);
+	data = malloc(width * height * 4);
+	for (j = 0; j < height; j++)
+		for (i = 0; i < width; i++) {
+			int a = (j * width + i) * 4;
+			data[a+0] =
+			data[a+1] =
+			data[a+2] =
+			data[a+3] = (i * 255) / (width - 1);
 		}
 
-	for (i = 0; i < maxsize; i++) {
-		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, i, maxsize, maxsize, 1,
+	for (i = 0; i < depth; i++) {
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, i, width, height, 1,
 				GL_RGBA, GL_UNSIGNED_BYTE, data);
 	}
 	free(data);
@@ -100,6 +180,11 @@ piglit_display(void)
 	pass = piglit_probe_pixel_rgb(piglit_width * 3 / 4,
 				      piglit_height * 3 / 4, c2) && pass;
 	glutSwapBuffers();
+
+	if (!pass) {
+		printf("%s: failed at size %d x %d x %d\n", TestName,
+		       width, height, depth);
+	}
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
