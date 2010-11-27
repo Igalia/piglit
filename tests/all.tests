@@ -733,6 +733,7 @@ add_plain_test(bugs, 'fdo23670-drawpix_stencil')
 add_plain_test(bugs, 'fdo24066')
 add_plain_test(bugs, 'fdo25614-genmipmap')
 add_plain_test(bugs, 'fdo28551')
+add_plain_test(bugs, 'fdo31934')
 add_plain_test(bugs, 'tri-tex-crash')
 
 glx = Group()
