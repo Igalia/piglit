@@ -903,10 +903,12 @@ add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_c
 
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
+add_fbo_generatemipmap_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-generatemipmap-formats')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
+add_fbo_generatemipmap_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-generatemipmap-formats')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')

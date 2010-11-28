@@ -280,6 +280,21 @@ static const struct format_desc ext_texture_compression_rgtc[] = {
 	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT),
 };
 
+static const struct format_desc arb_texture_float[] = {
+	FORMAT(GL_RGB16F_ARB),
+	FORMAT(GL_RGBA16F_ARB),
+	FORMAT(GL_ALPHA16F_ARB),
+	FORMAT(GL_LUMINANCE16F_ARB),
+	FORMAT(GL_LUMINANCE_ALPHA16F_ARB),
+	FORMAT(GL_INTENSITY16F_ARB),
+	FORMAT(GL_RGB32F_ARB),
+	FORMAT(GL_RGBA32F_ARB),
+	FORMAT(GL_ALPHA32F_ARB),
+	FORMAT(GL_LUMINANCE32F_ARB),
+	FORMAT(GL_LUMINANCE_ALPHA32F_ARB),
+	FORMAT(GL_INTENSITY32F_ARB)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -392,6 +407,12 @@ static const struct test_desc test_sets[] = {
 		Elements(ext_texture_compression_rgtc),
 		"GL_EXT_texture_compression_rgtc",
 		{"GL_EXT_texture_compression_rgtc"}
+	},
+	{
+		arb_texture_float,
+		Elements(arb_texture_float),
+		"GL_ARB_texture_float",
+		{"GL_ARB_texture_float"}
 	},
 };
 
