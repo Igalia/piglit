@@ -787,64 +787,77 @@ add_plain_test(texturing, 'depth-tex-modes-glsl')
 add_plain_test(texturing, 'depth-tex-modes-rg')
 add_plain_test(texturing, 'depth-tex-compare')
 
-def add_texwrap_test2(p1, p2):
-	texturing['texwrap-' + p1 + '-' + p2] = PlainExecTest(['texwrap', '-auto', p1, p2])
-def add_texwrap_test3(p1, p2, p3):
-	texturing['texwrap-' + p1 + '-' + p2 + '-' + p3] = PlainExecTest(['texwrap', '-auto', p1, p2, p3])
-def add_texwrap_test4(p1, p2, p3, p4):
-	texturing['texwrap-' + p1 + '-' + p2 + '-' + p3 + '-' + p4] = PlainExecTest(['texwrap', '-auto', p1, p2, p3, p4])
-
-# Test formats
-add_texwrap_test2('2D', 'GL_RGBA4')
-add_texwrap_test2('2D', 'GL_RGB5')
-add_texwrap_test2('2D', 'GL_RGB5_A1')
-add_texwrap_test2('2D', 'GL_RGB8')
-add_texwrap_test2('2D', 'GL_RGBA8')
-add_texwrap_test2('2D', 'GL_RGB10')
-add_texwrap_test2('2D', 'GL_RGB10_A2')
-add_texwrap_test2('2D', 'GL_RGB16')
-add_texwrap_test2('2D', 'GL_RGBA16')
-add_texwrap_test2('2D', 'GL_ALPHA8')
-add_texwrap_test2('2D', 'GL_ALPHA16')
-add_texwrap_test2('2D', 'GL_LUMINANCE8')
-add_texwrap_test2('2D', 'GL_LUMINANCE16')
-add_texwrap_test2('2D', 'GL_LUMINANCE4_ALPHA4')
-add_texwrap_test2('2D', 'GL_LUMINANCE8_ALPHA8')
-add_texwrap_test2('2D', 'GL_LUMINANCE16_ALPHA16')
-add_texwrap_test2('2D', 'GL_INTENSITY8')
-add_texwrap_test2('2D', 'GL_INTENSITY16')
-add_texwrap_test2('2D', 'GL_DEPTH_COMPONENT16')
-add_texwrap_test2('2D', 'GL_DEPTH_COMPONENT24')
-add_texwrap_test2('2D', 'GL_DEPTH_COMPONENT32')
-add_texwrap_test2('2D', 'GL_RGBA16F')
-add_texwrap_test2('2D', 'GL_RGBA32F')
-add_texwrap_test2('2D', 'GL_R8')
-add_texwrap_test2('2D', 'GL_RG8')
-add_texwrap_test2('2D', 'GL_R16')
-add_texwrap_test2('2D', 'GL_RG16')
-
-# Test various combinations of features
-add_texwrap_test2('1D', 'GL_RGBA8')
-add_texwrap_test2('3D', 'GL_RGBA8')
-add_texwrap_test2('RECT', 'GL_RGBA8')
-add_texwrap_test3('npot', '1D', 'GL_RGBA8')
-add_texwrap_test3('npot', '2D', 'GL_RGBA8')
-add_texwrap_test3('npot', '3D', 'GL_RGBA8')
-add_texwrap_test3('proj', '1D', 'GL_RGBA8')
-add_texwrap_test3('proj', '2D', 'GL_RGBA8')
-add_texwrap_test3('proj', '3D', 'GL_RGBA8')
-add_texwrap_test3('proj', 'RECT', 'GL_RGBA8')
-add_texwrap_test4('npot', 'proj', '1D', 'GL_RGBA8')
-add_texwrap_test4('npot', 'proj', '2D', 'GL_RGBA8')
-add_texwrap_test4('npot', 'proj', '3D', 'GL_RGBA8')
-add_texwrap_test3('border', '1D', 'GL_RGBA8')
-add_texwrap_test3('border', '2D', 'GL_RGBA8')
-add_texwrap_test3('border', '3D', 'GL_RGBA8')
-add_texwrap_test4('border', 'npot', '1D', 'GL_RGBA8')
-add_texwrap_test4('border', 'npot', '2D', 'GL_RGBA8')
-add_texwrap_test4('border', 'npot', '3D', 'GL_RGBA8')
+def add_texwrap_test1(group, p1):
+	group['texwrap-' + p1] = PlainExecTest(['texwrap', '-auto', p1])
+def add_texwrap_test2(group, p1, p2):
+	group['texwrap-' + p1 + '-' + p2] = PlainExecTest(['texwrap', '-auto', p1, p2])
+def add_texwrap_test3(group, p1, p2, p3):
+	group['texwrap-' + p1 + '-' + p2 + '-' + p3] = PlainExecTest(['texwrap', '-auto', p1, p2, p3])
 
 spec = Group();
+
+gl11 = Group()
+spec['!OpenGL 1.1'] = gl11;
+add_texwrap_test1(gl11, '1D')
+add_texwrap_test2(gl11, '1D', 'proj')
+add_texwrap_test2(gl11, '2D', 'proj')
+add_texwrap_test2(gl11, '1D', 'border')
+add_texwrap_test2(gl11, '2D', 'border')
+add_texwrap_test2(gl11, '2D', 'GL_RGBA2')
+add_texwrap_test2(gl11, '2D', 'GL_R3_G3_B2')
+add_texwrap_test2(gl11, '2D', 'GL_RGB4')
+add_texwrap_test2(gl11, '2D', 'GL_RGBA4')
+add_texwrap_test2(gl11, '2D', 'GL_RGB5')
+add_texwrap_test2(gl11, '2D', 'GL_RGB5_A1')
+add_texwrap_test2(gl11, '2D', 'GL_RGB8')
+add_texwrap_test2(gl11, '2D', 'GL_RGBA8')
+add_texwrap_test2(gl11, '2D', 'GL_RGB10')
+add_texwrap_test2(gl11, '2D', 'GL_RGB10_A2')
+add_texwrap_test2(gl11, '2D', 'GL_RGB12')
+add_texwrap_test2(gl11, '2D', 'GL_RGBA12')
+add_texwrap_test2(gl11, '2D', 'GL_RGB16')
+add_texwrap_test2(gl11, '2D', 'GL_RGBA16')
+add_texwrap_test2(gl11, '2D', 'GL_ALPHA4')
+add_texwrap_test2(gl11, '2D', 'GL_ALPHA8')
+add_texwrap_test2(gl11, '2D', 'GL_ALPHA12')
+add_texwrap_test2(gl11, '2D', 'GL_ALPHA16')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE4')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE8')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE12')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE16')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE4_ALPHA4')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE6_ALPHA2')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE8_ALPHA8')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE12_ALPHA4')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE12_ALPHA12')
+add_texwrap_test2(gl11, '2D', 'GL_LUMINANCE16_ALPHA16')
+add_texwrap_test2(gl11, '2D', 'GL_INTENSITY4')
+add_texwrap_test2(gl11, '2D', 'GL_INTENSITY8')
+add_texwrap_test2(gl11, '2D', 'GL_INTENSITY12')
+add_texwrap_test2(gl11, '2D', 'GL_INTENSITY16')
+
+gl12 = Group()
+spec['!OpenGL 1.2'] = gl12;
+add_texwrap_test1(gl12, '3D')
+add_texwrap_test2(gl12, '3D', 'proj')
+add_texwrap_test2(gl12, '3D', 'border')
+
+gl20 = Group()
+spec['!OpenGL 2.0'] = gl20;
+add_texwrap_test2(gl20, '1D', 'npot')
+add_texwrap_test3(gl20, '1D', 'npot', 'proj')
+add_texwrap_test3(gl20, '1D', 'npot', 'border')
+add_texwrap_test2(gl20, '2D', 'npot')
+add_texwrap_test3(gl20, '2D', 'npot', 'proj')
+add_texwrap_test3(gl20, '2D', 'npot', 'border')
+add_texwrap_test2(gl20, '3D', 'npot')
+add_texwrap_test3(gl20, '3D', 'npot', 'proj')
+add_texwrap_test3(gl20, '3D', 'npot', 'border')
+
+arb_texture_rectangle = Group()
+spec['ARB_texture_rectangle'] = arb_texture_rectangle;
+add_texwrap_test1(arb_texture_rectangle, 'RECT')
+add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
@@ -864,6 +877,9 @@ add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-mrt')
 arb_depth_texture = Group()
 spec['ARB_depth_texture'] = arb_depth_texture
 add_fbo_generatemipmap_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-generatemipmap-formats')
+add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT16')
+add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT24')
+add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT32')
 
 arb_depth_buffer_float = Group()
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
@@ -885,6 +901,25 @@ ext_texture_compression_s3tc = Group()
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
 add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc', 'fbo-generatemipmap-formats')
 
+ext_packed_float = Group()
+spec['EXT_packed_float'] = ext_packed_float
+add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
+
+arb_texture_float = Group()
+spec['ARB_texture_float'] = arb_texture_float
+add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_INTENSITY16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_RGB16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA16F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA32F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE32F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA32F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_INTENSITY32F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_RGB32F')
+add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA32F')
+
 ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
 add_fbo_generatemipmap_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-generatemipmap-formats')
@@ -894,10 +929,19 @@ spec['ARB_texture_rg'] = arb_texture_rg
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-generatemipmap-formats-int')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_R8')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG8')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG16')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16F')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG16F')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_R32F')
+add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG32F')
 
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
 add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
+add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 
 ext_texture_srgb = Group()
 spec['EXT_texture_sRGB'] = ext_texture_srgb

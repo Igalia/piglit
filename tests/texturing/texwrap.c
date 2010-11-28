@@ -68,15 +68,49 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_RGBA16F
-#define GL_RGBA16F 0x881A
-#endif
-#ifndef GL_RGBA32F
-#define GL_RGBA32F 0x8814
-#endif
 #ifndef GL_TEXTURE_SWIZZLE_RGBA_EXT
 #define GL_TEXTURE_SWIZZLE_RGBA_EXT 0x8E46
 #endif
+
+#ifndef GL_VERSION_3_0
+#define GL_VERSION_3_0 1
+#define GL_RGBA32F 0x8814
+#define GL_RGB32F 0x8815
+#define GL_RGBA16F 0x881A
+#define GL_RGB16F 0x881B
+#define GL_TEXTURE_RED_TYPE 0x8C10
+#define GL_TEXTURE_GREEN_TYPE 0x8C11
+#define GL_TEXTURE_BLUE_TYPE 0x8C12
+#define GL_TEXTURE_ALPHA_TYPE 0x8C13
+#define GL_TEXTURE_LUMINANCE_TYPE 0x8C14
+#define GL_TEXTURE_INTENSITY_TYPE 0x8C15
+#define GL_TEXTURE_DEPTH_TYPE 0x8C16
+#define GL_UNSIGNED_NORMALIZED 0x8C17
+#define GL_R11F_G11F_B10F 0x8C3A
+#define GL_RGB9_E5 0x8C3D
+#define GL_RGBA32UI 0x8D70
+#define GL_RGB32UI 0x8D71
+#define GL_RGBA16UI 0x8D76
+#define GL_RGB16UI 0x8D77
+#define GL_RGBA8UI 0x8D7C
+#define GL_RGB8UI 0x8D7D
+#define GL_RGBA32I 0x8D82
+#define GL_RGB32I 0x8D83
+#define GL_RGBA16I 0x8D88
+#define GL_RGB16I 0x8D89
+#define GL_RGBA8I 0x8D8E
+#define GL_RGB8I 0x8D8F
+#endif
+
+/* Only *_ARB versions of these exist. I am lazy to add the suffix. */
+#define GL_ALPHA32F                     0x8816
+#define GL_INTENSITY32F                 0x8817
+#define GL_LUMINANCE32F                 0x8818
+#define GL_LUMINANCE_ALPHA32F           0x8819
+#define GL_ALPHA16F                     0x881C
+#define GL_INTENSITY16F                 0x881D
+#define GL_LUMINANCE16F                 0x881E
+#define GL_LUMINANCE_ALPHA16F           0x881F
 
 #ifndef GL_ARB_texture_rg
 #define GL_RG 0x8227
@@ -113,26 +147,43 @@ struct format {
     int         red, green, blue, alpha, luminance, intensity, depth, stencil;
     float       version;
     const char  *extensions[2];
+    const char  *dependency_extension;
 } formats[] = {
+    /* GL 1.1 */
     {FORMAT(GL_RGBA8),              8, 8, 8, 8, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_RGBA2),              2, 2, 2, 2, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_R3_G3_B2),           3, 3, 2, 0, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_RGB4),               4, 4, 4, 0, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGBA4),              4, 4, 4, 4, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB5),               5, 5, 5, 0, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB5_A1),            5, 5, 5, 1, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_RGB10),              10, 10, 10, 0, 0, 0, 0, 0,  1.1},
     {FORMAT(GL_RGB10_A2),           10, 10, 10, 2, 0, 0, 0, 0,  1.1},
+    {FORMAT(GL_RGB12),              12, 12, 12, 0, 0, 0, 0, 0,  1.1},
+    {FORMAT(GL_RGBA12),             12, 12, 12, 12, 0, 0, 0, 0, 1.1},
     {FORMAT(GL_RGB16),              16, 16, 16, 0, 0, 0, 0, 0,  1.1},
     {FORMAT(GL_RGBA16),             16, 16, 16, 16, 0, 0, 0, 0, 1.1},
+    {FORMAT(GL_ALPHA4),             0, 0, 0, 4, 0, 0, 0, 0,     1.1},
     {FORMAT(GL_ALPHA8),             0, 0, 0, 8, 0, 0, 0, 0,     1.1},
+    {FORMAT(GL_ALPHA12),            0, 0, 0, 12, 0, 0, 0, 0,    1.1},
     {FORMAT(GL_ALPHA16),            0, 0, 0, 16, 0, 0, 0, 0,    1.1},
+    {FORMAT(GL_LUMINANCE4),         0, 0, 0, 0, 4, 0, 0, 0,     1.1},
     {FORMAT(GL_LUMINANCE8),         0, 0, 0, 0, 8, 0, 0, 0,     1.1},
+    {FORMAT(GL_LUMINANCE12),        0, 0, 0, 0, 12, 0, 0, 0,    1.1},
     {FORMAT(GL_LUMINANCE16),        0, 0, 0, 0, 16, 0, 0, 0,    1.1},
     {FORMAT(GL_LUMINANCE4_ALPHA4),  0, 0, 0, 4, 4, 0, 0, 0,     1.1},
+    {FORMAT(GL_LUMINANCE6_ALPHA2),  0, 0, 0, 2, 6, 0, 0, 0,     1.1},
     {FORMAT(GL_LUMINANCE8_ALPHA8),  0, 0, 0, 8, 8, 0, 0, 0,     1.1},
+    {FORMAT(GL_LUMINANCE12_ALPHA4), 0, 0, 0, 4, 12, 0, 0, 0,    1.1},
+    {FORMAT(GL_LUMINANCE12_ALPHA12),0, 0, 0, 12, 12, 0, 0, 0,   1.1},
     {FORMAT(GL_LUMINANCE16_ALPHA16),0, 0, 0, 16, 16, 0, 0, 0,   1.1},
+    {FORMAT(GL_INTENSITY4),         0, 0, 0, 0, 0, 4, 0, 0,     1.1},
     {FORMAT(GL_INTENSITY8),         0, 0, 0, 0, 0, 8, 0, 0,     1.1},
+    {FORMAT(GL_INTENSITY12),        0, 0, 0, 0, 0, 12, 0, 0,    1.1},
     {FORMAT(GL_INTENSITY16),        0, 0, 0, 0, 0, 16, 0, 0,    1.1},
 
+    /* ARB_depth_texture */
     {FORMAT(GL_DEPTH_COMPONENT16),  0, 0, 0, 0, 0, 0, 16, 0,    1.4,
      {"GL_ARB_depth_texture"}},
     {FORMAT(GL_DEPTH_COMPONENT24),  0, 0, 0, 0, 0, 0, 24, 0,    1.4,
@@ -140,11 +191,33 @@ struct format {
     {FORMAT(GL_DEPTH_COMPONENT32),  0, 0, 0, 0, 0, 0, 32, 0,    1.4,
      {"GL_ARB_depth_texture"}},
 
+    /* ARB_texture_float */
+    {FORMAT(GL_ALPHA16F),           0, 0, 0, 16, 0, 0, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_LUMINANCE16F),       0, 0, 0, 0, 16, 0, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_LUMINANCE_ALPHA16F), 0, 0, 0, 16, 16, 0, 0, 0,   999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_INTENSITY16F),       0, 0, 0, 0, 0, 16, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_RGB16F),             16, 16, 16, 0, 0, 0, 0, 0,  3.0,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
     {FORMAT(GL_RGBA16F),            16, 16, 16, 16, 0, 0, 0, 0, 3.0,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_ALPHA32F),           0, 0, 0, 32, 0, 0, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_LUMINANCE32F),       0, 0, 0, 0, 32, 0, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_LUMINANCE_ALPHA32F), 0, 0, 0, 32, 32, 0, 0, 0,   999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_INTENSITY32F),       0, 0, 0, 0, 0, 32, 0, 0,    999,
+     {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
+    {FORMAT(GL_RGB32F),             32, 32, 32, 0, 0, 0, 0, 0,  3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
     {FORMAT(GL_RGBA32F),            32, 32, 32, 32, 0, 0, 0, 0, 3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
 
+    /* ARB_texture_rg */
     {FORMAT(GL_R8),                 8, 0, 0, 0, 0, 0, 0, 0,     3.0,
      {"GL_ARB_texture_rg"}},
     {FORMAT(GL_RG8),                8, 8, 0, 0, 0, 0, 0, 0,     3.0,
@@ -153,6 +226,22 @@ struct format {
      {"GL_ARB_texture_rg"}},
     {FORMAT(GL_RG16),               16, 16, 0, 0, 0, 0, 0, 0,   3.0,
      {"GL_ARB_texture_rg"}},
+    {FORMAT(GL_R16F),               16, 0, 0, 0, 0, 0, 0, 0,    3.0,
+     {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
+    {FORMAT(GL_RG16F),              16, 16, 0, 0, 0, 0, 0, 0,   3.0,
+     {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
+    {FORMAT(GL_R32F),               32, 0, 0, 0, 0, 0, 0, 0,    3.0,
+     {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
+    {FORMAT(GL_RG32F),              32, 32, 0, 0, 0, 0, 0, 0,   3.0,
+     {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
+
+    /* EXT_packed_float */
+    {FORMAT(GL_R11F_G11F_B10F),     11, 11, 10, 0, 0, 0, 0, 0,  3.0,
+     {"GL_EXT_packed_float"}},
+
+    /* EXT_texture_shared_exponent */
+    {FORMAT(GL_RGB9_E5),            9, 9, 9, 0, 0, 0, 0, 0,     3.0,
+     {"GL_EXT_texture_shared_exponent"}},
 
     {0}
 };
@@ -235,7 +324,7 @@ static GLboolean has_texture_swizzle;
 
 /* Image data. */
 static const int swizzle[4] = {2, 0, 1, 3};
-static const float borderf[4] = { 0.0, 1.0, 0.5, 0.8 };
+static const float borderf[4] = { 0.1, 0.9, 0.5, 0.8 };
 static float borderf_real[4];
 static float border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
 static float no_border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
@@ -730,15 +819,18 @@ static void key_func(unsigned char key, int x, int y)
     piglit_escape_exit_key(key, x, y);
 }
 
-static GLboolean check_support(float version, const char *extensions[2])
+static GLboolean check_support(float version, const char *extensions[2],
+                               const char *dep_extension)
 {
     float glversion = atof((char *)glGetString(GL_VERSION));
 
-    if (version <= glversion ||
-        (extensions[0] && glutExtensionSupported(extensions[0])) ||
-        (extensions[1] && glutExtensionSupported(extensions[1]))) {
+    if (version <= glversion)
         return GL_TRUE;
-    }
+
+    if (((extensions[0] && glutExtensionSupported(extensions[0])) ||
+         (extensions[1] && glutExtensionSupported(extensions[1]))) &&
+        (!dep_extension || glutExtensionSupported(dep_extension)))
+        return GL_TRUE;
 
     return GL_FALSE;
 }
@@ -1015,7 +1107,7 @@ GLboolean is_format_supported(struct format *f)
     float p[4] = {0};
     int r, g, b, a, l, i, d, s, iformat;
 
-    if (!check_support(f->version, f->extensions))
+    if (!check_support(f->version, f->extensions, f->dependency_extension))
         return GL_FALSE;
 
     /* A quick and dirty way to check if we get the format we want. */
@@ -1083,7 +1175,7 @@ void piglit_init(int argc, char **argv)
     texture_proj = 0;
     texture_swizzle = 0;
     texture_format = &formats[0];
-    has_texture_swizzle = check_support(3.3, ext_swizzle);
+    has_texture_swizzle = check_support(3.3, ext_swizzle, NULL);
 
     piglit_require_extension("GL_ARB_window_pos");
 
@@ -1103,7 +1195,7 @@ void piglit_init(int argc, char **argv)
         }
         if (strcmp(argv[p], "3D") == 0) {
             const char *extensions[2] = {"GL_EXT_texture3D", NULL};
-            if (!check_support(1.2, extensions))
+            if (!check_support(1.2, extensions, NULL))
                 piglit_report_result(PIGLIT_SKIP);
 
             texture_target = GL_TEXTURE_3D;
@@ -1113,7 +1205,7 @@ void piglit_init(int argc, char **argv)
         if (strcmp(argv[p], "RECT") == 0) {
             const char *extensions[2] = {"GL_ARB_texture_rectangle",
                                          "GL_NV_texture_rectangle"};
-            if (!check_support(3.1, extensions))
+            if (!check_support(3.1, extensions, NULL))
                 piglit_report_result(PIGLIT_SKIP);
 
             texture_target = GL_TEXTURE_RECTANGLE_NV;
@@ -1168,7 +1260,8 @@ void piglit_init(int argc, char **argv)
             wrap_modes[i].supported = GL_FALSE;
         } else {
             wrap_modes[i].supported =
-                check_support(wrap_modes[i].version, wrap_modes[i].extensions);
+                check_support(wrap_modes[i].version,
+                              wrap_modes[i].extensions, NULL);
         }
     }
 
