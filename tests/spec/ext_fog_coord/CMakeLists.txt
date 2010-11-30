@@ -21,3 +21,6 @@ link_libraries (
 )
 
 add_executable (ext_fog_coord-modes modes.c)
+IF (UNIX)
+	target_link_libraries (ext_fog_coord-modes m)
+ENDIF (UNIX)
