@@ -115,7 +115,6 @@ piglit_display(void)
 	glEnableClientState(GL_COLOR_ARRAY);
 	set_colors(colors, blue);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	glutSwapBuffers();
 
 	pass &= piglit_probe_pixel_rgb(piglit_width * 1 / 6,
 				       piglit_height / 2, red);
@@ -123,6 +122,8 @@ piglit_display(void)
 				       piglit_height / 2, black);
 	pass &= piglit_probe_pixel_rgb(piglit_width * 5 / 6,
 				       piglit_height / 2, blue);
+
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
