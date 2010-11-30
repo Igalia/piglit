@@ -896,13 +896,32 @@ ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
 
+ext_texture_compression_latc = Group()
+spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
+add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_LATC1')
+add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_LATC1')
+add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_LATC2')
+add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2')
+
 ext_texture_compression_rgtc = Group()
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc', 'fbo-generatemipmap-formats')
+add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RED_RGTC1')
+add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_SIGNED_RED_RGTC1')
+add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RG_RGTC2')
+add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_SIGNED_RG_RGTC2')
 
 ext_texture_compression_s3tc = Group()
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
 add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc', 'fbo-generatemipmap-formats')
+add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGB_S3TC_DXT1')
+add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT1')
+add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT3')
+add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT5')
+
+ati_texture_compression_3dc = Group()
+spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
+add_texwrap_test2(ati_texture_compression_3dc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_3DC')
 
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float

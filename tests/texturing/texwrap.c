@@ -112,6 +112,20 @@
 #define GL_LUMINANCE16F                 0x881E
 #define GL_LUMINANCE_ALPHA16F           0x881F
 
+/* Only *_EXT versions of these exist. I am lazy to add the suffix. */
+#define GL_COMPRESSED_RGB_S3TC_DXT1 0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1 0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3 0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5 0x83F3
+#define GL_COMPRESSED_LUMINANCE_LATC1 0x8C70
+#define GL_COMPRESSED_SIGNED_LUMINANCE_LATC1 0x8C71
+#define GL_COMPRESSED_LUMINANCE_ALPHA_LATC2 0x8C72
+#define GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2 0x8C73
+
+/* Only *_ATI versions of these exist. It's nicer without the suffix. */
+#define GL_COMPRESSED_LUMINANCE_ALPHA_3DC 0x8837
+
+
 #ifndef GL_ARB_texture_rg
 #define GL_RG 0x8227
 #define GL_RG_INTEGER 0x8228
@@ -137,6 +151,14 @@
 #define GL_RG32UI 0x823C
 #endif
 
+#ifndef GL_ARB_texture_compression_rgtc
+#define GL_ARB_texture_compression_rgtc 1
+#define GL_COMPRESSED_RED_RGTC1 0x8DBB
+#define GL_COMPRESSED_SIGNED_RED_RGTC1 0x8DBC
+#define GL_COMPRESSED_RG_RGTC2 0x8DBD
+#define GL_COMPRESSED_SIGNED_RG_RGTC2 0x8DBE
+#endif /* GL_ARB_texture_compression_rgtc */
+
 /* Formats. */
 
 #define FORMAT(f) #f, f
@@ -145,103 +167,138 @@ struct format {
     const char  *name;
     GLenum      internalformat;
     int         red, green, blue, alpha, luminance, intensity, depth, stencil;
+    GLboolean   compressed;
     float       version;
     const char  *extensions[2];
     const char  *dependency_extension;
 } formats[] = {
     /* GL 1.1 */
-    {FORMAT(GL_RGBA8),              8, 8, 8, 8, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGBA2),              2, 2, 2, 2, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_R3_G3_B2),           3, 3, 2, 0, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB4),               4, 4, 4, 0, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGBA4),              4, 4, 4, 4, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB5),               5, 5, 5, 0, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB5_A1),            5, 5, 5, 1, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_RGB10),              10, 10, 10, 0, 0, 0, 0, 0,  1.1},
-    {FORMAT(GL_RGB10_A2),           10, 10, 10, 2, 0, 0, 0, 0,  1.1},
-    {FORMAT(GL_RGB12),              12, 12, 12, 0, 0, 0, 0, 0,  1.1},
-    {FORMAT(GL_RGBA12),             12, 12, 12, 12, 0, 0, 0, 0, 1.1},
-    {FORMAT(GL_RGB16),              16, 16, 16, 0, 0, 0, 0, 0,  1.1},
-    {FORMAT(GL_RGBA16),             16, 16, 16, 16, 0, 0, 0, 0, 1.1},
-    {FORMAT(GL_ALPHA4),             0, 0, 0, 4, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_ALPHA8),             0, 0, 0, 8, 0, 0, 0, 0,     1.1},
-    {FORMAT(GL_ALPHA12),            0, 0, 0, 12, 0, 0, 0, 0,    1.1},
-    {FORMAT(GL_ALPHA16),            0, 0, 0, 16, 0, 0, 0, 0,    1.1},
-    {FORMAT(GL_LUMINANCE4),         0, 0, 0, 0, 4, 0, 0, 0,     1.1},
-    {FORMAT(GL_LUMINANCE8),         0, 0, 0, 0, 8, 0, 0, 0,     1.1},
-    {FORMAT(GL_LUMINANCE12),        0, 0, 0, 0, 12, 0, 0, 0,    1.1},
-    {FORMAT(GL_LUMINANCE16),        0, 0, 0, 0, 16, 0, 0, 0,    1.1},
-    {FORMAT(GL_LUMINANCE4_ALPHA4),  0, 0, 0, 4, 4, 0, 0, 0,     1.1},
-    {FORMAT(GL_LUMINANCE6_ALPHA2),  0, 0, 0, 2, 6, 0, 0, 0,     1.1},
-    {FORMAT(GL_LUMINANCE8_ALPHA8),  0, 0, 0, 8, 8, 0, 0, 0,     1.1},
-    {FORMAT(GL_LUMINANCE12_ALPHA4), 0, 0, 0, 4, 12, 0, 0, 0,    1.1},
-    {FORMAT(GL_LUMINANCE12_ALPHA12),0, 0, 0, 12, 12, 0, 0, 0,   1.1},
-    {FORMAT(GL_LUMINANCE16_ALPHA16),0, 0, 0, 16, 16, 0, 0, 0,   1.1},
-    {FORMAT(GL_INTENSITY4),         0, 0, 0, 0, 0, 4, 0, 0,     1.1},
-    {FORMAT(GL_INTENSITY8),         0, 0, 0, 0, 0, 8, 0, 0,     1.1},
-    {FORMAT(GL_INTENSITY12),        0, 0, 0, 0, 0, 12, 0, 0,    1.1},
-    {FORMAT(GL_INTENSITY16),        0, 0, 0, 0, 0, 16, 0, 0,    1.1},
+    {FORMAT(GL_RGBA8),              8, 8, 8, 8, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGBA2),              2, 2, 2, 2, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_R3_G3_B2),           3, 3, 2, 0, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGB4),               4, 4, 4, 0, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGBA4),              4, 4, 4, 4, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGB5),               5, 5, 5, 0, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGB5_A1),            5, 5, 5, 1, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGB8),               8, 8, 8, 0, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_RGB10),              10, 10, 10, 0, 0, 0, 0, 0,  0, 1.1},
+    {FORMAT(GL_RGB10_A2),           10, 10, 10, 2, 0, 0, 0, 0,  0, 1.1},
+    {FORMAT(GL_RGB12),              12, 12, 12, 0, 0, 0, 0, 0,  0, 1.1},
+    {FORMAT(GL_RGBA12),             12, 12, 12, 12, 0, 0, 0, 0, 0, 1.1},
+    {FORMAT(GL_RGB16),              16, 16, 16, 0, 0, 0, 0, 0,  0, 1.1},
+    {FORMAT(GL_RGBA16),             16, 16, 16, 16, 0, 0, 0, 0, 0, 1.1},
+    {FORMAT(GL_ALPHA4),             0, 0, 0, 4, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_ALPHA8),             0, 0, 0, 8, 0, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_ALPHA12),            0, 0, 0, 12, 0, 0, 0, 0,    0, 1.1},
+    {FORMAT(GL_ALPHA16),            0, 0, 0, 16, 0, 0, 0, 0,    0, 1.1},
+    {FORMAT(GL_LUMINANCE4),         0, 0, 0, 0, 4, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_LUMINANCE8),         0, 0, 0, 0, 8, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_LUMINANCE12),        0, 0, 0, 0, 12, 0, 0, 0,    0, 1.1},
+    {FORMAT(GL_LUMINANCE16),        0, 0, 0, 0, 16, 0, 0, 0,    0, 1.1},
+    {FORMAT(GL_LUMINANCE4_ALPHA4),  0, 0, 0, 4, 4, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_LUMINANCE6_ALPHA2),  0, 0, 0, 2, 6, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_LUMINANCE8_ALPHA8),  0, 0, 0, 8, 8, 0, 0, 0,     0, 1.1},
+    {FORMAT(GL_LUMINANCE12_ALPHA4), 0, 0, 0, 4, 12, 0, 0, 0,    0, 1.1},
+    {FORMAT(GL_LUMINANCE12_ALPHA12),0, 0, 0, 12, 12, 0, 0, 0,   0, 1.1},
+    {FORMAT(GL_LUMINANCE16_ALPHA16),0, 0, 0, 16, 16, 0, 0, 0,   0, 1.1},
+    {FORMAT(GL_INTENSITY4),         0, 0, 0, 0, 0, 4, 0, 0,     0, 1.1},
+    {FORMAT(GL_INTENSITY8),         0, 0, 0, 0, 0, 8, 0, 0,     0, 1.1},
+    {FORMAT(GL_INTENSITY12),        0, 0, 0, 0, 0, 12, 0, 0,    0, 1.1},
+    {FORMAT(GL_INTENSITY16),        0, 0, 0, 0, 0, 16, 0, 0,    0, 1.1},
 
     /* ARB_depth_texture */
-    {FORMAT(GL_DEPTH_COMPONENT16),  0, 0, 0, 0, 0, 0, 16, 0,    1.4,
+    {FORMAT(GL_DEPTH_COMPONENT16),  0, 0, 0, 0, 0, 0, 16, 0,    0, 1.4,
      {"GL_ARB_depth_texture"}},
-    {FORMAT(GL_DEPTH_COMPONENT24),  0, 0, 0, 0, 0, 0, 24, 0,    1.4,
+    {FORMAT(GL_DEPTH_COMPONENT24),  0, 0, 0, 0, 0, 0, 24, 0,    0, 1.4,
      {"GL_ARB_depth_texture"}},
-    {FORMAT(GL_DEPTH_COMPONENT32),  0, 0, 0, 0, 0, 0, 32, 0,    1.4,
+    {FORMAT(GL_DEPTH_COMPONENT32),  0, 0, 0, 0, 0, 0, 32, 0,    0, 1.4,
      {"GL_ARB_depth_texture"}},
 
+    /* ARB_texture_compression_rgtc */
+    {FORMAT(GL_COMPRESSED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0,   1, 3.0,
+     {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
+    {FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0, 1, 3.0,
+     {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
+    {FORMAT(GL_COMPRESSED_RG_RGTC2), 4, 4, 0, 0, 0, 0, 0, 0,    1, 3.0,
+     {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
+    {FORMAT(GL_COMPRESSED_SIGNED_RG_RGTC2), 4, 4, 0, 0, 0, 0, 0, 0, 1, 3.0,
+     {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
+
     /* ARB_texture_float */
-    {FORMAT(GL_ALPHA16F),           0, 0, 0, 16, 0, 0, 0, 0,    999,
+    {FORMAT(GL_ALPHA16F),           0, 0, 0, 16, 0, 0, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_LUMINANCE16F),       0, 0, 0, 0, 16, 0, 0, 0,    999,
+    {FORMAT(GL_LUMINANCE16F),       0, 0, 0, 0, 16, 0, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_LUMINANCE_ALPHA16F), 0, 0, 0, 16, 16, 0, 0, 0,   999,
+    {FORMAT(GL_LUMINANCE_ALPHA16F), 0, 0, 0, 16, 16, 0, 0, 0,   0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_INTENSITY16F),       0, 0, 0, 0, 0, 16, 0, 0,    999,
+    {FORMAT(GL_INTENSITY16F),       0, 0, 0, 0, 0, 16, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_RGB16F),             16, 16, 16, 0, 0, 0, 0, 0,  3.0,
+    {FORMAT(GL_RGB16F),             16, 16, 16, 0, 0, 0, 0, 0,  0, 3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_RGBA16F),            16, 16, 16, 16, 0, 0, 0, 0, 3.0,
+    {FORMAT(GL_RGBA16F),            16, 16, 16, 16, 0, 0, 0, 0, 0, 3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_ALPHA32F),           0, 0, 0, 32, 0, 0, 0, 0,    999,
+    {FORMAT(GL_ALPHA32F),           0, 0, 0, 32, 0, 0, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_LUMINANCE32F),       0, 0, 0, 0, 32, 0, 0, 0,    999,
+    {FORMAT(GL_LUMINANCE32F),       0, 0, 0, 0, 32, 0, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_LUMINANCE_ALPHA32F), 0, 0, 0, 32, 32, 0, 0, 0,   999,
+    {FORMAT(GL_LUMINANCE_ALPHA32F), 0, 0, 0, 32, 32, 0, 0, 0,   0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_INTENSITY32F),       0, 0, 0, 0, 0, 32, 0, 0,    999,
+    {FORMAT(GL_INTENSITY32F),       0, 0, 0, 0, 0, 32, 0, 0,    0, 999,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_RGB32F),             32, 32, 32, 0, 0, 0, 0, 0,  3.0,
+    {FORMAT(GL_RGB32F),             32, 32, 32, 0, 0, 0, 0, 0,  0, 3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
-    {FORMAT(GL_RGBA32F),            32, 32, 32, 32, 0, 0, 0, 0, 3.0,
+    {FORMAT(GL_RGBA32F),            32, 32, 32, 32, 0, 0, 0, 0, 0, 3.0,
      {"GL_ARB_texture_float", "GL_ATI_texture_float"}},
 
     /* ARB_texture_rg */
-    {FORMAT(GL_R8),                 8, 0, 0, 0, 0, 0, 0, 0,     3.0,
+    {FORMAT(GL_R8),                 8, 0, 0, 0, 0, 0, 0, 0,     0, 3.0,
      {"GL_ARB_texture_rg"}},
-    {FORMAT(GL_RG8),                8, 8, 0, 0, 0, 0, 0, 0,     3.0,
+    {FORMAT(GL_RG8),                8, 8, 0, 0, 0, 0, 0, 0,     0, 3.0,
      {"GL_ARB_texture_rg"}},
-    {FORMAT(GL_R16),                16, 0, 0, 0, 0, 0, 0, 0,    3.0,
+    {FORMAT(GL_R16),                16, 0, 0, 0, 0, 0, 0, 0,    0, 3.0,
      {"GL_ARB_texture_rg"}},
-    {FORMAT(GL_RG16),               16, 16, 0, 0, 0, 0, 0, 0,   3.0,
+    {FORMAT(GL_RG16),               16, 16, 0, 0, 0, 0, 0, 0,   0, 3.0,
      {"GL_ARB_texture_rg"}},
-    {FORMAT(GL_R16F),               16, 0, 0, 0, 0, 0, 0, 0,    3.0,
+    {FORMAT(GL_R16F),               16, 0, 0, 0, 0, 0, 0, 0,    0, 3.0,
      {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
-    {FORMAT(GL_RG16F),              16, 16, 0, 0, 0, 0, 0, 0,   3.0,
+    {FORMAT(GL_RG16F),              16, 16, 0, 0, 0, 0, 0, 0,   0, 3.0,
      {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
-    {FORMAT(GL_R32F),               32, 0, 0, 0, 0, 0, 0, 0,    3.0,
+    {FORMAT(GL_R32F),               32, 0, 0, 0, 0, 0, 0, 0,    0, 3.0,
      {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
-    {FORMAT(GL_RG32F),              32, 32, 0, 0, 0, 0, 0, 0,   3.0,
+    {FORMAT(GL_RG32F),              32, 32, 0, 0, 0, 0, 0, 0,   0, 3.0,
      {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
 
     /* EXT_packed_float */
-    {FORMAT(GL_R11F_G11F_B10F),     11, 11, 10, 0, 0, 0, 0, 0,  3.0,
+    {FORMAT(GL_R11F_G11F_B10F),     11, 11, 10, 0, 0, 0, 0, 0,  0, 3.0,
      {"GL_EXT_packed_float"}},
 
+    /* EXT_texture_compression_latc */
+    {FORMAT(GL_COMPRESSED_LUMINANCE_LATC1), 0, 0, 0, 0, 4, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_latc"}},
+    {FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1), 0, 0, 0, 0, 4, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_latc"}},
+    {FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_latc"}},
+    {FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_latc"}},
+
+    /* EXT_texture_compression_s3tc */
+    {FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1), 4, 4, 4, 0, 0, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_s3tc"}},
+    {FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1), 4, 4, 4, 1, 0, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_s3tc"}},
+    {FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3), 4, 4, 4, 4, 0, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_s3tc"}},
+    {FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5), 4, 4, 4, 4, 0, 0, 0, 0, 1, 999,
+     {"GL_EXT_texture_compression_s3tc"}},
+
     /* EXT_texture_shared_exponent */
-    {FORMAT(GL_RGB9_E5),            9, 9, 9, 0, 0, 0, 0, 0,     3.0,
+    {FORMAT(GL_RGB9_E5),            9, 9, 9, 0, 0, 0, 0, 0,     0, 3.0,
      {"GL_EXT_texture_shared_exponent"}},
+
+    /* ATI_texture_compression_3dc */
+    {FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_3DC), 0, 0, 0, 4, 4, 0, 0, 0, 1, 999,
+     {"GL_ATI_texture_compression_3dc"}},
 
     {0}
 };
@@ -326,8 +383,8 @@ static GLboolean has_texture_swizzle;
 static const int swizzle[4] = {2, 0, 1, 3};
 static const float borderf[4] = { 0.1, 0.9, 0.5, 0.8 };
 static float borderf_real[4];
-static float border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
-static float no_border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
+static float border_image[(SIZEMAX+2) * (SIZEMAX+2) * (SIZEMAX+2) * 4];
+static float no_border_image[SIZEMAX * SIZEMAX * SIZEMAX * 4];
 
 /* Derived from texture_size, texture_target, and border. */
 static int size_x = 1, size_y = 1, size_z = 1;          /* size */
@@ -797,6 +854,11 @@ static void key_func(unsigned char key, int x, int y)
                    "textures.\n");
             return;
         }
+        if (texture_format->compressed) {
+            printf("The texture border cannot be used with compressed "
+                   "textures.\n");
+            return;
+        }
 
         texture_id = texture_id == NO_BORDER_TEXTURE ?
                      BORDER_TEXTURE : NO_BORDER_TEXTURE;
@@ -923,7 +985,8 @@ static void init_textures()
     }
 
     if ((!piglit_automatic || texture_id == BORDER_TEXTURE) &&
-        texture_target != GL_TEXTURE_RECTANGLE_NV) {
+        texture_target != GL_TEXTURE_RECTANGLE_NV &&
+        !texture_format->compressed) {
         for (z = 0; z < bsize_z; z++) {
             for (y = 0; y < bsize_y; y++) {
                 for (x = 0; x < bsize_x; x++) {
@@ -1018,6 +1081,9 @@ static void init_textures()
     }
 
     if (!piglit_automatic || texture_id == NO_BORDER_TEXTURE) {
+        float *data;
+        unsigned real_size_x, real_size_y;
+
         for (z = 0; z < size_z; z++) {
             for (y = 0; y < size_y; y++) {
                 for (x = 0; x < size_x; x++) {
@@ -1071,32 +1137,93 @@ static void init_textures()
             }
         }
 
+        /* Expand pixels to 4x4 blocks of one color to get
+         * "lossless compression". */
+        if (texture_format->compressed) {
+            data = malloc(SIZEMAX*4 * SIZEMAX*4 * SIZEMAX * sizeof(float) * 4);
+
+            for (z = 0; z < size_z; z++) {
+                for (y = 0; y < size_y; y++) {
+                    for (x = 0; x < size_x; x++) {
+                        unsigned src = (z*size_y*size_x + y*size_x + x)*4;
+                        unsigned dstb = (z*size_y*size_x + y*size_x)*16 + x*4;
+                        unsigned r, c;
+
+                        for (r = 0; r < 4; r++) {
+                            unsigned dstr = dstb + r*size_x*4;
+                            for (c = 0; c < 4; c++) {
+                                unsigned dst = (dstr + c)*4;
+                                data[dst+0] = no_border_image[src+0];
+                                data[dst+1] = no_border_image[src+1];
+                                data[dst+2] = no_border_image[src+2];
+                                data[dst+3] = no_border_image[src+3];
+                            }
+                        }
+
+                        if (texture_format->internalformat ==
+                            GL_COMPRESSED_RGBA_S3TC_DXT1) {
+                            if (no_border_image[src+0] == 0 &&
+                                no_border_image[src+1] == 0 &&
+                                no_border_image[src+2] == 0 &&
+                                no_border_image[src+3] == 0) {
+                                /* DXT1: If everything is black,
+                                 * the alpha is 1.
+                                 * XXX This behavior is weird and matches
+                                 * Mesa+libtxc_dxtn, proprietary drivers may
+                                 * behave differently. We need to test those
+                                 * and see if it's an issue with Mesa or not. */
+                                no_border_image[src+3] = 1;
+                            } else if (no_border_image[src+3] < 0.5) {
+                                /* DXT1: If the 1-bit alpha is black,
+                                 * the RGB color is black as well. */
+                                no_border_image[src+0] = 0;
+                                no_border_image[src+1] = 0;
+                                no_border_image[src+2] = 0;
+                                no_border_image[src+3] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            real_size_x = size_x*4;
+            real_size_y = size_y*4;
+        } else {
+            data = no_border_image;
+            real_size_x = size_x;
+            real_size_y = size_y;
+        }
+
         glBindTexture(texture_target, NO_BORDER_TEXTURE);
         glTexParameterfv(texture_target, GL_TEXTURE_BORDER_COLOR, borderf);
         switch (texture_target) {
         case GL_TEXTURE_1D:
             glTexImage1D(texture_target, 0, texture_format->internalformat,
-                         size_x, 0,
-                         baseformat, GL_FLOAT, (void *) no_border_image);
+                         real_size_x, 0,
+                         baseformat, GL_FLOAT, (void *) data);
             break;
 
         case GL_TEXTURE_2D:
         case GL_TEXTURE_RECTANGLE_NV:
             glTexImage2D(texture_target, 0, texture_format->internalformat,
-                         size_x, size_y, 0,
-                         baseformat, GL_FLOAT, (void *) no_border_image);
+                         real_size_x, real_size_y, 0,
+                         baseformat, GL_FLOAT, (void *) data);
             break;
 
         case GL_TEXTURE_3D:
             if (1.2 <= atof((char *)glGetString(GL_VERSION)))
                 glTexImage3D(texture_target, 0, texture_format->internalformat,
-                             size_x, size_y, size_z, 0,
-                             baseformat, GL_FLOAT, (void *) no_border_image);
+                             real_size_x, real_size_y, size_z, 0,
+                             baseformat, GL_FLOAT, (void *) data);
             else
                 glTexImage3DEXT(texture_target, 0, texture_format->internalformat,
-                                size_x, size_y, size_z, 0,
-                                baseformat, GL_FLOAT, (void *) no_border_image);
+                                real_size_x, real_size_y, size_z, 0,
+                                baseformat, GL_FLOAT, (void *) data);
             break;
+        }
+
+        if (texture_format->compressed) {
+            free(data);
         }
     }
 }
