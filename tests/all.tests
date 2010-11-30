@@ -956,6 +956,10 @@ ati_envmap_bumpmap = Group()
 spec['ATI_envmap_bumpmap'] = ati_envmap_bumpmap
 add_plain_test(ati_envmap_bumpmap, 'ati_envmap_bumpmap-bump')
 
+ext_fog_coord = Group()
+spec['EXT_fog_coord'] = ext_fog_coord
+add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
+
 # Include the glsl parser tests from glslparser.tests.
 def add_glslparsertest(shader, result):
 	glslparsertest[shader] = PlainExecTest(['glslparsertest', 'tests/glslparsertest/shaders/' + shader, result])
