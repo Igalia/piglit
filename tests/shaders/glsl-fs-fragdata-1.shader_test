@@ -1,0 +1,24 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 color;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	color = vec4(0.0, 1.0, 0.5, 0.0);
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragData[0] = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.5 0.0
