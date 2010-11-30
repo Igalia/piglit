@@ -29,6 +29,11 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
+#if defined(_MSC_VER)
+#undef near
+#undef far
+#endif
+
 int piglit_width = 100;
 int piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
