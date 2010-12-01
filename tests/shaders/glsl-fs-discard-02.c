@@ -69,7 +69,7 @@ static GLuint setup_shaders()
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
 	prog = piglit_link_simple_program(vs, fs);
 
-	glUseProgram(prog);
+	piglit_UseProgram(prog);
 	return prog;
 }
 
@@ -110,9 +110,7 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_vertex_shader();
+	piglit_require_fragment_shader();
 }
 
