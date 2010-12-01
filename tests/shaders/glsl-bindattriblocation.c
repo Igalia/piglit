@@ -68,19 +68,15 @@ piglit_display(void)
 	GLint orig_attrib_loc, attrib_loc;
 	enum piglit_result result;
 
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vertShaderText, NULL);
-
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		fprintf(stderr, "glsl-bindattriblocation: error compiling vertex shader!\n");
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
+	if (vs == 0) {
                 exit(1);
         }
 
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
-	glLinkProgram(prog);
+	prog = piglit_link_simple_program(vs, 0);
+	if (prog == 0) {
+                exit(1);
+        }
 
 	orig_attrib_loc = glGetAttribLocation(prog, "attrib");
 	if (!piglit_automatic)
@@ -88,7 +84,7 @@ piglit_display(void)
 
 	/* Bind "attrib" to location 3 and re-link */
 	glBindAttribLocation(prog, 3, "attrib");
-	glLinkProgram(prog);
+	piglit_LinkProgram(prog);
 
 	/* check that the bind worked */
 	attrib_loc = glGetAttribLocation(prog, "attrib");
@@ -102,7 +98,7 @@ piglit_display(void)
 	}
 
 	/* now draw something and check that it works */
-	glUseProgram(prog);
+	piglit_UseProgram(prog);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -129,6 +125,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	piglit_require_vertex_shader();
+
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);

@@ -1,6 +1,5 @@
 // if you inline all functions indiscriminately, you won't pass this
 [require]
-GL >= 2.0
 GLSL >= 1.10
 
 [vertex shader]

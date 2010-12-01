@@ -1,5 +1,4 @@
 [require]
-GL >= 2.0
 GLSL >= 1.20
 
 /* Test varying matrix whose column number greater than the row number.

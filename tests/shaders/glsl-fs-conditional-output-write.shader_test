@@ -1,6 +1,5 @@
 # Bug #30415
 [require]
-GL >= 2.0
 GLSL >= 1.10
 
 [vertex shader]

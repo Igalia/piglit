@@ -95,25 +95,39 @@ enum comparison {
 void
 compile_glsl(GLenum target, bool release_text)
 {
-	GLuint shader = glCreateShader(target);
+	GLuint shader = piglit_CreateShader(target);
 	GLint ok;
 	unsigned i;
 
-	glShaderSource(shader, num_shader_strings,
-		       (const GLchar **) shader_strings, shader_string_sizes);
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		piglit_require_vertex_shader();
+		break;
+	case GL_FRAGMENT_SHADER:
+		piglit_require_fragment_shader();
+		break;
+	case GL_GEOMETRY_SHADER_ARB:
+		if (gl_version < 3.2)
+			piglit_require_extension("GL_ARB_geometry_shader4");
+		break;
+	}
 
-	glCompileShader(shader);
+	piglit_ShaderSource(shader, num_shader_strings,
+			    (const GLchar **) shader_strings,
+			    shader_string_sizes);
 
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+	piglit_CompileShader(shader);
+
+	piglit_GetShaderiv(shader, GL_COMPILE_STATUS, &ok);
 
 	if (!ok) {
 		GLchar *info;
 		GLint size;
 
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
+		piglit_GetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		glGetShaderInfoLog(shader, size, NULL, info);
+		piglit_GetShaderInfoLog(shader, size, NULL, info);
 
 		fprintf(stderr, "Failed to compile %s: %s\n",
 			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
@@ -466,43 +480,43 @@ link_and_use_shaders(void)
 	    && (num_geometry_shaders == 0))
 		return;
 
-	prog = glCreateProgram();
+	prog = piglit_CreateProgram();
 
 	for (i = 0; i < num_vertex_shaders; i++) {
-		glAttachShader(prog, vertex_shaders[i]);
+		piglit_AttachShader(prog, vertex_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
-		glAttachShader(prog, geometry_shaders[i]);
+		piglit_AttachShader(prog, geometry_shaders[i]);
 	}
 
 	for (i = 0; i < num_fragment_shaders; i++) {
-		glAttachShader(prog, fragment_shaders[i]);
+		piglit_AttachShader(prog, fragment_shaders[i]);
 	}
 
-	glLinkProgram(prog);
+	piglit_LinkProgram(prog);
 
 	for (i = 0; i < num_vertex_shaders; i++) {
-		glDeleteShader(vertex_shaders[i]);
+		piglit_DeleteShader(vertex_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
-		glDeleteShader(geometry_shaders[i]);
+		piglit_DeleteShader(geometry_shaders[i]);
 	}
 
 	for (i = 0; i < num_fragment_shaders; i++) {
-		glDeleteShader(fragment_shaders[i]);
+		piglit_DeleteShader(fragment_shaders[i]);
 	}
 
-	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	piglit_GetProgramiv(prog, GL_LINK_STATUS, &ok);
 	if (!ok) {
 		GLchar *info;
 		GLint size;
 
-		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		glGetProgramInfoLog(prog, size, NULL, info);
+		piglit_GetProgramInfoLog(prog, size, NULL, info);
 
 		fprintf(stderr, "Failed to link:\n%s\n",
 			info);
@@ -511,7 +525,7 @@ link_and_use_shaders(void)
 		piglit_report_result(PIGLIT_FAILURE);
 	}
 
-	glUseProgram(prog);
+	piglit_UseProgram(prog);
 
 	err = glGetError();
 	if (err) {
@@ -520,10 +534,10 @@ link_and_use_shaders(void)
 
 		printf("GL error after linking program: 0x%04x\n", err);
 
-		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		glGetProgramInfoLog(prog, size, NULL, info);
+		piglit_GetProgramInfoLog(prog, size, NULL, info);
 		fprintf(stderr, "Info log: %s\n", info);
 
 		piglit_report_result(PIGLIT_FAILURE);
@@ -636,7 +650,7 @@ set_uniform(const char *line)
 	line = eat_text(type);
 
 	line = strcpy_to_space(name, eat_whitespace(line));
-	loc = glGetUniformLocation(prog, name);
+	loc = piglit_GetUniformLocation(prog, name);
 	if (loc < 0) {
 		printf("cannot get location of uniform \"%s\"\n",
 		       name);
@@ -645,25 +659,25 @@ set_uniform(const char *line)
 
 	if (strncmp("float", type, 5) == 0) {
 		get_floats(line, f, 1);
-		glUniform1fv(loc, 1, f);
+		piglit_Uniform1fv(loc, 1, f);
 		return;
 	} else if (strncmp("int", type, 3) == 0) {
 		int val = atoi(line);
-		glUniform1i(loc, val);
+		piglit_Uniform1i(loc, val);
 		return;
 	} else if (strncmp("vec", type, 3) == 0) {
 		switch (type[3]) {
 		case '2':
 			get_floats(line, f, 2);
-			glUniform2fv(loc, 1, f);
+			piglit_Uniform2fv(loc, 1, f);
 			return;
 		case '3':
 			get_floats(line, f, 3);
-			glUniform3fv(loc, 1, f);
+			piglit_Uniform3fv(loc, 1, f);
 			return;
 		case '4':
 			get_floats(line, f, 4);
-			glUniform4fv(loc, 1, f);
+			piglit_Uniform4fv(loc, 1, f);
 			return;
 		}
 	}
@@ -816,8 +830,8 @@ piglit_display(void)
 
 	if (piglit_automatic) {
 		/* Free our resources, useful for valgrinding. */
-		glDeleteProgram(prog);
-		glUseProgram(0);
+		piglit_DeleteProgram(prog);
+		piglit_UseProgram(0);
 	}
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
@@ -828,6 +842,8 @@ void
 piglit_init(int argc, char **argv)
 {
 	const char *glsl_version_string;
+
+	piglit_require_GLSL();
 
 	gl_version = strtod((char *) glGetString(GL_VERSION), NULL);
 
