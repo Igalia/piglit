@@ -145,6 +145,62 @@ extern const GLenum cube_face_targets[6];
  */
 extern GLint piglit_ARBfp_pass_through;
 
+/**
+ * \name Portable wrappers for GLSL functions\
+ *
+ * \note
+ * One of \c piglit_require_GLSL, \c piglit_require_vertex_shader, or
+ * \c piglit_require_fragment_shader must be called before using these
+ * wrappers.
+ */
+/*@{*/
+#if defined(PIGLIT_GLES2)
+#define piglit_AttachShader glAttachShader
+#define piglit_CompileShader glCompileShader
+#define piglit_CreateProgram glCreateProgram
+#define piglit_CreateShader glCreateShader
+#define piglit_DeleteProgram glDeleteProgram
+#define piglit_DeleteShader glDeleteShader
+#define piglit_GetProgramInfoLog glGetProgramInfoLog
+#define piglit_GetProgramiv glGetProgramiv
+#define piglit_GetShaderInfoLog glGetShaderInfoLog
+#define piglit_GetShaderiv glGetShaderiv
+#define piglit_GetUniformLocation glGetUniformLocation
+#define piglit_LinkProgram glLinkProgram
+#define piglit_ShaderSource glShaderSource
+#define piglit_UseProgram glUseProgram
+#define piglit_Uniform1fv glUniform1fv
+#define piglit_Uniform2fv glUniform2fv
+#define piglit_Uniform3fv glUniform3fv
+#define piglit_Uniform4fv glUniform4fv
+#define piglit_Uniform1i glUniform1i
+#else
+extern PFNGLATTACHSHADERPROC piglit_AttachShader;
+extern PFNGLCOMPILESHADERPROC piglit_CompileShader;
+extern PFNGLCREATEPROGRAMPROC piglit_CreateProgram;
+extern PFNGLCREATESHADERPROC piglit_CreateShader;
+extern PFNGLDELETEPROGRAMPROC piglit_DeleteProgram;
+extern PFNGLDELETESHADERPROC piglit_DeleteShader;
+extern PFNGLGETPROGRAMINFOLOGPROC piglit_GetProgramInfoLog;
+extern PFNGLGETPROGRAMIVPROC piglit_GetProgramiv;
+extern PFNGLGETSHADERINFOLOGPROC piglit_GetShaderInfoLog;
+extern PFNGLGETSHADERIVPROC piglit_GetShaderiv;
+extern PFNGLGETUNIFORMLOCATIONPROC piglit_GetUniformLocation;
+extern PFNGLLINKPROGRAMPROC piglit_LinkProgram;
+extern PFNGLSHADERSOURCEPROC piglit_ShaderSource;
+extern PFNGLUSEPROGRAMPROC piglit_UseProgram;
+extern PFNGLUNIFORM1FVPROC piglit_Uniform1fv;
+extern PFNGLUNIFORM2FVPROC piglit_Uniform2fv;
+extern PFNGLUNIFORM3FVPROC piglit_Uniform3fv;
+extern PFNGLUNIFORM4FVPROC piglit_Uniform4fv;
+extern PFNGLUNIFORM1IPROC piglit_Uniform1i;
+#endif
+/*@}*/
+
+extern void piglit_require_GLSL(void);
+extern void piglit_require_fragment_shader(void);
+extern void piglit_require_vertex_shader(void);
+
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c);
 #endif

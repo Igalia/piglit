@@ -9,6 +9,7 @@ include_directories(
 
 set (UTIL_SOURCES
 	fdo-bitmap.c
+	piglit-shader.c
 	piglit-util.c
 	shader-load.c
 	piglit-framework.c
@@ -17,6 +18,7 @@ set (UTIL_SOURCES
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_definitions ( -DUSE_GLX )
 	add_library (piglitglxutil
+		    piglit-shader.c
 		    piglit-util.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
