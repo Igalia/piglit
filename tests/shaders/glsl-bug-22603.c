@@ -91,10 +91,10 @@ piglit_display(void)
 
 	glViewport(0, 0, 512, 512);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glUseProgramObjectARB(shadow_prog);
-	glUniform1iARB(shadowMap_location, 0);
+	piglit_UseProgram(shadow_prog);
+	piglit_Uniform1i(shadowMap_location, 0);
 	/* ogl reads in col-vectors, so transform=true */
-	glUniformMatrix4fvARB(light_projection_location,
+	piglit_UniformMatrix4fv(light_projection_location,
 			      1, GL_TRUE, matrix);
 	glBegin(GL_QUADS);
 		/* rect1 */
@@ -124,8 +124,8 @@ piglit_display(void)
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, shadow_texture);
 
-	glUseProgramObjectARB(prog);
-	glUniformMatrix4fvARB(eye_projection_location, 1, 1, matrix);
+	piglit_UseProgram(prog);
+	piglit_UniformMatrix4fv(eye_projection_location, 1, 1, matrix);
 	/* this is the quad that is texturized with what we want to see */
 	glBegin(GL_QUADS);
 
@@ -192,32 +192,20 @@ piglit_init(int argc, char **argv)
 		"	gl_FragDepth = gl_FragCoord.z;"
 		"}";
 
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_GLSL();
 
-	vs = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	glShaderSourceARB(vs, 1, &vs_source, NULL);
-	glCompileShaderARB(vs);
-
-	fs = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	glShaderSourceARB(fs, 1, &fs_source, NULL);
-	glCompileShaderARB(fs);
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
 	prog = piglit_link_simple_program(vs, fs);
 
-	shadow_vs = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	glShaderSourceARB(shadow_vs, 1, &vs_shadow_source, NULL);
-	glCompileShaderARB(shadow_vs);
-
-	shadow_fs = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
-	glShaderSourceARB(shadow_fs, 1, &fs_shadow_source, NULL);
-	glCompileShaderARB(shadow_fs);
+	shadow_vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_shadow_source);
+	shadow_fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_shadow_source);
 	shadow_prog = piglit_link_simple_program(shadow_vs, shadow_fs);
 
-	eye_projection_location = glGetUniformLocationARB(prog,
+	eye_projection_location = piglit_GetUniformLocation(prog,
 							  "eye_projection");
-	light_projection_location = glGetUniformLocationARB(shadow_prog,
+	light_projection_location = piglit_GetUniformLocation(shadow_prog,
 							    "light_projection");
-	shadowMap_location = glGetUniformLocationARB(shadow_prog, "shadowMap");
+	shadowMap_location = piglit_GetUniformLocation(shadow_prog, "shadowMap");
 }
