@@ -1,5 +1,4 @@
 [require]
-GL >= 2.0
 GLSL >= 1.10
 
 [fragment shader]

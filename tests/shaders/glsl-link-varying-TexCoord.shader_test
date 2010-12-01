@@ -1,5 +1,4 @@
 [require]
-GL >= 2.0
 GLSL >= 1.10
 
 /* varying gl_TexCoord can be declared to different
