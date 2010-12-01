@@ -64,7 +64,6 @@ piglit_display(void)
 	static const GLfloat expColor[4] = {0, 1, 0, 1};
 	GLint vs;
 	GLint prog;
-	GLint stat;
 	GLint orig_attrib_loc, attrib_loc;
 	enum piglit_result result;
 
