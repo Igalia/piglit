@@ -33,13 +33,72 @@ int piglit_width = 256;
 int piglit_height = 256;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
+
+
+static int
+find_max_texture_size(void)
+{
+	GLint maxsize;
+
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxsize);
+
+	while (maxsize > 1) {
+		GLint w, h;
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA,
+			     maxsize, maxsize, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0,
+					 GL_TEXTURE_WIDTH, &w);
+		glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0,
+					 GL_TEXTURE_WIDTH, &h);
+		if (w == maxsize && h == maxsize) {
+			return maxsize;
+		}
+		else {
+			maxsize /= 2;
+		}
+	}
+	return maxsize;
+}
+
+
+static void
+draw_color_sub_rect(int x, int y, int texsize)
+{
+	int k = texsize / 64;
+	int x0 = x - k;
+	int x1 = x + k;
+	int y1 = y - k;
+	int y2 = y + k;
+
+	float r0 = (float) x0 / texsize;
+	float r1 = (float) x1 / texsize;
+
+	float g0 = (float) y1 / texsize;
+	float g1 = (float) y2 / texsize;
+
+	float b0 = (float) y1 / texsize;
+	float b1 = (float) y2 / texsize;
+
+	glBegin(GL_POLYGON);
+	glColor3f(r0, g0, b0);  glVertex2i(x0, y1);
+	glColor3f(r1, g0, b0);  glVertex2i(x1, y1);
+	glColor3f(r1, g1, b1);  glVertex2i(x1, y2);
+	glColor3f(r0, g1, b1);  glVertex2i(x0, y2);
+	glEnd();
+}
+
+
 static int create_fbo(void)
 {
 	GLuint tex, fb;
 	GLint maxsize;
 	GLenum status;
+	int x0, x1, y0, y1;
 
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxsize);
+	maxsize = find_max_texture_size();
+	if (0)
+		printf("max 2D texture size: %d x %d\n", maxsize, maxsize);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -64,21 +123,44 @@ static int create_fbo(void)
 	glViewport(0, 0, maxsize, maxsize);
 	piglit_ortho_projection(maxsize, maxsize, GL_FALSE);
 
-	glBegin(GL_QUADS);
-	glColor3f(0, 0, 0);
-	glVertex2f(0, 0);
-	glColor3f(0, 1, 1);
-	glVertex2f(0, maxsize);
-	glColor3f(1, 1, 1);
-	glVertex2f(maxsize, maxsize);
-	glColor3f(1, 0, 0);
-	glVertex2f(maxsize, 0);
-	glEnd();
+	x0 = maxsize / 4;
+	x1 = maxsize * 3 / 4;
+	y0 = maxsize / 4;
+	y1 = maxsize * 3 / 4;
+	draw_color_sub_rect(x0, y0, maxsize);
+	draw_color_sub_rect(x1, y0, maxsize);
+	draw_color_sub_rect(x1, y1, maxsize);
+	draw_color_sub_rect(x0, y1, maxsize);
 
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return tex;
 }
+
+
+/** draw textured rect centered on the given pixel.
+ */
+static void
+draw_tex_sub_rect(int x, int y)
+{
+	int x0 = x - 16;
+	int x1 = x + 16;
+	int y1 = y - 16;
+	int y2 = y + 16;
+
+	float s0 = (float) x0 / piglit_width;
+	float s1 = (float) x1 / piglit_width;
+	float t0 = (float) y1 / piglit_height;
+	float t1 = (float) y2 / piglit_height;
+
+	glBegin(GL_POLYGON);
+	glTexCoord2f(s0, t0);  glVertex2i(x0, y1);
+	glTexCoord2f(s1, t0);  glVertex2i(x1, y1);
+	glTexCoord2f(s1, t1);  glVertex2i(x1, y2);
+	glTexCoord2f(s0, t1);  glVertex2i(x0, y2);
+	glEnd();
+}
+
 
 enum piglit_result
 piglit_display(void)
@@ -109,8 +191,10 @@ piglit_display(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height,
-			     0, 0, 1, 1);
+	draw_tex_sub_rect(x1, y1);
+	draw_tex_sub_rect(x2, y1);
+	draw_tex_sub_rect(x1, y2);
+	draw_tex_sub_rect(x2, y2);
 
 	pass &= piglit_probe_pixel_rgb(x1, y1, c1);
 	pass &= piglit_probe_pixel_rgb(x2, y1, c2);
