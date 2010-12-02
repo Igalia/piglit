@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform float a;
+uniform float b;
+void main(void)
+{
+	struct S {
+		float a;
+		float b;
+		float c;
+		float d;
+	} s = S(0.5, 0.5, 0.5, 0.5);
+
+	s.a = s.a + a;
+	s.a = s.a - b;
+	gl_FragColor = vec4(s.a, s.b, s.c, s.d);
+}
+
+[test]
+uniform float a 0.3
+uniform float b 0.3
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.5 0.5 0.5
+
