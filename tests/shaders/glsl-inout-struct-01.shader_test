@@ -1,7 +1,12 @@
+/* Test struct inout parameter.
+ *
+ * Note: This test implicitly relies on correct behavior of struct
+ * constructors.
+ */
+
 [require]
 GLSL >= 1.10
 
-/* test inout parameter with type of struct.*/
 
 [vertex shader]
 void main()
