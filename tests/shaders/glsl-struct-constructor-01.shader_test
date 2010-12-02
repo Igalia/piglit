@@ -1,0 +1,30 @@
+/* Test an unary struct constructor. */
+
+[require]
+GLSL >= 1.10
+
+
+[vertex shader]
+void main()
+{
+	gl_Position = ftransform();
+}
+
+[fragment shader]
+struct s {
+	float f;
+};
+
+void main()
+{
+	s s1 = s(0.5);
+    if (s1.f == 0.5)
+        gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    else
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
