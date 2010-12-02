@@ -1,0 +1,34 @@
+/* Test struct inout parameter. */
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+
+void main()
+{
+	gl_Position = ftransform();
+}
+
+[fragment shader]
+
+struct s {
+	float f;
+};
+
+void myfunc(inout s s1)
+{
+	s1.f = s1.f + 0.1;
+}
+
+void main()
+{
+	s s1;
+	s1.f = 0.9;
+	myfunc(s1);
+	gl_FragColor = vec4(0.0, s1.f, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
