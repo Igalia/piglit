@@ -43,6 +43,7 @@ static const float yellow[4] = {1.0, 1.0, 0.0, 0.0};
 static const float gray25[4] = {0.25, 0.25, 0.0, 0.0};
 static const float gray75[4] = {0.75, 0.75, 0.0, 0.0};
 
+static int test = 0;
 
 /*
  * For each of the various pixel center/origin layout qualifier modes
@@ -61,6 +62,7 @@ piglit_display(void)
    vs = piglit_compile_shader(GL_VERTEX_SHADER, "shaders/glsl-mvp.vert");
 
    /* No layout: test regular gl_FragCoord */
+   if (piglit_automatic || test == 0)
    {
       const char *fragtext =
          "void main(void) \n"
@@ -68,6 +70,7 @@ piglit_display(void)
          "   gl_FragColor = gl_FragCoord * 0.01; \n"
          "} \n";
 
+      printf("Regular gl_FragCoord\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
       prog = piglit_link_simple_program(vs, fs);
       glUseProgram(prog);
@@ -77,13 +80,14 @@ piglit_display(void)
       piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
       /* lower-left corner */
-      pass = pass && piglit_probe_pixel_rgb(0, 0, black);
+      pass = piglit_probe_pixel_rgb(0, 0, black) && pass;
 
       /* upper-right corner */
-      pass = pass && piglit_probe_pixel_rgb(99, 99, yellow);
+      pass = piglit_probe_pixel_rgb(99, 99, yellow) && pass;
    }
 
    /* No layout, test pixel center is half integer */
+   if (piglit_automatic || test == 1)
    {
       const char *fragtext =
          "#extension GL_ARB_fragment_coord_conventions: enable \n"
@@ -93,6 +97,7 @@ piglit_display(void)
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
 
+      printf("Pixel center half integer\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
       prog = piglit_link_simple_program(vs, fs);
       glUseProgram(prog);
@@ -102,13 +107,14 @@ piglit_display(void)
       piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
       /* lower-left corner */
-      pass = pass && piglit_probe_pixel_rgb(0, 0, gray75);
+      pass = piglit_probe_pixel_rgb(0, 0, gray75) && pass;
 
       /* upper-right corner */
-      pass = pass && piglit_probe_pixel_rgb(99, 99, gray75);
+      pass = piglit_probe_pixel_rgb(99, 99, gray75) && pass;
    }
 
    /* Pixel center integer */
+   if (piglit_automatic || test == 2)
    {
       const char *fragtext =
          "#extension GL_ARB_fragment_coord_conventions: enable \n"
@@ -119,6 +125,7 @@ piglit_display(void)
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
 
+      printf("Pixel center integer\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
       prog = piglit_link_simple_program(vs, fs);
       glUseProgram(prog);
@@ -128,13 +135,14 @@ piglit_display(void)
       piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
       /* lower-left corner */
-      pass = pass && piglit_probe_pixel_rgb(0, 0, gray25);
+      pass = piglit_probe_pixel_rgb(0, 0, gray25) && pass;
 
       /* upper-right corner */
-      pass = pass && piglit_probe_pixel_rgb(99, 99, gray25);
+      pass = piglit_probe_pixel_rgb(99, 99, gray25) && pass;
    }
 
    /* Pixel origin upper left */
+   if (piglit_automatic || test == 3)
    {
       const char *fragtext =
          "#extension GL_ARB_fragment_coord_conventions: enable \n"
@@ -145,6 +153,7 @@ piglit_display(void)
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
 
+      printf("Pixel origin upper left\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
       prog = piglit_link_simple_program(vs, fs);
       glUseProgram(prog);
@@ -154,13 +163,14 @@ piglit_display(void)
       piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
       /* lower-left corner */
-      pass = pass && piglit_probe_pixel_rgb(0, 0, green);
+      pass = piglit_probe_pixel_rgb(0, 0, green) && pass;
 
       /* upper-right corner */
-      pass = pass && piglit_probe_pixel_rgb(99, 99, red);
+      pass = piglit_probe_pixel_rgb(99, 99, red) && pass;
    }
 
    /* Pixel origin upper left and pixel center integer */
+   if (piglit_automatic || test == 4)
    {
       static const float color1[4] = {0.125, 0.3725, 0.0, 0.0};
       static const float color2[4] = {0.3725, 0.125, 0.0, 0.0};
@@ -173,6 +183,7 @@ piglit_display(void)
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
 
+      printf("Pixel origin upper left and pixel center integer\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
       prog = piglit_link_simple_program(vs, fs);
       glUseProgram(prog);
@@ -182,10 +193,10 @@ piglit_display(void)
       piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
       /* lower-left corner */
-      pass = pass && piglit_probe_pixel_rgb(0, 0, color1);
+      pass = piglit_probe_pixel_rgb(0, 0, color1) && pass;
 
       /* upper-right corner */
-      pass = pass && piglit_probe_pixel_rgb(99, 99, color2);
+      pass = piglit_probe_pixel_rgb(99, 99, color2) && pass;
    }
 
    glutSwapBuffers();
@@ -193,6 +204,16 @@ piglit_display(void)
    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
+static void key_func(unsigned char key, int x, int y)
+{
+   switch (key) {
+   case 't':
+      test = (test + 1) % 5;
+      break;
+   }
+
+   piglit_escape_exit_key(key, x, y);
+}
 
 void
 piglit_init(int argc, char **argv)
@@ -203,4 +224,10 @@ piglit_init(int argc, char **argv)
    }
 
    piglit_require_extension("GL_ARB_fragment_coord_conventions");
+
+   if (!piglit_automatic) {
+      printf("Press t to switch between subtests.\n");
+   }
+
+   glutKeyboardFunc(key_func);
 }
