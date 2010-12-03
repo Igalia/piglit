@@ -33,6 +33,11 @@
 #define GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE 0x8212
 #endif
 
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE
+#define GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE 0x8CD0
+#endif
+
+
 int piglit_width = 100;
 int piglit_height = 100;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
@@ -40,8 +45,18 @@ int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
 enum piglit_result
 piglit_display(void)
 {
-	GLint red_bits;
+	GLint red_bits, att_type, att_name;
 	GLenum err;
+
+	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
+					      GL_BACK_LEFT,
+					      GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
+					      &att_type);
+
+	if (att_type != GL_FRAMEBUFFER_DEFAULT) {
+		printf("Default framebuffer's attachment type is not GL_FRAMEBUFFER_DEFAULT\n");
+		return PIGLIT_FAILURE;
+	}
 
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
 					      GL_BACK_LEFT,
