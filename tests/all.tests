@@ -1462,7 +1462,7 @@ class ValgrindExecTest(PlainExecTest):
 			assert(self.orig_test.result['result'] == 'fail')
 			return self.orig_test.result
 		self.command = [os.path.dirname(__file__) + '/valgrind-test/valgrind-test'] + orig_command
-		return self.orig_test.run()
+		return PlainExecTest.run(self)
 
 valgrind = Group()
 for groupname, group in sorted(profile.tests.iteritems()):
