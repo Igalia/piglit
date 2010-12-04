@@ -45,7 +45,7 @@ int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL;
 enum piglit_result
 piglit_display(void)
 {
-	GLint red_bits, att_type, att_name;
+	GLint red_bits, att_type;
 	GLenum err;
 
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER,
