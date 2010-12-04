@@ -1,0 +1,22 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[fragment shader]
+#version 120
+
+void main()
+{
+	mat2 a;
+	a[0][0] = 0;
+	a[int(a[0][0])][1] = 1;
+	if (a[0][0] == 0 && a[0][1] == 1)
+		gl_FragColor = vec4(0, 1, 0, 1);
+	else
+		gl_FragColor = vec4(1, 0, 0, 1);
+	
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
