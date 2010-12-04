@@ -1,3 +1,8 @@
+// [config]
+// expect_result: pass
+// glsl_version: 1.10
+// [end config]
+
 #if 0 
     
 #define f 1.2
