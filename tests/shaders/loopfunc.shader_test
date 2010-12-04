@@ -1,0 +1,31 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+bool myFunc(void)
+{
+	int i;
+	for(i = 0; i < 2; i++)
+	{
+		if(i < 1)
+			return true;
+ 		else
+			return false;
+	}
+}
+
+void main(void)
+{
+	if (myFunc())
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0); // green
+	else
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0); // red
+
+	gl_Position = gl_Vertex;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
