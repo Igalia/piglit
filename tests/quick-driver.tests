@@ -17,6 +17,7 @@ del profile.tests['asmparsertest']
 # These take too long
 del profile.tests['glean']['blendFunc']
 del profile.tests['glean']['depthStencil']
+del profile.tests['glean']['pointAtten']
 del profile.tests['texturing']['streaming-texture-leak']
 
 # This test is nonsense
