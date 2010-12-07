@@ -891,6 +891,9 @@ add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
 add_texwrap_test3(gl20, '3D', 'npot', 'border')
 
+# Group spec/glsl-1.30
+execfile(os.path.dirname(__file__) + '/spec/glsl-1.30/tests')
+
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle;
 add_texwrap_test1(arb_texture_rectangle, 'RECT')
