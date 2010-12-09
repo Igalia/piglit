@@ -47,6 +47,7 @@ PFNGLUNIFORM3FVPROC piglit_Uniform3fv = NULL;
 PFNGLUNIFORM4FVPROC piglit_Uniform4fv = NULL;
 PFNGLUNIFORM1IPROC piglit_Uniform1i = NULL;
 PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv = NULL;
+PFNGLGETUNIFORMFVPROC piglit_GetUniformfv = NULL;
 
 static void
 init_functions_from_core(void)
@@ -71,6 +72,7 @@ init_functions_from_core(void)
 	piglit_Uniform4fv = glUniform4fv;
 	piglit_Uniform1i = glUniform1i;
 	piglit_UniformMatrix4fv = glUniformMatrix4fv;
+	piglit_GetUniformfv = glGetUniformfv;
 }
 
 static void
@@ -96,6 +98,7 @@ init_functions_from_extension(void)
 	piglit_Uniform4fv = glUniform4fvARB;
 	piglit_Uniform1i = glUniform1iARB;
 	piglit_UniformMatrix4fv = glUniformMatrix4fvARB;
+	piglit_GetUniformfv = glGetUniformfvARB;
 }
 
 void

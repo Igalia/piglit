@@ -175,6 +175,7 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_Uniform4fv glUniform4fv
 #define piglit_Uniform1i glUniform1i
 #define piglit_UniformMatrix4fv glUniformMatrix4fv
+#define piglit_GetUniformfv glGetUniformfv
 #else
 extern PFNGLATTACHSHADERPROC piglit_AttachShader;
 extern PFNGLCOMPILESHADERPROC piglit_CompileShader;
@@ -196,6 +197,7 @@ extern PFNGLUNIFORM3FVPROC piglit_Uniform3fv;
 extern PFNGLUNIFORM4FVPROC piglit_Uniform4fv;
 extern PFNGLUNIFORM1IPROC piglit_Uniform1i;
 extern PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv;
+extern PFNGLGETUNIFORMFVPROC piglit_GetUniformfv;
 #endif
 /*@}*/
 
