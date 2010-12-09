@@ -55,6 +55,7 @@ piglit_display(void)
 
 	if (att_type != GL_FRAMEBUFFER_DEFAULT) {
 		printf("Default framebuffer's attachment type is not GL_FRAMEBUFFER_DEFAULT\n");
+		while (glGetError());
 		return PIGLIT_FAILURE;
 	}
 
