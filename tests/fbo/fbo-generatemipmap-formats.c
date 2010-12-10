@@ -540,7 +540,7 @@ draw_mipmap(int x, int y, int dim)
 }
 
 static GLboolean
-test_mipmap_drawing(int x, int y, int dim, int level)
+test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 {
 	GLboolean pass = GL_TRUE;
 	int half = dim / 2;
@@ -664,6 +664,14 @@ test_mipmap_drawing(int x, int y, int dim, int level)
 		piglit_set_tolerance_for_bits(r_size, g_size, b_size, a_size);
 	}
 
+	if (internalformat == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) {
+		/* If alpha in DXT1 is < 0.5, the whole pixel should be black. */
+		r[0] = r[1] = r[2] = r[3] = 0;
+		g[0] = g[1] = g[2] = g[3] = 0;
+		/* If alpha in DXT1 is >= 0.5, it should be white. */
+		b[3] = 1;
+	}
+
 	pass = pass && piglit_probe_rect_rgba(x1, y1, half, half, r);
 	pass = pass && piglit_probe_rect_rgba(x2, y1, half, half, g);
 	pass = pass && piglit_probe_rect_rgba(x1, y2, half, half, b);
@@ -693,7 +701,8 @@ test_format(const struct format_desc *format, GLenum baseformat)
 	x = 1;
 	level = 0;
 	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-		pass = pass && test_mipmap_drawing(x, 1, dim, level);
+		pass = pass && test_mipmap_drawing(x, 1, dim, level,
+						   format->internalformat);
 		x += dim + 1;
 		level++;
 	}
