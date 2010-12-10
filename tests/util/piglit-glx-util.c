@@ -58,9 +58,15 @@ piglit_get_glx_visual(Display *dpy)
 GLXContext
 piglit_get_glx_context(Display *dpy, XVisualInfo *visinfo)
 {
+	return piglit_get_glx_context_share(dpy, visinfo, NULL);
+}
+
+GLXContext
+piglit_get_glx_context_share(Display *dpy, XVisualInfo *visinfo, GLXContext share)
+{
 	GLXContext ctx;
 
-	ctx = glXCreateContext(dpy, visinfo, NULL, True);
+	ctx = glXCreateContext(dpy, visinfo, share, True);
 	if (ctx == None) {
 		fprintf(stderr, "glXCreateContext failed\n");
 		piglit_report_result(PIGLIT_FAILURE);
