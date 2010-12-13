@@ -15,7 +15,7 @@ void main()
 {
 	float a[];
 
-	// These assignments will implicitly size b.
+	// These assignments will implicitly size a.
 	a[0] = 0.0;
 	a[1] = 1.0;
 	a[2] = 2.0;
