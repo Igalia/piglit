@@ -39,7 +39,6 @@ static const char *TestName = "glx-shader-sharing";
 static Display *dpy;
 static Window win;
 static XVisualInfo *visinfo;
-static GLXContext ctx1, ctx2;
 
 
 static const char *vert_shader_text =
@@ -75,7 +74,14 @@ draw(Display *dpy)
 {
    const GLfloat red[3] = {1.0F, 0.0F, 0.0F};
    const GLfloat green[3] = {0.0F, 1.0F, 0.0F};
+   GLXContext ctx1 = piglit_get_glx_context(dpy, visinfo);
+   GLXContext ctx2 = piglit_get_glx_context_share(dpy, visinfo, ctx1);
    int ok;
+
+   if (!ctx1 || !ctx2) {
+      fprintf(stderr, "%s: create contexts failed\n", TestName);
+      piglit_report_result(PIGLIT_FAILURE);
+   }
 
    /*
     * Bind first context, make some shaders, draw something.
@@ -155,6 +161,7 @@ draw(Display *dpy)
 
    glXDestroyContext(dpy, ctx2);
 
+
    return PIGLIT_SUCCESS;
 }
 
@@ -179,14 +186,6 @@ main(int argc, char **argv)
 
    visinfo = piglit_get_glx_visual(dpy);
    win = piglit_get_glx_window(dpy, visinfo);
-
-   ctx1 = piglit_get_glx_context(dpy, visinfo);
-   ctx2 = piglit_get_glx_context_share(dpy, visinfo, ctx1);
-
-   if (!ctx1 || !ctx2) {
-      fprintf(stderr, "%s: create contexts failed\n", TestName);
-      piglit_report_result(PIGLIT_FAILURE);
-   }
 
    XMapWindow(dpy, win);
 
