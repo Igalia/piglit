@@ -1,0 +1,27 @@
+[require]
+
+[vertex shader]
+varying vec4 color;
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	for (int i = 0; i < 8; i++) {
+		if (i > 4) {
+			color = vec4(0.0, 1.0, 0.0, 0.0);
+			continue;
+		}
+		color = vec4(1.0, 0.0, 0.0, 0.0);
+	}
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+relative probe rgb (0.03, 0.25) (0.0, 1.0, 0.0)
