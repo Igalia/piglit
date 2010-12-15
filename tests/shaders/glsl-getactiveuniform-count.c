@@ -51,11 +51,7 @@ piglit_init(int argc, char **argv)
 	GLboolean pass = GL_TRUE;
 	GLint vs, fs, num;
 
-	if (!GLEW_VERSION_2_0) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
-
+	piglit_require_GLSL();
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   "shaders/glsl-getactiveuniform-length.vert");
 	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
@@ -63,7 +59,7 @@ piglit_init(int argc, char **argv)
 
 	prog = piglit_link_simple_program(vs, fs);
 
-	glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num);
+	piglit_GetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num);
 	if (num != 1) {
 		printf("Unexpected active uniform count "
 		       "(saw %d, expected 1)\n", num);
