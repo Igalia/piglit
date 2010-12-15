@@ -24,7 +24,7 @@
  *    Fredrik Höglund (fredrik@kde.org)
  */
 
-/** @file glsl-kwin-blur.c
+/** @file glsl-kwin-blur-2.c
  *
  * Tests the blur effect used by the KWin window manager,
  * with a 12 pixel blur radius (uses 13 varyings).
