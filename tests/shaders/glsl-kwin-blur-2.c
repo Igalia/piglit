@@ -256,12 +256,13 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+    int value;
+
     if (!GLEW_VERSION_2_0) {
         printf("Requires OpenGL 2.0\n");
         piglit_report_result(PIGLIT_SKIP);
     }
 
-    int value;
     glGetIntegerv(GL_MAX_VARYING_FLOATS, &value);
     if (value < (13 * 4)) {
         printf("Requires at least 13 varyings\n");
