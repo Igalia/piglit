@@ -207,6 +207,13 @@ def add_shader_generic(group, name):
 				     path + name + '.shader_test',
 				     path])
 
+def add_getactiveuniform_count(group, name, expected):
+	path = 'shaders/'
+	group['glsl-getactiveuniform-count: ' + name] = PlainExecTest(['glsl-getactiveuniform-count',
+								   '-auto',
+								   path + name + '.vert',
+								   expected])
+
 add_plain_test(shaders, 'activeprogram-bad-program')
 add_plain_test(shaders, 'activeprogram-get')
 add_plain_test(shaders, 'ati-fs-bad-delete')
@@ -295,7 +302,7 @@ add_shader_generic(shaders, 'glsl-deadcode-varying')
 add_plain_test(shaders, 'glsl-bindattriblocation')
 add_plain_test(shaders, 'glsl-dlist-getattriblocation')
 add_plain_test(shaders, 'glsl-getactiveuniform-array-size')
-add_plain_test(shaders, 'glsl-getactiveuniform-count')
+add_getactiveuniform_count(shaders, 'glsl-getactiveuniform-length', '1')
 add_plain_test(shaders, 'glsl-getactiveuniform-length')
 add_plain_test(shaders, 'glsl-getattriblocation')
 add_plain_test(shaders, 'getuniform-01')

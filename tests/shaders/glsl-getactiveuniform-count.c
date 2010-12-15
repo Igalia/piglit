@@ -50,19 +50,27 @@ piglit_init(int argc, char **argv)
 {
 	GLboolean pass = GL_TRUE;
 	GLint vs, fs, num;
+	GLint expect;
+
+	if (argc < 3) {
+		printf("Usage: %s <vertex shader file> "
+		       "<expected uniform count>\n", argv[0]);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+
+	expect = (int) strtol(argv[2], NULL, 0);
 
 	piglit_require_GLSL();
-	vs = piglit_compile_shader(GL_VERTEX_SHADER,
-				   "shaders/glsl-getactiveuniform-length.vert");
+	vs = piglit_compile_shader(GL_VERTEX_SHADER, argv[1]);
 	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
 				   "shaders/glsl-color.frag");
 
 	prog = piglit_link_simple_program(vs, fs);
 
 	piglit_GetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num);
-	if (num != 1) {
+	if (num != expect) {
 		printf("Unexpected active uniform count "
-		       "(saw %d, expected 1)\n", num);
+		       "(saw %d, expected %d)\n", num, expect);
 		pass = GL_FALSE;
 	}
 
