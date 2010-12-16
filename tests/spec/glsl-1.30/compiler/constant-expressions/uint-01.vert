@@ -11,7 +11,7 @@
 
 #version 130
 
-const uint u = 0;
+const uint x = 0u;
 
 float f() {
 	return 0.0;

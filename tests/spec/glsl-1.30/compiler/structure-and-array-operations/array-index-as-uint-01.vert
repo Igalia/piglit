@@ -14,7 +14,7 @@
 uniform float a[4];
 
 float f() {
-	uint u = 0;
+	uint u = 0u;
 	float x = a[u];
 	return 0.0;
 }

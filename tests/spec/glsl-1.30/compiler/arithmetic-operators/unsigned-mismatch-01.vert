@@ -13,7 +13,7 @@
 
 float f() {
 	int x = 0;
-	uint y = 0;
+	uint y = 0u;
 	int z = x + y;
 	return 0.0;
 }

@@ -16,5 +16,5 @@
 
 uint f() {
 	// Requires 33 bits.
-	return uint(0x1ffffffff);
+	return uint(0x1ffffffffu);
 }
