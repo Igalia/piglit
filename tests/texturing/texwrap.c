@@ -305,7 +305,7 @@ struct format {
 
 /* Indexed by the channel bitdepth. */
 static unsigned nearest_deltamax[33] = {
-    1, 210, 128, 17, 17, 9, 9, 9,
+    1, 210, 128, 32, 17, 9, 9, 9,
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1,
@@ -313,7 +313,7 @@ static unsigned nearest_deltamax[33] = {
 };
 
 static unsigned linear_deltamax[33] = {
-    1, 210, 128, 17, 17, 9, 9, 9,
+    1, 210, 128, 32, 17, 9, 9, 9,
     8, 8, 8, 8, 8, 8, 8, 8,
     8, 8, 8, 8, 8, 8, 8, 8,
     8, 8, 8, 8, 8, 8, 8, 8,
