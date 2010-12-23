@@ -125,6 +125,10 @@ calculate_expected_color(GLenum depth_mode, GLenum operand,
 		color[0] = texel; color[1] = 0.0;   color[2] = 0.0;
 		color[3] = 1.0;
 		break;
+	default:
+		assert(0);
+		color[0] = color[1] = color[2] = color[3] = 0.0;
+		break;
 	}
 
 	if (operand == GL_SRC_ALPHA) {
