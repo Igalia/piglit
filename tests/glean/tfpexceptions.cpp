@@ -29,7 +29,6 @@
 // Authors: Brian Paul, Keith Whitwell
 
 #include "tfpexceptions.h"
-#include <cassert>
 #include <cmath>
 
 #define INCLUDE_FPU_CONTROL 0

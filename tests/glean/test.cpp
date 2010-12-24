@@ -36,11 +36,9 @@
 
 #include <iostream>
 #include "dsconfig.h"
-#include "dsfilt.h"
 #include "dsurf.h"
 #include "winsys.h"
 #include "environ.h"
-#include "rc.h"
 #include "test.h"
 
 namespace GLEAN {
