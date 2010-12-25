@@ -117,8 +117,6 @@ compileLinkProg(void)
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;
-
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDrawArrays(GL_POINTS, 0, 4);
@@ -133,5 +131,5 @@ piglit_display(void)
 	glFinish();
         glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return PIGLIT_SUCCESS;
 }
