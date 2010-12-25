@@ -152,7 +152,7 @@ piglit_init(int argc, char **argv)
 	printf("Getting one array element at a time...\n");
 	for (i = 0; i < 4; i++) {
 		unsigned j;
-		for (j = 0; i < ARRAY_SIZE(buffer); j++) {
+		for (j = 0; j < ARRAY_SIZE(buffer); j++) {
 			buffer[j].u = 0xdeadbeef;
 		}
 
@@ -164,10 +164,10 @@ piglit_init(int argc, char **argv)
 			piglit_report_result(PIGLIT_FAILURE);
 		} else if (!piglit_automatic) {
 			printf("index %u: got %f, expected %f (good)\n",
-			       i, buffer[i].f, uniform_data[i]);
+			       i, buffer[0].f, uniform_data[i]);
 		}
 
-		for (j = 0; j < ARRAY_SIZE(buffer); j++) {
+		for (j = 1; j < ARRAY_SIZE(buffer); j++) {
 			if (buffer[j].u != 0xdeadbeef) {
 				printf("glGetUniformfv overrun at index %u!\n",
 				       j);
