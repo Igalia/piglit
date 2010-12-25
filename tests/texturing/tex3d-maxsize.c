@@ -124,6 +124,9 @@ piglit_display(void)
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height, depth, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		err = glGetError();
+
+		if (err == GL_OUT_OF_MEMORY)
+			return PIGLIT_SUCCESS;
 	}
 	else {
 		/* the max 3D texture size actually worked */
