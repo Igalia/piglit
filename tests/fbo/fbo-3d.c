@@ -184,5 +184,4 @@ piglit_display(void)
 void piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_EXT_texture3D");
 }
