@@ -1,0 +1,30 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 val;
+uniform int i;
+
+vec4 chan_to_green(float x)
+{
+	if (x < 0.0)
+		return vec4(0.0);
+	return vec4(0.0, x, 0.0, 0.0);
+}
+
+void main()
+{
+	gl_FragColor = chan_to_green(vec4(0.0, 0.0, 1.0, 0.0)[i]);
+}
+
+[test]
+uniform int i 2
+draw rect -1 -1 2 2
+probe rgb 1 1 0.0 1.0 0.0
