@@ -1,6 +1,6 @@
 // [config]
 // expect_result: pass
-// glsl_version: 110
+// glsl_version: 1.10
 // [end config]
 
 #if 1 == 0 || defined UNDEFINED
