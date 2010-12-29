@@ -230,7 +230,6 @@ piglit_init(int argc, char **argv)
 {
     piglit_automatic = GL_TRUE;
     piglit_require_extension("GL_ARB_texture_non_power_of_two");
-    piglit_require_extension("GL_EXT_texture3D");
 
     glutReshapeFunc(Reshape);
 
