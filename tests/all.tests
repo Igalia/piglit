@@ -80,9 +80,11 @@ def add_vp1(name):
 execfile(os.path.dirname(__file__) + '/glean-vertProg1.tests')
 
 def add_fbo_generatemipmap_extension(group, extension, name):
-	path = testBinDir + '../tests/shaders/'
 	group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
 				     extension])
+
+def add_fbo_clear_extension(group, extension, name):
+	group[name] = PlainExecTest(['fbo-clear-formats', '-auto', extension])
 
 mesa = Group()
 add_plain_test(mesa, 'crossbar')
@@ -100,6 +102,7 @@ add_plain_test(fbo, 'fbo-blit')
 add_plain_test(fbo, 'fbo-blit-d24s8')
 add_plain_test(fbo, 'fbo-cubemap')
 add_plain_test(fbo, 'fbo-clearmipmap')
+add_plain_test(fbo, 'fbo-clear-formats')
 add_plain_test(fbo, 'fbo-copypix')
 add_plain_test(fbo, 'fbo-copyteximage')
 add_plain_test(fbo, 'fbo-copyteximage-simple')
@@ -929,6 +932,8 @@ add_plain_test(arb_color_buffer_float, 'arb_color_buffer_float-mrt')
 arb_depth_texture = Group()
 spec['ARB_depth_texture'] = arb_depth_texture
 add_fbo_generatemipmap_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-generatemipmap-formats')
+# depth support not added to test yet
+#add_fbo_clear_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-clear-formats')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT16')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT24')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT32')
@@ -936,6 +941,8 @@ add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT32')
 arb_depth_buffer_float = Group()
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
 add_fbo_generatemipmap_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-generatemipmap-formats')
+# depth support not added to test yet
+#add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
 
 arb_texture_compression = Group()
 spec['ARB_texture_compression'] = arb_texture_compression
@@ -944,6 +951,8 @@ add_fbo_generatemipmap_extension(arb_texture_compression, 'GL_ARB_texture_compre
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
+# depth support not added to test yet
+#add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
@@ -975,11 +984,15 @@ add_texwrap_test2(ati_texture_compression_3dc, '2D', 'GL_COMPRESSED_LUMINANCE_AL
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
 add_fbo_generatemipmap_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-generatemipmap-formats')
+# untested for float yet
+#add_fbo_clear_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-clear-formats')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
 add_fbo_generatemipmap_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-generatemipmap-formats')
+# untested for float yet
+#add_fbo_clear_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-clear-formats')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')
@@ -996,12 +1009,19 @@ add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA32F')
 ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
 add_fbo_generatemipmap_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-generatemipmap-formats')
+# unsupported for int yet
+#add_fbo_clear_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-clear-formats')
 
 arb_texture_rg = Group()
 spec['ARB_texture_rg'] = arb_texture_rg
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-generatemipmap-formats-int')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
+add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-clear-formats')
+# unsupported for int yet
+#add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-clear-formats-int')
+# untested for int yet
+#add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-clear-formats-float')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16')
@@ -1014,11 +1034,14 @@ add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG32F')
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
 add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
+# untested yet
+#add_fbo_clear_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-clear-formats')
 add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 
 ext_texture_srgb = Group()
 spec['EXT_texture_sRGB'] = ext_texture_srgb
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-generatemipmap-formats')
+add_fbo_clear_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-clear-formats')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
 
 ati_envmap_bumpmap = Group()
