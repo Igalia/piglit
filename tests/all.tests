@@ -900,6 +900,9 @@ add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
 add_texwrap_test3(gl20, '3D', 'npot', 'border')
 
+# Group spec/glsl-1.10
+execfile(os.path.dirname(__file__) + '/spec/glsl-1.10/tests')
+
 # Group spec/glsl-1.30
 execfile(os.path.dirname(__file__) + '/spec/glsl-1.30/tests')
 
