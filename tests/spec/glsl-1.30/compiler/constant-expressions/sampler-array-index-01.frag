@@ -13,7 +13,7 @@
 
 #version 130
 
-sampler2D a[4];
+uniform sampler2D a[4];
 
 float f() {
 	vec4 v = texture(a[0], vec2(0.0, 0.0));
