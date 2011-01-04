@@ -757,6 +757,7 @@ void piglit_init(int argc, char **argv)
 				}
 
 				test_set = &test_sets[j];
+				test_index = j;
 				break;
 			}
 		}
