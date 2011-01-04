@@ -53,10 +53,10 @@ static GLfloat texCoords[8] = {1.0, 0.0,
 				0.0, 1.0};
 
 static GLboolean
-probes();
+probes(void);
 
 static void
-loadTex()
+loadTex(void)
 {
 	#define height 2
 	#define width 2
