@@ -102,8 +102,10 @@ init(void)
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		printf("%s:%u: framebuffer status = 0x%04x\n",
 			   __FUNCTION__, __LINE__, status);
-		printf("PIGLIT: {'result': 'fail' }\n");
-		exit(1);
+		if (status == GL_FRAMEBUFFER_UNSUPPORTED_EXT)
+			piglit_report_result(PIGLIT_SUCCESS);
+		else
+			piglit_report_result(PIGLIT_FAILURE);
 	}
 }
 
