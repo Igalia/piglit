@@ -31,6 +31,10 @@
 
 #include "piglit-util.h"
 
+int piglit_window_mode = GLUT_RGB;
+int piglit_width = 400;
+int piglit_height = 300;
+
 #define FAIL_ON_ERROR(string)						\
 	do {								\
 		const GLenum err = glGetError();			\
@@ -89,12 +93,22 @@ static PFNGLWAITSYNCPROC pglWaitSync = NULL;
 static PFNGLGETINTEGER64VPROC pglGetInteger64v = NULL;
 static PFNGLGETSYNCIVPROC pglGetSynciv = NULL;
 
-
-static GLboolean Automatic = GL_FALSE;
-
 static void
-init(void)
+reshape(int width, int height)
 {
+	glViewport(0, 0, (GLint) width, (GLint) height);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	glutReshapeFunc(reshape);
+
 	piglit_require_extension("GL_ARB_sync");
 
 	pglFenceSync = (PFNGLFENCESYNCPROC) piglit_get_proc_address("glFenceSync");
@@ -107,19 +121,6 @@ init(void)
 
 	glClearColor(0.1, 0.1, 0.3, 0.0);
 }
-
-
-static void
-reshape(int width, int height)
-{
-	glViewport(0, 0, (GLint) width, (GLint) height);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0);
-	glMatrixMode(GL_MODELVIEW);
-}
-
 
 GLboolean
 test_GetSynciv(GLsync sync, GLenum pname, GLint expect)
@@ -144,8 +145,8 @@ done:
 	return pass;
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	GLenum wait_val;
@@ -211,27 +212,6 @@ display(void)
 	FAIL_ON_ERROR("glDeleteSync");
 
 done:
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-
-int main(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = GL_TRUE;
-
-	glutInitWindowSize(400, 300);
-	glutInitDisplayMode(GLUT_RGB);
-	glutCreateWindow("GL_ARB_sync API test");
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(piglit_escape_exit_key);
-	glutDisplayFunc(display);
-
-	init();
-
-	glutMainLoop();
-	return 0;
-}
