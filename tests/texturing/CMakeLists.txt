@@ -65,8 +65,3 @@ add_executable (tex-skipped-unit tex-skipped-unit.c)
 add_executable (tex-swizzle tex-swizzle.c)
 add_executable (texture-rg texture-rg.c)
 add_executable (texwrap texwrap.c)
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	add_executable (tfp tfp.c)
-	target_link_libraries(tfp X11)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

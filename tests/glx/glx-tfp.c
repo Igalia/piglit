@@ -25,7 +25,7 @@
  *
  */
 
-/** @file tfp.c
+/** @file glx-tfp.c
  * Tests the GLX_EXT_texture_from_pixmap extension, in particular the bug
  * reported in https://bugs.freedesktop.org/show_bug.cgi?id=19910 in which
  * the RGB/RGBA attribute of the drawable was misplaced, resulting in always
@@ -36,6 +36,7 @@
  */
 
 #include "piglit-util.h"
+#include "piglit-glx-util.h"
 #include "GL/glx.h"
 
 GLfloat tex_data[4][4] = {
@@ -48,12 +49,11 @@ GLfloat tex_data[4][4] = {
 #define WIN_WIDTH	256
 #define WIN_HEIGHT	128
 
-static GLboolean Automatic = GL_FALSE;
 static GLXPixmap rgb_pixmap, rgba_pixmap;
 static Display *dpy;
 static Window win;
-static int win_width = WIN_WIDTH;
-static int win_height = WIN_HEIGHT;
+int piglit_width = WIN_WIDTH;
+int piglit_height = WIN_HEIGHT;
 
 static PFNGLXBINDTEXIMAGEEXTPROC pglXBindTexImageEXT;
 static PFNGLXRELEASETEXIMAGEEXTPROC pglXReleaseTexImageEXT;
@@ -160,12 +160,12 @@ static GLboolean
 draw(void)
 {
 	GLboolean pass = GL_TRUE;
-	int draw_w = win_width / 4;
-	int draw_h = win_height / 2;
-	int rgb_x = win_width / 8;
-	int rgb_y = win_height / 4;
-	int rgba_x = win_width * 5 / 8;
-	int rgba_y = win_height / 4;
+	int draw_w = piglit_width / 4;
+	int draw_h = piglit_height / 2;
+	int rgb_x = piglit_width / 8;
+	int rgb_y = piglit_height / 4;
+	int rgba_x = piglit_width * 5 / 8;
+	int rgba_y = piglit_height / 4;
 
 	/* Clear background to gray */
 	glClearColor(0.5, 0.5, 0.5, 1.0);
@@ -335,7 +335,7 @@ event_loop(void)
 		} else if (event.type == Expose) {
 			GLboolean pass = draw();
 
-			if (Automatic) {
+			if (piglit_automatic) {
 				if (pass) {
 					piglit_report_result(PIGLIT_SUCCESS);
 					exit(0);
@@ -363,14 +363,13 @@ int main(int argc, char**argv)
 	XSetWindowAttributes window_attr;
 	GLXContext ctx;
 	int i;
-	const char *glx_extension_list;
 	const GLubyte *extension_list;
 	int screen;
 	Window root_win;
 
 	for(i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
-			Automatic = 1;
+			piglit_automatic = 1;
 		else
 			fprintf(stderr, "Unknown option: %s\n", argv[i]);
 	}
@@ -414,15 +413,8 @@ int main(int argc, char**argv)
 
 	glXMakeCurrent(dpy, win, ctx);
 
-	/* This is a bogus way of checking for the extension.
-	 * Needs more GLEW.
-	 */
-	glx_extension_list = glXQueryExtensionsString(dpy, screen);
-	if (strstr(glx_extension_list, "GLX_EXT_texture_from_pixmap") == NULL) {
-		fprintf(stderr, "Test requires GLX_EXT_texture_from_pixmap\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
+	piglit_require_glx_extension(dpy, "GLX_EXT_texture_from_pixmap");
+
 	extension_list = glGetString(GL_EXTENSIONS);
 	if (strstr((const char *)extension_list,
 		   "GL_ARB_texture_env_combine") == NULL) {
@@ -443,7 +435,7 @@ int main(int argc, char**argv)
 
 	init();
 
-	if (!Automatic) {
+	if (!piglit_automatic) {
 		printf("Left rectangle (RGB) should be green on the top and\n"
 		       "red on the bottom.  The right rectangle (RGBA) should\n"
 		       "be the same, but darker on the right half.\n");
