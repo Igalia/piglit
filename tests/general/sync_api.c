@@ -85,14 +85,6 @@ typedef void (APIENTRYP PFNGLGETINTEGER64VPROC) (GLenum pname, GLint64 *params);
 typedef void (APIENTRYP PFNGLGETSYNCIVPROC) (GLsync sync, GLenum pname, GLsizei bufSize, GLsizei *length, GLint *values);
 #endif
 
-static PFNGLFENCESYNCPROC pglFenceSync = NULL;
-static PFNGLISSYNCPROC pglIsSync = NULL;
-static PFNGLDELETESYNCPROC pglDeleteSync = NULL;
-static PFNGLCLIENTWAITSYNCPROC pglClientWaitSync = NULL;
-static PFNGLWAITSYNCPROC pglWaitSync = NULL;
-static PFNGLGETINTEGER64VPROC pglGetInteger64v = NULL;
-static PFNGLGETSYNCIVPROC pglGetSynciv = NULL;
-
 static void
 reshape(int width, int height)
 {
@@ -111,14 +103,6 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_sync");
 
-	pglFenceSync = (PFNGLFENCESYNCPROC) piglit_get_proc_address("glFenceSync");
-	pglIsSync = (PFNGLISSYNCPROC) piglit_get_proc_address("glIsSync");
-	pglDeleteSync = (PFNGLDELETESYNCPROC) piglit_get_proc_address("glDeleteSync");
-	pglClientWaitSync = (PFNGLCLIENTWAITSYNCPROC) piglit_get_proc_address("glClientWaitSync");
-	pglWaitSync = (PFNGLWAITSYNCPROC) piglit_get_proc_address("glWaitSync");
-	pglGetInteger64v = (PFNGLGETINTEGER64VPROC) piglit_get_proc_address("glGetInteger64v");
-	pglGetSynciv = (PFNGLGETSYNCIVPROC) piglit_get_proc_address("glGetSynciv");
-
 	glClearColor(0.1, 0.1, 0.3, 0.0);
 }
 
@@ -129,7 +113,7 @@ test_GetSynciv(GLsync sync, GLenum pname, GLint expect)
 	GLint val;
 	GLsizei len;
 
-	(*pglGetSynciv)(sync, pname, 1, & len, & val);
+	glGetSynciv(sync, pname, 1, & len, & val);
 	FAIL_ON_ERROR("glGetSynciv");
 	if (len != 1) {
 		fprintf(stderr, "glGetSynciv length of 0x%04x was %d\n",
@@ -165,10 +149,10 @@ piglit_display(void)
 
 	glGetError();
 
-	sync = (*pglFenceSync)(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	FAIL_ON_ERROR("glFenceSync");
 
-	if (! (*pglIsSync)(sync)) {
+	if (!glIsSync(sync)) {
 		fprintf(stderr, "IsSync(%p) failed\n", sync);
 		pass = GL_FALSE;
 		goto done;
@@ -199,7 +183,7 @@ piglit_display(void)
 	/* Since the sync has already been signaled, the wait should return
 	 * GL_ALREADY_SIGNALED.
 	 */
-	wait_val = (*pglClientWaitSync)(sync, 0, 1);
+	wait_val = glClientWaitSync(sync, 0, 1);
 	FAIL_ON_ERROR("glClientWaitSync");
 
 	if (wait_val != GL_ALREADY_SIGNALED) {
@@ -208,7 +192,7 @@ piglit_display(void)
 		pass = GL_FALSE;
 	}
 
-	(*pglDeleteSync)(sync);
+	glDeleteSync(sync);
 	FAIL_ON_ERROR("glDeleteSync");
 
 done:
