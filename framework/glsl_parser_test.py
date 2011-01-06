@@ -305,12 +305,17 @@ class GLSLParserTest(PlainExecTest):
 		:return: ([str], None) or (None, TestResult)
 		"""
 
+		if config.has_option('config', 'extension'):
+			extensions = config.get('config', 'extension').split();
+		else:
+			extensions = []
+
 		command = [
 			path.join(testBinDir, 'glslparsertest'),
 			self.filepath,
 			config.get('config', 'expect_result'),
-			config.get('config', 'glsl_version'),
-			]
+			config.get('config', 'glsl_version')
+			] + extensions
 		# There is no case in which the function returns (None, result).
 		# However, the function may have a future need to do so.
 		return (command, None)

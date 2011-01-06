@@ -170,7 +170,7 @@ test(void)
 static void usage(char *name)
 {
 	printf("%s <filename.frag|filename.vert> <pass|fail> "
-	       "{minimum GLSL vesion}\n", name);
+	       "{minimum GLSL vesion} {list of required GL extensions}\n", name);
 	exit(1);
 }
 
@@ -179,9 +179,10 @@ int main(int argc, char**argv)
 	const char *glsl_version_string;
 	float glsl_version;
 	float minimum_version = 1.10;
+	int i;
 
 	glutInit(&argc, argv);
-	if ((argc != 3) && (argc != 4))
+	if (argc < 3)
 		usage(argv[0]);
 
 	if (strlen(argv[1]) < 5)
@@ -220,9 +221,12 @@ int main(int argc, char**argv)
 			glsl_version,
 			minimum_version);
 		piglit_report_result(PIGLIT_SKIP);
-	} else {
-		test();
 	}
 
+	for (i = 4; i < argc; i++) {
+		piglit_require_extension(argv[i]);
+	}
+
+	test();
 	return 0;
 }
