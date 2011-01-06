@@ -156,8 +156,8 @@ draw_pixmap(GLXPixmap pixmap, int x, int y, int w, int h)
 	glDisable(GL_TEXTURE_2D);
 }
 
-static GLboolean
-draw(void)
+static enum piglit_result
+draw(Display *dpy)
 {
 	GLboolean pass = GL_TRUE;
 	int draw_w = piglit_width / 4;
@@ -179,7 +179,7 @@ draw(void)
 	pass &= check_results(GL_FALSE, rgb_x, rgb_y, draw_w, draw_h);
 	pass &= check_results(GL_TRUE, rgba_x, rgba_y, draw_w, draw_h);
 
-	return pass;
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
 static void
@@ -300,70 +300,17 @@ create_pixmap(GLenum format)
 
 static void init(void)
 {
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho( 0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1 );
-
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glLoadIdentity();
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	rgb_pixmap = create_pixmap(GL_RGB);
 	rgba_pixmap = create_pixmap(GL_RGBA);
 }
 
-
-static void
-event_loop(void)
-{
-	for (;;) {
-		XEvent event;
-		XNextEvent (dpy, &event);
-
-		if (event.type == KeyPress) {
-			KeySym sym = XKeycodeToKeysym (dpy,
-						       event.xkey.keycode, 0);
-
-			if (sym == XK_Escape || sym == XK_q || sym == XK_Q)
-				break;
-			else
-				draw();
-		} else if (event.type == Expose) {
-			GLboolean pass = draw();
-
-			if (piglit_automatic) {
-				if (pass) {
-					piglit_report_result(PIGLIT_SUCCESS);
-					exit(0);
-				} else {
-					piglit_report_result(PIGLIT_FAILURE);
-					exit(1);
-				}
-			}
-		}
-        }
-}
-
 int main(int argc, char**argv)
 {
-	unsigned long mask;
 	XVisualInfo *visinfo;
-	int attrib[] = {
-		GLX_RGBA,
-		GLX_RED_SIZE, 1,
-		GLX_GREEN_SIZE, 1,
-		GLX_BLUE_SIZE, 1,
-		GLX_DOUBLEBUFFER,
-		None
-	};
-	XSetWindowAttributes window_attr;
 	GLXContext ctx;
 	int i;
-	const GLubyte *extension_list;
 	int screen;
 	Window root_win;
 
@@ -382,45 +329,24 @@ int main(int argc, char**argv)
 	screen = DefaultScreen(dpy);
 	root_win = RootWindow(dpy, screen);
 
-	visinfo = glXChooseVisual(dpy, screen, attrib);
-	if (visinfo == NULL) {
-		fprintf(stderr,
-			"Couldn't get an RGBA, double-buffered visual\n");
-		piglit_report_result(PIGLIT_FAILURE);
-		exit(1);
-	}
-
-	ctx = glXCreateContext(dpy, visinfo, NULL, True);
-	if (ctx == None) {
-		fprintf(stderr, "glXCreateContext failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
-	}
-
-	window_attr.background_pixel = 0;
-	window_attr.border_pixel = 0;
-	window_attr.colormap = XCreateColormap(dpy, root_win,
-					       visinfo->visual, AllocNone);
-	window_attr.event_mask = StructureNotifyMask | ExposureMask |
-		KeyPressMask;
-	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-	win = XCreateWindow(dpy, root_win, 0, 0,
-			    WIN_WIDTH, WIN_HEIGHT,
-			    0, visinfo->depth, InputOutput,
-			    visinfo->visual, mask, &window_attr);
+	visinfo = piglit_get_glx_visual(dpy);
+	ctx = piglit_get_glx_context(dpy, visinfo);
+	win = piglit_get_glx_window(dpy, visinfo);
 	XFree(visinfo);
-
-	XMapWindow(dpy, win);
 
 	glXMakeCurrent(dpy, win, ctx);
 
-	piglit_require_glx_extension(dpy, "GLX_EXT_texture_from_pixmap");
+	glewInit();
 
-	extension_list = glGetString(GL_EXTENSIONS);
-	if (strstr((const char *)extension_list,
-		   "GL_ARB_texture_env_combine") == NULL) {
+	if (piglit_automatic)
+		piglit_glx_set_no_input();
+
+	XMapWindow(dpy, win);
+
+	piglit_require_glx_extension(dpy, "GLX_EXT_texture_from_pixmap");
+	if (!GLEW_ARB_texture_env_combine) {
 		fprintf(stderr, "Test requires GL_ARB_texture_env_combine\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 
 	pglXBindTexImageEXT = (PFNGLXBINDTEXIMAGEEXTPROC)
@@ -442,7 +368,7 @@ int main(int argc, char**argv)
 		printf("Press Escape to quit\n");
 	}
 
-	event_loop();
+	piglit_glx_event_loop(dpy, draw);
 
 	return 0;
 }
