@@ -13,8 +13,10 @@
 #define ROWS 4
 #define COLS 8
 
-static int Automatic = 0;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH;
 static int Width = COLS*32, Height = ROWS*32;
+int piglit_width = COLS*32;
+int piglit_height = ROWS*32;
 static int CellWidth, CellHeight;
 static int CurrentTest = 0;
 
@@ -305,13 +307,14 @@ static struct test_step Tests[] = {
 };
 #define NumTests (ARRAY_SIZE(Tests))
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
 	glReadBuffer(GL_BACK);
 	CreateRenderedTexture();
 	glViewport(0, 0, Width, Height);
 
-	if (Automatic) {
+	if (piglit_automatic) {
 		int succ = 1;
 		int i;
 
@@ -326,7 +329,7 @@ static void Display(void)
 			}
 		}
 
-		piglit_report_result(succ ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+		return succ ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 	}
 
 	glClearColor(0.5, 0.5, 0.0, 0.6);
@@ -336,6 +339,7 @@ static void Display(void)
 
 	glutSwapBuffers();
 
+	return PIGLIT_SUCCESS;
 }
 
 static void Reshape(int width, int height)
@@ -371,9 +375,16 @@ static void Key(unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLfloat texbuf[4];
+
+	glutReshapeFunc(Reshape);
+	glutKeyboardFunc(Key);
+
+	if (!piglit_automatic)
+		printf("Press 't' to cycle through test images\n");
 
 	piglit_require_extension("GL_ARB_depth_texture");
 	HaveShadow = glutExtensionSupported("GL_ARB_shadow");
@@ -407,23 +418,4 @@ static void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	Reshape(Width,Height);
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	if (!Automatic)
-		printf("Press 't' to cycle through test images\n");
-	init();
-	glutMainLoop();
-	return 0;
 }
