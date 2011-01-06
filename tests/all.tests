@@ -917,6 +917,12 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.dirname(__file__) + '/spec/glsl-1.30',
 			 ['preprocessor', 'compiler'])
 
+# Group ARB_shader_texture_lod
+spec['ARB_shader_texture_lod'] = Group()
+import_glsl_parser_tests(spec['ARB_shader_texture_lod'],
+			 os.path.dirname(__file__) + '/spec/arb_shader_texture_lod',
+			 [''])
+
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle;
 add_texwrap_test1(arb_texture_rectangle, 'RECT')
