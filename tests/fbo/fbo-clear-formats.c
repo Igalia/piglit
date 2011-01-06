@@ -31,7 +31,13 @@
  * texture-based FBOs of various internalformats.
  */
 
+#if defined(_MSC_VER)
+#define bool BOOL
+#define true 1
+#define false 0
+#else
 #include <stdbool.h>
+#endif
 #include "piglit-util.h"
 #include "fbo-formats.h"
 
