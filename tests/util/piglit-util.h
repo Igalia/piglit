@@ -31,8 +31,12 @@ typedef __int64 int64_t;
 typedef unsigned __int8 uint8_t;
 typedef unsigned __int32 uint32_t;
 typedef unsigned __int64 uint64_t;
+#define bool BOOL
+#define true 1
+#define false 0
 #else
 #include <stdint.h>
+#include <stdbool.h>
 #endif
 
 #include <assert.h>
