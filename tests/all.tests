@@ -911,6 +911,12 @@ import_glsl_parser_tests(spec['glsl-1.10'],
 			 os.path.dirname(__file__) + '/spec/glsl-1.10',
 			 ['preprocessor', 'compiler'])
 
+# Group spec/glsl-1.20
+spec['glsl-1.20'] = Group()
+import_glsl_parser_tests(spec['glsl-1.20'],
+			 os.path.dirname(__file__) + '/spec/glsl-1.20',
+			 ['preprocessor', 'compiler'])
+
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
