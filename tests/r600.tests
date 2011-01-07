@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+#
+# Testing the r500 DRI driver
+#
+
+import os
+import re
+
+execfile(os.path.dirname(__file__) + '/radeon.tests')
+
+from framework.core import *
+from framework.gleantest import *
+
+# glean/blendFunc
+#   R500 blending hardware appears to be a bit better than R300
+env = profile.tests['glean']['blendFunc'].env
+env['GLEAN_BLEND_RGB_TOLERANCE'] = 1.35
+env['GLEAN_BLEND_ALPHA_TOLERANCE'] = 1.35
+
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst-in-nested-loop-combined']
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-nested-loop-combined']
+del profile.tests['shaders']['vp-address-01']
+del profile.tests['fbo']['fbo-drawbuffers-fragcolor']
+del profile.tests['fbo']['fbo-maxsize']
+del profile.tests['glean']['blendFunc']
+del profile.tests['glean']['depthStencil']
+del profile.tests['texturing']['streaming-texture-leak']
+del profile.tests['texturing']['tex3d-maxsize']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-varying']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-offset']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-offset-neg']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-overwritten']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-relative-offset']
+del profile.tests['shaders']['vpfp-generic']['vp-arl-neg-array']
