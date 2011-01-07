@@ -47,6 +47,28 @@ def add_glsl_parser_test(group, filepath, test_name):
 	"""Add an instance of GLSLParserTest to the given group."""
 	group[test_name] = GLSLParserTest(filepath)
 
+def import_glsl_parser_tests(group, filepath, subdirectories):
+	# Register each shader source file in the directories below as
+	# a GLSLParserTest.
+	for d in subdirectories:
+		walk_dir = path.join(filepath, d)
+		for (dirpath, dirnames, filenames) in os.walk(walk_dir):
+			# Ignore dirnames.
+			for f in filenames:
+				# Add f as a test if its file extension is good.
+				ext = f.rsplit('.')[-1]
+				if ext in ['vert', 'geom', 'frag']:
+					filepath = path.join(dirpath, f)
+					# testname := filepath with initial
+					#     'tests/spec/glsl-1.30' removed
+					sep = os.sep
+					testname = sep.join(filepath.split(sep)[3:])
+					assert(type(testname) is str)
+					add_glsl_parser_test(
+						group,
+						filepath,
+						testname)
+
 class GLSLParserTest(PlainExecTest):
 	"""Test for the GLSL parser (and more) on a GLSL source file.
 
