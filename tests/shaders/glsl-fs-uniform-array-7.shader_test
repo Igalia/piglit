@@ -1,0 +1,29 @@
+[require]
+GLSL >= 1.10
+GL_MAX_FRAGMENT_UNIFORM_COMPONENTS >= 128
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+/* Test that we can access a dynamically indexed array element of a
+ * large fragment shader uniform array.  Note that this array is
+ * much larger than the minimum MAX_FRAGMENT_UNIFORM_COMPONENTS, so a
+ * driver may just reject this shader.
+ */
+uniform vec4 arg[128];
+uniform int i;
+void main()
+{
+	gl_FragColor = arg[70] + arg[i];
+}
+
+[test]
+uniform vec4 arg[70] 0.0 0.0 0.5 0.0
+uniform vec4 arg[120] 0.0 1.0 0.0 0.0
+uniform int i 120
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.5 0.0
