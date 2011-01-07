@@ -1,0 +1,22 @@
+; Checks for a bug in the 965 driver in handling negation of constants.
+
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+
+TEMP temp1, temp2;
+MOV temp1, 2.0;
+MOV temp2, -2.0;
+ADD temp1, temp1, temp2;
+ABS temp1, temp1;
+SLT temp1, -temp1, {0.0};
+MOV result.color, {0.0, 1.0, 0.0, 0.0};
+MOV result.color.x, temp1;
+END
+
+!!ARBfp1.0
+MOV result.color, fragment.color;
+END
+
+!!test
+expected          0.0     1.0      0.0      0.0
+
