@@ -47,11 +47,11 @@ def add_glsl_parser_test(group, filepath, test_name):
 	"""Add an instance of GLSLParserTest to the given group."""
 	group[test_name] = GLSLParserTest(filepath)
 
-def import_glsl_parser_tests(group, filepath, subdirectories):
+def import_glsl_parser_tests(group, basepath, subdirectories):
 	# Register each shader source file in the directories below as
 	# a GLSLParserTest.
 	for d in subdirectories:
-		walk_dir = path.join(filepath, d)
+		walk_dir = path.join(basepath, d)
 		for (dirpath, dirnames, filenames) in os.walk(walk_dir):
 			# Ignore dirnames.
 			for f in filenames:

@@ -10,7 +10,7 @@ import subprocess
 from framework.core import *
 from framework.exectest import *
 from framework.gleantest import *
-from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test
+from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
 
 ######
 # Collecting all tests
@@ -906,10 +906,16 @@ add_texwrap_test3(gl20, '3D', 'npot', 'proj')
 add_texwrap_test3(gl20, '3D', 'npot', 'border')
 
 # Group spec/glsl-1.10
-execfile(os.path.dirname(__file__) + '/spec/glsl-1.10/tests')
+spec['glsl-1.10'] = Group()
+import_glsl_parser_tests(spec['glsl-1.10'],
+			 os.path.dirname(__file__) + '/spec/glsl-1.10',
+			 ['preprocessor', 'compiler'])
 
 # Group spec/glsl-1.30
-execfile(os.path.dirname(__file__) + '/spec/glsl-1.30/tests')
+spec['glsl-1.30'] = Group()
+import_glsl_parser_tests(spec['glsl-1.30'],
+			 os.path.dirname(__file__) + '/spec/glsl-1.30',
+			 ['preprocessor', 'compiler'])
 
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle;
