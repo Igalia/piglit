@@ -272,6 +272,12 @@ PointAttenuationTest::PointAttenuationTest(const char *testName,
 {
 	fWidth  = windowWidth;
 	fHeight = windowHeight;
+	errorCode = GL_NO_ERROR;
+	errorPos = NULL;
+	for (int i = 0; i < 2; i++) {
+		aliasedLimits[i] = 0;
+		smoothLimits[i] = 0;
+	}
 }
 
 
