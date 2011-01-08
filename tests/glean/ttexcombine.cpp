@@ -1276,7 +1276,7 @@ TexCombineTest::RunMultiTextureTest(glmachine &machine, BasicResult &r,
 
 		// 2. Compute expected result
 		GLfloat prevColor[4];
-		GLfloat expected[4];
+		GLfloat expected[4] = { 0 };
 		for (u = 0; u < machine.NumTexUnits; u++) {
 			if (u == 0) {
 				COPY4(prevColor, machine.FragColor);
