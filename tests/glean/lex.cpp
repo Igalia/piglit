@@ -45,6 +45,8 @@ Lex::Lex(const char* s, bool ignoreCase/* = false */) {
 	input = s;
 	p = input;
 	ignoringCase = ignoreCase;
+	token = ERROR;
+	iValue = 0;
 } // Lex::Lex
 
 ///////////////////////////////////////////////////////////////////////////////
