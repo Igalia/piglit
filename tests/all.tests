@@ -1079,6 +1079,7 @@ for filename in os.listdir('tests/glslparsertest/shaders'):
 	ext = filename.rsplit('.')[-1]
 	if ext in ['vert', 'geo', 'frag']:
 		add_glsl_parser_test(glslparsertest, path.join('tests/glslparsertest/shaders', filename), filename)
+del glslparsertest['CorrectPreprocess11.frag']
 for filename in os.listdir('tests/glslparsertest/glsl2'):
 	ext = filename.rsplit('.')[-1]
 	if ext in ['vert', 'geo', 'frag']:
