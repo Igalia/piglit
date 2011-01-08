@@ -61,6 +61,7 @@ Test::Test(const char* testName, const char *descrip):
     name(testName), description(descrip) {
 	prereqs = 0;
 	hasRun = false;
+	env = NULL;
 	nextTest = testList;
 	testList = this;
 	++testCount;
@@ -70,6 +71,7 @@ Test::Test(const char* testName, const char *descrip, Test** thePrereqs):
     name(testName), description(descrip) {
 	prereqs = thePrereqs;
 	hasRun = false;
+	env = NULL;
 	nextTest = testList;
 	testList = this;
 	++testCount;
