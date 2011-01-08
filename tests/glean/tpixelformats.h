@@ -45,6 +45,12 @@ public:
 					 const char *extensions, const char* description)
 		: MultiTest(testName, filter, extensions, description)
 	{
+		alphaBits = 0;
+		defaultAlpha = 0;
+		haveHalfFloat = false;
+		haveABGR = false;
+		haveSRGB = false;
+		haveCombine = false;
 	}
 
 	virtual void runOne(MultiTestResult &r, Window &w);
