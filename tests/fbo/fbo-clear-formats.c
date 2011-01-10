@@ -112,6 +112,7 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 	float green[4] = {0.0, 1.0, 0.0, 0.25};
 	float blue[4]  = {0.0, 0.0, 1.0, 0.5};
 	float white[4] = {1.0, 1.0, 1.0, 1.0};
+	float black[4] = {0.0, 0.0, 0.0, 0.0};
 	float *color;
 	GLuint fb;
 	GLenum status;
@@ -145,6 +146,10 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 			color = green;
 		else if (size == 1)
 			color = blue;
+		else {
+			assert(0);
+			color = black;
+		}
 		glClearColor(color[0], color[1], color[2], color[3]);
 		glClear(GL_COLOR_BUFFER_BIT);
 		return true;
