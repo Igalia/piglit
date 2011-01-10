@@ -181,8 +181,12 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 	if (compressed && dim < 8)
 		return GL_TRUE;
 
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
-				 GL_TEXTURE_DEPTH_SIZE, &d_size);
+	if (GLEW_ARB_depth_texture) {
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+					 GL_TEXTURE_DEPTH_SIZE, &d_size);
+	} else {
+		d_size = 0;
+	}
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 				 GL_TEXTURE_LUMINANCE_SIZE, &l_size);
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
