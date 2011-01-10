@@ -1,7 +1,7 @@
 #extension GL_ARB_explicit_attrib_location: require
 
-layout(location = 0) attribute vec4 vertex;
-layout(location = 1) attribute vec3 color;
+layout(location = 0) in vec4 vertex;
+layout(location = 1) in vec3 color;
 
 vec3 function(void);
 
