@@ -41,22 +41,6 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 /* size of texture/renderbuffer (power of two) */
 #define FBO_SIZE 128
 
-static GLfloat
-linear_to_nonlinear(GLfloat cl)
-{
-   /* can't have values outside [0, 1] */
-   GLfloat cs;
-
-   if (cl < 0.0031308f) {
-      cs = 12.92f * cl;
-   }
-   else {
-      cs = (GLfloat)(1.055 * pow(cl, 0.41666) - 0.055);
-   }
-   
-   return cs;
-}
-
 static GLuint
 make_fbo(int w, int h)
 {
@@ -178,11 +162,9 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	GLboolean have_srgb_ext = GL_FALSE;
 
 	pass = framebuffer_srgb_fbo();
 
- out:
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
