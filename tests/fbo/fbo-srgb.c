@@ -42,20 +42,22 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 #define FBO_SIZE 128
 
 static GLuint
-make_fbo(int w, int h)
+make_fbo(int w, int h, int srgb_format, int *tex_p)
 {
 	GLuint tex;
 	GLuint fb;
  	GLenum status;
+	int formats[2][2] =  { { GL_SRGB8_ALPHA8_EXT, GL_RGBA },
+			       { GL_SRGB8_EXT, GL_RGB } };
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8_EXT,
+	glTexImage2D(GL_TEXTURE_2D, 0, formats[srgb_format][0],
 		     w, h, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		     formats[srgb_format][1], GL_UNSIGNED_BYTE, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -73,6 +75,7 @@ make_fbo(int w, int h)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
+	*tex_p = tex;
 	return fb;
 }
 
@@ -94,10 +97,11 @@ draw_fbo(int x, int y)
 
 	piglit_draw_rect_tex(x, y, FBO_SIZE, FBO_SIZE,
 			     0, 0, 1, 1);
+	glDisable(GL_TEXTURE_2D);
 }
 
 static GLboolean
-framebuffer_srgb_fbo(void)
+framebuffer_srgb_fbo(int srgb_format)
 {
 	GLboolean pass = GL_TRUE;
 	int fbo_width = FBO_SIZE;
@@ -106,13 +110,13 @@ framebuffer_srgb_fbo(void)
 	float green[] = {0, 0.3, 0.0, 0};
 	float expected_green[4];
 	float expected_blend[4];
+	int tex;
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	fbo = make_fbo(fbo_width, fbo_height);
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
+	fbo = make_fbo(fbo_width, fbo_height, srgb_format, &tex);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 
 	assert(glGetError() == 0);
 
@@ -150,11 +154,13 @@ framebuffer_srgb_fbo(void)
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-
+	
 	draw_fbo(0, 0);
-	glutSwapBuffers();
+
 	glDeleteFramebuffersEXT(1, &fbo);
+	glDeleteTextures(1, &tex);
+	glutSwapBuffers();
+
 	return pass;
 }
 
@@ -163,7 +169,13 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
-	pass = framebuffer_srgb_fbo();
+	pass = framebuffer_srgb_fbo(0);
+	if (pass == GL_TRUE) {
+		pass = framebuffer_srgb_fbo(1);
+		if (pass == GL_FALSE)
+			printf("Failed on format SRGB8\n");
+	} else
+		printf("Failed on format SRGB8_ALPHA8\n");
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
