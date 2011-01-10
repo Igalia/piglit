@@ -110,6 +110,7 @@ draw_mipmap(int x, int y, int dim)
 
 	piglit_draw_rect_tex(x, y, dim, dim,
 			     0, 0, 1, 1);
+	glDisable(GL_TEXTURE_2D);
 }
 
 static GLboolean
