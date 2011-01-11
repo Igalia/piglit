@@ -679,11 +679,6 @@ add_plain_test(shaders, 'glsl-fwidth')
 add_plain_test(shaders, 'glsl-lod-bias')
 add_plain_test(shaders, 'vp-ignore-input')
 add_plain_test(shaders, 'glsl-empty-vs-no-fs')
-add_plain_test(shaders, 'glsl-explicit-location-01')
-add_plain_test(shaders, 'glsl-explicit-location-02')
-add_plain_test(shaders, 'glsl-explicit-location-03')
-add_plain_test(shaders, 'glsl-explicit-location-04')
-add_plain_test(shaders, 'glsl-explicit-location-05')
 add_plain_test(shaders, 'glsl-useprogram-displaylist')
 add_plain_test(shaders, 'glsl-vs-point-size')
 add_plain_test(shaders, 'glsl-light-model')
@@ -937,6 +932,20 @@ spec['ARB_shader_texture_lod'] = Group()
 import_glsl_parser_tests(spec['ARB_shader_texture_lod'],
 			 os.path.dirname(__file__) + '/spec/arb_shader_texture_lod',
 			 [''])
+
+# Group ARB_explicit_attrib_location
+arb_explicit_attrib_location = Group()
+spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
+import_glsl_parser_tests(arb_explicit_attrib_location,
+			 os.path.dirname(__file__)
+			 + '/spec/arb_explicit_attrib_location',
+			 [''])
+add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-01')
+add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-02')
+add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-03')
+add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-04')
+add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
+
 
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle;
