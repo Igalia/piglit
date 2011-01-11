@@ -66,11 +66,13 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 enum piglit_result {
-	PIGLIT_SUCCESS,
-	PIGLIT_FAILURE,
+	PIGLIT_PASS,
+	PIGLIT_FAIL,
 	PIGLIT_SKIP,
 	PIGLIT_WARN
 };
+#define PIGLIT_SUCCESS PIGLIT_PASS
+#define PIGLIT_FAILURE PIGLIT_FAIL
 
 #include "piglit-framework.h"
 
