@@ -32,4 +32,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(glx-swap-exchange X11)
 	add_executable (glx-tfp glx-tfp.c)
 	target_link_libraries(glx-tfp X11)
+
+	add_executable (glx-visuals-stencil glx-visuals-stencil.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

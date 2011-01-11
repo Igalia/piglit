@@ -96,6 +96,9 @@ piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
 			    0, visinfo->depth, InputOutput,
 			    visinfo->visual, mask, &window_attr);
 
+	if (piglit_automatic)
+		piglit_glx_window_set_no_input(dpy, win);
+
 	XMapWindow(dpy, win);
 
 	return win;
@@ -146,21 +149,102 @@ piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 }
 
 
+static enum piglit_result
+piglit_iterate_visuals_event_loop(Display *dpy,
+				  enum piglit_result (*draw)(Display *dpy,
+							     GLXFBConfig config),
+				  GLXFBConfig config)
+{
+	for (;;) {
+		XEvent event;
+		XNextEvent (dpy, &event);
+
+		if (event.type == Expose) {
+			return draw(dpy, config);
+		}
+        }
+}
+
+void
+piglit_glx_window_set_no_input(Display *dpy, GLXDrawable win)
+{
+	XWMHints *hints;
+	hints = XAllocWMHints();
+	hints->flags |= InputHint;
+	hints->input = False;
+
+	XSetWMHints(dpy, win, hints);
+
+	XFree(hints);
+}
+
 void
 piglit_glx_set_no_input(void)
 {
 	Display *d;
 	GLXDrawable win;
-	XWMHints *hints;
 
 	d = glXGetCurrentDisplay();
 	win = glXGetCurrentDrawable();
 
-	hints = XAllocWMHints();
-	hints->flags |= InputHint;
-	hints->input = False;
-
-	XSetWMHints(d, win, hints);
-
-	XFree(hints);
+	piglit_glx_window_set_no_input(d, win);
 }
+
+enum piglit_result
+piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
+						      GLXFBConfig config))
+{
+	int screen;
+	GLXFBConfig *configs;
+	int n_configs;
+	int i;
+	bool any_fail = false;
+	bool any_pass = false;
+
+	Display *dpy = XOpenDisplay(NULL);
+	if (!dpy) {
+		fprintf(stderr, "couldn't open display\n");
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+	screen = DefaultScreen(dpy);
+
+	configs = glXGetFBConfigs(dpy, screen, &n_configs);
+	if (!configs) {
+		fprintf(stderr, "No GLX FB configs\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	for (i = 0; i < n_configs; i++) {
+		enum piglit_result result;
+		XVisualInfo *visinfo;
+		GLXContext ctx;
+		GLXDrawable d;
+
+		visinfo = glXGetVisualFromFBConfig(dpy, configs[i]);
+		if (!visinfo)
+			continue;
+
+		ctx = piglit_get_glx_context(dpy, visinfo);
+		d = piglit_get_glx_window(dpy, visinfo);
+		glXMakeCurrent(dpy, d, ctx);
+		XFree(visinfo);
+
+		result = piglit_iterate_visuals_event_loop(dpy, draw,
+							   configs[i]);
+		if (result == PIGLIT_FAIL)
+			any_fail = true;
+		else if (result == PIGLIT_PASS)
+			any_pass = true;
+
+		XDestroyWindow(dpy, d);
+		glXDestroyContext(dpy, ctx);
+	}
+
+	if (any_fail)
+		return PIGLIT_FAIL;
+	else if (any_pass)
+		return PIGLIT_PASS;
+	else
+		return PIGLIT_SKIP;
+}
+

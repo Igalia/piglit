@@ -34,3 +34,8 @@ void piglit_require_glx_extension(Display *dpy, const char *name);
 void piglit_glx_event_loop(Display *dpy,
 			   enum piglit_result (*draw)(Display *dpy));
 void piglit_glx_set_no_input(void);
+void piglit_glx_window_set_no_input(Display *dpy, GLXDrawable win);
+
+enum piglit_result
+piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
+						      GLXFBConfig config));
