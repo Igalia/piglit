@@ -29,7 +29,7 @@ standalone tests on the command line. To add a test to a Piglit group, us
 ``glsl_parser_test.py TEST_FILE``.
 """
 
-usage_message = "uasge: glsl_parser_test.py TEST_FILE"
+usage_message = "usage: glsl_parser_test.py TEST_FILE"
 
 import ConfigParser
 import os
