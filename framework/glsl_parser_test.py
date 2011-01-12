@@ -48,8 +48,19 @@ def add_glsl_parser_test(group, filepath, test_name):
 	group[test_name] = GLSLParserTest(filepath)
 
 def import_glsl_parser_tests(group, basepath, subdirectories):
-	# Register each shader source file in the directories below as
-	# a GLSLParserTest.
+	"""
+	Recursively register each shader source file in the given
+	``subdirectories`` as a GLSLParserTest .
+
+	:subdirectories: A list of subdirectories under the basepath.
+
+	The name with which each test is registered into the given group is
+	the shader source file's path relative to ``basepath``. For example,
+	if::
+		import_glsl_parser_tests(group, 'a', ['b1', 'b2'])
+	is called and the file 'a/b/c/d.frag' exists, then the test is
+	registered into the group as ``group['b1/c/d.frag']``.
+	"""
 	for d in subdirectories:
 		walk_dir = path.join(basepath, d)
 		for (dirpath, dirnames, filenames) in os.walk(walk_dir):
@@ -60,7 +71,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
 				if ext in ['vert', 'geom', 'frag']:
 					filepath = path.join(dirpath, f)
 					# testname := filepath with initial
-					#     'tests/spec/glsl-1.30' removed
+					#   three directories removed.
 					sep = os.sep
 					testname = sep.join(filepath.split(sep)[3:])
 					assert(type(testname) is str)
