@@ -127,17 +127,18 @@ srgb_tex_test(int srgb_format)
 	}
 
 	memcpy(expected_green, green, sizeof(float) * 4);
-	if (!piglit_probe_rect_rgb(0, 0, 20, 20, expected_green))
+	memcpy(expected_srgb_green, green, sizeof(float) * 4);
+	expected_srgb_green[1] = nonlinear_to_linear(255.0*green[1]);
+
+	if (!piglit_probe_rect_rgb(0, 0, 20, 20, expected_srgb_green))
 		pass = GL_FALSE;
 
 	if (have_decode) {
 
-		memcpy(expected_srgb_green, green, sizeof(float) * 4);
-		expected_srgb_green[1] = nonlinear_to_linear(255.0*green[1]);
-		if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_srgb_green))
+		if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_green))
 			pass = GL_FALSE;
 
-		if (!piglit_probe_rect_rgb(40, 0, 20, 20, expected_green))
+		if (!piglit_probe_rect_rgb(40, 0, 20, 20, expected_srgb_green))
 			pass = GL_FALSE;
 	}
 
