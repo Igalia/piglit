@@ -170,7 +170,7 @@ test(void)
 static void usage(char *name)
 {
 	printf("%s <filename.frag|filename.vert> <pass|fail> "
-	       "{minimum GLSL vesion} {list of required GL extensions}\n", name);
+	       "{requested GLSL vesion} {list of required GL extensions}\n", name);
 	exit(1);
 }
 
@@ -178,7 +178,7 @@ int main(int argc, char**argv)
 {
 	const char *glsl_version_string;
 	float glsl_version;
-	float minimum_version = 1.10;
+	float requested_version = 1.10;
 	int i;
 
 	glutInit(&argc, argv);
@@ -197,7 +197,7 @@ int main(int argc, char**argv)
 		usage(argv[0]);
 
 	if (argc > 3)
-		minimum_version = strtod(argv[3], NULL);
+		requested_version = strtod(argv[3], NULL);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
@@ -215,11 +215,13 @@ int main(int argc, char**argv)
 	glsl_version = (glsl_version_string == NULL)
 		? 0.0 : strtod(glsl_version_string, NULL);
 
-	if (glsl_version < minimum_version) {
+	if (requested_version == 1.00) {
+		piglit_require_extension("GL_ARB_ES2_compatibility");
+	} else if (glsl_version < requested_version) {
 		fprintf(stderr,
-			"GLSL version is %f, but minimum version %f is required\n",
+			"GLSL version is %f, but requested version %f is required\n",
 			glsl_version,
-			minimum_version);
+			requested_version);
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
