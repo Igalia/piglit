@@ -78,8 +78,8 @@ draw(GLenum mode, GLuint numVerts)
 
    glBegin(mode);
    for (i = 0; i < numVerts; i++) {
-      float x = 0.1 * (rand() % 2000 - 1000);
-      float y = 0.1 * (rand() % 2000 - 1000);
+      float x = 0.025 * (rand() % 2000 - 1000);
+      float y = 0.025 * (rand() % 2000 - 1000);
       glVertex2f(x, y);
    }
    glEnd();
@@ -90,7 +90,7 @@ test_prims(void)
 {
    GLuint len, prim;
 
-   for (len = 10; len < 1000 * 1000; len *= 10) {
+   for (len = 1000; len <= 1000 * 1000; len *= 10) {
       for (prim = 0; prim < ELEMENTS(primTypes); prim++) {
          if (!piglit_automatic)
             printf("%s: %s %u vertices\n", TestName, primNames[prim], len);
@@ -114,4 +114,5 @@ void
 piglit_init(int argc, char**argv)
 {
    glOrtho(-100.0, 100.0, -100.0, 100.0, -1.0, 1.0);
+   glShadeModel(GL_FLAT);
 }
