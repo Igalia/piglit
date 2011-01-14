@@ -940,6 +940,11 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.dirname(__file__) + '/spec/glsl-1.30',
 			 ['preprocessor', 'compiler'])
 
+# Group ARB_ES2_compatibility
+arb_es2_compatibility = Group()
+spec['ARB_ES2_compatibility'] = arb_es2_compatibility
+add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-releaseshadercompiler')
+
 # Group ARB_shader_texture_lod
 spec['ARB_shader_texture_lod'] = Group()
 import_glsl_parser_tests(spec['ARB_shader_texture_lod'],
