@@ -14,7 +14,7 @@
 
 #version 100
 
-lowp float;
+precision lowp float;
 
 float f() {
 	return 0.0;

@@ -16,7 +16,7 @@
 
 #version 130
 
-mediump vec2;
+precision mediump vec2;
 
 float f() {
 	return 0.0;
