@@ -11,6 +11,6 @@
 
 #version 100
 
-highp float f(lowp int x) {
+lowp float f(lowp int x) {
 	return 0.0;
 }

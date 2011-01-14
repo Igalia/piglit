@@ -12,7 +12,7 @@
 
 #version 100
 
-highp struct s {
+lowp struct s {
 	float a;
 };
 

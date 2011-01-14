@@ -14,7 +14,7 @@
 
 #version 130
 
-mediump int;
+precision mediump int;
 
 float f() {
 	return 0.0;

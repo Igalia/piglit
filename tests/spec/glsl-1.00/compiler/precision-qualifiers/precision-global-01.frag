@@ -11,8 +11,8 @@
 
 #version 100
 
-uniform lowp float x;
-in highp float y;
+uniform mediump float x;
+in lowp float y;
 
 float f() {
 	return 0.0;

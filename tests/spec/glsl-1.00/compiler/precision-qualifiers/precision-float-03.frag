@@ -11,7 +11,7 @@
 
 #version 100
 
-highp float a[4];
+lowp float a[4];
 
 float f() {
 	return 0.0;

@@ -12,8 +12,8 @@
 
 #version 100
 
-highp struct s {
-	highp float a;
+lowp struct s {
+	lowp float a;
 };
 
 float f() {

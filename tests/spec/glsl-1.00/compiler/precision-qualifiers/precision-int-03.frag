@@ -11,7 +11,7 @@
 
 #version 100
 
-highp int a[4];
+lowp int a[4];
 
 float f() {
 	return 0.0;

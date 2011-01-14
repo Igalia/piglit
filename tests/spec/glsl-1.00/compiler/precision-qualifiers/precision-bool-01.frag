@@ -12,6 +12,6 @@
 #version 100
 
 float f() {
-	highp bool b;
+	lowp bool b;
 	return 0.0;
 }

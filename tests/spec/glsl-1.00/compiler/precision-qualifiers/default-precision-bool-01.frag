@@ -15,7 +15,7 @@
 
 #version 100
 
-precision highp bool;
+precision lowp bool;
 
 float f() {
 	return 0.0;

@@ -12,6 +12,6 @@
 #version 100
 
 float f() {
-	lowp ivec2 v;
+	mediump ivec2 v;
 	return 0.0;
 }
