@@ -911,6 +911,12 @@ add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
 add_texwrap_test3(gl20, '3D', 'npot', 'border')
 
+# Group spec/glsl-1.00
+spec['glsl-1.00'] = Group()
+import_glsl_parser_tests(spec['glsl-1.00'],
+			 os.path.dirname(__file__) + '/spec/glsl-1.00',
+			 ['compiler'])
+
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = Group()
 import_glsl_parser_tests(spec['glsl-1.10'],
