@@ -944,6 +944,7 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 arb_es2_compatibility = Group()
 spec['ARB_ES2_compatibility'] = arb_es2_compatibility
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-depthrangef')
+add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-maxvectors')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-releaseshadercompiler')
 
 # Group ARB_shader_texture_lod
