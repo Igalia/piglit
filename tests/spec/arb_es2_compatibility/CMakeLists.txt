@@ -26,3 +26,4 @@ add_executable (arb_es2_compatibility-drawbuffers arb_es2_compatibility-drawbuff
 add_executable (arb_es2_compatibility-maxvectors arb_es2_compatibility-maxvectors.c)
 add_executable (arb_es2_compatibility-releaseshadercompiler arb_es2_compatibility-releaseshadercompiler.c)
 add_executable (arb_es2_compatibility-shadercompiler arb_es2_compatibility-shadercompiler.c)
+add_executable (arb_es2_compatibility-getshaderprecisionformat arb_es2_compatibility-getshaderprecisionformat.c)
