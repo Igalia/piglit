@@ -41,6 +41,7 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
+#ifdef GL_ARB_ES2_compatibility
 	GLboolean pass = GL_TRUE;
 	float red[4] =   {1.0, 0.0, 0.0, 0.0};
 	float green[4] = {0.0, 1.0, 0.0, 0.0};
@@ -80,4 +81,7 @@ piglit_display(void)
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+#else
+	return PIGLIT_SKIP;
+#endif /* GL_ARB_ES2_compatibility */
 }

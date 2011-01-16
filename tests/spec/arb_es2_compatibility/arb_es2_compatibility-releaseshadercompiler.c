@@ -39,6 +39,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
+#ifdef GL_ARB_ES2_compatibility
 	GLboolean pass = GL_TRUE;
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	float blue[] = {0.0, 0.0, 1.0, 0.0};
@@ -86,11 +87,15 @@ piglit_display(void)
 	glutSwapBuffers();
 
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+#else
+	return PIGLIT_SKIP;
+#endif /* GL_ARB_ES2_compatibility */
 }
 
 void
 piglit_init(int argc, char **argv)
 {
+#ifdef GL_ARB_ES2_compatibility
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
@@ -100,4 +105,5 @@ piglit_init(int argc, char **argv)
 		printf("Requires ARB_ES2_compatibility\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+#endif
 }
