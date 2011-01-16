@@ -45,7 +45,7 @@ static GLboolean
 framebuffer_srgb_api_no_ext(void)
 {	
 	GLboolean pass = GL_TRUE;
-	GLboolean boolmode;
+	GLboolean boolmode = GL_FALSE;
 	GLenum ret;
 	GLboolean is_enabled;
 
