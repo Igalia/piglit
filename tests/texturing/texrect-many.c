@@ -56,46 +56,36 @@ static void DoFrame(void)
 	glutSwapBuffers();
 }
 
-static int DoTest(void)
+static bool
+DoTest(void)
 {
 	GLfloat dmax;
 	int x, y;
+	bool pass = true;
 
 	glReadBuffer(GL_FRONT);
 	dmax = 0;
 
 	for(x = 0; x < NumTextures; ++x) {
 		for(y = 0; y < 11; ++y) {
-			GLfloat probe[4];
-			GLfloat delta[4];
-			int i;
+			float expected[4];
 			int clr;
-
-			glReadPixels((2*x+1) * piglit_width / 32,
-				     (2*y+1) * piglit_height / 22,
-				     1, 1, GL_RGBA, GL_FLOAT, probe);
-
-			printf("   %i/%i: %f,%f,%f,%f", x, y,
-				probe[0], probe[1], probe[2], probe[3]);
+			int probe_x = (2*x+1) * piglit_width / 32;
+			int probe_y = (2*y+1) * piglit_height / 22;
 
 			clr = (x+y)%7;
-			for(i = 0; i < 4; ++i) {
-				delta[i] = probe[i] - colors[clr][i]/255.0;
 
-				if (delta[i] > dmax) dmax = delta[i];
-				else if (-delta[i] > dmax) dmax = -delta[i];
-			}
+			expected[0] = colors[clr][0] / 255.0;
+			expected[1] = colors[clr][1] / 255.0;
+			expected[2] = colors[clr][2] / 255.0;
+			expected[3] = colors[clr][3] / 255.0;
 
-			printf("   Delta: %f,%f,%f,%f\n", delta[0], delta[1], delta[2], delta[3]);
+			pass = pass && piglit_probe_pixel_rgba(probe_x, probe_y,
+							       expected);
 		}
 	}
 
-	printf("Max delta: %f\n", dmax);
-
-	if (dmax >= 0.02)
-		return 0;
-	else
-		return 1;
+	return pass;
 }
 
 
