@@ -12,7 +12,7 @@
 #version 100
 
 uniform mediump float x;
-in lowp float y;
+varying lowp float y;
 
 float f() {
 	return 0.0;
