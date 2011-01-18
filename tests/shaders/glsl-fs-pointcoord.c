@@ -97,8 +97,6 @@ void piglit_init(int argc, char**argv)
 
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_limits);
 	point_size = point_size_limits[1];
-        if (point_size > piglit_width)
-           point_size = piglit_width;
 
 	if (point_size > piglit_width)
 		point_size = piglit_width;
