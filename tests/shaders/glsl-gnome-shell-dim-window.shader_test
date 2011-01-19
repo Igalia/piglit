@@ -1,0 +1,77 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 texcoords;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	texcoords = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+/* This shader came from gnome-shell, which is GPLv2+.  This copyright
+ * notice was constructed from the git logs of that file plus the
+ * top-level COPYING file, as it did not explicitly include the
+ * notice.
+ */
+/*
+    Copyright (C) 2010 Maxim Ermilov <zaspire@rambler.ru>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+#version 110
+uniform sampler2D sampler0;
+uniform float fraction;
+uniform float height;
+const float c = -0.5;
+const float border_max_height = 60.0;
+varying vec4 texcoords;
+
+mat4 contrast = mat4(1.0 + c, 0.0, 0.0, 0.0,
+		     0.0, 1.0 + c, 0.0, 0.0,
+		     0.0, 0.0, 1.0 + c, 0.0,
+		     0.0, 0.0, 0.0, 1.0);
+vec4 off = vec4(0.633, 0.633, 0.633, 0);
+
+void main()
+{
+    vec4 color = texture2D(sampler0, texcoords.xy);
+    float y = height * texcoords.y;
+
+    // To reduce contrast, blend with a mid gray
+    gl_FragColor = color * contrast - off * c;
+
+    // We only fully dim at a distance of BORDER_MAX_HEIGHT from the edge and
+    // when the fraction is 1.0. For other locations and fractions we linearly
+    // interpolate back to the original undimmed color.
+    gl_FragColor = color + (gl_FragColor - color) * min(y / border_max_height, 1.0);
+    gl_FragColor = color + (gl_FragColor - color) * fraction;
+}
+
+[test]
+uniform int sampler0 0
+uniform float fraction 1.0
+uniform float height 60.0
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.0, 0.0) (1.0, 0.0, 0.0)
+relative probe rgb (1.0, 0.0) (0.0, 1.0, 0.0)
+relative probe rgb (0.0, 0.499) (0.90825, 0.15835, 0.15835)
+relative probe rgb (1.0, 0.499) (0.15835, 0.90825, 0.15835)
+relative probe rgb (0.0, 1.0) (0.3165, 0.3165, 0.8165)
+relative probe rgb (1.0, 1.0) (0.8165, 0.8165, 0.8165)

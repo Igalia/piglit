@@ -73,6 +73,7 @@ tests/glslparsertest/glsl2/norsetto-*
 
 tests/glslparsertest/glsl2/xreal-*
 tests/glslparsertest/glsl2/xonotic-*
+tests/shaders/glsl-gnome-shell-dim-window.shader_test
 /* Full text of the GPL v2 is included in licenses/GPL-2 */
 /*
 ===========================================================================
