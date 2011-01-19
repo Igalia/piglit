@@ -31,6 +31,7 @@ import subprocess
 import sys
 import time
 import traceback
+from cStringIO import StringIO
 
 __all__ = [
 	'Environment',
@@ -107,17 +108,19 @@ class TestResult(dict):
 		return {name: self}
 
 	def write(self, file, path):
-		print >>file, "@test: " + encode(path)
+		result = StringIO()
+		print >> result, "@test: " + encode(path)
 		for k in self:
 			v = self[k]
 			if type(v) == list:
-				print >>file, k + "!"
+				print >> result, k + "!"
 				for s in v:
-					print >>file, " " + encode(str(s))
-				print >>file, "!"
+					print >> result, " " + encode(str(s))
+				print >> result, "!"
 			else:
-				print >>file, k + ": " + encode(str(v))
-		print >>file, "!"
+				print >> result, k + ": " + encode(str(v))
+		print >> result, "!"
+		print >> file, result.getvalue(),
 
 
 class GroupResult(dict):
