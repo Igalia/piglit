@@ -31,6 +31,7 @@ import subprocess
 import sys
 import time
 import traceback
+from log import log
 from cStringIO import StringIO
 
 __all__ = [
@@ -304,10 +305,14 @@ class Test:
 		if len(env.exclude_filter) > 0:
 			if True in map(lambda f: f.search(path) != None, env.exclude_filter):
 				return None
+
+		def status(msg):
+			log(msg = msg, channel = path)
+
 		# Run the test
 		if env.execute:
 			try:
-				print "Test: %(path)s" % locals()
+				status("running")
 				time_start = time.time()
 				result = self.run()
 				time_end = time.time()
@@ -325,8 +330,7 @@ class Test:
 				result['exception'] = str(sys.exc_info()[0]) + str(sys.exc_info()[1])
 				result['traceback'] = '@@@' + "".join(traceback.format_tb(sys.exc_info()[2]))
 
-			if result['result'] != 'pass':
-				print "    result: %(result)s" % { 'result': result['result'] }
+			status(result['result'])
 
 			result.write(env.file, path)
 			if Test.sleep:
