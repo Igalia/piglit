@@ -28,6 +28,7 @@
 #include "piglit-util.h"
 
 PFNGLATTACHSHADERPROC piglit_AttachShader = NULL;
+PFNGLBINDATTRIBLOCATIONPROC piglit_BindAttribLocation = NULL;
 PFNGLCOMPILESHADERPROC piglit_CompileShader = NULL;
 PFNGLCREATEPROGRAMPROC piglit_CreateProgram = NULL;
 PFNGLCREATESHADERPROC piglit_CreateShader = NULL;
@@ -53,6 +54,7 @@ static void
 init_functions_from_core(void)
 {
 	piglit_AttachShader = glAttachShader;
+	piglit_BindAttribLocation = glBindAttribLocation;
 	piglit_CompileShader = glCompileShader;
 	piglit_CreateProgram = glCreateProgram;
 	piglit_CreateShader = glCreateShader;
@@ -79,6 +81,7 @@ static void
 init_functions_from_extension(void)
 {
 	piglit_AttachShader = glAttachObjectARB;
+	piglit_BindAttribLocation = glBindAttribLocationARB;
 	piglit_CompileShader = glCompileShaderARB;
 	piglit_CreateProgram = glCreateProgramObjectARB;
 	piglit_CreateShader = glCreateShaderObjectARB;

@@ -162,6 +162,7 @@ extern GLint piglit_ARBfp_pass_through;
 /*@{*/
 #if defined(PIGLIT_GLES2)
 #define piglit_AttachShader glAttachShader
+#define piglit_BindAttribLocation glBindAttribLocation
 #define piglit_CompileShader glCompileShader
 #define piglit_CreateProgram glCreateProgram
 #define piglit_CreateShader glCreateShader
@@ -184,6 +185,7 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_GetUniformfv glGetUniformfv
 #else
 extern PFNGLATTACHSHADERPROC piglit_AttachShader;
+extern PFNGLBINDATTRIBLOCATIONPROC piglit_BindAttribLocation;
 extern PFNGLCOMPILESHADERPROC piglit_CompileShader;
 extern PFNGLCREATEPROGRAMPROC piglit_CreateProgram;
 extern PFNGLCREATESHADERPROC piglit_CreateShader;
