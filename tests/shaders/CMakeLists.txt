@@ -24,6 +24,7 @@ link_libraries (
 add_executable (activeprogram-bad-program activeprogram-bad-program.c)
 add_executable (activeprogram-get activeprogram-get.c)
 add_executable (ati-fs-bad-delete ati-fs-bad-delete.c)
+add_executable (attribute0 attribute0.c)
 add_executable (createshaderprogram-bad-type createshaderprogram-bad-type.c)
 add_executable (createshaderprogram-attached-shaders createshaderprogram-attached-shaders.c)
 add_executable (trinity-fp1 trinity-fp1.c)

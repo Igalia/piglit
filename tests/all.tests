@@ -229,6 +229,7 @@ def add_getactiveuniform_count(group, name, expected):
 add_plain_test(shaders, 'activeprogram-bad-program')
 add_plain_test(shaders, 'activeprogram-get')
 add_plain_test(shaders, 'ati-fs-bad-delete')
+add_plain_test(shaders, 'attribute0')
 add_plain_test(shaders, 'createshaderprogram-bad-type')
 add_plain_test(shaders, 'createshaderprogram-attached-shaders')
 add_plain_test(shaders, 'trinity-fp1')
