@@ -23,10 +23,12 @@
 
 /**
  * \file fbo-incomplete-texture-01.c
- * Verify that an FBO with an incomplete texture attached in itself incomplete
+ * Verify that an FBO with an incomplete texture attached is complete
  *
  * This test uses a 2D texture that specifies a mipmap filter, but the mipmap
- * stack is not complete.
+ * stack is not complete.  This should not affect the completeness of the FBO.
+ * This test originally wanted the FBO to be incomplete.  However, this just
+ * verified incorrect behavior in another vendor's driver.
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
@@ -60,8 +62,8 @@ piglit_init(int argc, char **argv)
 	 */
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 32, 32, 0,
-		     GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 			GL_LINEAR_MIPMAP_LINEAR);
@@ -79,13 +81,10 @@ piglit_init(int argc, char **argv)
 	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status == GL_FRAMEBUFFER_COMPLETE) {
-		printf("FBO erroneously complete\n");
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		fprintf(stderr, "FBO erroneously incomplete: 0x%04x\n",
+			status);
 		piglit_report_result(PIGLIT_FAILURE);
-	} else if (status != GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
-		fprintf(stderr, "FBO incomplete for incorrect reason 0x%04x "
-			"(should be 0x%04x)\n",
-			GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT, status);
 	}
 
 	piglit_report_result(PIGLIT_SUCCESS);
