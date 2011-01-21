@@ -248,6 +248,7 @@ draw_fbo(int x, int y)
 
 	piglit_draw_rect_tex(x, y, FBO_SIZE, FBO_SIZE,
 			     0, 0, 1, 1);
+	glDisable(GL_TEXTURE_2D);
 }
 
 static GLboolean
