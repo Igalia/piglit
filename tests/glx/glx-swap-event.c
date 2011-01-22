@@ -33,6 +33,10 @@
 #include "GL/glx.h"
 #include <sys/time.h>
 
+
+#ifdef GLX_MESA_swap_control
+
+
 /* return current time (in seconds) */
 static double
 current_time(void)
@@ -513,3 +517,14 @@ main(int argc, char *argv[])
     
     return 0;
 }
+
+#else
+
+int
+main(int argc, char *argv[])
+{
+   piglit_report_result(PIGLIT_SKIP);
+   return 0;
+}
+
+#endif /* GLX_MESA_swap_control */
