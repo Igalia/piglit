@@ -42,7 +42,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 #define FBO_SIZE 128
 
 static GLuint
-make_fbo(int w, int h, int srgb_format, int *tex_p)
+make_fbo(int w, int h, int srgb_format, GLuint *tex_p)
 {
 	GLuint tex;
 	GLuint fb;
@@ -110,7 +110,7 @@ framebuffer_srgb_fbo(int srgb_format)
 	float green[] = {0, 0.3, 0.0, 0};
 	float expected_green[4];
 	float expected_blend[4];
-	int tex;
+	GLuint tex;
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
