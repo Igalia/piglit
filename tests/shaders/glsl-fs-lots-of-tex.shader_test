@@ -1,0 +1,45 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform sampler2D tex;
+uniform vec4 cst;
+void main()
+{
+	/* This test is for the extended shader limits on r400 cards.
+	 * It should generate 34 TEX instructions.
+	 */
+	vec4 a = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 b = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 c = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 d = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 e = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 f = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 g = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 h = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 i = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 j = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 k = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 l = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 m = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 n = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 o = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 p = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+	vec4 q = texture2D(tex, cst.xy) + texture2D(tex, cst.xy);
+
+	gl_FragColor = a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q;
+}
+
+[test]
+uniform int tex 0
+uniform vec4 cst 0.0 0.0 0.0 0.0
+texture checkerboard 0 0 (8, 8) (0.01, 0.0, 0.0, 0.0) (0.01, 0.0, 0.0, 0.0)
+draw rect -1 -1 2 2
+relative probe rgb (0.75, 0.75) (0.4, 0.0, 0.0)
