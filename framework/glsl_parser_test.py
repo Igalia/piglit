@@ -126,21 +126,31 @@ class GLSLParserTest(PlainExecTest):
 	----------------
 	* glsl_version: A valid GLSL version number, such as 1.10.
 	* expect_result: Either ``pass`` or ``fail``.
-	* Additional options are currenly ignored.
+
+	Nonrequired Options
+	-------------------
+	* extensions: List of GL extensions. If an extension is not
+	      supported, the test is skipped. Each extension name must begin
+	      with GL and elements are separated by whitespace.
 
 	Examples
 	--------
 	::
 		// [config]
-		// # Comments have this form
 		// glsl_version: 1.30
 		// expect_result: pass
+		// # Lists may be single-line.
+		// extensions: GL_ARB_fragment_coord_conventions GL_AMD_conservative_depth
 		// [end config]
 
 	::
 		/* [config]
 		 * glsl_version: 1.30
 		 * expect_result: pass
+		 * # Lists may be span multiple lines.
+		 * extensions:
+		 *     GL_ARB_fragment_coord_conventions
+		 *     GL_AMD_conservative_depth
 		 * [end config]
 		 */
 
@@ -166,27 +176,36 @@ class GLSLParserTest(PlainExecTest):
 		// [end config]
 	"""
 
+	__required_opts = [
+		'expect_result',
+		'glsl_version'
+		]
+
+	__config_defaults = {
+		'require_extensions' : '',
+		}
+
 	def __init__(self, filepath):
 		"""
 		:filepath: Must end in one '.vert', '.geom', or '.frag'.
 		"""
 		Test.__init__(self)
-		self.filepath = filepath
-		self.env = dict()
-		self._cached_command = None
+		self.__config = None
+		self.__command = None
+		self.__filepath = filepath
+		self.result = None
 
-	def _get_config(self):
+	def __get_config(self):
 		"""Extract the config section from the test file.
 
-		If there are no parsing errors in extracting the config, then
-		return a tuple ``(config, None)``, where ``config`` is
-		a ``SafeConfigPaser``. If the config section is missing or ill
-		formed, or any other errors occur, then return ``(None,
-		result)``, where ``result`` is a ``TestResult`` that reports
-		failure.
+		Set ``self.__cached_config``.  If the config section is missing
+		or invalid, or any other errors occur, then set ``self.result``
+		to failure.
 
-		:return: (SafeConfigParser, None) or (None, TestResult)
+		:return: None
 		"""
+
+		cls = self.__class__
 
 		# Text of config section.
 		text_io = StringIO()
@@ -205,12 +224,12 @@ class GLSLParserTest(PlainExecTest):
 		end = None # Marks end of config body.
 
 		try:
-			f = open(self.filepath, 'r')
+			f = open(self.__filepath, 'r')
 		except IOError:
-			result = TestResult()
-			result['result'] = 'fail'
-			result['errors'] = ["Failed to open test file '{0}'".format(self.filepath)]
-			return (None, result)
+			self.result = TestResult()
+			self.result['result'] = 'fail'
+			self.result['errors'] = ["Failed to open test file '{0}'".format(self.__filepath)]
+			return
 		for line in f:
 			if parse_state == PARSE_FIND_START:
 				m = start.match(line)
@@ -244,124 +263,115 @@ class GLSLParserTest(PlainExecTest):
 		if parse_state == PARSE_DONE:
 			pass
 		elif parse_state == PARSE_FIND_START:
-			result = TestResult()
-			result['result'] = 'fail'
-			result['errors'] = ["Config section of test file '{0}' is missing".format(self.filepath)]
-			result['errors'] += ["Failed to find initial line of config section '// [config]'"]
-			result['note'] = "See the docstring in file '{0}'".format(__file__)
-			return (None, result)
+			self.result = TestResult()
+			self.result['result'] = 'fail'
+			self.result['errors'] = ["Config section of test file '{0}' is missing".format(self.__filepath)]
+			self.result['errors'] += ["Failed to find initial line of config section '// [config]'"]
+			self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+			return
 		elif parse_state == PARSE_IN_CONFIG:
-			result = TestResult()
-			result['result'] = 'fail'
-			result['errors'] = ["Config section of test file '{0}' does not terminate".format(self.filepath)]
-			result['errors'] += ["Failed to find terminal line of config section '// [end config]'"]
-			result['note'] = "See the docstring in file '{0}'".format(__file__)
-			return (None, result)
+			self.result = TestResult()
+			self.result['result'] = 'fail'
+			self.result['errors'] = ["Config section of test file '{0}' does not terminate".format(self.__filepath)]
+			self.result['errors'] += ["Failed to find terminal line of config section '// [end config]'"]
+			self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+			return
 		elif parse_state == PARSE_ERROR:
-			result = TestResult()
-			result['result'] = 'fail'
-			result['errors'] = ["Config section of test file '{0}' is ill formed, most likely due to whitespace".format(self.filepath)]
-			result['note'] = "See the docstring in file '{0}'".format(__file__)
-			return (None, result)
+			self.result = TestResult()
+			self.result['result'] = 'fail'
+			self.result['errors'] = ["Config section of test file '{0}' is ill formed, most likely due to whitespace".format(self.__filepath)]
+			self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+			return
 		else:
 			assert(False)
 
-		config = ConfigParser.SafeConfigParser()
+		config = ConfigParser.SafeConfigParser(cls.__config_defaults)
 		try:
 			text = text_io.getvalue()
 			text_io.close()
 			config.readfp(StringIO(text))
 		except ConfigParser.Error as e:
-			result = TestResult()
-			result['result'] = 'fail'
-			result['errors'] = ['Errors exist in config section of test file']
-			result['errors'] += [e.message]
-			result['note'] = "See the docstring in file '{0}'".format(__file__)
-			return (None, result)
+			self.result = TestResult()
+			self.result['result'] = 'fail'
+			self.result['errors'] = ['Errors exist in config section of test file']
+			self.result['errors'] += [e.message]
+			self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+			return
 
-		return (config, None)
+		self.__config = config
 
-	def _validate_config(self, config):
+	def __validate_config(self):
 		"""Validate config.
 
-		Check that that all required options are present. If validation
-		succeeds, return ``None``. Else, return a ``TestResult`` that
-		reports failure. (Currently, this function does not validate the
-		options' values.)
+		Check that that all required options are present. If
+		validation fails, set ``self.result`` to failure.
+		
+		Currently, this function does not validate the options'
+		values.
 
-		Required Options: expect_result, glsl_version
-
-		:return: TestResult or None
+		:return: None
 		"""
-		# Check that all required options are present.
-		required_opts = ['expect_result', 'glsl_version']
-		for o in required_opts:
-			if not config.has_option('config', o):
-				result = TestResult()
-				result['result'] = 'fail'
-				result['errors'] = ['Errors exist in config section of test file']
-				result['errors'] += ["Option '{0}' is required".format(o)]
-				result['note'] = "See the docstring in file '{0}'".format(__file__)
-				return result
-		return None
+		cls = self.__class__
 
-	def _make_command(self, config):
-		"""Construct command line arguments for glslparsertest.
-
-		If construction is successful, return ``(command, None)``. Else,
-		return ``(None, result)`` where ``result`` is a ``TestResult``
-		that reports failure.
-
-		:precondition: config has already been validated
-		:return: ([str], None) or (None, TestResult)
-		"""
-
-		if config.has_option('config', 'extension'):
-			extensions = config.get('config', 'extension').split();
-		else:
-			extensions = []
-
-		command = [
-			path.join(testBinDir, 'glslparsertest'),
-			self.filepath,
-			config.get('config', 'expect_result'),
-			config.get('config', 'glsl_version')
-			] + extensions
-		# There is no case in which the function returns (None, result).
-		# However, the function may have a future need to do so.
-		return (command, None)
+		if self.__config is None:
+			return
+		for o in cls.__required_opts:
+			if not self.__config.has_option('config', o):
+				self.result = TestResult()
+				self.result['result'] = 'fail'
+				self.result['errors'] = ['Errors exist in config section of test file']
+				self.result['errors'] += ["Option '{0}' is required".format(o)]
+				self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+				return
 
 	def run_standalone(self):
 		"""Run the test as a standalone process outside of Piglit."""
-		command = self.command
-		if command is None:
-			assert(self.result is not None)
-			sys.stderr.write(repr(self.result))
+		if self.result is not None:
+			sys.stdout.write(self.result)
 			sys.exit(1)
-		p = subprocess.Popen(command)
+
+		assert(self.command is not None)
+		env = os.environ.copy()
+		for e in self.env:
+			env[e] = str(self.env[e])
+		p = subprocess.Popen(self.command, env=env)
 		p.communicate()
+
+	@property
+	def config(self):
+		if self.__config is None:
+			self.__get_config()
+			self.__validate_config()
+		return self.__config
 
 	@property
 	def command(self):
 		"""Command line arguments for 'glslparsertest'.
 
 		The command line arguments are constructed by parsing the
-		config section of the test file. If any errors occur, return
-		None and set ``self.result`` to a ``TestResult`` that reports
-		failure.
+		config section of the test file. If any errors are present in
+		the config section, then ``self.result`` is set to failure and
+		this returns ``None``.
 
 		:return: [str] or None
 		"""
-		if self._cached_command is None:
-			(config, self.result) = self._get_config()
-			if self.result is not None: return None
-			self.result = self._validate_config(config)
-			if self.result is not None: return None
-			self.result = self._validate_config(config)
-			if self.result is not None: return None
-			(self._cached_command, self.result) = \
-					self._make_command(config)
-		return self._cached_command
+
+		if self.result is not None:
+			return None
+
+		assert(self.config is not None)
+		command = [
+			path.join(testBinDir, 'glslparsertest'),
+			self.__filepath,
+			self.config.get('config', 'expect_result'),
+			self.config.get('config', 'glsl_version')
+			]
+		command += self.config.get('config', 'extensions').split()
+		return command
+
+	@property
+	def env(self):
+		return dict()
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
