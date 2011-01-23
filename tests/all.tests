@@ -954,6 +954,12 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.dirname(__file__) + '/spec/glsl-1.30',
 			 ['preprocessor', 'compiler'])
 
+# Group AMD_conservative_depth
+spec['AMD_conservative_depth'] = Group()
+import_glsl_parser_tests(spec['AMD_conservative_depth'],
+			 os.path.dirname(__file__) + '/spec/amd_conservative_depth',
+			 [''])
+
 # Group ARB_ES2_compatibility
 arb_es2_compatibility = Group()
 spec['ARB_ES2_compatibility'] = arb_es2_compatibility
