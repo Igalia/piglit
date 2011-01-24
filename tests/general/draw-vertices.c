@@ -239,26 +239,104 @@ static void test_short_vertices(float x1, float y1, float x2, float y2, int inde
 
 static void test_int_vertices(float x1, float y1, float x2, float y2, int index)
 {
-    int v[] = {
+    int v2[] = {
         x1, y1,
         x1, y2,
         x2, y1
     };
+    int v3[] = {
+        x1, y1, 0,
+        x1, y2, 0,
+        x2, y1, 0
+    };
+    int v4[] = {
+        x1, y1, 0, 1,
+        x1, y2, 0, 1,
+        x2, y1, 0, 1
+    };
+    int v2o[] = {
+	0,
+        x1, y1,
+        x1, y2,
+        x2, y1
+    };
+    int v3o[] = {
+	0,
+        x1, y1, 0,
+        x1, y2, 0,
+        x2, y1, 0
+    };
+    int v4o[] = {
+	0,
+        x1, y1, 0, 1,
+        x1, y2, 0, 1,
+        x2, y1, 0, 1
+    };
+    GLuint vbo;
 
-    glVertexPointer(2, GL_INT, 0, v);
+    switch (index) {
+        case 0: vbo = vboVertexPointer(2, GL_INT, 8, v2, sizeof(v2), 0); break;
+        case 1: vbo = vboVertexPointer(3, GL_INT, 12, v3, sizeof(v3), 0); break;
+        case 2: vbo = vboVertexPointer(4, GL_INT, 16, v4, sizeof(v4), 0); break;
+        case 3: vbo = vboVertexPointer(2, GL_INT, 8, v2o, sizeof(v2o), 4); break;
+        case 4: vbo = vboVertexPointer(3, GL_INT, 12, v3o, sizeof(v3o), 4); break;
+        case 5: vbo = vboVertexPointer(4, GL_INT, 16, v4o, sizeof(v4o), 4); break;
+    }
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDeleteBuffers(1, &vbo);
 }
 
 static void test_double_vertices(float x1, float y1, float x2, float y2, int index)
 {
-    double v[] = {
-        x1, y1,
-        x1, y2,
-        x2, y1
-    };
+	double v2[] = {
+	    x1, y1,
+	    x1, y2,
+	    x2, y1
+	};
+	double v3[] = {
+	    x1, y1, 0,
+	    x1, y2, 0,
+	    x2, y1, 0
+	};
+	double v4[] = {
+	    x1, y1, 0, 1,
+	    x1, y2, 0, 1,
+	    x2, y1, 0, 1
+	};
+	double v2o[] = {
+	    0,
+	    x1, y1,
+	    x1, y2,
+	    x2, y1
+	};
+	double v3o[] = {
+	    0,
+	    x1, y1, 0,
+	    x1, y2, 0,
+	    x2, y1, 0
+	};
+	double v4o[] = {
+	    0,
+	    x1, y1, 0, 1,
+	    x1, y2, 0, 1,
+	    x2, y1, 0, 1
+	};
+	GLuint vbo;
 
-    glVertexPointer(2, GL_DOUBLE, 0, v);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+	switch (index) {
+	    case 0: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2, sizeof(v2), 0); break;
+	    case 1: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3, sizeof(v3), 0); break;
+	    case 2: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4, sizeof(v4), 0); break;
+	    case 3: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2o, sizeof(v2o), 8); break;
+	    case 4: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3o, sizeof(v3o), 8); break;
+	    case 5: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4o, sizeof(v4o), 8); break;
+	}
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDeleteBuffers(1, &vbo);
 }
 
 struct test {
@@ -295,9 +373,19 @@ struct test tests[] = {
     {test_short_vertices, 10, {1, 1, 1}, "Short vertices - components: 3, stride: 8, offset: 2"},
     {test_short_vertices, 11, {1, 1, 1}, "Short vertices - components: 4, stride: 8, offset: 2"},
 
-    {test_int_vertices, 0, {1, 1, 1}, "Int vertices"},
+    {test_int_vertices, 0, {1, 1, 1}, "Int vertices - components: 2, stride: 8, offset: 0"},
+    {test_int_vertices, 1, {1, 1, 1}, "Int vertices - components: 3, stride: 12, offset: 0"},
+    {test_int_vertices, 2, {1, 1, 1}, "Int vertices - components: 4, stride: 16, offset: 0"},
+    {test_int_vertices, 3, {1, 1, 1}, "Int vertices - components: 2, stride: 8, offset: 4"},
+    {test_int_vertices, 4, {1, 1, 1}, "Int vertices - components: 3, stride: 12, offset: 4"},
+    {test_int_vertices, 5, {1, 1, 1}, "Int vertices - components: 4, stride: 16, offset: 4"},
 
-    {test_double_vertices, 0, {1, 1, 1}, "Double vertices"},
+    {test_double_vertices, 0, {1, 1, 1}, "Double vertices - components: 2, stride: 16, offset: 0"},
+    {test_double_vertices, 1, {1, 1, 1}, "Double vertices - components: 3, stride: 24, offset: 0"},
+    {test_double_vertices, 2, {1, 1, 1}, "Double vertices - components: 4, stride: 32, offset: 0"},
+    {test_double_vertices, 3, {1, 1, 1}, "Double vertices - components: 2, stride: 16, offset: 8"},
+    {test_double_vertices, 4, {1, 1, 1}, "Double vertices - components: 3, stride: 24, offset: 8"},
+    {test_double_vertices, 5, {1, 1, 1}, "Double vertices - components: 4, stride: 32, offset: 8"},
 
     {test_large_vertex_count, 0, {1, 1, 1}, "Large vertex count"},
 
