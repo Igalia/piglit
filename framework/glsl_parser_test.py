@@ -129,6 +129,9 @@ class GLSLParserTest(PlainExecTest):
 
 	Nonrequired Options
 	-------------------
+	* override_extensions: List of GL extensions to manually enable or
+	      disable. Each extension name must begin with GL and be prefixed
+	      with '+' or '-'. List elements are separated by whitespace.
 	* require_extensions: List of GL extensions. If an extension is not
 	      supported, the test is skipped. Each extension name must begin
 	      with GL and elements are separated by whitespace.
@@ -148,9 +151,9 @@ class GLSLParserTest(PlainExecTest):
 		 * glsl_version: 1.30
 		 * expect_result: pass
 		 * # Lists may be span multiple lines.
-		 * required_extensions:
-		 *     GL_ARB_fragment_coord_conventions
-		 *     GL_AMD_conservative_depth
+		 * override_extensions:
+		 *     +GL_ARB_fragment_coord_conventions
+		 *     -GL_AMD_conservative_depth
 		 * [end config]
 		 */
 
@@ -182,6 +185,7 @@ class GLSLParserTest(PlainExecTest):
 		]
 
 	__config_defaults = {
+		'override_extensions' : '',
 		'require_extensions' : '',
 		}
 
@@ -371,7 +375,7 @@ class GLSLParserTest(PlainExecTest):
 
 	@property
 	def env(self):
-		return dict()
+		return { 'MESA_EXTENSION_OVERRIDE' : self.config.get('config', 'override_extensions') }
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
