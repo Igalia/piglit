@@ -1,7 +1,7 @@
 /* [config]
  * expect_result: pass
  * glsl_version: 1.10
- * extension: GL_ARB_shader_texture_lod GL_ARB_texture_rectangle
+ * require_extensions: GL_ARB_shader_texture_lod GL_ARB_texture_rectangle
  * [end config]
  */
 #extension GL_ARB_shader_texture_lod: require

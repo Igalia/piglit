@@ -1,7 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.10
-// extension: GL_ARB_explicit_attrib_location
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 //
 // Even though the specified location is clearly too large, the spec says that

@@ -1,7 +1,7 @@
 // [config]
 // expect_result: fail
 // glsl_version: 1.20
-// extension: GL_ARB_explicit_attrib_location
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 //
 // The 'location' layout qualifier can only be used with 'in' and 'out'.  Also,

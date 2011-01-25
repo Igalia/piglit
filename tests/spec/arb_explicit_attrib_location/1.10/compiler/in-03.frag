@@ -1,7 +1,7 @@
 // [config]
 // expect_result: fail
 // glsl_version: 1.10
-// extension: GL_ARB_explicit_attrib_location
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 //
 // GL_ARB_explicit_attrib_location interacts with the 'centroid' qualifier,

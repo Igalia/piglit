@@ -129,7 +129,7 @@ class GLSLParserTest(PlainExecTest):
 
 	Nonrequired Options
 	-------------------
-	* extensions: List of GL extensions. If an extension is not
+	* require_extensions: List of GL extensions. If an extension is not
 	      supported, the test is skipped. Each extension name must begin
 	      with GL and elements are separated by whitespace.
 
@@ -140,7 +140,7 @@ class GLSLParserTest(PlainExecTest):
 		// glsl_version: 1.30
 		// expect_result: pass
 		// # Lists may be single-line.
-		// extensions: GL_ARB_fragment_coord_conventions GL_AMD_conservative_depth
+		// require_extensions: GL_ARB_fragment_coord_conventions GL_AMD_conservative_depth
 		// [end config]
 
 	::
@@ -148,7 +148,7 @@ class GLSLParserTest(PlainExecTest):
 		 * glsl_version: 1.30
 		 * expect_result: pass
 		 * # Lists may be span multiple lines.
-		 * extensions:
+		 * required_extensions:
 		 *     GL_ARB_fragment_coord_conventions
 		 *     GL_AMD_conservative_depth
 		 * [end config]
@@ -366,7 +366,7 @@ class GLSLParserTest(PlainExecTest):
 			self.config.get('config', 'expect_result'),
 			self.config.get('config', 'glsl_version')
 			]
-		command += self.config.get('config', 'extensions').split()
+		command += self.config.get('config', 'require_extensions').split()
 		return command
 
 	@property

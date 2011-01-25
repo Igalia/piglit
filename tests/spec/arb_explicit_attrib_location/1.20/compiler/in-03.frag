@@ -1,7 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.20
-// extension: GL_ARB_explicit_attrib_location
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 
 #version 120
