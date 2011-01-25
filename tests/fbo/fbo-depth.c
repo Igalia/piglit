@@ -26,9 +26,9 @@
  *
  */
 
-/** @file fbo-d24s8.c
+/** @file fbo-depth.c
  *
- * Tests that rendering to a 1D texture with a D24S8 texture
+ * Tests that rendering to a 1D texture with a depth texture
  * and then drawing both to the framebuffer succeeds.
  */
 
@@ -39,13 +39,40 @@ int piglit_width = 50;
 int piglit_height = 20;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH;
 
-static void
-create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
+#define F(name) #name, name
+
+struct format {
+	const char *name;
+	GLuint iformat, format, type;
+	const char *extension;
+} formats[] = {
+	{F(GL_DEPTH_COMPONENT16),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	 "GL_ARB_depth_texture"},
+
+	{F(GL_DEPTH_COMPONENT24),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	 "GL_ARB_depth_texture"},
+
+	{F(GL_DEPTH_COMPONENT32),  GL_DEPTH_COMPONENT, GL_FLOAT,
+	 "GL_ARB_depth_texture"},
+
+	{F(GL_DEPTH24_STENCIL8),   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8_EXT,
+	 "GL_EXT_packed_depth_stencil"},
+
+	{F(GL_DEPTH_COMPONENT32F), GL_DEPTH_COMPONENT, GL_FLOAT,
+	 "GL_ARB_depth_buffer_float"},
+
+	{F(GL_DEPTH32F_STENCIL8),  GL_DEPTH_STENCIL,   GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+	 "GL_ARB_depth_buffer_float"}
+};
+
+struct format f;
+
+static void create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 {
 	GLuint tex, ds, fb;
 	GLenum status;
 
-    /* Create the color buffer. */
+	/* Create the color buffer. */
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_1D, tex);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
@@ -57,13 +84,10 @@ create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 	/* Create the depth-stencil buffer. */
 	glGenTextures(1, &ds);
 	glBindTexture(GL_TEXTURE_1D, ds);
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_DEPTH24_STENCIL8_EXT,
-		     BUF_WIDTH,
-		     0,
-		     GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, NULL);
+	glTexImage1D(GL_TEXTURE_1D, 0, f.iformat, BUF_WIDTH, 0, f.format, f.type, NULL);
 	assert(glGetError() == 0);
 
-    /* Create the FBO. */
+	/* Create the FBO. */
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
@@ -79,18 +103,19 @@ create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 				  ds,
 				  0);
 
-	glFramebufferTexture1DEXT(GL_FRAMEBUFFER_EXT,
-				  GL_STENCIL_ATTACHMENT_EXT,
-				  GL_TEXTURE_1D,
-				  ds,
-				  0);
+	if (f.format == GL_DEPTH_STENCIL) {
+		glFramebufferTexture1DEXT(GL_FRAMEBUFFER_EXT,
+					  GL_STENCIL_ATTACHMENT_EXT,
+					  GL_TEXTURE_1D,
+					  ds,
+					  0);
+	}
 
 	assert(glGetError() == 0);
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "FBO incomplete\n");
-		goto done;
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	glViewport(0, 0, BUF_WIDTH, 1);
@@ -102,19 +127,17 @@ create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 	glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	piglit_ortho_projection(BUF_WIDTH, 1, GL_FALSE);
 
-    /* green */
+	/* green */
 	glColor4f(0.0, 1.0, 0.0, 0.0);
 	piglit_draw_rect(0, 0, BUF_WIDTH, 1);
 
-done:
 	glDeleteFramebuffersEXT(1, &fb);
 
 	*out_tex = tex;
 	*out_ds = ds;
 }
 
-static void
-draw_fbo_1d(int x, int y)
+static void draw_fbo_1d(int x, int y)
 {
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -133,8 +156,7 @@ draw_fbo_1d(int x, int y)
 			     0, 0, 1, 1);
 }
 
-enum piglit_result
-piglit_display(void)
+enum piglit_result piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float black[] = {0,0,0,0};
@@ -143,10 +165,10 @@ piglit_display(void)
 	int x;
 	GLuint tex, ds;
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -177,6 +199,22 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	unsigned i, p;
+
 	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_EXT_packed_depth_stencil");
+
+	for (p = 1; p < argc; p++) {
+		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {
+			if (!strcmp(argv[p], formats[i].name)) {
+				piglit_require_extension(formats[i].extension);
+				f = formats[i];
+				return;
+			}
+		}
+	}
+
+	if (!f.name) {
+		printf("Not enough parameters.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 }

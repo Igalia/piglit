@@ -22,7 +22,7 @@ link_libraries (
 )
 
 add_executable (fbo-1d fbo-1d.c)
-add_executable (fbo-d24s8 fbo-d24s8.c)
+add_executable (fbo-depth fbo-depth.c)
 add_executable (fbo-3d fbo-3d.c)
 add_executable (fbo-alpha fbo-alpha.c)
 add_executable (fbo-luminance-alpha fbo-luminance-alpha.c)
