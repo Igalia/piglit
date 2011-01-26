@@ -65,6 +65,35 @@ piglit_display(void)
 	return PIGLIT_FAILURE;
 }
 
+union data_blob {
+	float f;
+	uint32_t u;
+};
+
+void
+validate_buffer(const union data_blob *buffer, unsigned size, float expected)
+{
+	if (buffer[0].f != expected) {
+		printf("index 0: got %f, expected %f\n",
+		       buffer[0].f, uniform_data[0]);
+		piglit_report_result(PIGLIT_FAILURE);
+	} else if (!piglit_automatic) {
+		printf("index 0: got %f, expected %f (good)\n",
+		        buffer[0].f, uniform_data[0]);
+	}
+
+	for (i = 1; i < size; i++) {
+		if (buffer[i].u != 0xdeadbeef) {
+			printf("glGetUniformfv overrun at index %u!\n", i);
+			piglit_report_result(PIGLIT_FAILURE);
+		}
+	}
+
+	if (!piglit_automatic) {
+		printf("No buffer overrun.\n");
+	}
+}
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -75,10 +104,7 @@ piglit_init(int argc, char **argv)
 	GLint vs;
 	GLint fs;
 	unsigned i;
-	union {
-		float f;
-		uint32_t u;
-	} buffer[16];
+	union data_blob buffer[16];
 
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
@@ -111,6 +137,15 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
+	/* From page 80 of the OpenGL 2.1 spec:
+	 *
+	 *     The first element of a uniform array is identified using the
+	 *     name of the uniform array appended with "[0]". Except if the
+	 *     last part of the string name indicates a uniform array, then
+	 *     the location of the first element of that array can be
+	 *     retrieved by either using the name of the uniform array, or the
+	 *     name of the uniform array appended with "[0]".
+	 */
 	if (base_location != array_location[0]) {
 		printf("Locations of `c' = %d and `c[0]' = %d, but they "
 		       "should be the same.\n",
@@ -120,34 +155,21 @@ piglit_init(int argc, char **argv)
 
 	piglit_Uniform1fv(base_location, 4, uniform_data);
 
-	printf("Getting all array elements at once...\n");
+	/* From page 264 of the OpenGL 2.1 spec:
+	 *
+	 *     In order to query the values of an array of uniforms, a
+	 *     GetUniform* command needs to be issued for each array element.
+	 *
+	 * This means that querying using the location of 'array' is the same
+	 * as 'array[0]'.
+	 */
+	printf("Getting array element 0 from base location...\n");
 	for (i = 0; i < ARRAY_SIZE(buffer); i++) {
 		buffer[i].u = 0xdeadbeef;
 	}
 
 	piglit_GetUniformfv(prog, base_location, (GLfloat *) buffer);
-
-	for (i = 0; i < 4; i++) {
-		if (buffer[i].f != uniform_data[i]) {
-			printf("index %u: got %f, expected %f\n",
-			       i, buffer[i].f, uniform_data[i]);
-			piglit_report_result(PIGLIT_FAILURE);
-		} else if (!piglit_automatic) {
-			printf("index %u: got %f, expected %f (good)\n",
-			       i, buffer[i].f, uniform_data[i]);
-		}
-	}
-
-	for (/* empty */; i < ARRAY_SIZE(buffer); i++) {
-		if (buffer[i].u != 0xdeadbeef) {
-			printf("glGetUniformfv overrun at index %u!\n", i);
-			piglit_report_result(PIGLIT_FAILURE);
-		}
-	}
-
-	if (!piglit_automatic) {
-		printf("No buffer overrun.\n");
-	}
+	validate_buffer(buffer, ARRAY_SIZE(buffer), uniform_data[0]);
 
 	printf("Getting one array element at a time...\n");
 	for (i = 0; i < 4; i++) {
@@ -158,26 +180,7 @@ piglit_init(int argc, char **argv)
 
 		piglit_GetUniformfv(prog, array_location[i],
 				    (GLfloat *) buffer);
-		if (buffer[0].f != uniform_data[i]) {
-			printf("index %u: got %f, expected %f\n",
-			       i, buffer[0].f, uniform_data[i]);
-			piglit_report_result(PIGLIT_FAILURE);
-		} else if (!piglit_automatic) {
-			printf("index %u: got %f, expected %f (good)\n",
-			       i, buffer[0].f, uniform_data[i]);
-		}
-
-		for (j = 1; j < ARRAY_SIZE(buffer); j++) {
-			if (buffer[j].u != 0xdeadbeef) {
-				printf("glGetUniformfv overrun at index %u!\n",
-				       j);
-				piglit_report_result(PIGLIT_FAILURE);
-			}
-		}
-
-		if (!piglit_automatic) {
-			printf("No buffer overrun.\n");
-		}
+		validate_buffer(buffer, ARRAY_SIZE(buffer), uniform_data[i]);
 	}
 
 	piglit_report_result(PIGLIT_SUCCESS);
