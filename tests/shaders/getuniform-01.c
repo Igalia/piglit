@@ -73,13 +73,15 @@ union data_blob {
 void
 validate_buffer(const union data_blob *buffer, unsigned size, float expected)
 {
+	unsigned i;
+
 	if (buffer[0].f != expected) {
 		printf("index 0: got %f, expected %f\n",
-		       buffer[0].f, uniform_data[0]);
+		       buffer[0].f, expected);
 		piglit_report_result(PIGLIT_FAILURE);
 	} else if (!piglit_automatic) {
 		printf("index 0: got %f, expected %f (good)\n",
-		        buffer[0].f, uniform_data[0]);
+		       buffer[0].f, expected);
 	}
 
 	for (i = 1; i < size; i++) {
