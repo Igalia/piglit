@@ -1,0 +1,46 @@
+[require]
+# Once gl_Vertex is changed to piglit_vertex, this test will work with
+# GLSL ES 1.00 as well.
+GLSL >= 1.10
+
+[vertex shader]
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 color;
+varying float f;
+
+void a()
+{
+	f = 0.5;
+}
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	f = 0.1;
+	a();
+	color.g = f++;
+	color.rba = vec3(0.0);
+}
+
+[fragment shader]
+#ifdef GL_ES
+precision mediump float;
+#endif
+
+varying vec4 color;
+varying float f;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+draw rect -1 -1 2 2
+probe rgb 15 15 0.0 0.5 0.0
