@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+/* Tests a bug in copy propagation that turns
+ *  e.g. { a = v.x; v.x = v.y; v.y = a } into { v.x = v.y; v.y = v.x; }
+ */
+varying vec4 colour;
+
+void main()
+{
+    gl_Position = ftransform();
+    colour = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+varying vec4 colour;
+
+void main()
+{
+    vec4 col = colour;
+    while (col.b < 0.6) { /* prevent direct propagation of input */
+        float r = col.r;
+        col.r = col.g;
+        col.g = r;
+        col.b += 0.25;
+    }
+    gl_FragColor = col;
+}
+
+[test]
+clear color 0.5 0.5 0.5 1.0
+clear
+draw rect -1 -1 2 2
+probe rgb 1 1 1.0 0.0 0.75
