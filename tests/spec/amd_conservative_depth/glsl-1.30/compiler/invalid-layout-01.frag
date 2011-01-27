@@ -2,7 +2,6 @@
 // expect_result: fail
 // glsl_version: 1.30
 // require_extensions: GL_AMD_conservative_depth
-// override_extensions: +GL_AMD_conservative_depth
 // [end config]
 
 #version 130

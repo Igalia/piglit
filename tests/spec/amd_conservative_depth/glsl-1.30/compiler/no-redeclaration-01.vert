@@ -2,7 +2,6 @@
 // expect_result: pass
 // glsl_version: 1.30
 // require_extensions: GL_AMD_conservative_depth
-// override_extensions: +GL_AMD_conservative_depth
 // [end config]
 //
 // Require AMD_conservative_depth in the vertex shader, but don't use any of its
