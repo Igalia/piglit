@@ -1,5 +1,5 @@
 // [config]
-// expected_result: pass
+// expect_result: pass
 // glsl_version: 1.10
 // [end config]
 
