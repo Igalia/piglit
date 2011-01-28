@@ -5,10 +5,6 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/util
 )
 
-link_directories (
-	${piglit_SOURCE_DIR}/tests/util
-)
-
 link_libraries (
 	piglitglxutil
 	${OPENGL_gl_LIBRARY}

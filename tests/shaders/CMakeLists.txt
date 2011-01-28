@@ -6,11 +6,6 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/util
 )
 
-link_directories (
-	${piglit_SOURCE_DIR}/tests/mesa/util
-	${piglit_SOURCE_DIR}/tests/util
-)
-
 link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}

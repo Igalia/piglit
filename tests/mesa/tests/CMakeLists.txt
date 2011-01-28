@@ -5,10 +5,6 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/mesa/util
 )
 
-link_directories (
-	${piglit_SOURCE_DIR}/tests/mesa/util
-)
-
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}

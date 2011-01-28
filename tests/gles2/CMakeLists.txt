@@ -6,11 +6,6 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/util/glut_egl
 )
 
-link_directories (
-	${piglit_SOURCE_DIR}/tests/util/
-	${piglit_SOURCE_DIR}/tests/util/glut_egl
-)
-
 link_libraries (
 	${OPENGL_gles2_LIBRARY}
 	${OPENGL_egl_LIBRARY}
