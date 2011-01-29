@@ -323,18 +323,42 @@ static void test_double_vertices(float x1, float y1, float x2, float y2, int ind
 	    x1, y2, 0, 1,
 	    x2, y1, 0, 1
 	};
+	double v2s[] = {
+	    0,  0,
+	    x1, y1,
+	    x1, y2,
+	    x2, y1
+	};
+	double v3s[] = {
+	    0,  0,  0,
+	    x1, y1, 0,
+	    x1, y2, 0,
+	    x2, y1, 0
+	};
+	double v4s[] = {
+	    0,  0,  0, 0,
+	    x1, y1, 0, 1,
+	    x1, y2, 0, 1,
+	    x2, y1, 0, 1
+	};
 	GLuint vbo;
 
 	switch (index) {
-	    case 0: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2, sizeof(v2), 0); break;
-	    case 1: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3, sizeof(v3), 0); break;
-	    case 2: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4, sizeof(v4), 0); break;
-	    case 3: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2o, sizeof(v2o), 8); break;
-	    case 4: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3o, sizeof(v3o), 8); break;
-	    case 5: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4o, sizeof(v4o), 8); break;
+	case 0: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2, sizeof(v2), 0); break;
+	case 1: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3, sizeof(v3), 0); break;
+	case 2: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4, sizeof(v4), 0); break;
+	case 3: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2o, sizeof(v2o), 8); break;
+	case 4: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3o, sizeof(v3o), 8); break;
+	case 5: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4o, sizeof(v4o), 8); break;
+	case 6: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2s, sizeof(v2s), 0); break;
+	case 7: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3s, sizeof(v3s), 0); break;
+	case 8: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4s, sizeof(v4s), 0); break;
 	}
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	if (index <= 5)
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	else
+		glDrawArrays(GL_TRIANGLES, 1, 3);
 
 	glDeleteBuffers(1, &vbo);
 }
@@ -347,9 +371,9 @@ struct test {
 };
 
 struct test tests[] = {
-    {test_ubyte_colors, 0, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3, offset: 0"},
-    {test_ubyte_colors, 1, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 0"},
-    {test_ubyte_colors, 2, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 0"},
+    {test_ubyte_colors, 0, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3,"},
+    {test_ubyte_colors, 1, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4,"},
+    {test_ubyte_colors, 2, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4,"},
     {test_ubyte_colors, 3, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3, offset: 1"},
     {test_ubyte_colors, 4, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 1"},
     {test_ubyte_colors, 5, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 1"},
@@ -360,12 +384,12 @@ struct test tests[] = {
     {test_ubyte_colors, 10, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 3"},
     {test_ubyte_colors, 11, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 3"},
 
-    {test_short_vertices, 0, {1, 1, 1}, "Short vertices - components: 2, stride: 4, offset: 0"},
-    {test_short_vertices, 1, {1, 1, 1}, "Short vertices - components: 2, stride: 6, offset: 0"},
-    {test_short_vertices, 2, {1, 1, 1}, "Short vertices - components: 3, stride: 6, offset: 0"},
-    {test_short_vertices, 3, {1, 1, 1}, "Short vertices - components: 2, stride: 8, offset: 0"},
-    {test_short_vertices, 4, {1, 1, 1}, "Short vertices - components: 3, stride: 8, offset: 0"},
-    {test_short_vertices, 5, {1, 1, 1}, "Short vertices - components: 4, stride: 8, offset: 0"},
+    {test_short_vertices, 0, {1, 1, 1}, "Short vertices - components: 2, stride: 4,"},
+    {test_short_vertices, 1, {1, 1, 1}, "Short vertices - components: 2, stride: 6,"},
+    {test_short_vertices, 2, {1, 1, 1}, "Short vertices - components: 3, stride: 6,"},
+    {test_short_vertices, 3, {1, 1, 1}, "Short vertices - components: 2, stride: 8,"},
+    {test_short_vertices, 4, {1, 1, 1}, "Short vertices - components: 3, stride: 8,"},
+    {test_short_vertices, 5, {1, 1, 1}, "Short vertices - components: 4, stride: 8,"},
     {test_short_vertices, 6, {1, 1, 1}, "Short vertices - components: 2, stride: 4, offset: 2"},
     {test_short_vertices, 7, {1, 1, 1}, "Short vertices - components: 2, stride: 6, offset: 2"},
     {test_short_vertices, 8, {1, 1, 1}, "Short vertices - components: 3, stride: 6, offset: 2"},
@@ -373,19 +397,22 @@ struct test tests[] = {
     {test_short_vertices, 10, {1, 1, 1}, "Short vertices - components: 3, stride: 8, offset: 2"},
     {test_short_vertices, 11, {1, 1, 1}, "Short vertices - components: 4, stride: 8, offset: 2"},
 
-    {test_int_vertices, 0, {1, 1, 1}, "Int vertices - components: 2, stride: 8, offset: 0"},
-    {test_int_vertices, 1, {1, 1, 1}, "Int vertices - components: 3, stride: 12, offset: 0"},
-    {test_int_vertices, 2, {1, 1, 1}, "Int vertices - components: 4, stride: 16, offset: 0"},
-    {test_int_vertices, 3, {1, 1, 1}, "Int vertices - components: 2, stride: 8, offset: 4"},
+    {test_int_vertices, 0, {1, 1, 1}, "Int vertices - components: 2, stride: 8"},
+    {test_int_vertices, 1, {1, 1, 1}, "Int vertices - components: 3, stride: 12"},
+    {test_int_vertices, 2, {1, 1, 1}, "Int vertices - components: 4, stride: 16"},
+    {test_int_vertices, 3, {1, 1, 1}, "Int vertices - components: 2, stride: 8,  offset: 4"},
     {test_int_vertices, 4, {1, 1, 1}, "Int vertices - components: 3, stride: 12, offset: 4"},
     {test_int_vertices, 5, {1, 1, 1}, "Int vertices - components: 4, stride: 16, offset: 4"},
 
-    {test_double_vertices, 0, {1, 1, 1}, "Double vertices - components: 2, stride: 16, offset: 0"},
-    {test_double_vertices, 1, {1, 1, 1}, "Double vertices - components: 3, stride: 24, offset: 0"},
-    {test_double_vertices, 2, {1, 1, 1}, "Double vertices - components: 4, stride: 32, offset: 0"},
+    {test_double_vertices, 0, {1, 1, 1}, "Double vertices - components: 2, stride: 16"},
+    {test_double_vertices, 1, {1, 1, 1}, "Double vertices - components: 3, stride: 24"},
+    {test_double_vertices, 2, {1, 1, 1}, "Double vertices - components: 4, stride: 32"},
     {test_double_vertices, 3, {1, 1, 1}, "Double vertices - components: 2, stride: 16, offset: 8"},
     {test_double_vertices, 4, {1, 1, 1}, "Double vertices - components: 3, stride: 24, offset: 8"},
     {test_double_vertices, 5, {1, 1, 1}, "Double vertices - components: 4, stride: 32, offset: 8"},
+    {test_double_vertices, 6, {1, 1, 1}, "Double vertices - components: 2, stride: 16, start: 1"},
+    {test_double_vertices, 7, {1, 1, 1}, "Double vertices - components: 3, stride: 24, start: 1"},
+    {test_double_vertices, 8, {1, 1, 1}, "Double vertices - components: 4, stride: 32, start: 1"},
 
     {test_large_vertex_count, 0, {1, 1, 1}, "Large vertex count"},
 
