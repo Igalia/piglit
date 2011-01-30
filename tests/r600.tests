@@ -8,17 +8,19 @@ execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 from framework.core import *
 from framework.gleantest import *
 
+# These lock up evergreen/redwood
+del profile.tests['general']['depth_clamp'] # gpu reset doesn't work
+del profile.tests['general']['line-aa-width'] # gpu reset doesn't work
+del profile.tests['glean']['logicOp'] # gpu reset works but is useless
+del profile.tests['glean']['orthoPosRandRects']
+del profile.tests['glean']['orthoPosRandTris']
+del profile.tests['glean']['stencil2'] # works sometimes
+del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-dst'] # gpu reset doesn't work
+del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst'] # gpu reset doesn't work
+del profile.tests['shaders']['glsl-mat-attribute']
+del profile.tests['shaders']['glsl-vs-varying-array'] # gpu reset doesn't work
+del profile.tests['texturing']['copytexsubimage'] # gpu reset doesn't work
+
+# These lock up r600
 del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst-in-nested-loop-combined']
 del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-src-in-nested-loop-combined']
-#del profile.tests['shaders']['vp-address-01']
-#del profile.tests['fbo']['fbo-drawbuffers-fragcolor']
-#del profile.tests['fbo']['fbo-maxsize']
-#del profile.tests['texturing']['tex3d-maxsize']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-varying']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-offset']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-offset-neg']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-overwritten']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-constant-array-huge-relative-offset']
-#del profile.tests['shaders']['vpfp-generic']['vp-arl-neg-array']
-
