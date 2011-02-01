@@ -49,6 +49,9 @@ PFNGLUNIFORM4FVPROC piglit_Uniform4fv = NULL;
 PFNGLUNIFORM1IPROC piglit_Uniform1i = NULL;
 PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv = NULL;
 PFNGLGETUNIFORMFVPROC piglit_GetUniformfv = NULL;
+PFNGLVERTEXATTRIBPOINTERPROC piglit_VertexAttribPointer = NULL;
+PFNGLENABLEVERTEXATTRIBARRAYPROC piglit_EnableVertexAttribArray = NULL;
+PFNGLDISABLEVERTEXATTRIBARRAYPROC piglit_DisableVertexAttribArray = NULL;
 
 static void
 init_functions_from_core(void)
@@ -75,6 +78,9 @@ init_functions_from_core(void)
 	piglit_Uniform1i = glUniform1i;
 	piglit_UniformMatrix4fv = glUniformMatrix4fv;
 	piglit_GetUniformfv = glGetUniformfv;
+	piglit_VertexAttribPointer = glVertexAttribPointer;
+	piglit_EnableVertexAttribArray = glEnableVertexAttribArray;
+	piglit_DisableVertexAttribArray = glDisableVertexAttribArray;
 }
 
 static void
@@ -102,6 +108,9 @@ init_functions_from_extension(void)
 	piglit_Uniform1i = glUniform1iARB;
 	piglit_UniformMatrix4fv = glUniformMatrix4fvARB;
 	piglit_GetUniformfv = glGetUniformfvARB;
+	piglit_VertexAttribPointer = glVertexAttribPointerARB;
+	piglit_EnableVertexAttribArray = glEnableVertexAttribArrayARB;
+	piglit_DisableVertexAttribArray = glDisableVertexAttribArrayARB;
 }
 
 void
