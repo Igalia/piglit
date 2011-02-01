@@ -56,9 +56,9 @@ const char *fs_text =
 	"}\n";
 
 static const GLfloat identity_matrix[] = {
+	0.0, 0.0, 1.0, 0.0,
 	1.0, 0.0, 0.0, 0.0,
 	0.0, 1.0, 0.0, 0.0,
-	0.0, 0.0, 1.0, 0.0,
 	0.0, 0.0, 0.0, 1.0,
 };
 
@@ -94,14 +94,14 @@ piglit_display(void)
 
 	pass = piglit_probe_pixel_rgb(1 * piglit_width / 3,
 				      1 * piglit_width / 3,
-				      red);
+				      blue);
 	pass = piglit_probe_pixel_rgb(2 * piglit_width / 3,
 				      1 * piglit_width / 3,
-				      green)
+				      red)
 		&& pass;
 	pass = piglit_probe_pixel_rgb(1 * piglit_width / 3,
 				      2 * piglit_width / 3,
-				      blue)
+				      green)
 		&& pass;
 	pass = piglit_probe_pixel_rgb(2 * piglit_width / 3,
 				      2 * piglit_width / 3,
