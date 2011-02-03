@@ -180,8 +180,6 @@ test(void)
    piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
    for (i = 0; i < maxBuffers; i++) {
-      GLfloat pix[4];
-
       glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
       check_error(__LINE__);
 
