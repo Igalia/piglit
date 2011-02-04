@@ -176,7 +176,6 @@ static enum piglit_result
 test(void)
 {
    GLuint fbo, rb;
-   GLenum cbuffer = GL_COLOR_ATTACHMENT0_EXT;
    int i;
    GLboolean pass = GL_TRUE;
    GLenum err;
