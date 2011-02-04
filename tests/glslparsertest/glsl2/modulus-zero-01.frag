@@ -1,9 +1,9 @@
 // [config]
 // expect_result: pass
-// glsl_version: 1.20
+// glsl_version: 1.30
 // [end config]
 
-#version 120
+#version 130
 
 int
 f() {
