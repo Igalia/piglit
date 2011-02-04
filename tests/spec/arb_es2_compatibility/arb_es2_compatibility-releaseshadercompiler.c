@@ -36,6 +36,53 @@
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
+#ifdef GL_ARB_ES2_compatibility
+static const char vs_text[] =
+	"#version 100\n"
+	"uniform vec4 offset;\n"
+	"attribute vec4 vertex;\n"
+	"void main () {\n"
+	"    gl_Position = vertex + offset;"
+	"}\n"
+	;
+
+static const char fs_text[] =
+	"#version 100\n"
+	"uniform mediump vec4 color;\n"
+	"void main () {\n"
+	"    gl_FragColor = color;\n"
+	"}\n"
+	;
+
+void
+draw(const float *color, float x_offset)
+{
+	GLuint vs, fs, prog;
+	GLint color_location;
+	GLint offset_location;
+
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
+	prog = piglit_link_simple_program(vs, fs);
+
+	glBindAttribLocation(prog, 0, "vertex");
+	glLinkProgram(prog);
+	piglit_link_check_status(prog);
+
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	glUseProgram(prog);
+	color_location = glGetUniformLocation(prog, "color");
+	offset_location = glGetUniformLocation(prog, "offset");
+
+	glUniform4fv(color_location, 1, color);
+	glUniform4f(offset_location, x_offset, 0.0f, 0.0f, 0.0f);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDeleteProgram(prog);
+}
+#endif
+
 enum piglit_result
 piglit_display(void)
 {
@@ -43,39 +90,10 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	float green[] = {0.0, 1.0, 0.0, 0.0};
 	float blue[] = {0.0, 0.0, 1.0, 0.0};
-	GLuint vs, fs, prog;
 
-	static int color_location;
-
-	/* Set up projection matrix so we can just draw using window
-	 * coordinates.
-	 */
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
-	vs = piglit_compile_shader(GL_VERTEX_SHADER,
-				   "shaders/glsl-mvp.vert");
-	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
-				   "shaders/glsl-uniform-color.frag");
-	prog = piglit_link_simple_program(vs, fs);
-	glUseProgram(prog);
-	color_location = glGetUniformLocation(prog, "color");
-	glUniform4fv(color_location, 1, green);
-	piglit_draw_rect(0, 0, piglit_width / 2, piglit_height);
-	glDeleteProgram(prog);
-
+	draw(green, 0.0f);
 	glReleaseShaderCompiler();
-
-	vs = piglit_compile_shader(GL_VERTEX_SHADER,
-				   "shaders/glsl-mvp.vert");
-	fs = piglit_compile_shader(GL_FRAGMENT_SHADER,
-				   "shaders/glsl-uniform-color.frag");
-	prog = piglit_link_simple_program(vs, fs);
-	glUseProgram(prog);
-	color_location = glGetUniformLocation(prog, "color");
-	glUniform4fv(color_location, 1, blue);
-	piglit_draw_rect(piglit_width / 2, 0,
-			 piglit_width / 2 + 1, piglit_height);
-	glDeleteProgram(prog);
+	draw(blue, 1.0f);
 
 	pass &= piglit_probe_pixel_rgba(piglit_width / 4, piglit_height / 2,
 					green);
@@ -96,6 +114,13 @@ void
 piglit_init(int argc, char **argv)
 {
 #ifdef GL_ARB_ES2_compatibility
+	static const float verts[] = {
+		-1.0,  1.0, 0.0, 1.0,
+		-1.0, -1.0, 0.0, 1.0,
+		+0.0,  1.0, 0.0, 1.0,
+		+0.0, -1.0, 0.0, 1.0,
+	};
+
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
@@ -105,5 +130,9 @@ piglit_init(int argc, char **argv)
 		printf("Requires ARB_ES2_compatibility\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4,
+			      verts);
+	glEnableVertexAttribArray(0);
 #endif
 }
