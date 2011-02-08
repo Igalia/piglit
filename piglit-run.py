@@ -24,11 +24,41 @@
 
 from getopt import getopt, GetoptError
 import re
-import sys
+import sys, os
 
 import framework.core as core
+from framework.threads import synchronized_self
 
+class SyncFileWriter:
+	'''
+		Using the 'print' syntax to write to an instance of this class
+		may have unexpected results in a multithreaded program.  For example:
+			print >> file, "a", "b", "c"
+		will call write() to write "a", then call write() to write "b", and so on...
+		This type of execution allows for another thread to call write() before
+		the original statement completes its execution.
+		To avoid this behavior, call file.write() explicitly.  For example:
+			file.write("a", "b", "c", "\n")
+		will ensure that "a b c" gets written to the file before any other thread
+		is given write access.
+	'''
+	def __init__(self, filename):
+		self.file = open(filename, 'w')
 
+	@synchronized_self
+	def write(self, *args):
+		[self.file.write(str(a)) for a in args]
+		self.file.flush()
+		os.fsync(self.file.fileno())
+
+	@synchronized_self
+	def writeLine(self, *args):
+		self.write(*args)
+		self.write('\n')
+
+	@synchronized_self
+	def close(self):
+		self.file.close()
 
 #############################################################################
 ##### Main program
@@ -91,8 +121,8 @@ def main():
 	core.checkDir(resultsDir, False)
 
 	profile = core.loadTestProfile(profileFilename)
-	env.file = open(resultsDir + '/main', "w")
-	print >>env.file, "name: %(name)s" % { 'name': core.encode(OptionName) }
+	env.file = SyncFileWriter(resultsDir + '/main')
+	env.file.writeLine("name: %(name)s" % { 'name': core.encode(OptionName) })
 	env.collectData()
 	profile.run(env)
 	env.file.close()

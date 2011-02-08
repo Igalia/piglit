@@ -123,8 +123,7 @@ class TestResult(dict):
 			else:
 				print >> result, k + ": " + encode(str(v))
 		print >> result, "!"
-		print >> file, result.getvalue(),
-
+		file.write(result.getvalue())
 
 class GroupResult(dict):
 	def __init__(self, *args):
@@ -282,9 +281,9 @@ class Environment:
 
 	def collectData(self):
 		if platform.system() != 'Windows':
-			print >>self.file, "glxinfo:", '@@@' + encode(self.run('glxinfo'))
+			self.file.write("glxinfo:", '@@@' + encode(self.run('glxinfo')), "\n")
 		if platform.system() == 'Linux':
-			print >>self.file, "lspci:", '@@@' + encode(self.run('lspci'))
+			self.file.write("lspci:", '@@@' + encode(self.run('lspci')), "\n")
 
 
 class Test:
@@ -343,7 +342,7 @@ class Test:
 			if Test.sleep:
 				time.sleep(Test.sleep)
 		else:
-			print "Dry-run: %(path)s" % locals()
+			status("dry-run")
 
 	# Returns True iff the given error message should be ignored
 	def isIgnored(self, error):
@@ -389,7 +388,7 @@ class TestProfile:
 		self.tests.doRun(env, '')
 		ThreadPools().joinAll()
 		time_end = time.time()
-		print >>env.file, "time:",(time_end-time_start)
+		env.file.write("time:", time_end-time_start, "\n")
 
 #############################################################################
 ##### Loaders
