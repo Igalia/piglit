@@ -33,6 +33,8 @@ import time
 import traceback
 from log import log
 from cStringIO import StringIO
+from threads import ThreadPools
+import threading
 
 __all__ = [
 	'Environment',
@@ -289,13 +291,18 @@ class Test:
 	ignoreErrors = []
 	sleep = 0
 
-	def __init__(self):
-		pass
+	def __init__(self, poolName = "base"):
+		self.poolName = poolName
 
 	def run(self):
 		raise NotImplementedError
 
 	def doRun(self, env, path):
+		if ThreadPools().lookup(self.poolName) is None:
+			ThreadPools().create(self.poolName)
+		ThreadPools().put(self.__doRunWork, args = (env, path,), name = self.poolName)
+
+	def __doRunWork(self, env, path):
 		# Exclude tests that don't match the filter regexp
 		if len(env.filter) > 0:
 			if not True in map(lambda f: f.search(path) != None, env.filter):
@@ -380,6 +387,7 @@ class TestProfile:
 	def run(self, env):
 		time_start = time.time()
 		self.tests.doRun(env, '')
+		ThreadPools().joinAll()
 		time_end = time.time()
 		print >>env.file, "time:",(time_end-time_start)
 
