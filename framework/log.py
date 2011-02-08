@@ -21,13 +21,16 @@
 # IN THE SOFTWARE.
 #
 
+from threads import synchronized_self
 from patterns import Singleton
 import logging
 
 class Logger(Singleton):
+	@synchronized_self
 	def __logMessage(self, logfunc, message, **kwargs):
 		[logfunc(line, **kwargs) for line in message.split('\n')]
 
+	@synchronized_self
 	def getLogger(self, channel = None):
 		if 0 == len(logging.root.handlers):
 			logging.basicConfig(
