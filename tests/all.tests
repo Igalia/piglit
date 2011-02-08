@@ -1168,7 +1168,9 @@ for filename in os.listdir('tests/glslparsertest/glsl2'):
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
-	asmparsertest[group + '/' + shader] = PlainExecTest(['asmparsertest', '-auto', group, 'tests/asmparsertest/shaders/' + group + '/' + shader])
+	test = PlainExecTest(['asmparsertest', '-auto', group, 'tests/asmparsertest/shaders/' + group + '/' + shader])
+	test.poolName = "gpu-not-used"
+	asmparsertest[group + '/' + shader] = test
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
 add_asmparsertest('ARBfp1.0', 'abs-02.txt')
@@ -1618,7 +1620,7 @@ profile.tests['glx'] = glx
 
 class ValgrindExecTest(PlainExecTest):
 	def __init__(self, test):
-		Test.__init__(self)
+		Test.__init__(self, test.poolName)
 		self.orig_test = test
 		self.env = {}
 		if 'PIGLIT_TEST' in test.env:
