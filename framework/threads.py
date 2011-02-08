@@ -71,5 +71,10 @@ class ThreadPools(Singleton):
 
 	def joinAll(self):
 		pools = list(self.threadpools.itervalues())
-		for pool in pools:
-			pool.wait()
+		try:
+			for pool in pools:
+				pool.wait()
+		except KeyboardInterrupt:
+			pools = list(self.threadpools.itervalues())
+			for pool in pools:
+				pool.dismissWorkers(len(pool.workers))
