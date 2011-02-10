@@ -185,11 +185,11 @@ class GLSLParserTest(PlainExecTest):
 		'require_extensions' : '',
 		}
 
-	def __init__(self, filepath):
+	def __init__(self, filepath, poolName='gpu-not-used'):
 		"""
 		:filepath: Must end in one '.vert', '.geom', or '.frag'.
 		"""
-		Test.__init__(self)
+		Test.__init__(self, poolName)
 		self.__config = None
 		self.__command = None
 		self.__filepath = filepath
