@@ -33,7 +33,7 @@ import time
 import traceback
 from log import log
 from cStringIO import StringIO
-from threads import ThreadPools
+from threads import ConcurrentTestPool
 import threading
 
 __all__ = [
@@ -297,9 +297,10 @@ class Test:
 		raise NotImplementedError
 
 	def doRun(self, env, path):
-		if ThreadPools().lookup(self.poolName) is None:
-			ThreadPools().create(self.poolName)
-		ThreadPools().put(self.__doRunWork, args = (env, path,), name = self.poolName)
+		if "base" == self.poolName:
+			self.__doRunWork(env, path)
+		else:
+			ConcurrentTestPool().put(self.__doRunWork, args = (env, path,))
 
 	def __doRunWork(self, env, path):
 		# Exclude tests that don't match the filter regexp
@@ -386,7 +387,7 @@ class TestProfile:
 	def run(self, env):
 		time_start = time.time()
 		self.tests.doRun(env, '')
-		ThreadPools().joinAll()
+		ConcurrentTestPool().join()
 		time_end = time.time()
 		env.file.write("time:", time_end-time_start, "\n")
 
