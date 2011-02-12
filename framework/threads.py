@@ -41,6 +41,22 @@ def synchronized_self(function):
 
 synchronized_self.locks = WeakKeyDictionary() # track the locks for each instance
 
+class ConcurrentTestPool(Singleton):
+	@synchronized_self
+	def init(self):
+		self.pool = ThreadPool(2)
+
+	@synchronized_self
+	def put(self, callable_, args = None, kwds = None):
+		self.pool.putRequest(
+			WorkRequest(
+				callable_, args = args, kwds = kwds
+			)
+		)
+
+	def join(self):
+		self.pool.wait()
+
 class ThreadPools(Singleton):
 	@synchronized_self
 	def init(self):
