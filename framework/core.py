@@ -290,17 +290,22 @@ class Test:
 	ignoreErrors = []
 	sleep = 0
 
-	def __init__(self, poolName = "base"):
-		self.poolName = poolName
+	def __init__(self, runConcurrent = False):
+		'''
+			'runConcurrent' controls whether this test will
+			execute it's work (i.e. __doRunWork) on the calling thread
+			(i.e. the main thread) or from the ConcurrentTestPool threads.
+		'''
+		self.runConcurrent = runConcurrent
 
 	def run(self):
 		raise NotImplementedError
 
 	def doRun(self, env, path):
-		if "base" == self.poolName:
-			self.__doRunWork(env, path)
-		else:
+		if self.runConcurrent:
 			ConcurrentTestPool().put(self.__doRunWork, args = (env, path,))
+		else:
+			self.__doRunWork(env, path)
 
 	def __doRunWork(self, env, path):
 		# Exclude tests that don't match the filter regexp

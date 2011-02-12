@@ -185,11 +185,11 @@ class GLSLParserTest(PlainExecTest):
 		'require_extensions' : '',
 		}
 
-	def __init__(self, filepath, poolName='gpu-not-used'):
+	def __init__(self, filepath, runConcurrent = True):
 		"""
 		:filepath: Must end in one '.vert', '.geom', or '.frag'.
 		"""
-		Test.__init__(self, poolName)
+		Test.__init__(self, runConcurrent)
 		self.__config = None
 		self.__command = None
 		self.__filepath = filepath
@@ -305,7 +305,7 @@ class GLSLParserTest(PlainExecTest):
 
 		Check that that all required options are present. If
 		validation fails, set ``self.result`` to failure.
-		
+
 		Currently, this function does not validate the options'
 		values.
 
