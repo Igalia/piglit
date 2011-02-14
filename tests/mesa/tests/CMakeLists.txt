@@ -1,6 +1,3 @@
-
-#add_definitions ( -D__X11__ -D__UNIX__ )
-
 include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
@@ -29,5 +26,3 @@ add_executable (texline texline.c)
 IF (UNIX)
        target_link_libraries (texline m)
 ENDIF (UNIX)
-
-#add_executable (arbfptest1 arbfptest1.c)

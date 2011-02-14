@@ -16,16 +16,6 @@ add_definitions (
 )
 
 add_library (mesautil
-	dumpstate.c
-	glstate.c
-	idproj.c
-	matrix.c
 	readtex.c
-	trackball.c
-	errcheck.c
-	glutskel.c
-	imagesgi.cpp
-	showbuffer.c
-	winpos.c
 	writeimg.c
 )
