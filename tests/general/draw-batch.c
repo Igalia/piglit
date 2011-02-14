@@ -24,7 +24,7 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 100, piglit_height = 70;
+int piglit_width = 100, piglit_height = 130;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 void
@@ -34,6 +34,20 @@ piglit_init(int argc, char **argv)
 	if (!GLEW_VERSION_1_4) {
 		printf("Requires OpenGL 1.4.\n");
 		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+static void rotate_colors(float *array)
+{
+	unsigned i;
+	float tmp[3];
+
+	for (i = 0; i < 3; i++) {
+		memcpy(tmp,		 array + i*5 + 2,  12);
+		memcpy(array + i*5 + 2,  array + i*5 + 17, 12);
+		memcpy(array + i*5 + 17, array + i*5 + 32, 12);
+		memcpy(array + i*5 + 32, array + i*5 + 47, 12);
+		memcpy(array + i*5 + 47, tmp,		   12);
 	}
 }
 
@@ -82,9 +96,9 @@ piglit_display(void)
 	short indices[] = {
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 	};
-	int i;
+	int i, j;
 
-	printf("DrawElements: Bottom, DrawArrays: Top\n");
+	printf("From bottom to top:\n");
 
 	glEnable(GL_COLOR_SUM);
 	glLoadIdentity();
@@ -96,32 +110,90 @@ piglit_display(void)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
+
+	/* The vertex array state should be preserved after glClear. */
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Draw. */
+	printf("DrawElements\n");
 	for (i = 0; i < 4; i++)
 		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, indices + i*3);
 
 	/* State change: Constant buffer. */
 	glTranslatef(0, 30, 0);
 
+	rotate_colors(array);
+
 	/* Draw. */
+	printf("DrawArrays\n");
 	for (i = 0; i < 4; i++)
 		glDrawArrays(GL_TRIANGLES, i*3, 3);
 
+	/* State change: Vertex arrays. */
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
+
+	/* State change: Constant buffer. */
+	glTranslatef(0, 30, 0);
+
+	rotate_colors(array);
+
+	/* Draw. */
+	printf("Begin/End\n");
+	for (i = 0; i < 4; i++) {
+		glBegin(GL_TRIANGLES);
+		for (j = 0; j < 3; j++) {
+			glColor3fv(array + i*15 + j*5 + 2);
+			glSecondaryColor3fv(seccol);
+			glVertex2fv(array + i*15 + j*5);
+		}
+		glEnd();
+	}
+
+	/* State change: Constant buffer. */
+	glTranslatef(0, 30, 0);
+
+	rotate_colors(array);
+
+	/* Create display lists. */
+	for (i = 0; i < 4; i++) {
+		glNewList(i+1, GL_COMPILE);
+		glBegin(GL_TRIANGLES);
+		for (j = 0; j < 3; j++) {
+			glColor3fv(array + i*15 + j*5 + 2);
+			glSecondaryColor3fv(seccol);
+			glVertex2fv(array + i*15 + j*5);
+		}
+		glEnd();
+		glEndList();
+	}
+
+	/* Draw. */
+	printf("CallList\n");
+	for (i = 0; i < 4; i++) {
+		glCallList(i+1);
+	}
 
 	pass = pass && piglit_probe_pixel_rgb(15, 15, c0);
 	pass = pass && piglit_probe_pixel_rgb(35, 15, c1);
 	pass = pass && piglit_probe_pixel_rgb(55, 15, c2);
 	pass = pass && piglit_probe_pixel_rgb(75, 15, c3);
 
-	pass = pass && piglit_probe_pixel_rgb(15, 45, c0);
-	pass = pass && piglit_probe_pixel_rgb(35, 45, c1);
-	pass = pass && piglit_probe_pixel_rgb(55, 45, c2);
-	pass = pass && piglit_probe_pixel_rgb(75, 45, c3);
+	pass = pass && piglit_probe_pixel_rgb(15, 45, c1);
+	pass = pass && piglit_probe_pixel_rgb(35, 45, c2);
+	pass = pass && piglit_probe_pixel_rgb(55, 45, c3);
+	pass = pass && piglit_probe_pixel_rgb(75, 45, c0);
+
+	pass = pass && piglit_probe_pixel_rgb(15, 75, c2);
+	pass = pass && piglit_probe_pixel_rgb(35, 75, c3);
+	pass = pass && piglit_probe_pixel_rgb(55, 75, c0);
+	pass = pass && piglit_probe_pixel_rgb(75, 75, c1);
+
+	pass = pass && piglit_probe_pixel_rgb(15, 105, c3);
+	pass = pass && piglit_probe_pixel_rgb(35, 105, c0);
+	pass = pass && piglit_probe_pixel_rgb(55, 105, c1);
+	pass = pass && piglit_probe_pixel_rgb(75, 105, c2);
 
 	glutSwapBuffers();
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
