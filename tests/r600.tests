@@ -8,18 +8,12 @@ execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 from framework.core import *
 from framework.gleantest import *
 
+# You need kernel 2.6.38 to avoid/survive some hardlocks
+
 # These lock up evergreen/redwood
-del profile.tests['general']['depth_clamp'] # gpu reset doesn't work
-del profile.tests['general']['line-aa-width'] # gpu reset doesn't work
-del profile.tests['glean']['logicOp'] # gpu reset works but is useless
-del profile.tests['glean']['orthoPosRandRects']
-del profile.tests['glean']['orthoPosRandTris']
-del profile.tests['glean']['stencil2'] # works sometimes
 del profile.tests['shaders']['glsl-fs-vec4-indexing-temp-dst'] # gpu reset doesn't work
 del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst'] # gpu reset doesn't work
-del profile.tests['shaders']['glsl-mat-attribute']
 del profile.tests['shaders']['glsl-vs-varying-array'] # gpu reset doesn't work
-del profile.tests['texturing']['copytexsubimage'] # gpu reset doesn't work
 
 # These lock up r600
 del profile.tests['shaders']['glsl-vs-vec4-indexing-temp-dst-in-nested-loop-combined']
