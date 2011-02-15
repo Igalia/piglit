@@ -93,6 +93,19 @@ static GLuint vboColorPointer(GLint size, GLenum type, GLsizei stride,
     return id;
 }
 
+static GLuint vboVertexColorPointer(GLint vSize, GLenum vType, GLint vStride, intptr_t vOffset,
+                                    GLint cSize, GLenum cType, GLint cStride, intptr_t cOffset,
+                                    const GLvoid *buf, GLsizei bufSize)
+{
+    GLuint id;
+    glGenBuffers(1, &id);
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferData(GL_ARRAY_BUFFER, bufSize, buf, GL_STATIC_DRAW);
+    glVertexPointer(vSize, vType, vStride, (void*)vOffset);
+    glColorPointer(cSize, cType, cStride, (void*)cOffset);
+    return id;
+}
+
 static void test_ubyte_colors(float x1, float y1, float x2, float y2, int index)
 {
     float v[] = {
@@ -363,6 +376,35 @@ static void test_double_vertices(float x1, float y1, float x2, float y2, int ind
 	glDeleteBuffers(1, &vbo);
 }
 
+static void test_interleaved_vertices(float x1, float y1, float x2, float y2, int index)
+{
+    static const unsigned int offset[] = {4, 5, 6, 8};
+
+    struct vertex {
+        GLshort v[2];
+        GLubyte c[8];
+    } v[] = {
+        {{x1, y1}, {0}},
+        {{x1, y2}, {0}},
+        {{x2, y1}, {0}}
+    };
+
+    /* Set color green */
+    unsigned int i;
+    for (i = 0; i < 3; ++i)
+        v[i].c[offset[index] - 3] = 0xff;
+
+    glEnableClientState(GL_COLOR_ARRAY);
+    GLuint vbo = vboVertexColorPointer(2, GL_SHORT, sizeof(struct vertex), 0,
+                                       3, GL_UNSIGNED_BYTE, sizeof(struct vertex), offset[index],
+                                       v, sizeof(v));
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDeleteBuffers(1, &vbo);
+}
+
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
@@ -413,6 +455,11 @@ struct test tests[] = {
     {test_double_vertices, 6, {1, 1, 1}, "Double vertices - components: 2, stride: 16, start: 1"},
     {test_double_vertices, 7, {1, 1, 1}, "Double vertices - components: 3, stride: 24, start: 1"},
     {test_double_vertices, 8, {1, 1, 1}, "Double vertices - components: 4, stride: 32, start: 1"},
+
+    {test_interleaved_vertices, 0, {0, 1, 0}, "Interleaved VBO - gap: 0"},
+    {test_interleaved_vertices, 1, {0, 1, 0}, "Interleaved VBO - gap: 1"},
+    {test_interleaved_vertices, 2, {0, 1, 0}, "Interleaved VBO - gap: 2"},
+    {test_interleaved_vertices, 3, {0, 1, 0}, "Interleaved VBO - gap: 4"},
 
     {test_large_vertex_count, 0, {1, 1, 1}, "Large vertex count"},
 
