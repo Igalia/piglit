@@ -389,15 +389,17 @@ static void test_interleaved_vertices(float x1, float y1, float x2, float y2, in
         {{x2, y1}, {0}}
     };
 
-    /* Set color green */
     unsigned int i;
+    GLuint vbo;
+
+    /* Set color green */
     for (i = 0; i < 3; ++i)
         v[i].c[offset[index] - 3] = 0xff;
 
     glEnableClientState(GL_COLOR_ARRAY);
-    GLuint vbo = vboVertexColorPointer(2, GL_SHORT, sizeof(struct vertex), 0,
-                                       3, GL_UNSIGNED_BYTE, sizeof(struct vertex), offset[index],
-                                       v, sizeof(v));
+    vbo = vboVertexColorPointer(2, GL_SHORT, sizeof(struct vertex), 0,
+                                3, GL_UNSIGNED_BYTE, sizeof(struct vertex), offset[index],
+                                v, sizeof(v));
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
