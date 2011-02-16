@@ -34,8 +34,8 @@
 #include "piglit-util.h"
 #include "fbo-formats.h"
 
-#define TEX_WIDTH 256
-#define TEX_HEIGHT 256
+static int tex_width = 256;
+static int tex_height = 256;
 int piglit_width = 700;
 int piglit_height = 300;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
@@ -58,6 +58,17 @@ supported(const struct test_desc *test)
 	}
 
 	return GL_TRUE;
+}
+
+static void set_npot(GLboolean npot)
+{
+	if (npot) {
+		tex_width = 293;
+		tex_height = 277;
+	} else {
+		tex_width = 256;
+		tex_height = 256;
+	}
 }
 
 static void
@@ -99,6 +110,9 @@ key_func(unsigned char key, int x, int y)
 			format_index = test_sets[test_index].num_formats - 1;
 		}
 		break;
+	case 'd':
+		set_npot(tex_width == 256 && GLEW_ARB_texture_non_power_of_two);
+		break;
 	}
 
 	piglit_escape_exit_key(key, x, y);
@@ -108,12 +122,12 @@ static int
 create_tex(GLenum internalformat, GLenum baseformat)
 {
 	GLuint tex;
-	int i, dim;
+	int i;
 	GLenum type, format;
 
 	if ((baseformat == GL_DEPTH_COMPONENT) || (baseformat == GL_DEPTH_STENCIL)) {
 		tex = piglit_depth_texture(internalformat,
-					   TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
+					   tex_width, tex_height, GL_FALSE);
 		if (baseformat == GL_DEPTH_COMPONENT) {
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;
@@ -123,20 +137,21 @@ create_tex(GLenum internalformat, GLenum baseformat)
 		}
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
-					  TEX_WIDTH, TEX_HEIGHT, GL_FALSE,
+					  tex_width, tex_height, GL_FALSE,
 					  GL_TRUE);
 		format = GL_RGBA;
 		type = GL_FLOAT;
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			GL_LINEAR);
+			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR_MIPMAP_NEAREST);
+			GL_NEAREST_MIPMAP_NEAREST);
 
-	for (i = 1, dim = TEX_WIDTH/2; dim >0; i++, dim /= 2) {
+	for (i = 1; (tex_width >> i) || (tex_height >> i); i++) {
 		glTexImage2D(GL_TEXTURE_2D, i, internalformat,
-			     dim, dim,
+			     (tex_width >> i) ? (tex_width >> i) : 1,
+			     (tex_height >> i) ? (tex_height >> i) : 1,
 			     0,
 			     format, type, NULL);
 	}
@@ -149,7 +164,7 @@ create_tex(GLenum internalformat, GLenum baseformat)
 }
 
 static void
-draw_mipmap(int x, int y, int dim)
+draw_mipmap(int x, int y, int level)
 {
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -159,26 +174,29 @@ draw_mipmap(int x, int y, int dim)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	piglit_draw_rect_tex(x, y, dim, dim,
+	piglit_draw_rect_tex(x, y,
+			     (tex_width >> level) ? (tex_width >> level) : 1,
+			     (tex_height >> level) ? (tex_height >> level) : 1,
 			     0, 0, 1, 1);
 }
 
 static GLboolean
-test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
+test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 {
 	GLboolean pass = GL_TRUE;
-	int half = dim / 2;
-	int x1 = x, y1 = y, x2 = x + half, y2 = y + half;
+	int w = (tex_width >> level) ? (tex_width >> level) : 1;
+	int h = (tex_height >> level) ? (tex_height >> level) : 1;
+	int x1 = x, y1 = y, x2 = x + w/2, y2 = y + h/2;
 	float r[] = {1, 0, 0, 0};
 	float g[] = {0, 1, 0, 0.25};
 	float b[] = {0, 0, 1, 0.5};
-	float w[] = {1, 1, 1, 1};
+	float wh[] = {1, 1, 1, 1};
 	GLint r_size, g_size, b_size, l_size, a_size, d_size, i_size;
 	GLint compressed;
 
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 				 GL_TEXTURE_COMPRESSED, &compressed);
-	if (compressed && dim < 8)
+	if (compressed && (w < h ? w : h) < 8)
 		return GL_TRUE;
 
 	if (GLEW_ARB_depth_texture) {
@@ -201,10 +219,10 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 				 GL_TEXTURE_BLUE_SIZE, &b_size);
 
 	if (d_size) {
-		for (x1 = x; x1 < x + dim; x1++) {
-			float val = (x1 - x + 0.5) / (dim);
+		for (x1 = x; x1 < x + w; x1++) {
+			float val = (x1 - x + 0.5) / w;
 			float color[3] = {val, val, val};
-			pass = pass && piglit_probe_rect_rgb(x1, y, 1, dim,
+			pass = pass && piglit_probe_rect_rgb(x1, y, 1, h,
 							     color);
 		}
 		return pass;
@@ -231,7 +249,7 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 			r[3] = 1.0;
 			g[3] = 1.0;
 			b[3] = 1.0;
-			w[3] = 1.0;
+			wh[3] = 1.0;
 		}
 	} else if (a_size && !r_size && !l_size) {
 		r[0] = 1.0;
@@ -246,23 +264,23 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 	} else {
 		if (!r_size) {
 			r[0] = 0.0;
-			w[0] = 0.0;
+			wh[0] = 0.0;
 		}
 
 		if (!g_size) {
 			g[1] = 0.0;
-			w[1] = 0.0;
+			wh[1] = 0.0;
 		}
 
 		if (!b_size) {
 			b[2] = 0.0;
-			w[2] = 0.0;
+			wh[2] = 0.0;
 		}
 		if (!a_size) {
 			r[3] = 1.0;
 			g[3] = 1.0;
 			b[3] = 1.0;
-			w[3] = 1.0;
+			wh[3] = 1.0;
 		}
 	}
 
@@ -301,10 +319,29 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 		b[3] = 1;
 	}
 
-	pass = pass && piglit_probe_rect_rgba(x1, y1, half, half, r);
-	pass = pass && piglit_probe_rect_rgba(x2, y1, half, half, g);
-	pass = pass && piglit_probe_rect_rgba(x1, y2, half, half, b);
-	pass = pass && piglit_probe_rect_rgba(x2, y2, half, half, w);
+	if (tex_width == 256) {
+		pass = pass && piglit_probe_rect_rgba(x1, y1, w/2, h/2, r);
+		pass = pass && piglit_probe_rect_rgba(x2, y1, w/2, h/2, g);
+		pass = pass && piglit_probe_rect_rgba(x1, y2, w/2, h/2, b);
+		pass = pass && piglit_probe_rect_rgba(x2, y2, w/2, h/2, wh);
+	} else if (w > 1 && h > 1) {
+		if (compressed) {
+			/* DXT1 RGBA blurs the pixels in the NPOT case. */
+			if (w <= 7 || h <= 7) {
+				return pass;
+			}
+			pass = pass && piglit_probe_rect_rgba(x1,   y1,   w/2-4, h/2-4, r);
+			pass = pass && piglit_probe_rect_rgba(x2+4, y1,   w/2-4, h/2-4, g);
+			pass = pass && piglit_probe_rect_rgba(x1,   y2+4, w/2-4, h/2-4, b);
+			pass = pass && piglit_probe_rect_rgba(x2+4, y2+4, w/2-4, h/2-4, wh);
+		} else {
+			/* There may be inaccuracies with NPOT sampling in the middle of the texture. */
+			pass = pass && piglit_probe_rect_rgba(x1,   y1,   w/2-1, h/2-1, r);
+			pass = pass && piglit_probe_rect_rgba(x2+1, y1,   w/2-1, h/2-1, g);
+			pass = pass && piglit_probe_rect_rgba(x1,   y2+1, w/2-1, h/2-1, b);
+			pass = pass && piglit_probe_rect_rgba(x2+1, y2+1, w/2-1, h/2-1, wh);
+		}
+	}
 
 	return pass;
 }
@@ -312,28 +349,25 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 static GLboolean
 test_format(const struct format_desc *format, GLenum baseformat)
 {
-	int dim;
 	GLuint tex;
 	int x;
 	int level;
 	GLboolean pass = GL_TRUE;
 
-	printf("Testing %s\n", format->name);
+	printf("Testing %s%s\n", format->name, tex_width == 256 ? "" : " (NPOT)");
 	tex = create_tex(format->internalformat, baseformat);
 
 	x = 1;
-	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-		draw_mipmap(x, 1, dim);
-		x += dim + 1;
+	for (level = 0; (tex_width >> level) || (tex_height >> level); level++) {
+		draw_mipmap(x, 1, level);
+		x += (tex_width >> level) + 1;
 	}
 
 	x = 1;
-	level = 0;
-	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-		pass = pass && test_mipmap_drawing(x, 1, dim, level,
+	for (level = 0; (tex_width >> level) || (tex_height >> level); level++) {
+		pass = pass && test_mipmap_drawing(x, 1, level,
 						   format->internalformat);
-		x += dim + 1;
-		level++;
+		x += (tex_width >> level) + 1;
 	}
 
 	glDeleteTextures(1, &tex);
@@ -354,6 +388,14 @@ piglit_display(void)
 		for (i = 0; i < test_set->num_formats; i++) {
 			pass = test_format(&test_set->format[i],
 					   test_set->base) && pass;
+		}
+		if (GLEW_ARB_texture_non_power_of_two) {
+			set_npot(GL_TRUE);
+			for (i = 0; i < test_set->num_formats; i++) {
+				pass = test_format(&test_set->format[i],
+						   test_set->base) && pass;
+			}
+			set_npot(GL_FALSE);
 		}
 	} else {
 		pass = test_format(&test_sets[test_index].format[format_index],
@@ -400,7 +442,8 @@ void piglit_init(int argc, char **argv)
 		printf("    -n   Next test set.\n"
 		       "    -N   Previous test set.\n"
 		       "    -m   Next format in the set.\n"
-		       "    -M   Previous format in the set.\n");
+		       "    -M   Previous format in the set.\n"
+		       "    -d   Switch between POT and NPOT\n");
 	}
 
 	printf("Using test set: %s\n", test_set->param);
