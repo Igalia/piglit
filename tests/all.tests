@@ -1086,15 +1086,13 @@ add_texwrap_test2(ati_texture_compression_3dc, '2D', 'GL_COMPRESSED_LUMINANCE_AL
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
 add_fbo_generatemipmap_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-generatemipmap-formats')
-# untested for float yet
-#add_fbo_clear_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-clear-formats')
+add_fbo_clear_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-clear-formats')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
 add_fbo_generatemipmap_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-generatemipmap-formats')
-# untested for float yet
-#add_fbo_clear_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-clear-formats')
+add_fbo_clear_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-clear-formats')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')
@@ -1122,8 +1120,7 @@ add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo
 add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-clear-formats')
 # unsupported for int yet
 #add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-clear-formats-int')
-# untested for int yet
-#add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-clear-formats-float')
+add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-clear-formats-float')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16')
@@ -1136,8 +1133,7 @@ add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG32F')
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
 add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
-# untested yet
-#add_fbo_clear_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-clear-formats')
+add_fbo_clear_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-clear-formats')
 add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 
 ext_texture_srgb = Group()
