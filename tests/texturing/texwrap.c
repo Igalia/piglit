@@ -1161,26 +1161,14 @@ static void init_textures()
                         }
 
                         if (texture_format->internalformat ==
-                            GL_COMPRESSED_RGBA_S3TC_DXT1) {
-                            if (no_border_image[src+0] == 0 &&
-                                no_border_image[src+1] == 0 &&
-                                no_border_image[src+2] == 0 &&
-                                no_border_image[src+3] == 0) {
-                                /* DXT1: If everything is black,
-                                 * the alpha is 1.
-                                 * XXX This behavior is weird and matches
-                                 * Mesa+libtxc_dxtn, proprietary drivers may
-                                 * behave differently. We need to test those
-                                 * and see if it's an issue with Mesa or not. */
-                                no_border_image[src+3] = 1;
-                            } else if (no_border_image[src+3] < 0.5) {
-                                /* DXT1: If the 1-bit alpha is black,
-                                 * the RGB color is black as well. */
-                                no_border_image[src+0] = 0;
-                                no_border_image[src+1] = 0;
-                                no_border_image[src+2] = 0;
-                                no_border_image[src+3] = 0;
-                            }
+                            GL_COMPRESSED_RGBA_S3TC_DXT1 &&
+                            no_border_image[src+3] < 0.5) {
+                            /* DXT1: If the 1-bit alpha is black,
+                             * the RGB color is black as well. */
+                            no_border_image[src+0] = 0;
+                            no_border_image[src+1] = 0;
+                            no_border_image[src+2] = 0;
+                            no_border_image[src+3] = 0;
                         }
                     }
                 }
