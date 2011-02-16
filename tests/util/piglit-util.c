@@ -980,19 +980,16 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 	}
 	data = malloc(w * h * 4 * sizeof(GLfloat));
 
-	/* XXX: Do we want non-square textures?  Surely some day. */
-	assert(w == h);
-
-	for (level = 0, size = w; size > 0; level++, size >>= 1) {
-		for (y = 0; y < size; y++) {
-			for (x = 0; x < size; x++) {
+	for (level = 0, size = w > h ? w : h; size > 0; level++, size >>= 1) {
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
 				const float *color;
 
-				if (x < size / 2 && y < size / 2)
+				if (x < w / 2 && y < h / 2)
 					color = red;
-				else if (y < size / 2)
+				else if (y < h / 2)
 					color = green;
-				else if (x < size / 2)
+				else if (x < w / 2)
 					color = blue;
 				else
 					color = white;
@@ -1015,17 +1012,22 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 					break;
 				}
 
-				memcpy(data + (y * size + x) * 4, color,
+				memcpy(data + (y * w + x) * 4, color,
 				       4 * sizeof(float));
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, level,
 			     format,
-			     size, size, 0,
+			     w, h, 0,
 			     GL_RGBA, GL_FLOAT, data);
 
 		if (!mip)
 			break;
+
+		if (w > 1)
+			w >>= 1;
+		if (h > 1)
+			h >>= 1;
 	}
 	free(data);
 	return tex;
@@ -1058,9 +1060,6 @@ piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 	}
 	data = malloc(w * h * 4 * sizeof(GLfloat));
 
-	/* XXX: Do we want non-square textures?  Surely some day. */
-	assert(w == h);
-
 	if (internalformat == GL_DEPTH_STENCIL_EXT ||
 	    internalformat == GL_DEPTH24_STENCIL8_EXT) {
 		format = GL_DEPTH_STENCIL_EXT;
@@ -1072,23 +1071,28 @@ piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 		f = data;
 	}
 
-	for (level = 0, size = w; size > 0; level++, size >>= 1) {
-		for (y = 0; y < size; y++) {
-			for (x = 0; x < size; x++) {
+	for (level = 0, size = w > h ? w : h; size > 0; level++, size >>= 1) {
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
 				float val = (float)(x) / (w - 1);
 				if (f)
-					f[y * size + x] = val;
+					f[y * w + x] = val;
 				else
-					i[y * size + x] = 0xffffff00 * val;
+					i[y * w + x] = 0xffffff00 * val;
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, level,
 			     internalformat,
-			     size, size, 0,
+			     w, h, 0,
 			     format, type, data);
 
 		if (!mip)
 			break;
+
+		if (w > 1)
+			w >>= 1;
+		if (h > 1)
+			h >>= 1;
 	}
 	free(data);
 	return tex;
