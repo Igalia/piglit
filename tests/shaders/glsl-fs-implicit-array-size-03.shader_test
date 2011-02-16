@@ -1,0 +1,21 @@
+[require]
+# This test reproduces Mesa bugzilla #34198.
+GLSL >= 1.20
+
+[fragment shader]
+void myfunc()
+{
+	float a[];
+
+	a[0] = 1.0;
+	gl_FragColor = vec4(0.0, a[0], 0.0, 1.0);
+}
+
+void main()
+{
+	myfunc();
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1.0 0 1.0
