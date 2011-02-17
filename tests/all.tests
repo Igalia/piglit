@@ -1150,6 +1150,7 @@ add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 ext_texture_snorm = Group()
 spec['EXT_texture_snorm'] = ext_texture_snorm
 add_fbo_generatemipmap_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-generatemipmap-formats')
+add_fbo_clear_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-clear-formats')
 
 ext_texture_srgb = Group()
 spec['EXT_texture_sRGB'] = ext_texture_srgb
