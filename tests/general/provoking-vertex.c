@@ -36,35 +36,14 @@
 int piglit_width = 400, piglit_height = 300;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-#ifndef GL_EXT_provoking_vertex
-#define GL_EXT_provoking_vertex
-#define GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT 0x8E4C
-#define GL_FIRST_VERTEX_CONVENTION_EXT    0x8E4D
-#define GL_LAST_VERTEX_CONVENTION_EXT     0x8E4E
-#define GL_PROVOKING_VERTEX_EXT           0x8E4F
-typedef void (APIENTRYP PFNGLPROVOKINGVERTEXEXTPROC) (GLenum mode);
-#endif
-
-static PFNGLPROVOKINGVERTEXEXTPROC pglProvokingVertexEXT = 0;
-
 void
 piglit_init(int argc, char **argv)
 {
 
 	piglit_require_extension("GL_EXT_provoking_vertex");
-	pglProvokingVertexEXT = (PFNGLPROVOKINGVERTEXEXTPROC)
-		piglit_get_proc_address("glProvokingVertexEXT");
-
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glShadeModel(GL_FLAT);
-
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 
 }
@@ -77,7 +56,7 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	pglProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
+	glProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
 	glBegin(GL_TRIANGLES);
 		glColor3f(1.0, 0.0, 0.0);
 		glVertex3i(125, 125, 0);
@@ -87,7 +66,7 @@ piglit_display(void)
 		glVertex3i(150, 150, 0);
 	glEnd();
 
-	pglProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
+	glProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
 	glBegin(GL_TRIANGLES);
 		glColor3f(1.0, 0.0, 0.0);
 		glVertex3i(200, 125, 0);

@@ -33,29 +33,10 @@
 
 #include "piglit-util.h"
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-#ifndef GL_ARB_timer_query
-#define GL_TIME_ELAPSED 0x88BF
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTI64VPROC) (GLuint id, GLenum pname, GLint64 *params);
-typedef void (APIENTRYP PFNGLGETQUERYOBJECTUI64VPROC) (GLuint id, GLenum pname, GLuint64 *params);
-#endif
-
 int piglit_width = 180, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
 
 static GLuint timer_query;
-static PFNGLGENQUERIESPROC gen_queries = NULL;
-static PFNGLBEGINQUERYPROC begin_query = NULL;
-static PFNGLENDQUERYPROC end_query = NULL;
-static PFNGLGETQUERYIVPROC get_queryiv = NULL;
-static PFNGLGETQUERYOBJECTIVPROC get_query_objectiv = NULL;
-static PFNGLGETQUERYOBJECTI64VPROC get_query_objecti64v = NULL;
-static PFNGLGETQUERYOBJECTUI64VPROC get_query_objectui64v = NULL;
 
 void
 piglit_init(int argc, char **argv)
@@ -66,24 +47,16 @@ piglit_init(int argc, char **argv)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	gen_queries = GLEW_GET_FUN(__glewGenQueriesARB);
-	begin_query = GLEW_GET_FUN(__glewBeginQueryARB);
-	end_query = GLEW_GET_FUN(__glewEndQueryARB);
-	get_queryiv = GLEW_GET_FUN(__glewGetQueryivARB);
-	get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectivARB);
-	get_query_objecti64v = GLEW_GET_FUN(__glewGetQueryObjecti64vEXT);
-	get_query_objectui64v = GLEW_GET_FUN(__glewGetQueryObjectui64vEXT);
-
 	/* It is legal for a driver to support the query API but not have
 	 * any query bits.  I wonder how many applications actually check for
 	 * this case...
 	 */
-	(*get_queryiv)(GL_TIME_ELAPSED, GL_QUERY_COUNTER_BITS, &query_bits);
+	(*glGetQueryivARB)(GL_TIME_ELAPSED, GL_QUERY_COUNTER_BITS, &query_bits);
 	if (query_bits == 0) {
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	(*gen_queries)(1, &timer_query);
+	(*glGenQueriesARB)(1, &timer_query);
 }
 
 enum piglit_result
@@ -97,7 +70,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/* Start a query */
-	(*begin_query)(GL_TIME_ELAPSED_EXT, timer_query);
+	(*glBeginQueryARB)(GL_TIME_ELAPSED_EXT, timer_query);
 
 	/* Paint something */
 	glColor3ub(0xff, 0xff, 0xff);
@@ -110,16 +83,16 @@ piglit_display(void)
 	glEnd();
 
 	/* Stop a query */
-	(*end_query)(GL_TIME_ELAPSED_EXT);
+	(*glEndQueryARB)(GL_TIME_ELAPSED_EXT);
 
 	/* In this case poll until available */
 	while (!available)
-		(*get_query_objectiv)(timer_query, GL_QUERY_RESULT_AVAILABLE, &available);
+		(*glGetQueryObjectivARB)(timer_query, GL_QUERY_RESULT_AVAILABLE, &available);
 
 	/* Get the result */
-	(*get_query_objectiv)(timer_query, GL_QUERY_RESULT, &nsecs);
-	(*get_query_objecti64v)(timer_query, GL_QUERY_RESULT, &nsecs64);
-	(*get_query_objectui64v)(timer_query, GL_QUERY_RESULT, &nsecs64u);
+	(*glGetQueryObjectivARB)(timer_query, GL_QUERY_RESULT, &nsecs);
+	(*glGetQueryObjecti64vEXT)(timer_query, GL_QUERY_RESULT, &nsecs64);
+	(*glGetQueryObjectui64vEXT)(timer_query, GL_QUERY_RESULT, &nsecs64u);
 
 	if ((nsecs & 0xffffffff) != (nsecs64 & 0xffffffff)) {
 		printf("timer_query: 32 and 64-bit results differ!\n");

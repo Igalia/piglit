@@ -29,16 +29,6 @@
 
 #include "piglit-util.h"
 
-/* These are missing in some versions of glext.h */
-#ifndef GL_MIN_PROGRAM_TEXEL_OFFSET_EXT
-#define GL_MIN_PROGRAM_TEXEL_OFFSET_EXT 0x8904
-#endif
-
-#ifndef GL_MAX_PROGRAM_TEXEL_OFFSET_EXT
-#define GL_MAX_PROGRAM_TEXEL_OFFSET_EXT 0x8905
-#endif
-
-
 #define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
 
@@ -548,19 +538,19 @@ test_limits(void)
 {
    GLint val = 0;
 
-   glGetIntegerv(GL_MIN_PROGRAM_TEXEL_OFFSET_EXT, &val);
+   glGetIntegerv(GL_MIN_PROGRAM_TEXEL_OFFSET, &val);
    if (val > -8) {
       fprintf(stderr,
-              "%s failure: query of GL_MIN_PROGRAM_TEXEL_OFFSET_EXT "
+              "%s failure: query of GL_MIN_PROGRAM_TEXEL_OFFSET "
               "returned %d\n",
               TestName, val);
       return GL_FALSE;
    }
 
-   glGetIntegerv(GL_MAX_PROGRAM_TEXEL_OFFSET_EXT, &val);
+   glGetIntegerv(GL_MAX_PROGRAM_TEXEL_OFFSET, &val);
    if (val < 7) {
       fprintf(stderr,
-              "%s failure: query of GL_MAX_PROGRAM_TEXEL_OFFSET_EXT "
+              "%s failure: query of GL_MAX_PROGRAM_TEXEL_OFFSET "
               "returned %d\n",
               TestName, val);
       return GL_FALSE;

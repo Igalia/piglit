@@ -68,40 +68,6 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_TEXTURE_SWIZZLE_RGBA_EXT
-#define GL_TEXTURE_SWIZZLE_RGBA_EXT 0x8E46
-#endif
-
-#ifndef GL_VERSION_3_0
-#define GL_VERSION_3_0 1
-#define GL_RGBA32F 0x8814
-#define GL_RGB32F 0x8815
-#define GL_RGBA16F 0x881A
-#define GL_RGB16F 0x881B
-#define GL_TEXTURE_RED_TYPE 0x8C10
-#define GL_TEXTURE_GREEN_TYPE 0x8C11
-#define GL_TEXTURE_BLUE_TYPE 0x8C12
-#define GL_TEXTURE_ALPHA_TYPE 0x8C13
-#define GL_TEXTURE_LUMINANCE_TYPE 0x8C14
-#define GL_TEXTURE_INTENSITY_TYPE 0x8C15
-#define GL_TEXTURE_DEPTH_TYPE 0x8C16
-#define GL_UNSIGNED_NORMALIZED 0x8C17
-#define GL_R11F_G11F_B10F 0x8C3A
-#define GL_RGB9_E5 0x8C3D
-#define GL_RGBA32UI 0x8D70
-#define GL_RGB32UI 0x8D71
-#define GL_RGBA16UI 0x8D76
-#define GL_RGB16UI 0x8D77
-#define GL_RGBA8UI 0x8D7C
-#define GL_RGB8UI 0x8D7D
-#define GL_RGBA32I 0x8D82
-#define GL_RGB32I 0x8D83
-#define GL_RGBA16I 0x8D88
-#define GL_RGB16I 0x8D89
-#define GL_RGBA8I 0x8D8E
-#define GL_RGB8I 0x8D8F
-#endif
-
 /* Only *_ARB versions of these exist. I am lazy to add the suffix. */
 #define GL_ALPHA32F                     0x8816
 #define GL_INTENSITY32F                 0x8817
@@ -124,40 +90,6 @@
 
 /* Only *_ATI versions of these exist. It's nicer without the suffix. */
 #define GL_COMPRESSED_LUMINANCE_ALPHA_3DC 0x8837
-
-
-#ifndef GL_ARB_texture_rg
-#define GL_RG 0x8227
-#define GL_RG_INTEGER 0x8228
-#define GL_R8 0x8229
-#define GL_R16 0x822A
-#define GL_RG8 0x822B
-#define GL_RG16 0x822C
-#define GL_R16F 0x822D
-#define GL_R32F 0x822E
-#define GL_RG16F 0x822F
-#define GL_RG32F 0x8230
-#define GL_R8I 0x8231
-#define GL_R8UI 0x8232
-#define GL_R16I 0x8233
-#define GL_R16UI 0x8234
-#define GL_R32I 0x8235
-#define GL_R32UI 0x8236
-#define GL_RG8I 0x8237
-#define GL_RG8UI 0x8238
-#define GL_RG16I 0x8239
-#define GL_RG16UI 0x823A
-#define GL_RG32I 0x823B
-#define GL_RG32UI 0x823C
-#endif
-
-#ifndef GL_ARB_texture_compression_rgtc
-#define GL_ARB_texture_compression_rgtc 1
-#define GL_COMPRESSED_RED_RGTC1 0x8DBB
-#define GL_COMPRESSED_SIGNED_RED_RGTC1 0x8DBC
-#define GL_COMPRESSED_RG_RGTC2 0x8DBD
-#define GL_COMPRESSED_SIGNED_RG_RGTC2 0x8DBE
-#endif /* GL_ARB_texture_compression_rgtc */
 
 /* Formats. */
 

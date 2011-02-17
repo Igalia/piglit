@@ -59,11 +59,6 @@ union uif {
 	unsigned int ui;
 };
 
-
-#ifndef GL_HALF_FLOAT
-#define GL_HALF_FLOAT 0x140B
-#endif
-
 static const GLenum types[4] = {
 	GL_BYTE,
 	GL_UNSIGNED_BYTE,

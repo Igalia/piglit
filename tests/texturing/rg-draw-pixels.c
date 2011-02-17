@@ -31,10 +31,6 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#ifndef GL_RG
-#define GL_RG 0x8227
-#endif
-
 int piglit_width = 40, piglit_height = 30;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 

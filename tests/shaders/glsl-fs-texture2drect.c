@@ -32,10 +32,6 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_TEXTURE_RECTANGLE
-#define GL_TEXTURE_RECTANGLE 0x84F5
-#endif
-
 int piglit_width = 50, piglit_height = 50;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 

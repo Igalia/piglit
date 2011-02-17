@@ -32,24 +32,6 @@
 
 #include "piglit-util.h"
 
-/* GLEW hasn't added support for this yet. */
-
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-#ifndef GL_ARB_draw_elements_base_vertex
-#define GL_ARB_draw_elements_base_vertex
-typedef void (APIENTRYP PFNGLDRAWELEMENTSBASEVERTEXPROC) (GLenum mode,
-							  GLsizei count, GLenum type,
-							  const GLvoid *indices,
-							  GLint basevertex);
-#endif
-
-static PFNGLDRAWELEMENTSBASEVERTEXPROC pglDrawElementsBaseVertex = NULL;
-
 int piglit_width = 300, piglit_height = 300;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
@@ -64,9 +46,6 @@ piglit_init(int argc, char **argv)
 	GLuint *ib;
 	GLuint vbo;
 	int i;
-
-	pglDrawElementsBaseVertex = (PFNGLDRAWELEMENTSBASEVERTEXPROC)
-		piglit_get_proc_address("glDrawElementsBaseVertex");
 
 	glewInit();
 	piglit_require_extension("GL_ARB_vertex_buffer_object");
@@ -127,7 +106,7 @@ piglit_display(void)
 		glOrtho(0, piglit_width, 0, piglit_height, -1, 1);
 		glTranslatef(i * 20, 0, 0);
 
-		pglDrawElementsBaseVertex(GL_QUADS, 8, GL_UNSIGNED_INT,
+		glDrawElementsBaseVertex(GL_QUADS, 8, GL_UNSIGNED_INT,
 					  (void *)(uintptr_t)ib_offset, i * 4);
 
 		glPopMatrix();

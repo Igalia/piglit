@@ -39,11 +39,6 @@
 int piglit_width = 100, piglit_height = 150;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
 
-/* In case the headers have the old enum name but not the new */
-#ifndef GL_DEPTH_CLAMP
-#define GL_DEPTH_CLAMP GL_DEPTH_CLAMP_NV
-#endif
-
 void
 piglit_init(int argc, char **argv)
 {

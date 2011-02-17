@@ -32,12 +32,6 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_EXT_texture_sRGB_decode
-#define GL_TEXTURE_SRGB_DECODE_EXT        0x8A48
-#define GL_DECODE_EXT                     0x8A49
-#define GL_SKIP_DECODE_EXT                0x8A4A
-#endif
-
 int piglit_width = 128, piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 

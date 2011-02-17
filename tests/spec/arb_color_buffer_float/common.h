@@ -32,13 +32,6 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_COLOR_ATTACHMENT0
-#define GL_COLOR_ATTACHMENT0 0x8CE0
-#endif
-#ifndef GL_COLOR_ATTACHMENT1
-#define GL_COLOR_ATTACHMENT1 0x8CE1
-#endif
-
 int piglit_width = 128;
 int piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;

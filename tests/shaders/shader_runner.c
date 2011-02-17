@@ -33,10 +33,6 @@
 #include <ctype.h>
 #include "piglit-util.h"
 
-#ifndef GL_GEOMETRY_SHADER_ARB
-#define GL_GEOMETRY_SHADER_ARB 0x8DD9
-#endif
-
 int piglit_width = 250, piglit_height = 250;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 

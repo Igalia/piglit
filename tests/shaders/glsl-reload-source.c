@@ -35,10 +35,6 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB;
 

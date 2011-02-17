@@ -37,10 +37,6 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB;
 
@@ -126,7 +122,7 @@ static const char fs_vector_template[] =
 
 
 static void test_vector(const char *glsl_type, const char * suffix,
-		void (APIENTRY *uniform)(GLint, GLsizei, const GLfloat*))
+		void (GLAPIENTRY *uniform)(GLint, GLsizei, const GLfloat*))
 {
 	char buffer[2*sizeof(vs_vector_template)];
 	GLuint vs, fs;

@@ -36,11 +36,6 @@
 #include "piglit-util.h"
 #include "rg-teximage-common.h"
 
-#ifndef GL_ARB_texture_rg
-#define GL_R8 0x8229
-#define GL_R16 0x822A
-#endif
-
 #define WIDTH  256
 #define HEIGHT 256
 static float rgba_image[4 * WIDTH * HEIGHT];

@@ -26,35 +26,6 @@
  */
 
 #ifndef OBJECT_PURGEABLE_H
-#define OBJECT_PURGEABLE_H
-
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-
-#ifndef GL_APPLE_object_purgeable
-#define GL_APPLE_object_purgeable 1
-
-#define GL_RELEASED_APPLE                 0x8A19
-#define GL_VOLATILE_APPLE                 0x8A1A
-#define GL_RETAINED_APPLE                 0x8A1B
-#define GL_UNDEFINED_APPLE                0x8A1C
-#define GL_PURGEABLE_APPLE                0x8A1D
-#define GL_BUFFER_OBJECT_APPLE            0x85B3
-
-
-typedef GLenum (APIENTRYP PFNGLOBJECTPURGEABLEAPPLEPROC) (GLenum objectType, GLuint name, GLenum option);
-typedef GLenum (APIENTRYP PFNGLOBJECTUNPURGEABLEAPPLEPROC) (GLenum objectType, GLuint name, GLenum option);
-typedef void (APIENTRYP PFNGLGETOBJECTPARAMETERIVAPPLEPROC) (GLenum objectType, GLuint name, GLenum pname, GLint* params);
-
-#endif
-
-extern PFNGLOBJECTPURGEABLEAPPLEPROC pglObjectPurgeableAPPLE;
-extern PFNGLOBJECTUNPURGEABLEAPPLEPROC pglObjectUnpurgeableAPPLE;
-extern PFNGLGETOBJECTPARAMETERIVAPPLEPROC pglGetObjectParameterivAPPLE;
 
 extern void init_ObjectPurgeableAPI(void);
 

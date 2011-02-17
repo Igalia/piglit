@@ -28,10 +28,6 @@
 #include "piglit-util.h"
 #include "object_purgeable.h"
 
-PFNGLOBJECTPURGEABLEAPPLEPROC pglObjectPurgeableAPPLE = NULL;
-PFNGLOBJECTUNPURGEABLEAPPLEPROC pglObjectUnpurgeableAPPLE = NULL;
-PFNGLGETOBJECTPARAMETERIVAPPLEPROC pglGetObjectParameterivAPPLE = NULL;
-
 #define FAIL_ON_ERROR(string)						\
 	do {								\
 		const GLenum err = glGetError();			\
@@ -57,13 +53,6 @@ void
 init_ObjectPurgeableAPI(void)
 {
 	piglit_require_extension("GL_APPLE_object_purgeable");
-
-	pglObjectPurgeableAPPLE = (PFNGLOBJECTPURGEABLEAPPLEPROC)
-		piglit_get_proc_address("glObjectPurgeableAPPLE");
-	pglObjectUnpurgeableAPPLE = (PFNGLOBJECTUNPURGEABLEAPPLEPROC)
-		piglit_get_proc_address("glObjectUnpurgeableAPPLE");
-	pglGetObjectParameterivAPPLE = (PFNGLGETOBJECTPARAMETERIVAPPLEPROC)
-		piglit_get_proc_address("glGetObjectParameterivAPPLE");
 }
 
 
@@ -88,10 +77,10 @@ test_DefaultObject(GLenum objectType)
 	 *     "INVALID_VALUE is generated if the <name> parameter of
 	 *      ObjectUnpurgeableAPPLE or ObjectUnpurgeableAPPLE is zero."
 	 */
-	(void) (*pglObjectPurgeableAPPLE)(objectType, 0, GL_VOLATILE_APPLE);
+	glObjectPurgeableAPPLE(objectType, 0, GL_VOLATILE_APPLE);
 	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_VALUE);
 
-	(void) (*pglObjectUnpurgeableAPPLE)(objectType, 0, GL_RETAINED_APPLE);
+	glObjectUnpurgeableAPPLE(objectType, 0, GL_RETAINED_APPLE);
 	EXPECT_AN_ERROR("glObjectUnpurgeableAPPLE", GL_INVALID_VALUE);
 
 	/* From the GL_APPLE_object_purgeable spec:
@@ -99,7 +88,7 @@ test_DefaultObject(GLenum objectType)
 	 *     "INVALID_VALUE is generated if the <name> parameter of
 	 *      GetObjectParameterivAPPLE is zero."
 	 */
-	(*pglGetObjectParameterivAPPLE)(objectType, 0, GL_PURGEABLE_APPLE,
+	glGetObjectParameterivAPPLE(objectType, 0, GL_PURGEABLE_APPLE,
 					&param);
 	EXPECT_AN_ERROR("glGetObjectParameterivAPPLE", GL_INVALID_VALUE);
 
@@ -113,7 +102,7 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	GLboolean pass = GL_TRUE;
 	GLenum ret;
 
-	ret = (*pglObjectPurgeableAPPLE)(objectType, name, option);
+	ret = glObjectPurgeableAPPLE(objectType, name, option);
 	FAIL_ON_ERROR("glObjectPurgeableAPPLE");
 
 	switch (option) {
@@ -168,7 +157,7 @@ test_ObjectpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	 *     "If ObjectPurgeableAPPLE is called and PURGEABLE_APPLE is
 	 *     already TRUE, the error INVALID_OPERATION is generated."
 	 */
-	(void) (*pglObjectPurgeableAPPLE)(objectType, name, option);
+	glObjectPurgeableAPPLE(objectType, name, option);
 	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
 
 	return pass;
@@ -181,7 +170,7 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	GLboolean pass = GL_TRUE;
 	GLenum ret;
 
-	ret = (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
+	ret = glObjectUnpurgeableAPPLE(objectType, name, option);
 	FAIL_ON_ERROR("glObjectUnpurgeableAPPLE");
 
 	switch (option) {
@@ -236,7 +225,7 @@ test_ObjectunpurgeableAPPLE(GLenum objectType, GLuint name, GLenum option)
 	 *     "If ObjectUnpurgeableAPPLE is called and PURGEABLE_APPLE is
 	 *     already FALSE, the error INVALID_OPERATION is returned."
 	 */
-	(void) (*pglObjectUnpurgeableAPPLE)(objectType, name, option);
+	glObjectUnpurgeableAPPLE(objectType, name, option);
 	EXPECT_AN_ERROR("glObjectPurgeableAPPLE", GL_INVALID_OPERATION);
 
 	return pass;
@@ -249,7 +238,7 @@ test_GetObjectParameterivAPPLE(GLenum objectType, GLuint name, GLenum expect)
 	GLboolean pass = GL_TRUE;
 	GLint param;
 
-	(*pglGetObjectParameterivAPPLE)(objectType, name, GL_PURGEABLE_APPLE,
+	glGetObjectParameterivAPPLE(objectType, name, GL_PURGEABLE_APPLE,
 					&param);
 	FAIL_ON_ERROR("glGetObjectParameterivAPPLE");
 

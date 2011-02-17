@@ -33,10 +33,6 @@
 
 #include "piglit-util.h"
 
-#ifndef GL_TEXTURE_SWIZZLE_RGBA_EXT
-#define GL_TEXTURE_SWIZZLE_RGBA_EXT 0x8E46
-#endif
-
 int piglit_width = 400, piglit_height = 300;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
