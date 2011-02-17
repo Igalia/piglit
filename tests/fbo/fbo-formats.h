@@ -252,6 +252,33 @@ static const struct format_desc ext_texture_compression_latc[] = {
 	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT)
 };
 
+static const struct format_desc ext_texture_snorm[] = {
+        FORMAT(GL_RED_SNORM),
+        FORMAT(GL_RG_SNORM),
+        FORMAT(GL_RGB_SNORM),
+        FORMAT(GL_RGBA_SNORM),
+        FORMAT(GL_R8_SNORM),
+        FORMAT(GL_RG8_SNORM),
+        FORMAT(GL_RGB8_SNORM),
+        FORMAT(GL_RGBA8_SNORM),
+        FORMAT(GL_R16_SNORM),
+        FORMAT(GL_RG16_SNORM),
+        FORMAT(GL_RGB16_SNORM),
+        FORMAT(GL_RGBA16_SNORM),
+        FORMAT(GL_ALPHA_SNORM),
+        FORMAT(GL_LUMINANCE_SNORM),
+        FORMAT(GL_LUMINANCE_ALPHA_SNORM),
+        FORMAT(GL_INTENSITY_SNORM),
+        FORMAT(GL_ALPHA8_SNORM),
+        FORMAT(GL_LUMINANCE8_SNORM),
+        FORMAT(GL_LUMINANCE8_ALPHA8_SNORM),
+        FORMAT(GL_INTENSITY8_SNORM),
+        FORMAT(GL_ALPHA16_SNORM),
+        FORMAT(GL_LUMINANCE16_SNORM),
+        FORMAT(GL_LUMINANCE16_ALPHA16_SNORM),
+        FORMAT(GL_INTENSITY16_SNORM)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -382,5 +409,11 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(ext_texture_compression_latc),
 		"GL_EXT_texture_compression_latc",
 		{"GL_EXT_texture_compression_latc"}
+	},
+	{
+		ext_texture_snorm,
+		ARRAY_SIZE(ext_texture_snorm),
+		"GL_EXT_texture_snorm",
+		{"GL_EXT_texture_snorm"}
 	},
 };
