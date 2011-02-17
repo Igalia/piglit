@@ -241,6 +241,10 @@ static const struct format_desc arb_texture_float[] = {
 	FORMAT(GL_INTENSITY32F_ARB)
 };
 
+static const struct format_desc ati_texture_compression_3dc[] = {
+	FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -359,5 +363,11 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(arb_texture_float),
 		"GL_ARB_texture_float",
 		{"GL_ARB_texture_float"}
+	},
+	{
+		ati_texture_compression_3dc,
+		ARRAY_SIZE(ati_texture_compression_3dc),
+		"GL_ATI_texture_compression_3dc",
+		{"GL_ATI_texture_compression_3dc"}
 	},
 };

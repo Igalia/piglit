@@ -1089,6 +1089,7 @@ add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_D
 
 ati_texture_compression_3dc = Group()
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
+add_fbo_generatemipmap_extension(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc', 'fbo-generatemipmap-formats')
 add_texwrap_test2(ati_texture_compression_3dc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_3DC')
 
 ext_packed_float = Group()
