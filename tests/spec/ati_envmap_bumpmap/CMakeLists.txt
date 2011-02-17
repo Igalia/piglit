@@ -3,7 +3,6 @@ include_directories(
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/spec/arb_color_buffer_float
 	${piglit_SOURCE_DIR}/tests/util
-	${GLEW_INCLUDE_DIR}
 )
 
 link_directories (
@@ -17,7 +16,6 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
-	${GLEW_glew_LIBRARY}
 )
 
 add_executable (ati_envmap_bumpmap-bump bump.c)

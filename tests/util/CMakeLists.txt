@@ -4,7 +4,6 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/util
-	${GLEW_INCLUDE_DIR}
 )
 
 set (UTIL_SOURCES
@@ -13,6 +12,7 @@ set (UTIL_SOURCES
 	piglit-util.c
 	shader-load.c
 	piglit-framework.c
+	glew.c
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -22,6 +22,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		    piglit-util.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
+		    glew.c
 	)
 	set (UTIL_SOURCES
 		${UTIL_SOURCES}

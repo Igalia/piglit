@@ -45,7 +45,7 @@ typedef unsigned __int64 uint64_t;
 #include <stdlib.h>
 #include <math.h>
 
-#include <GL/glew.h>
+#include "glew.h"
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else

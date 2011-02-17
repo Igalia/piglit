@@ -38,7 +38,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #define GL_GLEXT_PROTOTYPES
-#include <GL/glew.h>
+#include "glew.h"
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #else

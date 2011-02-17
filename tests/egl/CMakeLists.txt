@@ -3,7 +3,6 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/util
-	${GLEW_INCLUDE_DIR}
 )
 
 link_directories (
@@ -17,7 +16,6 @@ link_libraries (
 	${OPENGL_egl_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
-	${GLEW_glew_LIBRARY}
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
