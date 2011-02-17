@@ -245,6 +245,13 @@ static const struct format_desc ati_texture_compression_3dc[] = {
 	FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI)
 };
 
+static const struct format_desc ext_texture_compression_latc[] = {
+	FORMAT(GL_COMPRESSED_LUMINANCE_LATC1_EXT),
+	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT),
+	FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT),
+	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -369,5 +376,11 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(ati_texture_compression_3dc),
 		"GL_ATI_texture_compression_3dc",
 		{"GL_ATI_texture_compression_3dc"}
+	},
+	{
+		ext_texture_compression_latc,
+		ARRAY_SIZE(ext_texture_compression_latc),
+		"GL_EXT_texture_compression_latc",
+		{"GL_EXT_texture_compression_latc"}
 	},
 };

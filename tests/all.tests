@@ -1067,6 +1067,7 @@ add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
+add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc', 'fbo-generatemipmap-formats')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_LATC1')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_LATC1')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_LATC2')
