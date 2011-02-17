@@ -220,6 +220,20 @@ struct format {
     {FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1, 999,
      {"GL_EXT_texture_compression_latc"}},
 
+    /* ARB_texture_compression */
+    {FORMAT(GL_COMPRESSED_ALPHA), 0, 0, 0, 4, 0, 0, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+    {FORMAT(GL_COMPRESSED_LUMINANCE), 0, 0, 0, 0, 4, 0, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+    {FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA), 0, 0, 0, 4, 4, 0, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+    {FORMAT(GL_COMPRESSED_INTENSITY), 0, 0, 0, 0, 0, 4, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+    {FORMAT(GL_COMPRESSED_RGB), 4, 4, 4, 0, 0, 0, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+    {FORMAT(GL_COMPRESSED_RGBA), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1.3,
+     {"GL_ARB_texture_compression"}},
+
     /* EXT_texture_compression_s3tc */
     {FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1), 4, 4, 4, 0, 0, 0, 0, 0, 1, 999,
      {"GL_EXT_texture_compression_s3tc"}},

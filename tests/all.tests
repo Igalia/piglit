@@ -1050,6 +1050,12 @@ add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
 arb_texture_compression = Group()
 spec['ARB_texture_compression'] = arb_texture_compression
 add_fbo_generatemipmap_extension(arb_texture_compression, 'GL_ARB_texture_compression', 'fbo-generatemipmap-formats')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_ALPHA')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_LUMINANCE')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_INTENSITY')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGB')
+add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGBA')
 
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
