@@ -146,6 +146,12 @@ struct format {
     {FORMAT(GL_DEPTH_COMPONENT32),  0, 0, 0, 0, 0, 0, 32, 0,    0, 1.4,
      {"GL_ARB_depth_texture"}},
 
+    /* ARB_depth_buffer_float */
+    {FORMAT(GL_DEPTH32F_STENCIL8),  0, 0, 0, 0, 0, 0, 32, 0,    0, 3.0,
+     {"GL_ARB_depth_buffer_float"}},
+    {FORMAT(GL_DEPTH_COMPONENT32F),  0, 0, 0, 0, 0, 0, 32, 0,    0, 3.0,
+     {"GL_ARB_depth_buffer_float"}},
+
     /* ARB_texture_compression_rgtc */
     {FORMAT(GL_COMPRESSED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0,   1, 3.0,
      {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},

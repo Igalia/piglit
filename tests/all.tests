@@ -1044,6 +1044,8 @@ add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 # depth support not added to test yet
 #add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
+add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH_COMPONENT32F')
+add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
 
 arb_texture_compression = Group()
 spec['ARB_texture_compression'] = arb_texture_compression
