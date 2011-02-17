@@ -152,6 +152,10 @@ struct format {
     {FORMAT(GL_DEPTH_COMPONENT32F),  0, 0, 0, 0, 0, 0, 32, 0,    0, 3.0,
      {"GL_ARB_depth_buffer_float"}},
 
+    /* EXT_packed_depth_stencil */
+    {FORMAT(GL_DEPTH24_STENCIL8),  0, 0, 0, 0, 0, 0, 24, 8,    0, 3.0,
+     {"GL_EXT_packed_depth_stencil"}},
+
     /* ARB_texture_compression_rgtc */
     {FORMAT(GL_COMPRESSED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0,   1, 3.0,
      {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
@@ -793,6 +797,7 @@ enum piglit_result piglit_display()
         }
         pass = test_simple();
     }
+    assert(glGetError() == 0);
 
     return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
@@ -863,6 +868,7 @@ static void init_textures()
         texture_format->depth ?
         texture_format->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT :
         GL_RGBA;
+    GLenum type = baseformat == GL_DEPTH_STENCIL ? GL_UNSIGNED_INT_24_8 : GL_FLOAT;
 
     memcpy(borderf_real, borderf, sizeof(borderf));
 
@@ -1009,25 +1015,25 @@ static void init_textures()
         case GL_TEXTURE_1D:
             glTexImage1D(texture_target, 0, texture_format->internalformat,
                          bsize_x, 1,
-                         baseformat, GL_FLOAT, (void *) border_image);
+                         baseformat, type, (void *) border_image);
             break;
 
         case GL_TEXTURE_2D:
         case GL_TEXTURE_RECTANGLE_NV:
             glTexImage2D(texture_target, 0, texture_format->internalformat,
                          bsize_x, bsize_y, 1,
-                         baseformat, GL_FLOAT, (void *) border_image);
+                         baseformat, type, (void *) border_image);
             break;
 
         case GL_TEXTURE_3D:
             if (1.2 <= atof((char *)glGetString(GL_VERSION)))
                 glTexImage3D(texture_target, 0, texture_format->internalformat,
                              bsize_x, bsize_y, bsize_z, 1,
-                             baseformat, GL_FLOAT, (void *) border_image);
+                             baseformat, type, (void *) border_image);
             else
                 glTexImage3DEXT(texture_target, 0, texture_format->internalformat,
                                 bsize_x, bsize_y, bsize_z, 1,
-                                baseformat, GL_FLOAT, (void *) border_image);
+                                baseformat, type, (void *) border_image);
             break;
         }
     }
@@ -1134,35 +1140,46 @@ static void init_textures()
             real_size_y = size_y;
         }
 
+        /* Convert to D24X8_UNORM. */
+        if (baseformat == GL_DEPTH_STENCIL) {
+            uint32_t *p = (uint32_t*)
+                          (data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 4));
+
+            for (x = 0; x < size_z*size_y*size_x; x++) {
+                p[x] = (uint32_t)(no_border_image[x] * ((1<<24) - 1)) << 8;
+            }
+        }
+
         glBindTexture(texture_target, NO_BORDER_TEXTURE);
         glTexParameterfv(texture_target, GL_TEXTURE_BORDER_COLOR, borderf);
         switch (texture_target) {
         case GL_TEXTURE_1D:
             glTexImage1D(texture_target, 0, texture_format->internalformat,
                          real_size_x, 0,
-                         baseformat, GL_FLOAT, (void *) data);
+                         baseformat, type, (void *) data);
             break;
 
         case GL_TEXTURE_2D:
         case GL_TEXTURE_RECTANGLE_NV:
             glTexImage2D(texture_target, 0, texture_format->internalformat,
                          real_size_x, real_size_y, 0,
-                         baseformat, GL_FLOAT, (void *) data);
+                         baseformat, type, (void *) data);
             break;
 
         case GL_TEXTURE_3D:
             if (1.2 <= atof((char *)glGetString(GL_VERSION)))
                 glTexImage3D(texture_target, 0, texture_format->internalformat,
                              real_size_x, real_size_y, size_z, 0,
-                             baseformat, GL_FLOAT, (void *) data);
+                             baseformat, type, (void *) data);
             else
                 glTexImage3DEXT(texture_target, 0, texture_format->internalformat,
                                 real_size_x, real_size_y, size_z, 0,
-                                baseformat, GL_FLOAT, (void *) data);
+                                baseformat, type, (void *) data);
             break;
         }
 
-        if (texture_format->compressed) {
+        if (texture_format->compressed ||
+            baseformat == GL_DEPTH_STENCIL) {
             free(data);
         }
     }

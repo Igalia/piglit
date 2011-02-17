@@ -1063,6 +1063,7 @@ add_fbo_depth_test(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
 # depth support not added to test yet
 #add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
+add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
