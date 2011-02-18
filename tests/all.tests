@@ -1121,14 +1121,12 @@ add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA32F')
 
 ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
-add_fbo_generatemipmap_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-generatemipmap-formats')
 # unsupported for int yet
 #add_fbo_clear_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-clear-formats')
 
 arb_texture_rg = Group()
 spec['ARB_texture_rg'] = arb_texture_rg
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
-add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-generatemipmap-formats-int')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
 add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-clear-formats')
 # unsupported for int yet
