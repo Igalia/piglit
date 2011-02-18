@@ -32,8 +32,9 @@
 #include "piglit-util.h"
 
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 100;
-int piglit_height = 100;
+int piglit_width = 700;
+int piglit_height = 400;
+int height = 100, ybase = 0;
 
 static const char *prog = "array-texture";
 
@@ -170,26 +171,27 @@ test_2d_array_texture(GLuint tex)
 {
    GLboolean pass;
    int i;
+   float width = piglit_width / NUM_COLORS;
+   float x = 0.0;
 
    glBindTexture(GL_TEXTURE_2D_ARRAY_EXT, tex);
-
    /* render each image in the array, check its color */
    for (i = 0; i < NUM_COLORS; i++) {
       GLfloat r = (GLfloat) i;
 
       glBegin(GL_POLYGON);
-      glTexCoord3f(0, 0, r);  glVertex2f(0, 0);
-      glTexCoord3f(1, 0, r);  glVertex2f(piglit_width, 0);
-      glTexCoord3f(1, 1, r);  glVertex2f(piglit_width, piglit_height);
-      glTexCoord3f(0, 1, r);  glVertex2f(0, piglit_height);
+      glTexCoord3f(0, 0, r);  glVertex2f(x, ybase);
+      glTexCoord3f(1, 0, r);  glVertex2f(x + width, ybase);
+      glTexCoord3f(1, 1, r);  glVertex2f(x + width, ybase + height);
+      glTexCoord3f(0, 1, r);  glVertex2f(x, ybase + height);
       glEnd();
 
-      pass = piglit_probe_pixel_rgb(piglit_width / 2, piglit_height / 2,
-                                    colors[i]);
+      pass = piglit_probe_pixel_rgb(x + (width / 2), ybase + (height / 2),
+				                       colors[i]);
 
+      x += width;
       if (!pass) {
          printf("%s: failed for 2D image/slice %d\n", prog, i);
-         break;
       }
    }
 
@@ -204,6 +206,8 @@ test_1d_array_texture(GLuint tex)
 {
    GLboolean pass;
    int i;
+   float width = piglit_width / NUM_COLORS;
+   float x = 0.0;
 
    glBindTexture(GL_TEXTURE_1D_ARRAY_EXT, tex);
 
@@ -212,20 +216,21 @@ test_1d_array_texture(GLuint tex)
       GLfloat r = (GLfloat) i;
 
       glBegin(GL_POLYGON);
-      glTexCoord2f(0, r);  glVertex2f(0, 0);
-      glTexCoord2f(1, r);  glVertex2f(piglit_width, 0);
-      glTexCoord2f(1, r);  glVertex2f(piglit_width, piglit_height);
-      glTexCoord2f(0, r);  glVertex2f(0, piglit_height);
+      glTexCoord2f(0, r);  glVertex2f(x, ybase);
+      glTexCoord2f(1, r);  glVertex2f(x + width, ybase);
+      glTexCoord2f(1, r);  glVertex2f(x + width, ybase + height);
+      glTexCoord2f(0, r);  glVertex2f(x, ybase + height);
       glEnd();
 
       glFinish();
 
-      pass = piglit_probe_pixel_rgb(piglit_width / 2, piglit_height / 2,
-                                    colors[i]);
+      pass = piglit_probe_pixel_rgb(x + (width / 2), ybase + (height / 2),
+				    colors[i]);
+
+      x += width;
 
       if (!pass) {
          printf("%s: failed for 1D image/slice %d\n", prog, i);
-         break;
       }
    }
 
@@ -264,6 +269,7 @@ piglit_display(void)
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
+   ybase = 0;
    /*
     * Test 2d array texture with fragment shader
     */
@@ -272,50 +278,47 @@ piglit_display(void)
       glUseProgram(program_2d_array);
       loc = glGetUniformLocation(program_2d_array, "tex");
       glUniform1i(loc, 0); /* texture unit p */
-      pass = pass && test_2d_array_texture(array_tex_2d);
+      pass &= test_2d_array_texture(array_tex_2d);
       glUseProgram(0);
-      glutSwapBuffers();
    }
 
+   ybase = 100;
    /*
     * Test 2d array texture with fixed function
     */
    if (have_MESA_texture_array) {
-      glClear(GL_COLOR_BUFFER_BIT);
       glEnable(GL_TEXTURE_2D_ARRAY_EXT);
       check_error(__LINE__);
-      pass = pass && test_2d_array_texture(array_tex_2d);
+      pass &= test_2d_array_texture(array_tex_2d);
       glDisable(GL_TEXTURE_2D_ARRAY_EXT);
       check_error(__LINE__);
-      glutSwapBuffers();
    }
 
+   ybase = 200;
    /*
     * Test 1d array texture with fragment shader
     */
    {
-      glClear(GL_COLOR_BUFFER_BIT);
       glUseProgram(program_1d_array);
       loc = glGetUniformLocation(program_1d_array, "tex");
       glUniform1i(loc, 0); /* texture unit p */
-      pass = pass && test_1d_array_texture(array_tex_1d);
+      pass &= test_1d_array_texture(array_tex_1d);
       glUseProgram(0);
-      glutSwapBuffers();
    }
 
+   ybase = 300;
    /*
     * Test 1d array texture with fixed function
     */
    if (have_MESA_texture_array) {
-      glClear(GL_COLOR_BUFFER_BIT);
       glEnable(GL_TEXTURE_1D_ARRAY_EXT);
       check_error(__LINE__);
-      pass = pass && test_1d_array_texture(array_tex_1d);
+      pass &= test_1d_array_texture(array_tex_1d);
       glDisable(GL_TEXTURE_1D_ARRAY_EXT);
       check_error(__LINE__);
-      glutSwapBuffers();
    }
 
+   glutSwapBuffers();
    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
