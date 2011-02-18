@@ -1037,7 +1037,7 @@ GLuint
 piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 {
 	void *data;
-	float *f = NULL;
+	float *f = NULL, *f2 = NULL;
 	unsigned int  *i = NULL;
 	int size, x, y, level;
 	GLuint tex;
@@ -1065,6 +1065,10 @@ piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 		format = GL_DEPTH_STENCIL_EXT;
 		type = GL_UNSIGNED_INT_24_8_EXT;
 		i = data;
+	} else if (internalformat == GL_DEPTH32F_STENCIL8) {
+		format = GL_DEPTH_STENCIL;
+		type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+		f2 = data;
 	} else {
 		format = GL_DEPTH_COMPONENT;
 		type = GL_FLOAT;
@@ -1077,6 +1081,8 @@ piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 				float val = (float)(x) / (w - 1);
 				if (f)
 					f[y * w + x] = val;
+				else if (f2)
+					f2[(y * w + x)*2] = val;
 				else
 					i[y * w + x] = 0xffffff00 * val;
 			}
