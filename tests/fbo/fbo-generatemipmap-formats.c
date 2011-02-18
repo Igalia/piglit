@@ -129,7 +129,7 @@ create_tex(GLenum internalformat, GLenum baseformat)
 		tex = piglit_depth_texture(internalformat,
 					   tex_width, tex_height, GL_FALSE);
 		assert(glGetError() == 0);
-		if (internalformat == GL_DEPTH24_STENCIL8) {
+		if (baseformat == GL_DEPTH_STENCIL) {
 			format = GL_DEPTH_STENCIL;
 			type = GL_UNSIGNED_INT_24_8;
 		} else if (internalformat == GL_DEPTH32F_STENCIL8) {
