@@ -147,7 +147,7 @@ struct format {
      {"GL_ARB_depth_texture"}},
 
     /* ARB_depth_buffer_float */
-    {FORMAT(GL_DEPTH32F_STENCIL8),  0, 0, 0, 0, 0, 0, 32, 0,    0, 3.0,
+    {FORMAT(GL_DEPTH32F_STENCIL8),  0, 0, 0, 0, 0, 0, 32, 8,    0, 3.0,
      {"GL_ARB_depth_buffer_float"}},
     {FORMAT(GL_DEPTH_COMPONENT32F),  0, 0, 0, 0, 0, 0, 32, 0,    0, 3.0,
      {"GL_ARB_depth_buffer_float"}},
@@ -902,7 +902,10 @@ static void init_textures()
         texture_format->depth ?
         texture_format->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT :
         GL_RGBA;
-    GLenum type = baseformat == GL_DEPTH_STENCIL ? GL_UNSIGNED_INT_24_8 : GL_FLOAT;
+    GLenum type =
+        texture_format->internalformat == GL_DEPTH24_STENCIL8 ? GL_UNSIGNED_INT_24_8 :
+        texture_format->internalformat == GL_DEPTH32F_STENCIL8 ? GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
+        GL_FLOAT;
 
     memcpy(borderf_real, borderf, sizeof(borderf));
 
@@ -1070,6 +1073,7 @@ static void init_textures()
                                 baseformat, type, (void *) border_image);
             break;
         }
+        assert(glGetError() == 0);
     }
 
     if (!piglit_automatic || texture_id == NO_BORDER_TEXTURE) {
@@ -1174,14 +1178,26 @@ static void init_textures()
             real_size_y = size_y;
         }
 
-        /* Convert to D24X8_UNORM. */
-        if (baseformat == GL_DEPTH_STENCIL) {
-            uint32_t *p = (uint32_t*)
-                          (data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 4));
+        switch (texture_format->internalformat) {
+        case GL_DEPTH24_STENCIL8:
+            /* Convert to D24X8_UNORM. */
+            {
+                uint32_t *p = (uint32_t*)
+                              (data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 4));
+
+                for (x = 0; x < size_z*size_y*size_x; x++) {
+                    p[x] = (uint32_t)(no_border_image[x] * ((1<<24) - 1)) << 8;
+                }
+            }
+            break;
+        case GL_DEPTH32F_STENCIL8:
+            /* Convert to D32F_X24X8. */
+            data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 8);
 
             for (x = 0; x < size_z*size_y*size_x; x++) {
-                p[x] = (uint32_t)(no_border_image[x] * ((1<<24) - 1)) << 8;
+                data[x*2] = no_border_image[x];
             }
+            break;
         }
 
         glBindTexture(texture_target, NO_BORDER_TEXTURE);
@@ -1211,9 +1227,9 @@ static void init_textures()
                                 baseformat, type, (void *) data);
             break;
         }
+        assert(glGetError() == 0);
 
-        if (texture_format->compressed ||
-            baseformat == GL_DEPTH_STENCIL) {
+        if (data != no_border_image) {
             free(data);
         }
     }
@@ -1224,6 +1240,14 @@ GLboolean is_format_supported(struct format *f)
     GLuint id;
     float p[4] = {0};
     int r, g, b, a, l, i, d, s, iformat;
+    GLenum baseformat =
+        f->depth ?
+        f->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT :
+        GL_RGBA;
+    GLenum type =
+        f->internalformat == GL_DEPTH24_STENCIL8 ? GL_UNSIGNED_INT_24_8 :
+        f->internalformat == GL_DEPTH32F_STENCIL8 ? GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
+        GL_FLOAT;
 
     if (!check_support(f->version, f->extensions, f->dependency_extension))
         return GL_FALSE;
@@ -1231,9 +1255,7 @@ GLboolean is_format_supported(struct format *f)
     /* A quick and dirty way to check if we get the format we want. */
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, f->internalformat, 1, 1, 0,
-                 f->depth ? f->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT : GL_RGBA,
-                 f->depth && f->stencil ? GL_UNSIGNED_INT_24_8 : GL_FLOAT, &p);
+    glTexImage2D(GL_TEXTURE_2D, 0, f->internalformat, 1, 1, 0, baseformat, type, &p);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_RED_SIZE, &r);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_GREEN_SIZE, &g);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_BLUE_SIZE, &b);
@@ -1255,6 +1277,7 @@ GLboolean is_format_supported(struct format *f)
                              &iformat);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &id);
+    assert(glGetError() == 0);
 
     printf("%s has bits R%iG%iB%iA%i L%i I%i D%iS%i. The internal format is 0x%04X.\n",
            f->name, r, g, b, a, l, i, d, s, iformat);
@@ -1389,6 +1412,7 @@ void piglit_init(int argc, char **argv)
 
     glClearColor(0.5, 0.5, 0.5, 1.0);
 
+    assert(glGetError() == 0);
     init_textures();
 
     if (!piglit_automatic) {
