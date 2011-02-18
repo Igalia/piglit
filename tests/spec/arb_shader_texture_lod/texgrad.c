@@ -1,5 +1,6 @@
 /*
  * Copyright © 2009 Intel Corporation
+ * Copyright © 2011 Marek Olšák <maraeo@gmail.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,6 +22,9 @@
  * IN THE SOFTWARE.
  *
  * Authors:
+ *    Marek Olšák <maraeo@gmail.com>
+ *
+ * Based on fbo-clearmipmap by:
  *    Eric Anholt <eric@anholt.net>
  *
  */
