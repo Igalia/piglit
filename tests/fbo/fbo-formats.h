@@ -384,6 +384,8 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(arb_depth_buffer_float),
 		"GL_ARB_depth_buffer_float",
 		{"GL_ARB_depth_buffer_float"},
+		/* XXX this extension consists of both DEPTH_COMPONENT and
+		 * DEPTH_STENCIL formats. */
 		GL_DEPTH_COMPONENT,
 	},
 	{

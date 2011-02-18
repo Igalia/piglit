@@ -128,12 +128,18 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	if ((baseformat == GL_DEPTH_COMPONENT) || (baseformat == GL_DEPTH_STENCIL)) {
 		tex = piglit_depth_texture(internalformat,
 					   tex_width, tex_height, GL_FALSE);
-		if (baseformat == GL_DEPTH_COMPONENT) {
+		assert(glGetError() == 0);
+		if (internalformat == GL_DEPTH24_STENCIL8) {
+			format = GL_DEPTH_STENCIL;
+			type = GL_UNSIGNED_INT_24_8;
+		} else if (internalformat == GL_DEPTH32F_STENCIL8) {
+			format = GL_DEPTH_STENCIL;
+			type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+		} else if (baseformat == GL_DEPTH_COMPONENT) {
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;
 		} else {
-			format = GL_DEPTH_STENCIL_EXT;
-			type = GL_UNSIGNED_INT_24_8_EXT;
+			assert(0);
 		}
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
@@ -155,7 +161,6 @@ create_tex(GLenum internalformat, GLenum baseformat)
 			     0,
 			     format, type, NULL);
 	}
-
 	assert(glGetError() == 0);
 
 	glGenerateMipmapEXT(GL_TEXTURE_2D);
