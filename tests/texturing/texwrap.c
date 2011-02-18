@@ -211,7 +211,7 @@ struct format {
      {"GL_ARB_texture_rg"}, "GL_ARB_texture_float"},
 
     /* EXT_packed_float */
-    {FORMAT(GL_R11F_G11F_B10F),     11, 11, 10, 0, 0, 0, 0, 0,  0, 3.0,
+    {FORMAT(GL_R11F_G11F_B10F),     6, 6, 5, 0, 0, 0, 0, 0,  0, 3.0,
      {"GL_EXT_packed_float"}},
 
     /* EXT_texture_compression_latc */
