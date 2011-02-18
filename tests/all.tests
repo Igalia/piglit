@@ -988,10 +988,12 @@ add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-shadercompiler')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-releaseshadercompiler')
 
 # Group ARB_shader_texture_lod
-spec['ARB_shader_texture_lod'] = Group()
-import_glsl_parser_tests(spec['ARB_shader_texture_lod'],
+arb_shader_texture_lod = Group()
+spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
+import_glsl_parser_tests(arb_shader_texture_lod,
 			 os.path.dirname(__file__) + '/spec/arb_shader_texture_lod',
 			 [''])
+add_plain_test(arb_shader_texture_lod, 'arb_shader_texture_lod-texgrad')
 
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = Group()
