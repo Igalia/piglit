@@ -822,6 +822,7 @@ add_plain_test(bugs, 'fdo25614-genmipmap')
 add_plain_test(bugs, 'fdo28551')
 add_plain_test(bugs, 'fdo31934')
 add_plain_test(bugs, 'tri-tex-crash')
+add_plain_test(bugs, 'vbo-buffer-unmap')
 
 glx = Group()
 add_plain_test(glx, 'glx-destroycontext-1')
