@@ -407,6 +407,36 @@ static void test_interleaved_vertices(float x1, float y1, float x2, float y2, in
     glDeleteBuffers(1, &vbo);
 }
 
+static void test_mixed_user_and_vbo_buffers(float x1, float y1, float x2, float y2, int index)
+{
+    float v2[] = {
+        x1, y1,
+        x1, y2,
+        x2, y1
+    };
+    float c3[] = {
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1
+    };
+    GLuint vbo;
+
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    if (!index) {
+        glColorPointer(3, GL_FLOAT, 0, c3);
+        vbo = vboVertexPointer(2, GL_FLOAT, 0, v2, sizeof(v2), 0);
+    } else {
+        glVertexPointer(2, GL_FLOAT, 0, v2);
+        vbo = vboColorPointer(3, GL_FLOAT, 0, c3, sizeof(c3), 0);
+    }
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDeleteBuffers(1, &vbo);
+}
+
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
@@ -463,6 +493,9 @@ struct test tests[] = {
     {test_interleaved_vertices, 2, {0, 1, 0}, "Interleaved VBO - gap: 2"},
     {test_interleaved_vertices, 3, {0, 1, 0}, "Interleaved VBO - gap: 4"},
 
+    {test_mixed_user_and_vbo_buffers, 0, {0, 0, 1}, "Mixed buffers - 0: vbo,  1: user"},
+    {test_mixed_user_and_vbo_buffers, 1, {0, 0, 1}, "Mixed buffers - 0: user, 1: vbo"},
+
     {test_large_vertex_count, 0, {1, 1, 1}, "Large vertex count"},
 
     {0}
@@ -498,4 +531,3 @@ piglit_display(void)
 
     return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
-
