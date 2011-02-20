@@ -409,10 +409,10 @@ static void test_interleaved_vertices(float x1, float y1, float x2, float y2, in
 
 static void test_mixed_user_and_vbo_buffers(float x1, float y1, float x2, float y2, int index)
 {
-    float v2[] = {
-        x1, y1,
-        x1, y2,
-        x2, y1
+    float v3[] = {
+        x1, y1, 0,
+        x1, y2, 0,
+        x2, y1, 0
     };
     float c3[] = {
         0, 0, 1,
@@ -425,9 +425,9 @@ static void test_mixed_user_and_vbo_buffers(float x1, float y1, float x2, float 
 
     if (!index) {
         glColorPointer(3, GL_FLOAT, 0, c3);
-        vbo = vboVertexPointer(2, GL_FLOAT, 0, v2, sizeof(v2), 0);
+        vbo = vboVertexPointer(3, GL_FLOAT, 0, v3, sizeof(v3), 0);
     } else {
-        glVertexPointer(2, GL_FLOAT, 0, v2);
+        glVertexPointer(3, GL_FLOAT, 0, v3);
         vbo = vboColorPointer(3, GL_FLOAT, 0, c3, sizeof(c3), 0);
     }
 
