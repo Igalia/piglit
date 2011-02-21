@@ -85,6 +85,11 @@ extern const unsigned int fdo_bitmap_height;
  */
 void piglit_get_gl_version(bool *es, float* version);
 
+/**
+ * \precondition name is not null
+ */
+bool piglit_is_extension_supported(const char *name);
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);

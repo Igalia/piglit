@@ -40,7 +40,7 @@ GLint piglit_ARBfp_pass_through = 0;
 
 void piglit_require_extension(const char *name)
 {
-	if (!glutExtensionSupported(name)) {
+	if (!piglit_is_extension_supported(name)) {
 		printf("Test requires %s\n", name);
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
@@ -49,7 +49,7 @@ void piglit_require_extension(const char *name)
 
 void piglit_require_not_extension(const char *name)
 {
-	if (glutExtensionSupported(name)) {
+	if (piglit_is_extension_supported(name)) {
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
 	}

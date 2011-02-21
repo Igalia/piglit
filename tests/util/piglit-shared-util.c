@@ -71,6 +71,24 @@ void piglit_get_gl_version(bool *es, float* version)
 		*version = strtof(buffer, NULL);
 }
 
+bool piglit_is_extension_supported(const char *name)
+{
+	char *extensions;
+	bool found = false;
+	char *i;
+
+	assert(name != NULL);
+	extensions = strdup((const char*) glGetString(GL_EXTENSIONS));
+	for (i = strtok(extensions, " "); i != NULL; i = strtok(NULL, " ")) {
+		if (strcmp(name, i) == 0) {
+			found = true;
+			break;
+		}
+	}
+	free(extensions);
+	return found;
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's
