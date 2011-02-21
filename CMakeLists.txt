@@ -6,11 +6,11 @@ INCLUDE (CheckIncludeFile)
 
 project (piglit)
 
-include(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
-include(${CMAKE_ROOT}/Modules/FindTIFF.cmake)
-include(${CMAKE_ROOT}/Modules/FindGLUT.cmake)
-include(${CMAKE_ROOT}/Modules/FindPNG.cmake)
-include(${CMAKE_ROOT}/Modules/FindX11.cmake)
+find_package(OpenGL REQUIRED)
+find_package(TIFF REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(PNG REQUIRED)
+find_package(X11)
 
 CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
 IF (C_COMPILER_FLAG_WALL)
