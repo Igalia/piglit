@@ -21,6 +21,8 @@
  * IN THE SOFTWARE.
  */
 
+#pragma once
+
 extern int piglit_automatic;
 
 extern int piglit_window_mode;

@@ -21,6 +21,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
+
 #include "config.h"
 
 #if defined(_MSC_VER)

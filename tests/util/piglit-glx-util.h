@@ -24,6 +24,9 @@
  *    Eric Anholt <eric@anholt.net>
  *
  */
+
+#pragma once
+
 #include "GL/glx.h"
 
 XVisualInfo * piglit_get_glx_visual(Display *dpy);
