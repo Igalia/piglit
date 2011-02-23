@@ -26,8 +26,6 @@ find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 set(EXECUTABLE_OUTPUT_PATH ${piglit_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${piglit_BINARY_DIR}/lib)
 
-add_subdirectory (tests)
-
 check_function_exists(strchrnul HAVE_STRCHRNUL)
 check_function_exists(fopen_s   HAVE_FOPEN_S)
 
@@ -40,3 +38,5 @@ configure_file(
 	"${piglit_SOURCE_DIR}/tests/util/config.h.in"
 	"${piglit_SOURCE_DIR}/tests/util/config.h"
 )
+
+add_subdirectory(cmake/target_api)
