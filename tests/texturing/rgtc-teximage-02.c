@@ -43,6 +43,7 @@ static float rgba_image[4 * WIDTH * HEIGHT];
 
 static const GLenum internal_formats[] = {
 	GL_COMPRESSED_RG_RGTC2,
+	GL_COMPRESSED_SIGNED_RG_RGTC2,
 	GL_RG,
 	GL_RGBA,
 };
