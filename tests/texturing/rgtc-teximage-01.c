@@ -22,14 +22,15 @@
  */
 
 /**
- * \file rg-teximage-01.c
+ * \file rgtc-teximage-01.c
  * Verify setting and getting image data for RED or RG formats
  *
- * Specify an RGBA image with a RED internal format.  Read the image back as
+ * Specify an RGBA image with a compressed RED internal format.  Read the image back as
  * RGBA.  Verify the red components read back match the source image and the
  * green, blue, and alpha components are 0, 0, and 1, respectively.
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
+ * Modified by Dave Airlie for RGTC
  */
 
 #include "piglit-framework.h"

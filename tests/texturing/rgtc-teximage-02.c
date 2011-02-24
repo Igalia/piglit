@@ -30,6 +30,7 @@
  * and the blue and alpha components are 0 and 1, respectively.
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
+ * modified by Dave Airlie for RGTC
  */
 
 #include "piglit-framework.h"
