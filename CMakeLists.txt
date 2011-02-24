@@ -39,4 +39,5 @@ configure_file(
 	"${piglit_SOURCE_DIR}/tests/util/config.h"
 )
 
+include_directories(src)
 add_subdirectory(cmake/target_api)
