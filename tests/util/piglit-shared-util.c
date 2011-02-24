@@ -35,6 +35,19 @@
 
 #include "piglit-util.h"
 
+void piglit_glutInit(int argc, char **argv)
+{
+	glutInit(&argc, argv);
+
+#if defined USE_EGLUT && defined USE_OPENGL
+	glutInitAPIMask(GLUT_OPENGL_BIT);
+#elif defined USE_EGLUT && defined USE_OPENGL_ES2
+	glutInitAPIMask(GLUT_OPENGL_ES2_BIT);
+#elif defined USE_EGLUT
+#	error
+#endif
+}
+
 void piglit_get_gl_version(bool *es, float* version)
 {
 	/* Version of OpenGL API. */

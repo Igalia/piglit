@@ -76,6 +76,11 @@ extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
 
 /**
+ * Call glutInit() and, if EGLUT is used, also call glutInitAPIMask().
+ */
+void piglit_glutInit(int argc, char **argv);
+
+/**
  * \brief Get version of OpenGL API.
  *
  * Null parameters are ignored.
@@ -120,6 +125,7 @@ GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
+
 void piglit_escape_exit_key(unsigned char key, int x, int y);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);

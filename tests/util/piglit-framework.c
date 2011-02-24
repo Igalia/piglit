@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 {
 	int j;
 
-	glutInit(&argc, argv);
+	piglit_glutInit(argc, argv);
 
 	/* Find/remove "-auto" from the argument vector.
 	 */
