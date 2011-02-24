@@ -3,5 +3,6 @@ add_definitions(
 	-DUSE_OPENGL_ES2
 	-DUSE_EGLUT
 	)
-
-# Don't add any targets, because Piglit doesn't support GLES2 yet.
+add_subdirectory(${piglit_SOURCE_DIR}/tests
+	${piglit_BINARY_DIR}/target_api/${piglit_target_api}/tests
+	)
