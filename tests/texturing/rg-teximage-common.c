@@ -46,6 +46,8 @@
 	(((float) x / (float) maximum) * 2.0 * M_PI)
 
 #define EPSILON (1.0 / 255.0)
+/* give a large value for compression */
+#define EPSILON_COMP (5.0 / 255.0)
 
 enum piglit_result
 piglit_display(void)
@@ -73,9 +75,15 @@ compare_texture(const GLfloat *orig, const GLfloat *copy,
 	GLboolean logged = GL_FALSE;
 	GLboolean pass = GL_TRUE;
 	unsigned i;
+	float e;
+
+	if (orig_fmt == GL_COMPRESSED_RED_RGTC1 || orig_fmt == GL_COMPRESSED_RG_RGTC2)
+		e = EPSILON_COMP;
+	else
+		e = EPSILON;
 
 	for (i = 0; i < num_pix; i++) {
-		if (fabs(orig[0] - copy[0]) > EPSILON) {
+		if (fabs(orig[0] - copy[0]) > e) {
 			if (!logged) {
 				fprintf(stderr,
 					"Got bad R channel reading back "
@@ -87,7 +95,7 @@ compare_texture(const GLfloat *orig, const GLfloat *copy,
 			pass = GL_FALSE;
 		}
 
-		if (has_green && fabs(orig[0] - copy[0]) > EPSILON) {
+		if (has_green && fabs(orig[0] - copy[0]) > e) {
 			if (!logged) {
 				fprintf(stderr,
 					"Got bad G channel reading back "
