@@ -38,10 +38,6 @@
 #include "piglit-glx-util.h"
 #endif
 
-#ifdef FREEGLUT
-#include "GL/freeglut_ext.h"
-#endif
-
 int piglit_automatic = 0;
 static int piglit_window;
 static enum piglit_result result;
