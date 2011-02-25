@@ -35,6 +35,42 @@
 
 #include "piglit-util.h"
 
+void piglit_get_gl_version(bool *es, float* version)
+{
+	/* Version of OpenGL API. */
+	bool es_local;
+	int major;
+	int minor;
+	const size_t buffer_size = 32;
+	char buffer[buffer_size];
+
+	const char *version_string;
+	int c; /* scanf count */
+
+	version_string = (const char*) glGetString(GL_VERSION);
+	es_local = strncmp("OpenGL ES ", version_string, 10) == 0;
+	if (es_local) {
+		c = sscanf(version_string,
+		           "OpenGL ES %i.%i",
+		           &major,
+		           &minor);
+	} else {
+		c = sscanf(version_string,
+		           "%i.%i",
+		           &major,
+		           &minor);
+	}
+	assert(c == 2);
+	memset(buffer, 0, buffer_size * sizeof(char));
+	sprintf(buffer, "%i.%i", major, minor);
+
+	/* Write outputs. */
+	if (es != NULL)
+		*es = es_local;
+	if (version != NULL)
+		*version = strtof(buffer, NULL);
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's

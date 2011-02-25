@@ -75,6 +75,16 @@ extern const uint8_t fdo_bitmap[];
 extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
 
+/**
+ * \brief Get version of OpenGL API.
+ *
+ * Null parameters are ignored.
+ *
+ * \param es Is the API OpenGL or OpenGL ES?
+ * \param version In the form of 'major.minor'.
+ */
+void piglit_get_gl_version(bool *es, float* version);
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
