@@ -35,8 +35,8 @@
 
 #define TEX_WIDTH 128
 #define TEX_HEIGHT 128
-int piglit_width = 300;
-int piglit_height = 500;
+int piglit_width = 600;
+int piglit_height = 560;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 static const float red[] =   {1, 0, 0, 0};
@@ -66,6 +66,17 @@ static const char *frag_shader_2d_array_text =
 static GLuint frag_shader_2d_array;
 static GLuint program_2d_array;
 
+static const char *frag_shader_1d_array_text =
+   "#extension GL_EXT_texture_array : enable \n"
+   "uniform sampler1DArray tex; \n"
+   "void main() \n"
+   "{ \n"
+   "   gl_FragColor = texture1DArray(tex, gl_TexCoord[0].xy); \n"
+   "} \n";
+
+static GLuint frag_shader_1d_array;
+static GLuint program_1d_array;
+
 #define NUM_LAYERS	4
 
 float layer_color[NUM_LAYERS][4] = {
@@ -78,7 +89,59 @@ float layer_color[NUM_LAYERS][4] = {
 int num_layers = NUM_LAYERS;
 
 static int
-create_array_fbo(void)
+create_array_fbo_1d(void)
+{
+	GLuint tex, fb;
+	GLenum status;
+	int i, dim;
+	int layer;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_1D_ARRAY_EXT, tex);
+	assert(glGetError() == 0);
+
+	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
+		glTexImage2D(GL_TEXTURE_1D_ARRAY_EXT, i, GL_RGBA,
+			     dim, num_layers, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	}
+	assert(glGetError() == 0);
+
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+
+	for (layer = 0; layer < num_layers; layer++) {
+		glFramebufferTextureLayer(GL_FRAMEBUFFER_EXT,
+					  GL_COLOR_ATTACHMENT0_EXT,
+					  tex,
+					  0,
+					  layer);
+		assert(glGetError() == 0);
+
+		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+			fprintf(stderr, "FBO incomplete\n");
+			goto done;
+		}
+
+		glViewport(0, 0, TEX_WIDTH, 1);
+		piglit_ortho_projection(TEX_WIDTH, 1, GL_FALSE);
+
+		glColor4fv(layer_color[layer]);
+		piglit_draw_rect(0, 0, TEX_WIDTH / 2, 1);
+		glColor4fv(layer_color[(layer + 1) % 4]);
+		piglit_draw_rect(TEX_WIDTH / 2, 0, TEX_WIDTH, 1);
+	}
+
+	glGenerateMipmapEXT(GL_TEXTURE_1D_ARRAY_EXT);
+done:
+	glDeleteFramebuffersEXT(1, &fb);
+
+	return tex;
+}
+
+static int
+create_array_fbo_2d(void)
 {
 	GLuint tex, fb;
 	GLenum status;
@@ -181,7 +244,7 @@ piglit_draw_rect_tex3(float x, float y, float w, float h,
 }
 
 static void
-draw_mipmap(int x, int y, int dim, int layer)
+draw_mipmap_2d(int x, int y, int dim, int layer)
 {
 	int loc;
 
@@ -205,8 +268,33 @@ draw_mipmap(int x, int y, int dim, int layer)
 	glUseProgram(0);
 }
 
+static void
+draw_mipmap_1d(int x, int y, int dim, int layer)
+{
+	int loc;
+
+	glUseProgram(program_1d_array);
+	loc = glGetUniformLocation(program_1d_array, "tex");
+	glUniform1i(loc, 0); /* texture unit p */
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	glEnable(GL_TEXTURE_1D_ARRAY_EXT);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexParameteri(GL_TEXTURE_1D_ARRAY_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_1D_ARRAY_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	piglit_draw_rect_tex3(x, y, dim, dim,
+			      0, layer, 1, 0, 0);
+	glDisable(GL_TEXTURE_1D_ARRAY_EXT);
+	glUseProgram(0);
+}
+
 static GLboolean
-test_mipmap_drawing(int start_x, int start_y, int dim, int layer)
+test_mipmap_drawing_2d(int start_x, int start_y, int dim, int layer)
 {
 	GLboolean pass = GL_TRUE;
 	pass = pass && piglit_probe_rect_rgb(
@@ -221,42 +309,82 @@ test_mipmap_drawing(int start_x, int start_y, int dim, int layer)
 	return pass;
 }
 
+static GLboolean
+test_mipmap_drawing_1d(int start_x, int start_y, int dim, int layer)
+{
+	GLboolean pass = GL_TRUE;
+	pass = pass && piglit_probe_rect_rgb(
+			start_x, start_y, dim/2, dim/2, layer_color[layer]);
+	pass = pass && piglit_probe_rect_rgb(
+					     start_x + dim/2, start_y, dim/2, dim/2, layer_color[(layer + 1) % 4]);
+
+	return pass;
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int dim;
-	GLuint tex;
+	GLuint tex1d, tex2d;
 	int x, y;
 	int layer;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	tex = create_array_fbo();
+	tex1d = create_array_fbo_1d();
+	tex2d = create_array_fbo_2d();
 
 	x = 1;
 	y = 1;
 	for (layer = 0; layer < num_layers; layer++) {
 		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-			draw_mipmap(x, y, dim, layer);
+			draw_mipmap_2d(x, y, dim, layer);
 			x += dim + 1;
 		}
-		y += TEX_HEIGHT;
+		y += TEX_HEIGHT + 5;
 		x = 1;
 	}
+
+	x = 270;
+	y = 1;
+	for (layer = 0; layer < num_layers; layer++) {
+		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
+			draw_mipmap_1d(x, y, dim, layer);
+			x += dim + 1;
+		}
+		y += TEX_HEIGHT + 5;
+		x = 270;
+	}
+
+
 	x = 1;
 	y = 1;
 	for (layer = 0; layer < num_layers; layer++) {
 		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-			pass &= test_mipmap_drawing(x, y, dim, layer);
+			pass &= test_mipmap_drawing_2d(x, y, dim, layer);
 			x += dim + 1;
 		}
-		y += TEX_HEIGHT;
+		y += TEX_HEIGHT + 5;
 		x = 1;
 	}
 
-	glDeleteTextures(1, &tex);
+	x = 270;
+	y = 1;
+	for (layer = 0; layer < num_layers; layer++) {
+		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
+			pass &= test_mipmap_drawing_1d(x, y, dim, layer);
+			x += dim + 1;
+		}
+		y += TEX_HEIGHT + 5;
+		x = 270;
+	}
+
+
+	glDeleteTextures(1, &tex1d);
+	glDeleteTextures(1, &tex2d);
 
 	glutSwapBuffers();
 
@@ -276,4 +404,13 @@ void piglit_init(int argc, char **argv)
 
 	program_2d_array = piglit_link_simple_program(0, frag_shader_2d_array);
 	check_error(__LINE__);
+
+	frag_shader_1d_array =
+		piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+					   frag_shader_1d_array_text);
+	check_error(__LINE__);
+
+	program_1d_array = piglit_link_simple_program(0, frag_shader_1d_array);
+	check_error(__LINE__);
+
 }
