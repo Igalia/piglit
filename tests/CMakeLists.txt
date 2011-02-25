@@ -13,10 +13,11 @@ add_subdirectory (spec)
 
 IF(OPENGL_egl_LIBRARY)
 	add_subdirectory (egl)
-	IF(OPENGL_gles2_LIBRARY)
-		add_subdirectory (gles2)
-		add_subdirectory (gles2parsertest)
-	ENDIF(OPENGL_gles2_LIBRARY)
+	# Temporarily disable building GLES2 targets.
+	#IF(OPENGL_gles2_LIBRARY)
+	#	add_subdirectory (gles2)
+	#	add_subdirectory (gles2parsertest)
+	#ENDIF(OPENGL_gles2_LIBRARY)
 ENDIF(OPENGL_egl_LIBRARY)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
