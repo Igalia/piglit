@@ -36,3 +36,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_library (piglitutil
 	${UTIL_SOURCES}
 )
+
+if(UNIX)
+	target_link_libraries(piglitutil m)
+endif(UNIX)
