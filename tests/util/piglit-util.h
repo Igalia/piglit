@@ -45,6 +45,9 @@ typedef unsigned __int64 uint64_t;
 #include <stdlib.h>
 #include <math.h>
 
+#if defined(PIGLIT_GLES2)
+#include <GLES2/gl2.h>
+#else
 #include "glew.h"
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
@@ -52,6 +55,7 @@ typedef unsigned __int64 uint64_t;
 #include <GL/glut.h>
 #if defined(FREEGLUT)
 #include <GL/freeglut_ext.h>
+#endif
 #endif
 #endif
 

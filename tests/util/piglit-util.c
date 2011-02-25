@@ -606,6 +606,8 @@ piglit_ortho_projection(int w, int h, GLboolean push)
         glLoadIdentity();
 }
 
+
+
 /**
  * Generate a checkerboard texture
  *
