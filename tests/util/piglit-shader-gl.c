@@ -21,6 +21,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#ifndef USE_OPENGL
+#	error USE_OPENGL is undefined
+#endif
+
 #if defined(_MSC_VER)
 #include <windows.h>
 #endif
