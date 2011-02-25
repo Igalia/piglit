@@ -42,3 +42,7 @@ add_library (piglitutil
 if(UNIX)
 	target_link_libraries(piglitutil m)
 endif(UNIX)
+
+IF(OPENGL_egl_LIBRARY)
+	add_subdirectory (glut_egl)
+ENDIF(OPENGL_egl_LIBRARY)
