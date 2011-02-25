@@ -10,6 +10,7 @@ set (UTIL_SOURCES
 	fdo-bitmap.c
 	piglit-shader.c
 	piglit-util.c
+	piglit-shared-util.c
 	shader-load.c
 	piglit-framework.c
 	glew.c
@@ -20,6 +21,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_library (piglitglxutil
 		    piglit-shader.c
 		    piglit-util.c
+		    piglit-shared-util.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
 		    glew.c
