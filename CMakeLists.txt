@@ -21,6 +21,7 @@ FIND_LIBRARY(OPENGL_egl_LIBRARY
       NAMES EGL
       PATHS /usr/lib
 )
+find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
 set(EXECUTABLE_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${piglit_SOURCE_DIR}/bin)
