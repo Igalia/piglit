@@ -1,16 +1,1 @@
-
-include_directories(
-	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
-	${piglit_SOURCE_DIR}/tests/util
-)
-
-link_libraries (
-	piglitutil
-	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
-	${TIFF_LIBRARY}
-)
-
-add_executable (glslparsertest glslparsertest.c)
+piglit_include_target_api()
