@@ -33,7 +33,7 @@
 
 #ifdef EGL_NOK_swap_region
 
-const char *extensions[] = { "EGL_NOK_swap_region" };
+const char *extensions[] = { "EGL_NOK_swap_region", NULL };
 
 static enum piglit_result
 draw(struct egl_state *state)

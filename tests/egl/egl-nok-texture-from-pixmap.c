@@ -33,7 +33,7 @@
 
 #ifdef EGL_NOK_texture_from_pixmap
 
-const char *extensions[] = { "EGL_NOK_texture_from_pixmap" };
+const char *extensions[] = { "EGL_NOK_texture_from_pixmap", NULL };
 
 static const EGLint pixmap_attribs[] = {
 	EGL_TEXTURE_FORMAT,	EGL_TEXTURE_RGB,
