@@ -55,7 +55,7 @@ void piglit_get_gl_version(bool *es, float* version)
 	int major;
 	int minor;
 	const size_t buffer_size = 32;
-	char buffer[buffer_size];
+	char buffer[32];
 
 	const char *version_string;
 	int c; /* scanf count */
@@ -81,7 +81,7 @@ void piglit_get_gl_version(bool *es, float* version)
 	if (es != NULL)
 		*es = es_local;
 	if (version != NULL)
-		*version = strtof(buffer, NULL);
+		*version = strtod(buffer, NULL);
 }
 
 bool piglit_is_extension_supported(const char *name)
