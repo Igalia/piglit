@@ -38,12 +38,12 @@ enum {
    GLUT_STENCIL = 32,
 };
 
-/* used by glut_eglInitAPIMask */
+/* used by glutInitAPIMask */
 enum {
-   GLUT_EGL_OPENGL_BIT     = 0x1,
-   GLUT_EGL_OPENGL_ES1_BIT = 0x2,
-   GLUT_EGL_OPENGL_ES2_BIT = 0x4,
-   GLUT_EGL_OPENVG_BIT     = 0x8
+   GLUT_OPENGL_BIT     = 0x1,
+   GLUT_OPENGL_ES1_BIT = 0x2,
+   GLUT_OPENGL_ES2_BIT = 0x4,
+   GLUT_OPENVG_BIT     = 0x8
 };
 
 /* used by GLUT_EGLspecialCB */
@@ -71,7 +71,7 @@ enum {
 
 /* used by glutGet */
 enum {
-   GLUT_EGL_ELAPSED_TIME
+   GLUT_ELAPSED_TIME
 };
 
 typedef void (*GLUT_EGLidleCB)(void);
@@ -80,7 +80,7 @@ typedef void (*GLUT_EGLdisplayCB)(void);
 typedef void (*GLUT_EGLkeyboardCB)(unsigned char, int, int);
 typedef void (*GLUT_EGLspecialCB)(int, int, int);
 
-void glut_eglInitAPIMask(int mask);
+void glutInitAPIMask(int mask);
 void glutInitDisplayMode(unsigned int mode);
 void glutInitWindowPosition(int x, int y);
 void glutInitWindowSize(int width, int height);
@@ -96,8 +96,8 @@ void glutMainLoop(void);
 int glutCreateWindow(const char *title);
 void glutDestroyWindow(int win);
 
-int glut_eglGetWindowWidth(void);
-int glut_eglGetWindowHeight(void);
+int glutGetWindowWidth(void);
+int glutGetWindowHeight(void);
 
 void glutDisplayFunc(GLUT_EGLdisplayCB func);
 void glutReshapeFunc(GLUT_EGLreshapeCB func);
@@ -105,4 +105,4 @@ void glutKeyboardFunc(GLUT_EGLkeyboardCB func);
 void glutSpecialFunc(GLUT_EGLspecialCB func);
 void glutSwapBuffers(void);
 
-#endif /* GLUT_EGL_H */
+#endif /* GLUTH */

@@ -30,23 +30,23 @@
 #include "glut_eglint.h"
 
 void
-_glut_eglNativeInitDisplay(void)
+_glutNativeInitDisplay(void)
 {
-   _glut_egl->native_dpy = XOpenDisplay(_glut_egl->display_name);
-   if (!_glut_egl->native_dpy)
-      _glut_eglFatal("failed to initialize native display");
+   _glut->native_dpy = XOpenDisplay(_glut->display_name);
+   if (!_glut->native_dpy)
+      _glutFatal("failed to initialize native display");
 
-   _glut_egl->surface_type = EGL_WINDOW_BIT;
+   _glut->surface_type = EGL_WINDOW_BIT;
 }
 
 void
-_glut_eglNativeFiniDisplay(void)
+_glutNativeFiniDisplay(void)
 {
-   XCloseDisplay(_glut_egl->native_dpy);
+   XCloseDisplay(_glut->native_dpy);
 }
 
 void
-_glut_eglNativeInitWindow(struct glut_egl_window *win, const char *title,
+_glutNativeInitWindow(struct glut_window *win, const char *title,
                        int x, int y, int w, int h)
 {
    XVisualInfo *visInfo, visTemplate;
@@ -56,31 +56,31 @@ _glut_eglNativeInitWindow(struct glut_egl_window *win, const char *title,
    unsigned long mask;
    EGLint vid;
 
-   if (!eglGetConfigAttrib(_glut_egl->dpy,
+   if (!eglGetConfigAttrib(_glut->dpy,
             win->config, EGL_NATIVE_VISUAL_ID, &vid))
-      _glut_eglFatal("failed to get visual id");
+      _glutFatal("failed to get visual id");
 
    /* The X window visual must match the EGL config */
    visTemplate.visualid = vid;
-   visInfo = XGetVisualInfo(_glut_egl->native_dpy,
+   visInfo = XGetVisualInfo(_glut->native_dpy,
          VisualIDMask, &visTemplate, &num_visuals);
    if (!visInfo)
-      _glut_eglFatal("failed to get an visual of id 0x%x", vid);
+      _glutFatal("failed to get an visual of id 0x%x", vid);
 
-   root = RootWindow(_glut_egl->native_dpy, DefaultScreen(_glut_egl->native_dpy));
+   root = RootWindow(_glut->native_dpy, DefaultScreen(_glut->native_dpy));
 
    /* window attributes */
    attr.background_pixel = 0;
    attr.border_pixel = 0;
-   attr.colormap = XCreateColormap(_glut_egl->native_dpy,
+   attr.colormap = XCreateColormap(_glut->native_dpy,
          root, visInfo->visual, AllocNone);
    attr.event_mask = StructureNotifyMask | ExposureMask | KeyPressMask;
    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
-   xwin = XCreateWindow(_glut_egl->native_dpy, root, x, y, w, h,
+   xwin = XCreateWindow(_glut->native_dpy, root, x, y, w, h,
          0, visInfo->depth, InputOutput, visInfo->visual, mask, &attr);
    if (!xwin)
-      _glut_eglFatal("failed to create a window");
+      _glutFatal("failed to create a window");
 
    XFree(visInfo);
 
@@ -92,12 +92,12 @@ _glut_eglNativeInitWindow(struct glut_egl_window *win, const char *title,
       sizehints.width  = w;
       sizehints.height = h;
       sizehints.flags = USSize | USPosition;
-      XSetNormalHints(_glut_egl->native_dpy, xwin, &sizehints);
-      XSetStandardProperties(_glut_egl->native_dpy, xwin,
+      XSetNormalHints(_glut->native_dpy, xwin, &sizehints);
+      XSetStandardProperties(_glut->native_dpy, xwin,
             title, title, None, (char **) NULL, 0, &sizehints);
    }
 
-   XMapWindow(_glut_egl->native_dpy, xwin);
+   XMapWindow(_glut->native_dpy, xwin);
 
    win->native.u.window = xwin;
    win->native.width = w;
@@ -105,9 +105,9 @@ _glut_eglNativeInitWindow(struct glut_egl_window *win, const char *title,
 }
 
 void
-_glut_eglNativeFiniWindow(struct glut_egl_window *win)
+_glutNativeFiniWindow(struct glut_window *win)
 {
-   XDestroyWindow(_glut_egl->native_dpy, win->native.u.window);
+   XDestroyWindow(_glut->native_dpy, win->native.u.window);
 }
 
 static int
@@ -177,18 +177,18 @@ lookup_keysym(KeySym sym)
 }
 
 static void
-next_event(struct glut_egl_window *win)
+next_event(struct glut_window *win)
 {
    int redraw = 0;
    XEvent event;
 
-   if (!XPending(_glut_egl->native_dpy)) {
-      if (_glut_egl->idle_cb)
-         _glut_egl->idle_cb();
+   if (!XPending(_glut->native_dpy)) {
+      if (_glut->idle_cb)
+         _glut->idle_cb();
       return;
    }
 
-   XNextEvent(_glut_egl->native_dpy, &event);
+   XNextEvent(_glut->native_dpy, &event);
 
    switch (event.type) {
    case Expose:
@@ -223,23 +223,23 @@ next_event(struct glut_egl_window *win)
       ; /*no-op*/
    }
 
-   _glut_egl->redisplay = redraw;
+   _glut->redisplay = redraw;
 }
 
 void
-_glut_eglNativeEventLoop(void)
+_glutNativeEventLoop(void)
 {
    while (1) {
-      struct glut_egl_window *win = _glut_egl->current;
+      struct glut_window *win = _glut->current;
 
       next_event(win);
 
-      if (_glut_egl->redisplay) {
-         _glut_egl->redisplay = 0;
+      if (_glut->redisplay) {
+         _glut->redisplay = 0;
 
          if (win->display_cb)
             win->display_cb();
-         eglSwapBuffers(_glut_egl->dpy, win->surface);
+         eglSwapBuffers(_glut->dpy, win->surface);
       }
    }
 }

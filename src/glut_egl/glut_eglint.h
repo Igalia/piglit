@@ -29,7 +29,7 @@
 #include "EGL/egl.h"
 #include "glut_egl.h"
 
-struct glut_egl_window {
+struct glut_window {
    EGLConfig config;
    EGLContext context;
 
@@ -53,7 +53,7 @@ struct glut_egl_window {
    GLUT_EGLspecialCB special_cb;
 };
 
-struct glut_egl_state {
+struct glut_state {
    int api_mask;
    int display_mode;
    int window_width, window_height;
@@ -72,33 +72,33 @@ struct glut_egl_state {
    EGLDisplay dpy;
    EGLint major, minor;
 
-   struct glut_egl_window *current;
+   struct glut_window *current;
 
    int redisplay;
 };
 
-extern struct glut_egl_state *_glut_egl;
+extern struct glut_state *_glut;
 
 void
-_glut_eglFatal(char *format, ...);
+_glutFatal(char *format, ...);
 
 int
-_glut_eglNow(void);
+_glutNow(void);
 
 void
-_glut_eglNativeInitDisplay(void);
+_glutNativeInitDisplay(void);
 
 void
-_glut_eglNativeFiniDisplay(void);
+_glutNativeFiniDisplay(void);
 
 void
-_glut_eglNativeInitWindow(struct glut_egl_window *win, const char *title,
+_glutNativeInitWindow(struct glut_window *win, const char *title,
                        int x, int y, int w, int h);
 
 void
-_glut_eglNativeFiniWindow(struct glut_egl_window *win);
+_glutNativeFiniWindow(struct glut_window *win);
 
 void
-_glut_eglNativeEventLoop(void);
+_glutNativeEventLoop(void);
 
 #endif /* _GLUT_EGLINT_H_ */

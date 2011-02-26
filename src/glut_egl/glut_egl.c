@@ -34,8 +34,8 @@
 
 #include "glut_eglint.h"
 
-static struct glut_egl_state _glut_egl_state = {
-   .api_mask = GLUT_EGL_OPENGL_ES1_BIT,
+static struct glut_state _glut_state = {
+   .api_mask = GLUT_OPENGL_ES1_BIT,
    .display_mode = GLUT_RGB,
    .window_width = 300,
    .window_height = 300,
@@ -43,10 +43,10 @@ static struct glut_egl_state _glut_egl_state = {
    .num_windows = 0,
 };
 
-struct glut_egl_state *_glut_egl = &_glut_egl_state;
+struct glut_state *_glut = &_glut_state;
 
 void
-_glut_eglFatal(char *format, ...)
+_glutFatal(char *format, ...)
 {
   va_list args;
 
@@ -62,7 +62,7 @@ _glut_eglFatal(char *format, ...)
 
 /* return current time (in milliseconds) */
 int
-_glut_eglNow(void)
+_glutNow(void)
 {
    struct timeval tv;
 #ifdef __VMS
@@ -75,19 +75,19 @@ _glut_eglNow(void)
 }
 
 static void
-_glut_eglDestroyWindow(struct glut_egl_window *win)
+_glutDestroyWindow(struct glut_window *win)
 {
-   if (_glut_egl->surface_type != EGL_PBUFFER_BIT &&
-       _glut_egl->surface_type != EGL_SCREEN_BIT_MESA)
-      eglDestroySurface(_glut_egl->dpy, win->surface);
+   if (_glut->surface_type != EGL_PBUFFER_BIT &&
+       _glut->surface_type != EGL_SCREEN_BIT_MESA)
+      eglDestroySurface(_glut->dpy, win->surface);
 
-   _glut_eglNativeFiniWindow(win);
+   _glutNativeFiniWindow(win);
 
-   eglDestroyContext(_glut_egl->dpy, win->context);
+   eglDestroyContext(_glut->dpy, win->context);
 }
 
 static EGLConfig
-_glut_eglChooseConfig(void)
+_glutChooseConfig(void)
 {
    EGLConfig config;
    EGLint config_attribs[32];
@@ -102,59 +102,59 @@ _glut_eglChooseConfig(void)
    config_attribs[i++] = 1;
 
    config_attribs[i++] = EGL_ALPHA_SIZE;
-   if (_glut_egl->display_mode & GLUT_ALPHA)
+   if (_glut->display_mode & GLUT_ALPHA)
       config_attribs[i++] = 1;
    else
       config_attribs[i++] = 0;
 
    config_attribs[i++] = EGL_DEPTH_SIZE;
-   if (_glut_egl->display_mode & GLUT_DEPTH)
+   if (_glut->display_mode & GLUT_DEPTH)
       config_attribs[i++] = 1;
    else
       config_attribs[i++] = 0;
 
    config_attribs[i++] = EGL_STENCIL_SIZE;
-   if (_glut_egl->display_mode & GLUT_STENCIL)
+   if (_glut->display_mode & GLUT_STENCIL)
       config_attribs[i++] = 1;
    else
       config_attribs[i++] = 0;
 
    config_attribs[i++] = EGL_SURFACE_TYPE;
-   config_attribs[i++] = _glut_egl->surface_type;
+   config_attribs[i++] = _glut->surface_type;
 
    config_attribs[i++] = EGL_RENDERABLE_TYPE;
    renderable_type = 0x0;
-   if (_glut_egl->api_mask & GLUT_EGL_OPENGL_BIT)
+   if (_glut->api_mask & GLUT_OPENGL_BIT)
       renderable_type |= EGL_OPENGL_BIT;
-   if (_glut_egl->api_mask & GLUT_EGL_OPENGL_ES1_BIT)
+   if (_glut->api_mask & GLUT_OPENGL_ES1_BIT)
       renderable_type |= EGL_OPENGL_ES_BIT;
-   if (_glut_egl->api_mask & GLUT_EGL_OPENGL_ES2_BIT)
+   if (_glut->api_mask & GLUT_OPENGL_ES2_BIT)
       renderable_type |= EGL_OPENGL_ES2_BIT;
-   if (_glut_egl->api_mask & GLUT_EGL_OPENVG_BIT)
+   if (_glut->api_mask & GLUT_OPENVG_BIT)
       renderable_type |= EGL_OPENVG_BIT;
    config_attribs[i++] = renderable_type;
 
    config_attribs[i] = EGL_NONE;
 
-   if (!eglChooseConfig(_glut_egl->dpy,
+   if (!eglChooseConfig(_glut->dpy,
             config_attribs, &config, 1, &num_configs) || !num_configs)
-      _glut_eglFatal("failed to choose a config");
+      _glutFatal("failed to choose a config");
 
    return config;
 }
 
-static struct glut_egl_window *
-_glut_eglCreateWindow(const char *title, int x, int y, int w, int h)
+static struct glut_window *
+_glutCreateWindow(const char *title, int x, int y, int w, int h)
 {
-   struct glut_egl_window *win;
+   struct glut_window *win;
    EGLint context_attribs[4];
    EGLint api, i;
 
    win = calloc(1, sizeof(*win));
    if (!win)
-      _glut_eglFatal("failed to allocate window");
+      _glutFatal("failed to allocate window");
 
-   win->config = _glut_eglChooseConfig();
+   win->config = _glutChooseConfig();
 
    i = 0;
    context_attribs[i] = EGL_NONE;
@@ -162,13 +162,13 @@ _glut_eglCreateWindow(const char *title, int x, int y, int w, int h)
    /* multiple APIs? */
 
    api = EGL_OPENGL_ES_API;
-   if (_glut_egl->api_mask & GLUT_EGL_OPENGL_BIT) {
+   if (_glut->api_mask & GLUT_OPENGL_BIT) {
       api = EGL_OPENGL_API;
    }
-   else if (_glut_egl->api_mask & GLUT_EGL_OPENVG_BIT) {
+   else if (_glut->api_mask & GLUT_OPENVG_BIT) {
       api = EGL_OPENVG_API;
    }
-   else if (_glut_egl->api_mask & GLUT_EGL_OPENGL_ES2_BIT) {
+   else if (_glut->api_mask & GLUT_OPENGL_ES2_BIT) {
       context_attribs[i++] = EGL_CONTEXT_CLIENT_VERSION;
       context_attribs[i++] = 2;
    }
@@ -176,19 +176,19 @@ _glut_eglCreateWindow(const char *title, int x, int y, int w, int h)
    context_attribs[i] = EGL_NONE;
 
    eglBindAPI(api);
-   win->context = eglCreateContext(_glut_egl->dpy,
+   win->context = eglCreateContext(_glut->dpy,
          win->config, EGL_NO_CONTEXT, context_attribs);
    if (!win->context)
-      _glut_eglFatal("failed to create context");
+      _glutFatal("failed to create context");
 
-   _glut_eglNativeInitWindow(win, title, x, y, w, h);
-   switch (_glut_egl->surface_type) {
+   _glutNativeInitWindow(win, title, x, y, w, h);
+   switch (_glut->surface_type) {
    case EGL_WINDOW_BIT:
-      win->surface = eglCreateWindowSurface(_glut_egl->dpy,
+      win->surface = eglCreateWindowSurface(_glut->dpy,
             win->config, win->native.u.window, NULL);
       break;
    case EGL_PIXMAP_BIT:
-      win->surface = eglCreatePixmapSurface(_glut_egl->dpy,
+      win->surface = eglCreatePixmapSurface(_glut->dpy,
             win->config, win->native.u.pixmap, NULL);
       break;
    case EGL_PBUFFER_BIT:
@@ -199,21 +199,21 @@ _glut_eglCreateWindow(const char *title, int x, int y, int w, int h)
       break;
    }
    if (win->surface == EGL_NO_SURFACE)
-      _glut_eglFatal("failed to create surface");
+      _glutFatal("failed to create surface");
 
    return win;
 }
 
 void
-glut_eglInitAPIMask(int mask)
+glutInitAPIMask(int mask)
 {
-   _glut_egl->api_mask = mask;
+   _glut->api_mask = mask;
 }
 
 void
 glutInitDisplayMode(unsigned int mode)
 {
-   _glut_egl->display_mode = mode;
+   _glut->display_mode = mode;
 }
 
 void
@@ -224,8 +224,8 @@ glutInitWindowPosition(int x, int y)
 void
 glutInitWindowSize(int width, int height)
 {
-   _glut_egl->window_width = width;
-   _glut_egl->window_height = height;
+   _glut->window_width = width;
+   _glut->window_height = height;
 }
 
 void
@@ -235,27 +235,27 @@ glutInit(int *argcp, char **argv)
 
    for (i = 1; i < *argcp; i++) {
       if (strcmp(argv[i], "-display") == 0)
-         _glut_egl->display_name = argv[++i];
+         _glut->display_name = argv[++i];
       else if (strcmp(argv[i], "-info") == 0) {
-         _glut_egl->verbose = 1;
+         _glut->verbose = 1;
       }
    }
 
-   _glut_eglNativeInitDisplay();
-   _glut_egl->dpy = eglGetDisplay(_glut_egl->native_dpy);
+   _glutNativeInitDisplay();
+   _glut->dpy = eglGetDisplay(_glut->native_dpy);
 
-   if (!eglInitialize(_glut_egl->dpy, &_glut_egl->major, &_glut_egl->minor))
-      _glut_eglFatal("failed to initialize EGL display");
+   if (!eglInitialize(_glut->dpy, &_glut->major, &_glut->minor))
+      _glutFatal("failed to initialize EGL display");
 
-   _glut_egl->init_time = _glut_eglNow();
+   _glut->init_time = _glutNow();
 
-   printf("EGL_VERSION = %s\n", eglQueryString(_glut_egl->dpy, EGL_VERSION));
-   if (_glut_egl->verbose) {
-      printf("EGL_VENDOR = %s\n", eglQueryString(_glut_egl->dpy, EGL_VENDOR));
+   printf("EGL_VERSION = %s\n", eglQueryString(_glut->dpy, EGL_VERSION));
+   if (_glut->verbose) {
+      printf("EGL_VENDOR = %s\n", eglQueryString(_glut->dpy, EGL_VENDOR));
       printf("EGL_EXTENSIONS = %s\n",
-            eglQueryString(_glut_egl->dpy, EGL_EXTENSIONS));
+            eglQueryString(_glut->dpy, EGL_EXTENSIONS));
       printf("EGL_CLIENT_APIS = %s\n",
-            eglQueryString(_glut_egl->dpy, EGL_CLIENT_APIS));
+            eglQueryString(_glut->dpy, EGL_CLIENT_APIS));
    }
 }
 
@@ -265,8 +265,8 @@ glutGet(int state)
    int val;
 
    switch (state) {
-   case GLUT_EGL_ELAPSED_TIME:
-      val = _glut_eglNow() - _glut_egl->init_time;
+   case GLUT_ELAPSED_TIME:
+      val = _glutNow() - _glut->init_time;
       break;
    default:
       val = -1;
@@ -279,58 +279,58 @@ glutGet(int state)
 void
 glutIdleFunc(GLUT_EGLidleCB func)
 {
-   _glut_egl->idle_cb = func;
+   _glut->idle_cb = func;
 }
 
 void
 glutPostRedisplay(void)
 {
-   _glut_egl->redisplay = 1;
+   _glut->redisplay = 1;
 }
 
 void
 glutMainLoop(void)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
 
    if (!win)
-      _glut_eglFatal("no window is created\n");
+      _glutFatal("no window is created\n");
 
    if (win->reshape_cb)
       win->reshape_cb(win->native.width, win->native.height);
 
-   _glut_eglNativeEventLoop();
+   _glutNativeEventLoop();
 }
 
 static void
-_glut_eglFini(void)
+_glutFini(void)
 {
-   eglTerminate(_glut_egl->dpy);
-   _glut_eglNativeFiniDisplay();
+   eglTerminate(_glut->dpy);
+   _glutNativeFiniDisplay();
 }
 
 void
 glutDestroyWindow(int win)
 {
-   struct glut_egl_window *window = _glut_egl->current;
+   struct glut_window *window = _glut->current;
 
    if (window->index != win)
       return;
 
    /* XXX it causes some bug in st/egl KMS backend */
-   if ( _glut_egl->surface_type != EGL_SCREEN_BIT_MESA)
-      eglMakeCurrent(_glut_egl->dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+   if ( _glut->surface_type != EGL_SCREEN_BIT_MESA)
+      eglMakeCurrent(_glut->dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
-   _glut_eglDestroyWindow(_glut_egl->current);
+   _glutDestroyWindow(_glut->current);
 }
 
 static void
-_glut_eglDefaultKeyboard(unsigned char key, int x, int y)
+_glutDefaultKeyboard(unsigned char key, int x, int y)
 {
    if (key == 27) {
-      if (_glut_egl->current)
-         glutDestroyWindow(_glut_egl->current->index);
-      _glut_eglFini();
+      if (_glut->current)
+         glutDestroyWindow(_glut->current->index);
+      _glutFini();
 
       exit(0);
    }
@@ -339,42 +339,42 @@ _glut_eglDefaultKeyboard(unsigned char key, int x, int y)
 int
 glutCreateWindow(const char *title)
 {
-   struct glut_egl_window *win;
+   struct glut_window *win;
 
-   win = _glut_eglCreateWindow(title, 0, 0,
-         _glut_egl->window_width, _glut_egl->window_height);
+   win = _glutCreateWindow(title, 0, 0,
+         _glut->window_width, _glut->window_height);
 
-   win->index = _glut_egl->num_windows++;
+   win->index = _glut->num_windows++;
    win->reshape_cb = NULL;
    win->display_cb = NULL;
-   win->keyboard_cb = _glut_eglDefaultKeyboard;
+   win->keyboard_cb = _glutDefaultKeyboard;
    win->special_cb = NULL;
 
-   if (!eglMakeCurrent(_glut_egl->dpy, win->surface, win->surface, win->context))
-      _glut_eglFatal("failed to make window current");
-   _glut_egl->current = win;
+   if (!eglMakeCurrent(_glut->dpy, win->surface, win->surface, win->context))
+      _glutFatal("failed to make window current");
+   _glut->current = win;
 
    return win->index;
 }
 
 int
-glut_eglGetWindowWidth(void)
+glutGetWindowWidth(void)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    return win->native.width;
 }
 
 int
-glut_eglGetWindowHeight(void)
+glutGetWindowHeight(void)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    return win->native.height;
 }
 
 void
 glutDisplayFunc(GLUT_EGLdisplayCB func)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    win->display_cb = func;
 
 }
@@ -382,21 +382,21 @@ glutDisplayFunc(GLUT_EGLdisplayCB func)
 void
 glutReshapeFunc(GLUT_EGLreshapeCB func)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    win->reshape_cb = func;
 }
 
 void
 glutKeyboardFunc(GLUT_EGLkeyboardCB func)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    win->keyboard_cb = func;
 }
 
 void
 glutSpecialFunc(GLUT_EGLspecialCB func)
 {
-   struct glut_egl_window *win = _glut_egl->current;
+   struct glut_window *win = _glut->current;
    win->special_cb = func;
 }
 
