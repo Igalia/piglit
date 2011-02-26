@@ -125,6 +125,7 @@ GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
+GLvoid piglit_draw_rect_back(float x, float y, float w, float h);
 
 void piglit_escape_exit_key(unsigned char key, int x, int y);
 
@@ -237,3 +238,6 @@ extern void piglit_require_vertex_shader(void);
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c);
 #endif
+
+static const GLint PIGLIT_ATTRIB_POS = 0;
+static const GLint PIGLIT_ATTRIB_TEX = 1;

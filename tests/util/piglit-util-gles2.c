@@ -35,9 +35,6 @@
 
 #include "piglit-util.h"
 
-static const GLint PIGLIT_ATTRIB_POS = 0;
-static const GLint PIGLIT_ATTRIB_TEX = 1;
-
 int
 piglit_extension_supported(const char *name)
 {
