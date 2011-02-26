@@ -1,0 +1,19 @@
+#add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
+
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	${piglit_SOURCE_DIR}/tests/util/
+	)
+
+link_libraries(
+	${OPENGL_gles2_LIBRARY}
+	${OPENGL_egl_LIBRARY}
+	glut_egl
+	piglitutil_gles2
+	)
+
+add_executable(gles2_shader_runner
+	gles2_shader_runner.c
+	)
+
+# vim: ft=cmake:

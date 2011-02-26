@@ -28,8 +28,12 @@
  */
 
 
-#include "piglit-gles2-util.h"
-#include "piglit-egl-gles2-framework.h"
+#define _GNU_SOURCE
+
+#include <ctype.h>
+#include <string.h>
+#include "piglit-util.h"
+#include "piglit-framework.h"
 
 int piglit_window_mode = GLUT_RGB | GLUT_DEPTH;
 int piglit_width = 250, piglit_height = 250;
