@@ -41,9 +41,15 @@ extern "C" {
 #ifdef USE_OPENGL
 #	include "glew.h"
 	/* Include the real headers too, in case GLEW misses something. */
-#	include <GL/gl.h>
-#	include <GL/glu.h>
-#	include <GL/glext.h>
+#	ifdef __APPLE__
+#		include <OpenGL/gl.h>
+#		include <OpenGL/glu.h>
+#		include <OpenGL/glext.h>
+#	else
+#		include <GL/gl.h>
+#		include <GL/glu.h>
+#		include <GL/glext.h>
+#	endif
 #endif
 
 #ifdef USE_OPENGL_ES2
