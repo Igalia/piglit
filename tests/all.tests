@@ -1719,4 +1719,6 @@ Test.ignoreErrors.append(re.compile("%.*"))
 Test.ignoreErrors.append(re.compile(".*failed to translate tgsi opcode.*to SSE"))
 Test.ignoreErrors.append(re.compile(".*falling back to interpreter"))
 Test.ignoreErrors.append(re.compile("GLSL version is .*, but requested version .* is required"))
+Test.ignoreErrors.append(re.compile("kCGErrorIllegalArgument: CGSOrderWindowList"))
+Test.ignoreErrors.append(re.compile("kCGErrorFailure: Set a breakpoint @ CGErrorBreakpoint\(\) to catch errors as they are logged."))
 
