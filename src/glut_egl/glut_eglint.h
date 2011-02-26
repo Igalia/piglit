@@ -23,8 +23,7 @@
  *    Chia-I Wu <olv@lunarg.com>
  */
 
-#ifndef _GLUT_EGLINT_H_
-#define _GLUT_EGLINT_H_
+#pragma once
 
 #include <EGL/egl.h>
 #include <glut_egl/glut_egl.h>
@@ -100,5 +99,3 @@ _glutNativeFiniWindow(struct glut_window *win);
 
 void
 _glutNativeEventLoop(void);
-
-#endif /* _GLUT_EGLINT_H_ */

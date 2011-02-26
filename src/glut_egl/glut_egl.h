@@ -23,8 +23,7 @@
  *    Chia-I Wu <olv@lunarg.com>
  */
 
-#ifndef GLUT_EGL_H
-#define GLUT_EGL_H
+#pragma once
 
 enum {
    GLUT_RGB = 0,
@@ -104,5 +103,3 @@ void glutReshapeFunc(GLUT_EGLreshapeCB func);
 void glutKeyboardFunc(GLUT_EGLkeyboardCB func);
 void glutSpecialFunc(GLUT_EGLspecialCB func);
 void glutSwapBuffers(void);
-
-#endif /* GLUTH */
