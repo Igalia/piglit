@@ -29,10 +29,10 @@
 #include <stdarg.h>
 #include <sys/time.h>
 
-#include "EGL/egl.h"
-#include "EGL/eglext.h"
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 
-#include "glut_eglint.h"
+#include <glut_egl/glut_eglint.h>
 
 static struct glut_state _glut_state = {
    .api_mask = GLUT_OPENGL_ES1_BIT,

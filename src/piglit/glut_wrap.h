@@ -50,7 +50,7 @@ extern "C" {
 #endif
 
 #ifdef USE_EGLUT
-#	include "glut_egl/glut_egl.h"
+#	include <glut_egl/glut_egl.h>
 #endif
 
 #ifdef __cplusplus

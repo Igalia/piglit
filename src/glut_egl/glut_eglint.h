@@ -26,8 +26,8 @@
 #ifndef _GLUT_EGLINT_H_
 #define _GLUT_EGLINT_H_
 
-#include "EGL/egl.h"
-#include "glut_egl.h"
+#include <EGL/egl.h>
+#include <glut_egl/glut_egl.h>
 
 struct glut_window {
    EGLConfig config;

@@ -27,7 +27,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include "glut_eglint.h"
+#include <glut_egl/glut_eglint.h>
 
 void
 _glutNativeInitDisplay(void)
