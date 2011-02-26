@@ -107,7 +107,9 @@ int main(int argc, char *argv[])
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(piglit_escape_exit_key);
 
+#ifdef USE_OPENGL
 	glewInit();
+#endif
 
 	piglit_init(argc, argv);
 

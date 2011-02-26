@@ -175,7 +175,7 @@ extern GLint piglit_ARBfp_pass_through;
  * wrappers.
  */
 /*@{*/
-#if defined(PIGLIT_GLES2)
+#if defined(USE_OPENGL_ES2)
 #define piglit_AttachShader glAttachShader
 #define piglit_BindAttribLocation glBindAttribLocation
 #define piglit_CompileShader glCompileShader
