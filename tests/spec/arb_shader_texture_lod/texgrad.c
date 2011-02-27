@@ -57,6 +57,7 @@ static const char *sh_tex =
 	"}";
 
 static const char *sh_texgrad =
+	"#extension GL_ARB_shader_texture_lod : enable\n"
 	"uniform sampler2D tex;"
 	"void main()"
 	"{"
