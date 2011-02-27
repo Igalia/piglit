@@ -121,6 +121,8 @@ piglit_init(int argc, char **argv)
 	GLint loc;
 	GLint tex;
 
+	piglit_require_GLSL();
+
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
 	prog = piglit_link_simple_program(vs, fs);
