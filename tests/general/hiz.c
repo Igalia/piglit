@@ -33,12 +33,9 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_width = 400; /* Do not change the size! */
+int piglit_width = 400;
 int piglit_height = 400;
-int piglit_window_mode = GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH;
-
-/* approximately 1-pixel tolerance on edges */
-static float dist_eps = 1.0f / 400;
+int piglit_window_mode = GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE;
 
 enum {
 	INSIDE,
@@ -49,7 +46,8 @@ enum {
 int tri_point_intersect_2d(const float v0[2],
 			   const float v1[2],
 			   const float v2[2],
-			   const float p[2])
+			   const float p[2],
+                           float dist_eps)
 {
 	float n0[2];
 	float n1[2];
@@ -125,20 +123,25 @@ GLboolean pix_equal(int x, int y, const float probe[3], const float expected[3])
 	return ret;
 }
 
-enum piglit_result piglit_display()
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
+GLboolean test_less()
 {
-	const float bg[3] = {0.3, 0.3, 0.3};
+	const float bg[3] = {0.1, 0.1, 0.1};
 	const float c1[3] = {1.0, 0.3, 0.3};
-	const float v11[3] = {0.1, 0.9, -1.0};
-	const float v12[3] = {0.1, 0.1, -1.0};
-	const float v13[3] = {0.9, 0.5,  1.0};
-	const float c2[3] = {0.0, 1.0, 1.0};
-	const float v21[3] = {0.9, 0.9, 0.0};
-	const float v22[3] = {0.1, 0.5, 0.0};
-	const float v23[3] = {0.9, 0.1, 0.0};
+	const float v11[3] = {0, 1,   -1};
+	const float v12[3] = {0, 0,   -1};
+	const float v13[3] = {1, 0.5,  1};
+	const float c2[3] = {0.0, 1.0, 1};
+	const float v21[3] = {1, 1,   0};
+	const float v22[3] = {0, 0.5, 0};
+	const float v23[3] = {1, 0,   0};
 	float *pix;
-	int res = PIGLIT_SUCCESS;
 	int i,j;
+        float dist_eps = 1.0f / MIN2(piglit_width, piglit_height);
+
+	glClearDepth(1);
+	glDepthFunc(GL_LESS);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -156,8 +159,6 @@ enum piglit_result piglit_display()
 	glVertex3fv(v23);
 	glEnd();
 
-	glFlush();
-
 	pix = malloc(piglit_width * piglit_height * 12);
 	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGB, GL_FLOAT, pix);
 
@@ -171,8 +172,8 @@ enum piglit_result piglit_display()
 			p[0] = i / (float)(piglit_width-1);
 			p[1] = j / (float)(piglit_height-1);
 
-			t1_intersect = tri_point_intersect_2d(v11, v12, v13, p);
-			t2_intersect = tri_point_intersect_2d(v21, v22, v23, p);
+			t1_intersect = tri_point_intersect_2d(v11, v12, v13, p, dist_eps);
+			t2_intersect = tri_point_intersect_2d(v21, v22, v23, p, dist_eps);
 
 			if (t1_intersect == EDGE || t2_intersect == EDGE) {
 				//printf(" ");
@@ -187,27 +188,37 @@ enum piglit_result piglit_display()
 					}
 					if (p[0] < 0.5) {
 						//printf("2");
-						if (!pix_equal(i, j, px, c2))
-							res = PIGLIT_FAILURE;
+						if (!pix_equal(i, j, px, c2)) {
+							free(pix);
+							return GL_FALSE;
+						}
 					} else {
 						//printf("1");
-						if (!pix_equal(i, j, px, c1))
-							res = PIGLIT_FAILURE;
+						if (!pix_equal(i, j, px, c1)) {
+							free(pix);
+							return GL_FALSE;
+						}
 					}
 				} else {
 					//printf("1");
-					if (!pix_equal(i, j, px, c1))
-						res = PIGLIT_FAILURE;
+					if (!pix_equal(i, j, px, c1)) {
+						free(pix);
+						return GL_FALSE;
+					}
 				}
 			} else {
 				if (t2_intersect == INSIDE) {
 					//printf("2");
-					if (!pix_equal(i, j, px, c2))
-						res = PIGLIT_FAILURE;
+					if (!pix_equal(i, j, px, c2)) {
+						free(pix);
+						return GL_FALSE;
+					}
 				} else {
 					//printf("0");
-					if (!pix_equal(i, j, px, bg))
-						res = PIGLIT_FAILURE;
+					if (!pix_equal(i, j, px, bg)) {
+						free(pix);
+						return GL_FALSE;
+					}
 				}
 			}
 
@@ -217,23 +228,22 @@ enum piglit_result piglit_display()
 	}
 
 	free(pix);
-	return res;
+	return GL_TRUE;
 }
 
-static void reshape(int w, int h)
+enum piglit_result piglit_display()
 {
-	glViewport(0, 0, w, h);
+	GLboolean pass = GL_TRUE;
+
+	pass = pass && test_less();
+	glutSwapBuffers();
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char**argv)
 {
-	glutReshapeFunc(reshape);
-
-	glClearColor(0.3, 0.3, 0.3, 0.3);
-	glClearDepth(1);
-	glDepthFunc(GL_LESS);
+	glClearColor(0.1, 0.1, 0.1, 0.1);
 	glEnable(GL_DEPTH_TEST);
-	glReadBuffer(GL_FRONT);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
