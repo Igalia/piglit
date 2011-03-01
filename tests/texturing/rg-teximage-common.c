@@ -47,7 +47,7 @@
 
 #define EPSILON (1.0 / 255.0)
 /* give a large value for compression */
-#define EPSILON_COMP (5.0 / 255.0)
+#define EPSILON_COMP (20.0 / 255.0)
 
 enum piglit_result
 piglit_display(void)
@@ -77,7 +77,8 @@ compare_texture(const GLfloat *orig, const GLfloat *copy,
 	unsigned i;
 	float e;
 
-	if (orig_fmt == GL_COMPRESSED_RED_RGTC1 || orig_fmt == GL_COMPRESSED_RG_RGTC2)
+	if (orig_fmt == GL_COMPRESSED_RED_RGTC1 || orig_fmt == GL_COMPRESSED_RG_RGTC2 ||
+	    orig_fmt == GL_COMPRESSED_SIGNED_RED_RGTC1 || orig_fmt == GL_COMPRESSED_SIGNED_RG_RGTC2)
 		e = EPSILON_COMP;
 	else
 		e = EPSILON;
