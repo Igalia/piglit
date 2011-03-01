@@ -217,6 +217,10 @@ int main(int argc, char**argv)
 	glutCreateWindow("glslparsertest");
 	piglit_get_gl_version(NULL, &gl_version);
 
+#ifdef USE_OPENGL
+	glewInit();
+#endif
+
 	if (gl_version < 2.0
 	    && !piglit_is_extension_supported("GL_ARB_shader_objects")) {
 		printf("Requires OpenGL 2.0\n");
