@@ -100,7 +100,7 @@ create_array_fbo(void)
 
 	/* draw something into each layer of the array texture */
 	for (layer = 0; layer < NUM_LAYERS; layer++) {
-		glFramebufferTextureLayerEXT(GL_FRAMEBUFFER_EXT,
+		glFramebufferTextureLayer(GL_FRAMEBUFFER_EXT,
 					     GL_COLOR_ATTACHMENT0_EXT,
 					     tex,
 					     0,
