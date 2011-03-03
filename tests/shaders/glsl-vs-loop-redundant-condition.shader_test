@@ -1,0 +1,42 @@
+# This test reproduces Mesa bug 34370.
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 color;
+
+
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	int a, i;
+	for (i=0; i<5 && i<4; i++)
+	{
+		a = i;
+	}
+
+	if (a==3)
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	else if (a==0)
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (a==4)
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+	else
+		color = vec4(vec3(1.0 / float(a)), 1.0);
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
