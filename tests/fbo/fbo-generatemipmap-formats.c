@@ -119,7 +119,7 @@ key_func(unsigned char key, int x, int y)
 }
 
 static int
-create_tex(GLenum internalformat, GLenum baseformat)
+create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 {
 	GLuint tex;
 	int i;
@@ -144,7 +144,7 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
 					  tex_width, tex_height, GL_FALSE,
-					  GL_TRUE, GL_UNSIGNED_NORMALIZED);
+					  GL_TRUE, basetype);
 		format = GL_RGBA;
 		type = GL_FLOAT;
 	}
@@ -168,16 +168,110 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	return tex;
 }
 
-static void
-draw_mipmap(int x, int y, int level)
+static void _glTexEnv4f(GLenum target, GLenum pname,
+		       GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 {
+	float v[4] = {x, y, z, w};
+	glTexEnvfv(target, pname, v);
+}
+
+static void
+draw_mipmap(int x, int y, int level, GLenum basetype)
+{
+	int r, g, b, l, a, d, i;
+
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
+	if (GLEW_ARB_depth_texture) {
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+					 GL_TEXTURE_DEPTH_SIZE, &d);
+	} else {
+		d = 0;
+	}
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_LUMINANCE_SIZE, &l);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_ALPHA_SIZE, &a);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_INTENSITY_SIZE, &i);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_RED_SIZE, &r);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_GREEN_SIZE, &g);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
+				 GL_TEXTURE_BLUE_SIZE, &b);
+
 	glEnable(GL_TEXTURE_2D);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	switch (basetype) {
+	case GL_UNSIGNED_NORMALIZED:
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB,   GL_REPLACE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+		break;
+
+	case GL_SIGNED_NORMALIZED:
+	case GL_FLOAT:
+		/* TEX*CONST + COLOR*(1-CONST)
+		 *
+		 * Default:
+		 *    CONST = 1
+		 *
+		 * Signed normalized:
+		 *    Convert [-1, 1] to [0, 1] using:
+		 *    x * 0.5 + 0.5
+		 *
+		 *    CONST = 0.5
+		 *    COLOR = 1
+		 *
+		 * Float:
+		 *    Convert [-5, 5] to [0, 1] using:
+		 *    x * 0.1 + 0.5
+		 *
+		 *    CONST = 0.1
+		 *    COLOR = 0.5/0.9
+		 */
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB,   GL_INTERPOLATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_INTERPOLATE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB,   GL_TEXTURE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_TEXTURE);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB,   GL_PRIMARY_COLOR);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_PRIMARY_COLOR);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB,   GL_CONSTANT);
+		glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, GL_CONSTANT);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_RGB,   GL_SRC_COLOR);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_RGB,   GL_SRC_COLOR);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_RGB,   GL_SRC_COLOR);
+		glTexEnvf(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, GL_SRC_ALPHA);
+
+		if (basetype == GL_FLOAT) {
+			glColor4f(0.5/0.9, 0.5/0.9, 0.5/0.9, 0.5/0.9);
+			_glTexEnv4f(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR,
+				    r||l||i||d ? 0.1 : 1,
+				    g||l||i||d ? 0.1 : 1,
+				    b||l||i||d ? 0.1 : 1,
+				    a||i       ? 0.1 : 1);
+		} else {
+			glColor4f(1, 1, 1, 1);
+			_glTexEnv4f(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR,
+				    r||l||i||d ? 0.5 : 1,
+				    g||l||i||d ? 0.5 : 1,
+				    b||l||i||d ? 0.5 : 1,
+				    a||i       ? 0.5 : 1);
+		}
+		assert(glGetError() == 0);
+		break;
+
+	default:
+		assert(0);
+	}
+
 
 	piglit_draw_rect_tex(x, y,
 			     (tex_width >> level) ? (tex_width >> level) : 1,
@@ -257,15 +351,18 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 			wh[3] = 1.0;
 		}
 	} else if (a_size && !r_size && !l_size) {
-		r[0] = 1.0;
-		r[1] = 1.0;
-		r[2] = 1.0;
-		g[0] = 1.0;
-		g[1] = 1.0;
-		g[2] = 1.0;
-		b[0] = 1.0;
-		b[1] = 1.0;
-		b[2] = 1.0;
+		r[0] = 0.0;
+		r[1] = 0.0;
+		r[2] = 0.0;
+		g[0] = 0.0;
+		g[1] = 0.0;
+		g[2] = 0.0;
+		b[0] = 0.0;
+		b[1] = 0.0;
+		b[2] = 0.0;
+		wh[0] = 0.0;
+		wh[1] = 0.0;
+		wh[2] = 0.0;
 	} else {
 		if (!r_size) {
 			r[0] = 0.0;
@@ -352,7 +449,7 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 }
 
 static GLboolean
-test_format(const struct format_desc *format, GLenum baseformat)
+test_format(const struct format_desc *format, GLenum baseformat, GLenum basetype)
 {
 	GLuint tex;
 	int x;
@@ -360,11 +457,11 @@ test_format(const struct format_desc *format, GLenum baseformat)
 	GLboolean pass = GL_TRUE;
 
 	printf("Testing %s%s\n", format->name, tex_width == 256 ? "" : " (NPOT)");
-	tex = create_tex(format->internalformat, baseformat);
+	tex = create_tex(format->internalformat, baseformat, basetype);
 
 	x = 1;
 	for (level = 0; (tex_width >> level) || (tex_height >> level); level++) {
-		draw_mipmap(x, 1, level);
+		draw_mipmap(x, 1, level, basetype);
 		x += (tex_width >> level) + 1;
 	}
 
@@ -392,19 +489,19 @@ piglit_display(void)
 	if (piglit_automatic) {
 		for (i = 0; i < test_set->num_formats; i++) {
 			pass = test_format(&test_set->format[i],
-					   test_set->base) && pass;
+					   test_set->base, test_set->basetype) && pass;
 		}
 		if (GLEW_ARB_texture_non_power_of_two) {
 			set_npot(GL_TRUE);
 			for (i = 0; i < test_set->num_formats; i++) {
 				pass = test_format(&test_set->format[i],
-						   test_set->base) && pass;
+						   test_set->base, test_set->basetype) && pass;
 			}
 			set_npot(GL_FALSE);
 		}
 	} else {
 		pass = test_format(&test_sets[test_index].format[format_index],
-				   test_sets[test_index].base);
+				   test_sets[test_index].base, test_sets[test_index].basetype);
 	}
 
 	glutSwapBuffers();
@@ -420,6 +517,7 @@ void piglit_init(int argc, char **argv)
 	glutKeyboardFunc(key_func);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_texture_env_combine");
 
 	test_set = &test_sets[0];
 

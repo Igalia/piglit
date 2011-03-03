@@ -220,9 +220,12 @@ static const struct format_desc arb_depth_buffer_float[] = {
 static const struct format_desc ext_texture_compression_rgtc[] = {
 	FORMAT(GL_COMPRESSED_RED),
 	FORMAT(GL_COMPRESSED_RED_RGTC1_EXT),
-	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT),
 	FORMAT(GL_COMPRESSED_RG),
 	FORMAT(GL_COMPRESSED_RED_GREEN_RGTC2_EXT),
+};
+
+static const struct format_desc ext_texture_compression_rgtc_signed[] = {
+	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT),
 	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT),
 };
 
@@ -247,8 +250,11 @@ static const struct format_desc ati_texture_compression_3dc[] = {
 
 static const struct format_desc ext_texture_compression_latc[] = {
 	FORMAT(GL_COMPRESSED_LUMINANCE_LATC1_EXT),
-	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT),
 	FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT),
+};
+
+static const struct format_desc ext_texture_compression_latc_signed[] = {
+	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT),
 	FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT)
 };
 
@@ -283,6 +289,7 @@ struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
 	const char *param;
+	GLenum basetype;
 	const char *ext[3];
 	GLenum base;
 };
@@ -291,18 +298,21 @@ static const struct test_desc test_sets[] = {
 	{
 		core,
 		ARRAY_SIZE(core),
-		"Core formats"
+		"Core formats",
+		GL_UNSIGNED_NORMALIZED,
 	},
 	{
 		ext_texture_compression,
 		ARRAY_SIZE(ext_texture_compression),
 		"GL_ARB_texture_compression",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_texture_compression"}
 	},
 	{
 		tdfx_texture_compression_fxt1,
 		ARRAY_SIZE(tdfx_texture_compression_fxt1),
 		"GL_3DFX_texture_compression_FXT1",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_texture_compression",
 		 "GL_3DFX_texture_compression_FXT1"},
 	},
@@ -310,6 +320,7 @@ static const struct test_desc test_sets[] = {
 		ext_texture_compression_s3tc,
 		ARRAY_SIZE(ext_texture_compression_s3tc),
 		"GL_EXT_texture_compression_s3tc",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_texture_compression",
 		 "GL_EXT_texture_compression_s3tc"},
 	},
@@ -317,6 +328,7 @@ static const struct test_desc test_sets[] = {
 		arb_depth_texture,
 		ARRAY_SIZE(arb_depth_texture),
 		"GL_ARB_depth_texture",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_depth_texture"},
 		GL_DEPTH_COMPONENT,
 	},
@@ -324,6 +336,7 @@ static const struct test_desc test_sets[] = {
 		ext_packed_depth_stencil,
 		ARRAY_SIZE(ext_packed_depth_stencil),
 		"GL_EXT_packed_depth_stencil",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_EXT_packed_depth_stencil"},
 		GL_DEPTH_STENCIL,
 	},
@@ -331,12 +344,14 @@ static const struct test_desc test_sets[] = {
 		ext_texture_srgb,
 		ARRAY_SIZE(ext_texture_srgb),
 		"GL_EXT_texture_sRGB",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_EXT_texture_sRGB"}
 	},
 	{
 		ext_texture_srgb_compressed,
 		ARRAY_SIZE(ext_texture_srgb_compressed),
 		"GL_EXT_texture_sRGB-s3tc",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_EXT_texture_sRGB",
 		 "GL_ARB_texture_compression",
 		 "GL_EXT_texture_compression_s3tc"},
@@ -345,18 +360,21 @@ static const struct test_desc test_sets[] = {
 		ext_texture_integer,
 		ARRAY_SIZE(ext_texture_integer),
 		"GL_EXT_texture_integer",
+		GL_INT,
 		{"GL_EXT_texture_integer"}
 	},
 	{
 		arb_texture_rg,
 		ARRAY_SIZE(arb_texture_rg),
 		"GL_ARB_texture_rg",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_texture_rg"}
 	},
 	{
 		arb_texture_rg_int,
 		ARRAY_SIZE(arb_texture_rg_int),
 		"GL_ARB_texture_rg-int",
+		GL_INT,
 		{"GL_ARB_texture_rg",
 		 "GL_EXT_texture_integer"}
 	},
@@ -364,6 +382,7 @@ static const struct test_desc test_sets[] = {
 		arb_texture_rg_float,
 		ARRAY_SIZE(arb_texture_rg_float),
 		"GL_ARB_texture_rg-float",
+		GL_FLOAT,
 		{"GL_ARB_texture_rg",
 		 "GL_ARB_texture_float"}
 	},
@@ -371,18 +390,21 @@ static const struct test_desc test_sets[] = {
 		ext_texture_shared_exponent,
 		ARRAY_SIZE(ext_texture_shared_exponent),
 		"GL_EXT_texture_shared_exponent",
+		GL_UNSIGNED_NORMALIZED, /* XXX UNSIGNED_FLOAT */
 		{"GL_EXT_texture_shared_exponent"}
 	},
 	{
 		ext_packed_float,
 		ARRAY_SIZE(ext_packed_float),
 		"GL_EXT_packed_float",
+		GL_UNSIGNED_NORMALIZED, /* XXX UNSIGNED_FLOAT */
 		{"GL_EXT_packed_float"}
 	},
 	{
 		arb_depth_buffer_float,
 		ARRAY_SIZE(arb_depth_buffer_float),
 		"GL_ARB_depth_buffer_float",
+		GL_FLOAT,
 		{"GL_ARB_depth_buffer_float"},
 		/* XXX this extension consists of both DEPTH_COMPONENT and
 		 * DEPTH_STENCIL formats. */
@@ -392,30 +414,49 @@ static const struct test_desc test_sets[] = {
 		ext_texture_compression_rgtc,
 		ARRAY_SIZE(ext_texture_compression_rgtc),
 		"GL_EXT_texture_compression_rgtc",
+		GL_UNSIGNED_NORMALIZED,
+		{"GL_EXT_texture_compression_rgtc"}
+	},
+	{
+		ext_texture_compression_rgtc_signed,
+		ARRAY_SIZE(ext_texture_compression_rgtc_signed),
+		"GL_EXT_texture_compression_rgtc-signed",
+		GL_SIGNED_NORMALIZED,
 		{"GL_EXT_texture_compression_rgtc"}
 	},
 	{
 		arb_texture_float,
 		ARRAY_SIZE(arb_texture_float),
 		"GL_ARB_texture_float",
+		GL_FLOAT,
 		{"GL_ARB_texture_float"}
 	},
 	{
 		ati_texture_compression_3dc,
 		ARRAY_SIZE(ati_texture_compression_3dc),
 		"GL_ATI_texture_compression_3dc",
+		GL_UNSIGNED_NORMALIZED,
 		{"GL_ATI_texture_compression_3dc"}
 	},
 	{
 		ext_texture_compression_latc,
 		ARRAY_SIZE(ext_texture_compression_latc),
 		"GL_EXT_texture_compression_latc",
+		GL_UNSIGNED_NORMALIZED,
+		{"GL_EXT_texture_compression_latc"}
+	},
+	{
+		ext_texture_compression_latc_signed,
+		ARRAY_SIZE(ext_texture_compression_latc_signed),
+		"GL_EXT_texture_compression_latc-signed",
+		GL_SIGNED_NORMALIZED,
 		{"GL_EXT_texture_compression_latc"}
 	},
 	{
 		ext_texture_snorm,
 		ARRAY_SIZE(ext_texture_snorm),
 		"GL_EXT_texture_snorm",
+		GL_SIGNED_NORMALIZED,
 		{"GL_EXT_texture_snorm"}
 	},
 };

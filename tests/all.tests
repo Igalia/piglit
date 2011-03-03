@@ -1081,6 +1081,7 @@ add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
 add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_LATC1')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_LATC1')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_LATC2')
@@ -1089,6 +1090,7 @@ add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMI
 ext_texture_compression_rgtc = Group()
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RED_RGTC1')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_SIGNED_RED_RGTC1')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RG_RGTC2')
