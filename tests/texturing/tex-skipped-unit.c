@@ -92,7 +92,7 @@ piglit_display(void)
 	float white[4] = {1.0, 1.0, 1.0, 1.0};
 
 	tex = piglit_rgbw_texture(GL_RGBA, TEXSIZE, TEXSIZE,
-				  GL_FALSE, GL_FALSE);
+				  GL_FALSE, GL_FALSE, GL_UNSIGNED_NORMALIZED);
 	glActiveTexture(GL_TEXTURE1);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex);

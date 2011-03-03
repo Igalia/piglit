@@ -151,5 +151,5 @@ piglit_init(int argc, char **argv)
 	piglit_EnableVertexAttribArray(0);
 	piglit_EnableVertexAttribArray(1);
 
-	tex = piglit_rgbw_texture(GL_RGBA8, 64, 64, GL_FALSE, GL_TRUE);
+	tex = piglit_rgbw_texture(GL_RGBA8, 64, 64, GL_FALSE, GL_TRUE, GL_UNSIGNED_NORMALIZED);
 }

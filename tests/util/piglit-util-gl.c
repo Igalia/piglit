@@ -701,7 +701,7 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
  */
 GLuint
 piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
-		    GLboolean alpha)
+		    GLboolean alpha, GLenum basetype)
 {
 	GLfloat *data;
 	int size, x, y, level;
@@ -716,6 +716,32 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		green[3] = 1.0;
 		blue[3] = 1.0;
 		white[3] = 1.0;
+	}
+
+	switch (basetype) {
+	case GL_UNSIGNED_NORMALIZED:
+		break;
+
+	case GL_SIGNED_NORMALIZED:
+		for (x = 0; x < 4; x++) {
+			red[x] = red[x] * 2 - 1;
+			green[x] = green[x] * 2 - 1;
+			blue[x] = blue[x] * 2 - 1;
+			white[x] = white[x] * 2 - 1;
+		}
+		break;
+
+	case GL_FLOAT:
+		for (x = 0; x < 4; x++) {
+			red[x] = red[x] * 10 - 5;
+			green[x] = green[x] * 10 - 5;
+			blue[x] = blue[x] * 10 - 5;
+			white[x] = white[x] * 10 - 5;
+		}
+		break;
+
+	default:
+		assert(0);
 	}
 
 	glGenTextures(1, &tex);

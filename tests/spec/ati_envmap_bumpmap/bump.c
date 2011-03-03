@@ -106,7 +106,7 @@ piglit_display(void)
 
 	/* First: the base texture. */
 	tex = piglit_rgbw_texture(GL_RGBA, TEXSIZE, TEXSIZE,
-				  GL_FALSE, GL_FALSE);
+				  GL_FALSE, GL_FALSE, GL_UNSIGNED_NORMALIZED);
 	glActiveTexture(tex_unit);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex);
