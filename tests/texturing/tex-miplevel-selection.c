@@ -47,6 +47,7 @@ static const float colors[][3] = {
 	{0.0, 1.0, 1.0},
 	{1.0, 0.0, 1.0},
 };
+static GLboolean in_place_probing, no_bias, no_lod;
 
 void
 piglit_init(int argc, char **argv)
@@ -54,6 +55,15 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fb;
 	GLenum status;
 	int i, dim;
+
+        for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-inplace") == 0)
+			in_place_probing = GL_TRUE;
+		else if (strcmp(argv[i], "-nobias") == 0)
+			no_bias = GL_TRUE;
+		else if (strcmp(argv[i], "-nolod") == 0)
+			no_lod = GL_TRUE;
+        }
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	if (!GLEW_VERSION_1_4)
@@ -142,8 +152,29 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	int scale_to_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter, expected_level, x, y, i, c;
+	int scale_to_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
+	int expected_level, x, y, i, c;
+	int start_bias, end_bias;
+	int start_min_lod, end_min_lod, end_max_lod;
 	unsigned char *pix, *p;
+
+	if (no_bias) {
+		start_bias = 0;
+		end_bias = 0;
+	} else {
+		start_bias = -LAST_LEVEL;
+		end_bias = LAST_LEVEL;
+	}
+
+	if (no_lod) {
+		start_min_lod = 0;
+		end_min_lod = 0;
+		end_max_lod = 0;
+	} else {
+		start_min_lod = 0;
+		end_min_lod = LAST_LEVEL;
+		end_max_lod = LAST_LEVEL;
+	}
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -152,15 +183,18 @@ piglit_display(void)
 	for (scale_to_level = 0; scale_to_level <= LAST_LEVEL; scale_to_level++)
 		for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
 			for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
-				for (minlod = 0; minlod <= LAST_LEVEL; minlod++)
-					for (maxlod = minlod; maxlod <= LAST_LEVEL; maxlod++)
-						for (bias = -LAST_LEVEL; bias <= LAST_LEVEL; bias++)
+				for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
+					for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
+						for (bias = start_bias; bias <= end_bias; bias++)
 							for (mipfilter = 0; mipfilter < 2; mipfilter++) {
 								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, baselevel);
 								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxlevel);
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, minlod);
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, maxlod);
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
+								if (!no_lod) {
+									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, minlod);
+									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, maxlod);
+								}
+								if (!no_bias)
+									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
 								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 										mipfilter ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
 
@@ -168,53 +202,86 @@ piglit_display(void)
 								y = (i / (piglit_width/3)) * 3;
 								draw_quad(x, y, 3, 3, scale_to_level);
 
-								i++;
-							}
-
-	pix = malloc(piglit_width * piglit_height * 4);
-	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
-
-	i = 0;
-	for (scale_to_level = 0; scale_to_level <= LAST_LEVEL; scale_to_level++)
-		for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
-			for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
-				for (minlod = 0; minlod <= LAST_LEVEL; minlod++)
-					for (maxlod = minlod; maxlod <= LAST_LEVEL; maxlod++)
-						for (bias = -LAST_LEVEL; bias <= LAST_LEVEL; bias++)
-							for (mipfilter = 0; mipfilter < 2; mipfilter++) {
 								if (mipfilter) {
-									expected_level = CLAMP(scale_to_level + bias,
-											       MIN2(baselevel + minlod, maxlevel),
-											       MIN2(baselevel + maxlod, maxlevel));
+									if (no_lod) {
+										expected_level = CLAMP(scale_to_level + bias,
+												       baselevel,
+												       maxlevel);
+									} else {
+										expected_level = CLAMP(scale_to_level + bias,
+												       MIN2(baselevel + minlod, maxlevel),
+												       MIN2(baselevel + maxlod, maxlevel));
+									}
 								} else {
 									expected_level = baselevel;
 								}
 								assert(expected_level <= 5);
 
-								x = (i % (piglit_width/3)) * 3;
-								y = (i / (piglit_width/3)) * 3;
-								p = pix + (y*piglit_width + x)*4;
+                                                                if (in_place_probing &&
+                                                                    !piglit_probe_pixel_rgb(x, y, colors[expected_level])) {
+									pass = GL_FALSE;
+									printf("  Expected mipmap level: %i\n", expected_level);
+									printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
+									       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
+									       scale_to_level, baselevel, maxlevel, minlod,
+									       maxlod, bias, mipfilter ? "yes" : "no");
+                                                                }
 
-								for (c = 0; c < 3; c++) {
-									if (fabs(colors[expected_level][c] - (p[c]/255.0)) > 0.01) {
-										pass = GL_FALSE;
-
-										printf("Probe at (%i,%i)\n", x, y);
-										printf("  Expected mipmap level: %i\n", expected_level);
-										printf("  Expected: %f %f %f\n", colors[expected_level][0],
-										       colors[expected_level][1], colors[expected_level][2]);
-										printf("  Observed: %f %f %f\n", p[0]/255.0, p[1]/255.0, p[2]/255.0);
-										printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
-										       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
-										       scale_to_level, baselevel, maxlevel, minlod,
-										       maxlod, bias, mipfilter ? "yes" : "no");
-										break;
-									}
-								}
 								i++;
 							}
 
-	free(pix);
+	if (!in_place_probing) {
+		pix = malloc(piglit_width * piglit_height * 4);
+		glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
+
+		i = 0;
+		for (scale_to_level = 0; scale_to_level <= LAST_LEVEL; scale_to_level++)
+			for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
+				for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
+					for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
+						for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
+							for (bias = start_bias; bias <= end_bias; bias++)
+								for (mipfilter = 0; mipfilter < 2; mipfilter++) {
+									if (mipfilter) {
+										if (no_lod) {
+											expected_level = CLAMP(scale_to_level + bias,
+													       baselevel,
+													       maxlevel);
+										} else {
+											expected_level = CLAMP(scale_to_level + bias,
+													       MIN2(baselevel + minlod, maxlevel),
+													       MIN2(baselevel + maxlod, maxlevel));
+										}
+									} else {
+										expected_level = baselevel;
+									}
+									assert(expected_level <= 5);
+
+									x = (i % (piglit_width/3)) * 3;
+									y = (i / (piglit_width/3)) * 3;
+									p = pix + (y*piglit_width + x)*4;
+
+									for (c = 0; c < 3; c++) {
+										if (fabs(colors[expected_level][c] - (p[c]/255.0)) > 0.01) {
+											pass = GL_FALSE;
+
+											printf("Probe at (%i,%i)\n", x, y);
+											printf("  Expected: %f %f %f\n", colors[expected_level][0],
+											       colors[expected_level][1], colors[expected_level][2]);
+											printf("  Observed: %f %f %f\n", p[0]/255.0, p[1]/255.0, p[2]/255.0);
+											printf("  Expected mipmap level: %i\n", expected_level);
+											printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
+											       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
+											       scale_to_level, baselevel, maxlevel, minlod,
+											       maxlod, bias, mipfilter ? "yes" : "no");
+											break;
+										}
+									}
+									i++;
+								}
+		free(pix);
+	}
+
 
 	glutSwapBuffers();
 
