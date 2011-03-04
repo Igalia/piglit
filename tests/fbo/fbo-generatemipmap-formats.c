@@ -44,22 +44,6 @@ static const struct test_desc *test_set;
 static int test_index;
 static int format_index;
 
-static GLboolean
-supported(const struct test_desc *test)
-{
-	unsigned i;
-
-	for (i = 0; i < 3; i++) {
-		if (test->ext[i]) {
-			if (!glutExtensionSupported(test->ext[i])) {
-				return GL_FALSE;
-			}
-		}
-	}
-
-	return GL_TRUE;
-}
-
 static void set_npot(GLboolean npot)
 {
 	if (npot) {

@@ -44,22 +44,6 @@ static const struct test_desc *test_set;
 static int test_index;
 static int format_index;
 
-static GLboolean
-supported(const struct test_desc *test)
-{
-	unsigned i;
-
-	for (i = 0; i < 3; i++) {
-		if (test->ext[i]) {
-			if (!glutExtensionSupported(test->ext[i])) {
-				return GL_FALSE;
-			}
-		}
-	}
-
-	return GL_TRUE;
-}
-
 static void
 key_func(unsigned char key, int x, int y)
 {
@@ -408,7 +392,7 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 	return pass;
 }
 
-static GLboolean
+static enum piglit_result
 test_format(const struct format_desc *format, GLenum baseformat)
 {
 	int dim;
