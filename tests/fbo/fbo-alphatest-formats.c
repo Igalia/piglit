@@ -1,0 +1,387 @@
+/*
+ * Copyright © 2010 Intel Corporation
+ * Copyright © 2010 Marek Olšák <maraeo@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * Authors:
+ *    Eric Anholt <eric@anholt.net>
+ *    Marek Olšák <maraeo@gmail.com>
+ *
+ */
+
+#include "piglit-util.h"
+#include "fbo-formats.h"
+
+int piglit_width = 128;
+int piglit_height = 64;
+int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+
+static const struct test_desc *test_set;
+static int test_index;
+static int format_index;
+
+static void alphatest(const float *rect, float alpha, GLenum func, float ref)
+{
+	glColor4f(1, 1, 1, alpha);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(func, ref);
+	piglit_draw_rect(rect[0], rect[1], rect[2], rect[3]);
+	glDisable(GL_ALPHA_TEST);
+	glColor4f(1, 1, 1, 1);
+}
+
+static enum piglit_result test_format(const struct format_desc *format, GLenum baseformat)
+{
+	GLboolean pass = GL_TRUE;
+	GLuint tex, fb;
+	GLenum status;
+	int r, g, b, l, a, i;
+
+	float cpass[] = {1, 1, 1, 1};
+	float cfail[] = {0, 0, 0, 0};
+
+	float pos0[] = {-1.0,  -1.0, 0.25, 2.0};
+	float pos1[] = {-0.75, -1.0, 0.25, 2.0};
+	float pos2[] = {-0.5,  -1.0, 0.25, 2.0};
+	float pos3[] = {-0.25, -1.0, 0.25, 2.0};
+	float pos4[] = { 0.0,  -1.0, 0.25, 2.0};
+	float pos5[] = { 0.25, -1.0, 0.25, 2.0};
+	float pos6[] = { 0.5,  -1.0, 0.25, 2.0};
+	float pos7[] = { 0.75, -1.0, 0.25, 2.0};
+
+        if (baseformat == GL_DEPTH_COMPONENT ||
+            baseformat == GL_DEPTH_STENCIL)
+		return PIGLIT_SKIP;
+
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	glViewport(0, 0, piglit_width, piglit_height);
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, format->internalformat,
+		     piglit_width, piglit_height, 0,
+		     GL_RGBA, GL_FLOAT, NULL);
+
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_LUMINANCE_SIZE, &l);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_ALPHA_SIZE, &a);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_INTENSITY_SIZE, &i);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_RED_SIZE, &r);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_GREEN_SIZE, &g);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_BLUE_SIZE, &b);
+
+        if (i) {
+		cpass[3] = cpass[2] = cpass[1] = cpass[0];
+		cfail[3] = cfail[2] = cfail[1] = cfail[0];
+        } else if (l) {
+		cpass[2] = cpass[1] = cpass[0];
+		cfail[2] = cfail[1] = cfail[0];
+		if (!a) {
+			cpass[3] = 1;
+			cfail[3] = 1;
+		}
+        } else {
+		if (!r) {
+			cpass[0] = 0;
+			cfail[0] = 0;
+		}
+		if (!g) {
+			cpass[1] = 0;
+			cfail[1] = 0;
+		}
+		if (!b) {
+			cpass[2] = 0;
+			cfail[2] = 0;
+		}
+		if (!a) {
+			cpass[3] = 1;
+			cfail[3] = 1;
+		}
+        }
+
+	/* Clamp the bits for the framebuffer, except we aren't checking
+	 * the actual framebuffer bits.
+	 */
+	if (l > 8)
+		l = 8;
+	if (i > 8)
+		i = 8;
+	if (r > 8)
+		r = 8;
+	if (g > 8)
+		g = 8;
+	if (b > 8)
+		b = 8;
+	if (a > 8)
+		a = 8;
+
+        if (i) {
+		piglit_set_tolerance_for_bits(i, i, i, i);
+        } else if (l) {
+		piglit_set_tolerance_for_bits(l, l, l, a);
+        } else {
+		piglit_set_tolerance_for_bits(r, g, b, a);
+        }
+
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				  GL_COLOR_ATTACHMENT0_EXT,
+				  GL_TEXTURE_2D,
+				  tex,
+				  0);
+	assert(glGetError() == 0);
+
+	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	printf("Testing %s", format->name);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		printf(" - fbo incomplete (status = 0x%04x)\n", status);
+		return PIGLIT_SKIP;
+	}
+        printf("\n");
+
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	alphatest(pos0, 0.2, GL_LESS, 0.25);
+	alphatest(pos1, 0.96, GL_LEQUAL, 0.92);
+	alphatest(pos2, 0.6, GL_GREATER, 0.55);
+	alphatest(pos3, 0.9, GL_GREATER, 0.1);
+	alphatest(pos4, 0.35, GL_GEQUAL, 0.4);
+	alphatest(pos5, 0.4, GL_EQUAL, 0.4);
+	alphatest(pos6, 0.8, GL_NOTEQUAL, 0.8);
+	alphatest(pos7, 0.3, GL_NEVER, 3);
+
+	if (!piglit_probe_pixel_rgb(piglit_width * 1 / 16, 0, cpass)) {
+		printf("  when testing FBO result, 1: 0.2 < 0.25.\n");
+		pass = GL_FALSE;
+        }
+	if (!piglit_probe_pixel_rgb(piglit_width * 3 / 16, 0, cfail)) {
+		printf("  when testing FBO result, 2: 0.96 <= 0.92.\n");
+		pass = GL_FALSE;
+        }
+	if (!piglit_probe_pixel_rgb(piglit_width * 5 / 16, 0, cpass)) {
+		printf("  when testing FBO result, 3: 0.6 > 0.55.\n");
+		pass = GL_FALSE;
+        }
+	if (!piglit_probe_pixel_rgb(piglit_width * 7 / 16, 0, cpass)) {
+		printf("  when testing FBO result, 4: 0.9 > 0.1.\n");
+		pass = GL_FALSE;
+        }
+	if (!piglit_probe_pixel_rgb(piglit_width * 9 / 16, 0, cfail)) {
+		printf("  when testing FBO result, 5: 0.35 >= 0.4.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 11 / 16, 0, cpass)) {
+		printf("  when testing FBO result, 6: 0.4 == 0.4.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 13 / 16, 0, cfail)) {
+		printf("  when testing FBO result, 7: 0.8 != 0.8.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 15 / 16, 0, cfail)) {
+		printf("  when testing FBO result, 8: FALSE.\n");
+		pass = GL_FALSE;
+	}
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glViewport(0, 0, piglit_width, piglit_height);
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB,   GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
+
+	glColor4f(1, 1, 1, 1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	piglit_draw_rect_tex(-1, -1, 2, 2,
+			     0, 0, 1, 1);
+
+	glDisable(GL_TEXTURE_2D);
+	glDeleteTextures(1, &tex);
+	glDeleteFramebuffersEXT(1, &fb);
+
+	if (!piglit_probe_pixel_rgb(piglit_width * 1 / 16, 0, cpass)) {
+		printf("  when testing window result, 1: 0.2 < 0.25.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 3 / 16, 0, cfail)) {
+		printf("  when testing window result, 2: 0.96 <= 0.92.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 5 / 16, 0, cpass)) {
+		printf("  when testing window result, 3: 0.6 > 0.55.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 7 / 16, 0, cpass)) {
+		printf("  when testing window result, 4: 0.9 > 0.1.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 9 / 16, 0, cfail)) {
+		printf("  when testing window result, 5: 0.35 >= 0.4.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 11 / 16, 0, cpass)) {
+		printf("  when testing window result, 6: 0.4 == 0.4.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 13 / 16, 0, cfail)) {
+		printf("  when testing window result, 7: 0.8 != 0.8.\n");
+		pass = GL_FALSE;
+	}
+	if (!piglit_probe_pixel_rgb(piglit_width * 15 / 16, 0, cfail)) {
+		printf("  when testing window result, 8: FALSE.\n");
+		pass = GL_FALSE;
+	}
+
+	glutSwapBuffers();
+
+	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+}
+
+static void add_result(bool *all_skip, enum piglit_result *end_result,
+		       enum piglit_result new)
+{
+	if (new != PIGLIT_SKIP)
+		*all_skip = false;
+
+	if (new == PIGLIT_FAILURE)
+		*end_result = new;
+}
+
+enum piglit_result piglit_display(void)
+{
+	enum piglit_result result, end_result = PIGLIT_SUCCESS;
+	bool all_skip = true;
+	int i;
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glClearColor(0.5, 0.5, 0.5, 0.5);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (piglit_automatic) {
+		for (i = 0; i < test_set->num_formats; i++) {
+			result = test_format(&test_set->format[i],
+					     test_set->base);
+			add_result(&all_skip, &end_result, result);
+		}
+	} else {
+		result = test_format(&test_sets[test_index].format[format_index],
+				     test_sets[test_index].base);
+		add_result(&all_skip, &end_result, result);
+	}
+
+	glutSwapBuffers();
+
+	if (all_skip)
+		return PIGLIT_SKIP;
+	return end_result;
+}
+
+static void key_func(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case 'n': /* next test set */
+		do {
+			test_index++;
+			if (test_index >= ARRAY_SIZE(test_sets)) {
+				test_index = 0;
+			}
+		} while (!supported(&test_sets[test_index]));
+		format_index = 0;
+		printf("Using test set: %s\n", test_sets[test_index].param);
+		break;
+
+	case 'N': /* previous test set */
+		do {
+			test_index--;
+			if (test_index < 0) {
+				test_index = ARRAY_SIZE(test_sets) - 1;
+			}
+		} while (!supported(&test_sets[test_index]));
+		format_index = 0;
+		printf("Using test set: %s\n", test_sets[test_index].param);
+		break;
+
+	case 'm': /* next format */
+		format_index++;
+		if (format_index >= test_sets[test_index].num_formats) {
+			format_index = 0;
+		}
+		break;
+
+	case 'M': /* previous format */
+		format_index--;
+		if (format_index < 0) {
+			format_index = test_sets[test_index].num_formats - 1;
+		}
+		break;
+	}
+
+	piglit_escape_exit_key(key, x, y);
+}
+
+void piglit_init(int argc, char **argv)
+{
+	int i, j, k;
+
+	glutKeyboardFunc(key_func);
+
+	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_texture_env_combine");
+
+	test_set = &test_sets[0];
+
+	for (i = 1; i < argc; i++) {
+		for (j = 1; j < ARRAY_SIZE(test_sets); j++) {
+			if (!strcmp(argv[i], test_sets[j].param)) {
+				for (k = 0; k < 3; k++) {
+					if (test_sets[j].ext[k]) {
+						piglit_require_extension(test_sets[j].ext[k]);
+					}
+				}
+
+				test_set = &test_sets[j];
+				break;
+			}
+		}
+		if (j == ARRAY_SIZE(test_sets)) {
+			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
+			exit(1);
+		}
+	}
+
+	if (!piglit_automatic) {
+		printf("    -n   Next test set.\n"
+		       "    -N   Previous test set.\n"
+		       "    -m   Next format in the set.\n"
+		       "    -M   Previous format in the set.\n");
+	}
+
+	printf("Using test set: %s\n", test_set->param);
+}

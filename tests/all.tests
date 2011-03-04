@@ -89,6 +89,9 @@ def add_fbo_clear_extension(group, extension, name):
 def add_fbo_blending_extension(group, extension, name):
 	group[name] = PlainExecTest(['fbo-blending-formats', '-auto', extension])
 
+def add_fbo_alphatest_extension(group, extension, name):
+	group[name] = PlainExecTest(['fbo-alphatest-formats', '-auto', extension])
+
 mesa = Group()
 add_plain_test(mesa, 'crossbar')
 
@@ -100,6 +103,7 @@ fbo = Group()
 add_plain_test(fbo, 'fbo-1d')
 add_plain_test(fbo, 'fbo-3d')
 add_plain_test(fbo, 'fbo-alpha')
+add_plain_test(fbo, 'fbo-alphatest-formats')
 add_plain_test(fbo, 'fbo-array')
 add_plain_test(fbo, 'fbo-luminance-alpha')
 add_plain_test(fbo, 'fbo-blending-formats')
@@ -1121,6 +1125,7 @@ spec['EXT_packed_float'] = ext_packed_float
 add_fbo_generatemipmap_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-generatemipmap-formats')
 add_fbo_clear_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-clear-formats')
 add_fbo_blending_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-blending-formats')
+add_fbo_alphatest_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-alphatest-formats')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 
 arb_texture_float = Group()
@@ -1128,6 +1133,7 @@ spec['ARB_texture_float'] = arb_texture_float
 add_fbo_generatemipmap_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-generatemipmap-formats')
 add_fbo_clear_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-clear-formats')
 add_fbo_blending_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-blending-formats')
+add_fbo_alphatest_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-alphatest-formats')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')
@@ -1156,6 +1162,8 @@ add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-clear-formats'
 add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-clear-formats-float')
 add_fbo_blending_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-blending-formats')
 add_fbo_blending_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-blending-formats-float')
+add_fbo_alphatest_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-alphatest-formats')
+add_fbo_alphatest_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-alphatest-formats-float')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16')
@@ -1170,6 +1178,7 @@ spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
 add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
 add_fbo_clear_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-clear-formats')
 add_fbo_blending_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-blending-formats')
+add_fbo_alphatest_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-alphatest-formats')
 add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 
 ext_texture_snorm = Group()
@@ -1177,6 +1186,7 @@ spec['EXT_texture_snorm'] = ext_texture_snorm
 add_fbo_generatemipmap_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-generatemipmap-formats')
 add_fbo_clear_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-clear-formats')
 add_fbo_blending_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-blending-formats')
+add_fbo_alphatest_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-alphatest-formats')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_R8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RG8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RGB8_SNORM')
@@ -1199,6 +1209,7 @@ spec['EXT_texture_sRGB'] = ext_texture_srgb
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-generatemipmap-formats')
 # TODO: also use GL_ARB_framebuffer_sRGB:
 #add_fbo_blending_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-blending-formats')
+add_fbo_alphatest_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-alphatest-formats')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
 
 ati_envmap_bumpmap = Group()
