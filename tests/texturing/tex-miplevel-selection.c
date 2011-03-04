@@ -224,7 +224,7 @@ piglit_display(void)
 									printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
 									       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
 									       scale_to_level, baselevel, maxlevel, minlod,
-									       maxlod, bias, mipfilter ? "yes" : "no");
+									       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
                                                                 }
 
 								i++;
@@ -273,7 +273,7 @@ piglit_display(void)
 											printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
 											       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
 											       scale_to_level, baselevel, maxlevel, minlod,
-											       maxlod, bias, mipfilter ? "yes" : "no");
+											       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
 											break;
 										}
 									}
@@ -281,7 +281,6 @@ piglit_display(void)
 								}
 		free(pix);
 	}
-
 
 	glutSwapBuffers();
 
