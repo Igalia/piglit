@@ -1,0 +1,22 @@
+#This test reproduces Mesa bug 34374.
+[require]
+GLSL >= 1.20
+
+[vertex shader file]
+glsl-mvp.vert
+
+[fragment shader]
+#version 120
+void main()
+{
+	float a[];
+	float a[] = float[](0,1);
+	if (a[1] == 1)
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
