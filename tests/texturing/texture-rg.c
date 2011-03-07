@@ -155,7 +155,7 @@ test_teximage_formats(void)
 
       if (info->IsCompressed) {
          /* use extra large error margin */
-         error = 5.0 / 255.0;
+         error = 1.0 / 15.0;
       }
 
       fill_texture_image(TexWidth, TexHeight, comps, image);
