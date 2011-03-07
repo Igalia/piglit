@@ -18,6 +18,20 @@ IF (C_COMPILER_FLAG_WALL)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 ENDIF (C_COMPILER_FLAG_WALL)
 
+if (APPLE)
+	find_path(GLEXT_INCLUDE_DIR
+		NAMES OpenGL/glext.h
+		PATHS ${OPENGL_INCLUDE_DIR}
+		DOC "Include for OpenGL/glext.h on OSX"
+	)
+else (APPLE)
+	find_path(GLEXT_INCLUDE_DIR
+		NAMES GL/glext.h
+		PATHS ${OPENGL_INCLUDE_DIR}
+		DOC "Include for GL/glext.h"
+	)
+endif (APPLE)
+
 FIND_LIBRARY(OPENGL_egl_LIBRARY
       NAMES EGL
       PATHS /usr/lib
