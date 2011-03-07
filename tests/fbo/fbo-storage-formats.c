@@ -211,6 +211,9 @@ test(void)
                 TestName, Formats[i].format);
          pass = GL_FALSE;
       }
+      printf("0x%04X: %s\n", Formats[i].format,
+             glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT ?
+             "complete" : "incomplete");
    }
 
    /* test formats that should fail */
