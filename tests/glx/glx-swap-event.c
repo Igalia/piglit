@@ -34,7 +34,7 @@
 #include <sys/time.h>
 
 
-#ifdef GLX_MESA_swap_control
+#if defined(GLX_MESA_swap_control) && defined(GLX_INTEL_swap_event)
 
 
 /* return current time (in seconds) */
@@ -527,4 +527,4 @@ main(int argc, char *argv[])
    return 0;
 }
 
-#endif /* GLX_MESA_swap_control */
+#endif /* GLX_MESA_swap_control && GLX_INTEL_swap_event */
