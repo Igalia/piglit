@@ -38,8 +38,16 @@ FIND_LIBRARY(OPENGL_egl_LIBRARY
 )
 find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
-set(EXECUTABLE_OUTPUT_PATH ${piglit_BINARY_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${piglit_BINARY_DIR}/lib)
+# Put all executables into the bin subdirectory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${piglit_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${piglit_BINARY_DIR}/lib)
+
+# Do the same for MSVC, regardless of the build type. This only works correctly
+# for CMake 2.8.1 and above.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${piglit_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${piglit_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${piglit_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${piglit_BINARY_DIR}/bin)
 
 check_function_exists(strchrnul HAVE_STRCHRNUL)
 check_function_exists(fopen_s   HAVE_FOPEN_S)
