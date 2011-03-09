@@ -55,26 +55,6 @@ void piglit_require_not_extension(const char *name)
 	}
 }
 
-static float tolerance[4] = { 0.01, 0.01, 0.01, 0.01 };
-
-void
-piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits)
-{
-	int bits[4] = {rbits, gbits, bbits, abits};
-	int i;
-
-	for (i = 0; i < 4; i++) {
-		if (bits[i] < 2) {
-			/* Don't try to validate channels when there's only 1
-			 * bit of precision (or none).
-			 */
-			tolerance[i] = 1.0;
-		} else {
-			tolerance[i] = 3.0 / (1 << bits[i]);
-		}
-	}
-}
-
 /**
  * Read a pixel from the given location and compare its RGBA value to the
  * given expected values.
@@ -91,7 +71,7 @@ int piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, probe);
 
 	for(i = 0; i < 4; ++i) {
-		if (fabs(probe[i] - expected[i]) > tolerance[i]) {
+		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i]) {
 			pass = GL_FALSE;
 		}
 	}
@@ -120,7 +100,7 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 			probe = &pixels[(j*w+i)*4];
 
 			for (p = 0; p < 4; ++p) {
-				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f %f\n",
 					       expected[0], expected[1], expected[2], expected[3]);
@@ -153,7 +133,7 @@ piglit_probe_image_rgb(int x, int y, int w, int h, const float *image)
 			probe = &pixels[(j*w+i)*3];
 
 			for (p = 0; p < 3; ++p) {
-				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f\n",
 					       expected[0], expected[1], expected[2]);
@@ -186,7 +166,7 @@ piglit_probe_image_rgba(int x, int y, int w, int h, const float *image)
 			probe = &pixels[(j*w+i)*4];
 
 			for (p = 0; p < 4; ++p) {
-				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f %f\n",
 					       expected[0], expected[1], expected[2], expected[3]);
@@ -221,7 +201,7 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 
 
 	for(i = 0; i < 3; ++i) {
-		if (fabs(probe[i] - expected[i]) > tolerance[i]) {
+		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i]) {
 			pass = GL_FALSE;
 		}
 	}
@@ -250,7 +230,7 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 			probe = &pixels[(j*w+i)*3];
 
 			for (p = 0; p < 3; ++p) {
-				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f\n",
 					       expected[0], expected[1], expected[2]);
@@ -424,7 +404,7 @@ int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 			probe2 = &pixels[(j*w+wh+i)*4];
 
 			for (p = 0; p < 4; ++p) {
-				if (fabs(probe1[p] - probe2[p]) >= tolerance[p]) {
+				if (fabs(probe1[p] - probe2[p]) >= piglit_tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Left: %f %f %f %f\n",
 					       probe1[0], probe1[1], probe1[2], probe1[3]);

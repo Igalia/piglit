@@ -367,6 +367,27 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 	return prog;
 }
 
+float piglit_tolerance[4] = { 0.01, 0.01, 0.01, 0.01 };
+
+void
+piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits)
+{
+	int bits[4] = {rbits, gbits, bbits, abits};
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		if (bits[i] < 2) {
+			/* Don't try to validate channels when there's only 1
+			 * bit of precision (or none).
+			 */
+			piglit_tolerance[i] = 1.0;
+		} else {
+			piglit_tolerance[i] = 3.0 / (1 << bits[i]);
+		}
+	}
+}
+
+
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c)
 {
