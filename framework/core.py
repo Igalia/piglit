@@ -80,7 +80,10 @@ def encode(text):
 def decode(text):
 	return text.decode("string_escape")
 
-testBinDir = os.path.dirname(__file__) + '/../bin/'
+if 'PIGLIT_BUILD_DIR' in os.environ:
+    testBinDir = os.environ['PIGLIT_BUILD_DIR'] + '/bin/'
+else:
+    testBinDir = os.path.dirname(__file__) + '/../bin/'
 
 
 #############################################################################

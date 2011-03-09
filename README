@@ -56,7 +56,13 @@ Make sure that everything is set up correctly:
 
   $ ./piglit-run.py tests/sanity.tests results/sanity.results
 
-This will run some minimal tests. Use
+This will run some minimal tests.  If you built Piglit out-of-source, then the
+environment variable PIGLIT_BUILD_DIR must be set:
+
+  $ env PIGLIT_BUILD_DIR=/path/to/piglit/build/dir \
+    ./piglit-run.py tests/sanity.tests results/sanity.results
+
+Use
 
   $ ./piglit-run.py
 
