@@ -48,14 +48,12 @@ void piglit_glutInit(int argc, char **argv)
 #endif
 }
 
-void piglit_get_gl_version(bool *es, float* version)
+void piglit_get_gl_version(bool *es, int* major, int* minor)
 {
 	/* Version of OpenGL API. */
 	bool es_local;
-	int major;
-	int minor;
-	const size_t buffer_size = 32;
-	char buffer[32];
+	int major_local;
+	int minor_local;
 
 	const char *version_string;
 	int c; /* scanf count */
@@ -65,23 +63,23 @@ void piglit_get_gl_version(bool *es, float* version)
 	if (es_local) {
 		c = sscanf(version_string,
 		           "OpenGL ES %i.%i",
-		           &major,
-		           &minor);
+		           &major_local,
+		           &minor_local);
 	} else {
 		c = sscanf(version_string,
 		           "%i.%i",
-		           &major,
-		           &minor);
+		           &major_local,
+		           &minor_local);
 	}
 	assert(c == 2);
-	memset(buffer, 0, buffer_size * sizeof(char));
-	sprintf(buffer, "%i.%i", major, minor);
 
 	/* Write outputs. */
 	if (es != NULL)
 		*es = es_local;
-	if (version != NULL)
-		*version = strtod(buffer, NULL);
+	if (major != NULL)
+		*major = major_local;
+	if (minor != NULL)
+		*minor = minor_local;
 }
 
 bool piglit_is_extension_supported(const char *name)

@@ -86,9 +86,8 @@ void piglit_glutInit(int argc, char **argv);
  * Null parameters are ignored.
  *
  * \param es Is the API OpenGL or OpenGL ES?
- * \param version In the form of 'major.minor'.
  */
-void piglit_get_gl_version(bool *es, float* version);
+void piglit_get_gl_version(bool *es, int* major, int* minor);
 
 /**
  * \precondition name is not null

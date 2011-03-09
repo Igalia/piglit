@@ -41,7 +41,7 @@
 
 static char *filename;
 static int expected_pass;
-static float gl_version = 0;
+static int gl_major_version = 0;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -49,7 +49,7 @@ get_shader_compile_status(GLuint shader)
 	GLint status;
 
 #if defined USE_OPENGL
-	if (gl_version >= 2.0) {
+	if (gl_major_version >= 2) {
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	} else {
 		glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB, &status);
@@ -69,7 +69,7 @@ get_shader_info_log_length(GLuint shader)
 	GLsizei length;
 
 #if defined USE_OPENGL
-	if (gl_version >= 2.0) {
+	if (gl_major_version >= 2) {
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 	} else {
 		glGetObjectParameterivARB(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length);
@@ -215,13 +215,13 @@ int main(int argc, char**argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
 	glutCreateWindow("glslparsertest");
-	piglit_get_gl_version(NULL, &gl_version);
+	piglit_get_gl_version(NULL, &gl_major_version, NULL);
 
 #ifdef USE_OPENGL
 	glewInit();
 #endif
 
-	if (gl_version < 2.0
+	if (gl_major_version < 2
 	    && !piglit_is_extension_supported("GL_ARB_shader_objects")) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
