@@ -691,7 +691,7 @@ piglit_display(void)
 				  "texture rgbw %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE, GL_FALSE);
+			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE, GL_FALSE, 0);
 			glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture checkerboard %d %d ( %d , %d ) "

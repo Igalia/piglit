@@ -408,7 +408,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
  */
 GLuint
 piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
-		    GLboolean alpha)
+		    GLboolean alpha, GLenum basetype)
 {
 	GLubyte *data;
 	int size, x, y, level;
