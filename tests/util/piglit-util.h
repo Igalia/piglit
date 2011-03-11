@@ -90,6 +90,13 @@ void piglit_glutInit(int argc, char **argv);
 void piglit_get_gl_version(bool *es, int* major, int* minor);
 
 /**
+ * Null parameters are ignored.
+ *
+ * \param es Is it GLSL ES?
+ */
+void piglit_get_glsl_version(bool *es, int* major, int* minor);
+
+/**
  * \precondition name is not null
  */
 bool piglit_is_extension_supported(const char *name);
