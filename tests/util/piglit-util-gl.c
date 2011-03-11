@@ -138,6 +138,72 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 	return 1;
 }
 
+int
+piglit_probe_image_rgb(int x, int y, int w, int h, const float *image)
+{
+	int i, j, p;
+	GLfloat *probe;
+	GLfloat *pixels = malloc(w*h*3*sizeof(float));
+
+	glReadPixels(x, y, w, h, GL_RGB, GL_FLOAT, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			const float *expected = &image[(j*w+i)*3];
+			probe = &pixels[(j*w+i)*3];
+
+			for (p = 0; p < 3; ++p) {
+				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+					printf("Probe at (%i,%i)\n", x+i, y+j);
+					printf("  Expected: %f %f %f\n",
+					       expected[0], expected[1], expected[2]);
+					printf("  Observed: %f %f %f\n",
+					       probe[0], probe[1], probe[2]);
+
+					free(pixels);
+					return 0;
+				}
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
+int
+piglit_probe_image_rgba(int x, int y, int w, int h, const float *image)
+{
+	int i, j, p;
+	GLfloat *probe;
+	GLfloat *pixels = malloc(w*h*4*sizeof(float));
+
+	glReadPixels(x, y, w, h, GL_RGBA, GL_FLOAT, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			const float *expected = &image[(j*w+i)*4];
+			probe = &pixels[(j*w+i)*4];
+
+			for (p = 0; p < 4; ++p) {
+				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+					printf("Probe at (%i,%i)\n", x+i, y+j);
+					printf("  Expected: %f %f %f %f\n",
+					       expected[0], expected[1], expected[2], expected[3]);
+					printf("  Observed: %f %f %f %f\n",
+					       probe[0], probe[1], probe[2], probe[3]);
+
+					free(pixels);
+					return 0;
+				}
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 /**
  * Read a pixel from the given location and compare its RGB value to the
  * given expected values.
