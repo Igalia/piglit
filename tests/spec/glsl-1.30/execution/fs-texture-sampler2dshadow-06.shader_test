@@ -1,0 +1,28 @@
+# [description]
+# Test texture(sampler2DShadow, vec3) with
+#   - depth texture mode = luminance
+#   - texture compare func = never
+
+[require]
+GLSL >= 1.30
+
+[vertex shader file]
+fs-texture-sampler2dshadow.vert
+
+[fragment shader file]
+fs-texture-sampler2dshadow.frag
+
+[test]
+uniform int tex 0
+texture shadow 0 (32, 32)
+texparameter depth_mode luminance
+texparameter compare_func never
+draw rect -1 -1 2 2
+
+# depth comparison pass
+relative probe rgba (0.0, 0.1) (0.0, 0.125, 0.125, 0.125);
+relative probe rgba (0.9, 1.0) (0.0, 0.125, 0.125, 0.125);
+
+# depth comparison fail
+relative probe rgba (0.1, 0.0) (0.0, 0.125, 0.125, 0.125);
+relative probe rgba (1.0, 0.9) (0.0, 0.125, 0.125, 0.125);
