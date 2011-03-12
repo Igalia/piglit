@@ -891,6 +891,10 @@ ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 
+nv_texture_barrier = Group()
+spec['NV_texture_barrier'] = nv_texture_barrier
+add_plain_test(nv_texture_barrier, 'blending-in-shader')
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
