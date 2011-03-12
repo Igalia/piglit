@@ -651,6 +651,10 @@ spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.dirname(__file__) + '/spec/glsl-1.30',
 			 ['preprocessor', 'compiler'])
+spec['glsl-1.30']['execution'] = Group()
+add_shader_test_dir(spec['glsl-1.30']['execution'],
+	            os.path.dirname(__file__) + '/spec/glsl-1.30/execution',
+		    recursive=True)
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
