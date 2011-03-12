@@ -810,6 +810,31 @@ piglit_display(void)
 					GL_INTENSITY);
 
 			glEnable(GL_TEXTURE_2D);
+		} else if (!strncmp(line,
+			           "texparameter depth_mode red\n",
+			            28)) {
+			/* Requires GL 3.0 or GL_ARB_texture_rg */
+			glTexParameteri(GL_TEXTURE_2D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_RED);
+		} else if (!strncmp(line,
+			           "texparameter depth_mode luminance\n",
+			            34)) {
+			glTexParameteri(GL_TEXTURE_2D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_LUMINANCE);
+		} else if (!strncmp(line,
+			           "texparameter depth_mode intensity\n",
+			            34)) {
+			glTexParameteri(GL_TEXTURE_2D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_INTENSITY);
+		} else if (!strncmp(line,
+			           "texparameter depth_mode alpha\n",
+			            29)) {
+			glTexParameteri(GL_TEXTURE_2D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_ALPHA);
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
