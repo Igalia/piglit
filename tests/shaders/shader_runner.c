@@ -811,6 +811,24 @@ piglit_display(void)
 
 			glEnable(GL_TEXTURE_2D);
 		} else if (!strncmp(line,
+				    "texparameter compare_func greater\n",
+				    34)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GREATER);
+		} else if (!strncmp(line,
+				    "texparameter compare_func always\n",
+				    33)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_ALWAYS);
+		} else if (!strncmp(line,
+				    "texparameter compare_func never\n",
+				    32)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_NEVER);
+		} else if (!strncmp(line,
 			           "texparameter depth_mode red\n",
 			            28)) {
 			/* Requires GL 3.0 or GL_ARB_texture_rg */
