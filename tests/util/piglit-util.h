@@ -105,6 +105,8 @@ int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
 void piglit_require_not_extension(const char *name);
+int piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe);
+int piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_probe);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
 int piglit_probe_rect_rgb(int x, int y, int w, int h, const float* expected);

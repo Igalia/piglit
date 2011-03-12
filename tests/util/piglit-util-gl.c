@@ -86,6 +86,46 @@ int piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	return 0;
 }
 
+int piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe)
+{
+	GLfloat probe[3];
+	int i;
+	GLboolean pass = GL_TRUE;
+
+	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, probe);
+
+	for(i = 0; i < 3; ++i) {
+		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i]) {
+			pass = GL_FALSE;
+		}
+	}
+
+	if (out_probe)
+		memcpy(out_probe, probe, sizeof(probe));
+
+	return pass;
+}
+
+int piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_probe)
+{
+	GLfloat probe[4];
+	int i;
+	GLboolean pass = GL_TRUE;
+
+	glReadPixels(x, y, 1, 1, GL_RGBA, GL_FLOAT, probe);
+
+	for(i = 0; i < 4; ++i) {
+		if (fabs(probe[i] - expected[i]) > piglit_tolerance[i]) {
+			pass = GL_FALSE;
+		}
+	}
+
+	if (out_probe)
+		memcpy(out_probe, probe, sizeof(probe));
+
+	return pass;
+}
+
 int
 piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 {
