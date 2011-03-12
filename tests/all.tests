@@ -12,6 +12,14 @@ from framework.exectest import *
 from framework.gleantest import *
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
 
+# Blacklisted tests are removed from the test profile.
+blacklist = [
+	'shaders/glsl-fs-unroll-explosion',
+	'shaders/glsl-fs-inline-explosion',
+	'shaders/glsl-vs-unroll-explosion',
+	'shaders/glsl-vs-inline-explosion',
+	]
+
 ######
 # Collecting all tests
 profile = TestProfile()
@@ -1406,3 +1414,6 @@ Test.ignoreErrors.append(re.compile("GLSL version is .*, but requested version .
 Test.ignoreErrors.append(re.compile("kCGErrorIllegalArgument: CGSOrderWindowList"))
 Test.ignoreErrors.append(re.compile("kCGErrorFailure: Set a breakpoint @ CGErrorBreakpoint\(\) to catch errors as they are logged."))
 
+# Remove blacklisted tests
+for test_path in blacklist:
+    profile.remove_test(test_path)

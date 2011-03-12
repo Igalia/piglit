@@ -399,6 +399,20 @@ class TestProfile:
 		time_end = time.time()
 		env.file.write("time:", time_end-time_start, "\n")
 
+	def remove_test(self, test_path):
+		"""Remove a fully qualified test from the profile.
+
+		``test_path`` is a string with slash ('/') separated
+		components. It has no leading slash. For example::
+			test_path = 'spec/glsl-1.30/linker/do-stuff'
+		"""
+
+		l = test_path.split('/')
+		group = self.tests[l[0]]
+		for group_name in l[1:-2]:
+			group = group[group_name]
+		del group[l[-1]]
+
 #############################################################################
 ##### Loaders
 #############################################################################
