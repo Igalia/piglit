@@ -34,9 +34,6 @@ int piglit_width = 128;
 int piglit_height = 64;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
-static const struct test_desc *test_set;
-static int test_index;
-static int format_index;
 
 static void alphatest(const float *rect, float alpha, GLenum func, float ref)
 {
@@ -264,124 +261,12 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-static void add_result(bool *all_skip, enum piglit_result *end_result,
-		       enum piglit_result new)
-{
-	if (new != PIGLIT_SKIP)
-		*all_skip = false;
-
-	if (new == PIGLIT_FAILURE)
-		*end_result = new;
-}
-
 enum piglit_result piglit_display(void)
 {
-	enum piglit_result result, end_result = PIGLIT_SUCCESS;
-	bool all_skip = true;
-	int i;
-
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	glClearColor(0.5, 0.5, 0.5, 0.5);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	if (piglit_automatic) {
-		for (i = 0; i < test_set->num_formats; i++) {
-			result = test_format(&test_set->format[i],
-					     test_set->base);
-			add_result(&all_skip, &end_result, result);
-		}
-	} else {
-		result = test_format(&test_sets[test_index].format[format_index],
-				     test_sets[test_index].base);
-		add_result(&all_skip, &end_result, result);
-	}
-
-	glutSwapBuffers();
-
-	if (all_skip)
-		return PIGLIT_SKIP;
-	return end_result;
-}
-
-static void key_func(unsigned char key, int x, int y)
-{
-	switch (key) {
-	case 'n': /* next test set */
-		do {
-			test_index++;
-			if (test_index >= ARRAY_SIZE(test_sets)) {
-				test_index = 0;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
-		break;
-
-	case 'N': /* previous test set */
-		do {
-			test_index--;
-			if (test_index < 0) {
-				test_index = ARRAY_SIZE(test_sets) - 1;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
-		break;
-
-	case 'm': /* next format */
-		format_index++;
-		if (format_index >= test_sets[test_index].num_formats) {
-			format_index = 0;
-		}
-		break;
-
-	case 'M': /* previous format */
-		format_index--;
-		if (format_index < 0) {
-			format_index = test_sets[test_index].num_formats - 1;
-		}
-		break;
-	}
-
-	piglit_escape_exit_key(key, x, y);
+	return fbo_formats_display(test_format);
 }
 
 void piglit_init(int argc, char **argv)
 {
-	int i, j, k;
-
-	glutKeyboardFunc(key_func);
-
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_ARB_texture_env_combine");
-
-	test_set = &test_sets[0];
-
-	for (i = 1; i < argc; i++) {
-		for (j = 1; j < ARRAY_SIZE(test_sets); j++) {
-			if (!strcmp(argv[i], test_sets[j].param)) {
-				for (k = 0; k < 3; k++) {
-					if (test_sets[j].ext[k]) {
-						piglit_require_extension(test_sets[j].ext[k]);
-					}
-				}
-
-				test_set = &test_sets[j];
-				break;
-			}
-		}
-		if (j == ARRAY_SIZE(test_sets)) {
-			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
-			exit(1);
-		}
-	}
-
-	if (!piglit_automatic) {
-		printf("    -n   Next test set.\n"
-		       "    -N   Previous test set.\n"
-		       "    -m   Next format in the set.\n"
-		       "    -M   Previous format in the set.\n");
-	}
-
-	printf("Using test set: %s\n", test_set->param);
+	fbo_formats_init(argc, argv, GL_TRUE);
 }

@@ -40,9 +40,6 @@ int piglit_width = 700;
 int piglit_height = 300;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
 
-static const struct test_desc *test_set;
-static int test_index;
-static int format_index;
 
 static void set_npot(GLboolean npot)
 {
@@ -59,47 +56,13 @@ static void
 key_func(unsigned char key, int x, int y)
 {
 	switch (key) {
-	case 'n': /* next test set */
-		do {
-			test_index++;
-			if (test_index >= ARRAY_SIZE(test_sets)) {
-				test_index = 0;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
-		break;
-
-	case 'N': /* previous test set */
-		do {
-			test_index--;
-			if (test_index < 0) {
-				test_index = ARRAY_SIZE(test_sets) - 1;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
-		break;
-
-	case 'm': /* next format */
-		format_index++;
-		if (format_index >= test_sets[test_index].num_formats) {
-			format_index = 0;
-		}
-		break;
-
-	case 'M': /* previous format */
-		format_index--;
-		if (format_index < 0) {
-			format_index = test_sets[test_index].num_formats - 1;
-		}
-		break;
 	case 'd':
 		set_npot(tex_width == 256 && GLEW_ARB_texture_non_power_of_two);
 		break;
-	}
 
-	piglit_escape_exit_key(key, x, y);
+	default:
+		fbo_formats_key_func(key, x, y);
+	}
 }
 
 static int
@@ -466,6 +429,7 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int i;
+	(void)fbo_formats_display;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -496,34 +460,9 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	int i, j, k;
+	fbo_formats_init(argc, argv, GL_FALSE);
 
 	glutKeyboardFunc(key_func);
-
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_ARB_texture_env_combine");
-
-	test_set = &test_sets[0];
-
-	for (i = 1; i < argc; i++) {
-		for (j = 1; j < ARRAY_SIZE(test_sets); j++) {
-			if (!strcmp(argv[i], test_sets[j].param)) {
-				for (k = 0; k < 3; k++) {
-					if (test_sets[j].ext[k]) {
-						piglit_require_extension(test_sets[j].ext[k]);
-					}
-				}
-
-				test_set = &test_sets[j];
-				test_index = j;
-				break;
-			}
-		}
-		if (j == ARRAY_SIZE(test_sets)) {
-			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
-			exit(1);
-		}
-	}
 
 	if (!piglit_automatic) {
 		printf("    -n   Next test set.\n"
@@ -532,6 +471,4 @@ void piglit_init(int argc, char **argv)
 		       "    -M   Previous format in the set.\n"
 		       "    -d   Switch between POT and NPOT\n");
 	}
-
-	printf("Using test set: %s\n", test_set->param);
 }
