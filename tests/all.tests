@@ -703,7 +703,7 @@ spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
 
 def add_color_buffer_float_test(name, format, p1, p2):
-	arb_color_buffer_float[name + '-' + format + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
+	arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
 
 arb_color_buffer_float = Group()
 spec['ARB_color_buffer_float'] = arb_color_buffer_float
