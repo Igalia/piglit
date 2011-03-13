@@ -31,7 +31,11 @@
 #endif
 #include <string.h>
 #include <ctype.h>
+#if defined(WIN32)
+#include <stdlib.h>
+#else
 #include <libgen.h>
+#endif
 #include "piglit-util.h"
 
 int piglit_width = 250, piglit_height = 250;
@@ -900,11 +904,24 @@ piglit_init(int argc, char **argv)
 	if (argc > 2) {
 		path = argv[2];
 	} else {
+#if defined(WIN32)
+		char drive[_MAX_DRIVE];
+		char dir[_MAX_DIR];
+		char fname[_MAX_FNAME];
+		char ext[_MAX_EXT];
+		char* scriptpath;
+		_splitpath(argv[1], drive, dir, fname, ext);
+		scriptpath = malloc(strlen(drive) + strlen(dir) + 1);
+		strcpy(scriptpath, drive);
+		strcat(scriptpath, dir);
+		path = scriptpath;
+#else
 		/* Because dirname()'s memory handling is unpredictable, we
 		 * must copy both its input and ouput. */
 		char* scriptpath = strdup(argv[1]);
 		path = strdup(dirname(scriptpath));
 		free(scriptpath);
+#endif
 	}
 
 	process_test_script(argv[1]);
