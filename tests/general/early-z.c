@@ -34,11 +34,14 @@ int piglit_width = 128;
 int piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH;
 
+GLint u_zval;
+
 static const char *fpFragDepthText =
+   "uniform float zval; \n"
    "void main() \n"
    "{ \n"
    "   gl_FragColor = vec4(gl_Color.rgb, 1.0); \n"
-   "   gl_FragDepth = 0.9; \n"
+   "   gl_FragDepth = zval; \n"
    "} \n";
 
 static const char *fpDiscardText =
@@ -81,8 +84,9 @@ test_early_depth(void)
    glDepthMask(GL_TRUE);
    glDepthFunc(GL_LESS);
 
-   /* 1. (blue) depth should be adjusted to 0.9 by the FP */
+   /* 1. (blue) depth should be adjusted to 0.8 by the FP */
    glUseProgram(program[0]);
+   glUniform1f(u_zval, 0.8f);
    quad(0.3, 0xff0000);
 
    /* 2. (red) should be discarded, no depth value written */
@@ -96,11 +100,17 @@ test_early_depth(void)
    quad(0.1, 0xffffff);
    glDisable(GL_ALPHA_TEST);
 
-   /* 4. (green) should be drawn because depth is still 0.9 */
-   quad(0.7, 0x00ff00);
+   /* 4. (green) should be drawn because depth is 0.8 and FragDepth is 0.5 */
+   glUseProgram(program[0]);
+   glUniform1f(u_zval, 0.5);
+   quad(0.9, 0x00ff00);
+
+   /* 5. (yellow) should be discarded because program sets depth to 0.9 */
+   glUniform1f(u_zval, 0.9);
+   quad(0.2, 0x00ffff);
 
    {
-      const GLfloat color[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+      const GLfloat color[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
       GLint pos[4];
 
       /* use glRasterPos to determine where to read a sample pixel */
@@ -134,6 +144,11 @@ piglit_init(int argc, char **argv)
 {
    int i;
 
+   if (!GLEW_VERSION_2_0) {
+      printf("Requires OpenGL 2.0 / GLSL\n");
+      piglit_report_result(PIGLIT_SKIP);
+   }
+
    shader[0] = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fpFragDepthText);
    assert(shader[0]);
 
@@ -145,4 +160,6 @@ piglit_init(int argc, char **argv)
 
    for (i = 0; i < 3; ++i)
       program[i] = piglit_link_simple_program(shader[i], 0);
+
+   u_zval = glGetUniformLocation(program[0], "zval");
 }
