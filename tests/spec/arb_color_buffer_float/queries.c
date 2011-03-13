@@ -44,22 +44,27 @@ GLboolean test()
 {
 	GLboolean pass = GL_TRUE;
 	glBindTexture(GL_TEXTURE_2D, tex); /* for border color */
+	unsigned frag_clamp;
 
-	for(frag_clamp = 0; frag_clamp < 3; ++frag_clamp)
+	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
 	{
 		const char *value_names[] = { "texture border color", "texenv color", "fog color", "alpha test reference", "blend color", "clear color" };
 		unsigned value;
 		for(value = 0; value < 6; ++value)
 		{
+			float observed[16];
+			char test_name[4096];
 			GLboolean cpass = GL_TRUE;
 			GLboolean opass;
 			unsigned clamped = clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 			unsigned comps = 4;
+			float* expected;
 
 			sprintf(test_name, "glGet of %s in %s mode with fragment clamp %s (expecting %sclamping)", value_names[value], mrt_mode_strings[mrt_mode], clamp_strings[frag_clamp], clamped ? "" : "no ");
 			printf("%s\n", test_name);
 
-			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
+			if (!test_defaults)
+				glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 
 			memset(observed, 0, sizeof(observed));
 			switch (value)

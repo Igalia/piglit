@@ -37,15 +37,19 @@
 GLboolean test()
 {
 	GLboolean pass = GL_TRUE;
+	unsigned frag_clamp;
 
-	for(frag_clamp = 0; frag_clamp < 3; ++frag_clamp)
+	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
 	{
 		GLboolean cpass = GL_TRUE;
 		GLboolean opass;
 		unsigned clamped = clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 		unsigned x, y;
+		float* expected;
+
 		printf("glDrawPixels of fbo for float texture with fragment clamp %s (expecting %sclamping)\n", clamp_strings[frag_clamp], clamped ? "" : "no ");
-		glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
+		if (!test_defaults)
+			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);

@@ -33,11 +33,16 @@
 GLboolean test()
 {
 	GLboolean pass = GL_TRUE;
+	unsigned read_clamp;
 
 	for(read_clamp = 0; read_clamp < 3; ++read_clamp)
 	{
+		float observed[16];
+		float* expected;
+
 		printf("glGetTexImage of %s texture with read clamp %s (expecting %sclamping)\n", format_name, clamp_strings[read_clamp], fixed ? "" : "no ");
-		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
+		if (!test_defaults)
+			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
 		memset(observed, 0, sizeof(observed));
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, observed);

@@ -41,7 +41,7 @@
 
 #include "common.h"
 
-const char *blend_strings[] = { "disabled", "(ONE, ZERO)", "(CONSTANT_COLOR, ZERO)", "(ONE, ONE)" };
+const char *blend_strings[] = { "disabled     ", "(ONE, ZERO)  ", "(CONST, ZERO)", "(ONE, ONE)   " };
 GLenum blend_src[] = { 0, GL_ONE, GL_CONSTANT_COLOR, GL_ONE };
 GLenum blend_dst[] = { 0, GL_ZERO, GL_ZERO, GL_ONE };
 
@@ -80,21 +80,25 @@ unsigned fps[4];
 
 GLboolean test()
 {
+	GLfloat probe[4];
 	GLboolean pass = GL_TRUE;
-	unsigned semantic, blend, logicop, vpmode, fpmode, fog;
+	int npass = 0, total = 0;
+	unsigned semantic, blend, logicop, vpmode, fpmode;
 	unsigned vpmodes = 1 + !!GLEW_ARB_vertex_program;
 	unsigned fpmodes = 1 + !!GLEW_ARB_fragment_program;
+	unsigned vert_clamp, frag_clamp;
+
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 
-	for(vert_clamp = 0; vert_clamp < 3; ++vert_clamp)
-	for(frag_clamp = 0; frag_clamp < 3; ++frag_clamp)
+	for(vert_clamp = 0; vert_clamp < (test_defaults ? 1 : 3); ++vert_clamp)
+	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
 	for(semantic = 0; semantic < 2; ++semantic)
 	for(blend = 0; blend < 4; ++blend)
 	for(logicop = 0; logicop < 2; ++logicop)
 	for(vpmode = 0; vpmode < vpmodes; ++vpmode)
 	for(fpmode = 0; fpmode < fpmodes; ++fpmode)
-	for(fog = 0; fog < 2; ++fog)
 	{
+		char test_name[4096];
 		unsigned clamped = (semantic == 0 && (clamp_enums[vert_clamp] == GL_TRUE || (clamp_enums[vert_clamp] == GL_FIXED_ONLY_ARB && fixed))) || clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
 		float *expected;
 		GLboolean cpass;
@@ -103,10 +107,11 @@ GLboolean test()
 		if(!fpmode && semantic)
 			continue;
 
-		sprintf(test_name, "%s: render constant through %s with vertex clamp %s and fragment clamp %s and blending %s and logicop %s using %s and %s%s (expecting %sclamping)", format_name, semantic ? "TEXCOORD0" : "COLOR", clamp_strings[vert_clamp], clamp_strings[frag_clamp], blend_strings[blend], logicop ? "enabled" : "disabled", vpmode ? "ARB_vp" : "ffvp", fpmode ? "ARB_fp" : "fffp", fog ? " with fog" : "", clamped ? "" : "no ");
-		printf("%s\n", test_name);
-		glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
-		glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
+		sprintf(test_name, "%s: Attrib %s  VertClamp %s  FragClamp %s  Blending %s  LogicOp %s  %s  %s  Fog %s (expecting %sclamping)", format_name, semantic ? "TEXCOORD0" : "COLOR    ", clamp_strings[vert_clamp], clamp_strings[frag_clamp], blend_strings[blend], logicop ? "Yes" : "No ", vpmode ? "ARB_vp" : "ffvp  ", fpmode ? "ARB_fp" : "fffp  ", test_fog ? "Yes" : "No ", clamped ? "" : "no ");
+		if (!test_defaults) {
+			glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
+			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
+		}
 
 		glColor4f(0.1f, 0.2f, 0.3f, 0.4f);
 		glTexCoord4f(0.5f, 0.6f, 0.7f, 0.8f);
@@ -126,12 +131,12 @@ GLboolean test()
 
 		if(fpmode)
 		{
-			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fps[semantic + (fog ? 2 : 0)]);
+			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fps[semantic + (test_fog ? 2 : 0)]);
 			glEnable(GL_FRAGMENT_PROGRAM_ARB);
 		}
 		else
 		{
-			if(fog)
+			if(test_fog)
 				glEnable(GL_FOG);
 		}
 
@@ -157,7 +162,7 @@ GLboolean test()
 			glDisable(GL_VERTEX_PROGRAM_ARB);
 		if(fpmode)
 			glDisable(GL_FRAGMENT_PROGRAM_ARB);
-		else if(fog)
+		else if(test_fog)
 			glDisable(GL_FOG);
 
 		if(blend == 2 && !logicop)
@@ -177,27 +182,38 @@ GLboolean test()
 		else
 			expected = (clamped || fixed) ? clamped_pixels : pixels;
 
-		opass = cpass = piglit_probe_pixel_rgba(0, 0, expected);
+		opass = cpass = piglit_probe_pixel_rgba_silent(0, 0, expected, probe);
 
-		if(!cpass && nvidia_driver && clamped && !(semantic == 0 && clamp_enums[vert_clamp] == GL_TRUE) && clamp_enums[frag_clamp] == GL_TRUE && !fixed && fpmode && (!blend || logicop || format == GL_RGBA16F_ARB))
+		if(nvidia_driver && clamped && !(semantic == 0 && clamp_enums[vert_clamp] == GL_TRUE) && clamp_enums[frag_clamp] == GL_TRUE && !fixed && fpmode && (!blend || logicop || format == GL_RGBA16F_ARB))
 		{
 			printf("nVidia driver known *** MAJOR BUG ***: they don't clamp fragment program results with ARB_fp on either fp32 with no blending or fp16!\n");
 			opass = GL_TRUE;
 		}
-		if(!cpass && nvidia_driver && clamped && !fixed && !fpmode && semantic == 0 && clamp_enums[vert_clamp] != GL_TRUE && clamp_enums[frag_clamp] == GL_TRUE)
+		if(nvidia_driver && clamped && !fixed && !fpmode && semantic == 0 && clamp_enums[vert_clamp] != GL_TRUE && clamp_enums[frag_clamp] == GL_TRUE)
 		{
 			printf("nVidia driver known *** MAJOR BUG ***: they don't clamp fragment program results with fffp, vertex clamp off and fragment clamp on fp16/fp32!\n");
 			opass = GL_TRUE;
 		}
-		if(!cpass && fog && fpmode)
+		if(test_fog && fpmode)
 		{
-			printf("Unclear specification on GL_ARB_fog_*\n");
+			//printf("Unclear specification on GL_ARB_fog_*\n");
 			opass = GL_TRUE;
 		}
-		printf("%s: %s\n", (cpass ? "PASS" : (opass ? "XFAIL" : "FAIL")), test_name);
+
+		if (!opass) {
+			printf("%s: %s\n", (cpass ? "PASS" : (opass ? "XFAIL" : "FAIL")), test_name);
+			printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
+			printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
+
+		} else {
+			npass++;
+		}
+		total++;
+
 		pass = opass && pass;
 	}
 
+	printf("Summary: %i/%i passed.\n", npass, total);
 	return pass;
 }
 

@@ -37,66 +37,64 @@ int piglit_height = 128;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 /* use small values for pixels[0..3], so that the 0.01 tolerance is met for fp16 */
-float pixels[] = {
+static float pixels[] = {
 	7, -2.75, -0.25, 0.75,
 	0.0, 1.0, 2.0, -1.0,
 	0.5, 9.0 / 8.0, -156, 390,
 	234, -86, -21.5, 46.5,
 };
 
-float clamped_pixels[16];
-float pixels_mul_2[16];
-float clamped_pixels_mul_2[16];
-float pixels_plus_half[16];
-float clamped_pixels_plus_half[16];
-float clamped_pixels_plus_half_clamped[16];
+static float clamped_pixels[16];
+static float pixels_mul_2[16];
+static float clamped_pixels_mul_2[16];
+static float pixels_plus_half[16];
+static float clamped_pixels_plus_half[16];
+static float clamped_pixels_plus_half_clamped[16];
 
-const char* clamp_strings[] = {"TRUE", "FIXED_ONLY", "FALSE"};
-GLenum clamp_enums[] = {GL_TRUE, GL_FIXED_ONLY_ARB, GL_FALSE};
+static const char* clamp_strings[] = {"TRUE ", "FIXED", "FALSE"};
+static GLenum clamp_enums[] = {GL_TRUE, GL_FIXED_ONLY_ARB, GL_FALSE};
 
 const char* mrt_mode_strings[] = {"single target", "homogeneous framebuffer", "dishomogeneous framebuffer"};
 
 static float clamp(float f)
 {
-	if(f >= 0.0f && f <= 1.0f)
+	if (f >= 0.0f && f <= 1.0f)
 		return f;
-	else if(f > 0.0f)
+	else if (f > 0.0f)
 		return 1.0f;
 	else
 		return 0.0f;
 }
 
-unsigned ati_driver;
-unsigned nvidia_driver;
+static unsigned ati_driver;
+static unsigned nvidia_driver;
 
-char test_name[4096];
-float observed[16];
-unsigned vert_clamp, frag_clamp, read_clamp;
-float* expected;
-float* expected1;
-GLuint tex, tex1, fb;
-GLenum status;
-unsigned error;
+static GLuint tex, tex1, fb;
+static GLenum status;
+static unsigned error;
 
-int fbo_width = 2;
-int fbo_height = 2;
+static int fbo_width = 2;
+static int fbo_height = 2;
 
-#define TEST_NO_RT 0
-#define TEST_SRT 1
-#define TEST_MRT 2
-#define TEST_SRT_MRT 3
+enum test_mode_type {
+	TEST_NO_RT,
+	TEST_SRT,
+	TEST_MRT,
+	TEST_SRT_MRT
+};
 
-int test_mode = TEST_SRT;
+static enum test_mode_type test_mode;
 
-GLenum format;
-const char* format_name;
-GLboolean fixed;
-GLboolean fixed0, fixed1;
-unsigned mrt_mode;
+static GLboolean test_defaults, test_fog;
+static GLenum format;
+static const char* format_name;
+static GLboolean fixed;
+static GLboolean fixed0, fixed1;
+static unsigned mrt_mode;
 
-GLboolean test();
+static GLboolean test();
 
-GLboolean run_test()
+static GLboolean run_test()
 {
 	GLboolean pass = GL_TRUE;
 	fixed = fixed0 = format == GL_RGBA8;
@@ -110,13 +108,13 @@ GLboolean run_test()
 		     2, 2, 0,
 		     GL_RGBA, GL_FLOAT, pixels);
 	error = glGetError();
-	if(error)
+	if (error)
 	{
 		printf("GL error after glTexImage2D 0x%04X\n", error);
 		return GL_FALSE;
 	}
 
-	if(test_mode)
+	if (test_mode)
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -130,7 +128,7 @@ GLboolean run_test()
 					  tex,
 					  0);
 		error = glGetError();
-		if(error)
+		if (error)
 		{
 			printf("GL error after FBO 0x%04X\n", error);
 			return GL_FALSE;
@@ -143,9 +141,10 @@ GLboolean run_test()
 		}
 	}
 
-	if(test_mode <= TEST_SRT)
+	if (test_mode <= TEST_SRT)
 	{
-		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
+		if (!test_defaults)
+			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 		pass = test();
 	}
 	else
@@ -153,14 +152,14 @@ GLboolean run_test()
 		unsigned mrt_modes = GLEW_ARB_draw_buffers ? (GLEW_ARB_texture_float ? 3 : 2) : 1;
 		unsigned first_mrt_mode = (test_mode == TEST_MRT) ? 1 : 0;
 
-		for(mrt_mode = first_mrt_mode; mrt_mode < mrt_modes; ++mrt_mode)
+		for (mrt_mode = first_mrt_mode; mrt_mode < mrt_modes; ++mrt_mode)
 		{
 			fixed1 = fixed;
-			if(mrt_mode)
+			if (mrt_mode)
 			{
 				GLenum bufs[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 				unsigned format1;
-				if(mrt_mode == 1)
+				if (mrt_mode == 1)
 					format1 = format;
 				else
 				{
@@ -177,7 +176,7 @@ GLboolean run_test()
 					     2, 2, 0,
 					     GL_RGBA, GL_FLOAT, pixels);
 				error = glGetError();
-				if(error)
+				if (error)
 				{
 					printf("GL error after second glTexImage2D 0x%04X\n", error);
 					return GL_FALSE;
@@ -191,7 +190,7 @@ GLboolean run_test()
 
 				status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 				if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-					if(mrt_mode == 2)
+					if (mrt_mode == 2)
 						printf("Dishomogeneous framebuffer is incomplete, skipping dishomogeneous tests (status = 0x%04x)\n", status);
 					else
 					{
@@ -204,18 +203,19 @@ GLboolean run_test()
 				glDrawBuffers(2, bufs);
 
 				error = glGetError();
-				if(error)
+				if (error)
 				{
 					printf("GL error after second glDrawBuffers 0x%04X\n", error);
 					return GL_FALSE;
 				}
 			}
 
-			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
+			if (!test_defaults)
+				glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 			pass = test() && pass;
 
 	skip_mrt:
-			if(mrt_mode)
+			if (mrt_mode)
 			{
 				glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -232,14 +232,14 @@ GLboolean run_test()
 	glDeleteTextures(1, &tex);
 	tex = 0;
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	if(fb)
+	if (fb)
 	{
 		glDeleteFramebuffersEXT(1, &fb);
 		fb = 0;
 	}
 
 	error = glGetError();
-	if(error)
+	if (error)
 	{
 		printf("GL error after test 0x%04X\n", error);
 		return GL_FALSE;
@@ -251,29 +251,11 @@ GLboolean run_test()
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;
 	unsigned error;
-	printf("Testing 8-bit fixed-point FBO\n");
-	format = GL_RGBA8;
-	format_name = "un8";
-	pass = run_test() && pass;
-
-	if(GLEW_ARB_texture_float)
-	{
-		printf("\n\n\nTesting 32-bit floating point FBO\n");
-		format = GL_RGBA32F_ARB;
-		format_name = "f32";
-		pass = run_test() && pass;
-		printf("\n\n\nTesting 16-bit floating point FBO\n");
-		format = GL_RGBA16F_ARB;
-		format_name = "f16";
-		pass = run_test() && pass;
-	}
-	else
-		printf("\n\n\nSkipping floating point FBO tests because of no ARB_texture_float.\n");
+	GLboolean pass = run_test();
 
 	error = glGetError();
-	if(error)
+	if (error)
 	{
 		printf("GL error at end 0x%04X\n", error);
 		return GL_FALSE;
@@ -282,7 +264,7 @@ piglit_display(void)
 	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
 }
 
-unsigned init();
+static unsigned init();
 
 void
 piglit_init(int argc, char **argv)
@@ -290,32 +272,55 @@ piglit_init(int argc, char **argv)
 	int i;
 	GLboolean distinguish_xfails = GL_FALSE;
 
-	(void)i;
 	/* displaying thousands of single-pixel floating point results isn't really useful, or even doable */
 	piglit_automatic = GL_TRUE;
 
-	piglit_require_extension("GL_ARB_color_buffer_float");
-
 	test_mode = init();
 
-	if(test_mode != TEST_NO_RT)
+	if (test_mode != TEST_NO_RT)
 		piglit_require_extension("GL_EXT_framebuffer_object");
 
-	for(i = 1; i < argc; ++i)
+	for (i = 1; i < argc; ++i)
 	{
-		if(!strcmp(argv[i], "-xfail"))
+		if (!strcmp(argv[i], "-xfail")) {
 			distinguish_xfails = GL_TRUE;
+		} else if (!strcmp(argv[i], "sanity")) {
+			test_defaults = GL_TRUE;
+		} else if (!strcmp(argv[i], "fog")) {
+			test_fog = GL_TRUE;
+		} else if (!strcmp(argv[i], "GL_RGBA16F")) {
+			piglit_require_extension("GL_ARB_texture_float");
+			format = GL_RGBA16F;
+			format_name = "f16";
+			printf("\n\n\nTesting 16-bit floating point FBO\n");
+		} else if (!strcmp(argv[i], "GL_RGBA32F")) {
+			piglit_require_extension("GL_ARB_texture_float");
+			format = GL_RGBA32F;
+			format_name = "f32";
+			printf("\n\n\nTesting 32-bit floating point FBO\n");
+		}
+	}
+	if (!format) {
+		format = GL_RGBA8;
+		format_name = "un8";
+		printf("Testing 8-bit fixed-point FBO\n");
+	}
+
+	if (test_defaults) {
+		printf("Testing default clamping rules only. This is a sanity check. GL_ARB_color_buffer_float is not required.\n");
+	} else {
+		piglit_require_extension("GL_ARB_color_buffer_float");
 	}
 
 	/* current ATI drivers are broken */
-	if(!strcmp((char*)glGetString(GL_VENDOR), "ATI Technologies Inc."))
+	if (!strcmp((char*)glGetString(GL_VENDOR), "ATI Technologies Inc."))
 		ati_driver = 1;
 
 	/* current nVidia drivers are broken at least on GeForce 7xxx */
-	if(!strcmp((char*)glGetString(GL_VENDOR), "NVIDIA Corporation"))
+	if (!strcmp((char*)glGetString(GL_VENDOR), "NVIDIA Corporation"))
 		nvidia_driver = 1;
 
-	if(ati_driver || nvidia_driver)
+	if (ati_driver || nvidia_driver)
 	{
 		/* print both so users don't think either driver is better */
 		printf("Notice: the ATI proprietary driver does NOT conform to the GL_ARB_color_buffer_float specification! (tested version was 10.6 on cypress, on Linux x86)\n");
@@ -323,10 +328,10 @@ piglit_init(int argc, char **argv)
 		printf("Notice: the nVidia and ATI proprietary drivers are both nonconformant, in different ways!\n\n\n");
 	}
 
-	if(!distinguish_xfails)
+	if (!distinguish_xfails)
 		ati_driver = nvidia_driver = 0;
 
-	for(i = 0; i < sizeof(pixels) / sizeof(pixels[0]); ++i)
+	for (i = 0; i < sizeof(pixels) / sizeof(pixels[0]); ++i)
 	{
 		clamped_pixels[i] = clamp(pixels[i]);
 		pixels_mul_2[i] = pixels[i] * 2.0f;
@@ -341,9 +346,9 @@ GLboolean compare_arrays(float* expected, float* observed, int length)
 {
 	GLboolean pass = GL_TRUE;
 	unsigned i;
-	for(i = 0; i < length; ++i)
+	for (i = 0; i < length; ++i)
 	{
-		if(fabs(expected[i] - observed[i]) > 0.01)
+		if (fabs(expected[i] - observed[i]) > 0.01)
 		{
 			printf("At %i Expected: %f Observed: %f\n", i, expected[i], observed[i]);
 			pass = GL_FALSE;

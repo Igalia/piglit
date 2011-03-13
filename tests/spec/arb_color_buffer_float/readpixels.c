@@ -43,15 +43,19 @@
 GLboolean test()
 {
 	GLboolean pass = GL_TRUE;
+	unsigned read_clamp;
 
 	for(read_clamp = 0; read_clamp < 3; ++read_clamp)
 	{
+		float observed[16];
 		GLboolean cpass = GL_TRUE;
 		GLboolean opass;
 		unsigned clamped = clamp_enums[read_clamp] == GL_TRUE || (clamp_enums[read_clamp] == GL_FIXED_ONLY_ARB && fixed);
+		float* expected;
 
 		printf("glReadPixels of fbo for float texture with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
-		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
+		if (!test_defaults)
+			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
 		memset(observed, 0, sizeof(observed));
 		glReadPixels(0, 0, 2, 2, GL_RGBA, GL_FLOAT, observed);
@@ -68,7 +72,8 @@ GLboolean test()
 		pass = opass && pass;
 	}
 
-	glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
+	if (!test_defaults)
+		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 	return pass;
 }
 
