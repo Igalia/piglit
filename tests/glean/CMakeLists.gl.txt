@@ -1,4 +1,4 @@
-if (MSVC)
+if (WIN32)
 	add_definitions ( -D__WIN__ -D__MS__ )
 ELSEIF (APPLE)
 	add_definitions ( -D__AGL__ -D__UNIX__ )

@@ -29,7 +29,7 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#if defined(_MSC_VER)
+#if defined(WIN32)
 #undef near
 #undef far
 #endif

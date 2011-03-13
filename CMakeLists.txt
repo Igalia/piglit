@@ -18,6 +18,11 @@ IF (C_COMPILER_FLAG_WALL)
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 ENDIF (C_COMPILER_FLAG_WALL)
 
+if (WIN32)
+	# MSVC & MinGW only define & use APIENTRY
+	add_definitions (-DGLAPIENTRY=__stdcall)
+endif (WIN32)
+
 if (APPLE)
 	find_path(GLEXT_INCLUDE_DIR
 		NAMES OpenGL/glext.h

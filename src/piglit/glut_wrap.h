@@ -38,6 +38,10 @@
 extern "C" {
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #ifdef USE_GLUT
 #	ifdef __APPLE__
 #		include <GLUT/glut.h>

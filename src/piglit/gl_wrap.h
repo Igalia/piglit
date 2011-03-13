@@ -38,6 +38,10 @@
 extern "C" {
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #ifdef USE_OPENGL
 #	include "glew.h"
 	/* Include the real headers too, in case GLEW misses something. */

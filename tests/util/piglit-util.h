@@ -25,9 +25,11 @@
 
 #include "config.h"
 
-#if defined(_MSC_VER)
+#if defined(WIN32)
 #include <windows.h>
+#endif
 
+#if defined(_MSC_VER)
 typedef __int32 int32_t;
 typedef __int64 int64_t;
 typedef unsigned __int8 uint8_t;
