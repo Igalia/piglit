@@ -31,6 +31,7 @@
 #endif
 #include <string.h>
 #include <ctype.h>
+#include <libgen.h>
 #include "piglit-util.h"
 
 int piglit_width = 250, piglit_height = 250;
@@ -853,8 +854,15 @@ piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
 		      &gl_max_vertex_uniform_components);
 
-	if (argc > 2)
+	if (argc > 2) {
 		path = argv[2];
+	} else {
+		/* Because dirname()'s memory handling is unpredictable, we
+		 * must copy both its input and ouput. */
+		char* scriptpath = strdup(argv[1]);
+		path = strdup(dirname(scriptpath));
+		free(scriptpath);
+	}
 
 	process_test_script(argv[1]);
 	link_and_use_shaders();
