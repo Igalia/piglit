@@ -43,8 +43,9 @@
 GLboolean test()
 {
 	GLboolean pass = GL_TRUE;
-	glBindTexture(GL_TEXTURE_2D, tex); /* for border color */
 	unsigned frag_clamp;
+
+	glBindTexture(GL_TEXTURE_2D, tex); /* for border color */
 
 	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
 	{
