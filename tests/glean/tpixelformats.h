@@ -63,6 +63,8 @@ private:
 	bool haveABGR;
 	bool haveSRGB;
 	bool haveCombine;
+	bool haveRG;
+	bool haveFloat;
 
 	bool CheckError(const char *where) const;
 

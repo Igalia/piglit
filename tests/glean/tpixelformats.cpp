@@ -96,6 +96,7 @@ static const NameTokenComps Formats[] =
 	{ "GL_LUMINANCE", GL_LUMINANCE, 1 },
 	{ "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, 2 },
 	{ "GL_ABGR_EXT", GL_ABGR_EXT, 4 },
+	{ "GL_RG", GL_RG, 2 }
 };
 
 #define NUM_FORMATS (sizeof(Formats) / sizeof(Formats[0]))
@@ -160,6 +161,17 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_INTENSITY8", GL_INTENSITY8, 1 },
 	{ "GL_INTENSITY12", GL_INTENSITY12, 1 },
 	{ "GL_INTENSITY16", GL_INTENSITY16, 1 },
+
+	{ "GL_RED", GL_RED, 1 },
+	{ "GL_RG", GL_RG, 2 },
+	{ "GL_R8", GL_R8, 1 },
+	{ "GL_RG8", GL_RG8, 2 },
+	{ "GL_R16", GL_R16, 1},
+	{ "GL_RG16", GL_RG16, 2 },
+	{ "GL_R16F", GL_R16F, 1 },
+	{ "GL_RG16F", GL_RG16F, 2 },
+	{ "GL_R32F", GL_R32F, 1},
+	{ "GL_RG32F", GL_RG32F, 2 },
 
 	// XXX maybe add compressed formats too...
 };
@@ -344,6 +356,12 @@ ComponentPositions(GLenum format, GLint pos[4])
 		pos[2] = 1;
 		pos[3] = 0;
 		break;
+	case GL_RG:
+		pos[0] = 0;
+		pos[1] = 1;
+		pos[2] = -1;
+		pos[3] = -1;
+		break;
 	default:
 		abort();
 	}
@@ -385,6 +403,21 @@ BaseTextureFormat(GLint intFormat)
 	case GL_INTENSITY12:
 	case GL_INTENSITY16:
 		return GL_INTENSITY;
+
+	case GL_RED:
+	case GL_R8:
+	case GL_R16:
+	case GL_R16F:
+	case GL_R32F:
+		return GL_RED;
+
+	case GL_RG:
+	case GL_RG8:
+	case GL_RG16:
+	case GL_RG16F:
+	case GL_RG32F:
+		return GL_RG;
+
 	case 3:
 	case GL_RGB:
 	case GL_R3_G3_B2:
@@ -520,6 +553,9 @@ PixelFormatsTest::CompatibleFormatAndType(GLenum format, GLenum datatype) const
 	if (format == GL_ABGR_EXT && !haveABGR)
 		return false;
 
+	if (format == GL_RG && !haveRG)
+		return false;
+
 	const int formatComps = NumberOfComponentsInFormat(format);
 	const int typeComps = NumberOfComponentsInPackedType(datatype);
 	return formatComps == typeComps || typeComps == 0;
@@ -539,6 +575,18 @@ PixelFormatsTest::SupportedIntFormat(GLint intFormat) const
 	case GL_SLUMINANCE_EXT:
 	case GL_SLUMINANCE8_EXT:
 		return haveSRGB;
+	case GL_RED:
+	case GL_RG:
+	case GL_R8:
+	case GL_RG8:
+	case GL_R16:
+	case GL_RG16:
+		return haveRG;
+	case GL_R16F:
+	case GL_RG16F:
+	case GL_R32F:
+	case GL_RG32F:
+		return haveRG && haveFloat;
 	default:
 		return true;
 	}
@@ -821,6 +869,19 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[testChan] = 255;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
+		case GL_RG:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[testChan] = 255;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
+			exp[0] = testChan == 0 ? 255 : 0;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
 		case GL_ALPHA:
 			exp[0] = 0;
 			exp[1] = 0;
@@ -869,6 +930,79 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[testChan] = 255;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
+		case GL_RG:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[testChan] = 255;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
+			exp[0] = testChan == 0 ? 255 : 0;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_ALPHA:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = 255; // texture's alpha
+			break;
+		case GL_LUMINANCE:
+			exp[0] =
+			exp[1] =
+			exp[2] = testChan == 0 ? 255 : 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_LUMINANCE_ALPHA:
+			exp[0] =
+			exp[1] =
+			exp[2] = testChan == 0 ? 255 : 0;
+			exp[3] = 255;  // texture's alpha
+			break;
+		case GL_INTENSITY:
+			exp[0] =
+			exp[1] =
+			exp[2] =
+			exp[3] = testChan == 0 ? 255 : 0;
+			break;
+		default:
+			abort();
+		}
+		break;
+
+	case GL_RG:
+		assert(testChan < 2);
+		switch (baseIntFormat) {
+		case 0:
+		case GL_RGBA:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[testChan] = 255;
+			exp[2] = 0;
+			exp[3] = 255; // texture's alpha
+			break;
+		case GL_RGB:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[testChan] = 255;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RG:
+			exp[0] = 0;
+			exp[1] = 0;
+			exp[testChan] = 255;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
+			exp[0] = testChan == 0 ? 255 : 0;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
 		case GL_ALPHA:
 			exp[0] = 0;
 			exp[1] = 0;
@@ -909,6 +1043,18 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[3] = 255; // texture's alpha
 			break;
 		case GL_RGB:
+			exp[0] = 255;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RG:
+			exp[0] = 255;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
 			exp[0] = 255;
 			exp[1] = 0;
 			exp[2] = 0;
@@ -1050,6 +1196,18 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[2] = 255;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
+		case GL_RG:
+			exp[0] = 255;
+			exp[1] = 255;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
+			exp[0] = 255;
+			exp[1] = 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
 		case GL_ALPHA:
 			exp[0] = 0;
 			exp[1] = 0;
@@ -1093,6 +1251,18 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 			exp[0] = 
 			exp[1] = 
 			exp[2] = testChan == 0 ? 255 : 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RG:
+			exp[0] =
+			exp[1] = testChan == 0 ? 255 : 0;
+			exp[2] = 0;
+			exp[3] = defaultAlpha; // fragment alpha or texture alpha
+			break;
+		case GL_RED:
+			exp[0] = testChan == 0 ? 255 : 0;
+			exp[1] = 0;
+			exp[2] = 0;
 			exp[3] = defaultAlpha; // fragment alpha or texture alpha
 			break;
 		case GL_ALPHA:
@@ -1232,6 +1402,8 @@ PixelFormatsTest::setup(void)
 	haveABGR = GLUtils::haveExtensions("GL_EXT_abgr");
 	haveSRGB = GLUtils::haveExtensions("GL_EXT_texture_sRGB");
 	haveCombine = GLUtils::haveExtensions("GL_ARB_texture_env_combine");
+	haveRG = GLUtils::haveExtensions("GL_ARB_texture_rg");
+	haveFloat = GLUtils::haveExtensions("GL_ARB_texture_float");
 
 	glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
 
