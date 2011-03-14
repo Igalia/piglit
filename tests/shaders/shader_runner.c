@@ -31,7 +31,7 @@
 #endif
 #include <string.h>
 #include <ctype.h>
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <stdlib.h>
 #else
 #include <libgen.h>
@@ -904,7 +904,7 @@ piglit_init(int argc, char **argv)
 	if (argc > 2) {
 		path = argv[2];
 	} else {
-#if defined(WIN32)
+#if defined(_WIN32)
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];
 		char fname[_MAX_FNAME];

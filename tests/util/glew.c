@@ -2365,7 +2365,7 @@ PFNGLTEXCOORD4FVERTEX4FVSUNPROC __glewTexCoord4fVertex4fvSUN = NULL;
 
 PFNGLADDSWAPHINTRECTWINPROC __glewAddSwapHintRectWIN = NULL;
 
-#endif /* !WIN32 || !GLEW_MX */
+#endif /* !_WIN32 || !GLEW_MX */
 
 #if !defined(GLEW_MX)
 
