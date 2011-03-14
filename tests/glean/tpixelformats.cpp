@@ -43,6 +43,7 @@
 // Maybe add fragment program path as a 3rd envMode (below) someday.
 #define USE_FRAG_PROG 0
 
+#define abort() do { printf("%s:%i\n", __func__, __LINE__); abort(); } while (0)
 
 namespace GLEAN {
 
@@ -63,9 +64,7 @@ static const NameTokenComps Types[] =
 	{ "GL_UNSIGNED_SHORT", GL_UNSIGNED_SHORT, 0 },
 	{ "GL_INT", GL_INT, 0 },
 	{ "GL_FLOAT", GL_FLOAT, 0 },
-#ifdef GL_ARB_half_float_pixel
 	{ "GL_HALF_FLOAT_ARB", GL_HALF_FLOAT_ARB, 0 },
-#endif
 
 	{ "GL_UNSIGNED_INT_8_8_8_8", GL_UNSIGNED_INT_8_8_8_8, 4 },
 	{ "GL_UNSIGNED_INT_8_8_8_8_REV", GL_UNSIGNED_INT_8_8_8_8_REV, 4 },
@@ -78,7 +77,7 @@ static const NameTokenComps Types[] =
 	{ "GL_UNSIGNED_SHORT_5_6_5", GL_UNSIGNED_SHORT_5_6_5, 3 },
 	{ "GL_UNSIGNED_SHORT_5_6_5_REV", GL_UNSIGNED_SHORT_5_6_5_REV, 3 },
 	{ "GL_UNSIGNED_BYTE_3_3_2", GL_UNSIGNED_BYTE_3_3_2, 3 },
-	{ "GL_UNSIGNED_BYTE_2_3_3_REV", GL_UNSIGNED_BYTE_2_3_3_REV, 3 }
+	{ "GL_UNSIGNED_BYTE_2_3_3_REV", GL_UNSIGNED_BYTE_2_3_3_REV, 3 },
 };
 
 #define NUM_TYPES (sizeof(Types) / sizeof(Types[0]))
@@ -96,9 +95,7 @@ static const NameTokenComps Formats[] =
 	{ "GL_ALPHA", GL_ALPHA, 1 },
 	{ "GL_LUMINANCE", GL_LUMINANCE, 1 },
 	{ "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, 2 },
-#ifdef GL_EXT_abgr
-	{ "GL_ABGR_EXT", GL_ABGR_EXT, 4 }
-#endif
+	{ "GL_ABGR_EXT", GL_ABGR_EXT, 4 },
 };
 
 #define NUM_FORMATS (sizeof(Formats) / sizeof(Formats[0]))
@@ -117,10 +114,8 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_RGB10_A2", GL_RGB10_A2, 4 },
 	{ "GL_RGBA12", GL_RGBA12, 4 },
 	{ "GL_RGBA16", GL_RGBA16, 4 },
-#ifdef GL_EXT_texture_sRGB
 	{ "GL_SRGB_ALPHA_EXT", GL_SRGB_ALPHA_EXT, 4 },
 	{ "GL_SRGB8_ALPHA8_EXT", GL_SRGB8_ALPHA8_EXT, 4 },
-#endif
 
 	{ "3", 3, 3 },
 	{ "GL_RGB", GL_RGB, 3 },
@@ -131,23 +126,19 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_RGB10", GL_RGB10, 3 },
 	{ "GL_RGB12", GL_RGB12, 3 },
 	{ "GL_RGB16", GL_RGB16, 3 },
-#ifdef GL_EXT_texture_sRGB
 	{ "GL_SRGB_EXT", GL_SRGB_EXT, 3 },
 	{ "GL_SRGB8_EXT", GL_SRGB8_EXT, 3 },
-#endif
 
-	{ "2", 2, 1 },
-	{ "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, 1 },
+	{ "2", 2, 2 },
+	{ "GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA, 2 },
 	{ "GL_LUMINANCE4_ALPHA4", GL_LUMINANCE4_ALPHA4, 1 },
 	{ "GL_LUMINANCE6_ALPHA2", GL_LUMINANCE6_ALPHA2, 1 },
 	{ "GL_LUMINANCE8_ALPHA8", GL_LUMINANCE8_ALPHA8, 1 },
 	{ "GL_LUMINANCE12_ALPHA4", GL_LUMINANCE12_ALPHA4, 1 },
 	{ "GL_LUMINANCE12_ALPHA12", GL_LUMINANCE12_ALPHA12, 1 },
 	{ "GL_LUMINANCE16_ALPHA16", GL_LUMINANCE16_ALPHA16, 1 },
-#ifdef GL_EXT_texture_sRGB
 	{ "GL_SLUMINANCE_ALPHA_EXT", GL_SLUMINANCE_ALPHA_EXT, 3 },
 	{ "GL_SLUMINANCE8_ALPHA8_EXT", GL_SLUMINANCE8_ALPHA8_EXT, 3 },
-#endif
 
 	{ "1", 1, 1 },
 	{ "GL_LUMINANCE", GL_LUMINANCE, 1 },
@@ -155,10 +146,8 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_LUMINANCE8", GL_LUMINANCE8, 1 },
 	{ "GL_LUMINANCE12", GL_LUMINANCE12, 1 },
 	{ "GL_LUMINANCE16", GL_LUMINANCE16, 1 },
-#ifdef GL_EXT_texture_sRGB
 	{ "GL_SLUMINANCE_EXT", GL_SLUMINANCE_EXT, 3 },
 	{ "GL_SLUMINANCE8_EXT", GL_SLUMINANCE8_EXT, 3 },
-#endif
 
 	{ "GL_ALPHA", GL_ALPHA, 1 },
 	{ "GL_ALPHA4", GL_ALPHA4, 1 },
@@ -198,9 +187,7 @@ ComponentMasks(GLenum datatype, GLuint masks[4])
 	case GL_UNSIGNED_INT:
 	case GL_INT:
 	case GL_FLOAT:
-#ifdef GL_ARB_half_float_pixel
 	case GL_HALF_FLOAT_ARB:
-#endif
 		masks[0] =
 		masks[1] =
 		masks[2] =
@@ -351,14 +338,12 @@ ComponentPositions(GLenum format, GLint pos[4])
 		pos[2] = -1;
 		pos[3] = 0;
 		break;
-#ifdef GL_EXT_abgr
 	case GL_ABGR_EXT:
 		pos[0] = 3;
 		pos[1] = 2;
 		pos[2] = 1;
 		pos[3] = 0;
 		break;
-#endif
 	default:
 		abort();
 	}
@@ -421,7 +406,6 @@ BaseTextureFormat(GLint intFormat)
 	case GL_RGBA16:
 		return GL_RGBA;
 
-#ifdef GL_EXT_texture_sRGB
 	case GL_SRGB_EXT:
 	case GL_SRGB8_EXT:
 	case GL_COMPRESSED_SRGB_EXT:
@@ -442,7 +426,6 @@ BaseTextureFormat(GLint intFormat)
 	case GL_SLUMINANCE_EXT:
 	case GL_SLUMINANCE8_EXT:
 		return GL_LUMINANCE;
-#endif
 	default:
 		abort();
 	}
@@ -498,9 +481,6 @@ SizeofType(GLenum datatype)
 	case GL_UNSIGNED_INT:
 	case GL_INT:
 	case GL_FLOAT:
-#ifdef GL_ARB_half_float_pixel
-	case GL_HALF_FLOAT_ARB:
-#endif
 		return 4;
 	case GL_UNSIGNED_SHORT_5_5_5_1:
 	case GL_UNSIGNED_SHORT_1_5_5_5_REV:
@@ -510,6 +490,7 @@ SizeofType(GLenum datatype)
 	case GL_UNSIGNED_SHORT_5_6_5_REV:
 	case GL_UNSIGNED_SHORT:
 	case GL_SHORT:
+	case GL_HALF_FLOAT_ARB:
 		return 2;
 	case GL_UNSIGNED_BYTE_3_3_2:
 	case GL_UNSIGNED_BYTE_2_3_3_REV:
@@ -533,15 +514,11 @@ PixelFormatsTest::CompatibleFormatAndType(GLenum format, GLenum datatype) const
 	if (format == GL_BGR && IsPackedType(datatype))
 		return false;
 
-#ifdef GL_ARB_half_float_pixel
 	if (datatype == GL_HALF_FLOAT_ARB && !haveHalfFloat)
 		return false;
-#endif
 
-#ifdef GL_EXT_abgr
 	if (format == GL_ABGR_EXT && !haveABGR)
 		return false;
-#endif
 
 	const int formatComps = NumberOfComponentsInFormat(format);
 	const int typeComps = NumberOfComponentsInPackedType(datatype);
@@ -553,7 +530,6 @@ bool
 PixelFormatsTest::SupportedIntFormat(GLint intFormat) const
 {
 	switch (intFormat) {
-#ifdef GL_EXT_texture_sRGB
 	case GL_SRGB_ALPHA_EXT:
 	case GL_SRGB8_ALPHA8_EXT:
 	case GL_SRGB_EXT:
@@ -563,7 +539,6 @@ PixelFormatsTest::SupportedIntFormat(GLint intFormat) const
 	case GL_SLUMINANCE_EXT:
 	case GL_SLUMINANCE8_EXT:
 		return haveSRGB;
-#endif
 	default:
 		return true;
 	}
@@ -725,7 +700,6 @@ MakeImage(int width, int height, GLenum format, GLenum type,
 				}
 			}
 			break;
-#ifdef GL_ARB_half_float_pixel
 		case GL_HALF_FLOAT_ARB:
 			{
 				GLhalfARB *f = (GLhalfARB *) image;
@@ -737,7 +711,6 @@ MakeImage(int width, int height, GLenum format, GLenum type,
 				}
 			}
 			break;
-#endif
 		default:
 			abort();
 		}
@@ -829,9 +802,7 @@ PixelFormatsTest::ComputeExpected(GLenum srcFormat, int testChan,
 
 	case GL_RGBA:
 	case GL_BGRA:
-#ifdef GL_EXT_abgr
 	case GL_ABGR_EXT:
-#endif
 		assert(testChan < 4);
 		switch (baseIntFormat) {
 		case 0: // == glReadPixels
@@ -1260,11 +1231,7 @@ PixelFormatsTest::setup(void)
 	haveHalfFloat = GLUtils::haveExtensions("GL_ARB_half_float_pixel");
 	haveABGR = GLUtils::haveExtensions("GL_EXT_abgr");
 	haveSRGB = GLUtils::haveExtensions("GL_EXT_texture_sRGB");
-#if GL_ARB_texture_env_combine
 	haveCombine = GLUtils::haveExtensions("GL_ARB_texture_env_combine");
-#else
-	haveCombine = false;
-#endif
 
 	glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
 
@@ -1332,7 +1299,6 @@ PixelFormatsTest::runOne(MultiTestResult &r, Window &w)
 		}
 		else {
 			assert(haveCombine);
-#if GL_ARB_texture_env_combine
 			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_REPLACE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
@@ -1340,7 +1306,6 @@ PixelFormatsTest::runOne(MultiTestResult &r, Window &w)
 			glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, GL_SRC_COLOR);
 			glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, GL_SRC_ALPHA);
-#endif
 			// For this GL_COMBINE mode, when sampling a texture that does
 			// not have an alpha channel, alpha is effectively 1.0.
 			defaultAlpha = 255;
