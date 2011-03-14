@@ -32,6 +32,10 @@
 
 #include "tbase.h"
 
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
 namespace GLEAN {
 
 #define windowSize 100
