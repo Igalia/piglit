@@ -519,10 +519,8 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 			format_index = test_sets[test_index].num_formats - 1;
 		}
 		break;
-
-	default:
-		piglit_escape_exit_key(key, x, y);
 	}
+	piglit_escape_exit_key(key, x, y);
 }
 
 static void fbo_formats_init(int argc, char **argv, GLboolean print_options)

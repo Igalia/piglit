@@ -59,10 +59,8 @@ key_func(unsigned char key, int x, int y)
 	case 'd':
 		set_npot(tex_width == 256 && GLEW_ARB_texture_non_power_of_two);
 		break;
-
-	default:
-		fbo_formats_key_func(key, x, y);
 	}
+	fbo_formats_key_func(key, x, y);
 }
 
 static int
