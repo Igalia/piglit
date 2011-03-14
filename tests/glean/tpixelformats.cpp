@@ -173,6 +173,33 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_R32F", GL_R32F, 1},
 	{ "GL_RG32F", GL_RG32F, 2 },
 
+	{ "GL_RED_SNORM", GL_RED_SNORM, 1 },
+	{ "GL_RG_SNORM", GL_RG_SNORM, 2 },
+	{ "GL_RGB_SNORM", GL_RGB_SNORM, 3 },
+	{ "GL_RGBA_SNORM", GL_RGBA_SNORM, 4 },
+	{ "GL_ALPHA_SNORM", GL_ALPHA_SNORM, 1 },
+	{ "GL_LUMINANCE_SNORM", GL_LUMINANCE_SNORM, 1 },
+	{ "GL_LUMINANCE_ALPHA_SNORM", GL_LUMINANCE_ALPHA_SNORM, 2 },
+	{ "GL_INTENSITY_SNORM", GL_INTENSITY_SNORM, 1 },
+
+	{ "GL_R8_SNORM", GL_R8_SNORM, 1 },
+	{ "GL_RG8_SNORM", GL_RG8_SNORM, 2 },
+	{ "GL_RGB8_SNORM", GL_RGB8_SNORM, 3 },
+	{ "GL_RGBA8_SNORM", GL_RGBA8_SNORM, 4 },
+	{ "GL_ALPHA8_SNORM", GL_ALPHA8_SNORM, 1 },
+	{ "GL_LUMINANCE8_SNORM", GL_LUMINANCE8_SNORM, 1 },
+	{ "GL_LUMINANCE8_ALPHA8_SNORM", GL_LUMINANCE8_ALPHA8_SNORM, 2 },
+	{ "GL_INTENSITY8_SNORM", GL_INTENSITY8_SNORM, 1 },
+
+	{ "GL_R16_SNORM", GL_R16_SNORM, 1 },
+	{ "GL_RG16_SNORM", GL_RG16_SNORM, 2 },
+	{ "GL_RGB16_SNORM", GL_RGB16_SNORM, 3 },
+	{ "GL_RGBA16_SNORM", GL_RGBA16_SNORM, 4 },
+	{ "GL_ALPHA16_SNORM", GL_ALPHA16_SNORM, 1 },
+	{ "GL_LUMINANCE16_SNORM", GL_LUMINANCE16_SNORM, 1 },
+	{ "GL_LUMINANCE16_ALPHA16_SNORM", GL_LUMINANCE16_ALPHA16_SNORM, 2 },
+	{ "GL_INTENSITY16_SNORM", GL_INTENSITY16_SNORM, 1 },
+
 	// XXX maybe add compressed formats too...
 };
 
@@ -380,6 +407,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_ALPHA8:
 	case GL_ALPHA12:
 	case GL_ALPHA16:
+	case GL_ALPHA_SNORM:
+	case GL_ALPHA8_SNORM:
+	case GL_ALPHA16_SNORM:
 		return GL_ALPHA;
 	case 1:
 	case GL_LUMINANCE:
@@ -387,6 +417,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_LUMINANCE8:
 	case GL_LUMINANCE12:
 	case GL_LUMINANCE16:
+	case GL_LUMINANCE_SNORM:
+	case GL_LUMINANCE8_SNORM:
+	case GL_LUMINANCE16_SNORM:
 		return GL_LUMINANCE;
 	case 2:
 	case GL_LUMINANCE_ALPHA:
@@ -396,12 +429,18 @@ BaseTextureFormat(GLint intFormat)
 	case GL_LUMINANCE12_ALPHA4:
 	case GL_LUMINANCE12_ALPHA12:
 	case GL_LUMINANCE16_ALPHA16:
+	case GL_LUMINANCE_ALPHA_SNORM:
+	case GL_LUMINANCE8_ALPHA8_SNORM:
+	case GL_LUMINANCE16_ALPHA16_SNORM:
 		return GL_LUMINANCE_ALPHA;
 	case GL_INTENSITY:
 	case GL_INTENSITY4:
 	case GL_INTENSITY8:
 	case GL_INTENSITY12:
 	case GL_INTENSITY16:
+	case GL_INTENSITY_SNORM:
+	case GL_INTENSITY8_SNORM:
+	case GL_INTENSITY16_SNORM:
 		return GL_INTENSITY;
 
 	case GL_RED:
@@ -409,6 +448,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_R16:
 	case GL_R16F:
 	case GL_R32F:
+	case GL_RED_SNORM:
+	case GL_R8_SNORM:
+	case GL_R16_SNORM:
 		return GL_RED;
 
 	case GL_RG:
@@ -416,6 +458,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_RG16:
 	case GL_RG16F:
 	case GL_RG32F:
+	case GL_RG_SNORM:
+	case GL_RG8_SNORM:
+	case GL_RG16_SNORM:
 		return GL_RG;
 
 	case 3:
@@ -427,6 +472,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_RGB10:
 	case GL_RGB12:
 	case GL_RGB16:
+	case GL_RGB_SNORM:
+	case GL_RGB8_SNORM:
+	case GL_RGB16_SNORM:
 		return GL_RGB;
 	case 4:
 	case GL_RGBA:
@@ -437,6 +485,9 @@ BaseTextureFormat(GLint intFormat)
 	case GL_RGB10_A2:
 	case GL_RGBA12:
 	case GL_RGBA16:
+	case GL_RGBA_SNORM:
+	case GL_RGBA8_SNORM:
+	case GL_RGBA16_SNORM:
 		return GL_RGBA;
 
 	case GL_SRGB_EXT:
@@ -587,7 +638,33 @@ PixelFormatsTest::SupportedIntFormat(GLint intFormat) const
 	case GL_R32F:
 	case GL_RG32F:
 		return haveRG && haveFloat;
+	case GL_RED_SNORM:
+	case GL_R8_SNORM:
+	case GL_R16_SNORM:
+	case GL_RG_SNORM:
+	case GL_RG8_SNORM:
+	case GL_RG16_SNORM:
+	case GL_RGB_SNORM:
+	case GL_RGB8_SNORM:
+	case GL_RGB16_SNORM:
+	case GL_RGBA_SNORM:
+	case GL_RGBA8_SNORM:
+	case GL_RGBA16_SNORM:
+	case GL_ALPHA_SNORM:
+	case GL_ALPHA8_SNORM:
+	case GL_ALPHA16_SNORM:
+	case GL_LUMINANCE_SNORM:
+	case GL_LUMINANCE8_SNORM:
+	case GL_LUMINANCE16_SNORM:
+	case GL_LUMINANCE_ALPHA_SNORM:
+	case GL_LUMINANCE8_ALPHA8_SNORM:
+	case GL_LUMINANCE16_ALPHA16_SNORM:
+	case GL_INTENSITY_SNORM:
+	case GL_INTENSITY8_SNORM:
+	case GL_INTENSITY16_SNORM:
+		return haveSnorm;
 	default:
+
 		return true;
 	}
 }
@@ -1404,6 +1481,7 @@ PixelFormatsTest::setup(void)
 	haveCombine = GLUtils::haveExtensions("GL_ARB_texture_env_combine");
 	haveRG = GLUtils::haveExtensions("GL_ARB_texture_rg");
 	haveFloat = GLUtils::haveExtensions("GL_ARB_texture_float");
+	haveSnorm = GLUtils::haveExtensions("GL_EXT_texture_snorm");
 
 	glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
 
