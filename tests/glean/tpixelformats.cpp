@@ -43,7 +43,7 @@
 // Maybe add fragment program path as a 3rd envMode (below) someday.
 #define USE_FRAG_PROG 0
 
-#define abort() do { printf("%s:%i\n", __func__, __LINE__); abort(); } while (0)
+#define abort() do { printf("%s:%i\n", __FUNCTION__, __LINE__); abort(); } while (0)
 
 namespace GLEAN {
 
