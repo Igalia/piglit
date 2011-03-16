@@ -64,8 +64,12 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		printf("FBO incomplete\n");
+		if (!level)
+			printf(" - FBO incomplete\n");
 		return false;
+	} else {
+		if (!level)
+			printf("\n");
 	}
 
 	/* Handle the small sizes of compressed mipmap blocks */
@@ -353,7 +357,7 @@ test_format(const struct format_desc *format, GLenum baseformat)
 	int level;
 	GLboolean pass = GL_TRUE;
 
-	printf("Testing %s\n", format->name);
+	printf("Testing %s", format->name);
 	tex = create_tex(format->internalformat, baseformat);
 
 	if (tex == 0)
