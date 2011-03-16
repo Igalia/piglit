@@ -90,13 +90,13 @@ GLboolean test()
 
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 
-	for(vert_clamp = 0; vert_clamp < (test_defaults ? 1 : 3); ++vert_clamp)
-	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
-	for(semantic = 0; semantic < 2; ++semantic)
-	for(blend = 0; blend < 4; ++blend)
-	for(logicop = 0; logicop < 2; ++logicop)
-	for(vpmode = 0; vpmode < vpmodes; ++vpmode)
-	for(fpmode = 0; fpmode < fpmodes; ++fpmode)
+	for (vert_clamp = 0; vert_clamp < (sanity ? 1 : 3); ++vert_clamp)
+	for (frag_clamp = sanity ? 1 : 0; frag_clamp < (sanity ? 2 : 3); ++frag_clamp)
+	for (semantic = 0; semantic < 2; ++semantic)
+	for (blend = 0; blend < 4; ++blend)
+	for (logicop = 0; logicop < 2; ++logicop)
+	for (vpmode = 0; vpmode < vpmodes; ++vpmode)
+	for (fpmode = 0; fpmode < fpmodes; ++fpmode)
 	{
 		char test_name[4096];
 		unsigned clamped = (semantic == 0 && (clamp_enums[vert_clamp] == GL_TRUE || (clamp_enums[vert_clamp] == GL_FIXED_ONLY_ARB && fixed))) || clamp_enums[frag_clamp] == GL_TRUE || (clamp_enums[frag_clamp] == GL_FIXED_ONLY_ARB && fixed);
@@ -104,11 +104,11 @@ GLboolean test()
 		GLboolean cpass;
 		GLboolean opass;
 
-		if(!fpmode && semantic)
+		if (!fpmode && semantic)
 			continue;
 
 		sprintf(test_name, "%s: Attrib %s  VertClamp %s  FragClamp %s  Blending %s  LogicOp %s  %s  %s  Fog %s (expecting %sclamping)", format_name, semantic ? "TEXCOORD0" : "COLOR    ", clamp_strings[vert_clamp], clamp_strings[frag_clamp], blend_strings[blend], logicop ? "Yes" : "No ", vpmode ? "ARB_vp" : "ffvp  ", fpmode ? "ARB_fp" : "fffp  ", test_fog ? "Yes" : "No ", clamped ? "" : "no ");
-		if (!test_defaults) {
+		if (!sanity) {
 			glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
 			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 		}
@@ -116,85 +116,92 @@ GLboolean test()
 		glColor4f(0.1f, 0.2f, 0.3f, 0.4f);
 		glTexCoord4f(0.5f, 0.6f, 0.7f, 0.8f);
 
-		if(vpmode)
+		if (vpmode)
 		{
 			glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vps[semantic]);
 			glEnable(GL_VERTEX_PROGRAM_ARB);
 		}
 		else
 		{
-			if(semantic == 0)
+			if (semantic == 0)
 				glColor4f(pixels[0], pixels[1], pixels[2], pixels[3]);
 			else
 				glTexCoord4f(pixels[0], pixels[1], pixels[2], pixels[3]);
 		}
 
-		if(fpmode)
+		if (fpmode)
 		{
 			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, fps[semantic + (test_fog ? 2 : 0)]);
 			glEnable(GL_FRAGMENT_PROGRAM_ARB);
 		}
 		else
 		{
-			if(test_fog)
+			if (test_fog)
 				glEnable(GL_FOG);
 		}
 
 		glClearColor(0.5, 0.5, 0.5, 0.5);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		if(blend)
+		if (blend)
 		{
 			glEnable(GL_BLEND);
 			glBlendFunc(blend_src[blend], blend_dst[blend]);
 			glBlendColor(2.0f, 2.0f, 2.0f, 2.0f);
 		}
-		if(logicop)
+		if (logicop)
 			glEnable(GL_COLOR_LOGIC_OP);
 
 		piglit_draw_rect(-1, -1, 1, 1);
 
-		if(logicop)
+		if (logicop)
 			glDisable(GL_COLOR_LOGIC_OP);
-		if(blend)
+		if (blend)
 			glDisable(GL_BLEND);
-		if(vpmode)
+		if (vpmode)
 			glDisable(GL_VERTEX_PROGRAM_ARB);
-		if(fpmode)
+		if (fpmode)
 			glDisable(GL_FRAGMENT_PROGRAM_ARB);
-		else if(test_fog)
+		else if (test_fog)
 			glDisable(GL_FOG);
 
-		if(blend == 2 && !logicop)
+		if (blend == 2 && !logicop)
 		{
-			if(fixed)
+			if (fixed_snorm)
+				expected = clamped ? clamped_pixels_mul_2_signed_clamped : signed_clamped_pixels_mul_2_signed_clamped;
+			else if (fixed)
 				expected = clamped_pixels;
 			else
 				expected = clamped ? clamped_pixels_mul_2 : pixels_mul_2;
 		}
-		else if(blend == 3 && !logicop)
+		else if (blend == 3 && !logicop)
 		{
-			if(fixed)
+			if (fixed_snorm)
+				expected = clamped ? clamped_pixels_plus_half_signed_clamped : signed_clamped_pixels_plus_half_signed_clamped;
+			else if (fixed)
 				expected = clamped_pixels_plus_half_clamped;
 			else
 				expected = clamped ? clamped_pixels_plus_half : pixels_plus_half;
 		}
 		else
-			expected = (clamped || fixed) ? clamped_pixels : pixels;
+			expected = clamped ? clamped_pixels :
+				   fixed_snorm ? signed_clamped_pixels :
+				   fixed ? clamped_pixels :
+				   pixels;
 
 		opass = cpass = piglit_probe_pixel_rgba_silent(0, 0, expected, probe);
 
-		if(nvidia_driver && clamped && !(semantic == 0 && clamp_enums[vert_clamp] == GL_TRUE) && clamp_enums[frag_clamp] == GL_TRUE && !fixed && fpmode && (!blend || logicop || format == GL_RGBA16F_ARB))
+		if (nvidia_driver && clamped && !(semantic == 0 && clamp_enums[vert_clamp] == GL_TRUE) && clamp_enums[frag_clamp] == GL_TRUE && !fixed && fpmode && (!blend || logicop || format == GL_RGBA16F_ARB))
 		{
 			printf("nVidia driver known *** MAJOR BUG ***: they don't clamp fragment program results with ARB_fp on either fp32 with no blending or fp16!\n");
 			opass = GL_TRUE;
 		}
-		if(nvidia_driver && clamped && !fixed && !fpmode && semantic == 0 && clamp_enums[vert_clamp] != GL_TRUE && clamp_enums[frag_clamp] == GL_TRUE)
+		if (nvidia_driver && clamped && !fixed && !fpmode && semantic == 0 && clamp_enums[vert_clamp] != GL_TRUE && clamp_enums[frag_clamp] == GL_TRUE)
 		{
 			printf("nVidia driver known *** MAJOR BUG ***: they don't clamp fragment program results with fffp, vertex clamp off and fragment clamp on fp16/fp32!\n");
 			opass = GL_TRUE;
 		}
-		if(test_fog && fpmode)
+		if (test_fog && fpmode)
 		{
 			//printf("Unclear specification on GL_ARB_fog_*\n");
 			opass = GL_TRUE;
@@ -220,17 +227,17 @@ GLboolean test()
 unsigned
 init()
 {
-	if(GLEW_ARB_vertex_program)
+	if (GLEW_ARB_vertex_program)
 	{
 		unsigned i;
-		for(i = 0; i < 2; ++i)
+		for (i = 0; i < 2; ++i)
 			vps[i] = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, vp_strings[i]);
 	}
 
-	if(GLEW_ARB_fragment_program)
+	if (GLEW_ARB_fragment_program)
 	{
 		unsigned i;
-		for(i = 0; i < 4; ++i)
+		for (i = 0; i < 4; ++i)
 			fps[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, fp_strings[i]);
 	}
 

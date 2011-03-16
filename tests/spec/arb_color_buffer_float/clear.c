@@ -46,16 +46,16 @@ GLboolean test()
 	GLboolean pass = GL_TRUE;
 	unsigned vert_clamp, frag_clamp;
 
-	for (vert_clamp = 0; vert_clamp < (test_defaults ? 1 : 3); ++vert_clamp)
+	for (vert_clamp = 0; vert_clamp < (sanity ? 1 : 3); ++vert_clamp)
 	{
-		for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
+		for (frag_clamp = sanity ? 1 : 0; frag_clamp < (sanity ? 2 : 3); ++frag_clamp)
 		{
 			GLboolean cpass;
 			GLboolean opass;
 			float* expected;
 
-			printf("glClear of fbo for float texture with vertex clamp %s and fragment clamp %s (expecting no clamping)\n", clamp_strings[vert_clamp], clamp_strings[frag_clamp]);
-			if (!test_defaults) {
+			printf("glClear of fbo with vertex clamp %s and fragment clamp %s (expecting no clamping)\n", clamp_strings[vert_clamp], clamp_strings[frag_clamp]);
+			if (!sanity) {
 				glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
 				glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 			}
@@ -63,7 +63,7 @@ GLboolean test()
 			glClearColor(pixels[0], pixels[1], pixels[2], pixels[3]);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			expected = fixed ? clamped_pixels : pixels;
+			expected = fixed ? (fixed_snorm ? signed_clamped_pixels : clamped_pixels) : pixels;
 
 			cpass = piglit_probe_pixel_rgba(0, 0, expected);
 			opass = cpass;

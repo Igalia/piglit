@@ -40,15 +40,17 @@ GLboolean test()
 		float observed[16];
 		float* expected;
 
-		printf("glGetTexImage of %s texture with read clamp %s (expecting %sclamping)\n", format_name, clamp_strings[read_clamp], fixed ? "" : "no ");
-		if (!test_defaults)
+		printf("glGetTexImage of %s texture with read clamp %s (expecting %sclamping)\n", format_name, clamp_strings[read_clamp], fixed && !fixed_snorm ? "" : "no ");
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
 		memset(observed, 0, sizeof(observed));
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, observed);
 
-		expected = fixed ? clamped_pixels : pixels;
-		pass = compare_arrays(expected, observed, 16);
+		expected = fixed_snorm ? signed_clamped_pixels :
+			   fixed ? clamped_pixels :
+			   pixels;
+		pass = compare_arrays(expected, observed, 4, 4) && pass;
 	}
 	return pass;
 }

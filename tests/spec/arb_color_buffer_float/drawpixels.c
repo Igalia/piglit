@@ -39,7 +39,7 @@ GLboolean test()
 	GLboolean pass = GL_TRUE;
 	unsigned frag_clamp;
 
-	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
+	for (frag_clamp = sanity ? 1 : 0; frag_clamp < (sanity ? 2 : 3); ++frag_clamp)
 	{
 		GLboolean cpass = GL_TRUE;
 		GLboolean opass;
@@ -47,8 +47,8 @@ GLboolean test()
 		unsigned x, y;
 		float* expected;
 
-		printf("glDrawPixels of fbo for float texture with fragment clamp %s (expecting %sclamping)\n", clamp_strings[frag_clamp], clamped ? "" : "no ");
-		if (!test_defaults)
+		printf("glDrawPixels of fbo with fragment clamp %s (expecting %sclamping)\n", clamp_strings[frag_clamp], clamped ? "" : "no ");
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 
 		glClearColor(0, 0, 0, 0);
@@ -57,7 +57,10 @@ GLboolean test()
 		glWindowPos2fARB(0, 0);
 		glDrawPixels(2, 2, GL_RGBA, GL_FLOAT, pixels);
 
-		expected = ((clamped || fixed) ? clamped_pixels : pixels);
+		expected = clamped ? clamped_pixels :
+			   fixed_snorm ? signed_clamped_pixels :
+			   fixed ? clamped_pixels :
+			   pixels;
 		for(y = 0; y < 2; ++y)
 			for(x = 0; x < 2; ++x)
 				cpass = piglit_probe_pixel_rgba(x, y, expected + 8 * y + 4 * x) && cpass;

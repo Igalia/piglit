@@ -72,7 +72,7 @@ test()
 	GLboolean pass = GL_TRUE;
 	unsigned frag_clamp;
 
-	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
+	for (frag_clamp = sanity ? 1 : 0; frag_clamp < (sanity ? 2 : 3); ++frag_clamp)
 	{
 		GLboolean cpass = GL_TRUE;
 		GLboolean opass;
@@ -80,7 +80,7 @@ test()
 		float *expected, *expected1;
 
 		printf("MRT rendering in %s mode with fragment clamp %s (expecting %sclamping)\n", mrt_mode_strings[mrt_mode], clamp_strings[frag_clamp], clamped ? "" : "no ");
-		if (!test_defaults)
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 
 		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, mrt_vp);
@@ -96,8 +96,12 @@ test()
 		glDisable(GL_VERTEX_PROGRAM_ARB);
 		glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
-		expected = (clamped || fixed0) ? clamped_pixels : pixels;
-		expected1 = (clamped || fixed1) ? clamped_pixels : pixels;
+		expected = clamped ? clamped_pixels :
+			   fixed ? clamped_pixels :
+			   pixels;
+		expected1 = clamped ? clamped_pixels :
+			    fixed1 ? clamped_pixels :
+			    pixels;
 
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 		printf("Probing buffer 0 (%s)\n", fixed ? "fixed point" : "floating point");

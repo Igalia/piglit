@@ -53,15 +53,18 @@ GLboolean test()
 		unsigned clamped = clamp_enums[read_clamp] == GL_TRUE || (clamp_enums[read_clamp] == GL_FIXED_ONLY_ARB && fixed);
 		float* expected;
 
-		printf("glReadPixels of fbo for float texture with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
-		if (!test_defaults)
+		printf("glReadPixels of fbo with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
 		memset(observed, 0, sizeof(observed));
 		glReadPixels(0, 0, 2, 2, GL_RGBA, GL_FLOAT, observed);
 
-		expected = (fixed || clamped) ? clamped_pixels : pixels;
-		cpass = compare_arrays(expected, observed, 4);
+		expected = clamped ? clamped_pixels :
+			   fixed_snorm ? signed_clamped_pixels :
+			   fixed ? clamped_pixels :
+			   pixels;
+		cpass = compare_arrays(expected, observed, 4, 4);
 
 		opass = cpass;
 		if(!cpass && nvidia_driver && clamped)
@@ -72,7 +75,7 @@ GLboolean test()
 		pass = opass && pass;
 	}
 
-	if (!test_defaults)
+	if (!sanity)
 		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 	return pass;
 }

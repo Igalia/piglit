@@ -45,11 +45,16 @@ static float pixels[] = {
 };
 
 static float clamped_pixels[16];
+static float signed_clamped_pixels[16];
 static float pixels_mul_2[16];
 static float clamped_pixels_mul_2[16];
+static float clamped_pixels_mul_2_signed_clamped[16];
+static float signed_clamped_pixels_mul_2_signed_clamped[16];
 static float pixels_plus_half[16];
 static float clamped_pixels_plus_half[16];
 static float clamped_pixels_plus_half_clamped[16];
+static float clamped_pixels_plus_half_signed_clamped[16];
+static float signed_clamped_pixels_plus_half_signed_clamped[16];
 
 static const char* clamp_strings[] = {"TRUE ", "FIXED", "FALSE"};
 static GLenum clamp_enums[] = {GL_TRUE, GL_FIXED_ONLY_ARB, GL_FALSE};
@@ -64,6 +69,16 @@ static float clamp(float f)
 		return 1.0f;
 	else
 		return 0.0f;
+}
+
+static float signed_clamp(float f)
+{
+	if (f >= -1.0f && f <= 1.0f)
+		return f;
+	else if (f > -1.0f)
+		return 1.0f;
+	else
+		return -1.0f;
 }
 
 static unsigned ati_driver;
@@ -85,11 +100,12 @@ enum test_mode_type {
 
 static enum test_mode_type test_mode;
 
-static GLboolean test_defaults, test_fog;
+static GLboolean sanity, test_fog;
 static GLenum format;
 static const char* format_name;
-static GLboolean fixed;
-static GLboolean fixed0, fixed1;
+static GLboolean fixed, fixed_snorm;
+static GLboolean fixed0;
+static GLboolean fixed1;
 static unsigned mrt_mode;
 
 static GLboolean test();
@@ -97,7 +113,8 @@ static GLboolean test();
 static GLboolean run_test()
 {
 	GLboolean pass = GL_TRUE;
-	fixed = fixed0 = format == GL_RGBA8;
+	fixed_snorm = format == GL_RGBA8_SNORM;
+	fixed = fixed0 = format == GL_RGBA8 || fixed_snorm;
 	fixed1 = -1;
 
 	glGenTextures(1, &tex);
@@ -143,7 +160,7 @@ static GLboolean run_test()
 
 	if (test_mode <= TEST_SRT)
 	{
-		if (!test_defaults)
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 		pass = test();
 	}
@@ -210,7 +227,7 @@ static GLboolean run_test()
 				}
 			}
 
-			if (!test_defaults)
+			if (!sanity)
 				glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 			pass = test() && pass;
 
@@ -285,28 +302,33 @@ piglit_init(int argc, char **argv)
 		if (!strcmp(argv[i], "-xfail")) {
 			distinguish_xfails = GL_TRUE;
 		} else if (!strcmp(argv[i], "sanity")) {
-			test_defaults = GL_TRUE;
+			sanity = GL_TRUE;
 		} else if (!strcmp(argv[i], "fog")) {
 			test_fog = GL_TRUE;
 		} else if (!strcmp(argv[i], "GL_RGBA16F")) {
 			piglit_require_extension("GL_ARB_texture_float");
 			format = GL_RGBA16F;
 			format_name = "f16";
-			printf("\n\n\nTesting 16-bit floating point FBO\n");
+			printf("\n\n\nTesting 16-bit floating-point FBO\n");
 		} else if (!strcmp(argv[i], "GL_RGBA32F")) {
 			piglit_require_extension("GL_ARB_texture_float");
 			format = GL_RGBA32F;
 			format_name = "f32";
-			printf("\n\n\nTesting 32-bit floating point FBO\n");
+			printf("\n\n\nTesting 32-bit floating-point FBO\n");
+		} else if (!strcmp(argv[i], "GL_RGBA8_SNORM")) {
+			piglit_require_extension("GL_EXT_texture_snorm");
+			format = GL_RGBA8_SNORM;
+			format_name = "sn8";
+			printf("\n\n\nTesting 8-bit signed normalized fixed-point FBO\n");
 		}
 	}
 	if (!format) {
 		format = GL_RGBA8;
 		format_name = "un8";
-		printf("Testing 8-bit fixed-point FBO\n");
+		printf("Testing 8-bit unsigned normalized fixed-point FBO\n");
 	}
 
-	if (test_defaults) {
+	if (sanity) {
 		printf("Testing default clamping rules only. This is a sanity check. GL_ARB_color_buffer_float is not required.\n");
 	} else {
 		piglit_require_extension("GL_ARB_color_buffer_float");
@@ -334,24 +356,40 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < sizeof(pixels) / sizeof(pixels[0]); ++i)
 	{
 		clamped_pixels[i] = clamp(pixels[i]);
+		signed_clamped_pixels[i] = signed_clamp(pixels[i]);
+
 		pixels_mul_2[i] = pixels[i] * 2.0f;
 		clamped_pixels_mul_2[i] = clamped_pixels[i] * 2.0f;
+		clamped_pixels_mul_2_signed_clamped[i] = signed_clamp(clamped_pixels_mul_2[i]);
+		signed_clamped_pixels_mul_2_signed_clamped[i] = signed_clamp(signed_clamped_pixels[i] * 2.0f);
+
 		pixels_plus_half[i] = pixels[i] + 0.5f;
 		clamped_pixels_plus_half[i] = clamped_pixels[i] + 0.5f;
 		clamped_pixels_plus_half_clamped[i] = clamp(clamped_pixels_plus_half[i]);
+		clamped_pixels_plus_half_signed_clamped[i] = signed_clamp(clamped_pixels_plus_half[i]);
+		signed_clamped_pixels_plus_half_signed_clamped[i] = signed_clamp(signed_clamped_pixels[i] + 0.5);
 	}
 }
 
-GLboolean compare_arrays(float* expected, float* observed, int length)
+GLboolean compare_arrays(float* expected, float* observed, int comps, int length)
 {
 	GLboolean pass = GL_TRUE;
-	unsigned i;
+	unsigned i, j, k;
 	for (i = 0; i < length; ++i)
 	{
-		if (fabs(expected[i] - observed[i]) > 0.01)
-		{
-			printf("At %i Expected: %f Observed: %f\n", i, expected[i], observed[i]);
-			pass = GL_FALSE;
+		for (j = 0; j < comps; j++) {
+			if (fabs(expected[i*comps+j] - observed[i*comps+j]) > 0.01)
+			{
+				printf(" At %i:\n  Expected: %f", i, expected[i*comps]);
+				for (k = 1; k < comps; k++)
+					printf(", %f", expected[i*comps+k]);
+				printf("\n  Observed: %f", observed[i*comps]);
+				for (k = 1; k < comps; k++)
+					printf(", %f", observed[i*comps+k]);
+				printf("\n");
+				pass = GL_FALSE;
+				break;
+			}
 		}
 	}
 

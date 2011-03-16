@@ -45,11 +45,14 @@ GLboolean test()
 		unsigned x, y;
 		float* expected;
 
-		printf("probe_pixel of fbo for float texture with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
-		if (!test_defaults)
+		printf("probe_pixel of fbo with read clamp %s (expecting %sclamping)\n", clamp_strings[read_clamp], clamped ? "" : "no ");
+		if (!sanity)
 			glClampColorARB(GL_CLAMP_READ_COLOR_ARB, clamp_enums[read_clamp]);
 
-		expected = (fixed || clamped) ? clamped_pixels : pixels;
+		expected = clamped ? clamped_pixels :
+			   fixed_snorm ? signed_clamped_pixels :
+			   fixed ? clamped_pixels :
+			   pixels;
 
 		for(y = 0; y < 2; ++y)
 			for(x = 0; x < 2; ++x)
@@ -70,7 +73,7 @@ GLboolean test()
 			}
 	}
 
-	if (!test_defaults)
+	if (!sanity)
 		glClampColorARB(GL_CLAMP_READ_COLOR_ARB, GL_FALSE);
 	return pass;
 }

@@ -47,7 +47,7 @@ GLboolean test()
 
 	glBindTexture(GL_TEXTURE_2D, tex); /* for border color */
 
-	for (frag_clamp = test_defaults ? 1 : 0; frag_clamp < (test_defaults ? 2 : 3); ++frag_clamp)
+	for (frag_clamp = sanity ? 1 : 0; frag_clamp < (sanity ? 2 : 3); ++frag_clamp)
 	{
 		const char *value_names[] = { "texture border color", "texenv color", "fog color", "alpha test reference", "blend color", "clear color" };
 		unsigned value;
@@ -64,7 +64,7 @@ GLboolean test()
 			sprintf(test_name, "glGet of %s in %s mode with fragment clamp %s (expecting %sclamping)", value_names[value], mrt_mode_strings[mrt_mode], clamp_strings[frag_clamp], clamped ? "" : "no ");
 			printf("%s\n", test_name);
 
-			if (!test_defaults)
+			if (!sanity)
 				glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
 
 			memset(observed, 0, sizeof(observed));
@@ -109,7 +109,7 @@ GLboolean test()
 			}
 
 			expected = clamped ? clamped_pixels : pixels;
-			cpass = compare_arrays(expected, observed, comps) && cpass;
+			cpass = compare_arrays(expected, observed, comps, 1) && cpass;
 
 			opass = cpass;
 			if(!cpass && !clamped && ati_driver && value == 0)
