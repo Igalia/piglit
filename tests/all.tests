@@ -318,7 +318,6 @@ add_plain_test(shaders, 'glsl-reload-source')
 add_plain_test(shaders, 'glsl-uniform-out-of-bounds')
 add_plain_test(shaders, 'glsl-uniform-update')
 add_plain_test(shaders, 'glsl-unused-varying')
-its
 add_plain_test(shaders, 'glsl-fs-bug25902')
 add_plain_test(shaders, 'glsl-fs-color-matrix')
 add_plain_test(shaders, 'glsl-fs-discard-02')
