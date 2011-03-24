@@ -1,6 +1,6 @@
 // [config]
 // expect_result: pass
-// glsl_version: 1.00
+// glsl_version: 1.10
 // [end config]
 //
 // Check that sampler arrays can be indexed with constant expressions.
