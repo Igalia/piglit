@@ -122,6 +122,25 @@ piglit_require_glx_extension(Display *dpy, const char *name)
 
 
 void
+piglit_require_glx_version(Display *dpy, int major, int minor)
+{
+	int glxMajor;
+	int glxMinor;
+
+	if (! glXQueryVersion(dpy, & glxMajor, & glxMinor)) {
+		fprintf(stderr, "Could not query GLX version!\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (glxMajor != major || glxMinor < minor) {
+		fprintf(stderr, "Test requires GLX %d.%d.  Got %d.%d.\n",
+			major, minor, glxMajor, glxMinor);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+
+void
 piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 {
 	for (;;) {
