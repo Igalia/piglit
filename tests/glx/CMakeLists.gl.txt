@@ -16,6 +16,7 @@ link_libraries (
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_executable (glx-fbconfig-sanity glx-fbconfig-sanity.c)
 	add_executable (glx-shader-sharing glx-shader-sharing.c)
 	add_executable (glx-destroycontext-1 glx-destroycontext-1.c)
 	add_executable (glx-destroycontext-2 glx-destroycontext-2.c)
