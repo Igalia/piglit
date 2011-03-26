@@ -45,7 +45,7 @@ enum piglit_result piglit_display(void)
 	glDrawBuffer(GL_FRONT);
 	glReadBuffer(GL_BACK);
 
-	glBlitFramebuffer(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBlitFramebufferEXT(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glDrawBuffer(GL_BACK);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
