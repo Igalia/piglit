@@ -115,7 +115,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "FBconfig 0x%x has "
 				"vinfo->visualid = %d and visual ID = %d.  "
 				"These should match!\n",
-				config_id, vinfo->visualid, visual_id);
+				config_id, (int) vinfo->visualid, visual_id);
 			result = PIGLIT_FAILURE;
 		}
 	}
