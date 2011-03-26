@@ -1407,6 +1407,10 @@ profile.tests['texturing'] = texturing
 profile.tests['spec'] = spec
 profile.tests['glx'] = glx
 
+# Remove blacklisted tests
+for test_path in blacklist:
+    profile.remove_test(test_path)
+
 class ValgrindExecTest(PlainExecTest):
 	def __init__(self, test):
 		Test.__init__(self, test.runConcurrent)
@@ -1470,7 +1474,3 @@ Test.ignoreErrors.append(re.compile(".*falling back to interpreter"))
 Test.ignoreErrors.append(re.compile("GLSL version is .*, but requested version .* is required"))
 Test.ignoreErrors.append(re.compile("kCGErrorIllegalArgument: CGSOrderWindowList"))
 Test.ignoreErrors.append(re.compile("kCGErrorFailure: Set a breakpoint @ CGErrorBreakpoint\(\) to catch errors as they are logged."))
-
-# Remove blacklisted tests
-for test_path in blacklist:
-    profile.remove_test(test_path)
