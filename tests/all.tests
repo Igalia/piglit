@@ -501,6 +501,7 @@ glx = Group()
 add_plain_test(glx, 'glx-destroycontext-1')
 add_plain_test(glx, 'glx-destroycontext-2')
 add_plain_test(glx, 'glx-fbconfig-sanity')
+glx['glx-fbconfig-sanity'].runConcurrent = True
 add_plain_test(glx, 'glx-multithread')
 add_plain_test(glx, 'glx-multithread-makecurrent-1')
 add_plain_test(glx, 'glx-multithread-makecurrent-2')
