@@ -514,6 +514,8 @@ glx['glx-swap-event_async'] = PlainExecTest(['glx-swap-event', '-auto', '--async
 glx['glx-swap-event_interval'] = PlainExecTest(['glx-swap-event', '-auto', '--interval'])
 add_plain_test(glx, 'glx-make-current')
 add_plain_test(glx, 'glx-make-glxdrawable-current')
+add_plain_test(glx, 'glx-pixmap-life')
+glx['glx-pixmap-life'].runConcurrent = True
 add_plain_test(glx, 'glx-tfp')
 add_plain_test(glx, 'glx-visuals-stencil')
 
