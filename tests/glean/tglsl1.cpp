@@ -4834,6 +4834,12 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 		env->log << "glsl1: Running single test: " << singleTest << "\n";
 		for (int i = 0; Programs[i].name; i++) {
 			if (strcmp(Programs[i].name, singleTest) == 0) {
+
+				if ((Programs[i].flags & FLAG_VERSION_1_20) && !glsl_120)
+					break; // skip non-applicable tests
+				if ((Programs[i].flags & FLAG_VERSION_1_30) && !glsl_130)
+					break; // skip non-applicable tests
+
 				r.numPassed = testProgram(Programs[i]);
 				r.numFailed = 1 - r.numPassed;
 				break;
