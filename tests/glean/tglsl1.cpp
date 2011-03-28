@@ -2361,7 +2361,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.1, 0.1, 0.5); \n"
 		"   // shadow map value should be 0.25 \n"
 		"   gl_FragColor = shadow2D(texZ, coord) + vec4(0.25); \n"
-		"   // 0.5 <= 0.25 ? color = 1 : 0\n"
+		"   // color = (0.5 <= 0.25) ? 1.25 : 0.25\n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 1.0 },
 		DONT_CARE_Z,
@@ -2376,7 +2376,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.1, 0.1, 0.2); \n"
 		"   // shadow map value should be 0.25 \n"
 		"   gl_FragColor = shadow2D(texZ, coord); \n"
-		"   // 0.2 <= 0.25 ? color = 1 : 0\n"
+		"   // color = (0.2 <= 0.25) ? 1 : 0\n"
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -2391,7 +2391,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.9, 0.9, 0.95); \n"
 		"   // shadow map value should be 0.75 \n"
 		"   gl_FragColor = shadow2D(texZ, coord) + vec4(0.25); \n"
-		"   // 0.95 <= 0.75 ? color = 1 : 0\n"
+		"   // color = (0.95 <= 0.75) ? 1.25 : 0.25\n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 1.0 },
 		DONT_CARE_Z,
@@ -2406,7 +2406,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.9, 0.9, 0.65); \n"
 		"   // shadow map value should be 0.75 \n"
 		"   gl_FragColor = shadow2D(texZ, coord); \n"
-		"   // 0.65 <= 0.75 ? color = 1 : 0\n"
+		"   // color = (0.65 <= 0.75) ? 1 : 0\n"
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -4342,6 +4342,7 @@ GLSLTest::setupTextures(void)
 
 	//
 	// 2D GL_DEPTH_COMPONENT texture (for shadow sampler tests)
+	// Left half = 0.25, right half = 0.75
 	//
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
@@ -4769,6 +4770,8 @@ GLSLTest::testProgram(const ShaderProgram &p)
 		glTexCoord2f(0, 1);  glVertex2f(-r,  r);
 		glEnd();
 	}
+
+	// env->log << "  Shader test: " << p.name << "\n";
 
 	// read a pixel from lower-left corder of rendered quad
 	GLfloat pixel[4];
