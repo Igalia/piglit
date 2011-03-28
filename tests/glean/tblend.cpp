@@ -38,6 +38,8 @@
 
 #define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 
+#define HUGE_STEP 1000
+
 namespace GLEAN {
 static PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_func = NULL;
 static PFNGLBLENDCOLORPROC glBlendColor_func = NULL;
@@ -720,6 +722,7 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 	unsigned numOperatorsRGB, numOperatorsA;
 	BlendFuncResult::PartialResult p;
 	bool allPassed = true;
+	unsigned testNo, testStride;
 
 	// test for features, get function pointers
 	if (GLUtils::getVersion() >= 1.4) {
@@ -795,6 +798,18 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 		numOperatorsA = 1; // just ADD
 	}
 
+	// If quick mode, run fewer tests
+	if (env->options.quick) {
+		testStride = 11;  // a prime number
+		assert(ELEMENTS(srcFactors) % testStride);
+		assert(ELEMENTS(dstFactors) % testStride);
+		assert(ELEMENTS(operators) % testStride);
+	}
+	else {
+		testStride = 1;
+	}
+	testNo = testStride - 1;
+
 #if 0
 	// use this to test a single combination:
 	p.srcRGB = p.srcA = GL_SRC_ALPHA;
@@ -817,7 +832,7 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 			else if (p.opRGB == GL_MIN || p.opRGB == GL_MAX ||
 				 p.opA == GL_MIN || p.opA == GL_MAX) {
 				// blend terms are N/A so only do one iteration of loops
-				step = 1000;
+				step = HUGE_STEP;
 			}
 			else {
 				// subtract modes: do every 3rd blend term for speed
@@ -855,6 +870,15 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 									needsBlendColor(p.dstRGB) ||
 									needsBlendColor(p.dstA)))
 								continue;
+
+							// skip all but every testStride-th test
+							++testNo;
+							if (testNo == testStride || step >= HUGE_STEP) {
+								testNo = 0;
+							}
+							else {
+								continue;
+							}
 
 							if (!runCombo(r, w, p, *env, rgbTolerance, alphaTolerance)) {
 								allPassed = false;
