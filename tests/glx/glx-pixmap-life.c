@@ -50,6 +50,8 @@ handler(Display *dpy, XErrorEvent *err)
 	       err->serial, err->error_code, err->request_code, err->minor_code,
 	       err->resourceid);
 #endif
+
+	return 0;
 }
 
 int
