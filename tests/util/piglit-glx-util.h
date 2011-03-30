@@ -27,7 +27,9 @@
 
 #pragma once
 
+#include "X11/Xmd.h"
 #include "GL/glx.h"
+#include "GL/glxproto.h"
 
 XVisualInfo * piglit_get_glx_visual(Display *dpy);
 GLXContext piglit_get_glx_context(Display *dpy, XVisualInfo *visinfo);
