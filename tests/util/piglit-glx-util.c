@@ -292,3 +292,20 @@ piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo)
 	XFree(configs);
 	return ret;
 }
+
+/*
+ * If you use this in an X error handler - and you will - pre-call it as:
+ *  piglit_glx_get_error(dpy, NULL);
+ * outside the error handler to cache errbase.  Otherwise this will
+ * generate protocol, and you'll deadlock.
+ */
+int
+piglit_glx_get_error(Display *dpy, XErrorEvent *err)
+{
+	static int errbase, evbase;
+	
+	if (!errbase)
+		glXQueryExtension(dpy, &errbase, &evbase);
+
+	return err ? err->error_code - errbase : -1;	
+}

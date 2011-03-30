@@ -48,3 +48,5 @@ piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 
 GLXFBConfig
 piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo);
+int
+piglit_glx_get_error(Display *dpy, XErrorEvent *err);
