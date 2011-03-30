@@ -45,3 +45,6 @@ void piglit_glx_window_set_no_input(Display *dpy, GLXDrawable win);
 enum piglit_result
 piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 						      GLXFBConfig config));
+
+GLXFBConfig
+piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo);

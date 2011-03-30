@@ -267,3 +267,28 @@ piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 		return PIGLIT_SKIP;
 }
 
+GLXFBConfig
+piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo)
+{
+	int i, nconfigs;
+	GLXFBConfig ret = None, *configs;
+
+	configs = glXGetFBConfigs(dpy, visinfo->screen, &nconfigs);
+	if (!configs)
+		return None;
+
+	for (i = 0; i < nconfigs; i++) {
+		int v;
+
+		if (glXGetFBConfigAttrib(dpy, configs[i], GLX_VISUAL_ID, &v))
+			continue;
+
+		if (v == visinfo->visualid) {
+			ret = configs[i];
+			break;
+		}
+	}
+
+	XFree(configs);
+	return ret;
+}
