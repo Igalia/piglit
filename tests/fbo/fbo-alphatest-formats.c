@@ -173,36 +173,36 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	alphatest(pos6, 0.8, GL_NOTEQUAL, 0.8);
 	alphatest(pos7, 0.3, GL_NEVER, 3);
 
-	if (!piglit_probe_pixel_rgb(piglit_width * 1 / 16, 0, cpass)) {
-		printf("  when testing FBO result, 1: 0.2 < 0.25.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 1 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing FBO result, 1: 0.2 < 0.25.\n");
 		pass = GL_FALSE;
         }
-	if (!piglit_probe_pixel_rgb(piglit_width * 3 / 16, 0, cfail)) {
-		printf("  when testing FBO result, 2: 0.96 <= 0.92.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 3 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing FBO result, 2: 0.96 <= 0.92.\n");
 		pass = GL_FALSE;
         }
-	if (!piglit_probe_pixel_rgb(piglit_width * 5 / 16, 0, cpass)) {
-		printf("  when testing FBO result, 3: 0.6 > 0.55.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 5 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing FBO result, 3: 0.6 > 0.55.\n");
 		pass = GL_FALSE;
         }
-	if (!piglit_probe_pixel_rgb(piglit_width * 7 / 16, 0, cpass)) {
-		printf("  when testing FBO result, 4: 0.9 > 0.1.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 7 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing FBO result, 4: 0.9 > 0.1.\n");
 		pass = GL_FALSE;
         }
-	if (!piglit_probe_pixel_rgb(piglit_width * 9 / 16, 0, cfail)) {
-		printf("  when testing FBO result, 5: 0.35 >= 0.4.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 9 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing FBO result, 5: 0.35 >= 0.4.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 11 / 16, 0, cpass)) {
-		printf("  when testing FBO result, 6: 0.4 == 0.4.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 11 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing FBO result, 6: 0.4 == 0.4.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 13 / 16, 0, cfail)) {
-		printf("  when testing FBO result, 7: 0.8 != 0.8.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 13 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing FBO result, 7: 0.8 != 0.8.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 15 / 16, 0, cfail)) {
-		printf("  when testing FBO result, 8: FALSE.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 15 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing FBO result, 8: FALSE.\n");
 		pass = GL_FALSE;
 	}
 
@@ -223,36 +223,36 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	glDeleteTextures(1, &tex);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	if (!piglit_probe_pixel_rgb(piglit_width * 1 / 16, 0, cpass)) {
-		printf("  when testing window result, 1: 0.2 < 0.25.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 1 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing window result, 1: 0.2 < 0.25.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 3 / 16, 0, cfail)) {
-		printf("  when testing window result, 2: 0.96 <= 0.92.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 3 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing window result, 2: 0.96 <= 0.92.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 5 / 16, 0, cpass)) {
-		printf("  when testing window result, 3: 0.6 > 0.55.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 5 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing window result, 3: 0.6 > 0.55.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 7 / 16, 0, cpass)) {
-		printf("  when testing window result, 4: 0.9 > 0.1.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 7 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing window result, 4: 0.9 > 0.1.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 9 / 16, 0, cfail)) {
-		printf("  when testing window result, 5: 0.35 >= 0.4.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 9 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing window result, 5: 0.35 >= 0.4.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 11 / 16, 0, cpass)) {
-		printf("  when testing window result, 6: 0.4 == 0.4.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 11 / 16, 0, cpass, NULL)) {
+		printf("  FAIL when testing window result, 6: 0.4 == 0.4.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 13 / 16, 0, cfail)) {
-		printf("  when testing window result, 7: 0.8 != 0.8.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 13 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing window result, 7: 0.8 != 0.8.\n");
 		pass = GL_FALSE;
 	}
-	if (!piglit_probe_pixel_rgb(piglit_width * 15 / 16, 0, cfail)) {
-		printf("  when testing window result, 8: FALSE.\n");
+	if (!piglit_probe_pixel_rgb_silent(piglit_width * 15 / 16, 0, cfail, NULL)) {
+		printf("  FAIL when testing window result, 8: FALSE.\n");
 		pass = GL_FALSE;
 	}
 
