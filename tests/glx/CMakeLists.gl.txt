@@ -42,6 +42,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(glx-pixmap-life X11)
 	add_executable (glx-window-life glx-window-life.c)
 	target_link_libraries(glx-window-life X11)
+	add_executable (glx-pixmap-multi glx-pixmap-multi.c)
+	target_link_libraries(glx-pixmap-multi X11)
 
 	add_executable (glx-visuals-stencil glx-visuals-stencil.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

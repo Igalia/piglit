@@ -516,6 +516,8 @@ add_plain_test(glx, 'glx-make-current')
 add_plain_test(glx, 'glx-make-glxdrawable-current')
 add_plain_test(glx, 'glx-pixmap-life')
 glx['glx-pixmap-life'].runConcurrent = True
+add_plain_test(glx, 'glx-pixmap-multi')
+glx['glx-pixmap-multi'].runConcurrent = True
 add_plain_test(glx, 'glx-tfp')
 add_plain_test(glx, 'glx-visuals-stencil')
 add_plain_test(glx, 'glx-window-life')
