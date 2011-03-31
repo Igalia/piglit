@@ -57,7 +57,6 @@ handler(Display *dpy, XErrorEvent *err)
 int
 main(int argc, char **argv)
 {
-	int i;
 	Pixmap p;
 	GLXPixmap g;
 
