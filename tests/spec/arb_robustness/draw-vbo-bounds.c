@@ -187,7 +187,6 @@ static void test(void)
 enum piglit_result
 piglit_display(void)
 {
-    GLboolean pass = GL_TRUE;
     unsigned i;
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -200,6 +199,6 @@ piglit_display(void)
 
     glFinish();
 
-    return pass;
+    return PIGLIT_SUCCESS;
 }
 
