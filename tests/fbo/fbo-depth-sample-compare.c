@@ -349,7 +349,7 @@ piglit_init(int argc, char **argv)
       /* A 1-bit error/difference in Z values results in a delta of 64 in
        * pixel intensity (where pixels are in [0,255]).
        */
-      ErrorScale = ((float) (1 << Zbits)) * 64.0 / 255.0;
+      ErrorScale = ((double) (1ull << Zbits)) * 64.0 / 255.0;
    }
 
    create_frag_shader();
