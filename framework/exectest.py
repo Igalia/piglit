@@ -82,6 +82,7 @@ class PlainExecTest(Test):
 
 			results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
 			results['returncode'] = proc.returncode
+			results['command'] = ' '.join(self.command)
 		else:
 			results = TestResult()
 			if 'result' not in results:

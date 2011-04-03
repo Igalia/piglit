@@ -72,6 +72,12 @@ class GleanTest(Test):
 			results['result'] = 'fail'
 
 		results['returncode'] = glean.returncode
+		results['command'] = ' '.join(self.command + GleanTest.globalParams)
+
+		env = ''
+		for key in self.env:
+			env = env + key + '="' + self.env[key] + '" ';
+		results['environment'] = env
 
 		self.handleErr(results, err)
 
