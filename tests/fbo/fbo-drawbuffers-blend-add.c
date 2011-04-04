@@ -109,6 +109,8 @@ generate_and_display_drawbuffers(int count)
 	GLuint tex[16], fb, fs, vs, prog;
 	GLenum attachments[16], status;
 	int i;
+	char fs_output_line[256];
+	char fs_full_source[1024];
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -132,9 +134,6 @@ generate_and_display_drawbuffers(int count)
 
 	/* Build the shader that spams green to all outputs. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-
-	char fs_output_line[256];
-	char fs_full_source[1024];
 
 	strcpy(fs_full_source, fs_source_start);
 		
