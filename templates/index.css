@@ -48,6 +48,12 @@ td {
 	background-color: #20ff20;
 }
 
+.trap, .abort, .crash {
+	text-align: right;
+	background-color: #000000;
+	color: #ffffff;
+}
+
 .skipa {
 	text-align: right;
 	background-color: #d0d0d0;
@@ -68,6 +74,12 @@ td {
 	background-color: #50ff50;
 }
 
+.trapa, .aborta, .crasha {
+	text-align: right;
+	background-color: #141414;
+	color: #ffffff;
+}
+
 .skipb {
 	text-align: right;
 	background-color: #c0c0c0;
@@ -86,4 +98,14 @@ td {
 .passb {
 	text-align: right;
 	background-color: #40ff40;
+}
+
+.trapb, .abortb, .crashb {
+	text-align: right;
+	background-color: #0a0a0a;
+	color: #ffffff;
+}
+
+td.trapa a, td.trapb a, td.aborta a, td.abortb a, td.crasha a, td.crashb a {
+	color: #ffffff;
 }

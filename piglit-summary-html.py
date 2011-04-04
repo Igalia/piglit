@@ -156,9 +156,18 @@ def buildGroupSummaryTestrun(groupresult):
 	warnnr = groupresult.passvector.warnnr
 	failnr = groupresult.passvector.failnr
 	skipnr = groupresult.passvector.skipnr
-	totalnr = passnr + warnnr + failnr # do not count skips
+	trapnr = groupresult.passvector.trapnr
+	abortnr = groupresult.passvector.abortnr
+	crashnr = groupresult.passvector.crashnr
+	totalnr = passnr + warnnr + failnr + trapnr + abortnr + crashnr # do not count skips
 
-	if failnr > 0:
+	if trapnr > 0:
+		status = 'trap'
+	elif abortnr > 0:
+		status = 'abort'
+	elif crashnr > 0:
+		status = 'crash'
+	elif failnr > 0:
 		status = 'fail'
 	elif warnnr > 0:
 		status = 'warn'

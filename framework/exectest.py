@@ -74,7 +74,13 @@ class PlainExecTest(Test):
 			if 'result' not in results:
 				results['result'] = 'fail'
 
-			if proc.returncode != 0:
+			if proc.returncode == -5:
+				results['result'] = 'trap'
+			elif proc.returncode == -6:
+				results['result'] = 'abort'
+			elif proc.returncode == -11:
+				results['result'] = 'crash'
+			elif proc.returncode != 0:
 				results['result'] = 'fail'
 				results['note'] = 'Returncode was %d' % (proc.returncode)
 

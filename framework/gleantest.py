@@ -68,7 +68,14 @@ class GleanTest(Test):
 		out, err = glean.communicate()
 
 		results['result'] = 'pass'
-		if glean.returncode != 0 or out.find('FAIL') >= 0:
+
+		if glean.returncode == -5:
+			results['result'] = 'trap'
+		elif glean.returncode == -6:
+			results['result'] = 'abort'
+		elif glean.returncode == -11:
+			results['result'] = 'crash'
+		elif glean.returncode != 0 or out.find('FAIL') >= 0:
 			results['result'] = 'fail'
 
 		results['returncode'] = glean.returncode
