@@ -76,7 +76,8 @@ SummaryPages = {
 	'all': 'index.html',
 	'changes': 'changes.html',
 	'problems': 'problems.html',
-	'regressions': 'regressions.html'
+	'regressions': 'regressions.html',
+	'fixes': 'fixes.html'
 }
 
 def buildDetailValue(detail):
@@ -195,6 +196,8 @@ def buildGroupSummary(indent, groupsummary, showcurrent):
 		names = filter(lambda n: groupsummary.children[n].problems, names)
 	elif showcurrent == 'regressions':
 		names = filter(lambda n: groupsummary.children[n].regressions, names)
+	elif showcurrent == 'fixes':
+		names = filter(lambda n: groupsummary.children[n].fixes, names)
 
 	names.sort()
 	for n in names:
@@ -329,6 +332,7 @@ def main():
 	writeSummaryHtml(summary, summaryDir, 'problems')
 	writeSummaryHtml(summary, summaryDir, 'changes')
 	writeSummaryHtml(summary, summaryDir, 'regressions')
+	writeSummaryHtml(summary, summaryDir, 'fixes')
 
 
 if __name__ == "__main__":

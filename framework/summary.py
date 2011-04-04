@@ -102,6 +102,8 @@ results is an array of TestResult instances, one per testrun
 		self.changes = len(statiSet) > 1
 		self.problems = len(statiSet - set(['pass', 'skip'])) > 0
 		self.regressions = self.isRegression(statiList)
+		statiList.reverse()
+		self.fixes = self.isRegression(statiList)
 
 	def allTests(self):
 		return [self]
@@ -124,6 +126,7 @@ results is an array of GroupResult instances, one per testrun
 		self.changes = False
 		self.problems = False
 		self.regressions = False
+		self.fixes = False
 		self.children = {}
 
 		# Perform some initial annotations
@@ -169,6 +172,7 @@ results is an array of GroupResult instances, one per testrun
 				self.changes = self.changes or self.children[name].changes
 				self.problems = self.problems or self.children[name].problems
 				self.regressions = self.regressions or self.children[name].regressions
+				self.fixes = self.fixes or self.children[name].fixes
 
 	def allTests(self):
 		"""\
