@@ -75,7 +75,8 @@ Testrun = readfile(os.path.join(templatedir, 'testrun.html'))
 SummaryPages = {
 	'all': 'index.html',
 	'changes': 'changes.html',
-	'problems': 'problems.html'
+	'problems': 'problems.html',
+	'regressions': 'regressions.html'
 }
 
 def buildDetailValue(detail):
@@ -192,6 +193,8 @@ def buildGroupSummary(indent, groupsummary, showcurrent):
 		names = filter(lambda n: groupsummary.children[n].changes, names)
 	elif showcurrent == 'problems':
 		names = filter(lambda n: groupsummary.children[n].problems, names)
+	elif showcurrent == 'regressions':
+		names = filter(lambda n: groupsummary.children[n].regressions, names)
 
 	names.sort()
 	for n in names:
@@ -325,6 +328,7 @@ def main():
 	writeSummaryHtml(summary, summaryDir, 'all')
 	writeSummaryHtml(summary, summaryDir, 'problems')
 	writeSummaryHtml(summary, summaryDir, 'changes')
+	writeSummaryHtml(summary, summaryDir, 'regressions')
 
 
 if __name__ == "__main__":

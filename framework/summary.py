@@ -52,6 +52,17 @@ class PassVector:
 ##### number of testruns
 #############################################################################
 class TestSummary:
+	def isRegression(self, statiList):
+		# Regression is:
+		# - if an item is neither 'pass' nor 'skip'
+		# - and if any item on the left side thereof is 'pass' or 'skip'
+		for i in range(1, len(statiList)):
+			if statiList[i-1] == 'pass' or statiList[i-1] == 'skip':
+				for j in range(i, len(statiList)):
+					if statiList[j] != 'pass' and statiList[j] != 'skip':
+						return True
+		return False
+
 	def __init__(self, summary, path, name, results):
 		"""\
 summary is the root summary object
@@ -86,9 +97,11 @@ results is an array of TestResult instances, one per testrun
 
 			result.passvector = vectormap[result.status]
 
-		stati = set([result.status for result in results])
-		self.changes = len(stati) > 1
-		self.problems = len(stati - set(['pass', 'skip'])) > 0
+		statiList = [result.status for result in results]
+		statiSet = set(statiList)
+		self.changes = len(statiSet) > 1
+		self.problems = len(statiSet - set(['pass', 'skip'])) > 0
+		self.regressions = self.isRegression(statiList)
 
 	def allTests(self):
 		return [self]
@@ -110,6 +123,7 @@ results is an array of GroupResult instances, one per testrun
 		self.results = results[:]
 		self.changes = False
 		self.problems = False
+		self.regressions = False
 		self.children = {}
 
 		# Perform some initial annotations
@@ -154,6 +168,7 @@ results is an array of GroupResult instances, one per testrun
 
 				self.changes = self.changes or self.children[name].changes
 				self.problems = self.problems or self.children[name].problems
+				self.regressions = self.regressions or self.children[name].regressions
 
 	def allTests(self):
 		"""\
