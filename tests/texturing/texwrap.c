@@ -159,7 +159,7 @@ struct format {
     /* ARB_texture_compression_rgtc */
     {FORMAT(GL_COMPRESSED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0,   1, 3.0,
      {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
-    {FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1), 4, 0, 0, 0, 0, 0, 0, 0, 1, 3.0,
+    {FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1), 3, 0, 0, 0, 0, 0, 0, 0, 1, 3.0,
      {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
     {FORMAT(GL_COMPRESSED_RG_RGTC2), 4, 4, 0, 0, 0, 0, 0, 0,    1, 3.0,
      {"GL_ARB_texture_compression_rgtc", "GL_EXT_texture_compression_rgtc"}},
@@ -217,7 +217,7 @@ struct format {
     /* EXT_texture_compression_latc */
     {FORMAT(GL_COMPRESSED_LUMINANCE_LATC1), 0, 0, 0, 0, 4, 0, 0, 0, 1, 999,
      {"GL_EXT_texture_compression_latc"}},
-    {FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1), 0, 0, 0, 0, 4, 0, 0, 0, 1, 999,
+    {FORMAT(GL_COMPRESSED_SIGNED_LUMINANCE_LATC1), 0, 0, 0, 0, 3, 0, 0, 0, 1, 999,
      {"GL_EXT_texture_compression_latc"}},
     {FORMAT(GL_COMPRESSED_LUMINANCE_ALPHA_LATC2), 0, 0, 0, 4, 4, 0, 0, 0, 1, 999,
      {"GL_EXT_texture_compression_latc"}},
