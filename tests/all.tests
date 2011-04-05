@@ -771,8 +771,7 @@ add_color_buffer_float_test('render', 'GL_RGBA32F', 'sanity', 'fog')
 arb_depth_texture = Group()
 spec['ARB_depth_texture'] = arb_depth_texture
 add_fbo_generatemipmap_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-generatemipmap-formats')
-# depth support not added to test yet
-#add_fbo_clear_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-clear-formats')
+add_fbo_clear_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-clear-formats')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT16')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT24')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT32')
@@ -785,8 +784,7 @@ spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
 add_fbo_generatemipmap_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-generatemipmap-formats')
 add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
-# depth support not added to test yet
-#add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
+add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH_COMPONENT32F')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
 
@@ -804,8 +802,7 @@ ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_test(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
-# depth support not added to test yet
-#add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
+add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
 add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')
 
 ext_texture_compression_latc = Group()

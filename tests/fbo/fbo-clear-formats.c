@@ -123,8 +123,53 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 static bool
 do_depth_clear(GLenum format, GLuint tex, int level, int size)
 {
-	/* XXX: FINISHME */
-	return false;
+	GLuint fb;
+	GLenum status;
+	GLint draw_buffer, read_buffer;
+	int x;
+
+	glGetIntegerv(GL_DRAW_BUFFER, &draw_buffer);
+	glGetIntegerv(GL_READ_BUFFER, &read_buffer);
+
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				  GL_DEPTH_ATTACHMENT_EXT,
+				  GL_TEXTURE_2D,
+				  tex,
+				  level);
+
+	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		if (!level)
+			printf(" - FBO incomplete\n");
+		return false;
+	} else {
+		if (!level)
+			printf("\n");
+	}
+
+	glEnable(GL_SCISSOR_TEST);
+
+	for (x = 0; x < size; x++) {
+		float val = (x + 0.5) / (size);
+		glScissor(x, 0, 1, size);
+		glClearDepth(val);
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+
+	glDeleteFramebuffersEXT(1, &fb);
+
+	glDrawBuffer(draw_buffer);
+	glReadBuffer(read_buffer);
+
+	return true;
 }
 
 static bool
