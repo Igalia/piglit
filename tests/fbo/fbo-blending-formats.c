@@ -49,6 +49,13 @@ static void blend(const float *rect, const float *src, const float *dst, const f
 	glDisable(GL_BLEND);
 }
 
+#define fix_alpha(a) \
+	(format->internalformat == GL_RGB5_A1 ? (a == 1 ? 1.0f : 0.0f) : \
+	 format->internalformat == GL_RGB10_A2 ? (a == 1 ? 1.0f : \
+						  a >= 0.666 ? 0.666f : \
+						  a >= 0.333 ? 0.333f : 0.0f) : \
+	 (a))
+
 static enum piglit_result test_format(const struct format_desc *format, GLenum baseformat)
 {
 	GLboolean pass = GL_TRUE;
@@ -59,41 +66,41 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	float res0[] = {0.3, 0.3, 0.3, 0.0};
 
 	float pos1[] = {-0.66, -1.0, 0.33, 2.0};
-        float src1[] = {0.4, 0.9, 0.8, 0.7};
-        float dst1[] = {0.5, 0.4, 0.6, 0.2};
-        float con1[] = {0.2, 0.8, 0.4, 0.6};
+        float src1[] = {0.4, 0.9, 0.8, fix_alpha(0.7)};
+        float dst1[] = {0.5, 0.4, 0.6, fix_alpha(0.2)};
+        float con1[] = {0.2, 0.8, 0.4, fix_alpha(0.6)};
 	float res1[] = {dst1[0]*(1-con1[0]) + src1[0]*con1[0],
                         dst1[1]*(1-con1[1]) + src1[1]*con1[1],
                         dst1[2]*(1-con1[2]) + src1[2]*con1[2],
                         dst1[3]*(1-con1[3]) + src1[3]*con1[3]};
 
 	float pos2[] = {-0.33, -1.0, 0.33, 2.0};
-	float dst2[] = {0.9, 0.4, 0.7, 0.5};
-        float src2[] = {0.8, 0.3, 0.5, 0.9};
+	float dst2[] = {0.9, 0.4, 0.7, fix_alpha(0.5)};
+        float src2[] = {0.8, 0.3, 0.5, fix_alpha(0.9)};
 	float res2[] = {dst2[0]*(1-dst2[0]) + src2[0]*dst2[0],
 			dst2[1]*(1-dst2[1]) + src2[1]*dst2[1],
 			dst2[2]*(1-dst2[2]) + src2[2]*dst2[2],
 			dst2[3]*(1-dst2[3]) + src2[3]*dst2[3]};
 
 	float pos3[] = {0.0, -1.0, 0.33, 2.0};
-	float dst3[] = {0.6, 0.4, 0.8, 0.5};
-	float src3[] = {0.8, 0.9, 0.7, 0.8};
+	float dst3[] = {0.6, 0.4, 0.8, fix_alpha(0.5)};
+	float src3[] = {0.8, 0.9, 0.7, fix_alpha(0.8)};
 	float res3[] = {dst3[0]*(1-src3[0]) + src3[0]*src3[0],
 			dst3[1]*(1-src3[1]) + src3[1]*src3[1],
 			dst3[2]*(1-src3[2]) + src3[2]*src3[2],
 			dst3[3]*(1-src3[3]) + src3[3]*src3[3]};
 
 	float pos4[] = {0.33, -1.0, 0.33, 2.0};
-	float dst4[] = {0.9, 0.4, 0.7, 0.5};
-	float src4[] = {0.8, 0.3, 0.5, 0.9};
+	float dst4[] = {0.9, 0.4, 0.7, fix_alpha(0.5)};
+	float src4[] = {0.8, 0.3, 0.5, fix_alpha(0.9)};
 	float res4[] = {dst4[0]*(1-dst4[3]) + src4[0]*dst4[3],
 			dst4[1]*(1-dst4[3]) + src4[1]*dst4[3],
 			dst4[2]*(1-dst4[3]) + src4[2]*dst4[3],
 			dst4[3]*(1-dst4[3]) + src4[3]*dst4[3]};
 
 	float pos5[] = {0.66, -1.0, 0.33, 2.0};
-	float dst5[] = {0.6, 0.4, 0.8, 0.5};
-	float src5[] = {0.8, 0.9, 0.7, 0.8};
+	float dst5[] = {0.6, 0.4, 0.8, fix_alpha(0.5)};
+	float src5[] = {0.8, 0.9, 0.7, fix_alpha(0.8)};
 	float res5[] = {dst5[0]*(1-src5[3]) + src5[0]*src5[3],
 			dst5[1]*(1-src5[3]) + src5[1]*src5[3],
 			dst5[2]*(1-src5[3]) + src5[2]*src5[3],
