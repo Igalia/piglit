@@ -278,6 +278,11 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	glDeleteTextures(1, &tex);
 	glDeleteFramebuffersEXT(1, &fb);
 
+	if (!pass) {
+		glutSwapBuffers();
+		return PIGLIT_FAIL;
+	}
+
 	if (!piglit_probe_pixel_rgba(piglit_width * 1 / 12, 0, res0)) {
 		printf("  when testing window result, simple.\n");
 		pass = GL_FALSE;
