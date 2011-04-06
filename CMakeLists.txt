@@ -11,7 +11,6 @@ find_package(TIFF REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
-find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
 CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
 IF (C_COMPILER_FLAG_WALL)
