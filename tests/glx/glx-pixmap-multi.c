@@ -60,6 +60,7 @@ main(int argc, char **argv)
 	int i;
 	Pixmap p;
 	GLXPixmap g1, g2;
+	GLXFBConfig fbc;
 
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
@@ -78,6 +79,13 @@ main(int argc, char **argv)
 
 	glXDestroyGLXPixmap(dpy, g1);
 	glXDestroyGLXPixmap(dpy, g2);
+
+	fbc = piglit_glx_get_fbconfig_for_visinfo(dpy, visinfo);
+	g1 = glXCreatePixmap(dpy, fbc, p, NULL);
+	g2 = glXCreatePixmap(dpy, fbc, p, NULL);
+	glXDestroyPixmap(dpy, g1);
+	glXDestroyPixmap(dpy, g2);
+
 	XFreePixmap(dpy, p);
 
 	XSync(dpy, 0);
