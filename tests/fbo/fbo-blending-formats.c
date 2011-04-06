@@ -97,6 +97,7 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 			dst4[1]*(1-dst4[3]) + src4[1]*dst4[3],
 			dst4[2]*(1-dst4[3]) + src4[2]*dst4[3],
 			dst4[3]*(1-dst4[3]) + src4[3]*dst4[3]};
+	float res4i = dst4[0]*(1-dst4[0]) + src4[0]*dst4[0]; /* intensity */
 
 	float pos5[] = {0.66, -1.0, 0.33, 2.0};
 	float dst5[] = {0.6, 0.4, 0.8, fix_alpha(0.5)};
@@ -140,7 +141,7 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 		res1[3] = res1[2] = res1[1] = res1[0];
 		res2[3] = res2[2] = res2[1] = res2[0];
 		res3[3] = res3[2] = res3[1] = res3[0];
-		res4[3] = res4[2] = res4[1] = res4[0];
+		res4[3] = res4[2] = res4[1] = res4[0] = res4i;
 		res5[3] = res5[2] = res5[1] = res5[0];
 	} else if (l) {
 		res0[2] = res0[1] = res0[0];
