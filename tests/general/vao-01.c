@@ -54,10 +54,7 @@ piglit_init(int argc, char **argv)
 	GLuint obj;
 	void * ptr;
 
-	if (!GLEW_APPLE_vertex_array_object) {
-		printf("Sorry, this program requires GL_APPLE_vertex_array_object\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_extension("GL_APPLE_vertex_array_object");
 
 	glGenVertexArraysAPPLE(1, & obj);
 	glBindVertexArrayAPPLE(obj);
