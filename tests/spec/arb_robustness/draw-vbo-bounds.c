@@ -66,9 +66,16 @@ void piglit_init(int argc, char **argv)
 static void
 random_vertices(GLsizei offset, GLsizei stride, GLsizei count)
 {
-    GLsizei size = offset + (count - 1)*stride + 2 * sizeof(GLfloat);
+    GLsizei element_size = 2 * sizeof(GLfloat);
+    GLsizei size;
     GLubyte *vertices;
     GLsizei i;
+
+    if (stride == 0) {
+	stride = element_size;
+    }
+
+    size = offset + (count - 1)*stride + element_size;
 
     assert(offset % sizeof(GLfloat) == 0);
     assert(stride % sizeof(GLfloat) == 0);
