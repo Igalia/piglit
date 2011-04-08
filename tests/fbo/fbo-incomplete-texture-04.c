@@ -52,6 +52,7 @@ piglit_init(int argc, char **argv)
 	GLuint fb;
 	GLenum status;
 	GLenum err;
+	const float color[] = {1.0,0.0,0.0,1.0};
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -75,7 +76,7 @@ piglit_init(int argc, char **argv)
 
 	err = glGetError();
 	if (err != 0) {
-		printf("Unexpected GL error state 0x%04x\n", err);
+		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -109,6 +110,21 @@ piglit_init(int argc, char **argv)
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		printf("FBO erroneously incomplete\n");
 		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glClearColor(color[0], color[1], color[2], color[3]);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	err = glGetError();
+	if (err != 0) {
+		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+		piglit_report_result(PIGLIT_FAILURE);
+	}
+
+	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 2, 0, 0, 8, 8,
+					  color)) {
+		fprintf(stderr, "FBO clear didn't work\n");
+		piglit_report_result(PIGLIT_FAILURE);
 	}
 
 	piglit_report_result(PIGLIT_PASS);
