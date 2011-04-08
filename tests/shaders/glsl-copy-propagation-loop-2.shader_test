@@ -1,0 +1,28 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 color;
+
+void main()
+{
+    gl_Position = ftransform();
+    color = vec4(1.0, 1.0, 0.0, 0.0);
+}
+
+[fragment shader]
+/* Tests for what was a crasher bug in glsl_copy_propagation_elements */
+varying vec4 color;
+
+void main()
+{
+    vec4 col = color;
+    for (int i = 0; i < 4; i++) {
+        col.r = col.b;
+    }
+    gl_FragColor = col;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
