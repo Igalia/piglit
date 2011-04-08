@@ -298,6 +298,9 @@ piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo)
  *  piglit_glx_get_error(dpy, NULL);
  * outside the error handler to cache errbase.  Otherwise this will
  * generate protocol, and you'll deadlock.
+ *
+ * Returns -1 if the error is not a GLX error, otherwise returns the
+ * GLX error code.
  */
 int
 piglit_glx_get_error(Display *dpy, XErrorEvent *err)
@@ -307,5 +310,12 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err)
 	if (!errbase)
 		glXQueryExtension(dpy, &errbase, &evbase);
 
-	return err ? err->error_code - errbase : -1;	
+	if (!err)
+		return -1;
+
+	if (err->error_code < errbase ||
+	    err->error_code > errbase + GLXBadWindow)
+		return -1;
+
+	return err->error_code - errbase;
 }
