@@ -341,20 +341,18 @@ int piglit_probe_rect_depth(int x, int y, int w, int h, float expected)
 }
 
 /**
- * Read a texel from the given location and compare its RGBA value to the
- * given expected values.
+ * Read a texel rectangle from the given location and compare its RGBA value to
+ * the given expected values.
  *
  * Print a log message if the color value deviates from the expected value.
  * \return true if the color values match, false otherwise
  */
-int piglit_probe_texel_rgba(int target, int level, int x, int y,
-			    const float* expected)
+int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
+				 int w, int h, const float* expected)
 {
 	GLfloat *buffer;
 	GLfloat *probe;
-	GLfloat delta[4];
-	GLfloat deltamax;
-	int i;
+	int i, j, p;
 	GLint width;
 	GLint height;
 
@@ -364,25 +362,32 @@ int piglit_probe_texel_rgba(int target, int level, int x, int y,
 
 	glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
 
-	probe = &buffer[4 * ((width * y) + x)];
-	deltamax = 0.0;
-	for(i = 0; i < 4; ++i) {
-		delta[i] = probe[i] - expected[i];
-		if (fabs(delta[i]) > deltamax)
-			deltamax = fabs(delta[i]);
-	}
+	assert(x >= 0);
+	assert(y >= 0);
+	assert(x+w <= width);
+	assert(y+h <= height);
 
-	if (deltamax < 0.01) {
-		free(buffer);
-		return 1;
-	}
+	for (j = y; j < y+h; ++j) {
+		for (i = x; i < x+w; ++i) {
+			probe = &buffer[(j*w+i)*4];
 
-	printf("Probe at (%i,%i)\n", x, y);
-	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
-	printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
+			for (p = 0; p < 4; ++p) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
+					printf("Probe at (%i,%i)\n", i, j);
+					printf("  Expected: %f %f %f %f\n",
+					       expected[0], expected[1], expected[2], expected[3]);
+					printf("  Observed: %f %f %f %f\n",
+					       probe[0], probe[1], probe[2], probe[3]);
+
+					free(buffer);
+					return 0;
+				}
+			}
+		}
+	}
 
 	free(buffer);
-	return 0;
+	return 1;
 }
 
 /**
@@ -392,14 +397,26 @@ int piglit_probe_texel_rgba(int target, int level, int x, int y,
  * Print a log message if the color value deviates from the expected value.
  * \return true if the color values match, false otherwise
  */
-int piglit_probe_texel_rgb(int target, int level, int x, int y,
-			   const float* expected)
+int piglit_probe_texel_rgba(int target, int level, int x, int y,
+			    const float* expected)
+{
+	return piglit_probe_texel_rect_rgba(target, level, x, y, 1, 1,
+					    expected);
+}
+
+/**
+ * Read a texel rectangle from the given location and compare its RGB value to
+ * the given expected values.
+ *
+ * Print a log message if the color value deviates from the expected value.
+ * \return true if the color values match, false otherwise
+ */
+int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
+				int w, int h, const float* expected)
 {
 	GLfloat *buffer;
 	GLfloat *probe;
-	GLfloat delta[3];
-	GLfloat deltamax;
-	int i;
+	int i, j, p;
 	GLint width;
 	GLint height;
 
@@ -409,25 +426,45 @@ int piglit_probe_texel_rgb(int target, int level, int x, int y,
 
 	glGetTexImage(target, level, GL_RGB, GL_FLOAT, buffer);
 
-	probe = &buffer[3 * ((width * y) + x)];
-	deltamax = 0.0;
-	for(i = 0; i < 3; ++i) {
-		delta[i] = probe[i] - expected[i];
-		if (fabs(delta[i]) > deltamax)
-			deltamax = fabs(delta[i]);
-	}
+	assert(x >= 0);
+	assert(y >= 0);
+	assert(x+w <= width);
+	assert(y+h <= height);
 
-	if (deltamax < 0.01) {
-		free(buffer);
-		return 1;
-	}
+	for (j = y; j < y+h; ++j) {
+		for (i = x; i < x+w; ++i) {
+			probe = &buffer[(j*w+i)*3];
 
-	printf("Probe at (%i,%i)\n", x, y);
-	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
-	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
+			for (p = 0; p < 3; ++p) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
+					printf("Probe at (%i,%i)\n", i, j);
+					printf("  Expected: %f %f %f\n",
+					       expected[0], expected[1], expected[2]);
+					printf("  Observed: %f %f %f\n",
+					       probe[0], probe[1], probe[2]);
+
+					free(buffer);
+					return 0;
+				}
+			}
+		}
+	}
 
 	free(buffer);
-	return 0;
+	return 1;
+}
+
+/**
+ * Read a texel from the given location and compare its RGB value to the
+ * given expected values.
+ *
+ * Print a log message if the color value deviates from the expected value.
+ * \return true if the color values match, false otherwise
+ */
+int piglit_probe_texel_rgb(int target, int level, int x, int y,
+			   const float *expected)
+{
+	return piglit_probe_texel_rect_rgb(target, level, x, y, 1, 1, expected);
 }
 
 int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
@@ -445,7 +482,7 @@ int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe1[p] - probe2[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", x+i, y+j);
+					printf("Probe at (%i,%i)\n", x+i, x+j);
 					printf("  Left: %f %f %f %f\n",
 					       probe1[0], probe1[1], probe1[2], probe1[3]);
 					printf("  Right: %f %f %f %f\n",

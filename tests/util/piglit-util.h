@@ -115,8 +115,12 @@ int piglit_probe_rect_rgb(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
 int piglit_probe_image_rgb(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);
+int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
+				int w, int h, const float *expected);
 int piglit_probe_texel_rgb(int target, int level, int x, int y,
 			   const float* expected);
+int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
+				 int w, int h, const float *expected);
 int piglit_probe_texel_rgba(int target, int level, int x, int y,
 			    const float* expected);
 int piglit_probe_pixel_depth(int x, int y, float expected);
