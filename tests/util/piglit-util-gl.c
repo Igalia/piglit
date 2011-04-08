@@ -369,7 +369,7 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 
 	for (j = y; j < y+h; ++j) {
 		for (i = x; i < x+w; ++i) {
-			probe = &buffer[(j*w+i)*4];
+			probe = &buffer[(j * width + i) * 4];
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
@@ -433,7 +433,7 @@ int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
 
 	for (j = y; j < y+h; ++j) {
 		for (i = x; i < x+w; ++i) {
-			probe = &buffer[(j*w+i)*3];
+			probe = &buffer[(j * width + i) * 3];
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
