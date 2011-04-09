@@ -1,0 +1,44 @@
+[require]
+GL_ARB_draw_instanced
+GLSL >= 1.20
+
+[vertex shader]
+/* Verify that InstanceID is zero when drawing primitives using a
+ * non-instanced drawing function.
+ */
+#version 120
+#extension GL_ARB_draw_instanced: require
+
+uniform vec4 instance_colors[] = vec4[](vec4(0.0, 1.0, 0.0, 1.0),
+					vec4(0.0, 0.5, 0.5, 1.0),
+					vec4(0.0, 0.0, 1.0, 1.0));
+
+varying vec4 color;
+
+void main()
+{
+  color = instance_colors[gl_InstanceIDARB];
+
+  vec4 v = gl_Vertex;
+  v.x += 20.0 * float(gl_InstanceIDARB);
+
+  gl_Position = gl_ModelViewProjectionMatrix * v;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+ortho
+clear color 0.5 0.5 0.5 0.5
+clear
+
+draw instanced rect 3 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
+probe rgb 35 15 0.0 0.5 0.5
+probe rgb 55 15 0.0 0.0 1.0

@@ -694,6 +694,10 @@ import_glsl_parser_tests(arb_draw_instanced,
 			 os.path.dirname(__file__) + '/spec/arb_draw_instanced',
 			 [''])
 
+add_shader_test_dir(arb_draw_instanced,
+                    os.path.dirname(__file__) + '/spec/arb_draw_instanced/execution',
+                    recursive=True)
+
 
 # Group ARB_shader_texture_lod
 arb_shader_texture_lod = Group()
