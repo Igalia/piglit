@@ -696,6 +696,38 @@ string_match(const char *string, const char *line)
 	return (strncmp(string, line, strlen(string)) == 0);
 }
 
+static void
+draw_instanced_rect(int primcount, float x, float y, float w, float h)
+{
+	float verts[4][4];
+
+	piglit_require_extension("GL_ARB_draw_instanced");
+
+	verts[0][0] = x;
+	verts[0][1] = y;
+	verts[0][2] = 0.0;
+	verts[0][3] = 1.0;
+	verts[1][0] = x + w;
+	verts[1][1] = y;
+	verts[1][2] = 0.0;
+	verts[1][3] = 1.0;
+	verts[2][0] = x + w;
+	verts[2][1] = y + h;
+	verts[2][2] = 0.0;
+	verts[2][3] = 1.0;
+	verts[3][0] = x;
+	verts[3][1] = y + h;
+	verts[3][2] = 0.0;
+	verts[3][3] = 1.0;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glDrawArraysInstancedARB(GL_QUADS, 0, 4, primcount);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -723,6 +755,13 @@ piglit_display(void)
 		} else if (string_match("draw rect", line)) {
 			get_floats(line + 9, c, 4);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
+		} else if (string_match("draw instanced rect", line)) {
+			int primcount;
+
+			sscanf(line + 19, "%d %f %f %f %f",
+			       &primcount,
+			       c + 0, c + 1, c + 2, c + 3);
+			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
 		} else if (string_match("ortho", line)) {
 			piglit_ortho_projection(piglit_width, piglit_height,
 						GL_FALSE);
