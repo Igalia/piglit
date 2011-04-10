@@ -26,11 +26,11 @@ const ivec2 iv2_1 = ivec2(1);
 const ivec2 iv2_0 = iv2_1 - iv2_1;
 
 const bvec4 bv4_1 = bvec4(true);
-const bvec4 bv4_0 = !bv4_1;
+const bvec4 bv4_0 = not(bv4_1);
 const bvec3 bv3_1 = bvec3(true);
-const bvec3 bv3_0 = !bv3_1;
+const bvec3 bv3_0 = not(bv3_1);
 const bvec2 bv2_1 = bvec2(true);
-const bvec2 bv2_0 = !bv2_1;
+const bvec2 bv2_0 = not(bv2_1);
 
 // All forms of lessThan.
 float [all(    lessThan( v4_1,  v4_0) ) ? -1 :  1] array01;
@@ -154,7 +154,7 @@ void main()
 		     + array56.length()
 		     + array57.length()
 		     + array58.length()
-		     + array5.length()
+		     + array59.length()
 		     + array5a.length()
 		     + array5b.length()
 		     + array5c.length());
