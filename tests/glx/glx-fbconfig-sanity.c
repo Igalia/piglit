@@ -77,6 +77,7 @@ main(int argc, char **argv)
 		int draw_type;
 		int visual_id;
 		int config_id;
+		int sample_buffers;
 		XVisualInfo *vinfo;
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_FBCONFIG_ID,
@@ -85,6 +86,8 @@ main(int argc, char **argv)
 				  &draw_type);
 		GetFBConfigAttrib(dpy, configs[i], GLX_VISUAL_ID,
 				  &visual_id);
+		GetFBConfigAttrib(dpy, configs[i], GLX_SAMPLE_BUFFERS,
+				  &sample_buffers);
 
 		if ((draw_type & GLX_WINDOW_BIT) != 0
 		    && visual_id == 0) {
@@ -140,6 +143,26 @@ main(int argc, char **argv)
 					result = PIGLIT_FAILURE;
 				}
 			}
+		}
+
+		if (sample_buffers == 0) {
+			int samples;
+			GetFBConfigAttrib(dpy, configs[i],
+					  GLX_SAMPLES, &samples);
+			if (samples != 0) {
+				fprintf(stderr, "FBConfig 0x%x has "
+					"0 sample buffers but %d "
+					"samples, should be 0\n",
+					config_id, samples);
+				result = PIGLIT_FAILURE;
+			}
+		} else if (sample_buffers == 1) {
+			/* TODO check color/depth/stencil bits per sample */
+		} else {
+			fprintf(stderr, "FBConfig 0x%x has bizarre "
+				"GLX_SAMPLE_BUFFERS of %d, should be "
+				"0 or 1\n", config_id, sample_buffers);
+			result = PIGLIT_FAILURE;
 		}
 	}
 
