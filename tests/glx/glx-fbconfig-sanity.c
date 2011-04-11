@@ -38,6 +38,13 @@ static PFNGLXGETFBCONFIGSPROC GetFBConfigs = NULL;
 static PFNGLXGETFBCONFIGATTRIBPROC GetFBConfigAttrib = NULL;
 static PFNGLXGETVISUALFROMFBCONFIGPROC GetVisualFromFBConfig = NULL;
 
+static void
+fbconfig_sanity_warn(int *result)
+{
+	if (*result != PIGLIT_FAILURE)
+		*result = PIGLIT_WARN;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -79,6 +86,7 @@ main(int argc, char **argv)
 		int config_id;
 		int sample_buffers;
 		int render_type;
+		int x_renderable;
 		XVisualInfo *vinfo;
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_FBCONFIG_ID,
@@ -91,12 +99,13 @@ main(int argc, char **argv)
 				  &sample_buffers);
 		GetFBConfigAttrib(dpy, configs[i], GLX_RENDER_TYPE,
 				  &render_type);
+		GetFBConfigAttrib(dpy, configs[i], GLX_X_RENDERABLE,
+				  &x_renderable);
 
 		if (!draw_type) {
 			fprintf(stderr, "FBConfig 0x%x supports no "
 				"drawables\n", config_id);
-			if (result != PIGLIT_FAILURE)
-				result = PIGLIT_WARN;
+			fbconfig_sanity_warn(&result);
 		}
 
 		if ((draw_type & GLX_WINDOW_BIT) != 0
@@ -185,8 +194,21 @@ main(int argc, char **argv)
 			fprintf(stderr, "FBConfig 0x%x supports rendering "
 				"to something other than RGBA or CI, "
 				"piglit needs to be fixed\n", config_id);
-			if (result != PIGLIT_FAILURE)
-				result = PIGLIT_WARN;
+			fbconfig_sanity_warn(&result);
+		}
+
+		if (x_renderable &&
+		    !(draw_type & (GLX_WINDOW_BIT | GLX_PIXMAP_BIT))) {
+			fprintf(stderr, "FBConfig 0x%x claims to be X "
+				"renderable (0x%x), but does not support "
+				"windows or pixmaps\n", config_id, draw_type);
+			fbconfig_sanity_warn(&result);
+		} else if (!x_renderable &&
+			   (draw_type & (GLX_WINDOW_BIT | GLX_PIXMAP_BIT))) {
+			fprintf(stderr, "FBConfig 0x%x claims to not be X "
+				"renderable but claims to support windows "
+				"and/or pixmaps\b", config_id);
+			result = PIGLIT_FAILURE;
 		}
 	}
 
