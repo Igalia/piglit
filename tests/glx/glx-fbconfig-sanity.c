@@ -94,14 +94,6 @@ main(int argc, char **argv)
 			result = PIGLIT_FAILURE;
 		}
 
-		if ((draw_type & GLX_PIXMAP_BIT) != 0
-		    && visual_id == 0) {
-			fprintf(stderr, "FBconfig 0x%x has GLX_PIXMAP_BIT "
-				"set, but the Visual ID is 0!\n",
-				config_id);
-			result = PIGLIT_FAILURE;
-		}
-
 		vinfo = GetVisualFromFBConfig(dpy, configs[i]);
 		if ((vinfo == NULL) != (visual_id == 0)) {
 			fprintf(stderr, "FBconfig 0x%x has vinfo = %p and "
