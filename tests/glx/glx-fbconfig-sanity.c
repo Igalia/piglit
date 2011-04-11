@@ -87,6 +87,7 @@ main(int argc, char **argv)
 		int sample_buffers;
 		int render_type;
 		int x_renderable;
+		int caveat;
 		XVisualInfo *vinfo;
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_FBCONFIG_ID,
@@ -101,6 +102,8 @@ main(int argc, char **argv)
 				  &render_type);
 		GetFBConfigAttrib(dpy, configs[i], GLX_X_RENDERABLE,
 				  &x_renderable);
+		GetFBConfigAttrib(dpy, configs[i], GLX_CONFIG_CAVEAT,
+				  &caveat);
 
 		if (!draw_type) {
 			fprintf(stderr, "FBConfig 0x%x supports no "
@@ -263,6 +266,18 @@ main(int argc, char **argv)
 				"renderable but claims to support windows "
 				"and/or pixmaps\n", config_id);
 			result = PIGLIT_FAILURE;
+		}
+
+		switch (caveat) {
+			case GLX_NONE:
+			case GLX_SLOW_CONFIG:
+			case GLX_NON_CONFORMANT_CONFIG:
+				break;
+			default:
+				fprintf(stderr, "FBConfig 0x%x has unknown "
+					"caveat 0x%x\n", config_id, caveat);
+				result = PIGLIT_FAILURE;
+				break;
 		}
 	}
 
