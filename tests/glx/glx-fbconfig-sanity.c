@@ -78,6 +78,7 @@ main(int argc, char **argv)
 		int visual_id;
 		int config_id;
 		int sample_buffers;
+		int render_type;
 		XVisualInfo *vinfo;
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_FBCONFIG_ID,
@@ -88,6 +89,8 @@ main(int argc, char **argv)
 				  &visual_id);
 		GetFBConfigAttrib(dpy, configs[i], GLX_SAMPLE_BUFFERS,
 				  &sample_buffers);
+		GetFBConfigAttrib(dpy, configs[i], GLX_RENDER_TYPE,
+				  &render_type);
 
 		if (!draw_type) {
 			fprintf(stderr, "FBConfig 0x%x supports no "
@@ -170,6 +173,20 @@ main(int argc, char **argv)
 				"GLX_SAMPLE_BUFFERS of %d, should be "
 				"0 or 1\n", config_id, sample_buffers);
 			result = PIGLIT_FAILURE;
+		}
+
+		if (render_type == 0) {
+			fprintf(stderr, "FBConfig 0x%x can be bound to "
+				"neither RGBA nor color-index contexts\n",
+				config_id);
+			result = PIGLIT_FAILURE;
+		} else if
+		    (render_type & ~(GLX_RGBA_BIT | GLX_COLOR_INDEX_BIT)) {
+			fprintf(stderr, "FBConfig 0x%x supports rendering "
+				"to something other than RGBA or CI, "
+				"piglit needs to be fixed\n", config_id);
+			if (result != PIGLIT_FAILURE)
+				result = PIGLIT_WARN;
 		}
 	}
 
