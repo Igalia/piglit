@@ -135,8 +135,11 @@ main(int argc, char **argv)
 
 		if (vinfo) {
 			int depth;
+			int vtype;
 			GetFBConfigAttrib(dpy, configs[i], GLX_BUFFER_SIZE,
 					  &depth);
+			GetFBConfigAttrib(dpy, configs[i], GLX_X_VISUAL_TYPE,
+					  &vtype);
 			if (vinfo->class == StaticColor ||
 			    vinfo->class == PseudoColor) {
 				if (depth != vinfo->depth) {
@@ -159,6 +162,57 @@ main(int argc, char **argv)
 						config_id, depth,
 						(int)vinfo->visualid,
 						vinfo->depth);
+					result = PIGLIT_FAILURE;
+				}
+			}
+			if (vtype == GLX_NONE) {
+				fprintf(stderr, "FBConfig 0x%x supports "
+					"windows but has no visual type\n",
+					config_id);
+				result = PIGLIT_FAILURE;
+			} else {
+				int fail = 0;
+				switch (vinfo->class) {
+					case TrueColor:
+						if (vtype != GLX_TRUE_COLOR)
+							fail = 1;
+						break;
+					case DirectColor:
+						if (vtype != GLX_DIRECT_COLOR)
+							fail = 1;
+						break;
+					case PseudoColor:
+						if (vtype != GLX_PSEUDO_COLOR)
+							fail = 1;
+						break;
+					case StaticColor:
+						if (vtype != GLX_STATIC_COLOR)
+							fail = 1;
+						break;
+					case GrayScale:
+						if (vtype != GLX_GRAY_SCALE)
+							fail = 1;
+						break;
+					case StaticGray:
+						if (vtype != GLX_STATIC_GRAY)
+							fail = 1;
+						break;
+					default:
+						fail = 2;
+						break;
+				}
+				if (fail == 2) {
+					fprintf(stderr, "FBConfig 0x%x has "
+						"visual with unknown class "
+						"%d\n", config_id,
+						vinfo->class);
+					result = PIGLIT_FAILURE;
+				} else if (fail == 1) {
+					fprintf(stderr, "FBConfig 0x%x claims "
+						"visual class that does not "
+						"match visual %d\n",
+						config_id,
+						(int)vinfo->visualid);
 					result = PIGLIT_FAILURE;
 				}
 			}
@@ -207,7 +261,7 @@ main(int argc, char **argv)
 			   (draw_type & (GLX_WINDOW_BIT | GLX_PIXMAP_BIT))) {
 			fprintf(stderr, "FBConfig 0x%x claims to not be X "
 				"renderable but claims to support windows "
-				"and/or pixmaps\b", config_id);
+				"and/or pixmaps\n", config_id);
 			result = PIGLIT_FAILURE;
 		}
 	}
