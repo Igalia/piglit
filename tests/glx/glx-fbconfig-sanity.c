@@ -89,6 +89,13 @@ main(int argc, char **argv)
 		GetFBConfigAttrib(dpy, configs[i], GLX_SAMPLE_BUFFERS,
 				  &sample_buffers);
 
+		if (!draw_type) {
+			fprintf(stderr, "FBConfig 0x%x supports no "
+				"drawables\n", config_id);
+			if (result != PIGLIT_FAILURE)
+				result = PIGLIT_WARN;
+		}
+
 		if ((draw_type & GLX_WINDOW_BIT) != 0
 		    && visual_id == 0) {
 			fprintf(stderr, "FBconfig 0x%x has GLX_WINDOW_BIT "
