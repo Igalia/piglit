@@ -110,6 +110,37 @@ main(int argc, char **argv)
 				config_id, (int) vinfo->visualid, visual_id);
 			result = PIGLIT_FAILURE;
 		}
+
+		if (vinfo) {
+			int depth;
+			GetFBConfigAttrib(dpy, configs[i], GLX_BUFFER_SIZE,
+					  &depth);
+			if (vinfo->class == StaticColor ||
+			    vinfo->class == PseudoColor) {
+				if (depth != vinfo->depth) {
+					fprintf(stderr, "FBConfig 0x%x has "
+						"depth %d but visual %d has "
+						"depth %d.  These should "
+						"match!\n", config_id, depth,
+						(int)vinfo->visualid,
+						vinfo->depth);
+					result = PIGLIT_FAILURE;
+				}
+			}
+			if (vinfo->class == TrueColor ||
+			    vinfo->class == DirectColor) {
+				if (depth < vinfo->depth) {
+					fprintf(stderr, "FBConfig 0x%x has "
+						"depth %d < visual %d depth "
+						"%d.  Should be >= visual "
+						"depth!\n",
+						config_id, depth,
+						(int)vinfo->visualid,
+						vinfo->depth);
+					result = PIGLIT_FAILURE;
+				}
+			}
+		}
 	}
 
 	piglit_report_result(result);
