@@ -75,6 +75,10 @@ class GleanTest(Test):
 			results['result'] = 'abort'
 		elif glean.returncode in (-10, -11):
 			results['result'] = 'crash'
+		elif glean.returncode == -1073741819:
+			# 0xc0000005
+			# Windows access violation
+			results['result'] = 'crash'
 		elif glean.returncode != 0 or out.find('FAIL') >= 0:
 			results['result'] = 'fail'
 
