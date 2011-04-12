@@ -67,6 +67,7 @@ add_executable (tex-srgb tex-srgb.c)
 IF (UNIX)
         target_link_libraries (tex-srgb m)
 ENDIF (UNIX)
+add_executable (texture-al texture-al.c)
 add_executable (texture-rg texture-rg.c)
 add_executable (texwrap texwrap.c)
 
