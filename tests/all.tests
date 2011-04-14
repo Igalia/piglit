@@ -586,10 +586,10 @@ def add_texwrap_test3(group, p1, p2, p3):
 def add_fbo_depth_test(group, p1):
 	group['fbo-depth-' + p1] = PlainExecTest(['fbo-depth', '-auto', p1])
 
-spec = Group();
+spec = Group()
 
 gl11 = Group()
-spec['!OpenGL 1.1'] = gl11;
+spec['!OpenGL 1.1'] = gl11
 add_texwrap_test1(gl11, '1D')
 add_texwrap_test2(gl11, '1D', 'proj')
 add_texwrap_test2(gl11, '2D', 'proj')
@@ -629,13 +629,13 @@ add_texwrap_test2(gl11, '2D', 'GL_INTENSITY12')
 add_texwrap_test2(gl11, '2D', 'GL_INTENSITY16')
 
 gl12 = Group()
-spec['!OpenGL 1.2'] = gl12;
+spec['!OpenGL 1.2'] = gl12
 add_texwrap_test1(gl12, '3D')
 add_texwrap_test2(gl12, '3D', 'proj')
 add_texwrap_test2(gl12, '3D', 'border')
 
 gl20 = Group()
-spec['!OpenGL 2.0'] = gl20;
+spec['!OpenGL 2.0'] = gl20
 add_texwrap_test2(gl20, '1D', 'npot')
 add_texwrap_test3(gl20, '1D', 'npot', 'proj')
 add_texwrap_test3(gl20, '1D', 'npot', 'border')
@@ -649,35 +649,35 @@ add_texwrap_test3(gl20, '3D', 'npot', 'border')
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
 import_glsl_parser_tests(spec['glsl-1.00'],
-			 os.path.dirname(__file__) + '/spec/glsl-1.00',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.00'),
 			 ['compiler'])
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = Group()
 import_glsl_parser_tests(spec['glsl-1.10'],
-			 os.path.dirname(__file__) + '/spec/glsl-1.10',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
 
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = Group()
 import_glsl_parser_tests(spec['glsl-1.20'],
-			 os.path.dirname(__file__) + '/spec/glsl-1.20',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.20'),
 			 ['preprocessor', 'compiler'])
 
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
-			 os.path.dirname(__file__) + '/spec/glsl-1.30',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.30'),
 			 ['preprocessor', 'compiler'])
 spec['glsl-1.30']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.30']['execution'],
-	            os.path.dirname(__file__) + '/spec/glsl-1.30/execution',
+	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.30', 'execution'),
 		    recursive=True)
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
 import_glsl_parser_tests(spec['AMD_conservative_depth'],
-			 os.path.dirname(__file__) + '/spec/amd_conservative_depth',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'amd_conservative_depth'),
 			 [''])
 
 # Group ARB_ES2_compatibility
@@ -698,7 +698,7 @@ add_plain_test(arb_sampler_objects, 'sampler-objects')
 arb_shader_texture_lod = Group()
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
 import_glsl_parser_tests(arb_shader_texture_lod,
-			 os.path.dirname(__file__) + '/spec/arb_shader_texture_lod',
+			 os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_texture_lod'),
 			 [''])
 add_plain_test(arb_shader_texture_lod, 'arb_shader_texture_lod-texgrad')
 
@@ -706,8 +706,8 @@ add_plain_test(arb_shader_texture_lod, 'arb_shader_texture_lod-texgrad')
 arb_explicit_attrib_location = Group()
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
 import_glsl_parser_tests(arb_explicit_attrib_location,
-			 os.path.dirname(__file__)
-			 + '/spec/arb_explicit_attrib_location',
+			 os.path.join(os.path.dirname(__file__),
+			 'spec', 'arb_explicit_attrib_location'),
 			 [''])
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-01')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-02')
@@ -717,7 +717,7 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
 
 
 arb_texture_rectangle = Group()
-spec['ARB_texture_rectangle'] = arb_texture_rectangle;
+spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_test1(arb_texture_rectangle, 'RECT')
 add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
 
