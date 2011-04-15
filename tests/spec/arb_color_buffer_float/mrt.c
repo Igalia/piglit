@@ -97,14 +97,14 @@ test()
 		glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
 		expected = clamped ? clamped_pixels :
-			   fixed ? clamped_pixels :
+			   fixed0 ? clamped_pixels :
 			   pixels;
 		expected1 = clamped ? clamped_pixels :
 			    fixed1 ? clamped_pixels :
 			    pixels;
 
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		printf("Probing buffer 0 (%s)\n", fixed ? "fixed point" : "floating point");
+		printf("Probing buffer 0 (%s)\n", fixed0 ? "fixed point" : "floating point");
 		cpass = piglit_probe_pixel_rgba(0, 0, expected) && cpass;
 		glReadBuffer(GL_COLOR_ATTACHMENT1);
 		printf("Probing buffer 1 (%s)\n", fixed1 ? "fixed point" : "floating point");
