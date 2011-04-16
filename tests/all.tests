@@ -689,6 +689,17 @@ add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-maxvectors')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-shadercompiler')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-releaseshadercompiler')
 
+# Group ARB_draw_instanced
+arb_draw_instanced = Group()
+spec['ARB_draw_instanced'] = arb_draw_instanced
+import_glsl_parser_tests(arb_draw_instanced,
+                        os.path.dirname(__file__) + '/spec/arb_draw_instanced',
+                        [''])
+
+add_shader_test_dir(arb_draw_instanced,
+                    os.path.dirname(__file__) + '/spec/arb_draw_instanced/execution',
+                    recursive=True)
+
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
