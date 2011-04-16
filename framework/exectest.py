@@ -78,7 +78,7 @@ class PlainExecTest(Test):
 				results['result'] = 'trap'
 			elif proc.returncode == -6:
 				results['result'] = 'abort'
-			elif proc.returncode in (-10, -11):
+			elif proc.returncode in (-8, -10, -11):
 				results['result'] = 'crash'
 			elif proc.returncode == -1073741819:
 				# 0xc0000005

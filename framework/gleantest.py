@@ -73,7 +73,7 @@ class GleanTest(Test):
 			results['result'] = 'trap'
 		elif glean.returncode == -6:
 			results['result'] = 'abort'
-		elif glean.returncode in (-10, -11):
+		elif glean.returncode in (-8, -10, -11):
 			results['result'] = 'crash'
 		elif glean.returncode == -1073741819:
 			# 0xc0000005
