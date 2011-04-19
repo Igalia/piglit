@@ -971,6 +971,15 @@ nv_texture_barrier = Group()
 spec['NV_texture_barrier'] = nv_texture_barrier
 add_plain_test(nv_texture_barrier, 'blending-in-shader')
 
+nv_conditional_render = Group()
+spec['NV_conditional_render'] = nv_conditional_render
+nv_conditional_render['bitmap'] = PlainExecTest(['nv_conditional_render-drawpixels', '-auto'])
+nv_conditional_render['clear'] = PlainExecTest(['nv_conditional_render-clear', '-auto'])
+nv_conditional_render['copypixels'] = PlainExecTest(['nv_conditional_render-copypixels', '-auto'])
+nv_conditional_render['drawpixels'] = PlainExecTest(['nv_conditional_render-drawpixels', '-auto'])
+nv_conditional_render['generatemipmap'] = PlainExecTest(['nv_conditional_render-generatemipmap', '-auto'])
+nv_conditional_render['vertex_array'] = PlainExecTest(['nv_conditional_render-vertex_array', '-auto'])
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
