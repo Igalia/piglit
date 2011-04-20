@@ -14,5 +14,7 @@ link_libraries (
 )
 
 add_executable (ati_draw_buffers-arbfp arbfp.c)
+add_executable (ati_draw_buffers-arbfp-no-index arbfp-no-index.c)
+add_executable (ati_draw_buffers-arbfp-no-option arbfp-no-option.c)
 
 # vim: ft=cmake:

@@ -954,6 +954,8 @@ add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '
 ati_draw_buffers = Group()
 spec['ATI_draw_buffers'] = ati_draw_buffers
 add_plain_test(ati_draw_buffers, 'ati_draw_buffers-arbfp')
+ati_draw_buffers['arbfp-no-index'] = PlainExecTest(['ati_draw_buffers-arbfp-no-index', '-auto'])
+ati_draw_buffers['arbfp-no-option'] = PlainExecTest(['ati_draw_buffers-arbfp-no-option', '-auto'])
 
 ati_envmap_bumpmap = Group()
 spec['ATI_envmap_bumpmap'] = ati_envmap_bumpmap
