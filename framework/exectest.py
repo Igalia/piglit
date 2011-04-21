@@ -82,7 +82,11 @@ class PlainExecTest(Test):
 				results['result'] = 'crash'
 			elif proc.returncode == -1073741819:
 				# 0xc0000005
-				# Windows access violation
+				# Windows EXCEPTION_ACCESS_VIOLATION
+				results['result'] = 'crash'
+			elif proc.returncode == -1073741676:
+				# 0xc0000094
+				# Windows EXCEPTION_INT_DIVIDE_BY_ZERO
 				results['result'] = 'crash'
 			elif proc.returncode != 0:
 				results['result'] = 'fail'
