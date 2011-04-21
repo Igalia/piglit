@@ -72,8 +72,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
 					filepath = path.join(dirpath, f)
 					# testname := filepath with initial
 					#   three directories removed.
-					sep = os.sep
-					testname = sep.join(filepath.split(sep)[3:])
+					testname = '/'.join(filepath.split(os.sep)[3:])
 					assert(type(testname) is str)
 					add_glsl_parser_test(
 						group,
