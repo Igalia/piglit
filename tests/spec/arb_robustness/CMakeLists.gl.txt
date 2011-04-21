@@ -15,5 +15,6 @@ link_libraries (
 )
 
 add_executable (arb_robustness_draw-vbo-bounds draw-vbo-bounds.c)
+add_executable (arb_robustness_client-mem-bounds client-mem-bounds.c)
 
 # vim: ft=cmake:

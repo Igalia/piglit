@@ -705,6 +705,13 @@ arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
 add_plain_test(arb_sampler_objects, 'sampler-objects')
 
+# Group ARB_robustness
+arb_robustness = Group()
+spec['ARB_robustness'] = arb_robustness
+add_plain_test(arb_robustness, 'arb_robustness_client-mem-bounds')
+# TODO: robust vertex buffer access
+#add_plain_test(arb_robustness, 'arb_robustness_draw-vbo-bounds')
+
 # Group ARB_shader_texture_lod
 arb_shader_texture_lod = Group()
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
