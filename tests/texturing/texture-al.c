@@ -244,5 +244,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+   piglit_require_extension("GL_ARB_window_pos");
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
