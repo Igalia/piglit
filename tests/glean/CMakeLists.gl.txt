@@ -84,6 +84,7 @@ add_executable (glean
 	basic.cpp
 	lex.cpp
 	timer.cpp
+	../util/rgb9e5.c
 )
 
 target_link_libraries (glean

@@ -31,6 +31,7 @@
 #include <cassert>
 #include <cmath>
 #include "tpixelformats.h"
+#include "../util/rgb9e5.h"
 
 
 // Set to 1 to help debug test failures:
@@ -78,6 +79,8 @@ static const NameTokenComps Types[] =
 	{ "GL_UNSIGNED_SHORT_5_6_5_REV", GL_UNSIGNED_SHORT_5_6_5_REV, 3 },
 	{ "GL_UNSIGNED_BYTE_3_3_2", GL_UNSIGNED_BYTE_3_3_2, 3 },
 	{ "GL_UNSIGNED_BYTE_2_3_3_REV", GL_UNSIGNED_BYTE_2_3_3_REV, 3 },
+
+	{ "GL_UNSIGNED_INT_5_9_9_9_REV", GL_UNSIGNED_INT_5_9_9_9_REV, 3 }
 };
 
 #define NUM_TYPES (sizeof(Types) / sizeof(Types[0]))
@@ -200,6 +203,8 @@ static const NameTokenComps InternalFormats[] =
 	{ "GL_LUMINANCE16_ALPHA16_SNORM", GL_LUMINANCE16_ALPHA16_SNORM, 2 },
 	{ "GL_INTENSITY16_SNORM", GL_INTENSITY16_SNORM, 1 },
 
+	{ "GL_RGB9_E5", GL_RGB9_E5, 3 }
+
 	// XXX maybe add compressed formats too...
 };
 
@@ -227,6 +232,7 @@ ComponentMasks(GLenum datatype, GLuint masks[4])
 	case GL_INT:
 	case GL_FLOAT:
 	case GL_HALF_FLOAT_ARB:
+	case GL_UNSIGNED_INT_5_9_9_9_REV: /* special case, handled separately */
 		masks[0] =
 		masks[1] =
 		masks[2] =
@@ -475,6 +481,7 @@ BaseTextureFormat(GLint intFormat)
 	case GL_RGB_SNORM:
 	case GL_RGB8_SNORM:
 	case GL_RGB16_SNORM:
+	case GL_RGB9_E5:
 		return GL_RGB;
 	case 4:
 	case GL_RGBA:
@@ -562,6 +569,7 @@ SizeofType(GLenum datatype)
 	case GL_UNSIGNED_INT_2_10_10_10_REV:
 	case GL_UNSIGNED_INT_8_8_8_8:
 	case GL_UNSIGNED_INT_8_8_8_8_REV:
+	case GL_UNSIGNED_INT_5_9_9_9_REV:
 	case GL_UNSIGNED_INT:
 	case GL_INT:
 	case GL_FLOAT:
@@ -605,6 +613,9 @@ PixelFormatsTest::CompatibleFormatAndType(GLenum format, GLenum datatype) const
 		return false;
 
 	if (format == GL_RG && !haveRG)
+		return false;
+
+	if (datatype == GL_UNSIGNED_INT_5_9_9_9_REV && !haveTexSharedExp)
 		return false;
 
 	const int formatComps = NumberOfComponentsInFormat(format);
@@ -663,6 +674,8 @@ PixelFormatsTest::SupportedIntFormat(GLint intFormat) const
 	case GL_INTENSITY8_SNORM:
 	case GL_INTENSITY16_SNORM:
 		return haveSnorm;
+	case GL_RGB9_E5:
+		return haveTexSharedExp;
 	default:
 
 		return true;
@@ -694,7 +707,25 @@ MakeImage(int width, int height, GLenum format, GLenum type,
 {
 	assert(fillComponent < 4);
 
-	if (IsPackedType(type)) {
+	if (type == GL_UNSIGNED_INT_5_9_9_9_REV) {
+		GLubyte *image = new GLubyte [width * height * 4];
+		int i;
+
+		assert(format == GL_RGB);
+
+		GLuint *ui = (GLuint *) image;
+		for (i = 0; i < width * height; i++) {
+			float p[3] = {0, 0, 0};
+
+			if (!IsUpperRight(i, width, height))
+				p[fillComponent] =  1;
+
+			ui[i] = float3_to_rgb9e5(p);
+		}
+
+		return image;
+	}
+	else if (IsPackedType(type)) {
 		const int bpp = SizeofType(type);
 		GLubyte *image = new GLubyte [width * height * bpp];
 		GLuint masks[4];
@@ -1482,6 +1513,7 @@ PixelFormatsTest::setup(void)
 	haveRG = GLUtils::haveExtensions("GL_ARB_texture_rg");
 	haveFloat = GLUtils::haveExtensions("GL_ARB_texture_float");
 	haveSnorm = GLUtils::haveExtensions("GL_EXT_texture_snorm");
+	haveTexSharedExp = GLUtils::haveExtensions("GL_EXT_texture_shared_exponent");
 
 	glGetIntegerv(GL_ALPHA_BITS, &alphaBits);
 

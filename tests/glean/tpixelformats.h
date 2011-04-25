@@ -66,6 +66,7 @@ private:
 	bool haveRG;
 	bool haveFloat;
 	bool haveSnorm;
+	bool haveTexSharedExp;
 
 	bool CheckError(const char *where) const;
 

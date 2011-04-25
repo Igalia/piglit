@@ -14,6 +14,7 @@ set(UTIL_SOURCES
 	piglit-util.c
 	shader-load.c
 	piglit-framework.c
+	rgb9e5.c
 	)
 
 piglit_include_target_api()
