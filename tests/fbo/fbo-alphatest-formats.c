@@ -35,6 +35,13 @@ int piglit_height = 64;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 
+/**
+ * Draw a quad with alpha testing
+ * \param rect  the coords of the rectangle to draw
+ * \param alpha  the alpha value to use when drawing the rect (color is white)
+ * \param func  the glAlphaFunc mode to test
+ * \param ref  the glAlphaFunc reference value
+ */
 static void alphatest(const float *rect, float alpha, GLenum func, float ref)
 {
 	glColor4f(1, 1, 1, alpha);
@@ -94,9 +101,11 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 				 GL_TEXTURE_BLUE_SIZE, &b);
 
         if (i) {
+		/* GL_INTENSITY format */
 		cpass[3] = cpass[2] = cpass[1] = cpass[0];
 		cfail[3] = cfail[2] = cfail[1] = cfail[0];
         } else if (l) {
+		/* GL_LUMINANCE format */
 		cpass[2] = cpass[1] = cpass[0];
 		cfail[2] = cfail[1] = cfail[0];
 		if (!a) {
@@ -104,6 +113,7 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 			cfail[3] = 1;
 		}
         } else {
+		/* other format */
 		if (!r) {
 			cpass[0] = 0;
 			cfail[0] = 0;
