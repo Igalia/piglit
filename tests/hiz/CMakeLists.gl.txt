@@ -26,6 +26,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	link_libraries(pthread X11)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+add_executable(hiz-depth-test-fbo-d24 hiz-depth-test-fbo-d24.c)
+add_executable(hiz-depth-test-fbo-d24-s8 hiz-depth-test-fbo-d24-s8.c)
+add_executable(hiz-depth-test-fbo-d24s8 hiz-depth-test-fbo-d24s8.c)
 add_executable(hiz-depth-test-window-stencil0 hiz-depth-test-window-stencil0.c)
 add_executable(hiz-depth-test-window-stencil1 hiz-depth-test-window-stencil1.c)
 
