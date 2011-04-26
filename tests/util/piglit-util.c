@@ -133,6 +133,23 @@ bool piglit_is_extension_supported(const char *name)
 	return found;
 }
 
+void piglit_require_extension(const char *name)
+{
+	if (!piglit_is_extension_supported(name)) {
+		printf("Test requires %s\n", name);
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}
+
+void piglit_require_not_extension(const char *name)
+{
+	if (piglit_is_extension_supported(name)) {
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's

@@ -35,62 +35,6 @@
 
 #include "piglit-util.h"
 
-int
-piglit_extension_supported(const char *name)
-{
-	static const GLubyte *extensions = NULL;
-	const GLubyte *start;
-	GLubyte *where, *terminator;
-
-	/* Extension names should not have spaces. */
-	where = (GLubyte *) strchr(name, ' ');
-	if (where || *name == '\0')
-		return 0;
-
-	if (!extensions) {
-		extensions = glGetString(GL_EXTENSIONS);
-	}
-	/* It takes a bit of care to be fool-proof about parsing the
-	OpenGL extensions string.  Don't be fooled by sub-strings,
-	etc. */
-	start = extensions;
-	for (;;) {
-		/* If your application crashes in the strstr routine below,
-		you are probably calling glutExtensionSupported without
-		having a current window.  Calling glGetString without
-		a current OpenGL context has unpredictable results.
-		Please fix your program. */
-		where = (GLubyte *) strstr((const char *) start, name);
-		if (!where)
-			break;
-		terminator = where + strlen(name);
-		if (where == start || *(where - 1) == ' ') {
-			if (*terminator == ' ' || *terminator == '\0') {
-				return 1;
-			}
-		}
-		start = terminator;
-	}
-	return 0;
-}
-
-void piglit_require_extension(const char *name)
-{
-	if (!piglit_extension_supported(name)) {
-		printf("Test requires %s\n", name);
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-}
-
-void piglit_require_not_extension(const char *name)
-{
-	if (piglit_extension_supported(name)) {
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
-}
-
 /**
  * Read a pixel from the given location and compare its RGBA value to the
  * given expected values.
