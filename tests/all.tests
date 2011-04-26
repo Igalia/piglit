@@ -890,6 +890,7 @@ add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA32F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_INTENSITY32F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_RGB32F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA32F')
+add_plain_test(arb_texture_float, 'arb_texture_float-texture-float-formats')
 
 ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
