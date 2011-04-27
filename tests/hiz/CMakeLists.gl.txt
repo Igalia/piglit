@@ -1,0 +1,14 @@
+include_directories(
+	${piglit_SOURCE_DIR}/tests
+	${piglit_SOURCE_DIR}/tests/util
+
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	${GLUT_INCLUDE_DIR}
+	)
+
+add_library(hiz-util
+	hiz-util.c
+	)
+
+# vim: ft=cmake:
