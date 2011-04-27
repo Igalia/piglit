@@ -11,4 +11,22 @@ add_library(hiz-util
 	hiz-util.c
 	)
 
+link_libraries (
+	hiz-util
+	piglitutil
+
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+	${OPENGL_egl_LIBRARY}
+	${GLUT_glut_LIBRARY}
+	${TIFF_LIBRARY}
+)
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	link_libraries(pthread X11)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+add_executable(hiz-depth-test-window-stencil0 hiz-depth-test-window-stencil0.c)
+add_executable(hiz-depth-test-window-stencil1 hiz-depth-test-window-stencil1.c)
+
 # vim: ft=cmake:
