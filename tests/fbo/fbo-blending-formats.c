@@ -209,6 +209,12 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	if (a > 8)
 		a = 8;
 
+	if (format->internalformat == GL_R11F_G11F_B10F) {
+		r = 6; /* precision of mantissa */
+		g = 6;
+		b = 5;
+	}
+
         if (i) {
 		piglit_set_tolerance_for_bits(i, i, i, i);
         } else if (l) {
