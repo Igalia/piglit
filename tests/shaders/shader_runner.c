@@ -681,6 +681,56 @@ set_uniform(const char *line)
 			piglit_Uniform4fv(loc, 1, f);
 			return;
 		}
+	} else if ((strncmp("mat", type, 3) == 0)
+		   && (type[3] != '\0')
+		   && (type[4] == 'x')) {
+		switch (type[3]) {
+		case '2':
+			switch (type[5]) {
+			case '2':
+				get_floats(line, f, 4);
+				piglit_UniformMatrix2fv(loc, 1, GL_FALSE, f);
+				return;
+			case '3':
+				get_floats(line, f, 6);
+				piglit_UniformMatrix2x3fv(loc, 1, GL_FALSE, f);
+				return;
+			case '4':
+				get_floats(line, f, 8);
+				piglit_UniformMatrix2x4fv(loc, 1, GL_FALSE, f);
+				return;
+			}
+		case '3':
+			switch (type[5]) {
+			case '2':
+				get_floats(line, f, 6);
+				piglit_UniformMatrix3x2fv(loc, 1, GL_FALSE, f);
+				return;
+			case '3':
+				get_floats(line, f, 9);
+				piglit_UniformMatrix3fv(loc, 1, GL_FALSE, f);
+				return;
+			case '4':
+				get_floats(line, f, 12);
+				piglit_UniformMatrix3x4fv(loc, 1, GL_FALSE, f);
+				return;
+			}
+		case '4':
+			switch (type[5]) {
+			case '2':
+				get_floats(line, f, 8);
+				piglit_UniformMatrix4x2fv(loc, 1, GL_FALSE, f);
+				return;
+			case '3':
+				get_floats(line, f, 12);
+				piglit_UniformMatrix4x3fv(loc, 1, GL_FALSE, f);
+				return;
+			case '4':
+				get_floats(line, f, 16);
+				piglit_UniformMatrix4fv(loc, 1, GL_FALSE, f);
+				return;
+			}
+		}
 	}
 
 	strcpy_to_space(name, type);
