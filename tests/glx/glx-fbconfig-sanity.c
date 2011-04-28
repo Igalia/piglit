@@ -22,10 +22,9 @@
  */
 
 /** @file glx-fbconfig-sanity.c
- * Verify that every FBconfig has a sane correspondence between its drawable
- * type and its visual ID.
+ * Verify that the list of fbconfigs conforms to GLX 1.4 section 3.3.3.
  *
- * This reproduces X.org bugzilla #34265.
+ * This reproduces X.org bugzilla #34265, among much else.
  */
 
 #include "piglit-util.h"
