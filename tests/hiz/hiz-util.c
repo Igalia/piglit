@@ -245,7 +245,7 @@ hiz_check_fbo_depth_test(const struct hiz_fbo_options *fbo_options)
 	bool pass = true;
 	GLuint fbo = 0;
 
-	piglit_require_extension("GL_ARB_fbo");
+	piglit_require_extension("GL_ARB_framebuffer_object");
 
 	/* Create and bind FBO. */
 	fbo = hiz_make_fbo(fbo_options);
