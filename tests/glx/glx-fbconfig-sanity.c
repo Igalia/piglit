@@ -122,7 +122,7 @@ main(int argc, char **argv)
 		vinfo = GetVisualFromFBConfig(dpy, configs[i]);
 		if ((vinfo == NULL) != (visual_id == 0)) {
 			fprintf(stderr, "FBconfig 0x%x has vinfo = %p and "
-				"visual ID = %d.  Both or neither must be "
+				"visual ID = 0x%x.  Both or neither must be "
 				"NULL / zero.\n",
 				config_id, vinfo, visual_id);
 			result = PIGLIT_FAILURE;
@@ -130,7 +130,7 @@ main(int argc, char **argv)
 
 		if (vinfo != NULL && vinfo->visualid != visual_id) {
 			fprintf(stderr, "FBconfig 0x%x has "
-				"vinfo->visualid = %d and visual ID = %d.  "
+				"vinfo->visualid = 0x%x and visual ID = 0x%x. "
 				"These should match!\n",
 				config_id, (int) vinfo->visualid, visual_id);
 			result = PIGLIT_FAILURE;
@@ -147,7 +147,7 @@ main(int argc, char **argv)
 			    vinfo->class == PseudoColor) {
 				if (depth != vinfo->depth) {
 					fprintf(stderr, "FBConfig 0x%x has "
-						"depth %d but visual %d has "
+						"depth %d but visual 0x%x has "
 						"depth %d.  These should "
 						"match!\n", config_id, depth,
 						(int)vinfo->visualid,
@@ -159,7 +159,7 @@ main(int argc, char **argv)
 			    vinfo->class == DirectColor) {
 				if (depth < vinfo->depth) {
 					fprintf(stderr, "FBConfig 0x%x has "
-						"depth %d < visual %d depth "
+						"depth %d < visual 0x%x depth "
 						"%d.  Should be >= visual "
 						"depth!\n",
 						config_id, depth,
@@ -227,7 +227,7 @@ main(int argc, char **argv)
 				} else if (fail == 1) {
 					fprintf(stderr, "FBConfig 0x%x claims "
 						"visual class that does not "
-						"match visual %d\n",
+						"match visual 0x%x\n",
 						config_id,
 						(int)vinfo->visualid);
 					result = PIGLIT_FAILURE;
