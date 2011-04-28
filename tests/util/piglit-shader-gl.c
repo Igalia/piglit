@@ -51,11 +51,20 @@ PFNGLUNIFORM2FVPROC piglit_Uniform2fv = NULL;
 PFNGLUNIFORM3FVPROC piglit_Uniform3fv = NULL;
 PFNGLUNIFORM4FVPROC piglit_Uniform4fv = NULL;
 PFNGLUNIFORM1IPROC piglit_Uniform1i = NULL;
+PFNGLUNIFORMMATRIX2FVPROC piglit_UniformMatrix2fv = NULL;
+PFNGLUNIFORMMATRIX3FVPROC piglit_UniformMatrix3fv = NULL;
 PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv = NULL;
 PFNGLGETUNIFORMFVPROC piglit_GetUniformfv = NULL;
 PFNGLVERTEXATTRIBPOINTERPROC piglit_VertexAttribPointer = NULL;
 PFNGLENABLEVERTEXATTRIBARRAYPROC piglit_EnableVertexAttribArray = NULL;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC piglit_DisableVertexAttribArray = NULL;
+
+PFNGLUNIFORMMATRIX2X3FVPROC piglit_UniformMatrix2x3fv = NULL;
+PFNGLUNIFORMMATRIX2X4FVPROC piglit_UniformMatrix2x4fv = NULL;
+PFNGLUNIFORMMATRIX3X2FVPROC piglit_UniformMatrix3x2fv = NULL;
+PFNGLUNIFORMMATRIX3X4FVPROC piglit_UniformMatrix3x4fv = NULL;
+PFNGLUNIFORMMATRIX4X2FVPROC piglit_UniformMatrix4x2fv = NULL;
+PFNGLUNIFORMMATRIX4X3FVPROC piglit_UniformMatrix4x3fv = NULL;
 
 static void
 init_functions_from_core(void)
@@ -80,11 +89,22 @@ init_functions_from_core(void)
 	piglit_Uniform3fv = glUniform3fv;
 	piglit_Uniform4fv = glUniform4fv;
 	piglit_Uniform1i = glUniform1i;
+	piglit_UniformMatrix2fv = glUniformMatrix2fv;
+	piglit_UniformMatrix3fv = glUniformMatrix3fv;
 	piglit_UniformMatrix4fv = glUniformMatrix4fv;
 	piglit_GetUniformfv = glGetUniformfv;
 	piglit_VertexAttribPointer = glVertexAttribPointer;
 	piglit_EnableVertexAttribArray = glEnableVertexAttribArray;
 	piglit_DisableVertexAttribArray = glDisableVertexAttribArray;
+
+	/* These are part of OpenGL 2.1.
+	 */
+	piglit_UniformMatrix2x3fv = glUniformMatrix2x3fv;
+	piglit_UniformMatrix2x4fv = glUniformMatrix2x4fv;
+	piglit_UniformMatrix3x2fv = glUniformMatrix3x2fv;
+	piglit_UniformMatrix3x4fv = glUniformMatrix3x4fv;
+	piglit_UniformMatrix4x2fv = glUniformMatrix4x2fv;
+	piglit_UniformMatrix4x3fv = glUniformMatrix4x3fv;
 }
 
 static void
@@ -110,6 +130,8 @@ init_functions_from_extension(void)
 	piglit_Uniform3fv = glUniform3fvARB;
 	piglit_Uniform4fv = glUniform4fvARB;
 	piglit_Uniform1i = glUniform1iARB;
+	piglit_UniformMatrix2fv = glUniformMatrix2fvARB;
+	piglit_UniformMatrix3fv = glUniformMatrix3fvARB;
 	piglit_UniformMatrix4fv = glUniformMatrix4fvARB;
 	piglit_GetUniformfv = glGetUniformfvARB;
 	piglit_VertexAttribPointer = glVertexAttribPointerARB;

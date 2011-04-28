@@ -212,11 +212,19 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_Uniform3fv glUniform3fv
 #define piglit_Uniform4fv glUniform4fv
 #define piglit_Uniform1i glUniform1i
+#define piglit_UniformMatrix2fv glUniformMatrix2fv
+#define piglit_UniformMatrix3fv glUniformMatrix3fv
 #define piglit_UniformMatrix4fv glUniformMatrix4fv
 #define piglit_GetUniformfv glGetUniformfv
 #define piglit_VertexAttribPointer glVertexAttribPointer
 #define piglit_EnableVertexAttribArray glEnableVertexAttribArray
 #define piglit_DisableVertexAttribArray glDisableVertexAttribArray
+#define piglit_UniformMatrix2x3fv assert(!"glUniformMatrix2x3fv does not exist in ES")
+#define piglit_UniformMatrix2x4fv assert(!"glUniformMatrix2x4fv does not exist in ES")
+#define piglit_UniformMatrix3x2fv assert(!"glUniformMatrix3x2fv does not exist in ES")
+#define piglit_UniformMatrix3x4fv assert(!"glUniformMatrix3x4fv does not exist in ES")
+#define piglit_UniformMatrix4x2fv assert(!"glUniformMatrix4x2fv does not exist in ES")
+#define piglit_UniformMatrix4x3fv assert(!"glUniformMatrix4x3fv does not exist in ES")
 #else
 extern PFNGLATTACHSHADERPROC piglit_AttachShader;
 extern PFNGLBINDATTRIBLOCATIONPROC piglit_BindAttribLocation;
@@ -238,11 +246,19 @@ extern PFNGLUNIFORM2FVPROC piglit_Uniform2fv;
 extern PFNGLUNIFORM3FVPROC piglit_Uniform3fv;
 extern PFNGLUNIFORM4FVPROC piglit_Uniform4fv;
 extern PFNGLUNIFORM1IPROC piglit_Uniform1i;
+extern PFNGLUNIFORMMATRIX2FVPROC piglit_UniformMatrix2fv;
+extern PFNGLUNIFORMMATRIX3FVPROC piglit_UniformMatrix3fv;
 extern PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv;
 extern PFNGLGETUNIFORMFVPROC piglit_GetUniformfv;
 extern PFNGLVERTEXATTRIBPOINTERPROC piglit_VertexAttribPointer;
 extern PFNGLENABLEVERTEXATTRIBARRAYPROC piglit_EnableVertexAttribArray;
 extern PFNGLDISABLEVERTEXATTRIBARRAYPROC piglit_DisableVertexAttribArray;
+extern PFNGLUNIFORMMATRIX2X3FVPROC piglit_UniformMatrix2x3fv;
+extern PFNGLUNIFORMMATRIX2X4FVPROC piglit_UniformMatrix2x4fv;
+extern PFNGLUNIFORMMATRIX3X2FVPROC piglit_UniformMatrix3x2fv;
+extern PFNGLUNIFORMMATRIX3X4FVPROC piglit_UniformMatrix3x4fv;
+extern PFNGLUNIFORMMATRIX4X2FVPROC piglit_UniformMatrix4x2fv;
+extern PFNGLUNIFORMMATRIX4X3FVPROC piglit_UniformMatrix4x3fv;
 #endif
 /*@}*/
 
