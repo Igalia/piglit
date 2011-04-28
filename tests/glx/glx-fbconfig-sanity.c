@@ -175,14 +175,21 @@ main(int argc, char **argv)
 				result = PIGLIT_FAILURE;
 			} else {
 				int fail = 0;
+				int ci_fail = 0;
 				switch (vinfo->class) {
 					case TrueColor:
 						if (vtype != GLX_TRUE_COLOR)
 							fail = 1;
+						if (render_type &
+						    GLX_COLOR_INDEX_BIT)
+							ci_fail = 1;
 						break;
 					case DirectColor:
 						if (vtype != GLX_DIRECT_COLOR)
 							fail = 1;
+						if (render_type &
+						    GLX_COLOR_INDEX_BIT)
+							ci_fail = 1;
 						break;
 					case PseudoColor:
 						if (vtype != GLX_PSEUDO_COLOR)
@@ -203,6 +210,13 @@ main(int argc, char **argv)
 					default:
 						fail = 2;
 						break;
+				}
+				if (ci_fail) {
+					fprintf(stderr, "FBConfig 0x%x is "
+						"{True,Direct}Color but claims "
+						"support for color-index\n",
+						config_id);
+					result = PIGLIT_FAILURE;
 				}
 				if (fail == 2) {
 					fprintf(stderr, "FBConfig 0x%x has "
