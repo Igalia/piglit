@@ -1,0 +1,48 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+uniform vec4 c, r;
+uniform mat2x4 expected;
+varying vec4 color;
+
+void main() {
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  mat2x4 result = outerProduct(c, r);
+  color = (result == expected) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[fragment shader]
+#version 120
+varying vec4 color;
+void main() { gl_FragColor = color; }
+
+[test]
+clear color 0.5 0.5 0.5 0.0
+clear
+ortho
+
+uniform vec4 c  2 3 4 5
+uniform vec2 r  6 7
+uniform mat2x4 expected  12 18 24 30 14 21 28 35
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
+
+uniform vec4 c  3 4 5 6
+uniform vec2 r  7 8
+uniform mat2x4 expected  21 28 35 42 24 32 40 48
+draw rect 30 10 10 10
+probe rgb 35 15 0.0 1.0 0.0
+
+uniform vec4 c  4 5 6 7
+uniform vec2 r  8 9
+uniform mat2x4 expected  32 40 48 56 36 45 54 63
+draw rect 50 10 10 10
+probe rgb 55 15 0.0 1.0 0.0
+
+uniform vec4 c  5 6 7 8
+uniform vec2 r  9 10
+uniform mat2x4 expected  45 54 63 72 50 60 70 80
+draw rect 70 10 10 10
+probe rgb 75 15 0.0 1.0 0.0
