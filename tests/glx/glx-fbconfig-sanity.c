@@ -88,6 +88,8 @@ main(int argc, char **argv)
 		int render_type;
 		int x_renderable;
 		int caveat;
+		int vtype;
+		int transparency;
 		XVisualInfo *vinfo;
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_FBCONFIG_ID,
@@ -104,6 +106,10 @@ main(int argc, char **argv)
 				  &x_renderable);
 		GetFBConfigAttrib(dpy, configs[i], GLX_CONFIG_CAVEAT,
 				  &caveat);
+		GetFBConfigAttrib(dpy, configs[i], GLX_TRANSPARENT_TYPE,
+				  &transparency);
+		GetFBConfigAttrib(dpy, configs[i], GLX_X_VISUAL_TYPE,
+				  &vtype);
 
 		if (!draw_type) {
 			fprintf(stderr, "FBConfig 0x%x supports no "
@@ -119,6 +125,8 @@ main(int argc, char **argv)
 			result = PIGLIT_FAILURE;
 		}
 
+		GetFBConfigAttrib(dpy, configs[i], GLX_TRANSPARENT_TYPE,
+				  &transparency);
 		vinfo = GetVisualFromFBConfig(dpy, configs[i]);
 		if ((vinfo == NULL) != (visual_id == 0)) {
 			fprintf(stderr, "FBconfig 0x%x has vinfo = %p and "
@@ -138,11 +146,8 @@ main(int argc, char **argv)
 
 		if (vinfo) {
 			int depth;
-			int vtype;
 			GetFBConfigAttrib(dpy, configs[i], GLX_BUFFER_SIZE,
 					  &depth);
-			GetFBConfigAttrib(dpy, configs[i], GLX_X_VISUAL_TYPE,
-					  &vtype);
 			if (vinfo->class == StaticColor ||
 			    vinfo->class == PseudoColor) {
 				if (depth != vinfo->depth) {
@@ -290,6 +295,35 @@ main(int argc, char **argv)
 			default:
 				fprintf(stderr, "FBConfig 0x%x has unknown "
 					"caveat 0x%x\n", config_id, caveat);
+				result = PIGLIT_FAILURE;
+				break;
+		}
+
+		switch (transparency) {
+			case GLX_NONE:
+				break;
+			case GLX_TRANSPARENT_RGB:
+				if (vtype != GLX_TRUE_COLOR &&
+				    vtype != GLX_DIRECT_COLOR) {
+					fprintf(stderr, "FBConfig 0x%x is rgb "
+						"transparent but not an rgb "
+						"visual type\n", config_id);
+					result = PIGLIT_FAILURE;
+				}
+				break;
+			case GLX_TRANSPARENT_INDEX:
+				if (vtype == GLX_TRUE_COLOR ||
+				    vtype == GLX_DIRECT_COLOR) {
+					fprintf(stderr, "FBConfig 0x%x is ci "
+						"transparent but not a ci "
+						"visual type\n", config_id);
+					result = PIGLIT_FAILURE;
+				}
+				break;
+			default:
+				fprintf(stderr, "FBConfig 0x%x has unknown "
+					"transparency type 0x%x\n", config_id,
+					transparency);
 				result = PIGLIT_FAILURE;
 				break;
 		}
