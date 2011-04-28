@@ -268,5 +268,5 @@ hiz_check_fbo_depth_test(const struct hiz_fbo_options *fbo_options)
 
 	hiz_delete_fbo(fbo);
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return pass;
 }
