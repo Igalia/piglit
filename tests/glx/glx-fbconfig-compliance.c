@@ -33,6 +33,7 @@
 static PFNGLXGETFBCONFIGSPROC GetFBConfigs = NULL;
 static PFNGLXGETFBCONFIGATTRIBPROC GetFBConfigAttrib = NULL;
 static PFNGLXGETVISUALFROMFBCONFIGPROC GetVisualFromFBConfig = NULL;
+static PFNGLXCHOOSEFBCONFIGPROC ChooseFBConfig = NULL;
 
 int piglit_width = 10;
 int piglit_height = 10;
@@ -177,9 +178,8 @@ main(int argc, char **argv)
 
 	configs = GetFBConfigs(dpy, DefaultScreen(dpy), &num_configs);
 
-	visual_depth = get_max_visual_depth(dpy, 1);
-
 	/* rgba support is mandatory */
+	visual_depth = get_max_visual_depth(dpy, 1);
 	if (!visual_depth)
 		goto out;
 
@@ -187,10 +187,31 @@ main(int argc, char **argv)
 		conformant |= config_is_sufficient(dpy, configs[i],
 						   visual_depth, 1);
 
-	/*
-	 * todo: add ci support checks.  this is not mandatory, and even
-	 * if you have ci visuals you need not support GLX on them.
-	 */
+	/* color index support is not mandatory */
+	visual_depth = get_max_visual_depth(dpy, 0);
+	if (visual_depth) {
+		GLXFBConfig *ci_configs;
+		int num_ci_configs;
+		int ci_conformant = 0;
+		const int ci_attribs[] = {
+			GLX_RENDER_TYPE, GLX_COLOR_INDEX_BIT,
+			GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+			None
+		};
+
+		/* even if you have CI visuals, you needn't have CI fbconfigs */
+		ci_configs = ChooseFBConfig(dpy, DefaultScreen(dpy),
+					    ci_attribs, &num_ci_configs);
+		if (!ci_configs)
+			goto out;
+
+		/* but if you do have them, they must conform */
+		for (i = 0; i < num_configs; i++)
+			ci_conformant = config_is_sufficient(dpy, configs[i],
+							     visual_depth, 0);
+
+		conformant &= ci_conformant;
+	}
 
 out:
 	piglit_report_result(conformant ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
