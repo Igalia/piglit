@@ -43,10 +43,10 @@ int piglit_height = 400;
 int piglit_window_mode = GLUT_RGB;
 
 struct hiz_fbo_options fbo_options = {
-	.color_format = GL_RGBA,
-	.depth_format = 0,
-	.stencil_format = 0,
-	.depth_stencil_format = GL_DEPTH24_STENCIL8,
+	GL_RGBA,
+	0,
+	0,
+	GL_DEPTH24_STENCIL8,
 };
 
 void
