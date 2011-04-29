@@ -42,7 +42,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -78,14 +78,14 @@ piglit_init(int argc, char **argv)
 	err = glGetError();
 	if (err != 0) {
 		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		fprintf(stderr, "FBO erroneously incomplete: 0x%04x\n",
 			status);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glClearColor(color[0], color[1], color[2], color[3]);
@@ -94,14 +94,14 @@ piglit_init(int argc, char **argv)
 	err = glGetError();
 	if (err != 0) {
 		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 0, 0, 0, 32, 32,
 					  color)) {
 		fprintf(stderr, "FBO clear didn't work\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

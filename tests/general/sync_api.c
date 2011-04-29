@@ -157,6 +157,6 @@ piglit_display(void)
 	FAIL_ON_ERROR("glDeleteSync");
 
 done:
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

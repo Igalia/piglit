@@ -248,22 +248,22 @@ piglit_display(void)
 
    if (!frag_shader_2d_array) {
       printf("%s: failed to compile 2D fragment shader.\n", prog);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    if (!program_2d_array) {
       printf("%s: failed to link 2D shader program.\n", prog);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    if (!frag_shader_1d_array) {
       printf("%s: failed to compile 1D fragment shader.\n", prog);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    if (!program_1d_array) {
       printf("%s: failed to link 1D shader program.\n", prog);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
 
@@ -319,7 +319,7 @@ piglit_display(void)
    }
 
    glutSwapBuffers();
-   return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

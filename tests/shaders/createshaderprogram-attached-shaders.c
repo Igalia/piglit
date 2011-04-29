@@ -39,7 +39,7 @@ static const char vs_text[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -73,5 +73,5 @@ piglit_init(int argc, char **argv)
 		pass = GL_FALSE;
 	}
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

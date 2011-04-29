@@ -570,7 +570,7 @@ static void add_result(bool *all_skip, enum piglit_result *end_result,
 	if (new != PIGLIT_SKIP)
 		*all_skip = false;
 
-	if (new == PIGLIT_FAILURE)
+	if (new == PIGLIT_FAIL)
 		*end_result = new;
 }
 
@@ -578,7 +578,7 @@ typedef enum piglit_result (*test_func)(const struct format_desc *format, GLenum
 
 static enum piglit_result fbo_formats_display(test_func test_format)
 {
-	enum piglit_result result, end_result = PIGLIT_SUCCESS;
+	enum piglit_result result, end_result = PIGLIT_PASS;
 	bool all_skip = true;
 	int i;
 

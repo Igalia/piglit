@@ -54,7 +54,7 @@ static const char layout_upper[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -85,8 +85,8 @@ piglit_init(int argc, char **argv)
 		fprintf(stderr,
 			"Linking with gl_FragCoord layouts "
 			"failed when it should have succeeded.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

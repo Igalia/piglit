@@ -106,7 +106,7 @@ enum piglit_result
 piglit_display(void)
 {
    test_prims();
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

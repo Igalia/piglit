@@ -80,7 +80,7 @@ draw(Display *dpy)
 
    if (!ctx1 || !ctx2) {
       fprintf(stderr, "%s: create contexts failed\n", TestName);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 
    /*
@@ -121,7 +121,7 @@ draw(Display *dpy)
 
    if (!ok) {
       printf("%s: drawing with context 1 failed\n", TestName);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    /*
@@ -156,13 +156,13 @@ draw(Display *dpy)
 
    if (!ok) {
       printf("%s: drawing with context 2 failed\n", TestName);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glXDestroyContext(dpy, ctx2);
 
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 
@@ -181,7 +181,7 @@ main(int argc, char **argv)
    dpy = XOpenDisplay(NULL);
    if (dpy == NULL) {
       fprintf(stderr, "%s: open display failed\n", TestName);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 
    visinfo = piglit_get_glx_visual(dpy);

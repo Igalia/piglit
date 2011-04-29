@@ -42,7 +42,7 @@ enum piglit_result
 piglit_display(void)
 {
 	/* unreached */
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -96,7 +96,7 @@ piglit_init(int argc, char **argv)
 
 
 	if (pass)
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	else
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 }

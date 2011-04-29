@@ -105,7 +105,7 @@ test(void)
 	else {
 		fprintf(stderr, "Couldn't determine type of program %s\n",
 			filename);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
 
@@ -177,7 +177,7 @@ test(void)
 		free(info);
 	free(prog_string);
 	piglit_DeleteShader(prog);
-	piglit_report_result (pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result (pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
 static void usage(char *name)

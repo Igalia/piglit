@@ -86,7 +86,7 @@ piglit_display(void)
 
 	glDeleteBuffersARB(1, &pbo);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

@@ -41,13 +41,13 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	GLenum err;
 
 	while (glGetError() != 0) {
@@ -62,7 +62,7 @@ piglit_init(int argc, char **argv)
 		printf("Unexpected OpenGL error state 0x%04x for glGetError() "
 		       "inside glBegin/glEnd pair (expected 0x0000).\n",
 		       err);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	err = glGetError();
@@ -71,7 +71,7 @@ piglit_init(int argc, char **argv)
 		printf("Unexpected OpenGL error state 0x%04x for glGetError() "
 		       "inside glBegin/glEnd pair (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	piglit_report_result(result);

@@ -91,7 +91,7 @@ piglit_display(void)
 
 	result = piglit_probe_pixel_rgba(piglit_width /2, piglit_height / 2,
                                          expColor)
-		? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+		? PIGLIT_PASS : PIGLIT_FAIL;
 
 	glutSwapBuffers();
 

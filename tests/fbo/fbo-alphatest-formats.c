@@ -273,7 +273,7 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result piglit_display(void)

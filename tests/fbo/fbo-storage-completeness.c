@@ -48,7 +48,7 @@ check_error(int line)
    if (err) {
       printf("%s: Unexpected error 0x%x at line %d\n",
               TestName, err, line);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 }
 

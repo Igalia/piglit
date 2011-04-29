@@ -42,7 +42,7 @@ piglit_display(void)
 {
 	glDeleteFragmentShaderATI(1001);
 
-	return glGetError() == 0 ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return glGetError() == 0 ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)

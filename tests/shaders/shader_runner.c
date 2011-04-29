@@ -135,7 +135,7 @@ compile_glsl(GLenum target, bool release_text)
 			info);
 
 		free(info);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (release_text) {
@@ -262,7 +262,7 @@ load_shader_file(const char *line)
 		strcpy_to_space(buf, line);
 
 		printf("could not load file \"%s\"\n", buf);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	shader_strings[num_shader_strings] = text;
@@ -312,7 +312,7 @@ process_comparison(const char *src, enum comparison *cmp)
 	strncpy(buf, src, sizeof(buf));
 	buf[sizeof(buf) - 1] = '\0';
 	printf("invalid comparison in test script:\n%s\n", buf);
-	piglit_report_result(PIGLIT_FAILURE);
+	piglit_report_result(PIGLIT_FAIL);
 
 	/* Won't get here. */
 	return NULL;
@@ -523,7 +523,7 @@ link_and_use_shaders(void)
 			info);
 
 		free(info);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	piglit_UseProgram(prog);
@@ -541,7 +541,7 @@ link_and_use_shaders(void)
 		piglit_GetProgramInfoLog(prog, size, NULL, info);
 		fprintf(stderr, "Info log: %s\n", info);
 
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -556,7 +556,7 @@ process_test_script(const char *script_name)
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	while (line[0] != '\0') {
@@ -655,7 +655,7 @@ set_uniform(const char *line)
 	if (loc < 0) {
 		printf("cannot get location of uniform \"%s\"\n",
 		       name);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (strncmp("float", type, 5) == 0) {
@@ -685,7 +685,7 @@ set_uniform(const char *line)
 
 	strcpy_to_space(name, type);
 	printf("unknown uniform type \"%s\"", name);
-	piglit_report_result(PIGLIT_FAILURE);
+	piglit_report_result(PIGLIT_FAIL);
 
 	return;
 }
@@ -736,7 +736,7 @@ piglit_display(void)
 	GLbitfield clear_bits = 0;
 
 	if (test_start == NULL)
-		return PIGLIT_SUCCESS;
+		return PIGLIT_PASS;
 
 
 	line = test_start;
@@ -901,7 +901,7 @@ piglit_display(void)
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"", line);
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 
 		line = strchrnul(line, '\n');
@@ -917,7 +917,7 @@ piglit_display(void)
 		piglit_UseProgram(0);
 	}
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

@@ -181,7 +181,7 @@ static void TestInstance(struct testinstance* instance)
 	glReadBuffer(GL_FRONT);
 	if (!piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, instance->expected)) {
 		fprintf(stderr, "Test %s, instance #%i failed\n", Filename, instance-Testcase.instances);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -192,7 +192,7 @@ piglit_display(void)
 	for(i = 0; i < Testcase.nrInstances; ++i)
 		TestInstance(&Testcase.instances[i]);
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 

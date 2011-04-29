@@ -464,7 +464,7 @@ piglit_display(void)
       pass = pass && test_draw_arrays();
    }
 
-   return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

@@ -45,7 +45,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 void
@@ -109,8 +109,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (! pass) {
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	} else {
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	}
 }

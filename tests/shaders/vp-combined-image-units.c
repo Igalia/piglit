@@ -64,9 +64,9 @@ piglit_display(void)
 
 	pass = pass && glGetError() == 0;
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 
-	return PIGLIT_FAILURE; /* NOTREACHED */
+	return PIGLIT_FAIL; /* NOTREACHED */
 }
 
 void

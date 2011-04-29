@@ -369,11 +369,11 @@ redisplay(void)
       pass = test_texture_env() && pass;
 
       if (pass) {
-         piglit_report_result(PIGLIT_SUCCESS);
+         piglit_report_result(PIGLIT_PASS);
       }
       else {
          report_info();
-         piglit_report_result(PIGLIT_FAILURE);
+         piglit_report_result(PIGLIT_FAIL);
       }
       exit(1);
    }

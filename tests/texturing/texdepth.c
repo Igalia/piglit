@@ -329,7 +329,7 @@ piglit_display(void)
 			}
 		}
 
-		return succ ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+		return succ ? PIGLIT_PASS : PIGLIT_FAIL;
 	}
 
 	glClearColor(0.5, 0.5, 0.0, 0.6);
@@ -339,7 +339,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 static void Reshape(int width, int height)

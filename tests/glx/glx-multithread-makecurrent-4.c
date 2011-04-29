@@ -141,7 +141,7 @@ draw(Display *dpy)
 
 	glXMakeCurrent(dpy, None, None);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 int
@@ -159,7 +159,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	visinfo = piglit_get_glx_visual(dpy);
 	win = piglit_get_glx_window(dpy, visinfo);

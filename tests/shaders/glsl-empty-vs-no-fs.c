@@ -67,7 +67,7 @@ piglit_display(void)
 		glDeleteShader(vs);
 	}
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 void

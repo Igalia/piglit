@@ -42,7 +42,7 @@ int piglit_height = 16;
 
 enum piglit_result piglit_display(void)
 {
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 
@@ -68,5 +68,5 @@ void piglit_init(int argc, char ** argv)
 	printf("Testing whether the following call crashes...\n");
 	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB, &result);
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

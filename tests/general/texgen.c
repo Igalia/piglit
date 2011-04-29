@@ -56,7 +56,7 @@ static void probe_cell(const char* testname, int x, int y, const float* expected
 	if (!piglit_probe_pixel_rgb((2*x+1)*Width/8, (2*y+1)*Height/8, expected)) {
 		fprintf(stderr, "%s: %i,%i failed\n", testname, x, y);
 		if (Automatic)
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -179,7 +179,7 @@ static void Redisplay(void)
 		for(i = 0; i < NrTests; ++i)
 			Tests[i].function();
 
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	} else {
 		Tests[CurrentTest].function();
 	}

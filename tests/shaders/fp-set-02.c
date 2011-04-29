@@ -160,7 +160,7 @@ piglit_display(void)
 	static const float values[3] = { 0.0, 0.5, 1.0 };
 	unsigned i;
 	unsigned j;
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	GLfloat color[4];
 	GLfloat ref[4];
 
@@ -219,7 +219,7 @@ piglit_display(void)
 					       tests[idx].opcode,
 					       ref[0], ref[1], ref[2], ref[2]);
 
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			}
 		}
 	}

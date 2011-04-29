@@ -181,7 +181,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
@@ -196,7 +196,7 @@ piglit_init(int argc, char **argv)
 	glGetTexBumpParameterivATI(GL_BUMP_ROT_MATRIX_SIZE_ATI, &size);
 	if (size < 4) {
 		printf("GL_BUMP_ROT_MATRIX_SIZE_ATI %d < 4\n", size);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	if (size != 4) {
 		printf("What does GL_BUMP_ROT_MATRIX_SIZE_ATI = %d even mean?\n",
@@ -207,7 +207,7 @@ piglit_init(int argc, char **argv)
 	glGetTexBumpParameterivATI(GL_BUMP_NUM_TEX_UNITS_ATI, &num_units);
 	if (num_units < 1) {
 		printf("GL_BUMP_NUM_TEX_UNITS_ATI %d < 4\n", num_units);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	units = malloc(num_units * sizeof(GLenum));
@@ -217,7 +217,7 @@ piglit_init(int argc, char **argv)
 		if (units[i] < GL_TEXTURE0) {
 			printf("Bad unit in GL_BUMP_TEX_UNITS_ATI: 0x%x\n",
 			       units[i]);
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 		if (units[i] == GL_TEXTURE1)
 			found_unit_1 = GL_TRUE;

@@ -236,5 +236,5 @@ depth_tex_display(const GLenum *depth_texture_modes, unsigned num_modes,
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

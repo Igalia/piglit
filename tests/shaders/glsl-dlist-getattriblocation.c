@@ -88,7 +88,7 @@ piglit_display(void)
 	glEndList();
 
 	pass = (attrib_loc == 1) && (attrib_loc == attrib_loc_in_dlist);
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

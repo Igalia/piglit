@@ -55,16 +55,16 @@ draw(struct egl_state *state)
 				      state->cfg, state->win, NULL);
 	if (surf != EGL_NO_SURFACE) {
 		fprintf(stderr, "eglCreateWindowSurface() didn't fail\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (eglGetError() != EGL_BAD_ALLOC) {
 		fprintf(stderr, "eglCreateWindowSurface() "
 			"error wasn't EGL_BAD_ALLOC\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 static const char *extensions[] = { NULL };

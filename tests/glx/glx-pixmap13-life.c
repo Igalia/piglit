@@ -65,7 +65,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	piglit_require_glx_version(dpy, 1, 3);
@@ -95,7 +95,7 @@ main(int argc, char **argv)
 
 	XSync(dpy, 0);
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 
 	return 0;
 }

@@ -100,9 +100,9 @@ piglit_display(void)
    glEnd();
 
    if (piglit_probe_pixel_rgb(piglit_width-5, piglit_height-20, red))
-      result = PIGLIT_SUCCESS;
+      result = PIGLIT_PASS;
    else
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
 
    glutSwapBuffers();
 

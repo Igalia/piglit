@@ -136,14 +136,14 @@ draw_frame(Display *dpy, Window win)
                 interval=(*pglXGetSwapIntervalMESA)();
                 if ( !  interval == 1 ) {
                     printf("Failed to set swap interval to 1.\n");
-                    piglit_report_result(PIGLIT_FAILURE);
+                    piglit_report_result(PIGLIT_FAIL);
                 }
             } else{
                 (*pglXSwapIntervalMESA)(0);
                 interval=(*pglXGetSwapIntervalMESA)();
                 if ( !  interval == 0 ) {
                     printf("Failed to set swap interval to 0.\n");
-                    piglit_report_result(PIGLIT_FAILURE);
+                    piglit_report_result(PIGLIT_FAIL);
                 }
             }
         }
@@ -168,7 +168,7 @@ event_count, seconds);
                             printf("There is swap event received, and the swap \
 type is %s.\n", swap_event_type);
                         }
-                        piglit_report_result(PIGLIT_SUCCESS);
+                        piglit_report_result(PIGLIT_PASS);
                     } else{
                         if (verbose) {
                             printf("glXSwapBuffers is called %d times and there\
@@ -177,7 +177,7 @@ event_count, seconds);
                             printf("There is no swap event received, and the \
 swap type is %s.\n", swap_event_type);
                         }
-                        piglit_report_result(PIGLIT_FAILURE);
+                        piglit_report_result(PIGLIT_FAIL);
                     }
                     
                 }
@@ -188,21 +188,21 @@ swap type is %s.\n", swap_event_type);
                             printf("The swap frequency of no swap interval is \
 much larger than swap interval being 1.\n");
                         }
-                        piglit_report_result(PIGLIT_SUCCESS);
+                        piglit_report_result(PIGLIT_PASS);
                     } else{
 			if(fullscreen)
 			{
 			   if(verbose)
 			        printf("In fullscreen mode, the swap frequency of \
 no swap interval is limited under fresh rate.\n");
-			   piglit_report_result(PIGLIT_SUCCESS);
+			   piglit_report_result(PIGLIT_PASS);
 			}
                         if (verbose) {
                             printf("The swap frequency of no swap interval is \
 not much larger than swap interval being 1. They are %lf and %lf.\n",
 swap_freq[0], swap_freq[1]);
                         }
-                        piglit_report_result(PIGLIT_FAILURE);
+                        piglit_report_result(PIGLIT_FAIL);
                     }
                 }
                 if (async) {
@@ -211,9 +211,9 @@ swap_freq[0], swap_freq[1]);
  the glXSwapBuffers call on average.\n", (time_val / frames));
                     }
                     if (async_swap ==1 ) {
-                        piglit_report_result(PIGLIT_SUCCESS);
+                        piglit_report_result(PIGLIT_PASS);
                     } else{
-                        piglit_report_result(PIGLIT_FAILURE);
+                        piglit_report_result(PIGLIT_FAIL);
                     }
                 }
             }    
@@ -492,7 +492,7 @@ main(int argc, char *argv[])
     if (!dpy) {
         printf("Error: couldn't open display %s\n",
             dpyName ? dpyName : getenv("DISPLAY"));
-        piglit_report_result(PIGLIT_FAILURE);
+        piglit_report_result(PIGLIT_FAIL);
     }
     
     make_window(dpy, "Swap event test", x, y, winWidth, winHeight, &win, &ctx, &glxWin);
@@ -506,7 +506,7 @@ main(int argc, char *argv[])
         interval=(*pglXGetSwapIntervalMESA)();
         if ( !  interval == 1 ) {
             printf("Failed to set swap interval to 1.\n");
-            piglit_report_result(PIGLIT_FAILURE);
+            piglit_report_result(PIGLIT_FAIL);
         }
     }
     event_loop(dpy, glxWin);

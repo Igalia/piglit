@@ -68,7 +68,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
         piglit_glx_get_error(dpy, NULL);

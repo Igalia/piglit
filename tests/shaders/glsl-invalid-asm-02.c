@@ -64,7 +64,7 @@ piglit_display(void)
 
 		pass = GL_FALSE;
         }
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
@@ -98,7 +98,7 @@ piglit_init(int argc, char **argv)
                 printf("Unexpected OpenGL error state 0x%04x with bad "
 		       "vertex program (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
         }
 
 	glEnable(GL_VERTEX_PROGRAM_ARB);

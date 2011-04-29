@@ -18,7 +18,7 @@ static void display(void)
 	glFlush();
 
 	if (Automatic) {
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	}
 }
 

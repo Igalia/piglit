@@ -53,7 +53,7 @@ enum piglit_result piglit_display(void)
 	glFinish();
 
 	glReadBuffer(GL_FRONT);
-	return piglit_probe_pixel_rgb(w / 2, h / 2, expected) ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return piglit_probe_pixel_rgb(w / 2, h / 2, expected) ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)

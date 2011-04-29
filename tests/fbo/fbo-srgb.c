@@ -177,7 +177,7 @@ piglit_display(void)
 	} else
 		printf("Failed on format SRGB8_ALPHA8\n");
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

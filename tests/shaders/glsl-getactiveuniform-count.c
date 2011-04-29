@@ -42,7 +42,7 @@ enum piglit_result
 piglit_display(void)
 {
 	/* unreached */
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -55,7 +55,7 @@ piglit_init(int argc, char **argv)
 	if (argc < 3) {
 		printf("Usage: %s <vertex shader file> "
 		       "<expected uniform count>\n", argv[0]);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	expect = (int) strtol(argv[2], NULL, 0);
@@ -75,7 +75,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (pass)
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	else
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 }

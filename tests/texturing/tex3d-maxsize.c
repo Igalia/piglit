@@ -99,7 +99,7 @@ piglit_display(void)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	if (glGetError())
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, maxsize, maxsize, maxsize, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -126,7 +126,7 @@ piglit_display(void)
 		err = glGetError();
 
 		if (err == GL_OUT_OF_MEMORY)
-			return PIGLIT_SUCCESS;
+			return PIGLIT_PASS;
 	}
 	else {
 		/* the max 3D texture size actually worked */
@@ -136,7 +136,7 @@ piglit_display(void)
 	if (err != GL_NO_ERROR) {
 		printf("%s: unexpected glTexImage3D error: 0x%x\n",
 		       TestName, err);
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 	}
 
 	if (0)
@@ -189,7 +189,7 @@ piglit_display(void)
 		       width, height, depth);
 	}
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

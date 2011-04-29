@@ -54,7 +54,7 @@ my_assert(int test, const char *text)
 {
    if (!test) {
       printf("%s: assertion %s failed\n", TestName, text);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
       exit(1);
    }
 }
@@ -67,7 +67,7 @@ check_error(int line)
    if (err) {
       printf("%s: Unexpected error 0x%x at line %d\n",
               TestName, err, line);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 }
 
@@ -185,11 +185,11 @@ test(void)
 
       if (!piglit_probe_pixel_rgba(5, 5, expected[i])) {
          printf("For color buffer %d\n", i);
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       }
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

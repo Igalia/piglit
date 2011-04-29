@@ -80,29 +80,29 @@ do {\
     glPixelTransferi(GL_MAP_COLOR, GL_FALSE);\
     glPixelMap##t##v(GL_PIXEL_MAP_R_TO_R, MAPSIZE, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glPixelMap##t##v(GL_PIXEL_MAP_G_TO_G, MAPSIZE, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glPixelMap##t##v(GL_PIXEL_MAP_B_TO_B, MAPSIZE, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glPixelMap##t##v(GL_PIXEL_MAP_A_TO_A, MAPSIZE, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 \
     glGetnPixelMap##t##vARB(GL_PIXEL_MAP_R_TO_R, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glGetnPixelMap##t##vARB(GL_PIXEL_MAP_G_TO_G, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glGetnPixelMap##t##vARB(GL_PIXEL_MAP_B_TO_B, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glGetnPixelMap##t##vARB(GL_PIXEL_MAP_A_TO_A, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 } while (0)
 
     TEST_PIXMAP(float, f);
@@ -111,7 +111,7 @@ do {\
 
 #undef TEST_PIXMAP
 #undef MAPSIZE
-  return PIGLIT_SUCCESS;
+  return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -127,17 +127,17 @@ do {\
 \
     glReadnPixelsARB(0, 0, width, height, GL_RGBA, GL_##enumtype, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
     glReadnPixelsARB(1, 1, width, height, GL_RGBA, GL_##enumtype, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 } while (0)
 
   TEST_READPIX(float, FLOAT);
   TEST_READPIX(int, INT);
   TEST_READPIX(byte, BYTE);
 #undef TEST_READPIX
-  return PIGLIT_SUCCESS;
+  return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -152,13 +152,13 @@ test_stipple(int offby)
 
     glPolygonStipple(pattern);
     if (!succeeded(0))
-        return PIGLIT_FAILURE;
+        return PIGLIT_FAIL;
 
     glGetnPolygonStippleARB(bufSize, pattern);
     if (!succeeded(offby))
-        return PIGLIT_FAILURE;
+        return PIGLIT_FAIL;
 
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -171,14 +171,14 @@ test_teximage3d(int offby);
 static enum piglit_result
 test_teximage(int offby)
 {
-    if (test_teximage1d(offby) != PIGLIT_SUCCESS)
-        return PIGLIT_FAILURE;
-    if (test_teximage2d(offby) != PIGLIT_SUCCESS)
-        return PIGLIT_FAILURE;
-    if (test_teximage3d(offby) != PIGLIT_SUCCESS)
-        return PIGLIT_FAILURE;
+    if (test_teximage1d(offby) != PIGLIT_PASS)
+        return PIGLIT_FAIL;
+    if (test_teximage2d(offby) != PIGLIT_PASS)
+        return PIGLIT_FAIL;
+    if (test_teximage3d(offby) != PIGLIT_PASS)
+        return PIGLIT_FAIL;
 
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -195,18 +195,18 @@ do {\
     glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width,\
                  0, GL_RGBA, GL_##enumtype, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 \
     glGetnTexImageARB(GL_TEXTURE_1D, 0, GL_RGBA, GL_##enumtype, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 } while(0)
 
     TEST_TEX1D(float, FLOAT);
     TEST_TEX1D(int, INT);
     TEST_TEX1D(byte, BYTE);
 #undef TEST_TEX1D
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -223,18 +223,18 @@ do {\
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,\
                  0, GL_RGBA, GL_##enumtype, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 \
     glGetnTexImageARB(GL_TEXTURE_2D, 0, GL_RGBA, GL_##enumtype, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 } while(0)
 
     TEST_TEX2D(float, FLOAT);
     TEST_TEX2D(int, INT);
     TEST_TEX2D(byte, BYTE);
 #undef TEST_TEX2D
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -251,18 +251,18 @@ do {\
     glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, width, height, depth,\
                  0, GL_RGBA, GL_##enumtype, v);\
     if (!succeeded(0))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 \
     glGetnTexImageARB(GL_TEXTURE_3D, 0, GL_RGBA, GL_##enumtype, bufSize, v);\
     if (!succeeded(offby))\
-        return PIGLIT_FAILURE;\
+        return PIGLIT_FAIL;\
 } while(0)
 
     TEST_TEX3D(float, FLOAT);
     TEST_TEX3D(int, INT);
     TEST_TEX3D(byte, BYTE);
 #undef TEST_TEX3D
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 static enum piglit_result
@@ -273,16 +273,16 @@ test(int offby)
    glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
    glBindBufferARB(GL_PIXEL_PACK_BUFFER_ARB, 0);
 
-    if (test_pixelmap(offby) != PIGLIT_SUCCESS)
-         return PIGLIT_FAILURE;
-    if (test_stipple(offby) != PIGLIT_SUCCESS)
-         return PIGLIT_FAILURE;
-    if (test_readpix(offby) != PIGLIT_SUCCESS)
-         return PIGLIT_FAILURE;
-    if (test_teximage(offby) != PIGLIT_SUCCESS)
-         return PIGLIT_FAILURE;
+    if (test_pixelmap(offby) != PIGLIT_PASS)
+         return PIGLIT_FAIL;
+    if (test_stipple(offby) != PIGLIT_PASS)
+         return PIGLIT_FAIL;
+    if (test_readpix(offby) != PIGLIT_PASS)
+         return PIGLIT_FAIL;
+    if (test_teximage(offby) != PIGLIT_PASS)
+         return PIGLIT_FAIL;
 
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 enum piglit_result
@@ -296,7 +296,7 @@ piglit_display(void)
     for (i = -9; i <= 1; ++i) {
         res = test(i);
         assert(glGetError() == GL_NO_ERROR);
-        if (res != PIGLIT_SUCCESS)
+        if (res != PIGLIT_PASS)
             break;
     }
 

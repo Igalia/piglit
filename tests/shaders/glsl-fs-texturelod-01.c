@@ -117,7 +117,7 @@ piglit_display()
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
@@ -150,14 +150,14 @@ piglit_init(int argc, char **argv)
 	sampler_uniform = glGetUniformLocation(prog, "sampler");
 	if (sampler_uniform == -1) {
 		printf("error: Unable to get location of uniform 'sampler'\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		return;
 	}
 	glUniform1i(sampler_uniform, texture_unit);
 	lod_uniform = glGetUniformLocation(prog, "lod");
 	if (lod_uniform == -1) {
 		printf("error: Unable to get location of uniform 'lod'\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		return;
 	}
 }

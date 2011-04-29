@@ -100,5 +100,5 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (piglit_automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+		piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

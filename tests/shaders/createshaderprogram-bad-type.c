@@ -53,7 +53,7 @@ static const char fs_text[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 GLboolean
@@ -126,5 +126,5 @@ piglit_init(int argc, char **argv)
 	pass = try_CreateShaderProgram(GL_GEOMETRY_SHADER_ARB, gs_text, expect)
 		&& pass;
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

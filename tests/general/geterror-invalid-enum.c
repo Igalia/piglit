@@ -28,7 +28,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -38,5 +38,5 @@ piglit_init(int argc, char **argv)
 
 	glGetBooleanv(GL_NONE, &params);
 	piglit_report_result(glGetError() == GL_INVALID_ENUM
-			     ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+			     ? PIGLIT_PASS : PIGLIT_FAIL);
 }

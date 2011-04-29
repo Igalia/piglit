@@ -251,7 +251,7 @@ piglit_display(void)
 {
 	unsigned i;
 	unsigned j;
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -285,7 +285,7 @@ piglit_display(void)
 					       colors[i][0], colors[i][1],
 					       colors[i][2], colors[i][3]);
 
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			}
 		}
 	}

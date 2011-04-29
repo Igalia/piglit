@@ -262,7 +262,7 @@ void Test::readline(const char* filename, int linenum, char* line)
 	char* p = strchr(line, ' ');
 	if (!p) {
 		fprintf(stderr, "%s:%i: malformed test line\n", filename, linenum);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	*p++ = 0;
@@ -284,7 +284,7 @@ void Test::readline(const char* filename, int linenum, char* line)
 		parameters.push_back(new ParameterEnv(GL_VERTEX_PROGRAM_NV, atoi(line+12), params));
 	} else {
 		fprintf(stderr, "%s:%i: unknown parameters %s\n", filename, linenum, line);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -304,7 +304,7 @@ void TestGroup::read(const char* filename)
 
 	if (!filp) {
 		fprintf(stderr, "Failed to read test data: %s\n", filename);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	ReadState state = None;
@@ -343,7 +343,7 @@ void TestGroup::read(const char* filename)
 				state = ReadTest;
 			} else {
 				fprintf(stderr, "%s:%i: unknown %s\n", filename, linenum, p);
-				piglit_report_result(PIGLIT_FAILURE);
+				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else {
 			switch(state) {
@@ -358,7 +358,7 @@ void TestGroup::read(const char* filename)
 				break;
 			default:
 				fprintf(stderr, "%s:%i: unexpected: %s\n", filename, linenum, p);
-				piglit_report_result(PIGLIT_FAILURE);
+				piglit_report_result(PIGLIT_FAIL);
 			}
 		}
 	}
@@ -369,7 +369,7 @@ void TestGroup::read(const char* filename)
 
 extern "C" piglit_result piglit_display(void)
 {
-	return tests.run() ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return tests.run() ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
@@ -397,7 +397,7 @@ extern "C" void piglit_init(int argc, char **argv)
 	}
 	if (!Filename) {
 		fprintf(stderr, "Need to give a testcase file\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	tests.read(Filename);
 

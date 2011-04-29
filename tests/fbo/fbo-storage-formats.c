@@ -47,7 +47,7 @@ check_error(int line)
    if (err) {
       printf("%s: Unexpected error 0x%x at line %d\n",
               TestName, err, line);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 }
 
@@ -228,7 +228,7 @@ test(void)
       }
    }
 
-   return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

@@ -53,7 +53,7 @@ draw(struct egl_state *state)
 
 	if (swap_buffers_region == NULL) {
 		fprintf(stderr, "could not getproc eglSwapBuffersRegionNOK");
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 	}
 
 	/* Clear background to green */
@@ -67,9 +67,9 @@ draw(struct egl_state *state)
 	for (i = 0; i < 16; i += 4)
 		if (!piglit_probe_pixel_rgba(rects[i] + 5,
 					     rects[i + 1] + 5, red))
-			return PIGLIT_FAILURE;
+			return PIGLIT_FAIL;
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 static const struct egl_test test = {

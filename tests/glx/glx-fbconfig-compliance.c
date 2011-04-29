@@ -160,7 +160,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Test requires at least GLX version 1.3.  Otherwise there is no
@@ -214,6 +214,6 @@ main(int argc, char **argv)
 	}
 
 out:
-	piglit_report_result(conformant ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(conformant ? PIGLIT_PASS : PIGLIT_FAIL);
 	return 0;
 }

@@ -61,7 +61,7 @@ attach_texture(int i)
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -90,17 +90,17 @@ piglit_init(int argc, char **argv)
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER) {
 		fprintf(stderr, "fbo incomplete draw buffer\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glReadBuffer(GL_COLOR_ATTACHMENT1);
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER) {
 		fprintf(stderr, "fbo incomplete read buffer\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	assert(glGetError() == 0);
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

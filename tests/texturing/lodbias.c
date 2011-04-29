@@ -248,7 +248,7 @@ piglit_display(void)
 		}
 	}
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static void Key(unsigned char key, int x, int y)

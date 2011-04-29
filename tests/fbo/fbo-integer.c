@@ -382,9 +382,9 @@ piglit_display(void)
    for (f = 0; f < NUM_FORMATS; f++) {
       GLboolean pass = test_fbo(&Formats[f]);
       if (!pass)
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
    }
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

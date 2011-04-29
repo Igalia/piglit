@@ -176,7 +176,7 @@ draw_and_test(const char *destination, int drawable_width, int drawable_height)
 	error = glGetError();
 	if (error) {
 		fprintf(stderr, "glClear error: 0x%x\n", error);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glColor4fv(red);
@@ -376,7 +376,7 @@ piglit_display()
 	glDeleteTextures(1, &texture);
 	glDeleteFramebuffersEXT(1, &fbo);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

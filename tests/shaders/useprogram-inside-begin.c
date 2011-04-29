@@ -41,13 +41,13 @@ static const char fs_text[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	GLint prog;
 	GLint fs;
 	GLint vs;
@@ -80,7 +80,7 @@ piglit_init(int argc, char **argv)
 		       "glUseProgram(0) "
 		       "inside glBegin/glEnd pair (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	while (glGetError() != 0)
@@ -101,7 +101,7 @@ piglit_init(int argc, char **argv)
 		       "glUseProgram(prog) "
 		       "inside glBegin/glEnd pair (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	piglit_report_result(result);

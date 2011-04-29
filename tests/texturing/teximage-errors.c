@@ -173,12 +173,12 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test_targets())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_pos_and_sizes())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

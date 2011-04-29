@@ -96,17 +96,17 @@ piglit_display(void)
 
 	if ((nsecs & 0xffffffff) != (nsecs64 & 0xffffffff)) {
 		printf("timer_query: 32 and 64-bit results differ!\n");
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 	}
 
 	if ((nsecs & 0xffffffff) != (nsecs64u & 0xffffffff)) {
 		printf("timer_query: 32 and 64-bit unsigned results differ!\n");
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 	}
 
 	/*printf("nsecs = %d %ld\n", nsecs, (long int) nsecs64);*/
 
 	glutSwapBuffers();
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }

@@ -75,14 +75,14 @@ create_window(struct egl_state *state)
 	if (!eglGetConfigAttrib(state->egl_dpy,
 				state->cfg, EGL_NATIVE_VISUAL_ID, &id)) {
 		fprintf(stderr, "eglGetConfigAttrib() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	template.visualid = id;
 	vinfo = XGetVisualInfo(state->dpy, VisualIDMask, &template, &count);
 	if (count != 1) {
 		fprintf(stderr, "XGetVisualInfo() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	state->depth = vinfo->depth;
@@ -107,7 +107,7 @@ static enum piglit_result
 event_loop(struct egl_state *state, const struct egl_test *test)
 {
 	XEvent event;
-	enum piglit_result result = PIGLIT_FAILURE;
+	enum piglit_result result = PIGLIT_FAIL;
 
 	while (1) {
 		XNextEvent (state->dpy, &event);
@@ -164,7 +164,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	state.dpy = XOpenDisplay(NULL);
 	if (state.dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	eglBindAPI(EGL_OPENGL_API);
@@ -172,12 +172,12 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	state.egl_dpy = eglGetDisplay(state.dpy);
 	if (state.egl_dpy == EGL_NO_DISPLAY) {
 		fprintf(stderr, "eglGetDisplay() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (!eglInitialize(state.egl_dpy, &state.major, &state.minor)) {
 		fprintf(stderr, "eglInitialize() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	check_extensions(&state, test);
@@ -185,14 +185,14 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	if (!eglChooseConfig(state.egl_dpy, attribs, &state.cfg, 1, &count) ||
 	    count == 0) {
 		fprintf(stderr, "eglChooseConfig() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	state.ctx = eglCreateContext(state.egl_dpy, state.cfg,
 				     EGL_NO_CONTEXT, NULL);
 	if (state.ctx == EGL_NO_CONTEXT) {
 		fprintf(stderr, "eglCreateContext() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	state.width = 300;
@@ -203,13 +203,13 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 					    state.cfg, state.win, NULL);
 	if (state.surf == EGL_NO_SURFACE) {
 		fprintf(stderr, "eglCreateWindowSurface() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (!eglMakeCurrent(state.egl_dpy,
 			    state.surf, state.surf, state.ctx)) {
 		fprintf(stderr, "eglMakeCurrent() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	result = event_loop(&state, test);

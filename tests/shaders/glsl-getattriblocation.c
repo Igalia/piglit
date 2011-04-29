@@ -101,7 +101,7 @@ piglit_display(void)
 	glDrawArrays(GL_POLYGON, 0, 4);
 
 	result = piglit_probe_pixel_rgba(20, 20, expColor)
-		? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+		? PIGLIT_PASS : PIGLIT_FAIL;
 
 	glDisableVertexAttribArray(attrib_loc);
 

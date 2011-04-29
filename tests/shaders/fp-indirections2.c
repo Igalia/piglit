@@ -190,12 +190,12 @@ static enum piglit_result test(unsigned int dim, unsigned int samples)
 			texture_follow(dim, x, y, 0, samples, expected);
 			if (!piglit_probe_pixel_rgb(x, y, expected)) {
 				fprintf(stderr, "Failure in dim = %i, samples = %i\n", dim, samples);
-				return PIGLIT_FAILURE;
+				return PIGLIT_FAIL;
 			}
 		}
 	}
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 enum piglit_result
@@ -212,7 +212,7 @@ piglit_display(void)
 		samples = 0;
 		for(;;) {
 			result = test(dim, samples);
-			if (result != PIGLIT_SUCCESS)
+			if (result != PIGLIT_PASS)
 				return result;
 
 			if (samples < 8) {
@@ -227,7 +227,7 @@ piglit_display(void)
 		}
 	}
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 

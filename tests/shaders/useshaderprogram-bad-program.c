@@ -42,13 +42,13 @@ static const char good_vs_text[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	GLenum err;
 	GLint ok;
 	GLuint prog;
@@ -73,7 +73,7 @@ piglit_init(int argc, char **argv)
 		fprintf(stderr,
 			"Linking with unresolved symbol succeeded when it "
 			"should have failed.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* There shouldn't be any GL errors, but clear them all just to be
@@ -93,7 +93,7 @@ piglit_init(int argc, char **argv)
 		       "glUseShaderProgramEXT called with\n"
 		       "an unlinked shader program (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	glDeleteProgram(prog);
@@ -124,7 +124,7 @@ piglit_init(int argc, char **argv)
 		       "glUseShaderProgramEXT called with\n"
 		       "an unlinked shader program (expected 0x%04x).\n",
 		       err, GL_INVALID_OPERATION);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	glDeleteProgram(prog);

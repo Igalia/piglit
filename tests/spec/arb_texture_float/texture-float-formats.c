@@ -341,7 +341,7 @@ piglit_display(void)
       if (!test_format(&Formats[f]))
          pass = GL_FALSE;
 
-   return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

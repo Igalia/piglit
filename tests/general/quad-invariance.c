@@ -114,7 +114,7 @@ piglit_display(void)
 		}
 	}
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_WARN;
+	return pass ? PIGLIT_PASS : PIGLIT_WARN;
 }
 
 void

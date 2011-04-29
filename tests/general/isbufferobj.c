@@ -49,7 +49,7 @@ test(void)
 
    if (glIsBuffer(0)) {
       printf("%s: glIsBuffer(0) returned true instead of false.\n", TestName);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glGenBuffers(2, buffers);
@@ -57,20 +57,20 @@ test(void)
        buffers[1] == 0 ||
        buffers[0] == buffers[1]) {
       printf("%s: glGenBuffers failed\n", TestName);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    if (glutExtensionSupported("GL_EXT_pixel_buffer_object")) {
       glBindBuffer(GL_PIXEL_PACK_BUFFER_EXT, buffers[0]);
       if (glGetError()) {
          printf("%s: glBindBuffer failed\n", TestName);
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       }
 
       if (!glIsBuffer(buffers[0])) {
          printf("%s: glIsBuffer(%u) returned false instead of true.\n",
                 TestName, buffers[0]);
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       }
    }
 
@@ -86,7 +86,7 @@ test(void)
       return PIGLIT_WARN;
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

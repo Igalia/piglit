@@ -59,7 +59,7 @@ enum piglit_result piglit_display(void)
 								x, y, color,
 								colors[color][0], colors[color][1], colors[color][2],
 								result[0], result[1], result[2]);
-							return PIGLIT_FAILURE;
+							return PIGLIT_FAIL;
 						}
 					}
 				}
@@ -67,7 +67,7 @@ enum piglit_result piglit_display(void)
 		}
 	}
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 void piglit_init(int argc, char **argv)

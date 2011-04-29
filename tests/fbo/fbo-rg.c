@@ -88,7 +88,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static int
@@ -125,7 +125,7 @@ create_fbo(unsigned width, unsigned height, GLenum internal_format)
 		glDeleteFramebuffersEXT(1, &fb);
 		glDeleteTextures(1, &tex);
 		piglit_report_result((status == GL_FRAMEBUFFER_UNSUPPORTED_EXT)
-				     ? PIGLIT_SKIP : PIGLIT_FAILURE);
+				     ? PIGLIT_SKIP : PIGLIT_FAIL);
 	}
 
 	return fb;
@@ -310,7 +310,7 @@ render_and_check_textures(GLenum internal_format)
 		break;
 	default:
 		fprintf(stderr, "invalid format 0x%04x\n", internal_format);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		break;
 	}
 
@@ -330,20 +330,20 @@ render_and_check_textures(GLenum internal_format)
 	glBindAttribLocation(fbo_program, 1, "color");
 	glLinkProgram(fbo_program);
 	if (!piglit_link_check_status(fbo_program))
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	scale_loc = glGetUniformLocation(fbo_program, "scale");
 	if (scale_loc < 0) {
 		fprintf(stderr,
 			"couldn't get uniform location for \"scale\"\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	bias_loc = glGetUniformLocation(fbo_program, "bias");
 	if (bias_loc < 0) {
 		fprintf(stderr,
 			"couldn't get uniform location for \"bias\"\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glUseProgram(fbo_program);
@@ -396,7 +396,7 @@ usage(const char *name)
 		"where internal_format is one of GL_RED, GL_R8, GL_RG, "
 		"GL_RG8, etc.\n",
 		name);
-	piglit_report_result(PIGLIT_FAILURE);
+	piglit_report_result(PIGLIT_FAIL);
 }
 
 void
@@ -478,5 +478,5 @@ piglit_init(int argc, char **argv)
 	pass = render_and_check_textures(internal_format);
 
 	if (piglit_automatic)
-		piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+		piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

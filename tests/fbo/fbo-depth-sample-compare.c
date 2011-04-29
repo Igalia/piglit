@@ -303,9 +303,9 @@ count_and_report_bad_pixels(void)
 
    /* XXX this error test is a total hack for now */
    if (error > ErrorScale)
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    else
-      return PIGLIT_SUCCESS;
+      return PIGLIT_PASS;
 }
 
 

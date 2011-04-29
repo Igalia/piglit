@@ -270,7 +270,7 @@ piglit_display(void)
 
   return ((float)passed_cnt > (1.0F-failing_pixel_percentage)
           *piglit_width*piglit_height)
-    ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+    ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
@@ -303,5 +303,5 @@ piglit_init(int argc, char **argv)
   assert(glIsProgram(program));
 
   if (!piglit_link_check_status(program))
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
 }

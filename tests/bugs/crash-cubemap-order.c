@@ -12,7 +12,7 @@ static int Width = 100, Height = 100;
 
 static void Display(void)
 {
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }
 
 static void init(void)

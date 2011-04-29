@@ -62,7 +62,7 @@ static GLint array_location[4];
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 union data_blob {
@@ -78,7 +78,7 @@ validate_buffer(const union data_blob *buffer, unsigned size, float expected)
 	if (buffer[0].f != expected) {
 		printf("index 0: got %f, expected %f\n",
 		       buffer[0].f, expected);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	} else if (!piglit_automatic) {
 		printf("index 0: got %f, expected %f (good)\n",
 		       buffer[0].f, expected);
@@ -87,7 +87,7 @@ validate_buffer(const union data_blob *buffer, unsigned size, float expected)
 	for (i = 1; i < size; i++) {
 		if (buffer[i].u != 0xdeadbeef) {
 			printf("glGetUniformfv overrun at index %u!\n", i);
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
 
@@ -121,7 +121,7 @@ piglit_init(int argc, char **argv)
 	base_location = piglit_GetUniformLocation(prog, "c");
 	if (base_location < 0) {
 		printf("Could not get location of `c'.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	for (i = 0; i < 4; i++) {
@@ -135,7 +135,7 @@ piglit_init(int argc, char **argv)
 		array_location[i] = piglit_GetUniformLocation(prog, name);
 		if (array_location[i] < 0) {
 			printf("Could not get location of `%s'.\n", name);
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
 
@@ -152,7 +152,7 @@ piglit_init(int argc, char **argv)
 		printf("Locations of `c' = %d and `c[0]' = %d, but they "
 		       "should be the same.\n",
 		       base_location, array_location[0]);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	piglit_Uniform1fv(base_location, 4, uniform_data);
@@ -185,5 +185,5 @@ piglit_init(int argc, char **argv)
 		validate_buffer(buffer, ARRAY_SIZE(buffer), uniform_data[i]);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

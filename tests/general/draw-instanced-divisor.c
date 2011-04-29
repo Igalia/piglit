@@ -146,10 +146,10 @@ piglit_display(void)
 
    for (div = 1; div <= PRIMS; div++) {
       if (!test_instancing(div))
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

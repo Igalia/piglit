@@ -54,7 +54,7 @@ static void expect_error(GLenum expect, const char * where, ...)
 		va_end(va);
 		fprintf(stderr, "\n");
 
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -73,7 +73,7 @@ static GLuint compile_shader(GLenum shaderType, const char * text)
 		GLsizei len;
 		glGetInfoLogARB(shader, 1000, &len, log);
 		fprintf(stderr, "Error: problem compiling shader: %s\n", log);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	return shader;
 }
@@ -96,7 +96,7 @@ static GLuint link_program(GLuint vs, GLuint fs)
 		GLsizei len;
 		glGetInfoLogARB(program, 1000, &len, log);
 		fprintf(stderr, "Error: problem linking program: %s\n", log);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	return program;
@@ -300,7 +300,7 @@ piglit_display(void)
 	test_vector("vec3", ", 0", glUniform3fvARB);
 	test_vector("vec4", "", glUniform4fvARB);
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 void

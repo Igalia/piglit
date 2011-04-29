@@ -206,6 +206,6 @@ piglit_display(void)
 
     glFinish();
 
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 

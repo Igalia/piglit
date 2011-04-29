@@ -53,7 +53,7 @@ draw(struct egl_state *state)
 				EGL_Y_INVERTED_NOK, &inv)) {
 		fprintf(stderr,
 			"eglGetConfigAttrib(EGL_Y_INVERTED_NOK) failed\n");
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 	}
 	
 	printf("EGL_Y_INVERTED_NOK: %s\n", inv ? "TRUE" : "FALSE");
@@ -61,7 +61,7 @@ draw(struct egl_state *state)
 	pixmap = egl_util_create_pixmap(state, 100, 100, pixmap_attribs);
 	if (!eglMakeCurrent(state->egl_dpy, pixmap, pixmap, state->ctx)) {
 		fprintf(stderr, "eglMakeCurrent() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	
 	/* Clear pixmap to purple */
@@ -71,7 +71,7 @@ draw(struct egl_state *state)
 	if (!eglMakeCurrent(state->egl_dpy,
 			    state->surf, state->surf, state->ctx)) {
 		fprintf(stderr, "eglMakeCurrent() failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glViewport(0, 0, state->width, state->height);
@@ -95,9 +95,9 @@ draw(struct egl_state *state)
 	    !piglit_probe_pixel_rgba(50, 50, purple) ||
 	    !piglit_probe_pixel_rgba(110, 110, purple) ||
 	    !piglit_probe_pixel_rgba(130, 130, red))
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 static const struct egl_test test = {

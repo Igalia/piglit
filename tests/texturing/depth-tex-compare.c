@@ -246,5 +246,5 @@ piglit_display(void)
 	printf("Top to Bottom: LESS, LEQUAL, GREATER, GEQUAL, "
 	       "ALWAYS, NEVER, NOTEQUAL, EQUAL\n");
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

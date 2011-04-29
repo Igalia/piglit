@@ -196,7 +196,7 @@ piglit_display(void)
 	glDisable(GL_TEXTURE_2D);
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

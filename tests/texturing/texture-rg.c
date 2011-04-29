@@ -287,9 +287,9 @@ enum piglit_result
 piglit_display(void)
 {
    if (test_teximage_formats() && test_drawpixels_formats())
-      return PIGLIT_SUCCESS;
+      return PIGLIT_PASS;
    else
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 }
 
 

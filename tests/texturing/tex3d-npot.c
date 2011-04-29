@@ -188,7 +188,7 @@ static void test_simple(int w, int h, int d, GLenum format)
     if (!success) {
         fprintf(stderr, "Failure with texture size %ix%ix%i, format = %s\n",
             w, h, d, formatname(format));
-        piglit_report_result(PIGLIT_FAILURE);
+        piglit_report_result(PIGLIT_FAIL);
     }
 }
 
@@ -214,7 +214,7 @@ piglit_display(void)
         }
     }
 
-    return PIGLIT_SUCCESS;
+    return PIGLIT_PASS;
 }
 
 

@@ -62,5 +62,5 @@ piglit_display(void)
 	pass = test_Purgeable(vbo, GL_BUFFER_OBJECT_APPLE);
 
 	glDeleteBuffersARB(1, &vbo);
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

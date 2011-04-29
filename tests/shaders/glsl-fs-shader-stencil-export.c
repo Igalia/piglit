@@ -56,7 +56,7 @@ piglit_display(void)
 	/* we hardcode 129 in the shader */
 	if (p[0] != 129)
 		pass = GL_FALSE;
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

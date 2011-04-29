@@ -554,11 +554,11 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 			fprintf(stderr, "%c", text[errorPos+a]);
 		}
 		fprintf(stderr, "\nin program:\n%s", text);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	if (!glIsProgramARB(program)) {
 		fprintf(stderr, "glIsProgramARB failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	return program;

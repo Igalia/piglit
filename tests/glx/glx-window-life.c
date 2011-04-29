@@ -67,7 +67,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
         piglit_glx_get_error(dpy, NULL);
@@ -77,7 +77,7 @@ main(int argc, char **argv)
         fbc = piglit_glx_get_fbconfig_for_visinfo(dpy, visinfo);
         if (fbc == None) {
 		fprintf(stderr, "No fbconfig available\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/*
@@ -106,7 +106,7 @@ main(int argc, char **argv)
 
 	XSync(dpy, 0);
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 
 	return 0;
 }

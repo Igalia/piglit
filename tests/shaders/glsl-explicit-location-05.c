@@ -40,7 +40,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)
@@ -70,7 +70,7 @@ void piglit_init(int argc, char **argv)
 
 	ok = piglit_link_check_status(prog);
 	if (!ok)
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	glDeleteProgram(prog);
 
@@ -81,16 +81,16 @@ void piglit_init(int argc, char **argv)
 
 	ok = piglit_link_check_status(prog);
 	if (!ok)
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	loc = glGetAttribLocation(prog, "vertex");
 	if (loc != 0) {
 		fprintf(stderr,
 			"Expected location of 'vertex' to be 0, got %d "
 			"instead.\n", loc);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }
 

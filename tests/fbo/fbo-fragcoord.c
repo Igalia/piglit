@@ -71,7 +71,7 @@ create_fbo(unsigned width, unsigned height, GLuint *out_tex)
 		glDeleteFramebuffersEXT(1, &fb);
 		glDeleteTextures(1, &tex);
 		piglit_report_result((status == GL_FRAMEBUFFER_UNSUPPORTED_EXT)
-				     ? PIGLIT_SKIP : PIGLIT_FAILURE);
+				     ? PIGLIT_SKIP : PIGLIT_FAIL);
 	}
 
 	*out_tex = tex;
@@ -131,7 +131,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

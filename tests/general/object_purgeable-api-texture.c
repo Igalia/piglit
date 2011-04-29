@@ -60,5 +60,5 @@ piglit_display(void)
 	pass = test_Purgeable(texture, GL_TEXTURE);
 
 	glDeleteTextures(1, &texture);
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

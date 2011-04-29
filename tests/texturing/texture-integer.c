@@ -565,18 +565,18 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test_general_formats())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_specific_formats())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_errors())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_limits())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

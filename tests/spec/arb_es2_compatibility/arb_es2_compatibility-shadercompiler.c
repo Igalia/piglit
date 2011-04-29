@@ -35,7 +35,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
@@ -57,9 +57,9 @@ piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_SHADER_COMPILER, &shadercompiler);
 	assert(!glGetError());
 	if (!shadercompiler)
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	else
-		piglit_report_result(PIGLIT_SUCCESS);
+		piglit_report_result(PIGLIT_PASS);
 #else
 	piglit_report_result(PIGLIT_SKIP);
 #endif

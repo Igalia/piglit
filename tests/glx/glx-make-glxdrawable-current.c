@@ -66,8 +66,8 @@ draw(Display *dpy)
 	if (nconfigs == 0 || !configs) {
 		fprintf(stderr,
 			"Couldn't get an RGBA, double-buffered FBConfig\n");
-		piglit_report_result(PIGLIT_FAILURE);
-		return PIGLIT_FAILURE;
+		piglit_report_result(PIGLIT_FAIL);
+		return PIGLIT_FAIL;
 	}
 
 	glxwin_one = glXCreateWindow(dpy, configs[0], win_one, NULL);
@@ -100,7 +100,7 @@ draw(Display *dpy)
 	glXMakeCurrent(dpy, None, NULL);
 	glXDestroyContext(dpy, ctx);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 int
@@ -118,7 +118,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	visinfo = piglit_get_glx_visual(dpy);
 	win_one = piglit_get_glx_window(dpy, visinfo);

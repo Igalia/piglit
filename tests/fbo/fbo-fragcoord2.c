@@ -72,7 +72,7 @@ check_error(int line)
    if (err) {
       printf("%s: Unexpected error 0x%x at line %d\n",
               TestName, err, line);
-      piglit_report_result(PIGLIT_FAILURE);
+      piglit_report_result(PIGLIT_FAIL);
    }
 }
 
@@ -124,7 +124,7 @@ test(void)
    static const GLfloat half_green[4] = {0, 0.5, 0, 1};
    static const GLfloat green_half_red[4] = {0.5, 1, 0, 1};
    GLenum buffer;
-   enum piglit_result result = PIGLIT_SUCCESS;
+   enum piglit_result result = PIGLIT_PASS;
 
    create_fbo();
 
@@ -170,24 +170,24 @@ test(void)
 
    /* left half probes */
    if (!piglit_probe_pixel_rgb(0, 0, black)) {
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
    }
 
    if (!piglit_probe_pixel_rgb(piglit_width/2-1, 0, half_red)) {
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
    }
 
    if (!piglit_probe_pixel_rgb(0, piglit_height/2, half_green)) {
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
    }
 
    if (!piglit_probe_pixel_rgb(piglit_width/2-1, piglit_height-1, green_half_red)) {
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
    }
 
    /* right half probe */
    if (!piglit_probe_pixel_rgb(piglit_width*3/4, piglit_height/2, blue)) {
-      result = PIGLIT_FAILURE;
+      result = PIGLIT_FAIL;
    }
 
    glutSwapBuffers();

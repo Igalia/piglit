@@ -194,7 +194,7 @@ piglit_display(void)
 				 0, (BUF_HEIGHT + 1) * 3);
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)

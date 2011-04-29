@@ -38,13 +38,13 @@ static const char vs_text[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	GLuint prog[2];
 	GLuint got;
 	GLuint vs;
@@ -66,7 +66,7 @@ piglit_init(int argc, char **argv)
 		printf("After calling glUseProgram, "
 		       "GL_ACTIVE_PROGRAM_EXT should be %d (got %d)\n",
 		       prog[0], got);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	glActiveProgramEXT(prog[1]);
@@ -75,7 +75,7 @@ piglit_init(int argc, char **argv)
 		printf("After calling glActiveProgramEXT, "
 		       "GL_ACTIVE_PROGRAM_EXT should be %d (got %d)\n",
 		       prog[1], got);
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	glUseProgram(0);

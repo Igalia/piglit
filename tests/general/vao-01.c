@@ -45,7 +45,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 void
@@ -70,14 +70,14 @@ piglit_init(int argc, char **argv)
 
 	if (! glIsEnabled(GL_VERTEX_ARRAY)) {
 		printf("Array state is incorrectly disabled.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glGetPointerv(GL_VERTEX_ARRAY_POINTER, & ptr);
 	if (ptr != (void *) 0xDEADBEEF) {
 		printf("Array pointer is incorrectly set to 0x%p.\n", ptr);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 }

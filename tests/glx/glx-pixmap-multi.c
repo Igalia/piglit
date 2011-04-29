@@ -57,7 +57,6 @@ handler(Display *dpy, XErrorEvent *err)
 int
 main(int argc, char **argv)
 {
-	int i;
 	Pixmap p;
 	GLXPixmap g1, g2;
 	GLXFBConfig fbc;
@@ -65,7 +64,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	visinfo = piglit_get_glx_visual(dpy);
@@ -90,7 +89,7 @@ main(int argc, char **argv)
 
 	XSync(dpy, 0);
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 
 	return 0;
 }

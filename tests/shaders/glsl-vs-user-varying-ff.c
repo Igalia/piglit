@@ -49,14 +49,14 @@ enum piglit_result
 piglit_display(void)
 {
 	static const float green[3] = { 0.0, 1.0, 0.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	piglit_draw_rect(10, 10, 10, 10);
 
 	if (!piglit_probe_pixel_rgb(15, 15, green))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	if (!piglit_automatic)
 		glutSwapBuffers();
@@ -87,7 +87,7 @@ piglit_init(int argc, char **argv)
 	 * had better succeed!
 	 */
 	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
 }

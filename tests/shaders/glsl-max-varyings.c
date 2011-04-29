@@ -175,7 +175,7 @@ draw(int max_varyings)
 
 		glLinkProgram(prog);
 		if (!piglit_link_check_status(prog))
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 
 		glUseProgram(prog);
 
@@ -248,11 +248,11 @@ printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
 	glutSwapBuffers();
 
 	if (!pass)
-		return PIGLIT_FAILURE;
+		return PIGLIT_FAIL;
 	if (warned)
 		return PIGLIT_WARN;
 	else
-		return PIGLIT_SUCCESS;
+		return PIGLIT_PASS;
 }
 
 void piglit_init(int argc, char **argv)

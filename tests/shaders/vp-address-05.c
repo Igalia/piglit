@@ -76,7 +76,7 @@ piglit_display(void)
 		{ 0.0, 3.0, 2.0, 1.0 },
 		{ 0.0, 3.0, 1.0, 2.0 },
 	};
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	unsigned i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -98,7 +98,7 @@ piglit_display(void)
 		if (!piglit_probe_pixel_rgb(x + (BOX_SIZE / 2),
 					    1 + (BOX_SIZE / 2),
 					    color)) {
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 	}
 

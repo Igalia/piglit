@@ -40,7 +40,7 @@ static GLuint list;
 enum piglit_result
 piglit_display(void)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	static const GLfloat color[4] = { 1.0, 1.0, 1.0, 1.0 };
 
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -71,7 +71,7 @@ piglit_display(void)
 	if (!piglit_probe_pixel_rgb(piglit_width / 2,
 				    piglit_height / 2,
 				    color)) {
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 	}
 
 	glutSwapBuffers();

@@ -77,7 +77,7 @@ piglit_display(void)
 	static const GLfloat color[4] = { 0.0, 1.0, 0.0, 1.0 };
 	static const GLfloat good_color[4] = { 0.0, 1.0, 0.0, 1.0 };
 	static const GLfloat bad_color[4] = { 1.0, 0.0, 0.0, 1.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	unsigned i;
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -103,7 +103,7 @@ piglit_display(void)
 				printf("shader %u failed with attribute "
 				       "%.1f\n", i, attrib[i]);
 
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 	}
 
@@ -132,7 +132,7 @@ piglit_init(int argc, char **argv)
 		/* we have to have at least one address register */
 		if (! piglit_automatic)
 			printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB == 0\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	for (i = 0; i < ELEMENTS(progs); i++) {

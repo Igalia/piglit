@@ -48,7 +48,7 @@ piglit_get_glx_visual(Display *dpy)
 	if (visinfo == NULL) {
 		fprintf(stderr,
 			"Couldn't get an RGBA, double-buffered visual\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
 
@@ -69,7 +69,7 @@ piglit_get_glx_context_share(Display *dpy, XVisualInfo *visinfo, GLXContext shar
 	ctx = glXCreateContext(dpy, visinfo, share, True);
 	if (ctx == None) {
 		fprintf(stderr, "glXCreateContext failed\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	return ctx;
@@ -223,7 +223,7 @@ piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 	Display *dpy = XOpenDisplay(NULL);
 	if (!dpy) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	screen = DefaultScreen(dpy);
 

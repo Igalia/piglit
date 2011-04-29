@@ -53,7 +53,7 @@ piglit_display(void)
 {
 	static const float green[3] = { 0.0, 1.0, 0.0 };
 	static const float blue[3]  = { 0.0, 0.0, 1.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3fv(blue);
@@ -66,7 +66,7 @@ piglit_display(void)
 	glUseShaderProgramEXT(GL_FRAGMENT_SHADER, prog[1]);
 	piglit_draw_rect(10, 10, 10, 10);
 	if (!piglit_probe_pixel_rgb(15, 15, green))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	if (!piglit_automatic)
 		glutSwapBuffers();
@@ -97,7 +97,7 @@ piglit_init(int argc, char **argv)
 	if (loc < 0) {
 		printf("Unable to get uniform location in separate vertex "
 		       "shader");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glActiveProgramEXT(prog[0]);
@@ -107,7 +107,7 @@ piglit_init(int argc, char **argv)
 	if (loc < 0) {
 		printf("Unable to get uniform location in separate fragment "
 		       "shader");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glActiveProgramEXT(prog[1]);

@@ -120,7 +120,7 @@ generate_and_display_drawbuffers(int count)
 	error = glGetError();
 	if (error) {
 		fprintf(stderr, "glUseProgram error: 0x%x\n", error);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Now render to all the color buffers. */
@@ -172,7 +172,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

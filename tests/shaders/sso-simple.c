@@ -51,7 +51,7 @@ piglit_display(void)
 {
 	static const float green[3] = { 0.0, 1.0, 0.0 };
 	static const float blue[3]  = { 0.0, 0.0, 1.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	float x = 10.0;
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -65,7 +65,7 @@ piglit_display(void)
 	glUseShaderProgramEXT(GL_FRAGMENT_SHADER, prog[1]);
 	piglit_draw_rect(x, 10, 10, 10);
 	if (!piglit_probe_pixel_rgb(x + 5, 15, green))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	x += 20.0;
 
@@ -81,7 +81,7 @@ piglit_display(void)
 	glUseShaderProgramEXT(GL_FRAGMENT_SHADER, prog[1]);
 	piglit_draw_rect(x, 10, 10, 10);
 	if (!piglit_probe_pixel_rgb(x + 5, 15, green))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	x += 20.0;
 
@@ -92,7 +92,7 @@ piglit_display(void)
 	glUseShaderProgramEXT(GL_VERTEX_SHADER, 0);
 	piglit_draw_rect(x, 10, 10, 10);
 	if (!piglit_probe_pixel_rgb(x + 5, 15, blue))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	if (!piglit_automatic)
 		glutSwapBuffers();

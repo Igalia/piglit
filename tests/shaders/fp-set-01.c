@@ -83,7 +83,7 @@ piglit_display(void)
 	const GLfloat comparitor[4] = { 0.5, 0.5, 0.5, 0.5 };
 	unsigned i;
 	unsigned j;
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -122,7 +122,7 @@ piglit_display(void)
                                         printf("shader %u failed on index %u\n",
 					       j, i);
 
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			}
 		}
 	}

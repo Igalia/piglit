@@ -133,9 +133,9 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test_early_depth())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

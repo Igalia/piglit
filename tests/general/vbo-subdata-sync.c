@@ -91,5 +91,5 @@ piglit_display(void)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

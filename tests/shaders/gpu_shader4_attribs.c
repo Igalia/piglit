@@ -505,15 +505,15 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test_attrib_funcs())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_uniform_funcs())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test_attrib_array())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

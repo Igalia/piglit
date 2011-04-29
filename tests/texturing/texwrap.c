@@ -833,7 +833,7 @@ enum piglit_result piglit_display()
     }
     assert(glGetError() == 0);
 
-    return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+    return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static void key_func(unsigned char key, int x, int y)

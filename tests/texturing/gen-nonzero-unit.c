@@ -165,7 +165,7 @@ piglit_display(void)
 
 	glDeleteTextures(3, textures);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

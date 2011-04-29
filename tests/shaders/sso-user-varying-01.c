@@ -57,7 +57,7 @@ enum piglit_result
 piglit_display(void)
 {
 	static const float green[3] = { 0.0, 1.0, 0.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -69,7 +69,7 @@ piglit_display(void)
 	 * illegal way.  The rendered result must not be green!
 	 */
 	if (piglit_probe_pixel_rgb(15, 15, green))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	if (!piglit_automatic)
 		glutSwapBuffers();
@@ -111,7 +111,7 @@ piglit_init(int argc, char **argv)
 		&& try_to_render;
 
 	if (!try_to_render)
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("\"Probe at (.., ..)\" returning mismatched results is "
 	       "expected and correct.\n");

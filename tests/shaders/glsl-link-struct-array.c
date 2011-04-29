@@ -29,7 +29,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 GLboolean
@@ -73,6 +73,6 @@ void piglit_init(int argc, char **argv)
 	glLinkProgram(prog);
 
 	ok = link_check_status(prog);
-	piglit_report_result((ok) ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result((ok) ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 

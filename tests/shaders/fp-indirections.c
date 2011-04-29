@@ -71,7 +71,7 @@ static char *gen_temporary_dest_indirections(int sample_count,
 
 	if (prog == 0) {
 		printf("malloc failed.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
 
@@ -140,7 +140,7 @@ static char *gen_temporary_source_indirections(int sample_count,
 
 	if (prog == 0) {
 		printf("malloc failed.\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
 
@@ -269,7 +269,7 @@ piglit_display(void)
 	pass = test_temporary_dest_indirections() && pass;
 	pass = test_temporary_source_indirections() && pass;
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void

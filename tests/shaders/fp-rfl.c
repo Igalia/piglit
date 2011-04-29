@@ -123,7 +123,7 @@ static const float green[4] = { 0.0, 1.0, 0.0, 0.0 };
 enum piglit_result
 piglit_display(void)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	unsigned r;
 	unsigned c;
 

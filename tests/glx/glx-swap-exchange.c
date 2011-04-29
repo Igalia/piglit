@@ -61,7 +61,7 @@ draw(Display *dpy)
 
 	glXSwapBuffers(dpy, win);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
@@ -108,7 +108,7 @@ main(int argc, char **argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glx_extension_list = glXQueryExtensionsString(dpy, DefaultScreen(dpy));

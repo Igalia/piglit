@@ -149,7 +149,7 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 
 	pass = srgb_tex_test(0);
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

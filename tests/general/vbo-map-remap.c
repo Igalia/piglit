@@ -50,12 +50,12 @@ vbo_write_floats_mapped(const float *varray, size_t count)
 	float *ptr = glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 
 	if (ptr == NULL)
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	memcpy(ptr, varray, count * sizeof(GLfloat));
 
 	if (!glUnmapBufferARB(GL_ARRAY_BUFFER_ARB))
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 enum piglit_result
@@ -99,5 +99,5 @@ piglit_display(void)
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

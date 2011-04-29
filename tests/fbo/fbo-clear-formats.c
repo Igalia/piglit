@@ -425,7 +425,7 @@ test_format(const struct format_desc *format, GLenum baseformat)
 
 	glDeleteTextures(1, &tex);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result piglit_display(void)

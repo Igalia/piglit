@@ -289,7 +289,7 @@ piglit_display(void)
 	DoFrame();
 	pass = DoTest();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

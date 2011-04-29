@@ -135,7 +135,7 @@ static void test(void)
 	success = success && verify(0, 1, 1, 1, 1, 0, "render in main window");
 
 	if (Automatic)
-		piglit_report_result(success ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+		piglit_report_result(success ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
 static void RedisplayMain(void)

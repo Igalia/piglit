@@ -205,7 +205,7 @@ piglit_display(void)
 {
 	GLboolean pass = run_test();
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

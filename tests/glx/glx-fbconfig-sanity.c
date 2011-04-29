@@ -40,7 +40,7 @@ static PFNGLXGETVISUALFROMFBCONFIGPROC GetVisualFromFBConfig = NULL;
 static void
 fbconfig_sanity_warn(int *result)
 {
-	if (*result != PIGLIT_FAILURE)
+	if (*result != PIGLIT_FAIL)
 		*result = PIGLIT_WARN;
 }
 
@@ -49,14 +49,14 @@ main(int argc, char **argv)
 {
 	Display *dpy;
 	int i;
-	int result = PIGLIT_SUCCESS;
+	int result = PIGLIT_PASS;
 	GLXFBConfig *configs;
 	int num_configs;
 
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Test requires at least GLX version 1.3.  Otherwise there is no
@@ -121,7 +121,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "FBconfig 0x%x has GLX_WINDOW_BIT "
 				"set, but the Visual ID is 0!\n",
 				config_id);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 
 		GetFBConfigAttrib(dpy, configs[i], GLX_TRANSPARENT_TYPE,
@@ -132,7 +132,7 @@ main(int argc, char **argv)
 				"visual ID = 0x%x.  Both or neither must be "
 				"NULL / zero.\n",
 				config_id, vinfo, visual_id);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 
 		if (vinfo != NULL && vinfo->visualid != visual_id) {
@@ -140,7 +140,7 @@ main(int argc, char **argv)
 				"vinfo->visualid = 0x%x and visual ID = 0x%x. "
 				"These should match!\n",
 				config_id, (int) vinfo->visualid, visual_id);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 
 		if (vinfo) {
@@ -156,7 +156,7 @@ main(int argc, char **argv)
 						"match!\n", config_id, depth,
 						(int)vinfo->visualid,
 						vinfo->depth);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 			}
 			if (vinfo->class == TrueColor ||
@@ -169,14 +169,14 @@ main(int argc, char **argv)
 						config_id, depth,
 						(int)vinfo->visualid,
 						vinfo->depth);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 			}
 			if (vtype == GLX_NONE) {
 				fprintf(stderr, "FBConfig 0x%x supports "
 					"windows but has no visual type\n",
 					config_id);
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			} else {
 				int fail = 0;
 				int ci_fail = 0;
@@ -220,21 +220,21 @@ main(int argc, char **argv)
 						"{True,Direct}Color but claims "
 						"support for color-index\n",
 						config_id);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 				if (fail == 2) {
 					fprintf(stderr, "FBConfig 0x%x has "
 						"visual with unknown class "
 						"%d\n", config_id,
 						vinfo->class);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				} else if (fail == 1) {
 					fprintf(stderr, "FBConfig 0x%x claims "
 						"visual class that does not "
 						"match visual 0x%x\n",
 						config_id,
 						(int)vinfo->visualid);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 			}
 		}
@@ -248,7 +248,7 @@ main(int argc, char **argv)
 					"0 sample buffers but %d "
 					"samples, should be 0\n",
 					config_id, samples);
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			}
 		} else if (sample_buffers == 1) {
 			/* TODO check color/depth/stencil bits per sample */
@@ -256,14 +256,14 @@ main(int argc, char **argv)
 			fprintf(stderr, "FBConfig 0x%x has bizarre "
 				"GLX_SAMPLE_BUFFERS of %d, should be "
 				"0 or 1\n", config_id, sample_buffers);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 
 		if (render_type == 0) {
 			fprintf(stderr, "FBConfig 0x%x can be bound to "
 				"neither RGBA nor color-index contexts\n",
 				config_id);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		} else if
 		    (render_type & ~(GLX_RGBA_BIT | GLX_COLOR_INDEX_BIT)) {
 			fprintf(stderr, "FBConfig 0x%x supports rendering "
@@ -283,7 +283,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "FBConfig 0x%x claims to not be X "
 				"renderable but claims to support windows "
 				"and/or pixmaps\n", config_id);
-			result = PIGLIT_FAILURE;
+			result = PIGLIT_FAIL;
 		}
 
 		switch (caveat) {
@@ -294,7 +294,7 @@ main(int argc, char **argv)
 			default:
 				fprintf(stderr, "FBConfig 0x%x has unknown "
 					"caveat 0x%x\n", config_id, caveat);
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 				break;
 		}
 
@@ -307,7 +307,7 @@ main(int argc, char **argv)
 					fprintf(stderr, "FBConfig 0x%x is rgb "
 						"transparent but not an rgb "
 						"visual type\n", config_id);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 				break;
 			case GLX_TRANSPARENT_INDEX:
@@ -316,14 +316,14 @@ main(int argc, char **argv)
 					fprintf(stderr, "FBConfig 0x%x is ci "
 						"transparent but not a ci "
 						"visual type\n", config_id);
-					result = PIGLIT_FAILURE;
+					result = PIGLIT_FAIL;
 				}
 				break;
 			default:
 				fprintf(stderr, "FBConfig 0x%x has unknown "
 					"transparency type 0x%x\n", config_id,
 					transparency);
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 				break;
 		}
 	}

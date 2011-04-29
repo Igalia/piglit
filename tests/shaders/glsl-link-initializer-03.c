@@ -43,7 +43,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)
@@ -74,6 +74,6 @@ void piglit_init(int argc, char **argv)
         glGetProgramiv(prog_a, GL_LINK_STATUS, &a);
         glGetProgramiv(prog_b, GL_LINK_STATUS, &b);
 
-	piglit_report_result((a && b) ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result((a && b) ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 

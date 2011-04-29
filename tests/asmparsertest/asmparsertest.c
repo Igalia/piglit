@@ -112,7 +112,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 
 	buf = piglit_load_text_file(filename, &sz);
 	if (buf == NULL) {
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 
@@ -195,7 +195,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 		}
 
 		if ((err == GL_NO_ERROR) != (expected_fail == FALSE)) {
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
 
@@ -228,7 +228,7 @@ main(int argc, char **argv)
 	}
 
 	if ((argc - i) < 2) {
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 
@@ -248,13 +248,13 @@ main(int argc, char **argv)
 		piglit_require_extension("GL_NV_fragment_program");
 		use_ARB = 0;
 	} else {
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	for (i++; i < argc; i++) {
 		compile(argv[i], target, use_ARB);
 	}
 
-	piglit_report_result(PIGLIT_SUCCESS);
+	piglit_report_result(PIGLIT_PASS);
 	return 0;
 }

@@ -130,7 +130,7 @@ piglit_display(void)
 	static const GLfloat color[4] = { 0.0, 0.5, 0.0, 0.5 };
 	static const GLfloat good_color[4] = { 0.0, 1.0, 0.0, 1.0 };
 	static const GLfloat bad_color[4] = { 1.0, 0.0, 0.0, 1.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 	unsigned i;
 	unsigned j;
 
@@ -173,7 +173,7 @@ piglit_display(void)
 					       src);
 				}
 
-				result = PIGLIT_FAILURE;
+				result = PIGLIT_FAIL;
 			}
 		}
 	}
@@ -243,7 +243,7 @@ piglit_init(int argc, char **argv)
 		if (! piglit_automatic)
 			printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB == 0\n");
 
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	} else 	if (max_address_registers == 1) {
 		if (glutExtensionSupported("GL_NV_vertex_program2_option")) {
 			/* this extension requires two address regs */
@@ -251,7 +251,7 @@ piglit_init(int argc, char **argv)
 				printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB "
 				       "== 1\n");
 
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 		} else {
 			piglit_report_result(PIGLIT_SKIP);
 		}

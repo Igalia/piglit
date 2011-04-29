@@ -156,7 +156,7 @@ piglit_display(void)
 	DoFrame();
 	succ = DoTest();
 
-	return succ ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return succ ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

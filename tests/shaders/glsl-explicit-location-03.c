@@ -39,7 +39,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)
@@ -72,6 +72,6 @@ void piglit_init(int argc, char **argv)
 			"Linking with conflicting explicit locations "
 			"succeeded when it should have failed.\n");
 
-	piglit_report_result(!ok ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(!ok ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 

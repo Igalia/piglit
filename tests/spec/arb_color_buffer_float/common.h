@@ -278,7 +278,7 @@ piglit_display(void)
 		return GL_FALSE;
 	}
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static unsigned init();

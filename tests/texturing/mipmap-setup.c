@@ -172,13 +172,13 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test(NORMAL, "Normal"))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test(REVERSE, "Reverse"))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    if (!test(RANDOM, "Random"))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }

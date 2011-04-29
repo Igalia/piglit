@@ -74,7 +74,7 @@ enum piglit_result
 piglit_display(void)
 {
 	float green[4] = { 0.0, 1.0, 0.0, 1.0 };
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	glShadeModel(GL_FLAT);
 
@@ -113,7 +113,7 @@ piglit_init(int argc, char **argv)
 	 * had better succeed!
 	 */
 	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
 }

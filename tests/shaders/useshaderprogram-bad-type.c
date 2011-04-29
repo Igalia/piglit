@@ -35,7 +35,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_FAILURE;
+	return PIGLIT_FAIL;
 }
 
 GLboolean
@@ -94,5 +94,5 @@ piglit_init(int argc, char **argv)
 	pass = try_UseShaderProgram(GL_GEOMETRY_SHADER_ARB, expect)
 		&& pass;
 
-	piglit_report_result(pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE);
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

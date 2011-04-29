@@ -49,7 +49,7 @@ static const char vertex_source_template[] =
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 
@@ -71,7 +71,7 @@ piglit_init(int argc, char **argv)
 		if (! piglit_automatic)
 			printf("GL_MAX_PROGRAM_PARAMETERS_ARB < 96\n");
 
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	snprintf(shader_source, sizeof(shader_source),

@@ -34,12 +34,12 @@ enum piglit_result piglit_display(void)
     glLinkProgram(objID);
     glValidateProgram(objID);
     if (!piglit_link_check_status(objID))
-	piglit_report_result(PIGLIT_FAILURE);
+	piglit_report_result(PIGLIT_FAIL);
     glUseProgram(objID);
     glUseProgram(0);
     glDeleteProgram(objID);
-    piglit_report_result(PIGLIT_SUCCESS);
-    return PIGLIT_SUCCESS;
+    piglit_report_result(PIGLIT_PASS);
+    return PIGLIT_PASS;
 }
 
 void

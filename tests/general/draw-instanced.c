@@ -139,9 +139,9 @@ enum piglit_result
 piglit_display(void)
 {
    if (!test_instancing())
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 

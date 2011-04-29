@@ -35,7 +35,7 @@ static void probe_pixel(int x, int y, const float* expected)
 {
 	if (!piglit_probe_pixel_rgb(x, y, expected)) {
 		if (piglit_automatic)
-			piglit_report_result(PIGLIT_FAILURE);
+			piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -185,7 +185,7 @@ piglit_display(void)
 {
 	test();
 
-	return PIGLIT_SUCCESS;
+	return PIGLIT_PASS;
 }
 
 

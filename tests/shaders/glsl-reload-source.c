@@ -87,7 +87,7 @@ static void compile_shader(GLuint shader, const char * text)
 		GLsizei len;
 		glGetInfoLogARB(shader, 1000, &len, log);
 		fprintf(stderr, "Error: problem compiling shader: %s\n", log);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -102,7 +102,7 @@ static void link_program(GLuint program)
 		GLsizei len;
 		glGetInfoLogARB(program, 1000, &len, log);
 		fprintf(stderr, "Error: problem linking program: %s\n", log);
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 }
 
@@ -118,7 +118,7 @@ static void setup_shaders(const char * vstext, const char * fstext)
 enum piglit_result
 piglit_display(void)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -127,22 +127,22 @@ piglit_display(void)
 	setup_shaders(vs_one, fs_one);
 	piglit_draw_rect(0, 0, piglit_width/2, piglit_height/2);
 	if (!piglit_probe_pixel_rgb(piglit_width/4, piglit_height/4, expect_one_one))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	setup_shaders(vs_one, fs_two);
 	piglit_draw_rect(piglit_width/2, 0, piglit_width/2, piglit_height/2);
 	if (!piglit_probe_pixel_rgb(3*piglit_width/4, piglit_height/4, expect_one_two))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	setup_shaders(vs_two, fs_one);
 	piglit_draw_rect(0, piglit_height/2, piglit_width/2, piglit_height/2);
 	if (!piglit_probe_pixel_rgb(piglit_width/4, 3*piglit_height/4, expect_two_one))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	setup_shaders(vs_two, fs_two);
 	piglit_draw_rect(piglit_width/2, piglit_height/2, piglit_width/2, piglit_height/2);
 	if (!piglit_probe_pixel_rgb(3*piglit_width/4, 3*piglit_height/4, expect_two_two))
-		result = PIGLIT_FAILURE;
+		result = PIGLIT_FAIL;
 
 	return result;
 }

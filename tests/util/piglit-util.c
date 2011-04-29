@@ -230,7 +230,7 @@ piglit_report_result(enum piglit_result result)
 {
 	fflush(stderr);
 
-	if (result == PIGLIT_SUCCESS) {
+	if (result == PIGLIT_PASS) {
 		printf("PIGLIT: {'result': 'pass' }\n");
 		fflush(stdout);
 		exit(0);

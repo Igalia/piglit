@@ -68,16 +68,16 @@ test_version(void)
    glGetIntegerv(GL_MAJOR_VERSION, &k);
    if (k != major) {
       printf("%s: major version mismatch (%d vs. %d)\n", Prog, k, major);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glGetIntegerv(GL_MINOR_VERSION, &k);
    if (k != minor) {
       printf("%s: minor version mismatch (%d vs. %d)\n", Prog, k, minor);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 
@@ -89,7 +89,7 @@ test_extension_list(void)
    glGetIntegerv(GL_NUM_EXTENSIONS, &num_ext);
    if (num_ext < 1 || num_ext > 10000) {
       printf("%s: unreasonable value for GL_NUM_EXTENSIONS: %d\n", Prog, num_ext);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    /* check that extension strings are reasonable */
@@ -102,15 +102,15 @@ test_extension_list(void)
           ext[1] != 'L' ||
           ext[2] != '_') {
          printf("%s: bad extension string [%d]: %s\n", Prog, k, ext);
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       }
       if (strchr((char *) ext, ' ')) {
          printf("%s: extension string [%d] contains a space: %s\n", Prog, k, ext);
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       }
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 
@@ -133,7 +133,7 @@ test_clearing(void)
    err = glGetError();
    if (err) {
       printf("%s: glClearBufferfv() generated error 0x%x.\n", Prog, err);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glReadBuffer(buf);
@@ -143,7 +143,7 @@ test_clearing(void)
        color[2] != purple[2] ||
        color[3] != purple[3]) {
       printf("%s: glClearBufferfv() failed.\n", Prog);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 #endif
 
@@ -152,23 +152,23 @@ test_clearing(void)
    err = glGetError();
    if (err) {
       printf("%s: glClearBufferfi() generated error 0x%x.\n", Prog, err);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glReadPixels(20, 20, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
    if (fabs(z - 0.5) > 0.001) {
       printf("%s: glClearBufferfi() failed (z was %f, expected 0.5).\n", Prog, z);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
    glReadPixels(20, 20, 1, 1, GL_STENCIL_INDEX, GL_INT, &stencil);
    if (stencil != 3) {
       printf("%s: glClearBufferfi() failed (stencil was %d, expected 3).\n",
              Prog, stencil);
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 
@@ -178,15 +178,15 @@ piglit_display(void)
    enum piglit_result res;
    
    res = test_version();
-   if (res != PIGLIT_SUCCESS)
+   if (res != PIGLIT_PASS)
       return res;
 
    res = test_extension_list();
-   if (res != PIGLIT_SUCCESS)
+   if (res != PIGLIT_PASS)
       return res;
 
    res = test_clearing();
-   if (res != PIGLIT_SUCCESS)
+   if (res != PIGLIT_PASS)
       return res;
 
    return res;

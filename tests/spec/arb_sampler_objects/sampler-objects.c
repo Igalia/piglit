@@ -62,33 +62,33 @@ test_objects(void)
 
    glGenSamplers(4, samplers);
    if (check_error(__LINE__))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    for (i = 0; i < 4; i++) {
       if (samplers[i] == 0)
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       if (i > 1 && samplers[i] == samplers[i-1])
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
       if (!glIsSampler(samplers[i]))
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
    }
 
    for (i = 0; i < 4; i++) {
       glBindSampler(i, samplers[i]);
       if (check_error(__LINE__))
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
    }
 
    glDeleteSamplers(4, samplers);
    if (check_error(__LINE__))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    for (i = 0; i < 4; i++) {
       if (glIsSampler(samplers[i]))
-         return PIGLIT_FAILURE;
+         return PIGLIT_FAIL;
    }
 
-   return PIGLIT_SUCCESS;
+   return PIGLIT_PASS;
 }
 
 
@@ -157,7 +157,7 @@ test_samplers(void)
 
    glGenSamplers(NUM_SAMPLERS, samplers);
    if (check_error(__LINE__))
-      return PIGLIT_FAILURE;
+      return PIGLIT_FAIL;
 
    /* Create samplers which clamp lod to a particular mipmap level) */
    for (i = 0; i < NUM_SAMPLERS; i++) {
@@ -231,11 +231,11 @@ piglit_display(void)
    enum piglit_result res;
    
    res = test_objects();
-   if (res != PIGLIT_SUCCESS)
+   if (res != PIGLIT_PASS)
       return res;
 
    res = test_samplers();
-   if (res != PIGLIT_SUCCESS)
+   if (res != PIGLIT_PASS)
       return res;
 
    return res;

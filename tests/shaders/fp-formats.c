@@ -52,7 +52,7 @@ static GLuint textures[1];
 enum piglit_result
 piglit_display(void)
 {
-	enum piglit_result result = PIGLIT_SUCCESS;
+	enum piglit_result result = PIGLIT_PASS;
 
 	const GLfloat expected[4] = { 0.5, 0.0, 0.0, 0.0 };
 
@@ -66,7 +66,7 @@ piglit_display(void)
 	if (!piglit_probe_pixel_rgb(piglit_width / 2,
 				    piglit_height / 2,
 				    expected))
-	  result = PIGLIT_FAILURE;
+	  result = PIGLIT_FAIL;
 
 	glutSwapBuffers();
 	return result;

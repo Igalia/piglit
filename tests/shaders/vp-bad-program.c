@@ -117,7 +117,7 @@ piglit_display(void)
 			err = glGetError();
 	}
 
-	return failed ? PIGLIT_FAILURE : PIGLIT_SUCCESS;
+	return failed ? PIGLIT_FAIL : PIGLIT_PASS;
 }
 
 void piglit_init(int argc, char **argv)

@@ -144,7 +144,7 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
-	return test_pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return test_pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 

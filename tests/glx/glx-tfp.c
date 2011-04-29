@@ -179,7 +179,7 @@ draw(Display *dpy)
 	pass &= check_results(GL_FALSE, rgb_x, rgb_y, draw_w, draw_h);
 	pass &= check_results(GL_TRUE, rgba_x, rgba_y, draw_w, draw_h);
 
-	return pass ? PIGLIT_SUCCESS : PIGLIT_FAILURE;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 static void
@@ -324,7 +324,7 @@ int main(int argc, char**argv)
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 	screen = DefaultScreen(dpy);
 	root_win = RootWindow(dpy, screen);
@@ -355,7 +355,7 @@ int main(int argc, char**argv)
 		glXGetProcAddress((GLubyte *)"glXReleaseTexImageEXT");
 	if (pglXBindTexImageEXT == NULL || pglXReleaseTexImageEXT == NULL) {
 		fprintf(stderr, "Couldn't get TFP functions\n");
-		piglit_report_result(PIGLIT_FAILURE);
+		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
 
