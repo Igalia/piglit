@@ -691,6 +691,7 @@ add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-drawbuffers')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-maxvectors')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-shadercompiler')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-releaseshadercompiler')
+add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-fixed-type')
 
 # Group ARB_draw_instanced
 arb_draw_instanced = Group()
