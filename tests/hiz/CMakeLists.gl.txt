@@ -17,7 +17,6 @@ link_libraries (
 
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${OPENGL_egl_LIBRARY}
 	${GLUT_glut_LIBRARY}
 	${TIFF_LIBRARY}
 )
