@@ -31,7 +31,6 @@
  */
 
 #include <assert.h>
-#include <getopt.h>
 #include "piglit-util.h"
 #include "hiz/hiz-util.h"
 
