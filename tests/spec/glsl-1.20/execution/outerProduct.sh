@@ -50,7 +50,8 @@ GLSL >= 1.20
 
 [vertex shader]
 #version 120
-uniform vec${c} c, r;
+uniform vec${c} c;
+uniform vec${r} r;
 uniform ${mat} expected;
 varying vec4 color;
 
@@ -94,7 +95,8 @@ void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
 
 [fragment shader]
 #version 120
-uniform vec${c} c, r;
+uniform vec${c} c;
+uniform vec${r} r;
 uniform ${mat} expected;
 
 void main() {

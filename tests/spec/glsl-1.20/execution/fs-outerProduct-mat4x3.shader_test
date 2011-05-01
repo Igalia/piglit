@@ -7,7 +7,8 @@ void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
 
 [fragment shader]
 #version 120
-uniform vec3 c, r;
+uniform vec3 c;
+uniform vec4 r;
 uniform mat4x3 expected;
 
 void main() {

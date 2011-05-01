@@ -3,7 +3,8 @@ GLSL >= 1.20
 
 [vertex shader]
 #version 120
-uniform vec2 c, r;
+uniform vec2 c;
+uniform vec2 r;
 uniform mat2x2 expected;
 varying vec4 color;
 
