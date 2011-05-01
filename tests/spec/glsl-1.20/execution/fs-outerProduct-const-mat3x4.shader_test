@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
+
+[fragment shader]
+#version 120
+
+const vec4 c = vec4(2, 3, 4, 5);
+const vec3 r = vec3(6, 7, 8);
+uniform mat3x4 expected = mat3x4(12, 18, 24, 30, 14, 21, 28, 35, 16, 24, 32, 40);
+
+void main() {
+  mat3x4 result = outerProduct(c, r);
+  gl_FragColor = (result == expected) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.0
+clear
+ortho
+
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0

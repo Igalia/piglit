@@ -1,0 +1,49 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+/* From page 43 (page 49 of the PDF) of the GLSL 1.20 spec:
+ *
+ *     "If an exact match is found, the other signatures are ignored, and the
+ *     exact match is used. Otherwise, if no exact match is found, then the
+ *     implicit conversions in Section 4.1.10 "Implicit Conversions" will be
+ *     applied to the calling arguments if this can make their types match a
+ *     signature."
+ *
+ * From page 20 (page 26 of the PDF) of the GLSL 1.20 spec:
+ *
+ *     "In some situations, an expression and its type will be implicitly
+ *     converted to a different type. The following table shows all allowed
+ *     implicit conversions:
+ *
+ *         Type of expression    Can be implicitly converted to
+ *               int                         float
+ *              ivec2                         vec2
+ *              ivec3                         vec3
+ *              ivec4                         vec4"
+ */
+#version 120
+
+const ivec3 c = ivec3(2, 3, 4);
+const ivec3 r = ivec3(5, 6, 7);
+uniform mat3 expected = mat3(10, 15, 20, 12, 18, 24, 14, 21, 28);
+varying vec4 color;
+
+void main() {
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  mat3 result = outerProduct(c, r);
+  color = (result == expected) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[fragment shader]
+#version 120
+varying vec4 color;
+void main() { gl_FragColor = color; }
+
+[test]
+clear color 0.5 0.5 0.5 0.0
+clear
+ortho
+
+draw rect 10 10 10 10
+probe rgb 15 15 0.0 1.0 0.0
