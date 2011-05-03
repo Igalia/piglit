@@ -120,7 +120,7 @@ draw_frame(Display *dpy, Window win)
     static double tRot0 = -1.0, tRate0 = -1.0;
     static double swap_freq[2];
     double dt, t = current_time();
-    int tem;
+    int tem, ret;
     
     if (tRot0 < 0.0)
         tRot0 = t;
@@ -132,16 +132,14 @@ draw_frame(Display *dpy, Window win)
     if (t - tRate0 >= 3.0) {
         if (interval_diff) {
             if (message_count & 0x1) {
-                (*pglXSwapIntervalMESA)(1);
-                interval=(*pglXGetSwapIntervalMESA)();
-                if ( !  interval == 1 ) {
-                    printf("Failed to set swap interval to 1.\n");
+                ret = (*pglXSwapIntervalMESA)(1);
+                if ( ret ) {
+		    printf("Failed to set swap interval to 1 (%d).\n", ret);
                     piglit_report_result(PIGLIT_FAIL);
                 }
             } else{
-                (*pglXSwapIntervalMESA)(0);
-                interval=(*pglXGetSwapIntervalMESA)();
-                if ( !  interval == 0 ) {
+		ret = (*pglXSwapIntervalMESA)(0);
+                if ( ret ) {
                     printf("Failed to set swap interval to 0.\n");
                     piglit_report_result(PIGLIT_FAIL);
                 }
@@ -456,7 +454,7 @@ main(int argc, char *argv[])
     GLXWindow glxWin;
     GLXContext ctx;
     char *dpyName = NULL;
-    int i, error_base;
+    int i, error_base, ret;
     
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-auto") == 0) {
@@ -502,10 +500,9 @@ main(int argc, char *argv[])
     glXQueryExtension(dpy, &error_base, &event_base);
     
     if (interval_diff) {
-        (*pglXSwapIntervalMESA)(1);
-        interval=(*pglXGetSwapIntervalMESA)();
-        if ( !  interval == 1 ) {
-            printf("Failed to set swap interval to 1.\n");
+        ret = (*pglXSwapIntervalMESA)(1);
+        if ( ret ) {
+	    printf("Failed to set swap interval to 1 (%d).\n", ret);
             piglit_report_result(PIGLIT_FAIL);
         }
     }
