@@ -212,6 +212,9 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_Uniform3fv glUniform3fv
 #define piglit_Uniform4fv glUniform4fv
 #define piglit_Uniform1i glUniform1i
+#define piglit_Uniform2iv glUniform2iv
+#define piglit_Uniform3iv glUniform3iv
+#define piglit_Uniform4iv glUniform4iv
 #define piglit_UniformMatrix2fv glUniformMatrix2fv
 #define piglit_UniformMatrix3fv glUniformMatrix3fv
 #define piglit_UniformMatrix4fv glUniformMatrix4fv
@@ -246,6 +249,9 @@ extern PFNGLUNIFORM2FVPROC piglit_Uniform2fv;
 extern PFNGLUNIFORM3FVPROC piglit_Uniform3fv;
 extern PFNGLUNIFORM4FVPROC piglit_Uniform4fv;
 extern PFNGLUNIFORM1IPROC piglit_Uniform1i;
+extern PFNGLUNIFORM2IVPROC piglit_Uniform2iv;
+extern PFNGLUNIFORM3IVPROC piglit_Uniform3iv;
+extern PFNGLUNIFORM4IVPROC piglit_Uniform4iv;
 extern PFNGLUNIFORMMATRIX2FVPROC piglit_UniformMatrix2fv;
 extern PFNGLUNIFORMMATRIX3FVPROC piglit_UniformMatrix3fv;
 extern PFNGLUNIFORMMATRIX4FVPROC piglit_UniformMatrix4fv;
