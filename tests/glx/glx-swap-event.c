@@ -317,6 +317,7 @@ make_window( Display *dpy, const char *name,
     XVisualInfo *visinfo;
     GLXFBConfig *fbc;
     GLXWindow gwin;
+    Bool ret;
     
     scrnum = DefaultScreen( dpy );
     root = RootWindow( dpy, scrnum );
@@ -328,6 +329,10 @@ make_window( Display *dpy, const char *name,
     }
     
     fbc = glXChooseFBConfig(dpy, scrnum, attribs, &nelements);
+    if (!fbc) {
+	    printf("Error: couldn't get framebuffer config\n");
+	    piglit_report_result(PIGLIT_FAIL);
+    }
     visinfo = glXGetVisualFromFBConfig(dpy, fbc[0]);
     if (!visinfo) {
         printf("Error: couldn't get an RGB, Double-buffered visual\n");
@@ -348,7 +353,9 @@ make_window( Display *dpy, const char *name,
                      visinfo->visual, mask, &attr );
     XMapWindow(dpy, win);
     gwin = glXCreateWindow(dpy, fbc[0], win, attribs);
-    glXMakeContextCurrent(dpy, gwin, gwin, ctx);
+    ret = glXMakeContextCurrent(dpy, gwin, gwin, ctx);
+    if (!ret)
+	    printf("make current failed: %d\n", glGetError());
     glXSelectEvent(dpy, gwin, GLX_BUFFER_SWAP_COMPLETE_INTEL_MASK);
 
     if (fullscreen)
