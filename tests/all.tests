@@ -997,6 +997,10 @@ arb_seamless_cube_map = Group()
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
 
+amd_seamless_cubemap_per_texture = Group()
+spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture
+add_plain_test(amd_seamless_cubemap_per_texture, 'amd_seamless_cubemap_per_texture')
+
 ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
