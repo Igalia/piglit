@@ -370,6 +370,7 @@ make_window( Display *dpy, const char *name,
 }
 
 
+static int64_t last_sbc;
 
 /**
  * Only handle one glx event.
@@ -379,6 +380,7 @@ handle_event(Display *dpy, Window win, XEvent *event)
 {
     (void) dpy;
     (void) win;
+
     if ( Glx_event == event->type) {
         XEvent * event_p=event;
         GLXBufferSwapComplete * glx_event=(GLXBufferSwapComplete *) event_p;
@@ -397,6 +399,24 @@ swap_start[count], swap_returned[count], (time_fin-swap_start[count]));
             }
             t_last=time_fin;
         }
+
+	if (glx_event->sbc == 0) {
+		printf("Error: swap event returned 0 swap count\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (glx_event->sbc == last_sbc) {
+		printf("Error: swap event count did not change\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	last_sbc = glx_event->sbc;
+
+	if (verbose)
+		printf("swap event: ust %lld\tmsc %lld\tsbc %lld\n",
+		       (unsigned long long)glx_event->ust,
+		       (unsigned long long)glx_event->msc,
+		       (unsigned long long)glx_event->sbc);
         switch (glx_event->event_type) {
         case GLX_EXCHANGE_COMPLETE_INTEL:
             Intel_swap_event=GLX_EXCHANGE_COMPLETE_INTEL;
