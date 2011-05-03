@@ -687,6 +687,18 @@ import_glsl_parser_tests(spec['AMD_conservative_depth'],
 			 os.path.join(os.path.dirname(__file__), 'spec', 'amd_conservative_depth'),
 			 [''])
 
+# Group AMD_shader_stencil_export
+spec['AMD_shader_stencil_export'] = Group()
+import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
+			 os.path.join(os.path.dirname(__file__), 'spec', 'amd_shader_stencil_export'),
+			 [''])
+
+# Group ARB_shader_stencil_export
+spec['ARB_shader_stencil_export'] = Group()
+import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
+			 os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_stencil_export'),
+			 [''])
+
 # Group ARB_ES2_compatibility
 arb_es2_compatibility = Group()
 spec['ARB_ES2_compatibility'] = arb_es2_compatibility
