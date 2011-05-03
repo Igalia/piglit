@@ -637,10 +637,21 @@ get_floats(const char *line, float *f, unsigned count)
 
 
 void
+get_ints(const char *line, int *ints, unsigned count)
+{
+	unsigned i;
+
+	for (i = 0; i < count; i++)
+		ints[i] = strtol(line, (char **) &line, 0);
+}
+
+
+void
 set_uniform(const char *line)
 {
 	char name[512];
 	float f[16];
+	int ints[16];
 	GLuint prog;
 	GLint loc;
 	const char *type;
@@ -679,6 +690,21 @@ set_uniform(const char *line)
 		case '4':
 			get_floats(line, f, 4);
 			piglit_Uniform4fv(loc, 1, f);
+			return;
+		}
+	} else if (strncmp("ivec", type, 4) == 0) {
+		switch (type[4]) {
+		case '2':
+			get_ints(line, ints, 2);
+			piglit_Uniform2iv(loc, 1, ints);
+			return;
+		case '3':
+			get_ints(line, ints, 3);
+			piglit_Uniform3iv(loc, 1, ints);
+			return;
+		case '4':
+			get_ints(line, ints, 4);
+			piglit_Uniform4iv(loc, 1, ints);
 			return;
 		}
 	} else if ((strncmp("mat", type, 3) == 0)
