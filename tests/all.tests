@@ -739,6 +739,9 @@ import_glsl_parser_tests(arb_shader_texture_lod,
 			 os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_texture_lod'),
 			 [''])
 add_plain_test(arb_shader_texture_lod, 'arb_shader_texture_lod-texgrad')
+arb_shader_texture_lod['tex-miplevel-selection-texture2DLod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod', '-GL_ARB_shader_texture_lod'])
+arb_shader_texture_lod['tex-miplevel-selection-texture2DLod-lod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-GL_ARB_shader_texture_lod'])
+arb_shader_texture_lod['tex-miplevel-selection-texture2DLod-lod-bias'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-GL_ARB_shader_texture_lod'])
 
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = Group()
