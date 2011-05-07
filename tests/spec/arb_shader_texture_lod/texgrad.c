@@ -141,6 +141,8 @@ void piglit_init(int argc, char **argv)
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
+	piglit_set_tolerance_for_bits(7, 7, 7, 7);
+
 	printf("Left: texture2D, Right: texture2DGradARB\n");
 }
 
