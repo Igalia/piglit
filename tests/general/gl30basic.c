@@ -117,9 +117,12 @@ test_extension_list(void)
 enum piglit_result
 test_clearing(void)
 {
+#if 0
    static const GLfloat purple[4] = {1.0, 0.0, 1.0, 1.0};
    GLuint buf = GL_FRONT;
    GLfloat color[4], z;
+#endif
+   GLfloat z;
    GLint stencil;
    GLenum err;
 
