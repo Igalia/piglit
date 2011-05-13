@@ -210,7 +210,7 @@ piglit_display(void)
 	glGetIntegerv(GL_MAX_VARYING_FLOATS, &max_components);
 	max_varyings = max_components / 4;
 
-printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
+	printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
 
 	if (max_varyings > MAX_VARYING) {
 		printf("test not designed to handle >%d varying vec4s.\n"
