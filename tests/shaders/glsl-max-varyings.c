@@ -232,9 +232,10 @@ printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
 			GLboolean ok;
 			float green[3] = {0.0, 1.0, 0.0};
 
-			ok = piglit_probe_pixel_rgb(coord_from_index(col) + 5,
-						    coord_from_index(row) + 5,
-						    green);
+			ok = piglit_probe_rect_rgb(coord_from_index(col),
+						   coord_from_index(row),
+						   10, 10,
+						   green);
 			if (!ok) {
 				printf("  Failure with %d vec4 varyings used "
 				       "in varying index %d\n",
