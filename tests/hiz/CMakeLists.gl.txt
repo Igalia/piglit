@@ -18,7 +18,6 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
-	${TIFF_LIBRARY}
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

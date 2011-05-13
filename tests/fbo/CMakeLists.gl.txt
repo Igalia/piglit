@@ -12,7 +12,6 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
-	${TIFF_LIBRARY}
 )
 
 add_executable (fbo-1d fbo-1d.c)

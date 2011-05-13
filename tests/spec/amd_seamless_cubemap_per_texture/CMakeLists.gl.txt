@@ -9,7 +9,6 @@ link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
-	${TIFF_LIBRARY}
 )
 
 add_executable (amd_seamless_cubemap_per_texture amd_seamless_cubemap_per_texture.c)

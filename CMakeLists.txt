@@ -7,7 +7,7 @@ INCLUDE (CheckIncludeFile)
 project (piglit)
 
 find_package(OpenGL REQUIRED)
-find_package(TIFF REQUIRED)
+find_package(TIFF)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
