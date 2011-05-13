@@ -56,7 +56,7 @@ static GLint get_vs(int num_varyings, int data_varying)
 
 	sprintf(temp,
 		"attribute vec4 green;\n"
-		"attribute vec4 black;\n"
+		"attribute vec4 red;\n"
 		"void main()\n"
 		"{\n"
 		"	gl_Position = (gl_ModelViewProjectionMatrix * \n"
@@ -68,7 +68,7 @@ static GLint get_vs(int num_varyings, int data_varying)
 		if (i == data_varying)
 			sprintf(temp, "	v%d = green;\n", i);
 		else
-			sprintf(temp, "	v%d = black;\n", i);
+			sprintf(temp, "	v%d = red;\n", i);
 		strcat(code, temp);
 	}
 
@@ -147,15 +147,15 @@ draw(int max_varyings)
 			      {0.0, 1.0, 0.0, 0.0},
 			      {0.0, 1.0, 0.0, 0.0},
 			      {0.0, 1.0, 0.0, 0.0} };
-	float black[4][4] = { {0.0, 0.0, 0.0, 0.0},
-			      {0.0, 0.0, 0.0, 0.0},
-			      {0.0, 0.0, 0.0, 0.0},
-			      {0.0, 0.0, 0.0, 0.0} };
+	float red[4][4] = { {1.0, 0.0, 0.0, 0.0},
+			    {1.0, 0.0, 0.0, 0.0},
+			    {1.0, 0.0, 0.0, 0.0},
+			    {1.0, 0.0, 0.0, 0.0} };
 
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
 			      green);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
-			      black);
+			      red);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
@@ -171,7 +171,7 @@ draw(int max_varyings)
 		glAttachShader(prog, fs);
 
 		glBindAttribLocation(prog, 1, "green");
-		glBindAttribLocation(prog, 2, "black");
+		glBindAttribLocation(prog, 2, "red");
 
 		glLinkProgram(prog);
 		if (!piglit_link_check_status(prog))
