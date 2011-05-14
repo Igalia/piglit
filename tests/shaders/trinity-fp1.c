@@ -111,40 +111,25 @@ static void DoFrame(void)
 	glutSwapBuffers();
 }
 
-static int DoTest( void )
+static bool
+DoTest( void )
 {
 	static const float expected[2][3] = {
 		{ 0.30, 0.23, 0.40 },
 		{ 0.24, 0.29, 0.40 }
 	};
 	int i;
-	GLfloat dmax = 0;
+	bool pass = true;
 
 	glReadBuffer( GL_FRONT );
 
 	for(i = 0; i < 2; ++i) {
-		GLfloat probe[4];
-		GLfloat delta[3];
-		int j;
-
-		glReadPixels(piglit_width*(2*i+1)/4, piglit_height/2, 1, 1, GL_RGBA, GL_FLOAT, probe);
-		printf("Probe: %f,%f,%f\n", probe[0], probe[1], probe[2]);
-
-		for(j = 0; j < 3; ++j) {
-			delta[j] = probe[j] - expected[i][j];
-			if (delta[j] > dmax) dmax = delta[j];
-			else if (-delta[j] > dmax) dmax = -delta[j];
-		}
-
-		printf("   Delta: %f,%f,%f\n", delta[0], delta[1], delta[2]);
+		pass = pass && piglit_probe_pixel_rgb(piglit_width*(2*i+1)/4,
+						      piglit_height/2,
+						      expected[i]);
 	}
 
-	printf("Max delta: %f\n", dmax);
-
-	if (dmax >= 0.02)
-		return 0;
-	else
-		return 1;
+	return pass;
 }
 
 
