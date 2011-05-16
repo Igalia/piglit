@@ -45,15 +45,31 @@ static const GLfloat hiz_green[4]  = { 0.0, 1.0, 0.0, 1.0 };
 static const GLfloat hiz_blue[4]   = { 0.0, 0.0, 1.0, 1.0 };
 static const GLfloat hiz_grey[4]   = { 0.5, 0.5, 0.5, 1.0 };
 
-static const GLfloat hiz_green_z  = 0.25;
-static const GLfloat hiz_blue_z   = 0.50;
-static const GLfloat hiz_clear_z  = 0.875;
+/* These must be defines so that they can be used in constant initializers. */
+#define hiz_green_z 0.25
+#define hiz_blue_z  0.50
+#define hiz_clear_z 0.875
 
-/**
- * \brief Probe the scene drawn by hiz_draw_rects().
- * \return True if all probes passed.
+/*
+ * \brief Probe the color buffer.
+ * \param expected_colors An array of 9 pointers, each to a float[4].
+ * \return True if all probes pass.
+ *
+ * The color buffer is probed as follows.  Let the read buffer's dimension be
+ * (w, h) and choose a tuple (i, j) where i and j are in {0, 1, 2}. Then the
+ * expected color in the subrectangle
+ *     {(x, y) | x in w / 3 * [i, i + 1] and y in h / 3 * [j, j + 1]}
+ * is expected_colors[3 * j + i].
  */
-bool hiz_probe_rects();
+bool hiz_probe_color_buffer(const float *expected_colors[]);
+
+/*
+ * \brief Probe the depth buffer.
+ * \param expected_depths Array of 9 floats.
+ * \return True if all probes pass.
+ * \see hiz_probe_color_buffer()
+ */
+bool hiz_probe_depth_buffer(const float expected_depths[]);
 
 GLuint hiz_make_fbo(const struct hiz_fbo_options *options);
 

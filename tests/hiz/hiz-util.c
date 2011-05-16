@@ -34,69 +34,34 @@
 #include "piglit-util.h"
 #include "hiz/hiz-util.h"
 
-bool
-hiz_probe_rects()
-{
-	bool pass = true;
-	const float width_9 = piglit_width / 9.0;
-	const float height_9 = piglit_height / 9.0;
-
-	/*
-	 * For the color and depth probing below, the read buffer is
-	 * decomposed as follows: Let (w,h) be the read buffer's dimentions.
-	 * Divide the read buffer into 9 large rectangles of dimension (w/3,
-	 * h/3). Subdivide each large rectangle into 9 small rectangles of
-	 * dimension (w/9, h/9).
-	 */
-
-	/*
-	 * Probe the color of the center small rectangle of each large
-	 * rectangle. The large rectangles are traversed in column major
-	 * order, bottom to top and left to right.
-	 *
-	 * Such exhaustive probing is necessary because HiZ corruption may
-	 * cause global artifacts in the scene.
-	 */
-	pass &= piglit_probe_rect_rgba(1 * width_9, 1 * height_9,
-	                                   width_9,     height_9, hiz_green);
-	pass &= piglit_probe_rect_rgba(1 * width_9, 4 * height_9,
-	                                   width_9,     height_9, hiz_green);
-	pass &= piglit_probe_rect_rgba(1 * width_9, 7 * height_9,
-	                                   width_9,     height_9, hiz_grey);
-	pass &= piglit_probe_rect_rgba(4 * width_9, 1 * height_9,
-	                                   width_9,     height_9, hiz_green);
-	pass &= piglit_probe_rect_rgba(4 * width_9, 4 * height_9,
-	                                   width_9,     height_9, hiz_green);
-	pass &= piglit_probe_rect_rgba(4 * width_9, 7 * height_9,
-	                                   width_9,     height_9, hiz_blue);
-	pass &= piglit_probe_rect_rgba(7 * width_9, 1 * height_9,
-	                                   width_9,     height_9, hiz_grey);
-	pass &= piglit_probe_rect_rgba(7 * width_9, 4 * height_9,
-	                                   width_9,     height_9, hiz_blue);
-	pass &= piglit_probe_rect_rgba(7 * width_9, 7 * height_9,
-	                                   width_9,     height_9, hiz_blue);
-
-	/* Now probe the depths. */
-	pass &= piglit_probe_rect_depth(1 * width_9, 1 * height_9,
-	                                    width_9,     height_9, hiz_green_z);
-	pass &= piglit_probe_rect_depth(1 * width_9, 4 * height_9,
-	                                    width_9,     height_9, hiz_green_z);
-	pass &= piglit_probe_rect_depth(1 * width_9, 7 * height_9,
-	                                    width_9,     height_9, hiz_clear_z);
-	pass &= piglit_probe_rect_depth(4 * width_9, 1 * height_9,
-	                                    width_9,     height_9, hiz_green_z);
-	pass &= piglit_probe_rect_depth(4 * width_9, 4 * height_9,
-	                                    width_9,     height_9, hiz_green_z);
-	pass &= piglit_probe_rect_depth(4 * width_9, 7 * height_9,
-	                                    width_9,     height_9, hiz_blue_z);
-	pass &= piglit_probe_rect_depth(7 * width_9, 1 * height_9,
-	                                    width_9,     height_9, hiz_clear_z);
-	pass &= piglit_probe_rect_depth(7 * width_9, 4 * height_9,
-	                                    width_9,     height_9, hiz_blue_z);
-	pass &= piglit_probe_rect_depth(7 * width_9, 7 * height_9,
-	                                    width_9,     height_9, hiz_blue_z);
-
+#define hiz_probe_common(probe_func, expect) \
+	bool pass = true; \
+	const float dx = piglit_width / 9.0; \
+	const float dy = piglit_height / 9.0; \
+	\
+	int ix; \
+	int iy; \
+	\
+	for (iy = 0; iy < 3; ++iy) for (ix = 0; ix < 3; ++ix) {	\
+		int x = (3 * ix + 1) * dx; \
+		int y = (3 * iy + 1) * dy; \
+		int i = 3 * iy + ix; \
+		pass &= probe_func(x, y, dx, dy, expect[i]); \
+	} \
+	\
 	return pass;
+
+
+bool
+hiz_probe_color_buffer(const float *expected_colors[])
+{
+	hiz_probe_common(piglit_probe_rect_rgb, expected_colors);
+}
+
+bool
+hiz_probe_depth_buffer(const float expected_depths[])
+{
+	hiz_probe_common(piglit_probe_rect_depth, expected_depths);
 }
 
 
@@ -226,6 +191,35 @@ hiz_delete_fbo(GLuint fbo)
 static bool
 hiz_run_test_depth_test_common()
 {
+	static const float *expect_color[9] = {
+		hiz_green,
+		hiz_green,
+		hiz_grey,
+
+		hiz_green,
+		hiz_green,
+		hiz_blue,
+
+		hiz_grey,
+		hiz_blue,
+		hiz_blue
+	};
+
+	static const float expect_depth[9] = {
+		hiz_green_z,
+		hiz_green_z,
+		hiz_clear_z,
+
+		hiz_green_z,
+		hiz_green_z,
+		hiz_blue_z,
+
+		hiz_clear_z,
+		hiz_blue_z,
+		hiz_blue_z,
+	};
+
+	bool pass = true;
 	const float width_3 = piglit_width / 3.0;
 	const float height_3 = piglit_height / 3.0;
 
@@ -251,7 +245,10 @@ hiz_run_test_depth_test_common()
 	glClearDepth(1.0);
 	glDepthRange(0, 1);
 
-	return hiz_probe_rects();
+	pass &= hiz_probe_color_buffer(expect_color);
+	pass &= hiz_probe_depth_buffer(expect_depth);
+
+	return pass;
 }
 
 bool
@@ -286,7 +283,8 @@ hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *fbo_options)
 }
 
 bool
-hiz_run_test_depth_test_window() {
+hiz_run_test_depth_test_window()
+{
 	bool pass = hiz_run_test_depth_test_common();
 	if (!piglit_automatic)
 		glutSwapBuffers();
