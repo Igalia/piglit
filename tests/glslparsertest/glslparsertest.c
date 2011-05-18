@@ -173,6 +173,23 @@ test(void)
 		}
 	}
 
+	/* Try linking the shader if it compiled.  We don't care about
+	 * the success or failure of linking for the purposes of
+	 * parser tests, we're just trying to increase coverage of
+	 * that code.  It also means that drivers that do a compile at
+	 * link time (to determine limits) get a chance to expose
+	 * their codegen to the parser tests, even if we don't ever
+	 * execute it.
+	 */
+	if (ok) {
+		GLuint shader_prog;
+
+		shader_prog = piglit_CreateProgram();
+		piglit_AttachShader(shader_prog, prog);
+		piglit_LinkProgram(shader_prog);
+		piglit_DeleteProgram(shader_prog);
+	}
+
 	if (size != 0)
 		free(info);
 	free(prog_string);
