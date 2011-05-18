@@ -344,6 +344,8 @@ piglit_compile_shader_text(GLenum target, const char *text)
 			fprintf(stderr, "Failed to compile %s shader: %s\n",
 				shader_name(target),
 				info);
+			glDeleteShader(prog);
+			prog = 0;
 		}
 		else if (0) {
 			/* Enable this to get extra compilation info.
@@ -426,7 +428,10 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 		glAttachShader(prog, vs);
 	glLinkProgram(prog);
 
-	piglit_link_check_status(prog);
+	if (!piglit_link_check_status(prog)) {
+		glDeleteProgram(prog);
+		prog = 0;
+	}
 
 	return prog;
 }
