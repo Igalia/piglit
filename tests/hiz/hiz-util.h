@@ -91,3 +91,12 @@ void hiz_delete_fbo(GLuint fbo);
  * \return True if test passed.
  */
 bool hiz_check_fbo_depth_test(const struct hiz_fbo_options *options);
+
+/**
+ * Check that depth tests work correctly when rendering to the window
+ * framebuffer.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ */
+bool hiz_run_test_depth_test_window();

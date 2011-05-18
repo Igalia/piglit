@@ -269,3 +269,13 @@ hiz_check_fbo_depth_test(const struct hiz_fbo_options *fbo_options)
 
 	return pass;
 }
+
+bool
+hiz_run_test_depth_test_window() {
+	bool pass = true;
+	hiz_draw_rects();
+	pass = hiz_probe_rects();
+	if (!piglit_automatic)
+		glutSwapBuffers();
+	return pass;
+}

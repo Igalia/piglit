@@ -48,10 +48,8 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display()
 {
-	bool pass;
-	hiz_draw_rects();
-	pass = hiz_probe_rects();
-	if (!piglit_automatic)
-		glutSwapBuffers();
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	if (hiz_run_test_depth_test_window())
+		return PIGLIT_PASS;
+	else
+		return PIGLIT_FAIL;
 }
