@@ -301,6 +301,22 @@ piglit_compile_shader(GLenum target, char *filename)
 	return prog;
 }
 
+/** Return a string name for a shader target enum */
+static const char *
+shader_name(GLenum target)
+{
+   switch (target) {
+   case GL_VERTEX_SHADER:
+      return "vertex";
+   case GL_GEOMETRY_SHADER:
+      return "geometry";
+   case GL_FRAGMENT_SHADER:
+      return "fragment";
+   default:
+      assert(!"Unexpected shader target in shader_name()");
+   }
+}
+
 /**
  * Convenience function to compile a GLSL shader.
  */
@@ -325,8 +341,8 @@ piglit_compile_shader_text(GLenum target, const char *text)
 
 		glGetShaderInfoLog(prog, size, NULL, info);
 		if (!ok) {
-			fprintf(stderr, "Failed to compile %s: %s\n",
-				target == GL_FRAGMENT_SHADER ? "FS" : "VS",
+			fprintf(stderr, "Failed to compile %s shader: %s\n",
+				shader_name(target),
 				info);
 		}
 		else if (0) {
