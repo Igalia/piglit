@@ -36,6 +36,7 @@ static const char *TestName = "texture-float-formats";
 static GLint TexWidth = 16, TexHeight = 16;
 static GLint BiasUniform = -1, ScaleUniform = -1, TexUniform = -1;
 static const float Scale = 1.0 / 2000.0, Bias = 0.5;
+static GLboolean HaveRG;
 
 
 struct format_info
@@ -61,7 +62,11 @@ static const struct format_info Formats[] = {
    { "GL_LUMINANCE16F_ARB", GL_LUMINANCE16F_ARB, GL_LUMINANCE, 16 },
    { "GL_LUMINANCE_ALPHA16F_ARB", GL_LUMINANCE_ALPHA16F_ARB, GL_LUMINANCE, 16 },
 
-   /* XXX could also add tests for RED, RG formats */
+   /* These require GL_ARB_texture_rg */
+   { "GL_R32F", GL_R32F, GL_RED, 32 },
+   { "GL_RG32F", GL_RG32F, GL_RG, 32 },
+   { "GL_R16F", GL_R16F, GL_RED, 16 },
+   { "GL_RG16F", GL_RG16F, GL_RG, 16 },
 };
 
 
@@ -184,6 +189,12 @@ test_format(const struct format_info *info)
    GLint f;
    GLenum userFormat;
    int p;
+
+   if ((info->BaseFormat == GL_RED ||
+        info->BaseFormat == GL_RG) && !HaveRG) {
+      /* skip it */
+      return GL_TRUE;
+   }
 
    /*printf("Testing %s\n", info->Name);*/
 
@@ -352,6 +363,8 @@ piglit_init(int argc, char **argv)
 
    piglit_require_extension("GL_ARB_texture_float");
    piglit_require_extension("GL_ARB_fragment_shader");
+
+   HaveRG = piglit_is_extension_supported("GL_ARB_texture_rg");
 
    FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
    assert(FragShader);
