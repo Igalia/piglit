@@ -50,29 +50,6 @@ static const GLfloat hiz_blue_z   = 0.50;
 static const GLfloat hiz_clear_z  = 0.875;
 
 /**
- * \brief Draw two overlapping rectangles.
- *
- * Draw a green rectangle, then a blue one behind it.
- * This draw function should be sufficient for all HiZ tests.
- *
- * Let (w, h) be the window's dimensions. Then the scene is as follows:
- *     - glClearDepth: hiz_clear_z
- *     - glClearColor: hiz_grey
- *     - glDepthFunc: GL_LESS
- *     - rectangle 1
- *         - color: hiz_green
- *         - x range: [0, 2/3 * w]
- *         - y range: [0, 2/3 * h]
- *         - z: hiz_green_z
- *     - rectangle 2
- *         - color: hiz_blue
- *         - x range: [1/3 * w, w]
- *         - y range: [1/3 * h, h]
- *         - z: hiz_blue_z
- */
-void hiz_draw_rects();
-
-/**
  * \brief Probe the scene drawn by hiz_draw_rects().
  * \return True if all probes passed.
  */
