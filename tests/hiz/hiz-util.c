@@ -239,7 +239,7 @@ hiz_delete_fbo(GLuint fbo)
 }
 
 bool
-hiz_check_fbo_depth_test(const struct hiz_fbo_options *fbo_options)
+hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *fbo_options)
 {
 	bool pass = true;
 	GLuint fbo = 0;

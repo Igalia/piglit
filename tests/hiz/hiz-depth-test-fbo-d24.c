@@ -58,7 +58,7 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display()
 {
-	if (hiz_check_fbo_depth_test(&fbo_options))
+	if (hiz_run_test_depth_test_fbo(&fbo_options))
 		return PIGLIT_PASS;
 	else
 		return PIGLIT_FAIL;
