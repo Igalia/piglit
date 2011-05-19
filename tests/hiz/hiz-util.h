@@ -71,6 +71,14 @@ bool hiz_probe_color_buffer(const float *expected_colors[]);
  */
 bool hiz_probe_depth_buffer(const float expected_depths[]);
 
+/**
+ * \brief Probe the stencil buffer.
+ * \param expected_stencil Array of 9 ints.
+ * \return True if all probes pass.
+ * \see hiz_probe_color_buffer()
+ */
+bool hiz_probe_stencil_buffer(const unsigned expected_stencil[]);
+
 GLuint hiz_make_fbo(const struct hiz_fbo_options *options);
 
 /**
@@ -118,3 +126,26 @@ bool hiz_run_test_stencil_test_fbo(const struct hiz_fbo_options *options);
  * \see hiz_run_test_stencil_test_fbo()
  */
 bool hiz_run_test_stencil_test_window();
+
+/**
+ * \brief Test reading the stencil buffer of an FBO.
+ *
+ * First, probe the color buffer to check that stencil testing worked as
+ * expected. If it did not, then immediately report test failure and do not
+ * probe the stencil buffer. If stencil testing misbehaved, we cannot expect
+ * the stencil buffer to hold the expected values.
+ *
+ * For this test, stencil test is enabled and depth test disabled.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ */
+bool hiz_run_test_stencil_read_fbo(const struct hiz_fbo_options *options);
+
+/**
+ * \brief Test reading the stencil buffer of the window framebuffer.
+ *
+ * \return True if test passed.
+ * \see hiz_run_test_stencil_read_fbo()
+ */
+bool hiz_run_test_stencil_read_window();
