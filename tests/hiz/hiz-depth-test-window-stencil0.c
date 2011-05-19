@@ -29,7 +29,7 @@
  * \author Chad Versace <chad.versace@intel.com>
  *
  * Checks that depth tests work correctly when rendering to a window
- * framebuffer with no stencilbuffer.
+ * framebuffer for which no stencil buffer was requested.
  */
 
 #include "piglit-util.h"
