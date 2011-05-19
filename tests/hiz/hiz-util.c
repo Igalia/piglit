@@ -292,3 +292,117 @@ hiz_run_test_depth_test_window()
 }
 
 /** \} */
+
+/* ------------------------------------------------------------------------ */
+
+/**
+ * \name hiz_run_stencil_test utilties
+ *
+ * Utilities for testing stencil testing.
+ *
+ * \{
+ */
+
+/**
+ * Common functionality needed by hiz_run_test_stencil_test_fbo() and
+ * hiz_run_test_stencil_test_window().
+ */
+static bool
+hiz_run_test_stencil_test_common()
+{
+	static const float *expected_colors[9] = {
+		hiz_green,
+		hiz_green,
+		hiz_grey,
+
+		hiz_green,
+		hiz_blue,
+		hiz_grey,
+
+		hiz_grey,
+		hiz_blue,
+		hiz_grey,
+	};
+
+	const float dx = piglit_width / 3.0;
+	const float dy = piglit_height / 3.0;
+
+	/* Set up depth state. */
+	glDisable(GL_DEPTH_TEST);
+	glClearDepth(hiz_clear_z);
+
+	/* Set up stencil state. */
+	glEnable(GL_STENCIL_TEST);
+	glClearStencil(3); /* 3 is a good canary. */
+	glStencilFunc(GL_LESS, 3, ~0);
+	glStencilOp(GL_INCR, GL_INCR, GL_INCR);
+
+	glClearColor(hiz_grey[0], hiz_grey[1], hiz_grey[2], hiz_grey[3]);
+	glClear(GL_COLOR_BUFFER_BIT
+		| GL_DEPTH_BUFFER_BIT
+		| GL_STENCIL_BUFFER_BIT);
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, false);
+
+	/* Draw rect 1. */
+	glColor4fv(hiz_grey);
+	piglit_draw_rect(0 * dx, 0 * dy, /* x, y */
+			 2 * dx, 3 * dy); /* w, h */
+
+	/* Draw rect 2. */
+	glColor4fv(hiz_green);
+	piglit_draw_rect(0 * dx, 0 * dy,  /* x, y */
+			 2 * dx, 2 * dy); /* w, h */
+
+	/* Draw rect 3. */
+	glColor4fv(hiz_blue);
+	piglit_draw_rect(1 * dx, 1 * dy,   /* x, y */
+		         2 * dx, 2 * dy);  /* w, h */
+
+	assert(!glGetError());
+
+	return hiz_probe_color_buffer(expected_colors);
+}
+
+bool
+hiz_run_test_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
+{
+	bool pass = true;
+	GLuint fbo = 0;
+
+	piglit_require_extension("GL_ARB_framebuffer_object");
+
+	/* Create and bind FBO. */
+	fbo = hiz_make_fbo(fbo_options);
+	assert(fbo != 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+
+	pass = hiz_run_test_stencil_test_common();
+
+	if (!piglit_automatic) {
+		/* Blit the FBO to the window FB so we can see the results. */
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
+			          0, 0, piglit_width, piglit_height,
+			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glutSwapBuffers();
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	}
+
+	hiz_delete_fbo(fbo);
+
+	return pass;
+}
+
+bool
+hiz_run_test_stencil_test_window()
+{
+	bool pass = hiz_run_test_stencil_test_common();
+	if (!piglit_automatic)
+		glutSwapBuffers();
+	return pass;
+}
+
+/** \} */

@@ -93,3 +93,28 @@ bool hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *options);
  * \return True if test passed.
  */
 bool hiz_run_test_depth_test_window();
+
+/**
+ * \brief Check that stencil testing works correctly when rendering to an FBO.
+ *
+ * This test probes only the color buffer; it does not probe the stencil
+ * buffer. Stencil test is enabled and depth test disabled.
+ *
+ * This test does not probe the stencil buffer because correct operation of 1)
+ * stencil testing and stencil writes (via glDraw*) and of 2) stencil buffer
+ * reads (via glRead*) are independent. It is possible for 1 to work while
+ * 2 to fail. This test covers only case 1.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ */
+bool hiz_run_test_stencil_test_fbo(const struct hiz_fbo_options *options);
+
+/**
+ * Check that stencil testing works correctly when rendering to the window
+ * framebuffer.
+ *
+ * \return True if test passed.
+ * \see hiz_run_test_stencil_test_fbo()
+ */
+bool hiz_run_test_stencil_test_window();
