@@ -123,6 +123,8 @@ int piglit_probe_texel_rgba(int target, int level, int x, int y,
 			    const float* expected);
 int piglit_probe_pixel_depth(int x, int y, float expected);
 int piglit_probe_rect_depth(int x, int y, int w, int h, float expected);
+int piglit_probe_pixel_stencil(int x, int y, unsigned expected);
+int piglit_probe_rect_stencil(int x, int y, int w, int h, unsigned expected);
 int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h);
 
 int piglit_use_fragment_program(void);

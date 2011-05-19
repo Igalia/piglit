@@ -323,6 +323,45 @@ int piglit_probe_rect_depth(int x, int y, int w, int h, float expected)
 	return 1;
 }
 
+int piglit_probe_pixel_stencil(int x, int y, unsigned expected)
+{
+	GLuint probe;
+	glReadPixels(x, y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &probe);
+
+	if (probe == expected)
+		return 1;
+
+	printf("Probe at (%i, %i)\n", x, y);
+	printf("  Expected: %u\n", expected);
+	printf("  Observed: %u\n", probe);
+
+	return 0;
+}
+
+int piglit_probe_rect_stencil(int x, int y, int w, int h, unsigned expected)
+{
+	int i, j;
+	GLuint *pixels = malloc(w*h*sizeof(GLuint));
+
+	glReadPixels(x, y, w, h, GL_STENCIL_INDEX, GL_UNSIGNED_INT, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			GLuint probe = pixels[j * w + i];
+			if (probe != expected) {
+				printf("Probe at (%i, %i)\n", x + i, y + j);
+				printf("  Expected: %u\n", expected);
+				printf("  Observed: %u\n", probe);
+				free(pixels);
+				return 0;
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 /**
  * Read a texel rectangle from the given location and compare its RGBA value to
  * the given expected values.
