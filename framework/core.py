@@ -189,7 +189,7 @@ class TestrunResult:
 				if line == '!':
 					del stack[-1]
 				else:
-					a.append(line[1:])
+					a.append(decode(line[1:]))
 			return cb
 
 		def dictparser(d):
