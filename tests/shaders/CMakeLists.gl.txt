@@ -14,6 +14,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
+add_executable (glsl-max-vertex-attrib glsl-max-vertex-attrib.c)
 add_executable (activeprogram-bad-program activeprogram-bad-program.c)
 add_executable (activeprogram-get activeprogram-get.c)
 add_executable (ati-fs-bad-delete ati-fs-bad-delete.c)
