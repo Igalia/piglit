@@ -1289,6 +1289,7 @@ FBOTest::testErrorHandling(void)
         GLuint fbs[1];
         GLuint textures[2];
         GLenum status;
+	bool have_ARB_ES2 = GLUtils::haveExtension("GL_ARB_ES2_compatibility");
 
         if (useFramebuffer) {
                 GLuint maxColorAttachment;
@@ -1385,7 +1386,8 @@ FBOTest::testErrorHandling(void)
                 status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
                 glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT_func(1, fbs);
-                if (status != GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT) {
+                if (status != GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT &&
+		    !have_ARB_ES2) {
                         REPORT_FAILURE
                                 ("All any buffer named by glDrawBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
                         return false;
@@ -1402,7 +1404,8 @@ FBOTest::testErrorHandling(void)
                 status = glCheckFramebufferStatusEXT_func(GL_FRAMEBUFFER_EXT);
                 glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT_func(1, fbs);
-                if (status != GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT) {
+                if (status != GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT &&
+		    !have_ARB_ES2) {
                         REPORT_FAILURE
                                 ("If buffer named by glReadBuffers is missing, status should be GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
                         return false;
