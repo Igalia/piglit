@@ -40,43 +40,109 @@
 int piglit_window_mode = GLUT_RGB;
 int piglit_width = 250, piglit_height = 250;
 
-#define CHECK_GL_INVALID_VALUE if (glGetError() != GL_INVALID_VALUE) return PIGLIT_FAIL;
+static int test = 0;
+
+#define CHECK_GL_INVALID_VALUE \
+	if (glGetError() != GL_INVALID_VALUE) return PIGLIT_FAIL; \
+	else printf("glsl-max-vertex-attrib test %d passed\n", ++test);
+
+static const char *vShaderString =
+	"attribute float pos;\n"
+	"void main()\n"
+	"{\n"
+	"	gl_Position = pos;\n"
+	"}\n";
+
+static const char *fShaderString =
+	"void main()\n"
+	"{\n"
+	"	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+	"}\n";
 
 enum piglit_result piglit_display(void)
 {
-	int attribCount;
-
+	GLvoid *datap;
+	GLint intv[] = { 1, 1, 1, 1 };
 	GLfloat floatv[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat quad[] = { -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0 };
 
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attribCount);
+	GLsizei length;
+	GLint size;
+	GLenum type;
+	GLchar buffer[64];
 
-	glVertexAttrib1f(attribCount, floatv[0]);
+	GLuint program, vShader, fShader;
+	int maxAttribCount;
+
+	/* --- valid program needed for some of the functions --- */
+
+	fShader = glCreateShader(GL_FRAGMENT_SHADER);
+	vShader = glCreateShader(GL_VERTEX_SHADER);
+
+	glShaderSource(fShader, 1, &fShaderString, NULL);
+	glShaderSource(vShader, 1, &vShaderString, NULL);
+
+	glCompileShader(vShader);
+	glCompileShader(fShader);
+
+	program = glCreateProgram();
+
+	glAttachShader(program, vShader);
+	glAttachShader(program, fShader);
+
+	glLinkProgram(program);
+
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttribCount);
+
+	/* --- tests begin here --- */
+
+	glVertexAttrib1f(maxAttribCount, floatv[0]);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib2f(attribCount, floatv[0], floatv[1]);
+	glVertexAttrib2f(maxAttribCount, floatv[0], floatv[1]);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib3f(attribCount, floatv[0], floatv[1], floatv[2]);
+	glVertexAttrib3f(maxAttribCount, floatv[0], floatv[1], floatv[2]);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib4f(attribCount, floatv[0], floatv[1], floatv[2],
+	glVertexAttrib4f(maxAttribCount, floatv[0], floatv[1], floatv[2],
 			 floatv[3]);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib1fv(attribCount, floatv);
+	glVertexAttrib1fv(maxAttribCount, floatv);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib2fv(attribCount, floatv);
+	glVertexAttrib2fv(maxAttribCount, floatv);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib3fv(attribCount, floatv);
+	glVertexAttrib3fv(maxAttribCount, floatv);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttrib4fv(attribCount, floatv);
+	glVertexAttrib4fv(maxAttribCount, floatv);
 	CHECK_GL_INVALID_VALUE;
 
-	glVertexAttribPointer(attribCount, 2, GL_FLOAT, GL_FALSE, 0, quad);
+	glVertexAttribPointer(maxAttribCount, 2, GL_FLOAT, GL_FALSE, 0, quad);
+	CHECK_GL_INVALID_VALUE;
+
+	glBindAttribLocation(program, maxAttribCount, "pos");
+	CHECK_GL_INVALID_VALUE;
+
+	glEnableVertexAttribArray(maxAttribCount);
+	CHECK_GL_INVALID_VALUE;
+
+	glDisableVertexAttribArray(maxAttribCount);
+	CHECK_GL_INVALID_VALUE;
+
+	glGetVertexAttribfv(maxAttribCount, GL_CURRENT_VERTEX_ATTRIB, floatv);
+	CHECK_GL_INVALID_VALUE;
+
+	glGetVertexAttribiv(maxAttribCount, GL_CURRENT_VERTEX_ATTRIB, intv);
+	CHECK_GL_INVALID_VALUE;
+
+	glGetVertexAttribPointerv(maxAttribCount, GL_VERTEX_ATTRIB_ARRAY_POINTER, &datap);
+	CHECK_GL_INVALID_VALUE;
+
+	glGetActiveAttrib(program, maxAttribCount, 64, &length, &size, &type, buffer);
 	CHECK_GL_INVALID_VALUE;
 
 	return PIGLIT_PASS;
