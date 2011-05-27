@@ -60,6 +60,7 @@ add_executable (glsl-getactiveuniform-array-size glsl-getactiveuniform-array-siz
 add_executable (glsl-getactiveuniform-count glsl-getactiveuniform-count.c)
 add_executable (glsl-getactiveuniform-length glsl-getactiveuniform-length.c)
 add_executable (getuniform-01 getuniform-01.c)
+add_executable (getuniform-02 getuniform-02.c)
 add_executable (glsl-invalid-asm-01 glsl-invalid-asm-01.c)
 add_executable (glsl-invalid-asm-02 glsl-invalid-asm-02.c)
 add_executable (glsl-novertexdata glsl-novertexdata.c)
