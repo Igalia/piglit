@@ -127,9 +127,8 @@ piglit_init(int argc, char **argv)
 	pass = try_GetAttachmentParam(GL_DEPTH_ATTACHMENT,
 				      GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE,
 				      0,
-				      0,
-				      "Expected alpha size of color attachment "
-				      "0 to be %d, got %d instead.\n")
+				      GL_INVALID_OPERATION,
+				      "")
 		&& pass;
 	pass = try_GetAttachmentParam(GL_DEPTH_ATTACHMENT,
 				      GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE,
@@ -148,7 +147,7 @@ piglit_init(int argc, char **argv)
 	pass = try_GetAttachmentParam(GL_DEPTH_ATTACHMENT,
 				      GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE,
 				      0,
-				      GL_INVALID_ENUM,
+				      GL_INVALID_OPERATION,
 				      "")
 		&& pass;
 
