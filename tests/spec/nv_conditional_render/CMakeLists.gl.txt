@@ -12,6 +12,7 @@ link_libraries (
 )
 
 add_executable (nv_conditional_render-bitmap bitmap.c)
+add_executable (nv_conditional_render-blitframebuffer blitframebuffer.c)
 add_executable (nv_conditional_render-clear clear.c)
 add_executable (nv_conditional_render-copypixels copypixels.c)
 add_executable (nv_conditional_render-copyteximage copyteximage.c)
