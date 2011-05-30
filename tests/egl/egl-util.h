@@ -1,3 +1,11 @@
+
+/**
+ * \file egl-util.h
+ * Common framework for EGL tests.
+ *
+ * \author Kristian Høgsberg <krh@bitplanet.net>
+ */
+
 #ifndef EGL_UTIL_H
 #define EGL_UTIL_H
 

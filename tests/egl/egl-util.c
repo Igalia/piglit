@@ -23,9 +23,11 @@
  * Author: Kristian Høgsberg <krh@bitplanet.net>
  */
 
-/** @file egl-nok-swap-region.c
+/**
+ * \file egl-util.c
+ * Common framework for EGL tests.
  *
- * Test EGL_NOK_swap_region.
+ * \author Kristian Høgsberg <krh@bitplanet.net>
  */
 
 #include "piglit-util.h"
