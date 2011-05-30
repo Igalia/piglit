@@ -35,16 +35,6 @@ static int automatic;
 
 int depth;
 
-static const EGLint attribs[] = {
-	EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PIXMAP_BIT | EGL_PBUFFER_BIT,
-	EGL_RED_SIZE, 1,
-	EGL_GREEN_SIZE, 1,
-	EGL_BLUE_SIZE, 1,
-	EGL_DEPTH_SIZE, 1,
-	EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-	EGL_NONE
-};
-
 EGLSurface
 egl_util_create_pixmap(struct egl_state *state,
 		       int width, int height, const EGLint *attribs)
@@ -167,7 +157,13 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	eglBindAPI(EGL_OPENGL_API);
+	for (count = 0; test->config_attribs[count] != EGL_NONE; count += 2) {
+		if (test->config_attribs[count] == EGL_RENDERABLE_TYPE &&
+		    test->config_attribs[count+1] == EGL_OPENGL_BIT) {
+			eglBindAPI(EGL_OPENGL_API);
+		}
+	}
+
 
 	state.egl_dpy = eglGetDisplay(state.dpy);
 	if (state.egl_dpy == EGL_NO_DISPLAY) {
@@ -182,7 +178,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 
 	check_extensions(&state, test);
 
-	if (!eglChooseConfig(state.egl_dpy, attribs, &state.cfg, 1, &count) ||
+	if (!eglChooseConfig(state.egl_dpy, test->config_attribs, &state.cfg, 1, &count) ||
 	    count == 0) {
 		fprintf(stderr, "eglChooseConfig() failed\n");
 		piglit_report_result(PIGLIT_FAIL);

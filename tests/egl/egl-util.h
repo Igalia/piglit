@@ -22,6 +22,7 @@ struct egl_state {
 };
 
 struct egl_test {
+	const EGLint *config_attribs;
 	const char **extensions;
 	enum piglit_result (*draw)(struct egl_state *state);
 };
