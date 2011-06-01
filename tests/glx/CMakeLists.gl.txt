@@ -36,6 +36,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-make-glxdrawable-current glx-make-glxdrawable-current.c)
 	add_executable (glx-swap-exchange glx-swap-exchange.c)
 	add_executable (glx-tfp glx-tfp.c)
+	target_link_libraries(glx-tfp Xrender)
 
 	add_executable (glx-pixmap-life glx-pixmap-life.c)
 	add_executable (glx-pixmap13-life glx-pixmap13-life.c)

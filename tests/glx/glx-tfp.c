@@ -38,6 +38,7 @@
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
 #include "GL/glx.h"
+#include "X11/extensions/Xrender.h"
 
 GLfloat tex_data[4][4] = {
 	{ 1.0, 0.0, 0.0, 1.0 },
@@ -183,25 +184,17 @@ draw(Display *dpy)
 }
 
 static void
-set_pixel(Display *dpy, Pixmap pixmap, int x, int y, GLfloat *color,
-	  unsigned long *masks)
+set_pixel(Display *dpy, Picture picture, int x, int y, GLfloat *color)
 {
-	unsigned long pixel = 0;
-	XGCValues gc_values;
-	GC gc;
+	XRectangle rect = {x, y, 1, 1};
+	XRenderColor render_color;
 
-	pixel |= (unsigned long)(color[0] * masks[0]) & masks[0];
-	pixel |= (unsigned long)(color[1] * masks[1]) & masks[1];
-	pixel |= (unsigned long)(color[2] * masks[2]) & masks[2];
-	pixel |= (unsigned long)(color[3] * masks[3]) & masks[3];
+	render_color.red = 0xffff * color[0];
+	render_color.green = 0xffff * color[1];
+	render_color.blue = 0xffff * color[2];
+	render_color.alpha = 0xffff * color[3];
 
-	gc_values.foreground = pixel;
-	gc_values.background = pixel;
-	gc = XCreateGC(dpy, pixmap, GCForeground | GCBackground, &gc_values);
-
-	XFillRectangle(dpy, pixmap, gc, x, y, 1, 1);
-
-	XFreeGC(dpy, gc);
+	XRenderFillRectangles(dpy, PictOpSrc, picture, &render_color, &rect, 1);
 }
 
 /**
@@ -247,14 +240,19 @@ create_pixmap(GLenum format)
 	Pixmap pixmap;
 	GLXPixmap glx_pixmap;
 	XVisualInfo *vis;
-	unsigned long channel_masks[4];
+	XRenderPictFormat *render_format;
+	Picture picture;
 
 	if (format == GL_RGBA) {
 		fb_config_attribs = rgba_fb_config_attribs;
 		pixmap_attribs = rgba_pixmap_attribs;
+		render_format = XRenderFindStandardFormat(dpy,
+							  PictStandardARGB32);
 	} else {
 		fb_config_attribs = rgb_fb_config_attribs;
 		pixmap_attribs = rgb_pixmap_attribs;
+		render_format = XRenderFindStandardFormat(dpy,
+							  PictStandardRGB24);
 	}
 
 	fb_configs = glXChooseFBConfig(dpy, DefaultScreen(dpy),
@@ -270,27 +268,17 @@ create_pixmap(GLenum format)
 	fb_config = fb_configs[n_fb_configs - 1];
 
 	pixmap = XCreatePixmap(dpy, RootWindow(dpy, DefaultScreen(dpy)),
-			       2, 2,
-			       format == GL_RGBA ? 32 : 24);
+			       2, 2, render_format->depth);
+	picture = XRenderCreatePicture(dpy, pixmap, render_format, 0, NULL);
 
 	glx_pixmap = glXCreatePixmap(dpy, fb_config, pixmap, pixmap_attribs);
 
 	vis = glXGetVisualFromFBConfig(dpy, fb_config);
 
-	channel_masks[0] = vis->red_mask;
-	channel_masks[1] = vis->green_mask;
-	channel_masks[2] = vis->blue_mask;
-	if (format == GL_RGBA) {
-		channel_masks[3] = ~(vis->red_mask | vis->green_mask |
-				     vis->blue_mask);
-	} else {
-		channel_masks[3] = 0;
-	}
-
-	set_pixel(dpy, pixmap, 0, 0, tex_data[0], channel_masks);
-	set_pixel(dpy, pixmap, 1, 0, tex_data[1], channel_masks);
-	set_pixel(dpy, pixmap, 0, 1, tex_data[2], channel_masks);
-	set_pixel(dpy, pixmap, 1, 1, tex_data[3], channel_masks);
+	set_pixel(dpy, picture, 0, 0, tex_data[0]);
+	set_pixel(dpy, picture, 1, 0, tex_data[1]);
+	set_pixel(dpy, picture, 0, 1, tex_data[2]);
+	set_pixel(dpy, picture, 1, 1, tex_data[3]);
 
 	XFree(fb_configs);
 	XFree(vis);
@@ -311,8 +299,6 @@ int main(int argc, char**argv)
 	XVisualInfo *visinfo;
 	GLXContext ctx;
 	int i;
-	int screen;
-	Window root_win;
 
 	for(i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
@@ -326,8 +312,6 @@ int main(int argc, char**argv)
 		fprintf(stderr, "couldn't open display\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
-	screen = DefaultScreen(dpy);
-	root_win = RootWindow(dpy, screen);
 
 	visinfo = piglit_get_glx_visual(dpy);
 	ctx = piglit_get_glx_context(dpy, visinfo);
