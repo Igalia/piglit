@@ -174,10 +174,10 @@ draw(Display *dpy)
 	draw_pixmap(rgb_pixmap, rgb_x, rgb_y, draw_w, draw_h);
 	draw_pixmap(rgba_pixmap, rgba_x, rgba_y, draw_w, draw_h);
 
-	glXSwapBuffers(dpy, win);
-
 	pass &= check_results(GL_FALSE, rgb_x, rgb_y, draw_w, draw_h);
 	pass &= check_results(GL_TRUE, rgba_x, rgba_y, draw_w, draw_h);
+
+	glXSwapBuffers(dpy, win);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
