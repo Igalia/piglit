@@ -149,3 +149,22 @@ bool hiz_run_test_stencil_read_fbo(const struct hiz_fbo_options *options);
  * \see hiz_run_test_stencil_read_fbo()
  */
 bool hiz_run_test_stencil_read_window();
+
+/**
+ * Check that rendering to an FBO works correctly when depth and stencil test
+ * are simultaneously enabled.
+ *
+ * This test probes only the color buffer; it does not probe the stencil
+ * nor the depth buffer.
+ *
+ * Superficially, this test appears to simply be hiz_run_test_depth_test_fbo()
+ * and hiz_run_test_stencil_test_fbo() amalgamated. But, this test's purpose is
+ * more sinister than the sum of its parts. It tests for undefined GPU behavior
+ * when stencil read/writes are accidentally enabled in hardware when no
+ * stencil buffer is present, and analogously for depth read/writes when no
+ * depth buffer is present.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ */
+bool hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *options);
