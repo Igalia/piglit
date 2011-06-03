@@ -1048,8 +1048,8 @@ for filename in os.listdir('tests/glslparsertest/glsl2'):
 # end group glslparsertest ---------------------------------------------------
 
 hiz = Group()
-add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24')
-add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24')
+add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d0-s8')
+add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24-s0')
 add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24-s8')
 add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24s8')
 add_plain_test(hiz, 'hiz-depth-test-fbo-d24')
