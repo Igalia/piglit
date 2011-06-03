@@ -557,7 +557,7 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 	const float dx = piglit_width / 3.0;
 	const float dy = piglit_height / 3.0;
 
-	static const float *expected_colors = NULL;
+	static const float **expected_colors = NULL;
 
 	static const float *expected_colors_d1s0[9] = {
 		hiz_green,
