@@ -25,7 +25,7 @@
  */
 
 /**
- * \file hiz-depth-test-fbo-d24.c
+ * \file hiz-depth-test-fbo-d24-s0.c
  *
  * Checks that depth tests work correctly when rendering to a window FBO with
  * the following attachments:
