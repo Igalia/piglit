@@ -109,6 +109,34 @@ bool hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *options);
 bool hiz_run_test_depth_test_window();
 
 /**
+ * \brief Check that depth reads work correctly when rendering to an FBO.
+ *
+ * First, probe the color buffer to check that depth testing worked as
+ * expected. If it did not, then immediately report test failure and do not
+ * probe the depth buffer. If depth testing misbehaved, we cannot expect
+ * the depth buffer to hold the expected values.
+ *
+ * For this test, depth test is enabled and stencil test disabled.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ *
+ * \see hiz_run_test_depth_read_window()
+ */
+bool hiz_run_test_depth_read_fbo(const struct hiz_fbo_options *options);
+
+/**
+ * \brief Check that depth reads work correctly when rendering to the window
+ * framebuffer.
+ *
+ * \param options Perform the test with an FBO with the given formats.
+ * \return True if test passed.
+ *
+ * \see hiz_run_test_depth_read_fbo()
+ */
+bool hiz_run_test_depth_read_window();
+
+/**
  * \brief Check that stencil testing works correctly when rendering to an FBO.
  *
  * This test probes only the color buffer; it does not probe the stencil
