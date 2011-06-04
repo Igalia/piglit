@@ -211,21 +211,6 @@ hiz_run_test_depth_test_common()
 		hiz_blue
 	};
 
-	static const float expect_depth[9] = {
-		hiz_green_z,
-		hiz_green_z,
-		hiz_clear_z,
-
-		hiz_green_z,
-		hiz_green_z,
-		hiz_blue_z,
-
-		hiz_clear_z,
-		hiz_blue_z,
-		hiz_blue_z,
-	};
-
-	bool pass = true;
 	const float width_3 = piglit_width / 3.0;
 	const float height_3 = piglit_height / 3.0;
 
@@ -251,10 +236,7 @@ hiz_run_test_depth_test_common()
 	glClearDepth(1.0);
 	glDepthRange(0, 1);
 
-	pass &= hiz_probe_color_buffer(expect_color);
-	pass &= hiz_probe_depth_buffer(expect_depth);
-
-	return pass;
+	return hiz_probe_color_buffer(expect_color);
 }
 
 bool

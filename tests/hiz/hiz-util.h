@@ -88,6 +88,12 @@ void hiz_delete_fbo(GLuint fbo);
 
 /**
  * \brief Check that depth tests work correctly when rendering to an FBO.
+ *
+ * This test does not probe the depth buffer because correct operation of 1)
+ * depth testing and depth writes (via glDraw*) and of 2) depth buffer
+ * reads (via glRead*) are independent. It is possible for 1 to work while
+ * 2 to fail. This test covers only case 1.
+ *
  * \param options Perform the test with an FBO with the given formats.
  * \return True if test passed.
  */
