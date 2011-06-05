@@ -74,7 +74,7 @@ piglit_display(void)
 
 	glPointSize(point_size);
 	glBegin(GL_POINTS);
-	glVertex2f(point_size / 2, point_size / 2);
+	glVertex2f(point_size / 2.0, point_size / 2.0);
 	glEnd();
 
 	pass = pass && piglit_probe_pixel_rgb(0, 0, green);
