@@ -52,8 +52,6 @@ static void DoFrame(void)
 			glMultiTexCoord2f(GL_TEXTURE0+i, 0, 11);
 		glVertex2f(0, 1);
 	glEnd();
-
-	glutSwapBuffers();
 }
 
 static bool
@@ -61,8 +59,6 @@ DoTest(void)
 {
 	int x, y;
 	bool pass = true;
-
-	glReadBuffer(GL_FRONT);
 
 	for(x = 0; x < NumTextures; ++x) {
 		for(y = 0; y < 11; ++y) {
@@ -94,6 +90,8 @@ piglit_display(void)
 
 	DoFrame();
 	pass = DoTest();
+
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
