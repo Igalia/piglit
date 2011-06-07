@@ -59,12 +59,10 @@ static void DoFrame(void)
 static bool
 DoTest(void)
 {
-	GLfloat dmax;
 	int x, y;
 	bool pass = true;
 
 	glReadBuffer(GL_FRONT);
-	dmax = 0;
 
 	for(x = 0; x < NumTextures; ++x) {
 		for(y = 0; y < 11; ++y) {
