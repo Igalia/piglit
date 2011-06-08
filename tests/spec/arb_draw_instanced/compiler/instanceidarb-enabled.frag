@@ -1,7 +1,7 @@
 /* [config]
  * expect_result: fail
  * glsl_version: 1.10
- * require_extension: GL_ARB_draw_instanced
+ * require_extensions: GL_ARB_draw_instanced
  * [end config]
  *
  * From the GL_ARB_draw_instanced spec:
