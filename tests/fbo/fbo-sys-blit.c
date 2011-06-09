@@ -38,6 +38,7 @@ enum piglit_result piglit_display(void)
 	const float expected[] = {0.0f, 1.0f, 0.0f};
 	int w = piglit_width;
 	int h = piglit_height;
+	int ret;
 
 	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -50,10 +51,13 @@ enum piglit_result piglit_display(void)
 	glDrawBuffer(GL_BACK);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glFinish();
 
 	glReadBuffer(GL_FRONT);
-	return piglit_probe_pixel_rgb(w / 2, h / 2, expected) ? PIGLIT_PASS : PIGLIT_FAIL;
+
+	ret = piglit_probe_pixel_rgb(w / 2, h / 2, expected);
+
+	glFlush();
+	return ret ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void piglit_init(int argc, char **argv)
