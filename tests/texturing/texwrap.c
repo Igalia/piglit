@@ -364,6 +364,7 @@ static GLuint texture_id;
 static GLenum texture_target;
 static GLboolean texture_npot;
 static GLboolean texture_proj;
+static GLboolean test_border_color;
 static GLboolean texture_swizzle;
 static int texture_size;
 static struct format *texture_format;
@@ -589,6 +590,19 @@ static void update_swizzle()
     }
 }
 
+static GLboolean skip_test(GLenum mode, GLenum filter)
+{
+    if (mode == GL_CLAMP_TO_BORDER ||
+        mode == GL_MIRROR_CLAMP_TO_BORDER_EXT ||
+        (filter == GL_LINEAR &&
+         (mode == GL_CLAMP ||
+          mode == GL_MIRROR_CLAMP_EXT))) {
+        return !test_border_color;
+    }
+
+    return test_border_color;
+}
+
 static void draw()
 {
     unsigned i, j;
@@ -599,15 +613,12 @@ static void draw()
 
     /* Loop over min/mag filters. */
     for (i = 0; i < 2; i++) {
+        GLenum filter = i ? GL_LINEAR : GL_NEAREST;
+
         offset = 0;
 
-        if (i) {
-            glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        } else {
-            glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        }
+        glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, filter);
+        glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, filter);
 
         /* Loop over wrap modes. */
         for (j = 0; wrap_modes[j].mode != 0; j++) {
@@ -624,6 +635,14 @@ static void draw()
 
             if (!wrap_modes[j].supported)
                 continue;
+
+            if (skip_test(wrap_modes[j].mode, filter)) {
+                if (skip_test(wrap_modes[j].mode, GL_LINEAR) !=
+                    skip_test(wrap_modes[j].mode, GL_NEAREST)) {
+                    offset++;
+                }
+                continue;
+            }
 
             /* Projective texturing. */
             if (texture_proj) {
@@ -692,6 +711,11 @@ static void draw()
     if (!piglit_automatic) {
         for (i = 0; wrap_modes[i].mode != 0; i++) {
             if (wrap_modes[i].supported) {
+                if (skip_test(wrap_modes[i].mode, GL_LINEAR) &&
+                    skip_test(wrap_modes[i].mode, GL_NEAREST)) {
+                    continue;
+                }
+
                 glWindowPos2iARB(offset * (TILE_SIZE + TILE_SPACE) + 5,
                                  5 + ((offset & 1) * 15));
                 print_string(wrap_modes[i].name);
@@ -711,7 +735,7 @@ static GLboolean probe_pixels()
     glReadPixels(0, 0, piglit_width, piglit_height,
                  GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
-    // make slices different for 3D textures
+    /* make slices different for 3D textures */
 
     /* Loop over min/mag filters. */
     for (i = 0; i < 2; i++) {
@@ -760,6 +784,14 @@ static GLboolean probe_pixels()
 
             if (!wrap_modes[j].supported)
                 continue;
+
+            if (skip_test(wrap_modes[j].mode, filter)) {
+                if (skip_test(wrap_modes[j].mode, GL_LINEAR) !=
+                    skip_test(wrap_modes[j].mode, GL_NEAREST)) {
+                    offset++;
+                }
+                continue;
+            }
 
             printf("Testing %s%s%s%s: %s\n",
                    sfilter,
@@ -1369,6 +1401,11 @@ void piglit_init(int argc, char **argv)
         if (strcmp(argv[p], "proj") == 0) {
             texture_proj = 1;
             printf("Using projective mapping.\n");
+            continue;
+        }
+        if (strcmp(argv[p], "bordercolor") == 0) {
+            test_border_color = 1;
+            printf("Testing the border color only.\n");
             continue;
         }
 
