@@ -647,10 +647,8 @@ static void draw()
                             wrap_modes[j].mode);
             glTexParameteri(texture_target, GL_TEXTURE_WRAP_T,
                             wrap_modes[j].mode);
-            if (texture_target == GL_TEXTURE_3D) {
-                glTexParameteri(texture_target, GL_TEXTURE_WRAP_R,
-                                wrap_modes[j].mode);
-            }
+            glTexParameteri(texture_target, GL_TEXTURE_WRAP_R,
+                            wrap_modes[j].mode);
 
             glPushMatrix();
             glTranslatef(offset * (TILE_SIZE + TILE_SPACE) + 5,
