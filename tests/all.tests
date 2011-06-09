@@ -614,8 +614,6 @@ spec['!OpenGL 1.1'] = gl11
 add_texwrap_test1(gl11, '1D')
 add_texwrap_test2(gl11, '1D', 'proj')
 add_texwrap_test2(gl11, '2D', 'proj')
-add_texwrap_test2(gl11, '1D', 'border')
-add_texwrap_test2(gl11, '2D', 'border')
 add_texwrap_test2(gl11, '2D', 'GL_RGBA2')
 add_texwrap_test2(gl11, '2D', 'GL_R3_G3_B2')
 add_texwrap_test2(gl11, '2D', 'GL_RGB4')
@@ -653,19 +651,15 @@ gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_test1(gl12, '3D')
 add_texwrap_test2(gl12, '3D', 'proj')
-add_texwrap_test2(gl12, '3D', 'border')
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
 add_texwrap_test2(gl20, '1D', 'npot')
 add_texwrap_test3(gl20, '1D', 'npot', 'proj')
-add_texwrap_test3(gl20, '1D', 'npot', 'border')
 add_texwrap_test2(gl20, '2D', 'npot')
 add_texwrap_test3(gl20, '2D', 'npot', 'proj')
-add_texwrap_test3(gl20, '2D', 'npot', 'border')
 add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
-add_texwrap_test3(gl20, '3D', 'npot', 'border')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
