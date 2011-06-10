@@ -54,6 +54,7 @@ void piglit_init(int argc, char **argv)
 {
 	GLint frag;
 	GLint prog;
+	const char *fs_text_ptr = fs_text;
 
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
@@ -62,7 +63,9 @@ void piglit_init(int argc, char **argv)
 
 	/* Intentionally omit check for GL_ARB_shader_texture_lod. */
 
-	frag = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
+	frag = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(frag, 1, (const GLchar **) &fs_text_ptr, NULL);
+	glCompileShader(frag);
 
 	prog = glCreateProgram();
 	glAttachShader(prog, frag);
