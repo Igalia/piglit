@@ -74,7 +74,7 @@ piglit_init(int argc, char **argv)
 			no_bias = GL_TRUE;
 		else if (strcmp(argv[i], "-nolod") == 0)
 			no_lod = GL_TRUE;
-		else if (strcmp(argv[i], "-GL_ARB_shader_texture_lod"))
+		else if (strcmp(argv[i], "-GL_ARB_shader_texture_lod") == 0)
 			ARB_shader_texture_lod = GL_TRUE;
         }
 
@@ -92,6 +92,8 @@ piglit_init(int argc, char **argv)
 		loc_tex = piglit_GetUniformLocation(prog, "tex");
 		loc_lod = piglit_GetUniformLocation(prog, "lod");
 		piglit_Uniform1i(loc_tex, 0);
+
+		puts("Testing GL_ARB_shader_texture_lod.");
 	}
 
 	glGenTextures(1, &tex);
