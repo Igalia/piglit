@@ -870,6 +870,10 @@ add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_INTENSITY')
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGB')
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGBA')
 
+arb_vertex_buffer_object = Group()
+spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
+add_plain_test(arb_vertex_buffer_object, 'arb_vertex_buffer_object-elements-negative-offset')
+
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_test(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
