@@ -35,6 +35,16 @@ int piglit_width = 640;
 int piglit_height = 480;
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
+static void
+check_fbo_status()
+{
+	GLint status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		fprintf(stderr, "FBO incomplete (status = 0x%04x)\n", status);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
 enum piglit_result piglit_display(void)
 {
 	static const char *frag_src =
@@ -86,7 +96,9 @@ enum piglit_result piglit_display(void)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, db_tex, 0);
+	check_fbo_status();
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, cb_tex, 0);
+	check_fbo_status();
 
 	glViewport(0, 0, piglit_width, piglit_height);
 
@@ -106,6 +118,7 @@ enum piglit_result piglit_display(void)
 
 	/* Fill the depth buffer with a gradient. */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	check_fbo_status();
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 	glDisable(GL_TEXTURE_2D);
 
