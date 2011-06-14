@@ -40,8 +40,8 @@ check_fbo_status()
 {
 	GLint status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "FBO incomplete (status = 0x%04x)\n", status);
-		piglit_report_result(PIGLIT_FAIL);
+		printf("FBO incomplete (status = 0x%04x)\n", status);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 }
 
@@ -96,7 +96,6 @@ enum piglit_result piglit_display(void)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, db_tex, 0);
-	check_fbo_status();
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, cb_tex, 0);
 	check_fbo_status();
 
