@@ -13,6 +13,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
+add_executable (array-stride array-stride.c)
 add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
 add_executable (bgra-sec-color-pointer bgra-sec-color-pointer.c)
 add_executable (blendminmax blendminmax.c)

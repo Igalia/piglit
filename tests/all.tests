@@ -179,6 +179,7 @@ fbo['FBO blit to missing attachment'] = PlainExecTest(['fbo-missing-attachment-b
 fbo['FBO blit from missing attachment'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'from'])
 
 general = Group()
+add_plain_test(general, 'array-stride')
 add_plain_test(general, 'bgra-sec-color-pointer')
 add_plain_test(general, 'bgra-vert-attrib-pointer')
 add_plain_test(general, 'blendminmax')
