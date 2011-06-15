@@ -21,15 +21,11 @@
  * IN THE SOFTWARE.
  */
 
-/*
- * Author:
- *    Brian Paul
- */
-
 /**
- * @file longprimc.
+ * @file longprim.c
  *
  * Test primitive with many vertices.  Just don't crash.
+ * Brian Paul
  */
 
 #include "piglit-util.h"
