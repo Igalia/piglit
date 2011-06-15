@@ -177,7 +177,7 @@ static void TestInstance(struct testinstance* instance)
 	glEnd();
 
 	if (!piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, instance->expected)) {
-		fprintf(stderr, "Test %s, instance #%i failed\n", Filename, instance-Testcase.instances);
+		fprintf(stderr, "Test %s, instance #%li failed\n", Filename, (long)(instance-Testcase.instances));
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
