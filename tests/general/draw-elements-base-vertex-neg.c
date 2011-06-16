@@ -38,6 +38,8 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
+	piglit_require_extension("GL_ARB_draw_elements_base_vertex");
+
 	glShadeModel(GL_FLAT);
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 }
