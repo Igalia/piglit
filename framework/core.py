@@ -386,6 +386,7 @@ class TestrunResult:
 
 class Environment:
 	def __init__(self):
+		self.concurrent = True
 		self.execute = True
 		self.filter = []
 		self.exclude_filter = []
@@ -436,7 +437,7 @@ class Test:
 		    assigned to ``testrun.tests[path]``
 		'''
 		args = (env, path, json_writer)
-		if self.runConcurrent:
+		if self.runConcurrent and env.concurrent:
 			ConcurrentTestPool().put(self.__doRunWork, args=args)
 		else:
 			self.__doRunWork(*args)

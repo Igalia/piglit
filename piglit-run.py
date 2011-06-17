@@ -78,7 +78,8 @@ Options:
   -x regexp, --exclude-tests=regexp Excludey matching tests (can be used
                             more than once)
   -n name, --name=name      Name of the testrun
-
+  -c bool, --concurrent=bool  Enable/disable concurrent test runs. Valid
+			      option values are: 0, 1, on, off.  (default: on)
 Example:
   %(progName)s tests/all.tests results/all
          Run all tests, store the results in the directory results/all
@@ -97,7 +98,15 @@ def main():
 	env = core.Environment()
 
 	try:
-		options, args = getopt(sys.argv[1:], "hdt:n:x:", [ "help", "dry-run", "tests=", "name=", "exclude-tests=" ])
+		option_list = [
+			 "help",
+			 "dry-run",
+			 "tests=",
+			 "name=",
+			 "exclude-tests=",
+			 "concurrent=",
+			 ]
+		options, args = getopt(sys.argv[1:], "hdt:n:x:c:", option_list)
 	except GetoptError:
 		usage()
 
@@ -114,6 +123,13 @@ def main():
 			env.exclude_filter[:0] = [re.compile(value)]
 		elif name in ('-n', '--name'):
 			OptionName = value
+		elif name in ('-c, --concurrent'):
+			if value in ('1', 'on'):
+				env.concurrent = True
+			elif value in ('0', 'off'):
+				env.concurrent = False
+			else:
+				usage()
 
 	if len(args) != 2:
 		usage()
