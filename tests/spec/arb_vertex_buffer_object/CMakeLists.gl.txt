@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (arb_vertex_buffer_object-elements-negative-offset elements-negative-offset.c)
+add_executable (arb_vertex_buffer_object-mixed-immediate-and-vbo mixed-immediate-and-vbo.c)
 
 # vim: ft=cmake:
