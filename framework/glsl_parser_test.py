@@ -238,7 +238,7 @@ class GLSLParserTest(PlainExecTest):
 					indent = '.' * len(m.group('indent'))
 					empty = re.compile(r'\A\s*(|//|/\*|\*)\s*\n\Z')
 					internal = re.compile(r'\A{indent}(?P<content>.*\n)\Z'.format(indent=indent))
-					end = re.compile(r'\A{indent}\[end config\]\s*\n\Z'.format(indent=indent))
+					end = re.compile(r'\A{indent}\[end( |_)config\]\s*\n\Z'.format(indent=indent))
 			elif parse_state == PARSE_IN_CONFIG:
 				if start.match(line) is not None:
 					parse_state = PARSE_ERROR
