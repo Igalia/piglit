@@ -268,6 +268,12 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 				 GL_TEXTURE_BLUE_SIZE, &b_size);
 
 	if (d_size) {
+		if (level < 3)
+			piglit_set_tolerance_for_bits(8, 8, 8, 8);
+		else if (level < 6)
+			piglit_set_tolerance_for_bits(7, 7, 7, 7);
+		else
+			piglit_set_tolerance_for_bits(4, 4, 4, 4);
 		for (x1 = x; x1 < x + w; x1++) {
 			float val = (x1 - x + 0.5) / w;
 			float color[3] = {val, val, val};
@@ -352,9 +358,7 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 	if (a_size > 8)
 		a_size = 8;
 
-	if (d_size) {
-		piglit_set_tolerance_for_bits(8, 8, 8, 8);
-	} else if (i_size) {
+	if (i_size) {
 		piglit_set_tolerance_for_bits(i_size, i_size, i_size, i_size);
 	} else if (l_size) {
 		piglit_set_tolerance_for_bits(l_size, l_size, l_size, a_size);
