@@ -147,6 +147,11 @@ draw_mipmap(int x, int y, int level, GLenum basetype)
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 				 GL_TEXTURE_BLUE_SIZE, &b);
 
+	/* Don't expect unclamped values for float depth buffers. */
+	if (d && basetype == GL_FLOAT) {
+		basetype = GL_UNSIGNED_NORMALIZED;
+	}
+
 	glEnable(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
