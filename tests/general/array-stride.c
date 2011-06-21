@@ -78,9 +78,9 @@ draw_simple_stride(void)
       elements[i] = i;
 
    glVertexPointer(2, GL_FLOAT, 2 * sizeof(GLfloat), Verts);
-   glEnable(GL_VERTEX_ARRAY);
+   glEnableClientState(GL_VERTEX_ARRAY);
    glDrawElements(GL_QUADS, NUM_VERTS, GL_UNSIGNED_SHORT, elements);
-   glDisable(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -99,9 +99,9 @@ draw_unusual_stride(int stride)
       elements[i] = i * 8 / stride;
 
    glVertexPointer(2, GL_FLOAT, stride, Verts);
-   glEnable(GL_VERTEX_ARRAY);
+   glEnableClientState(GL_VERTEX_ARRAY);
    glDrawElements(GL_QUADS, NUM_VERTS, GL_UNSIGNED_SHORT, elements);
-   glDisable(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
