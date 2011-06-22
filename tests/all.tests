@@ -363,6 +363,7 @@ shaders['glsl-fs-texturecube-2'] = PlainExecTest(['glsl-fs-texturecube-2',
 						 '-auto'])
 shaders['glsl-fs-texturecube-2-bias'] = PlainExecTest(['glsl-fs-texturecube-2',
 						      '-auto', '-bias'])
+add_plain_test(shaders, 'glsl-fs-textureenvcolor-statechange')
 shaders['glsl-fs-texture2drect'] = PlainExecTest(['glsl-fs-texture2drect',
 					       '-auto'])
 shaders['glsl-fs-texture2drect-proj3'] = PlainExecTest(['glsl-fs-texture2drect',
