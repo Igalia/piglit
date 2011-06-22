@@ -35,8 +35,6 @@ piglit_init(int argc, char **argv)
 {
 	(void) argc;
 	(void) argv;
-
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
 
 enum piglit_result
@@ -47,6 +45,8 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	static float red[] = {1.0, 0.0, 0,0, 0.0};
 	static float black[] = {0.0, 0.0, 0,0, 0.0};
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glClearStencil(0);
 	glClearDepth(1.0);
