@@ -30,7 +30,6 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	if (!GLEW_VERSION_1_4) {
 		printf("Requires OpenGL 1.4.\n");
 		piglit_report_result(PIGLIT_SKIP);
@@ -97,6 +96,8 @@ piglit_display(void)
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 	};
 	int i, j;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	printf("From bottom to top:\n");
 
