@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE (CheckCCompilerFlag)
+INCLUDE (CheckCXXCompilerFlag)
 INCLUDE (CheckFunctionExists)
 INCLUDE (CheckIncludeFile)
 
@@ -17,11 +18,16 @@ if (NOT MSVC)
 	IF (C_COMPILER_FLAG_WALL)
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 	ENDIF (C_COMPILER_FLAG_WALL)
+	CHECK_CXX_COMPILER_FLAG("-Wall" CXX_COMPILER_FLAG_WALL)
+	IF (CXX_COMPILER_FLAG_WALL)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	ENDIF (CXX_COMPILER_FLAG_WALL)
 else (NOT MSVC)
 	# -Wall or (/Wall) is actually supported by MSVC and would be detected
 	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
 	# thousand of warnings when including windows.h.
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W4")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W4")
 endif (NOT MSVC)
 
 if (WIN32)
