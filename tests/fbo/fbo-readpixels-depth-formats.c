@@ -44,9 +44,9 @@ int depth_bits;
 static bool
 test_float(int x, int y, void *values)
 {
-	float value = ((float *)values)[y * BUF_WIDTH + x];
-	float expected;
-	float limit;
+	GLfloat value = ((GLfloat *)values)[y * BUF_WIDTH + x];
+	GLfloat expected;
+	GLfloat limit;
 
 	if (x < w)
 		expected = 0.0;
@@ -75,9 +75,9 @@ test_float(int x, int y, void *values)
 static bool
 test_unsigned_int(int x, int y, void *values)
 {
-	uint32_t value = ((uint32_t *)values)[y * BUF_WIDTH + x];
-	uint32_t expected;
-	uint32_t high_bits, low_bits;
+	GLuint value = ((GLuint *)values)[y * BUF_WIDTH + x];
+	GLuint expected;
+	GLuint high_bits, low_bits;
 
 	if (x < w)
 		expected = 0x0;
@@ -92,7 +92,7 @@ test_unsigned_int(int x, int y, void *values)
 	expected &= high_bits;
 	expected |= expected >> depth_bits;
 
-	if ((int32_t)(value - expected) > 1 << (32 - depth_bits)) {
+	if ((GLint)(value - expected) > 1 << (32 - depth_bits)) {
 		fprintf(stderr,
 			"    GL_UNSIGNED_INT: "
 			"Expected 0x%08x at (%d,%d), found 0x%08x\n",
@@ -106,8 +106,8 @@ test_unsigned_int(int x, int y, void *values)
 static bool
 test_unsigned_short(int x, int y, void *values)
 {
-	uint16_t value = ((uint16_t *)values)[y * BUF_WIDTH + x];
-	uint16_t expected;
+	GLushort value = ((GLushort *)values)[y * BUF_WIDTH + x];
+	GLushort expected;
 
 	if (x < w)
 		expected = 0x0000;
@@ -116,7 +116,7 @@ test_unsigned_short(int x, int y, void *values)
 	else
 		expected = 0xffff;
 
-	if ((int16_t)(value - expected) > 1) {
+	if ((GLshort)(value - expected) > 1) {
 		fprintf(stderr,
 			"    GL_UNSIGNED_SHORT: "
 			"Expected 0x%04x at (%d,%d), found 0x%04x\n",
@@ -130,8 +130,8 @@ test_unsigned_short(int x, int y, void *values)
 static bool
 test_unsigned_byte(int x, int y, void *values)
 {
-	uint8_t value = ((uint8_t *)values)[y * BUF_WIDTH + x];
-	uint8_t expected;
+	GLubyte value = ((GLubyte *)values)[y * BUF_WIDTH + x];
+	GLubyte expected;
 
 	if (x < w)
 		expected = 0x00;
@@ -140,7 +140,7 @@ test_unsigned_byte(int x, int y, void *values)
 	else
 		expected = 0xff;
 
-	if ((int8_t)(value - expected) > 1) {
+	if ((GLbyte)(value - expected) > 1) {
 		fprintf(stderr,
 			"    GL_UNSIGNED_BYTE: "
 			"Expected 0x%02x at (%d,%d), found 0x%02x\n",
@@ -169,9 +169,9 @@ test_with_format(GLenum internal_format, const char *name)
 	GLenum status;
 	bool pass = true;
 	/* Storage for the values read.  The largest type is
-	 * uint32_t-sized, so this will be big enough for all types.
+	 * GLuint-sized, so this will be big enough for all types.
 	 */
-	uint32_t values[BUF_WIDTH * BUF_HEIGHT];
+	GLuint values[BUF_WIDTH * BUF_HEIGHT];
 	int i;
 
 	printf("testing %s:\n", name);
