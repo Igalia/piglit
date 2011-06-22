@@ -12,10 +12,17 @@ find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
 
-CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
-IF (C_COMPILER_FLAG_WALL)
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-ENDIF (C_COMPILER_FLAG_WALL)
+if (NOT MSVC)
+	CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
+	IF (C_COMPILER_FLAG_WALL)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+	ENDIF (C_COMPILER_FLAG_WALL)
+else (NOT MSVC)
+	# -Wall or (/Wall) is actually supported by MSVC and would be detected
+	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
+	# thousand of warnings when including windows.h.
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W4")
+endif (NOT MSVC)
 
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
