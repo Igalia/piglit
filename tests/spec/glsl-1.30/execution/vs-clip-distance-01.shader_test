@@ -1,0 +1,52 @@
+# [description]
+# Use all 6 gl_ClipDistance values to clip a rectangle to a hexagon shape.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	gl_ClipDistance[0] = gl_Vertex.y - 0.25;
+	gl_ClipDistance[1] = gl_Vertex.y - gl_Vertex.x + 0.4;
+	gl_ClipDistance[2] = 1.4 - gl_Vertex.x - gl_Vertex.y;
+	gl_ClipDistance[3] = 0.75 - gl_Vertex.y;
+	gl_ClipDistance[4] = gl_Vertex.x - gl_Vertex.y + 0.4;
+	gl_ClipDistance[5] = gl_Vertex.x + gl_Vertex.y - 0.6;
+}
+
+[fragment shader]
+#version 130
+void main(void)
+{
+	gl_FragColor = vec4(1, 1, 1, 1);
+}
+
+[test]
+ortho 0 1 0 1
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+draw rect 0.1 0.1 0.8 0.8
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.8) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0)
