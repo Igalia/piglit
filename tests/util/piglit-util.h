@@ -147,6 +147,9 @@ void piglit_escape_exit_key(unsigned char key, int x, int y);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
 
+void piglit_gen_ortho_projection(double left, double right, double bottom,
+				 double top, double near_val, double far_val,
+				 GLboolean push);
 void piglit_ortho_projection(int w, int h, GLboolean push);
 
 GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,

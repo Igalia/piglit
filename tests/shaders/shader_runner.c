@@ -886,6 +886,10 @@ piglit_display(void)
 			do_enable_disable(line + 7, false);
 		} else if (string_match("enable", line)) {
 			do_enable_disable(line + 6, true);
+		} else if (sscanf(line, "ortho %f %f %f %f",
+				  c + 0, c + 1, c + 2, c + 3) == 4) {
+			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
+						    -1, 1, GL_FALSE);
 		} else if (string_match("ortho", line)) {
 			piglit_ortho_projection(piglit_width, piglit_height,
 						GL_FALSE);
