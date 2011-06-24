@@ -766,6 +766,41 @@ set_uniform(const char *line)
 	return;
 }
 
+struct enable_table {
+	const char *name;
+	GLenum value;
+} enable_table[] = {
+	{ "GL_CLIP_PLANE0", GL_CLIP_PLANE0 },
+	{ "GL_CLIP_PLANE1", GL_CLIP_PLANE1 },
+	{ "GL_CLIP_PLANE2", GL_CLIP_PLANE2 },
+	{ "GL_CLIP_PLANE3", GL_CLIP_PLANE3 },
+	{ "GL_CLIP_PLANE4", GL_CLIP_PLANE4 },
+	{ "GL_CLIP_PLANE5", GL_CLIP_PLANE5 },
+	{ NULL, 0 }
+};
+
+void
+do_enable_disable(const char *line, bool enable_flag)
+{
+	char name[512];
+	int i;
+
+	strcpy_to_space(name, eat_whitespace(line));
+	for (i = 0; enable_table[i].name; ++i) {
+		if (0 == strcmp(name, enable_table[i].name)) {
+			if (enable_flag) {
+				glEnable(enable_table[i].value);
+			} else {
+				glDisable(enable_table[i].value);
+			}
+			return;
+		}
+	}
+
+	printf("unknown enable/disable enum \"%s\"", name);
+	piglit_report_result(PIGLIT_FAIL);
+}
+
 static GLboolean
 string_match(const char *string, const char *line)
 {
@@ -818,6 +853,7 @@ piglit_display(void)
 	line = test_start;
 	while (line[0] != '\0') {
 		float c[32];
+		double d[4];
 		int x, y, w, h, tex, level;
 
 		line = eat_whitespace(line);
@@ -828,6 +864,14 @@ piglit_display(void)
 			clear_bits |= GL_COLOR_BUFFER_BIT;
 		} else if (string_match("clear", line)) {
 			glClear(clear_bits);
+		} else if (sscanf(line,
+				  "clip plane %d %lf %lf %lf %lf",
+				  &x, &d[0], &d[1], &d[2], &d[3])) {
+			if (x < 0 || x >= GL_MAX_CLIP_PLANES) {
+				printf("clip plane id %d out of range", x);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			glClipPlane(GL_CLIP_PLANE0 + x, d);
 		} else if (string_match("draw rect", line)) {
 			get_floats(line + 9, c, 4);
 			piglit_draw_rect(c[0], c[1], c[2], c[3]);
@@ -838,6 +882,10 @@ piglit_display(void)
 			       &primcount,
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
+		} else if (string_match("disable", line)) {
+			do_enable_disable(line + 7, false);
+		} else if (string_match("enable", line)) {
+			do_enable_disable(line + 6, true);
 		} else if (string_match("ortho", line)) {
 			piglit_ortho_projection(piglit_width, piglit_height,
 						GL_FALSE);
