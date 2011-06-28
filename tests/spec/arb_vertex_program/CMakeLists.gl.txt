@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (arb_vertex_program-getenv4d-with-error getenv4d-with-error.c)
+add_executable (arb_vertex_program-getlocal4d-with-error getlocal4d-with-error.c)
 
 # vim: ft=cmake:
