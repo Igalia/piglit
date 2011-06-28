@@ -88,7 +88,7 @@ piglit_init(int argc, char **argv)
 	/* Don't try to render if the program failed to link, and linking
 	 * had better succeed!
 	 */
-	if (!piglit_link_check_status(prog))
+	if (!prog)
 		piglit_report_result(PIGLIT_FAIL);
 
 	printf("\"Probe at (.., ..)\" returning mismatched results is "
