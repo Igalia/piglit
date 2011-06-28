@@ -892,6 +892,10 @@ spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
 arb_vertex_buffer_object['elements-negative-offset'] = PlainExecTest(['arb_vertex_buffer_object-elements-negative-offset', '-auto'])
 arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PlainExecTest(['arb_vertex_buffer_object-mixed-immediate-and-vbo', '-auto'])
 
+arb_vertex_program = Group()
+spec['ARB_vertex_program'] = arb_vertex_program
+arb_vertex_program['getenv4d-with-error'] = PlainExecTest(['arb_vertex_program-getenv4d-with-error', '-auto'])
+
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
