@@ -46,22 +46,21 @@ int test = CLEAR;
 
 struct format {
 	const char *name;
-	GLuint iformat, format;
+	GLuint iformat;
 	const char *extension;
 } formats[] = {
-	{F(GL_STENCIL_INDEX1),    GL_STENCIL_INDEX, NULL},
-	{F(GL_STENCIL_INDEX4),    GL_STENCIL_INDEX, NULL},
-	{F(GL_STENCIL_INDEX8),    GL_STENCIL_INDEX, NULL},
-	{F(GL_STENCIL_INDEX16),   GL_STENCIL_INDEX, NULL},
+	{F(GL_STENCIL_INDEX1),    NULL},
+	{F(GL_STENCIL_INDEX4),    NULL},
+	{F(GL_STENCIL_INDEX8),    NULL},
+	{F(GL_STENCIL_INDEX16),   NULL},
 
-	{F(GL_DEPTH24_STENCIL8),  GL_DEPTH_STENCIL,
-	 "GL_EXT_packed_depth_stencil"},
+	{F(GL_DEPTH24_STENCIL8),  "GL_EXT_packed_depth_stencil"},
 
-	{F(GL_DEPTH32F_STENCIL8), GL_DEPTH_STENCIL,
-	 "GL_ARB_depth_buffer_float"}
+	{F(GL_DEPTH32F_STENCIL8), "GL_ARB_depth_buffer_float"}
 };
 
 struct format f;
+GLuint mask;
 
 static enum piglit_result test_clear(void)
 {
@@ -87,11 +86,11 @@ static enum piglit_result test_clear(void)
 		piglit_report_result(PIGLIT_FAIL); /* RGBA8 must succeed. */
 	}
 
-	glClearStencil(0x34);
+	glClearStencil(0x3456);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_EQUAL, 0x34, ~0);
+	glStencilFunc(GL_EQUAL, 0x3456 & mask, ~0);
 
 	glColor3fv(green);
 	piglit_draw_rect(-1, -1, 2, 2);
@@ -116,21 +115,21 @@ static enum piglit_result test_clear(void)
 static enum piglit_result compare_stencil(void)
 {
 	int x, y, failures = 0;
-	GLubyte stencil[BUF_SIZE*BUF_SIZE];
-	GLubyte expected;
+	GLushort stencil[BUF_SIZE*BUF_SIZE];
+	GLushort expected;
 
 	/* Read stencil. */
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glReadPixels(0, 0, BUF_SIZE, BUF_SIZE, GL_STENCIL_INDEX,
-		     GL_UNSIGNED_BYTE, stencil);
+		     GL_UNSIGNED_SHORT, stencil);
 
 	/* Compare results. */
 	for (y = 0; y < BUF_SIZE; y++) {
 		for (x = 0; x < BUF_SIZE; x++) {
 			if (y < BUF_SIZE/2)
-				expected = x < BUF_SIZE/2 ? 0x33 : 0x66;
+				expected = (x < BUF_SIZE/2 ? 0x3333 : 0x6666) & mask;
 			else
-				expected = x < BUF_SIZE/2 ? 0x99 : 0xbb;
+				expected = (x < BUF_SIZE/2 ? 0x9999 : 0xbbbb) & mask;
 
 			if (stencil[y*BUF_SIZE+x] != expected) {
 				failures++;
@@ -152,23 +151,23 @@ static enum piglit_result compare_stencil(void)
 static enum piglit_result test_readpixels(void)
 {
 	/* Clear stencil to 0xfe. */
-	glClearStencil(0xfe);
+	glClearStencil(0xfefe);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	/* Initialize stencil. */
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-	glStencilFunc(GL_ALWAYS, 0x33, ~0);
+	glStencilFunc(GL_ALWAYS, 0x3333 & mask, ~0);
 	piglit_draw_rect(-1, -1, 1, 1);
 
-	glStencilFunc(GL_ALWAYS, 0x66, ~0);
+	glStencilFunc(GL_ALWAYS, 0x6666 & mask, ~0);
 	piglit_draw_rect(0, -1, 1, 1);
 
-	glStencilFunc(GL_ALWAYS, 0x99, ~0);
+	glStencilFunc(GL_ALWAYS, 0x9999 & mask, ~0);
 	piglit_draw_rect(-1, 0, 1, 1);
 
-	glStencilFunc(GL_ALWAYS, 0xbb, ~0);
+	glStencilFunc(GL_ALWAYS, 0xbbbb & mask, ~0);
 	piglit_draw_rect(0, 0, 1, 1);
 
 	glDisable(GL_STENCIL_TEST);
@@ -179,24 +178,24 @@ static enum piglit_result test_readpixels(void)
 static enum piglit_result test_drawpixels(void)
 {
 	int x, y;
-	GLubyte drawbuf[BUF_SIZE*BUF_SIZE];
+	GLushort drawbuf[BUF_SIZE*BUF_SIZE];
 
 	for (y = 0; y < BUF_SIZE; y++) {
 		for (x = 0; x < BUF_SIZE; x++) {
 			if (y < BUF_SIZE/2)
-				drawbuf[y*BUF_SIZE+x] = x < BUF_SIZE/2 ? ~0x33 : ~0x66;
+				drawbuf[y*BUF_SIZE+x] = (x < BUF_SIZE/2 ? ~0x3333 : ~0x6666) & mask;
 			else
-				drawbuf[y*BUF_SIZE+x] = x < BUF_SIZE/2 ? ~0x99 : ~0xbb;
+				drawbuf[y*BUF_SIZE+x] = (x < BUF_SIZE/2 ? ~0x9999 : ~0xbbbb) & mask;
 		}
 	}
 
 	/* Clear stencil to 0xfe. */
-	glClearStencil(0xfe);
+	glClearStencil(0xfefe);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	/* Draw pixels. */
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glDrawPixels(BUF_SIZE, BUF_SIZE, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, drawbuf);
+	glDrawPixels(BUF_SIZE, BUF_SIZE, GL_STENCIL_INDEX, GL_UNSIGNED_SHORT, drawbuf);
 
 	/* Invert bits. */
 	glEnable(GL_STENCIL_TEST);
@@ -210,26 +209,26 @@ static enum piglit_result test_drawpixels(void)
 static enum piglit_result test_copypixels(void)
 {
 	/* Clear stencil to 0xfe. */
-	glClearStencil(0xfe);
+	glClearStencil(0xfefe);
 	glClear(GL_STENCIL_BUFFER_BIT);
 
 	/* Initialize stencil. */
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-	/* Set the upper-right corner to 0x33 and copy the content the lower-left one. */
-	glStencilFunc(GL_ALWAYS, 0x33, ~0);
+	/* Set the upper-right corner to 0x3333 and copy the content the lower-left one. */
+	glStencilFunc(GL_ALWAYS, 0x3333 & mask, ~0);
 	piglit_draw_rect(0, 0, 1, 1);
 	glCopyPixels(BUF_SIZE/2, BUF_SIZE/2, BUF_SIZE/2, BUF_SIZE/2, GL_STENCIL);
 
 	/* Initialize the other corners. */
-	glStencilFunc(GL_ALWAYS, 0x66, ~0);
+	glStencilFunc(GL_ALWAYS, 0x6666 & mask, ~0);
 	piglit_draw_rect(0, -1, 1, 1);
 
-	glStencilFunc(GL_ALWAYS, 0x99, ~0);
+	glStencilFunc(GL_ALWAYS, 0x9999 & mask, ~0);
 	piglit_draw_rect(-1, 0, 1, 1);
 
-	glStencilFunc(GL_ALWAYS, 0xbb, ~0);
+	glStencilFunc(GL_ALWAYS, 0xbbbb & mask, ~0);
 	piglit_draw_rect(0, 0, 1, 1);
 
 	glDisable(GL_STENCIL_TEST);
@@ -241,6 +240,7 @@ enum piglit_result piglit_display(void)
 {
 	enum piglit_result res;
 	GLuint fb, rb;
+	GLint stencil_size;
 	GLenum status;
 
 	glMatrixMode(GL_PROJECTION);
@@ -255,6 +255,7 @@ enum piglit_result piglit_display(void)
 	glGenRenderbuffersEXT(1, &rb);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, f.iformat, BUF_SIZE, BUF_SIZE);
+	glGetRenderbufferParameterivEXT(GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_STENCIL_SIZE_EXT, &stencil_size);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
 	glGenFramebuffersEXT(1, &fb);
@@ -269,6 +270,8 @@ enum piglit_result piglit_display(void)
 		printf("FBO incomplete status 0x%X\n", status);
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	mask = (1 << stencil_size) - 1;
 
 	switch (test) {
 	case CLEAR:
