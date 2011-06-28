@@ -238,7 +238,7 @@ test_with_format(GLenum internal_format, const char *name)
 
 done:
 	glDeleteFramebuffersEXT(1, &fb);
-	glDeleteRenderbuffers(1, &rb);
+	glDeleteRenderbuffersEXT(1, &rb);
 	return pass;
 }
 
