@@ -159,6 +159,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+   piglit_require_GLSL();
    piglit_require_extension("GL_ARB_instanced_arrays");
 
    /* Workaround a GLEW bug: */
