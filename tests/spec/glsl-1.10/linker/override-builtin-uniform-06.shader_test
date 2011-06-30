@@ -1,0 +1,33 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
+
+[fragment shader]
+/* From page 38 (page 44 of the PDF) of the GLSL 1.10 spec:
+ *
+ *     "A shader can redefine built-in functions. If a built-in function is
+ *     redeclared in a shader (i.e. a prototype is visible) before a call to
+ *     it, then the linker will only attempt to resolve that call within the
+ *     set shaders that are linked with it."
+ */
+uniform vec4 v;
+
+void main()
+{
+  gl_FragColor = abs(v);
+}
+
+vec4 abs(vec4 unused);
+
+[fragment shader]
+vec4 abs(vec4 unused)
+{
+  return vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform vec4 v 0.0 -1.0 0.0 1.0
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
