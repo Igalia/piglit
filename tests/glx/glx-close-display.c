@@ -61,7 +61,7 @@ isDirectRendering(void)
 	}
 
 	configs = glXChooseFBConfig(dpy, 0, attribList, &nitems);
-	if (dpy == NULL) {
+	if (configs == NULL) {
 		fprintf(stderr, "couldn't find a matching framebuffer configuration\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
