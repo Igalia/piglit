@@ -76,7 +76,7 @@ test()
 	glBindFramebufferEXT(GL_FRAMEBUFFER, fb);
 	assert(glGetError() == 0);
 
-	glGenTexturesEXT(1, &tex);
+	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8,
 		     BUF_WIDTH, BUF_HEIGHT, 0,
