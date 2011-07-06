@@ -126,6 +126,16 @@ static enum piglit_result compare_stencil(void)
 	/* Compare results. */
 	for (y = 0; y < BUF_SIZE; y++) {
 		for (x = 0; x < BUF_SIZE; x++) {
+
+			/* Skip the middle row and column of pixels because
+			 * drawing polygons for the left/right and bottom/top
+			 * quadrants may hit the middle pixels differently
+			 * depending on minor transformation and rasterization
+			 * differences.
+			 */
+			if (x == BUF_SIZE / 2 || y == BUF_SIZE / 2)
+				continue;
+
 			if (y < BUF_SIZE/2)
 				expected = (x < BUF_SIZE/2 ? 0x3333 : 0x6666) & mask;
 			else
@@ -134,7 +144,7 @@ static enum piglit_result compare_stencil(void)
 			if (stencil[y*BUF_SIZE+x] != expected) {
 				failures++;
 				if (failures < 20) {
-					printf("Stencil at %i,%i   Expected: %02x   Observed: %02x\n",
+					printf("Stencil at %i,%i   Expected: 0x%02x   Observed: 0x%02x\n",
 						x, y, expected, stencil[y*BUF_SIZE+x]);
 				} else if (failures == 20) {
 					printf("...\n");
@@ -219,7 +229,7 @@ static enum piglit_result test_copypixels(void)
 	/* Set the upper-right corner to 0x3333 and copy the content the lower-left one. */
 	glStencilFunc(GL_ALWAYS, 0x3333 & mask, ~0);
 	piglit_draw_rect(0, 0, 1, 1);
-	glCopyPixels(BUF_SIZE/2, BUF_SIZE/2, BUF_SIZE/2, BUF_SIZE/2, GL_STENCIL);
+	glCopyPixels(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE/2, BUF_SIZE/2, GL_STENCIL);
 
 	/* Initialize the other corners. */
 	glStencilFunc(GL_ALWAYS, 0x6666 & mask, ~0);
