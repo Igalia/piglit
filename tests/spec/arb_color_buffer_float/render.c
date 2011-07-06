@@ -168,7 +168,7 @@ GLboolean test()
 		if (blend == 2 && !logicop)
 		{
 			if (fixed_snorm)
-				expected = clamped ? clamped_pixels_mul_2_signed_clamped : signed_clamped_pixels_mul_2_signed_clamped;
+				expected = clamped ? clamped_pixels : signed_clamped_pixels;
 			else if (fixed)
 				expected = clamped_pixels;
 			else
