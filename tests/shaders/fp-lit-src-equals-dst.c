@@ -75,44 +75,31 @@ static void DoFrame(void)
 	glutSwapBuffers();
 }
 
-static int DoTest( void )
+static bool
+DoTest(void)
 {
 	int mask;
-	GLfloat dmax;
+ 	bool pass = true;
 
 	glReadBuffer( GL_FRONT );
-	dmax = 0;
 
 	for(mask = 1; mask < 16; ++mask) {
-		GLfloat probe[4];
-		GLfloat delta[4];
+		float expected[4];
 		int i;
-
-		glReadPixels(piglit_width * (2*(mask%4)+1)/8,
-			     piglit_height * (2*(mask/4)+1)/8, 1, 1,
-				GL_RGBA, GL_FLOAT, probe);
-
-		printf("Probe %i: %f,%f,%f,%f\n", mask, probe[0], probe[1], probe[2], probe[3]);
 
 		for(i = 0; i < 4; ++i) {
 			if (mask & (1 << i))
-				delta[i] = probe[i] - LitExpected[i];
+				expected[i] = LitExpected[i];
 			else
-				delta[i] = probe[i] - 0.8;
-
-			if (delta[i] > dmax) dmax = delta[i];
-			else if (-delta[i] > dmax) dmax = -delta[i];
+				expected[i] = 0.8;
 		}
 
-		printf("   Delta: %f,%f,%f,%f\n", delta[0], delta[1], delta[2], delta[3]);
+		pass = piglit_probe_pixel_rgba(piglit_width * (2*(mask%4)+1)/8,
+					       piglit_height * (2*(mask/4)+1)/8,
+					       expected) && pass;
 	}
 
-	printf("Max delta: %f\n", dmax);
-
-	if (dmax >= 0.02)
-		return 0;
-	else
-		return 1;
+	return pass;
 }
 
 enum piglit_result
