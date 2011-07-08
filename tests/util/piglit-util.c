@@ -158,6 +158,24 @@ void piglit_require_not_extension(const char *name)
 	}
 }
 
+const char* piglit_get_gl_error_name(GLenum error)
+{
+#define CASE(x) case x: return #x; 
+    switch (error) {
+    CASE(GL_INVALID_ENUM)
+    CASE(GL_INVALID_FRAMEBUFFER_OPERATION)
+    CASE(GL_INVALID_OPERATION)
+    CASE(GL_INVALID_VALUE)
+    CASE(GL_NO_ERROR)
+    CASE(GL_OUT_OF_MEMORY)
+    CASE(GL_STACK_OVERFLOW)
+    CASE(GL_STACK_UNDERFLOW)
+    default:
+        return "(unrecognized error)";
+    }
+#undef CASE
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's

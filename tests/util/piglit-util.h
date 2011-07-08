@@ -115,6 +115,17 @@ void piglit_get_glsl_version(bool *es, int* major, int* minor);
  */
 bool piglit_is_extension_supported(const char *name);
 
+/**
+ * \brief Convert a GL error to a string.
+ *
+ * For example, given GL_INVALID_ENUM, return "GL_INVALID_ENUM".
+ *
+ * Return "(unrecognized error)" if the enum is not recognized.
+ *
+ * \todo Create a more general function that stringifies any GLenum.
+ */
+const char* piglit_get_gl_error_name(GLenum error);
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
