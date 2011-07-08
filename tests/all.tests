@@ -761,6 +761,30 @@ add_shader_test_dir(spec['glsl-1.20']['execution'],
 		    os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
 		    recursive=True)
 
+def add_recursion_test(group, name):
+	# When the recursion tests fail it is usually because the GLSL
+	# compiler tries to recursively inline the function until the process
+	# runs out of stack or the system runs out of memory.  Run the test
+	# with a low rlimit to (hopefully) avoid having the test adversely
+	# affect the rest of the system.  This is especially important since
+	# there may be other tests running in parallel.
+	#
+	# This may cause false negatives on systems that map the framebuffer
+	# into the processes address space.  This happens on X with DRI1 based
+	# drivers, for example.
+	group[name] = PlainExecTest(['recursion', '-auto', '-rlimit', '268435456', name])
+
+rec = Group()
+spec['glsl-1.20']['recursion'] = rec
+add_recursion_test(rec, 'simple')
+add_recursion_test(rec, 'unreachable')
+add_recursion_test(rec, 'unreachable-constant-folding')
+add_recursion_test(rec, 'indirect')
+add_recursion_test(rec, 'indirect-separate')
+add_recursion_test(rec, 'indirect-complex')
+add_recursion_test(rec, 'indirect-complex-separate')
+
+
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
