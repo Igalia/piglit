@@ -176,6 +176,35 @@ const char* piglit_get_gl_error_name(GLenum error)
 #undef CASE
 }
 
+void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
+{
+	GLenum actual_error;
+	const char *expected_name;
+	const char *actual_name;
+
+	actual_error = glGetError();
+	if (actual_error == expected_error) {
+		return;
+	}
+
+	/*
+	 * If the lookup of the error's name is successful, then print
+	 *     Unexpected GL error: NAME 0xHEX
+	 * Else, print
+	 *     Unexpected GL error: 0xHEX
+	 */
+	printf("Unexpected GL error: %s 0x%x\n",
+               piglit_get_gl_error_name(actual_error), actual_error);
+
+	/* Print the expected error, but only if an error was really expected. */
+	if (expected_error != GL_NO_ERROR) {
+		printf("Expected GL error: %x 0x%x\n",
+		piglit_get_gl_error_name(expected_error), expected_error);
+        }
+
+	piglit_report_result(result);
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's

@@ -126,6 +126,14 @@ bool piglit_is_extension_supported(const char *name);
  */
 const char* piglit_get_gl_error_name(GLenum error);
 
+/**
+ * \brief Check for unexpected GL errors and possibly terminate the test.
+ *
+ * If glGetError() returns an error other than \c expected_error, then
+ * print a diagnostic and terminate the test with the given \c result.
+ */
+void piglit_check_gl_error(GLenum expected_error, enum piglit_result result);
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_extension(const char *name);
