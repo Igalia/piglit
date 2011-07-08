@@ -1,13 +1,39 @@
 #!/usr/bin/env python
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# This permission notice shall be included in all copies or
+# substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+# KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+# WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHOR(S) BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+# AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
+# OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
 
-from glob import glob
-from os import path
-from framework.core import testBinDir
+import os
 import re
 
-# All tests here are registered into the 'gtf' group.
-gtf = Group()
-profile.tests['gtf'] = gtf
+from glob import glob
+from framework.core import testBinDir
+
+#############################################################################
+##### GTFTest: Execute a sub-test of the Khronos ES 2.0 Conformance suite.
+#####
+##### To use this, create a 'GTF' symlink in piglit/bin which points to the
+##### Khronos 'GTF' executable.  Piglit will automatically add all .test
+##### files into the 'gtf' category.
+#############################################################################
 
 # Chase the piglit/bin/GTF symlink to find where the tests really live.
 gtfroot = path.dirname(path.realpath(path.join(testBinDir, 'GTF')))
@@ -57,10 +83,32 @@ class GTFTest(PlainExecTest):
 
         return results
 
-def add_gtf(testpath, name):
-    if name != 'example':
-        gtf[name] = GTFTest(['GTF', '-noimagefileio', '-id=7', '-run=' + testpath])
+# Populate a group with tests in the given directory:
+#
+# - Add new subgroups for subdirectories and recurse.
+# - Add any .test files to the group.
+def populateTests(group, directory):
+    for entry in os.listdir(directory):
+        pathname = path.join(directory, entry)
 
-# Find all the .test files and add them to the list.
-for test in glob(gtfroot + '/GL*/**/*.test'):
-    add_gtf(test, path.basename(test)[:-5])
+        if path.isdir(pathname):
+            # Recurse into the subdirectory...
+            subgroup = Group()
+            populateTests(subgroup, pathname)
+            group[entry] = subgroup
+
+        elif entry[-5:] == '.test':
+            name = entry[:-5]
+            # Don't add example.test...it's not a real test.
+            if name != 'example':
+                group[name] = GTFTest(['GTF', '-noimagefileio', '-id=7', '-run=' + pathname])
+
+# Create a new top-level 'gtf' category for all Khronos ES 2.0 tests
+gtf = Group()
+profile.tests['gtf'] = gtf
+
+# Populate the group with all the .test files
+for directory in glob(gtfroot + '/GL*'):
+    category = path.basename(directory)
+    gtf[category] = Group()
+    populateTests(gtf[category], directory)
