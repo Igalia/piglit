@@ -95,16 +95,27 @@ static int create_fbo(void)
 	GLint maxsize;
 	GLenum status;
 	int x0, x1, y0, y1;
+	GLenum glerror;
 
 	maxsize = find_max_texture_size();
-	if (0)
-		printf("max 2D texture size: %d x %d\n", maxsize, maxsize);
+	printf("max 2D texture size: %d x %d\n", maxsize, maxsize);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, maxsize, maxsize,
 		     0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glerror = glGetError();
+
+	switch (glerror) {
+	case GL_OUT_OF_MEMORY:
+		puts("Got GL_OUT_OF_MEMORY.");
+		piglit_report_result(PIGLIT_PASS);
+	default:
+		printf("Unexpected error: 0x%x\n", glerror);
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -116,7 +127,7 @@ static int create_fbo(void)
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "FBO incomplete\n");
+		printf("FBO incomplete\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
@@ -213,4 +224,3 @@ void piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_framebuffer_object");
 }
-
