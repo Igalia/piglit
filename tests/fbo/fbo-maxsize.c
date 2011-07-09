@@ -109,6 +109,8 @@ static int create_fbo(void)
 	glerror = glGetError();
 
 	switch (glerror) {
+	case GL_NO_ERROR:
+		break;
 	case GL_OUT_OF_MEMORY:
 		puts("Got GL_OUT_OF_MEMORY.");
 		piglit_report_result(PIGLIT_PASS);
