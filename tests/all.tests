@@ -574,6 +574,7 @@ add_concurrent_test(gl10, 'gl-1.0-dlist-beginend')
 add_concurrent_test(gl10, 'gl-1.0-dlist-shademodel')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag-quads')
+add_concurrent_test(gl10, 'gl-1.0-rendermode-feedback')
 
 gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
