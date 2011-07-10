@@ -38,7 +38,8 @@ enum {
 	CLEAR,
 	READPIXELS,
 	DRAWPIXELS,
-	COPYPIXELS
+	COPYPIXELS,
+	BLIT
 };
 int test = CLEAR;
 
@@ -102,7 +103,7 @@ static enum piglit_result test_clear(void)
 
 	/* Display the colorbuffer. */
 	if (!piglit_automatic) {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 		glBlitFramebufferEXT(0, 0, BUF_SIZE, BUF_SIZE, 0, 0, BUF_SIZE, BUF_SIZE,
 				     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
@@ -216,7 +217,7 @@ static enum piglit_result test_drawpixels(void)
 	return compare_stencil();
 }
 
-static enum piglit_result test_copypixels(void)
+static enum piglit_result test_copy(void)
 {
 	/* Clear stencil to 0xfe. */
 	glClearStencil(0xfefe);
@@ -226,10 +227,15 @@ static enum piglit_result test_copypixels(void)
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-	/* Set the upper-right corner to 0x3333 and copy the content the lower-left one. */
+	/* Set the upper-right corner to 0x3333 and copy the content to the lower-left one. */
 	glStencilFunc(GL_ALWAYS, 0x3333 & mask, ~0);
 	piglit_draw_rect(0, 0, 1, 1);
-	glCopyPixels(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE/2, BUF_SIZE/2, GL_STENCIL);
+	if (test == BLIT)
+		glBlitFramebufferEXT(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE, BUF_SIZE,
+				     0, 0, BUF_SIZE/2, BUF_SIZE/2,
+				     GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	else
+		glCopyPixels(BUF_SIZE/2+1, BUF_SIZE/2+1, BUF_SIZE/2, BUF_SIZE/2, GL_STENCIL);
 
 	/* Initialize the other corners. */
 	glStencilFunc(GL_ALWAYS, 0x6666 & mask, ~0);
@@ -297,8 +303,11 @@ enum piglit_result piglit_display(void)
 		res = test_drawpixels();
 		break;
 	case COPYPIXELS:
-		puts("Testing glCopyPixels(stencil).");
-		res = test_copypixels();
+	case BLIT:
+		puts(test == BLIT ?
+		     "Testing glBlitFramebuffer(stencil)." :
+		     "Testing glCopyPixels(stencil).");
+		res = test_copy();
 		break;
 	default:
 		assert(0);
@@ -336,6 +345,10 @@ void piglit_init(int argc, char **argv)
 		}
 		if (!strcmp(argv[p], "copypixels")) {
 			test = COPYPIXELS;
+			continue;
+		}
+		if (!strcmp(argv[p], "blit")) {
+			test = BLIT;
 			continue;
 		}
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {

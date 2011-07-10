@@ -625,6 +625,7 @@ def add_fbo_stencil_tests(group, format):
 	group['fbo-stencil-' + format + '-readpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'readpixels', format])
 	group['fbo-stencil-' + format + '-drawpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'drawpixels', format])
 	group['fbo-stencil-' + format + '-copypixels'] = PlainExecTest(['fbo-stencil', '-auto', 'copypixels', format])
+	group['fbo-stencil-' + format + '-blit'] = PlainExecTest(['fbo-stencil', '-auto', 'blit', format])
 
 spec = Group()
 
