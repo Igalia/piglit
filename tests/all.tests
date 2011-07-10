@@ -627,6 +627,17 @@ def add_fbo_stencil_tests(group, format):
 	group['fbo-stencil-' + format + '-copypixels'] = PlainExecTest(['fbo-stencil', '-auto', 'copypixels', format])
 	group['fbo-stencil-' + format + '-blit'] = PlainExecTest(['fbo-stencil', '-auto', 'blit', format])
 
+def add_fbo_depthstencil_tests(group, format):
+	group['fbo-depthstencil-' + format + '-clear'] = PlainExecTest(['fbo-depthstencil', '-auto', 'clear', format])
+	group['fbo-depthstencil-' + format + '-readpixels-FLOAT-and-USHORT'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, 'FLOAT-and-USHORT'])
+	group['fbo-depthstencil-' + format + '-readpixels-24_8'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '24_8'])
+	group['fbo-depthstencil-' + format + '-readpixels-32F_24_8_REV'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '32F_24_8_REV'])
+	group['fbo-depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, 'FLOAT-and-USHORT'])
+	group['fbo-depthstencil-' + format + '-drawpixels-24_8'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '24_8'])
+	group['fbo-depthstencil-' + format + '-drawpixels-32F_24_8_REV'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '32F_24_8_REV'])
+	group['fbo-depthstencil-' + format + '-copypixels'] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format])
+	group['fbo-depthstencil-' + format + '-blit'] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format])
+
 spec = Group()
 
 gl11 = Group()
@@ -874,6 +885,7 @@ add_fbo_generatemipmap_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_fl
 add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_test(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
+add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH_COMPONENT32F')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
@@ -909,6 +921,7 @@ ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_test(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
+add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
 add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
 add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')

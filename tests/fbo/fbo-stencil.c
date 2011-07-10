@@ -24,7 +24,7 @@
 
 /** @file fbo-stencil.c
  *
- * Tests glClear, glReadPixels, glDrawPixels, and glCopyPixels
+ * Tests glClear, glReadPixels, glDrawPixels, glCopyPixels, glBlitFramebuffer
  * with stencil buffers.
  */
 
