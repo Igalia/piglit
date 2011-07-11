@@ -212,6 +212,10 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_LinkProgram glLinkProgram
 #define piglit_ShaderSource glShaderSource
 #define piglit_UseProgram glUseProgram
+#define piglit_Uniform1f glUniform1f
+#define piglit_Uniform2f glUniform2f
+#define piglit_Uniform3f glUniform3f
+#define piglit_Uniform4f glUniform4f
 #define piglit_Uniform1fv glUniform1fv
 #define piglit_Uniform2fv glUniform2fv
 #define piglit_Uniform3fv glUniform3fv
@@ -249,6 +253,10 @@ extern PFNGLGETUNIFORMLOCATIONPROC piglit_GetUniformLocation;
 extern PFNGLLINKPROGRAMPROC piglit_LinkProgram;
 extern PFNGLSHADERSOURCEPROC piglit_ShaderSource;
 extern PFNGLUSEPROGRAMPROC piglit_UseProgram;
+extern PFNGLUNIFORM1FPROC piglit_Uniform1f;
+extern PFNGLUNIFORM2FPROC piglit_Uniform2f;
+extern PFNGLUNIFORM3FPROC piglit_Uniform3f;
+extern PFNGLUNIFORM4FPROC piglit_Uniform4f;
 extern PFNGLUNIFORM1FVPROC piglit_Uniform1fv;
 extern PFNGLUNIFORM2FVPROC piglit_Uniform2fv;
 extern PFNGLUNIFORM3FVPROC piglit_Uniform3fv;
