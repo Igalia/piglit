@@ -196,7 +196,10 @@ static enum piglit_result test_drawpixels()
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	/* Draw pixels. */
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
 	glDrawPixels(BUF_SIZE, BUF_SIZE, GL_DEPTH_COMPONENT, GL_FLOAT, depth);
+	glDisable(GL_DEPTH_TEST);
 
 	return compare();
 }
