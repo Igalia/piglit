@@ -136,6 +136,9 @@ init_functions_from_extension(void)
 	piglit_Uniform3fv = glUniform3fvARB;
 	piglit_Uniform4fv = glUniform4fvARB;
 	piglit_Uniform1i = glUniform1iARB;
+	piglit_Uniform2iv = glUniform2ivARB;
+	piglit_Uniform3iv = glUniform3ivARB;
+	piglit_Uniform4iv = glUniform4ivARB;
 	piglit_UniformMatrix2fv = glUniformMatrix2fvARB;
 	piglit_UniformMatrix3fv = glUniformMatrix3fvARB;
 	piglit_UniformMatrix4fv = glUniformMatrix4fvARB;
