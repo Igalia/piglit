@@ -204,6 +204,7 @@ extern GLint piglit_ARBfp_pass_through;
 #define piglit_CreateShader glCreateShader
 #define piglit_DeleteProgram glDeleteProgram
 #define piglit_DeleteShader glDeleteShader
+#define piglit_GetActiveUniform glGetActiveUniform
 #define piglit_GetProgramInfoLog glGetProgramInfoLog
 #define piglit_GetProgramiv glGetProgramiv
 #define piglit_GetShaderInfoLog glGetShaderInfoLog
@@ -245,6 +246,7 @@ extern PFNGLCREATEPROGRAMPROC piglit_CreateProgram;
 extern PFNGLCREATESHADERPROC piglit_CreateShader;
 extern PFNGLDELETEPROGRAMPROC piglit_DeleteProgram;
 extern PFNGLDELETESHADERPROC piglit_DeleteShader;
+extern PFNGLGETACTIVEUNIFORMPROC piglit_GetActiveUniform;
 extern PFNGLGETPROGRAMINFOLOGPROC piglit_GetProgramInfoLog;
 extern PFNGLGETPROGRAMIVPROC piglit_GetProgramiv;
 extern PFNGLGETSHADERINFOLOGPROC piglit_GetShaderInfoLog;

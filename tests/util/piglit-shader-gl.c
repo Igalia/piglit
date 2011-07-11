@@ -38,6 +38,7 @@ PFNGLCREATEPROGRAMPROC piglit_CreateProgram = NULL;
 PFNGLCREATESHADERPROC piglit_CreateShader = NULL;
 PFNGLDELETEPROGRAMPROC piglit_DeleteProgram = NULL;
 PFNGLDELETESHADERPROC piglit_DeleteShader = NULL;
+PFNGLGETACTIVEUNIFORMPROC piglit_GetActiveUniform = NULL;
 PFNGLGETPROGRAMINFOLOGPROC piglit_GetProgramInfoLog = NULL;
 PFNGLGETPROGRAMIVPROC piglit_GetProgramiv = NULL;
 PFNGLGETSHADERINFOLOGPROC piglit_GetShaderInfoLog = NULL;
@@ -83,6 +84,7 @@ init_functions_from_core(void)
 	piglit_CreateShader = glCreateShader;
 	piglit_DeleteProgram = glDeleteProgram;
 	piglit_DeleteShader = glDeleteShader;
+	piglit_GetActiveUniform = glGetActiveUniform;
 	piglit_GetProgramInfoLog = glGetProgramInfoLog;
 	piglit_GetProgramiv = glGetProgramiv;
 	piglit_GetShaderInfoLog = glGetShaderInfoLog;
@@ -131,6 +133,7 @@ init_functions_from_extension(void)
 	piglit_CreateShader = glCreateShaderObjectARB;
 	piglit_DeleteProgram = glDeleteObjectARB;
 	piglit_DeleteShader = glDeleteObjectARB;
+	piglit_GetActiveUniform = glGetActiveUniformARB;
 	piglit_GetProgramInfoLog = glGetInfoLogARB;
 	piglit_GetProgramiv = glGetObjectParameterivARB;
 	piglit_GetShaderInfoLog = glGetInfoLogARB;
