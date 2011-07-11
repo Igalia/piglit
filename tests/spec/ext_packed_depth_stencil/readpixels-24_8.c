@@ -53,7 +53,9 @@ test_pixel(int x, int y, uint32_t value)
 	else
 		expected = 0xffffff02;
 
-	if (value - expected != 0) {
+	/* Compare depth and stencil separately. Use 1-bit tolerance for depth. */
+	if ((value & 0xff) - (expected & 0xff) != 0 ||
+	    abs((value >> 8) - (expected >> 8)) > 1) {
 		fprintf(stderr,
 			"Expected 0x%08x at (%d,%d), found 0x%08x\n",
 			expected, x, y, value);
