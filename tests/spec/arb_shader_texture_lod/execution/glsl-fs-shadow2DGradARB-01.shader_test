@@ -5,6 +5,7 @@
 
 [require]
 GLSL >= 1.10
+GL_ARB_shader_texture_lod
 
 [vertex shader file]
 glsl-fs-shadow2DGradARB.vert
