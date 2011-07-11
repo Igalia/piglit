@@ -26,7 +26,7 @@
  *
  */
 
-/** @file fbo-depth.c
+/** @file fbo-depth-tex1d.c
  *
  * Tests that rendering to a 1D texture with a depth texture
  * and then drawing both to the framebuffer succeeds.
