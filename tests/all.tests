@@ -713,6 +713,10 @@ spec['glsl-1.10']['linker'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['linker'],
 	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10', 'linker'),
 		    recursive=True)
+spec['glsl-1.10']['execution'] = Group()
+add_shader_test_dir(spec['glsl-1.10']['execution'],
+	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10', 'execution'),
+		    recursive=True)
 
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = Group()

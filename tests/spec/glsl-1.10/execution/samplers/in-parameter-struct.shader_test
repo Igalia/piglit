@@ -12,14 +12,20 @@ void main()
 
 [fragment shader]
 varying vec4 texcoords;
-uniform struct S {
+struct S {
 	float f;
 	sampler2D tex;
-} s;
+};
+uniform S s;
+
+vec4 foo(in S foo_s, vec4 foo_texcoords)
+{
+	return texture2D(foo_s.tex, foo_texcoords.xy) * foo_s.f;
+}
 
 void main()
 {
-	gl_FragColor = texture2D(s.tex, texcoords.xy) * s.f;
+	gl_FragColor = foo(s, texcoords);
 }
 
 [test]
