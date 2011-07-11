@@ -139,18 +139,18 @@ create_frag_shader(void)
    ShaderProg = piglit_link_simple_program(0, fs);
    assert(ShaderProg);
 
-   glUseProgram(ShaderProg);
+   piglit_UseProgram(ShaderProg);
 
-   zTex = glGetUniformLocation(ShaderProg, "zTex");
-   glUniform1i(zTex, 0);  /* unit 0 */
+   zTex = piglit_GetUniformLocation(ShaderProg, "zTex");
+   piglit_Uniform1i(zTex, 0);  /* unit 0 */
 
-   errorScale = glGetUniformLocation(ShaderProg, "errorScale");
-   glUniform1f(errorScale, ErrorScale);
+   errorScale = piglit_GetUniformLocation(ShaderProg, "errorScale");
+   piglit_Uniform1f(errorScale, ErrorScale);
 
-   sizeScale = glGetUniformLocation(ShaderProg, "sizeScale");
-   glUniform1f(sizeScale, (float) (SIZE - 1));
+   sizeScale = piglit_GetUniformLocation(ShaderProg, "sizeScale");
+   piglit_Uniform1f(sizeScale, (float) (SIZE - 1));
 
-   glUseProgram(0);
+   piglit_UseProgram(0);
 }
 
 
@@ -249,7 +249,7 @@ draw_sphere_with_fragment_shader_compare(void)
 
    glBindTexture(GL_TEXTURE_2D, DepthTex);
 
-   glUseProgram(ShaderProg);
+   piglit_UseProgram(ShaderProg);
 
    glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1.0);
 
@@ -279,7 +279,7 @@ draw_sphere_with_fragment_shader_compare(void)
 
    glDisable(GL_DEPTH_TEST);
 
-   glUseProgram(0);
+   piglit_UseProgram(0);
 }
 
 
@@ -340,8 +340,7 @@ piglit_init(int argc, char **argv)
    }
 
    piglit_require_extension("GL_EXT_framebuffer_object");
-   piglit_require_extension("GL_ARB_shader_objects");
-   piglit_require_extension("GL_ARB_fragment_shader");
+   piglit_require_fragment_shader();
 
    create_fbo();
 
