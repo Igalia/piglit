@@ -257,10 +257,6 @@ static enum piglit_result test_readpixels(transfer_func read)
 
 static void draw_separately(GLfloat *depth, GLushort *stencil)
 {
-	puts("XXX: glDrawPixels with DEPTH_COMPONENT seems to be a no-op on all Mesa driver, namely:\n"
-	     "XXX: - swrast jumps into _swrast_write_rgba_span, which doesn't write any depth values.\n"
-	     "XXX: - Gallium appears to fail because the write_depth variable in draw_textured_quad is unused in this case.\n"
-	     "XXX: TODO: fix Mesa, validate this test, and remove this comment.");
 	glDrawPixels(BUF_SIZE, BUF_SIZE, GL_DEPTH_COMPONENT, GL_FLOAT, depth);
 	glDrawPixels(BUF_SIZE, BUF_SIZE, GL_STENCIL_INDEX, GL_UNSIGNED_SHORT, stencil);
 }
@@ -321,16 +317,16 @@ static enum piglit_result test_drawpixels(transfer_func draw, transfer_func read
 	glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	/* Draw pixels. */
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
 	draw(depth, stencil);
+	glDisable(GL_DEPTH_TEST);
 
 	/* Invert bits. */
-	glDepthMask(GL_FALSE);
-	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
 	piglit_draw_rect(-1, -1, 2, 2);
 	glDisable(GL_STENCIL_TEST);
-	glDepthMask(GL_TRUE);
 
 	return compare(read);
 }
