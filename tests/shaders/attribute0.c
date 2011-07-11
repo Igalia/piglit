@@ -84,7 +84,7 @@ piglit_init(int argc, char **argv)
 	piglit_LinkProgram(prog);
 	piglit_link_check_status(prog);
 
-	glUseProgram(prog);
+	piglit_UseProgram(prog);
 
 	glClearColor(blue[0], blue[1], blue[2], blue[3]);
 }
