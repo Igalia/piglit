@@ -328,25 +328,27 @@ piglit_compile_shader_text(GLenum target, const char *text)
 	GLuint prog;
 	GLint ok;
 
-	prog = glCreateShader(target);
-	glShaderSource(prog, 1, (const GLchar **) &text, NULL);
-	glCompileShader(prog);
+	piglit_require_GLSL();
 
-	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
+	prog = piglit_CreateShader(target);
+	piglit_ShaderSource(prog, 1, (const GLchar **) &text, NULL);
+	piglit_CompileShader(prog);
+
+	piglit_GetShaderiv(prog, GL_COMPILE_STATUS, &ok);
 
 	{
 		GLchar *info;
 		GLint size;
 
-		glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
+		piglit_GetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		glGetShaderInfoLog(prog, size, NULL, info);
+		piglit_GetShaderInfoLog(prog, size, NULL, info);
 		if (!ok) {
 			fprintf(stderr, "Failed to compile %s shader: %s\n",
 				shader_name(target),
 				info);
-			glDeleteShader(prog);
+			piglit_DeleteShader(prog);
 			prog = 0;
 		}
 		else if (0) {
@@ -369,15 +371,17 @@ link_check_status(GLint prog, FILE *output)
 	GLint size;
 	GLint ok;
 
-	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
+	piglit_require_GLSL();
+
+	piglit_GetProgramiv(prog, GL_LINK_STATUS, &ok);
 
 	/* Some drivers return a size of 1 for an empty log.  This is the size
 	 * of a log that contains only a terminating NUL character.
 	 */
-	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+	piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 	if (size > 1) {
 		info = malloc(size);
-		glGetProgramInfoLog(prog, size, NULL, info);
+		piglit_GetProgramInfoLog(prog, size, NULL, info);
 	}
 
 	if (!ok) {
@@ -423,15 +427,17 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 {
 	GLint prog;
 
-	prog = glCreateProgram();
+	piglit_require_GLSL();
+
+	prog = piglit_CreateProgram();
 	if (fs)
-		glAttachShader(prog, fs);
+		piglit_AttachShader(prog, fs);
 	if (vs)
-		glAttachShader(prog, vs);
-	glLinkProgram(prog);
+		piglit_AttachShader(prog, vs);
+	piglit_LinkProgram(prog);
 
 	if (!piglit_link_check_status(prog)) {
-		glDeleteProgram(prog);
+		piglit_DeleteProgram(prog);
 		prog = 0;
 	}
 
