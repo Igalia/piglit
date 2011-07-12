@@ -69,6 +69,7 @@ piglit_display(void)
 
 	/* Conditional render that should draw the whole screen. */
 	glBeginConditionalRenderNV(q, GL_QUERY_WAIT_NV);
+	glRasterPos2i(-1, -1);
 	glBitmap(piglit_width, piglit_height, 0, 0, 0, 0, buf);
 	glEndConditionalRenderNV();
 
