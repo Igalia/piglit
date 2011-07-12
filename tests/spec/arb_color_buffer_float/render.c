@@ -48,10 +48,12 @@ GLenum blend_dst[] = { 0, GL_ZERO, GL_ZERO, GL_ONE };
 const char *vp_strings[] = {
 	"!!ARBvp1.0\n"
 	"MOV result.position, vertex.position;\n"
+	"MOV result.fogcoord, 0;\n"
 	"MOV result.color, {7, -2.75, -0.25, 0.75};\n" "END\n",
 
 	"!!ARBvp1.0\n"
 	"MOV result.position, vertex.position;\n"
+	"MOV result.fogcoord, 0;\n"
 	"MOV result.texcoord[0], {7, -2.75, -0.25, 0.75};\n" "END\n"
 };
 
