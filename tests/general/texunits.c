@@ -292,7 +292,7 @@ test_texture_env(void)
    clear_errors();
 
    /* set per-unit state */
-   for (i = 0; i < MaxTextureImageUnits; i++) {
+   for (i = 0; i < MaxTextureCombinedUnits; i++) {
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
       err = glGetError();
@@ -303,7 +303,7 @@ test_texture_env(void)
    }
 
    /* check per-unit state */
-   for (i = 0; i < MaxTextureImageUnits; i++) {
+   for (i = 0; i < MaxTextureCombinedUnits; i++) {
       GLfloat v[4];
       glActiveTexture(GL_TEXTURE0 + i);
       glGetTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, v);
@@ -318,28 +318,6 @@ test_texture_env(void)
    err = glGetError();
    if (err != GL_NO_ERROR) {
       printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
-   }
-
-   /* this should generate an error */
-   {
-      glActiveTexture(GL_TEXTURE0 + MaxTextureImageUnits);
-      if (MaxTextureImageUnits == MaxTextureCombinedUnits) {
-         /* INVALID_ENUM is expected */
-         err = glGetError();
-         if (err != GL_INVALID_ENUM) {
-            printf("GL failed to raise GL_INVALID_ENUM setting texture unit\n");
-            return GL_FALSE;
-         }
-      }
-      else {
-         glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[0]);
-         /* INVALID_OPERATION is expected */
-         err = glGetError();
-         if (err != GL_INVALID_OPERATION) {
-            printf("GL failed to raise GL_INVALID_OPERATION setting texture env\n");
-            return GL_FALSE;
-         }
-      }
    }
 
    return GL_TRUE;
@@ -407,17 +385,24 @@ key(unsigned char key, int x, int y)
 static void
 init(void)
 {
-   if (glutExtensionSupported("GL_ARB_fragment_program")) {
+   if (glutExtensionSupported("GL_ARB_vertex_shader")) {
       glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
       glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
       glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxTextureVertexUnits);
       glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureCombinedUnits);
    }
+   else if (glutExtensionSupported("GL_ARB_fragment_shader") ||
+            glutExtensionSupported("GL_ARB_fragment_program")) {
+      glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
+      glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
+      MaxTextureVertexUnits = 0;
+      MaxTextureCombinedUnits = MaxTextureImageUnits;
+   }
    else {
       glGetIntegerv(GL_MAX_TEXTURE_UNITS, &MaxTextureCoordUnits);
       MaxTextureImageUnits =
-      MaxTextureVertexUnits =
       MaxTextureCombinedUnits = MaxTextureCoordUnits;
+      MaxTextureVertexUnits = 0;
    }
 
    if (0)
