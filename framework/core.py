@@ -24,6 +24,7 @@
 # Piglit core
 
 import errno
+import json
 import os
 import platform
 import stat
@@ -73,13 +74,6 @@ def checkDir(dirname, failifexists):
 		if e.errno != errno.EEXIST:
 			raise
 
-# Encode a string
-def encode(text):
-	return text.encode("string_escape")
-
-def decode(text):
-	return text.decode("string_escape")
-
 if 'PIGLIT_BUILD_DIR' in os.environ:
     testBinDir = os.environ['PIGLIT_BUILD_DIR'] + '/bin/'
 else:
@@ -91,176 +85,85 @@ else:
 #############################################################################
 
 class TestResult(dict):
-	def __init__(self, *args):
-		dict.__init__(self)
-
-		assert(len(args) == 0 or len(args) == 2)
-
-		if len(args) == 2:
-			for k in args[0]:
-				self.__setattr__(k, args[0][k])
-
-			self.update(args[1])
-
-	def __repr__(self):
-		attrnames = set(dir(self)) - set(dir(self.__class__()))
-		return '%(class)s(%(dir)s,%(dict)s)' % {
-			'class': self.__class__.__name__,
-			'dir': dict([(k, self.__getattribute__(k)) for k in attrnames]),
-			'dict': dict.__repr__(self)
-		}
-
-	def allTestResults(self, name):
-		return {name: self}
-
-	def write(self, file, path):
-		result = StringIO()
-		print >> result, "@test: " + encode(path)
-		for k in self:
-			v = self[k]
-			if type(v) == list:
-				print >> result, k + "!"
-				for s in v:
-					print >> result, " " + encode(str(s))
-				print >> result, "!"
-			else:
-				print >> result, k + ": " + encode(str(v))
-		print >> result, "!"
-		file.write(result.getvalue())
+	pass
 
 class GroupResult(dict):
-	def __init__(self, *args):
-		dict.__init__(self)
+	def get_subgroup(self, path, create=True):
+		'''
+		Retrieve subgroup specified by path
 
-		assert(len(args) == 0 or len(args) == 2)
+		For example, ``self.get_subgroup('a/b/c')`` will attempt to
+		return ``self['a']['b']['c']``. If any subgroup along ``path``
+		does not exist, then it will be created if ``create`` is true;
+		otherwise, ``None`` is returned.
+		'''
+		group = self
+		for subname in path.split('/'):
+			if subname not in group:
+				if create:
+					group[subname] = GroupResult()
+				else:
+					return None
+			group = group[subname]
+			assert(isinstance(group, GroupResult))
+		return group
 
-		if len(args) == 2:
-			for k in args[0]:
-				self.__setattr__(k, args[0][k])
+	@staticmethod
+	def make_tree(tests):
+		'''
+		Convert a flat dict of test results to a hierarchical tree
 
-			self.update(args[1])
+		``tests`` is a dict whose items have form ``(path, TestResult)``,
+		where path is a string with form ``group1/group2/.../test_name``.
 
-	def __repr__(self):
-		attrnames = set(dir(self)) - set(dir(self.__class__()))
-		return '%(class)s(%(dir)s,%(dict)s)' % {
-			'class': self.__class__.__name__,
-			'dir': dict([(k, self.__getattribute__(k)) for k in attrnames]),
-			'dict': dict.__repr__(self)
-		}
+		Return a tree whose leaves are the values of ``tests`` and
+		whose nodes, which have type ``GroupResult``, reflect the
+		paths in ``tests``.
+		'''
+		root = GroupResult()
 
-	def allTestResults(self, groupName):
-		collection = {}
-		for name, sub in self.items():
-			subfullname = name
-			if len(groupName) > 0:
-				subfullname = groupName + '/' + subfullname
-			collection.update(sub.allTestResults(subfullname))
-		return collection
+		for (path, result) in tests.items():
+			group_path = os.path.dirname(path)
+			test_name = os.path.basename(path)
 
-	def write(self, file, groupName):
-		for name, sub in self.items():
-			subfullname = name
-			if len(groupName) > 0:
-				subfullname = groupName + '/' + subfullname
-			sub.write(file, subfullname)
+			group = root.get_subgroup(group_path)
+			group[test_name] = TestResult(result)
 
+		return root
 
 class TestrunResult:
-	def __init__(self, *args):
-		self.name = ''
-		self.globalkeys = ['name', 'href', 'glxinfo', 'lspci', 'time']
-		self.results = GroupResult()
-
-	def allTestResults(self):
-		'''Return a dictionary containing (name: TestResult) mappings.
-		Note that writing to this dictionary has no effect.'''
-		return self.results.allTestResults('')
+	def __init__(self):
+		self.serialized_keys = [
+			'name',
+			'tests',
+			'glxinfo',
+			'lspci',
+			'time_elapsed',
+			]
+		self.name = None
+		self.glxinfo = None
+		self.lspci = None
+		self.tests = {}
 
 	def write(self, file):
-		for key in self.globalkeys:
-			if key in self.__dict__:
-				print >>file, "%s: %s" % (key, encode(self.__dict__[key]))
-
-		self.results.write(file,'')
+		# Serialize only the keys in serialized_keys.
+		keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
+		raw_dict = dict([(k, self.__dict__[k]) for k in keys])
+		json.dump(raw_dict, file, indent=4)
 
 	def parseFile(self, file):
-		def arrayparser(a):
-			def cb(line):
-				if line == '!':
-					del stack[-1]
-				else:
-					a.append(decode(line[1:]))
-			return cb
+		raw_dict = json.load(file)
 
-		def dictparser(d):
-			def cb(line):
-				if line == '!':
-					del stack[-1]
-					return
+		# Check that only expected keys were unserialized.
+		for key in raw_dict:
+			if key not in self.serialized_keys:
+				raise Exception('unexpected key in results file: ' + str(key))
 
-				colon = line.find(':')
-				if colon < 0:
-					excl = line.find('!')
-					if excl < 0:
-						raise Exception("Line %(linenr)d: Bad format" % locals())
+		self.__dict__.update(raw_dict)
 
-					key = line[:excl]
-					d[key] = []
-					stack.append(arrayparser(d[key]))
-					return
-
-				key = line[:colon]
-				value = decode(line[colon+2:])
-				d[key] = value
-			return cb
-
-		def toplevel(line):
-			colon = line.find(':')
-			if colon < 0:
-				raise Exception("Line %(linenr)d: Bad format" % locals())
-
-			key = line[:colon]
-			value = decode(line[colon+2:])
-			if key in self.globalkeys:
-				self.__dict__[key] = value
-			elif key == '@test':
-				comp = value.split('/')
-				group = self.results
-				for name in comp[:-1]:
-					if name not in group:
-						group[name] = GroupResult()
-					group = group[name]
-
-				result = TestResult()
-				group[comp[-1]] = result
-
-				stack.append(dictparser(result))
-			else:
-				raise Exception("Line %d: Unknown key %s" % (linenr, key))
-
-		stack = [toplevel]
-		linenr = 1
-		for line in file:
-			if line[-1] == '\n':
-				stack[-1](line[0:-1])
-			linenr = linenr + 1
-
-	def parseDir(self, path, PreferSummary):
-		main = None
-		filelist = [path + '/main', path + '/summary']
-		if PreferSummary:
-			filelist[:0] = [path + '/summary']
-		for filename in filelist:
-			try:
-				main = open(filename, 'U')
-				break
-			except:
-				pass
-		if not main:
-			raise Exception("Failed to open %(path)s" % locals())
-		self.parseFile(main)
-		main.close()
-
+		# Replace each raw dict in self.tests with a TestResult.
+		for (path, result) in self.tests.items():
+			self.tests[path] = TestResult(result)
 
 #############################################################################
 ##### Generic Test classes
@@ -268,7 +171,6 @@ class TestrunResult:
 
 class Environment:
 	def __init__(self):
-		self.file = sys.stdout
 		self.execute = True
 		self.filter = []
 		self.exclude_filter = []
@@ -283,11 +185,12 @@ class Environment:
 		return stderr+stdout
 
 	def collectData(self):
+		result = {}
 		if platform.system() != 'Windows':
-			self.file.write("glxinfo:", '@@@' + encode(self.run('glxinfo')), "\n")
+			result['glxinfo'] = self.run('glxinfo')
 		if platform.system() == 'Linux':
-			self.file.write("lspci:", '@@@' + encode(self.run('lspci')), "\n")
-
+			result['lspci'] = self.run('lspci')
+		return result
 
 class Test:
 	ignoreErrors = []
@@ -304,13 +207,26 @@ class Test:
 	def run(self):
 		raise NotImplementedError
 
-	def doRun(self, env, path):
-		if self.runConcurrent:
-			ConcurrentTestPool().put(self.__doRunWork, args = (env, path,))
-		else:
-			self.__doRunWork(env, path)
+	def doRun(self, env, path, testrun):
+		'''
+		Schedule test to be run
 
-	def __doRunWork(self, env, path):
+		:path:
+		    Fully qualified test name as a string.  For example,
+		    ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
+
+		:testrun:
+		    A TestrunResult object that accumulates test results.
+		    After this test has executed, the test's ``TestResult`` is
+		    assigned to ``testrun.tests[path]``
+		'''
+		args = (env, path, testrun)
+		if self.runConcurrent:
+			ConcurrentTestPool().put(self.__doRunWork, args=args)
+		else:
+			self.__doRunWork(*args)
+
+	def __doRunWork(self, env, path, testrun):
 		# Exclude tests that don't match the filter regexp
 		if len(env.filter) > 0:
 			if not True in map(lambda f: f.search(path) != None, env.filter):
@@ -336,18 +252,18 @@ class Test:
 				if 'result' not in result:
 					result['result'] = 'fail'
 				if not isinstance(result, TestResult):
-					result = TestResult({}, result)
+					result = TestResult(result)
 					result['result'] = 'warn'
 					result['note'] = 'Result not returned as an instance of TestResult'
 			except:
 				result = TestResult()
 				result['result'] = 'fail'
 				result['exception'] = str(sys.exc_info()[0]) + str(sys.exc_info()[1])
-				result['traceback'] = '@@@' + "".join(traceback.format_tb(sys.exc_info()[2]))
+				result['traceback'] = "".join(traceback.format_tb(sys.exc_info()[2]))
 
 			status(result['result'])
 
-			result.write(env.file, path)
+			testrun.tests[path] = result
 			if Test.sleep:
 				time.sleep(Test.sleep)
 		else:
@@ -379,12 +295,17 @@ class Test:
 
 
 class Group(dict):
-	def doRun(self, env, path):
+	def doRun(self, env, path, testrun):
+		'''
+		Schedule all tests in group for execution.
+
+		See ``Test.doRun``.
+		'''
 		for sub in sorted(self):
 			spath = sub
 			if len(path) > 0:
 				spath = path + '/' + spath
-			self[sub].doRun(env, spath)
+			self[sub].doRun(env, spath, testrun)
 
 
 class TestProfile:
@@ -392,12 +313,14 @@ class TestProfile:
 		self.tests = Group()
 		self.sleep = 0
 
-	def run(self, env):
-		time_start = time.time()
-		self.tests.doRun(env, '')
+	def run(self, env, testrun):
+		'''
+		Schedule all tests in profile for execution.
+
+		See ``Test.doRun``.
+		'''
+		self.tests.doRun(env, '', testrun)
 		ConcurrentTestPool().join()
-		time_end = time.time()
-		env.file.write("time:", time_end-time_start, "\n")
 
 	def remove_test(self, test_path):
 		"""Remove a fully qualified test from the profile.
@@ -428,24 +351,19 @@ def loadTestProfile(filename):
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
 
-def loadTestResults(path, PreferSummary=False):
+def loadTestResults(path):
+	if os.path.isdir(path):
+		filepath = os.path.join(path, 'main')
+	else:
+		filepath = path
+
+	testrun = TestrunResult()
 	try:
-		mode = os.stat(path)[stat.ST_MODE]
-		testrun = TestrunResult()
-		if stat.S_ISDIR(mode):
-			testrun.parseDir(path, PreferSummary)
-		else:
-			file = open(path, 'r')
+		with open(filepath, 'r') as file:
 			testrun.parseFile(file)
-			file.close()
-
-		if len(testrun.name) == 0:
-			if path[-1] == '/':
-				testrun.name = os.path.basename(path[0:-1])
-			else:
-				testrun.name = os.path.basename(path)
-
-		return testrun
-	except:
+	except OSError:
 		traceback.print_exc()
 		raise Exception('Could not read tests results')
+
+	assert(testrun.name is not None)
+	return testrun

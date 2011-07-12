@@ -156,7 +156,7 @@ results is an array of GroupResult instances, one per testrun
 						childresults
 					)
 				else:
-					childresults = [r.get(name, core.TestResult({}, { 'result': 'skip' }))
+					childresults = [r.get(name, core.TestResult({ 'result': 'skip' }))
 							for r in self.results]
 
 					self.children[name] = TestSummary(
@@ -188,8 +188,12 @@ class Summary:
 		"""\
 testruns is an array of TestrunResult instances
 """
+		groups = [
+			core.GroupResult.make_tree(testrun.tests)
+			for testrun in testruns
+			]
 		self.testruns = testruns
-		self.root = GroupSummary(self, '', 'All', [tr.results for tr in testruns])
+		self.root = GroupSummary(self, '', 'All', groups)
 
 	def allTests(self):
 		"""\

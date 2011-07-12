@@ -68,8 +68,8 @@ def main():
 	for resultsDir in args:
 		results = core.loadTestResults(resultsDir)
 
-		for testname, result in results.allTestResults().items():
-			combined.results[testname] = result
+		for testname, result in results.tests.items():
+			combined.tests[testname] = result
 
 	combined.write(sys.stdout)
 

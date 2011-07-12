@@ -23,8 +23,12 @@
 
 
 from getopt import getopt, GetoptError
+import json
+import os.path as path
 import re
 import sys, os
+import time
+import traceback
 
 import framework.core as core
 from framework.threads import synchronized_self
@@ -120,27 +124,43 @@ def main():
 
 	core.checkDir(resultsDir, False)
 
-	profile = core.loadTestProfile(profileFilename)
-	env.file = SyncFileWriter(resultsDir + '/main')
-	env.file.writeLine("name: %(name)s" % { 'name': core.encode(OptionName) })
-	env.collectData()
-	profile.run(env)
-	env.file.close()
+	results = core.TestrunResult()
 
-	print "Writing summary file..."
-	results = core.loadTestResults(resultsDir)
-	for testname, result in results.allTestResults().items():
-		if 'info' in result:
-			if len(result['info']) > 4096:
-				result['info'] = result['info'][0:4096]
-	file = open(resultsDir + '/summary', "w")
-	results.write(file)
-	file.close()
+	# Set results.name
+	if OptionName is '':
+		results.name = path.basename(resultsDir)
+	else:
+		results.name = OptionName
+
+	results.__dict__.update(env.collectData())
+
+	profile = core.loadTestProfile(profileFilename)
+	time_start = time.time()
+
+	try:
+		profile.run(env, results)
+	except Exception as e:
+		if isinstance(e, KeyboardInterrupt):
+			# When the user interrupts the test run, he may still
+			# want the partial test results.  So ignore
+			# KeyboardInterruption and proceed to writing the
+			# result files.
+			pass
+		else:
+			traceback.print_exc()
+			sys.exit(1)
+
+	time_end = time.time()
+	results.time_elapsed = time_end - time_start
+
+	result_filepath = os.path.join(resultsDir, 'main')
+	print("Writing results file...")
+	with open(result_filepath, 'w') as f:
+		results.write(f)
 
 	print
 	print 'Thank you for running Piglit!'
-	print 'Summary for submission has been written to ' + resultsDir + '/summary'
-
+	print 'Results have been written to ' + result_filepath
 
 if __name__ == "__main__":
 	main()

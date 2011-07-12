@@ -94,7 +94,7 @@ class PlainExecTest(Test):
 
 			self.handleErr(results, err)
 
-			results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
+			results['info'] = "Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
 			results['returncode'] = proc.returncode
 			results['command'] = ' '.join(self.command)
 		else:

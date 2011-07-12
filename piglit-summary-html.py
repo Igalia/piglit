@@ -88,8 +88,8 @@ def buildDetailValue(detail):
 			items = items + ResultListItem % { 'detail': buildDetailValue(d) }
 
 		return ResultList % { 'items': items }
-	elif type(detail) == str and detail[0:3] == '@@@':
-		return ResultMString % { 'detail': cgi.escape(detail[3:]) }
+	elif isinstance(detail, str) or isinstance(detail, unicode):
+		return ResultMString % { 'detail': cgi.escape(detail) }
 
 	return cgi.escape(str(detail))
 
@@ -97,7 +97,9 @@ def buildDetailValue(detail):
 def buildDetails(testResult):
 	details = []
 	for name in testResult:
-		if type(name) != str or name == 'result':
+		assert(isinstance(name, basestring))
+
+		if name == 'result':
 			continue
 
 		value = buildDetailValue(testResult[name])
@@ -133,7 +135,13 @@ def writeResultHtml(test, testResult, filename):
 	writefile(filename, Result % locals())
 
 def writeTestrunHtml(testrun, filename):
-	detaildict = dict(filter(lambda item: item[0] in testrun.globalkeys, testrun.__dict__.items()))
+	detail_keys = [
+		key
+		for key in testrun.__dict__.keys()
+		if key in testrun.serialized_keys
+		if key != 'tests'
+		]
+	detaildict = dict([(k, testrun.__dict__[k]) for k in detail_keys])
 	details = buildDetails(detaildict)
 	name = testrun.name
 	codename = testrun.codename
@@ -281,7 +289,7 @@ def parse_listfile(filename):
 	return eval(code)
 
 def loadresult(descr, OptionPreferSummary):
-	result = core.loadTestResults(descr[0], OptionPreferSummary)
+	result = core.loadTestResults(descr[0])
 	if len(descr) > 1:
 		result.__dict__.update(descr[1])
 	return result
