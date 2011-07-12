@@ -88,10 +88,12 @@ static enum piglit_result test_clear(void)
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_EQUAL);
 
 	glColor3fv(green);
-	piglit_draw_rect_z(0.5, -1, -1, 2, 2); /* 0.75 converted to clip space is 0.5. */
+	glDepthFunc(GL_LEQUAL);
+	piglit_draw_rect_z(0.499, -1, -1, 1, 2); /* 0.75 converted to clip space is 0.5. */
+	glDepthFunc(GL_GEQUAL);
+	piglit_draw_rect_z(0.501, 0, -1, 1, 2);
 	glColor3f(1, 1, 1);
 
 	glDisable(GL_DEPTH_TEST);
