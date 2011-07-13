@@ -51,13 +51,6 @@ static const char vs_text[] =
    "  gl_FrontColor = t; \n"
    "}\n";
 
-static const char fs_text[] =
-   "void main()\n"
-   "{\n"
-   "  gl_FragColor = gl_Color;\n"
-   "}\n";
-
-
 enum piglit_result
 piglit_display(void)
 {
@@ -69,7 +62,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-   GLuint vs, fs, prog;
+   GLuint vs, prog;
    GLint numUniforms, i;
    GLint expectedNum = 7;
    GLint loc_f1, loc_f2, loc_sa, loc_sd, loc_v1;
@@ -80,7 +73,6 @@ piglit_init(int argc, char **argv)
    piglit_require_fragment_shader();
 
    vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-   fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
    prog = piglit_link_simple_program(vs, 0);
 
    piglit_UseProgram(prog);

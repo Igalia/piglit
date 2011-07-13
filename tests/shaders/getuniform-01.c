@@ -46,15 +46,6 @@ static const char vs_text[] =
 	"}\n"
 	;
 
-static const char fs_text[] =
-	"varying vec4 color;\n"
-	"\n"
-	"void main()\n"
-	"{\n"
-	"  gl_FragColor = color;\n"
-	"}\n"
-	;
-
 static GLint prog;
 static GLint base_location;
 static GLint array_location[4];
@@ -102,9 +93,7 @@ piglit_init(int argc, char **argv)
 	static const float uniform_data[4] = {
 		12.0, 0.5, 3.14169, 42.0
 	};
-
 	GLint vs;
-	GLint fs;
 	unsigned i;
 	union data_blob buffer[16];
 
@@ -112,7 +101,6 @@ piglit_init(int argc, char **argv)
 	piglit_require_fragment_shader();
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
 
 	prog = piglit_link_simple_program(vs, 0);
 
