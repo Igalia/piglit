@@ -47,7 +47,6 @@ framebuffer_srgb_api_no_ext(void)
 	GLboolean pass = GL_TRUE;
 	GLboolean boolmode = GL_FALSE;
 	GLenum ret;
-	GLboolean is_enabled;
 
 	glGetBooleanv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &boolmode);
 	ret = glGetError();
@@ -56,7 +55,7 @@ framebuffer_srgb_api_no_ext(void)
 		pass = GL_FALSE;
 	}
 
-	is_enabled = glIsEnabled(GL_FRAMEBUFFER_SRGB_EXT);
+	(void)glIsEnabled(GL_FRAMEBUFFER_SRGB_EXT);
 	ret = glGetError();
 	if (ret != GL_INVALID_ENUM) {
 		printf("no invalid enum on glIsEnabled(GL_FRAMEBUFFER_SRGB_EXT)\n");

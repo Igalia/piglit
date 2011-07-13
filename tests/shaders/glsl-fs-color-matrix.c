@@ -88,6 +88,10 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
+	GLuint tex;
+
+	tex = piglit_rgbw_texture(GL_RGBA8, 64, 64, GL_FALSE, GL_TRUE,
+				  GL_UNSIGNED_NORMALIZED);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -110,6 +114,8 @@ piglit_display(void)
 
 	glutSwapBuffers();
 
+	glDeleteTextures(1, &tex);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
@@ -119,7 +125,6 @@ piglit_init(int argc, char **argv)
 	GLuint vs;
 	GLuint fs;
 	GLint loc;
-	GLint tex;
 
 	piglit_require_GLSL();
 
@@ -150,6 +155,4 @@ piglit_init(int argc, char **argv)
 
 	piglit_EnableVertexAttribArray(0);
 	piglit_EnableVertexAttribArray(1);
-
-	tex = piglit_rgbw_texture(GL_RGBA8, 64, 64, GL_FALSE, GL_TRUE, GL_UNSIGNED_NORMALIZED);
 }

@@ -102,5 +102,7 @@ piglit_init(int argc, char **argv)
 
 	assert(glGetError() == 0);
 
+	glDeleteTextures(1, &tex0);
+
 	piglit_report_result(PIGLIT_PASS);
 }
