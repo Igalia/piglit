@@ -264,7 +264,6 @@ def usage():
 Usage: %(progName)s [options] [summary-dir] [test.results]...
 
 Options:
-  -f, --full            Prefer the full results over the
   -h, --help            Show this message
   -o, --overwrite       Overwrite existing directories
   -l, --list=listfile   Use test results from a list file
@@ -288,7 +287,7 @@ def parse_listfile(filename):
 	file.close()
 	return eval(code)
 
-def loadresult(descr, OptionPreferSummary):
+def loadresult(descr):
 	result = core.loadTestResults(descr[0])
 	if len(descr) > 1:
 		result.__dict__.update(descr[1])
@@ -296,20 +295,17 @@ def loadresult(descr, OptionPreferSummary):
 
 def main():
 	try:
-		options, args = getopt(sys.argv[1:], "hofl:", [ "help", "overwrite", "full", "list" ])
+		options, args = getopt(sys.argv[1:], "hofl:", [ "help", "overwrite", "list" ])
 	except GetoptError:
 		usage()
 
 	OptionOverwrite = False
-	OptionPreferSummary = True
 	OptionList = []
 	for name, value in options:
 		if name == "-h" or name == "--help":
 			usage()
 		elif name == "-o" or name == "--overwrite":
 			OptionOverwrite = True
-		elif name == "-f" or name == "--full":
-			OptionPreferSummary = False
 		elif name == "-l" or name == "--list":
 			OptionList += parse_listfile(value)
 
@@ -321,7 +317,7 @@ def main():
 	summaryDir = args[0]
 	core.checkDir(summaryDir, not OptionOverwrite)
 
-	results = [loadresult(descr, OptionPreferSummary) for descr in OptionList]
+	results = [loadresult(descr) for descr in OptionList]
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):
