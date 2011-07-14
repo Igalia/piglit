@@ -317,7 +317,12 @@ def main():
 	summaryDir = args[0]
 	core.checkDir(summaryDir, not OptionOverwrite)
 
-	results = [loadresult(descr) for descr in OptionList]
+	results = []
+	for result_dir in OptionList:
+		try:
+			results.append(loadresult(result_dir))
+		except core.ResultFileInOldFormatError as e:
+			print('warning: skipping result file because it is in old format, json is now required: file={0}'.format(e.message))
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):
