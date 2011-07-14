@@ -34,6 +34,7 @@ import time
 import traceback
 from log import log
 from cStringIO import StringIO
+from textwrap import dedent
 from threads import ConcurrentTestPool
 import threading
 
@@ -47,7 +48,8 @@ __all__ = [
 	'TestProfile',
 	'Group',
 	'Test',
-	'testBinDir'
+	'testBinDir',
+	'ResultFileInOldFormatError',
 ]
 
 
@@ -131,6 +133,11 @@ class GroupResult(dict):
 
 		return root
 
+class ResultFileInOldFormatError(Exception):
+	def __init__(self, filepath):
+		super(Exception, self).__init__(filepath)
+		self.filepath = filepath
+
 class TestrunResult:
 	def __init__(self):
 		self.serialized_keys = [
@@ -152,6 +159,14 @@ class TestrunResult:
 		json.dump(raw_dict, file, indent=4)
 
 	def parseFile(self, file):
+		# If file contains the old, custom format, then raise
+		# an informative error.
+		saved_position = file.tell()
+		first_line = file.readline()
+		if first_line.startswith('name:'):
+			raise ResultFileInOldFormatError(file.name)
+		file.seek(saved_position)
+
 		raw_dict = json.load(file)
 
 		# Check that only expected keys were unserialized.
