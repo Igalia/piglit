@@ -58,10 +58,10 @@ PFNGLXGETSWAPINTERVALMESAPROC pglXGetSwapIntervalMESA;
 
 static GLboolean fullscreen = GL_FALSE;    /* Create a fullscreen window */
 static GLboolean verbose = GL_FALSE;    /* Disable verbose.  */
-static GLboolean Automatic = GL_FALSE;    /* Disable verbose.  */
-static GLboolean test_events = GL_FALSE;    /* Disable verbose.  */
-static GLboolean interval_diff = GL_FALSE;    /* Disable verbose.  */
-static GLboolean async = GL_FALSE;    /* Disable verbose.  */
+static GLboolean Automatic = GL_FALSE;    /* Test automatically.  */
+static GLboolean test_events = GL_FALSE;    /* Test event can be received.  */
+static GLboolean interval_diff = GL_FALSE;    /* Test interval can be set.  */
+static GLboolean async = GL_FALSE;    /* Test asynchronize.  */
 int event_base, Glx_event, count=0, swap_count=0, event_count=0;
 static int Intel_swap_event=0;
 int  event_count_total=0, frames_total=0, message_count=0;
