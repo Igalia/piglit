@@ -67,7 +67,7 @@ static int Intel_swap_event=0;
 int  event_count_total=0, frames_total=0, message_count=0;
 static double time_call=0.0, time_fin=0.0, time_val=0.0;
 double swap_start[STACK_L],swap_returned[STACK_L];
-int interval=1;
+int interval=0;
 char * swap_event_type=NULL;
 /**
  * Determine whether or not a GLX extension is supported.
