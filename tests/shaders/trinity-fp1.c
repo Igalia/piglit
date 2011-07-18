@@ -107,8 +107,6 @@ static void DoFrame(void)
 		glVertex2f(1.25, 0.25);
 		glVertex2f(1.75, 0.25);
 	glEnd();
-
-	glutSwapBuffers();
 }
 
 static bool
@@ -120,8 +118,6 @@ DoTest( void )
 	};
 	int i;
 	bool pass = true;
-
-	glReadBuffer( GL_FRONT );
 
 	for(i = 0; i < 2; ++i) {
 		pass = pass && piglit_probe_pixel_rgb(piglit_width*(2*i+1)/4,
@@ -140,6 +136,7 @@ piglit_display(void)
 
 	DoFrame();
 	succ = DoTest();
+	glutSwapBuffers();
 
 	return succ ? PIGLIT_PASS : PIGLIT_FAIL;
 }
