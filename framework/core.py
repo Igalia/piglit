@@ -36,6 +36,7 @@ from log import log
 from cStringIO import StringIO
 from textwrap import dedent
 from threads import ConcurrentTestPool
+from threads import synchronized_self
 import threading
 
 __all__ = [
@@ -52,6 +53,131 @@ __all__ = [
 	'ResultFileInOldFormatError',
 ]
 
+class JSONWriter:
+	'''
+	Writes to a JSON file stream
+
+	JSONWriter is threadsafe.
+
+	Example
+	-------
+
+	This call to ``json.dump``::
+	    json.dump(
+		{
+		    'a': [1, 2, 3],
+		    'b': 4,
+		    'c': {
+		        'x': 100,
+		    },
+		}
+		file,
+		indent=JSONWriter.INDENT)
+
+	is equivalent to::
+	    w = JSONWriter(file)
+	    w.open_dict()
+	    w.write_dict_item('a', [1, 2, 3])
+	    w.write_dict_item('b', 4)
+	    w.write_dict_item('c', {'x': 100})
+	    w.close_dict()
+
+	which is also equivalent to::
+	    w = JSONWriter(file)
+	    w.open_dict()
+	    w.write_dict_item('a', [1, 2, 3])
+	    w.write_dict_item('b', 4)
+
+	    w.write_dict_key('c')
+	    w.open_dict()
+	    w.write_dict_item('x', 100)
+	    w.close_dict()
+
+	    w.close_dict()
+	'''
+
+	INDENT = 4
+
+	def __init__(self, file):
+		self.file = file
+		self.__indent_level = 0
+		self.__inhibit_next_indent = False
+		self.__encoder = json.JSONEncoder(indent=self.INDENT)
+
+		# self.__is_collection_empty
+		#
+		# A stack that indicates if the currect collection is empty
+		#
+		# When open_dict is called, True is pushed onto the
+		# stack. When the first element is written to the newly
+		# opened dict, the top of the stack is set to False.
+		# When the close_dict is called, the stack is popped.
+		#
+		# The top of the stack is element -1.
+		#
+		# XXX: How does one attach docstrings to member variables?
+		#
+		self.__is_collection_empty = []
+
+	@synchronized_self
+	def __write_indent(self):
+		if self.__inhibit_next_indent:
+			self.__inhibit_next_indent = False
+			return
+		else:
+			i = ' ' * self.__indent_level * self.INDENT
+			self.file.write(i)
+
+	@synchronized_self
+	def __write(self, obj):
+		lines = list(self.__encoder.encode(obj).split('\n'))
+		n = len(lines)
+		for i in range(n):
+			self.__write_indent()
+			self.file.write(lines[i])
+			if i != n - 1:
+				self.file.write('\n')
+
+	@synchronized_self
+	def open_dict(self):
+		self.__write_indent()
+		self.file.write('{')
+
+		self.__indent_level += 1
+		self.__is_collection_empty.append(True)
+
+	@synchronized_self
+	def close_dict(self, comma=True):
+		self.__indent_level -= 1
+		self.__is_collection_empty.pop()
+
+		self.file.write('\n')
+		self.__write_indent()
+		self.file.write('}')
+
+	@synchronized_self
+	def write_dict_item(self, key, value):
+		# Write key.
+		self.write_dict_key(key)
+
+		# Write value.
+		self.__indent_level += 1
+		self.__write(value)
+		self.__indent_level -= 1
+
+	@synchronized_self
+	def write_dict_key(self, key):
+		# Write comma if this is not the initial item in the dict.
+		if self.__is_collection_empty[-1]:
+			self.__is_collection_empty[-1] = False
+		else:
+			self.file.write(',')
+
+		self.file.write('\n')
+		self.__write(key)
+		self.file.write(': ')
+
+		self.__inhibit_next_indent = True
 
 #############################################################################
 ##### Helper functions
