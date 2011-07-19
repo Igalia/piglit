@@ -278,6 +278,19 @@ class TestrunResult:
 		self.lspci = None
 		self.tests = {}
 
+	def __checkFileIsNotInOldFormat(self, file):
+		'''
+		If file contains the old, custom format, then raise
+		``ResultFileInOldFormatError``.
+
+		:return: None
+		'''
+		saved_position = file.tell()
+		first_line = file.readline()
+		if first_line.startswith('name:'):
+			raise ResultFileInOldFormatError(file.name)
+		file.seek(saved_position)
+
 	def write(self, file):
 		# Serialize only the keys in serialized_keys.
 		keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
@@ -285,14 +298,7 @@ class TestrunResult:
 		json.dump(raw_dict, file, indent=JSONWriter.INDENT)
 
 	def parseFile(self, file):
-		# If file contains the old, custom format, then raise
-		# an informative error.
-		saved_position = file.tell()
-		first_line = file.readline()
-		if first_line.startswith('name:'):
-			raise ResultFileInOldFormatError(file.name)
-		file.seek(saved_position)
-
+		self.__checkFileIsNotInOldFormat(file)
 		raw_dict = json.load(file)
 
 		# Check that only expected keys were unserialized.
