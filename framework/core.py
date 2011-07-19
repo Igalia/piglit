@@ -282,7 +282,7 @@ class TestrunResult:
 		# Serialize only the keys in serialized_keys.
 		keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
 		raw_dict = dict([(k, self.__dict__[k]) for k in keys])
-		json.dump(raw_dict, file, indent=4)
+		json.dump(raw_dict, file, indent=JSONWriter.INDENT)
 
 	def parseFile(self, file):
 		# If file contains the old, custom format, then raise
@@ -348,7 +348,7 @@ class Test:
 	def run(self):
 		raise NotImplementedError
 
-	def doRun(self, env, path, testrun):
+	def doRun(self, env, path, json_writer):
 		'''
 		Schedule test to be run
 
@@ -361,13 +361,13 @@ class Test:
 		    After this test has executed, the test's ``TestResult`` is
 		    assigned to ``testrun.tests[path]``
 		'''
-		args = (env, path, testrun)
+		args = (env, path, json_writer)
 		if self.runConcurrent:
 			ConcurrentTestPool().put(self.__doRunWork, args=args)
 		else:
 			self.__doRunWork(*args)
 
-	def __doRunWork(self, env, path, testrun):
+	def __doRunWork(self, env, path, json_writer):
 		# Exclude tests that don't match the filter regexp
 		if len(env.filter) > 0:
 			if not True in map(lambda f: f.search(path) != None, env.filter):
@@ -404,7 +404,7 @@ class Test:
 
 			status(result['result'])
 
-			testrun.tests[path] = result
+			json_writer.write_dict_item(path, result)
 			if Test.sleep:
 				time.sleep(Test.sleep)
 		else:
@@ -436,7 +436,7 @@ class Test:
 
 
 class Group(dict):
-	def doRun(self, env, path, testrun):
+	def doRun(self, env, path, json_writer):
 		'''
 		Schedule all tests in group for execution.
 
@@ -446,7 +446,7 @@ class Group(dict):
 			spath = sub
 			if len(path) > 0:
 				spath = path + '/' + spath
-			self[sub].doRun(env, spath, testrun)
+			self[sub].doRun(env, spath, json_writer)
 
 
 class TestProfile:
@@ -454,14 +454,17 @@ class TestProfile:
 		self.tests = Group()
 		self.sleep = 0
 
-	def run(self, env, testrun):
+	def run(self, env, json_writer):
 		'''
 		Schedule all tests in profile for execution.
 
 		See ``Test.doRun``.
 		'''
-		self.tests.doRun(env, '', testrun)
+		json_writer.write_dict_key('tests')
+		json_writer.open_dict()
+		self.tests.doRun(env, '', json_writer)
 		ConcurrentTestPool().join()
+		json_writer.close_dict()
 
 	def remove_test(self, test_path):
 		"""Remove a fully qualified test from the profile.

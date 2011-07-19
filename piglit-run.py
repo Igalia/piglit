@@ -23,7 +23,6 @@
 
 
 from getopt import getopt, GetoptError
-import json
 import os.path as path
 import re
 import sys, os
@@ -132,31 +131,27 @@ def main():
 	else:
 		results.name = OptionName
 
-	results.__dict__.update(env.collectData())
+	# Begin json.
+	result_filepath = os.path.join(resultsDir, 'main')
+	json_writer = core.JSONWriter(SyncFileWriter(result_filepath))
+	json_writer.open_dict()
+
+	json_writer.write_dict_item('name', results.name)
+	for (key, value) in env.collectData().items():
+		json_writer.write_dict_item(key, value)
 
 	profile = core.loadTestProfile(profileFilename)
 	time_start = time.time()
 
-	try:
-		profile.run(env, results)
-	except Exception as e:
-		if isinstance(e, KeyboardInterrupt):
-			# When the user interrupts the test run, he may still
-			# want the partial test results.  So ignore
-			# KeyboardInterruption and proceed to writing the
-			# result files.
-			pass
-		else:
-			traceback.print_exc()
-			sys.exit(1)
+	profile.run(env, json_writer)
 
 	time_end = time.time()
 	results.time_elapsed = time_end - time_start
+	json_writer.write_dict_item('time_elapsed', results.time_elapsed)
 
-	result_filepath = os.path.join(resultsDir, 'main')
-	print("Writing results file...")
-	with open(result_filepath, 'w') as f:
-		results.write(f)
+	# End json.
+	json_writer.close_dict()
+	json_writer.file.close()
 
 	print
 	print 'Thank you for running Piglit!'
