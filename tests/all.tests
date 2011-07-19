@@ -24,7 +24,10 @@ blacklist = [
 # Collecting all tests
 profile = TestProfile()
 
-execfile(path.join(path.dirname(__file__), 'gtf.tests'))
+try:
+	execfile(path.join(path.dirname(__file__), 'gtf.tests'))
+except SystemExit:
+	pass
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
