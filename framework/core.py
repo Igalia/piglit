@@ -291,6 +291,73 @@ class TestrunResult:
 			raise ResultFileInOldFormatError(file.name)
 		file.seek(saved_position)
 
+	def __repairFile(self, file):
+		'''
+		Reapair JSON file if necessary
+
+                If the JSON file is not closed properly, perhaps due a system
+                crash during a test run, then the JSON is repaired by
+                discarding the trailing, incomplete item and appending braces
+                to the file to close the JSON object.
+
+                The repair is performed on a string buffer, and the given file
+                is never written to. This allows the file to be safely read
+                during a test run.
+
+                :return: If no repair occured, then ``file`` is returned.
+                    Otherwise, a new file object containing the repaired JSON
+                    is returned.
+		'''
+
+                saved_position = file.tell()
+		lines = file.readlines()
+                file.seek(saved_position)
+
+		if lines[-1] == '}':
+			# JSON object was closed properly. No repair is
+			# necessary.
+			return file
+
+		# JSON object was not closed properly.
+		#
+		# To repair the file, we execute these steps:
+		#   1. Find the closing brace of the last, properly written
+		#      test result.
+		#   2. Discard all subsequent lines.
+		#   3. Remove the trailing comma of that test result.
+		#   4. Append enough closing braces to close the json object.
+		#   5. Return a file object containing the repaired JSON.
+
+		# Each non-terminal test result ends with this line:
+		safe_line =  3 * JSONWriter.INDENT * ' ' + '},\n'
+
+		# Search for the last occurence of safe_line.
+		safe_line_num = None
+		for i in range(-1, - len(lines), -1):
+			if lines[i] == safe_line:
+				safe_line_num = i
+				break
+
+		if safe_line_num is None:
+			raise Exception('failed to repair corrupt result file: ' + file.name)
+
+		# Remove corrupt lines.
+		lines = lines[0:(safe_line_num + 1)]
+
+		# Remove trailing comma.
+		lines[-1] = 3 * JSONWriter.INDENT * ' ' + '}\n'
+
+		# Close json object.
+		lines.append(JSONWriter.INDENT * ' ' + '}\n')
+		lines.append('}')
+
+                # Return new file object containing the repaired JSON.
+                new_file = StringIO()
+                new_file.writelines(lines)
+                new_file.flush()
+                new_file.seek(0)
+                return new_file
+
 	def write(self, file):
 		# Serialize only the keys in serialized_keys.
 		keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
@@ -299,6 +366,7 @@ class TestrunResult:
 
 	def parseFile(self, file):
 		self.__checkFileIsNotInOldFormat(file)
+		file = self.__repairFile(file)
 		raw_dict = json.load(file)
 
 		# Check that only expected keys were unserialized.
