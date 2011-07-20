@@ -48,6 +48,12 @@ Now build everything:
   $ make
 
 
+2.1 Cross Compiling
+-------------------
+
+On Linux, if cross-compiling a 32-bit build on a 64-bit host, then you must
+invoke cmake with option "-DCMAKE_SYSTEM_PROCESSOR=i386".
+
 
 3. How to run tests
 -------------------
