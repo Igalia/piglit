@@ -46,7 +46,7 @@ static GLint get_vs(int num_varyings, int data_varying)
 {
 	GLuint shader;
 	unsigned i;
-	char code[1024], temp[1024];
+	char code[2048], temp[2048];
 
 	code[0] = 0;
 	for (i = 0; i < num_varyings; i++) {
@@ -96,7 +96,7 @@ static GLint get_fs(int num_varyings, int data_varying)
 {
 	GLuint shader;
 	unsigned i;
-	char code[1024], temp[1024];
+	char code[2048], temp[2048];
 
 	code[0] = 0;
 	for (i = 0; i < num_varyings; i++) {
