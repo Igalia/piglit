@@ -922,6 +922,8 @@ add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA'
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_INTENSITY')
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGB')
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGBA')
+arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'] = PlainExecTest(['arb_texture_compression-internal-format-query', '-auto'])
+arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'].runConcurrent = True
 
 arb_vertex_buffer_object = Group()
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
