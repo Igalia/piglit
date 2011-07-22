@@ -13,6 +13,27 @@ find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
 
+# Check for presence of Python 2.6 or greater.
+execute_process(
+	COMMAND python -c "import sys; assert sys.version >= '2.6'"
+	OUTPUT_QUIET
+	ERROR_QUIET
+	RESULT_VARIABLE python_version_check_error_code)
+if(NOT(python_version_check_error_code EQUAL 0))
+	message(FATAL_ERROR "python version 2.6 or greater required")
+endif(NOT(python_version_check_error_code EQUAL 0))
+
+# Check for the presence of numpy, which is needed to build generated
+# tests.
+execute_process(
+	COMMAND python -c "import numpy"
+	OUTPUT_QUIET
+	ERROR_QUIET
+	RESULT_VARIABLE import_numpy_error_code)
+if(NOT(import_numpy_error_code EQUAL 0))
+	message(FATAL_ERROR "numpy library not found")
+endif(NOT(import_numpy_error_code EQUAL 0))
+
 if (NOT MSVC)
 	CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
 	IF (C_COMPILER_FLAG_WALL)
@@ -81,3 +102,4 @@ configure_file(
 
 include_directories(src)
 add_subdirectory(cmake/target_api)
+add_subdirectory(generated_tests)

@@ -28,7 +28,8 @@ The original tests have been taken from
 
 First of all, you need to make sure that the following are installed:
 
-  - Python 2.4 or greater
+  - Python 2.6 or greater
+  - numpy (http://www.numpy.org)
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
