@@ -13,5 +13,6 @@ link_libraries (
 )
 
 add_executable (arb_texture_compression-internal-format-query internal-format-query.c)
+add_executable (arb_texture_compression-invalid-formats invalid-formats.c)
 
 # vim: ft=cmake:

@@ -838,6 +838,8 @@ add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
+tdfx_texture_compression_fxt1['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'fxt1'])
+tdfx_texture_compression_fxt1['invalid formats'].runConcurrent = True
 
 def add_color_buffer_float_test(name, format, p1, p2):
 	arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
@@ -924,6 +926,13 @@ add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGB')
 add_texwrap_test2(arb_texture_compression, '2D', 'GL_COMPRESSED_RGBA')
 arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'] = PlainExecTest(['arb_texture_compression-internal-format-query', '-auto'])
 arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'].runConcurrent = True
+arb_texture_compression['unknown formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'unknown'])
+arb_texture_compression['unknown formats'].runConcurrent = True
+
+arb_texture_compression_bptc = Group()
+spec['ARB_texture_compression_bptc'] = arb_texture_compression_bptc
+arb_texture_compression_bptc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'bptc'])
+arb_texture_compression_bptc['invalid formats'].runConcurrent = True
 
 arb_vertex_buffer_object = Group()
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
@@ -960,6 +969,8 @@ add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_L
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_LATC1')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_LATC2')
 add_texwrap_test2(ext_texture_compression_latc, '2D', 'GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2')
+ext_texture_compression_latc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'latc'])
+ext_texture_compression_latc['invalid formats'].runConcurrent = True
 
 ext_texture_compression_rgtc = Group()
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
@@ -969,6 +980,8 @@ add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RED_RGTC1')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_SIGNED_RED_RGTC1')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RG_RGTC2')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_SIGNED_RG_RGTC2')
+ext_texture_compression_rgtc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'rgtc'])
+ext_texture_compression_rgtc['invalid formats'].runConcurrent = True
 
 ext_texture_compression_s3tc = Group()
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
@@ -977,11 +990,15 @@ add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGB_S3TC_DX
 add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT1')
 add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT3')
 add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT5')
+ext_texture_compression_s3tc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 's3tc'])
+ext_texture_compression_s3tc['invalid formats'].runConcurrent = True
 
 ati_texture_compression_3dc = Group()
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
 add_fbo_generatemipmap_extension(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc', 'fbo-generatemipmap-formats')
 add_texwrap_test2(ati_texture_compression_3dc, '2D', 'GL_COMPRESSED_LUMINANCE_ALPHA_3DC')
+ati_texture_compression_3dc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', '3dc'])
+ati_texture_compression_3dc['invalid formats'].runConcurrent = True
 
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
@@ -1078,6 +1095,8 @@ add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-g
 #add_fbo_blending_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-blending-formats')
 add_fbo_alphatest_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-alphatest-formats')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
+ext_texture_srgb['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'srgb'])
+ext_texture_srgb['invalid formats'].runConcurrent = True
 
 ati_draw_buffers = Group()
 spec['ATI_draw_buffers'] = ati_draw_buffers
@@ -1120,6 +1139,11 @@ nv_conditional_render['copytexsubimage'] = PlainExecTest(['nv_conditional_render
 nv_conditional_render['drawpixels'] = PlainExecTest(['nv_conditional_render-drawpixels', '-auto'])
 nv_conditional_render['generatemipmap'] = PlainExecTest(['nv_conditional_render-generatemipmap', '-auto'])
 nv_conditional_render['vertex_array'] = PlainExecTest(['nv_conditional_render-vertex_array', '-auto'])
+
+oes_compressed_paletted_texture = Group()
+spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
+oes_compressed_paletted_texture['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'paletted'])
+oes_compressed_paletted_texture['invalid formats'].runConcurrent = True
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
