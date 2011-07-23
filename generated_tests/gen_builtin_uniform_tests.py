@@ -79,11 +79,11 @@ def shader_runner_format(values):
     """
     transformed_values = []
     for value in values:
-	if isinstance(value, bool):
+	if isinstance(value, (bool, np.bool_)):
 	    transformed_values.append(int(value))
 	else:
 	    transformed_values.append(value)
-    return ' '.join(str(x) for x in transformed_values)
+    return ' '.join(repr(x) for x in transformed_values)
 
 
 
@@ -105,6 +105,119 @@ def shader_runner_type(glsl_type):
 
 
 
+class Comparator(object):
+    """Base class which abstracts how we compare expected and actual
+    values.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def make_additional_declarations(self):
+	"""Return additional declarations, if any, that are needed in
+	the shader program.
+	"""
+	return ''
+
+    @abc.abstractmethod
+    def make_result_handler(self, output_var):
+	"""Return the shader code that is needed to produce the result
+	and store it in output_var.
+	"""
+
+    @abc.abstractmethod
+    def make_result_test(self, test_num, test_vector):
+	"""Return the shader_runner test code that is needed to test a
+	single test vector.
+	"""
+
+
+
+class BoolComparator(Comparator):
+    def __init__(self, signature):
+	assert not signature.rettype.is_matrix
+	self.__padding = 4 - signature.rettype.num_rows
+
+    def make_result_handler(self, output_var):
+	return '  {0} = vec4(result{1});\n'.format(
+	    output_var, ', 0.0' * self.__padding)
+
+    def convert_to_float(self, value):
+	"""Convert the given vector or scalar value to a list of
+	floats representing the expected color produced by the test.
+	"""
+	value = value*1.0 # convert bools to floats
+	value = column_major_values(value)
+	value += [0.0] * self.__padding
+	return value
+
+    def make_result_test(self, test_num, test_vector):
+	test = 'draw rect -1 -1 2 2\n'
+	test += 'probe rgba {0} 0 {1}\n'.format(
+	    test_num,
+	    shader_runner_format(self.convert_to_float(test_vector.result)))
+	return test
+
+
+
+class FloatComparator(Comparator):
+    def __init__(self, signature):
+	self.__signature = signature
+
+    def make_additional_declarations(self):
+	decls = 'uniform float tolerance;\n'
+	decls += 'uniform {0} expected;\n'.format(self.__signature.rettype)
+	return decls
+
+    def make_indexers(self):
+	"""Build a list of strings which index into every possible
+	value of the result.  For example, if the result is a vec2,
+	then build the indexers ['[0]', '[1]'].
+	"""
+	if self.__signature.rettype.num_cols == 1:
+	    col_indexers = ['']
+	else:
+	    col_indexers = ['[{0}]'.format(i)
+			    for i in xrange(self.__signature.rettype.num_cols)]
+	if self.__signature.rettype.num_rows == 1:
+	    row_indexers = ['']
+	else:
+	    row_indexers = ['[{0}]'.format(i)
+			    for i in xrange(self.__signature.rettype.num_rows)]
+	return [col_indexer + row_indexer
+		for col_indexer in col_indexers
+		for row_indexer in row_indexers]
+
+    def make_result_handler(self, output_var):
+	statements = ''
+	# Can't use distance when testing itself, or when the rettype
+	# is a matrix.
+	if self.__signature.name == 'distance' or \
+		self.__signature.rettype.is_matrix:
+	    statements += '  {0} residual = result - expected;\n'.format(
+		self.__signature.rettype)
+	    statements += '  float error_sq = {0};\n'.format(
+		' + '.join(
+		    'residual{0} * residual{0}'.format(indexer)
+		    for indexer in self.make_indexers()))
+	    condition = 'error_sq <= tolerance * tolerance'
+	else:
+	    condition = 'distance(result, expected) <= tolerance'
+	statements += '  {v} = {cond} ? {green} : {red};\n'.format(
+	    v=output_var, cond=condition, green='vec4(0.0, 1.0, 0.0, 1.0)',
+	    red='vec4(1.0, 0.0, 0.0, 1.0)')
+	return statements
+
+    def make_result_test(self, test_num, test_vector):
+	test = 'uniform {0} expected {1}\n'.format(
+	    shader_runner_type(self.__signature.rettype),
+	    shader_runner_format(column_major_values(test_vector.result)))
+	test += 'uniform float tolerance {0}\n'.format(
+	    shader_runner_format([test_vector.tolerance]))
+	test += 'draw rect -1 -1 2 2\n'
+	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+	return test
+
+
+
 class ShaderTest(object):
     """Class used to build a test of a single built-in.  This is an
     abstract base class--derived types should override test_prefix(),
@@ -122,7 +235,12 @@ class ShaderTest(object):
 	"""
 	self._signature = signature
 	self._test_vectors = test_vectors
-	self._offset, self._scale = compute_offset_and_scale(test_vectors)
+	if signature.rettype.base_type == glsl_bool:
+	    self._comparator = BoolComparator(signature)
+	elif signature.rettype.base_type == glsl_float:
+	    self._comparator = FloatComparator(signature)
+	else:
+	    raise Exception('Unexpected rettype {0}'.format(signature.rettype))
 
     def glsl_version(self):
 	return self._signature.version_introduced
@@ -165,12 +283,7 @@ class ShaderTest(object):
 	for i in xrange(len(self._signature.argtypes)):
 	    shader += 'uniform {0} arg{1};\n'.format(
 		self._signature.argtypes[i], i)
-	if self._signature.rettype.is_matrix:
-	    shader += 'uniform int column;\n'
-	    indexer = '[column]'
-	else:
-	    indexer = ''
-	padding = 4 - self._signature.rettype.num_rows
+	shader += self._comparator.make_additional_declarations()
 	shader += '\n'
 	shader += 'void main()\n'
 	shader += '{\n'
@@ -179,28 +292,9 @@ class ShaderTest(object):
 	    'arg{0}'.format(i) for i in xrange(len(self._signature.argtypes)))
 	shader += '  {0} result = {1}({2});\n'.format(
 		self._signature.rettype, self._signature.name, args)
-	if self._signature.rettype.base_type != glsl_bool:
-	    shader += '  result -= {0};\n'.format(self._offset)
-	    shader += '  result *= {0};\n'.format(self._scale)
-	shader += '  {0} = vec4(result{1}{2});\n'.format(
-	    output_var, indexer, ', 0.0' * padding)
+	shader += self._comparator.make_result_handler(output_var)
 	shader += '}\n'
 	return shader
-
-    def rescale_and_pad(self, value):
-	"""Apply the scale and offset to the given vector or scalar
-	value, convert it into a list of floats, and pad it with 0's
-	to a length of 4.  This is used to determine the expected
-	color produced by the test.
-	"""
-	if self._signature.rettype.base_type == glsl_bool:
-	    value = value*1.0
-	else:
-	    value = (value - self._offset) * self._scale
-	value = column_major_values(value)
-	while len(value) < 4:
-	    value.append(0.0)
-	return value
 
     def make_test(self):
 	"""Make the complete shader_runner test file, and return it as
@@ -208,25 +302,12 @@ class ShaderTest(object):
 	"""
 	test = ''
 	for test_num, test_vector in enumerate(self._test_vectors):
-	    args, expected = test_vector
-	    for i in xrange(len(args)):
+	    for i in xrange(len(test_vector.arguments)):
 		test += 'uniform {0} arg{1} {2}\n'.format(
 		    shader_runner_type(self._signature.argtypes[i]),
-		    i, shader_runner_format(column_major_values(args[i])))
-	    if self._signature.rettype.is_matrix:
-		# Test one column at a time
-		for column in xrange(self._signature.rettype.num_cols):
-		    test += 'uniform int column {0}\n'.format(column)
-		    test += 'draw rect -1 -1 2 2\n'
-		    test += 'probe rgba {0} {1} {2}\n'.format(
-			test_num, column,
-			shader_runner_format(
-			    self.rescale_and_pad(expected[:,column])))
-	    else:
-		test += 'draw rect -1 -1 2 2\n'
-		test += 'probe rgba {0} 0 {1}\n'.format(
-		    test_num,
-		    shader_runner_format(self.rescale_and_pad(expected)))
+		    i, shader_runner_format(
+			column_major_values(test_vector.arguments[i])))
+	    test += self._comparator.make_result_test(test_num, test_vector)
 	return test
 
     def filename(self):

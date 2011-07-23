@@ -40,6 +40,11 @@ import numpy as np
 
 
 
+# Floating point types used by Python and numpy
+FLOATING_TYPES = (float, np.float64, np.float32)
+
+
+
 class GlslBuiltinType(object):
     """Class representing a GLSL built-in type."""
     def __init__(self, name, base_type, num_cols, num_rows,
@@ -160,10 +165,17 @@ Signature = collections.namedtuple(
 # built-in GLSL function:
 # - arguments is a tuple containing the arguments to apply to the
 #   function.  Each argument is of a type native to numpy (e.g.
-#   numpy.float64 or numpy.ndarray)
+#   numpy.float32 or numpy.ndarray)
 # - result is the value the function is expected to return.  It is
 #   also of a type native to numpy.
-TestVector = collections.namedtuple('TestVector', ('arguments', 'result'))
+# - tolerance is a float32 representing how much deviation from the
+#   result we expect, considering the floating point precision
+#   requirements of GLSL and OpenGL.  The value may be zero for test
+#   vectors involving booleans and integers.  If result is a vector or
+#   matrix, tolerance should be interpreted as the maximum permissible
+#   RMS error (as would be computed by the distance() function).
+TestVector = collections.namedtuple(
+    'TestVector', ('arguments', 'result', 'tolerance'))
 
 
 
@@ -171,7 +183,7 @@ def glsl_type_of(value):
     """Return the GLSL type corresponding to the given native numpy
     value, as a GlslBuiltinType.
     """
-    if isinstance(value, float):
+    if isinstance(value, FLOATING_TYPES):
 	return glsl_float
     elif isinstance(value, (bool, np.bool_)):
 	return glsl_bool
@@ -183,7 +195,7 @@ def glsl_type_of(value):
 	    # Vector
 	    vector_length = value.shape[0]
 	    assert 2 <= vector_length <= 4
-	    if value.dtype == float:
+	    if value.dtype in FLOATING_TYPES:
 		return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
 	    elif value.dtype == bool:
 		return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
@@ -194,7 +206,7 @@ def glsl_type_of(value):
 		    'Unexpected vector base type {0}'.format(value.dtype))
 	else:
 	    # Matrix
-	    assert value.dtype == float
+	    assert value.dtype in FLOATING_TYPES
 	    assert len(value.shape) == 2
 	    matrix_rows = value.shape[0]
 	    assert 2 <= matrix_rows <= 4
@@ -210,7 +222,10 @@ def glsl_type_of(value):
 def column_major_values(value):
     """Given a native numpy value, return a list of the scalar values
     comprising it, in column-major order."""
-    return np.reshape(np.array(value), -1, 'F').tolist()
+    if isinstance(value, np.ndarray):
+	return list(np.reshape(value, -1, 'F'))
+    else:
+	return [value]
 
 
 
@@ -221,11 +236,37 @@ def glsl_constant(value):
     if column_major.dtype == bool:
 	values = ['true' if x else 'false' for x in column_major]
     else:
-	values = [str(x) for x in column_major]
+	values = [repr(x) for x in column_major]
     if len(column_major) == 1:
 	return values[0]
     else:
 	return '{0}({1})'.format(glsl_type_of(value), ', '.join(values))
+
+
+
+def round_to_32_bits(value):
+    """If value is a floating point type, round it down to 32 bits.
+    Otherwise return it unchanged.
+    """
+    if isinstance(value, float):
+	return np.float32(value)
+    elif isinstance(value, np.ndarray) and value.dtype == np.float64:
+	return np.array(value, dtype=np.float32)
+    else:
+	return value
+
+
+
+def extend_to_64_bits(value):
+    """If value is a floating point type, extend it to 64 bits.
+    Otherwise return it unchanged.
+    """
+    if isinstance(value, np.float32):
+	return np.float64(value)
+    elif isinstance(value, np.ndarray) and value.dtype == np.float32:
+	return np.array(value, dtype=np.float64)
+    else:
+	return value
 
 
 
@@ -297,9 +338,80 @@ def _argument_types_match(arguments, argument_indices_to_match):
 
 
 
-def _simulate_function(test_inputs, python_equivalent):
+def _strict_tolerance(arguments, result):
+    """Compute tolerance using a strict interpretation of the GLSL and
+    OpenGL standards.
+
+    From the GLSL 1.20 spec (4.1.4 "Floats"):
+
+      "As an input value to one of the processing units, a
+      floating-point variable is expected to match the IEEE single
+      precision floating-point definition for precision and dynamic
+      range.  It is not required that the precision of internal
+      processing match the IEEE floating-point specification for
+      floating-point operations, but the guidelines for precision
+      established by the OpenGL 1.4 specification must be met."
+
+    From the OpenGL 1.4 spec (2.1.1 "Floating-Point Computation"):
+
+      "We require simply that numbers' floating-point parts contain
+      enough bits ... so that individual results of floating-point
+      operations are accurate to about 1 part in 10^5."
+
+    A harsh interpretation of the above is that (a) no precision is
+    lost in moving numbers into or out of the GPU, and (b) any
+    built-in function constitutes a single operation, so therefore the
+    error in applying any built-in function should be off by no more
+    than 1e-5 times its theoretically correct value.
+
+    This is not the only possible interpretation, however.  Certain
+    built-in functions, such as the cross product, are computed by a
+    formula consisting of many elementary multiplications and
+    additions, in which a large amount of cancellation sometimes
+    occurs.  It's possible that these rules are meant to apply to
+    those elementary multiplications and additions, and not the full
+    built-in function. Other built-in functions, such as the trig
+    functions, are typically implemented by a series approximation, in
+    which 1 part in 10^5 accuracy seems like overkill.  See below for
+    the tolerance computation we use on these other functions.
+    """
+    return 1e-5 * np.linalg.norm(result)
+
+
+
+def _trig_tolerance(arguments, result):
+    """Compute a more lenient tolerance bound for trig functions.
+
+    The GLSL and OpenGL specs don't provide any guidance as to the
+    required accuracy of trig functions (other than the "1 part in
+    10^5" general accuracy requirement, which seems like overkill for
+    trig functions.
+
+    So the tolerance here is rather arbitrarily chosen to be either 1
+    part in 10^3 or 10^-4, whichever is larger.
+    """
+    return max(1e-4, 1e-3 * np.linalg.norm(result))
+
+
+
+def _cross_product_tolerance(arguments, result):
+    """Compute a more lenient tolerance bound for cross product.
+
+    Since the computation of a cross product may involve a large
+    amount of cancellation, an error tolerance of 1 part in 10^5
+    (referred to the magnitude of the result vector) is overly tight.
+
+    So instead we allow the error to be 1 part in 10^5 referred to the
+    product of the magnitudes of the arguments.
+    """
+    assert len(arguments) == 2
+    return 1e-5 * np.linalg.norm(arguments[0]) * np.linalg.norm(arguments[1])
+
+
+
+def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     """Construct test vectors by simulating a GLSL function on a list
-    of possible inputs.
+    of possible inputs, and return a list of test vectors.
 
     test_inputs is a list of possible input sequences, each of which
     represents a set of arguments that should be applied to the
@@ -309,12 +421,28 @@ def _simulate_function(test_inputs, python_equivalent):
     None if the GLSL function returns undefined results for the given
     set of inputs, otherwise it should return the expected result.
     Input sequences for which python_equivalent returns None are
-    ignored."""
+    ignored.
+
+    The function is simulated using 64 bit floats for maximum possible
+    accuracy, but the output is rounded to 32 bits since that is the
+    data type that we expect to get back form OpenGL.
+
+    tolerance_function is the function to call to compute the
+    tolerance.  It should take the set of arguments and the expected
+    result as its parameters.  It is only used for functions that
+    return floating point values.
+    """
     test_vectors = []
     for inputs in test_inputs:
-	expected_output = python_equivalent(*inputs)
+	expected_output = round_to_32_bits(
+	    python_equivalent(*[extend_to_64_bits(x) for x in inputs]))
 	if expected_output is not None:
-	    test_vectors.append(TestVector(inputs, expected_output))
+	    if glsl_type_of(expected_output).base_type != glsl_float:
+		tolerance = np.float32(0.0)
+	    else:
+		tolerance = np.float32(
+		    tolerance_function(inputs, expected_output))
+	    test_vectors.append(TestVector(inputs, expected_output, tolerance))
     return test_vectors
 
 
@@ -324,17 +452,19 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
     test_vectors into vectors of length vector_length. For example,
     vectorizing the test vectors
 
-    [TestVector((10, 20), 30), TestVector((11, 20), 31)]
+    [TestVector((10, 20), 30, tolerance), TestVector((11, 20), 31, tolerance)]
 
     into vectors of length 2 would produce the result:
 
-    [TestVector((vec2(10, 11), vec2(20, 20)), vec2(30, 31))].
+    [TestVector((vec2(10, 11), vec2(20, 20)), vec2(30, 31), new_tolerance)].
+
+    Tolerances are combined in root-sum-square fashion.
 
     scalar_arg_indices is a sequence of argument indices which should
     not be vectorized.  So, if scalar_arg_indices is [1] in the above
     example, the result would be:
 
-    [TestVector((vec2(10, 11), 20), vec2(30, 31))].
+    [TestVector((vec2(10, 11), 20), vec2(30, 31), new_tolerance)].
     """
     def make_groups(test_vectors):
 	"""Group test vectors according to the values passed to the
@@ -373,7 +503,9 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
 		arguments.append(
 		    np.array([tv.arguments[j] for tv in test_vectors]))
 	result = np.array([tv.result for tv in test_vectors])
-	return TestVector(arguments, result)
+	tolerance = np.float32(
+	    np.linalg.norm([tv.tolerance for tv in test_vectors]))
+	return TestVector(arguments, result, tolerance)
     vectorized_test_vectors = []
     groups = make_groups(test_vectors)
     for key in sorted(groups.keys()):
@@ -415,13 +547,35 @@ def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors):
 
 
 
+def make_arguments(input_generators):
+    """Construct a list of tuples of input arguments to test.
+
+    input_generators is a list, the ith element of which is a sequence
+    of values that are suitable for use as the ith argument of the
+    function under test.
+
+    Output is a list, each element of which is a tuple of arguments to
+    be passed to the function under test.  These values are produced
+    by taking the cartesian product of the input sequences.
+
+    In addition, this function rounds floating point inputs to 32
+    bits, so that there will be no rounding errors when the input
+    values are passed into OpenGL.
+    """
+    input_generators = [
+	[round_to_32_bits(x) for x in seq] for seq in input_generators]
+    return list(itertools.product(*input_generators))
+
+
+
 def _make_componentwise_test_vectors(test_suite_dict):
     """Add test vectors to test_suite_dict for GLSL built-in
     functions that operate on vectors in componentwise fashion.
     Examples include sin(), cos(), min(), max(), and clamp().
     """
     def f(name, arity, glsl_version, python_equivalent,
-	  alternate_scalar_arg_indices, test_inputs):
+	  alternate_scalar_arg_indices, test_inputs,
+	  tolerance_function = _strict_tolerance):
 	"""Create test vectors for the function with the given name
 	and arity, which was introduced in the given glsl_version.
 
@@ -438,9 +592,13 @@ def _make_componentwise_test_vectors(test_suite_dict):
 	test_inputs is a list, the ith element of which is a list of
 	values that are suitable for use as the ith argument of the
 	function.
+
+	If tolerance_function is supplied, it is a function which
+	should be used to compute the tolerance for the test vectors.
+	Otherwise, _strict_tolerance is used.
 	"""
 	scalar_test_vectors = _simulate_function(
-	    itertools.product(*test_inputs), python_equivalent)
+	    make_arguments(test_inputs), python_equivalent, tolerance_function)
 	_store_test_vectors(
 	    test_suite_dict, name, glsl_version, scalar_test_vectors)
 	if alternate_scalar_arg_indices is None:
@@ -456,13 +614,13 @@ def _make_componentwise_test_vectors(test_suite_dict):
 			vector_length))
     f('radians', 1, '1.10', np.radians, None, [np.linspace(-180.0, 180.0, 4)])
     f('degrees', 1, '1.10', np.degrees, None, [np.linspace(-np.pi, np.pi, 4)])
-    f('sin', 1, '1.10', np.sin, None, [np.linspace(-np.pi, np.pi, 4)])
-    f('cos', 1, '1.10', np.cos, None, [np.linspace(-np.pi, np.pi, 4)])
-    f('tan', 1, '1.10', np.tan, None, [np.linspace(-np.pi, np.pi, 4)])
-    f('asin', 1, '1.10', np.arcsin, None, [np.linspace(-1.0, 1.0, 4)])
-    f('acos', 1, '1.10', np.arccos, None, [np.linspace(-1.0, 1.0, 4)])
-    f('atan', 1, '1.10', np.arctan, None, [np.linspace(-2.0, 2.0, 4)])
-    f('atan', 2, '1.10', _arctan2, None, [np.linspace(-2.0, 2.0, 3), np.linspace(-2.0, 2.0, 3)])
+    f('sin', 1, '1.10', np.sin, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('cos', 1, '1.10', np.cos, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('tan', 1, '1.10', np.tan, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('asin', 1, '1.10', np.arcsin, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
+    f('acos', 1, '1.10', np.arccos, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
+    f('atan', 1, '1.10', np.arctan, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('atan', 2, '1.10', _arctan2, None, [np.linspace(-2.0, 2.0, 3), np.linspace(-2.0, 2.0, 3)], _trig_tolerance)
     f('pow', 2, '1.10', _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('exp', 1, '1.10', np.exp, None, [np.linspace(-2.0, 2.0, 4)])
     f('log', 1, '1.10', np.log, None, [np.linspace(0.01, 2.0, 4)])
@@ -497,7 +655,8 @@ def _make_vector_relational_test_vectors(test_suite_dict):
 	'i': np.array([1, 2, 3, 4]),
 	'b': np.array([False, True])
 	}
-    def f(name, arity, glsl_version, python_equivalent, arg_types):
+    def f(name, arity, glsl_version, python_equivalent, arg_types,
+	  tolerance_function = _strict_tolerance):
 	"""Make test vectors for the function with the given name and
 	arity, which was introduced in the given glsl_version.
 
@@ -508,11 +667,16 @@ def _make_vector_relational_test_vectors(test_suite_dict):
 	standard "vec" inputs, 'i' if it supports "ivec" inputs, and 'b'
 	if it supports "bvec" inputs.  The output type of the function is
 	assumed to be the same as its input type.
+
+	If tolerance_function is supplied, it is a function which
+	should be used to compute the tolerance for the test vectors.
+	Otherwise, _strict_tolerance is used.
 	"""
 	for arg_type in arg_types:
 	    test_inputs = [_default_inputs[arg_type]]*arity
 	    scalar_test_vectors = _simulate_function(
-		itertools.product(*test_inputs), python_equivalent)
+		make_arguments(test_inputs), python_equivalent,
+		tolerance_function)
 	    for vector_length in (2, 3, 4):
 		_store_test_vectors(
 		    test_suite_dict, name, glsl_version,
@@ -548,7 +712,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	np.array([1.67, 0.66, 1.87]),
 	]
     _normalized_vectors = [_normalize(x) for x in _std_vectors]
-    _nontrivial_vectors = [x for x in _std_vectors if not isinstance(x, float)]
+    _nontrivial_vectors = [x for x in _std_vectors if not isinstance(x, FLOATING_TYPES)]
     _std_matrices = [
 	np.array([[ 1.60,  0.76],
 		  [ 1.53, -1.00]]), # mat2
@@ -610,7 +774,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	[np.array(bs) for bs in itertools.product(_ft, _ft, _ft)] + \
 	[np.array(bs) for bs in itertools.product(_ft, _ft, _ft, _ft)]
     def f(name, arity, glsl_version, python_equivalent,
-	  argument_indices_to_match, test_inputs):
+	  argument_indices_to_match, test_inputs,
+	  tolerance_function = _strict_tolerance):
 	"""Make test vectors for the function with the given name and
 	arity, which was introduced in the given glsl_version.
 
@@ -626,8 +791,12 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	test_inputs is a list, the ith element of which is a list of
 	vectors and/or scalars that are suitable for use as the ith
 	argument of the function.
+
+	If tolerance_function is supplied, it is a function which
+	should be used to compute the tolerance for the test vectors.
+	Otherwise, _strict_tolerance is used.
 	"""
-	test_inputs = itertools.product(*test_inputs)
+	test_inputs = make_arguments(test_inputs)
 	if argument_indices_to_match is not None:
 	    test_inputs = [
 		arguments
@@ -635,11 +804,12 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 		if _argument_types_match(arguments, argument_indices_to_match)]
 	_store_test_vectors(
 	    test_suite_dict, name, glsl_version,
-	    _simulate_function(test_inputs, python_equivalent))
+	    _simulate_function(
+		test_inputs, python_equivalent, tolerance_function))
     f('length', 1, '1.10', np.linalg.norm, None, [_std_vectors])
     f('distance', 2, '1.10', lambda x, y: np.linalg.norm(x-y), [0, 1], [_std_vectors, _std_vectors])
     f('dot', 2, '1.10', np.dot, [0, 1], [_std_vectors, _std_vectors])
-    f('cross', 2, '1.10', np.cross, [0, 1], [_std_vectors3, _std_vectors3])
+    f('cross', 2, '1.10', np.cross, [0, 1], [_std_vectors3, _std_vectors3], _cross_product_tolerance)
     f('normalize', 1, '1.10', _normalize, None, [_std_vectors])
     f('faceforward', 3, '1.10', _faceforward, [0, 1, 2], [_std_vectors, _std_vectors, _std_vectors])
     f('reflect', 2, '1.10', _reflect, [0, 1], [_std_vectors, _normalized_vectors])
