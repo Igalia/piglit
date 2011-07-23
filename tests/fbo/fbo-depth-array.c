@@ -169,7 +169,6 @@ draw_layer(int x, int y, int depth)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	glEnable(GL_TEXTURE_2D_ARRAY_EXT);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -192,7 +191,6 @@ draw_layer(int x, int y, int depth)
 
 	glEnd();
 
-	glDisable(GL_TEXTURE_2D_ARRAY_EXT);
 	glUseProgram(0);
 }
 
