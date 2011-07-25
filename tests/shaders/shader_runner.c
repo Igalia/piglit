@@ -988,6 +988,36 @@ piglit_display(void)
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_GREATER);
 		} else if (!strncmp(line,
+				    "texparameter compare_func gequal\n",
+				    33)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GEQUAL);
+		} else if (!strncmp(line,
+				    "texparameter compare_func less\n",
+				    31)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_LESS);
+		} else if (!strncmp(line,
+				    "texparameter compare_func lequal\n",
+				    33)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_LEQUAL);
+		} else if (!strncmp(line,
+				    "texparameter compare_func equal\n",
+				    32)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_EQUAL);
+		} else if (!strncmp(line,
+				    "texparameter compare_func notequal\n",
+				    35)) {
+			glTexParameteri(GL_TEXTURE_2D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_NOTEQUAL);
+		} else if (!strncmp(line,
 				    "texparameter compare_func always\n",
 				    33)) {
 			glTexParameteri(GL_TEXTURE_2D,
