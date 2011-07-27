@@ -1,5 +1,7 @@
 [require]
 GLSL >= 1.20
+# glUniformMatrix3x2fv only exists in OpenGL 2.1 or later.
+GL >= 2.1
 
 [vertex shader]
 #version 120

@@ -1,5 +1,7 @@
 [require]
 GLSL >= 1.20
+# glUniformMatrix2x4fv only exists in OpenGL 2.1 or later.
+GL >= 2.1
 
 [vertex shader]
 /* From page 43 (page 49 of the PDF) of the GLSL 1.20 spec:

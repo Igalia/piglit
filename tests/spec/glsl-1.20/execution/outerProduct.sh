@@ -77,10 +77,18 @@ function emit_vs_test
 	name="vs-outerProduct-${mat}.shader_test"
     fi
 
+    if [ $c -ne $r ]; then
+	GL_require="# glUniformMatrix${r}x${c}fv only exists in OpenGL 2.1 or later.
+GL >= 2.1
+"
+    else
+	GL_require=""
+    fi
+
     cat > $name <<EOF
 [require]
 GLSL >= 1.20
-
+$GL_require
 [vertex shader]
 EOF
 
@@ -131,10 +139,18 @@ function emit_fs_test
 	name="fs-outerProduct-${mat}.shader_test"
     fi
 
+    if [ $c -ne $r ]; then
+	GL_require="# glUniformMatrix${r}x${c}fv only exists in OpenGL 2.1 or later.
+GL >= 2.1
+"
+    else
+	GL_require=""
+    fi
+
     cat > $name <<EOF
 [require]
 GLSL >= 1.20
-
+$GL_require
 [vertex shader]
 #version 120
 void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
