@@ -577,6 +577,12 @@ def _make_componentwise_test_vectors(test_suite_dict):
     functions that operate on vectors in componentwise fashion.
     Examples include sin(), cos(), min(), max(), and clamp().
     """
+    # Make sure atan(x) and atan(x,y) don't misbehave for very large
+    # or very small input values.
+    atan_inputs = [0.0]
+    for exponent in (-10, -1, 0, 1, 10):
+	atan_inputs.append(pow(10.0, exponent))
+	atan_inputs.append(-pow(10.0, exponent))
     def f(name, arity, glsl_version, python_equivalent,
 	  alternate_scalar_arg_indices, test_inputs,
 	  tolerance_function = _strict_tolerance):
@@ -623,8 +629,8 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('tan', 1, '1.10', np.tan, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
     f('asin', 1, '1.10', np.arcsin, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
     f('acos', 1, '1.10', np.arccos, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
-    f('atan', 1, '1.10', np.arctan, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
-    f('atan', 2, '1.10', _arctan2, None, [np.linspace(-2.0, 2.0, 3), np.linspace(-2.0, 2.0, 3)], _trig_tolerance)
+    f('atan', 1, '1.10', np.arctan, None, [atan_inputs], _trig_tolerance)
+    f('atan', 2, '1.10', _arctan2, None, [atan_inputs, atan_inputs], _trig_tolerance)
     f('pow', 2, '1.10', _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('exp', 1, '1.10', np.exp, None, [np.linspace(-2.0, 2.0, 4)])
     f('log', 1, '1.10', np.log, None, [np.linspace(0.01, 2.0, 4)])
