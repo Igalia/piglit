@@ -1,6 +1,7 @@
 // if you inline all functions indiscriminately, you won't pass this
 [require]
 GLSL >= 1.10
+rlimit 268435456
 
 [vertex shader]
 void f64()

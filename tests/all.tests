@@ -14,10 +14,6 @@ from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, imp
 
 # Blacklisted tests are removed from the test profile.
 blacklist = [
-	'shaders/glsl-fs-unroll-explosion',
-	'shaders/glsl-fs-inline-explosion',
-	'shaders/glsl-vs-unroll-explosion',
-	'shaders/glsl-vs-inline-explosion',
 	]
 
 # Find the generated_tests directory, by looking either in
