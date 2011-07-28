@@ -568,6 +568,7 @@ glx['glx-pixmap-crosscheck'].runConcurrent = True
 texturing = Group()
 add_plain_test(texturing, 'array-texture')
 add_plain_test(texturing, 'copytexsubimage')
+add_plain_test(texturing, 'copyteximage')
 add_plain_test(texturing, 'copyteximage-clipping')
 add_plain_test(texturing, 'cubemap')
 add_plain_test(texturing, 'depth-level-clamp')

@@ -15,6 +15,7 @@ link_libraries (
 
 add_executable (array-texture array-texture.c)
 add_executable (copytexsubimage copytexsubimage.c)
+add_executable (copyteximage copyteximage.c)
 add_executable (copyteximage-clipping copyteximage-clipping.c)
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (crossbar crossbar.c)
