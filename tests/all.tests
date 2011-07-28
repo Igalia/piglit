@@ -14,13 +14,16 @@ from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, imp
 blacklist = [
 	]
 
+# Path to tests dir, correct even when not running from the top directory.
+testsDir = path.dirname(__file__)
+
 # Find the generated_tests directory, by looking either in
 # $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
 # parent directory of the directory containing this file.
 generatedTestDir = os.path.join(
 	os.environ.get(
 		'PIGLIT_BUILD_DIR',
-		os.path.join(os.path.dirname(__file__), '..')),
+		os.path.join(testsDir, '..')),
 	'generated_tests')
 
 # Quick wrapper for PlainExecTest for our usual concurrent args.
@@ -43,7 +46,7 @@ def add_concurrent_test(group, args):
 profile = TestProfile()
 
 try:
-	execfile(path.join(path.dirname(__file__), 'gtf.tests'))
+	execfile(path.join(testsDir, 'gtf.tests'))
 except SystemExit:
 	pass
 
@@ -111,19 +114,19 @@ def add_glsl1(name):
 	testname = 'glsl1-' + name
 	glean[testname] = GleanTest('glsl1', res_dir)
 	glean[testname].env['PIGLIT_TEST'] = name
-execfile(os.path.dirname(__file__) + '/glean-glsl1.tests')
+execfile(testsDir + '/glean-glsl1.tests')
 
 def add_fp1(name):
 	testname = 'fp1-' + name
 	glean[testname] = GleanTest('fragProg1', res_dir)
 	glean[testname].env['PIGLIT_TEST'] = name
-execfile(os.path.dirname(__file__) + '/glean-fragProg1.tests')
+execfile(testsDir + '/glean-fragProg1.tests')
 
 def add_vp1(name):
 	testname = 'vp1-' + name
 	glean[testname] = GleanTest('vertProg1', res_dir)
 	glean[testname].env['PIGLIT_TEST'] = name
-execfile(os.path.dirname(__file__) + '/glean-vertProg1.tests')
+execfile(testsDir + '/glean-vertProg1.tests')
 
 def add_fbo_generatemipmap_extension(group, extension, name):
 	group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
@@ -342,7 +345,7 @@ def add_getactiveuniform_count(group, name, expected):
 								   expected])
 
 add_shader_test_dir(shaders,
-                    os.path.dirname(__file__) + '/shaders',
+                    testsDir + '/shaders',
                     recursive=True)
 add_plain_test(shaders, 'activeprogram-bad-program')
 add_plain_test(shaders, 'activeprogram-get')
@@ -505,7 +508,7 @@ add_plain_test(shaders, 'useshaderprogram-flushverts-1')
 
 vpfpgeneric = Group()
 def add_vpfpgeneric(name):
-	vpfpgeneric[name] = PlainExecTest(['vpfp-generic', '-auto', os.path.dirname(__file__) + '/shaders/generic/' + name + '.vpfp'])
+	vpfpgeneric[name] = PlainExecTest(['vpfp-generic', '-auto', testsDir + '/shaders/generic/' + name + '.vpfp'])
 add_vpfpgeneric('arl')
 add_vpfpgeneric('big-param')
 add_vpfpgeneric('dataflow-bug')
@@ -845,24 +848,24 @@ add_concurrent_test(gl30, 'gl-3.0-required-texture-attachment-formats')
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
 import_glsl_parser_tests(spec['glsl-1.00'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.00'),
+			 os.path.join(testsDir, 'spec', 'glsl-1.00'),
 			 ['compiler'])
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = Group()
 import_glsl_parser_tests(spec['glsl-1.10'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10'),
+			 os.path.join(testsDir, 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
 import_glsl_parser_tests(spec['glsl-1.10'],
 			 os.path.join(generatedTestDir, 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
 spec['glsl-1.10']['linker'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['linker'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10', 'linker'),
+	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'linker'),
 		    recursive=True)
 spec['glsl-1.10']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['execution'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10', 'execution'),
+	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
 		    recursive=True)
 add_shader_test_dir(spec['glsl-1.10']['execution'],
 		    os.path.join(generatedTestDir, 'spec', 'glsl-1.10', 'execution'),
@@ -877,14 +880,14 @@ add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = Group()
 import_glsl_parser_tests(spec['glsl-1.20'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.20'),
+			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
 			 ['preprocessor', 'compiler'])
 import_glsl_parser_tests(spec['glsl-1.20'],
 			 os.path.join(generatedTestDir, 'spec', 'glsl-1.20'),
 			 ['compiler'])
 spec['glsl-1.20']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.20']['execution'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.20', 'execution'),
+	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
 		    recursive=True)
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 		    os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
@@ -920,7 +923,7 @@ add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.30'),
+			 os.path.join(testsDir, 'spec', 'glsl-1.30'),
 			 ['preprocessor', 'compiler'])
 import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.join(generatedTestDir, 'spec', 'glsl-1.30'),
@@ -942,7 +945,7 @@ for stage in ['vs', 'fs']:
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.30', 'execution'),
+	            os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
 		    recursive=True)
 add_shader_test_dir(spec['glsl-1.30']['execution'],
 		    os.path.join(generatedTestDir, 'spec', 'glsl-1.30', 'execution'),
@@ -967,19 +970,19 @@ add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
 import_glsl_parser_tests(spec['AMD_conservative_depth'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'amd_conservative_depth'),
+			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
 			 [''])
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'amd_shader_stencil_export'),
+			 os.path.join(testsDir, 'spec', 'amd_shader_stencil_export'),
 			 [''])
 
 # Group ARB_shader_stencil_export
 spec['ARB_shader_stencil_export'] = Group()
 import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
-			 os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_stencil_export'),
+			 os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
 			 [''])
 
 # Group ARB_ES2_compatibility
@@ -1011,18 +1014,18 @@ arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'
 arb_draw_instanced = Group()
 spec['ARB_draw_instanced'] = arb_draw_instanced
 import_glsl_parser_tests(arb_draw_instanced,
-                        os.path.dirname(__file__) + '/spec/arb_draw_instanced',
+                        testsDir + '/spec/arb_draw_instanced',
                         [''])
 
 add_shader_test_dir(arb_draw_instanced,
-                    os.path.dirname(__file__) + '/spec/arb_draw_instanced/execution',
+                    testsDir + '/spec/arb_draw_instanced/execution',
                     recursive=True)
 
 # Group ARB_fragment_program
 arb_fragment_program = Group()
 spec['ARB_fragment_program'] = arb_fragment_program
 add_shader_test_dir(spec['ARB_fragment_program'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'arb_fragment_program'),
+	            os.path.join(testsDir, 'spec', 'arb_fragment_program'),
 		    recursive=True)
 arb_fragment_program['minmax'] = concurrent_test('arb_fragment_program-minmax')
 
@@ -1030,7 +1033,7 @@ arb_fragment_program['minmax'] = concurrent_test('arb_fragment_program-minmax')
 arb_fragment_program_shadow = Group()
 spec['ARB_fragment_program_shadow'] = arb_fragment_program_shadow
 add_shader_test_dir(spec['ARB_fragment_program_shadow'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'arb_fragment_program_shadow'),
+	            os.path.join(testsDir, 'spec', 'arb_fragment_program_shadow'),
 		    recursive=True)
 
 # Group ARB_framebuffer_object
@@ -1055,11 +1058,11 @@ add_plain_test(arb_robustness, 'arb_robustness_client-mem-bounds')
 arb_shader_texture_lod = Group()
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
 import_glsl_parser_tests(arb_shader_texture_lod,
-			 os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_texture_lod'),
+			 os.path.join(testsDir, 'spec', 'arb_shader_texture_lod'),
 			 ['compiler'])
 arb_shader_texture_lod['execution'] = Group()
 add_shader_test_dir(arb_shader_texture_lod['execution'],
-	            os.path.join(os.path.dirname(__file__), 'spec', 'arb_shader_texture_lod', 'execution'),
+	            os.path.join(testsDir, 'spec', 'arb_shader_texture_lod', 'execution'),
 		    recursive=True)
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgrad')
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod', '-GL_ARB_shader_texture_lod'])
@@ -1080,7 +1083,7 @@ arb_shader_objects['delete-repeat'] = concurrent_test('arb_shader_objects-delete
 arb_explicit_attrib_location = Group()
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
 import_glsl_parser_tests(arb_explicit_attrib_location,
-			 os.path.join(os.path.dirname(__file__),
+			 os.path.join(testsDir,
 			 'spec', 'arb_explicit_attrib_location'),
 			 [''])
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-01')
@@ -1095,7 +1098,7 @@ spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_test1(arb_texture_rectangle, 'RECT')
 add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
 add_shader_test_dir(arb_texture_rectangle,
-                    os.path.dirname(__file__) + '/spec/arb_texture_rectangle',
+                    testsDir + '/spec/arb_texture_rectangle',
                     recursive=True)
 
 arb_texture_storage = Group()
@@ -1252,7 +1255,7 @@ spec['EXT_texture_array'] = ext_texture_array
 add_plain_test(ext_texture_array, 'fbo-generatemipmap-array')
 spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxlayers')
 add_shader_test_dir(ext_texture_array,
-                    os.path.dirname(__file__) + '/spec/ext_texture_array',
+                    testsDir + '/spec/ext_texture_array',
                     recursive=True)
 
 ext_texture_compression_latc = Group()
@@ -1346,7 +1349,7 @@ ext_texture_integer['texture_integer_glsl130'] = concurrent_test('ext_texture_in
 arb_texture_rg = Group()
 spec['ARB_texture_rg'] = arb_texture_rg
 add_shader_test_dir(arb_texture_rg,
-                    os.path.dirname(__file__) + '/spec/arb_texture_rg/execution',
+                    testsDir + '/spec/arb_texture_rg/execution',
                     recursive=True)
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
@@ -1608,15 +1611,15 @@ add_plain_test(arb_draw_buffers, 'arb_draw_buffers-state_change')
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
-for filename in os.listdir('tests/glslparsertest/shaders'):
+for filename in os.listdir(testsDir + '/glslparsertest/shaders'):
 	ext = filename.rsplit('.')[-1]
 	if ext in ['vert', 'geo', 'frag']:
-		add_glsl_parser_test(glslparsertest, path.join('tests/glslparsertest/shaders', filename), filename)
+		add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/shaders', filename), filename)
 del glslparsertest['CorrectPreprocess11.frag']
-for filename in os.listdir('tests/glslparsertest/glsl2'):
+for filename in os.listdir(testsDir + '/glslparsertest/glsl2'):
 	ext = filename.rsplit('.')[-1]
 	if ext in ['vert', 'geo', 'frag']:
-		add_glsl_parser_test(glslparsertest, path.join('tests/glslparsertest/glsl2', filename), 'glsl2/' + filename)
+		add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
 # end group glslparsertest ---------------------------------------------------
 
 hiz = Group()
@@ -1647,7 +1650,7 @@ add_plain_test(hiz, 'hiz-stencil-test-window-depth1')
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
-	test = PlainExecTest(['asmparsertest', '-auto', group, 'tests/asmparsertest/shaders/' + group + '/' + shader])
+	test = PlainExecTest(['asmparsertest', '-auto', group, testsDir + '/asmparsertest/shaders/' + group + '/' + shader])
 	test.runConcurrent = True
 	asmparsertest[group + '/' + shader] = test
 
@@ -2116,7 +2119,7 @@ class ValgrindExecTest(PlainExecTest):
 			assert(self.orig_test.result is not None)
 			assert(self.orig_test.result['result'] == 'fail')
 			return self.orig_test.result
-		self.command = [os.path.dirname(__file__) + '/valgrind-test/valgrind-test'] + orig_command
+		self.command = [testsDir + '/valgrind-test/valgrind-test'] + orig_command
 		return PlainExecTest.run(self)
 
 valgrind = Group()
