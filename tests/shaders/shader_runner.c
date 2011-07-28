@@ -414,6 +414,19 @@ process_requirement(const char *line)
 			       gl_version);
 			piglit_report_result(PIGLIT_SKIP);
 		}
+	} else if (strncmp("rlimit", line, 6) == 0) {
+		unsigned long lim;
+		char *ptr;
+
+		line = eat_whitespace(line + 6);
+
+		lim = strtoul(line, &ptr, 0);
+		if (ptr == line) {
+			printf("rlimit requires numeric argument\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		piglit_set_rlimit(lim);
 	}
 }
 
