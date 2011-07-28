@@ -81,9 +81,9 @@ int main(int argc, char *argv[])
 	/* Find/remove "-auto" from the argument vector.
 	 */
 	for (j = 1; j < argc; j++) {
-		if (!strcmp(argv[j], "-auto")) {
-			int i;
+		int i;
 
+		if (!strcmp(argv[j], "-auto")) {
 			piglit_automatic = 1;
 		
 			for (i = j + 1; i < argc; i++) {
@@ -91,6 +91,34 @@ int main(int argc, char *argv[])
 			}
 			argc--;
 			j--;
+		} else if (!strcmp(argv[j], "-rlimit")) {
+			char *ptr;
+			unsigned long lim;
+
+			j++;
+			if (j >= argc) {
+				fprintf(stderr,
+					"-rlimit requires an argument\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			lim = strtoul(argv[j], &ptr, 0);
+			if (ptr == argv[j]) {
+				fprintf(stderr,
+					"-rlimit requires an argument\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			piglit_set_rlimit(lim);
+
+			/* Remove 2 arguments (hence the 'i - 2') from the
+			 * command line.
+			 */
+			for (i = j + 1; i < argc; i++) {
+				argv[i - 2] = argv[i];
+			}
+			argc -= 2;
+			j -= 2;
 		}
 	}
 	glutInitWindowPosition(0, 0);
