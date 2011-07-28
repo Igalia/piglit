@@ -1,7 +1,10 @@
 #cmakedefine HAVE_STRCHRNUL
 #cmakedefine HAVE_FOPEN_S
+#cmakedefine HAVE_SETRLIMIT
 
 #cmakedefine HAVE_FCNTL_H
 #cmakedefine HAVE_SYS_STAT_H
 #cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_TIME_H
+#cmakedefine HAVE_SYS_RESOURCE_H
 #cmakedefine HAVE_UNISTD_H

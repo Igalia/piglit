@@ -96,8 +96,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${piglit_BINARY_DIR}/bin)
 
 check_function_exists(strchrnul HAVE_STRCHRNUL)
 check_function_exists(fopen_s   HAVE_FOPEN_S)
+check_function_exists(setrlimit HAVE_SETRLIMIT)
 
+check_include_file(sys/time.h  HAVE_SYS_TIME_H)
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(sys/resource.h  HAVE_SYS_RESOURCE_H)
 check_include_file(sys/stat.h  HAVE_SYS_STAT_H)
 check_include_file(unistd.h    HAVE_UNISTD_H)
 check_include_file(fcntl.h     HAVE_FCNTL_H)

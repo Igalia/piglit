@@ -319,5 +319,7 @@ extern void piglit_require_vertex_shader(void);
 char *strchrnul(const char *s, int c);
 #endif
 
+extern void piglit_set_rlimit(unsigned long lim);
+
 static const GLint PIGLIT_ATTRIB_POS = 0;
 static const GLint PIGLIT_ATTRIB_TEX = 1;

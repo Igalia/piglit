@@ -33,6 +33,14 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "config.h"
+#if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_SETRLIMIT)
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <errno.h>
+#define USE_SETRLIMIT
+#endif
+
 #include "piglit-util.h"
 
 void piglit_glutInit(int argc, char **argv)
@@ -473,3 +481,33 @@ char *strchrnul(const char *s, int c)
 	return (t == NULL) ? ((char *) s + strlen(s)) : t;
 }
 #endif
+
+
+void
+piglit_set_rlimit(unsigned long lim)
+{
+#if defined(USE_SETRLIMIT)
+	struct rlimit rl;
+	if (getrlimit(RLIMIT_AS, &rl) != -1) {
+		printf("Address space limit = %lu, max = %lu\n",
+		       (unsigned long) rl.rlim_cur,
+		       (unsigned long) rl.rlim_max);
+
+		if (rl.rlim_max > lim) {
+			printf("Resetting limit to %lu.\n", lim);
+
+			rl.rlim_cur = lim;
+			rl.rlim_max = lim;
+			if (setrlimit(RLIMIT_AS, &rl) == -1) {
+				printf("Could not set rlimit "
+				       "due to: %s (%d)\n",
+				       strerror(errno), errno);
+			}
+		}
+	}
+
+	printf("\n");
+#else
+	printf("Cannot reset rlimit on this platform.\n\n");
+#endif
+}
