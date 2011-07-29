@@ -23,8 +23,13 @@ piglit_make_generated_tests(
 	builtin_uniform_tests.list
 	gen_builtin_uniform_tests.py
 	builtin_function.py)
+piglit_make_generated_tests(
+	constant_array_size_tests.list
+	gen_constant_array_size_tests.py
+	builtin_function.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
 add_custom_target(gen-tests ALL
-	DEPENDS builtin_uniform_tests.list)
+	DEPENDS builtin_uniform_tests.list
+		constant_array_size_tests.list)
