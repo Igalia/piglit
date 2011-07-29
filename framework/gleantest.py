@@ -25,6 +25,7 @@ import os
 import subprocess
 
 from core import checkDir, testBinDir, Test, TestResult
+from exectest import ExecTest
 
 #############################################################################
 ##### GleanTest: Execute a sub-test of Glean
@@ -35,68 +36,27 @@ def gleanExecutable():
 def gleanResultDir():
 	return os.path.join('.', 'results', 'glean')
 
-class GleanTest(Test):
+class GleanTest(ExecTest):
 	globalParams = []
 
 	def __init__(self, name):
-		Test.__init__(self)
-		self.name = name
-		self.command = \
-			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), self.name),
+		ExecTest.__init__(self, \
+			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), name),
 			"-o",
 			"-v", "-v", "-v",
-			"-t", "+"+self.name]
-		self.env = {}
+			"-t", "+"+name])
+
+		checkDir(os.path.join(gleanResultDir(), name), False)
+
+		self.name = name
 
 	def run(self):
-		results = TestResult()
+                self.command += GleanTest.globalParams
+                return ExecTest.run(self)
 
-		fullenv = os.environ.copy()
-		for e in self.env:
-			fullenv[e] = str(self.env[e])
-
-		checkDir(os.path.join(gleanResultDir(), self.name), False)
-
-		glean = subprocess.Popen(
-			self.command + GleanTest.globalParams,
-			stdout=subprocess.PIPE,
-			stderr=subprocess.PIPE,
-			env=fullenv,
-			universal_newlines=True
-		)
-
-		out, err = glean.communicate()
-
-		results['result'] = 'pass'
-
-		if glean.returncode == -5:
-			results['result'] = 'trap'
-		elif glean.returncode == -6:
-			results['result'] = 'abort'
-		elif glean.returncode in (-8, -10, -11):
-			results['result'] = 'crash'
-		elif glean.returncode == -1073741819:
-			# 0xc0000005
-			# Windows EXCEPTION_ACCESS_VIOLATION
-			results['result'] = 'crash'
-		elif glean.returncode == -1073741676:
-			# 0xc0000094
-			# Windows EXCEPTION_INT_DIVIDE_BY_ZERO
-			results['result'] = 'crash'
-		elif glean.returncode != 0 or out.find('FAIL') >= 0:
+	def interpretResult(self, out, results):
+		if out.find('FAIL') >= 0:
 			results['result'] = 'fail'
-
-		results['returncode'] = glean.returncode
-		results['command'] = ' '.join(self.command + GleanTest.globalParams)
-
-		env = ''
-		for key in self.env:
-			env = env + key + '="' + self.env[key] + '" ';
-		results['environment'] = env
-
-		self.handleErr(results, err)
-
-		results['info'] = "Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (glean.returncode, err, out)
-
-		return results
-
+		else:
+			results['result'] = 'pass'
+		return out

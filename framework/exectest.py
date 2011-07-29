@@ -26,24 +26,21 @@ import subprocess
 
 from core import Test, testBinDir, TestResult
 
-def add_plain_test(group, name):
-	group[name] = PlainExecTest([name, '-auto'])
+#############################################################################
+##### ExecTest: A shared base class for tests that simply run an executable.
+#############################################################################
 
-#############################################################################
-##### PlainExecTest: Simply run an executable
-##### Expect one line prefixed PIGLIT: in the output, which contains a
-##### result dictionary. The plain output is appended to this dictionary
-#############################################################################
-class PlainExecTest(Test):
+class ExecTest(Test):
 	def __init__(self, command):
 		Test.__init__(self)
 		self.command = command
-		# Prepend testBinDir to the path.
-		self.command[0] = testBinDir + self.command[0]
 		self.env = {}
 
-	def run(self):
+	def interpretResult(self, out, results):
+		raise NotImplementedError
+		return out
 
+	def run(self):
 		fullenv = os.environ.copy()
 		for e in self.env:
 			fullenv[e] = str(self.env[e])
@@ -58,21 +55,9 @@ class PlainExecTest(Test):
 				)
 			out, err = proc.communicate()
 
-			outlines = out.split('\n')
-			outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
-
 			results = TestResult()
 
-			if len(outpiglit) > 0:
-				try:
-					results.update(eval(''.join(outpiglit), {}))
-					out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
-				except:
-					results['result'] = 'fail'
-					results['note'] = 'Failed to parse result string'
-
-			if 'result' not in results:
-				results['result'] = 'fail'
+			out = self.interpretResult(out, results)
 
 			if proc.returncode == -5:
 				results['result'] = 'trap'
@@ -92,11 +77,17 @@ class PlainExecTest(Test):
 				results['result'] = 'fail'
 				results['note'] = 'Returncode was %d' % (proc.returncode)
 
-			self.handleErr(results, err)
-
+			env = ''
+			for key in self.env:
+				env = env + key + '="' + self.env[key] + '" '
+			if env:
+				results['environment'] = env
 			results['info'] = "Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
 			results['returncode'] = proc.returncode
 			results['command'] = ' '.join(self.command)
+
+			self.handleErr(results, err)
+
 		else:
 			results = TestResult()
 			if 'result' not in results:
@@ -105,3 +96,33 @@ class PlainExecTest(Test):
 		return results
 
 
+
+def add_plain_test(group, name):
+	group[name] = PlainExecTest([name, '-auto'])
+
+#############################################################################
+##### PlainExecTest: Run a "native" piglit test executable
+##### Expect one line prefixed PIGLIT: in the output, which contains a
+##### result dictionary. The plain output is appended to this dictionary
+#############################################################################
+class PlainExecTest(ExecTest):
+	def __init__(self, command):
+		ExecTest.__init__(self, command)
+		# Prepend testBinDir to the path.
+		self.command[0] = testBinDir + self.command[0]
+
+	def interpretResult(self, out, results):
+		outlines = out.split('\n')
+		outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
+
+		if len(outpiglit) > 0:
+			try:
+				results.update(eval(''.join(outpiglit), {}))
+				out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
+			except:
+				results['result'] = 'fail'
+				results['note'] = 'Failed to parse result string'
+
+		if 'result' not in results:
+			results['result'] = 'fail'
+		return out
