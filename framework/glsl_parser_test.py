@@ -58,7 +58,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
 	the shader source file's path relative to ``basepath``. For example,
 	if::
 		import_glsl_parser_tests(group, 'a', ['b1', 'b2'])
-	is called and the file 'a/b/c/d.frag' exists, then the test is
+	is called and the file 'a/b1/c/d.frag' exists, then the test is
 	registered into the group as ``group['b1/c/d.frag']``.
 	"""
 	for d in subdirectories:
@@ -70,10 +70,11 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
 				ext = f.rsplit('.')[-1]
 				if ext in ['vert', 'geom', 'frag']:
 					filepath = path.join(dirpath, f)
-					# testname := filepath with initial
-					#   three directories removed.
-					testname = '/'.join(filepath.split(os.sep)[3:])
-					assert(type(testname) is str)
+					# testname := filepath relative to
+					# basepath.
+					testname = os.path.relpath(
+						filepath, basepath)
+					assert isinstance(testname, basestring)
 					add_glsl_parser_test(
 						group,
 						filepath,
