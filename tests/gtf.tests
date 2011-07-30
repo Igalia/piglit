@@ -46,7 +46,7 @@ class GTFTest(ExecTest):
     pass_re = re.compile(r'Regression PASSED all 1 tests')
 
     def __init__(self, testpath):
-        ExecTest.__init__(self, [path.join(testBinDir, 'GTF'), '-noimagefileio', '-width=113', '-height=47', '-seed=2', '-id=7', '-run=' + testpath])
+        ExecTest.__init__(self, [path.join(testBinDir, 'GTF'), '-noimagefileio', '-width=113', '-height=47', '-seed=2', '-id=10', '-run=' + testpath])
 
     def interpretResult(self, out, results):
 	if self.pass_re.search(out) is not None:
