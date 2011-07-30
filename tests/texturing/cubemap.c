@@ -27,15 +27,13 @@
 
 #include "piglit-util.h"
 
-#define MAX_SIZE	64
 #define PAD		5
 
-#define WIN_WIDTH	((MAX_SIZE * 6 + PAD * 9) * 2)
-#define WIN_HEIGHT	400
-
 int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = WIN_WIDTH;
-int piglit_height = WIN_HEIGHT;
+int piglit_width = (64 * 6 + PAD * 9) * 2;
+int piglit_height = 400;
+
+int max_size;
 
 static GLfloat colors[][3] = {
 	{1.0, 1.0, 1.0},
@@ -188,7 +186,7 @@ draw_at_size(int size, int x_offset, int y_offset, GLboolean mipmapped)
 		GLfloat row_x = PAD + x_offset;
 
 		for (face = 0; face < 6; face++) {
-			GLfloat base_x = row_x + face * (MAX_SIZE + PAD);
+			GLfloat base_x = row_x + face * (max_size + PAD);
 			GLfloat base_y = row_y;
 
 			glBegin(GL_QUADS);
@@ -248,7 +246,7 @@ piglit_display(void)
 	 * single texture level.
 	 */
 	y_offset = 0;
-	for (dim = MAX_SIZE; dim > 0; dim /= 2) {
+	for (dim = max_size; dim > 0; dim /= 2) {
 		pass = draw_at_size(dim, 0, y_offset, GL_FALSE) && pass;
 		y_offset += dim + PAD;
 	}
@@ -257,8 +255,8 @@ piglit_display(void)
 	 * to 1x1.
 	 */
 	y_offset = 0;
-	for (dim = MAX_SIZE; dim > 0; dim /= 2) {
-		int x_offset = (i % 2 == 1) ? 0 : WIN_WIDTH / 2;
+	for (dim = max_size; dim > 0; dim /= 2) {
+		int x_offset = (i % 2 == 1) ? 0 : piglit_width / 2;
 
 		row_dim = (row_dim < dim) ? dim : row_dim;
 
@@ -278,5 +276,16 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
+	max_size = 64;
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "npot") == 0) {
+			piglit_require_extension("GL_ARB_texture_non_power_of_two");
+			max_size = 50;
+			break;
+		}
+	}
 	piglit_require_extension("GL_ARB_texture_cube_map");
 }
