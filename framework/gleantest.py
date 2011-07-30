@@ -96,7 +96,7 @@ class GleanTest(Test):
 
 		self.handleErr(results, err)
 
-		results['info'] = "@@@Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (glean.returncode, err, out)
+		results['info'] = "Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (glean.returncode, err, out)
 
 		return results
 
