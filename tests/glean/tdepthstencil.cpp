@@ -303,7 +303,7 @@ DepthStencilTest::runOne(DepthStencilResult &r, Window &w)
 		r.pass = testDrawAndRead();
 	if (r.pass)
 		r.pass = testTextureOperations();
-	if (r.pass)
+	if (r.pass && !env->options.quick)
 		testPerformance(r);
 }
 
@@ -317,6 +317,10 @@ DepthStencilTest::logOne(DepthStencilResult &r)
 
 		char str[1000];
 		double mbps;
+
+		/* Skip perf results if we didn't test that. */
+		if (env->options.quick)
+			return;
 
 		env->log << "\tglReadPixels GL_DEPTH_STENCIL rate: ";
 		mbps = r.readDepthStencilRate * sizeof(GLuint) / (1024*1024);
