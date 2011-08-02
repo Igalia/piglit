@@ -82,8 +82,6 @@ static void DoFrame(void)
 		glTexCoord2f(0, 1);
 		glVertex2f(0, 2);
 	glEnd();
-
-	glutSwapBuffers();
 }
 
 static const struct {
@@ -208,7 +206,6 @@ static int DoTest( void )
 	int idx;
 	GLfloat dmax;
 
-	glReadBuffer( GL_FRONT );
 	dmax = 0;
 
 	idx = 0;
@@ -254,6 +251,7 @@ piglit_display(void)
 
 	DoFrame();
 	pass = DoTest();
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
