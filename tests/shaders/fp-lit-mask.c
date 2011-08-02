@@ -64,8 +64,6 @@ static void DoFrame(void)
 
 		glPopMatrix();
 	}
-
-	glutSwapBuffers();
 }
 
 static int DoTest( void )
@@ -73,7 +71,6 @@ static int DoTest( void )
 	int mask;
 	GLfloat dmax;
 
-	glReadBuffer( GL_FRONT );
 	dmax = 0;
 
 	for(mask = 1; mask < 16; ++mask) {
@@ -115,6 +112,7 @@ piglit_display(void)
 
 	DoFrame();
 	pass = DoTest();
+	glutSwapBuffers();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
