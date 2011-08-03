@@ -278,6 +278,8 @@ piglit_init(int argc, char **argv)
 {
 	int i;
 
+	piglit_require_extension("GL_ARB_texture_cube_map");
+
 	max_size = 64;
 
 	for (i = 1; i < argc; i++) {
@@ -287,5 +289,4 @@ piglit_init(int argc, char **argv)
 			break;
 		}
 	}
-	piglit_require_extension("GL_ARB_texture_cube_map");
 }
