@@ -32,37 +32,6 @@ import traceback
 import framework.core as core
 from framework.threads import synchronized_self
 
-class SyncFileWriter:
-	'''
-		Using the 'print' syntax to write to an instance of this class
-		may have unexpected results in a multithreaded program.  For example:
-			print >> file, "a", "b", "c"
-		will call write() to write "a", then call write() to write "b", and so on...
-		This type of execution allows for another thread to call write() before
-		the original statement completes its execution.
-		To avoid this behavior, call file.write() explicitly.  For example:
-			file.write("a", "b", "c", "\n")
-		will ensure that "a b c" gets written to the file before any other thread
-		is given write access.
-	'''
-	def __init__(self, filename):
-		self.file = open(filename, 'w')
-
-	@synchronized_self
-	def write(self, *args):
-		[self.file.write(str(a)) for a in args]
-		self.file.flush()
-		os.fsync(self.file.fileno())
-
-	@synchronized_self
-	def writeLine(self, *args):
-		self.write(*args)
-		self.write('\n')
-
-	@synchronized_self
-	def close(self):
-		self.file.close()
-
 #############################################################################
 ##### Main program
 #############################################################################
@@ -149,7 +118,8 @@ def main():
 
 	# Begin json.
 	result_filepath = os.path.join(resultsDir, 'main')
-	json_writer = core.JSONWriter(SyncFileWriter(result_filepath))
+	result_file = open(result_filepath, 'w')
+	json_writer = core.JSONWriter(result_file)
 	json_writer.open_dict()
 
 	json_writer.write_dict_item('name', results.name)
