@@ -1,0 +1,31 @@
+# Test that GLSL built-in global variables can be accessed from a
+# function that is neither defined nor declared in the compilation
+# unit that defines main().
+
+[vertex shader]
+void f();
+void main()
+{
+  f();
+}
+
+[vertex shader]
+void g()
+{
+  gl_Position = gl_Vertex;
+  gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+void f()
+{
+  g();
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
