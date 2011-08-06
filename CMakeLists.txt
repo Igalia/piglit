@@ -19,9 +19,9 @@ execute_process(
 	OUTPUT_QUIET
 	ERROR_QUIET
 	RESULT_VARIABLE python_version_check_error_code)
-if(NOT(python_version_check_error_code EQUAL 0))
+if(NOT python_version_check_error_code EQUAL 0)
 	message(FATAL_ERROR "python version 2.6 or greater required")
-endif(NOT(python_version_check_error_code EQUAL 0))
+endif(NOT python_version_check_error_code EQUAL 0)
 
 # Check for the presence of numpy, which is needed to build generated
 # tests.
@@ -30,9 +30,9 @@ execute_process(
 	OUTPUT_QUIET
 	ERROR_QUIET
 	RESULT_VARIABLE import_numpy_error_code)
-if(NOT(import_numpy_error_code EQUAL 0))
+if(NOT import_numpy_error_code EQUAL 0)
 	message(FATAL_ERROR "numpy library not found")
-endif(NOT(import_numpy_error_code EQUAL 0))
+endif(NOT import_numpy_error_code EQUAL 0)
 
 if (NOT MSVC)
 	CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)

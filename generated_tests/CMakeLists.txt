@@ -6,9 +6,9 @@ execute_process(
 	COMMAND python ${gen_builtin_uniform} --names-only
         OUTPUT_VARIABLE builtin_uniform_tests
 	RESULT_VARIABLE builtin_uniform_tests_result)
-if(NOT(builtin_uniform_tests_result EQUAL 0))
+if(NOT builtin_uniform_tests_result EQUAL 0)
 	message(FATAL_ERROR "gen_builtin_uniform_tests.py failed")
-endif(NOT(builtin_uniform_tests_result EQUAL 0))
+endif(NOT builtin_uniform_tests_result EQUAL 0)
 string(REPLACE "\n" ";" builtin_uniform_tests ${builtin_uniform_tests})
 
 # Add a custom command which executes gen_builtin_uniform_tests.py
