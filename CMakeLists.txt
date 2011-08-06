@@ -14,19 +14,26 @@ find_package(PNG REQUIRED)
 find_package(X11)
 
 # Check for presence of Python 2.6 or greater.
-execute_process(
-	COMMAND python -c "import sys; assert sys.version >= '2.6'"
-	OUTPUT_QUIET
-	ERROR_QUIET
-	RESULT_VARIABLE python_version_check_error_code)
-if(NOT python_version_check_error_code EQUAL 0)
-	message(FATAL_ERROR "python version 2.6 or greater required")
-endif(NOT python_version_check_error_code EQUAL 0)
+foreach(python_cmd python2 python)
+	execute_process(
+		COMMAND ${python_cmd} -c "import sys; assert '2.6' <= sys.version < '3'"
+		OUTPUT_QUIET
+		ERROR_QUIET
+		RESULT_VARIABLE python_version_check_error_code)
+	if(python_version_check_error_code EQUAL 0)
+		set(python ${python_cmd})
+		break()
+	endif(python_version_check_error_code EQUAL 0)
+endforeach(python_cmd)
+
+if(NOT DEFINED python)
+	message(FATAL_ERROR "python version 2.x (where x >= 6) required")
+endif(NOT DEFINED python)
 
 # Check for the presence of numpy, which is needed to build generated
 # tests.
 execute_process(
-	COMMAND python -c "import numpy"
+	COMMAND ${python} -c "import numpy"
 	OUTPUT_QUIET
 	ERROR_QUIET
 	RESULT_VARIABLE import_numpy_error_code)
