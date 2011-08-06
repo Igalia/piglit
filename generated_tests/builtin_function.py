@@ -34,6 +34,7 @@
 # they are not pure, so they can't be tested using simple test
 # vectors.
 
+import distutils.version
 import collections
 import itertools
 import numpy as np
@@ -624,7 +625,10 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('pow', 2, '1.10', _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('exp', 1, '1.10', np.exp, None, [np.linspace(-2.0, 2.0, 4)])
     f('log', 1, '1.10', np.log, None, [np.linspace(0.01, 2.0, 4)])
-    f('exp2', 1, '1.10', np.exp2, None, [np.linspace(-2.0, 2.0, 4)])
+    if distutils.version.StrictVersion(np.version.version) >= '1.3.0':
+        f('exp2', 1, '1.10', np.exp2, None, [np.linspace(-2.0, 2.0, 4)])
+    else:
+        f('exp2', 1, '1.10', lambda x: np.power(2, x), None, [np.linspace(-2.0, 2.0, 4)])
     f('log2', 1, '1.10', np.log2, None, [np.linspace(0.01, 2.0, 4)])
     f('sqrt', 1, '1.10', np.sqrt, None, [np.linspace(0.0, 2.0, 4)])
     f('inversesqrt', 1, '1.10', lambda x: 1.0/np.sqrt(x), None, [np.linspace(0.1, 2.0, 4)])
