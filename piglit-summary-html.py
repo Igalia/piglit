@@ -50,7 +50,7 @@ def readfile(filename):
 
 def writefile(filename, text):
 	f = open(filename, "w")
-	f.write(text)
+	f.write(text.encode('utf-8'))
 	f.close()
 
 templatedir = os.path.join(os.path.dirname(__file__), 'templates')
