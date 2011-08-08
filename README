@@ -56,6 +56,17 @@ On Linux, if cross-compiling a 32-bit build on a 64-bit host, then you must
 invoke cmake with option "-DCMAKE_SYSTEM_PROCESSOR=i386".
 
 
+2.2 Ubuntu
+----------
+
+Install development packages.
+  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev libtiff4-dev zlib1g-dev libpng12-dev python-numpy freeglut3-dev x11proto-gl-dev libxrender-dev
+
+Configure and build.
+  $ cmake .
+  $ make
+
+
 3. How to run tests
 -------------------
 
