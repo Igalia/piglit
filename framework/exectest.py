@@ -55,6 +55,23 @@ class ExecTest(Test):
 				)
 			out, err = proc.communicate()
 
+			# proc.communicate() returns 8-bit strings, but we need
+			# unicode strings.  In Python 2.x, this is because we
+			# will eventually be serializing the strings as JSON,
+			# and the JSON library expects unicode.  In Python 3.x,
+			# this is because all string operations require
+			# unicode.  So translate the strings into unicode,
+			# assuming they are using UTF-8 encoding.
+			#
+			# If the subprocess output wasn't properly UTF-8
+			# encoded, we don't want to raise an exception, so
+			# translate the strings using 'replace' mode, which
+			# replaces erroneous charcters with the Unicode
+			# "replacement character" (a white question mark inside
+			# a black diamond).
+			out = out.decode('utf-8', errors='replace')
+			err = err.decode('utf-8', errors='replace')
+
 			results = TestResult()
 
 			out = self.interpretResult(out, results)
