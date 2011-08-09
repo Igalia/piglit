@@ -67,6 +67,41 @@ Configure and build.
   $ make
 
 
+2.3 Mac OS X
+------------
+
+Install CMake. 
+http://cmake.org/cmake/resources/software.html
+Download and install 'Mac OSX Universal' platform.
+
+Install Xcode.
+http://developer.apple.com/xcode
+
+Configure and build.
+  $ cmake .
+  $ make
+
+glean
+In order to build glean, TIFF is required but not included as part of 
+Xcode. TIFF must be obtained elsewhere and one solution is to get TIFF 
+from MacPorts.
+
+Install MacPorts.
+http://www.macports.org/install.php
+
+Install TIFF through MacPorts. The '+universal' option is needed as 
+glean cannot be built as x86_64, only as i386.
+  $ sudo port selfupdate
+  $ sudo port install tiff +universal
+
+glean will also not build with MacOSX10.7.sdk. If you are trying to 
+build glean on Mac OS 10.7 (Lion), you will have to use MacOSX10.6.sdk.
+  $ ccmake .
+Set 'CMAKE_OSX_SYSROOT' to '/Developer/SDKs/MacOSX10.6.sdk'. Configure. 
+Generate and exit.
+  $ make
+
+
 3. How to run tests
 -------------------
 
