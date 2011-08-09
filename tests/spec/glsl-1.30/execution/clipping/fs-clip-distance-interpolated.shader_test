@@ -1,0 +1,89 @@
+# From the GLSL 1.30 spec, section 7.2 (Fragment Shader Special
+# Variables):
+#
+#   The built-in input variable gl_ClipDistance array contains
+#   linearly interpolated values for the vertex values written by the
+#   vertex shader to the gl_ClipDistance vertex output variable. This
+#   array must be sized in the fragment shader either implicitly or
+#   explicitly to be the same size as it was sized in the vertex
+#   shader. Only elements in this array that have clipping enabled
+#   will have defined values.
+#
+# This test checks proper operation of gl_ClipDistance in fragment
+# shaders by setting each element of gl_ClipDistance to simple linear
+# function of gl_Vertex (computed by taking the dot product of
+# gl_Vertex with a uniform vector, and dividing the result by
+# gl_Vertex's homogeneous coordinate).  gl_Vertex is also passed
+# through to the fragment shader, which uses the same dot product to
+# verify that gl_ClipDistance has been properly interpolated.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+uniform vec4 transform[6];
+out vec4 vertex;
+out float gl_ClipDistance[6];
+
+void main()
+{
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+  // Set each value of gl_ClipDistance to a linear transformation of
+  // gl_Vertex.
+  for (int i = 0; i < 6; ++i) {
+    gl_ClipDistance[i] = dot(transform[i], gl_Vertex) / gl_Vertex.w;
+  }
+
+  // Pass through gl_Vertex to the fragment shader so that it can
+  // verify the interpolated values of gl_ClipDistance.
+  vertex = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform vec4 transform[6];
+in vec4 vertex;
+
+void main()
+{
+  bool test_passed = true;
+
+  // Check that each value of gl_ClipDistance matches the value
+  // computed in the vertex shader.
+  for (int i = 0; i < 6; ++i) {
+    float expected_distance = dot(transform[i], vertex) / vertex.w;
+    float deviation = distance(gl_ClipDistance[i], expected_distance);
+    if (deviation > 1.0e-5) {
+      test_passed = false;
+    }
+  }
+
+  // Report pass/fail as a red or green pixel.
+  gl_FragColor = test_passed ? vec4(0.0, 1.0, 0.0, 1.0)
+                             : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+ortho 0 1 0 1
+
+# Since the fragment shader's gl_ClipDistance array is only defined
+# for elements that have clipping enabled, we need to enable all 6
+# clip planes and carefully shoose the transform vectors to make sure
+# that no pixels are actually clipped.
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+uniform vec4 transform[0]  1.0  1.0 0.0 0.0 # clipDistance[0] = x + y
+uniform vec4 transform[1]  1.0  2.0 0.0 0.0 # clipDistance[1] = x + 2*y
+uniform vec4 transform[2]  2.0  1.0 0.0 0.0 # clipDistance[2] = 2*x + y
+uniform vec4 transform[3]  2.0  2.0 0.0 0.0 # clipDistance[3] = 2*x + 2*y
+uniform vec4 transform[4] -1.0 -1.0 0.0 2.0 # clipDistance[4] = 2.0 - x - y
+uniform vec4 transform[5] -1.0  1.0 0.0 1.0 # clipDistance[5] = 1.0 - x + y
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

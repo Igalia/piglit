@@ -1,0 +1,65 @@
+# [description]
+#
+# From the GLSL 1.30 spec, section 7.1 (Vertex Shader Special
+# Variables):
+#
+#   If a linked set of shaders forming the vertex stage contains no
+#   static write to gl_ClipVertex or gl_ClipDistance, but the
+#   application has requested clipping against user clip planes
+#   through the API, then the coordinate written to gl_Position is
+#   used for comparison against the user clip planes.
+#
+# This test:
+# - uses all 6 clip planes to clip a rectangle to a hexagon shape.
+# - Multiplies all coordinates of gl_Position by 2 (including the
+#   homogeneous coordinate) to verify that homogeneity is properly
+#   accounted for in clipping.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main(void)
+{
+	gl_Position = 2.0 * gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+void main(void)
+{
+	gl_FragColor = vec4(1, 1, 1, 1);
+}
+
+[test]
+ortho 0 1 0 1
+clip plane 0 0 1 0 0.5
+clip plane 1 -1 1 0 0.8
+clip plane 2 -1 -1 0 0.8
+clip plane 3 0 -1 0 0.5
+clip plane 4 1 -1 0 0.8
+clip plane 5 1 1 0 0.8
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+draw rect 0.1 0.1 0.8 0.8
+
+# Test points inside each hexagon edge
+relative probe rgba (0.3, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.3) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.4) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.7, 0.6) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.5, 0.7) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.3, 0.6) (1.0, 1.0, 1.0, 1.0)
+
+# Test points outside each hexagon edge
+relative probe rgba (0.2, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.2) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.3) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.8, 0.7) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.5, 0.8) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.2, 0.7) (0.0, 0.0, 0.0, 0.0)
