@@ -296,7 +296,9 @@ test_format(const struct format_info *info)
       return GL_FALSE;
 
    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &f);
+   /*
    assert(f == info->IntFormat);
+   */
 
    /* setup expected polygon color */
    expected[0] = 0.25;
