@@ -158,6 +158,29 @@ class BoolComparator(Comparator):
 
 
 
+class IntComparator(Comparator):
+    def __init__(self, signature):
+	self.__signature = signature
+
+    def make_additional_declarations(self):
+	return 'uniform {0} expected;\n'.format(self.__signature.rettype)
+
+    def make_result_handler(self, output_var):
+	return '  {v} = {cond} ? {green} : {red};\n'.format(
+	    v=output_var, cond='result == expected',
+	    green='vec4(0.0, 1.0, 0.0, 1.0)',
+	    red='vec4(1.0, 0.0, 0.0, 1.0)')
+
+    def make_result_test(self, test_num, test_vector):
+	test = 'uniform {0} expected {1}\n'.format(
+	    shader_runner_type(self.__signature.rettype),
+	    shader_runner_format(column_major_values(test_vector.result)))
+	test += 'draw rect -1 -1 2 2\n'
+	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+	return test
+
+
+
 class FloatComparator(Comparator):
     def __init__(self, signature):
 	self.__signature = signature
@@ -239,6 +262,8 @@ class ShaderTest(object):
 	    self._comparator = BoolComparator(signature)
 	elif signature.rettype.base_type == glsl_float:
 	    self._comparator = FloatComparator(signature)
+	elif signature.rettype.base_type == glsl_int:
+	    self._comparator = IntComparator(signature)
 	else:
 	    raise Exception('Unexpected rettype {0}'.format(signature.rettype))
 
@@ -288,10 +313,11 @@ class ShaderTest(object):
 	shader += 'void main()\n'
 	shader += '{\n'
 	shader += additional_statements
-	args = ', '.join(
-	    'arg{0}'.format(i) for i in xrange(len(self._signature.argtypes)))
-	shader += '  {0} result = {1}({2});\n'.format(
-		self._signature.rettype, self._signature.name, args)
+	invocation = self._signature.template.format(
+	    *['arg{0}'.format(i)
+	      for i in xrange(len(self._signature.argtypes))])
+	shader += '  {0} result = {1};\n'.format(
+		self._signature.rettype, invocation)
 	shader += self._comparator.make_result_handler(output_var)
 	shader += '}\n'
 	return shader
@@ -307,7 +333,10 @@ class ShaderTest(object):
 		    shader_runner_type(self._signature.argtypes[i]),
 		    i, shader_runner_format(
 			column_major_values(test_vector.arguments[i])))
-	    test += self._comparator.make_result_test(test_num, test_vector)
+	    # Note: shader_runner uses a 250x250 window so we must
+	    # ensure that test_num <= 250.
+	    test += self._comparator.make_result_test(
+		test_num % 250, test_vector)
 	return test
 
     def filename(self):

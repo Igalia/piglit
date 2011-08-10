@@ -84,16 +84,15 @@ class ParserTest(object):
 	true if the GLSL compiler's constant evaluation produces the
 	correct result for the given test vector, and false if not.
 	"""
-	funcall = '{0}({1})'.format(
-	    self.__signature.name, ', '.join(
-		glsl_constant(x) for x in test_vector.arguments))
+	invocation = self.__signature.template.format(
+	    *[glsl_constant(x) for x in test_vector.arguments])
 	if self.__signature.rettype.base_type == glsl_float:
 	    # Test floating-point values within tolerance
 	    if self.__signature.name == 'distance':
 		# Don't use the distance() function to test itself.
 		return '{0} <= {1} && {1} <= {2}'.format(
 		    test_vector.result - test_vector.tolerance,
-		    funcall,
+		    invocation,
 		    test_vector.result + test_vector.tolerance)
 	    elif self.__signature.rettype.is_matrix:
 		# We can't apply distance() to matrices.  So apply it
@@ -103,7 +102,7 @@ class ParserTest(object):
 		terms = []
 		for col in xrange(self.__signature.rettype.num_cols):
 		    terms.append('pow(distance({0}[{1}], {2}), 2)'.format(
-			    funcall, col,
+			    invocation, col,
 			    glsl_constant(test_vector.result[:,col])))
 		rss_distance = ' + '.join(terms)
 		sq_tolerance = test_vector.tolerance * test_vector.tolerance
@@ -111,7 +110,7 @@ class ParserTest(object):
 		    rss_distance, glsl_constant(sq_tolerance))
 	    else:
 		return 'distance({0}, {1}) <= {2}'.format(
-		    funcall, glsl_constant(test_vector.result),
+		    invocation, glsl_constant(test_vector.result),
 		    glsl_constant(test_vector.tolerance))
 	else:
 	    # Test non-floating point values exactly
@@ -122,15 +121,15 @@ class ParserTest(object):
 		terms = []
 		for row in xrange(self.__signature.rettype.num_rows):
 		    terms.append('{0}[{1}] == {2}'.format(
-			    funcall, row,
+			    invocation, row,
 			    glsl_constant(test_vector.result[row])))
 		return ' && '.join(terms)
 	    elif self.__signature.rettype.is_vector:
 		return 'all(equal({0}, {1}))'.format(
-		    funcall, glsl_constant(test_vector.result))
+		    invocation, glsl_constant(test_vector.result))
 	    else:
 		return '{0} == {1}'.format(
-		    funcall, glsl_constant(test_vector.result))
+		    invocation, glsl_constant(test_vector.result))
 
     def make_shader(self):
 	"""Generate the shader code necessary to test the built-in."""
@@ -166,9 +165,9 @@ class ParserTest(object):
 	parser_test += ' *\n'
 	parser_test += ' * Check that the following test vectors are constant folded correctly:\n'
 	for test_vector in self.__test_vectors:
-	    parser_test += ' * {0}({1}) => {2}\n'.format(
-		self.__signature.name,
-		', '.join(glsl_constant(arg) for arg in test_vector.arguments),
+	    parser_test += ' * {0} => {1}\n'.format(
+		self.__signature.template.format(
+		    *[glsl_constant(arg) for arg in test_vector.arguments]),
 		glsl_constant(test_vector.result))
 	parser_test += ' */\n'
 	parser_test += self.make_shader()
