@@ -386,7 +386,10 @@ class TestrunResult:
 
 class Environment:
 	def __init__(self):
+		# If disabled, runs all tests serially from the main thread.
 		self.concurrent = True
+		# Set when we want doRun to only run a test if it's concurrent.
+		self.run_concurrent = True
 		self.execute = True
 		self.filter = []
 		self.exclude_filter = []
@@ -437,10 +440,12 @@ class Test:
 		    assigned to ``testrun.tests[path]``
 		'''
 		args = (env, path, json_writer)
-		if self.runConcurrent and env.concurrent:
-			ConcurrentTestPool().put(self.__doRunWork, args=args)
+		if env.run_concurrent:
+			if self.runConcurrent:
+				ConcurrentTestPool().put(self.__doRunWork, args=args)
 		else:
-			self.__doRunWork(*args)
+			if not env.concurrent or not self.runConcurrent:
+				self.__doRunWork(*args)
 
 	def __doRunWork(self, env, path, json_writer):
 		# Exclude tests that don't match the filter regexp
@@ -537,6 +542,14 @@ class TestProfile:
 		'''
 		json_writer.write_dict_key('tests')
 		json_writer.open_dict()
+		# queue up the concurrent tests up front, so the pool
+		# is filled from the start of the test.
+		if env.concurrent:
+			env.run_concurrent = True
+			self.tests.doRun(env, '', json_writer)
+		# Run any remaining non-concurrent tests serially from this
+		# thread, while the concurrent tests 
+		env.run_concurrent = False
 		self.tests.doRun(env, '', json_writer)
 		ConcurrentTestPool().join()
 		json_writer.close_dict()
