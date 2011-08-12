@@ -831,7 +831,7 @@ static GLboolean test_simple()
     GLboolean pass;
     draw();
     pass = probe_pixels();
-    glutSwapBuffers();
+    piglit_present_results();
     return pass;
 }
 
@@ -910,9 +910,9 @@ static GLboolean check_support(float version, const char *extensions[2],
     if (version <= glversion)
         return GL_TRUE;
 
-    if (((extensions[0] && glutExtensionSupported(extensions[0])) ||
-         (extensions[1] && glutExtensionSupported(extensions[1]))) &&
-        (!dep_extension || glutExtensionSupported(dep_extension)))
+    if (((extensions[0] && piglit_is_extension_supported(extensions[0])) ||
+         (extensions[1] && piglit_is_extension_supported(extensions[1]))) &&
+        (!dep_extension || piglit_is_extension_supported(dep_extension)))
         return GL_TRUE;
 
     return GL_FALSE;
@@ -1443,7 +1443,8 @@ void piglit_init(int argc, char **argv)
 
     piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-    glutKeyboardFunc(key_func);
+    if (!piglit_automatic)
+      glutKeyboardFunc(key_func);
 
     glClearColor(0.5, 0.5, 0.5, 1.0);
 

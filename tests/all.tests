@@ -646,15 +646,19 @@ add_plain_test(texturing, 'texture-packed-formats')
 add_plain_test(texturing, 'texture-rg')
 add_plain_test(texturing, 'tex-srgb')
 
+def texwrap_test(args):
+	test = PlainExecTest(args + ['-fbo'])
+	test.runConcurrent = True
+	return test
 def add_texwrap_test1(group, p1):
-	group['texwrap-' + p1] = PlainExecTest(['texwrap', '-auto', p1])
-	group['texwrap-' + p1 + '-bordercolor'] = PlainExecTest(['texwrap', '-auto', p1, 'bordercolor'])
+	group['texwrap-' + p1] = texwrap_test(['texwrap', '-auto', p1])
+	group['texwrap-' + p1 + '-bordercolor'] = texwrap_test(['texwrap', '-auto', p1, 'bordercolor'])
 def add_texwrap_test2(group, p1, p2):
-	group['texwrap-' + p1 + '-' + p2] = PlainExecTest(['texwrap', '-auto', p1, p2])
-	group['texwrap-' + p1 + '-' + p2 + '-bordercolor'] = PlainExecTest(['texwrap', '-auto', p1, p2, 'bordercolor'])
+	group['texwrap-' + p1 + '-' + p2] = texwrap_test(['texwrap', '-auto', p1, p2])
+	group['texwrap-' + p1 + '-' + p2 + '-bordercolor'] = texwrap_test(['texwrap', '-auto', p1, p2, 'bordercolor'])
 def add_texwrap_test3(group, p1, p2, p3):
-	group['texwrap-' + p1 + '-' + p2 + '-' + p3] = PlainExecTest(['texwrap', '-auto', p1, p2, p3])
-	group['texwrap-' + p1 + '-' + p2 + '-' + p3 + '-bordercolor'] = PlainExecTest(['texwrap', '-auto', p1, p2, p3, 'bordercolor'])
+	group['texwrap-' + p1 + '-' + p2 + '-' + p3] = texwrap_test(['texwrap', '-auto', p1, p2, p3])
+	group['texwrap-' + p1 + '-' + p2 + '-' + p3 + '-bordercolor'] = texwrap_test(['texwrap', '-auto', p1, p2, p3, 'bordercolor'])
 
 def add_fbo_depth_tests(group, format):
 	group['fbo-depth-' + format + '-tex1d'] = PlainExecTest(['fbo-depth-tex1d', '-auto', format])
