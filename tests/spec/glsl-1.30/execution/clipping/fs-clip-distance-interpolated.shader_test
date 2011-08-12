@@ -45,6 +45,7 @@ void main()
 #version 130
 uniform vec4 transform[6];
 in vec4 vertex;
+in float gl_ClipDistance[6];
 
 void main()
 {
