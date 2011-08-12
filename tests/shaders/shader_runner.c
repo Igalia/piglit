@@ -1110,7 +1110,7 @@ piglit_display(void)
 			line++;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	if (piglit_automatic) {
 		/* Free our resources, useful for valgrinding. */
