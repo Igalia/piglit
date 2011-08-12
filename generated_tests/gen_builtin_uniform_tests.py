@@ -416,7 +416,7 @@ class FragmentShaderTest(ShaderTest):
 
 
 def all_tests():
-    for signature, test_vectors in test_suite.items():
+    for signature, test_vectors in sorted(test_suite.items()):
 	yield VertexShaderTest(signature, test_vectors)
 	yield FragmentShaderTest(signature, test_vectors)
 

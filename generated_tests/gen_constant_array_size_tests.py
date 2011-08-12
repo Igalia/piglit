@@ -205,7 +205,7 @@ class FragmentParserTest(ParserTest):
 
 
 def all_tests():
-    for signature, test_vectors in test_suite.items():
+    for signature, test_vectors in sorted(test_suite.items()):
 	yield VertexParserTest(signature, test_vectors)
 	yield FragmentParserTest(signature, test_vectors)
 
