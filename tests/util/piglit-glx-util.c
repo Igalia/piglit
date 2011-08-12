@@ -30,6 +30,20 @@
 
 int piglit_automatic;
 
+Display *
+piglit_get_glx_display()
+{
+	Display *dpy;
+
+	dpy = XOpenDisplay(NULL);
+	if (!dpy) {
+		fprintf(stderr, "couldn't open display\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return dpy;
+}
+
 XVisualInfo *
 piglit_get_glx_visual(Display *dpy)
 {
@@ -76,7 +90,7 @@ piglit_get_glx_context_share(Display *dpy, XVisualInfo *visinfo, GLXContext shar
 }
 
 Window
-piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
+_piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo, bool map)
 {
 	XSetWindowAttributes window_attr;
 	unsigned long mask;
@@ -99,9 +113,22 @@ piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
 	if (piglit_automatic)
 		piglit_glx_window_set_no_input(dpy, win);
 
-	XMapWindow(dpy, win);
+	if (map)
+		XMapWindow(dpy, win);
 
 	return win;
+}
+
+Window
+piglit_get_glx_window_unmapped(Display *dpy, XVisualInfo *visinfo)
+{
+	return _piglit_get_glx_window(dpy, visinfo, false);
+}
+
+Window
+piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
+{
+	return _piglit_get_glx_window(dpy, visinfo, true);
 }
 
 void
@@ -318,4 +345,11 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err)
 		return -1;
 
 	return err->error_code - errbase;
+}
+
+/* Creates a GLX context for rendering into an FBO */
+void
+piglit_framework_fbo_init_glx()
+{
+
 }

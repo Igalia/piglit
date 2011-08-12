@@ -31,3 +31,4 @@ extern int piglit_height;
 
 extern enum piglit_result piglit_display(void);
 extern void piglit_init(int argc, char **argv);
+extern void piglit_present_results();
