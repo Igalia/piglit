@@ -647,11 +647,22 @@ get_ints(const char *line, int *ints, unsigned count)
 
 
 void
+get_uints(const char *line, unsigned *uints, unsigned count)
+{
+	unsigned i;
+
+	for (i = 0; i < count; i++)
+		uints[i] = strtoul(line, (char **) &line, 0);
+}
+
+
+void
 set_uniform(const char *line)
 {
 	char name[512];
 	float f[16];
 	int ints[16];
+	unsigned uints[16];
 	GLuint prog;
 	GLint loc;
 	const char *type;
@@ -676,6 +687,10 @@ set_uniform(const char *line)
 	} else if (strncmp("int", type, 3) == 0) {
 		int val = atoi(line);
 		piglit_Uniform1i(loc, val);
+		return;
+	} else if (strncmp("uint", type, 4) == 0) {
+		unsigned val = strtoul(line, NULL, 0);
+		piglit_Uniform1ui(loc, val);
 		return;
 	} else if (strncmp("vec", type, 3) == 0) {
 		switch (type[3]) {
@@ -705,6 +720,21 @@ set_uniform(const char *line)
 		case '4':
 			get_ints(line, ints, 4);
 			piglit_Uniform4iv(loc, 1, ints);
+			return;
+		}
+	} else if (strncmp("uvec", type, 4) == 0) {
+		switch (type[4]) {
+		case '2':
+			get_uints(line, uints, 2);
+			piglit_Uniform2uiv(loc, 1, uints);
+			return;
+		case '3':
+			get_uints(line, uints, 3);
+			piglit_Uniform3uiv(loc, 1, uints);
+			return;
+		case '4':
+			get_uints(line, uints, 4);
+			piglit_Uniform4uiv(loc, 1, uints);
 			return;
 		}
 	} else if ((strncmp("mat", type, 3) == 0)
