@@ -69,8 +69,8 @@ class ExecTest(Test):
 			# replaces erroneous charcters with the Unicode
 			# "replacement character" (a white question mark inside
 			# a black diamond).
-			out = out.decode('utf-8', errors='replace')
-			err = err.decode('utf-8', errors='replace')
+			out = out.decode('utf-8', 'replace')
+			err = err.decode('utf-8', 'replace')
 
 			results = TestResult()
 
