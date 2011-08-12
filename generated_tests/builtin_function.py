@@ -761,6 +761,7 @@ def _make_vector_relational_test_vectors(test_suite_dict):
     f('greaterThan', 2, '1.10', lambda x, y: x > y, 'vi')
     f('greaterThanEqual', 2, '1.10', lambda x, y: x >= y, 'vi')
     f('equal', 2, '1.10', lambda x, y: x == y, 'vib')
+    f('notEqual', 2, '1.10', lambda x, y: x != y, 'vib')
     f('not', 1, '1.10', lambda x: not x, 'b')
 _make_vector_relational_test_vectors(test_suite)
 
