@@ -118,9 +118,12 @@ class Comparator(object):
 	return ''
 
     @abc.abstractmethod
-    def make_result_handler(self, output_var):
+    def make_result_handler(self, invocation, output_var):
 	"""Return the shader code that is needed to produce the result
 	and store it in output_var.
+
+	invocation is the GLSL code to compute the output of the
+	built-in function.
 	"""
 
     @abc.abstractmethod
@@ -129,16 +132,33 @@ class Comparator(object):
 	single test vector.
 	"""
 
+    def testname_suffix(self):
+	"""Return a string to be used as a suffix on the test name to
+	distinguish it from tests using other comparators."""
+	return ''
+
 
 
 class BoolComparator(Comparator):
+    """Comparator that tests functions returning bools and bvecs by
+    converting them to floats.
+
+    This comparator causes code to be generated in the following form:
+
+        rettype result = func(args);
+        output_var = vec4(result, 0.0, ...);
+    """
     def __init__(self, signature):
 	assert not signature.rettype.is_matrix
+	self.__signature = signature
 	self.__padding = 4 - signature.rettype.num_rows
 
-    def make_result_handler(self, output_var):
-	return '  {0} = vec4(result{1});\n'.format(
+    def make_result_handler(self, invocation, output_var):
+	statements = '  {0} result = {1};\n'.format(
+	    self.__signature.rettype, invocation)
+	statements += '  {0} = vec4(result{1});\n'.format(
 	    output_var, ', 0.0' * self.__padding)
+	return statements
 
     def convert_to_float(self, value):
 	"""Convert the given vector or scalar value to a list of
@@ -158,18 +178,73 @@ class BoolComparator(Comparator):
 
 
 
+class BoolIfComparator(Comparator):
+    """Comparator that tests functions returning bools by evaluating
+    them inside an if statement.
+
+    This comparator causes code to be generated in the following form:
+
+        if (func(args))
+          output_var = vec4(1.0, 1.0, 0.0, 1.0);
+        else
+          output_var = vecp(0.0, 0.0, 1.0, 1.0);
+    """
+    def __init__(self, signature):
+	assert signature.rettype == glsl_bool
+	self.__padding = 4 - signature.rettype.num_rows
+
+    def make_result_handler(self, invocation, output_var):
+	statements = '  if({0})\n'.format(invocation)
+	statements += '    {0} = vec4(1.0, 1.0, 0.0, 1.0);\n'.format(output_var)
+	statements += '  else\n'
+	statements += '    {0} = vec4(0.0, 0.0, 1.0, 1.0);\n'.format(output_var)
+	return statements
+
+    def convert_to_float(self, value):
+	"""Convert the given vector or scalar value to a list of
+	floats representing the expected color produced by the test.
+	"""
+	if value:
+	    return [1.0, 1.0, 0.0, 1.0]
+	else:
+	    return [0.0, 0.0, 1.0, 1.0]
+
+    def make_result_test(self, test_num, test_vector):
+	test = 'draw rect -1 -1 2 2\n'
+	test += 'probe rgba {0} 0 {1}\n'.format(
+	    test_num,
+	    shader_runner_format(self.convert_to_float(test_vector.result)))
+	return test
+
+    def testname_suffix(self):
+	return '-using-if'
+
+
+
 class IntComparator(Comparator):
+    """Comparator that tests functions returning ints or ivecs using a
+    strict equality test.
+
+    This comparator causes code to be generated in the following form:
+
+        rettype result = func(args);
+        output_var = result == expected ? vec4(0.0, 1.0, 0.0, 1.0)
+                                        : vec4(1.0, 0.0, 0.0, 1.0);
+    """
     def __init__(self, signature):
 	self.__signature = signature
 
     def make_additional_declarations(self):
 	return 'uniform {0} expected;\n'.format(self.__signature.rettype)
 
-    def make_result_handler(self, output_var):
-	return '  {v} = {cond} ? {green} : {red};\n'.format(
+    def make_result_handler(self, invocation, output_var):
+	statements = '  {0} result = {1};\n'.format(
+	    self.__signature.rettype, invocation)
+	statements += '  {v} = {cond} ? {green} : {red};\n'.format(
 	    v=output_var, cond='result == expected',
 	    green='vec4(0.0, 1.0, 0.0, 1.0)',
 	    red='vec4(1.0, 0.0, 0.0, 1.0)')
+	return statements
 
     def make_result_test(self, test_num, test_vector):
 	test = 'uniform {0} expected {1}\n'.format(
@@ -182,6 +257,15 @@ class IntComparator(Comparator):
 
 
 class FloatComparator(Comparator):
+    """Comparator that tests functions returning ints or ivecs using a
+    strict equality test.
+
+    This comparator causes code to be generated in the following form:
+
+        rettype result = func(args);
+        output_var = distance(result, expected) <= tolerance
+                     ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    """
     def __init__(self, signature):
 	self.__signature = signature
 
@@ -209,8 +293,9 @@ class FloatComparator(Comparator):
 		for col_indexer in col_indexers
 		for row_indexer in row_indexers]
 
-    def make_result_handler(self, output_var):
-	statements = ''
+    def make_result_handler(self, invocation, output_var):
+	statements = '  {0} result = {1};\n'.format(
+	    self.__signature.rettype, invocation)
 	# Can't use distance when testing itself, or when the rettype
 	# is a matrix.
 	if self.__signature.name == 'distance' or \
@@ -248,17 +333,23 @@ class ShaderTest(object):
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, signature, test_vectors):
+    def __init__(self, signature, test_vectors, use_if):
 	"""Prepare to build a test for a single built-in.  signature
 	is the signature of the built-in (a key from the
 	builtin_function.test_suite dict), and test_vectors is the
 	list of test vectors for testing the given builtin (the
 	corresponding value from the builtin_function.test_suite
 	dict).
+
+	If use_if is True, then the generated test checks the result
+	by using it in an if statement--this only works for builtins
+	returning bool.
 	"""
 	self._signature = signature
 	self._test_vectors = test_vectors
-	if signature.rettype.base_type == glsl_bool:
+	if use_if:
+	    self._comparator = BoolIfComparator(signature)
+	elif signature.rettype.base_type == glsl_bool:
 	    self._comparator = BoolComparator(signature)
 	elif signature.rettype.base_type == glsl_float:
 	    self._comparator = FloatComparator(signature)
@@ -316,9 +407,7 @@ class ShaderTest(object):
 	invocation = self._signature.template.format(
 	    *['arg{0}'.format(i)
 	      for i in xrange(len(self._signature.argtypes))])
-	shader += '  {0} result = {1};\n'.format(
-		self._signature.rettype, invocation)
-	shader += self._comparator.make_result_handler(output_var)
+	shader += self._comparator.make_result_handler(invocation, output_var)
 	shader += '}\n'
 	return shader
 
@@ -345,8 +434,9 @@ class ShaderTest(object):
 	return os.path.join(
 	    'spec', 'glsl-{0}'.format(self.glsl_version()),
 	    'execution', 'built-in-functions',
-	    '{0}-{1}-{2}.shader_test'.format(
-		self.test_prefix(), self._signature.name, argtype_names))
+	    '{0}-{1}-{2}{3}.shader_test'.format(
+		self.test_prefix(), self._signature.name, argtype_names,
+		self._comparator.testname_suffix()))
 
     def generate_shader_test(self):
 	"""Generate the test and write it to the output file."""
@@ -416,9 +506,12 @@ class FragmentShaderTest(ShaderTest):
 
 
 def all_tests():
-    for signature, test_vectors in sorted(test_suite.items()):
-	yield VertexShaderTest(signature, test_vectors)
-	yield FragmentShaderTest(signature, test_vectors)
+    for use_if in [False, True]:
+	for signature, test_vectors in sorted(test_suite.items()):
+	    if use_if and signature.rettype != glsl_bool:
+		continue
+	    yield VertexShaderTest(signature, test_vectors, use_if)
+	    yield FragmentShaderTest(signature, test_vectors, use_if)
 
 
 
