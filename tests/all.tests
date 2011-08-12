@@ -295,7 +295,8 @@ shaders = Group()
 
 def add_shader_test(group, filepath, test_name):
 	"""Add a shader test to the given group."""
-	group[test_name] = PlainExecTest(['shader_runner', '-auto', filepath])
+	group[test_name] = PlainExecTest(['shader_runner', '-auto', '-fbo',
+					  filepath])
 
 def add_shader_test_dir(group, dirpath, recursive=False):
 	"""Add all shader tests in a directory to the given group."""
