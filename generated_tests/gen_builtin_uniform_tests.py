@@ -353,7 +353,7 @@ class ShaderTest(object):
 	    self._comparator = BoolComparator(signature)
 	elif signature.rettype.base_type == glsl_float:
 	    self._comparator = FloatComparator(signature)
-	elif signature.rettype.base_type == glsl_int:
+	elif signature.rettype.base_type in (glsl_int, glsl_uint):
 	    self._comparator = IntComparator(signature)
 	else:
 	    raise Exception('Unexpected rettype {0}'.format(signature.rettype))

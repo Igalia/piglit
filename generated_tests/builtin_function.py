@@ -122,6 +122,7 @@ class GlslBuiltinType(object):
 # Concrete declarations of GlslBuiltinType
 glsl_bool   = GlslBuiltinType('bool',   None,       1, 1, '1.10')
 glsl_int    = GlslBuiltinType('int',    None,       1, 1, '1.10')
+glsl_uint   = GlslBuiltinType('uint',   None,       1, 1, '1.30')
 glsl_float  = GlslBuiltinType('float',  None,       1, 1, '1.10')
 glsl_vec2   = GlslBuiltinType('vec2',   glsl_float, 1, 2, '1.10')
 glsl_vec3   = GlslBuiltinType('vec3',   glsl_float, 1, 3, '1.10')
@@ -132,6 +133,9 @@ glsl_bvec4  = GlslBuiltinType('bvec4',  glsl_bool,  1, 4, '1.10')
 glsl_ivec2  = GlslBuiltinType('ivec2',  glsl_int,   1, 2, '1.10')
 glsl_ivec3  = GlslBuiltinType('ivec3',  glsl_int,   1, 3, '1.10')
 glsl_ivec4  = GlslBuiltinType('ivec4',  glsl_int,   1, 4, '1.10')
+glsl_uvec2  = GlslBuiltinType('uvec2',  glsl_uint,  1, 2, '1.30')
+glsl_uvec3  = GlslBuiltinType('uvec3',  glsl_uint,  1, 3, '1.30')
+glsl_uvec4  = GlslBuiltinType('uvec4',  glsl_uint,  1, 4, '1.30')
 glsl_mat2   = GlslBuiltinType('mat2',   glsl_float, 2, 2, '1.10')
 glsl_mat3   = GlslBuiltinType('mat3',   glsl_float, 3, 3, '1.10')
 glsl_mat4   = GlslBuiltinType('mat4',   glsl_float, 4, 4, '1.10')
@@ -202,8 +206,10 @@ def glsl_type_of(value):
 	return glsl_float
     elif isinstance(value, (bool, np.bool_)):
 	return glsl_bool
-    elif isinstance(value, (int, long)):
+    elif isinstance(value, np.int32):
 	return glsl_int
+    elif isinstance(value, np.uint32):
+	return glsl_uint
     else:
 	assert isinstance(value, np.ndarray)
 	if len(value.shape) == 1:
@@ -214,8 +220,10 @@ def glsl_type_of(value):
 		return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
 	    elif value.dtype == bool:
 		return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
-	    elif value.dtype == int:
+	    elif value.dtype == np.int32:
 		return (glsl_ivec2, glsl_ivec3, glsl_ivec4)[vector_length - 2]
+	    elif value.dtype == np.uint32:
+		return (glsl_uvec2, glsl_uvec3, glsl_uvec4)[vector_length - 2]
 	    else:
 		raise Exception(
 		    'Unexpected vector base type {0}'.format(value.dtype))
@@ -250,6 +258,8 @@ def glsl_constant(value):
     column_major = np.reshape(np.array(value), -1, 'F')
     if column_major.dtype == bool:
 	values = ['true' if x else 'false' for x in column_major]
+    elif column_major.dtype == np.uint32:
+	values = [repr(x) + 'u' for x in column_major]
     else:
 	values = [repr(x) for x in column_major]
     if len(column_major) == 1:
@@ -333,6 +343,8 @@ def _divide(x, y):
 	# make sure we get round-toward-zero behavior, divide the
 	# absolute values of x and y, and then fix the sign.
 	return (np.abs(x) // np.abs(y)) * (np.sign(x) * np.sign(y))
+    elif glsl_type_of(x).base_type == glsl_uint:
+	return x // y
     else:
 	return x / y
 
@@ -647,6 +659,8 @@ def _make_componentwise_test_vectors(test_suite_dict):
     for exponent in (-10, -1, 0, 1, 10):
 	atan_inputs.append(pow(10.0, exponent))
 	atan_inputs.append(-pow(10.0, exponent))
+    ints = [np.int32(x) for x in [-5, -2, -1, 0, 1, 2, 5]]
+    uints = [np.uint32(x) for x in [0, 1, 2, 5, 34]]
     def f(name, arity, glsl_version, python_equivalent,
 	  alternate_scalar_arg_indices, test_inputs,
 	  tolerance_function = _strict_tolerance):
@@ -703,14 +717,22 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('sqrt', 1, '1.10', np.sqrt, None, [np.linspace(0.0, 2.0, 4)])
     f('inversesqrt', 1, '1.10', lambda x: 1.0/np.sqrt(x), None, [np.linspace(0.1, 2.0, 4)])
     f('abs', 1, '1.10', np.abs, None, [np.linspace(-1.5, 1.5, 5)])
+    f('abs', 1, '1.30', np.abs, None, [ints])
     f('sign', 1, '1.10', np.sign, None, [np.linspace(-1.5, 1.5, 5)])
+    f('sign', 1, '1.30', np.sign, None, [ints])
     f('floor', 1, '1.10', np.floor, None, [np.linspace(-2.0, 2.0, 4)])
     f('ceil', 1, '1.10', np.ceil, None, [np.linspace(-2.0, 2.0, 4)])
     f('fract', 1, '1.10', lambda x: x-np.floor(x), None, [np.linspace(-2.0, 2.0, 4)])
     f('mod', 2, '1.10', lambda x, y: x-y*np.floor(x/y), [1], [np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
     f('min', 2, '1.10', min, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('min', 2, '1.30', min, [1], [ints, ints])
+    f('min', 2, '1.30', min, [1], [uints, uints])
     f('max', 2, '1.10', max, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('max', 2, '1.30', max, [1], [ints, ints])
+    f('max', 2, '1.30', max, [1], [uints, uints])
     f('clamp', 3, '1.10', _clamp, [1, 2], [np.linspace(-2.0, 2.0, 4), np.linspace(-1.5, 1.5, 3), np.linspace(-1.5, 1.5, 3)])
+    f('clamp', 3, '1.30', _clamp, [1, 2], [ints, ints, ints])
+    f('clamp', 3, '1.30', _clamp, [1, 2], [uints, uints, uints])
     f('mix', 3, '1.10', lambda x, y, a: x*(1-a)+y*a, [2], [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), np.linspace(0.0, 1.0, 4)])
     f('step', 2, '1.10', lambda edge, x: 0.0 if x < edge else 1.0, [0], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('smoothstep', 3, '1.10', _smoothstep, [0, 1], [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
@@ -726,7 +748,8 @@ def _make_vector_relational_test_vectors(test_suite_dict):
     """
     _default_inputs = {
 	'v': np.linspace(-1.5, 1.5, 4),
-	'i': np.array([-5, -2, -1, 0, 1, 2, 5]),
+	'i': np.array([-5, -2, -1, 0, 1, 2, 5], dtype=np.int32),
+	'u': np.array([0, 1, 2, 5, 34], dtype=np.uint32),
 	'b': np.array([False, True])
 	}
     def f(name, arity, glsl_version, python_equivalent, arg_types,
@@ -756,12 +779,12 @@ def _make_vector_relational_test_vectors(test_suite_dict):
 		    test_suite_dict, name, glsl_version,
 		    _vectorize_test_vectors(
 			scalar_test_vectors, (), vector_length))
-    f('lessThan', 2, '1.10', lambda x, y: x < y, 'vi')
-    f('lessThanEqual', 2, '1.10', lambda x, y: x <= y, 'vi')
-    f('greaterThan', 2, '1.10', lambda x, y: x > y, 'vi')
-    f('greaterThanEqual', 2, '1.10', lambda x, y: x >= y, 'vi')
-    f('equal', 2, '1.10', lambda x, y: x == y, 'vib')
-    f('notEqual', 2, '1.10', lambda x, y: x != y, 'vib')
+    f('lessThan', 2, '1.10', lambda x, y: x < y, 'viu')
+    f('lessThanEqual', 2, '1.10', lambda x, y: x <= y, 'viu')
+    f('greaterThan', 2, '1.10', lambda x, y: x > y, 'viu')
+    f('greaterThanEqual', 2, '1.10', lambda x, y: x >= y, 'viu')
+    f('equal', 2, '1.10', lambda x, y: x == y, 'viub')
+    f('notEqual', 2, '1.10', lambda x, y: x != y, 'viub')
     f('not', 1, '1.10', lambda x: not x, 'b')
 _make_vector_relational_test_vectors(test_suite)
 
@@ -835,18 +858,27 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     bvecs = [np.array(bs) for bs in itertools.product(bools, bools)] + \
 	[np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
 	[np.array(bs) for bs in itertools.product(bools, bools, bools, bools)]
-    ints = [12, -6, 74, -32, 0]
+    ints = [np.int32(x) for x in [12, -6, 74, -32, 0]]
     ivecs = [
-	np.array([38, 35]),
-	np.array([64, -9]),
-	np.array([64, 9]),
-	np.array([-36, 32, -88]),
-	np.array([36, 32, 88]),
-	np.array([59, 77, 68]),
-	np.array([-66, 72, 87, -75]),
-	np.array([66, 72, 87, 75]),
-	np.array([-24, 40, -23, 74]),
-	np.array([24, 40, 23, 74]),
+	np.array([38, 35], dtype=np.int32),
+	np.array([64, -9], dtype=np.int32),
+	np.array([64, 9], dtype=np.int32),
+	np.array([-36, 32, -88], dtype=np.int32),
+	np.array([36, 32, 88], dtype=np.int32),
+	np.array([59, 77, 68], dtype=np.int32),
+	np.array([-66, 72, 87, -75], dtype=np.int32),
+	np.array([66, 72, 87, 75], dtype=np.int32),
+	np.array([-24, 40, -23, 74], dtype=np.int32),
+	np.array([24, 40, 23, 74], dtype=np.int32),
+	]
+    uints = [np.uint32(x) for x in [0, 6, 12, 32, 74]]
+    uvecs = [
+	np.array([38, 35], dtype=np.uint32),
+	np.array([64, 9], dtype=np.uint32),
+	np.array([36, 32, 88], dtype=np.uint32),
+	np.array([59, 77, 68], dtype=np.uint32),
+	np.array([66, 72, 87, 75], dtype=np.uint32),
+	np.array([24, 40, 23, 74], dtype=np.uint32)
 	]
     nz_floats = [-1.33, 0.85]
     floats = [0.0] + nz_floats
@@ -957,23 +989,23 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	    _simulate_function(
 		test_inputs, python_equivalent, tolerance_function),
 	    template = template)
-    f('op-add', 2, '1.10', lambda x, y: x + y, match_simple_binop, [floats+vecs+mats+ints+ivecs, floats+vecs+mats+ints+ivecs], template = '({0} + {1})')
-    f('op-sub', 2, '1.10', lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs, floats+vecs+mats+ints+ivecs], template = '({0} - {1})')
-    f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs, floats+vecs+mats+ints+ivecs], template = '({0} * {1})')
-    f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs, floats+vecs+mats+ints+ivecs], template = '({0} / {1})')
-    f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs], template = '(+ {0})')
-    f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs], template = '(- {0})')
-    f('op-gt', 2, '1.10', lambda x, y: x > y, match_args(0, 1), [ints+floats, ints+floats], template = '({0} > {1})')
-    f('op-lt', 2, '1.10', lambda x, y: x < y, match_args(0, 1), [ints+floats, ints+floats], template = '({0} < {1})')
-    f('op-ge', 2, '1.10', lambda x, y: x >= y, match_args(0, 1), [ints+floats, ints+floats], template = '({0} >= {1})')
-    f('op-le', 2, '1.10', lambda x, y: x <= y, match_args(0, 1), [ints+floats, ints+floats], template = '({0} <= {1})')
-    f('op-eq', 2, '1.10', _equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+bools+bvecs, floats+vecs+mats+ints+ivecs+bools+bvecs], template = '({0} == {1})')
-    f('op-ne', 2, '1.10', _not_equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+bools+bvecs, floats+vecs+mats+ints+ivecs+bools+bvecs], template = '({0} != {1})')
+    f('op-add', 2, '1.10', lambda x, y: x + y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} + {1})')
+    f('op-sub', 2, '1.10', lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
+    f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
+    f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
+    f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
+    f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
+    f('op-gt', 2, '1.10', lambda x, y: x > y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} > {1})')
+    f('op-lt', 2, '1.10', lambda x, y: x < y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} < {1})')
+    f('op-ge', 2, '1.10', lambda x, y: x >= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} >= {1})')
+    f('op-le', 2, '1.10', lambda x, y: x <= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} <= {1})')
+    f('op-eq', 2, '1.10', _equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} == {1})')
+    f('op-ne', 2, '1.10', _not_equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} != {1})')
     f('op-and', 2, '1.10', lambda x, y: x and y, None, [bools, bools], template = '({0} && {1})')
     f('op-or', 2, '1.10', lambda x, y: x or y, None, [bools, bools], template = '({0} || {1})')
     f('op-xor', 2, '1.10', lambda x, y: x != y, None, [bools, bools], template = '({0} ^^ {1})')
     f('op-not', 1, '1.10', lambda x: not x, None, [bools], template = '(! {0})')
-    f('op-selection', 3, '1.10', lambda x, y, z: y if x else z, match_args(1, 2), [bools, floats+vecs+mats+ints+ivecs+bools+bvecs, floats+vecs+mats+ints+ivecs+bools+bvecs], template = '({0} ? {1} : {2})')
+    f('op-selection', 3, '1.10', lambda x, y, z: y if x else z, match_args(1, 2), [bools, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} ? {1} : {2})')
     f('length', 1, '1.10', np.linalg.norm, None, [floats+vecs])
     f('distance', 2, '1.10', lambda x, y: np.linalg.norm(x-y), match_args(0, 1), [floats+vecs, floats+vecs])
     f('dot', 2, '1.10', np.dot, match_args(0, 1), [floats+vecs, floats+vecs])
