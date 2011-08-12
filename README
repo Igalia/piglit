@@ -102,6 +102,29 @@ Generate and exit.
   $ make
 
 
+2.4 Cygwin
+----------
+
+Install development packages.
+  - cmake
+  - gcc4
+  - make
+  - opengl
+  - libGL-devel
+  - libpng12-devel
+  - libpng14-devel
+  - zlib-devel
+  - libtiff-devel
+  - python
+  - python-numpy
+  - libglut-devel
+  - libGLU-devel
+
+Configure and build.
+  $ cmake .
+  $ make
+
+
 3. How to run tests
 -------------------
 
