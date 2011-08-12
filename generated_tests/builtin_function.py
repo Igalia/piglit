@@ -38,6 +38,12 @@
 # - ftransform()
 # - Increment and decrement operators
 #
+# The following functions are not included, since they need to be
+# tested in specialized ways:
+# - modf(): not tested because it has an out parameter
+# - isnan() and isinf(): not tested because special effort is required
+#   to create values that cause these functions to return true.
+#
 # Also not tested are array subscripting, field/method selection,
 # swizzling, the function call operator, assignment, and the sequence
 # operator.
@@ -417,6 +423,10 @@ def _exp2(x):
     # exp2() is not available in versions of numpy < 1.3.0 so we
     # emulate it with power().
     return np.power(2, x)
+def _trunc(x):
+    # trunc() rounds toward zero.  It is not available in version
+    # 1.2.1 of numpy so we emulate it with floor(), sign(), and abs().
+    return np.sign(x) * np.floor(np.abs(x))
 def _clamp(x, minVal, maxVal):
     if minVal > maxVal:
 	return None
@@ -724,6 +734,9 @@ def _make_componentwise_test_vectors(test_suite_dict):
     for exponent in (-10, -1, 0, 1, 10):
 	atan_inputs.append(pow(10.0, exponent))
 	atan_inputs.append(-pow(10.0, exponent))
+    # Make a similar set of inputs for acosh(), except don't use any
+    # values < 1, since acosh() is only defined for x >= 1.
+    acosh_inputs = [1.0 + x for x in atan_inputs if x >= 0]
     ints = [np.int32(x) for x in [-5, -2, -1, 0, 1, 2, 5]]
     uints = [np.uint32(x) for x in [0, 1, 2, 5, 34]]
     def f(name, arity, glsl_version, python_equivalent,
@@ -774,6 +787,12 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('acos', 1, '1.10', np.arccos, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
     f('atan', 1, '1.10', np.arctan, None, [atan_inputs], _trig_tolerance)
     f('atan', 2, '1.10', _arctan2, None, [atan_inputs, atan_inputs], _trig_tolerance)
+    f('sinh', 1, '1.30', np.sinh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('cosh', 1, '1.30', np.cosh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('tanh', 1, '1.30', np.tanh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('asinh', 1, '1.30', np.arcsinh, None, [atan_inputs], _trig_tolerance)
+    f('acosh', 1, '1.30', np.arccosh, None, [acosh_inputs], _trig_tolerance)
+    f('atanh', 1, '1.30', np.arctanh, None, [np.linspace(-0.99, 0.99, 4)], _trig_tolerance)
     f('pow', 2, '1.10', _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('exp', 1, '1.10', np.exp, None, [np.linspace(-2.0, 2.0, 4)])
     f('log', 1, '1.10', np.log, None, [np.linspace(0.01, 2.0, 4)])
@@ -786,6 +805,19 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('sign', 1, '1.10', np.sign, None, [np.linspace(-1.5, 1.5, 5)])
     f('sign', 1, '1.30', np.sign, None, [ints])
     f('floor', 1, '1.10', np.floor, None, [np.linspace(-2.0, 2.0, 4)])
+    f('trunc', 1, '1.30', _trunc, None, [np.linspace(-2.0, 2.0, 8)])
+
+    # Note: the direction of rounding used by round() is not specified
+    # for half-integer values, so we test it over a range that doesn't
+    # include exact half-integer values.  roundEven() is required to
+    # round half-integer values to the nearest even integer, so we
+    # test it over a range that does include exact half-integer
+    # values.  In both cases, we can use numpy's round() function,
+    # because it rounds half-integer values to even, and all other
+    # values to nearest.
+    f('round', 1, '1.30', np.round, None, [np.linspace(-2.0, 2.0, 8)])
+    f('roundEven', 1, '1.30', np.round, None, [np.linspace(-2.0, 2.0, 25)])
+
     f('ceil', 1, '1.10', np.ceil, None, [np.linspace(-2.0, 2.0, 4)])
     f('fract', 1, '1.10', lambda x: x-np.floor(x), None, [np.linspace(-2.0, 2.0, 4)])
     f('mod', 2, '1.10', lambda x, y: x-y*np.floor(x/y), [1], [np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
