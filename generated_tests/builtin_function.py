@@ -348,6 +348,55 @@ def _divide(x, y):
     else:
 	return x / y
 
+def _modulus(x, y):
+    if any(x_element < 0 for x_element in column_major_values(x)):
+	# Modulus operation with a negative first operand is
+	# undefined.
+	return None
+    if any(y_element <= 0 for y_element in column_major_values(y)):
+	# Modulus operation with a negative or zero second operand is
+	# undefined.
+	return None
+    return x % y
+
+def _lshift(x, y):
+    if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
+	# Shifts by less than 0 or more than the number of bits in the
+	# type being shifted are undefined.
+	return None
+    # When the arguments to << don't have the same signedness, numpy
+    # likes to promote them to int64.  To avoid this, convert y to be
+    # the same type as x.
+    y_orig = y
+    if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
+	y = _change_signedness(y)
+    result = x << y
+
+    # Shifting should always produce a result with the same base type
+    # as the left argument.
+    assert glsl_type_of(result).base_type == glsl_type_of(x).base_type
+
+    return result
+
+def _rshift(x, y):
+    if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
+	# Shifts by less than 0 or more than the number of bits in the
+	# type being shifted are undefined.
+	return None
+    # When the arguments to >> don't have the same signedness, numpy
+    # likes to promote them to int64.  To avoid this, convert y to be
+    # the same type as x.
+    y_orig = y
+    if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
+	y = _change_signedness(y)
+    result = x >> y
+
+    # Shifting should always produce a result with the same base type
+    # as the left argument.
+    assert glsl_type_of(result).base_type == glsl_type_of(x).base_type
+
+    return result
+
 def _equal(x, y):
     return all(column_major_values(x == y))
 
@@ -392,6 +441,22 @@ def _refract(I, N, eta):
 	return I*0.0
     else:
 	return eta*I-(eta*np.dot(N,I)+np.sqrt(k))*N
+
+
+
+def _change_signedness(x):
+    """Change signed integer types to unsigned integer types and vice
+    versa."""
+    if isinstance(x, np.int32):
+	return np.uint32(x)
+    elif isinstance(x, np.uint32):
+	return np.int32(x)
+    elif isinstance(x, np.ndarray):
+	if (x.dtype == np.int32):
+	    return np.array(x, dtype=np.uint32)
+	elif (x.dtype == np.uint32):
+	    return np.array(x, dtype=np.int32)
+    raise Exception('Unexpected type passed to _change_signedness')
 
 
 
@@ -853,12 +918,32 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	    # standard linear algebraic multiply is used, so x's
 	    # column count must match y's row count.
 	    return x_type.num_cols == y_type.num_rows
+    def match_shift(x, y):
+	"""Determine whether the type of the arguments is compatible
+	for shift operations.
+
+	Arguments are compatible if they are the same length or the
+	first one is a vector and the second is a scalar.  Their base
+	types need not be the same, but they both must be integral.
+	"""
+	x_type = glsl_type_of(x)
+	y_type = glsl_type_of(y)
+	if x_type.base_type not in (glsl_int, glsl_uint):
+	    return False
+	if y_type.base_type not in (glsl_int, glsl_uint):
+	    return False
+	if y_type.is_scalar:
+	    return True
+	assert not x_type.is_matrix
+	assert not y_type.is_matrix
+	return x_type.num_rows == y_type.num_rows
 
     bools = [False, True]
     bvecs = [np.array(bs) for bs in itertools.product(bools, bools)] + \
 	[np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
 	[np.array(bs) for bs in itertools.product(bools, bools, bools, bools)]
     ints = [np.int32(x) for x in [12, -6, 74, -32, 0]]
+    small_ints = [np.int32(x) for x in [-31, -25, -5, -2, -1, 0, 1, 2, 5, 25, 31]]
     ivecs = [
 	np.array([38, 35], dtype=np.int32),
 	np.array([64, -9], dtype=np.int32),
@@ -871,7 +956,21 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	np.array([-24, 40, -23, 74], dtype=np.int32),
 	np.array([24, 40, 23, 74], dtype=np.int32),
 	]
+    small_ivecs = [
+	np.array([13, 26], dtype=np.int32),
+	np.array([-2, 26], dtype=np.int32),
+	np.array([2, 26], dtype=np.int32),
+	np.array([22, -23, 4], dtype=np.int32),
+	np.array([22, 23, 4], dtype=np.int32),
+	np.array([-19, 1, -13], dtype=np.int32),
+	np.array([19, 1, 13], dtype=np.int32),
+	np.array([16, 24, -23, -25], dtype=np.int32),
+	np.array([16, 24, 23, 25], dtype=np.int32),
+	np.array([-23, -12, 14, 19], dtype=np.int32),
+	np.array([23, 12, 14, 19], dtype=np.int32),
+	]
     uints = [np.uint32(x) for x in [0, 6, 12, 32, 74]]
+    small_uints = [np.uint32(x) for x in [0, 1, 2, 5, 25, 31]]
     uvecs = [
 	np.array([38, 35], dtype=np.uint32),
 	np.array([64, 9], dtype=np.uint32),
@@ -879,6 +978,14 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	np.array([59, 77, 68], dtype=np.uint32),
 	np.array([66, 72, 87, 75], dtype=np.uint32),
 	np.array([24, 40, 23, 74], dtype=np.uint32)
+	]
+    small_uvecs = [
+	np.array([13, 26], dtype=np.uint32),
+	np.array([2, 26], dtype=np.uint32),
+	np.array([22, 23, 4], dtype=np.uint32),
+	np.array([19, 1, 13], dtype=np.uint32),
+	np.array([16, 24, 23, 25], dtype=np.uint32),
+	np.array([23, 12, 14, 19], dtype=np.uint32),
 	]
     nz_floats = [-1.33, 0.85]
     floats = [0.0] + nz_floats
@@ -993,6 +1100,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('op-sub', 2, '1.10', lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
     f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
     f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
+    f('op-mod', 2, '1.30', _divide, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} / {1})')
     f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
     f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
     f('op-gt', 2, '1.10', lambda x, y: x > y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} > {1})')
@@ -1006,6 +1114,12 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('op-xor', 2, '1.10', lambda x, y: x != y, None, [bools, bools], template = '({0} ^^ {1})')
     f('op-not', 1, '1.10', lambda x: not x, None, [bools], template = '(! {0})')
     f('op-selection', 3, '1.10', lambda x, y, z: y if x else z, match_args(1, 2), [bools, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} ? {1} : {2})')
+    f('op-complement', 1, '1.30', lambda x: ~x, None, [ints+ivecs+uints+uvecs], template = '(~ {0})')
+    f('op-lshift', 2, '1.30', _lshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} << {1})')
+    f('op-rshift', 2, '1.30', _rshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} >> {1})')
+    f('op-bitand', 2, '1.30', lambda x, y: x & y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} & {1})')
+    f('op-bitor', 2, '1.30', lambda x, y: x | y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} | {1})')
+    f('op-bitxor', 2, '1.30', lambda x, y: x ^ y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} ^ {1})')
     f('length', 1, '1.10', np.linalg.norm, None, [floats+vecs])
     f('distance', 2, '1.10', lambda x, y: np.linalg.norm(x-y), match_args(0, 1), [floats+vecs, floats+vecs])
     f('dot', 2, '1.10', np.dot, match_args(0, 1), [floats+vecs, floats+vecs])
