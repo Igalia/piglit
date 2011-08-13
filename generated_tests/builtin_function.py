@@ -726,7 +726,7 @@ def _make_vector_relational_test_vectors(test_suite_dict):
     """
     _default_inputs = {
 	'v': np.linspace(-1.5, 1.5, 4),
-	'i': np.array([1, 2, 3, 4]),
+	'i': np.array([-5, -2, -1, 0, 1, 2, 5]),
 	'b': np.array([False, True])
 	}
     def f(name, arity, glsl_version, python_equivalent, arg_types,
@@ -838,10 +838,14 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     ivecs = [
 	np.array([38, 35]),
 	np.array([64, -9]),
+	np.array([64, 9]),
 	np.array([-36, 32, -88]),
+	np.array([36, 32, 88]),
 	np.array([59, 77, 68]),
 	np.array([-66, 72, 87, -75]),
-	np.array([-24, 40, -23, 74])
+	np.array([66, 72, 87, 75]),
+	np.array([-24, 40, -23, 74]),
+	np.array([24, 40, 23, 74]),
 	]
     nz_floats = [-1.33, 0.85]
     floats = [0.0] + nz_floats
