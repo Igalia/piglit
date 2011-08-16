@@ -53,12 +53,26 @@ typedef unsigned __int64 uint64_t;
 #include <piglit/glut_wrap.h>
 
 #if defined(_MSC_VER)
+
 #define snprintf sprintf_s
 
+static __inline double
+round(double x) {
+	return x >= 0.0 ? floor(x + 0.5) : ceil(x - 0.5);
+}
+
+static __inline float
+roundf(float x) {
+	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
+}
+
 #define piglit_get_proc_address(x) wglGetProcAddress(x)
-#else
+
+#else /* !defined(_MSC_VER) */
+
 #define piglit_get_proc_address(x) glutGetProcAddress(x)
-#endif
+
+#endif /* !defined(_MSC_VER) */
 
 enum piglit_result {
 	PIGLIT_PASS,

@@ -90,11 +90,6 @@ static GLint progs[ELEMENTS(types)];
 /*@}*/
 
 
-double round(double x) {
-	return floor(x + 0.5);
-}
-
-
 void
 generate_shader(GLenum type)
 {
