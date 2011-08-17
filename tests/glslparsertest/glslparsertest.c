@@ -42,6 +42,7 @@
 static char *filename;
 static int expected_pass;
 static int gl_major_version = 0;
+static int check_link = 0;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -97,6 +98,7 @@ test(void)
 	GLchar *info;
 	GLint size;
 	GLenum type;
+	char *failing_stage = NULL;
 
 	if (strcmp(filename + strlen(filename) - 4, "frag") == 0)
 		type = GL_FRAGMENT_SHADER;
@@ -140,12 +142,6 @@ test(void)
 	piglit_ShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
 	piglit_CompileShader(prog);
 	ok = get_shader_compile_status(prog);
-	pass = (expected_pass == ok);
-
-	if (pass)
-		out = stdout;
-	else
-		out = stderr;
 
 	size = get_shader_info_log_length(prog);
 	if (size != 0) {
@@ -156,7 +152,36 @@ test(void)
 	}
 
 	if (!ok) {
-		fprintf(out, "Failed to compile %s shader %s: %s\n",
+		failing_stage = "compile";
+	} else {
+		/* Try linking the shader if it compiled.  We do this
+		 * even if --check-link wasn't specified, to increase
+		 * coverage of linker code.
+		 */
+		GLuint shader_prog;
+
+		shader_prog = piglit_CreateProgram();
+		piglit_AttachShader(shader_prog, prog);
+		piglit_LinkProgram(shader_prog);
+		if (check_link) {
+			ok = piglit_link_check_status_quiet(shader_prog);
+			if (!ok) {
+				failing_stage = "link";
+			}
+		}
+		piglit_DeleteProgram(shader_prog);
+	}
+
+	pass = (expected_pass == ok);
+
+	if (pass)
+		out = stdout;
+	else
+		out = stderr;
+
+	if (!ok) {
+		fprintf(out, "Failed to %s %s shader %s: %s\n",
+			failing_stage,
 			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
 			filename, info);
 		if (expected_pass) {
@@ -164,30 +189,14 @@ test(void)
 			printf("%s\n", prog_string);
 		}
 	} else {
-		fprintf(out, "Successfully compiled %s shader %s: %s\n",
+		fprintf(out, "Successfully %s %s shader %s: %s\n",
+			check_link ? "compiled and linked" : "compiled",
 			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
 			filename, info);
 		if (!expected_pass) {
 			printf("Shader source:\n");
 			printf("%s\n", prog_string);
 		}
-	}
-
-	/* Try linking the shader if it compiled.  We don't care about
-	 * the success or failure of linking for the purposes of
-	 * parser tests, we're just trying to increase coverage of
-	 * that code.  It also means that drivers that do a compile at
-	 * link time (to determine limits) get a chance to expose
-	 * their codegen to the parser tests, even if we don't ever
-	 * execute it.
-	 */
-	if (ok) {
-		GLuint shader_prog;
-
-		shader_prog = piglit_CreateProgram();
-		piglit_AttachShader(shader_prog, prog);
-		piglit_LinkProgram(shader_prog);
-		piglit_DeleteProgram(shader_prog);
 	}
 
 	if (size != 0)
@@ -199,9 +208,35 @@ test(void)
 
 static void usage(char *name)
 {
-	printf("%s <filename.frag|filename.vert> <pass|fail> "
+	printf("%s {options} <filename.frag|filename.vert> <pass|fail> "
 	       "{requested GLSL vesion} {list of required GL extensions}\n", name);
+	printf("\nSupported options:\n");
+	printf("  --check-link: also detect link failures\n");
 	exit(1);
+}
+
+/**
+ * Process any options and remove them from the argv array.  Return
+ * the new argc.
+ */
+int process_options(int argc, char **argv)
+{
+	int i = 1;
+	int new_argc = 1;
+	while (i < argc) {
+		if (argv[i][0] == '-') {
+			if (strcmp(argv[i], "--check-link") == 0)
+				check_link = 1;
+			else
+				usage(argv[0]);
+			/* do not retain the option; we've processed it */
+			i++;
+		} else {
+			/* retain the option in the argv array */
+			argv[new_argc++] = argv[i++];
+		}
+	}
+	return new_argc;
 }
 
 int main(int argc, char**argv)
@@ -212,6 +247,7 @@ int main(int argc, char**argv)
 	int i;
 
 	piglit_glutInit(argc, argv);
+	argc = process_options(argc, argv);
 	if (argc < 3)
 		usage(argv[0]);
 

@@ -132,6 +132,10 @@ class GLSLParserTest(PlainExecTest):
 	* require_extensions: List of GL extensions. If an extension is not
 	      supported, the test is skipped. Each extension name must begin
 	      with GL and elements are separated by whitespace.
+	* check_link: Either ``true`` or ``false``.  A true value passes the
+	      --check-link option to be supplied to glslparsertest, which
+	      causes it to detect link failures as well as compilation
+	      failures.
 
 	Examples
 	--------
@@ -159,6 +163,7 @@ class GLSLParserTest(PlainExecTest):
 		[config]
 		glsl_version: 1.30
 		expect_result: pass
+		check_link: true
 		[end config]
 		*/
 
@@ -183,6 +188,7 @@ class GLSLParserTest(PlainExecTest):
 
 	__config_defaults = {
 		'require_extensions' : '',
+		'check_link' : 'false',
 		}
 
 	def __init__(self, filepath, runConcurrent = True):
@@ -366,6 +372,8 @@ class GLSLParserTest(PlainExecTest):
 			self.config.get('config', 'expect_result'),
 			self.config.get('config', 'glsl_version')
 			]
+		if self.config.get('config', 'check_link').lower() == 'true':
+			command.append('--check-link')
 		command += self.config.get('config', 'require_extensions').split()
 		return command
 
