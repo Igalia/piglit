@@ -311,6 +311,13 @@ extern PFNGLUNIFORMMATRIX4X3FVPROC piglit_UniformMatrix4x3fv;
 #endif
 /*@}*/
 
+/**
+ * Require a specific version of GLSL.
+ *
+ * \param version Integer version, for example 130
+ */
+extern void piglit_require_GLSL_version(int version);
+/** Require any version of GLSL */
 extern void piglit_require_GLSL(void);
 extern void piglit_require_fragment_shader(void);
 extern void piglit_require_vertex_shader(void);

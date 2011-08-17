@@ -205,6 +205,24 @@ piglit_require_GLSL(void)
 }
 
 void
+piglit_require_GLSL_version(int version)
+{
+	bool es;
+	int major, minor;
+
+	piglit_require_GLSL();
+
+	piglit_get_glsl_version(&es, &major, &minor);
+
+	if (es || 100 * major + minor < version) {
+		printf("GLSL %d.%d not supported.\n",
+		       version / 100, version % 100);
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}
+
+void
 piglit_require_vertex_shader(void)
 {
 	if (GLEW_VERSION_2_0) {
