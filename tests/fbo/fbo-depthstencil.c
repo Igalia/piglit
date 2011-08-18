@@ -33,7 +33,7 @@
 #define BUF_SIZE 123
 int piglit_width = BUF_SIZE;
 int piglit_height = BUF_SIZE;
-int piglit_window_mode = GLUT_DOUBLE;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL;
 enum {
 	CLEAR,
 	READPIXELS,
@@ -50,6 +50,7 @@ struct format {
 	GLenum iformat;
 	const char *extension;
 } formats[] = {
+	{"default_fb", 0, NULL},
 	{F(GL_DEPTH24_STENCIL8),  "GL_EXT_packed_depth_stencil"},
 	{F(GL_DEPTH32F_STENCIL8), "GL_ARB_depth_buffer_float"}
 };
@@ -76,20 +77,22 @@ static enum piglit_result test_clear(void)
 	enum piglit_result res;
 
 	/* Add a colorbuffer. */
-	glGenRenderbuffersEXT(1, &cb);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, cb);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, BUF_SIZE, BUF_SIZE);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+	if (f.iformat) {
+		glGenRenderbuffersEXT(1, &cb);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, cb);
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA8, BUF_SIZE, BUF_SIZE);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0,
-				     GL_RENDERBUFFER_EXT, cb);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0,
+					     GL_RENDERBUFFER_EXT, cb);
 
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		printf("FBO incomplete status 0x%X\n", status);
-		piglit_report_result(PIGLIT_FAIL); /* RGBA8 must succeed. */
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+			printf("FBO incomplete status 0x%X\n", status);
+			piglit_report_result(PIGLIT_FAIL); /* RGBA8 must succeed. */
+		}
 	}
 
 	glClearDepth(0.75);
@@ -111,13 +114,14 @@ static enum piglit_result test_clear(void)
 	res = piglit_probe_rect_rgb(0, 0, BUF_SIZE, BUF_SIZE, green) ? PIGLIT_PASS : PIGLIT_FAIL;
 
 	/* Display the colorbuffer. */
-	if (!piglit_automatic) {
+	if (!piglit_automatic && f.iformat) {
 		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 		glBlitFramebufferEXT(0, 0, BUF_SIZE, BUF_SIZE, 0, 0, BUF_SIZE, BUF_SIZE,
 				     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}
 
-	glDeleteRenderbuffersEXT(1, &cb);
+	if (f.iformat)
+		glDeleteRenderbuffersEXT(1, &cb);
 
 	return res;
 }
@@ -387,25 +391,29 @@ enum piglit_result piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Create the FBO. */
-	glGenRenderbuffersEXT(1, &rb);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, f.iformat, BUF_SIZE, BUF_SIZE);
-	glGetRenderbufferParameterivEXT(GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_STENCIL_SIZE_EXT, &stencil_size);
-	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+	if (f.iformat) {
+		glGenRenderbuffersEXT(1, &rb);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, f.iformat, BUF_SIZE, BUF_SIZE);
+		glGetRenderbufferParameterivEXT(GL_RENDERBUFFER_EXT, GL_RENDERBUFFER_STENCIL_SIZE_EXT, &stencil_size);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 
-	glGenFramebuffersEXT(1, &fb);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT,
-				     GL_RENDERBUFFER_EXT, rb);
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT,
-				     GL_RENDERBUFFER_EXT, rb);
-	glViewport(0, 0, BUF_SIZE, BUF_SIZE);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		printf("FBO incomplete status 0x%X\n", status);
-		piglit_report_result(PIGLIT_SKIP);
+		glGenFramebuffersEXT(1, &fb);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT,
+					GL_RENDERBUFFER_EXT, rb);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT,
+					GL_RENDERBUFFER_EXT, rb);
+		glViewport(0, 0, BUF_SIZE, BUF_SIZE);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+			printf("FBO incomplete status 0x%X\n", status);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	} else {
+		stencil_size = 8;
 	}
 
 	stencilmask = (1 << stencil_size) - 1;
@@ -455,8 +463,10 @@ enum piglit_result piglit_display(void)
 	}
 
 	/* Cleanup. */
-	glDeleteFramebuffersEXT(1, &fb);
-	glDeleteRenderbuffersEXT(1, &rb);
+	if (f.iformat) {
+		glDeleteFramebuffersEXT(1, &fb);
+		glDeleteRenderbuffersEXT(1, &rb);
+	}
 
 	glutSwapBuffers();
 
