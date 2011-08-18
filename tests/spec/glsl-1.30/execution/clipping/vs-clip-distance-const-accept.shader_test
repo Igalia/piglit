@@ -1,0 +1,38 @@
+# From the GL 3.0 spec, section 2.17 (Clipping):
+#
+#   A vertex shader may, instead of writing to gl ClipVertex, write a
+#   single clip distance for each supported clip plane to elements of
+#   the gl_ClipDistance[] array. The half-space corresponding to clip
+#   plane n is then given by the set of points satisfying the
+#   inequality
+#
+#     c_n(P) >= 0
+#
+#   where c_n(P) is the value of clip distance n at point P.
+#
+# This test checks that gl_ClipDistance works properly for the trivial
+# case where gl_ClipDistance[0] is a constant value greater than zero.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	gl_ClipDistance[0] = 1.0;
+}
+
+[fragment shader]
+#version 130
+void main(void)
+{
+	gl_FragColor = vec4(1.0);
+}
+
+[test]
+enable GL_CLIP_PLANE0
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
