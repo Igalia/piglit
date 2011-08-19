@@ -883,6 +883,12 @@ arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = Pla
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-GL_ARB_shader_texture_lod'])
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-GL_ARB_shader_texture_lod'])
 
+# Group ARB_shader_objects
+arb_shader_objects = Group()
+spec['ARB_shader_objects'] = arb_shader_objects
+arb_shader_objects['getuniform'] = PlainExecTest(['arb_shader_objects-getuniform', '-auto'])
+arb_shader_objects['getuniform'].runConcurrent = True
+
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = Group()
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
