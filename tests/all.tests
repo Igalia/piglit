@@ -722,6 +722,7 @@ add_texwrap_test2(gl20, '2D', 'npot')
 add_texwrap_test3(gl20, '2D', 'npot', 'proj')
 add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
+add_plain_test(gl20, 'getattriblocation-conventional')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
