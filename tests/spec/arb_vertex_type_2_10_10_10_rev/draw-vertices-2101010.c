@@ -93,7 +93,7 @@ static void test_packed_int_color_vertices(float x1, float y1, float x2, float y
     v[1] = iconv(x1, y2, 0, 1);
     v[2] = iconv(x2, y1, 0, 1);
 
-    if (index == 0) {
+    if (index == 0 || index == 2) {
 	c[0] = iconv(511, 0, 0, 0);
 	c[1] = iconv(511, 0, 0, 0);
 	c[2] = iconv(511, 0, 0, 0);
@@ -109,6 +109,8 @@ static void test_packed_int_color_vertices(float x1, float y1, float x2, float y
     switch (index) {
         case 0: vbo = vboColorPointer(4, GL_INT_2_10_10_10_REV, 4, c, sizeof(c), 0); break;
         case 1: vbo = vboColorPointer(4, GL_UNSIGNED_INT_2_10_10_10_REV, 4, c, sizeof(c), 0); break;
+        case 2: vbo = vboColorPointer(GL_BGRA, GL_INT_2_10_10_10_REV, 4, c, sizeof(c), 0); break;
+        case 3: vbo = vboColorPointer(GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV, 4, c, sizeof(c), 0); break;
      }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -142,6 +144,40 @@ static void test_packed_int_vertices(float x1, float y1, float x2, float y2, int
     glDeleteBuffers(1, &vbo);
 }
 
+static void test_int_vertices_abi(float x1, float y1, float x2, float y2, int index)
+{
+    GLuint v[3];
+    GLuint c[3];
+    int i, type;
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    if (index == 0) {
+	v[0] = iconv(x1, y1, 0, 1);
+	v[1] = iconv(x1, y2, 0, 1);
+	v[2] = iconv(x2, y1, 0, 1);
+	type = GL_INT_2_10_10_10_REV;
+    } else {
+	v[0] = conv(x1, y1, 0, 1);
+	v[1] = conv(x1, y2, 0, 1);
+	v[2] = conv(x2, y1, 0, 1);
+	type = GL_UNSIGNED_INT_2_10_10_10_REV;
+    }
+
+    c[0] = iconv(511, 0, 0, 0);
+    c[1] = iconv(511, 0, 0, 0);
+    c[2] = iconv(511, 0, 0, 0);
+
+    glBegin(GL_TRIANGLES);
+    for (i = 0; i < 3; i++) {
+	glColorP3ui(GL_INT_2_10_10_10_REV, c[i]);
+	glVertexP3ui(type, v[i]);
+    }
+    glEnd();
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+}
+
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
@@ -154,7 +190,11 @@ struct test tests[] = {
     {test_packed_int_vertices, 1, {1, 1, 1}, "Unsigned Int vertices - 2/10/10/10"},
     {test_packed_int_color_vertices, 0, {1, 0, 0}, "Int Color - 2/10/10/10"},
     {test_packed_int_color_vertices, 1, {1, 0, 0}, "Unsigned Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 2, {0, 0, 1}, "Int BGRA Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 3, {0, 0, 1}, "Unsigned Int BGRA Color - 2/10/10/10"},
 
+    {test_int_vertices_abi, 0, {1, 0, 0}, "Int 2/10/10/10 - test ABI" },
+    {test_int_vertices_abi, 1, {1, 0, 0}, "Unsigned 2/10/10/10 - test ABI" },
     {0}
 };
 
