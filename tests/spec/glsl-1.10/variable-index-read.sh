@@ -81,7 +81,7 @@ function emit_globals
 	    matrix_data 1 $matrix_dim
 	    echo ");"
 	else
-	    echo "    ${type} m${dim} = ${type}("
+	    echo "${mode} ${type} m${dim} = ${type}("
 	    emit_matrix_array_initializer $matrix_dim $array_dim $base_type ""
 	    echo ");"
 	fi
