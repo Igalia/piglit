@@ -1158,6 +1158,39 @@ add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '
 ext_texture_srgb['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'srgb'])
 ext_texture_srgb['invalid formats'].runConcurrent = True
 
+ext_transform_feedback = Group()
+spec['EXT_transform_feedback'] = ext_transform_feedback
+ext_transform_feedback['position-readback-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto'])
+ext_transform_feedback['position-readback-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'discard'])
+ext_transform_feedback['position-readback-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset'])
+ext_transform_feedback['position-readback-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset', 'discard'])
+ext_transform_feedback['position-readback-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'range'])
+ext_transform_feedback['position-readback-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'range', 'discard'])
+
+ext_transform_feedback['position-render-bufferbase'] = 			PlainExecTest(['ext_transform_feedback-position', '-auto', 'render'])
+ext_transform_feedback['position-render-bufferbase-discard'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'discard'])
+ext_transform_feedback['position-render-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'offset'])
+ext_transform_feedback['position-render-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'offset', 'discard'])
+ext_transform_feedback['position-render-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'range'])
+ext_transform_feedback['position-render-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'range', 'discard'])
+
+ext_transform_feedback['query-primitives_generated-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen'])
+ext_transform_feedback['query-primitives_generated-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'discard'])
+ext_transform_feedback['query-primitives_generated-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'offset'])
+ext_transform_feedback['query-primitives_generated-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'offset', 'discard'])
+ext_transform_feedback['query-primitives_generated-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'range'])
+ext_transform_feedback['query-primitives_generated-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'range', 'discard'])
+
+ext_transform_feedback['query-primitives_written-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten'])
+ext_transform_feedback['query-primitives_written-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'discard'])
+ext_transform_feedback['query-primitives_written-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'offset'])
+ext_transform_feedback['query-primitives_written-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'offset', 'discard'])
+ext_transform_feedback['query-primitives_written-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'range'])
+ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'range', 'discard'])
+
+ext_transform_feedback['interleaved-attribs'] = PlainExecTest(['ext_transform_feedback-interleaved', '-auto'])
+ext_transform_feedback['separate-attribs'] = PlainExecTest(['ext_transform_feedback-separate', '-auto'])
+
 ati_draw_buffers = Group()
 spec['ATI_draw_buffers'] = ati_draw_buffers
 add_plain_test(ati_draw_buffers, 'ati_draw_buffers-arbfp')
