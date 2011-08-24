@@ -1191,6 +1191,10 @@ ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	PlainE
 ext_transform_feedback['interleaved-attribs'] = PlainExecTest(['ext_transform_feedback-interleaved', '-auto'])
 ext_transform_feedback['separate-attribs'] = PlainExecTest(['ext_transform_feedback-separate', '-auto'])
 
+arb_transform_feedback2 = Group()
+spec['ARB_transform_feedback2'] = arb_transform_feedback2
+arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
+
 ati_draw_buffers = Group()
 spec['ATI_draw_buffers'] = ati_draw_buffers
 add_plain_test(ati_draw_buffers, 'ati_draw_buffers-arbfp')
