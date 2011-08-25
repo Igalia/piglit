@@ -61,6 +61,9 @@ endif (NOT MSVC)
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)
+
+	# Don't define min/max macros
+	add_definitions (-DNOMINMAX)
 endif (WIN32)
 
 if (APPLE)
