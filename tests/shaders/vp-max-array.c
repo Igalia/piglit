@@ -36,11 +36,14 @@ int piglit_width = 100;
 int piglit_height = 100;
 
 
-static const char vertex_source_template[] =
+static const char template_header[] =
 	"!!ARBvp1.0\n"
 	"OPTION	ARB_position_invariant;\n"
-	"PARAM	colors[%d] = { program.local[0..%d] };\n"
-	"\n"
+	"PARAM	colors[%d] = {\n"
+	;
+
+static const char template_footer[] =
+	"	};\n"
 	"MOV	result.color, colors[0];\n"
 	"END\n"
 	;
@@ -74,8 +77,11 @@ piglit_init(int argc, char **argv)
 	GLint max_native_parameters;
 	GLint max_local_parameters;
 	GLint max_env_parameters;
-	char shader_source[1024];
+	char *shader_source;
 	bool pass = true;
+	size_t len;
+	int offset;
+	unsigned i;
 
 	(void) argc;
 	(void) argv;
@@ -108,9 +114,37 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	snprintf(shader_source, sizeof(shader_source),
-		 vertex_source_template,
-		 max_parameters, max_parameters - 1);
+	/* Allocate a buffer big enough to hold any program that this test
+	 * might generate.
+	 */
+	len = sizeof(template_header)
+		+ sizeof(template_footer)
+		+ (80 * max_parameters) + 1;
+	shader_source = malloc(len);
+	if (shader_source == NULL)
+		piglit_report_result(PIGLIT_FAIL);
+
+	/* Generate a program that uses the full parameter space using an
+	 * array of constants.  Since only one parameter is statically used,
+	 * this exercises GL_MAX_PROGRAM_PARAMETERS_ARB and *not*
+	 * GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB.
+	 */
+	offset = snprintf(shader_source, len, template_header, max_parameters);
+	for (i = 0; i < max_parameters; i++) {
+		int comma = (i < (max_parameters - 1)) ? ',' : ' ';
+		int used = snprintf(& shader_source[offset],
+				    len - offset,
+				    "\t\t{ %.1f, %.1f, %.1f, %.1f }%c\n",
+				    (float) i,
+				    (float) i + 0.2,
+				    (float) i + 0.4,
+				    (float) i + 0.6,
+				    comma);
+		offset += used;
+	}
+
+	memcpy(& shader_source[offset], template_footer,
+	       sizeof(template_footer));
 
 	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
 }
