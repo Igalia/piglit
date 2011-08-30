@@ -48,6 +48,13 @@ static const char template_footer[] =
 	"END\n"
 	;
 
+static const char max_native_template_footer[] =
+	"	};\n"
+	"ADDRESS	a;\n"
+	"ARL	a.x, vertex.position.x;\n"
+	"MOV	result.color, colors[a.x];\n"
+	"END\n"
+	;
 
 enum piglit_result
 piglit_display(void)
@@ -119,6 +126,7 @@ piglit_init(int argc, char **argv)
 	 */
 	len = sizeof(template_header)
 		+ sizeof(template_footer)
+		+ sizeof(max_native_template_footer)
 		+ (80 * max_parameters) + 1;
 	shader_source = malloc(len);
 	if (shader_source == NULL)
@@ -145,6 +153,32 @@ piglit_init(int argc, char **argv)
 
 	memcpy(& shader_source[offset], template_footer,
 	       sizeof(template_footer));
+
+	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
+
+	/* Generate a program that uses the full native parameter space using
+	 * an array of constants.  The array is accessed indirectly, so the
+	 * assembler cannot know which elements may be used.  As a result, it
+	 * has to upload all of them.  This exercises
+	 * GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB.
+	 */
+	offset = snprintf(shader_source, len, template_header,
+			  max_native_parameters);
+	for (i = 0; i < max_native_parameters; i++) {
+		int comma = (i < (max_native_parameters - 1)) ? ',' : ' ';
+		int used = snprintf(& shader_source[offset],
+				    len - offset,
+				    "\t\t{ %.1f, %.1f, %.1f, %.1f }%c\n",
+				    (float) i,
+				    (float) i + 0.2,
+				    (float) i + 0.4,
+				    (float) i + 0.6,
+				    comma);
+		offset += used;
+	}
+
+	memcpy(& shader_source[offset], max_native_template_footer,
+	       sizeof(max_native_template_footer));
 
 	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
 }
