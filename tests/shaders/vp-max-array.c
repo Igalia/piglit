@@ -56,6 +56,19 @@ static const char max_native_template_footer[] =
 	"END\n"
 	;
 
+static const char max_local_template[] =
+	"!!ARBvp1.0\n"
+	"OPTION	ARB_position_invariant;\n"
+	"PARAM	colors[96] = {\n"
+	"		program.%s[0..48],\n"
+	"		program.%s[%d..%d]\n"
+	"	};\n"
+	"ADDRESS	a;\n"
+	"ARL	a.x, vertex.position.x;\n"
+	"MOV	result.color, colors[a.x];\n"
+	"END\n"
+	;
+
 enum piglit_result
 piglit_display(void)
 {
@@ -179,6 +192,18 @@ piglit_init(int argc, char **argv)
 
 	memcpy(& shader_source[offset], max_native_template_footer,
 	       sizeof(max_native_template_footer));
+
+	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
+
+	/* Generate a program that uses as much of the local parameter space
+	 * as possible.  This basically tries to hit both ends of the
+	 * program.local array without making assumptions about the relative
+	 * amount of parameter space.  We only assume that the
+	 * minimum-maximums of 96 are respected by the GL implementation.
+	 */
+	snprintf(shader_source, len, max_local_template,
+		 "local",
+		 "local", max_local_parameters - 47, max_local_parameters - 1);
 
 	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
 }
