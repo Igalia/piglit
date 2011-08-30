@@ -6,7 +6,7 @@
 import os
 import re
 
-execfile(os.path.dirname(__file__) + '/radeon.tests')
+execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 
 from framework.core import *
 from framework.gleantest import *
