@@ -206,4 +206,16 @@ piglit_init(int argc, char **argv)
 		 "local", max_local_parameters - 47, max_local_parameters - 1);
 
 	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
+
+	/* Generate a program that uses as much of the env parameter space
+	 * as possible.  This basically tries to hit both ends of the
+	 * program.env array without making assumptions about the relative
+	 * amount of parameter space.  We only assume that the
+	 * minimum-maximums of 96 are respected by the GL implementation.
+	 */
+	snprintf(shader_source, len, max_local_template,
+		 "env",
+		 "env", max_env_parameters - 47, max_env_parameters - 1);
+
+	(void) piglit_compile_program(GL_VERTEX_PROGRAM_ARB, shader_source);
 }
