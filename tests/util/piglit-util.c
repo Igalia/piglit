@@ -198,7 +198,7 @@ void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
 
 	/* Print the expected error, but only if an error was really expected. */
 	if (expected_error != GL_NO_ERROR) {
-		printf("Expected GL error: %x 0x%x\n",
+		printf("Expected GL error: %s 0x%x\n",
 		piglit_get_gl_error_name(expected_error), expected_error);
         }
 
