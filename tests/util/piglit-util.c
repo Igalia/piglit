@@ -179,8 +179,6 @@ const char* piglit_get_gl_error_name(GLenum error)
 void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
 {
 	GLenum actual_error;
-	const char *expected_name;
-	const char *actual_name;
 
 	actual_error = glGetError();
 	if (actual_error == expected_error) {
