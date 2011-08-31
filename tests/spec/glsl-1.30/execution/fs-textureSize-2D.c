@@ -55,6 +55,9 @@ static const char frag[] =
 "	gl_FragColor = vec4(0.01 * size, 0.0, 1.0);\n"
 "}\n";
 
+#ifdef _MSC_VER
+#undef max
+#endif
 static float max(float x, float y) { return (x > y) ? x : y; }
 
 enum piglit_result

@@ -56,7 +56,10 @@ static const char frag[] =
 "	gl_FragColor = texel;\n"
 "}\n";
 
-static inline float max(float x, float y) { return (x > y) ? x : y; }
+#ifdef _MSC_VER
+#undef max
+#endif
+static float max(float x, float y) { return (x > y) ? x : y; }
 
 enum piglit_result
 piglit_display(void)
