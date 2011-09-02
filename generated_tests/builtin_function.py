@@ -1134,7 +1134,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
     f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
     f('op-div-large', 2, '1.30', _divide, match_simple_binop, [large_uints, large_uints+small_uints], template = '({0} / {1})')
-    f('op-mod', 2, '1.30', _divide, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} / {1})')
+    f('op-mod', 2, '1.30', _modulus, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} % {1})')
     f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
     f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
     f('op-gt', 2, '1.10', lambda x, y: x > y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} > {1})')
