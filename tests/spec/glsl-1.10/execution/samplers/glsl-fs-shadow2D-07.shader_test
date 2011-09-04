@@ -1,22 +1,22 @@
 # [description]
 # Test shadow2D(sampler2DShadow, vec3) with
 #   - depth texture mode = alpha
-#   - texture compare func = always
+#   - texture compare func = greater
 
 [require]
 GLSL >= 1.10
 
 [vertex shader file]
-glsl-fs-shadow2d.vert
+glsl-fs-shadow.vert
 
 [fragment shader file]
-glsl-fs-shadow2d.frag
+glsl-fs-shadow2D.frag
 
 [test]
 uniform int tex 0
 texture shadow2D 0 (32, 32)
 texparameter depth_mode alpha
-texparameter compare_func always
+texparameter compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -24,5 +24,5 @@ relative probe rgba (0.0, 0.1) (0.0, 0.0, 0.0, 1.0)
 relative probe rgba (0.9, 1.0) (0.0, 0.0, 0.0, 1.0)
 
 # depth comparison fail
-relative probe rgba (0.1, 0.0) (0.0, 0.0, 0.0, 1.0)
-relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.1, 0.0) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 0.0)

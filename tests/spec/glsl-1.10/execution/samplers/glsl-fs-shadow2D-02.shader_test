@@ -1,21 +1,21 @@
 # [description]
 # Test shadow2D(sampler2DShadow, vec3) with
-#   - depth texture mode = intensity
+#   - depth texture mode = luminance
 #   - texture compare func = always
 
 [require]
 GLSL >= 1.10
 
 [vertex shader file]
-glsl-fs-shadow2d.vert
+glsl-fs-shadow.vert
 
 [fragment shader file]
-glsl-fs-shadow2d.frag
+glsl-fs-shadow2D.frag
 
 [test]
 uniform int tex 0
 texture shadow2D 0 (32, 32)
-texparameter depth_mode intensity
+texparameter depth_mode luminance
 texparameter compare_func always
 draw rect -1 -1 2 2
 
