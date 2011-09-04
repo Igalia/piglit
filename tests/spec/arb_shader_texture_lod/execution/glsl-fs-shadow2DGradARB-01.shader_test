@@ -16,8 +16,8 @@ glsl-fs-shadow2DGradARB.frag
 [test]
 uniform int tex 0
 texture shadow2D 0 (32, 32)
-texparameter depth_mode luminance
-texparameter compare_func greater
+texparameter2D depth_mode luminance
+texparameter2D compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass

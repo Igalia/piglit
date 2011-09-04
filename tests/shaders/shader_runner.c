@@ -1025,75 +1025,75 @@ piglit_display(void)
 
 			glEnable(GL_TEXTURE_2D);
 		} else if (!strncmp(line,
-				    "texparameter compare_func greater\n",
-				    34)) {
+				    "texparameter2D compare_func greater\n",
+				    36)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_GREATER);
 		} else if (!strncmp(line,
-				    "texparameter compare_func gequal\n",
-				    33)) {
+				    "texparameter2D compare_func gequal\n",
+				    35)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_GEQUAL);
 		} else if (!strncmp(line,
-				    "texparameter compare_func less\n",
-				    31)) {
+				    "texparameter2D compare_func less\n",
+				    33)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_LESS);
 		} else if (!strncmp(line,
-				    "texparameter compare_func lequal\n",
-				    33)) {
+				    "texparameter2D compare_func lequal\n",
+				    35)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_LEQUAL);
 		} else if (!strncmp(line,
-				    "texparameter compare_func equal\n",
-				    32)) {
+				    "texparameter2D compare_func equal\n",
+				    34)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_EQUAL);
 		} else if (!strncmp(line,
-				    "texparameter compare_func notequal\n",
-				    35)) {
+				    "texparameter2D compare_func notequal\n",
+				    37)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_NOTEQUAL);
 		} else if (!strncmp(line,
-				    "texparameter compare_func always\n",
-				    33)) {
+				    "texparameter2D compare_func always\n",
+				    35)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_ALWAYS);
 		} else if (!strncmp(line,
-				    "texparameter compare_func never\n",
-				    32)) {
+				    "texparameter2D compare_func never\n",
+				    34)) {
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC_ARB,
 					GL_NEVER);
 		} else if (!strncmp(line,
-			           "texparameter depth_mode red\n",
-			            28)) {
+			           "texparameter2D depth_mode red\n",
+			            30)) {
 			/* Requires GL 3.0 or GL_ARB_texture_rg */
 			glTexParameteri(GL_TEXTURE_2D,
 				        GL_DEPTH_TEXTURE_MODE_ARB,
 				        GL_RED);
 		} else if (!strncmp(line,
-			           "texparameter depth_mode luminance\n",
-			            34)) {
+			           "texparameter2D depth_mode luminance\n",
+			            36)) {
 			glTexParameteri(GL_TEXTURE_2D,
 				        GL_DEPTH_TEXTURE_MODE_ARB,
 				        GL_LUMINANCE);
 		} else if (!strncmp(line,
-			           "texparameter depth_mode intensity\n",
-			            34)) {
+			           "texparameter2D depth_mode intensity\n",
+			            36)) {
 			glTexParameteri(GL_TEXTURE_2D,
 				        GL_DEPTH_TEXTURE_MODE_ARB,
 				        GL_INTENSITY);
 		} else if (!strncmp(line,
-			           "texparameter depth_mode alpha\n",
-			            29)) {
+			           "texparameter2D depth_mode alpha\n",
+			            31)) {
 			glTexParameteri(GL_TEXTURE_2D,
 				        GL_DEPTH_TEXTURE_MODE_ARB,
 				        GL_ALPHA);
