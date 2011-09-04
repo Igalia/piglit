@@ -1024,6 +1024,21 @@ piglit_display(void)
 					GL_INTENSITY);
 
 			glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line,
+				  "texture shadow1D %d ( %d )",
+				  &tex, &w) == 2) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_depth_texture(GL_TEXTURE_1D, GL_DEPTH_COMPONENT,
+					     w, 1, 1, GL_FALSE);
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_MODE_ARB,
+					GL_COMPARE_R_TO_TEXTURE_ARB);
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GREATER);
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_INTENSITY);
 		} else if (!strncmp(line,
 				    "texparameter2D compare_func greater\n",
 				    36)) {
@@ -1095,6 +1110,79 @@ piglit_display(void)
 			           "texparameter2D depth_mode alpha\n",
 			            31)) {
 			glTexParameteri(GL_TEXTURE_2D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_ALPHA);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func greater\n",
+				    36)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GREATER);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func gequal\n",
+				    35)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_GEQUAL);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func less\n",
+				    33)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_LESS);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func lequal\n",
+				    35)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_LEQUAL);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func equal\n",
+				    34)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_EQUAL);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func notequal\n",
+				    37)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_NOTEQUAL);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func always\n",
+				    35)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_ALWAYS);
+		} else if (!strncmp(line,
+				    "texparameter1D compare_func never\n",
+				    34)) {
+			glTexParameteri(GL_TEXTURE_1D,
+					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_NEVER);
+		} else if (!strncmp(line,
+			           "texparameter1D depth_mode red\n",
+			            30)) {
+			/* Requires GL 3.0 or GL_ARB_texture_rg */
+			glTexParameteri(GL_TEXTURE_1D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_RED);
+		} else if (!strncmp(line,
+			           "texparameter1D depth_mode luminance\n",
+			            36)) {
+			glTexParameteri(GL_TEXTURE_1D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_LUMINANCE);
+		} else if (!strncmp(line,
+			           "texparameter1D depth_mode intensity\n",
+			            36)) {
+			glTexParameteri(GL_TEXTURE_1D,
+				        GL_DEPTH_TEXTURE_MODE_ARB,
+				        GL_INTENSITY);
+		} else if (!strncmp(line,
+			           "texparameter1D depth_mode alpha\n",
+			            31)) {
+			glTexParameteri(GL_TEXTURE_1D,
 				        GL_DEPTH_TEXTURE_MODE_ARB,
 				        GL_ALPHA);
 		} else if (string_match("uniform", line)) {
