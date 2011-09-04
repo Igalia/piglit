@@ -976,28 +976,28 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 }
 
 GLuint
-piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
+piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, GLboolean mip)
 {
 	void *data;
 	float *f = NULL, *f2 = NULL;
 	unsigned int  *i = NULL;
-	int size, x, y, level;
+	int size, x, y, level, layer;
 	GLuint tex;
 	GLenum type, format;
 
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(target, tex);
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	if (mip) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER,
 				GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER,
 				GL_LINEAR_MIPMAP_NEAREST);
 	} else {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER,
 				GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER,
 				GL_NEAREST);
 	}
 	data = malloc(w * h * 4 * sizeof(GLfloat));
@@ -1029,10 +1029,38 @@ piglit_depth_texture(GLenum internalformat, int w, int h, GLboolean mip)
 					i[y * w + x] = 0xffffff00 * val;
 			}
 		}
-		glTexImage2D(GL_TEXTURE_2D, level,
-			     internalformat,
-			     w, h, 0,
-			     format, type, data);
+
+		switch (target) {
+		case GL_TEXTURE_1D:
+			glTexImage1D(target, level,
+				     internalformat,
+				     w, 0,
+				     format, type, data);
+			break;
+
+		case GL_TEXTURE_1D_ARRAY:
+		case GL_TEXTURE_2D:
+			glTexImage2D(target, level,
+				     internalformat,
+				     w, h, 0,
+				     format, type, data);
+			break;
+
+		case GL_TEXTURE_2D_ARRAY:
+			glTexImage3D(target, level,
+				     internalformat,
+				     w, h, d, 0,
+				     format, type, NULL);
+			for (layer = 0; layer < d; layer++) {
+				glTexSubImage3D(target, level,
+						0, 0, layer, w, h, 1,
+						format, type, data);
+			}
+			break;
+
+		default:
+			assert(0);
+		}
 
 		if (!mip)
 			break;

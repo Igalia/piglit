@@ -191,7 +191,7 @@ GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
     const float *black, const float *white);
 GLuint piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype);
-GLuint piglit_depth_texture(GLenum format, int w, int h, GLboolean mip);
+GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
 extern float piglit_tolerance[4];
 void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
 

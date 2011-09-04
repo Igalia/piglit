@@ -71,8 +71,8 @@ create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 	GLenum type, format;
 
 	if ((baseformat == GL_DEPTH_COMPONENT) || (baseformat == GL_DEPTH_STENCIL)) {
-		tex = piglit_depth_texture(internalformat,
-					   tex_width, tex_height, GL_FALSE);
+		tex = piglit_depth_texture(GL_TEXTURE_2D, internalformat,
+					   tex_width, tex_height, 1, GL_FALSE);
 		assert(glGetError() == 0);
 		if (baseformat == GL_DEPTH_STENCIL) {
 			format = GL_DEPTH_STENCIL;

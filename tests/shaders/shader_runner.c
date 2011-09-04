@@ -1011,8 +1011,8 @@ piglit_display(void)
 				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
-			piglit_depth_texture(GL_DEPTH_COMPONENT,
-					     w, h, GL_FALSE);
+			piglit_depth_texture(GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
+					     w, h, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_MODE_ARB,
 					GL_COMPARE_R_TO_TEXTURE_ARB);
