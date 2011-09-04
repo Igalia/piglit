@@ -16,6 +16,10 @@ del profile.tests['asmparsertest']
 
 # These take too long
 del profile.tests['glean']['pointAtten']
+del profile.tests['shaders']['glsl-fs-inline-explosion']
+del profile.tests['shaders']['glsl-fs-unroll-explosion']
+del profile.tests['shaders']['glsl-vs-inline-explosion']
+del profile.tests['shaders']['glsl-vs-unroll-explosion']
 del profile.tests['texturing']['streaming-texture-leak']
 
 # This test is nonsense
