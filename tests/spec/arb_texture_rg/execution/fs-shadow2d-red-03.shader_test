@@ -22,7 +22,7 @@ fs-shadow2d.frag
 
 [test]
 uniform int tex 0
-texture shadow 0 (32, 32)
+texture shadow2D 0 (32, 32)
 texparameter depth_mode red
 texparameter compare_func never
 draw rect -1 -1 2 2

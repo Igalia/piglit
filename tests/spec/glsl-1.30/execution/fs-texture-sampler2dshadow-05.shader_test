@@ -14,7 +14,7 @@ fs-texture-sampler2dshadow.frag
 
 [test]
 uniform int tex 0
-texture shadow 0 (32, 32)
+texture shadow2D 0 (32, 32)
 texparameter depth_mode luminance
 texparameter compare_func always
 draw rect -1 -1 2 2

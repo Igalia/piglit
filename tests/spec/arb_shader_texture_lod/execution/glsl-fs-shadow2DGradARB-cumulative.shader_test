@@ -18,7 +18,7 @@ glsl-fs-shadow2DGradARB.frag
 
 [test]
 uniform int tex 0
-texture shadow 0 (32, 32)
+texture shadow2D 0 (32, 32)
 
 ###
 ### glsl-fs-shadow2DGradARB-01.shader_test

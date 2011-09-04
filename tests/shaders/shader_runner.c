@@ -1008,7 +1008,7 @@ piglit_display(void)
 						    c + 0, c + 4);
 			glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
-				  "texture shadow %d ( %d , %d )",
+				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_depth_texture(GL_DEPTH_COMPONENT,

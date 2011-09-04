@@ -21,7 +21,7 @@ void main()
 
 [test]
 uniform int tex 0
-texture shadow 0 (32, 32)
+texture shadow2D 0 (32, 32)
 draw rect -1 -1 2 2
 relative probe rgba (0.0, 0.1) (1.0, 1.0, 1.0, 1.0)
 relative probe rgba (0.0, 1.0) (1.0, 1.0, 1.0, 1.0)
