@@ -48,6 +48,8 @@ void piglit_glutInit(int argc, char **argv)
 
 #if defined USE_EGLUT && defined USE_OPENGL
 	glutInitAPIMask(GLUT_OPENGL_BIT);
+#elif defined USE_EGLUT && defined USE_OPENGL_ES1
+	glutInitAPIMask(GLUT_OPENGL_ES1_BIT);
 #elif defined USE_EGLUT && defined USE_OPENGL_ES2
 	glutInitAPIMask(GLUT_OPENGL_ES2_BIT);
 #elif defined USE_EGLUT
@@ -129,7 +131,6 @@ const char* piglit_get_gl_error_name(GLenum error)
 #define CASE(x) case x: return #x; 
     switch (error) {
     CASE(GL_INVALID_ENUM)
-    CASE(GL_INVALID_FRAMEBUFFER_OPERATION)
     CASE(GL_INVALID_OPERATION)
     CASE(GL_INVALID_VALUE)
     CASE(GL_NO_ERROR)
@@ -140,6 +141,9 @@ const char* piglit_get_gl_error_name(GLenum error)
 #endif
 #if defined(GL_STACK_UNDERFLOW)
     CASE(GL_STACK_UNDERFLOW)
+#endif
+#if defined(GL_INVALID_FRAMEBUFFER_OPERATION)
+    CASE(GL_INVALID_FRAMEBUFFER_OPERATION)
 #endif
     default:
         return "(unrecognized error)";

@@ -188,6 +188,24 @@ piglit_escape_exit_key(unsigned char key, int x, int y)
 static void
 draw_arrays(const GLvoid *verts, const GLvoid *tex)
 {
+#if defined(USE_OPENGL_ES1)
+	if (verts) {
+		glVertexPointer(4, GL_FLOAT, 0, verts);
+		glEnableClientState(GL_VERTEX_ARRAY);
+	}
+
+	if (tex) {
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	if (verts)
+		glDisableClientState(GL_VERTEX_ARRAY);
+	if (tex)
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#elif defined(USE_OPENGL_ES2)
 	if (verts) {
 		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
 		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
@@ -204,6 +222,9 @@ draw_arrays(const GLvoid *verts, const GLvoid *tex)
 		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
 	if (tex)
 		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+#else
+#	error "don't know how to draw arrays"
+#endif
 }
 
 /**
@@ -499,3 +520,40 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
 
 	return tex;
 }
+
+#if defined(USE_OPENGL_ES1)
+
+/**
+ * Convenience function to configure an abitrary orthogonal projection matrix
+ */
+void
+piglit_gen_ortho_projection(double left, double right, double bottom,
+			    double top, double near_val, double far_val,
+			    GLboolean push)
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	if (push)
+		glPushMatrix();
+	glOrthof(left, right, bottom, top, near_val, far_val);
+
+	glMatrixMode(GL_MODELVIEW);
+	if (push)
+		glPushMatrix();
+	glLoadIdentity();
+}
+
+
+/**
+ * Convenience function to configure projection matrix for window coordinates
+ */
+void
+piglit_ortho_projection(int w, int h, GLboolean push)
+{
+	/* Set up projection matrix so we can just draw using window
+	 * coordinates.
+	 */
+	piglit_gen_ortho_projection(0, w, 0, h, -1, 1, push);
+}
+
+#endif /* USE_OPENGL_ES1 */
