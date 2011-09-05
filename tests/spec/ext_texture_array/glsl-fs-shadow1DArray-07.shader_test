@@ -1,0 +1,29 @@
+# [description]
+# Test shadow1DArray(sampler1DArrayShadow, vec3) with
+#   - depth texture mode = alpha
+#   - texture compare func = greater
+
+[require]
+GLSL >= 1.10
+GL_EXT_texture_array
+
+[vertex shader file]
+glsl-fs-shadow.vert
+
+[fragment shader file]
+glsl-fs-shadow1DArray.frag
+
+[test]
+uniform int tex 0
+texture shadow1DArray 0 (32, 1)
+texparameter1DArray depth_mode alpha
+texparameter1DArray compare_func greater
+draw rect -1 -1 2 2
+
+# depth comparison pass
+relative probe rgba (0.0, 0.1) (0.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.9, 1.0) (0.0, 0.0, 0.0, 1.0)
+
+# depth comparison fail
+relative probe rgba (0.1, 0.0) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 0.0)
