@@ -29,7 +29,7 @@
  * \brief Convenience header that includes the actual OpenGL headers.
  *
  * The actual OpenGL headers are chosen according to the macro definitions
- * USE_OPENGL and USE_OPENGL_ES2.
+ * USE_OPENGL, USE_OPENGL_ES1, and USE_OPENGL_ES2.
  */
 
 #pragma once
@@ -54,6 +54,11 @@ extern "C" {
 #		include <GL/glu.h>
 #		include <GL/glext.h>
 #	endif
+#endif
+
+#ifdef USE_OPENGL_ES1
+#	include <GLES/gl.h>
+#	include <GLES/glext.h>
 #endif
 
 #ifdef USE_OPENGL_ES2
