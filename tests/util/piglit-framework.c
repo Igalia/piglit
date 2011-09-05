@@ -147,14 +147,11 @@ piglit_framework_fbo_glx_destroy()
 static bool
 piglit_framework_fbo_init()
 {
+#ifdef USE_GLX
 	GLuint tex, depth = 0;
 	GLenum status;
 
-#ifdef USE_GLX
 	piglit_framework_fbo_glx_init();
-#else
-	return false;
-#endif
 
 #ifdef USE_OPENGL
 	glewInit();
@@ -212,6 +209,9 @@ piglit_framework_fbo_init()
 	}
 
 	return true;
+#else /* USE_GLX */
+	return false;
+#endif /* USE_GLX */
 }
 
 static void
