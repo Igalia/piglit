@@ -168,8 +168,13 @@ const char* piglit_get_gl_error_name(GLenum error)
     CASE(GL_INVALID_VALUE)
     CASE(GL_NO_ERROR)
     CASE(GL_OUT_OF_MEMORY)
+    /* enums that are not available everywhere */
+#if defined(GL_STACK_OVERFLOW)
     CASE(GL_STACK_OVERFLOW)
+#endif
+#if defined(GL_STACK_UNDERFLOW)
     CASE(GL_STACK_UNDERFLOW)
+#endif
     default:
         return "(unrecognized error)";
     }
