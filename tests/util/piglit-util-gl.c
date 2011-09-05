@@ -1040,6 +1040,7 @@ piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, 
 
 		case GL_TEXTURE_1D_ARRAY:
 		case GL_TEXTURE_2D:
+		case GL_TEXTURE_RECTANGLE:
 			glTexImage2D(target, level,
 				     internalformat,
 				     w, h, 0,

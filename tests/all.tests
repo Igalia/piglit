@@ -906,6 +906,9 @@ arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_test1(arb_texture_rectangle, 'RECT')
 add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
+add_shader_test_dir(arb_texture_rectangle,
+                    os.path.dirname(__file__) + '/spec/arb_texture_rectangle',
+                    recursive=True)
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1

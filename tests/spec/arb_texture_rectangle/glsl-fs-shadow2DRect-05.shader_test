@@ -1,0 +1,29 @@
+# [description]
+# Test shadow2DRect(sampler2DRectShadow, vec3) with
+#   - depth texture mode = intensity
+#   - texture compare func = always
+
+[require]
+GLSL >= 1.10
+GL_ARB_texture_rectangle
+
+[vertex shader file]
+glsl-fs-shadow.vert
+
+[fragment shader file]
+glsl-fs-shadow2DRect.frag
+
+[test]
+uniform int tex 0
+texture shadowRect 0 (32, 32)
+texparameterRect depth_mode intensity
+texparameterRect compare_func always
+draw rect -1 -1 2 2
+
+# depth comparison pass
+relative probe rgba (0.0, 0.1) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.9, 1.0) (1.0, 1.0, 1.0, 1.0)
+
+# depth comparison fail
+relative probe rgba (0.1, 0.0) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (1.0, 0.9) (1.0, 1.0, 1.0, 1.0)
