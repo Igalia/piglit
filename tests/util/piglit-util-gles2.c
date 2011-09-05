@@ -175,6 +175,38 @@ piglit_escape_exit_key(unsigned char key, int x, int y)
 }
 
 /**
+ * Call glDrawArrays.  verts is expected to be
+ *
+ *   float verts[4][4];
+ *
+ * if not NULL; tex is expected to be
+ *
+ *   float tex[4][2];
+ *
+ * if not NULL.
+ */
+static void
+draw_arrays(const GLvoid *verts, const GLvoid *tex)
+{
+	if (verts) {
+		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	}
+
+	if (tex) {
+		glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT, GL_FALSE, 0, tex);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+	}
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	if (verts)
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	if (tex)
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+}
+
+/**
  * Convenience function to draw an axis-aligned rectangle.
  */
 GLvoid
@@ -199,12 +231,7 @@ piglit_draw_rect(float x, float y, float w, float h)
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
 
-	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	draw_arrays(verts, NULL);
 }
 
 
@@ -233,12 +260,7 @@ piglit_draw_rect_back(float x, float y, float w, float h)
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
 
-	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	draw_arrays(verts, NULL);
 }
 
 
@@ -267,12 +289,7 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	verts[3][2] = z;
 	verts[3][3] = 1.0;
 
-	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	draw_arrays(verts, NULL);
 }
 
 /**
@@ -311,15 +328,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	tex[3][0] = tx + tw;
 	tex[3][1] = ty + th;
 
-	glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
-	glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT, GL_FALSE, 0, tex);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-	glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
-	glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+	draw_arrays(verts, tex);
 }
 
 /**
