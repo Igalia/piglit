@@ -84,6 +84,7 @@ FIND_LIBRARY(OPENGL_egl_LIBRARY
       NAMES EGL
       PATHS /usr/lib
 )
+find_library(OPENGL_gles1_LIBRARY NAMES GLESv1_CM)
 find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
 # Put all executables into the bin subdirectory

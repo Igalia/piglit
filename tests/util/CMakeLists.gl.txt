@@ -7,6 +7,7 @@ include_directories(
 set(UTIL_SOURCES
 	${UTIL_SOURCES}
 	glew.c
+	piglit-shader.c
 	piglit-shader-gl.c
 	piglit-util-gl.c
 	)

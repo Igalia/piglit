@@ -30,7 +30,7 @@
 #
 function(piglit_include_target_api)
 	set(valid_api FALSE)
-	foreach(api "gl" "gles2" "no_api")
+	foreach(api "gl" "gles1" "gles2" "no_api")
 		if(piglit_target_api STREQUAL ${api})
 			set(valid_api TRUE)
 			break()
@@ -46,5 +46,6 @@ function(piglit_include_target_api)
 endfunction(piglit_include_target_api)
 
 add_subdirectory(gl)
+add_subdirectory(gles1)
 add_subdirectory(gles2)
 add_subdirectory(no_api)

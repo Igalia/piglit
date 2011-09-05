@@ -12,7 +12,6 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 set(UTIL_SOURCES
 	fdo-bitmap.c
 	piglit-util.c
-	piglit-shader.c
 	shader-load.c
 	piglit-framework.c
 	rgb9e5.c

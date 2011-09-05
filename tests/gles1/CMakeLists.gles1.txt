@@ -1,0 +1,15 @@
+#add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
+
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	${piglit_SOURCE_DIR}/tests/util/
+	)
+
+link_libraries(
+	${OPENGL_gles1_LIBRARY}
+	${OPENGL_egl_LIBRARY}
+	glut_egl
+	piglitutil_gles1
+	)
+
+# vim: ft=cmake:
