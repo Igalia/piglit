@@ -42,7 +42,7 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#ifdef USE_OPENGL
+#if defined(USE_OPENGL)
 #	include "glew.h"
 	/* Include the real headers too, in case GLEW misses something. */
 #	ifdef __APPLE__
@@ -54,14 +54,20 @@ extern "C" {
 #		include <GL/glu.h>
 #		include <GL/glext.h>
 #	endif
-#endif
 
-#ifdef USE_OPENGL_ES1
+#elif defined(USE_OPENGL_ES1)
 #	include <GLES/gl.h>
 #	include <GLES/glext.h>
-#endif
 
-#ifdef USE_OPENGL_ES2
+	/* for source level compatibility */
+#       define GL_TEXTURE_CUBE_MAP_POSITIVE_X GL_TEXTURE_CUBE_MAP_POSITIVE_X_OES
+#       define GL_TEXTURE_CUBE_MAP_POSITIVE_Y GL_TEXTURE_CUBE_MAP_POSITIVE_Y_OES
+#       define GL_TEXTURE_CUBE_MAP_POSITIVE_Z GL_TEXTURE_CUBE_MAP_POSITIVE_Z_OES
+#       define GL_TEXTURE_CUBE_MAP_NEGATIVE_X GL_TEXTURE_CUBE_MAP_NEGATIVE_X_OES
+#       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_OES
+#       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_OES
+
+#elif defined(USE_OPENGL_ES2)
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
 #endif
