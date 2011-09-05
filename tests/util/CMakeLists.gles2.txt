@@ -1,7 +1,7 @@
 set(UTIL_SOURCES
 	${UTIL_SOURCES}
 	piglit-shader-gles2.c
-	piglit-util-gles2.c
+	piglit-util-gles.c
 	)
 
 link_libraries(
