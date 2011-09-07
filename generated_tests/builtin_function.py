@@ -57,6 +57,15 @@ import numpy as np
 # Floating point types used by Python and numpy
 FLOATING_TYPES = (float, np.float64, np.float32)
 
+# Due to a bug in the Windows implementation of numpy, there are
+# multiple int32 types (and multiple uint32 types).  So we have to
+# find them all when doing isinstance checks.  The following code will
+# create two-element tuples on numpy implementations that have the
+# bug, and one-element tuples on numpy implementations that don't.
+INT32_TYPES = tuple(set([np.int32, type(np.abs(np.int32(1)))]))
+UINT32_TYPES = tuple(set([np.uint32,
+			  type(np.dot(np.uint32(0), np.uint32(0)))]))
+
 
 
 class GlslBuiltinType(object):
@@ -212,9 +221,9 @@ def glsl_type_of(value):
 	return glsl_float
     elif isinstance(value, (bool, np.bool_)):
 	return glsl_bool
-    elif isinstance(value, np.int32):
+    elif isinstance(value, INT32_TYPES):
 	return glsl_int
-    elif isinstance(value, np.uint32):
+    elif isinstance(value, UINT32_TYPES):
 	return glsl_uint
     else:
 	assert isinstance(value, np.ndarray)
@@ -226,9 +235,9 @@ def glsl_type_of(value):
 		return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
 	    elif value.dtype == bool:
 		return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
-	    elif value.dtype == np.int32:
+	    elif value.dtype in INT32_TYPES:
 		return (glsl_ivec2, glsl_ivec3, glsl_ivec4)[vector_length - 2]
-	    elif value.dtype == np.uint32:
+	    elif value.dtype in UINT32_TYPES:
 		return (glsl_uvec2, glsl_uvec3, glsl_uvec4)[vector_length - 2]
 	    else:
 		raise Exception(
@@ -264,7 +273,7 @@ def glsl_constant(value):
     column_major = np.reshape(np.array(value), -1, 'F')
     if column_major.dtype == bool:
 	values = ['true' if x else 'false' for x in column_major]
-    elif column_major.dtype == np.uint32:
+    elif column_major.dtype in UINT32_TYPES:
 	values = [repr(x) + 'u' for x in column_major]
     else:
 	values = [repr(x) for x in column_major]
@@ -457,14 +466,14 @@ def _refract(I, N, eta):
 def _change_signedness(x):
     """Change signed integer types to unsigned integer types and vice
     versa."""
-    if isinstance(x, np.int32):
+    if isinstance(x, INT32_TYPES):
 	return np.uint32(x)
-    elif isinstance(x, np.uint32):
+    elif isinstance(x, UINT32_TYPES):
 	return np.int32(x)
     elif isinstance(x, np.ndarray):
-	if (x.dtype == np.int32):
+	if (x.dtype in INT32_TYPES):
 	    return np.array(x, dtype=np.uint32)
-	elif (x.dtype == np.uint32):
+	elif (x.dtype in UINT32_TYPES):
 	    return np.array(x, dtype=np.int32)
     raise Exception('Unexpected type passed to _change_signedness')
 
