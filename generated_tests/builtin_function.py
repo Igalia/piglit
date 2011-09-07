@@ -1003,6 +1003,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	]
     uints = [np.uint32(x) for x in [0, 6, 12, 32, 74]]
     small_uints = [np.uint32(x) for x in [0, 1, 2, 5, 25, 31]]
+    large_uints = [np.uint32(x) for x in [0xdeadbeef, 0xaffeaffe, 0xbadbad]]
     uvecs = [
 	np.array([38, 35], dtype=np.uint32),
 	np.array([64, 9], dtype=np.uint32),
@@ -1132,6 +1133,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('op-sub', 2, '1.10', lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
     f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
     f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
+    f('op-div-large', 2, '1.30', _divide, match_simple_binop, [large_uints, large_uints+small_uints], template = '({0} / {1})')
     f('op-mod', 2, '1.30', _divide, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} / {1})')
     f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
     f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
