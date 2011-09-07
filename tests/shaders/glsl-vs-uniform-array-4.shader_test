@@ -1,0 +1,158 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+GL_MAX_VERTEX_UNIFORM_COMPONENTS >= 516
+
+[vertex shader]
+uniform vec4 arg0[129];
+varying vec4 color;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	color = (arg0[ 0] +
+		 arg0[ 1] +
+		 arg0[ 2] +
+		 arg0[ 3] +
+		 arg0[ 4] +
+		 arg0[ 5] +
+		 arg0[ 6] +
+		 arg0[ 7] +
+		 arg0[ 8] +
+		 arg0[ 9] +
+		 arg0[10] +
+		 arg0[11] +
+		 arg0[12] +
+		 arg0[13] +
+		 arg0[14] +
+		 arg0[15] +
+		 arg0[16] +
+		 arg0[17] +
+		 arg0[18] +
+		 arg0[19] +
+		 arg0[20] +
+		 arg0[21] +
+		 arg0[22] +
+		 arg0[23] +
+		 arg0[24] +
+		 arg0[25] +
+		 arg0[26] +
+		 arg0[27] +
+		 arg0[28] +
+		 arg0[29] +
+		 arg0[30] +
+		 arg0[31] +
+		 arg0[32] +
+		 arg0[33] +
+		 arg0[34] +
+		 arg0[35] +
+		 arg0[36] +
+		 arg0[37] +
+		 arg0[38] +
+		 arg0[39] +
+		 arg0[40] +
+		 arg0[41] +
+		 arg0[42] +
+		 arg0[43] +
+		 arg0[44] +
+		 arg0[45] +
+		 arg0[46] +
+		 arg0[47] +
+		 arg0[48] +
+		 arg0[49] +
+		 arg0[50] +
+		 arg0[51] +
+		 arg0[52] +
+		 arg0[53] +
+		 arg0[54] +
+		 arg0[55] +
+		 arg0[56] +
+		 arg0[57] +
+		 arg0[58] +
+		 arg0[59] +
+		 arg0[60] +
+		 arg0[61] +
+		 arg0[62] +
+		 arg0[63] +
+		 arg0[64] +
+		 arg0[65] +
+		 arg0[66] +
+		 arg0[67] +
+		 arg0[68] +
+		 arg0[69] +
+		 arg0[70] +
+		 arg0[71] +
+		 arg0[72] +
+		 arg0[73] +
+		 arg0[74] +
+		 arg0[75] +
+		 arg0[76] +
+		 arg0[77] +
+		 arg0[78] +
+		 arg0[79] +
+		 arg0[80] +
+		 arg0[81] +
+		 arg0[82] +
+		 arg0[83] +
+		 arg0[84] +
+		 arg0[85] +
+		 arg0[86] +
+		 arg0[87] +
+		 arg0[88] +
+		 arg0[89] +
+		 arg0[90] +
+		 arg0[91] +
+		 arg0[92] +
+		 arg0[93] +
+		 arg0[94] +
+		 arg0[95] +
+		 arg0[96] +
+		 arg0[97] +
+		 arg0[98] +
+		 arg0[100] +
+		 arg0[101] +
+		 arg0[102] +
+		 arg0[103] +
+		 arg0[104] +
+		 arg0[105] +
+		 arg0[106] +
+		 arg0[107] +
+		 arg0[108] +
+		 arg0[109] +
+		 arg0[110] +
+		 arg0[111] +
+		 arg0[112] +
+		 arg0[113] +
+		 arg0[114] +
+		 arg0[115] +
+		 arg0[116] +
+		 arg0[117] +
+		 arg0[118] +
+		 arg0[119] +
+		 arg0[120] +
+		 arg0[121] +
+		 arg0[122] +
+		 arg0[123] +
+		 arg0[124] +
+		 arg0[125] +
+		 arg0[126] +
+		 arg0[127] +
+		 arg0[128]);
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform vec4 arg0[5] 0.0 0.1 0.0 0.0
+uniform vec4 arg0[19] 0.0 0.1 0.0 0.0
+uniform vec4 arg0[37] 0.0 0.1 0.0 0.0
+uniform vec4 arg0[50] 0.0 0.1 0.0 0.0
+uniform vec4 arg0[128] 0.0 0.1 0.0 0.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 0.5 0.0 0.0
