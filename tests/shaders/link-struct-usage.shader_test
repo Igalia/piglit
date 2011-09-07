@@ -1,0 +1,44 @@
+[require]
+
+[vertex shader]
+varying vec4 color;
+struct S {
+       vec4 v;
+};
+void func();
+
+S a;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	a.v = vec4(0.0);
+
+	func();
+
+	color = a.v;
+}
+
+[vertex shader]
+struct S {
+       vec4 v;
+};
+
+S a;
+
+void func()
+{
+	a.v += vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
