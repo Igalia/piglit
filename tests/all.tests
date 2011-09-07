@@ -973,6 +973,7 @@ spec['ARB_shader_objects'] = arb_shader_objects
 arb_shader_objects['getuniform'] = PlainExecTest(['arb_shader_objects-getuniform', '-auto'])
 arb_shader_objects['getuniform'].runConcurrent = True
 arb_shader_objects['bindattriblocation-scratch-name'] = concurrent_test('arb_shader_objects-bindattriblocation-scratch-name')
+arb_shader_objects['getuniformlocation-array-of-struct-of-array'] = concurrent_test('arb_shader_objects-getuniformlocation-array-of-struct-of-array')
 arb_shader_objects['clear-with-deleted'] = concurrent_test('arb_shader_objects-clear-with-deleted')
 arb_shader_objects['delete-repeat'] = concurrent_test('arb_shader_objects-delete-repeat')
 
