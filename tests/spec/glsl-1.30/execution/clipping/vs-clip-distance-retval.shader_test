@@ -1,0 +1,129 @@
+# [description]
+# Verify that gl_ClipDistance works properly when used as a function
+# return value.
+#
+# This test initializes an array of 8 floats to represent clip
+# distances, then returns them from a function to main, which assigns
+# the return value to gl_ClipDistance.
+#
+# Then it checks three things:
+# - That no data was corrupted when copying the array
+# - That clipping occurred as expected
+# - That the function was called exactly once
+#
+# The reason for checking that the function was called exactly once is
+# that Mesa unrolls assignments of the form
+#
+#   gl_ClipDistance = foo;
+#
+# Into a sequence of componentwise assignments:
+#
+#   gl_ClipDistance[0] = foo[0];
+#   gl_ClipDistance[1] = foo[1];
+#   ...and so on.
+#
+# We need to make sure that this unrolling doesn't cause the function
+# to be called multiple times.
+#
+# To check that clipping occurred as expected, the 8 gl_ClipDistance
+# values are used to clip a rectangle to an octagon shape.
+#
+# The octagon is centered at (0.5, 0.5), and has a small radius
+# (distance from center to perpendicular edge) of 0.4.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+out float gl_ClipDistance[8];
+int foo_call_count;
+
+float[8] foo(in float clip_distance_pre_copy[8])
+{
+	++foo_call_count;
+
+	float tmp[8];
+	for (int i = 0; i < 8; ++i) {
+		tmp[i] = clip_distance_pre_copy[i];
+	}
+	return tmp;
+}
+
+void main(void)
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	// Compute 2D cordinates relative to a center point of (0.5,
+	// 0.5).
+	vec2 coord = gl_Vertex.xy - vec2(0.5, 0.5);
+
+	float pre_copy[8];
+
+	for (int i = 0; i < 8; ++i) {
+		// Compute a unit vector in the direction i*45deg from
+		// the x axis.
+		float angle = i*(3.141592653589793/4);
+		vec2 u = vec2(cos(angle), sin(angle));
+
+		// Reject points whose 2D coordinate, projected onto
+		// that unit vector, is greater than 0.4.
+		pre_copy[i] = 0.4 - dot(u, coord);
+	}
+
+	foo_call_count = 0;
+	gl_ClipDistance = foo(pre_copy);
+
+	if (foo_call_count != 1) {
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+		return;
+	}
+
+	for (int i = 0; i < 8; ++i) {
+		if (pre_copy[i] != gl_ClipDistance[i]) {
+			gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+			return;
+		}
+	}
+	gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 130
+void main(void)
+{
+	gl_FragColor = gl_Color;
+}
+
+[test]
+ortho 0 1 0 1
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+enable GL_CLIP_PLANE6
+enable GL_CLIP_PLANE7
+draw rect 0.0 0.0 1.0 1.0
+
+# Test points inside each octagon edge
+relative probe rgba (0.850, 0.500) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.747, 0.747) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.500, 0.850) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.253, 0.747) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.150, 0.500) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.253, 0.253) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.500, 0.150) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.747, 0.253) (0.0, 1.0, 0.0, 1.0)
+
+# Test points outside each octagon edge
+relative probe rgba (0.950, 0.500) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.818, 0.818) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.500, 0.950) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.182, 0.818) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.050, 0.500) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.182, 0.182) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.500, 0.050) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.818, 0.182) (0.0, 0.0, 0.0, 0.0)
