@@ -23,6 +23,8 @@
 
 import os
 import subprocess
+import shlex
+import types
 
 from core import Test, testBinDir, TestResult
 
@@ -35,6 +37,9 @@ class ExecTest(Test):
 		Test.__init__(self)
 		self.command = command
 		self.env = {}
+
+		if type(self.command) is types.StringType:
+			self.command = shlex.split(self.command)
 
 	def interpretResult(self, out, results):
 		raise NotImplementedError
