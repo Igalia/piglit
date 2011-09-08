@@ -25,6 +25,12 @@ generatedTestDir = os.path.join(
 		os.path.join(os.path.dirname(__file__), '..')),
 	'generated_tests')
 
+# Quick wrapper for PlainExecTest for our usual concurrent args.
+def concurrent_test(args):
+	test = PlainExecTest(args + " -auto -fbo")
+	test.runConcurrent = True
+	return test
+
 ######
 # Collecting all tests
 profile = TestProfile()
@@ -293,12 +299,6 @@ add_fbo_depthstencil_tests(general, 'default_fb')
 
 shaders = Group()
 
-def add_shader_test(group, filepath, test_name):
-	"""Add a shader test to the given group."""
-	group[test_name] = PlainExecTest(['shader_runner', '-auto', '-fbo',
-					  filepath])
-	group[test_name].runConcurrent = True
-
 def add_shader_test_dir(group, dirpath, recursive=False):
 	"""Add all shader tests in a directory to the given group."""
 	for filename in os.listdir(dirpath):
@@ -314,7 +314,7 @@ def add_shader_test_dir(group, dirpath, recursive=False):
 			if ext != 'shader_test':
 				continue
 			testname = filename[0:-(len(ext) + 1)] # +1 for '.'
-			add_shader_test(group, filepath, testname)
+			group[testname] = concurrent_test('shader_runner ' + filepath)
 
 def add_getactiveuniform_count(group, name, expected):
 	path = 'shaders/'
