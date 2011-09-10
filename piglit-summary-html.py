@@ -80,14 +80,14 @@ SummaryPages = {
 	'fixes': 'fixes.html'
 }
 
+def buildResultListItem(detail):
+	return ResultListItem % { 'detail': buildDetailValue(detail) }
+
 def buildDetailValue(detail):
 	if type(detail) == list:
-		items = ''
+		items = map(buildResultListItem, detail)
+		return ResultList % { 'items': "".join(items) }
 
-		for d in detail:
-			items = items + ResultListItem % { 'detail': buildDetailValue(d) }
-
-		return ResultList % { 'items': items }
 	elif isinstance(detail, str) or isinstance(detail, unicode):
 		return ResultMString % { 'detail': cgi.escape(detail) }
 
