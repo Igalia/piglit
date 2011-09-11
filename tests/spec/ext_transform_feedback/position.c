@@ -72,7 +72,7 @@ void piglit_init(int argc, char **argv)
 	unsigned i;
 	float data[BUF_FLOATS];
 
-	for (i = 0; i < sizeof(data); i++) {
+	for (i = 0; i < BUF_FLOATS; i++) {
 		data[i] = DEFAULT_VALUE;
 	}
 
