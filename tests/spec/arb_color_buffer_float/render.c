@@ -109,7 +109,17 @@ GLboolean test()
 		if (!fpmode && semantic)
 			continue;
 
-		sprintf(test_name, "%s: Attrib %s  VertClamp %s  FragClamp %s  Blending %s  LogicOp %s  %s  %s  Fog %s (expecting %sclamping)", format_name, semantic ? "TEXCOORD0" : "COLOR    ", clamp_strings[vert_clamp], clamp_strings[frag_clamp], blend_strings[blend], logicop ? "Yes" : "No ", vpmode ? "ARB_vp" : "ffvp  ", fpmode ? "ARB_fp" : "fffp  ", test_fog ? "Yes" : "No ", clamped ? "" : "no ");
+		sprintf(test_name, "%s: Attrib %s  VertClamp %s  FragClamp %s  Blending %s  LogicOp %s  %s  %s  Fog %s (expecting %sclamping)",
+                        format_name,
+                        semantic ? "TEXCOORD0" : "COLOR    ",
+                        clamp_strings[vert_clamp],
+                        clamp_strings[frag_clamp],
+                        blend_strings[blend],
+                        logicop ? "Yes" : "No ",
+                        vpmode ? "ARB_vp" : "ffvp  ",
+                        fpmode ? "ARB_fp" : "fffp  ",
+                        test_fog ? "Yes" : "No ",
+                        clamped ? "" : "no ");
 		if (!sanity) {
 			glClampColorARB(GL_CLAMP_VERTEX_COLOR_ARB, clamp_enums[vert_clamp]);
 			glClampColorARB(GL_CLAMP_FRAGMENT_COLOR_ARB, clamp_enums[frag_clamp]);
