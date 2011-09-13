@@ -13,6 +13,12 @@ profile = TestProfile()
 
 spec = Group()
 
+# Group OES_compressed_paletted_texture
+oes_compressed_paletted_texture = Group()
+spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
+oes_compressed_paletted_texture['basic API'] = PlainExecTest(['oes_compressed_paletted_texture-api', '-auto'])
+oes_compressed_paletted_texture['basic API'].runConcurrent = True
+
 # Group OES_draw_texture
 oes_draw_texture = Group()
 spec['OES_draw_texture'] = oes_draw_texture
