@@ -43,6 +43,7 @@ static char *filename;
 static int expected_pass;
 static int gl_major_version = 0;
 static int check_link = 0;
+static float requested_version = 1.10;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -82,6 +83,44 @@ get_shader_info_log_length(GLuint shader)
 #endif
 
 	return length;
+}
+
+/**
+ * GLES requires both vertex and fragment shaders to be present in
+ * order to link.  From section 2.10.3 (Program Objects) of the GLES 2.0 spec:
+ *
+ *   "Linking will also fail ... if program does not contain both a
+ *   vertex shader and a fragment shader ..."
+ *
+ * So compile a dummy shader of type complementary to "type" and
+ * attach it to shader_prog.
+ */
+static void
+attach_complementary_shader(GLuint shader_prog, GLenum type)
+{
+	static const char *dummy_vertex_shader =
+		"#version 100\nvoid main() { gl_Position = vec4(0.0); }";
+	static const char *dummy_fragment_shader =
+		"#version 100\nvoid main() { }";
+
+	GLint shader;
+
+	switch (type) {
+	case GL_FRAGMENT_SHADER:
+		shader = piglit_compile_shader_text(GL_VERTEX_SHADER,
+						    dummy_vertex_shader);
+		break;
+	case GL_VERTEX_SHADER:
+		shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+						    dummy_fragment_shader);
+		break;
+	default:
+		fprintf(stderr,
+			"Unexpected type in attach_complementary_shader()");
+		piglit_report_result(PIGLIT_FAIL);
+		exit(1);
+	}
+	piglit_AttachShader(shader_prog, shader);
 }
 
 static void
@@ -162,6 +201,8 @@ test(void)
 
 		shader_prog = piglit_CreateProgram();
 		piglit_AttachShader(shader_prog, prog);
+		if (requested_version == 1.00)
+			attach_complementary_shader(shader_prog, type);
 		piglit_LinkProgram(shader_prog);
 		if (check_link) {
 			ok = piglit_link_check_status_quiet(shader_prog);
@@ -243,7 +284,6 @@ int main(int argc, char**argv)
 {
 	const char *glsl_version_string;
 	float glsl_version;
-	float requested_version = 1.10;
 	int i;
 
 	piglit_glutInit(argc, argv);
