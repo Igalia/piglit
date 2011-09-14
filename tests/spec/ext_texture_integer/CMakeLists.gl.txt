@@ -14,5 +14,6 @@ link_libraries (
 )
 
 add_executable (ext_texture_integer-fbo_integer_precision_clear fbo-integer-precision-clear.c)
+add_executable (ext_texture_integer-texture_integer_glsl130 texture-integer-glsl130.c)
 
 # vim: ft=cmake:
