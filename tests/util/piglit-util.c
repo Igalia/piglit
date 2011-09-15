@@ -36,7 +36,6 @@
 #if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_SETRLIMIT)
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <errno.h>
 #define USE_SETRLIMIT
 #endif
 
