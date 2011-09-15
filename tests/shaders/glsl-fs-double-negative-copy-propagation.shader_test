@@ -1,0 +1,31 @@
+# [description]
+# This test exercises a corner case of copy propagation found in Mesa:
+# double negation of a value should restore the original value.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+#version 110
+
+void main(void)
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 110
+
+uniform float x;
+
+void main(void)
+{
+	float y = -x;
+	float z = -y;
+	gl_FragColor = vec4(0.5 + x, 0.5 + y, 0.5 + z, 1.0);
+}
+
+[test]
+uniform float x 0.25
+draw rect -1 -1 2 2
+probe all rgba 0.75 0.25 0.75 1.0
