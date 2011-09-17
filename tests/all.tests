@@ -1290,6 +1290,10 @@ arb_vertex_type_2_10_10_10_rev = Group()
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev
 add_plain_test(arb_vertex_type_2_10_10_10_rev, 'draw-vertices-2101010')
 
+arb_draw_buffers = Group()
+spec['ARB_draw_buffers'] = arb_draw_buffers
+add_plain_test(arb_draw_buffers, 'arb_draw_buffers-state_change')
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
