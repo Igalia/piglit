@@ -847,6 +847,7 @@ add_shader_test_dir(spec['glsl-1.30']['execution'],
 spec['glsl-1.30']['linker'] = Group()
 spec['glsl-1.30']['linker']['clipping'] = Group()
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
+add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
