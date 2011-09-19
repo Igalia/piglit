@@ -31,6 +31,9 @@ def concurrent_test(args):
 	test.runConcurrent = True
 	return test
 
+def add_concurrent_test(group, args):
+	group[args] = concurrent_test(args)
+
 ######
 # Collecting all tests
 profile = TestProfile()
@@ -729,21 +732,21 @@ add_texwrap_test3(gl20, '2D', 'npot', 'proj')
 add_texwrap_test2(gl20, '3D', 'npot')
 add_texwrap_test3(gl20, '3D', 'npot', 'proj')
 add_plain_test(gl20, 'getattriblocation-conventional')
-gl20['vertex-program-two-side '] = concurrent_test('vertex-program-two-side')
-gl20['vertex-program-two-side front'] = concurrent_test('vertex-program-two-side front')
-gl20['vertex-program-two-side back'] = concurrent_test('vertex-program-two-side back')
-gl20['vertex-program-two-side primary'] = concurrent_test('vertex-program-two-side primary')
-gl20['vertex-program-two-side primary front'] = concurrent_test('vertex-program-two-side primary front')
-gl20['vertex-program-two-side primary back'] = concurrent_test('vertex-program-two-side primary back')
-gl20['vertex-program-two-side secondary'] = concurrent_test('vertex-program-two-side secondary')
-gl20['vertex-program-two-side secondary front'] = concurrent_test('vertex-program-two-side secondary front')
-gl20['vertex-program-two-side secondary back'] = concurrent_test('vertex-program-two-side secondary back')
-gl20['vertex-program-two-side disabled'] = concurrent_test('vertex-program-two-side disabled')
-gl20['vertex-program-two-side disabled front'] = concurrent_test('vertex-program-two-side disabled front')
-gl20['vertex-program-two-side disabled primary'] = concurrent_test('vertex-program-two-side disabled primary')
-gl20['vertex-program-two-side disabled primary front'] = concurrent_test('vertex-program-two-side disabled primary front')
-gl20['vertex-program-two-side disabled secondary'] = concurrent_test('vertex-program-two-side disabled secondary')
-gl20['vertex-program-two-side disabled secondary front'] = concurrent_test('vertex-program-two-side disabled secondary front')
+add_concurrent_test(gl20, 'vertex-program-two-side')
+add_concurrent_test(gl20, 'vertex-program-two-side front')
+add_concurrent_test(gl20, 'vertex-program-two-side back')
+add_concurrent_test(gl20, 'vertex-program-two-side primary')
+add_concurrent_test(gl20, 'vertex-program-two-side primary front')
+add_concurrent_test(gl20, 'vertex-program-two-side primary back')
+add_concurrent_test(gl20, 'vertex-program-two-side secondary')
+add_concurrent_test(gl20, 'vertex-program-two-side secondary front')
+add_concurrent_test(gl20, 'vertex-program-two-side secondary back')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled front')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled primary')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled primary front')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled secondary')
+add_concurrent_test(gl20, 'vertex-program-two-side disabled secondary front')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
