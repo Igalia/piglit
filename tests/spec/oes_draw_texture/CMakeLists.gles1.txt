@@ -12,4 +12,8 @@ link_libraries(
 	piglitutil_gles1
 	)
 
+add_executable(oes_draw_texture
+	oes_draw_texture.c
+	)
+
 # vim: ft=cmake:
