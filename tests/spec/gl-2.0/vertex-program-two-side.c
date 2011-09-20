@@ -50,11 +50,12 @@ int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
 static GLint prog;
 
-static bool primary = true;
-static bool secondary = true;
-static bool enabled = true;
-static bool front = true;
-static bool back = true;
+static bool enabled = false;
+static bool front = false;
+static bool back = false;
+static bool front2 = false;
+static bool back2 = false;
+
 static float frontcolor[4] = {0.0, 0.5, 0.0, 0.0};
 static float backcolor[4] = {0.0, 0.0, 0.5, 0.0};
 static float secondary_frontcolor[4] = {0.0, 0.25, 0.0, 0.0};
@@ -78,51 +79,49 @@ piglit_display(void)
 	int w = piglit_width / 2, h = piglit_height / 2;
 	int x2 = piglit_width - w, y2 = piglit_height - h;
 	bool pass = true;
-	bool draw_back = back || !enabled;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUniform1i(draw_secondary_loc, false);
-	if (front && primary)
+	if (front)
 		piglit_draw_rect(-1,  0,  1, 1); /* top left */
-	if (draw_back && primary)
+	if (back || (front && !enabled))
 		piglit_draw_rect( 1,  0, -1, 1); /* top right */
 
 	glUniform1i(draw_secondary_loc, true);
-	if (front && secondary)
+	if (front2)
 		piglit_draw_rect(-1, -1,  1, 1); /* bot left */
-	if (draw_back && secondary)
+	if (back2 || (front2 && !enabled))
 		piglit_draw_rect( 1, -1, -1, 1); /* bot right */
 
 	if (front) {
-		if (primary) {
-			pass = pass && piglit_probe_rect_rgba(x1, y2, w, h,
-							      frontcolor);
-		}
-		if (secondary) {
-			pass = pass && piglit_probe_rect_rgba(x1, y1, w, h,
-							      secondary_frontcolor);
-		}
+		pass = pass && piglit_probe_rect_rgba(x1, y2, w, h,
+						      frontcolor);
 	}
 
-	if (back && enabled) {
+	if (front2) {
+		pass = pass && piglit_probe_rect_rgba(x1, y1, w, h,
+						      secondary_frontcolor);
+	}
+
+	if (enabled) {
 		/* Two-sided: Get the back color/secondarycolor. */
-		if (primary) {
+		if (back) {
 			pass = pass && piglit_probe_rect_rgba(x2, y2, w, h,
 							      backcolor);
 		}
-		if (secondary) {
+		if (back2) {
 			pass = pass && piglit_probe_rect_rgba(x2, y1, w, h,
 							      secondary_backcolor);
 		}
-	} else if (back) {
+	} else {
 		/* Non-two-sided: Get the front color/secondarycolor. */
-		if (primary) {
+		if (front) {
 			pass = pass && piglit_probe_rect_rgba(x2, y2, w, h,
 							      frontcolor);
 		}
-		if (secondary) {
+		if (front2) {
 			pass = pass && piglit_probe_rect_rgba(x2, y1, w, h,
 							      secondary_frontcolor);
 		}
@@ -168,30 +167,28 @@ piglit_init(int argc, char **argv)
 	printf("+-------------------------+------------------------+\n");
 
 	for (i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "disabled") == 0) {
-			enabled = false;
+		if (strcmp(argv[i], "enabled") == 0) {
+			enabled = true;
 		} else if (strcmp(argv[i], "front") == 0) {
-			back = false;
+			front = true;
 		} else if (strcmp(argv[i], "back") == 0) {
-			front = false;
-		} else if (strcmp(argv[i], "primary") == 0) {
-			secondary = false;
-		} else if (strcmp(argv[i], "secondary") == 0) {
-			primary = false;
+			back = true;
+		} else if (strcmp(argv[i], "front2") == 0) {
+			front2 = true;
+		} else if (strcmp(argv[i], "back2") == 0) {
+			back2 = true;
 		} else {
 			fprintf(stderr, "unknown argument %s\n", argv[i]);
 		}
 	}
 
-	assert(enabled || front);
-
-	if (front && primary)
+	if (front)
 		setup_output(vs_outputs[0], "gl_FrontColor", frontcolor);
-	if (back && primary)
+	if (back)
 		setup_output(vs_outputs[1], "gl_BackColor", backcolor);
-	if (front && secondary)
+	if (front2)
 		setup_output(vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
-	if (back && secondary)
+	if (back2)
 		setup_output(vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 
 	sprintf(vs_source,
