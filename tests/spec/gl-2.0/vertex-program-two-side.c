@@ -151,23 +151,23 @@ piglit_display(void)
 }
 
 static void
-setup_output(char **out, const char *name, float *values)
+setup_output(char *out, const char *name, float *values)
 {
-	asprintf(out,
-		 "	%s = vec4(%f, %f, %f, %f);\n",
-		 name,
-		 values[0],
-		 values[1],
-		 values[2],
-		 values[3]);
+	sprintf(out,
+		"	%s = vec4(%f, %f, %f, %f);\n",
+		name,
+		values[0],
+		values[1],
+		values[2],
+		values[3]);
 }
 
 void
 piglit_init(int argc, char **argv)
 {
 	GLint vs, fs;
-	char *vs_outputs[4] = {"", "", "", ""};
-	char *vs_source;
+	static char vs_outputs[4][1024];
+	static char vs_source[4096];
 	const char *fs_source = fs_source_both;
 	int i;
 
@@ -199,24 +199,24 @@ piglit_init(int argc, char **argv)
 	assert(enabled || front);
 
 	if (front && primary)
-		setup_output(&vs_outputs[0], "gl_FrontColor", frontcolor);
+		setup_output(vs_outputs[0], "gl_FrontColor", frontcolor);
 	if (back && primary)
-		setup_output(&vs_outputs[1], "gl_BackColor", backcolor);
+		setup_output(vs_outputs[1], "gl_BackColor", backcolor);
 	if (front && secondary)
-		setup_output(&vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+		setup_output(vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
 	if (back && secondary)
-		setup_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+		setup_output(vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 
-	asprintf(&vs_source,
-		 "void main()\n"
-		 "{\n"
-		 "	gl_Position = ftransform();\n"
-		 "%s%s%s%s"
-		 "}\n",
-		 vs_outputs[0],
-		 vs_outputs[1],
-		 vs_outputs[2],
-		 vs_outputs[3]);
+	sprintf(vs_source,
+		"void main()\n"
+		"{\n"
+		"	gl_Position = ftransform();\n"
+		"%s%s%s%s"
+		"}\n",
+		vs_outputs[0],
+		vs_outputs[1],
+		vs_outputs[2],
+		vs_outputs[3]);
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
