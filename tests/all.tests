@@ -902,6 +902,7 @@ arb_shader_objects = Group()
 spec['ARB_shader_objects'] = arb_shader_objects
 arb_shader_objects['getuniform'] = PlainExecTest(['arb_shader_objects-getuniform', '-auto'])
 arb_shader_objects['getuniform'].runConcurrent = True
+arb_shader_objects['clear-with-deleted'] = concurrent_test('arb_shader_objects-clear-with-deleted')
 
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = Group()
