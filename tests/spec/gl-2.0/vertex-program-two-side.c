@@ -59,90 +59,73 @@ static float frontcolor[4] = {0.0, 0.5, 0.0, 0.0};
 static float backcolor[4] = {0.0, 0.0, 0.5, 0.0};
 static float secondary_frontcolor[4] = {0.0, 0.25, 0.0, 0.0};
 static float secondary_backcolor[4] = {0.0, 0.0, 0.25, 0.0};
+static int draw_secondary_loc;
 
-static const char *fs_source_primary =
+static const char *fs_source =
+	"uniform bool draw_secondary;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = gl_Color;\n"
+	"	if (draw_secondary)\n"
+	"		gl_FragColor = gl_SecondaryColor;\n"
+	"	else\n"
+	"		gl_FragColor = gl_Color;\n"
 	"}\n";
-
-static const char *fs_source_secondary =
-	"void main()\n"
-	"{\n"
-	"	gl_FragColor = gl_SecondaryColor;\n"
-	"}\n";
-
-static const char *fs_source_both =
-	"void main()\n"
-	"{\n"
-	"	gl_FragColor = gl_Color + gl_SecondaryColor;\n"
-	"}\n";
-
-void
-add(float *values, float *a)
-{
-	int i;
-
-	for (i = 0; i < 4; i++)
-		values[i] += a[i];
-}
-
-void
-get_expected(float *values, bool drew_front)
-{
-	int i;
-
-	for (i = 0; i < 4; i++)
-		values[i] = 0.0;
-
-	if (drew_front || !enabled) {
-		if (primary)
-			add(values, frontcolor);
-		if (secondary)
-			add(values, secondary_frontcolor);
-	}
-
-	if (!drew_front && enabled) {
-		if (primary)
-			add(values, backcolor);
-		if (secondary)
-			add(values, secondary_backcolor);
-	}
-}
 
 enum piglit_result
 piglit_display(void)
 {
-	int front_x = 10;
-	int front_y = 10;
-	int front_w = piglit_width / 2 - 20;
-	int front_h = piglit_height - 20;
-	int back_x = piglit_width - 10;
-	int back_y = 10;
-	int back_w = -(front_w);
-	int back_h = piglit_height - 20;
+	int x1 = 0, y1 = 0;
+	int w = piglit_width / 2, h = piglit_height / 2;
+	int x2 = piglit_width - w, y2 = piglit_height - h;
 	bool pass = true;
-	float expected[4];
-
-	piglit_ortho_projection(piglit_width, piglit_height, false);
+	bool draw_back = back || !enabled;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glUniform1i(draw_secondary_loc, false);
+	if (front && primary)
+		piglit_draw_rect(-1,  0,  1, 1); /* top left */
+	if (draw_back && primary)
+		piglit_draw_rect( 1,  0, -1, 1); /* top right */
+
+	glUniform1i(draw_secondary_loc, true);
+	if (front && secondary)
+		piglit_draw_rect(-1, -1,  1, 1); /* bot left */
+	if (draw_back && secondary)
+		piglit_draw_rect( 1, -1, -1, 1); /* bot right */
+
 	if (front) {
-		piglit_draw_rect(front_x, front_y, front_w, front_h);
-		get_expected(expected, true);
-		pass = pass && piglit_probe_rect_rgba(front_x, front_y,
-						      front_w, front_h,
-						      expected);
+		if (primary) {
+			pass = pass && piglit_probe_rect_rgba(x1, y2, w, h,
+							      frontcolor);
+		}
+		if (secondary) {
+			pass = pass && piglit_probe_rect_rgba(x1, y1, w, h,
+							      secondary_frontcolor);
+		}
 	}
 
-	if (back || !enabled) {
-		piglit_draw_rect(back_x, back_y, back_w, back_h);
-		get_expected(expected, false);
-		pass = pass && piglit_probe_rect_rgba(back_x + back_w, back_y,
-						      -back_w, back_h,
-						      expected);
+	if (back && enabled) {
+		/* Two-sided: Get the back color/secondarycolor. */
+		if (primary) {
+			pass = pass && piglit_probe_rect_rgba(x2, y2, w, h,
+							      backcolor);
+		}
+		if (secondary) {
+			pass = pass && piglit_probe_rect_rgba(x2, y1, w, h,
+							      secondary_backcolor);
+		}
+	} else if (back) {
+		/* Non-two-sided: Get the front color/secondarycolor. */
+		if (primary) {
+			pass = pass && piglit_probe_rect_rgba(x2, y2, w, h,
+							      frontcolor);
+		}
+		if (secondary) {
+			pass = pass && piglit_probe_rect_rgba(x2, y1, w, h,
+							      secondary_frontcolor);
+		}
 	}
 
 	piglit_present_results();
@@ -168,7 +151,6 @@ piglit_init(int argc, char **argv)
 	GLint vs, fs;
 	static char vs_outputs[4][1024];
 	static char vs_source[4096];
-	const char *fs_source = fs_source_both;
 	int i;
 
 	piglit_require_GLSL();
@@ -177,6 +159,13 @@ piglit_init(int argc, char **argv)
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	printf("Window quadrants show:\n");
+	printf("+-------------------------+------------------------+\n");
+	printf("| front gl_Color          | back gl_Color          |\n");
+	printf("+-------------------------+------------------------+\n");
+	printf("| front gl_SecondaryColor | back gl_SecondaryColor |\n");
+	printf("+-------------------------+------------------------+\n");
 
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "disabled") == 0) {
@@ -187,10 +176,8 @@ piglit_init(int argc, char **argv)
 			front = false;
 		} else if (strcmp(argv[i], "primary") == 0) {
 			secondary = false;
-			fs_source = fs_source_primary;
 		} else if (strcmp(argv[i], "secondary") == 0) {
 			primary = false;
-			fs_source = fs_source_secondary;
 		} else {
 			fprintf(stderr, "unknown argument %s\n", argv[i]);
 		}
@@ -208,15 +195,15 @@ piglit_init(int argc, char **argv)
 		setup_output(vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 
 	sprintf(vs_source,
-		"void main()\n"
-		"{\n"
-		"	gl_Position = ftransform();\n"
-		"%s%s%s%s"
-		"}\n",
-		vs_outputs[0],
-		vs_outputs[1],
-		vs_outputs[2],
-		vs_outputs[3]);
+		 "void main()\n"
+		 "{\n"
+		 "	gl_Position = gl_Vertex;\n"
+		 "%s%s%s%s"
+		 "}\n",
+		 vs_outputs[0],
+		 vs_outputs[1],
+		 vs_outputs[2],
+		 vs_outputs[3]);
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
@@ -229,6 +216,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	glUseProgram(prog);
+	draw_secondary_loc = glGetUniformLocation(prog, "draw_secondary");
+	assert(draw_secondary_loc != -1);
 
 	if (enabled)
 		glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
