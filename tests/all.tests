@@ -787,6 +787,9 @@ add_shader_test_dir(spec['glsl-1.10']['execution'],
 add_shader_test_dir(spec['glsl-1.10']['execution'],
 		    os.path.join(generatedTestDir, 'spec', 'glsl-1.10', 'execution'),
 		    recursive=True)
+for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
+	cmdline = 'clip-plane-transformation ' + mode
+	spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
 
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = Group()
@@ -848,6 +851,8 @@ spec['glsl-1.30']['linker'] = Group()
 spec['glsl-1.30']['linker']['clipping'] = Group()
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
+spec['glsl-1.30']['execution']['clipping']['clip-plane-transformation pos'] = \
+    concurrent_test('clip-plane-transformation pos')
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
