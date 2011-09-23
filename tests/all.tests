@@ -1285,6 +1285,10 @@ arb_instanced_arrays = Group()
 spec['ARB_instanced_arrays'] = arb_instanced_arrays
 add_plain_test(arb_instanced_arrays, 'instanced_arrays')
 
+arb_map_buffer_range = Group()
+spec['ARB_map_buffer_range'] = arb_map_buffer_range
+add_plain_test(arb_map_buffer_range, 'map_buffer_range_error_check')
+
 arb_seamless_cube_map = Group()
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
