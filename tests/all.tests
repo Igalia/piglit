@@ -228,9 +228,6 @@ add_plain_test(general, 'dlist-fdo3129-02')
 add_plain_test(general, 'dlist-fdo31590')
 add_plain_test(general, 'draw-batch')
 add_plain_test(general, 'draw-elements')
-add_plain_test(general, 'draw-elements-base-vertex')
-add_plain_test(general, 'draw-elements-base-vertex-neg')
-add_plain_test(general, 'draw-elements-instanced-base-vertex')
 add_plain_test(general, 'draw-elements-vs-inputs')
 add_plain_test(general, 'draw-instanced')
 add_plain_test(general, 'draw-instanced-divisor')
@@ -858,6 +855,14 @@ add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-fixed-type')
 add_plain_test(arb_es2_compatibility, 'fbo-missing-attachment-clear')
 arb_es2_compatibility['FBO blit to missing attachment (ES2 completeness rules)'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'es2', 'to'])
 arb_es2_compatibility['FBO blit from missing attachment (ES2 completeness rules)'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'es2', 'from'])
+
+# Group ARB_draw_elements_base_vertex
+arb_draw_elements_base_vertex = Group()
+spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
+add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
+add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-neg')
+add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-instanced-base-vertex')
+arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PlainExecTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
 
 # Group ARB_draw_instanced
 arb_draw_instanced = Group()

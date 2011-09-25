@@ -59,7 +59,7 @@ static const char *FragShaderText =
 
 static GLuint VertShader, FragShader, Program;
 
-static GLuint ib_offset;
+static uintptr_t ib_offset;
 
 void
 piglit_init(int argc, char **argv)
@@ -68,10 +68,19 @@ piglit_init(int argc, char **argv)
 	GLuint *ib;
 	GLuint vbo;
 	GLint OffsetAttrib;
+	GLboolean user_va = GL_FALSE;
 	int i;
 
-	glewInit();
-	piglit_require_extension("GL_ARB_vertex_buffer_object");
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "user_varrays")) {
+			user_va = GL_TRUE;
+			puts("Testing user vertex arrays.");
+		}
+	}
+
+	piglit_require_GLSL();
+	if (!user_va)
+		piglit_require_extension("GL_ARB_vertex_buffer_object");
 	piglit_require_extension("GL_ARB_draw_instanced");
 	piglit_require_extension("GL_ARB_draw_elements_base_vertex");
 
@@ -79,13 +88,18 @@ piglit_init(int argc, char **argv)
 	glPushMatrix();
 	glLoadIdentity();
 
-	glGenBuffersARB(1, &vbo);
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB,
-			NUM_QUADS * 8 * sizeof(GLfloat) +
-			2 * 4 * sizeof(GLuint),
-			NULL, GL_DYNAMIC_DRAW);
-	vb = glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	if (!user_va) {
+		glGenBuffersARB(1, &vbo);
+		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);
+		glBufferDataARB(GL_ARRAY_BUFFER_ARB,
+				NUM_QUADS * 8 * sizeof(GLfloat) +
+				2 * 4 * sizeof(GLuint),
+				NULL, GL_DYNAMIC_DRAW);
+		vb = glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	} else {
+		vb = malloc(NUM_QUADS * 8 * sizeof(GLfloat) +
+			    2 * 4 * sizeof(GLuint));
+	}
 
 	for (i = 0; i < NUM_QUADS; i++) {
 		float x1 = 10;
@@ -103,12 +117,15 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < 8; i++)
 		ib[i] = i;
 
-	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+	if (user_va) {
+		ib_offset = (uintptr_t)ib;
+	} else {
+		glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
+		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vbo);
+	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(2, GL_FLOAT, 0, 0);
-
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vbo);
+	glVertexPointer(2, GL_FLOAT, 0, user_va ? vb : NULL);
 
 	VertShader = piglit_compile_shader_text(GL_VERTEX_SHADER, VertShaderText);
 	assert(VertShader);
