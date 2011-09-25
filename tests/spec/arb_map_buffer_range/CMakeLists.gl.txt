@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (map_buffer_range_error_check map_buffer_range_error_check.c)
+add_executable (map_buffer_range_test map_buffer_range_test.c)
 
 # vim: ft=cmake:
