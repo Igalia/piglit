@@ -85,11 +85,11 @@ static void test_large_vertex_count(float x1, float y1, float x2, float y2, int 
 static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    GLuint id;
     if (user_va) {
         glVertexPointer(size, type, stride, (char*)buf + bufOffset);
         return 0;
     }
-    GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, bufSize, buf, GL_STATIC_DRAW);
@@ -100,11 +100,11 @@ static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
 static GLuint vboColorPointer(GLint size, GLenum type, GLsizei stride,
                               const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    GLuint id;
     if (user_va) {
         glColorPointer(size, type, stride, (char*)buf + bufOffset);
         return 0;
     }
-    GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, bufSize, buf, GL_STATIC_DRAW);
@@ -116,12 +116,12 @@ static GLuint vboVertexColorPointer(GLint vSize, GLenum vType, GLint vStride, in
                                     GLint cSize, GLenum cType, GLint cStride, intptr_t cOffset,
                                     const GLvoid *buf, GLsizei bufSize)
 {
+    GLuint id;
     if (user_va) {
         glVertexPointer(vSize, vType, vStride, (char*)buf + vOffset);
         glColorPointer(cSize, cType, cStride, (char*)buf + cOffset);
         return 0;
     }
-    GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, bufSize, buf, GL_STATIC_DRAW);
