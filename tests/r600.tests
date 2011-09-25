@@ -11,6 +11,7 @@ from framework.gleantest import *
 # NOTE: You need kernel 2.6.38 or later to avoid/survive some hardlocks
 
 # These lock up RV730:
+del profile.tests['spec']['glsl-1.20']['execution']['variable-indexing']['vs-temp-array-mat4-index-col-row-rd']
 del profile.tests['spec']['glsl-1.20']['execution']['variable-indexing']['fs-temp-array-mat4-index-col-row-rd']
 del profile.tests['spec']['glsl-1.20']['execution']['variable-indexing']['vs-temp-array-mat4-index-row-rd']
 
