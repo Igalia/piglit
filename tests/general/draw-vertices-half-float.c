@@ -62,11 +62,11 @@ void piglit_init(int argc, char **argv)
 static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    GLuint id;
     if (user_va) {
         glVertexPointer(size, type, stride, (char*)buf + bufOffset);
         return 0;
     }
-    GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, bufSize, buf, GL_STATIC_DRAW);
