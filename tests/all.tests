@@ -862,6 +862,7 @@ spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
 arb_draw_elements_base_vertex['draw-elements-base-vertex-user_varrays'] = PlainExecTest(['draw-elements-base-vertex', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-neg')
+arb_draw_elements_base_vertex['draw-elements-base-vertex-neg-user_varrays'] = PlainExecTest(['draw-elements-base-vertex-neg', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-instanced-base-vertex')
 arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PlainExecTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
 

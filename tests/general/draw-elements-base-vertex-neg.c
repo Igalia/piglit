@@ -29,8 +29,19 @@
 int piglit_width = 320, piglit_height = 80;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
+GLboolean user_va = GL_FALSE;
+
 void piglit_init(int argc, char **argv)
 {
+	unsigned i;
+
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "user_varrays")) {
+			user_va = GL_TRUE;
+			puts("Testing user vertex arrays.");
+		}
+	}
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	if (!GLEW_VERSION_1_5) {
@@ -47,6 +58,10 @@ void piglit_init(int argc, char **argv)
 static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+	if (user_va) {
+		glVertexPointer(size, type, stride, buf);
+		return 0;
+	}
 	GLuint id;
 	glGenBuffers(1, &id);
 	glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -57,6 +72,9 @@ static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
 
 static GLuint vboElementPointer(const GLvoid *buf, GLsizei bufSize)
 {
+	if (user_va) {
+		return 0;
+	}
 	GLuint id;
 	glGenBuffers(1, &id);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
@@ -78,9 +96,11 @@ static void test_negative_index_offset(float x1, float y1, float x2, float y2, i
 
 	vbo = vboVertexPointer(2, GL_FLOAT, 0, v2, sizeof(v2), 0);
 	ib = vboElementPointer(indices, sizeof(indices));
-	glDrawElementsBaseVertex(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL, -index);
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ib);
+	glDrawElementsBaseVertex(GL_TRIANGLES, 3, GL_UNSIGNED_INT, user_va ? indices : NULL, -index);
+	if (vbo)
+		glDeleteBuffers(1, &vbo);
+	if (ib)
+		glDeleteBuffers(1, &ib);
 }
 
 enum piglit_result piglit_display(void)
