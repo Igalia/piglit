@@ -34,8 +34,19 @@
 int piglit_width = 320, piglit_height = 60;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
+GLboolean user_va = GL_FALSE;
+
 void piglit_init(int argc, char **argv)
 {
+    unsigned i;
+
+    for (i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "user")) {
+            user_va = GL_TRUE;
+            puts("Testing user vertex arrays.");
+        }
+    }
+
     piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
     if (!GLEW_VERSION_1_5) {
@@ -51,6 +62,10 @@ void piglit_init(int argc, char **argv)
 static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    if (user_va) {
+        glVertexPointer(size, type, stride, (char*)buf + bufOffset);
+        return 0;
+    }
     GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -206,7 +221,8 @@ static void test_half_vertices_wrapped(unsigned short x1, unsigned short y1,
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
 
 static void test_half_vertices(float fx1, float fy1, float fx2, float fy2, int index)
