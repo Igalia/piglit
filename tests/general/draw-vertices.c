@@ -34,8 +34,19 @@
 int piglit_width = 320, piglit_height = 60;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
+GLboolean user_va = GL_FALSE;
+
 void piglit_init(int argc, char **argv)
 {
+    unsigned i;
+
+    for (i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "user")) {
+            user_va = GL_TRUE;
+            puts("Testing user vertex arrays.");
+        }
+    }
+
     piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
     if (!GLEW_VERSION_1_5) {
@@ -53,7 +64,7 @@ static void test_large_vertex_count(float x1, float y1, float x2, float y2, int 
     float *v = (float*)malloc(sizeof(float) * 6 * tris);
     unsigned i;
 
-    // A large vertex count for DrawArrays
+    /* A large vertex count for DrawArrays */
     for (i = 0; i < tris*6; i += 6) {
         v[i+0] = x1;
         v[i+1] = y1;
@@ -74,6 +85,10 @@ static void test_large_vertex_count(float x1, float y1, float x2, float y2, int 
 static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    if (user_va) {
+        glVertexPointer(size, type, stride, (char*)buf + bufOffset);
+        return 0;
+    }
     GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -85,6 +100,10 @@ static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
 static GLuint vboColorPointer(GLint size, GLenum type, GLsizei stride,
                               const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
+    if (user_va) {
+        glColorPointer(size, type, stride, (char*)buf + bufOffset);
+        return 0;
+    }
     GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -97,6 +116,11 @@ static GLuint vboVertexColorPointer(GLint vSize, GLenum vType, GLint vStride, in
                                     GLint cSize, GLenum cType, GLint cStride, intptr_t cOffset,
                                     const GLvoid *buf, GLsizei bufSize)
 {
+    if (user_va) {
+        glVertexPointer(vSize, vType, vStride, (char*)buf + vOffset);
+        glColorPointer(cSize, cType, cStride, (char*)buf + cOffset);
+        return 0;
+    }
     GLuint id;
     glGenBuffers(1, &id);
     glBindBuffer(GL_ARRAY_BUFFER, id);
@@ -185,7 +209,8 @@ static void test_ubyte_colors(float x1, float y1, float x2, float y2, int index)
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glDisableClientState(GL_COLOR_ARRAY);
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
 
 static void test_short_vertices(float x1, float y1, float x2, float y2, int index)
@@ -247,7 +272,8 @@ static void test_short_vertices(float x1, float y1, float x2, float y2, int inde
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
 
 static void test_int_vertices(float x1, float y1, float x2, float y2, int index)
@@ -298,7 +324,8 @@ static void test_int_vertices(float x1, float y1, float x2, float y2, int index)
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
 
 static void test_double_vertices(float x1, float y1, float x2, float y2, int index)
@@ -373,7 +400,8 @@ static void test_double_vertices(float x1, float y1, float x2, float y2, int ind
 	else
 		glDrawArrays(GL_TRIANGLES, 1, 3);
 
-	glDeleteBuffers(1, &vbo);
+	if (vbo)
+	    glDeleteBuffers(1, &vbo);
 }
 
 static void test_interleaved_vertices(float x1, float y1, float x2, float y2, int index)
@@ -404,7 +432,8 @@ static void test_interleaved_vertices(float x1, float y1, float x2, float y2, in
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glDisableClientState(GL_COLOR_ARRAY);
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
 
 static void test_mixed_user_and_vbo_buffers(float x1, float y1, float x2, float y2, int index)
@@ -434,69 +463,76 @@ static void test_mixed_user_and_vbo_buffers(float x1, float y1, float x2, float 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glDisableClientState(GL_COLOR_ARRAY);
-    glDeleteBuffers(1, &vbo);
+    if (vbo)
+        glDeleteBuffers(1, &vbo);
 }
+
+enum {
+    BOTH,
+    USER
+};
 
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
     float expected_color[3];
+    int flag;
     const char *name;
 };
 
 struct test tests[] = {
-    {test_ubyte_colors, 0, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3,"},
-    {test_ubyte_colors, 1, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4,"},
-    {test_ubyte_colors, 2, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4,"},
-    {test_ubyte_colors, 3, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3, offset: 1"},
-    {test_ubyte_colors, 4, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 1"},
-    {test_ubyte_colors, 5, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 1"},
-    {test_ubyte_colors, 6, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3, offset: 2"},
-    {test_ubyte_colors, 7, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 2"},
-    {test_ubyte_colors, 8, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 2"},
-    {test_ubyte_colors, 9, {1, 0, 0}, "Ubyte colors - components: 3, stride: 3, offset: 3"},
-    {test_ubyte_colors, 10, {1, 0, 0}, "Ubyte colors - components: 3, stride: 4, offset: 3"},
-    {test_ubyte_colors, 11, {1, 0, 0}, "Ubyte colors - components: 4, stride: 4, offset: 3"},
+    {test_ubyte_colors, 0, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 3,"},
+    {test_ubyte_colors, 1, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 4,"},
+    {test_ubyte_colors, 2, {1, 0, 0}, BOTH, "Ubyte colors - components: 4, stride: 4,"},
+    {test_ubyte_colors, 3, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 3, offset: 1"},
+    {test_ubyte_colors, 4, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 4, offset: 1"},
+    {test_ubyte_colors, 5, {1, 0, 0}, BOTH, "Ubyte colors - components: 4, stride: 4, offset: 1"},
+    {test_ubyte_colors, 6, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 3, offset: 2"},
+    {test_ubyte_colors, 7, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 4, offset: 2"},
+    {test_ubyte_colors, 8, {1, 0, 0}, BOTH, "Ubyte colors - components: 4, stride: 4, offset: 2"},
+    {test_ubyte_colors, 9, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 3, offset: 3"},
+    {test_ubyte_colors, 10, {1, 0, 0}, BOTH, "Ubyte colors - components: 3, stride: 4, offset: 3"},
+    {test_ubyte_colors, 11, {1, 0, 0}, BOTH, "Ubyte colors - components: 4, stride: 4, offset: 3"},
 
-    {test_short_vertices, 0, {1, 1, 1}, "Short vertices - components: 2, stride: 4,"},
-    {test_short_vertices, 1, {1, 1, 1}, "Short vertices - components: 2, stride: 6,"},
-    {test_short_vertices, 2, {1, 1, 1}, "Short vertices - components: 3, stride: 6,"},
-    {test_short_vertices, 3, {1, 1, 1}, "Short vertices - components: 2, stride: 8,"},
-    {test_short_vertices, 4, {1, 1, 1}, "Short vertices - components: 3, stride: 8,"},
-    {test_short_vertices, 5, {1, 1, 1}, "Short vertices - components: 4, stride: 8,"},
-    {test_short_vertices, 6, {1, 1, 1}, "Short vertices - components: 2, stride: 4, offset: 2"},
-    {test_short_vertices, 7, {1, 1, 1}, "Short vertices - components: 2, stride: 6, offset: 2"},
-    {test_short_vertices, 8, {1, 1, 1}, "Short vertices - components: 3, stride: 6, offset: 2"},
-    {test_short_vertices, 9, {1, 1, 1}, "Short vertices - components: 2, stride: 8, offset: 2"},
-    {test_short_vertices, 10, {1, 1, 1}, "Short vertices - components: 3, stride: 8, offset: 2"},
-    {test_short_vertices, 11, {1, 1, 1}, "Short vertices - components: 4, stride: 8, offset: 2"},
+    {test_short_vertices, 0, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 4,"},
+    {test_short_vertices, 1, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 6,"},
+    {test_short_vertices, 2, {1, 1, 1}, BOTH, "Short vertices - components: 3, stride: 6,"},
+    {test_short_vertices, 3, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 8,"},
+    {test_short_vertices, 4, {1, 1, 1}, BOTH, "Short vertices - components: 3, stride: 8,"},
+    {test_short_vertices, 5, {1, 1, 1}, BOTH, "Short vertices - components: 4, stride: 8,"},
+    {test_short_vertices, 6, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 4, offset: 2"},
+    {test_short_vertices, 7, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 6, offset: 2"},
+    {test_short_vertices, 8, {1, 1, 1}, BOTH, "Short vertices - components: 3, stride: 6, offset: 2"},
+    {test_short_vertices, 9, {1, 1, 1}, BOTH, "Short vertices - components: 2, stride: 8, offset: 2"},
+    {test_short_vertices, 10, {1, 1, 1}, BOTH, "Short vertices - components: 3, stride: 8, offset: 2"},
+    {test_short_vertices, 11, {1, 1, 1}, BOTH, "Short vertices - components: 4, stride: 8, offset: 2"},
 
-    {test_int_vertices, 0, {1, 1, 1}, "Int vertices - components: 2, stride: 8"},
-    {test_int_vertices, 1, {1, 1, 1}, "Int vertices - components: 3, stride: 12"},
-    {test_int_vertices, 2, {1, 1, 1}, "Int vertices - components: 4, stride: 16"},
-    {test_int_vertices, 3, {1, 1, 1}, "Int vertices - components: 2, stride: 8,  offset: 4"},
-    {test_int_vertices, 4, {1, 1, 1}, "Int vertices - components: 3, stride: 12, offset: 4"},
-    {test_int_vertices, 5, {1, 1, 1}, "Int vertices - components: 4, stride: 16, offset: 4"},
+    {test_int_vertices, 0, {1, 1, 1}, BOTH, "Int vertices - components: 2, stride: 8"},
+    {test_int_vertices, 1, {1, 1, 1}, BOTH, "Int vertices - components: 3, stride: 12"},
+    {test_int_vertices, 2, {1, 1, 1}, BOTH, "Int vertices - components: 4, stride: 16"},
+    {test_int_vertices, 3, {1, 1, 1}, BOTH, "Int vertices - components: 2, stride: 8,  offset: 4"},
+    {test_int_vertices, 4, {1, 1, 1}, BOTH, "Int vertices - components: 3, stride: 12, offset: 4"},
+    {test_int_vertices, 5, {1, 1, 1}, BOTH, "Int vertices - components: 4, stride: 16, offset: 4"},
 
-    {test_double_vertices, 0, {1, 1, 1}, "Double vertices - components: 2, stride: 16"},
-    {test_double_vertices, 1, {1, 1, 1}, "Double vertices - components: 3, stride: 24"},
-    {test_double_vertices, 2, {1, 1, 1}, "Double vertices - components: 4, stride: 32"},
-    {test_double_vertices, 3, {1, 1, 1}, "Double vertices - components: 2, stride: 16, offset: 8"},
-    {test_double_vertices, 4, {1, 1, 1}, "Double vertices - components: 3, stride: 24, offset: 8"},
-    {test_double_vertices, 5, {1, 1, 1}, "Double vertices - components: 4, stride: 32, offset: 8"},
-    {test_double_vertices, 6, {1, 1, 1}, "Double vertices - components: 2, stride: 16, start: 1"},
-    {test_double_vertices, 7, {1, 1, 1}, "Double vertices - components: 3, stride: 24, start: 1"},
-    {test_double_vertices, 8, {1, 1, 1}, "Double vertices - components: 4, stride: 32, start: 1"},
+    {test_double_vertices, 0, {1, 1, 1}, BOTH, "Double vertices - components: 2, stride: 16"},
+    {test_double_vertices, 1, {1, 1, 1}, BOTH, "Double vertices - components: 3, stride: 24"},
+    {test_double_vertices, 2, {1, 1, 1}, BOTH, "Double vertices - components: 4, stride: 32"},
+    {test_double_vertices, 3, {1, 1, 1}, BOTH, "Double vertices - components: 2, stride: 16, offset: 8"},
+    {test_double_vertices, 4, {1, 1, 1}, BOTH, "Double vertices - components: 3, stride: 24, offset: 8"},
+    {test_double_vertices, 5, {1, 1, 1}, BOTH, "Double vertices - components: 4, stride: 32, offset: 8"},
+    {test_double_vertices, 6, {1, 1, 1}, BOTH, "Double vertices - components: 2, stride: 16, start: 1"},
+    {test_double_vertices, 7, {1, 1, 1}, BOTH, "Double vertices - components: 3, stride: 24, start: 1"},
+    {test_double_vertices, 8, {1, 1, 1}, BOTH, "Double vertices - components: 4, stride: 32, start: 1"},
 
-    {test_interleaved_vertices, 0, {0, 1, 0}, "Interleaved VBO - gap: 0"},
-    {test_interleaved_vertices, 1, {0, 1, 0}, "Interleaved VBO - gap: 1"},
-    {test_interleaved_vertices, 2, {0, 1, 0}, "Interleaved VBO - gap: 2"},
-    {test_interleaved_vertices, 3, {0, 1, 0}, "Interleaved VBO - gap: 4"},
+    {test_interleaved_vertices, 0, {0, 1, 0}, BOTH, "Interleaved VBO - gap: 0"},
+    {test_interleaved_vertices, 1, {0, 1, 0}, BOTH, "Interleaved VBO - gap: 1"},
+    {test_interleaved_vertices, 2, {0, 1, 0}, BOTH, "Interleaved VBO - gap: 2"},
+    {test_interleaved_vertices, 3, {0, 1, 0}, BOTH, "Interleaved VBO - gap: 4"},
 
-    {test_mixed_user_and_vbo_buffers, 0, {0, 0, 1}, "Mixed buffers - 0: vbo,  1: user"},
-    {test_mixed_user_and_vbo_buffers, 1, {0, 0, 1}, "Mixed buffers - 0: user, 1: vbo"},
+    {test_mixed_user_and_vbo_buffers, 0, {0, 0, 1}, BOTH, "Mixed buffers - 0: vbo,  1: user"},
+    {test_mixed_user_and_vbo_buffers, 1, {0, 0, 1}, BOTH, "Mixed buffers - 0: user, 1: vbo"},
 
-    {test_large_vertex_count, 0, {1, 1, 1}, "Large vertex count"},
+    {test_large_vertex_count, 0, {1, 1, 1}, USER, "Large vertex count"},
 
     {0}
 };
@@ -512,6 +548,9 @@ piglit_display(void)
     glEnableClientState(GL_VERTEX_ARRAY);
 
     for (i = 0; tests[i].test; i++) {
+        if (!user_va && tests[i].flag == USER)
+            continue;
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         printf("%s\n", tests[i].name);

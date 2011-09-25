@@ -59,7 +59,7 @@ static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
                                const GLvoid *buf, GLsizei bufSize, intptr_t bufOffset)
 {
 	if (user_va) {
-		glVertexPointer(size, type, stride, buf);
+		glVertexPointer(size, type, stride, (char*)buf + bufOffset);
 		return 0;
 	}
 	GLuint id;
