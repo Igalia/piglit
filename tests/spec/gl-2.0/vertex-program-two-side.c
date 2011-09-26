@@ -84,16 +84,12 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUniform1i(draw_secondary_loc, false);
-	if (front)
-		piglit_draw_rect(-1,  0,  1, 1); /* top left */
-	if (back || (front && !enabled))
-		piglit_draw_rect( 1,  0, -1, 1); /* top right */
+	piglit_draw_rect(-1,  0,  1, 1); /* top left */
+	piglit_draw_rect( 1,  0, -1, 1); /* top right */
 
 	glUniform1i(draw_secondary_loc, true);
-	if (front2)
-		piglit_draw_rect(-1, -1,  1, 1); /* bot left */
-	if (back2 || (front2 && !enabled))
-		piglit_draw_rect( 1, -1, -1, 1); /* bot right */
+	piglit_draw_rect(-1, -1,  1, 1); /* bot left */
+	piglit_draw_rect( 1, -1, -1, 1); /* bot right */
 
 	if (front) {
 		pass = pass && piglit_probe_rect_rgba(x1, y2, w, h,
