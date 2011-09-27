@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec2 var1;
+varying vec2 var2;
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    var1.x = 1.0;
+    var1.y = 0.0;
+    var2 = var1;
+}
+
+[fragment shader]
+varying vec2 var1;
+varying vec2 var2;
+void main()
+{
+	gl_FragColor = vec4(0.0, var2, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
