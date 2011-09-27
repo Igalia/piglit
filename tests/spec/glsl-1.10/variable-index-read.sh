@@ -272,11 +272,18 @@ EOF
 function emit_test_vectors
 {
     matrix_dim=$1
-    array_dim=$2
+    local array_dim=$2
     mode=$3
     index_value=$4
     col=$5
     expect_type=$6
+
+    # Optimizing GLSL linkers may reduce the size of the uniform array if tail
+    # elements are not accessed.  Shader runner will fail the test if one of
+    # the set uniforms doesn't have a location.
+    if [ "x$mode" = "xuniform" -a $v -le 110 -a $array_dim -ne 0 -a "x$index_value" != "xindex" ]; then
+	array_dim=$((index_value+1))
+    fi
 
     cat <<EOF
 [test]
