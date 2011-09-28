@@ -118,7 +118,6 @@ check_enable_state(char *enum_name, GLenum enum_value, bool expected)
 void
 piglit_init(int argc, char **argv)
 {
-	GLenum err;
 	GLint max_clip_planes;
 	bool pass = true;
 	GLint plane;
