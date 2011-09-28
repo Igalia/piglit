@@ -365,7 +365,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (argc == 1) {
-		argv = all_formats;
+		argv = (char **) all_formats;  /* cast away const */
 		argc = ARRAY_SIZE(all_formats);
 		do_all = true;
 	}
