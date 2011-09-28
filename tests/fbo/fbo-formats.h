@@ -481,29 +481,36 @@ static const struct test_desc *test_set;
 static int test_index;
 static int format_index;
 
+
+/**
+ * If inc_dec == +1, go to  the next test set.
+ * If inc_dec == -1, go to the previous test set.
+ */
+static void next_test_set(int inc_dec)
+{
+	do {
+		test_index += inc_dec;
+		if (test_index >= ARRAY_SIZE(test_sets)) {
+			test_index = 0;
+		}
+		else if (test_index < 0) {
+			test_index = ARRAY_SIZE(test_sets) - 1;
+		}
+	} while (!supported(&test_sets[test_index]));
+	format_index = 0;
+	printf("Using test set: %s\n", test_sets[test_index].param);
+}
+
+
 static void fbo_formats_key_func(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'n': /* next test set */
-		do {
-			test_index++;
-			if (test_index >= ARRAY_SIZE(test_sets)) {
-				test_index = 0;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
+		next_test_set(+1);
 		break;
 
 	case 'N': /* previous test set */
-		do {
-			test_index--;
-			if (test_index < 0) {
-				test_index = ARRAY_SIZE(test_sets) - 1;
-			}
-		} while (!supported(&test_sets[test_index]));
-		format_index = 0;
-		printf("Using test set: %s\n", test_sets[test_index].param);
+		next_test_set(-1);
 		break;
 
 	case 'm': /* next format */
@@ -516,6 +523,19 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 	case 'M': /* previous format */
 		format_index--;
 		if (format_index < 0) {
+			format_index = test_sets[test_index].num_formats - 1;
+		}
+		break;
+	case 'f': /* next format, or next test set */
+		format_index++;
+		if (format_index >= test_sets[test_index].num_formats) {
+			next_test_set(+1);
+		}
+		break;
+	case 'F': /* prev format, or prev test set */
+		format_index--;
+		if (format_index < 0) {
+			next_test_set(-1);
 			format_index = test_sets[test_index].num_formats - 1;
 		}
 		break;
