@@ -68,9 +68,7 @@ piglit_display(void)
 	int l, q;
 	bool pass = true;
 	float red[4]   = {1.0, 0.0, 0.0, 1.0};
-	float green[4] = {0.0, 1.0, 0.0, 1.0};
 	float blue[4]  = {0.0, 0.0, 1.0, 1.0};
-	float white[4] = {1.0, 1.0, 1.0, 1.0};
 	float black[4] = {0.0, 0.0, 0.0, 1.0};
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
