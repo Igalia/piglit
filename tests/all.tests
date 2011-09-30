@@ -1236,6 +1236,12 @@ ext_texture_srgb['invalid formats'].runConcurrent = True
 
 ext_transform_feedback = Group()
 spec['EXT_transform_feedback'] = ext_transform_feedback
+ext_transform_feedback['discard-api'] = concurrent_test('ext_transform_feedback-discard-api')
+ext_transform_feedback['discard-bitmap'] = concurrent_test('ext_transform_feedback-discard-bitmap')
+ext_transform_feedback['discard-clear'] = concurrent_test('ext_transform_feedback-discard-clear')
+ext_transform_feedback['discard-copypixels'] = concurrent_test('ext_transform_feedback-discard-copypixels')
+ext_transform_feedback['discard-drawarrays'] = concurrent_test('ext_transform_feedback-discard-drawarrays')
+ext_transform_feedback['discard-drawpixels'] = concurrent_test('ext_transform_feedback-discard-drawpixels')
 ext_transform_feedback['position-readback-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto'])
 ext_transform_feedback['position-readback-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'discard'])
 ext_transform_feedback['position-readback-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset'])
