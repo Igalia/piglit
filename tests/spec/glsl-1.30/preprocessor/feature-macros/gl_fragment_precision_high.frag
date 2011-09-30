@@ -15,5 +15,5 @@
 #endif
 
 float f() {
-	return 0;
+	return 0.0;
 }
