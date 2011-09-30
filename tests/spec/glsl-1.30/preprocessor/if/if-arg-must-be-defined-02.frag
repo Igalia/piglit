@@ -13,7 +13,7 @@
 
 #version 130
 
-#if 1
+#if 0
 #	define JUNK 1
 #elif UNDEFINED_MACRO
 #	define JUNK 1
