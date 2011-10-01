@@ -141,6 +141,7 @@
  * The test may be run in one of four modes, chosen with a single
  * command line argument:
  * - "fixed": test using fixed functionality (no vertex shader)
+ * - "arb": test using GL_ARB_vertex_program extension (see below)
  * - "pos": test using a vertex shader that sets gl_Position only
  * - "pos_clipvert": test using a vertex shader that sets gl_Position first,
  *                   then gl_ClipVertex
@@ -152,6 +153,19 @@
  * variables gl_Position and gl_ClipVertex are aliases of each other,
  * so the order in which values are stored into these two variables
  * may affect shader behavior.
+ *
+ * Note: "arb" mode tests using an ARB vertex program, as defined in
+ * the GL_ARB_vertex_program extension.  From the extension spec:
+ *
+ *     "User-defined clipping is not supported in standard vertex
+ *     program mode.  User-defined clipping support will be provided
+ *     for programs that use the "position invariant" option, where
+ *     all vertex transformation operations are performed by the
+ *     fixed-function pipeline."
+ *
+ * The strong implication seems to be that for ARB vertex programs
+ * that use the "position invariant" option, clipping should behave as
+ * it does in fixed function mode.
  */
 
 #include "piglit-util.h"
@@ -161,6 +175,8 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 GLint position_angle_loc;
 GLint clipVertex_angle_loc;
 bool use_ff = false;
+bool use_arb = false;
+bool use_glsl = false;
 bool use_clip_vertex = false;
 bool use_glsl_130 = false;
 
@@ -171,7 +187,7 @@ bool use_glsl_130 = false;
 char *setters;
 
 void
-setup_shaders()
+setup_glsl_programs()
 {
 	GLuint vs;
 	GLuint fs;
@@ -229,11 +245,29 @@ setup_shaders()
 }
 
 void
+setup_arb_program()
+{
+	char vert[] =
+		"!!ARBvp1.0\n"
+		"OPTION ARB_position_invariant;\n"
+		"MOV result.color, { 1.0, 1.0, 1.0, 1.0 };"
+		"END";
+	GLuint vert_prog;
+
+	glGenProgramsARB(1, &vert_prog);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vert_prog);
+	glProgramStringARB(GL_VERTEX_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB,
+			   strlen(vert), vert);
+	glEnable(GL_VERTEX_PROGRAM_ARB);
+}
+
+void
 print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <mode>\n"
 	       "  where <mode> is one of:\n"
 	       "    fixed\n"
+	       "    arb\n"
 	       "    pos\n"
 	       "    pos_clipvert\n"
 	       "    clipvert_pos\n", prog_name);
@@ -247,15 +281,20 @@ piglit_init(int argc, char **argv)
 		print_usage_and_exit(argv[0]);
 	if (strcmp(argv[1], "fixed") == 0) {
 		use_ff = true;
+	} else if (strcmp(argv[1], "arb") == 0) {
+		use_arb = true;
 	} else if (strcmp(argv[1], "pos") == 0) {
+		use_glsl = true;
 		setters = "  gl_Position = rotate(position_angle) * gl_Vertex;\n";
 		use_glsl_130 = true;
 	} else if (strcmp(argv[1], "pos_clipvert") == 0) {
+		use_glsl = true;
 		setters =
 			"  gl_Position = rotate(position_angle) * gl_Vertex;\n"
 			"  gl_ClipVertex = rotate(clipVertex_angle) * gl_Vertex;\n";
 		use_clip_vertex = true;
 	} else if (strcmp(argv[1], "clipvert_pos") == 0) {
+		use_glsl = true;
 		setters =
 			"  gl_ClipVertex = rotate(clipVertex_angle) * gl_Vertex;\n"
 			"  gl_Position = rotate(position_angle) * gl_Vertex;\n";
@@ -264,10 +303,14 @@ piglit_init(int argc, char **argv)
 		print_usage_and_exit(argv[0]);
 	}
 
-	piglit_require_GLSL();
-	piglit_require_GLSL_version(use_glsl_130 ? 130 : 110);
-	if (!use_ff)
-		setup_shaders();
+	if (use_arb) {
+		piglit_require_extension("GL_ARB_vertex_program");
+		setup_arb_program();
+	} else if (use_glsl) {
+		piglit_require_GLSL();
+		piglit_require_GLSL_version(use_glsl_130 ? 130 : 110);
+		setup_glsl_programs();
+	}
 }
 
 void
@@ -344,8 +387,10 @@ piglit_display()
 {
 	bool pass = true;
 
-	piglit_Uniform1f(position_angle_loc, 0.0);
-	piglit_Uniform1f(clipVertex_angle_loc, 0.0);
+	if (use_glsl) {
+		piglit_Uniform1f(position_angle_loc, 0.0);
+		piglit_Uniform1f(clipVertex_angle_loc, 0.0);
+	}
 
 	/* Base behavior: no rotations, so the clipping planes should
 	 * show up on screen at the coordinates where they were
@@ -375,17 +420,18 @@ piglit_display()
             "effect of 20deg ModelView rotation while drawing",
 	    0, 0, 20, 0, 0) && pass;
 
-	/* When using fixed functionality, a 20 degree rotation in the
-	 * projection matrix at the time of drawing should result in a
-	 * 20 degree rotation of where clipping takes effect when
-	 * using fixed functionality.  When using a vertex shader, it
-	 * should have no effect.
+	/* When using fixed functionality or an ARB position invariant
+	 * program, a 20 degree rotation in the projection matrix at
+	 * the time of drawing should result in a 20 degree rotation
+	 * of where clipping takes effect when using fixed
+	 * functionality.  When using a vertex shader, it should have
+	 * no effect.
 	 */
 	pass = measure_effects(
             "effect of 20deg Projection rotation while drawing",
-	    0, 0, 0, 20, use_ff ? 20 : 0) && pass;
+	    0, 0, 0, 20, use_ff || use_arb ? 20 : 0) && pass;
 
-	if (!use_ff) {
+	if (use_glsl) {
 		/* When a vertex shader sets gl_Position to be 20
 		 * degrees rotated compared to gl_Vertex, and sets
 		 * gl_ClipVertex to be equal to gl_Vertex, this should

@@ -1072,6 +1072,7 @@ arb_vertex_program = Group()
 spec['ARB_vertex_program'] = arb_vertex_program
 arb_vertex_program['getenv4d-with-error'] = PlainExecTest(['arb_vertex_program-getenv4d-with-error', '-auto'])
 arb_vertex_program['getlocal4d-with-error'] = PlainExecTest(['arb_vertex_program-getlocal4d-with-error', '-auto'])
+arb_vertex_program['clip-plane-transformation arb'] = concurrent_test('clip-plane-transformation arb')
 
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
