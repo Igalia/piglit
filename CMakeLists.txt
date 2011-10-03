@@ -64,6 +64,9 @@ if (WIN32)
 
 	# Don't define min/max macros
 	add_definitions (-DNOMINMAX)
+
+	# Define M_PI and others
+	add_definitions (-D_USE_MATH_DEFINES)
 endif (WIN32)
 
 if (APPLE)
