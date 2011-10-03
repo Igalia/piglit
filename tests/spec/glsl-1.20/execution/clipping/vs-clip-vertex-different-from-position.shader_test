@@ -28,6 +28,8 @@ void main(void)
 }
 
 [test]
+clear color 0.0 0.0 0.0 0.0
+clear
 ortho 0 1 0 1
 clip plane 0 0 1 0 -2.5
 clip plane 1 -1 1 0 4
