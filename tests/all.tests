@@ -1309,6 +1309,10 @@ ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 
+ext_framebuffer_object = Group()
+spec['EXT_framebuffer_object'] = ext_framebuffer_object
+add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-noimage')
+
 nv_texture_barrier = Group()
 spec['NV_texture_barrier'] = nv_texture_barrier
 add_plain_test(nv_texture_barrier, 'blending-in-shader')
