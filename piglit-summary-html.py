@@ -148,6 +148,12 @@ def writeTestrunHtml(testrun, filename):
 
 	writefile(filename, Testrun % locals())
 
+def hrefFromParts(codename, path):
+	outStr = codename + '/' + testPathToHtmlFilename(path)
+	if outStr[0] == '/':
+		outStr = outStr[1:]
+	return outStr
+
 def buildTestSummary(indent, alternate, testsummary):
 	tenindent = 10 - indent
 	path = testsummary.path
@@ -155,7 +161,7 @@ def buildTestSummary(indent, alternate, testsummary):
 	testruns = "".join([IndexTestTestrun % {
 		'alternate': alternate,
 		'status': result.status,
-		'link': result.testrun.codename + '/' + testPathToHtmlFilename(path)
+		'link': hrefFromParts(result.testrun.codename, path)
 	} for result in testsummary.results])
 
 	return IndexTest % locals()
