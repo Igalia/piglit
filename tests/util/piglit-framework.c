@@ -200,6 +200,8 @@ piglit_framework_fbo_init()
 				       0);
 	}
 
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		fprintf(stderr,
