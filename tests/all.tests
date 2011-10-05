@@ -860,6 +860,9 @@ spec['glsl-1.30']['linker'] = Group()
 spec['glsl-1.30']['linker']['clipping'] = Group()
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
+for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
+	test_name = 'isinf-and-isnan ' + arg
+	spec['glsl-1.30']['execution'][test_name] = PlainExecTest(test_name + ' -auto')
 spec['glsl-1.30']['execution']['clipping']['clip-plane-transformation pos'] = \
     concurrent_test('clip-plane-transformation pos')
 

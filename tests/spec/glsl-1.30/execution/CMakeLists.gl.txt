@@ -16,3 +16,4 @@ link_libraries (
 add_executable (fs-textureSize-2D fs-textureSize-2D.c)
 add_executable (fs-texelFetch-2D fs-texelFetch-2D.c)
 add_executable (fs-texelFetchOffset-2D fs-texelFetchOffset-2D.c)
+add_executable (isinf-and-isnan isinf-and-isnan.c)
