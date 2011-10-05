@@ -13,3 +13,4 @@ link_libraries (
 
 add_executable (arb_shader_objects-getuniform getuniform.c)
 add_executable (arb_shader_objects-clear-with-deleted clear-with-deleted.c)
+add_executable (arb_shader_objects-delete-repeat delete-repeat.c)
