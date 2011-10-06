@@ -25,9 +25,10 @@
 
 /**
  * @file
- * Tests FBO integer clearing with a value that is outside a float precision,
- * if any part of the stack does an int->float conversion this test will fail
- * also tests read/draw pixels paths.
+ * Tests FBO integer clearing with a value that is signed or unsigned
+ * the reads back using the other type.
+ * This checks that the signed->unsigned and unsigned->signed conversions
+ * in the RP path are done correctly.
  */
 
 
