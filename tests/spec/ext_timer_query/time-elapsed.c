@@ -1,0 +1,254 @@
+/*
+ * Copyright © 2011 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+#include "piglit-util.h"
+
+/**
+ * @file time-elapsed.c
+ *
+ * Tests that conditional rendering appropriately affects commands
+ * inside of display lists.
+ */
+
+#include <sys/time.h>
+
+int piglit_width = 128;
+int piglit_height = 128;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+
+static float
+get_time(void)
+{
+	static bool inited = false;
+	static time_t base_sec = 0;
+	struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+
+	/* Return a value that is roughly seconds since program
+	 * startup, to avoid large tv_sec reducing precision of the
+	 * return value.
+	 */
+	if (!inited) {
+		inited = true;
+		base_sec = tv.tv_sec;
+	}
+	tv.tv_sec -= base_sec;
+
+	return (double)tv.tv_sec + tv.tv_usec / 1000000.0;
+}
+
+static float
+draw(GLuint q, int iters)
+{
+	float start_time, end_time;
+	int i;
+
+	start_time = get_time();
+
+	glBeginQuery(GL_TIME_ELAPSED, q);
+	for (i = 0; i < iters; i++) {
+		piglit_draw_rect(-1, -1, 2, 2);
+	}
+	glEndQuery(GL_TIME_ELAPSED);
+
+	/* This glFinish() is important, since this is used in a
+	 * timing loop.
+	 */
+	glFinish();
+
+	end_time = get_time();
+
+	return end_time - start_time;
+}
+
+static float
+get_gpu_time(GLuint q)
+{
+	GLint64EXT elapsed;
+
+	glGetQueryObjecti64vEXT(q, GL_QUERY_RESULT, &elapsed);
+
+	return elapsed / 1000.0 / 1000.0 / 1000.0;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	bool pass = true;
+	float green[4] = {0.0, 1.0, 0.0, 0.0};
+	GLuint q;
+	int iters;
+	int num_results = 5;
+	float cpu_time[num_results];
+	float gpu_time[num_results];
+	float delta[num_results];
+	float cpu_time_mean;
+	float delta_mean, delta_stddev;
+	float cpu_overhead;
+	float t, t_cutoff;
+	int i;
+
+	glColor4f(0.0, 1.0, 0.0, 0.0);
+	glGenQueries(1, &q);
+
+	/* Prime the drawing pipe before we start measuring time,
+	 * since the first draw call is likely to be slower than all
+	 * others.
+	 */
+	draw(q, 1);
+
+	/* Figure out some baseline difference between GPU time
+	 * elapsed and CPU time elapsed for a single draw call (CPU
+	 * overhead of timer query and glFinish()).
+	 *
+	 * Note that this doesn't take into account any extra CPU time
+	 * elapsed from start to finish if multiple batchbuffers are
+	 * accumulated by the driver in getting to our 1/10th of a
+	 * second elapsed time goal, and some other client sneaks
+	 * rendering in in between those batches.
+	 *
+	 * Part of the rendering size being relatively large is to
+	 * hopefully avoid that, though it might be better to have
+	 * some time-consuming shader with a single draw call instead.
+	 */
+	cpu_overhead = 0;
+	for (i = 0; i < num_results; i++) {
+		cpu_time[i] = draw(q, 1);
+		gpu_time[i] = get_gpu_time(q);
+
+		cpu_overhead += cpu_time[i] - gpu_time[i];
+	}
+	cpu_overhead /= num_results;
+
+	/* Find a number of draw calls that takes about 1/10th of a
+	 * second.
+	 */
+retry:
+	for (iters = 1; ; iters *= 2) {
+		if (draw(q, iters) > 0.1)
+			break;
+	}
+
+	/* Now, do several runs like this so we can determine if the
+	 * timer matches up with wall time.
+	 */
+	for (i = 0; i < num_results; i++) {
+		cpu_time[i] = draw(q, iters);
+		gpu_time[i] = get_gpu_time(q);
+	}
+
+	cpu_time_mean = 0;
+	delta_mean = 0;
+	for (i = 0; i < num_results; i++) {
+		delta[i] = cpu_time[i] - cpu_overhead - gpu_time[i];
+		cpu_time_mean += cpu_time[i];
+		delta_mean += delta[i];
+	}
+	cpu_time_mean /= num_results;
+	delta_mean /= num_results;
+
+	/* There's some risk of our "get to 0.1 seconds" loop deciding
+	 * that a small number of iters was sufficient if we got
+	 * scheduled out for a while.  Re-run if so.
+	 *
+	 * We wouldn't have that problem if we could rely on the GPU
+	 * time elapsed query, but that's the thing we're testing.
+	 */
+	if (cpu_time_mean < 0.05)
+		goto retry;
+
+	/* Calculate stddevs. */
+	delta_stddev = 0;
+	for (i = 0; i < num_results; i++) {
+		float d = delta[i] - delta_mean;
+		delta_stddev += d * d / (num_results - 1);
+	}
+	delta_stddev = sqrt(delta_stddev);
+
+	/* Dependent t-test for paired samples.
+	 *
+	 * This is a good test, because we expect the two times (cpu
+	 * and gpu) of the samples to be correlated, and we expect the
+	 * stddev to match (since time it should arise from system
+	 * variables like scheduling of other tasks and state of the
+	 * caches).  Unless maybe the variance of cpu time is greater
+	 * than gpu time, because we may see scheduling accounted for
+	 * in our CPU (wall) time, while scheduling other tasks
+	 * doesn't end up counted toward our GPU time.
+	 */
+	t = delta_mean / (delta_stddev / sqrt(num_results));
+
+	/* Integral of Student's t distribution for 4 degrees of
+	 * freedom (num_results = 5), two-tailed (we care about
+	 * difference above or below 0, not just one direction), at
+	 * p = .05.
+	 */
+	t_cutoff = 2.776;
+
+	/* Now test that our sampled distribution (rate of clock
+	 * advance between CPU and GPU) was within expectations for a
+	 * delta of 0.  I actually want to be testing the likelihood
+	 * that the real difference is enough that we actually care.
+	 * I didn't find an easy way to account for that after a bunch
+	 * of wikipedia browsing, so I'll punt on proper analysis for
+	 * now and just check that the sampled delta isn't too small
+	 * to care about.
+	 */
+	if (t > t_cutoff && fabs(delta_mean) > .05 * cpu_time_mean) {
+		fprintf(stderr, "GPU time didn't match CPU time\n");
+		printf("Estimated CPU overhead: %f\n", cpu_overhead);
+		printf("Difference: %f secs (+/- %f secs)\n",
+		       delta_mean, delta_stddev);
+		printf("t = %f\n", t);
+
+		printf("%20s %20s %20s\n",
+		       "gpu_time", "cpu_time", "delta");
+		for (i = 0; i < num_results; i++) {
+			printf("%20f %20f %20f\n",
+			       gpu_time[i], cpu_time[i], delta[i]);
+		}
+
+		pass = false;
+	}
+
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
+				      green) && pass;
+
+	piglit_present_results();
+
+	glDeleteQueries(1, &q);
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	if (!GLEW_VERSION_2_0) {
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_require_extension("GL_EXT_timer_query");
+}

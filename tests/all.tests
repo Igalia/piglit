@@ -1245,6 +1245,10 @@ add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '
 ext_texture_srgb['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'srgb'])
 ext_texture_srgb['invalid formats'].runConcurrent = True
 
+ext_timer_query = Group()
+spec['EXT_timer_query'] = ext_timer_query
+ext_timer_query['time-elapsed'] = concurrent_test('ext_timer_query-time-elapsed')
+
 ext_transform_feedback = Group()
 spec['EXT_transform_feedback'] = ext_transform_feedback
 ext_transform_feedback['discard-api'] = concurrent_test('ext_transform_feedback-discard-api')
