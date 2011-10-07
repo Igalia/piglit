@@ -1,0 +1,36 @@
+# [description]
+# This test exercises a bug found in Mesa: taking the absolute value
+# of -x should yield abs(x), not -abs(x).
+#
+# In this test, the intermediate value, -x, is also used in the
+# shader.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+#version 110
+
+uniform float x;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+
+	float y = -x;
+	float z = abs(y);
+	gl_FrontColor = vec4(0.5 + x, 0.5 + y, 0.5 + z, 1.0);
+}
+
+[fragment shader]
+#version 110
+
+void main(void)
+{
+	gl_FragColor = gl_Color;
+}
+
+[test]
+uniform float x 0.25
+draw rect -1 -1 2 2
+probe all rgba 0.75 0.25 0.75 1.0
