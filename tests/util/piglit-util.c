@@ -56,38 +56,35 @@ void piglit_glutInit(int argc, char **argv)
 #endif
 }
 
-void piglit_get_gl_version(bool *es, int* major, int* minor)
+bool piglit_is_gles()
 {
-	/* Version of OpenGL API. */
-	bool es_local;
-	int major_local;
-	int minor_local;
+	const char *version_string = (const char *) glGetString(GL_VERSION);
+	return strncmp("OpenGL ES ", version_string, 10) == 0;
+}
 
-	const char *version_string;
-	int c; /* scanf count */
+int piglit_get_gl_version()
+{
+	const char *version_string = (const char *) glGetString(GL_VERSION);
+	const char *version_number_string;
+	int scanf_count;
+	int major;
+	int minor;
 
-	version_string = (const char*) glGetString(GL_VERSION);
-	es_local = strncmp("OpenGL ES ", version_string, 10) == 0;
-	if (es_local) {
-		c = sscanf(version_string,
-		           "OpenGL ES %i.%i",
-		           &major_local,
-		           &minor_local);
-	} else {
-		c = sscanf(version_string,
-		           "%i.%i",
-		           &major_local,
-		           &minor_local);
+	/* skip to version number */
+	if (strncmp("OpenGL ES ", version_string, 10) == 0)
+		version_number_string = version_string + 10;
+	else
+		version_number_string = version_string;
+
+	/* Interpret version number */
+	scanf_count = sscanf(version_string, "%i.%i", &major, &minor);
+	if (scanf_count != 2) {
+		printf("Unable to interpret GL_VERSION string: %s\n",
+		       version_string);
+		piglit_report_result(PIGLIT_FAIL);
+		exit(1);
 	}
-	assert(c == 2);
-
-	/* Write outputs. */
-	if (es != NULL)
-		*es = es_local;
-	if (major != NULL)
-		*major = major_local;
-	if (minor != NULL)
-		*minor = minor_local;
+	return 10*major+minor;
 }
 
 bool piglit_is_extension_supported(const char *name)

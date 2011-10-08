@@ -100,13 +100,17 @@ extern const unsigned int fdo_bitmap_height;
 void piglit_glutInit(int argc, char **argv);
 
 /**
- * \brief Get version of OpenGL API.
- *
- * Null parameters are ignored.
- *
- * \param es Is the API OpenGL or OpenGL ES?
+ * Determine if the API is OpenGL ES.
  */
-void piglit_get_gl_version(bool *es, int* major, int* minor);
+bool piglit_is_gles();
+
+/**
+ * \brief Get version of OpenGL or OpenGL ES API.
+ *
+ * Returned version is multiplied by 10 to make it an integer.  So for
+ * example, if the GL version is 2.1, the return value is 21.
+ */
+int piglit_get_gl_version();
 
 /**
  * \precondition name is not null
