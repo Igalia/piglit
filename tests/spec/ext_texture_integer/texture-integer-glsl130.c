@@ -511,6 +511,7 @@ test_errors(void)
          return GL_FALSE;
    }
 
+   glBindTexture(GL_TEXTURE_2D, Texture);
    return GL_TRUE;
 }
 
