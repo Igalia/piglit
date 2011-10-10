@@ -40,7 +40,7 @@
 
 int piglit_width = 150;
 int piglit_height = 150;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE | GLUT_STENCIL;
+int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE | GLUT_STENCIL | GLUT_DEPTH;
 #define PAD 10
 #define SIZE 20
 
