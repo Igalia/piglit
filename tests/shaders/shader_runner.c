@@ -1497,7 +1497,7 @@ piglit_init(int argc, char **argv)
 
 	if (argc > 2) {
 		path = argv[2];
-	} else {
+	} else if (argc > 1) {
 #if defined(_WIN32)
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];
@@ -1516,6 +1516,9 @@ piglit_init(int argc, char **argv)
 		path = strdup(dirname(scriptpath));
 		free(scriptpath);
 #endif
+	} else {
+		printf("shader_runner: missing arguments\n");
+		exit(1);
 	}
 
 	process_test_script(argv[1]);
