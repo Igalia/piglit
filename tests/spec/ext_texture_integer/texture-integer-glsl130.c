@@ -515,36 +515,6 @@ test_errors(void)
    return GL_TRUE;
 }
 
-
-/** test some glGetInteger queries */
-static GLboolean
-test_limits(void)
-{
-   GLint val = 0;
-
-   glGetIntegerv(GL_MIN_PROGRAM_TEXEL_OFFSET, &val);
-   if (val > -8) {
-      fprintf(stderr,
-              "%s failure: query of GL_MIN_PROGRAM_TEXEL_OFFSET "
-              "returned %d\n",
-              TestName, val);
-      return GL_FALSE;
-   }
-
-   glGetIntegerv(GL_MAX_PROGRAM_TEXEL_OFFSET, &val);
-   if (val < 7) {
-      fprintf(stderr,
-              "%s failure: query of GL_MAX_PROGRAM_TEXEL_OFFSET "
-              "returned %d\n",
-              TestName, val);
-      return GL_FALSE;
-   }
-
-   return GL_TRUE;
-}
-
-
-
 enum piglit_result
 piglit_display(void)
 {
@@ -555,9 +525,6 @@ piglit_display(void)
       return PIGLIT_FAIL;
 
    if (!test_errors())
-      return PIGLIT_FAIL;
-
-   if (!test_limits())
       return PIGLIT_FAIL;
 
    return PIGLIT_PASS;
