@@ -281,17 +281,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	bool es;
-	int glslMajor, glslMinor;
-
 	piglit_require_extension("GL_EXT_texture_integer");
-
-	piglit_get_glsl_version(&es, &glslMajor, &glslMinor);
-	if (glslMajor * 100 + glslMinor < 130) {
-		printf("%s requires GLSL 1.30 or later\n", TestName);
-		piglit_report_result(PIGLIT_SKIP);
-		return;
-	}
+	piglit_require_GLSL_version(130);
 
 	PassthroughFragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 							   PassthroughFragShaderText);
