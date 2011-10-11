@@ -16,5 +16,8 @@ link_libraries (
 add_executable (ext_texture_integer-fbo_integer_precision_clear fbo-integer-precision-clear.c)
 add_executable (ext_texture_integer-fbo_integer_readpixels_sint_uint fbo-integer-readpixels-sint-uint.c)
 add_executable (ext_texture_integer-texture_integer_glsl130 texture-integer-glsl130.c)
+add_executable (ext_texture_integer-api-drawpixels api-drawpixels.c)
+add_executable (ext_texture_integer-api-readpixels api-readpixels.c)
+add_executable (ext_texture_integer-api-teximage api-teximage.c)
 
 # vim: ft=cmake:

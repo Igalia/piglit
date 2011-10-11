@@ -1183,6 +1183,9 @@ spec['EXT_texture_integer'] = ext_texture_integer
 # unsupported for int yet
 #add_fbo_clear_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-clear-formats')
 add_plain_test(ext_texture_integer, 'ext_texture_integer-fbo_integer_precision_clear')
+ext_texture_integer['api-drawpixels'] = concurrent_test('ext_texture_integer-api-drawpixels')
+ext_texture_integer['api-teximage'] = concurrent_test('ext_texture_integer-api-teximage')
+ext_texture_integer['api-readpixels'] = concurrent_test('ext_texture_integer-api-readpixels')
 
 arb_texture_rg = Group()
 spec['ARB_texture_rg'] = arb_texture_rg
