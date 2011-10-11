@@ -354,7 +354,7 @@ test_format(const struct format_info *info)
 		return GL_FALSE;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	free(buf);
 
