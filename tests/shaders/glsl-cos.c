@@ -95,6 +95,8 @@ enum piglit_result piglit_display(void)
 {
     GLboolean pass;
 
+    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
     glClearColor(0.5, 0.5, 0.5, 0.5);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -107,8 +109,6 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
     if (!GLEW_VERSION_2_0) {
         printf("Requires OpenGL 2.0\n");
         piglit_report_result(PIGLIT_SKIP);
