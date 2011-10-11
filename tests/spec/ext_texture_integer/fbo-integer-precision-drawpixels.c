@@ -24,11 +24,11 @@
  */
 
 /**
- * @file fbo-integer-precision-clear.c
+ * @file fbo-integer-precision-drawpixels.c
  *
- * Tests FBO integer clearing with a value that is outside a float
- * precision.  If any part of the stack does an int->float conversion
- * this test will fail.
+ * Tests FBO integer glDrawPixels() with a value that is outside a
+ * float precision, if any part of the stack does an int->float
+ * conversion this test will fail also tests read/draw pixels paths.
  */
 
 
@@ -64,10 +64,31 @@ static const struct format_info Formats[] = {
 static const char *PassthroughFragShaderText =
 	"void main() \n"
 	"{ \n"
-	"   gl_FragColor = gl_Color; \n"
+	"	gl_FragColor = gl_Color; \n"
 	"} \n";
 
 static GLuint PassthroughFragShader, PassthroughProgram;
+
+static int
+get_max_val(const struct format_info *info)
+{
+	int max;
+
+	switch (info->BitsPerChannel) {
+	case 32:
+		if (info->Signed)
+			max = 300000000; /* don't use 0x8fffffff to avoid overflow issues */
+		else
+			max = 200000000;
+		break;
+	default:
+		assert(0);
+		max = 0;
+	}
+
+	return max;
+}
+
 
 static int
 num_components(GLenum format)
@@ -127,6 +148,7 @@ check_error(const char *file, int line)
 static GLboolean
 test_fbo(const struct format_info *info)
 {
+	const int max = get_max_val(info);
 	const int comps = num_components(info->BaseFormat);
 	const GLenum type = get_datatype(info);
 	GLint f;
@@ -134,8 +156,6 @@ test_fbo(const struct format_info *info)
 	GLenum status;
 	GLboolean intMode;
 	GLint buf;
-	static const GLint clr[4] = { 300000005, 7, 6, 5 };
-	GLint pix[4], i;
 
 	if (0)
 		fprintf(stderr, "============ Testing format = %s ========\n",
@@ -174,7 +194,6 @@ test_fbo(const struct format_info *info)
 		return GL_FALSE;
 	}
 
-
 	glGetBooleanv(GL_RGBA_INTEGER_MODE_EXT, &intMode);
 	if (check_error(__FILE__, __LINE__))
 		return GL_FALSE;
@@ -190,25 +209,54 @@ test_fbo(const struct format_info *info)
 	glGetIntegerv(GL_DRAW_BUFFER, &buf);
 	assert(buf == GL_COLOR_ATTACHMENT0_EXT);
 
-	glClearColorIiEXT(clr[0], clr[1], clr[2], clr[3]);
-	glClear(GL_COLOR_BUFFER_BIT);
+	/* Do glDraw/ReadPixels test */
+#define W 15
+#define H 10
+	GLint image[H * W * 4], readback[H * W * 4];
+	GLint i;
 
-	glReadPixels(5, 5, 1, 1, GL_RGBA_INTEGER_EXT, GL_INT, pix);
-
-	for (i = 0; i < comps; i++) {
-		if (pix[i] != clr[i]) {
-			fprintf(stderr, "%s: glClear failed\n",
-				TestName);
-			fprintf(stderr, "  Texture format = %s\n",
-				info->Name);
-			fprintf(stderr, "  Expected %d, %d, %d, %d\n",
-				clr[0], clr[1], clr[2], clr[3]);
-			fprintf(stderr, "  Found %d, %d, %d, %d\n",
-				pix[0], pix[1], pix[2], pix[3]);
+	if (info->Signed) {
+		for (i = 0; i < W * H * 4; i++) {
+			image[i] = ((i - 10) % max) + max;
+		}
+	}
+	else {
+		for (i = 0; i < W * H * 4; i++) {
+			image[i] = ((i + 3) % max) + max;
 		}
 	}
 
-	glutSwapBuffers();
+	glUseProgram(PassthroughProgram);
+
+	glWindowPos2i(1, 1);
+	glDrawPixels(W, H, GL_RGBA_INTEGER_EXT, GL_INT, image);
+
+	if (check_error(__FILE__, __LINE__))
+		return GL_FALSE;
+
+	glReadPixels(1, 1, W, H, GL_RGBA_INTEGER_EXT, GL_INT, readback);
+
+	if (check_error(__FILE__, __LINE__))
+		return GL_FALSE;
+
+	for (i = 0; i < W * H * 4; i++) {
+		if (readback[i] != image[i]) {
+			/* alpha = 1 if base format == RGB */
+			if (comps == 3 && i % 4 == 3 &&
+			    readback[i] == 1)
+				continue;
+
+			fprintf(stderr,
+				"%s: glDraw/ReadPixels failed at %d.  "
+				"Expected %d, found %d\n",
+				TestName, i, image[i], readback[i]);
+			fprintf(stderr, "Texture format = %s\n",
+				info->Name);
+			return GL_FALSE;
+		}
+	}
+
+	piglit_present_results();
 
 	glDeleteTextures(1, &texObj);
 	glDeleteFramebuffers(1, &fbo);

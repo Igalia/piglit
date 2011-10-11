@@ -1192,6 +1192,7 @@ ext_texture_integer['api-drawpixels'] = concurrent_test('ext_texture_integer-api
 ext_texture_integer['api-teximage'] = concurrent_test('ext_texture_integer-api-teximage')
 ext_texture_integer['api-readpixels'] = concurrent_test('ext_texture_integer-api-readpixels')
 ext_texture_integer['fbo_integer_precision_clear'] = plain_test('ext_texture_integer-fbo_integer_precision_clear')
+ext_texture_integer['fbo_integer_precision_drawpixels'] = plain_test('ext_texture_integer-fbo_integer_precision_drawpixels')
 ext_texture_integer['fbo_integer_readpixels_sint_uint'] = plain_test('ext_texture_integer-fbo_integer_readpixels_sint_uint')
 ext_texture_integer['texture_integer_glsl130'] = concurrent_test('ext_texture_integer-texture_integer_glsl130')
 
