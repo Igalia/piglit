@@ -48,8 +48,8 @@ piglit_display(void)
 
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	for (y = 0; y < piglit_height; y++) {
-		for (x = 0; x < piglit_width; x++) {
+	for (y = 8; y < piglit_height && pass; y += 16) {
+		for (x = 8; x < piglit_width; x += 16) {
 			float color[3];
 
 			color[0] = x / 256.0;
