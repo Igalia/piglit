@@ -23,6 +23,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "config.h"
 
 #if defined(_WIN32)
@@ -217,3 +221,7 @@ extern void piglit_set_rlimit(unsigned long lim);
 
 static const GLint PIGLIT_ATTRIB_POS = 0;
 static const GLint PIGLIT_ATTRIB_TEX = 1;
+
+#ifdef __cplusplus
+} /* end extern "C" */
+#endif
