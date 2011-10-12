@@ -3,8 +3,7 @@
 # Testing the r500 DRI driver
 #
 
-import os
-import re
+import os.path
 
 execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 

@@ -4,13 +4,9 @@
 # Testing drivers for Radeon hardware
 #
 
-import os
-import re
+import os.path
 
 execfile(os.path.dirname(__file__) + '/all.tests')
-
-from framework.core import *
-from framework.gleantest import *
 
 GleanTest.globalParams += [ "--quick" ]
 

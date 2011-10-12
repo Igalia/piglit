@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
-import subprocess
-
-from framework.core import *
-from framework.exectest import *
-from framework.gleantest import *
+import os.path
 
 execfile(os.path.dirname(__file__) + '/quick.tests')
 

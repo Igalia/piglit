@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 # All tests that come with piglit, using default settings
 
-import os
-import re
-import subprocess
+import os.path
 
 from framework.core import *
 from framework.exectest import *
