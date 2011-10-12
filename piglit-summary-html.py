@@ -23,9 +23,10 @@
 
 from getopt import getopt, GetoptError
 import cgi
-import os
+import os, os.path
 import sys
 
+sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 import framework.core as core
 import framework.summary
 
@@ -53,7 +54,7 @@ def writefile(filename, text):
 	f.write(text.encode('utf-8'))
 	f.close()
 
-templatedir = os.path.join(os.path.dirname(__file__), 'templates')
+templatedir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 Result = readfile(os.path.join(templatedir, 'result.html'))
 ResultDetail = readfile(os.path.join(templatedir, 'result_detail.html'))
 ResultList = readfile(os.path.join(templatedir, 'result_list.html'))

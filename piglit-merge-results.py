@@ -23,8 +23,9 @@
 
 
 from getopt import getopt, GetoptError
-import sys
+import sys, os.path
 
+sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 import framework.core as core
 
 

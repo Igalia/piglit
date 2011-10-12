@@ -29,6 +29,7 @@ import sys, os
 import time
 import traceback
 
+sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
 from framework.threads import synchronized_self
 
@@ -106,6 +107,10 @@ def main():
 	profileFilename = args[0]
 	resultsDir = args[1]
 
+	# Change to the piglit's path
+	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
+	os.chdir(piglit_dir)
+
 	core.checkDir(resultsDir, False)
 
 	results = core.TestrunResult()
@@ -126,7 +131,7 @@ def main():
 	for (key, value) in env.collectData().items():
 		json_writer.write_dict_item(key, value)
 
-	profile = core.loadTestProfile(profileFilename)
+	profile = core.loadTestProfile(profileFilename, resultsDir)
 	time_start = time.time()
 
 	profile.run(env, json_writer)

@@ -572,16 +572,17 @@ class TestProfile:
 ##### Loaders
 #############################################################################
 
-def loadTestProfile(filename):
+def loadTestProfile(filename, resdir):
+	ns = {
+		'__file__': filename,
+		'res_dir': resdir
+	}
 	try:
-		ns = {
-			'__file__': filename
-		}
 		execfile(filename, ns)
-		return ns['profile']
 	except:
 		traceback.print_exc()
 		raise Exception('Could not read tests profile')
+	return ns['profile']
 
 def loadTestResults(path):
 	if os.path.isdir(path):

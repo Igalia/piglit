@@ -7,8 +7,8 @@ from framework.core import *
 from framework.gleantest import *
 
 glean = Group()
-glean['basic'] = GleanTest('basic')
-glean['readPixSanity'] = GleanTest('readPixSanity')
+glean['basic'] = GleanTest('basic', res_dir)
+glean['readPixSanity'] = GleanTest('readPixSanity', res_dir)
 
 profile = TestProfile()
 profile.tests['glean'] = glean

@@ -33,20 +33,20 @@ from exectest import ExecTest
 def gleanExecutable():
 	return testBinDir + 'glean'
 
-def gleanResultDir():
-	return os.path.join('.', 'results', 'glean')
+def gleanResultDir(r_dir):
+	return os.path.join(r_dir, 'results', 'glean')
 
 class GleanTest(ExecTest):
 	globalParams = []
 
-	def __init__(self, name):
+	def __init__(self, name, resdir):
 		ExecTest.__init__(self, \
-			[gleanExecutable(), "-r", os.path.join(gleanResultDir(), name),
+			[gleanExecutable(), "-r", os.path.join(gleanResultDir(resdir), name),
 			"-o",
 			"-v", "-v", "-v",
 			"-t", "+"+name])
 
-		checkDir(os.path.join(gleanResultDir(), name), False)
+		checkDir(os.path.join(gleanResultDir(resdir), name), False)
 
 		self.name = name
 
