@@ -84,7 +84,7 @@ piglit_compile_shader(GLenum target, char *filename)
 
 	err = stat(filename_with_path, &st);
 	if (err == -1) {
-		fprintf(stderr, "Couldn't stat program %s: %s\n", filename, strerror(errno));
+		fprintf(stderr, "Couldn't stat program %s: %s\n", filename_with_path, strerror(errno));
 		fprintf(stderr, "You can override the source dir by setting the PIGLIT_SOURCE_DIR environment variable.\n");
 		exit(1);
 	}
