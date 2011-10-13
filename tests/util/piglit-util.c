@@ -105,6 +105,17 @@ bool piglit_is_extension_supported(const char *name)
 	return found;
 }
 
+void piglit_require_gl_version(int required_version_times_10)
+{
+	if (piglit_is_gles() ||
+	    piglit_get_gl_version() < required_version_times_10) {
+		printf("Test requires GL version %g\n",
+		       required_version_times_10 / 10.0);
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}
+
 void piglit_require_extension(const char *name)
 {
 	if (!piglit_is_extension_supported(name)) {
