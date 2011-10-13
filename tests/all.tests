@@ -848,6 +848,7 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 ['compiler'])
 spec['glsl-1.30']['execution'] = Group()
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-textureSize-2D')
+add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
 	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.30', 'execution'),
 		    recursive=True)
