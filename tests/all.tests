@@ -337,7 +337,7 @@ def add_getactiveuniform_count(group, name, expected):
 
 add_shader_test_dir(shaders,
                     os.path.dirname(__file__) + '/shaders',
-                    recursive=False)
+                    recursive=True)
 add_plain_test(shaders, 'activeprogram-bad-program')
 add_plain_test(shaders, 'activeprogram-get')
 add_plain_test(shaders, 'ati-fs-bad-delete')
