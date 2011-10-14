@@ -1178,6 +1178,7 @@ ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
 # unsupported for int yet
 #add_fbo_clear_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-clear-formats')
+add_plain_test(ext_texture_integer, 'ext_texture_integer-fbo_integer_precision_clear')
 
 arb_texture_rg = Group()
 spec['ARB_texture_rg'] = arb_texture_rg
