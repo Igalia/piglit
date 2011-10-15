@@ -44,22 +44,24 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	static float red[]   = {1.0, 0.0, 0.0, 0.0};
+	static float blue[]   = {0.0, 0.0, 1.0, 0.0};
 	static float green[] = {0.0, 1.0, 0.0, 0.0};
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	glClearColor(1.0, 0.0, 0.0, 0.0);
+	glClearColor(0.0, 0.0, 1.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor4fv(green);
-	piglit_draw_rect(piglit_width / 2, 0, piglit_width / 2, piglit_height);
+	piglit_draw_rect(0, piglit_height / 2, piglit_width, piglit_height);
 
 	glReadBuffer(GL_FRONT);
 
 	glutSwapBuffers();
 
-	pass &= piglit_probe_rect_rgb(0, 0, piglit_width/2, piglit_height, red);
-	pass &= piglit_probe_rect_rgb(piglit_width/2, 0, piglit_width/2, piglit_height, green);
+	pass &= piglit_probe_rect_rgb(0, 0,
+				      piglit_width, piglit_height / 2, blue);
+	pass &= piglit_probe_rect_rgb(0, piglit_height / 2,
+				      piglit_width, piglit_height / 2, green);
 
 	glReadBuffer(GL_BACK);
 
