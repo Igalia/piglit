@@ -25,6 +25,12 @@ generatedTestDir = os.path.join(
 	'generated_tests')
 
 # Quick wrapper for PlainExecTest for our usual concurrent args.
+def plain_test(name):
+	return PlainExecTest([name, '-auto'])
+
+def add_plain_test(group, name):
+	group[name] = PlainExecTest([name, '-auto'])
+
 def concurrent_test(args):
 	test = PlainExecTest(args + " -auto -fbo")
 	test.runConcurrent = True
