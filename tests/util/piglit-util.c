@@ -77,7 +77,7 @@ int piglit_get_gl_version()
 		version_number_string = version_string;
 
 	/* Interpret version number */
-	scanf_count = sscanf(version_string, "%i.%i", &major, &minor);
+	scanf_count = sscanf(version_number_string, "%i.%i", &major, &minor);
 	if (scanf_count != 2) {
 		printf("Unable to interpret GL_VERSION string: %s\n",
 		       version_string);
