@@ -37,6 +37,7 @@
 #include <libgen.h>
 #endif
 #include "piglit-util.h"
+#include "piglit-vbo.h"
 
 int piglit_width = 250, piglit_height = 250;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
@@ -65,7 +66,10 @@ unsigned num_fragment_shaders = 0;
 char *shader_strings[256];
 GLsizei shader_string_sizes[256];
 unsigned num_shader_strings = 0;
+const char *vertex_data_start = NULL;
+const char *vertex_data_end = NULL;
 GLuint prog;
+size_t num_vbo_rows = 0;
 
 enum states {
 	none = 0,
@@ -79,6 +83,7 @@ enum states {
 	fragment_shader,
 	fragment_shader_file,
 	fragment_program,
+	vertex_data,
 	test,
 };
 
@@ -473,6 +478,10 @@ leave_state(enum states state, const char *line)
 	case fragment_program:
 		break;
 
+	case vertex_data:
+		vertex_data_end = line;
+		break;
+
 	case test:
 		break;
 
@@ -592,6 +601,9 @@ process_test_script(const char *script_name)
 				state = fragment_shader_file;
 				shader_strings[0] = NULL;
 				num_shader_strings = 0;
+			} else if (strncmp(line, "[vertex data]", 13) == 0) {
+				state = vertex_data;
+				vertex_data_start = NULL;
 			} else if (strncmp(line, "[test]", 6) == 0) {
 				test_start = strchrnul(line, '\n');
 				if (test_start[0] != '\0')
@@ -623,6 +635,11 @@ process_test_script(const char *script_name)
 				line = eat_whitespace(line);
 				if ((line[0] != '\n') && (line[0] != '#'))
 				    load_shader_file(line);
+				break;
+
+			case vertex_data:
+				if (vertex_data_start == NULL)
+					vertex_data_start = line;
 				break;
 
 			case test:
@@ -884,6 +901,43 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+
+struct mode_table {
+	const char *name;
+	GLenum value;
+} mode_table[] = {
+	{ "GL_POINTS",         GL_POINTS         },
+	{ "GL_LINE_STRIP",     GL_LINE_STRIP     },
+	{ "GL_LINE_LOOP",      GL_LINE_LOOP      },
+	{ "GL_LINES",          GL_LINES          },
+	{ "GL_POLYGON",        GL_POLYGON        },
+	{ "GL_TRIANGLE_STRIP", GL_TRIANGLE_STRIP },
+	{ "GL_TRIANGLE_FAN",   GL_TRIANGLE_FAN   },
+	{ "GL_TRIANGLES",      GL_TRIANGLES      },
+	{ "GL_QUAD_STRIP",     GL_QUAD_STRIP     },
+	{ "GL_QUADS",          GL_QUADS          },
+	{ NULL, 0 }
+};
+
+
+GLenum
+decode_mode(const char *mode_str)
+{
+	int i;
+
+	for (i = 0; mode_table[i].name; ++i) {
+		if (0 == strcmp(mode_str, mode_table[i].name))
+			return mode_table[i].value;
+	}
+
+	printf("unknown drawing mode \"%s\"", mode_str);
+	piglit_report_result(PIGLIT_FAIL);
+
+	/* Should not be reached, but return 0 to avoid compiler warning */
+	return 0;
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
@@ -900,6 +954,7 @@ piglit_display(void)
 		float c[32];
 		double d[4];
 		int x, y, w, h, l, tex, level;
+		char s[32];
 
 		line = eat_whitespace(line);
 
@@ -927,6 +982,28 @@ piglit_display(void)
 			       &primcount,
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
+		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y)) {
+			GLenum mode = decode_mode(s);
+			int first = x;
+			size_t count = (size_t) y;
+			if (first < 0) {
+				printf("draw arrays 'first' must be >= 0\n");
+				piglit_report_result(PIGLIT_FAIL);
+			} else if ((size_t) first >= num_vbo_rows) {
+				printf("draw arrays 'first' must be < %lu\n",
+				       num_vbo_rows);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			if (count <= 0) {
+				printf("draw arrays 'count' must be > 0\n");
+				piglit_report_result(PIGLIT_FAIL);
+			} else if (count > num_vbo_rows - (size_t) first) {
+				printf("draw arrays cannot draw beyond %lu\n",
+				       num_vbo_rows);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			/* TODO: wrapper? */
+			glDrawArrays(mode, first, count);
 		} else if (string_match("disable", line)) {
 			do_enable_disable(line + 7, false);
 		} else if (string_match("enable", line)) {
@@ -1523,4 +1600,7 @@ piglit_init(int argc, char **argv)
 
 	process_test_script(argv[1]);
 	link_and_use_shaders();
+	if (vertex_data_start != NULL)
+		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
+						   vertex_data_end);
 }

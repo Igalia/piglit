@@ -10,6 +10,7 @@ set(UTIL_SOURCES
 	piglit-shader.c
 	piglit-shader-gl.c
 	piglit-util-gl.c
+	piglit-vbo.cpp
 	)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
