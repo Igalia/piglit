@@ -11,4 +11,6 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (ext_timer_query-time-elapsed time-elapsed.c)
+IF (UNIX)
+   add_executable (ext_timer_query-time-elapsed time-elapsed.c)
+ENDIF (UNIX)
