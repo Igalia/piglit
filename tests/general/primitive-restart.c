@@ -340,7 +340,7 @@ test_draw_arrays(void)
 #define NUM_VERTS 12
    GLfloat verts[NUM_VERTS+2][2];
    const GLfloat dx = 20.0;
-   GLfloat x, dx;
+   GLfloat x;
    GLuint restart_index;
    GLboolean pass = GL_TRUE;
    const char *primStr = "GL_LINE_STRIP";
