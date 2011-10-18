@@ -339,6 +339,7 @@ test_draw_arrays(void)
 {
 #define NUM_VERTS 12
    GLfloat verts[NUM_VERTS+2][2];
+   const GLfloat dx = 20.0;
    GLfloat x, dx;
    GLuint restart_index;
    GLboolean pass = GL_TRUE;
@@ -347,7 +348,6 @@ test_draw_arrays(void)
    const GLenum primMode = GL_LINE_STRIP;
 
    x = 0.0;
-   dx = 20.0;
 
    /* setup vertices */
    {
@@ -395,12 +395,13 @@ test_draw_arrays(void)
 
       /* check */
       {
-         const GLfloat x0 = 0.0, dx = 20.0;
+         const GLfloat x0 = 0.0;
          const GLint iy = piglit_height / 2;
          GLint i;
 
          /* probe at midpoint of each line segment */
          for (i = 0; i < NUM_VERTS - 1 && pass; i++) {
+            /* test midpoint of line to see if it was drawn */
             const float fx = x0 + 0.5 * dx + i * dx;
             const int ix = (int) fx;
 
