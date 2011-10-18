@@ -148,7 +148,7 @@ test_begin_end(GLenum primMode)
                ? "GL_TRIANGLE_STRIP" : "GL_LINE_STRIP"));
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass;
 }
@@ -323,7 +323,7 @@ test_draw_elements(GLenum primMode, GLenum indexType)
               TestName, primStr, typeStr);      
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass;
 #undef NUM_VERTS
@@ -391,7 +391,6 @@ test_draw_arrays(void)
       enable_restart(restart_index);
       glDrawArrays(primMode, 0, NUM_VERTS);
       disable_restart();
-      glutSwapBuffers();
 
       /* check */
       {
@@ -425,6 +424,8 @@ test_draw_arrays(void)
          }
       }
    }
+
+   piglit_present_results();
 
    if (!pass) {
       fprintf(stderr, "%s: failure drawing with glDrawArrays(%s), "
