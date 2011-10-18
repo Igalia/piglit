@@ -35,7 +35,7 @@
 
 namespace GLEAN {
 
-#define drawingSize 8           // We will check each pair of blend factors
+#define drawingSize 32          // We will check each pair of blend factors
 				// for each pixel in a square image of this
 				// dimension, so if you make it too large,
 				// the tests may take quite a while to run.

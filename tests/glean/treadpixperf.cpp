@@ -207,7 +207,7 @@ ReadpixPerfTest::runNonPBOtest(int formatNum, GLsizei width, GLsizei height,
 
 	delete buffer;
 
-	double rate = width * height * iter / elapsedTime / 1000000.0;
+	double rate = static_cast<double>(width) * height * iter / elapsedTime / 1000000.0;
 	return rate;
 }
 
@@ -299,7 +299,7 @@ ReadpixPerfTest::runPBOtest(int formatNum, GLsizei width, GLsizei height,
 	delete b;
 #endif
 
-	double rate = width * height * iter / elapsedTime / 1000000.0;
+	double rate = static_cast<double>(width) * height * iter / elapsedTime / 1000000.0;
 	return rate;
 #else
 	return 0.0;

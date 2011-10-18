@@ -133,6 +133,53 @@ static const FragmentProgram Programs[] = {
 		},
 		DONT_CARE_Z
 	},
+
+	{
+		"ADD an immediate",
+		"!!ARBfp1.0\n"
+		"PARAM p = program.local[1]; \n"
+		"ADD result.color, p, {0.25, 0.0, 0.5, 0.25}; \n"
+		"END \n",
+		{ CLAMP01(Param1[0] + 0.25),
+		  CLAMP01(Param1[1] + 0.0),
+		  CLAMP01(Param1[2] + 0.5),
+		  CLAMP01(Param1[3] + 0.25),
+		},
+		DONT_CARE_Z
+	},
+
+	{
+		"ADD negative immediate",
+		"!!ARBfp1.0\n"
+		"PARAM p = program.local[1]; \n"
+		"ADD result.color, p, {-0.25, -0.2, 0.0, -0.25}; \n"
+		"END \n",
+		{ CLAMP01(Param1[0] - 0.25),
+		  CLAMP01(Param1[1] - 0.2),
+		  CLAMP01(Param1[2] - 0.0),
+		  CLAMP01(Param1[3] - 0.25),
+		},
+		DONT_CARE_Z
+	},
+
+	{
+		"ADD negative immediate (2)",
+		"!!ARBfp1.0\n"
+		"PARAM p = program.local[1]; \n"
+		"TEMP t; \n"
+		"MOV t, p; \n"
+		"MUL t.xyz, t, 2.0; \n"
+		"ADD t.xyz, t, -1.0; \n"
+		"MOV result.color, t; \n"
+		"END \n",
+		{ CLAMP01(Param1[0] * 2.0 - 1.0),
+		  CLAMP01(Param1[1] * 2.0 - 1.0),
+		  CLAMP01(Param1[2] * 2.0 - 1.0),
+		  CLAMP01(Param1[3] ),
+		},
+		DONT_CARE_Z
+	},
+
 	{
 		"CMP test",
 		"!!ARBfp1.0\n"
@@ -185,6 +232,21 @@ static const FragmentProgram Programs[] = {
 		{ SMEAR(CLAMP01(Param1[0] * FragColor[0] +
                                 Param1[1] * FragColor[1] +
                                 Param1[2] * FragColor[2]))
+		},
+		DONT_CARE_Z
+	},
+	{
+		"DP3 test (2)",
+		"!!ARBfp1.0\n"
+		"PARAM p1 = program.local[1]; \n"
+		"TEMP t, r; \n"
+		"MOV t, p1; \n"
+		"DP3 r.x, t, t; \n"
+		"MUL result.color, r.xxxx, 0.5; \n"
+		"END \n",
+		{ SMEAR(CLAMP01((Param1[0] * Param1[0] +
+				 Param1[1] * Param1[1] +
+				 Param1[2] * Param1[2]) * 0.5))
 		},
 		DONT_CARE_Z
 	},

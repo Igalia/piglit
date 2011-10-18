@@ -31,7 +31,6 @@
 #include "tvtxperf.h"
 #include "geomutil.h"
 #include "timer.h"
-#include "rand.h"
 #include "image.h"
 #include "codedid.h"
 #include "treadpix.h"

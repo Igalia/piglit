@@ -35,12 +35,10 @@
 // methods stuffed in a display list.
 
 #include "geomrend.h"
-#include "rand.h"
 #include "glutils.h"
 #include <algorithm>
 #include <iostream>
 #include <cmath>
-#include <float.h>
 #include <cassert>
 
 using namespace std;

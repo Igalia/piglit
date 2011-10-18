@@ -36,11 +36,9 @@
 
 #include <iostream>
 #include "dsconfig.h"
-#include "dsfilt.h"
 #include "dsurf.h"
 #include "winsys.h"
 #include "environ.h"
-#include "rc.h"
 #include "test.h"
 
 namespace GLEAN {
@@ -63,6 +61,7 @@ Test::Test(const char* testName, const char *descrip):
     name(testName), description(descrip) {
 	prereqs = 0;
 	hasRun = false;
+	env = NULL;
 	nextTest = testList;
 	testList = this;
 	++testCount;
@@ -72,6 +71,7 @@ Test::Test(const char* testName, const char *descrip, Test** thePrereqs):
     name(testName), description(descrip) {
 	prereqs = thePrereqs;
 	hasRun = false;
+	env = NULL;
 	nextTest = testList;
 	testList = this;
 	++testCount;

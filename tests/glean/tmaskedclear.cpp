@@ -29,8 +29,6 @@
 // tmaskedclear.cpp:  Test color/index masking with glClear.
 
 #include "tmaskedclear.h"
-#include "rand.h"
-#include "image.h"
 
 namespace GLEAN {
 

@@ -1,7 +1,7 @@
 // BEGIN_COPYRIGHT -*- glean -*-
 // 
 // Copyright (C) 1999  Allen Akin   All Rights Reserved.
-// Copyright (C) 2008  VMWare, Inc.  All Rights Reserved.
+// Copyright (C) 2008  VMware, Inc.  All Rights Reserved.
 // 
 // Permission is hereby granted, free of charge, to any person
 // obtaining a copy of this software and associated documentation
@@ -92,9 +92,10 @@ static PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv_func = NULL;
 #define FLAG_ILLEGAL_SHADER   0x2  // the shader test should not compile
 #define FLAG_ILLEGAL_LINK     0x4  // the shaders should not link
 #define FLAG_VERSION_1_20     0x8  // GLSL 1.20 test
-#define FLAG_WINDING_CW       0x10  // clockwise-winding polygon
-#define FLAG_VERTEX_TEXTURE   0x20
-#define FLAG_ARB_DRAW_BUFFERS 0x40
+#define FLAG_VERSION_1_30     0x10  // GLSL 1.30 test
+#define FLAG_WINDING_CW       0x20  // clockwise-winding polygon
+#define FLAG_VERTEX_TEXTURE   0x40
+#define FLAG_ARB_DRAW_BUFFERS 0x80
 
 #define DONT_CARE_Z -1.0
 
@@ -143,6 +144,12 @@ static const GLfloat LightDiffuse[4] = LIGHT_DIFFUSE;
 
 static const GLfloat Uniform1[4] = UNIFORM1;
 static const GLfloat UniformArray[4] = { 0.1, 0.25, 0.5, 0.75 };
+static const GLfloat UniformArray4[4][4] = {
+   { 0.1, 0.2, 0.3, 0.4 },
+   { 0.9, 0.8, 0.7, 0.6 },
+   { 0.5, 0.6, 0.7, 0.5 },
+   { 0.3, 0.4, 0.5, 0.6 }
+};
 
 static const GLfloat PointAtten[3] = { PSIZE_ATTEN0, PSIZE_ATTEN1, PSIZE_ATTEN2 };
 static const GLfloat FogColor[4] = { FOG_R, FOG_G, FOG_B, FOG_A };
@@ -473,6 +480,36 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
+		"Negation",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 a = vec4(0.5,  0.25, 0.0, 0.0); \n"
+		"   vec4 b = uniform1; \n"
+                "   vec4 na = -a; \n"
+                "   vec4 nb = -b; \n"
+                "   vec4 x = na + nb; \n"
+		"   gl_FragColor = -x; \n"
+		"} \n",
+		{ 1.0, 0.5, 0.75, 0.0 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"Negation2",
+		NO_VERTEX_SHADER,
+		"uniform vec4 uniform1; \n"
+		"void main() { \n"
+		"   vec4 a = -uniform1; \n"
+		"   gl_FragColor = -a; \n"
+		"} \n",
+		UNIFORM1,
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
 		"chained assignment",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -488,6 +525,7 @@ static const ShaderProgram Programs[] = {
 	{
 		"integer, float arithmetic",
 		NO_VERTEX_SHADER,
+                "#version 120 \n"
 		"void main() { \n"
 		"   int k = 100; \n"
 		"   gl_FragColor.x = k * 0.01; \n"
@@ -497,7 +535,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 0.5, 0.25, 0.0 },
 		DONT_CARE_Z,
-		FLAG_NONE
+		FLAG_VERSION_1_20
 	},
 
 	{
@@ -518,7 +556,7 @@ static const ShaderProgram Programs[] = {
 		"void main() { \n"
 		"   int i = 15, j = 6; \n"
 		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(k * 0.1); \n"
+		"   gl_FragColor = vec4(float(k) * 0.1); \n"
 		"} \n",
 		{ 0.2, 0.2, 0.2, 0.2 },
 		DONT_CARE_Z,
@@ -531,10 +569,10 @@ static const ShaderProgram Programs[] = {
 		"// as above, but prevent compile-time evaluation \n"
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
-		"   int i = int(15 * uniform1.x); \n"
+		"   int i = int(15.0 * uniform1.x); \n"
 		"   int j = 6; \n"
 		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(k * 0.1); \n"
+		"   gl_FragColor = vec4(float(k) * 0.1); \n"
 		"} \n",
 		{ 0.2, 0.2, 0.2, 0.2 },
 		DONT_CARE_Z,
@@ -1167,7 +1205,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"simple if/else statement, fragment shader",
+		"simple if-else statement, fragment shader",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   // this should always be false \n"
@@ -1183,7 +1221,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"simple if/else statement, vertex shader",
+		"simple if-else statement, vertex shader",
 		"uniform vec4 uniform1; \n"
 		"void main() { \n"
 		"   gl_Position = ftransform(); \n"
@@ -1519,6 +1557,31 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		NO_FRAGMENT_SHADER,
 		{ 0.5, 0.5, 0.5, 0.5 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
+	{
+		"constant array of vec4 with variable indexing, vertex shader",
+		"uniform vec4 uniform1; \n"
+		"uniform float uniformArray[4]; \n"
+		"uniform vec4 uniformArray4[4]; \n"
+		"void main() { \n"
+		"   int i0 = int(gl_TexCoord[0].x); \n"
+		"   int i1 = int(gl_TexCoord[0].y); \n"
+		"   int i2 = int(gl_TexCoord[0].z); \n"
+		"   int i3 = int(gl_TexCoord[0].w); \n"
+
+		"   int indx0 = int(uniform1.y * 3.0);  // should be 2 \n"
+		"   int indx = int(uniform1.y * 8.0);  // should be 2 \n"
+		"   gl_FrontColor.z = uniformArray4[indx].z; \n"
+		"   gl_FrontColor.x = uniformArray4[indx].x; \n"
+		"   gl_FrontColor.w = uniformArray4[indx].w; \n"
+		"   gl_FrontColor.y = uniformArray4[indx].y; \n"
+		"   gl_Position = ftransform(); \n"
+		"} \n",
+		NO_FRAGMENT_SHADER,
+		{ 0.5, 0.6, 0.7, 0.5 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -2038,7 +2101,7 @@ static const ShaderProgram Programs[] = {
 		// Note: var3 = gl_Color
 		// Note: var1 = -var2
 		// Final fragment color should be equal to gl_Color
-		"varying variable read/write",
+		"varying variable read-write",
 		// vertex program:
 		"varying vec4 var1, var2, var3; \n"
 		"void main() { \n"
@@ -2298,7 +2361,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.1, 0.1, 0.5); \n"
 		"   // shadow map value should be 0.25 \n"
 		"   gl_FragColor = shadow2D(texZ, coord) + vec4(0.25); \n"
-		"   // 0.5 <= 0.25 ? color = 1 : 0\n"
+		"   // color = (0.5 <= 0.25) ? 1.25 : 0.25\n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 1.0 },
 		DONT_CARE_Z,
@@ -2313,7 +2376,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.1, 0.1, 0.2); \n"
 		"   // shadow map value should be 0.25 \n"
 		"   gl_FragColor = shadow2D(texZ, coord); \n"
-		"   // 0.2 <= 0.25 ? color = 1 : 0\n"
+		"   // color = (0.2 <= 0.25) ? 1 : 0\n"
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -2328,7 +2391,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.9, 0.9, 0.95); \n"
 		"   // shadow map value should be 0.75 \n"
 		"   gl_FragColor = shadow2D(texZ, coord) + vec4(0.25); \n"
-		"   // 0.95 <= 0.75 ? color = 1 : 0\n"
+		"   // color = (0.95 <= 0.75) ? 1.25 : 0.25\n"
 		"} \n",
 		{ 0.25, 0.25, 0.25, 1.0 },
 		DONT_CARE_Z,
@@ -2343,7 +2406,7 @@ static const ShaderProgram Programs[] = {
 		"   vec3 coord = vec3(0.9, 0.9, 0.65); \n"
 		"   // shadow map value should be 0.75 \n"
 		"   gl_FragColor = shadow2D(texZ, coord); \n"
-		"   // 0.65 <= 0.75 ? color = 1 : 0\n"
+		"   // color = (0.65 <= 0.75) ? 1 : 0\n"
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
@@ -2544,6 +2607,27 @@ static const ShaderProgram Programs[] = {
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
+
+	{
+		"function prototype",
+		NO_VERTEX_SHADER,
+		"float Half(const in float x); \n"
+		"\n"
+		"void main() { \n"
+		"   float a = 0.5; \n"
+		"   float b = Half(a); \n"
+		"   gl_FragColor = vec4(b); \n"
+		"} \n"
+		"\n"
+		"float Half(const in float x) { \n"
+		"   return 0.5 * x; \n"
+		"} \n"
+		"\n",
+		{ 0.25, 0.25, 0.25, 0.25 },
+		DONT_CARE_Z,
+		FLAG_NONE
+	},
+
 
 	{
 		"TPPStreamCompiler::assignOperands",
@@ -3320,7 +3404,7 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"if (boolean/scalar) check",
+		"if (boolean-scalar) check",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
 		"   vec3 v; \n"
@@ -3859,11 +3943,11 @@ static const ShaderProgram Programs[] = {
 		FLAG_VERSION_1_20 | FLAG_ILLEGAL_SHADER
 	},
 
-	// Other new GLSL 1.20 features (just parse/compile tests)
+	// Other new GLSL 1.20, 1.30 features (just parse/compile tests)
 	{
-		"GLSL 1.20 precision qualifiers",
+		"GLSL 1.30 precision qualifiers",
 		NO_VERTEX_SHADER,
-		"#version 120 \n"
+		"#version 130 \n"
 		"highp float f1; \n"
 		"mediump float f2; \n"
 		"lowp float f3; \n"
@@ -3875,7 +3959,7 @@ static const ShaderProgram Programs[] = {
 		"} \n",
 		{ 1.0, 1.0, 1.0, 1.0 },
 		DONT_CARE_Z,
-		FLAG_VERSION_1_20
+		FLAG_VERSION_1_30
 	},
 	{
 		"GLSL 1.20 invariant, centroid qualifiers",
@@ -3963,12 +4047,14 @@ static const ShaderProgram Programs[] = {
 		// Does the linker correctly recognize that texcoord[1] is
 		// written by the vertex shader and read by the fragment shader?
 		// vert shader:
+		"varying vec4 gl_TexCoord[4]; \n"
 		"void main() { \n"
 		"   int i = 1; \n"
 		"   gl_TexCoord[i] = vec4(0.5, 0, 0, 0); \n"
 		"   gl_Position = ftransform(); \n"
 		"} \n",
 		// frag shader:
+		"varying vec4 gl_TexCoord[4]; \n"
 		"void main() { \n"
 		"   gl_FragColor = gl_TexCoord[1]; \n"
 		"} \n",
@@ -4256,6 +4342,7 @@ GLSLTest::setupTextures(void)
 
 	//
 	// 2D GL_DEPTH_COMPONENT texture (for shadow sampler tests)
+	// Left half = 0.25, right half = 0.75
 	//
 	for (i = 0; i < 16; i++) {
 		for (j = 0; j < 16; j++) {
@@ -4305,11 +4392,13 @@ GLSLTest::setup(void)
 #else
 	const char *glslVersion = NULL;
 #endif
-	if (!glslVersion || glslVersion[0] != '1') {
+	const float version = atof(glslVersion);
+	if (version < 1.00) {
 		env->log << "GLSL 1.x not supported\n";
 		return false;
 	}
-	glsl_120 = (glslVersion[2] >= '2');
+	glsl_120 = version >= 1.20;
+	glsl_130 = version >= 1.30;
 
 	if (!getFunctions()) {
 		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
@@ -4507,7 +4596,7 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	};
 	const GLfloat r = 0.62; // XXX draw 16x16 pixel quad
 	GLuint fragShader = 0, vertShader = 0, program = 0;
-	GLint u1, uArray, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
+	GLint u1, uArray, uArray4, utex1d, utex2d, utex3d, utexZ, umat4, umat4t;
 	GLint umat2x4, umat2x4t, umat4x3, umat4x3t;
 	bool retVal = false;
 
@@ -4611,6 +4700,10 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	if (uArray >= 0)
 		glUniform1fv_func(uArray, 4, UniformArray);
 
+	uArray4 = glGetUniformLocation_func(program, "uniformArray4");
+	if (uArray4 >= 0)
+		glUniform4fv_func(uArray4, 4, (float *) UniformArray4);
+
 	utex1d = glGetUniformLocation_func(program, "tex1d");
 	if (utex1d >= 0)
 		glUniform1i_func(utex1d, 0);  // bind to tex unit 0
@@ -4678,6 +4771,8 @@ GLSLTest::testProgram(const ShaderProgram &p)
 		glEnd();
 	}
 
+	// env->log << "  Shader test: " << p.name << "\n";
+
 	// read a pixel from lower-left corder of rendered quad
 	GLfloat pixel[4];
 	glReadPixels(windowSize / 2 - 2, windowSize / 2 - 2, 1, 1,
@@ -4739,6 +4834,12 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 		env->log << "glsl1: Running single test: " << singleTest << "\n";
 		for (int i = 0; Programs[i].name; i++) {
 			if (strcmp(Programs[i].name, singleTest) == 0) {
+
+				if ((Programs[i].flags & FLAG_VERSION_1_20) && !glsl_120)
+					break; // skip non-applicable tests
+				if ((Programs[i].flags & FLAG_VERSION_1_30) && !glsl_130)
+					break; // skip non-applicable tests
+
 				r.numPassed = testProgram(Programs[i]);
 				r.numFailed = 1 - r.numPassed;
 				break;
@@ -4749,6 +4850,8 @@ GLSLTest::runOne(MultiTestResult &r, Window &w)
 		// loop over all tests
 		for (int i = 0; Programs[i].name; i++) {
 			if ((Programs[i].flags & FLAG_VERSION_1_20) && !glsl_120)
+				continue; // skip non-applicable tests
+			if ((Programs[i].flags & FLAG_VERSION_1_30) && !glsl_130)
 				continue; // skip non-applicable tests
 			if (testProgram(Programs[i])) {
 				r.numPassed++;
@@ -4767,16 +4870,13 @@ bool
 GLSLTest::isApplicable() const
 {
 	const char *version = (const char *) glGetString(GL_VERSION);
-	if (strncmp(version, "2.0", 3) == 0 ||
-		strncmp(version, "2.1", 3) == 0 ||
-		strncmp(version, "3.0", 3) == 0 ||
-		strncmp(version, "3.1", 3) == 0 ||
-		strncmp(version, "3.2", 3) == 0) {
+	const float v = atof(version);
+	if (v >= 2.0) {
 		return true;
 	}
 	else {
 		env->log << name
-				 << ":  skipped.  Requires GL 2.0, 2.1 or 3.0.\n";
+				 << ":  skipped.  Requires GL 2.0 or later.\n";
 		return false;
 	}
 }

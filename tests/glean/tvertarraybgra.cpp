@@ -70,8 +70,7 @@ VertArrayBGRATest::testAPI(void)
 
 	// Get glVertexAttrib() function
 	PFNGLVERTEXATTRIBPOINTERARBPROC VertexAttribPointer = NULL;
-	const char *version = (const char *) glGetString(GL_VERSION);
-	if (version[0] == '2') {
+	if (GLUtils::getVersion() >= 2.0) {
 		VertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERARBPROC)
 			GLUtils::getProcAddress("glVertexAttribPointer");
 	}
@@ -140,18 +139,18 @@ void
 VertArrayBGRATest::renderPoints(bool useBGRA)
 {
 	glVertexPointer(2, GL_FLOAT, 0, mPos);
-	glEnable(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 
 	if (useBGRA)
 		glColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, mBGRA);
 	else
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, mRGBA);
-	glEnable(GL_COLOR_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
 
 	glDrawArrays(GL_POINTS, 0, NUM_POINTS);
 
-	glDisable(GL_VERTEX_ARRAY);
-	glDisable(GL_COLOR_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
