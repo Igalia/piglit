@@ -37,8 +37,7 @@
 #include "environ.h"
 #include "lex.h"
 #include "glutils.h"
-#include <cstdlib>
-#if defined(__X11__)
+#if defined(__X11__) || defined(__AGL__)
 #   include <dlfcn.h>
 #endif
 #if defined(__AGL__)
@@ -142,7 +141,7 @@ void
 #	error "Need GetProcAddress (or equivalent) for BeOS"
 	return 0;
 #elif defined(__AGL__)
-	return reinterpret_cast<void (*)()>(glutGetProcAddress(name));
+	return reinterpret_cast<void (*)()>(dlsym(RTLD_DEFAULT, name));
 #endif
 } // getProcAddress
 

@@ -128,9 +128,9 @@ TextureSRGBTest::testImageTransfer(void)
 				env->log << "Expected value at ["
 					<< j
 					<< "] should be "
-					<< image[j]
+					<< (int) image[j]
 					<< " found "
-					<< image2[j]
+					<< (int) image2[j]
 					<< "\n";
 				delete [] image;
                                 return false;

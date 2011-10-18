@@ -70,8 +70,7 @@ VertArrayBGRATest::testAPI(void)
 
 	// Get glVertexAttrib() function
 	PFNGLVERTEXATTRIBPOINTERARBPROC VertexAttribPointer = NULL;
-	const char *version = (const char *) glGetString(GL_VERSION);
-	if (version[0] == '2') {
+	if (GLUtils::getVersion() >= 2.0) {
 		VertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERARBPROC)
 			GLUtils::getProcAddress("glVertexAttribPointer");
 	}

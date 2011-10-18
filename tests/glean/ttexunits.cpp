@@ -69,11 +69,9 @@ TexUnitsTest::reportFailure(const char *msg, GLint unit) const
 bool
 TexUnitsTest::setup(void)
 {
-   // check that we have OpenGL 2.x or 3.x
-   const char *verString = (const char *) glGetString(GL_VERSION);
-
-   if (verString[0] != '2' && verString[0] != '3') {
-      env->log << "OpenGL 2.x or 3.x not supported\n";
+   // check that we have at least OpenGL 2.0
+   if (GLUtils::getVersion() < 2.0) {
+      env->log << "OpenGL >= 2.0 not supported\n";
       return false;
    }
 

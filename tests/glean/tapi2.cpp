@@ -181,8 +181,7 @@ bool
 API2Test::setup(void)
 {
 	// check that we have OpenGL 2.0
-	const char *version = (const char *) glGetString(GL_VERSION);
-	if (version[0] != '2' || version[1] != '.') {
+	if (GLUtils::getVersion() < 2.0) {
 		//env->log << "OpenGL 2.0 not supported\n";
 		return false;
 	}

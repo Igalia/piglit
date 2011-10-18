@@ -573,15 +573,12 @@ ShaderAPIResult::getresults(istream &s)
 bool
 ShaderAPITest::isApplicable() const
 {
-	const char *version = (const char *) glGetString(GL_VERSION);
-	if (strncmp(version, "2.0", 3) == 0 ||
-		strncmp(version, "2.1", 3) == 0 ||
-		strncmp(version, "3.0", 3) == 0) {
+	if (GLUtils::getVersion() >= 2.0) {
 		return true;
 	}
 	else {
 		env->log << name
-				 << ":  skipped.  Requires GL 2.0, 2.1 or 3.0.\n";
+				 << ":  skipped.  Requires GL >= 2.0.\n";
 		return false;
 	}
 }

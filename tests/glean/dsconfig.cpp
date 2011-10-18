@@ -37,7 +37,7 @@
 #include <map>
 #include <limits.h>
 
-#ifdef __WIN__
+#ifdef _MSC_VER
 // disable the annoying warning : "forcing value to bool 'true' or 'false' (performance warning)"
 #pragma warning (disable : 4800)
 #endif
