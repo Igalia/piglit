@@ -35,6 +35,23 @@ struct egl_test {
 	enum piglit_result (*draw)(struct egl_state *state);
 };
 
+
+static const EGLint egl_default_attribs[] = {
+	EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PIXMAP_BIT | EGL_PBUFFER_BIT,
+	EGL_RED_SIZE, 1,
+	EGL_GREEN_SIZE, 1,
+	EGL_BLUE_SIZE, 1,
+	EGL_DEPTH_SIZE, 1,
+	EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+	EGL_NONE
+};
+
+/**
+ * \brief Initialize test to default values.
+ */
+void
+egl_init_test(struct egl_test *test);
+
 EGLSurface
 egl_util_create_pixmap(struct egl_state *state,
 		       int width, int height, const EGLint *attribs);

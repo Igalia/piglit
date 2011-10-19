@@ -41,16 +41,6 @@ static const EGLint pixmap_attribs[] = {
 	EGL_NONE
 };
 
-static const EGLint attribs[] = {
-	EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PIXMAP_BIT | EGL_PBUFFER_BIT,
-	EGL_RED_SIZE, 1,
-	EGL_GREEN_SIZE, 1,
-	EGL_BLUE_SIZE, 1,
-	EGL_DEPTH_SIZE, 1,
-	EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-	EGL_NONE
-};
-
 static enum piglit_result
 draw(struct egl_state *state)
 {
@@ -110,15 +100,15 @@ draw(struct egl_state *state)
 	return PIGLIT_PASS;
 }
 
-static const struct egl_test test = {
-	.config_attribs = attribs,
-	.extensions = extensions,
-	.draw = draw
-};
-
 int
 main(int argc, char *argv[])
 {
+	struct egl_test test;
+
+	egl_init_test(&test);
+	test.extensions = extensions;
+	test.draw = draw;
+
 	return egl_util_run(&test, argc, argv);
 }
 

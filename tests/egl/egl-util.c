@@ -37,6 +37,16 @@ static int automatic;
 
 int depth;
 
+void
+egl_init_test(struct egl_test *test)
+{
+	static const char *no_extensions[] = { NULL };
+
+	test->config_attribs = egl_default_attribs;
+	test->draw = NULL;
+	test->extensions = no_extensions;
+}
+
 EGLSurface
 egl_util_create_pixmap(struct egl_state *state,
 		       int width, int height, const EGLint *attribs)
