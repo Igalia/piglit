@@ -156,6 +156,10 @@ test_fbo(const struct format_info *info)
 	GLenum status;
 	GLboolean intMode;
 	GLint buf;
+#define W 15
+#define H 10
+	GLint image[H * W * 4], readback[H * W * 4];
+	GLint i;
 
 	if (0)
 		fprintf(stderr, "============ Testing format = %s ========\n",
@@ -210,11 +214,6 @@ test_fbo(const struct format_info *info)
 	assert(buf == GL_COLOR_ATTACHMENT0_EXT);
 
 	/* Do glDraw/ReadPixels test */
-#define W 15
-#define H 10
-	GLint image[H * W * 4], readback[H * W * 4];
-	GLint i;
-
 	if (info->Signed) {
 		for (i = 0; i < W * H * 4; i++) {
 			image[i] = ((i - 10) % max) + max;
