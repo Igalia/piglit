@@ -612,6 +612,9 @@ add_plain_test(glx, 'glx-window-life')
 glx['glx-window-life'].runConcurrent = True
 add_plain_test(glx, 'glx-pixmap-crosscheck')
 glx['glx-pixmap-crosscheck'].runConcurrent = True
+glx['glx-query-drawable-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH'])
+glx['glx-query-drawable-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT'])
+glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', '-auto', '--bad-drawable'])
 
 texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')

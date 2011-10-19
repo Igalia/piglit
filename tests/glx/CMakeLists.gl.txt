@@ -52,6 +52,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-visuals-stencil glx-visuals-stencil.c)
 
 	add_executable (glx-copy-sub-buffer glx-copy-sub-buffer.c)
+	add_executable (glx-query-drawable glx-query-drawable.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
