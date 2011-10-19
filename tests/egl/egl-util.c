@@ -45,6 +45,8 @@ egl_init_test(struct egl_test *test)
 	test->config_attribs = egl_default_attribs;
 	test->draw = NULL;
 	test->extensions = no_extensions;
+	test->window_width = egl_default_window_width;
+	test->window_height = egl_default_window_height;
 }
 
 EGLSurface
@@ -203,8 +205,8 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	state.width = 300;
-	state.height = 300;
+	state.width = test->window_width;
+	state.height = test->window_height;
 	create_window(&state);
 
 	state.surf = eglCreateWindowSurface(state.egl_dpy,

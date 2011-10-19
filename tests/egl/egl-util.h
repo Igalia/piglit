@@ -33,8 +33,9 @@ struct egl_test {
 	const EGLint *config_attribs;
 	const char **extensions;
 	enum piglit_result (*draw)(struct egl_state *state);
+	EGLint window_width;
+	EGLint window_height;
 };
-
 
 static const EGLint egl_default_attribs[] = {
 	EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PIXMAP_BIT | EGL_PBUFFER_BIT,
@@ -45,6 +46,9 @@ static const EGLint egl_default_attribs[] = {
 	EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
 	EGL_NONE
 };
+
+static const EGLint egl_default_window_width = 300;
+static const EGLint egl_default_window_height = 300;
 
 /**
  * \brief Initialize test to default values.
