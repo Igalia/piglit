@@ -257,14 +257,11 @@ draw_mipmap_2d(int x, int y, int dim, int layer)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	glEnable(GL_TEXTURE_2D_ARRAY_EXT);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	piglit_draw_rect_tex3(x, y, dim, dim,
 			      0, 0, 1, 1, layer);
-	glDisable(GL_TEXTURE_2D_ARRAY_EXT);
 	glUseProgram(0);
 }
 
@@ -282,14 +279,11 @@ draw_mipmap_1d(int x, int y, int dim, int layer)
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-	glEnable(GL_TEXTURE_1D_ARRAY_EXT);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_1D_ARRAY_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_1D_ARRAY_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	piglit_draw_rect_tex3(x, y, dim, dim,
 			      0, layer, 1, 0, 0);
-	glDisable(GL_TEXTURE_1D_ARRAY_EXT);
 	glUseProgram(0);
 }
 
