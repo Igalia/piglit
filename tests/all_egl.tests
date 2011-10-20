@@ -14,6 +14,10 @@ profile.tests['egl'] = egl
 egl['egl-create-surface'] = plain_test('egl-create-surface')
 egl['egl-nok-swap-region'] = plain_test('egl-nok-swap-region')
 egl['egl-nok-texture-from-pixmap'] = plain_test('egl-nok-texture-from-pixmap')
+egl['egl-query-surface-EGL_BAD_ATTRIBUTE'] = plain_test('egl-query-surface --bad-attr')
+egl['egl-query-surface-EGL_BAD_SURFACE'] = plain_test('egl-query-surface --bad-surface')
+egl['egl-query-surface-EGL_HEIGHT'] = plain_test('egl-query-surface --attr=EGL_HEIGHT')
+egl['egl-query-surface-EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WIDTH')
 
 # Ignore these Mesa diagnostic messages.
 Test.ignoreErrors.append(re.compile("couldn't open libtxc_dxtn.so"))
