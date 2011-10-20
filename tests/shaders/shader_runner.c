@@ -1072,6 +1072,10 @@ piglit_display(void)
 			pass = pass &&
 				piglit_probe_rect_rgb(0, 0, piglit_width,
 						      piglit_height, c);
+		} else if (string_match("shade model smooth", line)) {
+			glShadeModel(GL_SMOOTH);
+		} else if (string_match("shade model flat", line)) {
+			glShadeModel(GL_FLAT);
 		} else if (sscanf(line,
 				  "texture rgbw %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
