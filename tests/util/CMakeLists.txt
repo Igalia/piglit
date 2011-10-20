@@ -17,4 +17,11 @@ set(UTIL_SOURCES
 	rgb9e5.c
 	)
 
+if(OPENGL_egl_LIBRARY)
+	set(UTIL_SOURCES
+	    ${UTIL_SOURCES}
+	    piglit-util-egl.c
+	    )
+endif(OPENGL_egl_LIBRARY)
+
 piglit_include_target_api()
