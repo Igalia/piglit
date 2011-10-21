@@ -1,0 +1,28 @@
+# [description]
+# Tests for GLSL 1.20 minimum maximums for the builtin constants.
+#
+# See the GLSL 1.20.8 specification, section 7.4, page 49 (page 55 of the PDF).
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+void main(void)
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+void main(void)
+{
+	if (gl_MaxVaryingFloats >= 32)
+		gl_FragColor = vec4(0, 1, 0, 0);
+	else
+		gl_FragColor = vec4(1, 0, 0, 0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
