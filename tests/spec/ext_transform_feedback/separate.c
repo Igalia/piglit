@@ -106,21 +106,25 @@ void piglit_init(int argc, char **argv)
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
-static GLboolean probe_buffer(GLuint buf, unsigned comps, const float *expected)
+static GLboolean probe_buffer(GLuint buf, int bufindex, unsigned comps, const float *expected)
 {
 	float *ptr;
 	unsigned i;
+	GLboolean status = GL_TRUE;
 
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, buf);
 	ptr = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, GL_READ_ONLY);
 	for (i = 0; i < NUM_OUT_VERTICES*comps; i++) {
 		if (fabs(ptr[i] - expected[i % comps]) > 0.01) {
-			printf("Buffer[%i]: %f,  Expected: %f\n", i, ptr[i], expected[i]);
-			return GL_FALSE;
+			printf("Buffer[%i][%i]: %f,  Expected: %f\n", bufindex, i, ptr[i], expected[i % comps]);
+			status = GL_FALSE;
+		} else {
+			printf("Buffer[%i][%i]: %f,  Expected: %f -- OK\n", bufindex, i, ptr[i], expected[i % comps]);
+
 		}
 	}
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
-	return GL_TRUE;
+	return status;
 }
 
 enum piglit_result piglit_display(void)
@@ -151,10 +155,10 @@ enum piglit_result piglit_display(void)
 
 	assert(glGetError() == 0);
 
-	pass = probe_buffer(buf[0], 3, v3) && pass;
-	pass = probe_buffer(buf[1], 4, frontcolor) && pass;
-	pass = probe_buffer(buf[2], 2, v2) && pass;
-	pass = probe_buffer(buf[3], 4, texcoord1) && pass;
+	pass = probe_buffer(buf[0], 0, 3, v3) && pass;
+	pass = probe_buffer(buf[1], 1, 4, frontcolor) && pass;
+	pass = probe_buffer(buf[2], 2, 2, v2) && pass;
+	pass = probe_buffer(buf[3], 3, 4, texcoord1) && pass;
 
 	assert(glGetError() == 0);
 
