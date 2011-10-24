@@ -1102,6 +1102,8 @@ add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX4')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX8')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX16')
+add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-noimage')
+
 
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
@@ -1341,10 +1343,6 @@ add_plain_test(amd_seamless_cubemap_per_texture, 'amd_seamless_cubemap_per_textu
 ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
-
-ext_framebuffer_object = Group()
-spec['EXT_framebuffer_object'] = ext_framebuffer_object
-add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-noimage')
 
 nv_texture_barrier = Group()
 spec['NV_texture_barrier'] = nv_texture_barrier
