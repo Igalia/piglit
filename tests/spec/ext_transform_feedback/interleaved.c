@@ -54,8 +54,9 @@ GLuint prog;
 
 void piglit_init(int argc, char **argv)
 {
-	GLuint vs;
+	GLuint vs, i;
 	GLint maxcomps;
+	float *ptr;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -90,6 +91,11 @@ void piglit_init(int argc, char **argv)
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, buf);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
 		     BUF_FLOATS*sizeof(float), NULL, GL_STREAM_READ);
+	ptr = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, GL_WRITE_ONLY);
+	for (i = 0; i < BUF_FLOATS; i++) {
+		ptr[i] = 0.123456;
+	}
+	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
 	glBindBufferBaseEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 
 	assert(glGetError() == 0);
@@ -167,6 +173,8 @@ enum piglit_result piglit_display(void)
 		if (fabs(ptr[i] - expected[i]) > 0.01) {
 			printf("Buffer[%i]: %f,  Expected: %f\n", i, ptr[i], expected[i]);
 			pass = GL_FALSE;
+		} else {
+			printf("Buffer[%i]: %f,  Expected: %f -- OK\n", i, ptr[i], expected[i]);
 		}
 	}
 	//puts("");

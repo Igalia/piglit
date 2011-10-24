@@ -94,9 +94,16 @@ void piglit_init(int argc, char **argv)
 	/* Set up the transform feedback buffer. */
 	glGenBuffers(4, buf);
 	for (i = 0; i < 4; i++) {
+		unsigned j;
+		float *ptr;
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, buf[i]);
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
 			     NUM_OUT_VERTICES*4*sizeof(float), NULL, GL_STREAM_READ);
+		ptr = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, GL_WRITE_ONLY);
+		for (j = 0; j < NUM_OUT_VERTICES*4; j++) {
+			ptr[j] = 0.123456;
+		}
+		glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
 		glBindBufferBaseEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, i, buf[i]);
 	}
 
