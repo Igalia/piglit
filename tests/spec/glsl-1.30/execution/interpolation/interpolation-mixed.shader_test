@@ -1,0 +1,54 @@
+# Test that interpolation qualifiers 'flat', 'smooth', and
+# 'noperspective' can be mixed within the same shader.
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+in vec4 vertex;
+in vec3 input_data;
+flat out float varying_flat;
+smooth out float varying_smooth;
+noperspective out float varying_noperspective;
+
+void main()
+{
+  gl_Position = gl_ModelViewProjectionMatrix * vertex;
+  varying_flat = input_data.r;
+  varying_smooth = input_data.g;
+  varying_noperspective = input_data.b;
+}
+
+[fragment shader]
+#version 130
+flat in float varying_flat;
+smooth in float varying_smooth;
+noperspective in float varying_noperspective;
+
+void main()
+{
+  gl_FragColor = vec4(varying_flat, varying_smooth,
+                      varying_noperspective, 1.0);
+}
+
+[vertex data]
+vertex/float/3  input_data/float/3
+ 0.0  2.0 -2.0  0.25 1.0 0.0
+-1.0 -1.0 -1.0  0.50 0.0 0.0
+ 3.0 -3.0 -3.0  0.75 0.0 1.0
+
+[test]
+frustum -1.0 1.0 -1.0 1.0 1.0 3.0
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLES 0 3
+relative probe rgba (0.444444444444, 0.222222222222) (0.75, 0.166666666667, 0.333333333333, 1.0)
+relative probe rgba (0.636363636364, 0.181818181818) (0.75, 0.166666666667, 0.545454545455, 1.0)
+relative probe rgba (0.769230769231, 0.153846153846) (0.75, 0.166666666667, 0.692307692308, 1.0)
+relative probe rgba (0.866666666667, 0.133333333333) (0.75, 0.166666666667, 0.8,            1.0)
+relative probe rgba (0.5,            0.4           ) (0.75, 0.333333333333, 0.3,            1.0)
+relative probe rgba (0.666666666667, 0.333333333333) (0.75, 0.333333333333, 0.5,            1.0)
+relative probe rgba (0.785714285714, 0.285714285714) (0.75, 0.333333333333, 0.642857142857, 1.0)
+relative probe rgba (0.545454545455, 0.545454545455) (0.75, 0.5,            0.272727272727, 1.0)
+relative probe rgba (0.692307692308, 0.461538461538) (0.75, 0.5,            0.461538461538, 1.0)
+relative probe rgba (0.583333333333, 0.666666666667) (0.75, 0.666666666667, 0.25,           1.0)
