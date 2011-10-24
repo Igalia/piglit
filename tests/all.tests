@@ -609,6 +609,7 @@ add_plain_test(glx, 'glx-pixmap-crosscheck')
 glx['glx-pixmap-crosscheck'].runConcurrent = True
 
 texturing = Group()
+add_concurrent_test(texturing, '1-1-linear-texture')
 add_plain_test(texturing, 'array-texture')
 add_plain_test(texturing, 'copytexsubimage')
 add_plain_test(texturing, 'copyteximage')
