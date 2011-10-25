@@ -46,7 +46,7 @@ static void * make_tex_data(void)
 		if (i % 4 == 3)
 			data[i] = 255;
 		else
-			data[i] = random() % 256;
+			data[i] = rand() % 256;
 	}
 
 	return data;
