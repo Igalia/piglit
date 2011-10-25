@@ -40,6 +40,9 @@
 #include "piglit-util.h"
 
 
+/** Set DEBUG to 1 to enable extra output when trying to debug failures */
+#define DEBUG 0
+
 #define SIZE 256
 
 
@@ -51,6 +54,7 @@ static GLfloat ErrorScale = 0.0;
 static GLuint ColorTex, DepthTex, FBO;
 static GLuint ShaderProg;
 static GLint Zbits;
+static GLenum TexTarget = GL_TEXTURE_2D;
 
 
 static void
@@ -61,21 +65,21 @@ create_fbo(void)
 
    /* depth texture */
    glGenTextures(1, &DepthTex);
-   glBindTexture(GL_TEXTURE_2D, DepthTex);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   glTexImage2D(GL_TEXTURE_2D, 0, depthIntFormat,
+   glBindTexture(TexTarget, DepthTex);
+   glTexParameteri(TexTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(TexTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexImage2D(TexTarget, 0, depthIntFormat,
                 SIZE, SIZE, 0,
                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
    assert(glGetError() == 0);
-   glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_DEPTH_SIZE, &Zbits);
+   glGetTexLevelParameteriv(TexTarget, 0, GL_TEXTURE_DEPTH_SIZE, &Zbits);
 
    /* color texture */
    glGenTextures(1, &ColorTex);
-   glBindTexture(GL_TEXTURE_2D, ColorTex);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+   glBindTexture(TexTarget, ColorTex);
+   glTexParameteri(TexTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(TexTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexImage2D(TexTarget, 0, GL_RGBA,
                 SIZE, SIZE, 0,
                 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
    assert(glGetError() == 0);
@@ -86,13 +90,13 @@ create_fbo(void)
 
    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
                              GL_COLOR_ATTACHMENT0_EXT,
-                             GL_TEXTURE_2D,
+                             TexTarget,
                              ColorTex,
                              0);
 
    glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
                              GL_DEPTH_ATTACHMENT_EXT,
-                             GL_TEXTURE_2D,
+                             TexTarget,
                              DepthTex,
                              0);
 
@@ -115,9 +119,9 @@ create_frag_shader(void)
     * E.g:  gl_FragColor = scale * abs(texture.Z - fragment.Z);
     *
     * Note that we have to be pretty careful with converting gl_FragCoord
-    * into a texture coordinate.  There's a -0.5 bias and scale factor.
+    * into a 2D texture coordinate.  There's a -0.5 bias and scale factor.
     */
-   static const char *text =
+   static const char *text_2d =
       "uniform sampler2D zTex; \n"
       "uniform float sizeScale; \n"
       "uniform float errorScale; \n"
@@ -129,11 +133,31 @@ create_frag_shader(void)
       "   //gl_FragColor = vec4(gl_FragCoord.z, 0, 0, 0); \n"
       "   //gl_FragColor = z; \n"
       "   gl_FragColor = vec4(diff, 0, 0, 0); \n"
+      "   gl_FragDepth = gl_FragCoord.z; \n"
+      "} \n";
+   static const char *text_rect =
+      "#extension GL_ARB_texture_rectangle: require \n"
+      "uniform sampler2DRect zTex; \n"
+      "uniform float sizeScale; \n"
+      "uniform float errorScale; \n"
+      "void main() \n"
+      "{ \n"
+      "   vec2 coord = gl_FragCoord.xy; \n"
+      "   vec4 z = texture2DRect(zTex, coord); \n"
+      "   float diff = errorScale * abs(z.r - gl_FragCoord.z); \n"
+      "   //gl_FragColor = vec4(gl_FragCoord.z, 0, 0, 0); \n"
+      "   //gl_FragColor = z; \n"
+      "   gl_FragColor = vec4(diff, 0, 0, 0); \n"
+      "   gl_FragDepth = gl_FragCoord.z; \n"
       "} \n";
    GLuint fs;
    GLint zTex, errorScale, sizeScale;
 
-   fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, text);
+   if (TexTarget == GL_TEXTURE_2D)
+      fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, text_2d);
+   else
+      fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, text_rect);
+
    assert(fs);
 
    ShaderProg = piglit_link_simple_program(0, fs);
@@ -154,6 +178,59 @@ create_frag_shader(void)
 }
 
 
+#if DEBUG
+static void
+find_float_min_max_center(const GLfloat *buf, GLuint n,
+			  GLfloat *min, GLfloat *max, GLfloat *center)
+{
+   GLint cx = SIZE/4, cy = SIZE/4;
+   GLuint i;
+
+   *min = 1.0e20;
+   *max = -1.0e20;
+
+   for (i = 0; i < n; i++) {
+      if (buf[i] != 1.0) {
+         if (buf[i] < *min)
+            *min = buf[i];
+         if (buf[i] > *max)
+            *max = buf[i];
+      }
+   }
+
+   *center = buf[cy * SIZE + cx];
+}
+
+static void
+find_uint_min_max_center(const GLuint *buf, GLuint n,
+			 GLuint *min, GLuint *max, GLuint *center)
+{
+   GLint cx = SIZE/4, cy = SIZE/4;
+   GLuint i;
+
+   *min = ~0U;
+   *max = 0;
+
+   for (i = 0; i < n; i++) {
+      if (buf[i] != ~0U) {
+         if (buf[i] < *min)
+            *min = buf[i];
+         if (buf[i] > *max)
+            *max = buf[i];
+      }
+   }
+
+   *center = buf[cy * SIZE + cx];
+}
+#endif /* DEBUG */
+
+
+static void
+draw_sphere(void)
+{
+   glutSolidSphere(0.95, 40, 20);
+}
+
 
 static void
 render_to_fbo(void)
@@ -168,10 +245,12 @@ render_to_fbo(void)
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
    glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1.0);
 
    glColor4f(1.0, 0.0, 0.0, 0.0);
-   glutSolidSphere(0.95, 40, 20);
+   draw_sphere();
 
    glDisable(GL_DEPTH_TEST);
 
@@ -179,23 +258,69 @@ render_to_fbo(void)
 }
 
 
+static GLfloat *
+read_float_z_image(GLint x, GLint y)
+{
+   GLfloat *z = (GLfloat *) malloc(SIZE * SIZE * sizeof(GLfloat));
+
+   glReadPixels(x, y, SIZE, SIZE, GL_DEPTH_COMPONENT, GL_FLOAT, z);
+
+   return z;
+}
+
+
+#if DEBUG
+static GLuint *
+read_uint_z_image(GLint x, GLint y)
+{
+   GLuint *z = (GLuint *) malloc(SIZE * SIZE * sizeof(GLuint));
+
+   glReadPixels(x, y, SIZE, SIZE, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, z);
+
+   return z;
+}
+#endif /* DEBUG */
+
+
 /** Show contents of depth buffer in middle of window */
 static void
 show_depth_fbo(void)
 {
-   GLfloat *z = (GLfloat *) malloc(SIZE * SIZE * sizeof(GLfloat));
+   GLfloat *zf;
 
    glViewport(1 * SIZE, 0, SIZE, SIZE); /* not really needed */
 
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBO);
-   glReadPixels(0, 0, SIZE, SIZE, GL_DEPTH_COMPONENT, GL_FLOAT, z);
+   zf = read_float_z_image(0, 0);
 
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
    glWindowPos2i(SIZE, 0);
-   glDrawPixels(SIZE, SIZE, GL_LUMINANCE, GL_FLOAT, z);
+   glDrawPixels(SIZE, SIZE, GL_LUMINANCE, GL_FLOAT, zf);
    assert(glGetError() == 0);
-   free(z);
+
+#if DEBUG
+   {
+      GLfloat min, max, center;
+      find_float_min_max_center(zf, SIZE * SIZE, &min, &max, &center);
+      printf("depth fbo min %f  max %f  center %f\n", min, max, center);
+   }
+
+   {
+      GLuint min, max, center;
+      GLuint *zi;
+
+      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBO);
+      zi = read_uint_z_image(0, 0);
+      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+      find_uint_min_max_center(zi, SIZE * SIZE, &min, &max, &center);
+      printf("depth fbo min 0x%x  max 0x%x  center 0x%x\n", min, max, center);
+      free(zi);
+   }
+#endif /* DEBUG */
+
+   free(zf);
 }
 
 
@@ -203,6 +328,16 @@ show_depth_fbo(void)
 static void
 draw_quad_with_depth_texture(void)
 {
+   GLfloat s1, t1;
+
+   if (TexTarget == GL_TEXTURE_2D) {
+      s1 = t1 = 1.0;
+   }
+   else {
+      s1 = SIZE;
+      t1 = SIZE;
+   }
+
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -211,23 +346,25 @@ draw_quad_with_depth_texture(void)
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
    glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1.0);
 
-   glBindTexture(GL_TEXTURE_2D, DepthTex);
-   glEnable(GL_TEXTURE_2D);
+   glBindTexture(TexTarget, DepthTex);
+   glEnable(TexTarget);
 
    glBegin(GL_POLYGON);
    glTexCoord2f(0, 0);
    glVertex2f(-1, -1);
-   glTexCoord2f(1, 0);
+   glTexCoord2f(s1, 0);
    glVertex2f( 1, -1);
-   glTexCoord2f(1, 1);
+   glTexCoord2f(s1, t1);
    glVertex2f( 1,  1);
-   glTexCoord2f(0, 1);
+   glTexCoord2f(0, t1);
    glVertex2f(-1,  1);
    glEnd();
 
-   glDisable(GL_TEXTURE_2D);
+   glDisable(TexTarget);
 }
 
 
@@ -246,17 +383,18 @@ draw_sphere_with_fragment_shader_compare(void)
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1.0);
 
-   glBindTexture(GL_TEXTURE_2D, DepthTex);
+   glBindTexture(TexTarget, DepthTex);
 
    piglit_UseProgram(ShaderProg);
-
-   glOrtho(-1.0, 1.0, -1.0, 1.0, -1, 1.0);
 
    glEnable(GL_DEPTH_TEST);
 
    if (1) {
-      glutSolidSphere(0.95, 40, 20);
+      draw_sphere();
    }
    else {
       /* To test using gl_TexCoord[0].xy instead of gl_FragCoord.xy in the shader
@@ -271,7 +409,7 @@ draw_sphere_with_fragment_shader_compare(void)
       glEnable(GL_TEXTURE_GEN_S);
       glEnable(GL_TEXTURE_GEN_T);
       
-      glutSolidSphere(0.95, 40, 20);
+      draw_sphere();
 
       glDisable(GL_TEXTURE_GEN_S);
       glDisable(GL_TEXTURE_GEN_T);
@@ -280,6 +418,27 @@ draw_sphere_with_fragment_shader_compare(void)
    glDisable(GL_DEPTH_TEST);
 
    piglit_UseProgram(0);
+
+#if DEBUG
+   {
+      GLfloat *z = read_float_z_image(0, 0);
+      GLfloat min, max, center;
+
+      find_float_min_max_center(z, SIZE * SIZE, &min, &max, &center);
+      printf("rendered  min %f  max %f  center %f\n", min, max, center);
+
+      free(z);
+   }
+   {
+      GLuint *z = read_uint_z_image(0, 0);
+      GLuint min, max, center;
+
+      find_uint_min_max_center(z, SIZE * SIZE, &min, &max, &center);
+      printf("rendered  min 0x%x  max 0x%x  center 0x%x\n", min, max, center);
+
+      free(z);
+   }
+#endif /* DEBUG */
 }
 
 
@@ -335,12 +494,21 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-   if (argc > 1) {
-      ErrorScale = atof(argv[1]);
+   int i = 1;
+
+   if (i < argc && strcmp(argv[i], "rect") == 0) {
+      TexTarget = GL_TEXTURE_RECTANGLE;
+      i++;
+   }
+   if (i < argc) {
+      ErrorScale = atof(argv[i]);
    }
 
    piglit_require_extension("GL_EXT_framebuffer_object");
    piglit_require_fragment_shader();
+   if (TexTarget == GL_TEXTURE_RECTANGLE) {
+      piglit_require_extension("GL_ARB_texture_rectangle");
+   }
 
    create_fbo();
 
@@ -360,5 +528,7 @@ piglit_init(int argc, char **argv)
       printf("Right: Quad textured with depth values\n");
       printf("Z bits = %d\n", Zbits);
       printf("ErrorScale = %f\n", ErrorScale);
+      printf("Texture target: %s\n",
+	     TexTarget == GL_TEXTURE_RECTANGLE ? "RECTANGLE" : "2D" );
    }
 }
