@@ -1,0 +1,77 @@
+# Test that a vertex shader output that is declared as "flat int" is
+# properly received in the fragment shader.
+#
+# We do this by passing a value into both the vertex shader and the
+# fragment shader as a uniform.  The vertex shader simply passes the
+# uniform value along to the fragment shader as a flat varying.  The
+# fragment shader compares the uniform to the flat varying it received
+# from the vertex shader.
+#
+# To make sure that the GL implementation doesn't try to operate on
+# "flat int" values as though they were floats, this test includes bit
+# patterns that would represent Inf or NaN as floats.
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+uniform int test_value;
+flat out int flat_int;
+
+void main()
+{
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+  flat_int = test_value;
+}
+
+[fragment shader]
+#version 130
+uniform int test_value;
+flat in int flat_int;
+
+void main()
+{
+  gl_FragColor = (test_value == flat_int) ? vec4(0.0, 1.0, 0.0, 1.0)
+                                          : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform int test_value 0
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 1.0 0.0 1.0
+uniform int test_value 1
+draw rect -1 -1 2 2
+probe rgba 1 0 0.0 1.0 0.0 1.0
+uniform int test_value -1
+draw rect -1 -1 2 2
+probe rgba 2 0 0.0 1.0 0.0 1.0
+uniform int test_value 10
+draw rect -1 -1 2 2
+probe rgba 3 0 0.0 1.0 0.0 1.0
+uniform int test_value -10
+draw rect -1 -1 2 2
+probe rgba 4 0 0.0 1.0 0.0 1.0
+uniform int test_value -2147483648
+draw rect -1 -1 2 2
+probe rgba 5 0 0.0 1.0 0.0 1.0
+uniform int test_value 2139095040 # Looks like Inf
+draw rect -1 -1 2 2
+probe rgba 6 0 0.0 1.0 0.0 1.0
+uniform int test_value -8388608   # Looks like -Inf
+draw rect -1 -1 2 2
+probe rgba 7 0 0.0 1.0 0.0 1.0
+uniform int test_value 2143289344 # Looks like NaN
+draw rect -1 -1 2 2
+probe rgba 8 0 0.0 1.0 0.0 1.0
+uniform int test_value -4194304   # Looks like -NaN
+draw rect -1 -1 2 2
+probe rgba 9 0 0.0 1.0 0.0 1.0
+uniform int test_value 2145948354 # Looks like an alternate NaN
+draw rect -1 -1 2 2
+probe rgba 10 0 0.0 1.0 0.0 1.0
+uniform int test_value -1849395   # Looks like an alternate -NaN
+draw rect -1 -1 2 2
+probe rgba 11 0 0.0 1.0 0.0 1.0
+uniform int test_value 1065353216 # Looks like 1.0
+draw rect -1 -1 2 2
+probe rgba 12 0 0.0 1.0 0.0 1.0
