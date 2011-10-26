@@ -1,0 +1,37 @@
+# Test proper behavior of the isinf(vec4) function.
+#
+# Note: testing behavior if isinf() is challenging because the GLSL
+# 1.30 spec does not explicitly define any circumstances under which
+# infinite values are required to be generated.  This test assumes
+# that the expressions 1.0*exp(1000.0) and -1.0*exp(1000.0) produce
+# infinite values when evaluated in the shader.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform vec4 multiplier;
+uniform vec4 exponent;
+
+void main()
+{
+  gl_FragColor = vec4(isinf(multiplier*exp(exponent)));
+}
+
+[test]
+uniform vec4 multiplier 1.0 1.0 -1.0 -1.0
+uniform vec4 exponent 1.0 1000.0 1000.0 1.0
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 1.0 1.0 0.0
+uniform vec4 multiplier -1.0 -1.0 1.0 1.0
+uniform vec4 exponent 1000.0 1.0 1.0 1000.0
+draw rect -1 -1 2 2
+probe rgba 1 0 1.0 0.0 0.0 1.0

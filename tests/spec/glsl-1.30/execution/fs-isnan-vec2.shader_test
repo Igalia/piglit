@@ -1,0 +1,37 @@
+# Test proper behavior of the isnan(vec2) function.
+#
+# Note: testing behavior if isnan() is challenging because the GLSL
+# 1.30 spec does not explicitly define any circumstances under which
+# NaN values are required to be generated.  This test assumes that the
+# expression 0.0/0.0 produces a NaN value when evaluated in the
+# shader.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform vec2 numerator;
+uniform vec2 denominator;
+
+void main()
+{
+  gl_FragColor = vec4(isnan(numerator/denominator), 0.0, 1.0);
+}
+
+[test]
+uniform vec2 numerator 1.0 0.0
+uniform vec2 denominator 1.0 0.0
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 1.0 0.0 1.0
+uniform vec2 numerator 0.0 1.0
+uniform vec2 denominator 0.0 1.0
+draw rect -1 -1 2 2
+probe rgba 1 0 1.0 0.0 0.0 1.0
