@@ -1,0 +1,25 @@
+# This test exercises a bug found in Mesa: if function inlining caused
+# an execution of notEqual() to be constant-folded, an assertion
+# failure would occur.
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+bvec4 foo(vec4 x, vec4 y)
+{
+  return notEqual(x, y);
+}
+
+void main()
+{
+  gl_FragColor = vec4(foo(vec4(0.0, 0.0, 1.0, 1.0),
+                          vec4(0.0, 1.0, 1.0, 0.0)));
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
