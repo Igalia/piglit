@@ -12,6 +12,7 @@ set(UTIL_SOURCES
 	piglit-transform-feedback.c
 	piglit-util-gl.c
 	piglit-vbo.cpp
+	sized-internalformats.c
 	)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

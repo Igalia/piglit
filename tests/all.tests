@@ -799,6 +799,9 @@ add_concurrent_test(gl30, 'clearbuffer-invalid-drawbuffer')
 add_concurrent_test(gl30, 'clearbuffer-invalid-buffer')
 add_concurrent_test(gl30, 'clearbuffer-stencil')
 add_concurrent_test(gl30, 'getfragdatalocation')
+add_concurrent_test(gl30, 'gl-3.0-required-sized-texture-formats')
+add_concurrent_test(gl30, 'gl-3.0-required-renderbuffer-attachment-formats')
+add_concurrent_test(gl30, 'gl-3.0-required-texture-attachment-formats')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
