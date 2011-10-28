@@ -90,19 +90,12 @@
 #define _GNU_SOURCE
 #endif
 
-#include <string.h>
-#include <ctype.h>
-#if defined(_WIN32)
-#include <stdlib.h>
-#else
-#include <libgen.h>
-#endif
-#include "piglit-util.h"
-#include "piglit-vbo.h"
-#include <vector>
 #include <string>
+#include <vector>
 #include <errno.h>
 
+#include "piglit-util.h"
+#include "piglit-vbo.h"
 
 /**
  * Currently all the attribute types we support (int, uint, and float)
