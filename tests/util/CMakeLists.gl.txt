@@ -9,6 +9,7 @@ set(UTIL_SOURCES
 	glew.c
 	piglit-shader.c
 	piglit-shader-gl.c
+	piglit-transform-feedback.c
 	piglit-util-gl.c
 	piglit-vbo.cpp
 	)
@@ -18,6 +19,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_library (piglitglxutil
 		    piglit-shader.c
 		    piglit-shader-gl.c
+		    piglit-transform-feedback.c
 		    piglit-util.c
 		    piglit-util-gl.c
 		    piglit-glx-framework.c

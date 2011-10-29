@@ -66,7 +66,7 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 	piglit_require_GLSL();
-	piglit_require_extension("GL_EXT_transform_feedback");
+	piglit_require_transform_feedback();
 
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS_EXT, &maxcomps);
 	if (maxcomps < 17) {
@@ -78,8 +78,8 @@ void piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	glTransformFeedbackVaryingsEXT(prog, sizeof(varyings)/sizeof(varyings[0]),
-				       varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	piglit_TransformFeedbackVaryings(prog, sizeof(varyings)/sizeof(varyings[0]),
+					 varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -96,7 +96,7 @@ void piglit_init(int argc, char **argv)
 		ptr[i] = 0.123456;
 	}
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
-	glBindBufferBaseEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
+	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 
 	assert(glGetError() == 0);
 
@@ -159,10 +159,10 @@ enum piglit_result piglit_display(void)
 	glLoadIdentity();
 	piglit_UseProgram(prog);
 	glEnable(GL_RASTERIZER_DISCARD);
-	glBeginTransformFeedbackEXT(GL_TRIANGLES);
+	piglit_BeginTransformFeedback(GL_TRIANGLES);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 	glDrawArrays(GL_QUADS, 0, 4);
-	glEndTransformFeedbackEXT();
+	piglit_EndTransformFeedback();
 	glDisable(GL_RASTERIZER_DISCARD);
 
 	assert(glGetError() == 0);

@@ -68,5 +68,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_extension("GL_EXT_transform_feedback");
+	piglit_require_transform_feedback();
 }

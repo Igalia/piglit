@@ -96,6 +96,7 @@ enum piglit_result {
 
 #include "piglit-framework.h"
 #include "piglit-shader.h"
+#include "piglit-transform-feedback.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 

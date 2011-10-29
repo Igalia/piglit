@@ -53,7 +53,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint enabled;
 
-	piglit_require_extension("GL_EXT_transform_feedback");
+	piglit_require_transform_feedback();
 
 	glEnable(GL_RASTERIZER_DISCARD);
 	if (!glIsEnabled(GL_RASTERIZER_DISCARD))

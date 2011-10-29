@@ -81,6 +81,8 @@ void piglit_init(int argc, char **argv)
 		if (!strcmp(argv[i], "discard")) {
 			discard = GL_TRUE;
 		} else if (!strcmp(argv[i], "offset")) {
+			/* BindBufferOffset only exists in the EXT specification */
+			piglit_require_extension("GL_EXT_transform_feedback");
 			offset = OFFSET;
 		} else if (!strcmp(argv[i], "range")) {
 			offset = OFFSET;
@@ -102,13 +104,13 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 	piglit_require_GLSL();
-	piglit_require_extension("GL_EXT_transform_feedback");
+	piglit_require_transform_feedback();
 
 	/* Create shaders. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	glTransformFeedbackVaryingsEXT(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	piglit_TransformFeedbackVaryings(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -118,7 +120,7 @@ void piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vspassthrough);
 	prog_passthrough = piglit_CreateProgram();
 	piglit_AttachShader(prog_passthrough, vs);
-	glTransformFeedbackVaryingsEXT(prog_passthrough, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	piglit_TransformFeedbackVaryings(prog_passthrough, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog_passthrough);
 	if (!piglit_link_check_status(prog_passthrough)) {
 		piglit_DeleteProgram(prog_passthrough);
@@ -135,7 +137,7 @@ void piglit_init(int argc, char **argv)
 
 	if (range) {
 		puts("Testing BindBufferRange.");
-		glBindBufferRangeEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
+		piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
 				     0, buf, offset*sizeof(float), range*sizeof(float));
 	} else if (offset) {
 		puts("Testing BindBufferOffset.");
@@ -143,7 +145,7 @@ void piglit_init(int argc, char **argv)
 				      0, buf, offset*sizeof(float));
 	} else {
 		puts("Testing BindBufferBase.");
-		glBindBufferBaseEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
+		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 	}
 
 	if (!range) {
@@ -201,11 +203,11 @@ enum piglit_result piglit_display(void)
 	piglit_UseProgram(prog);
 	if (discard)
 		glEnable(GL_RASTERIZER_DISCARD_EXT);
-	glBeginTransformFeedbackEXT(GL_TRIANGLES);
+	piglit_BeginTransformFeedback(GL_TRIANGLES);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 	glDrawArrays(GL_QUADS, 0, 4);
-	glEndTransformFeedbackEXT();
+	piglit_EndTransformFeedback();
 	if (discard)
 		glDisable(GL_RASTERIZER_DISCARD_EXT);
 
