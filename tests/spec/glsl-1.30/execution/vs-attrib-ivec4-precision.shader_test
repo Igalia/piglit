@@ -1,0 +1,45 @@
+# Check that vertex attributes whose type is ivec4 actually have 32
+# bits of precision.
+#
+#
+# This test sends the vertex shader various pairs of integral vertex
+# attributes that differ by exactly 1, and the vertex shader verifies
+# that the difference is exactly 1.  This verifies that the vertex
+# attributes haven't gone through a process that loses precision
+# (e.g. conversion to vec4 and back to ivec4).
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+attribute vec4 vertex;
+attribute ivec4 x;
+attribute ivec4 y;
+
+void main()
+{
+	gl_Position = vertex;
+	if (y - x == ivec4(1, 1, 1, 1))
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+	gl_FragColor = gl_Color;
+}
+
+[vertex data]
+vertex/float/2 x/int/4                                          y/int/4
+-1.0 -1.0      0x2f6dc4c6 -0x3e433294 -0x2dcaca76  0x69c54892  0x2f6dc4c7 -0x3e433293 -0x2dcaca75  0x69c54893
+ 1.0 -1.0     -0x45c1613a  0x514c063c  0x54be6d2b -0x755a8610 -0x45c16139  0x514c063d  0x54be6d2c -0x755a860f
+ 1.0  1.0     -0x1839ec67  0x4f49620f -0x1509bf47  0x266ef031 -0x1839ec66  0x4f496210 -0x1509bf46  0x266ef032
+-1.0  1.0      0x6c77114e  0x0c975f8b  0x6e0467a1  0x11d6b169  0x6c77114f  0x0c975f8c  0x6e0467a2  0x11d6b16a
+
+[test]
+draw arrays GL_QUADS 0 4
+probe all rgba 0.0 1.0 0.0 1.0

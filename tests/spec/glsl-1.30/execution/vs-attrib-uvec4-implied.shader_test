@@ -1,0 +1,48 @@
+# Check that unspecified components of vertex attributes are properly
+# filled in when the type is uvec4.
+#
+# This test sends the vertex shader a pair of vertex attributes of
+# type uvec4.  For the first attribute, it passes a size of 1,
+# indidcating that the only specified value is the x component, and
+# the y, z, and w components are implied to be 0, 0, and 1,
+# respectively.  For the second attribute, it passes a size of 4, and
+# specifies the values y=0, z=0, and w=1 explicitly.  The vertex
+# shader verifies that the two vertex attributes are equal.  This
+# verifies that the GL implementation properly filled in the values 0,
+# 0, and 1 in the first attribute.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+attribute vec4 vertex;
+attribute uvec4 x;
+attribute uvec4 y;
+
+void main()
+{
+	gl_Position = vertex;
+	if (x == y)
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+	gl_FragColor = gl_Color;
+}
+
+[vertex data]
+vertex/float/2 x/uint/1    y/uint/4
+-1.0 -1.0      0xa62b25d1  0xa62b25d1 0 0 1
+ 1.0 -1.0      0x19eb64f2  0x19eb64f2 0 0 1
+ 1.0  1.0      0x098b61e0  0x098b61e0 0 0 1
+-1.0  1.0      0xb0741d16  0xb0741d16 0 0 1
+
+[test]
+draw arrays GL_QUADS 0 4
+probe all rgba 0.0 1.0 0.0 1.0
