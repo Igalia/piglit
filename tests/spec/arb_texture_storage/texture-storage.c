@@ -29,14 +29,11 @@
  */
 
 #include "piglit-util.h"
-#include "piglit-glx-util.h"
+
 
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 static const char *TestName = "texture-storage";
-
-#ifdef GL_ARB_texture_storage
-
 
 static GLubyte Colors[][4] = {
 	{255,	0,	0, 255},
@@ -334,23 +331,19 @@ test_2d_mipmap_rendering(void)
 	return GL_TRUE;
 }
 
-#endif /* GL_ARB_texture_storage */
-
 
 enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 
-#ifdef GL_ARB_texture_storage
-	pass = pass && test_one_level_errors(GL_TEXTURE_1D);
-	pass = pass && test_one_level_errors(GL_TEXTURE_2D);
-	pass = pass && test_one_level_errors(GL_TEXTURE_3D);
-	pass = pass && test_mipmap_errors(GL_TEXTURE_1D);
-	pass = pass && test_mipmap_errors(GL_TEXTURE_2D);
-	pass = pass && test_mipmap_errors(GL_TEXTURE_3D);
-	pass = pass && test_2d_mipmap_rendering();
-#endif /* GL_ARB_texture_storage */
+	pass = test_one_level_errors(GL_TEXTURE_1D) && pass;
+	pass = test_one_level_errors(GL_TEXTURE_2D) && pass;
+	pass = test_one_level_errors(GL_TEXTURE_3D) && pass;
+	pass = test_mipmap_errors(GL_TEXTURE_1D) && pass;
+	pass = test_mipmap_errors(GL_TEXTURE_2D) && pass;
+	pass = test_mipmap_errors(GL_TEXTURE_3D) && pass;
+	pass = test_2d_mipmap_rendering() && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -359,14 +352,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-#ifdef GL_ARB_texture_storage
-	if (GLEW_ARB_texture_storage) {
-		piglit_require_extension("GL_ARB_texture_storage");
-	}
-	else {
-		piglit_report_result(PIGLIT_SKIP);
-	}
-#else
-	piglit_report_result(PIGLIT_SKIP);
-#endif
+	piglit_require_extension("GL_ARB_texture_storage");
 }
