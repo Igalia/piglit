@@ -13,5 +13,6 @@ link_libraries (
 )
 
 add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
+add_executable (clearbuffer-invalid-buffer clearbuffer-invalid-buffer.c)
 
 # vim: ft=cmake:

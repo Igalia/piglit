@@ -789,6 +789,7 @@ add_concurrent_test(gl20, 'vertex-program-two-side')
 gl30 = Group()
 spec['!OpenGL 3.0'] = gl30
 add_concurrent_test(gl30, 'clearbuffer-invalid-drawbuffer')
+add_concurrent_test(gl30, 'clearbuffer-invalid-buffer')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
