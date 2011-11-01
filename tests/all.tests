@@ -786,6 +786,10 @@ add_concurrent_test(gl20, 'vertex-program-two-side front2')
 add_concurrent_test(gl20, 'vertex-program-two-side back2')
 add_concurrent_test(gl20, 'vertex-program-two-side')
 
+gl30 = Group()
+spec['!OpenGL 3.0'] = gl30
+add_concurrent_test(gl30, 'clearbuffer-invalid-drawbuffer')
+
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
 import_glsl_parser_tests(spec['glsl-1.00'],
