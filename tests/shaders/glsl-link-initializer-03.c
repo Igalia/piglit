@@ -51,8 +51,8 @@ void piglit_init(int argc, char **argv)
 	GLint vert[3];
 	GLint prog_a;
 	GLint prog_b;
-	GLint a;
-	GLint b;
+	GLint prog_c;
+	GLint prog_d;
 
 	if (!GLEW_VERSION_2_0) {
 		printf("Requires OpenGL 2.0\n");
@@ -69,11 +69,15 @@ void piglit_init(int argc, char **argv)
 		piglit_compile_shader(GL_VERTEX_SHADER,
 				      "shaders/glsl-link-initializer-01c.vert");
 	prog_a = piglit_link_simple_program(vert[0], vert[1]);
-	prog_b = piglit_link_simple_program(vert[0], vert[2]);
+	prog_b = piglit_link_simple_program(vert[1], vert[0]);
+	prog_c = piglit_link_simple_program(vert[0], vert[2]);
+	prog_d = piglit_link_simple_program(vert[2], vert[0]);
 
-        glGetProgramiv(prog_a, GL_LINK_STATUS, &a);
-        glGetProgramiv(prog_b, GL_LINK_STATUS, &b);
-
-	piglit_report_result((a && b) ? PIGLIT_PASS : PIGLIT_FAIL);
+	/* piglit_link_simple_program() returns 0 on link failure.  So
+	 * verify that there was no link failure by simply checking
+	 * that two programs were returned.
+	 */
+	piglit_report_result((prog_a && prog_b && prog_c && prog_d)
+			     ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
