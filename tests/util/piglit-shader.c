@@ -240,10 +240,10 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 	piglit_require_GLSL();
 
 	prog = piglit_CreateProgram();
-	if (fs)
-		piglit_AttachShader(prog, fs);
 	if (vs)
 		piglit_AttachShader(prog, vs);
+	if (fs)
+		piglit_AttachShader(prog, fs);
 	piglit_LinkProgram(prog);
 
 	if (!piglit_link_check_status(prog)) {
