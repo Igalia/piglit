@@ -1,0 +1,29 @@
+# Test "++" operator on the "uint" type.
+
+[require]
+GLSL >= 1.30
+GL >= 3.0
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform uint starting_value;
+
+void main()
+{
+	uint x = starting_value;
+	uint a = x++;
+	uint b = ++x;
+	gl_FragColor = vec4(starting_value, a, b, x)/4.0;
+}
+
+[test]
+uniform uint starting_value 1
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.25 0.75 0.75

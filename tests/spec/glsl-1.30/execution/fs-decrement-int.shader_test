@@ -1,0 +1,28 @@
+# Test "--" operator on the "int" type.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform int starting_value;
+
+void main()
+{
+	int x = starting_value;
+	int a = x--;
+	int b = --x;
+	gl_FragColor = vec4(starting_value, a, b, x)/4.0;
+}
+
+[test]
+uniform int starting_value 3
+draw rect -1 -1 2 2
+probe all rgba 0.75 0.75 0.25 0.25
