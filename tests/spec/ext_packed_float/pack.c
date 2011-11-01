@@ -35,9 +35,9 @@ int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 /* Any maximum e with m != 0 is NAN */
 
 #define PACK(r, g, b) 	((b << 22) | (g << 11) | (r))
-#define GET_R(p)	((p) & 0x7ff);
-#define GET_G(p)	(((p) >> 11) & 0x7ff);
-#define GET_B(p)	(((p) >> 22) & 0x3ff);
+#define GET_R(p)	((p) & 0x7ff)
+#define GET_G(p)	(((p) >> 11) & 0x7ff)
+#define GET_B(p)	(((p) >> 22) & 0x3ff)
 
 /*     "An unsigned 11-bit floating-point number has no sign bit, a
  *      5-bit exponent (E), and a 6-bit mantissa (M).  The value of an
@@ -134,6 +134,7 @@ static uint32_t expected[ARRAY_SIZE(values) * 3];
 static uint32_t *
 get_packed_values()
 {
+	static float outf[ARRAY_SIZE(values) * 3][3];
 	GLuint tex;
 	int i;
 
@@ -153,7 +154,6 @@ get_packed_values()
 		expected[i * 3 + 1] = PACK(0, values[i].f11, 0);
 		expected[i * 3 + 2] = PACK(0, 0, values[i].f10);
 	}
-static float outf[ARRAY_SIZE(values) * 3][3];
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);

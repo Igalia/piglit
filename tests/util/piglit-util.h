@@ -52,6 +52,7 @@ typedef unsigned __int64 uint64_t;
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 #include <piglit/gl_wrap.h>
 #include <piglit/glut_wrap.h>
@@ -70,13 +71,21 @@ roundf(float x) {
 	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
 }
 
-#define piglit_get_proc_address(x) wglGetProcAddress(x)
+#endif /* defined(_MSC_VER) */
 
-#else /* !defined(_MSC_VER) */
+// Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
+#ifndef INFINITY
+#  define INFINITY (FLT_MAX + FLT_MAX)
+#endif
+#ifndef NAN
+#  define NAN (INFINITY - INFINITY)
+#endif
 
-#define piglit_get_proc_address(x) glutGetProcAddress(x)
-
-#endif /* !defined(_MSC_VER) */
+#ifdef _WIN32
+#  define piglit_get_proc_address(x) wglGetProcAddress(x)
+#else
+#  define piglit_get_proc_address(x) glutGetProcAddress(x)
+#endif
 
 enum piglit_result {
 	PIGLIT_PASS,
