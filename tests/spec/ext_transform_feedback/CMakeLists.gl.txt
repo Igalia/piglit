@@ -21,5 +21,6 @@ add_executable (ext_transform_feedback-discard-drawpixels discard-drawpixels.c)
 add_executable (ext_transform_feedback-position position.c)
 add_executable (ext_transform_feedback-interleaved interleaved.c)
 add_executable (ext_transform_feedback-separate separate.c)
+add_executable (ext_transform_feedback-output-type output-type.c)
 
 # vim: ft=cmake:
