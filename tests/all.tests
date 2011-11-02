@@ -1415,6 +1415,17 @@ for drawcall in ['arrays', 'elements']:
                 test_name = 'order {0} {1}'.format(drawcall, mode)
                 ext_transform_feedback[test_name] = PlainExecTest(
                         'ext_transform_feedback-{0} -auto'.format(test_name))
+for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
+                  'triangles', 'triangle_strip', 'triangle_fan',
+                  'quads', 'quad_strip', 'polygon']:
+        for shade_mode in ['monochrome', 'smooth', 'flat_first', 'flat_last', 'wireframe']:
+                if shade_mode == 'wireframe' and \
+                            draw_mode in ['points', 'lines', 'line_loop', 'line_strip']:
+                        continue
+                test_name = 'tessellation {0} {1}'.format(
+                        draw_mode, shade_mode)
+                ext_transform_feedback[test_name] = PlainExecTest(
+                        'ext_transform_feedback-{0} -auto'.format(test_name))
 
 ext_transform_feedback['output-type float'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'float'])
 ext_transform_feedback['output-type float[2]'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'float[2]'])
