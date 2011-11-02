@@ -220,6 +220,23 @@ struct test_desc {
 		{0.666, 666, 999, -2, 0.5, -0.4}
 	},
 	{
+		"mat2x3[2]", /* name */
+
+		"#version 120\n"
+		"varying mat2x3 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat2x3[2](mat2x3(0.666, 666.0, 999.0, -2.0, 0.5, -0.4),"
+		"                mat2x3(0.34, 0.12, -10.0, 30.1, 5.3, 9.8));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		12, /* num_elements, expected */
+		{0.666, 666, 999, -2, 0.5, -0.4, 0.34, 0.12, -10.0, 30.1, 5.3, 9.8}
+	},
+	{
 		"mat2x4", /* name */
 
 		"#version 120\n"
@@ -234,6 +251,23 @@ struct test_desc {
 
 		8, /* num_elements, expected */
 		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40}
+	},
+	{
+		"mat2x4[2]", /* name */
+
+		"#version 120\n"
+		"varying mat2x4 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat2x4[2](mat2x4(0.666, 666.0, 999.0, -2.0, 0.5, -0.4, 30.0, 40.0),"
+		"		 mat2x4(0.12, 0.24, 0.34, 0.56, 0.67, 0.78, 0.89, 0.04));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		16, /* num_elements, expected */
+		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.12, 0.24, 0.34, 0.56, 0.67, 0.78, 0.89, 0.04}
 	},
 	{
 		"mat3x2", /* name */
@@ -253,6 +287,23 @@ struct test_desc {
 		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0}
 	},
 	{
+		"mat3x2[2]", /* name */
+
+		"#version 120\n"
+		"varying mat3x2 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat3x2[2](mat3x2(0.666, 666.0, 999.0, -2.0, 0.2, 5.0),"
+		"		 mat3x2(0.98, 0.87, 0.76, 0.65, 0.54, 0.43));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		12, /* num_elements, expected */
+		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 0.98, 0.87, 0.76, 0.65, 0.54, 0.43}
+	},
+	{
 		"mat3", /* name */
 
 		"#version 110\n"
@@ -269,6 +320,26 @@ struct test_desc {
 
 		9, /* num_elements, expected */
 		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0}
+	},
+	{
+		"mat3[2]", /* name */
+
+		"#version 120\n"
+		"varying mat3 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat3[2](mat3(0.666, 666.0, 999.0,"
+		"                   -2.0, 0.2, 5.0,"
+		"                   3.0, 0.3, -10.0),"
+		"	       mat3(20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		18, /* num_elements, expected */
+		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0,
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0}
 	},
 	{
 		"mat3x4", /* name */
@@ -290,6 +361,26 @@ struct test_desc {
 		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0, 0.4, -4.1, -5.9}
 	},
 	{
+		"mat3x4[2]", /* name */
+
+		"#version 120\n"
+		"varying mat3x4 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat3x4[2](mat3x4(0.666, 666.0, 999.0, -2.0, 0.2, 5.0,"
+		"                       3.0, 0.3, -10.0, 0.4, -4.1, -5.9),"
+		"		 mat3x4(20.0, 10.0, 5.0, 90.0, -4.0, 3.4,"
+		"                       -2.3, -8.6, 8.0, 0.4, -4.1, -5.9));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		24, /* num_elements, expected */
+		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0, 0.4, -4.1, -5.9,
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}
+	},
+	{
 		"mat4x2", /* name */
 
 		"#version 120\n"
@@ -304,6 +395,24 @@ struct test_desc {
 
 		8, /* num_elements, expected */
 		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40}
+	},
+	{
+		"mat4x2[2]", /* name */
+
+		"#version 120\n"
+		"varying mat4x2 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat4x2[2](mat4x2(0.666, 666.0, 999.0, -2.0, 0.5, -0.4, 30.0, 40.0),"
+		"		 mat4x2(20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		16, /* num_elements, expected */
+		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40,
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6}
 	},
 	{
 		"mat4x3", /* name */
@@ -322,6 +431,27 @@ struct test_desc {
 
 		12, /* num_elements, expected */
 		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.3, 0.2, 0.1, 0.4}
+	},
+	{
+		"mat4x3[2]", /* name */
+
+		"#version 120\n"
+		"varying mat4x3 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat4x3[2](mat4x3(0.666, 666.0, 999.0, -2.0,"
+		"                       0.5, -0.4, 30.0, 40.0,"
+		"                       0.3, 0.2, 0.1, 0.4),"
+		"		 mat4x3(20.0, 10.0, 5.0, 90.0, -4.0, 3.4,"
+		"                       -2.3, -8.6, 8.0, 0.4, -4.1, -5.9));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		24, /* num_elements, expected */
+		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.3, 0.2, 0.1, 0.4,
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}
 	},
 	{
 		"mat4", /* name */
@@ -345,6 +475,30 @@ struct test_desc {
 		 -10.0, 20.1, 52.4, -34.3,
 		 45.0, 56.0, 67.0, 78.0}
 	},
+	{
+		"mat4[2]", /* name */
+
+		"#version 120\n"
+		"varying mat4 r[2];" /* vs */
+		"void main() {"
+		"  gl_Position = ftransform();"
+		"  r = mat4[2](mat4(0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3,"
+		"                   -10.0, 20.1, 52.4, -34.3, 45.0, 56.0, 67.0, 78.0),"
+		"	       mat4(20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6,"
+		"                   8.0, 0.4, -4.1, -5.9, -10.0, 0.4, -4.1, -5.9));"
+		"}",
+
+		2, /* num_varyings, varyings */
+		{"r[0]", "r[1]"},
+
+		32, /* num_elements, expected */
+		{0.666, 666.0, 999.0, -2.0,
+		 0.2, 5.0, 3.0, 0.3,
+		 -10.0, 20.1, 52.4, -34.3,
+		 45.0, 56.0, 67.0, 78.0,
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6,
+		 8.0, 0.4, -4.1, -5.9, -10.0, 0.4, -4.1, -5.9}
+	},
 
 	{NULL}
 };
@@ -360,6 +514,7 @@ void piglit_init(int argc, char **argv)
 {
 	GLuint vs;
 	unsigned i;
+	int maxcomps;
 	float *data;
 
 	/* Parse params. */
@@ -389,6 +544,11 @@ test_ready:
 	}
 	piglit_require_GLSL();
 	piglit_require_extension("GL_EXT_transform_feedback");
+
+	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS, &maxcomps);
+	if (maxcomps < test->num_elements) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	/* Create shaders. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, test->vs);
