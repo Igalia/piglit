@@ -71,7 +71,7 @@ main(int argc, char **argv)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Noop */
-	glXSwapBuffers(dpy, p);
+	glXSwapBuffers(dpy, g);
 
 	/* We want to actually catch any X error that leaks through as
 	 * a result of glXSwapBuffers() before we go saying "pass" or
