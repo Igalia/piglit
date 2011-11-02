@@ -404,7 +404,7 @@ test_ready:
 	}
 
 	/* Set up the transform feedback buffer. */
-	data = alloca(test->num_elements*NUM_VERTICES*sizeof(float));
+	data = malloc(test->num_elements*NUM_VERTICES*sizeof(float));
 	for (i = 0; i < test->num_elements*NUM_VERTICES; i++) {
 		data[i] = DEFAULT_VALUE;
 	}
@@ -423,6 +423,8 @@ test_ready:
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
+
+	free(data);
 }
 
 enum piglit_result piglit_display(void)
