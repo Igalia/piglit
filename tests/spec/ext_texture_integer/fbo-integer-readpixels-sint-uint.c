@@ -143,7 +143,7 @@ check_error(const char *file, int line)
 
 
 /** \return GL_TRUE for pass, GL_FALSE for fail */
-static GLboolean
+static bool
 test_fbo(const struct format_info *info)
 {
    const int comps = num_components(info->BaseFormat);
@@ -153,6 +153,7 @@ test_fbo(const struct format_info *info)
    GLenum status;
    GLboolean intMode;
    GLint buf;
+   bool pass = true;
 
    if (0)
       fprintf(stderr, "============ Testing format = %s ========\n", info->Name);
@@ -235,6 +236,8 @@ test_fbo(const struct format_info *info)
                         exp_ui[0], exp_ui[1], exp_ui[2], exp_ui[3]);
                    fprintf(stderr, "  Found %u, %u, %u, %u\n",
                         pix_ui[0], pix_ui[1], pix_ui[2], pix_ui[3]);
+		   pass = false;
+		   break;
                }
           }
       } else {
@@ -246,6 +249,8 @@ test_fbo(const struct format_info *info)
                         exp_i[0], exp_i[1], exp_i[2], exp_i[3]);
                    fprintf(stderr, "  Found %d, %d, %d, %d\n",
                         pix[0], pix[1], pix[2], pix[3]);
+		   pass = false;
+		   break;
                }
           }
       }
@@ -256,7 +261,7 @@ test_fbo(const struct format_info *info)
    glDeleteTextures(1, &texObj);
    glDeleteFramebuffers(1, &fbo);
 
-   return GL_TRUE;
+   return pass;
 }
 
 
@@ -265,7 +270,7 @@ piglit_display(void)
 {
    int f;
    for (f = 0; f < NUM_FORMATS; f++) {
-      GLboolean pass = test_fbo(&Formats[f]);
+      bool pass = test_fbo(&Formats[f]);
       if (!pass)
          return PIGLIT_FAIL;
    }
