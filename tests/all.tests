@@ -994,7 +994,7 @@ add_shader_test_dir(arb_texture_rectangle,
 
 arb_texture_storage = Group()
 spec['ARB_texture_storage'] = arb_texture_storage
-add_plain_test(arb_texture_storage, 'texture-storage')
+arb_texture_storage['texture-storage'] = plain_test('arb_texture_storage-texture-storage')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
