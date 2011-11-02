@@ -1,0 +1,33 @@
+# Check that multiplying a uvec4 by a constant value works correctly
+# in the vertex shader.
+
+[require]
+GLSL >= 1.30
+GL >= 3.0
+
+[vertex shader]
+#version 130
+uniform uvec4 x;
+uniform uvec4 expected;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+  if (x * 0xe1ac99a1u == expected)
+    gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+uniform uvec4 x        1531867558 1727206098 1831100720 2032151849
+uniform uvec4 expected 2412359526 1010194450 3728133936 3368413129
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

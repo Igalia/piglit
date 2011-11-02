@@ -1,0 +1,31 @@
+# Check that multiplying a constant value by an ivec4 works correctly
+# in the fragment shader.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform ivec4 x;
+uniform ivec4 expected;
+
+void main()
+{
+  if (0x69c477b9 * x == expected)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform ivec4 x        -763033965 -1295568908 -1071767891 -1156452404
+uniform ivec4 expected 1270617403 -1811147948  1199216133  -895607188
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
