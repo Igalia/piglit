@@ -594,6 +594,7 @@ glx['glx-swap-event_event'] = PlainExecTest(['glx-swap-event', '-auto', '--event
 glx['glx-swap-event_async'] = PlainExecTest(['glx-swap-event', '-auto', '--async'])
 glx['glx-swap-event_interval'] = PlainExecTest(['glx-swap-event', '-auto', '--interval'])
 add_plain_test(glx, 'glx-swap-pixmap')
+add_plain_test(glx, 'glx-swap-pixmap-bad')
 add_plain_test(glx, 'glx-swap-singlebuffer')
 add_plain_test(glx, 'glx-make-current')
 add_plain_test(glx, 'glx-make-glxdrawable-current')
