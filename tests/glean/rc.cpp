@@ -66,9 +66,7 @@ HGLRC create_context(GLEAN::DrawingSurfaceConfig &c)
 	if (!hDC)
 		return 0;
 
-	PIXELFORMATDESCRIPTOR pfd; 
-
-	if (!SetPixelFormat(hDC,c.pfdID,&pfd))
+	if (!SetPixelFormat(hDC,c.pfdID,&c.pfd))
 	{
 		ReleaseDC(hwnd,hDC);
 		DestroyWindow(hwnd);

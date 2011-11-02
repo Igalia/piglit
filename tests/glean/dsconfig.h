@@ -93,7 +93,7 @@ class DrawingSurfaceConfig {
 	::XID fbcID;			// Framebuffer Config ID.
 #     endif
 #   elif defined(__WIN__)
-	::PIXELFORMATDESCRIPTOR *pfd;
+	::PIXELFORMATDESCRIPTOR pfd;
 	int pfdID;
 #   elif defined(__AGL__)
 	AGLPixelFormat    pf;

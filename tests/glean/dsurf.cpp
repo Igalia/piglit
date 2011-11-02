@@ -155,8 +155,7 @@ legacyMethod:
 
 	hDC = GetDC(hWindow);
 
-	PIXELFORMATDESCRIPTOR pfd;
-	SetPixelFormat(hDC,config->pfdID,&pfd);
+	SetPixelFormat(hDC,config->pfdID,&config->pfd);
 	
 #elif defined(__BEWIN__)
 

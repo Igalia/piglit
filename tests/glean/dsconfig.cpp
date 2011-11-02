@@ -367,48 +367,48 @@ DrawingSurfaceConfig::DrawingSurfaceConfig(int id, ::PIXELFORMATDESCRIPTOR *ppfd
 	if (!mapsInitialized)
 		initializeMaps();
 
-	pfd = ppfd;
+	pfd = *ppfd;
 	pfdID = id;
 	
-	canRGBA = pfd->iPixelType == PFD_TYPE_RGBA;			
-	canCI = pfd->iPixelType == PFD_TYPE_COLORINDEX;			
+	canRGBA = pfd.iPixelType == PFD_TYPE_RGBA;
+	canCI = pfd.iPixelType == PFD_TYPE_COLORINDEX;
 
-	bufSize = pfd->cColorBits + pfd->cAlphaBits;
+	bufSize = pfd.cColorBits + pfd.cAlphaBits;
 
 	level = 0;
 
-	db = pfd->dwFlags & PFD_DOUBLEBUFFER;
+	db = pfd.dwFlags & PFD_DOUBLEBUFFER;
 
-	stereo = pfd->dwFlags & PFD_STEREO;
+	stereo = pfd.dwFlags & PFD_STEREO;
 
-	aux = pfd->cAuxBuffers;
+	aux = pfd.cAuxBuffers;
 
 	if (canRGBA)	{
-		r = pfd->cRedBits;
-		g = pfd->cGreenBits;
-		b = pfd->cBlueBits;
-		a = pfd->cAlphaBits;
+		r = pfd.cRedBits;
+		g = pfd.cGreenBits;
+		b = pfd.cBlueBits;
+		a = pfd.cAlphaBits;
 	}
 	else
 		r = g = b = a = 0;
 
-	z = pfd->cDepthBits;
-	s = pfd->cStencilBits;
+	z = pfd.cDepthBits;
+	s = pfd.cStencilBits;
 
-	accR = pfd->cAccumRedBits;
-	accG = pfd->cAccumGreenBits;
-	accB = pfd->cAccumBlueBits;
-	accA = pfd->cAccumAlphaBits;
+	accR = pfd.cAccumRedBits;
+	accG = pfd.cAccumGreenBits;
+	accB = pfd.cAccumBlueBits;
+	accA = pfd.cAccumAlphaBits;
 
 	samples = 0; // XXX implement properly for Windows!
 
-	canWindow = pfd->dwFlags & PFD_DRAW_TO_WINDOW;			
+	canWindow = pfd.dwFlags & PFD_DRAW_TO_WINDOW;
 
-	canWinSysRender = pfd->dwFlags & PFD_SUPPORT_GDI;		
+	canWinSysRender = pfd.dwFlags & PFD_SUPPORT_GDI;
 
-	if (pfd->dwFlags & PFD_GENERIC_FORMAT)
+	if (pfd.dwFlags & PFD_GENERIC_FORMAT)
 	{
-		if (pfd->dwFlags & PFD_GENERIC_ACCELERATED)
+		if (pfd.dwFlags & PFD_GENERIC_ACCELERATED)
 		{
 			// it's an MCD - at least it has some acceleration
 			fast = true;
