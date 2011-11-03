@@ -125,6 +125,65 @@ Configure and build.
   $ make
 
 
+2.5 Windows
+-----------
+
+Install Python.
+http://www.python.org/download
+
+Install NumPy.
+http://sourceforge.net/projects/numpy/files/NumPy
+
+Install CMake.
+http://cmake.org/cmake/resources/software.html
+Download and install 'Windows' platform.
+
+Install Microsoft Visual Studio.
+Install 'Visual C++' feature.
+
+Install TIFF for Windows.
+http://gnuwin32.sourceforge.net/packages/tiff.htm
+
+Install Zlib for Windows.
+http://gnuwin32.sourceforge.net/packages/zlib.htm
+
+Install LibPng for Windows.
+http://gnuwin32.sourceforge.net/packages/libpng.htm
+
+Download OpenGL Core API and Extension Header Files.
+http://www.opengl.org/registry/#headers
+Copy header files to MSVC.
+C:\Program Files\Microsoft Visual Studio 10.0\VC\include\GL
+
+Download freeglut for MSVC.
+http://www.transmissionzero.co.uk/software/freeglut-devel
+
+Open Visual Studio Command Prompt.
+Start Menu->All Programs->Microsoft Visual Studio 2010->Visual Studio Tools->Visual Studio Command Prompt (2010)
+CD to piglit directory.
+
+Run CMake GUI.
+  > C:\Program Files\CMake 2.8\bin\cmake-gui.exe .
+Configure
+  - NMake Makefiles
+  - Use default native compilers
+Set these variables in the Advanced view.
+  - TIFF_INCLUDE_DIR
+  - TIFF_LIBRARY
+  - ZLIB_INCLUDE_DIR
+  - ZLIB_LIBRARY
+  - PNG_PNG_INCLUDE_DIR
+  - PNG_LIBRARY
+  - GLUT_INCLUDE_DIR
+  - GLUT_glut_LIBRARY
+Configure
+Generate
+File->Exit
+
+Build from the Visual Studio Command Prompt.
+  > nmake
+
+
 3. How to run tests
 -------------------
 
