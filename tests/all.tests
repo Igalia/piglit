@@ -794,6 +794,7 @@ gl30 = Group()
 spec['!OpenGL 3.0'] = gl30
 add_concurrent_test(gl30, 'bindfragdata-invalid-parameters')
 add_concurrent_test(gl30, 'clearbuffer-depth')
+add_concurrent_test(gl30, 'clearbuffer-depth-stencil')
 add_concurrent_test(gl30, 'clearbuffer-invalid-drawbuffer')
 add_concurrent_test(gl30, 'clearbuffer-invalid-buffer')
 add_concurrent_test(gl30, 'clearbuffer-stencil')
