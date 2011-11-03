@@ -16,6 +16,7 @@ add_executable (bindfragdata-invalid-parameters bindfragdata-invalid-parameters.
 add_executable (clearbuffer-depth clearbuffer-common.c clearbuffer-depth.c)
 add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
 add_executable (clearbuffer-invalid-buffer clearbuffer-invalid-buffer.c)
+add_executable (clearbuffer-stencil clearbuffer-common.c clearbuffer-stencil.c)
 add_executable (getfragdatalocation getfragdatalocation.c)
 
 # vim: ft=cmake:
