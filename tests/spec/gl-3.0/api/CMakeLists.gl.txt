@@ -13,6 +13,7 @@ link_libraries (
 )
 
 add_executable (bindfragdata-invalid-parameters bindfragdata-invalid-parameters.c)
+add_executable (bindfragdata-link-error bindfragdata-link-error.c)
 add_executable (clearbuffer-depth clearbuffer-common.c clearbuffer-depth.c)
 add_executable (clearbuffer-depth-stencil clearbuffer-common.c clearbuffer-depth-stencil.c)
 add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
