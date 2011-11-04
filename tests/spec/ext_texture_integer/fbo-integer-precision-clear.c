@@ -136,6 +136,7 @@ test_fbo(const struct format_info *info)
 	GLint buf;
 	static const GLint clr[4] = { 300000005, 7, 6, 5 };
 	GLint pix[4], i;
+	bool pass = true;
 
 	if (0)
 		fprintf(stderr, "============ Testing format = %s ========\n",
@@ -205,6 +206,8 @@ test_fbo(const struct format_info *info)
 				clr[0], clr[1], clr[2], clr[3]);
 			fprintf(stderr, "  Found %d, %d, %d, %d\n",
 				pix[0], pix[1], pix[2], pix[3]);
+			pass = false;
+			break;
 		}
 	}
 
@@ -213,7 +216,7 @@ test_fbo(const struct format_info *info)
 	glDeleteTextures(1, &texObj);
 	glDeleteFramebuffers(1, &fbo);
 
-	return GL_TRUE;
+	return pass;
 }
 
 
@@ -222,7 +225,7 @@ piglit_display(void)
 {
 	int f;
 	for (f = 0; f < NUM_FORMATS; f++) {
-		GLboolean pass = test_fbo(&Formats[f]);
+		bool pass = test_fbo(&Formats[f]);
 		if (!pass)
 			return PIGLIT_FAIL;
 	}
