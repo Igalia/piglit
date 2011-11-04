@@ -12,6 +12,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
+add_executable (bindfragdata-invalid-parameters bindfragdata-invalid-parameters.c)
 add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
 add_executable (clearbuffer-invalid-buffer clearbuffer-invalid-buffer.c)
 
