@@ -794,6 +794,7 @@ spec['!OpenGL 3.0'] = gl30
 add_concurrent_test(gl30, 'bindfragdata-invalid-location')
 add_concurrent_test(gl30, 'clearbuffer-invalid-drawbuffer')
 add_concurrent_test(gl30, 'clearbuffer-invalid-buffer')
+add_concurrent_test(gl30, 'getfragdatalocation')
 
 # Group spec/glsl-1.00
 spec['glsl-1.00'] = Group()
