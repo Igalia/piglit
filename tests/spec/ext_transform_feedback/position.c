@@ -180,6 +180,9 @@ enum piglit_result piglit_display(void)
 		-0.375000, 0.250000, 0.000000, 1.000000,
 		-0.375000, -0.375000, 0.000000, 1.000000,
 	};
+	static const unsigned indices[] = {
+		0, 1, 3, 1, 2, 3
+	};
 	static const float clearcolor[] = {0.2, 0.2, 0.2};
 	static const float white[] = {1, 1, 1};
 	static const float red[] = {1, 0, 0};
@@ -206,7 +209,7 @@ enum piglit_result piglit_display(void)
 	piglit_BeginTransformFeedback(GL_TRIANGLES);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
 	piglit_EndTransformFeedback();
 	if (discard)
 		glDisable(GL_RASTERIZER_DISCARD_EXT);

@@ -115,6 +115,9 @@ enum piglit_result piglit_display(void)
 		20, 20,
 		20, 10
 	};
+	static const unsigned indices[] = {
+		0, 1, 3, 1, 2, 3
+	};
 	static const float expected[] = {
 		0.550000, 0.660000, 0.770000,
 		1.000000, 0.900000, 0.800000, 0.700000,
@@ -161,7 +164,7 @@ enum piglit_result piglit_display(void)
 	glEnable(GL_RASTERIZER_DISCARD);
 	piglit_BeginTransformFeedback(GL_TRIANGLES);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
 	piglit_EndTransformFeedback();
 	glDisable(GL_RASTERIZER_DISCARD);
 
