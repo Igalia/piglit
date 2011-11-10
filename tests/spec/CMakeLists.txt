@@ -1,5 +1,6 @@
 add_subdirectory (arb_color_buffer_float)
 add_subdirectory (arb_es2_compatibility)
+add_subdirectory (arb_framebuffer_object)
 add_subdirectory (arb_instanced_arrays)
 add_subdirectory (arb_map_buffer_range)
 add_subdirectory (arb_robustness)

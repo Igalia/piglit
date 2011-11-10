@@ -943,6 +943,12 @@ add_shader_test_dir(arb_draw_instanced,
                     os.path.dirname(__file__) + '/spec/arb_draw_instanced/execution',
                     recursive=True)
 
+# Group ARB_framebuffer_object
+arb_framebuffer_object = Group()
+spec['ARB_framebuffer_object'] = arb_framebuffer_object
+add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT')
+add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT')
+
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
