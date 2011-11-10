@@ -10,10 +10,6 @@
 
 varying float x;
 
-void f(out float y) {
-    y = 0.0;
-}
-
 void g() {
-    f(x);
+    x = 0.0;
 }
