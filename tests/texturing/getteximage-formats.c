@@ -83,7 +83,7 @@ static void
 print(int x, int y, const char *s)
 {
 	glColor3f(1, 1, 1);
-	glWindowPos2i(x, y);
+	glWindowPos2iARB(x, y);
 	while (*s) {
 		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, (int) *s);
 		s++;
@@ -382,7 +382,7 @@ test_format(const struct test_desc *test,
 
 			assert(!glIsEnabled(GL_TEXTURE_2D));
 			/* Draw the texture image */
-			glWindowPos2i(x, y);
+			glWindowPos2iARB(x, y);
 			glEnable(GL_BLEND);
 			assert(!glIsEnabled(GL_TEXTURE_2D));
 			glDrawPixels(w, h, GL_RGBA, GL_FLOAT, readback);
@@ -522,13 +522,11 @@ reshape(int width, int height)
 void
 piglit_init(int argc, char **argv)
 {
-	const GLubyte *verStr = glGetString(GL_VERSION);
-	GLuint version = verStr[0] * 10 + verStr[2];
 	GLuint t;
 
-	if (version < 14) {
+	if ((piglit_get_gl_version() < 14) && !piglit_is_extension_supported("GL_ARB_window_pos")) {
+		printf("Requires GL 1.4 or GL_ARB_window_pos");
 		piglit_report_result(PIGLIT_SKIP);
-		return;
 	}
 
 	fbo_formats_init(argc, argv, 0);

@@ -78,7 +78,7 @@ test(void)
    }
 
    /* glDrawPixels the image on left */
-   glWindowPos2i(0, 0);
+   glWindowPos2iARB(0, 0);
    glDrawPixels(TEX_SIZE, TEX_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
    glGenTextures(1, &tex);
@@ -141,5 +141,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-
+   if ((piglit_get_gl_version() < 14) && !piglit_is_extension_supported("GL_ARB_window_pos")) {
+	printf("Requires GL 1.4 or GL_ARB_window_pos");
+	piglit_report_result(PIGLIT_SKIP);
+   }
 }
