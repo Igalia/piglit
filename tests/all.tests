@@ -501,7 +501,7 @@ add_plain_test(shaders, 'useshaderprogram-flushverts-1')
 
 fpgeneric = Group()
 def add_fpgeneric(name):
-	fpgeneric[name] = PlainExecTest(['fp-generic', '-auto', testBinDir + '../tests/shaders/generic/' + name + '.fp'])
+	fpgeneric[name] = PlainExecTest(['fp-generic', '-auto', os.path.dirname(__file__) + '/shaders/generic/' + name + '.fp'])
 add_fpgeneric('dph')
 add_fpgeneric('kil-swizzle')
 add_fpgeneric('lrp_sat')
@@ -509,7 +509,7 @@ shaders['fp-generic'] = fpgeneric
 
 vpfpgeneric = Group()
 def add_vpfpgeneric(name):
-	vpfpgeneric[name] = PlainExecTest(['vpfp-generic', '-auto', testBinDir + '../tests/shaders/generic/' + name + '.vpfp'])
+	vpfpgeneric[name] = PlainExecTest(['vpfp-generic', '-auto', os.path.dirname(__file__) + '/shaders/generic/' + name + '.vpfp'])
 add_vpfpgeneric('arl')
 add_vpfpgeneric('big-param')
 add_vpfpgeneric('dataflow-bug')
