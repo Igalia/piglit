@@ -64,7 +64,7 @@ bool found_error_glxbaddrawable = false;
 static int
 expect_no_error(Display *display, XErrorEvent *error)
 {
-	static buf[256];
+	static char buf[256];
 	XGetErrorText(display, error->error_code, buf, 256);
 	fprintf(stderr, "error: unexpected X error: %s\n", buf);
 	piglit_report_result(PIGLIT_FAIL);
@@ -77,7 +77,7 @@ expect_glxbaddrawable(Display *display, XErrorEvent *error)
 	if (piglit_glx_get_error(display, error) == GLXBadDrawable) {
 		found_error_glxbaddrawable = true;
 	} else {
-		static buf[256];
+		static char buf[256];
 		XGetErrorText(display, error->error_code, buf, 256);
 		fprintf(stderr, "error: unexpected X error: %s\n", buf);
 		piglit_report_result(PIGLIT_FAIL);
