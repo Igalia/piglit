@@ -46,6 +46,7 @@ handler(Display *dpy, XErrorEvent *err)
 {
     if (piglit_glx_get_error(dpy, err) != GLXBadDrawable)
 	pass = 0;
+    return 0;
 }
 
 int
@@ -53,7 +54,6 @@ main(int argc, char **argv)
 {
 	Pixmap p;
 	GLXPixmap g;
-	float green[4] = {0.0, 1.0, 0.0, 0.0};
 	GLXContext ctx;
 
 	dpy = XOpenDisplay(NULL);
