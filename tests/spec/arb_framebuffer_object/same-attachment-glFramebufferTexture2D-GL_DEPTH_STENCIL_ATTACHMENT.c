@@ -95,6 +95,7 @@ check_attachment(GLenum attach, GLint expect_name)
 enum piglit_result
 piglit_display()
 {
+   return PIGLIT_PASS;
 }
 
 void piglit_init(int argc, char **argv)
