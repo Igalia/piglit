@@ -153,7 +153,7 @@ parse_args(char **argv,
 	/* Count of parsed args, excluding -auto. */
 	int num_parsed_args = 0;
 
-	for (i = 1; argv[i] != NULL; ++i) {
+	for (i = 1; argv[i] != NULL;) {
 		const char *arg = argv[i];
 		if (!strncmp(arg, "--bad-surface", 13)) {
 			++num_parsed_args;
@@ -173,7 +173,7 @@ parse_args(char **argv,
 			*out_test = query_height;
 		} else {
 		   /* Unrecognized argument. */
-		   usage_error();
+		   ++i;
 		}
 	}
 
@@ -181,7 +181,7 @@ parse_args(char **argv,
 	   usage_error();
 	}
 
-	*out_argc = i;
+	*out_argc -= num_parsed_args;
 }
 
 int
