@@ -41,6 +41,12 @@ if(NOT import_numpy_error_code EQUAL 0)
 	message(FATAL_ERROR "numpy library not found")
 endif(NOT import_numpy_error_code EQUAL 0)
 
+# Default to compiling with debug information (`gcc -g`):
+if(NOT CMAKE_BUILD_TYPE)
+	SET(CMAKE_BUILD_TYPE Debug CACHE STRING
+	"May be one of: None Debug RelWithDebInfo Release MinSizeRel" FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
 if (NOT MSVC)
 	CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WALL)
 	IF (C_COMPILER_FLAG_WALL)
