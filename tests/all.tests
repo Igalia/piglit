@@ -888,10 +888,15 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 ['compiler'])
 spec['glsl-1.30']['execution'] = Group()
 spec['glsl-1.30']['execution']['textureSize'] = Group()
+spec['glsl-1.30']['execution']['texelFetch'] = Group()
 for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']:
 		spec['glsl-1.30']['execution']['textureSize'][stage + '-textureSize-' + sampler] = PlainExecTest(['textureSize', stage, sampler, '-auto', '-fbo'])
+	# texelFetch():
+	for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
+		spec['glsl-1.30']['execution']['texelFetch'][stage + '-texelFetch-' + sampler] = PlainExecTest(['texelFetch', stage, sampler, '-auto', '-fbo'])
+
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],

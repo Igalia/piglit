@@ -14,3 +14,4 @@ link_libraries (
 )
 
 add_executable (textureSize textureSize.c common.c)
+add_executable (texelFetch texelFetch.c common.c)
