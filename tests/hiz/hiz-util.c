@@ -651,7 +651,10 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 	glDepthFunc(GL_LESS);
 	glClearDepth(hiz_clear_z);
 
-	/* Set up stencil state. */
+	/* Set up stencil state. The test for 3 < stencil with the
+	 * buffer cleared to 3 means the first primitive drawn will be
+	 * stenciled out.
+	 */
 	glEnable(GL_STENCIL_TEST);
 	glClearStencil(3); /* 3 is a good canary. */
 	glStencilFunc(GL_LESS, 3, ~0);
@@ -665,19 +668,24 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, false);
 
-	/* Draw rect 1. */
+	/* Draw a rect 1 on left 2/3 of the screen with clear color,
+	 * letting the next drawing there pass stencil.
+	 */
 	glColor4fv(hiz_grey);
 	glDepthRange(hiz_clear_z, hiz_clear_z);
 	piglit_draw_rect(0 * dx, 0 * dy, /* x, y */
 			 2 * dx, 3 * dy); /* w, h */
 
-	/* Draw rect 2. */
+	/* Draw rect 2. This should pass with or without stencil. */
 	glColor4fv(hiz_green);
 	glDepthRange(hiz_green_z, hiz_green_z);
 	piglit_draw_rect(0 * dx, 0 * dy,  /* x, y */
 			 2 * dx, 2 * dy); /* w, h */
 
-	/* Draw rect 3. */
+	/* Draw rect 3. This should draw only the left half if stencil
+	 * is present (due to rect 1 covering only that much), and
+	 * should draw over rect 2 only if depth is not present.
+	 */
 	glColor4fv(hiz_blue);
 	glDepthRange(hiz_blue_z, hiz_blue_z);
 	piglit_draw_rect(1 * dx, 1 * dy,   /* x, y */
