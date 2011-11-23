@@ -45,7 +45,7 @@
 	for (iy = 0; iy < 3; ++iy) for (ix = 0; ix < 3; ++ix) {	\
 		int x = (3 * ix + 1) * dx; \
 		int y = (3 * iy + 1) * dy; \
-		int i = 3 * iy + ix; \
+		int i = 3 * (2 - iy) + ix;		     \
 		pass &= probe_func(x, y, dx, dy, expect[i]); \
 	} \
 	\
@@ -198,17 +198,9 @@ static bool
 hiz_run_test_depth_test_common()
 {
 	static const float *expect_color[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_green,
-		hiz_blue,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_blue
+		hiz_grey,  hiz_blue,  hiz_blue,
+		hiz_green, hiz_green, hiz_blue,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	const float width_3 = piglit_width / 3.0;
@@ -299,31 +291,15 @@ static bool
 hiz_run_test_depth_read_common()
 {
 	static const float *expect_color[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_green,
-		hiz_blue,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_blue
+		hiz_grey,  hiz_blue,  hiz_blue,
+		hiz_green, hiz_green, hiz_blue,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	static const float expect_depth[9] = {
-		hiz_green_z,
-		hiz_green_z,
-		hiz_clear_z,
-
-		hiz_green_z,
-		hiz_green_z,
-		hiz_blue_z,
-
-		hiz_clear_z,
-		hiz_blue_z,
-		hiz_blue_z
+		hiz_clear_z, hiz_blue_z,  hiz_blue_z,
+		hiz_green_z, hiz_green_z, hiz_blue_z,
+		hiz_green_z, hiz_green_z, hiz_clear_z,
 	};
 
 
@@ -419,17 +395,9 @@ static bool
 hiz_run_test_stencil_test_common()
 {
 	static const float *expected_colors[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_blue,
-		hiz_grey,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_grey,
+		hiz_grey,  hiz_blue,  hiz_grey,
+		hiz_green, hiz_blue,  hiz_grey,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	const float dx = piglit_width / 3.0;
@@ -533,31 +501,15 @@ static bool
 hiz_run_test_stencil_read_common()
 {
 	static const float *expected_colors[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_blue,
-		hiz_grey,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_grey,
+		hiz_grey,  hiz_blue,  hiz_grey,
+		hiz_green, hiz_blue,  hiz_grey,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	static const unsigned expected_stencil[9] = {
-		5,
-		5,
-		3,
-
-		5,
-		6,
-		4,
-
-		4,
-		5,
-		4,
+		4, 5, 4,
+		5, 6, 4,
+		5, 5, 3,
 	};
 
 	const float dx = piglit_width / 3.0;
@@ -662,45 +614,21 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 	static const float **expected_colors = NULL;
 
 	static const float *expected_colors_d1s0[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_green,
-		hiz_blue,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_blue,
+		hiz_grey,  hiz_blue,  hiz_blue,
+		hiz_green, hiz_green, hiz_blue,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	static const float *expected_colors_d0s1[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_blue,
-		hiz_grey,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_grey,
+		hiz_grey,  hiz_blue,  hiz_grey,
+		hiz_green, hiz_blue,  hiz_grey,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	static const float *expected_colors_d1s1[9] = {
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_green,
-		hiz_green,
-		hiz_grey,
-
-		hiz_grey,
-		hiz_blue,
-		hiz_grey,
+		hiz_grey,  hiz_blue,  hiz_grey,
+		hiz_green, hiz_green, hiz_grey,
+		hiz_green, hiz_green, hiz_grey,
 	};
 
 	if (has_depth_buffer && !has_stencil_buffer)
