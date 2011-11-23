@@ -832,6 +832,9 @@ for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
 	cmdline = 'clip-plane-transformation ' + mode
 	spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
 
+spec['glsl-1.10']['api'] = Group()
+add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
+
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = Group()
 import_glsl_parser_tests(spec['glsl-1.20'],
@@ -871,6 +874,9 @@ add_recursion_test(rec, 'indirect-separate')
 add_recursion_test(rec, 'indirect-complex')
 add_recursion_test(rec, 'indirect-complex-separate')
 
+spec['glsl-1.20']['api'] = Group()
+add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
+
 
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = Group()
@@ -903,6 +909,9 @@ spec['glsl-1.30']['texel-offset-limits'] = concurrent_test('glsl-1.30-texel-offs
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-beginend')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawarrays')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
+
+spec['glsl-1.30']['api'] = Group()
+add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
