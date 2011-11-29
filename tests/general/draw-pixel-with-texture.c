@@ -37,9 +37,11 @@ piglit_display(void)
 		1, 0, 0, 1, 	1, 0, 0, 1,
 		1, 0, 0, 1, 	1, 0, 0, 1,
 	};
-	GLfloat pixels[SCREEN_SIZE_IN_PIXELS];
+	GLfloat *pixels;
 	GLfloat expected[4] = {0.2, 0, 0, 1};
 	int i;
+
+	pixels = (GLfloat *) malloc(SCREEN_SIZE_IN_PIXELS * sizeof(GLfloat));
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_FLOAT, tex_data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -62,6 +64,8 @@ piglit_display(void)
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, expected);
 
 	piglit_present_results();
+
+	free(pixels);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
