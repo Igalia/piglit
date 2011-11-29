@@ -218,7 +218,7 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	}
 
 	if (this->count < 1 || this->count > 4) {
-		printf("Count must be between 1 and 4.  Got: %lu\n", count);
+		printf("Count must be between 1 and 4.  Got: %lu\n", (unsigned long) count);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 }
