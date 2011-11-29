@@ -866,6 +866,34 @@ set_uniform(const char *line)
 	return;
 }
 
+void
+set_parameter(const char *line)
+{
+	float f[4];
+	int index, count;
+	char type[1024];
+
+	count = sscanf(line, "%s %d (%f , %f , %f , %f)",
+		       type, &index, &f[0], &f[1], &f[2], &f[3]);
+	if (count != 6) {
+		fprintf(stderr, "Couldn't parse parameter command:\n%s\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (string_match("env_vp", type)) {
+		glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, index, f);
+	} else if (string_match("local_vp", type)) {
+		glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, index, f);
+	} else if (string_match("env_fp", type)) {
+		glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, index, f);
+	} else if (string_match("local_fp", type)) {
+		glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, index, f);
+	} else {
+		fprintf(stderr, "Unknown parameter type `%s'\n", type);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
 struct enable_table {
 	const char *name;
 	GLenum value;
@@ -1273,6 +1301,8 @@ piglit_display(void)
 			handle_texparameter(GL_TEXTURE_1D_ARRAY, line + strlen("texparameter1DArray "));
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
+		} else if (string_match("parameter ", line)) {
+			set_parameter(line + strlen("parameter "));
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"", line);
