@@ -48,7 +48,7 @@ usage_error()
 	"    glx-query-drawable [-auto] --attr=GLX_WIDTH\n"
 	"    glx-query-drawable [-auto] --attr=GLX_HEIGHT\n"
 	"        Call glXQueryDrawable() with the given attribute.\n";
-	printf(message);
+	printf("%s", message);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
