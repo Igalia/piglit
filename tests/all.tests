@@ -958,6 +958,13 @@ add_shader_test_dir(arb_draw_instanced,
                     os.path.dirname(__file__) + '/spec/arb_draw_instanced/execution',
                     recursive=True)
 
+# Group ARB_fragment_program_shadow
+arb_fragment_program_shadow = Group()
+spec['ARB_fragment_program_shadow'] = arb_fragment_program_shadow
+add_shader_test_dir(spec['ARB_fragment_program_shadow'],
+	            os.path.join(os.path.dirname(__file__), 'spec', 'arb_fragment_program_shadow'),
+		    recursive=True)
+
 # Group ARB_framebuffer_object
 arb_framebuffer_object = Group()
 spec['ARB_framebuffer_object'] = arb_framebuffer_object
