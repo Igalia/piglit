@@ -169,6 +169,29 @@ compile_glsl(GLenum target, bool release_text)
 	}
 }
 
+void
+compile_and_bind_program(GLenum target, const char *start, int len)
+{
+	GLuint prog;
+	char *source;
+
+	switch (target) {
+	case GL_VERTEX_PROGRAM_ARB:
+		piglit_require_extension("GL_ARB_vertex_program");
+		break;
+	case GL_FRAGMENT_PROGRAM_ARB:
+		piglit_require_extension("GL_ARB_fragment_program");
+		break;
+	}
+
+	source = malloc(len + 1);
+	memcpy(source, start, len);
+	source[len] = 0;
+	prog = piglit_compile_program(target, source);
+
+	glEnable(target);
+	glBindProgramARB(target, prog);
+}
 
 /**
  * Copy a string until either whitespace or the end of the string
@@ -462,6 +485,9 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case vertex_program:
+		compile_and_bind_program(GL_VERTEX_PROGRAM_ARB,
+					 shader_strings[0],
+					 line - shader_strings[0]);
 		break;
 
 	case geometry_shader:
@@ -481,6 +507,9 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case fragment_program:
+		compile_and_bind_program(GL_FRAGMENT_PROGRAM_ARB,
+					 shader_strings[0],
+					 line - shader_strings[0]);
 		break;
 
 	case vertex_data:
@@ -595,12 +624,18 @@ process_test_script(const char *script_name)
 			} else if (string_match("[vertex shader]", line)) {
 				state = vertex_shader;
 				shader_strings[0] = NULL;
+			} else if (string_match("[vertex program]", line)) {
+				state = vertex_program;
+				shader_strings[0] = NULL;
 			} else if (string_match("[vertex shader file]", line)) {
 				state = vertex_shader_file;
 				shader_strings[0] = NULL;
 				num_shader_strings = 0;
 			} else if (string_match("[fragment shader]", line)) {
 				state = fragment_shader;
+				shader_strings[0] = NULL;
+			} else if (string_match("[fragment program]", line)) {
+				state = fragment_program;
 				shader_strings[0] = NULL;
 			} else if (string_match("[fragment shader file]", line)) {
 				state = fragment_shader_file;
