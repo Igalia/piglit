@@ -13,6 +13,12 @@ profile = TestProfile()
 
 spec = Group()
 
+# Group oes_compressed_etc1_rgb8_texture
+oes_compressed_etc1_rgb8_texture = Group()
+spec['OES_compressed_ETC1_RGB8_texture'] = oes_compressed_etc1_rgb8_texture
+oes_compressed_etc1_rgb8_texture['basic'] = PlainExecTest(['oes_compressed_etc1_rgb8_texture-basic', '-auto'])
+oes_compressed_etc1_rgb8_texture['basic'].runConcurrent = True
+
 # Group OES_compressed_paletted_texture
 oes_compressed_paletted_texture = Group()
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture

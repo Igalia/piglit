@@ -1,0 +1,11 @@
+include_directories(
+	${piglit_SOURCE_DIR}/tests/util
+)
+
+link_libraries(
+        glut_egl
+        piglitutil_${piglit_target_api}
+        ${OPENGL_gles1_LIBRARY}
+        )
+
+add_executable (oes_compressed_etc1_rgb8_texture-basic oes_compressed_etc1_rgb8_texture-basic.c)
