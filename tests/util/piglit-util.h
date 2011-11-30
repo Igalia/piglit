@@ -51,6 +51,7 @@ typedef unsigned __int64 uint64_t;
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include <float.h>
 
@@ -71,7 +72,23 @@ roundf(float x) {
 	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
 }
 
+#ifndef va_copy
+#ifdef __va_copy
+#define va_copy(dest, src) __va_copy((dest), (src))
+#else
+#define va_copy(dest, src) (dest) = (src)
+#endif
+#endif
+
 #endif /* defined(_MSC_VER) */
+
+#ifdef _WIN32
+int asprintf(char **strp, const char *fmt, ...)
+#ifdef __GNUC__
+	__attribute__ ((format (printf, 2, 3)))
+#endif
+;
+#endif /* _WIN32 */
 
 // Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
 #ifndef INFINITY

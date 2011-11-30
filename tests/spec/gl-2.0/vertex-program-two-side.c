@@ -129,23 +129,23 @@ piglit_display(void)
 }
 
 static void
-setup_output(char *out, const char *name, float *values)
+setup_output(char **out, const char *name, float *values)
 {
-	sprintf(out,
-		"	%s = vec4(%f, %f, %f, %f);\n",
-		name,
-		values[0],
-		values[1],
-		values[2],
-		values[3]);
+	asprintf(out,
+		 "	%s = vec4(%f, %f, %f, %f);\n",
+		 name,
+		 values[0],
+		 values[1],
+		 values[2],
+		 values[3]);
 }
 
 void
 piglit_init(int argc, char **argv)
 {
 	GLint vs, fs;
-	static char vs_outputs[4][1024];
-	static char vs_source[4096];
+	char *vs_outputs[4] = {"", "", "", ""};
+	char *vs_source;
 	int i;
 
 	piglit_require_GLSL();
@@ -179,15 +179,15 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (front)
-		setup_output(vs_outputs[0], "gl_FrontColor", frontcolor);
+		setup_output(&vs_outputs[0], "gl_FrontColor", frontcolor);
 	if (back)
-		setup_output(vs_outputs[1], "gl_BackColor", backcolor);
+		setup_output(&vs_outputs[1], "gl_BackColor", backcolor);
 	if (front2)
-		setup_output(vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
+		setup_output(&vs_outputs[2], "gl_FrontSecondaryColor", secondary_frontcolor);
 	if (back2)
-		setup_output(vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
+		setup_output(&vs_outputs[3], "gl_BackSecondaryColor", secondary_backcolor);
 
-	sprintf(vs_source,
+	asprintf(&vs_source,
 		 "void main()\n"
 		 "{\n"
 		 "	gl_Position = gl_Vertex;\n"
