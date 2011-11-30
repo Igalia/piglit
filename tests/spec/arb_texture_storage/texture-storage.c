@@ -56,7 +56,6 @@ static GLboolean
 test_one_level_errors(GLenum target)
 {
 	const GLint width = 64, height = 4, depth = 8;
-	const char *targetString = "";
 	GLuint tex;
 	GLint v;
 
@@ -69,15 +68,12 @@ test_one_level_errors(GLenum target)
 
 	if (target == GL_TEXTURE_1D) {
 		glTexStorage1D(target, 1, GL_RGBA, width);
-		targetString = "GL_TEXTURE_1D";
 	}
 	else if (target == GL_TEXTURE_2D) {
 		glTexStorage2D(target, 1, GL_RGBA, width, height);
-		targetString = "GL_TEXTURE_2D";
 	}
 	else if (target == GL_TEXTURE_3D) {
 		glTexStorage3D(target, 1, GL_RGBA, width, height, depth);
-		targetString = "GL_TEXTURE_3D";
 	}
 
 	glGetTexLevelParameteriv(target, 0, GL_TEXTURE_WIDTH, &v);
