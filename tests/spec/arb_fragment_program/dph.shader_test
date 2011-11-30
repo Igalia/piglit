@@ -1,0 +1,23 @@
+[vertex program]
+!!ARBvp1.0
+MOV result.position, vertex.position;
+MOV result.texcoord[0], program.env[0];
+MOV result.texcoord[1], program.env[1];
+END
+
+[fragment program]
+!!ARBfp1.0
+DPH result.color, -fragment.texcoord[0], fragment.texcoord[1];
+MOV result.color.w, 1;
+END
+
+[test]
+parameter env_vp 0 (-1.0, 0.0, 0.0, -0.5)
+parameter env_vp 1 (0.2, 0.0, 0.0, 0.0)
+draw rect -1 -1 1 2
+relative probe rgba (0.25, 0.5) (0.2, 0.2, 0.2, 1.0);
+
+parameter env_vp 0 (-1.0, 0.0, 0.0, -0.5)
+parameter env_vp 1 (0.2, 0.0, 0.0, 0.5)
+draw rect 0 -1 1 2
+relative probe rgba (0.75, 0.5) (0.7, 0.7, 0.7, 1.0);
