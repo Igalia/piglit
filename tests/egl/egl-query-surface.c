@@ -52,7 +52,7 @@ usage_error()
 		"    egl-query-surface [-auto] --attr=EGL_WIDTH\n"
 		"    egl-query-surface [-auto] --attr=EGL_HEIGHT\n"
 		"        Call eglQueryDrawable() with the given attribute.\n";
-	printf(message);
+	printf("%s", message);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
