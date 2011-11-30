@@ -992,7 +992,7 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			} else if ((size_t) first >= num_vbo_rows) {
 				printf("draw arrays 'first' must be < %lu\n",
-				       num_vbo_rows);
+				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			if (count <= 0) {
@@ -1000,7 +1000,7 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			} else if (count > num_vbo_rows - (size_t) first) {
 				printf("draw arrays cannot draw beyond %lu\n",
-				       num_vbo_rows);
+				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			/* TODO: wrapper? */
