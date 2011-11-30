@@ -1,0 +1,60 @@
+[vertex program]
+!!ARBvp1.0
+MOV result.position, vertex.position;
+MOV result.texcoord[0], program.env[0];
+MOV result.texcoord[1], program.env[1];
+END
+
+[fragment program]
+!!ARBfp1.0
+KIL fragment.texcoord[0].xxyy;
+KIL fragment.texcoord[1].zwwz;
+
+# green will be neither of the kills occurring, otherwise
+# we'll get the blue clear color.
+MOV result.color, { 0.0, 1.0, 0.0, 0.0 };
+END
+
+[test]
+clear color 0 0 1 0
+# both kill
+parameter env_vp 0 (-1.0, -1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0, -1.0, -1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 0 1 0
+
+# neither kill
+parameter env_vp 0 ( 1.0,  1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0,  1.0,  1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 0
+
+# second kills
+parameter env_vp 0 ( 1.0,  1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0, -1.0,  1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 0 1 0
+
+# second kills
+parameter env_vp 0 ( 1.0,  1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0,  1.0, -1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 0 1 0
+
+# first kills
+parameter env_vp 0 ( 1.0, -1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0,  1.0,  1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 0 1 0
+
+# first kills
+parameter env_vp 0 (-1.0,  1.0, -1.0, -1.0)
+parameter env_vp 1 (-1.0, -1.0,  1.0,  1.0)
+clear
+draw rect -1 -1 2 2
+probe all rgba 0 0 1 0
