@@ -48,7 +48,7 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	GLuint rb, fbo;
-	int i, c;
+	int i;
 
 	if (!GLEW_VERSION_3_0) {
 		printf("Requires GL 3.0\n");
