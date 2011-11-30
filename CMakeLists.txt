@@ -50,13 +50,16 @@ if (NOT MSVC)
 	IF (CXX_COMPILER_FLAG_WALL)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	ENDIF (CXX_COMPILER_FLAG_WALL)
-else (NOT MSVC)
+else ()
 	# -Wall or (/Wall) is actually supported by MSVC and would be detected
 	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
 	# thousand of warnings when including windows.h.
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W4")
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W4")
-endif (NOT MSVC)
+
+	add_definitions (-D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS)
+	add_definitions (-D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
+endif ()
 
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
