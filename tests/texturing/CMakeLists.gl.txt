@@ -15,6 +15,7 @@ link_libraries (
 
 add_executable (1-1-linear-texture 1-1-linear-texture.c)
 add_executable (array-texture array-texture.c)
+add_executable (compressedteximage compressedteximage.c)
 add_executable (copytexsubimage copytexsubimage.c)
 add_executable (copyteximage copyteximage.c)
 add_executable (copyteximage-border copyteximage-border.c)

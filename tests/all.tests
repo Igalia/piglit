@@ -1056,6 +1056,8 @@ arb_texture_storage['texture-storage'] = plain_test('arb_texture_storage-texture
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
+add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGB_FXT1_3DFX')
+add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGBA_FXT1_3DFX')
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
 tdfx_texture_compression_fxt1['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'fxt1'])
 tdfx_texture_compression_fxt1['invalid formats'].runConcurrent = True
@@ -1203,6 +1205,10 @@ ext_texture_compression_latc['invalid formats'].runConcurrent = True
 
 ext_texture_compression_rgtc = Group()
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
+add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_RED_RGTC1_EXT')
+add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_RED_GREEN_RGTC2_EXT')
+add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_SIGNED_RED_RGTC1_EXT')
+add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT')
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_test2(ext_texture_compression_rgtc, '2D', 'GL_COMPRESSED_RED_RGTC1')
@@ -1214,6 +1220,10 @@ ext_texture_compression_rgtc['invalid formats'].runConcurrent = True
 
 ext_texture_compression_s3tc = Group()
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGB_S3TC_DXT1_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGBA_S3TC_DXT1_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGBA_S3TC_DXT3_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGBA_S3TC_DXT5_EXT')
 add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc', 'fbo-generatemipmap-formats')
 add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGB_S3TC_DXT1')
 add_texwrap_test2(ext_texture_compression_s3tc, '2D', 'GL_COMPRESSED_RGBA_S3TC_DXT1')
@@ -1326,6 +1336,10 @@ add_texwrap_test2(ext_texture_snorm, '2D', 'GL_INTENSITY16_SNORM')
 
 ext_texture_srgb = Group()
 spec['EXT_texture_sRGB'] = ext_texture_srgb
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_S3TC_DXT1_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT')
+add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-generatemipmap-formats')
 # TODO: also use GL_ARB_framebuffer_sRGB:
 #add_fbo_blending_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-blending-formats')
