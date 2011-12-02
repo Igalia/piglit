@@ -785,6 +785,10 @@ add_concurrent_test(gl20, 'vertex-program-two-side front2')
 add_concurrent_test(gl20, 'vertex-program-two-side back2')
 add_concurrent_test(gl20, 'vertex-program-two-side')
 
+gl21 = Group()
+spec['!OpenGL 2.1'] = gl21
+gl21['minmax'] = concurrent_test('gl-2.1-minmax')
+
 gl30 = Group()
 spec['!OpenGL 3.0'] = gl30
 add_concurrent_test(gl30, 'bindfragdata-invalid-parameters')
