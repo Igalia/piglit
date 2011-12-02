@@ -982,6 +982,7 @@ spec['ARB_fragment_program'] = arb_fragment_program
 add_shader_test_dir(spec['ARB_fragment_program'],
 	            os.path.join(os.path.dirname(__file__), 'spec', 'arb_fragment_program'),
 		    recursive=True)
+arb_fragment_program['minmax'] = concurrent_test('arb_fragment_program-minmax')
 
 # Group ARB_fragment_program_shadow
 arb_fragment_program_shadow = Group()
