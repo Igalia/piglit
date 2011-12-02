@@ -962,6 +962,10 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 				case GL_COMPRESSED_SIGNED_RED_RGTC1:
 				case GL_COMPRESSED_RG_RGTC2:
 				case GL_COMPRESSED_SIGNED_RG_RGTC2:
+				case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
+				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
+				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
 					if (size == 4)
 						color = red;
 					else if (size == 2)
