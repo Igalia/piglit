@@ -239,6 +239,10 @@ compute_expected_color(const struct format_desc *fmt,
 			}
 			else {
 				baseFormat = 0;  /* ??? */
+				texel[0] = 0.0;
+				texel[1] = 0.0;
+				texel[2] = 0.0;
+				texel[3] = 0.0;
 			}
 		}
 		else if (l > 0) {
