@@ -57,6 +57,13 @@ static const struct format_info Formats[] = {
 	{ "GL_RGBA32I_EXT",  GL_RGBA32I_EXT,  GL_RGBA_INTEGER_EXT, 32, GL_TRUE  },
 	{ "GL_RGBA32UI_EXT", GL_RGBA32UI_EXT, GL_RGBA_INTEGER_EXT, 32, GL_FALSE },
 
+	{ "GL_RGBA8I_EXT (bgra)",   GL_RGBA8I_EXT,   GL_BGRA_INTEGER_EXT, 8,  GL_TRUE  },
+	{ "GL_RGBA8UI_EXT (bgra)",  GL_RGBA8UI_EXT , GL_BGRA_INTEGER_EXT, 8,  GL_FALSE },
+	{ "GL_RGBA16I_EXT (bgra)",  GL_RGBA16I_EXT,  GL_BGRA_INTEGER_EXT, 16, GL_TRUE  },
+	{ "GL_RGBA16UI_EXT (bgra)", GL_RGBA16UI_EXT, GL_BGRA_INTEGER_EXT, 16, GL_FALSE },
+	{ "GL_RGBA32I_EXT (bgra)",  GL_RGBA32I_EXT,  GL_BGRA_INTEGER_EXT, 32, GL_TRUE  },
+	{ "GL_RGBA32UI_EXT (bgra)", GL_RGBA32UI_EXT, GL_BGRA_INTEGER_EXT, 32, GL_FALSE },
+
 	{ "GL_RGB8I_EXT",   GL_RGB8I_EXT,   GL_RGB_INTEGER_EXT, 8,  GL_TRUE  },
 	{ "GL_RGB8UI_EXT",  GL_RGB8UI_EXT , GL_RGB_INTEGER_EXT, 8,  GL_FALSE },
 	{ "GL_RGB16I_EXT",  GL_RGB16I_EXT,  GL_RGB_INTEGER_EXT, 16, GL_TRUE  },
@@ -161,6 +168,7 @@ num_components(GLenum format)
 	switch (format) {
 	case GL_RGBA:
 	case GL_RGBA_INTEGER_EXT:
+	case GL_BGRA_INTEGER_EXT:
 		return 4;
 	case GL_RGB_INTEGER_EXT:
 		return 3;
@@ -269,6 +277,7 @@ test_format(const struct format_info *info)
 	int value[4];
 	GLfloat result[4], bias[4];
 	GLint f;
+	GLfloat temp;
 
 	/* pick random texture color */
 	value[0] = rand() % max;
@@ -302,6 +311,15 @@ test_format(const struct format_info *info)
 	switch (info->BaseFormat) {
 	case GL_RGBA_INTEGER_EXT:
 		/* nothing */
+		break;
+	case GL_BGRA_INTEGER_EXT:
+		/* swap 0 and 2 */
+		temp = expected[2];
+		expected[2] = expected[0];
+		expected[0] = temp;
+		temp = value[2];
+		value[2] = value[0];
+		value[0] = temp;
 		break;
 	case GL_RGB_INTEGER_EXT:
 		expected[3] = 0.0;
