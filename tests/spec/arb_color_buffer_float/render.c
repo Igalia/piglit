@@ -196,7 +196,7 @@ GLboolean test_one(unsigned vert_clamp, unsigned frag_clamp, unsigned semantic,
 	}
 
 	if (!opass) {
-		printf("%s: %s\n", (cpass ? "PASS" : (opass ? "XFAIL" : "FAIL")), test_name);
+		printf("%s: %s\n", (cpass ? "PASS" : "FAIL"), test_name);
 		printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
 		printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
 		
