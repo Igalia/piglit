@@ -204,6 +204,8 @@ static void test_ubyte_colors(float x1, float y1, float x2, float y2, int index)
         case 9: vbo = vboColorPointer(3, GL_UNSIGNED_BYTE, 3, c3o3, sizeof(c3o3), 3); break;
         case 10:vbo = vboColorPointer(3, GL_UNSIGNED_BYTE, 4, c4o3, sizeof(c4o3), 3); break;
         case 11:vbo = vboColorPointer(4, GL_UNSIGNED_BYTE, 4, c4o3, sizeof(c4o3), 3); break;
+
+        default:vbo= 0; assert(0); break;
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -268,6 +270,8 @@ static void test_short_vertices(float x1, float y1, float x2, float y2, int inde
         case 9: vbo = vboVertexPointer(2, GL_SHORT, 8, v4o, sizeof(v4o), 2); break;
         case 10:vbo = vboVertexPointer(3, GL_SHORT, 8, v4o, sizeof(v4o), 2); break;
         case 11:vbo = vboVertexPointer(4, GL_SHORT, 8, v4o, sizeof(v4o), 2); break;
+
+        default:vbo = 0; assert(0); break;
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -320,6 +324,7 @@ static void test_int_vertices(float x1, float y1, float x2, float y2, int index)
         case 3: vbo = vboVertexPointer(2, GL_INT, 8, v2o, sizeof(v2o), 4); break;
         case 4: vbo = vboVertexPointer(3, GL_INT, 12, v3o, sizeof(v3o), 4); break;
         case 5: vbo = vboVertexPointer(4, GL_INT, 16, v4o, sizeof(v4o), 4); break;
+        default: vbo = 0; assert(0); break;
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -393,6 +398,7 @@ static void test_double_vertices(float x1, float y1, float x2, float y2, int ind
 	case 6: vbo = vboVertexPointer(2, GL_DOUBLE, 16, v2s, sizeof(v2s), 0); break;
 	case 7: vbo = vboVertexPointer(3, GL_DOUBLE, 24, v3s, sizeof(v3s), 0); break;
 	case 8: vbo = vboVertexPointer(4, GL_DOUBLE, 32, v4s, sizeof(v4s), 0); break;
+	default: vbo = 0; assert(0); break;
 	}
 
 	if (index <= 5)
