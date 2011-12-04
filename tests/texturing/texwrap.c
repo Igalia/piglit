@@ -1211,9 +1211,14 @@ static void init_textures()
         switch (texture_format->internalformat) {
         case GL_DEPTH24_STENCIL8:
             /* Convert to D24X8_UNORM. */
-            {
-                uint32_t *p = (uint32_t*)
-                              (data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 4));
+           {
+                uint32_t *p;
+
+                if (data != no_border_image) {
+                    free(data);
+                }
+
+                p = (uint32_t*)(data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 4));
 
                 for (x = 0; x < size_z*size_y*size_x; x++) {
                     p[x] = (uint32_t)(no_border_image[x] * ((1<<24) - 1)) << 8;
@@ -1221,6 +1226,10 @@ static void init_textures()
             }
             break;
         case GL_DEPTH32F_STENCIL8:
+            if (data != no_border_image) {
+                free(data);
+            }
+
             /* Convert to D32F_X24X8. */
             data = malloc(SIZEMAX * SIZEMAX * SIZEMAX * 8);
 
