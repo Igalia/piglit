@@ -94,6 +94,21 @@ static const struct format_info Formats[] = {
 
 };
 
+static const struct format_info rg_formats[] = {
+	{ "GL_RG8I",   GL_RG8I,   GL_RG_INTEGER, 8,  GL_TRUE  },
+	{ "GL_RG8UI",  GL_RG8UI , GL_RG_INTEGER, 8,  GL_FALSE },
+	{ "GL_RG16I",  GL_RG16I,  GL_RG_INTEGER, 16, GL_TRUE  },
+	{ "GL_RG16UI", GL_RG16UI, GL_RG_INTEGER, 16, GL_FALSE },
+	{ "GL_RG32I",  GL_RG32I,  GL_RG_INTEGER, 32, GL_TRUE  },
+	{ "GL_RG32UI", GL_RG32UI, GL_RG_INTEGER, 32, GL_FALSE },
+	{ "GL_R8I",   GL_R8I,   GL_RED_INTEGER, 8,  GL_TRUE  },
+	{ "GL_R8UI",  GL_R8UI , GL_RED_INTEGER, 8,  GL_FALSE },
+	{ "GL_R16I",  GL_R16I,  GL_RED_INTEGER, 16, GL_TRUE  },
+	{ "GL_R16UI", GL_R16UI, GL_RED_INTEGER, 16, GL_FALSE },
+	{ "GL_R32I",  GL_R32I,  GL_RED_INTEGER, 32, GL_TRUE  },
+	{ "GL_R32UI", GL_R32UI, GL_RED_INTEGER, 32, GL_FALSE },
+};
+
 static const char *FragShaderText =
 	"#version 130\n"
 	"uniform vec4 bias; \n"
@@ -149,6 +164,8 @@ num_components(GLenum format)
 		return 4;
 	case GL_RGB_INTEGER_EXT:
 		return 3;
+	case GL_RG_INTEGER:
+		return 2;
 	case GL_ALPHA_INTEGER_EXT:
 		return 1;
 	case GL_LUMINANCE_INTEGER_EXT:
@@ -289,6 +306,9 @@ test_format(const struct format_info *info)
 	case GL_RGB_INTEGER_EXT:
 		expected[3] = 0.0;
 		break;
+	case GL_RG_INTEGER:
+		expected[2] = expected[3] = 0.0;
+		break;
 	case GL_ALPHA_INTEGER_EXT:
 		expected[0] = expected[1] = expected[2] = 0.0;
 		expected[3] = 0.25;
@@ -306,8 +326,17 @@ test_format(const struct format_info *info)
 		value[1] = value[2] = value[0];
 		break;
 	case GL_RED_INTEGER_EXT:
-		expected[0] = expected[1] = expected[2] = expected[3] = 0.25;
-		value[1] = value[2] = value[3] = value[0];
+		if (info->IntFormat == GL_INTENSITY8I_EXT ||
+		    info->IntFormat == GL_INTENSITY8UI_EXT ||
+		    info->IntFormat == GL_INTENSITY16I_EXT ||
+		    info->IntFormat == GL_INTENSITY16UI_EXT ||
+		    info->IntFormat == GL_INTENSITY32I_EXT ||
+		    info->IntFormat == GL_INTENSITY32UI_EXT) {
+			expected[0] = expected[1] = expected[2] = expected[3] = 0.25;
+			value[1] = value[2] = value[3] = value[0];
+		} else {
+			expected[1] = expected[2] = expected[3] = 0.0;
+		}			
 		break;
 	default:
 		;
@@ -371,6 +400,15 @@ test_general_formats(void)
 		for (i = 0; i < 5; i++) {
 			if (!test_format(&Formats[f]))
 				return GL_FALSE;
+		}
+	}
+
+	if (piglit_is_extension_supported("GL_ARB_texture_rg")) {
+		for (f = 0; f < ARRAY_SIZE(rg_formats); f++) {
+			for (i = 0; i < 5; i++) {
+				if (!test_format(&rg_formats[f]))
+					return GL_FALSE;
+			}
 		}
 	}
 	return GL_TRUE;
