@@ -217,6 +217,8 @@ static void test_half_vertices_wrapped(unsigned short x1, unsigned short y1,
         case 9: vbo = vboVertexPointer(2, GL_HALF_FLOAT_ARB, 8, v4o, sizeof(v4o), 2); break;
         case 10:vbo = vboVertexPointer(3, GL_HALF_FLOAT_ARB, 8, v4o, sizeof(v4o), 2); break;
         case 11:vbo = vboVertexPointer(4, GL_HALF_FLOAT_ARB, 8, v4o, sizeof(v4o), 2); break;
+
+        default:vbo = 0; assert(0); break;
     }
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
