@@ -116,6 +116,16 @@ static const struct format_info rg_formats[] = {
 	{ "GL_R32UI", GL_R32UI, GL_RED_INTEGER, 32, GL_FALSE },
 };
 
+/* the rgb10 formats overload the Signed TRUE/FALSE member to test
+ * the _REV and non-REV component ordering.
+ */
+static const struct format_info rgb10_formats[] = {
+	{ "GL_RGB10_A2UI", GL_RGB10_A2UI, GL_RGBA_INTEGER_EXT, 10, GL_FALSE },
+	{ "GL_RGB10_A2UI (bgra)", GL_RGB10_A2UI, GL_BGRA_INTEGER_EXT, 10, GL_FALSE },
+	{ "GL_RGB10_A2UI (rev)", GL_RGB10_A2UI, GL_RGBA_INTEGER_EXT, 10, GL_TRUE },
+	{ "GL_RGB10_A2UI (rev bgra)", GL_RGB10_A2UI, GL_BGRA_INTEGER_EXT, 10, GL_TRUE },
+};
+
 static const char *FragShaderText =
 	"#version 130\n"
 	"uniform vec4 bias; \n"
@@ -140,6 +150,9 @@ get_max_val(const struct format_info *info)
 			max = 127;
 		else
 			max = 255;
+		break;
+	case 10:
+		max = 1023;
 		break;
 	case 16:
 		if (info->Signed)
@@ -230,6 +243,29 @@ fill_array(int comps, int texels, void *buf, int bpp, const int val[4])
 	}
 }
 
+static void
+fill_array_rgb10(int comps, int texels, void *buf, int type,
+	   const int val[4])
+{
+	int i;
+	GLuint *b = (GLuint *)buf;
+
+	if (type == GL_UNSIGNED_INT_2_10_10_10_REV) {
+		for (i = 0; i < texels; i++) {
+			b[i] = (val[0] & 0x3ff) << 0 |
+				(val[1] & 0x3ff) << 10 |
+				(val[2] & 0x3ff) << 20 |
+				(val[3] & 0x3) << 30;
+		}
+	} else if (type == GL_UNSIGNED_INT_10_10_10_2) {
+		for (i = 0; i < texels; i++) {
+			b[i] = (val[3] & 0x3) << 0 |
+			       (val[2] & 0x3ff) << 2 |
+			       (val[1] & 0x3ff) << 12 |
+			       (val[0] & 0x3ff) << 22;
+		}
+	}
+}
 
 static GLenum
 get_datatype(const struct format_info *info)
@@ -237,6 +273,8 @@ get_datatype(const struct format_info *info)
 	switch (info->BitsPerChannel) {
 	case 8:
 		return info->Signed ? GL_BYTE : GL_UNSIGNED_BYTE;
+	case 10:
+		return info->Signed ? GL_UNSIGNED_INT_10_10_10_2 : GL_UNSIGNED_INT_2_10_10_10_REV;
 	case 16:
 		return info->Signed ? GL_SHORT : GL_UNSIGNED_SHORT;
 	case 32:
@@ -286,8 +324,14 @@ test_format(const struct format_info *info)
 	value[3] = rand() % max;
 
 	/* alloc, fill texture image */
-	buf = malloc(comps * texels * info->BitsPerChannel / 8);
-	fill_array(comps, texels, buf, info->BitsPerChannel, value);
+	if (info->BitsPerChannel == 10) {
+		value[3] = rand() % 3;
+		buf = malloc(texels * 4);
+		fill_array_rgb10(comps, texels, buf, type, value);
+	} else {
+		buf = malloc(comps * texels * info->BitsPerChannel / 8);
+		fill_array(comps, texels, buf, info->BitsPerChannel, value);
+	}
 
 	glTexImage2D(GL_TEXTURE_2D, 0, info->IntFormat, TexWidth, TexHeight, 0,
 		     info->BaseFormat, type, buf);
@@ -425,6 +469,15 @@ test_general_formats(void)
 		for (f = 0; f < ARRAY_SIZE(rg_formats); f++) {
 			for (i = 0; i < 5; i++) {
 				if (!test_format(&rg_formats[f]))
+					return GL_FALSE;
+			}
+		}
+	}
+
+	if (piglit_is_extension_supported("GL_ARB_texture_rgb10_a2ui")) {
+		for (f = 0; f < ARRAY_SIZE(rgb10_formats); f++) {
+			for (i = 0; i < 5; i++) {
+				if (!test_format(&rgb10_formats[f]))
 					return GL_FALSE;
 			}
 		}
