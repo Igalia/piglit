@@ -131,6 +131,7 @@ piglit_display()
 			float divisors[4];
 
 			compute_divisors(l, divisors);
+			swizzle(divisors);
 			glUniform4fv(divisor_loc, 1, divisors);
 
 			glDrawArrays(GL_POINTS, i, points);
@@ -248,6 +249,9 @@ generate_texture()
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (swizzling)
+		glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA,
+				 (GLint *) sampler.swizzle);
 
 	expected_colors = calloc(miplevels, sizeof(float **));
 
@@ -294,6 +298,7 @@ generate_texture()
 					expected_ptr[1] = f_ptr[1]/divisors[1];
 					expected_ptr[2] = f_ptr[2]/divisors[2];
 					expected_ptr[3] = 1.0;
+					swizzle(expected_ptr);
 
 					f_ptr += 4;
 					i_ptr += 4;
@@ -482,6 +487,9 @@ piglit_init(int argc, char **argv)
 
 		/* Maybe it's the sampler type? */
 		if (!sampler_found && (sampler_found = select_sampler(argv[i])))
+			continue;
+
+		if (!swizzling && (swizzling = parse_swizzle(argv[i])))
 			continue;
 
 		fail_and_show_usage();

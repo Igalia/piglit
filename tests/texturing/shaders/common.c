@@ -260,6 +260,9 @@ require_GL_features(enum shader_target test_stage)
 
 	piglit_require_GLSL_version(130);
 
+	if (swizzling)
+		piglit_require_extension("GL_EXT_texture_swizzle");
+
 	switch (sampler.internal_format) {
 	case GL_RGBA32I:
 	case GL_RGBA32UI:
@@ -291,4 +294,84 @@ require_GL_features(enum shader_target test_stage)
 	glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &tex_units);
 	if (test_stage == VS && tex_units <= 0)
 		piglit_report_result(PIGLIT_SKIP);
+}
+
+/**
+ * Performs an in-place swizzle of a vec4 based on the EXT_texture_swizzle mode.
+ */
+void
+swizzle(float vec[])
+{
+	int i;
+	float temp[4];
+
+	if (!swizzling)
+		return;
+
+	memcpy(temp, vec, 4*sizeof(float));
+
+	for (i = 0; i < 4; i++) {
+		switch (sampler.swizzle[i]) {
+		case GL_RED:
+			vec[i] = temp[0];
+			break;
+		case GL_GREEN:
+			vec[i] = temp[1];
+			break;
+		case GL_BLUE:
+			vec[i] = temp[2];
+			break;
+		case GL_ALPHA:
+			vec[i] = temp[3];
+			break;
+		case GL_ZERO:
+			vec[i] = 0.0;
+			break;
+		case GL_ONE:
+			vec[i] = 1.0;
+			break;
+		default:
+			assert(!"Should not get here.");
+		}
+	}
+}
+
+/**
+ * Parse the command line argument for the EXT_texture_swizzle mode.
+ * It should be a string of length 4 consisting of r, g, b, a, 0, or 1.
+ * For example, "bgr1".
+ */
+bool
+parse_swizzle(const char *swiz)
+{
+	int i;
+	if (strlen(swiz) != 4 || strspn(swiz, "rgba01") != 4)
+		return false;
+
+	for (i = 0; i < 4; i++) {
+		switch (swiz[i]) {
+		case 'r':
+			sampler.swizzle[i] = GL_RED;
+			break;
+		case 'g':
+			sampler.swizzle[i] = GL_GREEN;
+			break;
+		case 'b':
+			sampler.swizzle[i] = GL_BLUE;
+			break;
+		case 'a':
+			sampler.swizzle[i] = GL_ALPHA;
+			break;
+		case '0':
+			sampler.swizzle[i] = GL_ZERO;
+			break;
+		case '1':
+			sampler.swizzle[i] = GL_ONE;
+			break;
+		default:
+			assert(!"Should not get here.");
+		}
+	}
+
+	return true;
 }

@@ -896,6 +896,9 @@ for stage in ['vs', 'fs']:
 	# texelFetch():
 	for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
 		spec['glsl-1.30']['execution']['texelFetch'][stage + '-texelFetch-' + sampler] = PlainExecTest(['texelFetch', stage, sampler, '-auto', '-fbo'])
+	# texelFetch() with EXT_texture_swizzle mode "b0r1":
+	for type in ['i', 'u', '']:
+		spec['glsl-1.30']['execution']['texelFetch'][stage + '-texelFetch-' + type + 'sampler2DArray-swizzle'] = PlainExecTest(['texelFetch', stage, type + 'sampler2DArray', 'b0r1', '-auto', '-fbo'])
 
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')

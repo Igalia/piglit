@@ -74,7 +74,13 @@ struct sampler_info
 	 * GL_DEPTH_COMPONENT.
 	 */
 	GLenum internal_format;
+
+	/** GL_EXT_texture_swizzle setting: GL_RED/GREEN/BLUE/ALPHA/ZERO/ONE */
+	GLenum swizzle[4];
 } sampler;
+
+/** Whether or not we're using GL_EXT_texture_swizzle */
+bool swizzling;
 
 /**
  * Which shader stage to test
@@ -94,8 +100,10 @@ bool has_slices();
 bool is_array_sampler();
 bool is_shadow_sampler();
 
+void swizzle(float vec4[]);
+
 void upload_miplevel_data(GLenum target, int level, void *level_image);
 void compute_miplevel_info();
 void require_GL_features(enum shader_target test_stage);
 bool select_sampler(const char *name);
-
+bool parse_swizzle(const char *swiz);
