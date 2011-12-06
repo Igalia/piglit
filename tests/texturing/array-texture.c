@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 VMWare, Inc.
+ * Copyright (c) 2010 VMware, Inc.
  *
  * Permission is hereby , free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

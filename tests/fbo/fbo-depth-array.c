@@ -1,6 +1,6 @@
 /*
  * Copyright © 2009 Intel Corporation
- * Copyright (c) 2010 VMWare, Inc.
+ * Copyright (c) 2010 VMware, Inc.
  * Copyright © 2011 Red Hat Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
