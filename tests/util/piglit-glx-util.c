@@ -28,6 +28,10 @@
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
 
+#ifndef GLXBadProfileARB
+#define GLXBadProfileARB 13
+#endif
+
 int piglit_automatic;
 
 Display *
@@ -341,7 +345,7 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err)
 		return -1;
 
 	if (err->error_code < errbase ||
-	    err->error_code > errbase + GLXBadWindow)
+	    err->error_code > errbase + GLXBadProfileARB)
 		return -1;
 
 	return err->error_code - errbase;
