@@ -15,6 +15,7 @@ link_libraries (
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_executable (glx-get-context-id get-context-id.c common.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
