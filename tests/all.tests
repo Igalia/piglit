@@ -613,6 +613,7 @@ glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', 
 
 import_context = Group();
 glx['GLX_EXT_import_context'] = import_context
+import_context['free context'] = PlainExecTest(['glx-free-context'])
 import_context['get context ID'] = PlainExecTest(['glx-get-context-id'])
 
 texturing = Group()
