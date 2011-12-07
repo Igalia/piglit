@@ -385,6 +385,32 @@ piglit_glx_error_string(int err)
 	}
 }
 
+/**
+ * Get the procedure adddresses for a group of function names
+ *
+ * \note
+ * If any call to \c glXGetProcAddress fails, this function will call
+ * \c piglit_report_result with \c PIGLIT_FAIL.
+ */
+void
+piglit_glx_get_all_proc_addresses(__GLXextFuncPtr **procedures,
+				  const char *const *names,
+				  unsigned num)
+{
+	unsigned i;
+
+	for (i = 0; i < num; i++) {
+		*(procedures[i]) =
+			glXGetProcAddress((const GLubyte *) names[i]);
+		if (procedures[i] == NULL) {
+			fprintf(stderr,
+				"Failed to get function pointer for %s.\n",
+				names[i]);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+}
+
 /* Creates a GLX context for rendering into an FBO */
 void
 piglit_framework_fbo_init_glx()

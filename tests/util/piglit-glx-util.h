@@ -55,3 +55,8 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err);
 
 const char *
 piglit_glx_error_string(int err);
+
+void
+piglit_glx_get_all_proc_addresses(__GLXextFuncPtr **procedures,
+				  const char *const *names,
+				  unsigned num);
