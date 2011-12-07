@@ -17,6 +17,7 @@ link_libraries (
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-free-context free-context.c common.c)
 	add_executable (glx-get-context-id get-context-id.c common.c)
+	add_executable (glx-import-context-single-process import-context-single-process.c common.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
