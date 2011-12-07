@@ -52,3 +52,6 @@ GLXFBConfig
 piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo);
 int
 piglit_glx_get_error(Display *dpy, XErrorEvent *err);
+
+const char *
+piglit_glx_error_string(int err);

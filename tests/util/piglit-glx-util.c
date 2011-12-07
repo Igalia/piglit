@@ -351,6 +351,40 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err)
 	return err->error_code - errbase;
 }
 
+/**
+ * Convert a GLX error code to a printable string
+ *
+ * \sa piglit_glx_get_error
+ */
+const char *
+piglit_glx_error_string(int err)
+{
+	static const char *const error_table[] = {
+		"GLXBadContext",
+		"GLXBadContextState",
+		"GLXBadDrawable",
+		"GLXBadPixmap",
+		"GLXBadContextTag",
+		"GLXBadCurrentWindow",
+		"GLXBadRenderRequest",
+		"GLXBadLargeRequest",
+		"GLXUnsupportedPrivateRequest",
+		"GLXBadFBConfig",
+		"GLXBadPbuffer",
+		"GLXBadCurrentDrawable",
+		"GLXBadWindow",
+		"GLXBadProfileARB"
+	};
+
+	if (err < 0) {
+		return "non-GLX error";
+	} else if (err >= ARRAY_SIZE(error_table)) {
+		return "unknown GLX error";
+	} else {
+		return error_table[err];
+	}
+}
+
 /* Creates a GLX context for rendering into an FBO */
 void
 piglit_framework_fbo_init_glx()
