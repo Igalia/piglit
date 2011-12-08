@@ -23,6 +23,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-import-context-single-process import-context-single-process.c common.c)
 	add_executable (glx-make-current-multi-process make-current-multi-process.c common.c)
 	add_executable (glx-make-current-single-process make-current-single-process.c common.c)
+	add_executable (glx-query-context-info-ext query-context-info.c common.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
