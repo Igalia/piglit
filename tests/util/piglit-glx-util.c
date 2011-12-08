@@ -135,8 +135,8 @@ piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
 	return _piglit_get_glx_window(dpy, visinfo, true);
 }
 
-void
-piglit_require_glx_extension(Display *dpy, const char *name)
+bool
+piglit_is_glx_extension_supported(Display *dpy, const char *name)
 {
 	const char *glx_extension_list;
 	int screen = DefaultScreen(dpy);
@@ -146,6 +146,16 @@ piglit_require_glx_extension(Display *dpy, const char *name)
 	 */
 	glx_extension_list = glXQueryExtensionsString(dpy, screen);
 	if (strstr(glx_extension_list, name) == NULL) {
+		return false;
+	}
+
+	return true;
+}
+
+void
+piglit_require_glx_extension(Display *dpy, const char *name)
+{
+	if (!piglit_is_glx_extension_supported(dpy, name)) {
 		fprintf(stderr, "Test requires %s\n", name);
 		piglit_report_result(PIGLIT_SKIP);
 	}

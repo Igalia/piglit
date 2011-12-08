@@ -37,6 +37,7 @@ GLXContext piglit_get_glx_context(Display *dpy, XVisualInfo *visinfo);
 GLXContext piglit_get_glx_context_share(Display *dpy, XVisualInfo *visinfo, GLXContext share);
 Window piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo);
 Window piglit_get_glx_window_unmapped(Display *dpy, XVisualInfo *visinfo);
+bool piglit_is_glx_extension_supported(Display *dpy, const char *name);
 void piglit_require_glx_extension(Display *dpy, const char *name);
 void piglit_require_glx_version(Display *dpy, int major, int minor);
 void piglit_glx_event_loop(Display *dpy,
