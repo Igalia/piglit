@@ -1426,6 +1426,10 @@ for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
                         draw_mode, shade_mode)
                 ext_transform_feedback[test_name] = PlainExecTest(
                         'ext_transform_feedback-{0} -auto'.format(test_name))
+for alignment in [0, 4, 8, 12]:
+        test_name = 'alignment {0}'.format(alignment)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto'.format(test_name))
 
 ext_transform_feedback['output-type float'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'float'])
 ext_transform_feedback['output-type float[2]'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'float[2]'])
