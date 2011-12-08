@@ -236,6 +236,13 @@ void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
 	piglit_report_result(result);
 }
 
+void piglit_reset_gl_error(void)
+{
+	while (glGetError() != GL_NO_ERROR) {
+		/* empty */
+	}
+}
+
 /* These texture coordinates should have 1 or -1 in the major axis selecting
  * the face, and a nearly-1-or-negative-1 value in the other two coordinates
  * which will be used to produce the s,t values used to sample that face's

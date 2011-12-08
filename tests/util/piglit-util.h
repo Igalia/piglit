@@ -163,6 +163,13 @@ const char* piglit_get_gl_error_name(GLenum error);
  */
 void piglit_check_gl_error(GLenum expected_error, enum piglit_result result);
 
+/**
+ * \brief Drain all GL errors.
+ *
+ * Repeatly call glGetError and discard errors until it returns GL_NO_ERROR.
+ */
+void piglit_reset_gl_error(void);
+
 int FindLine(const char *program, int position);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_gl_version(int required_version_times_10);
