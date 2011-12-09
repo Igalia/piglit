@@ -138,22 +138,33 @@ int piglit_get_gl_version()
 	return 10*major+minor;
 }
 
+bool piglit_is_extension_in_string(const char *haystack, const char *needle)
+{
+	const unsigned needle_len = strlen(needle);
+
+	if (needle_len == 0)
+		return false;
+
+	while (haystack != NULL) {
+		const char *const s = strstr(haystack, needle);
+
+		if (s != NULL
+		    && (s[needle_len] == ' ' || s[needle_len] == '\0')) {
+			return true;
+		}
+
+		haystack = s;
+	}
+
+	return false;
+}
+
 bool piglit_is_extension_supported(const char *name)
 {
-	char *extensions;
-	bool found = false;
-	char *i;
+	const char *const extensions =
+		(const char*) glGetString(GL_EXTENSIONS);
 
-	assert(name != NULL);
-	extensions = strdup((const char*) glGetString(GL_EXTENSIONS));
-	for (i = strtok(extensions, " "); i != NULL; i = strtok(NULL, " ")) {
-		if (strcmp(name, i) == 0) {
-			found = true;
-			break;
-		}
-	}
-	free(extensions);
-	return found;
+	return piglit_is_extension_in_string(extensions, name);
 }
 
 void piglit_require_gl_version(int required_version_times_10)

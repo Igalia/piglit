@@ -138,18 +138,11 @@ piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
 bool
 piglit_is_glx_extension_supported(Display *dpy, const char *name)
 {
-	const char *glx_extension_list;
 	int screen = DefaultScreen(dpy);
+	const char *const glx_extension_list =
+		glXQueryExtensionsString(dpy, screen);
 
-	/* This is a bogus way of checking for the extension.
-	 * Needs more GLEW.
-	 */
-	glx_extension_list = glXQueryExtensionsString(dpy, screen);
-	if (strstr(glx_extension_list, name) == NULL) {
-		return false;
-	}
-
-	return true;
+	return piglit_is_extension_in_string(glx_extension_list, name);
 }
 
 void

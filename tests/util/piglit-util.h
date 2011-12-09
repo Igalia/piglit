@@ -140,6 +140,18 @@ bool piglit_is_gles();
 int piglit_get_gl_version();
 
 /**
+ * Determine if an extension is listed in an extension string
+ *
+ * \param haystack   List of all extensions to be searched
+ * \param needle     Extension whose presens is to be detected
+ *
+ * \precondition \c haystack is not null
+ *
+ * \sa piglit_is_extension_supported, piglit_is_glx_extension_supported
+ */
+bool piglit_is_extension_in_string(const char *haystack, const char *needle);
+
+/**
  * \precondition name is not null
  */
 bool piglit_is_extension_supported(const char *name);

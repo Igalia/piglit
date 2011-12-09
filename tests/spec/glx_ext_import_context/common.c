@@ -100,27 +100,13 @@ void GLX_EXT_import_context_setup(void)
 	 */
 	vendor = glXGetClientString(dpy, GLX_VENDOR);
 	if (strcmp("NVIDIA Corporation", vendor) == 0) {
-		const char needle[] = "GLX_EXT_import_context";
-		const unsigned needle_len = sizeof(needle) - 1;
-		const char *haystack;
-		bool found = false;
+		const char *const client_extensions =
+			glXGetClientString(dpy, GLX_EXTENSIONS);
 
-		haystack = glXGetClientString(dpy, GLX_EXTENSIONS);
-		while (haystack != NULL) {
-			const char *s = strstr(haystack, needle);
-
-			if (s != NULL
-			    && (s[needle_len] == ' '
-				|| s[needle_len] == '\0')) {
-				found = true;
-				break;
-			}
-
-			haystack = s;
-		}
-
-		if (!found) {
-			fprintf(stderr, "Test requires %s\n", needle);
+		if (!piglit_is_extension_in_string(client_extensions,
+						   "GLX_EXT_import_context")) {
+			fprintf(stderr,
+				"Test requires GLX_EXT_import_context.\n");
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else {
