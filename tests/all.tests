@@ -633,6 +633,7 @@ create_context['forward-compatible flag with pre-3.0'] = PlainExecTest(['glx-cre
 create_context['invalid OpenGL version'] = PlainExecTest(['glx-create-context-invalid-gl-version'])
 create_context['empty attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-empty'])
 create_context['NULL attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-null'])
+create_context['forward-compatible flag with 3.0'] = PlainExecTest(['glx-create-context-valid-flag-forward-compatible'])
 
 texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')

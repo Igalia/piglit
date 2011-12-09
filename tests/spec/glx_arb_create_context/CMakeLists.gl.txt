@@ -23,6 +23,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-create-context-invalid-gl-version invalid-gl-version.c common.c)
 	add_executable (glx-create-context-valid-attribute-empty valid-attribute-empty.c common.c)
 	add_executable (glx-create-context-valid-attribute-null valid-attribute-null.c common.c)
+	add_executable (glx-create-context-valid-flag-forward-compatible valid-flag-forward-compatible.c common.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
