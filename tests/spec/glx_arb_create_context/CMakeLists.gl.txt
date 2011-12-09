@@ -17,6 +17,7 @@ link_libraries (
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-create-context-default-major-version default-major-version.c common.c)
 	add_executable (glx-create-context-default-minor-version default-minor-version.c common.c)
+	add_executable (glx-create-context-invalid-gl-version invalid-gl-version.c common.c)
 	add_executable (glx-create-context-valid-attribute-empty valid-attribute-empty.c common.c)
 	add_executable (glx-create-context-valid-attribute-null valid-attribute-null.c common.c)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
