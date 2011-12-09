@@ -1,0 +1,20 @@
+
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	${GLUT_INCLUDE_DIR}
+	${piglit_SOURCE_DIR}/tests/util
+)
+
+link_libraries (
+	piglitglxutil
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+	${GLUT_glut_LIBRARY}
+	${X11_X11_LIB}
+)
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+# vim: ft=cmake:
