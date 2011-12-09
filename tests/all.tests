@@ -628,6 +628,7 @@ glx['GLX_ARB_create_context'] = create_context
 create_context['default major version'] = PlainExecTest(['glx-create-context-default-major-version'])
 create_context['default minor version'] = PlainExecTest(['glx-create-context-default-minor-version'])
 create_context['invalid attribute'] = PlainExecTest(['glx-create-context-invalid-attribute'])
+create_context['invalid flag'] = PlainExecTest(['glx-create-context-invalid-flag'])
 create_context['invalid OpenGL version'] = PlainExecTest(['glx-create-context-invalid-gl-version'])
 create_context['empty attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-empty'])
 create_context['NULL attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-null'])
