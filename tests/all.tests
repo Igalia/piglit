@@ -627,6 +627,7 @@ create_context = Group();
 glx['GLX_ARB_create_context'] = create_context
 create_context['default major version'] = PlainExecTest(['glx-create-context-default-major-version'])
 create_context['default minor version'] = PlainExecTest(['glx-create-context-default-minor-version'])
+create_context['empty attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-empty'])
 
 texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')
