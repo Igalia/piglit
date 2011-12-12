@@ -515,41 +515,59 @@ class Test:
 
 
 class Group(dict):
-	def doRun(self, env, path, json_writer):
-		'''
-		Schedule all tests in group for execution.
-
-		See ``Test.doRun``.
-		'''
-		for sub in sorted(self):
-			spath = sub
-			if len(path) > 0:
-				spath = path + '/' + spath
-			self[sub].doRun(env, spath, json_writer)
-
+	pass
 
 class TestProfile:
 	def __init__(self):
 		self.tests = Group()
+		self.test_list = {}
 		self.sleep = 0
 
+	def flatten_group_hierarchy(self):
+		'''
+		Convert Piglit's old hierarchical Group() structure into a flat
+		dictionary mapping from fully qualified test names to "Test" objects.
+
+		For example,
+		tests['spec']['glsl-1.30']['preprocessor']['compiler']['keywords']['void.frag']
+		would become:
+		test_list['spec/glsl-1.30/preprocessor/compiler/keywords/void.frag']
+		'''
+
+		def f(prefix, group, test_dict):
+			for key in group:
+				fullkey = key if prefix == '' else prefix + '/' + key
+				if isinstance(group[key], dict):
+					f(fullkey, group[key], test_dict)
+				else:
+					test_dict[fullkey] = group[key]
+		f('', self.tests, self.test_list)
+		# Clear out the old Group()
+		self.tests = Group()
+
 	def run(self, env, json_writer):
+		self.flatten_group_hierarchy()
 		'''
 		Schedule all tests in profile for execution.
 
-		See ``Test.doRun``.
+		See ``Test.schedule`` and ``Test.run``.
 		'''
 		json_writer.write_dict_key('tests')
 		json_writer.open_dict()
-		# queue up the concurrent tests up front, so the pool
-		# is filled from the start of the test.
+
+		# Queue up all the concurrent tests, so the pool is filled
+		# at the start of the test run.
 		if env.concurrent:
 			env.run_concurrent = True
-			self.tests.doRun(env, '', json_writer)
+			for (path, test) in self.test_list.items():
+				test.doRun(env, path, json_writer)
+
 		# Run any remaining non-concurrent tests serially from this
 		# thread, while the concurrent tests 
 		env.run_concurrent = False
-		self.tests.doRun(env, '', json_writer)
+		for (path, test) in self.test_list.items():
+			if not env.concurrent or not test.runConcurrent:
+				test.doRun(env, path, json_writer)
 		ConcurrentTestPool().join()
 		json_writer.close_dict()
 
