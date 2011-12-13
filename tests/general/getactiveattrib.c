@@ -507,7 +507,7 @@ do_test(const struct test *tests, unsigned num_tests)
 			visited_count[attr_idx]++;
 		}
 
-		for (j = 0; j < tests[i].attributes[j].name != NULL; j++) {
+		for (j = 0; tests[i].attributes[j].name != NULL; j++) {
 			if (tests[i].attributes[j].must_be_active
 			    && visited_count[j] == 0) {
 				DUMP_SHADER(tests[i].code);
