@@ -173,6 +173,33 @@ simple_probe(bool color, const float *color_value,
 	return pass;
 }
 
+/* Read pixel color values from float, integer or unsigned integer color
+ * buffer types
+ */
+bool
+probe_rect_color(int x, int y, int w, int h, GLenum type,
+		 const GLvoid *refcolor)
+{
+	if (type == GL_FLOAT)
+		return piglit_probe_rect_rgba(x, y,
+					      w, h,
+					      (const float*)refcolor);
+	else if (type == GL_UNSIGNED_INT)
+		return piglit_probe_rect_rgba_uint(x, y,
+						   w, h,
+						   (const unsigned int*)
+						   refcolor);
+	else if (type == GL_INT)
+		return piglit_probe_rect_rgba_int(x, y,
+					          w, h,
+					          (const int*)refcolor);
+	else
+		assert(type == GL_INT ||
+		       type == GL_UNSIGNED_INT ||
+		       type == GL_FLOAT);
+	return true;
+}
+
 enum piglit_result
 piglit_display(void)
 {

@@ -31,3 +31,7 @@ extern bool
 simple_probe(bool color, const float *color_value,
 	     bool stencil, int stencil_value,
 	     bool depth, float depth_value);
+
+extern bool
+probe_rect_color(int x, int y, int width, int height,
+		 GLenum type, const GLvoid *refcolor);
