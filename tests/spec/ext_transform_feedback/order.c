@@ -133,6 +133,7 @@ initialize_shader_and_xfb()
 {
 	GLuint vs;
 
+	piglit_require_gl_version(30);
 	piglit_require_GLSL_version(130);
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
