@@ -145,15 +145,23 @@ bool piglit_is_extension_in_string(const char *haystack, const char *needle)
 	if (needle_len == 0)
 		return false;
 
-	while (haystack != NULL) {
+	while (true) {
 		const char *const s = strstr(haystack, needle);
 
-		if (s != NULL
-		    && (s[needle_len] == ' ' || s[needle_len] == '\0')) {
+		if (s == NULL)
+			return false;
+
+		if (s[needle_len] == ' ' || s[needle_len] == '\0') {
 			return true;
 		}
 
-		haystack = s;
+		/* strstr found an extension whose name begins with
+		 * needle, but whose name is not equal to needle.
+		 * Restart the search at s + needle_len so that we
+		 * don't just find the same extension again and go
+		 * into an infinite loop.
+		 */
+		haystack = s + needle_len;
 	}
 
 	return false;
