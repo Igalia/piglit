@@ -50,6 +50,12 @@ piglit_display(void)
 {
 	bool pass = true;
 	float green[4] = {0.0, 1.0, 0.0, 0.0};
+	float vertex_data[] = {
+		-0.5, -0.5,
+		0.5, -0.5,
+		0.0, 0.5,
+		0.0, 0.0
+	};
 
 	glDisable(GL_RASTERIZER_DISCARD);
 	glColor4f(0.0, 1.0, 0.0, 0.0);
@@ -58,6 +64,10 @@ piglit_display(void)
 	glEnable(GL_RASTERIZER_DISCARD);
 	glColor4f(1.0, 0.0, 0.0, 0.0);
 	piglit_draw_rect(-1, -1, 2, 2);
+	glVertexPointer(2, GL_FLOAT, 0, vertex_data);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glDrawArrays(GL_LINE_LOOP, 0, 3);
+	glDrawArrays(GL_POINTS, 3, 1);
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
