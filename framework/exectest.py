@@ -37,8 +37,8 @@ class ExecTest(Test):
 		self.command = command
 		self.env = {}
 
-		if type(self.command) is types.StringType:
-			self.command = shlex.split(self.command)
+		if isinstance(self.command, basestring):
+			self.command = shlex.split(str(self.command))
 
 	def interpretResult(self, out, results):
 		raise NotImplementedError
