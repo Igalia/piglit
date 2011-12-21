@@ -1532,6 +1532,11 @@ ext_transform_feedback['output-type uvec3[2]'] = PlainExecTest(['ext_transform_f
 ext_transform_feedback['output-type uvec4'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'uvec4'])
 ext_transform_feedback['output-type uvec4[2]'] = PlainExecTest(['ext_transform_feedback-output-type', '-auto', 'uvec4[2]'])
 
+for mode in ['discard', 'buffer', 'prims_generated', 'prims_written']:
+        test_name = 'generatemipmap {0}'.format(mode)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto -fbo'.format(test_name))
+
 arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
