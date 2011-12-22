@@ -140,7 +140,7 @@ coord_from_index(int index)
 }
 
 static void
-draw(int max_varyings)
+draw(int num_varyings)
 {
 	int data_varying;
 	float green[4][4] = { {0.0, 1.0, 0.0, 0.0},
@@ -159,12 +159,12 @@ draw(int max_varyings)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
-	for (data_varying = 0; data_varying < max_varyings; data_varying++) {
+	for (data_varying = 0; data_varying < num_varyings; data_varying++) {
 		GLuint prog, vs, fs;
 		GLint loc;
 
-		vs = get_vs(max_varyings, data_varying);
-		fs = get_fs(max_varyings, data_varying);
+		vs = get_vs(num_varyings, data_varying);
+		fs = get_fs(num_varyings, data_varying);
 
 		prog = glCreateProgram();
 		glAttachShader(prog, vs);
@@ -180,7 +180,7 @@ draw(int max_varyings)
 		glUseProgram(prog);
 
 		loc = glGetUniformLocation(prog, "zero");
-		if (loc != -1) /* not used for max_varyings == 1 */
+		if (loc != -1) /* not used for num_varyings == 1 */
 			glUniform1f(loc, 0.0);
 
 		loc = glGetUniformLocation(prog, "one");
@@ -188,7 +188,7 @@ draw(int max_varyings)
 		glUniform1f(loc, 1.0);
 
 		piglit_draw_rect(coord_from_index(data_varying),
-				 coord_from_index(max_varyings - 1),
+				 coord_from_index(num_varyings - 1),
 				 10,
 				 10);
 
