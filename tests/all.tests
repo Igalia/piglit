@@ -1398,6 +1398,10 @@ ext_transform_feedback['discard-copypixels'] = concurrent_test('ext_transform_fe
 ext_transform_feedback['discard-drawarrays'] = concurrent_test('ext_transform_feedback-discard-drawarrays')
 ext_transform_feedback['discard-drawpixels'] = concurrent_test('ext_transform_feedback-discard-drawpixels')
 ext_transform_feedback['immediate-reuse'] = concurrent_test('ext_transform_feedback-immediate-reuse')
+for mode in ['output', 'prims_generated', 'prims_written']:
+        test_name = 'intervening-read {0}'.format(mode)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto'.format(test_name))
 ext_transform_feedback['position-readback-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto'])
 ext_transform_feedback['position-readback-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'discard'])
 ext_transform_feedback['position-readback-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset'])
