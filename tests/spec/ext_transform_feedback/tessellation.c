@@ -392,11 +392,11 @@ match_strips(int reference, int compare)
 		malloc(piglit_width * (piglit_height / 4) * 4 * sizeof(float));
 	int reference_offset = (3 - reference) * (piglit_height / 4);
 	int compare_offset = (3 - compare) * (piglit_height / 4);
+	GLboolean result;
 	glReadPixels(0, reference_offset, piglit_width, piglit_height / 4,
 		     GL_RGBA, GL_FLOAT, reference_image);
-	GLboolean result =
-		piglit_probe_image_rgba(0, compare_offset, piglit_width,
-					piglit_height / 4, reference_image);
+	result = piglit_probe_image_rgba(0, compare_offset, piglit_width,
+					 piglit_height / 4, reference_image);
 	free(reference_image);
 	return result;
 }
