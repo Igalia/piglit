@@ -91,6 +91,13 @@ static float max3(float x, float y, float z)
 	return max2(x, max2(y, z));
 }
 
+#if defined(_MSC_VER)
+static float log2f(float x)
+{
+	return logf(x) * 1.442695041f;
+}
+#endif
+
 /**
  * Compute the number of miplevels, as well as the dimensions (width, height,
  * depth/number of array slices) of each level.
