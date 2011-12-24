@@ -13,6 +13,7 @@ link_libraries (
 )
 
 add_executable (ext_transform_feedback-alignment alignment.c)
+add_executable (ext_transform_feedback-builtin-varyings builtin-varyings.c)
 add_executable (ext_transform_feedback-discard-api discard-api.c)
 add_executable (ext_transform_feedback-discard-bitmap discard-bitmap.c)
 add_executable (ext_transform_feedback-discard-clear discard-clear.c)

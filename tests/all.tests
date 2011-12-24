@@ -1394,6 +1394,12 @@ ext_timer_query['time-elapsed'] = concurrent_test('ext_timer_query-time-elapsed'
 
 ext_transform_feedback = Group()
 spec['EXT_transform_feedback'] = ext_transform_feedback
+for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
+                'gl_FogFragCoord', 'gl_Position', 'gl_PointSize',
+                'gl_ClipVertex', 'gl_ClipDistance']:
+        test_name = 'builtin-varyings {0}'.format(varying)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto'.format(test_name))
 ext_transform_feedback['discard-api'] = concurrent_test('ext_transform_feedback-discard-api')
 ext_transform_feedback['discard-bitmap'] = concurrent_test('ext_transform_feedback-discard-bitmap')
 ext_transform_feedback['discard-clear'] = concurrent_test('ext_transform_feedback-discard-clear')
