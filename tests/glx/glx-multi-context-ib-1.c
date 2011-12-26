@@ -33,7 +33,6 @@
 #include <unistd.h>
 #include "piglit-util.h"
 #include "piglit-glx-util.h"
-#include "pthread.h"
 
 int piglit_width = 50, piglit_height = 50;
 static Display *dpy;
