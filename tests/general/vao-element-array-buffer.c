@@ -68,6 +68,11 @@ piglit_init(int argc, char **argv)
 	};
 	GLubyte indices[] = {0, 1, 2, 3};
 
+	if (!GLEW_VERSION_1_5) {
+		printf("Requires OpenGL 1.5\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	glClearColor(0, 0, 0, 1);
