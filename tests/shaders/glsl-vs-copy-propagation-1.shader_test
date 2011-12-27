@@ -1,0 +1,44 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+/* Tests for a bug in the 965 vertex shader backend where kills of
+ * overwritten copy propagation sources didn't happen when new
+ * propagation entries were being created.
+ */
+
+uniform vec4 u;
+uniform int j;
+varying vec4 color;
+
+void main()
+{
+	float a;
+	float b = u.y;
+
+	color = u;
+
+	/* This loop tricks core GLSL into not optimizing out the
+	 * pattern for hitting the driver bug.
+	 */
+	for (int i = 0; i < j; i++) {
+		a = b; /* a = 1.0 */
+		b = color.z; /* b = 0 */
+		color.z = a; /* color.z = 0.5, but the bug makes it 0. */
+	}
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform vec4 u 0 1 0 0
+uniform int j 1
+draw rect -1 -1 2 2
+probe all rgba 0 1 1 0
