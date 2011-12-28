@@ -198,8 +198,12 @@ DrawingSurface::commonDestructorCode() {
 Window::~Window() {
 
 #if defined(__X11__)
+	if (glXGetCurrentDrawable() == xWindow)
+		glXMakeCurrent(winSys->dpy, None, NULL);
 	XDestroyWindow(winSys->dpy, xWindow);
 #elif defined(__WIN__)
+	if (wglGetCurrentDC() == hDC)
+		wglMakeCurrent(NULL, NULL);
 	ReleaseDC(hWindow,hDC);
 	DestroyWindow(hWindow);
 
