@@ -228,13 +228,14 @@ const char* piglit_get_gl_error_name(GLenum error)
 #undef CASE
 }
 
-void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
+GLboolean
+piglit_check_gl_error(GLenum expected_error)
 {
 	GLenum actual_error;
 
 	actual_error = glGetError();
 	if (actual_error == expected_error) {
-		return;
+		return GL_TRUE;
 	}
 
 	/*
@@ -252,7 +253,7 @@ void piglit_check_gl_error(GLenum expected_error, enum piglit_result result)
 		piglit_get_gl_error_name(expected_error), expected_error);
         }
 
-	piglit_report_result(result);
+	return GL_FALSE;
 }
 
 void piglit_reset_gl_error(void)

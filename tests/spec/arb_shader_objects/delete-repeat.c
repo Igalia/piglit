@@ -82,7 +82,8 @@ piglit_display(void)
 
 	/* The program should still report being deleted. */
 	piglit_GetProgramiv(prog, GL_DELETE_STATUS, &status);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 	if (status != GL_TRUE) {
 		fprintf(stderr,
 			"GL_DELETE_STATUS after a clear reported non-true %d\n",
@@ -94,7 +95,7 @@ piglit_display(void)
 	piglit_UseProgram(0);
 
 	piglit_GetProgramiv(prog, GL_DELETE_STATUS, &status);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	piglit_present_results();
 

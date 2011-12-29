@@ -91,7 +91,8 @@ void piglit_init(int argc, char **argv)
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
 	glAttachShader(prog, vs);
 	glAttachShader(prog, fs);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 237 (page 253 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -101,7 +102,8 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Querying index before linking...\n");
 	idx = glGetFragDataIndex(prog, "v");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (idx != -1) {
 		fprintf(stderr, "Expected index = -1, got %d\n", idx);
@@ -109,7 +111,8 @@ void piglit_init(int argc, char **argv)
 	}
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -117,7 +120,8 @@ void piglit_init(int argc, char **argv)
 
 	printf("Querying index of nonexistent variable...\n");
 	idx = glGetFragDataIndex(prog, "waldo");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (idx != -1) {
 		fprintf(stderr, "Expected index = -1, got %d\n", idx);

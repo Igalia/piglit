@@ -155,7 +155,7 @@ void piglit_init(int argc, char **argv)
 			&& pass;
 
 		glDeleteFramebuffers(1, &fb);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);

@@ -58,7 +58,8 @@ void piglit_init(int argc, char **argv)
 	 * without a shader at all.  Only a program object is necessary.
 	 */
 	prog = glCreateProgram();
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 236 (page 252 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -70,11 +71,13 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Trying location = -1...\n");
 	glBindFragDataLocationIndexed(prog, -1, 0, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying location = GL_MAX_DRAW_BUFFERS...\n");
 	glBindFragDataLocationIndexed(prog, max_draw_buffers, 0, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 
 	/* ARB_blend_func_extended says,
@@ -85,11 +88,13 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Trying index > 1...\n");
 	glBindFragDataLocationIndexed(prog, 0, 2, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying location = GL_MAX_DUAL_SOURCE_DRAW_BUFFERS with index 1...\n");
 	glBindFragDataLocationIndexed(prog, max_dual_source, 1, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 236 (page 252 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -107,15 +112,18 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Trying name = `gl_FragColor'...\n");
 	glBindFragDataLocationIndexed(prog, 0, 0, "gl_FragColor");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying name = `gl_FragDepth'...\n");
 	glBindFragDataLocationIndexed(prog, 0, 0, "gl_FragDepth");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying name = `gl_'...\n");
 	glBindFragDataLocationIndexed(prog, 0, 0, "gl_");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

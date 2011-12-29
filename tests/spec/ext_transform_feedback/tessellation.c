@@ -314,7 +314,8 @@ initialize_shader_and_xfb()
 	}
 	glGenBuffers(1, &xfb_buf);
 	glFrontFace(GL_CW);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static void
@@ -333,7 +334,8 @@ setup_vertex_shader_inputs(GLuint prog)
 	glEnableVertexAttribArray(vertex_index);
 	glEnableVertexAttribArray(smooth_color_index);
 	glEnableVertexAttribArray(flat_color_index);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static void
@@ -431,7 +433,8 @@ draw(GLuint prog, bool use_xfb, float y_offset, GLenum mode,
 	glDrawArrays(mode, 0, num_vertices);
 	if (use_xfb)
 		piglit_EndTransformFeedback();
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static void
@@ -590,7 +593,7 @@ enum piglit_result piglit_display(void)
 	pass = match_strips(0, 1) && pass;
 
 	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	num_output_vertices = count_output_vertices(readback);
 	if (num_output_vertices != expected_num_output_vertices) {

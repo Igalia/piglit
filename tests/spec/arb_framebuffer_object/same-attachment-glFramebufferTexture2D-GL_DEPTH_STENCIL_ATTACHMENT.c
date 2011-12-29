@@ -126,13 +126,13 @@ void piglit_init(int argc, char **argv)
 			       tex,
 			       0); /*level*/
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	pass = check_attachment(GL_DEPTH_ATTACHMENT, tex) && pass;
 	pass = check_attachment(GL_STENCIL_ATTACHMENT, tex) && pass;
 	pass = check_attachment(GL_DEPTH_STENCIL_ATTACHMENT, tex) && pass;
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

@@ -66,43 +66,55 @@ void piglit_init(int argc, char **argv)
 		printf("Trying invalid drawbuffer with GL_DEPTH...\n");
 
 	glClearBufferfv(GL_DEPTH, 1, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfv(GL_DEPTH, -1, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_DEPTH, 1, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_DEPTH, -1, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_DEPTH, 1, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_DEPTH, -1, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_automatic)
 		printf("Trying invalid drawbuffer with GL_STENCIL...\n");
 
 	glClearBufferfv(GL_STENCIL, 1, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfv(GL_STENCIL, -1, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_STENCIL, 1, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_STENCIL, -1, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_STENCIL, 1, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_STENCIL, -1, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 263 (page 279 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -119,31 +131,39 @@ void piglit_init(int argc, char **argv)
 		printf("Trying invalid drawbuffer with GL_DEPTH_STENCIL...\n");
 
 	glClearBufferfi(GL_DEPTH_STENCIL, 1, 0.0f, 0);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfi(GL_DEPTH_STENCIL, -1, 0.0f, 0);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_automatic)
 		printf("Trying invalid drawbuffer with GL_COLOR...\n");
 
 	glClearBufferfv(GL_COLOR, -1, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfv(GL_COLOR, max_draw_buffers, zero_f);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_COLOR, -1, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_COLOR, max_draw_buffers, zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_COLOR, -1, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_COLOR, max_draw_buffers, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0; i < max_draw_buffers; i++) {
 		/* It seems reasonable that someone might accidentally use
@@ -151,14 +171,17 @@ void piglit_init(int argc, char **argv)
 		 * generates the expected error.
 		 */
 		glClearBufferfv(GL_COLOR, GL_DRAW_BUFFER0 + i, zero_f);
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferiv(GL_COLOR, GL_DRAW_BUFFER0 + i, zero_i);
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferuiv(GL_COLOR, GL_DRAW_BUFFER0 + i,
 				 (GLuint *) zero_i);
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Now try the valid cases and assert no error.
@@ -168,35 +191,45 @@ void piglit_init(int argc, char **argv)
 
 	for (i = 0; i < max_draw_buffers; i++) {
 		glClearBufferfv(GL_COLOR, i, zero_f);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferiv(GL_COLOR, i, zero_i);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferuiv(GL_COLOR, i, (GLuint *) zero_i);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glClearBufferfv(GL_DEPTH, 0, zero_f);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_DEPTH, 0, zero_i);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_DEPTH, 0, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfv(GL_STENCIL, 0, zero_f);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferiv(GL_STENCIL, 0, zero_i);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferuiv(GL_STENCIL, 0, (GLuint *) zero_i);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearBufferfi(GL_DEPTH_STENCIL, 0, 0.0f, 0);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

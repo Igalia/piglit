@@ -59,7 +59,7 @@ void piglit_init(int argc, char **argv)
 			GL_BACK,
 			first);
 	glEndList();
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	/* To ensure that glNewList() just compiles the list in GL_COMPILE
 	 * mode, probe the color buffer after glEndList()
@@ -107,6 +107,6 @@ void piglit_init(int argc, char **argv)
 				      piglit_width, piglit_height,
 				      second)
 		&& pass;
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

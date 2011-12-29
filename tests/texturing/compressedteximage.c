@@ -218,7 +218,8 @@ piglit_display(void)
 		glBindTexture(GL_TEXTURE_2D, tex);
 		glCompressedTexImage2D(GL_TEXTURE_2D, level, format->token,
 				       w, h, 0, size, compressed);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		free(compressed);
 	}

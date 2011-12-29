@@ -66,7 +66,7 @@ piglit_display(void)
 {
 	static const int black[4] = {0, 0, 0, 0};
 	static const float green[4] = {0, 1, 0, 0};
-	bool pass;
+	bool pass = GL_TRUE;
 
 	/* We don't have to do an integer FBO for this test, because
 	 * no error is specified in the non-integer FBO case:
@@ -79,7 +79,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glDrawPixels(1, 1, GL_RGBA_INTEGER_EXT, GL_UNSIGNED_INT, black);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	/* The text in GL 3.0 specification banning
 	 * glDrawPixels(integer format) precedes the restriction from
@@ -93,10 +93,10 @@ piglit_display(void)
 	 * Based on this, we test for GL_INVALID_OPERATION even for FLOAT.
 	 */
 	glDrawPixels(1, 1, GL_RGBA_INTEGER_EXT, GL_FLOAT, black);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	/* Make sure that we really didn't render anything. */
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

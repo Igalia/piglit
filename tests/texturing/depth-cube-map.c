@@ -229,7 +229,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_pixel_rgb(185, 210, ColorPosZ);
 	pass = pass && piglit_probe_pixel_rgb(260, 210, ColorNegZ);
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_present_results();
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;

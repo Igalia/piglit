@@ -114,7 +114,8 @@ generate_fbo(void)
 					  GL_RENDERBUFFER,
 					  rb[i]);
 
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -138,7 +139,8 @@ generate_fbo(void)
 		glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	return fb;
 }
 
@@ -240,10 +242,10 @@ void piglit_init(int argc, char **argv)
 				i,
 				fcolor[0]);
 
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	}
 	/* Delete framebuffer object */
 	glDeleteFramebuffers(1, &fb);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

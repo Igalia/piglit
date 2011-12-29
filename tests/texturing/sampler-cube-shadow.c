@@ -281,7 +281,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_rect_rgba(175, 200, 50, 50, black);
 	pass = pass && piglit_probe_rect_rgba(250, 200, 50, 50, white);
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 	piglit_present_results();
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;

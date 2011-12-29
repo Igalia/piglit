@@ -93,7 +93,8 @@ generate_simple_fbo(bool color, bool stencil, bool depth, bool packed)
 					  rb[2]);
 	}
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* All of the possible combinations that we can generate are required
 	 * to be supported by all OpenGL 3.0 implementations, with one
@@ -130,7 +131,8 @@ generate_simple_fbo(bool color, bool stencil, bool depth, bool packed)
 		| GL_STENCIL_BUFFER_BIT);
 	glFinish();
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return fb;
 }
@@ -169,7 +171,7 @@ simple_probe(bool color, const float *color_value,
 		}
 	}
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	return pass;
 }
 

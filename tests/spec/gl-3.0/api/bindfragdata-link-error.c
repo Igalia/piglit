@@ -78,7 +78,8 @@ void piglit_init(int argc, char **argv)
 	prog = glCreateProgram();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* First, verify that the program will link without making any
 	 * location assignments through the API.
@@ -88,7 +89,8 @@ void piglit_init(int argc, char **argv)
 	glAttachShader(prog, vs);
 	glAttachShader(prog, fs);
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -111,12 +113,15 @@ void piglit_init(int argc, char **argv)
 	printf("Assigning `a' to GL_MAX_DRAW_BUFFERS - 1...\n");
 
 	glBindFragDataLocation(prog, 0, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, max_draw_buffers - 1, "a");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (piglit_link_check_status(prog)) {
 		fprintf(stderr,
@@ -139,12 +144,15 @@ void piglit_init(int argc, char **argv)
 	printf("Assigning `a[0]' and `v' to the same slot...\n");
 
 	glBindFragDataLocation(prog, 0, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, 0, "a");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (piglit_link_check_status(prog)) {
 		fprintf(stderr,
@@ -155,12 +163,15 @@ void piglit_init(int argc, char **argv)
 	printf("Assigning `a[1]' to `v' to the same slot...\n");
 
 	glBindFragDataLocation(prog, 1, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, 0, "a");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (piglit_link_check_status(prog)) {
 		fprintf(stderr,
@@ -171,12 +182,15 @@ void piglit_init(int argc, char **argv)
 	printf("Assigning `a' to `v' to non-overlapping slots...\n");
 
 	glBindFragDataLocation(prog, 0, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, 2, "a");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		fprintf(stderr,

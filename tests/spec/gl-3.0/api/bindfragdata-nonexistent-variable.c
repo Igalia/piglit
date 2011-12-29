@@ -77,7 +77,8 @@ void piglit_init(int argc, char **argv)
 	prog = glCreateProgram();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* First, verify that the program will link without making any
 	 * location assignments through the API.
@@ -87,7 +88,8 @@ void piglit_init(int argc, char **argv)
 	glAttachShader(prog, vs);
 	glAttachShader(prog, fs);
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -101,12 +103,15 @@ void piglit_init(int argc, char **argv)
 	printf("Binding `unicorn' to a non-conflicting location...\n");
 
 	glBindFragDataLocation(prog, 0, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, 1, "unicorn");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		fprintf(stderr,
@@ -116,7 +121,8 @@ void piglit_init(int argc, char **argv)
 	}
 
 	loc = glGetFragDataLocation(prog, "unicorn");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (loc != -1) {
 		fprintf(stderr, "Expected location = -1, got %d\n", loc);
@@ -126,12 +132,15 @@ void piglit_init(int argc, char **argv)
 	printf("Binding `unicorn' to a conflicting location...\n");
 
 	glBindFragDataLocation(prog, 0, "v");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindFragDataLocation(prog, 0, "unicorn");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glLinkProgram(prog);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_link_check_status(prog)) {
 		fprintf(stderr,
@@ -141,7 +150,8 @@ void piglit_init(int argc, char **argv)
 	}
 
 	loc = glGetFragDataLocation(prog, "unicorn");
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (loc != -1) {
 		fprintf(stderr, "Expected location = -1, got %d\n", loc);

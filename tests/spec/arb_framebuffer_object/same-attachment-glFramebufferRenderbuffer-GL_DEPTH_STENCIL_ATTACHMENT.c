@@ -118,13 +118,13 @@ void piglit_init(int argc, char **argv)
 			         GL_RENDERBUFFER,
 			         rb);
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	pass = check_attachment(GL_DEPTH_ATTACHMENT, rb) && pass;
 	pass = check_attachment(GL_STENCIL_ATTACHMENT, rb) && pass;
 	pass = check_attachment(GL_DEPTH_STENCIL_ATTACHMENT, rb) && pass;
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

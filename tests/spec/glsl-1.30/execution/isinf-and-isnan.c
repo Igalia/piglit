@@ -235,7 +235,8 @@ setup_fbo()
 			      piglit_width, piglit_height);
 	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				  GL_RENDERBUFFER, color_rb);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 
 	fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (fb_status != GL_FRAMEBUFFER_COMPLETE) {

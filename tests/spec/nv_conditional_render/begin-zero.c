@@ -61,7 +61,8 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_NV_conditional_render");
 
 	glBeginConditionalRenderNV(0, GL_QUERY_WAIT_NV);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

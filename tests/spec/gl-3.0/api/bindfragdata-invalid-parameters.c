@@ -56,7 +56,8 @@ void piglit_init(int argc, char **argv)
 	 * without a shader at all.  Only a program object is necessary.
 	 */
 	prog = glCreateProgram();
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 236 (page 252 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -68,11 +69,13 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Trying location = -1...\n");
 	glBindFragDataLocation(prog, -1, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying location = GL_MAX_DRAW_BUFFERS...\n");
 	glBindFragDataLocation(prog, max_draw_buffers, "foo");
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Page 236 (page 252 of the PDF) of the OpenGL 3.0 spec says:
 	 *
@@ -90,15 +93,18 @@ void piglit_init(int argc, char **argv)
 	 */
 	printf("Trying name = `gl_FragColor'...\n");
 	glBindFragDataLocation(prog, 0, "gl_FragColor");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying name = `gl_FragDepth'...\n");
 	glBindFragDataLocation(prog, 0, "gl_FragDepth");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Trying name = `gl_'...\n");
 	glBindFragDataLocation(prog, 0, "gl_");
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

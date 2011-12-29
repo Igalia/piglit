@@ -95,7 +95,8 @@ hiz_make_fbo(const struct hiz_fbo_options *options)
 		                          GL_COLOR_ATTACHMENT0,
 		                          GL_RENDERBUFFER,
 		                          color_rb);
-         	piglit_check_gl_error(0, PIGLIT_FAIL);
+         	if (!piglit_check_gl_error(0))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Bind depth attachment. */
@@ -109,7 +110,8 @@ hiz_make_fbo(const struct hiz_fbo_options *options)
 		                          GL_DEPTH_ATTACHMENT,
 		                          GL_RENDERBUFFER,
 		                          depth_rb);
-         	piglit_check_gl_error(0, PIGLIT_FAIL);
+         	if (!piglit_check_gl_error(0))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Bind stencil attachment. */
@@ -123,7 +125,8 @@ hiz_make_fbo(const struct hiz_fbo_options *options)
 		                          GL_STENCIL_ATTACHMENT,
 		                          GL_RENDERBUFFER,
 		                          stencil_rb);
-         	piglit_check_gl_error(0, PIGLIT_FAIL);
+         	if (!piglit_check_gl_error(0))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* Bind depth/stencil attachment. */
@@ -137,7 +140,8 @@ hiz_make_fbo(const struct hiz_fbo_options *options)
 		                          GL_DEPTH_STENCIL_ATTACHMENT,
 		                          GL_RENDERBUFFER,
 		                          depth_stencil_rb);
-         	piglit_check_gl_error(0, PIGLIT_FAIL);
+         	if (!piglit_check_gl_error(0))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	fb_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -177,7 +181,8 @@ hiz_delete_fbo(GLuint fbo)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
- 	piglit_check_gl_error(0, PIGLIT_FAIL);
+ 	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -436,7 +441,8 @@ hiz_run_test_stencil_test_common()
 	piglit_draw_rect(1 * dx, 1 * dy,   /* x, y */
 		         2 * dx, 2 * dy);  /* w, h */
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		return false;
 
 	return hiz_probe_color_buffer(expected_colors);
 }
@@ -548,7 +554,8 @@ hiz_run_test_stencil_read_common()
 	piglit_draw_rect(1 * dx, 1 * dy,   /* x, y */
 		         2 * dx, 2 * dy);  /* w, h */
 
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		return false;
 
 	if (!hiz_probe_color_buffer(expected_colors))
 		return false;
@@ -691,9 +698,9 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 	piglit_draw_rect(1 * dx, 1 * dy,   /* x, y */
 		         2 * dx, 2 * dy);  /* w, h */
 
- 	piglit_check_gl_error(0, PIGLIT_FAIL);
+ 	pass = piglit_check_gl_error(0);
 
-	pass = hiz_probe_color_buffer(expected_colors);
+	pass = hiz_probe_color_buffer(expected_colors) && pass;
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */

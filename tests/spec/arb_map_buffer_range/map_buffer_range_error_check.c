@@ -68,19 +68,23 @@ piglit_init(int argc, char *argv[])
 
 	/* offset < 0 */
 	glMapBufferRange(target, -1, 1, access);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* length < 0 */
 	glMapBufferRange(target, 0, -1, access);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* offset + lenght > GL_BUFFER_SIZE */
 	glMapBufferRange(target, 1, GL_BUFFER_SIZE, access);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* undefined access bits */
 	glMapBufferRange(target, 0, 10, 0xffffffff);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		piglit_report_result(PIGLIT_FAIL);
 
 
 	/*
@@ -102,30 +106,36 @@ piglit_init(int argc, char *argv[])
 
 	/* (a) map again */
 	glMapBufferRange(target, 0, 10, access);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 	glUnmapBuffer(target);
 
 	/* for (b) case */
 	glMapBufferRange(target, 0, 10, 0);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* for (c) case */
 	glMapBufferRange(target, 0, 10, GL_MAP_READ_BIT |
 					      GL_MAP_INVALIDATE_RANGE_BIT);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glMapBufferRange(target, 0, 10, GL_MAP_READ_BIT |
 					      GL_MAP_INVALIDATE_BUFFER_BIT);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glMapBufferRange(target, 0, 10, GL_MAP_READ_BIT |
 					      GL_MAP_UNSYNCHRONIZED_BIT);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* for (d) case */
 	glMapBufferRange(target, 0, 10, GL_MAP_FLUSH_EXPLICIT_BIT |
 					      GL_MAP_READ_BIT);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 
 
 	piglit_report_result(PIGLIT_PASS);

@@ -115,13 +115,16 @@ void piglit_init(int argc, char **argv)
 			       test_vectors[i].name);
 
 		glClearBufferfv(test_vectors[i].value, 0, zero_f);
-		piglit_check_gl_error(GL_INVALID_ENUM, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferiv(test_vectors[i].value, 0, zero_i);
-		piglit_check_gl_error(GL_INVALID_ENUM, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glClearBufferuiv(test_vectors[i].value, 0, (GLuint *) zero_i);
-		piglit_check_gl_error(GL_INVALID_ENUM, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	for (i = 0; i < ARRAY_SIZE(fi_test_vectors); i++) {
@@ -130,7 +133,8 @@ void piglit_init(int argc, char **argv)
 			       fi_test_vectors[i].name);
 
 		glClearBufferfi(fi_test_vectors[i].value, 0, 0.0, 0);
-		piglit_check_gl_error(GL_INVALID_ENUM, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM))
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	piglit_report_result(PIGLIT_PASS);

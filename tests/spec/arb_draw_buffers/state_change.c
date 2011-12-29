@@ -82,7 +82,8 @@ piglit_display(void)
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT,
 				  GL_TEXTURE_2D, tex[1], 0);
 	check_fbo_status();
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0; i < sizeof(tests) / sizeof(*tests); ++i) {
 		GLint buffer, expected_buffer;
@@ -115,7 +116,8 @@ piglit_display(void)
 		}
 	}
 
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return PIGLIT_PASS;
 }

@@ -61,7 +61,8 @@ piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_RASTERIZER_DISCARD, &enabled);
 	if (!enabled)
 		piglit_report_result(PIGLIT_FAIL);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glDisable(GL_RASTERIZER_DISCARD);
 	if (glIsEnabled(GL_RASTERIZER_DISCARD))
@@ -69,7 +70,8 @@ piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_RASTERIZER_DISCARD, &enabled);
 	if (enabled)
 		piglit_report_result(PIGLIT_FAIL);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

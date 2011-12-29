@@ -142,11 +142,11 @@ test_etc1_rgb8_texture_8x8(const struct etc1_rgb8_texture_8x8 *tex)
     const GLenum format = GL_ETC1_RGB8_OES;
     const GLsizei width = 8, height = 8;
     unsigned x, y;
-    int pass;
+    int pass = GL_TRUE;
 
     glCompressedTexImage2D(GL_TEXTURE_2D, 0,
             format, width, height, 0, sizeof(tex->data), tex->data);
-    piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
     glEnable(GL_TEXTURE_2D);
 
@@ -177,7 +177,7 @@ piglit_display(void)
     const GLsizei width = 8, height = 8;
     struct etc1_rgb8_texture_8x8 tex;
     GLuint t;
-    int pass;
+    int pass = GL_TRUE;
 
     glGenTextures(1, &t);
     glBindTexture(GL_TEXTURE_2D, t);
@@ -191,24 +191,24 @@ piglit_display(void)
     /* no compression support */
     glTexImage2D(GL_TEXTURE_2D, 0, format,
             width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.rgb);
-    piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, format, 0, 0, width, height, 0);
-    piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
     /* test the texture */
-    pass = test_etc1_rgb8_texture_8x8(&tex);
+    pass = test_etc1_rgb8_texture_8x8(&tex) && pass;
 
     /* no subimage support */
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
             width, height, GL_RGB, GL_UNSIGNED_BYTE, tex.rgb);
-    piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, width, height);
-    piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
     glCompressedTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, sizeof(tex.data), tex.data);
-    piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+    pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
     glDeleteTextures(1, &t);
 

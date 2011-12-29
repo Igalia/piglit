@@ -85,11 +85,11 @@ piglit_init(int argc, char **argv)
 	pass = test(2.2, 2) && pass;
 	pass = test(2.8, 3) && pass;
 	pass = test(-0.1, 0) && pass;
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	printf("Setting row length -0.9, and expecting error\n");
 	glPixelStoref(GL_UNPACK_ROW_LENGTH, -0.9);
-	piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

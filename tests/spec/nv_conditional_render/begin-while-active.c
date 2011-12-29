@@ -65,7 +65,8 @@ piglit_init(int argc, char **argv)
 	glGenQueries(1, &q);
 	glBeginQuery(GL_SAMPLES_PASSED, q);
 	glBeginConditionalRenderNV(q, GL_QUERY_WAIT_NV);
-	piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
 	glEndQuery(GL_SAMPLES_PASSED);
 	glDeleteQueries(1, &q);
 

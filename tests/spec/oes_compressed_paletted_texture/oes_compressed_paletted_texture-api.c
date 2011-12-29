@@ -94,9 +94,11 @@ piglit_init(int argc, char **argv)
 			     16, 16, 0,
 			     t[i].internal_format, t[i].type, buffer);
 #if defined(USE_OPENGL_ES1) || defined(USE_OPENGL_ES2)
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 #else
-		piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			piglit_report_result(PIGLIT_FAIL);
 #endif
 	}
 
@@ -114,12 +116,14 @@ piglit_init(int argc, char **argv)
 		glCompressedTexImage2D(GL_TEXTURE_2D, 0, t[i].internal_format,
 					  16, 16, 0,
 					  size + t[i].palette_size - 1, buffer);
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 
 		glCompressedTexImage2D(GL_TEXTURE_2D, 0, t[i].internal_format,
 					  16, 16, 0,
 					  size + t[i].palette_size, buffer);
-		piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		/* The OES_compressed_paletted_texture spec says:
 		 *
@@ -136,7 +140,8 @@ piglit_init(int argc, char **argv)
 		glCompressedTexImage2D(GL_TEXTURE_2D, 1, t[i].internal_format,
 				       8, 8, 0,
 				       size + t[i].palette_size, buffer);
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 
 		/* The OES_compressed_paletted_texture spec says:
 		 *
@@ -165,9 +170,11 @@ piglit_init(int argc, char **argv)
 				       16, 16, 1,
 				       size + t[i].palette_size, buffer);
 #if defined(USE_OPENGL_ES1) || defined(USE_OPENGL_ES2)
-		piglit_check_gl_error(GL_INVALID_VALUE, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_VALUE))
+			piglit_report_result(PIGLIT_FAIL);
 #else
-		piglit_check_gl_error(GL_INVALID_OPERATION, PIGLIT_FAIL);
+		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+			piglit_report_result(PIGLIT_FAIL);
 #endif
 	}
 

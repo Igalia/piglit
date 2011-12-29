@@ -168,12 +168,13 @@ bool piglit_is_extension_supported(const char *name);
 const char* piglit_get_gl_error_name(GLenum error);
 
 /**
- * \brief Check for unexpected GL errors and possibly terminate the test.
+ * \brief Check for unexpected GL errors.
  *
  * If glGetError() returns an error other than \c expected_error, then
- * print a diagnostic and terminate the test with the given \c result.
+ * print a diagnostic and return GL_FALSE.  Otherwise return GL_TRUE.
  */
-void piglit_check_gl_error(GLenum expected_error, enum piglit_result result);
+GLboolean
+piglit_check_gl_error(GLenum expected_error);
 
 /**
  * \brief Drain all GL errors.

@@ -136,7 +136,8 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 	glGenBuffers(1, &xfb_buf);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 enum piglit_result piglit_display(void)
@@ -154,7 +155,7 @@ enum piglit_result piglit_display(void)
 	glVertexAttribIPointer(input_index, 1, GL_UNSIGNED_INT,
 			       sizeof(GLuint), &verts);
 	glEnableVertexAttribArray(input_index);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 	memset(buffer, 0xffffffff, sizeof(buffer));
@@ -166,10 +167,10 @@ enum piglit_result piglit_display(void)
 	piglit_BeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, 4);
 	piglit_EndTransformFeedback();
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	/* Figure out expected output */
 	memset(expected, 0xffffffff, sizeof(expected));

@@ -49,7 +49,8 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL_version(130);
 
 	glGetIntegerv(GL_MIN_PROGRAM_TEXEL_OFFSET, &val);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	if (val > -8) {
 		fprintf(stderr,
 			"query of GL_MIN_PROGRAM_TEXEL_OFFSET "
@@ -59,7 +60,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	glGetIntegerv(GL_MAX_PROGRAM_TEXEL_OFFSET, &val);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	if (val < 7) {
 		fprintf(stderr,
 			"query of GL_MAX_PROGRAM_TEXEL_OFFSET "

@@ -60,40 +60,49 @@ void piglit_init(int argc, char **argv)
 	printf("Querying blend mode (SRC1_COLOR, 0).\n");
 	/* try all new blending modes */
 	glBlendFunc(GL_SRC1_COLOR, GL_ZERO);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (SRC1_ALPHA, 0)\n");
 	glBlendFunc(GL_SRC1_ALPHA, GL_ZERO);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (1-SRC1_COLOR, 0)\n");
 	glBlendFunc(GL_ONE_MINUS_SRC1_COLOR, GL_ZERO);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (1-SRC1_ALPHA, 0)\n");
 	glBlendFunc(GL_ONE_MINUS_SRC1_ALPHA, GL_ZERO);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (0, SRC1_COLOR)\n");
 	glBlendFunc(GL_ZERO, GL_SRC1_COLOR);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (0, SRC1_ALPHA)\n");
 	glBlendFunc(GL_ZERO, GL_SRC1_ALPHA);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (0, 1-SRC1_COLOR)\n");
 	glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC1_COLOR);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Querying blend mode (0, 1-SRC1_ALPHA)\n");
 	glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC1_ALPHA);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* GL_SRC_ALPHA_SATURATE is now handled as a DST attrib */
 	printf("Querying blend mode (0, SRC_ALPHA_SATURATE)\n");
 	glBlendFunc(GL_ZERO, GL_SRC_ALPHA_SATURATE);
-	piglit_check_gl_error(GL_NO_ERROR, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

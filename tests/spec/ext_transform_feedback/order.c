@@ -152,7 +152,8 @@ initialize_shader_and_xfb()
 		     3*NUM_POINTS*sizeof(unsigned), NULL, GL_STREAM_READ);
 	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
 	piglit_UseProgram(prog);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static void
@@ -176,7 +177,8 @@ initialize_vertex_shader_inputs()
 	glVertexAttribIPointer(starting_x_index, 1, GL_UNSIGNED_INT, sizeof(unsigned),
 			       verts);
 	glEnableVertexAttribArray(starting_x_index);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 /**
@@ -227,7 +229,8 @@ draw()
 		glDrawArrays(draw_mode, 0, NUM_POINTS);
 	}
 	piglit_EndTransformFeedback();
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	if (!piglit_check_gl_error(0))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static void
@@ -238,7 +241,7 @@ check_results_and_exit()
 	GLboolean pass = GL_TRUE;
 
 	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
-	piglit_check_gl_error(0, PIGLIT_FAIL);
+	pass = piglit_check_gl_error(0) && pass;
 
 	for (i = 0; i < NUM_POINTS; ++i) {
 		unsigned expected_starting_x =
