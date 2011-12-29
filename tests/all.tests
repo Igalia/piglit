@@ -1400,6 +1400,24 @@ ext_timer_query['time-elapsed'] = concurrent_test('ext_timer_query-time-elapsed'
 
 ext_transform_feedback = Group()
 spec['EXT_transform_feedback'] = ext_transform_feedback
+for mode in ['interleaved_ok_base', 'interleaved_ok_range',
+             'interleaved_ok_offset', 'interleaved_unbound',
+             'interleaved_no_varyings', 'separate_ok_1',
+             'separate_unbound_0_1', 'separate_ok_2', 'separate_unbound_0_2',
+             'separate_unbound_1_2', 'separate_no_varyings', 'no_prog_active',
+             'begin_active', 'useprog_active', 'link_current_active',
+             'link_other_active', 'bind_base_active', 'bind_range_active',
+             'bind_offset_active', 'end_inactive', 'bind_base_max',
+             'bind_range_max', 'bind_offset_max', 'bind_range_size_m4',
+             'bind_range_size_0', 'bind_range_size_1', 'bind_range_size_2',
+             'bind_range_size_3', 'bind_range_size_5', 'bind_range_offset_1',
+             'bind_range_offset_2', 'bind_range_offset_3',
+             'bind_range_offset_5', 'bind_offset_offset_1',
+             'bind_offset_offset_2', 'bind_offset_offset_3',
+             'bind_offset_offset_5', 'not_a_program']:
+        test_name = 'api-errors {0}'.format(mode)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto'.format(test_name))
 for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_FogFragCoord', 'gl_Position', 'gl_PointSize',
                 'gl_ClipVertex', 'gl_ClipDistance']:
