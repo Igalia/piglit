@@ -1284,6 +1284,7 @@ add_fbo_blending_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-blendin
 add_fbo_alphatest_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-alphatest-formats')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 ext_packed_float['pack'] = concurrent_test('ext_packed_float-pack')
+ext_packed_float['getteximage-invalid-format-for-packed-type'] = concurrent_test('getteximage-invalid-format-for-packed-type')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
