@@ -61,6 +61,11 @@ piglit_init(int argc, char *argv[])
 	int i;
 	bool ret;
 
+	if (!GLEW_VERSION_1_5) {
+		printf("Requires OpenGL 1.5\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	piglit_require_extension("GL_ARB_map_buffer_range");
 
 	for (i = 0; i < sizeof(data); i++) {
