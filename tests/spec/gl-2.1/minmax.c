@@ -27,7 +27,6 @@
  */
 
 #include "piglit-util.h"
-#include "sized-internalformats.h"
 
 int piglit_width = 32;
 int piglit_height = 32;
