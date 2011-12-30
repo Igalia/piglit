@@ -147,6 +147,7 @@ do_depth_clear(GLenum format, GLuint tex, int level, int size)
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		if (!level)
 			printf(" - FBO incomplete\n");
+		glDeleteFramebuffersEXT(1, &fb);
 		return false;
 	} else {
 		if (!level)
