@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 	const char *version_string;
 	int major;
 	int minor;
-	bool pass = true;
 
 	GLX_ARB_create_context_setup();
 
@@ -82,6 +81,6 @@ int main(int argc, char **argv)
 done:
 	GLX_ARB_create_context_teardown();
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	piglit_report_result(PIGLIT_PASS);
 	return 0;
 }
