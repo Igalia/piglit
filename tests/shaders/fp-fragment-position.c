@@ -127,7 +127,6 @@ static void DoFrame(void)
 		glVertex2f(1, 2);
 	glEnd();
 
-	glutSwapBuffers();
 }
 
 static const struct {
@@ -230,8 +229,6 @@ DoTest(void)
 	int i;
 	bool pass = true;
 
-	glReadBuffer( GL_FRONT );
-
 	for (i = 0; i < ARRAY_SIZE(Probes); i++) {
 		printf("Testing: %s\n", Probes[i].name);
 		pass = piglit_probe_pixel_rgba(Probes[i].x * piglit_width / 2,
@@ -251,6 +248,8 @@ piglit_display(void)
 	DoFrame();
 	pass = DoTest();
 
+	if (!piglit_automatic)
+		glutSwapBuffers();
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
