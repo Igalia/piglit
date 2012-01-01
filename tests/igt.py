@@ -56,6 +56,8 @@ def checkEnvironment():
         print "Test Environment check: debugfs not mounted properly!"
         return False
     for subdir in os.listdir(debugfs_path):
+        if not os.path.isdir(os.path.join(debugfs_path, subdir)):
+            continue
         clients = open(os.path.join(debugfs_path, subdir, "clients"), 'r')
         lines = clients.readlines()
         if len(lines) > 2:
