@@ -154,6 +154,7 @@ run_test(void)
 	int y1 = PAD * 2 + SIZE;
 	int y2 = PAD * 3 + SIZE * 2;
 	GLenum err;
+	GLint win_depth_bits, fbo_depth_bits, win_stencil_bits, fbo_stencil_bits;
 
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -170,6 +171,23 @@ run_test(void)
 	draw_depth_rect(x0, y0, SIZE, SIZE);
 
 	fbo = make_fbo(fbo_width, fbo_height);
+
+	/* query depth/stencil sizes */
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glGetIntegerv(GL_DEPTH_BITS, &win_depth_bits);
+	glGetIntegerv(GL_STENCIL_BITS, &win_stencil_bits);
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
+	glGetIntegerv(GL_DEPTH_BITS, &fbo_depth_bits);
+	glGetIntegerv(GL_STENCIL_BITS, &fbo_stencil_bits);
+
+	if (win_depth_bits != fbo_depth_bits ||
+	    win_stencil_bits != fbo_stencil_bits) {
+		/* The spec doesn't allow blitting between depth/blitting surfaces
+		 * of different formats.
+		 */
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
