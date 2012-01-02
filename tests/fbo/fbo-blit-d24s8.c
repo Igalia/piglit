@@ -216,16 +216,16 @@ run_test(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	assert(glGetError() == 0);
 
-    printf("Verify 1\n");
+	printf("Verify 1\n");
 	pass = verify_depth_rect(PAD, y0, SIZE, SIZE) && pass;
-    printf("Verify 2\n");
+	printf("Verify 2\n");
 	pass = verify_depth_rect(PAD, y1, SIZE, SIZE) && pass;
-    printf("Verify 3\n");
+	printf("Verify 3\n");
 	pass = verify_depth_rect(PAD, y2, SIZE, SIZE) && pass;
-    printf("Verify 4 (FBO)\n");
+	printf("Verify 4 (FBO)\n");
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	pass = verify_depth_rect(PAD, y0, SIZE, SIZE) && pass;
-    printf("Verify 5 (FBO)\n");
+	printf("Verify 5 (FBO)\n");
 	pass = verify_depth_rect(PAD, y1, SIZE, SIZE) && pass;
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	assert(glGetError() == 0);
