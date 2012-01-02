@@ -660,6 +660,11 @@ add_plain_test(texturing, 'gen-nonzero-unit')
 add_plain_test(texturing, 'gen-texsubimage')
 add_plain_test(texturing, 'getteximage-formats')
 add_plain_test(texturing, 'getteximage-simple')
+
+texturing['incomplete-texture-fixed'] = concurrent_test('incomplete-texture -auto fixed')
+texturing['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
+texturing['incomplete-texture-glsl'] = concurrent_test('incomplete-texture -auto glsl')
+
 add_plain_test(texturing, 'levelclamp')
 add_plain_test(texturing, 'lodbias')
 add_plain_test(texturing, 'lodclamp')
