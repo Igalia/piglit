@@ -1434,6 +1434,10 @@ ext_transform_feedback['discard-clear'] = concurrent_test('ext_transform_feedbac
 ext_transform_feedback['discard-copypixels'] = concurrent_test('ext_transform_feedback-discard-copypixels')
 ext_transform_feedback['discard-drawarrays'] = concurrent_test('ext_transform_feedback-discard-drawarrays')
 ext_transform_feedback['discard-drawpixels'] = concurrent_test('ext_transform_feedback-discard-drawpixels')
+for mode in ['main_binding', 'indexed_binding', 'buffer_start', 'buffer_size']:
+        test_name = 'get-buffer-state {0}'.format(mode)
+        ext_transform_feedback[test_name] = PlainExecTest(
+                'ext_transform_feedback-{0} -auto'.format(test_name))
 ext_transform_feedback['immediate-reuse'] = concurrent_test('ext_transform_feedback-immediate-reuse')
 for mode in ['output', 'prims_generated', 'prims_written']:
         test_name = 'intervening-read {0}'.format(mode)
