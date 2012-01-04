@@ -1,0 +1,21 @@
+[require]
+GLSL >= 1.30
+
+[fragment shader]
+#version 130
+void main() { gl_FragColor = gl_Color; }
+
+[vertex shader]
+#version 130
+uniform sampler2D tex;
+void main()
+{
+    gl_Position = gl_Vertex;
+    gl_FrontColor = vec4(0,(textureSize(tex, 0)==ivec2(1024, 1024)),0,1);
+}
+
+[test]
+texture checkerboard 0 0 (1024, 1024) (0.0, 0.0, 0.0, 0.0) (0.0, 0.0, 0.0, 0.0)
+uniform int tex 0
+draw rect -1 -1 2 2
+relative probe rgb (0.75, 0.75) (0.0, 1.0, 0.0)
