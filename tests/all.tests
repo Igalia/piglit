@@ -1567,6 +1567,7 @@ oes_compressed_paletted_texture['invalid formats'].runConcurrent = True
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer
 add_plain_test(arb_copy_buffer, 'copy_buffer_coherency')
+add_plain_test(arb_copy_buffer, 'copybuffersubdata')
 
 arb_vertex_type_2_10_10_10_rev = Group()
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev

@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (copy_buffer_coherency copy_buffer_coherency.c)
+add_executable (copybuffersubdata copybuffersubdata.c)
 
 # vim: ft=cmake:
