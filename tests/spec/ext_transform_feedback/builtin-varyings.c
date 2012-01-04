@@ -56,6 +56,8 @@ struct test_desc {
 	unsigned num_varyings;
 	const char *varyings[16];
 	unsigned expected_num_output_components;
+	GLenum expected_type;
+	GLsizei expected_size;
 } tests[] = {
 	{
 		"gl_Color", /* name */
@@ -75,7 +77,9 @@ struct test_desc {
 		2, /* num_varyings */
 		{"gl_FrontColor", "gl_BackColor"}, /* varyings */
 
-		8 /* expected_num_output_components */
+		8, /* expected_num_output_components */
+		GL_FLOAT_VEC4, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_SecondaryColor", /* name */
@@ -95,7 +99,9 @@ struct test_desc {
 		2, /* num_varyings */
 		{"gl_FrontSecondaryColor", "gl_BackSecondaryColor"}, /* varyings */
 
-		8 /* expected_num_output_components */
+		8, /* expected_num_output_components */
+		GL_FLOAT_VEC4, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_TexCoord", /* name */
@@ -115,7 +121,9 @@ struct test_desc {
 		2, /* num_varyings */
 		{"gl_TexCoord[0]", "gl_TexCoord[1]"}, /* varyings */
 
-		8 /* expected_num_output_components */
+		8, /* expected_num_output_components */
+		GL_FLOAT_VEC4, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_FogFragCoord", /* name */
@@ -132,7 +140,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_FogFragCoord"}, /* varyings */
 
-		1 /* expected_num_output_components */
+		1, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_Position", /* name */
@@ -150,7 +160,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_Position"}, /* varyings */
 
-		4 /* expected_num_output_components */
+		4, /* expected_num_output_components */
+		GL_FLOAT_VEC4, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_PointSize", /* name */
@@ -167,7 +179,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_PointSize"}, /* varyings */
 
-		1 /* expected_num_output_components */
+		1, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_ClipVertex", /* name */
@@ -186,7 +200,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipVertex"}, /* varyings */
 
-		4 /* expected_num_output_components */
+		4, /* expected_num_output_components */
+		GL_FLOAT_VEC4, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_ClipDistance", /* name */
@@ -209,7 +225,9 @@ struct test_desc {
 		 "gl_ClipDistance[4]", "gl_ClipDistance[5]",
 		 "gl_ClipDistance[6]", "gl_ClipDistance[7]"},
 
-		8 /* expected_num_output_components */
+		8, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[1]-no-subscript", /* name */
@@ -229,7 +247,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		1 /* expected_num_output_components */
+		1, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		1, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[2]-no-subscript", /* name */
@@ -249,7 +269,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		2 /* expected_num_output_components */
+		2, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		2, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[3]-no-subscript", /* name */
@@ -269,7 +291,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		3 /* expected_num_output_components */
+		3, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		3, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[4]-no-subscript", /* name */
@@ -289,7 +313,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		4 /* expected_num_output_components */
+		4, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		4, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[5]-no-subscript", /* name */
@@ -309,7 +335,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		5 /* expected_num_output_components */
+		5, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		5, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[6]-no-subscript", /* name */
@@ -329,7 +357,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		6 /* expected_num_output_components */
+		6, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		6, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[7]-no-subscript", /* name */
@@ -349,7 +379,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		7 /* expected_num_output_components */
+		7, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		7, /* expected_size */
 	},
 	{
 		"gl_ClipDistance[8]-no-subscript", /* name */
@@ -369,7 +401,9 @@ struct test_desc {
 		1, /* num_varyings */
 		{"gl_ClipDistance"}, /* varyings */
 
-		8 /* expected_num_output_components */
+		8, /* expected_num_output_components */
+		GL_FLOAT, /* expected_type */
+		8, /* expected_size */
 	},
 };
 
@@ -378,6 +412,7 @@ const struct test_desc *test_to_run;
 static GLuint xfb_buf;
 static GLuint prog;
 static GLuint query;
+static GLboolean size_and_type_ok = GL_TRUE;
 
 void
 print_usage_and_exit(const char *prog_name)
@@ -407,6 +442,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint vs;
+	int i;
 
 	/* Parse params. */
 	if (argc != 2)
@@ -429,6 +465,27 @@ piglit_init(int argc, char **argv)
 		piglit_DeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	/* Test that GetTransformFeedbackVarying reports the correct
+	 * size and type for all of the varyings.
+	 */
+	for (i = 0; i < test_to_run->num_varyings; ++i) {
+		GLsizei size;
+		GLenum type;
+		piglit_GetTransformFeedbackVarying(prog, i, 0, NULL, &size,
+						   &type, NULL);
+		if (size != test_to_run->expected_size) {
+			printf("For varying %i, expected size %i, got %i\n",
+			       i, test_to_run->expected_size, size);
+			size_and_type_ok = GL_FALSE;
+		}
+		if (type != test_to_run->expected_type) {
+			printf("For varying %i, expected type %i, got %i\n",
+			       i, test_to_run->expected_type, type);
+			size_and_type_ok = GL_FALSE;
+		}
+	}
+
 	glGenBuffers(1, &xfb_buf);
 	glGenQueries(1, &query);
 	glEnable(GL_VERTEX_PROGRAM_TWO_SIDE);
@@ -452,7 +509,7 @@ piglit_display(void)
 		{ {  1.0,  1.0, 0.0, 1.0 }, 5.0 }
 	};
 	static float initial_xfb_data[MAX_EXPECTED_OUTPUT_COMPONENTS * 6];
-	GLboolean pass = GL_TRUE;
+	GLboolean pass = size_and_type_ok;
 	int i;
 	float *readback;
 	GLuint query_result;
