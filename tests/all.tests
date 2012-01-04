@@ -1424,7 +1424,15 @@ for mode in ['interleaved_ok_base', 'interleaved_ok_range',
                 'ext_transform_feedback-{0} -auto'.format(test_name))
 for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_FogFragCoord', 'gl_Position', 'gl_PointSize',
-                'gl_ClipVertex', 'gl_ClipDistance']:
+                'gl_ClipVertex', 'gl_ClipDistance',
+                'gl_ClipDistance[1]-no-subscript',
+                'gl_ClipDistance[2]-no-subscript',
+                'gl_ClipDistance[3]-no-subscript',
+                'gl_ClipDistance[4]-no-subscript',
+                'gl_ClipDistance[5]-no-subscript',
+                'gl_ClipDistance[6]-no-subscript',
+                'gl_ClipDistance[7]-no-subscript',
+                'gl_ClipDistance[8]-no-subscript']:
         test_name = 'builtin-varyings {0}'.format(varying)
         ext_transform_feedback[test_name] = PlainExecTest(
                 'ext_transform_feedback-{0} -auto'.format(test_name))
@@ -1500,7 +1508,7 @@ for output_type in ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat2x3',
                     'mat2x4', 'mat3x2', 'mat3', 'mat3x4', 'mat4x2', 'mat4x3',
                     'mat4', 'int', 'ivec2', 'ivec3', 'ivec4', 'uint', 'uvec2',
                     'uvec3', 'uvec4']:
-        for suffix in ['', '[2]']:
+        for suffix in ['', '[2]', '[2]-no-subscript']:
                 test_name = 'output-type {0}{1}'.format(output_type, suffix)
                 ext_transform_feedback[test_name] = PlainExecTest(
                         'ext_transform_feedback-{0} -auto'.format(test_name))

@@ -211,6 +211,166 @@ struct test_desc {
 
 		8 /* expected_num_output_components */
 	},
+	{
+		"gl_ClipDistance[1]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[1];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 1; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 1.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		1 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[2]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[2];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 2; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 2.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		2 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[3]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[3];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 3; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 3.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		3 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[4]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[4];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 4; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 4.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		4 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[5]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[5];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 5; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 5.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		5 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[6]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[6];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 6; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 6.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		6 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[7]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[7];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 7; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 7.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		7 /* expected_num_output_components */
+	},
+	{
+		"gl_ClipDistance[8]-no-subscript", /* name */
+		130, /* version */
+
+		"#version 130\n" /* vs */
+		"in vec4 vertex_pos;\n"
+		"in float vertex_num;\n"
+		"out float gl_ClipDistance[8];\n"
+		"void main() {\n"
+		"  gl_Position = vertex_pos;\n"
+		"  float scale = 1.0/256.0;\n"
+		"  for(int i = 0; i < 8; ++i)\n"
+		"    gl_ClipDistance[i] = (float(i) + 8.0 * vertex_num) * scale;\n"
+		"}\n",
+
+		1, /* num_varyings */
+		{"gl_ClipDistance"}, /* varyings */
+
+		8 /* expected_num_output_components */
+	},
 };
 
 const struct test_desc *test_to_run;
