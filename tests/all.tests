@@ -1218,6 +1218,7 @@ arb_vertex_program['minmax'] = concurrent_test('arb_vertex_program-minmax')
 ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
 ext_framebuffer_multisample['negative-max-samples'] = concurrent_test('ext_framebuffer_multisample-negative-max-samples')
+ext_framebuffer_multisample['renderbuffer-samples'] = concurrent_test('ext_framebuffer_multisample-renderbuffer-samples')
 
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
