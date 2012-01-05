@@ -508,6 +508,12 @@ test_specific_formats(void)
 	while (glGetError() != GL_NO_ERROR)
 		;
 
+	/* All of the packed formats require GL_ARB_texture_rgb10_a2ui.
+	 */
+	if (!piglit_is_extension_supported("GL_ARB_texture_rgb10_a2ui")) {
+		return GL_TRUE;
+	}
+
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
 		glTexImage2D(GL_TEXTURE_2D, 0, formats[i].intFormat,
 			     16, 16, 0,
