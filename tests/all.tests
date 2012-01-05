@@ -1219,6 +1219,7 @@ ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
 ext_framebuffer_multisample['dlist'] = concurrent_test('ext_framebuffer_multisample-dlist')
 ext_framebuffer_multisample['negative-max-samples'] = concurrent_test('ext_framebuffer_multisample-negative-max-samples')
+ext_framebuffer_multisample['renderbufferstorage-samples'] = concurrent_test('ext_framebuffer_multisample-renderbufferstorage-samples')
 ext_framebuffer_multisample['renderbuffer-samples'] = concurrent_test('ext_framebuffer_multisample-renderbuffer-samples')
 
 ext_framebuffer_object = Group()
