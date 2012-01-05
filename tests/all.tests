@@ -1215,6 +1215,10 @@ arb_vertex_program['getlocal4d-with-error'] = PlainExecTest(['arb_vertex_program
 arb_vertex_program['clip-plane-transformation arb'] = concurrent_test('clip-plane-transformation arb')
 arb_vertex_program['minmax'] = concurrent_test('arb_vertex_program-minmax')
 
+ext_framebuffer_multisample = Group()
+spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
+ext_framebuffer_multisample['negative-max-samples'] = concurrent_test('ext_framebuffer_multisample-negative-max-samples')
+
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
