@@ -34,7 +34,7 @@ int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 
-static GLboolean
+static bool
 test_copy(void)
 {
 #define BUF_SIZE 600  /* multiple of 100 */
@@ -43,7 +43,7 @@ test_copy(void)
 	char data[BUF_SIZE], *p;
 	int i;
 	int chunk = 100;
-	GLboolean pass = GL_TRUE;
+	bool pass = true;
 
 	assert(BUF_SIZE % chunk == 0);
 
@@ -72,7 +72,7 @@ test_copy(void)
 		if (p[i] != data[i]) {
 			printf("expected %d, found %d at location %d\n",
 			       data[i], p[i], i);
-			pass = GL_FALSE;
+			pass = false;
 			break;
 		}
 	}
@@ -88,18 +88,18 @@ test_copy(void)
 enum piglit_result
 piglit_display(void)
 {
-	return PIGLIT_PASS;
+	/* should never get here */
+	return PIGLIT_FAIL;
 }
 
 
 void
 piglit_init(int argc, char **argv)
 {
-	if (!piglit_is_extension_supported("GL_ARB_copy_buffer"))
-		piglit_report_result(PIGLIT_SKIP);
+	piglit_require_extension("GL_ARB_copy_buffer");
 
-	if (!test_copy())
-		piglit_report_result(PIGLIT_FAIL);
-	else
+	if (test_copy())
 		piglit_report_result(PIGLIT_PASS);
+	else
+		piglit_report_result(PIGLIT_FAIL);
 }
