@@ -312,6 +312,7 @@ add_plain_test(general, 'vbo-map-remap')
 add_plain_test(general, 'vbo-subdata-sync')
 add_plain_test(general, 'vbo-subdata-zero')
 add_plain_test(general, 'windowoverlap')
+add_plain_test(general, 'clear-accum')
 add_fbo_depthstencil_tests(general, 'default_fb')
 
 shaders = Group()
