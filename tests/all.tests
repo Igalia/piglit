@@ -552,6 +552,7 @@ shaders['vpfp-generic'] = vpfpgeneric
 bugs = Group()
 add_plain_test(bugs, 'crash-cubemap-order')
 add_plain_test(bugs, 'crash-texparameter-before-teximage')
+add_plain_test(bugs, 'drawbuffer-modes')
 add_plain_test(bugs, 'fdo9833')
 add_plain_test(bugs, 'fdo10370')
 add_plain_test(bugs, 'fdo14575')
