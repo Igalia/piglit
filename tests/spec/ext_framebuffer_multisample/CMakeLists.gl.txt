@@ -13,5 +13,6 @@ link_libraries (
 
 add_executable (ext_framebuffer_multisample-dlist dlist.c)
 add_executable (ext_framebuffer_multisample-negative-max-samples negative-max-samples.c)
+add_executable (ext_framebuffer_multisample-negative-readpixels negative-readpixels.c)
 add_executable (ext_framebuffer_multisample-renderbuffer-samples renderbuffer-samples.c)
 add_executable (ext_framebuffer_multisample-renderbufferstorage-samples renderbufferstorage-samples.c)
