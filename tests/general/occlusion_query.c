@@ -174,17 +174,17 @@ piglit_init(int argc, char **argv)
 
 
 	if (piglit_get_gl_version() >= 15) {
-		gen_queries = GLEW_GET_FUN(__glewGenQueries);
-		begin_query = GLEW_GET_FUN(__glewBeginQuery);
-		end_query = GLEW_GET_FUN(__glewEndQuery);
-		get_queryiv = GLEW_GET_FUN(__glewGetQueryiv);
-		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectiv);
+		gen_queries = glGenQueries;
+		begin_query = glBeginQuery;
+		end_query = glEndQuery;
+		get_queryiv = glGetQueryiv;
+		get_query_objectiv = glGetQueryObjectiv;
 	} else if (piglit_is_extension_supported("GL_ARB_occlusion_query")) {
-		gen_queries = GLEW_GET_FUN(__glewGenQueriesARB);
-		begin_query = GLEW_GET_FUN(__glewBeginQueryARB);
-		end_query = GLEW_GET_FUN(__glewEndQueryARB);
-		get_queryiv = GLEW_GET_FUN(__glewGetQueryivARB);
-		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectivARB);
+		gen_queries = glGenQueriesARB;
+		begin_query = glBeginQueryARB;
+		end_query = glEndQueryARB;
+		get_queryiv = glGetQueryivARB;
+		get_query_objectiv = glGetQueryObjectivARB;
 	} else {
 		piglit_report_result(PIGLIT_SKIP);
 	}

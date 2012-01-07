@@ -174,10 +174,10 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_SGIS_generate_mipmap");
 
 	if (piglit_get_gl_version() >= 13) {
-		ActiveTexture = GLEW_GET_FUN(__glewActiveTexture);
+		ActiveTexture = glActiveTexture;
 	} else {
 		piglit_require_extension("GL_ARB_multitexture");
-		ActiveTexture = GLEW_GET_FUN(__glewActiveTextureARB);
+		ActiveTexture = glActiveTextureARB;
 	}
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
