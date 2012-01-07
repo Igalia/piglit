@@ -49,12 +49,7 @@ test_version(void)
    GLuint iversion;
    GLint major, minor, k;
 
-#ifdef GL_VERSION_3_0
-   if (!glewIsSupported("GL_VERSION_3_0"))
-      return PIGLIT_SKIP;
-#else
-   return PIGLIT_SKIP;
-#endif
+   piglit_require_gl_version(30);
 
    major = version[0] - '0';
    minor = version[2] - '0';

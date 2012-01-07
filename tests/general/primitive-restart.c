@@ -473,12 +473,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-   Have_NV = glewIsSupported("GL_NV_primitive_restart");
-#ifdef GL_VERSION_3_1
-   Have_31 = glewIsSupported("GL_VERSION_3_1");
-#else
-   Have_31 = GL_FALSE;
-#endif
+   Have_NV = piglit_is_extension_supported("GL_NV_primitive_restart");
+   Have_31 = piglit_get_gl_version() >= 31;
 
    /* Debug */
    /* NOTE!  glew 1.5.2's OpenGL 3.1 detection is broken.  You'll need
