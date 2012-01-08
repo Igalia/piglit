@@ -95,6 +95,9 @@ def run(input_):
                         action="store_true",
                         help="Produce a line of output for each test before "
                              "and after it runs")
+    parser.add_argument("-s", "--sync",
+                        action="store_true",
+                        help="Sync results to disk after every test")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -138,7 +141,8 @@ def run(input_):
                         execute=args.execute,
                         valgrind=args.valgrind,
                         dmesg=args.dmesg,
-                        verbose=args.verbose)
+                        verbose=args.verbose,
+                        sync=args.sync)
 
     # Set the platform to pass to waffle
     opts.env['PIGLIT_PLATFORM'] = args.platform
@@ -159,7 +163,7 @@ def run(input_):
     # Begin json.
     result_filepath = path.join(args.results_path, 'results.json')
     result_file = open(result_filepath, 'w')
-    json_writer = framework.results.JSONWriter(result_file)
+    json_writer = framework.results.JSONWriter(result_file, opts.sync)
 
     # Create a dictionary to pass to initialize json, it needs the contents of
     # the env dictionary and profile and platform information
@@ -216,14 +220,16 @@ def resume(input_):
                         execute=results.options['execute'],
                         valgrind=results.options['valgrind'],
                         dmesg=results.options['dmesg'],
-                        verbose=results.options['verbose'])
+                        verbose=results.options['verbose'],
+                        sync=results.options['sync'])
 
     core.get_config(args.config_file)
 
     opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, 'results.json')
-    json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
+    json_writer = framework.results.JSONWriter(open(results_path, 'w+'),
+                                               opts.sync)
     json_writer.initialize_json(results.options, results.name,
                                 core.collect_system_info())
 

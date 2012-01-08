@@ -95,7 +95,7 @@ class Options(object):
     """
     def __init__(self, concurrent=True, execute=True, include_filter=None,
                  exclude_filter=None, valgrind=False, dmesg=False,
-                 verbose=False):
+                 verbose=False, sync=False):
         self.concurrent = concurrent
         self.execute = execute
         self.filter = [re.compile(x) for x in include_filter or []]
@@ -104,6 +104,7 @@ class Options(object):
         self.valgrind = valgrind
         self.dmesg = dmesg
         self.verbose = verbose
+        self.sync = sync
         # env is used to set some base environment variables that are not going
         # to change across runs, without sending them to os.environ which is
         # fickle as easy to break

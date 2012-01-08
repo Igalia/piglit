@@ -102,8 +102,9 @@ class JSONWriter(object):
 
     INDENT = 4
 
-    def __init__(self, f):
+    def __init__(self, f, fsync):
         self.file = f
+        self.fsync = fsync
         self.__indent_level = 0
         self.__inhibit_next_indent = False
         self.__encoder = json.JSONEncoder(indent=self.INDENT,
@@ -175,6 +176,12 @@ class JSONWriter(object):
         self.file.close()
 
     @synchronized_self
+    def __file_sync(self):
+        if self.fsync:
+            self.file.flush()
+            os.fsync(self.file.fileno())
+
+    @synchronized_self
     def __write_indent(self):
         if self.__inhibit_next_indent:
             self.__inhibit_next_indent = False
@@ -201,6 +208,7 @@ class JSONWriter(object):
         self.__indent_level += 1
         self.__is_collection_empty.append(True)
         self._open_containers.append('dict')
+        self.__file_sync()
 
     @synchronized_self
     def close_dict(self):
@@ -212,6 +220,7 @@ class JSONWriter(object):
         self.file.write('}')
         assert self._open_containers[-1] == 'dict'
         self._open_containers.pop()
+        self.__file_sync()
 
     @synchronized_self
     def write_dict_item(self, key, value):
@@ -220,6 +229,8 @@ class JSONWriter(object):
 
         # Write value.
         self.__write(value)
+
+        self.__file_sync()
 
     @synchronized_self
     def write_dict_key(self, key):
@@ -234,6 +245,8 @@ class JSONWriter(object):
         self.file.write(': ')
 
         self.__inhibit_next_indent = True
+
+        self.__file_sync()
 
 
 class TestResult(dict):
