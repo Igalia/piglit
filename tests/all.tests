@@ -1249,6 +1249,7 @@ ext_packed_depth_stencil['readpixels-24_8'] = PlainExecTest(['ext_packed_depth_s
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
 add_plain_test(ext_texture_array, 'fbo-generatemipmap-array')
+spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxlayers')
 add_shader_test_dir(ext_texture_array,
                     os.path.dirname(__file__) + '/spec/ext_texture_array',
                     recursive=True)
