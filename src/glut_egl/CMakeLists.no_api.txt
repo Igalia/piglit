@@ -1,3 +1,8 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	)
+
 link_libraries(${OPENGL_egl_LIBRARY})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
