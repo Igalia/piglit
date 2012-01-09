@@ -20,10 +20,6 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	link_libraries(pthread X11)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
 add_executable(hiz-depth-stencil-test-fbo-d0-s8 hiz-depth-stencil-test-fbo-d0-s8.c)
 add_executable(hiz-depth-stencil-test-fbo-d24-s0 hiz-depth-stencil-test-fbo-d24-s0.c)
 add_executable(hiz-depth-stencil-test-fbo-d24-s8 hiz-depth-stencil-test-fbo-d24-s8.c)
