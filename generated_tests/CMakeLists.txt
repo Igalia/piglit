@@ -30,10 +30,14 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	interpolation_tests.list
 	gen_interpolation_tests.py)
+piglit_make_generated_tests(
+	non-lvalue_tests.list
+	gen_non-lvalue_tests.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
 add_custom_target(gen-tests ALL
 	DEPENDS builtin_uniform_tests.list
 		constant_array_size_tests.list
-		interpolation_tests.list)
+		interpolation_tests.list
+		non-lvalue_tests.list)

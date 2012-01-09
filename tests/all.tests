@@ -852,6 +852,9 @@ spec['glsl-1.10'] = Group()
 import_glsl_parser_tests(spec['glsl-1.10'],
 			 os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
+import_glsl_parser_tests(spec['glsl-1.10'],
+			 os.path.join(generatedTestDir, 'spec', 'glsl-1.10'),
+			 ['preprocessor', 'compiler'])
 spec['glsl-1.10']['linker'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['linker'],
 	            os.path.join(os.path.dirname(__file__), 'spec', 'glsl-1.10', 'linker'),
