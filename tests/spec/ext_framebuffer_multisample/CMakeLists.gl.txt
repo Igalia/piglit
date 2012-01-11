@@ -18,3 +18,4 @@ add_executable (ext_framebuffer_multisample-negative-max-samples negative-max-sa
 add_executable (ext_framebuffer_multisample-negative-readpixels negative-readpixels.c)
 add_executable (ext_framebuffer_multisample-renderbuffer-samples renderbuffer-samples.c)
 add_executable (ext_framebuffer_multisample-renderbufferstorage-samples renderbufferstorage-samples.c)
+add_executable (ext_framebuffer_multisample-samples samples.c)
