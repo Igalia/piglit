@@ -105,7 +105,7 @@ def main():
 		usage()
 
 	profileFilename = args[0]
-	resultsDir = args[1]
+	resultsDir = path.realpath(args[1])
 
 	# Change to the piglit's path
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
