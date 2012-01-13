@@ -49,6 +49,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	add_executable (glx-pixmap-multi glx-pixmap-multi.c)
 	add_executable (glx-pixmap-crosscheck glx-pixmap-crosscheck.c)
 
+	add_executable (glx-visuals-depth glx-visuals-depth.c)
 	add_executable (glx-visuals-stencil glx-visuals-stencil.c)
 
 	add_executable (glx-copy-sub-buffer glx-copy-sub-buffer.c)

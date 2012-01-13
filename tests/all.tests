@@ -607,6 +607,7 @@ glx['glx-pixmap13-life'].runConcurrent = True
 add_plain_test(glx, 'glx-pixmap-multi')
 glx['glx-pixmap-multi'].runConcurrent = True
 add_plain_test(glx, 'glx-tfp')
+add_plain_test(glx, 'glx-visuals-depth')
 add_plain_test(glx, 'glx-visuals-stencil')
 add_plain_test(glx, 'glx-window-life')
 glx['glx-window-life'].runConcurrent = True
