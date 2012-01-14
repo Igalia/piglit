@@ -277,7 +277,7 @@ piglit_display(void)
 		}
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	if (!pass)
 		return PIGLIT_FAIL;

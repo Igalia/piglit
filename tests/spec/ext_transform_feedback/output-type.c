@@ -1349,7 +1349,7 @@ enum piglit_result piglit_display(void)
 
 	assert(glGetError() == 0);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

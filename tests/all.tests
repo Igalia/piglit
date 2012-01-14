@@ -1420,8 +1420,8 @@ for mode in ['interleaved_ok_base', 'interleaved_ok_range',
              'bind_offset_offset_2', 'bind_offset_offset_3',
              'bind_offset_offset_5', 'not_a_program']:
         test_name = 'api-errors {0}'.format(mode)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto'.format(test_name))
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_FogFragCoord', 'gl_Position', 'gl_PointSize',
                 'gl_ClipVertex', 'gl_ClipDistance',
@@ -1434,8 +1434,8 @@ for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_ClipDistance[7]-no-subscript',
                 'gl_ClipDistance[8]-no-subscript']:
         test_name = 'builtin-varyings {0}'.format(varying)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto'.format(test_name))
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['buffer-usage'] = concurrent_test('ext_transform_feedback-buffer-usage')
 ext_transform_feedback['discard-api'] = concurrent_test('ext_transform_feedback-discard-api')
 ext_transform_feedback['discard-bitmap'] = concurrent_test('ext_transform_feedback-discard-bitmap')
@@ -1445,50 +1445,50 @@ ext_transform_feedback['discard-drawarrays'] = concurrent_test('ext_transform_fe
 ext_transform_feedback['discard-drawpixels'] = concurrent_test('ext_transform_feedback-discard-drawpixels')
 for mode in ['main_binding', 'indexed_binding', 'buffer_start', 'buffer_size']:
         test_name = 'get-buffer-state {0}'.format(mode)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto'.format(test_name))
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['immediate-reuse'] = concurrent_test('ext_transform_feedback-immediate-reuse')
 for mode in ['output', 'prims_generated', 'prims_written']:
         test_name = 'intervening-read {0}'.format(mode)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto'.format(test_name))
-ext_transform_feedback['max-varyings'] = PlainExecTest(['ext_transform_feedback-max-varyings', '-auto'])
-ext_transform_feedback['overflow-edge-cases'] = PlainExecTest(['ext_transform_feedback-overflow-edge-cases', '-auto'])
-ext_transform_feedback['position-readback-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto'])
-ext_transform_feedback['position-readback-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'discard'])
-ext_transform_feedback['position-readback-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset'])
-ext_transform_feedback['position-readback-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'offset', 'discard'])
-ext_transform_feedback['position-readback-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'range'])
-ext_transform_feedback['position-readback-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'range', 'discard'])
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
+ext_transform_feedback['max-varyings'] = concurrent_test('ext_transform_feedback-max-varyings')
+ext_transform_feedback['overflow-edge-cases'] = concurrent_test('ext_transform_feedback-overflow-edge-cases')
+ext_transform_feedback['position-readback-bufferbase'] = 		concurrent_test('ext_transform_feedback-position')
+ext_transform_feedback['position-readback-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position discard')
+ext_transform_feedback['position-readback-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position offset')
+ext_transform_feedback['position-readback-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position offset discard')
+ext_transform_feedback['position-readback-bufferrange'] = 		concurrent_test('ext_transform_feedback-position range')
+ext_transform_feedback['position-readback-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position range discard')
 
-ext_transform_feedback['position-render-bufferbase'] = 			PlainExecTest(['ext_transform_feedback-position', '-auto', 'render'])
-ext_transform_feedback['position-render-bufferbase-discard'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'discard'])
-ext_transform_feedback['position-render-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'offset'])
-ext_transform_feedback['position-render-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'offset', 'discard'])
-ext_transform_feedback['position-render-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'range'])
-ext_transform_feedback['position-render-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'render', 'range', 'discard'])
+ext_transform_feedback['position-render-bufferbase'] = 			concurrent_test('ext_transform_feedback-position render')
+ext_transform_feedback['position-render-bufferbase-discard'] = 		concurrent_test('ext_transform_feedback-position render discard')
+ext_transform_feedback['position-render-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position render offset')
+ext_transform_feedback['position-render-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position render offset discard')
+ext_transform_feedback['position-render-bufferrange'] = 		concurrent_test('ext_transform_feedback-position render range')
+ext_transform_feedback['position-render-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position render range discard')
 
-ext_transform_feedback['query-primitives_generated-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen'])
-ext_transform_feedback['query-primitives_generated-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'discard'])
-ext_transform_feedback['query-primitives_generated-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'offset'])
-ext_transform_feedback['query-primitives_generated-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'offset', 'discard'])
-ext_transform_feedback['query-primitives_generated-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'range'])
-ext_transform_feedback['query-primitives_generated-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primgen', 'range', 'discard'])
+ext_transform_feedback['query-primitives_generated-bufferbase'] = 		concurrent_test('ext_transform_feedback-position primgen')
+ext_transform_feedback['query-primitives_generated-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position primgen discard')
+ext_transform_feedback['query-primitives_generated-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position primgen offset')
+ext_transform_feedback['query-primitives_generated-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position primgen offset discard')
+ext_transform_feedback['query-primitives_generated-bufferrange'] = 		concurrent_test('ext_transform_feedback-position primgen range')
+ext_transform_feedback['query-primitives_generated-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position primgen range discard')
 
-ext_transform_feedback['query-primitives_written-bufferbase'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten'])
-ext_transform_feedback['query-primitives_written-bufferbase-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'discard'])
-ext_transform_feedback['query-primitives_written-bufferoffset'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'offset'])
-ext_transform_feedback['query-primitives_written-bufferoffset-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'offset', 'discard'])
-ext_transform_feedback['query-primitives_written-bufferrange'] = 		PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'range'])
-ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	PlainExecTest(['ext_transform_feedback-position', '-auto', 'primwritten', 'range', 'discard'])
+ext_transform_feedback['query-primitives_written-bufferbase'] = 		concurrent_test('ext_transform_feedback-position primwritten')
+ext_transform_feedback['query-primitives_written-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten discard')
+ext_transform_feedback['query-primitives_written-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position primwritten offset')
+ext_transform_feedback['query-primitives_written-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten offset discard')
+ext_transform_feedback['query-primitives_written-bufferrange'] = 		concurrent_test('ext_transform_feedback-position primwritten range')
+ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten range discard')
 
-ext_transform_feedback['interleaved-attribs'] = PlainExecTest(['ext_transform_feedback-interleaved', '-auto'])
-ext_transform_feedback['separate-attribs'] = PlainExecTest(['ext_transform_feedback-separate', '-auto'])
+ext_transform_feedback['interleaved-attribs'] = concurrent_test('ext_transform_feedback-interleaved')
+ext_transform_feedback['separate-attribs'] = concurrent_test('ext_transform_feedback-separate')
 for drawcall in ['arrays', 'elements']:
         for mode in ['triangles', 'lines', 'points']:
                 test_name = 'order {0} {1}'.format(drawcall, mode)
-                ext_transform_feedback[test_name] = PlainExecTest(
-                        'ext_transform_feedback-{0} -auto'.format(test_name))
+                ext_transform_feedback[test_name] = concurrent_test(
+                        'ext_transform_feedback-{0}'.format(test_name))
 for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
                   'triangles', 'triangle_strip', 'triangle_fan',
                   'quads', 'quad_strip', 'polygon']:
@@ -1498,12 +1498,12 @@ for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
                         continue
                 test_name = 'tessellation {0} {1}'.format(
                         draw_mode, shade_mode)
-                ext_transform_feedback[test_name] = PlainExecTest(
-                        'ext_transform_feedback-{0} -auto'.format(test_name))
+                ext_transform_feedback[test_name] = concurrent_test(
+                        'ext_transform_feedback-{0}'.format(test_name))
 for alignment in [0, 4, 8, 12]:
         test_name = 'alignment {0}'.format(alignment)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto'.format(test_name))
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 
 for output_type in ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat2x3',
                     'mat2x4', 'mat3x2', 'mat3', 'mat3x4', 'mat4x2', 'mat4x3',
@@ -1511,13 +1511,13 @@ for output_type in ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat2x3',
                     'uvec3', 'uvec4']:
         for suffix in ['', '[2]', '[2]-no-subscript']:
                 test_name = 'output-type {0}{1}'.format(output_type, suffix)
-                ext_transform_feedback[test_name] = PlainExecTest(
-                        'ext_transform_feedback-{0} -auto'.format(test_name))
+                ext_transform_feedback[test_name] = concurrent_test(
+                        'ext_transform_feedback-{0}'.format(test_name))
 
 for mode in ['discard', 'buffer', 'prims_generated', 'prims_written']:
         test_name = 'generatemipmap {0}'.format(mode)
-        ext_transform_feedback[test_name] = PlainExecTest(
-                'ext_transform_feedback-{0} -auto -fbo'.format(test_name))
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 
 arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
