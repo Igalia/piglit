@@ -244,6 +244,75 @@ piglit_glx_set_no_input(void)
 }
 
 enum piglit_result
+piglit_glx_iterate_pixmap_fbconfigs(enum piglit_result (*draw)(Display *dpy,
+						      GLXFBConfig config))
+{
+	int screen;
+	GLXFBConfig *configs;
+	int n_configs;
+	int i;
+	bool any_fail = false;
+	bool any_pass = false;
+	Window root_win;
+
+	Display *dpy = XOpenDisplay(NULL);
+	if (!dpy) {
+		fprintf(stderr, "couldn't open display\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	screen = DefaultScreen(dpy);
+	root_win = RootWindow(dpy, screen);
+
+	configs = glXGetFBConfigs(dpy, screen, &n_configs);
+	if (!configs) {
+		fprintf(stderr, "No GLX FB configs\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	for (i = 0; i < n_configs; i++) {
+		GLXFBConfig config = configs[i];
+		enum piglit_result result;
+		GLXContext ctx;
+		Pixmap pix;
+		GLXPixmap glx_pix;
+		int draw_types;
+		int depth;
+
+		glXGetFBConfigAttrib(dpy, config, GLX_DRAWABLE_TYPE,
+				     &draw_types);
+
+		if (!(draw_types & GLX_PIXMAP_BIT))
+			continue;
+
+		glXGetFBConfigAttrib(dpy, config, GLX_BUFFER_SIZE,
+				     &depth);
+		ctx = glXCreateNewContext(dpy, config, GLX_RGBA_TYPE,
+					  NULL, true);
+		pix = XCreatePixmap(dpy, root_win,
+				    piglit_width, piglit_height, depth);
+		glx_pix = glXCreatePixmap(dpy, config, pix, NULL);
+		glXMakeCurrent(dpy, glx_pix, ctx);
+
+		result = draw(dpy, config);
+
+		if (result == PIGLIT_FAIL)
+			any_fail = true;
+		else if (result == PIGLIT_PASS)
+			any_pass = true;
+
+		XFreePixmap(dpy, pix);
+		glXDestroyContext(dpy, ctx);
+	}
+
+	if (any_fail)
+		return PIGLIT_FAIL;
+	else if (any_pass)
+		return PIGLIT_PASS;
+	else
+		return PIGLIT_SKIP;
+}
+
+enum piglit_result
 piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 						      GLXFBConfig config))
 {

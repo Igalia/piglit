@@ -49,6 +49,10 @@ enum piglit_result
 piglit_glx_iterate_visuals(enum piglit_result (*draw)(Display *dpy,
 						      GLXFBConfig config));
 
+enum piglit_result
+piglit_glx_iterate_pixmap_fbconfigs(enum piglit_result (*draw)(Display *dpy,
+							       GLXFBConfig config));
+
 GLXFBConfig
 piglit_glx_get_fbconfig_for_visinfo(Display *dpy, XVisualInfo *visinfo);
 int
