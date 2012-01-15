@@ -89,7 +89,7 @@ piglit_display()
 	/* Draw consecutive squares for each mipmap level */
 	for (l = 0; l < miplevels; l++) {
 		const int x = 10 + l * 20;
-		float expected_color[4];
+		float expected_color[4] = {};
 		expected_color[0] = 0.01 * level_size[l][0];
 		if (sampler.target == GL_TEXTURE_1D_ARRAY) {
 			expected_color[1] = 0.01 * level_size[l][2];
