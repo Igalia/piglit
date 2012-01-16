@@ -44,16 +44,16 @@ static bool pass = true;
 static void
 min_test_i(GLenum token, GLint min, const char *name)
 {
-	GLint val;
+	GLint vals[2];
 
-	glGetIntegerv(token, &val);
+	glGetIntegerv(token, vals);
 
-	if (val < min) {
+	if (vals[0] < min) {
 		fprintf(stderr, "%-50s %8d %8d (ERROR)\n",
-			name, min, val);
+			name, min, vals[0]);
 		pass = false;
 	} else {
-		printf("%-50s %8d %8d\n", name, min, val);
+		printf("%-50s %8d %8d\n", name, min, vals[0]);
 	}
 }
 
@@ -103,7 +103,7 @@ static double log2(double x)
 static void
 test_oq_bits()
 {
-	GLint dims;
+	GLint dims[2];
 	GLint minbits, oqbits;
 
 	/* From the GL 2.1 specification:
@@ -121,8 +121,8 @@ test_oq_bits()
 	 *      n = min{32, log2(maxViewportWidth ∗ maxViewportHeight * 2}"
 	 */
 
-	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &dims);
-	minbits = log2((float)dims * dims * 2);
+	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, dims);
+	minbits = log2((float)dims[0] * dims[0] * 2);
 	if (minbits > 32)
 		minbits = 32;
 
