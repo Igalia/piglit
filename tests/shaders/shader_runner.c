@@ -807,12 +807,12 @@ set_uniform(const char *line)
 			piglit_Uniform4uiv(loc, 1, uints);
 			return;
 		}
-	} else if ((string_match("mat", type))
-		   && (type[3] != '\0')
-		   && (type[4] == 'x')) {
-		switch (type[3]) {
+	} else if (string_match("mat", type) && type[3] != '\0') {
+		char cols = type[3];
+		char rows = type[4] == 'x' ? type[5] : cols;
+		switch (cols) {
 		case '2':
-			switch (type[5]) {
+			switch (rows) {
 			case '2':
 				get_floats(line, f, 4);
 				piglit_UniformMatrix2fv(loc, 1, GL_FALSE, f);
@@ -827,7 +827,7 @@ set_uniform(const char *line)
 				return;
 			}
 		case '3':
-			switch (type[5]) {
+			switch (rows) {
 			case '2':
 				get_floats(line, f, 6);
 				piglit_UniformMatrix3x2fv(loc, 1, GL_FALSE, f);
@@ -842,7 +842,7 @@ set_uniform(const char *line)
 				return;
 			}
 		case '4':
-			switch (type[5]) {
+			switch (rows) {
 			case '2':
 				get_floats(line, f, 8);
 				piglit_UniformMatrix4x2fv(loc, 1, GL_FALSE, f);
