@@ -93,7 +93,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		2, /* num_elements, expected_float, expected_int */
-		{666, 0.123}, {}
+		{666, 0.123}, {0}
 	},
 	{
 		"vec2", /* name */
@@ -144,7 +144,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		4, /* num_elements, expected_float, expected_int */
-		{666, 999, -1.5, -20.0}, {}
+		{666, 999, -1.5, -20.0}, {0}
 	},
 	{
 		"vec3", /* name */
@@ -195,7 +195,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		6, /* num_elements, expected_float, expected_int */
-		{666, 999, -2, 0.4, 1.4, 3.5}, {}
+		{666, 999, -2, 0.4, 1.4, 3.5}, {0}
 	},
 	{
 		"vec4", /* name */
@@ -246,7 +246,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		8, /* num_elements, expected_float, expected_int */
-		{0.666, 666, 999, -2, 0.5, -0.4, 30.0, 40.0}, {}
+		{0.666, 666, 999, -2, 0.5, -0.4, 30.0, 40.0}, {0}
 	},
 	{
 		"mat2", /* name */
@@ -299,7 +299,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		8, /* num_elements, expected_float, expected_int */
-		{0.666, 666, 999, -2, 0.34, 0.65, 0.14, -0.97}, {}
+		{0.666, 666, 999, -2, 0.34, 0.65, 0.14, -0.97}, {0}
 	},
 	{
 		"mat2x3", /* name */
@@ -352,7 +352,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		12, /* num_elements, expected_float, expected_int */
-		{0.666, 666, 999, -2, 0.5, -0.4, 0.34, 0.12, -10.0, 30.1, 5.3, 9.8}, {}
+		{0.666, 666, 999, -2, 0.5, -0.4, 0.34, 0.12, -10.0, 30.1, 5.3, 9.8}, {0}
 	},
 	{
 		"mat2x4", /* name */
@@ -405,7 +405,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		16, /* num_elements, expected_float, expected_int */
-		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.12, 0.24, 0.34, 0.56, 0.67, 0.78, 0.89, 0.04}, {}
+		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.12, 0.24, 0.34, 0.56, 0.67, 0.78, 0.89, 0.04}, {0}
 	},
 	{
 		"mat3x2", /* name */
@@ -459,7 +459,7 @@ struct test_desc {
 
 		true, /* is_floating_point */
 		12, /* num_elements, expected_float, expected_int */
-		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 0.98, 0.87, 0.76, 0.65, 0.54, 0.43}, {}
+		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 0.98, 0.87, 0.76, 0.65, 0.54, 0.43}, {0}
 	},
 	{
 		"mat3", /* name */
@@ -520,7 +520,7 @@ struct test_desc {
 		true, /* is_floating_point */
 		18, /* num_elements, expected_float, expected_int */
 		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0,
-		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0}, {}
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0}, {0}
 	},
 	{
 		"mat3x4", /* name */
@@ -582,7 +582,7 @@ struct test_desc {
 		true, /* is_floating_point */
 		24, /* num_elements, expected_float, expected_int */
 		{0.666, 666.0, 999.0, -2.0, 0.2, 5.0, 3.0, 0.3, -10.0, 0.4, -4.1, -5.9,
-		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}, {}
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}, {0}
 	},
 	{
 		"mat4x2", /* name */
@@ -637,7 +637,7 @@ struct test_desc {
 		true, /* is_floating_point */
 		16, /* num_elements, expected_float, expected_int */
 		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40,
-		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6}, {}
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6}, {0}
 	},
 	{
 		"mat4x3", /* name */
@@ -700,7 +700,7 @@ struct test_desc {
 		true, /* is_floating_point */
 		24, /* num_elements, expected_float, expected_int */
 		{0.666, 666, 999, -2, 0.5, -0.4, 30, 40, 0.3, 0.2, 0.1, 0.4,
-		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}, {}
+		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6, 8.0, 0.4, -4.1, -5.9}, {0}
 	},
 	{
 		"mat4", /* name */
@@ -773,7 +773,7 @@ struct test_desc {
 		 -10.0, 20.1, 52.4, -34.3,
 		 45.0, 56.0, 67.0, 78.0,
 		 20.0, 10.0, 5.0, 90.0, -4.0, 3.4, -2.3, -8.6,
-		 8.0, 0.4, -4.1, -5.9, -10.0, 0.4, -4.1, -5.9}, {}
+		 8.0, 0.4, -4.1, -5.9, -10.0, 0.4, -4.1, -5.9}, {0}
 	},
 	{
 		"int", /* name */
@@ -826,7 +826,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		2, /* num_elements, expected_float, expected_int */
-		{}, {-362245257, 2074398469}
+		{0}, {-362245257, 2074398469}
 	},
 	{
 		"ivec2", /* name */
@@ -879,7 +879,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		4, /* num_elements, expected_float, expected_int */
-		{}, {5703639, 654049542, 82927237, -1489678625}
+		{0}, {5703639, 654049542, 82927237, -1489678625}
 	},
 	{
 		"ivec3", /* name */
@@ -933,7 +933,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		6, /* num_elements, expected_float, expected_int */
-		{}, {819762795, 292214138, 207695021,
+		{0}, {819762795, 292214138, 207695021,
 		     -541769145, -896550370, -322088831}
 	},
 	{
@@ -988,7 +988,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		8, /* num_elements, expected_float, expected_int */
-		{}, {-764612129, 395402837, -1260359913, 936205122,
+		{0}, {-764612129, 395402837, -1260359913, 936205122,
 		     -1510453781, -707590649, -760434930, -1756396083}
 	},
 	{
@@ -1042,7 +1042,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		2, /* num_elements, expected_float, expected_int */
-		{}, {4073369952u, 1026348970u}
+		{0}, {4073369952u, 1026348970u}
 	},
 	{
 		"uvec2", /* name */
@@ -1095,7 +1095,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		4, /* num_elements, expected_float, expected_int */
-		{}, {1011258288u, 684916166u, 381807053u, 3306523233u}
+		{0}, {1011258288u, 684916166u, 381807053u, 3306523233u}
 	},
 	{
 		"uvec3", /* name */
@@ -1149,7 +1149,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		6, /* num_elements, expected_float, expected_int */
-		{}, {2984731006u, 2324137892u, 876349448u,
+		{0}, {2984731006u, 2324137892u, 876349448u,
 		     2493082028u, 1481747175u, 1530233730u}
 	},
 	{
@@ -1204,7 +1204,7 @@ struct test_desc {
 
 		false, /* is_floating_point */
 		8, /* num_elements, expected_float, expected_int */
-		{}, {2563680931u, 754130007u, 230209823u, 707580188u,
+		{0}, {2563680931u, 754130007u, 230209823u, 707580188u,
 		     3015681429u, 3850948302u, 2224673498u, 2376088107u}
 	},
 
