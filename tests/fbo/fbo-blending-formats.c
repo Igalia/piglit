@@ -335,4 +335,5 @@ enum piglit_result piglit_display(void)
 void piglit_init(int argc, char **argv)
 {
 	fbo_formats_init(argc, argv, GL_TRUE);
+	glDisable(GL_DITHER);
 }
