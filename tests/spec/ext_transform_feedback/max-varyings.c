@@ -139,11 +139,11 @@ check_xfb_output(int max_varyings, int num_xfb_varyings, int offset)
 	for (vertex = 0; vertex < 6; ++vertex) {
 		for (varying = 0; varying < num_xfb_varyings; ++varying) {
 			float expected[4];
+			float *actual;
 			for (i = 0; i < 4; ++i) {
 				expected[i] = (varying + offset) * 4.0 + i;
 			}
-			float *actual =
-				buffer[vertex * num_xfb_varyings + varying];
+			actual = buffer[vertex * num_xfb_varyings + varying];
 			if (memcmp(expected, actual, 4 * sizeof(float)) != 0) {
 				printf("When recording %i varyings\n",
 				       num_xfb_varyings);
@@ -176,6 +176,7 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings, int max_varyings)
 
 	for (offset = 0; offset + num_xfb_varyings <= max_varyings; ++offset) {
 		GLuint prog;
+		float initial_buffer[MAX_VARYING * 6][4];
 
 		prog = glCreateProgram();
 		glAttachShader(prog, vs);
@@ -191,7 +192,6 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings, int max_varyings)
 
 		glUseProgram(prog);
 
-		float initial_buffer[MAX_VARYING * 6][4];
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 		memset(initial_buffer, 0, sizeof(initial_buffer));
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
