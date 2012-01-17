@@ -182,7 +182,7 @@ test_mipmap_copypixels(GLenum srcIntFormat, GLenum dstIntFormat,
    glDeleteFramebuffers(1, &fboSrc);
    glDeleteFramebuffers(1, &fboDst);
 
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
    if (!pass)
       return GL_FALSE;
@@ -205,8 +205,6 @@ test_mipmap_copypixels(GLenum srcIntFormat, GLenum dstIntFormat,
       piglit_draw_rect_tex(0, 0, piglit_width, piglit_height,
                            0.0, 0.0, 1.0, 1.0);
 
-      glutSwapBuffers();
-
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, colors[level]);
       if (!p) {
          printf("  Mipmap level %d\n", level);
@@ -224,6 +222,8 @@ test_mipmap_copypixels(GLenum srcIntFormat, GLenum dstIntFormat,
       }
 
       size /= 2;
+
+      piglit_present_results();
    }
 
    glDisable(GL_TEXTURE_2D);
