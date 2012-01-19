@@ -274,10 +274,11 @@ void piglit_init(int argc, char **argv)
 	else
 		print_usage_and_exit(argv[0]);
 
+	piglit_require_transform_feedback();
+
 	if (buffer || prims_written) {
 		GLuint vs;
 		piglit_require_GLSL();
-		piglit_require_transform_feedback();
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 		xfb_prog = piglit_CreateProgram();
 		piglit_AttachShader(xfb_prog, vs);
