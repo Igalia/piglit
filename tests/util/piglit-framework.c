@@ -40,7 +40,7 @@
 
 int piglit_automatic = 0;
 bool piglit_use_fbo = false;
-GLuint piglit_fbo;
+unsigned piglit_winsys_fbo = 0;
 static int piglit_window;
 static enum piglit_result result;
 #ifdef USE_GLX
@@ -144,6 +144,16 @@ piglit_framework_fbo_glx_destroy()
 #endif
 }
 
+static void
+piglit_framework_fbo_destroy()
+{
+#ifdef USE_OPENGL
+	glDeleteFramebuffers(1, &piglit_winsys_fbo);
+#endif
+	piglit_winsys_fbo = 0;
+	piglit_framework_fbo_glx_destroy();
+}
+
 static bool
 piglit_framework_fbo_init()
 {
@@ -160,8 +170,8 @@ piglit_framework_fbo_init()
 		return false;
 #endif
 
-	glGenFramebuffers(1, &piglit_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, piglit_fbo);
+	glGenFramebuffers(1, &piglit_winsys_fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -207,6 +217,12 @@ piglit_framework_fbo_init()
 		fprintf(stderr,
 			"-fbo resulted in incomplete FBO, falling back\n");
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glDeleteTextures(1, &depth);
+		glDeleteTextures(1, &tex);
+
+		piglit_framework_fbo_destroy();
+
 		return false;
 	}
 
@@ -214,12 +230,6 @@ piglit_framework_fbo_init()
 #else /* USE_GLX */
 	return false;
 #endif /* USE_GLX */
-}
-
-static void
-piglit_framework_fbo_destroy()
-{
-	piglit_framework_fbo_glx_destroy();
 }
 
 static void
