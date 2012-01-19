@@ -1345,6 +1345,8 @@ spec['EXT_texture_integer'] = ext_texture_integer
 ext_texture_integer['api-drawpixels'] = concurrent_test('ext_texture_integer-api-drawpixels')
 ext_texture_integer['api-teximage'] = concurrent_test('ext_texture_integer-api-teximage')
 ext_texture_integer['api-readpixels'] = concurrent_test('ext_texture_integer-api-readpixels')
+ext_texture_integer['fbo-blending'] = concurrent_test('ext_texture_integer-fbo-blending')
+ext_texture_integer['fbo-blending GL_ARB_texture_rg'] = concurrent_test('ext_texture_integer-fbo-blending GL_ARB_texture_rg')
 ext_texture_integer['fbo_integer_precision_clear'] = plain_test('ext_texture_integer-fbo_integer_precision_clear')
 ext_texture_integer['fbo_integer_readpixels_sint_uint'] = plain_test('ext_texture_integer-fbo_integer_readpixels_sint_uint')
 ext_texture_integer['texture_integer_glsl130'] = concurrent_test('ext_texture_integer-texture_integer_glsl130')
@@ -1372,6 +1374,10 @@ add_texwrap_test2(arb_texture_rg, '2D', 'GL_R16F')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG16F')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R32F')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG32F')
+
+ext_texture_rgb10_a2ui = Group()
+spec['EXT_texture_rgb10_a2ui'] = ext_texture_rgb10_a2ui
+ext_texture_rgb10_a2ui['fbo-blending'] = concurrent_test('ext_texture_integer-fbo-blending GL_ARB_texture_rgb10_a2ui')
 
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
