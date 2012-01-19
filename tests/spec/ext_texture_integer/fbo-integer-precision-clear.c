@@ -60,15 +60,6 @@ static const struct format_info Formats[] = {
 
 #define NUM_FORMATS  (sizeof(Formats) / sizeof(Formats[0]))
 
-/* For glDrawPixels */
-static const char *PassthroughFragShaderText =
-	"void main() \n"
-	"{ \n"
-	"   gl_FragColor = gl_Color; \n"
-	"} \n";
-
-static GLuint PassthroughFragShader, PassthroughProgram;
-
 static int
 num_components(GLenum format)
 {
@@ -237,14 +228,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_texture_integer");
-	piglit_require_GLSL_version(130);
-
-	PassthroughFragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-							   PassthroughFragShaderText);
-	assert(PassthroughFragShader);
-	PassthroughProgram = piglit_link_simple_program(0, PassthroughFragShader);
-
-	(void) check_error(__FILE__, __LINE__);
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
