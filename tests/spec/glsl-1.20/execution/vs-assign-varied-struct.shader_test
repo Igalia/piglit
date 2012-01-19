@@ -1,0 +1,32 @@
+# Test initialization of an array of structures where the elements of
+# the structure do not all have the same vector size.
+#
+# This test reproduces the problem described in
+# https://bugs.freedesktop.org/show_bug.cgi?id=40865#c9.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+void main(void)
+{
+    float x = 3.0;
+    struct s { float f; vec3 v; };
+    s a[1]=s[](s(x,vec3(x)));
+    if (a[0].f==3.0)
+      gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0); // green
+    else
+      gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0); // red
+    gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main(void)
+{
+    gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
