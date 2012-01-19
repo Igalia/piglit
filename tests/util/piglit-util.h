@@ -188,6 +188,7 @@ piglit_check_gl_error(GLenum expected_error);
 void piglit_reset_gl_error(void);
 
 int FindLine(const char *program, int position);
+void piglit_merge_result(enum piglit_result *all, enum piglit_result subtest);
 void piglit_report_result(enum piglit_result result);
 void piglit_require_gl_version(int required_version_times_10);
 void piglit_require_extension(const char *name);

@@ -421,3 +421,28 @@ piglit_set_rlimit(unsigned long lim)
 	printf("Cannot reset rlimit on this platform.\n\n");
 #endif
 }
+
+/* Merges the PASS/FAIL/SKIP for @subtest into the overall result
+ * @all.
+ *
+ * The @all should start out initialized to PIGLIT_SKIP.
+ */
+void
+piglit_merge_result(enum piglit_result *all, enum piglit_result subtest)
+{
+	switch (subtest) {
+	case PIGLIT_FAIL:
+		*all = PIGLIT_FAIL;
+		break;
+	case PIGLIT_WARN:
+		if (*all == PIGLIT_SKIP || *all == PIGLIT_PASS)
+			*all = PIGLIT_WARN;
+		break;
+	case PIGLIT_PASS:
+		if (*all == PIGLIT_SKIP)
+			*all = PIGLIT_PASS;
+		break;
+	case PIGLIT_SKIP:
+		break;
+	}
+}
