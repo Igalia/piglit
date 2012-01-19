@@ -176,6 +176,7 @@ compute_expected_color(const struct format_desc *fmt,
 		texel[1] = ubyte_to_float(upperRightTexel[1], bits[1]);
 		texel[2] = ubyte_to_float(upperRightTexel[2], bits[2]);
 		texel[3] = 1.0;
+		compressed = GL_FALSE;
 	}
 	else {
 		GLint r, g, b, a, l, i;
