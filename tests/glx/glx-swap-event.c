@@ -129,6 +129,7 @@ draw_frame(Display *dpy, Window win)
     if (tRate0 < 0.0)
         tRate0 = t;
     if (t - tRate0 >= 3.0) {
+        GLfloat seconds;
         if (interval_diff) {
             if (message_count & 0x1) {
                 ret = (*pglXSwapIntervalMESA)(1);
@@ -145,7 +146,7 @@ draw_frame(Display *dpy, Window win)
             }
         }
         message_count++;
-        GLfloat seconds = t - tRate0;
+        seconds = t - tRate0;
         if ( (time_val / frames) < 0.0016 ) {  
             // 0.0016 <=> 60Hz * 10 or 100Hz * 6 
             async_swap=1;
