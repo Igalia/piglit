@@ -113,7 +113,7 @@ compute_miplevel_info()
 
 	/* Compute the number of miplevels */
 	if (sampler.target == GL_TEXTURE_3D)
-		max_dimension = max3(base_size[0], base_size[1], base_size[3]);
+		max_dimension = max3(base_size[0], base_size[1], base_size[2]);
 	else
 		max_dimension = max2(base_size[0], base_size[1]);
 
