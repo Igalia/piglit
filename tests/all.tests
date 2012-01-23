@@ -1350,6 +1350,8 @@ ext_texture_integer['fbo-blending'] = concurrent_test('ext_texture_integer-fbo-b
 ext_texture_integer['fbo-blending GL_ARB_texture_rg'] = concurrent_test('ext_texture_integer-fbo-blending GL_ARB_texture_rg')
 ext_texture_integer['fbo_integer_precision_clear'] = plain_test('ext_texture_integer-fbo_integer_precision_clear')
 ext_texture_integer['fbo_integer_readpixels_sint_uint'] = plain_test('ext_texture_integer-fbo_integer_readpixels_sint_uint')
+ext_texture_integer['getteximage-clamping'] = concurrent_test('ext_texture_integer-getteximage-clamping')
+ext_texture_integer['getteximage-clamping GL_ARB_texture_rg'] = concurrent_test('ext_texture_integer-getteximage-clamping GL_ARB_texture_rg')
 ext_texture_integer['texture_integer_glsl130'] = concurrent_test('ext_texture_integer-texture_integer_glsl130')
 
 arb_texture_rg = Group()

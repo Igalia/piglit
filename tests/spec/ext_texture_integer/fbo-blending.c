@@ -288,9 +288,6 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	if (argc > 1) {
-	}
-
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_GLSL_version(130);
 
