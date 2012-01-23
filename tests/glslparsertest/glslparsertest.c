@@ -32,7 +32,6 @@
  */
 
 #include <errno.h>
-#include <sys/stat.h>
 
 #include "piglit-util.h"
 
@@ -128,10 +127,7 @@ test(void)
 {
 	GLint prog;
 	GLint ok;
-	struct stat st;
-	int err;
 	GLchar *prog_string;
-	FILE *f;
 	FILE *out;
 	GLboolean pass;
 	GLchar *info;
@@ -153,29 +149,12 @@ test(void)
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
 
-	err = stat(filename, &st);
-	if (err == -1) {
-		fprintf(stderr, "Couldn't stat program %s: %s\n",
-			filename, strerror(errno));
-		exit(1);
-	}
-
-	prog_string = malloc(st.st_size + 1);
+	prog_string = piglit_load_text_file(filename, NULL);
 	if (prog_string == NULL) {
-		fprintf(stderr, "malloc\n");
-		exit(1);
-	}
-
-	f = fopen(filename, "r");
-	if (f == NULL) {
 		fprintf(stderr, "Couldn't open program %s: %s\n",
 			filename, strerror(errno));
 		exit(1);
 	}
-	fread(prog_string, 1, st.st_size, f);
-	prog_string[st.st_size] = '\0';
-	fclose(f);
-
 
 	prog = piglit_CreateShader(type);
 	piglit_ShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
