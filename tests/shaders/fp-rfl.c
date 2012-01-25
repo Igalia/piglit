@@ -48,8 +48,6 @@ int piglit_window_mode = GLUT_DOUBLE;
 int piglit_width = (((BOX_SIZE + 1) * TEST_COLS)+1);
 int piglit_height = (((BOX_SIZE + 1) * TEST_ROWS)+1);
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 static const char vert_shader_source[] =
 	"!!ARBvp1.0\n"
 	"ATTRIB	iPos = vertex.position;\n"
@@ -221,7 +219,7 @@ piglit_init(int argc, char **argv)
 	 * random vector across the axis is { 0, 1, 0 }.
 	 */
 	srand(time(NULL));
-	for (i = 0; i < (ELEMENTS(direction) / 4); i++) {
+	for (i = 0; i < (ARRAY_SIZE(direction) / 4); i++) {
 		const double d[3] = {
 			random_float(),
 			random_float(),

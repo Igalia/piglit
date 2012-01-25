@@ -68,10 +68,8 @@ static const GLfloat attrib[] = {
 	-2.0, -2.0,
 };
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 #define TEST_ROWS  16
-#define TEST_COLS  (ELEMENTS(attrib) / 2)
+#define TEST_COLS  (ARRAY_SIZE(attrib) / 2)
 #define BOX_SIZE   16
 
 

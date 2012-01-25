@@ -28,8 +28,6 @@
 
 #include "piglit-util.h"
 
-#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 static const char *TestName = "texture-float-formats";
@@ -244,7 +242,7 @@ test_format(const struct format_info *info)
          "GL_TEXTURE_DEPTH_TYPE_ARB"
       };
       int i;
-      for (i = 0; i < ELEMENTS(queries); i++) {
+      for (i = 0; i < ARRAY_SIZE(queries); i++) {
          GLint type = 1;
          glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, queries[i], &type);
          if (check_error(__FILE__, __LINE__))
@@ -348,7 +346,7 @@ piglit_display(void)
    int f;
    GLboolean pass = GL_TRUE;
 
-   for (f = 0; f < ELEMENTS(Formats); f++)
+   for (f = 0; f < ARRAY_SIZE(Formats); f++)
       if (!test_format(&Formats[f]))
          pass = GL_FALSE;
 

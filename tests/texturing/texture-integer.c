@@ -29,8 +29,6 @@
 
 #include "piglit-util.h"
 
-#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
 
 int piglit_width = 100, piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
@@ -423,7 +421,7 @@ test_specific_formats(void)
    while (glGetError() != GL_NO_ERROR)
       ;
 
-   for (i = 0; i < ELEMENTS(formats); i++) {
+   for (i = 0; i < ARRAY_SIZE(formats); i++) {
       glTexImage2D(GL_TEXTURE_2D, 0, formats[i].intFormat,
                    16, 16, 0,
                    formats[i].srcFormat, formats[i].srcType, NULL);

@@ -35,8 +35,6 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 #define TEST_ROWS  1
 #define TEST_COLS  6
 #define BOX_SIZE   32
@@ -82,7 +80,7 @@ piglit_display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (i = 0; i < ELEMENTS(progs); i++) {
+	for (i = 0; i < ARRAY_SIZE(progs); i++) {
 		const int x = 1 + (i * (BOX_SIZE + 1));
 		const GLenum p = GL_CLIP_PLANE0 + ((i + 1) % 6);
 
@@ -117,7 +115,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_NV_vertex_program2_option");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	for (i = 0; i < ELEMENTS(progs); i++) {
+	for (i = 0; i < ARRAY_SIZE(progs); i++) {
 		char shader_source[1024];
 
 		snprintf(shader_source, sizeof(shader_source),

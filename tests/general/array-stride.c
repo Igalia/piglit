@@ -37,8 +37,6 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static const char *TestName = "array-stride";
 
 
-#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
 #define ROWS 10
 #define COLS 10
 #define NUM_VERTS (ROWS * COLS * 4)
@@ -74,7 +72,7 @@ draw_simple_stride(void)
    static GLushort elements[NUM_VERTS];
    int i;
 
-   for (i = 0; i < ELEMENTS(elements); i++)
+   for (i = 0; i < ARRAY_SIZE(elements); i++)
       elements[i] = i;
 
    glVertexPointer(2, GL_FLOAT, 2 * sizeof(GLfloat), Verts);
@@ -95,7 +93,7 @@ draw_unusual_stride(int stride)
    static GLushort elements[NUM_VERTS];
    int i;
 
-   for (i = 0; i < ELEMENTS(elements); i++)
+   for (i = 0; i < ARRAY_SIZE(elements); i++)
       elements[i] = i * 8 / stride;
 
    glVertexPointer(2, GL_FLOAT, stride, Verts);

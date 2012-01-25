@@ -30,8 +30,6 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 #define BOX_SIZE   32
 
 

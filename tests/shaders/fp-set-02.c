@@ -60,15 +60,13 @@ struct {
 	{ "SLE", le_func },
 };
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 /* One column for each possible combination of set-on results
  */
 #define TEST_COLS  (3 * 3 * 3 * 3)
 
 /* One for each set-on opcode and its reference square.
  */
-#define TEST_ROWS  (ELEMENTS(tests) * 2)
+#define TEST_ROWS  (ARRAY_SIZE(tests) * 2)
 
 #define BOX_SIZE   8
 
@@ -100,7 +98,7 @@ static const char shader_template[] =
  */
 /*@{*/
 static GLint reference_prog;
-static GLint progs[ELEMENTS(tests)];
+static GLint progs[ARRAY_SIZE(tests)];
 /*@}*/
 
 int
@@ -169,7 +167,7 @@ piglit_display(void)
 
 	glProgramEnvParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, comparitor);
 
-	for (i = 0; i < (2 * ELEMENTS(progs)); i++) {
+	for (i = 0; i < (2 * ARRAY_SIZE(progs)); i++) {
 		const int y = (i * (BOX_SIZE + 1)) + 1;
 		const unsigned idx = i >> 1;
 
@@ -245,7 +243,7 @@ piglit_init(int argc, char **argv)
 	reference_prog = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 						reference_shader_source);
 
-	for (i = 0; i < ELEMENTS(tests); i++) {
+	for (i = 0; i < ARRAY_SIZE(tests); i++) {
 		char shader_source[512];
 
 		sprintf(shader_source, shader_template, tests[i].opcode);

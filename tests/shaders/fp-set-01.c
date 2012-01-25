@@ -45,8 +45,6 @@ int piglit_window_mode = GLUT_DOUBLE;
 int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
 int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 /**
  * Source for the fragment program to render the reference box.
  */
@@ -109,7 +107,7 @@ piglit_display(void)
 
 		glColor4fv(color);
 
-		for (j = 0; j < ELEMENTS(progs); j++) {
+		for (j = 0; j < ARRAY_SIZE(progs); j++) {
 			const int y = ((j + 1) * (BOX_SIZE + 1)) + 1;
 
 			glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, progs[j]);

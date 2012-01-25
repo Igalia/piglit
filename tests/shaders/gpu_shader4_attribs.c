@@ -44,9 +44,6 @@ static GLuint Program;
 #define SIGNED 1
 
 
-#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
-
 static GLboolean
 check_error(const char *file, int line)
 {
@@ -474,7 +471,7 @@ test_attrib_array(void)
       ;
 
    /* These should not generate a GL error */
-   for (i = 0; i < ELEMENTS(goodTypes); i++) {
+   for (i = 0; i < ARRAY_SIZE(goodTypes); i++) {
       glVertexAttribIPointerEXT(index, size, goodTypes[i], stride, data);
       err = glGetError();
       if (err != GL_NO_ERROR) {
@@ -485,7 +482,7 @@ test_attrib_array(void)
       }
    }
 
-   for (i = 0; i < ELEMENTS(badTypes); i++) {
+   for (i = 0; i < ARRAY_SIZE(badTypes); i++) {
       glVertexAttribIPointerEXT(index, size, badTypes[i], stride, data);
       err = glGetError();
       if (err != GL_INVALID_ENUM) {

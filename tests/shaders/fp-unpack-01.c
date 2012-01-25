@@ -46,8 +46,6 @@ int piglit_window_mode = GLUT_DOUBLE;
 int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
 int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 static char shader_source[64 * 1024];
 static GLfloat colors[TEST_COLS][4];
 
@@ -83,7 +81,7 @@ static const char reference_shader_source[] =
  */
 /*@{*/
 static GLint reference_prog;
-static GLint progs[ELEMENTS(types)];
+static GLint progs[ARRAY_SIZE(types)];
 /*@}*/
 
 
@@ -257,7 +255,7 @@ piglit_display(void)
 					    0, colors[i]);
 		piglit_draw_rect(x, 1, BOX_SIZE, BOX_SIZE);
 
-		for (j = 0; j < ELEMENTS(types); j++) {
+		for (j = 0; j < ARRAY_SIZE(types); j++) {
 			const int y = ((j + 1) * (BOX_SIZE + 1)) + 1;
 			GLfloat v[4];
 
@@ -331,7 +329,7 @@ piglit_init(int argc, char **argv)
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
-	for (i = 0; i < ELEMENTS(types); i++) {
+	for (i = 0; i < ARRAY_SIZE(types); i++) {
 		generate_shader(types[i]);
 		progs[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB,
 						  shader_source);
@@ -344,7 +342,7 @@ piglit_init(int argc, char **argv)
 		v[i] = ((float) i) / 127.0;
 	}
 
-	for (/* empty */; i < ELEMENTS(v); i++) {
+	for (/* empty */; i < ARRAY_SIZE(v); i++) {
 		v[i] = 0.5;
 	}
 
@@ -354,7 +352,7 @@ piglit_init(int argc, char **argv)
 	 */
 	shuffle(v, 128);
 	for (i = 0; i < TEST_COLS; i++) {
-		assert((i * 3) + 2 < ELEMENTS(v));
+		assert((i * 3) + 2 < ARRAY_SIZE(v));
 
 		colors[i][0] = v[(i * 3) + 0];
 		colors[i][1] = v[(i * 3) + 1];

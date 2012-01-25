@@ -35,8 +35,6 @@
 #define TEST_COLS  2
 #define BOX_SIZE   32
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 int piglit_window_mode = GLUT_DOUBLE;
 int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
 int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
@@ -128,7 +126,7 @@ piglit_display(void)
 
 	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, vert_prog);
 
-	for (i = 0; i < ELEMENTS(progs); i++) {
+	for (i = 0; i < ARRAY_SIZE(progs); i++) {
 		const int x = 1 + (i * (BOX_SIZE + 1));
 
 		glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, progs[i]);

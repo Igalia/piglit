@@ -39,10 +39,8 @@ static const GLfloat attrib[] = {
 	-2.0
 };
 
-#define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-
 #define TEST_ROWS  1
-#define TEST_COLS  ELEMENTS(attrib)
+#define TEST_COLS  ARRAY_SIZE(attrib)
 #define BOX_SIZE   32
 
 
@@ -87,7 +85,7 @@ piglit_display(void)
 	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 2, bad_color);
 	glProgramEnvParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 3, bad_color);
 
-	for (i = 0; i < ELEMENTS(progs); i++) {
+	for (i = 0; i < ARRAY_SIZE(progs); i++) {
 		const int x = 1 + (i * (BOX_SIZE + 1));
 
 		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, progs[i]);
@@ -135,7 +133,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	for (i = 0; i < ELEMENTS(progs); i++) {
+	for (i = 0; i < ARRAY_SIZE(progs); i++) {
 		char shader_source[1024];
 		int offset[2];
 		char direction[2];

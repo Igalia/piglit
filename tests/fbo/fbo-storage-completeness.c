@@ -139,9 +139,6 @@ static const struct format_info Formats[] = {
 };
 
 
-#define ELEMENTS(A) (sizeof(A) / sizeof(A[0]))
-
-
 static enum piglit_result
 test(void)
 {
@@ -154,7 +151,7 @@ test(void)
       ;
 
    /* find a format which is incomplete */
-   for (i = 0; i < ELEMENTS(Formats); i++) {
+   for (i = 0; i < ARRAY_SIZE(Formats); i++) {
       if (!HaveExtension[Formats[i].extension])
           continue;
 

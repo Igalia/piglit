@@ -64,8 +64,6 @@ static const char *primNames[] = {
    "GL_POLYGON"
 };
 
-#define ELEMENTS(ARRAY)  (sizeof(ARRAY) / sizeof(ARRAY[0]))
-
 
 static void
 draw(GLenum mode, GLuint numVerts)
@@ -87,7 +85,7 @@ test_prims(void)
    GLuint len, prim;
 
    for (len = 1000; len <= 1000 * 1000; len *= 10) {
-      for (prim = 0; prim < ELEMENTS(primTypes); prim++) {
+      for (prim = 0; prim < ARRAY_SIZE(primTypes); prim++) {
          if (!piglit_automatic)
             printf("%s: %s %u vertices\n", TestName, primNames[prim], len);
          glClear(GL_COLOR_BUFFER_BIT);

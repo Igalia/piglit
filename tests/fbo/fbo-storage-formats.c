@@ -169,9 +169,6 @@ static const GLenum InvalidFormats[] = {
 };
 
 
-#define ELEMENTS(A) (sizeof(A) / sizeof(A[0]))
-
-
 static enum piglit_result
 test(void)
 {
@@ -199,7 +196,7 @@ test(void)
       ;
 
    /* test formats that should be accepted */
-   for (i = 0; i < ELEMENTS(Formats); i++) {
+   for (i = 0; i < ARRAY_SIZE(Formats); i++) {
       if (!HaveExtension[Formats[i].extension])
           continue;
 
@@ -217,7 +214,7 @@ test(void)
    }
 
    /* test formats that should fail */
-   for (i = 0; i < ELEMENTS(InvalidFormats); i++) {
+   for (i = 0; i < ARRAY_SIZE(InvalidFormats); i++) {
       glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, InvalidFormats[i],
                                piglit_width, piglit_height);
       err = glGetError();
