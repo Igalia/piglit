@@ -49,7 +49,7 @@ int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 #define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
-#define CLAMP(x, h, l) MIN2(MAX2(x, l), h)
+#define CLAMP(x, l, h) MIN2(MAX2(x, l), h)
 
 static char shader_source[64 * 1024];
 static GLfloat colors[TEST_COLS][4];
@@ -161,7 +161,7 @@ float_to_half(float f)
 	/* Clamp the value to the range of values representable by a
 	 * half precision float.
 	 */
-	bits.f = CLAMP(f, HALF_MAX, -HALF_MAX);
+	bits.f = CLAMP(f, -HALF_MAX, HALF_MAX);
 
 	sign = bits.ui & (1U << 31);
 	sign >>= 16;
@@ -211,7 +211,7 @@ pack(float *packed, const float *color, GLenum type)
 
 	case GL_UNSIGNED_SHORT:
 		for (i = 0; i < 4; i++) {
-			const float tmp = CLAMP(color[i], 1.0, 0.0);
+			const float tmp = CLAMP(color[i], 0.0, 1.0);
 			us[i] = (GLushort) round(65535.0 * tmp);
 		}
 
@@ -221,7 +221,7 @@ pack(float *packed, const float *color, GLenum type)
 
 	case GL_UNSIGNED_BYTE:
 		for (i = 0; i < 4; i++) {
-			const float tmp = CLAMP(color[i], 1.0, 0.0);
+			const float tmp = CLAMP(color[i], 0.0, 1.0);
 			ub[i] = (GLubyte) round(255.0 * tmp);
 		}
 
@@ -231,7 +231,7 @@ pack(float *packed, const float *color, GLenum type)
 	case GL_BYTE:
 		for (i = 0; i < 4; i++) {
 			const float tmp =
-				CLAMP(color[i], 1.0, -(128.0 / 127.0));
+				CLAMP(color[i], -(128.0 / 127.0), 1.0);
 			ub[i] = (GLubyte) round(127.0 * tmp + 128.0);
 		}
 
