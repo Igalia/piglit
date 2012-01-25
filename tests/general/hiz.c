@@ -123,8 +123,6 @@ GLboolean pix_equal(int x, int y, const float probe[3], const float expected[3])
 	return ret;
 }
 
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
-
 GLboolean test_less()
 {
 	const float bg[3] = {0.1, 0.1, 0.1};

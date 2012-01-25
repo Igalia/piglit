@@ -31,9 +31,6 @@
 #include "piglit-util.h"
 
 
-#define MAX2( A, B )   ( (A)>(B) ? (A) : (B) )
-
-
 static int Width = 128, Height = 128;
 static int Automatic = 0;
 

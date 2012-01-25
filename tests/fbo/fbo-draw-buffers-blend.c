@@ -45,8 +45,6 @@ static GLint maxBuffers;
 static GLuint FBO;
 
 
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
-
 #define MY_ASSERT(x) my_assert(x, #x)
 
 static void

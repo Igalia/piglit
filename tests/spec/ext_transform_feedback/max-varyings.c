@@ -48,8 +48,6 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static const char *xfb_varying_array[MAX_VARYING];
 static GLuint xfb_buf;
 
-#define MIN2(A, B) ((A) < (B) ? (A) : (B))
-
 /* Generate a VS that writes to a varying vec4[num_varyings] called
  * "v".  The values written are v[0] = (0.0, 1.0, 2.0, 3.0), v[1] =
  * (4.0, 5.0, 6.0, 7.0), and so on.

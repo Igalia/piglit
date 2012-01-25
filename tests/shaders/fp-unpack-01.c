@@ -47,9 +47,6 @@ int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
 int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
 
 #define ELEMENTS(x)  (sizeof(x) / sizeof(x[0]))
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
-#define CLAMP(x, l, h) MIN2(MAX2(x, l), h)
 
 static char shader_source[64 * 1024];
 static GLfloat colors[TEST_COLS][4];

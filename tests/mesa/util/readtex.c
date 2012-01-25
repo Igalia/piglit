@@ -369,8 +369,6 @@ GLubyte *LoadRGBImage( const char *imageFile, GLint *width, GLint *height,
    return buffer;
 }
 
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
-
 
 static void ConvertRGBtoYUV(GLint w, GLint h, GLint texel_bytes,
 			    const GLubyte *src,

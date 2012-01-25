@@ -27,8 +27,6 @@
 #define GL_ETC1_RGB8_OES                                        0x8D64
 #endif
 
-#define CLAMP(x, min, max) ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
-
 int piglit_width = 100;
 int piglit_height = 100;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;

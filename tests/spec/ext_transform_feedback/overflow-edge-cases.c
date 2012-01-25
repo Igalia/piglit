@@ -50,8 +50,6 @@ int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 #define XFB_BUFFER_SIZE 12
 #define MAX_VERTICES 9
 
-#define MIN2(A, B) ((A) < (B) ? (A) : (B))
-
 static const char *vstext =
 	"attribute float vertex_num;\n"
 	"varying float varying1;\n"

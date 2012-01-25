@@ -181,10 +181,6 @@ draw_quad(int x, int y, int w, int h, int level)
 	glEnd();
 }
 
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
-#define MIN2( A, B )   ( (A)<(B) ? (A) : (B) )
-#define MAX2( A, B )   ( (A)>(B) ? (A) : (B) )
-
 enum piglit_result
 piglit_display(void)
 {

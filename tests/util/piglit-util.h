@@ -117,6 +117,10 @@ enum piglit_result {
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+
 extern const uint8_t fdo_bitmap[];
 extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
