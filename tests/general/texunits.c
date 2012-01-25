@@ -31,7 +31,7 @@
 #include "piglit-util.h"
 
 
-#define MAX( A, B )   ( (A)>(B) ? (A) : (B) )
+#define MAX2( A, B )   ( (A)>(B) ? (A) : (B) )
 
 
 static int Width = 128, Height = 128;
@@ -267,7 +267,7 @@ test_texture_params(void)
       printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
    }
 
-   maxUnit = MAX(MaxTextureCombinedUnits, MaxTextureCoordUnits);
+   maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
 
    /* this should generate an error */
    glActiveTexture(GL_TEXTURE0 + maxUnit);
