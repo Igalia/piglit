@@ -18,5 +18,6 @@ add_executable (arb_copy_buffer-overlap overlap.c)
 add_executable (arb_copy_buffer-negative-bound-zero negative-bound-zero.c)
 add_executable (arb_copy_buffer-negative-bounds negative-bounds.c)
 add_executable (arb_copy_buffer-negative-mapped negative-mapped.c)
+add_executable (arb_copy_buffer-targets targets.c)
 
 # vim: ft=cmake:

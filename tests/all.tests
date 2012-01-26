@@ -1616,6 +1616,7 @@ arb_copy_buffer['negative-bound-zero'] = concurrent_test('arb_copy_buffer-negati
 arb_copy_buffer['negative-bounds'] = concurrent_test('arb_copy_buffer-negative-bounds')
 arb_copy_buffer['negative-mapped'] = concurrent_test('arb_copy_buffer-negative-mapped')
 arb_copy_buffer['overlap'] = concurrent_test('arb_copy_buffer-overlap')
+arb_copy_buffer['targets'] = concurrent_test('arb_copy_buffer-targets')
 
 arb_vertex_type_2_10_10_10_rev = Group()
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev
