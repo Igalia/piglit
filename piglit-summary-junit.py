@@ -39,52 +39,56 @@ class Writer:
 		self.report = junit.Report(filename)
 		self.path = []
 
-	def write(self, args):
-		results = [framework.core.loadTestResults(arg) for arg in args]
+	def write(self, arg):
+		results = [framework.core.loadTestResults(arg)]
 		summary = framework.summary.Summary(results)
 
 		self.report.start()
+		self.report.startSuite('piglit')
 		try:
 			for test in summary.allTests():
 				self.write_test(summary, test)
 		finally:
 			self.enter_path([])
+			self.report.stopSuite()
 			self.report.stop()
 
 	def write_test(self, summary, test):
-		self.enter_path(test.path.split('/'))
-		for j in range(len(summary.testruns)):
-			tr = summary.testruns[j]
-			tr_name, _ = tr.name.rsplit('.', 1)
-			result = test.results[j]
+		test_path = test.path.split('/')
+		test_name = test_path.pop()
+		self.enter_path(test_path)
 
-			self.report.startCase(tr_name)
-			duration = None
+		assert len(summary.testruns) == 1
+		tr = summary.testruns[0]
+		result = test.results[0]
+
+		self.report.startCase(test_name)
+		duration = None
+		try:
 			try:
-				try:
-					self.report.addStdout(result['command'] + '\n')
-				except KeyError:
-					pass
+				self.report.addStdout(result['command'] + '\n')
+			except KeyError:
+				pass
 
-				try:
-					self.report.addStderr(result['info'])
-				except KeyError:
-					pass
+			try:
+				self.report.addStderr(result['info'])
+			except KeyError:
+				pass
 
-				success = result.get('result')
-				if success == 'pass':
-					pass
-				elif success == 'skip':
-					self.report.addSkipped()
-				else:
-					self.report.addFailure(success)
+			success = result.get('result')
+			if success == 'pass':
+				pass
+			elif success == 'skip':
+				self.report.addSkipped()
+			else:
+				self.report.addFailure(success)
 
-				try:
-					duration = float(result['time'])
-				except KeyError:
-					pass
-			finally:
-				self.report.stopCase(duration)
+			try:
+				duration = float(result['time'])
+			except KeyError:
+				pass
+		finally:
+			self.report.stopCase(duration)
 
 	def enter_path(self, path):
 		ancestor = 0
@@ -105,7 +109,7 @@ class Writer:
 
 def main():
 	optparser = optparse.OptionParser(
-		usage="\n\t%prog [options] [test.results] ...",
+		usage="\n\t%prog [options] test.results",
 		version="%%prog")
 	optparser.add_option(
 		'-o', '--output', metavar='FILE',
@@ -113,12 +117,12 @@ def main():
 		help="output filename")
 	(options, args) = optparser.parse_args(sys.argv[1:])
 
-	if not args:
+	if len(args) != 1:
 		optparser.error('need to specify one test result')
 		usage()
 
 	writer = Writer(options.output)
-	writer.write(args)
+	writer.write(args[0])
 
 
 if __name__ == "__main__":
