@@ -1,0 +1,72 @@
+/*
+ * Copyright © 2012 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ */
+
+/** @file negative-bound-zero.c
+ *
+ * Tests the following piece of the GL_ARB_copy_buffer spec:
+ *
+ *     "An INVALID_OPERATION error is generated if zero is bound to
+ *      readtarget or writetarget."
+ */
+
+#include "piglit-util.h"
+
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+enum piglit_result
+piglit_display(void)
+{
+	/* uncreached */
+	return PIGLIT_FAIL;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	GLuint buf;
+	uint8_t data[8] = { 0 };
+
+	piglit_require_extension("GL_ARB_copy_buffer");
+
+	glGenBuffers(1, &buf);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, buf);
+	glBufferData(GL_COPY_READ_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, 0);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, buf);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 1);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
+
+	glBindBuffer(GL_COPY_READ_BUFFER, buf);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 1);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
+
+	glDeleteBuffers(1, &buf);
+
+	piglit_report_result(PIGLIT_PASS);
+}
