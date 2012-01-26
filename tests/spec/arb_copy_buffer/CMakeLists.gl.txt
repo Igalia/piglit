@@ -14,6 +14,7 @@ link_libraries (
 add_executable (copy_buffer_coherency copy_buffer_coherency.c)
 add_executable (copybuffersubdata copybuffersubdata.c)
 add_executable (arb_copy_buffer-dlist dlist.c)
+add_executable (arb_copy_buffer-get get.c)
 add_executable (arb_copy_buffer-overlap overlap.c)
 add_executable (arb_copy_buffer-negative-bound-zero negative-bound-zero.c)
 add_executable (arb_copy_buffer-negative-bounds negative-bounds.c)

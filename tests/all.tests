@@ -1612,6 +1612,7 @@ spec['ARB_copy_buffer'] = arb_copy_buffer
 add_plain_test(arb_copy_buffer, 'copy_buffer_coherency')
 add_plain_test(arb_copy_buffer, 'copybuffersubdata')
 arb_copy_buffer['dlist'] = concurrent_test('arb_copy_buffer-dlist')
+arb_copy_buffer['get'] = concurrent_test('arb_copy_buffer-get')
 arb_copy_buffer['negative-bound-zero'] = concurrent_test('arb_copy_buffer-negative-bound-zero')
 arb_copy_buffer['negative-bounds'] = concurrent_test('arb_copy_buffer-negative-bounds')
 arb_copy_buffer['negative-mapped'] = concurrent_test('arb_copy_buffer-negative-mapped')
