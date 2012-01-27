@@ -67,6 +67,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+   piglit_require_gl_version(20);
    vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
    assert(vs);
    prog = piglit_link_simple_program(vs, 0);
