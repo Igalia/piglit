@@ -1,0 +1,34 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+
+uniform int i;
+
+void main()
+{
+	switch (i) {
+	case 0:
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+		break;
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+
+	default:
+		gl_FragColor = vec4(1.0, 0.0, 1.0, 0.0);
+		break;
+	}
+}
+
+[test]
+uniform int i 0
+draw rect -1 -1 2 2
+
+probe all rgba 0 1 0 0
