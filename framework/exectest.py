@@ -78,6 +78,7 @@ class ExecTest(Test):
 
 			results = TestResult()
 
+			results['result'] = 'fail'
 			out = self.interpretResult(out, results)
 
 			if proc.returncode == -5:
@@ -95,7 +96,6 @@ class ExecTest(Test):
 				# Windows EXCEPTION_INT_DIVIDE_BY_ZERO
 				results['result'] = 'crash'
 			elif proc.returncode != 0:
-				results['result'] = 'fail'
 				results['note'] = 'Returncode was %d' % (proc.returncode)
 
 			env = ''
