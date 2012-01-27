@@ -1,0 +1,68 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+
+uniform int i, j;
+
+void main()
+{
+	switch (i) {
+	case 0:
+		switch (j) {
+		case 0:
+			gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+			break;
+		case 1:
+			gl_FragColor = vec4(0.0, 0.0, 1.0, 0.0);
+			break;
+		default:
+			gl_FragColor = vec4(1.0, 0.0, 1.0, 0.0);
+			break;
+		}
+		break;
+	case 1:
+		switch (j) {
+		case 0:
+			gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+			break;
+		case 1:
+			gl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);
+			break;
+		default:
+			gl_FragColor = vec4(1.0, 0.0, 1.0, 0.0);
+			break;
+		}
+		break;
+	default:
+		gl_FragColor = vec4(1.0, 0.0, 1.0, 0.0);
+		break;
+	}
+}
+
+[test]
+uniform int i 0
+uniform int j 0
+draw rect -1 -1 1 1
+uniform int i 1
+uniform int j 0
+draw rect 0 -1 1 1
+uniform int i 0
+uniform int j 1
+draw rect -1 0 1 1
+uniform int i 1
+uniform int j 1
+draw rect 0 0 1 1
+
+relative probe rgba (0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+relative probe rgba (1.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+relative probe rgba (0.0, 1.0) (0.0, 0.0, 1.0, 0.0)
+relative probe rgba (1.0, 1.0) (1.0, 1.0, 1.0, 0.0)
