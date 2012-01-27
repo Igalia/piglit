@@ -1,0 +1,49 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+
+void main()
+{
+	int i = (int(gl_FragCoord.x) & 1) + (int(gl_FragCoord.y) & 1) * 2;
+
+	switch (i) {
+	case 0:
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+		break;
+	case 1:
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+		break;
+	case 2:
+		gl_FragColor = vec4(0.0, 0.0, 1.0, 0.0);
+		break;
+	case 3:
+		gl_FragColor = vec4(1.0, 1.0, 1.0, 0.0);
+		break;
+	default:
+		gl_FragColor = vec4(1.0, 0.0, 1.0, 0.0);
+	}
+}
+
+[test]
+draw rect -1 -1 2 2
+
+# test a couple of 2x2 blocks.
+
+probe rgba 0 0 1.0 0.0 0.0 0.0
+probe rgba 1 0 0.0 1.0 0.0 0.0
+probe rgba 0 1 0.0 0.0 1.0 0.0
+probe rgba 1 1 1.0 1.0 1.0 0.0
+
+probe rgba 2 0 1.0 0.0 0.0 0.0
+probe rgba 3 0 0.0 1.0 0.0 0.0
+probe rgba 2 1 0.0 0.0 1.0 0.0
+probe rgba 3 1 1.0 1.0 1.0 0.0

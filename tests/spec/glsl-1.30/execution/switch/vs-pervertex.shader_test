@@ -1,0 +1,45 @@
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+uniform int i;
+
+void main()
+{
+	int i = int(gl_Vertex.x > 0) + 2 * int(gl_Vertex.y > 0);
+
+	gl_Position = gl_Vertex;
+
+	switch (i) {
+	case 0:
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 0.0);
+		break;
+	case 1:
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 0.0);
+		break;
+	case 2:
+		gl_FrontColor = vec4(0.0, 0.0, 1.0, 0.0);
+		break;
+	case 3:
+		gl_FrontColor = vec4(1.0, 1.0, 1.0, 0.0);
+		break;
+	default:
+		gl_FrontColor = vec4(1.0, 0.0, 1.0, 0.0);
+	}
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+	gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+
+relative probe rgba (0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+relative probe rgba (1.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+relative probe rgba (0.0, 1.0) (0.0, 0.0, 1.0, 0.0)
+relative probe rgba (1.0, 1.0) (1.0, 1.0, 1.0, 0.0)
