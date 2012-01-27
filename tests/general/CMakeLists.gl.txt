@@ -125,5 +125,6 @@ add_executable (occlusion_query occlusion_query.c)
 add_executable (occlusion-query-discard occlusion-query-discard.c)
 add_executable (quad-invariance quad-invariance.c)
 add_executable (clear-accum clear-accum.c)
+add_executable (vs-point_size-zero vs-point_size-zero.c)
 
 # vim: ft=cmake:

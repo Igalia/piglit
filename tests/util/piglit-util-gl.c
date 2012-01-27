@@ -336,6 +336,32 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	return 1;
 }
 
+int
+piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
+{
+	int i, j, p;
+	GLfloat *probe;
+	GLfloat *pixels = malloc(w*h*3*sizeof(float));
+
+	glReadPixels(x, y, w, h, GL_RGB, GL_FLOAT, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			probe = &pixels[(j*w+i)*3];
+
+			for (p = 0; p < 3; ++p) {
+				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
+					free(pixels);
+					return 0;
+				}
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 /**
  * Read a pixel from the given location and compare its depth value to the
  * given expected value.
