@@ -106,4 +106,6 @@ main(int argc, char **argv)
 		result = piglit_glx_iterate_visuals(draw);
 
 	piglit_report_result(result);
+
+	return 0; /* UNREACHED */
 }
