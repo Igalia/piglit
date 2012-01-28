@@ -387,8 +387,6 @@ class Environment:
 	def __init__(self):
 		# If disabled, runs all tests serially from the main thread.
 		self.concurrent = True
-		# Set when we want doRun to only run a test if it's concurrent.
-		self.run_concurrent = True
 		self.execute = True
 		self.filter = []
 		self.exclude_filter = []
@@ -425,28 +423,25 @@ class Test:
 	def run(self):
 		raise NotImplementedError
 
+	def schedule(self, env, path, json_writer):
+		'''
+		Schedule test to be run via the concurrent thread pool.
+		This is a no-op if the test isn't marked as concurrent.
+
+		See ``Test.doRun`` for a description of the parameters.
+		'''
+		args = (env, path, json_writer)
+		if self.runConcurrent:
+			ConcurrentTestPool().put(self.doRun, args=args)
+
 	def doRun(self, env, path, json_writer):
 		'''
-		Schedule test to be run
+		Run the test immediately.
 
 		:path:
 		    Fully qualified test name as a string.  For example,
 		    ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
-
-		:testrun:
-		    A TestrunResult object that accumulates test results.
-		    After this test has executed, the test's ``TestResult`` is
-		    assigned to ``testrun.tests[path]``
 		'''
-		args = (env, path, json_writer)
-		if env.run_concurrent:
-			if self.runConcurrent:
-				ConcurrentTestPool().put(self.__doRunWork, args=args)
-		else:
-			if not env.concurrent or not self.runConcurrent:
-				self.__doRunWork(*args)
-
-	def __doRunWork(self, env, path, json_writer):
 		# Exclude tests that don't match the filter regexp
 		if len(env.filter) > 0:
 			if not True in map(lambda f: f.search(path) != None, env.filter):
@@ -558,13 +553,11 @@ class TestProfile:
 		# Queue up all the concurrent tests, so the pool is filled
 		# at the start of the test run.
 		if env.concurrent:
-			env.run_concurrent = True
 			for (path, test) in self.test_list.items():
-				test.doRun(env, path, json_writer)
+				test.schedule(env, path, json_writer)
 
 		# Run any remaining non-concurrent tests serially from this
 		# thread, while the concurrent tests 
-		env.run_concurrent = False
 		for (path, test) in self.test_list.items():
 			if not env.concurrent or not test.runConcurrent:
 				test.doRun(env, path, json_writer)
