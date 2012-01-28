@@ -33,7 +33,7 @@ static const char *vstext =
    "{ \n"
    "   gl_Position = ftransform(); \n"
    "   gl_FrontColor = vec4(1.0); \n"
-   "   gl_PointSize = 0.0; \n"
+   "   gl_PointSize = 0.001; \n"
    "} \n";
 
 
