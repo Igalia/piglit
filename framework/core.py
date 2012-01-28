@@ -410,7 +410,6 @@ class Environment:
 
 class Test:
 	ignoreErrors = []
-	sleep = 0
 
 	def __init__(self, runConcurrent = False):
 		'''
@@ -469,8 +468,6 @@ class Test:
 			status(result['result'])
 
 			json_writer.write_dict_item(path, result)
-			if Test.sleep:
-				time.sleep(Test.sleep)
 		else:
 			status("dry-run")
 
@@ -506,7 +503,6 @@ class TestProfile:
 	def __init__(self):
 		self.tests = Group()
 		self.test_list = {}
-		self.sleep = 0
 
 	def flatten_group_hierarchy(self):
 		'''
