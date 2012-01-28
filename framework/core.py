@@ -442,16 +442,6 @@ class Test:
 		    Fully qualified test name as a string.  For example,
 		    ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
 		'''
-		# Exclude tests that don't match the filter regexp
-		if len(env.filter) > 0:
-			if not True in map(lambda f: f.search(path) != None, env.filter):
-				return None
-
-		# And exclude tests that do match the exclude_filter regexp
-		if len(env.exclude_filter) > 0:
-			if True in map(lambda f: f.search(path) != None, env.exclude_filter):
-				return None
-
 		def status(msg):
 			log(msg = msg, channel = path)
 
@@ -549,6 +539,19 @@ class TestProfile:
 		'''
 		json_writer.write_dict_key('tests')
 		json_writer.open_dict()
+
+		def matches_any_regexp(x, re_list):
+			return True in map(lambda r: r.search(x) != None, re_list)
+
+		# Filter out unwanted tests
+		for path in self.test_list.keys():
+			# Exclude tests that don't match any of the `filter' regexps (-t options)
+			if env.filter and not matches_any_regexp(path, env.filter):
+				del self.test_list[path]
+
+			# Exclude tests that match an `exclude_filter' regexp (-x options)
+			if env.exclude_filter and matches_any_regexp(path, env.exclude_filter):
+				del self.test_list[path]
 
 		# Queue up all the concurrent tests, so the pool is filled
 		# at the start of the test run.
