@@ -182,10 +182,13 @@ piglit_glx_event_loop(Display *dpy, enum piglit_result (*draw)(Display *dpy))
 		XNextEvent (dpy, &event);
 
 		if (event.type == KeyPress) {
-			KeySym sym = XKeycodeToKeysym (dpy,
-						       event.xkey.keycode, 0);
+			int keysyms_per_keycode_return;
+			KeySym *sym = XGetKeyboardMapping (dpy,
+							   event.xkey.keycode,
+							   1,
+							   &keysyms_per_keycode_return);
 
-			if (sym == XK_Escape || sym == XK_q || sym == XK_Q)
+			if (sym[0] == XK_Escape || sym[0] == XK_q || sym[0] == XK_Q)
 				break;
 			else
 				draw(dpy);
