@@ -220,6 +220,11 @@ test_format(const struct format_info *info)
 		expected_color[2] = 0;
 		expected_color[3] = 1;
 		break;
+	case GL_ALPHA_INTEGER_EXT:
+		expected_color[0] = 0;
+		expected_color[1] = 0;
+		expected_color[2] = 0;
+		break;
 	default:
 		abort();
 	}
