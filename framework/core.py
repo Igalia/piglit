@@ -26,6 +26,7 @@ import errno
 import json
 import os
 import platform
+import re
 import stat
 import subprocess
 import sys
@@ -609,3 +610,45 @@ def loadTestResults(path):
 
 	assert(testrun.name is not None)
 	return testrun
+
+#############################################################################
+##### Error messages to be ignored
+#############################################################################
+Test.ignoreErrors = map(re.compile, [
+	"couldn't open libtxc_dxtn.so",
+	"compression/decompression available",
+	"Mesa: .*build",
+	"Mesa: CPU.*",
+	"Mesa: .*cpu detected.",
+	"Mesa: Test.*",
+	"Mesa: Yes.*",
+	"libGL: XF86DRIGetClientDriverName.*",
+	"libGL: OpenDriver: trying.*",
+	"libGL: Warning in.*drirc*",
+	"ATTENTION.*value of option.*",
+	"drmOpen.*",
+	"Mesa: Not testing OS support.*",
+	"Mesa: User error:.*",
+	"Mesa: Initializing .* optimizations",
+	"debug_get_.*",
+	"util_cpu_caps.*",
+	"Mesa: 3Dnow! detected",
+	"r300:.*",
+	"radeon:.*",
+	"Warning:.*",
+	"0 errors, .*",
+	"Mesa.*",
+	"no rrb",
+	"; ModuleID.*",
+	"%.*",
+	".*failed to translate tgsi opcode.*to SSE",
+	".*falling back to interpreter",
+	"GLSL version is .*, but requested version .* is required",
+	"kCGErrorIllegalArgument: CGSOrderWindowList",
+	"kCGErrorFailure: Set a breakpoint @ CGErrorBreakpoint\(\) to catch errors as they are logged.",
+	"stw_(init|cleanup).*",
+	"OpenGLInfo..*",
+	"AdapterInfo..*",
+	"No memory leaks detected.",
+	"libGL: Can't open configuration file.*",
+])
