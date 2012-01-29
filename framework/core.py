@@ -50,7 +50,6 @@ __all__ = [
 	'Group',
 	'Test',
 	'testBinDir',
-	'ResultFileInOldFormatError',
 ]
 
 class JSONWriter:
@@ -259,11 +258,6 @@ class GroupResult(dict):
 
 		return root
 
-class ResultFileInOldFormatError(Exception):
-	def __init__(self, filepath):
-		super(Exception, self).__init__(filepath)
-		self.filepath = filepath
-
 class TestrunResult:
 	def __init__(self):
 		self.serialized_keys = [
@@ -277,19 +271,6 @@ class TestrunResult:
 		self.glxinfo = None
 		self.lspci = None
 		self.tests = {}
-
-	def __checkFileIsNotInOldFormat(self, file):
-		'''
-		If file contains the old, custom format, then raise
-		``ResultFileInOldFormatError``.
-
-		:return: None
-		'''
-		saved_position = file.tell()
-		first_line = file.readline()
-		if first_line.startswith('name:'):
-			raise ResultFileInOldFormatError(file.name)
-		file.seek(saved_position)
 
 	def __repairFile(self, file):
 		'''
@@ -365,7 +346,6 @@ class TestrunResult:
 		json.dump(raw_dict, file, indent=JSONWriter.INDENT)
 
 	def parseFile(self, file):
-		self.__checkFileIsNotInOldFormat(file)
 		file = self.__repairFile(file)
 		raw_dict = json.load(file)
 
