@@ -149,6 +149,8 @@ get_datatype(const struct format_info *info)
 		return info->sign ? GL_SHORT : GL_UNSIGNED_SHORT;
 	case 32:
 		return info->sign ? GL_INT : GL_UNSIGNED_INT;
+	case 10:
+		return GL_UNSIGNED_INT_2_10_10_10_REV;
 	default:
 		assert(0);
 		return 0;
