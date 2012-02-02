@@ -272,8 +272,10 @@ require_GL_features(enum shader_target test_stage)
 
 	switch (sampler.internal_format) {
 	case GL_RGBA32I:
-	case GL_RGBA32UI:
 		piglit_require_extension("GL_EXT_texture_integer");
+		break;
+	case GL_RGBA32UI:
+		piglit_require_gl_version(30);
 		break;
 	case GL_RGBA32F:
 		piglit_require_extension("GL_ARB_texture_float");
