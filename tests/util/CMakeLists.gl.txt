@@ -29,6 +29,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		    piglit-shader-gl.c
 		    piglit-transform-feedback.c
 		    piglit-util.c
+		    piglit-util-enum.c
 		    piglit-util-gl.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c

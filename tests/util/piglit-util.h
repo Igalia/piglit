@@ -166,10 +166,17 @@ bool piglit_is_extension_supported(const char *name);
  * For example, given GL_INVALID_ENUM, return "GL_INVALID_ENUM".
  *
  * Return "(unrecognized error)" if the enum is not recognized.
- *
- * \todo Create a more general function that stringifies any GLenum.
  */
 const char* piglit_get_gl_error_name(GLenum error);
+
+/**
+ * \brief Convert a GL enum to a string.
+ *
+ * For example, given GL_INVALID_ENUM, return "GL_INVALID_ENUM".
+ *
+ * Return "(unrecognized enum)" if the enum is not recognized.
+ */
+const char *piglit_get_gl_enum_name(GLenum param);
 
 /**
  * \brief Check for unexpected GL errors.
