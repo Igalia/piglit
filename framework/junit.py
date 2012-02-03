@@ -111,8 +111,13 @@ class Report:
         self.stream.flush()
         self.stream.close()
 
+    def escapeName(self, name):
+        '''Dots are special for junit, so escape them with underscores.'''
+        name = name.replace('.', '_')
+        return name
+
     def startSuite(self, name):
-        self.testsuites.append(name)
+        self.testsuites.append(self.escapeName(name))
 
     def stopSuite(self):
         if self.inside_testsuite:
@@ -128,7 +133,7 @@ class Report:
             self.stream.write('<testsuite name="%s">\n' % escape('.'.join(self.testsuites)))
             self.inside_testsuite = True
 
-        self.case_name = name
+        self.case_name = self.escapeName(name)
         self.buffer = []
         self.stdout = []
         self.stderr = []
