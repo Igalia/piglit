@@ -114,8 +114,7 @@ check_error(const char *file, int line)
 }
 
 
-/** \return GL_TRUE for pass, GL_FALSE for fail */
-static GLboolean
+static enum piglit_result
 test_fbo(const struct format_info *info)
 {
 	const int comps = num_components(info->BaseFormat);
@@ -143,7 +142,7 @@ test_fbo(const struct format_info *info)
 		     info->BaseFormat, type, NULL);
 
 	if (check_error(__FILE__, __LINE__))
-		return GL_FALSE;
+		return PIGLIT_FAIL;
 
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
 				 &f);
@@ -157,24 +156,23 @@ test_fbo(const struct format_info *info)
 			       GL_TEXTURE_2D, texObj, 0);
 
 	if (check_error(__FILE__, __LINE__))
-		return GL_FALSE;
+		return PIGLIT_FAIL;
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "%s: failure: framebuffer incomplete.\n",
-			TestName);
-		return GL_FALSE;
+		printf("%s: framebuffer incomplete.\n", info->Name);
+		return PIGLIT_SKIP;
 	}
 
 
 	glGetBooleanv(GL_RGBA_INTEGER_MODE_EXT, &intMode);
 	if (check_error(__FILE__, __LINE__))
-		return GL_FALSE;
+		return PIGLIT_FAIL;
 	if (!intMode) {
 		fprintf(stderr,
 			"%s: GL_RGBA_INTEGER_MODE_EXT return GL_FALSE\n",
 			TestName);
-		return GL_FALSE;
+		return PIGLIT_FAIL;
 	}
 
 	glGetIntegerv(GL_READ_BUFFER, &buf);
@@ -207,20 +205,21 @@ test_fbo(const struct format_info *info)
 	glDeleteTextures(1, &texObj);
 	glDeleteFramebuffers(1, &fbo);
 
-	return pass;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
 enum piglit_result
 piglit_display(void)
 {
+	enum piglit_result result = PIGLIT_SKIP;
 	int f;
+
 	for (f = 0; f < NUM_FORMATS; f++) {
-		bool pass = test_fbo(&Formats[f]);
-		if (!pass)
-			return PIGLIT_FAIL;
+		piglit_merge_result(&result, test_fbo(&Formats[f]));
 	}
-	return PIGLIT_PASS;
+
+	return result;
 }
 
 
