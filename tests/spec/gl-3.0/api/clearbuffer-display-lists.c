@@ -44,8 +44,10 @@ void piglit_init(int argc, char **argv)
 	bool pass = true;
 
 	piglit_require_gl_version(30);
-	/* Probe the color buffer before creating display list. color buffers
-	 * are by default cleared to (0.0, 0.0, 0.0, 1.0)
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	/* Probe the color buffer before creating display list. Default clear
+	 * color is (0.0, 0.0, 0.0, 1.0)
 	 */
 	pass = piglit_probe_rect_rgba(0, 0,
 				      piglit_width, piglit_height,
