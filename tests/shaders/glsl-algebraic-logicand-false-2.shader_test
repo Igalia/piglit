@@ -8,19 +8,18 @@ void main()
 }
 
 [fragment shader]
-uniform vec4 color;
+uniform bool some_bool; /* defaults to false */
 void main()
 {
 	const vec4 red = vec4(1.0, 0.0, 0.0, 0.0);
 	const vec4 green = vec4(0.0, 1.0, 0.0, 0.0);
 
-	if (color.b != 0.0 && false)
+	if (!some_bool && false)
 		gl_FragColor = red;
 	else
 		gl_FragColor = green;
 }
 
 [test]
-uniform vec4 color 0.0 0.0 1.0 0.0
 draw rect -1 -1 2 2
 probe rgb 1 1 0.0 1.0 0.0
