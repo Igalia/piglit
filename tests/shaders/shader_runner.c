@@ -726,6 +726,19 @@ get_uints(const char *line, unsigned *uints, unsigned count)
 }
 
 
+/**
+ * Check that the GL implementation supports unsigned uniforms
+ * (e.g. through glUniform1ui).  If not, terminate the test with a
+ * SKIP.
+ */
+void
+check_unsigned_support()
+{
+	if (gl_version < 3.0)
+		piglit_report_result(PIGLIT_SKIP);
+}
+
+
 void
 set_uniform(const char *line)
 {
@@ -759,6 +772,7 @@ set_uniform(const char *line)
 		piglit_Uniform1i(loc, val);
 		return;
 	} else if (string_match("uint", type)) {
+		check_unsigned_support();
 		unsigned val = strtoul(line, NULL, 0);
 		piglit_Uniform1ui(loc, val);
 		return;
@@ -793,6 +807,7 @@ set_uniform(const char *line)
 			return;
 		}
 	} else if (string_match("uvec", type)) {
+		check_unsigned_support();
 		switch (type[4]) {
 		case '2':
 			get_uints(line, uints, 2);
