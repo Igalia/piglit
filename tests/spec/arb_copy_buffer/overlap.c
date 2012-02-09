@@ -42,10 +42,13 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 static void
 test_copy(GLenum usage, int data_size, int src, int dst, int size)
 {
-	uint8_t data[data_size];
-	uint8_t expected[data_size];
+	uint8_t *data;
+	uint8_t *expected;
 	uint8_t *ptr;
 	int i;
+
+	data = (uint8_t *)malloc(data_size);
+	expected = (uint8_t *)malloc(data_size);
 
 	for (i = 0; i < data_size; i++) {
 		data[i] = i;
@@ -66,6 +69,8 @@ test_copy(GLenum usage, int data_size, int src, int dst, int size)
 				src, dst, size);
 			piglit_report_result(PIGLIT_FAIL);
 		} else {
+			free(expected);
+			free(data);
 			return;
 		}
 	} else {
@@ -99,6 +104,9 @@ test_copy(GLenum usage, int data_size, int src, int dst, int size)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 	glUnmapBuffer(GL_COPY_READ_BUFFER);
+
+	free(expected);
+	free(data);
 }
 
 enum piglit_result

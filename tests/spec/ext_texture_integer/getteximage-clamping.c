@@ -375,13 +375,12 @@ read_format(const struct format_info *tex_info,
 	    const struct read_format_info *read_info,
 	    uint32_t texels[][4], int num_texels)
 {
-	char expected[num_texels * 4 * sizeof(uint32_t)];
-	char read[num_texels * 4 * sizeof(uint32_t)];
+	size_t texels_size = num_texels * 4 * sizeof(uint32_t);
+	char *expected;
+	char *read;
 	int i;
 	int chans = 0;
-
-	memset(expected, 0xd0, sizeof(expected));
-	memset(read, 0xd0, sizeof(read));
+	enum piglit_result result;
 
 	if (!test_rg && (read_info->format == GL_RED_INTEGER ||
 			 read_info->format == GL_RG_INTEGER)) {
@@ -412,6 +411,12 @@ read_format(const struct format_info *tex_info,
 
 	printf("Reading from %s to %s/%s\n", tex_info->name,
 	       read_info->format_name, read_info->type_name);
+
+	expected = (char *)malloc(texels_size);
+	read = (char *)malloc(texels_size);
+
+	memset(expected, 0xd0, texels_size);
+	memset(read, 0xd0, texels_size);
 
 	glGetTexImage(GL_TEXTURE_2D, 0,
 		      read_info->format, read_info->type, read);
@@ -499,10 +504,15 @@ read_format(const struct format_info *tex_info,
 	if (memcmp(expected, read, num_texels * chans * read_info->size / 8)) {
 		report_fail(tex_info, read_info, texels, read, expected,
 			    num_texels, chans);
-		return PIGLIT_FAIL;
+		result = PIGLIT_FAIL;
+	} else {
+		result = PIGLIT_PASS;
 	}
 
-	return PIGLIT_PASS;
+	free(read);
+	free(expected);
+
+	return result;
 }
 
 static enum piglit_result
