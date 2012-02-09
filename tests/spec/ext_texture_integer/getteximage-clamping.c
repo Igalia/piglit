@@ -519,7 +519,7 @@ static enum piglit_result
 test_format(const struct format_info *info)
 {
 	int num_texels = ARRAY_SIZE(texels_s);
-	uint32_t texels[num_texels][4];
+	uint32_t texels[ARRAY_SIZE(texels_s)][4];
 	GLenum type;
 	int lbits, abits, ibits, rbits, gbits, bbits;
 	int i, readf;
