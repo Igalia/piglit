@@ -47,6 +47,8 @@ piglit_init(int argc, char **argv)
 
 	memset(get_bufs, 0xd0, sizeof(get_bufs));
 
+	piglit_require_extension("GL_ARB_copy_buffer");
+
 	glGetIntegerv(GL_COPY_READ_BUFFER, &get_bufs[0]);
 	glGetIntegerv(GL_COPY_WRITE_BUFFER, &get_bufs[1]);
 
@@ -56,8 +58,6 @@ piglit_init(int argc, char **argv)
 			get_bufs[0], get_bufs[1]);
 		piglit_report_result(PIGLIT_FAIL);
 	}
-
-	piglit_require_extension("GL_ARB_copy_buffer");
 
 	glGenBuffers(2, bufs);
 	glBindBuffer(GL_COPY_READ_BUFFER, bufs[0]);
