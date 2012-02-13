@@ -1576,6 +1576,10 @@ spec['ARB_map_buffer_range'] = arb_map_buffer_range
 add_plain_test(arb_map_buffer_range, 'map_buffer_range_error_check')
 add_plain_test(arb_map_buffer_range, 'map_buffer_range_test')
 
+arb_multisample = Group()
+spec['ARB_multisample'] = arb_multisample
+arb_multisample['beginend'] = concurrent_test('arb_multisample-beginend')
+
 arb_seamless_cube_map = Group()
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
