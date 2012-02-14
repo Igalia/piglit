@@ -772,8 +772,9 @@ set_uniform(const char *line)
 		piglit_Uniform1i(loc, val);
 		return;
 	} else if (string_match("uint", type)) {
+		unsigned val;
 		check_unsigned_support();
-		unsigned val = strtoul(line, NULL, 0);
+		val = strtoul(line, NULL, 0);
 		piglit_Uniform1ui(loc, val);
 		return;
 	} else if (string_match("vec", type)) {
