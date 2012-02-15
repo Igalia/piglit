@@ -58,16 +58,10 @@ piglit_display(void)
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0,
-			0, 0, 4, 4,
-			GL_RGBA_INTEGER, GL_FLOAT, NULL);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-		piglit_report_result(PIGLIT_FAIL);
-
 	/* Check for GL_INVALID_OPERATION when trying to copy framebuffer pixels
 	 * to an integer texture when the framebuffer is not an integer format.
 	 */
-	/* make valid texture image here */
+	/* make valid integer texture image here */
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16UI_EXT, 4, 4, 0,
 		     GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, NULL);
 
@@ -75,6 +69,44 @@ piglit_display(void)
 			    0, 0, 0, 0, 4, 4);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
+
+
+	/* can't put non-integer data into an integer texture */
+	glTexSubImage2D(GL_TEXTURE_2D, 0,
+			0, 0, 4, 4,
+			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
+
+
+	/* check for invalid format/type combo */
+	glTexSubImage2D(GL_TEXTURE_2D, 0,
+			0, 0, 4, 4,
+			GL_RGBA_INTEGER, GL_FLOAT, NULL);
+	if (!piglit_check_gl_error(GL_INVALID_ENUM))
+		piglit_report_result(PIGLIT_FAIL);
+
+
+	/* make valid non-integer texture image here */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	/* This should generate INVALID_OPERATION because the new tex data
+	 * is integer but the existing texture image is not.
+	 */
+	glTexSubImage2D(GL_TEXTURE_2D, 0,
+			0, 0, 4, 4,
+			GL_RGBA_INTEGER, GL_INT, NULL);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
+
+
+	/* Creating an integer-valued texture by copying image data from a
+	 * non-integer framebuffer should generate GL_INVALID_OPERATION.
+	 */
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI_EXT, 0, 0, 4, 4, 0);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		piglit_report_result(PIGLIT_FAIL);
+
 
 	glDeleteTextures(1, &tex);
 
