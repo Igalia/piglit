@@ -132,11 +132,16 @@ def main():
 		json_writer.write_dict_item(key, value)
 
 	profile = core.loadTestProfile(profileFilename, resultsDir)
+
+	json_writer.write_dict_key('tests')
+	json_writer.open_dict()
+
 	time_start = time.time()
-
 	profile.run(env, json_writer)
-
 	time_end = time.time()
+
+	json_writer.close_dict()
+
 	results.time_elapsed = time_end - time_start
 	json_writer.write_dict_item('time_elapsed', results.time_elapsed)
 

@@ -514,9 +514,6 @@ class TestProfile:
 
 		See ``Test.schedule`` and ``Test.run``.
 		'''
-		json_writer.write_dict_key('tests')
-		json_writer.open_dict()
-
 		def matches_any_regexp(x, re_list):
 			return True in map(lambda r: r.search(x) != None, re_list)
 
@@ -539,7 +536,6 @@ class TestProfile:
 			if not env.concurrent or not test.runConcurrent:
 				test.doRun(env, path, json_writer)
 		ConcurrentTestPool().join()
-		json_writer.close_dict()
 
 	def remove_test(self, test_path):
 		"""Remove a fully qualified test from the profile.
