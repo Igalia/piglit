@@ -28,6 +28,7 @@ import re
 import sys, os
 import time
 import traceback
+import json
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
@@ -39,6 +40,7 @@ from framework.threads import synchronized_self
 def usage():
 	USAGE = """\
 Usage: %(progName)s [options] [profile.tests] [results]
+       %(progName)s [options] -r [results]
 
 Options:
   -h, --help                Show this message
@@ -60,6 +62,10 @@ Example:
   %(progName)s -t ^glean/ -t tex tests/all.tests results/all
          Run all tests that are in the 'glean' group or whose path contains
 		 the substring 'tex'
+
+  %(progName)s -r -x bad-test results/all
+         Resume an interrupted test run whose results are stored in the
+         directory results/all, skipping bad-test.
 """
 	print USAGE % {'progName': sys.argv[0]}
 	sys.exit(1)
@@ -71,25 +77,33 @@ def main():
 		option_list = [
 			 "help",
 			 "dry-run",
+			 "resume",
 			 "tests=",
 			 "name=",
 			 "exclude-tests=",
 			 "concurrent=",
 			 ]
-		options, args = getopt(sys.argv[1:], "hdt:n:x:c:", option_list)
+		options, args = getopt(sys.argv[1:], "hdrt:n:x:c:", option_list)
 	except GetoptError:
 		usage()
 
 	OptionName = ''
+	OptionResume = False
+	test_filter = []
+	exclude_filter = []
 
 	for name, value in options:
 		if name in ('-h', '--help'):
 			usage()
 		elif name in ('-d', '--dry-run'):
 			env.execute = False
+		elif name in ('-r', '--resume'):
+			OptionResume = True
 		elif name in ('-t', '--tests'):
+			test_filter.append(value)
 			env.filter.append(re.compile(value))
 		elif name in ('-x', '--exclude-tests'):
+			exclude_filter.append(value)
 			env.exclude_filter.append(re.compile(value))
 		elif name in ('-n', '--name'):
 			OptionName = value
@@ -101,11 +115,29 @@ def main():
 			else:
 				usage()
 
-	if len(args) != 2:
-		usage()
+	if OptionResume:
+		if test_filter or OptionName:
+			print "-r is not compatible with -t or -n."
+			usage()
+		if len(args) != 1:
+			usage()
+		resultsDir = args[0]
 
-	profileFilename = args[0]
-	resultsDir = path.realpath(args[1])
+		# Load settings from the old results JSON
+		old_results = core.loadTestResults(resultsDir)
+		profileFilename = old_results.options['profile']
+		for value in old_results.options['filter']:
+			test_filter.append(value)
+			env.filter.append(re.compile(value))
+		for value in old_results.options['exclude_filter']:
+			exclude_filter.append(value)
+			env.exclude_filter.append(re.compile(value))
+	else:
+		if len(args) != 2:
+			usage()
+
+		profileFilename = args[0]
+		resultsDir = path.realpath(args[1])
 
 	# Change to the piglit's path
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -127,6 +159,16 @@ def main():
 	json_writer = core.JSONWriter(result_file)
 	json_writer.open_dict()
 
+	# Write out command line options for use in resuming.
+	json_writer.write_dict_key('options')
+	json_writer.open_dict()
+	json_writer.write_dict_item('profile', profileFilename)
+	json_writer.write_dict_key('filter')
+	result_file.write(json.dumps(test_filter))
+	json_writer.write_dict_key('exclude_filter')
+	result_file.write(json.dumps(exclude_filter))
+	json_writer.close_dict()
+
 	json_writer.write_dict_item('name', results.name)
 	for (key, value) in env.collectData().items():
 		json_writer.write_dict_item(key, value)
@@ -135,6 +177,13 @@ def main():
 
 	json_writer.write_dict_key('tests')
 	json_writer.open_dict()
+	# If resuming an interrupted test run, re-write all of the existing
+	# results since we clobbered the results file.  Also, exclude them
+	# from being run again.
+	if OptionResume:
+		for (key, value) in old_results.tests.items():
+			json_writer.write_dict_item(key, value)
+			env.exclude_tests.add(key)
 
 	time_start = time.time()
 	profile.run(env, json_writer)

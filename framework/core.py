@@ -261,6 +261,7 @@ class GroupResult(dict):
 class TestrunResult:
 	def __init__(self):
 		self.serialized_keys = [
+			'options',
 			'name',
 			'tests',
 			'glxinfo',
@@ -371,6 +372,7 @@ class Environment:
 		self.execute = True
 		self.filter = []
 		self.exclude_filter = []
+		self.exclude_tests = set()
 
 	def run(self, command):
 		try:
@@ -519,6 +521,7 @@ class TestProfile:
 
 		def test_matches((path, test)):
 			return ((not env.filter or matches_any_regexp(path, env.filter)) and
+			        not path in env.exclude_tests and
 			        not matches_any_regexp(path, env.exclude_filter))
 
 		# Filter out unwanted tests
