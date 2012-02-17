@@ -520,15 +520,12 @@ class TestProfile:
 		def matches_any_regexp(x, re_list):
 			return True in map(lambda r: r.search(x) != None, re_list)
 
-		# Filter out unwanted tests
-		for path in self.test_list.keys():
-			# Exclude tests that don't match any of the `filter' regexps (-t options)
-			if env.filter and not matches_any_regexp(path, env.filter):
-				del self.test_list[path]
+		def test_matches((path, test)):
+			return (matches_any_regexp(path, env.filter) and
+			        not matches_any_regexp(path, env.exclude_filter))
 
-			# Exclude tests that match an `exclude_filter' regexp (-x options)
-			if env.exclude_filter and matches_any_regexp(path, env.exclude_filter):
-				del self.test_list[path]
+		# Filter out unwanted tests
+		self.test_list = dict(filter(test_matches, self.test_list.items()))
 
 		# Queue up all the concurrent tests, so the pool is filled
 		# at the start of the test run.
