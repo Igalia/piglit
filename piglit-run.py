@@ -88,9 +88,9 @@ def main():
 		elif name in ('-d', '--dry-run'):
 			env.execute = False
 		elif name in ('-t', '--tests'):
-			env.filter[:0] = [re.compile(value)]
+			env.filter.append(re.compile(value))
 		elif name in ('-x', '--exclude-tests'):
-			env.exclude_filter[:0] = [re.compile(value)]
+			env.exclude_filter.append(re.compile(value))
 		elif name in ('-n', '--name'):
 			OptionName = value
 		elif name in ('-c, --concurrent'):
