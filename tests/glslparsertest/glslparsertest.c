@@ -309,7 +309,10 @@ piglit_init(int argc, char**argv)
 	}
 
 	for (i = 4; i < argc; i++) {
-		piglit_require_extension(argv[i]);
+		if (argv[i][0] == '!')
+			piglit_require_not_extension(argv[i] + 1);
+		else
+			piglit_require_extension(argv[i]);
 	}
 
 	test();
