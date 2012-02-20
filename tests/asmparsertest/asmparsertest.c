@@ -133,7 +133,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 
 			ptr += strlen("# REQUIRE ");
 
-			for (i = 0; !isspace(ptr[i]) && (ptr[i] != '\0'); i++) {
+			for (i = 0; !isspace((int) ptr[i]) && (ptr[i] != '\0'); i++) {
 				extension[i] = ptr[i];
 			}
 
