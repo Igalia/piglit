@@ -199,7 +199,7 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 const char *
 strcpy_to_space(char *dst, const char *src)
 {
-	while (!isspace(*src) && (*src != '\0'))
+	while (!isspace((int) *src) && (*src != '\0'))
 		*(dst++) = *(src++);
 
 	*dst = '\0';
@@ -213,7 +213,7 @@ strcpy_to_space(char *dst, const char *src)
 const char *
 eat_whitespace(const char *src)
 {
-	while (isspace(*src) && (*src != '\n'))
+	while (isspace((int) *src) && (*src != '\n'))
 		src++;
 
 	return src;
@@ -226,7 +226,7 @@ eat_whitespace(const char *src)
 const char *
 eat_text(const char *src)
 {
-	while (!isspace(*src) && (*src != '\0'))
+	while (!isspace((int) *src) && (*src != '\0'))
 		src++;
 
 	return src;
