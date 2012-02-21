@@ -169,6 +169,7 @@ configure_file(
 	"${piglit_BINARY_DIR}/tests/util/config.h"
 )
 
+include(cmake/piglit_util.cmake)
 include(cmake/piglit_glapi.cmake)
 include(cmake/piglit_dispatch.cmake)
 
