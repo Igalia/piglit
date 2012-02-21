@@ -36,12 +36,14 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
-static int Width = 128, Height = 128;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB;
+
 static GLuint fb;
 static GLuint tex;
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 	glClearColor(1.0, 0.0, 0.0, 1.0);
@@ -49,40 +51,16 @@ static void Display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glFinish();
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': 'pass' }\n");
-		exit(0);
-	}
+	// If the test doesn't crash, then it passes.
+	return PIGLIT_PASS;
 }
 
 
-static void Reshape(int width, int height)
-{
-	(void) width;
-	(void) height;
-}
-
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-
-static void
-init(void)
+void
+piglit_init(int argc, char**argv)
 {
 	GLenum status;
 
-	glewInit();
-	
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
 	glGenFramebuffersEXT(1, &fb);
@@ -107,23 +85,4 @@ init(void)
 		else
 			piglit_report_result(PIGLIT_FAIL);
 	}
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_RGB);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow("FD.O bug #20701 test");
-	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
-	glutDisplayFunc(Display);
-	if (!Automatic)
-		printf("If the test doesn't crash, then it passes.\n");
-	init();
-	glutMainLoop();
-	return 0;
 }

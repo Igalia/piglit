@@ -31,8 +31,8 @@
 #include "piglit-util.h"
 
 
-static int Width = 128, Height = 128;
-static int Automatic = 0;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 
 /** random number for checking state */
@@ -332,50 +332,17 @@ report_info(void)
 }
 
 
-static void
-redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-   if (Automatic) {
-      GLboolean pass = GL_TRUE;
+	GLboolean pass = GL_TRUE;
 
-      pass = test_rasterpos() && pass;
-      pass = test_texture_matrix() && pass;
-      pass = test_texture_params() && pass;
-      pass = test_texture_env() && pass;
+	pass = test_rasterpos() && pass;
+	pass = test_texture_matrix() && pass;
+	pass = test_texture_params() && pass;
+	pass = test_texture_env() && pass;
 
-      if (pass) {
-         piglit_report_result(PIGLIT_PASS);
-      }
-      else {
-         report_info();
-         piglit_report_result(PIGLIT_FAIL);
-      }
-      exit(1);
-   }
-}
-
-
-static void
-reshape(int width, int height)
-{
-   Width = width;
-   Height = height;
-   glViewport(0, 0, width, height);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-}
-
-
-static void
-key(unsigned char key, int x, int y)
-{
-   if (key == 27) {
-      exit(0);
-   }
-   glutPostRedisplay();
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
@@ -402,41 +369,26 @@ init(void)
       MaxTextureVertexUnits = 0;
    }
 
-   if (0)
-      report_info();
+   report_info();
 
    generate_random_numbers();
 
-   reshape(Width, Height);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
 }
 
 
-int
-main(int argc, char *argv[])
+void
+piglit_init(int argc, char *argv[])
 {
-   glutInit(&argc, argv);
-   if (argc == 2 && !strcmp(argv[1], "-auto"))
-      Automatic = 1;
-
-   glutInitWindowPosition(0, 0);
-   glutInitWindowSize(Width, Height);
-   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-   glutCreateWindow(argv[0]);
-
-   glewInit();
-
    if (!GLEW_VERSION_1_3) {
 	   printf("Requires OpenGL 1.3\n");
 	   piglit_report_result(PIGLIT_SKIP);
    }
 
-   glutReshapeFunc(reshape);
-   glutDisplayFunc(redisplay);
-   if (!Automatic) {
-      glutKeyboardFunc(key);
-   }
    init();
-   glutMainLoop();
-   return 0;
 }
 

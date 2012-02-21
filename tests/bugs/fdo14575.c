@@ -32,26 +32,15 @@
  */
 #include "piglit-util.h"
 
-static int Automatic = 0;
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_SINGLE | GLUT_RGB;
 
-#define WIN_WIDTH 128
-#define WIN_HEIGHT 128
-
-int main(int argc, char**argv)
+void
+piglit_init(int argc, char**argv)
 {
 	GLfloat data = 1.0;
 	GLfloat *v;
 	GLuint buf;
-
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("fdo10370");
-
-	glewInit();
 
 	piglit_require_extension("GL_ARB_vertex_buffer_object");
 
@@ -80,8 +69,12 @@ int main(int argc, char**argv)
 	glDeleteBuffersARB(1, &buf);
 	assert(glGetError() == 0);
 
-	if (Automatic)
-		printf("PIGLIT: {'result': 'pass' }\n");
+	piglit_report_result(PIGLIT_PASS);
+}
 
-	return 0;
+enum piglit_result
+piglit_display(void)
+{
+	/* Should never be reached */
+	return PIGLIT_FAIL;
 }

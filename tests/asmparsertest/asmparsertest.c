@@ -30,7 +30,8 @@
 #define TRUE    (!FALSE)
 #endif
 
-int automatic = FALSE;
+int piglit_width = 250, piglit_height = 250;
+int piglit_window_mode = GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH;
 
 char *
 unix_line_endings(const char *input, size_t length)
@@ -106,7 +107,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 	unsigned i;
 
 
-	if (!automatic) {
+	if (!piglit_automatic) {
 		printf("%s:\n", filename);
 	}
 
@@ -186,7 +187,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 			GLint errorpos;
 
 			glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
-			if (!automatic) {
+			if (!piglit_automatic) {
 				printf("glGetError = 0x%04x\n", err);
 				printf("errorpos: %d\n", errorpos);
 				printf("%s\n",
@@ -206,44 +207,31 @@ compile(const char *filename, GLenum target, int use_ARB)
 }
 
 
-int
-main(int argc, char **argv)
+void
+piglit_init(int argc, char **argv)
 {
 	GLenum target;
 	unsigned i;
 	int use_ARB;
 
 
-	glutInit(&argc, argv);
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(250, 250);
-	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH);
-	glutCreateWindow("assembler test");
-	glewInit();
-
-	i = 1;
-	if (((argc - 1) >= 1) && (strcmp(argv[i], "-auto") == 0)) {
-		automatic = TRUE;
-		i++;
-	}
-
-	if ((argc - i) < 2) {
+	if (argc < 3) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 
 	use_ARB = 1;
-	if (strcmp(argv[i], "ARBvp1.0") == 0) {
+	if (strcmp(argv[1], "ARBvp1.0") == 0) {
 		target = GL_VERTEX_PROGRAM_ARB;
 		piglit_require_extension("GL_ARB_vertex_program");
-	} else if (strcmp(argv[i], "ARBfp1.0") == 0) {
+	} else if (strcmp(argv[1], "ARBfp1.0") == 0) {
 		target = GL_FRAGMENT_PROGRAM_ARB;
 		piglit_require_extension("GL_ARB_fragment_program");
-	} else if (strcmp(argv[i], "NVvp1.0") == 0) {
+	} else if (strcmp(argv[1], "NVvp1.0") == 0) {
 		target = GL_VERTEX_PROGRAM_NV;
 		piglit_require_extension("GL_NV_vertex_program");
 		use_ARB = 0;
-	} else if (strcmp(argv[i], "NVfp1.0") == 0) {
+	} else if (strcmp(argv[1], "NVfp1.0") == 0) {
 		target = GL_FRAGMENT_PROGRAM_NV;
 		piglit_require_extension("GL_NV_fragment_program");
 		use_ARB = 0;
@@ -251,10 +239,16 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	for (i++; i < argc; i++) {
+	for (i = 2; i < argc; i++) {
 		compile(argv[i], target, use_ARB);
 	}
 
 	piglit_report_result(PIGLIT_PASS);
-	return 0;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	/* Should never be reached */
+	return PIGLIT_FAIL;
 }

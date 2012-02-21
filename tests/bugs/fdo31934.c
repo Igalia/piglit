@@ -1,19 +1,12 @@
 #include "piglit-util.h"
 
-static int Automatic = 0;
+int piglit_width = 512, piglit_height = 512;
+int piglit_window_mode = GLUT_RGBA;
 
-int main (int argc, char *argv[])
+void
+piglit_init(int argc, char *argv[])
 {
     GLuint id;
-
-    glutInit(&argc, argv);
-    if (argc == 2 && !strcmp(argv[1], "-auto"))
-        Automatic = 1;
-    glutInitDisplayMode(GLUT_RGBA);
-    glutInitWindowSize(512,512);
-    glutCreateWindow("fdo31934");
-
-    glewInit();
 
     if (!GLEW_VERSION_1_5) {
         printf("Requires OpenGL 1.5\n");
@@ -31,8 +24,12 @@ int main (int argc, char *argv[])
     glMapBuffer(GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB); /* CRASH! */
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
-    if (Automatic)
-        printf("PIGLIT: {'result': 'pass' }\n");
+    piglit_report_result(PIGLIT_PASS);
+}
 
-    return 0;
+enum piglit_result
+piglit_display(void)
+{
+	/* Should never be reached */
+	return PIGLIT_FAIL;
 }

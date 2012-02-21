@@ -25,13 +25,14 @@
 
 #include "piglit-util.h"
 
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 400, piglit_height = 300;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+
 static GLuint vBuffer;
 
 static void
 Init(void)
 {
-	glewInit();
 	piglit_require_extension("GL_ARB_vertex_buffer_object");
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -67,8 +68,8 @@ vboMap(void)
 	return (glGetError() == 0);
 }
 
-static void
-display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLfloat gray[3] = {0.5, 0.5, 0.5};
 	GLboolean pass;
@@ -87,28 +88,12 @@ display(void)
 	glFinish();
 	glutSwapBuffers();
 
-	if (Automatic)
-		piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
-
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-int main(int argc, char  **argv)
+void
+piglit_init(int argc, char  **argv)
 {
-	glutInit(&argc, argv);
-	if(argc==2 && !strncmp(argv[1],"-auto", 5))
-		Automatic = GL_TRUE;
-
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(400, 300);
-	glutCreateWindow("VBO map");
-	glutDisplayFunc(display);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
 	Init();
 	vboInit();
-
-	glutMainLoop();
-
-	glDeleteBuffersARB(1, &vBuffer);
-	return 0;
 }

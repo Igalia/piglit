@@ -35,8 +35,8 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 200
-#define WIN_HEIGHT 100
+int piglit_width = 200, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 static char *filename;
 static int expected_pass;
@@ -259,13 +259,13 @@ int process_options(int argc, char **argv)
 	return new_argc;
 }
 
-int main(int argc, char**argv)
+void
+piglit_init(int argc, char**argv)
 {
 	const char *glsl_version_string;
 	float glsl_version;
 	int i;
 
-	piglit_glutInit(argc, argv);
 	argc = process_options(argc, argv);
 	if (argc < 3)
 		usage(argv[0]);
@@ -284,14 +284,7 @@ int main(int argc, char**argv)
 	if (argc > 3)
 		requested_version = strtod(argv[3], NULL);
 
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-	glutCreateWindow("glslparsertest");
 	gl_version_times_10 = piglit_get_gl_version();
-
-#ifdef USE_OPENGL
-	glewInit();
-#endif
 
 	if (gl_version_times_10 < 20
 	    && !piglit_is_extension_supported("GL_ARB_shader_objects")) {
@@ -320,5 +313,11 @@ int main(int argc, char**argv)
 	}
 
 	test();
-	return 0;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	/* Should never be reached */
+	return PIGLIT_FAIL;
 }
