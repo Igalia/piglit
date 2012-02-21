@@ -47,6 +47,8 @@ static const char fs_text[] =
 	;
 static GLuint prog;
 static GLuint fb, rb;
+static GLuint testPoint_x, testPoint_y;
+static GLuint PointSize;
 
 static const float green[] = { 0.0, 1.0, 0.0, 1.0 };
 static const float black[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -63,9 +65,14 @@ piglit_display(void)
 	glEnd();
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
+
+	testPoint_x = ( piglit_width - PointSize ) / 2;
+	testPoint_y = ( piglit_width - PointSize ) / 2;
 	pass = piglit_probe_pixel_rgb(0, 0, black) && pass;
-	pass = piglit_probe_pixel_rgb(18, 18, green) && pass;
-	pass = piglit_probe_pixel_rgb(18, 81, black) && pass;
+	pass = piglit_probe_pixel_rgb(testPoint_x, testPoint_y, green) && pass;
+
+	testPoint_y = piglit_height - testPoint_y ;
+	pass = piglit_probe_pixel_rgb(testPoint_x, testPoint_y - 1, black) && pass;
 
 	/* Draw the point out if want to have a look. */
 	if (!piglit_automatic){
@@ -84,11 +91,14 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint vs, fs;
-	int PointSize = 64;
+	int point_size_limits[2];
 
 	piglit_require_extension("GL_ARB_point_sprite");
 	piglit_require_extension("GL_ARB_framebuffer_object");
 
+	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_limits);
+
+	PointSize = point_size_limits[1] >= 64 ? 64 : point_size_limits[1];
 	glEnable(GL_POINT_SPRITE_ARB);
 	glPointSize(PointSize);
 
