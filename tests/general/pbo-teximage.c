@@ -105,5 +105,4 @@ piglit_init(int argc, char **argv)
 {
 	reshape(piglit_width, piglit_height);
 	piglit_require_extension("GL_ARB_pixel_buffer_object");
-	glewInit();
 }

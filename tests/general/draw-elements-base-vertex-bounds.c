@@ -61,7 +61,6 @@ piglit_init(int argc, char **argv)
 		"END\n";
 	GLuint program_no;
 
-	glewInit();
 	piglit_require_extension("GL_ARB_draw_elements_base_vertex");
 	piglit_require_extension("GL_ARB_vertex_program");
 	glGenProgramsARB(1, &program_no);

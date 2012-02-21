@@ -128,7 +128,6 @@ static void Reshape(int width, int height)
 void
 piglit_init(int argc, char **argv)
 {
-	glewInit();
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
 	glutReshapeFunc(Reshape);

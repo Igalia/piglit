@@ -100,8 +100,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char**argv)
 {
-   glewInit();
-
    if (!GLEW_VERSION_1_5) {
       printf("Requires OpenGL 1.5\n");
       piglit_report_result(PIGLIT_SKIP);

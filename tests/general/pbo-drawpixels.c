@@ -85,5 +85,4 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_pixel_buffer_object");
-	glewInit();
 }
