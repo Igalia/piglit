@@ -6,7 +6,7 @@ include_directories(
 	${GLUT_INCLUDE_DIR}
 	)
 
-add_library(hiz-util
+piglit_add_library(hiz-util
 	hiz-util.c
 	)
 
@@ -19,29 +19,29 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable(hiz-depth-stencil-test-fbo-d0-s8 hiz-depth-stencil-test-fbo-d0-s8.c)
-add_executable(hiz-depth-stencil-test-fbo-d24-s0 hiz-depth-stencil-test-fbo-d24-s0.c)
-add_executable(hiz-depth-stencil-test-fbo-d24-s8 hiz-depth-stencil-test-fbo-d24-s8.c)
-add_executable(hiz-depth-stencil-test-fbo-d24s8 hiz-depth-stencil-test-fbo-d24s8.c)
-add_executable(hiz-depth-read-fbo-d24-s0 hiz-depth-read-fbo-d24-s0.c)
-add_executable(hiz-depth-read-fbo-d24-s8 hiz-depth-read-fbo-d24-s8.c)
-add_executable(hiz-depth-read-fbo-d24s8 hiz-depth-read-fbo-d24s8.c)
-add_executable(hiz-depth-read-window-stencil0 hiz-depth-read-window-stencil0.c)
-add_executable(hiz-depth-read-window-stencil1 hiz-depth-read-window-stencil1.c)
-add_executable(hiz-depth-test-fbo-d24-s0 hiz-depth-test-fbo-d24-s0.c)
-add_executable(hiz-depth-test-fbo-d24-s8 hiz-depth-test-fbo-d24-s8.c)
-add_executable(hiz-depth-test-fbo-d24s8 hiz-depth-test-fbo-d24s8.c)
-add_executable(hiz-depth-test-window-stencil0 hiz-depth-test-window-stencil0.c)
-add_executable(hiz-depth-test-window-stencil1 hiz-depth-test-window-stencil1.c)
-add_executable(hiz-stencil-read-fbo-d0-s8 hiz-stencil-read-fbo-d0-s8.c)
-add_executable(hiz-stencil-read-fbo-d24-s8 hiz-stencil-read-fbo-d24-s8.c)
-add_executable(hiz-stencil-read-fbo-d24s8 hiz-stencil-read-fbo-d24s8.c)
-add_executable(hiz-stencil-read-window-depth0 hiz-stencil-read-window-depth0.c)
-add_executable(hiz-stencil-read-window-depth1 hiz-stencil-read-window-depth1.c)
-add_executable(hiz-stencil-test-fbo-d0-s8 hiz-stencil-test-fbo-d0-s8.c)
-add_executable(hiz-stencil-test-fbo-d24-s8 hiz-stencil-test-fbo-d24-s8.c)
-add_executable(hiz-stencil-test-fbo-d24s8 hiz-stencil-test-fbo-d24s8.c)
-add_executable(hiz-stencil-test-window-depth0 hiz-stencil-test-window-depth0.c)
-add_executable(hiz-stencil-test-window-depth1 hiz-stencil-test-window-depth1.c)
+piglit_add_executable(hiz-depth-stencil-test-fbo-d0-s8 hiz-depth-stencil-test-fbo-d0-s8.c)
+piglit_add_executable(hiz-depth-stencil-test-fbo-d24-s0 hiz-depth-stencil-test-fbo-d24-s0.c)
+piglit_add_executable(hiz-depth-stencil-test-fbo-d24-s8 hiz-depth-stencil-test-fbo-d24-s8.c)
+piglit_add_executable(hiz-depth-stencil-test-fbo-d24s8 hiz-depth-stencil-test-fbo-d24s8.c)
+piglit_add_executable(hiz-depth-read-fbo-d24-s0 hiz-depth-read-fbo-d24-s0.c)
+piglit_add_executable(hiz-depth-read-fbo-d24-s8 hiz-depth-read-fbo-d24-s8.c)
+piglit_add_executable(hiz-depth-read-fbo-d24s8 hiz-depth-read-fbo-d24s8.c)
+piglit_add_executable(hiz-depth-read-window-stencil0 hiz-depth-read-window-stencil0.c)
+piglit_add_executable(hiz-depth-read-window-stencil1 hiz-depth-read-window-stencil1.c)
+piglit_add_executable(hiz-depth-test-fbo-d24-s0 hiz-depth-test-fbo-d24-s0.c)
+piglit_add_executable(hiz-depth-test-fbo-d24-s8 hiz-depth-test-fbo-d24-s8.c)
+piglit_add_executable(hiz-depth-test-fbo-d24s8 hiz-depth-test-fbo-d24s8.c)
+piglit_add_executable(hiz-depth-test-window-stencil0 hiz-depth-test-window-stencil0.c)
+piglit_add_executable(hiz-depth-test-window-stencil1 hiz-depth-test-window-stencil1.c)
+piglit_add_executable(hiz-stencil-read-fbo-d0-s8 hiz-stencil-read-fbo-d0-s8.c)
+piglit_add_executable(hiz-stencil-read-fbo-d24-s8 hiz-stencil-read-fbo-d24-s8.c)
+piglit_add_executable(hiz-stencil-read-fbo-d24s8 hiz-stencil-read-fbo-d24s8.c)
+piglit_add_executable(hiz-stencil-read-window-depth0 hiz-stencil-read-window-depth0.c)
+piglit_add_executable(hiz-stencil-read-window-depth1 hiz-stencil-read-window-depth1.c)
+piglit_add_executable(hiz-stencil-test-fbo-d0-s8 hiz-stencil-test-fbo-d0-s8.c)
+piglit_add_executable(hiz-stencil-test-fbo-d24-s8 hiz-stencil-test-fbo-d24-s8.c)
+piglit_add_executable(hiz-stencil-test-fbo-d24s8 hiz-stencil-test-fbo-d24s8.c)
+piglit_add_executable(hiz-stencil-test-window-depth0 hiz-stencil-test-window-depth0.c)
+piglit_add_executable(hiz-stencil-test-window-depth1 hiz-stencil-test-window-depth1.c)
 
 # vim: ft=cmake:

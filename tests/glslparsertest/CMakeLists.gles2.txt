@@ -4,7 +4,7 @@ link_libraries(
 	${OPENGL_gles2_LIBRARY}
 	)
 
-add_executable(glslparsertest_${piglit_target_api}
+piglit_add_executable(glslparsertest_${piglit_target_api}
 	glslparsertest.c
 	)
 

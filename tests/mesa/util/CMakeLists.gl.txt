@@ -16,7 +16,7 @@ add_definitions (
 	${PNG_DEFINITIONS}
 )
 
-add_library (mesautil
+piglit_add_library (mesautil
 	readtex.c
 	writeimg.c
 )

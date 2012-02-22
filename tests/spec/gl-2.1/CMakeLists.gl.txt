@@ -12,4 +12,4 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (gl-2.1-minmax minmax.c)
+piglit_add_executable (gl-2.1-minmax minmax.c)

@@ -11,4 +11,4 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (ext_texture_array-maxlayers maxlayers.c)
+piglit_add_executable (ext_texture_array-maxlayers maxlayers.c)

@@ -11,7 +11,7 @@ link_libraries(
 	piglitutil_gles2
 	)
 
-add_executable(gles2_shader_runner
+piglit_add_executable(gles2_shader_runner
 	gles2_shader_runner.c
 	)
 

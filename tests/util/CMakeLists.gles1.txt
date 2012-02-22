@@ -9,7 +9,7 @@ link_libraries(
 	glut_egl
 	)
 
-add_library(piglitutil_${piglit_target_api}
+piglit_add_library(piglitutil_${piglit_target_api}
 	${UTIL_SOURCES}
 )
 

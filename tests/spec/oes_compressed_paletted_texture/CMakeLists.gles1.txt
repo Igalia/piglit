@@ -9,4 +9,4 @@ link_libraries(
         ${OPENGL_gles1_LIBRARY}
         )
 
-add_executable (oes_compressed_paletted_texture-api oes_compressed_paletted_texture-api.c)
+piglit_add_executable (oes_compressed_paletted_texture-api oes_compressed_paletted_texture-api.c)

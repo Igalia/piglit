@@ -6,7 +6,7 @@ include_directories(
 link_libraries(${OPENGL_egl_LIBRARY})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	add_library (glut_egl
+	piglit_add_library (glut_egl
 		    glut_egl.c
 		    glut_egl_x11.c
 	)

@@ -30,7 +30,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	)
 
 	add_definitions ( -DUSE_GLX )
-	add_library (piglitglxutil
+	piglit_add_library (piglitglxutil
 		    piglit-shader.c
 		    piglit-shader-gl.c
 		    piglit-transform-feedback.c
@@ -47,7 +47,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-add_library (piglitutil
+piglit_add_library (piglitutil
 	${UTIL_SOURCES}
 )
 

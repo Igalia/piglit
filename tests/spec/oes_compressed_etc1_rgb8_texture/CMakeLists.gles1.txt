@@ -9,4 +9,4 @@ link_libraries(
         ${OPENGL_gles1_LIBRARY}
         )
 
-add_executable (oes_compressed_etc1_rgb8_texture-basic oes_compressed_etc1_rgb8_texture-basic.c)
+piglit_add_executable (oes_compressed_etc1_rgb8_texture-basic oes_compressed_etc1_rgb8_texture-basic.c)

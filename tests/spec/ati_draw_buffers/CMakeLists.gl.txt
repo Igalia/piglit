@@ -11,8 +11,8 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (ati_draw_buffers-arbfp arbfp.c)
-add_executable (ati_draw_buffers-arbfp-no-index arbfp-no-index.c)
-add_executable (ati_draw_buffers-arbfp-no-option arbfp-no-option.c)
+piglit_add_executable (ati_draw_buffers-arbfp arbfp.c)
+piglit_add_executable (ati_draw_buffers-arbfp-no-index arbfp-no-index.c)
+piglit_add_executable (ati_draw_buffers-arbfp-no-option arbfp-no-option.c)
 
 # vim: ft=cmake:

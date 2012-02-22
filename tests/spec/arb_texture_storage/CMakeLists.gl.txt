@@ -11,6 +11,6 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (arb_texture_storage-texture-storage texture-storage.c)
+piglit_add_executable (arb_texture_storage-texture-storage texture-storage.c)
 
 # vim: ft=cmake:

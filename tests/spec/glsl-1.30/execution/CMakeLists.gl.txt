@@ -12,11 +12,11 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (fs-texelFetch-2D fs-texelFetch-2D.c)
-add_executable (fs-texelFetchOffset-2D fs-texelFetchOffset-2D.c)
+piglit_add_executable (fs-texelFetch-2D fs-texelFetch-2D.c)
+piglit_add_executable (fs-texelFetchOffset-2D fs-texelFetchOffset-2D.c)
 IF (NOT MSVC)
-	add_executable (isinf-and-isnan isinf-and-isnan.c)
+	piglit_add_executable (isinf-and-isnan isinf-and-isnan.c)
 ENDIF (NOT MSVC)
-add_executable (vertexid-beginend vertexid-beginend.c)
-add_executable (vertexid-drawarrays vertexid-drawarrays.c)
-add_executable (vertexid-drawelements vertexid-drawelements.c)
+piglit_add_executable (vertexid-beginend vertexid-beginend.c)
+piglit_add_executable (vertexid-drawarrays vertexid-drawarrays.c)
+piglit_add_executable (vertexid-drawelements vertexid-drawelements.c)

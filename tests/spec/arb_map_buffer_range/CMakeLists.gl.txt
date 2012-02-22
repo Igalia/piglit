@@ -11,7 +11,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (map_buffer_range_error_check map_buffer_range_error_check.c)
-add_executable (map_buffer_range_test map_buffer_range_test.c)
+piglit_add_executable (map_buffer_range_error_check map_buffer_range_error_check.c)
+piglit_add_executable (map_buffer_range_test map_buffer_range_test.c)
 
 # vim: ft=cmake:

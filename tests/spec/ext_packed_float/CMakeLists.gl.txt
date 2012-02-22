@@ -11,7 +11,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (ext_packed_float-pack pack.c)
-add_executable (getteximage-invalid-format-for-packed-type getteximage-invalid-format-for-packed-type.c)
+piglit_add_executable (ext_packed_float-pack pack.c)
+piglit_add_executable (getteximage-invalid-format-for-packed-type getteximage-invalid-format-for-packed-type.c)
 
 # vim: ft=cmake:

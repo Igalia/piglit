@@ -11,6 +11,6 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (arb_transform_feedback2-draw-auto draw-auto.c)
+piglit_add_executable (arb_transform_feedback2-draw-auto draw-auto.c)
 
 # vim: ft=cmake:

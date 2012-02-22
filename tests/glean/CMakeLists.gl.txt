@@ -15,7 +15,7 @@ include_directories(
 	${piglit_SOURCE_DIR}/tests/util
 )
 
-add_executable (glean
+piglit_add_executable (glean
 	codedid.cpp
 	dsconfig.cpp
 	dsfilt.cpp

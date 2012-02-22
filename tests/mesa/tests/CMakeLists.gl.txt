@@ -18,7 +18,7 @@ add_definitions (
 	${PNG_DEFINITIONS}
 )
 
-add_executable (texline texline.c)
+piglit_add_executable (texline texline.c)
 IF (UNIX)
        target_link_libraries (texline m)
 ENDIF (UNIX)

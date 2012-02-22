@@ -11,7 +11,7 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (getattriblocation-conventional getattriblocation-conventional.c)
-add_executable (clip-flag-behavior clip-flag-behavior.c)
+piglit_add_executable (getattriblocation-conventional getattriblocation-conventional.c)
+piglit_add_executable (clip-flag-behavior clip-flag-behavior.c)
 
 # vim: ft=cmake:

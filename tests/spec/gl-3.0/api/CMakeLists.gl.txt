@@ -11,16 +11,16 @@ link_libraries (
 	${GLUT_glut_LIBRARY}
 )
 
-add_executable (bindfragdata-invalid-parameters bindfragdata-invalid-parameters.c)
-add_executable (bindfragdata-link-error bindfragdata-link-error.c)
-add_executable (bindfragdata-nonexistent-variable bindfragdata-nonexistent-variable.c)
-add_executable (clearbuffer-depth clearbuffer-common.c clearbuffer-depth.c)
-add_executable (clearbuffer-depth-stencil clearbuffer-common.c clearbuffer-depth-stencil.c)
-add_executable (clearbuffer-display-lists clearbuffer-common.c clearbuffer-display-lists.c)
-add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
-add_executable (clearbuffer-invalid-buffer clearbuffer-invalid-buffer.c)
-add_executable (clearbuffer-mixed-format clearbuffer-common.c clearbuffer-mixed-format.c)
-add_executable (clearbuffer-stencil clearbuffer-common.c clearbuffer-stencil.c)
-add_executable (getfragdatalocation getfragdatalocation.c)
+piglit_add_executable (bindfragdata-invalid-parameters bindfragdata-invalid-parameters.c)
+piglit_add_executable (bindfragdata-link-error bindfragdata-link-error.c)
+piglit_add_executable (bindfragdata-nonexistent-variable bindfragdata-nonexistent-variable.c)
+piglit_add_executable (clearbuffer-depth clearbuffer-common.c clearbuffer-depth.c)
+piglit_add_executable (clearbuffer-depth-stencil clearbuffer-common.c clearbuffer-depth-stencil.c)
+piglit_add_executable (clearbuffer-display-lists clearbuffer-common.c clearbuffer-display-lists.c)
+piglit_add_executable (clearbuffer-invalid-drawbuffer clearbuffer-invalid-drawbuffer.c)
+piglit_add_executable (clearbuffer-invalid-buffer clearbuffer-invalid-buffer.c)
+piglit_add_executable (clearbuffer-mixed-format clearbuffer-common.c clearbuffer-mixed-format.c)
+piglit_add_executable (clearbuffer-stencil clearbuffer-common.c clearbuffer-stencil.c)
+piglit_add_executable (getfragdatalocation getfragdatalocation.c)
 
 # vim: ft=cmake:
