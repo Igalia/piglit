@@ -12,24 +12,26 @@ table {
 	border-collapse: collapse;
 }
 
-.head {
+th {
 	background-color: #c8c838
 }
 
-.a {
+/* Second column (details) */
+tr:nth-child(even) > td {
 	background-color: #ffff95
 }
 
-.b {
+tr:nth-child(odd) > td {
 	background-color: #e1e183
 }
 
-.bara {
+/* First column (labels) */
+tr:nth-child(even) > td:first-child {
 	vertical-align: top;
 	background-color: #ffff85;
 }
 
-.barb {
+tr:nth-child(odd) > td:first-child {
 	vertical-align: top;
 	background-color: #d1d173;
 }

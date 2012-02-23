@@ -110,14 +110,8 @@ def buildDetails(testResult):
 	details.sort(lambda a, b: len(a[1])-len(b[1]))
 
 	text = ''
-	alternate = 'a'
 	for name, value in details:
 		text += ResultDetail % locals()
-
-		if alternate == 'a':
-			alternate = 'b'
-		else:
-			alternate = 'a'
 
 	return text
 
@@ -156,11 +150,10 @@ def hrefFromParts(codename, path):
 		outStr = outStr[1:]
 	return outStr
 
-def buildTestSummary(indent, alternate, testsummary):
+def buildTestSummary(indent, testsummary):
 	path = testsummary.path
 	name = testsummary.name
 	testruns = "".join([IndexTestTestrun % {
-		'alternate': alternate,
 		'status': result.status,
 		'link': hrefFromParts(result.testrun.codename, path)
 	} for result in testsummary.results])
@@ -193,7 +186,6 @@ def buildGroupSummaryTestrun(groupresult):
 def buildGroupSummary(indent, groupsummary, showcurrent):
 	indent_inc = 1.75 # em
 	items = ''
-	alternate = 'a'
 	path = groupsummary.path
 	name = groupsummary.name
 	names = groupsummary.children.keys()
@@ -217,12 +209,7 @@ def buildGroupSummary(indent, groupsummary, showcurrent):
 				'group': buildGroupSummary(indent + indent_inc, child, showcurrent)
 			}
 		else:
-			items = items + buildTestSummary(indent + indent_inc, alternate, child)
-
-		if alternate == 'a':
-			alternate = 'b'
-		else:
-			alternate = 'a'
+			items = items + buildTestSummary(indent + indent_inc, child)
 
 	testruns = "".join([buildGroupSummaryTestrun(result)
 			for result in groupsummary.results])
