@@ -157,7 +157,6 @@ def hrefFromParts(codename, path):
 	return outStr
 
 def buildTestSummary(indent, alternate, testsummary):
-	tenindent = 10 - indent
 	path = testsummary.path
 	name = testsummary.name
 	testruns = "".join([IndexTestTestrun % {
@@ -192,8 +191,7 @@ def buildGroupSummaryTestrun(groupresult):
 
 
 def buildGroupSummary(indent, groupsummary, showcurrent):
-	tenindent = 10 - indent
-
+	indent_inc = 1.75 # em
 	items = ''
 	alternate = 'a'
 	path = groupsummary.path
@@ -216,10 +214,10 @@ def buildGroupSummary(indent, groupsummary, showcurrent):
 		child = groupsummary.children[n]
 		if isinstance(child, framework.summary.GroupSummary):
 			items = items + IndexGroupGroup % {
-				'group': buildGroupSummary(indent+1, child, showcurrent)
+				'group': buildGroupSummary(indent + indent_inc, child, showcurrent)
 			}
 		else:
-			items = items + buildTestSummary(indent+1, alternate, child)
+			items = items + buildTestSummary(indent + indent_inc, alternate, child)
 
 		if alternate == 'a':
 			alternate = 'b'
@@ -249,7 +247,7 @@ results is an array containing the top-level results dictionarys.
 		else:
 			return IndexTestrunB % tr.__dict__
 
-	group = buildGroupSummary(1, summary.root, showcurrent)
+	group = buildGroupSummary(0, summary.root, showcurrent)
 	testruns = "".join([IndexTestrun % tr.__dict__ for tr in summary.testruns])
 	testrunsb = "".join([testrunb(tr) for tr in summary.testruns])
 
