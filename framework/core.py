@@ -521,7 +521,7 @@ class TestProfile:
 			return True in map(lambda r: r.search(x) != None, re_list)
 
 		def test_matches((path, test)):
-			return (matches_any_regexp(path, env.filter) and
+			return ((not env.filter or matches_any_regexp(path, env.filter)) and
 			        not matches_any_regexp(path, env.exclude_filter))
 
 		# Filter out unwanted tests
