@@ -67,7 +67,6 @@ IndexTestrunB = readfile(os.path.join(templatedir, 'index_testrunb.html'))
 IndexTestrunBHref = readfile(os.path.join(templatedir, 'index_testrunb_href.html'))
 IndexGroup = readfile(os.path.join(templatedir, 'index_group.html'))
 IndexGroupTestrun = readfile(os.path.join(templatedir, 'index_group_testrun.html'))
-IndexGroupGroup = readfile(os.path.join(templatedir, 'index_groupgroup.html'))
 IndexTest = readfile(os.path.join(templatedir, 'index_test.html'))
 IndexTestTestrun = readfile(os.path.join(templatedir, 'index_test_testrun.html'))
 
@@ -205,9 +204,7 @@ def buildGroupSummary(indent, groupsummary, showcurrent):
 	for n in names:
 		child = groupsummary.children[n]
 		if isinstance(child, framework.summary.GroupSummary):
-			items = items + IndexGroupGroup % {
-				'group': buildGroupSummary(indent + indent_inc, child, showcurrent)
-			}
+			items = items + buildGroupSummary(indent + indent_inc, child, showcurrent)
 		else:
 			items = items + buildTestSummary(indent + indent_inc, child)
 
