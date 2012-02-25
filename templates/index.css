@@ -5,6 +5,7 @@ table {
 	padding-left: 1.75em;
 	padding-right: 1.75em;
 	min-width: 100%;
+	table-layout: fixed;
 }
 
 col:not(:first-child) {
