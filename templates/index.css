@@ -7,6 +7,10 @@ table {
 	width: 100%;
 }
 
+col:not(:first-child) {
+	width: 50pt;
+}
+
 tr {
 	padding: 4pt;
 }

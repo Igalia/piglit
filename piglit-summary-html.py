@@ -62,7 +62,6 @@ ResultListItem = readfile(os.path.join(templatedir, 'result_listitem.html'))
 ResultMString = readfile(os.path.join(templatedir, 'result_mstring.html'))
 
 Index = readfile(os.path.join(templatedir, 'index.html'))
-IndexTestrun = readfile(os.path.join(templatedir, 'index_testrun.html'))
 IndexTestrunB = readfile(os.path.join(templatedir, 'index_testrunb.html'))
 IndexTestrunBHref = readfile(os.path.join(templatedir, 'index_testrunb_href.html'))
 IndexGroup = readfile(os.path.join(templatedir, 'index_group.html'))
@@ -232,7 +231,7 @@ results is an array containing the top-level results dictionarys.
 			return IndexTestrunB % tr.__dict__
 
 	group = buildGroupSummary(0, summary.root, showcurrent)
-	testruns = "".join([IndexTestrun % tr.__dict__ for tr in summary.testruns])
+	testruns = '<col/>' * len(summary.testruns)
 	testrunsb = "".join([testrunb(tr) for tr in summary.testruns])
 
 	tolist = SummaryPages.keys()
