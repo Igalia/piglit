@@ -150,7 +150,7 @@ def hrefFromParts(codename, path):
 
 def buildTestSummary(indent, testsummary):
 	path = testsummary.path
-	name = testsummary.name
+	name = cgi.escape(testsummary.name)
 	testruns = "".join([IndexTestTestrun % {
 		'status': result.status,
 		'link': hrefFromParts(result.testrun.codename, path)
