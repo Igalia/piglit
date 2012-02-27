@@ -2,7 +2,6 @@
 
 include_directories(
 	${OPENGL_INCLUDE_PATH}
-	${piglit_SOURCE_DIR}/tests/util/
 	)
 
 link_libraries(

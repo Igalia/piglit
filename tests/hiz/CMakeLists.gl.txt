@@ -1,6 +1,5 @@
 include_directories(
 	${piglit_SOURCE_DIR}/tests
-	${piglit_SOURCE_DIR}/tests/util
 
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}

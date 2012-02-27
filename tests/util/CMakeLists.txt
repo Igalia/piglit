@@ -2,7 +2,8 @@ add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
 
 include_directories(
 	${OPENGL_INCLUDE_PATH}
-	${piglit_SOURCE_DIR}/tests/util
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

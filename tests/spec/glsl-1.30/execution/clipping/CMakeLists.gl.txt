@@ -4,7 +4,6 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
-	${piglit_SOURCE_DIR}/tests/util
 )
 
 link_libraries (

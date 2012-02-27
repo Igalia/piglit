@@ -131,7 +131,7 @@ check_include_file(fcntl.h     HAVE_FCNTL_H)
 
 configure_file(
 	"${piglit_SOURCE_DIR}/tests/util/config.h.in"
-	"${piglit_SOURCE_DIR}/tests/util/config.h"
+	"${piglit_BINARY_DIR}/tests/util/config.h"
 )
 
 include_directories(src)
