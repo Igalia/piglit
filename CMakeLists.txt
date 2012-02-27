@@ -13,6 +13,20 @@ find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
 
+# The 'REQUIRED' above correctly produces an error for
+# OpenGL and PNG, but there's a bug involving FindGLUT.cmake
+# that fails to produce the error as of CMake 2.8.5.
+#
+# Instead, CMake keeps going and eventually spams
+# the console with a message for every target that used
+# e.g. the ${GLUT_INCLUDE_DIR} variable. So it
+# prints a line for basically every single test in piglit.
+#
+# Work around the bug and error out quickly here instead.
+if (NOT GLUT_FOUND)
+	message(FATAL_ERROR "GLUT library not found")
+endif()
+
 # Check for presence of Python 2.6 or greater.
 foreach(python_cmd python2 python)
 	execute_process(
