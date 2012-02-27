@@ -136,7 +136,7 @@ piglit_init(int argc, char **argv)
 
 	if (piglit_get_gl_version() >= 14) {
 		pglFogCoordf = glFogCoordf;
-	} else if (GLEW_EXT_fog_coord) {
+	} else if (piglit_is_extension_supported("GL_EXT_fog_coord")) {
 		pglFogCoordf = glFogCoordfEXT;
 	} else {
 		piglit_report_result(PIGLIT_SKIP);

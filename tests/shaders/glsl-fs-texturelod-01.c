@@ -129,7 +129,7 @@ piglit_init(int argc, char **argv)
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
-	if (!GLEW_ARB_shader_texture_lod) {
+	if (!piglit_is_extension_supported("GL_ARB_shader_texture_lod")) {
 		printf("Requires extension GL_ARB_shader_texture_lod\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

@@ -124,7 +124,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_ARB_imaging && !GLEW_EXT_blend_minmax) {
+	if (!piglit_is_extension_supported("GL_ARB_imaging") && !piglit_is_extension_supported("GL_EXT_blend_minmax")) {
 		printf("Sorry, this program requires either GL_ARB_imaging or "
 		       "GL_EXT_blend_minmax.\n");
 		piglit_report_result(PIGLIT_SKIP);

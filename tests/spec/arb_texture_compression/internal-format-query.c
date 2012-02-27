@@ -297,7 +297,7 @@ piglit_init(int argc, char **argv)
 	 * caveats for RGB or RGBA base formats.  We have to add these formats
 	 * to the list of possible formats by hand.
 	 */
-	if (GLEW_EXT_texture_compression_latc) {
+	if (piglit_is_extension_supported("GL_EXT_texture_compression_latc")) {
 		compressed_formats =
 			add_formats(compressed_formats,
 				    &num_compressed_formats,
@@ -308,7 +308,7 @@ piglit_init(int argc, char **argv)
 				    GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT);
 	}
 
-	if (GLEW_ATI_texture_compression_3dc) {
+	if (piglit_is_extension_supported("GL_ATI_texture_compression_3dc")) {
 		compressed_formats =
 			add_formats(compressed_formats,
 				    &num_compressed_formats,
@@ -324,19 +324,19 @@ piglit_init(int argc, char **argv)
 	/* Remove the various luminance and luminance-alpha formats from the
 	 * list since they cannot be used for the later tests.
 	 */
-	if (GLEW_ATI_texture_compression_3dc) {
+	if (piglit_is_extension_supported("GL_ATI_texture_compression_3dc")) {
 		num_compressed_formats--;
 	}
 
-	if (GLEW_EXT_texture_compression_latc) {
+	if (piglit_is_extension_supported("GL_EXT_texture_compression_latc")) {
 		num_compressed_formats -= 4;
 	}
 
 	/* Add the RGTC formats, then check them.
 	 */
-	if (GLEW_ARB_texture_rg) {
-		if (GLEW_ARB_texture_compression_rgtc
-		    || GLEW_EXT_texture_compression_rgtc) {
+	if (piglit_is_extension_supported("GL_ARB_texture_rg")) {
+		if (piglit_is_extension_supported("GL_ARB_texture_compression_rgtc")
+		    || piglit_is_extension_supported("GL_EXT_texture_compression_rgtc")) {
 			compressed_formats =
 				add_formats(compressed_formats,
 					    &num_compressed_formats,
@@ -356,8 +356,8 @@ piglit_init(int argc, char **argv)
 		/* Remove the RGTC formats from the list since they cannot be
 		 * used for the later tests.
 		 */
-		if (GLEW_ARB_texture_compression_rgtc
-		    || GLEW_EXT_texture_compression_rgtc) {
+		if (piglit_is_extension_supported("GL_ARB_texture_compression_rgtc")
+		    || piglit_is_extension_supported("GL_EXT_texture_compression_rgtc")) {
 			num_compressed_formats -= 4;
 		}
 	}
@@ -365,7 +365,7 @@ piglit_init(int argc, char **argv)
 
 	/* Add the sRGB formats, then check them.
 	 */
-	if (GLEW_EXT_texture_sRGB) {
+	if (piglit_is_extension_supported("GL_EXT_texture_sRGB")) {
 		compressed_formats =
 			add_formats(compressed_formats,
 				    &num_compressed_formats,
@@ -375,7 +375,7 @@ piglit_init(int argc, char **argv)
 				    GL_COMPRESSED_SLUMINANCE,
 				    GL_COMPRESSED_SLUMINANCE_ALPHA);
 
-		if (GLEW_EXT_texture_compression_s3tc) {
+		if (piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")) {
 			compressed_formats =
 				add_formats(compressed_formats,
 					    &num_compressed_formats,
@@ -396,7 +396,7 @@ piglit_init(int argc, char **argv)
 		 * used for the later tests.
 		 */
 		num_compressed_formats -= 4;
-		if (GLEW_EXT_texture_compression_s3tc) {
+		if (piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")) {
 			num_compressed_formats -= 4;
 		}
 	}

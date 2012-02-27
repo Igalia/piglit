@@ -211,8 +211,8 @@ GLboolean test(void)
 	GLboolean all_pass = GL_TRUE;
 	int npass = 0, total = 0;
 	unsigned semantic, blend, logicop, vpmode, fpmode;
-	unsigned vpmodes = 1 + !!GLEW_ARB_vertex_program;
-	unsigned fpmodes = 1 + !!GLEW_ARB_fragment_program;
+	unsigned vpmodes = 1 + !!piglit_is_extension_supported("GL_ARB_vertex_program");
+	unsigned fpmodes = 1 + !!piglit_is_extension_supported("GL_ARB_fragment_program");
 	unsigned vert_clamp, frag_clamp;
 
 	glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -258,14 +258,14 @@ GLboolean test(void)
 unsigned
 init(void)
 {
-	if (GLEW_ARB_vertex_program)
+	if (piglit_is_extension_supported("GL_ARB_vertex_program"))
 	{
 		unsigned i;
 		for (i = 0; i < 2; ++i)
 			vps[i] = piglit_compile_program(GL_VERTEX_PROGRAM_ARB, vp_strings[i]);
 	}
 
-	if (GLEW_ARB_fragment_program)
+	if (piglit_is_extension_supported("GL_ARB_fragment_program"))
 	{
 		unsigned i;
 		for (i = 0; i < 4; ++i)

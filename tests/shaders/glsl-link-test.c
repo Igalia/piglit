@@ -83,7 +83,7 @@ void piglit_init(int argc, char **argv)
 			target = GL_VERTEX_SHADER;
 		} else if (strcmp(argv[i] + len - 5, ".geom") == 0) {
 			target = GL_GEOMETRY_SHADER;
-			if (piglit_get_gl_version() < 32 && !GLEW_ARB_geometry_shader4) {
+			if (piglit_get_gl_version() < 32 && !piglit_is_extension_supported("GL_ARB_geometry_shader4")) {
 				printf("Requires geometry shaders.\n");
 				piglit_report_result(PIGLIT_SKIP);
 			}

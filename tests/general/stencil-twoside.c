@@ -176,7 +176,7 @@ piglit_display(void)
 	piglit_draw_rect(w * 9, start_y, w, h);
 
 	/* 6th square */
-	if (GLEW_EXT_stencil_wrap) {
+	if (piglit_is_extension_supported("GL_EXT_stencil_wrap")) {
 		if (use20syntax) {
 			glStencilFuncSeparate(GL_FRONT, GL_ALWAYS, 0, ~0);
 			glStencilFuncSeparate(GL_BACK, GL_ALWAYS, 0, ~0);
@@ -217,7 +217,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_ATI_separate_stencil && piglit_get_gl_version() < 20) {
+	if (!piglit_is_extension_supported("GL_ATI_separate_stencil") && piglit_get_gl_version() < 20) {
 		printf("Sorry, this program requires either "
 		       "GL_ATI_separate_stencil or OpenGL 2.0.\n");
 		piglit_report_result(PIGLIT_SKIP);

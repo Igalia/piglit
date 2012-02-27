@@ -166,7 +166,7 @@ static GLboolean run_test()
 	}
 	else
 	{
-		unsigned mrt_modes = GLEW_ARB_draw_buffers ? (GLEW_ARB_texture_float ? 3 : 2) : 1;
+		unsigned mrt_modes = piglit_is_extension_supported("GL_ARB_draw_buffers") ? (piglit_is_extension_supported("GL_ARB_texture_float") ? 3 : 2) : 1;
 		unsigned first_mrt_mode = (test_mode == TEST_MRT) ? 1 : 0;
 
 		for (mrt_mode = first_mrt_mode; mrt_mode < mrt_modes; ++mrt_mode)

@@ -376,58 +376,58 @@ piglit_init(int argc, char **argv)
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_ARB_texture_compression_bptc)
+					   piglit_is_extension_supported("GL_ARB_texture_compression_bptc"))
 				&& pass;
 		} else if (strcmp(argv[i], "s3tc") == 0) {
 			pass = try_formats(&s3tc_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_EXT_texture_compression_s3tc)
+					   piglit_is_extension_supported("GL_EXT_texture_compression_s3tc"))
 				&& pass;
 		} else if (strcmp(argv[i], "fxt1") == 0) {
 			pass = try_formats(&fxt1_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_3DFX_texture_compression_FXT1)
+					   piglit_is_extension_supported("GL_3DFX_texture_compression_FXT1"))
 				&& pass;
 		} else if (strcmp(argv[i], "latc") == 0) {
 			pass = try_formats(&latc_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_EXT_texture_compression_latc)
+					   piglit_is_extension_supported("GL_EXT_texture_compression_latc"))
 				&& pass;
 		} else if (strcmp(argv[i], "3dc") == 0) {
 			pass = try_formats(&ati_3dc_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_ATI_texture_compression_3dc)
+					   piglit_is_extension_supported("GL_ATI_texture_compression_3dc"))
 				&& pass;
 		} else if (strcmp(argv[i], "rgtc") == 0) {
 			pass = try_formats(&rgtc_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   (GLEW_ARB_texture_compression_rgtc
-					    || GLEW_EXT_texture_compression_rgtc))
+					   (piglit_is_extension_supported("GL_ARB_texture_compression_rgtc")
+					    || piglit_is_extension_supported("GL_EXT_texture_compression_rgtc")))
 				&& pass;
 		} else if (strcmp(argv[i], "srgb") == 0) {
 			pass = try_formats(&srgb_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   (GLEW_EXT_texture_sRGB
-					    && GLEW_EXT_texture_compression_s3tc))
+					   (piglit_is_extension_supported("GL_EXT_texture_sRGB")
+					    && piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")))
 				&& pass;
 		} else if (strcmp(argv[i], "paletted") == 0) {
 			pass = try_formats(&paletted_formats,
 					   compressed_formats,
 					   num_compressed_formats,
 					   check_errors,
-					   GLEW_OES_compressed_paletted_texture)
+					   piglit_is_extension_supported("GL_OES_compressed_paletted_texture"))
 				&& pass;
 		} else {
 			fprintf(stderr,

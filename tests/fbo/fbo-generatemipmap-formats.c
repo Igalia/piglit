@@ -57,7 +57,7 @@ key_func(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'd':
-		set_npot(tex_width == 256 && GLEW_ARB_texture_non_power_of_two);
+		set_npot(tex_width == 256 && piglit_is_extension_supported("GL_ARB_texture_non_power_of_two"));
 		break;
 	}
 	fbo_formats_key_func(key, x, y);
@@ -128,7 +128,7 @@ draw_mipmap(int x, int y, int level, GLenum basetype)
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	if (GLEW_ARB_depth_texture) {
+	if (piglit_is_extension_supported("GL_ARB_depth_texture")) {
 		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 					 GL_TEXTURE_DEPTH_SIZE, &d);
 	} else {
@@ -248,7 +248,7 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 	if (compressed && (w < h ? w : h) < 8)
 		return GL_TRUE;
 
-	if (GLEW_ARB_depth_texture) {
+	if (piglit_is_extension_supported("GL_ARB_depth_texture")) {
 		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 					 GL_TEXTURE_DEPTH_SIZE, &d_size);
 	} else {
@@ -446,7 +446,7 @@ piglit_display(void)
 			pass = test_format(&test_set->format[i],
 					   test_set->base, test_set->basetype) && pass;
 		}
-		if (GLEW_ARB_texture_non_power_of_two) {
+		if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
 			set_npot(GL_TRUE);
 			for (i = 0; i < test_set->num_formats; i++) {
 				pass = test_format(&test_set->format[i],

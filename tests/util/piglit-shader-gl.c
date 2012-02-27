@@ -195,7 +195,7 @@ piglit_require_GLSL(void)
 {
 	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
-	} else if (GLEW_ARB_shader_objects && GLEW_ARB_shading_language_100) {
+	} else if (piglit_is_extension_supported("GL_ARB_shader_objects") && piglit_is_extension_supported("GL_ARB_shading_language_100")) {
 		init_functions_from_extension();
 	} else {
 		printf("GLSL not supported.\n");
@@ -227,7 +227,7 @@ piglit_require_vertex_shader(void)
 {
 	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
-	} else if (GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader) {
+	} else if (piglit_is_extension_supported("GL_ARB_shader_objects") && piglit_is_extension_supported("GL_ARB_vertex_shader")) {
 		init_functions_from_extension();
 	} else {
 		printf("GLSL vertex shaders are not supported.\n");
@@ -241,7 +241,7 @@ piglit_require_fragment_shader(void)
 {
 	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
-	} else if (GLEW_ARB_shader_objects && GLEW_ARB_fragment_shader) {
+	} else if (piglit_is_extension_supported("GL_ARB_shader_objects") && piglit_is_extension_supported("GL_ARB_fragment_shader")) {
 		init_functions_from_extension();
 	} else {
 		printf("GLSL vertex shaders are not supported.\n");

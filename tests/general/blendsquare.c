@@ -89,7 +89,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (piglit_get_gl_version() < 14 && !GLEW_NV_blend_square) {
+	if (piglit_get_gl_version() < 14 && !piglit_is_extension_supported("GL_NV_blend_square")) {
 		printf("Sorry, this program requires either OpenGL 1.4 or "
 		       "GL_NV_blend_square\n");
 		piglit_report_result(PIGLIT_SKIP);

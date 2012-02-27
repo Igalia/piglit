@@ -179,7 +179,7 @@ piglit_init(int argc, char **argv)
 		end_query = GLEW_GET_FUN(__glewEndQuery);
 		get_queryiv = GLEW_GET_FUN(__glewGetQueryiv);
 		get_query_objectiv = GLEW_GET_FUN(__glewGetQueryObjectiv);
-	} else if (GLEW_ARB_occlusion_query) {
+	} else if (piglit_is_extension_supported("GL_ARB_occlusion_query")) {
 		gen_queries = GLEW_GET_FUN(__glewGenQueriesARB);
 		begin_query = GLEW_GET_FUN(__glewBeginQueryARB);
 		end_query = GLEW_GET_FUN(__glewEndQueryARB);

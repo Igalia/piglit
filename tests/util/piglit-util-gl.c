@@ -621,7 +621,7 @@ int piglit_use_fragment_program(void)
 		;
 
 	glewInit();
-	if (!GLEW_ARB_fragment_program)
+	if (!piglit_is_extension_supported("GL_ARB_fragment_program"))
 		return 0;
 
 	piglit_ARBfp_pass_through =
@@ -642,7 +642,7 @@ void piglit_require_fragment_program(void)
 int piglit_use_vertex_program(void)
 {
 	glewInit();
-	return GLEW_ARB_vertex_program;
+	return piglit_is_extension_supported("GL_ARB_vertex_program");
 }
 
 void piglit_require_vertex_program(void)

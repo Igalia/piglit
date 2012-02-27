@@ -158,7 +158,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	/* Check if EXT_gpu_shader4 is supported */
-	if (!piglit_is_extension_supported("EXT_gpu_shader4"))
+	if (!piglit_is_extension_supported("GL_EXT_gpu_shader4"))
 		/* If EXT_gpu_shader4 is not supported GL version must be 3.0 */
 		piglit_require_gl_version(30);
 	loadTex();

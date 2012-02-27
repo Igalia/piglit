@@ -306,7 +306,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_ARB_shader_objects || !GLEW_ARB_vertex_shader || !GLEW_ARB_fragment_shader) {
+	if (!piglit_is_extension_supported("GL_ARB_shader_objects") || !piglit_is_extension_supported("GL_ARB_vertex_shader") || !piglit_is_extension_supported("GL_ARB_fragment_shader")) {
 		printf("Requires ARB_shader_objects and ARB_{vertex,fragment}_shader\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

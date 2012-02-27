@@ -71,7 +71,7 @@ piglit_require_transform_feedback(void)
 {
 	if (piglit_get_gl_version() >= 30) {
 		init_functions_from_core();
-	} else if (GLEW_EXT_transform_feedback) {
+	} else if (piglit_is_extension_supported("GL_EXT_transform_feedback")) {
 		init_functions_from_ext();
 	} else {
 		printf("Transform feedback not supported.\n");

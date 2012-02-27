@@ -104,9 +104,9 @@ try_CreateShaderProgram(GLenum type, const char *source, GLenum expect)
 void
 piglit_init(int argc, char **argv)
 {
-	const GLenum expect = (GLEW_ARB_geometry_shader4
-			       || GLEW_EXT_geometry_shader4
-			       || GLEW_NV_geometry_shader4)
+	const GLenum expect = (piglit_is_extension_supported("GL_ARB_geometry_shader4")
+			       || piglit_is_extension_supported("GL_EXT_geometry_shader4")
+			       || piglit_is_extension_supported("GL_NV_geometry_shader4"))
 		? 0 : GL_INVALID_ENUM;
 	GLboolean pass;
 

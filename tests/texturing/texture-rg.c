@@ -137,7 +137,7 @@ test_teximage_formats(void)
       if (info->IsInteger) {
 #if 0
          /* XXX we don't test integer texture formats yet */
-         if (!GLEW_EXT_texture_integer) {
+	      if (!piglit_is_extension_supported("GL_EXT_texture_integer")) {
             continue;
          }
          else {
@@ -148,7 +148,7 @@ test_teximage_formats(void)
 #endif
       }
       else if (info->IsFloat) {
-         if (!GLEW_ARB_texture_float) {
+	      if (!piglit_is_extension_supported("GL_ARB_texture_float")) {
             continue;
          }
       }

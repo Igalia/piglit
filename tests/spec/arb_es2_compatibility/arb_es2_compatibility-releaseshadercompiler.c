@@ -126,7 +126,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	if (!GLEW_ARB_ES2_compatibility) {
+	if (!piglit_is_extension_supported("GL_ARB_ES2_compatibility")) {
 		printf("Requires ARB_ES2_compatibility\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

@@ -73,7 +73,7 @@ GLboolean test()
 			case 0:
 				/* ARB_color_buffer_float adds a potential clamp on queries, but only ARB_texture_float removes
 				 * the clamp on setting the texture border color  */
-				if(!GLEW_ARB_texture_float)
+				if(!piglit_is_extension_supported("GL_ARB_texture_float"))
 					clamped = 1;
 				glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, pixels);
 				glGetTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, observed);

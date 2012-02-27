@@ -271,7 +271,7 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 	if (compressed && dim < 8)
 		return GL_TRUE;
 
-	if (GLEW_ARB_depth_texture) {
+	if (piglit_is_extension_supported("GL_ARB_depth_texture")) {
 		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
 					 GL_TEXTURE_DEPTH_SIZE, &d_size);
 	} else {
