@@ -4,6 +4,7 @@ INCLUDE (CheckCCompilerFlag)
 INCLUDE (CheckCXXCompilerFlag)
 INCLUDE (CheckFunctionExists)
 INCLUDE (CheckIncludeFile)
+INCLUDE (FindPkgConfig)
 
 project (piglit)
 
@@ -12,6 +13,10 @@ find_package(TIFF)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	pkg_check_modules(GLPROTO REQUIRED glproto)
+ENDIF()
 
 # The 'REQUIRED' above correctly produces an error for
 # OpenGL and PNG, but there's a bug involving FindGLUT.cmake

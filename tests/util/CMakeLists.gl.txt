@@ -23,6 +23,12 @@ if (C_COMPILER_FLAG_WDECL_AFTER_STMT)
 endif ()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	# XXX: This is currently duplicated wherever tests
+	# include "piglit-glx-util.h". Is it possible to refactor it?
+	include_directories(
+		${GLPROTO_INCLUDE_DIRS}
+	)
+
 	add_definitions ( -DUSE_GLX )
 	add_library (piglitglxutil
 		    piglit-shader.c

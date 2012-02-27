@@ -14,6 +14,9 @@ link_libraries (
 )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	include_directories(
+		${GLPROTO_INCLUDE_DIRS}
+	)
 	add_executable (glx-fbconfig-sanity glx-fbconfig-sanity.c)
 	add_executable (glx-fbconfig-compliance glx-fbconfig-compliance.c)
 	add_executable (glx-fbo-binding glx-fbo-binding.c)
