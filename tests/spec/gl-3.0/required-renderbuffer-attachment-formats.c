@@ -50,7 +50,7 @@ piglit_init(int argc, char **argv)
 	GLuint rb, fbo;
 	int i;
 
-	if (!GLEW_VERSION_3_0) {
+	if (piglit_get_gl_version() < 30) {
 		printf("Requires GL 3.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

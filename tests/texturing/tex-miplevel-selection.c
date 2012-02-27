@@ -79,7 +79,7 @@ piglit_init(int argc, char **argv)
         }
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
-	if (!GLEW_VERSION_1_4)
+	if (piglit_get_gl_version() < 14)
 		piglit_report_result(PIGLIT_SKIP);
 
 	if (ARB_shader_texture_lod) {

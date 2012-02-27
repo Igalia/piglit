@@ -114,7 +114,7 @@ void piglit_init(int argc, char **argv)
 	int i;
 	int maxtextures;
 
-	if (!GLEW_VERSION_1_3) {
+	if (piglit_get_gl_version() < 13) {
 		printf("Requires OpenGL 1.3\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

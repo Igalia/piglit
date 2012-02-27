@@ -173,7 +173,7 @@ piglit_init(int argc, char **argv)
 	glDepthFunc(GL_LESS);
 
 
-	if (GLEW_VERSION_1_5) {
+	if (piglit_get_gl_version() >= 15) {
 		gen_queries = GLEW_GET_FUN(__glewGenQueries);
 		begin_query = GLEW_GET_FUN(__glewBeginQuery);
 		end_query = GLEW_GET_FUN(__glewEndQuery);

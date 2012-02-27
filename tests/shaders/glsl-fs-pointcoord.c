@@ -92,7 +92,7 @@ void piglit_init(int argc, char**argv)
 	GLint vs, fs;
 	GLint point_size_limits[2];
 
-	if (!GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() < 20) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);

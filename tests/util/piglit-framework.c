@@ -166,7 +166,7 @@ piglit_framework_fbo_init()
 #ifdef USE_OPENGL
 	glewInit();
 
-	if (!GLEW_VERSION_2_0)
+	if (piglit_get_gl_version() < 20)
 		return false;
 #endif
 

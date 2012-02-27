@@ -49,7 +49,7 @@ piglit_init(int argc, char **argv)
 {
    GLfloat red[4] = {1, 0, 0, 1};
 
-   if (!GLEW_VERSION_1_2) {
+   if (piglit_get_gl_version() < 12) {
       printf("Requires OpenGL 1.2\n");
       piglit_report_result(PIGLIT_SKIP);
    }

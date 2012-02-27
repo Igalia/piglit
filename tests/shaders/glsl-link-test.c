@@ -47,7 +47,7 @@ void piglit_init(int argc, char **argv)
 	unsigned i;
 	const char *invalid_file = NULL;
 
-	if (!GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() < 20) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
@@ -83,7 +83,7 @@ void piglit_init(int argc, char **argv)
 			target = GL_VERTEX_SHADER;
 		} else if (strcmp(argv[i] + len - 5, ".geom") == 0) {
 			target = GL_GEOMETRY_SHADER;
-			if (!GLEW_VERSION_3_2 && !GLEW_ARB_geometry_shader4) {
+			if (piglit_get_gl_version() < 32 && !GLEW_ARB_geometry_shader4) {
 				printf("Requires geometry shaders.\n");
 				piglit_report_result(PIGLIT_SKIP);
 			}

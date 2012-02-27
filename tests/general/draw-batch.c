@@ -30,7 +30,7 @@ int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_VERSION_1_4) {
+	if (piglit_get_gl_version() < 14) {
 		printf("Requires OpenGL 1.4.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

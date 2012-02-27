@@ -144,7 +144,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_EXT_stencil_wrap && !GLEW_VERSION_1_4) {
+	if (!GLEW_EXT_stencil_wrap && piglit_get_gl_version() < 14) {
 		printf("Sorry, this program requires either "
 		       "GL_EXT_stencil_wrap or OpenGL 1.4.\n");
 		piglit_report_result(PIGLIT_SKIP);

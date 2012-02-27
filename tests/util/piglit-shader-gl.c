@@ -193,7 +193,7 @@ init_functions_from_extension(void)
 void
 piglit_require_GLSL(void)
 {
-	if (GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
 	} else if (GLEW_ARB_shader_objects && GLEW_ARB_shading_language_100) {
 		init_functions_from_extension();
@@ -225,7 +225,7 @@ piglit_require_GLSL_version(int version)
 void
 piglit_require_vertex_shader(void)
 {
-	if (GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
 	} else if (GLEW_ARB_shader_objects && GLEW_ARB_vertex_shader) {
 		init_functions_from_extension();
@@ -239,7 +239,7 @@ piglit_require_vertex_shader(void)
 void
 piglit_require_fragment_shader(void)
 {
-	if (GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() >= 20) {
 		init_functions_from_core();
 	} else if (GLEW_ARB_shader_objects && GLEW_ARB_fragment_shader) {
 		init_functions_from_extension();

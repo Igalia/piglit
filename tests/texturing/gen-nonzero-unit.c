@@ -173,7 +173,7 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_SGIS_generate_mipmap");
 
-	if (GLEW_VERSION_1_3) {
+	if (piglit_get_gl_version() >= 13) {
 		ActiveTexture = GLEW_GET_FUN(__glewActiveTexture);
 	} else {
 		piglit_require_extension("GL_ARB_multitexture");

@@ -69,7 +69,7 @@ init_functions_from_ext(void)
 void
 piglit_require_transform_feedback(void)
 {
-	if (GLEW_VERSION_3_0) {
+	if (piglit_get_gl_version() >= 30) {
 		init_functions_from_core();
 	} else if (GLEW_EXT_transform_feedback) {
 		init_functions_from_ext();

@@ -8,7 +8,7 @@ piglit_init(int argc, char *argv[])
 {
     GLuint id;
 
-    if (!GLEW_VERSION_1_5) {
+    if (piglit_get_gl_version() < 15) {
         printf("Requires OpenGL 1.5\n");
         piglit_report_result(PIGLIT_SKIP);
     }

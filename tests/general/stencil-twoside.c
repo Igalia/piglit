@@ -217,13 +217,13 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_ATI_separate_stencil && !GLEW_VERSION_2_0) {
+	if (!GLEW_ATI_separate_stencil && piglit_get_gl_version() < 20) {
 		printf("Sorry, this program requires either "
 		       "GL_ATI_separate_stencil or OpenGL 2.0.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	if (!GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() < 20) {
 		use20syntax = 0;
 	}
 

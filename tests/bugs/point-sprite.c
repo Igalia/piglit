@@ -77,7 +77,7 @@ enum piglit_result
 piglit_display(void)
 {
 	static const GLenum origins[2] = { GL_UPPER_LEFT, GL_LOWER_LEFT	};
-	const unsigned num_rows = (GLEW_VERSION_2_0) ? 2 : 1;
+	const unsigned num_rows = (piglit_get_gl_version() >= 20) ? 2 : 1;
 	GLboolean pass = GL_TRUE;
 	unsigned i;
 	unsigned j;
@@ -95,7 +95,7 @@ piglit_display(void)
 		/* OpenGL version must be at least 2.0 to support modifying
 		 * GL_POINT_SPRITE_COORD_ORIGIN.
 		 */
-		if (GLEW_VERSION_2_0)
+		if (piglit_get_gl_version() >= 20)
 			glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN,
 					  origins[i]);
 

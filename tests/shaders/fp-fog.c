@@ -134,7 +134,7 @@ piglit_init(int argc, char **argv)
 
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 
-	if (GLEW_VERSION_1_4) {
+	if (piglit_get_gl_version() >= 14) {
 		pglFogCoordf = glFogCoordf;
 	} else if (GLEW_EXT_fog_coord) {
 		pglFogCoordf = glFogCoordfEXT;

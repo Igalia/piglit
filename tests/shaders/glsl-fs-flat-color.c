@@ -94,7 +94,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vs, fs;
 
-	if (!GLEW_VERSION_2_0) {
+	if (piglit_get_gl_version() < 20) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}

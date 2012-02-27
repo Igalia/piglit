@@ -129,7 +129,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (!GLEW_VERSION_1_2) {
+	if (piglit_get_gl_version() < 12) {
 		piglit_report_result(PIGLIT_SKIP);
 	}
 }
