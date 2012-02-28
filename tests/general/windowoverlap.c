@@ -181,6 +181,7 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(MainWidth, MainHeight);
 	glutInitDisplayMode(GLUT_RGB);
 	glutCreateWindow(argv[0]);
+	glewInit();
 	glutReshapeFunc(Reshape);
 	glutDisplayFunc(RedisplayMain);
 	if (!Automatic)
