@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (arb_draw_instanced-dlist dlist.c)
+add_executable (arb_draw_instanced-elements elements.c)
 add_executable (arb_draw_instanced-negative-arrays-first-negative negative-arrays-first-negative.c)
 add_executable (arb_draw_instanced-negative-elements-type negative-elements-type.c)
