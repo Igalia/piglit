@@ -27,10 +27,8 @@
 
 #include "piglit-util.h"
 
-#define WIN_WIDTH 200
-#define WIN_HEIGHT 200
-
-static GLboolean Automatic = GL_FALSE;
+int piglit_width = 200, piglit_height = 200;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
 
 /** Should GL_TEXTURE_RECTANGLE_ARB be tested? */
 int have_rect = 0;
@@ -219,7 +217,8 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 }
 
 
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	GLboolean pass;
 	int srcy = 5;
@@ -253,23 +252,20 @@ static void display(void)
 		srcy += 35 + 5;
 	}
 
-	if (Automatic) {
-		printf("PIGLIT: {'result': '%s' }\n",
-		       pass ? "pass" : "fail");
-		exit(pass ? 0 : 1);
-	}
+	piglit_present_results();
 
-	glutSwapBuffers();
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	glDisable(GL_DITHER);
 
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
 	glLoadIdentity();
-	glOrtho( 0, WIN_WIDTH, 0, WIN_HEIGHT, -1, 1 );
+	glOrtho( 0, piglit_width, 0, piglit_height, -1, 1 );
 
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
@@ -277,26 +273,10 @@ static void init(void)
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 
-	have_NPOT = ((atof((const char *) glGetString(GL_VERSION)) >= 2.0)
-		|| (glutExtensionSupported("GL_ARB_texture_non_power_of_two")));
+	have_NPOT = (piglit_get_gl_version() >= 20
+		|| (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")));
 
-	have_rect = ((glutExtensionSupported("GL_ARB_texture_rectangle"))
-		|| (glutExtensionSupported("GL_EXT_texture_rectangle"))
-		|| (glutExtensionSupported("GL_NV_texture_rectangle")));
-}
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("copytexsubimage");
-	init();
-	glutDisplayFunc(display);
-	glutMainLoop();
-
-	return 0;
+	have_rect = ((piglit_is_extension_supported("GL_ARB_texture_rectangle"))
+		|| (piglit_is_extension_supported("GL_EXT_texture_rectangle"))
+		|| (piglit_is_extension_supported("GL_NV_texture_rectangle")));
 }

@@ -10,16 +10,19 @@
 #include "piglit-util.h"
 
 
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
-	piglit_report_result(PIGLIT_PASS);
+	return PIGLIT_PASS;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
-	glViewport(0, 0, Width, Height);
+	glViewport(0, 0, piglit_width, piglit_height);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -31,17 +34,4 @@ static void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -4);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 4);
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutDisplayFunc(Display);
-	init();
-	glutMainLoop();
-	return 0;
 }

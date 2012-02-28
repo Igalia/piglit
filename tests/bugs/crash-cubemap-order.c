@@ -8,20 +8,23 @@
 
 #include "piglit-util.h"
 
-static int Width = 100, Height = 100;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
 
-static void Display(void)
+enum piglit_result
+piglit_display(void)
 {
-	piglit_report_result(PIGLIT_PASS);
+	return PIGLIT_PASS;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	GLubyte data[4096]; /* 32*32*4 */
 
 	memset(data, 0, sizeof(data));
 	
-	glViewport(0, 0, Width, Height);
+	glViewport(0, 0, piglit_width, piglit_height);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 1);
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -39,17 +42,3 @@ static void init(void)
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 }
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize(Width, Height);
-	glutCreateWindow(argv[0]);
-	glutDisplayFunc(Display);
-	init();
-	glutMainLoop();
-	return 0;
-}
-

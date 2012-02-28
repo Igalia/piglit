@@ -5,9 +5,11 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
+int piglit_width = 100, piglit_height = 100;
+int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
 
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	static int goterrors = 0;
 	static int frame = 0;
@@ -29,21 +31,12 @@ static void display(void)
 		goterrors++;
 	}
 
-	if (Automatic && frame > 2) {
-		printf("PIGLIT: {'result': '%s' }\n", goterrors ? "fail" : "pass");
-		exit(0);
-	}
+	piglit_present_results();
 
-	glutPostRedisplay();
+	return goterrors ? PIGLIT_FAIL : PIGLIT_PASS;
 }
 
-int main(int argc, char **argv)
+void
+piglit_init(int argc, char **argv)
 {
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutCreateWindow("fdo9833");
-	glutDisplayFunc(display);
-	glutMainLoop();
-	return 0;
 }

@@ -5,9 +5,11 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
+int piglit_width = 250, piglit_height = 250;
+int piglit_window_mode = GLUT_SINGLE | GLUT_RGB;
 
-static void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	int i;
 
@@ -17,32 +19,14 @@ static void display(void)
 	}
 	glFlush();
 
-	if (Automatic) {
-		piglit_report_result(PIGLIT_PASS);
-	}
+	return PIGLIT_PASS;
 }
 
-static void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 }
-
-int main(int argc, char** argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize(250, 250);
-	glutInitWindowPosition(100, 100);
-	glutCreateWindow("fdo23489");
-	glutKeyboardFunc(piglit_escape_exit_key);
-	init();
-	glutDisplayFunc(display);
-	glutMainLoop();
-	return 0;
-}
-

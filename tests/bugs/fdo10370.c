@@ -5,10 +5,8 @@
 
 #include "piglit-util.h"
 
-static int Automatic = 0;
-
-#define WIN_WIDTH 128
-#define WIN_HEIGHT 128
+int piglit_width = 128, piglit_height = 128;
+int piglit_window_mode = GLUT_SINGLE | GLUT_RGB;
 #define BITMAP_WIDTH 1
 #define BITMAP_HEIGHT 1
 #define ALIGN 1
@@ -21,12 +19,13 @@ static GLubyte data[] = { 0x8f, 0xff, 0x7f, 0x70 };
 
 static GLuint tex_name;
 
-void init(void)
+void
+piglit_init(int argc, char **argv)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glTranslatef(-1.0, -1.0, 0.0);
-	glScalef(2.0/WIN_WIDTH, 2.0/WIN_HEIGHT, 1.0);
+	glScalef(2.0/piglit_width, 2.0/piglit_height, 1.0);
 
 	glDisable(GL_DITHER);
 	glClearColor(1, 1, 1, 1);
@@ -53,7 +52,8 @@ void init(void)
 
 
 
-void display(void)
+enum piglit_result
+piglit_display(void)
 {
 	int i, j, k, col, pixel;
 	GLfloat expected[4];
@@ -145,29 +145,8 @@ void display(void)
 
 	printf("max delta: %f\n", dmax);
 
-	if (Automatic) {
-		if (dmax > 0.02)
-			printf("PIGLIT: {'result': 'fail' }\n");
-		else
-			printf("PIGLIT: {'result': 'pass' }\n");
-
-		exit(0);
-	}
-}
-
-
-int main(int argc, char**argv)
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize (WIN_WIDTH, WIN_HEIGHT);
-	glutInitWindowPosition (100, 100);
-	glutCreateWindow ("fdo10370");
-	init();
-	glutDisplayFunc(display);
-	glutMainLoop();
-
-	return 0;
+	if (dmax > 0.02)
+		return PIGLIT_FAIL;
+	else
+		return PIGLIT_PASS;
 }
