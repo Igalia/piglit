@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (draw-elements-instanced-base-vertex draw-elements-instanced-base-vertex.c)
+add_executable (arb_draw_elements_base_vertex-dlist-arb_draw_instanced dlist-arb_draw_instanced.c)
 
 # vim: ft=cmake:
