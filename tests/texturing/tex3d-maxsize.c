@@ -110,17 +110,7 @@ piglit_display(void)
 
 		/* use proxy texture to find working max texture size */
 		find_max_tex3d_size(maxsize, &width, &height, &depth);
-#ifdef NVIDIA_HACK
-		/* XXX NVIDIA's proxy texture mechanism is broken.
-		 * If this code is enabled, a smaller texture is used and
-		 * the test passes.  Only halving the texture size isn't enough:
-		 * we try to allocate a gigantic texture which typically brings
-		 * the machine to its knees, swapping, then dying.
-		 */
-		width /= 4;
-		height /= 4;
-		depth /= 4;
-#endif
+
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height, depth, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		err = glGetError();
