@@ -1024,6 +1024,7 @@ import_glsl_parser_tests(arb_draw_instanced,
 add_shader_test_dir(arb_draw_instanced,
                     testsDir + '/spec/arb_draw_instanced/execution',
                     recursive=True)
+arb_draw_instanced['dlist'] = concurrent_test('arb_draw_instanced-dlist')
 
 # Group ARB_fragment_program
 arb_fragment_program = Group()
