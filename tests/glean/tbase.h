@@ -106,6 +106,8 @@ and tbasic.cpp.
 #ifndef __tbase_h__
 #define __tbase_h__
 
+#include "glew.h"
+
 #ifdef __UNIX__
 #include <unistd.h>
 #endif
@@ -308,6 +310,10 @@ public:
 				if (!ws.makeCurrent(rc, w)) {
 					// XXX need to throw exception here
 				}
+
+				// Make sure glew is initialized so we can call
+				// GL functions safely.
+				glewInit();
 
 				// Check if test is applicable to this context
 				if (!isApplicable())
