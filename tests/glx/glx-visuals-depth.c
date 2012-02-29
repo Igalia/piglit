@@ -50,6 +50,7 @@ draw(Display *dpy, GLXFBConfig config)
 	float *left, *right;
 	bool pass = true;
 
+	glewInit();
 	glXGetFBConfigAttrib(dpy, config, GLX_DEPTH_SIZE, &dbits);
 
 	piglit_ortho_projection(piglit_width, piglit_height, false);
