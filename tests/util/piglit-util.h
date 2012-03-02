@@ -104,11 +104,7 @@ int asprintf(char **strp, const char *fmt, ...)
 #  define NAN (INFINITY - INFINITY)
 #endif
 
-#ifdef _WIN32
-#  define piglit_get_proc_address(x) wglGetProcAddress(x)
-#else
-#  define piglit_get_proc_address(x) glutGetProcAddress(x)
-#endif
+#define piglit_get_proc_address(x) piglit_dispatch_resolve_function(x)
 
 enum piglit_result {
 	PIGLIT_PASS,

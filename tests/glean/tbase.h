@@ -106,7 +106,7 @@ and tbasic.cpp.
 #ifndef __tbase_h__
 #define __tbase_h__
 
-#include "glew.h"
+#include "piglit-dispatch.h"
 
 #ifdef __UNIX__
 #include <unistd.h>

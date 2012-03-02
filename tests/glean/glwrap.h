@@ -48,7 +48,7 @@
 #ifndef __glwrap_h__
 #define __glwrap_h__
 
-#include "../util/glew.h"
+#include "../util/piglit-dispatch.h"
 
 #if defined(__WIN__)
 #  include <windows.h>

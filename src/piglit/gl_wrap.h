@@ -43,17 +43,7 @@ extern "C" {
 #endif
 
 #if defined(USE_OPENGL)
-#	include "glew.h"
-	/* Include the real headers too, in case GLEW misses something. */
-#	ifdef __APPLE__
-#		include <OpenGL/gl.h>
-#		include <OpenGL/glu.h>
-#		include <OpenGL/glext.h>
-#	else
-#		include <GL/gl.h>
-#		include <GL/glu.h>
-#		include <GL/glext.h>
-#	endif
+#	include "piglit-dispatch.h"
 
 #elif defined(USE_OPENGL_ES1)
 #	include <GLES/gl.h>
