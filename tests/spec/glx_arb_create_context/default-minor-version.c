@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 	}
 
 	glXMakeContextCurrent(dpy, glxWin, glxWin, ctx);
+	glewInit();
 
 	version_string = (char *) glGetString(GL_VERSION);
 
