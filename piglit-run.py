@@ -52,6 +52,7 @@ Options:
   -n name, --name=name      Name of the testrun
   -c bool, --concurrent=bool  Enable/disable concurrent test runs. Valid
 			      option values are: 0, 1, on, off.  (default: on)
+  --valgrind                Run tests in valgrind's memcheck.
 Example:
   %(progName)s tests/all.tests results/all
          Run all tests, store the results in the directory results/all
@@ -78,6 +79,7 @@ def main():
 			 "help",
 			 "dry-run",
 			 "resume",
+			 "valgrind",
 			 "tests=",
 			 "name=",
 			 "exclude-tests=",
@@ -99,6 +101,8 @@ def main():
 			env.execute = False
 		elif name in ('-r', '--resume'):
 			OptionResume = True
+		elif name in ('--valgrind'):
+			env.valgrind = True
 		elif name in ('-t', '--tests'):
 			test_filter.append(value)
 			env.filter.append(re.compile(value))

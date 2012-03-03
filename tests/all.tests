@@ -2140,32 +2140,3 @@ profile.tests['glx'] = glx
 for test_path in blacklist:
     profile.remove_test(test_path)
 
-class ValgrindExecTest(PlainExecTest):
-	def __init__(self, test):
-		Test.__init__(self, test.runConcurrent)
-		self.orig_test = test
-		self.env = {}
-		if 'PIGLIT_TEST' in test.env:
-			self.env['PIGLIT_TEST'] = test.env['PIGLIT_TEST']
-
-	def run(self):
-		orig_command = self.orig_test.command
-		if orig_command is None:
-			assert(self.orig_test.result is not None)
-			assert(self.orig_test.result['result'] == 'fail')
-			return self.orig_test.result
-		self.command = [testsDir + '/valgrind-test/valgrind-test'] + orig_command
-		return PlainExecTest.run(self)
-
-valgrind = Group()
-for groupname, group in sorted(profile.tests.iteritems()):
-	for testname, test in sorted(group.iteritems()):
-		if issubclass(test.__class__, PlainExecTest) or issubclass(test.__class__, GleanTest):
-			valgrind[groupname+"/"+testname] = ValgrindExecTest(test)
-
-		if issubclass(test.__class__, Group):
-			for subtestname, subtest in sorted(test.iteritems()):
-				if issubclass(subtest.__class__, PlainExecTest) or issubclass(subtest.__class__, GleanTest):
-					valgrind[groupname+"/"+testname+"/"+subtestname] = ValgrindExecTest(subtest)
-
-profile.tests['valgrind'] = valgrind

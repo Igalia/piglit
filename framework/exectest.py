@@ -44,14 +44,18 @@ class ExecTest(Test):
 		raise NotImplementedError
 		return out
 
-	def run(self):
+	def run(self, valgrind):
 		fullenv = os.environ.copy()
 		for e in self.env:
 			fullenv[e] = str(self.env[e])
 
 		if self.command is not None:
+			command = self.command
+			if valgrind:
+				command[:0] = ['valgrind', '--quiet', '--error-exitcode=1', '--tool=memcheck']
+
 			proc = subprocess.Popen(
-				self.command,
+				command,
 				stdout=subprocess.PIPE,
 				stderr=subprocess.PIPE,
 				env=fullenv,
@@ -97,6 +101,18 @@ class ExecTest(Test):
 				results['result'] = 'crash'
 			elif proc.returncode != 0:
 				results['note'] = 'Returncode was %d' % (proc.returncode)
+
+			if valgrind:
+				# If the underlying test failed, simply report
+				# 'skip' for this valgrind test.
+				if results['result'] != 'pass':
+					results['result'] = 'skip'
+				elif proc.returncode == 0:
+					# Test passes and is valgrind clean.
+					results['result'] = 'pass'
+				else:
+					# Test passed but has valgrind errors.
+					results['result'] = 'fail'
 
 			env = ''
 			for key in self.env:

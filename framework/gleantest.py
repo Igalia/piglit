@@ -49,9 +49,9 @@ class GleanTest(ExecTest):
 
 		self.name = name
 
-	def run(self):
+	def run(self, valgrind):
                 self.command += GleanTest.globalParams
-                return ExecTest.run(self)
+                return ExecTest.run(self, valgrind)
 
 	def interpretResult(self, out, results):
 		if out.find('FAIL') >= 0:

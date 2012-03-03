@@ -373,6 +373,7 @@ class Environment:
 		self.filter = []
 		self.exclude_filter = []
 		self.exclude_tests = set()
+		self.valgrind = False
 
 	def run(self, command):
 		try:
@@ -432,7 +433,7 @@ class Test:
 			try:
 				status("running")
 				time_start = time.time()
-				result = self.run()
+				result = self.run(env.valgrind)
 				time_end = time.time()
 				if 'time' not in result:
 					result['time'] = time_end - time_start
