@@ -45,6 +45,8 @@ static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
 #define TEX_WIDTH 128
 #define TEX_HEIGHT 128
 
+#define DO_BLEND 1
+
 
 /**
  * Make a simple texture image where red increases from left to right,
@@ -299,10 +301,17 @@ compute_expected_color(const struct format_desc *fmt,
 	}
 
 	/* compute texel color blended with background color */
+#if DO_BLEND
 	expected[0] = texel[0] * texel[3] + clearColor[0] * (1.0 - texel[3]);
 	expected[1] = texel[1] * texel[3] + clearColor[1] * (1.0 - texel[3]);
 	expected[2] = texel[2] * texel[3] + clearColor[2] * (1.0 - texel[3]);
 	expected[3] = texel[3] * texel[3] + clearColor[3] * (1.0 - texel[3]);
+#else
+        expected[0] = texel[0];
+        expected[1] = texel[1];
+        expected[2] = texel[2];
+        expected[3] = texel[3];
+#endif
 
 	assert(expected[0] == expected[0]);
 
@@ -365,7 +374,9 @@ test_format(const struct test_desc *test,
 
 		/* Draw with the texture */
 		glEnable(GL_TEXTURE_2D);
+#if DO_BLEND
 		glEnable(GL_BLEND);
+#endif
 		piglit_draw_rect_tex(x, y, w, h,  0.0, 0.0, 1.0, 1.0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
@@ -384,7 +395,9 @@ test_format(const struct test_desc *test,
 			assert(!glIsEnabled(GL_TEXTURE_2D));
 			/* Draw the texture image */
 			glWindowPos2iARB(x, y);
+#if DO_BLEND
 			glEnable(GL_BLEND);
+#endif
 			assert(!glIsEnabled(GL_TEXTURE_2D));
 			glDrawPixels(w, h, GL_RGBA, GL_FLOAT, readback);
 			glDisable(GL_BLEND);
