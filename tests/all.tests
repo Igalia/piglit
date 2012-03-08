@@ -1124,6 +1124,8 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
 arb_texture_buffer_object = Group()
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
 arb_texture_buffer_object['minmax'] = concurrent_test('arb_texture_buffer_object-minmax')
+arb_texture_buffer_object['negative-bad-bo'] = concurrent_test('arb_texture_buffer_object-negative-bad-bo')
+arb_texture_buffer_object['negative-bad-target'] = concurrent_test('arb_texture_buffer_object-negative-bad-target')
 
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
