@@ -669,6 +669,7 @@ add_plain_test(texturing, 'gen-nonzero-unit')
 add_plain_test(texturing, 'gen-texsubimage')
 add_plain_test(texturing, 'getteximage-formats')
 add_plain_test(texturing, 'getteximage-simple')
+add_plain_test(texturing, 'getteximage-luminance')
 
 texturing['incomplete-texture-fixed'] = concurrent_test('incomplete-texture -auto fixed')
 texturing['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
