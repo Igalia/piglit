@@ -976,6 +976,15 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
 spec['glsl-1.30']['api'] = Group()
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
+# Group spec/glsl-1.40
+spec['glsl-1.40'] = Group()
+import_glsl_parser_tests(spec['glsl-1.40'],
+			 os.path.join(testsDir, 'spec', 'glsl-1.40'),
+			 ['compiler'])
+add_shader_test_dir(spec['glsl-1.40'],
+	            os.path.join(testsDir, 'spec', 'glsl-1.40'),
+		    recursive=True)
+
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
 import_glsl_parser_tests(spec['AMD_conservative_depth'],

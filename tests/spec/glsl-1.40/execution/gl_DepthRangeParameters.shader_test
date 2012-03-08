@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.40
+
+[vertex shader]
+#version 140
+
+in vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 140
+
+void main()
+{
+	float a = gl_DepthRange.near / 2 + 0.25;
+	float b = gl_DepthRange.far / 2 + 0.25;
+	float c = gl_DepthRange.diff / 2 + 0.25;
+
+	gl_FragColor = vec4(a, b, c, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.25 0.75 0.75 1.0
