@@ -9774,7 +9774,6 @@ IsProgramARB(program)
 	version		1.3
 	extension	soft WINSOFT NV10
 	glxvendorpriv	1304
-	alias		IsProgram
 
 
 ###############################################################################
@@ -20620,7 +20619,6 @@ GetVertexAttribdvNV(index, pname, params)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxvendorpriv	1301
-	alias		GetVertexAttribdv
 
 GetVertexAttribfvNV(index, pname, params)
 	return		void
@@ -20632,7 +20630,6 @@ GetVertexAttribfvNV(index, pname, params)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxvendorpriv	1302
-	alias		GetVertexAttribfv
 
 GetVertexAttribivNV(index, pname, params)
 	return		void
@@ -20644,7 +20641,6 @@ GetVertexAttribivNV(index, pname, params)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxvendorpriv	1303
-	alias		GetVertexAttribiv
 
 GetVertexAttribPointervNV(index, pname, pointer)
 	return		void
@@ -20666,7 +20662,7 @@ IsProgramNV(id)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxvendorpriv	1304
-	alias		IsProgram
+	alias		IsProgramARB
 
 LoadProgramNV(target, id, len, program)
 	return		void
@@ -20874,7 +20870,6 @@ VertexAttrib1dNV(index, x)
 	version		1.2
 	vectorequiv	VertexAttrib1dvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib1d
 
 VertexAttrib1dvNV(index, v)
 	return		void
@@ -20884,7 +20879,6 @@ VertexAttrib1dvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4197
-	alias		VertexAttrib1dv
 
 VertexAttrib1fNV(index, x)
 	return		void
@@ -20894,7 +20888,6 @@ VertexAttrib1fNV(index, x)
 	version		1.2
 	vectorequiv	VertexAttrib1fvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib1f
 
 VertexAttrib1fvNV(index, v)
 	return		void
@@ -20904,7 +20897,6 @@ VertexAttrib1fvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4193
-	alias		VertexAttrib1fv
 
 VertexAttrib1sNV(index, x)
 	return		void
@@ -20914,7 +20906,6 @@ VertexAttrib1sNV(index, x)
 	version		1.2
 	vectorequiv	VertexAttrib1svNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib1s
 
 VertexAttrib1svNV(index, v)
 	return		void
@@ -20924,7 +20915,6 @@ VertexAttrib1svNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4189
-	alias		VertexAttrib1sv
 
 VertexAttrib2dNV(index, x, y)
 	return		void
@@ -20935,7 +20925,6 @@ VertexAttrib2dNV(index, x, y)
 	version		1.2
 	vectorequiv	VertexAttrib2dvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib2d
 
 VertexAttrib2dvNV(index, v)
 	return		void
@@ -20945,7 +20934,6 @@ VertexAttrib2dvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4198
-	alias		VertexAttrib2dv
 
 VertexAttrib2fNV(index, x, y)
 	return		void
@@ -20956,7 +20944,6 @@ VertexAttrib2fNV(index, x, y)
 	version		1.2
 	vectorequiv	VertexAttrib2fvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib2f
 
 VertexAttrib2fvNV(index, v)
 	return		void
@@ -20966,7 +20953,6 @@ VertexAttrib2fvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4194
-	alias		VertexAttrib2fv
 
 VertexAttrib2sNV(index, x, y)
 	return		void
@@ -20977,7 +20963,6 @@ VertexAttrib2sNV(index, x, y)
 	version		1.2
 	vectorequiv	VertexAttrib2svNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib2s
 
 VertexAttrib2svNV(index, v)
 	return		void
@@ -20987,7 +20972,6 @@ VertexAttrib2svNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4190
-	alias		VertexAttrib2sv
 
 VertexAttrib3dNV(index, x, y, z)
 	return		void
@@ -20999,7 +20983,6 @@ VertexAttrib3dNV(index, x, y, z)
 	version		1.2
 	vectorequiv	VertexAttrib3dvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib3d
 
 VertexAttrib3dvNV(index, v)
 	return		void
@@ -21009,7 +20992,6 @@ VertexAttrib3dvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4199
-	alias		VertexAttrib3dv
 
 VertexAttrib3fNV(index, x, y, z)
 	return		void
@@ -21021,7 +21003,6 @@ VertexAttrib3fNV(index, x, y, z)
 	version		1.2
 	vectorequiv	VertexAttrib3fvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib3f
 
 VertexAttrib3fvNV(index, v)
 	return		void
@@ -21031,7 +21012,6 @@ VertexAttrib3fvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4195
-	alias		VertexAttrib3fv
 
 VertexAttrib3sNV(index, x, y, z)
 	return		void
@@ -21043,7 +21023,6 @@ VertexAttrib3sNV(index, x, y, z)
 	version		1.2
 	vectorequiv	VertexAttrib3svNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib3s
 
 VertexAttrib3svNV(index, v)
 	return		void
@@ -21053,7 +21032,6 @@ VertexAttrib3svNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4191
-	alias		VertexAttrib3sv
 
 VertexAttrib4dNV(index, x, y, z, w)
 	return		void
@@ -21066,7 +21044,6 @@ VertexAttrib4dNV(index, x, y, z, w)
 	version		1.2
 	vectorequiv	VertexAttrib4dvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib4d
 
 VertexAttrib4dvNV(index, v)
 	return		void
@@ -21076,7 +21053,6 @@ VertexAttrib4dvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4200
-	alias		VertexAttrib4dv
 
 VertexAttrib4fNV(index, x, y, z, w)
 	return		void
@@ -21089,7 +21065,6 @@ VertexAttrib4fNV(index, x, y, z, w)
 	version		1.2
 	vectorequiv	VertexAttrib4fvNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib4f
 
 VertexAttrib4fvNV(index, v)
 	return		void
@@ -21099,7 +21074,6 @@ VertexAttrib4fvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4196
-	alias		VertexAttrib4fv
 
 VertexAttrib4sNV(index, x, y, z, w)
 	return		void
@@ -21112,7 +21086,6 @@ VertexAttrib4sNV(index, x, y, z, w)
 	version		1.2
 	vectorequiv	VertexAttrib4svNV
 	extension	soft WINSOFT NV10
-	alias		VertexAttrib4s
 
 VertexAttrib4svNV(index, v)
 	return		void
@@ -21122,7 +21095,6 @@ VertexAttrib4svNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4192
-	alias		VertexAttrib4sv
 
 VertexAttrib4ubNV(index, x, y, z, w)
 	return		void
@@ -21135,7 +21107,6 @@ VertexAttrib4ubNV(index, x, y, z, w)
 	version		1.2
 	extension	soft WINSOFT NV10
 	vectorequiv	VertexAttrib4ubvNV
-	alias		VertexAttrib4Nub
 
 VertexAttrib4ubvNV(index, v)
 	return		void
@@ -21145,7 +21116,6 @@ VertexAttrib4ubvNV(index, v)
 	version		1.2
 	extension	soft WINSOFT NV10
 	glxropcode	4201
-	alias		VertexAttrib4Nubv
 
 VertexAttribs1dvNV(index, count, v)
 	return		void
@@ -23341,7 +23311,7 @@ GenVertexArraysAPPLE(n, arrays)
 	extension
 	glxropcode	?
 	glxflags	ignore
-	alias		GenVertexArray
+	alias		GenVertexArrays
 
 IsVertexArrayAPPLE(array)
 	return		Boolean
@@ -24241,7 +24211,6 @@ StencilFuncSeparateATI(frontfunc, backfunc, ref, mask)
 	extension
 	glxropcode	?
 	glxflags	ignore
-	alias		StencilFuncSeparate
 
 ###############################################################################
 #
@@ -26066,7 +26035,6 @@ TransformFeedbackVaryingsNV(program, count, locations, bufferMode)
 	glxflags	ignore
 	glfflags	ignore
 	extension	soft WINSOFT
-	alias		TransformFeedbackVaryings
 
 ActiveVaryingNV(program, name)
 	return		void
@@ -26117,7 +26085,6 @@ GetTransformFeedbackVaryingNV(program, index, location)
 	extension	soft WINSOFT
 	glfflags	ignore
 	glxflags	ignore
-	alias		GetTransformFeedbackVarying
 
 # These commands require ARB_transform_feedback3
 

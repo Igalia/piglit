@@ -271,7 +271,7 @@ passthru: /* AttribMask */
 	LIST_BIT					= 0x00020000	# AttribMask
 	TEXTURE_BIT					= 0x00040000	# AttribMask
 	SCISSOR_BIT					= 0x00080000	# AttribMask
-	ALL_ATTRIB_BITS					= 0xFFFFFFFF	# AttribMask
+	ALL_ATTRIB_BITS					= 0x000FFFFF	# AttribMask
 passthru: /* ClientAttribMask */
 	CLIENT_PIXEL_STORE_BIT				= 0x00000001	# ClientAttribMask
 	CLIENT_VERTEX_ARRAY_BIT				= 0x00000002	# ClientAttribMask
