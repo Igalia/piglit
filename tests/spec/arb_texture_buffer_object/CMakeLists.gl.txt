@@ -13,4 +13,5 @@ link_libraries (
 
 add_executable (arb_texture_buffer_object-minmax minmax.c)
 add_executable (arb_texture_buffer_object-negative-bad-bo negative-bad-bo.c)
+add_executable (arb_texture_buffer_object-negative-bad-format negative-bad-format.c)
 add_executable (arb_texture_buffer_object-negative-bad-target negative-bad-target.c)
