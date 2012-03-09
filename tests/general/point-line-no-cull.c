@@ -37,17 +37,23 @@ int piglit_width = 120, piglit_height = 120;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 
-/** test if the pixel at (x,y) is black */
+/** Test if the pixels at (x,y) and (x,y+1) are black.
+ * We test two pixels to be sure we hit the primitive we drew.  We could
+ * be off by one and miss the line if it's only one pixel wide otherwise.
+ */
 static GLboolean
 black_pixel(float x, float y)
 {
-   GLfloat pixel[4];
+   GLfloat pixel[2][3];
 
-   glReadPixels((int) x, (int) y, 1, 1, GL_RGB, GL_FLOAT, pixel);
+   glReadPixels((int) x, (int) (y-0.5), 1, 2, GL_RGB, GL_FLOAT, pixel);
 
-   if (pixel[0] == 0.0 &&
-       pixel[1] == 0.0 &&
-       pixel[2] == 0.0)
+   if (pixel[0][0] == 0.0 &&
+       pixel[0][1] == 0.0 &&
+       pixel[0][2] == 0.0 &&
+       pixel[1][0] == 0.0 &&
+       pixel[1][1] == 0.0 &&
+       pixel[2][2] == 0.0)
       return GL_TRUE;
    else
       return GL_FALSE;
