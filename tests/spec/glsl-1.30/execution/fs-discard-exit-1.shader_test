@@ -1,0 +1,49 @@
+# This is a simple test for exiting the shader on discard.  See
+# fs-discard-exit-2.c for a more complete test.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 vertex;
+void main()
+{
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 130
+uniform int inc;
+uniform bool disc;
+
+void main()
+{
+	if (disc)
+		discard;
+
+	gl_FragColor = vec4(0.0);
+
+	/* Should not execute, but would infinite loop if it did. */
+	for (int i = 0; i < 10; i += inc) {
+		gl_FragColor += 0.1;
+	}
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0.0 1.0 0.0 0.0
+clear
+
+uniform int inc 0
+uniform int disc 1
+
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 0.0

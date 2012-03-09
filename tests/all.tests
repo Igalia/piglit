@@ -972,6 +972,7 @@ for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
 spec['glsl-1.30']['execution']['clipping']['clip-plane-transformation pos'] = \
     concurrent_test('clip-plane-transformation pos')
 spec['glsl-1.30']['texel-offset-limits'] = concurrent_test('glsl-1.30-texel-offset-limits')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-discard-exit-2')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-beginend')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawarrays')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
