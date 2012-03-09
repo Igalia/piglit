@@ -94,6 +94,22 @@ else ()
 	add_definitions (-D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
 endif ()
 
+if (MINGW)
+	# Avoid depending on MinGW runtime DLLs
+	check_cxx_compiler_flag (-static-libgcc HAVE_STATIC_LIBGCC_FLAG)
+	if (HAVE_STATIC_LIBGCC_FLAG)
+		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
+		set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
+		set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -static-libgcc")
+	endif ()
+	check_cxx_compiler_flag (-static-libstdc++ HAVE_STATIC_LIBSTDCXX_FLAG)
+	if (HAVE_STATIC_LIBSTDCXX_FLAG)
+		set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++")
+		set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
+		set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -static-libstdc++")
+	endif ()
+endif ()
+
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)
