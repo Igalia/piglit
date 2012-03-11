@@ -16,13 +16,6 @@ set(UTIL_SOURCES
 	sized-internalformats.c
 	)
 
-# glew.c is copied verbatim from upstream and has C99 on MacOSX so silent the warnings
-if (C_COMPILER_FLAG_WDECL_AFTER_STMT)
-	set_property (SOURCE glew.c
-		PROPERTY COMPILE_FLAGS -Wno-declaration-after-statement
-	)
-endif ()
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# XXX: This is currently duplicated wherever tests
 	# include "piglit-glx-util.h". Is it possible to refactor it?

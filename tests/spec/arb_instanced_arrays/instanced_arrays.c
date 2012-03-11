@@ -162,10 +162,6 @@ piglit_init(int argc, char **argv)
    piglit_require_GLSL();
    piglit_require_extension("GL_ARB_instanced_arrays");
 
-   /* Workaround a GLEW bug: */
-   glDrawArraysInstancedARB = (PFNGLDRAWARRAYSINSTANCEDARBPROC)piglit_get_proc_address("glDrawArraysInstancedARB");
-   glDrawElementsInstancedARB = (PFNGLDRAWELEMENTSINSTANCEDARBPROC)piglit_get_proc_address("glDrawElementsInstancedARB");
-
    VertShader = piglit_compile_shader_text(GL_VERTEX_SHADER, VertShaderText);
    assert(VertShader);
 
