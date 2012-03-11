@@ -15,6 +15,11 @@ find_package(PNG REQUIRED)
 find_package(X11)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	option(BUILD_GLX_TESTS "Build tests that require GLX" ON)
+ELSE()
+	option(BUILD_GLX_TESTS "Build tests that require GLX" OFF)
+ENDIF()
+IF(BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 

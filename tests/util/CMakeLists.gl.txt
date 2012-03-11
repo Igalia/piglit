@@ -16,7 +16,7 @@ set(UTIL_SOURCES
 	sized-internalformats.c
 	)
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+IF(BUILD_GLX_TESTS)
 	# XXX: This is currently duplicated wherever tests
 	# include "piglit-glx-util.h". Is it possible to refactor it?
 	include_directories(
@@ -40,7 +40,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		${UTIL_SOURCES}
 		piglit-glx-util.c
 	)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ENDIF(BUILD_GLX_TESTS)
 
 piglit_add_library (piglitutil
 	${UTIL_SOURCES}

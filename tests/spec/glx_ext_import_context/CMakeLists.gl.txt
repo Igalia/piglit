@@ -13,7 +13,7 @@ link_libraries (
 	${X11_X11_LIB}
 )
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+IF(BUILD_GLX_TESTS)
 	include_directories(
 		${GLPROTO_INCLUDE_DIRS}
 	)
@@ -26,6 +26,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	piglit_add_executable (glx-make-current-multi-process make-current-multi-process.c common.c)
 	piglit_add_executable (glx-make-current-single-process make-current-single-process.c common.c)
 	piglit_add_executable (glx-query-context-info-ext query-context-info.c common.c)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ENDIF(BUILD_GLX_TESTS)
 
 # vim: ft=cmake:

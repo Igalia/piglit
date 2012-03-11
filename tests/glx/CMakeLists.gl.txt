@@ -13,7 +13,7 @@ link_libraries (
 	${X11_X11_LIB}
 )
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+IF(BUILD_GLX_TESTS)
 	include_directories(
 		${GLPROTO_INCLUDE_DIRS}
 	)
@@ -61,6 +61,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 	piglit_add_executable (glx-copy-sub-buffer glx-copy-sub-buffer.c)
 	piglit_add_executable (glx-query-drawable glx-query-drawable.c)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ENDIF(BUILD_GLX_TESTS)
 
 # vim: ft=cmake:
