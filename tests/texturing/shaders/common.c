@@ -53,6 +53,7 @@ upload_miplevel_data(GLenum target, int level, void *level_image)
 			     0, format, data_type, level_image);
 		break;
 	case GL_TEXTURE_2D:
+	case GL_TEXTURE_RECTANGLE:
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
@@ -120,6 +121,9 @@ compute_miplevel_info()
 		max_dimension = max2(base_size[0], base_size[1]);
 
 	miplevels = (int) log2f(max_dimension) + 1;
+
+	if (sampler.target == GL_TEXTURE_RECTANGLE)
+		miplevels = 1;
 
 	/* Compute the size of each miplevel */
 	level_size = malloc(miplevels * sizeof(int *));

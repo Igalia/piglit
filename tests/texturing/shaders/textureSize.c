@@ -151,8 +151,11 @@ generate_texture()
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (target != GL_TEXTURE_RECTANGLE) {
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -176,10 +179,16 @@ generate_GLSL(enum shader_target test_stage)
 
 	static char *vs_code;
 	static char *fs_code;
-
+	char *lod_arg;
 	static const char *zeroes[3] = { "", "0, ", "0, 0, " };
 
 	const int size = sampler_size();
+
+	/* The GLSL 1.40 sampler2DRect samplers don't take a lod argument. */
+	if (sampler.target == GL_TEXTURE_RECTANGLE)
+		lod_arg = "";
+	else
+		lod_arg = ", lod";
 
 	switch (test_stage) {
 	case VS:
@@ -192,10 +201,10 @@ generate_GLSL(enum shader_target test_stage)
 			 "flat out ivec%d size;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    size = textureSize(tex, lod);\n"
+			 "    size = textureSize(tex%s);\n"
 			 "    gl_Position = vertex;\n"
 			 "}\n",
-			 shader_version, sampler.name, size);
+			 shader_version, sampler.name, size, lod_arg);
 		asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
@@ -223,10 +232,11 @@ generate_GLSL(enum shader_target test_stage)
 			 "uniform %s tex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    ivec%d size = textureSize(tex, lod);\n"
+			 "    ivec%d size = textureSize(tex%s);\n"
 			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
-			 shader_version, sampler.name, size, zeroes[3 - size]);
+			 shader_version, sampler.name, size, lod_arg,
+			 zeroes[3 - size]);
 		break;
 	default:
 		assert(!"Should not get here.");
@@ -286,8 +296,7 @@ piglit_init(int argc, char **argv)
 		fail_and_show_usage();
 
 	/* Not implemented yet */
-	assert(sampler.target != GL_TEXTURE_CUBE_MAP_ARRAY &&
-	       sampler.target != GL_TEXTURE_RECTANGLE);
+	assert(sampler.target != GL_TEXTURE_CUBE_MAP_ARRAY);
 
 	require_GL_features(test_stage);
 
