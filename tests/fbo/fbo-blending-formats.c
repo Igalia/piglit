@@ -136,20 +136,23 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
 				 GL_TEXTURE_BLUE_SIZE, &b);
 
+	/* Compute expected result colors when reading back from a texture/FBO */
         if (i) {
-		res0[3] = res0[2] = res0[1] = res0[0];
-		res1[3] = res1[2] = res1[1] = res1[0];
-		res2[3] = res2[2] = res2[1] = res2[0];
-		res3[3] = res3[2] = res3[1] = res3[0];
-		res4[3] = res4[2] = res4[1] = res4[0] = res4i;
-		res5[3] = res5[2] = res5[1] = res5[0];
+		/* expected result = (I, 0, 0, 1) */
+		res0[1] = res0[2] = 0.0;   res0[3] = 1.0;
+		res1[1] = res1[2] = 0.0;   res1[3] = 1.0;
+		res2[1] = res2[2] = 0.0;   res2[3] = 1.0;
+		res3[1] = res3[2] = 0.0;   res3[3] = 1.0;
+		res4[1] = res4[2] = 0.0;   res4[3] = 1.0;   res4[0] = res4i;
+		res5[1] = res5[2] = 0.0;   res5[3] = 1.0;
 	} else if (l) {
-		res0[2] = res0[1] = res0[0];
-		res1[2] = res1[1] = res1[0];
-		res2[2] = res2[1] = res2[0];
-		res3[2] = res3[1] = res3[0];
-		res4[2] = res4[1] = res4[0];
-		res5[2] = res5[1] = res5[0];
+		/* expected result = (L, 0, 0, A) */
+		res0[1] = res0[2] = 0.0;
+		res1[1] = res1[2] = 0.0;
+		res2[1] = res2[2] = 0.0;
+		res3[1] = res3[2] = 0.0;
+		res4[1] = res4[2] = 0.0;
+		res5[1] = res5[2] = 0.0;
 		if (!a) {
 			res0[3] = 1;
 			res1[3] = 1;
@@ -295,6 +298,27 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	if (!pass) {
 		glutSwapBuffers();
 		return PIGLIT_FAIL;
+	}
+
+	/* Compute expected result colors when reading back from the window */
+        if (i) {
+		/* expected result = (I, I, I, I) */
+		res0[3] = res0[2] = res0[1] = res0[0];
+		res1[3] = res1[2] = res1[1] = res1[0];
+		res2[3] = res2[2] = res2[1] = res2[0];
+		res3[3] = res3[2] = res3[1] = res3[0];
+		res4[3] = res4[2] = res4[1] = res4[0] = res4i;
+		res5[3] = res5[2] = res5[1] = res5[0];
+	} else if (l) {
+		/* expected result = (L, L, L, A) */
+		res0[2] = res0[1] = res0[0];
+		res1[2] = res1[1] = res1[0];
+		res2[2] = res2[1] = res2[0];
+		res3[2] = res3[1] = res3[0];
+		res4[2] = res4[1] = res4[0];
+		res5[2] = res5[1] = res5[0];
+	} else {
+		/* leave 'res' colors as-is from above */
 	}
 
 	if (!piglit_probe_pixel_rgba(piglit_width * 1 / 12, 0, res0)) {
