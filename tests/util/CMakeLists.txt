@@ -1,6 +1,7 @@
 add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
 
 include_directories(
+	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
