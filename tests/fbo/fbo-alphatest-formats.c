@@ -75,6 +75,10 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
             baseformat == GL_DEPTH_STENCIL)
 		return PIGLIT_SKIP;
 
+	/*
+	 * Check alpha test using an FBO that contains/wraps a texture.
+	 */
+
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 	glViewport(0, 0, piglit_width, piglit_height);
@@ -100,14 +104,17 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
 				 GL_TEXTURE_BLUE_SIZE, &b);
 
+	/* Set up expected colors for testing the pass and fail cases.
+	 * We're using glReadPixels from the texture.
+	 */
         if (i) {
-		/* GL_INTENSITY format */
-		cpass[3] = cpass[2] = cpass[1] = cpass[0];
-		cfail[3] = cfail[2] = cfail[1] = cfail[0];
+		/* GL_INTENSITY texture:  result = (I,0,0,0) */
+		cpass[3] = cpass[2] = cpass[1] = 0;
+		cfail[3] = cfail[2] = cfail[1] = 0;
         } else if (l) {
-		/* GL_LUMINANCE format */
-		cpass[2] = cpass[1] = cpass[0];
-		cfail[2] = cfail[1] = cfail[0];
+		/* GL_LUMINANCE texture:  result = (L,0,0,A) */
+		cpass[2] = cpass[1] = 0;
+		cfail[2] = cfail[1] = 0;
 		if (!a) {
 			cpass[3] = 1;
 			cfail[3] = 1;
@@ -216,6 +223,10 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 		pass = GL_FALSE;
 	}
 
+
+	/*
+	 * Now check alpha test using the window buffer.
+	 */
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, piglit_width, piglit_height);
 
@@ -236,6 +247,28 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	if (!pass) {
 		glutSwapBuffers();
 		return PIGLIT_FAIL;
+	}
+
+	/* Set up expected colors for testing the pass and fail cases.
+	 * These are the colors we expect to see with glReadPixels from the window.
+	 * The colors are different than above for the intensity/luminance cases
+	 * because here we're actually sampling from the texture.
+	 */
+        if (i) {
+		/* GL_INTENSITY texture: RGBA=(I,I,I,I) */
+		cpass[3] = cpass[2] = cpass[1] = cpass[0];
+		cfail[3] = cfail[2] = cfail[1] = cfail[0];
+        } else if (l) {
+		/* GL_LUMINANCE texture: RGBA=(L,L,L,A) */
+		cpass[2] = cpass[1] = cpass[0];
+		cfail[2] = cfail[1] = cfail[0];
+		if (!a) {
+			cpass[3] = 1;
+			cfail[3] = 1;
+		}
+	}
+	else {
+		/* same R,G,B,A that we computed above */
 	}
 
 	if (!piglit_probe_pixel_rgb_silent(piglit_width * 1 / 16, 0, cpass, NULL)) {
