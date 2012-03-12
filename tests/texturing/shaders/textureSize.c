@@ -220,6 +220,10 @@ generate_GLSL(enum shader_target test_stage)
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
+
+	if (!vs || !fs)
+		return 0;
+
 	return piglit_link_simple_program(vs, fs);
 }
 
@@ -268,6 +272,8 @@ piglit_init(int argc, char **argv)
 	require_GL_features(test_stage);
 
 	prog = generate_GLSL(test_stage);
+	if (!prog)
+		piglit_report_result(PIGLIT_FAIL);
 
 	tex_location = piglit_GetUniformLocation(prog, "tex");
 	lod_location = piglit_GetUniformLocation(prog, "lod");
