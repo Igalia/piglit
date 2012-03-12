@@ -81,6 +81,7 @@ struct sampler_info
 
 /** Whether or not we're using GL_EXT_texture_swizzle */
 bool swizzling;
+extern int shader_version;
 
 /**
  * Which shader stage to test

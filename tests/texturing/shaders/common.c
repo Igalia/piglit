@@ -28,6 +28,8 @@
  */
 #include "common.h"
 
+int shader_version = 130;
+
 /**
  * Load a miplevel's texel data via glTexImage.
  *
@@ -265,7 +267,7 @@ require_GL_features(enum shader_target test_stage)
 {
 	int tex_units;
 
-	piglit_require_GLSL_version(130);
+	piglit_require_GLSL_version(shader_version);
 
 	if (swizzling)
 		piglit_require_extension("GL_EXT_texture_swizzle");

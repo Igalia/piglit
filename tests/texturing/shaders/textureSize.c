@@ -50,6 +50,7 @@ int piglit_width = 150, piglit_height = 30;
 int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
 
 static int lod_location;
+static int vertex_location;
 
 /**
  * Returns the number of components expected from textureSize().
@@ -82,9 +83,18 @@ piglit_display()
 	bool pass = true;
 	int i, l;
 	const int size = sampler_size();
+	static const float verts[] = {
+		-1, -1,
+		-1,  1,
+		 1,  1,
+		 1, -1,
+	};
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glVertexAttribPointer(vertex_location, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	glEnableVertexAttribArray(vertex_location);
 
 	/* Draw consecutive squares for each mipmap level */
 	for (l = 0; l < miplevels; l++) {
@@ -101,10 +111,12 @@ piglit_display()
 
 		piglit_Uniform1i(lod_location, l);
 		glViewport(x, 10, 10, 10);
-		piglit_draw_rect(-1, -1, 2, 2);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		pass &= piglit_probe_rect_rgba(x, 10, 10, 10, expected_color);
 	}
+
+	glDisableVertexAttribArray(vertex_location);
 
 	piglit_present_results();
 
@@ -172,19 +184,20 @@ generate_GLSL(enum shader_target test_stage)
 	switch (test_stage) {
 	case VS:
 		asprintf(&vs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
+			 "in vec4 vertex;\n"
 			 "flat out ivec%d size;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    size = textureSize(tex, lod);\n"
-			 "    gl_Position = gl_Vertex;\n"
+			 "    gl_Position = vertex;\n"
 			 "}\n",
-			 sampler.name, size);
+			 shader_version, sampler.name, size);
 		asprintf(&fs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "#define vec1 float\n"
 			 "flat in ivec%d size;\n"
@@ -192,17 +205,19 @@ generate_GLSL(enum shader_target test_stage)
 			 "{\n"
 			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
-			 size, zeroes[3 - size]);
+			 shader_version, size, zeroes[3 - size]);
 		break;
 	case FS:
 		asprintf(&vs_code,
-			 "#version 130\n"
+			 "#version %d\n"
+			 "in vec4 vertex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_Position = gl_Vertex;\n"
-			 "}\n");
+			 "    gl_Position = vertex;\n"
+			 "}\n",
+			 shader_version);
 		asprintf(&fs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
@@ -211,7 +226,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    ivec%d size = textureSize(tex, lod);\n"
 			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
-			 sampler.name, size, zeroes[3 - size]);
+			 shader_version, sampler.name, size, zeroes[3 - size]);
 		break;
 	default:
 		assert(!"Should not get here.");
@@ -230,7 +245,7 @@ generate_GLSL(enum shader_target test_stage)
 void
 fail_and_show_usage()
 {
-	printf("Usage: textureSize <vs|fs> <sampler type> [piglit args...]\n");
+	printf("Usage: textureSize [140] <vs|fs> <sampler type> [piglit args...]\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -255,6 +270,11 @@ piglit_init(int argc, char **argv)
 			}
 		}
 
+		if (strcmp(argv[i], "140") == 0) {
+			shader_version = 140;
+			continue;
+		}
+
 		/* Maybe it's the sampler type? */
 		if (!sampler_found && (sampler_found = select_sampler(argv[i])))
 			continue;
@@ -277,6 +297,7 @@ piglit_init(int argc, char **argv)
 
 	tex_location = piglit_GetUniformLocation(prog, "tex");
 	lod_location = piglit_GetUniformLocation(prog, "lod");
+	vertex_location = piglit_GetAttribLocation(prog, "vertex");
 	piglit_UseProgram(prog);
 	piglit_Uniform1i(tex_location, 0);
 
