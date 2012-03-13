@@ -45,10 +45,14 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	GLuint tex, fb;
 	GLenum status;
-	float fbo_simple1[] = {0.3, 0.3, 0.3, 0.0};
-	float fbo_simple2[] = {0.6, 0.6, 0.6, 1.0};
-	float fbo_blend1[] =  {0.4, 0.4, 0.4, 0.5};
-	float fbo_blend2[] =  {0.56, 0.56, 0.56, 0.4};
+	float fbo_simple1[] = {0.3, 0.0, 0.0, 0.0};
+	float fbo_simple2[] = {0.6, 0.0, 0.0, 1.0};
+	float fbo_blend1[] =  {0.4, 0.0, 0.0, 0.5};
+	float fbo_blend2[] =  {0.56, 0.0, 0.0, 0.4};
+	float win_simple1[] = {0.3, 0.3, 0.3, 0.0};
+	float win_simple2[] = {0.6, 0.6, 0.6, 1.0};
+	float win_blend1[] =  {0.4, 0.4, 0.4, 0.5};
+	float win_blend2[] =  {0.56, 0.56, 0.56, 0.4};
 	int fbo_width = 64;
 	int fbo_height = 64;
 
@@ -130,13 +134,13 @@ piglit_display(void)
 	glDeleteFramebuffersEXT(1, &fb);
 
 	printf("Testing window result, simple 1.\n");
-	pass = piglit_probe_pixel_rgba(piglit_width * 1 / 8, 0, fbo_simple1) && pass;
+	pass = piglit_probe_pixel_rgba(piglit_width * 1 / 8, 0, win_simple1) && pass;
 	printf("Testing window result, simple 2.\n");
-	pass = piglit_probe_pixel_rgba(piglit_width * 3 / 8, 0, fbo_simple2) && pass;
+	pass = piglit_probe_pixel_rgba(piglit_width * 3 / 8, 0, win_simple2) && pass;
 	printf("Testing window result, blending DST_ALPHA.\n");
-	pass = piglit_probe_pixel_rgba(piglit_width * 5 / 8, 0, fbo_blend1) && pass;
+	pass = piglit_probe_pixel_rgba(piglit_width * 5 / 8, 0, win_blend1) && pass;
 	printf("Testing window result, blending SRC_ALPHA.\n");
-	pass = piglit_probe_pixel_rgba(piglit_width * 7 / 8, 0, fbo_blend2) && pass;
+	pass = piglit_probe_pixel_rgba(piglit_width * 7 / 8, 0, win_blend2) && pass;
 
 	glutSwapBuffers();
 
