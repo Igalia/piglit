@@ -109,13 +109,6 @@ size_range_test(GLenum token, const char *name)
 	}
 }
 
-#if defined(_MSC_VER)
-static double log2(double x)
-{
-	return log(x) / log(2);
-}
-#endif
-
 static void
 test_oq_bits()
 {

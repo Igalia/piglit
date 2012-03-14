@@ -45,6 +45,7 @@ typedef unsigned __int64 uint64_t;
 #define bool BOOL
 #define true 1
 #define false 0
+#define log2(x) (log(x) / log(2))
 #else
 #include <stdint.h>
 #include <stdbool.h>
