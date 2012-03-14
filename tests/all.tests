@@ -1531,6 +1531,8 @@ ext_transform_feedback['position-readback-bufferoffset-discard'] = 	concurrent_t
 ext_transform_feedback['position-readback-bufferrange'] = 		concurrent_test('ext_transform_feedback-position range')
 ext_transform_feedback['position-readback-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position range discard')
 
+ext_transform_feedback['negative-prims'] = 				concurrent_test('ext_transform_feedback-negative-prims')
+
 ext_transform_feedback['position-render-bufferbase'] = 			concurrent_test('ext_transform_feedback-position render')
 ext_transform_feedback['position-render-bufferbase-discard'] = 		concurrent_test('ext_transform_feedback-position render discard')
 ext_transform_feedback['position-render-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position render offset')
