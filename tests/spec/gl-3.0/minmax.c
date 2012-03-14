@@ -44,11 +44,11 @@ static bool pass = true;
 static void
 max_test_i(GLenum token, GLint max, const char *name)
 {
-	GLint val;
+	GLint val[2];
 
-	glGetIntegerv(token, &val);
+	glGetIntegerv(token, val);
 
-	if (val > max) {
+	if (val[0] > max) {
 		fprintf(stderr, "%-50s %8d %8d (ERROR)\n",
 			name, max, val);
 		pass = false;
@@ -112,7 +112,7 @@ size_range_test(GLenum token, const char *name)
 static void
 test_oq_bits()
 {
-	GLint dims;
+	GLint dims[2];
 	GLint minbits, oqbits;
 
 	/* From the GL 3.0 specification, page 329:
@@ -134,8 +134,8 @@ test_oq_bits()
 	 *      n = min{32, log2(maxViewportWidth ∗ maxViewportHeight * 2}"
 	 */
 
-	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, &dims);
-	minbits = log2((float)dims * dims * 2);
+	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, dims);
+	minbits = log2((float)dims[0] * dims[1] * 2);
 	if (minbits > 32)
 		minbits = 32;
 
