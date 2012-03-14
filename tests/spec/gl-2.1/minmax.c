@@ -115,7 +115,7 @@ test_oq_bits()
 	 */
 
 	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, dims);
-	minbits = log2((float)dims[0] * dims[0] * 2);
+	minbits = log2((float)dims[0] * dims[1] * 2);
 	if (minbits > 32)
 		minbits = 32;
 
