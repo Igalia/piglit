@@ -748,6 +748,7 @@ def _make_componentwise_test_vectors(test_suite_dict):
     acosh_inputs = [1.0 + x for x in atan_inputs if x >= 0]
     ints = [np.int32(x) for x in [-5, -2, -1, 0, 1, 2, 5]]
     uints = [np.uint32(x) for x in [0, 1, 2, 5, 34]]
+    bools = [True, False]
     def f(name, arity, glsl_version, python_equivalent,
 	  alternate_scalar_arg_indices, test_inputs,
 	  tolerance_function = _strict_tolerance):
@@ -840,6 +841,7 @@ def _make_componentwise_test_vectors(test_suite_dict):
     f('clamp', 3, '1.30', _clamp, [1, 2], [ints, ints, ints])
     f('clamp', 3, '1.30', _clamp, [1, 2], [uints, uints, uints])
     f('mix', 3, '1.10', lambda x, y, a: x*(1-a)+y*a, [2], [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), np.linspace(0.0, 1.0, 4)])
+    f('mix', 3, '1.30', lambda x, y, a: y if a else x, None, [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), bools])
     f('step', 2, '1.10', lambda edge, x: 0.0 if x < edge else 1.0, [0], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('smoothstep', 3, '1.10', _smoothstep, [0, 1], [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
 _make_componentwise_test_vectors(test_suite)
