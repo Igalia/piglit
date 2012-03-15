@@ -1,0 +1,45 @@
+# From the GLSL 1.30 spec:
+#
+#     Selects which vector each returned component comes
+#     from. For a component of a that is false, the
+#     corresponding component of x is returned. For a
+#     component of a that is true, the corresponding
+#     component of y is returned. Components of x and y that
+#     are not selected are allowed to be invalid floating point
+#     values and will have no effect on the results.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform float a, b, zero, one;
+uniform bvec4 selector;
+
+void main()
+{
+	float inf = one / zero;
+	float nan = zero / zero;
+
+	vec4 arg0 = vec4(a, b, inf, nan);
+	vec4 arg1 = vec4(inf, nan, a, b);
+
+	gl_FragColor = mix(arg0, arg1, selector);
+}
+
+[test]
+uniform float a 0.25
+uniform float b 0.75;
+uniform float zero 0.0
+uniform float one 1.0
+uniform ivec4 selector 0 0 1 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.75 0.25 0.75
