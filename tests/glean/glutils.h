@@ -57,7 +57,7 @@ inline bool haveExtension(const char* name) {
 // Get a pointer to a function (usually, an extension function).
 // Like haveExtension, we have to do this here rather than in
 // RenderingContext.
-void (*getProcAddress(const char* name))();
+void (APIENTRY *getProcAddress(const char* name))();
 
 // Return GL renderer version as a float (1.1, 2.0, etc)
 float getVersion();

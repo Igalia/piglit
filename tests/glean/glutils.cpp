@@ -43,6 +43,7 @@
 #if defined(__AGL__)
 #   include <cstring>
 #endif
+#include "piglit-util.h"
 
 namespace GLEAN {
 
@@ -118,31 +119,8 @@ getVersion()
 //	doesn't take a rendering context as an argument.)
 ///////////////////////////////////////////////////////////////////////////////
 void
-(*getProcAddress(const char* name))() {
-#if defined(__X11__)
-#   if defined(GLX_ARB_get_proc_address)
-	return glXGetProcAddressARB(reinterpret_cast<const GLubyte*>(name));
-#   else
-	// XXX This isn't guaranteed to work, but it may be the best option
-	// we have at the moment.
-	void* libHandle = dlopen("libGL.so", RTLD_LAZY);
-	if (libHandle) {
-		void* funcPointer = dlsym(libHandle, name);
-		dlclose(libHandle);
-		return funcPointer;
-	} else
-		return 0;
-#   endif
-#elif defined(__WIN__)
-	// Gotta be a little more explicit about the cast to please MSVC.
-	typedef void (__cdecl* VOID_FUNC_VOID) ();
-	return reinterpret_cast<VOID_FUNC_VOID>(wglGetProcAddress(name));
-#elif defined(__BEWIN__)
-#	error "Need GetProcAddress (or equivalent) for BeOS"
-	return 0;
-#elif defined(__AGL__)
-	return reinterpret_cast<void (*)()>(dlsym(RTLD_DEFAULT, name));
-#endif
+(APIENTRY *getProcAddress(const char* name))() {
+	return piglit_get_proc_address(name);
 } // getProcAddress
 
 ///////////////////////////////////////////////////////////////////////////////
