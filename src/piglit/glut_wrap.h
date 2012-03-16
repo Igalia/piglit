@@ -45,6 +45,13 @@ extern "C" {
 #ifdef USE_GLUT
 #	ifdef __APPLE__
 #		include <GLUT/glut.h>
+
+		/* Apple's version of glut.h, annoyingly, #undefs
+		 * APIENTRY.  Redefine it so that Piglit code that
+		 * uses it won't get confused.
+		 */
+#		define APIENTRY
+
 #	else
 #		include <GL/glut.h>
 #		ifdef FREEGLUT
