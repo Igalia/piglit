@@ -13,6 +13,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_buffer_object-dlist dlist.c)
+piglit_add_executable (arb_texture_buffer_object-get get.c)
 piglit_add_executable (arb_texture_buffer_object-minmax minmax.c)
 piglit_add_executable (arb_texture_buffer_object-negative-bad-bo negative-bad-bo.c)
 piglit_add_executable (arb_texture_buffer_object-negative-bad-format negative-bad-format.c)
