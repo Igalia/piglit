@@ -988,6 +988,7 @@ add_shader_test_dir(spec['glsl-1.40'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.40'),
 		    recursive=True)
 spec['glsl-1.40']['execution']['textureSize'] = Group()
+spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
 for stage in ['vs', 'fs']:
