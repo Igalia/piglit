@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+// Pass loop info as uniforms to avoid unrolling
+// We test 300 iterations because that's greater than PS3.0's 255 loop
+// iteration limit.
+uniform int iters;
+uniform float step;
+uniform float expected;
+varying vec4 color;
+void main()
+{
+	float sum = 0.0;
+	int i;
+	for (i = 0; i < iters; i++) {
+		sum += step;
+	}
+	if (sum == expected) {
+		color = vec4(0, 1, 0, 1); // green=good
+	} else {
+		color = vec4(1, 0, 0, 1); // red=bad
+	}
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+
+[fragment shader]
+varying vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform int iters 300
+uniform float step 1.0
+uniform float expected 300.0
+draw rect -1 -1 2 2
+probe rgb 1 1  0 1 0
