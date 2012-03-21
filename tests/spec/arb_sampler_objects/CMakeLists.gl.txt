@@ -12,5 +12,6 @@ link_libraries (
 )
 
 add_executable (sampler-objects sampler-objects.c)
+add_executable (sampler-incomplete sampler-incomplete.c)
 
 # vim: ft=cmake:
