@@ -50,10 +50,10 @@ max_test_i(GLenum token, GLint max, const char *name)
 
 	if (val[0] > max) {
 		fprintf(stderr, "%-50s %8d %8d (ERROR)\n",
-			name, max, val);
+			name, max, val[0]);
 		pass = false;
 	} else {
-		printf("%-50s %8d %8d\n", name, max, val);
+		printf("%-50s %8d %8d\n", name, max, val[0]);
 	}
 }
 
