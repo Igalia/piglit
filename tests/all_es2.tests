@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# All GLESv2 tests that come with piglit, using default settings
+
+from framework.core import *
+from framework.exectest import *
+
+######
+# Collecting all tests
+profile = TestProfile()
+
+spec = Group()
+
+# Group ext_unpack_subimage
+ext_unpack_subimage = Group()
+spec['EXT_unpack_subimage'] = ext_unpack_subimage
+ext_unpack_subimage['basic'] = PlainExecTest(['ext_unpack_subimage', '-auto'])
+ext_unpack_subimage['basic'].runConcurrent = True
+
+profile.tests['spec'] = spec
