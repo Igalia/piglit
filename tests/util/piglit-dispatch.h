@@ -68,8 +68,17 @@ extern "C" {
 
 #else
 
+#ifndef APIENTRY
 #define APIENTRY __stdcall
-#define GLAPIENTRY __stdcall
+#endif
+
+#ifndef GLAPIENTRY
+#define GLAPIENTRY APIENTRY
+#endif
+
+#ifndef GLAPI
+#define GLAPI extern
+#endif
 
 #endif
 
