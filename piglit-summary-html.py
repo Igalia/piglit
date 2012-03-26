@@ -89,7 +89,7 @@ def buildDetailValue(detail):
 		items = map(buildResultListItem, detail)
 		return ResultList % { 'items': "".join(items) }
 
-	elif isinstance(detail, str) or isinstance(detail, unicode):
+	elif isinstance(detail, basestring):
 		return ResultMString % { 'detail': cgi.escape(detail) }
 
 	return cgi.escape(str(detail))
