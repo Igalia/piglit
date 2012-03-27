@@ -6,16 +6,18 @@ include_directories(
 )
 
 link_libraries (
-	piglitglxutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${GLUT_glut_LIBRARY}
-	${X11_X11_LIB}
 )
 
 IF(BUILD_GLX_TESTS)
 	include_directories(
 		${GLPROTO_INCLUDE_DIRS}
+	)
+	link_libraries (
+		piglitglxutil
+		${X11_X11_LIB}
 	)
 	piglit_add_executable (glx-create-context-default-major-version default-major-version.c common.c)
 	piglit_add_executable (glx-create-context-default-minor-version default-minor-version.c common.c)
