@@ -74,92 +74,6 @@ static GLuint vboVertexPointer(GLint size, GLenum type, GLsizei stride,
     return id;
 }
 
-typedef union { GLfloat f; GLint i; } fi_type;
-
-/**
- * Convert a 4-byte float to a 2-byte half float.
- * Based on code from:
- * http://www.opengl.org/discussion_boards/ubb/Forum3/HTML/008786.html
- *
- * Taken over from Mesa.
- */
-static unsigned short half(float val)
-{
-   const fi_type fi = {val};
-   const int flt_m = fi.i & 0x7fffff;
-   const int flt_e = (fi.i >> 23) & 0xff;
-   const int flt_s = (fi.i >> 31) & 0x1;
-   int s, e, m = 0;
-   unsigned short result;
-
-   /* sign bit */
-   s = flt_s;
-
-   /* handle special cases */
-   if ((flt_e == 0) && (flt_m == 0)) {
-      /* zero */
-      /* m = 0; - already set */
-      e = 0;
-   }
-   else if ((flt_e == 0) && (flt_m != 0)) {
-      /* denorm -- denorm float maps to 0 half */
-      /* m = 0; - already set */
-      e = 0;
-   }
-   else if ((flt_e == 0xff) && (flt_m == 0)) {
-      /* infinity */
-      /* m = 0; - already set */
-      e = 31;
-   }
-   else if ((flt_e == 0xff) && (flt_m != 0)) {
-      /* NaN */
-      m = 1;
-      e = 31;
-   }
-   else {
-      /* regular number */
-      const int new_exp = flt_e - 127;
-      if (new_exp < -24) {
-         /* this maps to 0 */
-         /* m = 0; - already set */
-         e = 0;
-      }
-      else if (new_exp < -14) {
-         /* this maps to a denorm */
-         unsigned int exp_val = (unsigned int) (-14 - new_exp); /* 2^-exp_val*/
-         e = 0;
-         switch (exp_val) {
-            case 0:
-               /* m = 0; - already set */
-               break;
-            case 1: m = 512 + (flt_m >> 14); break;
-            case 2: m = 256 + (flt_m >> 15); break;
-            case 3: m = 128 + (flt_m >> 16); break;
-            case 4: m = 64 + (flt_m >> 17); break;
-            case 5: m = 32 + (flt_m >> 18); break;
-            case 6: m = 16 + (flt_m >> 19); break;
-            case 7: m = 8 + (flt_m >> 20); break;
-            case 8: m = 4 + (flt_m >> 21); break;
-            case 9: m = 2 + (flt_m >> 22); break;
-            case 10: m = 1; break;
-         }
-      }
-      else if (new_exp > 15) {
-         /* map this value to infinity */
-         /* m = 0; - already set */
-         e = 31;
-      }
-      else {
-         /* regular */
-         e = new_exp + 15;
-         m = flt_m >> 13;
-      }
-   }
-
-   result = (s << 15) | (e << 10) | m;
-   return result;
-}
-
 static void test_half_vertices_wrapped(unsigned short x1, unsigned short y1,
                                        unsigned short x2, unsigned short y2,
                                        unsigned short one, int index)
@@ -230,11 +144,11 @@ static void test_half_vertices_wrapped(unsigned short x1, unsigned short y1,
 static void test_half_vertices(float fx1, float fy1, float fx2, float fy2, int index)
 {
     unsigned short x1, y1, x2, y2, one;
-    x1 = half(fx1);
-    y1 = half(fy1);
-    x2 = half(fx2);
-    y2 = half(fy2);
-    one = half(1);
+    x1 = piglit_half_from_float(fx1);
+    y1 = piglit_half_from_float(fy1);
+    x2 = piglit_half_from_float(fx2);
+    y2 = piglit_half_from_float(fy2);
+    one = piglit_half_from_float(1);
 
     test_half_vertices_wrapped(x1, y1, x2, y2, one, index);
 }

@@ -238,6 +238,8 @@ GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
 GLvoid piglit_draw_rect_back(float x, float y, float w, float h);
 
+unsigned short piglit_half_from_float(float val);
+
 void piglit_escape_exit_key(unsigned char key, int x, int y);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
