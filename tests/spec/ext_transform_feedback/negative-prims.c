@@ -111,7 +111,6 @@ enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
-	GLuint tf;
 
 	pass = pass && test_transform_feedback_prim(GL_POINTS, "GL_POINTS");
 	pass = pass && test_transform_feedback_prim(GL_LINES, "GL_LINES");
