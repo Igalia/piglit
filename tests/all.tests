@@ -1682,6 +1682,8 @@ add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-bindfragdataind
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-blend-api')
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-error-at-begin')
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-getfragdataindex')
+add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend')
+add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend-explicit')
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
