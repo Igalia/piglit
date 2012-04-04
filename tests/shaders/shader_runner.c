@@ -1264,6 +1264,10 @@ piglit_display(void)
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE, GL_FALSE, GL_UNSIGNED_NORMALIZED);
 			glEnable(GL_TEXTURE_2D);
+		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_miptree_texture();
+			glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture checkerboard %d %d ( %d , %d ) "
 				  "( %f , %f , %f , %f ) "
