@@ -1019,8 +1019,20 @@ decode_drawing_mode(const char *mode_str)
 }
 
 static void
-handle_texparameter(GLenum target, const char *line)
+handle_texparameter(const char *line)
 {
+	const struct string_to_enum texture_target[] = {
+		{ "1D ",        GL_TEXTURE_1D             },
+		{ "2D ",        GL_TEXTURE_2D             },
+		{ "3D ",        GL_TEXTURE_3D             },
+		{ "Rect ",      GL_TEXTURE_RECTANGLE      },
+		{ "Cube ",      GL_TEXTURE_CUBE_MAP       },
+		{ "1DArray ",   GL_TEXTURE_1D_ARRAY       },
+		{ "2DArray ",   GL_TEXTURE_2D_ARRAY       },
+		{ "CubeArray ", GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ NULL, 0 }
+	};
+
 	const struct string_to_enum compare_funcs[] = {
 		{ "greater", GL_GREATER },
 		{ "gequal", GL_GEQUAL },
@@ -1039,10 +1051,25 @@ handle_texparameter(GLenum target, const char *line)
 		{ "red", GL_RED }, /* Requires GL 3.0 or GL_ARB_texture_rg */
 		{ NULL, 0 },
 	};
+	GLenum target = 0;
 	GLenum parameter;
 	const char *parameter_name;
 	const struct string_to_enum *strings = NULL;
 	int i;
+
+	for (i = 0; texture_target[i].name; i++) {
+		if (string_match(texture_target[i].name, line)) {
+			target = texture_target[i].token;
+			line += strlen(texture_target[i].name);
+			line = eat_whitespace(line);
+			break;
+		}
+	}
+
+	if (!target) {
+		fprintf(stderr, "bad texture target in `texparameter%s`\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	if (string_match("compare_func ", line)) {
 		parameter = GL_TEXTURE_COMPARE_FUNC;
@@ -1303,16 +1330,8 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_DEPTH_TEXTURE_MODE_ARB,
 					GL_INTENSITY);
-		} else if (string_match("texparameter2D ", line)) {
-			handle_texparameter(GL_TEXTURE_2D, line + strlen("texparameter2D "));
-		} else if (string_match("texparameter2DArray ", line)) {
-			handle_texparameter(GL_TEXTURE_2D_ARRAY, line + strlen("texparameter2DArray "));
-		} else if (string_match("texparameterRect ", line)) {
-			handle_texparameter(GL_TEXTURE_RECTANGLE, line + strlen("texparameterRect "));
-		} else if (string_match("texparameter1D ", line)) {
-			handle_texparameter(GL_TEXTURE_1D, line + strlen("texparameter1D "));
-		} else if (string_match("texparameter1DArray ", line)) {
-			handle_texparameter(GL_TEXTURE_1D_ARRAY, line + strlen("texparameter1DArray "));
+		} else if (string_match("texparameter", line)) {
+			handle_texparameter(line + strlen("texparameter"));
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if (string_match("parameter ", line)) {
