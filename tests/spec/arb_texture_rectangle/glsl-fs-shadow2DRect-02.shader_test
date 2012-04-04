@@ -16,8 +16,8 @@ glsl-fs-shadow2DRect.frag
 [test]
 uniform int tex 0
 texture shadowRect 0 (32, 32)
-texparameterRect depth_mode luminance
-texparameterRect compare_func always
+texparameter Rect depth_mode luminance
+texparameter Rect compare_func always
 draw rect -1 -1 2 2
 
 # depth comparison pass

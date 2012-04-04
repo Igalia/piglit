@@ -15,8 +15,8 @@ glsl-fs-shadow2D.frag
 [test]
 uniform int tex 0
 texture shadow2D 0 (32, 32)
-texparameter2D depth_mode intensity
-texparameter2D compare_func greater
+texparameter 2D depth_mode intensity
+texparameter 2D compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass

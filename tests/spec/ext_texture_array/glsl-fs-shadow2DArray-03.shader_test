@@ -16,8 +16,8 @@ glsl-fs-shadow2DArray.frag
 [test]
 uniform int tex 0
 texture shadow2DArray 0 (32, 32, 1)
-texparameter2DArray depth_mode luminance
-texparameter2DArray compare_func never
+texparameter 2DArray depth_mode luminance
+texparameter 2DArray compare_func never
 draw rect -1 -1 2 2
 
 # depth comparison pass

@@ -1067,7 +1067,7 @@ handle_texparameter(const char *line)
 	}
 
 	if (!target) {
-		fprintf(stderr, "bad texture target in `texparameter%s`\n", line);
+		fprintf(stderr, "bad texture target in `texparameter %s`\n", line);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -1330,8 +1330,8 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_DEPTH_TEXTURE_MODE_ARB,
 					GL_INTENSITY);
-		} else if (string_match("texparameter", line)) {
-			handle_texparameter(line + strlen("texparameter"));
+		} else if (string_match("texparameter ", line)) {
+			handle_texparameter(line + strlen("texparameter "));
 		} else if (string_match("uniform", line)) {
 			set_uniform(line + 7);
 		} else if (string_match("parameter ", line)) {

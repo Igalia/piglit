@@ -16,8 +16,8 @@ fs-texture-sampler2dshadow.frag
 [test]
 uniform int tex 0
 texture shadow2D 0 (32, 32)
-texparameter2D depth_mode red
-texparameter2D compare_func always
+texparameter 2D depth_mode red
+texparameter 2D compare_func always
 draw rect -1 -1 2 2
 
 # depth comparison pass

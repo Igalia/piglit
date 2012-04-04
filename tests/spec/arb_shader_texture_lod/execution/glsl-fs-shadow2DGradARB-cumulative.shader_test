@@ -24,8 +24,8 @@ texture shadow2D 0 (32, 32)
 ### glsl-fs-shadow2DGradARB-01.shader_test
 ###
 clear
-texparameter2D depth_mode luminance
-texparameter2D compare_func greater
+texparameter 2D depth_mode luminance
+texparameter 2D compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -40,8 +40,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 1.0)
 ### glsl-fs-shadow2DGradARB-02.shader_test
 ###
 clear
-texparameter2D depth_mode luminance
-texparameter2D compare_func always
+texparameter 2D depth_mode luminance
+texparameter 2D compare_func always
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -56,8 +56,8 @@ relative probe rgba (1.0, 0.9) (1.0, 1.0, 1.0, 1.0)
 ### glsl-fs-shadow2DGradARB-03.shader_test
 ###
 clear
-texparameter2D depth_mode luminance
-texparameter2D compare_func never
+texparameter 2D depth_mode luminance
+texparameter 2D compare_func never
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -72,8 +72,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 1.0)
 ### glsl-fs-shadow2DGradARB-04.shader_test
 ###
 clear
-texparameter2D depth_mode intensity
-texparameter2D compare_func greater
+texparameter 2D depth_mode intensity
+texparameter 2D compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -88,8 +88,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 0.0)
 ### glsl-fs-shadow2DGradARB-05.shader_test
 ###
 clear
-texparameter2D depth_mode intensity
-texparameter2D compare_func always
+texparameter 2D depth_mode intensity
+texparameter 2D compare_func always
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -104,8 +104,8 @@ relative probe rgba (1.0, 0.9) (1.0, 1.0, 1.0, 1.0)
 ### glsl-fs-shadow2DGradARB-06.shader_test
 ###
 clear
-texparameter2D depth_mode intensity
-texparameter2D compare_func never
+texparameter 2D depth_mode intensity
+texparameter 2D compare_func never
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -120,8 +120,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 0.0)
 ### glsl-fs-shadow2DGradARB-07.shader_test
 ###
 clear
-texparameter2D depth_mode alpha
-texparameter2D compare_func greater
+texparameter 2D depth_mode alpha
+texparameter 2D compare_func greater
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -136,8 +136,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 0.0)
 ### glsl-fs-shadow2DGradARB-08.shader_test
 ###
 clear
-texparameter2D depth_mode alpha
-texparameter2D compare_func always
+texparameter 2D depth_mode alpha
+texparameter 2D compare_func always
 draw rect -1 -1 2 2
 
 # depth comparison pass
@@ -152,8 +152,8 @@ relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 1.0)
 ### glsl-fs-shadow2DGradARB-09.shader_test
 ###
 clear
-texparameter2D depth_mode alpha
-texparameter2D compare_func never
+texparameter 2D depth_mode alpha
+texparameter 2D compare_func never
 draw rect -1 -1 2 2
 
 # depth comparison pass
