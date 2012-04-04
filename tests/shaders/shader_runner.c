@@ -1051,6 +1051,20 @@ handle_texparameter(const char *line)
 		{ "red", GL_RED }, /* Requires GL 3.0 or GL_ARB_texture_rg */
 		{ NULL, 0 },
 	};
+	const struct string_to_enum min_filter_modes[] = {
+		{ "nearest_mipmap_nearest", GL_NEAREST_MIPMAP_NEAREST },
+		{ "linear_mipmap_nearest",  GL_LINEAR_MIPMAP_NEAREST  },
+		{ "nearest_mipmap_linear",  GL_NEAREST_MIPMAP_LINEAR  },
+		{ "linear_mipmap_linear",   GL_LINEAR_MIPMAP_LINEAR   },
+		{ "nearest",                GL_NEAREST                },
+		{ "linear",                 GL_LINEAR                 },
+		{ NULL, 0 }
+	};
+	const struct string_to_enum mag_filter_modes[] = {
+		{ "nearest",                GL_NEAREST                },
+		{ "linear",                 GL_LINEAR                 },
+		{ NULL, 0 }
+	};
 	GLenum target = 0;
 	GLenum parameter;
 	const char *parameter_name;
@@ -1081,6 +1095,16 @@ handle_texparameter(const char *line)
 		parameter_name = "depth_mode";
 		line += strlen("depth_mode ");
 		strings = depth_modes;
+	} else if (string_match("min ", line)) {
+		parameter = GL_TEXTURE_MIN_FILTER;
+		parameter_name = "min";
+		line += strlen("min ");
+		strings = min_filter_modes;
+	} else if (string_match("mag ", line)) {
+		parameter = GL_TEXTURE_MAG_FILTER;
+		parameter_name = "mag";
+		line += strlen("mag ");
+		strings = mag_filter_modes;
 	} else {
 		fprintf(stderr, "unknown texture parameter in `%s'\n", line);
 		piglit_report_result(PIGLIT_FAIL);
