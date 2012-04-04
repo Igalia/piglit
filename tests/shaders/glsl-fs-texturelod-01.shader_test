@@ -1,0 +1,53 @@
+[require]
+GLSL >= 1.20
+require GL_ARB_shader_texture_lod
+
+[vertex shader]
+#version 120
+
+varying vec2 texcoord;
+
+void main()
+{
+       texcoord = (vec2(gl_Vertex) + 1.0) / 2.0;
+       gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+#extension GL_ARB_shader_texture_lod: enable
+
+uniform sampler2D sampler;
+uniform float lod;
+
+varying vec2 texcoord;
+
+void main()
+{
+       gl_FragColor = texture2DLod(sampler, texcoord, lod);
+}
+
+[test]
+ortho
+clear color 0.4 0.4 0.4 0.0
+clear
+uniform int sampler 0
+texture miptree 0
+texparameter 2D min nearest_mipmap_nearest
+texparameter 2D mag nearest
+
+uniform float lod 0
+draw rect 10 10 10 10
+probe rgb 15 15 1.0 0.0 0.0
+
+uniform float lod 1
+draw rect 30 10 10 10
+probe rgb 35 15 0.0 1.0 0.0
+
+uniform float lod 2
+draw rect 50 10 10 10
+probe rgb 55 15 0.0 0.0 1.0
+
+uniform float lod 3
+draw rect 70 10 10 10
+probe rgb 75 15 1.0 1.0 1.0

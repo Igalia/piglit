@@ -428,7 +428,6 @@ shaders['glsl-fs-texture2drect-proj3'] = PlainExecTest(['glsl-fs-texture2drect',
 							'-auto', '-proj3'])
 shaders['glsl-fs-texture2drect-proj4'] = PlainExecTest(['glsl-fs-texture2drect',
 							'-auto', '-proj4'])
-add_plain_test(shaders, 'glsl-fs-texturelod-01')
 add_plain_test(shaders, 'glsl-fs-user-varying-ff')
 add_plain_test(shaders, 'glsl-mat-attribute')
 add_plain_test(shaders, 'glsl-max-varyings')
