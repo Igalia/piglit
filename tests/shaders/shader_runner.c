@@ -981,10 +981,12 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 }
 
 
-struct mode_table {
+struct string_to_enum {
 	const char *name;
-	GLenum value;
-} mode_table[] = {
+	GLenum token;
+};
+
+struct string_to_enum drawing_mode_table[] = {
 	{ "GL_POINTS",         GL_POINTS         },
 	{ "GL_LINE_STRIP",     GL_LINE_STRIP     },
 	{ "GL_LINE_LOOP",      GL_LINE_LOOP      },
@@ -1000,13 +1002,13 @@ struct mode_table {
 
 
 GLenum
-decode_mode(const char *mode_str)
+decode_drawing_mode(const char *mode_str)
 {
 	int i;
 
-	for (i = 0; mode_table[i].name; ++i) {
-		if (0 == strcmp(mode_str, mode_table[i].name))
-			return mode_table[i].value;
+	for (i = 0; drawing_mode_table[i].name; ++i) {
+		if (0 == strcmp(mode_str, drawing_mode_table[i].name))
+			return drawing_mode_table[i].token;
 	}
 
 	printf("unknown drawing mode \"%s\"", mode_str);
@@ -1019,10 +1021,6 @@ decode_mode(const char *mode_str)
 static void
 handle_texparameter(GLenum target, const char *line)
 {
-	struct string_to_enum {
-		const char *name;
-		GLenum token;
-	};
 	const struct string_to_enum compare_funcs[] = {
 		{ "greater", GL_GREATER },
 		{ "gequal", GL_GEQUAL },
@@ -1117,7 +1115,7 @@ piglit_display(void)
 			       c + 0, c + 1, c + 2, c + 3);
 			draw_instanced_rect(primcount, c[0], c[1], c[2], c[3]);
 		} else if (sscanf(line, "draw arrays %31s %d %d", s, &x, &y)) {
-			GLenum mode = decode_mode(s);
+			GLenum mode = decode_drawing_mode(s);
 			int first = x;
 			size_t count = (size_t) y;
 			if (first < 0) {
