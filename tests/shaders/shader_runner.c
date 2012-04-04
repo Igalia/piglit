@@ -42,6 +42,8 @@
 int piglit_width = 250, piglit_height = 250;
 int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 
+extern float piglit_tolerance[4];
+
 static float gl_version = 0.0;
 static float glsl_version = 0.0;
 static int gl_max_fragment_uniform_components;
@@ -1254,6 +1256,8 @@ piglit_display(void)
 			pass = pass &&
 				piglit_probe_rect_rgb(0, 0, piglit_width,
 						      piglit_height, c);
+		} else if (string_match("tolerance", line)) {
+			get_floats(line + strlen("tolerance"), piglit_tolerance, 4);
 		} else if (string_match("shade model smooth", line)) {
 			glShadeModel(GL_SMOOTH);
 		} else if (string_match("shade model flat", line)) {
