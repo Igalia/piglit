@@ -102,8 +102,10 @@ piglit_display(void)
 	glClearColor(0.3, 0.3, 0.3, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_VERTEX_PROGRAM_NV);
+	glEnable(GL_VERTEX_PROGRAM_ARB);
+        /* draw elements 3,4,5 ->verts 3,0,1 (lower-right tri) */
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices + 3);
+        /* draw elements 0,1,2 ->verts (1+1),(2+1),(0+1) (upper-left tri) */
 	glDrawElementsBaseVertex(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices, 1);
 	glFlush();
 
