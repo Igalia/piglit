@@ -60,7 +60,7 @@ test(void)
       return PIGLIT_FAIL;
    }
 
-   if (glutExtensionSupported("GL_EXT_pixel_buffer_object")) {
+   if (piglit_is_extension_supported("GL_EXT_pixel_buffer_object")) {
       glBindBuffer(GL_PIXEL_PACK_BUFFER_EXT, buffers[0]);
       if (glGetError()) {
          printf("%s: glBindBuffer failed\n", TestName);

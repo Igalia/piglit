@@ -349,14 +349,14 @@ piglit_display(void)
 static void
 init(void)
 {
-   if (glutExtensionSupported("GL_ARB_vertex_shader")) {
+   if (piglit_is_extension_supported("GL_ARB_vertex_shader")) {
       glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
       glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
       glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxTextureVertexUnits);
       glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxTextureCombinedUnits);
    }
-   else if (glutExtensionSupported("GL_ARB_fragment_shader") ||
-            glutExtensionSupported("GL_ARB_fragment_program")) {
+   else if (piglit_is_extension_supported("GL_ARB_fragment_shader") ||
+            piglit_is_extension_supported("GL_ARB_fragment_program")) {
       glGetIntegerv(GL_MAX_TEXTURE_COORDS, &MaxTextureCoordUnits);
       glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &MaxTextureImageUnits);
       MaxTextureVertexUnits = 0;

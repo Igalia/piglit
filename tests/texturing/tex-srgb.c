@@ -91,7 +91,7 @@ srgb_tex_test(int srgb_format)
 	GLuint tex;
 	GLboolean have_decode;
 
-	have_decode = glutExtensionSupported("GL_EXT_texture_sRGB_decode");
+	have_decode = piglit_is_extension_supported("GL_EXT_texture_sRGB_decode");
 
 	glGenTextures(1, &tex);
 

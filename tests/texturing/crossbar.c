@@ -217,13 +217,13 @@ static void Init( void )
    printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
    printf("GL_VERSION = %s\n", ver_string);
 
-   if ( (!glutExtensionSupported("GL_ARB_multitexture")
+   if ( (!piglit_is_extension_supported("GL_ARB_multitexture")
 	 && (ver < 1.3))
-	|| (!glutExtensionSupported("GL_ARB_texture_env_combine")
-	    && !glutExtensionSupported("GL_EXT_texture_env_combine")
+	|| (!piglit_is_extension_supported("GL_ARB_texture_env_combine")
+	    && !piglit_is_extension_supported("GL_EXT_texture_env_combine")
 	    && (ver < 1.3))
-	|| (!glutExtensionSupported("GL_ARB_texture_env_crossbar")
-	    && !glutExtensionSupported("GL_NV_texture_env_combine4")
+	|| (!piglit_is_extension_supported("GL_ARB_texture_env_crossbar")
+	    && !piglit_is_extension_supported("GL_NV_texture_env_combine4")
 	    && (ver < 1.4)) ) {
       printf("\nSorry, this program requires GL_ARB_multitexture and either\n"
 	     "GL_ARB_texture_env_combine or GL_EXT_texture_env_combine (or OpenGL 1.3).\n"

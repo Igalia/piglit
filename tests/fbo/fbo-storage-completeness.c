@@ -237,9 +237,9 @@ piglit_init(int argc, char**argv)
    piglit_require_extension("GL_EXT_framebuffer_object");
 
    HaveExtension[0] = GL_TRUE;
-   HaveExtension[EXT_packed_depth_stencil] = glutExtensionSupported("GL_EXT_packed_depth_stencil");
-   HaveExtension[ARB_framebuffer_object] = glutExtensionSupported("GL_ARB_framebuffer_object");
-   HaveExtension[ARB_texture_rg] = glutExtensionSupported("GL_ARB_texture_rg");
+   HaveExtension[EXT_packed_depth_stencil] = piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
+   HaveExtension[ARB_framebuffer_object] = piglit_is_extension_supported("GL_ARB_framebuffer_object");
+   HaveExtension[ARB_texture_rg] = piglit_is_extension_supported("GL_ARB_texture_rg");
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

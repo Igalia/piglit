@@ -387,13 +387,13 @@ piglit_init(int argc, char **argv)
 		printf("Press 't' to cycle through test images\n");
 
 	piglit_require_extension("GL_ARB_depth_texture");
-	HaveShadow = glutExtensionSupported("GL_ARB_shadow");
+	HaveShadow = piglit_is_extension_supported("GL_ARB_shadow");
 	if (!HaveShadow)
 		printf("GL_ARB_shadow not supported.\n");
-	HaveShadowAmbient = glutExtensionSupported("GL_ARB_shadow_ambient");
+	HaveShadowAmbient = piglit_is_extension_supported("GL_ARB_shadow_ambient");
 	if (!HaveShadowAmbient)
 		printf("GL_ARB_shadow_ambient not supported.\n");
-	HaveShadowFuncs = glutExtensionSupported("GL_EXT_shadow_funcs");
+	HaveShadowFuncs = piglit_is_extension_supported("GL_EXT_shadow_funcs");
 	if (!HaveShadowFuncs)
 		printf("GL_EXT_shadow_funcs not supported.\n");
 

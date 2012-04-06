@@ -58,7 +58,7 @@ create_3d_fbo(void)
 	GLuint tex, fb;
 	GLenum status;
 	int depth;
-	pot_depth = glutExtensionSupported("GL_ARB_texture_non_power_of_two") ?
+	pot_depth = piglit_is_extension_supported("GL_ARB_texture_non_power_of_two") ?
 		NUM_DEPTHS: POT_DEPTHS;
 
 	glGenTextures(1, &tex);

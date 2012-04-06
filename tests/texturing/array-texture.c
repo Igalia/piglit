@@ -328,7 +328,7 @@ piglit_init(int argc, char **argv)
 {
    piglit_require_extension("GL_EXT_texture_array");
 
-   have_MESA_texture_array = glutExtensionSupported("GL_MESA_texture_array");
+   have_MESA_texture_array = piglit_is_extension_supported("GL_MESA_texture_array");
 
    /* Make shader programs */
    frag_shader_2d_array =

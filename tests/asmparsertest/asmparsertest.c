@@ -139,14 +139,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 			}
 
 			extension[i] = '\0';
-
-			if (!glutExtensionSupported(extension)) {
-				printf("Test requires %s\n", extension);
-				piglit_report_result(PIGLIT_SKIP);
-
-				free(buf);
-				return;
-			}
+			piglit_require_extension(extension);
 		}
 	}
 

@@ -468,7 +468,7 @@ supported(const struct test_desc *test)
 
 	for (i = 0; i < 3; i++) {
 		if (test->ext[i]) {
-			if (!glutExtensionSupported(test->ext[i])) {
+			if (!piglit_is_extension_supported(test->ext[i])) {
 				return GL_FALSE;
 			}
 		}

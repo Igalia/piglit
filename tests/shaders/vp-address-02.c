@@ -147,7 +147,7 @@ piglit_init(int argc, char **argv)
 
 		piglit_report_result(PIGLIT_FAIL);
 	} else 	if (max_address_registers == 1) {
-		if (glutExtensionSupported("GL_NV_vertex_program2_option")) {
+		if (piglit_is_extension_supported("GL_NV_vertex_program2_option")) {
 			/* this extension requires two address regs */
 			if (! piglit_automatic)
 				printf("GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB "
