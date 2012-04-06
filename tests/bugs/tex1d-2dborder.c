@@ -90,7 +90,7 @@ piglit_display(void)
 	pass &= test(GL_CLAMP_TO_EDGE, 2, 0);
 	pass &= test(GL_CLAMP_TO_BORDER, 3, 0);
 	pass &= test(GL_MIRRORED_REPEAT, 0, 1);
-	if (glutExtensionSupported("GL_EXT_texture_mirror_clamp")) {
+	if (piglit_is_extension_supported("GL_EXT_texture_mirror_clamp")) {
 		pass &= test(GL_MIRROR_CLAMP_EXT, 1, 1);
 		pass &= test(GL_MIRROR_CLAMP_TO_EDGE_EXT, 2, 1);
 		pass &= test(GL_MIRROR_CLAMP_TO_BORDER_EXT, 3, 1);
