@@ -60,6 +60,7 @@ sampler_size()
 {
 	switch (sampler.target) {
 	case GL_TEXTURE_1D:
+	case GL_TEXTURE_BUFFER:
 		return 1;
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_1D_ARRAY:
@@ -151,7 +152,12 @@ generate_texture()
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
-	if (target == GL_TEXTURE_RECTANGLE) {
+	if (target == GL_TEXTURE_BUFFER) {
+		/* Texture buffers only use texelFetch() and
+		 * textureSize(), so setting the filter parameters on
+		 * them is invalid.
+		 */
+	} else if (target == GL_TEXTURE_RECTANGLE) {
 		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	} else {
@@ -160,8 +166,10 @@ generate_texture()
 		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (target != GL_TEXTURE_BUFFER) {
+		glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
 
 	for (l = 0; l < miplevels; l++) {
 		if (target == GL_TEXTURE_CUBE_MAP) {
@@ -188,8 +196,11 @@ generate_GLSL(enum shader_target test_stage)
 
 	const int size = sampler_size();
 
-	/* The GLSL 1.40 sampler2DRect samplers don't take a lod argument. */
-	if (sampler.target == GL_TEXTURE_RECTANGLE)
+	/* The GLSL 1.40 sampler2DRect/samplerBuffer samplers don't
+	 * take a lod argument.
+	 */
+	if (sampler.target == GL_TEXTURE_RECTANGLE ||
+	    sampler.target == GL_TEXTURE_BUFFER)
 		lod_arg = "";
 	else
 		lod_arg = ", lod";

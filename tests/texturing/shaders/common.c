@@ -45,6 +45,7 @@ upload_miplevel_data(GLenum target, int level, void *level_image)
 	const GLenum format          = sampler.format;
 	const GLenum internal_format = sampler.internal_format;
 	const GLenum data_type       = sampler.data_type;
+	GLuint bo;
 
 	switch (target) {
 	case GL_TEXTURE_1D:
@@ -77,6 +78,15 @@ upload_miplevel_data(GLenum target, int level, void *level_image)
 			     level_size[level][0], level_size[level][2],
 			     0, format, data_type, level_image);
 		break;
+
+	case GL_TEXTURE_BUFFER:
+		glGenBuffers(1, &bo);
+		glBindBuffer(GL_TEXTURE_BUFFER, bo);
+		glBufferData(GL_TEXTURE_BUFFER, 16 * level_size[level][0],
+			     level_image, GL_STATIC_DRAW);
+		glTexBuffer(GL_TEXTURE_BUFFER, internal_format, bo);
+		break;
+
 	default:
 		assert(!"Not implemented yet.");
 		break;
@@ -122,7 +132,8 @@ compute_miplevel_info()
 
 	miplevels = (int) log2f(max_dimension) + 1;
 
-	if (sampler.target == GL_TEXTURE_RECTANGLE)
+	if (sampler.target == GL_TEXTURE_RECTANGLE ||
+	    sampler.target == GL_TEXTURE_BUFFER)
 		miplevels = 1;
 
 	/* Compute the size of each miplevel */
@@ -194,6 +205,7 @@ select_sampler(const char *name)
 		{ "sampler1DArray",         GL_SAMPLER_1D_ARRAY,                    GL_TEXTURE_1D_ARRAY       },
 		{ "sampler2DArray",         GL_SAMPLER_2D_ARRAY,                    GL_TEXTURE_2D_ARRAY       },
 		{ "samplerCubeArray",       GL_SAMPLER_CUBE_MAP_ARRAY,              GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ "samplerBuffer",          GL_SAMPLER_BUFFER,                      GL_TEXTURE_BUFFER },
 
 		{ "sampler1DShadow",        GL_SAMPLER_1D_SHADOW,                   GL_TEXTURE_1D             },
 		{ "sampler2DShadow",        GL_SAMPLER_2D_SHADOW,                   GL_TEXTURE_2D             },
@@ -211,6 +223,7 @@ select_sampler(const char *name)
 		{ "isampler1DArray",        GL_INT_SAMPLER_1D_ARRAY,                GL_TEXTURE_1D_ARRAY       },
 		{ "isampler2DArray",        GL_INT_SAMPLER_2D_ARRAY,                GL_TEXTURE_2D_ARRAY       },
 		{ "isamplerCubeArray",      GL_INT_SAMPLER_CUBE_MAP_ARRAY,          GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ "isamplerBuffer",         GL_INT_SAMPLER_BUFFER,                  GL_TEXTURE_BUFFER },
 
 		{ "usampler1D",             GL_UNSIGNED_INT_SAMPLER_1D,             GL_TEXTURE_1D             },
 		{ "usampler2D",             GL_UNSIGNED_INT_SAMPLER_2D,             GL_TEXTURE_2D             },
@@ -220,6 +233,7 @@ select_sampler(const char *name)
 		{ "usampler1DArray",        GL_UNSIGNED_INT_SAMPLER_1D_ARRAY,       GL_TEXTURE_1D_ARRAY       },
 		{ "usampler2DArray",        GL_UNSIGNED_INT_SAMPLER_2D_ARRAY,       GL_TEXTURE_2D_ARRAY       },
 		{ "usamplerCubeArray",      GL_UNSIGNED_INT_SAMPLER_CUBE_MAP_ARRAY, GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ "usamplerBuffer",         GL_UNSIGNED_INT_SAMPLER_BUFFER,         GL_TEXTURE_BUFFER },
 	};
 
 	for (i = 0; i < ARRAY_SIZE(samplers); i++) {
@@ -302,6 +316,9 @@ require_GL_features(enum shader_target test_stage)
 		break;
 	case GL_TEXTURE_RECTANGLE:
 		piglit_require_extension("GL_ARB_texture_rectangle");
+		break;
+	case GL_TEXTURE_BUFFER:
+		piglit_require_extension("GL_ARB_texture_buffer_object");
 		break;
 	}
 
