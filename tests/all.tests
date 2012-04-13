@@ -991,6 +991,7 @@ add_shader_test_dir(spec['glsl-1.40'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.40'),
 		    recursive=True)
 spec['glsl-1.40']['execution']['textureSize'] = Group()
+spec['glsl-1.40']['execution']['texelFetch'] = Group()
 spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
@@ -998,6 +999,9 @@ for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_140:
 		spec['glsl-1.40']['execution']['textureSize'][stage + '-textureSize-' + sampler] = PlainExecTest(['textureSize', '140', stage, sampler, '-auto', '-fbo'])
+	# texelFetch():
+	for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
+		spec['glsl-1.40']['execution']['texelFetch'][stage + '-texelFetch-' + sampler] = concurrent_test('texelFetch 140 ' + stage + ' ' + sampler)
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()

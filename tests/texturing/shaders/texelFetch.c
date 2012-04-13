@@ -116,8 +116,6 @@ piglit_display()
 	int i, l, z;
 	bool pass = true;
 
-	piglit_ortho_projection(piglit_width, piglit_height, false);
-
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -187,6 +185,12 @@ generate_VBOs()
 					pos[1] = 5.5 + (5 + base_size[1])*l + y;
 					pos[2] = 0.0;
 					pos[3] = 1.0;
+
+					pos[0] = -1.0 + 2.0 * (pos[0] /
+							       piglit_width);
+					pos[1] = -1.0 + 2.0 * (pos[1] /
+							       piglit_height);
+
 					pos += 4;
 
 					/* Assign texture coordinates:
@@ -206,7 +210,7 @@ generate_VBOs()
 		}
 	}
 
-	/* Create VBO for pixel positions in screen-space: */
+	/* Create VBO for pixel positions in NDC: */
 	glGenBuffers(1, &pos_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -245,8 +249,13 @@ generate_texture()
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
-	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	if (sampler.target == GL_TEXTURE_RECTANGLE) {
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	} else {
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
 	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	if (swizzling)
@@ -360,7 +369,7 @@ generate_GLSL(enum shader_target test_stage)
 	switch (test_stage) {
 	case VS:
 		asprintf(&vs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "flat out %s color;\n"
 			 "in vec4 pos;\n"
@@ -368,24 +377,27 @@ generate_GLSL(enum shader_target test_stage)
 			 "uniform %s tex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    color = texelFetch(tex, ivec%d(texcoord),\n"
-			 "                       texcoord.w);\n"
-			 "    gl_Position = gl_ModelViewProjectionMatrix*pos;\n"
+			 "    color = texelFetch(tex, ivec%d(texcoord)%s);\n"
+			 "    gl_Position = pos;\n"
 			 "}\n",
-			 sampler.return_type, sampler.name, coordinate_size());
+			 shader_version,
+			 sampler.return_type, sampler.name, coordinate_size(),
+			 ((sampler.target == GL_TEXTURE_RECTANGLE) ?
+			  "" : ", texcoord.w"));
 		asprintf(&fs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "flat in %s color;\n"
 			 "uniform vec4 divisor;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    gl_FragColor = vec4(color)/divisor;\n"
 			 "}\n",
+			 shader_version,
 			 sampler.return_type);
 		break;
 	case FS:
 		asprintf(&vs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "in vec4 pos;\n"
 			 "in ivec4 texcoord;\n"
@@ -393,20 +405,24 @@ generate_GLSL(enum shader_target test_stage)
 			 "void main()\n"
 			 "{\n"
 			 "    tc = texcoord;\n"
-			 "    gl_Position = gl_ModelViewProjectionMatrix*pos;\n"
-			 "}\n");
+			 "    gl_Position = pos;\n"
+			 "}\n",
+			 shader_version);
 		asprintf(&fs_code,
-			 "#version 130\n"
+			 "#version %d\n"
 			 "#define ivec1 int\n"
 			 "flat in ivec4 tc;\n"
 			 "uniform vec4 divisor;\n"
 			 "uniform %s tex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    vec4 color = texelFetch(tex, ivec%d(tc), tc.w);\n"
+			 "    vec4 color = texelFetch(tex, ivec%d(tc)%s);\n"
 			 "    gl_FragColor = color/divisor;\n"
 			 "}\n",
-			 sampler.name, coordinate_size());
+			 shader_version,
+			 sampler.name, coordinate_size(),
+			 (sampler.target == GL_TEXTURE_RECTANGLE ?
+			  "" : ", tc.w"));
 		break;
 	default:
 		assert(!"Should not get here.");
@@ -451,7 +467,7 @@ supported_sampler()
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_1D_ARRAY:
 	case GL_TEXTURE_2D_ARRAY:
-	/* case GL_TEXTURE_RECTANGLE: not implemented yet */
+	case GL_TEXTURE_RECTANGLE:
 		return true;
 	}
 	return false;
@@ -483,6 +499,11 @@ piglit_init(int argc, char **argv)
 				test_stage = FS;
 				continue;
 			}
+		}
+
+		if (strcmp(argv[i], "140") == 0) {
+			shader_version = 140;
+			continue;
 		}
 
 		/* Maybe it's the sampler type? */
