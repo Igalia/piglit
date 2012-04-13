@@ -734,6 +734,20 @@ add_plain_test(texturing, 'texture-packed-formats')
 add_plain_test(texturing, 'texture-rg')
 add_plain_test(texturing, 'tex-srgb')
 
+# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
+# exercise all possible combinations of buffer alignments on i965.
+for texture_size in (146, 292, 585, 1024):
+        for test_type in ('s=z24_s8', 'd=z24_s8', 'd=z24', 'd=z32f_s8',
+                          'd=z32f', 'd=z16', 'd=z24_s8_s=z24_s8',
+                          'd=z24_s=z24_s8', 's=z24_s8_d=z24_s8',
+                          's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
+                          'ds=z24_s8', 'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
+                          's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f',
+                          'd=s=z32f_s8', 's=d=z32f_s8', 'ds=z32f_s8'):
+                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                        texture_size, test_type)
+                texturing[test_name] = PlainExecTest(test_name + ' -auto')
+
 def texwrap_test(args):
 	test = PlainExecTest(args + ['-fbo'])
 	test.runConcurrent = True
