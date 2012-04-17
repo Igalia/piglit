@@ -510,13 +510,9 @@ class TestProfile:
 		# Clear out the old Group()
 		self.tests = Group()
 
-	def run(self, env, json_writer):
+	def prepare_test_list(self, env):
 		self.flatten_group_hierarchy()
-		'''
-		Schedule all tests in profile for execution.
 
-		See ``Test.schedule`` and ``Test.run``.
-		'''
 		def matches_any_regexp(x, re_list):
 			return True in map(lambda r: r.search(x) != None, re_list)
 
@@ -527,6 +523,15 @@ class TestProfile:
 
 		# Filter out unwanted tests
 		self.test_list = dict(filter(test_matches, self.test_list.items()))
+
+	def run(self, env, json_writer):
+		'''
+		Schedule all tests in profile for execution.
+
+		See ``Test.schedule`` and ``Test.run``.
+		'''
+
+		self.prepare_test_list(env)
 
 		# Queue up all the concurrent tests, so the pool is filled
 		# at the start of the test run.
