@@ -232,6 +232,10 @@ int piglit_use_vertex_program(void);
 void piglit_require_fragment_program(void);
 void piglit_require_vertex_program(void);
 GLuint piglit_compile_program(GLenum target, const char* text);
+GLvoid piglit_draw_triangle(float x1, float y1, float x2, float y2,
+			    float x3, float y3);
+GLvoid piglit_draw_triangle_z(float z, float x1, float y1, float x2, float y2,
+			      float x3, float y3);
 GLvoid piglit_draw_rect(float x, float y, float w, float h);
 GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
