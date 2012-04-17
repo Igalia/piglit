@@ -85,6 +85,15 @@ int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
 const int pos_loc = 0;
 const int texcoord_loc = 1;
 
+/** Whether we're testing texelFetchOffset() instead of texelFetch(). */
+static bool test_offset = false;
+const int fetch_x_offset = 7;
+const int fetch_y_offset = -8;
+const int fetch_z_offset = 4;
+const char *fetch_1d_arg = ", int(7)";
+const char *fetch_2d_arg = ", ivec2(7, -8)";
+const char *fetch_3d_arg = ", ivec3(7, -8, 4)";
+
 /** Uniform locations */
 int divisor_loc;
 
@@ -204,6 +213,15 @@ generate_VBOs()
 					tc[1] = array_1D ? z : y;
 					tc[2] = z;
 					tc[3] = l;
+
+					if (test_offset) {
+						tc[0] -= fetch_x_offset;
+						if (sampler.target != GL_TEXTURE_1D_ARRAY)
+							tc[1] -= fetch_y_offset;
+						if (sampler.target != GL_TEXTURE_2D_ARRAY)
+							tc[2] -= fetch_z_offset;
+					}
+
 					tc += 4;
 				}
 			}
@@ -365,6 +383,28 @@ generate_GLSL(enum shader_target test_stage)
 
 	static char *vs_code;
 	static char *fs_code;
+	const char *offset_func, *offset_arg;
+
+	if (test_offset) {
+		offset_func = "Offset";
+		switch (sampler.target) {
+		case GL_TEXTURE_1D:
+		case GL_TEXTURE_1D_ARRAY:
+			offset_arg = fetch_1d_arg;
+			break;
+		case GL_TEXTURE_2D:
+		case GL_TEXTURE_2D_ARRAY:
+		case GL_TEXTURE_RECTANGLE:
+			offset_arg = fetch_2d_arg;
+			break;
+		case GL_TEXTURE_3D:
+			offset_arg = fetch_3d_arg;
+			break;
+		}
+	} else {
+		offset_func = "";
+		offset_arg = "";
+	}
 
 	switch (test_stage) {
 	case VS:
@@ -377,13 +417,16 @@ generate_GLSL(enum shader_target test_stage)
 			 "uniform %s tex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    color = texelFetch(tex, ivec%d(texcoord)%s);\n"
+			 "    color = texelFetch%s(tex, ivec%d(texcoord)%s%s);\n"
 			 "    gl_Position = pos;\n"
 			 "}\n",
 			 shader_version,
-			 sampler.return_type, sampler.name, coordinate_size(),
+			 sampler.return_type, sampler.name,
+			 offset_func,
+			 coordinate_size(),
 			 ((sampler.target == GL_TEXTURE_RECTANGLE) ?
-			  "" : ", texcoord.w"));
+			  "" : ", texcoord.w"),
+			 offset_arg);
 		asprintf(&fs_code,
 			 "#version %d\n"
 			 "flat in %s color;\n"
@@ -416,13 +459,16 @@ generate_GLSL(enum shader_target test_stage)
 			 "uniform %s tex;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    vec4 color = texelFetch(tex, ivec%d(tc)%s);\n"
+			 "    vec4 color = texelFetch%s(tex, ivec%d(tc)%s%s);\n"
 			 "    gl_FragColor = color/divisor;\n"
 			 "}\n",
 			 shader_version,
-			 sampler.name, coordinate_size(),
+			 sampler.name,
+			 offset_func,
+			 coordinate_size(),
 			 (sampler.target == GL_TEXTURE_RECTANGLE ?
-			  "" : ", tc.w"));
+			  "" : ", tc.w"),
+			 offset_arg);
 		break;
 	default:
 		assert(!"Should not get here.");
@@ -430,7 +476,15 @@ generate_GLSL(enum shader_target test_stage)
 	}
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
+	if (!vs) {
+		printf("VS code:\n%s", vs_code);
+		piglit_report_result(PIGLIT_FAIL);
+	}
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
+	if (!fs) {
+		printf("FS code:\n%s", fs_code);
+		piglit_report_result(PIGLIT_FAIL);
+	}
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
 	piglit_AttachShader(prog, fs);
@@ -439,7 +493,8 @@ generate_GLSL(enum shader_target test_stage)
 	glBindAttribLocation(prog, texcoord_loc, "texcoord");
 
 	piglit_LinkProgram(prog);
-	piglit_link_check_status(prog);
+	if (!piglit_link_check_status(prog))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return prog;
 }
@@ -476,7 +531,8 @@ supported_sampler()
 void
 fail_and_show_usage()
 {
-	printf("Usage: texelFetch <vs|fs> <sampler type> [piglit args...]\n");
+	printf("Usage: texelFetch [140] [offset] <vs|fs> <sampler type> "
+	       "[piglit args...]\n");
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -503,6 +559,11 @@ piglit_init(int argc, char **argv)
 
 		if (strcmp(argv[i], "140") == 0) {
 			shader_version = 140;
+			continue;
+		}
+
+		if (strcmp(argv[i], "offset") == 0) {
+			test_offset = true;
 			continue;
 		}
 
