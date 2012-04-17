@@ -941,20 +941,18 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.join(generatedTestDir, 'spec', 'glsl-1.30'),
 			 ['compiler'])
 spec['glsl-1.30']['execution'] = Group()
-spec['glsl-1.30']['execution']['textureSize'] = Group()
-spec['glsl-1.30']['execution']['texelFetch'] = Group()
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
 for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_130:
-		spec['glsl-1.30']['execution']['textureSize'][stage + '-textureSize-' + sampler] = PlainExecTest(['textureSize', stage, sampler, '-auto', '-fbo'])
+		spec['glsl-1.30/execution/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 	# texelFetch():
 	for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
-		spec['glsl-1.30']['execution']['texelFetch'][stage + '-texelFetch-' + sampler] = PlainExecTest(['texelFetch', stage, sampler, '-auto', '-fbo'])
+		spec['glsl-1.30/execution/texelFetch/' + stage + '-texelFetch-' + sampler] = concurrent_test('texelFetch ' + stage + ' ' + sampler)
 	# texelFetch() with EXT_texture_swizzle mode "b0r1":
 	for type in ['i', 'u', '']:
-		spec['glsl-1.30']['execution']['texelFetch'][stage + '-texelFetch-' + type + 'sampler2DArray-swizzle'] = PlainExecTest(['texelFetch', stage, type + 'sampler2DArray', 'b0r1', '-auto', '-fbo'])
+		spec['glsl-1.30/execution/texelFetch/' + stage + '-texelFetch-' + type + 'sampler2DArray-swizzle'] = concurrent_test('texelFetch ' + stage + ' ' + type + 'sampler2DArray b0r1')
 
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
@@ -990,18 +988,16 @@ import_glsl_parser_tests(spec['glsl-1.40'],
 add_shader_test_dir(spec['glsl-1.40'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.40'),
 		    recursive=True)
-spec['glsl-1.40']['execution']['textureSize'] = Group()
-spec['glsl-1.40']['execution']['texelFetch'] = Group()
 spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
 for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_140:
-		spec['glsl-1.40']['execution']['textureSize'][stage + '-textureSize-' + sampler] = PlainExecTest(['textureSize', '140', stage, sampler, '-auto', '-fbo'])
+		spec['glsl-1.40/execution/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize 140 ' + stage + ' ' + sampler)
 	# texelFetch():
 	for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
-		spec['glsl-1.40']['execution']['texelFetch'][stage + '-texelFetch-' + sampler] = concurrent_test('texelFetch 140 ' + stage + ' ' + sampler)
+		spec['glsl-1.40/execution/texelFetch/' + stage + '-texelFetch-' + sampler] = concurrent_test('texelFetch 140 ' + stage + ' ' + sampler)
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
