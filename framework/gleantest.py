@@ -45,7 +45,8 @@ class GleanTest(ExecTest):
 			"-v", "-v", "-v",
 			"-t", "+"+name])
 
-		checkDir(os.path.join(gleanResultDir(resdir), name), False)
+		if resdir[0] not in '$%':
+			checkDir(os.path.join(gleanResultDir(resdir), name), False)
 
 		self.name = name
 
