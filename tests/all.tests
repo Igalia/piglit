@@ -138,6 +138,13 @@ def add_vp1(name):
 	glean[testname].env['PIGLIT_TEST'] = name
 execfile(testsDir + '/glean-vertProg1.tests')
 
+def add_fbo_formats_tests(path, extension):
+	profile.tests[path + '/fbo-generatemipmap-formats'] = PlainExecTest('fbo-generatemipmap-formats -auto ' + extension)
+	profile.tests[path + '/fbo-clear-formats'] = PlainExecTest('fbo-clear-formats -auto ' + extension)
+	if 'depth' not in extension:
+		profile.tests[path + '/fbo-blending-formats'] = PlainExecTest('fbo-blending-formats -auto ' + extension)
+		profile.tests[path + '/fbo-alphatest-formats'] = PlainExecTest('fbo-alphatest-formats -auto ' + extension)
+
 def add_fbo_generatemipmap_extension(group, extension, name):
 	group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
 				     extension])
@@ -1236,8 +1243,7 @@ add_color_buffer_float_test('render', 'GL_RGBA32F', 'sanity', 'fog')
 
 arb_depth_texture = Group()
 spec['ARB_depth_texture'] = arb_depth_texture
-add_fbo_generatemipmap_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(arb_depth_texture, 'GL_ARB_depth_texture', 'fbo-clear-formats')
+add_fbo_formats_tests('spec/ARB_depth_texture', 'GL_ARB_depth_texture')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT16')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT24')
 add_texwrap_test2(arb_depth_texture, '2D', 'GL_DEPTH_COMPONENT32')
@@ -1247,12 +1253,11 @@ add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT32')
 
 arb_depth_buffer_float = Group()
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
-add_fbo_generatemipmap_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-generatemipmap-formats')
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
-add_fbo_clear_extension(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float', 'fbo-clear-formats')
+add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH_COMPONENT32F')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
 
@@ -1324,8 +1329,7 @@ spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
-add_fbo_generatemipmap_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil', 'fbo-clear-formats')
+add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_stencil')
 add_texwrap_test2(ext_packed_depth_stencil, '2D', 'GL_DEPTH24_STENCIL8')
 ext_packed_depth_stencil['readpixels-24_8'] = PlainExecTest(['ext_packed_depth_stencil-readpixels-24_8', '-auto'])
 
@@ -1386,20 +1390,14 @@ ati_texture_compression_3dc['invalid formats'].runConcurrent = True
 
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
-add_fbo_generatemipmap_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-clear-formats')
-add_fbo_blending_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-blending-formats')
-add_fbo_alphatest_extension(ext_packed_float, 'GL_EXT_packed_float', 'fbo-alphatest-formats')
+add_fbo_formats_tests('spec/EXT_packed_float', 'GL_EXT_packed_float')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 ext_packed_float['pack'] = concurrent_test('ext_packed_float-pack')
 ext_packed_float['getteximage-invalid-format-for-packed-type'] = concurrent_test('getteximage-invalid-format-for-packed-type')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
-add_fbo_generatemipmap_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-clear-formats')
-add_fbo_blending_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-blending-formats')
-add_fbo_alphatest_extension(arb_texture_float, 'GL_ARB_texture_float', 'fbo-alphatest-formats')
+add_fbo_formats_tests('spec/ARB_texture_float', 'GL_ARB_texture_float')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_ALPHA16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE16F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_LUMINANCE_ALPHA16F')
@@ -1434,15 +1432,12 @@ spec['ARB_texture_rg'] = arb_texture_rg
 add_shader_test_dir(arb_texture_rg,
                     testsDir + '/spec/arb_texture_rg/execution',
                     recursive=True)
-add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-generatemipmap-formats')
+add_fbo_formats_tests('spec/ARB_texture_rg', 'GL_ARB_texture_rg')
 add_fbo_generatemipmap_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-generatemipmap-formats-float')
-add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-clear-formats')
 # unsupported for int yet
 #add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-clear-formats-int')
 add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-clear-formats-float')
-add_fbo_blending_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-blending-formats')
 add_fbo_blending_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-blending-formats-float')
-add_fbo_alphatest_extension(arb_texture_rg, 'GL_ARB_texture_rg', 'fbo-alphatest-formats')
 add_fbo_alphatest_extension(arb_texture_rg, 'GL_ARB_texture_rg-float', 'fbo-alphatest-formats-float')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_R8')
 add_texwrap_test2(arb_texture_rg, '2D', 'GL_RG8')
@@ -1459,18 +1454,12 @@ ext_texture_rgb10_a2ui['fbo-blending'] = concurrent_test('ext_texture_integer-fb
 
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
-add_fbo_generatemipmap_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-clear-formats')
-add_fbo_blending_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-blending-formats')
-add_fbo_alphatest_extension(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent', 'fbo-alphatest-formats')
+add_fbo_formats_tests('spec/EXT_texture_shared_exponent', 'GL_EXT_texture_shared_exponent')
 add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 
 ext_texture_snorm = Group()
 spec['EXT_texture_snorm'] = ext_texture_snorm
-add_fbo_generatemipmap_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-generatemipmap-formats')
-add_fbo_clear_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-clear-formats')
-add_fbo_blending_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-blending-formats')
-add_fbo_alphatest_extension(ext_texture_snorm, 'GL_EXT_texture_snorm', 'fbo-alphatest-formats')
+add_fbo_formats_tests('spec/EXT_texture_snorm', 'GL_EXT_texture_snorm')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_R8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RG8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RGB8_SNORM')
