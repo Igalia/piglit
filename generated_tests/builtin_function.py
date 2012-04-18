@@ -1047,7 +1047,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	np.array([1.67, 0.66, 1.87]),
 	]
     norm_floats_vecs = [_normalize(x) for x in nz_floats_vecs]
-    mats = [
+    squaremats = [
 	np.array([[ 1.60,  0.76],
 		  [ 1.53, -1.00]]), # mat2
 	np.array([[-0.13, -0.87],
@@ -1066,6 +1066,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 		  [ 1.60, -0.32,  0.51, -1.84],
 		  [ 1.25,  0.45,  1.90, -0.72],
 		  [-0.16,  0.45, -0.88,  0.39]]), # mat4
+        ]
+    mats = squaremats + [
 	np.array([[ 0.09,  1.30,  1.25],
 		  [-1.19,  0.08,  1.08]]), # mat3x2
 	np.array([[-0.36, -1.08, -0.60],
@@ -1184,6 +1186,9 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('transpose', 1, '1.20', np.transpose, None, [mats])
     f('any', 1, '1.10', any, None, [bvecs])
     f('all', 1, '1.10', all, None, [bvecs])
+
+    f('inverse', 1, '1.40', np.linalg.inv, None, [squaremats])
+
 _make_vector_or_matrix_test_vectors(test_suite)
 
 
