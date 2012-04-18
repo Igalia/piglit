@@ -547,7 +547,8 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 {
 	int i, j, k;
 
-	glutKeyboardFunc(fbo_formats_key_func);
+	if (!piglit_automatic)
+		glutKeyboardFunc(fbo_formats_key_func);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_env_combine");
@@ -618,7 +619,7 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 		add_result(&all_skip, &end_result, result);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	if (all_skip)
 		return PIGLIT_SKIP;

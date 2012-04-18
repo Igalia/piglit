@@ -141,6 +141,7 @@ execfile(testsDir + '/glean-vertProg1.tests')
 def add_fbo_formats_tests(path, extension):
 	profile.tests[path + '/fbo-generatemipmap-formats'] = PlainExecTest('fbo-generatemipmap-formats -auto ' + extension)
 	profile.tests[path + '/fbo-clear-formats'] = PlainExecTest('fbo-clear-formats -auto ' + extension)
+	profile.tests[path + '/get-renderbuffer-internalformat'] = concurrent_test('get-renderbuffer-internalformat ' + extension)
 	if 'depth' not in extension:
 		profile.tests[path + '/fbo-blending-formats'] = PlainExecTest('fbo-blending-formats -auto ' + extension)
 		profile.tests[path + '/fbo-alphatest-formats'] = PlainExecTest('fbo-alphatest-formats -auto ' + extension)
