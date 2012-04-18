@@ -169,8 +169,8 @@ class BoolComparator(Comparator):
 	value += [0.0] * self.__padding
 	return value
 
-    def make_result_test(self, test_num, test_vector):
-	test = 'draw rect -1 -1 2 2\n'
+    def make_result_test(self, test_num, test_vector, draw):
+	test = draw
 	test += 'probe rgba {0} 0 {1}\n'.format(
 	    test_num,
 	    shader_runner_format(self.convert_to_float(test_vector.result)))
@@ -209,8 +209,8 @@ class BoolIfComparator(Comparator):
 	else:
 	    return [0.0, 0.0, 1.0, 1.0]
 
-    def make_result_test(self, test_num, test_vector):
-	test = 'draw rect -1 -1 2 2\n'
+    def make_result_test(self, test_num, test_vector, draw):
+	test = draw
 	test += 'probe rgba {0} 0 {1}\n'.format(
 	    test_num,
 	    shader_runner_format(self.convert_to_float(test_vector.result)))
@@ -246,11 +246,11 @@ class IntComparator(Comparator):
 	    red='vec4(1.0, 0.0, 0.0, 1.0)')
 	return statements
 
-    def make_result_test(self, test_num, test_vector):
+    def make_result_test(self, test_num, test_vector, draw):
 	test = 'uniform {0} expected {1}\n'.format(
 	    shader_runner_type(self.__signature.rettype),
 	    shader_runner_format(column_major_values(test_vector.result)))
-	test += 'draw rect -1 -1 2 2\n'
+	test += draw
 	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
 	return test
 
@@ -314,13 +314,13 @@ class FloatComparator(Comparator):
 	    red='vec4(1.0, 0.0, 0.0, 1.0)')
 	return statements
 
-    def make_result_test(self, test_num, test_vector):
+    def make_result_test(self, test_num, test_vector, draw):
 	test = 'uniform {0} expected {1}\n'.format(
 	    shader_runner_type(self.__signature.rettype),
 	    shader_runner_format(column_major_values(test_vector.result)))
 	test += 'uniform float tolerance {0}\n'.format(
 	    shader_runner_format([test_vector.tolerance]))
-	test += 'draw rect -1 -1 2 2\n'
+	test += draw
 	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
 	return test
 
@@ -362,10 +362,16 @@ class ShaderTest(object):
 	return self._signature.version_introduced
 
     def version_directive(self):
-	if self.glsl_version() == '1.10':
+	if float(self.glsl_version()) == '1.10':
 	    return ''
 	else:
 	    return '#version {0}\n'.format(self.glsl_version().replace('.', ''))
+
+    def draw_command(self):
+        if float(self.glsl_version()) >= 1.40:
+            return 'draw arrays GL_TRIANGLE_FAN 0 4\n'
+        else:
+            return 'draw rect -1 -1 2 2\n'
 
     @abc.abstractmethod
     def test_prefix(self):
@@ -425,8 +431,23 @@ class ShaderTest(object):
 	    # Note: shader_runner uses a 250x250 window so we must
 	    # ensure that test_num <= 250.
 	    test += self._comparator.make_result_test(
-		test_num % 250, test_vector)
+		test_num % 250, test_vector, self.draw_command())
 	return test
+
+    def make_vbo_data(self):
+        # Starting with GLSL 1.40/GL 3.1, we need to use VBOs and
+        # vertex shader input bindings for our vertex data instead of
+        # the piglit drawing utilities and gl_Vertex.
+        if float(self.glsl_version()) < 1.40:
+            return ""
+        vbo = '[vertex data]\n'
+        vbo += 'vertex/float/2\n'
+        vbo += '-1.0 -1.0\n'
+        vbo += ' 1.0 -1.0\n'
+        vbo += ' 1.0  1.0\n'
+        vbo += '-1.0  1.0\n'
+        vbo += '\n'
+        return vbo
 
     def filename(self):
 	argtype_names = '-'.join(
@@ -449,6 +470,7 @@ class ShaderTest(object):
 	shader_test += '[fragment shader]\n'
 	shader_test += self.make_fragment_shader()
 	shader_test += '\n'
+        shader_test += self.make_vbo_data()
 	shader_test += '[test]\n'
 	shader_test += self.make_test()
 	filename = self.filename()
@@ -468,8 +490,17 @@ class VertexShaderTest(ShaderTest):
 	return 'vs'
 
     def make_vertex_shader(self):
-	return self.make_test_shader(
-	    'varying vec4 color;\n', '  gl_Position = gl_Vertex;\n', 'color')
+        if float(self.glsl_version()) >= 1.40:
+            return self.make_test_shader(
+                'in vec4 vertex;\n' +
+                'out vec4 color;\n',
+                '  gl_Position = vertex;\n',
+                'color')
+        else:
+            return self.make_test_shader(
+                'varying vec4 color;\n',
+                '  gl_Position = gl_Vertex;\n',
+                'color')
 
     def make_fragment_shader(self):
 	shader = self.version_directive()
@@ -493,11 +524,17 @@ class FragmentShaderTest(ShaderTest):
 
     def make_vertex_shader(self):
 	shader = self.version_directive()
-	shader += '''void main()
-{
-  gl_Position = gl_Vertex;
-}
-'''
+        if float(self.glsl_version()) >= 1.40:
+            shader += "in vec4 vertex;\n"
+
+	shader += "void main()\n"
+        shader += "{\n"
+        if float(self.glsl_version()) >= 1.40:
+            shader += "	gl_Position = vertex;\n"
+        else:
+            shader += "	gl_Position = gl_Vertex;\n"
+        shader += "}\n"
+
 	return shader
 
     def make_fragment_shader(self):
