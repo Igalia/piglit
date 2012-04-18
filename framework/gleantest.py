@@ -33,7 +33,7 @@ def gleanExecutable():
 	return testBinDir + 'glean'
 
 def gleanResultDir(r_dir):
-	return os.path.join(r_dir, 'results', 'glean')
+	return os.path.join(r_dir, 'glean')
 
 class GleanTest(ExecTest):
 	globalParams = []
