@@ -898,9 +898,6 @@ spec['glsl-1.10']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
 		    recursive=True)
-add_shader_test_dir(spec['glsl-1.10']['execution'],
-		    os.path.join(generatedTestDir, 'spec', 'glsl-1.10', 'execution'),
-		    recursive=True)
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
 	cmdline = 'clip-plane-transformation ' + mode
 	spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
@@ -919,9 +916,6 @@ import_glsl_parser_tests(spec['glsl-1.20'],
 spec['glsl-1.20']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
-		    recursive=True)
-add_shader_test_dir(spec['glsl-1.20']['execution'],
-		    os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
 		    recursive=True)
 
 def add_recursion_test(group, name):
@@ -978,9 +972,6 @@ add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
-		    recursive=True)
-add_shader_test_dir(spec['glsl-1.30']['execution'],
-		    os.path.join(generatedTestDir, 'spec', 'glsl-1.30', 'execution'),
 		    recursive=True)
 spec['glsl-1.30']['linker'] = Group()
 spec['glsl-1.30']['linker']['clipping'] = Group()
@@ -2191,6 +2182,9 @@ add_asmparsertest('ARBvp1.0', 'txq-18.txt')
 add_asmparsertest('ARBvp1.0', 'txq-19.txt')
 add_asmparsertest('ARBvp1.0', 'txq-20.txt')
 add_asmparsertest('ARBvp1.0', 'xpd.txt')
+
+add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
+		    recursive=True)
 
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
