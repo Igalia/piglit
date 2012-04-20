@@ -85,19 +85,21 @@ class ExecTest(Test):
 			results['result'] = 'fail'
 			out = self.interpretResult(out, results)
 
-			if proc.returncode == -5:
-				results['result'] = 'trap'
-			elif proc.returncode == -6:
-				results['result'] = 'abort'
-			elif proc.returncode in (-8, -10, -11):
-				results['result'] = 'crash'
-			elif proc.returncode == -1073741819:
-				# 0xc0000005
-				# Windows EXCEPTION_ACCESS_VIOLATION
-				results['result'] = 'crash'
-			elif proc.returncode == -1073741676:
-				# 0xc0000094
-				# Windows EXCEPTION_INT_DIVIDE_BY_ZERO
+			crash_codes = [
+				# Unix: terminated by a signal
+				-5,  # SIGTRAP
+				-6,  # SIGABRT
+				-8,  # SIGFPE  (Floating point exception)
+				-10, # SIGUSR1
+				-11, # SIGSEGV (Segmentation fault)
+				# Windows:
+				# EXCEPTION_ACCESS_VIOLATION (0xc0000005):
+				-1073741819,
+				# EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
+				-1073741676
+			]
+
+			if proc.returncode in crash_codes:
 				results['result'] = 'crash'
 			elif proc.returncode != 0:
 				results['note'] = 'Returncode was %d' % (proc.returncode)

@@ -27,13 +27,11 @@ import core
 ##### Vector indicating the number of subtests that have passed/failed/etc.
 #############################################################################
 class PassVector:
-	def __init__(self, p, w, f, s, t, a, c):
+	def __init__(self, p, w, f, s, c):
 		self.passnr = p
 		self.warnnr = w
 		self.failnr = f
 		self.skipnr = s
-		self.trapnr = t
-		self.abortnr = a
 		self.crashnr = c
 
 	def add(self, o):
@@ -41,8 +39,6 @@ class PassVector:
 		self.warnnr += o.warnnr
 		self.failnr += o.failnr
 		self.skipnr += o.skipnr
-		self.trapnr += o.trapnr
-		self.abortnr += o.abortnr
 		self.crashnr += o.crashnr
 
 
@@ -82,13 +78,11 @@ results is an array of TestResult instances, one per testrun
 				result.status = result['result']
 
 			vectormap = {
-				'pass': PassVector(1,0,0,0,0,0,0),
-				'warn': PassVector(0,1,0,0,0,0,0),
-				'fail': PassVector(0,0,1,0,0,0,0),
-				'skip': PassVector(0,0,0,1,0,0,0),
-				'trap': PassVector(0,0,0,0,1,0,0),
-				'abort': PassVector(0,0,0,0,0,1,0),
-				'crash': PassVector(0,0,0,0,0,0,1)
+				'pass': PassVector(1,0,0,0,0),
+				'warn': PassVector(0,1,0,0,0),
+				'fail': PassVector(0,0,1,0,0),
+				'skip': PassVector(0,0,0,1,0),
+				'crash': PassVector(0,0,0,0,1)
 			}
 
 			if result.status not in vectormap:
@@ -131,7 +125,7 @@ results is an array of GroupResult instances, one per testrun
 		# Perform some initial annotations
 		for j in range(len(self.results)):
 			result = self.results[j]
-			result.passvector = PassVector(0, 0, 0, 0, 0, 0, 0)
+			result.passvector = PassVector(0, 0, 0, 0, 0)
 			result.testrun = self.summary.testruns[j]
 
 		# Collect, create and annotate children

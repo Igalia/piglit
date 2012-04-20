@@ -48,7 +48,7 @@ td {
 	background-color: #20ff20;
 }
 
-.trap, .abort, .crash {
+.crash {
 	text-align: right;
 	background-color: #000000;
 	color: #ffffff;
@@ -74,7 +74,7 @@ td {
 	background-color: #50ff50;
 }
 
-.trapa, .aborta, .crasha {
+.crasha {
 	text-align: right;
 	background-color: #141414;
 	color: #ffffff;
@@ -100,12 +100,12 @@ td {
 	background-color: #40ff40;
 }
 
-.trapb, .abortb, .crashb {
+.crashb {
 	text-align: right;
 	background-color: #0a0a0a;
 	color: #ffffff;
 }
 
-td.trapa a, td.trapb a, td.aborta a, td.abortb a, td.crasha a, td.crashb a {
+td.crasha a, td.crashb a {
 	color: #ffffff;
 }
