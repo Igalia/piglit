@@ -187,7 +187,10 @@ const char *piglit_get_gl_enum_name(GLenum param);
  * print a diagnostic and return GL_FALSE.  Otherwise return GL_TRUE.
  */
 GLboolean
-piglit_check_gl_error(GLenum expected_error);
+piglit_check_gl_error_(GLenum expected_error, const char *file, unsigned line);
+
+#define piglit_check_gl_error(expected) \
+ piglit_check_gl_error_((expected), __FILE__, __LINE__)
 
 /**
  * \brief Drain all GL errors.

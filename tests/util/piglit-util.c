@@ -229,7 +229,7 @@ const char* piglit_get_gl_error_name(GLenum error)
 }
 
 GLboolean
-piglit_check_gl_error(GLenum expected_error)
+piglit_check_gl_error_(GLenum expected_error, const char *file, unsigned line)
 {
 	GLenum actual_error;
 
@@ -246,6 +246,7 @@ piglit_check_gl_error(GLenum expected_error)
 	 */
 	printf("Unexpected GL error: %s 0x%x\n",
                piglit_get_gl_error_name(actual_error), actual_error);
+        printf("(Error at %s:%u)\n", file, line);
 
 	/* Print the expected error, but only if an error was really expected. */
 	if (expected_error != GL_NO_ERROR) {
