@@ -1,0 +1,29 @@
+# This test exercises a bug introduced in i965: Comparison of comparison
+# results to boolean values gave incorrect results.
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform float one;
+uniform float zero;
+uniform bool f;
+
+void main()
+{
+	if (one < zero == f)
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+	else
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+}
+
+[test]
+uniform float one 1.0
+uniform float zero 0.0
+uniform int f 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
