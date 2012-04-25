@@ -1333,7 +1333,7 @@ Test::measure_accuracy()
 		 */
 		int effective_num_samples = num_samples == 0 ? 1 : num_samples;
 		error_threshold = 0.333 *
-			pow(0.6, log(effective_num_samples) / log(2.0));
+			pow(0.6, log((double)effective_num_samples) / log(2.0));
 	}
 	printf("The error threshold for this test is %f\n", error_threshold);
 	pass = partially_lit_stats.is_better_than(error_threshold) && pass;
