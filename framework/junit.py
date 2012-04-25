@@ -130,10 +130,10 @@ class Report:
         self.inside_testcase = True
 
         if not self.inside_testsuite:
-            self.stream.write('<testsuite name="%s">\n' % escape('.'.join(self.testsuites)))
+            self.stream.write('<testsuite name="%s">\n' % escape('.'.join(self.testsuites[:1])))
             self.inside_testsuite = True
 
-        self.case_name = self.escapeName(name)
+        self.case_name = name
         self.buffer = []
         self.stdout = []
         self.stderr = []
@@ -143,9 +143,13 @@ class Report:
         assert self.inside_testcase
         self.inside_testcase = False
 
+        if len(self.testsuites) == 1:
+            classname = self.testsuites[0] + '.' + self.testsuites[0]
+        else:
+            classname = '.'.join(self.testsuites)
         name = self.case_name
 
-        self.stream.write('<testcase name="%s"' % escape(name))
+        self.stream.write('<testcase classname="%s" name="%s"' % (escape(classname), escape(name)))
         if duration is None:
             if self.time:
                 stop_time = time.time()
@@ -315,7 +319,7 @@ class Test(BaseTest):
             report.stopCase()
 
     def test(self, report):
-        pass
+        raise NotImplementedError
 
 
 class Main:
