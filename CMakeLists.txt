@@ -114,6 +114,10 @@ if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)
 
+        # Avoid namespace pollution when including windows.h
+        # http://support.microsoft.com/kb/166474
+	add_definitions (-DWIN32_LEAN_AND_MEAN=1)
+
 	# Don't define min/max macros
 	add_definitions (-DNOMINMAX)
 
