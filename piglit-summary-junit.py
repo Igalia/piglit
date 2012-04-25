@@ -76,7 +76,7 @@ class Writer:
 				pass
 
 			success = result.get('result')
-			if success == 'pass':
+			if success in ('pass', 'warn'):
 				pass
 			elif success == 'skip':
 				self.report.addSkipped()
