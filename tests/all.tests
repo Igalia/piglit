@@ -1626,6 +1626,7 @@ spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
 import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
 			 os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
 			 [''])
+arb_uniform_buffer_object['getuniformblockindex'] = concurrent_test('arb_uniform_buffer_object-getuniformblockindex')
 arb_uniform_buffer_object['layout-std140'] = concurrent_test('arb_uniform_buffer_object-layout-std140')
 
 ati_draw_buffers = Group()
