@@ -138,9 +138,9 @@ validate_offset_and_size()
 			pass = false;
 			printf("%8s%17d%10s%15d%8s INACTIVE\n",
 			       expected_result[i].name,
-			       expected_result[i].size,
-			       "",
 			       expected_result[i].offset,
+			       "",
+			       expected_result[i].size,
 			       "");
 			continue;
 		}
