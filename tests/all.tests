@@ -887,9 +887,6 @@ spec['glsl-1.10'] = Group()
 import_glsl_parser_tests(spec['glsl-1.10'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
-import_glsl_parser_tests(spec['glsl-1.10'],
-			 os.path.join(generatedTestDir, 'spec', 'glsl-1.10'),
-			 ['preprocessor', 'compiler'])
 spec['glsl-1.10']['linker'] = Group()
 add_shader_test_dir(spec['glsl-1.10']['linker'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'linker'),
@@ -910,9 +907,6 @@ spec['glsl-1.20'] = Group()
 import_glsl_parser_tests(spec['glsl-1.20'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
 			 ['preprocessor', 'compiler'])
-import_glsl_parser_tests(spec['glsl-1.20'],
-			 os.path.join(generatedTestDir, 'spec', 'glsl-1.20'),
-			 ['compiler'])
 spec['glsl-1.20']['execution'] = Group()
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
@@ -950,9 +944,6 @@ spec['glsl-1.30'] = Group()
 import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.30'),
 			 ['preprocessor', 'compiler'])
-import_glsl_parser_tests(spec['glsl-1.30'],
-			 os.path.join(generatedTestDir, 'spec', 'glsl-1.30'),
-			 ['compiler'])
 spec['glsl-1.30']['execution'] = Group()
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
@@ -2185,6 +2176,7 @@ add_asmparsertest('ARBvp1.0', 'xpd.txt')
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
+import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
 profile.tests['bugs'] = bugs
 profile.tests['general'] = general
