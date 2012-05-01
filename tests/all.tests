@@ -1628,6 +1628,7 @@ import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
 			 [''])
 arb_uniform_buffer_object['getuniformblockindex'] = concurrent_test('arb_uniform_buffer_object-getuniformblockindex')
 arb_uniform_buffer_object['getuniformindices'] = concurrent_test('arb_uniform_buffer_object-getuniformindices')
+arb_uniform_buffer_object['getuniformlocation'] = concurrent_test('arb_uniform_buffer_object-getuniformlocation')
 arb_uniform_buffer_object['layout-std140'] = concurrent_test('arb_uniform_buffer_object-layout-std140')
 
 ati_draw_buffers = Group()
