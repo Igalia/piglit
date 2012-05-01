@@ -121,6 +121,36 @@ is_compressed_format(GLenum format)
    }
 }
 
+/** is the given texture internal format supported? */
+static bool
+supported_format(GLenum format)
+{
+	switch (format) {
+	case GL_RGBA16F:
+	case GL_RGBA32F:
+	case GL_RGB16F:
+	case GL_RGB32F:
+		return piglit_is_extension_supported("GL_ARB_texture_float");
+	case GL_RG:
+		return piglit_is_extension_supported("GL_ARB_texture_rg");
+	case GL_DEPTH_COMPONENT32F:
+		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
+	default:
+		return true;
+	}
+}
+
+/** is the texture format allowed for the texture target? */
+static bool
+supported_target_format(GLenum target, GLenum format)
+{
+	/* all the compressed formats we test (so far) are 2D only */
+	if (is_compressed_format(format) && target == GL_TEXTURE_1D) {
+		return false;
+	}
+	return true;
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -183,18 +213,12 @@ piglit_display(void)
 				       piglit_get_gl_enum_name(target[j]),
 				       piglit_get_gl_enum_name(format));
 
-			if (((format == GL_RGBA16F ||
-			      format == GL_RGBA32F) &&
-			     !piglit_is_extension_supported(
-			     "GL_ARB_texture_float")) ||
-
-			    ((format == GL_RG) &&
-			     !piglit_is_extension_supported(
-			     "GL_ARB_texture_rg"))) {
+			if (!supported_format(format) ||
+			    !supported_target_format(target[j], format)) {
 				if (!piglit_automatic)
 					printf("Internal format = %s skipped\n",
 					       piglit_get_gl_enum_name(format));
-				   continue;
+				continue;
 			}
 
 			/* To avoid failures not related to this test case,
