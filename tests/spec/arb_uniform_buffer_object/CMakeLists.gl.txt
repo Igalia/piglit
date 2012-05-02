@@ -16,5 +16,6 @@ add_executable (arb_uniform_buffer_object-getuniformblockindex getuniformblockin
 add_executable (arb_uniform_buffer_object-getuniformindices getuniformindices.c)
 add_executable (arb_uniform_buffer_object-getuniformlocation getuniformlocation.c)
 add_executable (arb_uniform_buffer_object-layout-std140 layout-std140.c)
+add_executable (arb_uniform_buffer_object-minmax minmax.c)
 
 # vim: ft=cmake:
