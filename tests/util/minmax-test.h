@@ -1,4 +1,4 @@
-/* Copyright © 2011-2012 Intel Corporation
+/* Copyright © 2012 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -20,32 +20,14 @@
  * IN THE SOFTWARE.
  */
 
-/** @file minmax.c
- *
- * Test for the minimum maximum value in the GL_ARB_texture_buffer_object spec.
- */
+extern bool piglit_minmax_pass;
 
-#include "piglit-util.h"
-#include "minmax-test.h"
-
-int piglit_width = 32;
-int piglit_height = 32;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
-
-enum piglit_result
-piglit_display(void)
-{
-	/* UNREACHED */
-	return PIGLIT_FAIL;
-}
-
-void
-piglit_init(int argc, char **argv)
-{
-	piglit_require_extension("GL_ARB_texture_buffer_object");
-
-	piglit_print_minmax_header();
-	piglit_test_min_int(GL_MAX_TEXTURE_BUFFER_SIZE, 65536);
-
-	piglit_report_result(piglit_minmax_pass ? PIGLIT_PASS : PIGLIT_FAIL);
-}
+void piglit_print_minmax_header(void);
+void piglit_test_min_int(GLenum token, GLint val);
+void piglit_test_max_int(GLenum token, GLint val);
+void piglit_test_min_float(GLenum token, GLfloat val);
+void piglit_test_max_float(GLenum token, GLfloat val);
+void piglit_test_range_float(GLenum token, GLfloat low, GLfloat high);
+void piglit_test_min_viewport_dimensions();
+void piglit_test_oq_bits(void);
+void piglit_test_tf_bits(GLenum target);
