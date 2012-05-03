@@ -184,11 +184,41 @@ disable_restart(void)
 }
 
 
+static void draw_all_indices(GLboolean one_by_one,
+                             GLenum mode, GLsizei count,
+                             GLenum type, const GLvoid *indices)
+{
+   GLuint index;
+
+   if (one_by_one) {
+      glBegin(mode);
+      for (index = 0; index < count; index++) {
+         switch (type) {
+         case GL_UNSIGNED_BYTE:
+            glArrayElement(((GLubyte*)indices)[index]);
+            break;
+         case GL_UNSIGNED_SHORT:
+            glArrayElement(((GLushort*)indices)[index]);
+            break;
+         case GL_UNSIGNED_INT:
+            glArrayElement(((GLuint*)indices)[index]);
+            break;
+         default:
+            assert(0);
+         }
+      }
+      glEnd();
+   } else {
+      glDrawElements(mode, count, type, indices);
+   }
+}
+
+
 /**
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
 static GLboolean
-test_draw_elements(GLenum primMode, GLenum indexType)
+test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 {
 #define NUM_VERTS 48
 #define NUM_ELEMS (NUM_VERTS * 5 / 4)
@@ -295,7 +325,7 @@ test_draw_elements(GLenum primMode, GLenum indexType)
          int i;
          for (i = 0; i < num_elems; i++)
             ub_elements[i] = (GLubyte) elements[i];
-         glDrawElements(primMode, num_elems, GL_UNSIGNED_BYTE, ub_elements);
+         draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_BYTE, ub_elements);
       }
       break;
    case GL_UNSIGNED_SHORT:
@@ -304,11 +334,11 @@ test_draw_elements(GLenum primMode, GLenum indexType)
          int i;
          for (i = 0; i < num_elems; i++)
             us_elements[i] = (GLushort) elements[i];
-         glDrawElements(primMode, num_elems, GL_UNSIGNED_SHORT, us_elements);
+         draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_SHORT, us_elements);
       }
       break;
    case GL_UNSIGNED_INT:
-      glDrawElements(primMode, num_elems, GL_UNSIGNED_INT, elements);
+      draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_INT, elements);
       break;
    default:
       assert(0);
@@ -319,14 +349,36 @@ test_draw_elements(GLenum primMode, GLenum indexType)
 
    pass = check_rendering();
    if (!pass) {
-      fprintf(stderr, "%s: failure drawing with glDrawElements(%s, %s)\n",
-              TestName, primStr, typeStr);      
+      fprintf(stderr, "%s: failure drawing with %s(%s, %s)\n",
+              TestName,
+              one_by_one ? "glArrayElement" : "glDrawElements",
+              primStr, typeStr);
    }
 
    piglit_present_results();
 
    return pass;
 #undef NUM_VERTS
+}
+
+
+/**
+ * Test glDrawElements() with glPrimitiveRestartIndexNV().
+ */
+static GLboolean
+test_draw_elements(GLenum primMode, GLenum indexType)
+{
+   return test_draw_by_index(GL_FALSE, primMode, indexType);
+}
+
+
+/**
+ * Test glArrayElement() with glPrimitiveRestartIndexNV().
+ */
+static GLboolean
+test_array_element(GLenum primMode, GLenum indexType)
+{
+   return test_draw_by_index(GL_TRUE, primMode, indexType);
 }
 
 
@@ -452,6 +504,12 @@ piglit_display(void)
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_INT);
       pass = pass && test_draw_arrays();
    }
 
@@ -463,6 +521,12 @@ piglit_display(void)
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
       pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_INT);
       pass = pass && test_draw_arrays();
    }
 
