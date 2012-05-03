@@ -5,6 +5,12 @@ include_directories(
 	${GLUT_INCLUDE_DIR}
 )
 
+if(BUILD_GLX_TESTS)
+    link_libraries (
+        piglitglxutil
+    )
+endif(BUILD_GLX_TESTS)
+
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
@@ -16,7 +22,6 @@ IF(BUILD_GLX_TESTS)
 		${GLPROTO_INCLUDE_DIRS}
 	)
 	link_libraries (
-		piglitglxutil
 		${X11_X11_LIB}
 	)
 	piglit_add_executable (glx-free-context free-context.c common.c)
