@@ -1,0 +1,76 @@
+# This is a test for derivatives behavior after a discard.
+#
+# From the GLSL 1.30 spec:
+#
+#     "The discard keyword is only allowed within fragment shaders. It
+#      can be used within a fragment shader to abandon the operation
+#      on the current fragment. This keyword causes the fragment to be
+#      discarded and no updates to any buffers will occur. Control
+#      flow exits the shader, and subsequent implicit or explicit
+#      derivatives are undefined when this control flow is non-uniform
+#      (meaning different fragments within the primitive take
+#      different control paths)."
+
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+
+in vec4 vertex;
+out vec2 texcoords;
+void main()
+{
+	gl_Position = vertex;
+
+	/* Turn the texcoords into a 1:1 mapping with pixels when
+	 * interpolated.  This means that the coords for our 2x2
+	 * subspan we're interested in for the FS will be:
+	 *
+	 * +-----+-----+
+	 * | 0,1 | 1,1 |
+	 * +-----+-----+
+	 * | 0,0 | 0,1 |
+	 * +-----+-----+
+	 *
+	 * So it would sample the 1x1 miplevel of the GL_TEXTURE_2D
+	 * miptree, unless some other math occurs...
+	 */
+	texcoords.yx = (vertex.xy + 1) / 2 * 250;
+}
+
+[fragment shader]
+#version 130
+in vec2 texcoords;
+uniform sampler2D s;
+
+void main()
+{
+	if (gl_FragCoord.x >= 1.0 || gl_FragCoord.y >= 1.0)
+		discard;
+
+	/* Now, we have uniform control after the discard (well,
+	 * except for the join after the if statement up there).  The
+	 * derivatives on this sample should get us the same values
+	 * for the undiscarded pixel as if we hadn't done any discard
+	 * (comment out the "discard" above to see).
+	 */
+	gl_FragColor = texture(s, texcoords / 4);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+
+texture miptree 0
+
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
