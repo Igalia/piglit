@@ -1,0 +1,49 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+/**
+ * Test i965 guardband limits by drawing a really huge triangle.  The
+ * guardband allows primitives to be trivially accepted by the clip stage
+ * without incurring the overhead of actual clipping.  However, there are
+ * generation-specific limits on the size of a primitive, and software is
+ * supposed to ensure that clipping reduces primitives to not exceed that.
+ * Otherwise, coordinates are clamped to fit within that range, causing
+ * the primitive to be drawn incorrectly.
+ *
+ * This makes sure we program the guardband size correctly; otherwise, the
+ * triangle's vertices will be clamped instead of clipped, resulting in a
+ * change in position and slope.
+ */
+attribute vec4 vertex;
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * vertex;
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(1.0);
+}
+
+[vertex data]
+vertex/float/2
+-28000.0 -3700.0
+ 37000.0 -3700.0
+ 37000.0  5300.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+ortho
+draw arrays GL_TRIANGLE_FAN 0 3
+probe rgb   2 175 1.0 1.0 1.0
+probe rgb 122 192 1.0 1.0 1.0
+probe rgb 201 203 1.0 1.0 1.0
+probe rgb 245 199 1.0 1.0 1.0
+
+probe rgb   2 180 0.0 0.0 0.0
+probe rgb 122 198 0.0 0.0 0.0
+probe rgb 201 208 0.0 0.0 0.0
+probe rgb 245 214 0.0 0.0 0.0
