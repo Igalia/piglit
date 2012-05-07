@@ -362,7 +362,7 @@ class ShaderTest(object):
 	return self._signature.version_introduced
 
     def version_directive(self):
-	if float(self.glsl_version()) == '1.10':
+	if self.glsl_version() == '1.10':
 	    return ''
 	else:
 	    return '#version {0}\n'.format(self.glsl_version().replace('.', ''))
