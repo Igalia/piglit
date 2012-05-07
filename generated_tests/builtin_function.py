@@ -122,7 +122,7 @@ class GlslBuiltinType(object):
     @property
     def version_introduced(self):
 	"""The earliest version of GLSL that this type appears in (as
-	a string, e.g. '1.10').
+	a string, e.g. 110).
 	"""
 	return self.__version_introduced
 
@@ -135,33 +135,33 @@ class GlslBuiltinType(object):
 
 
 # Concrete declarations of GlslBuiltinType
-glsl_bool   = GlslBuiltinType('bool',   None,       1, 1, '1.10')
-glsl_int    = GlslBuiltinType('int',    None,       1, 1, '1.10')
-glsl_uint   = GlslBuiltinType('uint',   None,       1, 1, '1.30')
-glsl_float  = GlslBuiltinType('float',  None,       1, 1, '1.10')
-glsl_vec2   = GlslBuiltinType('vec2',   glsl_float, 1, 2, '1.10')
-glsl_vec3   = GlslBuiltinType('vec3',   glsl_float, 1, 3, '1.10')
-glsl_vec4   = GlslBuiltinType('vec4',   glsl_float, 1, 4, '1.10')
-glsl_bvec2  = GlslBuiltinType('bvec2',  glsl_bool,  1, 2, '1.10')
-glsl_bvec3  = GlslBuiltinType('bvec3',  glsl_bool,  1, 3, '1.10')
-glsl_bvec4  = GlslBuiltinType('bvec4',  glsl_bool,  1, 4, '1.10')
-glsl_ivec2  = GlslBuiltinType('ivec2',  glsl_int,   1, 2, '1.10')
-glsl_ivec3  = GlslBuiltinType('ivec3',  glsl_int,   1, 3, '1.10')
-glsl_ivec4  = GlslBuiltinType('ivec4',  glsl_int,   1, 4, '1.10')
-glsl_uvec2  = GlslBuiltinType('uvec2',  glsl_uint,  1, 2, '1.30')
-glsl_uvec3  = GlslBuiltinType('uvec3',  glsl_uint,  1, 3, '1.30')
-glsl_uvec4  = GlslBuiltinType('uvec4',  glsl_uint,  1, 4, '1.30')
-glsl_mat2   = GlslBuiltinType('mat2',   glsl_float, 2, 2, '1.10')
-glsl_mat3   = GlslBuiltinType('mat3',   glsl_float, 3, 3, '1.10')
-glsl_mat4   = GlslBuiltinType('mat4',   glsl_float, 4, 4, '1.10')
+glsl_bool   = GlslBuiltinType('bool',   None,       1, 1, 110)
+glsl_int    = GlslBuiltinType('int',    None,       1, 1, 110)
+glsl_uint   = GlslBuiltinType('uint',   None,       1, 1, 130)
+glsl_float  = GlslBuiltinType('float',  None,       1, 1, 110)
+glsl_vec2   = GlslBuiltinType('vec2',   glsl_float, 1, 2, 110)
+glsl_vec3   = GlslBuiltinType('vec3',   glsl_float, 1, 3, 110)
+glsl_vec4   = GlslBuiltinType('vec4',   glsl_float, 1, 4, 110)
+glsl_bvec2  = GlslBuiltinType('bvec2',  glsl_bool,  1, 2, 110)
+glsl_bvec3  = GlslBuiltinType('bvec3',  glsl_bool,  1, 3, 110)
+glsl_bvec4  = GlslBuiltinType('bvec4',  glsl_bool,  1, 4, 110)
+glsl_ivec2  = GlslBuiltinType('ivec2',  glsl_int,   1, 2, 110)
+glsl_ivec3  = GlslBuiltinType('ivec3',  glsl_int,   1, 3, 110)
+glsl_ivec4  = GlslBuiltinType('ivec4',  glsl_int,   1, 4, 110)
+glsl_uvec2  = GlslBuiltinType('uvec2',  glsl_uint,  1, 2, 130)
+glsl_uvec3  = GlslBuiltinType('uvec3',  glsl_uint,  1, 3, 130)
+glsl_uvec4  = GlslBuiltinType('uvec4',  glsl_uint,  1, 4, 130)
+glsl_mat2   = GlslBuiltinType('mat2',   glsl_float, 2, 2, 110)
+glsl_mat3   = GlslBuiltinType('mat3',   glsl_float, 3, 3, 110)
+glsl_mat4   = GlslBuiltinType('mat4',   glsl_float, 4, 4, 110)
 glsl_mat2x2 = glsl_mat2
-glsl_mat3x2 = GlslBuiltinType('mat3x2', glsl_float, 3, 2, '1.20')
-glsl_mat4x2 = GlslBuiltinType('mat4x2', glsl_float, 4, 2, '1.20')
-glsl_mat2x3 = GlslBuiltinType('mat2x3', glsl_float, 2, 3, '1.20')
+glsl_mat3x2 = GlslBuiltinType('mat3x2', glsl_float, 3, 2, 120)
+glsl_mat4x2 = GlslBuiltinType('mat4x2', glsl_float, 4, 2, 120)
+glsl_mat2x3 = GlslBuiltinType('mat2x3', glsl_float, 2, 3, 120)
 glsl_mat3x3 = glsl_mat3
-glsl_mat4x3 = GlslBuiltinType('mat4x3', glsl_float, 4, 3, '1.20')
-glsl_mat2x4 = GlslBuiltinType('mat2x4', glsl_float, 2, 4, '1.20')
-glsl_mat3x4 = GlslBuiltinType('mat3x4', glsl_float, 3, 4, '1.20')
+glsl_mat4x3 = GlslBuiltinType('mat4x3', glsl_float, 4, 3, 120)
+glsl_mat2x4 = GlslBuiltinType('mat2x4', glsl_float, 2, 4, 120)
+glsl_mat3x4 = GlslBuiltinType('mat3x4', glsl_float, 3, 4, 120)
 glsl_mat4x4 = glsl_mat4
 
 
@@ -174,7 +174,7 @@ glsl_mat4x4 = glsl_mat4
 # - template is a Python format string that can be used to construct
 #   GLSL code that invokes the function or operator.
 # - version_introduced earliest version of GLSL the test applies to
-#   (as a string, e.g. '1.10').
+#   (as a string, e.g. 110).
 # - rettype is the return type of the function or operator (as a
 #   GlslBuiltinType).
 # - argtypes is a tuple containing the types of each parameter (as
@@ -187,7 +187,7 @@ glsl_mat4x4 = glsl_mat4
 # has a signature of
 #
 # Signature(name='step', template='step({0}, {1})',
-#           version_introduced='1.10', rettype='vec3',
+#           version_introduced=110, rettype='vec3',
 #           argtypes=('float', 'vec3'))
 Signature = collections.namedtuple(
     'Signature',
@@ -788,34 +788,34 @@ def _make_componentwise_test_vectors(test_suite_dict):
 		    _vectorize_test_vectors(
 			scalar_test_vectors, scalar_arg_indices,
 			vector_length))
-    f('radians', 1, '1.10', np.radians, None, [np.linspace(-180.0, 180.0, 4)])
-    f('degrees', 1, '1.10', np.degrees, None, [np.linspace(-np.pi, np.pi, 4)])
-    f('sin', 1, '1.10', np.sin, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
-    f('cos', 1, '1.10', np.cos, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
-    f('tan', 1, '1.10', np.tan, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
-    f('asin', 1, '1.10', np.arcsin, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
-    f('acos', 1, '1.10', np.arccos, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
-    f('atan', 1, '1.10', np.arctan, None, [atan_inputs], _trig_tolerance)
-    f('atan', 2, '1.10', _arctan2, None, [atan_inputs, atan_inputs], _trig_tolerance)
-    f('sinh', 1, '1.30', np.sinh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
-    f('cosh', 1, '1.30', np.cosh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
-    f('tanh', 1, '1.30', np.tanh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
-    f('asinh', 1, '1.30', np.arcsinh, None, [atan_inputs], _trig_tolerance)
-    f('acosh', 1, '1.30', np.arccosh, None, [acosh_inputs], _trig_tolerance)
-    f('atanh', 1, '1.30', np.arctanh, None, [np.linspace(-0.99, 0.99, 4)], _trig_tolerance)
-    f('pow', 2, '1.10', _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
-    f('exp', 1, '1.10', np.exp, None, [np.linspace(-2.0, 2.0, 4)])
-    f('log', 1, '1.10', np.log, None, [np.linspace(0.01, 2.0, 4)])
-    f('exp2', 1, '1.10', _exp2, None, [np.linspace(-2.0, 2.0, 4)])
-    f('log2', 1, '1.10', np.log2, None, [np.linspace(0.01, 2.0, 4)])
-    f('sqrt', 1, '1.10', np.sqrt, None, [np.linspace(0.0, 2.0, 4)])
-    f('inversesqrt', 1, '1.10', lambda x: 1.0/np.sqrt(x), None, [np.linspace(0.1, 2.0, 4)])
-    f('abs', 1, '1.10', np.abs, None, [np.linspace(-1.5, 1.5, 5)])
-    f('abs', 1, '1.30', np.abs, None, [ints])
-    f('sign', 1, '1.10', np.sign, None, [np.linspace(-1.5, 1.5, 5)])
-    f('sign', 1, '1.30', np.sign, None, [ints])
-    f('floor', 1, '1.10', np.floor, None, [np.linspace(-2.0, 2.0, 4)])
-    f('trunc', 1, '1.30', _trunc, None, [np.linspace(-2.0, 2.0, 8)])
+    f('radians', 1, 110, np.radians, None, [np.linspace(-180.0, 180.0, 4)])
+    f('degrees', 1, 110, np.degrees, None, [np.linspace(-np.pi, np.pi, 4)])
+    f('sin', 1, 110, np.sin, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('cos', 1, 110, np.cos, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('tan', 1, 110, np.tan, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
+    f('asin', 1, 110, np.arcsin, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
+    f('acos', 1, 110, np.arccos, None, [np.linspace(-1.0, 1.0, 4)], _trig_tolerance)
+    f('atan', 1, 110, np.arctan, None, [atan_inputs], _trig_tolerance)
+    f('atan', 2, 110, _arctan2, None, [atan_inputs, atan_inputs], _trig_tolerance)
+    f('sinh', 1, 130, np.sinh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('cosh', 1, 130, np.cosh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('tanh', 1, 130, np.tanh, None, [np.linspace(-2.0, 2.0, 4)], _trig_tolerance)
+    f('asinh', 1, 130, np.arcsinh, None, [atan_inputs], _trig_tolerance)
+    f('acosh', 1, 130, np.arccosh, None, [acosh_inputs], _trig_tolerance)
+    f('atanh', 1, 130, np.arctanh, None, [np.linspace(-0.99, 0.99, 4)], _trig_tolerance)
+    f('pow', 2, 110, _pow, None, [np.linspace(0.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('exp', 1, 110, np.exp, None, [np.linspace(-2.0, 2.0, 4)])
+    f('log', 1, 110, np.log, None, [np.linspace(0.01, 2.0, 4)])
+    f('exp2', 1, 110, _exp2, None, [np.linspace(-2.0, 2.0, 4)])
+    f('log2', 1, 110, np.log2, None, [np.linspace(0.01, 2.0, 4)])
+    f('sqrt', 1, 110, np.sqrt, None, [np.linspace(0.0, 2.0, 4)])
+    f('inversesqrt', 1, 110, lambda x: 1.0/np.sqrt(x), None, [np.linspace(0.1, 2.0, 4)])
+    f('abs', 1, 110, np.abs, None, [np.linspace(-1.5, 1.5, 5)])
+    f('abs', 1, 130, np.abs, None, [ints])
+    f('sign', 1, 110, np.sign, None, [np.linspace(-1.5, 1.5, 5)])
+    f('sign', 1, 130, np.sign, None, [ints])
+    f('floor', 1, 110, np.floor, None, [np.linspace(-2.0, 2.0, 4)])
+    f('trunc', 1, 130, _trunc, None, [np.linspace(-2.0, 2.0, 8)])
 
     # Note: the direction of rounding used by round() is not specified
     # for half-integer values, so we test it over a range that doesn't
@@ -825,25 +825,25 @@ def _make_componentwise_test_vectors(test_suite_dict):
     # values.  In both cases, we can use numpy's round() function,
     # because it rounds half-integer values to even, and all other
     # values to nearest.
-    f('round', 1, '1.30', np.round, None, [np.linspace(-2.0, 2.0, 8)])
-    f('roundEven', 1, '1.30', np.round, None, [np.linspace(-2.0, 2.0, 25)])
+    f('round', 1, 130, np.round, None, [np.linspace(-2.0, 2.0, 8)])
+    f('roundEven', 1, 130, np.round, None, [np.linspace(-2.0, 2.0, 25)])
 
-    f('ceil', 1, '1.10', np.ceil, None, [np.linspace(-2.0, 2.0, 4)])
-    f('fract', 1, '1.10', lambda x: x-np.floor(x), None, [np.linspace(-2.0, 2.0, 4)])
-    f('mod', 2, '1.10', lambda x, y: x-y*np.floor(x/y), [1], [np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
-    f('min', 2, '1.10', min, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
-    f('min', 2, '1.30', min, [1], [ints, ints])
-    f('min', 2, '1.30', min, [1], [uints, uints])
-    f('max', 2, '1.10', max, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
-    f('max', 2, '1.30', max, [1], [ints, ints])
-    f('max', 2, '1.30', max, [1], [uints, uints])
-    f('clamp', 3, '1.10', _clamp, [1, 2], [np.linspace(-2.0, 2.0, 4), np.linspace(-1.5, 1.5, 3), np.linspace(-1.5, 1.5, 3)])
-    f('clamp', 3, '1.30', _clamp, [1, 2], [ints, ints, ints])
-    f('clamp', 3, '1.30', _clamp, [1, 2], [uints, uints, uints])
-    f('mix', 3, '1.10', lambda x, y, a: x*(1-a)+y*a, [2], [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), np.linspace(0.0, 1.0, 4)])
-    f('mix', 3, '1.30', lambda x, y, a: y if a else x, None, [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), bools])
-    f('step', 2, '1.10', lambda edge, x: 0.0 if x < edge else 1.0, [0], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
-    f('smoothstep', 3, '1.10', _smoothstep, [0, 1], [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
+    f('ceil', 1, 110, np.ceil, None, [np.linspace(-2.0, 2.0, 4)])
+    f('fract', 1, 110, lambda x: x-np.floor(x), None, [np.linspace(-2.0, 2.0, 4)])
+    f('mod', 2, 110, lambda x, y: x-y*np.floor(x/y), [1], [np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
+    f('min', 2, 110, min, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('min', 2, 130, min, [1], [ints, ints])
+    f('min', 2, 130, min, [1], [uints, uints])
+    f('max', 2, 110, max, [1], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('max', 2, 130, max, [1], [ints, ints])
+    f('max', 2, 130, max, [1], [uints, uints])
+    f('clamp', 3, 110, _clamp, [1, 2], [np.linspace(-2.0, 2.0, 4), np.linspace(-1.5, 1.5, 3), np.linspace(-1.5, 1.5, 3)])
+    f('clamp', 3, 130, _clamp, [1, 2], [ints, ints, ints])
+    f('clamp', 3, 130, _clamp, [1, 2], [uints, uints, uints])
+    f('mix', 3, 110, lambda x, y, a: x*(1-a)+y*a, [2], [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), np.linspace(0.0, 1.0, 4)])
+    f('mix', 3, 130, lambda x, y, a: y if a else x, None, [np.linspace(-2.0, 2.0, 2), np.linspace(-3.0, 3.0, 2), bools])
+    f('step', 2, 110, lambda edge, x: 0.0 if x < edge else 1.0, [0], [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
+    f('smoothstep', 3, 110, _smoothstep, [0, 1], [np.linspace(-1.9, 1.9, 4), np.linspace(-1.9, 1.9, 4), np.linspace(-2.0, 2.0, 4)])
 _make_componentwise_test_vectors(test_suite)
 
 
@@ -887,13 +887,13 @@ def _make_vector_relational_test_vectors(test_suite_dict):
 		    test_suite_dict, name, glsl_version,
 		    _vectorize_test_vectors(
 			scalar_test_vectors, (), vector_length))
-    f('lessThan', 2, '1.10', lambda x, y: x < y, 'viu')
-    f('lessThanEqual', 2, '1.10', lambda x, y: x <= y, 'viu')
-    f('greaterThan', 2, '1.10', lambda x, y: x > y, 'viu')
-    f('greaterThanEqual', 2, '1.10', lambda x, y: x >= y, 'viu')
-    f('equal', 2, '1.10', lambda x, y: x == y, 'viub')
-    f('notEqual', 2, '1.10', lambda x, y: x != y, 'viub')
-    f('not', 1, '1.10', lambda x: not x, 'b')
+    f('lessThan', 2, 110, lambda x, y: x < y, 'viu')
+    f('lessThanEqual', 2, 110, lambda x, y: x <= y, 'viu')
+    f('greaterThan', 2, 110, lambda x, y: x > y, 'viu')
+    f('greaterThanEqual', 2, 110, lambda x, y: x >= y, 'viu')
+    f('equal', 2, 110, lambda x, y: x == y, 'viub')
+    f('notEqual', 2, 110, lambda x, y: x != y, 'viub')
+    f('not', 1, 110, lambda x: not x, 'b')
 _make_vector_relational_test_vectors(test_suite)
 
 
@@ -1142,52 +1142,52 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 	    _simulate_function(
 		test_inputs, python_equivalent, tolerance_function),
 	    template = template)
-    f('op-add', 2, '1.10', lambda x, y: x + y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} + {1})')
-    f('op-sub', 2, '1.10', lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
-    f('op-mult', 2, '1.10', _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
-    f('op-div', 2, '1.10', _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
-    f('op-div-large', 2, '1.30', _divide, match_simple_binop, [large_uints, large_uints+small_uints], template = '({0} / {1})')
-    f('op-mod', 2, '1.30', _modulus, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} % {1})')
-    f('op-uplus', 1, '1.10', lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
-    f('op-neg', 1, '1.10', lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
-    f('op-gt', 2, '1.10', lambda x, y: x > y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} > {1})')
-    f('op-lt', 2, '1.10', lambda x, y: x < y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} < {1})')
-    f('op-ge', 2, '1.10', lambda x, y: x >= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} >= {1})')
-    f('op-le', 2, '1.10', lambda x, y: x <= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} <= {1})')
-    f('op-eq', 2, '1.10', _equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} == {1})')
-    f('op-ne', 2, '1.10', _not_equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} != {1})')
-    f('op-and', 2, '1.10', lambda x, y: x and y, None, [bools, bools], template = '({0} && {1})')
-    f('op-or', 2, '1.10', lambda x, y: x or y, None, [bools, bools], template = '({0} || {1})')
-    f('op-xor', 2, '1.10', lambda x, y: x != y, None, [bools, bools], template = '({0} ^^ {1})')
-    f('op-not', 1, '1.10', lambda x: not x, None, [bools], template = '(! {0})')
-    f('op-selection', 3, '1.10', lambda x, y, z: y if x else z, match_args(1, 2), [bools, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} ? {1} : {2})')
-    f('op-complement', 1, '1.30', lambda x: ~x, None, [ints+ivecs+uints+uvecs], template = '(~ {0})')
-    f('op-lshift', 2, '1.30', _lshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} << {1})')
-    f('op-rshift', 2, '1.30', _rshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} >> {1})')
-    f('op-bitand', 2, '1.30', lambda x, y: x & y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} & {1})')
-    f('op-bitor', 2, '1.30', lambda x, y: x | y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} | {1})')
-    f('op-bitxor', 2, '1.30', lambda x, y: x ^ y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} ^ {1})')
-    f('length', 1, '1.10', np.linalg.norm, None, [floats+vecs])
-    f('distance', 2, '1.10', lambda x, y: np.linalg.norm(x-y), match_args(0, 1), [floats+vecs, floats+vecs])
-    f('dot', 2, '1.10', np.dot, match_args(0, 1), [floats+vecs, floats+vecs])
-    f('cross', 2, '1.10', np.cross, match_args(0, 1), [vec3s, vec3s], _cross_product_tolerance)
-    f('normalize', 1, '1.10', _normalize, None, [nz_floats_vecs])
-    f('faceforward', 3, '1.10', _faceforward, match_args(0, 1, 2), [floats+vecs, floats+vecs, floats+vecs])
-    f('reflect', 2, '1.10', _reflect, match_args(0, 1), [floats+vecs, norm_floats_vecs])
-    f('refract', 3, '1.10', _refract, match_args(0, 1), [norm_floats_vecs, norm_floats_vecs, [0.5, 2.0]])
+    f('op-add', 2, 110, lambda x, y: x + y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} + {1})')
+    f('op-sub', 2, 110, lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
+    f('op-mult', 2, 110, _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
+    f('op-div', 2, 110, _divide, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} / {1})')
+    f('op-div-large', 2, 130, _divide, match_simple_binop, [large_uints, large_uints+small_uints], template = '({0} / {1})')
+    f('op-mod', 2, 130, _modulus, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} % {1})')
+    f('op-uplus', 1, 110, lambda x: +x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(+ {0})')
+    f('op-neg', 1, 110, lambda x: -x, None, [floats+vecs+mats+ints+ivecs+uints+uvecs], template = '(- {0})')
+    f('op-gt', 2, 110, lambda x, y: x > y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} > {1})')
+    f('op-lt', 2, 110, lambda x, y: x < y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} < {1})')
+    f('op-ge', 2, 110, lambda x, y: x >= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} >= {1})')
+    f('op-le', 2, 110, lambda x, y: x <= y, match_args(0, 1), [ints+uints+floats, ints+uints+floats], template = '({0} <= {1})')
+    f('op-eq', 2, 110, _equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} == {1})')
+    f('op-ne', 2, 110, _not_equal, match_args(0, 1), [floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} != {1})')
+    f('op-and', 2, 110, lambda x, y: x and y, None, [bools, bools], template = '({0} && {1})')
+    f('op-or', 2, 110, lambda x, y: x or y, None, [bools, bools], template = '({0} || {1})')
+    f('op-xor', 2, 110, lambda x, y: x != y, None, [bools, bools], template = '({0} ^^ {1})')
+    f('op-not', 1, 110, lambda x: not x, None, [bools], template = '(! {0})')
+    f('op-selection', 3, 110, lambda x, y, z: y if x else z, match_args(1, 2), [bools, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs, floats+vecs+mats+ints+ivecs+uints+uvecs+bools+bvecs], template = '({0} ? {1} : {2})')
+    f('op-complement', 1, 130, lambda x: ~x, None, [ints+ivecs+uints+uvecs], template = '(~ {0})')
+    f('op-lshift', 2, 130, _lshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} << {1})')
+    f('op-rshift', 2, 130, _rshift, match_shift, [small_ints+small_ivecs+small_uints+small_uvecs, small_ints+small_ivecs+small_uints+small_uvecs], template = '({0} >> {1})')
+    f('op-bitand', 2, 130, lambda x, y: x & y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} & {1})')
+    f('op-bitor', 2, 130, lambda x, y: x | y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} | {1})')
+    f('op-bitxor', 2, 130, lambda x, y: x ^ y, match_simple_binop, [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs], template = '({0} ^ {1})')
+    f('length', 1, 110, np.linalg.norm, None, [floats+vecs])
+    f('distance', 2, 110, lambda x, y: np.linalg.norm(x-y), match_args(0, 1), [floats+vecs, floats+vecs])
+    f('dot', 2, 110, np.dot, match_args(0, 1), [floats+vecs, floats+vecs])
+    f('cross', 2, 110, np.cross, match_args(0, 1), [vec3s, vec3s], _cross_product_tolerance)
+    f('normalize', 1, 110, _normalize, None, [nz_floats_vecs])
+    f('faceforward', 3, 110, _faceforward, match_args(0, 1, 2), [floats+vecs, floats+vecs, floats+vecs])
+    f('reflect', 2, 110, _reflect, match_args(0, 1), [floats+vecs, norm_floats_vecs])
+    f('refract', 3, 110, _refract, match_args(0, 1), [norm_floats_vecs, norm_floats_vecs, [0.5, 2.0]])
 
     # Note: technically matrixCompMult operates componentwise.
     # However, since it is the only componentwise function to operate
     # on matrices, it is easier to generate test cases for it here
     # than to add matrix support to _make_componentwise_test_vectors.
-    f('matrixCompMult', 2, '1.10', lambda x, y: x*y, match_args(0, 1), [mats, mats])
+    f('matrixCompMult', 2, 110, lambda x, y: x*y, match_args(0, 1), [mats, mats])
 
-    f('outerProduct', 2, '1.20', np.outer, None, [vecs, vecs])
-    f('transpose', 1, '1.20', np.transpose, None, [mats])
-    f('any', 1, '1.10', any, None, [bvecs])
-    f('all', 1, '1.10', all, None, [bvecs])
+    f('outerProduct', 2, 120, np.outer, None, [vecs, vecs])
+    f('transpose', 1, 120, np.transpose, None, [mats])
+    f('any', 1, 110, any, None, [bvecs])
+    f('all', 1, 110, all, None, [bvecs])
 
-    f('inverse', 1, '1.40', np.linalg.inv, None, [squaremats])
+    f('inverse', 1, 140, np.linalg.inv, None, [squaremats])
 
 _make_vector_or_matrix_test_vectors(test_suite)
 

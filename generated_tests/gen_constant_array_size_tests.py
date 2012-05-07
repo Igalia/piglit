@@ -60,17 +60,17 @@ class ParserTest(object):
 	self.__test_vectors = test_vectors
 
     def glsl_version(self):
-	if self.__signature.version_introduced < '1.20':
+	if self.__signature.version_introduced < 120:
 	    # Before version 1.20, built-in function invocations
 	    # weren't allowed in constant expressions.  So even if
 	    # this built-in was introduced prior to 1.20, test it in
 	    # version 1.20.
-	    return '1.20'
+	    return 120
 	else:
 	    return self.__signature.version_introduced
 
     def version_directive(self):
-	return '#version {0}\n'.format(self.glsl_version().replace('.', ''))
+	return '#version {0}\n'.format(self.glsl_version())
 
     @abc.abstractmethod
     def test_suffix(self):
@@ -151,7 +151,7 @@ class ParserTest(object):
 	argtype_names = '-'.join(
 	    str(argtype) for argtype in self.__signature.argtypes)
 	return os.path.join(
-	    'spec', 'glsl-{0}'.format(self.glsl_version()),
+	    'spec', 'glsl-{:1.2f}'.format(float(self.glsl_version()) / 100),
 	    'compiler', 'built-in-functions',
 	    '{0}-{1}.{2}'.format(
 		self.__signature.name, argtype_names, self.test_suffix()))
@@ -160,7 +160,7 @@ class ParserTest(object):
 	"""Generate the test and write it to the output file."""
 	parser_test = '/* [config]\n'
 	parser_test += ' * expect_result: pass\n'
-	parser_test += ' * glsl_version: {0}\n'.format(self.glsl_version())
+	parser_test += ' * glsl_version: {:1.2f}\n'.format(float(self.glsl_version()) / 100)
 	parser_test += ' * [end config]\n'
 	parser_test += ' *\n'
 	parser_test += ' * Check that the following test vectors are constant folded correctly:\n'

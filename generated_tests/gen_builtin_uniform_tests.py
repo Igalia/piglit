@@ -362,13 +362,13 @@ class ShaderTest(object):
 	return self._signature.version_introduced
 
     def version_directive(self):
-	if self.glsl_version() == '1.10':
+	if self.glsl_version() == 110:
 	    return ''
 	else:
-	    return '#version {0}\n'.format(self.glsl_version().replace('.', ''))
+	    return '#version {0}\n'.format(self.glsl_version())
 
     def draw_command(self):
-        if float(self.glsl_version()) >= 1.40:
+        if self.glsl_version() >= 140:
             return 'draw arrays GL_TRIANGLE_FAN 0 4\n'
         else:
             return 'draw rect -1 -1 2 2\n'
@@ -438,7 +438,7 @@ class ShaderTest(object):
         # Starting with GLSL 1.40/GL 3.1, we need to use VBOs and
         # vertex shader input bindings for our vertex data instead of
         # the piglit drawing utilities and gl_Vertex.
-        if float(self.glsl_version()) < 1.40:
+        if self.glsl_version() < 140:
             return ""
         vbo = '[vertex data]\n'
         vbo += 'vertex/float/2\n'
@@ -453,7 +453,7 @@ class ShaderTest(object):
 	argtype_names = '-'.join(
 	    str(argtype) for argtype in self._signature.argtypes)
 	return os.path.join(
-	    'spec', 'glsl-{0}'.format(self.glsl_version()),
+	    'spec', 'glsl-{:1.2f}'.format(float(self.glsl_version()) / 100),
 	    'execution', 'built-in-functions',
 	    '{0}-{1}-{2}{3}.shader_test'.format(
 		self.test_prefix(), self._signature.name, argtype_names,
@@ -462,7 +462,7 @@ class ShaderTest(object):
     def generate_shader_test(self):
 	"""Generate the test and write it to the output file."""
 	shader_test = '[require]\n'
-	shader_test += 'GLSL >= {0}\n'.format(self.glsl_version())
+	shader_test += 'GLSL >= {:1.2f}\n'.format(float(self.glsl_version()) / 100)
 	shader_test += '\n'
 	shader_test += '[vertex shader]\n'
 	shader_test += self.make_vertex_shader()
@@ -490,7 +490,7 @@ class VertexShaderTest(ShaderTest):
 	return 'vs'
 
     def make_vertex_shader(self):
-        if float(self.glsl_version()) >= 1.40:
+        if self.glsl_version() >= 140:
             return self.make_test_shader(
                 'in vec4 vertex;\n' +
                 'out vec4 color;\n',
@@ -524,12 +524,12 @@ class FragmentShaderTest(ShaderTest):
 
     def make_vertex_shader(self):
 	shader = self.version_directive()
-        if float(self.glsl_version()) >= 1.40:
+        if self.glsl_version() >= 140:
             shader += "in vec4 vertex;\n"
 
 	shader += "void main()\n"
         shader += "{\n"
-        if float(self.glsl_version()) >= 1.40:
+        if self.glsl_version() >= 140:
             shader += "	gl_Position = vertex;\n"
         else:
             shader += "	gl_Position = gl_Vertex;\n"
