@@ -23,3 +23,4 @@ piglit_add_executable (ext_framebuffer_multisample-renderbuffer-samples renderbu
 piglit_add_executable (ext_framebuffer_multisample-renderbufferstorage-samples renderbufferstorage-samples.c)
 piglit_add_executable (ext_framebuffer_multisample-samples samples.c)
 piglit_add_executable (ext_framebuffer_multisample-turn-on-off common.cpp turn-on-off.cpp)
+piglit_add_executable (ext_framebuffer_multisample-upsample common.cpp upsample.cpp)
