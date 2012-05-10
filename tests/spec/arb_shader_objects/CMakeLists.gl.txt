@@ -12,6 +12,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_shader_objects-bindattriblocation-scratch-name bindattriblocation-scratch-name.c)
+piglit_add_executable (arb_shader_objects-getactiveuniform-beginend getactiveuniform-beginend.c)
 piglit_add_executable (arb_shader_objects-getuniform getuniform.c)
 piglit_add_executable (arb_shader_objects-getuniformlocation-array-of-struct-of-array getuniformlocation-array-of-struct-of-array.c)
 piglit_add_executable (arb_shader_objects-clear-with-deleted clear-with-deleted.c)
