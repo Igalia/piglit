@@ -1,0 +1,34 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform mat2 m[2];
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	mat2 a = m[0];
+	mat2 b = m[1];
+
+	/* Prevent copy propagation to help trigger the driver bug on
+	 * the assignment above.
+	 */
+	a[0].x = 0.0;
+	b[0].x = 0.0;
+
+	if (a == b)
+		gl_FrontColor = vec4(0.0, 1.0, 0.0, 0.0);
+	else
+		gl_FrontColor = vec4(1.0, 0.0, 0.0, 0.0);
+}
+
+[fragment shader]
+void main() {
+	gl_FragColor = gl_Color;
+}
+
+[test]
+uniform mat2x2 m[0] 0.0 1.0 2.0 3.0
+uniform mat2x2 m[1] 0.0 1.0 2.0 3.0
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 0
