@@ -54,6 +54,10 @@ check_rendering(void)
    GLboolean draw = GL_TRUE;
    GLfloat x;
 
+   if (!piglit_probe_pixel_rgb(0, 0, black)) {
+      return GL_FALSE;
+   }
+
    for (x = x0 + 0.5 * dx; x < x1; x += dx) {
       GLboolean pass;
       const int ix = (int) x;
