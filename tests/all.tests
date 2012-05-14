@@ -30,6 +30,10 @@ generatedTestDir = os.path.join(
 def plain_test(name):
 	return PlainExecTest([name, '-auto'])
 
+def add_single_param_test_set(group, name, *params):
+    for param in params:
+        group[name + '-' + param] = PlainExecTest([name, param, '-auto'])
+
 def add_plain_test(group, name):
 	group[name] = PlainExecTest([name, '-auto'])
 
@@ -300,7 +304,13 @@ add_plain_test(general, 'pbo-teximage-tiling-2')
 add_plain_test(general, 'point-line-no-cull')
 add_plain_test(general, 'polygon-mode')
 add_plain_test(general, 'pos-array')
-add_plain_test(general, 'primitive-restart')
+add_single_param_test_set(
+    general,
+    'primitive-restart',
+    "DISABLE_VBO",
+    "VBO_VERTEX_ONLY", "VBO_INDEX_ONLY",
+    "VBO_SEPARATE_VERTEX_AND_INDEX", "VBO_COMBINED_VERTEX_AND_INDEX"
+    )
 add_plain_test(general, 'provoking-vertex')
 add_plain_test(general, 'oes-read-format')
 add_plain_test(general, 'quad-invariance')

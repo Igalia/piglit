@@ -1,5 +1,6 @@
 /*
  * Copyright 2010 VMware, Inc.
+ * Copyright © 2012 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -36,6 +37,26 @@ int piglit_width = 400, piglit_height = 300;
 int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static const char *TestName = "primitive-restart";
+
+typedef enum {
+   DISABLE_VBO,
+   VBO_VERTEX_ONLY,
+   VBO_INDEX_ONLY,
+   VBO_SEPARATE_VERTEX_AND_INDEX,
+   VBO_COMBINED_VERTEX_AND_INDEX,
+   ALL_TESTS,
+} VBO_CFG;
+
+static char* vbo_cfg_names[] = {
+   "DISABLE_VBO",
+   "VBO_VERTEX_ONLY",
+   "VBO_INDEX_ONLY",
+   "VBO_SEPARATE_VERTEX_AND_INDEX",
+   "VBO_COMBINED_VERTEX_AND_INDEX",
+   "all",
+};
+
+static VBO_CFG vbo_init_cfg = DISABLE_VBO;
 
 static const GLfloat red[4] = {1.0, 0.0, 0.0, 1.0};
 static const GLfloat green[4] = {0.0, 1.0, 0.0, 0.0};
@@ -188,6 +209,28 @@ disable_restart(void)
 }
 
 
+static GLuint type_size(GLenum type)
+{
+   switch (type) {
+   case GL_UNSIGNED_BYTE:
+      return sizeof(GLubyte);
+   case GL_UNSIGNED_SHORT:
+      return sizeof(GLushort);
+   case GL_UNSIGNED_INT:
+      return sizeof(GLuint);
+   default:
+      assert(0);
+      return 0;
+   }
+}
+
+
+static GLuint type_array_size(GLenum type, GLuint length)
+{
+   return length * type_size(type);
+}
+
+
 static GLuint read_index_value(const GLvoid *indices, GLenum type, GLuint index)
 {
    switch (type) {
@@ -238,7 +281,7 @@ static void do_ArrayElement(GLenum mode, GLsizei count,
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
 static GLboolean
-test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
+test_draw_by_index(VBO_CFG vbo_cfg, GLboolean one_by_one, GLenum primMode, GLenum indexType)
 {
 #define NUM_VERTS 48
 #define NUM_ELEMS (NUM_VERTS * 5 / 4)
@@ -249,7 +292,28 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
    GLuint num_elems;
    GLboolean pass;
    const char *typeStr = NULL, *primStr = NULL;
+   GLuint vbo1, vbo2;
+   GLboolean create_vbo1 = GL_FALSE;
+   GLboolean create_vbo2 = GL_FALSE;
+   uintptr_t index_offset = 0;
+   uintptr_t vbo_data_size = sizeof(verts) + sizeof(indices);
    GLuint i, j;
+
+   if ((vbo_cfg != DISABLE_VBO) && (vbo_cfg != VBO_INDEX_ONLY)) {
+      create_vbo1 = GL_TRUE;
+   }
+
+   if ((vbo_cfg == VBO_INDEX_ONLY) || (vbo_cfg == VBO_SEPARATE_VERTEX_AND_INDEX)) {
+      create_vbo2 = GL_TRUE;
+   }
+
+   if ((vbo_cfg == DISABLE_VBO) || (vbo_cfg == VBO_VERTEX_ONLY)) {
+      index_offset = (uintptr_t) indices;
+   } else if (vbo_cfg == VBO_COMBINED_VERTEX_AND_INDEX) {
+      index_offset = sizeof(verts);
+   } else {
+      index_offset = 0;
+   }
 
    switch (indexType) {
    case GL_UNSIGNED_BYTE:
@@ -335,7 +399,39 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 
    glColor4fv(green);
 
-   glVertexPointer(2, GL_FLOAT, 2*sizeof(GLfloat), verts);
+   if (create_vbo1) {
+      glGenBuffers(1, &vbo1);
+      glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+      glBufferData(GL_ARRAY_BUFFER, vbo_data_size, NULL, GL_STATIC_DRAW);
+   }
+
+   if (create_vbo2) {
+      glGenBuffers(1, &vbo2);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo2);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, vbo_data_size, NULL, GL_STATIC_DRAW);
+   } else {
+      vbo2 = vbo1;
+   }
+
+   if (create_vbo1) {
+      /* Load vertex data into VBO */
+      glBindBuffer(GL_ARRAY_BUFFER, vbo1);
+      glBufferSubData(GL_ARRAY_BUFFER,
+                      0, sizeof(verts),
+                      verts);
+      glVertexPointer(2, GL_FLOAT, 0, (void *)0);
+   } else {
+      glVertexPointer(2, GL_FLOAT, 0, (void *)verts);
+   }
+
+   if ((vbo_cfg != DISABLE_VBO) && (vbo_cfg != VBO_VERTEX_ONLY)) {
+      /* Load index data into VBO */
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo2);
+      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
+                      index_offset, type_array_size(indexType, num_elems),
+                      indices);
+   }
+
    glEnableClientState(GL_VERTEX_ARRAY);
 
    assert(glGetError()==0);
@@ -345,18 +441,33 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
    if (one_by_one) {
       do_ArrayElement(primMode, num_elems, indexType, indices);
    } else {
-      glDrawElements(primMode, num_elems, indexType, indices);
+      glDrawElements(primMode, num_elems, indexType, (void*) index_offset);
    }
 
    disable_restart();
+
    glDisableClientState(GL_VERTEX_ARRAY);
+
+   if (vbo_cfg != DISABLE_VBO) {
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   }
+
+   if (create_vbo1) {
+      glDeleteBuffers(1, &vbo1);
+   }
+
+   if (create_vbo2) {
+      glDeleteBuffers(1, &vbo2);
+   }
 
    pass = check_rendering();
    if (!pass) {
-      fprintf(stderr, "%s: failure drawing with %s(%s, %s)\n",
+      fprintf(stderr, "%s: failure drawing with %s(%s, %s), %s\n",
               TestName,
               one_by_one ? "glArrayElement" : "glDrawElements",
-              primStr, typeStr);
+              primStr, typeStr,
+              vbo_cfg_names[vbo_cfg]);
    }
 
    piglit_present_results();
@@ -370,9 +481,9 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
  * Test glDrawElements() with glPrimitiveRestartIndexNV().
  */
 static GLboolean
-test_draw_elements(GLenum primMode, GLenum indexType)
+test_draw_elements(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
 {
-   return test_draw_by_index(GL_FALSE, primMode, indexType);
+   return test_draw_by_index(vbo_cfg, GL_FALSE, primMode, indexType);
 }
 
 
@@ -380,9 +491,9 @@ test_draw_elements(GLenum primMode, GLenum indexType)
  * Test glArrayElement() with glPrimitiveRestartIndexNV().
  */
 static GLboolean
-test_array_element(GLenum primMode, GLenum indexType)
+test_array_element(VBO_CFG vbo_cfg, GLenum primMode, GLenum indexType)
 {
-   return test_draw_by_index(GL_TRUE, primMode, indexType);
+   return test_draw_by_index(vbo_cfg, GL_TRUE, primMode, indexType);
 }
 
 
@@ -391,7 +502,7 @@ test_array_element(GLenum primMode, GLenum indexType)
  * We only test a line strip.
  */
 static GLboolean
-test_draw_arrays(void)
+test_draw_arrays(VBO_CFG vbo_cfg)
 {
 #define NUM_VERTS 12
    GLfloat verts[NUM_VERTS+2][2];
@@ -402,6 +513,7 @@ test_draw_arrays(void)
    const char *primStr = "GL_LINE_STRIP";
    GLuint test;
    const GLenum primMode = GL_LINE_STRIP;
+   GLuint vbo = 0;
 
    x = 0.0;
 
@@ -423,11 +535,18 @@ test_draw_arrays(void)
 
    glColor4fv(green);
 
-   glVertexPointer(2, GL_FLOAT, 2*sizeof(GLfloat), verts);
+   if ((vbo_cfg != DISABLE_VBO) && (vbo_cfg != VBO_INDEX_ONLY)) {
+      glGenBuffers(1, &vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+      glVertexPointer(2, GL_FLOAT, 0, (void *)0);
+   } else {
+      glVertexPointer(2, GL_FLOAT, 2*sizeof(GLfloat), verts);
+   }
+
    glEnableClientState(GL_VERTEX_ARRAY);
 
    assert(glGetError()==0);
-
 
    /*
     * Render and do checks.
@@ -483,6 +602,10 @@ test_draw_arrays(void)
 
    piglit_present_results();
 
+   if (vbo != 0) {
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+   }
+
    if (!pass) {
       fprintf(stderr, "%s: failure drawing with glDrawArrays(%s), "
               "restart index = %u\n",
@@ -493,8 +616,8 @@ test_draw_arrays(void)
 }
 
 
-enum piglit_result
-piglit_display(void)
+GLboolean
+primitive_restart_test(VBO_CFG vbo_cfg)
 {
    GLboolean pass = GL_TRUE;
 
@@ -502,39 +625,56 @@ piglit_display(void)
       TestGL31 = GL_FALSE;
       pass = pass && test_begin_end(GL_TRIANGLE_STRIP);
       pass = pass && test_begin_end(GL_LINE_STRIP);
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_arrays();
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_arrays(vbo_cfg);
    }
 
    if (Have_31) {
       TestGL31 = GL_TRUE;
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_draw_elements(GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_BYTE);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_SHORT);
-      pass = pass && test_array_element(GL_LINE_STRIP, GL_UNSIGNED_INT);
-      pass = pass && test_draw_arrays();
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_draw_elements(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(vbo_cfg, GL_TRIANGLE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_BYTE);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_SHORT);
+      pass = pass && test_array_element(vbo_cfg, GL_LINE_STRIP, GL_UNSIGNED_INT);
+      pass = pass && test_draw_arrays(vbo_cfg);
    }
 
-   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+   return pass;
+}
+
+
+enum piglit_result
+piglit_display(void)
+{
+   if (vbo_init_cfg == ALL_TESTS) {
+      VBO_CFG vbo_cfg;
+      for (vbo_cfg = 0; vbo_cfg < ARRAY_SIZE(vbo_cfg_names); vbo_cfg++) {
+         if ((vbo_cfg != ALL_TESTS) && !primitive_restart_test(vbo_cfg)) {
+            return PIGLIT_FAIL;
+         }
+      }
+      return PIGLIT_PASS;
+   } else {
+      return primitive_restart_test(vbo_init_cfg) ? PIGLIT_PASS : PIGLIT_FAIL;
+   }
 }
 
 
@@ -543,6 +683,16 @@ piglit_init(int argc, char **argv)
 {
    Have_NV = piglit_is_extension_supported("GL_NV_primitive_restart");
    Have_31 = piglit_get_gl_version() >= 31;
+
+   if (argc >= 2) {
+      VBO_CFG vbo_cfg;
+      for (vbo_cfg = 0; vbo_cfg < ARRAY_SIZE(vbo_cfg_names); vbo_cfg++) {
+         if (strcmp(argv[1], vbo_cfg_names[vbo_cfg]) == 0) {
+            vbo_init_cfg = vbo_cfg;
+            break;
+         }
+      }
+   }
 
    /* Debug */
    /* NOTE!  glew 1.5.2's OpenGL 3.1 detection is broken.  You'll need
