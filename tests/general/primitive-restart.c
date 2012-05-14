@@ -188,33 +188,49 @@ disable_restart(void)
 }
 
 
-static void draw_all_indices(GLboolean one_by_one,
-                             GLenum mode, GLsizei count,
+static GLuint read_index_value(const GLvoid *indices, GLenum type, GLuint index)
+{
+   switch (type) {
+   case GL_UNSIGNED_BYTE:
+      return (GLuint)((GLubyte*)indices)[index];
+   case GL_UNSIGNED_SHORT:
+      return (GLuint)((GLushort*)indices)[index];
+   case GL_UNSIGNED_INT:
+      return ((GLuint*)indices)[index];
+   default:
+      assert(0);
+   }
+}
+
+
+static void write_index_value(const GLvoid *indices, GLenum type, GLuint index, GLuint value)
+{
+   switch (type) {
+   case GL_UNSIGNED_BYTE:
+      ((GLubyte*)indices)[index] = (GLubyte) value;
+      break;
+   case GL_UNSIGNED_SHORT:
+      ((GLushort*)indices)[index] = (GLushort) value;
+      break;
+   case GL_UNSIGNED_INT:
+      ((GLuint*)indices)[index] = value;
+      break;
+   default:
+      assert(0);
+   }
+}
+
+
+static void do_ArrayElement(GLenum mode, GLsizei count,
                              GLenum type, const GLvoid *indices)
 {
    GLuint index;
 
-   if (one_by_one) {
-      glBegin(mode);
-      for (index = 0; index < count; index++) {
-         switch (type) {
-         case GL_UNSIGNED_BYTE:
-            glArrayElement(((GLubyte*)indices)[index]);
-            break;
-         case GL_UNSIGNED_SHORT:
-            glArrayElement(((GLushort*)indices)[index]);
-            break;
-         case GL_UNSIGNED_INT:
-            glArrayElement(((GLuint*)indices)[index]);
-            break;
-         default:
-            assert(0);
-         }
-      }
-      glEnd();
-   } else {
-      glDrawElements(mode, count, type, indices);
+   glBegin(mode);
+   for (index = 0; index < count; index++) {
+      glArrayElement(read_index_value(indices, type, index));
    }
+   glEnd();
 }
 
 
@@ -227,12 +243,13 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 #define NUM_VERTS 48
 #define NUM_ELEMS (NUM_VERTS * 5 / 4)
    GLfloat verts[NUM_VERTS+2][2];
-   GLuint elements[NUM_ELEMS];
+   GLubyte indices[sizeof(GLuint) * NUM_ELEMS];
    GLfloat x, dx;
    GLuint restart_index;
    GLuint num_elems;
    GLboolean pass;
    const char *typeStr = NULL, *primStr = NULL;
+   GLuint i, j;
 
    switch (indexType) {
    case GL_UNSIGNED_BYTE:
@@ -255,7 +272,6 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
    dx = 20.0;
 
    if (primMode == GL_TRIANGLE_STRIP) {
-      GLuint i, j;
       const GLfloat y = 0.5 * piglit_height - 10.0, dy = 20.0;
       for (i = 0; i < NUM_VERTS / 2; i++) {
          verts[i*2+0][0] = x;
@@ -267,16 +283,18 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 
       /* setup elements to draw series of squares w/ tri strip */
       for (i = j = 0; i < NUM_VERTS; i++) {
-         elements[j++] = i;
-         if (i > 0 && i % 4 == 3)
-            elements[j++] = restart_index;
+         write_index_value(indices, indexType, j, i);
+         j++;
+         if (i > 0 && i % 4 == 3) {
+            write_index_value(indices, indexType, j, restart_index);
+            j++;
+         }
       }
 
       num_elems = j;
       primStr = "GL_TRIANGLE_STRIP";
    }
    else {
-      GLuint i, j;
       const GLfloat y = 0.5 * piglit_height;
 
       assert(primMode == GL_LINE_STRIP);
@@ -291,9 +309,12 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 
       /* setup elements to draw series of disjoint lines w/ line strip */
       for (i = j = 0; i < NUM_VERTS / 2; i++) {
-         elements[j++] = i;
-         if (i > 0 && i % 2 == 1)
-            elements[j++] = restart_index;
+         write_index_value(indices, indexType, j, i);
+         j++;
+         if (i > 0 && i % 2 == 1) {
+            write_index_value(indices, indexType, j, restart_index);
+            j++;
+         }
       }
 
       num_elems = j;
@@ -304,9 +325,8 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
 
    /* debug */
    if (0) {
-      GLint i;
       for (i = 0; i < num_elems; i++)
-         printf("%2d: %d\n", i, elements[i]);
+         printf("%2d: %d\n", i, read_index_value(indices, indexType, i));
    }
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -322,30 +342,10 @@ test_draw_by_index(GLboolean one_by_one, GLenum primMode, GLenum indexType)
    enable_restart(restart_index);
 
    /* Draw */
-   switch (indexType) {
-   case GL_UNSIGNED_BYTE:
-      {
-         GLubyte ub_elements[NUM_ELEMS];
-         int i;
-         for (i = 0; i < num_elems; i++)
-            ub_elements[i] = (GLubyte) elements[i];
-         draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_BYTE, ub_elements);
-      }
-      break;
-   case GL_UNSIGNED_SHORT:
-      {
-         GLushort us_elements[NUM_ELEMS];
-         int i;
-         for (i = 0; i < num_elems; i++)
-            us_elements[i] = (GLushort) elements[i];
-         draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_SHORT, us_elements);
-      }
-      break;
-   case GL_UNSIGNED_INT:
-      draw_all_indices(one_by_one, primMode, num_elems, GL_UNSIGNED_INT, elements);
-      break;
-   default:
-      assert(0);
+   if (one_by_one) {
+      do_ArrayElement(primMode, num_elems, indexType, indices);
+   } else {
+      glDrawElements(primMode, num_elems, indexType, indices);
    }
 
    disable_restart();
