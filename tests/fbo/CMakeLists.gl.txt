@@ -86,5 +86,6 @@ piglit_add_executable (fbo-copyteximage fbo-copyteximage.c)
 piglit_add_executable (fbo-copyteximage-simple fbo-copyteximage-simple.c)
 piglit_add_executable (fbo-cubemap fbo-cubemap.c)
 piglit_add_executable (fbo-scissor-bitmap fbo-scissor-bitmap.c)
+piglit_add_executable (fbo-viewport fbo-viewport.c)
 
 # vim: ft=cmake:
