@@ -170,7 +170,7 @@ void TestCase::generate(void)
       }
    } else {
       /* Step around a circle that contains the window */
-      double radius = (sqrt(probe_rect.w*probe_rect.w + probe_rect.h*probe_rect.h) / 2.0) + 5.0;
+      double radius = (sqrt((double)(probe_rect.w*probe_rect.w + probe_rect.h*probe_rect.h)) / 2.0) + 5.0;
       double perimeter = 2.0 * M_PI * radius;
       double pos = 0.0;
 
@@ -276,7 +276,7 @@ piglit_display(void)
          pass = GL_FALSE;
    } else {
       test_case.generate();
-      pass &= test_case.run();
+      pass = pass && test_case.run();
 
       piglit_present_results();
    }
