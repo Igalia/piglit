@@ -72,7 +72,7 @@ int random_test_count = 10;
 /* Piglit variables */
 int piglit_width = 1000;
 int piglit_height = 1000;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_STENCIL;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 /* Globals */
 int test_id = 0;
@@ -198,20 +198,19 @@ bool TestCase::run(void) const
 
    /* Set render state */
    float colour[4];
+   glEnable(GL_BLEND);
+   glBlendEquation(GL_FUNC_ADD);
    if (rect) {
-      glEnable(GL_BLEND);
-      glBlendEquation(GL_FUNC_ADD);
       glBlendFunc(GL_ONE, GL_ONE);
       colour[0] = colour[1] = colour[2] = 127.0f / 255.0f;
    } else {
-      /* When contouring a circle with very small steps, some overdraw occurs
+      /* Invert.
+       *
+       * When contouring a circle with very small steps, some overdraw occurs
        * naturally, but it should cancel itself out, i.e., there should be an
        * odd number of overdraw inside the shape, and an even number outside.
        * */
-      glClearStencil(0);
-      glEnable(GL_STENCIL_TEST);
-      glStencilFunc(GL_EQUAL, 0, 1);
-      glStencilOp(GL_INVERT, GL_INVERT, GL_INVERT);
+      glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO);
       colour[0] = colour[1] = colour[2] = 1.0f;
    }
 
@@ -219,7 +218,7 @@ bool TestCase::run(void) const
    glColor4fv(colour);
 
    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-   glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT);
 
    /* Draw triangle fan */
    glEnableClientState(GL_VERTEX_ARRAY);
@@ -227,14 +226,7 @@ bool TestCase::run(void) const
    glDrawArrays(GL_TRIANGLE_FAN, 0, triangle_fan.size());
    glDisableClientState(GL_VERTEX_ARRAY);
 
-   if (!rect) {
-      /* Draw over whole screen, stencil buffer should leave the circle visible */
-      glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
-   }
-
    /* Reset draw state */
-   glDisable(GL_STENCIL_TEST);
    glDisable(GL_BLEND);
 
    if (!piglit_probe_rect_rgb(probe_rect.x, probe_rect.y, probe_rect.w, probe_rect.y, colour)) {
