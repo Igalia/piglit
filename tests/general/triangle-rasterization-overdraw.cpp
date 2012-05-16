@@ -222,7 +222,7 @@ bool TestCase::run(void) const
 
    /* Draw triangle fan */
    glEnableClientState(GL_VERTEX_ARRAY);
-   glVertexPointer(2, GL_FLOAT, 0, triangle_fan.data());
+   glVertexPointer(2, GL_FLOAT, 0, &triangle_fan.front());
    glDrawArrays(GL_TRIANGLE_FAN, 0, triangle_fan.size());
    glDisableClientState(GL_VERTEX_ARRAY);
 
