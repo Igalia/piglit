@@ -38,6 +38,8 @@ piglit_make_generated_tests(
 	gen_uniform_initializer_tests.py
 	uniform-initializer-templates/fs-initializer.template
 	uniform-initializer-templates/vs-initializer.template
+	uniform-initializer-templates/fs-initializer-from-const.template
+	uniform-initializer-templates/vs-initializer-from-const.template
 	)
 
 # Add a "gen-tests" target that can be used to generate all the
