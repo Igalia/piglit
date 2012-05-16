@@ -63,6 +63,12 @@ public:
 	 * be used.  Defaults to false.
 	 */
 	bool attach_texture;
+
+	/**
+	 * Internalformat that should be used for the color buffer.
+	 * Defaults to GL_RGBA.
+	 */
+	GLenum color_internalformat;
 };
 
 /**

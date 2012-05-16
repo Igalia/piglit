@@ -115,7 +115,8 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  width(width),
 	  height(height),
 	  combine_depth_stencil(true),
-	  attach_texture(false)
+	  attach_texture(false),
+	  color_internalformat(GL_RGBA)
 {
 }
 
@@ -163,7 +164,8 @@ Fbo::setup(const FboConfig &new_config)
 		glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 						 config.num_samples,
-						 GL_RGBA, config.width,
+						 config.color_internalformat,
+						 config.width,
 						 config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_COLOR_ATTACHMENT0,
@@ -176,7 +178,7 @@ Fbo::setup(const FboConfig &new_config)
 				GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D,
 			     0 /* level */,
-			     GL_RGBA /* internalformat */,
+			     config.color_internalformat,
 			     config.width,
 			     config.height,
 			     0 /* border */,
