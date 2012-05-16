@@ -110,15 +110,9 @@ piglit_display()
 	bool pass = true;
 
 	/* Draw the test pattern in src_fbo. */
-	float proj[4][4] = {
-		{ 1, 0, 0, 0 },
-		{ 0, 1, 0, 0 },
-		{ 0, 0, 1, 0 },
-		{ 0, 0, 0, 1 }
-	};
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, src_fbo.handle);
 	src_fbo.set_viewport();
-	test_pattern->draw(proj);
+	test_pattern->draw(TestPattern::no_projection);
 
 	/* Blit from src_fbo to dst_fbo. */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo.handle);

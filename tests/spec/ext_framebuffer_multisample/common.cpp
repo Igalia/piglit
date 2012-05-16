@@ -570,6 +570,15 @@ ManifestDepth::run()
 	glDisable(GL_DEPTH_TEST);
 }
 
+
+const float TestPattern::no_projection[4][4] = {
+	{ 1, 0, 0, 0 },
+	{ 0, 1, 0, 0 },
+	{ 0, 0, 1, 0 },
+	{ 0, 0, 0, 1 }
+};
+
+
 void Triangles::compile()
 {
 	/* Triangle coords within (-1,-1) to (1,1) rect */

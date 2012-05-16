@@ -220,8 +220,13 @@ public:
 	 * Draw the test pattern, applying the given projection matrix
 	 * to vertex coordinates.  The projection matrix is in
 	 * row-major order.
+	 *
+	 * If no projection transformation is needed, pass
+	 * TestPattern::no_projection for \c proj.
 	 */
 	virtual void draw(const float (*proj)[4]) = 0;
+
+	static const float no_projection[4][4];
 };
 
 /**
