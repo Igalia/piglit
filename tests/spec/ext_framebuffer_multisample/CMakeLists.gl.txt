@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (ext_framebuffer_multisample-accuracy common.cpp accuracy.cpp)
 piglit_add_executable (ext_framebuffer_multisample-dlist dlist.c)
+piglit_add_executable (ext_framebuffer_multisample-line-smooth common.cpp line-smooth.cpp)
 piglit_add_executable (ext_framebuffer_multisample-minmax minmax.c)
 piglit_add_executable (ext_framebuffer_multisample-multisample-blit common.cpp multisample-blit.cpp)
 piglit_add_executable (ext_framebuffer_multisample-negative-copypixels negative-copypixels.c)
