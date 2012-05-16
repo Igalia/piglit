@@ -86,6 +86,7 @@ public:
 
 	void set_samples(int num_samples);
 	void setup(const FboConfig &new_config);
+	bool try_setup(const FboConfig &new_config);
 
 	void set_viewport();
 

@@ -147,10 +147,36 @@ Fbo::set_samples(int num_samples)
 
 /**
  * Modify the state of the framebuffer object to reflect the state in
- * new_config.
+ * new_config.  if the resulting framebuffer is incomplete, terminate
+ * the test.
  */
 void
 Fbo::setup(const FboConfig &new_config)
+{
+	if (!try_setup(new_config)) {
+		printf("Framebuffer not complete\n");
+		if (!config.combine_depth_stencil) {
+			/* Some implementations do not support
+			 * separate depth and stencil attachments, so
+			 * don't consider it an error if we fail to
+			 * make a complete framebuffer using separate
+			 * depth and stencil attachments.
+			 */
+			piglit_report_result(PIGLIT_SKIP);
+		} else {
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+}
+
+
+/**
+ * Modify the state of the framebuffer object to reflect the state in
+ * config.  Return true if the resulting framebuffer is complete,
+ * false otherwise.
+ */
+bool
+Fbo::try_setup(const FboConfig &new_config)
 {
 	this->config = new_config;
 
@@ -223,22 +249,12 @@ Fbo::setup(const FboConfig &new_config)
 					  GL_RENDERBUFFER, depth_rb);
 	}
 
-	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		printf("Framebuffer not complete\n");
-		if (!config.combine_depth_stencil) {
-			/* Some implementations do not support
-			 * separate depth and stencil attachments, so
-			 * don't consider it an error if we fail to
-			 * make a complete framebuffer using separate
-			 * depth and stencil attachments.
-			 */
-			piglit_report_result(PIGLIT_SKIP);
-		} else {
-			piglit_report_result(PIGLIT_FAIL);
-		}
-	}
+	bool success = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)
+		== GL_FRAMEBUFFER_COMPLETE;
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	return success;
 }
 
 
