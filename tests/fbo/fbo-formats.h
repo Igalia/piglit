@@ -28,7 +28,7 @@
 
 struct format_desc {
 	GLenum internalformat;
-	char *name;
+	const char *name;
 };
 
 #define FORMAT(f) { f, #f }
@@ -490,7 +490,7 @@ static void next_test_set(int inc_dec)
 {
 	do {
 		test_index += inc_dec;
-		if (test_index >= ARRAY_SIZE(test_sets)) {
+		if (test_index >= (int) ARRAY_SIZE(test_sets)) {
 			test_index = 0;
 		}
 		else if (test_index < 0) {
@@ -515,7 +515,7 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 
 	case 'm': /* next format */
 		format_index++;
-		if (format_index >= test_sets[test_index].num_formats) {
+		if (format_index >= (int) test_sets[test_index].num_formats) {
 			format_index = 0;
 		}
 		break;
@@ -528,7 +528,7 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 		break;
 	case 'f': /* next format, or next test set */
 		format_index++;
-		if (format_index >= test_sets[test_index].num_formats) {
+		if (format_index >= (int) test_sets[test_index].num_formats) {
 			next_test_set(+1);
 		}
 		break;
@@ -556,7 +556,7 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	test_set = &test_sets[0];
 
 	for (i = 1; i < argc; i++) {
-		for (j = 1; j < ARRAY_SIZE(test_sets); j++) {
+		for (j = 1; j < (int) ARRAY_SIZE(test_sets); j++) {
 			if (!strcmp(argv[i], test_sets[j].param)) {
 				for (k = 0; k < 3; k++) {
 					if (test_sets[j].ext[k]) {
@@ -586,13 +586,13 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 }
 
 static void add_result(bool *all_skip, enum piglit_result *end_result,
-		       enum piglit_result new)
+		       enum piglit_result new_result)
 {
-	if (new != PIGLIT_SKIP)
+	if (new_result != PIGLIT_SKIP)
 		*all_skip = false;
 
-	if (new == PIGLIT_FAIL)
-		*end_result = new;
+	if (new_result == PIGLIT_FAIL)
+		*end_result = new_result;
 }
 
 typedef enum piglit_result (*test_func)(const struct format_desc *format, GLenum baseformat);
@@ -601,7 +601,7 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 {
 	enum piglit_result result, end_result = PIGLIT_PASS;
 	bool all_skip = true;
-	int i;
+	unsigned i;
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glClearColor(0.5, 0.5, 0.5, 0.5);
