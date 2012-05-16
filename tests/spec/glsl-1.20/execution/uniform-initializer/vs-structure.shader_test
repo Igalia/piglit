@@ -1,0 +1,42 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+struct S {
+  int i;
+  float f;
+  vec4 v[2];
+};
+
+uniform S s = S(9, 33.3, vec4[2](vec4(1, 2, 3, 4),
+				 vec4(9, 8, 7, 6)));
+varying vec4 color;
+
+void main()
+{
+  if (s.i == 9
+      && s.f == 33.3
+      && s.v[0] == vec4(1, 2, 3, 4)
+      && s.v[1] == vec4(9, 8, 7, 6)) {
+    color = vec4(0, 1, 0, 1);
+  } else {
+    color = vec4(1, 0, 0, 1);
+  }
+
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 120
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0 1 0
