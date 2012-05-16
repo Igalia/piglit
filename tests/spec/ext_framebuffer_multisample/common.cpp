@@ -639,6 +639,204 @@ void Triangles::draw(float (*proj)[4])
 	}
 }
 
+void Lines::compile()
+{
+	/* Line coords within (-1,-1) to (1,1) rect */
+	static const float pos_line[][2] = {
+		{ -0.8, -0.5 },
+		{  0.8, -0.5 }
+	};
+
+	/* Number of line instances across (and down) */
+	int lines_across = 4;
+
+	/* Total number of lines drawn */
+	num_lines = lines_across * lines_across;
+
+	/* Amount each line should be rotated compared to prev */
+	float rotation_delta = M_PI * 2.0 / num_lines;
+
+	/* Scaling factor uniformly applied to line coords */
+	float line_scale = 0.8 / lines_across;
+
+	/* Final scaling factor */
+	float final_scale = 0.95;
+
+	static const char *vert =
+		"#version 130\n"
+		"in vec2 pos_line;\n"
+		"uniform float line_scale;\n"
+		"uniform float rotation_delta;\n"
+		"uniform int lines_across;\n"
+		"uniform float final_scale;\n"
+		"uniform mat4 proj;\n"
+		"uniform int line_num;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"  vec2 pos = line_scale * pos_line;\n"
+		"  float rotation = rotation_delta * line_num;\n"
+		"  pos = mat2(cos(rotation), sin(rotation),\n"
+		"             -sin(rotation), cos(rotation)) * pos;\n"
+		"  int i = line_num % lines_across;\n"
+		"  int j = lines_across - 1 - line_num / lines_across;\n"
+		"  pos += (vec2(i, j) * 2.0 + 1.0) / lines_across - 1.0;\n"
+		"  pos *= final_scale;\n"
+		"  gl_Position = proj * vec4(pos, 0.0, 1.0);\n"
+		"}\n";
+
+	static const char *frag =
+		"#version 130\n"
+		"void main()\n"
+		"{\n"
+		"  gl_FragColor = vec4(1.0);\n"
+		"}\n";
+
+	/* Compile program */
+	prog = glCreateProgram();
+	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
+	glAttachShader(prog, vs);
+	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
+	glAttachShader(prog, fs);
+	glBindAttribLocation(prog, 0, "pos_line");
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	/* Set up uniforms */
+	glUseProgram(prog);
+	glUniform1f(glGetUniformLocation(prog, "line_scale"), line_scale);
+	glUniform1f(glGetUniformLocation(prog, "rotation_delta"),
+		    rotation_delta);
+	glUniform1i(glGetUniformLocation(prog, "lines_across"), lines_across);
+	glUniform1f(glGetUniformLocation(prog, "final_scale"), final_scale);
+	proj_loc = glGetUniformLocation(prog, "proj");
+	line_num_loc = glGetUniformLocation(prog, "line_num");
+
+	/* Set up vertex array object */
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	/* Set up vertex input buffer */
+	glGenBuffers(1, &vertex_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pos_line), pos_line,
+		     GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, ARRAY_SIZE(pos_line[0]), GL_FLOAT,
+			      GL_FALSE, sizeof(pos_line[0]), (void *) 0);
+}
+
+void Lines::draw(float (*proj)[4])
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUseProgram(prog);
+	glUniformMatrix4fv(proj_loc, 1, GL_TRUE, &proj[0][0]);
+	glBindVertexArray(vao);
+	for (int line_num = 0; line_num < num_lines; ++line_num) {
+		/* Draws with line width = 0.25, 0.75, 1.25,
+		 * 1.75, 2.25, 2.75, 3.25, 3.75
+		 */
+		glLineWidth((1 + 2 * line_num) / 4.0);
+		glUniform1i(line_num_loc, line_num);
+		glDrawArrays(GL_LINES, 0, 2);
+	}
+}
+
+void Points::compile()
+{
+	/* Point coords within (-1,-1) to (1,1) rect */
+	static const float pos_point[2] = { -0.5, -0.5 };
+
+	/* Number of point instances across (and down) */
+	int points_across = 4;
+
+	/* Total number of points drawn */
+	num_points = points_across * points_across;
+
+	/* Scaling factor uniformly applied to point coords */
+	float point_scale = 0.8 / points_across;
+
+	/* Final scaling factor */
+	float final_scale = 0.95;
+
+	static const char *vert =
+		"#version 130\n"
+		"in vec2 pos_point;\n"
+		"uniform float point_scale;\n"
+		"uniform int points_across;\n"
+		"uniform float final_scale;\n"
+		"uniform mat4 proj;\n"
+		"uniform int point_num;\n"
+		"uniform float depth;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"  vec2 pos = point_scale * pos_point;\n"
+		"  int i = point_num % points_across;\n"
+		"  int j = points_across - 1 - point_num / points_across;\n"
+		"  pos += (vec2(i, j) * 2.0 + 1.0) / points_across - 1.0;\n"
+		"  pos *= final_scale;\n"
+		"  gl_Position = proj * vec4(pos, depth, 1.0);\n"
+		"}\n";
+
+	static const char *frag =
+		"#version 130\n"
+		"void main()\n"
+		"{\n"
+		"  gl_FragColor = vec4(1.0);\n"
+		"}\n";
+
+	/* Compile program */
+	prog = glCreateProgram();
+	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
+	glAttachShader(prog, vs);
+	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
+	glAttachShader(prog, fs);
+	glBindAttribLocation(prog, 0, "pos_point");
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	/* Set up uniforms */
+	glUseProgram(prog);
+	glUniform1f(glGetUniformLocation(prog, "point_scale"), point_scale);
+	glUniform1i(glGetUniformLocation(prog, "points_across"), points_across);
+	glUniform1f(glGetUniformLocation(prog, "final_scale"), final_scale);
+	proj_loc = glGetUniformLocation(prog, "proj");
+	point_num_loc = glGetUniformLocation(prog, "point_num");
+	depth_loc = glGetUniformLocation(prog, "depth");
+
+	/* Set up vertex array object */
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	/* Set up vertex input buffer */
+	glGenBuffers(1, &vertex_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pos_point), pos_point,
+		     GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, ARRAY_SIZE(pos_point), GL_FLOAT,
+			      GL_FALSE, 0, (void *) 0);
+}
+
+void Points::draw(float (*proj)[4])
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUseProgram(prog);
+	glUniformMatrix4fv(proj_loc, 1, GL_TRUE, &proj[0][0]);
+	glBindVertexArray(vao);
+	glUniform1f(depth_loc, 0.0);
+	for (int point_num = 0; point_num < num_points; ++point_num) {
+		glPointSize((1.0 + 4 * point_num) / 4.0);
+		glUniform1i(point_num_loc, point_num);
+		glDrawArrays(GL_POINTS, 0, 1);
+	}
+}
+
 void Sunburst::compile()
 {
 	/* Triangle coords within (-1,-1) to (1,1) rect */

@@ -187,6 +187,49 @@ private:
 };
 
 /**
+ * Program we use to draw a test pattern into the color buffer.
+ *
+ * This program draws a sequence of points with varied sizes. This ensures
+ * antialiasing works well with all point sizes.
+ */
+class Points : public TestPattern
+{
+public:
+	virtual void compile();
+	virtual void draw(float (*proj)[4]);
+
+private:
+	GLint prog;
+	GLuint vao;
+	GLint proj_loc;
+	GLint depth_loc;
+	GLint point_num_loc;
+	GLuint vertex_buf;
+	int num_points;
+};
+
+/**
+ * Program we use to draw a test pattern into the color buffer.
+ *
+ * This program draws a sequence of lines with varied width. This ensures
+ * antialiasing works well with all line widths.
+ */
+class Lines : public TestPattern
+{
+public:
+	virtual void compile();
+	virtual void draw(float (*proj)[4]);
+
+private:
+	GLint prog;
+	GLuint vao;
+	GLint proj_loc;
+	GLint line_num_loc;
+	GLuint vertex_buf;
+	int num_lines;
+};
+
+/**
  * Program we use to draw a test pattern into the depth and stencil
  * buffers.
  *
