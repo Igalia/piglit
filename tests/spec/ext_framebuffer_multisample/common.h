@@ -221,7 +221,7 @@ public:
 	 * to vertex coordinates.  The projection matrix is in
 	 * row-major order.
 	 */
-	virtual void draw(float (*proj)[4]) = 0;
+	virtual void draw(const float (*proj)[4]) = 0;
 };
 
 /**
@@ -236,7 +236,7 @@ class Triangles : public TestPattern
 {
 public:
 	virtual void compile();
-	virtual void draw(float (*proj)[4]);
+	virtual void draw(const float (*proj)[4]);
 
 private:
 	GLint prog;
@@ -257,7 +257,7 @@ class Points : public TestPattern
 {
 public:
 	virtual void compile();
-	virtual void draw(float (*proj)[4]);
+	virtual void draw(const float (*proj)[4]);
 
 private:
 	GLint prog;
@@ -279,7 +279,7 @@ class Lines : public TestPattern
 {
 public:
 	virtual void compile();
-	virtual void draw(float (*proj)[4]);
+	virtual void draw(const float (*proj)[4]);
 
 private:
 	GLint prog;
@@ -342,7 +342,7 @@ public:
 class StencilSunburst : public Sunburst
 {
 public:
-	virtual void draw(float (*proj)[4]);
+	virtual void draw(const float (*proj)[4]);
 };
 
 /**
@@ -356,7 +356,7 @@ public:
 class DepthSunburst : public Sunburst
 {
 public:
-	virtual void draw(float (*proj)[4]);
+	virtual void draw(const float (*proj)[4]);
 };
 
 /**

@@ -660,7 +660,7 @@ void Triangles::compile()
 			      GL_FALSE, sizeof(pos_within_tri[0]), (void *) 0);
 }
 
-void Triangles::draw(float (*proj)[4])
+void Triangles::draw(const float (*proj)[4])
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -762,7 +762,7 @@ void Lines::compile()
 			      GL_FALSE, sizeof(pos_line[0]), (void *) 0);
 }
 
-void Lines::draw(float (*proj)[4])
+void Lines::draw(const float (*proj)[4])
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(prog);
@@ -857,7 +857,7 @@ void Points::compile()
 			      GL_FALSE, 0, (void *) 0);
 }
 
-void Points::draw(float (*proj)[4])
+void Points::draw(const float (*proj)[4])
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(prog);
@@ -973,7 +973,7 @@ ColorGradientSunburst::draw(const float (*proj)[4])
 }
 
 void
-StencilSunburst::draw(float (*proj)[4])
+StencilSunburst::draw(const float (*proj)[4])
 {
 	glEnable(GL_STENCIL_TEST);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -993,7 +993,7 @@ StencilSunburst::draw(float (*proj)[4])
 }
 
 void
-DepthSunburst::draw(float (*proj)[4])
+DepthSunburst::draw(const float (*proj)[4])
 {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
