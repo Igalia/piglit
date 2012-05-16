@@ -33,6 +33,12 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	non-lvalue_tests.list
 	gen_non-lvalue_tests.py)
+piglit_make_generated_tests(
+	uniform-initializer_tests.list
+	gen_uniform_initializer_tests.py
+	uniform-initializer-templates/fs-initializer.template
+	uniform-initializer-templates/vs-initializer.template
+	)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
@@ -40,4 +46,5 @@ add_custom_target(gen-tests ALL
 	DEPENDS builtin_uniform_tests.list
 		constant_array_size_tests.list
 		interpolation_tests.list
-		non-lvalue_tests.list)
+		non-lvalue_tests.list
+		uniform-initializer_tests.list)
