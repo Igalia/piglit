@@ -40,6 +40,8 @@ piglit_make_generated_tests(
 	uniform-initializer-templates/vs-initializer.template
 	uniform-initializer-templates/fs-initializer-from-const.template
 	uniform-initializer-templates/vs-initializer-from-const.template
+	uniform-initializer-templates/fs-initializer-set-by-API.template
+	uniform-initializer-templates/vs-initializer-set-by-API.template
 	uniform-initializer-templates/fs-initializer-set-by-other-stage.template
 	uniform-initializer-templates/vs-initializer-set-by-other-stage.template
 	)

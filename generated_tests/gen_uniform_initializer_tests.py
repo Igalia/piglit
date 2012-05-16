@@ -172,6 +172,7 @@ random_numbers = (0.78685, 0.89828, 0.36590, 0.92504, 0.48998, 0.27989,
 
 all_templates = ("",
                  "-from-const",
+                 "-set-by-API",
                  "-set-by-other-stage",
                  )
 
