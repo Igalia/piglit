@@ -839,11 +839,13 @@ void Points::draw(float (*proj)[4])
 
 void Sunburst::compile()
 {
-	/* Triangle coords within (-1,-1) to (1,1) rect */
-	static const float pos_within_tri[][2] = {
-		{ -0.3, -0.8 },
-		{  0.0,  1.0 },
-		{  0.3, -0.8 }
+	static struct vertex_attributes {
+		float pos_within_tri[2];
+		float barycentric_coords[3];
+	} vertex_data[] = {
+		{ { -0.3, -0.8 }, { 1, 0, 0 } },
+		{ {  0.0,  1.0 }, { 0, 1, 0 } },
+		{ {  0.3, -0.8 }, { 0, 0, 1 } }
 	};
 
 	/* Total number of triangles drawn */
@@ -852,6 +854,8 @@ void Sunburst::compile()
 	static const char *vert =
 		"#version 130\n"
 		"in vec2 pos_within_tri;\n"
+		"in vec3 in_barycentric_coords;\n"
+		"out vec3 barycentric_coords;\n"
 		"uniform float rotation;\n"
 		"uniform float depth;\n"
 		"uniform mat4 proj;\n"
@@ -862,13 +866,17 @@ void Sunburst::compile()
 		"  pos = mat2(cos(rotation), sin(rotation),\n"
 		"             -sin(rotation), cos(rotation)) * pos;\n"
 		"  gl_Position = proj * vec4(pos, depth, 1.0);\n"
+		"  barycentric_coords = in_barycentric_coords;\n"
 		"}\n";
 
 	static const char *frag =
 		"#version 130\n"
+		"in vec3 barycentric_coords;\n"
+		"uniform mat3x4 draw_colors;\n"
+		"\n"
 		"void main()\n"
 		"{\n"
-		"  gl_FragColor = vec4(0.0);\n"
+		"  gl_FragColor = draw_colors * barycentric_coords;\n"
 		"}\n";
 
 	/* Compile program */
@@ -878,6 +886,7 @@ void Sunburst::compile()
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	glAttachShader(prog, fs);
 	glBindAttribLocation(prog, 0, "pos_within_tri");
+	glBindAttribLocation(prog, 1, "in_barycentric_coords");
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -889,6 +898,7 @@ void Sunburst::compile()
 	depth_loc = glGetUniformLocation(prog, "depth");
 	glUniform1f(depth_loc, 0.0);
 	proj_loc = glGetUniformLocation(prog, "proj");
+	draw_colors_loc = glGetUniformLocation(prog, "draw_colors");
 
 	/* Set up vertex array object */
 	glGenVertexArrays(1, &vao);
@@ -897,11 +907,35 @@ void Sunburst::compile()
 	/* Set up vertex input buffer */
 	glGenBuffers(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(pos_within_tri), pos_within_tri,
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
 		     GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, ARRAY_SIZE(pos_within_tri[0]), GL_FLOAT,
-			      GL_FALSE, sizeof(pos_within_tri[0]), (void *) 0);
+	glVertexAttribPointer(0, ARRAY_SIZE(vertex_data[0].pos_within_tri),
+			      GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
+			      (void *) 0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, ARRAY_SIZE(vertex_data[0].barycentric_coords),
+			      GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
+			      (void *) offsetof(vertex_attributes,
+						barycentric_coords));
+}
+
+void
+ColorGradientSunburst::draw(const float (*proj)[4])
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glUseProgram(prog);
+	glUniformMatrix4fv(proj_loc, 1, GL_TRUE, &proj[0][0]);
+	float draw_colors[3][4] =
+		{ { 1, 0, 0, 1.0 }, { 0, 1, 0, 0.5 }, { 0, 0, 1, 1.0 } };
+	glUniformMatrix3x4fv(draw_colors_loc, 1, GL_FALSE,
+			     &draw_colors[0][0]);
+	glBindVertexArray(vao);
+	for (int i = 0; i < num_tris; ++i) {
+		glUniform1f(rotation_loc, M_PI * 2.0 * i / num_tris);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
 }
 
 void

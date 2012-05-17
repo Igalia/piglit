@@ -251,11 +251,24 @@ protected:
 	GLint rotation_loc;
 	GLint depth_loc;
 	GLint proj_loc;
+	GLint draw_colors_loc;
 	GLuint vao;
 	int num_tris;
 
 private:
 	GLuint vertex_buf;
+};
+
+/**
+ * Program that draws a test pattern into the color buffer.
+ *
+ * This program draws triangles using a variety of colors and
+ * gradients.
+ */
+class ColorGradientSunburst : public Sunburst
+{
+public:
+	virtual void draw(const float (*proj)[4]);
 };
 
 /**
