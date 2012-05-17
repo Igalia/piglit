@@ -1373,6 +1373,12 @@ for num_samples in (2, 4, 8, 16, 32):
 	        test_name)
 	ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
+for num_samples in (2, 4, 8, 16, 32):
+        test_name = ' '.join(['formats', str(num_samples)])
+        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                test_name)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
