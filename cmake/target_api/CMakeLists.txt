@@ -23,6 +23,13 @@
 #     Chad Versace <chad.versace@intel.com>
 
 add_subdirectory(gl)
-add_subdirectory(gles1)
-add_subdirectory(gles2)
+
+if(BUILD_GLES1_TESTS)
+	add_subdirectory(gles1)
+endif(BUILD_GLES1_TESTS)
+
+if(BUILD_GLES2_TESTS)
+	add_subdirectory(gles2)
+endif(BUILD_GLES2_TESTS)
+
 add_subdirectory(no_api)
