@@ -46,6 +46,20 @@ unsigned piglit_winsys_fbo = 0;
 static int piglit_window;
 static enum piglit_result result;
 
+#ifndef _WIN32
+__attribute__((weak)) int piglit_width = 100;
+__attribute__((weak)) int piglit_height = 100;
+__attribute__((weak)) int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+__attribute__((weak)) enum piglit_result piglit_display(void)
+{
+	return PIGLIT_FAIL;
+}
+__attribute__((weak)) void piglit_init(int argc, char **argv)
+{
+}
+#endif
+
 static void
 display(void)
 {

@@ -34,6 +34,11 @@
 
 int piglit_automatic;
 
+#ifndef _WIN32
+__attribute__((weak)) int piglit_width = 100;
+__attribute__((weak)) int piglit_height = 100;
+#endif
+
 Display *
 piglit_get_glx_display()
 {

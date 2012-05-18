@@ -26,6 +26,7 @@ if(OPENGL_egl_LIBRARY)
 	    ${UTIL_SOURCES}
 	    piglit-util-egl.c
 	    )
+	link_libraries(${OPENGL_egl_LIBRARY})
 endif(OPENGL_egl_LIBRARY)
 
 if(USE_WAFFLE)

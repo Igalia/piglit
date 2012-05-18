@@ -75,7 +75,11 @@ endfunction(piglit_add_executable)
 function(piglit_add_library name)
 
     list(REMOVE_AT ARGV 0)
-    add_library(${name} ${ARGV})
+    if(WIN32)
+        add_library(${name} ${ARGV})
+    else(WIN32)
+        add_library(${name} SHARED ${ARGV})
+    endif(WIN32)
     add_dependencies(${name} piglit_dispatch_gen)
 
 endfunction(piglit_add_library)
