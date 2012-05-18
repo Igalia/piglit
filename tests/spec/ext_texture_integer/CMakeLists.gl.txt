@@ -1,7 +1,6 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/spec/arb_color_buffer_float
 )
 
@@ -9,7 +8,6 @@ link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
 
 piglit_add_executable (ext_texture_integer-fbo-blending fbo-blending.c)

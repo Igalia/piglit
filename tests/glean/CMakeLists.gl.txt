@@ -11,7 +11,6 @@ ENDIF ()
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 	${TIFF_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/util
 )
@@ -93,7 +92,6 @@ target_link_libraries (glean
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 	${X11_X11_LIB}
 	${TIFF_LIBRARY}
 	${CARBON_LIBRARY}
