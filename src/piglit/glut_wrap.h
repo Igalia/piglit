@@ -42,7 +42,9 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#ifdef USE_GLUT
+#if defined(USE_WAFFLE)
+#	include <glut_waffle/glut_waffle.h>
+#elif defined(USE_GLUT)
 #	ifdef __APPLE__
 #		include <GLUT/glut.h>
 
@@ -58,9 +60,7 @@ extern "C" {
 #			include <GL/freeglut_ext.h>
 #		endif
 #	endif
-#endif
-
-#ifdef USE_EGLUT
+#elif defined(USE_EGLUT)
 #	include <glut_egl/glut_egl.h>
 #endif
 
