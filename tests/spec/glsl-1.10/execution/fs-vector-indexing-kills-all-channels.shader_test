@@ -1,0 +1,39 @@
+# This test exercises a bug in mesa as of 5/19.12: constant
+# propagation fails to detect that array indexing into a vector might
+# kill any component of the vector.
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#define RED vec4(1.0, 0.0, 0.0, 0.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 0.0)
+
+uniform int three;
+uniform float five;
+
+void main()
+{
+  vec4 v = vec4(1.0, 2.0, 3.0, 4.0);
+
+  // If the bug is present, constant propagation will see a scalar on
+  // the RHS, and incorrectly conclude that therefore only v.x is
+  // killed.
+  v[three] = five;
+
+  vec4 color = v.a == 5.0 ? GREEN : RED;
+
+  // If the bug is present, then index and new_value will be optimized
+  // away, making shader_runner fail to assign uniforms.  To avoid
+  // that, multiply color by (five - three - 1.0).
+  gl_FragColor = color * (five - float(three) - 1.0);
+}
+
+[test]
+uniform int three 3
+uniform float five 5.0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
