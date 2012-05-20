@@ -35,7 +35,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <GL/glut.h>
+
+#include "piglit-util.h"
 
 static const GLint tests[][8] = {
    { 1, GL_REPLACE,  GL_PRIMARY_COLOR, GL_PRIMARY_COLOR,
@@ -54,10 +55,9 @@ static const GLint tests[][8] = {
 
 #define NUM_TESTS (sizeof(tests) / sizeof(tests[0]))
 
-static int Width = 100 * (NUM_TESTS + 1);
-static int Height = 100;
-static int Interactive = 1;
-
+int piglit_width = 100 * (NUM_TESTS + 1);
+int piglit_height = 100;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
 
 static void DoFrame( void )
 {
@@ -120,7 +120,7 @@ static int DoTest( void )
 
    dmax = 0;
    for( i = 0; i <= NUM_TESTS; ++i ) {
-      glReadPixels(Width*(2*i+1)/((NUM_TESTS+1)*2), Height/2, 1, 1, GL_RGBA, GL_FLOAT, probe[i]);
+      glReadPixels(piglit_width*(2*i+1)/((NUM_TESTS+1)*2), piglit_height/2, 1, 1, GL_RGBA, GL_FLOAT, probe[i]);
       printf("Probe %i: %f,%f,%f\n", i, probe[i][0], probe[i][1], probe[i][2]);
       dr = probe[i][0] - 0.5f;
       dg = probe[i][1] - 0.5f;
@@ -142,11 +142,13 @@ static int DoTest( void )
       return 1;
 }
 
-static void Display( void )
+enum piglit_result
+piglit_display(void)
 {
-   if (Interactive) {
+   if (piglit_automatic) {
       DoFrame();
       glutSwapBuffers();
+      return PIGLIT_PASS;
    } else {
       int success, retry;
 
@@ -166,23 +168,19 @@ static void Display( void )
       retry = DoTest();
       glutSwapBuffers();
 
-      if (retry && success) {
-         printf("\nPIGLIT: { 'result': 'pass' }\n");
-      } else if (retry || success) {
-         printf("\nPIGLIT: { 'result': 'warn', 'note': 'Inconsistent results in first and second frame' }\n");
-      } else {
-         printf("\nPIGLIT: { 'result': 'fail' }\n");
-      }
-
-      exit(0);
+      if (retry && success)
+          return PIGLIT_PASS;
+      else
+          return PIGLIT_FAIL;
    }
 }
 
 
 static void Reshape( int width, int height )
 {
-   Width = width;
-   Height = height;
+   piglit_width = width;
+   piglit_height = height;
+
    glViewport( 0, 0, width, height );
    glMatrixMode( GL_PROJECTION );
    glLoadIdentity();
@@ -191,21 +189,7 @@ static void Reshape( int width, int height )
    glLoadIdentity();
 }
 
-
-static void Key( unsigned char key, int x, int y )
-{
-   (void) x;
-   (void) y;
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-   }
-   glutPostRedisplay();
-}
-
-
-static void Init( void )
+void piglit_init(int argc, char **argv)
 {
    const char * const ver_string = (const char * const)
        glGetString( GL_VERSION );
@@ -213,9 +197,7 @@ static void Init( void )
    GLint tex_units;
    GLint temp[ 256 ];
 
-
-   printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
-   printf("GL_VERSION = %s\n", ver_string);
+   glutReshapeFunc(Reshape);
 
    if ( (!piglit_is_extension_supported("GL_ARB_multitexture")
 	 && (ver < 1.3))
@@ -229,7 +211,7 @@ static void Init( void )
 	     "GL_ARB_texture_env_combine or GL_EXT_texture_env_combine (or OpenGL 1.3).\n"
 	     "Either GL_ARB_texture_env_crossbar or GL_NV_texture_env_combine4 (or\n"
 	     "OpenGL 1.4) are also required.\n");
-      if (!Interactive)
+      if (!piglit_automatic)
          printf("PIGLIT: {'result': 'fail' }\n");
       exit(1);
    }
@@ -237,12 +219,12 @@ static void Init( void )
    glGetIntegerv( GL_MAX_TEXTURE_UNITS, & tex_units );
    if ( tex_units < 2 ) {
       printf("\nSorry, this program requires at least 2 texture units.\n");
-      if (!Interactive)
+      if (!piglit_automatic)
          printf("PIGLIT: {'result': 'fail' }\n");
       exit(1);
    }
 
-   if (Interactive)
+   if (piglit_automatic)
       printf("\nAll %lu squares should be the same color.\n", (unsigned long) NUM_TESTS + 1);
 
    (void) memset( temp, 0x00, sizeof( temp ) );
@@ -286,24 +268,4 @@ static void Init( void )
    glVertex2f(-1,  1);
    glEnd();
    glEndList();
-
-   Reshape(Width, Height);
-}
-
-
-int main( int argc, char *argv[] )
-{
-   glutInit( &argc, argv );
-   if (argc == 2 && !strcmp(argv[1], "-auto"))
-      Interactive = 0;
-   glutInitWindowPosition( 0, 0 );
-   glutInitWindowSize( Width, Height );
-   glutInitDisplayMode( GLUT_RGB | GLUT_DOUBLE );
-   glutCreateWindow( "GL_ARB_texture_env_crossbar test" );
-   glutReshapeFunc( Reshape );
-   glutKeyboardFunc( Key );
-   glutDisplayFunc( Display );
-   Init();
-   glutMainLoop();
-   return 0;
 }
