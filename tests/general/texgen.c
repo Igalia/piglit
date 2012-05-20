@@ -28,8 +28,10 @@
 
 #include "piglit-util.h"
 
-static int Width = 128, Height = 128;
-static int Automatic = 0;
+int piglit_width = 128;
+int piglit_height = 128;
+int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
 static int CurrentTest = 0;
 static int UseFragmentProgram = 0;
 
@@ -53,9 +55,9 @@ static const char TextureFP[] =
 
 static void probe_cell(const char* testname, int x, int y, const float* expected)
 {
-	if (!piglit_probe_pixel_rgb((2*x+1)*Width/8, (2*y+1)*Height/8, expected)) {
+	if (!piglit_probe_pixel_rgb((2*x+1)*piglit_width/8, (2*y+1)*piglit_height/8, expected)) {
 		fprintf(stderr, "%s: %i,%i failed\n", testname, x, y);
-		if (Automatic)
+		if (piglit_automatic)
 			piglit_report_result(PIGLIT_FAIL);
 	}
 }
@@ -172,24 +174,26 @@ static struct {
 };
 #define NrTests (ARRAY_SIZE(Tests))
 
-static void Redisplay(void)
+enum piglit_result
+piglit_display(void)
 {
-	if (Automatic) {
+	if (piglit_automatic) {
 		int i;
 		for(i = 0; i < NrTests; ++i)
 			Tests[i].function();
-
-		piglit_report_result(PIGLIT_PASS);
+                return PIGLIT_PASS;
 	} else {
 		Tests[CurrentTest].function();
+                return PIGLIT_PASS;
 	}
 }
 
 
 static void Reshape(int width, int height)
 {
-	Width = width;
-	Height = height;
+	piglit_width = width;
+	piglit_height = height;
+
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -198,10 +202,32 @@ static void Reshape(int width, int height)
 	glLoadIdentity();
 }
 
+static void Key(unsigned char key, int x, int y)
+{
+	(void) x;
+	(void) y;
+	switch (key) {
+	case 't':
+		CurrentTest++;
+		if (CurrentTest >= NrTests)
+			CurrentTest = 0;
+		printf("Test: %s\n", Tests[CurrentTest].name);
+		break;
+	case 27:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
+}
 
-static void Init(void)
+void piglit_init(int argc, char *argv[])
 {
 	int x, y;
+
+	if (!piglit_automatic) {
+		printf("Press 't' to switch tests; Escape to quit\n");
+		glutKeyboardFunc(Key);
+	}
 
 	if (piglit_use_fragment_program()) {
 		UseFragmentProgram = 1;
@@ -224,44 +250,7 @@ static void Init(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_FLOAT, TextureData);
 	glEnable(GL_TEXTURE_2D);
 
-	Reshape(Width,Height);
-}
-
-static void Key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-	case 't':
-		CurrentTest++;
-		if (CurrentTest >= NrTests)
-			CurrentTest = 0;
-		printf("Test: %s\n", Tests[CurrentTest].name);
-		break;
-	case 27:
-		exit(0);
-		break;
-	}
-	glutPostRedisplay();
-}
-
-int main(int argc, char *argv[])
-{
-	glutInit(&argc, argv);
-	if (argc == 2 && !strcmp(argv[1], "-auto"))
-		Automatic = 1;
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(Width, Height);
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	glutCreateWindow(argv[0]);
 	glutReshapeFunc(Reshape);
-	glutDisplayFunc(Redisplay);
-	if (!Automatic) {
-		printf("Press 't' to switch tests; Escape to quit\n");
-		glutKeyboardFunc(Key);
-	}
-	Init();
-	glutMainLoop();
-	return 0;
+	Reshape(piglit_width, piglit_height);
 }
 
