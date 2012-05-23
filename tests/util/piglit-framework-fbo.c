@@ -71,24 +71,12 @@ piglit_framework_fbo_glx_destroy()
 #endif
 }
 
-static void
-piglit_framework_fbo_destroy()
-{
-#ifdef USE_OPENGL
-	glDeleteFramebuffers(1, &piglit_winsys_fbo);
-#endif
-	piglit_winsys_fbo = 0;
-	piglit_framework_fbo_glx_destroy();
-}
-
 static bool
-piglit_framework_fbo_init()
+piglit_framework_fbo_gl_init()
 {
 #ifdef USE_GLX
 	GLuint tex, depth = 0;
 	GLenum status;
-
-	piglit_framework_fbo_glx_init();
 
 #ifdef USE_OPENGL
 	glewInit();
@@ -157,4 +145,25 @@ piglit_framework_fbo_init()
 #else /* USE_GLX */
 	return false;
 #endif /* USE_GLX */
+}
+
+static bool
+piglit_framework_fbo_init(void)
+{
+#ifdef USE_GLX
+	piglit_framework_fbo_glx_init();
+#endif
+
+	return piglit_framework_fbo_gl_init();
+}
+
+static void
+piglit_framework_fbo_destroy(void)
+{
+#ifdef USE_OPENGL
+	glDeleteFramebuffers(1, &piglit_winsys_fbo);
+#endif
+
+	piglit_winsys_fbo = 0;
+	piglit_framework_fbo_glx_destroy();
 }
