@@ -151,7 +151,7 @@ class ParserTest(object):
 	argtype_names = '-'.join(
 	    str(argtype) for argtype in self.__signature.argtypes)
 	return os.path.join(
-	    'spec', 'glsl-{:1.2f}'.format(float(self.glsl_version()) / 100),
+	    'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
 	    'compiler', 'built-in-functions',
 	    '{0}-{1}.{2}'.format(
 		self.__signature.name, argtype_names, self.test_suffix()))
@@ -160,7 +160,7 @@ class ParserTest(object):
 	"""Generate the test and write it to the output file."""
 	parser_test = '/* [config]\n'
 	parser_test += ' * expect_result: pass\n'
-	parser_test += ' * glsl_version: {:1.2f}\n'.format(float(self.glsl_version()) / 100)
+	parser_test += ' * glsl_version: {0:1.2f}\n'.format(float(self.glsl_version()) / 100)
 	parser_test += ' * [end config]\n'
 	parser_test += ' *\n'
 	parser_test += ' * Check that the following test vectors are constant folded correctly:\n'

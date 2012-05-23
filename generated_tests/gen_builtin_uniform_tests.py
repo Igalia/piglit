@@ -453,7 +453,7 @@ class ShaderTest(object):
 	argtype_names = '-'.join(
 	    str(argtype) for argtype in self._signature.argtypes)
 	return os.path.join(
-	    'spec', 'glsl-{:1.2f}'.format(float(self.glsl_version()) / 100),
+	    'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
 	    'execution', 'built-in-functions',
 	    '{0}-{1}-{2}{3}.shader_test'.format(
 		self.test_prefix(), self._signature.name, argtype_names,
@@ -462,7 +462,7 @@ class ShaderTest(object):
     def generate_shader_test(self):
 	"""Generate the test and write it to the output file."""
 	shader_test = '[require]\n'
-	shader_test += 'GLSL >= {:1.2f}\n'.format(float(self.glsl_version()) / 100)
+	shader_test += 'GLSL >= {0:1.2f}\n'.format(float(self.glsl_version()) / 100)
 	shader_test += '\n'
 	shader_test += '[vertex shader]\n'
 	shader_test += self.make_vertex_shader()
