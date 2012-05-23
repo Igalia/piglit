@@ -17,6 +17,7 @@ set(UTIL_SOURCES
 	piglit-util-enum.c
 	shader-load.c
 	piglit-framework.c
+	piglit-framework-fbo.c
 	rgb9e5.c
 	)
 

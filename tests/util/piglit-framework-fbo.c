@@ -40,6 +40,8 @@
 #include "piglit-glx-util.h"
 #endif
 
+bool piglit_use_fbo = false;
+
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 Display *piglit_glx_dpy;
 Window piglit_glx_window;
@@ -153,7 +155,7 @@ piglit_framework_fbo_gl_init()
 #endif /* PIGLIT_FRAMEWORK_FBO_DISABLED */
 }
 
-static bool
+bool
 piglit_framework_fbo_init(void)
 {
 #if defined(PIGLIT_FRAMEWORK_FBO_USE_GLX)
@@ -163,7 +165,7 @@ piglit_framework_fbo_init(void)
 	return piglit_framework_fbo_gl_init();
 }
 
-static void
+void
 piglit_framework_fbo_destroy(void)
 {
 #ifdef USE_OPENGL
