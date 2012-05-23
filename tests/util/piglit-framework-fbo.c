@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 Intel Corporation
+ * Copyright © 2009-2012 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -21,6 +21,14 @@
  * IN THE SOFTWARE.
  */
 
+#if defined(USE_OPENGL_ES1)
+#	define PIGLIT_FRAMEWORK_FBO_DISABLED
+#elif defined(USE_GLX)
+#	define PIGLIT_FRAMEWORK_FBO_USE_GLX
+#else
+#	define PIGLIT_FRAMEWORK_FBO_DISABLED
+#endif
+
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -28,18 +36,18 @@
 
 #include "piglit-util.h"
 
-#ifdef USE_GLX
+#ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 #include "piglit-glx-util.h"
 #endif
 
-#ifdef USE_GLX
+#ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 Display *piglit_glx_dpy;
 Window piglit_glx_window;
 XVisualInfo *piglit_glx_visinfo;
 GLXContext piglit_glx_context;
 #endif
 
-#ifdef USE_GLX
+#ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 static void
 piglit_framework_fbo_glx_init()
 {
@@ -58,23 +66,23 @@ piglit_framework_fbo_glx_init()
 
 	glXMakeCurrent(piglit_glx_dpy, piglit_glx_window, piglit_glx_context);
 }
-#endif
 
 static void
 piglit_framework_fbo_glx_destroy()
 {
-#ifdef USE_GLX
 	glXMakeCurrent(piglit_glx_dpy, None, None);
 	glXDestroyContext(piglit_glx_dpy, piglit_glx_context);
 	XFree(piglit_glx_visinfo);
 	XCloseDisplay(piglit_glx_dpy);
-#endif
 }
+#endif
 
 static bool
 piglit_framework_fbo_gl_init()
 {
-#ifdef USE_GLX
+#ifdef PIGLIT_FRAMEWORK_FBO_DISABLED
+	return false;
+#else
 	GLuint tex, depth = 0;
 	GLenum status;
 
@@ -142,15 +150,13 @@ piglit_framework_fbo_gl_init()
 	}
 
 	return true;
-#else /* USE_GLX */
-	return false;
-#endif /* USE_GLX */
+#endif /* PIGLIT_FRAMEWORK_FBO_DISABLED */
 }
 
 static bool
 piglit_framework_fbo_init(void)
 {
-#ifdef USE_GLX
+#if defined(PIGLIT_FRAMEWORK_FBO_USE_GLX)
 	piglit_framework_fbo_glx_init();
 #endif
 
@@ -165,5 +171,8 @@ piglit_framework_fbo_destroy(void)
 #endif
 
 	piglit_winsys_fbo = 0;
+
+#if defined(PIGLIT_FRAMEWORK_FBO_USE_GLX)
 	piglit_framework_fbo_glx_destroy();
+#endif
 }
