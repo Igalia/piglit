@@ -28,4 +28,8 @@ if(OPENGL_egl_LIBRARY)
 	    )
 endif(OPENGL_egl_LIBRARY)
 
+if(USE_WAFFLE)
+	link_libraries("${WAFFLE_waffle_LIBRARY}")
+endif(USE_WAFFLE)
+
 piglit_include_target_api()
