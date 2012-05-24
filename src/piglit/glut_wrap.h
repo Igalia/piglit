@@ -29,7 +29,7 @@
  * \brief Convenience header that includes the actual GLUT headers.
  *
  * The actual GLUT headers are chosen according to the macro definitions
- * USE_GLUT and USE_EGLUT.
+ * USE_GLUT and USE_WAFFLE.
  */
 
 #pragma once
@@ -60,8 +60,6 @@ extern "C" {
 #			include <GL/freeglut_ext.h>
 #		endif
 #	endif
-#elif defined(USE_EGLUT)
-#	include <glut_egl/glut_egl.h>
 #endif
 
 #ifdef __cplusplus
