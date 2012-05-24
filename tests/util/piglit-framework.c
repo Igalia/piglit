@@ -94,7 +94,13 @@ piglit_framework_glut_init(int argc, char *argv[])
 	glutInitDisplayMode(piglit_window_mode);
 	piglit_window = glutCreateWindow(argv[0]);
 
-#ifdef USE_GLX
+#if defined(USE_GLX) && !defined(USE_WAFFLE)
+	/* If using waffle, then the current platform might not be GLX.
+	 * So we can't call any GLX functions.
+	 *
+	 * FIXME: Detect the waffle platform and handle piglit_automatic
+	 * FIXME: appropriately.
+	 */
 	if (piglit_automatic)
 		piglit_glx_set_no_input();
 #endif
