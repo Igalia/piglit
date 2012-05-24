@@ -17,6 +17,7 @@ set(UTIL_SOURCES
 	piglit-util-enum.c
 	shader-load.c
 	piglit-framework.c
+	piglit-framework-fbo.c
 	rgb9e5.c
 	)
 
@@ -26,5 +27,9 @@ if(OPENGL_egl_LIBRARY)
 	    piglit-util-egl.c
 	    )
 endif(OPENGL_egl_LIBRARY)
+
+if(USE_WAFFLE)
+	link_libraries("${WAFFLE_waffle_LIBRARY}")
+endif(USE_WAFFLE)
 
 piglit_include_target_api()

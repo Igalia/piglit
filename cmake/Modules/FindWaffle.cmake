@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2012 Intel Corporation
+# Copyright © 2012 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -19,16 +19,25 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# The no_api directory must precede the GL directories because it builds
-# glut_waffle, which the GL targets depend on.
-add_subdirectory(no_api)
 
-add_subdirectory(gl)
+# This module defines the following variables:
+#
+#   WAFFLE_FOUND
+#       True if Waffle is installed.
+#
+#   WAFFLE_INCLUDE_DIR
+#
+#   WAFFLE_waffle_LIBRARY
+#       Path to Waffle's library.
+#
+# FIXME: Set WAFFLE_VERSION.  But how does one detect package versions in
+# FIXME: CMake?
 
-if(BUILD_GLES1_TESTS)
-	add_subdirectory(gles1)
-endif(BUILD_GLES1_TESTS)
+find_path(WAFFLE_INCLUDE_DIR waffle/waffle.h)
+find_library(WAFFLE_waffle_LIBRARY waffle)
 
-if(BUILD_GLES2_TESTS)
-	add_subdirectory(gles2)
-endif(BUILD_GLES2_TESTS)
+include(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Waffle
+    DEFAULT_MSG
+    WAFFLE_INCLUDE_DIR WAFFLE_waffle_LIBRARY
+    )

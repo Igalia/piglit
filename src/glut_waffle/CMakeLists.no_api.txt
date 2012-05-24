@@ -1,0 +1,6 @@
+include_directories(${WAFFLE_INCLUDE_DIR})
+link_libraries(${WAFFLE_waffle_LIBRARY})
+
+add_library(glut_waffle SHARED
+    glut_waffle.c
+    )

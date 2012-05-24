@@ -3,7 +3,6 @@ include_directories(
 
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 	)
 
 piglit_add_library(hiz-util
@@ -16,7 +15,6 @@ link_libraries (
 
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
 
 piglit_add_executable(hiz-depth-stencil-test-fbo-d0-s8 hiz-depth-stencil-test-fbo-d0-s8.c)

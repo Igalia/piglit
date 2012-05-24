@@ -25,52 +25,32 @@
 
 #pragma once
 
-enum {
-   GLUT_RGB = 0,
-   GLUT_RGBA = 0,
-   GLUT_INDEX = 1,
-   GLUT_SINGLE = 0,
-   GLUT_DOUBLE = 2,
-   GLUT_ACCUM = 4,
-   GLUT_ALPHA = 8,
-   GLUT_DEPTH = 16,
-   GLUT_STENCIL = 32,
+enum glut_display_mode {
+	GLUT_RGB = 0,
+	GLUT_RGBA = 0,
+	GLUT_INDEX = 1,
+	GLUT_SINGLE = 0,
+	GLUT_DOUBLE = 2,
+	GLUT_ACCUM = 4,
+	GLUT_ALPHA = 8,
+	GLUT_DEPTH = 16,
+	GLUT_STENCIL = 32,
 };
 
 /* used by glutInitAPIMask */
-enum {
-   GLUT_OPENGL_BIT     = 0x1,
-   GLUT_OPENGL_ES1_BIT = 0x2,
-   GLUT_OPENGL_ES2_BIT = 0x4,
-   GLUT_OPENVG_BIT     = 0x8
-};
-
-/* used by GLUT_EGLspecialCB */
-enum {
-   /* function keys */
-   GLUT_KEY_F1  = 1,
-   GLUT_KEY_F2  = 2,
-   GLUT_KEY_F3  = 3,
-   GLUT_KEY_F4  = 4,
-   GLUT_KEY_F5  = 5,
-   GLUT_KEY_F6  = 6,
-   GLUT_KEY_F7  = 7,
-   GLUT_KEY_F8  = 8,
-   GLUT_KEY_F9  = 9,
-   GLUT_KEY_F10 = 10,
-   GLUT_KEY_F11 = 11,
-   GLUT_KEY_F12 = 12,
-
-   /* directional keys */
-   GLUT_KEY_LEFT = 100,
-   GLUT_KEY_UP = 101,
-   GLUT_KEY_RIGHT = 102,
-   GLUT_KEY_DOWN = 103,
+enum glut_api {
+	GLUT_OPENGL_BIT     = 0x1,
+	GLUT_OPENGL_ES1_BIT = 0x2,
+	GLUT_OPENGL_ES2_BIT = 0x4,
 };
 
 /* used by glutGet */
 enum {
-   GLUT_ELAPSED_TIME
+	GLUT_ELAPSED_TIME,
+	GLUT_WINDOW_RED_SIZE,
+	GLUT_WINDOW_GREEN_SIZE,
+	GLUT_WINDOW_BLUE_SIZE,
+	GLUT_WINDOW_ALPHA_SIZE,
 };
 
 typedef void (*GLUT_EGLidleCB)(void);
@@ -92,11 +72,13 @@ void glutPostRedisplay(void);
 
 void glutMainLoop(void);
 
+/**
+ * Create the window, but do not show it.
+ */
 int glutCreateWindow(const char *title);
-void glutDestroyWindow(int win);
 
-int glutGetWindowWidth(void);
-int glutGetWindowHeight(void);
+void glutDestroyWindow(int win);
+void glutShowWindow(int win);
 
 void glutDisplayFunc(GLUT_EGLdisplayCB func);
 void glutReshapeFunc(GLUT_EGLreshapeCB func);

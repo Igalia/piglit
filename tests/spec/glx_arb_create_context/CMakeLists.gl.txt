@@ -2,7 +2,6 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 )
 
 if(BUILD_GLX_TESTS)
@@ -14,7 +13,6 @@ endif(BUILD_GLX_TESTS)
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
 
 IF(BUILD_GLX_TESTS)

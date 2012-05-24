@@ -4,7 +4,6 @@ include_directories(
 )
 
 link_libraries(
-        glut_egl
         piglitutil_${piglit_target_api}
         ${OPENGL_gles1_LIBRARY}
         )

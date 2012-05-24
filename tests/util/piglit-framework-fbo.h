@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Intel Corporation
+ * Copyright © 2012 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -19,49 +19,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
- *
- * Authors:
- *     Chad Versace <chad.versace@intel.com>
  */
 
-/**
- * \file glut_wrap.h
- * \brief Convenience header that includes the actual GLUT headers.
- *
- * The actual GLUT headers are chosen according to the macro definitions
- * USE_GLUT and USE_WAFFLE.
- */
+#include "piglit-util.h"
 
-#pragma once
+extern bool piglit_use_fbo;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#if defined(USE_WAFFLE)
-#	include <glut_waffle/glut_waffle.h>
-#elif defined(USE_GLUT)
-#	ifdef __APPLE__
-#		include <GLUT/glut.h>
-
-		/* Apple's version of glut.h, annoyingly, #undefs
-		 * APIENTRY.  Redefine it so that Piglit code that
-		 * uses it won't get confused.
-		 */
-#		define APIENTRY
-
-#	else
-#		include <GL/glut.h>
-#		ifdef FREEGLUT
-#			include <GL/freeglut_ext.h>
-#		endif
-#	endif
-#endif
-
-#ifdef __cplusplus
-} /* end extern "C" */
-#endif
+bool piglit_framework_fbo_init(void);
+void piglit_framework_fbo_destroy(void);

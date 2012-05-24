@@ -130,7 +130,7 @@ extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
 
 /**
- * Call glutInit() and, if EGLUT is used, also call glutInitAPIMask().
+ * Call glutInit() and, if glut_waffle is used, also call glutInitAPIMask().
  */
 void piglit_glutInit(int argc, char **argv);
 

@@ -1,5 +1,4 @@
 link_libraries(
-	glut_egl
 	piglitutil_${piglit_target_api}
 	${OPENGL_gles2_LIBRARY}
 	)

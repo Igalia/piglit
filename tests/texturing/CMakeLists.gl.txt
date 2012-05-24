@@ -2,15 +2,20 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 )
 
 link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
+
+if(NOT USE_WAFFLE)
+	# These tests use glutBitmapCharacter.
+	piglit_add_executable (getteximage-formats getteximage-formats.c)
+	piglit_add_executable (texture-packed-formats texture-packed-formats.c)
+	piglit_add_executable (texwrap texwrap.c)
+endif(NOT USE_WAFFLE)
 
 piglit_add_executable (1-1-linear-texture 1-1-linear-texture.c)
 piglit_add_executable (array-texture array-texture.c)
@@ -30,7 +35,6 @@ piglit_add_executable (gen-nonzero-unit gen-nonzero-unit.c)
 piglit_add_executable (gen-teximage gen-teximage.c)
 piglit_add_executable (gen-texsubimage gen-texsubimage.c)
 piglit_add_executable (getteximage-simple getteximage-simple.c)
-piglit_add_executable (getteximage-formats getteximage-formats.c)
 piglit_add_executable (getteximage-luminance getteximage-luminance.c)
 piglit_add_executable (incomplete-texture incomplete-texture.c)
 piglit_add_executable (fragment-and-vertex-texturing fragment-and-vertex-texturing.c)
@@ -65,7 +69,6 @@ piglit_add_executable (texdepth texdepth.c)
 piglit_add_executable (teximage-errors teximage-errors.c)
 piglit_add_executable (texrect-many texrect-many.c)
 piglit_add_executable (texredefine texredefine.c)
-piglit_add_executable (texture-packed-formats texture-packed-formats.c)
 piglit_add_executable (texture-integer texture-integer.c)
 piglit_add_executable (depth-tex-modes      depth-tex-modes.c depth-tex-modes-common.c)
 piglit_add_executable (depth-tex-modes-rg   depth-tex-modes-rg.c depth-tex-modes-common.c)
@@ -83,6 +86,5 @@ ENDIF (UNIX)
 piglit_add_executable (texsubimage texsubimage.c)
 piglit_add_executable (texture-al texture-al.c)
 piglit_add_executable (texture-rg texture-rg.c)
-piglit_add_executable (texwrap texwrap.c)
 
 # vim: ft=cmake:

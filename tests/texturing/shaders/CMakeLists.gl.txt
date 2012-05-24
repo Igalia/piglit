@@ -1,7 +1,6 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/mesa/util
 )
 
@@ -9,7 +8,6 @@ link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
 
 piglit_add_executable (textureSize textureSize.c common.c)

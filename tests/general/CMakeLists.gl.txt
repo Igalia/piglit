@@ -2,15 +2,18 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 )
 
 link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
+
+if(NOT USE_WAFFLE)
+	# This test uses glutCreateSubWindow.
+	piglit_add_executable (windowoverlap windowoverlap.c)
+endif(NOT USE_WAFFLE)
 
 piglit_add_executable (array-stride array-stride.c)
 piglit_add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)
@@ -121,7 +124,6 @@ piglit_add_executable (vbo-map-remap vbo-map-remap.c)
 piglit_add_executable (vbo-bufferdata vbo-bufferdata.c)
 piglit_add_executable (vbo-subdata-zero vbo-subdata-zero.c)
 piglit_add_executable (vbo-subdata-sync vbo-subdata-sync.c)
-piglit_add_executable (windowoverlap windowoverlap.c)
 piglit_add_executable (object_purgeable-api-pbo object_purgeable-api-pbo.c object_purgeable.c)
 piglit_add_executable (object_purgeable-api-texture object_purgeable-api-texture.c object_purgeable.c)
 piglit_add_executable (object_purgeable-api-vbo object_purgeable-api-vbo.c object_purgeable.c)

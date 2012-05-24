@@ -1,14 +1,12 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${GLUT_INCLUDE_DIR}
 )
 
 link_libraries (
 	piglitutil
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${GLUT_glut_LIBRARY}
 )
 
 piglit_add_executable (arb_texture_float-texture-float-formats texture-float-formats.c)

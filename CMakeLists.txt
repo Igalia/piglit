@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
+
 INCLUDE (CheckCCompilerFlag)
 INCLUDE (CheckCXXCompilerFlag)
 INCLUDE (CheckFunctionExists)
@@ -13,6 +15,26 @@ find_package(TIFF)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
+
+
+option(BUILD_GLES1_TESTS "Build tests for OpenGL ES1" OFF)
+option(BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
+
+option(USE_WAFFLE "Use Waffle in place of GLUT" OFF)
+if(USE_WAFFLE)
+	# FIXME: Specify version requirements for Waffle.
+	find_package(Waffle REQUIRED)
+	add_definitions(-DUSE_WAFFLE)
+	include_directories("${WAFFLE_INCLUDE_DIR}")
+endif(USE_WAFFLE)
+
+if(BUILD_GLES1_TESTS AND NOT USE_WAFFLE)
+	message(FATAL_ERROR "Option BUILD_GLES1_TESTS requires USE_WAFFLE")
+endif(BUILD_GLES1_TESTS AND NOT USE_WAFFLE)
+
+if(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
+	message(FATAL_ERROR "Option BUILD_GLES2_TESTS requires USE_WAFFLE")
+endif(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	option(BUILD_GLX_TESTS "Build tests that require GLX" ON)
