@@ -7,7 +7,6 @@ include_directories(
 link_libraries(
 	${OPENGL_gles2_LIBRARY}
 	${OPENGL_egl_LIBRARY}
-	glut_egl
 	piglitutil_gles2
 	)
 

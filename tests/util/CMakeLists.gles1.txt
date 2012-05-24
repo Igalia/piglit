@@ -6,7 +6,6 @@ set(UTIL_SOURCES
 link_libraries(
 	${OPENGL_gles1_LIBRARY}
 	piglitutil_${piglit_target_api}
-	glut_egl
 	)
 
 piglit_add_library(piglitutil_${piglit_target_api}
