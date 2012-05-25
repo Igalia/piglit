@@ -61,6 +61,8 @@ static const char *FragShaderText =
 
 static GLuint VertShader, FragShader, Program;
 
+static GLboolean use_vbo = GL_FALSE;
+
 static const GLfloat Positions[PRIMS][2] = {
    { -6, 6 },
    { -4, 4 },
@@ -90,14 +92,39 @@ test_instancing(GLuint divisor)
    static const GLfloat verts[4][2] = {
       {-1, -1}, {1, -1}, {1, 1}, {-1, 1}
    };
-   
-   glVertexPointer(2, GL_FLOAT, 0, verts);
-   glEnableClientState(GL_VERTEX_ARRAY);
+   GLuint vbo;
+   uintptr_t offset = 0;
 
-   glVertexAttribPointer(PosAttrib, 2, GL_FLOAT, GL_FALSE, 0, Positions);
-   glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, Colors);
+   if (use_vbo) {
+      glGenBuffers(1, &vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      glBufferData(GL_ARRAY_BUFFER,
+                   sizeof(verts) + sizeof(Positions) + sizeof(Colors),
+                   NULL,
+                   GL_STATIC_DRAW);
+      glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(verts), verts);
+      glVertexPointer(2, GL_FLOAT, 0, (void*) offset);
+      offset += sizeof(verts);
+
+      glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(Positions), Positions);
+      glVertexAttribPointer(PosAttrib, 2, GL_FLOAT, GL_FALSE, 0, (void*) offset);
+      offset += sizeof(Positions);
+
+      glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(Colors), Colors);
+      glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, (void*) offset);
+      offset += sizeof(Colors);
+
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+   } else {
+      glVertexPointer(2, GL_FLOAT, 0, verts);
+      glVertexAttribPointer(PosAttrib, 2, GL_FLOAT, GL_FALSE, 0, Positions);
+      glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, Colors);
+   }
+
+   glEnableClientState(GL_VERTEX_ARRAY);
    glEnableVertexAttribArray(PosAttrib);
    glEnableVertexAttribArray(ColorAttrib);
+
    glVertexAttribDivisorARB(PosAttrib, 1);
    /* advance color once every 'n' instances */
    glVertexAttribDivisorARB(ColorAttrib, divisor);
@@ -109,6 +136,10 @@ test_instancing(GLuint divisor)
    glDrawArraysInstancedARB(GL_POLYGON, 0, 4, PRIMS);
 
    glUseProgram(0);
+
+   if (use_vbo) {
+      glDeleteBuffers(1, &vbo);
+   }
 
    {
       GLint i;
@@ -136,7 +167,7 @@ test_instancing(GLuint divisor)
    glDisableVertexAttribArray(PosAttrib);
    glDisableVertexAttribArray(ColorAttrib);
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return GL_TRUE;
 }
@@ -183,4 +214,8 @@ piglit_init(int argc, char **argv)
    glLoadIdentity();
    glTranslatef(0, 0, -11.0);
    glScalef(0.5, 0.5, 1.0);
+
+   if ((argc >= 2) && (strcmp(argv[1], "vbo") == 0)) {
+      use_vbo = GL_TRUE;
+   }
 }
