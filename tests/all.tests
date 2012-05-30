@@ -1052,6 +1052,10 @@ import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
 			 os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
 			 [''])
 
+# Group ARB_sync
+spec['ARB_sync/repeat-wait'] = concurrent_test('arb_sync-repeat-wait')
+spec['ARB_sync/timeout-zero'] = concurrent_test('arb_sync-timeout-zero')
+
 # Group ARB_ES2_compatibility
 arb_es2_compatibility = Group()
 spec['ARB_ES2_compatibility'] = arb_es2_compatibility
