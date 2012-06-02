@@ -411,7 +411,8 @@ test_format(const struct format_desc *format, GLenum baseformat, GLenum basetype
 	GLboolean pass = GL_TRUE;
 
 	printf("Testing %s%s\n", format->name, tex_width == 256 ? "" : " (NPOT)");
-	tex = create_tex(format->internalformat, baseformat, basetype);
+	tex = create_tex(format->internalformat, format->base_internal_format,
+			 basetype);
 
 	x = 1;
 	for (level = 0; (tex_width >> level) || (tex_height >> level); level++) {

@@ -407,7 +407,7 @@ test_format(const struct format_desc *format, GLenum baseformat)
 	GLboolean pass = GL_TRUE;
 
 	printf("Testing %s", format->name);
-	tex = create_tex(format->internalformat, baseformat);
+	tex = create_tex(format->internalformat, format->base_internal_format);
 
 	if (tex == 0)
 		return PIGLIT_SKIP;

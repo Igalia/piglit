@@ -107,8 +107,8 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 			dst5[2]*(1-src5[3]) + src5[2]*src5[3],
 			dst5[3]*(1-src5[3]) + src5[3]*src5[3]};
 
-        if (baseformat == GL_DEPTH_COMPONENT ||
-            baseformat == GL_DEPTH_STENCIL)
+        if (format->base_internal_format == GL_DEPTH_COMPONENT ||
+            format->base_internal_format == GL_DEPTH_STENCIL)
 		return PIGLIT_SKIP;
 
 	glGenFramebuffersEXT(1, &fb);

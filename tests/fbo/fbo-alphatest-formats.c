@@ -71,8 +71,8 @@ static enum piglit_result test_format(const struct format_desc *format, GLenum b
 	float pos6[] = { 0.5,  -1.0, 0.25, 2.0};
 	float pos7[] = { 0.75, -1.0, 0.25, 2.0};
 
-        if (baseformat == GL_DEPTH_COMPONENT ||
-            baseformat == GL_DEPTH_STENCIL)
+        if (format->base_internal_format == GL_DEPTH_COMPONENT ||
+            format->base_internal_format == GL_DEPTH_STENCIL)
 		return PIGLIT_SKIP;
 
 	/*
