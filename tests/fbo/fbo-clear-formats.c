@@ -398,7 +398,7 @@ test_mipmap_drawing(int x, int y, int dim, int level, GLuint internalformat)
 }
 
 static enum piglit_result
-test_format(const struct format_desc *format, GLenum baseformat)
+test_format(const struct format_desc *format)
 {
 	int dim;
 	GLuint tex;

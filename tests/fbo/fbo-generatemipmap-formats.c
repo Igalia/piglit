@@ -403,7 +403,7 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 }
 
 static GLboolean
-test_format(const struct format_desc *format, GLenum baseformat, GLenum basetype)
+test_format(const struct format_desc *format, GLenum basetype)
 {
 	GLuint tex;
 	int x;
@@ -445,19 +445,19 @@ piglit_display(void)
 	if (piglit_automatic) {
 		for (i = 0; i < test_set->num_formats; i++) {
 			pass = test_format(&test_set->format[i],
-					   test_set->base, test_set->basetype) && pass;
+					   test_set->basetype) && pass;
 		}
 		if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
 			set_npot(GL_TRUE);
 			for (i = 0; i < test_set->num_formats; i++) {
 				pass = test_format(&test_set->format[i],
-						   test_set->base, test_set->basetype) && pass;
+						   test_set->basetype) && pass;
 			}
 			set_npot(GL_FALSE);
 		}
 	} else {
 		pass = test_format(&test_sets[test_index].format[format_index],
-				   test_sets[test_index].base, test_sets[test_index].basetype);
+				   test_sets[test_index].basetype);
 	}
 
 	glutSwapBuffers();

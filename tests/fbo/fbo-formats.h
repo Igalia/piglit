@@ -302,7 +302,6 @@ struct test_desc {
 	const char *param;
 	GLenum basetype;
 	const char *ext[3];
-	GLenum base;
 };
 
 static const struct test_desc test_sets[] = {
@@ -341,7 +340,6 @@ static const struct test_desc test_sets[] = {
 		"GL_ARB_depth_texture",
 		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_depth_texture"},
-		GL_DEPTH_COMPONENT,
 	},
 	{
 		ext_packed_depth_stencil,
@@ -349,7 +347,6 @@ static const struct test_desc test_sets[] = {
 		"GL_EXT_packed_depth_stencil",
 		GL_UNSIGNED_NORMALIZED,
 		{"GL_EXT_packed_depth_stencil"},
-		GL_DEPTH_STENCIL,
 	},
 	{
 		ext_texture_srgb,
@@ -417,9 +414,6 @@ static const struct test_desc test_sets[] = {
 		"GL_ARB_depth_buffer_float",
 		GL_FLOAT,
 		{"GL_ARB_depth_buffer_float"},
-		/* XXX this extension consists of both DEPTH_COMPONENT and
-		 * DEPTH_STENCIL formats. */
-		GL_DEPTH_COMPONENT,
 	},
 	{
 		ext_texture_compression_rgtc,
@@ -606,7 +600,7 @@ static void add_result(bool *all_skip, enum piglit_result *end_result,
 		*end_result = new_result;
 }
 
-typedef enum piglit_result (*test_func)(const struct format_desc *format, GLenum baseformat);
+typedef enum piglit_result (*test_func)(const struct format_desc *format);
 
 static enum piglit_result fbo_formats_display(test_func test_format)
 {
@@ -620,13 +614,11 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 
 	if (piglit_automatic) {
 		for (i = 0; i < test_set->num_formats; i++) {
-			result = test_format(&test_set->format[i],
-					     test_set->base);
+			result = test_format(&test_set->format[i]);
 			add_result(&all_skip, &end_result, result);
 		}
 	} else {
-		result = test_format(&test_sets[test_index].format[format_index],
-				     test_sets[test_index].base);
+		result = test_format(&test_sets[test_index].format[format_index]);
 		add_result(&all_skip, &end_result, result);
 	}
 

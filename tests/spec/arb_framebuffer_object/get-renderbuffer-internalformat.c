@@ -44,7 +44,7 @@ piglit_display()
 }
 
 static enum piglit_result
-test_format(const struct format_desc *format, GLenum baseformat)
+test_format(const struct format_desc *format)
 {
 	GLuint rb;
 	GLint internalformat;

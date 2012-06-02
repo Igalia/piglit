@@ -52,7 +52,7 @@ static void alphatest(const float *rect, float alpha, GLenum func, float ref)
 	glColor4f(1, 1, 1, 1);
 }
 
-static enum piglit_result test_format(const struct format_desc *format, GLenum baseformat)
+static enum piglit_result test_format(const struct format_desc *format)
 {
 	GLboolean pass = GL_TRUE;
 	GLuint tex, fb;

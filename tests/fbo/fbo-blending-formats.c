@@ -56,7 +56,7 @@ static void blend(const float *rect, const float *src, const float *dst, const f
 						  a >= 0.333 ? 0.333f : 0.0f) : \
 	 (a))
 
-static enum piglit_result test_format(const struct format_desc *format, GLenum baseformat)
+static enum piglit_result test_format(const struct format_desc *format)
 {
 	GLboolean pass = GL_TRUE;
 	GLuint tex, fb;
