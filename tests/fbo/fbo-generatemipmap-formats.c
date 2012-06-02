@@ -74,12 +74,12 @@ create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 		tex = piglit_depth_texture(GL_TEXTURE_2D, internalformat,
 					   tex_width, tex_height, 1, GL_FALSE);
 		assert(glGetError() == 0);
-		if (baseformat == GL_DEPTH_STENCIL) {
-			format = GL_DEPTH_STENCIL;
-			type = GL_UNSIGNED_INT_24_8;
-		} else if (internalformat == GL_DEPTH32F_STENCIL8) {
+		if (internalformat == GL_DEPTH32F_STENCIL8) {
 			format = GL_DEPTH_STENCIL;
 			type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+		} else if (baseformat == GL_DEPTH_STENCIL) {
+			format = GL_DEPTH_STENCIL;
+			type = GL_UNSIGNED_INT_24_8;
 		} else if (baseformat == GL_DEPTH_COMPONENT) {
 			format = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;

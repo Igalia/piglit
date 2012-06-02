@@ -183,14 +183,12 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
-	if (baseformat == GL_DEPTH_COMPONENT) {
-		if (internalformat == GL_DEPTH32F_STENCIL8) {
-			format = GL_DEPTH_STENCIL;
-			type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
-		} else {
-			format = GL_DEPTH_COMPONENT;
-			type = GL_FLOAT;
-		}
+	if (internalformat == GL_DEPTH32F_STENCIL8) {
+		format = GL_DEPTH_STENCIL;
+		type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+	} else if (baseformat == GL_DEPTH_COMPONENT) {
+		format = GL_DEPTH_COMPONENT;
+		type = GL_FLOAT;
 	} else if (baseformat == GL_DEPTH_STENCIL) {
 		format = GL_DEPTH_STENCIL_EXT;
 		type = GL_UNSIGNED_INT_24_8_EXT;
