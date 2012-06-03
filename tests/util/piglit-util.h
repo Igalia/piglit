@@ -207,6 +207,7 @@ void piglit_report_result(enum piglit_result result);
 void piglit_require_gl_version(int required_version_times_10);
 void piglit_require_extension(const char *name);
 void piglit_require_not_extension(const char *name);
+unsigned piglit_num_components(GLenum base_format);
 int piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe);
 int piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_probe);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
@@ -216,6 +217,7 @@ int piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expect
 int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgba_int(int x, int y, int w, int h, const int* expected);
 int piglit_probe_rect_rgba_uint(int x, int y, int w, int h, const unsigned int* expected);
+int piglit_probe_image_color(int x, int y, int w, int h, GLenum format, const float *image);
 int piglit_probe_image_rgb(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);
 int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
