@@ -482,7 +482,6 @@ supported(const struct test_desc *test)
 	return GL_TRUE;
 }
 
-static const struct test_desc *test_set;
 static int test_index;
 static int format_index;
 
@@ -558,8 +557,6 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_env_combine");
 
-	test_set = &test_sets[0];
-
 	for (i = 1; i < argc; i++) {
 		for (j = 1; j < (int) ARRAY_SIZE(test_sets); j++) {
 			if (!strcmp(argv[i], test_sets[j].param)) {
@@ -569,7 +566,6 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 					}
 				}
 
-				test_set = &test_sets[j];
 				test_index = j;
 				break;
 			}
@@ -587,7 +583,7 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 		       "    -M   Previous format in the set.\n");
 	}
 
-	printf("Using test set: %s\n", test_set->param);
+	printf("Using test set: %s\n", test_sets[test_index].param);
 }
 
 static void add_result(bool *all_skip, enum piglit_result *end_result,
@@ -613,8 +609,8 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (piglit_automatic) {
-		for (i = 0; i < test_set->num_formats; i++) {
-			result = test_format(&test_set->format[i]);
+		for (i = 0; i < test_sets[test_index].num_formats; i++) {
+			result = test_format(&test_sets[test_index].format[i]);
 			add_result(&all_skip, &end_result, result);
 		}
 	} else {

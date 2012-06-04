@@ -443,15 +443,15 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (piglit_automatic) {
-		for (i = 0; i < test_set->num_formats; i++) {
-			pass = test_format(&test_set->format[i],
-					   test_set->basetype) && pass;
+		for (i = 0; i < test_sets[test_index].num_formats; i++) {
+			pass = test_format(&test_sets[test_index].format[i],
+					   test_sets[test_index].basetype) && pass;
 		}
 		if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
 			set_npot(GL_TRUE);
-			for (i = 0; i < test_set->num_formats; i++) {
-				pass = test_format(&test_set->format[i],
-						   test_set->basetype) && pass;
+			for (i = 0; i < test_sets[test_index].num_formats; i++) {
+				pass = test_format(&test_sets[test_index].format[i],
+						   test_sets[test_index].basetype) && pass;
 			}
 			set_npot(GL_FALSE);
 		}
