@@ -547,33 +547,40 @@ static void fbo_formats_key_func(unsigned char key, int x, int y)
 	piglit_escape_exit_key(key, x, y);
 }
 
+static int
+fbo_lookup_test_set(const char *test_set_name)
+{
+	int i, j;
+
+	for (i = 1; i < (int) ARRAY_SIZE(test_sets); i++) {
+		if (!strcmp(test_set_name, test_sets[i].param)) {
+			for (j = 0; j < 3; j++) {
+				if (test_sets[i].ext[j]) {
+					piglit_require_extension(test_sets[i].ext[j]);
+				}
+			}
+
+			return i;
+		}
+	}
+
+	fprintf(stderr, "Unknown test set: %s\n", test_set_name);
+	exit(1);
+}
+
 static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 {
-	int i, j, k;
-
 	if (!piglit_automatic)
 		glutKeyboardFunc(fbo_formats_key_func);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_env_combine");
 
-	for (i = 1; i < argc; i++) {
-		for (j = 1; j < (int) ARRAY_SIZE(test_sets); j++) {
-			if (!strcmp(argv[i], test_sets[j].param)) {
-				for (k = 0; k < 3; k++) {
-					if (test_sets[j].ext[k]) {
-						piglit_require_extension(test_sets[j].ext[k]);
-					}
-				}
-
-				test_index = j;
-				break;
-			}
-		}
-		if (j == ARRAY_SIZE(test_sets)) {
-			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
-			exit(1);
-		}
+	if (argc == 2) {
+		test_index = fbo_lookup_test_set(argv[1]);
+	} else if (argc > 2) {
+		printf("More than 1 test set specified\n");
+		exit(1);
 	}
 
 	if (!piglit_automatic && print_options) {
