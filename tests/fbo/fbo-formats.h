@@ -568,7 +568,8 @@ fbo_lookup_test_set(const char *test_set_name)
 	exit(1);
 }
 
-static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
+static void
+fbo_formats_init_test_set(int test_set_index, GLboolean print_options)
 {
 	if (!piglit_automatic)
 		glutKeyboardFunc(fbo_formats_key_func);
@@ -576,12 +577,7 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_env_combine");
 
-	if (argc == 2) {
-		test_index = fbo_lookup_test_set(argv[1]);
-	} else if (argc > 2) {
-		printf("More than 1 test set specified\n");
-		exit(1);
-	}
+	test_index = test_set_index;
 
 	if (!piglit_automatic && print_options) {
 		printf("    -n   Next test set.\n"
@@ -591,6 +587,20 @@ static void fbo_formats_init(int argc, char **argv, GLboolean print_options)
 	}
 
 	printf("Using test set: %s\n", test_sets[test_index].param);
+}
+
+void
+fbo_formats_init(int argc, char **argv, GLboolean print_options)
+{
+	int test_set_index = 0;
+	if (argc == 2) {
+		test_set_index = fbo_lookup_test_set(argv[1]);
+	} else if (argc > 2) {
+		printf("More than 1 test set specified\n");
+		exit(1);
+	}
+
+	fbo_formats_init_test_set(test_set_index, print_options);
 }
 
 static void add_result(bool *all_skip, enum piglit_result *end_result,
