@@ -127,15 +127,19 @@ Fbo::Fbo()
 void
 Fbo::init(const FboConfig &initial_config)
 {
-	generate();
+	generate_gl_objects();
 	this->config = initial_config;
 	setup();
 }
 
 void
-Fbo::generate(void)
+Fbo::generate_gl_objects(void)
 {
 	glGenFramebuffers(1, &handle);
+	glGenTextures(1, &color_tex);
+	glGenRenderbuffers(1, &color_rb);
+	glGenRenderbuffers(1, &depth_rb);
+	glGenRenderbuffers(1, &stencil_rb);
 }
 
 void
@@ -153,22 +157,18 @@ void
 Fbo::setup()
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
-	this->color_tex = 0;
 
 	/* Color buffer */
 	if (!config.attach_texture) {
-		GLuint rb;
-		glGenRenderbuffers(1, &rb);
-		glBindRenderbuffer(GL_RENDERBUFFER, rb);
+		glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 						 config.num_samples,
 						 GL_RGBA, config.width,
 						 config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_COLOR_ATTACHMENT0,
-					  GL_RENDERBUFFER, rb);
+					  GL_RENDERBUFFER, color_rb);
 	} else {
-		glGenTextures(1, &color_tex);
 		glBindTexture(GL_TEXTURE_2D, color_tex);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 				GL_NEAREST);
@@ -192,9 +192,7 @@ Fbo::setup()
 
 	/* Depth/stencil buffer(s) */
 	if (config.combine_depth_stencil) {
-		GLuint depth_stencil;
-		glGenRenderbuffers(1, &depth_stencil);
-		glBindRenderbuffer(GL_RENDERBUFFER, depth_stencil);
+		glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 						 config.num_samples,
 						 GL_DEPTH_STENCIL,
@@ -202,29 +200,25 @@ Fbo::setup()
 						 config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_DEPTH_STENCIL_ATTACHMENT,
-					  GL_RENDERBUFFER, depth_stencil);
+					  GL_RENDERBUFFER, depth_rb);
 	} else {
-		GLuint stencil;
-		glGenRenderbuffers(1, &stencil);
-		glBindRenderbuffer(GL_RENDERBUFFER, stencil);
+		glBindRenderbuffer(GL_RENDERBUFFER, stencil_rb);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 						 config.num_samples,
 						 GL_STENCIL_INDEX8,
 						 config.width, config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_STENCIL_ATTACHMENT,
-					  GL_RENDERBUFFER, stencil);
+					  GL_RENDERBUFFER, stencil_rb);
 
-		GLuint depth;
-		glGenRenderbuffers(1, &depth);
-		glBindRenderbuffer(GL_RENDERBUFFER, depth);
+		glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 						 config.num_samples,
 						 GL_DEPTH_COMPONENT24,
 						 config.width, config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_DEPTH_ATTACHMENT,
-					  GL_RENDERBUFFER, depth);
+					  GL_RENDERBUFFER, depth_rb);
 	}
 
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {

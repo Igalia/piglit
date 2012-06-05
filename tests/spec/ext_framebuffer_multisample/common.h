@@ -79,7 +79,7 @@ public:
 	Fbo();
 
 	void init(const FboConfig &initial_config);
-	void generate();
+	void generate_gl_objects();
 	void set_samples(int num_samples);
 	void setup();
 
@@ -93,6 +93,26 @@ public:
 	 * color buffer.
 	 */
 	GLuint color_tex;
+
+	/**
+	 * If config.attach_texture is false, the backing store for
+	 * the color buffer.
+	 */
+	GLuint color_rb;
+
+	/**
+	 * If config.combine_depth_stencil is true, the backing store
+	 * for the depth/stencil buffer.  If
+	 * config.combine_depth_stencil is false, the backing store
+	 * for the depth buffer.
+	 */
+	GLuint depth_rb;
+
+	/**
+	 * If config.combine_depth_stencil is false, the backing store
+	 * for the stencil buffer.
+	 */
+	GLuint stencil_rb;
 };
 
 /**
