@@ -114,9 +114,8 @@ piglit_init(int argc, char **argv)
 	if (manifest_program)
 		manifest_program->compile();
 
-	multisample_fbo.init(num_samples, pattern_width, pattern_height,
-			     true /* combine_depth_stencil */,
-			     false /* attach_texture */);
+	multisample_fbo.init(FboConfig(num_samples, pattern_width,
+				       pattern_height));
 }
 
 enum piglit_result

@@ -110,20 +110,24 @@
 
 #include "common.h"
 
-/**
- * \param attach_texture, if true, means to use a texture as color
- * attachment instead of a renderbuffer.
- */
+FboConfig::FboConfig(int num_samples, int width, int height)
+	: num_samples(num_samples),
+	  width(width),
+	  height(height),
+	  combine_depth_stencil(true),
+	  attach_texture(false)
+{
+}
+
 void
-Fbo::init(int num_samples, int width, int height, bool combine_depth_stencil,
-	  bool attach_texture)
+Fbo::init(const FboConfig &initial_config)
 {
 	generate();
-	this->width = width;
-	this->height = height;
-	this->combine_depth_stencil = combine_depth_stencil;
-	this->attach_texture = attach_texture;
-	set_samples(num_samples);
+	this->width = initial_config.width;
+	this->height = initial_config.height;
+	this->combine_depth_stencil = initial_config.combine_depth_stencil;
+	this->attach_texture = initial_config.attach_texture;
+	set_samples(initial_config.num_samples);
 }
 
 void
@@ -1041,28 +1045,28 @@ Test::init(int num_samples, bool small, bool combine_depth_stencil,
 	this->pattern_height = pattern_height;
 	this->supersample_factor = supersample_factor;
 
-	test_fbo.init(0,
-		      small ? 16 : pattern_width,
-		      small ? 16 : pattern_height,
-		      combine_depth_stencil,
-		      false);
+	FboConfig test_fbo_config(0,
+				  small ? 16 : pattern_width,
+				  small ? 16 : pattern_height);
+	test_fbo_config.combine_depth_stencil = combine_depth_stencil;
+	test_fbo.init(test_fbo_config);
 
-	multisample_fbo.init(num_samples,
-			     small ? 16 : pattern_width,
-			     small ? 16 : pattern_height,
-			     combine_depth_stencil,
-			     false);
-	resolve_fbo.init(0,
-			 small ? 16 : pattern_width,
-			 small ? 16 : pattern_height,
-			 combine_depth_stencil,
-			 false);
-	supersample_fbo.init(0 /* num_samples */,
-			     1024, 1024, combine_depth_stencil, true);
-	downsample_fbo.init(0 /* num_samples */,
-			    1024 / supersample_factor,
-			    1024 / supersample_factor,
-			    combine_depth_stencil, false);
+	FboConfig multisample_fbo_config = test_fbo_config;
+	multisample_fbo_config.num_samples = num_samples;
+	multisample_fbo.init(multisample_fbo_config);
+
+	resolve_fbo.init(test_fbo_config);
+
+	FboConfig supersample_fbo_config = test_fbo_config;
+	supersample_fbo_config.width = 1024;
+	supersample_fbo_config.height = 1024;
+	supersample_fbo_config.attach_texture = true;
+	supersample_fbo.init(supersample_fbo_config);
+
+	FboConfig downsample_fbo_config = test_fbo_config;
+	downsample_fbo_config.width = 1024 / supersample_factor;
+	downsample_fbo_config.height = 1024 / supersample_factor;
+	downsample_fbo.init(downsample_fbo_config);
 
 	pattern->compile();
 	downsample_prog.compile(supersample_factor);

@@ -158,12 +158,8 @@ piglit_init(int argc, char **argv)
 	test_pattern->compile();
 	if (manifest_program)
 		manifest_program->compile();
-	src_fbo.init(src_samples, pattern_size, pattern_size,
-		     true /* combine_depth_stencil */,
-		     false /* attach_texture */);
-	dst_fbo.init(dst_samples, pattern_size, pattern_size,
-		     true /* combine_depth_stencil */,
-		     false /* attach_texture */);
+	src_fbo.init(FboConfig(src_samples, pattern_size, pattern_size));
+	dst_fbo.init(FboConfig(dst_samples, pattern_size, pattern_size));
 }
 
 enum piglit_result

@@ -87,9 +87,7 @@ piglit_init(int argc, char **argv)
 	test_pattern = new Triangles();
 	test_pattern->compile();
 
-	ms_fbo.init(num_samples, pattern_width, pattern_height,
-		     true /* combine_depth_stencil */,
-		     false /* attach_texture */);
+	ms_fbo.init(FboConfig(num_samples, pattern_width, pattern_height));
 
 	/* Enable blending to test GL_POLYGON_SMOOTH */
 	glEnable (GL_BLEND);

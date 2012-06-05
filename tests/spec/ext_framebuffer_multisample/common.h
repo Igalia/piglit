@@ -38,6 +38,34 @@ enum test_type_enum {
 };
 
 /**
+ * Information needed to configure a framebuffer object for MSAA
+ * testing.
+ */
+class FboConfig
+{
+public:
+	FboConfig(int num_samples, int width, int height);
+
+	int num_samples;
+	int width;
+	int height;
+
+	/**
+	 * True if a single renderbuffer should be used as the backing
+	 * store for both the depth and stencil attachment points.
+	 * Defaults to true.
+	 */
+	bool combine_depth_stencil;
+
+	/**
+	 * True if a texture should be used as the backing store for
+	 * the color attachment point, false if a renderbuffer should
+	 * be used.  Defaults to false.
+	 */
+	bool attach_texture;
+};
+
+/**
  * Data structure representing one of the framebuffer objects used in
  * the test.
  *
@@ -48,8 +76,7 @@ enum test_type_enum {
 class Fbo
 {
 public:
-	void init(int num_samples, int width, int height,
-		  bool combine_depth_stencil, bool attach_texture);
+	void init(const FboConfig &initial_config);
 	void generate();
 	void set_samples(int num_samples);
 

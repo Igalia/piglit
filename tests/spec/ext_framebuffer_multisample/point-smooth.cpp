@@ -87,9 +87,7 @@ piglit_init(int argc, char **argv)
 	test_pattern = new Points();
 	test_pattern->compile();
 
-	test_fbo.init(num_samples, pattern_width, pattern_height,
-		      true /* combine_depth_stencil */,
-		      false /* attach_texture */);
+	test_fbo.init(FboConfig(num_samples, pattern_width, pattern_height));
 
 	/* Blending is required to test smooth points */
 	glEnable (GL_BLEND);
