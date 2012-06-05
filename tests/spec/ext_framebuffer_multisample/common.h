@@ -81,6 +81,7 @@ public:
 	void init(const FboConfig &initial_config);
 	void generate();
 	void set_samples(int num_samples);
+	void setup();
 
 	void set_viewport();
 

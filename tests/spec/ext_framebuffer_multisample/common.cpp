@@ -129,7 +129,7 @@ Fbo::init(const FboConfig &initial_config)
 {
 	generate();
 	this->config = initial_config;
-	set_samples(initial_config.num_samples);
+	setup();
 }
 
 void
@@ -142,6 +142,16 @@ void
 Fbo::set_samples(int num_samples)
 {
 	this->config.num_samples = num_samples;
+	setup();
+}
+
+/**
+ * Modify the state of the framebuffer object to reflect the state in
+ * this->config.
+ */
+void
+Fbo::setup()
+{
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
 	this->color_tex = 0;
 
