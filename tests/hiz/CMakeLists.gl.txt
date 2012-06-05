@@ -5,13 +5,16 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 	)
 
+link_libraries (
+	piglitutil
+)
+
 piglit_add_library(hiz-util
 	hiz-util.c
 	)
 
 link_libraries (
 	hiz-util
-	piglitutil
 
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
