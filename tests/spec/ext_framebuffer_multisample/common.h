@@ -76,21 +76,20 @@ public:
 class Fbo
 {
 public:
+	Fbo();
+
 	void init(const FboConfig &initial_config);
 	void generate();
 	void set_samples(int num_samples);
 
 	void set_viewport();
 
-	int width;
-	int height;
-	bool combine_depth_stencil;
-	bool attach_texture;
+	FboConfig config;
 	GLuint handle;
 
 	/**
-	 * If attach_texture is true, the backing store for the color
-	 * buffer.
+	 * If config.attach_texture is true, the backing store for the
+	 * color buffer.
 	 */
 	GLuint color_tex;
 };

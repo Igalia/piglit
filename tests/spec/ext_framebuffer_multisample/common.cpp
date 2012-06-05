@@ -119,14 +119,16 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 {
 }
 
+Fbo::Fbo()
+	: config(0, 0, 0) /* will be overwritten when init() is called */
+{
+}
+
 void
 Fbo::init(const FboConfig &initial_config)
 {
 	generate();
-	this->width = initial_config.width;
-	this->height = initial_config.height;
-	this->combine_depth_stencil = initial_config.combine_depth_stencil;
-	this->attach_texture = initial_config.attach_texture;
+	this->config = initial_config;
 	set_samples(initial_config.num_samples);
 }
 
@@ -139,17 +141,19 @@ Fbo::generate(void)
 void
 Fbo::set_samples(int num_samples)
 {
+	this->config.num_samples = num_samples;
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
-
 	this->color_tex = 0;
 
 	/* Color buffer */
-	if (!attach_texture) {
+	if (!config.attach_texture) {
 		GLuint rb;
 		glGenRenderbuffers(1, &rb);
 		glBindRenderbuffer(GL_RENDERBUFFER, rb);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, num_samples,
-						 GL_RGBA, width, height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+						 config.num_samples,
+						 GL_RGBA, config.width,
+						 config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_COLOR_ATTACHMENT0,
 					  GL_RENDERBUFFER, rb);
@@ -163,8 +167,8 @@ Fbo::set_samples(int num_samples)
 		glTexImage2D(GL_TEXTURE_2D,
 			     0 /* level */,
 			     GL_RGBA /* internalformat */,
-			     width,
-			     height,
+			     config.width,
+			     config.height,
 			     0 /* border */,
 			     GL_RGBA /* format */,
 			     GL_BYTE /* type */,
@@ -177,13 +181,15 @@ Fbo::set_samples(int num_samples)
 	}
 
 	/* Depth/stencil buffer(s) */
-	if (combine_depth_stencil) {
+	if (config.combine_depth_stencil) {
 		GLuint depth_stencil;
 		glGenRenderbuffers(1, &depth_stencil);
 		glBindRenderbuffer(GL_RENDERBUFFER, depth_stencil);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, num_samples,
-						 GL_DEPTH_STENCIL, width,
-						 height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+						 config.num_samples,
+						 GL_DEPTH_STENCIL,
+						 config.width,
+						 config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_DEPTH_STENCIL_ATTACHMENT,
 					  GL_RENDERBUFFER, depth_stencil);
@@ -191,9 +197,10 @@ Fbo::set_samples(int num_samples)
 		GLuint stencil;
 		glGenRenderbuffers(1, &stencil);
 		glBindRenderbuffer(GL_RENDERBUFFER, stencil);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, num_samples,
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+						 config.num_samples,
 						 GL_STENCIL_INDEX8,
-						 width, height);
+						 config.width, config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_STENCIL_ATTACHMENT,
 					  GL_RENDERBUFFER, stencil);
@@ -201,9 +208,10 @@ Fbo::set_samples(int num_samples)
 		GLuint depth;
 		glGenRenderbuffers(1, &depth);
 		glBindRenderbuffer(GL_RENDERBUFFER, depth);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, num_samples,
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+						 config.num_samples,
 						 GL_DEPTH_COMPONENT24,
-						 width, height);
+						 config.width, config.height);
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 					  GL_DEPTH_ATTACHMENT,
 					  GL_RENDERBUFFER, depth);
@@ -211,7 +219,7 @@ Fbo::set_samples(int num_samples)
 
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		printf("Framebuffer not complete\n");
-		if (!combine_depth_stencil) {
+		if (!config.combine_depth_stencil) {
 			/* Some implementations do not support
 			 * separate depth and stencil attachments, so
 			 * don't consider it an error if we fail to
@@ -232,7 +240,7 @@ Fbo::set_samples(int num_samples)
 void
 Fbo::set_viewport()
 {
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, config.width, config.height);
 }
 
 void
@@ -1089,8 +1097,9 @@ Test::resolve(Fbo *fbo, GLbitfield which_buffers)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo->handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolve_fbo.handle);
 	resolve_fbo.set_viewport();
-	glBlitFramebuffer(0, 0, fbo->width, fbo->height,
-			  0, 0, resolve_fbo.width, resolve_fbo.height,
+	glBlitFramebuffer(0, 0, fbo->config.width, fbo->config.height,
+			  0, 0, resolve_fbo.config.width,
+			  resolve_fbo.config.height,
 			  which_buffers, GL_NEAREST);
 }
 
@@ -1105,7 +1114,8 @@ Test::downsample_color(int downsampled_width, int downsampled_height)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, downsample_fbo.handle);
 	downsample_fbo.set_viewport();
 	downsample_prog.run(&supersample_fbo,
-			    downsample_fbo.width, downsample_fbo.height);
+			    downsample_fbo.config.width,
+			    downsample_fbo.config.height);
 }
 
 /**
@@ -1119,10 +1129,10 @@ Test::show(Fbo *src_fbo, int x_offset, int y_offset)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo->handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glViewport(0, 0, piglit_width, piglit_height);
-	glBlitFramebuffer(0, 0, src_fbo->width, src_fbo->height,
+	glBlitFramebuffer(0, 0, src_fbo->config.width, src_fbo->config.height,
 			  x_offset, y_offset,
-			  x_offset + src_fbo->width,
-			  y_offset + src_fbo->height,
+			  x_offset + src_fbo->config.width,
+			  y_offset + src_fbo->config.height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
@@ -1169,18 +1179,18 @@ Test::draw_pattern(int x_offset, int y_offset, int width, int height)
 void
 Test::draw_test_image(Fbo *fbo)
 {
-	int num_h_tiles = pattern_width / fbo->width;
-	int num_v_tiles = pattern_height / fbo->height;
+	int num_h_tiles = pattern_width / fbo->config.width;
+	int num_v_tiles = pattern_height / fbo->config.height;
 	for (int h = 0; h < num_h_tiles; ++h) {
 		for (int v = 0; v < num_v_tiles; ++v) {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
 					  fbo->handle);
 			fbo->set_viewport();
-			int x_offset = h * fbo->width;
-			int y_offset = v * fbo->height;
+			int x_offset = h * fbo->config.width;
+			int y_offset = v * fbo->config.height;
 			draw_pattern(x_offset, y_offset,
-				     fbo->width,
-				     fbo->height);
+				     fbo->config.width,
+				     fbo->config.height);
 			if (test_resolve) {
 				resolve(fbo, blit_type);
 				if (manifest_program)
@@ -1214,8 +1224,10 @@ Test::draw_to_default_framebuffer()
 void
 Test::draw_reference_image()
 {
-	int downsampled_width = supersample_fbo.width / supersample_factor;
-	int downsampled_height = supersample_fbo.height / supersample_factor;
+	int downsampled_width =
+		supersample_fbo.config.width / supersample_factor;
+	int downsampled_height =
+		supersample_fbo.config.height / supersample_factor;
 	int num_h_tiles = pattern_width / downsampled_width;
 	int num_v_tiles = pattern_height / downsampled_height;
 	for (int h = 0; h < num_h_tiles; ++h) {
