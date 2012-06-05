@@ -78,10 +78,8 @@ class Fbo
 public:
 	Fbo();
 
-	void init(const FboConfig &initial_config);
-	void generate_gl_objects();
 	void set_samples(int num_samples);
-	void setup();
+	void setup(const FboConfig &new_config);
 
 	void set_viewport();
 
@@ -113,6 +111,15 @@ public:
 	 * for the stencil buffer.
 	 */
 	GLuint stencil_rb;
+
+private:
+	void generate_gl_objects();
+
+	/**
+	 * True if generate_gl_objects has been called and color_tex,
+	 * color_rb, depth_rb, and stencil_rb have been initialized.
+	 */
+	bool gl_objects_generated;
 };
 
 /**

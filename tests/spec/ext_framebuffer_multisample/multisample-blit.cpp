@@ -100,8 +100,8 @@ piglit_init(int argc, char **argv)
 	if (manifest_program)
 		manifest_program->compile();
 
-	src_fbo.init(FboConfig(num_samples, pattern_width, pattern_height));
-	dst_fbo.init(FboConfig(num_samples, pattern_width, pattern_height));
+	src_fbo.setup(FboConfig(num_samples, pattern_width, pattern_height));
+	dst_fbo.setup(FboConfig(num_samples, pattern_width, pattern_height));
 }
 
 enum piglit_result

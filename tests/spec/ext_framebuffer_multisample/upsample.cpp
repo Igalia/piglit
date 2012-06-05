@@ -114,8 +114,8 @@ piglit_init(int argc, char **argv)
 	if (manifest_program)
 		manifest_program->compile();
 
-	multisample_fbo.init(FboConfig(num_samples, pattern_width,
-				       pattern_height));
+	multisample_fbo.setup(FboConfig(num_samples, pattern_width,
+					pattern_height));
 }
 
 enum piglit_result

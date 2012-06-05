@@ -120,16 +120,9 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 }
 
 Fbo::Fbo()
-	: config(0, 0, 0) /* will be overwritten when init() is called */
+	: config(0, 0, 0), /* will be overwritten on first call to setup() */
+	  gl_objects_generated(false)
 {
-}
-
-void
-Fbo::init(const FboConfig &initial_config)
-{
-	generate_gl_objects();
-	this->config = initial_config;
-	setup();
 }
 
 void
@@ -140,22 +133,29 @@ Fbo::generate_gl_objects(void)
 	glGenRenderbuffers(1, &color_rb);
 	glGenRenderbuffers(1, &depth_rb);
 	glGenRenderbuffers(1, &stencil_rb);
+	gl_objects_generated = true;
 }
 
 void
 Fbo::set_samples(int num_samples)
 {
-	this->config.num_samples = num_samples;
-	setup();
+	FboConfig new_config = this->config;
+	new_config.num_samples = num_samples;
+	setup(new_config);
 }
 
 /**
  * Modify the state of the framebuffer object to reflect the state in
- * this->config.
+ * new_config.
  */
 void
-Fbo::setup()
+Fbo::setup(const FboConfig &new_config)
 {
+	this->config = new_config;
+
+	if (!gl_objects_generated)
+		generate_gl_objects();
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
 
 	/* Color buffer */
@@ -1061,24 +1061,24 @@ Test::init(int num_samples, bool small, bool combine_depth_stencil,
 				  small ? 16 : pattern_width,
 				  small ? 16 : pattern_height);
 	test_fbo_config.combine_depth_stencil = combine_depth_stencil;
-	test_fbo.init(test_fbo_config);
+	test_fbo.setup(test_fbo_config);
 
 	FboConfig multisample_fbo_config = test_fbo_config;
 	multisample_fbo_config.num_samples = num_samples;
-	multisample_fbo.init(multisample_fbo_config);
+	multisample_fbo.setup(multisample_fbo_config);
 
-	resolve_fbo.init(test_fbo_config);
+	resolve_fbo.setup(test_fbo_config);
 
 	FboConfig supersample_fbo_config = test_fbo_config;
 	supersample_fbo_config.width = 1024;
 	supersample_fbo_config.height = 1024;
 	supersample_fbo_config.attach_texture = true;
-	supersample_fbo.init(supersample_fbo_config);
+	supersample_fbo.setup(supersample_fbo_config);
 
 	FboConfig downsample_fbo_config = test_fbo_config;
 	downsample_fbo_config.width = 1024 / supersample_factor;
 	downsample_fbo_config.height = 1024 / supersample_factor;
-	downsample_fbo.init(downsample_fbo_config);
+	downsample_fbo.setup(downsample_fbo_config);
 
 	pattern->compile();
 	downsample_prog.compile(supersample_factor);

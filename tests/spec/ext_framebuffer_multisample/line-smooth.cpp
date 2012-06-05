@@ -87,7 +87,7 @@ piglit_init(int argc, char **argv)
 	test_pattern = new Lines();
 	test_pattern->compile();
 
-	test_fbo.init(FboConfig(num_samples, pattern_width, pattern_height));
+	test_fbo.setup(FboConfig(num_samples, pattern_width, pattern_height));
 
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA_SATURATE, GL_ONE);
