@@ -508,7 +508,7 @@ test_format(const struct format_desc *format)
 void
 print_usage_and_exit(char *prog_name)
 {
-	printf("Usage: %s <num_samples>\n", prog_name);
+	printf("Usage: %s <num_samples> [test_set]\n", prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -516,12 +516,19 @@ print_usage_and_exit(char *prog_name)
 extern "C" void
 piglit_init(int argc, char **argv)
 {
-	if (argc < 2)
+	if (argc < 2 || argc > 3)
 		print_usage_and_exit(argv[0]);
+
+	/* First argument (required): num_samples */
 	char *endptr = NULL;
 	num_samples = strtol(argv[1], &endptr, 0);
 	if (endptr != argv[1] + strlen(argv[1]))
 		print_usage_and_exit(argv[0]);
+
+	/* Second argument (optional): test_set */
+	int test_set = 0; /* Default to core */
+	if (argc == 3)
+		test_set = fbo_lookup_test_set(argv[2]);
 
 	piglit_require_gl_version(30);
 
@@ -531,7 +538,7 @@ piglit_init(int argc, char **argv)
 	if (num_samples > max_samples)
 		piglit_report_result(PIGLIT_SKIP);
 
-	fbo_formats_init_test_set(0 /* core formats */,
+	fbo_formats_init_test_set(test_set,
 				  GL_TRUE /* print_options */);
 	test_pattern_vec4 = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
 	test_pattern_vec4->compile();
