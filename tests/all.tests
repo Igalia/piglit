@@ -1342,7 +1342,7 @@ ext_framebuffer_multisample['renderbuffer-samples'] = concurrent_test('ext_frame
 ext_framebuffer_multisample['samples'] = concurrent_test('ext_framebuffer_multisample-samples')
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for test_type in ('color', 'stencil_draw', 'stencil_resolve',
+        for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
                           'depth_draw', 'depth_resolve'):
                 for options in power_set(('small', 'depthstencil')):
                         test_name = ' '.join(['accuracy', str(num_samples), test_type]

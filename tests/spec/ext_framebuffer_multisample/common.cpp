@@ -342,7 +342,8 @@ DownsampleProg::compile(int supersample_factor)
 }
 
 void
-DownsampleProg::run(const Fbo *src_fbo, int dest_width, int dest_height)
+DownsampleProg::run(const Fbo *src_fbo, int dest_width, int dest_height,
+		    bool srgb)
 {
 	float w = dest_width;
 	float h = dest_height;
@@ -363,7 +364,15 @@ DownsampleProg::run(const Fbo *src_fbo, int dest_width, int dest_height)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
 		     GL_STREAM_DRAW);
 
+	if (srgb) {
+		/* If we're testing sRGB color, instruct OpenGL to
+		 * convert the output of the fragment shader from
+		 * linear color space to sRGB color space.
+		 */
+		glEnable(GL_FRAMEBUFFER_SRGB);
+	}
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+	glDisable(GL_FRAMEBUFFER_SRGB);
 }
 
 void
@@ -1156,11 +1165,12 @@ Stats::is_better_than(double rms_error_threshold)
 }
 
 Test::Test(TestPattern *pattern, ManifestProgram *manifest_program,
-	   bool test_resolve, GLbitfield blit_type)
+	   bool test_resolve, GLbitfield blit_type, bool srgb)
 	: pattern(pattern),
 	  manifest_program(manifest_program),
 	  test_resolve(test_resolve),
-	  blit_type(blit_type)
+	  blit_type(blit_type),
+	  srgb(srgb)
 {
 }
 
@@ -1176,6 +1186,8 @@ Test::init(int num_samples, bool small, bool combine_depth_stencil,
 	FboConfig test_fbo_config(0,
 				  small ? 16 : pattern_width,
 				  small ? 16 : pattern_height);
+	if (srgb)
+		test_fbo_config.color_internalformat = GL_SRGB8_ALPHA8;
 	test_fbo_config.combine_depth_stencil = combine_depth_stencil;
 	test_fbo.setup(test_fbo_config);
 
@@ -1235,7 +1247,7 @@ Test::downsample_color(int downsampled_width, int downsampled_height)
 	downsample_fbo.set_viewport();
 	downsample_prog.run(&supersample_fbo,
 			    downsample_fbo.config.width,
-			    downsample_fbo.config.height);
+			    downsample_fbo.config.height, srgb);
 }
 
 /**
@@ -1371,6 +1383,20 @@ Test::draw_reference_image()
 }
 
 /**
+ * Convert from sRGB color space to linear color space, using the
+ * formula from the GL 3.0 spec, section 4.1.8 (sRGB Texture Color
+ * Conversion).
+ */
+float
+decode_srgb(float x)
+{
+	if (x <= 0.0405)
+		return x / 12.92;
+	else
+		return pow((x + 0.055) / 1.055, 2.4);
+}
+
+/**
  * Measure the accuracy of MSAA downsampling.  Pixels that are fully
  * on or off in the reference image are required to be fully on or off
  * in the test image.  Pixels that are not fully on or off in the
@@ -1403,6 +1429,14 @@ Test::measure_accuracy()
 				int pixel_pos = 4*(y*pattern_width + x) + c;
 				float ref = reference_data[pixel_pos];
 				float test = test_data[pixel_pos];
+				/* When testing sRGB, compare pixels
+				 * linearly so that the measured error
+				 * is comparable to the non-sRGB case.
+				 */
+				if (srgb && c < 3) {
+					ref = decode_srgb(ref);
+					test = decode_srgb(test);
+				}
 				if (ref <= 0.0)
 					unlit_stats.record(test - ref);
 				else if (ref >= 1.0)
@@ -1464,29 +1498,32 @@ create_test(test_type_enum test_type, int n_samples, bool small,
 	Test *test = NULL;
 	switch (test_type) {
 	case TEST_TYPE_COLOR:
-		test = new Test(new Triangles(), NULL, false, 0);
+		test = new Test(new Triangles(), NULL, false, 0, false);
+		break;
+	case TEST_TYPE_SRGB:
+		test = new Test(new Triangles(), NULL, false, 0, true);
 		break;
 	case TEST_TYPE_STENCIL_DRAW:
 		test = new Test(new StencilSunburst(),
 				new ManifestStencil(),
-				false, 0);
+				false, 0, false);
 		break;
 	case TEST_TYPE_STENCIL_RESOLVE:
 		test = new Test(new StencilSunburst(),
 				new ManifestStencil(),
 				true,
-				GL_STENCIL_BUFFER_BIT);
+				GL_STENCIL_BUFFER_BIT, false);
 		break;
 	case TEST_TYPE_DEPTH_DRAW:
 		test = new Test(new DepthSunburst(),
 				new ManifestDepth(),
-				false, 0);
+				false, 0, false);
 		break;
 	case TEST_TYPE_DEPTH_RESOLVE:
 		test = new Test(new DepthSunburst(),
 				new ManifestDepth(),
 				true,
-				GL_DEPTH_BUFFER_BIT);
+				GL_DEPTH_BUFFER_BIT, false);
 		break;
 	default:
 		printf("Unrecognized test type\n");

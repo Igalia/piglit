@@ -31,6 +31,7 @@
 
 enum test_type_enum {
 	TEST_TYPE_COLOR,
+	TEST_TYPE_SRGB,
 	TEST_TYPE_STENCIL_DRAW,
 	TEST_TYPE_STENCIL_RESOLVE,
 	TEST_TYPE_DEPTH_DRAW,
@@ -139,7 +140,8 @@ class DownsampleProg
 {
 public:
 	void compile(int supersample_factor);
-	void run(const Fbo *src_fbo, int dest_width, int dest_height);
+	void run(const Fbo *src_fbo, int dest_width, int dest_height,
+		 bool srgb);
 
 private:
 	GLint prog;
@@ -424,7 +426,7 @@ class Test
 {
 public:
 	Test(TestPattern *pattern, ManifestProgram *manifest_program,
-	     bool test_resolve, GLbitfield blit_type);
+	     bool test_resolve, GLbitfield blit_type, bool srgb);
 	void init(int num_samples, bool small, bool combine_depth_stencil,
 		  int pattern_width, int pattern_height,
 		  int supersample_factor);
@@ -497,6 +499,7 @@ private:
 	int pattern_width;
 	int pattern_height;
 	int supersample_factor;
+	bool srgb;
 	DownsampleProg downsample_prog;
 };
 

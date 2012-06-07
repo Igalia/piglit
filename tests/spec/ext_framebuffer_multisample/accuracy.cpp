@@ -59,6 +59,7 @@ print_usage_and_exit(char *prog_name)
 	printf("Usage: %s <num_samples> <test_type> [options]\n"
 	       "  where <test_type> is one of:\n"
 	       "    color: test downsampling of color buffer\n"
+	       "    srgb: test downsampling of srgb color buffer\n"
 	       "    stencil_draw: test drawing using MSAA stencil buffer\n"
 	       "    stencil_resolve: test resolve of MSAA stencil buffer\n"
 	       "    depth_draw: test drawing using MSAA depth buffer\n"
@@ -108,6 +109,8 @@ piglit_init(int argc, char **argv)
 	test_type_enum test_type;
 	if (strcmp(argv[2], "color") == 0) {
 		test_type = TEST_TYPE_COLOR;
+	} else if (strcmp(argv[2], "srgb") == 0) {
+		test_type = TEST_TYPE_SRGB;
 	} else if (strcmp(argv[2], "stencil_draw") == 0) {
 		test_type = TEST_TYPE_STENCIL_DRAW;
 	} else if (strcmp(argv[2], "stencil_resolve") == 0) {
