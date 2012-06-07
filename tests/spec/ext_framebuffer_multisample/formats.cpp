@@ -361,9 +361,13 @@ visualize_image(float *img, GLenum base_internal_format, bool rhs)
 				a = pixel[3];
 				/* Fall through */
 			case GL_RGB:
-				r = pixel[0];
-				g = pixel[1];
 				b = pixel[2];
+				/* Fall through */
+			case GL_RG:
+				g = pixel[1];
+				/* Fall through */
+			case GL_RED:
+				r = pixel[0];
 				break;
 			case GL_LUMINANCE_ALPHA:
 				a = pixel[1];
