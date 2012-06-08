@@ -429,7 +429,7 @@ piglit_init(int argc, char **argv)
 
 	fbo_formats_init_test_set(0 /* core formats */,
 				  GL_TRUE /* print_options */);
-	test_pattern = new ColorGradientSunburst();
+	test_pattern = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
 	test_pattern->compile();
 }
 

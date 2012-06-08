@@ -880,6 +880,36 @@ void Points::draw(const float (*proj)[4])
 	}
 }
 
+Sunburst::Sunburst()
+	: out_type(GL_UNSIGNED_NORMALIZED)
+{
+}
+
+
+/**
+ * Determine the GLSL type that should be used for rendering, based on
+ * out_type.
+ */
+const char *
+Sunburst::get_out_type_glsl() const
+{
+	switch(out_type) {
+	case GL_INT:
+		return "ivec4";
+	case GL_UNSIGNED_INT:
+		return "uvec4";
+	case GL_UNSIGNED_NORMALIZED:
+	case GL_FLOAT:
+		return "vec4";
+	default:
+		printf("Unrecognized out_type: %s\n",
+		       piglit_get_gl_enum_name(out_type));
+		piglit_report_result(PIGLIT_FAIL);
+		return "UNKNOWN";
+	}
+}
+
+
 void Sunburst::compile()
 {
 	static struct vertex_attributes {
@@ -912,24 +942,33 @@ void Sunburst::compile()
 		"  barycentric_coords = in_barycentric_coords;\n"
 		"}\n";
 
-	static const char *frag =
+	static const char *frag_template =
 		"#version 130\n"
+		"#define OUT_TYPE %s\n"
 		"in vec3 barycentric_coords;\n"
 		"uniform mat3x4 draw_colors;\n"
+		"out OUT_TYPE frag_out;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
-		"  gl_FragColor = draw_colors * barycentric_coords;\n"
+		"  frag_out = OUT_TYPE(draw_colors * barycentric_coords);\n"
 		"}\n";
 
 	/* Compile program */
 	prog = glCreateProgram();
 	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
 	glAttachShader(prog, vs);
+	const char *out_type_glsl = get_out_type_glsl();
+	unsigned frag_alloc_len =
+		strlen(frag_template) + strlen(out_type_glsl) + 1;
+	char *frag = (char *) malloc(frag_alloc_len);
+	sprintf(frag, frag_template, out_type_glsl);
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
+	free(frag);
 	glAttachShader(prog, fs);
 	glBindAttribLocation(prog, 0, "pos_within_tri");
 	glBindAttribLocation(prog, 1, "in_barycentric_coords");
+	glBindFragDataLocation(prog, 0, "frag_out");
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -962,6 +1001,13 @@ void Sunburst::compile()
 			      (void *) offsetof(vertex_attributes,
 						barycentric_coords));
 }
+
+
+ColorGradientSunburst::ColorGradientSunburst(GLenum out_type)
+{
+	this->out_type = out_type;
+}
+
 
 void
 ColorGradientSunburst::draw(const float (*proj)[4])

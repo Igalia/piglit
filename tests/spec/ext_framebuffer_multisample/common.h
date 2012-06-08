@@ -310,7 +310,18 @@ private:
 class Sunburst : public TestPattern
 {
 public:
+	Sunburst();
+
 	virtual void compile();
+
+	/**
+	 * Type of color buffer being rendered into.  Should be one of
+	 * the following enum values: GL_FLOAT,
+	 * GL_UNSIGNED_NORMALIZED, GL_UNSIGNED_INT, or GL_INT.
+	 *
+	 * Defaults to GL_UNSIGNED_NORMALIZED.
+	 */
+	GLenum out_type;
 
 protected:
 	GLint prog;
@@ -322,6 +333,8 @@ protected:
 	int num_tris;
 
 private:
+	const char *get_out_type_glsl() const;
+
 	GLuint vertex_buf;
 };
 
@@ -330,10 +343,17 @@ private:
  *
  * This program draws triangles using a variety of colors and
  * gradients.
+ *
+ * This program is capable of drawing to floating point, integer, and
+ * unsigned integer framebuffers, controlled by the out_type
+ * constructor parameter, which should be GL_FLOAT,
+ * GL_UNSIGNED_NORMALIZED, GL_UNSIGNED_INT, or GL_INT.
  */
 class ColorGradientSunburst : public Sunburst
 {
 public:
+	explicit ColorGradientSunburst(GLenum out_type);
+
 	virtual void draw(const float (*proj)[4]);
 };
 
