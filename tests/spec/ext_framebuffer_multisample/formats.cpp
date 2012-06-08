@@ -90,6 +90,17 @@ public:
 	 */
 	ColorGradientSunburst *test_pattern;
 
+	/**
+	 * Color offset that will be used to draw the test pattern.
+	 */
+	float color_offset;
+
+	/**
+	 * Color scale factor that will be used to draw the test
+	 * pattern.
+	 */
+	float color_scale;
+
 	Fbo fbo_msaa;
 	Fbo fbo_downsampled;
 };
@@ -134,13 +145,19 @@ PatternRenderer::try_setup(GLenum internalformat)
 	switch (component_type) {
 	case GL_INT:
 		test_pattern = test_pattern_ivec4;
+		color_offset = 1.0 - pow(2.0, color_bits[0] - 1);
+		color_scale = -2.0 * color_offset;
 		break;
 	case GL_UNSIGNED_INT:
 		test_pattern = test_pattern_uvec4;
+		color_scale = pow(2.0, color_bits[0]) - 1.0;
+		color_offset = 0.0;
 		break;
 	case GL_UNSIGNED_NORMALIZED:
 	case GL_FLOAT:
 		test_pattern = test_pattern_vec4;
+		color_offset = 0.0;
+		color_scale = 1.0;
 		break;
 	default:
 		printf("Unrecognized component type: %s\n",
@@ -193,7 +210,8 @@ PatternRenderer::draw()
 	/* Draw into the MSAA fbo */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_msaa.handle);
 	fbo_msaa.set_viewport();
-	test_pattern->draw(TestPattern::no_projection);
+	test_pattern->draw_with_scale_and_offset(TestPattern::no_projection,
+						 color_scale, color_offset);
 
 	/* Blit to the downsampled fbo, forcing the image to be downsampled */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_msaa.handle);
@@ -269,6 +287,8 @@ PatternRenderer::read_image(GLenum base_format)
 		glReadPixels(0, 0, pattern_width, pattern_height, base_format,
 			     GL_FLOAT, image);
 	}
+	for (unsigned i = 0; i < array_size; ++i)
+		image[i] = (image[i] - color_offset) / color_scale;
 	return image;
 }
 
