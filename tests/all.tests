@@ -706,6 +706,7 @@ create_context['forward-compatible flag with 3.0'] = PlainExecTest(['glx-create-
 
 create_context_profile = Group();
 glx['GLX_ARB_create_context_profile'] = create_context_profile
+create_context_profile['3.2 core profile required'] = PlainExecTest(['glx-create-context-core-profile'])
 create_context_profile['invalid profile'] = PlainExecTest(['glx-create-context-invalid-profile'])
 
 texturing = Group()
