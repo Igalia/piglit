@@ -1009,15 +1009,50 @@ ColorGradientSunburst::ColorGradientSunburst(GLenum out_type)
 }
 
 
+/**
+ * Draw the color gradient sunburst, but instead of using color
+ * components that range from 0.0 to 1.0, apply the given scaling
+ * factor and offset to each color component.
+ *
+ * The offset is also applied when clearing the color buffer.
+ */
 void
-ColorGradientSunburst::draw(const float (*proj)[4])
+ColorGradientSunburst::draw_with_scale_and_offset(const float (*proj)[4],
+						  float scale, float offset)
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	switch (out_type) {
+	case GL_INT: {
+		int clear_color[4] = { offset, offset, offset, offset };
+		glClearBufferiv(GL_COLOR, 0, clear_color);
+		break;
+	}
+	case GL_UNSIGNED_INT: {
+		unsigned clear_color[4] = { offset, offset, offset, offset };
+		glClearBufferuiv(GL_COLOR, 0, clear_color);
+		break;
+	}
+	case GL_UNSIGNED_NORMALIZED:
+	case GL_FLOAT: {
+		float clear_color[4] = { offset, offset, offset, offset };
+		glClearBufferfv(GL_COLOR, 0, clear_color);
+		break;
+	}
+	default:
+		printf("Unrecognized out_type: %s\n",
+		       piglit_get_gl_enum_name(out_type));
+		piglit_report_result(PIGLIT_FAIL);
+		break;
+	}
 
 	glUseProgram(prog);
 	glUniformMatrix4fv(proj_loc, 1, GL_TRUE, &proj[0][0]);
 	float draw_colors[3][4] =
 		{ { 1, 0, 0, 1.0 }, { 0, 1, 0, 0.5 }, { 0, 0, 1, 1.0 } };
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			draw_colors[i][j] = scale * draw_colors[i][j] + offset;
+		}
+	}
 	glUniformMatrix3x4fv(draw_colors_loc, 1, GL_FALSE,
 			     &draw_colors[0][0]);
 	glBindVertexArray(vao);
@@ -1026,6 +1061,14 @@ ColorGradientSunburst::draw(const float (*proj)[4])
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 }
+
+
+void
+ColorGradientSunburst::draw(const float (*proj)[4])
+{
+	draw_with_scale_and_offset(proj, 1.0, 0.0);
+}
+
 
 void
 StencilSunburst::draw(const float (*proj)[4])

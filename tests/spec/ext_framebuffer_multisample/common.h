@@ -355,6 +355,9 @@ public:
 	explicit ColorGradientSunburst(GLenum out_type);
 
 	virtual void draw(const float (*proj)[4]);
+
+	void draw_with_scale_and_offset(const float (*proj)[4],
+					float scale, float offset);
 };
 
 /**
