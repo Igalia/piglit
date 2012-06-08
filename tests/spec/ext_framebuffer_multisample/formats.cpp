@@ -205,6 +205,37 @@ PatternRenderer::draw()
 
 
 /**
+ * Return the integer base format corresponding to a given base
+ * format.
+ */
+GLenum
+integer_base_format(GLenum base_format)
+{
+	switch (base_format) {
+	case GL_RED:
+		return GL_RED_INTEGER_EXT;
+	case GL_RG:
+		return GL_RG_INTEGER;
+	case GL_RGB:
+		return GL_RGB_INTEGER;
+	case GL_RGBA:
+		return GL_RGBA_INTEGER;
+	case GL_ALPHA:
+		return GL_ALPHA_INTEGER;
+	case GL_LUMINANCE:
+		return GL_LUMINANCE_INTEGER_EXT;
+	case GL_LUMINANCE_ALPHA:
+		return GL_LUMINANCE_ALPHA_INTEGER_EXT;
+	default:
+		printf("Unexpected integer base_format: %s\n",
+		       piglit_get_gl_enum_name(base_format));
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+}
+
+
+/**
  * Read the image from the downsampled FBO into a newly allocated
  * array of floats and return it.
  */
@@ -212,8 +243,8 @@ float *
 PatternRenderer::read_image(GLenum base_format)
 {
 	unsigned components = piglit_num_components(base_format);
-	unsigned size = sizeof(float)*components*pattern_width*pattern_height;
-	float *image = (float *) malloc(size);
+	unsigned array_size = components*pattern_width*pattern_height;
+	float *image = (float *) malloc(sizeof(float)*array_size);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_downsampled.handle);
 	if (base_format == GL_INTENSITY) {
 		/* GL_INTENSITY is not allowed for ReadPixels so
@@ -221,8 +252,23 @@ PatternRenderer::read_image(GLenum base_format)
 		 */
 		base_format = GL_LUMINANCE;
 	}
-	glReadPixels(0, 0, pattern_width, pattern_height, base_format, GL_FLOAT,
-		     image);
+	if (component_type == GL_INT || component_type == GL_UNSIGNED_INT) {
+		int *tmp = (int *) malloc(sizeof(int)*array_size);
+		glReadPixels(0, 0, pattern_width, pattern_height,
+			     integer_base_format(base_format),
+			     component_type, tmp);
+		if (component_type == GL_INT) {
+			for (unsigned i = 0; i < array_size; ++i)
+				image[i] = tmp[i];
+		} else {
+			for (unsigned i = 0; i < array_size; ++i)
+				image[i] = (unsigned) tmp[i];
+		}
+		free(tmp);
+	} else {
+		glReadPixels(0, 0, pattern_width, pattern_height, base_format,
+			     GL_FLOAT, image);
+	}
 	return image;
 }
 
