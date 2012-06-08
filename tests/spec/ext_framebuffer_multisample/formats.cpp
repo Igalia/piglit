@@ -53,7 +53,9 @@ const int pattern_width = 256; const int pattern_height = 256;
 
 int num_samples;
 
-TestPattern *test_pattern;
+ColorGradientSunburst *test_pattern_vec4;
+ColorGradientSunburst *test_pattern_ivec4;
+ColorGradientSunburst *test_pattern_uvec4;
 
 
 /**
@@ -75,6 +77,18 @@ public:
 	 * == number of bits in blue color channel.
 	 */
 	GLint color_bits[4];
+
+	/**
+	 * Type of data in the color buffer.  E.g. GL_FLOAT,
+	 * GL_UNSIGNED_NORMALIZED, or GL_UNSIGNED_INT.
+	 */
+	GLenum component_type;
+
+	/**
+	 * ColorGradientSunburst object that will be used to draw the
+	 * test pattern.
+	 */
+	ColorGradientSunburst *test_pattern;
 
 	Fbo fbo_msaa;
 	Fbo fbo_downsampled;
@@ -112,6 +126,27 @@ PatternRenderer::try_setup(GLenum internalformat)
 	glGetFramebufferAttachmentParameteriv(
 		GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 		GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE, &color_bits[3]);
+	glGetFramebufferAttachmentParameteriv(
+		GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE,
+		(GLint *) &component_type);
+
+	switch (component_type) {
+	case GL_INT:
+		test_pattern = test_pattern_ivec4;
+		break;
+	case GL_UNSIGNED_INT:
+		test_pattern = test_pattern_uvec4;
+		break;
+	case GL_UNSIGNED_NORMALIZED:
+	case GL_FLOAT:
+		test_pattern = test_pattern_vec4;
+		break;
+	default:
+		printf("Unrecognized component type: %s\n",
+		       piglit_get_gl_enum_name(component_type));
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	return true;
 }
@@ -429,8 +464,12 @@ piglit_init(int argc, char **argv)
 
 	fbo_formats_init_test_set(0 /* core formats */,
 				  GL_TRUE /* print_options */);
-	test_pattern = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
-	test_pattern->compile();
+	test_pattern_vec4 = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
+	test_pattern_vec4->compile();
+	test_pattern_ivec4 = new ColorGradientSunburst(GL_INT);
+	test_pattern_ivec4->compile();
+	test_pattern_uvec4 = new ColorGradientSunburst(GL_UNSIGNED_INT);
+	test_pattern_uvec4->compile();
 }
 
 extern "C" enum piglit_result
