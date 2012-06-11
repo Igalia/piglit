@@ -35,16 +35,12 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 #include "piglit-framework-fbo.h"
-
-#ifdef USE_GLX
-#include "piglit-glx-util.h"
-#endif
+#include "piglit-framework-glut.h"
 
 bool piglit_use_fbo = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
 
-static int piglit_window;
 static enum piglit_result result;
 
 #ifndef _WIN32
@@ -60,74 +56,6 @@ __attribute__((weak)) void piglit_init(int argc, char **argv)
 {
 }
 #endif
-
-static void
-display(void)
-{
-	result = piglit_display();
-
-	if (piglit_automatic) {
-		glutDestroyWindow(piglit_window);
-#ifdef FREEGLUT
-		/* Tell GLUT to clean up and exit, so that we can
-		 * reasonably valgrind our testcases for memory
-		 * leaks by the GL.
-		 */
-		glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
-			      GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-		glutLeaveMainLoop();
-#else
-		piglit_report_result(result);
-#endif
-	}
-}
-
-static void
-reshape(int w, int h)
-{
-	piglit_width = w;
-	piglit_height = h;
-
-	glViewport(0, 0, w, h);
-}
-
-/* Swapbuffers the results to the window in non-auto mode. */
-void
-piglit_present_results()
-{
-	if (!piglit_automatic && !piglit_use_fbo)
-		glutSwapBuffers();
-}
-
-static void
-piglit_framework_glut_init(int argc, char *argv[])
-{
-	piglit_glutInit(argc, argv);
-
-	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(piglit_width, piglit_height);
-	glutInitDisplayMode(piglit_window_mode);
-	piglit_window = glutCreateWindow(argv[0]);
-
-#if defined(USE_GLX) && !defined(USE_WAFFLE)
-	/* If using waffle, then the current platform might not be GLX.
-	 * So we can't call any GLX functions.
-	 *
-	 * FIXME: Detect the waffle platform and handle piglit_automatic
-	 * FIXME: appropriately.
-	 */
-	if (piglit_automatic)
-		piglit_glx_set_no_input();
-#endif
-
-	glutDisplayFunc(display);
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(piglit_escape_exit_key);
-
-#ifdef USE_OPENGL
-	glewInit();
-#endif
-}
 
 static void
 delete_arg(char *argv[], int argc, int arg)
