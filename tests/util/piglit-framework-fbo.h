@@ -23,7 +23,5 @@
 
 #include <stdbool.h>
 
-extern bool piglit_use_fbo;
-
 bool piglit_framework_fbo_init(void);
 void piglit_framework_fbo_destroy(void);

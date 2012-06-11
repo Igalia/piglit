@@ -40,6 +40,7 @@
 #include "piglit-glx-util.h"
 #endif
 
+bool piglit_use_fbo = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
 

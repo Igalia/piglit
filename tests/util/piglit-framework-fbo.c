@@ -53,8 +53,6 @@
 #include <waffle/waffle.h>
 #endif
 
-bool piglit_use_fbo = false;
-
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 Display *piglit_glx_dpy;
 Window piglit_glx_window;
