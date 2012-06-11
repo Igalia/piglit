@@ -198,6 +198,11 @@ int piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expect
 int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgba_int(int x, int y, int w, int h, const int* expected);
 int piglit_probe_rect_rgba_uint(int x, int y, int w, int h, const unsigned int* expected);
+void piglit_compute_probe_tolerance(GLenum format, float *tolerance);
+int piglit_compare_images_color(int x, int y, int w, int h, int num_components,
+				const float *tolerance,
+				const float *expected_image,
+				const float *observed_image);
 int piglit_probe_image_color(int x, int y, int w, int h, GLenum format, const float *image);
 int piglit_probe_image_rgb(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);

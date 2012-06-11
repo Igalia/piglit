@@ -240,21 +240,14 @@ print_pixel(const float *pixel, unsigned components)
 		printf(" %f", pixel[p]);
 }
 
-int
-piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
-			 const float *image)
+/**
+ * Compute the appropriate tolerance for comparing images of the given
+ * base format.
+ */
+void
+piglit_compute_probe_tolerance(GLenum format, float *tolerance)
 {
-	int i, j, p;
-	int c = piglit_num_components(format);
-	GLfloat *probe;
-	GLfloat *pixels = malloc(w*h*c*sizeof(float));
-	float tolerance[4];
-	if (format == GL_INTENSITY) {
-		/* GL_INTENSITY is not allowed for ReadPixels so
-		 * substitute GL_LUMINANCE.
-		 */
-		format = GL_LUMINANCE;
-	}
+	int num_components, component;
 	switch (format) {
 	case GL_LUMINANCE_ALPHA:
 		tolerance[0] = piglit_tolerance[0];
@@ -264,35 +257,78 @@ piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
 		tolerance[0] = piglit_tolerance[3];
 		break;
 	default:
-		for (p = 0; p < c; ++p)
-			tolerance[p] = piglit_tolerance[p];
+		num_components = piglit_num_components(format);
+		for (component = 0; component < num_components; ++component)
+			tolerance[component] = piglit_tolerance[component];
+		break;
 	}
+}
 
-	glReadPixels(x, y, w, h, format, GL_FLOAT, pixels);
-
+/**
+ * Compare two in-memory floating-point images.
+ */
+int
+piglit_compare_images_color(int x, int y, int w, int h, int num_components,
+			    const float *tolerance,
+			    const float *expected_image,
+			    const float *observed_image)
+{
+	int i, j, p;
 	for (j = 0; j < h; j++) {
 		for (i = 0; i < w; i++) {
-			const float *expected = &image[(j*w+i)*c];
-			probe = &pixels[(j*w+i)*c];
+			const float *expected =
+				&expected_image[(j*w+i)*num_components];
+			const float *probe =
+				&observed_image[(j*w+i)*num_components];
 
-			for (p = 0; p < c; ++p) {
-				if (fabs(probe[p] - expected[p]) >= tolerance[p]) {
+			for (p = 0; p < num_components; ++p) {
+				if (fabs(probe[p] - expected[p])
+				    >= tolerance[p]) {
 					printf("Probe at (%i,%i)\n", x+i, y+j);
 					printf("  Expected:");
-					print_pixel(expected, c);
+					print_pixel(expected, num_components);
 					printf("\n  Observed:");
-					print_pixel(probe, c);
+					print_pixel(probe, num_components);
 					printf("\n");
 
-					free(pixels);
 					return 0;
 				}
 			}
 		}
 	}
 
-	free(pixels);
 	return 1;
+}
+
+/**
+ * Compare the contents of the current read framebuffer with the given
+ * in-memory floating-point image.
+ */
+int
+piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
+			 const float *image)
+{
+	int c = piglit_num_components(format);
+	GLfloat *pixels = malloc(w*h*c*sizeof(float));
+	float tolerance[4];
+	int result;
+
+	piglit_compute_probe_tolerance(format, tolerance);
+
+	if (format == GL_INTENSITY) {
+		/* GL_INTENSITY is not allowed for ReadPixels so
+		 * substitute GL_LUMINANCE.
+		 */
+		format = GL_LUMINANCE;
+	}
+
+	glReadPixels(x, y, w, h, format, GL_FLOAT, pixels);
+
+	result = piglit_compare_images_color(x, y, w, h, c, tolerance, image,
+					     pixels);
+
+	free(pixels);
+	return result;
 }
 
 int
