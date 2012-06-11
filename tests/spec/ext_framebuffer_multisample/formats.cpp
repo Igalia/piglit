@@ -459,11 +459,14 @@ test_format(const struct format_desc *format)
 				       format->base_internal_format);
 
 	/* Check that the test image was correct */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER,
-			  test_renderer.fbo_downsampled.handle);
-	pass = piglit_probe_image_color(0, 0, pattern_width, pattern_height,
-					format->base_internal_format,
-					expected_image) && pass;
+	unsigned num_components =
+		piglit_num_components(format->base_internal_format);
+	float tolerance[4];
+	piglit_compute_probe_tolerance(format->base_internal_format,
+				       tolerance);
+	pass = piglit_compare_images_color(0, 0, pattern_width, pattern_height,
+					   num_components, tolerance,
+					   expected_image, test_image);
 
 	/* Show both the test and expected images on screen so that
 	 * the user can diagnose problems.
