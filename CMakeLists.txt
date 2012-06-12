@@ -119,6 +119,8 @@ if (NOT MSVC)
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wdeclaration-after-statement")
 	ENDIF (C_COMPILER_FLAG_WDECL_AFTER_STMT)
 else ()
+	include_directories("include/msvc/c99")
+
 	# -Wall or (/Wall) is actually supported by MSVC and would be detected
 	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
 	# thousand of warnings when including windows.h.
