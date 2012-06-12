@@ -23,5 +23,10 @@
 
 #include <stdbool.h>
 
-bool piglit_framework_fbo_init(void);
-void piglit_framework_fbo_run(void);
+struct piglit_gl_test_info;
+
+bool
+piglit_framework_fbo_init(const struct piglit_gl_test_info *info);
+
+void
+piglit_framework_fbo_run(const struct piglit_gl_test_info *info);

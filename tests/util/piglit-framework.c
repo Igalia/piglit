@@ -41,19 +41,8 @@ bool piglit_use_fbo = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
 
-#ifndef _WIN32
-__attribute__((weak)) int piglit_width = 100;
-__attribute__((weak)) int piglit_height = 100;
-__attribute__((weak)) int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
-
-__attribute__((weak)) enum piglit_result piglit_display(void)
-{
-	return PIGLIT_FAIL;
-}
-__attribute__((weak)) void piglit_init(int argc, char **argv)
-{
-}
-#endif
+int piglit_width;
+int piglit_height;
 
 void
 piglit_gl_test_info_init(struct piglit_gl_test_info *info)
@@ -132,22 +121,21 @@ piglit_gl_test_run(int argc, char *argv[],
 
 	piglit_width = info->window_width;
 	piglit_height = info->window_height;
-	piglit_window_mode = info->window_visual;
 
 	if (piglit_use_fbo) {
-		if (!piglit_framework_fbo_init())
+		if (!piglit_framework_fbo_init(info))
 			piglit_use_fbo = false;
 	}
 
 	if (!piglit_use_fbo)
-		piglit_framework_glut_init(argc, argv);
+		piglit_framework_glut_init(argc, argv, info);
 
-	piglit_init(argc, argv);
+	info->init(argc, argv);
 
 	if (piglit_use_fbo) {
-		piglit_framework_fbo_run();
+		piglit_framework_fbo_run(info);
 	} else {
-		piglit_framework_glut_run();
+		piglit_framework_glut_run(info);
 	}
 
 	assert(false);

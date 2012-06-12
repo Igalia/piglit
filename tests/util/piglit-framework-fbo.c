@@ -232,7 +232,7 @@ piglit_framework_fbo_waffle_destroy(void)
 #endif
 
 static bool
-piglit_framework_fbo_gl_init()
+piglit_framework_fbo_gl_init(const struct piglit_gl_test_info *info)
 {
 #ifdef PIGLIT_FRAMEWORK_FBO_DISABLED
 	return false;
@@ -261,7 +261,7 @@ piglit_framework_fbo_gl_init()
 			       tex,
 			       0);
 
-	if (piglit_window_mode & (GLUT_DEPTH | GLUT_STENCIL)) {
+	if (info->window_visual & (GLUT_DEPTH | GLUT_STENCIL)) {
 		/* Create a combined depth+stencil texture and attach it
 		 * to the depth and stencil attachment points.
 		 */
@@ -303,7 +303,7 @@ piglit_framework_fbo_gl_init()
 }
 
 bool
-piglit_framework_fbo_init(void)
+piglit_framework_fbo_init(const struct piglit_gl_test_info *info)
 {
 #if defined(PIGLIT_FRAMEWORK_FBO_USE_GLX)
 	piglit_framework_fbo_glx_init();
@@ -311,7 +311,7 @@ piglit_framework_fbo_init(void)
 	piglit_framework_fbo_waffle_init();
 #endif
 
-	return piglit_framework_fbo_gl_init();
+	return piglit_framework_fbo_gl_init(info);
 }
 
 static void
@@ -330,9 +330,10 @@ piglit_framework_fbo_destroy(void)
 #endif
 }
 
-void piglit_framework_fbo_run(void)
+void
+piglit_framework_fbo_run(const struct piglit_gl_test_info *info)
 {
-	enum piglit_result result = piglit_display();
+	enum piglit_result result = info->display();
 	piglit_framework_fbo_destroy();
 	piglit_report_result(result);
 }

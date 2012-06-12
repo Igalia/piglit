@@ -35,6 +35,14 @@
 #include "piglit-glx-util.h"
 #endif
 
+/**
+ * \brief Set by piglit_framework_glut_init().
+ *
+ * This global variable exists because GLUT's API requires that data be passed
+ * to the display function via a global. Ugh, what an awful API.
+ */
+static const struct piglit_gl_test_info *test_info;
+
 static int piglit_window;
 static enum piglit_result result;
 
@@ -42,7 +50,7 @@ static enum piglit_result result;
 static void
 display(void)
 {
-	result = piglit_display();
+	result = test_info->display();
 
 	if (piglit_automatic) {
 		glutDestroyWindow(piglit_window);
@@ -78,8 +86,13 @@ piglit_present_results()
 }
 
 void
-piglit_framework_glut_init(int argc, char *argv[])
+piglit_framework_glut_init(int argc, char *argv[],
+			   const struct piglit_gl_test_info *info)
 {
+	if (test_info != NULL)
+		assert(!"already init");
+
+	test_info = info;
 	glutInit(&argc, argv);
 
 #	if defined(USE_WAFFLE)
@@ -95,8 +108,9 @@ piglit_framework_glut_init(int argc, char *argv[])
 #	endif
 
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(piglit_width, piglit_height);
-	glutInitDisplayMode(piglit_window_mode);
+	glutInitWindowSize(info->window_width,
+			info->window_height);
+	glutInitDisplayMode(info->window_visual);
 	piglit_window = glutCreateWindow(argv[0]);
 
 #if defined(USE_GLX) && !defined(USE_WAFFLE)
@@ -120,7 +134,7 @@ piglit_framework_glut_init(int argc, char *argv[])
 }
 
 void
-piglit_framework_glut_run(void)
+piglit_framework_glut_run(const struct piglit_gl_test_info *info)
 {
 	glutMainLoop();
 	piglit_report_result(result);

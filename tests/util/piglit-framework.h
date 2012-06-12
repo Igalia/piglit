@@ -121,12 +121,9 @@ piglit_gl_test_run(int argc, char *argv[],
 
 extern int piglit_automatic;
 
-extern int piglit_window_mode;
 extern int piglit_width;
 extern int piglit_height;
 extern bool piglit_use_fbo;
 extern unsigned int piglit_winsys_fbo;
 
-extern enum piglit_result piglit_display(void);
-extern void piglit_init(int argc, char **argv);
 extern void piglit_present_results();
