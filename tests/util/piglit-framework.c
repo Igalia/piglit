@@ -152,7 +152,3 @@ piglit_gl_test_run(int argc, char *argv[],
 
 	assert(false);
 }
-
-PIGLIT_GL_TEST_MAIN(piglit_width,
-                    piglit_height,
-                    piglit_window_mode)
