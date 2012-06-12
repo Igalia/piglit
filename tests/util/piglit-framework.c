@@ -55,6 +55,12 @@ __attribute__((weak)) void piglit_init(int argc, char **argv)
 }
 #endif
 
+void
+piglit_gl_test_info_init(struct piglit_gl_test_info *info)
+{
+	memset(info, 0, sizeof(*info));
+}
+
 static void
 delete_arg(char *argv[], int argc, int arg)
 {
@@ -118,9 +124,15 @@ process_args(int *argc, char *argv[])
 	}
 }
 
-int main(int argc, char *argv[])
+void
+piglit_gl_test_run(int argc, char *argv[],
+		   const struct piglit_gl_test_info *info)
 {
 	process_args(&argc, argv);
+
+	piglit_width = info->window_width;
+	piglit_height = info->window_height;
+	piglit_window_mode = info->window_visual;
 
 	if (piglit_use_fbo) {
 		if (!piglit_framework_fbo_init())
@@ -139,5 +151,8 @@ int main(int argc, char *argv[])
 	}
 
 	assert(false);
-	return 0;
 }
+
+PIGLIT_GL_TEST_MAIN(piglit_width,
+                    piglit_height,
+                    piglit_window_mode)
