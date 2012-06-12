@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util.h"
+#include <stdbool.h>
 
 extern bool piglit_use_fbo;
 
