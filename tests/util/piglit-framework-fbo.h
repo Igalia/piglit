@@ -24,4 +24,4 @@
 #include <stdbool.h>
 
 bool piglit_framework_fbo_init(void);
-void piglit_framework_fbo_destroy(void);
+void piglit_framework_fbo_run(void);

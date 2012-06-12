@@ -118,3 +118,10 @@ piglit_framework_glut_init(int argc, char *argv[])
 	glewInit();
 #endif
 }
+
+void
+piglit_framework_glut_run(void)
+{
+	glutMainLoop();
+	piglit_report_result(result);
+}

@@ -41,8 +41,6 @@ bool piglit_use_fbo = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
 
-static enum piglit_result result;
-
 #ifndef _WIN32
 __attribute__((weak)) int piglit_width = 100;
 __attribute__((weak)) int piglit_height = 100;
@@ -135,13 +133,11 @@ int main(int argc, char *argv[])
 	piglit_init(argc, argv);
 
 	if (piglit_use_fbo) {
-		result = piglit_display();
-		piglit_framework_fbo_destroy();
+		piglit_framework_fbo_run();
 	} else {
-		glutMainLoop();
+		piglit_framework_glut_run();
 	}
 
-	piglit_report_result(result);
-	/* UNREACHED */
+	assert(false);
 	return 0;
 }

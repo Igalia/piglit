@@ -26,3 +26,4 @@
 #include "piglit-util.h"
 
 void piglit_framework_glut_init(int argc, char *argv[]);
+void piglit_framework_glut_run(void);

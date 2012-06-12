@@ -66,6 +66,9 @@ static struct waffle_window *piglit_waffle_window;
 static struct waffle_context *piglit_waffle_context;
 #endif
 
+static void
+piglit_framework_fbo_destroy(void);
+
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
 static void
 piglit_framework_fbo_glx_init()
@@ -311,7 +314,7 @@ piglit_framework_fbo_init(void)
 	return piglit_framework_fbo_gl_init();
 }
 
-void
+static void
 piglit_framework_fbo_destroy(void)
 {
 #ifdef USE_OPENGL
@@ -325,4 +328,11 @@ piglit_framework_fbo_destroy(void)
 #elif defined(PIGLIT_FRAMEWORK_FBO_USE_WAFFLE)
 	piglit_framework_fbo_waffle_destroy();
 #endif
+}
+
+void piglit_framework_fbo_run(void)
+{
+	enum piglit_result result = piglit_display();
+	piglit_framework_fbo_destroy();
+	piglit_report_result(result);
 }
