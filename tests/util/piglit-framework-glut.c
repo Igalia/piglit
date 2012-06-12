@@ -80,7 +80,19 @@ piglit_present_results()
 void
 piglit_framework_glut_init(int argc, char *argv[])
 {
-	piglit_glutInit(argc, argv);
+	glutInit(&argc, argv);
+
+#	if defined(USE_WAFFLE)
+#		if defined(USE_OPENGL)
+			glutInitAPIMask(GLUT_OPENGL_BIT);
+#		elif defined(USE_OPENGL_ES1)
+			glutInitAPIMask(GLUT_OPENGL_ES1_BIT);
+#		elif defined(USE_OPENGL_ES2)
+			glutInitAPIMask(GLUT_OPENGL_ES2_BIT);
+#		else
+#			error
+#		endif
+#	endif
 
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(piglit_width, piglit_height);

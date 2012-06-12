@@ -91,24 +91,6 @@ int asprintf(char **strp, const char *fmt, ...)
 
 #endif /* _WIN32 */
 
-
-void piglit_glutInit(int argc, char **argv)
-{
-	glutInit(&argc, argv);
-
-#	if defined(USE_WAFFLE)
-#		if defined(USE_OPENGL)
-			glutInitAPIMask(GLUT_OPENGL_BIT);
-#		elif defined(USE_OPENGL_ES1)
-			glutInitAPIMask(GLUT_OPENGL_ES1_BIT);
-#		elif defined(USE_OPENGL_ES2)
-			glutInitAPIMask(GLUT_OPENGL_ES2_BIT);
-#		else
-#			error
-#		endif
-#	endif
-}
-
 bool piglit_is_gles()
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);

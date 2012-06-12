@@ -116,11 +116,6 @@ extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
 
 /**
- * Call glutInit() and, if glut_waffle is used, also call glutInitAPIMask().
- */
-void piglit_glutInit(int argc, char **argv);
-
-/**
  * Determine if the API is OpenGL ES.
  */
 bool piglit_is_gles();
