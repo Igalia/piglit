@@ -36,4 +36,3 @@ extern unsigned int piglit_winsys_fbo;
 extern enum piglit_result piglit_display(void);
 extern void piglit_init(int argc, char **argv);
 extern void piglit_present_results();
-extern void piglit_set_default_fbo(unsigned int target);
