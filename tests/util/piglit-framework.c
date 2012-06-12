@@ -67,26 +67,33 @@ delete_arg(char *argv[], int argc, int arg)
 	}
 }
 
-int main(int argc, char *argv[])
+/**
+ * Recognized arguments are removed from @a argv. The updated array
+ * length is returned in @a argc.
+ */
+static void
+process_args(int *argc, char *argv[])
 {
 	int j;
 
 	/* Find/remove "-auto" and "-fbo" from the argument vector.
 	 */
-	for (j = 1; j < argc; j++) {
+	for (j = 1; j < *argc; j++) {
 		if (!strcmp(argv[j], "-auto")) {
 			piglit_automatic = 1;
-			delete_arg(argv, argc--, j--);
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
 		} else if (!strcmp(argv[j], "-fbo")) {
 			piglit_use_fbo = true;
-			delete_arg(argv, argc--, j--);
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
 		} else if (!strcmp(argv[j], "-rlimit")) {
 			char *ptr;
 			unsigned long lim;
 			int i;
 
 			j++;
-			if (j >= argc) {
+			if (j >= *argc) {
 				fprintf(stderr,
 					"-rlimit requires an argument\n");
 				piglit_report_result(PIGLIT_FAIL);
@@ -104,13 +111,18 @@ int main(int argc, char *argv[])
 			/* Remove 2 arguments (hence the 'i - 2') from the
 			 * command line.
 			 */
-			for (i = j + 1; i < argc; i++) {
+			for (i = j + 1; i < *argc; i++) {
 				argv[i - 2] = argv[i];
 			}
-			argc -= 2;
+			*argc -= 2;
 			j -= 2;
 		}
 	}
+}
+
+int main(int argc, char *argv[])
+{
+	process_args(&argc, argv);
 
 	if (piglit_use_fbo) {
 		if (!piglit_framework_fbo_init())
