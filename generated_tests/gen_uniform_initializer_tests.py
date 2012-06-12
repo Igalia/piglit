@@ -25,6 +25,13 @@ import os
 import os.path
 from mako.template import Template
 
+
+def open_src_file(filename):
+    """Open a file relative to the source directory"""
+    local_dir = os.path.dirname(__file__)
+    return open(os.path.join(local_dir, filename))
+
+
 def get_value(type, idx):
     """Get a string representing a number in the specified GLSL type"""
 
@@ -48,7 +55,7 @@ def generate_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
         for t in all_templates:
             template_file_name = "uniform-initializer-templates/{0}-initializer{1}.template".format(target, t)
-            f = open(template_file_name)
+            f = open_src_file(template_file_name)
             template = f.read()
             f.close()
 
@@ -107,7 +114,7 @@ def generate_tests(type_list, base_name, major, minor):
 def generate_array_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
         template_file_name = "uniform-initializer-templates/{0}-initializer.template".format(target)
-        f = open(template_file_name)
+        f = open_src_file(template_file_name)
         template = f.read()
         f.close()
 
