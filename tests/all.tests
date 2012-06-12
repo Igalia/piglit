@@ -713,6 +713,7 @@ create_context_profile['pre-GL3 profile'] = PlainExecTest(['glx-create-context-p
 create_context_es2_profile = Group();
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = PlainExecTest(['glx-create-context-indirect-es2-profile'])
+create_context_es2_profile['invalid OpenGL ES version'] = PlainExecTest(['glx-create-context-invalid-es-version'])
 
 texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')
