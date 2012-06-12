@@ -55,9 +55,10 @@ static const GLint tests[][8] = {
 
 #define NUM_TESTS (sizeof(tests) / sizeof(tests[0]))
 
-int piglit_width = 100 * (NUM_TESTS + 1);
-int piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    100 * (NUM_TESTS + 1) /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static void DoFrame( void )
 {

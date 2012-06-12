@@ -34,9 +34,10 @@
 #include <string.h>
 #include "piglit-util.h"
 
-int piglit_width = 256;
-int piglit_height = 256;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    256 /*window_width*/,
+    256 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static GLint max_targets;
 

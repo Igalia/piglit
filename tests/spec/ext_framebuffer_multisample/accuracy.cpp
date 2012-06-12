@@ -43,8 +43,11 @@
  *   driver for Linux) this is necessary for framebuffer completeness.
  *   On others (e.g. i965), this is an important corner case to test.
  */
-int piglit_width = 512; int piglit_height = 256;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA;
+
+PIGLIT_GL_TEST_MAIN(
+    512 /*window_width*/,
+    256 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
 
 const int pattern_width = 256; const int pattern_height = 256;
 const int supersample_factor = 16;

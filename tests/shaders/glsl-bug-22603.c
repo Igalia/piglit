@@ -32,8 +32,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 800, piglit_height = 600;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    800 /*window_width*/,
+    600 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 /* Misbehaviour: first: the quads are not drawn in the correct order
  * (darker equals closer to the viewer), second: the middle one is strangely

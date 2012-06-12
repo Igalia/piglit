@@ -35,9 +35,11 @@
 #include "piglit-util.h"
 
 #define BUF_WIDTH 16
-int piglit_width = 50;
-int piglit_height = 20;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH;
+
+PIGLIT_GL_TEST_MAIN(
+    50 /*window_width*/,
+    20 /*window_height*/,
+    GLUT_DOUBLE | GLUT_DEPTH)
 
 #define F(name) #name, name
 

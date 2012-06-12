@@ -5,8 +5,11 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 128, piglit_height = 128;
-int piglit_window_mode = GLUT_SINGLE | GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    128 /*window_height*/,
+    GLUT_SINGLE | GLUT_RGB)
+
 #define BITMAP_WIDTH 1
 #define BITMAP_HEIGHT 1
 #define ALIGN 1

@@ -36,9 +36,10 @@
 #define MAX_LOD	5
 #define PAD		5
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 500;
-int piglit_height = 600;
+PIGLIT_GL_TEST_MAIN(
+    500 /*window_width*/,
+    600 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static GLfloat colors[][3] = {
 	{1.0, 0.0, 0.0},

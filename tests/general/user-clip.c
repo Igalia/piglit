@@ -32,13 +32,10 @@
 
 #define BOX_SIZE   32
 
-
-int piglit_window_mode = GLUT_DOUBLE;
-int piglit_width = 100;
-int piglit_height = 100;
-
-
-
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_DOUBLE)
 
 static const GLfloat clear_color[4] = { 0.5, 0.5, 0.5, 1.0 };
 

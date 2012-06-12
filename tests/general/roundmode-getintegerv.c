@@ -44,9 +44,10 @@
 
 #include <fenv.h>
 
-int piglit_window_mode = GLUT_DOUBLE;
-int piglit_width = 10;
-int piglit_height = 10;
+PIGLIT_GL_TEST_MAIN(
+    10 /*window_width*/,
+    10 /*window_height*/,
+    GLUT_DOUBLE)
 
 enum piglit_result
 piglit_display(void)

@@ -40,9 +40,10 @@
 #define TEST_COLS 5
 #define BOX_SIZE  (1 << (TEST_COLS + 1))
 
-int piglit_width = (BOX_SIZE + 2) * TEST_COLS + 1;
-int piglit_height = (BOX_SIZE + 1) + 1;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    (BOX_SIZE + 2) * TEST_COLS + 1 /*window_width*/,
+    (BOX_SIZE + 1) + 1 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static GLuint tex[1];
 

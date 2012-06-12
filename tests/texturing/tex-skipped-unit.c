@@ -31,9 +31,10 @@
 
 #define TEXSIZE 32
 
-int piglit_width = TEXSIZE * 2;
-int piglit_height = TEXSIZE * 2;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    TEXSIZE * 2 /*window_width*/,
+    TEXSIZE * 2 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 GLvoid
 draw_rect_tex(float x, float y, float w, float h,

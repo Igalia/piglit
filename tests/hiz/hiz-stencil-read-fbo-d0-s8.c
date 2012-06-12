@@ -39,9 +39,10 @@
 #include "piglit-util.h"
 #include "hiz/hiz-util.h"
 
-int piglit_width = 400;
-int piglit_height = 400;
-int piglit_window_mode = GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    400 /*window_width*/,
+    400 /*window_height*/,
+    GLUT_RGB)
 
 struct hiz_fbo_options fbo_options = {
 	GL_RGBA,

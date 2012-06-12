@@ -32,9 +32,11 @@
 
 #define BUF_WIDTH 15
 #define BUF_HEIGHT 15
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
-int piglit_width = BUF_WIDTH;
-int piglit_height = BUF_WIDTH;
+
+PIGLIT_GL_TEST_MAIN(
+    BUF_WIDTH /*window_width*/,
+    BUF_WIDTH /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 /* Width of our stripes of z = 0.0, 0.5, 1.0 */
 static int w = BUF_WIDTH / 3;

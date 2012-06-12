@@ -26,8 +26,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 320, piglit_height = 80;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    320 /*window_width*/,
+    80 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 GLboolean user_va = GL_FALSE;
 

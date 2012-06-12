@@ -38,9 +38,11 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 150;
-int piglit_height = 150;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE | GLUT_STENCIL | GLUT_DEPTH;
+PIGLIT_GL_TEST_MAIN(
+    150 /*window_width*/,
+    150 /*window_height*/,
+    GLUT_RGBA | GLUT_DOUBLE | GLUT_STENCIL | GLUT_DEPTH)
+
 #define PAD 10
 #define SIZE 20
 

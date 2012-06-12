@@ -34,9 +34,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_width = 100;
-int piglit_height = 100;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL)
 
 static const char *Prog = "gl30basic";
 

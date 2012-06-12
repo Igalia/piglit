@@ -31,8 +31,10 @@
 #define WIDTH 256
 #define HEIGHT 256
 
-int piglit_width = WIDTH, piglit_height = HEIGHT;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    WIDTH /*window_width*/,
+    HEIGHT /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA)
 
 static GLint prog;
 

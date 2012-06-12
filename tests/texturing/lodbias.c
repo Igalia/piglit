@@ -45,9 +45,11 @@
 
 #define SquareSize 32
 
-int piglit_width = 3*SquareSize;
-int piglit_height = 3*SquareSize;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    3*SquareSize /*window_width*/,
+    3*SquareSize /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
+
 static int CurrentTest = 0;
 static int CurrentBias = 0;
 static int CurrentBias2 = 0;

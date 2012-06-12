@@ -38,8 +38,10 @@ static const char* const program_text =
 	"END\n"
 	;
 
-int piglit_width = 50, piglit_height = 50;
-int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    50 /*window_width*/,
+    50 /*window_height*/,
+    GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE)
 
 static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
 

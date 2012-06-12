@@ -43,9 +43,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 16;
-int piglit_height = 16;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    16 /*window_width*/,
+    16 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 #define XFB_BUFFER_SIZE 12
 #define MAX_VERTICES 9

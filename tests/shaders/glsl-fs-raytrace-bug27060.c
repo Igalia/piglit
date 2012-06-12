@@ -25,8 +25,10 @@
 #include "piglit-util.h"
 #include "glsl-fs-raytrace-bug27060.h"
 
-int piglit_width = 256, piglit_height = 256;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    256 /*window_width*/,
+    256 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static GLint program = -1;
 static float rot[9] = {1,0,0,  0,1,0,   0,0,1};

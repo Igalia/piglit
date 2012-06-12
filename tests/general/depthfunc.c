@@ -33,9 +33,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_width = 100;
-int piglit_height = 200;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DEPTH;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    200 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DEPTH)
 
 /**
  * Convenience function to draw an axis-aligned rectangle.

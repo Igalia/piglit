@@ -98,9 +98,11 @@ int fbo_width = 256;
 int fbo_height = 256;
 
 /* Piglit variables */
-int piglit_width = fbo_width;
-int piglit_height = fbo_height;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    fbo_width /*window_width*/,
+    fbo_height /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 /* Globals */
 int test_id = 0;

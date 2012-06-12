@@ -30,10 +30,10 @@
 #include "piglit-util.h"
 #include "fbo-formats.h"
 
-int piglit_width = 128;
-int piglit_height = 64;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
-
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    64 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 /**
  * Draw a quad with alpha testing

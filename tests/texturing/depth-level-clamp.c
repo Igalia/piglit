@@ -41,9 +41,10 @@
 #define MAX_LOD	6
 #define PAD		5
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = (MAX_SIZE * 2 + PAD * 3);
-int piglit_height = (MAX_SIZE * MAX_LOD + PAD * (MAX_LOD + 1));
+PIGLIT_GL_TEST_MAIN(
+    (MAX_SIZE * 2 + PAD * 3) /*window_width*/,
+    (MAX_SIZE * MAX_LOD + PAD * (MAX_LOD + 1)) /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static void
 set_level_value(int level, int size, float val)

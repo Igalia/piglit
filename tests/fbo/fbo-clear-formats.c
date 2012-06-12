@@ -36,9 +36,11 @@
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256
-int piglit_width = 700;
-int piglit_height = 300;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+
+PIGLIT_GL_TEST_MAIN(
+    700 /*window_width*/,
+    300 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 /* Do piglit_rgbw_texture() image but using glClear */
 static bool

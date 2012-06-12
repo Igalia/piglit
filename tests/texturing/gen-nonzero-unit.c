@@ -41,8 +41,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 512, piglit_height = 512;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    512 /*window_width*/,
+    512 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static PFNGLACTIVETEXTUREPROC ActiveTexture = NULL;
 

@@ -63,8 +63,9 @@
 
 #include "common.h"
 
-int piglit_width = 512; int piglit_height = 256;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(256 /*window_width*/,
+                    256 /*window_height*/,
+                    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA);
 
 namespace {
 

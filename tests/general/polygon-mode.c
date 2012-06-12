@@ -30,9 +30,10 @@
 
 #include "piglit-util.h"
 
-
-int piglit_width = 500, piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    500 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 static float ortho_left = -1, ortho_right = 8, ortho_bottom = -2, ortho_top = 2;
 

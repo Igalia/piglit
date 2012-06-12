@@ -36,8 +36,10 @@
 
 #define SIZE 128
 
-int piglit_width = (SIZE * 2) + 60, piglit_height = SIZE + 20;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    (SIZE * 2) + 60 /*window_width*/,
+    SIZE + 20 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 struct format {
 	const char *name;

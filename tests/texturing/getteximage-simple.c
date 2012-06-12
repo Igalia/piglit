@@ -12,8 +12,11 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 100, piglit_height = 100;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGBA | GLUT_DOUBLE)
+
 static GLubyte data[4096]; /* 64*16*4 */
 
 static int test_getteximage(void)

@@ -35,9 +35,11 @@
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
-int piglit_width = 200;
-int piglit_height = 100;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+
+PIGLIT_GL_TEST_MAIN(
+    200 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 #define NUM_DEPTHS	6
 #define POT_DEPTHS	8

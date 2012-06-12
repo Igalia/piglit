@@ -39,8 +39,10 @@
 #include "piglit-util.h"
 #include "piglit-vbo.h"
 
-int piglit_width = 250, piglit_height = 250;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    250 /*window_width*/,
+    250 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 extern float piglit_tolerance[4];
 

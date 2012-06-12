@@ -34,9 +34,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 200;
-int piglit_height = 200;
+PIGLIT_GL_TEST_MAIN(
+    200 /*window_width*/,
+    200 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 #define MAX_LEVEL 7
 

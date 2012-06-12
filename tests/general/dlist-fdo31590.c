@@ -38,9 +38,10 @@
 
 static const char *TestName = "dlist-fdo31590";
 
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
-int piglit_width = 500, piglit_height = 500;
-
+PIGLIT_GL_TEST_MAIN(
+    500 /*window_width*/,
+    500 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static const GLfloat ctrlpoints[4][3] = {
    { -4.0, -4.0, 0.0}, { -2.0, 4.0, 0.0}, 

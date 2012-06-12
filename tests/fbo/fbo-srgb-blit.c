@@ -30,9 +30,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 128;
-int piglit_height = 128;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    128 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static GLuint src_tex, dst_tex;
 static GLuint src_fbo, dst_fbo;

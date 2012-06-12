@@ -37,9 +37,11 @@
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256
-int piglit_width = TEX_WIDTH;
-int piglit_height = TEX_HEIGHT;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+
+PIGLIT_GL_TEST_MAIN(
+    TEX_WIDTH /*window_width*/,
+    TEX_HEIGHT /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static const float red[] =   {1, 0, 0, 0};
 static const float green[] = {0, 1, 0, 0};

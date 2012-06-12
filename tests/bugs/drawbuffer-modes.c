@@ -35,8 +35,11 @@
  * \Author Yi Sun <yi.sun@intel.com>, Anuj Phogat <anuj.phogat@gmail.com>
  */
 #include "piglit-util.h"
-int piglit_width = 100, piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 float color[7][4] = {
 	{ 0.1, 0.2, 0.3, 1.0 },

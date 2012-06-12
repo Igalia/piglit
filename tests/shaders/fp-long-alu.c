@@ -37,9 +37,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA;
-int piglit_width = 32;
-int piglit_height = 32;
+PIGLIT_GL_TEST_MAIN(
+    32 /*window_width*/,
+    32 /*window_height*/,
+    GLUT_RGBA | GLUT_ALPHA)
 
 int max_alu_instructions;
 

@@ -36,8 +36,11 @@
 #define MAX_VARYING 32
 
 /* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
-int piglit_width = (2 + MAX_VARYING * 12), piglit_height = (2 + MAX_VARYING * 12);
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    (2 + MAX_VARYING * 12) /*window_width*/,
+    (2 + MAX_VARYING * 12) /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 /* Generate a VS that writes to num_varyings vec4s, and put
  * interesting data in data_varying with 0.0 everywhere else.

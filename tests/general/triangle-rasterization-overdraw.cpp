@@ -70,9 +70,11 @@ bool break_on_fail = false;
 int random_test_count = 10;
 
 /* Piglit variables */
-int piglit_width = 1000;
-int piglit_height = 1000;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    1000 /*window_width*/,
+    1000 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 /* Globals */
 int test_id = 0;

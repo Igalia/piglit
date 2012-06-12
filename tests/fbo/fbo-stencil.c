@@ -31,9 +31,12 @@
 #include "piglit-util.h"
 
 #define BUF_SIZE 123
-int piglit_width = BUF_SIZE;
-int piglit_height = BUF_SIZE;
-int piglit_window_mode = GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    BUF_SIZE /*window_width*/,
+    BUF_SIZE /*window_height*/,
+    GLUT_DOUBLE)
+
 enum {
 	CLEAR,
 	READPIXELS,

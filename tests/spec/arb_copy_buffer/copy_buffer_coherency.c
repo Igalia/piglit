@@ -31,8 +31,10 @@
 uint8_t src_data[COPY_BUFFER_SIZE];
 uint8_t dest_data[COPY_BUFFER_SIZE];
 
-int piglit_width = 400, piglit_height = 300;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    400 /*window_width*/,
+    300 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 enum piglit_result
 piglit_display(void)

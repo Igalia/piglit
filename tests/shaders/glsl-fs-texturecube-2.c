@@ -34,8 +34,11 @@
 #include "piglit-util.h"
 
 #define SIZE 32
-int piglit_width = SIZE * 6, piglit_height = SIZE;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    SIZE * 6 /*window_width*/,
+    SIZE /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 static GLint prog;
 

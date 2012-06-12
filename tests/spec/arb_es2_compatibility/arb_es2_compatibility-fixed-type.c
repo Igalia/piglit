@@ -25,8 +25,10 @@
 #include "piglit-util.h"
 #include <stdarg.h>
 
-int piglit_width = 250, piglit_height = 250;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    250 /*window_width*/,
+    250 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA)
 
 static unsigned verts[4*4*4];
 

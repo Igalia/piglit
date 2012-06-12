@@ -18,8 +18,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_width = 100, piglit_height = 100;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGBA)
 
 static GLfloat colors[8][3] = {
 	{ 1.0, 1.0, 1.0 },

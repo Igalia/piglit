@@ -32,8 +32,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 120, piglit_height = 20;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    120 /*window_width*/,
+    20 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 static GLint prog;
 

@@ -31,9 +31,10 @@
 
 #include "piglit-util.h"
 
-int piglit_window_mode = GLUT_RGB;
-int piglit_width = 400;
-int piglit_height = 300;
+PIGLIT_GL_TEST_MAIN(
+    400 /*window_width*/,
+    300 /*window_height*/,
+    GLUT_RGB)
 
 #define FAIL_ON_ERROR(string)						\
 	do {								\

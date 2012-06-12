@@ -32,9 +32,6 @@
 #include "piglit-util.h"
 
 #define IMAGE_SIZE 16
-
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA;
-
 static const GLfloat fcolor[8][4] = {
 	/* GL_RED */
 	{0.5, 0.0, 0.0, 1.0},
@@ -97,8 +94,10 @@ static const GLenum target[] = {
 	GL_TEXTURE_2D,
 	GL_TEXTURE_CUBE_MAP };
 
-int piglit_width = IMAGE_SIZE * (ARRAY_SIZE(test_vectors) + 1);
-int piglit_height = IMAGE_SIZE;
+PIGLIT_GL_TEST_MAIN(
+    IMAGE_SIZE * (ARRAY_SIZE(test_vectors) + 1) /*window_width*/,
+    IMAGE_SIZE /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA)
 
 static const float texCoords_1d[2] = { 0.0, 1.0 };
 static const float texCoords_2d[4][2] = {

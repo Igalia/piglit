@@ -37,9 +37,10 @@
  *      in tables 3.16- 3.17:"
  */
 
-int piglit_width = 32;
-int piglit_height = 32;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    32 /*window_width*/,
+    32 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 GLenum type_queries[CHANNELS] = {
 	GL_TEXTURE_RED_TYPE,

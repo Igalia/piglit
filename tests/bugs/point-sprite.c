@@ -35,9 +35,10 @@
 #define TEST_COLS 6
 #define TEST_ROWS 2
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 1 + ((BOX_SIZE + 1) * TEST_COLS);
-int piglit_height = 1 + ((BOX_SIZE + 1) * TEST_ROWS);
+PIGLIT_GL_TEST_MAIN(
+    1 + ((BOX_SIZE + 1) * TEST_COLS) /*window_width*/,
+    1 + ((BOX_SIZE + 1) * TEST_ROWS) /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static float maxSize = 0.0f;
 static GLuint tex;

@@ -35,9 +35,10 @@
  *      MAX_SAMPLES_EXT, then the error INVALID_VALUE is generated."
  */
 
-int piglit_width = 32;
-int piglit_height = 32;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    32 /*window_width*/,
+    32 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 enum piglit_result
 piglit_display(void)

@@ -21,8 +21,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 200, piglit_height = 40;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    200 /*window_width*/,
+    40 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static const float colors[6][3] = {
    {1, 0, 0},

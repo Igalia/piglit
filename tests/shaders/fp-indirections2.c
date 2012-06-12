@@ -37,9 +37,10 @@
 
 #define TEXTURE_SIZE 32 /* Note: Hardcoded dependencies in texture_init and texture_follow */
 
-int piglit_window_mode = GLUT_RGBA;
-int piglit_width = TEXTURE_SIZE;
-int piglit_height = TEXTURE_SIZE;
+PIGLIT_GL_TEST_MAIN(
+    TEXTURE_SIZE /*window_width*/,
+    TEXTURE_SIZE /*window_height*/,
+    GLUT_RGBA)
 
 unsigned int max_samples;
 unsigned char * texture_data;

@@ -33,9 +33,10 @@
 #define NUM_POINTS 10002
 #define SHIFT_COUNT 64
 
-int piglit_width = 100;
-int piglit_height = 100;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 static const char *vstext =
 	"#version 130\n"

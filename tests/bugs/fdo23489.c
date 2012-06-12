@@ -5,8 +5,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 250, piglit_height = 250;
-int piglit_window_mode = GLUT_SINGLE | GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    250 /*window_width*/,
+    250 /*window_height*/,
+    GLUT_SINGLE | GLUT_RGB)
 
 enum piglit_result
 piglit_display(void)

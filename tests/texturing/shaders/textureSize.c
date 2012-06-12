@@ -46,8 +46,10 @@
  */
 #include "common.h"
 
-int piglit_width = 150, piglit_height = 30;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    150 /*window_width*/,
+    30 /*window_height*/,
+    GLUT_RGBA | GLUT_DOUBLE)
 
 static int lod_location;
 static int vertex_location;

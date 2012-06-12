@@ -34,8 +34,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 128, piglit_height = 128;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    128 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 /* size of texture/renderbuffer (power of two) */
 #define FBO_SIZE 128

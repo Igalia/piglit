@@ -30,8 +30,10 @@ const float default_color[4] = { 0.2, 0.4, 0.6, 1.0 };
 const float default_depth = 0.2;
 const int default_stencil = 0x7a;
 
-int piglit_width = 100, piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 GLuint
 generate_simple_fbo(bool color, bool stencil, bool depth, bool packed)

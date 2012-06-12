@@ -36,9 +36,10 @@
 
 #define BUFFER_SIZE 0x40
 
-int piglit_width = 10;
-int piglit_height = 10;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    10 /*window_width*/,
+    10 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 /* Test parameters */
 static unsigned long additional_offset;

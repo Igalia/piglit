@@ -27,8 +27,11 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 200, piglit_height = 200;
-int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH;
+PIGLIT_GL_TEST_MAIN(
+    200 /*window_width*/,
+    200 /*window_height*/,
+    GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH)
+
 extern float piglit_tolerance[4];
 
 #define NUM_PROGRAMS 4

@@ -32,9 +32,10 @@
 
 #include <sys/time.h>
 
-int piglit_width = 128;
-int piglit_height = 128;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA;
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    128 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 static float
 get_time(void)

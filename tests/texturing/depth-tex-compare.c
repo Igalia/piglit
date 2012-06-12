@@ -36,9 +36,10 @@
 
 #define BOX_SIZE 25
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 400;
-int piglit_height = 300;
+PIGLIT_GL_TEST_MAIN(
+    400 /*window_width*/,
+    300 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static GLuint tex;
 

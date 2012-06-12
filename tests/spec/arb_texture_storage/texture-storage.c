@@ -30,9 +30,11 @@
 
 #include "piglit-util.h"
 
+PIGLIT_GL_TEST_MAIN(
+    100 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
-int piglit_width = 100, piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
 static const char *TestName = "texture-storage";
 
 static GLubyte Colors[][4] = {

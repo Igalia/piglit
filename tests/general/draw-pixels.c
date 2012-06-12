@@ -51,9 +51,10 @@
 /** Convert GLint in [-2147483648,2147483647] to GLfloat in [-1.0,1.0] */
 #define INT_TO_FLOAT(I)     ((GLfloat) ((2.0F * (I) + 1.0F) * (1.0F/4294967294.0)))
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA |
-			 GLUT_DEPTH | GLUT_STENCIL;
-int piglit_width = 16, piglit_height = 16;
+PIGLIT_GL_TEST_MAIN(
+    16 /*window_width*/,
+    16 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL)
 
 const GLuint idx0 = 0, idx1 = 1, idx2 = 2, idx3 = 3;
 static GLfloat expected[100][4];

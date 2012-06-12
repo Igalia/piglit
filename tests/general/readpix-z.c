@@ -29,10 +29,9 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 200, piglit_height = 200;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH;
-
-
+PIGLIT_GL_TEST_MAIN(200 /*window_width*/,
+                    200 /*window_height*/,
+                    GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 
 static void
 draw_z_gradient(GLfloat zLeft, GLfloat zRight)

@@ -86,9 +86,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 16;
-int piglit_height = 16;
-int piglit_window_mode = GLUT_RGBA;
+PIGLIT_GL_TEST_MAIN(
+    16 /*window_width*/,
+    16 /*window_height*/,
+    GLUT_RGBA)
 
 namespace {
 

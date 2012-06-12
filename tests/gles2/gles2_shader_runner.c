@@ -35,8 +35,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_window_mode = GLUT_RGB | GLUT_DEPTH;
-int piglit_width = 250, piglit_height = 250;
+PIGLIT_GL_TEST_MAIN(
+    250 /*window_width*/,
+    250 /*window_height*/,
+    GLUT_RGB | GLUT_DEPTH)
 
 static float gles_version = 0.0;
 static float essl_version = 0.0;

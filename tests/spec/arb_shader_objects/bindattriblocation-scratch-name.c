@@ -34,9 +34,10 @@
 #include "piglit-util.h"
 #include "piglit-framework.h"
 
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
-int piglit_width = 10;
-int piglit_height = 10;
+PIGLIT_GL_TEST_MAIN(
+    10 /*window_width*/,
+    10 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static const GLchar *vertShaderText =
 	"attribute vec4 attrib;\n"

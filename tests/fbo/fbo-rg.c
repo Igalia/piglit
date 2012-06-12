@@ -44,9 +44,10 @@ static GLuint rgba_tex;
 static GLuint other_tex;
 static GLboolean pass = GL_TRUE;
 
-int piglit_width = 128;
-int piglit_height = 64;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
+PIGLIT_GL_TEST_MAIN(
+    128 /*window_width*/,
+    64 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 static const char vert_code[] =
 	"attribute vec2 position;\n"

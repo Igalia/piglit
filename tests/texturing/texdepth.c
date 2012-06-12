@@ -12,11 +12,13 @@
 
 #define ROWS 4
 #define COLS 8
-
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH;
 static int Width = COLS*32, Height = ROWS*32;
-int piglit_width = COLS*32;
-int piglit_height = ROWS*32;
+
+PIGLIT_GL_TEST_MAIN(
+    COLS*32 /*window_width*/,
+    ROWS*32 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH)
+
 static int CellWidth, CellHeight;
 static int CurrentTest = 0;
 

@@ -51,9 +51,10 @@
  * the downsample blit.  These are already adequately tested by
  * accuracy.cpp.
  */
-int piglit_width = 512; int piglit_height = 256;
-int piglit_window_mode =
-	GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL;
+
+PIGLIT_GL_TEST_MAIN(512 /*window_width*/,
+		    256 /*window_height*/,
+		    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL);
 
 const int pattern_width = 256; const int pattern_height = 256;
 

@@ -36,8 +36,9 @@
 
 #include "common.h"
 
-int piglit_width = 256; int piglit_height = 256;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGBA;
+PIGLIT_GL_TEST_MAIN(256 /*window_width*/,
+                    256 /*window_height*/,
+                    GLUT_DOUBLE | GLUT_RGBA);
 
 const int pattern_width = 256; const int pattern_height = 256;
 Fbo src_fbo, dst_fbo;

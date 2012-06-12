@@ -35,11 +35,10 @@
 #define TEST_COLS  1
 #define BOX_SIZE   32
 
-
-int piglit_window_mode = GLUT_DOUBLE;
-int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
-int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
-
+PIGLIT_GL_TEST_MAIN(
+    (((BOX_SIZE+1)*TEST_COLS)+1) /*window_width*/,
+    (((BOX_SIZE+1)*TEST_ROWS)+1) /*window_height*/,
+    GLUT_DOUBLE)
 
 static const char vertex_source_template[] =
 	"!!ARBvp1.0\n"

@@ -41,9 +41,10 @@
 
 #define BOX_SIZE   16
 
-int piglit_window_mode = GLUT_DOUBLE;
-int piglit_width = (((BOX_SIZE+1)*TEST_COLS)+1);
-int piglit_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
+PIGLIT_GL_TEST_MAIN(
+    (((BOX_SIZE+1)*TEST_COLS)+1) /*window_width*/,
+    (((BOX_SIZE+1)*TEST_ROWS)+1) /*window_height*/,
+    GLUT_DOUBLE)
 
 /**
  * Source for the fragment program to render the reference box.

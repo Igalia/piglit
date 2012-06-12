@@ -31,8 +31,10 @@
  */
 #include "piglit-util.h"
 
-int piglit_width = 90, piglit_height = 150;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    90 /*window_width*/,
+    150 /*window_height*/,
+    GLUT_RGBA | GLUT_DOUBLE)
 
 const int tex_size = 64;
 

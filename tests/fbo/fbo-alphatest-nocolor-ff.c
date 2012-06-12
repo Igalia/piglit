@@ -31,9 +31,11 @@
 #include "piglit-util.h"
 
 #define BUF_WIDTH 32
-int piglit_width = 32;
-int piglit_height = 32;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA;
+
+PIGLIT_GL_TEST_MAIN(
+    32 /*window_width*/,
+    32 /*window_height*/,
+    GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA)
 
 static void create_fbo(GLuint *out_tex)
 {

@@ -45,10 +45,10 @@
 
 #define SIZE 256
 
-
-int piglit_width = 3 * SIZE;
-int piglit_height = SIZE;
-int piglit_window_mode = GLUT_DOUBLE | GLUT_DEPTH;
+PIGLIT_GL_TEST_MAIN(
+    3 * SIZE /*window_width*/,
+    SIZE /*window_height*/,
+    GLUT_DOUBLE | GLUT_DEPTH)
 
 static GLfloat ErrorScale = 0.0;
 static GLuint ColorTex, DepthTex, FBO;

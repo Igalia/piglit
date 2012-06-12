@@ -78,8 +78,10 @@
  */
 #include "common.h"
 
-int piglit_width = 355, piglit_height = 250;
-int piglit_window_mode = GLUT_RGBA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    355 /*window_width*/,
+    250 /*window_height*/,
+    GLUT_RGBA | GLUT_DOUBLE)
 
 /** Vertex shader attribute locations */
 const int pos_loc = 0;

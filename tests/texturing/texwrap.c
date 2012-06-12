@@ -383,8 +383,12 @@ static int bsize_x = 1, bsize_y = 1, bsize_z = 1;       /* size + 2*border */
 static int border_x = 0, border_y = 0, border_z = 0;    /* 0 or 1 */
 
 /* Piglit stuff. */
-int piglit_width = 872, piglit_height = 230;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+
+PIGLIT_GL_TEST_MAIN(
+    872 /*window_width*/,
+    230 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+
 extern int piglit_automatic;
 
 

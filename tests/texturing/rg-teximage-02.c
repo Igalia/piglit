@@ -51,9 +51,10 @@ GLuint tex[Elements(internal_formats)];
 const unsigned num_tex = Elements(tex);
 GLboolean pass = GL_TRUE;
 
-int piglit_width = WIDTH * Elements(tex);
-int piglit_height = HEIGHT;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    WIDTH * Elements(tex) /*window_width*/,
+    HEIGHT /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 void
 piglit_init(int argc, char **argv)

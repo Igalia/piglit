@@ -41,9 +41,10 @@
 #define TEX_WIDTH 8
 #define TEX_HEIGHT 8
 
-int piglit_width = 64;
-int piglit_height = 64;
-int piglit_window_mode = GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    64 /*window_width*/,
+    64 /*window_height*/,
+    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
 
 enum piglit_result
 piglit_display(void)

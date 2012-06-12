@@ -38,8 +38,10 @@
 
 #include "piglit-util.h"
 
-int piglit_width = 300, piglit_height = 100;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    300 /*window_width*/,
+    100 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static float
 y_from_x(float x)

@@ -39,9 +39,10 @@
 #include <string.h>
 #include "piglit-util.h"
 
-int piglit_width = 700;
-int piglit_height = 620;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
+PIGLIT_GL_TEST_MAIN(
+    700 /*window_width*/,
+    620 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 static GLboolean PrintInfo = GL_TRUE;
 

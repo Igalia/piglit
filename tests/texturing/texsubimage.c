@@ -35,9 +35,10 @@
 #include "piglit-util.h"
 #include "../fbo/fbo-formats.h"
 
-int piglit_width = 150, piglit_height = 150;
-int piglit_window_mode = GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE;
-
+PIGLIT_GL_TEST_MAIN(
+    150 /*window_width*/,
+    150 /*window_height*/,
+    GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE)
 
 /**
  * This is a subset of the formats in fbo-formats.h

@@ -31,9 +31,11 @@
 
 #include "piglit-util.h"
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 700;
-int piglit_height = 400;
+PIGLIT_GL_TEST_MAIN(
+    700 /*window_width*/,
+    400 /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
+
 int height = 100, ybase = 0;
 
 static const char *prog = "array-texture";

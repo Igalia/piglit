@@ -40,9 +40,10 @@ static const GLenum depth_texture_modes[] = {
 #define TEST_ROWS 4
 #define TEST_COLS ARRAY_SIZE(depth_texture_modes)
 
-int piglit_window_mode = GLUT_DOUBLE | GLUT_RGB;
-int piglit_width = 1 + (TEST_COLS * (BOX_SIZE + 1));
-int piglit_height = 1 + (TEST_ROWS * (BOX_SIZE + 1));
+PIGLIT_GL_TEST_MAIN(
+    1 + (TEST_COLS * (BOX_SIZE + 1)) /*window_width*/,
+    1 + (TEST_ROWS * (BOX_SIZE + 1)) /*window_height*/,
+    GLUT_DOUBLE | GLUT_RGB)
 
 GLuint tex[2];
 

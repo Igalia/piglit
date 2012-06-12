@@ -32,10 +32,10 @@
 
 #include "piglit-util.h"
 
-
-int piglit_width = 120, piglit_height = 120;
-int piglit_window_mode = GLUT_RGB | GLUT_DOUBLE;
-
+PIGLIT_GL_TEST_MAIN(
+    120 /*window_width*/,
+    120 /*window_height*/,
+    GLUT_RGB | GLUT_DOUBLE)
 
 /** Test if the pixels at (x,y) and (x,y+1) are black.
  * We test two pixels to be sure we hit the primitive we drew.  We could
