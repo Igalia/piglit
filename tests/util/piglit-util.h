@@ -36,26 +36,12 @@ extern "C" {
 #endif
 
 #if defined(_MSC_VER)
-typedef signed char int8_t;
-typedef __int16 int16_t;
-typedef __int32 int32_t;
-typedef __int64 int64_t;
-typedef unsigned __int8 uint8_t;
-typedef unsigned __int16 uint16_t;
-typedef unsigned __int32 uint32_t;
-typedef unsigned __int64 uint64_t;
-#ifndef __cplusplus
-#define bool BOOL
-#define true 1
-#define false 0
-#endif
 #define log2(x) (log(x) / log(2))
-#else
-#include <stdint.h>
-#include <stdbool.h>
 #endif
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
