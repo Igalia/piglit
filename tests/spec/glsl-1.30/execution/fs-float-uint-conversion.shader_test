@@ -1,0 +1,37 @@
+# Check that a very large floating point value can be converted to a
+# uint, even though it falls outside the valid range of ints.
+#
+# The very large floating point value we test with is 0xff000000 ==
+# 4278190080, which can be represented exactly using a 32-bit float,
+# so we don't need to worry about rounding error.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform float float_value;
+uniform uint uint_value;
+
+#define RED vec4(1.0, 0.0, 0.0, 1.0)
+#define GREEN vec4(0.0, 1.0, 0.0, 1.0)
+
+void main()
+{
+	uint converted = uint(float_value);
+	bool match = converted == uint_value;
+	gl_FragColor = match ? GREEN : RED;
+}
+
+[test]
+uniform float float_value 4278190080
+uniform uint uint_value 4278190080
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
