@@ -256,19 +256,14 @@ piglit_framework_fbo_gl_init()
 			       0);
 
 	if (piglit_window_mode & (GLUT_DEPTH | GLUT_STENCIL)) {
-		GLenum depth_stencil;
-
-#ifdef USE_OPENGL
-		depth_stencil = GL_DEPTH_STENCIL;
-#else
-		depth_stencil = GL_DEPTH_STENCIL_OES;
-#endif
-
+		/* Create a combined depth+stencil texture and attach it
+		 * to the depth and stencil attachment points.
+		 */
 		glGenTextures(1, &depth);
 		glBindTexture(GL_TEXTURE_2D, depth);
-		glTexImage2D(GL_TEXTURE_2D, 0, depth_stencil,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL,
 			     piglit_width, piglit_height, 0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 		glFramebufferTexture2D(GL_FRAMEBUFFER,
 				       GL_DEPTH_ATTACHMENT,
 				       GL_TEXTURE_2D,
