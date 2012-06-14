@@ -60,6 +60,8 @@ GLuint geometry_shaders[256];
 unsigned num_geometry_shaders = 0;
 GLuint fragment_shaders[256];
 unsigned num_fragment_shaders = 0;
+int num_uniform_blocks;
+GLuint *uniform_block_bos;
 
 /**
  * List of strings loaded from files
@@ -742,6 +744,117 @@ check_unsigned_support()
 		piglit_report_result(PIGLIT_SKIP);
 }
 
+/**
+ * Handles uploads of UBO uniforms by mapping the buffer and storing
+ * the data.  If the uniform is not in a uniform block, returns false.
+ */
+bool
+set_ubo_uniform(const char *name, const char *type, const char *line)
+{
+	GLuint uniform_index;
+	GLint block_index;
+	GLint offset;
+	char *data;
+	float f[16];
+	int ints[16];
+	unsigned uints[16];
+	int name_len = strlen(name);
+
+	if (!num_uniform_blocks)
+		return false;
+
+	glGetUniformIndices(prog, 1, &name, &uniform_index);
+	if (uniform_index == GL_INVALID_INDEX) {
+		printf("cannot get index of uniform \"%s\"\n", name);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glGetActiveUniformsiv(prog, 1, &uniform_index,
+			      GL_UNIFORM_BLOCK_INDEX, &block_index);
+
+	if (block_index == -1)
+		return false;
+
+	glGetActiveUniformsiv(prog, 1, &uniform_index,
+			      GL_UNIFORM_OFFSET, &offset);
+
+	if (name[name_len - 1] == ']') {
+		GLint stride;
+		int i;
+
+		for (i = name_len - 1; (i > 0) && isdigit(name[i-1]); --i)
+			/* empty */;
+
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_ARRAY_STRIDE, &stride);
+		offset += stride * strtol(&name[i], NULL, 0);
+	}
+
+	glBindBuffer(GL_UNIFORM_BUFFER,
+		     uniform_block_bos[block_index]);
+	data = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+	data += offset;
+
+	if (string_match("float", type)) {
+		get_floats(line, f, 1);
+		memcpy(data, f, sizeof(float));
+	} else if (string_match("int", type)) {
+		get_ints(line, ints, 1);
+		memcpy(data, ints, sizeof(int));
+	} else if (string_match("uint", type)) {
+		get_uints(line, uints, 1);
+		memcpy(data, uints, sizeof(int));
+	} else if (string_match("vec", type)) {
+		int elements = type[3] - '0';
+		get_floats(line, f, elements);
+		memcpy(data, f, elements * sizeof(float));
+	} else if (string_match("ivec", type)) {
+		int elements = type[4] - '0';
+		get_ints(line, ints, elements);
+		memcpy(data, ints, elements * sizeof(int));
+	} else if (string_match("uvec", type)) {
+		int elements = type[4] - '0';
+		get_uints(line, uints, elements);
+		memcpy(data, uints, elements * sizeof(unsigned));
+	} else if (string_match("mat", type)) {
+		GLint matrix_stride, row_major;
+		int cols = type[3] - '0';
+		int rows = type[4] == 'x' ? type[5] - '0' : cols;
+		int r, c;
+		float *matrixdata = (float *)data;
+
+		assert(cols >= 2 && cols <= 4);
+		assert(rows >= 2 && rows <= 4);
+
+		get_floats(line, f, rows * cols);
+
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+
+		matrix_stride /= sizeof(float);
+
+		for (c = 0; c < cols; c++) {
+			for (r = 0; r < rows; r++) {
+				if (row_major) {
+					matrixdata[matrix_stride * c + r] =
+						f[r * rows + c];
+				} else {
+					matrixdata[matrix_stride * r + c] =
+						f[r * rows + c];
+				}
+			}
+		}
+	} else {
+		printf("unknown uniform type \"%s\" for \"%s\"", type, name);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+	return true;
+}
 
 void
 set_uniform(const char *line)
@@ -760,6 +873,10 @@ set_uniform(const char *line)
 	line = eat_text(type);
 
 	line = strcpy_to_space(name, eat_whitespace(line));
+
+	if (set_ubo_uniform(name, type, line))
+		return;
+
 	loc = piglit_GetUniformLocation(prog, name);
 	if (loc < 0) {
 		printf("cannot get location of uniform \"%s\"\n",
@@ -1125,6 +1242,35 @@ handle_texparameter(const char *line)
 	piglit_report_result(PIGLIT_FAIL);
 }
 
+static void
+setup_ubos()
+{
+	int i;
+
+	if (!piglit_is_extension_supported("GL_ARB_uniform_buffer_object") &&
+	    piglit_get_gl_version() < 31) {
+		return;
+	}
+
+	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_BLOCKS, &num_uniform_blocks);
+	if (num_uniform_blocks == 0)
+		return;
+
+	uniform_block_bos = calloc(num_uniform_blocks, sizeof(GLuint));
+	glGenBuffers(num_uniform_blocks, uniform_block_bos);
+
+	for (i = 0; i < num_uniform_blocks; i++) {
+		GLint size;
+
+		glGetActiveUniformBlockiv(prog, i, GL_UNIFORM_BLOCK_DATA_SIZE,
+					  &size);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, uniform_block_bos[i]);
+		glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
+		glBindBufferBase(GL_UNIFORM_BUFFER, i, uniform_block_bos[i]);
+	}
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -1443,4 +1589,5 @@ piglit_init(int argc, char **argv)
 	if (vertex_data_start != NULL)
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
+	setup_ubos();
 }
