@@ -1,0 +1,58 @@
+#
+# A slightly more convoluted mipmap test.
+#
+# Create an 8x8 texture with four miplevels, colored red, green, blue, and
+# white, respectively.  Draw a quad with each vertex looking up the color
+# in a different lod.
+#
+# This verifies that textureLod() selects the proper miplevel for integer
+# LODs when all vertices are given a different LOD.  Or on other words the
+# test verifies that LODs are not improperly shared.
+
+[require]
+GLSL >= 1.30
+
+[fragment shader]
+#version 130
+void main()
+{
+    gl_FragColor = gl_Color;
+}
+
+[vertex shader]
+#version 130
+uniform sampler2D tex;
+in vec4 vertex;
+in float lod;
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * vertex;
+    gl_FrontColor = textureLod(tex, vec2(0.5, 0.5), lod);
+}
+
+[vertex data]
+vertex/float/2  lod/float/1
+-1.0 -1.0       0
+ 1.0 -1.0       1
+ 1.0  1.0       2
+-1.0  1.0       3
+
+[test]
+clear color 0.4 0.4 0.4 0.4
+clear
+
+uniform int tex 0
+texture miptree 0
+
+# Draw the miptree: basic integer LODs.
+
+texparameter 2D min nearest_mipmap_nearest
+texparameter 2D mag nearest
+
+draw arrays GL_QUADS 0 4
+
+# Probes: integer LODs
+relative probe rgba (0.0, 0.0) (1.0, 0.0, 0.0, 1.0)
+relative probe rgba (1.0, 0.0) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (1.0, 1.0) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.0, 1.0) (1.0, 1.0, 1.0, 1.0)
