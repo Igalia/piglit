@@ -37,6 +37,10 @@
  *
  * Finally, the images that were compared are drawn on screen to make
  * it easier to diagnose failures.
+ *
+ * When testing sRGB formats, the reference image is rendered using
+ * SRGB8_ALPHA8 format rather than RGBA format (SRGB8_ALPHA8 format is
+ * also well tested by the other MSAA tests).
  */
 
 #include "common.h"
@@ -83,6 +87,11 @@ public:
 	 * GL_UNSIGNED_NORMALIZED, or GL_UNSIGNED_INT.
 	 */
 	GLenum component_type;
+
+	/**
+	 * True if the color buffer uses an sRGB format.
+	 */
+	bool is_srgb;
 
 	/**
 	 * ColorGradientSunburst object that will be used to draw the
@@ -164,6 +173,12 @@ PatternRenderer::try_setup(GLenum internalformat)
 		       piglit_get_gl_enum_name(component_type));
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+	GLint color_encoding;
+	glGetFramebufferAttachmentParameteriv(
+		GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &color_encoding);
+	is_srgb = color_encoding == GL_SRGB;
 
 	return true;
 }
@@ -458,19 +473,6 @@ test_format(const struct format_desc *format)
 
 	printf("Testing %s\n", format->name);
 
-	/* Set up the framebuffers for rendering the reference image.
-	 * This shouldn't fail.
-	 */
-	bool setup_success = ref_renderer.try_setup(GL_RGBA);
-	if (!piglit_check_gl_error(GL_NO_ERROR)) {
-		printf("Error setting up reference renderbuffers\n");
-		return PIGLIT_FAIL;
-	}
-	if (!setup_success) {
-		printf("Reference framebuffer combination is unsupported\n");
-		return PIGLIT_FAIL;
-	}
-
 	/* Set up the framebuffers for rendering the test image.  This
 	 * might fail if the format we're testing isn't supported as a
 	 * render target, and that's ok.
@@ -487,7 +489,7 @@ test_format(const struct format_desc *format)
 	 * supported, we might have received a GL error.  In either
 	 * case just skip to the next format.
 	 */
-	setup_success = test_renderer.try_setup(format->internalformat);
+	bool setup_success = test_renderer.try_setup(format->internalformat);
 	if (glGetError() != GL_NO_ERROR) {
 		printf("Error setting up test renderbuffers\n");
 		return PIGLIT_SKIP;
@@ -495,6 +497,20 @@ test_format(const struct format_desc *format)
 	if (!setup_success) {
 		printf("Unsupported framebuffer combination\n");
 		return PIGLIT_SKIP;
+	}
+
+	/* Set up the framebuffers for rendering the reference image.
+	 * This shouldn't fail.
+	 */
+	setup_success = ref_renderer.try_setup(test_renderer.is_srgb ?
+					       GL_SRGB8_ALPHA8 : GL_RGBA);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		printf("Error setting up reference renderbuffers\n");
+		return PIGLIT_FAIL;
+	}
+	if (!setup_success) {
+		printf("Reference framebuffer combination is unsupported\n");
+		return PIGLIT_FAIL;
 	}
 
 	/* Draw test and reference images, and read them into memory */
