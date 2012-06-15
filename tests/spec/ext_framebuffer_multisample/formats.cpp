@@ -170,6 +170,27 @@ PatternRenderer::try_setup(GLenum internalformat)
 
 
 /**
+ * Return the number of mantissa bits available in an n-bit floating
+ * point format.
+ */
+int
+get_mantissa_bits(int n)
+{
+	switch (n) {
+	case 32: return 23;
+	case 16: return 10;
+	case 11: return 6;
+	case 10: return 5;
+	case 0: return 0; /* Unused channel */
+	default:
+		printf("Unrecognized floating point format (%d bits)\n", n);
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+}
+
+
+/**
  * Set the piglit tolerance appropriately based on the number of bits
  * in each channel.
  */
@@ -178,20 +199,27 @@ void PatternRenderer::set_piglit_tolerance()
 	int tolerance_bits[4];
 
 	for (int i = 0; i < 4; ++i) {
-		if (color_bits[i] == 0) {
+		int bits = color_bits[i];
+		if (component_type == GL_FLOAT) {
+			/* We only want to count mantissa bits for the
+			 * purpose of setting the test tolerance.
+			 */
+			bits = get_mantissa_bits(bits);
+		}
+		if (bits == 0) {
 			/* For channels that have 0 bits, test to 8
 			 * bits precision so we can verify that the
 			 * blit puts in the appropriate value.
 			 */
 			tolerance_bits[i] = 8;
-		} else if (color_bits[i] > 8) {
+		} else if (bits > 8) {
 			/* For channels that have >8 bits, test to 8
 			 * bits precision because we only use an 8-bit
 			 * reference image.
 			 */
 			tolerance_bits[i] = 8;
 		} else {
-			tolerance_bits[i] = color_bits[i];
+			tolerance_bits[i] = bits;
 		}
 	}
 
