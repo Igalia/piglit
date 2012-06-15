@@ -1521,6 +1521,7 @@ add_fbo_formats_tests('spec/EXT_packed_float', 'GL_EXT_packed_float')
 add_texwrap_test2(ext_packed_float, '2D', 'GL_R11F_G11F_B10F')
 ext_packed_float['pack'] = concurrent_test('ext_packed_float-pack')
 ext_packed_float['getteximage-invalid-format-for-packed-type'] = concurrent_test('getteximage-invalid-format-for-packed-type')
+add_msaa_formats_tests(ext_packed_float, 'GL_EXT_packed_float')
 
 arb_texture_float = Group()
 spec['ARB_texture_float'] = arb_texture_float
@@ -1538,6 +1539,7 @@ add_texwrap_test2(arb_texture_float, '2D', 'GL_INTENSITY32F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_RGB32F')
 add_texwrap_test2(arb_texture_float, '2D', 'GL_RGBA32F')
 add_plain_test(arb_texture_float, 'arb_texture_float-texture-float-formats')
+add_msaa_formats_tests(arb_texture_float, 'GL_ARB_texture_float')
 
 ext_texture_integer = Group()
 spec['EXT_texture_integer'] = ext_texture_integer
