@@ -159,6 +159,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 	int maxSide, k;
 	GLfloat *pixels = NULL;
 	GLenum err = GL_NO_ERROR;
+	GLboolean first_oom;
 
 	/* Query the largest supported texture size */
 	glGetIntegerv(getMaxTarget(target), &maxSide);
@@ -200,6 +201,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 				     0, GL_RGBA, GL_FLOAT, NULL);
 
 			err = glGetError();
+			first_oom = err == GL_OUT_OF_MEMORY;
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
 			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 				free(pixels);
@@ -211,8 +213,10 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 					GL_FLOAT, pixels);
 
 			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			/* Report a GL error other than GL_OUT_OF_MEMORY and
+                         * INVALID_VALUE */
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+                            (!first_oom || err != GL_INVALID_VALUE)) {
 				free(pixels);
 				printf("Unexpected GL error: 0x%x\n", err);
 				return false;
@@ -237,6 +241,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 				     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 
 			err = glGetError();
+			first_oom = err == GL_OUT_OF_MEMORY;
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
 			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 				free(pixels);
@@ -248,8 +253,10 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 					GL_RGBA, GL_FLOAT, pixels);
 
 			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			/* Report a GL error other than GL_OUT_OF_MEMORY and
+                         * INVALID_VALUE */
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+                            (!first_oom || err != GL_INVALID_VALUE)) {
 				free(pixels);
 				printf("Unexpected GL error: 0x%x\n", err);
 				return false;
@@ -291,6 +298,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 				     NULL);
 
 			err = glGetError();
+			first_oom = err == GL_OUT_OF_MEMORY;
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
 			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 				printf("Unexpected GL error: 0x%x\n", err);
@@ -302,8 +310,10 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 					maxSide/2, maxSide/2, GL_RGBA,
 					GL_FLOAT, pixels);
 			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			/* Report a GL error other than GL_OUT_OF_MEMORY and
+                         * INVALID_VALUE */
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+                            (!first_oom || err != GL_INVALID_VALUE)) {
 				free(pixels);
 				printf("Unexpected GL error: 0x%x\n", err);
 				return false;
@@ -328,6 +338,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 
 	case GL_TEXTURE_CUBE_MAP_ARB:
 		if (!useProxy) {
+			first_oom = GL_FALSE;
 			for (k = 0; k < 6; k++) {
 				glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
@@ -335,6 +346,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 				GL_RGBA, GL_FLOAT, NULL);
 
 				err = glGetError();
+				first_oom = first_oom || err == GL_OUT_OF_MEMORY;
 				/* Report a GL error other than GL_OUT_OF_MEMORY */
 				if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 					printf("Unexpected GL error: 0x%x\n", err);
@@ -355,8 +367,10 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 					return true;
 				}
 
-				/* Report a GL error other than GL_OUT_OF_MEMORY */
-				if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+				/* Report a GL error other than GL_OUT_OF_MEMORY and
+                                 * INVALID_VALUE */
+				if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+                                    (!first_oom || err != GL_INVALID_VALUE)) {
 					printf("Unexpected GL error: 0x%x\n", err);
 					free(pixels);
 					return false;
