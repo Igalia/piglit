@@ -1623,6 +1623,7 @@ add_fbo_alphatest_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-alphat
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
 ext_texture_srgb['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'srgb'])
 ext_texture_srgb['invalid formats'].runConcurrent = True
+add_msaa_formats_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB')
 
 ext_timer_query = Group()
 spec['EXT_timer_query'] = ext_timer_query
