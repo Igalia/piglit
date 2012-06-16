@@ -1311,6 +1311,7 @@ arb_vertex_program['minmax'] = concurrent_test('arb_vertex_program-minmax')
 ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
 ext_framebuffer_multisample['blit-mismatched-samples'] = concurrent_test('ext_framebuffer_multisample-blit-mismatched-samples')
+ext_framebuffer_multisample['blit-mismatched-sizes'] = concurrent_test('ext_framebuffer_multisample-blit-mismatched-sizes')
 ext_framebuffer_multisample['dlist'] = concurrent_test('ext_framebuffer_multisample-dlist')
 ext_framebuffer_multisample['minmax'] = concurrent_test('ext_framebuffer_multisample-minmax')
 ext_framebuffer_multisample['negative-copypixels'] = concurrent_test('ext_framebuffer_multisample-negative-copypixels')
