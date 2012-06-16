@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (ext_framebuffer_multisample-accuracy common.cpp accuracy.cpp)
+piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-samples common.cpp blit-mismatched-samples.cpp)
 piglit_add_executable (ext_framebuffer_multisample-dlist dlist.c)
 piglit_add_executable (ext_framebuffer_multisample-formats common.cpp formats.cpp)
 piglit_add_executable (ext_framebuffer_multisample-line-smooth common.cpp line-smooth.cpp)
