@@ -1705,6 +1705,7 @@ arb_uniform_buffer_object['getuniformlocation'] = concurrent_test('arb_uniform_b
 arb_uniform_buffer_object['layout-std140'] = concurrent_test('arb_uniform_buffer_object-layout-std140')
 arb_uniform_buffer_object['minmax'] = concurrent_test('arb_uniform_buffer_object-minmax')
 arb_uniform_buffer_object['negative-bindbuffer-index'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-index')
+arb_uniform_buffer_object['negative-bindbuffer-target'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-target')
 
 ati_draw_buffers = Group()
 spec['ATI_draw_buffers'] = ati_draw_buffers
