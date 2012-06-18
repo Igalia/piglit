@@ -1705,6 +1705,7 @@ arb_uniform_buffer_object['getuniformindices'] = concurrent_test('arb_uniform_bu
 arb_uniform_buffer_object['getuniformlocation'] = concurrent_test('arb_uniform_buffer_object-getuniformlocation')
 arb_uniform_buffer_object['layout-std140'] = concurrent_test('arb_uniform_buffer_object-layout-std140')
 arb_uniform_buffer_object['minmax'] = concurrent_test('arb_uniform_buffer_object-minmax')
+arb_uniform_buffer_object['negative-bindbuffer-buffer'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-buffer')
 arb_uniform_buffer_object['negative-bindbuffer-index'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-index')
 arb_uniform_buffer_object['negative-bindbuffer-target'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-target')
 arb_uniform_buffer_object['negative-bindbufferrange-range'] = concurrent_test('arb_uniform_buffer_object-negative-bindbufferrange-range')
