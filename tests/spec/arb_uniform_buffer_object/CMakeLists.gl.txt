@@ -18,5 +18,6 @@ add_executable (arb_uniform_buffer_object-layout-std140 layout-std140.c)
 add_executable (arb_uniform_buffer_object-minmax minmax.c)
 add_executable (arb_uniform_buffer_object-negative-bindbuffer-index negative-bindbuffer-index.c)
 add_executable (arb_uniform_buffer_object-negative-bindbuffer-target negative-bindbuffer-target.c)
+add_executable (arb_uniform_buffer_object-negative-bindbufferrange-range negative-bindbufferrange-range.c)
 
 # vim: ft=cmake:
