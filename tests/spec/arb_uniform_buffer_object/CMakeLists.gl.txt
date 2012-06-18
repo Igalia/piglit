@@ -11,6 +11,7 @@ link_libraries (
 )
 
 add_executable (arb_uniform_buffer_object-bindbuffer-general-point bindbuffer-general-point.c)
+add_executable (arb_uniform_buffer_object-getintegeri_v getintegeri_v.c)
 add_executable (arb_uniform_buffer_object-getuniformblockindex getuniformblockindex.c)
 add_executable (arb_uniform_buffer_object-getuniformindices getuniformindices.c)
 add_executable (arb_uniform_buffer_object-getuniformlocation getuniformlocation.c)
