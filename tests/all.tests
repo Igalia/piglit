@@ -1885,6 +1885,7 @@ import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
 			 [''])
 arb_uniform_buffer_object['bindbuffer-general-point'] = concurrent_test('arb_uniform_buffer_object-bindbuffer-general-point')
 arb_uniform_buffer_object['buffer-targets'] = concurrent_test('arb_uniform_buffer_object-buffer-targets')
+arb_uniform_buffer_object['getactiveuniformblockname'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformblockname')
 arb_uniform_buffer_object['getintegeri_v'] = concurrent_test('arb_uniform_buffer_object-getintegeri_v')
 arb_uniform_buffer_object['getprogramiv'] = concurrent_test('arb_uniform_buffer_object-getprogramiv')
 arb_uniform_buffer_object['getuniformblockindex'] = concurrent_test('arb_uniform_buffer_object-getuniformblockindex')
