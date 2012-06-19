@@ -691,6 +691,138 @@ void Triangles::draw(const float (*proj)[4])
 	}
 }
 
+
+InterpolationTestPattern::InterpolationTestPattern(const char *frag)
+	: frag(frag)
+{
+}
+
+
+void
+InterpolationTestPattern::compile()
+{
+	static struct vertex_attributes {
+		float pos_within_tri[2];
+		float barycentric_coords[3];
+	} vertex_data[] = {
+		{ { -0.5, -1.0 }, { 1, 0, 0 } },
+		{ {  0.0,  1.0 }, { 0, 1, 0 } },
+		{ {  0.5, -1.0 }, { 0, 0, 1 } }
+	};
+
+	/* Number of triangle instances across (and down) */
+	int tris_across = 8;
+
+	/* Total number of triangles drawn */
+	num_tris = tris_across * tris_across;
+
+	/* Scaling factor uniformly applied to triangle coords */
+	float tri_scale = 0.8 / tris_across;
+
+	/* Amount each triangle should be rotated compared to prev */
+	float rotation_delta = M_PI * 2.0 / num_tris;
+
+	/* Final scaling factor */
+	float final_scale = 0.95;
+
+	static const char *vert =
+		"#version 130\n"
+		"in vec2 pos_within_tri;\n"
+		"in vec3 in_barycentric_coords;\n"
+		"out vec3 barycentric_coords;\n"
+		"centroid out vec3 barycentric_coords_centroid;\n"
+		"out vec2 pixel_pos;\n"
+		"centroid out vec2 pixel_pos_centroid;\n"
+		"uniform float tri_scale;\n"
+		"uniform float rotation_delta;\n"
+		"uniform int tris_across;\n"
+		"uniform float final_scale;\n"
+		"uniform mat4 proj;\n"
+		"uniform int tri_num; /* [0, num_tris) */\n"
+		"uniform ivec2 viewport_size;\n"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"  vec2 pos = tri_scale * pos_within_tri;\n"
+		"  float rotation = rotation_delta * tri_num;\n"
+		"  pos = mat2(cos(rotation), sin(rotation),\n"
+		"             -sin(rotation), cos(rotation)) * pos;\n"
+		"  int i = tri_num % tris_across;\n"
+		"  int j = tris_across - 1 - tri_num / tris_across;\n"
+		"  pos += (vec2(i, j) * 2.0 + 1.0) / tris_across - 1.0;\n"
+		"  pos *= final_scale;\n"
+		"  gl_Position = proj * vec4(pos, 0.0, 1.0);\n"
+		"  barycentric_coords = barycentric_coords_centroid =\n"
+		"    in_barycentric_coords;\n"
+		"  pixel_pos = pixel_pos_centroid =\n"
+		"    vec2(viewport_size) * (pos + 1.0) / 2.0;\n"
+		"}\n";
+
+	/* Compile program */
+	prog = glCreateProgram();
+	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
+	glAttachShader(prog, vs);
+	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
+	glAttachShader(prog, fs);
+	glBindAttribLocation(prog, 0, "pos_within_tri");
+	glBindAttribLocation(prog, 1, "in_barycentric_coords");
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	/* Set up uniforms */
+	glUseProgram(prog);
+	glUniform1f(glGetUniformLocation(prog, "tri_scale"), tri_scale);
+	glUniform1f(glGetUniformLocation(prog, "rotation_delta"),
+		    rotation_delta);
+	glUniform1i(glGetUniformLocation(prog, "tris_across"), tris_across);
+	glUniform1f(glGetUniformLocation(prog, "final_scale"), final_scale);
+	proj_loc = glGetUniformLocation(prog, "proj");
+	tri_num_loc = glGetUniformLocation(prog, "tri_num");
+	viewport_size_loc = glGetUniformLocation(prog, "viewport_size");
+
+	/* Set up vertex array object */
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	/* Set up vertex input buffer */
+	glGenBuffers(1, &vertex_buf);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
+		     GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, ARRAY_SIZE(vertex_data[0].pos_within_tri),
+			      GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
+			      (void *) offsetof(vertex_attributes,
+						pos_within_tri));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, ARRAY_SIZE(vertex_data[0].barycentric_coords),
+			      GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
+			      (void *) offsetof(vertex_attributes,
+						barycentric_coords));
+}
+
+
+void
+InterpolationTestPattern::draw(const float (*proj)[4])
+{
+	glUseProgram(prog);
+
+	/* Depending what the fragment shader does, it's possible that
+	 * viewport_size might get optimized away.  Only set it if it
+	 * didn't.
+	 */
+	if (viewport_size_loc != -1) {
+		GLint viewport_dims[4];
+		glGetIntegerv(GL_VIEWPORT, viewport_dims);
+		glUniform2i(viewport_size_loc, viewport_dims[2], viewport_dims[3]);
+	}
+
+	Triangles::draw(proj);
+}
+
+
 void Lines::compile()
 {
 	/* Line coords within (-1,-1) to (1,1) rect */

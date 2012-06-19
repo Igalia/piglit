@@ -245,7 +245,7 @@ public:
 	virtual void compile();
 	virtual void draw(const float (*proj)[4]);
 
-private:
+protected:
 	GLint prog;
 	GLuint vertex_buf;
 	GLuint vao;
@@ -253,6 +253,42 @@ private:
 	GLint tri_num_loc;
 	int num_tris;
 };
+
+
+/**
+ * Program we use to test that interpolation works properly.
+ *
+ * This program draws the same sequence of small triangles as the
+ * Triangles program, but it's capable of coloring the triangles in
+ * various ways based on the fragment program provided to the
+ * constructor.
+ *
+ * The fragment program has access to the following variables:
+ *
+ * - in vec3 barycentric_coords: barycentric coordinates of the
+ *   triangle being drawn, normally interpolated.
+ *
+ * - centroid in vec3 barycentric_coords_centroid: same as
+ *   barycentric_coords, but centroid interpolated.
+ *
+ * - in vec2 pixel_pos: pixel coordinate ((0,0) to (viewport_width,
+ *   viewport_height)), normally interpolated.
+ *
+ * - centroid in vec2 pixel_pos_centroid: same as pixel_pos, but
+ *   centroid interpolated.
+ */
+class InterpolationTestPattern : public Triangles
+{
+public:
+	explicit InterpolationTestPattern(const char *frag);
+	virtual void compile();
+	virtual void draw(const float (*proj)[4]);
+
+private:
+	const char *frag;
+	GLint viewport_size_loc;
+};
+
 
 /**
  * Program we use to draw a test pattern into the color buffer.
