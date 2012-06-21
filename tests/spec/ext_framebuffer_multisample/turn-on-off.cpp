@@ -132,7 +132,6 @@ piglit_init(int argc, char **argv)
 	}
 
 	piglit_require_gl_version(30);
-	piglit_require_GLSL_version(130);
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
 	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
@@ -143,7 +142,7 @@ piglit_init(int argc, char **argv)
 
 	test = create_test(TEST_TYPE_COLOR, num_samples,
 			   false /*small*/,
-			   false /* combine_depth_stencil */,
+			   true /* combine_depth_stencil */,
 			   pattern_width, pattern_height,
 			   16 /* supersample_factor */);
 }
