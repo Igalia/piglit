@@ -5,7 +5,7 @@ include_directories (
 	${PNG_INCLUDE_DIR}
 )
 link_libraries (
-	piglitutil
+	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${PNG_LIBRARIES}

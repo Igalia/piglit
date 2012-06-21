@@ -89,7 +89,7 @@ piglit_add_executable (glean
 )
 
 target_link_libraries (glean
-	piglitutil
+	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${X11_X11_LIB}

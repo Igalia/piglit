@@ -43,12 +43,12 @@ IF(BUILD_GLX_TESTS)
 	)
 ENDIF(BUILD_GLX_TESTS)
 
-piglit_add_library (piglitutil
+piglit_add_library (piglitutil_${piglit_target_api}
 	${UTIL_SOURCES}
 )
 
 if(UNIX)
-	target_link_libraries(piglitutil m)
+	target_link_libraries(piglitutil_${piglit_target_api} m)
 endif(UNIX)
 
 # vim: ft=cmake:
