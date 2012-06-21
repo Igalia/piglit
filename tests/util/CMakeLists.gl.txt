@@ -1,10 +1,5 @@
-include_directories(
-	${GLEXT_INCLUDE_DIR}
-	${OPENGL_INCLUDE_PATH}
-	)
-
-set(UTIL_SOURCES
-	${UTIL_SOURCES}
+set(UTIL_GL_SOURCES
+	${UTIL_GL_SOURCES}
 	piglit-dispatch.c
 	piglit-dispatch-init.c
 	piglit-shader.c
@@ -14,6 +9,14 @@ set(UTIL_SOURCES
 	piglit-vbo.cpp
 	sized-internalformats.c
 	minmax-test.c
+	)
+
+include_directories(
+	${UTIL_GL_INCLUDES}
+	)
+
+link_libraries(
+	${UTIL_GL_LIBS}
 	)
 
 IF(BUILD_GLX_TESTS)
@@ -28,7 +31,6 @@ IF(BUILD_GLX_TESTS)
 		    piglit-shader.c
 		    piglit-shader-gl.c
 		    piglit-transform-feedback.c
-		    piglit-util.c
 		    piglit-util-gl-common.c
 		    piglit-util-gl-enum.c
 		    piglit-util-gl.c
@@ -37,18 +39,14 @@ IF(BUILD_GLX_TESTS)
 		    piglit-dispatch.c
 		    piglit-dispatch-init.c
 	)
-	set (UTIL_SOURCES
-		${UTIL_SOURCES}
+	set (UTIL_GL_SOURCES
+		${UTIL_GL_SOURCES}
 		piglit-glx-util.c
 	)
 ENDIF(BUILD_GLX_TESTS)
 
 piglit_add_library (piglitutil_${piglit_target_api}
-	${UTIL_SOURCES}
+	${UTIL_GL_SOURCES}
 )
-
-if(UNIX)
-	target_link_libraries(piglitutil_${piglit_target_api} m)
-endif(UNIX)
 
 # vim: ft=cmake:

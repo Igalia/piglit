@@ -1,19 +1,20 @@
-set(UTIL_SOURCES
-	${UTIL_SOURCES}
+set(UTIL_GL_SOURCES
+	${UTIL_GL_SOURCES}
 	piglit-util-gles.c
 	)
 
+include_directories(
+	${UTIL_GL_INCLUDES}
+	)
+
 link_libraries(
+	${UTIL_GL_LIBS}
 	${OPENGL_gles1_LIBRARY}
 	piglitutil_${piglit_target_api}
 	)
 
 piglit_add_library(piglitutil_${piglit_target_api}
-	${UTIL_SOURCES}
+	${UTIL_GL_SOURCES}
 )
-
-if(UNIX)
-	target_link_libraries(piglitutil_${piglit_target_api} m)
-endif(UNIX)
 
 # vim: ft=cmake:
