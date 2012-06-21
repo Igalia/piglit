@@ -15,7 +15,7 @@ set(UTIL_SOURCES
 	fdo-bitmap.c
 	piglit-util.c
 	piglit-util-gl-common.c
-	piglit-util-enum.c
+	piglit-util-gl-enum.c
 	shader-load.c
 	piglit-framework.c
 	piglit-framework-fbo.c

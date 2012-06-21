@@ -30,7 +30,7 @@ IF(BUILD_GLX_TESTS)
 		    piglit-transform-feedback.c
 		    piglit-util.c
 		    piglit-util-gl-common.c
-		    piglit-util-enum.c
+		    piglit-util-gl-enum.c
 		    piglit-util-gl.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
