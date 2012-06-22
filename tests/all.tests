@@ -1899,6 +1899,7 @@ arb_uniform_buffer_object['negative-bindbuffer-index'] = concurrent_test('arb_un
 arb_uniform_buffer_object['negative-bindbuffer-target'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-target')
 arb_uniform_buffer_object['negative-bindbufferrange-range'] = concurrent_test('arb_uniform_buffer_object-negative-bindbufferrange-range')
 arb_uniform_buffer_object['referenced-by-shader'] = concurrent_test('arb_uniform_buffer_object-referenced-by-shader')
+arb_uniform_buffer_object['row-major'] = concurrent_test('arb_uniform_buffer_object-row-major')
 arb_uniform_buffer_object['uniformblockbinding'] = concurrent_test('arb_uniform_buffer_object-uniformblockbinding')
 
 ati_draw_buffers = Group()
