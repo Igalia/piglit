@@ -22,6 +22,8 @@
  */
 
 #pragma once
+#ifndef PIGLIT_FRAMEWORK_H
+#define PIGLIT_FRAMEWORK_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -127,3 +129,5 @@ extern bool piglit_use_fbo;
 extern unsigned int piglit_winsys_fbo;
 
 extern void piglit_present_results();
+
+#endif /* PIGLIT_FRAMEWORK_H */
