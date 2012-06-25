@@ -231,7 +231,8 @@ bool
 probe_framebuffer_color(void)
 {
 	bool result = true;
-	float coverage[num_rects];
+
+	float *coverage = new float[num_rects];
 
 	if(coverage_invert) {
 		for (int i = 0; i < num_rects; i++)
@@ -259,6 +260,9 @@ probe_framebuffer_color(void)
 				 && result;
 		}
 	}
+
+	delete [] coverage;
+
 	return result;
 }
 
