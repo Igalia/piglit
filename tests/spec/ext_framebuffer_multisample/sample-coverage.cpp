@@ -180,7 +180,6 @@ void
 compute_expected(void)
 {
 	int i, j;
-	float coverage[num_rects];
 
 	/* Sample coverage doesn't affect single sample FBO */
 	if(num_samples == 0) {
@@ -188,6 +187,8 @@ compute_expected(void)
 			expected[i] = color[i];
 		return;
 	}
+
+	float *coverage = new float[num_rects];
 
 	if(coverage_invert) {
 		for (i = 0; i < num_rects; i++)
@@ -222,6 +223,8 @@ compute_expected(void)
 			}
 		}
 	}
+
+	delete [] coverage;
 }
 
 bool
