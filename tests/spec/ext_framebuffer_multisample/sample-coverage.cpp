@@ -310,10 +310,10 @@ allocate_data_arrays(void)
 	expected = (float *) malloc(num_rects * 4 * sizeof(float));
 
 	for(int i = 0; i < num_rects; i++) {
-		color[i * 4 + 0] = (sin(i * 4 + 0) + 1) / 2;
-		color[i * 4 + 1] = (sin(i * 4 + 1) + 1) / 2;
-		color[i * 4 + 2] = (sin(i * 4 + 2) + 1) / 2;
-		color[i * 4 + 3] = (sin(i * 4 + 3) + 1) / 2;
+		color[i * 4 + 0] = (sin((float)(i * 4 + 0)) + 1) / 2;
+		color[i * 4 + 1] = (sin((float)(i * 4 + 1)) + 1) / 2;
+		color[i * 4 + 2] = (sin((float)(i * 4 + 2)) + 1) / 2;
+		color[i * 4 + 3] = (sin((float)(i * 4 + 3)) + 1) / 2;
 
 		cov[i] = i * (1.0 / (2 * num_samples));
 	}
