@@ -26,8 +26,7 @@
 /**
  * @file time-elapsed.c
  *
- * Tests that conditional rendering appropriately affects commands
- * inside of display lists.
+ * Test TIME_ELAPSED and TIMESTAMP queries.
  */
 
 #include <sys/time.h>
@@ -36,6 +35,11 @@ PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     128 /*window_height*/,
     GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+
+enum {
+	TIME_ELAPSED,
+	TIMESTAMP
+} test = TIME_ELAPSED;
 
 static float
 get_time(void)
@@ -60,18 +64,26 @@ get_time(void)
 }
 
 static float
-draw(GLuint q, int iters)
+draw(GLuint *q, int iters)
 {
 	float start_time, end_time;
 	int i;
 
 	start_time = get_time();
 
-	glBeginQuery(GL_TIME_ELAPSED, q);
+	if (test == TIMESTAMP) {
+		glQueryCounter(q[0], GL_TIMESTAMP);
+	} else {
+		glBeginQuery(GL_TIME_ELAPSED, q[0]);
+	}
 	for (i = 0; i < iters; i++) {
 		piglit_draw_rect(-1, -1, 2, 2);
 	}
-	glEndQuery(GL_TIME_ELAPSED);
+	if (test == TIMESTAMP) {
+		glQueryCounter(q[1], GL_TIMESTAMP);
+	} else {
+		glEndQuery(GL_TIME_ELAPSED);
+	}
 
 	/* This glFinish() is important, since this is used in a
 	 * timing loop.
@@ -84,11 +96,18 @@ draw(GLuint q, int iters)
 }
 
 static float
-get_gpu_time(GLuint q)
+get_gpu_time(GLuint *q)
 {
 	GLint64EXT elapsed;
 
-	glGetQueryObjecti64vEXT(q, GL_QUERY_RESULT, &elapsed);
+	if (test == TIMESTAMP) {
+		GLint64 start, end;
+		glGetQueryObjecti64vEXT(q[0], GL_QUERY_RESULT, &start);
+		glGetQueryObjecti64vEXT(q[1], GL_QUERY_RESULT, &end);
+		elapsed = end - start;
+	} else {
+		glGetQueryObjecti64vEXT(q[0], GL_QUERY_RESULT, &elapsed);
+	}
 
 	return elapsed / 1000.0 / 1000.0 / 1000.0;
 }
@@ -98,7 +117,7 @@ piglit_display(void)
 {
 	bool pass = true;
 	float green[4] = {0.0, 1.0, 0.0, 0.0};
-	GLuint q;
+	GLuint q[2];
 	int iters;
 	int num_results = 5;
 	float cpu_time[num_results];
@@ -111,7 +130,7 @@ piglit_display(void)
 	int i;
 
 	glColor4f(0.0, 1.0, 0.0, 0.0);
-	glGenQueries(1, &q);
+	glGenQueries(2, q);
 
 	/* Prime the drawing pipe before we start measuring time,
 	 * since the first draw call is likely to be slower than all
@@ -238,7 +257,7 @@ retry:
 
 	piglit_present_results();
 
-	glDeleteQueries(1, &q);
+	glDeleteQueries(2, q);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -252,4 +271,9 @@ piglit_init(int argc, char **argv)
 	}
 
 	piglit_require_extension("GL_EXT_timer_query");
+
+	if (argc == 2 && strcmp(argv[1], "timestamp") == 0) {
+		piglit_require_extension("GL_ARB_timer_query");
+		test = TIMESTAMP;
+	}
 }

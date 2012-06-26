@@ -1650,6 +1650,10 @@ ext_timer_query = Group()
 spec['EXT_timer_query'] = ext_timer_query
 ext_timer_query['time-elapsed'] = concurrent_test('ext_timer_query-time-elapsed')
 
+arb_timer_query = Group()
+spec['ARB_timer_query'] = arb_timer_query
+arb_timer_query['query GL_TIMESTAMP'] = concurrent_test('ext_timer_query-time-elapsed timestamp')
+
 ext_transform_feedback = Group()
 spec['EXT_transform_feedback'] = ext_transform_feedback
 for mode in ['interleaved_ok_base', 'interleaved_ok_range',
