@@ -234,9 +234,9 @@ public:
 /**
  * Program we use to draw a test pattern into the color buffer.
  *
- * This program draws a sequence of small triangles, each rotated at a
- * different angle.  This ensures that the image will have a large
- * number of edges at different angles, so that we'll thoroughly
+ * This program draws a grid of small disjoint triangles, each rotated
+ * at a different angle.  This ensures that the image will have a
+ * large number of edges at different angles, so that we'll thoroughly
  * exercise antialiasing.
  */
 class Triangles : public TestPattern

@@ -620,7 +620,7 @@ void Triangles::compile()
 		"uniform int tris_across;\n"
 		"uniform float final_scale;\n"
 		"uniform mat4 proj;\n"
-		"uniform int tri_num;\n"
+		"uniform int tri_num; /* [0, num_tris) */\n"
 		"\n"
 		"void main()\n"
 		"{\n"
