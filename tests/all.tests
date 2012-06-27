@@ -369,6 +369,10 @@ add_plain_test(general, 'windowoverlap')
 add_plain_test(general, 'clear-accum')
 add_fbo_depthstencil_tests(general, 'default_fb')
 
+security = Group()
+add_plain_test(security, 'initialized-texmemory')
+
+
 shaders = Group()
 
 def add_shader_test_dir(group, dirpath, recursive=False):
@@ -2368,6 +2372,7 @@ profile.tests['glslparsertest'] = glslparsertest
 profile.tests['asmparsertest'] = asmparsertest
 profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
+profile.tests['security'] = security
 profile.tests['texturing'] = texturing
 profile.tests['spec'] = spec
 profile.tests['glx'] = glx
