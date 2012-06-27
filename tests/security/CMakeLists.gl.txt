@@ -13,5 +13,6 @@ link_libraries (
 
 piglit_add_executable (initialized-texmemory initialized-texmemory.c)
 piglit_add_executable (initialized-fbo initialized-fbo.c)
+piglit_add_executable (initialized-vbo initialized-vbo.c)
 
 # vim: ft=cmake:

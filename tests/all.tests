@@ -372,6 +372,7 @@ add_fbo_depthstencil_tests(general, 'default_fb')
 security = Group()
 add_plain_test(security, 'initialized-texmemory')
 add_plain_test(security, 'initialized-fbo')
+add_plain_test(security, 'initialized-vbo')
 
 
 shaders = Group()
