@@ -28,7 +28,7 @@
  *      buffer object, the error INVALID_OPERATION is generated."
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,

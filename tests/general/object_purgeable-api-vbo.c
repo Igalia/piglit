@@ -29,7 +29,7 @@
  * Simple test of the API for GL_APPLE_object_purgeable with GL_ARB_vertex_buffer_object.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "object_purgeable.h"
 
 PIGLIT_GL_TEST_MAIN(

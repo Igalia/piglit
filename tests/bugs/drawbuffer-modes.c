@@ -34,7 +34,7 @@
  *
  * \Author Yi Sun <yi.sun@intel.com>, Anuj Phogat <anuj.phogat@gmail.com>
  */
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

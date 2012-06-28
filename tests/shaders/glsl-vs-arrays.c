@@ -30,7 +30,7 @@
  * Tests use of a temporary array as a source/destination in the VS.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

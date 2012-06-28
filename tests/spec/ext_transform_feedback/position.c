@@ -28,7 +28,7 @@
  * BindBufferOffset, BindBufferRange, GL_RASTERIZER_DISCARD, and related queries.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,

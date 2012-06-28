@@ -34,7 +34,7 @@
  * the same operations against the far plane.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

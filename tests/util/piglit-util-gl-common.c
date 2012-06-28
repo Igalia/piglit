@@ -39,7 +39,7 @@
 #define USE_SETRLIMIT
 #endif
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 
 #if defined(_WIN32)

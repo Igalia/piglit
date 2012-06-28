@@ -24,7 +24,7 @@
  *    Shuang he <shuang.he@intel.com>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

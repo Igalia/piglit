@@ -26,7 +26,7 @@
  * Tests that gl_FragCoord produces the expected output in a fragment shader.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define WIDTH 256
 #define HEIGHT 256

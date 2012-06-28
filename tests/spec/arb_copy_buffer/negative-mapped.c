@@ -29,7 +29,7 @@
  *      bound to either readtarget or writetarget are mapped."
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

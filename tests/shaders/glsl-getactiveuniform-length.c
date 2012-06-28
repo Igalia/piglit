@@ -31,7 +31,7 @@
  * reflected in GL_ACTIVE_UNIFORM_MAX_LENGTH and the *length outvalue.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

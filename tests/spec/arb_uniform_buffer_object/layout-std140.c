@@ -34,7 +34,7 @@
  * http://www.opengl.org/registry/specs/ARB/uniform_buffer_object.txt
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

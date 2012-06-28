@@ -26,7 +26,7 @@
  * Tests for errors when binding a bad buffer object name.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,

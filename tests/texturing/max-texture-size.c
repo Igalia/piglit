@@ -41,7 +41,7 @@
  * \Author Anuj Phogat <anuj.phogat@gmail.com>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #define COLOR_COMPONENTS 4 /*GL_RGBA*/
 
 PIGLIT_GL_TEST_MAIN(

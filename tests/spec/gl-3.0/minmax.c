@@ -26,7 +26,7 @@
  * of the GL 3.0 spec.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "minmax-test.h"
 
 PIGLIT_GL_TEST_MAIN(

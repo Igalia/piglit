@@ -27,7 +27,7 @@
  * Test for bugs with early depth testing and early depth update.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,

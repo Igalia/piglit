@@ -25,7 +25,7 @@
  *    Marek Olšák <maraeo@gmail.com>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     400 /*window_width*/,

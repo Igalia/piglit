@@ -27,7 +27,7 @@
  *
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     70 /*window_width*/,

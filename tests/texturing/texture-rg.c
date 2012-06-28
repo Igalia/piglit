@@ -27,7 +27,7 @@
  * Tests GL_ARB_texture_rg extension (red/green texture formats)
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,

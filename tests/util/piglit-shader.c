@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 void piglit_get_glsl_version(bool *es, int* major, int* minor)
 {

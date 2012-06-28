@@ -30,7 +30,7 @@
  * Tests that we can access cubemaps in the fragment shader.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     120 /*window_width*/,

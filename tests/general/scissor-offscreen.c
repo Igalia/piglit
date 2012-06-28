@@ -34,7 +34,7 @@
  * Bug #27643
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,

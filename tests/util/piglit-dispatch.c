@@ -21,7 +21,7 @@
  */
 
 #include "piglit-dispatch.h"
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #ifdef _WIN32
 #define inline __inline

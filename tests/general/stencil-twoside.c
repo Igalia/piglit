@@ -33,7 +33,7 @@
  * final color.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 static int use20syntax = 1;
 

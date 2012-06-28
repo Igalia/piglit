@@ -25,7 +25,7 @@
 
 #include <EGL/egl.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #ifdef __cplusplus
 extern "C" {

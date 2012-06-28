@@ -29,7 +29,7 @@
  * same thing into an FBO.  Compare the images.  They should be the same.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(

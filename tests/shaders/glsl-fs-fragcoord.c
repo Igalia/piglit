@@ -30,7 +30,7 @@
  * Tests that gl_FragCoord produces the expected output in a fragment shader.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,

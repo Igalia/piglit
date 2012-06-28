@@ -29,7 +29,7 @@
  * depth texture would be created before the draw to that texture.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     640 /*window_width*/,

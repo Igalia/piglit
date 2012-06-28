@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 
 GLint piglit_ARBfp_pass_through = 0;

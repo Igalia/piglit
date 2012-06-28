@@ -29,7 +29,7 @@
  * Simple test of the API for GL_ARB_sync.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     400 /*window_width*/,

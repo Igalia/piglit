@@ -48,7 +48,7 @@
  * implementation is not overly aggressive in flagging errors.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     16 /*window_width*/,

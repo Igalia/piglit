@@ -26,7 +26,7 @@
  * Tests that the three fog modes work with fog enabled using EXT_fog_coord.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 #if defined(_WIN32)

@@ -28,7 +28,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 static GLint prog = 0;
 

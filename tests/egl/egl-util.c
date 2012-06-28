@@ -30,7 +30,7 @@
  * \author Kristian Høgsberg <krh@bitplanet.net>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "egl-util.h"
 
 static int automatic;

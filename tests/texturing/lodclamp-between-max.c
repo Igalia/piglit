@@ -32,7 +32,7 @@
  * results in appropriate mipmap filtering.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define MAX_SIZE	32
 #define MAX_LOD	5

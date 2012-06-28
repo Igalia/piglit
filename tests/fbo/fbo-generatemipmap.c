@@ -30,7 +30,7 @@
  * Tests that glGenerateMipmapEXT works correctly on a 2D texture.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256

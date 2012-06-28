@@ -31,7 +31,7 @@
  * internalformats.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "fbo-formats.h"
 
 static int tex_width = 256;

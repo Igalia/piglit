@@ -28,7 +28,7 @@
  * with depth buffers.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define BUF_SIZE 123
 

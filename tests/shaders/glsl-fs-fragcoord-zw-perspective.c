@@ -33,7 +33,7 @@
  * with a perspective projection.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,

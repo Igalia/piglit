@@ -34,7 +34,7 @@
  *   error is generated.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "egl-util.h"
 
 static const EGLint pixmap_attribs[] = {

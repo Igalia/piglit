@@ -28,7 +28,7 @@
  * on varyings after other math has been used on them.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 static void compileLinkProg(void);
 static void loadTex(void);

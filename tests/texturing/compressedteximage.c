@@ -32,7 +32,7 @@
  * glCompressedTexImage2D().
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define SIZE 128
 

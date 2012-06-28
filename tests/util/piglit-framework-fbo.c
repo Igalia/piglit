@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 #include "piglit-framework-fbo.h"
 

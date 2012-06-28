@@ -29,7 +29,7 @@
  * https://bugs.freedesktop.org/show_bug.cgi?id=34656
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32

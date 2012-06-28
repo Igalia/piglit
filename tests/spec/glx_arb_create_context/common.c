@@ -21,7 +21,7 @@
  */
 #include <ctype.h>
 #include <errno.h>
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-glx-util.h"
 #include "common.h"
 

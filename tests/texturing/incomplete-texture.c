@@ -29,7 +29,7 @@
  * Oct 2011
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     150 /*window_width*/,

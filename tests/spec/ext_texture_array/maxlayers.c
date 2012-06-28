@@ -28,7 +28,7 @@
  * GL_MAX_TEXTURE_LAYERS layers.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

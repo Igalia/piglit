@@ -42,7 +42,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,

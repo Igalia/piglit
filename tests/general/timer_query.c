@@ -31,7 +31,7 @@
  * Simple test for GL_EXT_timer_query.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     180 /*window_width*/,

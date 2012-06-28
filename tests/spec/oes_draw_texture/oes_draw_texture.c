@@ -30,7 +30,7 @@
 
 #include <EGL/egl.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define TEXTURE_SIZE 2
 

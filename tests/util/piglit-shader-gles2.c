@@ -25,7 +25,7 @@
 #	error USE_OPENGL_ES2 is undefined
 #endif
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 void piglit_require_GLSL(void) {}
 void piglit_require_vertex_shader(void) {}

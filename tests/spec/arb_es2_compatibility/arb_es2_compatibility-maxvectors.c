@@ -26,7 +26,7 @@
  * Tests that MAX_*_VECTORS = MAX_*_COMPONENTS / 4.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

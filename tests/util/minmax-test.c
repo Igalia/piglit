@@ -29,7 +29,7 @@
 #define _GNU_SOURCE
 #include <string.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "minmax-test.h"
 
 bool piglit_minmax_pass = true;

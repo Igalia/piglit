@@ -28,7 +28,7 @@
  * This test is based on a test case posted to fdo bug #3129 by David Reveman.
  * Once upon a time, this triggered an assertion failure in Mesa.
  */
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(

@@ -31,7 +31,7 @@
  * ARB_draw_buffers and fixed function fragment works.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,

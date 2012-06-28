@@ -25,7 +25,7 @@
  * Test for the minimum maximum values in GL_ARB_fragment_program.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,

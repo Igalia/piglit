@@ -29,7 +29,7 @@
 #include <windows.h>
 #endif
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PFNGLATTACHSHADERPROC piglit_AttachShader = NULL;
 PFNGLBINDATTRIBLOCATIONPROC piglit_BindAttribLocation = NULL;

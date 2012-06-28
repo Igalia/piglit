@@ -30,7 +30,7 @@
  * GL_TEXTURE_MAX_LEVEL work on a mipmapped 2D texture.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define MAX_SIZE	32
 #define MAX_LEVEL	5

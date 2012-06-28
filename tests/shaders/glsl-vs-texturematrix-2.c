@@ -32,7 +32,7 @@
  * Compared to glsl-vs-texturematrix-1, this uses varying access of the array.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

@@ -8,7 +8,7 @@
  *  - EXT_shadow_funcs
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define ROWS 4
 #define COLS 8

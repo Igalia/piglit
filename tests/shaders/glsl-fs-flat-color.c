@@ -25,7 +25,7 @@
  * \file glsl-fs-flat-color.c
  * Test that gl_Color works correctly with GL_SHADE_MODEL of GL_FLAT
  */
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     30 /*window_width*/,

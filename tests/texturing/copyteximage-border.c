@@ -27,7 +27,7 @@
  */
 
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 /* Size of the body of the texture, not counting border. */
 #define TEX_SIZE 64

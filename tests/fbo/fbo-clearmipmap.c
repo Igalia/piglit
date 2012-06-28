@@ -32,7 +32,7 @@
  * Catches a 965 driver bug that idr ran into trying to write an app.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     700 /*window_width*/,

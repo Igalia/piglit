@@ -36,7 +36,7 @@
 #  undef USE_OPENGL_ES2
 #endif
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 
 const char *

@@ -26,7 +26,7 @@
  */
 
 #define _GNU_SOURCE
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     200 /*window_width*/,

@@ -28,7 +28,7 @@
  * INCOMPLETE_READ_BUFFER with ARB_ES2_compatibility.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,

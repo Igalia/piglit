@@ -33,7 +33,7 @@
  */
 
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 static const char *TestName = "dlist-fdo31590";

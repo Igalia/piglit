@@ -28,7 +28,7 @@
  */
 #pragma once
 #define _GNU_SOURCE
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 /**
  * Texture miplevel info:

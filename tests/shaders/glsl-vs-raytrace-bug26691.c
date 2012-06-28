@@ -22,7 +22,7 @@
 */
 
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "glsl-vs-raytrace-bug26691.h"
 
 PIGLIT_GL_TEST_MAIN(

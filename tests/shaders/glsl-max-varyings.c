@@ -31,7 +31,7 @@
  * GL_MAX_VARYING_FLOATS / 4.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define MAX_VARYING 32
 

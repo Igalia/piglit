@@ -32,7 +32,7 @@
  * them.  Same for gl_FrontSecondaryColor and gl_BackSecondaryColor.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,

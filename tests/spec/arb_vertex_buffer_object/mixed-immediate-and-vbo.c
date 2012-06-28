@@ -30,7 +30,7 @@
  * https://bugs.freedesktop.org/show_bug.cgi?id=37934
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,

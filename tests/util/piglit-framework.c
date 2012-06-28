@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 #include "piglit-framework-fbo.h"
 #include "piglit-framework-glut.h"

@@ -41,7 +41,7 @@
  * - GL_PRIMITIVES_GENERATED is set correctly.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     16 /*window_width*/,

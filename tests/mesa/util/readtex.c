@@ -7,7 +7,7 @@
 
 
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>

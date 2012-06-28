@@ -22,8 +22,8 @@
  */
 
 #pragma once
-#ifndef PIGLIT_UTIL_H
-#define PIGLIT_UTIL_H
+#ifndef PIGLIT_UTIL_GL_COMMON_H
+#define PIGLIT_UTIL_GL_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -297,4 +297,4 @@ static const GLint PIGLIT_ATTRIB_TEX = 1;
 } /* end extern "C" */
 #endif
 
-#endif /* PIGLIT_UTIL_H */
+#endif /* PIGLIT_UTIL_GL_COMMON_H */

@@ -28,7 +28,7 @@ IF(BUILD_GLX_TESTS)
 		    piglit-shader.c
 		    piglit-shader-gl.c
 		    piglit-transform-feedback.c
-		    piglit-util.c
+		    piglit-util-gl-common.c
 		    piglit-util-enum.c
 		    piglit-util-gl.c
 		    piglit-glx-framework.c

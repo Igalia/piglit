@@ -31,7 +31,7 @@
  * Simple test for GL_ARB_occlusion_query with a discard statement in GLSL.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     50 /*window_width*/,

@@ -26,7 +26,7 @@
  * test cases.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "math.h"
 
 enum test_type_enum {

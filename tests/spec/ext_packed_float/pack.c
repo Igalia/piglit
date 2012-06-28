@@ -27,7 +27,7 @@
  * GL_UNSIGNED_INT_10F_11F_11F_REV format.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,

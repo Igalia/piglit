@@ -30,7 +30,7 @@
  * Test for synchronizing behavior of glBufferSubDataARB, bug #23857.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     400 /*window_width*/,

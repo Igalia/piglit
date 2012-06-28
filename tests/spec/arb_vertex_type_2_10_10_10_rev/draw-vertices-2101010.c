@@ -27,7 +27,7 @@
 
 /* this test does some basic tests of ARB_vertex_type_2_10_10_10 vbos */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     320 /*window_width*/,

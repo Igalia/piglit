@@ -33,7 +33,7 @@
  * driver, where each scissor state is in a separate BO.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

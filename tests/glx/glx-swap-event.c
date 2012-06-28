@@ -29,7 +29,7 @@
  *  
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "GL/glx.h"
 #include <sys/time.h>
 

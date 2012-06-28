@@ -31,7 +31,7 @@
  * \author Anuj Phogat
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "clearbuffer-common.h"
 
 void piglit_init(int argc, char **argv)

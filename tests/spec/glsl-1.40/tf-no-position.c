@@ -28,7 +28,7 @@
  * using EXT_transform_feedback to get results.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define BUFFER_SIZE 4
 

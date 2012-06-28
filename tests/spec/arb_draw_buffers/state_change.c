@@ -29,7 +29,7 @@
  * It would then fail to enable the second buffer again because it was already
  * pointing to the new buffer. */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,

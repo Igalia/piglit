@@ -63,7 +63,7 @@
 #include <vector>
 
 extern "C" {
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 }
 
 using namespace std;

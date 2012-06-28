@@ -33,7 +33,7 @@
  * In Mesa Gallium 7.11 this causes a crash.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     300 /*window_width*/,

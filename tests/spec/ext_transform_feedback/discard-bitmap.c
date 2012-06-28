@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 /**
  * @file discard-bitmap.c

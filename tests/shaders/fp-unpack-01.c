@@ -28,7 +28,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 /* There are 128 possible values.  These values a distributed into 3 color

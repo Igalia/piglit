@@ -35,7 +35,7 @@
  * Neil Roberts <neil@linux.intel.com>.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-glx-util.h"
 #include "GL/glx.h"
 #include "X11/extensions/Xrender.h"

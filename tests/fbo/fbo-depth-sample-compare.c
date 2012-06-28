@@ -37,7 +37,7 @@
 
 
 #include <assert.h>
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 
 /** Set DEBUG to 1 to enable extra output when trying to debug failures */

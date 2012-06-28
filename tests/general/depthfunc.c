@@ -30,7 +30,7 @@
  * Tests that glDepthFunc()'s various modes all work correctly.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(

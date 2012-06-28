@@ -33,7 +33,7 @@
  * if \c GL_OES_fragment_precision_high is supported.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,

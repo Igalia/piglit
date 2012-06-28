@@ -27,7 +27,7 @@
  * June 14, 2011
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(

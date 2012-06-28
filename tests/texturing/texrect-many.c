@@ -6,7 +6,7 @@
  * (Prompted by a bug in R300 where the driver ran out of indirections).
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     16 * 16 /*window_width*/,

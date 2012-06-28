@@ -29,7 +29,7 @@
  * Author: Anuj Phogat
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 #define IMAGE_WIDTH 16

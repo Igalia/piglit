@@ -28,7 +28,7 @@
  * author: Anuj Phogat
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     400 /*window_width*/,

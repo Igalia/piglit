@@ -27,7 +27,7 @@
  * Test Pause, Resume, and DrawTF.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,

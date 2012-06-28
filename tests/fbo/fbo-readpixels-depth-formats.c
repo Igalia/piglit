@@ -28,7 +28,7 @@
  * combinations.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define BUF_WIDTH 15
 #define BUF_HEIGHT 15

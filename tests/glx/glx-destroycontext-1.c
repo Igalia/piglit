@@ -31,7 +31,7 @@
  * current thread works correctly.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 50, piglit_height = 50;

@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 /**
  * Read a pixel from the given location and compare its RGBA value to the

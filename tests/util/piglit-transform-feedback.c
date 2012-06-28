@@ -29,7 +29,7 @@
 #include <windows.h>
 #endif
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PFNGLBEGINTRANSFORMFEEDBACKPROC piglit_BeginTransformFeedback = NULL;
 PFNGLBINDBUFFERBASEPROC piglit_BindBufferBase = NULL;

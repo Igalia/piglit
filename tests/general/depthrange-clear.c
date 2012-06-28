@@ -31,7 +31,7 @@
  * Caught a regression in the intel driver with the metaops clear code.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,

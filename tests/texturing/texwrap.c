@@ -66,7 +66,7 @@
  *   2D GL_RGBA8
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 /* Only *_ARB versions of these exist. I am lazy to add the suffix. */
 #define GL_ALPHA32F                     0x8816

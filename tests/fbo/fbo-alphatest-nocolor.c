@@ -27,7 +27,7 @@
  * and alpha testing enabled does the alpha testing correctly.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define BUF_WIDTH 32
 

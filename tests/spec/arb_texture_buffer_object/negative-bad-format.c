@@ -28,7 +28,7 @@
  *      of the sized internal formats found in Table X.1."
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,

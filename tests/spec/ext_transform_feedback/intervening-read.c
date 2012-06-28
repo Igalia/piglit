@@ -46,7 +46,7 @@
  * doesn't interfere with overflow checking.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,

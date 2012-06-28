@@ -29,7 +29,7 @@
  */
 
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 
 #define IMAGE_SIZE 16
 static const GLfloat fcolor[8][4] = {

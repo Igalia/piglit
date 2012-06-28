@@ -34,7 +34,7 @@
  * catches a bug found in the 965 driver in an app I was writing.
  */
 
-#include "piglit-util.h"
+#include "piglit-util-gl-common.h"
 #include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(
