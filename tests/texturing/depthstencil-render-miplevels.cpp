@@ -128,7 +128,7 @@ create_mipmapped_tex(GLenum internal_format)
 	default:
 		printf("Unexpected internal_format in create_mipmapped_tex\n");
 		piglit_report_result(PIGLIT_FAIL);
-	};
+	}
 	GLenum type = format == GL_DEPTH_STENCIL
 		? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE;
 	GLuint tex;
