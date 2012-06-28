@@ -29,87 +29,16 @@
 extern "C" {
 #endif
 
-#include "config.h"
-
-#if defined(_WIN32)
-#include <windows.h>
-#endif
-
-#if defined(_MSC_VER)
-#define log2(x) (log(x) / log(2))
-#endif
-
-#include <assert.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <math.h>
-#include <float.h>
+#include "piglit-util.h"
 
 #include <piglit/gl_wrap.h>
 #include <piglit/glut_wrap.h>
 
-#if defined(_MSC_VER)
-
-#define snprintf sprintf_s
-
-static __inline double
-round(double x) {
-	return x >= 0.0 ? floor(x + 0.5) : ceil(x - 0.5);
-}
-
-static __inline float
-roundf(float x) {
-	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
-}
-
-#ifndef va_copy
-#ifdef __va_copy
-#define va_copy(dest, src) __va_copy((dest), (src))
-#else
-#define va_copy(dest, src) (dest) = (src)
-#endif
-#endif
-
-#endif /* defined(_MSC_VER) */
-
-#ifdef _WIN32
-int asprintf(char **strp, const char *fmt, ...)
-#ifdef __GNUC__
-	__attribute__ ((format (printf, 2, 3)))
-#endif
-;
-#endif /* _WIN32 */
-
-// Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
-#ifndef INFINITY
-#  define INFINITY (FLT_MAX + FLT_MAX)
-#endif
-#ifndef NAN
-#  define NAN (INFINITY - INFINITY)
-#endif
-
 #define piglit_get_proc_address(x) piglit_dispatch_resolve_function(x)
-
-enum piglit_result {
-	PIGLIT_PASS,
-	PIGLIT_FAIL,
-	PIGLIT_SKIP,
-	PIGLIT_WARN
-};
 
 #include "piglit-framework.h"
 #include "piglit-shader.h"
 #include "piglit-transform-feedback.h"
-
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
 
 extern const uint8_t fdo_bitmap[];
 extern const unsigned int fdo_bitmap_width;
@@ -127,18 +56,6 @@ bool piglit_is_gles();
  * example, if the GL version is 2.1, the return value is 21.
  */
 int piglit_get_gl_version();
-
-/**
- * Determine if an extension is listed in an extension string
- *
- * \param haystack   List of all extensions to be searched
- * \param needle     Extension whose presens is to be detected
- *
- * \precondition \c haystack is not null
- *
- * \sa piglit_is_extension_supported, piglit_is_glx_extension_supported
- */
-bool piglit_is_extension_in_string(const char *haystack, const char *needle);
 
 /**
  * \precondition name is not null
@@ -182,9 +99,6 @@ piglit_check_gl_error_(GLenum expected_error, const char *file, unsigned line);
  */
 void piglit_reset_gl_error(void);
 
-int FindLine(const char *program, int position);
-void piglit_merge_result(enum piglit_result *all, enum piglit_result subtest);
-void piglit_report_result(enum piglit_result result);
 void piglit_require_gl_version(int required_version_times_10);
 void piglit_require_extension(const char *name);
 void piglit_require_not_extension(const char *name);
@@ -239,8 +153,6 @@ unsigned short piglit_half_from_float(float val);
 
 void piglit_escape_exit_key(unsigned char key, int x, int y);
 
-char *piglit_load_text_file(const char *file_name, unsigned *size);
-
 void piglit_gen_ortho_projection(double left, double right, double bottom,
 				 double top, double near_val, double far_val,
 				 GLboolean push);
@@ -283,12 +195,6 @@ extern const GLenum cube_face_targets[6];
  * must be called before using this program handle.
  */
 extern GLint piglit_ARBfp_pass_through;
-
-#ifndef HAVE_STRCHRNUL
-char *strchrnul(const char *s, int c);
-#endif
-
-extern void piglit_set_rlimit(unsigned long lim);
 
 static const GLint PIGLIT_ATTRIB_POS = 0;
 static const GLint PIGLIT_ATTRIB_TEX = 1;
