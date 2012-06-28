@@ -105,6 +105,27 @@ GLenum depth_format;
 int miplevel0_size;
 int max_miplevel;
 
+
+/**
+ * Check if the given depth/stencil/rgba texture internal format is supported.
+ */
+static bool
+supported_format(GLenum internal_format)
+{
+	switch (internal_format) {
+	case GL_DEPTH_COMPONENT32F:
+	case GL_DEPTH32F_STENCIL8:
+		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
+	case GL_RGBA:
+	case GL_DEPTH_COMPONENT16:
+	case GL_DEPTH_COMPONENT24:
+	case GL_DEPTH24_STENCIL8:
+	default:
+		return true;
+	}
+}
+
+
 /**
  * Create a mipmapped texture with the given dimensions and internal format.
  */
@@ -112,6 +133,10 @@ GLuint
 create_mipmapped_tex(GLenum internal_format)
 {
 	GLenum format;
+
+	if (!supported_format(internal_format))
+		return 0;
+
 	switch (internal_format) {
 	case GL_RGBA:
 		format = GL_RGBA;
@@ -392,6 +417,10 @@ piglit_init(int argc, char **argv)
 
 	if (attach_depth) {
 		depth_tex = create_mipmapped_tex(depth_format);
+		if (!depth_tex) {
+			/* unsupported format */
+			piglit_report_result(PIGLIT_SKIP);
+		}
 	}
 
 	if (attach_stencil) {
@@ -399,6 +428,10 @@ piglit_init(int argc, char **argv)
 			stencil_tex = depth_tex;
 		} else {
 			stencil_tex = create_mipmapped_tex(GL_DEPTH24_STENCIL8);
+		}
+		if (!stencil_tex) {
+			/* unsupported format */
+			piglit_report_result(PIGLIT_SKIP);
 		}
 	}
 
