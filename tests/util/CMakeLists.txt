@@ -22,6 +22,7 @@ set(UTIL_GL_SOURCES
 	piglit-framework.c
 	piglit-framework-fbo.c
 	piglit-framework-glut.c
+        piglit_ktx.c
 	rgb9e5.c
 	)
 
