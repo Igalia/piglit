@@ -24,44 +24,6 @@
 #pragma once
 
 /**
- * \name Portable wrappers for transform feedback functions
- *
- * \note
- * \c piglit_require_transform_feedback must be called before using
- * these wrappers.
- */
-/*@{*/
-#if defined(USE_OPENGL_ES1)
-#define piglit_BeginTransformFeedback assert(!"glBeginTransformFeedback does not exist in ES1")
-#define piglit_BindBufferBase assert(!"glBindBufferBase does not exist in ES1")
-#define piglit_BindBufferRange assert(!"glBindBufferRange does not exist in ES1")
-#define piglit_EndTransformFeedback assert(!"glEndTransformFeedback does not exist in ES1")
-#define piglit_GetBooleani_v assert(!"glGetBooleani_v does not exist in ES1")
-#define piglit_GetIntegeri_v assert(!"glGetIntegeri_v does not exist in ES1")
-#define piglit_GetTransformFeedbackVarying assert(!"glGetTransformFeedbackVarying does not exist in ES1")
-#define piglit_TransformFeedbackVaryings assert(!"glTransformFeedbackVaryings does not exist in ES1")
-#elif defined(USE_OPENGL_ES2)
-#define piglit_BeginTransformFeedback assert(!"glBeginTransformFeedback does not exist in ES2")
-#define piglit_BindBufferBase assert(!"glBindBufferBase does not exist in ES2")
-#define piglit_BindBufferRange assert(!"glBindBufferRange does not exist in ES2")
-#define piglit_EndTransformFeedback assert(!"glEndTransformFeedback does not exist in ES2")
-#define piglit_GetBooleani_v assert(!"glGetBooleani_v does not exist in ES2")
-#define piglit_GetIntegeri_v assert(!"glGetIntegeri_v does not exist in ES2")
-#define piglit_GetTransformFeedbackVarying assert(!"glGetTransformFeedbackVarying does not exist in ES2")
-#define piglit_TransformFeedbackVaryings assert(!"glTransformFeedbackVaryings does not exist in ES2")
-#else
-extern PFNGLBEGINTRANSFORMFEEDBACKPROC piglit_BeginTransformFeedback;
-extern PFNGLBINDBUFFERBASEPROC piglit_BindBufferBase;
-extern PFNGLBINDBUFFERRANGEPROC piglit_BindBufferRange;
-extern PFNGLENDTRANSFORMFEEDBACKPROC piglit_EndTransformFeedback;
-extern PFNGLGETBOOLEANI_VPROC piglit_GetBooleani_v;
-extern PFNGLGETINTEGERI_VPROC piglit_GetIntegeri_v;
-extern PFNGLGETTRANSFORMFEEDBACKVARYINGPROC piglit_GetTransformFeedbackVarying;
-extern PFNGLTRANSFORMFEEDBACKVARYINGSPROC piglit_TransformFeedbackVaryings;
-#endif
-/*@}*/
-
-/**
  * Require transform feedback.
  *
  * Transform feedback may either be provided by GL 3.0 or

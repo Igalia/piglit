@@ -31,49 +31,11 @@
 
 #include "piglit-util-gl-common.h"
 
-PFNGLBEGINTRANSFORMFEEDBACKPROC piglit_BeginTransformFeedback = NULL;
-PFNGLBINDBUFFERBASEPROC piglit_BindBufferBase = NULL;
-PFNGLBINDBUFFERRANGEPROC piglit_BindBufferRange = NULL;
-PFNGLENDTRANSFORMFEEDBACKPROC piglit_EndTransformFeedback = NULL;
-PFNGLGETBOOLEANI_VPROC piglit_GetBooleani_v = NULL;
-PFNGLGETINTEGERI_VPROC piglit_GetIntegeri_v = NULL;
-PFNGLGETTRANSFORMFEEDBACKVARYINGPROC piglit_GetTransformFeedbackVarying = NULL;
-PFNGLTRANSFORMFEEDBACKVARYINGSPROC piglit_TransformFeedbackVaryings = NULL;
-
-static void
-init_functions_from_core(void)
-{
-	piglit_BeginTransformFeedback = glBeginTransformFeedback;
-	piglit_BindBufferBase = glBindBufferBase;
-	piglit_BindBufferRange = glBindBufferRange;
-	piglit_EndTransformFeedback = glEndTransformFeedback;
-	piglit_GetBooleani_v = glGetBooleani_v;
-	piglit_GetIntegeri_v = glGetIntegeri_v;
-	piglit_GetTransformFeedbackVarying = glGetTransformFeedbackVarying;
-	piglit_TransformFeedbackVaryings = glTransformFeedbackVaryings;
-}
-
-static void
-init_functions_from_ext(void)
-{
-	piglit_BeginTransformFeedback = glBeginTransformFeedbackEXT;
-	piglit_BindBufferBase = glBindBufferBaseEXT;
-	piglit_BindBufferRange = glBindBufferRangeEXT;
-	piglit_EndTransformFeedback = glEndTransformFeedbackEXT;
-	piglit_GetBooleani_v = glGetBooleanIndexedvEXT;
-	piglit_GetIntegeri_v = glGetIntegerIndexedvEXT;
-	piglit_GetTransformFeedbackVarying = glGetTransformFeedbackVaryingEXT;
-	piglit_TransformFeedbackVaryings = glTransformFeedbackVaryingsEXT;
-}
-
 void
 piglit_require_transform_feedback(void)
 {
-	if (piglit_get_gl_version() >= 30) {
-		init_functions_from_core();
-	} else if (piglit_is_extension_supported("GL_EXT_transform_feedback")) {
-		init_functions_from_ext();
-	} else {
+	if (!(piglit_get_gl_version() >= 30 ||
+	      piglit_is_extension_supported("GL_EXT_transform_feedback"))) {
 		printf("Transform feedback not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
 		exit(1);
