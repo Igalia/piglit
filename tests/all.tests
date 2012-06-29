@@ -471,7 +471,6 @@ add_plain_test(shaders, 'glsl-fs-raytrace-bug27060')
 add_plain_test(shaders, 'glsl-fs-sampler-numbering')
 add_plain_test(shaders, 'glsl-fs-shader-stencil-export')
 add_plain_test(shaders, 'glsl-fs-sqrt-branch')
-add_plain_test(shaders, 'glsl-fs-sqrt-zero')
 shaders['glsl-fs-texturecube'] = PlainExecTest(['glsl-fs-texturecube',
 					       '-auto'])
 shaders['glsl-fs-texturecube-bias'] = PlainExecTest(['glsl-fs-texturecube',
