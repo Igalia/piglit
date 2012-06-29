@@ -119,10 +119,9 @@ create_texture(void)
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(buffer),
 			     buffer, GL_STREAM_READ);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,
-				      xfb_buf);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
 		piglit_UseProgram(xfb_prog);
-		piglit_BeginTransformFeedback(GL_POINTS);
+		glBeginTransformFeedback(GL_POINTS);
 	}
 	if (prims_written) {
 		glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
@@ -147,7 +146,7 @@ create_texture(void)
 		glDisable(GL_RASTERIZER_DISCARD);
 	}
 	if (buffer || prims_written) {
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 		piglit_UseProgram(0);
 	}
 	if (buffer) {
@@ -284,8 +283,8 @@ void piglit_init(int argc, char **argv)
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 		xfb_prog = piglit_CreateProgram();
 		piglit_AttachShader(xfb_prog, vs);
-		piglit_TransformFeedbackVaryings(xfb_prog, 1, xfb_varyings,
-						 GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(xfb_prog, 1, xfb_varyings,
+					    GL_INTERLEAVED_ATTRIBS);
 		piglit_LinkProgram(xfb_prog);
 		if (!piglit_link_check_status(xfb_prog)) {
 			piglit_report_result(PIGLIT_FAIL);

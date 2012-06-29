@@ -167,8 +167,7 @@ piglit_init(int argc, char **argv)
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
 	piglit_AttachShader(prog, fs);
-	piglit_TransformFeedbackVaryings(prog, 1, &varying,
-					 GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 1, &varying, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!fs || !vs || !prog)
 		piglit_report_result(PIGLIT_FAIL);
@@ -176,5 +175,5 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
-	piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb, 0, 4096);
+	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb, 0, 4096);
 }

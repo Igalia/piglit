@@ -1265,9 +1265,9 @@ test_ready:
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, test->vs);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	piglit_TransformFeedbackVaryings(prog, test->num_varyings,
-					 test->varyings,
-					 GL_INTERLEAVED_ATTRIBS_EXT);
+	glTransformFeedbackVaryings(prog, test->num_varyings,
+				    test->varyings,
+				    GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -1288,7 +1288,7 @@ test_ready:
 
 	assert(glGetError() == 0);
 
-	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 
 	assert(glGetError() == 0);
 
@@ -1316,11 +1316,11 @@ enum piglit_result piglit_display(void)
 	/* Render into TFBO. */
 	glLoadIdentity();
 	piglit_UseProgram(prog);
-	piglit_BeginTransformFeedback(GL_TRIANGLES);
+	glBeginTransformFeedback(GL_TRIANGLES);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 
 	assert(glGetError() == 0);
 

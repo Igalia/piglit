@@ -310,8 +310,8 @@ initialize_shader_and_xfb()
 	xfb_prog = piglit_CreateProgram();
 	piglit_AttachShader(xfb_prog, vs);
 	piglit_AttachShader(xfb_prog, fs);
-	piglit_TransformFeedbackVaryings(xfb_prog, 3, varyings,
-					 GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(xfb_prog, 3, varyings,
+				    GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(xfb_prog);
 	if (!piglit_link_check_status(xfb_prog)) {
 		piglit_report_result(PIGLIT_FAIL);
@@ -432,16 +432,15 @@ draw(GLuint prog, bool use_xfb, float y_offset, GLenum mode,
 		memset(buffer, 0, sizeof(buffer));
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(buffer),
 			     buffer, GL_STREAM_READ);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,
-				      xfb_buf);
-		piglit_BeginTransformFeedback(xfb_mode);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+		glBeginTransformFeedback(xfb_mode);
 		glBeginQuery(GL_PRIMITIVES_GENERATED, xfb_generated_query);
 		glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
 			     xfb_written_query);
 	}
 	glDrawArrays(mode, 0, num_vertices);
 	if (use_xfb) {
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 		glEndQuery(GL_PRIMITIVES_GENERATED);
 		glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
 	}

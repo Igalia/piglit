@@ -60,8 +60,7 @@ initialize_shader_and_xfb()
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	piglit_TransformFeedbackVaryings(prog, 1, &varying,
-					 GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 1, &varying, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -103,12 +102,12 @@ draw()
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 			     sizeof(float), NULL, bo_modes[i]);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
 
 		/* Do the draw call.  Here's where we segfaulted before. */
-		piglit_BeginTransformFeedback(GL_POINTS);
+		glBeginTransformFeedback(GL_POINTS);
 		glDrawArrays(GL_POINTS, 0, 1);
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 
 		/* Test the output, just to be sure. */
 		readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER,

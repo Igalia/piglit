@@ -183,9 +183,9 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings, int max_varyings)
 		glAttachShader(prog, vs);
 		glAttachShader(prog, fs);
 
-		piglit_TransformFeedbackVaryings(prog, num_xfb_varyings,
-						 xfb_varying_array + offset,
-						 GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(prog, num_xfb_varyings,
+					    xfb_varying_array + offset,
+					    GL_INTERLEAVED_ATTRIBS);
 
 		glLinkProgram(prog);
 		if (!piglit_link_check_status(prog))
@@ -198,16 +198,15 @@ draw(GLuint vs, GLuint fs, int num_xfb_varyings, int max_varyings)
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 			     sizeof(initial_buffer), initial_buffer,
 			     GL_STREAM_READ);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,
-				      xfb_buf);
-		piglit_BeginTransformFeedback(GL_TRIANGLES);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+		glBeginTransformFeedback(GL_TRIANGLES);
 
 		piglit_draw_rect(coord_from_index(offset),
 				 coord_from_index(num_xfb_varyings - 1),
 				 10,
 				 10);
 
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 		pass = check_xfb_output(max_varyings, num_xfb_varyings, offset)
 			&& pass;
 

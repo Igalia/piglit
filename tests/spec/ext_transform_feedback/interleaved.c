@@ -79,8 +79,8 @@ void piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	piglit_TransformFeedbackVaryings(prog, sizeof(varyings)/sizeof(varyings[0]),
-					 varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	glTransformFeedbackVaryings(prog, sizeof(varyings)/sizeof(varyings[0]),
+				    varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -97,7 +97,7 @@ void piglit_init(int argc, char **argv)
 		ptr[i] = 0.123456;
 	}
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
-	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 
 	assert(glGetError() == 0);
 
@@ -163,10 +163,10 @@ enum piglit_result piglit_display(void)
 	glLoadIdentity();
 	piglit_UseProgram(prog);
 	glEnable(GL_RASTERIZER_DISCARD);
-	piglit_BeginTransformFeedback(GL_TRIANGLES);
+	glBeginTransformFeedback(GL_TRIANGLES);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	glDisable(GL_RASTERIZER_DISCARD);
 
 	assert(glGetError() == 0);

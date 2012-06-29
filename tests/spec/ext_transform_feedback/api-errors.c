@@ -159,13 +159,13 @@ do_bind(const struct test_desc *test, GLuint buf, int i)
 	switch (test->bind_mode) {
 	case BASE:
 		printf("BindBufferBase(buffer %i)\n", i);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, i, buf);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, i, buf);
 		break;
 	case RANGE:
 		printf("BindBufferRange(buffer %i, offset=%i, size=%i)\n", i,
 		       offset, size);
-		piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, i, buf,
-				       offset, size);
+		glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, i, buf,
+				  offset, size);
 		break;
 	case OFFSET:
 		printf("BindBufferOffsetEXT(buffer %i, offset=%i)\n", i,
@@ -210,8 +210,8 @@ do_test(const struct test_desc *test)
 	       num_varyings,
 	       test->buffer_mode == GL_INTERLEAVED_ATTRIBS
 	       ? "interleaved" : "separate");
-	piglit_TransformFeedbackVaryings(progs[0], num_varyings,
-					 varyings, test->buffer_mode);
+	glTransformFeedbackVaryings(progs[0], num_varyings,
+				    varyings, test->buffer_mode);
 
 	if (test->mode == NOT_A_PROGRAM) {
 		pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
@@ -277,13 +277,13 @@ do_test(const struct test_desc *test)
 
 	if (test->mode == END_INACTIVE) {
 		printf("EndTransformFeedback\n");
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 		return pass;
 	}
 
 	printf("BeginTransformFeedback\n");
-	piglit_BeginTransformFeedback(GL_POINTS);
+	glBeginTransformFeedback(GL_POINTS);
 	switch (test->mode) {
 	case UNBOUND_BUFFER:
 	case NO_VARYINGS:
@@ -298,7 +298,7 @@ do_test(const struct test_desc *test)
 	switch (test->mode) {
 	case BEGIN_ACTIVE:
 		printf("BeginTransformFeedback\n");
-		piglit_BeginTransformFeedback(GL_POINTS);
+		glBeginTransformFeedback(GL_POINTS);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 		break;
 	case USEPROG_ACTIVE:

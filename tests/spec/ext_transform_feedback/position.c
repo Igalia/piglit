@@ -111,7 +111,7 @@ void piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	piglit_TransformFeedbackVaryings(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	glTransformFeedbackVaryings(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -121,7 +121,7 @@ void piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vspassthrough);
 	prog_passthrough = piglit_CreateProgram();
 	piglit_AttachShader(prog_passthrough, vs);
-	piglit_TransformFeedbackVaryings(prog_passthrough, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
+	glTransformFeedbackVaryings(prog_passthrough, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog_passthrough);
 	if (!piglit_link_check_status(prog_passthrough)) {
 		piglit_DeleteProgram(prog_passthrough);
@@ -138,15 +138,15 @@ void piglit_init(int argc, char **argv)
 
 	if (range) {
 		puts("Testing BindBufferRange.");
-		piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
-				     0, buf, offset*sizeof(float), range*sizeof(float));
+		glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
+				  0, buf, offset*sizeof(float), range*sizeof(float));
 	} else if (offset) {
 		puts("Testing BindBufferOffset.");
 		glBindBufferOffsetEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
 				      0, buf, offset*sizeof(float));
 	} else {
 		puts("Testing BindBufferBase.");
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 	}
 
 	if (!range) {
@@ -207,11 +207,11 @@ enum piglit_result piglit_display(void)
 	piglit_UseProgram(prog);
 	if (discard)
 		glEnable(GL_RASTERIZER_DISCARD_EXT);
-	piglit_BeginTransformFeedback(GL_TRIANGLES);
+	glBeginTransformFeedback(GL_TRIANGLES);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexPointer(2, GL_FLOAT, 0, verts);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	if (discard)
 		glDisable(GL_RASTERIZER_DISCARD_EXT);
 

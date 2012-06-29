@@ -458,9 +458,9 @@ piglit_init(int argc, char **argv)
 	piglit_AttachShader(prog, vs);
 	piglit_BindAttribLocation(prog, 0, "vertex_pos");
 	piglit_BindAttribLocation(prog, 1, "vertex_num");
-	piglit_TransformFeedbackVaryings(prog, test_to_run->num_varyings,
-					 (const char **) test_to_run->varyings,
-					 GL_INTERLEAVED_ATTRIBS_EXT);
+	glTransformFeedbackVaryings(prog, test_to_run->num_varyings,
+				    (const char **) test_to_run->varyings,
+				    GL_INTERLEAVED_ATTRIBS_EXT);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -473,8 +473,8 @@ piglit_init(int argc, char **argv)
 	for (i = 0; i < test_to_run->num_varyings; ++i) {
 		GLsizei size;
 		GLenum type;
-		piglit_GetTransformFeedbackVarying(prog, i, 0, NULL, &size,
-						   &type, NULL);
+		glGetTransformFeedbackVarying(prog, i, 0, NULL, &size,
+					      &type, NULL);
 		if (size != test_to_run->expected_size) {
 			printf("For varying %i, expected size %i, got %i\n",
 			       i, test_to_run->expected_size, size);
@@ -533,8 +533,8 @@ piglit_display(void)
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(initial_xfb_data),
 		     initial_xfb_data, GL_STREAM_READ);
-	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
-	piglit_BeginTransformFeedback(GL_TRIANGLES);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+	glBeginTransformFeedback(GL_TRIANGLES);
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
 
 	/* Draw */
@@ -552,7 +552,7 @@ piglit_display(void)
 	}
 
 	/* Check transform feedback output */
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);
 	for (i = 0; i < ARRAY_SIZE(initial_xfb_data); ++i) {
 		float expected =

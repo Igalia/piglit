@@ -82,7 +82,7 @@ check_indexed(const struct test_desc *test, GLenum param,
 	GLint get_result;
 
 	if (test->mode == INDEXED && test->param == param) {
-		piglit_GetIntegeri_v(param, index, &get_result);
+		glGetIntegeri_v(param, index, &get_result);
 		if (get_result != expected) {
 			printf("%s[%u] == %i, expected %i\n", param_string,
 			       index, get_result, expected);
@@ -142,8 +142,8 @@ do_test(const struct test_desc *test)
 		int size = 4 * ((i % 3) + 1);
 		printf("BindBufferRange(TRANSFORM_FEEDBACK_BUFFER, %i, %u, %i, %i)\n",
 		       i, bufs[i], offset, size);
-		piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, i,
-				       bufs[i], offset, size);
+		glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, i,
+				  bufs[i], offset, size);
 		CHECK_INTEGER(GL_TRANSFORM_FEEDBACK_BUFFER_BINDING, bufs[i]);
 	}
 

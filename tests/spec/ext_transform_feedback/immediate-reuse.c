@@ -86,7 +86,7 @@ piglit_init(int argc, char **argv)
 	piglit_AttachShader(prog, fs);
 	piglit_BindAttribLocation(prog, 0, "in_position");
 	piglit_BindAttribLocation(prog, 1, "in_color");
-	piglit_TransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -141,16 +141,16 @@ piglit_display(void)
 	 */
 	for (i = 0; i < 16; ++i) {
 		glBindBuffer(GL_ARRAY_BUFFER, bufs[i % 2]);
-		piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,
-				      bufs[(i + 1) % 2]);
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0,
+				 bufs[(i + 1) % 2]);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
 				      8 * sizeof(float), (void *) 0);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
 				      8 * sizeof(float),
 				      (void *) (4 * sizeof(float)));
-		piglit_BeginTransformFeedback(GL_TRIANGLES);
+		glBeginTransformFeedback(GL_TRIANGLES);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		piglit_EndTransformFeedback();
+		glEndTransformFeedback();
 	}
 
 	/* Check that the proper gradient was drawn */

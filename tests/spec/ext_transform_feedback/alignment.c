@@ -131,8 +131,7 @@ void piglit_init(int argc, char **argv)
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
 	piglit_AttachShader(prog, fs);
-	piglit_TransformFeedbackVaryings(prog, 5, varyings,
-					 GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 5, varyings, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
@@ -162,12 +161,12 @@ enum piglit_result piglit_display(void)
 	memset(buffer, 0xffffffff, sizeof(buffer));
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(buffer), buffer,
 		     GL_STREAM_READ);
-	piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf,
-			       additional_offset,
-			       sizeof(buffer) - additional_offset);
-	piglit_BeginTransformFeedback(GL_POINTS);
+	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf,
+			  additional_offset,
+			  sizeof(buffer) - additional_offset);
+	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, 4);
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	pass = piglit_check_gl_error(0) && pass;
 
 	readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY);

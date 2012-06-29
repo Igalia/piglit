@@ -141,8 +141,7 @@ initialize_shader_and_xfb()
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	prog = piglit_CreateProgram();
 	piglit_AttachShader(prog, vs);
-	piglit_TransformFeedbackVaryings(prog, 3, varyings,
-					 GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 3, varyings, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -152,7 +151,7 @@ initialize_shader_and_xfb()
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 		     3*NUM_POINTS*sizeof(unsigned), NULL, GL_STREAM_READ);
-	piglit_BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
 	piglit_UseProgram(prog);
 	if (!piglit_check_gl_error(0))
 		piglit_report_result(PIGLIT_FAIL);
@@ -222,7 +221,7 @@ static void
 draw()
 {
 	glEnable(GL_RASTERIZER_DISCARD);
-	piglit_BeginTransformFeedback(draw_mode);
+	glBeginTransformFeedback(draw_mode);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	if (use_draw_elements) {
 		glDrawElements(draw_mode, NUM_POINTS, GL_UNSIGNED_INT,
@@ -230,7 +229,7 @@ draw()
 	} else {
 		glDrawArrays(draw_mode, 0, NUM_POINTS);
 	}
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	if (!piglit_check_gl_error(0))
 		piglit_report_result(PIGLIT_FAIL);
 }

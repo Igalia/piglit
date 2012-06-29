@@ -84,8 +84,8 @@ piglit_init(int argc, char **argv)
 		GLuint prog = piglit_CreateProgram();
 		piglit_AttachShader(prog, vs);
 		piglit_BindAttribLocation(prog, 0, "vertex_num");
-		piglit_TransformFeedbackVaryings(prog, num_varyings, varyings,
-						 GL_INTERLEAVED_ATTRIBS);
+		glTransformFeedbackVaryings(prog, num_varyings, varyings,
+					    GL_INTERLEAVED_ATTRIBS);
 		piglit_LinkProgram(prog);
 		if (!piglit_link_check_status(prog)) {
 			piglit_DeleteProgram(prog);
@@ -138,20 +138,20 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(initial_xfb_buf),
 		     initial_xfb_buf, GL_STREAM_READ);
-	piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf, 0,
-			       sizeof(float) * bind_size);
+	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf, 0,
+			  sizeof(float) * bind_size);
 
 	/* Start queries and XFB */
 	glBeginQuery(GL_PRIMITIVES_GENERATED, query_prims_generated);
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN,
 		     query_prims_written);
-	piglit_BeginTransformFeedback(modes[mode_index]);
+	glBeginTransformFeedback(modes[mode_index]);
 
 	/* Draw */
 	glDrawArrays(modes[mode_index], 0, num_primitives * vertices_per_prim);
 
 	/* Stop XFB and check queries */
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	glEndQuery(GL_PRIMITIVES_GENERATED);
 	glGetQueryObjectuiv(query_prims_generated, GL_QUERY_RESULT,
 			    &query_result);

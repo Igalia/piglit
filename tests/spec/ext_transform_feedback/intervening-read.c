@@ -124,7 +124,7 @@ piglit_init(int argc, char **argv)
 	piglit_AttachShader(prog, fs);
 	piglit_BindAttribLocation(prog, 0, "in_position");
 	piglit_BindAttribLocation(prog, 1, "in_color");
-	piglit_TransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
+	glTransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
 	piglit_LinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_DeleteProgram(prog);
@@ -194,9 +194,9 @@ piglit_display(void)
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(initial_xfb_data),
 		     initial_xfb_data, GL_STREAM_READ);
-	piglit_BindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf, 0,
-			       sizeof(float[9][8]));
-	piglit_BeginTransformFeedback(GL_TRIANGLES);
+	glBindBufferRange(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf, 0,
+			  sizeof(float[9][8]));
+	glBeginTransformFeedback(GL_TRIANGLES);
 	switch (test_mode) {
 	case TEST_MODE_PRIMS_GENERATED:
 		glBeginQuery(GL_PRIMITIVES_GENERATED, query);
@@ -219,7 +219,7 @@ piglit_display(void)
 	glDrawArrays(GL_TRIANGLES, 6, 6);
 
 	/* Finish transform feedback and test correct behavior. */
-	piglit_EndTransformFeedback();
+	glEndTransformFeedback();
 	switch (test_mode) {
 	case TEST_MODE_OUTPUT:
 		readback = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER,
