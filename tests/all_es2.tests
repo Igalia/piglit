@@ -17,4 +17,8 @@ spec['EXT_unpack_subimage'] = ext_unpack_subimage
 ext_unpack_subimage['basic'] = PlainExecTest(['ext_unpack_subimage', '-auto'])
 ext_unpack_subimage['basic'].runConcurrent = True
 
+oes_compressed_etc1_rgb8_texture = Group()
+spec['OES_compressed_ETC1_RGB8_texture'] = oes_compressed_etc1_rgb8_texture
+oes_compressed_etc1_rgb8_texture['miptree'] = PlainExecTest(['oes_compressed_etc1_rgb8_texture-miptree', '-auto'])
+
 profile.tests['spec'] = spec
