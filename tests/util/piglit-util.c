@@ -304,6 +304,13 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 	if (fstat(fd, & st) == 0) {
 		ssize_t total_read = 0;
 
+                if (!S_ISREG(st.st_mode) &&
+                    !S_ISLNK(st.st_mode)) {
+                   /* not a regular file or symlink */
+                   close(fd);
+                   return NULL;
+                }
+
 		text = malloc(st.st_size + 1);
 		if (text != NULL) {
 			do {
