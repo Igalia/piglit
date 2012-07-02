@@ -4,7 +4,6 @@ set(UTIL_GL_SOURCES
 	piglit-dispatch-init.c
 	piglit-shader.c
 	piglit-shader-gl.c
-	piglit-transform-feedback.c
 	piglit-util-gl.c
 	piglit-vbo.cpp
 	sized-internalformats.c
@@ -30,7 +29,6 @@ IF(BUILD_GLX_TESTS)
 	piglit_add_library (piglitglxutil
 		    piglit-shader.c
 		    piglit-shader-gl.c
-		    piglit-transform-feedback.c
 		    piglit-util-gl-common.c
 		    piglit-util-gl-enum.c
 		    piglit-util-gl.c

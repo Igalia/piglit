@@ -1338,3 +1338,20 @@ piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, 
 	free(data);
 	return tex;
 }
+
+/**
+ * Require transform feedback.
+ *
+ * Transform feedback may either be provided by GL 3.0 or
+ * EXT_transform_feedback.
+ */
+void
+piglit_require_transform_feedback(void)
+{
+	if (!(piglit_get_gl_version() >= 30 ||
+	      piglit_is_extension_supported("GL_EXT_transform_feedback"))) {
+		printf("Transform feedback not supported.\n");
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+}

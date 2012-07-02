@@ -38,7 +38,6 @@ extern "C" {
 
 #include "piglit-framework.h"
 #include "piglit-shader.h"
-#include "piglit-transform-feedback.h"
 
 extern const uint8_t fdo_bitmap[];
 extern const unsigned int fdo_bitmap_width;
@@ -170,6 +169,7 @@ GLuint piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
 extern float piglit_tolerance[4];
 void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
+extern void piglit_require_transform_feedback(void);
 
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
