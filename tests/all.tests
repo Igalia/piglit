@@ -713,6 +713,7 @@ create_context_profile['pre-GL3 profile'] = PlainExecTest(['glx-create-context-p
 create_context_robustness = Group();
 glx['GLX_ARB_create_context_robustness'] = create_context_robustness
 create_context_robustness['invalid reset notification strategy'] = PlainExecTest(['glx-create-context-invalid-reset-strategy'])
+create_context_robustness['require GL_ARB_robustness'] = PlainExecTest(['glx-create-context-require-robustness'])
 
 create_context_es2_profile = Group();
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
