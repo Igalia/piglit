@@ -710,6 +710,10 @@ create_context_profile['3.2 core profile required'] = PlainExecTest(['glx-create
 create_context_profile['invalid profile'] = PlainExecTest(['glx-create-context-invalid-profile'])
 create_context_profile['pre-GL3 profile'] = PlainExecTest(['glx-create-context-pre-GL3-profile'])
 
+create_context_robustness = Group();
+glx['GLX_ARB_create_context_robustness'] = create_context_robustness
+create_context_robustness['invalid reset notification strategy'] = PlainExecTest(['glx-create-context-invalid-reset-strategy'])
+
 create_context_es2_profile = Group();
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = PlainExecTest(['glx-create-context-indirect-es2-profile'])
