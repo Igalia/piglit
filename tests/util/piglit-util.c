@@ -347,3 +347,55 @@ piglit_source_dir(void)
     }
 
     return s;
+}
+
+#ifdef _WIN32
+#  define PIGLIT_PATH_SEP '\\'
+#else
+#  define PIGLIT_PATH_SEP '/'
+#endif
+
+size_t
+piglit_join_paths(char buf[], size_t buf_size, int n, ...)
+{
+	char *dest = buf;
+	size_t size_written = 0;
+
+	int i;
+	va_list va;
+
+	if (buf_size  == 0 || n < 1)
+		return 0;
+
+	va_start(va, n);
+
+	i = 0;
+	while (true) {
+		const char *p = va_arg(va, const char*);
+
+		while (*p != 0) {
+			if (size_written == buf_size - 1)
+				goto write_null;
+
+			*dest = *p;
+			++dest;
+			++p;
+			++size_written;
+		}
+
+		++i;
+		if (i == n)
+			break;
+
+		*dest = PIGLIT_PATH_SEP;
+		++dest;
+		++size_written;
+	}
+
+write_null:
+	*dest = '\0';
+	++size_written;
+
+	va_end(va);
+	return size_written;
+}

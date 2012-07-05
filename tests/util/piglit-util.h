@@ -135,6 +135,19 @@ char *piglit_load_text_file(const char *file_name, unsigned *size);
 const char*
 piglit_source_dir(void);
 
+/**
+ * \brief Join paths together with the system path separator.
+ *
+ * On Unix, the path separator is '/'. On Windows, '\\'.
+ *
+ * The variable argument consists of \a n null-terminated strings.  The
+ * resultant path is written to \a buf.  No more than \a buf_size bytes are
+ * written to \a buf. The last byte written is always the null character.
+ * Returned is the number of bytes written, including the terminating null.
+ */
+size_t
+piglit_join_paths(char buf[], size_t buf_size, int n, ...);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
