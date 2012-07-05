@@ -31,7 +31,7 @@
 
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,
-    64 /*window_height*/,
+    128 /*window_height*/,
     GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
 
 static const char *vstext = {
@@ -42,20 +42,31 @@ static const char *vstext = {
 };
 static const char *vstext_notransform = {
 	"void main() {"
-	"  gl_Position = gl_Vertex + vec4(0.0, 0.625, 0.0, 0.0);"
+	"  gl_Position = gl_Vertex + vec4(0.0, 0.32, 0.0, 0.0);"
+	"  gl_FrontColor = gl_Color;"
+	"}"
+};
+static const char *vstext_notransform_instanced = {
+	"#extension GL_ARB_draw_instanced : enable\n"
+	"void main() {"
+	"  gl_Position = gl_Vertex + vec4(0.0, 0.32 * float(gl_InstanceID+1), 0.0, 0.0);"
 	"  gl_FrontColor = gl_Color;"
 	"}"
 };
 
 static const char *varyings[] = {"gl_FrontColor", "gl_Position"};
 GLuint buf;
-GLuint prog, prog_notransform;
+GLuint prog, prog_notransform, prog_notransform_instanced;
 GLuint tfb;
+GLboolean instanced;
 
 void piglit_init(int argc, char **argv)
 {
 	GLuint vs;
 	GLint maxcomps;
+
+	if (argc == 2 && strcmp(argv[1], "instanced") == 0)
+		instanced = GL_TRUE;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -67,6 +78,8 @@ void piglit_init(int argc, char **argv)
 	piglit_require_GLSL();
 	piglit_require_extension("GL_EXT_transform_feedback");
 	piglit_require_extension("GL_ARB_transform_feedback2");
+	if (instanced)
+		piglit_require_extension("GL_ARB_transform_feedback_instanced");
 
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS_EXT, &maxcomps);
 	if (maxcomps < 8) {
@@ -88,6 +101,10 @@ void piglit_init(int argc, char **argv)
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_notransform);
 	prog_notransform = piglit_link_simple_program(vs, 0);
+	if (instanced) {
+		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_notransform_instanced);
+		prog_notransform_instanced = piglit_link_simple_program(vs, 0);
+	}
 
 	/* Set up transform feedback. */
 	glGenBuffers(1, &buf);
@@ -149,12 +166,16 @@ enum piglit_result piglit_display(void)
 
 	assert(glGetError() == 0);
 
-	piglit_UseProgram(prog_notransform);
+	piglit_UseProgram(instanced ? prog_notransform_instanced : prog_notransform);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glColorPointer(4, GL_FLOAT, sizeof(float)*8, NULL);
 	glVertexPointer(4, GL_FLOAT, sizeof(float)*8, (void*)(intptr_t)(4*sizeof(float)));
-	glDrawTransformFeedback(GL_TRIANGLES, tfb);
+	if (instanced) {
+		glDrawTransformFeedbackInstanced(GL_TRIANGLES, tfb, 4);
+	} else {
+		glDrawTransformFeedback(GL_TRIANGLES, tfb);
+	}
 	glDisableClientState(GL_COLOR_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -167,6 +188,15 @@ enum piglit_result piglit_display(void)
 	pass = piglit_probe_pixel_rgb(15, 35, red) && pass;
 	pass = piglit_probe_pixel_rgb(35, 35, clearcolor) && pass;
 	pass = piglit_probe_pixel_rgb(55, 35, blue) && pass;
+
+	if (instanced) {
+		unsigned i;
+		for (i = 1; i < 4; i++) {
+			pass = piglit_probe_pixel_rgb(15, 35 + 20*i, red) && pass;
+			pass = piglit_probe_pixel_rgb(35, 35 + 20*i, clearcolor) && pass;
+			pass = piglit_probe_pixel_rgb(55, 35 + 20*i, blue) && pass;
+		}
+	}
 
 	glutSwapBuffers();
 

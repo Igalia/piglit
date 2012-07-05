@@ -1788,6 +1788,10 @@ arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
 
+arb_transform_feedback_instanced = Group()
+spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
+arb_transform_feedback_instanced['draw-auto instanced'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto', 'instanced'])
+
 arb_transform_feedback3 = Group()
 spec['ARB_transform_feedback3'] = arb_transform_feedback3
 
