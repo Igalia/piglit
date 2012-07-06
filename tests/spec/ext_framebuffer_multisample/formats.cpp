@@ -73,6 +73,7 @@ class PatternRenderer
 public:
 	bool try_setup(GLenum internalformat);
 	void set_piglit_tolerance();
+	void set_color_clamping_mode();
 	void draw();
 	float *read_image(GLenum base_format);
 
@@ -109,6 +110,15 @@ public:
 	 * pattern.
 	 */
 	float color_scale;
+
+	/**
+	 * Color clamping setting that should be used for this test.
+	 * Normally GL_FIXED_ONLY (the default setting) works fine,
+	 * however the GL spec mandates that signed normalized formats
+	 * be clamped to [0, 1] when in GL_FIXED_ONLY mode.  So when
+	 * testing signed normalized formats, this is GL_FALSE.
+	 */
+	GLenum color_clamping_mode;
 
 	Fbo fbo_msaa;
 	Fbo fbo_downsampled;
@@ -151,6 +161,7 @@ PatternRenderer::try_setup(GLenum internalformat)
 		GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE,
 		(GLint *) &component_type);
 
+	color_clamping_mode = GL_FIXED_ONLY;
 	switch (component_type) {
 	case GL_INT:
 		test_pattern = test_pattern_ivec4;
@@ -183,6 +194,12 @@ PatternRenderer::try_setup(GLenum internalformat)
 			color_offset = -10.0;
 			color_scale = 20.0;
 		}
+		break;
+	case GL_SIGNED_NORMALIZED:
+		test_pattern = test_pattern_vec4;
+		color_offset = -1.0;
+		color_scale = 2.0;
+		color_clamping_mode = GL_FALSE;
 		break;
 	default:
 		printf("Unrecognized component type: %s\n",
@@ -260,6 +277,17 @@ void PatternRenderer::set_piglit_tolerance()
 
 
 /**
+ * Set up the appropriate color clamping mode for testing this format.
+ */
+void
+PatternRenderer::set_color_clamping_mode()
+{
+	glClampColor(GL_CLAMP_FRAGMENT_COLOR, color_clamping_mode);
+	glClampColor(GL_CLAMP_READ_COLOR, color_clamping_mode);
+}
+
+
+/**
  * Draw the test pattern into the MSAA framebuffer, and then blit it
  * to the downsampled FBO to force an MSAA resolve.
  */
@@ -269,6 +297,7 @@ PatternRenderer::draw()
 	/* Draw into the MSAA fbo */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo_msaa.handle);
 	fbo_msaa.set_viewport();
+	set_color_clamping_mode();
 	test_pattern->draw_with_scale_and_offset(TestPattern::no_projection,
 						 color_scale, color_offset);
 
@@ -323,6 +352,7 @@ PatternRenderer::read_image(GLenum base_format)
 	unsigned array_size = components*pattern_width*pattern_height;
 	float *image = (float *) malloc(sizeof(float)*array_size);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_downsampled.handle);
+	set_color_clamping_mode();
 	if (base_format == GL_INTENSITY) {
 		/* GL_INTENSITY is not allowed for ReadPixels so
 		 * substitute GL_LUMINANCE.

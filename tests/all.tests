@@ -1635,6 +1635,7 @@ add_texwrap_test2(ext_texture_shared_exponent, '2D', 'GL_RGB9_E5')
 ext_texture_snorm = Group()
 spec['EXT_texture_snorm'] = ext_texture_snorm
 add_fbo_formats_tests('spec/EXT_texture_snorm', 'GL_EXT_texture_snorm')
+add_msaa_formats_tests(ext_texture_snorm, 'GL_EXT_texture_snorm')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_R8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RG8_SNORM')
 add_texwrap_test2(ext_texture_snorm, '2D', 'GL_RGB8_SNORM')
