@@ -163,10 +163,26 @@ PatternRenderer::try_setup(GLenum internalformat)
 		color_offset = 0.0;
 		break;
 	case GL_UNSIGNED_NORMALIZED:
-	case GL_FLOAT:
 		test_pattern = test_pattern_vec4;
 		color_offset = 0.0;
 		color_scale = 1.0;
+		break;
+	case GL_FLOAT:
+		/* Test floating point formats to a (rather arbitrary)
+		 * range of [-10.0, 10.0], to make sure no extraneous
+		 * clamping occurs.  Exception: GL_R11F_G11F_B10F_EXT
+		 * and GL_RGB9_E5_EXT are unsigned, so they are tested
+		 * to a range of [0.0, 10.0].
+		 */
+		test_pattern = test_pattern_vec4;
+		if (internalformat == GL_R11F_G11F_B10F_EXT ||
+		    internalformat == GL_RGB9_E5_EXT) {
+			color_offset = 0.0;
+			color_scale = 10.0;
+		} else {
+			color_offset = -10.0;
+			color_scale = 20.0;
+		}
 		break;
 	default:
 		printf("Unrecognized component type: %s\n",
