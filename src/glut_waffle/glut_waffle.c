@@ -399,9 +399,6 @@ glutMainLoop(void)
 	if (_glut->window->display_cb)
 		_glut->window->display_cb();
 
-	if (_glut->window)
-		waffle_window_swap_buffers(_glut->window->waffle);
-
 	// FIXME: Tests run without -auto require basic input.
 
 	// Workaround for input:
