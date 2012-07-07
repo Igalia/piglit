@@ -126,6 +126,15 @@ extern void piglit_set_rlimit(unsigned long lim);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
 
+/**
+ * \brief Read environment variable PIGLIT_SOURCE_DIR.
+ *
+ * If environment is not defined, then report failure. The intention is
+ * that tests should use this to construct the path to any needed data files.
+ */
+const char*
+piglit_source_dir(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

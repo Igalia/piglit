@@ -334,3 +334,16 @@ char *piglit_load_text_file(const char *file_name, unsigned *size)
 	return text;
 #endif
 }
+
+const char*
+piglit_source_dir(void)
+{
+
+    const char *s = getenv("PIGLIT_SOURCE_DIR");
+
+    if (s == NULL) {
+        printf("error: env var PIGLIT_SOURCE_DIR is undefined\n");
+        piglit_report_result(PIGLIT_FAIL);
+    }
+
+    return s;
