@@ -651,44 +651,6 @@ int piglit_probe_texel_rgb(int target, int level, int x, int y,
 	return piglit_probe_texel_rect_rgb(target, level, x, y, 1, 1, expected);
 }
 
-int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
-{
-	int i, j, p;
-	GLfloat probe1[4];
-	GLfloat probe2[4];
-	GLubyte *pixels = malloc(w*h*4*sizeof(GLubyte));
-
-	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-	for (j = 0; j < h; j++) {
-		for (i = 0; i < w / 2; i++) {
-			GLubyte *pixel1 = &pixels[4 * (j * w + i)];
-			GLubyte *pixel2 = &pixels[4 * (j * w + w / 2 + i)];
-
-			for (p = 0; p < 4; ++p) {
-				probe1[p] = pixel1[p] / 255.0f;
-				probe2[p] = pixel2[p] / 255.0f;
-			}
-
-			for (p = 0; p < 4; ++p) {
-				if (fabs(probe1[p] - probe2[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", x+i, x+j);
-					printf("  Left: %f %f %f %f\n",
-					       probe1[0], probe1[1], probe1[2], probe1[3]);
-					printf("  Right: %f %f %f %f\n",
-					       probe2[0], probe2[1], probe2[2], probe2[3]);
-
-					free(pixels);
-					return 0;
-				}
-			}
-		}
-	}
-
-	free(pixels);
-	return 1;
-}
-
 int piglit_use_fragment_program(void)
 {
 	static const char source[] =
