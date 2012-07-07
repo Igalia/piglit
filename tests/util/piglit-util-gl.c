@@ -653,16 +653,22 @@ int piglit_probe_texel_rgb(int target, int level, int x, int y,
 
 int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 {
-	int i, j, p, wh = w/2;
-	GLfloat *probe1, *probe2;
-	GLfloat *pixels = malloc(w*h*4*sizeof(float));
+	int i, j, p;
+	GLfloat probe1[4];
+	GLfloat probe2[4];
+	GLubyte *pixels = malloc(w*h*4*sizeof(GLubyte));
 
-	glReadPixels(x, y, w, h, GL_RGBA, GL_FLOAT, pixels);
+	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	for (j = 0; j < h; j++) {
-		for (i = 0; i < wh; i++) {
-			probe1 = &pixels[(j*w+i)*4];
-			probe2 = &pixels[(j*w+wh+i)*4];
+		for (i = 0; i < w / 2; i++) {
+			GLubyte *pixel1 = &pixels[4 * (j * w + i)];
+			GLubyte *pixel2 = &pixels[4 * (j * w + w / 2 + i)];
+
+			for (p = 0; p < 4; ++p) {
+				probe1[p] = pixel1[p] / 255.0f;
+				probe2[p] = pixel2[p] / 255.0f;
+			}
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe1[p] - probe2[p]) >= piglit_tolerance[p]) {
