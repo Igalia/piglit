@@ -2289,6 +2289,7 @@ spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
 arb_transform_feedback2['istranformfeedback'] = PlainExecTest(['arb_transform_feedback2-istransformfeedback', '-auto'])
 arb_transform_feedback2['glGenTransformFeedbacks names only'] = concurrent_test('arb_transform_feedback2-gen-names-only')
+arb_transform_feedback2['cannot bind when another object is active'] = concurrent_test('arb_transform_feedback2-cannot-bind-when-active')
 
 arb_transform_feedback_instanced = Group()
 spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
