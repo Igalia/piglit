@@ -290,7 +290,9 @@ struct format {
     {FORMAT(GL_INTENSITY16_SNORM),        0, 0, 0, 0, 0, 16, 0, 0,     0, 3.1,
      {"GL_EXT_texture_snorm"}},
 
-    {0}
+    /* ARB_ES2_compatibility */
+    {FORMAT(GL_RGB565),                   5, 6, 5, 0, 0, 0, 0, 0,     0, 4.1,
+     {"GL_ARB_ES2_compatibility"}}
 };
 
 /* Indexed by the channel bitdepth. */
