@@ -1087,6 +1087,7 @@ add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-fixed-type')
 add_plain_test(arb_es2_compatibility, 'fbo-missing-attachment-clear')
 arb_es2_compatibility['FBO blit to missing attachment (ES2 completeness rules)'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'es2', 'to'])
 arb_es2_compatibility['FBO blit from missing attachment (ES2 completeness rules)'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'es2', 'from'])
+add_fbo_formats_tests('spec/ARB_ES2_compatibility', 'GL_ARB_ES2_compatibility')
 add_texwrap_test2(arb_es2_compatibility, '2D', 'GL_RGB565')
 
 # Group ARB_draw_elements_base_vertex

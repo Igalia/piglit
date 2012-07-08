@@ -296,6 +296,10 @@ static const struct format_desc ext_texture_snorm[] = {
         FORMAT(GL_INTENSITY16_SNORM, GL_INTENSITY)
 };
 
+static const struct format_desc arb_es2_compatibility[] = {
+	FORMAT(GL_RGB565, GL_RGB)
+};
+
 struct test_desc {
 	const struct format_desc *format;
 	unsigned num_formats;
@@ -464,6 +468,13 @@ static const struct test_desc test_sets[] = {
 		GL_SIGNED_NORMALIZED,
 		{"GL_EXT_texture_snorm"}
 	},
+	{
+		arb_es2_compatibility,
+		ARRAY_SIZE(arb_es2_compatibility),
+		"GL_ARB_ES2_compatibility",
+		GL_UNSIGNED_NORMALIZED,
+		{"GL_ARB_ES2_compatibility"}
+	}
 };
 
 static GLboolean
