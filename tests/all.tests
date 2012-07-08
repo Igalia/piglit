@@ -706,7 +706,6 @@ texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')
 add_plain_test(texturing, 'array-texture')
 add_plain_test(texturing, 'copytexsubimage')
-add_plain_test(texturing, 'copyteximage')
 add_plain_test(texturing, 'copyteximage-border')
 add_plain_test(texturing, 'copyteximage-clipping')
 add_plain_test(texturing, 'cubemap')
@@ -849,11 +848,14 @@ add_texwrap_test2(gl11, '2D', 'GL_INTENSITY4')
 add_texwrap_test2(gl11, '2D', 'GL_INTENSITY8')
 add_texwrap_test2(gl11, '2D', 'GL_INTENSITY12')
 add_texwrap_test2(gl11, '2D', 'GL_INTENSITY16')
+gl11['copyteximage 1D'] = PlainExecTest(['copyteximage', '-auto', '1D'])
+gl11['copyteximage 2D'] = PlainExecTest(['copyteximage', '-auto', '2D'])
 
 gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_test1(gl12, '3D')
 add_texwrap_test2(gl12, '3D', 'proj')
+gl12['copyteximage 3D'] = PlainExecTest(['copyteximage', '-auto', '3D'])
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
@@ -1216,6 +1218,7 @@ add_texwrap_test2(arb_texture_rectangle, 'RECT', 'proj')
 add_shader_test_dir(arb_texture_rectangle,
                     testsDir + '/spec/arb_texture_rectangle',
                     recursive=True)
+arb_texture_rectangle['copyteximage RECT'] = PlainExecTest(['copyteximage', '-auto', 'RECT'])
 
 arb_texture_storage = Group()
 spec['ARB_texture_storage'] = arb_texture_storage
@@ -1498,6 +1501,13 @@ spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxl
 add_shader_test_dir(ext_texture_array,
                     testsDir + '/spec/ext_texture_array',
                     recursive=True)
+ext_texture_array['copyteximage 1D_ARRAY'] = PlainExecTest(['copyteximage', '-auto', '1D_ARRAY'])
+ext_texture_array['copyteximage 2D_ARRAY'] = PlainExecTest(['copyteximage', '-auto', '2D_ARRAY'])
+
+arb_texture_cube_map = Group()
+spec['ARB_texture_cube_map'] = arb_texture_cube_map
+arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-auto', 'CUBE'])
+
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
