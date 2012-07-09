@@ -206,6 +206,9 @@ if 'PIGLIT_BUILD_DIR' in os.environ:
 else:
     testBinDir = os.path.dirname(__file__) + '/../bin/'
 
+if 'PIGLIT_SOURCE_DIR' not in os.environ:
+    p = os.path
+    os.environ['PIGLIT_SOURCE_DIR'] = p.abspath(p.join(p.dirname(__file__), '..'))
 
 #############################################################################
 ##### Result classes
