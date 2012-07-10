@@ -2291,6 +2291,7 @@ arb_transform_feedback2['istranformfeedback'] = PlainExecTest(['arb_transform_fe
 arb_transform_feedback2['glGenTransformFeedbacks names only'] = concurrent_test('arb_transform_feedback2-gen-names-only')
 arb_transform_feedback2['cannot bind when another object is active'] = concurrent_test('arb_transform_feedback2-cannot-bind-when-active')
 arb_transform_feedback2['misc. API queries'] = concurrent_test('arb_transform_feedback2-api-queries')
+arb_transform_feedback2['counting with pause'] = concurrent_test('arb_transform_feedback2-pause-counting')
 
 arb_transform_feedback_instanced = Group()
 spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
