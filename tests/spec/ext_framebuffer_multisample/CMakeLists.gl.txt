@@ -24,6 +24,8 @@ piglit_add_executable (ext_framebuffer_multisample-dlist dlist.c)
 piglit_add_executable (ext_framebuffer_multisample-enable-flag enable-flag.cpp common.cpp)
 piglit_add_executable (ext_framebuffer_multisample-formats common.cpp formats.cpp)
 piglit_add_executable (ext_framebuffer_multisample-interpolation common.cpp interpolation.cpp)
+piglit_add_executable (ext_framebuffer_multisample-int-draw-buffers-alpha-to-one common.cpp
+		       draw-buffers-common.cpp int-draw-buffers-alpha-to-one.cpp)
 piglit_add_executable (ext_framebuffer_multisample-line-smooth common.cpp line-smooth.cpp)
 piglit_add_executable (ext_framebuffer_multisample-minmax minmax.c)
 piglit_add_executable (ext_framebuffer_multisample-multisample-blit common.cpp multisample-blit.cpp)
