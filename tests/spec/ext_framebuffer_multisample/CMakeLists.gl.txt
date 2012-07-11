@@ -16,6 +16,8 @@ piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-sizes common.
 piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-formats common.cpp blit-mismatched-formats.cpp)
 piglit_add_executable (ext_framebuffer_multisample-clear common.cpp clear.cpp)
 piglit_add_executable (ext_framebuffer_multisample-clip-and-scissor-blit common.cpp clip-and-scissor-blit.cpp)
+piglit_add_executable (ext_framebuffer_multisample-draw-buffers-alpha-to-one common.cpp
+		       draw-buffers-common.cpp draw-buffers-alpha-to-one.cpp)
 piglit_add_executable (ext_framebuffer_multisample-dlist dlist.c)
 piglit_add_executable (ext_framebuffer_multisample-enable-flag enable-flag.cpp common.cpp)
 piglit_add_executable (ext_framebuffer_multisample-formats common.cpp formats.cpp)
