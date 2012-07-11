@@ -1,0 +1,193 @@
+#
+# A basic mipmap test:
+#
+# Create an 8x8 texture with four miplevels, colored red, green, blue, and
+# white, respectively.  Draw the following:
+#
+#
+# (integer LODs)     (fractional w/ linear)       (fractional w/ nearest)
+#
+# miplevel 3 +
+#                    [2.2] [2.4] [2.6] [2.8]      [2.2] [2.4] [2.6] [2.8]
+# miplevel 2 +-+
+#            +-+
+#                    [1.2] [1.4] [1.6] [1.8]      [1.2] [1.4] [1.6] [1.8]
+# miplevel 1 +---+
+#            |   |
+#            +---+
+#                    [0.2] [0.4] [0.6] [0.8]      [0.2] [0.4] [0.6] [0.8]
+#            +------+
+# miplevel 0 |      |
+#            |      |
+#            +------+
+#
+# This verifies that textureGrad() selects the proper miplevel for integer
+# LODs (left boxes) and that both linear and nearest filtering for fractional
+# LODs work correctly.
+#
+# It does not verify anything regarding texture coordinates.
+
+[require]
+GLSL >= 1.30
+
+[fragment shader]
+#version 130
+uniform sampler2D tex;
+uniform float lod;
+void main()
+{
+    float dsdx = exp2(lod) / 8;
+    float dtdy = exp2(lod) / 8;
+    gl_FragColor = textureGrad(tex, vec2(0.5, 0.5 + 0.0001*lod), vec2(dsdx, 0.0), vec2(0.0, dtdy));
+}
+
+[vertex shader]
+#version 130
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[test]
+ortho
+clear color 0.4 0.4 0.4 0.4
+clear
+
+uniform int tex 0
+texture miptree 0
+
+# Draw the miptree: basic integer LODs.
+
+texparameter 2D min nearest_mipmap_nearest
+texparameter 2D mag nearest
+
+uniform float lod 0
+draw rect 10 10 32 32
+
+uniform float lod 1
+draw rect 10 52 16 16
+
+uniform float lod 2
+draw rect 10 78 8 8
+
+uniform float lod 3
+draw rect 10 96 4 4
+
+# Fractional LODs: nearest filtering between miplevels
+
+uniform float lod 0.2
+draw rect 152 42 10 10
+
+uniform float lod 0.4
+draw rect 167 42 10 10
+
+uniform float lod 0.6
+draw rect 182 42 10 10
+
+uniform float lod 0.8
+draw rect 197 42 10 10
+
+uniform float lod 1.2
+draw rect 152 68 10 10
+
+uniform float lod 1.4
+draw rect 167 68 10 10
+
+uniform float lod 1.6
+draw rect 182 68 10 10
+
+uniform float lod 1.8
+draw rect 197 68 10 10
+
+uniform float lod 2.2
+draw rect 152 86 10 10
+
+uniform float lod 2.4
+draw rect 167 86 10 10
+
+uniform float lod 2.6
+draw rect 182 86 10 10
+
+uniform float lod 2.8
+draw rect 197 86 10 10
+
+
+# Fractional LODs: linear filtering between miplevels
+
+texparameter 2D min nearest_mipmap_linear
+
+uniform float lod 0.2
+draw rect 52 42 10 10
+
+uniform float lod 0.4
+draw rect 67 42 10 10
+
+uniform float lod 0.6
+draw rect 82 42 10 10
+
+uniform float lod 0.8
+draw rect 97 42 10 10
+
+uniform float lod 1.2
+draw rect 52 68 10 10
+
+uniform float lod 1.4
+draw rect 67 68 10 10
+
+uniform float lod 1.6
+draw rect 82 68 10 10
+
+uniform float lod 1.8
+draw rect 97 68 10 10
+
+uniform float lod 2.2
+draw rect 52 86 10 10
+
+uniform float lod 2.4
+draw rect 67 86 10 10
+
+uniform float lod 2.6
+draw rect 82 86 10 10
+
+uniform float lod 2.8
+draw rect 97 86 10 10
+
+# Probes: integer LODs
+probe rgb 26 15 1.0 0.0 0.0
+probe rgb 18 57 0.0 1.0 0.0
+probe rgb 14 83 0.0 0.0 1.0
+probe rgb 12 98 1.0 1.0 1.0
+
+# Probes: nearest filtering
+probe rgb 157 47 1.0 0.0 0.0
+probe rgb 172 47 1.0 0.0 0.0
+probe rgb 189 47 0.0 1.0 0.0
+probe rgb 202 47 0.0 1.0 0.0
+
+probe rgb 157 73 0.0 1.0 0.0
+probe rgb 172 73 0.0 1.0 0.0
+probe rgb 189 73 0.0 0.0 1.0
+probe rgb 202 73 0.0 0.0 1.0
+
+probe rgb 157 91 0.0 0.0 1.0
+probe rgb 172 91 0.0 0.0 1.0
+probe rgb 189 91 1.0 1.0 1.0
+probe rgb 202 91 1.0 1.0 1.0
+
+# Probes: linear filtering (tolerance of 0.05 makes it pass on fglrx)
+tolerance 0.05 0.05 0.05 0.05
+
+probe rgb  57 47 0.8 0.2 0.0
+probe rgb  72 47 0.6 0.4 0.0
+probe rgb  89 47 0.4 0.6 0.0
+probe rgb 102 47 0.2 0.8 0.0
+
+probe rgb  57 73 0.0 0.8 0.2
+probe rgb  72 73 0.0 0.6 0.4
+probe rgb  89 73 0.0 0.4 0.6
+probe rgb 102 73 0.0 0.2 0.8
+
+probe rgb  57 91 0.2 0.2 1.0
+probe rgb  72 91 0.4 0.4 1.0
+probe rgb  89 91 0.6 0.6 1.0
+probe rgb 102 91 0.8 0.8 1.0
