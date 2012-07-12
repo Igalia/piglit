@@ -576,3 +576,8 @@ Test *
 create_test(test_type_enum test_type, int n_samples, bool small,
 	    bool combine_depth_stencil, int pattern_width,
 	    int pattern_height, int supersample_factor);
+
+void
+visualize_image(float *img, GLenum base_internal_format,
+		int image_width, int image_height,
+		int draw_buffer_count, bool rhs);

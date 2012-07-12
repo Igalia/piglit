@@ -1693,3 +1693,85 @@ create_test(test_type_enum test_type, int n_samples, bool small,
 		   pattern_height, supersample_factor);
 	return test;
 }
+
+/**
+ * Convert the image into a format that can be easily understood by
+ * visual inspection, and display it on the screen.
+ *
+ * Luminance and intensity values are converted to a grayscale value.
+ * Alpha values are visualized by blending the image with a grayscale
+ * checkerboard.
+ *
+ * Pass image_count = 0 to disable drawing multiple images to window
+ * system framebuffer.
+ */
+void
+visualize_image(float *img, GLenum base_internal_format,
+		int image_width, int image_height,
+		int image_count, bool rhs)
+{
+	unsigned components = piglit_num_components(base_internal_format);
+	float *visualization =
+		(float *) malloc(sizeof(float)*3*image_width*image_height);
+	for (int y = 0; y < image_height; ++y) {
+		for (int x = 0; x < image_width; ++x) {
+			float r = 0, g = 0, b = 0, a = 1;
+			float *pixel =
+				&img[(y * image_width + x) * components];
+			switch (base_internal_format) {
+			case GL_ALPHA:
+				a = pixel[0];
+				break;
+			case GL_RGBA:
+				a = pixel[3];
+				/* Fall through */
+			case GL_RGB:
+				b = pixel[2];
+				/* Fall through */
+			case GL_RG:
+				g = pixel[1];
+				/* Fall through */
+			case GL_RED:
+				r = pixel[0];
+				break;
+			case GL_LUMINANCE_ALPHA:
+				a = pixel[1];
+				/* Fall through */
+			case GL_INTENSITY:
+			case GL_LUMINANCE:
+				r = pixel[0];
+				g = pixel[0];
+				b = pixel[0];
+				break;
+			}
+			float checker = ((x ^ y) & 0x10) ? 0.75 : 0.25;
+			r = r * a + checker * (1 - a);
+			g = g * a + checker * (1 - a);
+			b = b * a + checker * (1 - a);
+			visualization[(y * image_width + x) * 3] = r;
+			visualization[(y * image_width + x) * 3 + 1] = g;
+			visualization[(y * image_width + x) * 3 + 2] = b;
+		}
+	}
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glUseProgram(0);
+
+	/* To simultaneously display multiple images on window system
+	 * framebuffer.
+	 */
+	if(image_count) {
+		/* Use glWindowPos to directly update x, y coordinates of
+		 * current raster position without getting transformed by
+		 * modelview projection matrix and viewport-to-window
+		 * transform.
+		 */
+		glWindowPos2f(rhs ? image_width : 0,
+			      (image_count - 1) * image_height);
+	}
+	else {
+		glRasterPos2f(rhs ? 0 : -1, -1);
+	}
+	glDrawPixels(image_width, image_height, GL_RGB, GL_FLOAT,
+		     visualization);
+	free(visualization);
+}

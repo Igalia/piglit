@@ -396,70 +396,6 @@ PatternRenderer ref_renderer;
 
 
 /**
- * Convert the image into a format that can be easily understood by
- * visual inspection, and display it on the screen.
- *
- * Luminance and intensity values are converted to a grayscale value.
- * Alpha values are visualized by blending the image with a grayscale
- * checkerboard.
- */
-void
-visualize_image(float *img, GLenum base_internal_format, bool rhs)
-{
-	unsigned components = piglit_num_components(base_internal_format);
-	float *visualization =
-		(float *) malloc(sizeof(float)*3*pattern_width*pattern_height);
-	for (int y = 0; y < pattern_height; ++y) {
-		for (int x = 0; x < pattern_width; ++x) {
-			float r = 0, g = 0, b = 0, a = 1;
-			float *pixel =
-				&img[(y * pattern_width + x) * components];
-			switch (base_internal_format) {
-			case GL_ALPHA:
-				a = pixel[0];
-				break;
-			case GL_RGBA:
-				a = pixel[3];
-				/* Fall through */
-			case GL_RGB:
-				b = pixel[2];
-				/* Fall through */
-			case GL_RG:
-				g = pixel[1];
-				/* Fall through */
-			case GL_RED:
-				r = pixel[0];
-				break;
-			case GL_LUMINANCE_ALPHA:
-				a = pixel[1];
-				/* Fall through */
-			case GL_INTENSITY:
-			case GL_LUMINANCE:
-				r = pixel[0];
-				g = pixel[0];
-				b = pixel[0];
-				break;
-			}
-			float checker = ((x ^ y) & 0x10) ? 0.75 : 0.25;
-			r = r * a + checker * (1 - a);
-			g = g * a + checker * (1 - a);
-			b = b * a + checker * (1 - a);
-			visualization[(y * pattern_width + x) * 3] = r;
-			visualization[(y * pattern_width + x) * 3 + 1] = g;
-			visualization[(y * pattern_width + x) * 3 + 2] = b;
-		}
-	}
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glViewport(0, 0, piglit_width, piglit_height);
-	glUseProgram(0);
-	glRasterPos2f(rhs ? 0 : -1, -1);
-	glDrawPixels(pattern_width, pattern_height, GL_RGB, GL_FLOAT,
-		     visualization);
-	free(visualization);
-}
-
-
-/**
  * Transform the reference image (which is in GL_RGBA format) to an
  * expected image for a given base internal format, using the the
  * transformation described in the GL 3.0 spec, table 3.15 (Conversion
@@ -582,11 +518,20 @@ test_format(const struct format_desc *format)
 					   num_components, tolerance,
 					   expected_image, test_image);
 
+
 	/* Show both the test and expected images on screen so that
-	 * the user can diagnose problems.
+	 * the user can diagnose problems. Pass image_count = 0 to
+	 * display image without any offset applied to raster position.
 	 */
-	visualize_image(test_image, format->base_internal_format, false);
-	visualize_image(expected_image, format->base_internal_format, true);
+	glViewport(0, 0, piglit_width, piglit_height);
+	visualize_image(test_image, format->base_internal_format,
+			pattern_width, pattern_height,
+			0 /* image_count */,
+			false /* rhs */);
+	visualize_image(expected_image, format->base_internal_format,
+			pattern_width, pattern_height,
+			0 /* image_count */,
+			true /* rhs */);
 
 	/* Finally, if any error occurred, count that as a failure. */
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
