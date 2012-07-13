@@ -28,6 +28,7 @@ piglit_add_executable (ext_framebuffer_multisample-negative-copyteximage negativ
 piglit_add_executable (ext_framebuffer_multisample-negative-max-samples negative-max-samples.c)
 piglit_add_executable (ext_framebuffer_multisample-negative-mismatched-samples negative-mismatched-samples.c)
 piglit_add_executable (ext_framebuffer_multisample-negative-readpixels negative-readpixels.c)
+piglit_add_executable (ext_framebuffer_multisample-no-color no-color.cpp common.cpp)
 piglit_add_executable (ext_framebuffer_multisample-point-smooth common.cpp point-smooth.cpp)
 piglit_add_executable (ext_framebuffer_multisample-polygon-smooth common.cpp polygon-smooth.cpp)
 piglit_add_executable (ext_framebuffer_multisample-polygon-stipple common.cpp polygon-stipple.cpp)

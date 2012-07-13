@@ -1477,6 +1477,15 @@ for num_samples in MSAA_SAMPLE_COUNTS:
                 ext_framebuffer_multisample[test_name] = PlainExecTest(
                         executable)
 
+for num_samples in MSAA_SAMPLE_COUNTS:
+        for test_type in ('depth', 'depth-computed', 'stencil'):
+                for buffer_config in ('combined', 'separate', 'single'):
+                        test_name = ' '.join(['no-color', str(num_samples),
+                                              test_type, buffer_config])
+                        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                                test_name)
+                        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
