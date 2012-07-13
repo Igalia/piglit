@@ -116,7 +116,9 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  height(height),
 	  combine_depth_stencil(true),
 	  attach_texture(false),
-	  color_internalformat(GL_RGBA)
+	  color_internalformat(GL_RGBA),
+	  depth_internalformat(GL_DEPTH_COMPONENT24),
+	  stencil_internalformat(GL_STENCIL_INDEX8)
 {
 }
 
@@ -186,36 +188,38 @@ Fbo::try_setup(const FboConfig &new_config)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, handle);
 
 	/* Color buffer */
-	if (!config.attach_texture) {
-		glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-						 config.num_samples,
-						 config.color_internalformat,
-						 config.width,
-						 config.height);
-		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-					  GL_COLOR_ATTACHMENT0,
-					  GL_RENDERBUFFER, color_rb);
-	} else {
-		glBindTexture(GL_TEXTURE_2D, color_tex);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-				GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-				GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D,
-			     0 /* level */,
-			     config.color_internalformat,
-			     config.width,
-			     config.height,
-			     0 /* border */,
-			     GL_RGBA /* format */,
-			     GL_BYTE /* type */,
-			     NULL /* data */);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-				       GL_COLOR_ATTACHMENT0,
-				       GL_TEXTURE_2D,
-				       color_tex,
-				       0 /* level */);
+	if (config.color_internalformat != GL_NONE) {
+		if (!config.attach_texture) {
+			glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+							 config.num_samples,
+							 config.color_internalformat,
+							 config.width,
+							 config.height);
+			glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
+						  GL_COLOR_ATTACHMENT0,
+						  GL_RENDERBUFFER, color_rb);
+		} else {
+			glBindTexture(GL_TEXTURE_2D, color_tex);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+					GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+					GL_NEAREST);
+			glTexImage2D(GL_TEXTURE_2D,
+				     0 /* level */,
+				     config.color_internalformat,
+				     config.width,
+				     config.height,
+				     0 /* border */,
+				     GL_RGBA /* format */,
+				     GL_BYTE /* type */,
+				     NULL /* data */);
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+					       GL_COLOR_ATTACHMENT0,
+					       GL_TEXTURE_2D,
+					       color_tex,
+					       0 /* level */);
+		}
 	}
 
 	/* Depth/stencil buffer(s) */
@@ -230,23 +234,29 @@ Fbo::try_setup(const FboConfig &new_config)
 					  GL_DEPTH_STENCIL_ATTACHMENT,
 					  GL_RENDERBUFFER, depth_rb);
 	} else {
-		glBindRenderbuffer(GL_RENDERBUFFER, stencil_rb);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-						 config.num_samples,
-						 GL_STENCIL_INDEX8,
-						 config.width, config.height);
-		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-					  GL_STENCIL_ATTACHMENT,
-					  GL_RENDERBUFFER, stencil_rb);
+		if (config.stencil_internalformat != GL_NONE) {
+			glBindRenderbuffer(GL_RENDERBUFFER, stencil_rb);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+							 config.num_samples,
+							 config.stencil_internalformat,
+							 config.width,
+							 config.height);
+			glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
+						  GL_STENCIL_ATTACHMENT,
+						  GL_RENDERBUFFER, stencil_rb);
+		}
 
-		glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-						 config.num_samples,
-						 GL_DEPTH_COMPONENT24,
-						 config.width, config.height);
-		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-					  GL_DEPTH_ATTACHMENT,
-					  GL_RENDERBUFFER, depth_rb);
+		if (config.depth_internalformat != GL_NONE) {
+			glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
+			glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+							 config.num_samples,
+							 config.depth_internalformat,
+							 config.width,
+							 config.height);
+			glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
+						  GL_DEPTH_ATTACHMENT,
+						  GL_RENDERBUFFER, depth_rb);
+		}
 	}
 
 	bool success = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)

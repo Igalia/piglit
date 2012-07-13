@@ -66,10 +66,27 @@ public:
 	bool attach_texture;
 
 	/**
-	 * Internalformat that should be used for the color buffer.
-	 * Defaults to GL_RGBA.
+	 * Internalformat that should be used for the color buffer, or
+	 * GL_NONE if no color buffer should be used.  Defaults to
+	 * GL_RGBA.
 	 */
 	GLenum color_internalformat;
+
+	/**
+	 * Internalformat that should be used for the depth buffer, or
+	 * GL_NONE if no depth buffer should be used.  Ignored if
+	 * combine_depth_stencil is true.  Defaults to
+	 * GL_DEPTH_COMPONENT24.
+	 */
+	GLenum depth_internalformat;
+
+	/**
+	 * Internalformat that should be used for the stencil buffer,
+	 * or GL_NONE if no stencil buffer should be used.  Ignored if
+	 * combine_depth_stencil is true.  Defaults to
+	 * GL_STENCIL_INDEX8.
+	 */
+	GLenum stencil_internalformat;
 };
 
 /**
