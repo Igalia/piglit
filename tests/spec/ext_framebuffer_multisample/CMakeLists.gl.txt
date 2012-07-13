@@ -12,6 +12,8 @@ link_libraries (
 piglit_add_executable (ext_framebuffer_multisample-accuracy common.cpp accuracy.cpp)
 piglit_add_executable (ext_framebuffer_multisample-alpha-to-one-msaa-disabled common.cpp
 		       draw-buffers-common.cpp alpha-to-one-msaa-disabled.cpp)
+piglit_add_executable (ext_framebuffer_multisample-alpha-to-one-single-sample-buffer common.cpp
+		       draw-buffers-common.cpp alpha-to-one-single-sample-buffer.cpp)
 piglit_add_executable (ext_framebuffer_multisample-bitmap common.cpp bitmap.cpp)
 piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-samples common.cpp blit-mismatched-samples.cpp)
 piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-sizes common.cpp blit-mismatched-sizes.cpp)
