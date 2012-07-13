@@ -378,10 +378,19 @@ public:
 	 */
 	GLenum out_type;
 
+	/**
+	 * Whether or not the fragment shader should output a depth
+	 * value.
+	 *
+	 * Defaults to false.
+	 */
+	bool compute_depth;
+
 protected:
 	GLint prog;
 	GLint rotation_loc;
-	GLint depth_loc;
+	GLint vert_depth_loc;
+	GLint frag_depth_loc;
 	GLint proj_loc;
 	GLint draw_colors_loc;
 	GLuint vao;
@@ -435,10 +444,17 @@ public:
  * depth values, with depth testing enabled.  They are drawn in an
  * arbitrary non-consecutive order, to verify that depth testing
  * properly sorts the surfaces into front-to-back order.
+ *
+ * If the constructor parameter compute_depth is true, the depth value
+ * is determined using a fragment shader output.  If it is false, it
+ * is determined by the z value of the vertex shader gl_Position
+ * output.
  */
 class DepthSunburst : public Sunburst
 {
 public:
+	explicit DepthSunburst(bool compute_depth = false);
+
 	virtual void draw(const float (*proj)[4]);
 };
 

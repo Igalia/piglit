@@ -1032,7 +1032,8 @@ void Points::draw(const float (*proj)[4])
 }
 
 Sunburst::Sunburst()
-	: out_type(GL_UNSIGNED_NORMALIZED)
+	: out_type(GL_UNSIGNED_NORMALIZED),
+	  compute_depth(false)
 {
 }
 
@@ -1081,7 +1082,7 @@ void Sunburst::compile()
 		"in vec3 in_barycentric_coords;\n"
 		"out vec3 barycentric_coords;\n"
 		"uniform float rotation;\n"
-		"uniform float depth;\n"
+		"uniform float vert_depth;\n"
 		"uniform mat4 proj;\n"
 		"\n"
 		"void main()\n"
@@ -1089,13 +1090,15 @@ void Sunburst::compile()
 		"  vec2 pos = pos_within_tri;\n"
 		"  pos = mat2(cos(rotation), sin(rotation),\n"
 		"             -sin(rotation), cos(rotation)) * pos;\n"
-		"  gl_Position = proj * vec4(pos, depth, 1.0);\n"
+		"  gl_Position = proj * vec4(pos, vert_depth, 1.0);\n"
 		"  barycentric_coords = in_barycentric_coords;\n"
 		"}\n";
 
 	static const char *frag_template =
 		"#version 130\n"
 		"#define OUT_TYPE %s\n"
+		"#define COMPUTE_DEPTH %s\n"
+		"uniform float frag_depth;\n"
 		"in vec3 barycentric_coords;\n"
 		"uniform mat3x4 draw_colors;\n"
 		"out OUT_TYPE frag_out;\n"
@@ -1103,6 +1106,9 @@ void Sunburst::compile()
 		"void main()\n"
 		"{\n"
 		"  frag_out = OUT_TYPE(draw_colors * barycentric_coords);\n"
+		"#if COMPUTE_DEPTH\n"
+		"  gl_FragDepth = (frag_depth + 1.0) / 2.0;\n"
+		"#endif\n"
 		"}\n";
 
 	/* Compile program */
@@ -1113,7 +1119,8 @@ void Sunburst::compile()
 	unsigned frag_alloc_len =
 		strlen(frag_template) + strlen(out_type_glsl) + 1;
 	char *frag = (char *) malloc(frag_alloc_len);
-	sprintf(frag, frag_template, out_type_glsl);
+	sprintf(frag, frag_template, out_type_glsl,
+		compute_depth ? "1" : "0");
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	free(frag);
 	glAttachShader(prog, fs);
@@ -1128,8 +1135,10 @@ void Sunburst::compile()
 	/* Set up uniforms */
 	glUseProgram(prog);
 	rotation_loc = glGetUniformLocation(prog, "rotation");
-	depth_loc = glGetUniformLocation(prog, "depth");
-	glUniform1f(depth_loc, 0.0);
+	vert_depth_loc = glGetUniformLocation(prog, "vert_depth");
+	frag_depth_loc = glGetUniformLocation(prog, "frag_depth");
+	glUniform1f(vert_depth_loc, 0.0);
+	glUniform1f(frag_depth_loc, 0.0);
 	proj_loc = glGetUniformLocation(prog, "proj");
 	draw_colors_loc = glGetUniformLocation(prog, "draw_colors");
 
@@ -1241,6 +1250,13 @@ StencilSunburst::draw(const float (*proj)[4])
 	glDisable(GL_STENCIL_TEST);
 }
 
+
+DepthSunburst::DepthSunburst(bool compute_depth)
+{
+	this->compute_depth = compute_depth;
+}
+
+
 void
 DepthSunburst::draw(const float (*proj)[4])
 {
@@ -1263,7 +1279,7 @@ DepthSunburst::draw(const float (*proj)[4])
 		 * triangles at depths of 3/4, 1/2, -1/4, 0, 1/4, 1/2,
 		 * and 3/4.
 		 */
-		glUniform1f(depth_loc,
+		glUniform1f(compute_depth ? frag_depth_loc : vert_depth_loc,
 			    float(num_tris - triangle_to_draw * 2 - 1)
 			    / (num_tris + 1));
 
