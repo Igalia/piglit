@@ -4,6 +4,7 @@
 import itertools
 import os
 import os.path as path
+import platform
 
 from framework.core import *
 from framework.exectest import *
@@ -2417,7 +2418,8 @@ profile.tests['shaders'] = shaders
 profile.tests['security'] = security
 profile.tests['texturing'] = texturing
 profile.tests['spec'] = spec
-profile.tests['glx'] = glx
+if platform.system() is not 'Windows':
+	profile.tests['glx'] = glx
 
 # Remove blacklisted tests
 for test_path in blacklist:
