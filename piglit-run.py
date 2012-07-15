@@ -186,6 +186,8 @@ def main():
 	# from being run again.
 	if OptionResume:
 		for (key, value) in old_results.tests.items():
+			if os.path.sep != '/':
+				key = key.replace(os.path.sep, '/', -1)
 			json_writer.write_dict_item(key, value)
 			env.exclude_tests.add(key)
 
