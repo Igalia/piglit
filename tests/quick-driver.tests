@@ -2,6 +2,8 @@
 
 import os.path
 
+global profile
+
 execfile(os.path.dirname(__file__) + '/quick.tests')
 
 # These don't test the driver

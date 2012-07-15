@@ -1,6 +1,8 @@
 
 import os.path
 
+global profile
+
 execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 
 from framework.core import *
