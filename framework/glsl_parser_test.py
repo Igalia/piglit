@@ -74,6 +74,8 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
 					# basepath.
 					testname = os.path.relpath(
 						filepath, basepath)
+					if os.path.sep != '/':
+						testname = testname.replace(os.path.sep, '/', -1)
 					assert isinstance(testname, basestring)
 					add_glsl_parser_test(
 						group,
