@@ -1422,10 +1422,11 @@ for num_samples in MSAA_SAMPLE_COUNTS:
                 ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['sample-alpha-to-coverage', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+        for buffer_type in ('color', 'depth'):
+                test_name = ' '.join(['sample-alpha-to-coverage', str(num_samples), buffer_type])
+                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                        test_name)
+                ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
         test_name = ' '.join(['sample-alpha-to-one', str(num_samples)])

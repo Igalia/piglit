@@ -44,23 +44,29 @@
  */
 
 PIGLIT_GL_TEST_MAIN(512 /*window_width*/,
-		    768 /*window_height*/,
+		    256 /*window_height*/,
 		    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
+
+static GLenum buffer_to_test;
 
 void
 print_usage_and_exit(char *prog_name)
 {
-        printf("Usage: %s <num_samples>\n", prog_name);
+	printf("Usage: %s <num_samples> <test_type>\n"
+	       "  where <test_type> is one of:\n"
+	       "    color\n"
+	       "    depth\n",
+	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
 void
 piglit_init(int argc, char **argv)
 {
+	const int num_attachments = 1;
 	int samples;
-	int num_attachments = 1;
-
-	if (argc < 2)
+	piglit_require_gl_version(30);
+	if (argc < 3)
 		print_usage_and_exit(argv[0]);
 	{
 		char *endptr = NULL;
@@ -68,8 +74,14 @@ piglit_init(int argc, char **argv)
 		if (endptr != argv[1] + strlen(argv[1]))
 			print_usage_and_exit(argv[0]);
 	}
-
-	piglit_require_gl_version(30);
+	if (strcmp(argv[2], "color") == 0) {
+		buffer_to_test = GL_COLOR_BUFFER_BIT;
+	} else if (strcmp(argv[2], "depth") == 0) {
+		buffer_to_test = GL_DEPTH_BUFFER_BIT;
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_ALWAYS);
+	} else
+		print_usage_and_exit(argv[0]);
 
 	int pattern_width = piglit_width / 2;
 	int pattern_height = piglit_height / num_attachments;
@@ -89,7 +101,7 @@ piglit_init(int argc, char **argv)
 				      pattern_width,
 				      pattern_height,
 				      num_attachments,
-				      GL_COLOR_BUFFER_BIT,
+				      buffer_to_test,
 				      GL_RGBA);
 	shader_compile();
 }
@@ -103,13 +115,13 @@ piglit_display()
 	glClear(GL_COLOR_BUFFER_BIT);
 	allocate_data_arrays();
 
-	/* Reference image drawn when sample_alpha_to_coverage is enabled,
-	 * doesn't represent an expected image. Reference image is drawn only
-	 * to visualize the image difference caused by enabling
-	 * sample_alpha_to_coverage
+	/* Reference image drawn here doesn't represent an expected image.
+	 * Reference image is drawn only to visualize the image difference
+	 * caused by enabling sample_alpha_to_coverage in test image.
 	 */
-	draw_reference_image(true /* sample_alpha_to_coverage */,
-			     false /* sample_alpha_to_one */);
+	if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+		draw_reference_image(true /* sample_alpha_to_coverage */,
+				     false /* sample_alpha_to_one */);
 
 	draw_test_image(true /* sample_alpha_to_coverage */,
 			false /* sample_alpha_to_one */);
@@ -123,12 +135,15 @@ piglit_display()
 	 * of 1 / num_samples makes image compare (test / reference image)
 	 * unsuitable for this test.
 	 */
-	pass = probe_framebuffer_color() && pass;
+	if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+		pass = probe_framebuffer_color() && pass;
+	else if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
+		pass = probe_framebuffer_depth() && pass;
 
 	/* Free the memory allocated for data arrays */
 	free_data_arrays();
 
-	if (!piglit_automatic)
+	if (!piglit_automatic && buffer_to_test == GL_COLOR_BUFFER_BIT)
 		piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
