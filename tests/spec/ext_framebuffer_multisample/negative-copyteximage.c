@@ -93,7 +93,7 @@ piglit_init(int argc, char **argv)
 
 	/* Finally, the actual test! */
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 1, 1, 0);
-	if (!piglit_check_gl_error(GL_INVALID_FRAMEBUFFER_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
 	glDeleteTextures(1, &tex);

@@ -90,7 +90,7 @@ piglit_init(int argc, char **argv)
 
 	/* Finally, the actual test! */
 	glCopyPixels(0, 0, 1, 1, GL_COLOR);
-	if (!piglit_check_gl_error(GL_INVALID_FRAMEBUFFER_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 		piglit_report_result(PIGLIT_FAIL);
 
 	glDeleteRenderbuffersEXT(1, &rb);
