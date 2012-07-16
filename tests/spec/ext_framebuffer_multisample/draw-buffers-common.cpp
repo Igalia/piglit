@@ -72,13 +72,16 @@ static GLbitfield buffer_to_test;
 
 static float *coverage = NULL;
 static float *color = NULL;
-static float *expected = NULL;
+static float *depth = NULL;
+static float *expected_color = NULL;
+static float *expected_depth = NULL;
 
 static int num_draw_buffers;
 static int num_samples;
 static int num_rects;
 static int prog;
 static int color_loc;
+static int depth_loc;
 static int frag_0_color_loc;
 static int alpha_to_coverage_loc;
 static int pattern_width;
@@ -89,6 +92,7 @@ static bool is_buffer_zero_integer_format = false;
 static const int num_components = 4; /* for RGBA formats */
 static const int num_color_bits = 8; /* for GL_RGBA & GL_RGBA8I formats */
 
+static const float bg_depth = 0.8;
 static const float bg_color[4] = {
 	0.0, 0.6, 0.0, 0.4 };
 
@@ -98,13 +102,17 @@ static const GLenum draw_buffers[] = {
 	GL_COLOR_ATTACHMENT1_EXT,
 	GL_COLOR_ATTACHMENT2_EXT };
 
+/* Offset the viewport transformation on depth value passed to the vertex
+ * shader by setting it to (2 * depth - 1.0).
+ */
 static const char *vert =
 	"#version 130\n"
 	"in vec2 pos;\n"
 	"uniform float depth;\n"
 	"void main()\n"
 	"{\n"
-	"  gl_Position = gl_ModelViewProjectionMatrix * vec4(pos, 0.0, 1.0);\n"
+        "  vec4 eye_pos = gl_ModelViewProjectionMatrix * vec4(pos, 0.0, 1.0);\n"
+	"  gl_Position = vec4(eye_pos.xy, 2 * depth - 1.0, 1.0);\n"
 	"}\n";
 
 /* Fragment shader outputs to three draw buffers. Output different alpha values
@@ -177,6 +185,7 @@ shader_compile(void)
 	/* Set up uniforms */
 	glUseProgram(prog);
 	color_loc = glGetUniformLocation(prog, "color");
+	depth_loc = glGetUniformLocation(prog, "depth");
 	frag_0_color_loc = glGetUniformLocation(prog, "frag_0_color");
 	alpha_to_coverage_loc = glGetUniformLocation(prog, "alphatocoverage");
 }
@@ -198,10 +207,18 @@ allocate_data_arrays(void)
 	}
 
 	/* Allocate data arrays based on number of samples used */
-	color = (float *) malloc(num_rects * num_components * sizeof(float));
+	color = (float *) malloc(num_rects *
+				 num_components *
+				 sizeof(float));
+	expected_color = (float *) malloc(num_draw_buffers *
+				  num_rects *
+				  num_components *
+				  sizeof(float));
+	depth = (float *) malloc(num_rects * sizeof(float));
+	expected_depth = (float *) malloc(num_draw_buffers *
+					  num_rects *
+					  sizeof(float));
 	coverage = (float *) malloc(num_rects * sizeof(float));
-	expected = (float *) malloc(num_draw_buffers * num_rects *
-				    num_components * sizeof(float));
 
 	for(int i = 0; i < num_rects; i++) {
 		unsigned rect_idx = i * num_components;
@@ -209,11 +226,19 @@ allocate_data_arrays(void)
 			color[rect_idx + j] =
 			(sin((float)(rect_idx + j)) + 1) / 2;
 		}
-		/* Alpha value will be directly used as coverage */
-		if (num_samples)
-			color[rect_idx + 3] = i * alpha_scale;
+
+		/* In case of alpha-to-coverage enabled, alpha values will be
+		 * directly used as coverage.
+		 */
+		if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
+			/* For depth buffer testing with alpha-to-coverage,
+			 * set more rects with alpha = 1.0.
+			 */
+			color[rect_idx + 3] = 2 * i * alpha_scale;
 		else
 			color[rect_idx + 3] = i * alpha_scale;
+
+		depth[i] =  i * (alpha_scale / 2.0);
 	}
 }
 
@@ -222,10 +247,12 @@ free_data_arrays(void)
 {
 	free(color);
 	color = NULL;
+	free(depth);
+	depth = NULL;
 	free(coverage);
 	coverage = NULL;
-	free(expected);
-	expected = NULL;
+	free(expected_color);
+	expected_color = NULL;
 }
 
 void
@@ -249,8 +276,11 @@ draw_pattern(bool sample_alpha_to_coverage,
 	     float *float_color)
 {
 	glUseProgram(prog);
-	glClearColor(bg_color[0], bg_color[1],
-		     bg_color[2], bg_color[3]);
+	if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+		glClearColor(bg_color[0], bg_color[1],
+			     bg_color[2], bg_color[3]);
+	else if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
+		glClearDepth(bg_depth);
 	glClear(buffer_to_test);
 
 	if(!is_reference_image) {
@@ -289,6 +319,7 @@ draw_pattern(bool sample_alpha_to_coverage,
 			glUniform4fv(frag_0_color_loc, 1,
 				     (float_color + i * num_components));
 		}
+		glUniform1f(depth_loc, depth[i]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,
 			       (void *) indices);
 	}
@@ -297,15 +328,100 @@ draw_pattern(bool sample_alpha_to_coverage,
 }
 
 void
+compute_expected_color(bool sample_alpha_to_coverage,
+		       bool sample_alpha_to_one,
+		       int draw_buffer_count)
+{
+	unsigned buffer_idx_offset = draw_buffer_count *
+				     num_rects *
+				     num_components;
+	/* Coverage value decides the number of samples in multisample buffer
+	 * covered by an incoming fragment, which will then receive the
+	 * fragment data. When the multisample buffer is resolved it gets
+	 * blended with the background color which is written to the remaining
+	 * samples.
+	 * Page 254 (page 270 of the PDF) of the OpenGL 3.0 spec says:
+	 * "The method of combination is not specified, though a simple average
+	 * computed independently for each color component is recommended."
+	 * This is followed by NVIDIA and AMD in their proprietary drivers.
+	 */
+	for (int i = 0; i < num_rects; i++) {
+
+		float samples_used = coverage[i] * num_samples;
+		/* Expected color values are computed only for integer
+		 * number of samples_used. Non-integer values may result
+		 * in dithering effect.
+		 */
+		if(samples_used == (int) samples_used) {
+			int rect_idx_offset = buffer_idx_offset +
+					      i * num_components;
+			for (int j = 0; j < num_components - 1 ; j++) {
+
+				expected_color[rect_idx_offset + j] =
+				color[i * num_components + j] * coverage[i] +
+				bg_color[j] * (1 - coverage[i]);
+			}
+
+			/* Compute expected alpha values of draw buffers */
+			float frag_alpha = color[i * num_components + 3];
+			int alpha_idx = rect_idx_offset + 3;
+
+			if ((!num_samples &&
+			     !sample_alpha_to_coverage) ||
+			    is_buffer_zero_integer_format) {
+				/* Taking in account alpha values modified by
+				 * fragment shader.
+				 */
+				expected_color[alpha_idx] =
+					is_buffer_zero_integer_format ?
+					frag_alpha / pow(2, draw_buffer_count) :
+					frag_alpha;
+			}
+			else if (sample_alpha_to_coverage) {
+				/* Taking in account alpha values modified by
+				 * fragment shader.
+				 */
+				frag_alpha /= pow(2, draw_buffer_count);
+				if(sample_alpha_to_one) {
+					expected_color[alpha_idx] =
+					1.0 * coverage[i] +
+					bg_color[3] * (1 - coverage[i]);
+				}
+				else {
+					expected_color[alpha_idx] =
+					frag_alpha * coverage[i] +
+					bg_color[3] * (1 - coverage[i]);
+				}
+			}
+			else {
+				expected_color[alpha_idx] =
+					sample_alpha_to_one ? 1.0 : frag_alpha;
+			}
+		}
+	}
+
+}
+
+void
+compute_expected_depth(void)
+{
+	/* Compute the expected depth values only for coverage value equal to
+	 * 0.0 and 1.0. Expected depth is not defined by OpenGL specification
+	 * when coverage value is between 0.0 and 1.0 */
+	for (int i = 0; i < num_rects; i++) {
+		if (coverage[i] == 0.0)
+			expected_depth[i] = bg_depth;
+		else if (coverage[i] == 1.0)
+			expected_depth[i] = (depth[i] < 1.0) ? depth[i] : 1.0;
+	}
+}
+
+void
 compute_expected(bool sample_alpha_to_coverage,
 		 bool sample_alpha_to_one,
 		 int draw_buffer_count)
 {
-	int i, j;
-	unsigned buffer_idx_offset = draw_buffer_count *
-				     num_rects *
-				     num_components;
-
+	int i;
 	/* Compute the coverage value used in the test */
 	if (num_samples &&
 	    sample_alpha_to_coverage &&
@@ -324,70 +440,13 @@ compute_expected(bool sample_alpha_to_coverage,
 			coverage[i] = 1.0;
 	}
 
-	/* Coverage value decides the number of samples in multisample buffer
-	 * covered by an incoming fragment, which will then receive the
-	 * fragment data. When the multisample buffer is resolved it gets
-	 * blended with the background color which is written to the remaining
-	 * samples.
-	 * Page 254 (page 270 of the PDF) of the OpenGL 3.0 spec says:
-	 * "The method of combination is not specified, though a simple average
-	 * computed independently for each color component is recommended."
-	 * This is followed by NVIDIA and AMD in their proprietary drivers.
-	 */
-	for (i = 0; i < num_rects; i++) {
+	if (buffer_to_test == GL_COLOR_BUFFER_BIT)
+		compute_expected_color(sample_alpha_to_coverage,
+				       sample_alpha_to_one,
+				       draw_buffer_count);
+	else if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
+		compute_expected_depth();
 
-		float samples_used = coverage[i] * num_samples;
-		/* Expected color values are computed only for integer
-		 * number of samples_used. Non-integer values may result
-		 * in dithering effect.
-		 */
-		if(samples_used == (int) samples_used) {
-			int rect_idx_offset = buffer_idx_offset +
-					      i * num_components;
-			for (j = 0; j < num_components - 1 ; j++) {
-
-				expected[rect_idx_offset + j] =
-				color[i * num_components + j] * coverage[i] +
-				bg_color[j] * (1 - coverage[i]);
-			}
-
-			/* Compute expected alpha values of draw buffers */
-			float frag_alpha = color[i * num_components + 3];
-			int alpha_idx = rect_idx_offset + 3;
-
-			if ((!num_samples &&
-			     !sample_alpha_to_coverage) ||
-			    is_buffer_zero_integer_format) {
-				/* Taking in account alpha values modified by
-				 * fragment shader.
-				 */
-				expected[alpha_idx] =
-					is_buffer_zero_integer_format ?
-					frag_alpha / pow(2, draw_buffer_count) :
-					frag_alpha;
-			}
-			else if (sample_alpha_to_coverage) {
-				/* Taking in account alpha values modified by
-				 * fragment shader.
-				 */
-				frag_alpha /= pow(2, draw_buffer_count);
-				if(sample_alpha_to_one) {
-					expected[alpha_idx] =
-					1.0 * coverage[i] +
-					bg_color[3] * (1 - coverage[i]);
-				}
-				else {
-					expected[alpha_idx] =
-					frag_alpha * coverage[i] +
-					bg_color[3] * (1 - coverage[i]);
-				}
-			}
-			else {
-				expected[alpha_idx] =
-					sample_alpha_to_one ? 1.0 : frag_alpha;
-			}
-		}
-	}
 }
 
 /* This function probes all the draw buffers blitted to downsampled FBO
@@ -420,7 +479,7 @@ probe_framebuffer_color(void)
 			float samples_used = coverage[j] * num_samples;
 			int rect_x = 0;
 			int rect_y = i * pattern_height +
-				     j * (pattern_height / num_rects);
+				     j * rect_height;
 			int rect_idx_offset = (i * num_rects + j) *
 					      num_components;
 
@@ -430,7 +489,7 @@ probe_framebuffer_color(void)
 			if(samples_used == (int)samples_used) {
 				if(is_integer_operation) {
 					float_color_to_int_color(expected_int_color,
-								 expected);
+								 expected_color);
 					result = piglit_probe_rect_rgba_int(
 						 rect_x,
 						 rect_y,
@@ -446,7 +505,7 @@ probe_framebuffer_color(void)
 						 rect_y,
 						 rect_width,
 						 rect_height,
-						 expected + rect_idx_offset)
+						 expected_color + rect_idx_offset)
 						 && result;
 				}
 			}
@@ -454,6 +513,37 @@ probe_framebuffer_color(void)
 	}
 	if(expected_int_color)
 		free(expected_int_color);
+	return result;
+}
+
+bool
+probe_framebuffer_depth(void)
+{
+	bool result = true;
+	int rect_width = pattern_width;
+	int rect_height = pattern_height / num_rects;
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_fbo.handle);
+	for (int i = 0; i < num_rects; i++) {
+		if(coverage[i] == 0.0 || coverage[i] == 1.0) {
+			int rect_x = 0;
+			int rect_y = i * rect_height;
+			int rect_idx = i;
+
+			result = piglit_probe_rect_depth(
+				 rect_x,
+				 rect_y,
+				 rect_width,
+				 rect_height,
+				 expected_depth[rect_idx])
+				 && result;
+		}
+		else {
+		/*Skip probing polygons which are drawn with fractional
+		* coverage value (between 0.0 and 1.0)*/
+		       continue;
+		}
+	}
 	return result;
 }
 
@@ -540,11 +630,13 @@ draw_test_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 				  pattern_width, pattern_height + y_offset,
 				  buffer_to_test, GL_NEAREST);
 
-		draw_image_to_window_system_fb(i /* draw_buffer_count */,
-					       false /* rhs */);
+		if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+			draw_image_to_window_system_fb(i /* draw_buffer_count */,
+						       false /* rhs */);
 
 		/* Expected color values for all the draw buffers are computed
-		 * to aid probe_framebuffer_color() in verification.
+		 * to aid probe_framebuffer_color() and probe_framebuffer_depth()
+		 * in verification.
 		 */
 		if(sample_alpha_to_coverage) {
 			/* Expected color is different for different draw
@@ -581,14 +673,15 @@ draw_reference_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 		draw_pattern(sample_alpha_to_coverage,
 			     sample_alpha_to_one,
 			     true /* is_reference_image */,
-			     expected);
+			     expected_color);
 	}
 
 	for(int i = 0; i < num_draw_buffers; i++) {
 
 		/* Blit ms_fbo to resolve_fbo to resolve multisample buffer */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo.handle);
-		glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
+		if (buffer_to_test == GL_COLOR_BUFFER_BIT)
+			glReadBuffer(GL_COLOR_ATTACHMENT0_EXT + i);
 		if (is_buffer_zero_integer_format && !i) {
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
 					  resolve_int_fbo.handle);

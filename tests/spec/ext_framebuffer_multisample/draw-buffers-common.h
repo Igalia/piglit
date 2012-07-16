@@ -54,8 +54,13 @@ void ms_fbo_and_draw_buffers_setup(int samples,
 				   GLenum color_buffer_zero_format);
 
 /* Probe downsampled FBO (resolve_fbo / resolve_int_fbo) to compare against
- * expected color for each draw buffer
+ * expected color for each draw buffer.
  */
 bool probe_framebuffer_color(void);
+
+/* Probe downsampled FBO (resolve_fbo) to compare against expected depth values
+ * for each draw buffer.
+ */
+bool probe_framebuffer_depth(void);
 
 void shader_compile(void);
