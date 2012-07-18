@@ -47,6 +47,7 @@ struct vertex {
 };
 
 struct stipple_line {
+	const char *name;
 	GLint factor;
 	GLuint pattern;
 	GLfloat color[3];
@@ -131,31 +132,37 @@ static struct vertex Factor2Vertices[] = { { 0, 32 }, { 32, 32 }, { 32, 33 }, { 
 static struct vertex Factor3Vertices[] = { { 0, 35 }, { 63, 35 }, { 63, 36 }, { 0, 36 } };
 static struct stipple_line Lines[] = {
 	{ /* Baseline */
+		"Baseline",
 		1, 0xffff, { 1.0, 1.0, 1.0 },
 		GL_LINES, 2,
 		BaselineVertices
 	},
 	{ /* Restarting lines within a single Begin/End block */
+		"Restarting lines within a single Begin/End block",
 		1, 0x00ff, { 1.0, 0.0, 0.0 },
 		GL_LINES, 4,
 		RestartVertices
 	},
 	{ /* Line strip */
+		"Line strip",
 		1, 0x0f8f, { 1.0, 1.0, 0.0 },
 		GL_LINE_STRIP, 3,
 		LinestripVertices
 	},
 	{ /* Line loop */
+		"Line loop",
 		1, 0x8cef, { 0.0, 1.0, 0.0 },
 		GL_LINE_LOOP, 4,
 		LineloopVertices
 	},
 	{ /* Factor 2x */
+		"Factor 2x",
 		2, 0x838f, { 0.0, 0.0, 1.0 },
 		GL_LINE_LOOP, 4,
 		Factor2Vertices
 	},
 	{ /* Factor 3x */
+		"Factor 3x",
 		3, 0xf731, { 0.0, 1.0, 1.0 },
 		GL_LINE_LOOP, 4,
 		Factor3Vertices
@@ -174,8 +181,10 @@ static void test(void)
 	glPushMatrix();
 	glTranslatef(basex, basey, 0.0);
 
-	for(i = 0; i < sizeof(Lines)/sizeof(Lines[0]); ++i)
+	for(i = 0; i < sizeof(Lines)/sizeof(Lines[0]); ++i) {
+		puts(Lines[i].name);
 		test_line(&Lines[i]);
+	}
 	glPopMatrix();
 
 	glutSwapBuffers();
