@@ -71,6 +71,14 @@ display(void)
 static void
 reshape(int w, int h)
 {
+	if (piglit_automatic &&
+	    (w != piglit_width ||
+	     h != piglit_height)) {
+		printf("Got spurious window resize in automatic run "
+		       "(%d,%d to %d,%d)\n", piglit_width, piglit_height, w, h);
+		piglit_report_result(PIGLIT_WARN);
+	}
+
 	piglit_width = w;
 	piglit_height = h;
 
