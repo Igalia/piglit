@@ -610,28 +610,6 @@ add_vpfpgeneric('vp-sge-alias')
 add_vpfpgeneric('vp-two-constants')
 shaders['vpfp-generic'] = vpfpgeneric
 
-bugs = Group()
-add_plain_test(bugs, 'crash-cubemap-order')
-add_plain_test(bugs, 'crash-texparameter-before-teximage')
-add_plain_test(bugs, 'drawbuffer-modes')
-add_plain_test(bugs, 'fdo9833')
-add_plain_test(bugs, 'fdo10370')
-add_plain_test(bugs, 'fdo14575')
-add_plain_test(bugs, 'fdo20701')
-add_plain_test(bugs, 'fdo22540')
-add_plain_test(bugs, 'fdo23489')
-add_plain_test(bugs, 'fdo23670-depth_test')
-add_plain_test(bugs, 'fdo23670-drawpix_stencil')
-add_plain_test(bugs, 'fdo24066')
-add_plain_test(bugs, 'fdo25614-genmipmap')
-add_plain_test(bugs, 'fdo28551')
-add_plain_test(bugs, 'fdo31934')
-add_plain_test(bugs, 'point-sprite')
-add_plain_test(bugs, 'r300-readcache')
-add_plain_test(bugs, 'tex1d-2dborder')
-add_plain_test(bugs, 'tri-tex-crash')
-add_plain_test(bugs, 'vbo-buffer-unmap')
-
 glx = Group()
 add_plain_test(glx, 'glx-copy-sub-buffer')
 add_plain_test(glx, 'glx-destroycontext-1')
@@ -868,12 +846,27 @@ add_texwrap_test2(gl11, '2D', 'GL_INTENSITY12')
 add_texwrap_test2(gl11, '2D', 'GL_INTENSITY16')
 gl11['copyteximage 1D'] = PlainExecTest(['copyteximage', '-auto', '1D'])
 gl11['copyteximage 2D'] = PlainExecTest(['copyteximage', '-auto', '2D'])
+add_plain_test(gl11, 'drawbuffer-modes')
+add_plain_test(gl11, 'fdo9833')
+add_plain_test(gl11, 'fdo10370')
+add_plain_test(gl11, 'fdo23489')
+add_plain_test(gl11, 'fdo23670-depth_test')
+add_plain_test(gl11, 'fdo23670-drawpix_stencil')
+add_plain_test(gl11, 'r300-readcache')
+add_plain_test(gl11, 'tri-tex-crash')
+add_plain_test(gl11, 'vbo-buffer-unmap')
 
 gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_test1(gl12, '3D')
 add_texwrap_test2(gl12, '3D', 'proj')
 gl12['copyteximage 3D'] = PlainExecTest(['copyteximage', '-auto', '3D'])
+add_plain_test(gl12, 'crash-texparameter-before-teximage')
+
+gl14 = Group()
+spec['!OpenGL 1.4'] = gl14
+add_plain_test(gl14, 'fdo25614-genmipmap')
+add_plain_test(gl14, 'tex1d-2dborder')
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
@@ -1078,6 +1071,11 @@ import_glsl_parser_tests(spec['AMD_conservative_depth'],
 			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
 			 [''])
 
+# Group ARB_point_sprite
+arb_point_sprite = Group()
+spec['ARB_point_sprite'] = arb_point_sprite
+add_plain_test(arb_point_sprite, 'point-sprite')
+
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
@@ -1157,6 +1155,8 @@ arb_framebuffer_object = Group()
 spec['ARB_framebuffer_object'] = arb_framebuffer_object
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT')
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT')
+add_plain_test(arb_framebuffer_object, 'fdo28551')
+
 
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
@@ -1345,6 +1345,10 @@ arb_vertex_buffer_object = Group()
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
 arb_vertex_buffer_object['elements-negative-offset'] = PlainExecTest(['arb_vertex_buffer_object-elements-negative-offset', '-auto'])
 arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PlainExecTest(['arb_vertex_buffer_object-mixed-immediate-and-vbo', '-auto'])
+add_plain_test(arb_vertex_buffer_object, 'fdo14575')
+add_plain_test(arb_vertex_buffer_object, 'fdo22540')
+add_plain_test(arb_vertex_buffer_object, 'fdo31934')
+
 
 arb_vertex_program = Group()
 spec['ARB_vertex_program'] = arb_vertex_program
@@ -1352,6 +1356,7 @@ arb_vertex_program['getenv4d-with-error'] = PlainExecTest(['arb_vertex_program-g
 arb_vertex_program['getlocal4d-with-error'] = PlainExecTest(['arb_vertex_program-getlocal4d-with-error', '-auto'])
 arb_vertex_program['clip-plane-transformation arb'] = concurrent_test('clip-plane-transformation arb')
 arb_vertex_program['minmax'] = concurrent_test('arb_vertex_program-minmax')
+add_plain_test(arb_vertex_program, 'fdo24066')
 
 ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
@@ -1547,6 +1552,7 @@ add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX4')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX8')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX16')
 add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-noimage')
+add_plain_test(ext_framebuffer_object, 'fdo20701')
 
 
 ext_packed_depth_stencil = Group()
@@ -1571,6 +1577,7 @@ ext_texture_array['copyteximage 2D_ARRAY'] = PlainExecTest(['copyteximage', '-au
 arb_texture_cube_map = Group()
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
 arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-auto', 'CUBE'])
+add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 
 
 ext_texture_compression_latc = Group()
@@ -2477,7 +2484,6 @@ add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
-profile.tests['bugs'] = bugs
 profile.tests['general'] = general
 profile.tests['hiz'] = hiz
 profile.tests['fbo'] = fbo
