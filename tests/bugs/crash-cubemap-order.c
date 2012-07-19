@@ -24,6 +24,8 @@ piglit_init(int argc, char **argv)
 {
 	GLubyte data[4096]; /* 32*32*4 */
 
+	piglit_require_extension("GL_ARB_texture_cube_map");
+
 	memset(data, 0, sizeof(data));
 	
 	glViewport(0, 0, piglit_width, piglit_height);
