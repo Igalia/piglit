@@ -1047,6 +1047,7 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-discard-exit-2')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-beginend')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawarrays')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-execution-ordering')
 
 spec['glsl-1.30']['api'] = Group()
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
