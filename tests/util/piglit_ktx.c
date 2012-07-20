@@ -26,9 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <errno.h>
-#include <sys/mman.h>
-
 #include "piglit_ktx.h"
 
 /* FIXME: Remove #defines when piglit-dispatch gains support for GLES. */
