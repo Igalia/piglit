@@ -54,14 +54,26 @@ class ExecTest(Test):
 			if valgrind:
 				command[:0] = ['valgrind', '--quiet', '--error-exitcode=1', '--tool=memcheck']
 
-			proc = subprocess.Popen(
-				command,
-				stdout=subprocess.PIPE,
-				stderr=subprocess.PIPE,
-				env=fullenv,
-				universal_newlines=True
-				)
-			out, err = proc.communicate()
+			i = 0
+			while True:
+				proc = subprocess.Popen(
+					command,
+					stdout=subprocess.PIPE,
+					stderr=subprocess.PIPE,
+					env=fullenv,
+					universal_newlines=True
+					)
+				out, err = proc.communicate()
+
+				# https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
+				# affecting many developers.  If we catch it
+				# happening, try just re-running the test.
+				if out.find("Got spurious window resize") >= 0:
+					i = i + 1
+					if i >= 5:
+						break
+				else:
+					break
 
 			# proc.communicate() returns 8-bit strings, but we need
 			# unicode strings.  In Python 2.x, this is because we
