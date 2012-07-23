@@ -1,0 +1,14 @@
+
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	${GLPROTO_INCLUDE_DIRS}
+)
+
+link_libraries (
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+	${X11_X11_LIB}
+)
+
+# vim: ft=cmake:

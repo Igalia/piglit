@@ -17,3 +17,6 @@ egl['egl-query-surface-EGL_BAD_ATTRIBUTE'] = plain_test('egl-query-surface --bad
 egl['egl-query-surface-EGL_BAD_SURFACE'] = plain_test('egl-query-surface --bad-surface')
 egl['egl-query-surface-EGL_HEIGHT'] = plain_test('egl-query-surface --attr=EGL_HEIGHT')
 egl['egl-query-surface-EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WIDTH')
+
+create_context = Group();
+egl['EGL_KHR_create_context'] = create_context
