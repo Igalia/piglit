@@ -88,6 +88,7 @@ static int pattern_width;
 static int pattern_height;
 
 static bool is_buffer_zero_integer_format = false;
+static GLenum draw_buffer_zero_format;
 
 static const int num_components = 4; /* for RGBA formats */
 static const int num_color_bits = 8; /* for GL_RGBA & GL_RGBA8I formats */
@@ -443,10 +444,16 @@ compute_expected(bool sample_alpha_to_coverage,
 			coverage[i] = 1.0;
 	}
 
-	if (buffer_to_test == GL_COLOR_BUFFER_BIT)
+	if (buffer_to_test == GL_COLOR_BUFFER_BIT) {
+		/* Don't compute expected color for color buffer zero
+		 * if no renderbuffer is attached to it.
+		 */
+		if(draw_buffer_count == 0 && draw_buffer_zero_format == GL_NONE)
+			return;
 		compute_expected_color(sample_alpha_to_coverage,
 				       sample_alpha_to_one,
 				       draw_buffer_count);
+	}
 	else if (buffer_to_test == GL_DEPTH_BUFFER_BIT)
 		compute_expected_depth();
 
@@ -464,6 +471,11 @@ probe_framebuffer_color(void)
 	int rect_height = pattern_height / num_rects;
 
 	for (int i = 0; i < num_draw_buffers; i++) {
+		/* Don't probe color buffer zero if no renderbuffer is
+		 * attached to it.
+		 */
+		if( i == 0 && draw_buffer_zero_format == GL_NONE)
+			continue;
 		bool is_integer_operation = is_buffer_zero_integer_format && !i;
 
 		if(is_integer_operation) {
@@ -733,6 +745,7 @@ ms_fbo_and_draw_buffers_setup(int samples,
 
 	pattern_width = width;
 	pattern_height = height;
+	draw_buffer_zero_format = color_buffer_zero_format;
 
 	/* Setup frame buffer objects with required configuration */
 	FboConfig ms_config(samples, pattern_width, pattern_height);
@@ -755,7 +768,8 @@ ms_fbo_and_draw_buffers_setup(int samples,
 		resolve_int_fbo.setup(resolve_config);
 		is_buffer_zero_integer_format = true;
 	}
-	else if (color_buffer_zero_format != GL_RGBA){
+	else if (color_buffer_zero_format != GL_RGBA &&
+		 color_buffer_zero_format != GL_NONE) {
 		printf("Draw buffer zero format is not"
 		       " supported by test functions.\n");
 		piglit_report_result(PIGLIT_FAIL);
