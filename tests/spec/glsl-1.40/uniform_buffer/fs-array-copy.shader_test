@@ -1,0 +1,43 @@
+[require]
+GLSL >= 1.40
+
+[vertex shader]
+#version 140
+
+in vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 140
+
+uniform int i;
+uniform ubo1 {
+	vec4 colors[4];
+};
+
+void main()
+{
+	vec4 temp[4] = colors;
+	temp[0] = vec4(1.0, 0.0, 0.0, 0.0);
+	gl_FragColor = temp[i];
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform int i 1
+uniform vec4 colors[0] 0.0 0.0 0.0 0.0
+uniform vec4 colors[1] 0.0 1.0 0.0 0.0
+uniform vec4 colors[2] 0.0 1.0 1.0 0.0
+uniform vec4 colors[3] 1.0 0.0 1.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 0.0
