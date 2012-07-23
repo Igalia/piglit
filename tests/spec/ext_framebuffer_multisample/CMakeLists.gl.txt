@@ -10,6 +10,8 @@ link_libraries (
 )
 
 piglit_add_executable (ext_framebuffer_multisample-accuracy common.cpp accuracy.cpp)
+piglit_add_executable (ext_framebuffer_multisample-alpha-to-coverage-no-draw-buffer-zero common.cpp
+                       draw-buffers-common.cpp alpha-to-coverage-no-draw-buffer-zero.cpp)
 piglit_add_executable (ext_framebuffer_multisample-alpha-blending alpha-blending.c)
 piglit_add_executable (ext_framebuffer_multisample-alpha-to-one-msaa-disabled common.cpp
 		       draw-buffers-common.cpp alpha-to-one-msaa-disabled.cpp)
