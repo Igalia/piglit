@@ -24,7 +24,7 @@
 /** @file getuniformindices.c
  *
  * Tests the glGetUniformIndices API: not writing on error conditions,
- * and consecutive indices starting from 0.
+ * invalid uniform names, and consecutive indices starting from 0.
  */
 
 #include "piglit-util-gl-common.h"
@@ -54,6 +54,7 @@ piglit_init(int argc, char **argv)
 	GLuint fs;
 	GLuint save_index = 0xaaaaaaaa;
 	const GLchar *one_uniform = "a";
+	const GLchar *bad_uniform = "d";
 	const GLchar *uniform_names[] = {"a", "b", "c"};
 	bool found_index[3] = {false, false, false};
 	GLuint indices[3], index;
@@ -119,6 +120,20 @@ piglit_init(int argc, char **argv)
 			pass = false;
 		}
 		found_index[indices[i]] = true;
+	}
+
+	/*     "If a string in <uniformNames> is not the name of an
+	 *      active uniform, the value INVALID_INDEX will be
+	 *      written to the corresponding element of
+	 *      <uniformIndices>."
+	 */
+	glGetUniformIndices(prog, 1, &bad_uniform, &index);
+	if (!piglit_check_gl_error(0)) {
+		pass = false;
+	} else if (index != GL_INVALID_INDEX) {
+		printf("Bad uniform index for %s: 0x%08x\n", bad_uniform, index);
+		printf("  Expected 0x%08x\n", GL_INVALID_INDEX);
+		pass = false;
 	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
