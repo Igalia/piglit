@@ -1487,6 +1487,12 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
+        test_name = ' '.join(['alpha-to-coverage-dual-src-blend', str(num_samples)])
+        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                test_name)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
         test_name = ' '.join(['int-draw-buffers-alpha-to-one', str(num_samples)])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
