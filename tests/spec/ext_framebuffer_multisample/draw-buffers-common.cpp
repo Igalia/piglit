@@ -88,6 +88,7 @@ static int pattern_width;
 static int pattern_height;
 
 static bool is_buffer_zero_integer_format = false;
+static bool is_dual_src_blending = false;
 static GLenum draw_buffer_zero_format;
 
 static const int num_components = 4; /* for RGBA formats */
@@ -116,30 +117,31 @@ static const char *vert =
 	"  gl_Position = vec4(eye_pos.xy, 2 * depth - 1.0, 1.0);\n"
 	"}\n";
 
-/* Fragment shader outputs to three draw buffers. Output different alpha values
- * to different draw buffers. This is required to verify that alpha values from
- * draw buffer zero are used to determine the fragment coverage value for all
- * the draw buffers.
+/* Fragment shader generates three different color outputs. Different color
+ * values are generated based on if sample_alpha_to_coverage / dual_src_blend
+ * are enabled or not.
  */
 static const char *frag_template =
 	"#version 130\n"
+	"#define DUAL_SRC_BLEND %d\n"
+	"#define ALPHA_TO_COVERAGE %d\n"
 	"#define OUT_TYPE %s\n"
 	"out OUT_TYPE frag_out_0;\n"
 	"out vec4 frag_out_1;\n"
 	"out vec4 frag_out_2;\n"
 	"uniform OUT_TYPE frag_0_color;\n"
 	"uniform vec4 color;\n"
-	"uniform bool alphatocoverage;\n"
 	"void main()\n"
 	"{\n"
 	"  frag_out_0 = frag_0_color;\n"
-	"  if(alphatocoverage) {\n"
+	"  #if DUAL_SRC_BLEND\n"
+	"    frag_out_1 = vec4(color.rgb, 1.0 - color.a / 2.0);\n"
+	"  #elif ALPHA_TO_COVERAGE\n"
 	"    frag_out_1 = vec4(color.rgb, color.a / 2);\n"
 	"    frag_out_2 = vec4(color.rgb, color.a / 4);\n"
-	"  }\n"
-	"  else {\n"
+	"  #else\n"
 	"    frag_out_1 = frag_out_2 = color;\n"
-	"  }\n"
+	"  #endif\n"
 	"}\n";
 
 const char *
@@ -151,16 +153,19 @@ get_out_type_glsl(void)
 		return "vec4";
 }
 void
-shader_compile(void)
+shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 {
+	is_dual_src_blending = dual_src_blend;
 	/* Compile program */
 	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
 
+	/* Generate appropriate fragment shader program */
 	const char *out_type_glsl = get_out_type_glsl();;
         unsigned frag_alloc_len = strlen(frag_template) +
 				  strlen(out_type_glsl) + 1;
 	char *frag = (char *) malloc(frag_alloc_len);
-	sprintf(frag, frag_template, out_type_glsl);
+	sprintf(frag, frag_template, is_dual_src_blending,
+		sample_alpha_to_coverage, out_type_glsl);
 
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	prog = piglit_link_simple_program(vs, fs);
@@ -170,12 +175,18 @@ shader_compile(void)
 	}
 	free(frag);
 
-	glBindFragDataLocation(prog, 0, "frag_out_0");
-	/* For multiple draw buffers */
-	if (num_draw_buffers > 1) {
+	if (is_dual_src_blending) {
+		glBindFragDataLocationIndexed(prog, 0, 0, "frag_out_0");
+		glBindFragDataLocationIndexed(prog, 0, 1, "frag_out_1");
+
+	}
+	else if (num_draw_buffers > 1) {
+		glBindFragDataLocation(prog, 0, "frag_out_0");
 		glBindFragDataLocation(prog, 1, "frag_out_1");
 		glBindFragDataLocation(prog, 2, "frag_out_2");
 	}
+	else
+		glBindFragDataLocation(prog, 0, "frag_out_0");
 
 	glBindAttribLocation(prog, 0, "pos");
 	glEnableVertexAttribArray(0);
@@ -331,6 +342,76 @@ draw_pattern(bool sample_alpha_to_coverage,
 	free(integer_color);
 }
 
+float
+get_alpha_blend_factor(float src0_alpha, float src1_alpha,
+		       bool compute_src)
+{
+	GLint blend_func;
+	if(compute_src)
+		glGetIntegerv(GL_BLEND_SRC_RGB, &blend_func);
+	else
+		glGetIntegerv(GL_BLEND_DST_RGB, &blend_func);
+
+	switch(blend_func) {
+		case GL_SRC_ALPHA:
+			return src0_alpha;
+			break;
+		case GL_ONE_MINUS_SRC_ALPHA:
+			return (1.0 - src0_alpha);
+			break;
+		case GL_SRC1_ALPHA:
+			return src1_alpha;
+			break;
+		case GL_ONE_MINUS_SRC1_ALPHA:
+			return (1.0 - src1_alpha);
+			break;
+		default:
+			printf("Blend function is not supported"
+			       " by test case\n");
+	}
+	return -1;
+}
+
+void
+compute_blend_color(float *frag_color, int rect_count,
+		    bool sample_alpha_to_one)
+{
+	float src_blend_factor, dst_blend_factor;
+	/* Taking in to account alpha values output by
+	 * fragment shader.
+	 */
+	float src0_alpha = color[rect_count * num_components + 3];
+	float src1_alpha =  1.0 - src0_alpha / 2.0;
+
+	if(sample_alpha_to_one && num_samples) {
+		/* Set fragment src0_alpha, src1_alpha to 1.0 and use them
+		 * to compute blending factors.
+		 */
+		src0_alpha = 1.0;
+		src1_alpha = 1.0;
+	}
+
+	src_blend_factor = get_alpha_blend_factor(src0_alpha,
+						  src1_alpha,
+						  true);
+	dst_blend_factor = get_alpha_blend_factor(src0_alpha,
+						  src1_alpha,
+						  false);
+	/* Using default BlendEquation, blend_color is:
+	 * src0_color * src_blend_factor + dst_color * dst_blend_factor
+	 */
+	for (int j = 0; j < num_components; j++) {
+		float blend_color=
+		color[rect_count * num_components + j] *
+		src_blend_factor +
+		bg_color[j] *
+		dst_blend_factor;
+
+		frag_color[rect_count * num_components + j] =
+			(blend_color > 1) ? 1.0 : blend_color;
+	}
+}
+
 void
 compute_expected_color(bool sample_alpha_to_coverage,
 		       bool sample_alpha_to_one,
@@ -339,18 +420,9 @@ compute_expected_color(bool sample_alpha_to_coverage,
 	unsigned buffer_idx_offset = draw_buffer_count *
 				     num_rects *
 				     num_components;
-	/* Coverage value decides the number of samples in multisample buffer
-	 * covered by an incoming fragment, which will then receive the
-	 * fragment data. When the multisample buffer is resolved it gets
-	 * blended with the background color which is written to the remaining
-	 * samples.
-	 * Page 254 (page 270 of the PDF) of the OpenGL 3.0 spec says:
-	 * "The method of combination is not specified, though a simple average
-	 * computed independently for each color component is recommended."
-	 * This is followed by NVIDIA and AMD in their proprietary drivers.
-	 */
 	for (int i = 0; i < num_rects; i++) {
 
+		float *frag_color = NULL;
 		float samples_used = coverage[i] * num_samples;
 		/* Expected color values are computed only for integer
 		 * number of samples_used. Non-integer values may result
@@ -359,21 +431,49 @@ compute_expected_color(bool sample_alpha_to_coverage,
 		if(samples_used == (int) samples_used) {
 			int rect_idx_offset = buffer_idx_offset +
 					      i * num_components;
+			frag_color = (float *) malloc(num_rects *
+						      num_components *
+						      sizeof(float));
+
+			/* Do dual source blending computations */
+			if(is_dual_src_blending) {
+				compute_blend_color(frag_color,
+						    i /* rect_count */,
+						    sample_alpha_to_one);
+			}
+			else {
+				memcpy(frag_color, color,
+				       num_rects * num_components *
+				       sizeof(float));
+			}
+
+			/* Coverage value decides the number of samples in
+			 * multisample buffer covered by an incoming fragment,
+			 * which will then receive the fragment data. When the
+			 * multisample buffer is resolved it gets blended with
+			 * the background color which is written to the
+			 * remaining samples. Page 254 (page 270 of the PDF) of
+			 * the OpenGL 3.0 spec says: "The method of combination
+			 * is not specified, though a simple average computed
+			 * independently for each color component is recommended."
+			 * This is followed by NVIDIA and AMD in their proprietary
+			 * linux drivers.
+			 */
 			for (int j = 0; j < num_components - 1 ; j++) {
 
 				expected_color[rect_idx_offset + j] =
-				color[i * num_components + j] * coverage[i] +
+				frag_color[i * num_components + j] * coverage[i] +
 				bg_color[j] * (1 - coverage[i]);
 			}
 
 			/* Compute expected alpha values of draw buffers */
-			float frag_alpha = color[i * num_components + 3];
+			float frag_alpha = frag_color[i * num_components + 3];
 			int alpha_idx = rect_idx_offset + 3;
 
 			if ((!num_samples &&
 			     !sample_alpha_to_coverage) ||
 			    is_buffer_zero_integer_format) {
-				/* Taking in account alpha values modified by
+				/* Taking in to account alpha values output by
 				 * fragment shader.
 				 */
 				expected_color[alpha_idx] =
@@ -382,7 +482,7 @@ compute_expected_color(bool sample_alpha_to_coverage,
 					frag_alpha;
 			}
 			else if (sample_alpha_to_coverage) {
-				/* Taking in account alpha values modified by
+				/* Taking in to account alpha values output by
 				 * fragment shader.
 				 */
 				frag_alpha /= (1 << draw_buffer_count);
@@ -402,6 +502,7 @@ compute_expected_color(bool sample_alpha_to_coverage,
 					sample_alpha_to_one ? 1.0 : frag_alpha;
 			}
 		}
+		free(frag_color);
 	}
 
 }
@@ -645,15 +746,16 @@ draw_test_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 				  pattern_width, pattern_height + y_offset,
 				  buffer_to_test, GL_NEAREST);
 
-		if(buffer_to_test == GL_COLOR_BUFFER_BIT)
+		if(buffer_to_test == GL_COLOR_BUFFER_BIT) {
 			draw_image_to_window_system_fb(i /* draw_buffer_count */,
 						       false /* rhs */);
+		}
 
 		/* Expected color values for all the draw buffers are computed
 		 * to aid probe_framebuffer_color() and probe_framebuffer_depth()
 		 * in verification.
 		 */
-		if(sample_alpha_to_coverage) {
+		if(sample_alpha_to_coverage || is_dual_src_blending) {
 			/* Expected color is different for different draw
 			 * buffers
 			 */
@@ -716,8 +818,10 @@ draw_reference_image(bool sample_alpha_to_coverage, bool sample_alpha_to_one)
 				  pattern_width, pattern_height + y_offset,
 				  buffer_to_test, GL_NEAREST);
 
-		draw_image_to_window_system_fb(i /* buffer_count */,
-					       true  /* rhs */ );
+		if(buffer_to_test == GL_COLOR_BUFFER_BIT) {
+			draw_image_to_window_system_fb(i /* draw_buffer_count */,
+						       true /* rhs */);
+		}
 	}
 }
 

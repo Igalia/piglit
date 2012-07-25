@@ -63,4 +63,4 @@ bool probe_framebuffer_color(void);
  */
 bool probe_framebuffer_depth(void);
 
-void shader_compile(void);
+void shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend);

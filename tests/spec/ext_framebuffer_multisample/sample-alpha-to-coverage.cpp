@@ -28,7 +28,7 @@
  *
  * Verify sample alpha to coverage with multisample FBO
  *
- * When rendering to multiple draw buffers, fragment's alpha value should be
+ * When rendering to multisample FBO, fragment's alpha value should be
  * used to determine the coverage value.
  *
  * This test operates by drawing a pattern in multisample FBO to generate
@@ -103,7 +103,8 @@ piglit_init(int argc, char **argv)
 				      num_attachments,
 				      buffer_to_test,
 				      GL_RGBA);
-	shader_compile();
+	shader_compile(true /* sample_alpha_to_coverage */,
+		       false /* dual_src_blend */);
 }
 
 enum piglit_result
