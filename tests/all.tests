@@ -1944,6 +1944,7 @@ arb_uniform_buffer_object['negative-bindbuffer-buffer'] = concurrent_test('arb_u
 arb_uniform_buffer_object['negative-bindbuffer-index'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-index')
 arb_uniform_buffer_object['negative-bindbuffer-target'] = concurrent_test('arb_uniform_buffer_object-negative-bindbuffer-target')
 arb_uniform_buffer_object['negative-bindbufferrange-range'] = concurrent_test('arb_uniform_buffer_object-negative-bindbufferrange-range')
+arb_uniform_buffer_object['negative-getactiveuniformblockiv'] = concurrent_test('arb_uniform_buffer_object-negative-getactiveuniformblockiv')
 arb_uniform_buffer_object['referenced-by-shader'] = concurrent_test('arb_uniform_buffer_object-referenced-by-shader')
 arb_uniform_buffer_object['row-major'] = concurrent_test('arb_uniform_buffer_object-row-major')
 arb_uniform_buffer_object['uniformblockbinding'] = concurrent_test('arb_uniform_buffer_object-uniformblockbinding')

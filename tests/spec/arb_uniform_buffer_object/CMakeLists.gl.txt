@@ -31,6 +31,7 @@ add_executable (arb_uniform_buffer_object-negative-bindbuffer-index negative-bin
 add_executable (arb_uniform_buffer_object-negative-bindbuffer-buffer negative-bindbuffer-buffer.c)
 add_executable (arb_uniform_buffer_object-negative-bindbuffer-target negative-bindbuffer-target.c)
 add_executable (arb_uniform_buffer_object-negative-bindbufferrange-range negative-bindbufferrange-range.c)
+add_executable (arb_uniform_buffer_object-negative-getactiveuniformblockiv negative-getactiveuniformblockiv.c)
 add_executable (arb_uniform_buffer_object-referenced-by-shader referenced-by-shader.c)
 add_executable (arb_uniform_buffer_object-row-major row-major.c)
 add_executable (arb_uniform_buffer_object-uniformblockbinding uniformblockbinding.c)
