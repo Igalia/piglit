@@ -12,6 +12,7 @@ link_libraries (
 
 add_executable (arb_uniform_buffer_object-bindbuffer-general-point bindbuffer-general-point.c)
 add_executable (arb_uniform_buffer_object-buffer-targets buffer-targets.c)
+add_executable (arb_uniform_buffer_object-getactiveuniformblockiv-uniform-block-data-size getactiveuniformblockiv-uniform-block-data-size.c uniform-types.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformblockname getactiveuniformblockname.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformname getactiveuniformname.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformsiv-uniform-block-index getactiveuniformsiv-uniform-block-index.c)
