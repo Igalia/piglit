@@ -17,6 +17,7 @@ add_executable (arb_uniform_buffer_object-getactiveuniformblockname getactiveuni
 add_executable (arb_uniform_buffer_object-getactiveuniformname getactiveuniformname.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformsiv-uniform-array-stride getactiveuniformsiv-uniform-array-stride.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformsiv-uniform-block-index getactiveuniformsiv-uniform-block-index.c)
+add_executable (arb_uniform_buffer_object-getactiveuniformsiv-uniform-matrix-stride getactiveuniformsiv-uniform-matrix-stride.c)
 add_executable (arb_uniform_buffer_object-getactiveuniformsiv-uniform-type getactiveuniformsiv-uniform-type.c uniform-types.c)
 add_executable (arb_uniform_buffer_object-getintegeri_v getintegeri_v.c)
 add_executable (arb_uniform_buffer_object-getprogramiv getprogramiv.c)

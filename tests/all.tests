@@ -1930,6 +1930,7 @@ arb_uniform_buffer_object['getactiveuniformblockname'] = concurrent_test('arb_un
 arb_uniform_buffer_object['getactiveuniformname'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformname')
 arb_uniform_buffer_object['getactiveuniformsiv-uniform-array-stride'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformsiv-uniform-array-stride')
 arb_uniform_buffer_object['getactiveuniformsiv-uniform-block-index'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformsiv-uniform-block-index')
+arb_uniform_buffer_object['getactiveuniformsiv-uniform-matrix-stride'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformsiv-uniform-matrix-stride')
 arb_uniform_buffer_object['getactiveuniformsiv-uniform-type'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformsiv-uniform-type')
 arb_uniform_buffer_object['getintegeri_v'] = concurrent_test('arb_uniform_buffer_object-getintegeri_v')
 arb_uniform_buffer_object['getprogramiv'] = concurrent_test('arb_uniform_buffer_object-getprogramiv')
