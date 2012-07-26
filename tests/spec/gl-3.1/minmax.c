@@ -118,11 +118,15 @@ piglit_init(int argc, char **argv)
 	 *      MAX_stage_UNIFORM_BLOCKS ×
 	 *      MAX_stage_UNIFORM_BLOCK_SIZE +
 	 *      MAX_stage_UNIFORM_COMPONENTS"
+	 *
+	 * But that doesn't make sense -- BLOCK_SIZE is in bytes,
+	 * while components is in number of floats.  The GL 3.3 spec
+	 * corrects this apparent typo to say BLOCK_SIZE / 4 * BLOCKS.
 	 */
 	piglit_test_min_int(GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS,
-			 vblocks * blocksize + vuniforms);
+			 vblocks * blocksize / 4 + vuniforms);
 	piglit_test_min_int(GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS,
-			 fblocks * blocksize + funiforms);
+			 fblocks * blocksize / 4 + funiforms);
 
 	piglit_test_min_int(GL_MAX_DRAW_BUFFERS, 8);
 
