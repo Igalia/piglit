@@ -1,7 +1,6 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${piglit_SOURCE_DIR}/tests/mesa/util
 )
 
 link_libraries (
@@ -10,5 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-piglit_add_executable (vertex-program-two-side vertex-program-two-side.c)
-piglit_add_executable (gl-2.0-edgeflag edgeflag.c)
+piglit_add_executable (gl-1.0-edgeflag edgeflag.c)
+piglit_add_executable (gl-1.0-edgeflag-quads edgeflag-quads.c)
+
+# vim: ft=cmake:

@@ -856,6 +856,11 @@ add_plain_test(gl11, 'r300-readcache')
 add_plain_test(gl11, 'tri-tex-crash')
 add_plain_test(gl11, 'vbo-buffer-unmap')
 
+gl10 = Group()
+spec['!OpenGL 1.0'] = gl10
+add_concurrent_test(gl10, 'gl-1.0-edgeflag')
+add_concurrent_test(gl10, 'gl-1.0-edgeflag-quads')
+
 gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_test1(gl12, '3D')
@@ -870,6 +875,7 @@ add_plain_test(gl14, 'tex1d-2dborder')
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
+add_concurrent_test(gl20, 'gl-2.0-edgeflag')
 add_texwrap_test2(gl20, '1D', 'npot')
 add_texwrap_test3(gl20, '1D', 'npot', 'proj')
 add_texwrap_test2(gl20, '2D', 'npot')
