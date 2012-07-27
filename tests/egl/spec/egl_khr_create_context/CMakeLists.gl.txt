@@ -11,4 +11,6 @@ link_libraries (
 	${X11_X11_LIB}
 )
 
+piglit_add_executable (egl-create-context-default-major-version-gles default-major-version-gles.c common.c)
+
 # vim: ft=cmake:
