@@ -1393,6 +1393,7 @@ arb_texture_buffer_object['minmax'] = concurrent_test('arb_texture_buffer_object
 arb_texture_buffer_object['negative-bad-bo'] = concurrent_test('arb_texture_buffer_object-negative-bad-bo')
 arb_texture_buffer_object['negative-bad-format'] = concurrent_test('arb_texture_buffer_object-negative-bad-format')
 arb_texture_buffer_object['negative-bad-target'] = concurrent_test('arb_texture_buffer_object-negative-bad-target')
+arb_texture_buffer_object['negative-unsupported'] = concurrent_test('arb_texture_buffer_object-negative-unsupported')
 arb_texture_buffer_object['unused-name'] = concurrent_test('arb_texture_buffer_object-unused-name')
 
 arb_texture_buffer_range = Group()
