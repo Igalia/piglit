@@ -22,6 +22,7 @@
  */
 
 #include "piglit-util-gl-common.h"
+#include <ctype.h>
 
 
 bool piglit_is_gles()
@@ -33,19 +34,16 @@ bool piglit_is_gles()
 int piglit_get_gl_version()
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);
-	const char *version_number_string;
 	int scanf_count;
 	int major;
 	int minor;
 
 	/* skip to version number */
-	if (strncmp("OpenGL ES ", version_string, 10) == 0)
-		version_number_string = version_string + 10;
-	else
-		version_number_string = version_string;
+	while (!isdigit(*version_string) && *version_string != '\0')
+		version_string++;
 
 	/* Interpret version number */
-	scanf_count = sscanf(version_number_string, "%i.%i", &major, &minor);
+	scanf_count = sscanf(version_string, "%i.%i", &major, &minor);
 	if (scanf_count != 2) {
 		printf("Unable to interpret GL_VERSION string: %s\n",
 		       version_string);
