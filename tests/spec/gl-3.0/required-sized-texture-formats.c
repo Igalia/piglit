@@ -35,17 +35,18 @@
  *      internal formats for any texture type will allocate exactly
  *      the internal component sizes and types shown for that format
  *      in tables 3.16- 3.17:"
+ *
+ * In GL 3.1 this is changed to allow increased precision for the
+ * required sized formats.  From page 118 of the GL 3.1 core spec PDF
+ * (20090528):
+ *
+ *     "In addition, implementations are required to support the
+ *      following sized and compressed internal formats. Requesting
+ *      one of these sized internal formats for any texture type will
+ *      allocate at least the internal component sizes, and exactly
+ *      the component types shown for that format in tables 3.12-
+ *      3.13: "
  */
-
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 10;
-
-	config.window_width = 32;
-	config.window_height = 32;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-
-PIGLIT_GL_TEST_CONFIG_END
 
 GLenum type_queries[CHANNELS] = {
 	GL_TEXTURE_RED_TYPE,
@@ -69,6 +70,8 @@ GLenum size_queries[CHANNELS] = {
 	GL_TEXTURE_STENCIL_SIZE,
 };
 
+static int target_version;
+
 enum piglit_result
 piglit_display(void)
 {
@@ -83,7 +86,7 @@ piglit_init(int argc, char **argv)
 	GLuint tex;
 	int i, c;
 
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(target_version);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -95,11 +98,16 @@ piglit_init(int argc, char **argv)
 		GLenum format, type;
 		const struct sized_internalformat *f;
 
-		/* FINISHME: Add support for future GL versions. */
-		if (required_formats[i].version != 30)
+		if (!valid_for_gl_version(&required_formats[i], target_version))
 			continue;
 
 		f = get_sized_internalformat(required_formats[i].token);
+		if (!f) {
+			printf("Failed to get sized format for %s\n",
+			       piglit_get_gl_enum_name(required_formats[i].token));
+			pass = false;
+			continue;
+		}
 
 		if (f->token == GL_DEPTH24_STENCIL8 ||
 		    f->token == GL_DEPTH32F_STENCIL8) {
@@ -184,8 +192,12 @@ piglit_init(int argc, char **argv)
 			    f->bits[c] == UCMP) {
 				if (sizes[c] <= 0 || sizes[c] > 8)
 					format_pass = false;
-			} else {
+			} else if (target_version == 30) {
 				if (sizes[c] != get_channel_size(f, c)) {
+					format_pass = false;
+				}
+			} else {
+				if (sizes[c] < get_channel_size(f, c)) {
 					format_pass = false;
 				}
 			}
@@ -220,4 +232,21 @@ piglit_init(int argc, char **argv)
 	glDeleteTextures(1, &tex);
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+}
+
+int
+main(int argc, char *argv[])
+{
+	struct piglit_gl_test_config config;
+
+	setup_required_size_test(argc, argv, &config);
+	target_version = MAX2(config.supports_gl_compat_version,
+			      config.supports_gl_core_version);
+	config.init = piglit_init;
+	config.display = piglit_display;
+
+	piglit_gl_test_run(argc, argv, &config);
+
+	/* UNREACHED */
+	return 0;
 }

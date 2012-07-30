@@ -41,6 +41,7 @@ static const struct {
 	{ 24, GL_UNSIGNED_NORMALIZED },
 
 	{ 16, GL_UNSIGNED_NORMALIZED },
+	{ 16, GL_SIGNED_NORMALIZED },
 	{ 16, GL_FLOAT },
 	{ 16, GL_INT },
 	{ 16, GL_UNSIGNED_INT },
@@ -129,6 +130,19 @@ const struct sized_internalformat sized_internalformats[] = {
 	FORMAT(GL_RGBA16UI, U16, U16, U16, U16, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA32I, I32, I32, I32, I32, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA32UI, U32, U32, U32, U32, NONE, NONE, NONE, NONE),
+
+	/* SNORM formats introduced as required sized texture formats
+	 * in GL 3.1, but didn't get sizes actually specified until GL
+	 * 3.2's table 3.12.
+	 */
+	FORMAT(GL_R8_SNORM, SN8, NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_R16_SNORM, SN16, NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RG8_SNORM, SN8, SN8, NONE, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RG16_SNORM, SN16, SN16, NONE, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGB8_SNORM, SN8, SN8, SN8, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGB16_SNORM, SN16, SN16, SN16, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGBA8_SNORM, SN8, SN8, SN8, SN8, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGBA16_SNORM, SN16, SN16, SN16, SN16, NONE, NONE, NONE, NONE),
 
 	/* Sized internal luminance formats, table 3.17 of the GL 3.0
 	 * specification.
@@ -225,6 +239,7 @@ const struct required_format required_formats[] = {
 	/* Required color formats (texture-only): */
 
 	{ GL_RGBA16_SNORM, 31, false },
+	{ GL_RGBA8_SNORM, 31, false },
 	{ GL_RGB32F, 30, false },
 	{ GL_RGB32I, 30, false },
 	{ GL_RGB32UI, 30, false },
@@ -244,11 +259,13 @@ const struct required_format required_formats[] = {
 	{ GL_RGB9_E5, 30, false },
 
 	{ GL_RG16_SNORM, 31, false },
+	{ GL_RG8_SNORM, 31, false },
 
 	{ GL_COMPRESSED_RG_RGTC2, 30, false },
 	{ GL_COMPRESSED_SIGNED_RG_RGTC2, 30, false },
 
 	{ GL_R16_SNORM, 31, false },
+	{ GL_R8_SNORM, 31, false },
 
 	{ GL_COMPRESSED_RED_RGTC1, 30, false },
 	{ GL_COMPRESSED_SIGNED_RED_RGTC1, 30, false },
@@ -312,4 +329,74 @@ print_bits(int size, GLenum type)
 		printf("  ");
 	else
 		printf("??");
+}
+
+static bool
+string_starts_with(const char *string, const char *start)
+{
+	return !strncmp(string, start, strlen(start));
+}
+
+bool
+valid_for_gl_version(const struct required_format *format, int target_version)
+{
+	if (format->version > target_version)
+		return false;
+
+	/* Since we have a core context for 3.1, don't test
+	 * deprecated formats there.
+	 */
+	if (piglit_get_gl_version() >= 31 &&
+	    !piglit_is_extension_supported("GL_ARB_compatibility")) {
+		const char *name = piglit_get_gl_enum_name(format->token);
+		if (string_starts_with(name, "GL_ALPHA") ||
+		    string_starts_with(name, "GL_LUMINANCE_ALPHA") ||
+		    string_starts_with(name, "GL_LUMINANCE") ||
+		    string_starts_with(name, "GL_INTENSITY")) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+static void
+usage(const char *name)
+{
+	fprintf(stderr, "usage: %s <30 | 31>\n", name);
+	piglit_report_result(PIGLIT_FAIL);
+}
+
+/**
+ * Sets up the test config for the 3 required size tests across GL
+ * compat/core versions.
+ */
+void
+setup_required_size_test(int argc, char **argv,
+			 struct piglit_gl_test_config *config)
+{
+	int target_version;
+
+	if (argc < 2)
+		usage(argv[0]);
+
+	piglit_gl_test_config_init(config);
+
+	target_version = strtol(argv[1], NULL, 0);
+
+	switch (target_version) {
+	case 30:
+		config->supports_gl_compat_version = 30;
+		break;
+	case 31:
+		config->supports_gl_core_version = target_version;
+		break;
+	default:
+		usage(argv[0]);
+	}
+
+	config->window_width = 32;
+	config->window_height = 32;
+	config->window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+
 }

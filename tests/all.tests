@@ -696,7 +696,7 @@ add_concurrent_test(gl30, 'genmipmap-errors')
 add_concurrent_test(gl30, 'getfragdatalocation')
 add_concurrent_test(gl30, 'integer-errors')
 gl30['minmax'] = concurrent_test('gl-3.0-minmax')
-add_concurrent_test(gl30, 'gl-3.0-required-sized-texture-formats')
+gl30['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 30')
 add_concurrent_test(gl30, 'gl-3.0-required-renderbuffer-attachment-formats')
 add_concurrent_test(gl30, 'gl-3.0-required-texture-attachment-formats')
 add_concurrent_test(gl30, 'gl-3.0-texture-integer')
@@ -712,6 +712,7 @@ gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 for subtest in ['generated', 'written', 'flush']:
         cmdline = 'primitive-restart-xfb {0}'.format(subtest)
         gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
+gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 
 # Group spec/glsl-es-1.00
 spec['glsl-es-1.00'] = Group()

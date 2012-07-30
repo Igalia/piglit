@@ -36,6 +36,7 @@ enum bits_types {
 	UN24,
 
 	UN16,
+	SN16,
 	F16,
 	I16,
 	U16,
@@ -104,3 +105,16 @@ get_channel_type(const struct sized_internalformat *f, enum channel c);
 
 void
 print_bits(int size, GLenum type);
+
+bool
+valid_for_gl_version(const struct required_format *format, int target_version);
+
+void
+piglit_init(int argc, char **argv);
+
+enum piglit_result
+piglit_display(void);
+
+void
+setup_required_size_test(int argc, char **argv,
+			 struct piglit_gl_test_config *config);
