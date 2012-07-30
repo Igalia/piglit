@@ -22,3 +22,4 @@ create_context = Group();
 egl['EGL_KHR_create_context'] = create_context
 create_context['default major version GLES'] = plain_test('egl-create-context-default-major-version-gles')
 create_context['default minor version GLES'] = plain_test('egl-create-context-default-minor-version-gles')
+create_context['valid attribute empty GLES'] = plain_test('egl-create-context-valid-attribute-empty-gles')
