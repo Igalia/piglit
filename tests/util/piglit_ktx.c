@@ -325,7 +325,7 @@ piglit_ktx_parse_images(struct piglit_ktx *self)
 	/* Begin parsing first image. */
 	image = &self->images[0];
 
-#define CUR_SIZE ((void*) p.u8 - self->data)
+#define CUR_SIZE (p.u8 - (uint8_t *) self->data)
 
 	for (miplevel = 0; miplevel < info->num_miplevels; ++miplevel) {
 		uint32_t image_size;
