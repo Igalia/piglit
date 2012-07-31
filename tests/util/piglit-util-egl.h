@@ -50,6 +50,11 @@ const char* piglit_get_egl_error_name(EGLint error);
  */
 void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result);
 
+/**
+ * \brief Checks whether an EGL extension is supported.
+ */
+bool piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

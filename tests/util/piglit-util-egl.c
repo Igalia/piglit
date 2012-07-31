@@ -74,3 +74,12 @@ void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result)
 
 	piglit_report_result(result);
 }
+
+bool
+piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name)
+{
+	const char *const egl_extension_list =
+		eglQueryString(egl_dpy, EGL_EXTENSIONS);
+
+	return piglit_is_extension_in_string(egl_extension_list, name);
+}
