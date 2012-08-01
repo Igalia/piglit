@@ -246,8 +246,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char**argv)
 {
-   if (!piglit_is_extension_supported("GL_ARB_sampler_objects"))
-      piglit_report_result(PIGLIT_SKIP);
+   piglit_require_extension("GL_ARB_sampler_objects");
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
