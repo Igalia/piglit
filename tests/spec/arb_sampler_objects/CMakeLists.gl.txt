@@ -12,5 +12,6 @@ link_libraries (
 piglit_add_executable (sampler-objects sampler-objects.c)
 piglit_add_executable (sampler-incomplete sampler-incomplete.c)
 piglit_add_executable (arb_sampler_objects-srgb-decode srgb-decode.c)
+piglit_add_executable (arb_sampler_objects-framebufferblit framebufferblit.c)
 
 # vim: ft=cmake:
