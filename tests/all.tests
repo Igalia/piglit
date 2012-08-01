@@ -1174,6 +1174,7 @@ arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
 add_plain_test(arb_sampler_objects, 'sampler-objects')
 add_plain_test(arb_sampler_objects, 'sampler-incomplete')
+arb_sampler_objects['GL_EXT_texture_sRGB_decode'] = concurrent_test('arb_sampler_objects-srgb-decode')
 
 # Group ARB_debug_output
 arb_debug_output = Group()
