@@ -236,11 +236,9 @@ pass_link_test(int y_index,
 {
 	bool pass = true;
 	GLuint prog;
-	GLuint bos[vs_blocks + fs_blocks];
+	GLuint *bos = (GLuint *) calloc(vs_blocks + fs_blocks, sizeof(GLuint));
 	GLint active_blocks;
 	int i;
-
-	memset(bos, 0, sizeof(bos));
 
 	prog = build_shaders(vs_prefix, vs_blocks,
 			     fs_prefix, fs_blocks);
@@ -267,6 +265,8 @@ pass_link_test(int y_index,
 
 	glDeleteBuffers(active_blocks, bos);
 	glDeleteProgram(prog);
+
+	free(bos);
 
 	return pass;
 }
