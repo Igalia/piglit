@@ -87,9 +87,9 @@ get_shader(GLenum target, const char *block_prefix, int blocks)
 	int i;
 
 	prefix = calloc(1, (strlen(block_prefix) * 2 + strlen(prefix_template) +
-			    20) * blocks);
+			    20) * blocks + 1);
 	body = calloc(1, (strlen(block_prefix) + strlen(body_template) +
-			  20) * blocks);
+			  20) * blocks + 1);
 	prefix_tail = prefix;
 	prefix[0] = 0;
 	body_tail = body;
