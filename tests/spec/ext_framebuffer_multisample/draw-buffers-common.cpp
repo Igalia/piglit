@@ -258,7 +258,7 @@ free_data_arrays(void)
 void
 float_color_to_int_color(int *dst, float *src)
 {
-	float offset = 1 - pow(2, (num_color_bits - 1));
+	float offset = 1 - (1 << (num_color_bits - 1));
 	float scale = -2.0 * offset;
 
 	for (int j = 0; j < num_rects; ++j) {
@@ -292,7 +292,9 @@ draw_pattern(bool sample_alpha_to_coverage,
 	glUniform1i(alpha_to_coverage_loc, sample_alpha_to_coverage);
 
 	unsigned indices[6] = {0, 1, 2, 0, 2, 3};
-	int integer_color[num_rects * num_components];
+	int *integer_color = (int *) malloc(num_rects *
+					    num_components *
+					    sizeof(int));
 
 	/* For integer color buffers convert the color data to integer format */
         if(is_buffer_zero_integer_format) {
@@ -325,6 +327,7 @@ draw_pattern(bool sample_alpha_to_coverage,
 	}
 	glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
 	glDisable (GL_SAMPLE_ALPHA_TO_ONE);
+	free(integer_color);
 }
 
 void
@@ -374,14 +377,14 @@ compute_expected_color(bool sample_alpha_to_coverage,
 				 */
 				expected_color[alpha_idx] =
 					is_buffer_zero_integer_format ?
-					frag_alpha / pow(2, draw_buffer_count) :
+					frag_alpha / (1 << draw_buffer_count) :
 					frag_alpha;
 			}
 			else if (sample_alpha_to_coverage) {
 				/* Taking in account alpha values modified by
 				 * fragment shader.
 				 */
-				frag_alpha /= pow(2, draw_buffer_count);
+				frag_alpha /= (1 << draw_buffer_count);
 				if(sample_alpha_to_one) {
 					expected_color[alpha_idx] =
 					1.0 * coverage[i] +
@@ -567,7 +570,7 @@ draw_image_to_window_system_fb(int draw_buffer_count, bool rhs)
 		}
 
 		/* Convert integer color data to float color data */
-		float color_offset = 1.0 - pow(2.0, num_color_bits - 1);
+		float color_offset = 1.0 - (1 << (num_color_bits - 1));
 		float color_scale = -2.0 * color_offset;
 
 		for (unsigned i = 0; i < array_size; ++i) {
@@ -772,7 +775,8 @@ ms_fbo_and_draw_buffers_setup(int samples,
 	/* Attach additional color buffers to multisample FBO with default
 	 * non-integer format (GL_RGBA.)
 	 */
-	GLuint color_rb[num_draw_buffers - 1];
+	GLuint *color_rb = (GLuint *)malloc((num_draw_buffers - 1) *
+					    sizeof(GLuint));
 	glGenRenderbuffers(num_draw_buffers - 1, color_rb);
 
 	for(int i = 0; i < num_draw_buffers - 1; i++) {
@@ -795,4 +799,5 @@ ms_fbo_and_draw_buffers_setup(int samples,
 		piglit_report_result(PIGLIT_FAIL);
 	}
 	buffer_to_test = test_buffer;
+	free(color_rb);
 }
