@@ -1,0 +1,21 @@
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 x;
+uniform vec4 y;
+
+void main()
+{
+	gl_FragColor = 0.25 + clamp(pow(x, y), 0.0, 1.0) * 0.5;
+}
+
+[test]
+uniform vec4 x 0.5 2.0 0.5 1.0
+uniform vec4 y 2.0 0.5 -1.0 1.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.375 0.75 0.75 0.75
