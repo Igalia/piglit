@@ -70,12 +70,12 @@ enum piglit_result piglit_display(void)
    draw_quad(100, 10, 1, 0, 0.99);
    glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-   glutSwapBuffers();
-
    pass = piglit_probe_pixel_rgb(20, 20, colors[4]) && pass;
    pass = piglit_probe_pixel_rgb(50, 20, colors[0]) && pass;
    pass = piglit_probe_pixel_rgb(80, 20, violet) && pass;
    pass = piglit_probe_pixel_rgb(110, 20, violet) && pass;
+
+   piglit_present_results();
 
    return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
