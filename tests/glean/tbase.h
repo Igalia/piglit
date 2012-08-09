@@ -305,6 +305,12 @@ public:
 				     p = configs.begin();
 			     p < configs.end();
 			     ++p) {
+				// Many tests do not adjust their expectations
+				// for multisampling and hence incorrectly
+				// fail.
+				if ((*p)->samples > 0)
+					continue;
+
 				Window w(ws, **p, fWidth, fHeight);
 				RenderingContext rc(ws, **p);
 				if (!ws.makeCurrent(rc, w)) {
