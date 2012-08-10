@@ -40,7 +40,7 @@
 #define USE_SETRLIMIT
 #endif
 
-#if defined(HAVE_FCNTL_H) && defined(HAVE_SYS_STAT_H) && defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
+#if defined(HAVE_FCNTL_H) && defined(HAVE_SYS_STAT_H) && defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H) && !defined(_WIN32)
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
