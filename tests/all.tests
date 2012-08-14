@@ -1163,6 +1163,9 @@ spec['ARB_framebuffer_object'] = arb_framebuffer_object
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT')
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT')
 add_plain_test(arb_framebuffer_object, 'fdo28551')
+for test_mode in ('draw', 'read'):
+        test_name = ' '.join(['framebuffer-blit-levels', test_mode])
+        arb_framebuffer_object[test_name] = PlainExecTest(test_name + ' -auto')
 
 
 # Group ARB_sampler_objects
