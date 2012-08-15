@@ -70,6 +70,14 @@ GLuint aux_framebuffer;
 GLuint test_texture;
 GLuint aux_texture;
 
+GLenum texture_internal_format;
+GLenum texture_format;
+GLenum texture_type;
+
+GLbitfield blit_mask;
+GLenum framebuffer_attachment;
+
+
 #define LOG2_SIZE 7
 #define SIZE (1 << LOG2_SIZE)
 
@@ -83,8 +91,8 @@ GLuint aux_texture;
  * by taking an integer mod four different primes.
  */
 static void
-create_test_data(GLfloat *data, unsigned level,
-		 unsigned width, unsigned height)
+create_test_data_rgba(GLfloat *data, unsigned level,
+		      unsigned width, unsigned height)
 {
 	unsigned pixel;
 	unsigned num_pixels = width * height;
@@ -97,13 +105,47 @@ create_test_data(GLfloat *data, unsigned level,
 	}
 }
 
+/**
+ * Generate a block of test data where each pixel has a unique depth value in
+ * the range [0.0, 1.0).
+ */
+static void
+create_test_data_depth(GLfloat *data, unsigned level,
+		       unsigned width, unsigned height)
+{
+	unsigned pixel;
+	unsigned num_pixels = width * height;
+	double depth_delta = 0.95 / num_pixels;
+	double depth_value = 0;
+
+	for (pixel = 0; pixel < num_pixels; ++pixel) {
+		data[pixel] = depth_value;
+		depth_value += depth_delta;
+	}
+}
+
+static void
+create_test_data(GLfloat *data, GLenum texture_format,
+		 unsigned level, unsigned width, unsigned height)
+{
+	if (texture_format == GL_RGBA)
+		create_test_data_rgba(data, level, width, height);
+	else if (texture_format == GL_DEPTH_COMPONENT)
+		create_test_data_depth(data, level, width, height);
+	else
+		assert(0);
+}
+
 static void
 print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <test_mode>\n"
 	       "  where <test_mode> is one of:\n"
 	       "    draw: test blitting *to* the given texture type\n"
-	       "    read: test blitting *from* the given texture type\n",
+	       "    read: test blitting *from* the given texture type\n"
+	       "  where <format> is one of:\n"
+	       "    rgba\n"
+	       "    depth\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -113,7 +155,7 @@ piglit_init(int argc, char **argv)
 {
 	unsigned level;
 
-	if (argc != 2) {
+	if (argc != 3) {
 		print_usage_and_exit(argv[0]);
 	}
 
@@ -121,6 +163,22 @@ piglit_init(int argc, char **argv)
 		test_mode = TEST_MODE_DRAW;
 	} else if (strcmp(argv[1], "read") == 0) {
 		test_mode = TEST_MODE_READ;
+	} else {
+		print_usage_and_exit(argv[0]);
+	}
+
+	if(strcmp(argv[2], "rgba") == 0) {
+		texture_internal_format = GL_RGBA;
+		texture_format = GL_RGBA;
+		texture_type = GL_FLOAT;
+		framebuffer_attachment = GL_COLOR_ATTACHMENT0;
+		blit_mask = GL_COLOR_BUFFER_BIT;
+	} else if (strcmp(argv[2], "depth") == 0) {
+		texture_internal_format = GL_DEPTH_COMPONENT;
+		texture_format = GL_DEPTH_COMPONENT;
+		texture_type = GL_FLOAT;
+		framebuffer_attachment = GL_DEPTH_ATTACHMENT;
+		blit_mask = GL_DEPTH_BUFFER_BIT;
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
@@ -139,9 +197,12 @@ piglit_init(int argc, char **argv)
 			GL_NEAREST);
 	for (level = 0; level < LOG2_SIZE; ++level) {
 		glTexImage2D(GL_TEXTURE_2D, level,
-			     GL_RGBA, SIZE >> level, SIZE >> level,
-			     0 /* border */, GL_RGBA,
-			     GL_BYTE /* type */, NULL /* data */);
+			     texture_internal_format,
+			     SIZE >> level, SIZE >> level,
+			     0 /* border */,
+			     texture_format,
+			     texture_type,
+			     NULL /* data */);
 	}
 
 	/* Set up aux framebuffer */
@@ -151,11 +212,11 @@ piglit_init(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0 /* level */,
-		     GL_RGBA, SIZE, SIZE,
-		     0 /* border */, GL_RGBA,
-		     GL_BYTE /* type */, NULL /* data */);
+		     texture_internal_format, SIZE, SIZE,
+		     0 /* border */, texture_format,
+		     texture_type, NULL /* data */);
 	glBindFramebuffer(GL_FRAMEBUFFER, aux_framebuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+	glFramebufferTexture2D(GL_FRAMEBUFFER, framebuffer_attachment,
 			       GL_TEXTURE_2D, aux_texture, 0 /* level */);
 }
 
@@ -170,14 +231,14 @@ piglit_display()
 	for (level = 0; level < LOG2_SIZE; ++level) {
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
-		create_test_data(data, level, width, height);
+		create_test_data(data, texture_format, level, width, height);
 		if (test_mode == TEST_MODE_READ) {
 			/* Populate directly */
 			glBindTexture(GL_TEXTURE_2D, test_texture);
 			glTexImage2D(GL_TEXTURE_2D, level,
-				     GL_RGBA, width, height,
-				     0 /* border */, GL_RGBA,
-				     GL_FLOAT /* type */, data);
+				     texture_internal_format, width, height,
+				     0 /* border */, texture_format,
+				     texture_type, data);
 		} else {
 			/* Populate via aux texture */
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
@@ -186,18 +247,18 @@ piglit_display()
 					  test_framebuffer);
 			glBindTexture(GL_TEXTURE_2D, aux_texture);
 			glTexImage2D(GL_TEXTURE_2D, 0 /* level */,
-				     GL_RGBA, width, height,
-				     0 /* border */, GL_RGBA,
-				     GL_FLOAT /* type */, data);
+				     texture_internal_format, width, height,
+				     0 /* border */, texture_format,
+				     texture_type, data);
 			glBindTexture(GL_TEXTURE_2D, test_texture);
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
+					       framebuffer_attachment,
 					       GL_TEXTURE_2D,
 					       test_texture,
 					       level);
 			glBlitFramebuffer(0, 0, width, height,
 					  0, 0, width, height,
-					  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+					  blit_mask, GL_NEAREST);
 		}
 	}
 
@@ -206,17 +267,18 @@ piglit_display()
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
 		printf("Testing level %d\n", level);
-		create_test_data(data, level, width, height);
+		create_test_data(data, texture_format, level, width, height);
 		if (test_mode == TEST_MODE_DRAW) {
 			/* Read texture data directly using glReadPixels() */
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, test_texture);
 			glFramebufferTexture2D(GL_READ_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
+					       framebuffer_attachment,
 					       GL_TEXTURE_2D,
 					       test_texture,
 					       level);
-			pass = piglit_probe_image_rgba(0, 0, width, height,
-						       data) && pass;
+			pass = piglit_probe_image_color(0, 0, width, height,
+							texture_format,
+							data) && pass;
 		} else {
 			/* Read via aux texture */
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
@@ -225,22 +287,23 @@ piglit_display()
 					  aux_framebuffer);
 			glBindTexture(GL_TEXTURE_2D, test_texture);
 			glFramebufferTexture2D(GL_READ_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
+					       framebuffer_attachment,
 					       GL_TEXTURE_2D,
 					       test_texture,
 					       level);
 			glBindTexture(GL_TEXTURE_2D, aux_texture);
 			glTexImage2D(GL_TEXTURE_2D, 0 /* level */,
-				     GL_RGBA, width, height,
-				     0 /* border */, GL_RGBA,
-				     GL_BYTE /* type */, NULL);
+				     texture_internal_format, width, height,
+				     0 /* border */, texture_format,
+				     texture_type, NULL);
 			glBlitFramebuffer(0, 0, width, height,
 					  0, 0, width, height,
-					  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+					  blit_mask, GL_NEAREST);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
 					  aux_framebuffer);
-			pass = piglit_probe_image_rgba(0, 0, width, height,
-						       data) && pass;
+			pass = piglit_probe_image_color(0, 0, width, height,
+							texture_format,
+							data) && pass;
 		}
 	}
 
