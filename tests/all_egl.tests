@@ -25,6 +25,7 @@ create_context['default minor version GLES'] = plain_test('egl-create-context-de
 create_context['valid attribute empty GLES'] = plain_test('egl-create-context-valid-attribute-empty-gles')
 create_context['valid attribute empty GL'] = plain_test('egl-create-context-valid-attribute-empty-gl')
 create_context['NULL valid attribute GLES'] = plain_test('egl-create-context-valid-attribute-null-gles')
+create_context['NULL valid attribute GL'] = plain_test('egl-create-context-valid-attribute-null-gl')
 create_context['invalid OpenGL version'] = plain_test('egl-create-context-invalid-gl-version')
 create_context['invalid attribute GL'] = plain_test('egl-create-context-invalid-attribute-gl')
 create_context['invalid flag GL'] = plain_test('egl-create-context-invalid-flag-gl')
