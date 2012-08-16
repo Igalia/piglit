@@ -14,6 +14,7 @@ link_libraries (
 piglit_add_executable (egl-create-context-default-major-version-gles default-major-version-gles.c common.c)
 piglit_add_executable (egl-create-context-default-major-version-gl default-major-version-gl.c common.c)
 piglit_add_executable (egl-create-context-default-minor-version-gles default-minor-version-gles.c common.c)
+piglit_add_executable (egl-create-context-default-minor-version-gl default-minor-version-gl.c common.c)
 piglit_add_executable (egl-create-context-valid-attribute-empty-gles valid-attribute-empty-gles.c common.c)
 piglit_add_executable (egl-create-context-valid-attribute-empty-gl valid-attribute-empty-gl.c common.c)
 piglit_add_executable (egl-create-context-valid-attribute-null-gles valid-attribute-null-gles.c common.c)

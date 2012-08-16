@@ -23,6 +23,7 @@ egl['EGL_KHR_create_context'] = create_context
 create_context['default major version GLES'] = plain_test('egl-create-context-default-major-version-gles')
 create_context['default major version GL'] = plain_test('egl-create-context-default-major-version-gl')
 create_context['default minor version GLES'] = plain_test('egl-create-context-default-minor-version-gles')
+create_context['default minor version GL'] = plain_test('egl-create-context-default-minor-version-gl')
 create_context['valid attribute empty GLES'] = plain_test('egl-create-context-valid-attribute-empty-gles')
 create_context['valid attribute empty GL'] = plain_test('egl-create-context-valid-attribute-empty-gl')
 create_context['NULL valid attribute GLES'] = plain_test('egl-create-context-valid-attribute-null-gles')
