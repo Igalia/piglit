@@ -21,6 +21,7 @@ egl['egl-query-surface-EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WI
 create_context = Group();
 egl['EGL_KHR_create_context'] = create_context
 create_context['default major version GLES'] = plain_test('egl-create-context-default-major-version-gles')
+create_context['default major version GL'] = plain_test('egl-create-context-default-major-version-gl')
 create_context['default minor version GLES'] = plain_test('egl-create-context-default-minor-version-gles')
 create_context['valid attribute empty GLES'] = plain_test('egl-create-context-valid-attribute-empty-gles')
 create_context['valid attribute empty GL'] = plain_test('egl-create-context-valid-attribute-empty-gl')
