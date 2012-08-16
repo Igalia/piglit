@@ -328,14 +328,6 @@ supported_format(GLenum format)
 static bool
 supported_target_format(GLenum target, GLenum format)
 {
-	/* all the compressed formats we test (so far) are 2D only */
-	if (is_compressed_format(format) &&
-	    (target == GL_TEXTURE_1D ||
-	     target == GL_TEXTURE_1D_ARRAY ||
-	     target == GL_TEXTURE_3D ||
-	     target == GL_TEXTURE_RECTANGLE)) {
-		return false;
-	}
 	if (is_depth_format(format) && target == GL_TEXTURE_3D) {
 		return false;
 	}
