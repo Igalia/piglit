@@ -72,6 +72,13 @@ piglit_init(int argc, char **argv)
 				pattern_height,
 				GL_TRUE);
 
+	/* Skip the test if samples > GL_MAX_SAMPLES */
+	GLint max_samples;
+	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+
+	if (samples > max_samples)
+		piglit_report_result(PIGLIT_SKIP);
+
 	ms_fbo_and_draw_buffers_setup(samples,
 				      pattern_width,
 				      pattern_height,
