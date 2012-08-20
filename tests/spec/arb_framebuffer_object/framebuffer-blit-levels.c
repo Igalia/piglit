@@ -77,6 +77,7 @@ GLuint aux_texture;
 
 GLenum texture_internal_format;
 GLenum texture_format;
+GLenum readback_format;
 GLenum texture_type;
 
 GLbitfield blit_mask;
@@ -130,16 +131,82 @@ create_test_data_depth(GLfloat *data, unsigned level,
 	}
 }
 
+/**
+ * Generate a block of test data appropriate for testing a stencil
+ * buffer.  Different values of the \c level parameter produce
+ * different unique sets of pixels.
+ *
+ * Since there are only 256 possible stencil values, we need to be
+ * clever to generate a pattern that doesn't repeat every 256 pixels.
+ * Here's how we do it: for each consecutive pair of values, we
+ * compute x = (16451 * (i + 1)) % 65521 (where i is the index of the
+ * pair, and starts at a different value for each miplevel).  Since
+ * 16451 and 65521 are relatively prime, this pattern won't repeat for
+ * 65521 pairs.  Then we set the first pixel in the pair to x / 256
+ * and the second pixel in the pair to x % 256.
+ */
 static void
-create_test_data(GLfloat *data, GLenum texture_format,
+create_test_data_stencil(GLbyte *data, unsigned level,
+			 unsigned width, unsigned height)
+{
+	unsigned pixel;
+	unsigned num_pixels = width * height;
+	for (pixel = 0; pixel < num_pixels; ++pixel) {
+		unsigned i = (level * (SIZE * SIZE) + pixel) / 2;
+		unsigned x = (16451 * (i + 1)) % 65521;
+		if (pixel % 2 == 0)
+			data[pixel] = x / 256;
+		else
+			data[pixel] = x % 256;
+	}
+}
+
+/**
+ * As with create_test_data_stencil(), but intersperse the stencil
+ * data with depth values of 0, so that the resulting data can be
+ * uploaded to a depth/stencil texture using glTexImage2D().
+ */
+static void
+create_test_data_depthstencil(GLbyte *data, unsigned level,
+			      unsigned width, unsigned height)
+{
+	GLbyte *stencil_data = malloc(width * height);
+	unsigned i;
+	create_test_data_stencil(stencil_data, level, width, height);
+
+	for (i = 0; i < width * height; ++i) {
+		data[4 * i] = stencil_data[i];
+		data[4 * i + 1] = 0;
+		data[4 * i + 2] = 0;
+		data[4 * i + 3] = 0;
+	}
+
+	free(stencil_data);
+}
+
+static void
+create_test_data(GLfloat *data, GLenum format,
 		 unsigned level, unsigned width, unsigned height)
 {
-	if (texture_format == GL_RGBA)
+	switch (format) {
+	case GL_RGBA:
 		create_test_data_rgba(data, level, width, height);
-	else if (texture_format == GL_DEPTH_COMPONENT)
+		break;
+	case GL_DEPTH_COMPONENT:
 		create_test_data_depth(data, level, width, height);
-	else
+		break;
+	case GL_STENCIL_INDEX:
+		create_test_data_stencil((GLbyte *) data, level,
+					 width, height);
+		break;
+	case GL_DEPTH_STENCIL:
+		create_test_data_depthstencil((GLbyte *) data, level,
+					      width, height);
+		break;
+	default:
 		assert(0);
+		break;
+	}
 }
 
 static void
@@ -151,7 +218,8 @@ print_usage_and_exit(char *prog_name)
 	       "    read: test blitting *from* the given texture type\n"
 	       "  where <format> is one of:\n"
 	       "    rgba\n"
-	       "    depth\n",
+	       "    depth\n"
+	       "    stencil\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -176,15 +244,24 @@ piglit_init(int argc, char **argv)
 	if(strcmp(argv[2], "rgba") == 0) {
 		texture_internal_format = GL_RGBA;
 		texture_format = GL_RGBA;
+		readback_format = GL_RGBA;
 		texture_type = GL_FLOAT;
 		framebuffer_attachment = GL_COLOR_ATTACHMENT0;
 		blit_mask = GL_COLOR_BUFFER_BIT;
 	} else if (strcmp(argv[2], "depth") == 0) {
 		texture_internal_format = GL_DEPTH_COMPONENT;
 		texture_format = GL_DEPTH_COMPONENT;
+		readback_format = GL_DEPTH_COMPONENT;
 		texture_type = GL_FLOAT;
 		framebuffer_attachment = GL_DEPTH_ATTACHMENT;
 		blit_mask = GL_DEPTH_BUFFER_BIT;
+	} else if (strcmp(argv[2], "stencil") == 0) {
+		texture_internal_format = GL_DEPTH_STENCIL;
+		texture_format = GL_DEPTH_STENCIL;
+		readback_format = GL_STENCIL_INDEX;
+		texture_type = GL_UNSIGNED_INT_24_8;
+		framebuffer_attachment = GL_DEPTH_STENCIL_ATTACHMENT;
+		blit_mask = GL_STENCIL_BUFFER_BIT;
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
@@ -253,6 +330,18 @@ upload_test_data(GLuint texture, unsigned data_level,
 	free(data);
 }
 
+static bool
+test_image(unsigned width, unsigned height, const GLfloat *expected)
+{
+	if (readback_format == GL_STENCIL_INDEX) {
+		return piglit_probe_image_stencil(0, 0, width, height,
+						  (const GLubyte *) expected);
+	} else {
+		return piglit_probe_image_color(0, 0, width, height,
+						readback_format, expected);
+	}
+}
+
 enum piglit_result
 piglit_display()
 {
@@ -293,7 +382,7 @@ piglit_display()
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
 		printf("Testing level %d\n", level);
-		create_test_data(data, texture_format, level, width, height);
+		create_test_data(data, readback_format, level, width, height);
 		if (test_mode == TEST_MODE_DRAW) {
 			/* Read texture data directly using glReadPixels() */
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, test_texture);
@@ -302,9 +391,7 @@ piglit_display()
 					       GL_TEXTURE_2D,
 					       test_texture,
 					       level);
-			pass = piglit_probe_image_color(0, 0, width, height,
-							texture_format,
-							data) && pass;
+			pass = test_image(width, height, data) && pass;
 		} else {
 			/* Read via aux texture */
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
@@ -327,9 +414,7 @@ piglit_display()
 					  blit_mask, GL_NEAREST);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
 					  aux_framebuffer);
-			pass = piglit_probe_image_color(0, 0, width, height,
-							texture_format,
-							data) && pass;
+			pass = test_image(width, height, data) && pass;
 		}
 	}
 
