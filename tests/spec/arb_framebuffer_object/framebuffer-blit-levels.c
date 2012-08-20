@@ -226,6 +226,33 @@ piglit_init(int argc, char **argv)
 			       GL_TEXTURE_2D, aux_texture, 0 /* level */);
 }
 
+/**
+ * Upload test data to the given texture.
+ *
+ * \param data_level is the miplevel that the data is destined to
+ * ultimately end up in--this influences the contents of the test
+ * data.
+ *
+ * \param upload_level is the miplevel that the data should be
+ * uploaded to.
+ */
+static void
+upload_test_data(GLuint texture, unsigned data_level,
+		 unsigned upload_level, unsigned width, unsigned height)
+{
+	GLfloat *data = malloc(SIZE * SIZE * 4 * sizeof(GLfloat));
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	create_test_data(data, texture_format, data_level, width, height);
+
+	glTexImage2D(GL_TEXTURE_2D, upload_level, texture_internal_format,
+		     width, height, 0 /* border */, texture_format,
+		     texture_type, data);
+
+	free(data);
+}
+
 enum piglit_result
 piglit_display()
 {
@@ -237,25 +264,18 @@ piglit_display()
 	for (level = 0; level < NUM_LEVELS; ++level) {
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
-		create_test_data(data, texture_format, level, width, height);
 		if (test_mode == TEST_MODE_READ) {
 			/* Populate directly */
-			glBindTexture(GL_TEXTURE_2D, test_texture);
-			glTexImage2D(GL_TEXTURE_2D, level,
-				     texture_internal_format, width, height,
-				     0 /* border */, texture_format,
-				     texture_type, data);
+			upload_test_data(test_texture, level, level,
+					 width, height);
 		} else {
 			/* Populate via aux texture */
+			upload_test_data(aux_texture, level, 0,
+					 width, height);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER,
 					  aux_framebuffer);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
 					  test_framebuffer);
-			glBindTexture(GL_TEXTURE_2D, aux_texture);
-			glTexImage2D(GL_TEXTURE_2D, 0 /* level */,
-				     texture_internal_format, width, height,
-				     0 /* border */, texture_format,
-				     texture_type, data);
 			glBindTexture(GL_TEXTURE_2D, test_texture);
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
 					       framebuffer_attachment,
