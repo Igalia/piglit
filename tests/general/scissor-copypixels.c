@@ -103,7 +103,7 @@ piglit_display(void)
 	pass &= check_red_box_surrounded_by_green(dst_x, 30, 0, 0);
 	pass &= check_red_box_surrounded_by_green(dst_x, 50, dst_w, dst_h);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

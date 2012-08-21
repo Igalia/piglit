@@ -118,7 +118,7 @@ piglit_display(void)
 		}
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 	return result;
 }
 

@@ -201,7 +201,7 @@ piglit_display(void)
 		}
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

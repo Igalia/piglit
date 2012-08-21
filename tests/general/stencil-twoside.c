@@ -212,7 +212,7 @@ piglit_display(void)
 	pass = piglit_probe_pixel_rgb(w * 9.5, piglit_height / 2, expected);
 	pass = piglit_probe_pixel_rgb(w * 11.5, piglit_height / 2, expected);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

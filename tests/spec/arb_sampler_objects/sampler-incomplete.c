@@ -127,7 +127,7 @@ piglit_display(void)
 	p = piglit_probe_pixel_rgb(piglit_width / 2, piglit_height / 2,
 				   expected);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return p ? PIGLIT_PASS : PIGLIT_FAIL;
 }

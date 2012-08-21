@@ -146,7 +146,7 @@ piglit_display(void)
 	/* 8: clamped raster */
 	pass = piglit_probe_pixel_rgb(50, 90, white) && pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

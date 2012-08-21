@@ -148,7 +148,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
     }
     free(readback);
 
-    glutSwapBuffers();
+    piglit_present_results();
     return 1;
 }
 

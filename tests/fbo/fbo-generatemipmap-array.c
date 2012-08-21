@@ -382,7 +382,7 @@ piglit_display(void)
 	glDeleteTextures(1, &tex1d);
 	glDeleteTextures(1, &tex2d);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

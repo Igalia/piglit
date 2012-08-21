@@ -158,7 +158,7 @@ test_instancing(GLuint divisor)
                     TestName, i);
             fprintf(stderr, "%s: color instance divisor = %u\n",
                     TestName, divisor);
-            glutSwapBuffers();
+            piglit_present_results();
             return GL_FALSE;
          }
       }

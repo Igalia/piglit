@@ -241,7 +241,7 @@ piglit_display(void)
 		}
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	printf("Left to Right: ALPHA, LUMINANCE, INTENSITY\n");
 	printf("Top to Bottom: LESS, LEQUAL, GREATER, GEQUAL, "

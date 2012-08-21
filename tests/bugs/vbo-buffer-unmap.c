@@ -76,7 +76,7 @@ piglit_display(void)
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0,
                 GL_RGBA, GL_UNSIGNED_BYTE, image);
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return PIGLIT_PASS;
 }

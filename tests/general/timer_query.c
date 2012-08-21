@@ -108,7 +108,7 @@ piglit_display(void)
 
 	/*printf("nsecs = %d %ld\n", nsecs, (long int) nsecs64);*/
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return PIGLIT_PASS;
 }

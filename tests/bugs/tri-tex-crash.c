@@ -104,7 +104,7 @@ piglit_display(void)
    else
       result = PIGLIT_FAIL;
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return result;
 }

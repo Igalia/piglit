@@ -187,7 +187,7 @@ static void test(void)
 	}
 	glPopMatrix();
 
-	glutSwapBuffers();
+	piglit_present_results();
 }
 
 

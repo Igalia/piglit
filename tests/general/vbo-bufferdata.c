@@ -86,7 +86,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_pixel_rgb(250, 150, white);
 	pass = pass && piglit_probe_pixel_rgb(150, 150, white);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 

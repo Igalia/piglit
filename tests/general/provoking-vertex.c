@@ -82,7 +82,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_pixel_rgb(225, 130, blue);
 
 	glFinish();
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

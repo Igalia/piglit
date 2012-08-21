@@ -321,7 +321,7 @@ piglit_display(void)
 	}
 	printf("Summary: %i/%i passed\n", total-failed, total);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return !failed ? PIGLIT_PASS : PIGLIT_FAIL;
 }

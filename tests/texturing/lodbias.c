@@ -146,7 +146,7 @@ test_simple(int bias1, int bias2)
 	glDisable(GL_TEXTURE_2D);
 
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 
 	return pass;
 }
@@ -222,7 +222,7 @@ test_multitex(int bias1, int bias2)
 	glDisable(GL_TEXTURE_2D);
 
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 
 	return pass;
 }

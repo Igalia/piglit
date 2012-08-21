@@ -74,7 +74,7 @@ piglit_display(void)
 		result = PIGLIT_FAIL;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return result;
 }

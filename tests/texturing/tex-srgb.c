@@ -140,7 +140,7 @@ srgb_tex_test(int srgb_format)
 
 
 	glDeleteTextures(1, &tex);
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass;
 }

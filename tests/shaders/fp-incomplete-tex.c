@@ -179,7 +179,7 @@ piglit_display(void)
 
 	DoFrame();
 	pass = DoTest();
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

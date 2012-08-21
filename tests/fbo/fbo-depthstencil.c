@@ -471,7 +471,7 @@ enum piglit_result piglit_display(void)
 		glDeleteRenderbuffersEXT(1, &rb);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	assert(glGetError() == 0);
 	return res;

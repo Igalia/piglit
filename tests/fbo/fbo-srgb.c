@@ -161,7 +161,7 @@ framebuffer_srgb_fbo(int srgb_format)
 
 	glDeleteFramebuffersEXT(1, &fbo);
 	glDeleteTextures(1, &tex);
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass;
 }

@@ -442,7 +442,7 @@ test_format(const struct test_desc *test,
 
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass;
 }
@@ -513,7 +513,7 @@ piglit_display(void)
 			glClear(GL_COLOR_BUFFER_BIT);
 			draw_format_text(set, &set->format[format_index]);
 			draw_unsupported();
-			glutSwapBuffers();
+			piglit_present_results();
 		}
 	}
 

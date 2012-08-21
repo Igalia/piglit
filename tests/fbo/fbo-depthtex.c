@@ -146,7 +146,7 @@ enum piglit_result piglit_display(void)
 		pass &= piglit_probe_pixel_rgb(expected[i].x, expected[i].y, expected[i].color);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

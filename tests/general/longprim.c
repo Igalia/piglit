@@ -91,7 +91,7 @@ test_prims(void)
             printf("%s: %s %u vertices\n", TestName, primNames[prim], len);
          glClear(GL_COLOR_BUFFER_BIT);
          draw(primTypes[prim], len);
-         glutSwapBuffers();
+         piglit_present_results();
       }
    }
 }

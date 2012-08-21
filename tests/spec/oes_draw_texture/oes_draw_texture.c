@@ -213,7 +213,7 @@ piglit_display(void)
 	pass = test_depth() && pass;
 
 	glFinish();
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

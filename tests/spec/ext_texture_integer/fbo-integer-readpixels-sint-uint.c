@@ -258,7 +258,7 @@ test_fbo(const struct format_info *info)
       }
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    glDeleteTextures(1, &texObj);
    glDeleteFramebuffers(1, &fbo);

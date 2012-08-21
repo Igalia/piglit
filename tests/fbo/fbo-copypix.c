@@ -193,7 +193,7 @@ run_test(void)
 	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y2, SIZE, SIZE) && pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass;
 }

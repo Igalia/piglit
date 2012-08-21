@@ -174,7 +174,7 @@ piglit_display(void)
 				      piglit_height * 3 / 4, c1) && pass;
 	pass = piglit_probe_pixel_rgb(piglit_width * 3 / 4,
 				      piglit_height * 3 / 4, c2) && pass;
-	glutSwapBuffers();
+	piglit_present_results();
 
 	if (!pass) {
 		printf("%s: failed at size %d x %d x %d\n", TestName,

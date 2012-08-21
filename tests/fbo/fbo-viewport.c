@@ -169,7 +169,7 @@ piglit_display(void)
 			printf("Showing %s image\n", (i & 1) ? "FBO" : "window");
 			glDrawPixels(piglit_width, piglit_height,
 				     GL_RGB, GL_UNSIGNED_BYTE, image);
-			glutSwapBuffers();
+			piglit_present_results();
 			sleep(1);
 		}
 	}

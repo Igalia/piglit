@@ -136,7 +136,7 @@ enum piglit_result piglit_display(void)
 
 	glDeleteTextures(1, &tex);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

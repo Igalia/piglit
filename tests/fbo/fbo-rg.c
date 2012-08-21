@@ -87,7 +87,7 @@ piglit_display(void)
 	piglit_draw_rect_tex(0.0, -1.0, 1.0, 2.0,
 			     0.0, 0.0, 1.0, 1.0);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

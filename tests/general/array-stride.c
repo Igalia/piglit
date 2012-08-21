@@ -129,7 +129,7 @@ piglit_display(void)
       glReadPixels(0, 0, piglit_width, piglit_height,
                    GL_RGBA, GL_UNSIGNED_BYTE, buf1);
 
-      glutSwapBuffers();
+      piglit_present_results();
 
       /* compare bufs */
       if (memcmp(buf0, buf1, piglit_width * piglit_height * 4) != 0) {

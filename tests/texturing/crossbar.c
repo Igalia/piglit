@@ -148,7 +148,7 @@ piglit_display(void)
 {
    if (piglit_automatic) {
       DoFrame();
-      glutSwapBuffers();
+      piglit_present_results();
       return PIGLIT_PASS;
    } else {
       int success, retry;
@@ -156,7 +156,7 @@ piglit_display(void)
       printf("\nFirst frame\n-----------\n");
       DoFrame();
       success = DoTest();
-      glutSwapBuffers();
+      piglit_present_results();
 
       printf("\nSecond frame\n------------\n");
       glMatrixMode( GL_PROJECTION );
@@ -167,7 +167,7 @@ piglit_display(void)
 
       DoFrame();
       retry = DoTest();
-      glutSwapBuffers();
+      piglit_present_results();
 
       if (retry && success)
           return PIGLIT_PASS;

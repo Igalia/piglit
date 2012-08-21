@@ -371,7 +371,7 @@ Test(GLuint intFmt, GLuint dims)
       glPopMatrix();
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass;
 }

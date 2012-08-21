@@ -155,7 +155,7 @@ test(enum order ord, const char *order)
 
       pass &= p;
       
-      glutSwapBuffers();
+      piglit_present_results();
    }
 
    return pass;

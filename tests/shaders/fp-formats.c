@@ -69,7 +69,7 @@ piglit_display(void)
 				    expected))
 	  result = PIGLIT_FAIL;
 
-	glutSwapBuffers();
+	piglit_present_results();
 	return result;
 }
 

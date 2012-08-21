@@ -342,7 +342,7 @@ static void display_texture_to_window(GLint texture)
 
 	glDisable(GL_TEXTURE_2D);
 
-	glutSwapBuffers();
+	piglit_present_results();
 }
 
 enum piglit_result

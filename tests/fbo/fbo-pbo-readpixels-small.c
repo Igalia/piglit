@@ -156,7 +156,7 @@ piglit_display(void)
 	glDeleteFramebuffersEXT(1, &fbo);
 	glDeleteTextures(1, &tex);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

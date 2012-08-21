@@ -73,7 +73,7 @@ enum piglit_result piglit_display(void)
 
 	piglit_draw_rect_tex(-1, -1, 2, 2, 0, 0, 1, 1);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

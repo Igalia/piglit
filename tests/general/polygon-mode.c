@@ -281,7 +281,7 @@ test_combo(GLenum frontMode, GLenum backMode)
       }
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass;
 }

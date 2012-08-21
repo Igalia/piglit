@@ -296,7 +296,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 	glDeleteFramebuffersEXT(1, &fb);
 
 	if (!pass) {
-		glutSwapBuffers();
+		piglit_present_results();
 		return PIGLIT_FAIL;
 	}
 
@@ -346,7 +346,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 		pass = GL_FALSE;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

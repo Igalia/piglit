@@ -77,7 +77,7 @@ piglit_display(void)
 	glReadPixels(piglit_width - 10, 10, 1, 1,
 		     GL_BGRA, GL_UNSIGNED_BYTE, (void *)(uintptr_t)4);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	addr = glMapBufferARB(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY_ARB);
 

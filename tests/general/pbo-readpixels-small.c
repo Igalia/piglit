@@ -105,7 +105,7 @@ piglit_display(void)
 	pass &= probe(1, 1, 0x000000ff, addr[1]);
 	glUnmapBufferARB(GL_PIXEL_PACK_BUFFER);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDeleteBuffersARB(1, &pbo);
 

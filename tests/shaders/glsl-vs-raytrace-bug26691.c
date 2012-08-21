@@ -260,7 +260,7 @@ piglit_display(void)
     }
   }
 
-  glutSwapBuffers();
+  piglit_present_results();
 
   return ((float)passed_cnt > (1.0F-failing_pixel_percentage)
           *piglit_width*piglit_height)

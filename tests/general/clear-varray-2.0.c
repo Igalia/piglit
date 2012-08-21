@@ -113,7 +113,7 @@ piglit_display(void)
 	/* The second rectangle should have shown blue. */
 	pass = pass && piglit_probe_pixel_rgb(35, 15, blue);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

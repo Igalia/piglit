@@ -131,7 +131,7 @@ piglit_display(void)
 	glPopMatrix();
 
 	glFinish();
-        glutSwapBuffers();
+        piglit_present_results();
 
 	return PIGLIT_PASS;
 }

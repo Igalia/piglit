@@ -87,7 +87,7 @@ piglit_display(void)
 			     0, 0, 1, 1);
 	glDisable(GL_TEXTURE_2D);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

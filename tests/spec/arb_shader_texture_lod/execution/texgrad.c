@@ -180,7 +180,7 @@ enum piglit_result piglit_display(void)
 	if (!piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width, piglit_height))
 		pass = GL_FALSE;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

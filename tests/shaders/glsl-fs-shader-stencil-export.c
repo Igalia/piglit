@@ -53,7 +53,7 @@ piglit_display(void)
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
 	glReadPixels(0, 0, 3, 1, GL_STENCIL_INDEX, GL_FLOAT, p);
-	glutSwapBuffers();
+	piglit_present_results();
 
 	/* we hardcode 129 in the shader */
 	if (p[0] != 129)

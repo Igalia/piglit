@@ -114,7 +114,7 @@ piglit_display(void)
 				      white)
 		&& pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDeleteTextures(1, &tex);
 

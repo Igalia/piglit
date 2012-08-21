@@ -173,7 +173,7 @@ test_teximage_formats(void)
          return GL_FALSE;
       }
 
-      glutSwapBuffers();
+      piglit_present_results();
    }
 
    free(image);

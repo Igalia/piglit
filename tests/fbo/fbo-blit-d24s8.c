@@ -250,7 +250,7 @@ run_test(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	assert(glGetError() == 0);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass;
 }

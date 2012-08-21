@@ -192,7 +192,7 @@ framebuffer_srgb_non_fbo(void)
 	if (!piglit_probe_rect_rgb(30, 30, 20, 20, expected_green))
 		pass = GL_FALSE;
 
-	glutSwapBuffers();
+	piglit_present_results();
 	return pass;
 }
 
@@ -327,7 +327,7 @@ framebuffer_srgb_fbo(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
 	draw_fbo(0, 0);
-	glutSwapBuffers();
+	piglit_present_results();
 	glDeleteFramebuffersEXT(1, &fbo);
 	return pass;
 }

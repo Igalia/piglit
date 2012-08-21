@@ -92,7 +92,7 @@ test_fixedfunc_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("conventional vertex arrays\n");
@@ -122,7 +122,7 @@ test_fixedfunc_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("generic array [%u]\n", attrib);
@@ -149,7 +149,7 @@ test_fixedfunc_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, black);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("generic array [%u]\n", attrib);
@@ -160,7 +160,7 @@ test_fixedfunc_arrays(void)
       glDisableClientState(GL_COLOR_ARRAY);
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    glDeleteBuffersARB(1, &buf);
 
@@ -226,7 +226,7 @@ test_glsl_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("compiler-assigned attribute locations\n");
@@ -261,7 +261,7 @@ test_glsl_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("user-assigned attribute locations\n");
@@ -319,7 +319,7 @@ test_glsl_no_arrays(void)
    glPointSize(1.0);
 
    p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-   glutSwapBuffers();
+   piglit_present_results();
    if (!p) {
       printf("%s: failed when drawing with GLSL and no vertex arrays\n",
              TestName);
@@ -412,7 +412,7 @@ test_arbvp_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("ARB VP and conventional vertex arrays\n");
@@ -443,7 +443,7 @@ test_arbvp_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("ARB VP and generic vertex array[%u]\n", attrib);
@@ -474,7 +474,7 @@ test_arbvp_arrays(void)
       glDrawArrays(GL_QUADS, 0, 4);
 
       p = piglit_probe_pixel_rgba(piglit_width/2, piglit_height/2, expected);
-      glutSwapBuffers();
+      piglit_present_results();
       if (!p) {
          printf("%s: failed when drawing with ", TestName);
          printf("ARB VP and generic vertex array[%u]\n", attrib);

@@ -124,13 +124,13 @@ test_instancing(void)
          if (!piglit_probe_pixel_rgba(pos[0], pos[1], Colors[i])) {
             fprintf(stderr, "%s: instance %d failed to draw correctly\n",
                     TestName, i);
-            glutSwapBuffers();
+            piglit_present_results();
             return GL_FALSE;
          }
       }
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return GL_TRUE;
 }

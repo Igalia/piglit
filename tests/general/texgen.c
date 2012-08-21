@@ -89,7 +89,7 @@ static void test_sanity(void)
 			probe_cell("test_sanity", x, y, TextureData[y][x]);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 }
 
 static void do_test_texgen_eye(const char* testname)
@@ -148,7 +148,7 @@ static void do_test_texgen_eye(const char* testname)
 			probe_cell(testname, x, y, TextureData[y+1][x+1]);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 }
 
 static void test_texgen_eye(void)

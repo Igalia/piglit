@@ -252,7 +252,7 @@ piglit_display(void)
 	pass = DoTest();
 
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

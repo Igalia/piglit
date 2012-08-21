@@ -311,7 +311,7 @@ piglit_display(void)
         pass = test(conf[i][0], conf[i][1], i) && pass;
     }
 
-    glutSwapBuffers();
+    piglit_present_results();
 
     return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

@@ -59,7 +59,7 @@ piglit_display(void)
 	glVertex2f(0, 1);
 	glEnd();
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	pass = test_getteximage();
 

@@ -485,7 +485,7 @@ piglit_display(void)
 
    result = count_and_report_bad_pixels();
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return result;
 }

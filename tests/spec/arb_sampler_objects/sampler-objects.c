@@ -213,7 +213,7 @@ test_samplers(void)
 
       p = piglit_probe_pixel_rgba(10, 10, exp);
 
-      glutSwapBuffers();
+      piglit_present_results();
 
       if (!p) {
          fprintf(stderr, "%s failed for sampler %d\n", Prog, i);

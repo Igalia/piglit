@@ -143,7 +143,7 @@ piglit_display(void)
 	printf("Testing window result, blending SRC_ALPHA.\n");
 	pass = piglit_probe_pixel_rgba(piglit_width * 7 / 8, 0, win_blend2) && pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

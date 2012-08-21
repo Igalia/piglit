@@ -101,7 +101,7 @@ piglit_display(void)
 
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDeleteBuffersARB(1, &vbo);

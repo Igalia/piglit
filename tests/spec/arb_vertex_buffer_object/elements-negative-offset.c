@@ -104,7 +104,7 @@ piglit_display(void)
 				      piglit_width / 2, piglit_height / 2,
 				      blue) && pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);

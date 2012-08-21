@@ -60,7 +60,7 @@ piglit_display(void)
    if (!pass)
       puts("Fail: nothing rendered.");
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

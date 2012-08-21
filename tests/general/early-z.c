@@ -118,12 +118,12 @@ test_early_depth(void)
       glGetIntegerv(GL_CURRENT_RASTER_POSITION, pos);
 
       if (!piglit_probe_pixel_rgba(pos[0], pos[1], color)) {
-         glutSwapBuffers();
+         piglit_present_results();
          return GL_FALSE;
       }
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return GL_TRUE;
 }

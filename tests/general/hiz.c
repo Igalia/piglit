@@ -235,7 +235,7 @@ enum piglit_result piglit_display()
 	GLboolean pass = GL_TRUE;
 
 	pass = pass && test_less();
-	glutSwapBuffers();
+	piglit_present_results();
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

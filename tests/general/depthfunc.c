@@ -121,7 +121,7 @@ piglit_display(void)
 						      i & 4 ? blue : green);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

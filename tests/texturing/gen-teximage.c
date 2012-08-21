@@ -151,7 +151,7 @@ piglit_display(void)
 	pass = pass && check_resulting_mipmaps(0, SIZE, blue);
 	pass = pass && check_resulting_mipmaps(0, SIZE * 2, red);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDeleteTextures(1, &texture);
 

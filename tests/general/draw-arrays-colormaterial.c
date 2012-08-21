@@ -111,7 +111,7 @@ piglit_display(void)
 		pass = GL_FALSE;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

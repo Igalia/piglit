@@ -313,7 +313,7 @@ test_2d_mipmap_rendering(void)
 		p = piglit_probe_pixel_rgb(piglit_width/2, piglit_height/2,
 					   expected);
 
-		glutSwapBuffers();
+		piglit_present_results();
 
 		if (!p) {
 			printf("%s: wrong color for mipmap level %d\n",

@@ -269,7 +269,7 @@ piglit_display(void)
 		i++;
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

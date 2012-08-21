@@ -94,7 +94,7 @@ piglit_display(void)
                                          expColor)
 		? PIGLIT_PASS : PIGLIT_FAIL;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return result;
 }

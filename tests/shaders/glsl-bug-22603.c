@@ -158,7 +158,7 @@ piglit_display(void)
 	/* check that rect2 where less than rect1 is rendered */
 	pass &= piglit_probe_pixel_rgb(450, 250, rect2_color_bottom_rect1);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

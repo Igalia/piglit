@@ -124,7 +124,7 @@ piglit_display(void)
 	pass = pass && check_resulting_mipmaps(10, 10 + (10 + SIZE) * 0);
 	pass = pass && check_resulting_mipmaps(10, 10 + (10 + SIZE) * 1);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

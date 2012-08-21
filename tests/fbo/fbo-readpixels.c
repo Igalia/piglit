@@ -194,7 +194,7 @@ piglit_display(void)
 				 0, (BUF_HEIGHT + 1) * 2);
 	pass &= test_with_format(GL_RGB5_A1, GL_BGRA,
 				 0, (BUF_HEIGHT + 1) * 3);
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

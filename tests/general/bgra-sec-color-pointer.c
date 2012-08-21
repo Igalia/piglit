@@ -117,7 +117,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_pixel_rgb(275, 125, greyBlue);
 
 	glFinish();
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDisable(GL_BLEND);
 	glDisableClientState(GL_SECONDARY_COLOR_ARRAY);

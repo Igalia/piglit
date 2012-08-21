@@ -426,7 +426,7 @@ piglit_display(void)
    pass = test_lines_no_pgonmode() && pass;
    pass = test_points_no_pgonmode() && pass;
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

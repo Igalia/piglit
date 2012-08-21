@@ -106,7 +106,7 @@ piglit_display(void)
 
 	glDisableVertexAttribArray(attrib_loc);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return result;
 }

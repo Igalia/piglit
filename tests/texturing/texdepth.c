@@ -339,7 +339,7 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	Tests[CurrentTest].func(Tests[CurrentTest].param);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return PIGLIT_PASS;
 }

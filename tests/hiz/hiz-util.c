@@ -258,7 +258,7 @@ hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *fbo_options)
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glutSwapBuffers();
+		piglit_present_results();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	}
 
@@ -272,7 +272,7 @@ hiz_run_test_depth_test_window()
 {
 	bool pass = hiz_run_test_depth_test_common();
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 	return pass;
 }
 
@@ -362,7 +362,7 @@ hiz_run_test_depth_read_fbo(const struct hiz_fbo_options *fbo_options)
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glutSwapBuffers();
+		piglit_present_results();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	}
 
@@ -376,7 +376,7 @@ hiz_run_test_depth_read_window()
 {
 	bool pass = hiz_run_test_depth_read_common();
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 	return pass;
 }
 
@@ -469,7 +469,7 @@ hiz_run_test_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glutSwapBuffers();
+		piglit_present_results();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	}
 
@@ -483,7 +483,7 @@ hiz_run_test_stencil_test_window()
 {
 	bool pass = hiz_run_test_stencil_test_common();
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 	return pass;
 }
 
@@ -584,7 +584,7 @@ hiz_run_test_stencil_read_fbo(const struct hiz_fbo_options *fbo_options)
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glutSwapBuffers();
+		piglit_present_results();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	}
 
@@ -598,7 +598,7 @@ hiz_run_test_stencil_read_window()
 {
 	bool pass = hiz_run_test_stencil_read_common();
 	if (!piglit_automatic)
-		glutSwapBuffers();
+		piglit_present_results();
 	return pass;
 }
 
@@ -708,7 +708,7 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glutSwapBuffers();
+		piglit_present_results();
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	}
 

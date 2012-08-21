@@ -76,7 +76,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_pixel_rgb(0, point_size - 1, black);
 	pass = pass && piglit_probe_pixel_rgb(point_size - 1, point_size - 1, red);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

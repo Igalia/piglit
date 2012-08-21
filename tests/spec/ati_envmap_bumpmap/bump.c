@@ -181,7 +181,7 @@ piglit_display(void)
 					      piglit_height / 2,
 					      green);
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

@@ -74,7 +74,7 @@ piglit_display(void)
 				       piglit_height * 3 / 4,
 				       green) && pass;
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	glDeleteTextures(1, &tex);
 

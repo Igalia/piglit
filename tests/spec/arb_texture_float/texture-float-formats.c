@@ -337,7 +337,7 @@ test_format(const struct format_info *info)
       printf("\n");
    }
 
-   glutSwapBuffers();
+   piglit_present_results();
 
    return p;
 }

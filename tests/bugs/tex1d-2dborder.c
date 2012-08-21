@@ -98,7 +98,7 @@ piglit_display(void)
 		pass &= test(GL_MIRROR_CLAMP_TO_BORDER_EXT, 3, 1);
 	}
 
-	glutSwapBuffers();
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

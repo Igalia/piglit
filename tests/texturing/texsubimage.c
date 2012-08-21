@@ -305,7 +305,7 @@ test_format(GLenum target, GLenum intFormat)
 		piglit_draw_rect_tex3d(0, 0, w, h, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0);
 		glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, testImg);
 
-		glutSwapBuffers();
+		piglit_present_results();
 
 		if (!equal_images(ref, testImg, w, h)) {
 			printf("texsubimage failed\n");
