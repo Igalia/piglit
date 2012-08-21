@@ -301,6 +301,33 @@ piglit_compare_images_color(int x, int y, int w, int h, int num_components,
 }
 
 /**
+ * Compare two in-memory unsigned-byte images.
+ */
+int
+piglit_compare_images_ubyte(int x, int y, int w, int h,
+			    const GLubyte *expected_image,
+			    const GLubyte *observed_image)
+{
+	int i, j;
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			const GLubyte expected = expected_image[j*w+i];
+			const GLubyte probe = observed_image[j*w+i];
+
+			if (probe != expected) {
+				printf("Probe at (%i,%i)\n", x+i, y+j);
+				printf("  Expected: %d\n", expected);
+				printf("  Observed: %d\n", probe);
+
+				return 0;
+			}
+		}
+	}
+
+	return 1;
+}
+
+/**
  * Compare the contents of the current read framebuffer with the given
  * in-memory floating-point image.
  */
@@ -326,6 +353,34 @@ piglit_probe_image_color(int x, int y, int w, int h, GLenum format,
 
 	result = piglit_compare_images_color(x, y, w, h, c, tolerance, image,
 					     pixels);
+
+	free(pixels);
+	return result;
+}
+
+/**
+ * Compare the contents of the current read framebuffer's stencil
+ * buffer with the given in-memory byte image.
+ */
+int
+piglit_probe_image_stencil(int x, int y, int w, int h,
+			   const GLubyte *image)
+{
+	GLubyte *pixels = malloc(w*h*sizeof(GLubyte));
+	int result;
+	GLint old_pack_alignment;
+
+	/* Temporarily set pack alignment to 1 so that glReadPixels
+	 * won't put any padding at the end of the row.
+	 */
+	glGetIntegerv(GL_PACK_ALIGNMENT, &old_pack_alignment);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	glReadPixels(x, y, w, h, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, pixels);
+
+	glPixelStorei(GL_PACK_ALIGNMENT, old_pack_alignment);
+
+	result = piglit_compare_images_ubyte(x, y, w, h, image, pixels);
 
 	free(pixels);
 	return result;
