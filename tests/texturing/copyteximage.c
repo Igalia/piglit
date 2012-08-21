@@ -442,8 +442,6 @@ piglit_display(void)
 		for (i = 0; i < ARRAY_SIZE(test_vectors); i++) {
 			GLint x = IMAGE_SIZE * (i + 1);
 			GLint y = 0;
-			GLfloat vertices_1d[2][2] = { {x, y},
-						      {x + IMAGE_SIZE, y} };
 
 			format = test_vectors[i].format;
 			expected = (const float*)test_vectors[i].expected;
@@ -485,15 +483,11 @@ piglit_display(void)
 				       && pass;
 
 				glEnable(target[j].target);
-				glEnableClientState(GL_VERTEX_ARRAY);
-				glTexCoordPointer(1, GL_FLOAT, 0, texCoords_1d);
-				glVertexPointer(2, GL_FLOAT, 0, vertices_1d);
-
-				glDrawArrays(GL_LINES, 0, 2);
-				pass = piglit_probe_pixel_rgba(x, 0, expected)
-				       && pass;
-				pass = piglit_probe_pixel_rgba(x + IMAGE_SIZE - 1,
-							       0, expected)
+				glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
+				piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+				pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
+							      IMAGE_SIZE,
+							      expected)
 				       && pass;
 				break;
 
