@@ -50,7 +50,7 @@
 #endif
 
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_WAFFLE
-#include <waffle/waffle.h>
+#include <waffle.h>
 #endif
 
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX

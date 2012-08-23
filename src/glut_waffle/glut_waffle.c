@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 #include <EGL/egl.h>
-#include <waffle/waffle.h>
+#include <waffle.h>
 
 extern int piglit_automatic;
 

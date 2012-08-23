@@ -28,6 +28,7 @@ set(UTIL_GL_SOURCES
 
 set(UTIL_GL_LIBS
 	piglitutil
+        ${WAFFLE_LIBRARIES}
 	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -47,12 +48,5 @@ if(OPENGL_egl_LIBRARY)
 		${OPENGL_egl_LIBRARY}
 	)
 endif(OPENGL_egl_LIBRARY)
-
-if(USE_WAFFLE)
-	set(UTIL_GL_LIBS
-		${UTIL_GL_LIBS}
-		"${WAFFLE_waffle_LIBRARY}"
-	)
-endif(USE_WAFFLE)
 
 piglit_include_target_api()
