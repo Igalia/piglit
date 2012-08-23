@@ -102,8 +102,6 @@ piglit_display(void)
 		once = GL_FALSE;
 	}
 
-	glutSwapBuffers();
-
 	for (x = 0; x < piglit_width / 2; x++) {
 		for (y = 0; y < piglit_height; y++) {
 			float probed[4];
@@ -115,6 +113,8 @@ piglit_display(void)
 			pass = pass && piglit_probe_pixel_rgb(x, y, probed);
 		}
 	}
+
+	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_WARN;
 }
