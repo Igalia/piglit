@@ -217,19 +217,18 @@ static void key_func(unsigned char key, int x, int y)
    piglit_escape_exit_key(key, x, y);
 }
 
-void
-piglit_init(int argc, char **argv)
+void piglit_init(int argc, char **argv)
 {
 	if (piglit_get_gl_version() < 20) {
-      printf("Requires OpenGL 2.0\n");
-      piglit_report_result(PIGLIT_SKIP);
-   }
+		printf("Requires OpenGL 2.0\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
-   piglit_require_extension("GL_ARB_fragment_coord_conventions");
+	piglit_require_extension("GL_ARB_fragment_coord_conventions");
 
-   if (!piglit_automatic) {
-      printf("Press t to switch between subtests.\n");
-   }
+	if (!piglit_automatic) {
+		printf("Press t to switch between subtests.\n");
+	}
 
-   glutKeyboardFunc(key_func);
+	glutKeyboardFunc(key_func);
 }
