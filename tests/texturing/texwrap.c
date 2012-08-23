@@ -1458,15 +1458,13 @@ void piglit_init(int argc, char **argv)
 
     piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-    if (!piglit_automatic)
-      glutKeyboardFunc(key_func);
-
     glClearColor(0.5, 0.5, 0.5, 1.0);
 
     assert(glGetError() == 0);
     init_textures();
 
     if (!piglit_automatic) {
+        glutKeyboardFunc(key_func);
         printf("Hotkeys in the interactive mode:\n"
                "    b  - use 1-pixel texture border (deprecated in GL3)\n"
                "    p  - use projective texturing\n"

@@ -225,7 +225,6 @@ void piglit_init(int argc, char **argv)
 
 	if (!piglit_automatic) {
 		printf("Press t to switch between subtests.\n");
+		glutKeyboardFunc(key_func);
 	}
-
-	glutKeyboardFunc(key_func);
 }

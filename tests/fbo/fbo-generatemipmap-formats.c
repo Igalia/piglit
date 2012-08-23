@@ -480,9 +480,8 @@ void piglit_init(int argc, char **argv)
 {
 	fbo_formats_init(argc, argv, GL_FALSE);
 
-	glutKeyboardFunc(key_func);
-
 	if (!piglit_automatic) {
+		glutKeyboardFunc(key_func);
 		printf("    -n   Next test set.\n"
 		       "    -N   Previous test set.\n"
 		       "    -m   Next format in the set.\n"

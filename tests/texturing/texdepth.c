@@ -383,10 +383,11 @@ piglit_init(int argc, char **argv)
 	GLfloat texbuf[4];
 
 	glutReshapeFunc(Reshape);
-	glutKeyboardFunc(Key);
 
-	if (!piglit_automatic)
+	if (!piglit_automatic) {
+		glutKeyboardFunc(Key);
 		printf("Press 't' to cycle through test images\n");
+	}
 
 	piglit_require_extension("GL_ARB_depth_texture");
 	HaveShadow = piglit_is_extension_supported("GL_ARB_shadow");
