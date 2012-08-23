@@ -221,15 +221,14 @@ glutChooseConfig(void)
 
 	ADD_ATTR(WAFFLE_CONTEXT_API, _glut->waffle_context_api);
 
-	if (_glut->display_mode & (GLUT_RGB | GLUT_RGBA)) {
-		ADD_ATTR(WAFFLE_RED_SIZE,    1);
-		ADD_ATTR(WAFFLE_GREEN_SIZE,  1);
-		ADD_ATTR(WAFFLE_BLUE_SIZE,   1);
-	}
-
-	if (_glut->display_mode & (GLUT_ALPHA | GLUT_RGBA)) {
-		ADD_ATTR(WAFFLE_ALPHA_SIZE, 1);
-	}
+	/* It is impossible to not request RGBA because GLUT_RGB and
+	 * GLUT_RGBA are both 0. That is, (display_mode & (GLUT_RGB
+	 * | GLUT_RGBA)) is unconditonally true.
+	 */
+	ADD_ATTR(WAFFLE_RED_SIZE,   1);
+	ADD_ATTR(WAFFLE_GREEN_SIZE, 1);
+	ADD_ATTR(WAFFLE_BLUE_SIZE,  1);
+	ADD_ATTR(WAFFLE_ALPHA_SIZE, 1);
 
 	if (_glut->display_mode & GLUT_DEPTH) {
 		ADD_ATTR(WAFFLE_DEPTH_SIZE, 1);
