@@ -315,7 +315,10 @@ supported_format(GLenum format)
 	case GL_RGB16F:
 	case GL_RGB32F:
 		return piglit_is_extension_supported("GL_ARB_texture_float");
+	case GL_RED:
 	case GL_RG:
+	case GL_COMPRESSED_RED:
+	case GL_COMPRESSED_RG:
 		return piglit_is_extension_supported("GL_ARB_texture_rg");
 	case GL_DEPTH_COMPONENT32F:
 		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
