@@ -401,16 +401,212 @@ static GLboolean probe_rect(int x, int y, int w, int h,
 	return piglit_probe_rect_rgba(x, y, w, h, expected_scaled);
 }
 
+
+/**
+ * Test a specific texture target and format combination.
+ */
+static GLboolean
+test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
+		       const GLfloat *expected)
+{
+	GLboolean pass = GL_TRUE;
+	GLuint k;
+
+	if (!piglit_automatic)
+		printf("Texture target = %s, Internal format = %s",
+		       piglit_get_gl_enum_name(target),
+		       piglit_get_gl_enum_name(format));
+
+	if (!supported_format(format) ||
+	    !supported_target_format(target, format)) {
+		if (!piglit_automatic)
+			printf(" - skipped\n");
+		return GL_TRUE; /* not a failure */
+	} else {
+		if (!piglit_automatic)
+			printf("\n");
+	}
+
+	/* To avoid failures not related to this test case,
+	 * loosen up the tolerence for compressed texture
+	 * formats
+	 */
+	if (is_compressed_format(format))
+		piglit_set_tolerance_for_bits(7, 7, 7, 7);
+	else
+		piglit_set_tolerance_for_bits(8, 8, 8, 8);
+
+	switch(target) {
+
+	case GL_TEXTURE_1D:
+		draw(format, 1.0);
+		glCopyTexImage1D(GL_TEXTURE_1D, 0,
+				 format,
+				 0, 0, IMAGE_SIZE, 0);
+		pass = piglit_check_gl_error(GL_NO_ERROR)
+			&& pass;
+
+		glEnable(target);
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
+		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
+					      IMAGE_SIZE,
+					      expected)
+			&& pass;
+		break;
+
+	case GL_TEXTURE_2D:
+		draw(format, 1.0);
+		glCopyTexImage2D(GL_TEXTURE_2D, 0, format, 0, 0,
+				 IMAGE_SIZE, IMAGE_SIZE, 0);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glEnable(target);
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
+
+		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
+					      IMAGE_SIZE,
+					      expected)
+			&& pass;
+		break;
+
+	case GL_TEXTURE_3D:
+		glTexImage3D(GL_TEXTURE_3D, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
+			     0, GL_RGBA, GL_FLOAT, NULL);
+
+		for (k = 0; k < 4; k++) {
+			draw(format, 1.0 - k*0.2);
+			glCopyTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, k,
+					    0, 0, IMAGE_SIZE, IMAGE_SIZE);
+		}
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glEnable(target);
+
+		for (k = 0; k < 4; k++) {
+			glTexCoordPointer(3, GL_FLOAT, 0, texCoords_3d[k]);
+			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					  expected, 1.0 - k*0.2) && pass;
+		}
+		break;
+
+	case GL_TEXTURE_CUBE_MAP:
+		for (k = 0; k < 6; k++) {
+			draw(format, 1.0 - k*0.15);
+			glCopyTexImage2D(cube_face_targets[k],
+					 0, format, 0, 0,
+					 IMAGE_SIZE, IMAGE_SIZE, 0);
+		}
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glEnable(target);
+
+		for (k = 0; k < 6; k++) {
+			glTexCoordPointer(3, GL_FLOAT, 0,
+					  cube_face_texcoords[k]);
+			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					  expected, 1.0 - k*0.15) && pass;
+		}
+		break;
+
+	case GL_TEXTURE_1D_ARRAY:
+		glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, format, IMAGE_SIZE, 16,
+			     0, get_format(format), GL_FLOAT, NULL);
+
+		for (k = 0; k < 4; k++) {
+			draw(format, 1.0 - 0.2*k);
+			glCopyTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0, 0, 4*k,
+					    0, 0, IMAGE_SIZE, 4);
+		}
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glEnable(target);
+
+		for (k = 0; k < 16; k++) {
+			glTexCoordPointer(2, GL_FLOAT, 0, texCoords_1d_array[k]);
+			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					  expected, 1.0 - 0.2*(k/4)) && pass;
+		}
+		break;
+
+	case GL_TEXTURE_2D_ARRAY:
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
+			     0, get_format(format), GL_FLOAT, NULL);
+
+		for (k = 0; k < 4; k++) {
+			draw(format, 1.0 - k*0.2);
+			glCopyTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, k,
+					    0, 0, IMAGE_SIZE, IMAGE_SIZE);
+		}
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glEnable(target);
+
+		for (k = 0; k < 4; k++) {
+			glTexCoordPointer(3, GL_FLOAT, 0, texCoords_2d_array[k]);
+			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					  expected, 1.0 - k*0.2) && pass;
+		}
+		break;
+
+	case GL_TEXTURE_RECTANGLE:
+		draw(format, 1.0);
+		glCopyTexImage2D(GL_TEXTURE_RECTANGLE, 0, format, 0, 0,
+				 IMAGE_SIZE, IMAGE_SIZE, 0);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+		
+		glEnable(target);
+		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_rect);
+
+		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
+					      IMAGE_SIZE,
+					      expected)
+			&& pass;
+		break;
+	}
+
+	glDisable(target);
+
+	return pass;
+}
+
+
+static GLuint
+create_texture(GLenum target)
+{
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(target,	GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_GENERATE_MIPMAP, GL_FALSE);
+
+	return tex;
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
 	GLuint tex;
 	GLboolean pass = GL_TRUE;
-	GLenum format;
 	const GLfloat *expected;
-	int i, j, k;
+	int i, j;
 
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	/* Do glCopyPixels and draw a textured rectangle for each format
 	 * and each texture target
@@ -427,195 +623,20 @@ piglit_display(void)
 			printf("NOTE: We use glCopyTexSubImage2D to set 4 texture layers at once.\n");
 		}
 
-		/* Texture setup */
-		glGenTextures(1, &tex);
-		glBindTexture(target[j].target, tex);
-		glTexParameteri(target[j].target,
-				GL_TEXTURE_MIN_FILTER,
-				GL_NEAREST);
-		glTexParameteri(target[j].target,
-				GL_TEXTURE_MAG_FILTER,
-				GL_NEAREST);
-		glTexParameteri(target[j].target,
-				GL_GENERATE_MIPMAP,
-				GL_FALSE);
-
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		tex = create_texture(target[j].target);
 
 		for (i = 0; i < ARRAY_SIZE(test_vectors); i++) {
 			GLint x = IMAGE_SIZE * (i + 1);
 			GLint y = 0;
-
-			format = test_vectors[i].format;
 			expected = (const float*)test_vectors[i].expected;
 
-			if (!piglit_automatic)
-				printf("Texture target = %s, Internal"
-				       " format = %s",
-				       piglit_get_gl_enum_name(target[j].target),
-				       piglit_get_gl_enum_name(format));
-
-			if (!supported_format(format) ||
-			    !supported_target_format(target[j].target, format)) {
-				if (!piglit_automatic)
-					printf(" - skipped\n");
-				continue;
-			} else {
-				if (!piglit_automatic)
-					printf("\n");
+			if (!test_target_and_format(x, y, target[j].target,
+						    test_vectors[i].format,
+						    expected)) {
+				pass = GL_FALSE;
 			}
-
-
-			/* To avoid failures not related to this test case,
-			 * loosen up the tolerence for compressed texture
-			 * formats
-			 */
-			if (is_compressed_format(format))
-				piglit_set_tolerance_for_bits(7, 7, 7, 7);
-			else
-				piglit_set_tolerance_for_bits(8, 8, 8, 8);
-
-			switch(target[j].target) {
-
-			case GL_TEXTURE_1D:
-				draw(format, 1.0);
-				glCopyTexImage1D(GL_TEXTURE_1D, 0,
-						 format,
-						 0, 0, IMAGE_SIZE, 0);
-				pass = piglit_check_gl_error(GL_NO_ERROR)
-				       && pass;
-
-				glEnable(target[j].target);
-				glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
-				piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-				pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
-							      IMAGE_SIZE,
-							      expected)
-				       && pass;
-				break;
-
-			case GL_TEXTURE_2D:
-				draw(format, 1.0);
-				glCopyTexImage2D(GL_TEXTURE_2D, 0, format, 0, 0,
-						 IMAGE_SIZE, IMAGE_SIZE, 0);
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-				glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
-
-				piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-				pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
-							      IMAGE_SIZE,
-							      expected)
-				       && pass;
-				break;
-
-			case GL_TEXTURE_3D:
-				glTexImage3D(GL_TEXTURE_3D, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
-					     0, GL_RGBA, GL_FLOAT, NULL);
-
-				for (k = 0; k < 4; k++) {
-					draw(format, 1.0 - k*0.2);
-					glCopyTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, k,
-							    0, 0, IMAGE_SIZE, IMAGE_SIZE);
-				}
-
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-
-				for (k = 0; k < 4; k++) {
-					glTexCoordPointer(3, GL_FLOAT, 0, texCoords_3d[k]);
-					piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-					pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
-							  expected, 1.0 - k*0.2) && pass;
-				}
-				break;
-
-			case GL_TEXTURE_CUBE_MAP:
-				for (k = 0; k < 6; k++) {
-					draw(format, 1.0 - k*0.15);
-					glCopyTexImage2D(cube_face_targets[k],
-							 0, format, 0, 0,
-							 IMAGE_SIZE, IMAGE_SIZE, 0);
-				}
-
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-
-				for (k = 0; k < 6; k++) {
-					glTexCoordPointer(3, GL_FLOAT, 0,
-							  cube_face_texcoords[k]);
-					piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-					pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
-							  expected, 1.0 - k*0.15) && pass;
-				}
-				break;
-
-			case GL_TEXTURE_1D_ARRAY:
-				glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, format, IMAGE_SIZE, 16,
-					     0, get_format(format), GL_FLOAT, NULL);
-
-				for (k = 0; k < 4; k++) {
-					draw(format, 1.0 - 0.2*k);
-					glCopyTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0, 0, 4*k,
-							    0, 0, IMAGE_SIZE, 4);
-				}
-
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-
-				for (k = 0; k < 16; k++) {
-					glTexCoordPointer(2, GL_FLOAT, 0, texCoords_1d_array[k]);
-					piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-					pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
-							  expected, 1.0 - 0.2*(k/4)) && pass;
-				}
-				break;
-
-			case GL_TEXTURE_2D_ARRAY:
-				glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
-					     0, get_format(format), GL_FLOAT, NULL);
-
-				for (k = 0; k < 4; k++) {
-					draw(format, 1.0 - k*0.2);
-					glCopyTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, k,
-							    0, 0, IMAGE_SIZE, IMAGE_SIZE);
-				}
-
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-
-				for (k = 0; k < 4; k++) {
-					glTexCoordPointer(3, GL_FLOAT, 0, texCoords_2d_array[k]);
-					piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-					pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
-							  expected, 1.0 - k*0.2) && pass;
-				}
-				break;
-
-			case GL_TEXTURE_RECTANGLE:
-				draw(format, 1.0);
-				glCopyTexImage2D(GL_TEXTURE_RECTANGLE, 0, format, 0, 0,
-						 IMAGE_SIZE, IMAGE_SIZE, 0);
-				pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-
-				glEnable(target[j].target);
-				glTexCoordPointer(2, GL_FLOAT, 0, texCoords_rect);
-
-				piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
-				pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
-							      IMAGE_SIZE,
-							      expected)
-				       && pass;
-				break;
-			}
-			glDisable(target[j].target);
 		}
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 		glDeleteTextures(1, &tex);
 	}
 	if (!piglit_automatic)
