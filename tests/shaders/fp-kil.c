@@ -113,7 +113,7 @@ static const struct {
 		{ 0.0, 0.0, 0.0, 1.0 }
 	},
 
-	// Program 0
+	// Program 1
 	{
 		"texture #1",
 		0.125, 1.125,
@@ -264,6 +264,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	int i, x, y;
+	GLuint texname;
 	GLubyte tex[4][4][4];
 
 	if (piglit_get_gl_version() < 13) {
@@ -293,9 +294,10 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
+	glGenTextures(1, &texname);
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 1);
+	glBindTexture(GL_TEXTURE_2D, texname);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0,
 	             GL_RGBA, GL_UNSIGNED_BYTE, tex);
 
