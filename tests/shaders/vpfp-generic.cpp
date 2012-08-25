@@ -374,20 +374,6 @@ extern "C" piglit_result piglit_display(void)
 	return tests.run() ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
 extern "C" void piglit_init(int argc, char **argv)
 {
 	int i;
@@ -421,6 +407,5 @@ extern "C" void piglit_init(int argc, char **argv)
 	if (tests.nv_vertex_program)
 		piglit_require_extension("GL_NV_vertex_program");
 
-	glutReshapeFunc(Reshape);
-	Reshape(piglit_width, piglit_height);
+	piglit_ortho_projection(1.0, 1.0, GL_FALSE);
 }

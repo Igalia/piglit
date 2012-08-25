@@ -417,6 +417,8 @@ piglit_display(void)
 {
    GLboolean pass = GL_TRUE;
 
+   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
    glClear(GL_COLOR_BUFFER_BIT);
 
    pass = test_lines_no_culling() && pass;
@@ -431,20 +433,7 @@ piglit_display(void)
    return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void
-reshape(int width, int height)
-{
-   piglit_width = width;
-   piglit_height = height;
-   glViewport(0, 0, width, height);
-   piglit_ortho_projection(width, height, GL_FALSE);
-}
-
-
 void
 piglit_init(int argc, char **argv)
 {
-   glutReshapeFunc(reshape);
-   reshape(piglit_width, piglit_height);
 }

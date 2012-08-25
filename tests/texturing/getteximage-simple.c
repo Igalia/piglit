@@ -66,24 +66,9 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -2.0, 6.0);
-	glScalef(1.0, 1.0, -1.0); // flip z-axis
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
 void piglit_init(int argc, char **argv)
 {
 	int i;
-
-	glutReshapeFunc(Reshape);
 
 	for(i = 0; i < 4096; ++i)
 		data[i] = rand() & 0xff;
@@ -92,5 +77,5 @@ void piglit_init(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-	Reshape(piglit_width, piglit_height);
+	piglit_gen_ortho_projection(0.0, 1.0, 0.0, 1.0, -2.0, 6.0, GL_FALSE);
 }

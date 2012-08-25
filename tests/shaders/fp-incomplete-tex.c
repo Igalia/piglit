@@ -184,20 +184,6 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 3.0, 0.0, 2.0, -2.0, 6.0);
-	glScalef(1.0, 1.0, -1.0); // flip z-axis
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
 void
 piglit_init(int argc, char **argv)
 {
@@ -205,13 +191,11 @@ piglit_init(int argc, char **argv)
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
-	glutReshapeFunc(Reshape);
-
 	piglit_require_fragment_program();
 
 	for(i = 0; i < NUM_PROGRAMS; ++i)
 		FragProg[i] = piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, ProgramText[i]);
 
-	Reshape(piglit_width, piglit_height);
+	piglit_gen_ortho_projection(0.0, 3.0, 0.0, 2.0, -2.0, 6.0, GL_FALSE);
 }
 

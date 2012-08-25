@@ -201,6 +201,8 @@ piglit_display(void)
 	GLenum formats[] = { GL_RGBA, GL_RGB, GL_ALPHA };
 	int w, h, d, fmt;
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	for(fmt = 0; fmt < sizeof(formats)/sizeof(formats[0]); ++fmt) {
 		for(w = 1; w <= 16; w *= 2) {
 			for(h = 1; h <= 16; h *= 2) {
@@ -214,14 +216,6 @@ piglit_display(void)
 	return PIGLIT_PASS;
 }
 
-
-static void Reshape(int width, int height)
-{
-	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-}
-
-
 void
 piglit_init(int argc, char **argv)
 {
@@ -232,11 +226,8 @@ piglit_init(int argc, char **argv)
 
 	piglit_automatic = GL_TRUE;
 
-	glutReshapeFunc(Reshape);
-
 	glDisable(GL_DITHER);
 
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_3D, Texture);
-	Reshape(piglit_width, piglit_height);
 }

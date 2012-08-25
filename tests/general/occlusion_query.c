@@ -139,6 +139,7 @@ piglit_display(void)
 {
 	int test_pass;
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	test_pass = do_test(0.0f, 0);
@@ -149,24 +150,10 @@ piglit_display(void)
 	return test_pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	piglit_ortho_projection(width, height, GL_FALSE);
-}
-
-
 void
 piglit_init(int argc, char **argv)
 {
 	GLint query_bits;
-
-	glutReshapeFunc(Reshape);
-
-	Reshape(piglit_width, piglit_height);
 
 	glClearColor(0.0, 0.2, 0.3, 0.0);
 	glClearDepth(1.0);

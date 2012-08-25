@@ -159,11 +159,6 @@ piglit_display(void)
       piglit_present_results();
 
       printf("\nSecond frame\n------------\n");
-      glMatrixMode( GL_PROJECTION );
-      glLoadIdentity();
-      glOrtho( 0, 3*(NUM_TESTS+1), -1.5, 1.5, -1, 1 );
-      glMatrixMode( GL_MODELVIEW );
-      glLoadIdentity();
 
       DoFrame();
       retry = DoTest();
@@ -176,20 +171,6 @@ piglit_display(void)
    }
 }
 
-
-static void Reshape( int width, int height )
-{
-   piglit_width = width;
-   piglit_height = height;
-
-   glViewport( 0, 0, width, height );
-   glMatrixMode( GL_PROJECTION );
-   glLoadIdentity();
-   glOrtho( 0, 3*(NUM_TESTS+1), -1.5, 1.5, -1, 1 );
-   glMatrixMode( GL_MODELVIEW );
-   glLoadIdentity();
-}
-
 void piglit_init(int argc, char **argv)
 {
    const char * const ver_string = (const char * const)
@@ -198,7 +179,7 @@ void piglit_init(int argc, char **argv)
    GLint tex_units;
    GLint temp[ 256 ];
 
-   glutReshapeFunc(Reshape);
+   piglit_gen_ortho_projection( 0, 3*(NUM_TESTS+1), -1.5, 1.5, -1, 1, GL_FALSE );
 
    if ( (!piglit_is_extension_supported("GL_ARB_multitexture")
 	 && (ver < 1.3))

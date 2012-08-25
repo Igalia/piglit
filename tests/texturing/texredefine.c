@@ -184,6 +184,8 @@ piglit_display(void)
 
 	testnr = 0;
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -201,17 +203,6 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	glViewport(0, 0, width, height);
-	piglit_ortho_projection(width, height, GL_FALSE);
-}
-
-
 void piglit_init(int argc, char **argv)
 {
-	glutReshapeFunc(Reshape);
-
-	Reshape(piglit_width, piglit_height);
 }

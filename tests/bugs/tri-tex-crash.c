@@ -109,26 +109,9 @@ piglit_display(void)
    return result;
 }
 
-
-static void
-reshape(int width, int height)
-{
-   piglit_width = width;
-   piglit_height = height;
-
-   glViewport(0, 0, width, height);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glFrustum(-1.0, 1.0, -1.0, 1.0, 5.0, 50.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-   glTranslatef(0.0, 0.0, -25.0);
-}
-
-
 void
 piglit_init(int argc, char **argv)
 {
-   glutReshapeFunc(reshape);
-   reshape(piglit_width, piglit_height);
+   piglit_frustum_projection(GL_FALSE, -1.0, 1.0, -1.0, 1.0, 5.0, 50.0);
+   glTranslatef(0.0, 0.0, -25.0);
 }

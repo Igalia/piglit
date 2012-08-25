@@ -194,23 +194,12 @@ static void test(void)
 enum piglit_result
 piglit_display(void)
 {
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	test();
 
 	return PIGLIT_PASS;
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	piglit_ortho_projection(width, height, GL_FALSE);
-}
-
-
 void piglit_init(int argc, char **argv)
 {
-	glutReshapeFunc(Reshape);
-	Reshape(piglit_width, piglit_height);
 }

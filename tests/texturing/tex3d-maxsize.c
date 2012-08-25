@@ -93,6 +93,8 @@ piglit_display(void)
 	float c1[4] = {0.25, 0.25, 0.25, 1.0};
 	float c2[4] = {0.75, 0.75, 0.75, 1.0};
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxsize);
 
 	/* Create the texture. */
@@ -184,14 +186,6 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-}
-
-
 void piglit_init(int argc, char **argv)
 {
 	if (piglit_get_gl_version() < 12) {
@@ -199,8 +193,6 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	glutReshapeFunc(Reshape);
 	glDisable(GL_DITHER);
-	Reshape(piglit_width, piglit_height);
 }
 

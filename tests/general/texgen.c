@@ -189,20 +189,6 @@ piglit_display(void)
 	}
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
 static void Key(unsigned char key, int x, int y)
 {
 	(void) x;
@@ -251,7 +237,6 @@ void piglit_init(int argc, char *argv[])
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_FLOAT, TextureData);
 	glEnable(GL_TEXTURE_2D);
 
-	glutReshapeFunc(Reshape);
-	Reshape(piglit_width, piglit_height);
+	piglit_ortho_projection(1.0, 1.0, GL_FALSE);
 }
 

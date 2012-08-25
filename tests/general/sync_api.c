@@ -47,25 +47,13 @@ PIGLIT_GL_TEST_MAIN(
 		}							\
 	} while (0)
 
-static void
-reshape(int width, int height)
-{
-	glViewport(0, 0, (GLint) width, (GLint) height);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0);
-	glMatrixMode(GL_MODELVIEW);
-}
-
 void
 piglit_init(int argc, char **argv)
 {
-	glutReshapeFunc(reshape);
-
 	piglit_require_extension("GL_ARB_sync");
 
 	glClearColor(0.1, 0.1, 0.3, 0.0);
+	piglit_gen_ortho_projection(-1.0, 1.0, -1.0, 1.0, -0.5, 1000.0, GL_FALSE);
 }
 
 GLboolean

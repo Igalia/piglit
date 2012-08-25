@@ -251,6 +251,8 @@ piglit_display(void)
 {
 	int pass;
 
+	piglit_gen_ortho_projection(0.0, 2.0, 0.0, 2.0, -2.0, 6.0, GL_FALSE);
+
 	DoFrame();
 	pass = DoTest();
 	piglit_present_results();
@@ -258,27 +260,11 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void Reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, 2.0, 0.0, 2.0, -2.0, 6.0);
-	glScalef(1.0, 1.0, -1.0); // flip z-axis
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
 void
 piglit_init(int argc, char **argv)
 {
 	int i, x, y;
 	GLubyte tex[4][4][4];
-
-	glutReshapeFunc(Reshape);
 
 	if (piglit_get_gl_version() < 13) {
 		printf("Requires OpenGL 1.3\n");
@@ -315,6 +301,4 @@ piglit_init(int argc, char **argv)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	Reshape(piglit_width, piglit_height);
 }

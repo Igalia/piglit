@@ -501,6 +501,8 @@ piglit_display(void)
 {
 	GLboolean pass;
 
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
 	if (piglit_automatic) {
 		pass = test_all_formats();
 	}
@@ -520,21 +522,6 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-
-static void
-reshape(int width, int height)
-{
-	piglit_width = width;
-	piglit_height = height;
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, piglit_width, 0, piglit_height, -1.0, 1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
 void
 piglit_init(int argc, char **argv)
 {
@@ -547,11 +534,6 @@ piglit_init(int argc, char **argv)
 
 	fbo_formats_init(argc, argv, 0);
 	(void) fbo_formats_display;
-
-	glutReshapeFunc(reshape);
-	/*glutKeyboardFunc(key);*/
-
-	reshape(piglit_width, piglit_height);
 
 	glGenTextures(1, &t);
 	glBindTexture(GL_TEXTURE_2D, t);

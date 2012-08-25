@@ -312,6 +312,12 @@ static struct test_step Tests[] = {
 enum piglit_result
 piglit_display(void)
 {
+	CellWidth = piglit_width / COLS;
+	CellHeight = piglit_height / ROWS;
+	Width = CellWidth*COLS;
+	Height = CellHeight*ROWS;
+	piglit_gen_ortho_projection(0.0, COLS, 0.0, ROWS, 0.0, -1.0, GL_FALSE);
+
 	glReadBuffer(GL_BACK);
 	CreateRenderedTexture();
 	glViewport(0, 0, Width, Height);
@@ -344,21 +350,6 @@ piglit_display(void)
 	return PIGLIT_PASS;
 }
 
-static void Reshape(int width, int height)
-{
-	CellWidth = width / COLS;
-	CellHeight = height / ROWS;
-	Width = CellWidth*COLS;
-	Height = CellHeight*ROWS;
-	glViewport(0, 0, Width, Height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, COLS, 0.0, ROWS, 0.0, -1.0);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
 static void Key(unsigned char key, int x, int y)
 {
 	(void) x;
@@ -381,8 +372,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLfloat texbuf[4];
-
-	glutReshapeFunc(Reshape);
 
 	if (!piglit_automatic) {
 		glutKeyboardFunc(Key);
@@ -419,6 +408,4 @@ piglit_init(int argc, char **argv)
 		     GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	Reshape(Width,Height);
 }
