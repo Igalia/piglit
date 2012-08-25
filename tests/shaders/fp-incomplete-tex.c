@@ -128,54 +128,27 @@ static const struct {
 	}
 };
 
-static int DoTest( void )
+static bool DoTest( void )
 {
-	int idx;
-	GLfloat dmax;
+	int idx = 0;
+	bool pass = true;
 
-	dmax = 0;
-
-	idx = 0;
 	while(Probes[idx].name) {
-		GLfloat probe[4];
-		GLfloat delta[4];
-		int i;
-
-		glReadPixels((int)(Probes[idx].x * piglit_width / 3),
-			     (int)(Probes[idx].y * piglit_height / 2),
-			     1, 1,
-		GL_RGBA, GL_FLOAT, probe);
-
-		printf("%20s (%3.1f,%3.1f): %f,%f,%f,%f",
-		       Probes[idx].name,
-		       Probes[idx].x, Probes[idx].y,
-		       probe[0], probe[1], probe[2], probe[3]);
-
-		for(i = 0; i < 4; ++i) {
-			delta[i] = probe[i] - Probes[idx].expected[i];
-
-			if (delta[i] > dmax) dmax = delta[i];
-			else if (-delta[i] > dmax) dmax = -delta[i];
-		}
-
-		printf("   Delta: %f,%f,%f,%f\n", delta[0], delta[1], delta[2], delta[3]);
-
+		pass = piglit_probe_pixel_rgba(
+			(int)(Probes[idx].x * piglit_width / 3),
+			(int)(Probes[idx].y * piglit_height / 2),
+			Probes[idx].expected) && pass;
 		idx++;
 	}
 
-	printf("Max delta: %f\n", dmax);
-
-	if (dmax >= 0.02)
-		return 0;
-	else
-		return 1;
+	return pass;
 }
 
 
 enum piglit_result
 piglit_display(void)
 {
-	int pass;
+	bool pass;
 
 	DoFrame();
 	pass = DoTest();

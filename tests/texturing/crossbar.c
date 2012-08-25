@@ -110,37 +110,19 @@ static void DoFrame( void )
 
 }
 
-static int DoTest( void )
+static bool DoTest( void )
 {
+   const static float expected[] = {0.5f, 0.5f, 0.5f};
+   bool pass = true;
    int i;
-   GLfloat probe[NUM_TESTS+1][4];
-   GLfloat dr, dg, db;
-   GLfloat dmax;
 
-   glReadBuffer( GL_BACK );
-
-   dmax = 0;
    for( i = 0; i <= NUM_TESTS; ++i ) {
-      glReadPixels(piglit_width*(2*i+1)/((NUM_TESTS+1)*2), piglit_height/2, 1, 1, GL_RGBA, GL_FLOAT, probe[i]);
-      printf("Probe %i: %f,%f,%f\n", i, probe[i][0], probe[i][1], probe[i][2]);
-      dr = probe[i][0] - 0.5f;
-      dg = probe[i][1] - 0.5f;
-      db = probe[i][2] - 0.5f;
-      printf("   Delta: %f,%f,%f\n", dr, dg, db);
-      if (dr > dmax) dmax = dr;
-      else if (-dr > dmax) dmax = -dr;
-      if (dg > dmax) dmax = dg;
-      else if (-dg > dmax) dmax = -dg;
-      if (db > dmax) dmax = db;
-      else if (-db > dmax) dmax = -db;
+	   pass = piglit_probe_pixel_rgb(piglit_width*(2*i+1)/((NUM_TESTS+1)*2),
+			   piglit_height/2,
+			   expected) && pass;
    }
 
-   printf("Max delta: %f\n", dmax);
-
-   if (dmax >= 0.07) // roughly 1/128
-      return 0;
-   else
-      return 1;
+   return pass;
 }
 
 enum piglit_result
@@ -151,7 +133,7 @@ piglit_display(void)
       piglit_present_results();
       return PIGLIT_PASS;
    } else {
-      int success, retry;
+      bool success, retry;
 
       printf("\nFirst frame\n-----------\n");
       DoFrame();
