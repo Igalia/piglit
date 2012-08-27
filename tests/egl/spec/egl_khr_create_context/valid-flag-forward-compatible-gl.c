@@ -20,6 +20,7 @@
  * IN THE SOFTWARE.
  */
 #include "piglit-util-gl-common.h"
+#include "piglit-util-egl.h"
 #include "common.h"
 
 int gl_version;
@@ -47,11 +48,19 @@ static bool try_flag(int flag)
 			gl_version = piglit_get_gl_version();
 		}
 		eglDestroyContext(egl_dpy, ctx);
-		return true;
+	} else {
+		fprintf(stderr, "Failed to create context with flag %d\n", flag);
+
+		/* The EGL_KHR_create_context spec says:
+		 *
+		 *     "* If an attribute name or attribute value in <attrib_list> is not
+		 *        recognized (including unrecognized bits in bitmask attributes),
+		 *        then an EGL_BAD_ATTRIBUTE error is generated."
+		 */
+		piglit_expect_egl_error(EGL_BAD_ATTRIBUTE, PIGLIT_FAIL);
 	}
 
-	fprintf(stderr, "Failed to create context with flag %d\n", flag);
-	return false;
+	return true;
 }
 
 int main(int argc, char **argv)
