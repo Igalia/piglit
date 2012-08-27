@@ -12,3 +12,4 @@ link_libraries (
 piglit_add_executable (arb_texture_cube_map_array-cubemap cubemap.c)
 piglit_add_executable (arb_texture_cube_map_array-teximage3d-invalid-values teximage3d-invalid-values.c)
 piglit_add_executable (arb_texture_cube_map_array-get get.c)
+piglit_add_executable (arb_texture_cube_map_array-sampler-cube-array-shadow sampler-cube-array-shadow.c)
