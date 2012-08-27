@@ -198,5 +198,5 @@ for (types, base_name, major, minor) in [(bool_types,  "bool",  1, 20),
                                          (mat3_types,  "mat3",  1, 20),
                                          (mat4_types,  "mat4",  1, 20),
                                          (uint_types,  "uint",  1, 30)]:
-    generate_tests(types, base_name, 1, 20)
-    generate_array_tests(types, base_name, 1, 20)
+    generate_tests(types, base_name, major, minor)
+    generate_array_tests(types, base_name, major, minor)
