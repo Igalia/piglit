@@ -28,13 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <unistd.h>
 
-#include <EGL/egl.h>
 #include <waffle.h>
-
-extern int piglit_automatic;
 
 struct glut_waffle_window;
 
@@ -55,11 +51,6 @@ struct glut_waffle_state {
 	int window_width;
 	int window_height;
 
-	int verbose;
-	int init_time;
-
-	GLUT_EGLidleCB idle_cb;
-
 	struct waffle_display *display;
 	struct waffle_context *context;
 	struct glut_window *window;
@@ -72,7 +63,6 @@ static struct glut_waffle_state _glut_waffle_state = {
 	.display_mode = GLUT_RGB,
 	.window_width = 300,
 	.window_height = 300,
-	.verbose = 0,
 	.window_id_pool = 0,
 };
 
@@ -86,7 +76,6 @@ struct glut_window {
 	GLUT_EGLreshapeCB reshape_cb;
 	GLUT_EGLdisplayCB display_cb;
 	GLUT_EGLkeyboardCB keyboard_cb;
-	GLUT_EGLspecialCB special_cb;
 };
 
 static void
@@ -103,20 +92,6 @@ glutFatal(char *format, ...)
 	putc('\n', stderr);
 
 	exit(1);
-}
-
-/**  Return current time (in milliseconds). */
-static int
-glutNow(void)
-{
-	struct timeval tv;
-#ifdef __VMS
-	(void) gettimeofday(&tv, NULL );
-#else
-	struct timezone tz;
-	(void) gettimeofday(&tv, &tz);
-#endif
-	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
 void
@@ -183,8 +158,6 @@ glutInit(int *argcp, char **argv)
 	_glut->display = waffle_display_connect(display_name);
 	if (!_glut->display)
 		glutFatal("waffle_display_connect() failed");
-
-	_glut->init_time = glutNow();
 }
 
 void
@@ -252,29 +225,6 @@ glutChooseConfig(void)
 	if (!config)
 		glutFatal("waffle_config_choose() failed");
 	return config;
-}
-
-int
-glutGet(int state)
-{
-	int val;
-
-	switch (state) {
-		case GLUT_ELAPSED_TIME:
-			val = glutNow() - _glut->init_time;
-			break;
-		default:
-			val = -1;
-			break;
-	}
-
-	return val;
-}
-
-void
-glutIdleFunc(GLUT_EGLidleCB func)
-{
-	_glut->idle_cb = func;
 }
 
 void
@@ -371,12 +321,6 @@ void
 glutKeyboardFunc(GLUT_EGLkeyboardCB func)
 {
 	_glut->window->keyboard_cb = func;
-}
-
-void
-glutSpecialFunc(GLUT_EGLspecialCB func)
-{
-	_glut->window->special_cb = func;
 }
 
 void

@@ -44,20 +44,9 @@ enum glut_api {
 	GLUT_OPENGL_ES2_BIT = 0x4,
 };
 
-/* used by glutGet */
-enum {
-	GLUT_ELAPSED_TIME,
-	GLUT_WINDOW_RED_SIZE,
-	GLUT_WINDOW_GREEN_SIZE,
-	GLUT_WINDOW_BLUE_SIZE,
-	GLUT_WINDOW_ALPHA_SIZE,
-};
-
-typedef void (*GLUT_EGLidleCB)(void);
 typedef void (*GLUT_EGLreshapeCB)(int, int);
 typedef void (*GLUT_EGLdisplayCB)(void);
 typedef void (*GLUT_EGLkeyboardCB)(unsigned char, int, int);
-typedef void (*GLUT_EGLspecialCB)(int, int, int);
 
 void glutInitAPIMask(int mask);
 void glutInitDisplayMode(unsigned int mode);
@@ -65,9 +54,6 @@ void glutInitWindowPosition(int x, int y);
 void glutInitWindowSize(int width, int height);
 void glutInit(int *argcp, char **argv);
 
-int glutGet(int state);
-
-void glutIdleFunc(GLUT_EGLidleCB func);
 void glutPostRedisplay(void);
 
 void glutMainLoop(void);
@@ -83,5 +69,4 @@ void glutShowWindow(int win);
 void glutDisplayFunc(GLUT_EGLdisplayCB func);
 void glutReshapeFunc(GLUT_EGLreshapeCB func);
 void glutKeyboardFunc(GLUT_EGLkeyboardCB func);
-void glutSpecialFunc(GLUT_EGLspecialCB func);
 void glutSwapBuffers(void);
