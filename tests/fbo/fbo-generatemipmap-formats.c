@@ -359,6 +359,15 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 	if (a_size > 8)
 		a_size = 8;
 
+	if (compressed) {
+		l_size = MIN2(7, l_size);
+		i_size = MIN2(7, i_size);
+		r_size = MIN2(7, r_size);
+		g_size = MIN2(7, g_size);
+		b_size = MIN2(7, b_size);
+		a_size = MIN2(7, a_size);
+	}
+
 	if (i_size) {
 		piglit_set_tolerance_for_bits(i_size, i_size, i_size, i_size);
 	} else if (l_size) {
