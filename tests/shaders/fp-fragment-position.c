@@ -83,12 +83,6 @@ static const char* const ProgramText[NUM_PROGRAMS] = {
  */
 static void DoFrame(void)
 {
-	printf("rgba: %i %i %i %i\n",
-	       glutGet(GLUT_WINDOW_RED_SIZE),
-	       glutGet(GLUT_WINDOW_GREEN_SIZE),
-	       glutGet(GLUT_WINDOW_BLUE_SIZE),
-	       glutGet(GLUT_WINDOW_ALPHA_SIZE));
-
 	glClearColor(0.3, 0.3, 0.3, 0.3);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
