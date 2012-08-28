@@ -175,8 +175,6 @@ def add_fbo_blending_extension(group, extension, name):
 def add_fbo_alphatest_extension(group, extension, name):
 	group[name] = PlainExecTest(['fbo-alphatest-formats', '-auto', extension])
 
-mesa = Group()
-add_plain_test(mesa, 'crossbar')
 
 def add_fbo_rg(group, format):
 	name = "fbo-rg-" + format
@@ -1337,6 +1335,10 @@ add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH_COMPONENT32F')
 add_texwrap_test2(arb_depth_buffer_float, '2D', 'GL_DEPTH32F_STENCIL8')
+
+arb_texture_env_crossbar = Group()
+spec['ARB_texture_env_crossbar'] = arb_texture_env_crossbar
+add_plain_test(arb_texture_env_crossbar, 'crossbar')
 
 arb_texture_compression = Group()
 spec['ARB_texture_compression'] = arb_texture_compression
@@ -2544,7 +2546,6 @@ profile.tests['fbo'] = fbo
 profile.tests['glean'] = glean
 profile.tests['glslparsertest'] = glslparsertest
 profile.tests['asmparsertest'] = asmparsertest
-profile.tests['mesa'] = mesa
 profile.tests['shaders'] = shaders
 profile.tests['security'] = security
 profile.tests['texturing'] = texturing
