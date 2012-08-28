@@ -432,7 +432,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 	 * formats
 	 */
 	if (is_compressed_format(format))
-		piglit_set_tolerance_for_bits(7, 7, 7, 7);
+		piglit_set_tolerance_for_bits(5, 5, 5, 5);
 	else
 		piglit_set_tolerance_for_bits(8, 8, 8, 8);
 
