@@ -49,15 +49,15 @@ static bool try_flag(int flag)
 		}
 		eglDestroyContext(egl_dpy, ctx);
 	} else {
-		fprintf(stderr, "Failed to create context with flag %d\n", flag);
-
 		/* The EGL_KHR_create_context spec says:
 		 *
-		 *     "* If an attribute name or attribute value in <attrib_list> is not
-		 *        recognized (including unrecognized bits in bitmask attributes),
-		 *        then an EGL_BAD_ATTRIBUTE error is generated."
+		 *     "* If <config> does not support a client API context compatible
+		 *        with the requested API major and minor version, context flags,
+		 *        and context reset notification behavior (for client API types
+		 *        where these attributes are supported), then an EGL_BAD_MATCH
+		 *        error is generated.
 		 */
-		piglit_expect_egl_error(EGL_BAD_ATTRIBUTE, PIGLIT_FAIL);
+		piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
 	}
 
 	return true;

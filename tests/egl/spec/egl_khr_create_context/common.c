@@ -119,7 +119,6 @@ EGL_KHR_create_context_setup(EGLint renderable_type_mask)
 
 	if (!eglChooseConfig(egl_dpy, config_attribs, &cfg, 1, &count) ||
 	    count == 0) {
-		fprintf(stderr, "eglChooseConfig() failed\n");
 		return false;
 	}
 
