@@ -37,6 +37,7 @@ if(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
 endif(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	add_definitions(-DPIGLIT_HAS_X11)
 	option(BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
 	option(BUILD_GLX_TESTS "Build tests that require GLX" OFF)

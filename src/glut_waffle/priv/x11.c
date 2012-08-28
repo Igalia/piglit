@@ -20,59 +20,70 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include <stdbool.h>
 
-#include <waffle.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
 
-#ifdef PIGLIT_HAS_X11
-#	include <X11/Xlib.h>
-#endif
+#include "common.h"
 
-#include "glut_waffle.h"
+static void
+x11_process_next_event(void)
+{
+	struct glut_window *gwin = _glut->window;
+	Display *xdpy = gwin->x11.display;
 
-struct glut_window {
-        struct waffle_window *waffle;
+	bool redraw = false;
+	XEvent event;
 
-#ifdef PIGLIT_HAS_X11
-	struct {
-		Display *display;
-		Window window;
-	} x11;
-#endif
+	if (!XPending(xdpy))
+		return;
 
-        int id;
+	XNextEvent(xdpy, &event);
 
-        GLUT_EGLreshapeCB reshape_cb;
-        GLUT_EGLdisplayCB display_cb;
-        GLUT_EGLkeyboardCB keyboard_cb;
-};
+	switch (event.type) {
+		case Expose:
+			redraw = true;
+			break;
+		case ConfigureNotify:
+			if (gwin->reshape_cb)
+				gwin->reshape_cb(event.xconfigure.width,
+				                 event.xconfigure.height);
+			break;
+		case KeyPress: {
+			char buffer[1];
+			KeySym sym;
+			int n;
 
-struct glut_waffle_state {
-	/** \brief One of `WAFFLE_PLATFORM_*`. */
-	int waffle_platform;
+			redraw = true;
+			n = XLookupString(&event.xkey,
+					  buffer,
+					  sizeof(buffer), &sym, NULL);
 
-	/** \brief One of `WAFFLE_CONTEXT_OPENGL*`.
-	 *
-	 * The default value is `WAFFLE_CONTEXT_OPENGL`. To change the value,
-	 * call glutInitAPIMask().
-	 */
-	int waffle_context_api;
+			if (n > 0 && gwin->keyboard_cb)
+				gwin->keyboard_cb(buffer[0],
+				                  event.xkey.x, event.xkey.y);
+			break;
+		}
+		default:
+			break;
+	}
 
-	/** \brief A bitmask of enum glut_display_mode`. */
-	int display_mode;
-
-	int window_width;
-	int window_height;
-
-	struct waffle_display *display;
-	struct waffle_context *context;
-	struct glut_window *window;
-
-	int redisplay;
-	int window_id_pool;
-};
-
-extern struct glut_waffle_state *const _glut;
+	_glut->redisplay = redraw;
+}
 
 void
-glutFatal(char *format, ...);
+x11_event_loop(void)
+{
+	while (true) {
+		x11_process_next_event();
+
+		if (_glut->redisplay) {
+			_glut->redisplay = 0;
+
+			if (_glut->window->display_cb)
+				_glut->window->display_cb();
+		}
+	}
+}

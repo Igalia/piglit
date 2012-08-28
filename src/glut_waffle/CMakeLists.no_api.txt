@@ -1,7 +1,11 @@
-link_libraries(${WAFFLE_LIBRARIES})
+link_libraries(
+    ${WAFFLE_LIBRARIES}
+    X11
+    )
 
 add_library(glut_waffle SHARED
     glut_waffle.c
 
     priv/common.c
+    priv/x11.c
     )

@@ -21,6 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <assert.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -28,7 +29,14 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <waffle_glx.h>
+#include <waffle_x11_egl.h>
+
 #include "priv/common.h"
+
+#ifdef PIGLIT_HAS_X11
+#	include "priv/x11.h"
+#endif
 
 void
 glutInitAPIMask(int mask)
@@ -85,6 +93,12 @@ glutInit(int *argcp, char **argv)
 		glutFatal("environment var PIGLIT_PLATFORM has bad "
 			  "value \"%s\"", piglit_platform);
 	}
+
+#ifndef PIGLIT_HAS_X11
+	if (_glut->waffle_platform == WAFFLE_PLATFORM_GLX ||
+	    _glut->waffle_platform == WAFFLE_PLATFORM_X11_EGL)
+		glutFatal("piglit was built without x11 support");
+#endif
 
 	waffle_init_attrib_list[1] = _glut->waffle_platform;
 	ok = waffle_init(waffle_init_attrib_list);
@@ -181,6 +195,7 @@ glutCreateWindow(const char *title)
 {
 	bool ok = true;
 	struct waffle_config *config = NULL;
+	union waffle_native_window *n_window = NULL;
 
 	if (_glut->window)
 		glutFatal("cannot create window; one already exists");
@@ -200,6 +215,30 @@ glutCreateWindow(const char *title)
 	                                             _glut->window_height);
 	if (!_glut->window->waffle)
 		glutFatal("waffle_window_create() failed");
+
+	n_window = waffle_window_get_native(_glut->window->waffle);
+	if (!n_window)
+		glutFatal("waffle_window_get_window() failed");
+
+	switch (_glut->waffle_platform) {
+#ifdef PIGLIT_HAS_X11
+	case WAFFLE_PLATFORM_GLX:
+		_glut->window->x11.display = n_window->glx->xlib_display;
+		_glut->window->x11.window = n_window->glx->xlib_window;
+	break;
+	case WAFFLE_PLATFORM_X11_EGL:
+		_glut->window->x11.display = n_window->x11_egl->display.xlib_display;
+		_glut->window->x11.window = n_window->x11_egl->xlib_window;
+	break;
+#endif
+	case WAFFLE_PLATFORM_WAYLAND:
+		printf("glut_waffle: warning: input is not yet "
+		       "implemented for Wayland\n");
+		break;
+	default:
+		assert(0);
+		break;
+	}
 
 	ok = waffle_make_current(_glut->display, _glut->window->waffle,
 			_glut->context);
@@ -278,14 +317,30 @@ glutMainLoop(void)
 	if (_glut->window->display_cb)
 		_glut->window->display_cb();
 
-	// FIXME: Tests run without -auto require basic input.
+	switch (_glut->waffle_platform) {
+#ifdef PIGLIT_HAS_X11
+	case WAFFLE_PLATFORM_GLX:
+	case WAFFLE_PLATFORM_X11_EGL:
+		x11_event_loop();
+		break;
+#endif
+	case WAFFLE_PLATFORM_WAYLAND:
+		/* The Wayland window fails to appear on the first call to
+		 * swapBuffers (which occured in display_cb above). This is
+		 * likely due to swapBuffers being called before receiving an
+		 * expose event. Until piglit has proper Wayland support,
+		 * call swapBuffers again as a workaround.
+		 */
+		if (_glut->window->display_cb)
+			_glut->window->display_cb();
 
-	// Workaround for input:
-	// Since glut_waffle doesn't handle input yet, it sleeps in order to
-	// give the user a chance to see the test output. If the user wishes
-	// the test to sleep for a shorter or longer time, he can use Ctrl-C
-	// or Ctrl-Z.
-	sleep(20);
+		/* FINISHME: Write event loop for Wayland. */
+		sleep(20);
+		break;
+	default:
+		assert(0);
+		break;
+	}
 }
 
 void
