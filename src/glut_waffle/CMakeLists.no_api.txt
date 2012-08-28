@@ -2,4 +2,6 @@ link_libraries(${WAFFLE_LIBRARIES})
 
 add_library(glut_waffle SHARED
     glut_waffle.c
+
+    priv/common.c
     )

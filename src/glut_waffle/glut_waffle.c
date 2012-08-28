@@ -21,8 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "glut_waffle.h"
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -30,69 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <waffle.h>
-
-struct glut_waffle_window;
-
-struct glut_waffle_state {
-	/** \brief One of `WAFFLE_PLATFORM_*`. */
-	int waffle_platform;
-
-	/** \brief One of `WAFFLE_CONTEXT_OPENGL*`.
-	 *
-	 * The default value is `WAFFLE_CONTEXT_OPENGL`. To change the value,
-	 * call glutInitAPIMask().
-	 */
-	int waffle_context_api;
-
-	/** \brief A bitmask of enum glut_display_mode`. */
-	int display_mode;
-
-	int window_width;
-	int window_height;
-
-	struct waffle_display *display;
-	struct waffle_context *context;
-	struct glut_window *window;
-
-	int redisplay;
-	int window_id_pool;
-};
-
-static struct glut_waffle_state _glut_waffle_state = {
-	.display_mode = GLUT_RGB,
-	.window_width = 300,
-	.window_height = 300,
-	.window_id_pool = 0,
-};
-
-static struct glut_waffle_state *const _glut = &_glut_waffle_state;
-
-struct glut_window {
-	struct waffle_window *waffle;
-
-	int id;
-
-	GLUT_EGLreshapeCB reshape_cb;
-	GLUT_EGLdisplayCB display_cb;
-	GLUT_EGLkeyboardCB keyboard_cb;
-};
-
-static void
-glutFatal(char *format, ...)
-{
-	va_list args;
-
-	va_start(args, format);
-
-	fflush(stdout);
-	fprintf(stderr, "glut_waffle: ");
-	vfprintf(stderr, format, args);
-	va_end(args);
-	putc('\n', stderr);
-
-	exit(1);
-}
+#include "priv/common.h"
 
 void
 glutInitAPIMask(int mask)
