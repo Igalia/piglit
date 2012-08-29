@@ -1,0 +1,41 @@
+# Basic
+piglit_cl_add_api_test (get-platform-ids get-platform-ids.c)
+piglit_cl_add_api_test (get-platform-info get-platform-info.c)
+piglit_cl_add_api_test (get-device-ids get-device-ids.c)
+piglit_cl_add_api_test (get-device-info get-device-info.c)
+piglit_cl_add_api_test (create-context create-context.c)
+piglit_cl_add_api_test (create-context-from-type create-context-from-type.c)
+piglit_cl_add_api_test (get-context-info get-context-info.c)
+piglit_cl_add_api_test (retain_release-context retain_release-context.c)
+
+# Command queues
+piglit_cl_add_api_test (create-command-queue create-command-queue.c)
+piglit_cl_add_api_test (get-command-queue-info get-command-queue-info.c)
+piglit_cl_add_api_test (retain_release-command-queue retain_release-command-queue.c)
+
+# Memory objects
+piglit_cl_add_api_test (create-buffer create-buffer.c)
+piglit_cl_add_api_test (enqueue-read_write-buffer enqueue-read_write-buffer.c)
+piglit_cl_add_api_test (retain_release-mem-object retain_release-mem-object.c)
+piglit_cl_add_api_test (get-mem-object-info get-mem-object-info.c)
+piglit_cl_add_api_test (get-image-info get-image-info.c)
+
+# Programs
+piglit_cl_add_api_test (create-program-with-source create-program-with-source.c)
+piglit_cl_add_api_test (retain_release-program retain_release-program.c)
+piglit_cl_add_api_test (build-program build-program.c)
+piglit_cl_add_api_test (unload-compiler unload-compiler.c)
+piglit_cl_add_api_test (get-program-info get-program-info.c)
+piglit_cl_add_api_test (get-program-build-info get-program-build-info.c)
+
+# Kernels
+piglit_cl_add_api_test (create-kernel create-kernel.c)
+piglit_cl_add_api_test (create-kernels-in-program create-kernels-in-program.c)
+piglit_cl_add_api_test (set-kernel-arg set-kernel-arg.c)
+piglit_cl_add_api_test (retain_release-kernel retain_release-kernel.c)
+piglit_cl_add_api_test (get-kernel-info get-kernel-info.c)
+piglit_cl_add_api_test (get-kernel-work-group-info get-kernel-work-group-info.c)
+
+# Events
+piglit_cl_add_api_test (retain_release-event retain_release-event.c)
+piglit_cl_add_api_test (get-event-info get-event-info.c)
