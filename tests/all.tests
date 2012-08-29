@@ -752,6 +752,7 @@ texturing['tex-miplevel-selection-lod-bias'] = PlainExecTest(['tex-miplevel-sele
 add_plain_test(texturing, 'tex-skipped-unit')
 add_plain_test(texturing, 'tex-swizzle')
 add_plain_test(texturing, 'tex3d')
+add_concurrent_test(texturing, 'tex3d-depth1')
 add_plain_test(texturing, 'tex3d-maxsize')
 add_plain_test(texturing, 'tex3d-npot')
 add_plain_test(texturing, 'texdepth')
