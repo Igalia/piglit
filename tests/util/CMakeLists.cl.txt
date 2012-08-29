@@ -1,0 +1,20 @@
+include_directories(
+	${UTIL_INCLUDES}
+	${OPENCL_INCLUDE_PATH}
+	)
+
+link_libraries(
+	piglitutil
+	${OPENCL_opencl_LIBRARY}
+	)
+
+piglit_add_library (piglitutil_${piglit_target_api}
+	piglit-util-cl.c
+	piglit-util-cl-enum.c
+	piglit-framework-cl.c
+	piglit-framework-cl-custom.c
+	piglit-framework-cl-api.c
+	piglit-framework-cl-program.c
+)
+
+# vim: ft=cmake:

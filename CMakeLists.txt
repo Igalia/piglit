@@ -19,6 +19,7 @@ find_package(X11)
 
 option(BUILD_GLES1_TESTS "Build tests for OpenGL ES1" OFF)
 option(BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
+option(BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 
 option(USE_WAFFLE "Use Waffle in place of GLUT" OFF)
 if(USE_WAFFLE)
@@ -35,6 +36,10 @@ endif(BUILD_GLES1_TESTS AND NOT USE_WAFFLE)
 if(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
 	message(FATAL_ERROR "Option BUILD_GLES2_TESTS requires USE_WAFFLE")
 endif(BUILD_GLES2_TESTS AND NOT USE_WAFFLE)
+
+if(BUILD_CL_TESTS)
+	find_package(OpenCL REQUIRED)
+endif(BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	option(BUILD_GLX_TESTS "Build tests that require GLX" ON)
