@@ -22,7 +22,7 @@ option(BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
 
 option(USE_WAFFLE "Use Waffle in place of GLUT" OFF)
 if(USE_WAFFLE)
-	pkg_check_modules(WAFFLE REQUIRED waffle-1>=1.0)
+	pkg_check_modules(WAFFLE REQUIRED waffle-1>=1.0.1)
 	add_definitions(-DUSE_WAFFLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WAFFLE_CFLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WAFFLE_CFLAGS}")
