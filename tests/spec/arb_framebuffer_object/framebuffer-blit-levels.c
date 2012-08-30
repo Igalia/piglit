@@ -80,6 +80,7 @@ GLenum framebuffer_attachment;
 
 #define LOG2_SIZE 7
 #define SIZE (1 << LOG2_SIZE)
+#define NUM_LEVELS (LOG2_SIZE + 1)
 
 /**
  * Generate a block of test data in which each pixel has a unique RGBA
@@ -195,7 +196,7 @@ piglit_init(int argc, char **argv)
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 			GL_NEAREST);
-	for (level = 0; level < LOG2_SIZE; ++level) {
+	for (level = 0; level < NUM_LEVELS; ++level) {
 		glTexImage2D(GL_TEXTURE_2D, level,
 			     texture_internal_format,
 			     SIZE >> level, SIZE >> level,
@@ -228,7 +229,7 @@ piglit_display()
 	unsigned level;
 
 	/* Populate the test texture */
-	for (level = 0; level < LOG2_SIZE; ++level) {
+	for (level = 0; level < NUM_LEVELS; ++level) {
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
 		create_test_data(data, texture_format, level, width, height);
@@ -263,7 +264,7 @@ piglit_display()
 	}
 
 	/* Verify the test texture */
-	for (level = 0; level < LOG2_SIZE; ++level) {
+	for (level = 0; level < NUM_LEVELS; ++level) {
 		unsigned width = SIZE >> level;
 		unsigned height = SIZE >> level;
 		printf("Testing level %d\n", level);
