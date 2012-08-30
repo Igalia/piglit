@@ -63,15 +63,8 @@ unsigned num_fragment_shaders = 0;
 int num_uniform_blocks;
 GLuint *uniform_block_bos;
 
-/**
- * List of strings loaded from files
- *
- * Some test script sections, such as "[vertex shader file]", can supply shader
- * source code from multiple disk files.  This array stores those strings.
- */
-char *shader_strings[256];
-GLsizei shader_string_sizes[256];
-unsigned num_shader_strings = 0;
+char *shader_string;
+GLint shader_string_size;
 const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
@@ -114,7 +107,6 @@ compile_glsl(GLenum target, bool release_text)
 {
 	GLuint shader = piglit_CreateShader(target);
 	GLint ok;
-	unsigned i;
 
 	switch (target) {
 	case GL_VERTEX_SHADER:
@@ -129,9 +121,9 @@ compile_glsl(GLenum target, bool release_text)
 		break;
 	}
 
-	piglit_ShaderSource(shader, num_shader_strings,
-			    (const GLchar **) shader_strings,
-			    shader_string_sizes);
+	piglit_ShaderSource(shader, 1,
+			    &shader_string,
+			    &shader_string_size);
 
 	piglit_CompileShader(shader);
 
@@ -155,8 +147,7 @@ compile_glsl(GLenum target, bool release_text)
 	}
 
 	if (release_text) {
-		for (i = 0; i < num_shader_strings; i++)
-			free(shader_strings[i]);
+		free(shader_string);
 	}
 
 	switch (target) {
@@ -280,9 +271,14 @@ comparison_string(enum comparison cmp)
 void
 load_shader_file(const char *line)
 {
-	GLsizei *const size = &shader_string_sizes[num_shader_strings];
+	GLsizei *const size = &shader_string_size;
 	char buf[256];
 	char *text;
+
+	if (shader_string) {
+		printf("Multiple shader files in same section: %s\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	strcpy_to_space(buf, line);
 
@@ -304,8 +300,7 @@ load_shader_file(const char *line)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	shader_strings[num_shader_strings] = text;
-	num_shader_strings++;
+	shader_string = text;
 }
 
 
@@ -481,8 +476,7 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case vertex_shader:
-		shader_string_sizes[0] = line - shader_strings[0];
-		num_shader_strings = 1;
+		shader_string_size = line - shader_string;
 		compile_glsl(GL_VERTEX_SHADER, false);
 		break;
 
@@ -492,8 +486,8 @@ leave_state(enum states state, const char *line)
 
 	case vertex_program:
 		compile_and_bind_program(GL_VERTEX_PROGRAM_ARB,
-					 shader_strings[0],
-					 line - shader_strings[0]);
+					 shader_string,
+					 line - shader_string);
 		break;
 
 	case geometry_shader:
@@ -503,8 +497,7 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case fragment_shader:
-		shader_string_sizes[0] = line - shader_strings[0];
-		num_shader_strings = 1;
+		shader_string_size = line - shader_string;
 		compile_glsl(GL_FRAGMENT_SHADER, false);
 		break;
 
@@ -514,8 +507,8 @@ leave_state(enum states state, const char *line)
 
 	case fragment_program:
 		compile_and_bind_program(GL_FRAGMENT_PROGRAM_ARB,
-					 shader_strings[0],
-					 line - shader_strings[0]);
+					 shader_string,
+					 line - shader_string);
 		break;
 
 	case vertex_data:
@@ -629,24 +622,22 @@ process_test_script(const char *script_name)
 				state = requirements;
 			} else if (string_match("[vertex shader]", line)) {
 				state = vertex_shader;
-				shader_strings[0] = NULL;
+				shader_string = NULL;
 			} else if (string_match("[vertex program]", line)) {
 				state = vertex_program;
-				shader_strings[0] = NULL;
+				shader_string = NULL;
 			} else if (string_match("[vertex shader file]", line)) {
 				state = vertex_shader_file;
-				shader_strings[0] = NULL;
-				num_shader_strings = 0;
+				shader_string = NULL;
 			} else if (string_match("[fragment shader]", line)) {
 				state = fragment_shader;
-				shader_strings[0] = NULL;
+				shader_string = NULL;
 			} else if (string_match("[fragment program]", line)) {
 				state = fragment_program;
-				shader_strings[0] = NULL;
+				shader_string = NULL;
 			} else if (string_match("[fragment shader file]", line)) {
 				state = fragment_shader_file;
-				shader_strings[0] = NULL;
-				num_shader_strings = 0;
+				shader_string = NULL;
 			} else if (string_match("[vertex data]", line)) {
 				state = vertex_data;
 				vertex_data_start = NULL;
@@ -671,8 +662,8 @@ process_test_script(const char *script_name)
 			case geometry_program:
 			case fragment_shader:
 			case fragment_program:
-				if (shader_strings[0] == NULL)
-					shader_strings[0] = (char *) line;
+				if (shader_string == NULL)
+					shader_string = (char *) line;
 				break;
 
 			case vertex_shader_file:
@@ -680,7 +671,7 @@ process_test_script(const char *script_name)
 			case fragment_shader_file:
 				line = eat_whitespace(line);
 				if ((line[0] != '\n') && (line[0] != '#'))
-				    load_shader_file(line);
+					load_shader_file(line);
 				break;
 
 			case vertex_data:
