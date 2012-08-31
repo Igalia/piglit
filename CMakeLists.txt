@@ -158,6 +158,14 @@ if (MINGW)
 	endif ()
 endif ()
 
+if (${CMAKE_C_COMPILER_ID} STREQUAL "SunPro")
+	# Use C++ to link C files.
+	# http://developers.sun.com/solaris/articles/mixing.html#linking
+	# Modified rule from Modules/CMakeCInformation.cmake.
+	set (CMAKE_C_LINK_EXECUTABLE
+		"<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+endif()
+
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)
