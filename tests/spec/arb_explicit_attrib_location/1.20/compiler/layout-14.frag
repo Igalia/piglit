@@ -13,7 +13,7 @@
 
 #version 120
 #extension GL_ARB_explicit_attrib_location: require
-layout(location = 0, index = 2) out vec4 color;
+layout(location = 0, index = -5) out vec4 color;
 
 void main()
 {
