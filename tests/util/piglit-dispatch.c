@@ -63,15 +63,6 @@ static piglit_error_function_ptr get_proc_address_failure = NULL;
 static int gl_version = 0;
 
 /**
- * The GL extension string returned by glGetString(GL_EXTENSIONS).
- *
- * We cache this here because calling glGetString is prohibited
- * between glBegin and glEnd, and to avoid the inefficiency of
- * redundant glGetString queries.
- */
-static const char *gl_extensions = NULL;
-
-/**
  * True if piglit_dispatch_init has been called.
  */
 static bool is_initialized = false;
@@ -134,7 +125,7 @@ check_version(int required_version)
 static inline bool
 check_extension(const char *name)
 {
-	return piglit_is_extension_in_string(gl_extensions, name);
+	return piglit_is_extension_supported(name);
 }
 
 #include "generated_dispatch.c"
@@ -195,7 +186,6 @@ piglit_dispatch_init(piglit_dispatch_api api,
 	 * check_extension().
 	 */
 	gl_version = piglit_get_gl_version();
-	gl_extensions = (const char *) glGetString(GL_EXTENSIONS);
 }
 
 /**

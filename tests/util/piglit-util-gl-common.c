@@ -25,6 +25,15 @@
 #include <ctype.h>
 
 
+/**
+ * The GL extension string returned by glGetString(GL_EXTENSIONS).
+ *
+ * We cache this here because calling glGetString is prohibited
+ * between glBegin and glEnd, and to avoid the inefficiency of
+ * redundant glGetString queries.
+ */
+static const char *gl_extensions = NULL;
+
 bool piglit_is_gles()
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);
@@ -55,10 +64,11 @@ int piglit_get_gl_version()
 
 bool piglit_is_extension_supported(const char *name)
 {
-	const char *const extensions =
-		(const char*) glGetString(GL_EXTENSIONS);
+	if (gl_extensions == NULL) {
+		gl_extensions = (const char *) glGetString(GL_EXTENSIONS);
+	}
 
-	return piglit_is_extension_in_string(extensions, name);
+	return piglit_is_extension_in_string(gl_extensions, name);
 }
 
 void piglit_require_gl_version(int required_version_times_10)
