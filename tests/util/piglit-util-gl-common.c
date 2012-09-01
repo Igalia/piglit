@@ -90,13 +90,43 @@ static const char** gl_extension_array_from_getstring()
 	return split_string(gl_extensions_string);
 }
 
+#if defined(USE_OPENGL)
+static const char** gl_extension_array_from_getstringi()
+{
+	const char **strings;
+	int loop, num_extensions;
+
+	glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+	strings = malloc (sizeof(char*) * (num_extensions + 1));
+	assert (strings != NULL);
+
+	for (loop = 0; loop < num_extensions; loop++) {
+		strings[loop] = (const char*) glGetStringi(GL_EXTENSIONS, loop);
+	}
+
+	strings[loop] = NULL;
+
+	return (const char**) strings;
+}
+#endif
+
 static void initialize_piglit_extension_support(void)
 {
 	if (gl_extensions != NULL) {
 		return;
 	}
 
+#if defined(USE_OPENGL_ES1) || defined(USE_OPENGL_ES2)
 	gl_extensions = gl_extension_array_from_getstring();
+#elif defined(USE_OPENGL)
+	if (piglit_get_gl_version() < 30) {
+		gl_extensions = gl_extension_array_from_getstring();
+	} else {
+		gl_extensions = gl_extension_array_from_getstringi();
+	}
+#else
+#error Need code implemented to read extensions
+#endif
 }
 
 bool piglit_is_extension_supported(const char *name)
