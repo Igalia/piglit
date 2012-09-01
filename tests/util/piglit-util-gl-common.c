@@ -26,13 +26,13 @@
 
 
 /**
- * The GL extension string returned by glGetString(GL_EXTENSIONS).
+ * An array of pointers to extension strings.
  *
- * We cache this here because calling glGetString is prohibited
- * between glBegin and glEnd, and to avoid the inefficiency of
- * redundant glGetString queries.
+ * Each extension is pointed to by a separate entry in the array.
+ *
+ * The end of the array is indicated by a NULL pointer.
  */
-static const char *gl_extensions = NULL;
+static const char **gl_extensions = NULL;
 
 bool piglit_is_gles()
 {
@@ -62,13 +62,47 @@ int piglit_get_gl_version()
 	return 10*major+minor;
 }
 
-bool piglit_is_extension_supported(const char *name)
+static const char** split_string(const char *string)
 {
-	if (gl_extensions == NULL) {
-		gl_extensions = (const char *) glGetString(GL_EXTENSIONS);
+	char **strings, *string_copy;
+	int i, length, max_words;
+
+	length = strlen(string);
+	max_words = length / 2;
+	strings = malloc ((sizeof(char*) * (max_words + 1)) +
+	                  (sizeof(char) * (length + 1)));
+	assert (strings != NULL);
+
+	string_copy = (char*) &strings[max_words + 1];
+	strcpy(string_copy, string);
+
+	strings[0] = strtok(string_copy, " ");
+	for (i = 0; strings[i] != NULL; ++i)
+		strings[i + 1] = strtok(NULL, " ");
+
+	return (const char**) strings;
+}
+
+static const char** gl_extension_array_from_getstring()
+{
+	const char *gl_extensions_string;
+	gl_extensions_string = (const char *) glGetString(GL_EXTENSIONS);
+	return split_string(gl_extensions_string);
+}
+
+static void initialize_piglit_extension_support(void)
+{
+	if (gl_extensions != NULL) {
+		return;
 	}
 
-	return piglit_is_extension_in_string(gl_extensions, name);
+	gl_extensions = gl_extension_array_from_getstring();
+}
+
+bool piglit_is_extension_supported(const char *name)
+{
+	initialize_piglit_extension_support();
+	return piglit_is_extension_in_array(gl_extensions, name);
 }
 
 void piglit_require_gl_version(int required_version_times_10)

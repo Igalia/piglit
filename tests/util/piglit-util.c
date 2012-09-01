@@ -101,6 +101,21 @@ int asprintf(char **strp, const char *fmt, ...)
 
 #endif /* _WIN32 */
 
+bool piglit_is_extension_in_array(const char **haystack, const char *needle)
+{
+	if (needle[0] == 0)
+		return false;
+
+	while (*haystack != NULL) {
+		if (strcmp(*haystack, needle) == 0) {
+			return true;
+		}
+		haystack++;
+	}
+
+	return false;
+}
+
 bool piglit_is_extension_in_string(const char *haystack, const char *needle)
 {
 	const unsigned needle_len = strlen(needle);
