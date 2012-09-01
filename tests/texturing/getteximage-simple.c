@@ -2,7 +2,7 @@
  * @file getteximage-simple.c
  *
  * Extremely basic test to check whether image data can be retrieved.
- * 
+ *
  * Note that the texture is used in a full frame of rendering before
  * the readback, to ensure that buffer manager related code for uploading
  * texture images is executed before the readback.
@@ -38,12 +38,12 @@ static int test_getteximage(void)
 
 	return 1;
 }
-	
+
 enum piglit_result
 piglit_display(void)
 {
 	int pass;
-	
+
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

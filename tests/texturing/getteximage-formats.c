@@ -495,7 +495,7 @@ test_all_formats(void)
 	return pass;
 }
 
-	
+
 enum piglit_result
 piglit_display(void)
 {
