@@ -1551,6 +1551,15 @@ for num_samples in MSAA_SAMPLE_COUNTS:
                 ext_framebuffer_multisample[test_name] = PlainExecTest(
                         executable)
 
+for num_samples in MSAA_SAMPLE_COUNTS:
+        for flip_direction in ('x', 'y'):
+                test_name = ' '.join(['blit-flipped', str(num_samples),
+                                      flip_direction])
+                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                        test_name)
+                ext_framebuffer_multisample[test_name] = PlainExecTest(
+                        executable)
+
 # Note: the interpolation tests also check for sensible behaviour with
 # non-multisampled framebuffers, so go ahead and test them with
 # num_samples==0 as well.
