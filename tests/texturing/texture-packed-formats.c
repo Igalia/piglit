@@ -44,9 +44,6 @@ PIGLIT_GL_TEST_MAIN(
     620 /*window_height*/,
     GLUT_RGB | GLUT_DOUBLE)
 
-static GLboolean PrintInfo = GL_TRUE;
-
-
 struct pixel_format {
    const char *name;
    GLenum format;
@@ -141,16 +138,6 @@ static const struct name_format IntFormats[] = {
 #define NUM_INT_FORMATS (sizeof(IntFormats) / sizeof(IntFormats[0]))
 
 static GLboolean Blend = GL_FALSE;  /* XXX not used at this time */
-
-
-static void
-PrintString(const char *s)
-{
-   while (*s) {
-      glutBitmapCharacter(GLUT_BITMAP_8_BY_13, (int) *s);
-      s++;
-   }
-}
 
 
 static void
@@ -261,7 +248,6 @@ Test(GLuint intFmt, GLuint dims)
 {
    static const float red[4] = {1, 0, 0, 1};
    static const float green[4] = {0, 1, 0, 1};
-   char s[1000];
    int w = 350, h = 20;
    int i, swap;
    GLboolean pass = GL_TRUE;
@@ -308,13 +294,6 @@ Test(GLuint intFmt, GLuint dims)
             glDisable(GL_TEXTURE_2D);
 
          glDisable(GL_BLEND);
-
-         if (PrintInfo) {
-            glColor3f(0, 0, 0);
-            glRasterPos2i(8, 6);
-            PrintString(Formats[i].name);
-         }
-
          glPopMatrix();
 
          /* test rendering */
@@ -332,50 +311,10 @@ Test(GLuint intFmt, GLuint dims)
       }
    }
 
-   if (PrintInfo) {
-      i = NUM_FORMATS;
-      glPushMatrix();
-      glTranslatef(2, i * (h + 2), 0);
-      glColor3f(1, 1, 1);
-      glRasterPos2i(8, 6);
-      PrintString("Normal");
-      glRasterPos2i(w + 2, 6);
-      PrintString("Byte Swapped");
-      glPopMatrix();
-
-      glPushMatrix();
-      glTranslatef(2, (i + 1) * (h + 2), 0);
-      glRasterPos2i(8, 6);
-      sprintf(s, "Internal Texture Format: %s (%d of %u)",
-              IntFormats[intFmt].name, intFmt + 1,
-              (unsigned) NUM_INT_FORMATS);
-      PrintString(s);
-      glPopMatrix();
-
-      glPushMatrix();
-      glTranslatef(2, (i + 2) * (h + 2), 0);
-      glRasterPos2i(8, 6);
-      if (dims == 3)
-         PrintString("Target: GL_TEXTURE_3D");
-      else
-         PrintString("Target: GL_TEXTURE_2D");
-      glPopMatrix();
-
-      glPushMatrix();
-      glTranslatef(2, (i + 3) * (h + 2), 0);
-      glRasterPos2i(8, 6);
-      if (Blend)
-         PrintString("Blend: Yes");
-      else
-         PrintString("Blend: No");
-      glPopMatrix();
-   }
-
    piglit_present_results();
 
    return pass;
 }
-
 
 enum piglit_result
 piglit_display(void)
@@ -414,7 +353,5 @@ piglit_init(int argc, char **argv)
    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-   PrintInfo = !piglit_automatic;
 }
 

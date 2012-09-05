@@ -82,36 +82,6 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 	return glGetError() == GL_NO_ERROR;
 }
 
-
-static void
-print(int x, int y, const char *s)
-{
-	glColor3f(1, 1, 1);
-	glWindowPos2iARB(x, y);
-	while (*s) {
-		glutBitmapCharacter(GLUT_BITMAP_8_BY_13, (int) *s);
-		s++;
-	}
-}
-
-
-static void
-draw_format_text(const struct test_desc *test,
-		 const struct format_desc *fmt)
-{
-	char s[200];
-	sprintf(s, "%s: %s", test->param, fmt->name);
-	print(10, piglit_height - 20, s);
-}
-
-
-static void
-draw_unsupported(void)
-{
-	print(10, piglit_height - 40, "Not supported by test");
-}
-
-
 static GLfloat
 ubyte_to_float(GLubyte b, GLint bits)
 {
@@ -352,19 +322,12 @@ test_format(const struct test_desc *test,
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (!piglit_automatic) {
-		draw_format_text(test, fmt);
-	}
-
-	if (fmt->internalformat == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ||
-		 fmt->internalformat == GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) {
-		/* The RGBA_DXT1 formats seem to expose a Mesa/libtxc_dxtn bug.
-		 * Just skip them for now.  Testing the other compressed formats
-		 * is good enough.
-		 */
-		draw_unsupported();
-	}
-	else {
+	/* The RGBA_DXT1 formats seem to expose a Mesa/libtxc_dxtn bug.
+	 * Just skip them for now.  Testing the other compressed formats
+	 * is good enough.
+	 */
+	if (fmt->internalformat != GL_COMPRESSED_RGBA_S3TC_DXT1_EXT &&
+	    fmt->internalformat != GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT) {
 		/* init texture image */
 		if (!make_texture_image(fmt->internalformat, upperRightTexel))
 			return GL_TRUE; /* unsupported = OK */
@@ -382,9 +345,6 @@ test_format(const struct test_desc *test,
 		piglit_draw_rect_tex(x, y, w, h,  0.0, 0.0, 1.0, 1.0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
-
-		if (!piglit_automatic)
-			print(x, y - 18, "Textured Quad");
 
 		x += TEX_WIDTH + 20;
 
@@ -405,17 +365,6 @@ test_format(const struct test_desc *test,
 			glDisable(GL_BLEND);
 
 			assert(!glIsEnabled(GL_TEXTURE_2D));
-			if (!piglit_automatic) {
-				if (level == 0) {
-					print(x, y - 18, "glGetTexImage");
-					print(x, y - 30, "level 0");
-				}
-				else {
-					char s[10];
-					sprintf(s, "%d", level);
-					print(x, y - 18, s);
-				}
-			}
 
 			if (level <= 2) {
 				GLint rx = x + w-1;
@@ -513,8 +462,6 @@ piglit_display(void)
 		}
 		else {
 			glClear(GL_COLOR_BUFFER_BIT);
-			draw_format_text(set, &set->format[format_index]);
-			draw_unsupported();
 			piglit_present_results();
 		}
 	}

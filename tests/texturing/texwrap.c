@@ -393,15 +393,6 @@ PIGLIT_GL_TEST_MAIN(
 
 extern int piglit_automatic;
 
-
-static void print_string(const char *s)
-{
-    while (*s) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, (int) *s);
-        s++;
-    }
-}
-
 static void sample_nearest(int x, int y, int z,
                            GLenum wrap_mode, GLenum filter,
                            unsigned char pixel[4])
@@ -724,7 +715,6 @@ static void draw()
 
                 glWindowPos2iARB(offset * (TILE_SIZE + TILE_SPACE) + 5,
                                  5 + ((offset & 1) * 15));
-                print_string(wrap_modes[i].name);
                 offset++;
             }
         }
