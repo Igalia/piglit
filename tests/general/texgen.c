@@ -204,7 +204,7 @@ static void Key(unsigned char key, int x, int y)
 		exit(0);
 		break;
 	}
-	glutPostRedisplay();
+	piglit_post_redisplay();
 }
 
 void piglit_init(int argc, char *argv[])

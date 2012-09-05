@@ -129,5 +129,6 @@ extern bool piglit_use_fbo;
 extern unsigned int piglit_winsys_fbo;
 
 extern void piglit_present_results();
+void piglit_post_redisplay(void);
 
 #endif /* PIGLIT_FRAMEWORK_H */

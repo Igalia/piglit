@@ -289,7 +289,7 @@ static void Key(unsigned char key, int x, int y)
 		break;
 	}
 	printf("Current LOD bias: 1st tex: %i  2nd tex: %i\n", CurrentBias, CurrentBias2);
-	glutPostRedisplay();
+	piglit_post_redisplay();
 }
 
 void

@@ -140,3 +140,10 @@ piglit_gl_test_run(int argc, char *argv[],
 
 	assert(false);
 }
+
+void
+piglit_post_redisplay(void)
+{
+	if (!piglit_use_fbo && !piglit_automatic)
+		glutPostRedisplay();
+}
