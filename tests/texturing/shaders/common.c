@@ -67,6 +67,7 @@ upload_miplevel_data(GLenum target, int level, void *level_image)
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
 		glTexImage3D(target, level, internal_format,
 			     level_size[level][0],
 			     level_size[level][1],

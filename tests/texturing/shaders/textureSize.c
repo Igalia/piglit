@@ -54,6 +54,8 @@ PIGLIT_GL_TEST_MAIN(
 static int lod_location;
 static int vertex_location;
 
+static char *cube_map_array_extension = "";
+
 /**
  * Returns the number of components expected from textureSize().
  */
@@ -71,9 +73,8 @@ sampler_size()
 		return 2;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
-		return 3;
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		assert(!"Not implemented yet.");
+		return 3;
 	default:
 		assert(!"Should not get here.");
 		return 0;
@@ -107,8 +108,12 @@ piglit_display()
 		if (sampler.target == GL_TEXTURE_1D_ARRAY) {
 			expected_color[1] = 0.01 * level_size[l][2];
 		} else {
-			for (i = 1; i < size; i++)
+			for (i = 1; i < size; i++) {
 				expected_color[i] = 0.01 * level_size[l][i];
+				/* the ARB_texture_cube_map_array spec specifies we get number of layer cubes back not faces * layers */
+				if (i == 2 && sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY)
+					expected_color[i] /= 6;
+			}
 		}
 		expected_color[3] = 1.0;
 
@@ -136,6 +141,9 @@ set_base_size()
 		/* Cube face width/height must be the same size. */
 		base_size[0] = base_size[1] = 65;
 		base_size[2] = 1;
+	} else if (sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY) {
+		base_size[0] = base_size[1] = 65;
+		base_size[2] = 6;
 	} else {
 		base_size[0] = 65;
 		base_size[1] = has_height() ? 32 : 1;
@@ -210,7 +218,7 @@ generate_GLSL(enum shader_target test_stage)
 	switch (test_stage) {
 	case VS:
 		asprintf(&vs_code,
-			 "#version %d\n"
+			 "#version %d\n%s"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
@@ -221,7 +229,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    size = textureSize(tex%s);\n"
 			 "    gl_Position = vertex;\n"
 			 "}\n",
-			 shader_version, sampler.name, size, lod_arg);
+			 shader_version, cube_map_array_extension, sampler.name, size, lod_arg);
 		asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
@@ -243,7 +251,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "}\n",
 			 shader_version);
 		asprintf(&fs_code,
-			 "#version %d\n"
+			 "#version %d\n%s"
 			 "#define ivec1 int\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
@@ -252,7 +260,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    ivec%d size = textureSize(tex%s);\n"
 			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
-			 shader_version, sampler.name, size, lod_arg,
+			 shader_version, cube_map_array_extension, sampler.name, size, lod_arg,
 			 zeroes[3 - size]);
 		break;
 	default:
@@ -311,11 +319,11 @@ piglit_init(int argc, char **argv)
 
 	if (test_stage == UNKNOWN || !sampler_found)
 		fail_and_show_usage();
-
-	/* Not implemented yet */
-	assert(sampler.target != GL_TEXTURE_CUBE_MAP_ARRAY);
-
+		
 	require_GL_features(test_stage);
+
+	if (sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY)
+		cube_map_array_extension = "#extension GL_ARB_texture_cube_map_array : enable\n";
 
 	prog = generate_GLSL(test_stage);
 	if (!prog)
