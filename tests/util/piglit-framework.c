@@ -154,3 +154,12 @@ piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y))
 	if (!piglit_automatic && !piglit_use_fbo)
 		glutKeyboardFunc(func);
 }
+
+void
+piglit_swap_buffers(void)
+{
+	if (piglit_use_fbo)
+		piglit_framework_fbo_swap_buffers();
+	else
+		piglit_framework_glut_swap_buffers();
+}

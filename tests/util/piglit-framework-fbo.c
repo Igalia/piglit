@@ -337,3 +337,13 @@ piglit_framework_fbo_run(const struct piglit_gl_test_info *info)
 	piglit_framework_fbo_destroy();
 	piglit_report_result(result);
 }
+
+void
+piglit_framework_fbo_swap_buffers(void)
+{
+#if defined(PIGLIT_FRAMEWORK_FBO_USE_GLX)
+	glXSwapBuffers(piglit_glx_dpy, piglit_glx_window);
+#elif defined(PIGLIT_FRAMEWORK_FBO_USE_WAFFLE)
+	waffle_window_swap_buffers(piglit_waffle_window);
+#endif
+}

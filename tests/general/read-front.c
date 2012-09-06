@@ -58,7 +58,7 @@ piglit_display(void)
 
 	glReadBuffer(GL_FRONT);
 
-	glutSwapBuffers();
+	piglit_swap_buffers();
 
 	pass &= piglit_probe_rect_rgb(0, 0,
 				      piglit_width, piglit_height / 2, blue);

@@ -30,3 +30,6 @@ piglit_framework_fbo_init(const struct piglit_gl_test_info *info);
 
 void
 piglit_framework_fbo_run(const struct piglit_gl_test_info *info);
+
+void
+piglit_framework_fbo_swap_buffers(void);

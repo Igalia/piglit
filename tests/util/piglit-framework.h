@@ -128,6 +128,7 @@ extern int piglit_height;
 extern bool piglit_use_fbo;
 extern unsigned int piglit_winsys_fbo;
 
+void piglit_swap_buffers(void);
 extern void piglit_present_results();
 void piglit_post_redisplay(void);
 void piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y));

@@ -147,3 +147,9 @@ piglit_framework_glut_run(const struct piglit_gl_test_info *info)
 	glutMainLoop();
 	piglit_report_result(result);
 }
+
+void
+piglit_framework_glut_swap_buffers(void)
+{
+	glutSwapBuffers();
+}

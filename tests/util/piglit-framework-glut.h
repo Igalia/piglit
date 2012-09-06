@@ -31,3 +31,7 @@ piglit_framework_glut_init(int argc, char *argv[],
 
 void
 piglit_framework_glut_run(const struct piglit_gl_test_info *info);
+
+
+void
+piglit_framework_glut_swap_buffers(void);
