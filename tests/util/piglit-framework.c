@@ -147,3 +147,10 @@ piglit_post_redisplay(void)
 	if (!piglit_use_fbo && !piglit_automatic)
 		glutPostRedisplay();
 }
+
+void
+piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y))
+{
+	if (!piglit_automatic && !piglit_use_fbo)
+		glutKeyboardFunc(func);
+}

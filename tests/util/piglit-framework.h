@@ -130,5 +130,6 @@ extern unsigned int piglit_winsys_fbo;
 
 extern void piglit_present_results();
 void piglit_post_redisplay(void);
+void piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y));
 
 #endif /* PIGLIT_FRAMEWORK_H */

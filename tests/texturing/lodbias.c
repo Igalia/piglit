@@ -311,7 +311,7 @@ piglit_init(int argc, char **argv)
 			"Press 'b'/'B' to change primary LOD bias\n"
 			"Press 'n'/'N' to change secondary LOD bias\n"
 			"Press 'Escape' to quit\n");
-		glutKeyboardFunc(Key);
+		piglit_set_keyboard_func(Key);
 	}
 
 	glGenTextures(2, Textures);

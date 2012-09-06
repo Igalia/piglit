@@ -213,7 +213,7 @@ void piglit_init(int argc, char *argv[])
 
 	if (!piglit_automatic) {
 		printf("Press 't' to switch tests; Escape to quit\n");
-		glutKeyboardFunc(Key);
+		piglit_set_keyboard_func(Key);
 	}
 
 	if (piglit_use_fragment_program()) {

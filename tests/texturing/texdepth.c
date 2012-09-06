@@ -374,7 +374,7 @@ piglit_init(int argc, char **argv)
 	GLfloat texbuf[4];
 
 	if (!piglit_automatic) {
-		glutKeyboardFunc(Key);
+		piglit_set_keyboard_func(Key);
 		printf("Press 't' to cycle through test images\n");
 	}
 

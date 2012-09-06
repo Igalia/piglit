@@ -583,7 +583,7 @@ static void
 fbo_formats_init_test_set(int test_set_index, GLboolean print_options)
 {
 	if (!piglit_automatic)
-		glutKeyboardFunc(fbo_formats_key_func);
+		piglit_set_keyboard_func(fbo_formats_key_func);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_texture_env_combine");
