@@ -103,11 +103,11 @@ glutInit(int *argcp, char **argv)
 	waffle_init_attrib_list[1] = _glut->waffle_platform;
 	ok = waffle_init(waffle_init_attrib_list);
 	if (!ok)
-		glutFatal("waffle_init() failed");
+		glutFatalWaffleError("waffle_init");
 
 	_glut->display = waffle_display_connect(display_name);
 	if (!_glut->display)
-		glutFatal("waffle_display_connect() failed");
+		glutFatalWaffleError("waffle_display_connect");
 }
 
 void
@@ -173,7 +173,7 @@ glutChooseConfig(void)
 
 	config = waffle_config_choose(_glut->display, attrib_list);
 	if (!config)
-		glutFatal("waffle_config_choose() failed");
+		glutFatalWaffleError("waffle_config_choose");
 	return config;
 }
 
@@ -204,7 +204,7 @@ glutCreateWindow(const char *title)
 
 	_glut->context = waffle_context_create(config, NULL);
 	if (!_glut->context)
-		glutFatal("waffle_context_create() failed");
+		glutFatalWaffleError("waffle_context_create");
 
 	_glut->window = calloc(1, sizeof(*_glut->window));
 	if (!_glut->window)
@@ -214,11 +214,11 @@ glutCreateWindow(const char *title)
 	                                             _glut->window_width,
 	                                             _glut->window_height);
 	if (!_glut->window->waffle)
-		glutFatal("waffle_window_create() failed");
+		glutFatalWaffleError("waffle_window_create");
 
 	n_window = waffle_window_get_native(_glut->window->waffle);
 	if (!n_window)
-		glutFatal("waffle_window_get_window() failed");
+		glutFatalWaffleError("waffle_window_get_native");
 
 	switch (_glut->waffle_platform) {
 #ifdef PIGLIT_HAS_X11
@@ -243,7 +243,7 @@ glutCreateWindow(const char *title)
 	ok = waffle_make_current(_glut->display, _glut->window->waffle,
 			_glut->context);
 	if (!ok)
-		glutFatal("waffle_make_current() failed");
+		glutFatalWaffleError("waffle_make_current");
 
 	_glut->window->id = ++_glut->window_id_pool;
 	_glut->window->keyboard_cb = _glutDefaultKeyboard;
@@ -261,7 +261,7 @@ glutDestroyWindow(int win)
 
 	ok = waffle_window_destroy(_glut->window->waffle);
 	if (!ok)
-		glutFatal("waffle_window_destroy() failed");
+		glutFatalWaffleError("waffle_window_destroy");
 
 	free(_glut->window);
 	_glut->window = NULL;
@@ -277,7 +277,7 @@ glutShowWindow(int win)
 
 	ok = waffle_window_show(_glut->window->waffle);
 	if (!ok)
-		glutFatal("waffle_window_show() failed");
+		glutFatalWaffleError("waffle_window_show");
 }
 
 void
@@ -308,7 +308,7 @@ glutMainLoop(void)
 
 	ok = waffle_window_show(_glut->window->waffle);
 	if (!ok)
-		glutFatal("waffle_window_show() failed");
+		glutFatalWaffleError("waffle_window_show");
 
 	if (_glut->window->reshape_cb)
 		_glut->window->reshape_cb(_glut->window_width,
@@ -348,5 +348,5 @@ glutSwapBuffers(void)
 {
 	bool ok = waffle_window_swap_buffers(_glut->window->waffle);
 	if (!ok)
-		glutFatal("waffle_window_swap_buffers() failed");
+		glutFatalWaffleError("waffle_window_swap_buffers() failed");
 }

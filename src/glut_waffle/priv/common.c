@@ -43,10 +43,24 @@ glutFatal(char *format, ...)
 	va_start(args, format);
 
 	fflush(stdout);
-	fprintf(stderr, "glut_waffle: ");
+	fprintf(stderr, "glut_waffle: error: ");
 	vfprintf(stderr, format, args);
 	va_end(args);
 	putc('\n', stderr);
 
 	exit(1);
+}
+
+void
+glutFatalWaffleError(const char *waffle_func)
+{
+	const struct waffle_error_info *info = waffle_error_get_info();
+	const char *code = waffle_error_to_string(info->code);
+
+	if (info->message_length > 0)
+		glutFatal("%s() failed: %s: %s",
+		          waffle_func, code, info->message);
+	else
+		glutFatal("%s() failed: %s",
+		          waffle_func, code);
 }

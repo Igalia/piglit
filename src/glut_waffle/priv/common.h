@@ -76,3 +76,6 @@ extern struct glut_waffle_state *const _glut;
 
 void
 glutFatal(char *format, ...);
+
+void
+glutFatalWaffleError(const char *waffle_func);
