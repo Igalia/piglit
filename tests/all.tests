@@ -1627,6 +1627,20 @@ spec['ARB_texture_cube_map'] = arb_texture_cube_map
 arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-auto', 'CUBE'])
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 
+arb_texture_cube_map_array = Group()
+spec['ARB_texture_cube_map_array'] = arb_texture_cube_map_array
+add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-get')
+add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-teximage3d-invalid-values')
+add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap')
+add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubemap-array')
+add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
+textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray'];
+
+for stage in ['vs', 'fs']:
+	# textureSize():
+	for sampler in textureSize_samplers_atcma:
+		spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
+
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
