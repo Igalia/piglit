@@ -61,25 +61,47 @@ piglit_init(int argc, char **argv)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
-	/* The max texture size should be OK for mipmap level zero. */
+        /*
+         * Note: we don't try to create any maxSize by maxSize textures
+         * since we may not have enough texture memory.
+         */
+
+	/*
+         * For level 0, maxSize by 1 (and vice-versa) should be OK.
+         */
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-		     maxSize, maxSize, 0,
+		     maxSize, 1, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	pass = piglit_check_gl_error(GL_NO_ERROR);
 
-	/* Setting the level 1 image to the max texture size should be
-	 * an error.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+		     1, maxSize, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+        /*
+         * For level 1, maxSize by 1 (and vice versa) should fail.
 	 */
 	glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
-		     maxSize, maxSize, 0,
+		     maxSize, 1, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
 
-	/* Setting the level 2 image to half the max texture size should be
-	 * an error also.
-	 */
+	glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA,
+		     1, maxSize, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+
+        /*
+         * For level 2, maxSize/2 by 1 (and vice versa) should fail.
+         */
 	glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
-		     maxSize/2, maxSize/2, 0,
+		     maxSize/2, 1, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
+
+	glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA,
+		     1, maxSize/2, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) & pass;
 
