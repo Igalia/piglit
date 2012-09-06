@@ -163,3 +163,10 @@ piglit_swap_buffers(void)
 	else
 		piglit_framework_glut_swap_buffers();
 }
+
+void
+piglit_set_reshape_func(void (*func)(int w, int h))
+{
+	if (!piglit_use_fbo && !piglit_automatic)
+		glutReshapeFunc(func);
+}

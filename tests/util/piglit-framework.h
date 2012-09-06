@@ -132,5 +132,6 @@ void piglit_swap_buffers(void);
 extern void piglit_present_results();
 void piglit_post_redisplay(void);
 void piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y));
+void piglit_set_reshape_func(void (*func)(int w, int h));
 
 #endif /* PIGLIT_FRAMEWORK_H */
