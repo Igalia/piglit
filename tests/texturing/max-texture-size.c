@@ -49,7 +49,7 @@ PIGLIT_GL_TEST_MAIN(
     100 /*window_height*/,
     GLUT_RGBA | GLUT_DOUBLE)
 
-GLenum target[] = {
+static const GLenum target[] = {
 	GL_TEXTURE_1D,
 	GL_TEXTURE_2D,
 	GL_TEXTURE_RECTANGLE,
@@ -57,7 +57,7 @@ GLenum target[] = {
 	GL_TEXTURE_3D,
 	};
 
-GLenum internalformat[] = {
+static const GLenum internalformat[] = {
 	GL_RGBA8,
 	GL_RGBA16,
 	GL_RGBA32F,
@@ -66,7 +66,7 @@ GLenum internalformat[] = {
 static GLenum
 getMaxTarget(GLenum target)
 {
-	switch(target) {
+	switch (target) {
 	case GL_TEXTURE_1D:
 	case GL_TEXTURE_2D:
 		return GL_MAX_TEXTURE_SIZE;
@@ -79,7 +79,7 @@ getMaxTarget(GLenum target)
 	case GL_RENDERBUFFER_EXT:
 		return GL_MAX_RENDERBUFFER_SIZE_EXT;
 	default:
-		printf ("Invalid texture target\n");
+		printf("Invalid texture target\n");
 		return 0;
 	}
 }
@@ -87,7 +87,7 @@ getMaxTarget(GLenum target)
 static GLenum
 getProxyTarget(GLenum target)
 {
-	switch(target) {
+	switch (target) {
 	case GL_TEXTURE_1D:
 		return GL_PROXY_TEXTURE_1D;
 	case GL_TEXTURE_2D:
@@ -99,7 +99,7 @@ getProxyTarget(GLenum target)
 	case GL_TEXTURE_RECTANGLE:
 		return GL_PROXY_TEXTURE_RECTANGLE;
 	default:
-		printf ("No proxy target for this texture target\n");
+		printf("No proxy target for this texture target\n");
 		return 0;
 	}
 }
@@ -110,23 +110,23 @@ isValidTexSize(GLenum target, GLenum internalFormat, int sideLength)
 	GLint texWidth;
 	GLenum proxyTarget = getProxyTarget(target);
 
-	switch(proxyTarget) {
+	switch (proxyTarget) {
 	case GL_PROXY_TEXTURE_1D:
 		glTexImage1D(proxyTarget, 0, internalFormat, sideLength, 0,
-			     GL_RGBA, GL_FLOAT, 0);
+			     GL_RGBA, GL_FLOAT, NULL);
 		break;
 	case GL_PROXY_TEXTURE_2D:
 	case GL_PROXY_TEXTURE_RECTANGLE:
 	case GL_PROXY_TEXTURE_CUBE_MAP_ARB:
 		glTexImage2D(proxyTarget, 0, internalFormat, sideLength,
-			     sideLength, 0, GL_RGBA, GL_FLOAT, 0);
+			     sideLength, 0, GL_RGBA, GL_FLOAT, NULL);
 		break;
 	case GL_PROXY_TEXTURE_3D:
 		glTexImage3D(proxyTarget, 0, internalFormat, sideLength,
-			     sideLength, sideLength, 0, GL_RGBA, GL_FLOAT, 0);
+			     sideLength, sideLength, 0, GL_RGBA, GL_FLOAT, NULL);
 		break;
 	default:
-		printf ("Invalid  proxy texture target\n");
+		printf("Invalid  proxy texture target\n");
 	}
 
 	glGetTexLevelParameteriv(proxyTarget, 0, GL_TEXTURE_WIDTH, &texWidth);
@@ -165,31 +165,31 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 	glGetIntegerv(getMaxTarget(target), &maxSide);
 
 	if (!useProxy) {
-		printf("%s, Internal Format = %s, Largest Texture Size ="
-		       " %d\n", piglit_get_gl_enum_name(target),
+		printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
+                       piglit_get_gl_enum_name(target),
 		       piglit_get_gl_enum_name(internalformat),
 		       maxSide);
 		/* Allocate and initialize texture data array */
 		pixels = initTexData(target, maxSide);
 
-		if ( pixels == NULL) {
+		if (pixels == NULL) {
 			printf("Error allocating texture data array\n");
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	}
 	else {
 		/* Compute largest supported texture size using proxy textures */
-		while(isValidTexSize(target, internalformat, maxSide))
+		while (isValidTexSize(target, internalformat, maxSide))
 			maxSide *= 2;
 		/* First unsupported size */
-		while(!isValidTexSize(target, internalformat, maxSide))
+		while (!isValidTexSize(target, internalformat, maxSide))
 			maxSide /= 2;
-		while(isValidTexSize(target, internalformat, maxSide))
+		while (isValidTexSize(target, internalformat, maxSide))
 			maxSide += 1;
 		/* Last supported texture size */
 		maxSide -= 1;
-		printf("%s, Internal Format = %s, Largest Texture Size ="
-		       " %d\n", piglit_get_gl_enum_name(getProxyTarget(target)),
+		printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
+                       piglit_get_gl_enum_name(getProxyTarget(target)),
 		       piglit_get_gl_enum_name(internalformat),
 		       maxSide);
 	}
@@ -236,7 +236,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 		break;
 
 	case GL_TEXTURE_2D:
-		if(!useProxy) {
+		if (!useProxy) {
 			glTexImage2D(target, 0, internalformat, maxSide,
 				     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 
@@ -292,7 +292,7 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 	case GL_TEXTURE_3D:
 		//printf("Width = %d, Height = %d, Depth =  %d\n", maxSide,
 		//       maxSide, maxSide);
-		if(!useProxy) {
+		if (!useProxy) {
 			glTexImage3D(target, 0, internalformat, maxSide,
 				     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
 				     NULL);
@@ -415,9 +415,9 @@ piglit_init(int argc, char **argv)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for (useProxy = 1; useProxy >= 0; useProxy--) {
-		for ( i = 0; i < ARRAY_SIZE(target); i++) {
+		for (i = 0; i < ARRAY_SIZE(target); i++) {
 
-			if(!useProxy) {
+			if (!useProxy) {
 				glGenTextures(1, &tex);
 				glBindTexture(target[i], tex);
 				glTexParameteri(target[i],
@@ -451,8 +451,7 @@ piglit_init(int argc, char **argv)
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
-enum
-piglit_result
+enum piglit_result
 piglit_display(void)
 {
 	return PIGLIT_FAIL;
