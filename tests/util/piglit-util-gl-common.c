@@ -172,29 +172,29 @@ GLfloat cube_face_texcoords[6][4][3] = {
 		{1.0, -0.99, -0.99},
 		{1.0, -0.99,  0.99},
 	},
-	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */
-		{-0.99, 1.0, -0.99},
-		{ 0.99, 1.0, -0.99},
-		{ 0.99, 1.0,  0.99},
-		{-0.99, 1.0,  0.99},
-	},
-	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */
-		{-0.99,  0.99, 1.0},
-		{-0.99, -0.99, 1.0},
-		{ 0.99, -0.99, 1.0},
-		{ 0.99,  0.99, 1.0},
-	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */
 		{-1.0,  0.99, -0.99},
 		{-1.0,  0.99,  0.99},
 		{-1.0, -0.99,  0.99},
 		{-1.0, -0.99, -0.99},
 	},
+	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */
+		{-0.99, 1.0, -0.99},
+		{ 0.99, 1.0, -0.99},
+		{ 0.99, 1.0,  0.99},
+		{-0.99, 1.0,  0.99},
+	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */
 		{-0.99, -1.0,  0.99},
 		{-0.99, -1.0, -0.99},
 		{ 0.99, -1.0, -0.99},
 		{ 0.99, -1.0,  0.99},
+	},
+	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */
+		{-0.99,  0.99, 1.0},
+		{-0.99, -0.99, 1.0},
+		{ 0.99, -0.99, 1.0},
+		{ 0.99,  0.99, 1.0},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */
 		{ 0.99,  0.99, -1.0},
@@ -206,19 +206,19 @@ GLfloat cube_face_texcoords[6][4][3] = {
 
 const char *cube_face_names[6] = {
 	"POSITIVE_X",
-	"POSITIVE_Y",
-	"POSITIVE_Z",
 	"NEGATIVE_X",
+	"POSITIVE_Y",
 	"NEGATIVE_Y",
+	"POSITIVE_Z",
 	"NEGATIVE_Z",
 };
 
 const GLenum cube_face_targets[6] = {
 	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 };
 
