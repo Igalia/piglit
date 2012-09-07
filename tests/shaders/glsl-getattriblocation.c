@@ -115,9 +115,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
+	piglit_require_gl_version(20);
 }

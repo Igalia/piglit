@@ -58,10 +58,7 @@ void piglit_init(int argc, char **argv)
 	GLint prog;
 	const char *fs_text_ptr = fs_text;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	/* Intentionally omit check for GL_ARB_shader_texture_lod. */
 

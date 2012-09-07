@@ -61,10 +61,7 @@ piglit_init(int argc, char **argv)
 	(void) argc;
 	(void) argv;
 
-	if (piglit_get_gl_version() < 14) {
-		printf("Requires OpenGL 1.4\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(14);
 
 	loadTex();
 

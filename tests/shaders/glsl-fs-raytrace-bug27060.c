@@ -282,10 +282,7 @@ piglit_init(int argc, char **argv)
 
   glDisable(GL_DEPTH_TEST);
 
-  if (piglit_get_gl_version() < 20) {
-    printf("Requires OpenGL 2.0\n");
-    piglit_report_result(PIGLIT_SKIP);
-  }
+  piglit_require_gl_version(20);
 
   glViewport(0, 0, piglit_width, piglit_height);
   glMatrixMode(GL_PROJECTION);

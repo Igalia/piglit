@@ -115,10 +115,7 @@ piglit_init(int argc, char **argv)
 		"	gl_FragColor = vec4(0.0, 0.0, 1.0, 0.0);\n"
 		"}\n";
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 	piglit_require_extension("GL_EXT_separate_shader_objects");
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);

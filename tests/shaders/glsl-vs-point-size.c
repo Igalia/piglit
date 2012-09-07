@@ -87,10 +87,7 @@ piglit_init(int argc, char **argv)
 	GLint vs;
 	GLint point_size_range[2];
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 	/* If the driver doesn't claim to support the point size the
 	   shader is going to set then we should skip the test */
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_range);

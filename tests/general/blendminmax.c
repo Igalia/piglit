@@ -132,10 +132,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	if (piglit_get_gl_version() < 14) {
-		printf("Requires OpenGL 1.4\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(14);
 
 	printf("\nAll 4 quads should be the same color.\n");
 	glEnable(GL_BLEND);

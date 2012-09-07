@@ -83,10 +83,7 @@ piglit_init(int argc, char **argv)
 	GLuint vs, prog;
 	int i,j;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	piglit_require_extension("GL_ARB_ES2_compatibility");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

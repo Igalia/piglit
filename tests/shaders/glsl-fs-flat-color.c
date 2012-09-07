@@ -96,10 +96,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vs, fs;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   "shaders/glsl-color-mvp.vert");

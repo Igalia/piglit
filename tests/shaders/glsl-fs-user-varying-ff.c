@@ -73,10 +73,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint fs;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	glClearColor(0.3, 0.3, 0.3, 0.0);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

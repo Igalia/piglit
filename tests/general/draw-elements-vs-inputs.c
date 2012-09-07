@@ -49,10 +49,7 @@ piglit_init(int argc, char **argv)
 {
    GLfloat red[4] = {1, 0, 0, 1};
 
-   if (piglit_get_gl_version() < 12) {
-      printf("Requires OpenGL 1.2\n");
-      piglit_report_result(PIGLIT_SKIP);
-   }
+   piglit_require_gl_version(12);
 
    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, red);
 

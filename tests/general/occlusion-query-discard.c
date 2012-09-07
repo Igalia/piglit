@@ -128,10 +128,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint query_bits;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	/* It is legal for a driver to support the query API but not have
 	 * any query bits.  I wonder how many applications actually check for

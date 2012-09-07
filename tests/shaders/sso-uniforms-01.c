@@ -81,10 +81,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint loc;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	piglit_require_extension("GL_EXT_separate_shader_objects");
 

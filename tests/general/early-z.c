@@ -144,10 +144,7 @@ piglit_init(int argc, char **argv)
 {
    int i;
 
-   if (piglit_get_gl_version() < 20) {
-      printf("Requires OpenGL 2.0 / GLSL\n");
-      piglit_report_result(PIGLIT_SKIP);
-   }
+   piglit_require_gl_version(20);
 
    shader[0] = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fpFragDepthText);
    assert(shader[0]);

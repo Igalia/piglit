@@ -46,10 +46,7 @@ piglit_init(int argc, char **argv)
 #ifdef GL_ARB_ES2_compatibility
 	GLint shadercompiler;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	if (!piglit_is_extension_supported("GL_ARB_ES2_compatibility")) {
 		printf("Requires ARB_ES2_compatibility\n");

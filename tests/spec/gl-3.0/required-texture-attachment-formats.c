@@ -51,10 +51,7 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fbo;
 	int i, c;
 
-	if (piglit_get_gl_version() < 30) {
-		printf("Requires GL 3.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(30);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);

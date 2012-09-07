@@ -52,10 +52,7 @@ static GLubyte colors[16] = {255, 0, 0, 127,
 void
 piglit_init(int argc, char **argv)
 {
-	if (piglit_get_gl_version() < 14) {
-		printf("Requires OpenGL 1.4\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(14);
 
 	piglit_require_extension("GL_EXT_vertex_array_bgra");
 

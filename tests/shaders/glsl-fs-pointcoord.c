@@ -86,11 +86,7 @@ void piglit_init(int argc, char**argv)
 	GLint vs, fs;
 	GLint point_size_limits[2];
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
+	piglit_require_gl_version(20);
 	piglit_require_extension("GL_ARB_point_sprite");
 
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_limits);

@@ -127,9 +127,5 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_vertex_shader();
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
-	}
+	piglit_require_gl_version(20);
 }

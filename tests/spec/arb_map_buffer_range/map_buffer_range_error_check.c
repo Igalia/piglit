@@ -47,10 +47,7 @@ piglit_init(int argc, char *argv[])
 	GLbitfield access = GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 	GLuint buffer;
 
-	if (piglit_get_gl_version() < 15) {
-		printf("Requires OpenGL 1.5\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(15);
 
 	piglit_require_extension("GL_ARB_map_buffer_range");
 

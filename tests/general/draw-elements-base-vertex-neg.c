@@ -46,10 +46,7 @@ void piglit_init(int argc, char **argv)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	if (piglit_get_gl_version() < 15) {
-		printf("Requires OpenGL 1.5\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(15);
 
 	piglit_require_extension("GL_ARB_draw_elements_base_vertex");
 

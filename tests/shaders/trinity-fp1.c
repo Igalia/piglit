@@ -229,10 +229,7 @@ piglit_init(int argc, char **argv)
 
 		"END";
 
-	if (piglit_get_gl_version() < 13) {
-		printf("Requires OpenGL 1.3\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(13);
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 

@@ -179,10 +179,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, &m);
 	if (m < 1) {

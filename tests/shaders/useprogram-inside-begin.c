@@ -55,10 +55,7 @@ piglit_init(int argc, char **argv)
 	GLint vs;
 	GLenum err;
 
-	if (piglit_get_gl_version() < 20) {
-		printf("Requires OpenGL 2.0\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(20);
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
