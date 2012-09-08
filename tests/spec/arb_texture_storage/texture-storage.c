@@ -69,14 +69,16 @@ test_one_level_errors(GLenum target)
 	glBindTexture(target, tex);
 
 	if (target == GL_TEXTURE_1D) {
-		glTexStorage1D(target, 1, GL_RGBA, width);
+		glTexStorage1D(target, 1, GL_RGBA8, width);
 	}
 	else if (target == GL_TEXTURE_2D) {
-		glTexStorage2D(target, 1, GL_RGBA, width, height);
+		glTexStorage2D(target, 1, GL_RGBA8, width, height);
 	}
 	else if (target == GL_TEXTURE_3D) {
-		glTexStorage3D(target, 1, GL_RGBA, width, height, depth);
+		glTexStorage3D(target, 1, GL_RGBA8, width, height, depth);
 	}
+
+	piglit_check_gl_error(GL_NO_ERROR);
 
 	glGetTexLevelParameteriv(target, 0, GL_TEXTURE_WIDTH, &v);
 	if (v != width) {
@@ -111,7 +113,7 @@ test_one_level_errors(GLenum target)
 			return GL_FALSE;
 		}
 
-		glTexStorage2D(target, 1, GL_RGBA, width, height);
+		glTexStorage2D(target, 1, GL_RGBA8, width, height);
 		if (glGetError() != GL_INVALID_OPERATION) {
 			printf("%s: glTexStorage2D() failed to generate error\n", TestName);
 			return GL_FALSE;
@@ -149,17 +151,19 @@ test_mipmap_errors(GLenum target)
 	glBindTexture(target, tex);
 
 	if (target == GL_TEXTURE_1D) {
-		glTexStorage1D(target, levels, GL_RGBA, width);
+		glTexStorage1D(target, levels, GL_RGBA8, width);
 		targetString = "GL_TEXTURE_1D";
 	}
 	else if (target == GL_TEXTURE_2D) {
-		glTexStorage2D(target, levels, GL_RGBA, width, height);
+		glTexStorage2D(target, levels, GL_RGBA8, width, height);
 		targetString = "GL_TEXTURE_2D";
 	}
 	else if (target == GL_TEXTURE_3D) {
-		glTexStorage3D(target, levels, GL_RGBA, width, height, depth);
+		glTexStorage3D(target, levels, GL_RGBA8, width, height, depth);
 		targetString = "GL_TEXTURE_3D";
 	}
+
+	piglit_check_gl_error(GL_NO_ERROR);
 
 	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT, &v);
 	if (!v) {
@@ -238,7 +242,9 @@ test_2d_mipmap_rendering(void)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
-	glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA, width, height);
+	glTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8, width, height);
+
+	piglit_check_gl_error(GL_NO_ERROR);
 
 	/* check that the mipmap level sizes are correct */
 	for (l = 0; l < levels; l++) {
