@@ -336,6 +336,90 @@ test_2d_mipmap_rendering(void)
 }
 
 
+/**
+ * Per issue 27 of the spec, only sized internalFormat values are allowed.
+ * Ex: GL_RGBA8 is OK but GL_RGBA is illegal.
+ * Check some common formats here.  These lists aren't exhaustive since
+ * there are many extensions/versions that could effect the lists (ex:
+ * integer formats, etc.)
+ */
+static bool
+test_internal_formats(void)
+{
+	const GLenum target = GL_TEXTURE_2D;
+	static const GLenum legal_formats[] = {
+		GL_RGB4,
+		GL_RGB5,
+		GL_RGB8,
+		GL_RGBA2,
+		GL_RGBA4,
+		GL_RGBA8,
+		GL_DEPTH_COMPONENT16,
+		GL_DEPTH_COMPONENT32
+	};
+	static const GLenum illegal_formats[] = {
+		GL_ALPHA,
+		GL_LUMINANCE,
+		GL_LUMINANCE_ALPHA,
+		GL_INTENSITY,
+		GL_RGB,
+		GL_RGBA,
+		GL_DEPTH_COMPONENT,
+		GL_COMPRESSED_ALPHA,
+		GL_COMPRESSED_LUMINANCE_ALPHA,
+		GL_COMPRESSED_LUMINANCE,
+		GL_COMPRESSED_INTENSITY,
+		GL_COMPRESSED_RGB,
+		GL_COMPRESSED_RGBA,
+		GL_COMPRESSED_RGBA,
+		GL_COMPRESSED_SRGB,
+		GL_COMPRESSED_SRGB_ALPHA,
+		GL_COMPRESSED_SLUMINANCE,
+		GL_COMPRESSED_SLUMINANCE_ALPHA
+	};
+	GLuint tex;
+	bool pass = true;
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(legal_formats); i++) {
+		glGenTextures(1, &tex);
+		glBindTexture(target, tex);
+
+		glTexStorage2D(target, 1, legal_formats[i], 32, 32);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			printf("%s: internal format %s should be legal"
+			       " but raised an error.",
+			       TestName,
+			       piglit_get_gl_enum_name(legal_formats[i]));
+			pass = false;
+		}
+
+		glDeleteTextures(1, &tex);
+	}
+
+	for (i = 0; i < ARRAY_SIZE(illegal_formats); i++) {
+		glGenTextures(1, &tex);
+		glBindTexture(target, tex);
+
+		glTexStorage2D(target, 1, illegal_formats[i], 32, 32);
+
+		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+			printf("%s: internal format %s should be illegal"
+			       " but didn't raised an error.",
+			       TestName,
+			       piglit_get_gl_enum_name(illegal_formats[i]));
+			pass = false;
+		}
+
+		glDeleteTextures(1, &tex);
+	}
+
+	return pass;
+}
+	
+
+
 enum piglit_result
 piglit_display(void)
 {
@@ -348,6 +432,7 @@ piglit_display(void)
 	pass = test_mipmap_errors(GL_TEXTURE_2D) && pass;
 	pass = test_mipmap_errors(GL_TEXTURE_3D) && pass;
 	pass = test_2d_mipmap_rendering() && pass;
+	pass = test_internal_formats() && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
