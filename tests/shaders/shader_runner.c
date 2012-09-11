@@ -48,6 +48,7 @@ extern float piglit_tolerance[4];
 
 static float gl_version = 0.0;
 static float glsl_version = 0.0;
+static float glsl_req_version = 0.0;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
 
@@ -121,9 +122,29 @@ compile_glsl(GLenum target, bool release_text)
 		break;
 	}
 
-	piglit_ShaderSource(shader, 1,
-			    &shader_string,
-			    &shader_string_size);
+	if (glsl_req_version != 0.0f &&
+	    !strstr(shader_string, "#version ")) {
+		char *shader_strings[2];
+		char version_string[100];
+		GLint shader_string_sizes[2];
+		
+		/* Add a #version directive based on the GLSL requirement. */
+		sprintf(version_string, "#version %ld\n",
+			lround(100.0f * glsl_req_version));
+		shader_strings[0] = version_string;
+		shader_string_sizes[0] = strlen(version_string);
+		shader_strings[1] = shader_string;
+		shader_string_sizes[1] = shader_string_size;
+		
+		piglit_ShaderSource(shader, 2,
+				    shader_strings,
+				    shader_string_sizes);
+
+	} else {
+		piglit_ShaderSource(shader, 1,
+				    &shader_string,
+				    &shader_string_size);
+	}
 
 	piglit_CompileShader(shader);
 
@@ -416,18 +437,24 @@ process_requirement(const char *line)
 		piglit_require_not_extension(buffer);
 	} else if (string_match("GLSL", line)) {
 		enum comparison cmp;
-		float version;
 
 		line = eat_whitespace(line + 4);
 
 		line = process_comparison(line, &cmp);
 
-		version = strtod(line, NULL);
-		if (!compare(version, glsl_version, cmp)) {
+		/* We only allow >= because we potentially use the
+		 * version number to insert a #version directive. */
+		if (cmp != greater_equal) {
+			printf("Unsupported GLSL version comparison\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		glsl_req_version = strtod(line, NULL);
+		if (!compare(glsl_req_version, glsl_version, cmp)) {
 			printf("Test requires GLSL version %s %.1f.  "
 			       "Actual version is %.1f.\n",
 			       comparison_string(cmp),
-			       version,
+			       glsl_req_version,
 			       glsl_version);
 			piglit_report_result(PIGLIT_SKIP);
 		}
