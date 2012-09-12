@@ -530,11 +530,17 @@ tests[] = {
 	},
 };
 
+static int test_index = -1;
+
 enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	for (unsigned i = 0; i < ARRAY_SIZE(tests); i++) {
+		if (test_index != -1 &&
+		    test_index != i)
+			continue;
+
 		TestCase test = tests[i];
 
 		test.filter = GL_NEAREST;
@@ -553,4 +559,7 @@ piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
+
+	if (argc == 2)
+		sscanf(argv[1], "%d", &test_index);
 }
