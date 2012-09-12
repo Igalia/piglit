@@ -38,8 +38,6 @@
 #include "timer.h"
 #include "image.h"
 
-#ifdef GL_EXT_packed_depth_stencil
-
 namespace GLEAN {
 
 static PFNGLWINDOWPOS2IARBPROC WindowPos2i = NULL;
@@ -433,5 +431,3 @@ DepthStencilTest depthstencilTest("depthStencil", "window, rgb",
 
 
 } // namespace GLEAN
-
-#endif // GL_EXT_packed_depth_stencil
