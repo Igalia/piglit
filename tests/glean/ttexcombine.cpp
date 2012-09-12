@@ -1609,7 +1609,7 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 
 	// If quick mode, run fewer tests
 	if (env->options.quick)
-		testStride = 11;  // a prime number
+		testStride = 67;  // a prime number
 	else
 		testStride = 1;
 
