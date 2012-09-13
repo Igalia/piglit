@@ -21,11 +21,6 @@
  * IN THE SOFTWARE.
  */
 
-/**
- * Simple test case framework.
- *
- * \author Ian Romanick <ian.d.romanick@intel.com>
- */
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -33,9 +28,9 @@
 #include <math.h>
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework-gl.h"
-#include "piglit-framework-fbo.h"
-#include "piglit-framework-glut.h"
+#include "piglit-framework-gl/piglit_gl_framework.h"
+
+static struct piglit_gl_framework *gl_fw;
 
 bool piglit_use_fbo = false;
 int piglit_automatic = 0;
@@ -122,51 +117,48 @@ piglit_gl_test_run(int argc, char *argv[],
 	piglit_width = config->window_width;
 	piglit_height = config->window_height;
 
-	if (piglit_use_fbo) {
-		if (!piglit_framework_fbo_init(config))
-			piglit_use_fbo = false;
+	gl_fw = piglit_gl_framework_factory(config);
+	if (gl_fw == NULL) {
+		printf("piglit: error: failed to create "
+		       "piglit_gl_framework\n");
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	if (!piglit_use_fbo)
-		piglit_framework_glut_init(argc, argv, config);
-
-	config->init(argc, argv);
-
-	if (piglit_use_fbo) {
-		piglit_framework_fbo_run(config);
-	} else {
-		piglit_framework_glut_run(config);
-	}
-
+	gl_fw->run_test(gl_fw, argc, argv);
 	assert(false);
 }
 
 void
 piglit_post_redisplay(void)
 {
-	if (!piglit_use_fbo && !piglit_automatic)
-		glutPostRedisplay();
+	if (gl_fw->post_redisplay)
+		gl_fw->post_redisplay(gl_fw);
 }
 
 void
 piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y))
 {
-	if (!piglit_automatic && !piglit_use_fbo)
-		glutKeyboardFunc(func);
+	if (gl_fw->set_keyboard_func)
+		gl_fw->set_keyboard_func(gl_fw, func);
 }
 
 void
 piglit_swap_buffers(void)
 {
-	if (piglit_use_fbo)
-		piglit_framework_fbo_swap_buffers();
-	else
-		piglit_framework_glut_swap_buffers();
+	if (gl_fw->swap_buffers)
+		gl_fw->swap_buffers(gl_fw);
+}
+
+void
+piglit_present_results(void)
+{
+	if (!piglit_automatic)
+		piglit_swap_buffers();
 }
 
 void
 piglit_set_reshape_func(void (*func)(int w, int h))
 {
-	if (!piglit_use_fbo && !piglit_automatic)
-		glutReshapeFunc(func);
+	if (!gl_fw->set_reshape_func)
+		gl_fw->set_reshape_func(gl_fw, func);
 }

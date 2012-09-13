@@ -27,9 +27,6 @@
 /**
  * \file glut_wrap.h
  * \brief Convenience header that includes the actual GLUT headers.
- *
- * The actual GLUT headers are chosen according to the macro definitions
- * PIGLIT_USE_GLUT and PIGLIT_USE_WAFFLE.
  */
 
 #pragma once
@@ -42,9 +39,7 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#if defined(PIGLIT_USE_WAFFLE)
-#	include <glut_waffle/glut_waffle.h>
-#elif defined(PIGLIT_USE_GLUT)
+#if defined(PIGLIT_USE_GLUT)
 #	ifdef __APPLE__
 #		include <GLUT/glut.h>
 

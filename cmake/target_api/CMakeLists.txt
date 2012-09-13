@@ -19,8 +19,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-# The no_api directory must precede the GL directories because it builds
-# glut_waffle, which the GL targets depend on.
+# The no_api directory must precede the GL directories because it may build
+# api-independent libraries on which the api-dependent targets rely.
 add_subdirectory(no_api)
 
 add_subdirectory(gl)

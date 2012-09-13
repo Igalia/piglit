@@ -21,8 +21,6 @@ set(UTIL_GL_SOURCES
 	piglit-util-gl-enum.c
 	piglit-framework-gl/piglit_gl_framework.c
 	piglit-framework-gl.c
-	piglit-framework-fbo.c
-	piglit-framework-glut.c
         piglit_ktx.c
 	rgb9e5.c
 	)
