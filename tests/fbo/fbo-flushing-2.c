@@ -36,7 +36,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define TEX_WIDTH 8
 #define TEX_HEIGHT 8

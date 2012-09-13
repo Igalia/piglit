@@ -29,7 +29,6 @@
  * Once upon a time, this triggered an assertion failure in Mesa.
  */
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,

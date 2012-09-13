@@ -29,7 +29,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 /* There are 128 possible values.  These values a distributed into 3 color
  * components.  Ensure that all of the values are seen at least once.

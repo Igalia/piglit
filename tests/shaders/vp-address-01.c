@@ -29,7 +29,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 static const GLfloat attrib[] = {
 	1.0,

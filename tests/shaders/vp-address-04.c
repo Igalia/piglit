@@ -34,7 +34,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 static const GLfloat attrib[] = {
 	0.0, 0.0,

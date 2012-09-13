@@ -29,7 +29,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define BOX_SIZE 64
 #define TEST_COLS 6

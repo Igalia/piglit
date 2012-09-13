@@ -32,7 +32,6 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-framework.h"
 #include "piglit-util-gl-common.h"
 #include "rg-teximage-common.h"
 

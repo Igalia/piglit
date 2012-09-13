@@ -29,7 +29,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 /* One column for each possible combination of set-on results
  */

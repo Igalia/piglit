@@ -27,7 +27,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #if defined(_WIN32)
 #undef near

@@ -33,7 +33,6 @@
  * modified by Dave Airlie for RGTC
  */
 
-#include "piglit-framework.h"
 #include "piglit-util-gl-common.h"
 #include "rg-teximage-common.h"
 

@@ -29,7 +29,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define TEST_ROWS  1
 #define TEST_COLS  2

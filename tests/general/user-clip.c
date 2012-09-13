@@ -28,7 +28,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define BOX_SIZE   32
 

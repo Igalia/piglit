@@ -33,7 +33,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 typedef int (cmp_func)(float a, float b);
 

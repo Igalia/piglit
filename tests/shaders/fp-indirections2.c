@@ -33,7 +33,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define TEXTURE_SIZE 32 /* Note: Hardcoded dependencies in texture_init and texture_follow */
 

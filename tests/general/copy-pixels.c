@@ -30,7 +30,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
 
 #define IMAGE_WIDTH 16
 #define IMAGE_HEIGHT 16

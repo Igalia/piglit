@@ -40,7 +40,6 @@
  * Check clamping behaviour.
  */
 
-#include "piglit-framework.h"
 #include "piglit-util-gl-common.h"
 
 #define SquareSize 32
