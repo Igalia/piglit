@@ -404,16 +404,6 @@ piglit_init(int argc, char **argv)
 	GLboolean pass = true;
 	int i, j, useProxy;
 
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, piglit_width, 0, piglit_height, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	glClearColor(0.2, 0.2, 0.2, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
 	for (useProxy = 1; useProxy >= 0; useProxy--) {
 		for (i = 0; i < ARRAY_SIZE(target); i++) {
 
