@@ -84,14 +84,13 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_gl_version(20);
 
-	if (piglit_automatic)
+	if (!piglit_automatic)
 		printf(" Left to Right: LUMINANCE, INTENSITY, ALPHA\n"
 		       "Lower row: Combined with color\n"
 		       "Upper row: combined with alpha\n");
 
 	loadTex();
 
-	piglit_require_extension("GL_ARB_texture_rectangle");
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
@@ -110,30 +109,11 @@ piglit_init(int argc, char **argv)
 static void
 compileLinkProg(void)
 {
-	GLint stat;
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
 
-	vs = glCreateShader(GL_VERTEX_SHADER);
-	fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vs, 1, (const GLchar **) &vertShaderText, NULL);
-	glShaderSource(fs, 1, (const GLchar **) &fragShaderText, NULL);
-	glCompileShader(vs);
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		printf("error compiling vertex shader!\n");
-		exit(1);
-	}
-	glCompileShader(fs);
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &stat);
-	if (!stat) {
-		printf("error compiling fragment shader!\n");
-		exit(1);
-	}
-
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
-	glAttachShader(prog, fs);
+	prog = piglit_link_simple_program(vs, fs);
 	glBindAttribLocation(prog, 1, "textureCoords");
-	glLinkProgram(prog);
 	glUseProgram(prog);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
@@ -304,7 +284,6 @@ piglit_display(void)
 
 	}
 
-	glFinish();
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
