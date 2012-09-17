@@ -123,6 +123,7 @@ add_plain_program_tester_test(program_execute, 'Scalar comparison uint', 'execut
 add_plain_program_tester_test(program_execute, 'Scalar comparison ulong', 'execute/scalar-comparison-ulong.cl')
 add_plain_program_tester_test(program_execute, 'Scalar comparison ushort', 'execute/scalar-comparison-ushort.cl')
 add_plain_program_tester_test(program_execute, 'Scalar load uchar', 'execute/scalar-load-uchar.cl')
+add_plain_program_tester_test(program_execute, 'Scalar load float', 'execute/scalar-load-float.cl')
 add_plain_program_tester_test(program_execute, 'Scalar logical op float', 'execute/scalar-logical-float.cl')
 add_plain_program_tester_test(program_execute, 'Scalar logical op int', 'execute/scalar-logical-int.cl')
 add_plain_program_tester_test(program_execute, 'Sizeof operator', 'execute/sizeof.cl')
