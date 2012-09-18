@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_framebuffer_srgb-pushpop pushpop.c)
+piglit_add_executable (arb_framebuffer_srgb-blit blit.c)

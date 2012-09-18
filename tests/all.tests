@@ -1136,6 +1136,23 @@ for format in ('rgba', 'depth', 'stencil'):
         arb_framebuffer_object[test_name] = PlainExecTest(test_name + ' -auto')
 
 
+# Group ARB_framebuffer_sRGB
+arb_framebuffer_srgb = Group()
+spec['ARB_framebuffer_sRGB'] = arb_framebuffer_srgb
+for backing_type in ('texture', 'renderbuffer'):
+        for srgb_types in ('linear', 'srgb', 'linear_to_srgb',
+                           'srgb_to_linear'):
+                for blit_type in ('single_sampled', 'upsample', 'downsample',
+                                  'msaa', 'scaled'):
+                        for framebuffer_srgb_setting in ('enabled',
+                                                         'disabled'):
+                                test_name = ' '.join(
+                                        ['blit', backing_type, srgb_types,
+                                         blit_type, framebuffer_srgb_setting])
+                                arb_framebuffer_srgb[test_name] = concurrent_test(
+                                        'arb_framebuffer_srgb-' + test_name)
+
+
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
