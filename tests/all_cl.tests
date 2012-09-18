@@ -131,3 +131,4 @@ add_plain_program_tester_test(program_execute, 'Comma operator', 'execute/comma.
 add_plain_program_tester_test(program_execute, 'Reference and dereference operators', 'execute/reference.cl')
 add_plain_program_tester_test(program_execute, 'get_global_id', 'execute/get-global-id.cl')
 add_plain_program_tester_test(program_execute, 'For loop', 'execute/for-loop.cl')
+add_plain_program_tester_test(program_execute, 'GEGL gamma-2-2-to-linear', 'execute/gegl-gamma-2-2-to-linear.cl')
