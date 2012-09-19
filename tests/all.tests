@@ -1641,6 +1641,7 @@ for stage in ['vs', 'fs']:
 	for sampler in textureSize_samplers_atcma:
 		spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
+profile.test_list['spec/EXT_texture_swizzle/depth_texture_mode_and_swizzle'] = concurrent_test('depth_texture_mode_and_swizzle')
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
