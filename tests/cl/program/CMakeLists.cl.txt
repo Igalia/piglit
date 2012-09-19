@@ -1,0 +1,2 @@
+piglit_cl_add_program_test (tester program-tester.c)
+piglit_cl_add_program_test (max-work-item-sizes max-work-item-sizes.c)

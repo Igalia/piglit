@@ -1,0 +1,107 @@
+
+OpenCL testing framework
+------------------------
+1. About
+2. Test types
+3. How to run tests
+4. How to write tests
+
+
+1. About
+--------
+
+This framework is used to write OpenCL tests for Piglit framework.
+
+The framework supports creating tests to run once or per each platform (if
+cl_khr_icd is supported, else only one platform is tested) or per each
+device. Each test can be limited to a particular group of platforms or
+devices.
+
+There are different test types which can be used to write a test. These
+test types automate checking for different implementation functionality
+(OpenCL version, extensions, filter by platform name,...) and creating
+objects (context creation, program creation and building, source code
+loading, buffer creation and buffer data initialization,...).
+
+2. Test types
+-------------
+
+Currently there are three different types of tests:
+
+ * API tests:
+    These type of tests are meant for testing the API functions.
+    Documentation is located at tests/cl/doc_api.c.
+
+ * Program tests:
+    These type of tests are meant for testing compilation of OpenCL C
+    programs and kernel execution. These tests can be normal C/C++ programs
+    or special files that are parsed by program-tester
+    (bin/cl-program-tester). This program takes in an ini-like file
+    (test.program_test) or an OpenCL source code (test.cl) with a special
+    comment. The binary programs (test.bin) can be referenced from
+    program_test files.
+    Documentation is located at tests/cl/doc_program.c,
+    test/cl/doc_program.cl and test/cl/doc_program.program_test.
+
+ * Custom tests:
+    These type of tests are for tests that don't fit well in any other test
+    type.
+    Documentation is located at tests/cl/doc_custom.c.
+
+3. How to run tests
+-------------------
+
+All compilable tests are compiled to the bin/ folder. Each test has a
+prefix applied to it, depending on its type:
+  * API: cl-api-
+  * Program: cl-program-
+  * Custom: cl-custom-
+
+The OpenCL C and program_test tests are parsed and run by program-tester
+that is located at bin/cl-program-tester.
+
+Each test can be run independently or they can all be run by Piglit as a
+test set. The test set is located at tests/all_cl.tests.
+
+Each test accepts the following environment variables:
+ * PIGLIT_CL_PLATFORM: Only run test on platforms whose platform name
+                       begins with PIGLIT_CL_PLATFORM. (This variable
+                       is accepted only when the test is run per platform
+                       or per device)
+ * PIGLIT_CL_DEVICE: Only run tests on devices whose device name begins
+                     with PIGLIT_CL_DEVICE. (This variable is accepted only
+                     when the test is run per device)
+ * PIGLIT_CL_VERSION: Test against OpenCL version PIGLIT_CL_VERSION. This
+                      variable is a normal OprnCL versioning number
+                      (example: 1.1).
+
+The same variables are accepted as program arguments:
+ * -platform name: Same as PIGLIT_CL_PLATFORM.
+ * -device name: Same as PIGLIT_CL_DEVICE.
+ * -version ver: Same as PIGLIT_CL_VERSION.
+
+4. How to write tests
+---------------------
+
+Tests should be created in appropriate folder in cl/tests:
+ * api/: API tests
+ * program/: Program tests
+ * program/build/: Program-tester compilation tests
+ * program/build/fail/: Program-tester compilation tests that should fail
+ * program/execute: Program-tester kernel execution tests
+
+Templates for the different types of tests and documentation for them is
+located at tests/cl/doc_* and tests/cl/template_*.
+
+To cover the widest range of OpenCL versions with one test, each compiled
+test is passed an env->version variable which contains a version number
+against which the test should test. Also the PIGLIT_CL_VERSION macro
+present in piglit-util-cl.h contains a version number against which Piglit
+was compiled. Both numbers are multiples of 10 of OpenCL version (1.1 -> 11).
+
+The program tests run by program-tester (bin/cl-program-tester) are compiled
+with a macro __OPENCL_C_VERSION__ which tells against which version the
+source will be compiled. To comply with OpenCL spec this version number is a
+multiple of 100 of OpenCL C version (1.1 -> 110).
+
+All new tests should be added to an appropriate group in tests/all_cl.tests.

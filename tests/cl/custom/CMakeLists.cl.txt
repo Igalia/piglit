@@ -1,0 +1,1 @@
+piglit_cl_add_custom_test (run-simple-kernel run-simple-kernel.c)
