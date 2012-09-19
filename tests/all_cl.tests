@@ -133,3 +133,4 @@ add_plain_program_tester_test(program_execute, 'get_global_id', 'execute/get-glo
 add_plain_program_tester_test(program_execute, 'For loop', 'execute/for-loop.cl')
 add_plain_program_tester_test(program_execute, 'GEGL gamma-2-2-to-linear', 'execute/gegl-gamma-2-2-to-linear.cl')
 add_plain_program_tester_test(program_execute, 'GEGL rgb-gamma-u8-to-ragabaf', 'execute/gegl-rgb-gamma-u8-to-ragabaf.cl')
+add_plain_program_tester_test(program_execute, 'GEGL fir-get-mean-component-1D-CL', 'execute/gegl-fir-get-mean-component-1D-CL.cl')
