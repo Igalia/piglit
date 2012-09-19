@@ -210,9 +210,9 @@ do_row(int srcy, int srcw, int srch, GLenum target)
 	glDisable(target);
 	glDeleteTextures(1, &texname);
 
-	printf("Checking 0x%04x, rect 1:\n", target);
+	printf("Checking %s, rect 1:\n", piglit_get_gl_enum_name(target));
 	pass &= check_results(dstx, dsty, srcw, srch);
-	printf("Checking 0x%04x, rect 2:\n", target);
+	printf("Checking %s, rect 2:\n", piglit_get_gl_enum_name(target));
 	pass &= check_results(dstx2, dsty2, srcw, srch);
 
 	return pass;
