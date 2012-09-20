@@ -37,6 +37,37 @@ static int automatic;
 
 int depth;
 
+int
+egl_probe_front_pixel_rgb(struct egl_state *state,
+			  int x, int y, const float *expected)
+{
+	XImage *ximage = XGetImage(state->dpy, state->win,
+				   x, state->height - y - 1, 1, 1, AllPlanes, ZPixmap);
+	unsigned long pixel = XGetPixel(ximage, 0, 0);
+	uint8_t *probe = (uint8_t *)&pixel;
+	int pass = 1;
+	int i;
+
+	XDestroyImage(ximage);
+
+	/* NB: XGetPixel returns a normalized BGRA, byte per
+	 * component, pixel format */
+	for(i = 0; i < 3; ++i) {
+		if (fabs(probe[2 - i]/255.0 - expected[i]) > piglit_tolerance[i]) {
+			pass = 0;
+		}
+	}
+
+	if (pass)
+		return 1;
+
+	printf("Front Buffer Probe at (%i,%i)\n", x, y);
+	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
+	printf("  Observed: %f %f %f %f\n", probe[0]/255.0, probe[1]/255.0, probe[2]/255.0, probe[3]/255.0);
+
+	return 0;
+}
+
 void
 egl_init_test(struct egl_test *test)
 {

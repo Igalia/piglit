@@ -62,4 +62,8 @@ egl_util_create_pixmap(struct egl_state *state,
 
 int egl_util_run(const struct egl_test *test, int argc, char *argv[]);
 
+int
+egl_probe_front_pixel_rgb(struct egl_state *state,
+			  int x, int y, const float *expected);
+
 #endif
