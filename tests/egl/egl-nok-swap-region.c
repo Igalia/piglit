@@ -40,12 +40,33 @@ draw(struct egl_state *state)
 {
 	EGLint rects[] = { 
 		10, 10, 10, 10, 
-		20, 20, 20, 10,
-		40, 30, 10, 20,
+		20, 20, 20, 10, /* wide rect */
+		40, 30, 10, 20, /* tall rect */
 		50, 50, 10, 10
 	};
-	PFNEGLSWAPBUFFERSREGIONNOK swap_buffers_region;
+	float green[] = { 0.0, 1.0, 0.0, 1.0};
 	float red[] = { 1.0, 0.0, 0.0, 1.0};
+	struct {
+		int x, y;
+		const float *expected;
+	} probes[] = {
+		{ 15, 15, red },
+		{ 15, state->height - 15, green },
+
+		{ 25, 25, red },
+		{ 35, 25, red },
+		{ 25, 35, green },
+		{ 25, state->height - 25, green },
+
+		{ 45, 35, red },
+		{ 45, 45, red },
+		{ 55, 35, green },
+		{ 45, state->height - 35, green },
+
+		{ 55, 55, red },
+		{ 55, state->height - 55, green },
+	};
+	PFNEGLSWAPBUFFERSREGIONNOK swap_buffers_region;
 	int i;
 
 	swap_buffers_region = (PFNEGLSWAPBUFFERSREGIONNOK) 
@@ -64,9 +85,13 @@ draw(struct egl_state *state)
 	glClear(GL_COLOR_BUFFER_BIT);
 	swap_buffers_region(state->egl_dpy, state->surf, 4, rects);
 
-	for (i = 0; i < 16; i += 4)
-		if (!piglit_probe_pixel_rgba(rects[i] + 5,
-					     rects[i + 1] + 5, red))
+	glFinish();
+
+	for (i = 0; i < ARRAY_SIZE(probes); i++)
+		if (!egl_probe_front_pixel_rgb(state,
+					       probes[i].x,
+					       probes[i].y,
+					       probes[i].expected))
 			return PIGLIT_FAIL;
 
 	return PIGLIT_PASS;
