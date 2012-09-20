@@ -137,12 +137,12 @@ compile_glsl(GLenum target, bool release_text)
 		shader_string_sizes[1] = shader_string_size;
 		
 		piglit_ShaderSource(shader, 2,
-				    shader_strings,
+				    (const GLchar **) shader_strings,
 				    shader_string_sizes);
 
 	} else {
 		piglit_ShaderSource(shader, 1,
-				    &shader_string,
+				    (const GLchar **) &shader_string,
 				    &shader_string_size);
 	}
 
