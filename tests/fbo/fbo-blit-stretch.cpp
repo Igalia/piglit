@@ -538,7 +538,7 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	for (unsigned i = 0; i < ARRAY_SIZE(tests); i++) {
 		if (test_index != -1 &&
-		    test_index != i)
+		    test_index != (int) i)
 			continue;
 
 		TestCase test = tests[i];
