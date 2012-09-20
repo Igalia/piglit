@@ -63,6 +63,11 @@ roundf(float x) {
 	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
 }
 
+static __inline long
+lround(double x) {
+	return (long)round(x);
+}
+
 #ifndef va_copy
 #ifdef __va_copy
 #define va_copy(dest, src) __va_copy((dest), (src))
