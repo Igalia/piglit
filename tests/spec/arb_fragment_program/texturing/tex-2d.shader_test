@@ -1,0 +1,37 @@
+[vertex program]
+!!ARBvp1.0
+TEMP texcoord;
+
+ADD texcoord.xy, vertex.position, {1}.x;
+MUL texcoord.xy, texcoord.xyyy, {0.5}.x;
+MOV texcoord.z, {0}.x;
+MOV texcoord.w, {0}.x;
+
+MOV result.position, vertex.position;
+MOV result.texcoord[0], texcoord;
+END
+
+[fragment program]
+!!ARBfp1.0
+TEX result.color, fragment.texcoord[0], texture[0], 2D;
+END
+
+[test]
+
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+
+# tests pixels at the corners, and somewhere near the center in case
+# the projection goes wrong.
+
+relative probe rgba (0.0, 0.0) (1.0, 0.0, 0.0, 1.0)
+relative probe rgba (0.4, 0.4) (1.0, 0.0, 0.0, 1.0)
+
+relative probe rgba (1.0, 0.0) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.6, 0.4) (0.0, 1.0, 0.0, 1.0)
+
+relative probe rgba (0.0, 1.0) (0.0, 0.0, 1.0, 1.0)
+relative probe rgba (0.4, 0.6) (0.0, 0.0, 1.0, 1.0)
+
+relative probe rgba (1.0, 1.0) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.6, 0.6) (1.0, 1.0, 1.0, 1.0)

@@ -1,0 +1,36 @@
+[require]
+GL_ARB_texture_rectangle
+GL_ARB_fragment_program_shadow
+
+[vertex program]
+!!ARBvp1.0
+TEMP texcoord;
+
+ADD texcoord.xyz, vertex.position.xyyy, {1}.x;
+MUL texcoord.xy, texcoord, {32}.x;
+MUL texcoord.z, texcoord, {1.0}.x;
+MOV texcoord.w, {2}.x;
+
+MOV result.position, vertex.position;
+MOV result.texcoord[0], texcoord;
+END
+
+[fragment program]
+!!ARBfp1.0
+OPTION ARB_fragment_program_shadow;
+TXP result.color, fragment.texcoord[0], texture[0], SHADOWRECT;
+END
+
+[test]
+texture shadowRect 0 (32, 32)
+texparameter Rect depth_mode luminance
+texparameter Rect compare_func greater
+draw rect -1 -1 2 2
+
+# depth comparison pass
+relative probe rgba (0.0, 0.1) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.9, 1.0) (1.0, 1.0, 1.0, 1.0)
+
+# depth comparison fail
+relative probe rgba (0.1, 0.0) (0.0, 0.0, 0.0, 1.0)
+relative probe rgba (1.0, 0.9) (0.0, 0.0, 0.0, 1.0)

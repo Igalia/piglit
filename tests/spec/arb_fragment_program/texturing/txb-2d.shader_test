@@ -1,0 +1,42 @@
+[vertex program]
+!!ARBvp1.0
+OPTION ARB_position_invariant;
+TEMP texcoord;
+
+ADD texcoord.xy, vertex.position, program.env[0].xyyy;
+MUL texcoord.xy, texcoord.xyyy, program.env[0].z;
+MOV texcoord.z, {0}.x;
+MOV texcoord.w, {1}.x;
+
+MOV result.texcoord[0], texcoord;
+END
+
+[fragment program]
+!!ARBfp1.0
+TXB result.color, fragment.texcoord[0], texture[0], 2D;
+END
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+ortho
+
+# 8x8 miptree, levels are (red, green, blue, white)
+texture miptree 0
+
+parameter env_vp 0 (-1.0,  -1.0, 0.0625, 0.0)
+draw rect 01 1 16 16
+parameter env_vp 0 (-21.0, -1.0, 0.125,  0.0)
+draw rect 21 1 8 8
+parameter env_vp 0 (-41.0, -1.0, 0.25,  0.0)
+draw rect 41 1 4 4
+parameter env_vp 0 (-61.0, -1.0, 0.5,  0.0)
+draw rect 61 1 2 2
+parameter env_vp 0 (-81.0, -1.0, 1.0,  0.0)
+draw rect 81 1 1 1
+
+probe rgba  1  1 1.0 0.0 0.0 1.0
+probe rgba 21  1 0.0 1.0 0.0 1.0
+probe rgba 41  1 0.0 0.0 1.0 1.0
+probe rgba 61  1 1.0 1.0 1.0 1.0
+probe rgba 81  1 1.0 1.0 1.0 1.0
