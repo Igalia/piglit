@@ -1131,25 +1131,31 @@ piglit_miptree_texture()
 	return tex;
 }
 
+
 /**
- * Generates a texture with the given internalFormat, w, h with a
- * teximage of r, g, b w quadrants.
- *
+ * Generates an image of the given size with quadrants of red, green,
+ * blue and white.
  * Note that for compressed teximages, where the blocking would be
  * problematic, we assign the whole layers at w == 4 to red, w == 2 to
  * green, and w == 1 to blue.
+ *
+ * \param internalFormat  either GL_RGBA or a specific compressed format
+ * \param w  the width in texels
+ * \param h  the height in texels
+ * \param alpha  if TRUE, use varied alpha values, else all alphas = 1
+ * \param basetype  either GL_UNSIGNED_NORMALIZED, GL_SIGNED_NORMALIZED
+ *                  or GL_FLOAT
  */
-GLuint
-piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
-		    GLboolean alpha, GLenum basetype)
+GLfloat *
+piglit_rgbw_image(GLenum internalFormat, int w, int h,
+		  GLboolean alpha, GLenum basetype)
 {
-	GLfloat *data;
-	int size, x, y, level;
-	GLuint tex;
 	float red[4]   = {1.0, 0.0, 0.0, 0.0};
 	float green[4] = {0.0, 1.0, 0.0, 0.25};
 	float blue[4]  = {0.0, 0.0, 1.0, 0.5};
 	float white[4] = {1.0, 1.0, 1.0, 1.0};
+	GLfloat *data;
+	int x, y;
 
 	if (!alpha) {
 		red[3] = 1.0;
@@ -1184,6 +1190,72 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		assert(0);
 	}
 
+	data = malloc(w * h * 4 * sizeof(GLfloat));
+
+	for (y = 0; y < h; y++) {
+		for (x = 0; x < w; x++) {
+			const int size = w > h ? w : h;
+			const float *color;
+
+			if (x < w / 2 && y < h / 2)
+				color = red;
+			else if (y < h / 2)
+				color = green;
+			else if (x < w / 2)
+				color = blue;
+			else
+				color = white;
+
+			switch (internalFormat) {
+			case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+			case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+			case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+			case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+			case GL_COMPRESSED_RGB_FXT1_3DFX:
+			case GL_COMPRESSED_RGBA_FXT1_3DFX:
+			case GL_COMPRESSED_RED_RGTC1:
+			case GL_COMPRESSED_SIGNED_RED_RGTC1:
+			case GL_COMPRESSED_RG_RGTC2:
+			case GL_COMPRESSED_SIGNED_RG_RGTC2:
+			case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+			case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
+			case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
+			case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
+				if (size == 4)
+					color = red;
+				else if (size == 2)
+					color = green;
+				else if (size == 1)
+					color = blue;
+				break;
+			default:
+				break;
+			}
+
+			memcpy(data + (y * w + x) * 4, color,
+			       4 * sizeof(float));
+		}
+	}
+
+	return data;
+}
+
+
+/**
+ * Generates a texture with the given internalFormat, w, h with a
+ * teximage of r, g, b, w quadrants.
+ *
+ * Note that for compressed teximages, where the blocking would be
+ * problematic, we assign the whole layers at w == 4 to red, w == 2 to
+ * green, and w == 1 to blue.
+ */
+GLuint
+piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
+		    GLboolean alpha, GLenum basetype)
+{
+	int size, level;
+	GLuint tex;
+
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1199,56 +1271,18 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 				GL_NEAREST);
 	}
-	data = malloc(w * h * 4 * sizeof(GLfloat));
 
 	for (level = 0, size = w > h ? w : h; size > 0; level++, size >>= 1) {
-		for (y = 0; y < h; y++) {
-			for (x = 0; x < w; x++) {
-				const float *color;
+		GLfloat *data =
+			piglit_rgbw_image(internalFormat, w, h,
+					  alpha, basetype);
 
-				if (x < w / 2 && y < h / 2)
-					color = red;
-				else if (y < h / 2)
-					color = green;
-				else if (x < w / 2)
-					color = blue;
-				else
-					color = white;
-
-				switch (format) {
-				case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-				case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-				case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-				case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-				case GL_COMPRESSED_RGB_FXT1_3DFX:
-				case GL_COMPRESSED_RGBA_FXT1_3DFX:
-				case GL_COMPRESSED_RED_RGTC1:
-				case GL_COMPRESSED_SIGNED_RED_RGTC1:
-				case GL_COMPRESSED_RG_RGTC2:
-				case GL_COMPRESSED_SIGNED_RG_RGTC2:
-				case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
-				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
-				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
-				case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
-					if (size == 4)
-						color = red;
-					else if (size == 2)
-						color = green;
-					else if (size == 1)
-						color = blue;
-					break;
-				default:
-					break;
-				}
-
-				memcpy(data + (y * w + x) * 4, color,
-				       4 * sizeof(float));
-			}
-		}
 		glTexImage2D(GL_TEXTURE_2D, level,
-			     format,
+			     internalFormat,
 			     w, h, 0,
 			     GL_RGBA, GL_FLOAT, data);
+
+		free(data);
 
 		if (!mip)
 			break;
@@ -1258,7 +1292,7 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		if (h > 1)
 			h >>= 1;
 	}
-	free(data);
+
 	return tex;
 }
 
