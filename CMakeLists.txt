@@ -42,7 +42,12 @@ if(PIGLIT_BUILD_CL_TESTS)
 endif(PIGLIT_BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set(PIGLIT_HAS_X11 True)
 	add_definitions(-DPIGLIT_HAS_X11)
+
+        set(PIGLIT_HAS_GLX True)
+        add_definitions(-DPIGLIT_HAS_GLX)
+
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" OFF)
@@ -199,6 +204,12 @@ FIND_LIBRARY(OPENGL_egl_LIBRARY
       NAMES EGL
       PATHS /usr/lib
 )
+
+if(OPENGL_egl_LIBRARY)
+    set(PIGLIT_HAS_EGL True)
+    add_definitions(-DPIGLIT_HAS_EGL)
+endif()
+
 find_library(OPENGL_gles1_LIBRARY NAMES GLESv1_CM)
 find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
