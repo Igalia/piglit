@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     1 + ((BOX_SIZE + 1) * TEST_COLS) /*window_width*/,
     1 + ((BOX_SIZE + 1) * TEST_ROWS) /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static float maxSize = 0.0f;
 static GLuint tex;

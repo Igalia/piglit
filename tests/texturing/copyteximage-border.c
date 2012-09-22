@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     TEX_SIZE * 2 + 30 /*window_width*/,
     TEX_SIZE + 20 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 enum piglit_result
 piglit_display(void)

@@ -34,7 +34,7 @@
 PIGLIT_GL_TEST_MAIN(
     150 /*window_width*/,
     50 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 #define TEST_FIXED_FUNC 1
 #define TEST_ARB_FP     2

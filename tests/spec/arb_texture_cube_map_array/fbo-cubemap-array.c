@@ -42,7 +42,7 @@
 PIGLIT_GL_TEST_MAIN(
     200 /*window_width*/,
     100 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 #define NUM_FACES       6
 #define NUM_LAYERS	3

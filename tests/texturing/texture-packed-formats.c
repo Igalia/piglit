@@ -42,7 +42,7 @@
 PIGLIT_GL_TEST_MAIN(
     700 /*window_width*/,
     620 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 struct pixel_format {
    const char *name;

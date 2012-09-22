@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     200 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH)
 
 /**
  * Convenience function to draw an axis-aligned rectangle.

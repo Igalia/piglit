@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     50 /*window_width*/,
     50 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static const GLuint NumLevels = 10;
 

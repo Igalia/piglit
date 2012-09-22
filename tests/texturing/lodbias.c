@@ -48,7 +48,7 @@
 PIGLIT_GL_TEST_MAIN(
     3*SquareSize /*window_width*/,
     3*SquareSize /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static int CurrentTest = 0;
 static int CurrentBias = 0;

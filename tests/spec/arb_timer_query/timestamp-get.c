@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     128 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 static GLint64
 get_gpu_time_via_query(GLuint q)

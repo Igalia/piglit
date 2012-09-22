@@ -54,7 +54,7 @@
 PIGLIT_GL_TEST_MAIN(
     DSTW /*window_width*/,
     DSTH /*window_height*/,
-    GLUT_RGBA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 struct TestCase
 {

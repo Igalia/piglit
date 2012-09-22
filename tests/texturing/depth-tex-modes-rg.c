@@ -43,7 +43,7 @@ static const GLenum depth_texture_modes[] = {
 PIGLIT_GL_TEST_MAIN(
     1 + (TEST_COLS * (BOX_SIZE + 1)) /*window_width*/,
     1 + (TEST_ROWS * (BOX_SIZE + 1)) /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 GLuint tex[2];
 

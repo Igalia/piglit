@@ -21,7 +21,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA)
 
 static GLfloat colors[8][3] = {
 	{ 1.0, 1.0, 1.0 },

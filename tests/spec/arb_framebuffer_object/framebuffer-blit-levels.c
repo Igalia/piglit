@@ -57,7 +57,7 @@
 PIGLIT_GL_TEST_MAIN(
     32,
     32,
-    GLUT_RGBA);
+    PIGLIT_GL_VISUAL_RGBA);
 
 enum {
 	TEST_MODE_DRAW,

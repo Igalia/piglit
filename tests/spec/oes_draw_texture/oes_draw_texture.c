@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DEPTH | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_DOUBLE)
 
 /* see piglit_rgbw_texture */
 static const float red[4] =   { 1.0f, 0.0f, 0.0f, 0.0f };

@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     250 /*window_width*/,
     250 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char *vs_source = "void main() {}";
 

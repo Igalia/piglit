@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     256 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const GLfloat red[4] = {1, 0, 0, 0};
 static const GLfloat green[4] = {0, 1, 0, 1};

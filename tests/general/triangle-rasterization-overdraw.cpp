@@ -74,7 +74,7 @@ int random_test_count = 10;
 PIGLIT_GL_TEST_MAIN(
     1000 /*window_width*/,
     1000 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 /* Globals */
 int test_id = 0;

@@ -40,7 +40,7 @@
 PIGLIT_GL_TEST_MAIN(
     700 /*window_width*/,
     300 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 /* Do piglit_rgbw_texture() image but using glClear */
 static bool

@@ -17,7 +17,7 @@ static int Width = COLS*32, Height = ROWS*32;
 PIGLIT_GL_TEST_MAIN(
     COLS*32 /*window_width*/,
     ROWS*32 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH)
 
 static int CellWidth, CellHeight;
 static int CurrentTest = 0;

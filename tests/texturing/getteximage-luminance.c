@@ -33,7 +33,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGBA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char *TestName = "getteximage-luminance";
 static float tolerance = 2.0 / 255.0;

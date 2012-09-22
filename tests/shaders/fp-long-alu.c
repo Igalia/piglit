@@ -40,7 +40,7 @@
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,
     32 /*window_height*/,
-    GLUT_RGBA | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
 
 int max_alu_instructions;
 

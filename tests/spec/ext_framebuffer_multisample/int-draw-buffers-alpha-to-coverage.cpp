@@ -45,7 +45,7 @@
 
 PIGLIT_GL_TEST_MAIN(512 /*window_width*/,
 		    768 /*window_height*/,
-		    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
+		    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
 
 /* At present fragment shader in draw-buffers-common.cpp supports only
  * fixed number of attachments = 3.

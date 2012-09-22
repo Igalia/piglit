@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     (64 * 6 + PAD * 9) * 2 /*window_width*/,
     400 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 int max_size;
 

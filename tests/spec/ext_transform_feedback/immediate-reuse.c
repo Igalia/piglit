@@ -41,7 +41,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     16 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static const char *vstext =
 	"attribute vec4 in_position;\n"

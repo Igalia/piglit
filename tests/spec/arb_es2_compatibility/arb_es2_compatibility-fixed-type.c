@@ -28,7 +28,7 @@
 PIGLIT_GL_TEST_MAIN(
     250 /*window_width*/,
     250 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA)
 
 static unsigned verts[4*4*4];
 

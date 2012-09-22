@@ -55,7 +55,7 @@ const int num_tiles = tiles_across * tiles_across;
 
 PIGLIT_GL_TEST_MAIN(2 * pattern_size /*window_width*/,
 		    pattern_size /*window_height*/,
-		    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL);
+		    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL);
 
 const int permutation[num_tiles] = {
 	10, 5, 6, 17, 3, 11, 16, 21, 14, 24, 23, 8, 15, 18, 0, 12, 9,

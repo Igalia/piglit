@@ -54,7 +54,7 @@
 PIGLIT_GL_TEST_MAIN(
     16 /*window_width*/,
     16 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL)
 
 const GLuint idx0 = 0, idx1 = 1, idx2 = 2, idx3 = 3;
 static GLfloat expected[100][4];

@@ -40,7 +40,7 @@ immediately instead of being compiled into display lists.
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,
     32 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 enum piglit_result
 piglit_display(void)

@@ -42,7 +42,7 @@
 PIGLIT_GL_TEST_MAIN(
     (BOX_SIZE + 2) * TEST_COLS + 1 /*window_width*/,
     (BOX_SIZE + 1) + 1 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static GLuint tex[1];
 static GLint prog;

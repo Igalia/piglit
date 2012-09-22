@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     128 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static float result0[] = {0.7, 0.6, 0.3, 0.1};
 static float result1[] = {0.2, 0.9, 0.5, 0.8};

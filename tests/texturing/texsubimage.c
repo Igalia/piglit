@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     150 /*window_width*/,
     150 /*window_height*/,
-    GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 /**
  * This is a subset of the formats in fbo-formats.h

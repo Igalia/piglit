@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     320 /*window_width*/,
     60 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 #define i32to10(x) ((x) >= 0 ? (x & 0x1ff) : 1024-(abs((x))& 0x1ff))
 #define i32to2(x) ((x) >= 0 ? (x & 0x1) : 1-abs((x)))

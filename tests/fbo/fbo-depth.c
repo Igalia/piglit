@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     BUF_SIZE /*window_width*/,
     BUF_SIZE /*window_height*/,
-    GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_DOUBLE)
 
 enum {
 	CLEAR,

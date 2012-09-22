@@ -34,7 +34,7 @@
 
 PIGLIT_GL_TEST_MAIN(128 /*window_width*/,
 		    128 /*window_height*/,
-		    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+		    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 /* use small values for pixels[0..3], so that the 0.01 tolerance is met for fp16 */
 static float pixels[] = {

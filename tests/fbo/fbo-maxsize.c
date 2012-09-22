@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     256 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static int
 find_max_texture_size(void)

@@ -40,7 +40,7 @@
 PIGLIT_GL_TEST_MAIN(
     (2 + MAX_VARYING * 12) /*window_width*/,
     (2 + MAX_VARYING * 12) /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 /* Generate a VS that writes to num_varyings vec4s, and put
  * interesting data in data_varying with 0.0 everywhere else.

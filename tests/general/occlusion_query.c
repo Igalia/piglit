@@ -34,7 +34,7 @@
 PIGLIT_GL_TEST_MAIN(
     180 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
 
 #define MAX_QUERIES 5
 static GLuint occ_queries[MAX_QUERIES];

@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     BUF_WIDTH /*window_width*/,
     BUF_WIDTH /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 /* Width of our stripes of z = 0.0, 0.5, 1.0 */
 static int w = BUF_WIDTH / 3;

@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     300 /*window_width*/,
     300 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static GLfloat vertices[][4] = {
 	{  1, -1, 0, 1 }, /* bottom right */

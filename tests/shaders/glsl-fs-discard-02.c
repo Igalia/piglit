@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
 
 static char vs_code[] =
 	"varying vec4 color;"

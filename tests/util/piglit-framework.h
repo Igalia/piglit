@@ -29,6 +29,25 @@
 #include <stdbool.h>
 
 /**
+ * A bitmask of these enums specifies visual attributes for the test's window.
+ *
+ * Each enum has the same value of its corresponding GLUT enum. That is, for
+ * each X, `PIGLIT_GL_VISUAL_X == GLUT_X`.
+ *
+ * \see piglit_gl_test_info::window_visual
+ */
+enum piglit_gl_visual {
+	PIGLIT_GL_VISUAL_RGB 		= 0,
+	PIGLIT_GL_VISUAL_RGBA 		= 0,
+	PIGLIT_GL_VISUAL_SINGLE 	= 0,
+	PIGLIT_GL_VISUAL_DOUBLE 	= 1 << 1,
+	PIGLIT_GL_VISUAL_ACCUM 		= 1 << 2,
+	PIGLIT_GL_VISUAL_ALPHA 		= 1 << 3,
+	PIGLIT_GL_VISUAL_DEPTH 		= 1 << 4,
+	PIGLIT_GL_VISUAL_STENCIL 	= 1 << 5,
+};
+
+/**
  * @brief Info needed to run an OpenGL test.
  *
  * To run a test, pass this to piglit_gl_test_run().
@@ -43,7 +62,9 @@ struct piglit_gl_test_info {
 	int window_width;
 	int window_height;
 
-	/** A bitmask such as `GLUT_RGBA | GLUT_DOUBLE`. */
+	/**
+	 * A bitmask of `enum piglit_gl_visual`.
+	 */
 	int window_visual;
 
 	/**

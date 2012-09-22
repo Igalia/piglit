@@ -33,7 +33,7 @@
 PIGLIT_GL_TEST_MAIN(
     250 /*window_width*/,
     250 /*window_height*/,
-    GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_SINGLE | PIGLIT_GL_VISUAL_DEPTH)
 
 char *
 unix_line_endings(const char *input, size_t length)

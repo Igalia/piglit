@@ -48,7 +48,7 @@
 PIGLIT_GL_TEST_MAIN(
     3 * SIZE /*window_width*/,
     SIZE /*window_height*/,
-    GLUT_DOUBLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
 
 static GLfloat ErrorScale = 0.0;
 static GLuint ColorTex, DepthTex, FBO;

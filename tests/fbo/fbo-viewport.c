@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     500 /*window_width*/,
     500 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 /**
  * Draw some simple quads in a bunch of viewports which tile the window.

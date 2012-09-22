@@ -34,7 +34,7 @@
 PIGLIT_GL_TEST_MAIN(
     640 /*window_width*/,
     480 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static void
 check_fbo_status()

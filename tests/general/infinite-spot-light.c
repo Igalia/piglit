@@ -44,7 +44,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 /* Already normalized, and 0.5 would be the expected color */
 static GLfloat dir[3] = {0.866025404, 0.0, 0.5};

@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     20 /*window_width*/,
     20 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char vs_text[] =
 	"uniform float c[4];\n"

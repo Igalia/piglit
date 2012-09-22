@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,
     10 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 static const char fs_source[] =
 	"#extension GL_ARB_uniform_buffer_object : require\n"

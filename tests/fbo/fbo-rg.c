@@ -47,7 +47,7 @@ static GLboolean pass = GL_TRUE;
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     64 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static const char vert_code[] =
 	"attribute vec2 position;\n"

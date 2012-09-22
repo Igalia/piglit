@@ -42,7 +42,7 @@
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,
     10 /*window_height*/,
-    GLUT_RGB)
+    PIGLIT_GL_VISUAL_RGB)
 
 #define ENUM_AND_STRING(e) \
 	# e, e

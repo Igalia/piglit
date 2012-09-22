@@ -11,7 +11,7 @@
 PIGLIT_GL_TEST_MAIN(
     16 * 16 /*window_width*/,
     11 * 16 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
 
 static int NumTextures = 16;
 static GLuint Textures[16];

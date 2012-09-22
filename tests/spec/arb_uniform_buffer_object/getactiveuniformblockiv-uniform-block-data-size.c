@@ -41,7 +41,7 @@
 PIGLIT_GL_TEST_MAIN(
     10 /*window_width*/,
     10 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA)
 
 static int
 align(int v, int a)

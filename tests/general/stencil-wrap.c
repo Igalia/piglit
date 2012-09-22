@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     550 /*window_width*/,
     200 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL)
 
 enum piglit_result
 piglit_display(void)

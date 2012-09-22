@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     500 /*window_width*/,
     500 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char *TestName = "draw-instanced";
 

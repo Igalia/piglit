@@ -123,7 +123,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     256 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 /* Test parameters */
 static GLenum draw_mode;

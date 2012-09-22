@@ -49,7 +49,7 @@
 PIGLIT_GL_TEST_MAIN(
     150 /*window_width*/,
     30 /*window_height*/,
-    GLUT_RGBA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static int lod_location;
 static int vertex_location;

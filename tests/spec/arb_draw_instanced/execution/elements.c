@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     70 /*window_width*/,
     30 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char *vs_source =
 	"#version 120\n"

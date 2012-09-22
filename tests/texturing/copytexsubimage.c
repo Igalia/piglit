@@ -30,7 +30,7 @@
 PIGLIT_GL_TEST_MAIN(
     200 /*window_width*/,
     200 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 /** Should GL_TEXTURE_RECTANGLE_ARB be tested? */
 int have_rect = 0;

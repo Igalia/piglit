@@ -72,7 +72,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGBA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const GLenum formatTypes[] = {
 	GL_RGBA,

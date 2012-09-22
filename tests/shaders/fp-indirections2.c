@@ -40,7 +40,7 @@
 PIGLIT_GL_TEST_MAIN(
     TEXTURE_SIZE /*window_width*/,
     TEXTURE_SIZE /*window_height*/,
-    GLUT_RGBA)
+    PIGLIT_GL_VISUAL_RGBA)
 
 unsigned int max_samples;
 unsigned char * texture_data;

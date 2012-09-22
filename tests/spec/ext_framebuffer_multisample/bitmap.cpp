@@ -43,7 +43,7 @@
 
 PIGLIT_GL_TEST_MAIN(512 /*window_width*/,
 		    256 /*window_height*/,
-		    GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
+		    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
 
 const int pattern_width = 256; const int pattern_height = 256;
 

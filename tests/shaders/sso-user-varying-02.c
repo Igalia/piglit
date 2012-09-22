@@ -32,7 +32,7 @@
 PIGLIT_GL_TEST_MAIN(
     30 /*window_width*/,
     30 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char vs_text[] =
 	"varying vec4 color;\n"

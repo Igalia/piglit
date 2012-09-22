@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     128 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const GLfloat TextureColor[3] = { 1.0, 0.5, 0.0 };
 

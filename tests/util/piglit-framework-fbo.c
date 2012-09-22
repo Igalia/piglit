@@ -261,7 +261,7 @@ piglit_framework_fbo_gl_init(const struct piglit_gl_test_info *info)
 			       tex,
 			       0);
 
-	if (info->window_visual & (GLUT_DEPTH | GLUT_STENCIL)) {
+	if (info->window_visual & (PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL)) {
 		/* Create a combined depth+stencil texture and attach it
 		 * to the depth and stencil attachment points.
 		 */

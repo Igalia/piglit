@@ -39,7 +39,7 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(170, 30, GLUT_RGBA | GLUT_DOUBLE)
+PIGLIT_GL_TEST_MAIN(170, 30, PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 enum piglit_result
 piglit_display()

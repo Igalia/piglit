@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     200 /*window_width*/,
     200 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 #define MAX_LEVEL 7
 

@@ -41,7 +41,7 @@ static const char* const program_text =
 PIGLIT_GL_TEST_MAIN(
     50 /*window_width*/,
     50 /*window_height*/,
-    GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 static PFNGLFOGCOORDFPROC pglFogCoordf = NULL;
 

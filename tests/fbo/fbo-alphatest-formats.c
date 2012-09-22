@@ -33,7 +33,7 @@
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     64 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 /**
  * Draw a quad with alpha testing

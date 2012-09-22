@@ -45,7 +45,7 @@
 PIGLIT_GL_TEST_MAIN(
     (((BOX_SIZE+1)*TEST_COLS)+1) /*window_width*/,
     (((BOX_SIZE+1)*TEST_ROWS)+1) /*window_height*/,
-    GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_DOUBLE)
 
 static char shader_source[64 * 1024];
 static GLfloat colors[TEST_COLS][4];

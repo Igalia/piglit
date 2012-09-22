@@ -44,7 +44,7 @@
 PIGLIT_GL_TEST_MAIN(
     (MAX_SIZE * 2 + PAD * 3) /*window_width*/,
     (MAX_SIZE * MAX_LOD + PAD * (MAX_LOD + 1)) /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static void
 set_level_value(int level, int size, float val)

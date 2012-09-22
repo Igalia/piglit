@@ -48,7 +48,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     128 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA)
 
 static const int fbo_width = 128, fbo_height = 128;
 

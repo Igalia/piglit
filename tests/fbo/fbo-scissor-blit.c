@@ -40,7 +40,7 @@
 
 static const int width = 128, height = 128;
 
-PIGLIT_GL_TEST_MAIN(width, height, GLUT_DOUBLE | GLUT_RGBA | GLUT_ALPHA)
+PIGLIT_GL_TEST_MAIN(width, height, PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
 
 static GLuint src_fbo;
 static GLuint ref_fbo;

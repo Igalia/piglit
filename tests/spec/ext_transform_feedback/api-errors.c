@@ -53,7 +53,7 @@
 PIGLIT_GL_TEST_MAIN(
     16 /*window_width*/,
     16 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 #define XFB_BUFFER_SIZE 12
 #define NUM_BUFFERS 2

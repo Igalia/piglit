@@ -37,7 +37,7 @@
 
 PIGLIT_GL_TEST_MAIN(256 /*window_width*/,
                     256 /*window_height*/,
-                    GLUT_DOUBLE | GLUT_RGBA);
+                    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA);
 
 const int pattern_width = 256; const int pattern_height = 256;
 Fbo src_fbo, dst_fbo;

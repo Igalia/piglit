@@ -51,7 +51,7 @@
 PIGLIT_GL_TEST_MAIN(
     64 /*window_width*/,
     32 /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
 
 static enum test_mode {
 	TEST_MODE_OUTPUT,

@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     128 /*window_width*/,
     128 /*window_height*/,
-    GLUT_SINGLE | GLUT_RGB)
+    PIGLIT_GL_VISUAL_SINGLE | PIGLIT_GL_VISUAL_RGB)
 
 void
 piglit_init(int argc, char**argv)

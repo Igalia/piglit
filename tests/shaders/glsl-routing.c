@@ -37,7 +37,7 @@
 PIGLIT_GL_TEST_MAIN(
     260 /*window_width*/,
     365 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 #define COLORS 2
 #define TEXCOORDS 6

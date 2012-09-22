@@ -28,7 +28,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     256 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static GLint program = -1;
 static float rot[9] = {1,0,0,  0,1,0,   0,0,1};

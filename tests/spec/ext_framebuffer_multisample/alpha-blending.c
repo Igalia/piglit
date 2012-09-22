@@ -44,7 +44,7 @@ int numSamples;
 PIGLIT_GL_TEST_MAIN(
     WIDTH,
     HEIGHT,
-    GLUT_DOUBLE| GLUT_RGBA | GLUT_ALPHA);
+    PIGLIT_GL_VISUAL_DOUBLE| PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA);
 
 void
 piglit_init(int argc, char **argv)

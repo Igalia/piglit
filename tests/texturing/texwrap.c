@@ -389,7 +389,7 @@ static int border_x = 0, border_y = 0, border_z = 0;    /* 0 or 1 */
 PIGLIT_GL_TEST_MAIN(
     872 /*window_width*/,
     230 /*window_height*/,
-    GLUT_RGB | GLUT_ALPHA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
 
 extern int piglit_automatic;
 

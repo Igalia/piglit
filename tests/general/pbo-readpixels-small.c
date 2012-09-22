@@ -41,7 +41,7 @@
 PIGLIT_GL_TEST_MAIN(
     2 /*window_width*/,
     2 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static GLboolean
 probe(int x, int y, uint32_t expected, uint32_t observed)

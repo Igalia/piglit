@@ -109,7 +109,7 @@ static int test_target = -1;
 PIGLIT_GL_TEST_MAIN(
     IMAGE_SIZE * (ARRAY_SIZE(test_vectors) + 1) /*window_width*/,
     IMAGE_SIZE /*window_height*/,
-    GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_ALPHA)
 
 static const float texCoords_1d[2] = { 0.0, 1.0 };
 static const float texCoords_2d[4][2] = {

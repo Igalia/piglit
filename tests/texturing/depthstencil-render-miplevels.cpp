@@ -89,7 +89,7 @@
 PIGLIT_GL_TEST_MAIN(
     16 /*window_width*/,
     16 /*window_height*/,
-    GLUT_RGBA)
+    PIGLIT_GL_VISUAL_RGBA)
 
 namespace {
 

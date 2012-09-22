@@ -55,7 +55,7 @@ static const int window_height = 2 * level0_height;
 
 PIGLIT_GL_TEST_MAIN(
     window_width, window_height,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 
 static GLuint prog;

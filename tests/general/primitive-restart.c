@@ -36,7 +36,7 @@
 PIGLIT_GL_TEST_MAIN(
     400 /*window_width*/,
     300 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 static const char *TestName = "primitive-restart";
 

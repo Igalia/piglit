@@ -34,7 +34,7 @@
 PIGLIT_GL_TEST_MAIN(
     32 /*window_width*/,
     32 /*window_height*/,
-    GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_ALPHA)
 
 GLuint prog;
 

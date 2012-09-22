@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     256 /*window_width*/,
     256 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
 
 static GLfloat Znear = 1.0, Zfar = 10.0;
 

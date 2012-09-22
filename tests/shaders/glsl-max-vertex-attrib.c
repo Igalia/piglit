@@ -40,7 +40,7 @@
 PIGLIT_GL_TEST_MAIN(
     250 /*window_width*/,
     250 /*window_height*/,
-    GLUT_RGB)
+    PIGLIT_GL_VISUAL_RGB)
 
 static int test = 0;
 

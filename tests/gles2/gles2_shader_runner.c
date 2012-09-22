@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     250 /*window_width*/,
     250 /*window_height*/,
-    GLUT_RGB | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH)
 
 static float gles_version = 0.0;
 static float essl_version = 0.0;

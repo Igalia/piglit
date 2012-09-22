@@ -38,7 +38,7 @@
 PIGLIT_GL_TEST_MAIN(
     50 /*window_width*/,
     20 /*window_height*/,
-    GLUT_DOUBLE | GLUT_DEPTH)
+    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
 
 static int
 create_1d_fbo(void)

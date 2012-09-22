@@ -169,7 +169,7 @@ private:
 
 PIGLIT_GL_TEST_MAIN(100 /*window_width*/,
 		    100 /*window_height*/,
-		    GLUT_RGB | GLUT_ALPHA)
+		    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
 
 static const char* Filename = 0;
 static TestGroup tests;

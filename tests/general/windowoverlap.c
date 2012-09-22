@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
 		Automatic = 1;
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(MainWidth, MainHeight);
-	glutInitDisplayMode(GLUT_RGB);
+	glutInitDisplayMode(PIGLIT_GL_VISUAL_RGB);
 	glutCreateWindow(argv[0]);
 	glewInit();
 	glutReshapeFunc(Reshape);

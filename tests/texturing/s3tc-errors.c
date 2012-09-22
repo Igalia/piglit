@@ -34,7 +34,7 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(200, 200, GLUT_RGB | GLUT_DOUBLE)
+PIGLIT_GL_TEST_MAIN(200, 200, PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 
 static const float red[4] =   {1.0, 0.0, 0.0, 1.0};

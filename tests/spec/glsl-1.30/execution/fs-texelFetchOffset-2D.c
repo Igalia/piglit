@@ -34,7 +34,7 @@
 PIGLIT_GL_TEST_MAIN(
     90 /*window_width*/,
     150 /*window_height*/,
-    GLUT_RGBA | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
 
 const int tex_size = 64;
 

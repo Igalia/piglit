@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     900 /*window_width*/,
     600 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
 
 #define TEX_WIDTH 32
 #define TEX_HEIGHT 32

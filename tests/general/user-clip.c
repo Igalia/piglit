@@ -35,7 +35,7 @@
 PIGLIT_GL_TEST_MAIN(
     100 /*window_width*/,
     100 /*window_height*/,
-    GLUT_DOUBLE)
+    PIGLIT_GL_VISUAL_DOUBLE)
 
 static const GLfloat clear_color[4] = { 0.5, 0.5, 0.5, 1.0 };
 

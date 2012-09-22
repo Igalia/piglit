@@ -50,7 +50,7 @@
 PIGLIT_GL_TEST_MAIN(
     500 /*window_width*/,
     100 /*window_height*/,
-    GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA)
+    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA)
 
 static char *
 get_shader(GLenum target, const char *block_prefix, int blocks)
