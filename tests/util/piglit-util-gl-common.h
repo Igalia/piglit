@@ -36,7 +36,7 @@ extern "C" {
 
 #define piglit_get_proc_address(x) piglit_dispatch_resolve_function(x)
 
-#include "piglit-framework.h"
+#include "piglit-framework-gl.h"
 #include "piglit-shader.h"
 
 extern const uint8_t fdo_bitmap[];

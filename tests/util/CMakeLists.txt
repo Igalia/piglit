@@ -19,7 +19,7 @@ set(UTIL_GL_SOURCES
 	fdo-bitmap.c
 	piglit-util-gl-common.c
 	piglit-util-gl-enum.c
-	piglit-framework.c
+	piglit-framework-gl.c
 	piglit-framework-fbo.c
 	piglit-framework-glut.c
         piglit_ktx.c

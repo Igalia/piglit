@@ -42,7 +42,7 @@
 #include <stdlib.h>
 
 #include "piglit-util-gl-common.h"
-#include "piglit-framework.h"
+#include "piglit-framework-gl.h"
 #include "piglit-framework-fbo.h"
 
 #ifdef PIGLIT_FRAMEWORK_FBO_USE_GLX
