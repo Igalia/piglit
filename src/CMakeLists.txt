@@ -1,3 +1,3 @@
-if(USE_WAFFLE)
+if(PIGLIT_USE_WAFFLE)
 	add_subdirectory(glut_waffle)
-endif(USE_WAFFLE)
+endif(PIGLIT_USE_WAFFLE)

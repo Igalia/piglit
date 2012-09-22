@@ -30,10 +30,10 @@
 #endif
 
 /* Force GL defines */
-#ifndef USE_OPENGL
-#  define USE_OPENGL
-#  undef USE_OPENGL_ES1
-#  undef USE_OPENGL_ES2
+#ifndef PIGLIT_USE_OPENGL
+#  define PIGLIT_USE_OPENGL
+#  undef PIGLIT_USE_OPENGL_ES1
+#  undef PIGLIT_USE_OPENGL_ES2
 #endif
 
 #include "piglit-util-gl-common.h"

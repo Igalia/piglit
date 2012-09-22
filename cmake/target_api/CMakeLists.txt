@@ -25,14 +25,14 @@ add_subdirectory(no_api)
 
 add_subdirectory(gl)
 
-if(BUILD_GLES1_TESTS)
+if(PIGLIT_BUILD_GLES1_TESTS)
 	add_subdirectory(gles1)
-endif(BUILD_GLES1_TESTS)
+endif(PIGLIT_BUILD_GLES1_TESTS)
 
-if(BUILD_GLES2_TESTS)
+if(PIGLIT_BUILD_GLES2_TESTS)
 	add_subdirectory(gles2)
-endif(BUILD_GLES2_TESTS)
+endif(PIGLIT_BUILD_GLES2_TESTS)
 
-if(BUILD_CL_TESTS)
+if(PIGLIT_BUILD_CL_TESTS)
 	add_subdirectory(cl)
-endif(BUILD_CL_TESTS)
+endif(PIGLIT_BUILD_CL_TESTS)

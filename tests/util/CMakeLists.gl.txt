@@ -18,14 +18,14 @@ link_libraries(
 	${UTIL_GL_LIBS}
 	)
 
-IF(BUILD_GLX_TESTS)
+IF(PIGLIT_BUILD_GLX_TESTS)
 	# XXX: This is currently duplicated wherever tests
 	# include "piglit-glx-util.h". Is it possible to refactor it?
 	include_directories(
 		${GLPROTO_INCLUDE_DIRS}
 	)
 
-	add_definitions ( -DUSE_GLX )
+	add_definitions ( -DPIGLIT_USE_GLX )
 	piglit_add_library (piglitglxutil
 		    piglit-shader.c
 		    piglit-shader-gl.c
@@ -44,7 +44,7 @@ IF(BUILD_GLX_TESTS)
 		${UTIL_GL_SOURCES}
 		piglit-glx-util.c
 	)
-ENDIF(BUILD_GLX_TESTS)
+ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 piglit_add_library (piglitutil_${piglit_target_api}
 	${UTIL_GL_SOURCES}

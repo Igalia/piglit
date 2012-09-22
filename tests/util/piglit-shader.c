@@ -118,7 +118,7 @@ shader_name(GLenum target)
    switch (target) {
    case GL_VERTEX_SHADER:
       return "vertex";
-#if defined USE_OPENGL
+#if defined PIGLIT_USE_OPENGL
    case GL_GEOMETRY_SHADER:
       return "geometry";
 #endif

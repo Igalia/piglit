@@ -4,18 +4,18 @@ include_directories(
 	${OPENGL_INCLUDE_PATH}
 )
 
-if(BUILD_GLX_TESTS)
+if(PIGLIT_BUILD_GLX_TESTS)
     link_libraries (
         piglitglxutil
     )
-endif(BUILD_GLX_TESTS)
+endif(PIGLIT_BUILD_GLX_TESTS)
 
 link_libraries (
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 )
 
-IF(BUILD_GLX_TESTS)
+IF(PIGLIT_BUILD_GLX_TESTS)
 	include_directories(
 		${GLPROTO_INCLUDE_DIRS}
 	)
@@ -31,6 +31,6 @@ IF(BUILD_GLX_TESTS)
 	piglit_add_executable (glx-make-current-multi-process make-current-multi-process.c common.c)
 	piglit_add_executable (glx-make-current-single-process make-current-single-process.c common.c)
 	piglit_add_executable (glx-query-context-info-ext query-context-info.c common.c)
-ENDIF(BUILD_GLX_TESTS)
+ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 # vim: ft=cmake:

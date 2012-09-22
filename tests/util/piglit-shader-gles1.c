@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef USE_OPENGL_ES1
-#	error USE_OPENGL_ES1 is undefined
+#ifndef PIGLIT_USE_OPENGL_ES1
+#	error PIGLIT_USE_OPENGL_ES1 is undefined
 #endif
 
 #include "piglit-util-gl-common.h"

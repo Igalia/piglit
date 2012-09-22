@@ -21,17 +21,17 @@
  * IN THE SOFTWARE.
  */
 
-#if defined(USE_OPENGL_ES1)
+#if defined(PIGLIT_USE_OPENGL_ES1)
 #	define PIGLIT_FRAMEWORK_FBO_DISABLED
-#elif defined(USE_WAFFLE)
+#elif defined(PIGLIT_USE_WAFFLE)
 #	define PIGLIT_FRAMEWORK_FBO_USE_WAFFLE
-#elif defined(USE_GLX)
+#elif defined(PIGLIT_USE_GLX)
 #	define PIGLIT_FRAMEWORK_FBO_USE_GLX
 #else
 #	define PIGLIT_FRAMEWORK_FBO_DISABLED
 #endif
 
-#ifdef USE_OPENGL_ES2
+#ifdef PIGLIT_USE_OPENGL_ES2
 #	define GL_DEPTH_STENCIL GL_DEPTH_STENCIL_OES
 #	define GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_24_8_OES
 #endif
@@ -147,11 +147,11 @@ piglit_framework_fbo_waffle_init(void)
 			"value \"%s\"", env_platform);
 	}
 
-#if defined(USE_OPENGL)
+#if defined(PIGLIT_USE_OPENGL)
 	waffle_context_api = WAFFLE_CONTEXT_OPENGL;
-#elif defined(USE_OPENGL_ES1)
+#elif defined(PIGLIT_USE_OPENGL_ES1)
 	waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES1;
-#elif defined(USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES2)
 	waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES2;
 #else
 #	error
@@ -240,7 +240,7 @@ piglit_framework_fbo_gl_init(const struct piglit_gl_test_info *info)
 	GLuint tex, depth = 0;
 	GLenum status;
 
-#ifdef USE_OPENGL
+#ifdef PIGLIT_USE_OPENGL
 	glewInit();
 
 	if (piglit_get_gl_version() < 20)
@@ -317,7 +317,7 @@ piglit_framework_fbo_init(const struct piglit_gl_test_info *info)
 static void
 piglit_framework_fbo_destroy(void)
 {
-#ifdef USE_OPENGL
+#ifdef PIGLIT_USE_OPENGL
 	glDeleteFramebuffers(1, &piglit_winsys_fbo);
 #endif
 

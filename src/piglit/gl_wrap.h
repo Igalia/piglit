@@ -29,7 +29,7 @@
  * \brief Convenience header that includes the actual OpenGL headers.
  *
  * The actual OpenGL headers are chosen according to the macro definitions
- * USE_OPENGL, USE_OPENGL_ES1, and USE_OPENGL_ES2.
+ * PIGLIT_USE_OPENGL, PIGLIT_USE_OPENGL_ES1, and PIGLIT_USE_OPENGL_ES2.
  */
 
 #pragma once
@@ -42,10 +42,10 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#if defined(USE_OPENGL)
+#if defined(PIGLIT_USE_OPENGL)
 #	include "piglit-dispatch.h"
 
-#elif defined(USE_OPENGL_ES1)
+#elif defined(PIGLIT_USE_OPENGL_ES1)
 #	include <GLES/gl.h>
 #	include <GLES/glext.h>
 
@@ -57,7 +57,7 @@ extern "C" {
 #       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_OES
 #       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_OES
 
-#elif defined(USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES2)
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
 #endif

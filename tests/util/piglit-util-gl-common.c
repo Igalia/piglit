@@ -90,7 +90,7 @@ static const char** gl_extension_array_from_getstring()
 	return split_string(gl_extensions_string);
 }
 
-#if defined(USE_OPENGL)
+#if defined(PIGLIT_USE_OPENGL)
 static const char** gl_extension_array_from_getstringi()
 {
 	const char **strings;
@@ -116,9 +116,9 @@ static void initialize_piglit_extension_support(void)
 		return;
 	}
 
-#if defined(USE_OPENGL_ES1) || defined(USE_OPENGL_ES2)
+#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
 	gl_extensions = gl_extension_array_from_getstring();
-#elif defined(USE_OPENGL)
+#elif defined(PIGLIT_USE_OPENGL)
 	if (piglit_get_gl_version() < 30) {
 		gl_extensions = gl_extension_array_from_getstring();
 	} else {

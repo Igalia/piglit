@@ -21,8 +21,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef USE_OPENGL
-#	error USE_OPENGL is undefined
+#ifndef PIGLIT_USE_OPENGL
+#	error PIGLIT_USE_OPENGL is undefined
 #endif
 
 #if defined(_MSC_VER)

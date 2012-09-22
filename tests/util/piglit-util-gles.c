@@ -188,7 +188,7 @@ piglit_escape_exit_key(unsigned char key, int x, int y)
 static void
 draw_arrays(const GLvoid *verts, const GLvoid *tex)
 {
-#if defined(USE_OPENGL_ES1)
+#if defined(PIGLIT_USE_OPENGL_ES1)
 	if (verts) {
 		glVertexPointer(4, GL_FLOAT, 0, verts);
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -205,7 +205,7 @@ draw_arrays(const GLvoid *verts, const GLvoid *tex)
 		glDisableClientState(GL_VERTEX_ARRAY);
 	if (tex)
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#elif defined(USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES2)
 	if (verts) {
 		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
 		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
@@ -521,7 +521,7 @@ piglit_checkerboard_texture(GLuint tex, unsigned level,
 	return tex;
 }
 
-#if defined(USE_OPENGL_ES1)
+#if defined(PIGLIT_USE_OPENGL_ES1)
 
 /**
  * Convenience function to configure an abitrary orthogonal projection matrix
@@ -556,4 +556,4 @@ piglit_ortho_projection(int w, int h, GLboolean push)
 	piglit_gen_ortho_projection(0, w, 0, h, -1, 1, push);
 }
 
-#endif /* USE_OPENGL_ES1 */
+#endif /* PIGLIT_USE_OPENGL_ES1 */

@@ -10,10 +10,10 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-if(NOT USE_WAFFLE)
+if(NOT PIGLIT_USE_WAFFLE)
 	# This test uses glutCreateSubWindow.
 	piglit_add_executable (windowoverlap windowoverlap.c)
-endif(NOT USE_WAFFLE)
+endif(NOT PIGLIT_USE_WAFFLE)
 
 piglit_add_executable (array-stride array-stride.c)
 piglit_add_executable (bgra-vert-attrib-pointer bgra-vert-attrib-pointer.c)

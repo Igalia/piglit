@@ -31,7 +31,7 @@
 #include "piglit-framework-gl.h"
 #include "piglit-framework-glut.h"
 
-#ifdef USE_GLX
+#ifdef PIGLIT_USE_GLX
 #include "piglit-glx-util.h"
 #endif
 
@@ -103,12 +103,12 @@ piglit_framework_glut_init(int argc, char *argv[],
 	test_info = info;
 	glutInit(&argc, argv);
 
-#	if defined(USE_WAFFLE)
-#		if defined(USE_OPENGL)
+#	if defined(PIGLIT_USE_WAFFLE)
+#		if defined(PIGLIT_USE_OPENGL)
 			glutInitAPIMask(GLUT_OPENGL_BIT);
-#		elif defined(USE_OPENGL_ES1)
+#		elif defined(PIGLIT_USE_OPENGL_ES1)
 			glutInitAPIMask(GLUT_OPENGL_ES1_BIT);
-#		elif defined(USE_OPENGL_ES2)
+#		elif defined(PIGLIT_USE_OPENGL_ES2)
 			glutInitAPIMask(GLUT_OPENGL_ES2_BIT);
 #		else
 #			error
@@ -121,7 +121,7 @@ piglit_framework_glut_init(int argc, char *argv[],
 	glutInitDisplayMode(info->window_visual);
 	piglit_window = glutCreateWindow(argv[0]);
 
-#if defined(USE_GLX) && !defined(USE_WAFFLE)
+#if defined(PIGLIT_USE_GLX) && !defined(PIGLIT_USE_WAFFLE)
 	/* If using waffle, then the current platform might not be GLX.
 	 * So we can't call any GLX functions.
 	 *
@@ -136,7 +136,7 @@ piglit_framework_glut_init(int argc, char *argv[],
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(piglit_escape_exit_key);
 
-#ifdef USE_OPENGL
+#ifdef PIGLIT_USE_OPENGL
 	glewInit();
 #endif
 }

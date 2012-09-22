@@ -631,7 +631,7 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 
 	switch (info->target) {
 	case GL_TEXTURE_1D:
-#ifdef USE_OPENGL
+#ifdef PIGLIT_USE_OPENGL
 		if (info->gl_type == 0)
 			glCompressedTexImage1D(info->target,
 					       level,
@@ -679,7 +679,7 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-#ifdef USE_OPENGL
+#ifdef PIGLIT_USE_OPENGL
 		if (info->gl_type == 0)
 			glCompressedTexImage3D(info->target,
 					       level,
@@ -715,7 +715,7 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 	*gl_error = glGetError();
 	return *gl_error == 0;
 
-#ifndef USE_OPENGL
+#ifndef PIGLIT_USE_OPENGL
 unsupported_on_gles:
 	*gl_error = 0;
 	piglit_ktx_error("%s", "GLES supports only GL_TEXTURE_2D and "

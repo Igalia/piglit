@@ -45,7 +45,7 @@ GLint piglit_link_simple_program(GLint vs, GLint fs);
  * wrappers.
  */
 /*@{*/
-#if defined(USE_OPENGL_ES1)
+#if defined(PIGLIT_USE_OPENGL_ES1)
 #define piglit_AttachShader assert(!"glAttachShader does not exist in ES1")
 #define piglit_BindAttribLocation assert(!"glBindAttribLocation does not exist in ES1")
 #define piglit_CompileShader assert(!"glCompileShader does not exist in ES1")
@@ -88,7 +88,7 @@ GLint piglit_link_simple_program(GLint vs, GLint fs);
 #define piglit_UniformMatrix3x4fv assert(!"glUniformMatrix3x4fv does not exist in ES1")
 #define piglit_UniformMatrix4x2fv assert(!"glUniformMatrix4x2fv does not exist in ES1")
 #define piglit_UniformMatrix4x3fv assert(!"glUniformMatrix4x3fv does not exist in ES1")
-#elif defined(USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES2)
 #define piglit_AttachShader glAttachShader
 #define piglit_BindAttribLocation glBindAttribLocation
 #define piglit_CompileShader glCompileShader
