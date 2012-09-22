@@ -26,6 +26,12 @@ set(UTIL_GL_SOURCES
 	rgb9e5.c
 	)
 
+if(PIGLIT_USE_WAFFLE)
+	list(APPEND UTIL_GL_SOURCES
+		piglit-util-waffle.c
+	)
+endif()
+
 set(UTIL_GL_LIBS
 	piglitutil
         ${WAFFLE_LIBRARIES}
