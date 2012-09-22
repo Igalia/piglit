@@ -119,7 +119,7 @@ create_array_fbo(void)
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-			fprintf(stderr, "FBO incomplete\n");
+			fprintf(stderr, "%s: FBO incomplete\n", prog);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 
@@ -131,8 +131,6 @@ create_array_fbo(void)
 		piglit_draw_rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
 	}
 
-
-done:
 	glDeleteFramebuffersEXT(1, &fb);
 	return tex;
 }

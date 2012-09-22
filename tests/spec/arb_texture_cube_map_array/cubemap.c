@@ -106,8 +106,8 @@ ffs(int i)
 static void
 set_image(int level, int size, int *color)
 {
-	GLfloat *color1;
-	GLfloat *color2;
+	const GLfloat *color1;
+	const GLfloat *color2;
 	GLfloat *tex;
 	int x, y;
 	int face;
@@ -126,7 +126,7 @@ set_image(int level, int size, int *color)
 		 */
 		for (y = 0; y < size; y++) {
 			for (x = 0; x < size; x++) {
-				GLfloat *chosen_color;
+				const GLfloat *chosen_color;
 
 				if (y >= (size / 2) || x >= (size / 2))
 					chosen_color = color1;
@@ -153,8 +153,8 @@ static bool
 test_results(int x, int y, int size, int level, int face, bool mipmapped,
 	     int color, int layer)
 {
-	GLfloat *color1 = colors[color];
-	GLfloat *color2 = colors[(color + 1) % ARRAY_SIZE(colors)];
+	const GLfloat *color1 = colors[color];
+	const GLfloat *color2 = colors[(color + 1) % ARRAY_SIZE(colors)];
 	bool pass = true;
 	int x1 = x + size / 4, x2 = x + size * 3 / 4;
 	int y1 = y + size / 4, y2 = y + size * 3 / 4;
@@ -170,8 +170,8 @@ test_results(int x, int y, int size, int level, int face, bool mipmapped,
 
 	if (!pass) {
 		int base_size = size * (1 << level);
-		printf("Cube map failed at size %dx%d, level %d (%dx%d), face %s%s\n",
-		       base_size, base_size, level, size, size,
+		printf("%s: Cube map failed at size %dx%d, level %d (%dx%d), face %s%s\n",
+		       prog, base_size, base_size, level, size, size,
 		       cube_face_names[face],
 		       mipmapped ? ", mipmapped" : "");
 	}
