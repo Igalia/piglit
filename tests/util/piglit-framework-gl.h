@@ -34,7 +34,7 @@
  * Each enum has the same value of its corresponding GLUT enum. That is, for
  * each X, `PIGLIT_GL_VISUAL_X == GLUT_X`.
  *
- * \see piglit_gl_test_info::window_visual
+ * \see piglit_gl_test_config::window_visual
  */
 enum piglit_gl_visual {
 	PIGLIT_GL_VISUAL_RGB 		= 0,
@@ -48,17 +48,17 @@ enum piglit_gl_visual {
 };
 
 /**
- * @brief Info needed to run an OpenGL test.
+ * @brief Configuration for running an OpenGL test.
  *
  * To run a test, pass this to piglit_gl_test_run().
  *
- * This is named piglit_gl_test_info, rather than piglit_test_info, in
+ * This is named piglit_gl_test_config, rather than piglit_test_config, in
  * order to distinguish it from other test types, such as EGL and GLX tests.
  *
  * TODO: Add fields here that declare test requirements on GL context
  * TODO: flavor, extensions, and window system.
  */
-struct piglit_gl_test_info {
+struct piglit_gl_test_config {
 	int window_width;
 	int window_height;
 
@@ -84,17 +84,17 @@ struct piglit_gl_test_info {
 };
 
 /**
- * Initialize @a info with default values.
+ * Initialize @a config with default values.
  */
 void
-piglit_gl_test_info_init(struct piglit_gl_test_info *info);
+piglit_gl_test_config_init(struct piglit_gl_test_config *config);
 
 /**
- * Run the OpenGL test described by @a info. Does not return.
+ * Run the OpenGL test described by @a config. Does not return.
  */
 void
 piglit_gl_test_run(int argc, char *argv[],
-		   const struct piglit_gl_test_info *info);
+		   const struct piglit_gl_test_config *config);
 
 #ifdef __cplusplus
 #  define PIGLIT_EXTERN_C_BEGIN extern "C" {
@@ -125,18 +125,18 @@ piglit_gl_test_run(int argc, char *argv[],
         int                                                                  \
         main(int argc, char *argv[])                                         \
         {                                                                    \
-                struct piglit_gl_test_info info;                             \
+                struct piglit_gl_test_config config;                         \
                                                                              \
-                piglit_gl_test_info_init(&info);                             \
+                piglit_gl_test_config_init(&config);                         \
                                                                              \
-                info.window_width = _window_width;                           \
-                info.window_height = _window_height;                         \
-                info.window_visual = _window_visual;                         \
+                config.window_width = _window_width;                         \
+                config.window_height = _window_height;                       \
+                config.window_visual = _window_visual;                       \
                                                                              \
-                info.init = piglit_init;                                     \
-                info.display = piglit_display;                               \
+                config.init = piglit_init;                                   \
+                config.display = piglit_display;                             \
                                                                              \
-                piglit_gl_test_run(argc, argv, &info);                       \
+                piglit_gl_test_run(argc, argv, &config);                     \
                                                                              \
                 assert(false);                                               \
                 return 0;                                                    \

@@ -23,14 +23,14 @@
 
 #pragma once
 
-struct piglit_gl_test_info;
+struct piglit_gl_test_config;
 
 void
 piglit_framework_glut_init(int argc, char *argv[],
-			   const struct piglit_gl_test_info *info);
+			   const struct piglit_gl_test_config *config);
 
 void
-piglit_framework_glut_run(const struct piglit_gl_test_info *info);
+piglit_framework_glut_run(const struct piglit_gl_test_config *config);
 
 
 void

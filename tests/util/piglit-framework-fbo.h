@@ -23,13 +23,13 @@
 
 #include <stdbool.h>
 
-struct piglit_gl_test_info;
+struct piglit_gl_test_config;
 
 bool
-piglit_framework_fbo_init(const struct piglit_gl_test_info *info);
+piglit_framework_fbo_init(const struct piglit_gl_test_config *config);
 
 void
-piglit_framework_fbo_run(const struct piglit_gl_test_info *info);
+piglit_framework_fbo_run(const struct piglit_gl_test_config *config);
 
 void
 piglit_framework_fbo_swap_buffers(void);

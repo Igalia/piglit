@@ -45,9 +45,9 @@ int piglit_width;
 int piglit_height;
 
 void
-piglit_gl_test_info_init(struct piglit_gl_test_info *info)
+piglit_gl_test_config_init(struct piglit_gl_test_config *config)
 {
-	memset(info, 0, sizeof(*info));
+	memset(config, 0, sizeof(*config));
 }
 
 static void
@@ -115,27 +115,27 @@ process_args(int *argc, char *argv[])
 
 void
 piglit_gl_test_run(int argc, char *argv[],
-		   const struct piglit_gl_test_info *info)
+		   const struct piglit_gl_test_config *config)
 {
 	process_args(&argc, argv);
 
-	piglit_width = info->window_width;
-	piglit_height = info->window_height;
+	piglit_width = config->window_width;
+	piglit_height = config->window_height;
 
 	if (piglit_use_fbo) {
-		if (!piglit_framework_fbo_init(info))
+		if (!piglit_framework_fbo_init(config))
 			piglit_use_fbo = false;
 	}
 
 	if (!piglit_use_fbo)
-		piglit_framework_glut_init(argc, argv, info);
+		piglit_framework_glut_init(argc, argv, config);
 
-	info->init(argc, argv);
+	config->init(argc, argv);
 
 	if (piglit_use_fbo) {
-		piglit_framework_fbo_run(info);
+		piglit_framework_fbo_run(config);
 	} else {
-		piglit_framework_glut_run(info);
+		piglit_framework_glut_run(config);
 	}
 
 	assert(false);
