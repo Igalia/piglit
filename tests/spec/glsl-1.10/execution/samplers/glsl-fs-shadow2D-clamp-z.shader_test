@@ -1,0 +1,37 @@
+# Test that the Z texture coordinate is clamped to [0,1] prior to the comparison.
+#
+# From the GL 3.3 core specification, section 3.8.16 "Texture Comparison
+# Modes":
+#
+#     If the texture’s internal format indicates a fixed-point depth
+#     texture, then Dt and Dref are clamped to the range [0, 1];
+#     otherwise no clamping is performed.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader file]
+glsl-fs-shadow.vert
+
+[fragment shader]
+uniform vec3 texcoords;
+uniform sampler2DShadow tex;
+
+void main()
+{
+	gl_FragColor = shadow2D(tex, texcoords.xyz);
+}
+
+[test]
+uniform int tex 0
+texture shadow2D 0 (32, 32)
+texparameter 2D compare_func equal
+
+uniform vec3 texcoords 0 0 -1
+draw rect -1 -1 1 2
+
+uniform vec3 texcoords 1 0 2
+draw rect 0 -1 1 2
+
+relative probe rgba (0.25, 0) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.75, 0) (1.0, 1.0, 1.0, 1.0)
