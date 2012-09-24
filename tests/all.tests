@@ -1630,6 +1630,9 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubem
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
 textureSize_samplers_atcma = ['samplerCubeArray'];
 
+import_glsl_parser_tests(arb_texture_cube_map_array,
+			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
+			 ['compiler'])
 for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_atcma:
