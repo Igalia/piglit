@@ -1,0 +1,16 @@
+#define glXGetSyncValuesOML __piglit_glXGetSyncValuesOML
+#define glXGetMscRateOML __piglit_glXGetMscRateOML
+#define glXSwapBuffersMscOML __piglit_glXSwapBuffersMscOML
+#define glXWaitForMscOML __piglit_glXWaitForMscOML
+#define glXWaitForSbcOML __piglit_glXWaitForSbcOML
+
+extern PFNGLXGETSYNCVALUESOMLPROC __piglit_glXGetSyncValuesOML;
+extern PFNGLXGETMSCRATEOMLPROC __piglit_glXGetMscRateOML;
+extern PFNGLXSWAPBUFFERSMSCOMLPROC __piglit_glXSwapBuffersMscOML;
+extern PFNGLXWAITFORMSCOMLPROC __piglit_glXWaitForMscOML;
+extern PFNGLXWAITFORSBCOMLPROC __piglit_glXWaitForSbcOML;
+
+extern Window win;
+extern XVisualInfo *visinfo;
+
+void piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy));

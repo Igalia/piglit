@@ -432,6 +432,14 @@ glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = concurrent_test('glx-create-context-indirect-es2-profile')
 create_context_es2_profile['invalid OpenGL ES version'] = concurrent_test('glx-create-context-invalid-es-version')
 
+oml_sync_control = Group();
+glx['GLX_OML_sync_control'] = oml_sync_control
+oml_sync_control['swapbuffersmsc-divisor-zero'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-divisor-zero')
+oml_sync_control['swapbuffersmsc-return'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return')
+oml_sync_control['swapbuffersmsc-return swap_interval 0'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 0')
+oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 1')
+oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
+
 def texwrap_test(args):
 	test = PlainExecTest(['texwrap', '-fbo', '-auto'] + args)
 	test.runConcurrent = True
