@@ -21,9 +21,22 @@ option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" OFF)
 option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
 option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 
-option(PIGLIT_USE_WAFFLE "Use Waffle in place of GLUT" OFF)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	option(PIGLIT_USE_WAFFLE "Use Waffle in place of GLUT" ON)
+else()
+	option(PIGLIT_USE_WAFFLE "Use Waffle in place of GLUT" OFF)
+endif()
+
 if(PIGLIT_USE_WAFFLE)
 	pkg_check_modules(WAFFLE REQUIRED waffle-1>=1.0.1)
+
+	if(NOT WAFFLE_FOUND)
+		message(FATAL_ERROR "Failed to find Waffle. If Waffle is not "
+		"packaged for your distribution, you can get it at "
+		"http://people.freedesktop.org/~chadversary/waffle."
+	)
+        endif()
+
         add_definitions(-DPIGLIT_USE_WAFFLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WAFFLE_CFLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WAFFLE_CFLAGS}")
