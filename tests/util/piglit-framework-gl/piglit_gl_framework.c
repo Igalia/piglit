@@ -21,10 +21,12 @@
  * IN THE SOFTWARE.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "piglit-util-gl-common.h"
 #include "piglit_gl_framework.h"
+#include "piglit-util-gl-common.h"
 
 #ifdef PIGLIT_USE_WAFFLE
 #	include "piglit_fbo_framework.h"
@@ -54,10 +56,48 @@ piglit_gl_framework_factory(const struct piglit_gl_test_config *test_config)
 #endif
 }
 
+static void
+validate_supported_apis(const struct piglit_gl_test_config *test_config)
+{
+	if (!test_config->supports_gl_core_version &&
+	    !test_config->supports_gl_compat_version &&
+	    !test_config->supports_gl_es1 &&
+	    !test_config->supports_gl_es2) {
+		printf("The test config supports no GL API's.\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (test_config->supports_gl_core_version > 0 &&
+	    test_config->supports_gl_core_version < 31) {
+		printf("Config attribute 'supports_gl_core_version' is %d, "
+		       "but must be either 0 or at least 31\n",
+		       test_config->supports_gl_core_version);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+#if defined(PIGLIT_USE_OPENGL)
+	if (!test_config->supports_gl_core_version
+	    && !test_config->supports_gl_compat_version) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
+#elif defined(PIGLIT_USE_OPENGL_ES1)
+	if (!test_config->supports_gl_es1) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
+#elif defined(PIGLIT_USE_OPENGL_ES2)
+	if (!test_config->supports_gl_es2) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
+#else
+#	error
+#endif
+}
+
 bool
 piglit_gl_framework_init(struct piglit_gl_framework *gl_fw,
                          const struct piglit_gl_test_config *test_config)
 {
+	validate_supported_apis(test_config);
 	memset(gl_fw, 0, sizeof(*gl_fw));
 	gl_fw->test_config = test_config;
 	return true;

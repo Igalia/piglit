@@ -25,6 +25,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_es1 = true;
+
 	config.window_width = 100;
 	config.window_height = 100;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;

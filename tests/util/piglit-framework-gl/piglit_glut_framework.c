@@ -159,6 +159,12 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 {
 	bool ok = true;
 
+	if (!test_config->supports_gl_compat_version) {
+		printf("GLUT can create only GL compatibility contexts, "
+			"which the test does not support running under.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	ok = piglit_gl_framework_init(&glut_fw.gl_fw, test_config);
 	if (!ok)
 		return NULL;

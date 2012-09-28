@@ -42,6 +42,8 @@ static const int width = 128, height = 128;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = width;
 	config.window_height = height;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA;

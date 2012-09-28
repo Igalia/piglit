@@ -38,6 +38,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = TEXTURE_SIZE;
 	config.window_height = TEXTURE_SIZE;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA;

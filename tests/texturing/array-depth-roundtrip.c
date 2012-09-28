@@ -54,6 +54,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = TEX_WIDTH*NUM_TILES_ACROSS;
 	config.window_height = TEX_HEIGHT*NUM_TILES_DOWN;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;

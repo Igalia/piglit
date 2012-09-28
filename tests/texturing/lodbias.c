@@ -46,6 +46,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = 3*SquareSize;
 	config.window_height = 3*SquareSize;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;

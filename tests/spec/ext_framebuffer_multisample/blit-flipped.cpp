@@ -54,6 +54,8 @@ const int pattern_width = 256; const int pattern_height = 256;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = pattern_width*2;
 	config.window_height = pattern_height;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA;

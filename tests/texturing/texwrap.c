@@ -388,6 +388,8 @@ static int border_x = 0, border_y = 0, border_z = 0;    /* 0 or 1 */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = 872;
 	config.window_height = 230;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;

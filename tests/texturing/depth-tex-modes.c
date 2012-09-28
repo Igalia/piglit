@@ -41,6 +41,8 @@ static const GLenum depth_texture_modes[] = {
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.supports_gl_compat_version = 10;
+
 	config.window_width = 1+(TEST_COLS*(BOX_SIZE+1));
 	config.window_height = 1+(TEST_ROWS*(BOX_SIZE+1));
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
