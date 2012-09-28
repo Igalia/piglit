@@ -51,19 +51,35 @@ class ExecTest(Test):
 
 		if self.command is not None:
 			command = self.command
+			returncode = None
+
 			if valgrind:
 				command[:0] = ['valgrind', '--quiet', '--error-exitcode=1', '--tool=memcheck']
 
 			i = 0
 			while True:
-				proc = subprocess.Popen(
-					command,
-					stdout=subprocess.PIPE,
-					stderr=subprocess.PIPE,
-					env=fullenv,
-					universal_newlines=True
-					)
-				out, err = proc.communicate()
+				try:
+					proc = subprocess.Popen(
+						command,
+						stdout=subprocess.PIPE,
+						stderr=subprocess.PIPE,
+						env=fullenv,
+						universal_newlines=True
+						)
+					out, err = proc.communicate()
+					returncode = proc.returncode
+				except OSError as e:
+					# Different sets of tests get built under
+					# different build configurations.  If
+					# a developer chooses to not build a test,
+					# Piglit should not report that test as having
+					# failed.
+					if e.strerror == "No such file or directory":
+						out = "PIGLIT: {'result': 'skip'}\n" \
+						    + "Test executable not found: {0}\n".format(command[0])
+						err = ""
+                                        else:
+                                            raise e
 
 				# https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
 				# affecting many developers.  If we catch it
@@ -111,17 +127,17 @@ class ExecTest(Test):
 				-1073741676
 			]
 
-			if proc.returncode in crash_codes:
+			if returncode in crash_codes:
 				results['result'] = 'crash'
-			elif proc.returncode != 0:
-				results['note'] = 'Returncode was %d' % (proc.returncode)
+			elif returncode != 0:
+				results['note'] = 'Returncode was {0}'.format(returncode)
 
 			if valgrind:
 				# If the underlying test failed, simply report
 				# 'skip' for this valgrind test.
 				if results['result'] != 'pass':
 					results['result'] = 'skip'
-				elif proc.returncode == 0:
+				elif returncode == 0:
 					# Test passes and is valgrind clean.
 					results['result'] = 'pass'
 				else:
@@ -133,8 +149,9 @@ class ExecTest(Test):
 				env = env + key + '="' + self.env[key] + '" '
 			if env:
 				results['environment'] = env
-			results['info'] = "Returncode: %d\n\nErrors:\n%s\n\nOutput:\n%s" % (proc.returncode, err, out)
-			results['returncode'] = proc.returncode
+
+			results['info'] = "Returncode: {0}\n\nErrors:\n{1}\n\nOutput:\n{2}".format(returncode, err, out)
+			results['returncode'] = returncode
 			results['command'] = ' '.join(self.command)
 
 			self.handleErr(results, err)
