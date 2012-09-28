@@ -37,10 +37,13 @@
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256
 
-PIGLIT_GL_TEST_MAIN(
-    700 /*window_width*/,
-    300 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 700;
+	config.window_height = 300;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Do piglit_rgbw_texture() image but using glClear */
 static bool

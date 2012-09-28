@@ -40,10 +40,13 @@
 
 #define BOX_SIZE   16
 
-PIGLIT_GL_TEST_MAIN(
-    (((BOX_SIZE+1)*TEST_COLS)+1) /*window_width*/,
-    (((BOX_SIZE+1)*TEST_ROWS)+1) /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (((BOX_SIZE+1)*TEST_COLS)+1);
+	config.window_height = (((BOX_SIZE+1)*TEST_ROWS)+1);
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /**
  * Source for the fragment program to render the reference box.

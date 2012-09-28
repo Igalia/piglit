@@ -38,10 +38,13 @@
 #include "piglit-util-gl-common.h"
 #include "hiz/hiz-util.h"
 
-PIGLIT_GL_TEST_MAIN(
-    400 /*window_width*/,
-    400 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 400;
+	config.window_height = 400;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 struct hiz_fbo_options fbo_options = {
 	GL_RGBA,

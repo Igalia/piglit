@@ -36,10 +36,13 @@
 
 #define SIZE 128
 
-PIGLIT_GL_TEST_MAIN(
-    (SIZE * 2) + 60 /*window_width*/,
-    SIZE + 20 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (SIZE*2)+60;
+	config.window_height = SIZE+20;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 struct format {
 	const char *name;

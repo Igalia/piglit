@@ -32,10 +32,13 @@
 
 #define BUF_SIZE 123
 
-PIGLIT_GL_TEST_MAIN(
-    BUF_SIZE /*window_width*/,
-    BUF_SIZE /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = BUF_SIZE;
+	config.window_height = BUF_SIZE;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum {
 	CLEAR,

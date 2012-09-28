@@ -30,10 +30,13 @@
 
 #define TEXSIZE 32
 
-PIGLIT_GL_TEST_MAIN(
-    TEXSIZE * 2 /*window_width*/,
-    TEXSIZE * 2 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = TEXSIZE*2;
+	config.window_height = TEXSIZE*2;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static GLenum tex_unit, bump_unit;
 

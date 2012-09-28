@@ -32,10 +32,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    800 /*window_width*/,
-    600 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 800;
+	config.window_height = 600;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Misbehaviour: first: the quads are not drawn in the correct order
  * (darker equals closer to the viewer), second: the middle one is strangely

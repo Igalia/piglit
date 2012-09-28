@@ -32,10 +32,13 @@
 /* Size of the body of the texture, not counting border. */
 #define TEX_SIZE 64
 
-PIGLIT_GL_TEST_MAIN(
-    TEX_SIZE * 2 + 30 /*window_width*/,
-    TEX_SIZE + 20 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = TEX_SIZE*2+30;
+	config.window_height = TEX_SIZE+20;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)

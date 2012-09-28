@@ -37,10 +37,13 @@
 static int tex_width = 256;
 static int tex_height = 256;
 
-PIGLIT_GL_TEST_MAIN(
-    700 /*window_width*/,
-    300 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 700;
+	config.window_height = 300;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static void set_npot(GLboolean npot)
 {

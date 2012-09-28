@@ -38,10 +38,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    256 /*window_width*/,
-    16 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 256;
+	config.window_height = 16;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vstext =
 	"attribute vec4 in_position;\n"

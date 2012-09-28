@@ -38,10 +38,13 @@
 #define MAX_LOD	5
 #define PAD		5
 
-PIGLIT_GL_TEST_MAIN(
-    100 /*window_width*/,
-    200 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 100;
+	config.window_height = 200;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static GLfloat colors[][3] = {
 	{1.0, 0.0, 0.0},

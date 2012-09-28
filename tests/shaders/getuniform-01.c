@@ -31,10 +31,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    20 /*window_width*/,
-    20 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 20;
+	config.window_height = 20;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const char vs_text[] =
 	"uniform float c[4];\n"

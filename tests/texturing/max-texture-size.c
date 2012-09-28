@@ -44,10 +44,13 @@
 #include "piglit-util-gl-common.h"
 #define COLOR_COMPONENTS 4 /*GL_RGBA*/
 
-PIGLIT_GL_TEST_MAIN(
-    100 /*window_width*/,
-    100 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 100;
+	config.window_height = 100;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const GLenum target[] = {
 	GL_TEXTURE_1D,

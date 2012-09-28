@@ -78,10 +78,13 @@
  */
 #include "common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    355 /*window_width*/,
-    250 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 355;
+	config.window_height = 250;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /** Vertex shader attribute locations */
 const int pos_loc = 0;

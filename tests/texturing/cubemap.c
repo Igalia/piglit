@@ -29,10 +29,13 @@
 
 #define PAD		5
 
-PIGLIT_GL_TEST_MAIN(
-    (64 * 6 + PAD * 9) * 2 /*window_width*/,
-    400 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (64*6+PAD*9)*2;
+	config.window_height = 400;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 int max_size;
 

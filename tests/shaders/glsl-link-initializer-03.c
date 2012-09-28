@@ -36,10 +36,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    100 /*window_width*/,
-    100 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 100;
+	config.window_height = 100;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)

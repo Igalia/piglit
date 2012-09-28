@@ -51,10 +51,13 @@
 #define DSTW 200
 #define DSTH 150
 
-PIGLIT_GL_TEST_MAIN(
-    DSTW /*window_width*/,
-    DSTH /*window_height*/,
-    PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = DSTW;
+	config.window_height = DSTH;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 struct TestCase
 {

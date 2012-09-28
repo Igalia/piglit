@@ -31,10 +31,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    640 /*window_width*/,
-    480 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 640;
+	config.window_height = 480;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static void
 check_fbo_status()

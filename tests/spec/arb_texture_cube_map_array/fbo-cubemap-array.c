@@ -39,10 +39,13 @@
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32
 
-PIGLIT_GL_TEST_MAIN(
-    200 /*window_width*/,
-    100 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+    config.window_width = 200;
+    config.window_height = 100;
+    config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 #define NUM_FACES       6
 #define NUM_LAYERS	3

@@ -41,10 +41,13 @@
 #define MAX_LOD	6
 #define PAD		5
 
-PIGLIT_GL_TEST_MAIN(
-    (MAX_SIZE * 2 + PAD * 3) /*window_width*/,
-    (MAX_SIZE * MAX_LOD + PAD * (MAX_LOD + 1)) /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (MAX_SIZE*2+PAD*3);
+	config.window_height = (MAX_SIZE*MAX_LOD+PAD*(MAX_LOD+1));
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static void
 set_level_value(int level, int size, float val)

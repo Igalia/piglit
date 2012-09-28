@@ -50,10 +50,13 @@ GLuint tex[Elements(internal_formats)];
 const unsigned num_tex = Elements(tex);
 GLboolean pass = GL_TRUE;
 
-PIGLIT_GL_TEST_MAIN(
-    WIDTH * Elements(tex) /*window_width*/,
-    HEIGHT /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = WIDTH*Elements(tex);
+	config.window_height = HEIGHT;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 void
 piglit_init(int argc, char **argv)

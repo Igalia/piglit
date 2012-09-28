@@ -33,10 +33,13 @@
 #define BUF_WIDTH 15
 #define BUF_HEIGHT 15
 
-PIGLIT_GL_TEST_MAIN(
-    BUF_WIDTH /*window_width*/,
-    BUF_WIDTH /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = BUF_WIDTH;
+	config.window_height = BUF_WIDTH;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Width of our stripes of z = 0.0, 0.5, 1.0 */
 static int w = BUF_WIDTH / 3;

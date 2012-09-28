@@ -44,10 +44,13 @@
 
 #define SquareSize 32
 
-PIGLIT_GL_TEST_MAIN(
-    3*SquareSize /*window_width*/,
-    3*SquareSize /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 3*SquareSize;
+	config.window_height = 3*SquareSize;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static int CurrentTest = 0;
 static int CurrentBias = 0;

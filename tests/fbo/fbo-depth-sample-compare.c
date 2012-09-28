@@ -45,10 +45,13 @@
 
 #define SIZE 256
 
-PIGLIT_GL_TEST_MAIN(
-    3 * SIZE /*window_width*/,
-    SIZE /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 3*SIZE;
+	config.window_height = SIZE;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_DEPTH;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static GLfloat ErrorScale = 0.0;
 static GLuint ColorTex, DepthTex, FBO;

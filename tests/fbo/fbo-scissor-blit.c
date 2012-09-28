@@ -40,8 +40,13 @@
 
 static const int width = 128, height = 128;
 
-PIGLIT_GL_TEST_MAIN(width, height, PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.window_width = width;
+	config.window_height = height;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 static GLuint src_fbo;
 static GLuint ref_fbo;
 static GLuint dst_fbo;

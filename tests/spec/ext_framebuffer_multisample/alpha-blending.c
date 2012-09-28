@@ -41,10 +41,13 @@ GLuint framebuffer, renderbuffer;
 #define HEIGHT 350
 int numSamples;
 
-PIGLIT_GL_TEST_MAIN(
-    WIDTH,
-    HEIGHT,
-    PIGLIT_GL_VISUAL_DOUBLE| PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA);
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = WIDTH;
+	config.window_height = HEIGHT;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 void
 piglit_init(int argc, char **argv)

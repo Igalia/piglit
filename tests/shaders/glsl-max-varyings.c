@@ -37,10 +37,13 @@
 
 /* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
 
-PIGLIT_GL_TEST_MAIN(
-    (2 + MAX_VARYING * 12) /*window_width*/,
-    (2 + MAX_VARYING * 12) /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (2+MAX_VARYING*12);
+	config.window_height = (2+MAX_VARYING*12);
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Generate a VS that writes to num_varyings vec4s, and put
  * interesting data in data_varying with 0.0 everywhere else.

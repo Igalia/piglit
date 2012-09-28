@@ -38,10 +38,13 @@
 #define TEX_HEIGHT 64
 #define TEX_DIFF (TEX_WIDTH/TEX_HEIGHT)
 
-PIGLIT_GL_TEST_MAIN(
-    700 /*window_width*/,
-    300 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 700;
+	config.window_height = 300;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const float red[] =   {1, 0, 0, 0};
 static const float green[] = {0, 1, 0, 0};

@@ -104,13 +104,7 @@ piglit_gl_test_run(int argc, char *argv[],
 #  define PIGLIT_EXTERN_C_END
 #endif
 
-/**
- * Define a boilerplate main() that should be suitable for most OpenGL test
- * executables.
- */
-#define PIGLIT_GL_TEST_MAIN(_window_width,                                   \
-                            _window_height,                                  \
-                            _window_visual)                                  \
+#define PIGLIT_GL_TEST_CONFIG_BEGIN                                          \
                                                                              \
         PIGLIT_EXTERN_C_BEGIN                                                \
                                                                              \
@@ -129,12 +123,10 @@ piglit_gl_test_run(int argc, char *argv[],
                                                                              \
                 piglit_gl_test_config_init(&config);                         \
                                                                              \
-                config.window_width = _window_width;                         \
-                config.window_height = _window_height;                       \
-                config.window_visual = _window_visual;                       \
-                                                                             \
                 config.init = piglit_init;                                   \
                 config.display = piglit_display;                             \
+
+#define PIGLIT_GL_TEST_CONFIG_END                                            \
                                                                              \
                 piglit_gl_test_run(argc, argv, &config);                     \
                                                                              \

@@ -106,10 +106,13 @@ static const struct {
 
 static int test_target = -1;
 
-PIGLIT_GL_TEST_MAIN(
-    IMAGE_SIZE * (ARRAY_SIZE(test_vectors) + 1) /*window_width*/,
-    IMAGE_SIZE /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = IMAGE_SIZE*(ARRAY_SIZE(test_vectors)+1);
+	config.window_height = IMAGE_SIZE;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const float texCoords_1d[2] = { 0.0, 1.0 };
 static const float texCoords_2d[4][2] = {

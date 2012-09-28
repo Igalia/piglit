@@ -36,10 +36,13 @@
 
 #define TEXTURE_SIZE 32 /* Note: Hardcoded dependencies in texture_init and texture_follow */
 
-PIGLIT_GL_TEST_MAIN(
-    TEXTURE_SIZE /*window_width*/,
-    TEXTURE_SIZE /*window_height*/,
-    PIGLIT_GL_VISUAL_RGBA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = TEXTURE_SIZE;
+	config.window_height = TEXTURE_SIZE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 unsigned int max_samples;
 unsigned char * texture_data;

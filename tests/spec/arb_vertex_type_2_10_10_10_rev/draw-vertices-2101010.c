@@ -29,10 +29,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    320 /*window_width*/,
-    60 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 320;
+	config.window_height = 60;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 #define i32to10(x) ((x) >= 0 ? (x & 0x1ff) : 1024-(abs((x))& 0x1ff))
 #define i32to2(x) ((x) >= 0 ? (x & 0x1) : 1-abs((x)))

@@ -5,10 +5,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    128 /*window_width*/,
-    128 /*window_height*/,
-    PIGLIT_GL_VISUAL_SINGLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 128;
+	config.window_height = 128;
+	config.window_visual = PIGLIT_GL_VISUAL_SINGLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 #define BITMAP_WIDTH 1
 #define BITMAP_HEIGHT 1

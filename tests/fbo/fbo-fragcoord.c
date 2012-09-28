@@ -31,10 +31,13 @@
 #define WIDTH 256
 #define HEIGHT 256
 
-PIGLIT_GL_TEST_MAIN(
-    WIDTH /*window_width*/,
-    HEIGHT /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = WIDTH;
+	config.window_height = HEIGHT;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static GLint prog;
 

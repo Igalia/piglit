@@ -42,9 +42,13 @@
  * Author: Anuj Phogat <anuj.phogat@gmail.com>
  */
 
-PIGLIT_GL_TEST_MAIN(512 /*window_width*/,
-		    768 /*window_height*/,
-		    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 512;
+	config.window_height = 768;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* At present fragment shader supports only fixed number of attachments (3) */
 static int num_attachments = 3;

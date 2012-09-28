@@ -41,11 +41,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    16 /*window_width*/,
-    16 /*window_height*/,
+PIGLIT_GL_TEST_CONFIG_BEGIN
 
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+	config.window_width = 16;
+	config.window_height = 16;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static bool
 test_getter(GLuint sampler)

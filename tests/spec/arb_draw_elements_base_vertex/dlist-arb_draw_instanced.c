@@ -53,10 +53,13 @@
  *      during display list compilation."
  */
 
-PIGLIT_GL_TEST_MAIN(
-    32 /*window_width*/,
-    32 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 32;
+	config.window_height = 32;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)

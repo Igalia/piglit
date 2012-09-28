@@ -34,10 +34,13 @@
 #define TEST_COLS 6
 #define TEST_ROWS 2
 
-PIGLIT_GL_TEST_MAIN(
-    1 + ((BOX_SIZE + 1) * TEST_COLS) /*window_width*/,
-    1 + ((BOX_SIZE + 1) * TEST_ROWS) /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 1+((BOX_SIZE+1)*TEST_COLS);
+	config.window_height = 1+((BOX_SIZE+1)*TEST_ROWS);
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static float maxSize = 0.0f;
 static GLuint tex;

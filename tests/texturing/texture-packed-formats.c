@@ -39,10 +39,13 @@
 #include <string.h>
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    700 /*window_width*/,
-    620 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 700;
+	config.window_height = 620;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 struct pixel_format {
    const char *name;

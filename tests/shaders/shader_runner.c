@@ -39,10 +39,13 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-vbo.h"
 
-PIGLIT_GL_TEST_MAIN(
-    250 /*window_width*/,
-    250 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 250;
+	config.window_height = 250;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 extern float piglit_tolerance[4];
 

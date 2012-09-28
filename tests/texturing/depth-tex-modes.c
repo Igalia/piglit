@@ -39,10 +39,13 @@ static const GLenum depth_texture_modes[] = {
 #define TEST_ROWS 4
 #define TEST_COLS ARRAY_SIZE(depth_texture_modes)
 
-PIGLIT_GL_TEST_MAIN(
-    1 + (TEST_COLS * (BOX_SIZE + 1)) /*window_width*/,
-    1 + (TEST_ROWS * (BOX_SIZE + 1)) /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 1+(TEST_COLS*(BOX_SIZE+1));
+	config.window_height = 1+(TEST_ROWS*(BOX_SIZE+1));
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 GLuint tex[2];
 

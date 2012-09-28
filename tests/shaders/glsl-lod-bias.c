@@ -39,10 +39,13 @@
 #define TEST_COLS 5
 #define BOX_SIZE  (1 << (TEST_COLS + 1))
 
-PIGLIT_GL_TEST_MAIN(
-    (BOX_SIZE + 2) * TEST_COLS + 1 /*window_width*/,
-    (BOX_SIZE + 1) + 1 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = (BOX_SIZE+2)*TEST_COLS+1;
+	config.window_height = (BOX_SIZE+1)+1;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static GLuint tex[1];
 static GLint prog;

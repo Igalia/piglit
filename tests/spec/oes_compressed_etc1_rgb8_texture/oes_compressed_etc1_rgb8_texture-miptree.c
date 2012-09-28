@@ -53,9 +53,13 @@
 static const int window_width = 2 * level0_width;
 static const int window_height = 2 * level0_height;
 
-PIGLIT_GL_TEST_MAIN(
-    window_width, window_height,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = window_width;
+	config.window_height = window_height;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 
 static GLuint prog;

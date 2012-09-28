@@ -34,10 +34,13 @@
 #include <string.h>
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    250 /*window_width*/,
-    250 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 250;
+	config.window_height = 250;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DEPTH;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static float gles_version = 0.0;
 static float essl_version = 0.0;

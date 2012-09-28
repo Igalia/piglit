@@ -71,10 +71,13 @@ int random_test_count = 10;
 
 /* Piglit variables */
 
-PIGLIT_GL_TEST_MAIN(
-    1000 /*window_width*/,
-    1000 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 1000;
+	config.window_height = 1000;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Globals */
 int test_id = 0;

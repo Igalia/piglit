@@ -47,10 +47,13 @@
 #define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    500 /*window_width*/,
-    100 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 500;
+	config.window_height = 100;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static char *
 get_shader(GLenum target, const char *block_prefix, int blocks)

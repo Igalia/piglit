@@ -86,10 +86,13 @@
 
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_MAIN(
-    16 /*window_width*/,
-    16 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGBA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 16;
+	config.window_height = 16;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 namespace {
 

@@ -40,10 +40,13 @@
 #define TEX_WIDTH 8
 #define TEX_HEIGHT 8
 
-PIGLIT_GL_TEST_MAIN(
-    64 /*window_width*/,
-    64 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 64;
+	config.window_height = 64;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 enum piglit_result
 piglit_display(void)

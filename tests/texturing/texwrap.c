@@ -386,10 +386,13 @@ static int border_x = 0, border_y = 0, border_z = 0;    /* 0 or 1 */
 
 /* Piglit stuff. */
 
-PIGLIT_GL_TEST_MAIN(
-    872 /*window_width*/,
-    230 /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 872;
+	config.window_height = 230;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 extern int piglit_automatic;
 

@@ -32,10 +32,13 @@
 
 #define BUFFER_SIZE 4
 
-PIGLIT_GL_TEST_MAIN(
-    10 /*window_width*/,
-    10 /*window_height*/,
-    PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = 10;
+	config.window_height = 10;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vs_source =
 	"#version 140\n"

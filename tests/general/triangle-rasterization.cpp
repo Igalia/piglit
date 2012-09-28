@@ -99,10 +99,13 @@ int fbo_height = 256;
 
 /* Piglit variables */
 
-PIGLIT_GL_TEST_MAIN(
-    fbo_width /*window_width*/,
-    fbo_height /*window_height*/,
-    PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE)
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.window_width = fbo_width;
+	config.window_height = fbo_height;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
 
 /* Globals */
 int test_id = 0;
