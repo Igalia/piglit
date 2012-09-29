@@ -34,22 +34,6 @@ PIGLIT_GL_TEST_MAIN(
     100 /*window_height*/,
     GLUT_RGB)
 
-static const char *TestName = "texture-errors";
-
-
-
-/** check that an expected error is actually generated */
-static GLboolean
-verify_error(const char *func, GLenum error)
-{
-   GLenum err = glGetError();
-   if (err != error) {
-      fprintf(stderr, "%s: %s didn't generate '%s' error, found '%s'.\n",
-              TestName, func, gluErrorString(error), gluErrorString(err));
-      return GL_FALSE;
-   }
-   return GL_TRUE;
-}
 
 
 /** Test target params to glTexImage functions */
@@ -59,58 +43,58 @@ test_targets(void)
    /* all of these should generate GL_INVALID_ENUM */
 
    glTexImage1D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glTexImage2D(GL_TEXTURE_3D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage2D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glTexImage3D(GL_TEXTURE_1D, 0, GL_RGBA, 16, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage3D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
 
    glTexSubImage1D(GL_TEXTURE_2D, 0, 6, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glTexSubImage1D(GL_PROXY_TEXTURE_1D, 0, 6, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glTexSubImage2D(GL_PROXY_TEXTURE_2D, 0, 6, 6, 10, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glTexSubImage3D(GL_PROXY_TEXTURE_2D, 0, 6, 6, 6, 10, 10, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage3D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
 
    glCopyTexImage1D(GL_PROXY_TEXTURE_1D, 0, GL_RGBA, 4, 4, 16, 0);
-   if (!verify_error("glCopyTexImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glCopyTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 4, 4, 16, 16, 0);
-   if (!verify_error("glCopyTexImage2D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glCopyTexImage2D(GL_TEXTURE_1D, 0, GL_RGBA, 4, 4, 16, 16, 0);
-   if (!verify_error("glCopyTexImage2D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
 
    glCopyTexSubImage1D(GL_PROXY_TEXTURE_1D, 0, 4, 4, 6, 10);
-   if (!verify_error("glCopyTexSubImage1D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glCopyTexSubImage2D(GL_PROXY_TEXTURE_2D, 0, 4, 4, 6, 6, 10, 10);
-   if (!verify_error("glCopyTexSubImage2D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
    glCopyTexSubImage3D(GL_PROXY_TEXTURE_3D, 0, 4, 4, 4, 6, 6, 10, 10);
-   if (!verify_error("glCopyTexSubImage2D", GL_INVALID_ENUM))
+   if (!piglit_check_gl_error(GL_INVALID_ENUM))
       return GL_FALSE;
 
 
@@ -125,24 +109,24 @@ test_pos_and_sizes(void)
    /* all of these should generate GL_INVALID_VALUE */
 
    glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, -16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage1D(size)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, -6, -5, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage2D(size)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    glTexImage2D(GL_TEXTURE_2D, -2, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage2D(level)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    glTexImage2D(GL_TEXTURE_2D, 2000, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexImage2D(level)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
 
    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 1<<28, 1<<28, 0);
-   if (!verify_error("glTexImage2D(huge size)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
 
@@ -151,20 +135,20 @@ test_pos_and_sizes(void)
 
 
    glTexSubImage2D(GL_TEXTURE_2D, 0, 6, 6, 100, 100, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage2D(size)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    glTexSubImage2D(GL_TEXTURE_2D, 0, -6, -6, 10, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!verify_error("glTexSubImage2D(pos)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
 
    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, -6, -6, 2, 2, 10, 10);
-   if (!verify_error("glCopyTexSubImage2D(pos)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 6, 6, 200, 200, 10, 10);
-   if (!verify_error("glCopyTexSubImage2D(size)", GL_INVALID_VALUE))
+   if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
    return GL_TRUE;
