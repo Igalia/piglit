@@ -1296,6 +1296,20 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 	return tex;
 }
 
+
+/**
+ * Create a depth texture.  The depth texture will be a gradient which varies
+ * from 0.0 at the left side to 1.0 at the right side.  For a 2D array texture,
+ * all the texture layers will have the same gradient.
+ *
+ * \param target  either GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_1D_ARRAY, 
+ *                GL_TEXTURE_2D_ARRAY or GL_TEXTURE_RECTANGLE.
+ * \param internalformat  either GL_DEPTH_STENCIL, GL_DEPTH_COMPONENT,
+ *                        GL_DEPTH24_STENCIL8_EXT or GL_DEPTH32F_STENCIL8.
+ * \param w, h, d  level 0 image width, height and depth
+ * \param mip  if true, create a full mipmap.  Else, create single-level texture.
+ * \return the new texture object id
+ */
 GLuint
 piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, GLboolean mip)
 {
