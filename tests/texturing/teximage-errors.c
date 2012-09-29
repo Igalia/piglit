@@ -131,7 +131,7 @@ test_pos_and_sizes(void)
 
 
    /* setup valid 2D texture for subsequent TexSubImage calls */
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 15, 0, GL_RGBA, GL_FLOAT, NULL);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
 
 
    glTexSubImage2D(GL_TEXTURE_2D, 0, 6, 6, 100, 100, GL_RGBA, GL_FLOAT, NULL);
@@ -147,9 +147,20 @@ test_pos_and_sizes(void)
    if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
 
-   glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 6, 6, 200, 200, 10, 10);
+   glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 6, 6, 2, 2, 200, 200);
    if (!piglit_check_gl_error(GL_INVALID_VALUE))
       return GL_FALSE;
+
+   /* mipmap level 1 doesn't exist */
+   glTexSubImage2D(GL_TEXTURE_2D, 1, 0, 0, 8, 8, GL_RGBA, GL_FLOAT, NULL);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+      return GL_FALSE;
+
+   /* mipmap level 2 doesn't exist */
+   glCopyTexSubImage2D(GL_TEXTURE_2D, 2, 0, 0, 0, 0, 4, 4);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+      return GL_FALSE;
+
 
    return GL_TRUE;
 }
