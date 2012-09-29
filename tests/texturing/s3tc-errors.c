@@ -99,66 +99,6 @@ check_rendering_(int width, int height, int line)
 
 
 /**
- * Return block size info for a compressed format.
- * XXX this could be a piglit utility function someday
- */
-static void
-get_compressed_block_size(GLenum format, int *bw, int *bh, int *bytes)
-{
-	switch (format) {
-	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
-	case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
-		*bytes = 8;
-		break;
-	case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
-	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
-		*bytes = 16;
-		break;
-	default:
-		assert(!"Unexpected format in get_compressed_block_size()");
-	}
-	/* XXX all formats use 4x4 blocks at this time */
-	*bw = *bh = 4;
-}
-
-
-/**
- * Compute size (in bytes) neede to store an image in the given compressed
- * format.
- * XXX this could be a piglit utility function someday
- */
-static int
-compressed_image_size(GLenum format, int width, int height)
-{
-	int bw, bh, bytes;
-	get_compressed_block_size(format, &bw, &bh, &bytes);
-	return width / bw * height / bh * bytes;
-}
-
-
-/**
- * Return offset (in bytes) to the given texel in a compressed image.
- * Note the x and y must be multiples of the compressed block size.
- * XXX this could be a piglit utility function someday
- */
-static int
-compressed_offset(GLenum format, int x, int y, int width)
-{
-	int bw, bh, bytes, offset;
-
-	get_compressed_block_size(format, &bw, &bh, &bytes);
-
-	assert(x % bw == 0);
-	assert(y % bh == 0);
-	assert(width % bw == 0);
-
-	offset = (width / bw * bytes * y / bh) + (x / bw * bytes);
-
-	return offset;
-}
-
-
-/**
  * Check for either of two expected GL errors.
  * XXX this could be a piglit util function
  */
@@ -181,7 +121,7 @@ static bool
 test_format(int width, int height, GLfloat *image, GLenum format)
 {
 	GLubyte *compressed_image =
-		malloc(compressed_image_size(format, width, height));
+		malloc(piglit_compressed_image_size(format, width, height));
 	GLenum format2;
 	int x, y, w, h;
 	GLuint tex;
@@ -238,9 +178,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, w, h),
+				  piglit_compressed_image_size(format, w, h),
 				  compressed_image +
-				  compressed_offset(format, x, y, width));
+				  piglit_compressed_pixel_offset(format, width, x, y));
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = check_rendering(width, height) && pass;
@@ -253,9 +193,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, w, h),
+				  piglit_compressed_image_size(format, w, h),
 				  compressed_image +
-				  compressed_offset(format, 0, 0, width));
+				  piglit_compressed_pixel_offset(format, width, 0, 0));
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
@@ -271,9 +211,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, 4, 4),
+				  piglit_compressed_image_size(format, 4, 4),
 				  compressed_image +
-				  compressed_offset(format, x, y, width));
+				  piglit_compressed_pixel_offset(format, width, x, y));
 	/* Note, we can get either of these errors depending on the order
 	 * in which glCompressedTexSubImage parameters are checked.
 	 * INVALID_OPERATION for the bad size or INVALID_VALUE for the
@@ -291,9 +231,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, w, h),
+				  piglit_compressed_image_size(format, w, h),
 				  compressed_image +
-				  compressed_offset(format, 0, 0, width));
+				  piglit_compressed_pixel_offset(format, width, 0, 0));
 
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
@@ -307,9 +247,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, w, h),
+				  piglit_compressed_image_size(format, w, h),
 				  compressed_image +
-				  compressed_offset(format, x, y, width));
+				  piglit_compressed_pixel_offset(format, width, x, y));
 
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
@@ -327,9 +267,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format2,
-				  compressed_image_size(format2, w, h),
+				  piglit_compressed_image_size(format2, w, h),
 				  compressed_image +
-				  compressed_offset(format2, x, y, width));
+				  piglit_compressed_pixel_offset(format2, width, x, y));
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
@@ -343,9 +283,9 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 1,
 				  x, y, w, h,
 				  format,
-				  compressed_image_size(format, w, h),
+				  piglit_compressed_image_size(format, w, h),
 				  compressed_image +
-				  compressed_offset(format, x, y, width));
+				  piglit_compressed_pixel_offset(format, width, x, y));
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
