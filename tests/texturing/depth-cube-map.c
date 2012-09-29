@@ -221,8 +221,6 @@ piglit_display(void)
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 	glPopMatrix();
 
-	glFinish();
-
 	/* Test the pixel color of polygons against the expected output */
 	pass = piglit_probe_pixel_rgb(110, 135, ColorPosX);
 	pass = pass && piglit_probe_pixel_rgb(185, 135, ColorNegX);
@@ -233,6 +231,5 @@ piglit_display(void)
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_present_results();
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
