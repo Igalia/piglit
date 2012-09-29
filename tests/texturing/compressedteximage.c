@@ -44,7 +44,6 @@ PIGLIT_GL_TEST_MAIN(
 struct format {
 	const char *name;
 	GLenum token;
-	int bw, bh, bs;
 	const char **extension;
 };
 
@@ -77,32 +76,26 @@ const char *RGTC_signed[] = {
 	NULL
 };
 
-#define FORMAT(t, bw, bh, bs, ext) { #t, t, bw, bh, bs, ext }
+#define FORMAT(t, ext) { #t, t, ext }
 static struct format formats[] = {
-	FORMAT(GL_COMPRESSED_RGB_FXT1_3DFX, 8, 4, 16, FXT1),
-	FORMAT(GL_COMPRESSED_RGBA_FXT1_3DFX, 8, 4, 16, FXT1),
+	FORMAT(GL_COMPRESSED_RGB_FXT1_3DFX, FXT1),
+	FORMAT(GL_COMPRESSED_RGBA_FXT1_3DFX, FXT1),
 
-	FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 4, 4, 8, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 4, 4, 8, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 4, 4, 16, S3TC),
-	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 4, 4, 16, S3TC),
+	FORMAT(GL_COMPRESSED_RGB_S3TC_DXT1_EXT, S3TC),
+	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, S3TC),
+	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, S3TC),
+	FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, S3TC),
 
-	FORMAT(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, 4, 4, 8, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, 4, 4, 8, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, 4, 4, 16, S3TC_srgb),
-	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, 4, 4, 16, S3TC_srgb),
+	FORMAT(GL_COMPRESSED_SRGB_S3TC_DXT1_EXT, S3TC_srgb),
+	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT, S3TC_srgb),
+	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT, S3TC_srgb),
+	FORMAT(GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT, S3TC_srgb),
 
-	FORMAT(GL_COMPRESSED_RED_RGTC1_EXT, 4, 4, 8, RGTC),
-	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT, 4, 4, 8, RGTC_signed),
-	FORMAT(GL_COMPRESSED_RED_GREEN_RGTC2_EXT, 4, 4, 16, RGTC),
-	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT, 4, 4, 16, RGTC_signed),
+	FORMAT(GL_COMPRESSED_RED_RGTC1_EXT, RGTC),
+	FORMAT(GL_COMPRESSED_SIGNED_RED_RGTC1_EXT, RGTC_signed),
+	FORMAT(GL_COMPRESSED_RED_GREEN_RGTC2_EXT, RGTC),
+	FORMAT(GL_COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT, RGTC_signed),
 };
-
-static int
-align(int v, int a)
-{
-	return (v + a - 1) & ~(a - 1);
-}
 
 static void
 display_mipmaps(int x, int y)
@@ -180,7 +173,9 @@ piglit_display(void)
 	GLuint tex, tex_src;
 	bool pass;
 	int level;
+	unsigned bw, bh, bs;
 
+	piglit_get_compressed_block_size(format->token, &bw, &bh, &bs);
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -190,16 +185,13 @@ piglit_display(void)
 	glGenTextures(1, &tex);
 
 	for (level = 0; (SIZE >> level) > 0; level++) {
-		int w, h, w_a, h_a;
+		int w, h;
 		int expected_size, size;
 		void *compressed;
 
 		w = SIZE >> level;
 		h = SIZE >> level;
-		w_a = align(w, format->bw);
-		h_a = align(h, format->bh);
-		expected_size = ((w_a / format->bw) *
-				 (h_a / format->bh)) * format->bs;
+		expected_size = piglit_compressed_image_size(format->token, w, h);
 
 		glBindTexture(GL_TEXTURE_2D, tex_src);
 		glGetTexLevelParameteriv(GL_TEXTURE_2D, level,
