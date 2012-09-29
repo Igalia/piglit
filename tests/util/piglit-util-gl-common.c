@@ -433,3 +433,88 @@ piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 	free(pixels);
 	return 1;
 }
+
+
+/**
+ * Return block size info for a specific texture compression format.
+ * \param  bw returns the block width, in pixels
+ * \param  bh returns the block height, in pixels
+ * \param  return number of bytes per block
+ * \return true if format is a known compressed format, false otherwise
+ */
+bool
+piglit_get_compressed_block_size(GLenum format,
+				 unsigned *bw, unsigned *bh, unsigned *bytes)
+{
+	switch (format) {
+	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+	case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+	case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
+	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
+	case GL_COMPRESSED_RED_RGTC1:
+	case GL_COMPRESSED_SIGNED_RED_RGTC1:
+	case GL_COMPRESSED_LUMINANCE_LATC1_EXT:
+	case GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT:
+		*bw = *bh = 4;
+		*bytes = 8;
+		return true;
+	case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+	case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT:
+	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT:
+	case GL_COMPRESSED_RG_RGTC2:
+	case GL_COMPRESSED_SIGNED_RG_RGTC2:
+	case GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT:
+	case GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT:
+		*bw = *bh = 4;
+		*bytes = 16;
+		return true;
+	case GL_COMPRESSED_RGB_FXT1_3DFX:
+	case GL_COMPRESSED_RGBA_FXT1_3DFX:
+		*bw = 8;
+		*bh = 4;
+		*bytes = 16;
+		return true;
+	default:
+		/* return something rather than uninitialized values */
+		*bw = *bh = *bytes = 1;
+		return false;
+	}
+}
+
+
+/**
+ * Compute size (in bytes) neede to store an image in the given compressed
+ * format.
+ */
+unsigned
+piglit_compressed_image_size(GLenum format, unsigned width, unsigned height)
+{
+	unsigned bw, bh, bytes;
+	bool b = piglit_get_compressed_block_size(format, &bw, &bh, &bytes);
+	assert(b);
+	return ((width + bw - 1) / bw) * ((height + bh - 1) / bh) * bytes;
+}
+
+
+/**
+ * Return offset (in bytes) to the given texel in a compressed image.
+ * Note the x and y must be multiples of the compressed block size.
+ */
+unsigned
+piglit_compressed_pixel_offset(GLenum format, unsigned width,
+			       unsigned x, unsigned y)
+{
+	unsigned bw, bh, bytes, offset;
+	bool b = piglit_get_compressed_block_size(format, &bw, &bh, &bytes);
+
+	assert(b);
+
+	assert(x % bw == 0);
+	assert(y % bh == 0);
+	assert(width % bw == 0);
+
+	offset = (width / bw * bytes * y / bh) + (x / bw * bytes);
+
+	return offset;
+}

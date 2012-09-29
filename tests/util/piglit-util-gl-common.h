@@ -174,6 +174,19 @@ extern float piglit_tolerance[4];
 void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
 extern void piglit_require_transform_feedback(void);
 
+bool
+piglit_get_compressed_block_size(GLenum format,
+				 unsigned *bw, unsigned *bh, unsigned *bytes);
+
+unsigned
+piglit_compressed_image_size(GLenum format, unsigned width, unsigned height);
+
+unsigned
+piglit_compressed_pixel_offset(GLenum format, unsigned width,
+			       unsigned x, unsigned y);
+
+
+
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];
 extern const GLenum cube_face_targets[6];
