@@ -27,6 +27,7 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-util-waffle.h"
 
+#include "piglit_gbm_framework.h"
 #include "piglit_gl_framework.h"
 #include "piglit_winsys_framework.h"
 #include "piglit_wl_framework.h"
@@ -139,6 +140,11 @@ piglit_winsys_framework_factory(const struct piglit_gl_test_config *test_config)
 	case WAFFLE_PLATFORM_GLX:
 	case WAFFLE_PLATFORM_X11_EGL:
 		return piglit_x11_framework_create(test_config, platform);
+#endif
+
+#ifdef PIGLIT_HAS_GBM
+	case WAFFLE_PLATFORM_GBM:
+		return piglit_gbm_framework_create(test_config);
 #endif
 
 /* There is no need to #ifdef out Piglit support for Wayland yet

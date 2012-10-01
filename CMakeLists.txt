@@ -55,6 +55,9 @@ if(PIGLIT_BUILD_CL_TESTS)
 endif(PIGLIT_BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+        set(PIGLIT_HAS_GBM True)
+        add_definitions(-DPIGLIT_HAS_GBM)
+
 	set(PIGLIT_HAS_X11 True)
 	add_definitions(-DPIGLIT_HAS_X11)
 

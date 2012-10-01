@@ -27,6 +27,7 @@ set(UTIL_GL_SOURCES
 
 if(PIGLIT_USE_WAFFLE)
 	list(APPEND UTIL_GL_SOURCES
+		piglit-framework-gl/piglit_gbm_framework.c
 		piglit-framework-gl/piglit_fbo_framework.c
 		piglit-framework-gl/piglit_wfl_framework.c
 		piglit-framework-gl/piglit_winsys_framework.c

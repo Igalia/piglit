@@ -56,6 +56,16 @@ piglit_wfl_framework_choose_platform(void)
 #endif
 	}
 
+	else if (strcmp(env, "gbm") == 0) {
+#ifdef PIGLIT_HAS_GBM
+		return WAFFLE_PLATFORM_GBM;
+#else
+		fprintf(stderr, "environment var PIGLIT_PLATFORM=gbm, but "
+		        "piglit was built without GBM support\n");
+		piglit_report_result(PIGLIT_FAIL);
+#endif
+	}
+
 	else if (strcmp(env, "glx") == 0) {
 #ifdef PIGLIT_HAS_GLX
 		return WAFFLE_PLATFORM_GLX;
