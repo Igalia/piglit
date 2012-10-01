@@ -83,11 +83,8 @@ piglit_init(int argc, char **argv)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			       GL_TEXTURE_CUBE_MAP_POSITIVE_X, tex, 0);
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -99,11 +96,8 @@ piglit_init(int argc, char **argv)
 	glClearColor(color[0], color[1], color[2], color[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0,
 					 0, 0, 32, 32, color)) {

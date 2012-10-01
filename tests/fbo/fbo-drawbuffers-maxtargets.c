@@ -118,11 +118,8 @@ generate_and_display_drawbuffers(int count)
 	prog = piglit_link_simple_program(vs, fs);
 	glUseProgram(prog);
 
-	error = glGetError();
-	if (error) {
-		fprintf(stderr, "glUseProgram error: 0x%x\n", error);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	/* Now render to all the color buffers. */
 	piglit_draw_rect(-1, -1, 2, 2);

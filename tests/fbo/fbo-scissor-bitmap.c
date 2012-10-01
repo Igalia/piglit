@@ -174,11 +174,8 @@ draw_and_test(const char *destination, int drawable_width, int drawable_height)
 	/* Clear to black */
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	error = glGetError();
-	if (error) {
-		fprintf(stderr, "glClear error: 0x%x\n", error);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	glColor4fv(red);
 	/* Center: full image */

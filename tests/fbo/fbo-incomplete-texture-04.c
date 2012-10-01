@@ -75,11 +75,8 @@ piglit_init(int argc, char **argv)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			       GL_TEXTURE_2D, tex, 2);
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	/* Since texture level 2 does not exist, the FBO should be incomplete.
 	 */
@@ -101,11 +98,8 @@ piglit_init(int argc, char **argv)
 	glTexImage2D(GL_TEXTURE_2D, 2, GL_RGBA, 8, 8, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-	err = glGetError();
-	if (err != 0) {
-		printf("Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -116,11 +110,8 @@ piglit_init(int argc, char **argv)
 	glClearColor(color[0], color[1], color[2], color[3]);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	if (!piglit_probe_texel_rect_rgba(GL_TEXTURE_2D, 2, 0, 0, 8, 8,
 					  color)) {

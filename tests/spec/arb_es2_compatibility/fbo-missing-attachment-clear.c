@@ -78,11 +78,8 @@ piglit_init(int argc, char **argv)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 			       GL_TEXTURE_2D, tex, 0);
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -106,11 +103,8 @@ piglit_init(int argc, char **argv)
 	pass = piglit_probe_rect_depth(0, 0, piglit_width, piglit_height, 0.5)
 		&& pass;
 
-	err = glGetError();
-	if (err != 0) {
-		fprintf(stderr, "Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

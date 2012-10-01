@@ -213,11 +213,8 @@ run_test(void)
 	     x0, y1, x0 + SIZE, y1 + SIZE,
 	     GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	err = glGetError();
-	if (err != GL_NO_ERROR) {
-		printf("Unexpected GL error state 0x%04x\n", err);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
