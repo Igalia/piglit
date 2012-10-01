@@ -1470,10 +1470,7 @@ test_ready:
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	/* Check the driver. */
-	if (piglit_get_gl_version() < 15) {
-		fprintf(stderr, "OpenGL 1.5 required.\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	piglit_require_gl_version(15);
 	piglit_require_GLSL();
 	piglit_require_transform_feedback();
 	if (!test->is_floating_point)
