@@ -273,6 +273,23 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
+	/* Try zero-sized subimage - should not be an error */
+	x = 4;
+	y = 4;
+	w = 0;
+	h = 0;
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, x);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, y);
+	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
+				  x, y, w, h,
+				  format,
+				  piglit_compressed_image_size(format, w, h),
+				  compressed_image +
+				  piglit_compressed_pixel_offset(format, width, x, y));
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+
 	/* Try CompressedTexSubImage into level 1 (which is missing) */
 	x = 0;
 	y = 0;
@@ -288,6 +305,27 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 				  piglit_compressed_pixel_offset(format, width, x, y));
 
 	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
+	/* Try CompressedTexImage of size zero - should not be an erorr */
+	w = 0;
+	h = 0;
+	glCompressedTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0,
+			       piglit_compressed_image_size(format, w, h),
+			       compressed_image);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+	/* Try CompressedTexImage with size which is a not a multiple of the
+         * block size - should not be an erorr
+         */
+	w = width - 1;
+	h = height - 1;
+	glCompressedTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0,
+			       piglit_compressed_image_size(format, w, h),
+			       compressed_image);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+	pass = check_rendering(width, height) && pass;
 
 	glDeleteTextures(1, &tex);
 
