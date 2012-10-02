@@ -97,6 +97,7 @@ results is an array of TestResult instances, one per testrun
 		self.regressions = self.isRegression(statiList)
 		statiList.reverse()
 		self.fixes = self.isRegression(statiList)
+		self.skipped = 'skip' in statiSet
 
 	def allTests(self):
 		return [self]
@@ -120,6 +121,7 @@ results is an array of GroupResult instances, one per testrun
 		self.problems = False
 		self.regressions = False
 		self.fixes = False
+		self.skipped = False
 		self.children = {}
 
 		# Perform some initial annotations
@@ -166,6 +168,7 @@ results is an array of GroupResult instances, one per testrun
 				self.problems = self.problems or self.children[name].problems
 				self.regressions = self.regressions or self.children[name].regressions
 				self.fixes = self.fixes or self.children[name].fixes
+				self.skipped = self.skipped or self.children[name].skipped
 
 	def allTests(self):
 		"""\
