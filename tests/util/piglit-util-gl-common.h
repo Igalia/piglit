@@ -46,7 +46,7 @@ extern const unsigned int fdo_bitmap_height;
 /**
  * Determine if the API is OpenGL ES.
  */
-bool piglit_is_gles();
+bool piglit_is_gles(void);
 
 /**
  * \brief Get version of OpenGL or OpenGL ES API.
@@ -54,7 +54,7 @@ bool piglit_is_gles();
  * Returned version is multiplied by 10 to make it an integer.  So for
  * example, if the GL version is 2.1, the return value is 21.
  */
-int piglit_get_gl_version();
+int piglit_get_gl_version(void);
 
 /**
  * \precondition name is not null

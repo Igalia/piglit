@@ -34,13 +34,13 @@
  */
 static const char **gl_extensions = NULL;
 
-bool piglit_is_gles()
+bool piglit_is_gles(void)
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);
 	return strncmp("OpenGL ES ", version_string, 10) == 0;
 }
 
-int piglit_get_gl_version()
+int piglit_get_gl_version(void)
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);
 	int scanf_count;
