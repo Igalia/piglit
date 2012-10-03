@@ -63,7 +63,7 @@ void piglit_get_glsl_version(bool *es, int* major, int* minor)
  * Convenience function to compile a GLSL shader from a file.
  */
 GLuint
-piglit_compile_shader(GLenum target, char *filename)
+piglit_compile_shader(GLenum target, const char *filename)
 {
 	GLuint prog;
 	struct stat st;
