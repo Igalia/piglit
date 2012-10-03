@@ -146,7 +146,7 @@ bool piglit_is_extension_in_string(const char *haystack, const char *needle)
 }
 
 /** Returns the line in the program string given the character position. */
-int FindLine(const char *program, int position)
+int piglit_find_line(const char *program, int position)
 {
 	int i, line = 1;
 	for (i = 0; i < position; i++) {

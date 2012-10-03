@@ -762,7 +762,7 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 			(const GLubyte *)text);
 	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
 	if (glGetError() != GL_NO_ERROR || errorPos != -1) {
-		int l = FindLine(text, errorPos);
+		int l = piglit_find_line(text, errorPos);
 		int a;
 
 		fprintf(stderr, "Compiler Error (pos=%d line=%d): %s\n",
