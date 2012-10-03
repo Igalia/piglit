@@ -27,8 +27,8 @@ static bool try_attribute(int attribute)
 {
 	/* If the attribute is EGL_CONTEXT_OPENGL_RESET_NOTIFICATION_STRATEGY_KHR
 	 * or EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, use a valid value for that
-	 * attribute.  This ensures that the attribute is  rejected for the
-	 * correct reason.
+	 * attribute.  This ensures that the attribute is rejected for the
+	 * correct reason that GLES doesn't support profiles.
 	 */
 	const EGLint attribs[] = {
 		attribute,
