@@ -25,14 +25,8 @@
 
 static bool try_attribute(int attribute)
 {
-	/* If the attribute is EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR, use a valid
-	 * value for that attribute.  This ensures that the attribute is
-	 * rejected for the correct reason.
-	 */
 	const EGLint attribs[] = {
 		attribute,
-		(attribute == EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR)
-		? EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR : 0,
 		EGL_NONE
 	};
 	bool pass = true;
@@ -66,7 +60,6 @@ int main(int argc, char **argv)
 	};
 	bool pass = true;
 	unsigned i;
-	int gl_version;
 
 	if (!EGL_KHR_create_context_setup(EGL_OPENGL_BIT)) {
 		fprintf(stderr, "Desktop GL not available.\n");
@@ -76,42 +69,6 @@ int main(int argc, char **argv)
 
 	for (i = 0; i < ARRAY_SIZE(bad_attributes); i++) {
 		pass = try_attribute(bad_attributes[i]) && pass;
-	}
-
-	/* Create a context so that we can determine the GL version. */
-	ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT, NULL);
-	if (ctx == EGL_NO_CONTEXT) {
-		fprintf(stderr, "eglCreateContext() failed\n");
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	if (!eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, ctx)) {
-		fprintf(stderr, "eglMakeCurrent() failed\n");
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	piglit_dispatch_default_init();
-
-	gl_version = piglit_get_gl_version();
-
-	eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-	eglDestroyContext(egl_dpy, ctx);
-
-	/* The EGL_KHR_create_context spec says:
-	 *
-	 * "* If an OpenGL context is requested, the requested version is
-	 *    greater than [sic] 3.2, and the value for attribute
-	 *    EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR has no bits set; has any bits set
-	 *    other than EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR and
-	 *    EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR; has more than one of
-	 *    these bits set; or if the implementation does not support the
-	 *    requested profile, then an EGL_BAD_PROFILE_KHR error is
-	 *    generated."
-	 */
-
-	if (gl_version >= 32) {
-		pass = try_attribute(EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR)
-		       && pass;
 	}
 
 	EGL_KHR_create_context_teardown();
