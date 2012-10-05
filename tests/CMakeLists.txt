@@ -28,7 +28,3 @@ ENDIF(OPENGL_egl_LIBRARY)
 IF(BUILD_CL_TESTS)
 	add_subdirectory (cl)
 ENDIF(BUILD_CL_TESTS)
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	add_subdirectory (mesa)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
