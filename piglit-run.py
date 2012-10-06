@@ -53,6 +53,7 @@ Options:
   -c bool, --concurrent=bool  Enable/disable concurrent test runs. Valid
 			      option values are: 0, 1, on, off.  (default: on)
   --valgrind                Run tests in valgrind's memcheck.
+  -p platform, --platform=platform  Name of the piglit platform to use.
 Example:
   %(progName)s tests/all.tests results/all
          Run all tests, store the results in the directory results/all
@@ -84,8 +85,9 @@ def main():
 			 "name=",
 			 "exclude-tests=",
 			 "concurrent=",
+			 "platform=",
 			 ]
-		options, args = getopt(sys.argv[1:], "hdrt:n:x:c:", option_list)
+		options, args = getopt(sys.argv[1:], "hdrt:n:x:c:p:", option_list)
 	except GetoptError:
 		usage()
 
@@ -93,6 +95,7 @@ def main():
 	OptionResume = False
 	test_filter = []
 	exclude_filter = []
+	platform = None
 
 	for name, value in options:
 		if name in ('-h', '--help'):
@@ -118,6 +121,11 @@ def main():
 				env.concurrent = False
 			else:
 				usage()
+		elif name in ('-p, --platform'):
+			platform = value
+
+	if platform is not None:
+		os.environ['PIGLIT_PLATFORM'] = platform
 
 	if OptionResume:
 		if test_filter or OptionName:
