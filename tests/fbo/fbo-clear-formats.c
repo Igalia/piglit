@@ -43,9 +43,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 700;
 	config.window_height = 300;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_STENCIL |
+			       PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
 
 PIGLIT_GL_TEST_CONFIG_END
+
+static bool clear_stencil = false;
 
 /* Do piglit_rgbw_texture() image but using glClear */
 static bool
@@ -71,12 +74,8 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		if (!level)
-			printf(" - FBO incomplete\n");
+		glDeleteFramebuffersEXT(1, &fb);
 		return false;
-	} else {
-		if (!level)
-			printf("\n");
 	}
 
 	/* Handle the small sizes of compressed mipmap blocks */
@@ -152,13 +151,8 @@ do_depth_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		if (!level)
-			printf(" - FBO incomplete\n");
 		glDeleteFramebuffersEXT(1, &fb);
 		return false;
-	} else {
-		if (!level)
-			printf("\n");
 	}
 
 	glEnable(GL_SCISSOR_TEST);
@@ -176,6 +170,55 @@ do_depth_clear(GLenum format, GLuint tex, int level, int size)
 
 	glDrawBuffer(draw_buffer);
 	glReadBuffer(read_buffer);
+
+	return true;
+}
+
+static bool
+do_stencil_clear(GLenum format, GLuint tex, int level, int size)
+{
+	GLuint fb;
+	GLenum status;
+	GLint draw_buffer, read_buffer;
+	int x;
+
+	glGetIntegerv(GL_DRAW_BUFFER, &draw_buffer);
+	glGetIntegerv(GL_READ_BUFFER, &read_buffer);
+
+	glGenFramebuffersEXT(1, &fb);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				  GL_STENCIL_ATTACHMENT_EXT,
+				  GL_TEXTURE_2D,
+				  tex,
+				  level);
+
+	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		glDeleteFramebuffersEXT(1, &fb);
+		return false;
+	}
+
+	glEnable(GL_SCISSOR_TEST);
+
+	for (x = 0; x < size; x++) {
+		unsigned val = ((x + 0.5) / (size)) * 0xff;
+		glScissor(x, 0, 1, size);
+		glClearStencil(val);
+		glClear(GL_STENCIL_BUFFER_BIT);
+	}
+
+	glDisable(GL_SCISSOR_TEST);
+
+	glDeleteFramebuffersEXT(1, &fb);
+
+	glDrawBuffer(draw_buffer);
+	glReadBuffer(read_buffer);
+	assert(glGetError() == 0);
 
 	return true;
 }
@@ -220,8 +263,13 @@ create_tex(GLenum internalformat, GLenum baseformat)
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, level);
 
-		if (baseformat == GL_DEPTH_COMPONENT ||
-		    baseformat == GL_DEPTH_STENCIL) {
+		if (clear_stencil) {
+			if (!do_stencil_clear(format, tex, level, dim)) {
+				glDeleteTextures(1, &tex);
+				return 0;
+			}
+		} else if (baseformat == GL_DEPTH_COMPONENT ||
+			   baseformat == GL_DEPTH_STENCIL) {
 			if (!do_depth_clear(format, tex, level, dim)) {
 				glDeleteTextures(1, &tex);
 				return 0;
@@ -244,9 +292,6 @@ create_tex(GLenum internalformat, GLenum baseformat)
 static void
 draw_mipmap(int x, int y, int dim)
 {
-	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
@@ -256,6 +301,51 @@ draw_mipmap(int x, int y, int dim)
 			     0, 0, 1, 1);
 
 	glDisable(GL_TEXTURE_2D);
+}
+
+static void
+draw_stencil_mipmap(int x, int y, int dim, GLuint tex, GLuint level)
+{
+	GLuint fbo;
+	GLint draw_buffer, read_buffer;
+
+	glGetIntegerv(GL_DRAW_BUFFER, &draw_buffer);
+	glGetIntegerv(GL_READ_BUFFER, &read_buffer);
+
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+			       GL_TEXTURE_2D, tex, level);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, dim, dim, x, y, x+dim, y+dim,
+			  GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
+
+	glDrawBuffer(draw_buffer);
+	glReadBuffer(read_buffer);
+
+	assert(glGetError() == 0);
+}
+
+static void
+visualize_stencil()
+{
+	unsigned i;
+
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	for (i = 0; i <= 0xff; i++) {
+		glStencilFunc(GL_EQUAL, i, ~0);
+		glColor4ub(i, i, i, 255);
+		piglit_draw_rect(0, 0, piglit_width, piglit_height);
+	}
+	glDisable(GL_STENCIL_TEST);
+	glColor4ub(255, 255, 255, 255);
 }
 
 static GLboolean
@@ -414,16 +504,40 @@ test_format(const struct format_desc *format)
 	GLboolean pass = GL_TRUE;
 
 	printf("Testing %s", format->name);
-	tex = create_tex(format->internalformat, format->base_internal_format);
 
-	if (tex == 0)
+	if (clear_stencil && format->base_internal_format != GL_DEPTH_STENCIL) {
+		printf(" - no stencil.\n");
 		return PIGLIT_SKIP;
+	}
+
+	tex = create_tex(format->internalformat, format->base_internal_format);
+	if (tex == 0) {
+		printf(" - FBO incomplete\n");
+		return PIGLIT_SKIP;
+	}
+	printf("\n");
+
+	if (clear_stencil) {
+		glClearStencil(0x0);
+		glClear(GL_STENCIL_BUFFER_BIT);
+	}
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	x = 1;
+	level = 0;
 	for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
-		draw_mipmap(x, 1, dim);
+		if (clear_stencil)
+			draw_stencil_mipmap(x, 1, dim, tex, level);
+		else
+			draw_mipmap(x, 1, dim);
 		x += dim + 1;
+		level++;
 	}
+
+	if (clear_stencil)
+		visualize_stencil();
 
 	x = 1;
 	level = 0;
@@ -446,5 +560,11 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	fbo_formats_init(argc, argv, GL_TRUE);
+	if (argc == 3 && strcmp(argv[2], "stencil") == 0)
+		clear_stencil = true;
+
+	if (clear_stencil)
+		piglit_require_extension("GL_ARB_framebuffer_object");
+
+	fbo_formats_init(clear_stencil ? 2 : argc, argv, GL_TRUE);
 }

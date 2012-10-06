@@ -1185,6 +1185,7 @@ for texture_size in (146, 292, 585, 1024):
                 test_name = 'depthstencil-render-miplevels {0} {1}'.format(
                         texture_size, test_type)
                 arb_depth_buffer_float[test_name] = PlainExecTest(test_name + ' -auto')
+arb_depth_buffer_float['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_ARB_depth_buffer_float', 'stencil', '-auto'])
 
 arb_texture_env_crossbar = Group()
 spec['ARB_texture_env_crossbar'] = arb_texture_env_crossbar
@@ -1581,6 +1582,7 @@ for texture_size in (146, 292, 585, 1024):
                 test_name = 'depthstencil-render-miplevels {0} {1}'.format(
                         texture_size, test_type)
                 ext_packed_depth_stencil[test_name] = PlainExecTest(test_name + ' -auto')
+ext_packed_depth_stencil['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_EXT_packed_depth_stencil', 'stencil', '-auto'])
 
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
