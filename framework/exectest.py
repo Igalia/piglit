@@ -51,35 +51,13 @@ class ExecTest(Test):
 
 		if self.command is not None:
 			command = self.command
-			returncode = None
 
 			if valgrind:
 				command[:0] = ['valgrind', '--quiet', '--error-exitcode=1', '--tool=memcheck']
 
 			i = 0
 			while True:
-				try:
-					proc = subprocess.Popen(
-						command,
-						stdout=subprocess.PIPE,
-						stderr=subprocess.PIPE,
-						env=fullenv,
-						universal_newlines=True
-						)
-					out, err = proc.communicate()
-					returncode = proc.returncode
-				except OSError as e:
-					# Different sets of tests get built under
-					# different build configurations.  If
-					# a developer chooses to not build a test,
-					# Piglit should not report that test as having
-					# failed.
-					if e.strerror == "No such file or directory":
-						out = "PIGLIT: {'result': 'skip'}\n" \
-						    + "Test executable not found: {0}\n".format(command[0])
-						err = ""
-                                        else:
-                                            raise e
+				(out, err, returncode) = self.get_command_result(command, fullenv)
 
 				# https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
 				# affecting many developers.  If we catch it
@@ -164,6 +142,31 @@ class ExecTest(Test):
 		return results
 
 
+	def get_command_result(self, command, fullenv):
+		try:
+			proc = subprocess.Popen(
+				command,
+				stdout=subprocess.PIPE,
+				stderr=subprocess.PIPE,
+				env=fullenv,
+				universal_newlines=True
+				)
+			out, err = proc.communicate()
+			returncode = proc.returncode
+		except OSError as e:
+			# Different sets of tests get built under
+			# different build configurations.  If
+			# a developer chooses to not build a test,
+			# Piglit should not report that test as having
+			# failed.
+			if e.strerror == "No such file or directory":
+				out = "PIGLIT: {'result': 'skip'}\n" \
+				    + "Test executable not found.\n"
+				err = ""
+				returncode = None
+			else:
+				raise e
+		return out, err, returncode
 
 #############################################################################
 ##### PlainExecTest: Run a "native" piglit test executable
