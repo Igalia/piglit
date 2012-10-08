@@ -35,3 +35,4 @@ create_context['invalid flag GLES'] = plain_test('egl-create-context-invalid-fla
 create_context['invalid flag GL'] = plain_test('egl-create-context-invalid-flag-gl')
 create_context['valid forward-compatible flag GL'] = plain_test('egl-create-context-valid-flag-forward-compatible-gl')
 create_context['invalid profile'] = plain_test('egl-create-context-invalid-profile')
+create_context['3.2 core profile required'] = plain_test('egl-create-context-core-profile')
