@@ -166,6 +166,8 @@ class ExecTest(Test):
 		if PIGLIT_PLATFORM == 'gbm':
 			if 'glean' == self.split_command:
 				return True
+			if self.split_command.startswith('glx-'):
+				return True
 		return False
 
 	def get_command_result(self, command, fullenv):
