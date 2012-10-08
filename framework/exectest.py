@@ -43,6 +43,7 @@ class ExecTest(Test):
 	def __init__(self, command):
 		Test.__init__(self)
 		self.command = command
+		self.split_command = os.path.split(self.command[0])[1]
 		self.env = {}
 
 		if isinstance(self.command, basestring):
@@ -161,6 +162,10 @@ class ExecTest(Test):
 		return results
 
 	def check_for_skip_scenario(self, command):
+		global PIGLIT_PLATFORM
+		if PIGLIT_PLATFORM == 'gbm':
+			if 'glean' == self.split_command:
+				return True
 		return False
 
 	def get_command_result(self, command, fullenv):
