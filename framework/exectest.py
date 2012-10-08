@@ -28,6 +28,14 @@ import types
 from core import Test, testBinDir, TestResult
 
 #############################################################################
+##### Platform global variables
+#############################################################################
+if 'PIGLIT_PLATFORM' in os.environ:
+    PIGLIT_PLATFORM = os.environ['PIGLIT_PLATFORM']
+else:
+    PIGLIT_PLATFORM = ''
+
+#############################################################################
 ##### ExecTest: A shared base class for tests that simply run an executable.
 #############################################################################
 
