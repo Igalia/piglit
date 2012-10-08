@@ -155,7 +155,6 @@ draw_and_test(const char *destination, int drawable_width, int drawable_height)
 	int start_x, start_y;
 	struct probes probes;
 	GLboolean pass = GL_TRUE;
-	GLenum error;
 
 	memset(&probes, 0, sizeof(probes));
 

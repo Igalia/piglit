@@ -155,7 +155,6 @@ run_test(void)
 	int y0 = PAD;
 	int y1 = PAD * 2 + SIZE;
 	int y2 = PAD * 3 + SIZE * 2;
-	GLenum err;
 	GLint win_depth_bits, fbo_depth_bits, win_stencil_bits, fbo_stencil_bits;
 
 	glViewport(0, 0, piglit_width, piglit_height);

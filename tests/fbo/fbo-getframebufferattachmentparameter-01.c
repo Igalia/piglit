@@ -80,7 +80,6 @@ piglit_init(int argc, char **argv)
 	GLuint tex;
 	GLuint fb;
 	GLenum status;
-	GLenum err;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 

@@ -52,7 +52,6 @@ piglit_init(int argc, char **argv)
 	GLuint tex;
 	GLuint fb;
 	GLenum status;
-	GLenum err;
 	const float color[] = {1.0,0.0,0.0,1.0};
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

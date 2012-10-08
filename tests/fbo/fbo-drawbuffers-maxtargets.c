@@ -83,7 +83,7 @@ static void
 generate_and_display_drawbuffers(int count)
 {
 	GLuint tex[16], fb, fs, vs, prog;
-	GLenum attachments[16], status, error;
+	GLenum attachments[16], status;
 	char *fs_count_source;
 	int i;
 
