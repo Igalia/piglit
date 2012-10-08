@@ -69,7 +69,7 @@ void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result)
 	/* Print the expected error, but only if an error was really expected. */
 	if (expected_error != EGL_SUCCESS) {
 		printf("Expected EGL error: %s 0x%x\n",
-		piglit_get_gl_error_name(expected_error), expected_error);
+		piglit_get_egl_error_name(expected_error), expected_error);
         }
 
 	piglit_report_result(result);
