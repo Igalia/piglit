@@ -405,6 +405,7 @@ class Test:
 			(i.e. the main thread) or from the ConcurrentTestPool threads.
 		'''
 		self.runConcurrent = runConcurrent
+		self.skip_test = False
 
 	def run(self):
 		raise NotImplementedError

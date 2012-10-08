@@ -40,6 +40,8 @@ class ExecTest(Test):
 		if isinstance(self.command, basestring):
 			self.command = shlex.split(str(self.command))
 
+		self.skip_test = self.check_for_skip_scenario(command)
+
 	def interpretResult(self, out, results):
 		raise NotImplementedError
 		return out
@@ -57,7 +59,13 @@ class ExecTest(Test):
 
 			i = 0
 			while True:
-				(out, err, returncode) = self.get_command_result(command, fullenv)
+				if self.skip_test:
+					out = "PIGLIT: {'result': 'skip'}\n"
+					err = ""
+					returncode = None
+				else:
+					(out, err, returncode) = \
+						self.get_command_result(command, fullenv)
 
 				# https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
 				# affecting many developers.  If we catch it
@@ -88,8 +96,11 @@ class ExecTest(Test):
 
 			results = TestResult()
 
-			results['result'] = 'fail'
-			out = self.interpretResult(out, results)
+			if self.skip_test:
+				results['result'] = 'skip'
+			else:
+				results['result'] = 'fail'
+				out = self.interpretResult(out, results)
 
 			crash_codes = [
 				# Unix: terminated by a signal
@@ -141,6 +152,8 @@ class ExecTest(Test):
 
 		return results
 
+	def check_for_skip_scenario(self, command):
+		return False
 
 	def get_command_result(self, command, fullenv):
 		try:
