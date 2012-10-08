@@ -60,7 +60,6 @@ piglit_init(int argc, char **argv)
 	GLuint tex;
 	GLuint fb;
 	GLenum status;
-	GLenum err;
 	bool pass;
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
