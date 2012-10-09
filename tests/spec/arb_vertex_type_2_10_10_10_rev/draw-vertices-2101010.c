@@ -211,6 +211,7 @@ piglit_display(void)
 
     glClear(GL_COLOR_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
+    glColor4f(1,1,1,1);
 
     for (i = 0; tests[i].test; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
