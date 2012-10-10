@@ -126,7 +126,6 @@ piglit_cl_test(const int argc,
 
 
 	// TODO: test callback
-	// TODO: test build options
 
 	/*** Errors ***/
 
