@@ -98,6 +98,7 @@ add_plain_program_tester_test(program_build, 'Scalar operators',  'build/scalar-
 add_plain_program_tester_test(program_build, 'Vector operators',  'build/vector-operators.cl')
 add_plain_program_tester_test(program_build, 'Scalar and vector operators',  'build/scalar-and-vector-operators.cl')
 add_plain_program_tester_test(program_build, 'Macro Definitions', 'build/macro-definitions.cl')
+add_plain_program_tester_test(program_build, 'Macro definitions with values', 'build/macro-definitions-with-values.cl')
 add_plain_program_tester_test(program_build_fail, 'Increment operator on float',  'build/fail/increment-float.cl')
 add_plain_program_tester_test(program_build_fail, 'Add different size vector',  'build/fail/add-different-size-vector.cl')
 #   Execute
