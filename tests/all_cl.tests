@@ -106,6 +106,7 @@ add_plain_program_tester_test(program_build, 'Optimization Options', 'build/opti
 add_plain_program_tester_test(program_build, 'Disable Warnings', 'build/disable-warnings.cl')
 add_plain_program_tester_test(program_build, 'CL Version Declaration', 'build/version-declaration.cl')
 add_plain_program_tester_test(program_build_fail, 'Treat warnings as errors', 'build/fail/warnings-as-errors.cl')
+add_plain_program_tester_test(program_build_fail, 'Invalid CL Version Declaration', 'build/fail/invalid-version-declaration.cl')
 add_plain_program_tester_test(program_build_fail, 'Increment operator on float',  'build/fail/increment-float.cl')
 add_plain_program_tester_test(program_build_fail, 'Add different size vector',  'build/fail/add-different-size-vector.cl')
 #   Execute
