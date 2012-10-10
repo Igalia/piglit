@@ -101,6 +101,7 @@ add_plain_program_tester_test(program_build, 'Macro Definitions', 'build/macro-d
 add_plain_program_tester_test(program_build, 'Macro definitions with values', 'build/macro-definitions-with-values.cl')
 add_plain_program_tester_test(program_build, 'Mixed macro definitions', 'build/mixed-macro-definitions.cl')
 add_plain_program_tester_test(program_build, 'Include Directories', 'build/include-directories.cl')
+add_plain_program_tester_test(program_build, 'Math Intrinsics', 'build/math-intrinsics.cl')
 add_plain_program_tester_test(program_build_fail, 'Increment operator on float',  'build/fail/increment-float.cl')
 add_plain_program_tester_test(program_build_fail, 'Add different size vector',  'build/fail/add-different-size-vector.cl')
 #   Execute
