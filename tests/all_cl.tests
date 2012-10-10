@@ -104,6 +104,7 @@ add_plain_program_tester_test(program_build, 'Include Directories', 'build/inclu
 add_plain_program_tester_test(program_build, 'Math Intrinsics', 'build/math-intrinsics.cl')
 add_plain_program_tester_test(program_build, 'Optimization Options', 'build/optimization-options.cl')
 add_plain_program_tester_test(program_build, 'Disable Warnings', 'build/disable-warnings.cl')
+add_plain_program_tester_test(program_build, 'CL Version Declaration', 'build/version-declaration.cl')
 add_plain_program_tester_test(program_build_fail, 'Increment operator on float',  'build/fail/increment-float.cl')
 add_plain_program_tester_test(program_build_fail, 'Add different size vector',  'build/fail/add-different-size-vector.cl')
 #   Execute
