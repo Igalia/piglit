@@ -22,6 +22,8 @@
  */
 
 #pragma once
+#ifndef PIGLIT_GL_FRAMEWORK_H
+#define PIGLIT_GL_FRAMEWORK_H
 
 #include <stdbool.h>
 
@@ -80,3 +82,5 @@ piglit_gl_framework_init(struct piglit_gl_framework *gl_fw,
 
 void
 piglit_gl_framework_teardown(struct piglit_gl_framework *gl_fw);
+
+#endif /* PIGLIT_GL_FRAMEWORK_H */
