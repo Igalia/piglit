@@ -474,6 +474,14 @@ def generate_resolve_function(ds):
 
 	condition_code_pairs.append((condition, code))
 
+    # XXX: glDraw{Arrays,Elements}InstancedARB are exposed by
+    # ARB_instanced_arrays in addition to ARB_draw_instanced, but neither
+    # gl.spec nor gl.json can accomodate an extension with two categories, so
+    # insert these cases here.
+	if f.gl_name in ('glDrawArraysInstancedARB', 'glDrawElementsInstancedARB'):
+	    condition = 'check_extension("GL_ARB_instanced_arrays")'
+	    condition_code_pairs.append((condition, code))
+
     # Finally, if none of the previous conditions were satisfied, then
     # the given dispatch set is not supported by the implementation,
     # so we want to call the unsupported() function.
