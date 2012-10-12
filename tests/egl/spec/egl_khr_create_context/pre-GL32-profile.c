@@ -46,9 +46,6 @@ static bool try_version(int major, int minor)
 		EGL_CONTEXT_MINOR_VERSION_KHR,
 		minor,
 
-		EGL_CONTEXT_OPENGL_PROFILE_MASK_KHR,
-		EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT_KHR,
-
 		EGL_NONE
 	};
 
