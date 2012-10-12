@@ -145,8 +145,7 @@ int main(int argc, char **argv)
 	if (got_core_with_profile != got_core_without_profile) {
 		fprintf(stderr,
 			"Core profile context was created %s profile mask "
-			"but not\n"
-			"%s profile mask.\n",
+			"but not %s profile mask.\n",
 			got_core_with_profile ? "with" : "without",
 			got_core_with_profile ? "without" : "with");
 		pass = false;
