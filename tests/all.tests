@@ -668,33 +668,33 @@ import_context['query context info'] = PlainExecTest(['glx-query-context-info-ex
 
 create_context = Group();
 glx['GLX_ARB_create_context'] = create_context
-create_context['default major version'] = PlainExecTest(['glx-create-context-default-major-version'])
-create_context['default minor version'] = PlainExecTest(['glx-create-context-default-minor-version'])
-create_context['invalid attribute'] = PlainExecTest(['glx-create-context-invalid-attribute'])
-create_context['invalid flag'] = PlainExecTest(['glx-create-context-invalid-flag'])
-create_context['forward-compatible flag with pre-3.0'] = PlainExecTest(['glx-create-context-invalid-flag-forward-compatible'])
-create_context['invalid OpenGL version'] = PlainExecTest(['glx-create-context-invalid-gl-version'])
-create_context['invalid render type'] = PlainExecTest(['glx-create-context-invalid-render-type'])
-create_context['color-index render type with 3.0'] = PlainExecTest(['glx-create-context-invalid-render-type-color-index'])
-create_context['empty attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-empty'])
-create_context['NULL attribute list'] = PlainExecTest(['glx-create-context-valid-attribute-null'])
-create_context['forward-compatible flag with 3.0'] = PlainExecTest(['glx-create-context-valid-flag-forward-compatible'])
+create_context['default major version'] = concurrent_test('glx-create-context-default-major-version')
+create_context['default minor version'] = concurrent_test('glx-create-context-default-minor-version')
+create_context['invalid attribute'] = concurrent_test('glx-create-context-invalid-attribute')
+create_context['invalid flag'] = concurrent_test('glx-create-context-invalid-flag')
+create_context['forward-compatible flag with pre-3.0'] = concurrent_test('glx-create-context-invalid-flag-forward-compatible')
+create_context['invalid OpenGL version'] = concurrent_test('glx-create-context-invalid-gl-version')
+create_context['invalid render type'] = concurrent_test('glx-create-context-invalid-render-type')
+create_context['color-index render type with 3.0'] = concurrent_test('glx-create-context-invalid-render-type-color-index')
+create_context['empty attribute list'] = concurrent_test('glx-create-context-valid-attribute-empty')
+create_context['NULL attribute list'] = concurrent_test('glx-create-context-valid-attribute-null')
+create_context['forward-compatible flag with 3.0'] = concurrent_test('glx-create-context-valid-flag-forward-compatible')
 
 create_context_profile = Group();
 glx['GLX_ARB_create_context_profile'] = create_context_profile
-create_context_profile['3.2 core profile required'] = PlainExecTest(['glx-create-context-core-profile'])
-create_context_profile['invalid profile'] = PlainExecTest(['glx-create-context-invalid-profile'])
-create_context_profile['pre-GL3.2 profile'] = PlainExecTest(['glx-create-context-pre-GL32-profile'])
+create_context_profile['3.2 core profile required'] = concurrent_test('glx-create-context-core-profile')
+create_context_profile['invalid profile'] = concurrent_test('glx-create-context-invalid-profile')
+create_context_profile['pre-GL3.2 profile'] = concurrent_test('glx-create-context-pre-GL32-profile')
 
 create_context_robustness = Group();
 glx['GLX_ARB_create_context_robustness'] = create_context_robustness
-create_context_robustness['invalid reset notification strategy'] = PlainExecTest(['glx-create-context-invalid-reset-strategy'])
-create_context_robustness['require GL_ARB_robustness'] = PlainExecTest(['glx-create-context-require-robustness'])
+create_context_robustness['invalid reset notification strategy'] = concurrent_test('glx-create-context-invalid-reset-strategy')
+create_context_robustness['require GL_ARB_robustness'] = concurrent_test('glx-create-context-require-robustness')
 
 create_context_es2_profile = Group();
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
-create_context_es2_profile['indirect rendering ES2 profile'] = PlainExecTest(['glx-create-context-indirect-es2-profile'])
-create_context_es2_profile['invalid OpenGL ES version'] = PlainExecTest(['glx-create-context-invalid-es-version'])
+create_context_es2_profile['indirect rendering ES2 profile'] = concurrent_test('glx-create-context-indirect-es2-profile')
+create_context_es2_profile['invalid OpenGL ES version'] = concurrent_test('glx-create-context-invalid-es-version')
 
 texturing = Group()
 add_concurrent_test(texturing, '1-1-linear-texture')
