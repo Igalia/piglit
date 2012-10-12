@@ -47,9 +47,6 @@ static bool try_version(int major, int minor)
 		GLX_CONTEXT_MINOR_VERSION_ARB,
 		minor,
 
-		GLX_CONTEXT_PROFILE_MASK_ARB,
-		GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-
 		None
 	};
 
