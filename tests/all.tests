@@ -684,7 +684,7 @@ create_context_profile = Group();
 glx['GLX_ARB_create_context_profile'] = create_context_profile
 create_context_profile['3.2 core profile required'] = PlainExecTest(['glx-create-context-core-profile'])
 create_context_profile['invalid profile'] = PlainExecTest(['glx-create-context-invalid-profile'])
-create_context_profile['pre-GL3 profile'] = PlainExecTest(['glx-create-context-pre-GL3-profile'])
+create_context_profile['pre-GL3.2 profile'] = PlainExecTest(['glx-create-context-pre-GL32-profile'])
 
 create_context_robustness = Group();
 glx['GLX_ARB_create_context_robustness'] = create_context_robustness
