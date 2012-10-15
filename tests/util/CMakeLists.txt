@@ -47,7 +47,7 @@ endif()
 
 set(UTIL_GL_LIBS
 	piglitutil
-        ${WAFFLE_LIBRARIES}
+        ${WAFFLE_LDFLAGS}
 	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
