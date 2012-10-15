@@ -97,9 +97,9 @@
 #define FORMAT(f) #f, f
 
 enum {
-	FLOAT,
-	INT,
-	UINT
+	FLOAT_TYPE,
+	INT_TYPE,
+	UINT_TYPE
 };
 
 struct format_desc {
@@ -224,47 +224,47 @@ static const struct format_desc arb_texture_float[] = {
 };
 
 static const struct format_desc ext_texture_integer[] = {
-	{FORMAT(GL_RGB8I),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_RGBA8I),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_ALPHA8I_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE8I_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE_ALPHA8I_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_INTENSITY8I_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, INT},
+	{FORMAT(GL_RGB8I),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_RGBA8I),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_ALPHA8I_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE8I_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA8I_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_INTENSITY8I_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB16I),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, INT},
-	{FORMAT(GL_RGBA16I),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, INT},
-	{FORMAT(GL_ALPHA16I_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE16I_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE_ALPHA16I_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, INT},
-	{FORMAT(GL_INTENSITY16I_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, INT},
+	{FORMAT(GL_RGB16I),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
+	{FORMAT(GL_RGBA16I),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, INT_TYPE},
+	{FORMAT(GL_ALPHA16I_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE16I_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA16I_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, INT_TYPE},
+	{FORMAT(GL_INTENSITY16I_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB32I),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, INT},
-	{FORMAT(GL_RGBA32I),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, INT},
-	{FORMAT(GL_ALPHA32I_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE32I_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_LUMINANCE_ALPHA32I_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, INT},
-	{FORMAT(GL_INTENSITY32I_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, INT},
+	{FORMAT(GL_RGB32I),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, INT_TYPE},
+	{FORMAT(GL_RGBA32I),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, INT_TYPE},
+	{FORMAT(GL_ALPHA32I_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE32I_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA32I_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, INT_TYPE},
+	{FORMAT(GL_INTENSITY32I_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, INT_TYPE},
 
-	{FORMAT(GL_RGB8UI),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_RGBA8UI),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_ALPHA8UI_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE8UI_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE_ALPHA8UI_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_INTENSITY8UI_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, UINT},
+	{FORMAT(GL_RGB8UI),              8, 8, 8, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_RGBA8UI),             8, 8, 8, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_ALPHA8UI_EXT),            0, 0, 0, 8, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE8UI_EXT),        0, 0, 0, 0, 8, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA8UI_EXT),  0, 0, 0, 8, 8, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_INTENSITY8UI_EXT),        0, 0, 0, 0, 0, 8, 0, 0,    0, 0, UINT_TYPE},
 
-	{FORMAT(GL_RGB16UI),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, UINT},
-	{FORMAT(GL_RGBA16UI),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, UINT},
-	{FORMAT(GL_ALPHA16UI_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE16UI_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE_ALPHA16UI_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, UINT},
-	{FORMAT(GL_INTENSITY16UI_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, UINT},
+	{FORMAT(GL_RGB16UI),             16, 16, 16, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
+	{FORMAT(GL_RGBA16UI),            16, 16, 16, 16, 0, 0, 0, 0, 0, 0, UINT_TYPE},
+	{FORMAT(GL_ALPHA16UI_EXT),           0, 0, 0, 16, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE16UI_EXT),       0, 0, 0, 0, 16, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA16UI_EXT), 0, 0, 0, 16, 16, 0, 0, 0,   0, 0, UINT_TYPE},
+	{FORMAT(GL_INTENSITY16UI_EXT),       0, 0, 0, 0, 0, 16, 0, 0,    0, 0, UINT_TYPE},
 
-	{FORMAT(GL_RGB32UI),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, UINT},
-	{FORMAT(GL_RGBA32UI),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, UINT},
-	{FORMAT(GL_ALPHA32UI_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE32UI_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_LUMINANCE_ALPHA32UI_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, UINT},
-	{FORMAT(GL_INTENSITY32UI_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, UINT},
+	{FORMAT(GL_RGB32UI),             32, 32, 32, 0, 0, 0, 0, 0,  0, 0, UINT_TYPE},
+	{FORMAT(GL_RGBA32UI),            32, 32, 32, 32, 0, 0, 0, 0, 0, 0, UINT_TYPE},
+	{FORMAT(GL_ALPHA32UI_EXT),           0, 0, 0, 32, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE32UI_EXT),       0, 0, 0, 0, 32, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_LUMINANCE_ALPHA32UI_EXT), 0, 0, 0, 32, 32, 0, 0, 0,   0, 0, UINT_TYPE},
+	{FORMAT(GL_INTENSITY32UI_EXT),       0, 0, 0, 0, 0, 32, 0, 0,    0, 0, UINT_TYPE},
 };
 
 static const struct format_desc arb_texture_rg[] = {
@@ -282,18 +282,18 @@ static const struct format_desc arb_texture_rg_float[] = {
 };
 
 static const struct format_desc arb_texture_rg_int[] = {
-	{FORMAT(GL_R8I),                8, 0, 0, 0, 0, 0, 0, 0,     0, 0, INT},
-	{FORMAT(GL_RG8I),               8, 8, 0, 0, 0, 0, 0, 0,     0, 0, INT},
-	{FORMAT(GL_R16I),               16, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_RG16I),              16, 16, 0, 0, 0, 0, 0, 0,   0, 0, INT},
-	{FORMAT(GL_R32I),               32, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT},
-	{FORMAT(GL_RG32I),              32, 32, 0, 0, 0, 0, 0, 0,   0, 0, INT},
-	{FORMAT(GL_R8UI),               8, 0, 0, 0, 0, 0, 0, 0,     0, 0, UINT},
-	{FORMAT(GL_RG8UI),              8, 8, 0, 0, 0, 0, 0, 0,     0, 0, UINT},
-	{FORMAT(GL_R16UI),              16, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_RG16UI),             16, 16, 0, 0, 0, 0, 0, 0,   0, 0, UINT},
-	{FORMAT(GL_R32UI),              32, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT},
-	{FORMAT(GL_RG32UI),             32, 32, 0, 0, 0, 0, 0, 0,   0, 0, UINT},
+	{FORMAT(GL_R8I),                8, 0, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
+	{FORMAT(GL_RG8I),               8, 8, 0, 0, 0, 0, 0, 0,     0, 0, INT_TYPE},
+	{FORMAT(GL_R16I),               16, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_RG16I),              16, 16, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
+	{FORMAT(GL_R32I),               32, 0, 0, 0, 0, 0, 0, 0,    0, 0, INT_TYPE},
+	{FORMAT(GL_RG32I),              32, 32, 0, 0, 0, 0, 0, 0,   0, 0, INT_TYPE},
+	{FORMAT(GL_R8UI),               8, 0, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
+	{FORMAT(GL_RG8UI),              8, 8, 0, 0, 0, 0, 0, 0,     0, 0, UINT_TYPE},
+	{FORMAT(GL_R16UI),              16, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_RG16UI),             16, 16, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
+	{FORMAT(GL_R32UI),              32, 0, 0, 0, 0, 0, 0, 0,    0, 0, UINT_TYPE},
+	{FORMAT(GL_RG32UI),             32, 32, 0, 0, 0, 0, 0, 0,   0, 0, UINT_TYPE},
 };
 
 static const struct format_desc ext_packed_float[] = {
@@ -339,7 +339,7 @@ static const struct format_desc arb_es2_compatibility[] = {
 };
 
 static const struct format_desc arb_texture_rgb10_a2ui[] = {
-	{FORMAT(GL_RGB10_A2UI),           10, 10, 10, 2, 0, 0, 0, 0,  0, 0, UINT},
+	{FORMAT(GL_RGB10_A2UI),           10, 10, 10, 2, 0, 0, 0, 0,  0, 0, UINT_TYPE},
 };
 
 static const struct test_desc test_sets[] = {
@@ -734,17 +734,17 @@ static void sample_nearest(int x, int y, int z,
 
 	/* Final conversion. */
 	switch (format->type) {
-	case FLOAT:
+	case FLOAT_TYPE:
 		for (i = 0; i < 4; i++) {
 			pixel[i] = result[i] * 255.1;
 		}
 		break;
-	case INT:
+	case INT_TYPE:
 		for (i = 0; i < 4; i++) {
 			pixel[i] = iresult[i] * (255.1 / ((1ull << (bits-1))-1));
 		}
 		break;
-	case UINT:
+	case UINT_TYPE:
 		for (i = 0; i < 4; i++) {
 			pixel[i] = uiresult[i] * (255.1 / ((1ull << bits)-1));
 		}
@@ -815,7 +815,7 @@ static void draw(const struct format_desc *format,
 {
 	unsigned i, j;
 	int offset;
-	int num_filters = format->type == FLOAT ? 2 : 1;
+	int num_filters = format->type == FLOAT_TYPE ? 2 : 1;
 	int bits = get_int_format_bits(format);
 	float scale[4];
 
@@ -823,12 +823,12 @@ static void draw(const struct format_desc *format,
 	glBindTexture(texture_target, texture_id);
 
 	switch (format->type) {
-	case INT:
+	case INT_TYPE:
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << (bits-1))-1);
 		piglit_UseProgram(prog_int);
 		piglit_Uniform4fv(int_scale_loc, 1, scale);
 		break;
-	case UINT:
+	case UINT_TYPE:
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << bits)-1);
 		if (bits == 10) {
 			scale[3] = 1.0/3;
@@ -933,8 +933,8 @@ static void draw(const struct format_desc *format,
 	}
 
 	switch (format->type) {
-	case INT:
-	case UINT:
+	case INT_TYPE:
+	case UINT_TYPE:
 		piglit_UseProgram(0);
 		break;
 	default:;
@@ -965,7 +965,7 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 	unsigned i, j;
 	unsigned char *pixels;
 	GLboolean pass = GL_TRUE;
-	int num_filters = format->type == FLOAT ? 2 : 1;
+	int num_filters = format->type == FLOAT_TYPE ? 2 : 1;
 	int bits = get_int_format_bits(format);
 
 	pixels = malloc(piglit_width * piglit_height * 4);
@@ -1262,7 +1262,7 @@ static void get_int_border_color(const struct format_desc *format,
 	int bits = get_int_format_bits(format);
 	unsigned *uresult = (unsigned*)iresult;
 
-	if (format->type == INT) {
+	if (format->type == INT_TYPE) {
 		for (i = 0; i < 4; i++) {
 			iresult[i] = border[i] * (double)((1ull << (bits-1))-1);
 		}
@@ -1343,7 +1343,7 @@ static void init_int_texture(const struct format_desc *format,
 	int *red, *cyan, *blue, *orange, *white, *black;
 
 	switch (format->type) {
-	case INT:
+	case INT_TYPE:
 		switch (bits) {
 		case 8:
 			colors = i8colors;
@@ -1356,7 +1356,7 @@ static void init_int_texture(const struct format_desc *format,
 			break;
 		}
 		break;
-	case UINT:
+	case UINT_TYPE:
 		switch (bits) {
 		case 10:
 			colors = (int**)ui1010102colors;
@@ -1468,11 +1468,11 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 {
 	int x, y, z;
 	GLenum baseformat = format->depth ? (format->stencil ? GL_DEPTH_STENCIL : GL_DEPTH_COMPONENT) :
-			    format->type == FLOAT ? GL_RGBA : GL_RGBA_INTEGER;
+			    format->type == FLOAT_TYPE ? GL_RGBA : GL_RGBA_INTEGER;
 	GLenum type = format->internalformat == GL_DEPTH24_STENCIL8 ? GL_UNSIGNED_INT_24_8 :
 		      format->internalformat == GL_DEPTH32F_STENCIL8 ? GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
-		      format->type == FLOAT ? GL_FLOAT :
-		      format->type == INT ? GL_INT : GL_UNSIGNED_INT;
+		      format->type == FLOAT_TYPE ? GL_FLOAT :
+		      format->type == INT_TYPE ? GL_INT : GL_UNSIGNED_INT;
 	float *data;
 	unsigned real_size_x, real_size_y;
 	int int_border[4];
@@ -1489,7 +1489,7 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 		size_x = TEXTURE_SIZE(npot);
 	}
 
-	if (format->type == FLOAT) {
+	if (format->type == FLOAT_TYPE) {
 		init_float_texture(format, image, border, border_real);
 	} else {
 		get_int_border_color(format, border, int_border);
@@ -1582,13 +1582,13 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 
 	glBindTexture(texture_target, texture_id);
 	switch (format->type) {
-	case FLOAT:
+	case FLOAT_TYPE:
 		glTexParameterfv(texture_target, GL_TEXTURE_BORDER_COLOR, border);
 		break;
-	case INT:
+	case INT_TYPE:
 		glTexParameterIivEXT(texture_target, GL_TEXTURE_BORDER_COLOR, int_border);
 		break;
-	case UINT:
+	case UINT_TYPE:
 		glTexParameterIuivEXT(texture_target, GL_TEXTURE_BORDER_COLOR, (unsigned*)int_border);
 		break;
 	}
@@ -1758,8 +1758,8 @@ outer_continue:;
 	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE);
 
 	switch (test->format[0].type) {
-	case INT:
-	case UINT:
+	case INT_TYPE:
+	case UINT_TYPE:
 		piglit_require_GLSL_version(130);
 		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_int);
 		assert(fp);
