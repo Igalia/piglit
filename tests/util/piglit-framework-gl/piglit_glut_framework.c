@@ -96,8 +96,8 @@ static void
 init_glut(void)
 {
 	const struct piglit_gl_test_config *test_config = glut_fw.gl_fw.test_config;
-	char *argv[] = {0};
-	int argc = 0;
+	char *argv[] = {"piglit"};
+	int argc = 1;
 
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
