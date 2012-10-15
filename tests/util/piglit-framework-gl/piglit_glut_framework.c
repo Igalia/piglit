@@ -57,7 +57,7 @@ display(void)
 	const struct piglit_gl_test_config *test_config = glut_fw.gl_fw.test_config;
 
 	if (test_config->display)
-		test_config->display();
+		glut_fw.result = test_config->display();
 
 	if (piglit_automatic) {
 		glutDestroyWindow(glut_fw.window);
