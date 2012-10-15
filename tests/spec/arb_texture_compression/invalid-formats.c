@@ -344,7 +344,9 @@ piglit_init(int argc, char **argv)
 
 		printf("Driver reported the following compressed formats:\n");
 		for (i = 0; i < num_compressed_formats; i++) {
-			printf("    0x%04x\n", compressed_formats[i]);
+			printf("    0x%04x: %s\n",
+			       compressed_formats[i],
+			       piglit_get_gl_enum_name(compressed_formats[i]));
 		}
 		printf("\n");
 		fflush(stdout);
@@ -458,8 +460,9 @@ piglit_init(int argc, char **argv)
 					log_header = false;
 				}
 
-				fprintf(stderr, "    0x%04x\n",
-					compressed_formats[i]);
+				fprintf(stderr, "    0x%04x: %s\n",
+					compressed_formats[i],
+					piglit_get_gl_enum_name(compressed_formats[i]));
 				pass = false;
 			}
 		}
