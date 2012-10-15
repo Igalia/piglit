@@ -444,15 +444,27 @@ tests[] = {
 	{
 		SRCW, SRCH,
 		SRCXMIN, SRCYMIN, SRCXMAX, SRCYMAX,
-		DSTXMIN, DSTYMIN, DSTXMAX + 3*DX, DSTYMAX + 3*DY, // strech x y
+		DSTXMIN, DSTYMIN, DSTXMAX + 3*DX, DSTYMAX + 3*DY, // stretch x y
 		GL_NEAREST,
 	},
 	{
 		SRCW, SRCH,
 		SRCXMIN, SRCYMIN, SRCXMAX, SRCYMAX,
-		DSTXMIN, DSTYMIN, DSTXMAX + 3*DX, DSTYMAX + 3*DY, // strech x y
+		DSTXMIN, DSTYMIN, DSTXMAX + 3*DX, DSTYMAX + 3*DY, // stretch x y
 		GL_NEAREST,
 	},
+
+	/*
+	 * Stretch of a single pixel.
+	 */
+
+	{
+		SRCW, SRCH,
+		SRCXMIN, SRCYMIN, SRCXMIN + 1, SRCYMIN + 1,
+		DSTXMIN, DSTYMIN, DSTXMIN + 7, DSTYMIN + 7, // stretch x y
+		GL_NEAREST,
+	},
+
 
 	/*
 	 * Clip
