@@ -34,6 +34,14 @@
  * Each enum has the same value of its corresponding GLUT enum. That is, for
  * each X, `PIGLIT_GL_VISUAL_X == GLUT_X`.
  *
+ * Note that PIGLIT_GL_VISUAL_RGBA is an alias for PIGLIT_GL_VISUAL_RGB and is
+ * always selected.  From the documentation of glutInitDisplayMode in
+ * Kilgard's GLUT:
+ *
+ *     Note that GLUT_RGBA selects the RGBA color model, but it does not
+ *     request any bits of alpha (sometimes called an alpha buffer or
+ *     destination alpha) be allocated. To request alpha, specify GLUT_ALPHA.
+ *
  * \see piglit_gl_test_config::window_visual
  */
 enum piglit_gl_visual {
