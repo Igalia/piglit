@@ -51,13 +51,22 @@ run_test(struct piglit_gl_framework *gl_fw,
 	struct piglit_winsys_framework *winsys_fw = piglit_winsys_framework(gl_fw);
 	enum piglit_result result = PIGLIT_PASS;
 
+	if (gl_fw->test_config->requires_displayed_window) {
+		/* Display the window before running the actual test. */
+		winsys_fw->show_window(winsys_fw);
+	}
+
 	if (gl_fw->test_config->init)
 		gl_fw->test_config->init(argc, argv);
 	if (gl_fw->test_config->display)
 		result = gl_fw->test_config->display();
+
 	if (piglit_automatic)
 		piglit_report_result(result);
 
+	/* In non-auto mode, the user wishes to see the window regardless
+	 * of the value of piglit_gl_test_config::require_displayed_window.
+	 */
 	winsys_fw->show_window(winsys_fw);
 	winsys_fw->enter_event_loop(winsys_fw);
 	abort();

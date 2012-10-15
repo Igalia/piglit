@@ -152,6 +152,13 @@ struct piglit_gl_test_config {
 	int window_visual;
 
 	/**
+	 * The test requires the window to be displayed in order to run
+	 * correctly. Tests that read from the front buffer must enable
+	 * this.
+	 */
+	bool requires_displayed_window;
+
+	/**
 	 * This is called once per test, after the GL context has been created
 	 * and made current but before display() is called.
 	 */
