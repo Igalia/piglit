@@ -111,6 +111,7 @@ piglit_init(int argc, char **argv)
 	GLint vs, fs;
 
 	piglit_require_gl_version(20);
+	piglit_require_extension("GL_ARB_framebuffer_object");
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
