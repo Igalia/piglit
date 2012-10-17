@@ -215,7 +215,7 @@ piglit_init(int argc, char**argv)
 
    piglit_require_gl_version(20);
 
-   piglit_require_extension("GL_ARB_framebuffer_object");
+   piglit_require_extension("GL_EXT_framebuffer_object");
 
    piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
