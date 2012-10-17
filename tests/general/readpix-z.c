@@ -39,6 +39,69 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+
+
+/** Display contents of the depth buffer as grayscale color */
+static void
+display_depth(const GLfloat *buf)
+{
+	glWindowPos2i(0, 0);
+	glDrawPixels(piglit_width, piglit_height,
+		     GL_LUMINANCE, GL_FLOAT, buf);
+}
+
+
+/** Test glClear(GL_DEPTH_BUFFER_BIT) + glReadPixels */
+static bool
+test_z_clear(void)
+{
+	GLfloat *buf = malloc(piglit_width * piglit_height * sizeof(GLfloat));
+	float z;
+	double diff, tolerance;
+	GLint zBits, i;
+
+	glGetIntegerv(GL_DEPTH_BITS, &zBits);
+
+	/* allow 1-bit error */
+	tolerance = 1.0 / (1 << (zBits - 1));
+
+	for (z = 0.0f; z <= 1.0f; z += 0.125) {
+		glClearDepth(z);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glReadPixels(0, 0, piglit_width, piglit_height,
+			     GL_DEPTH_COMPONENT, GL_FLOAT, buf);
+
+		if (!piglit_automatic) {
+			display_depth(buf);
+			piglit_present_results();
+		}
+
+		/* Make sure all the values are the same */
+		for (i = 1; i < piglit_width * piglit_height; i++) {
+			if (buf[i] != buf[0]) {
+				printf("depth[%d]=%f != depth[0]=%f\n",
+				       i, buf[i], buf[0]);
+				free(buf);
+				return false;
+			}
+		}
+
+		/* Check that the depth value read back is within tolerance */
+		diff = buf[0] - z;
+		if (diff > tolerance) {
+			printf("Depth buffer clear failed!\n");
+			printf("Expected %f, found %f\n", z, buf[0]);
+			free(buf);
+			return false;
+		}
+	}
+
+	free(buf);
+	return true;
+}
+
+
 static void
 draw_z_gradient(GLfloat zLeft, GLfloat zRight)
 {
@@ -55,11 +118,11 @@ draw_z_gradient(GLfloat zLeft, GLfloat zRight)
 }
 
 
-enum piglit_result
-piglit_display(void)
+static bool
+test_z_gradient(void)
 {
 	const GLfloat epsilon = 2.0 / piglit_width;
-	GLfloat *buf;
+	GLfloat *buf, *row;
 	bool pass = true;
 	int pos, i;
 
@@ -67,48 +130,69 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 	draw_z_gradient(-1.0, 1.0);
+	glDisable(GL_DEPTH_TEST);
 
-	buf = (GLfloat *) malloc(piglit_width * sizeof(GLfloat));
+	buf = (GLfloat *) malloc(piglit_width * piglit_height * sizeof(GLfloat));
 
-	glReadPixels(0, piglit_height / 2, piglit_width, 1,
+	/* read whole buffer */
+	glReadPixels(0, 0, piglit_width, piglit_height,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, buf);
 
+	/* examine a horizontal row at mid-Y */
+	row = buf + piglit_width * piglit_height / 2;
+
 	pos = 0;
-	if (fabs(buf[pos] - 0.0) > epsilon) {
+	if (fabs(row[pos] - 0.0) > epsilon) {
 		printf("Left-most Z value should be close to 0.0, found %f\n",
-		       buf[pos]);
+		       row[pos]);
 		pass = false;
 	}
 
 	pos = piglit_width / 2;
-	if (fabs(buf[pos] - 0.5) > epsilon) {
+	if (fabs(row[pos] - 0.5) > epsilon) {
 		printf("Middle Z value should be close to 0.5, found %f\n",
-		       buf[pos]);
+		       row[pos]);
 		pass = false;
 	}
 
 	pos = piglit_width - 1;
-	if (fabs(buf[pos] - 1.0) > epsilon) {
+	if (fabs(row[pos] - 1.0) > epsilon) {
 		printf("Left-most Z value should be close to 1.0, found %f\n",
-		       buf[pos]);
+		       row[pos]);
 		pass = false;
 	}
 
 	/* check for monotonicity */
 	for (i = 1; i < piglit_width; i++) {
-		if (buf[i - 1] > buf[i]) {
-			printf("Z values aren't increasing from left to right. buf[%d]=%f > buf[%d]=%f\n",
-			       i-1, buf[i-1], i, buf[i]);
+		if (row[i - 1] > row[i]) {
+			printf("Z values aren't increasing from left to right. row[%d]=%f > row[%d]=%f\n",
+			       i-1, row[i-1], i, row[i]);
 			pass = false;
 			break;
 		}
 	}
 
+	if (!piglit_automatic) {
+		display_depth(buf);
+		piglit_present_results();
+	}
+
 	free(buf);
 
-	piglit_present_results();
+	return pass;
+}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+
+enum piglit_result
+piglit_display(void)
+{
+	if (!test_z_clear())
+		return PIGLIT_FAIL;
+
+	if (!test_z_gradient())
+		return PIGLIT_FAIL;
+
+	return PIGLIT_PASS;
 }
 
 
