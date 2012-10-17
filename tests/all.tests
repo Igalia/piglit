@@ -1004,6 +1004,12 @@ arb_debug_output = Group()
 spec['ARB_debug_output'] = arb_debug_output
 add_plain_test(arb_debug_output, 'arb_debug_output-api_error')
 
+# Group ARB_occlusion_query2
+arb_occlusion_query2 = Group()
+spec['ARB_occlusion_query2'] = arb_occlusion_query2
+arb_occlusion_query2['api'] = concurrent_test('arb_occlusion_query2-api')
+arb_occlusion_query2['render'] = concurrent_test('arb_occlusion_query2-render')
+
 arb_pixel_buffer_object = Group()
 spec['ARB_pixel_buffer_object'] = arb_pixel_buffer_object
 add_plain_test(arb_pixel_buffer_object, 'fbo-pbo-readpixels-small')
