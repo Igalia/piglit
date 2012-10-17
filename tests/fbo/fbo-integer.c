@@ -403,6 +403,7 @@ piglit_init(int argc, char **argv)
    bool es;
    int glslMajor, glslMinor;
 
+   piglit_require_extension("GL_ARB_framebuffer_object");
    piglit_require_extension("GL_EXT_texture_integer");
    piglit_require_extension("GL_EXT_gpu_shader4");
 
