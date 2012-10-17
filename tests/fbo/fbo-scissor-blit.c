@@ -102,8 +102,7 @@ piglit_init(int argc, char **argv)
 	else
 		print_usage_and_exit(argv[0]);
 
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_EXT_framebuffer_blit");
+	piglit_require_extension("GL_ARB_framebuffer_object");
 
 	src_fbo = setup_framebuffer();
 	ref_fbo = setup_framebuffer();
