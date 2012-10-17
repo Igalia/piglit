@@ -147,6 +147,7 @@ piglit_init(int argc, char **argv)
 	GLint vs, fs;
 
 	piglit_require_gl_version(20);
+	piglit_require_extension("GL_EXT_framebuffer_object");
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
 				   "shaders/glsl-mvp.vert");
