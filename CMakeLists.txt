@@ -10,16 +10,22 @@ INCLUDE (FindPkgConfig)
 
 project (piglit)
 
-find_package(OpenGL REQUIRED)
 find_package(TIFF)
 find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
 
 
+option(PIGLIT_BUILD_GL_TESTS "Build tests for OpenGL" ON)
 option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" OFF)
 option(PIGLIT_BUILD_GLES2_TESTS "Build tests for OpenGL ES2" OFF)
 option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
+
+if(PIGLIT_BUILD_GL_TESTS)
+	find_package(OpenGL REQUIRED)
+else()
+	find_package(OpenGL)
+endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	option(PIGLIT_USE_WAFFLE "Use Waffle in place of GLUT" ON)

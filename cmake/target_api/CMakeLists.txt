@@ -23,7 +23,9 @@
 # api-independent libraries on which the api-dependent targets rely.
 add_subdirectory(no_api)
 
-add_subdirectory(gl)
+if(PIGLIT_BUILD_GL_TESTS)
+	add_subdirectory(gl)
+endif(PIGLIT_BUILD_GL_TESTS)
 
 if(PIGLIT_BUILD_GLES1_TESTS)
 	add_subdirectory(gles1)
