@@ -1,0 +1,5 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+	)
+
+piglit_add_executable(oes_compressed_etc2_texture-miptree oes_compressed_etc2_texture-miptree.c)
