@@ -66,6 +66,8 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 
 	piglit_add_executable (glx-copy-sub-buffer glx-copy-sub-buffer.c)
 	piglit_add_executable (glx-query-drawable glx-query-drawable.c)
+
+	piglit_add_executable (glx-string-sanity glx-string-sanity.c)
 ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 # vim: ft=cmake:

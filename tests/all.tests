@@ -390,6 +390,8 @@ glx['glx-pixmap-crosscheck'].runConcurrent = True
 glx['glx-query-drawable-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH'])
 glx['glx-query-drawable-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT'])
 glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', '-auto', '--bad-drawable'])
+glx['extension string sanity'] = PlainExecTest(['glx-string-sanity'])
+glx['extension string sanity'].runConcurrent = True
 
 import_context = Group();
 glx['GLX_EXT_import_context'] = import_context
