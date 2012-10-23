@@ -343,7 +343,7 @@ piglit_display(void)
 	GLboolean pass = GL_TRUE;
 	GLboolean have_srgb_ext = GL_FALSE;
 
-	if (piglit_is_extension_supported("GL_EXT_framebuffer_sRGB"))
+	if (piglit_is_extension_supported("GL_ARB_framebuffer_sRGB"))
 		have_srgb_ext = GL_TRUE;
 
 	if (!have_srgb_ext) {
