@@ -17,6 +17,3 @@ del profile.tests['shaders']['glsl-fs-unroll-explosion']
 del profile.tests['shaders']['glsl-vs-inline-explosion']
 del profile.tests['shaders']['glsl-vs-unroll-explosion']
 del profile.tests['spec']['!OpenGL 1.1']['streaming-texture-leak']
-
-# This test is nonsense
-del profile.tests['glean']['exactRGBA']

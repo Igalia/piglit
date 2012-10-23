@@ -109,7 +109,8 @@ glean['polygonOffset'] = GleanTest('polygonOffset', res_dir)
 glean['pixelFormats'] = GleanTest('pixelFormats', res_dir)
 glean['pointAtten'] = GleanTest('pointAtten', res_dir)
 glean['pointSprite'] = GleanTest('pointSprite', res_dir)
-glean['exactRGBA'] = GleanTest('exactRGBA', res_dir)
+# exactRGBA is not included intentionally, because it's too strict and
+# the equivalent functionality is covered by other tests
 glean['readPixSanity'] = GleanTest('readPixSanity', res_dir)
 glean['rgbTriStrip'] = GleanTest('rgbTriStrip', res_dir)
 glean['scissor'] = GleanTest('scissor', res_dir)
