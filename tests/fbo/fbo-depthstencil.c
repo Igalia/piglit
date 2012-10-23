@@ -486,9 +486,6 @@ void piglit_init(int argc, char **argv)
 {
 	unsigned i, p;
 
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_EXT_framebuffer_blit");
-
 	for (p = 1; p < argc; p++) {
 		if (!strcmp(argv[p], "clear")) {
 			test = CLEAR;
@@ -508,6 +505,8 @@ void piglit_init(int argc, char **argv)
 		}
 		if (!strcmp(argv[p], "blit")) {
 			test = BLIT;
+			piglit_require_extension("GL_EXT_framebuffer_object");
+			piglit_require_extension("GL_EXT_framebuffer_blit");
 			continue;
 		}
 		for (i = 0; i < sizeof(formats)/sizeof(*formats); i++) {
@@ -533,5 +532,10 @@ void piglit_init(int argc, char **argv)
 	if (!f.name) {
 		printf("Not enough parameters.\n");
 		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (f.iformat) {
+	        piglit_require_extension("GL_EXT_framebuffer_object");
+		piglit_require_extension("GL_EXT_framebuffer_blit");
 	}
 }
