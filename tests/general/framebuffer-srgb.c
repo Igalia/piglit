@@ -375,4 +375,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	reshape(piglit_width, piglit_height);
+	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_EXT_framebuffer_blit");
 }
