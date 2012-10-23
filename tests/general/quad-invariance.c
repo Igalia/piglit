@@ -85,7 +85,6 @@ piglit_display(void)
 		{0.0, 0.0, 1.0, 0.0},
 		{1.0, 1.0, 1.0, 0.0},
 	};
-	int x, y;
 	static GLboolean once = GL_TRUE;
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -107,17 +106,8 @@ piglit_display(void)
 		once = GL_FALSE;
 	}
 
-	for (x = 0; x < piglit_width / 2; x++) {
-		for (y = 0; y < piglit_height; y++) {
-			float probed[4];
-			glReadPixels((piglit_width + 1) / 2 + x,
-				     y,
-				     1, 1,
-				     GL_RGBA, GL_FLOAT, &probed);
-
-			pass = pass && piglit_probe_pixel_rgb(x, y, probed);
-		}
-	}
+	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
+	                                           piglit_height);
 
 	piglit_present_results();
 
