@@ -11,7 +11,6 @@ INCLUDE (FindPkgConfig)
 project (piglit)
 
 find_package(TIFF)
-find_package(GLUT REQUIRED)
 find_package(PNG REQUIRED)
 find_package(X11)
 
@@ -47,6 +46,22 @@ if(PIGLIT_USE_WAFFLE)
         add_definitions(-DPIGLIT_USE_WAFFLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WAFFLE_CFLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WAFFLE_CFLAGS}")
+else()
+	find_package(GLUT REQUIRED)
+
+	# The 'REQUIRED' above correctly produces an error for
+	# OpenGL and PNG, but there's a bug involving FindGLUT.cmake
+	# that fails to produce the error as of CMake 2.8.5.
+	#
+	# Instead, CMake keeps going and eventually spams
+	# the console with a message for every target that used
+	# e.g. the ${GLUT_INCLUDE_DIR} variable. So it
+	# prints a line for basically every single test in piglit.
+	#
+	# Work around the bug and error out quickly here instead.
+	if (NOT GLUT_FOUND)
+		message(FATAL_ERROR "GLUT library not found")
+	endif()
 endif(PIGLIT_USE_WAFFLE)
 
 if(PIGLIT_BUILD_GLES1_TESTS AND NOT PIGLIT_USE_WAFFLE)
@@ -82,20 +97,6 @@ ENDIF()
 IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
-
-# The 'REQUIRED' above correctly produces an error for
-# OpenGL and PNG, but there's a bug involving FindGLUT.cmake
-# that fails to produce the error as of CMake 2.8.5.
-#
-# Instead, CMake keeps going and eventually spams
-# the console with a message for every target that used
-# e.g. the ${GLUT_INCLUDE_DIR} variable. So it
-# prints a line for basically every single test in piglit.
-#
-# Work around the bug and error out quickly here instead.
-if (NOT GLUT_FOUND)
-	message(FATAL_ERROR "GLUT library not found")
-endif()
 
 # Check for presence of Python 2.6 or greater.
 foreach(python_cmd python2 python)
