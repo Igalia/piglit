@@ -431,89 +431,6 @@ glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = concurrent_test('glx-create-context-indirect-es2-profile')
 create_context_es2_profile['invalid OpenGL ES version'] = concurrent_test('glx-create-context-invalid-es-version')
 
-texturing = Group()
-add_concurrent_test(texturing, '1-1-linear-texture')
-add_plain_test(texturing, 'array-depth-roundtrip')
-add_plain_test(texturing, 'array-texture')
-add_plain_test(texturing, 'copytexsubimage')
-add_plain_test(texturing, 'copyteximage-border')
-add_plain_test(texturing, 'copyteximage-clipping')
-add_plain_test(texturing, 'cubemap')
-texturing['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'])
-add_plain_test(texturing, 'depth-level-clamp')
-add_plain_test(texturing, 'depth-tex-modes')
-add_plain_test(texturing, 'depth-tex-modes-glsl')
-add_plain_test(texturing, 'depth-tex-modes-rg')
-add_plain_test(texturing, 'depth-tex-compare')
-add_plain_test(texturing, 'depth-cube-map')
-add_plain_test(texturing, 'fragment-and-vertex-texturing')
-add_plain_test(texturing, 'fxt1-teximage')
-add_plain_test(texturing, 'gen-teximage')
-add_plain_test(texturing, 'gen-compressed-teximage')
-add_plain_test(texturing, 'gen-nonzero-unit')
-add_plain_test(texturing, 'gen-texsubimage')
-add_plain_test(texturing, 'getteximage-formats')
-add_plain_test(texturing, 'getteximage-simple')
-add_plain_test(texturing, 'getteximage-luminance')
-
-texturing['incomplete-texture-fixed'] = concurrent_test('incomplete-texture -auto fixed')
-texturing['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
-texturing['incomplete-texture-glsl'] = concurrent_test('incomplete-texture -auto glsl')
-
-add_plain_test(texturing, 'levelclamp')
-add_plain_test(texturing, 'lodbias')
-add_plain_test(texturing, 'lodclamp')
-add_plain_test(texturing, 'lodclamp-between')
-add_plain_test(texturing, 'lodclamp-between-max')
-add_plain_test(texturing, 'mipmap-setup')
-add_plain_test(texturing, 'max-texture-size')
-add_concurrent_test(texturing, 'max-texture-size-level')
-add_concurrent_test(texturing, 'proxy-texture')
-add_plain_test(texturing, 'rg-draw-pixels')
-add_plain_test(texturing, 'rg-teximage-01')
-add_plain_test(texturing, 'rg-teximage-02')
-add_plain_test(texturing, 'rgtc-teximage-01')
-add_plain_test(texturing, 'rgtc-teximage-02')
-add_concurrent_test(texturing, 's3tc-errors')
-add_plain_test(texturing, 's3tc-teximage')
-add_plain_test(texturing, 's3tc-texsubimage')
-add_plain_test(texturing, 'sampler-cube-shadow')
-add_concurrent_test(texturing, 'sized-texture-format-channels')
-add_plain_test(texturing, 'streaming-texture-leak')
-add_plain_test(texturing, 'tex-border-1')
-texturing['tex-miplevel-selection'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod'])
-texturing['tex-miplevel-selection-lod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias'])
-texturing['tex-miplevel-selection-lod-bias'] = PlainExecTest(['tex-miplevel-selection', '-auto'])
-add_plain_test(texturing, 'tex-skipped-unit')
-add_plain_test(texturing, 'tex-swizzle')
-add_plain_test(texturing, 'tex3d')
-add_concurrent_test(texturing, 'tex3d-depth1')
-add_plain_test(texturing, 'tex3d-maxsize')
-add_plain_test(texturing, 'tex3d-npot')
-add_plain_test(texturing, 'texdepth')
-add_plain_test(texturing, 'teximage-errors')
-add_plain_test(texturing, 'texrect-many')
-add_plain_test(texturing, 'texredefine')
-add_plain_test(texturing, 'texsubimage')
-add_plain_test(texturing, 'texture-al')
-add_plain_test(texturing, 'texture-packed-formats')
-add_plain_test(texturing, 'texture-rg')
-add_plain_test(texturing, 'tex-srgb')
-
-# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
-# exercise all possible combinations of buffer alignments on i965.
-for texture_size in (146, 292, 585, 1024):
-        for test_type in ('s=z24_s8', 'd=z24_s8', 'd=z24', 'd=z32f_s8',
-                          'd=z32f', 'd=z16', 'd=z24_s8_s=z24_s8',
-                          'd=z24_s=z24_s8', 's=z24_s8_d=z24_s8',
-                          's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
-                          'ds=z24_s8', 'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
-                          's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f',
-                          'd=s=z32f_s8', 's=d=z32f_s8', 'ds=z32f_s8'):
-                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                        texture_size, test_type)
-                texturing[test_name] = PlainExecTest(test_name + ' -auto')
-
 def texwrap_test(args):
 	test = PlainExecTest(['texwrap', '-fbo', '-auto'] + args)
 	test.runConcurrent = True
@@ -615,6 +532,21 @@ add_plain_test(gl11, 'two-sided-lighting')
 add_plain_test(gl11, 'user-clip')
 add_plain_test(gl11, 'varray-disabled')
 add_plain_test(gl11, 'windowoverlap')
+add_plain_test(gl11, 'copyteximage-border')
+add_plain_test(gl11, 'copyteximage-clipping')
+add_plain_test(gl11, 'copytexsubimage')
+add_plain_test(gl11, 'getteximage-formats')
+add_plain_test(gl11, 'getteximage-luminance')
+add_plain_test(gl11, 'getteximage-simple')
+gl11['incomplete-texture-fixed'] = concurrent_test('incomplete-texture -auto fixed')
+add_plain_test(gl11, 'max-texture-size')
+add_concurrent_test(gl11, 'max-texture-size-level')
+add_concurrent_test(gl11, 'proxy-texture')
+add_concurrent_test(gl11, 'sized-texture-format-channels')
+add_plain_test(gl11, 'streaming-texture-leak')
+add_plain_test(gl11, 'texredefine')
+add_plain_test(gl11, 'texsubimage')
+add_plain_test(gl11, 'texture-al')
 
 gl10 = Group()
 spec['!OpenGL 1.0'] = gl10
@@ -628,10 +560,22 @@ gl12['copyteximage 3D'] = PlainExecTest(['copyteximage', '-auto', '3D'])
 add_plain_test(gl12, 'crash-texparameter-before-teximage')
 add_plain_test(gl12, 'draw-elements-vs-inputs')
 add_plain_test(gl12, 'two-sided-lighting-separate-specular')
+add_plain_test(gl12, 'levelclamp')
+add_plain_test(gl12, 'lodclamp')
+add_plain_test(gl12, 'lodclamp-between')
+add_plain_test(gl12, 'lodclamp-between-max')
+add_plain_test(gl12, 'mipmap-setup')
+add_plain_test(gl12, 'tex-skipped-unit')
+add_plain_test(gl12, 'tex3d')
+add_plain_test(gl12, 'tex3d-maxsize')
+add_plain_test(gl12, 'teximage-errors')
+add_plain_test(gl12, 'texture-packed-formats')
 
 gl13 = Group()
 spec['!OpenGL 1.3'] = gl13
 add_plain_test(gl13, 'texunits')
+add_plain_test(gl13, 'tex-border-1')
+add_concurrent_test(gl13, 'tex3d-depth1')
 
 gl14 = Group()
 spec['!OpenGL 1.4'] = gl14
@@ -645,6 +589,9 @@ add_plain_test(gl14, 'stencil-wrap')
 add_plain_test(gl14, 'triangle-rasterization')
 gl14['triangle-rasterization-fbo'] = PlainExecTest(['triangle-rasterization', '-auto', '-fbo'])
 add_plain_test(gl14, 'triangle-rasterization-overdraw')
+gl14['tex-miplevel-selection'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod'])
+gl14['tex-miplevel-selection-lod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias'])
+gl14['tex-miplevel-selection-lod-bias'] = PlainExecTest(['tex-miplevel-selection', '-auto'])
 
 gl15 = Group()
 spec['!OpenGL 1.5'] = gl15
@@ -653,6 +600,7 @@ gl15['draw-elements-user'] = PlainExecTest(['draw-elements', '-auto', 'user'])
 add_plain_test(gl15, 'draw-vertices')
 gl15['draw-vertices-user'] = PlainExecTest(['draw-vertices', '-auto', 'user'])
 add_plain_test(gl15, 'isbufferobj')
+add_plain_test(gl15, 'depth-tex-compare')
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
@@ -696,6 +644,10 @@ add_plain_test(gl20, 'early-z')
 add_plain_test(gl20, 'occlusion-query-discard')
 add_plain_test(gl20, 'stencil-twoside')
 add_plain_test(gl20, 'vs-point_size-zero')
+add_plain_test(gl20, 'depth-tex-modes-glsl')
+add_plain_test(gl20, 'fragment-and-vertex-texturing')
+gl20['incomplete-texture-glsl'] = concurrent_test('incomplete-texture -auto glsl')
+add_plain_test(gl20, 'tex3d-npot')
 
 gl21 = Group()
 spec['!OpenGL 2.1'] = gl21
@@ -721,6 +673,9 @@ add_concurrent_test(gl30, 'gl-3.0-required-renderbuffer-attachment-formats')
 add_concurrent_test(gl30, 'gl-3.0-required-texture-attachment-formats')
 add_concurrent_test(gl30, 'gl-3.0-texture-integer')
 add_plain_test(gl30, 'gl30basic')
+add_plain_test(gl30, 'array-depth-roundtrip')
+add_plain_test(gl30, 'depth-cube-map')
+add_plain_test(gl30, 'sampler-cube-shadow')
 
 gl31 = Group()
 spec['!OpenGL 3.1'] = gl31
@@ -961,6 +916,7 @@ add_plain_test(arb_fragment_program, 'fp-lit-src-equals-dst')
 add_plain_test(arb_fragment_program, 'fp-long-alu')
 add_plain_test(arb_fragment_program, 'fp-set-01')
 add_plain_test(arb_fragment_program, 'trinity-fp1')
+arb_fragment_program['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
 
 # Group ARB_fragment_program_shadow
 arb_fragment_program_shadow = Group()
@@ -1124,6 +1080,8 @@ add_shader_test_dir(arb_texture_rectangle,
                     testsDir + '/spec/arb_texture_rectangle',
                     recursive=True)
 arb_texture_rectangle['copyteximage RECT'] = PlainExecTest(['copyteximage', '-auto', 'RECT'])
+add_concurrent_test(arb_texture_rectangle, '1-1-linear-texture')
+add_plain_test(arb_texture_rectangle, 'texrect-many')
 
 arb_texture_storage = Group()
 spec['ARB_texture_storage'] = arb_texture_storage
@@ -1136,6 +1094,7 @@ add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRE
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
 tdfx_texture_compression_fxt1['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'fxt1'])
 tdfx_texture_compression_fxt1['invalid formats'].runConcurrent = True
+add_plain_test(tdfx_texture_compression_fxt1, 'fxt1-teximage')
 
 def add_color_buffer_float_test(name, format, p1, p2):
 	arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
@@ -1196,6 +1155,16 @@ add_texwrap_format_tests(arb_depth_texture, 'GL_ARB_depth_texture')
 add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT16')
 add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT24')
 add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT32')
+add_plain_test(arb_depth_texture, 'depth-level-clamp')
+add_plain_test(arb_depth_texture, 'depth-tex-modes')
+add_plain_test(arb_depth_texture, 'texdepth')
+# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
+# exercise all possible combinations of buffer alignments on i965.
+for texture_size in (146, 292, 585, 1024):
+        for test_type in ('d=z24', 'd=z16'):
+                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                        texture_size, test_type)
+                arb_depth_texture[test_name] = PlainExecTest(test_name + ' -auto')
 
 arb_depth_buffer_float = Group()
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
@@ -1205,6 +1174,16 @@ add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
 add_texwrap_format_tests(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float')
+# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
+# exercise all possible combinations of buffer alignments on i965.
+for texture_size in (146, 292, 585, 1024):
+        for test_type in ('d=z32f_s8', 'd=z32f',
+                          'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
+                          's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f',
+                          'd=s=z32f_s8', 's=d=z32f_s8', 'ds=z32f_s8'):
+                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                        texture_size, test_type)
+                arb_depth_buffer_float[test_name] = PlainExecTest(test_name + ' -auto')
 
 arb_texture_env_crossbar = Group()
 spec['ARB_texture_env_crossbar'] = arb_texture_env_crossbar
@@ -1590,6 +1569,17 @@ add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_sten
 add_texwrap_format_tests(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil')
 ext_packed_depth_stencil['readpixels-24_8'] = PlainExecTest(['ext_packed_depth_stencil-readpixels-24_8', '-auto'])
 add_plain_test(ext_packed_depth_stencil, 'fbo-blit-d24s8')
+# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
+# exercise all possible combinations of buffer alignments on i965.
+for texture_size in (146, 292, 585, 1024):
+        for test_type in ('s=z24_s8', 'd=z24_s8',
+                          'd=z24_s8_s=z24_s8',
+                          'd=z24_s=z24_s8', 's=z24_s8_d=z24_s8',
+                          's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
+                          'ds=z24_s8'):
+                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                        texture_size, test_type)
+                ext_packed_depth_stencil[test_name] = PlainExecTest(test_name + ' -auto')
 
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
@@ -1602,11 +1592,14 @@ ext_texture_array['copyteximage 1D_ARRAY'] = PlainExecTest(['copyteximage', '-au
 ext_texture_array['copyteximage 2D_ARRAY'] = PlainExecTest(['copyteximage', '-auto', '2D_ARRAY'])
 add_plain_test(ext_texture_array, 'fbo-array')
 add_plain_test(ext_texture_array, 'fbo-depth-array')
+add_plain_test(ext_texture_array, 'array-texture')
 
 arb_texture_cube_map = Group()
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
 arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-auto', 'CUBE'])
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
+add_plain_test(arb_texture_cube_map, 'cubemap')
+arb_texture_cube_map['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'])
 
 arb_texture_cube_map_array = Group()
 spec['ARB_texture_cube_map_array'] = arb_texture_cube_map_array
@@ -1622,7 +1615,10 @@ for stage in ['vs', 'fs']:
 	for sampler in textureSize_samplers_atcma:
 		spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
-profile.test_list['spec/EXT_texture_swizzle/depth_texture_mode_and_swizzle'] = concurrent_test('depth_texture_mode_and_swizzle')
+ext_texture_swizzle = Group()
+spec['EXT_texture_swizzle'] = ext_texture_swizzle
+add_plain_test(ext_texture_swizzle, 'tex-swizzle')
+ext_texture_swizzle['depth_texture_mode_and_swizzle'] = concurrent_test('depth_texture_mode_and_swizzle')
 
 ext_texture_compression_latc = Group()
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
@@ -1643,6 +1639,8 @@ add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_c
 add_texwrap_format_tests(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc')
 ext_texture_compression_rgtc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'rgtc'])
 ext_texture_compression_rgtc['invalid formats'].runConcurrent = True
+add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-01')
+add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-02')
 
 ext_texture_compression_s3tc = Group()
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
@@ -1654,6 +1652,10 @@ add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_c
 add_texwrap_format_tests(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc')
 ext_texture_compression_s3tc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 's3tc'])
 ext_texture_compression_s3tc['invalid formats'].runConcurrent = True
+add_plain_test(ext_texture_compression_s3tc, 'gen-compressed-teximage')
+add_concurrent_test(ext_texture_compression_s3tc, 's3tc-errors')
+add_plain_test(ext_texture_compression_s3tc, 's3tc-teximage')
+add_plain_test(ext_texture_compression_s3tc, 's3tc-texsubimage')
 
 ati_texture_compression_3dc = Group()
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
@@ -1716,6 +1718,11 @@ add_fbo_rg(arb_texture_rg, 'GL_R16')
 add_fbo_rg(arb_texture_rg, 'GL_RG')
 add_fbo_rg(arb_texture_rg, 'GL_RG8')
 add_fbo_rg(arb_texture_rg, 'GL_RG16')
+add_plain_test(arb_texture_rg, 'depth-tex-modes-rg')
+add_plain_test(arb_texture_rg, 'rg-draw-pixels')
+add_plain_test(arb_texture_rg, 'rg-teximage-01')
+add_plain_test(arb_texture_rg, 'rg-teximage-02')
+add_plain_test(arb_texture_rg, 'texture-rg')
 
 arb_texture_rgb10_a2ui = Group()
 spec['ARB_texture_rgb10_a2ui'] = arb_texture_rgb10_a2ui
@@ -1750,6 +1757,7 @@ add_msaa_formats_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB')
 add_texwrap_format_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB')
 add_texwrap_format_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
 add_plain_test(ext_texture_srgb, 'fbo-srgb')
+add_plain_test(ext_texture_srgb, 'tex-srgb')
 
 ext_timer_query = Group()
 spec['EXT_timer_query'] = ext_timer_query
@@ -2069,6 +2077,16 @@ add_single_param_test_set(
 ext_provoking_vertex = Group()
 spec['EXT_provoking_vertex'] = ext_provoking_vertex
 add_plain_test(ext_provoking_vertex, 'provoking-vertex')
+
+ext_texture_lod_bias = Group()
+spec['EXT_texture_lod_bias'] = ext_texture_lod_bias
+add_plain_test(ext_texture_lod_bias, 'lodbias')
+
+sgis_generate_mipmap = Group()
+spec['SGIS_generate_mipmap'] = sgis_generate_mipmap
+add_plain_test(sgis_generate_mipmap, 'gen-nonzero-unit')
+add_plain_test(sgis_generate_mipmap, 'gen-teximage')
+add_plain_test(sgis_generate_mipmap, 'gen-texsubimage')
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
@@ -2560,7 +2578,6 @@ profile.tests['glslparsertest'] = glslparsertest
 profile.tests['asmparsertest'] = asmparsertest
 profile.tests['shaders'] = shaders
 profile.tests['security'] = security
-profile.tests['texturing'] = texturing
 profile.tests['spec'] = spec
 if platform.system() is not 'Windows':
 	profile.tests['glx'] = glx
