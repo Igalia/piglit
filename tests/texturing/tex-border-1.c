@@ -104,4 +104,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	piglit_require_gl_version(13);
 }
