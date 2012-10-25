@@ -35,7 +35,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 320;
 	config.window_height = 60;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA |
+			       PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -185,20 +186,20 @@ static void test_int_vertices_abi(float x1, float y1, float x2, float y2, int in
 struct test {
     void (*test)(float x1, float y1, float x2, float y2, int index);
     int index;
-    float expected_color[3];
+    float expected_color[4];
     const char *name;
 };
 
 struct test tests[] = {
-    {test_packed_int_vertices, 0, {1, 1, 1}, "Int vertices - 2/10/10/10"},
-    {test_packed_int_vertices, 1, {1, 1, 1}, "Unsigned Int vertices - 2/10/10/10"},
-    {test_packed_int_color_vertices, 0, {1, 0, 0}, "Int Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 1, {1, 0, 0}, "Unsigned Int Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 2, {0, 0, 1}, "Int BGRA Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 3, {0, 0, 1}, "Unsigned Int BGRA Color - 2/10/10/10"},
+    {test_packed_int_vertices, 0, {1, 1, 1, 1}, "Int vertices - 2/10/10/10"},
+    {test_packed_int_vertices, 1, {1, 1, 1, 1}, "Unsigned Int vertices - 2/10/10/10"},
+    {test_packed_int_color_vertices, 0, {1, 0, 0, 0}, "Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 1, {1, 0, 0, 0}, "Unsigned Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 2, {0, 0, 1, 0}, "Int BGRA Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 3, {0, 0, 1, 0}, "Unsigned Int BGRA Color - 2/10/10/10"},
 
-    {test_int_vertices_abi, 0, {1, 0, 0}, "Int 2/10/10/10 - test ABI" },
-    {test_int_vertices_abi, 1, {1, 0, 0}, "Unsigned 2/10/10/10 - test ABI" },
+    {test_int_vertices_abi, 0, {1, 0, 0, 1}, "Int 2/10/10/10 - test ABI" },
+    {test_int_vertices_abi, 1, {1, 0, 0, 1}, "Unsigned 2/10/10/10 - test ABI" },
     {0}
 };
 
@@ -219,7 +220,7 @@ piglit_display(void)
         printf("%s\n", tests[i].name);
         tests[i].test(x, y, x+20, y+20, tests[i].index);
         assert(glGetError() == 0);
-        pass = piglit_probe_pixel_rgb(x+5, y+5, tests[i].expected_color) && pass;
+        pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color) && pass;
 
         x += 20;
         if (x > 300) {
