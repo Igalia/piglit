@@ -408,7 +408,8 @@ static const struct test_desc test_sets[] = {
 		arb_texture_rg_float,
 		ARRAY_SIZE(arb_texture_rg_float),
 		"GL_ARB_texture_rg-float",
-		{"GL_ARB_texture_rg"}
+		{"GL_ARB_texture_rg",
+		 "GL_ARB_texture_float"}
 	},
 	{
 		arb_texture_rg_int,
