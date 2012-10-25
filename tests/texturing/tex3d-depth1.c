@@ -105,6 +105,8 @@ piglit_init(int argc, char **argv)
 	GLuint tex;
 	int i, j;
 
+	piglit_require_gl_version(13);
+
 	/* solid red texture */
 	for (i = 0; i < TEX_SIZE; i++) {
 		for (j = 0; j < TEX_SIZE; j++) {
