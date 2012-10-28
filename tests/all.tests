@@ -2105,6 +2105,10 @@ add_plain_test(sgis_generate_mipmap, 'gen-nonzero-unit')
 add_plain_test(sgis_generate_mipmap, 'gen-teximage')
 add_plain_test(sgis_generate_mipmap, 'gen-texsubimage')
 
+arb_map_buffer_alignment = Group()
+spec['ARB_map_buffer_alignment'] = arb_map_buffer_alignment
+add_plain_test(arb_map_buffer_alignment, 'arb_map_buffer_alignment-sanity_test')
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
