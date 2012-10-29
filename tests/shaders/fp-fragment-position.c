@@ -26,7 +26,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include <GL/glu.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -277,7 +276,8 @@ piglit_init(int argc, char **argv)
 	GLubyte rectangle[200][200][4];
 	GLubyte tex[256*256][4];
 
-	piglit_require_gl_version(13);
+	/* Need GL 1.4 for GL_GENERATE_MIPMAP tex param */
+	piglit_require_gl_version(14);
 
 	printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));
 
@@ -322,8 +322,9 @@ piglit_init(int argc, char **argv)
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, 2);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 256, 256,
-	                  GL_RGBA, GL_UNSIGNED_BYTE, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, tex);
 
 	// Overwrite higher mipmap levels
 	for(x = 0; x < 4; ++x) {
