@@ -30,7 +30,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include <GL/glu.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -137,7 +136,7 @@ void piglit_init(int argc, char **argv)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45, 1, 0.1, 1000);
+	glFrustum(-0.1, 0.1, -0.1, 0.1, 0.1, 1000.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
