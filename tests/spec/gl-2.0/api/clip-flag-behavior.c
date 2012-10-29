@@ -37,7 +37,6 @@
  */
 
 #include "piglit-util-gl-common.h"
-#include <GL/glu.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -64,19 +63,6 @@ static char *bool_to_string(bool b)
 }
 
 static bool
-check_error(GLenum expected)
-{
-	GLenum err = glGetError();
-	if (err == expected) {
-		return true;
-	} else {
-		printf("Expected '%s', got '%s'\n", gluErrorString(expected),
-		       gluErrorString(err));
-		return false;
-	}
-}
-
-static bool
 check_bool(GLboolean b, bool expected)
 {
 	/* Negate the bools before comparing so that distinct nonzero
@@ -95,7 +81,7 @@ check_bool(GLboolean b, bool expected)
  * Print "OK" and return true.  This is helpful in chaining with the
  * functions above, e.g.:
  *
- * bool pass = check_error(...) && check_bool(...) && print_ok();
+ * bool pass = piglit_check_gl_error(...) && check_bool(...) && print_ok();
  */
 static bool
 print_ok()
@@ -112,13 +98,13 @@ check_enable_state(char *enum_name, GLenum enum_value, bool expected)
 	bool pass = true;
 	printf("Trying glIsEnabled(%s): ", enum_name);
 	b = glIsEnabled(enum_value);
-	pass = (check_error(GL_NO_ERROR) && check_bool(b, expected)
-		&& print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_NO_ERROR) && check_bool(b, expected)
+		&& print_ok() && pass;
 
 	printf("Trying glGetBooleanv(%s): ", enum_name);
 	glGetBooleanv(enum_value, &b);
-	pass = (check_error(GL_NO_ERROR) && check_bool(b, expected)
-		&& print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_NO_ERROR) && check_bool(b, expected)
+		&& print_ok() && pass;
 
 	return pass;
 }
@@ -135,7 +121,7 @@ piglit_init(int argc, char **argv)
 
 	printf("Querying GL_MAX_CLIP_PLANES: ");
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &max_clip_planes);
-	if (!check_error(GL_NO_ERROR))
+	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 	printf("%d\n", max_clip_planes);
 	if (max_clip_planes < 0) {
@@ -152,13 +138,13 @@ piglit_init(int argc, char **argv)
 
 		printf("Trying glEnable(%s): ", enum_name);
 		glEnable(enum_value);
-		pass = (check_error(GL_NO_ERROR) && print_ok()) && pass;
+		pass = piglit_check_gl_error(GL_NO_ERROR) && print_ok() && pass;
 
 		pass = check_enable_state(enum_name, enum_value, true) && pass;
 
 		printf("Trying glDisable(%s): ", enum_name);
 		glDisable(enum_value);
-		pass = (check_error(GL_NO_ERROR) && print_ok()) && pass;
+		pass = piglit_check_gl_error(GL_NO_ERROR) && print_ok() && pass;
 
 		pass = check_enable_state(enum_name, enum_value, false) && pass;
 	}
@@ -169,19 +155,19 @@ piglit_init(int argc, char **argv)
 
 	printf("Trying glIsEnabled(%s): ", enum_name);
 	b = glIsEnabled(enum_value);
-	pass = (check_error(GL_INVALID_ENUM) && print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
 	printf("Trying glGetBooleanv(%s): ", enum_name);
 	glGetBooleanv(enum_value, &b);
-	pass = (check_error(GL_INVALID_ENUM) && print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
 	printf("Trying glEnable(%s): ", enum_name);
 	glEnable(enum_value);
-	pass = (check_error(GL_INVALID_ENUM) && print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
 	printf("Trying glDisable(%s): ", enum_name);
 	glDisable(enum_value);
-	pass = (check_error(GL_INVALID_ENUM) && print_ok()) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_ENUM) && print_ok() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
