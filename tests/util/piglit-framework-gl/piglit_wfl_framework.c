@@ -166,7 +166,7 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			head_attrib_list[i++] = test_config->supports_gl_core_version / 10;
 
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
-			head_attrib_list[i++] = test_config->supports_gl_compat_version % 10;
+			head_attrib_list[i++] = test_config->supports_gl_core_version % 10;
 
 			head_attrib_list[i++] = 0;
 			break;
