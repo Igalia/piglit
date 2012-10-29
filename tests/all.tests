@@ -691,6 +691,7 @@ add_plain_test(gl30, 'sampler-cube-shadow')
 
 gl31 = Group()
 spec['!OpenGL 3.1'] = gl31
+gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
 gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 
 # Group spec/glsl-1.00
