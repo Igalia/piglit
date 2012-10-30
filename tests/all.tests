@@ -613,6 +613,7 @@ add_plain_test(gl15, 'depth-tex-compare')
 
 gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
+add_concurrent_test(gl20, 'attribs')
 add_concurrent_test(gl20, 'gl-2.0-edgeflag')
 add_plain_test(gl20, 'getattriblocation-conventional')
 add_plain_test(gl20, 'clip-flag-behavior')
@@ -664,6 +665,7 @@ gl21['minmax'] = concurrent_test('gl-2.1-minmax')
 
 gl30 = Group()
 spec['!OpenGL 3.0'] = gl30
+gl30['attribs'] = concurrent_test('attribs GL3')
 add_concurrent_test(gl30, 'bindfragdata-invalid-parameters')
 add_concurrent_test(gl30, 'bindfragdata-link-error')
 add_concurrent_test(gl30, 'bindfragdata-nonexistent-variable')
@@ -2049,6 +2051,7 @@ arb_half_float_vertex['draw-vertices-half-float-user'] = PlainExecTest(['draw-ve
 arb_vertex_type_2_10_10_10_rev = Group()
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev
 add_plain_test(arb_vertex_type_2_10_10_10_rev, 'draw-vertices-2101010')
+arb_vertex_type_2_10_10_10_rev['attribs'] = concurrent_test('attribs GL_ARB_vertex_type_2_10_10_10_rev')
 
 arb_draw_buffers = Group()
 spec['ARB_draw_buffers'] = arb_draw_buffers
