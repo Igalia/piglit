@@ -58,7 +58,7 @@ black_pixel(float x, float y)
        pixel[0][2] == 0.0 &&
        pixel[1][0] == 0.0 &&
        pixel[1][1] == 0.0 &&
-       pixel[2][2] == 0.0)
+       pixel[1][2] == 0.0)
       return GL_TRUE;
    else
       return GL_FALSE;
