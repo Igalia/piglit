@@ -30,7 +30,7 @@
  *
  * Note that the original ARB_vertex_buffer_object extension explicitly states
  * program termination is allowed when out-of-bounds vertex buffer object
- * fetches occur.  The ARB_robustness extension does provides an enbale to
+ * fetches occur.  The ARB_robustness extension does provides an enable to
  * guarantee that out-of-bounds buffer object accesses by the GPU will have
  * deterministic behavior and preclude application instability or termination
  * due to an incorrect buffer access.  But regardless of ARB_robustness
