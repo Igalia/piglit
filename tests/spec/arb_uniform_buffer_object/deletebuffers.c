@@ -47,14 +47,14 @@ piglit_init(int argc, char **argv)
 	GLuint bo[2];
 	GLint binding;
 
+	piglit_require_extension("GL_ARB_uniform_buffer_object");
+
 	glGetIntegeri_v(GL_UNIFORM_BUFFER_BINDING, 0, &binding);
 	if (binding != 0) {
 		fprintf(stderr, "Default UBO binding should be 0, was %d\n",
 			binding);
 		piglit_report_result(PIGLIT_FAIL);
 	}
-
-	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
 	glGenBuffers(2, bo);
 
