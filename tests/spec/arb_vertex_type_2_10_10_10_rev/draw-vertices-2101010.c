@@ -193,9 +193,9 @@ struct test {
 struct test tests[] = {
     {test_packed_int_vertices, 0, {1, 1, 1, 1}, "Int vertices - 2/10/10/10"},
     {test_packed_int_vertices, 1, {1, 1, 1, 1}, "Unsigned Int vertices - 2/10/10/10"},
-    {test_packed_int_color_vertices, 0, {1, 0, 0, 0}, "Int Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 0, {1, 0, 0, 0.333}, "Int Color - 2/10/10/10"},
     {test_packed_int_color_vertices, 1, {1, 0, 0, 0}, "Unsigned Int Color - 2/10/10/10"},
-    {test_packed_int_color_vertices, 2, {0, 0, 1, 0}, "Int BGRA Color - 2/10/10/10"},
+    {test_packed_int_color_vertices, 2, {0, 0, 1, 0.333}, "Int BGRA Color - 2/10/10/10"},
     {test_packed_int_color_vertices, 3, {0, 0, 1, 0}, "Unsigned Int BGRA Color - 2/10/10/10"},
 
     {test_int_vertices_abi, 0, {1, 0, 0, 1}, "Int 2/10/10/10 - test ABI" },
