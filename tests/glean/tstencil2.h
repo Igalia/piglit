@@ -80,8 +80,25 @@ private:
 			       GLenum backZPass,
 			       GLenum frontFunc,
 			       GLenum backFunc,
+			       GLint frontRef,
+			       GLint backRef,
+			       GLuint frontMask,
+			       GLuint backMask,
+			       GLuint frontWriteMask,
+			       GLuint backWriteMask);
+
+	bool set_stencil_state(int method,
+			       GLenum frontStencilFail,
+			       GLenum backStencilFail,
+			       GLenum frontZFail,
+			       GLenum backZFail,
+			       GLenum frontZPass,
+			       GLenum backZPass,
+			       GLenum frontFunc,
+			       GLenum backFunc,
 			       GLint ref,
-			       GLuint mask);
+			       GLuint mask,
+			       GLuint writeMask = ~0);
 
 	void reset_stencil_state(int method);
 
