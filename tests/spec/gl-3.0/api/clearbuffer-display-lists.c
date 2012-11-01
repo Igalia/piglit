@@ -36,7 +36,7 @@
 
 void piglit_init(int argc, char **argv)
 {
-	static const float initial_color[4]  = { 0.0, 0.0, 0.0, 1.0 };
+	static const float initial_color[4]  = { 0.0, 0.0, 0.0, 0.0 };
 	static const float first[4]  = { 0.5, 0.4, 0.3, 1.0 };
 	static const float second[4] = { 0.8, 0.0, 0.8, 1.0 };
 	static const float third[4] = { 1.0, 0.3, 0.7, 1.0 };
@@ -47,7 +47,7 @@ void piglit_init(int argc, char **argv)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Probe the color buffer before creating display list. Default clear
-	 * color is (0.0, 0.0, 0.0, 1.0)
+	 * color is (0.0, 0.0, 0.0, 0.0)
 	 */
 	pass = piglit_probe_rect_rgba(0, 0,
 				      piglit_width, piglit_height,
