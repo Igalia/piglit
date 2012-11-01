@@ -49,6 +49,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = 150;
 	config.window_height = 30;
@@ -98,11 +99,25 @@ piglit_display()
 		 1,  1,
 		 1, -1,
 	};
+	GLuint vbo;
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glVertexAttribPointer(vertex_location, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	/* For GL core, we need to have a vertex array object bound.
+	 * Otherwise, we don't particularly have to.  Always use a
+	 * vertex buffer object, though.
+	 */
+	if (piglit_get_gl_version() >= 31) {
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STREAM_DRAW);
+
+	glVertexAttribPointer(vertex_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(vertex_location);
 
 	/* Draw consecutive squares for each mipmap level */
@@ -130,7 +145,6 @@ piglit_display()
 	}
 
 	glDisableVertexAttribArray(vertex_location);
-
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
