@@ -162,7 +162,7 @@ void piglit_init(int argc, char **argv)
 {
    const char * const ver_string = (const char * const)
        glGetString( GL_VERSION );
-   float ver = strtof( ver_string, NULL );
+   float ver = strtod( ver_string, NULL );
    GLint tex_units;
    GLint temp[ 256 ];
 
