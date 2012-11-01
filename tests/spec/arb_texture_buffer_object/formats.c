@@ -28,16 +28,6 @@
 #define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 10;
-
-	config.window_width = 200;
-	config.window_height = 500;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
-
-PIGLIT_GL_TEST_CONFIG_END
-
 enum channels {
 	A,
 	L,
@@ -146,12 +136,12 @@ struct program {
 	GLuint prog;
 	int pos_location;
 	int expected_location;
-	int vertex_location;
 };
 
 struct program prog_f;
 struct program prog_i;
 struct program prog_u;
+static int vertex_location;
 
 static int y_index;
 
@@ -497,10 +487,8 @@ test_format(int format_index)
 
 		glUniform1i(prog->pos_location, i);
 
-		glVertexAttribPointer(prog->vertex_location, 2, GL_FLOAT,
-				      GL_FALSE, 0, &verts);
-		glEnableVertexAttribArray(prog->vertex_location);
-
+		glBufferData(GL_ARRAY_BUFFER_ARB, sizeof(verts), verts,
+			     GL_STREAM_DRAW);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 		if (pass &&
@@ -536,15 +524,33 @@ piglit_display(void)
 {
 	enum piglit_result result = PIGLIT_SKIP;
 	int i;
+	GLuint vao, vbo;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	y_index = 0;
 
+	/* For GL core, we need to have a vertex array object bound.
+	 * Otherwise, we don't particularly have to.  Always use a
+	 * vertex buffer object, though.
+	 */
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER_ARB, vbo);
+	if (piglit_get_gl_version() >= 31) {
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
+	glVertexAttribPointer(vertex_location, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(vertex_location);
+
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
 		piglit_merge_result(&result, test_format(i));
 	}
+
+	glDeleteBuffers(1, &vbo);
+	glDeleteVertexArrays(1, &vao);
 
 	piglit_present_results();
 
@@ -647,7 +653,8 @@ create_program(struct program *program, const char *type)
         program->pos_location = piglit_GetUniformLocation(prog, "pos");
         program->expected_location = piglit_GetUniformLocation(prog,
 							       "expected");
-	program->vertex_location = glGetAttribLocation(prog, "vertex");
+	vertex_location = glGetAttribLocation(prog, "vertex");
+	assert(vertex_location == 0);
 }
 
 static void
@@ -670,17 +677,6 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_GLSL_version(140);
 
-	if (argc != 3)
-		usage(argv[0]);
-
-	test_vs = strcmp(argv[1], "vs") == 0;
-	if (!test_vs && strcmp(argv[1], "fs") != 0)
-		usage(argv[0]);
-
-	test_arb = strcmp(argv[2], "arb") == 0;
-	if (!test_arb && strcmp(argv[2], "core") != 0)
-		usage(argv[0]);
-
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_extension("GL_ARB_texture_rg");
 
@@ -692,4 +688,50 @@ piglit_init(int argc, char **argv)
 	}
 
 	init_programs();
+}
+
+static bool
+find_arg(int argc, char *argv[], const char *str)
+{
+	int i;
+
+	for (i = 0; i < argc; i++) {
+		if (strcmp(argv[i], str) == 0)
+			return true;
+	}
+
+	return false;
+}
+
+int
+main(int argc, char *argv[])
+{
+	struct piglit_gl_test_config config;
+
+	test_vs = find_arg(argc, argv, "vs");
+	if (!test_vs && !find_arg(argc, argv, "fs"))
+		usage(argv[0]);
+
+	test_arb = find_arg(argc, argv, "arb");
+	if (!test_arb && !find_arg(argc, argv, "core"))
+		usage(argv[0]);
+
+	piglit_gl_test_config_init(&config);
+
+	config.init = piglit_init;
+	config.display = piglit_display;
+
+	if (test_arb)
+		config.supports_gl_compat_version = 10;
+	else
+		config.supports_gl_core_version = 31;
+
+	config.window_width = 200;
+	config.window_height = 500;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+	piglit_gl_test_run(argc, argv, &config);
+
+	assert(false);
+	return 0;
 }
