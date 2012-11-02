@@ -224,6 +224,14 @@ piglit_gl_test_run(int argc, char *argv[],
                                                                              \
                 config.init = piglit_init;                                   \
                 config.display = piglit_display;                             \
+                                                                             \
+                /* Default window size.  Note: Win7's min window width */    \
+                /* seems to be 116 pixels.  When the window size is */       \
+                /* unexpectedly resized, tests are marked as "WARN". */      \
+                /* Let's use a larger default to avoid that. */              \
+                config.window_width = 150;                                   \
+                config.window_height = 150;
+
 
 #define PIGLIT_GL_TEST_CONFIG_END                                            \
                                                                              \
