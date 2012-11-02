@@ -1004,8 +1004,8 @@ add_plain_test(arb_occlusion_query, 'occlusion_query')
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
 spec['ARB_sampler_objects'] = arb_sampler_objects
-add_plain_test(arb_sampler_objects, 'sampler-objects')
-add_plain_test(arb_sampler_objects, 'sampler-incomplete')
+arb_sampler_objects['sampler-objects'] = concurrent_test('arb_sampler_objects-sampler-objects')
+arb_sampler_objects['sampler-incomplete'] = concurrent_test('arb_sampler_objects-sampler-incomplete')
 arb_sampler_objects['GL_EXT_texture_sRGB_decode'] = concurrent_test('arb_sampler_objects-srgb-decode')
 arb_sampler_objects['framebufferblit'] = plain_test('arb_sampler_objects-framebufferblit')
 
