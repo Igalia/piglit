@@ -34,8 +34,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 100;
-	config.window_height = 100;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_SINGLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -57,6 +55,8 @@ static GLuint fb, rb;
 static GLuint testPoint_x, testPoint_y;
 static GLuint PointSize;
 
+static const int rb_size = 100;
+
 static const float green[] = { 0.0, 1.0, 0.0, 1.0 };
 static const float black[] = { 0.0, 0.0, 0.0, 1.0 };
 
@@ -64,6 +64,10 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
+
+	glViewport(0, 0, rb_size, rb_size);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -73,18 +77,21 @@ piglit_display(void)
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
 
-	testPoint_x = ( piglit_width - PointSize ) / 2;
-	testPoint_y = ( piglit_width - PointSize ) / 2;
+	testPoint_x = ( rb_size - PointSize ) / 2;
+	testPoint_y = ( rb_size - PointSize ) / 2;
 	pass = piglit_probe_pixel_rgb(0, 0, black) && pass;
 	pass = piglit_probe_pixel_rgb(testPoint_x, testPoint_y, green) && pass;
 
-	testPoint_y = piglit_height - testPoint_y ;
-	pass = piglit_probe_pixel_rgb(testPoint_x, testPoint_y - 1, black) && pass;
+	testPoint_y = rb_size - testPoint_y;
+	pass = piglit_probe_pixel_rgb(testPoint_x, testPoint_y + 1, black) && pass;
 
 	/* Draw the point out if want to have a look. */
 	if (!piglit_automatic){
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBlitFramebuffer(0, 0, 100, 100, 0, 0, 100, 100, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBlitFramebuffer(0, 0, rb_size, rb_size,
+				  0, 0, rb_size, rb_size,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		glFlush();
 	}
 
@@ -120,7 +127,7 @@ piglit_init(int argc, char **argv)
 
 	glGenRenderbuffers(1, &rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, 100, 100);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, rb_size, rb_size);
 
 	glGenFramebuffers(1, &fb);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fb);
