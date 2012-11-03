@@ -60,12 +60,13 @@ static GLfloat compvals[6][4] = { { -0.50,  0.00,  0.50,  0.00 },
 				  {  0.90,  0.90,  0.90,  0.90 } };
 
 #define STRIDE (5 * sizeof(GLfloat))
-void setup_texcoords(void)
+void setup_texcoords(float layer_sample)
 {
 	int i, j;
 	for (i = 0; i < 6; i++) {
 		for (j = 0; j < 4; j++) {
 			memcpy(cube_shadow_texcoords[i][j], cube_face_texcoords[i][j], 3 * sizeof(GLfloat));
+			cube_shadow_texcoords[i][j][3] = layer_sample;
 			cube_shadow_texcoords[i][j][4] = compvals[i][j];
 		}
 	}
@@ -109,17 +110,26 @@ loadTex(void)
 #define height 2
 #define width 2
 	int i, j;
-	GLfloat tex_vals[6][width][height];
+	GLfloat tex_vals[12][width][height];
 
 	/* Set the cubemap depth values for each face */
 	for (i=0; i < height; ++i) {
 		for (j=0; j < width; ++j) {
-			tex_vals[0][i][j] = 0.0;
-			tex_vals[1][i][j] = 0.2;
-			tex_vals[2][i][j] = 0.35;
-			tex_vals[3][i][j] = 0.50;
-			tex_vals[4][i][j] = 0.75;
-			tex_vals[5][i][j] = 1.0;
+			/* fill base layer with wrong stuff - checks
+			   we don't accidentally sample layer 0 */
+			tex_vals[0][i][j] = 1.0;
+			tex_vals[1][i][j] = 0.75;
+			tex_vals[2][i][j] = 0.50;
+			tex_vals[3][i][j] = 0.35;
+			tex_vals[4][i][j] = 0.2;
+			tex_vals[5][i][j] = 0.0;
+
+			tex_vals[6][i][j] = 0.0;
+			tex_vals[7][i][j] = 0.2;
+			tex_vals[8][i][j] = 0.35;
+			tex_vals[9][i][j] = 0.50;
+			tex_vals[10][i][j] = 0.75;
+			tex_vals[11][i][j] = 1.0;
 		}
 	}
 
@@ -144,7 +154,7 @@ loadTex(void)
 			GL_LEQUAL);
 
 	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT,
-		     width, height, 6, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)tex_vals);
+		     width, height, 12, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)tex_vals);
 #undef height
 #undef width
 }
@@ -163,7 +173,7 @@ piglit_init(int argc, char **argv)
 	glLoadIdentity();
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	shaderSetup();
-	setup_texcoords();
+	setup_texcoords(1.0);
 }
 
 enum piglit_result
