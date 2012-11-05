@@ -42,6 +42,10 @@ def usage():
 	USAGE = """\
 Usage: %(progName)s [options] [profile.tests]
 
+Prints a list of all the tests and how to run them.  Ex:
+   piglit test name ::: /path/to/piglit/bin/program <args>
+   glean test name ::: PIGLIT_TEST='...' /path/to/piglit/bin/glean -v -v -v ...
+
 Options:
   -h, --help                Show this message
   -t regexp, --tests=regexp Run only matching tests (can be used more
@@ -50,12 +54,12 @@ Options:
                             more than once)
 Example:
   %(progName)s tests/all.tests
-  %(progName)s -t basic tests/all.tests results/all
-         Run all tests whose path contains the word 'basic'
+  %(progName)s -t basic tests/all.tests
+         Print tests whose path contains the word 'basic'
 
-  %(progName)s -t ^glean/ -t tex tests/all.tests results/all
-         Run all tests that are in the 'glean' group or whose path contains
-		 the substring 'tex'
+  %(progName)s -t ^glean/ -t tex tests/all.tests
+         Print tests that are in the 'glean' group or whose path contains
+         the substring 'tex'
 """
 	print USAGE % {'progName': sys.argv[0]}
 	sys.exit(1)
