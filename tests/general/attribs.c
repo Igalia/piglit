@@ -50,9 +50,9 @@ enum {
 };
 
 enum {
-	FLOAT,
-	INT,
-	UINT
+	FLOAT_TYPE,
+	INT_TYPE,
+	UINT_TYPE
 };
 
 enum {
@@ -137,8 +137,8 @@ static GLboolean test(int x, int y, const char *shaderfunc,
 	};
 
 	sprintf(vstext, templ,
-		type != FLOAT ? "#version 130" : "",
-		type == INT ? "ivec4" : type == UINT ? "uvec4" : "vec4",
+		type != FLOAT_TYPE ? "#version 130" : "",
+		type == INT_TYPE ? "ivec4" : type == UINT_TYPE ? "uvec4" : "vec4",
 		shaderfunc);
 
 	/* Create the shader. */
@@ -239,35 +239,35 @@ typedef GLboolean (*test_func)(int x, int y, unsigned mode);
 
 /* GL 2.0 */
 /* XXX This list is incomplete. */
-DEFINE_TEST(glColor3b,,  (B(x), B(y), B(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3d,,  (x, y, z),			"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3f,,  (x, y, z),			"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3i,,  (I(x), I(y), I(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3s,,  (S(x), S(y), S(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3ub,, (UB(x), UB(y), UB(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3ui,, (UI(x), UI(y), UI(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor3us,, (US(x), US(y), US(z)),		"gl_Color", RGB, FLOAT, "")
-DEFINE_TEST(glColor4b,,  (B(x), B(y), B(z), B(w)),	"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4d,,  (x, y, z, w),			"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4f,,  (x, y, z, w),			"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4i,,  (I(x), I(y), I(z), I(w)),	"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4s,,  (S(x), S(y), S(z), S(w)),	"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4ub,, (UB(x), UB(y), UB(z), UB(w)),	"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4ui,, (UI(x), UI(y), UI(z), UI(w)),	"gl_Color", RGBA, FLOAT, "")
-DEFINE_TEST(glColor4us,, (US(x), US(y), US(z), US(w)),	"gl_Color",RGBA, FLOAT, "")
-DEFINE_TEST(glVertexAttrib1d,, (1, x),			"attr",	R, FLOAT, "")
-DEFINE_TEST(glVertexAttrib1f,, (1, x),			"attr", R, FLOAT, "")
-DEFINE_TEST(glVertexAttrib1s,, (1, S(x)),		"attr * vec4(1.0/32768.0, 1.0, 1.0, 1.0)", R, FLOAT, "")
-DEFINE_TEST(glVertexAttrib2d,, (1, x, y),		"attr", RG, FLOAT, "")
-DEFINE_TEST(glVertexAttrib2f,, (1, x, y),		"attr", RG, FLOAT, "")
-DEFINE_TEST(glVertexAttrib2s,, (1, S(x), S(y)),		"attr * vec4(vec2(1.0/32768.0), 1.0, 1.0)", RG, FLOAT, "")
-DEFINE_TEST(glVertexAttrib3d,, (1, x, y, z),		"attr", RGB, FLOAT, "")
-DEFINE_TEST(glVertexAttrib3f,, (1, x, y, z),		"attr", RGB, FLOAT, "")
-DEFINE_TEST(glVertexAttrib3s,, (1, S(x), S(y), S(z)),	"attr * vec4(vec3(1.0/32768.0), 1.0)", RGB, FLOAT, "")
-DEFINE_TEST(glVertexAttrib4Nub,, (1, UB(x), UB(y), UB(z), UB(w)), "attr", RGBA, FLOAT, "")
-DEFINE_TEST(glVertexAttrib4d,, (1, x, y, z, w),		"attr", RGBA, FLOAT, "")
-DEFINE_TEST(glVertexAttrib4f,, (1, x, y, z, w),		"attr", RGBA, FLOAT, "")
-DEFINE_TEST(glVertexAttrib4s,, (1, S(x), S(y), S(z), S(w)), "attr * vec4(1.0/32768.0)", RGBA, FLOAT, "")
+DEFINE_TEST(glColor3b,,  (B(x), B(y), B(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3d,,  (x, y, z),			"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3f,,  (x, y, z),			"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3i,,  (I(x), I(y), I(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3s,,  (S(x), S(y), S(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3ub,, (UB(x), UB(y), UB(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3ui,, (UI(x), UI(y), UI(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor3us,, (US(x), US(y), US(z)),		"gl_Color", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4b,,  (B(x), B(y), B(z), B(w)),	"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4d,,  (x, y, z, w),			"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4f,,  (x, y, z, w),			"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4i,,  (I(x), I(y), I(z), I(w)),	"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4s,,  (S(x), S(y), S(z), S(w)),	"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4ub,, (UB(x), UB(y), UB(z), UB(w)),	"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4ui,, (UI(x), UI(y), UI(z), UI(w)),	"gl_Color", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glColor4us,, (US(x), US(y), US(z), US(w)),	"gl_Color",RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib1d,, (1, x),			"attr",	R, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib1f,, (1, x),			"attr", R, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib1s,, (1, S(x)),		"attr * vec4(1.0/32768.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib2d,, (1, x, y),		"attr", RG, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib2f,, (1, x, y),		"attr", RG, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib2s,, (1, S(x), S(y)),		"attr * vec4(vec2(1.0/32768.0), 1.0, 1.0)", RG, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib3d,, (1, x, y, z),		"attr", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib3f,, (1, x, y, z),		"attr", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib3s,, (1, S(x), S(y), S(z)),	"attr * vec4(vec3(1.0/32768.0), 1.0)", RGB, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib4Nub,, (1, UB(x), UB(y), UB(z), UB(w)), "attr", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib4d,, (1, x, y, z, w),		"attr", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib4f,, (1, x, y, z, w),		"attr", RGBA, FLOAT_TYPE, "")
+DEFINE_TEST(glVertexAttrib4s,, (1, S(x), S(y), S(z), S(w)), "attr * vec4(1.0/32768.0)", RGBA, FLOAT_TYPE, "")
 
 static test_func tests_GL2[] = {
 	test_glColor3b,
@@ -305,21 +305,21 @@ static test_func tests_GL2[] = {
 
 /* GL 3.0 */
 DEFINE_TEST(glVertexAttribI1i,, (1, I(x)),
-	    "vec4(attr) * vec4(1.0/2147483647.0, 1.0, 1.0, 1.0)", R, INT, "")
+	    "vec4(attr) * vec4(1.0/2147483647.0, 1.0, 1.0, 1.0)", R, INT_TYPE, "")
 DEFINE_TEST(glVertexAttribI2i,, (1, I(x), I(y)),
-	    "vec4(attr) * vec4(vec2(1.0/2147483647.0), 1.0, 1.0)", RG, INT, "")
+	    "vec4(attr) * vec4(vec2(1.0/2147483647.0), 1.0, 1.0)", RG, INT_TYPE, "")
 DEFINE_TEST(glVertexAttribI3i,, (1, I(x), I(y), I(z)),
-	    "vec4(attr) * vec4(vec3(1.0/2147483647.0), 1.0)",	RGB, INT, "")
+	    "vec4(attr) * vec4(vec3(1.0/2147483647.0), 1.0)",	RGB, INT_TYPE, "")
 DEFINE_TEST(glVertexAttribI4i,, (1, I(x), I(y), I(z), I(w)),
-	    "vec4(attr) * vec4(1.0/2147483647.0)",		RGBA, INT, "")
+	    "vec4(attr) * vec4(1.0/2147483647.0)",		RGBA, INT_TYPE, "")
 DEFINE_TEST(glVertexAttribI1ui,, (1, UI(x)),
-	    "vec4(attr) * vec4(1.0/4294967295.0, 1.0, 1.0, 1.0)", R, UINT, "")
+	    "vec4(attr) * vec4(1.0/4294967295.0, 1.0, 1.0, 1.0)", R, UINT_TYPE, "")
 DEFINE_TEST(glVertexAttribI2ui,, (1, UI(x), UI(y)),
-	    "vec4(attr) * vec4(vec2(1.0/4294967295.0), 1.0, 1.0)", RG, UINT, "")
+	    "vec4(attr) * vec4(vec2(1.0/4294967295.0), 1.0, 1.0)", RG, UINT_TYPE, "")
 DEFINE_TEST(glVertexAttribI3ui,, (1, UI(x), UI(y), UI(z)),
-	    "vec4(attr) * vec4(vec3(1.0/4294967295.0), 1.0)",	RGB, UINT, "")
+	    "vec4(attr) * vec4(vec3(1.0/4294967295.0), 1.0)",	RGB, UINT_TYPE, "")
 DEFINE_TEST(glVertexAttribI4ui,, (1, UI(x), UI(y), UI(z), UI(w)),
-	    "vec4(attr) * vec4(1.0/4294967295.0)",		RGBA, UINT, "")
+	    "vec4(attr) * vec4(1.0/4294967295.0)",		RGBA, UINT_TYPE, "")
 
 static test_func tests_GL3[] = {
 	test_glVertexAttribI1i,
@@ -344,91 +344,91 @@ static test_func tests_GL3[] = {
 
 /* GL_INT_2_10_10_10_REV */
 DEFINE_TEST(glTexCoordP1ui,, (GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP2ui,, (GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP3ui,, (GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP4ui,, (GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP1ui,, (GL_TEXTURE1, GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP2ui,, (GL_TEXTURE1, GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP3ui,, (GL_TEXTURE1, GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP4ui,, (GL_TEXTURE1, GL_INT_2_10_10_10_REV, P1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glNormalP3ui,, (GL_INT_2_10_10_10_REV, PN1010102(x,y,z,w)),
-	    "vec4(gl_Normal, 1.0)", RGB, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "vec4(gl_Normal, 1.0)", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glColorP3ui,, (GL_INT_2_10_10_10_REV, PN1010102(x,y,z,w)),
-	    "gl_Color", RGB, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "gl_Color", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glColorP4ui,, (GL_INT_2_10_10_10_REV, PN1010102(x,y,z,w)),
-	    "gl_Color", RGBA, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "gl_Color", RGBA, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glSecondaryColorP3ui,, (GL_INT_2_10_10_10_REV, PN1010102(x,y,z,w)),
-	    "gl_SecondaryColor", RGB, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "gl_SecondaryColor", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 /* GL_INT_2_10_10_10_REV unnormalized */
 DEFINE_TEST(glVertexAttribP1ui,, (1, GL_INT_2_10_10_10_REV, 0, P1010102(x,y,z,w)),
-	    "attr * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "attr * vec4(1.0/511.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP2ui,, (1, GL_INT_2_10_10_10_REV, 0, P1010102(x,y,z,w)),
-	    "attr * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "attr * vec4(vec2(1.0/511.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP3ui,, (1, GL_INT_2_10_10_10_REV, 0, P1010102(x,y,z,w)),
-	    "attr * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "attr * vec4(vec3(1.0/511.0), 1.0)", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP4ui,, (1, GL_INT_2_10_10_10_REV, 0, P1010102(x,y,z,w)),
-	    "attr * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT, "GL_INT_2_10_10_10_REV")
+	    "attr * vec4(vec3(1.0/511.0), 1.0)", RGBA, FLOAT_TYPE, "GL_INT_2_10_10_10_REV")
 /* GL_INT_2_10_10_10_REV normalized */
 DEFINE_TEST(glVertexAttribP1ui,_norm, (1, GL_INT_2_10_10_10_REV, 1, PN1010102(x,y,z,w)),
-	    "attr", R, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "attr", R, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP2ui,_norm, (1, GL_INT_2_10_10_10_REV, 1, PN1010102(x,y,z,w)),
-	    "attr", RG, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "attr", RG, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP3ui,_norm, (1, GL_INT_2_10_10_10_REV, 1, PN1010102(x,y,z,w)),
-	    "attr", RGB, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "attr", RGB, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP4ui,_norm, (1, GL_INT_2_10_10_10_REV, 1, PN1010102(x,y,z,w)),
-	    "attr", RGBA, FLOAT, "GL_INT_2_10_10_10_REV-norm")
+	    "attr", RGBA, FLOAT_TYPE, "GL_INT_2_10_10_10_REV-norm")
 
 /* GL_UNSIGNED_INT_2_10_10_10_REV */
 DEFINE_TEST(glTexCoordP1ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP2ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP3ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glTexCoordP4ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord0 * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord0 * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP1ui,_uint, (GL_TEXTURE1, GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP2ui,_uint, (GL_TEXTURE1, GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP3ui,_uint, (GL_TEXTURE1, GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glMultiTexCoordP4ui,_uint, (GL_TEXTURE1, GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_MultiTexCoord1 * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "gl_MultiTexCoord1 * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glNormalP3ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "vec4(gl_Normal, 1.0)", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "vec4(gl_Normal, 1.0)", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glColorP3ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_Color", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "gl_Color", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glColorP4ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_Color", RGBA, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "gl_Color", RGBA, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glSecondaryColorP3ui,_uint, (GL_UNSIGNED_INT_2_10_10_10_REV, UP1010102(x,y,z,w)),
-	    "gl_SecondaryColor", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "gl_SecondaryColor", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 /* GL_UNSIGNED_INT_2_10_10_10_REV unnormalized */
 DEFINE_TEST(glVertexAttribP1ui,_uint, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 0, UP1010102(x,y,z,w)),
-	    "attr * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "attr * vec4(1.0/1023.0, 1.0, 1.0, 1.0)", R, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP2ui,_uint, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 0, UP1010102(x,y,z,w)),
-	    "attr * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "attr * vec4(vec2(1.0/1023.0), 1.0, 1.0)", RG, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP3ui,_uint, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 0, UP1010102(x,y,z,w)),
-	    "attr * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "attr * vec4(vec3(1.0/1023.0), 1.0)", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 DEFINE_TEST(glVertexAttribP4ui,_uint, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 0, UP1010102(x,y,z,w)),
-	    "attr * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV")
+	    "attr * vec4(vec3(1.0/1023.0), 1.0/3.0)", RGBA, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV")
 /* GL_UNSIGNED_INT_2_10_10_10_REV normalized */
 DEFINE_TEST(glVertexAttribP1ui,_uint_norm, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 1, UP1010102(x,y,z,w)),
-	    "attr", R, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "attr", R, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP2ui,_uint_norm, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 1, UP1010102(x,y,z,w)),
-	    "attr", RG, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "attr", RG, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP3ui,_uint_norm, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 1, UP1010102(x,y,z,w)),
-	    "attr", RGB, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "attr", RGB, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 DEFINE_TEST(glVertexAttribP4ui,_uint_norm, (1, GL_UNSIGNED_INT_2_10_10_10_REV, 1, UP1010102(x,y,z,w)),
-	    "attr", RGBA, FLOAT, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
+	    "attr", RGBA, FLOAT_TYPE, "GL_UNSIGNED_INT_2_10_10_10_REV-norm")
 
 static test_func tests_GL_ARB_vertex_type_2_10_10_10_rev[] = {
 	test_glTexCoordP1ui,
