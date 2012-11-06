@@ -450,6 +450,7 @@ test_format(const struct format_desc *format, GLenum basetype)
 enum piglit_result
 piglit_display(void)
 {
+	struct format_desc format;
 	GLboolean pass = GL_TRUE;
 	int i;
 	(void)fbo_formats_display;
@@ -459,20 +460,33 @@ piglit_display(void)
 
 	if (piglit_automatic) {
 		for (i = 0; i < test_sets[test_index].num_formats; i++) {
-			pass = test_format(&test_sets[test_index].format[i],
+			format = test_sets[test_index].format[i];
+			/* Skip testing textures with depth-stencil internal
+			 * formats as they are not allowed in glGenerateMipmap.
+			 */
+			if (format.base_internal_format == GL_DEPTH_STENCIL)
+				continue;
+
+			pass = test_format(&format,
 					   test_sets[test_index].basetype) && pass;
 		}
 		if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
 			set_npot(GL_TRUE);
 			for (i = 0; i < test_sets[test_index].num_formats; i++) {
-				pass = test_format(&test_sets[test_index].format[i],
+				format = test_sets[test_index].format[i];
+				if (format.base_internal_format == GL_DEPTH_STENCIL)
+					continue;
+
+				pass = test_format(&format,
 						   test_sets[test_index].basetype) && pass;
 			}
 			set_npot(GL_FALSE);
 		}
 	} else {
-		pass = test_format(&test_sets[test_index].format[format_index],
-				   test_sets[test_index].basetype);
+		format = test_sets[test_index].format[format_index];
+		if (format.base_internal_format != GL_DEPTH_STENCIL)
+			pass = test_format(&format,
+					   test_sets[test_index].basetype);
 	}
 
 	piglit_present_results();
