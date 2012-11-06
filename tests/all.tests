@@ -1619,6 +1619,9 @@ arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-aut
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 add_plain_test(arb_texture_cube_map, 'cubemap')
 arb_texture_cube_map['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'])
+add_plain_test(arb_texture_cube_map, 'cubemap-shader')
+arb_texture_cube_map['cubemap-shader lod'] = PlainExecTest(['cubemap-shader', '-auto', 'lod'])
+arb_texture_cube_map['cubemap-shader bias'] = PlainExecTest(['cubemap-shader', '-auto', 'bias'])
 
 arb_texture_cube_map_array = Group()
 spec['ARB_texture_cube_map_array'] = arb_texture_cube_map_array
