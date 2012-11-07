@@ -14,7 +14,6 @@ link_libraries (
 piglit_add_executable (crash-cubemap-order crash-cubemap-order.c)
 piglit_add_executable (crash-texparameter-before-teximage crash-texparameter-before-teximage.c)
 piglit_add_executable (drawbuffer-modes drawbuffer-modes.c)
-piglit_add_executable (fdo9833 fdo9833.c)
 piglit_add_executable (fdo10370 fdo10370.c)
 piglit_add_executable (fdo14575 fdo14575.c)
 piglit_add_executable (r300-readcache r300-readcache.c)

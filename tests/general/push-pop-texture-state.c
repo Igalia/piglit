@@ -1,4 +1,6 @@
 /**
+ * Test pushing/popping of GL_TEXTURE_BIT state.
+ *
  * Test case from fd.o bug #9833.
  * https://bugs.freedesktop.org/show_bug.cgi?id=9833
  */
@@ -16,29 +18,19 @@ PIGLIT_GL_TEST_CONFIG_END
 enum piglit_result
 piglit_display(void)
 {
-	static int goterrors = 0;
-	static int frame = 0;
-	GLuint error;
+	bool pass = true;
 
-	frame++;
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushAttrib(GL_TEXTURE_BIT);
-	while ( (error = glGetError()) != GL_NO_ERROR) {
-		fprintf(stderr, "OpenGL error 0x%0x occured after glPushAttrib!\n", error);
-		goterrors++;
-	}
-
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	glPopAttrib();
-	while ( (error = glGetError()) != GL_NO_ERROR) {
-		fprintf(stderr, "OpenGL error 0x%0x occured after glPopAttrib!\n", error);
-		goterrors++;
-	}
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	piglit_present_results();
 
-	return goterrors ? PIGLIT_FAIL : PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
