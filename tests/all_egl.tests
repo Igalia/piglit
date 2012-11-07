@@ -42,3 +42,4 @@ create_context['valid forward-compatible flag GL'] = concurrent_test('egl-create
 create_context['invalid profile'] = concurrent_test('egl-create-context-invalid-profile')
 create_context['3.2 core profile required'] = concurrent_test('egl-create-context-core-profile')
 create_context['pre-GL3.2 profile'] = concurrent_test('egl-create-context-pre-GL32-profile')
+create_context['verify GL flavor'] = concurrent_test('egl-create-context-verify-gl-flavor')
