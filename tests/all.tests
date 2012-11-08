@@ -1245,6 +1245,7 @@ add_plain_test(arb_vertex_buffer_object, 'fdo31934')
 add_plain_test(arb_vertex_buffer_object, 'pos-array')
 add_plain_test(arb_vertex_buffer_object, 'vbo-bufferdata')
 add_plain_test(arb_vertex_buffer_object, 'vbo-map-remap')
+add_concurrent_test(arb_vertex_buffer_object, 'vbo-map-unsync')
 add_plain_test(arb_vertex_buffer_object, 'vbo-subdata-sync')
 add_plain_test(arb_vertex_buffer_object, 'vbo-subdata-zero')
 
