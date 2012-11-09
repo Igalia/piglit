@@ -56,7 +56,8 @@ static bool try_attribute(int attribute)
 	 *        recognized (including unrecognized bits in bitmask attributes),
 	 *        then an EGL_BAD_ATTRIBUTE error is generated."
 	 */
-	piglit_expect_egl_error(EGL_BAD_ATTRIBUTE, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return pass;
 }

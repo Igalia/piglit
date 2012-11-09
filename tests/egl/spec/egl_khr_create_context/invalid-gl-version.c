@@ -50,7 +50,8 @@ static bool try_version(int major, int minor)
 	 *     version and feature set that are not defined, than an
 	 *     EGL_BAD_MATCH error is generated."
 	 */
-	piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_BAD_MATCH))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return pass;
 }

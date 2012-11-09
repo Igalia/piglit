@@ -48,7 +48,7 @@ static bool try_flag(int flag)
 			gl_version = piglit_get_gl_version();
 		}
 		eglDestroyContext(egl_dpy, ctx);
-	} else {
+	} else if (!piglit_check_egl_error(EGL_BAD_MATCH)) {
 		/* The EGL_KHR_create_context spec says:
 		 *
 		 *     "* If <config> does not support a client API context compatible
@@ -57,7 +57,7 @@ static bool try_flag(int flag)
 		 *        where these attributes are supported), then an EGL_BAD_MATCH
 		 *        error is generated.
 		 */
-		piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	return true;

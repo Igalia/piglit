@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	if (ctx != EGL_NO_CONTEXT) {
 		eglDestroyContext(egl_dpy, ctx);
 		got_core_with_profile = true;
-	} else {
+	} else if (!piglit_check_egl_error(EGL_BAD_MATCH)) {
 		/* The EGL_KHR_create_context spec says:
 		 *
 		 *     "* If <config> does not support a client API context
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
 		 *        are supported), then an EGL_BAD_MATCH error is
 		 *        generated."
 		 */
-		piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* The EGL_KHR_create_context spec says:
@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 	if (ctx != EGL_NO_CONTEXT) {
 		eglDestroyContext(egl_dpy, ctx);
 		got_core_without_profile = true;
-	} else {
+	} else if (!piglit_check_egl_error(EGL_BAD_MATCH)) {
 		/* The EGL_KHR_create_context spec says:
 		 *
 		 *     "* If <config> does not support a client API context
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 		 *        are supported), then an EGL_BAD_MATCH error is
 		 *        generated."
 		 */
-		piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT, compatibility_attribs);
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 	if (ctx != EGL_NO_CONTEXT) {
 		eglDestroyContext(egl_dpy, ctx);
 		got_compatibility = true;
-	} else {
+	} else if (!piglit_check_egl_error(EGL_BAD_MATCH)) {
 		/* The EGL_KHR_create_context spec says:
 		 *
 		 *     "* If <config> does not support a client API context
@@ -125,7 +125,7 @@ int main(int argc, char **argv)
 		 *        are supported), then an EGL_BAD_MATCH error is
 		 *        generated."
 		 */
-		piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	EGL_KHR_create_context_teardown();

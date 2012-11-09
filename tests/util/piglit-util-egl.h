@@ -41,14 +41,15 @@ extern "C" {
 const char* piglit_get_egl_error_name(EGLint error);
 
 /**
- * \brief Check for unexpected EGL errors and possibly terminate the test.
+ * \brief Check for unexpected EGL errors.
  *
  * If eglGetError() returns an error other than \c expected_error, then
- * print a diagnostic and terminate the test with the given result.
+ * print a diagnostic and return false.
  *
  * If you expect no error, then set \code expected_error = EGL_SUCCESS \endcode.
  */
-void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result);
+bool
+piglit_check_egl_error(EGLint expected_error);
 
 /**
  * \brief Checks whether an EGL extension is supported.

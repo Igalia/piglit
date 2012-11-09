@@ -48,13 +48,14 @@ const char* piglit_get_egl_error_name(EGLint error) {
 #undef CASE
 }
 
-void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result)
+bool
+piglit_check_egl_error(EGLint expected_error)
 {
 	EGLint actual_error;
 
 	actual_error = eglGetError();
 	if (actual_error == expected_error) {
-		return;
+		return true;
 	}
 
 	/*
@@ -72,7 +73,7 @@ void piglit_expect_egl_error(EGLint expected_error, enum piglit_result result)
 		piglit_get_egl_error_name(expected_error), expected_error);
         }
 
-	piglit_report_result(result);
+	return false;
 }
 
 bool

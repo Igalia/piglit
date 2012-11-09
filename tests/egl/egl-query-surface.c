@@ -64,7 +64,9 @@ query_width(struct egl_state *state)
 
 	assert(state->width == window_width);
 	ok = eglQuerySurface(state->egl_dpy, state->surf, EGL_WIDTH, &width);
-	piglit_expect_egl_error(EGL_SUCCESS, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_SUCCESS)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 	if (!ok) {
 		fprintf(stderr, "error: eglQuerySurface() failed\n");
 		return PIGLIT_FAIL;
@@ -86,7 +88,9 @@ query_height(struct egl_state *state)
 
 	assert(state->height == window_height);
 	ok = eglQuerySurface(state->egl_dpy, state->surf, EGL_HEIGHT, &height);
-	piglit_expect_egl_error(EGL_SUCCESS, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_SUCCESS)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 	if (!ok) {
 		fprintf(stderr, "error: eglQuerySurface() failed\n");
 		return PIGLIT_FAIL;
@@ -112,7 +116,9 @@ query_bad_surface(struct egl_state *state)
 		        "error: eglQuerySurface(surface=0) succeeded\n");
 		return PIGLIT_FAIL;
 	}
-	piglit_expect_egl_error(EGL_BAD_SURFACE, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_BAD_SURFACE)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 	return PIGLIT_PASS;
 }
 
@@ -130,7 +136,8 @@ query_bad_parameter(struct egl_state *state)
 		        "succeeded\n");
 		return PIGLIT_FAIL;
 	}
-	piglit_expect_egl_error(EGL_BAD_ATTRIBUTE, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_BAD_ATTRIBUTE))
+		piglit_report_result(PIGLIT_FAIL);
 	return PIGLIT_PASS;
 }
 

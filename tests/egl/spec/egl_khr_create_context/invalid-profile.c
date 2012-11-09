@@ -59,7 +59,8 @@ static bool try_profile(int profile)
 	 *        support the requested profile, then an EGL_BAD_MATCH error is
 	 *        generated."
 	 */
-	piglit_expect_egl_error(EGL_BAD_MATCH, PIGLIT_FAIL);
+	if (!piglit_check_egl_error(EGL_BAD_MATCH))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return pass;
 }
