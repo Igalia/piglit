@@ -1631,7 +1631,7 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap-lod')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubemap-array')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
-textureSize_samplers_atcma = ['samplerCubeArray'];
+textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray'];
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
 			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
