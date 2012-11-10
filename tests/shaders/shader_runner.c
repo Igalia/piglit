@@ -39,9 +39,16 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-vbo.h"
 
+static void
+get_required_versions(const char *script_name,
+		      struct piglit_gl_test_config *config);
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	if (argc > 1)
+		get_required_versions(argv[1], &config);
+	else
+		config.supports_gl_compat_version = 10;
 
 	config.window_width = 250;
 	config.window_height = 250;
@@ -741,6 +748,99 @@ process_test_script(const char *script_name)
 	leave_state(state, line);
 }
 
+/**
+ * Just determine the GLSL version required by the shader script.
+ *
+ * This function is a bit of a hack that is, unfortunately necessary.  A test
+ * script can require a specific GLSL version or a specific GL version.  To
+ * satisfy this requirement, the piglit framework code needs to know about the
+ * requirement before creating the context.  However, the requirements section
+ * can contain other requirements, such as minimum number of uniforms.
+ *
+ * The requirements section can't be fully processed until after the context
+ * is created, but the context can't be created until after the requirements
+ * section is processed.  Do a quick can over the requirements section to find
+ * the GL and GLSL version requirements.  Use these to guide context creation.
+ */
+void
+get_required_versions(const char *script_name,
+		      struct piglit_gl_test_config *config)
+{
+	unsigned text_size;
+	char *text = piglit_load_text_file(script_name, &text_size);
+	const char *line = text;
+	unsigned requested_glsl_version = 110;
+	unsigned requested_gl_version = 10;
+	bool in_requirement_section = false;
+
+
+	if (line == NULL) {
+		printf("could not read file \"%s\"\n", script_name);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	while (line[0] != '\0') {
+		if (line[0] == '[')
+			in_requirement_section = false;
+
+		if (!in_requirement_section) {
+			if (string_match("[require]", line)) {
+				in_requirement_section = true;
+			}
+		} else {
+			if (string_match("GL_", line)
+			    || string_match("!GL_", line)) {
+				/* empty */
+			} else if (string_match("GLSL", line)) {
+				enum comparison cmp;
+				unsigned version;
+
+				parse_version_comparison(line + 4, &cmp,
+							 &version, true);
+				if (cmp == greater_equal)
+					requested_glsl_version = version;
+
+			} else if (string_match("GL", line)) {
+				enum comparison cmp;
+				unsigned version;
+
+				parse_version_comparison(line + 2, &cmp,
+							 &version, false);
+				if (cmp == greater_equal
+				    || cmp == greater
+				    || cmp == equal)
+					requested_gl_version = version;
+			}
+		}
+
+		line = strchrnul(line, '\n');
+		if (line[0] != '\0')
+			line++;
+	}
+
+	switch (requested_glsl_version) {
+	case 140:
+	case 150:
+	case 330:
+		if (requested_gl_version < 31)
+			requested_gl_version = 31;
+		break;
+	case 400:
+	case 410:
+	case 420:
+		if (requested_gl_version < 40)
+			requested_gl_version = 40;
+		break;
+	}
+
+	if (requested_gl_version > 30) {
+		config->supports_gl_core_version = requested_gl_version;
+		config->supports_gl_compat_version = requested_gl_version;
+	} else {
+		config->supports_gl_core_version = 0;
+		config->supports_gl_compat_version = 10;
+	}
+}
 
 void
 get_floats(const char *line, float *f, unsigned count)
