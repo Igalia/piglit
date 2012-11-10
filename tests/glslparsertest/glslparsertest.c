@@ -37,8 +37,41 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_es2 = true;
+	if (argc > 3) {
+		const float version = strtod(argv[3], NULL);
+		const unsigned int int_version = (unsigned) (version * 10);
+
+		switch (int_version) {
+		case 11:
+		case 12:
+		case 13:
+			config.supports_gl_compat_version = 10;
+			config.supports_gl_core_version = 0;
+			config.supports_gl_es2 = false;
+			break;
+		case 14:
+		case 15:
+		case 33:
+			config.supports_gl_compat_version = 31;
+			config.supports_gl_core_version = 31;
+			config.supports_gl_es2 = false;
+			break;
+		case 40:
+		case 41:
+		case 42:
+			config.supports_gl_compat_version = 40;
+			config.supports_gl_core_version = 40;
+			config.supports_gl_es2 = false;
+			break;
+		default:
+			config.supports_gl_compat_version = 10;
+			config.supports_gl_es2 = true;
+			break;
+		}
+	} else {
+		config.supports_gl_compat_version = 10;
+		config.supports_gl_es2 = true;
+	}
 
 	config.window_width = 200;
 	config.window_height = 100;
