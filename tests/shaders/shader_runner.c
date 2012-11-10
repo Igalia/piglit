@@ -379,6 +379,15 @@ process_comparison(const char *src, enum comparison *cmp)
 }
 
 
+void
+parse_version_comparison(const char *line, enum comparison *cmp,
+			 float *version)
+{
+	line = eat_whitespace(line);
+	line = process_comparison(line, cmp);
+	*version = strtod(line, NULL);
+}
+
 /**
  * Parse and check a line from the requirement section of the test
  */
@@ -443,9 +452,7 @@ process_requirement(const char *line)
 	} else if (string_match("GLSL", line)) {
 		enum comparison cmp;
 
-		line = eat_whitespace(line + 4);
-
-		line = process_comparison(line, &cmp);
+		parse_version_comparison(line + 4, &cmp, &glsl_req_version);
 
 		/* We only allow >= because we potentially use the
 		 * version number to insert a #version directive. */
@@ -454,7 +461,6 @@ process_requirement(const char *line)
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
-		glsl_req_version = strtod(line, NULL);
 		if (!compare(glsl_req_version, glsl_version, cmp)) {
 			printf("Test requires GLSL version %s %.1f.  "
 			       "Actual version is %.1f.\n",
@@ -467,11 +473,8 @@ process_requirement(const char *line)
 		enum comparison cmp;
 		float version;
 
-		line = eat_whitespace(line + 2);
+		parse_version_comparison(line + 2, &cmp, &version);
 
-		line = process_comparison(line, &cmp);
-
-		version = strtod(line, NULL);
 		if (!compare(version, gl_version, cmp)) {
 			printf("Test requires GL version %s %.1f.  "
 			       "Actual version is %.1f.\n",
