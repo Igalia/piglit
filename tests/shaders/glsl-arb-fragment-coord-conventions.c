@@ -41,6 +41,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+
+/* Test size / region */
+#define WIDTH 100
+#define HEIGHT 100
+
+
 static const float black[4] = {0.0, 0.0, 0.0, 0.0};
 static const float red[4] = {1.0, 0.0, 0.0, 0.0};
 static const float green[4] = {0.0, 1.0, 0.0, 0.0};
@@ -62,7 +68,12 @@ piglit_display(void)
    GLuint vs, fs;
    GLboolean pass = GL_TRUE;
 
-   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+   if (piglit_width < WIDTH || piglit_height < HEIGHT) {
+      printf("window is too small.\n");
+      return PIGLIT_SKIP;
+   }
+
+   piglit_ortho_projection(WIDTH, HEIGHT, GL_FALSE);
 
    vs = piglit_compile_shader(GL_VERTEX_SHADER, "shaders/glsl-mvp.vert");
 
@@ -81,14 +92,15 @@ piglit_display(void)
       glUseProgram(prog);
 
       glClear(GL_COLOR_BUFFER_BIT);
+      glViewport(0, 0, WIDTH, HEIGHT);
 
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
+      piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
       pass = piglit_probe_pixel_rgb(0, 0, black) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(99, 99, yellow) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, yellow) && pass;
    }
 
    /* No layout, test pixel center is half integer */
@@ -108,14 +120,15 @@ piglit_display(void)
       glUseProgram(prog);
 
       glClear(GL_COLOR_BUFFER_BIT);
+      glViewport(0, 0, WIDTH, HEIGHT);
 
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
+      piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
       pass = piglit_probe_pixel_rgb(0, 0, gray75) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(99, 99, gray75) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray75) && pass;
    }
 
    /* Pixel center integer */
@@ -136,14 +149,15 @@ piglit_display(void)
       glUseProgram(prog);
 
       glClear(GL_COLOR_BUFFER_BIT);
+      glViewport(0, 0, WIDTH, HEIGHT);
 
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
+      piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
       pass = piglit_probe_pixel_rgb(0, 0, gray25) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(99, 99, gray25) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray25) && pass;
    }
 
    /* Pixel origin upper left */
@@ -157,6 +171,7 @@ piglit_display(void)
          "   gl_FragColor = gl_FragCoord * 0.01; \n"
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
+      int y0 = piglit_height - HEIGHT;
 
       printf("Pixel origin upper left\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
@@ -164,14 +179,15 @@ piglit_display(void)
       glUseProgram(prog);
 
       glClear(GL_COLOR_BUFFER_BIT);
+      glViewport(0, y0, WIDTH, HEIGHT);
 
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
+      piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
-      pass = piglit_probe_pixel_rgb(0, 0, green) && pass;
+      pass = piglit_probe_pixel_rgb(0, y0, green) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(99, 99, red) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, y0 + HEIGHT - 1, red) && pass;
    }
 
    /* Pixel origin upper left and pixel center integer */
@@ -187,6 +203,7 @@ piglit_display(void)
          "   gl_FragColor = gl_FragCoord * 0.0025 + 0.125; \n"
          "   gl_FragColor.z = 0.0; \n"
          "} \n";
+      int y0 = piglit_height - HEIGHT;
 
       printf("Pixel origin upper left and pixel center integer\n");
       fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtext);
@@ -194,14 +211,15 @@ piglit_display(void)
       glUseProgram(prog);
 
       glClear(GL_COLOR_BUFFER_BIT);
+      glViewport(0, y0, WIDTH, HEIGHT);
 
-      piglit_draw_rect(0, 0, piglit_width, piglit_height);
+      piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
-      pass = piglit_probe_pixel_rgb(0, 0, color1) && pass;
+      pass = piglit_probe_pixel_rgb(0, y0, color1) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(99, 99, color2) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, y0 + HEIGHT - 1, color2) && pass;
    }
 
    piglit_present_results();
