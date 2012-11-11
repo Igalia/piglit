@@ -41,6 +41,11 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+/* Test size - note that the pixel probing below is very specific */
+#define WIDTH 100
+#define HEIGHT 100
+
+
 static int bump_density_location, bump_size_location;
 static int specular_factor_location, surface_color_location;
 static int light_position_location, tangent_attrib;
@@ -56,14 +61,20 @@ piglit_display(void)
 	static const float test_bump_dark[3] = {0.411, 0.352, 0.105};
 	static const float test_bump_light[3] = {1.0, 0.961, 0.557};
 	float light_position[3] = {-1.0, -1.0, 2.0};
-	float w = piglit_width;
-	float h = piglit_height;
+	float w = WIDTH;
+	float h = HEIGHT;
 	float bump_x = w * 3 / 8;
 	float bump_y = h * 3 / 8;
 	float x, y;
 
+	if (piglit_width < WIDTH || piglit_height < HEIGHT) {
+		printf("window is too small.\n");
+		return PIGLIT_SKIP;
+	}
+
 	piglit_ortho_projection(1, 1, GL_FALSE);
 
+	glViewport(0, 0, WIDTH, HEIGHT);
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -87,7 +98,7 @@ piglit_display(void)
 	 * non-specular point.
 	 */
 	pass &= piglit_probe_pixel_rgb(0, 0, test_specular);
-	pass &= piglit_probe_pixel_rgb(piglit_width - 1, piglit_height - 1,
+	pass &= piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1,
 				       test_nonspecular);
 
 	/* Look at a bump -- does it have a lit part and an unlit part? */
