@@ -40,6 +40,14 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+
+/* Size of viewport and test region.  Note that there are pixel probes at
+ * specific locations.
+ */
+#define WIDTH 100
+#define HEIGHT 100
+
+
 /*
     Note: In KWin, the code for these shaders is generated at runtime,
           based on the blur radius. This is what the code looks like
@@ -169,8 +177,8 @@ static GLboolean test()
     int i;
 
     /* Pixel sizes in texture coordinates for the horizontal and vertical passes */
-    const float horizontal[2] = { 1.0 / piglit_width, 0 };
-    const float vertical[2]   = { 0, 1.0 / piglit_height };
+    const float horizontal[2] = { 1.0 / WIDTH, 0 };
+    const float vertical[2]   = { 0, 1.0 / HEIGHT };
 
     /* Texture and vertex coordinates */
     const float tc[] = { 0,1, 1,1, 0,0, 0,0, 1,1, 1,0 };
@@ -186,7 +194,7 @@ static GLboolean test()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, piglit_width, piglit_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
 
     glUseProgram(prog);
     glUniform1i(uTexUnit, 0);
@@ -198,12 +206,12 @@ static GLboolean test()
     glVertexPointer(2, GL_FLOAT, 0, vc);
 
     /* Horizontal pass */
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, piglit_width, piglit_height);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIDTH, HEIGHT);
     glUniform2fv(uPixelSize, 1, horizontal);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     /* Vertical pass */
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, piglit_width, piglit_height);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, WIDTH, HEIGHT);
     glUniform2fv(uPixelSize, 1, vertical);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -225,9 +233,9 @@ static GLboolean test()
         color[1] = color[0];
         color[2] = color[0];
         pass = piglit_probe_pixel_rgb(50, 12 + i, color) && pass;
-        pass = piglit_probe_pixel_rgb(50, piglit_height - 13 - i, color) && pass;
+        pass = piglit_probe_pixel_rgb(50, HEIGHT - 13 - i, color) && pass;
         pass = piglit_probe_pixel_rgb(12 + i, 50, color) && pass;
-        pass = piglit_probe_pixel_rgb(piglit_width - 13 - i, 50, color) && pass;
+        pass = piglit_probe_pixel_rgb(WIDTH - 13 - i, 50, color) && pass;
     }
 
     /* Test the corners */
@@ -237,9 +245,9 @@ static GLboolean test()
         color[1] = color[0];
         color[2] = color[0];
         pass = piglit_probe_pixel_rgb(16 + i, 16 + i, color) && pass;
-        pass = piglit_probe_pixel_rgb(16 + i, piglit_height - 17 - i, color) && pass;
-        pass = piglit_probe_pixel_rgb(piglit_width - 17 - i, 16 + i, color) && pass;
-        pass = piglit_probe_pixel_rgb(piglit_width - 17 - i, piglit_height - 17 - i, color) && pass;
+        pass = piglit_probe_pixel_rgb(16 + i, HEIGHT - 17 - i, color) && pass;
+        pass = piglit_probe_pixel_rgb(WIDTH - 17 - i, 16 + i, color) && pass;
+        pass = piglit_probe_pixel_rgb(WIDTH - 17 - i, HEIGHT - 17 - i, color) && pass;
     }
 
     return pass;
@@ -249,6 +257,7 @@ enum piglit_result piglit_display(void)
 {
     GLboolean pass;
 
+    glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
