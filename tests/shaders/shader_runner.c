@@ -1626,8 +1626,16 @@ piglit_init(int argc, char **argv)
 
 	process_test_script(argv[1]);
 	link_and_use_shaders();
-	if (vertex_data_start != NULL)
+	if (vertex_data_start != NULL) {
+		if (gl_version >= 31) {
+			GLuint vao;
+
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
+		}
+
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
+	}
 	setup_ubos();
 }
