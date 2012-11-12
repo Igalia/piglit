@@ -51,9 +51,9 @@ PIGLIT_GL_TEST_CONFIG_END
 
 extern float piglit_tolerance[4];
 
-static float gl_version = 0.0;
-static float glsl_version = 0.0;
-static float glsl_req_version = 0.0;
+static unsigned gl_version = 0;
+static unsigned glsl_version = 0;
+static unsigned glsl_req_version = 0;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
 
@@ -122,20 +122,19 @@ compile_glsl(GLenum target, bool release_text)
 		piglit_require_fragment_shader();
 		break;
 	case GL_GEOMETRY_SHADER_ARB:
-		if (gl_version < 3.2)
+		if (gl_version < 32)
 			piglit_require_extension("GL_ARB_geometry_shader4");
 		break;
 	}
 
-	if (glsl_req_version != 0.0f &&
+	if (glsl_req_version != 0 &&
 	    !strstr(shader_string, "#version ")) {
 		char *shader_strings[2];
 		char version_string[100];
 		GLint shader_string_sizes[2];
 		
 		/* Add a #version directive based on the GLSL requirement. */
-		sprintf(version_string, "#version %ld\n",
-			lround(100.0f * glsl_req_version));
+		sprintf(version_string, "#version %d\n", glsl_req_version);
 		shader_strings[0] = version_string;
 		shader_string_sizes[0] = strlen(version_string);
 		shader_strings[1] = shader_string;
@@ -381,11 +380,26 @@ process_comparison(const char *src, enum comparison *cmp)
 
 void
 parse_version_comparison(const char *line, enum comparison *cmp,
-			 float *version)
+			 unsigned *version, bool is_glsl)
 {
+	unsigned major;
+	unsigned minor;
+
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
-	*version = strtod(line, NULL);
+
+	sscanf(line, "%u.%u", &major, &minor);
+
+	/* This hack is so that we can tell the difference between GL versions
+	 * and GLSL versions.  All GL versions look like 3.2, and we want the
+	 * integer to be 32.  All GLSL versions look like 1.40, and we want
+	 * the integer to be 140.
+	 */
+	if (is_glsl) {
+		*version = (major * 100) + minor;
+	} else {
+		*version = (major * 10) + minor;
+	}
 }
 
 /**
@@ -452,7 +466,7 @@ process_requirement(const char *line)
 	} else if (string_match("GLSL", line)) {
 		enum comparison cmp;
 
-		parse_version_comparison(line + 4, &cmp, &glsl_req_version);
+		parse_version_comparison(line + 4, &cmp, &glsl_req_version, true);
 
 		/* We only allow >= because we potentially use the
 		 * version number to insert a #version directive. */
@@ -462,25 +476,25 @@ process_requirement(const char *line)
 		}
 
 		if (!compare(glsl_req_version, glsl_version, cmp)) {
-			printf("Test requires GLSL version %s %.1f.  "
-			       "Actual version is %.1f.\n",
+			printf("Test requires GLSL version %s %d.%d.  "
+			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
-			       glsl_req_version,
-			       glsl_version);
+			       glsl_req_version / 100, glsl_req_version % 100,
+			       glsl_version / 100, glsl_version % 100);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("GL", line)) {
 		enum comparison cmp;
-		float version;
+		unsigned version;
 
-		parse_version_comparison(line + 2, &cmp, &version);
+		parse_version_comparison(line + 2, &cmp, &version, false);
 
 		if (!compare(version, gl_version, cmp)) {
-			printf("Test requires GL version %s %.1f.  "
-			       "Actual version is %.1f.\n",
+			printf("Test requires GL version %s %d.%d.  "
+			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
-			       version,
-			       gl_version);
+			       version / 10, version % 10,
+			       gl_version / 10, gl_version % 10);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("rlimit", line)) {
@@ -766,7 +780,7 @@ get_uints(const char *line, unsigned *uints, unsigned count)
 void
 check_unsigned_support()
 {
-	if (gl_version < 3.0)
+	if (gl_version < 30)
 		piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -1569,15 +1583,15 @@ void
 piglit_init(int argc, char **argv)
 {
 	const char *glsl_version_string;
+	int major;
+	int minor;
 
 	piglit_require_GLSL();
 
-	gl_version = strtod((char *) glGetString(GL_VERSION), NULL);
+	gl_version = piglit_get_gl_version();
 
-	glsl_version_string = (char *)
-		glGetString(GL_SHADING_LANGUAGE_VERSION);
-	glsl_version = (glsl_version_string == NULL)
-		? 0.0 : strtod(glsl_version_string, NULL);
+	piglit_get_glsl_version(NULL, &major, &minor);
+	glsl_version = (major * 100) + minor;
 
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
 		      &gl_max_fragment_uniform_components);
