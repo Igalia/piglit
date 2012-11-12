@@ -29,6 +29,7 @@ import platform
 import re
 import stat
 import subprocess
+import string
 import sys
 import time
 import traceback
@@ -389,9 +390,13 @@ class Environment:
 
 	def collectData(self):
 		result = {}
-		if platform.system() != 'Windows':
+		system = platform.system()
+		if (system == 'Windows' or
+		    string.find(system, "CYGWIN_NT") == 0):
+			result['wglinfo'] = self.run('wglinfo')
+		else:
 			result['glxinfo'] = self.run('glxinfo')
-		if platform.system() == 'Linux':
+		if system == 'Linux':
 			result['lspci'] = self.run('lspci')
 		return result
 
