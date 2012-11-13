@@ -76,7 +76,7 @@ draw(Display *dpy)
 	ctx = piglit_get_glx_context(dpy, visinfo);
 
 	glXMakeCurrent(dpy, glxwin_one, ctx);
-	glewInit();
+	piglit_dispatch_default_init();
 
 	glClearColor(0.0, 1.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);

@@ -189,7 +189,7 @@ main(int argc, char **argv)
 	ctx1 = piglit_get_glx_context(dpy, visinfo);
 
 	glXMakeCurrent(dpy, win, ctx0);
-	glewInit();
+	piglit_dispatch_default_init();
 	piglit_require_extension("GL_ARB_vertex_buffer_object");
 	context0_init();
 	glXMakeCurrent(dpy, win, ctx1);

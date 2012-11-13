@@ -88,7 +88,7 @@ draw(Display *dpy)
     */
    glXMakeCurrent(dpy, win, ctx1);
 
-   glewInit();
+   piglit_dispatch_default_init();
 
    if (piglit_get_gl_version() < 20) {
       printf("%s: Requires OpenGL 2.0\n", TestName);

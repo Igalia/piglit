@@ -111,7 +111,7 @@ main(int argc, char **argv)
    ctx = piglit_get_glx_context(dpy, visinfo);
 
    glXMakeCurrent(dpy, Windows[0], ctx);
-   glewInit();
+   piglit_dispatch_default_init();
 
    piglit_glx_event_loop(dpy, draw);
 
