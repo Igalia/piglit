@@ -278,6 +278,7 @@ shaders['glsl-fs-texture2drect-proj4'] = PlainExecTest(['glsl-fs-texture2drect',
 add_plain_test(shaders, 'glsl-fs-user-varying-ff')
 add_plain_test(shaders, 'glsl-mat-attribute')
 shaders['glsl-max-varyings'] = concurrent_test('glsl-max-varyings')
+shaders['glsl-max-varyings >MAX_VARYING_COMPONENTS'] = concurrent_test('glsl-max-varyings --exceed-limits')
 add_plain_test(shaders, 'glsl-orangebook-ch06-bump')
 add_plain_test(shaders, 'glsl-routing')
 add_plain_test(shaders, 'glsl-vs-arrays')

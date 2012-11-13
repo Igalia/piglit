@@ -47,6 +47,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static bool exceed_limits = false;
+static int max_varyings;
+
 /* Generate a VS that writes to num_varyings vec4s, and put
  * interesting data in data_varying with 0.0 everywhere else.
  */
@@ -147,7 +150,7 @@ coord_from_index(int index)
 	return 2 + 12 * index;
 }
 
-static void
+static bool
 draw(int num_varyings)
 {
 	int data_varying;
@@ -182,8 +185,16 @@ draw(int num_varyings)
 		glBindAttribLocation(prog, 2, "red");
 
 		glLinkProgram(prog);
-		if (!piglit_link_check_status(prog))
-			piglit_report_result(PIGLIT_FAIL);
+		if (!piglit_link_check_status_quiet(prog)) {
+			if (num_varyings > max_varyings) {
+				printf("Failed to link with %d out of %d "
+				       "varyings used\n",
+				       num_varyings, max_varyings);
+				return false;
+			} else {
+				piglit_report_result(PIGLIT_FAIL);
+			}
+		}
 
 		glUseProgram(prog);
 
@@ -204,14 +215,17 @@ draw(int num_varyings)
 		glDeleteShader(fs);
 		glDeleteProgram(prog);
 	}
+
+	return true;
 }
 
 enum piglit_result
 piglit_display(void)
 {
 	GLint max_components;
-	int max_varyings, row, col;
+	int test_varyings, row, col;
 	GLboolean pass = GL_TRUE, warned = GL_FALSE;
+	bool drew[MAX_VARYING];
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -220,22 +234,28 @@ piglit_display(void)
 
 	printf("GL_MAX_VARYING_FLOATS = %i\n", max_components);
 
-	if (max_varyings > MAX_VARYING) {
+	test_varyings = max_varyings;
+	if (exceed_limits)
+		test_varyings++;
+	if (test_varyings > MAX_VARYING) {
 		printf("test not designed to handle >%d varying vec4s.\n"
 		       "(implementation reports %d components)\n",
-		       max_components, MAX_VARYING);
-		max_varyings = MAX_VARYING;
+		       MAX_VARYING, max_varyings);
+		test_varyings = MAX_VARYING;
 		warned = GL_TRUE;
 	}
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	for (row = 0; row < max_varyings; row++) {
-		draw(row + 1);
+	for (row = 0; row < test_varyings; row++) {
+		drew[row] = draw(row + 1);
 	}
 
-	for (row = 0; row < max_varyings; row++) {
+	for (row = 0; row < test_varyings; row++) {
+		if (!drew[row])
+			continue;
+
 		for (col = 0; col <= row; col++) {
 			GLboolean ok;
 			float green[3] = {0.0, 1.0, 0.0};
@@ -266,7 +286,14 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	int i;
+
 	piglit_require_gl_version(20);
+
+	for (i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "--exceed-limits") == 0)
+			exceed_limits = true;
+	}
 
 	printf("Vertical axis: Increasing numbers of varyings.\n");
 	printf("Horizontal axis: Which of the varyings contains the color.\n");
