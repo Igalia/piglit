@@ -982,6 +982,7 @@ arb_framebuffer_object['FBO blit to missing attachment'] = PlainExecTest(['fbo-m
 arb_framebuffer_object['FBO blit from missing attachment'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'from'])
 arb_framebuffer_object['fbo-scissor-blit fbo'] = PlainExecTest(['fbo-scissor-blit', 'fbo', '-auto'])
 arb_framebuffer_object['fbo-scissor-blit window'] = PlainExecTest(['fbo-scissor-blit', 'window', '-auto'])
+arb_framebuffer_object['negative-readpixels-no-rb'] = concurrent_test('arb_framebuffer_object-negative-readpixels-no-rb')
 
 # Group ARB_framebuffer_sRGB
 arb_framebuffer_srgb = Group()
