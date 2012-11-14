@@ -35,30 +35,31 @@
 
 #include "piglit-util-gl-common.h"
 
+static unsigned parse_glsl_version(const char *str);
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	if (argc > 3) {
-		const float version = strtod(argv[3], NULL);
-		const unsigned int int_version = (unsigned) (version * 10);
+		const unsigned int int_version = parse_glsl_version(argv[3]);
 
 		switch (int_version) {
-		case 11:
-		case 12:
-		case 13:
+		case 110:
+		case 120:
+		case 130:
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_core_version = 0;
 			config.supports_gl_es2 = false;
 			break;
-		case 14:
-		case 15:
-		case 33:
+		case 140:
+		case 150:
+		case 330:
 			config.supports_gl_compat_version = 31;
 			config.supports_gl_core_version = 31;
 			config.supports_gl_es2 = false;
 			break;
-		case 40:
-		case 41:
-		case 42:
+		case 400:
+		case 410:
+		case 420:
 			config.supports_gl_compat_version = 40;
 			config.supports_gl_core_version = 40;
 			config.supports_gl_es2 = false;
@@ -83,7 +84,7 @@ static char *filename;
 static int expected_pass;
 static int gl_version_times_10 = 0;
 static int check_link = 0;
-static float requested_version = 1.10;
+static unsigned requested_version = 110;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -221,7 +222,7 @@ test(void)
 
 		shader_prog = piglit_CreateProgram();
 		piglit_AttachShader(shader_prog, prog);
-		if (requested_version == 1.00)
+		if (requested_version == 100)
 			attach_complementary_shader(shader_prog, type);
 		piglit_LinkProgram(shader_prog);
 		if (check_link) {
@@ -300,11 +301,21 @@ int process_options(int argc, char **argv)
 	return new_argc;
 }
 
+static unsigned
+parse_glsl_version(const char *str)
+{
+	unsigned major;
+	unsigned minor;
+
+	sscanf(str, "%u.%u", &major, &minor);
+	return (major * 100) + minor;
+}
+
 void
 piglit_init(int argc, char**argv)
 {
 	const char *glsl_version_string;
-	float glsl_version;
+	unsigned glsl_version = 0;
 	int i;
 
 	argc = process_options(argc, argv);
@@ -323,7 +334,7 @@ piglit_init(int argc, char**argv)
 		usage(argv[0]);
 
 	if (argc > 3)
-		requested_version = strtod(argv[3], NULL);
+		requested_version = parse_glsl_version(argv[3]);
 
 	gl_version_times_10 = piglit_get_gl_version();
 
@@ -336,16 +347,17 @@ piglit_init(int argc, char**argv)
 
 	glsl_version_string = (char *)
 		glGetString(GL_SHADING_LANGUAGE_VERSION);
-	glsl_version = (glsl_version_string == NULL)
-		? 0.0 : strtod(glsl_version_string, NULL);
 
-	if (requested_version == 1.00) {
+	if (glsl_version_string != NULL)
+		glsl_version = parse_glsl_version(glsl_version_string);
+
+	if (requested_version == 100) {
 		piglit_require_extension("GL_ARB_ES2_compatibility");
 	} else if (glsl_version < requested_version) {
 		fprintf(stderr,
-			"GLSL version is %f, but requested version %f is required\n",
-			glsl_version,
-			requested_version);
+			"GLSL version is %u.%u, but requested version %u.%u is required\n",
+			glsl_version / 100, glsl_version % 100,
+			requested_version / 100, requested_version % 100);
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
