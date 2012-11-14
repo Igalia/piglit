@@ -557,6 +557,7 @@ add_plain_test(gl11, 'streaming-texture-leak')
 add_plain_test(gl11, 'texredefine')
 add_plain_test(gl11, 'texsubimage')
 add_plain_test(gl11, 'texture-al')
+add_concurrent_test(gl11, 'triangle-guardband-viewport')
 
 gl10 = Group()
 spec['!OpenGL 1.0'] = gl10
