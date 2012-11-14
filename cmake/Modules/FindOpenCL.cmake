@@ -29,8 +29,13 @@
 #   OPENCL_opencl_LIBRARY
 #       Path to OpenCL's library.
 
-find_path(OPENCL_INCLUDE_PATH CL/opencl.h)
-find_library(OPENCL_opencl_LIBRARY OpenCL)
+  if (APPLE)
+    find_path(OPENCL_INCLUDE_PATH OpenCL/cl.h)
+  else()
+    find_path(OPENCL_INCLUDE_PATH CL/opencl.h)
+  endif()
+
+  find_library(OPENCL_opencl_LIBRARY OpenCL)
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(OpenCL
