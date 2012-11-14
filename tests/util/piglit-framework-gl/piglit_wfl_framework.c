@@ -162,6 +162,11 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
 
+			if (test_config->supports_gl_core_version >= 32) {
+				head_attrib_list[i++] = WAFFLE_CONTEXT_PROFILE;
+				head_attrib_list[i++] = WAFFLE_CONTEXT_CORE_PROFILE;
+			}
+
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
 			head_attrib_list[i++] = test_config->supports_gl_core_version / 10;
 
@@ -177,6 +182,11 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			i = 0;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
+
+			if (test_config->supports_gl_compat_version >= 32) {
+				head_attrib_list[i++] = WAFFLE_CONTEXT_PROFILE;
+				head_attrib_list[i++] = WAFFLE_CONTEXT_COMPATIBILITY_PROFILE;
+			}
 
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
 			head_attrib_list[i++] = test_config->supports_gl_compat_version / 10;
