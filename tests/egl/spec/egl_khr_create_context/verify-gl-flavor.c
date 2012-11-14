@@ -73,6 +73,7 @@ enum gl_api {
 	API_GL_CORE,
 	API_GLES1,
 	API_GLES2,
+	API_GLES3,
 };
 
 static void (*my_glGetIntegerv)(GLenum pname, GLint *params);
@@ -170,6 +171,7 @@ check_flavor(int requested_version, enum gl_api requested_api)
 		break;
 	case API_GLES1:
 	case API_GLES2:
+	case API_GLES3:
 		requested_client_type = EGL_OPENGL_ES_API;
 		api_name = "OpenGL ES";
 		break;
@@ -414,6 +416,20 @@ check_opengl_es2(void)
 	return result;
 }
 
+static enum piglit_result
+check_opengl_es3(void)
+{
+	enum piglit_result result = PIGLIT_SKIP;
+
+	if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES3_BIT_KHR))
+		return PIGLIT_SKIP;
+
+	fold_results(&result, check_flavor(30, API_GLES3));
+
+	EGL_KHR_create_context_teardown();
+	return result;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -434,6 +450,7 @@ main(int argc, char **argv)
 	fold_results(&result, check_opengl());
 	fold_results(&result, check_opengl_es1());
 	fold_results(&result, check_opengl_es2());
+	fold_results(&result, check_opengl_es3());
 
 	piglit_report_result(result);
 	return EXIT_SUCCESS;
