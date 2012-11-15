@@ -32,22 +32,15 @@ from exectest import ExecTest
 def gleanExecutable():
 	return testBinDir + 'glean'
 
-def gleanResultDir(r_dir):
-	return os.path.join(r_dir, 'glean')
-
 class GleanTest(ExecTest):
 	globalParams = []
 
-	def __init__(self, name, resdir):
+	def __init__(self, name):
 		ExecTest.__init__(self, \
-			[gleanExecutable(), "-r", os.path.join(gleanResultDir(resdir), name),
+			[gleanExecutable(),
 			"-o",
 			"-v", "-v", "-v",
 			"-t", "+"+name])
-
-		if resdir[0] not in '$%':
-			checkDir(os.path.join(gleanResultDir(resdir), name), False)
-
 		self.name = name
 
 	def run(self, valgrind):

@@ -64,10 +64,6 @@ class Options {
 	int verbosity;		// Verbosity level.  0 == concise; larger
 				// values imply more verbose output.
 
-	string db1Name;		// Name of output database.
-				// Typically the pathname of a directory,
-				// provided on the command line.
-
 	string visFilter;	// Filter constraining the set of visuals
 				// (FBConfigs, pixel formats) that will be
 				// available for test.  See

@@ -573,10 +573,9 @@ class TestProfile:
 ##### Loaders
 #############################################################################
 
-def loadTestProfile(filename, resdir):
+def loadTestProfile(filename):
 	ns = {
 		'__file__': filename,
-		'res_dir': resdir
 	}
 	try:
 		execfile(filename, ns)

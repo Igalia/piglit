@@ -185,7 +185,7 @@ def main():
 	for (key, value) in env.collectData().items():
 		json_writer.write_dict_item(key, value)
 
-	profile = core.loadTestProfile(profileFilename, resultsDir)
+	profile = core.loadTestProfile(profileFilename)
 
 	json_writer.write_dict_key('tests')
 	json_writer.open_dict()

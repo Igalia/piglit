@@ -69,15 +69,6 @@ class Environment {
 
 	WindowSystem winSys;	// The window system providing the OpenGL
 				// implementation under test.
-
-	string resultFileName(string& dbName, string& testName);
-				// Return name of results file for given
-				// test.  Suitable for opening a stream.
-				// XXX Creates results directory as a side
-				// effect.  Should separate this.
-	inline string resultFileName(string& testName) {
-		return resultFileName(options.db1Name, testName);
-	}
 }; // class Environment
 
 } // namespace GLEAN

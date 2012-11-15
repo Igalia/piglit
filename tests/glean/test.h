@@ -100,32 +100,6 @@ class Test {
 
 	// Exceptions:
 	struct Error { };	// Base class for all exceptions.
-	struct CantOpenResultsFile: public Error {
-		const string& testName;
-		const string& dbName;
-		CantOpenResultsFile(const string& test, const string& db):
-			testName(test), dbName(db) { }
-	};
-
-
-	// OutputStream and Input*Stream objects provide convenient access
-	// to the results database, and close the file streams automatically
-	// when their destructors are executed.
-	class OutputStream {	// Open an output stream for storing results.
-	    public:
-		ofstream* s;
-		OutputStream(Test& t);
-		~OutputStream();
-		operator ofstream& ();
-	};
-	class Input1Stream {	// Open db #1 input stream for reading results.
-	    public:
-		ifstream* s;
-	    	Input1Stream(Test& t);
-		~Input1Stream();
-		operator ifstream& ();
-	};
-
 
 	static Test* testList;	// List of all test objects.  Built by
 				// constructor Test::Test(...).

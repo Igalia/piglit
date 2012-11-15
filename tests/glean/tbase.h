@@ -286,8 +286,6 @@ public:
 		WindowSystem& ws = env->winSys;
 
 		try {
-			OutputStream os(*this);	// open results file
-
 			// Select the drawing configurations for testing
 			DrawingSurfaceFilter f(filter);
 			vector<DrawingSurfaceConfig*>
@@ -335,7 +333,6 @@ public:
 
 				// Save the result
 				results.push_back(r);
-				r->put(os);
 
 				// if testOne, skip remaining surface configs
 				if (testOne)

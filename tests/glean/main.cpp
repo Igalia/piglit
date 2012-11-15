@@ -68,6 +68,7 @@ main(int argc, char* argv[]) {
                 allTestNames.push_back(t->name);
         sort(allTestNames.begin(), allTestNames.end());
         o.selectedTests = allTestNames;
+	o.mode = Options::run;
 
 	for (int i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "--help")) {
@@ -75,11 +76,6 @@ main(int argc, char* argv[]) {
 		} else if (!strcmp(argv[i], "-v")
 		    || !strcmp(argv[i], "--verbose")) {
 			++o.verbosity;
-		} else if (!strcmp(argv[i], "-r")
-		    || !strcmp(argv[i], "--run")) {
-			o.mode = Options::run;
-			++i;
-			o.db1Name = mandatoryArg(argc, argv, i);
 		} else if (!strcmp(argv[i], "-o")
 		    || !strcmp(argv[i], "--overwrite")) {
 			o.overwrite = true;
@@ -105,9 +101,6 @@ main(int argc, char* argv[]) {
 			usage(argv[0]);
 		}
 	}
-
-	if (o.mode == Options::notSet)
-		usage(argv[0]);
 
 	if (o.mode == Options::listtests) {
 		listTests(Test::testList, o.verbosity);
@@ -155,20 +148,6 @@ main(int argc, char* argv[]) {
 		for (int i = 0; i < e.position; ++i)
 			cerr << ' ';
 		cerr << "^ " << e.err << '\n';
-		exit(1);
-	}
-	catch (Environment::DBExists) {
-		cerr << "Won't overwrite existing database " << o.db1Name
-			<< "\n";
-		exit(1);
-	}
-	catch (Environment::DBCantOpen e) {
-		cerr << "Can't open database directory " << *e.db << "\n";
-		exit(1);
-	}
-	catch (Test::CantOpenResultsFile e) {
-		cerr << "Can't open results file for test " << e.testName
-			<< " in database " << e.dbName << '\n';
 		exit(1);
 	}
 	catch (...) {
@@ -290,10 +269,7 @@ listTests(const Test *tests, bool verbose) {
 void
 usage(char* command) {
 	cerr << GLEAN::versionString << '\n';
-	cerr << "Usage:  " << command << " mode [options]\n"
-"\n"
-"mode:\n"
-"       (-r|--run) results-directory\n"
+	cerr << "Usage:  " << command << " [options]\n"
 "\n"
 "options:\n"
 "       (-v|--verbose)             # each occurrence increases\n"

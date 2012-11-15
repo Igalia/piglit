@@ -80,39 +80,4 @@ Test::Test(const char* testName, const char *descrip, Test** thePrereqs):
 Test::~Test() {
 } // Test::~Test
 
-///////////////////////////////////////////////////////////////////////////////
-// Stream opening utilities for results databases
-///////////////////////////////////////////////////////////////////////////////
-
-Test::OutputStream::OutputStream(Test& t) {
-	s = new ofstream(t.env->resultFileName(t.name).c_str());
-	if (!*s)
-		throw Test::CantOpenResultsFile(t.name, t.env->options.db1Name);
-} // Test::OutputStream::OutputStream
-
-Test::OutputStream::~OutputStream() {
-	s->close();
-	delete s;
-} // Test::OutputStream::~OutputStream
-
-Test::OutputStream::operator ofstream& () {
-	return *s;
-} // Test::OutputStream::operator ::ofstream&
-
-Test::Input1Stream::Input1Stream(Test& t) {
-	s = new ifstream(t.env->resultFileName(
-		t.env->options.db1Name, t.name).c_str());
-	if (!*s)
-		throw Test::CantOpenResultsFile(t.name, t.env->options.db1Name);
-} // Test::Input1Stream::Input1Stream
-
-Test::Input1Stream::~Input1Stream() {
-	s->close();
-	delete s;
-} // Test::Input1Stream::~Input1Stream
-
-Test::Input1Stream::operator ifstream& () {
-	return *s;
-} // Test::Input1Stream::operator ::ifstream&
-
 } // namespace GLEAN
