@@ -1,6 +1,11 @@
 .*.sw?
 *.pyc
 *~
+
+/.ninja_log
+/build.ninja
+/rules.ninja
+
 bin
 lib
 CMakeFiles
