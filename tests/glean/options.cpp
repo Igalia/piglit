@@ -41,7 +41,6 @@ namespace GLEAN {
 
 
 Options::Options() {
-	mode = notSet;
 	verbosity = 0;
 	visFilter = "1";
 	maxVisuals = ~0U;

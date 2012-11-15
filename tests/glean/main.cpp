@@ -68,7 +68,8 @@ main(int argc, char* argv[]) {
                 allTestNames.push_back(t->name);
         sort(allTestNames.begin(), allTestNames.end());
         o.selectedTests = allTestNames;
-	o.mode = Options::run;
+
+	bool listTestsMode = false;
 
 	for (int i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "--help")) {
@@ -90,7 +91,7 @@ main(int argc, char* argv[]) {
 			++i;
 			selectTests(o, allTestNames, argc, argv, i);
 		} else if (!strcmp(argv[i], "--listtests")) {
-			o.mode = Options::listtests;
+			listTestsMode = true;
 #	    if defined(__X11__)
 		} else if (!strcmp(argv[i], "-display")
 		    || !strcmp(argv[i], "--display")) {
@@ -102,7 +103,7 @@ main(int argc, char* argv[]) {
 		}
 	}
 
-	if (o.mode == Options::listtests) {
+	if (listTestsMode) {
 		listTests(Test::testList, o.verbosity);
 		exit(0);
 	}
@@ -118,19 +119,10 @@ main(int argc, char* argv[]) {
 	// results.
 	try {
 		Environment e(o);
-		switch (o.mode) {
-		case Options::run:
-		{
-			for (Test* t = Test::testList; t; t = t->nextTest)
-                                if (binary_search(o.selectedTests.begin(),
-                                    o.selectedTests.end(), t->name))
-                                        t->run(e);
-			break;
-		}
-		default:
-			cerr << "Bad run mode in main()\n";
-			break;
-		}
+		for (Test* t = Test::testList; t; t = t->nextTest)
+			if (binary_search(o.selectedTests.begin(),
+			    o.selectedTests.end(), t->name))
+				t->run(e);
 	}
 #if defined(__X11__)
 	catch (WindowSystem::CantOpenDisplay) {

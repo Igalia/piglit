@@ -57,10 +57,6 @@ namespace GLEAN {
 
 class Options {
     public:
-	typedef enum {notSet, run, listtests} RunMode;
-	RunMode mode;		// Indicates whether we're generating
-				// results, or comparing two previous runs.
-
 	int verbosity;		// Verbosity level.  0 == concise; larger
 				// values imply more verbose output.
 
