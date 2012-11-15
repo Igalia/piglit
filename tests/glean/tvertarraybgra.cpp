@@ -40,7 +40,6 @@
 #include <cstring>
 #include "tvertarraybgra.h"
 #include "rand.h"
-#include "timer.h"
 #include "image.h"
 
 

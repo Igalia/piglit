@@ -34,7 +34,6 @@
 #include <cstring>
 #include "tshaderapi.h"
 #include "rand.h"
-#include "timer.h"
 #include "image.h"
 
 

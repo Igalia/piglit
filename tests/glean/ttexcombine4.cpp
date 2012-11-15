@@ -43,7 +43,6 @@
 #include <cmath>
 #include <cstring>
 #include "ttexcombine4.h"
-#include "timer.h"
 
 
 namespace GLEAN {

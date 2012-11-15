@@ -41,7 +41,6 @@
 #include <stdlib.h>
 #include "ttexswizzle.h"
 #include "rand.h"
-#include "timer.h"
 #include "image.h"
 
 
