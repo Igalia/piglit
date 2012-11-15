@@ -52,26 +52,6 @@ class RandomMesh2D {
 		{ return m + 2 * (y * rowLength + x); }
 }; // RandomMesh2D
 
-class SpiralStrip2D {
-	float* v;
-    public:
-	SpiralStrip2D(int nPoints, float minX, float maxX,
-		float minY, float maxY);
-	~SpiralStrip2D();
-	inline float* operator() (int i)
-		{ return v + 2 * i; }
-}; // SpiralStrip2D
-
-class SpiralTri2D {
-	float* v;
-    public:
-	SpiralTri2D(int nTris, float minX, float maxX,
-		float minY, float maxY);
-	~SpiralTri2D();
-	inline float* operator() (int i)
-		{ return v + 6 * i; }
-}; // SpiralTri2D
-
 class Sphere3D {
     std::vector<float> vertices;
     std::vector<float> normals;
