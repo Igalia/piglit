@@ -15,7 +15,6 @@ include_directories(
 )
 
 piglit_add_executable (glean
-	codedid.cpp
 	dsconfig.cpp
 	dsfilt.cpp
 	dsurf.cpp
