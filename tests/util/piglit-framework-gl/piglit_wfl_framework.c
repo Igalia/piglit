@@ -200,12 +200,9 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			int32_t waffle_context_api;
 			assert(test_config->supports_gl_es_version);
 
-			if (test_config->supports_gl_es_version >= 30) {
-				printf("piglit: info: piglit does not yet "
-				       "support OpenGL ES %d.%d\n",
-				       test_config->supports_gl_es_version / 10,
-				       test_config->supports_gl_es_version % 10);
-				piglit_report_result(PIGLIT_SKIP);
+			if (test_config->supports_gl_es_version < 40 &&
+			    test_config->supports_gl_es_version >= 30) {
+				waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES3;
 			} else if (test_config->supports_gl_es_version >= 20) {
 				waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES2;
 			} else if (test_config->supports_gl_es_version >= 10) {
@@ -221,6 +218,10 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			i = 0;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = waffle_context_api;
+			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
+			head_attrib_list[i++] = test_config->supports_gl_es_version / 10;
+			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
+			head_attrib_list[i++] = test_config->supports_gl_es_version % 10;
 			head_attrib_list[i++] = 0;
 			break;
 			}
