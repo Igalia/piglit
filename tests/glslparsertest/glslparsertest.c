@@ -48,30 +48,30 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		case 130:
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_core_version = 0;
-			config.supports_gl_es2 = false;
+			config.supports_gl_es_version = 0;
 			break;
 		case 140:
 		case 150:
 		case 330:
 			config.supports_gl_compat_version = 31;
 			config.supports_gl_core_version = 31;
-			config.supports_gl_es2 = false;
+			config.supports_gl_es_version = 0;
 			break;
 		case 400:
 		case 410:
 		case 420:
 			config.supports_gl_compat_version = 40;
 			config.supports_gl_core_version = 40;
-			config.supports_gl_es2 = false;
+			config.supports_gl_es_version = 0;
 			break;
 		default:
 			config.supports_gl_compat_version = 10;
-			config.supports_gl_es2 = true;
+			config.supports_gl_es_version = 20;
 			break;
 		}
 	} else {
 		config.supports_gl_compat_version = 10;
-		config.supports_gl_es2 = true;
+		config.supports_gl_es_version = 20;
 	}
 
 	config.window_width = 200;

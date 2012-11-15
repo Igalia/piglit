@@ -34,7 +34,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_es2 = true;
+	config.supports_gl_es_version = 20;
 
 	config.window_width = 100;
 	config.window_height = 100;

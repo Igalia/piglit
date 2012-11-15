@@ -31,8 +31,7 @@
 enum context_flavor {
 	CONTEXT_GL_CORE,
 	CONTEXT_GL_COMPAT,
-	CONTEXT_GL_ES1,
-	CONTEXT_GL_ES2,
+	CONTEXT_GL_ES,
 };
 
 struct piglit_wfl_framework*
@@ -197,23 +196,34 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			head_attrib_list[i++] = 0;
 			break;
 
-		case CONTEXT_GL_ES1:
-			assert(test_config->supports_gl_es1);
+		case CONTEXT_GL_ES: {
+			int32_t waffle_context_api;
+			assert(test_config->supports_gl_es_version);
+
+			if (test_config->supports_gl_es_version >= 30) {
+				printf("piglit: info: piglit does not yet "
+				       "support OpenGL ES %d.%d\n",
+				       test_config->supports_gl_es_version / 10,
+				       test_config->supports_gl_es_version % 10);
+				piglit_report_result(PIGLIT_SKIP);
+			} else if (test_config->supports_gl_es_version >= 20) {
+				waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES2;
+			} else if (test_config->supports_gl_es_version >= 10) {
+				waffle_context_api = WAFFLE_CONTEXT_OPENGL_ES1;
+			} else {
+				printf("piglit: error: config attribute "
+				       "'supports_gl_es_version' has "
+				       "bad value %d\n",
+				       test_config->supports_gl_es_version);
+				piglit_report_result(PIGLIT_FAIL);
+			}
 
 			i = 0;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
-			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL_ES1;
+			head_attrib_list[i++] = waffle_context_api;
 			head_attrib_list[i++] = 0;
 			break;
-
-		case CONTEXT_GL_ES2:
-			assert(test_config->supports_gl_es2);
-
-			i = 0;
-			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
-			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL_ES2;
-			head_attrib_list[i++] = 0;
-			break;
+			}
 
 		default:
 			assert(0);
@@ -360,25 +370,16 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		}
 	}
 
-#elif defined(PIGLIT_USE_OPENGL_ES1)
+#elif defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
 	ok = make_context_current_singlepass(wfl_fw, test_config,
-	                                     CONTEXT_GL_ES1,
+	                                     CONTEXT_GL_ES,
 	                                     partial_config_attrib_list);
 
 	if (ok)
 		return;
 	else
-		printf("piglit: info: Failed to create GL ES1 context\n");
+		printf("piglit: info: Failed to create GL ES context\n");
 
-#elif defined(PIGLIT_USE_OPENGL_ES2)
-	ok = make_context_current_singlepass(wfl_fw, test_config,
-	                                     CONTEXT_GL_ES2,
-	                                     partial_config_attrib_list);
-
-	if (ok)
-		return;
-	else
-		printf("piglit: info: Failed to create GL ES2 context\n");
 #else
 #	error
 #endif

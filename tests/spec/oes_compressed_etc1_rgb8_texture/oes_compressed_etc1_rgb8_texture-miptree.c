@@ -55,7 +55,7 @@ static const int window_height = 2 * level0_height;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_es2 = true;
+	config.supports_gl_es_version = 20;
 
 	config.window_width = window_width;
 	config.window_height = window_height;

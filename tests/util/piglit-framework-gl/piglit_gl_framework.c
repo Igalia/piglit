@@ -61,8 +61,7 @@ validate_supported_apis(const struct piglit_gl_test_config *test_config)
 {
 	if (!test_config->supports_gl_core_version &&
 	    !test_config->supports_gl_compat_version &&
-	    !test_config->supports_gl_es1 &&
-	    !test_config->supports_gl_es2) {
+	    !test_config->supports_gl_es_version) {
 		printf("The test config supports no GL API's.\n");
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -80,12 +79,8 @@ validate_supported_apis(const struct piglit_gl_test_config *test_config)
 	    && !test_config->supports_gl_compat_version) {
 		piglit_report_result(PIGLIT_SKIP);
 	}
-#elif defined(PIGLIT_USE_OPENGL_ES1)
-	if (!test_config->supports_gl_es1) {
-		piglit_report_result(PIGLIT_SKIP);
-	}
-#elif defined(PIGLIT_USE_OPENGL_ES2)
-	if (!test_config->supports_gl_es2) {
+#elif defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
+	if (!test_config->supports_gl_es_version) {
 		piglit_report_result(PIGLIT_SKIP);
 	}
 #else

@@ -73,6 +73,24 @@ enum piglit_gl_visual {
  */
 struct piglit_gl_test_config {
 	/**
+	 * If this field is non-zero, then the test is able to run under any
+	 * OpenGL ES context whose version is backwards-compatible with the
+	 * given version.
+	 *
+	 * For example, if this field's value is '10', then Piglit will
+	 * attempt to run the test under an OpenGL ES 1.0 context. Likewise
+	 * for '20' and OpenGL ES 2.0.
+	 *
+	 * If Piglit fails to acquire the waffle_config or to create the
+	 * waffle_context, then it skips its attempt to run the test under
+	 * an OpenGL ES context.
+	 *
+	 * If this field is 0, then the test is not able to run under an
+	 * OpenGL ES context of any version.
+	 */
+	int supports_gl_es_version;
+
+	/**
 	 * If this field is non-zero, then the test is able to run under a GL
 	 * core context having at least the given version.
 	 *
@@ -140,16 +158,6 @@ struct piglit_gl_test_config {
 	 * compatibility context of any version.
 	 */
 	int supports_gl_compat_version;
-
-	/**
-	 * The test is able to run under an OpenGL ES1 context.
-	 */
-	bool supports_gl_es1;
-
-	/**
-	 * The test is able to run under an OpenGL ES2 context.
-	 */
-	bool supports_gl_es2;
 
 	int window_width;
 	int window_height;
