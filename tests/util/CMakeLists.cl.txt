@@ -3,9 +3,15 @@ include_directories(
 	${OPENCL_INCLUDE_PATH}
 	)
 
+#MacOS has issues with linking a dylib with missing symbols without these flags
+if (APPLE)
+	set(link_opts -Wl,-undefined,dynamic_lookup)
+endif(APPLE)
+
 link_libraries(
 	piglitutil
 	${OPENCL_opencl_LIBRARY}
+	${link_opts}
 	)
 
 piglit_add_library (piglitutil_${piglit_target_api}

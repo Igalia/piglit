@@ -25,8 +25,6 @@
 #ifndef PIGLIT_UTIL_CL_H
 #define PIGLIT_UTIL_CL_H
 
-#include <CL/opencl.h>
-
 #include "piglit-util.h"
 #include "piglit-util-cl-enum.h"
 

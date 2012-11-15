@@ -25,8 +25,11 @@
 #ifndef PIGLIT_UTIL_CL_ENUM_H
 #define PIGLIT_UTIL_CL_ENUM_H
 
+#ifdef __APPLE__
+#include <OpenCL/opencl.h>
+#else
 #include <CL/opencl.h>
-
+#endif
 /**
  * \brief Convert a CL enum to a string.
  *
