@@ -262,12 +262,4 @@ WindowSystem::makeCurrent(RenderingContext& r, Window& w) {
 #   endif
 } // WindowSystem::makeCurrent
 
-void
-WindowSystem::quiesce() {
-#   if defined(__X11__)
-	XSync(dpy, False);
-#   elif defined(__WIN__)
-#   endif
-} // WindowSystem::quiesce
-
 } // namespace GLEAN

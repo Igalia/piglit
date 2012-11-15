@@ -158,13 +158,4 @@ Environment::imageFileName(string& dbName, string& testName, int n) {
 	return fileName;
 } // Environment::imageFileName
 
-void
-Environment::quiesce() {
-	winSys.quiesce();
-#   if defined(__UNIX__)
-	sync();
-#   elif defined(__MS__)
-#   endif
-} // Environment::quiesce
-
 } // namespace GLEAN

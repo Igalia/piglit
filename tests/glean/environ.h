@@ -101,8 +101,6 @@ class Environment {
 		return imageFileName(options.db2Name, testName, n);
 	}
 
-	void quiesce();		// Settle down before starting a benchmark.
-
 }; // class Environment
 
 } // namespace GLEAN

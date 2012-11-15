@@ -84,7 +84,6 @@ class WindowSystem {
 	bool makeCurrent();		// Remove context/surface binding.
 	bool makeCurrent(RenderingContext& r, Window& w);
 					// Bind given context and surface.
-	void quiesce();			// Wait for system to go idle.
 
 	// State information:
 
