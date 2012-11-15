@@ -75,7 +75,6 @@ piglit_add_executable (glean
 	unpack.cpp
 	basic.cpp
 	lex.cpp
-	timer.cpp
 	../util/rgb9e5.c
 )
 
