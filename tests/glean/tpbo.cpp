@@ -40,7 +40,6 @@
 #include <cassert>
 #include <math.h>
 #include "tpbo.h"
-#include "timer.h"
 
 
 namespace GLEAN
@@ -1089,7 +1088,8 @@ bool PBOTest::testErrorHandling(void)
    return true;
 }
 
-bool PBOTest::testFunctionality(MultiTestResult & r)
+void
+PBOTest::runOne(MultiTestResult & r, Window & w)
 {
    static SubTestFunc
       funcs[] = {
@@ -1104,154 +1104,6 @@ bool PBOTest::testFunctionality(MultiTestResult & r)
       NULL
    };
 
-   for (int i = 0; funcs[i]; i++)
-      if ((this->*funcs[i]) ())
-         r.numPassed++;
-      else
-         r.numFailed++;
-   return true;
-}
-
-enum {
-   BLACK,
-   RED,
-   GREEN,
-   BLUE,
-   WHITE
-};
-
-GLfloat colors1[][4] = {
-   {0.0, 0.0, 0.0, 0.0},
-   {1.0, 0.0, 0.0, 1.0},
-   {0.0, 1.0, 0.0, 1.0},
-   {0.0, 0.0, 1.0, 1.0},
-   {1.0, 1.0, 1.0, 1.0}
-};
-
-#define TEXSIZE1 64
-bool PBOTest::testPerformance(MultiTestResult & r)
-{
-   GLuint pbs[1];
-   GLuint textures[1];
-   GLubyte data[TEXSIZE1 * TEXSIZE1 * 4];
-   int mode;
-   int i, j;
-   Timer t;
-   double t0, t1, perf[2];
-   GLubyte *pboMem = NULL;
-
-   (void) r;
-
-   for (mode = 0; mode < usePBO + 1; mode++) {
-      t0 = t.getClock();
-
-      glClearColor(0.0, 0.0, 0.0, 1.0);
-      glClear(GL_COLOR_BUFFER_BIT);
-      if (mode) {
-         glGenBuffersARB_func(1, pbs);
-         glBindBufferARB_func(GL_PIXEL_UNPACK_BUFFER, pbs[0]);
-         glBufferDataARB_func(GL_PIXEL_UNPACK_BUFFER,
-                      TEXSIZE1 * TEXSIZE1 * 4 * sizeof(GLubyte), NULL,
-                      GL_STREAM_DRAW);
-      }
-      glGenTextures(1, textures);
-      glBindTexture(GL_TEXTURE_2D, textures[0]);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TEXSIZE1,
-                   TEXSIZE1, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-      for (i = 0; i < 1024; i++) {
-         if (mode) {
-            glBindBufferARB_func(GL_PIXEL_UNPACK_BUFFER, pbs[0]);
-            pboMem =
-               (GLubyte *) glMapBufferARB_func(GL_PIXEL_UNPACK_BUFFER_ARB,
-                                       GL_WRITE_ONLY);
-         }
-         else {
-            pboMem = data;
-         }
-
-         for (j = 0; j < TEXSIZE1 * TEXSIZE1; j++) {
-            pboMem[4 * j] = 255;
-            pboMem[4 * j + 1] = 255;
-            pboMem[4 * j + 2] = 0;
-            pboMem[4 * j + 3] = 0;
-         }
-
-         if (mode) {
-            glUnmapBufferARB_func(GL_PIXEL_UNPACK_BUFFER_ARB);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEXSIZE1,
-                            TEXSIZE1, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
-            glBindBufferARB_func(GL_PIXEL_UNPACK_BUFFER, 0);
-         }
-         else {
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, TEXSIZE1,
-                            TEXSIZE1, GL_BGRA, GL_UNSIGNED_BYTE, data);
-         }
-
-
-         // Actually apply the texture
-         glEnable(GL_TEXTURE_2D);
-         glColor4fv(colors1[WHITE]);
-
-         glBegin(GL_POLYGON);
-         glTexCoord2f(0.0, 0.0);
-         glVertex2f(0, 0);
-         glTexCoord2f(1.0, 0.0);
-         glVertex2f(1, 0);
-         glTexCoord2f(1.0, 1.0);
-         glVertex2f(1, 1);
-         glTexCoord2f(0.0, 1.0);
-         glVertex2f(0, 1);
-         glEnd();
-         glFlush();
-         glDisable(GL_TEXTURE_2D);
-      }
-      t1 = t.getClock();
-      glDeleteTextures(1, textures);
-      if (mode)
-         glDeleteBuffersARB_func(1, pbs);
-
-      perf[mode] = (double) TEXSIZE1 * TEXSIZE1 * 3 * sizeof(GLfloat) / 1024 / (t1 - t0);
-
-   }
-
-   if (perf[1] < perf[0] && usePBO) {
-      env->log << name << ":  NOTE "
-         << "perf[0] = " << perf[0] <<
-         " MB/s, which is in normal mode" << endl;
-      env->log << name << ":  NOTE " << "perf[1] = " <<
-         perf[1] << " MB/s, which is using PBO" << endl;
-   }
-
-   return true;
-}
-
-
-
-// Run all the subtests, incrementing numPassed, numFailed
-void
-PBOTest::runSubTests(MultiTestResult & r)
-{
-   static TestFunc funcs[] = {
-      &GLEAN::PBOTest::testFunctionality,
-      &GLEAN::PBOTest::testPerformance,
-      NULL
-   };
-
-   for (int i = 0; funcs[i]; i++)
-      if ((this->*funcs[i]) (r))
-         r.numPassed++;
-      else
-         r.numFailed++;
-}
-
-
-void
-PBOTest::runOne(MultiTestResult & r, Window & w)
-{
    (void) w;
 
    if (!setup()) {
@@ -1259,11 +1111,14 @@ PBOTest::runOne(MultiTestResult & r, Window & w)
       return;
    }
 
-   runSubTests(r);
+   for (int i = 0; funcs[i]; i++)
+      if ((this->*funcs[i]) ())
+         r.numPassed++;
+      else
+         r.numFailed++;
 
    r.pass = (r.numFailed == 0);
 }
-
 
 // The test object itself:
 PBOTest pboTest("pbo", "window, rgb, z", "",    // no extension filter 

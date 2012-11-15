@@ -60,8 +60,6 @@ private:
 
 	GLfloat tolerance[5];
 
-        bool testFunctionality(MultiTestResult &r);
-	bool testPerformance(MultiTestResult &r);
         bool testSanity(void);
 	bool testErrorHandling(void);
 	bool testDrawPixels(void);
@@ -70,8 +68,6 @@ private:
         bool testTexImage(void);
 	bool testTexSubImage(void);
 	bool testPolygonStip(void);
-
-        void runSubTests(MultiTestResult &r);
 
 	bool setup(void);
 	bool checkResult(const GLfloat exp[4], const int depth, const int stencil) const;
