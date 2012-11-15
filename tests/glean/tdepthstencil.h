@@ -72,8 +72,6 @@ private:
         bool testErrorDetection(void);
         bool testDrawAndRead(void);
 	bool testTextureOperations(void);
-	void testPerformance(DepthStencilResult &r);
-	double readPixelsRate(GLenum format, GLenum type);
 };
 
 } // namespace GLEAN

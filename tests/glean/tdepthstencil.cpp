@@ -35,7 +35,6 @@
 #include <cstring>
 #include "tdepthstencil.h"
 #include "rand.h"
-#include "timer.h"
 #include "image.h"
 
 namespace GLEAN {
@@ -232,53 +231,6 @@ DepthStencilTest::testTextureOperations(void)
 }
 
 
-double
-DepthStencilTest::readPixelsRate(GLenum format, GLenum type)
-{
-	const int width = drawingSize, height = drawingSize;
-	GLuint *img = new GLuint [width * height];
-
-	WindowPos2i(0, 0);
-	glDrawPixels(width, height, GL_DEPTH_STENCIL_EXT,
-		     GL_UNSIGNED_INT_24_8_EXT, img);
-
-	const double minInterval = 2.0; // two seconds
-	Timer tTimer;
-	double start = tTimer.getClock();
-	double elapsedTime = 0.0;
-	int iterations = 0;
-	do {
-		for (int i = 0; i < 50; i++) {
-			glReadPixels(0, 0, width, height, format, type, img);
-			iterations++;
-		}
-
-		double finish = tTimer.getClock();
-		elapsedTime = finish - start;
-	} while (elapsedTime < minInterval);
-
-	delete [] img;
-
-	double rate = width * height * (double) iterations / elapsedTime;
-	assert(rate > 0.0);
-	return rate;  // pixels/second
-}
-
-
-void
-DepthStencilTest::testPerformance(DepthStencilResult &r)
-{
-	r.readDepthStencilRate = readPixelsRate(GL_DEPTH_STENCIL_EXT,
-						GL_UNSIGNED_INT_24_8_EXT);
-	r.readDepthUintRate = readPixelsRate(GL_DEPTH_COMPONENT,
-					     GL_UNSIGNED_INT);
-	r.readDepthUshortRate = readPixelsRate(GL_DEPTH_COMPONENT,
-					       GL_UNSIGNED_SHORT);
-
-	// XXX maybe also test glCopyTexImage, etc.
-}
-
-
 void
 DepthStencilTest::runOne(DepthStencilResult &r, Window &w)
 {
@@ -301,8 +253,6 @@ DepthStencilTest::runOne(DepthStencilResult &r, Window &w)
 		r.pass = testDrawAndRead();
 	if (r.pass)
 		r.pass = testTextureOperations();
-	if (r.pass && !env->options.quick)
-		testPerformance(r);
 }
 
 
