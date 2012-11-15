@@ -69,7 +69,6 @@ piglit_add_executable (glean
 	tvertarraybgra.cpp
 	tvertattrib.cpp
 	tvertprog1.cpp
-	tvtxperf.cpp
 	winsys.cpp
 	gl.cpp
 	image_misc.cpp
