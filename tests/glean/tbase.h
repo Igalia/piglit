@@ -48,10 +48,9 @@ those variables from and to a stream.
 
 The template class, BaseTest, is parameterized by the result class and
 declares member functions and variables that are common to all
-portable tests.  These include the member functions run() and
-compare() which are invoked for each test by main().  BaseTest also
-provides several variables which you might want to use when
-constructing a test:
+portable tests.  This includes the member function run() which is
+invoked for each test by main().  BaseTest also provides several
+variables which you might want to use when constructing a test:
 
 	A drawing surface filter string.  The test can be run on all
 	the drawing surface configurations that are selected by the
@@ -79,11 +78,10 @@ constructing a test:
 	"prerequisite" tests available.
 
 To use BaseTest, declare a new class derived from BaseTest,
-parameterized by your result class.  Then override the runOne(),
-compareOne(), and logOne() member functions.  runOne() runs a test and
-generates a result.  compareOne() compares one result from a test run
-with the same result from another test run.  logOne() generates a log
-message summarizing the result of the test.
+parameterized by your result class.  Then override the runOne()
+and logOne() member functions.  runOne() runs a test and generates a
+result.  logOne() generates a log message summarizing the result of
+the test.
 
 Your new test will need a few common declarations (such as
 constructors).  To simplify writing them, this file provides a few
@@ -157,7 +155,6 @@ and tbasic.cpp.
 	virtual ~TEST() {}                                                    \
                                                                               \
 	virtual void runOne(RESULT& r, Window& w);                            \
-	virtual void compareOne(RESULT& oldR, RESULT& newR);                  \
 	virtual void logOne(RESULT& r)
 
 // Macro for constructor for Glean test taking width, height
@@ -247,7 +244,6 @@ public:
 	vector<ResultType*> results;     // Test results.
 
 	virtual void runOne(ResultType& r, Window& w) = 0;
-	virtual void compareOne(ResultType& oldR, ResultType& newR) = 0;
 	virtual void logOne(ResultType& r) = 0;
 
 	virtual vector<ResultType*> getResults(istream& s) {
@@ -361,81 +357,6 @@ public:
 		env->log << '\n';
 
 		hasRun = true;	// Note that we've completed the run
-	}
-
-	virtual void compare(Environment& environment) {
-		env = &environment; // Save the environment
-		logDescription();
-		// Read results from previous runs:
-		Input1Stream is1(*this);
-		vector<ResultType*> oldR(getResults(is1));
-		Input2Stream is2(*this);
-		vector<ResultType*> newR(getResults(is2));
-
-		// Construct a vector of surface configurations from the
-		// old run.  (Later we'll find the best match in this
-		// vector for each config in the new run.)
-		vector<DrawingSurfaceConfig*> oldConfigs;
-		for (typename vector<ResultType*>::const_iterator p = oldR.begin();
-		     p < oldR.end();
-		     ++p)
-			oldConfigs.push_back((*p)->config);
-
-		// Compare results:
-		for (typename vector<ResultType*>::const_iterator newP = newR.begin();
-		     newP < newR.end();
-		     ++newP) {
-
-			// Find the drawing surface config that most
-			// closely matches the config for this result:
-			int c = (*newP)->config->match(oldConfigs);
-
-			// If there was a match, compare the results:
-			if (c < 0)
-				env->log << name
-					 << ":  NOTE no matching config for "
-					 << (*newP)
-					->config->conciseDescription()
-					 << '\n';
-			else
-				compareOne(*(oldR[c]), **newP);
-		}
-
-		// Get rid of the results; we don't need them for future
-		// comparisons.
-		for (typename vector<ResultType*>::iterator np = newR.begin();
-		     np < newR.end();
-		     ++np)
-			delete *np;
-		for (typename vector<ResultType*>::iterator op = oldR.begin();
-		     op < oldR.end();
-		     ++op)
-			delete *op;
-	}
-
-	// comparePassFail is a helper function for tests that have a
-	// boolean result as all or part of their ResultType
-	virtual void comparePassFail(ResultType& oldR, ResultType& newR) {
-		if (oldR.pass == newR.pass) {
-			if (env->options.verbosity)
-				env->log << name
-					 << ":  SAME "
-					 << newR.config->conciseDescription()
-					 << '\n'
-					 << (oldR.pass
-					     ? "\tBoth PASS\n"
-					     : "\tBoth FAIL\n");
-		} else {
-			env->log << name
-				 << ":  DIFF "
-				 << newR.config->conciseDescription()
-				 << '\n'
-				 << '\t'
-				 << env->options.db1Name
-				 << (oldR.pass? " PASS, ": " FAIL, ")
-				 << env->options.db2Name
-				 << (newR.pass? " PASS\n": " FAIL\n");
-		}
 	}
 
 	virtual void logPassFail(ResultType& r) {

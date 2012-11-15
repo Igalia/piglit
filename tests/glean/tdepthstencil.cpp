@@ -299,35 +299,6 @@ DepthStencilTest::logOne(DepthStencilResult &r)
 
 
 void
-DepthStencilTest::compareOne(DepthStencilResult &oldR,
-			     DepthStencilResult &newR)
-{
-	comparePassFail(oldR, newR);
-
-	if (newR.pass && oldR.pass == newR.pass) {
-		if (env->options.verbosity) {
-			env->log << "\tReadPixels rate:\n";
-			env->log << "\t\tGL_DEPTH_STENCIL:\n";
-			env->log << "\t\t\told: " << oldR.readDepthStencilRate;
-			env->log << "\t\t\tnew: " << newR.readDepthStencilRate;
-			env->log << "\t\tGL_DEPTH/GL_UNSIGNED_INT:\n";
-			env->log << "\t\t\told: " << oldR.readDepthUintRate;
-			env->log << "\t\t\tnew: " << newR.readDepthUintRate;
-			env->log << "\t\tGL_DEPTH/GL_UNSIGNED_SHORT:\n";
-			env->log << "\t\t\told: " << oldR.readDepthUshortRate;
-			env->log << "\t\t\tnew: " << newR.readDepthUshortRate;
-		}
-	}
-	else {
-		env->log << "\tNew: ";
-		env->log << (newR.pass ? "PASS" : "FAIL");
-		env->log << "\tOld: ";
-		env->log << (oldR.pass ? "PASS" : "FAIL");
-	}
-}
-
-
-void
 DepthStencilResult::putresults(ostream &s) const
 {
 	if (pass) {

@@ -100,25 +100,6 @@ MultiTest::logOne(MultiTestResult &r)
 }
 
 
-void
-MultiTest::compareOne(MultiTestResult &oldR,
-			    MultiTestResult &newR)
-{
-	if (oldR.numPassed != newR.numPassed ||
-		oldR.numFailed != newR.numFailed) {
-		env->log << "Different results: passed: "
-				 << oldR.numPassed
-				 << " vs. "
-				 << newR.numPassed
-				 << "  failed: "
-				 << oldR.numFailed
-				 << " vs. "
-				 << newR.numFailed
-				 << "\n";
-	}
-}
-
-
 #if 0
 MultiTest multiTest("multi", "window",
 					"",

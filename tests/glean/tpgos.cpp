@@ -578,69 +578,6 @@ PgosTest::runOne(POResult& r, GLEAN::Window& w) {
 	r.pass = r.bigEnoughMRD && r.smallEnoughMRD && r.slopeOffsetsPassed;
 } // PgosTest::runOne
 
-///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-PgosTest::compareOne(POResult& oldR, POResult& newR) {
-	comparePassFail(oldR, newR);
-	if (oldR.bigEnoughMRD != newR.bigEnoughMRD) {
-		env->log << "\tMin size MRD criterion: "
-			<< env->options.db1Name
-			<< (oldR.bigEnoughMRD? " PASS, ": " FAIL, ")
-			<< env->options.db2Name
-			<< (newR.bigEnoughMRD? " PASS\n": " FAIL\n");
-	}
-	if (oldR.smallEnoughMRD != newR.smallEnoughMRD) {
-		env->log << "\tMax size MRD criterion: "
-			<< env->options.db1Name
-			<< (oldR.smallEnoughMRD? " PASS, ": " FAIL, ")
-			<< env->options.db2Name
-			<< (newR.smallEnoughMRD? " PASS\n": " FAIL\n");
-	}
-	if (oldR.slopeOffsetsPassed != newR.slopeOffsetsPassed) {
-		env->log << "\tSlope-relative offsets criterion: "
-			<< env->options.db1Name
-			<< (oldR.slopeOffsetsPassed? " PASS, ": " FAIL, ")
-			<< env->options.db2Name
-			<< (newR.slopeOffsetsPassed? " PASS\n": " FAIL\n");
-	}
-	if (!oldR.slopeOffsetsPassed && !newR.slopeOffsetsPassed) {
-		if (oldR.failingAngle != newR.failingAngle) {
-			env->log << '\t'
-				<< env->options.db1Name
-				<< " failed at angle "
-				<< oldR.failingAngle
-				<< ", "
-				<< env->options.db2Name
-				<< " failed at angle "
-				<< newR.failingAngle
-				<< '\n';
-		}
-		if (oldR.failingAxis[0] != newR.failingAxis[0]
-		 || oldR.failingAxis[1] != newR.failingAxis[1]
-		 || oldR.failingAxis[2] != newR.failingAxis[2]) {
-			env->log << '\t'
-				<< env->options.db1Name
-				<< " failed at axis ("
-				<< oldR.failingAxis[0]
-				<< ", "
-				<< oldR.failingAxis[1]
-				<< ", "
-				<< oldR.failingAxis[2]
-				<< "), "
-				<< env->options.db2Name
-				<< " failed at axis ("
-				<< newR.failingAxis[0]
-				<< ", "
-				<< newR.failingAxis[1]
-				<< ", "
-				<< newR.failingAxis[2]
-				<< ")\n";
-		}
-	}
-} // PgosTest::compareOne
-
 void
 PgosTest::logOne(POResult& r) {
 	logPassFail(r);

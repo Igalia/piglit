@@ -206,14 +206,6 @@ VertArrayBGRATest::logOne(VertArrayBGRAResult &r)
 
 
 void
-VertArrayBGRATest::compareOne(VertArrayBGRAResult &oldR,
-			     VertArrayBGRAResult &newR)
-{
-	comparePassFail(oldR, newR);
-}
-
-
-void
 VertArrayBGRAResult::putresults(ostream &s) const
 {
 	if (pass) {

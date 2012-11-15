@@ -57,20 +57,16 @@ namespace GLEAN {
 
 class Options {
     public:
-	typedef enum {notSet, run, compare, listtests} RunMode;
+	typedef enum {notSet, run, listtests} RunMode;
 	RunMode mode;		// Indicates whether we're generating
 				// results, or comparing two previous runs.
 
 	int verbosity;		// Verbosity level.  0 == concise; larger
 				// values imply more verbose output.
 
-	string db1Name;		// Name of output database, or one of
-				// the two databases being compared.
+	string db1Name;		// Name of output database.
 				// Typically the pathname of a directory,
 				// provided on the command line.
-
-	string db2Name;		// Name of the second database being
-				// compared.
 
 	string visFilter;	// Filter constraining the set of visuals
 				// (FBConfigs, pixel formats) that will be

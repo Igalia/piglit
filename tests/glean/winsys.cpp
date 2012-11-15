@@ -49,16 +49,6 @@ namespace GLEAN {
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__X11__)
 WindowSystem::WindowSystem(Options& o) {
-	// If running in "compare" mode we never actually use the window
-	// system, so we don't initialize it here.  This allows us to run
-	// on systems without graphics hardware/software.
-	if (o.mode == Options::compare) {
-		dpy = 0;
-		GLXVersMajor = GLXVersMinor = 0;
-		vip = 0;
-		return;
-	}
-
 	// Open the X11 display:
 	dpy = XOpenDisplay(o.dpyName.c_str());
 	if (!dpy)

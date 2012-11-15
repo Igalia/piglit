@@ -85,13 +85,6 @@ main(int argc, char* argv[]) {
 			o.overwrite = true;
 		} else if (!strcmp(argv[i], "--quick")) {
 			o.quick = true;
-		} else if (!strcmp(argv[i], "-c")
-		    || !strcmp(argv[i], "--compare")) {
-			o.mode = Options::compare;
-			++i;
-			o.db1Name = mandatoryArg(argc, argv, i);
-			++i;
-			o.db2Name = mandatoryArg(argc, argv, i);
 		} else if (!strcmp(argv[i], "--visuals")) {
 			visFilter = true;
 			++i;
@@ -129,7 +122,7 @@ main(int argc, char* argv[]) {
 	}
 
 	// Create the test environment, then invoke each test to generate
-	// results or compare two previous runs.
+	// results.
 	try {
 		Environment e(o);
 		switch (o.mode) {
@@ -139,30 +132,6 @@ main(int argc, char* argv[]) {
                                 if (binary_search(o.selectedTests.begin(),
                                     o.selectedTests.end(), t->name))
                                         t->run(e);
-			break;
-		}
-		case Options::compare:
-		{
-			for (Test* t = Test::testList; t; t = t->nextTest)
-				if (binary_search(o.selectedTests.begin(),
-				    o.selectedTests.end(), t->name))
-					try {
-						t->compare(e);
-					}
-					catch (Test::CantOpenResultsFile e) {
-						// For comparisons, we want to
-						// continue running even if a
-						// test result file can't be
-						// opened.  We report the
-						// problem here, but don't exit
-						// as we would in the catch{}
-						// below.
-						cerr << "Can't open results file for test "
-							<< e.testName
-							<< " in database "
-							<< e.dbName
-							<< '\n';
-					}
 			break;
 		}
 		default:
@@ -325,7 +294,6 @@ usage(char* command) {
 "\n"
 "mode:\n"
 "       (-r|--run) results-directory\n"
-"   or  (-c|--compare) old-results-dir new-results-dir\n"
 "\n"
 "options:\n"
 "       (-v|--verbose)             # each occurrence increases\n"

@@ -98,9 +98,6 @@ class Test {
 
 	virtual void run(Environment& env) = 0;	// Run test, save results.
 
-	virtual void compare(Environment& env) = 0;
-				// Compare two previous runs.
-
 	// Exceptions:
 	struct Error { };	// Base class for all exceptions.
 	struct CantOpenResultsFile: public Error {
@@ -126,13 +123,6 @@ class Test {
 		ifstream* s;
 	    	Input1Stream(Test& t);
 		~Input1Stream();
-		operator ifstream& ();
-	};
-	class Input2Stream {	// Open db #2 input stream for reading results.
-	    public:
-		ifstream* s;
-	    	Input2Stream(Test& t);
-		~Input2Stream();
 		operator ifstream& ();
 	};
 

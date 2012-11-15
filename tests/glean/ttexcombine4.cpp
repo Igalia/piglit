@@ -376,14 +376,6 @@ TexCombine4Test::logOne(TexCombine4Result &r)
 
 
 void
-TexCombine4Test::compareOne(TexCombine4Result &oldR,
-			     TexCombine4Result &newR)
-{
-	comparePassFail(oldR, newR);
-}
-
-
-void
 TexCombine4Result::putresults(ostream &s) const
 {
 	if (pass) {

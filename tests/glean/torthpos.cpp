@@ -95,49 +95,6 @@ failHeader(bool& pass, const string& name,
 	}
 } // failHeader
 
-void
-doComparison(const GLEAN::OPResult& oldR,
-    const GLEAN::OPResult& newR,
-    GLEAN::DrawingSurfaceConfig* config,
-    bool& same,
-    const string& name,
-    GLEAN::Environment* env,
-    const char* title) {
-	if (newR.hasGaps != oldR.hasGaps) {
-		diffHeader(same, name, config, env);
-		env->log << '\t' << env->options.db1Name
-			<< ' ' << title << ' '
-			<< (oldR.hasGaps? " has": " does not have")
-			<< " gaps\n";
-		env->log << '\t' << env->options.db2Name
-			<< ' ' << title << ' '
-			<< (newR.hasGaps? " has": " does not have")
-			<< " gaps\n";
-	}
-	if (newR.hasOverlaps != oldR.hasOverlaps) {
-		diffHeader(same, name, config, env);
-		env->log << '\t' << env->options.db1Name
-			<< ' ' << title << ' '
-			<< (oldR.hasOverlaps? " has": " does not have")
-			<< " overlaps\n";
-		env->log << '\t' << env->options.db2Name
-			<< ' ' << title << ' '
-			<< (newR.hasOverlaps? " has": " does not have")
-			<< " overlaps\n";
-	}
-	if (newR.hasBadEdges != oldR.hasBadEdges) {
-		diffHeader(same, name, config, env);
-		env->log << '\t' << env->options.db1Name
-			<< ' ' << title << ' '
-			<< (oldR.hasBadEdges? " has": " does not have")
-			<< " incorrect edges\n";
-		env->log << '\t' << env->options.db2Name
-			<< ' ' << title << ' '
-			<< (newR.hasBadEdges? " has": " does not have")
-			<< " incorrect edges\n";
-	}
-} // doComparison
-
 GLubyte
 logicalSum(GLubyte* start, int stride, int count) {
 	GLubyte* p = start;
@@ -405,30 +362,6 @@ OrthoPosPoints::logStats(OPResult& r) {
 } // OrthoPosPoints::logStats
 
 ///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosPoints::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		     env, "immediate-mode points");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			 << newR.config->conciseDescription()
-			 << "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosPoints::compareOne
-
-///////////////////////////////////////////////////////////////////////////////
 // The test object itself:
 ///////////////////////////////////////////////////////////////////////////////
 OrthoPosPoints orthoPosPointsTest("orthoPosPoints",
@@ -545,30 +478,6 @@ void
 OrthoPosVLines::logStats(OPResult& r) {
 	logStats1("Immediate-mode vertical lines", r, env);
 } // OrthoPosVLines::logStats
-
-///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosVLines::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		env, "immediate-mode vertical lines");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			<< newR.config->conciseDescription()
-			<< "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosVLines::compareOne
 
 ///////////////////////////////////////////////////////////////////////////////
 // The test object itself:
@@ -690,30 +599,6 @@ void
 OrthoPosHLines::logStats(OPResult& r) {
 	logStats1("Immediate-mode horizontal lines", r, env);
 } // OrthoPosHLines::logStats
-
-///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosHLines::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		env, "immediate-mode horizontal lines");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			<< newR.config->conciseDescription()
-			<< "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosHLines::compareOne
 
 ///////////////////////////////////////////////////////////////////////////////
 // The test object itself:
@@ -839,30 +724,6 @@ OrthoPosTinyQuads::logStats(OPResult& r) {
 } // OrthoPosTinyQuads::logStats
 
 ///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosTinyQuads::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		env, "immediate-mode 1x1 quads");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			<< newR.config->conciseDescription()
-			<< "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosTinyQuads::compareOne
-
-///////////////////////////////////////////////////////////////////////////////
 // The test object itself:
 ///////////////////////////////////////////////////////////////////////////////
 OrthoPosTinyQuads orthoPosTinyQuadsTest("orthoPosTinyQuads",
@@ -964,30 +825,6 @@ void
 OrthoPosRandRects::logStats(OPResult& r) {
 	logStats1("Immediate-mode axis-aligned rectangles", r, env);
 } // OrthoPosRandRects::logStats
-
-///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosRandRects::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		env, "immediate-mode axis-aligned rectangles");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			<< newR.config->conciseDescription()
-			<< "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosRandRects::compareOne
 
 ///////////////////////////////////////////////////////////////////////////////
 // The test object itself:
@@ -1103,30 +940,6 @@ void
 OrthoPosRandTris::logStats(OPResult& r) {
 	logStats1("Immediate-mode triangles", r, env);
 } // OrthoPosRandTris::logStats
-
-///////////////////////////////////////////////////////////////////////////////
-// compareOne:  Compare results for a single test case
-///////////////////////////////////////////////////////////////////////////////
-void
-OrthoPosRandTris::compareOne(OPResult& oldR, OPResult& newR) {
-	bool same = true;
-
-	doComparison(oldR, newR, newR.config, same, name,
-		env, "immediate-mode triangles");
-
-	if (same && env->options.verbosity) {
-		env->log << name << ":  SAME "
-			<< newR.config->conciseDescription()
-			<< "\n";
-	}
-
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-} // OrthoPosRandTris::compareOne
 
 ///////////////////////////////////////////////////////////////////////////////
 // The test object itself:

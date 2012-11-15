@@ -115,20 +115,4 @@ Test::Input1Stream::operator ifstream& () {
 	return *s;
 } // Test::Input1Stream::operator ::ifstream&
 
-Test::Input2Stream::Input2Stream(Test& t) {
-	s = new ifstream(t.env->resultFileName(
-		t.env->options.db2Name, t.name).c_str());
-	if (!*s)
-		throw Test::CantOpenResultsFile(t.name, t.env->options.db2Name);
-} // Test::Input2Stream::Input2Stream
-
-Test::Input2Stream::~Input2Stream() {
-	s->close();
-	delete s;
-} // Test::Input2Stream::~Input2Stream
-
-Test::Input2Stream::operator ifstream& () {
-	return *s;
-} // Test::Input2Stream::operator ::ifstream&
-
 } // namespace GLEAN

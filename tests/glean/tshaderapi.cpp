@@ -533,14 +533,6 @@ ShaderAPITest::logOne(ShaderAPIResult &r)
 
 
 void
-ShaderAPITest::compareOne(ShaderAPIResult &oldR,
-						  ShaderAPIResult &newR)
-{
-	comparePassFail(oldR, newR);
-}
-
-
-void
 ShaderAPIResult::putresults(ostream &s) const
 {
 	if (pass) {

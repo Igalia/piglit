@@ -406,14 +406,6 @@ TexSwizzleTest::logOne(TexSwizzleResult &r)
 
 
 void
-TexSwizzleTest::compareOne(TexSwizzleResult &oldR,
-			     TexSwizzleResult &newR)
-{
-	comparePassFail(oldR, newR);
-}
-
-
-void
 TexSwizzleResult::putresults(ostream &s) const
 {
 	if (pass) {

@@ -834,14 +834,6 @@ Stencil2Test::logOne(Stencil2Result &r)
 
 
 void
-Stencil2Test::compareOne(Stencil2Result &oldR,
-			     Stencil2Result &stencil2R)
-{
-	comparePassFail(oldR, stencil2R);
-}
-
-
-void
 Stencil2Result::putresults(ostream &s) const
 {
 	if (pass) {

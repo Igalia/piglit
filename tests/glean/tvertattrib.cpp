@@ -1600,18 +1600,6 @@ VertAttribTest::logStats(VertAttribResult& r)
 }
 
 
-void
-VertAttribTest::compareOne(VertAttribResult& oldR, VertAttribResult& newR)
-{
-	if (env->options.verbosity) {
-		env->log << env->options.db1Name << ':';
-		logStats(oldR);
-		env->log << env->options.db2Name << ':';
-		logStats(newR);
-	}
-}
-
-
 // Instantiate this test object
 VertAttribTest vertAttribTest("vertattrib", "window, rgb",
 	"Verify that the glVertexAttribNV, glVertexAttribARB, and glVertexAttrib\n"

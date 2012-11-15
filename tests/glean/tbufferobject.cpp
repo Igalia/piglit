@@ -284,14 +284,6 @@ BufferObjectTest::logOne(BufferObjectResult &r)
 
 
 void
-BufferObjectTest::compareOne(BufferObjectResult &oldR,
-			     BufferObjectResult &newR)
-{
-   comparePassFail(oldR, newR);
-}
-
-
-void
 BufferObjectResult::putresults(ostream &s) const
 {
    if (pass) {

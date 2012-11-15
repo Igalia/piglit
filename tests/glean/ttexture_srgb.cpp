@@ -318,24 +318,6 @@ TextureSRGBTest::logOne(TextureSRGBResult &r)
 
 
 void
-TextureSRGBTest::compareOne(TextureSRGBResult &oldR,
-			     TextureSRGBResult &newR)
-{
-	comparePassFail(oldR, newR);
-
-	if (newR.pass && oldR.pass == newR.pass) {
-		// XXX
-	}
-	else {
-		env->log << "\tNew: ";
-		env->log << (newR.pass ? "PASS" : "FAIL");
-		env->log << "\tOld: ";
-		env->log << (oldR.pass ? "PASS" : "FAIL");
-	}
-}
-
-
-void
 TextureSRGBResult::putresults(ostream &s) const
 {
 	if (pass) {

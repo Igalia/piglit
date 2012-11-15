@@ -565,14 +565,6 @@ ClipFlatTest::logOne(ClipFlatResult &r)
 
 
 void
-ClipFlatTest::compareOne(ClipFlatResult &oldR,
-			     ClipFlatResult &newR)
-{
-   comparePassFail(oldR, newR);
-}
-
-
-void
 ClipFlatResult::putresults(ostream &s) const
 {
    if (pass) {

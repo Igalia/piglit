@@ -168,7 +168,6 @@ public:
 	void checkDepth(ReadPixSanityResult& r, Window& w);
 	void checkStencil(ReadPixSanityResult& r, Window& w);
 	void checkIndex(ReadPixSanityResult& r, Window& w);
-	void summarize(const char* label, bool oldPass, bool newPass);
 }; // class ReadPixSanityTest
 extern ReadPixSanityTest readPixSanityTest;
 
@@ -283,8 +282,6 @@ public:
 	GLEAN_CLASS_WH(ExactRGBATest, ExactRGBAResult,
 		EXACT_RGBA_WIN_SIZE, EXACT_RGBA_WIN_SIZE);
 
-	void summarize(const char* label, const ExactRGBAResult::Flavor& o,
-	    const ExactRGBAResult::Flavor& n);
 	void logFlavor(const char* label, const ExactRGBAResult::Flavor& r);
 }; // class ExactRGBATest
 extern ExactRGBATest exactRGBATest;

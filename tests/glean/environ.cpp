@@ -77,14 +77,6 @@ Environment::Environment(Options& opt):
 			else
 				throw DBCantOpen(opt.db1Name);
 		}
-	// If comparing previous runs, make a token attempt to verify
-	// that the two databases exist.
-	} else {
-		struct stat s;
-		if (stat(opt.db1Name.c_str(), &s) || !S_ISDIR(s.st_mode))
-			throw DBCantOpen(opt.db1Name);
-		if (stat(opt.db2Name.c_str(), &s) || !S_ISDIR(s.st_mode))
-			throw DBCantOpen(opt.db2Name);
 	}
 
 #   elif defined(__MS__)
@@ -106,15 +98,6 @@ Environment::Environment(Options& opt):
 			else
 				throw DBCantOpen(opt.db1Name);
 		}
-	// If comparing previous runs, make a token attempt to verify
-	// that the two databases exist.
-	} else {
-		struct _stat s; 
-
-		if (_stat(opt.db1Name.c_str(), &s) || !(s.st_mode & _S_IFDIR))
-			throw DBCantOpen(opt.db1Name);
-		if (_stat(opt.db2Name.c_str(), &s) || !(s.st_mode & _S_IFDIR))
-			throw DBCantOpen(opt.db2Name);
 	}
 
 #   endif

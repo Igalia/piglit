@@ -44,7 +44,6 @@ Options::Options() {
 	mode = notSet;
 	verbosity = 0;
 	db1Name = "results";
-	db2Name = "previous";
 	visFilter = "1";
 	maxVisuals = ~0U;
 	selectedTests.resize(0);

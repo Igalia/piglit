@@ -78,12 +78,6 @@ class Environment {
 	inline string resultFileName(string& testName) {
 		return resultFileName(options.db1Name, testName);
 	}
-	inline string result1FileName(string& testName) {
-		return resultFileName(options.db1Name, testName);
-	}
-	inline string result2FileName(string& testName) {
-		return resultFileName(options.db2Name, testName);
-	}
 
 	string imageFileName(string& dbName, string& testName, int n);
 				// Return name of image file number ``n''
@@ -93,12 +87,6 @@ class Environment {
 				// using this.
 	inline string imageFileName(string& testName, int n) {
 		return imageFileName(options.db1Name, testName, n);
-	}
-	inline string image1FileName(string& testName, int n) {
-		return imageFileName(options.db1Name, testName, n);
-	}
-	inline string image2FileName(string& testName, int n) {
-		return imageFileName(options.db2Name, testName, n);
 	}
 
 }; // class Environment
