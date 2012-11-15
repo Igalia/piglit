@@ -63,8 +63,6 @@ private:
 	bool testTextureFormat(GLenum intFormat, GLint components,
                                GLEAN::Environment &env);
         bool testTexturing(void);
-
-	void testPerformance(TextureSRGBResult &r);
 };
 
 } // namespace GLEAN
