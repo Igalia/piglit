@@ -29,7 +29,6 @@ piglit_add_executable (glean
 	rc.cpp
 	tapi2.cpp
 	tbasic.cpp
-	tbasicperf.cpp
 	tbinding.cpp
 	tblend.cpp
 	tbufferobject.cpp
