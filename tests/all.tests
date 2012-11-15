@@ -112,7 +112,6 @@ glean['pointSprite'] = GleanTest('pointSprite', res_dir)
 # exactRGBA is not included intentionally, because it's too strict and
 # the equivalent functionality is covered by other tests
 glean['readPixSanity'] = GleanTest('readPixSanity', res_dir)
-glean['rgbTriStrip'] = GleanTest('rgbTriStrip', res_dir)
 glean['scissor'] = GleanTest('scissor', res_dir)
 glean['shaderAPI'] = GleanTest('shaderAPI', res_dir)
 glean['stencil2'] = GleanTest('stencil2', res_dir)
