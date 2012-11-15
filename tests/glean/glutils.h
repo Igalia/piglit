@@ -65,48 +65,6 @@ float getVersion();
 // Check for OpenGL errors and log any that have occurred:
 void logGLErrors(Environment& env);
 
-// Syntactic sugar for dealing with light source parameters:
-class Light {
-	GLenum lightNumber;
-    public:
-	Light(int l);
-	void ambient(float r, float g, float b, float a);
-	void diffuse(float r, float g, float b, float a);
-	void specular(float r, float g, float b, float a);
-	void position(float x, float y, float z, float w);
-	void spotDirection(float x, float y, float z);
-	void spotExponent(float e);
-	void spotCutoff(float c);
-	void constantAttenuation(float a);
-	void linearAttenuation(float a);
-	void quadraticAttenuation(float a);
-	void enable();
-	void disable();
-}; // Light
-
-// Syntactic sugar for dealing with light model:
-class LightModel {
-    public:
-	LightModel();
-	void ambient(float r, float g, float b, float a);
-	void localViewer(bool v);
-	void twoSide(bool v);
-	void colorControl(GLenum e);
-}; // LightModel
-
-// Syntactic sugar for dealing with material properties:
-class Material {
-	GLenum face;
-    public:
-	Material(GLenum f = GL_FRONT_AND_BACK);
-	void ambient(float r, float g, float b, float a);
-	void diffuse(float r, float g, float b, float a);
-	void ambientAndDiffuse(float r, float g, float b, float a);
-	void specular(float r, float g, float b, float a);
-	void emission(float r, float g, float b, float a);
-	void shininess(float s);
-}; // Material
-
 } // namespace GLUtils
 
 } // namespace GLEAN
