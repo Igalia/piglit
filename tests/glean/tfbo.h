@@ -62,8 +62,6 @@ private:
 	GLboolean haveARBfbo;  // GL_ARB_framebuffer_object supported?
 	GLfloat tolerance[5];
 	void reset(void);
-        bool testFunctionality(MultiTestResult &r);
-	bool testPerformance(MultiTestResult &r);
         bool testSanity(void);
 	bool testRender2SingleTexture(void);
 	bool testRender2MultiTexture(void);
@@ -71,8 +69,6 @@ private:
 	bool testRender2MipmapTexture(void);
 	bool testErrorHandling(void);
 
-
-	void runSubTests(MultiTestResult &r);
 
 	bool setup(void);
 	bool checkResult(const GLfloat exp[4], const int depth, const int stencil) const;

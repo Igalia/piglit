@@ -39,7 +39,6 @@
 #include <cassert>
 #include <math.h>
 #include <cstring>
-#include "timer.h"
 
 namespace GLEAN
 {
@@ -1414,9 +1413,16 @@ FBOTest::testErrorHandling(void)
         return true;
 }
 
-bool
-FBOTest::testFunctionality(MultiTestResult & r)
+void
+FBOTest::runOne(MultiTestResult & r, Window & w)
 {
+        (void) w;
+
+        if (!setup()) {
+                r.pass = false;
+                return;
+        }
+
         static SubTestFunc funcs[] = {
                 &GLEAN::FBOTest::testSanity,
                 &GLEAN::FBOTest::testRender2SingleTexture,
@@ -1432,147 +1438,6 @@ FBOTest::testFunctionality(MultiTestResult & r)
                         r.numPassed++;
                 else
                         r.numFailed++;
-        return true;
-}
-
-
-bool
-FBOTest::testPerformance(MultiTestResult & r)
-{
-        GLuint fbs[1];
-        GLuint textures[1];
-        int mode;
-
-        Timer t;
-        double t0, t1, perf[2];
-	
-	(void) r;
-
-        for (mode = 0; mode < useFramebuffer + 1; mode++) {
-                t0 = t.getClock();
-                glClearColor(0.0, 0.0, 0.0, 1.0);
-                glClear(GL_COLOR_BUFFER_BIT);
-                if (mode)
-                        glGenFramebuffersEXT_func(1, fbs);
-                glGenTextures(1, textures);
-
-                glBindTexture(GL_TEXTURE_2D, textures[0]);
-                glTexParameteri(GL_TEXTURE_2D,
-                                GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D,
-                                GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, TEXSIZE,
-                             TEXSIZE, 0, GL_RGB, GL_INT, NULL);
-
-                if (mode) {
-                        glBindFramebufferEXT_func(GL_FRAMEBUFFER_EXT, fbs[0]);
-                        glFramebufferTexture2DEXT_func
-                                (GL_FRAMEBUFFER_EXT,
-                                 GL_COLOR_ATTACHMENT0_EXT,
-                                 GL_TEXTURE_2D, textures[0], 0);
-                        CheckFramebufferStatus("FBOTest::testPerformance", __LINE__);
-                }
-
-                int i;
-
-                for (i = 0; i < 1024; i++) {
-                        if (mode)
-                                glBindFramebufferEXT_func
-                                        (GL_FRAMEBUFFER_EXT, fbs[0]);
-
-                        // Render to the texture
-                        glBindTexture(GL_TEXTURE_2D, 0);
-                        glDisable(GL_TEXTURE_2D);
-                        glColor4fv(colors[RED + (i % (WHITE - RED))]);
-                        glClearColor(0.0, 0.0, 0.0, 0.0);
-                        glClear(GL_COLOR_BUFFER_BIT);
-
-
-                        glBegin(GL_POLYGON);
-                        glVertex3f(0, 0, 0.2);
-                        glVertex3f(TEXSIZE, 0, 0.2);
-                        glVertex3f(TEXSIZE, TEXSIZE, 0.2);
-                        glVertex3f(0, TEXSIZE, 0.2);
-                        glEnd();
-
-                        // Render to the window
-                        if (mode) {
-                                glBindFramebufferEXT_func
-                                        (GL_FRAMEBUFFER_EXT, 0);
-                                glBindTexture(GL_TEXTURE_2D, textures[0]);
-                        }
-                        else {
-                                glBindTexture(GL_TEXTURE_2D, textures[0]);
-                                glCopyTexImage2D(GL_TEXTURE_2D, 0,
-                                                 GL_RGB, 0, 0,
-                                                 TEXSIZE, TEXSIZE, 0);
-                        }
-                        glEnable(GL_TEXTURE_2D);
-                        glColor4fv(colors[WHITE]);
-                        glClearColor(0.0, 0.0, 0.0, 0.0);
-                        glClear(GL_COLOR_BUFFER_BIT);
-
-                        glBegin(GL_POLYGON);
-                        glTexCoord3f(0.0, 0.0, 1.0);
-                        glVertex2f(0, 0);
-                        glTexCoord3f(1.0, 0.0, 1.0);
-                        glVertex2f(1, 0);
-                        glTexCoord3f(1.0, 1.0, 1.0);
-                        glVertex2f(1, 1);
-                        glTexCoord3f(0.0, 1.0, 1.0);
-                        glVertex2f(0, 1);
-                        glEnd();
-                }
-                t1 = t.getClock();
-                glDeleteTextures(1, textures);
-                if (mode)
-                        glDeleteFramebuffersEXT_func(1, fbs);
-
-                perf[mode] =
-                        (double) TEXSIZE *TEXSIZE * 3 / 1024 / (t1 - t0);
-        }
-
-        if (perf[1] < perf[0] && useFramebuffer) {
-                env->log << name << ":  NOTE "
-                        << "perf[0] = " << perf[0] <<
-                        " MB/s, which is using glCopyTexImage2D" << endl;
-                env->log << name << ":  NOTE " << "perf[1] = " <<
-                        perf[1] << " MB/s, which is using FBO" << endl;
-        }
-
-        return true;
-}
-
-// Run all the subtests, incrementing numPassed, numFailed
-void
-FBOTest::runSubTests(MultiTestResult & r)
-{
-        static TestFunc funcs[] = {
-                &GLEAN::FBOTest::testFunctionality,
-                &GLEAN::FBOTest::testPerformance,
-                NULL
-        };
-
-        for (int i = 0; funcs[i]; i++)
-                if ((this->*funcs[i]) (r))
-                        r.numPassed++;
-                else
-                        r.numFailed++;
-}
-
-
-void
-FBOTest::runOne(MultiTestResult & r, Window & w)
-{
-        (void) w;
-
-        if (!setup()) {
-                r.pass = false;
-                return;
-        }
-
-        runSubTests(r);
 
         r.pass = (r.numFailed == 0);
 }
