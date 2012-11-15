@@ -34,7 +34,7 @@ else()
 endif()
 
 if(PIGLIT_USE_WAFFLE)
-	pkg_check_modules(WAFFLE REQUIRED waffle-1>=1.1.0)
+	pkg_check_modules(WAFFLE REQUIRED waffle-1>=1.2.2)
 
 	if(NOT WAFFLE_FOUND)
 		message(FATAL_ERROR "Failed to find Waffle. If Waffle is not "
