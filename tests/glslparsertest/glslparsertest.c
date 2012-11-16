@@ -353,6 +353,8 @@ piglit_init(int argc, char**argv)
 
 	if (requested_version == 100) {
 		piglit_require_extension("GL_ARB_ES2_compatibility");
+	} else if (requested_version == 300) {
+		piglit_require_extension("GL_ARB_ES3_compatibility");
 	} else if (glsl_version < requested_version) {
 		fprintf(stderr,
 			"GLSL version is %u.%u, but requested version %u.%u is required\n",
