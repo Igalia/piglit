@@ -41,10 +41,50 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static char *vs_text =
+	"#version 110\n"
+	"void main()\n"
+	"{\n"
+	"  gl_Position = gl_Vertex;\n"
+	"}\n";
+
+/**
+ * Time-wasting fragment shader.  This fragment shader computes:
+ *
+ *   x = (sum(i=0..(iters-1): 2*i) % iters) / iters
+ *
+ * This value should always work out to 0.0, but it's highly unlikely
+ * that an optimizer will figure this out.  Hence we can use this
+ * shader to waste an arbitrary amount of time (by suitable choice of
+ * the value of iters).
+ *
+ * The shader outputs a color of (x, 1.0, 0.0, 0.0).
+ */
+static char *fs_text =
+	"#version 110\n"
+	"uniform int iters;\n"
+	"void main()\n"
+	"{\n"
+	"  int cumulative_sum = 0;\n"
+	"  for (int i = 0; i < iters; ++i) {\n"
+	"    cumulative_sum += i;\n"
+	"    if (cumulative_sum >= iters)\n"
+	"      cumulative_sum -= iters;\n"
+	"    cumulative_sum += i;\n"
+	"    if (cumulative_sum >= iters)\n"
+	"      cumulative_sum -= iters;\n"
+	"  }\n"
+	"  float x = float(cumulative_sum) / float(iters);\n"
+	"  gl_FragColor = vec4(x, 1.0, 0.0, 0.0);\n"
+	"}\n";
+
 enum {
 	TIME_ELAPSED,
 	TIMESTAMP
 } test = TIME_ELAPSED;
+
+GLuint prog;
+GLint iters_loc;
 
 static float
 get_time(void)
@@ -72,7 +112,9 @@ static float
 draw(GLuint *q, int iters)
 {
 	float start_time, end_time;
-	int i;
+
+	glUseProgram(prog);
+	glUniform1i(iters_loc, iters);
 
 	start_time = get_time();
 
@@ -81,9 +123,7 @@ draw(GLuint *q, int iters)
 	} else {
 		glBeginQuery(GL_TIME_ELAPSED, q[0]);
 	}
-	for (i = 0; i < iters; i++) {
-		piglit_draw_rect(-1, -1, 2, 2);
-	}
+	piglit_draw_rect(-1, -1, 2, 2);
 	if (test == TIMESTAMP) {
 		glQueryCounter(q[1], GL_TIMESTAMP);
 	} else {
@@ -270,7 +310,16 @@ retry:
 void
 piglit_init(int argc, char **argv)
 {
+	GLint vs, fs;
+
 	piglit_require_gl_version(20);
+
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
+	prog = piglit_link_simple_program(vs, fs);
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+	iters_loc = glGetUniformLocation(prog, "iters");
 
 	piglit_require_extension("GL_EXT_timer_query");
 
