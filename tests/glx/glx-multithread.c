@@ -58,7 +58,7 @@ thread_func(void *arg)
 	glColor4f(0.0, 1.0, 0.0, 0.0);
 	piglit_draw_rect(*x, 10, 10, 10);
 
-	glFlush();
+	glFinish();
 	glXDestroyContext(dpy, ctx);
 
 	pthread_mutex_unlock(&mutex);
@@ -84,7 +84,7 @@ draw(Display *dpy)
 	/* Clear background to gray */
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glFlush();
+	glFinish();
 
 	pthread_mutex_init(&mutex, NULL);
 	/* Now, spawn some threads that do some drawing, both with this
