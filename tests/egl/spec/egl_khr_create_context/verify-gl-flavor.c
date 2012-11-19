@@ -34,7 +34,7 @@
  * for each OpenGL API:
  *     `api` := the chosen OpenGL API
  *
- *     for each valid context version and profile of `api`:
+ *     for many (context version, profile) in `api`:
  *         `flavor` := the chosen combination of version and profile
  *
  *         call eglBindAPI(`api`)
@@ -362,24 +362,50 @@ check_opengl(void)
 	fold_results(&result, check_flavor(11, API_GL_COMPAT));
 	fold_results(&result, check_flavor(12, API_GL_COMPAT));
 	fold_results(&result, check_flavor(13, API_GL_COMPAT));
+	fold_results(&result, check_flavor(14, API_GL_COMPAT));
+	fold_results(&result, check_flavor(15, API_GL_COMPAT));
+	fold_results(&result, check_flavor(16, API_GL_COMPAT));
+	fold_results(&result, check_flavor(17, API_GL_COMPAT));
 	fold_results(&result, check_flavor(20, API_GL_COMPAT));
 	fold_results(&result, check_flavor(21, API_GL_COMPAT));
+	fold_results(&result, check_flavor(22, API_GL_COMPAT));
+	fold_results(&result, check_flavor(23, API_GL_COMPAT));
+	fold_results(&result, check_flavor(24, API_GL_COMPAT));
+	fold_results(&result, check_flavor(25, API_GL_COMPAT));
+	fold_results(&result, check_flavor(26, API_GL_COMPAT));
+	fold_results(&result, check_flavor(27, API_GL_COMPAT));
 	fold_results(&result, check_flavor(30, API_GL_COMPAT));
 	fold_results(&result, check_flavor(31, API_GL_COMPAT));
 	fold_results(&result, check_flavor(32, API_GL_COMPAT));
 	fold_results(&result, check_flavor(33, API_GL_COMPAT));
+	fold_results(&result, check_flavor(34, API_GL_COMPAT));
+	fold_results(&result, check_flavor(35, API_GL_COMPAT));
+	fold_results(&result, check_flavor(36, API_GL_COMPAT));
+	fold_results(&result, check_flavor(37, API_GL_COMPAT));
 	fold_results(&result, check_flavor(40, API_GL_COMPAT));
 	fold_results(&result, check_flavor(41, API_GL_COMPAT));
 	fold_results(&result, check_flavor(42, API_GL_COMPAT));
 	fold_results(&result, check_flavor(43, API_GL_COMPAT));
+	fold_results(&result, check_flavor(44, API_GL_COMPAT));
+	fold_results(&result, check_flavor(45, API_GL_COMPAT));
+	fold_results(&result, check_flavor(46, API_GL_COMPAT));
+	fold_results(&result, check_flavor(47, API_GL_COMPAT));
 
 	/* Try all valid OpenGL core context versions. */
 	fold_results(&result, check_flavor(32, API_GL_CORE));
 	fold_results(&result, check_flavor(33, API_GL_CORE));
+	fold_results(&result, check_flavor(34, API_GL_CORE));
+	fold_results(&result, check_flavor(35, API_GL_CORE));
+	fold_results(&result, check_flavor(36, API_GL_CORE));
+	fold_results(&result, check_flavor(37, API_GL_CORE));
 	fold_results(&result, check_flavor(40, API_GL_CORE));
 	fold_results(&result, check_flavor(41, API_GL_CORE));
 	fold_results(&result, check_flavor(42, API_GL_CORE));
 	fold_results(&result, check_flavor(43, API_GL_CORE));
+	fold_results(&result, check_flavor(44, API_GL_CORE));
+	fold_results(&result, check_flavor(45, API_GL_CORE));
+	fold_results(&result, check_flavor(46, API_GL_CORE));
+	fold_results(&result, check_flavor(47, API_GL_CORE));
 
 	EGL_KHR_create_context_teardown();
 	return result;
@@ -393,9 +419,11 @@ check_opengl_es1(void)
 	if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES_BIT))
 		return PIGLIT_SKIP;
 
-	/* Try all valid OpenGL ES1 context versions. */
+	/* Try OpenGL ES1 context versions. */
 	fold_results(&result, check_flavor(10, API_GLES1));
 	fold_results(&result, check_flavor(11, API_GLES1));
+	fold_results(&result, check_flavor(12, API_GLES1));
+	fold_results(&result, check_flavor(13, API_GLES1));
 
 	EGL_KHR_create_context_teardown();
 	return result;
@@ -409,8 +437,15 @@ check_opengl_es2(void)
 	if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES2_BIT))
 		return PIGLIT_SKIP;
 
-	/* Try all valid OpenGL ES2 context versions. */
+	/* Try OpenGL ES2 context versions. */
 	fold_results(&result, check_flavor(20, API_GLES2));
+	fold_results(&result, check_flavor(21, API_GLES2));
+	fold_results(&result, check_flavor(22, API_GLES2));
+	fold_results(&result, check_flavor(23, API_GLES2));
+	fold_results(&result, check_flavor(24, API_GLES2));
+	fold_results(&result, check_flavor(25, API_GLES2));
+	fold_results(&result, check_flavor(26, API_GLES2));
+	fold_results(&result, check_flavor(27, API_GLES2));
 
 	EGL_KHR_create_context_teardown();
 	return result;
@@ -425,6 +460,13 @@ check_opengl_es3(void)
 		return PIGLIT_SKIP;
 
 	fold_results(&result, check_flavor(30, API_GLES3));
+	fold_results(&result, check_flavor(31, API_GLES3));
+	fold_results(&result, check_flavor(32, API_GLES3));
+	fold_results(&result, check_flavor(33, API_GLES3));
+	fold_results(&result, check_flavor(34, API_GLES3));
+	fold_results(&result, check_flavor(35, API_GLES3));
+	fold_results(&result, check_flavor(36, API_GLES3));
+	fold_results(&result, check_flavor(37, API_GLES3));
 
 	EGL_KHR_create_context_teardown();
 	return result;
