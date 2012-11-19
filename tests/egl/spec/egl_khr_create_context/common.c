@@ -119,6 +119,15 @@ EGL_KHR_create_context_setup(EGLint renderable_type_mask)
 
 	if (!eglChooseConfig(egl_dpy, config_attribs, &cfg, 1, &count) ||
 	    count == 0) {
+		if (eglGetError() == EGL_BAD_ATTRIBUTE) {
+			/* Piglit requests only valid attributes, therefore
+			 * EGL_BAD_ATTRIBUTE should not be emitted.
+			 */
+			fprintf(stderr, "eglChooseConfig() emitted "
+			        "EGL_BAD_ATTRIBUTE\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
 		return false;
 	}
 
