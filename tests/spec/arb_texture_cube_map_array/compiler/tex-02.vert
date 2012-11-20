@@ -1,7 +1,7 @@
 /* [config]
  * expect_result: pass
  * glsl_version: 1.30
- * extension: GL_ARB_texture_cube_map_array
+ * require_extensions: GL_ARB_texture_cube_map_array
  * [end config]
  */
 #version 130
