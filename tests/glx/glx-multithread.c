@@ -120,6 +120,7 @@ main(int argc, char **argv)
 			fprintf(stderr, "Unknown option: %s\n", argv[i]);
 	}
 
+	XInitThreads();
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
 		fprintf(stderr, "couldn't open display\n");
