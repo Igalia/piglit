@@ -195,7 +195,7 @@ char *strchrnul(const char *s, int c)
 void
 piglit_set_rlimit(unsigned long lim)
 {
-#if defined(USE_SETRLIMIT)
+#if defined(USE_SETRLIMIT) && defined(RLIMIT_AS)
 	struct rlimit rl;
 	if (getrlimit(RLIMIT_AS, &rl) != -1) {
 		printf("Address space limit = %lu, max = %lu\n",
