@@ -17,3 +17,4 @@ for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb
 	test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format])
 	executable = '{0} -auto'.format(test_name)
 	gles30[test_name] = concurrent_test(executable)
+gles30['minmax'] = concurrent_test('gles-3.0-minmax')
