@@ -11,5 +11,6 @@ link_libraries (
 
 piglit_add_executable (map_buffer_range_error_check map_buffer_range_error_check.c)
 piglit_add_executable (map_buffer_range_test map_buffer_range_test.c)
+piglit_add_executable (map_buffer_range-invalidate invalidate.c)
 
 # vim: ft=cmake:
