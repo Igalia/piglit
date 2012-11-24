@@ -4,7 +4,7 @@ name: Scalar data types declarations
 clc_version_min: 10
 !*/
 
-kernel void test() {
+kernel void test(global int* out) {
 	bool b;
 	char c;
 	unsigned char uc1; uchar uc2;

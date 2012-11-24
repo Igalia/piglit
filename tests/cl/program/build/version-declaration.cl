@@ -7,6 +7,6 @@ build_options: -cl-std=CL1.1
 
 void dummy_function() {}
 
-kernel void dummy_kernel() {
+kernel void dummy_kernel(global int* out) {
     dummy_function();
 }

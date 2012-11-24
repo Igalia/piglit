@@ -4,7 +4,7 @@ name: Vector operators
 clc_version_min: 10
 !*/
 
-void test() {
+kernel void test(global int* out) {
 	int4 a;
 	int4 b;
 

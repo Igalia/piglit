@@ -7,7 +7,7 @@ name: Other data types declarations (image, sampler, event)
 clc_version_min: 10
 !*/
 
-kernel void test() {
+kernel void test(global int* out) {
 	image2d_t i2;
 	image3d_t i3;
 	sampler_t s;

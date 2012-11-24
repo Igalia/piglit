@@ -4,7 +4,7 @@ name: Vector data types declarations
 clc_version_min: 10
 !*/
 
-kernel void test() {
+kernel void test(global int* out) {
 	char2    c2; char4    c4; char8    c8; char16    c16;
 	uchar2  uc2; uchar4  uc4; uchar8  uc8; uchar16  uc16;
 	short2   s2; short4   s4; short8   s8; short16   s16;

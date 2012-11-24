@@ -4,7 +4,7 @@ name: Scalar operators
 clc_version_min: 10
 !*/
 
-void test() {
+kernel void test(global int* out) {
 	int a;
 	int b;
 

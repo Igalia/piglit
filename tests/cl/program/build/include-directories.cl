@@ -7,9 +7,6 @@ build_options: -I . -I tests/cl/program/build
 
 #include "include_test.h"
 
-void dummy_function() {}
-
-kernel void dummy_kernel() {
-    dummy_function();
-    int test = BUILD_OPT;
+kernel void dummy_kernel(global int* out) {
+    *out = BUILD_OPT;
 }

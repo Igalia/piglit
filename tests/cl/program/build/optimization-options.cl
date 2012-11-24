@@ -7,6 +7,6 @@ build_options: -cl-opt-disable -cl-strict-aliasing -cl-mad-enable -cl-finite-mat
 
 void dummy_function() {}
 
-kernel void dummy_kernel() {
+kernel void dummy_kernel(global int* out) {
     dummy_function();
 }
