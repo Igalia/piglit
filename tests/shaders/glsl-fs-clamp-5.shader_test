@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 color;
+
+void main()
+{
+	/* The i965 driver failed when it was faced with a saturate of
+	 * a uniform -- https://bugs.freedesktop.org/show_bug.cgi?id=57166
+	 */
+	gl_FragColor = clamp(color, 0.0, 1.0) * 0.5 + 0.25;
+}
+
+[test]
+uniform vec4 color -1.0 1.0 2.0 0.0
+
+draw rect -1 -1 2 2
+probe all rgba 0.25 0.75 0.75 0.25
