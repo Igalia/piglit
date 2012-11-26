@@ -42,6 +42,13 @@
 #define EGL_CONTEXT_OPENGL_COMPATIBILITY_PROFILE_BIT_KHR    0x00000002
 #endif
 
+/* Old versions of eglext.h may define EGL_KHR_create_context without defining
+ * the EGL_OPENGL_ES3_BIT_KHR, because the bit was not defined until version
+ * 13 of the extension.
+ */
+#ifdef EGL_OPENGL_ES3_BIT_KHR
+#define EGL_OPENGL_ES3_BIT_KHR                              0x00000040
+#endif
 
 extern EGLDisplay egl_dpy;
 extern EGLConfig cfg;
