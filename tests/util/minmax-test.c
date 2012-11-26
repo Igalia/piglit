@@ -27,6 +27,8 @@
  */
 
 #define _GNU_SOURCE
+
+#include <inttypes.h>
 #include <string.h>
 
 #include "piglit-util-gl-common.h"
@@ -49,6 +51,40 @@ piglit_report_int(const char *name, GLint limit, GLint val, bool pass)
 			name, limit, val);
 		piglit_minmax_pass = false;
 	}
+}
+
+static void
+piglit_report_uint(const char *name, GLuint limit, GLuint val, bool pass)
+{
+
+	printf("%-50s %8u %8u", name, limit, val);
+	if (!pass) {
+		printf(" (ERROR)");
+		piglit_minmax_pass = false;
+	}
+	printf("\n");
+}
+
+static void
+piglit_report_int64(const char *name, GLint64 limit, GLint64 val, bool pass)
+{
+	printf("%-50s %8"PRId64" %8"PRId64 , name, limit, val);
+	if (!pass) {
+		printf(" (ERROR)");
+		piglit_minmax_pass = false;
+	}
+	printf("\n");
+}
+
+static void
+piglit_report_uint64(const char *name, GLuint64 limit, GLuint64 val, bool pass)
+{
+	printf("%-50s %8"PRIu64" %8"PRIu64 , name, limit, val);
+	if (!pass) {
+		printf(" (ERROR)");
+		piglit_minmax_pass = false;
+	}
+	printf("\n");
 }
 
 static void
@@ -76,6 +112,58 @@ piglit_test_int(GLenum token, GLint limit, bool max)
 			  (!max && val >= limit));
 }
 
+static void
+piglit_test_uint(GLenum token, GLuint limit, bool max)
+{
+	const char *name = piglit_get_gl_enum_name(token);
+	GLuint val = 9999;
+
+	glGetIntegerv(token, (GLint*) &val);
+
+	piglit_report_uint(name, limit, val,
+			   (max && val <= limit) ||
+			   (!max && val >= limit));
+}
+
+static void
+piglit_test_int64(GLenum token, GLint64 limit, bool max)
+{
+	const char *name = piglit_get_gl_enum_name(token);
+	GLint64 val = 9999;
+
+	glGetInteger64v(token, &val);
+
+	piglit_report_int64(name, limit, val,
+			    (max && val <= limit) ||
+			    (!max && val >= limit));
+}
+
+static void
+piglit_test_uint64(GLenum token, GLuint64 limit, bool max)
+{
+	const char *name = piglit_get_gl_enum_name(token);
+	GLuint64 val;
+
+	/* To obtain GLuint64 values, we must use glGetInteger64v.
+	 * Justification is found in the GL_ARB_sync spec:
+	 *
+	 *   30) What is the type of the timeout interval?
+	 *
+	 *       RESOLVED: GLuint64. [...] Consequently the type of <timeout>
+	 *       has been changed to 'GLuint64' and a corresponding
+	 *       'GetInteger64v' query taking 'GLint64' added (by symmetry
+	 *       with GetInteger, where unsigned quantities are queries with
+	 *       a function taking a pointer to a signed integer - the pointer
+	 *       conversion is harmless).
+	 */
+
+	glGetInteger64v(token, (GLint64*) &val);
+
+	piglit_report_uint64(name, limit, val,
+			     (max && val <= limit) ||
+			     (!max && val >= limit));
+}
+
 void piglit_test_min_int(GLenum token, GLint min)
 {
 	piglit_test_int(token, min, false);
@@ -86,6 +174,35 @@ void piglit_test_max_int(GLenum token, GLint max)
 	piglit_test_int(token, max, true);
 }
 
+void piglit_test_min_uint(GLenum token, GLuint min)
+{
+	piglit_test_uint(token, min, false);
+}
+
+void piglit_test_max_uint(GLenum token, GLuint max)
+{
+	piglit_test_uint(token, max, true);
+}
+
+void piglit_test_min_int64(GLenum token, GLint64 min)
+{
+	piglit_test_int64(token, min, false);
+}
+
+void piglit_test_max_int64(GLenum token, GLint64 max)
+{
+	piglit_test_int64(token, max, true);
+}
+
+void piglit_test_min_uint64(GLenum token, GLuint64 min)
+{
+	piglit_test_uint64(token, min, false);
+}
+
+void piglit_test_max_uint64(GLenum token, GLuint64 max)
+{
+	piglit_test_uint64(token, max, true);
+}
 
 static void
 piglit_test_float(GLenum token, GLfloat limit, bool max)
