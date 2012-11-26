@@ -121,6 +121,7 @@ add_plain_program_tester_test(program_execute, 'Scalar arithmetic ulong', 'execu
 add_plain_program_tester_test(program_execute, 'Scalar arithmetic ushort', 'execute/scalar-arithmetic-ushort.cl')
 add_plain_program_tester_test(program_execute, 'Vector arithmetic int4', 'execute/vector-arithmetic-int4.program_test')
 add_plain_program_tester_test(program_execute, 'Vector arithmetic float4', 'execute/vector-arithmetic-float4.program_test')
+add_plain_program_tester_test(program_execute, 'Vector conversions', 'execute/vector-conversion.cl')
 add_plain_program_tester_test(program_execute, 'Vector load int4', 'execute/vector-load-int4.cl')
 add_plain_program_tester_test(program_execute, 'Vector store int4', 'execute/vector-store-int4.cl')
 add_plain_program_tester_test(program_execute, 'Scalar bitwise op int', 'execute/scalar-bitwise-int.cl')
