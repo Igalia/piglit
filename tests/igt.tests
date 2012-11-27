@@ -48,8 +48,8 @@ igtTestRoot = path.join(path.realpath(path.join(testBinDir, 'igt')), 'tests')
 profile = TestProfile()
 
 class IGTTest(ExecTest):
-    def __init__(self, binary):
-	ExecTest.__init__(self, [path.join(igtTestRoot, binary)])
+    def __init__(self, binary, arguments=[]):
+	ExecTest.__init__(self, [path.join(igtTestRoot, binary)] + arguments)
 
     def interpretResult(self, out, returncode, results):
 	if returncode == 0:
@@ -95,7 +95,25 @@ singleTests = listTests("list-single-tests")
 for test in singleTests:
     profile.test_list['igt/' + test] = IGTTest(test)
 
+def addSubTestCases(test):
+    proc = subprocess.Popen(
+	    [path.join(igtTestRoot, test), '--list-subtests' ],
+	    stdout=subprocess.PIPE,
+	    stderr=subprocess.PIPE,
+	    env=os.environ.copy(),
+	    universal_newlines=True
+	    )
+    out, err = proc.communicate()
+    returncode = proc.returncode
+
+    subtests = out.split("\n")
+
+    for subtest in subtests:
+	if subtest == "":
+	    continue
+	profile.test_list['igt/' + test + '/' + subtest] = IGTTest(test, ['--run-subtest', subtest])
+
 multiTests = listTests("list-multi-tests")
 
-for test in singleTests:
-    profile.test_list['igt/' + test] = IGTTest(test)
+for test in multiTests:
+    addSubTestCases(test)
