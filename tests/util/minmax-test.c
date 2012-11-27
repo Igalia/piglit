@@ -174,6 +174,7 @@ void piglit_test_min_viewport_dimensions(void)
 			  dims[1] >= min_h);
 }
 
+#ifdef PIGLIT_USE_OPENGL
 void
 piglit_test_oq_bits()
 {
@@ -247,3 +248,4 @@ piglit_test_tf_bits(GLenum target)
 		piglit_minmax_pass = false;
 	}
 }
+#endif /*PIGLIT_USE_OPENGL*/

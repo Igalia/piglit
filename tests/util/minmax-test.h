@@ -29,5 +29,8 @@ void piglit_test_min_float(GLenum token, GLfloat val);
 void piglit_test_max_float(GLenum token, GLfloat val);
 void piglit_test_range_float(GLenum token, GLfloat low, GLfloat high);
 void piglit_test_min_viewport_dimensions();
+
+#ifdef PIGLIT_USE_OPENGL
 void piglit_test_oq_bits(void);
 void piglit_test_tf_bits(GLenum target);
+#endif
