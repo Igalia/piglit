@@ -3,6 +3,7 @@
 # All OpenCL tests that come with piglit, using default settings
 
 import os
+import os.path as path
 
 from framework.core import *
 from framework.exectest import *
@@ -18,8 +19,8 @@ def add_concurrent_test(group, name, args):
 	test.runConcurrent = true;
 	group[name] = PlainExecTest(args)
 
-def add_plain_program_tester_test(group, name, filename):
-	add_plain_test(group, name, ['cl-program-tester', 'tests/cl/program/'+filename])
+def add_plain_program_tester_test(group, name, path):
+	add_plain_test(group, name, ['cl-program-tester', path])
 
 ######
 # Collecting all tests
@@ -83,66 +84,23 @@ add_plain_test(api, 'clRetainEvent and clReleaseEvent', ['cl-api-retain_release-
 add_plain_test(program, 'Run kernel with max work item sizes', ['cl-program-max-work-item-sizes'])
 
 # Program tester
+
+def add_program_test_dir(group, dirpath):
+	for filename in os.listdir(dirpath):
+		filepath = path.join(dirpath, filename)
+		ext = filename.rsplit('.')[-1]
+		if ext != 'cl' and ext != 'program_test':
+			continue
+		testname = filename[0:-(len(ext) + 1)]
+		add_plain_program_tester_test(group, testname, filepath)
+
 program_build = Group()
 program_build_fail = Group()
 program_execute = Group()
 program["Build"] = program_build
 program["Build"]["Fail"] = program_build_fail
 program["Execute"] = program_execute
-#   Build
-add_plain_program_tester_test(program_build, 'Scalar data types', 'build/scalar-data-types.cl')
-add_plain_program_tester_test(program_build, 'Scalar data type half', 'build/scalar-data-type-half.cl')
-add_plain_program_tester_test(program_build, 'Vector data types', 'build/vector-data-types.cl')
-add_plain_program_tester_test(program_build, 'Other data types',  'build/other-data-types.cl')
-add_plain_program_tester_test(program_build, 'Scalar operators',  'build/scalar-operators.cl')
-add_plain_program_tester_test(program_build, 'Vector operators',  'build/vector-operators.cl')
-add_plain_program_tester_test(program_build, 'Scalar and vector operators',  'build/scalar-and-vector-operators.cl')
-add_plain_program_tester_test(program_build, 'Macro Definitions', 'build/macro-definitions.cl')
-add_plain_program_tester_test(program_build, 'Macro definitions with values', 'build/macro-definitions-with-values.cl')
-add_plain_program_tester_test(program_build, 'Mixed macro definitions', 'build/mixed-macro-definitions.cl')
-add_plain_program_tester_test(program_build, 'Include Directories', 'build/include-directories.cl')
-add_plain_program_tester_test(program_build, 'Math Intrinsics', 'build/math-intrinsics.cl')
-add_plain_program_tester_test(program_build, 'Optimization Options', 'build/optimization-options.cl')
-add_plain_program_tester_test(program_build, 'Disable Warnings', 'build/disable-warnings.cl')
-add_plain_program_tester_test(program_build, 'CL Version Declaration', 'build/version-declaration.cl')
-add_plain_program_tester_test(program_build_fail, 'Treat warnings as errors', 'build/fail/warnings-as-errors.cl')
-add_plain_program_tester_test(program_build_fail, 'Invalid CL Version Declaration', 'build/fail/invalid-version-declaration.cl')
-add_plain_program_tester_test(program_build_fail, 'Increment operator on float',  'build/fail/increment-float.cl')
-add_plain_program_tester_test(program_build_fail, 'Add different size vector',  'build/fail/add-different-size-vector.cl')
-#   Execute
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic char', 'execute/scalar-arithmetic-char.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic float', 'execute/scalar-arithmetic-float.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic int', 'execute/scalar-arithmetic-int.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic long', 'execute/scalar-arithmetic-long.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic short', 'execute/scalar-arithmetic-short.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic uchar', 'execute/scalar-arithmetic-uchar.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic uint', 'execute/scalar-arithmetic-uint.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic ulong', 'execute/scalar-arithmetic-ulong.cl')
-add_plain_program_tester_test(program_execute, 'Scalar arithmetic ushort', 'execute/scalar-arithmetic-ushort.cl')
-add_plain_program_tester_test(program_execute, 'Vector arithmetic int4', 'execute/vector-arithmetic-int4.program_test')
-add_plain_program_tester_test(program_execute, 'Vector arithmetic float4', 'execute/vector-arithmetic-float4.program_test')
-add_plain_program_tester_test(program_execute, 'Vector conversions', 'execute/vector-conversion.cl')
-add_plain_program_tester_test(program_execute, 'Vector load int4', 'execute/vector-load-int4.cl')
-add_plain_program_tester_test(program_execute, 'Vector store int4', 'execute/vector-store-int4.cl')
-add_plain_program_tester_test(program_execute, 'Scalar bitwise op int', 'execute/scalar-bitwise-int.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison char', 'execute/scalar-comparison-char.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison float', 'execute/scalar-comparison-float.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison int', 'execute/scalar-comparison-int.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison long', 'execute/scalar-comparison-long.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison short', 'execute/scalar-comparison-short.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison uchar', 'execute/scalar-comparison-uchar.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison uint', 'execute/scalar-comparison-uint.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison ulong', 'execute/scalar-comparison-ulong.cl')
-add_plain_program_tester_test(program_execute, 'Scalar comparison ushort', 'execute/scalar-comparison-ushort.cl')
-add_plain_program_tester_test(program_execute, 'Scalar load uchar', 'execute/scalar-load-uchar.cl')
-add_plain_program_tester_test(program_execute, 'Scalar load float', 'execute/scalar-load-float.cl')
-add_plain_program_tester_test(program_execute, 'Scalar logical op float', 'execute/scalar-logical-float.cl')
-add_plain_program_tester_test(program_execute, 'Scalar logical op int', 'execute/scalar-logical-int.cl')
-add_plain_program_tester_test(program_execute, 'Sizeof operator', 'execute/sizeof.cl')
-add_plain_program_tester_test(program_execute, 'Comma operator', 'execute/comma.cl')
-add_plain_program_tester_test(program_execute, 'Reference and dereference operators', 'execute/reference.cl')
-add_plain_program_tester_test(program_execute, 'get_global_id', 'execute/get-global-id.cl')
-add_plain_program_tester_test(program_execute, 'For loop', 'execute/for-loop.cl')
-add_plain_program_tester_test(program_execute, 'GEGL gamma-2-2-to-linear', 'execute/gegl-gamma-2-2-to-linear.cl')
-add_plain_program_tester_test(program_execute, 'GEGL rgb-gamma-u8-to-ragabaf', 'execute/gegl-rgb-gamma-u8-to-ragabaf.cl')
-add_plain_program_tester_test(program_execute, 'GEGL fir-get-mean-component-1D-CL', 'execute/gegl-fir-get-mean-component-1D-CL.cl')
+
+add_program_test_dir(program_build, 'tests/cl/program/build')
+add_program_test_dir(program_build_fail, 'tests/cl/program/build/fail')
+add_program_test_dir(program_execute, 'tests/cl/program/execute')
