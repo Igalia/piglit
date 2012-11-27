@@ -35,6 +35,10 @@ if(PIGLIT_BUILD_GLES2_TESTS)
 	add_subdirectory(gles2)
 endif(PIGLIT_BUILD_GLES2_TESTS)
 
+if(PIGLIT_BUILD_GLES3_TESTS)
+	add_subdirectory(gles3)
+endif(PIGLIT_BUILD_GLES3_TESTS)
+
 if(PIGLIT_BUILD_CL_TESTS)
 	add_subdirectory(cl)
 endif(PIGLIT_BUILD_CL_TESTS)
