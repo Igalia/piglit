@@ -1,7 +1,6 @@
 /*!
 [config]
 name: Scalar load float
-clc_version_min: 11
 
 [test]
 kernel_name: load_global
