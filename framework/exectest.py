@@ -148,7 +148,7 @@ class ExecTest(Test):
 			if env:
 				results['environment'] = env
 
-			results['info'] = "Returncode: {0}\n\nErrors:\n{1}\n\nOutput:\n{2}".format(returncode, err, out)
+			results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\nOutput:\n{2}").format(returncode, err, out)
 			results['returncode'] = returncode
 			results['command'] = ' '.join(self.command)
 
