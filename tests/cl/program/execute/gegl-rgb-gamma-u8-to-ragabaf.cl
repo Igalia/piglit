@@ -21,7 +21,6 @@
 /*!
 [config]
 name: GEGL rgb_gamma_u8_to_ragabaf
-clc_version_min: 11
 kernel_name: rgb_gamma_u8_to_ragabaf
 global_size: 208320 1 1
 local_size: 1 1 1
