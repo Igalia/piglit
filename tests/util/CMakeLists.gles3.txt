@@ -1,0 +1,21 @@
+list(APPEND UTIL_GL_SOURCES
+	minmax-test.c
+	piglit-util-gles.c
+	piglit-util-gles3-enum.c
+	)
+
+include_directories(
+	${UTIL_GL_INCLUDES}
+	)
+
+link_libraries(
+	${UTIL_GL_LIBS}
+	${OPENGL_gles2_LIBRARY}
+	piglitutil_${piglit_target_api}
+	)
+
+piglit_add_library(piglitutil_${piglit_target_api}
+	${UTIL_GL_SOURCES}
+	)
+
+# vim: ft=cmake:
