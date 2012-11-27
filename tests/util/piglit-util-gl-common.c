@@ -116,7 +116,9 @@ static void initialize_piglit_extension_support(void)
 		return;
 	}
 
-#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
+#if defined(PIGLIT_USE_OPENGL_ES1) || \
+    defined(PIGLIT_USE_OPENGL_ES2) || \
+    defined(PIGLIT_USE_OPENGL_ES3)
 	gl_extensions = gl_extension_array_from_getstring();
 #elif defined(PIGLIT_USE_OPENGL)
 	if (piglit_get_gl_version() < 30) {

@@ -79,7 +79,9 @@ validate_supported_apis(const struct piglit_gl_test_config *test_config)
 	    && !test_config->supports_gl_compat_version) {
 		piglit_report_result(PIGLIT_SKIP);
 	}
-#elif defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES1) || \
+      defined(PIGLIT_USE_OPENGL_ES2) || \
+      defined(PIGLIT_USE_OPENGL_ES3)
 	if (!test_config->supports_gl_es_version) {
 		piglit_report_result(PIGLIT_SKIP);
 	}

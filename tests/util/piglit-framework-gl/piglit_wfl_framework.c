@@ -371,7 +371,9 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		}
 	}
 
-#elif defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES1) || \
+      defined(PIGLIT_USE_OPENGL_ES2) || \
+      defined(PIGLIT_USE_OPENGL_ES3)
 	ok = make_context_current_singlepass(wfl_fw, test_config,
 	                                     CONTEXT_GL_ES,
 	                                     partial_config_attrib_list);

@@ -131,7 +131,7 @@ GLint piglit_link_simple_program(GLint vs, GLint fs);
 #define piglit_UniformMatrix3x4fv assert(!"glUniformMatrix3x4fv does not exist in ES")
 #define piglit_UniformMatrix4x2fv assert(!"glUniformMatrix4x2fv does not exist in ES")
 #define piglit_UniformMatrix4x3fv assert(!"glUniformMatrix4x3fv does not exist in ES")
-#else
+#elif defined(PIGLIT_USE_OPENGL) || defined(PIGLIT_USE_OPENGL_ES2)
 extern PFNGLATTACHSHADERPROC piglit_AttachShader;
 extern PFNGLBINDATTRIBLOCATIONPROC piglit_BindAttribLocation;
 extern PFNGLCOMPILESHADERPROC piglit_CompileShader;

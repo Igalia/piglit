@@ -205,7 +205,7 @@ draw_arrays(const GLvoid *verts, const GLvoid *tex)
 		glDisableClientState(GL_VERTEX_ARRAY);
 	if (tex)
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#elif defined(PIGLIT_USE_OPENGL_ES2)
+#elif defined(PIGLIT_USE_OPENGL_ES2) ||defined(PIGLIT_USE_OPENGL_ES3)
 	if (verts) {
 		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
 		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
