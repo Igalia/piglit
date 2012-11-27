@@ -51,7 +51,7 @@ class ExecTest(Test):
 
 		self.skip_test = self.check_for_skip_scenario(command)
 
-	def interpretResult(self, out, results):
+	def interpretResult(self, out, returncode, results):
 		raise NotImplementedError
 		return out
 
@@ -109,7 +109,7 @@ class ExecTest(Test):
 				results['result'] = 'skip'
 			else:
 				results['result'] = 'fail'
-				out = self.interpretResult(out, results)
+				out = self.interpretResult(out, returncode, results)
 
 			crash_codes = [
 				# Unix: terminated by a signal
@@ -207,7 +207,7 @@ class PlainExecTest(ExecTest):
 		# Prepend testBinDir to the path.
 		self.command[0] = testBinDir + self.command[0]
 
-	def interpretResult(self, out, results):
+	def interpretResult(self, out, returncode, results):
 		outlines = out.split('\n')
 		outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
 
