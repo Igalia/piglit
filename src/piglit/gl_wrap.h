@@ -60,6 +60,9 @@ extern "C" {
 #elif defined(PIGLIT_USE_OPENGL_ES2)
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+#	include <GLES3/gl3.h>
+#	include <GLES3/gl3ext.h>
 #endif
 
 #ifdef __cplusplus
