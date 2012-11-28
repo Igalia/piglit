@@ -46,7 +46,7 @@
  * the EGL_OPENGL_ES3_BIT_KHR, because the bit was not defined until version
  * 13 of the extension.
  */
-#ifdef EGL_OPENGL_ES3_BIT_KHR
+#ifndef EGL_OPENGL_ES3_BIT_KHR
 #define EGL_OPENGL_ES3_BIT_KHR                              0x00000040
 #endif
 
