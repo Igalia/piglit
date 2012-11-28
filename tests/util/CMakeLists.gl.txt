@@ -4,6 +4,7 @@ set(UTIL_GL_SOURCES
 	piglit-dispatch-init.c
 	piglit-shader.c
 	piglit-shader-gl.c
+	piglit-util-gl-enum.c
 	piglit-util-gl.c
 	piglit-vbo.cpp
 	sized-internalformats.c

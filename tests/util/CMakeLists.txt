@@ -18,7 +18,6 @@ set(UTIL_GL_INCLUDES
 set(UTIL_GL_SOURCES
 	fdo-bitmap.c
 	piglit-util-gl-common.c
-	piglit-util-gl-enum.c
 	piglit-framework-gl/piglit_gl_framework.c
 	piglit-framework-gl.c
         piglit_ktx.c
