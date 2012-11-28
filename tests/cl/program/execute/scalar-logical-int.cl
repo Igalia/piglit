@@ -14,19 +14,19 @@ global_size: 1 0 0
 
 [test]
 name: !true
-kernel_name: not
+kernel_name: test_not
 arg_in:  1 int 1
 arg_out: 0 buffer int[1] 0
 
 [test]
 name: !false
-kernel_name: not
+kernel_name: test_not
 arg_in:  1 int 0
 arg_out: 0 buffer int[1] 1
 
 [test]
 name: !big_num
-kernel_name: not
+kernel_name: test_not
 arg_in:  1 int 3452
 arg_out: 0 buffer int[1] 0
 
@@ -34,21 +34,21 @@ arg_out: 0 buffer int[1] 0
 
 [test]
 name: true&&true
-kernel_name: and
+kernel_name: test_and
 arg_in:  1 int 1
 arg_in:  2 int 1
 arg_out: 0 buffer int[1] 1
 
 [test]
 name: true&&false
-kernel_name: and
+kernel_name: test_and
 arg_in:  1 int 1
 arg_in:  2 int 0
 arg_out: 0 buffer int[1] 0
 
 [test]
 name: false&&false
-kernel_name: and
+kernel_name: test_and
 arg_in:  1 int 0
 arg_in:  2 int 0
 arg_out: 0 buffer int[1] 0
@@ -57,35 +57,35 @@ arg_out: 0 buffer int[1] 0
 
 [test]
 name: true||true
-kernel_name: or
+kernel_name: test_or
 arg_in:  1 int 1
 arg_in:  2 int 1
 arg_out: 0 buffer int[1] 1
 
 [test]
 name: true||false
-kernel_name: or
+kernel_name: test_or
 arg_in:  1 int 1
 arg_in:  2 int 0
 arg_out: 0 buffer int[1] 1
 
 [test]
 name: false||false
-kernel_name: or
+kernel_name: test_or
 arg_in:  1 int 0
 arg_in:  2 int 0
 arg_out: 0 buffer int[1] 0
 
 !*/
 
-kernel void not(global int* out, int in) {
+kernel void test_not(global int* out, int in) {
 	out[0] = !in;
 }
 
-kernel void and(global int* out, int a, int b) {
+kernel void test_and(global int* out, int a, int b) {
 	out[0] = a && b;
 }
 
-kernel void or(global int* out, int a, int b) {
+kernel void test_or(global int* out, int a, int b) {
 	out[0] = a || b;
 }
