@@ -76,7 +76,7 @@ piglit_display(void)
 	bool pass = true;
 	float red[4]   = {1.0, 0.0, 0.0, 1.0};
 	float blue[4]  = {0.0, 0.0, 1.0, 1.0};
-	float black[4] = {0.0, 0.0, 0.0, 1.0};
+	float undefined[4] = {0.0, 0.0, 0.0, 0.0};
 
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -92,12 +92,29 @@ piglit_display(void)
 		for (q = 0; q < 4; q++) {
 			const int tex_x = (q / 2) * ((width / 2));
 			const int tex_y = (q % 2) * ((height / 2));
-			float *c = black;
+			float *c = undefined;
 			const int x = 10+20*q;
 
-			/* fancy stuff - we should see red and blue
-			   due to the offset for 3 levels, 
-			   otherwise we get lots of black border color */
+			/* fancy stuff - we should see some red and blue
+			 * due to the offset for 3 levels, all the rest is
+			 * undefined due to out-of-bounds.
+			 * Only with ARB_robust_buffer_access_behavior
+			 * (and a robust context) the undefined result would
+			 * be guaranteed to be zero instead.
+			 *
+			 * From the GL 3.0 spec, page 105 ("Texel Fetches"):
+			 *
+			 *     "The results of the texel fetch are
+			 *      undefined if any of the following
+			 *      conditions hold:
+			 *
+			 *      ...
+			 *
+			 *      - The texel coordinates refer to a
+			 *        border texel outside of the defined
+			 *        extents of the specified LOD"
+			 */
+
 			if (l < 3) {
 				if (q == 2) c = red;
 				else if (q == 3) c = blue;
@@ -107,7 +124,7 @@ piglit_display(void)
 			piglit_Uniform2i(pos_location, tex_x, tex_y);
 			piglit_draw_rect(x, y, 10, 10);
 
-			if (width > 2) /* below 1 wide no test */
+			if (width > 2 && c != undefined) /* below 1 wide no test */
 				pass &= piglit_probe_rect_rgba(x, y, 10, 10, c);
 		}
 	}
