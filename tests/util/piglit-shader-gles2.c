@@ -21,10 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef PIGLIT_USE_OPENGL_ES2
-#	error PIGLIT_USE_OPENGL_ES2 is undefined
-#endif
-
 #include "piglit-util-gl-common.h"
 
 void piglit_require_GLSL(void) {}
