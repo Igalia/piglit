@@ -77,12 +77,16 @@ validate_supported_apis(const struct piglit_gl_test_config *test_config)
 #if defined(PIGLIT_USE_OPENGL)
 	if (!test_config->supports_gl_core_version
 	    && !test_config->supports_gl_compat_version) {
+		printf("Neither config attribute 'supports_gl_core_version' "
+		       "nor 'supports_gl_compat_version' is set\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 #elif defined(PIGLIT_USE_OPENGL_ES1) || \
       defined(PIGLIT_USE_OPENGL_ES2) || \
       defined(PIGLIT_USE_OPENGL_ES3)
 	if (!test_config->supports_gl_es_version) {
+		printf("Config attribute 'supports_gl_es_version' is not "
+		       "set\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 #else
