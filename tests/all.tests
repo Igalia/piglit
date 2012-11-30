@@ -40,7 +40,7 @@ def add_plain_test(group, name):
 	group[name] = PlainExecTest([name, '-auto'])
 
 def concurrent_test(args):
-	test = PlainExecTest(args.split() + ['-auto', '-fbo'])
+	test = PlainExecTest(shlex.split(args) + ['-auto', '-fbo'])
 	test.runConcurrent = True
 	return test
 
