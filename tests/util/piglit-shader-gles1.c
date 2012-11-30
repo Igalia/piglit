@@ -30,17 +30,20 @@
 void
 piglit_require_GLSL(void)
 {
+	printf("GLES1 lacks GLSL\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
 void
 piglit_require_vertex_shader(void)
 {
+	printf("GLES1 lacks GLSL\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
 void
 piglit_require_fragment_shader(void)
 {
+	printf("GLES1 lacks GLSL\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
