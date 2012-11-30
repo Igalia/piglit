@@ -2619,6 +2619,43 @@ add_asmparsertest('ARBvp1.0', 'txq-19.txt')
 add_asmparsertest('ARBvp1.0', 'txq-20.txt')
 add_asmparsertest('ARBvp1.0', 'xpd.txt')
 
+egl14 = Group()
+spec['EGL 1.4'] = egl14
+egl14['eglCreateSurface'] = plain_test('egl-create-surface')
+egl14['eglQuerySurface EGL_BAD_ATTRIBUTE'] = plain_test('egl-query-surface --bad-attr')
+egl14['eglQuerySurface EGL_BAD_SURFACE'] = plain_test('egl-query-surface --bad-surface')
+egl14['eglQuerySurface EGL_HEIGHT'] = plain_test('egl-query-surface --attr=EGL_HEIGHT')
+egl14['eglQuerySurface EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WIDTH')
+
+egl_nok_swap_region = Group()
+spec['EGL_NOK_swap_region'] = egl_nok_swap_region
+egl_nok_swap_region['basic']  = plain_test('egl-nok-swap-region')
+
+egl_nok_texture_from_pixmap = Group()
+spec['EGL_NOK_texture_from_pixmap'] = egl_nok_texture_from_pixmap
+egl_nok_texture_from_pixmap['basic'] = plain_test('egl-nok-texture-from-pixmap')
+
+egl_khr_create_context = Group();
+spec['EGL_KHR_create_context'] = egl_khr_create_context
+egl_khr_create_context['default major version GLES'] = plain_test('egl-create-context-default-major-version-gles')
+egl_khr_create_context['default major version GL'] = plain_test('egl-create-context-default-major-version-gl')
+egl_khr_create_context['default minor version GLES'] = plain_test('egl-create-context-default-minor-version-gles')
+egl_khr_create_context['default minor version GL'] = plain_test('egl-create-context-default-minor-version-gl')
+egl_khr_create_context['valid attribute empty GLES'] = plain_test('egl-create-context-valid-attribute-empty-gles')
+egl_khr_create_context['valid attribute empty GL'] = plain_test('egl-create-context-valid-attribute-empty-gl')
+egl_khr_create_context['NULL valid attribute GLES'] = plain_test('egl-create-context-valid-attribute-null-gles')
+egl_khr_create_context['NULL valid attribute GL'] = plain_test('egl-create-context-valid-attribute-null-gl')
+egl_khr_create_context['invalid OpenGL version'] = plain_test('egl-create-context-invalid-gl-version')
+egl_khr_create_context['invalid attribute GLES'] = plain_test('egl-create-context-invalid-attribute-gles')
+egl_khr_create_context['invalid attribute GL'] = plain_test('egl-create-context-invalid-attribute-gl')
+egl_khr_create_context['invalid flag GLES'] = plain_test('egl-create-context-invalid-flag-gles')
+egl_khr_create_context['invalid flag GL'] = plain_test('egl-create-context-invalid-flag-gl')
+egl_khr_create_context['valid forward-compatible flag GL'] = plain_test('egl-create-context-valid-flag-forward-compatible-gl')
+egl_khr_create_context['invalid profile'] = plain_test('egl-create-context-invalid-profile')
+egl_khr_create_context['3.2 core profile required'] = plain_test('egl-create-context-core-profile')
+egl_khr_create_context['pre-GL3.2 profile'] = plain_test('egl-create-context-pre-GL32-profile')
+egl_khr_create_context['verify GL flavor'] = plain_test('egl-create-context-verify-gl-flavor')
+
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
