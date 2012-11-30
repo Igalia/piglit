@@ -5,6 +5,7 @@ import itertools
 import os
 import os.path as path
 import platform
+import shlex
 
 from framework.core import *
 from framework.exectest import *
@@ -28,8 +29,8 @@ generatedTestDir = os.path.join(
 	'generated_tests')
 
 # Quick wrapper for PlainExecTest for our usual concurrent args.
-def plain_test(name):
-	return PlainExecTest([name, '-auto'])
+def plain_test(args):
+	return PlainExecTest(shlex.split(args) + ['-auto'])
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
