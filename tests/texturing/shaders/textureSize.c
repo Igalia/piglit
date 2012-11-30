@@ -137,7 +137,7 @@ piglit_display()
 		}
 		expected_color[3] = 1.0;
 
-		piglit_Uniform1i(lod_location, l);
+		glUniform1i(lod_location, l);
 		glViewport(x, 10, 10, 10);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
@@ -348,11 +348,11 @@ piglit_init(int argc, char **argv)
 	if (!prog)
 		piglit_report_result(PIGLIT_FAIL);
 
-	tex_location = piglit_GetUniformLocation(prog, "tex");
-	lod_location = piglit_GetUniformLocation(prog, "lod");
-	vertex_location = piglit_GetAttribLocation(prog, "vertex");
-	piglit_UseProgram(prog);
-	piglit_Uniform1i(tex_location, 0);
+	tex_location = glGetUniformLocation(prog, "tex");
+	lod_location = glGetUniformLocation(prog, "lod");
+	vertex_location = glGetAttribLocation(prog, "vertex");
+	glUseProgram(prog);
+	glUniform1i(tex_location, 0);
 
 	/* Create textures and set miplevel info */
 	set_base_size();

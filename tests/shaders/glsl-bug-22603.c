@@ -98,10 +98,10 @@ piglit_display(void)
 
 	glViewport(0, 0, 512, 512);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	piglit_UseProgram(shadow_prog);
-	piglit_Uniform1i(shadowMap_location, 0);
+	glUseProgram(shadow_prog);
+	glUniform1i(shadowMap_location, 0);
 	/* ogl reads in col-vectors, so transform=true */
-	piglit_UniformMatrix4fv(light_projection_location,
+	glUniformMatrix4fv(light_projection_location,
 			      1, GL_TRUE, matrix);
 	glBegin(GL_QUADS);
 		/* rect1 */
@@ -131,8 +131,8 @@ piglit_display(void)
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, shadow_texture);
 
-	piglit_UseProgram(prog);
-	piglit_UniformMatrix4fv(eye_projection_location, 1, 1, matrix);
+	glUseProgram(prog);
+	glUniformMatrix4fv(eye_projection_location, 1, 1, matrix);
 	/* this is the quad that is texturized with what we want to see */
 	glBegin(GL_QUADS);
 
@@ -210,9 +210,9 @@ piglit_init(int argc, char **argv)
 	shadow_fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_shadow_source);
 	shadow_prog = piglit_link_simple_program(shadow_vs, shadow_fs);
 
-	eye_projection_location = piglit_GetUniformLocation(prog,
+	eye_projection_location = glGetUniformLocation(prog,
 							  "eye_projection");
-	light_projection_location = piglit_GetUniformLocation(shadow_prog,
+	light_projection_location = glGetUniformLocation(shadow_prog,
 							    "light_projection");
-	shadowMap_location = piglit_GetUniformLocation(shadow_prog, "shadowMap");
+	shadowMap_location = glGetUniformLocation(shadow_prog, "shadowMap");
 }

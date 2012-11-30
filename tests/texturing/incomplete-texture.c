@@ -184,8 +184,8 @@ test_glsl(void)
 	draw_rect(2);
 
 	glUseProgram(0);
-	piglit_DeleteShader(frag);
-	piglit_DeleteProgram(prog);
+	glDeleteShader(frag);
+	glDeleteProgram(prog);
 
 	p = probe_pos(pos, expected);
 	if (!p)

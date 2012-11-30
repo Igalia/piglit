@@ -86,7 +86,7 @@ piglit_display(void)
 
 	/* Bind "attrib" to location 3 and re-link */
 	glBindAttribLocation(prog, 3, "attrib");
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 
 	/* check that the bind worked */
 	attrib_loc = glGetAttribLocation(prog, "attrib");
@@ -100,7 +100,7 @@ piglit_display(void)
 	}
 
 	/* now draw something and check that it works */
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

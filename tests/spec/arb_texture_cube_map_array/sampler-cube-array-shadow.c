@@ -100,7 +100,7 @@ shaderSetup(void)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
 	prog = piglit_link_simple_program(vs, fs);
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 }
 
 
@@ -185,7 +185,7 @@ piglit_display(void)
 	GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
 
 	loc1 = glGetUniformLocation(prog, "cubeArrayShadow");
-	loc2 = piglit_GetAttribLocation(prog, "compf");
+	loc2 = glGetAttribLocation(prog, "compf");
 	
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);

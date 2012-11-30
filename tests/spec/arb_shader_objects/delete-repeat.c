@@ -71,15 +71,15 @@ piglit_display(void)
 	if (!vs || !fs || !prog)
 		piglit_report_result(PIGLIT_FAIL);
 
-	piglit_DeleteShader(vs);
-	piglit_DeleteShader(fs);
-	piglit_UseProgram(prog);
-	piglit_DeleteProgram(prog);
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+	glUseProgram(prog);
+	glDeleteProgram(prog);
 
 	/* Try to blow out the refcount */
-	piglit_DeleteProgram(prog);
-	piglit_DeleteProgram(prog);
-	piglit_DeleteProgram(prog);
+	glDeleteProgram(prog);
+	glDeleteProgram(prog);
+	glDeleteProgram(prog);
 
 	/* Sanity check: deleting didn't already unbind our shader program. */
 	piglit_draw_rect(-1, -1, 2, 2);
@@ -87,7 +87,7 @@ piglit_display(void)
 				      green) && pass;
 
 	/* The program should still report being deleted. */
-	piglit_GetProgramiv(prog, GL_DELETE_STATUS, &status);
+	glGetProgramiv(prog, GL_DELETE_STATUS, &status);
 	if (!piglit_check_gl_error(0))
 		piglit_report_result(PIGLIT_FAIL);
 	if (status != GL_TRUE) {
@@ -98,9 +98,9 @@ piglit_display(void)
 	}
 
 	/* Now, disable the program and it should be finally deleted. */
-	piglit_UseProgram(0);
+	glUseProgram(0);
 
-	piglit_GetProgramiv(prog, GL_DELETE_STATUS, &status);
+	glGetProgramiv(prog, GL_DELETE_STATUS, &status);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	piglit_present_results();

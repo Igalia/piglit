@@ -129,16 +129,16 @@ piglit_display(void)
 	}
 
 	expected_value = max_clip_distances;
-	loc = piglit_GetUniformLocation(prog, "expected_value");
-	piglit_Uniform1i(loc, expected_value);
+	loc = glGetUniformLocation(prog, "expected_value");
+	glUniform1i(loc, expected_value);
 
 	for (test_distances = 0; test_distances <= 1; ++test_distances) {
-		loc = piglit_GetUniformLocation(prog, "test_distances");
-		piglit_Uniform1i(loc, test_distances);
+		loc = glGetUniformLocation(prog, "test_distances");
+		glUniform1i(loc, test_distances);
 		for (test_in_vs = 0; test_in_vs <= 1; ++test_in_vs) {
 			bool pass;
-			loc = piglit_GetUniformLocation(prog, "test_in_vs");
-			piglit_Uniform1i(loc, test_in_vs);
+			loc = glGetUniformLocation(prog, "test_in_vs");
+			glUniform1i(loc, test_in_vs);
 			piglit_draw_rect(-1, -1, 2, 2);
 			pass = piglit_probe_rect_rgba(0, 0, piglit_width,
 						      piglit_height, green);
@@ -166,11 +166,11 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL_version(130);
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
-	piglit_LinkProgram(prog);
-	piglit_DeleteShader(vs);
-	piglit_DeleteShader(fs);
-	piglit_UseProgram(prog);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
+	glLinkProgram(prog);
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+	glUseProgram(prog);
 }

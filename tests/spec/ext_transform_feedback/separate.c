@@ -84,13 +84,13 @@ void piglit_init(int argc, char **argv)
 
 	/* Create shaders. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
 	glTransformFeedbackVaryings(prog, sizeof(varyings)/sizeof(varyings[0]),
 				    varyings, GL_SEPARATE_ATTRIBS_EXT);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -155,7 +155,7 @@ enum piglit_result piglit_display(void)
 
 	/* Render into TFBO. */
 	glLoadIdentity();
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	glEnable(GL_RASTERIZER_DISCARD);
 	glBeginTransformFeedback(GL_TRIANGLES);
 	glVertexPointer(2, GL_FLOAT, 0, verts);

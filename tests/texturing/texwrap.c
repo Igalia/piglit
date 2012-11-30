@@ -826,16 +826,16 @@ static void draw(const struct format_desc *format,
 	switch (format->type) {
 	case INT_TYPE:
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << (bits-1))-1);
-		piglit_UseProgram(prog_int);
-		piglit_Uniform4fv(int_scale_loc, 1, scale);
+		glUseProgram(prog_int);
+		glUniform4fv(int_scale_loc, 1, scale);
 		break;
 	case UINT_TYPE:
 		scale[0] = scale[1] = scale[2] = scale[3] = 1.0/((1ull << bits)-1);
 		if (bits == 10) {
 			scale[3] = 1.0/3;
 		}
-		piglit_UseProgram(prog_uint);
-		piglit_Uniform4fv(uint_scale_loc, 1, scale);
+		glUseProgram(prog_uint);
+		glUniform4fv(uint_scale_loc, 1, scale);
 		break;
 	default:;
 	}
@@ -936,7 +936,7 @@ static void draw(const struct format_desc *format,
 	switch (format->type) {
 	case INT_TYPE:
 	case UINT_TYPE:
-		piglit_UseProgram(0);
+		glUseProgram(0);
 		break;
 	default:;
 	}
@@ -1766,14 +1766,14 @@ outer_continue:;
 		assert(fp);
 		prog_int = piglit_link_simple_program(0, fp);
 		assert(prog_int);
-		int_scale_loc = piglit_GetUniformLocation(prog_int, "scale");
+		int_scale_loc = glGetUniformLocation(prog_int, "scale");
 		assert(int_scale_loc != -1);
 
 		fp = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fp_uint);
 		assert(fp);
 		prog_uint = piglit_link_simple_program(0, fp);
 		assert(prog_uint);
-		uint_scale_loc = piglit_GetUniformLocation(prog_uint, "scale");
+		uint_scale_loc = glGetUniformLocation(prog_uint, "scale");
 		assert(uint_scale_loc != -1);
 		break;
 	default:;

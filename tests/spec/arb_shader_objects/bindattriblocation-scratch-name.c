@@ -69,8 +69,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
 
 	/* Bind "attrib" to location 3.  Once the attribute is bound, smash
 	 * the string containing the name.  After smashing the name, link the
@@ -78,14 +78,14 @@ piglit_init(int argc, char **argv)
 	 * problems linking.
 	 */
 	memcpy(alt_name, name, sizeof(name));
-	piglit_BindAttribLocation(prog, 3, alt_name);
+	glBindAttribLocation(prog, 3, alt_name);
 	memset(alt_name, 0, sizeof(alt_name));
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 
-	attrib_loc = piglit_GetAttribLocation(prog, "attrib");
+	attrib_loc = glGetAttribLocation(prog, "attrib");
 	if (attrib_loc != 3) {
 		fprintf(stderr, "Expected location 3, got location %d\n",
 			attrib_loc);

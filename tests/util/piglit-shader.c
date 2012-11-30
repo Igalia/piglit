@@ -140,25 +140,25 @@ piglit_compile_shader_text(GLenum target, const char *text)
 
 	piglit_require_GLSL();
 
-	prog = piglit_CreateShader(target);
-	piglit_ShaderSource(prog, 1, (const GLchar **) &text, NULL);
-	piglit_CompileShader(prog);
+	prog = glCreateShader(target);
+	glShaderSource(prog, 1, (const GLchar **) &text, NULL);
+	glCompileShader(prog);
 
-	piglit_GetShaderiv(prog, GL_COMPILE_STATUS, &ok);
+	glGetShaderiv(prog, GL_COMPILE_STATUS, &ok);
 
 	{
 		GLchar *info;
 		GLint size;
 
-		piglit_GetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
+		glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		piglit_GetShaderInfoLog(prog, size, NULL, info);
+		glGetShaderInfoLog(prog, size, NULL, info);
 		if (!ok) {
 			fprintf(stderr, "Failed to compile %s shader: %s\n",
 				shader_name(target),
 				info);
-			piglit_DeleteShader(prog);
+			glDeleteShader(prog);
 			prog = 0;
 		}
 		else if (0) {
@@ -183,15 +183,15 @@ link_check_status(GLint prog, FILE *output)
 
 	piglit_require_GLSL();
 
-	piglit_GetProgramiv(prog, GL_LINK_STATUS, &ok);
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 
 	/* Some drivers return a size of 1 for an empty log.  This is the size
 	 * of a log that contains only a terminating NUL character.
 	 */
-	piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+	glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 	if (size > 1) {
 		info = malloc(size);
-		piglit_GetProgramInfoLog(prog, size, NULL, info);
+		glGetProgramInfoLog(prog, size, NULL, info);
 	}
 
 	if (!ok) {
@@ -239,15 +239,15 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 
 	piglit_require_GLSL();
 
-	prog = piglit_CreateProgram();
+	prog = glCreateProgram();
 	if (vs)
-		piglit_AttachShader(prog, vs);
+		glAttachShader(prog, vs);
 	if (fs)
-		piglit_AttachShader(prog, fs);
-	piglit_LinkProgram(prog);
+		glAttachShader(prog, fs);
+	glLinkProgram(prog);
 
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		prog = 0;
 	}
 

@@ -492,14 +492,14 @@ generate_GLSL(enum shader_target test_stage)
 		printf("FS code:\n%s", fs_code);
 		piglit_report_result(PIGLIT_FAIL);
 	}
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
 
 	glBindAttribLocation(prog, pos_loc, "pos");
 	glBindAttribLocation(prog, texcoord_loc, "texcoord");
 
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 
@@ -596,12 +596,12 @@ piglit_init(int argc, char **argv)
 
 	prog = generate_GLSL(test_stage);
 
-	tex_location = piglit_GetUniformLocation(prog, "tex");
-	divisor_loc = piglit_GetUniformLocation(prog, "divisor");
+	tex_location = glGetUniformLocation(prog, "tex");
+	divisor_loc = glGetUniformLocation(prog, "divisor");
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
-	piglit_Uniform1i(tex_location, 0);
+	glUniform1i(tex_location, 0);
 
 	/* Create textures and set miplevel info */
 	set_base_size();

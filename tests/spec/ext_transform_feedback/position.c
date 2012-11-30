@@ -111,22 +111,22 @@ void piglit_init(int argc, char **argv)
 
 	/* Create shaders. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
 	glTransformFeedbackVaryings(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vspassthrough);
-	prog_passthrough = piglit_CreateProgram();
-	piglit_AttachShader(prog_passthrough, vs);
+	prog_passthrough = glCreateProgram();
+	glAttachShader(prog_passthrough, vs);
 	glTransformFeedbackVaryings(prog_passthrough, 1, varyings, GL_INTERLEAVED_ATTRIBS_EXT);
-	piglit_LinkProgram(prog_passthrough);
+	glLinkProgram(prog_passthrough);
 	if (!piglit_link_check_status(prog_passthrough)) {
-		piglit_DeleteProgram(prog_passthrough);
+		glDeleteProgram(prog_passthrough);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -206,7 +206,7 @@ enum piglit_result piglit_display(void)
 
 	/* Render into TFBO. */
 	glLoadIdentity();
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	if (discard)
 		glEnable(GL_RASTERIZER_DISCARD_EXT);
 	glBeginTransformFeedback(GL_TRIANGLES);
@@ -237,7 +237,7 @@ enum piglit_result piglit_display(void)
 
 	case RENDER:
 		puts("Testing rendering.");
-		piglit_UseProgram(prog_passthrough);
+		glUseProgram(prog_passthrough);
 		glBindBuffer(GL_ARRAY_BUFFER, buf);
 		glVertexPointer(4, GL_FLOAT, 0, (void*)(intptr_t)(offset * sizeof(float)));
 		glDrawArrays(GL_TRIANGLES, 0, range == MAX_RANGE ? 6 : 3);

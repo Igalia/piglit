@@ -133,11 +133,11 @@ void piglit_init(int argc, char **argv)
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
 	glTransformFeedbackVaryings(prog, 5, varyings, GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 	glGenBuffers(1, &xfb_buf);
@@ -154,7 +154,7 @@ enum piglit_result piglit_display(void)
 	int i;
 	GLboolean pass = GL_TRUE;
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexAttribIPointer(input_index, 1, GL_UNSIGNED_INT,

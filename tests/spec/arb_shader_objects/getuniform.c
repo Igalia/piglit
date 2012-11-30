@@ -76,16 +76,16 @@ uniformiv_n(int loc, int count, int *values)
 {
 	switch (count) {
 	case 1:
-		piglit_Uniform1iv(loc, 1, values);
+		glUniform1iv(loc, 1, values);
 		break;
 	case 2:
-		piglit_Uniform2iv(loc, 1, values);
+		glUniform2iv(loc, 1, values);
 		break;
 	case 3:
-		piglit_Uniform3iv(loc, 1, values);
+		glUniform3iv(loc, 1, values);
 		break;
 	case 4:
-		piglit_Uniform4iv(loc, 1, values);
+		glUniform4iv(loc, 1, values);
 		break;
 	default:
 		abort();
@@ -97,16 +97,16 @@ uniformfv_n(int loc, int count, float *values)
 {
 	switch (count) {
 	case 1:
-		piglit_Uniform1fv(loc, 1, values);
+		glUniform1fv(loc, 1, values);
 		break;
 	case 2:
-		piglit_Uniform2fv(loc, 1, values);
+		glUniform2fv(loc, 1, values);
 		break;
 	case 3:
-		piglit_Uniform3fv(loc, 1, values);
+		glUniform3fv(loc, 1, values);
 		break;
 	case 4:
-		piglit_Uniform4fv(loc, 1, values);
+		glUniform4fv(loc, 1, values);
 		break;
 	default:
 		abort();
@@ -322,7 +322,7 @@ piglit_init(int argc, char **argv)
 
 	for (i = 0; i < ARRAY_SIZE(uniforms); i++) {
 		const char *name = uniforms[i].name;
-		int loc = piglit_GetUniformLocation(prog, name);
+		int loc = glGetUniformLocation(prog, name);
 		assert(loc != -1);
 
 		pass = pass && uniforms[i].test_func(name, loc,

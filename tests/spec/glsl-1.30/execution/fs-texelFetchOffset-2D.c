@@ -86,7 +86,7 @@ piglit_display(void)
 		const int height = max(width / 2, 1);
 		const int y = 10 + 20 * l;
 
-		piglit_Uniform1i(lod_location, l);
+		glUniform1i(lod_location, l);
 
 		/* Draw 4 squares with a color sample for each quad */
 		for (q = 0; q < 4; q++) {
@@ -121,7 +121,7 @@ piglit_display(void)
 			} else if (l == 3)
 				if (q == 2) c = blue;
 
-			piglit_Uniform2i(pos_location, tex_x, tex_y);
+			glUniform2i(pos_location, tex_x, tex_y);
 			piglit_draw_rect(x, y, 10, 10);
 
 			if (width > 2 && c != undefined) /* below 1 wide no test */
@@ -152,10 +152,10 @@ piglit_init(int argc, char **argv)
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	prog = piglit_link_simple_program(vs, fs);
 
-	tex_location = piglit_GetUniformLocation(prog, "tex");
-	lod_location = piglit_GetUniformLocation(prog, "lod");
-	pos_location = piglit_GetUniformLocation(prog, "pos");
+	tex_location = glGetUniformLocation(prog, "tex");
+	lod_location = glGetUniformLocation(prog, "lod");
+	pos_location = glGetUniformLocation(prog, "pos");
 
-	piglit_UseProgram(prog);
-	piglit_Uniform1i(tex_location, 0);
+	glUseProgram(prog);
+	glUniform1i(tex_location, 0);
 }

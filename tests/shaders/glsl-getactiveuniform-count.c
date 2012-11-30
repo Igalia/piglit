@@ -72,7 +72,7 @@ piglit_init(int argc, char **argv)
 
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_GetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num);
+	glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num);
 	if (num != expect) {
 		printf("Unexpected active uniform count "
 		       "(saw %d, expected %d)\n", num, expect);

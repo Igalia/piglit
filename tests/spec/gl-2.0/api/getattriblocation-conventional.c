@@ -61,7 +61,7 @@ void piglit_init(int argc, char **argv)
 	vert = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
 	prog = piglit_link_simple_program(vert, 0);
 
-	loc = piglit_GetAttribLocation(prog, "gl_Vertex");
+	loc = glGetAttribLocation(prog, "gl_Vertex");
 	printf("Attribute location reported for gl_Vertex is %d.\n", loc);
 
 	piglit_report_result(loc == -1 ? PIGLIT_PASS : PIGLIT_FAIL);

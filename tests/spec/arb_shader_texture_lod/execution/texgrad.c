@@ -175,11 +175,11 @@ enum piglit_result piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glViewport(0, 0, piglit_width/2, piglit_height);
-	piglit_UseProgram(prog_tex);
+	glUseProgram(prog_tex);
 	draw_quad();
 
 	glViewport(piglit_width/2, 0, piglit_width/2, piglit_height);
-	piglit_UseProgram(prog_texgrad);
+	glUseProgram(prog_texgrad);
 	draw_quad();
 
 	if (!piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width, piglit_height))

@@ -73,7 +73,7 @@ void piglit_init(int argc, char **argv)
 	 *     "A valid name cannot be a structure, an array of structures, or
 	 *     any portion of a single vector or a matrix."
 	 */
-	loc = piglit_GetUniformLocation(prog, "s");
+	loc = glGetUniformLocation(prog, "s");
 	if (loc != -1) {
 		printf("s location = %d (should be -1)\n", loc);
 		pass = false;
@@ -87,7 +87,7 @@ void piglit_init(int argc, char **argv)
 		 *     matrix."
 		 */
 		snprintf(name, sizeof(name), "s[%d]", i);
-		loc = piglit_GetUniformLocation(prog, name);
+		loc = glGetUniformLocation(prog, name);
 
 		if (loc != -1) {
 			printf("%s location = %d (should be -1)\n", name, loc);
@@ -95,7 +95,7 @@ void piglit_init(int argc, char **argv)
 		}
 
 		snprintf(name, sizeof(name), "s[%d].m", i);
-		loc = piglit_GetUniformLocation(prog, name);
+		loc = glGetUniformLocation(prog, name);
 
 		if (loc == -1) {
 			printf("%s location = %d (should not be -1)\n",
@@ -105,7 +105,7 @@ void piglit_init(int argc, char **argv)
 
 		for (j = 0; j < 10; j++) {
 			snprintf(name, sizeof(name), "s[%d].v[%d]", i, j);
-			loc = piglit_GetUniformLocation(prog, name);
+			loc = glGetUniformLocation(prog, name);
 
 			if (loc == -1) {
 				printf("%s location = %d (should not be -1)\n",

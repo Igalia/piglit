@@ -456,7 +456,7 @@ do_test(const struct test *tests, unsigned num_tests)
 		 * Compare the set of active attributes against the list of
 		 * expected active attributes.
 		 */
-		piglit_GetProgramiv(prog, GL_ACTIVE_ATTRIBUTES, &num_attr);
+		glGetProgramiv(prog, GL_ACTIVE_ATTRIBUTES, &num_attr);
 
 		for (j = 0; j < num_attr; j++) {
 			const struct attribute *attr;

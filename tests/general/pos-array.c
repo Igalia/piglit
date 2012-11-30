@@ -204,14 +204,14 @@ test_glsl_arrays(void)
    fragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
    program = piglit_link_simple_program(vertShader, fragShader);
 
-   piglit_UseProgram(program);
+   glUseProgram(program);
 
    /*
     * Draw with compiler-assigned attribute locations
     */
    {
-      posAttrib = piglit_GetAttribLocation(program, "pos");
-      colorAttrib = piglit_GetAttribLocation(program, "color");
+      posAttrib = glGetAttribLocation(program, "pos");
+      colorAttrib = glGetAttribLocation(program, "color");
 
       if (0)
          printf("%s: GLSL posAttrib = %d  colorAttrib = %d\n",
@@ -247,10 +247,10 @@ test_glsl_arrays(void)
       posAttrib = 5;
       colorAttrib = 7;
 
-      piglit_BindAttribLocation(program, posAttrib, "pos");
-      piglit_BindAttribLocation(program, colorAttrib, "color");
+      glBindAttribLocation(program, posAttrib, "pos");
+      glBindAttribLocation(program, colorAttrib, "color");
 
-      piglit_LinkProgram(program);
+      glLinkProgram(program);
 
       glVertexAttribPointerARB(posAttrib, 2, GL_FLOAT, GL_FALSE,
                                2 * sizeof(GLfloat), (void *) 0);
@@ -275,8 +275,8 @@ test_glsl_arrays(void)
       glDisableVertexAttribArrayARB(colorAttrib);
    }
 
-   piglit_DeleteShader(vertShader);
-   piglit_DeleteProgram(program);
+   glDeleteShader(vertShader);
+   glDeleteProgram(program);
    glDeleteBuffersARB(1, &buf);
 
    return pass;
@@ -314,7 +314,7 @@ test_glsl_no_arrays(void)
    fragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
    program = piglit_link_simple_program(vertShader, fragShader);
 
-   piglit_UseProgram(program);
+   glUseProgram(program);
 
    glClear(GL_COLOR_BUFFER_BIT);
    glPointSize(3.0);
@@ -329,8 +329,8 @@ test_glsl_no_arrays(void)
       pass = GL_FALSE;
    }
 
-   piglit_DeleteShader(vertShader);
-   piglit_DeleteProgram(program);
+   glDeleteShader(vertShader);
+   glDeleteProgram(program);
 
    return pass;
 }

@@ -459,16 +459,16 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL_version(test_to_run->version);
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, test_to_run->vs);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_BindAttribLocation(prog, 0, "vertex_pos");
-	piglit_BindAttribLocation(prog, 1, "vertex_num");
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glBindAttribLocation(prog, 0, "vertex_pos");
+	glBindAttribLocation(prog, 1, "vertex_num");
 	glTransformFeedbackVaryings(prog, test_to_run->num_varyings,
 				    (const char **) test_to_run->varyings,
 				    GL_INTERLEAVED_ATTRIBS_EXT);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 

@@ -125,7 +125,7 @@ create_texture(void)
 		glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, sizeof(buffer),
 			     buffer, GL_STREAM_READ);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
-		piglit_UseProgram(xfb_prog);
+		glUseProgram(xfb_prog);
 		glBeginTransformFeedback(GL_POINTS);
 	}
 	if (prims_written) {
@@ -152,7 +152,7 @@ create_texture(void)
 	}
 	if (buffer || prims_written) {
 		glEndTransformFeedback();
-		piglit_UseProgram(0);
+		glUseProgram(0);
 	}
 	if (buffer) {
 		ptr = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
@@ -286,11 +286,11 @@ void piglit_init(int argc, char **argv)
 		GLuint vs;
 		piglit_require_GLSL();
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-		xfb_prog = piglit_CreateProgram();
-		piglit_AttachShader(xfb_prog, vs);
+		xfb_prog = glCreateProgram();
+		glAttachShader(xfb_prog, vs);
 		glTransformFeedbackVaryings(xfb_prog, 1, xfb_varyings,
 					    GL_INTERLEAVED_ATTRIBS);
-		piglit_LinkProgram(xfb_prog);
+		glLinkProgram(xfb_prog);
 		if (!piglit_link_check_status(xfb_prog)) {
 			piglit_report_result(PIGLIT_FAIL);
 		}

@@ -401,17 +401,17 @@ draw_and_readback(float *readback)
 static void
 set_uniform_float_if_present(GLint program, char *name, float value)
 {
-	GLint loc = piglit_GetUniformLocation(program, name);
+	GLint loc = glGetUniformLocation(program, name);
 	if (loc != -1)
-		piglit_Uniform1f(loc, value);
+		glUniform1f(loc, value);
 }
 
 static void
 set_uniform_int_if_present(GLint program, char *name, int value)
 {
-	GLint loc = piglit_GetUniformLocation(program, name);
+	GLint loc = glGetUniformLocation(program, name);
 	if (loc != -1)
-		piglit_Uniform1i(loc, value);
+		glUniform1i(loc, value);
 }
 
 /**
@@ -435,7 +435,7 @@ test_expr(char *expression, int expected_behavior)
 	char *expected_behavior_string;
 
 	/* Create and link a program specifically to test this expression */
-	prog = piglit_CreateProgram();
+	prog = glCreateProgram();
 	sprintf(compute_value_text,
 		"#version 130\n"
 		"uniform float z = 0.0;\n" /* To defeat constant folding */
@@ -447,19 +447,19 @@ test_expr(char *expression, int expected_behavior)
 		"}\n",
 		expression);
 	if (use_fs) {
-		piglit_AttachShader(prog, stock_vs);
-		piglit_AttachShader(prog, main_fs);
-		piglit_AttachShader(prog, do_test_fs);
+		glAttachShader(prog, stock_vs);
+		glAttachShader(prog, main_fs);
+		glAttachShader(prog, do_test_fs);
 		shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 						    compute_value_text);
-		piglit_AttachShader(prog, shader);
+		glAttachShader(prog, shader);
 	} else {
-		piglit_AttachShader(prog, stock_fs);
-		piglit_AttachShader(prog, main_vs);
-		piglit_AttachShader(prog, do_test_vs);
+		glAttachShader(prog, stock_fs);
+		glAttachShader(prog, main_vs);
+		glAttachShader(prog, do_test_vs);
 		shader = piglit_compile_shader_text(GL_VERTEX_SHADER,
 						    compute_value_text);
-		piglit_AttachShader(prog, shader);
+		glAttachShader(prog, shader);
 	}
 	if (use_xfb) {
 		static const char *var_name = "data";
@@ -467,9 +467,9 @@ test_expr(char *expression, int expected_behavior)
 					    GL_SEPARATE_ATTRIBS);
 		glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buffer);
 	}
-	piglit_LinkProgram(prog);
-	piglit_DeleteShader(shader);
-	piglit_UseProgram(prog);
+	glLinkProgram(prog);
+	glDeleteShader(shader);
+	glUseProgram(prog);
 
 	/* Set up uniforms */
 	set_uniform_float_if_present(prog, "u_inf", INFINITY);
@@ -586,8 +586,8 @@ test_expr(char *expression, int expected_behavior)
 	}
 	printf("%s\n", pass ? "OK" : "FAIL");
 
-	piglit_UseProgram(0);
-	piglit_DeleteProgram(prog);
+	glUseProgram(0);
+	glDeleteProgram(prog);
 
 	return pass;
 }

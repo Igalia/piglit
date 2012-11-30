@@ -83,7 +83,7 @@ piglit_display(void)
 	 */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	prog = piglit_link_simple_program(vs, 0);
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glGenBuffersARB(1, &vbo);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vbo);

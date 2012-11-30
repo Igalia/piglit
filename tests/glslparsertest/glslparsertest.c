@@ -161,7 +161,7 @@ attach_complementary_shader(GLuint shader_prog, GLenum type)
 		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
-	piglit_AttachShader(shader_prog, shader);
+	glAttachShader(shader_prog, shader);
 }
 
 static void
@@ -198,15 +198,15 @@ test(void)
 		exit(1);
 	}
 
-	prog = piglit_CreateShader(type);
-	piglit_ShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
-	piglit_CompileShader(prog);
+	prog = glCreateShader(type);
+	glShaderSource(prog, 1, (const GLchar **)&prog_string, NULL);
+	glCompileShader(prog);
 	ok = get_shader_compile_status(prog);
 
 	size = get_shader_info_log_length(prog);
 	if (size != 0) {
 		info = malloc(size);
-		piglit_GetShaderInfoLog(prog, size, NULL, info);
+		glGetShaderInfoLog(prog, size, NULL, info);
 	} else {
 		info = "(no compiler output)";
 	}
@@ -220,18 +220,18 @@ test(void)
 		 */
 		GLuint shader_prog;
 
-		shader_prog = piglit_CreateProgram();
-		piglit_AttachShader(shader_prog, prog);
+		shader_prog = glCreateProgram();
+		glAttachShader(shader_prog, prog);
 		if (requested_version == 100)
 			attach_complementary_shader(shader_prog, type);
-		piglit_LinkProgram(shader_prog);
+		glLinkProgram(shader_prog);
 		if (check_link) {
 			ok = piglit_link_check_status_quiet(shader_prog);
 			if (!ok) {
 				failing_stage = "link";
 			}
 		}
-		piglit_DeleteProgram(shader_prog);
+		glDeleteProgram(shader_prog);
 	}
 
 	pass = (expected_pass == ok);
@@ -264,7 +264,7 @@ test(void)
 	if (size != 0)
 		free(info);
 	free(prog_string);
-	piglit_DeleteShader(prog);
+	glDeleteShader(prog);
 	piglit_report_result (pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 

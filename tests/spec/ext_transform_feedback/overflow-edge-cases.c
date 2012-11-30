@@ -86,14 +86,14 @@ piglit_init(int argc, char **argv)
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	for (num_varyings = 1; num_varyings <= 2; ++num_varyings) {
-		GLuint prog = piglit_CreateProgram();
-		piglit_AttachShader(prog, vs);
-		piglit_BindAttribLocation(prog, 0, "vertex_num");
+		GLuint prog = glCreateProgram();
+		glAttachShader(prog, vs);
+		glBindAttribLocation(prog, 0, "vertex_num");
 		glTransformFeedbackVaryings(prog, num_varyings, varyings,
 					    GL_INTERLEAVED_ATTRIBS);
-		piglit_LinkProgram(prog);
+		glLinkProgram(prog);
 		if (!piglit_link_check_status(prog)) {
-			piglit_DeleteProgram(prog);
+			glDeleteProgram(prog);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 		progs[num_varyings - 1] = prog;
@@ -132,7 +132,7 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 	       mode_names[mode_index]);
 
 	/* Setup program and initial buffer contents */
-	piglit_UseProgram(progs[num_varyings - 1]);
+	glUseProgram(progs[num_varyings - 1]);
 	for (i = 0; i < MAX_VERTICES; ++i)
 		vertex_data[i] = i;
 	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float),

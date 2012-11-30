@@ -137,27 +137,27 @@ piglit_init(int argc, char **argv)
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_BindAttribLocation(prog, 0, "vertex");
-	piglit_BindAttribLocation(prog, 1, "textureCoord");
+	glBindAttribLocation(prog, 0, "vertex");
+	glBindAttribLocation(prog, 1, "textureCoord");
 
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	piglit_link_check_status(prog);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
-	loc = piglit_GetUniformLocation(prog, "colorMatrix");
-	piglit_UniformMatrix4fv(loc, 1, GL_FALSE, identity_matrix);
+	loc = glGetUniformLocation(prog, "colorMatrix");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, identity_matrix);
 
-	loc = piglit_GetUniformLocation(prog, "texture");
-	piglit_Uniform1i(loc, 0);
+	loc = glGetUniformLocation(prog, "texture");
+	glUniform1i(loc, 0);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 
-	piglit_VertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
 				   2 * sizeof(GLfloat), vertex);
-	piglit_VertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
 				   2 * sizeof(GLfloat), tex_coord);
 
-	piglit_EnableVertexAttribArray(0);
-	piglit_EnableVertexAttribArray(1);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 }

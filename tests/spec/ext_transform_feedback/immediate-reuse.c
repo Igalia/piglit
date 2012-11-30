@@ -86,15 +86,15 @@ piglit_init(int argc, char **argv)
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
-	piglit_BindAttribLocation(prog, 0, "in_position");
-	piglit_BindAttribLocation(prog, 1, "in_color");
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
+	glBindAttribLocation(prog, 0, "in_position");
+	glBindAttribLocation(prog, 1, "in_color");
 	glTransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -137,7 +137,7 @@ piglit_display(void)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Draw 16 times, swapping transform feedback and vertex data

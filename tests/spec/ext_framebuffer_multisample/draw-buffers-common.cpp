@@ -192,7 +192,7 @@ shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 	glEnableVertexAttribArray(0);
 
 	/* Linking is rquired after glBindFragDataLocation */
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 
 	/* Set up uniforms */
 	glUseProgram(prog);

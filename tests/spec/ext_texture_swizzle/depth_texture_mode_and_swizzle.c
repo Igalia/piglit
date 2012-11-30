@@ -183,10 +183,10 @@ setup_shaders()
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
-	tex_location = piglit_GetUniformLocation(prog, "tex");
-	piglit_Uniform1i(tex_location, 0);
+	tex_location = glGetUniformLocation(prog, "tex");
+	glUniform1i(tex_location, 0);
 }
 
 void

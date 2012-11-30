@@ -97,8 +97,8 @@ piglit_display(void)
 
 	for (x = 0; x < 8; x++) {
 		for (y = 0; y < 8; y++) {
-			piglit_Uniform2i(coord1_location, x * 9, y * 9);
-			piglit_Uniform2i(coord2_location, x * 9, y * 9);
+			glUniform2i(coord1_location, x * 9, y * 9);
+			glUniform2i(coord2_location, x * 9, y * 9);
 			piglit_draw_rect(-1.0 + 0.25 * x,
 					 -1.0 + 0.25 * y,
 					 0.25,
@@ -155,8 +155,8 @@ piglit_init(int argc, char **argv)
 	if (!vs || !fs || !prog)
 		piglit_report_result(PIGLIT_FAIL);
 
-	coord1_location = piglit_GetUniformLocation(prog, "coord1");
-	coord2_location = piglit_GetUniformLocation(prog, "coord2");
+	coord1_location = glGetUniformLocation(prog, "coord1");
+	coord2_location = glGetUniformLocation(prog, "coord2");
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 }

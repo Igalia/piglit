@@ -85,11 +85,11 @@ piglit_init(int argc, char **argv)
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_BindAttribLocation(prog, 0, "vertex");
-	piglit_LinkProgram(prog);
+	glBindAttribLocation(prog, 0, "vertex");
+	glLinkProgram(prog);
 	piglit_link_check_status(prog);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glClearColor(blue[0], blue[1], blue[2], blue[3]);
 }

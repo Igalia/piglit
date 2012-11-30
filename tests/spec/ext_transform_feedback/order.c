@@ -144,12 +144,12 @@ initialize_shader_and_xfb()
 	piglit_require_GLSL_version(130);
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
 	glTransformFeedbackVaryings(prog, 3, varyings, GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 	glGenBuffers(1, &xfb_buf);
@@ -157,7 +157,7 @@ initialize_shader_and_xfb()
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER,
 		     3*NUM_POINTS*sizeof(unsigned), NULL, GL_STREAM_READ);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, xfb_buf);
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	if (!piglit_check_gl_error(0))
 		piglit_report_result(PIGLIT_FAIL);
 }
@@ -178,7 +178,7 @@ initialize_vertex_shader_inputs()
 		indices[i + NUM_POINTS/2] = 2*i+1;
 	}
 
-	piglit_Uniform1ui(piglit_GetUniformLocation(prog, "shift_count"),
+	glUniform1ui(glGetUniformLocation(prog, "shift_count"),
 			  SHIFT_COUNT);
 	glVertexAttribIPointer(starting_x_index, 1, GL_UNSIGNED_INT, sizeof(unsigned),
 			       verts);

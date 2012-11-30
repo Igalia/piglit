@@ -202,11 +202,11 @@ do_test(const struct test_desc *test)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	if (test->mode == NOT_A_PROGRAM) {
 		printf("Create a program and then delete it\n");
-		progs[0] = piglit_CreateProgram();
-		piglit_DeleteProgram(progs[0]);
+		progs[0] = glCreateProgram();
+		glDeleteProgram(progs[0]);
 	} else {
-		progs[0] = piglit_CreateProgram();
-		piglit_AttachShader(progs[0], vs);
+		progs[0] = glCreateProgram();
+		glAttachShader(progs[0], vs);
 	}
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
@@ -224,17 +224,17 @@ do_test(const struct test_desc *test)
 	}
 
 	printf("Link program\n");
-	piglit_LinkProgram(progs[0]);
+	glLinkProgram(progs[0]);
 	pass = piglit_link_check_status(progs[0]) && pass;
 
 	if (test->mode == USEPROG_ACTIVE || test->mode == LINK_OTHER_ACTIVE) {
 		printf("Prepare 2nd program\n");
-		progs[1] = piglit_CreateProgram();
-		piglit_AttachShader(progs[1], vs);
+		progs[1] = glCreateProgram();
+		glAttachShader(progs[1], vs);
 	}
 	if (test->mode == USEPROG_ACTIVE) {
 		printf("Link 2nd program\n");
-		piglit_LinkProgram(progs[1]);
+		glLinkProgram(progs[1]);
 		pass = piglit_link_check_status(progs[1]) && pass;
 	}
 
@@ -242,7 +242,7 @@ do_test(const struct test_desc *test)
 		printf("Don't use program\n");
 	} else {
 		printf("Use program\n");
-		piglit_UseProgram(progs[0]);
+		glUseProgram(progs[0]);
 	}
 
 	printf("Prepare %i buffers\n", test->num_buffers);
@@ -308,17 +308,17 @@ do_test(const struct test_desc *test)
 		break;
 	case USEPROG_ACTIVE:
 		printf("Use new program\n");
-		piglit_UseProgram(progs[1]);
+		glUseProgram(progs[1]);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 		break;
 	case LINK_CURRENT_ACTIVE:
 		printf("Link current program\n");
-		piglit_LinkProgram(progs[0]);
+		glLinkProgram(progs[0]);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 		break;
 	case LINK_OTHER_ACTIVE:
 		printf("Link 2nd program\n");
-		piglit_LinkProgram(progs[1]);
+		glLinkProgram(progs[1]);
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 		break;
 	case BIND_ACTIVE:

@@ -168,18 +168,18 @@ create_frag_shader(void)
    ShaderProg = piglit_link_simple_program(0, fs);
    assert(ShaderProg);
 
-   piglit_UseProgram(ShaderProg);
+   glUseProgram(ShaderProg);
 
-   zTex = piglit_GetUniformLocation(ShaderProg, "zTex");
-   piglit_Uniform1i(zTex, 0);  /* unit 0 */
+   zTex = glGetUniformLocation(ShaderProg, "zTex");
+   glUniform1i(zTex, 0);  /* unit 0 */
 
-   errorScale = piglit_GetUniformLocation(ShaderProg, "errorScale");
-   piglit_Uniform1f(errorScale, ErrorScale);
+   errorScale = glGetUniformLocation(ShaderProg, "errorScale");
+   glUniform1f(errorScale, ErrorScale);
 
-   sizeScale = piglit_GetUniformLocation(ShaderProg, "sizeScale");
-   piglit_Uniform1f(sizeScale, (float) (SIZE - 1));
+   sizeScale = glGetUniformLocation(ShaderProg, "sizeScale");
+   glUniform1f(sizeScale, (float) (SIZE - 1));
 
-   piglit_UseProgram(0);
+   glUseProgram(0);
 }
 
 
@@ -394,7 +394,7 @@ draw_sphere_with_fragment_shader_compare(void)
 
    glBindTexture(TexTarget, DepthTex);
 
-   piglit_UseProgram(ShaderProg);
+   glUseProgram(ShaderProg);
 
    glEnable(GL_DEPTH_TEST);
 
@@ -422,7 +422,7 @@ draw_sphere_with_fragment_shader_compare(void)
 
    glDisable(GL_DEPTH_TEST);
 
-   piglit_UseProgram(0);
+   glUseProgram(0);
 
 #if DEBUG
    {

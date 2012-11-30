@@ -238,17 +238,17 @@ setup_glsl_programs()
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
-	piglit_LinkProgram(prog);
-	piglit_DeleteShader(vs);
-	piglit_DeleteShader(fs);
-	piglit_UseProgram(prog);
-	position_angle_loc = piglit_GetUniformLocation(prog, "position_angle");
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
+	glLinkProgram(prog);
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+	glUseProgram(prog);
+	position_angle_loc = glGetUniformLocation(prog, "position_angle");
 	if (use_clip_vertex) {
 		clipVertex_angle_loc =
-			piglit_GetUniformLocation(prog, "clipVertex_angle");
+			glGetUniformLocation(prog, "clipVertex_angle");
 	}
 }
 
@@ -396,8 +396,8 @@ piglit_display()
 	bool pass = true;
 
 	if (use_glsl) {
-		piglit_Uniform1f(position_angle_loc, 0.0);
-		piglit_Uniform1f(clipVertex_angle_loc, 0.0);
+		glUniform1f(position_angle_loc, 0.0);
+		glUniform1f(clipVertex_angle_loc, 0.0);
 	}
 
 	/* Base behavior: no rotations, so the clipping planes should
@@ -451,11 +451,11 @@ piglit_display()
 		 * effect, because the shader should behave as though
 		 * it set gl_ClipVertex equal to gl_Position.
 		 */
-		piglit_Uniform1f(position_angle_loc, 20.0);
+		glUniform1f(position_angle_loc, 20.0);
 		pass = measure_effects(
 		    "effect of 20deg rotation on gl_Position",
 		    0, 0, 0, 0, use_clip_vertex ? 20 : 0) && pass;
-		piglit_Uniform1f(position_angle_loc, 0.0);
+		glUniform1f(position_angle_loc, 0.0);
 	}
 
 	if (use_clip_vertex) {
@@ -467,11 +467,11 @@ piglit_display()
 		 * gl_Position to be rotated negative 20 degrees with
 		 * respect to gl_ClipVertex.
 		 */
-		piglit_Uniform1f(clipVertex_angle_loc, 20.0);
+		glUniform1f(clipVertex_angle_loc, 20.0);
 		pass = measure_effects(
 		    "effect of 20deg rotation on gl_ClipVertex",
 		    0, 0, 0, 0, -20) && pass;
-		piglit_Uniform1f(clipVertex_angle_loc, 0.0);
+		glUniform1f(clipVertex_angle_loc, 0.0);
 	}
 
 	piglit_present_results();

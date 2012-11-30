@@ -78,10 +78,10 @@ void piglit_init(int argc, char **argv)
 	if (!vs)
 		piglit_report_result(PIGLIT_FAIL);
 
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
 	glTransformFeedbackVaryings(prog, 1, &varying, GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
 		piglit_report_result(PIGLIT_FAIL);
 	glGenBuffers(1, &xfb_buf);
@@ -90,7 +90,7 @@ void piglit_init(int argc, char **argv)
 
 	input_index = glGetAttribLocation(prog, "i");
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexAttribIPointer(input_index, 1, GL_UNSIGNED_INT,

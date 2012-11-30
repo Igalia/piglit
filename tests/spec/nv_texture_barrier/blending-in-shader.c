@@ -61,7 +61,7 @@ enum piglit_result piglit_display(void)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 	glViewport(0, 0, 16, 16);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	glUniform1i(texloc, 0);
 
 	for (i = 0; i < PASSES; i++) {
@@ -72,7 +72,7 @@ enum piglit_result piglit_display(void)
 
 	pass = piglit_probe_image_rgba(0, 0, 16, 16, res_data);
 
-	piglit_UseProgram(0);
+	glUseProgram(0);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glViewport(0, 0, piglit_width, piglit_height);
 
@@ -118,5 +118,5 @@ void piglit_init(int argc, char **argv)
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
 	prog = piglit_link_simple_program(0, fs);
 
-	texloc = piglit_GetUniformLocation(prog, "fb");
+	texloc = glGetUniformLocation(prog, "fb");
 }

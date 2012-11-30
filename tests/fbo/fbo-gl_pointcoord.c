@@ -123,7 +123,7 @@ piglit_init(int argc, char **argv)
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	glGenRenderbuffers(1, &rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb);

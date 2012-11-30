@@ -94,10 +94,10 @@ piglit_init(int argc, char **argv)
 
 		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fscode);
 		prog = piglit_link_simple_program(0, fs);
-		piglit_UseProgram(prog);
-		loc_tex = piglit_GetUniformLocation(prog, "tex");
-		loc_lod = piglit_GetUniformLocation(prog, "lod");
-		piglit_Uniform1i(loc_tex, 0);
+		glUseProgram(prog);
+		loc_tex = glGetUniformLocation(prog, "tex");
+		loc_lod = glGetUniformLocation(prog, "lod");
+		glUniform1i(loc_tex, 0);
 
 		puts("Testing GL_ARB_shader_texture_lod.");
 	}
@@ -164,7 +164,7 @@ draw_quad(int x, int y, int w, int h, int level)
 
 	if (ARB_shader_texture_lod) {
 		float lod = level;
-		piglit_Uniform1fv(loc_lod, 1, &lod);
+		glUniform1fv(loc_lod, 1, &lod);
 
 		s = w/(float)TEX_WIDTH;
 		t = h/(float)TEX_HEIGHT;

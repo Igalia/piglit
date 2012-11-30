@@ -650,8 +650,8 @@ create_program(struct program *program, const char *type)
 		piglit_report_result(PIGLIT_FAIL);
 
 	program->prog = prog;
-        program->pos_location = piglit_GetUniformLocation(prog, "pos");
-        program->expected_location = piglit_GetUniformLocation(prog,
+        program->pos_location = glGetUniformLocation(prog, "pos");
+        program->expected_location = glGetUniformLocation(prog,
 							       "expected");
 	vertex_location = glGetAttribLocation(prog, "vertex");
 	assert(vertex_location == 0);

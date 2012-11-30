@@ -169,11 +169,11 @@ piglit_init(int argc, char **argv)
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_CreateProgram();
-	piglit_AttachShader(prog, vs);
-	piglit_AttachShader(prog, fs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	glAttachShader(prog, fs);
 	glTransformFeedbackVaryings(prog, 1, &varying, GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 	if (!fs || !vs || !prog)
 		piglit_report_result(PIGLIT_FAIL);
 	if (!piglit_link_check_status(prog))

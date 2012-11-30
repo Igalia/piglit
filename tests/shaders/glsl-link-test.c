@@ -55,7 +55,7 @@ void piglit_init(int argc, char **argv)
 	piglit_require_gl_version(20);
 
 	piglit_require_GLSL();
-	program = piglit_CreateProgram();
+	program = glCreateProgram();
 
 	for (i = 1; i < argc; i++) {
 		size_t len;
@@ -117,7 +117,7 @@ void piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_LinkProgram(program);
+	glLinkProgram(program);
 
 	result = piglit_link_check_status_quiet(program);
 	if (result != expect)

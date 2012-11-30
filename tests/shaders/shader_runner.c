@@ -118,7 +118,7 @@ string_match(const char *string, const char *line)
 void
 compile_glsl(GLenum target, bool release_text)
 {
-	GLuint shader = piglit_CreateShader(target);
+	GLuint shader = glCreateShader(target);
 	GLint ok;
 
 	switch (target) {
@@ -147,28 +147,28 @@ compile_glsl(GLenum target, bool release_text)
 		shader_strings[1] = shader_string;
 		shader_string_sizes[1] = shader_string_size;
 		
-		piglit_ShaderSource(shader, 2,
+		glShaderSource(shader, 2,
 				    (const GLchar **) shader_strings,
 				    shader_string_sizes);
 
 	} else {
-		piglit_ShaderSource(shader, 1,
+		glShaderSource(shader, 1,
 				    (const GLchar **) &shader_string,
 				    &shader_string_size);
 	}
 
-	piglit_CompileShader(shader);
+	glCompileShader(shader);
 
-	piglit_GetShaderiv(shader, GL_COMPILE_STATUS, &ok);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);
 
 	if (!ok) {
 		GLchar *info;
 		GLint size;
 
-		piglit_GetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		piglit_GetShaderInfoLog(shader, size, NULL, info);
+		glGetShaderInfoLog(shader, size, NULL, info);
 
 		fprintf(stderr, "Failed to compile %s: %s\n",
 			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
@@ -592,43 +592,43 @@ link_and_use_shaders(void)
 	    && (num_geometry_shaders == 0))
 		return;
 
-	prog = piglit_CreateProgram();
+	prog = glCreateProgram();
 
 	for (i = 0; i < num_vertex_shaders; i++) {
-		piglit_AttachShader(prog, vertex_shaders[i]);
+		glAttachShader(prog, vertex_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
-		piglit_AttachShader(prog, geometry_shaders[i]);
+		glAttachShader(prog, geometry_shaders[i]);
 	}
 
 	for (i = 0; i < num_fragment_shaders; i++) {
-		piglit_AttachShader(prog, fragment_shaders[i]);
+		glAttachShader(prog, fragment_shaders[i]);
 	}
 
-	piglit_LinkProgram(prog);
+	glLinkProgram(prog);
 
 	for (i = 0; i < num_vertex_shaders; i++) {
-		piglit_DeleteShader(vertex_shaders[i]);
+		glDeleteShader(vertex_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
-		piglit_DeleteShader(geometry_shaders[i]);
+		glDeleteShader(geometry_shaders[i]);
 	}
 
 	for (i = 0; i < num_fragment_shaders; i++) {
-		piglit_DeleteShader(fragment_shaders[i]);
+		glDeleteShader(fragment_shaders[i]);
 	}
 
-	piglit_GetProgramiv(prog, GL_LINK_STATUS, &ok);
+	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 	if (!ok) {
 		GLchar *info;
 		GLint size;
 
-		piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		piglit_GetProgramInfoLog(prog, size, NULL, info);
+		glGetProgramInfoLog(prog, size, NULL, info);
 
 		fprintf(stderr, "Failed to link:\n%s\n",
 			info);
@@ -637,7 +637,7 @@ link_and_use_shaders(void)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
 	err = glGetError();
 	if (err) {
@@ -646,10 +646,10 @@ link_and_use_shaders(void)
 
 		printf("GL error after linking program: 0x%04x\n", err);
 
-		piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 		info = malloc(size);
 
-		piglit_GetProgramInfoLog(prog, size, NULL, info);
+		glGetProgramInfoLog(prog, size, NULL, info);
 		fprintf(stderr, "Info log: %s\n", info);
 
 		piglit_report_result(PIGLIT_FAIL);
@@ -1017,7 +1017,7 @@ set_uniform(const char *line)
 	if (set_ubo_uniform(name, type, line))
 		return;
 
-	loc = piglit_GetUniformLocation(prog, name);
+	loc = glGetUniformLocation(prog, name);
 	if (loc < 0) {
 		printf("cannot get location of uniform \"%s\"\n",
 		       name);
@@ -1026,46 +1026,46 @@ set_uniform(const char *line)
 
 	if (string_match("float", type)) {
 		get_floats(line, f, 1);
-		piglit_Uniform1fv(loc, 1, f);
+		glUniform1fv(loc, 1, f);
 		return;
 	} else if (string_match("int", type)) {
 		int val = atoi(line);
-		piglit_Uniform1i(loc, val);
+		glUniform1i(loc, val);
 		return;
 	} else if (string_match("uint", type)) {
 		unsigned val;
 		check_unsigned_support();
 		val = strtoul(line, NULL, 0);
-		piglit_Uniform1ui(loc, val);
+		glUniform1ui(loc, val);
 		return;
 	} else if (string_match("vec", type)) {
 		switch (type[3]) {
 		case '2':
 			get_floats(line, f, 2);
-			piglit_Uniform2fv(loc, 1, f);
+			glUniform2fv(loc, 1, f);
 			return;
 		case '3':
 			get_floats(line, f, 3);
-			piglit_Uniform3fv(loc, 1, f);
+			glUniform3fv(loc, 1, f);
 			return;
 		case '4':
 			get_floats(line, f, 4);
-			piglit_Uniform4fv(loc, 1, f);
+			glUniform4fv(loc, 1, f);
 			return;
 		}
 	} else if (string_match("ivec", type)) {
 		switch (type[4]) {
 		case '2':
 			get_ints(line, ints, 2);
-			piglit_Uniform2iv(loc, 1, ints);
+			glUniform2iv(loc, 1, ints);
 			return;
 		case '3':
 			get_ints(line, ints, 3);
-			piglit_Uniform3iv(loc, 1, ints);
+			glUniform3iv(loc, 1, ints);
 			return;
 		case '4':
 			get_ints(line, ints, 4);
-			piglit_Uniform4iv(loc, 1, ints);
+			glUniform4iv(loc, 1, ints);
 			return;
 		}
 	} else if (string_match("uvec", type)) {
@@ -1073,15 +1073,15 @@ set_uniform(const char *line)
 		switch (type[4]) {
 		case '2':
 			get_uints(line, uints, 2);
-			piglit_Uniform2uiv(loc, 1, uints);
+			glUniform2uiv(loc, 1, uints);
 			return;
 		case '3':
 			get_uints(line, uints, 3);
-			piglit_Uniform3uiv(loc, 1, uints);
+			glUniform3uiv(loc, 1, uints);
 			return;
 		case '4':
 			get_uints(line, uints, 4);
-			piglit_Uniform4uiv(loc, 1, uints);
+			glUniform4uiv(loc, 1, uints);
 			return;
 		}
 	} else if (string_match("mat", type) && type[3] != '\0') {
@@ -1092,45 +1092,45 @@ set_uniform(const char *line)
 			switch (rows) {
 			case '2':
 				get_floats(line, f, 4);
-				piglit_UniformMatrix2fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
 				get_floats(line, f, 6);
-				piglit_UniformMatrix2x3fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix2x3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
 				get_floats(line, f, 8);
-				piglit_UniformMatrix2x4fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix2x4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
 		case '3':
 			switch (rows) {
 			case '2':
 				get_floats(line, f, 6);
-				piglit_UniformMatrix3x2fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix3x2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
 				get_floats(line, f, 9);
-				piglit_UniformMatrix3fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
 				get_floats(line, f, 12);
-				piglit_UniformMatrix3x4fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix3x4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
 		case '4':
 			switch (rows) {
 			case '2':
 				get_floats(line, f, 8);
-				piglit_UniformMatrix4x2fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix4x2fv(loc, 1, GL_FALSE, f);
 				return;
 			case '3':
 				get_floats(line, f, 12);
-				piglit_UniformMatrix4x3fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix4x3fv(loc, 1, GL_FALSE, f);
 				return;
 			case '4':
 				get_floats(line, f, 16);
-				piglit_UniformMatrix4fv(loc, 1, GL_FALSE, f);
+				glUniformMatrix4fv(loc, 1, GL_FALSE, f);
 				return;
 			}
 		}
@@ -1671,8 +1671,8 @@ piglit_display(void)
 
 	if (piglit_automatic) {
 		/* Free our resources, useful for valgrinding. */
-		piglit_DeleteProgram(prog);
-		piglit_UseProgram(0);
+		glDeleteProgram(prog);
+		glUseProgram(0);
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;

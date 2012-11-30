@@ -74,7 +74,7 @@ static GLuint setup_shaders()
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	return prog;
 }
 
@@ -99,7 +99,7 @@ static GLboolean test()
 
 	pass = pass && piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
-	piglit_DeleteProgram(prog);
+	glDeleteProgram(prog);
 
 	return pass;
 }

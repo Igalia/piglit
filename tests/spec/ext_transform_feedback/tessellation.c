@@ -305,19 +305,19 @@ initialize_shader_and_xfb()
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
-	normal_prog = piglit_CreateProgram();
-	piglit_AttachShader(normal_prog, vs);
-	piglit_AttachShader(normal_prog, fs);
-	piglit_LinkProgram(normal_prog);
+	normal_prog = glCreateProgram();
+	glAttachShader(normal_prog, vs);
+	glAttachShader(normal_prog, fs);
+	glLinkProgram(normal_prog);
 	if (!piglit_link_check_status(normal_prog)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
-	xfb_prog = piglit_CreateProgram();
-	piglit_AttachShader(xfb_prog, vs);
-	piglit_AttachShader(xfb_prog, fs);
+	xfb_prog = glCreateProgram();
+	glAttachShader(xfb_prog, vs);
+	glAttachShader(xfb_prog, fs);
 	glTransformFeedbackVaryings(xfb_prog, 3, varyings,
 				    GL_INTERLEAVED_ATTRIBS);
-	piglit_LinkProgram(xfb_prog);
+	glLinkProgram(xfb_prog);
 	if (!piglit_link_check_status(xfb_prog)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -421,11 +421,11 @@ draw(GLuint prog, bool use_xfb, float y_offset, GLenum mode,
 	float vertex_offset[2] = { -82.0, y_offset };
 	struct vertex_data buffer[BUFFER_SIZE];
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	setup_vertex_shader_inputs(prog);
-	piglit_Uniform2fv(piglit_GetUniformLocation(prog, "vertex_offset"),
+	glUniform2fv(glGetUniformLocation(prog, "vertex_offset"),
 			  1, vertex_offset);
-	piglit_Uniform1i(piglit_GetUniformLocation(prog, "use_flat_color"),
+	glUniform1i(glGetUniformLocation(prog, "use_flat_color"),
 			 use_flat_color);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	if (use_xfb) {

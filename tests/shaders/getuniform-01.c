@@ -115,9 +115,9 @@ piglit_init(int argc, char **argv)
 
 	prog = piglit_link_simple_program(vs, fs);
 
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 
-	base_location = piglit_GetUniformLocation(prog, "c");
+	base_location = glGetUniformLocation(prog, "c");
 	if (base_location < 0) {
 		printf("Could not get location of `c'.\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -131,7 +131,7 @@ piglit_init(int argc, char **argv)
 		name[2] = '0' + i;
 		name[3] = ']';
 		name[4] = '\0';
-		array_location[i] = piglit_GetUniformLocation(prog, name);
+		array_location[i] = glGetUniformLocation(prog, name);
 		if (array_location[i] < 0) {
 			printf("Could not get location of `%s'.\n", name);
 			piglit_report_result(PIGLIT_FAIL);
@@ -154,7 +154,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_Uniform1fv(base_location, 4, uniform_data);
+	glUniform1fv(base_location, 4, uniform_data);
 
 	/* From page 264 of the OpenGL 2.1 spec:
 	 *
@@ -169,7 +169,7 @@ piglit_init(int argc, char **argv)
 		buffer[i].u = 0xdeadbeef;
 	}
 
-	piglit_GetUniformfv(prog, base_location, (GLfloat *) buffer);
+	glGetUniformfv(prog, base_location, (GLfloat *) buffer);
 	validate_buffer(buffer, ARRAY_SIZE(buffer), uniform_data[0]);
 
 	printf("Getting one array element at a time...\n");
@@ -179,7 +179,7 @@ piglit_init(int argc, char **argv)
 			buffer[j].u = 0xdeadbeef;
 		}
 
-		piglit_GetUniformfv(prog, array_location[i],
+		glGetUniformfv(prog, array_location[i],
 				    (GLfloat *) buffer);
 		validate_buffer(buffer, ARRAY_SIZE(buffer), uniform_data[i]);
 	}

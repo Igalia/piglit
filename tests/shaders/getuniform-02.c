@@ -79,9 +79,9 @@ piglit_init(int argc, char **argv)
    vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
    prog = piglit_link_simple_program(vs, 0);
 
-   piglit_UseProgram(prog);
+   glUseProgram(prog);
 
-   piglit_GetProgramiv(prog, GL_ACTIVE_UNIFORMS, &numUniforms);
+   glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &numUniforms);
    if (numUniforms != expectedNum) {
       printf("%s: incorrect number of uniforms (found %d, expected %d)\n",
              TestName, numUniforms, expectedNum);
@@ -96,9 +96,9 @@ piglit_init(int argc, char **argv)
       GLenum type, expectedType;
       GLint loc;
 
-      piglit_GetActiveUniform(prog,
+      glGetActiveUniform(prog,
 				 i, sizeof(name), &len, &size, &type, name);
-      loc = piglit_GetUniformLocation(prog, name);
+      loc = glGetUniformLocation(prog, name);
 
       if (loc < 0) {
          printf("%s: bad uniform location for %s: %d\n", TestName, name, loc);
@@ -133,47 +133,47 @@ piglit_init(int argc, char **argv)
 
    /* Check setting/getting values */
 
-   loc_f1 = piglit_GetUniformLocation(prog, "f1");
-   loc_f2 = piglit_GetUniformLocation(prog, "f2");
-   loc_sa = piglit_GetUniformLocation(prog, "s.a");
-   loc_sd = piglit_GetUniformLocation(prog, "s.d");
-   loc_v1 = piglit_GetUniformLocation(prog, "v[1]");
+   loc_f1 = glGetUniformLocation(prog, "f1");
+   loc_f2 = glGetUniformLocation(prog, "f2");
+   loc_sa = glGetUniformLocation(prog, "s.a");
+   loc_sd = glGetUniformLocation(prog, "s.d");
+   loc_v1 = glGetUniformLocation(prog, "v[1]");
 
-   piglit_Uniform1f(loc_f1, 5.0);
-   piglit_Uniform1f(loc_f2, 10.0);
-   piglit_Uniform1f(loc_sa, 15.0);
-   piglit_Uniform1f(loc_sd, 20.0);
-   piglit_Uniform4fv(loc_v1, 1, vVals);
+   glUniform1f(loc_f1, 5.0);
+   glUniform1f(loc_f2, 10.0);
+   glUniform1f(loc_sa, 15.0);
+   glUniform1f(loc_sd, 20.0);
+   glUniform4fv(loc_v1, 1, vVals);
 
-   piglit_GetUniformfv(prog, loc_f1, v);
+   glGetUniformfv(prog, loc_f1, v);
    if (v[0] != 5.0) {
       printf("%s: wrong value for f1 (found %f, expected %f)\n",
              TestName, v[0], 5.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
-   piglit_GetUniformfv(prog, loc_f2, v);
+   glGetUniformfv(prog, loc_f2, v);
    if (v[0] != 10.0) {
       printf("%s: wrong value for f2 (found %f, expected %f)\n",
              TestName, v[0], 10.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
-   piglit_GetUniformfv(prog, loc_sa, v);
+   glGetUniformfv(prog, loc_sa, v);
    if (v[0] != 15.0) {
       printf("%s: wrong value for s.a (found %f, expected %f)\n",
              TestName, v[0], 15.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
-   piglit_GetUniformfv(prog, loc_sd, v);
+   glGetUniformfv(prog, loc_sd, v);
    if (v[0] != 20.0) {
       printf("%s: wrong value for s.d (found %f, expected %f)\n",
              TestName, v[0], 20.0);
       piglit_report_result(PIGLIT_FAIL);
    }
 
-   piglit_GetUniformfv(prog, loc_v1, v);
+   glGetUniformfv(prog, loc_v1, v);
    if (v[0] != 30.0 ||
        v[1] != 31.0 ||
        v[2] != 32.0 ||

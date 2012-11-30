@@ -226,56 +226,56 @@ do_named_test(const char *name)
 
 		printf("Starting test \"%s\":\n", all_tests[i].name);
 
-		prog = piglit_CreateProgram();
+		prog = glCreateProgram();
 
 		for (j = 0; all_tests[i].shader_source[j] != NULL; j++) {
 			GLuint vs;
 
-			vs = piglit_CreateShader(GL_VERTEX_SHADER);
-			piglit_ShaderSource(vs, 1,
+			vs = glCreateShader(GL_VERTEX_SHADER);
+			glShaderSource(vs, 1,
 					    (const GLchar **)
 					    & all_tests[i].shader_source[j],
 					    NULL);
-			piglit_CompileShader(vs);
+			glCompileShader(vs);
 
 			/* Some drivers return a size of 1 for an empty log.
 			 * This is the size of a log that contains only a
 			 * terminating NUL character.
 			 */
 			printf("Compilation info log for shader %u:\n", j);
-			piglit_GetShaderiv(vs, GL_INFO_LOG_LENGTH, &size);
+			glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &size);
 			if (size > 1) {
 				GLchar *info = malloc(size);
 
-				piglit_GetShaderInfoLog(vs, size, NULL, info);
+				glGetShaderInfoLog(vs, size, NULL, info);
 				printf("%s\n", info);
 				free(info);
 			} else {
 				printf("<empty log>\n\n");
 			}
 
-			piglit_AttachShader(prog, vs);
-			piglit_DeleteShader(vs);
+			glAttachShader(prog, vs);
+			glDeleteShader(vs);
 		}
 
-		piglit_LinkProgram(prog);
+		glLinkProgram(prog);
 
 		/* Some drivers return a size of 1 for an empty log.  This is
 		 * the size of a log that contains only a terminating NUL
 		 * character.
 		 */
 		printf("Link info log:\n");
-		piglit_GetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
 		if (size > 1) {
 			GLchar *info = malloc(size);
-			piglit_GetProgramInfoLog(prog, size, NULL, info);
+			glGetProgramInfoLog(prog, size, NULL, info);
 			printf("%s\n", info);
 			free(info);
 		} else {
 			printf("<empty log>\n\n");
 		}
 
-		piglit_GetProgramiv(prog, GL_LINK_STATUS, &ok);
+		glGetProgramiv(prog, GL_LINK_STATUS, &ok);
 		if (ok) {
 			fprintf(stderr,
 				"Shader with recursion compiled and linked, "
@@ -284,7 +284,7 @@ do_named_test(const char *name)
 		}
 		printf("Done with test \"%s\".\n\n", all_tests[i].name);
 
-		piglit_DeleteProgram(prog);
+		glDeleteProgram(prog);
 
 		if (name != NULL)
 			break;

@@ -150,7 +150,7 @@ static GLboolean test(int x, int y, const char *shaderfunc,
 		piglit_report_result(PIGLIT_FAIL);
 
 	/* Render. */
-	piglit_UseProgram(prog);
+	glUseProgram(prog);
 	glLoadIdentity();
 	glTranslatef(x, y, 0);
 
