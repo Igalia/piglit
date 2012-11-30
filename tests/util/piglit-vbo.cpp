@@ -442,7 +442,7 @@ vbo_data::parse_line(std::string line, unsigned int line_num, GLuint prog)
  * then exit with PIGLIT_FAIL.
  */
 vbo_data::vbo_data(const std::string &text, GLuint prog)
-	: header_seen(false), num_rows(0)
+	: header_seen(false), stride(0), num_rows(0)
 {
 	unsigned int line_num = 1;
 
