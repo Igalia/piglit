@@ -1682,7 +1682,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	const char *glsl_version_string;
 	int major;
 	int minor;
 
