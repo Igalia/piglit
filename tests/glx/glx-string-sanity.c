@@ -135,7 +135,7 @@ main(int argc, char **argv)
 	 * valid for a string to not be in the server string when it is listed
 	 * in the unified string.
 	 */
-	buf = malloc(strlen(server_string + 1));
+	buf = malloc(strlen(server_string) + 1);
 	while (*server_string != '\0') {
 		const char *client;
 		const char *end;
