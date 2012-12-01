@@ -36,7 +36,7 @@ void piglit_get_glsl_version(bool *es, int* major, int* minor)
 	int c; /* scanf count */
 
 	version_string = (const char*) glGetString(GL_SHADING_LANGUAGE_VERSION);
-	es_local = strncmp("OpenGL ES", version_string, 10) == 0;
+	es_local = strncmp("OpenGL ES", version_string, 9) == 0;
 	if (es_local) {
 		c = sscanf(version_string,
 		           "OpenGL ES GLSL ES %i.%i",
