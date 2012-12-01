@@ -2006,6 +2006,7 @@ add_single_param_test_set(arb_instanced_arrays, 'instanced_arrays', 'vbo')
 arb_internalformat_query = Group()
 spec['ARB_internalformat_query'] = arb_internalformat_query
 arb_internalformat_query['misc. API error checks'] = concurrent_test('arb_internalformat_query-api-errors')
+arb_internalformat_query['buffer over-run checks'] = concurrent_test('arb_internalformat_query-overrun')
 
 arb_map_buffer_range = Group()
 spec['ARB_map_buffer_range'] = arb_map_buffer_range

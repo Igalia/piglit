@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_internalformat_query-api-errors api-errors.c)
+piglit_add_executable (arb_internalformat_query-overrun overrun.c)
 
 # vim: ft=cmake:
