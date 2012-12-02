@@ -251,6 +251,7 @@ pass_link_test(int y_index,
 	if (!prog) {
 		printf("shader with (%d, %d) blocks failed to link\n",
 		       vs_blocks, fs_blocks);
+		free(bos);
 		return false;
 	}
 
