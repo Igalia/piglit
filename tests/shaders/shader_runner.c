@@ -36,6 +36,8 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-vbo.h"
 
+#include "shader_runner_gles_workarounds.h"
+
 static void
 get_required_versions(const char *script_name,
 		      struct piglit_gl_test_config *config);
