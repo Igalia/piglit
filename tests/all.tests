@@ -2619,6 +2619,18 @@ add_asmparsertest('ARBvp1.0', 'txq-19.txt')
 add_asmparsertest('ARBvp1.0', 'txq-20.txt')
 add_asmparsertest('ARBvp1.0', 'xpd.txt')
 
+oes_draw_texture = Group()
+spec['OES_draw_texture'] = oes_draw_texture
+oes_draw_texture['oes_draw_texture'] = concurrent_test('oes_draw_texture')
+
+oes_compressed_etc1_rgb8_texture = Group()
+spec['OES_compressed_ETC1_RGB8_texture'] = oes_compressed_etc1_rgb8_texture
+oes_compressed_etc1_rgb8_texture['basic'] = concurrent_test('oes_compressed_etc1_rgb8_texture-basic')
+
+oes_compressed_paletted_texture = Group()
+spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
+oes_compressed_paletted_texture['basic API'] = concurrent_test('oes_compressed_paletted_texture-api')
+
 egl14 = Group()
 spec['EGL 1.4'] = egl14
 egl14['eglCreateSurface'] = plain_test('egl-create-surface')
