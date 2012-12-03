@@ -62,6 +62,7 @@ struct version {
 		VERSION_GLSL,
 	} _tag;
 
+	bool es;
 	unsigned num;
 	char _string[100];
 };
@@ -123,11 +124,12 @@ bool
 compare(float ref, float value, enum comparison cmp);
 
 static void
-version_init(struct version *v, enum version_tag tag, unsigned num)
+version_init(struct version *v, enum version_tag tag, bool es, unsigned num)
 {
 	assert(tag == VERSION_GL || tag == VERSION_GLSL);
 
 	v->_tag = tag;
+	v->es = es;
 	v->num = num;
 	v->_string[0] = 0;
 }
@@ -143,6 +145,9 @@ version_compare(struct version *a, struct version *b, enum comparison cmp)
 {
 	assert(a->_tag == b->_tag);
 
+	if (a->es != b->es)
+		return false;
+
 	return compare(a->num, b->num, cmp);
 }
 
@@ -157,11 +162,13 @@ version_string(struct version *v)
 
 	switch (v->_tag) {
 	case VERSION_GL:
-		snprintf(v->_string, sizeof(v->_string) - 1, "GL %d.%d",
+		snprintf(v->_string, sizeof(v->_string) - 1, "GL%s %d.%d",
+		         v->es ? " ES" : "",
 		         v->num / 10, v->num % 10);
 		break;
 	case VERSION_GLSL:
-		snprintf(v->_string, sizeof(v->_string) - 1, "GLSL %d.%d",
+		snprintf(v->_string, sizeof(v->_string) - 1, "GLSL%s %d.%d",
+		         v->es ? " ES" : "",
 		         v->num / 100, v->num % 100);
 		break;
 	default:
@@ -204,7 +211,11 @@ compile_glsl(GLenum target, bool release_text)
 		GLint shader_string_sizes[2];
 		
 		/* Add a #version directive based on the GLSL requirement. */
-		sprintf(version_string, "#version %d\n", glsl_req_version.num);
+		sprintf(version_string, "#version %d", glsl_req_version.num);
+		if (glsl_req_version.es && glsl_req_version.num != 100) {
+			strcat(version_string, " es");
+		}
+		strcat(version_string, "\n");
 		shader_strings[0] = version_string;
 		shader_string_sizes[0] = strlen(version_string);
 		shader_strings[1] = shader_string;
@@ -455,6 +466,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	unsigned major;
 	unsigned minor;
 	unsigned full_num;
+	bool es = false;
 
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
@@ -472,7 +484,7 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 		full_num = (major * 10) + minor;
 	}
 
-	version_init(v, tag, full_num);
+	version_init(v, tag, es, full_num);
 }
 
 /**
@@ -841,8 +853,8 @@ get_required_versions(const char *script_name,
 	struct version requested_gl_version;
 	bool in_requirement_section = false;
 
-	version_init(&requested_glsl_version, VERSION_GLSL, 110);
-	version_init(&requested_gl_version, VERSION_GL, 10);
+	version_init(&requested_glsl_version, VERSION_GLSL, false, 110);
+	version_init(&requested_gl_version, VERSION_GL, false, 10);
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -886,6 +898,10 @@ get_required_versions(const char *script_name,
 		line = strchrnul(line, '\n');
 		if (line[0] != '\0')
 			line++;
+	}
+
+	if (requested_glsl_version.es || requested_gl_version.es) {
+		assert(!"ES support is not implemented");
 	}
 
 	switch (requested_glsl_version.num) {
@@ -1754,13 +1770,17 @@ piglit_init(int argc, char **argv)
 {
 	int major;
 	int minor;
+	bool es;
 
 	piglit_require_GLSL();
 
-	version_init(&gl_version, VERSION_GL, piglit_get_gl_version());
+	version_init(&gl_version, VERSION_GL,
+	             piglit_is_gles(),
+	             piglit_get_gl_version());
 
-	piglit_get_glsl_version(NULL, &major, &minor);
-	version_init(&glsl_version, VERSION_GLSL, (major * 100) + minor);
+	piglit_get_glsl_version(&es, &major, &minor);
+	version_init(&glsl_version, VERSION_GLSL, es,
+	             (major * 100) + minor);
 
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
 		      &gl_max_fragment_uniform_components);
