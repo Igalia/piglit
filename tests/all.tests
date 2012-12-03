@@ -2673,6 +2673,14 @@ egl_khr_create_context['3.2 core profile required'] = plain_test('egl-create-con
 egl_khr_create_context['pre-GL3.2 profile'] = plain_test('egl-create-context-pre-GL32-profile')
 egl_khr_create_context['verify GL flavor'] = plain_test('egl-create-context-verify-gl-flavor')
 
+gles30 = Group()
+spec['!OpenGL ES 3.0'] = gles30
+for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
+	test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format])
+	executable = '{0} -auto'.format(test_name)
+	gles30[test_name] = concurrent_test(executable)
+gles30['minmax'] = concurrent_test('gles-3.0-minmax')
+
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
