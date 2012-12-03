@@ -2,7 +2,7 @@
 name: Int4 arithmetic
 clc_version_min: 10
 
-program_source_file: vector-arithmetic-integer.cl
+program_source_file: vector-arithmetic-integer.cl.inc
 build_options: -D VECTOR_TYPE=int4
 
 dimensions: 1

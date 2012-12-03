@@ -2,7 +2,7 @@
 name: Float4 arithmetic
 clc_version_min: 10
 
-program_source_file: vector-arithmetic-floating.cl
+program_source_file: vector-arithmetic-floating.cl.inc
 build_options: -D VECTOR_TYPE=float4
 
 dimensions: 1
