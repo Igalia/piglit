@@ -118,6 +118,9 @@ enum comparison {
 	less_equal
 };
 
+bool
+compare(float ref, float value, enum comparison cmp);
+
 static void
 version_init(struct version *v, enum version_tag tag, unsigned num)
 {
@@ -131,6 +134,14 @@ static void
 version_copy(struct version *dest, struct version *src)
 {
 	memcpy(dest, src, sizeof(*dest));
+}
+
+static bool
+version_compare(struct version *a, struct version *b, enum comparison cmp)
+{
+	assert(a->_tag == b->_tag);
+
+	return compare(a->num, b->num, cmp);
 }
 
 static GLboolean
@@ -510,7 +521,7 @@ process_requirement(const char *line)
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
-		if (!compare(glsl_req_version.num, glsl_version.num, cmp)) {
+		if (!version_compare(&glsl_req_version, &glsl_version, cmp)) {
 			printf("Test requires GLSL version %s %d.%d.  "
 			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
@@ -525,7 +536,7 @@ process_requirement(const char *line)
 		parse_version_comparison(line + 2, &cmp, &gl_req_version,
 		                         VERSION_GL);
 
-		if (!compare(gl_req_version.num, gl_version.num, cmp)) {
+		if (!version_compare(&gl_req_version, &gl_version, cmp)) {
 			printf("Test requires GL version %s %d.%d.  "
 			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
