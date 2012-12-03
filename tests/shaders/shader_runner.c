@@ -63,6 +63,7 @@ struct version {
 	} _tag;
 
 	unsigned num;
+	char _string[100];
 };
 
 extern float piglit_tolerance[4];
@@ -128,6 +129,7 @@ version_init(struct version *v, enum version_tag tag, unsigned num)
 
 	v->_tag = tag;
 	v->num = num;
+	v->_string[0] = 0;
 }
 
 static void
@@ -142,6 +144,32 @@ version_compare(struct version *a, struct version *b, enum comparison cmp)
 	assert(a->_tag == b->_tag);
 
 	return compare(a->num, b->num, cmp);
+}
+
+/**
+ * Get the version string.
+ */
+static const char*
+version_string(struct version *v)
+{
+	if (v->_string[0])
+		return v->_string;
+
+	switch (v->_tag) {
+	case VERSION_GL:
+		snprintf(v->_string, sizeof(v->_string) - 1, "GL %d.%d",
+		         v->num / 10, v->num % 10);
+		break;
+	case VERSION_GLSL:
+		snprintf(v->_string, sizeof(v->_string) - 1, "GLSL %d.%d",
+		         v->num / 100, v->num % 100);
+		break;
+	default:
+		assert(false);
+		break;
+	}
+
+	return v->_string;
 }
 
 static GLboolean
@@ -522,11 +550,11 @@ process_requirement(const char *line)
 		}
 
 		if (!version_compare(&glsl_req_version, &glsl_version, cmp)) {
-			printf("Test requires GLSL version %s %d.%d.  "
-			       "Actual version is %d.%d.\n",
+			printf("Test requires %s %s.  "
+			       "Actual version %s.\n",
 			       comparison_string(cmp),
-			       glsl_req_version.num / 100, glsl_req_version.num % 100,
-			       glsl_version.num / 100, glsl_version.num % 100);
+			       version_string(&glsl_req_version),
+			       version_string(&glsl_version));
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("GL", line)) {
@@ -537,11 +565,11 @@ process_requirement(const char *line)
 		                         VERSION_GL);
 
 		if (!version_compare(&gl_req_version, &gl_version, cmp)) {
-			printf("Test requires GL version %s %d.%d.  "
-			       "Actual version is %d.%d.\n",
+			printf("Test requires %s %s.  "
+			       "Actual version is %s.\n",
 			       comparison_string(cmp),
-			       gl_req_version.num / 10, gl_req_version.num % 10,
-			       gl_version.num / 10, gl_version.num % 10);
+			       version_string(&gl_req_version),
+			       version_string(&gl_version));
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("rlimit", line)) {
