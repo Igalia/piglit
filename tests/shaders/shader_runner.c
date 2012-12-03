@@ -56,11 +56,20 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+struct version {
+	enum version_tag {
+		VERSION_GL,
+		VERSION_GLSL,
+	} _tag;
+
+	unsigned num;
+};
+
 extern float piglit_tolerance[4];
 
-static unsigned gl_version = 0;
-static unsigned glsl_version = 0;
-static unsigned glsl_req_version = 0;
+static struct version gl_version;
+static struct version glsl_version;
+static struct version glsl_req_version;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
 
@@ -109,6 +118,21 @@ enum comparison {
 	less_equal
 };
 
+static void
+version_init(struct version *v, enum version_tag tag, unsigned num)
+{
+	assert(tag == VERSION_GL || tag == VERSION_GLSL);
+
+	v->_tag = tag;
+	v->num = num;
+}
+
+static void
+version_copy(struct version *dest, struct version *src)
+{
+	memcpy(dest, src, sizeof(*dest));
+}
+
 static GLboolean
 string_match(const char *string, const char *line)
 {
@@ -129,19 +153,19 @@ compile_glsl(GLenum target, bool release_text)
 		piglit_require_fragment_shader();
 		break;
 	case GL_GEOMETRY_SHADER_ARB:
-		if (gl_version < 32)
+		if (gl_version.num < 32)
 			piglit_require_extension("GL_ARB_geometry_shader4");
 		break;
 	}
 
-	if (glsl_req_version != 0 &&
+	if (glsl_req_version.num != 0 &&
 	    !strstr(shader_string, "#version ")) {
 		char *shader_strings[2];
 		char version_string[100];
 		GLint shader_string_sizes[2];
 		
 		/* Add a #version directive based on the GLSL requirement. */
-		sprintf(version_string, "#version %d\n", glsl_req_version);
+		sprintf(version_string, "#version %d\n", glsl_req_version.num);
 		shader_strings[0] = version_string;
 		shader_string_sizes[0] = strlen(version_string);
 		shader_strings[1] = shader_string;
@@ -387,10 +411,11 @@ process_comparison(const char *src, enum comparison *cmp)
 
 void
 parse_version_comparison(const char *line, enum comparison *cmp,
-			 unsigned *version, bool is_glsl)
+			 struct version *v, enum version_tag tag)
 {
 	unsigned major;
 	unsigned minor;
+	unsigned full_num;
 
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
@@ -402,11 +427,13 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	 * integer to be 32.  All GLSL versions look like 1.40, and we want
 	 * the integer to be 140.
 	 */
-	if (is_glsl) {
-		*version = (major * 100) + minor;
+	if (tag == VERSION_GLSL) {
+		full_num = (major * 100) + minor;
 	} else {
-		*version = (major * 10) + minor;
+		full_num = (major * 10) + minor;
 	}
+
+	version_init(v, tag, full_num);
 }
 
 /**
@@ -473,7 +500,8 @@ process_requirement(const char *line)
 	} else if (string_match("GLSL", line)) {
 		enum comparison cmp;
 
-		parse_version_comparison(line + 4, &cmp, &glsl_req_version, true);
+		parse_version_comparison(line + 4, &cmp, &glsl_req_version,
+		                         VERSION_GLSL);
 
 		/* We only allow >= because we potentially use the
 		 * version number to insert a #version directive. */
@@ -482,26 +510,27 @@ process_requirement(const char *line)
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
-		if (!compare(glsl_req_version, glsl_version, cmp)) {
+		if (!compare(glsl_req_version.num, glsl_version.num, cmp)) {
 			printf("Test requires GLSL version %s %d.%d.  "
 			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
-			       glsl_req_version / 100, glsl_req_version % 100,
-			       glsl_version / 100, glsl_version % 100);
+			       glsl_req_version.num / 100, glsl_req_version.num % 100,
+			       glsl_version.num / 100, glsl_version.num % 100);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("GL", line)) {
 		enum comparison cmp;
-		unsigned version;
+		struct version gl_req_version;
 
-		parse_version_comparison(line + 2, &cmp, &version, false);
+		parse_version_comparison(line + 2, &cmp, &gl_req_version,
+		                         VERSION_GL);
 
-		if (!compare(version, gl_version, cmp)) {
+		if (!compare(gl_req_version.num, gl_version.num, cmp)) {
 			printf("Test requires GL version %s %d.%d.  "
 			       "Actual version is %d.%d.\n",
 			       comparison_string(cmp),
-			       version / 10, version % 10,
-			       gl_version / 10, gl_version % 10);
+			       gl_req_version.num / 10, gl_req_version.num % 10,
+			       gl_version.num / 10, gl_version.num % 10);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	} else if (string_match("rlimit", line)) {
@@ -769,10 +798,12 @@ get_required_versions(const char *script_name,
 	unsigned text_size;
 	char *text = piglit_load_text_file(script_name, &text_size);
 	const char *line = text;
-	unsigned requested_glsl_version = 110;
-	unsigned requested_gl_version = 10;
+	struct version requested_glsl_version;
+	struct version requested_gl_version;
 	bool in_requirement_section = false;
 
+	version_init(&requested_glsl_version, VERSION_GLSL, 110);
+	version_init(&requested_gl_version, VERSION_GL, 10);
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -793,23 +824,23 @@ get_required_versions(const char *script_name,
 				/* empty */
 			} else if (string_match("GLSL", line)) {
 				enum comparison cmp;
-				unsigned version;
+				struct version version;
 
 				parse_version_comparison(line + 4, &cmp,
-							 &version, true);
+							 &version, VERSION_GLSL);
 				if (cmp == greater_equal)
-					requested_glsl_version = version;
+					version_copy(&requested_glsl_version, &version);
 
 			} else if (string_match("GL", line)) {
 				enum comparison cmp;
-				unsigned version;
+				struct version version;
 
 				parse_version_comparison(line + 2, &cmp,
-							 &version, false);
+							 &version, VERSION_GL);
 				if (cmp == greater_equal
 				    || cmp == greater
 				    || cmp == equal)
-					requested_gl_version = version;
+					version_copy(&requested_gl_version, &version);
 			}
 		}
 
@@ -818,24 +849,24 @@ get_required_versions(const char *script_name,
 			line++;
 	}
 
-	switch (requested_glsl_version) {
+	switch (requested_glsl_version.num) {
 	case 140:
 	case 150:
 	case 330:
-		if (requested_gl_version < 31)
-			requested_gl_version = 31;
+		if (requested_gl_version.num < 31)
+			requested_gl_version.num = 31;
 		break;
 	case 400:
 	case 410:
 	case 420:
-		if (requested_gl_version < 40)
-			requested_gl_version = 40;
+		if (requested_gl_version.num < 40)
+			requested_gl_version.num = 40;
 		break;
 	}
 
-	if (requested_gl_version > 30) {
-		config->supports_gl_core_version = requested_gl_version;
-		config->supports_gl_compat_version = requested_gl_version;
+	if (requested_gl_version.num > 30) {
+		config->supports_gl_core_version = requested_gl_version.num;
+		config->supports_gl_compat_version = requested_gl_version.num;
 	} else {
 		config->supports_gl_core_version = 0;
 		config->supports_gl_compat_version = 10;
@@ -880,7 +911,7 @@ get_uints(const char *line, unsigned *uints, unsigned count)
 void
 check_unsigned_support()
 {
-	if (gl_version < 30)
+	if (gl_version.num < 30)
 		piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -1687,10 +1718,10 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_GLSL();
 
-	gl_version = piglit_get_gl_version();
+	version_init(&gl_version, VERSION_GL, piglit_get_gl_version());
 
 	piglit_get_glsl_version(NULL, &major, &minor);
-	glsl_version = (major * 100) + minor;
+	version_init(&glsl_version, VERSION_GLSL, (major * 100) + minor);
 
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
 		      &gl_max_fragment_uniform_components);
@@ -1726,7 +1757,7 @@ piglit_init(int argc, char **argv)
 	process_test_script(argv[1]);
 	link_and_use_shaders();
 	if (vertex_data_start != NULL) {
-		if (gl_version >= 31) {
+		if (gl_version.num >= 31) {
 			GLuint vao;
 
 			glGenVertexArrays(1, &vao);
