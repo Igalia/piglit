@@ -2619,6 +2619,10 @@ add_asmparsertest('ARBvp1.0', 'txq-19.txt')
 add_asmparsertest('ARBvp1.0', 'txq-20.txt')
 add_asmparsertest('ARBvp1.0', 'xpd.txt')
 
+ext_unpack_subimage = Group()
+spec['EXT_unpack_subimage'] = ext_unpack_subimage
+ext_unpack_subimage['basic'] = concurrent_test('ext_unpack_subimage')
+
 oes_draw_texture = Group()
 spec['OES_draw_texture'] = oes_draw_texture
 oes_draw_texture['oes_draw_texture'] = concurrent_test('oes_draw_texture')
@@ -2626,6 +2630,7 @@ oes_draw_texture['oes_draw_texture'] = concurrent_test('oes_draw_texture')
 oes_compressed_etc1_rgb8_texture = Group()
 spec['OES_compressed_ETC1_RGB8_texture'] = oes_compressed_etc1_rgb8_texture
 oes_compressed_etc1_rgb8_texture['basic'] = concurrent_test('oes_compressed_etc1_rgb8_texture-basic')
+oes_compressed_etc1_rgb8_texture['miptree'] = concurrent_test('oes_compressed_etc1_rgb8_texture-miptree')
 
 oes_compressed_paletted_texture = Group()
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
