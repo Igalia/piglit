@@ -22,20 +22,17 @@
  */
 
 #define _GNU_SOURCE
-#if defined(_MSC_VER)
-#define bool BOOL
-#define true 1
-#define false 0
-#else
+
 #include <stdbool.h>
-#endif
 #include <string.h>
 #include <ctype.h>
+
 #if defined(_WIN32)
 #include <stdlib.h>
 #else
 #include <libgen.h>
 #endif
+
 #include "piglit-util-gl-common.h"
 #include "piglit-vbo.h"
 
