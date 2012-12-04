@@ -846,33 +846,24 @@ process_test_script(const char *script_name)
 	leave_state(state, line);
 }
 
-/**
- * Just determine the GLSL version required by the shader script.
- *
- * This function is a bit of a hack that is, unfortunately necessary.  A test
- * script can require a specific GLSL version or a specific GL version.  To
- * satisfy this requirement, the piglit framework code needs to know about the
- * requirement before creating the context.  However, the requirements section
- * can contain other requirements, such as minimum number of uniforms.
- *
- * The requirements section can't be fully processed until after the context
- * is created, but the context can't be created until after the requirements
- * section is processed.  Do a quick can over the requirements section to find
- * the GL and GLSL version requirements.  Use these to guide context creation.
- */
-void
-get_required_versions(const char *script_name,
-		      struct piglit_gl_test_config *config)
+struct requirement_parse_results {
+	bool found_gl;
+	bool found_glsl;
+	struct version gl_version;
+	struct version glsl_version;
+};
+
+static void
+parse_required_versions(struct requirement_parse_results *results,
+                        const char *script_name)
 {
 	unsigned text_size;
 	char *text = piglit_load_text_file(script_name, &text_size);
 	const char *line = text;
-	struct version requested_glsl_version;
-	struct version requested_gl_version;
 	bool in_requirement_section = false;
 
-	version_init(&requested_glsl_version, VERSION_GLSL, false, 110);
-	version_init(&requested_gl_version, VERSION_GL, false, 10);
+	results->found_gl = false;
+	results->found_glsl = false;
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -897,9 +888,10 @@ get_required_versions(const char *script_name,
 
 				parse_version_comparison(line + 4, &cmp,
 							 &version, VERSION_GLSL);
-				if (cmp == greater_equal)
-					version_copy(&requested_glsl_version, &version);
-
+				if (cmp == greater_equal) {
+					results->found_glsl = true;
+					version_copy(&results->glsl_version, &version);
+				}
 			} else if (string_match("GL", line)) {
 				enum comparison cmp;
 				struct version version;
@@ -908,8 +900,10 @@ get_required_versions(const char *script_name,
 							 &version, VERSION_GL);
 				if (cmp == greater_equal
 				    || cmp == greater
-				    || cmp == equal)
-					version_copy(&requested_gl_version, &version);
+				    || cmp == equal) {
+					results->found_gl = true;
+					version_copy(&results->gl_version, &version);
+				}
 			}
 		}
 
@@ -918,30 +912,74 @@ get_required_versions(const char *script_name,
 			line++;
 	}
 
-	if (requested_glsl_version.es || requested_gl_version.es) {
-		assert(!"ES support is not implemented");
+	if (results->found_glsl && results->glsl_version.es && !results->found_gl) {
+		printf("%s", "The test specifies a requirement for GLSL ES, "
+		       "but specifies no GL requirement\n.");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+static void
+choose_required_gl_version(struct requirement_parse_results *parse_results,
+                           struct version *gl_version)
+{
+	if (parse_results->found_gl) {
+		version_copy(gl_version, &parse_results->gl_version);
+	} else {
+		assert(!parse_results->found_glsl || !parse_results->glsl_version.es);
+		version_init(gl_version, VERSION_GL, false, 10);
 	}
 
-	switch (requested_glsl_version.num) {
+	if (gl_version->es)
+		return;
+
+	/* Possibly promote the GL version. */
+	switch (parse_results->glsl_version.num) {
 	case 140:
 	case 150:
 	case 330:
-		if (requested_gl_version.num < 31)
-			requested_gl_version.num = 31;
+		if (gl_version->num < 31)
+			gl_version->num = 31;
 		break;
 	case 400:
 	case 410:
 	case 420:
-		if (requested_gl_version.num < 40)
-			requested_gl_version.num = 40;
+		if (gl_version->num < 40)
+			gl_version->num = 40;
 		break;
 	}
+}
 
-	if (requested_gl_version.num > 30) {
-		config->supports_gl_core_version = requested_gl_version.num;
-		config->supports_gl_compat_version = requested_gl_version.num;
+/**
+ * Just determine the GLSL version required by the shader script.
+ *
+ * This function is a bit of a hack that is, unfortunately necessary.  A test
+ * script can require a specific GLSL version or a specific GL version.  To
+ * satisfy this requirement, the piglit framework code needs to know about the
+ * requirement before creating the context.  However, the requirements section
+ * can contain other requirements, such as minimum number of uniforms.
+ *
+ * The requirements section can't be fully processed until after the context
+ * is created, but the context can't be created until after the requirements
+ * section is processed.  Do a quick can over the requirements section to find
+ * the GL and GLSL version requirements.  Use these to guide context creation.
+ */
+void
+get_required_versions(const char *script_name,
+		      struct piglit_gl_test_config *config)
+{
+	struct requirement_parse_results parse_results;
+	struct version required_gl_version;
+
+	parse_required_versions(&parse_results, script_name);
+	choose_required_gl_version(&parse_results, &required_gl_version);
+
+	if (required_gl_version.es) {
+		config->supports_gl_es_version = required_gl_version.num;
+	} else if (required_gl_version.num >= 31) {
+		config->supports_gl_core_version = required_gl_version.num;
+		config->supports_gl_compat_version = required_gl_version.num;
 	} else {
-		config->supports_gl_core_version = 0;
 		config->supports_gl_compat_version = 10;
 	}
 }
