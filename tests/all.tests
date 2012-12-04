@@ -1118,6 +1118,13 @@ arb_es2_compatibility['FBO blit to missing attachment (ES2 completeness rules)']
 arb_es2_compatibility['FBO blit from missing attachment (ES2 completeness rules)'] = PlainExecTest(['fbo-missing-attachment-blit', '-auto', 'es2', 'from'])
 add_fbo_formats_tests('spec/ARB_ES2_compatibility', 'GL_ARB_ES2_compatibility')
 add_texwrap_format_tests(arb_es2_compatibility, 'GL_ARB_ES2_compatibility')
+arb_es2_compatibility['NUM_SHADER_BINARY_FORMATS over-run check'] = concurrent_test('arb_get_program_binary-overrun shader')
+
+
+# Group ARB_get_program_binary
+arb_get_program_binary = Group()
+spec['ARB_get_program_binary'] = arb_get_program_binary
+arb_get_program_binary['NUM_PROGRAM_BINARY_FORMATS over-run check'] = concurrent_test('arb_get_program_binary-overrun program')
 
 arb_depth_clamp = Group()
 spec['ARB_depth_clamp'] = arb_depth_clamp
