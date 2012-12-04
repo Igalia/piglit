@@ -195,7 +195,7 @@ compile_glsl(GLenum target, bool release_text)
 	case GL_FRAGMENT_SHADER:
 		piglit_require_fragment_shader();
 		break;
-	case GL_GEOMETRY_SHADER_ARB:
+	case GL_GEOMETRY_SHADER:
 		if (gl_version.num < 32)
 			piglit_require_extension("GL_ARB_geometry_shader4");
 		break;
@@ -258,7 +258,7 @@ compile_glsl(GLenum target, bool release_text)
 		vertex_shaders[num_vertex_shaders] = shader;
 		num_vertex_shaders++;
 		break;
-	case GL_GEOMETRY_SHADER_ARB:
+	case GL_GEOMETRY_SHADER:
 		geometry_shaders[num_geometry_shaders] = shader;
 		num_geometry_shaders++;
 		break;
@@ -1375,7 +1375,7 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 	glVertexPointer(4, GL_FLOAT, 0, verts);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	glDrawArraysInstancedARB(GL_QUADS, 0, 4, primcount);
+	glDrawArraysInstanced(GL_QUADS, 0, 4, primcount);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -1719,13 +1719,13 @@ piglit_display(void)
 			piglit_depth_texture(GL_TEXTURE_2D, GL_DEPTH_COMPONENT,
 					     w, h, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_2D,
-					GL_TEXTURE_COMPARE_MODE_ARB,
-					GL_COMPARE_R_TO_TEXTURE_ARB);
+					GL_TEXTURE_COMPARE_MODE,
+					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_2D,
-					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 			glTexParameteri(GL_TEXTURE_2D,
-					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_DEPTH_TEXTURE_MODE,
 					GL_INTENSITY);
 
 			glEnable(GL_TEXTURE_2D);
@@ -1736,13 +1736,13 @@ piglit_display(void)
 			piglit_depth_texture(GL_TEXTURE_RECTANGLE, GL_DEPTH_COMPONENT,
 					     w, h, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
-					GL_TEXTURE_COMPARE_MODE_ARB,
-					GL_COMPARE_R_TO_TEXTURE_ARB);
+					GL_TEXTURE_COMPARE_MODE,
+					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
-					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
-					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_DEPTH_TEXTURE_MODE,
 					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow1D %d ( %d )",
@@ -1751,13 +1751,13 @@ piglit_display(void)
 			piglit_depth_texture(GL_TEXTURE_1D, GL_DEPTH_COMPONENT,
 					     w, 1, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_1D,
-					GL_TEXTURE_COMPARE_MODE_ARB,
-					GL_COMPARE_R_TO_TEXTURE_ARB);
+					GL_TEXTURE_COMPARE_MODE,
+					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_1D,
-					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 			glTexParameteri(GL_TEXTURE_1D,
-					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_DEPTH_TEXTURE_MODE,
 					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow1DArray %d ( %d , %d )",
@@ -1766,13 +1766,13 @@ piglit_display(void)
 			piglit_depth_texture(GL_TEXTURE_1D_ARRAY, GL_DEPTH_COMPONENT,
 					     w, 1, l, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
-					GL_TEXTURE_COMPARE_MODE_ARB,
-					GL_COMPARE_R_TO_TEXTURE_ARB);
+					GL_TEXTURE_COMPARE_MODE,
+					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
-					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
-					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_DEPTH_TEXTURE_MODE,
 					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow2DArray %d ( %d , %d , %d )",
@@ -1781,13 +1781,13 @@ piglit_display(void)
 			piglit_depth_texture(GL_TEXTURE_2D_ARRAY, GL_DEPTH_COMPONENT,
 					     w, h, l, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
-					GL_TEXTURE_COMPARE_MODE_ARB,
-					GL_COMPARE_R_TO_TEXTURE_ARB);
+					GL_TEXTURE_COMPARE_MODE,
+					GL_COMPARE_R_TO_TEXTURE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
-					GL_TEXTURE_COMPARE_FUNC_ARB,
+					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
-					GL_DEPTH_TEXTURE_MODE_ARB,
+					GL_DEPTH_TEXTURE_MODE,
 					GL_INTENSITY);
 		} else if (string_match("texparameter ", line)) {
 			handle_texparameter(line + strlen("texparameter "));
