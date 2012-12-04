@@ -1,0 +1,27 @@
+[config]
+name: Scalar Data Type Load (uchar)
+
+program_source_file: scalar-load.inc
+build_options: -D SCALAR_TYPE=uchar -D OUT_TYPE=uint
+
+dimensions: 1
+global_size: 1 0 0
+
+[test]
+name: global address space
+kernel_name: load_global
+arg_out: 0 buffer uint[1] 5
+arg_in:  1 buffer uchar[1] 5
+
+[test]
+name: parameter address space
+kernel_name: load_param
+arg_out: 0 buffer uint[1] 6
+arg_in:  1 uchar 6
+
+[test]
+name: constant address space
+kernel_name: load_constant
+arg_out: 0 buffer uint[1] 7
+arg_in:  1 buffer uchar[1] 7
+

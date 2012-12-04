@@ -1,6 +1,11 @@
-/*!
 [config]
-name: Scalar load float
+name: Scalar Data Type Load (float)
+
+program_source_file: scalar-load.inc
+build_options: -D SCALAR_TYPE=float -D OUT_TYPE=float
+
+dimensions: 1
+global_size: 1 0 0
 
 [test]
 kernel_name: load_global
@@ -19,16 +24,4 @@ kernel_name: load_constant
 name: constant address space
 arg_out: 0 buffer float[1] 3.7
 arg_in:  1 buffer float[1] 3.7
-!*/
 
-kernel void load_global(global float *out, global float *in) {
-	out[0] = in[0];
-}
-
-kernel void load_param(global float *out, float in) {
-	out[0] = in;
-}
-
-kernel void load_constant(global float *out, constant float *in) {
-	out[0] = in[0];
-}
