@@ -85,9 +85,9 @@ piglit_init(int argc, char **argv)
 	glBindBuffer(GL_TEXTURE_BUFFER, bo);
 	pass = expect(GL_TEXTURE_BUFFER, bo) && pass;
 
-	pass = expect(GL_TEXTURE_BUFFER_FORMAT, GL_LUMINANCE8) && pass;
+	pass = expect(GL_TEXTURE_BUFFER_FORMAT_ARB, GL_LUMINANCE8) && pass;
 	glTexBufferARB(GL_TEXTURE_BUFFER, GL_RGBA8, 0);
-	pass = expect(GL_TEXTURE_BUFFER_FORMAT, GL_RGBA8) && pass;
+	pass = expect(GL_TEXTURE_BUFFER_FORMAT_ARB, GL_RGBA8) && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
