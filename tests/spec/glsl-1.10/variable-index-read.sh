@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Generate a set of data for a sized matrix.  Elements start with a specified
 # value and increment by 1.0 for each element.

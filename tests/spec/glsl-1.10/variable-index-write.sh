@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Emit global variable declarations for either the vertex shader or the
 # fragment shader.
