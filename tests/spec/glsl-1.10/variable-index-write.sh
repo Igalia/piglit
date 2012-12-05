@@ -326,7 +326,7 @@ function emit_fs_wr_test
     echo "# ${cmd}"
     echo
     echo "[require]"
-    echo "GLSL >= 1.10"
+    echo "GLSL >= ${version}"
     echo
 
     echo "[vertex shader]"
