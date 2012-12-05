@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_get_program_binary-overrun overrun.c)
+piglit_add_executable (arb_get_program_binary-retrievable_hint retrievable_hint.c)
 
 # vim: ft=cmake:

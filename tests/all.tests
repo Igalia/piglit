@@ -1125,6 +1125,7 @@ arb_es2_compatibility['NUM_SHADER_BINARY_FORMATS over-run check'] = concurrent_t
 arb_get_program_binary = Group()
 spec['ARB_get_program_binary'] = arb_get_program_binary
 arb_get_program_binary['NUM_PROGRAM_BINARY_FORMATS over-run check'] = concurrent_test('arb_get_program_binary-overrun program')
+arb_get_program_binary['PROGRAM_BINARY_RETRIEVABLE_HINT'] = concurrent_test('arb_get_program_binary-retrievable_hint')
 
 arb_depth_clamp = Group()
 spec['ARB_depth_clamp'] = arb_depth_clamp
