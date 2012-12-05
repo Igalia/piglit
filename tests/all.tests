@@ -11,6 +11,7 @@ from framework.core import *
 from framework.exectest import *
 from framework.gleantest import *
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
+from framework.shader_test import add_shader_test_dir
 
 # Blacklisted tests are removed from the test profile.
 blacklist = [
@@ -188,23 +189,6 @@ add_plain_test(security, 'initialized-vbo')
 
 
 shaders = Group()
-
-def add_shader_test_dir(group, dirpath, recursive=False):
-	"""Add all shader tests in a directory to the given group."""
-	for filename in os.listdir(dirpath):
-		filepath = path.join(dirpath, filename)
-		if path.isdir(filepath):
-			if not recursive:
-				continue
-			if not filename in group:
-				group[filename] = Group()
-			add_shader_test_dir(group[filename], filepath, recursive)
-		else:
-			ext = filename.rsplit('.')[-1]
-			if ext != 'shader_test':
-				continue
-			testname = filename[0:-(len(ext) + 1)] # +1 for '.'
-			group[testname] = concurrent_test('shader_runner ' + filepath)
 
 def add_getactiveuniform_count(group, name, expected):
 	path = 'shaders/'
