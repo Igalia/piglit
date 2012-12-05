@@ -61,6 +61,23 @@ static void blend(const float *rect, const float *src, const float *dst, const f
 						  a >= 0.333 ? 0.333f : 0.0f) : \
 	 (a))
 
+static int
+get_texture_bits(GLenum target, GLenum size_enum, GLenum type_enum)
+{
+	GLint size = 0;
+	GLint type = GL_NONE;
+	glGetTexLevelParameteriv(target, 0, size_enum, &size);
+	if (!size) {
+		return size;
+	}
+	glGetTexLevelParameteriv(target, 0, type_enum, &type);
+	if (type == GL_SIGNED_NORMALIZED) {
+		/* One bit is lost for the sign */
+		size -= 1;
+	}
+	return size;
+}
+
 static enum piglit_result test_format(const struct format_desc *format)
 {
 	GLboolean pass = GL_TRUE;
@@ -128,18 +145,24 @@ static enum piglit_result test_format(const struct format_desc *format)
 		     piglit_width, piglit_height, 0,
 		     GL_RGBA, GL_FLOAT, NULL);
 
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_LUMINANCE_SIZE, &l);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_ALPHA_SIZE, &a);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_INTENSITY_SIZE, &i);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_RED_SIZE, &r);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_GREEN_SIZE, &g);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-				 GL_TEXTURE_BLUE_SIZE, &b);
+	l = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_LUMINANCE_SIZE,
+			     GL_TEXTURE_LUMINANCE_TYPE);
+	a = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_ALPHA_SIZE,
+			     GL_TEXTURE_ALPHA_TYPE);
+	i = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_INTENSITY_SIZE,
+			     GL_TEXTURE_INTENSITY_TYPE);
+	r = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_RED_SIZE,
+			     GL_TEXTURE_RED_TYPE);
+	g = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_GREEN_SIZE,
+			     GL_TEXTURE_GREEN_TYPE);
+	b = get_texture_bits(GL_TEXTURE_2D,
+			     GL_TEXTURE_BLUE_SIZE,
+			     GL_TEXTURE_BLUE_TYPE);
 
 	/* Compute expected result colors when reading back from a texture/FBO */
         if (i) {
