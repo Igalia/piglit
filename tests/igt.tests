@@ -40,6 +40,7 @@ from framework.exectest import *
 #############################################################################
 
 if not os.path.exists(os.path.join(testBinDir, 'igt')):
+    print "igt symlink not found!"
     sys.exit(0)
 
 # Chase the piglit/bin/igt symlink to find where the tests really live.
