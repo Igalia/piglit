@@ -1106,6 +1106,21 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 	}
 }
 
+/**
+ * Helper function for parsing a test name and checking for illegal characters.
+ */
+static char*
+parse_name(const char *input)
+{
+	char *name = add_dynamic_str_copy(input);
+	if (strrchr(name, '/')) {
+		fprintf(stderr,	"Illegal character in test name '%s': /\n",
+								input);
+		return NULL;
+	}
+	return name;
+}
+
 void
 parse_config(const char* config_str,
              struct piglit_cl_program_test_config* config)
@@ -1253,7 +1268,10 @@ parse_config(const char* config_str,
 				break;
 			case SECTION_CONFIG:
 				if(regex_match(key, "^name$")) {
-					config->name = add_dynamic_str_copy(value);
+					config->name = parse_name(value);
+					if (!config->name) {
+						exit_report_result(PIGLIT_FAIL);
+					}
 				} else if(regex_match(key, "^clc_version_min$")) {
 					config->clc_version_min = get_int(value);
 				} else if(regex_match(key, "clc_version_max$")) {
@@ -1318,7 +1336,10 @@ parse_config(const char* config_str,
 				break;
 			case SECTION_TEST:
 				if(regex_match(key, "^name$")) {
-					test->name = add_dynamic_str_copy(value);
+					test->name = parse_name(value);
+					if (!test->name) {
+						exit_report_result(PIGLIT_FAIL);
+					}
 				} else if(regex_match(key, "^kernel_name$")) {
 					test->kernel_name = add_dynamic_str_copy(value); // test can't have kernel_name == NULL like config section
 				} else if(regex_match(key, "^expect_test_fail$")) {
@@ -1921,20 +1942,7 @@ piglit_cl_test(const int argc,
 		test_result = test_kernel(config, env, tests[i]);
 		piglit_merge_result(&result, test_result);
 
-		switch(test_result) {
-		case PIGLIT_FAIL:
-			printf("Test FAILED\n");
-			break;
-		case PIGLIT_SKIP:
-			printf("Test SKIPPED\n");
-			break;
-		case PIGLIT_WARN:
-			printf("Test produced a WARNING\n");
-			break;
-		case PIGLIT_PASS:
-			printf("Test PASSED\n");
-			break;
-		}
+		piglit_report_subtest_result(tests[i].name, test_result);
 	}
 
 	/* Print result */
