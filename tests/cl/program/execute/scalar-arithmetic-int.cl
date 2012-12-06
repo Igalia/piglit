@@ -106,63 +106,63 @@ arg_out: 0 buffer int[1] 0
 ## Division ##
 
 [test]
-name: pos/pos
+name: pos div pos
 kernel_name: div
 arg_in:  1 int 8
 arg_in:  2 int 4
 arg_out: 0 buffer int[1] 2
 
 [test]
-name: pos/pos (remainder)
+name: pos div pos (remainder)
 kernel_name: div
 arg_in:  1 int 7
 arg_in:  2 int 4
 arg_out: 0 buffer int[1] 1
 
 [test]
-name: pos/neg
+name: pos div neg
 kernel_name: div
 arg_in:  1 int 8
 arg_in:  2 int -4
 arg_out: 0 buffer int[1] -2
 
 [test]
-name: pos/neg (remainder)
+name: pos div neg (remainder)
 kernel_name: div
 arg_in:  1 int 8
 arg_in:  2 int -3
 arg_out: 0 buffer int[1] -2
 
 [test]
-name: neg/pos
+name: neg div pos
 kernel_name: div
 arg_in:  1 int -20
 arg_in:  2 int 5
 arg_out: 0 buffer int[1] -4
 
 [test]
-name: neg/pos (remainder)
+name: neg div pos (remainder)
 kernel_name: div
 arg_in:  1 int -2
 arg_in:  2 int 5
 arg_out: 0 buffer int[1] 0
 
 [test]
-name: neg/neg
+name: neg div neg
 kernel_name: div
 arg_in:  1 int -9
 arg_in:  2 int -3
 arg_out: 0 buffer int[1] 3
 
 [test]
-name: neg/neg (remainder)
+name: neg div neg (remainder)
 kernel_name: div
 arg_in:  1 int -8
 arg_in:  2 int -3
 arg_out: 0 buffer int[1] 2
 
 [test]
-name: 0/num
+name: 0 div num
 kernel_name: div
 arg_in:  1 int 0
 arg_in:  2 int -3

@@ -174,91 +174,91 @@ arg_out: 0 buffer float[1] nan
 ## Division ##
 
 [test]
-name: pos/pos
+name: pos div pos
 kernel_name: div
 arg_in:  1 float 8.5
 arg_in:  2 float 4.25
 arg_out: 0 buffer float[1] 2
 
 [test]
-name: pos/neg
+name: pos div neg
 kernel_name: div
 arg_in:  1 float 11.25
 arg_in:  2 float -3
 arg_out: 0 buffer float[1] -3.75
 
 [test]
-name: neg/pos
+name: neg div pos
 kernel_name: div
 arg_in:  1 float -21
 arg_in:  2 float 5.25
 arg_out: 0 buffer float[1] -4
 
 [test]
-name: neg/neg
+name: neg div neg
 kernel_name: div
 arg_in:  1 float -21.25
 arg_in:  2 float -5
 arg_out: 0 buffer float[1] 4.25
 
 [test]
-name: 0/pos
+name: 0 div pos
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float 3.7
 arg_out: 0 buffer float[1] 0
 
 [test]
-name: 0/neg
+name: 0 div neg
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float -3.7
 arg_out: 0 buffer float[1] -0
 
 [test]
-name: num/0
+name: num div 0
 kernel_name: div
 arg_in:  1 float 45.25
 arg_in:  2 float 0
 arg_out: 0 buffer float[1] inf
 
 [test]
-name: -num/0
+name: -num div 0
 kernel_name: div
 arg_in:  1 float -45.25
 arg_in:  2 float 0
 arg_out: 0 buffer float[1] -inf
 
 [test]
-name: 0/inf
+name: 0 div inf
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float inf
 arg_out: 0 buffer float[1] 0
 
 [test]
-name: inf/0
+name: inf div 0
 kernel_name: div
 arg_in:  1 float inf
 arg_in:  2 float 0
 arg_out: 0 buffer float[1] inf
 
 [test]
-name: inf/inf
+name: inf div inf
 kernel_name: div
 arg_in:  1 float inf
 arg_in:  2 float inf
 arg_out: 0 buffer float[1] nan
 
 [test]
-name: num/nan
+name: num div nan
 kernel_name: div
 arg_in:  1 float 234.5
 arg_in:  2 float nan
 arg_out: 0 buffer float[1] nan
 
 [test]
-name: nan/0
+name: nan div 0
 kernel_name: div
 arg_in:  1 float nan
 arg_in:  2 float 0

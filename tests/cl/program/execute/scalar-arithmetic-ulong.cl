@@ -57,21 +57,21 @@ arg_out: 0 buffer ulong[1] 0
 ## Division ##
 
 [test]
-name: pos/pos
+name: pos div pos
 kernel_name: div
 arg_in:  1 ulong 8
 arg_in:  2 ulong 4
 arg_out: 0 buffer ulong[1] 2
 
 [test]
-name: pos/pos (remainder)
+name: pos div pos (remainder)
 kernel_name: div
 arg_in:  1 ulong 7
 arg_in:  2 ulong 4
 arg_out: 0 buffer ulong[1] 1
 
 [test]
-name: 0/num
+name: 0 div num
 kernel_name: div
 arg_in:  1 ulong 0
 arg_in:  2 ulong 77

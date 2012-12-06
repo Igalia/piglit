@@ -57,21 +57,21 @@ arg_out: 0 buffer uint[1] 0
 ## Division ##
 
 [test]
-name: pos/pos
+name: pos div pos
 kernel_name: div
 arg_in:  1 uint 8
 arg_in:  2 uint 4
 arg_out: 0 buffer uint[1] 2
 
 [test]
-name: pos/pos (remainder)
+name: pos div pos (remainder)
 kernel_name: div
 arg_in:  1 uint 7
 arg_in:  2 uint 4
 arg_out: 0 buffer uint[1] 1
 
 [test]
-name: 0/num
+name: 0 div num
 kernel_name: div
 arg_in:  1 uint 0
 arg_in:  2 uint 77
