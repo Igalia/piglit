@@ -106,6 +106,11 @@ results is an array of TestResult instances, one per testrun
 ##### GroupSummary: Summarize a group of tests
 #############################################################################
 class GroupSummary:
+	def createDummyGroup(self, result, test_name):
+		new_group = core.GroupResult()
+		new_group[' ' + test_name + '(All Tests)'] = result[test_name]
+		result[test_name] = new_group
+
 	def __init__(self, summary, path, name, results):
 		"""\
 summary is the root summary object
@@ -141,6 +146,25 @@ results is an array of GroupResult instances, one per testrun
 					childpath = self.path + '/' + childpath
 
 				if isinstance(result[name], core.GroupResult):
+					# This loop checks to make sure that all results
+					# with the same 'name' are of the same type.
+					# This is necessary to handle the case where
+					# a testname in an earlier result (an earlier
+					# result in this case means a result that
+					# comes before the current result in self.results)
+					# denotes a test group but in a later
+					# result it denotes a single test case, for example:
+					#
+					# result 0:
+					#	test/group/a PASS
+					#	test/group/b PASS
+					#	test/group/c PASS
+					# result 1:
+					#	test/group PASS
+					for r in self.results:
+						if r.has_key(name) and not isinstance(r[name], core.GroupResult):
+							self.createDummyGroup(r, name)
+
 					childresults = [r.get(name, core.GroupResult())
 							for r in self.results]
 
@@ -151,15 +175,40 @@ results is an array of GroupResult instances, one per testrun
 						childresults
 					)
 				else:
-					childresults = [r.get(name, core.TestResult({ 'result': 'skip' }))
-							for r in self.results]
+					# We need to check and handle the reversed case
+					# described in the above comment e.g.:
+					# result 0:
+					#	test/group PASS
+					# result 1:
+					#	test/group/a PASS
+					#	test/group/b PASS
+					#	test/group/c PASS
+					need_group = 0
+					for r in self.results:
+						if r.has_key(name) and not isinstance(r[name], core.TestResult):
+							need_group = 1
+					if need_group:
+						for r in self.results:
+							if r.has_key(name) and isinstance(r[name], core.TestResult):
+								self.createDummyGroup(r, name)
+						childresults = [r.get(name, core.GroupResult())
+								for r in self.results]
 
-					self.children[name] = TestSummary(
-						summary,
-						childpath,
-						name,
-						childresults
-					)
+						self.children[name] = GroupSummary(
+							summary,
+							childpath,
+							name,
+							childresults
+						)
+					else:
+						childresults = [r.get(name, core.TestResult({ 'result': 'skip' }))
+								for r in self.results]
+						self.children[name] = TestSummary(
+							summary,
+							childpath,
+							name,
+							childresults
+						)
 
 				for j in range(len(self.results)):
 					self.results[j].passvector.add(childresults[j].passvector)

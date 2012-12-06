@@ -460,7 +460,12 @@ class Test:
 
 			status(result['result'])
 
-			json_writer.write_dict_item(path, result)
+			if 'subtest' in result and len(result['subtest'].keys()) > 1:
+				for test in result['subtest'].keys():
+					result['result'] = result['subtest'][test]
+					json_writer.write_dict_item(path + '/' + test, result)
+			else:
+				json_writer.write_dict_item(path, result)
 		else:
 			status("dry-run")
 

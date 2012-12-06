@@ -190,6 +190,14 @@ piglit_report_result(enum piglit_result result)
 	}
 }
 
+void
+piglit_report_subtest_result(const char *name, enum piglit_result result)
+{
+	const char *result_str = piglit_result_to_string(result);
+	printf("PIGLIT:subtest {'%s' : '%s'}\n", name, result_str);
+	fflush(stdout);
+}
+
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c)
 {

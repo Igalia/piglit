@@ -213,7 +213,13 @@ class PlainExecTest(ExecTest):
 
 		if len(outpiglit) > 0:
 			try:
-				results.update(eval(''.join(outpiglit), {}))
+				for piglit in outpiglit:
+					if piglit.startswith('subtest'):
+						if not results.has_key('subtest'):
+							results['subtest'] = {}
+						results['subtest'].update(eval(piglit[7:]))
+					else:
+						results.update(eval(piglit))
 				out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
 			except:
 				results['result'] = 'fail'
