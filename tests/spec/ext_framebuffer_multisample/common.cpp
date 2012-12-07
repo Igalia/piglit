@@ -703,7 +703,7 @@ void Triangles::draw(const float (*proj)[4])
 
 
 InterpolationTestPattern::InterpolationTestPattern(const char *frag)
-	: frag(frag)
+	: frag(frag), viewport_size_loc(0)
 {
 }
 
