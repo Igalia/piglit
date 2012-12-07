@@ -815,6 +815,10 @@ spec['glsl-es-3.00'] = Group()
 import_glsl_parser_tests(spec['glsl-es-3.00'],
 			 os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
 			 ['compiler'])
+add_shader_test_dir(spec['glsl-es-3.00'],
+		    os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
+		    recursive=True)
+
 
 
 # Group AMD_conservative_depth
