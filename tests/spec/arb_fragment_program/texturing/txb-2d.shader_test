@@ -1,3 +1,6 @@
+[require]
+GL_ARB_fragment_program
+
 [vertex program]
 !!ARBvp1.0
 OPTION ARB_position_invariant;
