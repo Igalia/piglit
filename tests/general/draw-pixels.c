@@ -278,6 +278,11 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 			}
 		}
 		break;
+
+	default:
+		assert(!"Unexpected data type");
+		pixels = NULL;
+		break;
 	}
 	return pixels;
 }
