@@ -265,6 +265,10 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 		*((GLuint *) data) = (GLuint) value;
 		break;
 	}
+	default:
+		assert(!"Unexpected data type");
+		endptr = NULL;
+		break;
 	}
 	*text = endptr;
 	return true;
