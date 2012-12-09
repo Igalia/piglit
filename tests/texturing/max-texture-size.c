@@ -151,6 +151,10 @@ initTexData (GLenum target, int sideLength)
 		nPixels = (uint64_t)(sideLength) *
 			  (uint64_t)(sideLength) *
 			  (uint64_t)(sideLength);
+	else {
+		assert(!"Unexpected target");
+		return NULL;
+	}
 
 	/* Allocate sufficiently large data array and initialize to zero */
 	return ((GLfloat *) calloc(nPixels * COLOR_COMPONENTS, sizeof(float)));
