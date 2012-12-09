@@ -1355,6 +1355,9 @@ static void init_int_texture(const struct format_desc *format,
 		case 32:
 			colors = i32colors;
 			break;
+		default:
+			assert(!"Unexpected number of bits");
+			break;
 		}
 		break;
 	case UINT_TYPE:
@@ -1370,6 +1373,9 @@ static void init_int_texture(const struct format_desc *format,
 			break;
 		case 32:
 			colors = (int**)ui32colors;
+			break;
+		default:
+			assert(!"Unexpected number of bits");
 			break;
 		}
 		break;
