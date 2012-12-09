@@ -1033,7 +1033,16 @@ void Points::draw(const float (*proj)[4])
 
 Sunburst::Sunburst()
 	: out_type(GL_UNSIGNED_NORMALIZED),
-	  compute_depth(false)
+	  compute_depth(false),
+	  prog(0),
+	  rotation_loc(0),
+	  vert_depth_loc(0),
+	  frag_depth_loc(0),
+	  proj_loc(0),
+	  draw_colors_loc(0),
+	  vao(0),
+	  num_tris(0),
+	  vertex_buf(0)
 {
 }
 
