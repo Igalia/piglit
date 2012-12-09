@@ -272,6 +272,12 @@ compute_expected_color(const struct format_desc *fmt,
 				texel[2] = 0.0;
 				texel[3] = 1.0;
 			}
+		} else {
+			assert(!"Unexpected texture component sizes");
+			texel[0] = 0.0;
+			texel[1] = 0.0;
+			texel[2] = 0.0;
+			texel[3] = 0.0;
 		}
 
 		(void) baseFormat;  /* not used, at this time */
