@@ -81,6 +81,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = 355;
 	config.window_height = 250;
@@ -234,6 +235,12 @@ generate_VBOs()
 			}
 		}
 	}
+
+	if (piglit_get_gl_version() >= 31) {
+                GLuint vao;
+                glGenVertexArrays(1, &vao);
+                glBindVertexArray(vao);
+        }
 
 	/* Create VBO for pixel positions in NDC: */
 	glGenBuffers(1, &pos_vbo);
