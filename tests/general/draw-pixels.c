@@ -872,6 +872,7 @@ piglit_display(void)
 					break;
 				}
 				free(pixels);
+				pixels = NULL;
 			}
 		}
 	}
