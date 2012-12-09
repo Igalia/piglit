@@ -359,6 +359,10 @@ generate_texture()
 		case GL_INT:
 			level_image = i_level;
 			break;
+		default:
+			assert(!"Unexpected data type");
+			level_image = NULL;
+			break;
 		}
 
 		upload_miplevel_data(target, l, level_image);
