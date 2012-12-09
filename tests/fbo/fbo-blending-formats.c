@@ -70,10 +70,12 @@ get_texture_bits(GLenum target, GLenum size_enum, GLenum type_enum)
 	if (!size) {
 		return size;
 	}
-	glGetTexLevelParameteriv(target, 0, type_enum, &type);
-	if (type == GL_SIGNED_NORMALIZED) {
-		/* One bit is lost for the sign */
-		size -= 1;
+	if (piglit_is_extension_supported("GL_EXT_texture_snorm")) {
+		glGetTexLevelParameteriv(target, 0, type_enum, &type);
+		if (type == GL_SIGNED_NORMALIZED) {
+			/* One bit is lost for the sign */
+			size -= 1;
+		}
 	}
 	return size;
 }
