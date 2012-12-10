@@ -35,6 +35,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = 10;
 	config.window_height = 10;
@@ -91,6 +92,12 @@ void piglit_init(int argc, char **argv)
 	input_index = glGetAttribLocation(prog, "i");
 
 	glUseProgram(prog);
+
+	if (piglit_get_gl_version() >= 31) {
+                GLuint vao;
+                glGenVertexArrays(1, &vao);
+                glBindVertexArray(vao);
+        }
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glVertexAttribIPointer(input_index, 1, GL_UNSIGNED_INT,
