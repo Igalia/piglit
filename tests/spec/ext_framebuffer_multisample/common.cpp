@@ -124,6 +124,11 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 
 Fbo::Fbo()
 	: config(0, 0, 0), /* will be overwritten on first call to setup() */
+	  handle(0),
+	  color_tex(0),
+	  color_rb(0),
+	  depth_rb(0),
+	  stencil_rb(0),
 	  gl_objects_generated(false)
 {
 }
