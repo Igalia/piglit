@@ -68,7 +68,7 @@ void piglit_init(int argc, char **argv)
 	bool pass = true;
 	GLint input_index;
 	GLuint prog;
-	GLuint xfb_buf;
+	GLuint xfb_buf, vbo;
 	GLuint verts[4] = { 0, 1, 2, 3 };
 	const char *varying = "o";
 
@@ -99,9 +99,14 @@ void piglit_init(int argc, char **argv)
                 glBindVertexArray(vao);
         }
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER,
+		     4 * sizeof(GLuint), verts, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribIPointer(input_index, 1, GL_UNSIGNED_INT,
-			       sizeof(GLuint), &verts);
+			       sizeof(GLuint), 0);
 	glEnableVertexAttribArray(input_index);
 	pass = piglit_check_gl_error(0) && pass;
 
