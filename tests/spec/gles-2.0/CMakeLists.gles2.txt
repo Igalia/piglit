@@ -1,0 +1,5 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+	)
+
+# vim: ft=cmake:
