@@ -64,7 +64,10 @@
 #define GL_VERTEX_PROGRAM_TWO_SIDE 0x8643
 #define GL_WRITE_ONLY 0x88B9
 
-static void __attribute__((unused))
+static void
+#if defined(__GNUC__)
+__attribute__((unused))
+#endif
 unsupported_function(const char *name)
 {
 	printf("Function \"%s\" not supported on this implementation\n", name);
