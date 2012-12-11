@@ -51,7 +51,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint prog;
 	GLint vs, fs;
-	int i, j, k;
+	int i, k;
 	bool pass = true;
 	GLint num_active_uniform;
 	GLint min = -1, max = -1;
