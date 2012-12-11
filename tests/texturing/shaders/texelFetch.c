@@ -418,6 +418,10 @@ generate_GLSL(enum shader_target test_stage)
 		case GL_TEXTURE_3D:
 			offset_arg = fetch_3d_arg;
 			break;
+		default:
+			assert(!"Unexpected target texture");
+			offset_arg = "";
+			break;
 		}
 	} else {
 		offset_func = "";
