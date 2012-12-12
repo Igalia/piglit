@@ -38,7 +38,7 @@
 namespace GLEAN {
 
 // Max tested point size
-#define MAX_SIZE 25.0
+#define MAX_SIZE 24.0
 
 
 /* Clamp X to [MIN,MAX] */
@@ -191,11 +191,11 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 			for (int c = -2; c < 3; c++) {
 				atten[2] = (c == -1) ? 0.0 : pow(10.0, -c);
 				PointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
-				for (float min = 1.0; min < MAX_SIZE; min += 5) {
+				for (float min = 1.0; min < MAX_SIZE; min += 10) {
 					PointParameterfARB(GL_POINT_SIZE_MIN_ARB, min);
-					for (float max = min; max < MAX_SIZE; max += 5) {
+					for (float max = min; max < MAX_SIZE; max += 10) {
 						PointParameterfARB(GL_POINT_SIZE_MAX_ARB, max);
-						for (float size = 1.0; size < MAX_SIZE; size += 4) {
+						for (float size = 1.0; size < MAX_SIZE; size += 8) {
 							glPointSize(size);
 
 							// draw column of points
@@ -205,8 +205,6 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 								glVertex3f(0, z, z);
 							}
 							glEnd();
-
-									glFinish();
 
 							// test the column of points
 							for (float z = -6.0; z <= 6.0; z += 1.0) {
