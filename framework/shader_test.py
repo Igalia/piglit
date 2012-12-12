@@ -196,13 +196,13 @@ class ShaderTest(PlainExecTest):
                     else:
                         assert(False)
 
-                # Failed to parse the GL requirement.
-                self.__gl_api = ShaderTest.API_ERROR
-
-                if parse_state == PARSE_FIND_REQUIRE_HEADER:
-                    self.__report_failure("Failed to find [require] block")
-                elif parse_state == PARSE_FIND_GL_REQUIREMENT:
-                    self.__report_failure("Failed to find end of [require] block")
+                if parse_state == PARSE_FIND_REQUIRE_HEADER or \
+                   parse_state == PARSE_FIND_GL_REQUIREMENT:
+                    # If no requirements are found, then assume the required
+                    # API is GL. This matches the behavior of the
+                    # shader_runner executable, whose default requirements are
+                    # GL >= 1.0 and GLSL >= 1.10.
+                    self.__gl_api = ShaderTest.API_GL
                 else:
                     assert(False)
 
