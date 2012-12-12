@@ -6,12 +6,7 @@ global profile
 
 execfile(os.path.dirname(__file__) + '/quick.tests')
 
-# These don't test the driver
-del profile.tests['glslparsertest']
-del profile.tests['asmparsertest']
-
 # These take too long
-del profile.tests['glean']['pointAtten']
 del profile.tests['shaders']['glsl-fs-inline-explosion']
 del profile.tests['shaders']['glsl-fs-unroll-explosion']
 del profile.tests['shaders']['glsl-vs-inline-explosion']
