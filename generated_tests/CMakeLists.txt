@@ -20,6 +20,9 @@ endfunction(piglit_make_generated_tests custom_target generator_script)
 
 # Create custom commands and targets to build generated tests.
 piglit_make_generated_tests(
+	builtin_packing_tests.list
+	gen_builtin_packing_tests.py)
+piglit_make_generated_tests(
 	builtin_uniform_tests.list
 	gen_builtin_uniform_tests.py
 	builtin_function.py)
@@ -49,7 +52,8 @@ piglit_make_generated_tests(
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
 add_custom_target(gen-tests ALL
-	DEPENDS builtin_uniform_tests.list
+	DEPENDS builtin_packing_tests.list
+		builtin_uniform_tests.list
 		constant_array_size_tests.list
 		interpolation_tests.list
 		non-lvalue_tests.list
