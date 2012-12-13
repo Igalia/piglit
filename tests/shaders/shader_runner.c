@@ -55,7 +55,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-struct version {
+struct component_version {
 	enum version_tag {
 		VERSION_GL,
 		VERSION_GLSL,
@@ -68,9 +68,9 @@ struct version {
 
 extern float piglit_tolerance[4];
 
-static struct version gl_version;
-static struct version glsl_version;
-static struct version glsl_req_version;
+static struct component_version gl_version;
+static struct component_version glsl_version;
+static struct component_version glsl_req_version;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
 
@@ -123,7 +123,7 @@ bool
 compare(float ref, float value, enum comparison cmp);
 
 static void
-version_init(struct version *v, enum version_tag tag, bool es, unsigned num)
+version_init(struct component_version *v, enum version_tag tag, bool es, unsigned num)
 {
 	assert(tag == VERSION_GL || tag == VERSION_GLSL);
 
@@ -134,13 +134,13 @@ version_init(struct version *v, enum version_tag tag, bool es, unsigned num)
 }
 
 static void
-version_copy(struct version *dest, struct version *src)
+version_copy(struct component_version *dest, struct component_version *src)
 {
 	memcpy(dest, src, sizeof(*dest));
 }
 
 static bool
-version_compare(struct version *a, struct version *b, enum comparison cmp)
+version_compare(struct component_version *a, struct component_version *b, enum comparison cmp)
 {
 	assert(a->_tag == b->_tag);
 
@@ -154,7 +154,7 @@ version_compare(struct version *a, struct version *b, enum comparison cmp)
  * Get the version string.
  */
 static const char*
-version_string(struct version *v)
+version_string(struct component_version *v)
 {
 	if (v->_string[0])
 		return v->_string;
@@ -471,7 +471,7 @@ process_comparison(const char *src, enum comparison *cmp)
  */
 void
 parse_version_comparison(const char *line, enum comparison *cmp,
-			 struct version *v, enum version_tag tag)
+			 struct component_version *v, enum version_tag tag)
 {
 	unsigned major;
 	unsigned minor;
@@ -588,7 +588,7 @@ process_requirement(const char *line)
 		}
 	} else if (string_match("GL", line)) {
 		enum comparison cmp;
-		struct version gl_req_version;
+		struct component_version gl_req_version;
 
 		parse_version_comparison(line + 2, &cmp, &gl_req_version,
 		                         VERSION_GL);
@@ -848,8 +848,8 @@ process_test_script(const char *script_name)
 struct requirement_parse_results {
 	bool found_gl;
 	bool found_glsl;
-	struct version gl_version;
-	struct version glsl_version;
+	struct component_version gl_version;
+	struct component_version glsl_version;
 };
 
 static void
@@ -883,7 +883,7 @@ parse_required_versions(struct requirement_parse_results *results,
 				/* empty */
 			} else if (string_match("GLSL", line)) {
 				enum comparison cmp;
-				struct version version;
+				struct component_version version;
 
 				parse_version_comparison(line + 4, &cmp,
 							 &version, VERSION_GLSL);
@@ -893,7 +893,7 @@ parse_required_versions(struct requirement_parse_results *results,
 				}
 			} else if (string_match("GL", line)) {
 				enum comparison cmp;
-				struct version version;
+				struct component_version version;
 
 				parse_version_comparison(line + 2, &cmp,
 							 &version, VERSION_GL);
@@ -920,7 +920,7 @@ parse_required_versions(struct requirement_parse_results *results,
 
 static void
 choose_required_gl_version(struct requirement_parse_results *parse_results,
-                           struct version *gl_version)
+                           struct component_version *gl_version)
 {
 	if (parse_results->found_gl) {
 		version_copy(gl_version, &parse_results->gl_version);
@@ -968,7 +968,7 @@ get_required_versions(const char *script_name,
 		      struct piglit_gl_test_config *config)
 {
 	struct requirement_parse_results parse_results;
-	struct version required_gl_version;
+	struct component_version required_gl_version;
 
 	parse_required_versions(&parse_results, script_name);
 	choose_required_gl_version(&parse_results, &required_gl_version);
