@@ -472,6 +472,8 @@ piglit_display(void)
 			pass = test_format(set, &set->format[format_index]);
 		}
 		else {
+			/* unsupported format - not a failure */
+			pass = GL_TRUE;
 			glClear(GL_COLOR_BUFFER_BIT);
 			piglit_present_results();
 		}
