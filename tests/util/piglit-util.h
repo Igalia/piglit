@@ -133,6 +133,7 @@ bool piglit_is_extension_in_array(const char **haystack, const char *needle);
 
 int piglit_find_line(const char *program, int position);
 void piglit_merge_result(enum piglit_result *all, enum piglit_result subtest);
+const char * piglit_result_to_string(enum piglit_result result);
 void piglit_report_result(enum piglit_result result);
 
 #ifndef HAVE_STRCHRNUL

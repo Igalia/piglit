@@ -158,26 +158,34 @@ int piglit_find_line(const char *program, int position)
 	return line;
 }
 
+const char *
+piglit_result_to_string(enum piglit_result result)
+{
+        switch (result) {
+        case PIGLIT_FAIL: return "fail";
+        case PIGLIT_SKIP: return "skip";
+        case PIGLIT_WARN: return "warn";
+        case PIGLIT_PASS: return "pass";
+        }
+        return "Unknown result";
+}
+
 void
 piglit_report_result(enum piglit_result result)
 {
+	const char *result_str = piglit_result_to_string(result);
+
 	fflush(stderr);
 
-	if (result == PIGLIT_PASS) {
-		printf("PIGLIT: {'result': 'pass' }\n");
-		fflush(stdout);
+	printf("PIGLIT: {'result': '%s' }\n", result_str);
+	fflush(stdout);
+
+	switch(result) {
+	case PIGLIT_PASS:
+	case PIGLIT_SKIP:
+	case PIGLIT_WARN:
 		exit(0);
-	} else if (result == PIGLIT_SKIP) {
-		printf("PIGLIT: {'result': 'skip' }\n");
-		fflush(stdout);
-		exit(0);
-	} else if (result == PIGLIT_WARN) {
-		printf("PIGLIT: {'result': 'warn' }\n");
-		fflush(stdout);
-		exit(0);
-	} else {
-		printf("PIGLIT: {'result': 'fail' }\n");
-		fflush(stdout);
+	default:
 		exit(1);
 	}
 }
