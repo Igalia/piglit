@@ -59,6 +59,13 @@ piglit_init(int argc, char **argv)
 	char *name;
 	GLsizei size;
 
+	/* OpenGL ES 3.0 and OpenGL 4.2 require that the "[0]" be appended to
+	 * the name.  Earlier versions of the spec are ambiguous.  Accept
+	 * either name.
+	 */
+	const size_t scalar_length = strlen("color");
+	const size_t array_length = strlen("color[0]");
+
 	piglit_require_gl_version(20);
 
 	vs = piglit_compile_shader(GL_VERTEX_SHADER,
@@ -76,9 +83,11 @@ piglit_init(int argc, char **argv)
 	 */
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_MAX_LENGTH, &len);
-	if (len != strlen("color") + 1) {
+	if (len != (scalar_length + 1) && len != (array_length + 1)) {
 		printf("Unexpected max active uniform length "
-		       "(saw %d, expected %lu)\n", len, (unsigned long) strlen("color") + 1);
+		       "(saw %d, expected %lu or %lu)\n", len,
+		       (unsigned long) scalar_length,
+		       (unsigned long) array_length);
 		pass = GL_FALSE;
 	}
 
@@ -89,10 +98,14 @@ piglit_init(int argc, char **argv)
 	 */
 	name = malloc(len);
 	glGetActiveUniform(prog, 0, len + 20, &ret_len, &size, &type, name);
-	if (ret_len != strlen("color")) {
+
+	if (ret_len != scalar_length && ret_len != array_length) {
 		printf("Unexpected active uniform length "
-		       "(saw %d, expected %lu) for \"%s\"\n",
-		       ret_len, (unsigned long) strlen("color"), name);
+		       "(saw %d, expected %lu or %lu) for \"%s\"\n",
+		       ret_len,
+		       (unsigned long) scalar_length,
+		       (unsigned long) array_length,
+		       name);
 		pass = GL_FALSE;
 	}
 

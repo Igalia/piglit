@@ -109,7 +109,11 @@ piglit_init(int argc, char **argv)
          printf("%d: %s loc=%d size=%d type=0x%x\n", i, name, loc, size, type);
       }
 
-      if (strcmp(name, "v") == 0) {
+      /* OpenGL ES 3.0 and OpenGL 4.2 require that the "[0]" be appended to
+       * the name.  Earlier versions of the spec are ambiguous.  Accept either
+       * name.
+       */
+      if (strcmp(name, "v") == 0 || strcmp(name, "v[0]") == 0) {
          expectedType = GL_FLOAT_VEC4_ARB;
          expectedSize = 3;
       }
