@@ -66,8 +66,8 @@ PIGLIT_GL_TEST_CONFIG_END
 
 const char *source =
 	"#extension GL_ARB_uniform_buffer_object : enable\n"
-	"uniform a { float a; };\n"
-	"uniform b { float b; };\n"
+	"uniform A { float a; };\n"
+	"uniform B { float b; };\n"
 	"void main() {\n"
 	"	gl_FragColor = vec4(a);\n"
 	"}\n";
