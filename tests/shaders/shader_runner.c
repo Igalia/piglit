@@ -911,6 +911,8 @@ parse_required_versions(struct requirement_parse_results *results,
 			line++;
 	}
 
+	free(text);
+
 	if (results->found_glsl && results->glsl_version.es && !results->found_gl) {
 		printf("%s", "The test specifies a requirement for GLSL ES, "
 		       "but specifies no GL requirement\n.");
