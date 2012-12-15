@@ -119,8 +119,7 @@ piglit_init(int argc, char **argv)
 
 	for (i = 0; i < 3; i++) {
 		printf("%s: index %d\n", uniform_names[i], indices[i]);
-		if (indices[i] < 0 || indices[i] > 2 ||
-		    found_index[indices[i]]) {
+		if (indices[i] > 2 || found_index[indices[i]]) {
 			printf("Expected consecutive numbers starting from 0\n");
 			pass = false;
 		}
