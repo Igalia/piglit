@@ -213,7 +213,7 @@ static GLboolean test(unsigned vsbitmask, unsigned fsbitmask, int line)
     }
     assert(glGetError() == 0);
 
-    for (i = 0; i <= ATTRIBS; i++) {
+    for (i = 0; i < ATTRIBS; i++) {
         if (((1 << i) & vsbitmask) && ((1 << i) & fsbitmask)) {
             pass = piglit_probe_pixel_rgb(7 + (i*(BOX_SIZE+5)), 7 + height, &input[i*4]) && pass;
         }
