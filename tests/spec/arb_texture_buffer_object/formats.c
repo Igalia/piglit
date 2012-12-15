@@ -35,6 +35,7 @@ enum channels {
 	I,
 	R,
 	RG,
+	RGB,
 	RGBA,
 };
 
@@ -127,11 +128,15 @@ static const struct format {
 	{ GL_RG8UI,                      GL_UNSIGNED_BYTE,  2,        false,    RG },
 	{ GL_RG16UI,                     GL_UNSIGNED_SHORT, 2,        false,    RG },
 	{ GL_RG32UI,                     GL_UNSIGNED_INT,   2,        false,    RG },
+
+	{ GL_RGB32F,                     GL_FLOAT,          3,        false,    RGB },
+	{ GL_RGB32I,                     GL_INT,            3,        false,    RGB },
+	{ GL_RGB32UI,                    GL_UNSIGNED_INT,   3,        false,    RGB },
 };
 
 bool test_vs;
 bool test_arb;
-
+bool test_rgb32;
 struct program {
 	GLuint prog;
 	int pos_location;
@@ -216,7 +221,12 @@ get_expected_f(const struct format *format, int sample, float *expected)
 		expected[2] = chans[2];
 		expected[3] = chans[3];
 		break;
-
+	case RGB:
+		expected[0] = chans[0];
+		expected[1] = chans[1];
+		expected[2] = chans[2];
+		expected[3] = 1.0;
+		break;
 	case RG:
 		expected[0] = chans[0];
 		expected[1] = chans[1];
@@ -304,7 +314,12 @@ get_expected_i(const struct format *format, int sample, uint32_t *expected)
 		expected[2] = chans[2];
 		expected[3] = chans[3];
 		break;
-
+	case RGB:
+		expected[0] = chans[0];
+		expected[1] = chans[1];
+		expected[2] = chans[2];
+		expected[3] = 1.0;
+		break;
 	case RG:
 		expected[0] = chans[0];
 		expected[1] = chans[1];
@@ -362,6 +377,7 @@ test_format(int format_index)
 		       format->channels == L ||
 		       format->channels == LA ||
 		       format->channels == A);
+	bool is_rgb32 = (format->channels == RGB);
 	bool pass = true;
 	int data_components, num_samples;
 	int i;
@@ -388,6 +404,9 @@ test_format(int format_index)
 	glUseProgram(prog->prog);
 
 	if (test_arb != is_arb)
+		return PIGLIT_SKIP;
+
+	if (is_rgb32 && !test_rgb32)
 		return PIGLIT_SKIP;
 
 	/* These didn't exist in the extension before being promoted to
@@ -685,6 +704,10 @@ piglit_init(int argc, char **argv)
 	} else {
 		if (piglit_get_gl_version() < 31)
 			piglit_require_extension("GL_ARB_texture_buffer_object");
+
+		if (piglit_is_extension_supported("GL_ARB_texture_buffer_object_rgb32"))
+			test_rgb32 = true;
+
 	}
 
 	init_programs();
