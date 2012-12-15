@@ -48,7 +48,8 @@ public:
    static const uint32_t rand_max = 0xFFFFFFFF;
 
 public:
-   Mersenne()
+   Mersenne() :
+      mSeed(0), mIndex(0), mState()
    {
    }
 
