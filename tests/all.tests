@@ -1925,6 +1925,12 @@ for mode in ['discard', 'buffer', 'prims_generated', 'prims_written']:
         ext_transform_feedback[test_name] = concurrent_test(
                 'ext_transform_feedback-{0}'.format(test_name))
 
+for test_case in ['base-shrink', 'base-grow', 'offset-shrink', 'offset-grow',
+                  'range-shrink', 'range-grow']:
+        test_name = 'change-size {0}'.format(test_case)
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
+
 arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
