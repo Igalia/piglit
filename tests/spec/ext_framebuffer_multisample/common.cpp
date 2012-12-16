@@ -1342,7 +1342,12 @@ Test::Test(TestPattern *pattern, ManifestProgram *manifest_program,
 	  manifest_program(manifest_program),
 	  test_resolve(test_resolve),
 	  blit_type(blit_type),
-	  srgb(srgb)
+	  num_samples(0),
+	  pattern_width(0),
+	  pattern_height(0),
+	  supersample_factor(0),
+	  srgb(srgb),
+	  downsample_prog()
 {
 }
 
