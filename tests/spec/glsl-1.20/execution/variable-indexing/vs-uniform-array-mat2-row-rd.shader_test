@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform int row;
 uniform float expect;
 uniform mat2x2[3] m = mat2x2[3](
@@ -22,7 +21,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform int row;
 uniform float expect;
 uniform mat2x2[3] m = mat2x2[3](

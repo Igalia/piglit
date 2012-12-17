@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform int index;
 uniform int row;
 uniform float expect;
@@ -17,7 +16,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform int index;
 uniform int row;
 uniform float expect;

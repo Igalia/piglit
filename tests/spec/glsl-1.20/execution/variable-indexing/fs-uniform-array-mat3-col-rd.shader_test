@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform int col;
 uniform vec3 expect;
 uniform mat3x3[3] m = mat3x3[3](
@@ -20,7 +19,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform int col;
 uniform vec3 expect;
 uniform mat3x3[3] m = mat3x3[3](

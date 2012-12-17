@@ -5,7 +5,6 @@
 GLSL >= 1.10
 
 [vertex shader]
-#version 110
 uniform int index;
 uniform int col;
 uniform vec3 expect;
@@ -17,7 +16,6 @@ void main()
 }
 
 [fragment shader]
-#version 110
 uniform int index;
 uniform int col;
 uniform vec3 expect;

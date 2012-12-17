@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform vec4 expect;
 varying mat4x4[3] m;
 varying vec4 color;
@@ -30,7 +29,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform vec4 expect;
 varying mat4x4[3] m;
 varying vec4 color;

@@ -29,7 +29,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform mat2x2 src_matrix;
 uniform vec2 v;
 uniform vec2 expect;

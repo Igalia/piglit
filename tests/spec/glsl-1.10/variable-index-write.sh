@@ -177,7 +177,6 @@ function emit_fs
     fi
 
     echo "[fragment shader]"
-    echo "#version ${version/./}"
 
     emit_globals $*
 
@@ -330,7 +329,6 @@ function emit_fs_wr_test
     echo
 
     echo "[vertex shader]"
-    echo "#version ${version/./}"
     echo "void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }"
     echo
 
@@ -353,7 +351,6 @@ function emit_vs_wr_test
     echo
 
     echo "[vertex shader]"
-    echo "#version ${version/./}"
     emit_globals $*
 
     echo "void main()"
@@ -374,7 +371,6 @@ function emit_vs_wr_test
 
     if [ "x$mode" != "xvarying" ];then
 	echo "[fragment shader]"
-	echo "#version ${version/./}"
 	echo "void main() { gl_FragColor = gl_Color; }"
 	echo
     else

@@ -34,7 +34,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
 uniform mat4x4 src_matrix;
 uniform vec4 v;
 uniform vec4 expect;

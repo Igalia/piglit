@@ -164,7 +164,6 @@ function emit_vs
     fi
 
     echo "[vertex shader]"
-    echo "#version ${version/./}"
     emit_globals $*
 
     echo "void main()"
@@ -218,7 +217,6 @@ emit_fs()
     do_compare=$7
 
     echo "[fragment shader]"
-    echo "#version ${version/./}"
     emit_globals $*
 
     echo "void main()"

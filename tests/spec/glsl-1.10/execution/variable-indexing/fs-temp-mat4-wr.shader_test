@@ -5,11 +5,9 @@
 GLSL >= 1.10
 
 [vertex shader]
-#version 110
 void main() { gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; }
 
 [fragment shader]
-#version 110
 uniform mat4 src_matrix;
 uniform vec4 v;
 uniform vec4 expect;
