@@ -392,6 +392,7 @@ piglit_init(int argc, char **argv)
 			num_varyings, varyings);
 	prog = piglit_link_simple_program(vs, fs);
 	i_location = glGetUniformLocation(prog, "i");
+	free(varyings);
 }
 
 enum piglit_result
