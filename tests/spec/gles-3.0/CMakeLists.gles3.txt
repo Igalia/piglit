@@ -2,7 +2,7 @@ link_libraries(
 	piglitutil_${piglit_target_api}
 	)
 
-piglit_add_executable(gles-3.0-minmax minmax.c)
+piglit_add_executable(minmax_${piglit_target_api} minmax.c)
 piglit_add_executable(oes_compressed_etc2_texture-miptree oes_compressed_etc2_texture-miptree.c)
 
 # vim: ft=cmake:
