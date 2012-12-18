@@ -59,7 +59,9 @@ class VertexProgramTest: public MultiTest
 public:
 	VertexProgramTest(const char* testName, const char* filter,
 			  const char *extensions, const char* description):
-		MultiTest(testName, filter, extensions, description)
+		MultiTest(testName, filter, extensions, description),
+		tolerance(),
+		looseTolerance()
 	{
 	}
 
