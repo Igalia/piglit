@@ -492,7 +492,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	fbo_formats_init(argc, argv, 0);
+	fbo_formats_init(argc, argv, !piglit_automatic);
 	(void) fbo_formats_display;
 
 	glGenTextures(1, &t);
