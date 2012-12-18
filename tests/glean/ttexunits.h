@@ -42,7 +42,11 @@ class TexUnitsTest: public MultiTest
 public:
 	TexUnitsTest(const char* testName, const char* filter,
                  const char *extensions, const char* description):
-		MultiTest(testName, filter, extensions, description)
+		MultiTest(testName, filter, extensions, description),
+		maxCombinedUnits(0),
+		maxImageUnits(0),
+		maxCoordUnits(0),
+		maxUnits(0)
 	{
 	}
 
