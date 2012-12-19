@@ -1,0 +1,60 @@
+# Test that varying packing can properly pack floats, ints, and uints
+# together into the same varying slot.
+#
+# In order to force this to happen, we use a shader whose "varyings"
+# are a float, a uint, and an array of gl_MaxVaryingComponents-2 ints.
+# All "varyings" use the "flat" interpolation type, since we don't
+# intend to test the packing of interpolation types in this test.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+uniform float f_ref;
+uniform uint u_ref;
+uniform int i_ref;
+flat out float f;
+flat out uint u;
+flat out int ia[gl_MaxVaryingComponents - 2];
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	f = f_ref;
+	u = u_ref;
+	for (int i = 0; i < gl_MaxVaryingComponents - 2; i++)
+		ia[i] = i_ref + i;
+}
+
+[fragment shader]
+#version 130
+uniform float f_ref;
+uniform uint u_ref;
+uniform int i_ref;
+flat in float f;
+flat in uint u;
+flat in int ia[gl_MaxVaryingComponents - 2];
+
+void main()
+{
+	bool failed = false;
+	if (distance(f, f_ref) > 0.00001)
+		failed = true;
+	if (u != u_ref)
+		failed = true;
+	for (int i = 0; i < gl_MaxVaryingComponents - 2; i++)
+		if (ia[i] != i_ref + i)
+			failed = true;
+	if (failed)
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+uniform int i_ref -1000
+uniform uint u_ref 0xfedcba98
+uniform float f_ref 3.1415926
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
