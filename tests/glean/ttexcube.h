@@ -43,7 +43,8 @@ class TexCubeTest: public BasicTest {
 	TexCubeTest(const char* testName, const char* filter,
 		       const char* description):
 	    BasicTest(testName, filter, "GL_ARB_texture_cube_map",
-		      description) {
+		      description),
+	    mTolerance() {
 	}
 
 	virtual void runOne(BasicResult& r, Window& w);
