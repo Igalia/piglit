@@ -273,12 +273,13 @@ try(const GLenum *targets, unsigned num_targets,
 	for (i = 0; i < num_targets; i++) {
 		for (j = 0; j < num_formats; j++) {
 			for (k = 0; k < num_pnames; k++) {
+				bool this_test;
 				glGetInternalformativ(targets[i],
 						      formats[j],
 						      pnames[k],
 						      ARRAY_SIZE(params),
 						      params);
-				bool this_test =
+				this_test =
 					piglit_check_gl_error(expected_error);
 
 				if (this_test)
