@@ -199,40 +199,40 @@ piglit_display(void)
 
 	/* Apply each face of cubemap as a texture to a polygon */
 	glUniform1i(loc1, 0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[0]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[0]); /* +X */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 
 	glPushMatrix();
 	glTranslatef(75.0, 0.0, 0.0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[3]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[2]); /* +Y */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 
 	glTranslatef(75.0, 0.0, 0.0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[1]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[4]); /* +Z */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(0.0, 75.0, 0.0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[4]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[1]); /* -X */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 
 	glTranslatef(75.0, 0.0, 0.0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[2]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[3]); /* -Y */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 
 	glTranslatef(75.0, 0.0, 0.0);
-	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[5]);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[5]); /* -Z */
 	glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, elements);
 	glPopMatrix();
 
 	/* Test the pixel color of polygons against the expected output */
 	pass = piglit_probe_pixel_rgb(110, 135, ColorPosX);
-	pass = pass && piglit_probe_pixel_rgb(185, 135, ColorNegX);
-	pass = pass && piglit_probe_pixel_rgb(260, 135, ColorPosY);
-	pass = pass && piglit_probe_pixel_rgb(110, 210, ColorNegY);
-	pass = pass && piglit_probe_pixel_rgb(185, 210, ColorPosZ);
-	pass = pass && piglit_probe_pixel_rgb(260, 210, ColorNegZ);
+	pass = piglit_probe_pixel_rgb(185, 135, ColorPosY) && pass;
+	pass = piglit_probe_pixel_rgb(260, 135, ColorPosZ) && pass;
+	pass = piglit_probe_pixel_rgb(110, 210, ColorNegX) && pass;
+	pass = piglit_probe_pixel_rgb(185, 210, ColorNegY) && pass;
+	pass = piglit_probe_pixel_rgb(260, 210, ColorNegZ) && pass;
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_present_results();
