@@ -1934,6 +1934,7 @@ for test_case in ['base-shrink', 'base-grow', 'offset-shrink', 'offset-grow',
 arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
+arb_transform_feedback2['istranformfeedback'] = PlainExecTest(['arb_transform_feedback2-istransformfeedback', '-auto'])
 
 arb_transform_feedback_instanced = Group()
 spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
