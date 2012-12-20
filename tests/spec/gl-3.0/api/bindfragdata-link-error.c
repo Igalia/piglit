@@ -130,7 +130,7 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	if (piglit_link_check_status(prog)) {
+	if (piglit_link_check_status_quiet(prog)) {
 		fprintf(stderr,
 			"Linking was successful when it should have failed.\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -161,7 +161,7 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	if (piglit_link_check_status(prog)) {
+	if (piglit_link_check_status_quiet(prog)) {
 		fprintf(stderr,
 			"Linking was successful when it should have failed.\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -180,7 +180,7 @@ void piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	if (piglit_link_check_status(prog)) {
+	if (piglit_link_check_status_quiet(prog)) {
 		fprintf(stderr,
 			"Linking was successful when it should have failed.\n");
 		piglit_report_result(PIGLIT_FAIL);
