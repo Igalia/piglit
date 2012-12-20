@@ -44,6 +44,8 @@
  *      GenVertexArrays with the command
  *
  *         void BindVertexArray(uint array);"
+ *
+ * The APPLE_vertex_array_object spec contains similar wording.
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -66,9 +68,18 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint id;
+	GLboolean apple;
+
+	if (argc == 2 && strcmp(argv[1], "apple") == 0) {
+		printf("apple\n");
+		apple = GL_TRUE;
+	}
 
 	piglit_require_gl_version(15);
-	piglit_require_extension("GL_ARB_vertex_array_object");
+	if (apple)
+		piglit_require_extension("GL_APPLE_vertex_array_object");
+	else
+		piglit_require_extension("GL_ARB_vertex_array_object");
 
 	glGenVertexArrays(1, &id);
 
@@ -77,7 +88,10 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	glBindVertexArray(id);
+	if (apple)
+		glBindVertexArrayAPPLE(id);
+	else
+		glBindVertexArray(id);
 
 	if (!glIsVertexArray(id)) {
 		fprintf(stderr, "id not recognized correctly as a vertex array object.\n");

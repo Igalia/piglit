@@ -2636,6 +2636,10 @@ arb_vertex_array_object = Group()
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
 arb_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array_object_isvertexarray')
 
+apple_vertex_array_object = Group()
+spec['APPLE_vertex_array_object'] = apple_vertex_array_object
+apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array_object_isvertexarray apple')
+
 oes_draw_texture = Group()
 spec['OES_draw_texture'] = oes_draw_texture
 oes_draw_texture['oes_draw_texture'] = concurrent_test('oes_draw_texture')
