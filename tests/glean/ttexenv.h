@@ -42,7 +42,8 @@ class TexEnvTest: public BasicTest {
     public:
 	TexEnvTest(const char* testName, const char* filter,
 		       const char* description):
-	    BasicTest(testName, filter, description) {
+	    BasicTest(testName, filter, description),
+	    mTolerance() {
 	}
 
 	virtual void runOne(BasicResult& r, Window& w);
