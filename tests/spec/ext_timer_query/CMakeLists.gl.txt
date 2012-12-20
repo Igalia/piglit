@@ -12,3 +12,5 @@ link_libraries (
 IF (UNIX)
    piglit_add_executable (ext_timer_query-time-elapsed time-elapsed.c)
 ENDIF (UNIX)
+
+ piglit_add_executable (ext_timer_query-lifetime lifetime.c)
