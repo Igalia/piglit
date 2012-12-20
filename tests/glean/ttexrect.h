@@ -43,7 +43,8 @@ class TexRectTest: public BasicTest {
     public:
 	TexRectTest(const char* testName, const char* filter,
 		    const char *prereqs, const char* description):
-	    BasicTest(testName, filter, prereqs, description) {
+	    BasicTest(testName, filter, prereqs, description),
+	    mTolerance() {
 	}
 
 	virtual void runOne(BasicResult& r, Window& w);
