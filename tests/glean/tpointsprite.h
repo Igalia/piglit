@@ -45,7 +45,10 @@ class PointSpriteTest: public MultiTest
     public:
 	PointSpriteTest(const char* testName, const char* filter,
 		 const char *extensions, const char* description):
-		 MultiTest(testName, filter, extensions, description){
+		 MultiTest(testName, filter, extensions, description),
+		 texImages(),
+		 mTolerance(),
+		 have_2_0(false) {
 	}
 
 	virtual void runOne(MultiTestResult &r, Window &w);
