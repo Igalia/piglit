@@ -543,6 +543,8 @@ add_plain_test(gl11, 'texredefine')
 add_plain_test(gl11, 'texsubimage')
 add_plain_test(gl11, 'texture-al')
 add_concurrent_test(gl11, 'triangle-guardband-viewport')
+add_concurrent_test(gl11, 'getteximage-targets 1D')
+add_concurrent_test(gl11, 'getteximage-targets 2D')
 
 gl10 = Group()
 spec['!OpenGL 1.0'] = gl10
@@ -566,6 +568,7 @@ add_plain_test(gl12, 'tex3d')
 add_plain_test(gl12, 'tex3d-maxsize')
 add_plain_test(gl12, 'teximage-errors')
 add_plain_test(gl12, 'texture-packed-formats')
+add_concurrent_test(gl12, 'getteximage-targets 3D')
 
 gl13 = Group()
 spec['!OpenGL 1.3'] = gl13
@@ -1107,6 +1110,7 @@ add_shader_test_dir(arb_texture_rectangle,
 arb_texture_rectangle['copyteximage RECT'] = PlainExecTest(['copyteximage', '-auto', 'RECT'])
 add_concurrent_test(arb_texture_rectangle, '1-1-linear-texture')
 add_plain_test(arb_texture_rectangle, 'texrect-many')
+add_concurrent_test(arb_texture_rectangle, 'getteximage-targets RECT')
 
 arb_texture_storage = Group()
 spec['ARB_texture_storage'] = arb_texture_storage
@@ -1621,6 +1625,8 @@ ext_texture_array['copyteximage 2D_ARRAY'] = PlainExecTest(['copyteximage', '-au
 add_plain_test(ext_texture_array, 'fbo-array')
 add_plain_test(ext_texture_array, 'fbo-depth-array')
 add_plain_test(ext_texture_array, 'array-texture')
+add_concurrent_test(ext_texture_array, 'getteximage-targets 1D_ARRAY')
+add_concurrent_test(ext_texture_array, 'getteximage-targets 2D_ARRAY')
 
 arb_texture_cube_map = Group()
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
@@ -1631,6 +1637,7 @@ arb_texture_cube_map['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'
 add_plain_test(arb_texture_cube_map, 'cubemap-shader')
 arb_texture_cube_map['cubemap-shader lod'] = PlainExecTest(['cubemap-shader', '-auto', 'lod'])
 arb_texture_cube_map['cubemap-shader bias'] = PlainExecTest(['cubemap-shader', '-auto', 'bias'])
+add_concurrent_test(arb_texture_cube_map, 'getteximage-targets CUBE')
 
 arb_texture_cube_map_array = Group()
 spec['ARB_texture_cube_map_array'] = arb_texture_cube_map_array
@@ -1640,6 +1647,7 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap-lod')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubemap-array')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
+add_concurrent_test(arb_texture_cube_map_array, 'getteximage-targets CUBE_ARRAY')
 textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray', 'samplerCubeArrayShadow' ];
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
@@ -1691,6 +1699,10 @@ add_plain_test(ext_texture_compression_s3tc, 'gen-compressed-teximage')
 add_concurrent_test(ext_texture_compression_s3tc, 's3tc-errors')
 add_plain_test(ext_texture_compression_s3tc, 's3tc-teximage')
 add_plain_test(ext_texture_compression_s3tc, 's3tc-texsubimage')
+add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC 2D')
+add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC 2D_ARRAY')
+add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC CUBE')
+add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC CUBE_ARRAY')
 
 ati_texture_compression_3dc = Group()
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
