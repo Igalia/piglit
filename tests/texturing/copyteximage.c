@@ -87,6 +87,9 @@ static const struct {
 	{ GL_DEPTH_COMPONENT16, fcolor[7] },
 	{ GL_DEPTH_COMPONENT24, fcolor[7] },
 	{ GL_DEPTH_COMPONENT32F, fcolor[7] },
+
+	{ GL_DEPTH24_STENCIL8,	fcolor[7] },
+	{ GL_DEPTH32F_STENCIL8, fcolor[7] },
 };
 
 static const struct {
@@ -112,7 +115,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = IMAGE_SIZE*(ARRAY_SIZE(test_vectors)+1);
 	config.window_height = IMAGE_SIZE;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_ALPHA;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA |
+			       PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL |
+			       PIGLIT_GL_VISUAL_ALPHA;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -304,6 +309,8 @@ is_depth_format(GLenum format)
 	case GL_DEPTH_COMPONENT16:
 	case GL_DEPTH_COMPONENT24:
 	case GL_DEPTH_COMPONENT32F:
+	case GL_DEPTH32F_STENCIL8:
+	case GL_DEPTH24_STENCIL8:
 		return true;
 	default:
 		return false;
@@ -325,7 +332,10 @@ supported_format(GLenum format)
 	case GL_COMPRESSED_RED:
 	case GL_COMPRESSED_RG:
 		return piglit_is_extension_supported("GL_ARB_texture_rg");
+	case GL_DEPTH24_STENCIL8:
+		return piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
 	case GL_DEPTH_COMPONENT32F:
+	case GL_DEPTH32F_STENCIL8:
 		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
 	default:
 		return true;
@@ -352,10 +362,25 @@ supported_target(unsigned i)
 
 static GLenum get_format(GLenum format)
 {
-	if (is_depth_format(format))
+	if (format == GL_DEPTH32F_STENCIL8 ||
+	    format == GL_DEPTH24_STENCIL8)
+		return GL_DEPTH_STENCIL;
+	else if (is_depth_format(format))
 		return GL_DEPTH_COMPONENT;
 	else
 		return GL_RGBA;
+}
+
+static GLenum get_type(GLenum format)
+{
+	switch (format) {
+	case GL_DEPTH24_STENCIL8:
+		return GL_UNSIGNED_INT_24_8;
+	case GL_DEPTH32F_STENCIL8:
+		return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+	default:
+		return GL_FLOAT;
+	}
 }
 
 static void draw_pixels(float scale)
@@ -478,7 +503,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 
 	case GL_TEXTURE_3D:
 		glTexImage3D(GL_TEXTURE_3D, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
-			     0, GL_RGBA, GL_FLOAT, NULL);
+			     0, GL_RGBA, get_type(format), NULL);
 
 		for (k = 0; k < 4; k++) {
 			draw(format, 1.0 - k*0.2);
@@ -521,7 +546,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 
 	case GL_TEXTURE_1D_ARRAY:
 		glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, format, IMAGE_SIZE, 16,
-			     0, get_format(format), GL_FLOAT, NULL);
+			     0, get_format(format), get_type(format), NULL);
 
 		for (k = 0; k < 4; k++) {
 			draw(format, 1.0 - 0.2*k);
@@ -543,7 +568,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 
 	case GL_TEXTURE_2D_ARRAY:
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, format, IMAGE_SIZE, IMAGE_SIZE, 4,
-			     0, get_format(format), GL_FLOAT, NULL);
+			     0, get_format(format), get_type(format), NULL);
 
 		for (k = 0; k < 4; k++) {
 			draw(format, 1.0 - k*0.2);
