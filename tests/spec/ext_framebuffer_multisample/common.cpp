@@ -162,17 +162,7 @@ Fbo::setup(const FboConfig &new_config)
 {
 	if (!try_setup(new_config)) {
 		printf("Framebuffer not complete\n");
-		if (!config.combine_depth_stencil) {
-			/* Some implementations do not support
-			 * separate depth and stencil attachments, so
-			 * don't consider it an error if we fail to
-			 * make a complete framebuffer using separate
-			 * depth and stencil attachments.
-			 */
-			piglit_report_result(PIGLIT_SKIP);
-		} else {
-			piglit_report_result(PIGLIT_FAIL);
-		}
+		piglit_report_result(PIGLIT_SKIP);
 	}
 }
 
