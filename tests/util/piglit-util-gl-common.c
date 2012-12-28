@@ -527,3 +527,37 @@ piglit_compressed_pixel_offset(GLenum format, unsigned width,
 
 	return offset;
 }
+
+
+#ifndef PIGLIT_USE_OPENGL_ES1
+/**
+ * Convenience function to configure a shader uniform variable as an
+ * arbitrary orthogonal projection matrix.
+ */
+void
+piglit_gen_ortho_uniform(GLint location, double l, double r, double b,
+			 double t, double n, double f)
+{
+	float values[4][4] = {
+		{ 2/(r-l),    0,        0,    -(r+l)/(r-l) },
+		{    0,    2/(t-b),     0,    -(t+b)/(t-b) },
+		{    0,       0,    -2/(f-n), -(f+n)/(f-n) },
+		{    0,       0,        0,          1      }
+	};
+	glUniformMatrix4fv(location, 1, GL_TRUE, values);
+}
+
+
+/**
+ * Convenience function to configure a shader uniform variable as a
+ * projection matrix for window coordinates.
+ */
+void
+piglit_ortho_uniform(GLint location, int w, int h)
+{
+        /* Set up projection matrix so we can just draw using window
+         * coordinates.
+         */
+	piglit_gen_ortho_uniform(location, 0, w, 0, h, -1, 1);
+}
+#endif

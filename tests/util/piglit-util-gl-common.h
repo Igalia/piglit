@@ -159,6 +159,10 @@ void piglit_gen_ortho_projection(double left, double right, double bottom,
 void piglit_ortho_projection(int w, int h, GLboolean push);
 void piglit_frustum_projection(GLboolean push, double l, double r, double b,
 			       double t, double n, double f);
+void piglit_gen_ortho_uniform(GLint location, double left, double right,
+			      double bottom, double top, double near_val,
+			      double far_val);
+void piglit_ortho_uniform(GLint location, int w, int h);
 
 GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
     unsigned width, unsigned height,
