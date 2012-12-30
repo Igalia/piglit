@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
+
+[fragment shader]
+uniform vec4 args1, args2, args3;
+
+void main()
+{
+	gl_FragColor = mix(args1, args2, args3);
+}
+
+[test]
+clear color 0.0 1.0 0.0 0.0
+clear
+ortho
+uniform vec4 args1 1.0 0.0 2.0  0.0
+uniform vec4 args2 0.0 1.0 0.0  2.0
+uniform vec4 args3 0.5 0.5 0.75 0.25
+draw rect 10 10 10 10
+probe rgba 15 15 0.5 0.5 0.5 0.5
