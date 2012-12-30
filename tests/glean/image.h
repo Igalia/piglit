@@ -95,7 +95,7 @@ class Image {
 	// descriptive information that might arise when an Image is reused,
 	// and might permit use of template functions instead of lots of
 	// switches.  Probably not; it would make dynamic type assignment
-	// (such as reading a TIFF file) quite awkward.
+	// quite awkward.
 
     public:
 
@@ -113,8 +113,6 @@ class Image {
 	struct CantOpen: public Error {		// Can't open file.
 		const char* filename;
 		CantOpen(const char* p) {filename = p;}
-	};
-	struct UnsupportedTIFF: public Error {	// TIFF we can't handle.
 	};
 	struct RefImageTooLarge: public Error {	// Can't register ref image.
 	};
@@ -227,18 +225,6 @@ class Image {
 
         // test if images are identical
         bool operator==(const Image &ref) const;
-
-	// Image arithmetic
-	// XXX type and format conversions, with appropriate scaling.
-	// XXX image difference
-	// XXX minmax, histogram, contrast stretch?
-
-	// TIFF I/O utilities:
-
-	void readTIFF(const char* filename);
-	inline void readTIFF(const std::string& s)  { readTIFF(s.c_str()); }
-	void writeTIFF(const char* filename);
-	inline void writeTIFF(const std::string& s)  { writeTIFF(s.c_str()); }
 
 	// GL operation utilities:
 

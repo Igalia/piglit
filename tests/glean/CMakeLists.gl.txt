@@ -11,7 +11,6 @@ ENDIF ()
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
-	${TIFF_INCLUDE_DIR}
 	${piglit_SOURCE_DIR}/tests/util
 )
 
@@ -56,7 +55,6 @@ piglit_add_executable (glean
 	tpointsprite.cpp
 	treadpix.cpp
 	treadpixperf.cpp
-	trgbtris.cpp
 	tscissor.cpp
 	tshaderapi.cpp
 	tstencil2.cpp
@@ -78,10 +76,8 @@ piglit_add_executable (glean
 	gl.cpp
 	image_misc.cpp
 	pack.cpp
-	rdtiff.cpp
 	reg.cpp
 	unpack.cpp
-	wrtiff.cpp
 	basic.cpp
 	lex.cpp
 	timer.cpp
@@ -93,6 +89,5 @@ target_link_libraries (glean
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
 	${X11_X11_LIB}
-	${TIFF_LIBRARY}
 	${CARBON_LIBRARY}
 )

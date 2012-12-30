@@ -16,9 +16,7 @@ add_subdirectory (shaders)
 add_subdirectory (texturing)
 add_subdirectory (spec)
 
-if (TIFF_FOUND)
-	add_subdirectory (glean)
-endif (TIFF_FOUND)
+add_subdirectory (glean)
 
 IF(OPENGL_egl_LIBRARY)
 	add_subdirectory (egl)

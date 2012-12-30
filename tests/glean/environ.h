@@ -87,8 +87,7 @@ class Environment {
 
 	string imageFileName(string& dbName, string& testName, int n);
 				// Return name of image file number ``n''
-				// associated with the given test.  Suitable
-				// for use with Image::readTIFF(), etc.
+				// associated with the given test.
 				// XXX Doesn't create results directory,
 				// so resultFileName() must be called before
 				// using this.

@@ -10,8 +10,6 @@ INCLUDE (FindPkgConfig)
 
 project (piglit)
 
-find_package(TIFF)
-find_package(PNG REQUIRED)
 find_package(X11)
 
 
@@ -50,7 +48,7 @@ else()
 	find_package(GLUT REQUIRED)
 
 	# The 'REQUIRED' above correctly produces an error for
-	# OpenGL and PNG, but there's a bug involving FindGLUT.cmake
+	# OpenGL, but there's a bug involving FindGLUT.cmake
 	# that fails to produce the error as of CMake 2.8.5.
 	#
 	# Instead, CMake keeps going and eventually spams

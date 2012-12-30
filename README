@@ -34,7 +34,6 @@ First of all, you need to make sure that the following are installed:
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
-  - libpng, libtiff and related development packages (i.e. headers)
   - waffle (http://people.freedesktop.org/~chadversary/waffle)
 
 Now configure the build system:
@@ -62,7 +61,7 @@ invoke cmake with option "-DCMAKE_SYSTEM_PROCESSOR=i386".
 ----------
 
 Install development packages.
-  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev libtiff4-dev zlib1g-dev libpng12-dev python-numpy freeglut3-dev x11proto-gl-dev libxrender-dev
+  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy freeglut3-dev x11proto-gl-dev libxrender-dev
 
 Install additional components for which Ubuntu packages do not yet exist:
   - waffle (http://people.freedesktop.org/~chadversary/waffle)
@@ -87,19 +86,8 @@ Configure and build.
   $ make
 
 glean
-In order to build glean, TIFF is required but not included as part of 
-Xcode. TIFF must be obtained elsewhere and one solution is to get TIFF 
-from MacPorts.
 
-Install MacPorts.
-http://www.macports.org/install.php
-
-Install TIFF through MacPorts. The '+universal' option is needed as 
-glean cannot be built as x86_64, only as i386.
-  $ sudo port selfupdate
-  $ sudo port install tiff +universal
-
-glean will also not build with MacOSX10.7.sdk. If you are trying to 
+glean will not build with MacOSX10.7.sdk. If you are trying to 
 build glean on Mac OS 10.7 (Lion), you will have to use MacOSX10.6.sdk.
   $ ccmake .
 Set 'CMAKE_OSX_SYSROOT' to '/Developer/SDKs/MacOSX10.6.sdk'. Configure. 
@@ -116,10 +104,6 @@ Install development packages.
   - make
   - opengl
   - libGL-devel
-  - libpng12-devel
-  - libpng14-devel
-  - zlib-devel
-  - libtiff-devel
   - python
   - python-numpy
   - libglut-devel
@@ -146,15 +130,6 @@ Download and install 'Windows' platform.
 Install Microsoft Visual Studio.
 Install 'Visual C++' feature.
 
-Install TIFF for Windows.
-http://gnuwin32.sourceforge.net/packages/tiff.htm
-
-Install Zlib for Windows.
-http://gnuwin32.sourceforge.net/packages/zlib.htm
-
-Install LibPng for Windows.
-http://gnuwin32.sourceforge.net/packages/libpng.htm
-
 Download OpenGL Core API and Extension Header Files.
 http://www.opengl.org/registry/#headers
 Copy header files to MSVC.
@@ -173,12 +148,6 @@ Configure
   - NMake Makefiles
   - Use default native compilers
 Set these variables in the Advanced view.
-  - TIFF_INCLUDE_DIR
-  - TIFF_LIBRARY
-  - ZLIB_INCLUDE_DIR
-  - ZLIB_LIBRARY
-  - PNG_PNG_INCLUDE_DIR
-  - PNG_LIBRARY
   - GLUT_INCLUDE_DIR
   - GLUT_glut_LIBRARY
 Configure
