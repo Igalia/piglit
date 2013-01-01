@@ -57,7 +57,11 @@ class GLSLTest: public MultiTest
 public:
 	GLSLTest(const char* testName, const char* filter,
                  const char *extensions, const char* description):
-		MultiTest(testName, filter, extensions, description)
+		MultiTest(testName, filter, extensions, description),
+		tolerance(),
+		looseTolerance(),
+		glsl_120(false),
+		glsl_130(false)
 	{
 		testOne = true;  // test with just one surface config
 	}
