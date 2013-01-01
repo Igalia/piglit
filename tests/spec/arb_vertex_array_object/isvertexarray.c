@@ -68,7 +68,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint id;
-	GLboolean apple;
+	GLboolean apple = GL_FALSE;
 
 	if (argc == 2 && strcmp(argv[1], "apple") == 0) {
 		printf("apple\n");
