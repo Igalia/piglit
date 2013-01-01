@@ -78,17 +78,6 @@ class Environment {
 	inline string resultFileName(string& testName) {
 		return resultFileName(options.db1Name, testName);
 	}
-
-	string imageFileName(string& dbName, string& testName, int n);
-				// Return name of image file number ``n''
-				// associated with the given test.
-				// XXX Doesn't create results directory,
-				// so resultFileName() must be called before
-				// using this.
-	inline string imageFileName(string& testName, int n) {
-		return imageFileName(options.db1Name, testName, n);
-	}
-
 }; // class Environment
 
 } // namespace GLEAN

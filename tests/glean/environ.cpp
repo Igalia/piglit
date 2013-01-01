@@ -126,19 +126,4 @@ Environment::resultFileName(string& dbName, string& testName) {
 	return fileName;
 } // Environment::resultFileName
 
-string
-Environment::imageFileName(string& dbName, string& testName, int n) {
-	char sn[4];
-	sn[3] = 0;
-	sn[2] = static_cast<char>('0' + n % 10);
-	sn[1] = static_cast<char>('0' + (n / 10) % 10);
-	sn[0] = static_cast<char>('0' + (n / 100) % 10);
-#   if defined(__UNIX__)
-	string fileName(dbName + '/' + testName + "/i" + sn + ".tif");
-#   elif defined(__MS__)
-	string fileName(dbName + '/' + testName + "/i" + sn + ".tif");
-#   endif
-	return fileName;
-} // Environment::imageFileName
-
 } // namespace GLEAN
