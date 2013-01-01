@@ -42,15 +42,18 @@ class PixelFormatsTest: public MultiTest
 {
 public:
 	PixelFormatsTest(const char* testName, const char* filter,
-					 const char *extensions, const char* description)
-		: MultiTest(testName, filter, extensions, description)
+					 const char *extensions, const char* description):
+		MultiTest(testName, filter, extensions, description),
+		alphaBits(0),
+		defaultAlpha(0),
+		haveHalfFloat(false),
+		haveABGR(false),
+		haveSRGB(false),
+		haveCombine(false),
+		haveRG(false),
+		haveSnorm(false),
+		haveTexSharedExp(false)
 	{
-		alphaBits = 0;
-		defaultAlpha = 0;
-		haveHalfFloat = false;
-		haveABGR = false;
-		haveSRGB = false;
-		haveCombine = false;
 	}
 
 	virtual void runOne(MultiTestResult &r, Window &w);
