@@ -47,7 +47,9 @@ class FBOTest: public MultiTest
 public:
 	FBOTest(const char* testName, const char* filter,
                  const char *extensions, const char* description):
-		MultiTest(testName, filter, extensions, description)
+		MultiTest(testName, filter, extensions, description),
+		haveARBfbo(false),
+		tolerance()
 	{
 	}
 
