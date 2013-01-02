@@ -44,7 +44,8 @@ class API2Test: public MultiTest
 public:
 	API2Test(const char* testName, const char* filter,
                  const char *extensions, const char* description):
-		MultiTest(testName, filter, extensions, description)
+		MultiTest(testName, filter, extensions, description),
+		tolerance()
 	{
 	}
 
