@@ -2704,6 +2704,7 @@ egl_khr_create_context['verify GL flavor'] = plain_test('egl-create-context-veri
 gles20 = Group()
 spec['!OpenGL ES 2.0'] = gles20
 add_concurrent_test(gles20, 'invalid-es3-queries_gles2')
+add_concurrent_test(gles20, 'minmax_gles2')
 
 gles30 = Group()
 spec['!OpenGL ES 3.0'] = gles30

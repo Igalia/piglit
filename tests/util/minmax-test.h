@@ -27,14 +27,17 @@ void piglit_test_min_int(GLenum token, GLint val);
 void piglit_test_max_int(GLenum token, GLint val);
 void piglit_test_min_uint(GLenum token, GLuint val);
 void piglit_test_max_uint(GLenum token, GLuint val);
-void piglit_test_min_int64(GLenum token, GLint64 min);
-void piglit_test_max_int64(GLenum token, GLint64 min);
-void piglit_test_min_uint64(GLenum token, GLuint64 min);
-void piglit_test_max_uint64(GLenum token, GLuint64 min);
 void piglit_test_min_float(GLenum token, GLfloat val);
 void piglit_test_max_float(GLenum token, GLfloat val);
 void piglit_test_range_float(GLenum token, GLfloat low, GLfloat high);
 void piglit_test_min_viewport_dimensions();
+
+#if !defined(PIGLIT_USE_OPENGL_ES2)
+void piglit_test_min_int64(GLenum token, GLint64 min);
+void piglit_test_max_int64(GLenum token, GLint64 min);
+void piglit_test_min_uint64(GLenum token, GLuint64 min);
+void piglit_test_max_uint64(GLenum token, GLuint64 min);
+#endif /* !PIGLIT_USE_OPENGL_ES2 */
 
 #ifdef PIGLIT_USE_OPENGL
 void piglit_test_oq_bits(void);
