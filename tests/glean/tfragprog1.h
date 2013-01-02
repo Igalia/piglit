@@ -66,8 +66,9 @@ class FragmentProgramTest: public MultiTest
 {
 public:
 	FragmentProgramTest(const char* testName, const char* filter,
-			    const char *extensions, const char* description)
-		: MultiTest(testName, filter, extensions, description)
+			    const char *extensions, const char* description):
+		MultiTest(testName, filter, extensions, description),
+		tolerance()
 	{
 	}
 
