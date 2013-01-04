@@ -836,7 +836,7 @@ import_glsl_parser_tests(spec['glsl-es-3.00'],
 add_shader_test_dir(spec['glsl-es-3.00'],
 		    os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
 		    recursive=True)
-
+add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_gles3')
 
 
 # Group AMD_conservative_depth

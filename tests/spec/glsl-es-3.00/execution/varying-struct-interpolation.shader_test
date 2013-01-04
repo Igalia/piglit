@@ -1,0 +1,86 @@
+# Test that varying structs work properly.
+#
+# From the GLSL ES 3.00 specification, section 4.3.4 ("Input Variables"):
+#
+#     Fragment inputs can only be signed and unsigned integers and
+#     integer vectors, float, floating-point vectors, matrices, or
+#     arrays or structures of these.
+#
+# And from section 4.3.6 ("Output Variables"):
+#
+#     Vertex output variables ... can only be float, floating-point
+#     vectors, matrices, signed or unsigned integers or integer
+#     vectors, or arrays or structures of any these.
+#
+# This tests that the elements of varying structs properly respect the
+# keywords "flat" and "smooth".
+#
+# Note: the keyword "noperspective" is not tested because it does not
+# exist in GLSL ES 3.00.
+
+[require]
+GL ES >= 3.0
+GLSL ES >= 3.00
+
+[vertex shader]
+#version 300 es
+
+in vec4 vertex;
+struct Foo
+{
+	vec4 a;
+};
+out Foo foo;
+flat out Foo foo_flat;
+smooth out Foo foo_smooth;
+out vec4 ref;
+flat out vec4 ref_flat;
+smooth out vec4 ref_smooth;
+
+void main()
+{
+	gl_Position = vertex;
+	foo.a = vertex;
+	foo_flat.a = vertex;
+	foo_smooth.a = vertex;
+	ref = vertex;
+	ref_flat = vertex;
+	ref_smooth = vertex;
+}
+
+[fragment shader]
+#version 300 es
+
+struct Foo
+{
+	vec4 a;
+};
+in Foo foo;
+flat in Foo foo_flat;
+smooth in Foo foo_smooth;
+in vec4 ref;
+flat in vec4 ref_flat;
+smooth in vec4 ref_smooth;
+out vec4 color;
+
+#define CHECK(value, expected) \
+	if (distance(value, expected) > 0.00001) \
+		failed = true
+
+void main()
+{
+	bool failed = false;
+
+	CHECK(foo.a, ref);
+	CHECK(foo_flat.a, ref_flat);
+	CHECK(foo_smooth.a, ref_smooth);
+
+	if (failed)
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,89 @@
+# Test that varying structs work properly.
+#
+# From the GLSL ES 3.00 specification, section 4.3.4 ("Input Variables"):
+#
+#     Fragment inputs can only be signed and unsigned integers and
+#     integer vectors, float, floating-point vectors, matrices, or
+#     arrays or structures of these.
+#
+# And from section 4.3.6 ("Output Variables"):
+#
+#     Vertex output variables ... can only be float, floating-point
+#     vectors, matrices, signed or unsigned integers or integer
+#     vectors, or arrays or structures of any these.
+#
+# This tests that varying structs work when copied from the return
+# value of a function.
+#
+# This case is important because in implementations that flatten
+# varying structs to their individual components, this use of varying
+# structs is likely to take a different code path than uses of varying
+# structs that access the structure elements one at a time.
+
+[require]
+GL ES >= 3.0
+GLSL ES >= 3.00
+
+[vertex shader]
+#version 300 es
+
+in vec4 vertex;
+struct Foo
+{
+	float a;
+	vec2 b;
+	vec3 c;
+	vec4 d;
+};
+out Foo foo;
+
+Foo return_foo()
+{
+	return Foo(1.0,
+		   vec2(2.0, 3.0),
+		   vec3(4.0, 5.0, 6.0),
+		   vec4(7.0, 8.0, 9.0, 10.0));
+}
+
+void main()
+{
+	gl_Position = vertex;
+
+	foo = return_foo();
+}
+
+[fragment shader]
+#version 300 es
+
+struct Foo
+{
+	float a;
+	vec2 b;
+	vec3 c;
+	vec4 d;
+};
+in Foo foo;
+out vec4 color;
+
+#define CHECK(value, expected) \
+	if (distance(value, expected) > 0.00001) \
+		failed = true
+
+void main()
+{
+	bool failed = false;
+
+	CHECK(foo.a, 1.0);
+	CHECK(foo.b, vec2(2.0, 3.0));
+	CHECK(foo.c, vec3(4.0, 5.0, 6.0));
+	CHECK(foo.d, vec4(7.0, 8.0, 9.0, 10.0));
+
+	if (failed)
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
