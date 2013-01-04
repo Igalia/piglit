@@ -211,37 +211,24 @@ piglit_cl_program_test_run(const int argc,
 	}
 
 	/* Set build options */
-	if(version > 10) {
-		char* template = "-cl-std=CL%d.%d ";
-		char* old = build_options;
-		build_options = malloc((strlen(old) + strlen(template) + 1) * sizeof(char));
-		strcpy(build_options, old);
-		sprintf(build_options+strlen(old), template, env.clc_version/10,
-		                                             env.clc_version%10);
-		free(old);
-	}
-	if(env.clc_version <= 10) {
-		char* template = "-D CL_VERSION_1_0=100 ";
-		char* old = build_options;
-		build_options = malloc((strlen(old) + strlen(template) + 1) * sizeof(char));
-		strcpy(build_options, old);
-		sprintf(build_options+strlen(old), template);
-		free(old);
-	}
-	if(env.clc_version <= 11) {
-		char* template = "-D __OPENCL_C_VERSION__=1%d0 ";
-		char* old = build_options;
-		build_options = malloc((strlen(old) + strlen(template) + 1) * sizeof(char));
-		strcpy(build_options, old);
-		sprintf(build_options+strlen(old), template, env.clc_version%10);
-		free(old);
-	}
 	if(config->build_options != NULL) {
 		char* old = build_options;
 		build_options = malloc((strlen(old) + strlen(config->build_options) + 1) * sizeof(char));
 		strcpy(build_options, old);
 		sprintf(build_options+strlen(old), config->build_options);
 		free(old);
+	}
+	if(version > 10) {
+		//If -cl-std was already in config->build_options, use what the test requested
+		if (!strstr(build_options, "-cl-std")){
+			char* template = " -cl-std=CL%d.%d";
+			char* old = build_options;
+			build_options = malloc((strlen(old) + strlen(template) + 1) * sizeof(char));
+			strcpy(build_options, old);
+			sprintf(build_options+strlen(old), template, env.clc_version/10,
+								     env.clc_version%10);
+			free(old);
+		}
 	}
 
 	printf("#   Build options: %s\n", build_options);
