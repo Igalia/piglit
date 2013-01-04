@@ -1242,10 +1242,12 @@ apple_vertex_array_object = Group()
 spec['APPLE_vertex_array_object'] = apple_vertex_array_object
 add_plain_test(apple_vertex_array_object, 'vao-01')
 add_plain_test(apple_vertex_array_object, 'vao-02')
+apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-isvertexarray apple')
 
 arb_vertex_array_object = Group()
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
 add_concurrent_test(arb_vertex_array_object, 'vao-element-array-buffer')
+arb_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-isvertexarray')
 
 arb_vertex_buffer_object = Group()
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
@@ -2641,14 +2643,6 @@ add_asmparsertest('ARBvp1.0', 'xpd.txt')
 ext_unpack_subimage = Group()
 spec['EXT_unpack_subimage'] = ext_unpack_subimage
 ext_unpack_subimage['basic'] = concurrent_test('ext_unpack_subimage')
-
-arb_vertex_array_object = Group()
-spec['ARB_vertex_array_object'] = arb_vertex_array_object
-arb_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array_object_isvertexarray')
-
-apple_vertex_array_object = Group()
-spec['APPLE_vertex_array_object'] = apple_vertex_array_object
-apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array_object_isvertexarray apple')
 
 oes_draw_texture = Group()
 spec['OES_draw_texture'] = oes_draw_texture
