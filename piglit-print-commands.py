@@ -101,7 +101,7 @@ def main():
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
 	os.chdir(piglit_dir)
 
-	profile = core.loadTestProfile(profileFilename, "$GLEAN_RESULT_DIR")
+	profile = core.loadTestProfile(profileFilename)
 
 	# If resuming an interrupted test run, re-write all of the existing
 	# results since we clobbered the results file.  Also, exclude them
