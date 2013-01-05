@@ -84,10 +84,12 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 
 	config.window_width = 355;
-	config.window_height = 250;
+	config.window_height = 350;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
+
+#define MAX_LOD_OR_SAMPLES  8.0
 
 /** Vertex shader attribute locations */
 const int pos_loc = 0;
@@ -121,7 +123,7 @@ compute_divisors(int lod, float *divisors)
 	divisors[0] = max2(level_size[lod][0] - 1, 1);
 	divisors[1] = max2(level_size[lod][1] - 1, 1);
 	divisors[2] = max2(level_size[lod][2] - 1, 1);
-	divisors[3] = 1.0;
+	divisors[3] = MAX_LOD_OR_SAMPLES;
 
 	if (sampler.data_type != GL_UNSIGNED_INT)
 		divisors[0] = -divisors[0];
@@ -132,6 +134,8 @@ piglit_display()
 {
 	int i, l, z;
 	bool pass = true;
+
+   glViewport(0, 0, piglit_width, piglit_height);
 
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -261,6 +265,150 @@ generate_VBOs()
 	glEnableVertexAttribArray(texcoord_loc);
 }
 
+/* like piglit_draw_rect(), but works in a core context too.
+ * pretty silly and wasteful (binds a throwaway VAO and BO) */
+static void
+draw_rect_core(int x, int y, int w, int h)
+{
+    float verts[4][4];
+    GLuint bo, vao;
+
+    verts[0][0] = x;
+    verts[0][1] = y;
+    verts[0][2] = 0.0;
+    verts[0][3] = 1.0;
+    verts[1][0] = x + w;
+    verts[1][1] = y;
+    verts[1][2] = 0.0;
+    verts[1][3] = 1.0;
+    verts[2][0] = x + w;
+    verts[2][1] = y + h;
+    verts[2][2] = 0.0;
+    verts[2][3] = 1.0;
+    verts[3][0] = x;
+    verts[3][1] = y + h;
+    verts[3][2] = 0.0;
+    verts[3][3] = 1.0;
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &bo);
+    glBindBuffer(GL_ARRAY_BUFFER, bo);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(float),
+            verts, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    glBindVertexArray(0);
+    glDeleteBuffers(1, &bo);
+    glDeleteVertexArrays(1, &vao);
+}
+
+/**
+ * Generate the same test pattern as generate_texture() does, but do it in the shader.
+ * This is a silly workaround for not being able to just upload directly.
+ */
+static void
+upload_multisample_data(GLuint tex, int width, int height,
+        int layers, int samples)
+{
+    GLuint oldFBO, FBO;
+    int si;
+    char *fs_code;
+    int vs, fs;
+    int staging_program = 0;
+    int layer_loc = 0;
+    int si_loc = 0;
+
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, (GLint *) &oldFBO);
+    if (is_array_sampler())
+        glTexImage3DMultisample(sampler.target,
+                samples, sampler.internal_format,
+                width, height, layers, GL_TRUE);
+    else
+        glTexImage2DMultisample(sampler.target,
+                samples, sampler.internal_format,
+                width, height, GL_TRUE);
+    if (!piglit_check_gl_error(GL_NO_ERROR)) {
+        printf("Error creating multisample texture\n");
+        piglit_report_result(PIGLIT_FAIL);
+    }
+
+    vs = piglit_compile_shader_text(GL_VERTEX_SHADER,
+            "#version 130\n"
+            "#extension GL_ARB_explicit_attrib_location: require\n"
+            "layout(location=0) in vec4 pos;\n"
+            "void main() {\n"
+            "   gl_Position = pos;\n"
+            "}\n");
+    asprintf(&fs_code,
+            "#version 130\n"
+            "#extension GL_ARB_explicit_attrib_location: require\n"
+            "#extension GL_ARB_fragment_coord_conventions: require\n"
+            "uniform int layer;\n"
+            "uniform int si;\n"
+            "layout(pixel_center_integer) in vec4 gl_FragCoord;\n"
+            "layout(location=0) out %s o;\n"
+            "void main() {\n"
+            "  o = %s(%sgl_FragCoord.x, gl_FragCoord.y, layer, si);\n"
+            "}\n",
+            sampler.return_type,
+            sampler.return_type,
+            sampler.data_type == GL_UNSIGNED_INT ? "" : "-");
+    fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
+    if (!fs) {
+        printf("Failed to compile staging program.\n");
+        piglit_report_result(PIGLIT_FAIL);
+    }
+    staging_program = piglit_link_simple_program(vs,fs);
+    if (!piglit_link_check_status(staging_program))
+        piglit_report_result(PIGLIT_FAIL);
+
+    layer_loc = glGetUniformLocation(staging_program, "layer");
+    si_loc = glGetUniformLocation(staging_program, "si");
+
+    glUseProgram(staging_program);
+    if (!piglit_check_gl_error(GL_NO_ERROR)) {
+        printf("glUseProgram failed\n");
+        piglit_report_result(PIGLIT_FAIL);
+    }
+
+    glGenFramebuffers(1, &FBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
+    glViewport(0, 0, width, height);
+
+    glEnable(GL_SAMPLE_MASK);
+
+    for (si=0; si < samples; si++) {
+        glUniform1i(si_loc, si);
+        glSampleMaski(0, 1<<si);
+
+        if (is_array_sampler()) {
+            int layer;
+            for(layer = 0; layer < layers; layer++) {
+                glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                    tex, 0, layer);
+                glUniform1i(layer_loc, layer);
+                draw_rect_core(-1, -1, 2, 2);
+            }
+        }
+        else {
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                   sampler.target, tex, 0);
+
+            glUniform1i(layer_loc, 0);
+            draw_rect_core(-1, -1, 2, 2);
+        }
+    }
+
+    glDisable(GL_SAMPLE_MASK);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, oldFBO);
+}
+
 /**
  * Create texel data.
  */
@@ -281,18 +429,21 @@ generate_texture()
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
-	if (sampler.target == GL_TEXTURE_RECTANGLE) {
-		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	} else {
-		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	if (!has_samples()) {
+		if (sampler.target == GL_TEXTURE_RECTANGLE) {
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		} else {
+			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+		glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		if (swizzling)
+			glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA,
+					 (GLint *) sampler.swizzle);
 	}
-	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	if (swizzling)
-		glTexParameteriv(target, GL_TEXTURE_SWIZZLE_RGBA,
-				 (GLint *) sampler.swizzle);
 
 	expected_colors = calloc(miplevels, sizeof(float **));
 
@@ -321,24 +472,24 @@ generate_texture()
 					f_ptr[0] = nx;
 					f_ptr[1] = y;
 					f_ptr[2] = z;
-					f_ptr[3] = 1.0;
+					f_ptr[3] = l;
 
 					i_ptr[0] = nx;
 					i_ptr[1] = y;
 					i_ptr[2] = z;
-					i_ptr[3] = 1;
+					i_ptr[3] = l;
 
 					u_ptr[0] = nx;
 					u_ptr[1] = y;
 					u_ptr[2] = z;
-					u_ptr[3] = 1;
+					u_ptr[3] = l;
 
 					compute_divisors(l, divisors);
 
 					expected_ptr[0] = f_ptr[0]/divisors[0];
 					expected_ptr[1] = f_ptr[1]/divisors[1];
 					expected_ptr[2] = f_ptr[2]/divisors[2];
-					expected_ptr[3] = 1.0;
+					expected_ptr[3] = f_ptr[3]/divisors[3];
 					swizzle(expected_ptr);
 
 					f_ptr += 4;
@@ -365,8 +516,14 @@ generate_texture()
 			break;
 		}
 
-		upload_miplevel_data(target, l, level_image);
+		if (!has_samples())
+			upload_miplevel_data(target, l, level_image);
 	}
+
+	if (has_samples())
+		upload_multisample_data(tex, level_size[0][0],
+				level_size[0][1], level_size[0][2],
+				sample_count);
 }
 
 /**
@@ -381,9 +538,11 @@ coordinate_size()
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_1D_ARRAY:
 	case GL_TEXTURE_RECTANGLE:
+	case GL_TEXTURE_2D_MULTISAMPLE:
 		return 2;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
 		return 3;
 	default:
 		assert(!"Should not get here.");
@@ -432,6 +591,7 @@ generate_GLSL(enum shader_target test_stage)
 	case VS:
 		asprintf(&vs_code,
 			 "#version %d\n"
+			 "%s\n"
 			 "#define ivec1 int\n"
 			 "flat out %s color;\n"
 			 "in vec4 pos;\n"
@@ -443,6 +603,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = pos;\n"
 			 "}\n",
 			 shader_version,
+			 has_samples() ? "#extension GL_ARB_texture_multisample: require" : "",
 			 sampler.return_type, sampler.name,
 			 offset_func,
 			 coordinate_size(),
@@ -475,6 +636,7 @@ generate_GLSL(enum shader_target test_stage)
 			 shader_version);
 		asprintf(&fs_code,
 			 "#version %d\n"
+			 "%s\n"
 			 "#define ivec1 int\n"
 			 "flat in ivec4 tc;\n"
 			 "uniform vec4 divisor;\n"
@@ -485,6 +647,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_FragColor = color/divisor;\n"
 			 "}\n",
 			 shader_version,
+			 has_samples() ? "#extension GL_ARB_texture_multisample: require" : "",
 			 sampler.name,
 			 offset_func,
 			 coordinate_size(),
@@ -545,6 +708,8 @@ supported_sampler()
 	case GL_TEXTURE_1D_ARRAY:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_RECTANGLE:
+	case GL_TEXTURE_2D_MULTISAMPLE:
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
 		return true;
 	}
 	return false;
@@ -554,7 +719,7 @@ void
 fail_and_show_usage()
 {
 	printf("Usage: texelFetch [140] [offset] <vs|fs> <sampler type> "
-	       "[piglit args...]\n");
+	       "[sample_count] [swizzle] [piglit args...]\n");
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -593,6 +758,21 @@ piglit_init(int argc, char **argv)
 		if (!sampler_found && (sampler_found = select_sampler(argv[i])))
 			continue;
 
+        /* Maybe it's the sample count? */
+        if (sampler_found && has_samples() && !sample_count) {
+            if ((sample_count = atoi(argv[i]))) {
+                /* check it */
+                GLint max_samples;
+                glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+                if (sample_count > max_samples) {
+                    printf("Sample count of %d not supported, >MAX_SAMPLES\n",
+                            sample_count);
+                    piglit_report_result(PIGLIT_SKIP);
+                }
+            }
+            continue;
+        }
+
 		if (!swizzling && (swizzling = parse_swizzle(argv[i])))
 			continue;
 
@@ -614,14 +794,14 @@ piglit_init(int argc, char **argv)
 	tex_location = glGetUniformLocation(prog, "tex");
 	divisor_loc = glGetUniformLocation(prog, "divisor");
 
-	glUseProgram(prog);
-
-	glUniform1i(tex_location, 0);
-
 	/* Create textures and set miplevel info */
 	set_base_size();
 	compute_miplevel_info();
 	generate_texture();
 
 	generate_VBOs();
+
+	glUseProgram(prog);
+
+	glUniform1i(tex_location, 0);
 }

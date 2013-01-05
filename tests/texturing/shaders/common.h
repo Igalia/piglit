@@ -81,6 +81,7 @@ struct sampler_info
 
 /** Whether or not we're using GL_EXT_texture_swizzle */
 bool swizzling;
+int sample_count;
 extern int shader_version;
 
 /**
@@ -97,6 +98,7 @@ float max2(float x, float y);
 
 bool has_height();
 bool has_slices();
+bool has_samples();
 
 bool is_array_sampler();
 bool is_shadow_sampler();

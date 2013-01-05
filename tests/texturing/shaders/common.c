@@ -151,10 +151,11 @@ compute_miplevel_info()
 	miplevels = (int) log2f(max_dimension) + 1;
 
 	if (sampler.target == GL_TEXTURE_RECTANGLE ||
-	    sampler.target == GL_TEXTURE_BUFFER ||
-		sampler.target == GL_TEXTURE_2D_MULTISAMPLE ||
-		sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
+	    sampler.target == GL_TEXTURE_BUFFER)
 		miplevels = 1;
+	if (sampler.target == GL_TEXTURE_2D_MULTISAMPLE ||
+		sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
+		miplevels = sample_count;
 
 	/* Compute the size of each miplevel */
 	level_size = malloc(miplevels * sizeof(int *));
@@ -165,7 +166,11 @@ compute_miplevel_info()
 		level_size[l] = malloc(3 * sizeof(int));
 
 		for (i = 0; i < 3 - is_array; i++)
-			level_size[l][i] = max2(level_size[l-1][i] / 2, 1);
+			if (has_samples())
+				/* same size for all sample planes */
+				level_size[l][i] = level_size[l-1][i];
+			else
+				level_size[l][i] = max2(level_size[l-1][i] / 2, 1);
 
 		if (is_array)
 			level_size[l][2] = base_size[2];
@@ -187,6 +192,13 @@ bool
 has_slices()
 {
 	return is_array_sampler() || sampler.target == GL_TEXTURE_3D;
+}
+
+bool
+has_samples()
+{
+    return sampler.target == GL_TEXTURE_2D_MULTISAMPLE ||
+           sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
 }
 
 bool
@@ -279,15 +291,20 @@ select_sampler(const char *name)
 	sampler.type = samplers[i].type;
 	sampler.target = samplers[i].target;
 
+	/* Use 32bpc sized formats where possible; drop down to 16bpc for
+	 * testing multisample targets to avoid hitting some hardware limits.
+	 * on i965.
+	 */
+
 	if (name[0] == 'i') {
 		sampler.data_type = GL_INT;
 		sampler.format = GL_RGBA_INTEGER;
-		sampler.internal_format = GL_RGBA32I;
+		sampler.internal_format = has_samples() ? GL_RGBA16I : GL_RGBA32I;
 		sampler.return_type = "ivec4";
 	} else if (name[0] == 'u') {
 		sampler.data_type = GL_UNSIGNED_INT;
 		sampler.format = GL_RGBA_INTEGER;
-		sampler.internal_format = GL_RGBA32UI;
+		sampler.internal_format = has_samples() ? GL_RGBA16UI : GL_RGBA32UI;
 		sampler.return_type = "uvec4";
 	} else if (strstr(name, "Shadow")) {
 		/* Shadow Sampler */
@@ -298,7 +315,7 @@ select_sampler(const char *name)
 	} else {
 		sampler.data_type = GL_FLOAT;
 		sampler.format = GL_RGBA;
-		sampler.internal_format = GL_RGBA32F;
+		sampler.internal_format = has_samples() ? GL_RGBA16F : GL_RGBA32F;
 		sampler.return_type = "vec4";
 	}
 
@@ -321,12 +338,15 @@ require_GL_features(enum shader_target test_stage)
 
 	switch (sampler.internal_format) {
 	case GL_RGBA32I:
+	case GL_RGBA16I:
 		piglit_require_extension("GL_EXT_texture_integer");
 		break;
 	case GL_RGBA32UI:
+	case GL_RGBA16UI:
 		piglit_require_gl_version(30);
 		break;
 	case GL_RGBA32F:
+	case GL_RGBA16F:
 		piglit_require_extension("GL_ARB_texture_float");
 		break;
 	}
