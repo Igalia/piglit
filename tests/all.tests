@@ -867,6 +867,10 @@ add_plain_test(arb_point_sprite, 'point-sprite')
 arb_texture_multisample = Group()
 spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-minmax')
+for sample_count in MSAA_SAMPLE_COUNTS:
+    # fb-completeness
+    spec['ARB_texture_multisample/fb-completeness/%d' % (sample_count,)] = \
+        concurrent_test('arb_texture_multisample-fb-completeness %d' % (sample_count,))
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
