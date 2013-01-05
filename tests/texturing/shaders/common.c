@@ -88,6 +88,23 @@ upload_miplevel_data(GLenum target, int level, void *level_image)
 		glTexBuffer(GL_TEXTURE_BUFFER, internal_format, bo);
 		break;
 
+	case GL_TEXTURE_2D_MULTISAMPLE:
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4,
+				internal_format,
+				level_size[level][0],
+				level_size[level][1],
+				GL_TRUE);
+		break;
+	
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+		glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 4,
+				internal_format,
+				level_size[level][0],
+				level_size[level][1],
+				level_size[level][2],
+				GL_TRUE);
+		break;
+
 	default:
 		assert(!"Not implemented yet.");
 		break;
@@ -134,7 +151,9 @@ compute_miplevel_info()
 	miplevels = (int) log2f(max_dimension) + 1;
 
 	if (sampler.target == GL_TEXTURE_RECTANGLE ||
-	    sampler.target == GL_TEXTURE_BUFFER)
+	    sampler.target == GL_TEXTURE_BUFFER ||
+		sampler.target == GL_TEXTURE_2D_MULTISAMPLE ||
+		sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
 		miplevels = 1;
 
 	/* Compute the size of each miplevel */
@@ -159,7 +178,9 @@ has_height()
 	return sampler.target == GL_TEXTURE_2D ||
 	       sampler.target == GL_TEXTURE_3D ||
 	       sampler.target == GL_TEXTURE_2D_ARRAY ||
-	       sampler.target == GL_TEXTURE_RECTANGLE;
+	       sampler.target == GL_TEXTURE_RECTANGLE ||
+	       sampler.target == GL_TEXTURE_2D_MULTISAMPLE ||
+	       sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
 }
 
 bool
@@ -173,7 +194,8 @@ is_array_sampler()
 {
 	return sampler.target == GL_TEXTURE_1D_ARRAY ||
 	       sampler.target == GL_TEXTURE_2D_ARRAY ||
-	       sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY;
+	       sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY ||
+	       sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
 }
 
 bool
@@ -207,6 +229,8 @@ select_sampler(const char *name)
 		{ "sampler2DArray",         GL_SAMPLER_2D_ARRAY,                    GL_TEXTURE_2D_ARRAY       },
 		{ "samplerCubeArray",       GL_SAMPLER_CUBE_MAP_ARRAY,              GL_TEXTURE_CUBE_MAP_ARRAY },
 		{ "samplerBuffer",          GL_SAMPLER_BUFFER,                      GL_TEXTURE_BUFFER },
+		{ "sampler2DMS",            GL_SAMPLER_2D_MULTISAMPLE,              GL_TEXTURE_2D_MULTISAMPLE },
+		{ "sampler2DMSArray",       GL_SAMPLER_2D_MULTISAMPLE_ARRAY,        GL_TEXTURE_2D_MULTISAMPLE_ARRAY },
 
 		{ "sampler1DShadow",        GL_SAMPLER_1D_SHADOW,                   GL_TEXTURE_1D             },
 		{ "sampler2DShadow",        GL_SAMPLER_2D_SHADOW,                   GL_TEXTURE_2D             },
@@ -225,6 +249,8 @@ select_sampler(const char *name)
 		{ "isampler2DArray",        GL_INT_SAMPLER_2D_ARRAY,                GL_TEXTURE_2D_ARRAY       },
 		{ "isamplerCubeArray",      GL_INT_SAMPLER_CUBE_MAP_ARRAY,          GL_TEXTURE_CUBE_MAP_ARRAY },
 		{ "isamplerBuffer",         GL_INT_SAMPLER_BUFFER,                  GL_TEXTURE_BUFFER },
+		{ "isampler2DMS",           GL_INT_SAMPLER_2D_MULTISAMPLE,          GL_TEXTURE_2D_MULTISAMPLE },
+		{ "isampler2DMSArray",      GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY,    GL_TEXTURE_2D_MULTISAMPLE_ARRAY },
 
 		{ "usampler1D",             GL_UNSIGNED_INT_SAMPLER_1D,             GL_TEXTURE_1D             },
 		{ "usampler2D",             GL_UNSIGNED_INT_SAMPLER_2D,             GL_TEXTURE_2D             },
@@ -235,6 +261,8 @@ select_sampler(const char *name)
 		{ "usampler2DArray",        GL_UNSIGNED_INT_SAMPLER_2D_ARRAY,       GL_TEXTURE_2D_ARRAY       },
 		{ "usamplerCubeArray",      GL_UNSIGNED_INT_SAMPLER_CUBE_MAP_ARRAY, GL_TEXTURE_CUBE_MAP_ARRAY },
 		{ "usamplerBuffer",         GL_UNSIGNED_INT_SAMPLER_BUFFER,         GL_TEXTURE_BUFFER },
+		{ "usampler2DMS",           GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE, GL_TEXTURE_2D_MULTISAMPLE },
+		{ "usampler2DMSArray",      GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY, GL_TEXTURE_2D_MULTISAMPLE_ARRAY },
 	};
 
 	for (i = 0; i < ARRAY_SIZE(samplers); i++) {
@@ -321,6 +349,9 @@ require_GL_features(enum shader_target test_stage)
 	case GL_TEXTURE_BUFFER:
 		piglit_require_extension("GL_ARB_texture_buffer_object");
 		break;
+	case GL_TEXTURE_2D_MULTISAMPLE:
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+		piglit_require_extension("GL_ARB_texture_multisample");
 	}
 
 	/* If testing in the VS, check for VS texture units */

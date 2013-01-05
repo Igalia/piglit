@@ -60,7 +60,7 @@ PIGLIT_GL_TEST_CONFIG_END
 static int lod_location;
 static int vertex_location;
 
-static char *cube_map_array_extension = "";
+static char *extension = "";
 
 /**
  * Returns the number of components expected from textureSize().
@@ -76,10 +76,12 @@ sampler_size()
 	case GL_TEXTURE_1D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP:
 	case GL_TEXTURE_RECTANGLE:
+	case GL_TEXTURE_2D_MULTISAMPLE:
 		return 2;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
 		return 3;
 	default:
 		assert(!"Should not get here.");
@@ -181,10 +183,12 @@ generate_texture()
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
-	if (target == GL_TEXTURE_BUFFER) {
-		/* Texture buffers only use texelFetch() and
-		 * textureSize(), so setting the filter parameters on
-		 * them is invalid.
+	if (target == GL_TEXTURE_BUFFER ||
+		target == GL_TEXTURE_2D_MULTISAMPLE ||
+		target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
+		/* Texture buffers, multisample textures and multisample
+		 * texture arrays only use texelFetch() and textureSize(),
+		 * so setting the filter parameters on them is invalid.
 		 */
 	} else if (target == GL_TEXTURE_RECTANGLE) {
 		glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -195,7 +199,9 @@ generate_texture()
 		glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 
-	if (target != GL_TEXTURE_BUFFER) {
+	if (target != GL_TEXTURE_BUFFER &&
+		target != GL_TEXTURE_2D_MULTISAMPLE &&
+		target != GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
 		glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
@@ -212,6 +218,19 @@ generate_texture()
 	}
 }
 
+bool
+has_lod(void)
+{
+	switch (sampler.target) {
+		case GL_TEXTURE_RECTANGLE:
+		case GL_TEXTURE_BUFFER:
+		case GL_TEXTURE_2D_MULTISAMPLE:
+		case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+			return false;
+		default:
+			return true;
+	}
+}
 
 int
 generate_GLSL(enum shader_target test_stage)
@@ -226,13 +245,10 @@ generate_GLSL(enum shader_target test_stage)
 	const int size = sampler_size();
 
 	/* The GLSL 1.40 sampler2DRect/samplerBuffer samplers don't
-	 * take a lod argument.
+	 * take a lod argument. Neither do ARB_texture_multisample's
+	 * sampler2DMS/sampler2DMSArray samplers.
 	 */
-	if (sampler.target == GL_TEXTURE_RECTANGLE ||
-	    sampler.target == GL_TEXTURE_BUFFER)
-		lod_arg = "";
-	else
-		lod_arg = ", lod";
+	lod_arg = has_lod() ? ", lod" : "";
 
 	switch (test_stage) {
 	case VS:
@@ -248,7 +264,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    size = textureSize(tex%s);\n"
 			 "    gl_Position = vertex;\n"
 			 "}\n",
-			 shader_version, cube_map_array_extension, sampler.name, size, lod_arg);
+			 shader_version, extension, sampler.name, size, lod_arg);
 		asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
@@ -279,7 +295,7 @@ generate_GLSL(enum shader_target test_stage)
 			 "    ivec%d size = textureSize(tex%s);\n"
 			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
 			 "}\n",
-			 shader_version, cube_map_array_extension, sampler.name, size, lod_arg,
+			 shader_version, extension, sampler.name, size, lod_arg,
 			 zeroes[3 - size]);
 		break;
 	default:
@@ -342,7 +358,10 @@ piglit_init(int argc, char **argv)
 	require_GL_features(test_stage);
 
 	if (sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY)
-		cube_map_array_extension = "#extension GL_ARB_texture_cube_map_array : enable\n";
+		extension = "#extension GL_ARB_texture_cube_map_array : enable\n";
+	if (sampler.target == GL_TEXTURE_2D_MULTISAMPLE
+		|| sampler.target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
+		extension = "#extension GL_ARB_texture_multisample : enable\n";
 
 	prog = generate_GLSL(test_stage);
 	if (!prog)

@@ -864,6 +864,8 @@ spec['ARB_point_sprite'] = arb_point_sprite
 add_plain_test(arb_point_sprite, 'point-sprite')
 
 # Group ARB_texture_multisample
+samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
+				'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
 arb_texture_multisample = Group()
 spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-minmax')
@@ -876,6 +878,10 @@ add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mas
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-value')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution -tex')
+for stage in ['vs', 'fs']:
+	# textureSize():
+	for sampler in samplers_atm:
+		spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
