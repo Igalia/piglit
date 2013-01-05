@@ -10,5 +10,6 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (arb_texture_multisample-minmax minmax.c)
 
 # vim: ft=cmake:

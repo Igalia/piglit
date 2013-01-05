@@ -863,6 +863,11 @@ arb_point_sprite = Group()
 spec['ARB_point_sprite'] = arb_point_sprite
 add_plain_test(arb_point_sprite, 'point-sprite')
 
+# Group ARB_texture_multisample
+arb_texture_multisample = Group()
+spec['ARB_texture_multisample'] = arb_texture_multisample
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-minmax')
+
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
