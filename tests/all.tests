@@ -872,6 +872,10 @@ for sample_count in MSAA_SAMPLE_COUNTS:
     spec['ARB_texture_multisample/fb-completeness/%d' % (sample_count,)] = \
         concurrent_test('arb_texture_multisample-fb-completeness %d' % (sample_count,))
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-texstate')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-value')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution -tex')
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
