@@ -37,6 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 PIGLIT_GL_TEST_CONFIG_END
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 static const struct {
 	GLfloat pos[3];
@@ -132,8 +133,8 @@ piglit_display(void)
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
 	/* Draw first triangle: upper-right half of window */
-	glVertexPointer(3, GL_FLOAT, vstride, (void *) voffset1);
-	glColorPointer(4, GL_UNSIGNED_BYTE, vstride, (void *) coffset1);
+	glVertexPointer(3, GL_FLOAT, vstride, BUFFER_OFFSET(voffset1));
+	glColorPointer(4, GL_UNSIGNED_BYTE, vstride, BUFFER_OFFSET(coffset1));
 
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 
@@ -152,8 +153,8 @@ piglit_display(void)
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 
 	/* Draw second triangle: lower-left half of window */
-	glVertexPointer(3, GL_FLOAT, vstride, (void *) voffset2);
-	glColorPointer(4, GL_UNSIGNED_BYTE, vstride, (void *) coffset2);
+	glVertexPointer(3, GL_FLOAT, vstride, BUFFER_OFFSET(voffset2));
+	glColorPointer(4, GL_UNSIGNED_BYTE, vstride, BUFFER_OFFSET(coffset2));
 
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, NULL);
 
