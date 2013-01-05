@@ -12,5 +12,6 @@ link_libraries (
 
 piglit_add_executable (arb_texture_multisample-minmax minmax.c)
 piglit_add_executable (arb_texture_multisample-fb-completeness fb-completeness.c)
+piglit_add_executable (arb_texture_multisample-texstate texstate.c)
 
 # vim: ft=cmake:
