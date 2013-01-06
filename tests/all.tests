@@ -68,7 +68,7 @@ except SystemExit:
 	pass
 
 # List of all of the MSAA sample counts we wish to test
-MSAA_SAMPLE_COUNTS = (2, 4, 8, 16, 32)
+MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
 def add_fbo_depthstencil_tests(group, format):
 	if format == 'default_fb':
