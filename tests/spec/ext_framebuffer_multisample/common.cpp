@@ -1219,8 +1219,8 @@ ColorGradientSunburst::draw_with_scale_and_offset(const float (*proj)[4],
 	}
 	case GL_UNSIGNED_NORMALIZED:
 	case GL_FLOAT: {
-		float clear_color[4] = { offset, offset, offset, offset };
-		glClearBufferfv(GL_COLOR, 0, clear_color);
+		glClearColor(offset, offset, offset, offset);
+		glClear(GL_COLOR_BUFFER_BIT);
 		break;
 	}
 	default:
