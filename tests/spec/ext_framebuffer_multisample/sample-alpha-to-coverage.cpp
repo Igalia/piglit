@@ -71,7 +71,11 @@ piglit_init(int argc, char **argv)
 {
 	const int num_attachments = 1;
 	int samples;
-	piglit_require_gl_version(30);
+
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
+
 	if (argc < 3)
 		print_usage_and_exit(argv[0]);
 	{

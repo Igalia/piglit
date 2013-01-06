@@ -327,8 +327,9 @@ print_usage_and_exit(char *prog_name)
 extern "C" void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(30);
-	piglit_require_GLSL_version(130);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	if (argc < 3)
 		print_usage_and_exit(argv[0]);

@@ -84,7 +84,9 @@ Triangles triangles;
 extern "C" void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	GLint max_samples;
 	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);

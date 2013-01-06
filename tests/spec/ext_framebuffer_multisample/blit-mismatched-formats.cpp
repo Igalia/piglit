@@ -92,7 +92,9 @@ piglit_display()
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	/* Passing sample count = 1 will create the FBOs with minimum supported
 	 * sample count. Both FBOs are created with GL_RGBA format by default.

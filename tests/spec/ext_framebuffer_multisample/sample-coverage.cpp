@@ -369,7 +369,10 @@ piglit_init(int argc, char **argv)
 			coverage_invert = false;
 	}
 
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
+
 	piglit_ortho_projection(pattern_width, pattern_height, GL_TRUE);
 
 	/* Skip the test if samples > GL_MAX_SAMPLES */

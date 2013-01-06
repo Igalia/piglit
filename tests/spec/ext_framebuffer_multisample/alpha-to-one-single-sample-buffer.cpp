@@ -56,7 +56,9 @@ piglit_init(int argc, char **argv)
 	/* For single sample buffer */
 	const int samples = 0;
 
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	int pattern_width = piglit_width / 2;
 	int pattern_height = piglit_height / num_attachments;

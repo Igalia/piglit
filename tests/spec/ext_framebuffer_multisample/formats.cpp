@@ -581,7 +581,9 @@ piglit_init(int argc, char **argv)
 	if (argc == 3)
 		test_set = fbo_lookup_test_set(argv[2]);
 
-	piglit_require_gl_version(30);
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
 	GLint max_samples;

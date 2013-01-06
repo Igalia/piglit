@@ -70,7 +70,10 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLint samples, max_samples;
-	piglit_require_gl_version(30);
+
+	piglit_require_gl_version(21);
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	/* OpenGL driver is supposed to round up the specified sample count to
 	 * the next available sample count. So, this will create the FBO with
