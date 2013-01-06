@@ -107,9 +107,9 @@ static const GLenum draw_buffers[] = {
 /* Offset the viewport transformation on depth value passed to the vertex
  * shader by setting it to (2 * depth - 1.0).
  */
-static const char *vert =
-	"#version 130\n"
-	"in vec2 pos;\n"
+static const char *vert_template =
+	"#version %s\n"
+	"attribute vec2 pos;\n"
 	"uniform float depth;\n"
 	"void main()\n"
 	"{\n"
@@ -122,13 +122,19 @@ static const char *vert =
  * are enabled or not.
  */
 static const char *frag_template =
-	"#version 130\n"
+	"#version %s\n"
 	"#define DUAL_SRC_BLEND %d\n"
 	"#define ALPHA_TO_COVERAGE %d\n"
 	"#define OUT_TYPE %s\n"
+	"#if __VERSION__ == 130\n"
 	"out OUT_TYPE frag_out_0;\n"
 	"out vec4 frag_out_1;\n"
 	"out vec4 frag_out_2;\n"
+	"#else\n"
+	"#define frag_out_0 gl_FragData[0]\n"
+	"#define frag_out_1 gl_FragData[1]\n"
+	"#define frag_out_2 gl_FragData[2]\n"
+	"#endif\n"
 	"uniform OUT_TYPE frag_0_color;\n"
 	"uniform vec4 color;\n"
 	"void main()\n"
@@ -155,16 +161,28 @@ get_out_type_glsl(void)
 void
 shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 {
+	bool need_glsl130 = is_buffer_zero_integer_format || dual_src_blend;
+
+	if (need_glsl130) {
+		piglit_require_gl_version(30);
+	}
+
 	is_dual_src_blending = dual_src_blend;
+
 	/* Compile program */
+	unsigned vert_alloc_len = strlen(vert_template) + 4;
+	char *vert = (char *) malloc(vert_alloc_len);
+	sprintf(vert, vert_template, need_glsl130 ? "130" : "120");
 	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
+	free(vert);
 
 	/* Generate appropriate fragment shader program */
-	const char *out_type_glsl = get_out_type_glsl();;
+	const char *out_type_glsl = get_out_type_glsl();
         unsigned frag_alloc_len = strlen(frag_template) +
-				  strlen(out_type_glsl) + 1;
+				  strlen(out_type_glsl) + 4;
 	char *frag = (char *) malloc(frag_alloc_len);
-	sprintf(frag, frag_template, is_dual_src_blending,
+	sprintf(frag, frag_template, need_glsl130 ? "130" : "120",
+		is_dual_src_blending,
 		sample_alpha_to_coverage, out_type_glsl);
 
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
@@ -175,18 +193,20 @@ shader_compile(bool sample_alpha_to_coverage, bool dual_src_blend)
 	}
 	free(frag);
 
-	if (is_dual_src_blending) {
-		glBindFragDataLocationIndexed(prog, 0, 0, "frag_out_0");
-		glBindFragDataLocationIndexed(prog, 0, 1, "frag_out_1");
+	if (need_glsl130) {
+		if (is_dual_src_blending) {
+			glBindFragDataLocationIndexed(prog, 0, 0, "frag_out_0");
+			glBindFragDataLocationIndexed(prog, 0, 1, "frag_out_1");
 
+		}
+		else if (num_draw_buffers > 1) {
+			glBindFragDataLocation(prog, 0, "frag_out_0");
+			glBindFragDataLocation(prog, 1, "frag_out_1");
+			glBindFragDataLocation(prog, 2, "frag_out_2");
+		}
+		else
+			glBindFragDataLocation(prog, 0, "frag_out_0");
 	}
-	else if (num_draw_buffers > 1) {
-		glBindFragDataLocation(prog, 0, "frag_out_0");
-		glBindFragDataLocation(prog, 1, "frag_out_1");
-		glBindFragDataLocation(prog, 2, "frag_out_2");
-	}
-	else
-		glBindFragDataLocation(prog, 0, "frag_out_0");
 
 	glBindAttribLocation(prog, 0, "pos");
 	glEnableVertexAttribArray(0);

@@ -195,12 +195,13 @@ Fbo::try_setup(const FboConfig &new_config)
 						  GL_COLOR_ATTACHMENT0,
 						  GL_RENDERBUFFER, color_rb);
 		} else {
-			glBindTexture(GL_TEXTURE_2D, color_tex);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			piglit_require_extension("GL_ARB_texture_rectangle");
+			glBindTexture(GL_TEXTURE_RECTANGLE, color_tex);
+			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
 					GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER,
 					GL_NEAREST);
-			glTexImage2D(GL_TEXTURE_2D,
+			glTexImage2D(GL_TEXTURE_RECTANGLE,
 				     0 /* level */,
 				     config.color_internalformat,
 				     config.width,
@@ -211,7 +212,7 @@ Fbo::try_setup(const FboConfig &new_config)
 				     NULL /* data */);
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
 					       GL_COLOR_ATTACHMENT0,
-					       GL_TEXTURE_2D,
+					       GL_TEXTURE_RECTANGLE,
 					       color_tex,
 					       0 /* level */);
 		}
@@ -274,10 +275,10 @@ void
 DownsampleProg::compile(int supersample_factor)
 {
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos;\n"
-		"in vec2 texCoord;\n"
-		"out vec2 texCoordVarying;\n"
+		"#version 120\n"
+		"attribute vec2 pos;\n"
+		"attribute vec2 texCoord;\n"
+		"varying vec2 texCoordVarying;\n"
 		"void main()\n"
 		"{\n"
 		"  gl_Position = vec4(pos, 0.0, 1.0);\n"
@@ -285,18 +286,18 @@ DownsampleProg::compile(int supersample_factor)
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
-		"uniform sampler2D samp;\n"
+		"#version 120\n"
+		"uniform sampler2DRect samp;\n"
 		"uniform int supersample_factor;\n"
-		"in vec2 texCoordVarying;\n"
+		"varying vec2 texCoordVarying;\n"
 		"void main()\n"
 		"{\n"
 		"  vec4 sum = vec4(0.0);\n"
-		"  ivec2 pixel = ivec2(texCoordVarying);\n"
+		"  vec2 pixel = floor(texCoordVarying);\n"
 		"  for (int i = 0; i < supersample_factor; ++i) {\n"
 		"    for (int j = 0; j < supersample_factor; ++j) {\n"
-		"      sum += texelFetch(\n"
-		"          samp, pixel * supersample_factor + ivec2(i, j), 0);\n"
+		"      sum += texture2DRect(\n"
+		"          samp, pixel * float(supersample_factor) + vec2(i, j));\n"
 		"    }\n"
 		"  }\n"
 		"  gl_FragColor = sum / (supersample_factor * supersample_factor);\n"
@@ -354,7 +355,7 @@ DownsampleProg::run(const Fbo *src_fbo, int dest_width, int dest_height,
 	float h = dest_height;
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, src_fbo->color_tex);
+	glBindTexture(GL_TEXTURE_RECTANGLE, src_fbo->color_tex);
 
 	glUseProgram(prog);
 	glBindVertexArray(vao);
@@ -384,15 +385,15 @@ void
 ManifestStencil::compile()
 {
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos;\n"
+		"#version 120\n"
+		"attribute vec2 pos;\n"
 		"void main()\n"
 		"{\n"
 		"  gl_Position = vec4(pos, 0.0, 1.0);\n"
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
+		"#version 120\n"
 		"uniform vec4 color;\n"
 		"void main()\n"
 		"{\n"
@@ -483,8 +484,8 @@ void
 ManifestDepth::compile()
 {
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos;\n"
+		"#version 120\n"
+		"attribute vec2 pos;\n"
 		"uniform float depth;\n"
 		"void main()\n"
 		"{\n"
@@ -492,7 +493,7 @@ ManifestDepth::compile()
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
+		"#version 120\n"
 		"uniform vec4 color;\n"
 		"void main()\n"
 		"{\n"
@@ -618,8 +619,8 @@ void Triangles::compile()
 	float final_scale = 0.95;
 
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos_within_tri;\n"
+		"#version 120\n"
+		"attribute vec2 pos_within_tri;\n"
 		"uniform float tri_scale;\n"
 		"uniform float rotation_delta;\n"
 		"uniform int tris_across;\n"
@@ -633,7 +634,7 @@ void Triangles::compile()
 		"  float rotation = rotation_delta * tri_num;\n"
 		"  pos = mat2(cos(rotation), sin(rotation),\n"
 		"             -sin(rotation), cos(rotation)) * pos;\n"
-		"  int i = tri_num % tris_across;\n"
+		"  int i = int(mod(float(tri_num), float(tris_across)));\n"
 		"  int j = tris_across - 1 - tri_num / tris_across;\n"
 		"  pos += (vec2(i, j) * 2.0 + 1.0) / tris_across - 1.0;\n"
 		"  pos *= final_scale;\n"
@@ -641,7 +642,7 @@ void Triangles::compile()
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
+		"#version 120\n"
 		"void main()\n"
 		"{\n"
 		"  gl_FragColor = vec4(1.0);\n"
@@ -731,13 +732,13 @@ InterpolationTestPattern::compile()
 	float final_scale = 0.95;
 
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos_within_tri;\n"
-		"in vec3 in_barycentric_coords;\n"
-		"out vec3 barycentric_coords;\n"
-		"centroid out vec3 barycentric_coords_centroid;\n"
-		"out vec2 pixel_pos;\n"
-		"centroid out vec2 pixel_pos_centroid;\n"
+		"#version 120\n"
+		"attribute vec2 pos_within_tri;\n"
+		"attribute vec3 in_barycentric_coords;\n"
+		"varying vec3 barycentric_coords;\n"
+		"centroid varying vec3 barycentric_coords_centroid;\n"
+		"varying vec2 pixel_pos;\n"
+		"centroid varying vec2 pixel_pos_centroid;\n"
 		"uniform float tri_scale;\n"
 		"uniform float rotation_delta;\n"
 		"uniform int tris_across;\n"
@@ -752,7 +753,7 @@ InterpolationTestPattern::compile()
 		"  float rotation = rotation_delta * tri_num;\n"
 		"  pos = mat2(cos(rotation), sin(rotation),\n"
 		"             -sin(rotation), cos(rotation)) * pos;\n"
-		"  int i = tri_num % tris_across;\n"
+		"  int i = int(mod(float(tri_num), float(tris_across)));\n"
 		"  int j = tris_across - 1 - tri_num / tris_across;\n"
 		"  pos += (vec2(i, j) * 2.0 + 1.0) / tris_across - 1.0;\n"
 		"  pos *= final_scale;\n"
@@ -852,8 +853,8 @@ void Lines::compile()
 	float final_scale = 0.95;
 
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos_line;\n"
+		"#version 120\n"
+		"attribute vec2 pos_line;\n"
 		"uniform float line_scale;\n"
 		"uniform float rotation_delta;\n"
 		"uniform int lines_across;\n"
@@ -867,7 +868,7 @@ void Lines::compile()
 		"  float rotation = rotation_delta * line_num;\n"
 		"  pos = mat2(cos(rotation), sin(rotation),\n"
 		"             -sin(rotation), cos(rotation)) * pos;\n"
-		"  int i = line_num % lines_across;\n"
+		"  int i = int(mod(float(line_num), float(lines_across)));\n"
 		"  int j = lines_across - 1 - line_num / lines_across;\n"
 		"  pos += (vec2(i, j) * 2.0 + 1.0) / lines_across - 1.0;\n"
 		"  pos *= final_scale;\n"
@@ -875,7 +876,7 @@ void Lines::compile()
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
+		"#version 120\n"
 		"void main()\n"
 		"{\n"
 		"  gl_FragColor = vec4(1.0);\n"
@@ -951,8 +952,8 @@ void Points::compile()
 	float final_scale = 0.95;
 
 	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos_point;\n"
+		"#version 120\n"
+		"attribute vec2 pos_point;\n"
 		"uniform float point_scale;\n"
 		"uniform int points_across;\n"
 		"uniform float final_scale;\n"
@@ -963,7 +964,7 @@ void Points::compile()
 		"void main()\n"
 		"{\n"
 		"  vec2 pos = point_scale * pos_point;\n"
-		"  int i = point_num % points_across;\n"
+		"  int i = int(mod(float(point_num), float(points_across)));\n"
 		"  int j = points_across - 1 - point_num / points_across;\n"
 		"  pos += (vec2(i, j) * 2.0 + 1.0) / points_across - 1.0;\n"
 		"  pos *= final_scale;\n"
@@ -971,7 +972,7 @@ void Points::compile()
 		"}\n";
 
 	static const char *frag =
-		"#version 130\n"
+		"#version 120\n"
 		"void main()\n"
 		"{\n"
 		"  gl_FragColor = vec4(1.0);\n"
@@ -1076,15 +1077,20 @@ void Sunburst::compile()
 		{ {  0.0,  1.0 }, { 0, 1, 0 } },
 		{ {  0.3, -0.8 }, { 0, 0, 1 } }
 	};
+        bool need_glsl130 = out_type == GL_INT || out_type == GL_UNSIGNED_INT;
+
+	if (need_glsl130) {
+		piglit_require_gl_version(30);
+	}
 
 	/* Total number of triangles drawn */
 	num_tris = 7;
 
-	static const char *vert =
-		"#version 130\n"
-		"in vec2 pos_within_tri;\n"
-		"in vec3 in_barycentric_coords;\n"
-		"out vec3 barycentric_coords;\n"
+	static const char *vert_template =
+		"#version %s\n"
+		"attribute vec2 pos_within_tri;\n"
+		"attribute vec3 in_barycentric_coords;\n"
+		"varying vec3 barycentric_coords;\n"
 		"uniform float rotation;\n"
 		"uniform float vert_depth;\n"
 		"uniform mat4 proj;\n"
@@ -1099,17 +1105,23 @@ void Sunburst::compile()
 		"}\n";
 
 	static const char *frag_template =
-		"#version 130\n"
+		"#version %s\n"
 		"#define OUT_TYPE %s\n"
 		"#define COMPUTE_DEPTH %s\n"
 		"uniform float frag_depth;\n"
-		"in vec3 barycentric_coords;\n"
+		"varying vec3 barycentric_coords;\n"
 		"uniform mat3x4 draw_colors;\n"
-		"out OUT_TYPE frag_out;\n"
+		"#if __VERSION__ == 130\n"
+		"  out OUT_TYPE frag_out;\n"
+		"#endif\n"
 		"\n"
 		"void main()\n"
 		"{\n"
+		"#if __VERSION__ == 130\n"
 		"  frag_out = OUT_TYPE(draw_colors * barycentric_coords);\n"
+		"#else\n"
+		"  gl_FragColor = draw_colors * barycentric_coords;\n"
+		"#endif\n"
 		"#if COMPUTE_DEPTH\n"
 		"  gl_FragDepth = (frag_depth + 1.0) / 2.0;\n"
 		"#endif\n"
@@ -1117,20 +1129,30 @@ void Sunburst::compile()
 
 	/* Compile program */
 	prog = glCreateProgram();
+	unsigned vert_alloc_len =
+		strlen(vert_template) + 4;
+	char *vert = (char *) malloc(vert_alloc_len);
+	sprintf(vert, vert_template, need_glsl130 ? "130" : "120");
 	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
+	free(vert);
 	glAttachShader(prog, vs);
+
 	const char *out_type_glsl = get_out_type_glsl();
 	unsigned frag_alloc_len =
-		strlen(frag_template) + strlen(out_type_glsl) + 1;
+		strlen(frag_template) + strlen(out_type_glsl) + 4;
 	char *frag = (char *) malloc(frag_alloc_len);
-	sprintf(frag, frag_template, out_type_glsl,
+	sprintf(frag, frag_template, need_glsl130 ? "130" : "120",
+		out_type_glsl,
 		compute_depth ? "1" : "0");
 	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
 	free(frag);
 	glAttachShader(prog, fs);
+
 	glBindAttribLocation(prog, 0, "pos_within_tri");
 	glBindAttribLocation(prog, 1, "in_barycentric_coords");
-	glBindFragDataLocation(prog, 0, "frag_out");
+	if (need_glsl130) {
+		glBindFragDataLocation(prog, 0, "frag_out");
+	}
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);

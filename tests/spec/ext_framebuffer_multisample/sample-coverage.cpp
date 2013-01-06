@@ -91,8 +91,8 @@ static int depth_loc;
 static const float bg_color[4] = { 0.4, 0.6, 0.0, 0.8 };
 
 static const char *vert =
-	"#version 130\n"
-	"in vec2 pos;\n"
+	"#version 120\n"
+	"attribute vec2 pos;\n"
 	"uniform float depth;\n"
 	"void main()\n"
 	"{\n"
@@ -101,7 +101,7 @@ static const char *vert =
 	"}\n";
 
 static const char *frag =
-	"#version 130\n"
+	"#version 120\n"
 	"uniform vec4 color;\n"
 	"void main()\n"
 	"{\n"

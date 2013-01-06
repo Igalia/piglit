@@ -167,8 +167,8 @@ bool disable_msaa_during_test_image = false;
  * each triangle.
  */
 const char *frag_non_centroid_barycentric =
-	"#version 130\n"
-	"in vec3 barycentric_coords;\n"
+	"#version 120\n"
+	"varying vec3 barycentric_coords;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -182,8 +182,8 @@ const char *frag_non_centroid_barycentric =
  * triangle.
  */
 const char *frag_centroid_barycentric =
-	"#version 130\n"
-	"centroid in vec3 barycentric_coords_centroid;\n"
+	"#version 120\n"
+	"centroid varying vec3 barycentric_coords_centroid;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -197,8 +197,8 @@ const char *frag_centroid_barycentric =
  * barycentric coordinates is outside the range [0, 1].
  */
 const char *frag_centroid_range_check =
-	"#version 130\n"
-	"centroid in vec3 barycentric_coords_centroid;\n"
+	"#version 120\n"
+	"centroid varying vec3 barycentric_coords_centroid;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -218,8 +218,8 @@ const char *frag_centroid_range_check =
  * are non-centroid interpolated.
  */
 const char *frag_non_centroid_deriv =
-	"#version 130\n"
-	"in vec2 pixel_pos;\n"
+	"#version 120\n"
+	"varying vec2 pixel_pos;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -237,8 +237,8 @@ const char *frag_non_centroid_deriv =
  * are non-centroid interpolated.
  */
 const char *frag_centroid_deriv =
-	"#version 130\n"
-	"centroid in vec2 pixel_pos_centroid;\n"
+	"#version 120\n"
+	"centroid varying vec2 pixel_pos_centroid;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -254,8 +254,8 @@ const char *frag_centroid_deriv =
  * tolerance.
  */
 const char *frag_centroid_deriv_range_check =
-	"#version 130\n"
-	"centroid in vec2 pixel_pos_centroid;\n"
+	"#version 120\n"
+	"centroid varying vec2 pixel_pos_centroid;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -272,7 +272,7 @@ const char *frag_centroid_deriv_range_check =
  * frag_centroid_range_check and frag_centroid_deriv_range_check).
  */
 const char *frag_blue =
-	"#version 130\n"
+	"#version 120\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -286,7 +286,7 @@ const char *frag_blue =
  * frag_centroid_deriv).
  */
 const char *frag_rg_0_5 =
-	"#version 130\n"
+	"#version 120\n"
 	"\n"
 	"void main()\n"
 	"{\n"
