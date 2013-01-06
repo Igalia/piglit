@@ -1117,6 +1117,12 @@ arb_texture_buffer_object['negative-bad-format'] = concurrent_test('arb_texture_
 arb_texture_buffer_object['negative-bad-target'] = concurrent_test('arb_texture_buffer_object-negative-bad-target')
 arb_texture_buffer_object['unused-name'] = concurrent_test('arb_texture_buffer_object-unused-name')
 
+arb_texture_buffer_range = Group()
+spec['ARB_texture_buffer_range'] = arb_texture_buffer_range
+arb_texture_buffer_range['dlist'] = concurrent_test('arb_texture_buffer_range-dlist')
+arb_texture_buffer_range['errors'] = concurrent_test('arb_texture_buffer_range-errors')
+arb_texture_buffer_range['ranges'] = concurrent_test('arb_texture_buffer_range-ranges')
+
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
