@@ -455,6 +455,11 @@ test_format(const struct format_desc *format)
 {
 	bool pass = true;
 
+	if (format->internalformat == 3 ||
+	    format->internalformat == 4) {
+		return PIGLIT_SKIP;
+	}
+
 	/* Caller messes with the clear color.  Reset it to the
 	 * default.
 	 */
