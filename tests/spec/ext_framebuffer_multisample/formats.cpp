@@ -169,11 +169,13 @@ PatternRenderer::try_setup(GLenum internalformat)
 	color_clamping_mode = GL_FIXED_ONLY;
 	switch (component_type) {
 	case GL_INT:
+		assert(test_pattern_ivec4);
 		test_pattern = test_pattern_ivec4;
 		color_offset = 1.0 - pow(2.0, color_bits[0] - 1);
 		color_scale = -2.0 * color_offset;
 		break;
 	case GL_UNSIGNED_INT:
+		assert(test_pattern_uvec4);
 		test_pattern = test_pattern_uvec4;
 		color_scale = pow(2.0, color_bits[0]) - 1.0;
 		color_offset = 0.0;
@@ -586,10 +588,12 @@ piglit_init(int argc, char **argv)
 				  GL_TRUE /* print_options */);
 	test_pattern_vec4 = new ColorGradientSunburst(GL_UNSIGNED_NORMALIZED);
 	test_pattern_vec4->compile();
-	test_pattern_ivec4 = new ColorGradientSunburst(GL_INT);
-	test_pattern_ivec4->compile();
-	test_pattern_uvec4 = new ColorGradientSunburst(GL_UNSIGNED_INT);
-	test_pattern_uvec4->compile();
+	if (piglit_get_gl_version() >= 30) {
+		test_pattern_ivec4 = new ColorGradientSunburst(GL_INT);
+		test_pattern_ivec4->compile();
+		test_pattern_uvec4 = new ColorGradientSunburst(GL_UNSIGNED_INT);
+		test_pattern_uvec4->compile();
+	}
 }
 
 extern "C" enum piglit_result
