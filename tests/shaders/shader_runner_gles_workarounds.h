@@ -23,9 +23,9 @@
 
 /**
  * \file
- * \brief Workarounds for building with GLES.
+ * \brief Workarounds for building with GLES2 and GLES3.
  *
- * When building shader_runner against GLES3 and libpiglitutil_gles3, there
+ * When building shader_runner against GLESX and libpiglitutil_glesX, there
  * are many macros and symbols that are not defined. This header defines such
  * macros to have the same value found in <GL/gl*.h>, and defines such
  * functions to print an error message and then report PIGLIT_SKIP, just as
@@ -64,6 +64,26 @@
 #define GL_VERTEX_PROGRAM_TWO_SIDE 0x8643
 #define GL_WRITE_ONLY 0x88B9
 
+#if defined(PIGLIT_USE_OPENGL_ES2)
+#define GL_UNIFORM_BLOCK_INDEX 0x8A3A
+#define GL_UNIFORM_OFFSET 0x8A3B
+#define GL_UNIFORM_ARRAY_STRIDE 0x8A3C
+#define GL_UNIFORM_BUFFER 0x8A11
+#define GL_UNIFORM_MATRIX_STRIDE 0x8A3D
+#define GL_UNIFORM_IS_ROW_MAJOR 0x8A3E
+#define GL_UNIFORM_BLOCK_DATA_SIZE 0x8A40
+#define GL_TEXTURE_COMPARE_MODE 0x884C
+#define GL_TEXTURE_3D 0x806F
+#define GL_TEXTURE_2D_ARRAY 0x8C1A
+#define GL_RED 0x1903
+#define GL_TEXTURE_COMPARE_FUNC 0x884D
+#define GL_ACTIVE_UNIFORM_BLOCKS 0x8A36
+#define GL_INVALID_INDEX 0xFFFFFFFFu
+#define GL_UNSIGNED_NORMALIZED 0x8C17
+#define GL_MAX_FRAGMENT_UNIFORM_COMPONENTS GL_MAX_FRAGMENT_UNIFORM_VECTORS
+#define GL_MAX_VERTEX_UNIFORM_COMPONENTS GL_MAX_VERTEX_UNIFORM_VECTORS
+#endif /*PIGLIT_USE_OPENGL_ES2 */
+
 static void
 #if defined(__GNUC__)
 __attribute__((unused))
@@ -88,7 +108,7 @@ unsupported_function(const char *name)
 	 	return_value; \
 	 })
 
-#if defined(PIGLIT_USE_OPENGL_ES3)
+#if defined(PIGLIT_USE_OPENGL_ES3) || defined(PIGLIT_USE_OPENGL_ES2)
 
 #define piglit_frustum_projection(...) UNSUPPORTED_FUNCTION(piglit_frustum_projection, 0)
 #define piglit_gen_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_gen_ortho_projection, 0)
@@ -103,6 +123,28 @@ unsupported_function(const char *name)
 #define glProgramEnvParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramEnvParameter4fvARB, 0)
 #define glProgramLocalParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramLocalParameter4fvARB, 0)
 #define glShadeModel(...) 				UNSUPPORTED_FUNCTION(glShadeModel, 0)
+
+#if defined(PIGLIT_USE_OPENGL_ES2)
+#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, 0)
+#define glUnmapBuffer(...) UNSUPPORTED_FUNCTION(glUnmapBuffer, 0)
+#define glUniform1ui(...) UNSUPPORTED_FUNCTION(glUniform1ui, 0)
+#define glUniform2uiv(...) UNSUPPORTED_FUNCTION(glUniform2uiv, 0)
+#define glUniform3uiv(...) UNSUPPORTED_FUNCTION(glUniform3uiv, 0)
+#define glUniform4uiv(...) UNSUPPORTED_FUNCTION(glUniform4uiv, 0)
+#define glUniformMatrix2x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x3fv, 0)
+#define glUniformMatrix2x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x4fv, 0)
+#define glUniformMatrix3x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x2fv, 0)
+#define glUniformMatrix3x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x4fv, 0)
+#define glUniformMatrix4x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x2fv, 0)
+#define glUniformMatrix4x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x3fv, 0)
+#define glDrawArraysInstanced(...) UNSUPPORTED_FUNCTION(glDrawArrayInstanced, 0)
+#define glGetActiveUniformBlockiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformBlockiv, 0)
+#define glBindBufferBase(...) UNSUPPORTED_FUNCTION(glBindBufferiBase, 0)
+#define glGetUniformIndices(...) UNSUPPORTED_FUNCTION(glGetUniformIndices, 0)
+#define glGetActiveUniformsiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformsiv, 0)
+#define glGenVertexArrays(...) UNSUPPORTED_FUNCTION(glGenVertexArrays, 0)
+#define glBindVertexArray(...) UNSUPPORTED_FUNCTION(glBindVertexArray, 0)
+#endif /* PIGLIT_USE_OPENGL_ES2 */
 
 #define glBindProgramARB(a, b) \
 	/* Custom definition to suppress unused-variable warnings. */ \
@@ -122,6 +164,7 @@ unsupported_function(const char *name)
 		unsupported_function("glVertexPointer"); \
 	 })
 
+#if defined(PIGLIT_USE_OPENGL_ES3)
 static GLvoid*
 glMapBuffer(GLenum target, GLbitfield access)
 {
@@ -135,5 +178,6 @@ glMapBuffer(GLenum target, GLbitfield access)
 
 	return glMapBufferRange(target, 0, length, access);
 }
+#endif /* PIGLIT_USE_OPENGL_ES3 */
 
-#endif /*PIGLIT_USE_OPENGL*/
+#endif /* PIGLIT_USE_OPENGL_ES3 || PIGLIT_USE_OPENGL_ES2 */

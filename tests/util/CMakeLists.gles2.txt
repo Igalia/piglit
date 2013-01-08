@@ -1,5 +1,6 @@
 set(UTIL_GL_SOURCES
 	${UTIL_GL_SOURCES}
+	piglit-vbo.cpp
 	piglit-shader.c
 	piglit-shader-gles2.c
 	piglit-util-gl-enum.c
