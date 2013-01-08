@@ -224,9 +224,7 @@ class ShaderTest(PlainExecTest):
         if self.__gl_api == ShaderTest.API_GL:
             runner = "shader_runner"
         elif self.__gl_api == ShaderTest.API_GLES2:
-            # Tentatively, let's use the gles3 shader runner to run gles2
-            # tests.
-            runner = "shader_runner_gles3"
+            runner = "shader_runner_gles2"
         elif self.__gl_api == ShaderTest.API_GLES3:
             runner = "shader_runner_gles3"
         else:
