@@ -210,12 +210,12 @@ piglit_display(void)
 		piglit_draw_rect(w * 11, start_y, w, h);
 	}
 
-	pass = piglit_probe_pixel_rgb(w * 1.5, piglit_height / 2, expected);
-	pass = piglit_probe_pixel_rgb(w * 3.5, piglit_height / 2, expected);
-	pass = piglit_probe_pixel_rgb(w * 5.5, piglit_height / 2, expected);
-	pass = piglit_probe_pixel_rgb(w * 7.5, piglit_height / 2, expected);
-	pass = piglit_probe_pixel_rgb(w * 9.5, piglit_height / 2, expected);
-	pass = piglit_probe_pixel_rgb(w * 11.5, piglit_height / 2, expected);
+	pass = piglit_probe_pixel_rgb(w * 1.5, piglit_height / 2, expected) && pass;
+	pass = piglit_probe_pixel_rgb(w * 3.5, piglit_height / 2, expected) && pass;
+	pass = piglit_probe_pixel_rgb(w * 5.5, piglit_height / 2, expected) && pass;
+	pass = piglit_probe_pixel_rgb(w * 7.5, piglit_height / 2, expected) && pass;
+	pass = piglit_probe_pixel_rgb(w * 9.5, piglit_height / 2, expected) && pass;
+	pass = piglit_probe_pixel_rgb(w * 11.5, piglit_height / 2, expected) && pass;
 
 	piglit_present_results();
 
