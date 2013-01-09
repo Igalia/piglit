@@ -88,7 +88,7 @@ static void
 #if defined(__GNUC__)
 __attribute__((unused))
 #endif
-unsupported_function(const char *name)
+unsupported_function(const char *name, ...)
 {
 	printf("Function \"%s\" not supported on this implementation\n", name);
 	piglit_report_result(PIGLIT_SKIP);
@@ -102,67 +102,52 @@ unsupported_function(const char *name)
  * GLES doesn't exist on Windows. So we're free to use the GCC/Clang extension
  * for statement expressions.
  */
-#define UNSUPPORTED_FUNCTION(name, return_value) \
+#define UNSUPPORTED_FUNCTION(name, return_value, ...) \
 	({ \
-	 	unsupported_function(#name); \
-	 	return_value; \
+		unsupported_function(#name, __VA_ARGS__); \
+		return_value; \
 	 })
 
 #if defined(PIGLIT_USE_OPENGL_ES3) || defined(PIGLIT_USE_OPENGL_ES2)
 
-#define piglit_frustum_projection(...) UNSUPPORTED_FUNCTION(piglit_frustum_projection, 0)
-#define piglit_gen_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_gen_ortho_projection, 0)
-#define piglit_miptree_texture(...) UNSUPPORTED_FUNCTION(piglit_miptree_texture, 0)
-#define piglit_depth_texture(...) UNSUPPORTED_FUNCTION(piglit_depth_texture, 0)
-#define piglit_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_ortho_projection, 0)
-#define piglit_compile_program(...) UNSUPPORTED_FUNCTION(piglit_compile_program, 0)
+#define piglit_frustum_projection(...) UNSUPPORTED_FUNCTION(piglit_frustum_projection, 0, __VA_ARGS__)
+#define piglit_gen_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_gen_ortho_projection, 0, __VA_ARGS__)
+#define piglit_miptree_texture() UNSUPPORTED_FUNCTION(piglit_miptree_texture, 0, 0)
+#define piglit_depth_texture(...) UNSUPPORTED_FUNCTION(piglit_depth_texture, 0, __VA_ARGS__)
+#define piglit_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_ortho_projection, 0, __VA_ARGS__)
+#define piglit_compile_program(...) UNSUPPORTED_FUNCTION(piglit_compile_program, 0, __VA_ARGS__)
 
-#define glClipPlane(...) 				UNSUPPORTED_FUNCTION(glClipPlane, 0)
-#define glDisableClientState(...) 			UNSUPPORTED_FUNCTION(glDisableClientState, 0)
-#define glEnableClientState(...) 			UNSUPPORTED_FUNCTION(glEnableClientState, 0)
-#define glProgramEnvParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramEnvParameter4fvARB, 0)
-#define glProgramLocalParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramLocalParameter4fvARB, 0)
-#define glShadeModel(...) 				UNSUPPORTED_FUNCTION(glShadeModel, 0)
+#define glClipPlane(...) 				UNSUPPORTED_FUNCTION(glClipPlane, 0, __VA_ARGS__)
+#define glDisableClientState(...) 			UNSUPPORTED_FUNCTION(glDisableClientState, 0, __VA_ARGS__)
+#define glEnableClientState(...) 			UNSUPPORTED_FUNCTION(glEnableClientState, 0, __VA_ARGS__)
+#define glProgramEnvParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramEnvParameter4fvARB, 0, __VA_ARGS__)
+#define glProgramLocalParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramLocalParameter4fvARB, 0, __VA_ARGS__)
+#define glShadeModel(...) 				UNSUPPORTED_FUNCTION(glShadeModel, 0, __VA_ARGS__)
 
 #if defined(PIGLIT_USE_OPENGL_ES2)
-#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, 0)
-#define glUnmapBuffer(...) UNSUPPORTED_FUNCTION(glUnmapBuffer, 0)
-#define glUniform1ui(...) UNSUPPORTED_FUNCTION(glUniform1ui, 0)
-#define glUniform2uiv(...) UNSUPPORTED_FUNCTION(glUniform2uiv, 0)
-#define glUniform3uiv(...) UNSUPPORTED_FUNCTION(glUniform3uiv, 0)
-#define glUniform4uiv(...) UNSUPPORTED_FUNCTION(glUniform4uiv, 0)
-#define glUniformMatrix2x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x3fv, 0)
-#define glUniformMatrix2x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x4fv, 0)
-#define glUniformMatrix3x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x2fv, 0)
-#define glUniformMatrix3x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x4fv, 0)
-#define glUniformMatrix4x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x2fv, 0)
-#define glUniformMatrix4x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x3fv, 0)
-#define glDrawArraysInstanced(...) UNSUPPORTED_FUNCTION(glDrawArrayInstanced, 0)
-#define glGetActiveUniformBlockiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformBlockiv, 0)
-#define glBindBufferBase(...) UNSUPPORTED_FUNCTION(glBindBufferiBase, 0)
-#define glGetUniformIndices(...) UNSUPPORTED_FUNCTION(glGetUniformIndices, 0)
-#define glGetActiveUniformsiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformsiv, 0)
-#define glGenVertexArrays(...) UNSUPPORTED_FUNCTION(glGenVertexArrays, 0)
-#define glBindVertexArray(...) UNSUPPORTED_FUNCTION(glBindVertexArray, 0)
+#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, 0, __VA_ARGS__)
+#define glUnmapBuffer(...) UNSUPPORTED_FUNCTION(glUnmapBuffer, 0, __VA_ARGS__)
+#define glUniform1ui(...) UNSUPPORTED_FUNCTION(glUniform1ui, 0, __VA_ARGS__)
+#define glUniform2uiv(...) UNSUPPORTED_FUNCTION(glUniform2uiv, 0, __VA_ARGS__)
+#define glUniform3uiv(...) UNSUPPORTED_FUNCTION(glUniform3uiv, 0, __VA_ARGS__)
+#define glUniform4uiv(...) UNSUPPORTED_FUNCTION(glUniform4uiv, 0, __VA_ARGS__)
+#define glUniformMatrix2x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x3fv, 0, __VA_ARGS__)
+#define glUniformMatrix2x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x4fv, 0, __VA_ARGS__)
+#define glUniformMatrix3x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x2fv, 0, __VA_ARGS__)
+#define glUniformMatrix3x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x4fv, 0, __VA_ARGS__)
+#define glUniformMatrix4x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x2fv, 0, __VA_ARGS__)
+#define glUniformMatrix4x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x3fv, 0, __VA_ARGS__)
+#define glDrawArraysInstanced(...) UNSUPPORTED_FUNCTION(glDrawArrayInstanced, 0, __VA_ARGS__)
+#define glGetActiveUniformBlockiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformBlockiv, 0, __VA_ARGS__)
+#define glBindBufferBase(...) UNSUPPORTED_FUNCTION(glBindBufferiBase, 0, __VA_ARGS__)
+#define glGetUniformIndices(...) UNSUPPORTED_FUNCTION(glGetUniformIndices, 0, __VA_ARGS__)
+#define glGetActiveUniformsiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformsiv, 0, __VA_ARGS__)
+#define glGenVertexArrays(...) UNSUPPORTED_FUNCTION(glGenVertexArrays, 0, __VA_ARGS__)
+#define glBindVertexArray(...) UNSUPPORTED_FUNCTION(glBindVertexArray, 0, __VA_ARGS__)
 #endif /* PIGLIT_USE_OPENGL_ES2 */
 
-#define glBindProgramARB(a, b) \
-	/* Custom definition to suppress unused-variable warnings. */ \
-	({ \
-	 	(void) a; \
-	 	(void) b; \
-		unsupported_function("glBindProgramARB"); \
-	 })
-
-#define glVertexPointer(a, b, c, d) \
-	/* Custom definition to suppress unused-variable warnings. */ \
-	({ \
-	 	(void) a; \
-	 	(void) b; \
-	 	(void) c; \
-	 	(void) d; \
-		unsupported_function("glVertexPointer"); \
-	 })
+#define glBindProgramARB(...) UNSUPPORTED_FUNCTION(glBindProgramARB, 0, __VA_ARGS__)
+#define glVertexPointer(...) UNSUPPORTED_FUNCTION(glVertexPointer, 0, __VA_ARGS__)
 
 #if defined(PIGLIT_USE_OPENGL_ES3)
 static GLvoid*
