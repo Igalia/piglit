@@ -125,7 +125,7 @@ unsupported_function(const char *name, ...)
 #define glShadeModel(...) 				UNSUPPORTED_FUNCTION(glShadeModel, 0, __VA_ARGS__)
 
 #if defined(PIGLIT_USE_OPENGL_ES2)
-#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, 0, __VA_ARGS__)
+#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, NULL, __VA_ARGS__)
 #define glUnmapBuffer(...) UNSUPPORTED_FUNCTION(glUnmapBuffer, 0, __VA_ARGS__)
 #define glUniform1ui(...) UNSUPPORTED_FUNCTION(glUniform1ui, 0, __VA_ARGS__)
 #define glUniform2uiv(...) UNSUPPORTED_FUNCTION(glUniform2uiv, 0, __VA_ARGS__)
