@@ -66,6 +66,11 @@ test_format(const struct format_desc *format)
 	glGenRenderbuffers(1, &rb);
 	glBindRenderbuffer(GL_RENDERBUFFER, rb);
 	glRenderbufferStorage(GL_RENDERBUFFER, format->internalformat, 1, 1);
+	if (glGetError() == GL_INVALID_ENUM) {
+		printf("SKIP\n");
+		return PIGLIT_SKIP;
+	}
+
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_INTERNAL_FORMAT,
 				     &internalformat);
