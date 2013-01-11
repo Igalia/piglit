@@ -59,7 +59,6 @@ piglit_init(int argc, char **argv)
 	GLint max_samples;
 	GLuint rb, fb;
 	GLenum status;
-	bool pass = true;
 	float data[4];
 
 	piglit_require_extension("GL_EXT_framebuffer_multisample");
@@ -94,5 +93,5 @@ piglit_init(int argc, char **argv)
 	glDeleteRenderbuffersEXT(1, &rb);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	piglit_report_result(PIGLIT_PASS);
 }
