@@ -297,7 +297,7 @@ generate_texture()
 	expected_colors = calloc(miplevels, sizeof(float **));
 
 	for (l = 0; l < miplevels; l++) {
-		expected_colors[l] = calloc(level_size[l][2], sizeof(float **));
+		expected_colors[l] = calloc(level_size[l][2], sizeof(float *));
 
 		i_ptr = i_level =
 			malloc(level_size[l][0] * level_size[l][1] *
