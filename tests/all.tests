@@ -1013,6 +1013,7 @@ arb_occlusion_query = Group()
 spec['ARB_occlusion_query'] = arb_occlusion_query
 add_concurrent_test(arb_occlusion_query, 'occlusion_query')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_lifetime')
+add_concurrent_test(arb_occlusion_query, 'occlusion_query_order')
 
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()

@@ -11,3 +11,4 @@ link_libraries (
 
 piglit_add_executable (occlusion_query occlusion_query.c)
 piglit_add_executable (occlusion_query_lifetime occlusion_query_lifetime.c)
+piglit_add_executable (occlusion_query_order occlusion_query_order.c)
