@@ -217,12 +217,32 @@ static enum piglit_result test_format(const struct format_desc *format)
 			res5[2] = 0;
 		}
 		if (!a) {
+			/* When there are no bits for the alpha channel, we
+			 * always expect to read an alpha value of 1.0.
+			 */
 			res0[3] = 1;
 			res1[3] = 1;
 			res2[3] = 1;
 			res3[3] = 1;
 			res4[3] = 1;
 			res5[3] = 1;
+
+			/* Also blending with
+			 * DST_ALPHA/ONE_MINUS_DST_ALPHA (as in case
+			 * 4) with an implicit destination alpha value
+			 * of 1.0 means that the result color should
+			 * be identical to the source color, (if there
+			 * are any bits to store that color that is).
+			 */
+			if (r)  {
+				res4[0] = src4[0];
+			}
+			if (g) {
+				res4[1] = src4[1];
+			}
+			if (b) {
+				res4[2] = src4[2];
+			}
 		}
         }
 
