@@ -78,12 +78,14 @@ lround(double x) {
 
 #endif /* defined(_MSC_VER) */
 
-#ifdef _WIN32
-int asprintf(char **strp, const char *fmt, ...)
-#ifdef __GNUC__
-	__attribute__ ((format (printf, 2, 3)))
+#if (__GNUC__ >= 3)
+#define PRINTFLIKE(f, a) __attribute__ ((format(__printf__, f, a)))
+#else
+#define PRINTFLIKE(f, a)
 #endif
-;
+
+#ifdef _WIN32
+int asprintf(char **strp, const char *fmt, ...) PRINTFLIKE(2, 3);
 #endif /* _WIN32 */
 
 // Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
