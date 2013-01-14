@@ -42,19 +42,6 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "fbo-storage-formats";
 
-
-static void
-check_error(int line)
-{
-	GLenum err = glGetError();
-	if (err) {
-		printf("%s: Unexpected error 0x%x at line %d\n",
-		       TestName, err, line);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-}
-
-
 #define EXT_packed_depth_stencil 1
 #define ARB_framebuffer_object 2
 #define ARB_texture_rg 3
@@ -182,17 +169,20 @@ test(void)
 
 	glGenFramebuffersEXT(1, &fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
-	check_error(__LINE__);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenRenderbuffersEXT(1, &rb);
-	check_error(__LINE__);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
 
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
 				     GL_COLOR_ATTACHMENT0,
 				     GL_RENDERBUFFER_EXT,
 				     rb);
-	check_error(__LINE__);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* clear out any errors */
 	while (glGetError())
