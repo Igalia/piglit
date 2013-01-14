@@ -37,8 +37,8 @@ def add_single_param_test_set(group, name, *params):
     for param in params:
         group[name + '-' + param] = PlainExecTest([name, param, '-auto'])
 
-def add_plain_test(group, name):
-	group[name] = PlainExecTest([name, '-auto'])
+def add_plain_test(group, args):
+	group[args] = PlainExecTest(shlex.split(args) + ['-auto'])
 
 def concurrent_test(args):
 	test = PlainExecTest(shlex.split(args) + ['-auto', '-fbo'])
