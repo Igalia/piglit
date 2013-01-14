@@ -47,7 +47,7 @@ static const char *TestName = "fbo-storage-formats";
 #define ARB_texture_rg 3
 #define MAX_EXT 4
 
-static GLboolean HaveExtension[MAX_EXT];
+static GLboolean have_extension[MAX_EXT];
 
 
 
@@ -58,7 +58,7 @@ struct format_info
 };
 
 
-static const struct format_info Formats[] = {
+static const struct format_info formats[] = {
 	{ GL_RGB, 0 },
 	{ GL_R3_G3_B2, 0 },
 	{ GL_RGB4, 0 },
@@ -128,7 +128,7 @@ static const struct format_info Formats[] = {
 };
 
 
-static const GLenum InvalidFormats[] = {
+static const GLenum invalid_formats[] = {
 	GL_COLOR_INDEX,
 	GL_COLOR_INDEX1_EXT,
 	GL_COLOR_INDEX2_EXT,
@@ -189,34 +189,35 @@ test(void)
 		;
 
 	/* test formats that should be accepted */
-	for (i = 0; i < ARRAY_SIZE(Formats); i++) {
-		if (!HaveExtension[Formats[i].extension])
+	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		if (!have_extension[formats[i].extension])
 			continue;
 
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, Formats[i].format,
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[i].format,
 					 piglit_width, piglit_height);
 		err = glGetError();
 		if (err) {
 			printf("%s: glRenderbufferStorage failed for "
 			       "format 0x%x\n",
-			       TestName, Formats[i].format);
+			       TestName, formats[i].format);
 			pass = GL_FALSE;
 		}
-		printf("0x%04X: %s\n", Formats[i].format,
+		printf("0x%04X: %s\n", formats[i].format,
 		       (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) ==
 			GL_FRAMEBUFFER_COMPLETE_EXT ?
 			"complete" : "incomplete"));
 	}
 
 	/* test formats that should fail */
-	for (i = 0; i < ARRAY_SIZE(InvalidFormats); i++) {
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, InvalidFormats[i],
+	for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
+					 invalid_formats[i],
 					 piglit_width, piglit_height);
 		err = glGetError();
 		if (err != GL_INVALID_ENUM) {
 			printf("%s: glRenderbufferStorage erroneously "
 			       "accepted format 0x%x\n",
-			       TestName, InvalidFormats[i]);
+			       TestName, invalid_formats[i]);
 			pass = GL_FALSE;
 		}
 	}
@@ -237,10 +238,10 @@ piglit_init(int argc, char**argv)
 {
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
-	HaveExtension[0] = GL_TRUE;
-	HaveExtension[EXT_packed_depth_stencil] = piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
-	HaveExtension[ARB_framebuffer_object] = piglit_is_extension_supported("GL_ARB_framebuffer_object");
-	HaveExtension[ARB_texture_rg] = piglit_is_extension_supported("GL_ARB_texture_rg");
+	have_extension[0] = GL_TRUE;
+	have_extension[EXT_packed_depth_stencil] = piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
+	have_extension[ARB_framebuffer_object] = piglit_is_extension_supported("GL_ARB_framebuffer_object");
+	have_extension[ARB_texture_rg] = piglit_is_extension_supported("GL_ARB_texture_rg");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }

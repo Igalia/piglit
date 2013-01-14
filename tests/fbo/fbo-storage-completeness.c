@@ -46,7 +46,7 @@ PIGLIT_GL_TEST_CONFIG_END
 #define ARB_texture_rg 3
 #define MAX_EXT 4
 
-static GLboolean HaveExtension[MAX_EXT];
+static GLboolean have_extension[MAX_EXT];
 
 
 
@@ -57,7 +57,7 @@ struct format_info
 };
 
 
-static const struct format_info Formats[] = {
+static const struct format_info formats[] = {
 	{ GL_RGB, 0 },
 	{ GL_R3_G3_B2, 0 },
 	{ GL_RGB4, 0 },
@@ -139,8 +139,8 @@ test(void)
 		;
 
 	/* find a format which is incomplete */
-	for (i = 0; i < ARRAY_SIZE(Formats); i++) {
-		if (!HaveExtension[Formats[i].extension])
+	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		if (!have_extension[formats[i].extension])
 			continue;
 
 		glGenFramebuffersEXT(1, &fbo);
@@ -160,7 +160,7 @@ test(void)
 		if (!piglit_check_gl_error(GL_NO_ERROR))
 			piglit_report_result(PIGLIT_FAIL);
 
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, Formats[i].format,
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[i].format,
 					 piglit_width, piglit_height);
 		if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) ==
 		    GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -200,7 +200,7 @@ test(void)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, Formats[complete].format,
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[complete].format,
 				 piglit_width, piglit_height);
 	if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) !=
 	    GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -210,7 +210,7 @@ test(void)
 	}
 
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
-				 Formats[incomplete].format,
+				 formats[incomplete].format,
 				 piglit_width, piglit_height);
 	if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) ==
 	    GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -238,10 +238,10 @@ piglit_init(int argc, char**argv)
 {
 	piglit_require_extension("GL_EXT_framebuffer_object");
 
-	HaveExtension[0] = GL_TRUE;
-	HaveExtension[EXT_packed_depth_stencil] = piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
-	HaveExtension[ARB_framebuffer_object] = piglit_is_extension_supported("GL_ARB_framebuffer_object");
-	HaveExtension[ARB_texture_rg] = piglit_is_extension_supported("GL_ARB_texture_rg");
+	have_extension[0] = GL_TRUE;
+	have_extension[EXT_packed_depth_stencil] = piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
+	have_extension[ARB_framebuffer_object] = piglit_is_extension_supported("GL_ARB_framebuffer_object");
+	have_extension[ARB_texture_rg] = piglit_is_extension_supported("GL_ARB_texture_rg");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
