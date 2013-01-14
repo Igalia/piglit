@@ -191,11 +191,19 @@ piglit_report_result(enum piglit_result result)
 }
 
 void
-piglit_report_subtest_result(const char *name, enum piglit_result result)
+piglit_report_subtest_result(enum piglit_result result, const char *format, ...)
 {
 	const char *result_str = piglit_result_to_string(result);
-	printf("PIGLIT:subtest {'%s' : '%s'}\n", name, result_str);
+	va_list ap;
+
+	va_start(ap, format);
+
+	printf("PIGLIT:subtest {'");
+	vprintf(format, ap);
+	printf("' : '%s'}\n", result_str);
 	fflush(stdout);
+
+	va_end(ap);
 }
 
 #ifndef HAVE_STRCHRNUL

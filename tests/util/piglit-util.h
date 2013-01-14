@@ -137,7 +137,8 @@ int piglit_find_line(const char *program, int position);
 void piglit_merge_result(enum piglit_result *all, enum piglit_result subtest);
 const char * piglit_result_to_string(enum piglit_result result);
 void piglit_report_result(enum piglit_result result);
-void piglit_report_subtest_result(const char *name, enum piglit_result result);
+void piglit_report_subtest_result(enum piglit_result result,
+				  const char *format, ...) PRINTFLIKE(2, 3);
 
 #ifndef HAVE_STRCHRNUL
 char *strchrnul(const char *s, int c);
