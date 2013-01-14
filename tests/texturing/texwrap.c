@@ -1077,6 +1077,13 @@ static GLboolean test_format_npot_swizzle(const struct format_desc *format,
 	draw(format, npot, texture_proj);
 	pass = probe_pixels(format, npot, texswizzle);
 	piglit_present_results();
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "%s%s%s%s%s", format->name,
+				     npot ? ", NPOT" : "",
+				     texswizzle ? ", swizzled" : "",
+				     texture_proj ? ", projected" : "",
+				     test_border_color ? ", border color only" : "");
 	return pass;
 }
 
