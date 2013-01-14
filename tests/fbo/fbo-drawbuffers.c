@@ -39,7 +39,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 128;
 	config.window_height = 128;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA |
+			       PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -67,6 +68,8 @@ attach_texture(int i)
 	return tex;
 }
 
+static GLboolean test_masked_clear;
+
 enum piglit_result
 piglit_display(void)
 {
@@ -74,6 +77,8 @@ piglit_display(void)
 	GLuint tex0, tex1, fb;
 	GLenum status;
 	float green[] = {0, 1, 0, 0};
+	float masked_clear[] = {0.1, 0.7, 0.3, 0.4};
+	float *expected;
 	const GLenum attachments[] = {
 		GL_COLOR_ATTACHMENT0_EXT,
 		GL_COLOR_ATTACHMENT1_EXT,
@@ -96,11 +101,25 @@ piglit_display(void)
 	}
 
 	/* Clear render targets (textures) to red */
-	glClearColor(1.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	if (test_masked_clear) {
+		glClearColor(0.1, 0.2, 0.3, 0.4);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor4fv(green);
-	piglit_draw_rect(0, 0, piglit_width, piglit_height);
+		glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_FALSE);
+		glClearColor(0.6, 0.7, 0.8, 0.9);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+		expected = masked_clear;
+	} else {
+		glClearColor(1.0, 0.0, 0.0, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glColor4fv(green);
+		piglit_draw_rect(0, 0, piglit_width, piglit_height);
+
+		expected = green;
+	}
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
@@ -120,8 +139,7 @@ piglit_display(void)
 	glDeleteTextures(1, &tex1);
 	glDeleteFramebuffersEXT(1, &fb);
 
-	pass = pass && piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height,
-					     green);
+	pass = pass && piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, expected);
 
 	piglit_present_results();
 
@@ -132,6 +150,14 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLint num;
+	int i;
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "masked-clear") == 0) {
+			puts("Testing masked glClear.");
+			test_masked_clear = GL_TRUE;
+		}
+	}
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
