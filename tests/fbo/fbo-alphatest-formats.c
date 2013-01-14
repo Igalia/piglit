@@ -178,7 +178,9 @@ static enum piglit_result test_format(const struct format_desc *format)
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	printf("Testing %s", format->name);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		printf(" - fbo incomplete (status = 0x%04x)\n", status);
+		printf("- fbo incomplete (status = %s)\n",
+		       piglit_get_gl_enum_name(status));
+		piglit_report_subtest_result(PIGLIT_SKIP, format->name);
 		return PIGLIT_SKIP;
 	}
         printf("\n");
@@ -251,6 +253,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 
 	if (!pass) {
 		piglit_present_results();
+		piglit_report_subtest_result(PIGLIT_FAIL, format->name);
 		return PIGLIT_FAIL;
 	}
 
@@ -311,6 +314,8 @@ static enum piglit_result test_format(const struct format_desc *format)
 
 	piglit_present_results();
 
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     format->name);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
