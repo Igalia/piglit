@@ -22,7 +22,7 @@
  */
 
 /*
- * @file fbo-storage-formats.c
+ * @file fbo-storage-completeness.c
  *
  * Tests if glRenderbufferStorage() affects framebuffer completeness.
  *
