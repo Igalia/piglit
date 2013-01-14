@@ -43,6 +43,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static GLboolean test_clear;
+
 static GLuint
 attach_texture(int i)
 {
@@ -105,8 +107,13 @@ piglit_display(void)
 	glColorMaskIndexedEXT(0, GL_FALSE, GL_TRUE, GL_FALSE, GL_FALSE);
 	glColorMaskIndexedEXT(1, GL_FALSE, GL_FALSE, GL_TRUE, GL_FALSE);
 
-	glColor4fv(white);
-	piglit_draw_rect(0, 0, piglit_width, piglit_height);
+	if (test_clear) {
+		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+	} else {
+		glColor4fv(white);
+		piglit_draw_rect(0, 0, piglit_width, piglit_height);
+	}
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -141,6 +148,14 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLint num;
+	int i;
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "clear") == 0) {
+			puts("Testing glClear.");
+			test_clear = GL_TRUE;
+		}
+	}
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 

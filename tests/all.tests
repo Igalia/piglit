@@ -2131,6 +2131,7 @@ ext_draw_buffers2 = Group()
 spec['EXT_draw_buffers2'] = ext_draw_buffers2
 add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-blend')
 add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-colormask')
+add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-colormask clear')
 
 arb_draw_buffers_blend = Group()
 spec['ARB_draw_buffers_blend'] = arb_draw_buffers_blend
