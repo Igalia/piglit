@@ -40,8 +40,6 @@ config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char *TestName = "fbo-storage-formats";
-
 #define EXT_packed_depth_stencil 1
 #define ARB_framebuffer_object 2
 #define ARB_texture_rg 3
@@ -165,7 +163,6 @@ test(void)
 	GLuint fbo, rb;
 	int i;
 	GLboolean pass = GL_TRUE;
-	GLenum err;
 
 	glGenFramebuffersEXT(1, &fbo);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
@@ -190,35 +187,38 @@ test(void)
 
 	/* test formats that should be accepted */
 	for (i = 0; i < ARRAY_SIZE(formats); i++) {
+		const char *name = piglit_get_gl_enum_name(formats[i].format);
+
 		if (!have_extension[formats[i].extension])
 			continue;
 
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[i].format,
 					 piglit_width, piglit_height);
-		err = glGetError();
-		if (err) {
-			printf("%s: glRenderbufferStorage failed for "
-			       "format 0x%x\n",
-			       TestName, formats[i].format);
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			piglit_report_subtest_result(PIGLIT_FAIL, name);
 			pass = GL_FALSE;
+		} else {
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			piglit_report_subtest_result(PIGLIT_PASS,
+						     "%s (%s)",
+						     name,
+						     (status == GL_FRAMEBUFFER_COMPLETE ?
+						      "complete" : "incomplete"));
 		}
-		printf("0x%04X: %s\n", formats[i].format,
-		       (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) ==
-			GL_FRAMEBUFFER_COMPLETE_EXT ?
-			"complete" : "incomplete"));
 	}
 
 	/* test formats that should fail */
 	for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
+		const char *name = piglit_get_gl_enum_name(formats[i].format);
+
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
 					 invalid_formats[i],
 					 piglit_width, piglit_height);
-		err = glGetError();
-		if (err != GL_INVALID_ENUM) {
-			printf("%s: glRenderbufferStorage erroneously "
-			       "accepted format 0x%x\n",
-			       TestName, invalid_formats[i]);
+		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
+			piglit_report_subtest_result(PIGLIT_FAIL, name);
 			pass = GL_FALSE;
+		} else {
+			piglit_report_subtest_result(PIGLIT_PASS, name);
 		}
 	}
 
