@@ -202,6 +202,7 @@ test_with_format(GLenum internal_format, const char *name)
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		fprintf(stderr, "framebuffer incomplete\n");
+		piglit_report_subtest_result(PIGLIT_SKIP, name);
 		goto done;
 	}
 
@@ -236,11 +237,12 @@ test_with_format(GLenum internal_format, const char *name)
 
 		}
 
-		if (format_passed) {
-			printf("    %s: passed\n", read_formats[i].name);
-		} else {
-			pass = false;
-		}
+		piglit_report_subtest_result((format_passed ?
+					      PIGLIT_PASS : PIGLIT_FAIL),
+					     "%s/%s",
+					     name,
+					     read_formats[i].name);
+		pass = format_passed && pass;
 	}
 
 done:
