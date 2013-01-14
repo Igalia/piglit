@@ -297,9 +297,15 @@ piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits)
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		if (bits[i] < 2) {
+		if (bits[i] == 0) {
+			/* With 0 bits of storage, we still want to
+			 * validate expected results, (such as
+			 * alpha==1.0 when targeting storage with no
+			 * alpha bits). */
+			piglit_tolerance[i] = 3.0 / (1 << 8);
+		} else if (bits[i] == 1) {
 			/* Don't try to validate channels when there's only 1
-			 * bit of precision (or none).
+			 * bit of precision.
 			 */
 			piglit_tolerance[i] = 1.0;
 		} else {
