@@ -819,6 +819,14 @@ for stage in ['vs', 'fs']:
 		spec['glsl-1.40/execution/texelFetch/' + stage + '-texelFetch-' + sampler] = concurrent_test('texelFetch 140 ' + stage + ' ' + sampler)
 		spec['glsl-1.40/execution/texelFetchOffset/' + stage + '-' + sampler] = concurrent_test('texelFetch offset 140 ' + stage + ' ' + sampler)
 
+spec['glsl-1.50'] = Group()
+import_glsl_parser_tests(spec['glsl-1.50'],
+			 os.path.join(testsDir, 'spec', 'glsl-1.50'),
+			 ['compiler'])
+add_shader_test_dir(spec['glsl-1.50'],
+		    os.path.join(testsDir, 'spec', 'glsl-1.50'),
+		    recursive=True)
+
 # Group spec/glsl-es-3.00
 spec['glsl-es-3.00'] = Group()
 import_glsl_parser_tests(spec['glsl-es-3.00'],
