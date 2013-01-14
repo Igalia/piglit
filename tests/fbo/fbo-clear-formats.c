@@ -513,6 +513,9 @@ test_format(const struct format_desc *format)
 	tex = create_tex(format->internalformat, format->base_internal_format);
 	if (tex == 0) {
 		printf(" - FBO incomplete\n");
+		piglit_report_subtest_result(PIGLIT_SKIP,
+					     "%s (fbo incomplete)",
+					     format->name);
 		return PIGLIT_SKIP;
 	}
 	printf("\n");
@@ -550,6 +553,8 @@ test_format(const struct format_desc *format)
 
 	glDeleteTextures(1, &tex);
 
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     format->name);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
