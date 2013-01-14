@@ -301,7 +301,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 		printf("  when testing FBO result, blending with SRC_COLOR.\n");
 		pass = GL_FALSE;
         }
-	if ((i || a) && !piglit_probe_pixel_rgba(piglit_width * 9 / 12, 0, res4)) {
+	if (!piglit_probe_pixel_rgba(piglit_width * 9 / 12, 0, res4)) {
 		printf("  when testing FBO result, blending with DST_ALPHA.\n");
 		pass = GL_FALSE;
 	}
@@ -370,7 +370,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 		printf("  when testing window result, blending SRC_COLOR.\n");
 		pass = GL_FALSE;
         }
-	if ((i || a) && !piglit_probe_pixel_rgba(piglit_width * 9 / 12, 0, res4)) {
+	if (!piglit_probe_pixel_rgba(piglit_width * 9 / 12, 0, res4)) {
 		printf("  when testing window result, blending DST_ALPHA.\n");
 		pass = GL_FALSE;
 	}
