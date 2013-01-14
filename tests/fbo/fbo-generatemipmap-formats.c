@@ -34,6 +34,7 @@
 #include "piglit-util-gl-common.h"
 #include "fbo-formats.h"
 
+static bool npot;
 static int tex_width = 256;
 static int tex_height = 256;
 
@@ -47,8 +48,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static void set_npot(GLboolean npot)
+static void set_npot(bool new_npot)
 {
+	npot = new_npot;
 	if (npot) {
 		tex_width = 293;
 		tex_height = 277;
@@ -63,7 +65,8 @@ key_func(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'd':
-		set_npot(tex_width == 256 && piglit_is_extension_supported("GL_ARB_texture_non_power_of_two"));
+		if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two"))
+			set_npot(!npot);
 		break;
 	}
 	fbo_formats_key_func(key, x, y);
@@ -443,6 +446,10 @@ test_format(const struct format_desc *format, GLenum basetype)
 	}
 
 	glDeleteTextures(1, &tex);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "%s%s", format->name,
+				     npot ? " NPOT" : "");
 
 	return pass;
 }
