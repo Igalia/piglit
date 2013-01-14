@@ -1189,6 +1189,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 
     f('inverse', 1, 140, np.linalg.inv, None, [squaremats])
 
+    f('determinant', 1, 150, np.linalg.det, None, [squaremats])
+
 _make_vector_or_matrix_test_vectors(test_suite)
 
 
