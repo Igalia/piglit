@@ -212,6 +212,7 @@ void piglit_init(int argc, char **argv)
 		const char *sources[2];
 		GLint stat;
 		GLuint sh;
+		GLboolean ok;
 
 		sprintf(buf, "#define IDX %d\n", i);
 
@@ -238,7 +239,9 @@ void piglit_init(int argc, char **argv)
 		glBindAttribLocation(prog[i], 5, "normalization");
 
 		glLinkProgram(prog[i]);
-		piglit_link_check_status(prog[i]);
+		ok = piglit_link_check_status(prog[i]);
+		if (!ok)
+			piglit_report_result(PIGLIT_FAIL);
 	}
 
 	glClearColor(0.3, 0.3, 0.3, 0.0);
