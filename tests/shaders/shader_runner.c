@@ -459,15 +459,8 @@ process_comparison(const char *src, enum comparison *cmp)
 
 
 /**
- * To specify an ES version, append "es" to the version. For example:
- * 	GL >= 3.0 es
- * 	GLSL >= 3.00 es
- *
- * GLSL ES 1.00 is a special case. Despite being an ES shading language,
- * the #version directive lacks "es"; that is, the directive is
- * `#version 100` rather than `#version 100 es`. Therefore be lenient in
- * parsing that version. Interpret `GLSL >= 100` and `GLSL >= 100 es`
- * identically.
+ * " ES" before the comparison operator indicates the version
+ * pertains to GL ES.
  */
 void
 parse_version_comparison(const char *line, enum comparison *cmp,
@@ -476,8 +469,12 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	unsigned major;
 	unsigned minor;
 	unsigned full_num;
-	bool es;
+	bool es = false;
 
+	if (string_match(" ES", line)) {
+		es = true;
+		line += 3;
+	}
 	line = eat_whitespace(line);
 	line = process_comparison(line, cmp);
 
@@ -486,7 +483,10 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	line = eat_text(line);
 
 	line = eat_whitespace(line);
-	es = string_match("es", line);
+	if (*line != '\n') {
+		printf("Unexpected characters following version comparison\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	/* This hack is so that we can tell the difference between GL versions
 	 * and GLSL versions.  All GL versions look like 3.2, and we want the
@@ -495,8 +495,6 @@ parse_version_comparison(const char *line, enum comparison *cmp,
 	 */
 	if (tag == VERSION_GLSL) {
 		full_num = (major * 100) + minor;
-		if (full_num == 100)
-			es = true;
 	} else {
 		full_num = (major * 10) + minor;
 	}

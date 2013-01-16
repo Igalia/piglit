@@ -1,11 +1,10 @@
 # Fill the window with red, then green, then blue.
 
 [require]
-GL >= 2.0 es
+GL ES >= 2.0
+GLSL ES >= 1.00
 
 [vertex shader]
-#version 100
-
 attribute vec4 vertex;
 
 void main() {
@@ -13,8 +12,6 @@ void main() {
 }
 
 [fragment shader]
-#version 100
-
 uniform vec4 u_color;
 
 void main() {
