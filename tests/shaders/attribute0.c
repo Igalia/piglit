@@ -77,6 +77,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vs;
 	GLuint fs;
+	GLboolean ok;
 
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
@@ -87,7 +88,9 @@ piglit_init(int argc, char **argv)
 
 	glBindAttribLocation(prog, 0, "vertex");
 	glLinkProgram(prog);
-	piglit_link_check_status(prog);
+	ok = piglit_link_check_status(prog);
+	if (!ok)
+		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
 
