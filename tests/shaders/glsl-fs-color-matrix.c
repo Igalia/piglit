@@ -130,6 +130,7 @@ piglit_init(int argc, char **argv)
 	GLuint vs;
 	GLuint fs;
 	GLint loc;
+	GLboolean ok;
 
 	piglit_require_GLSL();
 
@@ -141,7 +142,9 @@ piglit_init(int argc, char **argv)
 	glBindAttribLocation(prog, 1, "textureCoord");
 
 	glLinkProgram(prog);
-	piglit_link_check_status(prog);
+	ok = piglit_link_check_status(prog);
+	if (!ok)
+		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(prog);
 
