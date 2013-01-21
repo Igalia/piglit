@@ -533,6 +533,7 @@ test_format(int format_index)
 	glDeleteBuffers(1, &bo);
 	glDeleteTextures(1, &tex);
 
+	glUseProgram(0);
 	y_index++;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
