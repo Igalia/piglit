@@ -868,8 +868,12 @@ parse_required_versions(struct requirement_parse_results *results,
 	}
 
 	while (line[0] != '\0') {
-		if (line[0] == '[')
-			in_requirement_section = false;
+		if (line[0] == '[') {
+			if (in_requirement_section)
+				break;
+			else
+				in_requirement_section = false;
+		}
 
 		if (!in_requirement_section) {
 			if (string_match("[require]", line)) {
