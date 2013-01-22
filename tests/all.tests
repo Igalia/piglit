@@ -880,6 +880,7 @@ for sample_count in MSAA_SAMPLE_COUNTS:
                     sample_count, stage, sampler)] = \
                     concurrent_test('texelFetch %s %s %d' % (stage, sampler, sample_count))
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-texstate')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-errors')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-value')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution')
