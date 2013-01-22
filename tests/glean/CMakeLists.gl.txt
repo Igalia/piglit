@@ -31,7 +31,6 @@ piglit_add_executable (glean
 	tbinding.cpp
 	tblend.cpp
 	tbufferobject.cpp
-	tclipflat.cpp
 	tdepthstencil.cpp
 	test.cpp
 	tfbo.cpp
