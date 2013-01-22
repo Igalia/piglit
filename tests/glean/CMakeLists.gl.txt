@@ -39,7 +39,6 @@ piglit_add_executable (glean
 	tgetstr.cpp
 	tglsl1.cpp
 	tlogicop.cpp
-	tmaskedclear.cpp
 	tmultitest.cpp
 	toccluqry.cpp
 	torthpos.cpp
