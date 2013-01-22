@@ -107,16 +107,16 @@ class ShaderTest(PlainExecTest):
         common = {
             'cmp' : r'(<|<=|=|>=|>)',
             'gl_version' : r'(\d.\d)',
-            'gles2_version' : r'(2.\d\s+es)',
-            'gles3_version' : r'(3.\d\s+es)',
+            'gles2_version' : r'(2.\d\s)',
+            'gles3_version' : r'(3.\d\s)',
             'comment' : r'(#.*)',
         }
 
         cls.__re_require_header = re.compile(r'^\s*\[require\]\s*{comment}?$'.format(**common))
         cls.__re_end_require_block = re.compile(r'^\s*\['.format(*common))
         cls.__re_gl = re.compile(r'^\s*GL\s*{cmp}\s*{gl_version}\s*{comment}?$'.format(**common))
-        cls.__re_gles2 = re.compile(r'^\s*GL\s*{cmp}\s*{gles2_version}\s*{comment}?$'.format(**common))
-        cls.__re_gles3 = re.compile(r'^\s*GL\s*{cmp}\s*{gles3_version}\s*{comment}?$'.format(**common))
+        cls.__re_gles2 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles2_version}\s*{comment}?$'.format(**common))
+        cls.__re_gles3 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles3_version}\s*{comment}?$'.format(**common))
         cls.__re_gl_unknown = re.compile(r'^\s*GL\s*{cmp}'.format(**common))
 
     def __init__(self, shader_runner_args, run_standalone=False):
