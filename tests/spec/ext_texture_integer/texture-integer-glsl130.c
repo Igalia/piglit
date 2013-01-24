@@ -356,7 +356,16 @@ test_format(const struct format_info *info)
 	expected[2] = 0.75;
 	expected[3] = 1.00;
 
-	/* need to swizzle things depending on texture format */
+	/* Need to swizzle things depending on texture format.
+	 *
+	 * Also, for texture formats with no storage for a particular
+	 * channel, instead of reading the randomly-chosen value
+	 * above, we need to expect to read a 0, (for Green or Blue
+	 * channels), or a 1 (for Alpha).
+	 *
+	 * Note: The alpha value read is an integer 1, not a
+	 * maximum-valued integer representing 1.0.
+	 */
 	switch (info->BaseFormat) {
 	case GL_RGBA_INTEGER_EXT:
 		/* nothing */
@@ -371,10 +380,11 @@ test_format(const struct format_info *info)
 		value[0] = temp;
 		break;
 	case GL_RGB_INTEGER_EXT:
-		expected[3] = 0.0;
+		value[3] = 1;
 		break;
 	case GL_RG_INTEGER:
-		expected[2] = expected[3] = 0.0;
+		value[2] = 0;
+		value[3] = 1;
 		break;
 	case GL_ALPHA_INTEGER_EXT:
 		expected[0] = expected[1] = expected[2] = 0.0;
@@ -402,7 +412,8 @@ test_format(const struct format_info *info)
 			expected[0] = expected[1] = expected[2] = expected[3] = 0.25;
 			value[1] = value[2] = value[3] = value[0];
 		} else {
-			expected[1] = expected[2] = expected[3] = 0.0;
+			value[1] = value[2] = 0;
+			value[3] = 1;
 		}			
 		break;
 	default:
