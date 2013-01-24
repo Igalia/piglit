@@ -1279,7 +1279,7 @@ static void get_int_border_color(const struct format_desc *format,
 			uresult[i] = border[i] * (double)((1ull << bits)-1);
 		}
 		if (bits == 10) {
-			uresult[3] = border[i] * (double)3;
+			uresult[3] = border[3] * (double)3;
 		}
 	}
 }
