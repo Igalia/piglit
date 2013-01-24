@@ -12,7 +12,7 @@ import sys
 from collections import namedtuple
 from mako.template import Template
 from math import copysign, fabs, fmod, frexp, isinf, isnan, modf
-from numpy import int16, int32, uint16, uint32, float32
+from numpy import int8, int16, int32, uint8, uint16, uint32, float32
 from textwrap import dedent
 
 # ----------------------------------------------------------------------------
@@ -35,12 +35,15 @@ from textwrap import dedent
 # ----------------------------------------------------------------------------
 
 # Test evaluation of constant pack2x16 expressions.
-const_pack_2x16_template = Template(dedent("""\
+const_pack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
@@ -55,7 +58,7 @@ const_pack_2x16_template = Template(dedent("""\
         vert_color = green;
 
         % for io in func.inout_seq:
-        actual = ${func.name}(vec2(${io.input[0]}, ${io.input[1]}));
+        actual = ${func.name}(${func.vector_type}(${', '.join(io.input)}));
 
         if (true
             % for u in sorted(set(io.valid_outputs)):
@@ -90,12 +93,15 @@ const_pack_2x16_template = Template(dedent("""\
 """))
 
 # Test evaluation of constant unpack2x16 expressions.
-const_unpack_2x16_template = Template(dedent("""\
+const_unpack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
@@ -104,7 +110,7 @@ const_unpack_2x16_template = Template(dedent("""\
 
     void main()
     {
-        ${func.result_precision} vec2 actual;
+        ${func.result_precision} ${func.vector_type} actual;
 
         gl_Position = vertex;
         vert_color = green;
@@ -114,8 +120,8 @@ const_unpack_2x16_template = Template(dedent("""\
 
         if (true
             % for v in io.valid_outputs:
-            && actual != vec2(${v[0]}, ${v[1]})
-            % endfor
+            && actual != ${func.vector_type}(${', '.join(v)})
+	    % endfor
            ) {
             vert_color = red;
         }
@@ -145,16 +151,19 @@ const_unpack_2x16_template = Template(dedent("""\
 """))
 
 # Test execution of pack2x16 functions in the vertex shader.
-vs_pack_2x16_template = Template(dedent("""\
+vs_pack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
-    uniform vec2 func_input;
+    uniform ${func.vector_type} func_input;
 
     % for j in range(func.num_valid_outputs):
     uniform ${func.result_precision} uint expect${j};
@@ -197,7 +206,7 @@ vs_pack_2x16_template = Template(dedent("""\
 
     [test]
     % for io in func.inout_seq:
-    uniform vec2 func_input ${io.input[0]} ${io.input[1]}
+    uniform ${func.vector_type} func_input ${" ".join(io.input)}
     % for j in range(func.num_valid_outputs):
     uniform uint expect${j} ${io.valid_outputs[j]}
     % endfor
@@ -208,19 +217,22 @@ vs_pack_2x16_template = Template(dedent("""\
 """))
 
 # Test execution of unpack2x16 functions in the vertex shader.
-vs_unpack_2x16_template = Template(dedent("""\
+vs_unpack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
     uniform highp uint func_input;
 
     % for j in range(func.num_valid_outputs):
-    uniform ${func.result_precision} vec2 expect${j};
+    uniform ${func.result_precision} ${func.vector_type} expect${j};
     % endfor
 
     in vec4 vertex;
@@ -230,7 +242,7 @@ vs_unpack_2x16_template = Template(dedent("""\
     {
         gl_Position = vertex;
 
-        ${func.result_precision} vec2 actual = ${func.name}(func_input);
+        ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
 
         if (false
             % for j in range(func.num_valid_outputs):
@@ -263,7 +275,7 @@ vs_unpack_2x16_template = Template(dedent("""\
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
     % for j in range(func.num_valid_outputs):
-    uniform vec2 expect${j} ${io.valid_outputs[j][0]} ${io.valid_outputs[j][1]}
+    uniform ${func.vector_type} expect${j} ${" ".join(io.valid_outputs[j])}
     % endfor
     draw arrays GL_TRIANGLE_FAN 0 4
     probe all rgba 0.0 1.0 0.0 1.0
@@ -273,10 +285,9 @@ vs_unpack_2x16_template = Template(dedent("""\
 
 
 # Test execution of pack2x16 functions in the fragment shader.
-fs_pack_2x16_template = Template(dedent("""\
+fs_pack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
     in vec4 vertex;
@@ -287,10 +298,14 @@ fs_pack_2x16_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
-    uniform vec2 func_input;
+    uniform ${func.vector_type} func_input;
 
     % for i in range(func.num_valid_outputs):
     uniform ${func.result_precision} uint expect${i};
@@ -322,7 +337,7 @@ fs_pack_2x16_template = Template(dedent("""\
 
     [test]
     % for io in func.inout_seq:
-    uniform vec2 func_input ${io.input[0]} ${io.input[1]}
+    uniform ${func.vector_type} func_input ${" ".join(io.input)}
     % for i in range(func.num_valid_outputs):
     uniform uint expect${i} ${io.valid_outputs[i]}
     % endfor
@@ -333,10 +348,9 @@ fs_pack_2x16_template = Template(dedent("""\
 """))
 
 # Test execution of unpack2x16 functions in the fragment shader.
-fs_unpack_2x16_template = Template(dedent("""\
+fs_unpack_template = Template(dedent("""\
     [require]
-    GL ES >= 3.0
-    GLSL ES >= 3.00
+    ${func.requirements}
 
     [vertex shader]
     in vec4 vertex;
@@ -347,20 +361,24 @@ fs_unpack_2x16_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifndef GL_ES
+    #extension GL_ARB_shading_language_packing : require
+    #endif
+
     const vec4 red = vec4(1, 0, 0, 1);
     const vec4 green = vec4(0, 1, 0, 1);
 
     uniform highp uint func_input;
 
     % for i in range(func.num_valid_outputs):
-    uniform ${func.result_precision} vec2 expect${i};
+    uniform ${func.result_precision} ${func.vector_type} expect${i};
     % endfor
 
     out vec4 frag_color;
 
     void main()
     {
-        ${func.result_precision} vec2 actual = ${func.name}(func_input);
+        ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
 
         if (false
             % for i in range(func.num_valid_outputs):
@@ -384,7 +402,7 @@ fs_unpack_2x16_template = Template(dedent("""\
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
     % for i in range(func.num_valid_outputs):
-    uniform vec2 expect${i} ${io.valid_outputs[i][0]} ${io.valid_outputs[i][1]}
+    uniform ${func.vector_type} expect${i} ${" ".join(io.valid_outputs[i])}
     % endfor
     draw arrays GL_TRIANGLE_FAN 0 4
     probe all rgba 0.0 1.0 0.0 1.0
@@ -393,12 +411,18 @@ fs_unpack_2x16_template = Template(dedent("""\
 """))
 
 template_table = {
-    ("const", "p", "2x16") : const_pack_2x16_template,
-    ("const", "u", "2x16") : const_unpack_2x16_template,
-    ("vs",    "p", "2x16") : vs_pack_2x16_template,
-    ("vs",    "u", "2x16") : vs_unpack_2x16_template,
-    ("fs",    "p", "2x16") : fs_pack_2x16_template,
-    ("fs",    "u", "2x16") : fs_unpack_2x16_template,
+    ("const", "p", "2x16") : const_pack_template,
+    ("const", "p",  "4x8") : const_pack_template,
+    ("const", "u", "2x16") : const_unpack_template,
+    ("const", "u",  "4x8") : const_unpack_template,
+    ("vs",    "p", "2x16") : vs_pack_template,
+    ("vs",    "p",  "4x8") : vs_pack_template,
+    ("vs",    "u", "2x16") : vs_unpack_template,
+    ("vs",    "u",  "4x8") : vs_unpack_template,
+    ("fs",    "p", "2x16") : fs_pack_template,
+    ("fs",    "p",  "4x8") : fs_pack_template,
+    ("fs",    "u", "2x16") : fs_unpack_template,
+    ("fs",    "u",  "4x8") : fs_unpack_template,
 }
 
 # ----------------------------------------------------------------------------
@@ -499,6 +523,31 @@ def pack_2x16(pack_1x16_func, x, y, func_opts):
 
     return uint32((uy << 16) | ux)
 
+def pack_4x8(pack_1x8_func, x, y, z, w, func_opts):
+    """Evaluate a GLSL pack4x8 function.
+
+    :param pack_1x8_func: the component-wise function of the GLSL pack4x8
+        function
+    :param x,y,z,w: each a float32
+    :return: a uint32
+    """
+    assert(isinstance(x, float32))
+    assert(isinstance(y, float32))
+    assert(isinstance(z, float32))
+    assert(isinstance(w, float32))
+
+    ux = pack_1x8_func(x, func_opts)
+    uy = pack_1x8_func(y, func_opts)
+    uz = pack_1x8_func(z, func_opts)
+    uw = pack_1x8_func(w, func_opts)
+
+    assert(isinstance(ux, uint8))
+    assert(isinstance(uy, uint8))
+    assert(isinstance(uz, uint8))
+    assert(isinstance(uw, uint8))
+
+    return uint32((uw << 24) | (uz << 16) | (uy << 8) | ux)
+
 def unpack_2x16(unpack_1x16_func, u, func_opts):
     """Evaluate a GLSL unpack2x16 function.
 
@@ -520,20 +569,67 @@ def unpack_2x16(unpack_1x16_func, u, func_opts):
 
     return (x, y)
 
+def unpack_4x8(unpack_1x8_func, u, func_opts):
+    """Evaluate a GLSL unpack4x8 function.
+
+    :param unpack_1x8_func: the component-wise function of the GLSL
+        unpack4x8 function
+    :param u: a uint32
+    :return: a 4-tuple of float32
+    """
+    assert(isinstance(u, uint32))
+
+    ux = uint8(u & 0xff)
+    uy = uint8((u >> 8) & 0xff)
+    uz = uint8((u >> 16) & 0xff)
+    uw = uint8((u >> 24) & 0xff)
+
+    x = unpack_1x8_func(ux)
+    y = unpack_1x8_func(uy)
+    z = unpack_1x8_func(uz)
+    w = unpack_1x8_func(uw)
+
+    assert(isinstance(x, float32))
+    assert(isinstance(y, float32))
+    assert(isinstance(z, float32))
+    assert(isinstance(w, float32))
+
+    return (x, y, z, w)
+
+def pack_snorm_1x8(f32, func_opts):
+    """Component-wise function of packSnorm4x8."""
+    assert(isinstance(f32, float32))
+    return uint8(int8(func_opts.round(clamp(f32, -1.0, +1.0) * 127.0)))
+
 def pack_snorm_1x16(f32, func_opts):
     """Component-wise function of packSnorm2x16."""
     assert(isinstance(f32, float32))
     return uint16(int16(func_opts.round(clamp(f32, -1.0, +1.0) * 32767.0)))
+
+def unpack_snorm_1x8(u8):
+    """Component-wise function of unpackSnorm4x8."""
+    assert(isinstance(u8, uint8))
+    return float32(clamp(int8(u8) / 127.0, -1.0, +1.0))
 
 def unpack_snorm_1x16(u16):
     """Component-wise function of unpackSnorm2x16."""
     assert(isinstance(u16, uint16))
     return float32(clamp(int16(u16) / 32767.0, -1.0, +1.0))
 
+def pack_unorm_1x8(f32, func_opts):
+    """Component-wise function of packUnorm4x8."""
+    assert(isinstance(f32, float32))
+    return uint8(func_opts.round(clamp(f32, 0.0, 1.0) * 255.0))
+
 def pack_unorm_1x16(f32, func_opts):
     """Component-wise function of packUnorm2x16."""
     assert(isinstance(f32, float32))
     return uint16(func_opts.round(clamp(f32, 0.0, 1.0) * 65535.0))
+
+def unpack_unorm_1x8(u8):
+    """Component-wise function of unpackUnorm4x8."""
+    assert(isinstance(u8, uint8))
+    return float32(u8 / 255.0)
 
 def unpack_unorm_1x16(u16):
     """Component-wise function of unpackUnorm2x16."""
@@ -688,9 +784,11 @@ def unpack_half_1x16(u16):
 # ----------------------------------------------------------------------------
 
 # This table maps GLSL pack/unpack function names to a sequence of inputs to
-# the respective component-wise function. It contains two types of mappings:
+# the respective component-wise function. It contains four types of mappings:
 #    - name of a pack2x16 function to a sequence of float32
+#    - name of a pack4x8 function to a sequence of float32
 #    - name of a unpack2x16 function to a sequence of uint16
+#    - name of a unpack4x8 function to a sequence of uint8
 full_input_table = dict()
 
 # This table maps each GLSL pack/unpack function name to a subset of
@@ -720,6 +818,8 @@ def make_inputs_for_pack_snorm_2x16():
 full_input_table["packSnorm2x16"] = make_inputs_for_pack_snorm_2x16()
 reduced_input_table["packSnorm2x16"] = None
 
+full_input_table["packSnorm4x8"] = full_input_table["packSnorm2x16"]
+
 # XXX: Perhaps there is a better choice of test inputs?
 full_input_table["unpackSnorm2x16"] = tuple(uint16(u) for u in (
     0, 1, 2, 3,
@@ -727,6 +827,15 @@ full_input_table["unpackSnorm2x16"] = tuple(uint16(u) for u in (
     2**15,
     2**15 + 1,
     2**16 - 1, # max uint16
+    ))
+
+# XXX: Perhaps there is a better choice of test inputs?
+full_input_table["unpackSnorm4x8"] = tuple(uint8(u) for u in (
+    0, 1, 2, 3,
+    2**7 - 1,
+    2**7,
+    2**7 + 1,
+    2**8 - 1, # max uint8
     ))
 
 full_input_table["packUnorm2x16"] = tuple(float32(x) for x in (
@@ -746,8 +855,11 @@ full_input_table["packUnorm2x16"] = tuple(float32(x) for x in (
 
 reduced_input_table["packUnorm2x16"] = None
 
+full_input_table["packUnorm4x8"] = full_input_table["packUnorm2x16"]
+
 # XXX: Perhaps there is a better choice of test inputs?
 full_input_table["unpackUnorm2x16"] = full_input_table["unpackSnorm2x16"]
+full_input_table["unpackUnorm4x8"] = full_input_table["unpackSnorm4x8"]
 
 def make_inputs_for_pack_half_2x16():
     # The domain of packHalf2x16 is ([-inf, +inf] + {NaN})^2. The function
@@ -989,6 +1101,43 @@ def make_inouts_for_pack_2x16(pack_1x16_func,
 
     return inout_seq
 
+def make_inouts_for_pack_4x8(pack_1x8_func, float32_inputs):
+    """Determine valid outputs for a given GLSL pack4x8 function.
+
+    :param pack_1x8_func: the component-wise function of the pack4x8
+        function
+    :param float32_inputs: a sequence of inputs to pack_1x8_func
+    :return: a sequence of InOutTuple
+    """
+    inout_seq = []
+
+    func_opt_seq = (FuncOpts(FuncOpts.ROUND_TO_EVEN),
+                    FuncOpts(FuncOpts.ROUND_TO_NEAREST))
+
+    for y in float32_inputs:
+        for x in float32_inputs:
+            assert(isinstance(x, float32))
+
+            valid_outputs_0 = []
+            valid_outputs_1 = []
+            for func_opts in func_opt_seq:
+                u32_0 = pack_4x8(pack_1x8_func, x, y, x, y, func_opts)
+                u32_1 = pack_4x8(pack_1x8_func, x, x, y, y, func_opts)
+                assert(isinstance(u32_0, uint32))
+                assert(isinstance(u32_1, uint32))
+                valid_outputs_0.append(glsl_literal(u32_0))
+                valid_outputs_1.append(glsl_literal(u32_1))
+
+            inout_seq.append(
+                InOutTuple(input=(glsl_literal(x), glsl_literal(y),
+                                  glsl_literal(x), glsl_literal(y)),
+                           valid_outputs=valid_outputs_0))
+            inout_seq.append(
+                InOutTuple(input=(glsl_literal(x), glsl_literal(x),
+                                  glsl_literal(y), glsl_literal(y)),
+                           valid_outputs=valid_outputs_1))
+    return inout_seq
+
 def make_inouts_for_unpack_2x16(unpack_1x16_func, uint16_inputs):
     """Determine expected outputs of a given GLSL unpack2x16 function.
 
@@ -1014,27 +1163,83 @@ def make_inouts_for_unpack_2x16(unpack_1x16_func, uint16_inputs):
 
     return inout_seq
 
+def make_inouts_for_unpack_4x8(unpack_1x8_func, uint8_inputs):
+    """Determine expected outputs of a given GLSL unpack4x8 function.
+
+    :param unpack_1x8_func: the component-wise function of the unpack4x8
+        function
+    :param uint8_inputs: a sequence of inputs to unpack_1x8_func
+    :return: a sequence of InOutTuple
+    """
+    inout_seq = []
+
+    func_opts = FuncOpts()
+
+    for y in uint8_inputs:
+        for x in uint8_inputs:
+            assert(isinstance(x, uint8))
+            u32_0 = uint32((y << 24) | (x << 16) | (y << 8) | x)
+            u32_1 = uint32((y << 24) | (y << 16) | (x << 8) | x)
+
+            valid_outputs_0 = []
+            valid_outputs_1 = []
+            vec4_0 = unpack_4x8(unpack_1x8_func, u32_0, func_opts)
+            vec4_1 = unpack_4x8(unpack_1x8_func, u32_1, func_opts)
+            assert(isinstance(vec4_0[0], float32))
+            assert(isinstance(vec4_0[1], float32))
+            assert(isinstance(vec4_0[2], float32))
+            assert(isinstance(vec4_0[3], float32))
+            assert(isinstance(vec4_1[0], float32))
+            assert(isinstance(vec4_1[1], float32))
+            assert(isinstance(vec4_1[2], float32))
+            assert(isinstance(vec4_1[3], float32))
+            valid_outputs_0.append((glsl_literal(vec4_0[0]),
+                                    glsl_literal(vec4_0[1]),
+                                    glsl_literal(vec4_0[2]),
+                                    glsl_literal(vec4_0[3])))
+            valid_outputs_1.append((glsl_literal(vec4_1[0]),
+                                    glsl_literal(vec4_1[1]),
+                                    glsl_literal(vec4_1[2]),
+                                    glsl_literal(vec4_1[3])))
+
+            inout_seq.append(
+                InOutTuple(input=glsl_literal(u32_0),
+                           valid_outputs=valid_outputs_0))
+            inout_seq.append(
+                InOutTuple(input=glsl_literal(u32_1),
+                           valid_outputs=valid_outputs_1))
+
+    return inout_seq
+
 # This table maps GLSL pack/unpack function names to the precision of their
 # return type.
 result_precision_table = {
     "packSnorm2x16": "highp",
+    "packSnorm4x8": "highp",
     "packUnorm2x16": "highp",
+    "packUnorm4x8": "highp",
     "packHalf2x16":  "highp",
 
     "unpackSnorm2x16": "highp",
+    "unpackSnorm4x8": "highp",
     "unpackUnorm2x16": "highp",
+    "unpackUnorm4x8": "highp",
     "unpackHalf2x16":  "mediump",
     }
 
 # This table maps GLSL pack/unpack function names to a sequence of InOutTuple.
 inout_table = {
     "packSnorm2x16": make_inouts_for_pack_2x16(pack_snorm_1x16, full_input_table["packSnorm2x16"],  reduced_input_table["packSnorm2x16"]),
+    "packSnorm4x8": make_inouts_for_pack_4x8(pack_snorm_1x8, full_input_table["packSnorm4x8"]),
     "packUnorm2x16": make_inouts_for_pack_2x16(pack_unorm_1x16, full_input_table["packUnorm2x16"],  reduced_input_table["packUnorm2x16"]),
+    "packUnorm4x8": make_inouts_for_pack_4x8(pack_unorm_1x8, full_input_table["packUnorm4x8"]),
     "packHalf2x16":  make_inouts_for_pack_2x16(pack_half_1x16,  full_input_table["packHalf2x16"],   reduced_input_table["packHalf2x16"]),
 
 
     "unpackSnorm2x16": make_inouts_for_unpack_2x16(unpack_snorm_1x16, full_input_table["unpackSnorm2x16"]),
+    "unpackSnorm4x8": make_inouts_for_unpack_4x8(unpack_snorm_1x8, full_input_table["unpackSnorm4x8"]),
     "unpackUnorm2x16": make_inouts_for_unpack_2x16(unpack_unorm_1x16, full_input_table["unpackUnorm2x16"]),
+    "unpackUnorm4x8": make_inouts_for_unpack_4x8(unpack_unorm_1x8, full_input_table["unpackUnorm4x8"]),
     "unpackHalf2x16":  make_inouts_for_unpack_2x16(unpack_half_1x16,  full_input_table["unpackHalf2x16"]),
     }
 
@@ -1060,18 +1265,27 @@ class FuncInfo:
     - num_valid_outputs: The number of valid outputs for each input of
       self.inout_seq. (We assume that each input has the  same number of valid
       outputs).
+
+    - vector_type: The type of the GLSL function's parameter  or return value.
+      E.g., vec4 for a 4x8 function and vec2 for a 2x16 function.
+
+    - requirements: A set of API/extension requirments to be listed in the
+      .shader_test's [requires] section.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, requirements):
         self.name = name
         self.result_precision = result_precision_table[name]
         self.inout_seq = inout_table[name]
         self.num_valid_outputs = len(self.inout_seq[0].valid_outputs)
+        self.requirements = requirements
 
         if name.endswith("2x16"):
             self.dimension = "2x16"
+            self.vector_type = "vec2"
         elif name.endswith("4x8"):
             self.dimension =  "4x8"
+            self.vector_type = "vec4"
         else:
             assert(False)
 
@@ -1080,14 +1294,30 @@ class ShaderTest:
 
     @staticmethod
     def all_tests():
-        funcs = (
-            FuncInfo("packSnorm2x16"),
-            FuncInfo("packUnorm2x16"),
-            FuncInfo("packHalf2x16"),
+        requirements = "GLSL >= 1.30\nGL_ARB_shading_language_packing"
+        ARB_shading_language_packing_funcs = (
+            FuncInfo("packSnorm2x16", requirements),
+            FuncInfo("packSnorm4x8", requirements),
+            FuncInfo("packUnorm2x16", requirements),
+            FuncInfo("packUnorm4x8", requirements),
+            FuncInfo("packHalf2x16", requirements),
 
-            FuncInfo("unpackSnorm2x16"),
-            FuncInfo("unpackUnorm2x16"),
-            FuncInfo("unpackHalf2x16"),
+            FuncInfo("unpackSnorm2x16", requirements),
+            FuncInfo("unpackSnorm4x8", requirements),
+            FuncInfo("unpackUnorm2x16", requirements),
+            FuncInfo("unpackUnorm4x8", requirements),
+            FuncInfo("unpackHalf2x16", requirements),
+            )
+
+        requirements = "GL ES >= 3.0\nGLSL ES >= 3.00"
+        glsl_es_300_funcs = (
+            FuncInfo("packSnorm2x16", requirements),
+            FuncInfo("packUnorm2x16", requirements),
+            FuncInfo("packHalf2x16", requirements),
+
+            FuncInfo("unpackSnorm2x16", requirements),
+            FuncInfo("unpackUnorm2x16", requirements),
+            FuncInfo("unpackHalf2x16", requirements),
             )
 
         execution_stages = (
@@ -1097,12 +1327,15 @@ class ShaderTest:
             )
 
         for s in execution_stages:
-            for f in funcs:
-                yield ShaderTest(f, s)
+            for f in glsl_es_300_funcs:
+                yield ShaderTest(f, s, "glsl-es-3.00")
+            for f in ARB_shading_language_packing_funcs:
+                yield ShaderTest(f, s, "ARB_shading_language_packing")
 
-    def __init__(self, func_info, execution_stage):
+    def __init__(self, func_info, execution_stage, api):
         assert(isinstance(func_info, FuncInfo))
         assert(execution_stage in ("const", "vs", "fs"))
+        assert(api in ("glsl-es-3.00", "ARB_shading_language_packing"))
 
         self.__template = template_table[(execution_stage,
                                           func_info.name[0],
@@ -1110,7 +1343,7 @@ class ShaderTest:
         self.__func_info = func_info
         self.__filename = os.path.join(
                             "spec",
-                            "glsl-es-3.00",
+                            api,
                             "execution",
                             "built-in-functions",
                             "{0}-{1}.shader_test"\
