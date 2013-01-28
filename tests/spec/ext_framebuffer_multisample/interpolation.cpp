@@ -362,6 +362,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_gl_version(21);
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_vertex_array_object");
+	piglit_require_extension("GL_EXT_framebuffer_multisample");
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
 	GLint max_samples;
