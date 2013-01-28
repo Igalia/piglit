@@ -63,7 +63,7 @@ thread1_func(void *arg)
 	pthread_mutex_unlock(&mutex);
 
 	get_lock_for_step(3);
-	glColor4f(0.0, 1.0, 0.0, 0.0);
+	glColor4f(0.0, 1.0, 0.0, 1.0);
 	piglit_draw_rect(10, 10, 10, 10);
 	pthread_mutex_unlock(&mutex);
 
@@ -82,7 +82,7 @@ thread2_func(void *arg)
 	pthread_mutex_unlock(&mutex);
 
 	get_lock_for_step(4);
-	glColor4f(0.0, 0.0, 1.0, 0.0);
+	glColor4f(0.0, 0.0, 1.0, 1.0);
 	piglit_draw_rect(30, 10, 10, 10);
 	pthread_mutex_unlock(&mutex);
 
@@ -132,7 +132,7 @@ draw(Display *dpy)
 
 	pthread_mutex_destroy(&mutex);
 
-	glColor4f(0.0, 1.0, 0.0, 0.0);
+	glColor4f(0.0, 1.0, 0.0, 1.0);
 	piglit_draw_rect(50, 10, 10, 10);
 
 	pass &= piglit_probe_rect_rgba( 0, 10, 10, 10, gray);

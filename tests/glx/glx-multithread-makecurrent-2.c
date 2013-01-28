@@ -63,7 +63,7 @@ thread1_func(void *arg)
 
 	get_lock_for_step(1);
 	glXMakeCurrent(dpy, win, ctx);
-	glColor4f(0.0, 1.0, 0.0, 0.0);
+	glColor4f(0.0, 1.0, 0.0, 1.0);
 	piglit_draw_rect(10, 10, 10, 10);
 	pthread_mutex_unlock(&mutex);
 
@@ -85,7 +85,7 @@ thread2_func(void *arg)
 {
 	get_lock_for_step(2);
 	glXMakeCurrent(dpy, win, ctx);
-	glColor4f(0.0, 1.0, 0.0, 0.0);
+	glColor4f(0.0, 1.0, 0.0, 1.0);
 	piglit_draw_rect(30, 10, 10, 10);
 	pthread_mutex_unlock(&mutex);
 
