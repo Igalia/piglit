@@ -127,6 +127,8 @@ shader_name(GLenum target)
    default:
       assert(!"Unexpected shader target in shader_name()");
    }
+
+   return "error";
 }
 
 /**
