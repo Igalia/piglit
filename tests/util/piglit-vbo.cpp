@@ -93,6 +93,7 @@
 #include <string>
 #include <vector>
 #include <errno.h>
+#include <ctype.h>
 
 #include "piglit-util-gl-common.h"
 #include "piglit-vbo.h"
