@@ -87,7 +87,7 @@ test_format(const struct uniform_type *type, bool row_major)
 		deref = "u[0].x";
 
 	asprintf(&fs_source, fs_template,
-		 row_major ? "layout(row_major) " : "",
+		 row_major && type->size > 16 ? "layout(row_major) " : "",
 		 type->type,
 		 deref);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
