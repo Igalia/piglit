@@ -53,7 +53,7 @@ static const char fs_source[] =
 	"\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = a + e + f[0];\n"
+	"	gl_FragColor = a + b[0] + vec4(c[0]) + d[0][0] + e + f[0];\n"
 	"}\n";
 
 void

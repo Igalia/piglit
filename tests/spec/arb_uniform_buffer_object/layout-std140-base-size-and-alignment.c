@@ -62,7 +62,7 @@ test_format(const struct uniform_type *type, bool row_major)
 		"};\n"
 		"\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(pad);\n"
+		"	gl_FragColor = vec4(pad + %s + size_test);\n"
 		"}\n";
 	char *fs_source;
 	GLuint fs, prog;
@@ -72,15 +72,24 @@ test_format(const struct uniform_type *type, bool row_major)
 	int offset, size, expected_offset;
 	const struct uniform_type *transposed_type;
 	bool pass;
+	const char *deref;
 
 	if (row_major)
 		transposed_type = get_transposed_type(type);
 	else
 		transposed_type = type;
 
+	if (type->size == 4)
+		deref = "u";
+	else if (type->size <= 16)
+		deref = "u.x";
+	else
+		deref = "u[0].x";
+
 	asprintf(&fs_source, fs_template,
 		 row_major ? "layout(row_major) " : "",
-		 type->type);
+		 type->type,
+		 deref);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
 	prog = piglit_link_simple_program(0, fs);
 	if (!fs || !prog) {

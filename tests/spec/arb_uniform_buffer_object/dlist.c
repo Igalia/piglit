@@ -69,7 +69,7 @@ const char *source =
 	"uniform A { float a; };\n"
 	"uniform B { float b; };\n"
 	"void main() {\n"
-	"	gl_FragColor = vec4(a);\n"
+	"	gl_FragColor = vec4(a + b);\n"
 	"}\n";
 
 enum piglit_result

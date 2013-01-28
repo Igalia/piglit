@@ -97,7 +97,7 @@ static const char frag_shader_text[] =
 	"\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = vec4(a);\n"
+	"	gl_FragColor = vec4(a + b.x + c.x + float(f.d) + g + h[0] + i[0].x + o[1].k.x);\n"
 	"}\n";
 
 static void

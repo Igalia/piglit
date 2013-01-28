@@ -58,7 +58,7 @@ static const char fs_source[] =
 	"\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = v4 + default_v4 + default_m4[0];\n"
+	"	gl_FragColor = v4 + default_v4 + default_m4[0] + m4[0] + vec4(m3[0], 0.) + vec4(m2[0], 0., 0.) + m4a[0][0];\n"
 	"}\n";
 
 void

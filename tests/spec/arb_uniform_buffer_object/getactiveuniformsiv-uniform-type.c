@@ -54,15 +54,24 @@ test_format(const struct uniform_type *type)
 		"};\n"
 		"\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(align_test);\n"
+		"	gl_FragColor = vec4(align_test + float(%s));\n"
 		"}\n";
 	char *fs_source;
 	GLuint fs, prog;
 	const char *uniform_name = "u";
 	GLuint uniform_index;
 	GLint uniform_type;
+	const char *deref;
 
-	asprintf(&fs_source, fs_template, type->type);
+	if (type->size == 4) {
+		deref = "u";
+	} else if (type->size <= 16) {
+		deref = "u.x";
+	} else {
+		deref = "u[0].x";
+	}
+
+	asprintf(&fs_source, fs_template, type->type, deref);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
 	prog = piglit_link_simple_program(0, fs);
 	if (!fs || !prog) {
