@@ -758,6 +758,8 @@ target_to_texture_binding(GLuint target)
 			assert(0);
 			break;
 	}
+
+	return 0;
 }
 
 bool
