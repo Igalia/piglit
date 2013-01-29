@@ -53,9 +53,15 @@ piglit_display(void)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    /* no compression support */
+    /* GL_ETC1_RGB8_OES is not a valid format for glTexImage2D().
+     *
+     * From page 73 OpenGL ES 1.1 spec:
+     *
+     *     Specifying a value for internalformat that is not one of the above
+     *     values generates the error INVALID VALUE.
+     */
     glTexImage2D(GL_TEXTURE_2D, 0, format,
-            width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, fake_tex_data);
+            width, height, 0, format, GL_UNSIGNED_BYTE, fake_tex_data);
     pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, format, 0, 0, width, height, 0);
