@@ -54,8 +54,10 @@ int main(int argc, char **argv)
 	 */
 	ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT, attribs);
 	if (ctx == EGL_NO_CONTEXT) {
-		fprintf(stderr, "eglCreateContext() failed\n");
-		piglit_report_result(PIGLIT_FAIL);
+		fprintf(stderr, "eglCreateContext() failed with "
+				"EGL_CONTEXT_MAJOR_VERSION_KHR=%d. skipping "
+				"test.\n", attribs[1]);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	if (!eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, ctx)) {
