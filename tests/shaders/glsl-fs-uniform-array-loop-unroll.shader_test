@@ -1,0 +1,20 @@
+# https://bugs.freedesktop.org/show_bug.cgi?id=59429
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = vec4(0,0,0,0);
+}
+
+[fragment shader]
+uniform vec4 u[1];
+void main()
+{
+	vec4 c = vec4(0,0,0,0);
+	for (int i = 0; i < 2; ++i)
+		c += u[i];
+	gl_FragColor = c;
+}
