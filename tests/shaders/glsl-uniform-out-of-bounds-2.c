@@ -80,9 +80,26 @@ piglit_init(int argc, char **argv)
 		GLchar name[99];
 		GLint num_active_elements;
 		GLenum type;
+		char *bracket;
+
 		glGetActiveUniform(prog, k, ARRAY_SIZE(name), NULL,
 				   &num_active_elements,
 				   &type, name);
+
+		/* OpenGL 4.2 and OpenGL ES 3.0 require that the name returned
+		 * for an array have "[0]" on the end.  Earlier versions make
+		 * it optional.
+		 */
+		bracket = strchr(name, '[');
+		if (bracket != NULL) {
+			if (strncmp(bracket, "[0]", 3) != 0) {
+				printf("FAIL: invalid uniform array element "
+				       "returned: %s\n", name);
+				pass = false;
+			}
+			*bracket = '\0';
+		}
+
 		if (!((name[0] == 'v' || name[0] == 'm') && name[1] == 0))
 			continue;
 		printf("array '%s' active elements %d\n",
