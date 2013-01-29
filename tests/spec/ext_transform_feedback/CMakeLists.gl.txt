@@ -32,6 +32,7 @@ piglit_add_executable (ext_transform_feedback-separate separate.c)
 piglit_add_executable (ext_transform_feedback-output-type output-type.c)
 piglit_add_executable (ext_transform_feedback-order order.c)
 piglit_add_executable (ext_transform_feedback-overflow-edge-cases overflow-edge-cases.c)
+piglit_add_executable (ext_transform_feedback-structs structs.c)
 piglit_add_executable (ext_transform_feedback-tessellation tessellation.c)
 
 # vim: ft=cmake:
