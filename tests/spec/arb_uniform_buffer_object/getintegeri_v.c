@@ -78,10 +78,13 @@ piglit_init(int argc, char **argv)
 	int size = 1024;
 	GLint max_bindings;
 	GLint junk;
+	GLint alignment;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
 	test_range(__LINE__, 0, 0, -1, -1);
+
+	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
 
 	glGenBuffers(2, bo);
 	glBindBuffer(GL_UNIFORM_BUFFER, bo[0]);
@@ -90,9 +93,9 @@ piglit_init(int argc, char **argv)
 	glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_READ);
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, bo[0], 0, 1);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 1, bo[1], 2, 3);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 1, bo[1], 2 * alignment, 3);
 	test_range(__LINE__, 0, bo[0], 0, 1);
-	test_range(__LINE__, 1, bo[1], 2, 3);
+	test_range(__LINE__, 1, bo[1], 2 * alignment, 3);
 
 	/* There's a bit of a contradiction in the spec.  On the one
 	 * hand, "BindBufferBase is equivalent to calling
