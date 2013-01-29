@@ -44,9 +44,11 @@ main(int argc, char **argv)
 {
 	Pixmap p;
 	GLXPixmap g;
-	float green[4] = {0.0, 1.0, 0.0, 0.0};
+	static const float green_alpha_zero[4] = {0.0, 1.0, 0.0, 0.0};
+	static const float green_alpha_one[4] = {0.0, 1.0, 0.0, 1.0};
 	GLXContext ctx;
 	bool pass;
+	GLint alpha_bits;
 
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
@@ -80,7 +82,17 @@ main(int argc, char **argv)
 	 */
 	XSync(dpy, False);
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
+	/* If the visual has no alpha, then the GL spec requires that 1.0 be
+	 * read back.  Otherwise, we should read back the 0.0 that we wrote.
+	 */
+	glGetIntegerv(GL_ALPHA_BITS, &alpha_bits);
+	if (alpha_bits == 0) {
+		pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
+					      green_alpha_one);
+	} else {
+		pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
+					      green_alpha_zero);
+	}
 
 	glXDestroyPixmap(dpy, g);
 
