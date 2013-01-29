@@ -45,6 +45,9 @@ int main(int argc, char **argv)
 	 * Request an OpenGL ES 1.x context by explicitly setting the minor
 	 * version to 0 and leaving the major version at the default value of
 	 * 1.
+	 *
+	 * The EGL_OPENGL_ES_BIT is set in EGLConfig's EGL_RENDERABLE_TYPE,
+	 * so the driver is required to succeed in creating an ES1 context.
 	 */
 	ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT, attribs);
 	if (ctx == EGL_NO_CONTEXT) {

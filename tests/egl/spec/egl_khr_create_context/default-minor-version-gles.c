@@ -49,6 +49,10 @@ int main(int argc, char **argv)
 	 * Request an OpenGL ES 1.x or 2.0 context by explicitly setting the
 	 * major version and leaving the minor version at the default value of
 	 * 0.
+	 *
+	 * The EGLConfig's EGL_RENDERABLE_TYPE and the attribute list's
+	 * EGL_CONTEXT_MAJOR_VERSION_KHR have been chosen so that the driver
+	 * is required to succeed at context creation.
 	 */
 	ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT, attribs);
 	if (ctx == EGL_NO_CONTEXT) {
