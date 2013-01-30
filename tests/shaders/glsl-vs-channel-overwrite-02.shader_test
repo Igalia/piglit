@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+attribute vec3 vertex;
+uniform mat4 mvp = mat4(1.);
+
+void main()
+{
+    vec4 tmp;
+
+#if 1
+    tmp.x = vertex.x;
+    tmp.y = vertex.y;
+    tmp.z = vertex.z;
+    tmp[3] = 1.0;
+#else
+    tmp.xyz = vertex;
+    tmp.w = 1.0;
+#endif
+    gl_Position = mvp * tmp;
+}
+
+[fragment shader]
+void main()
+{
+    gl_FragColor = vec4(0., 1., 0., 1.);
+}
+
+[vertex data]
+vertex/float/3
+ 1.0  1.0  1.0
+-1.0  1.0  1.0
+-1.0 -1.0  1.0
+ 1.0 -1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+relative probe rgb (.5, .5) (0.0, 1.0, 0.0)
