@@ -204,24 +204,15 @@ test_format(const struct format_info *info)
 		expected_color[3] = 1;
 		break;
 	case GL_LUMINANCE_INTEGER_EXT:
-		expected_color[1] = expected_color[0];
-		expected_color[2] = expected_color[0];
+		expected_color[1] = expected_color[2] = 0;
 		expected_color[3] = 1;
 		break;
 	case GL_LUMINANCE_ALPHA_INTEGER_EXT:
-		expected_color[1] = expected_color[0];
-		expected_color[2] = expected_color[0];
+		expected_color[1] = expected_color[2] = 0;
 		break;
 	case GL_RED_INTEGER:
-		if (strstr(info->name, "INTENSITY")) {
-			expected_color[1] = expected_color[0];
-			expected_color[2] = expected_color[0];
-			expected_color[3] = expected_color[0];
-		} else {
-			expected_color[1] = 0;
-			expected_color[2] = 0;
-			expected_color[3] = 1;
-		}
+		expected_color[1] = expected_color[2] = 0;
+		expected_color[3] = 1;
 		break;
 	case GL_RG_INTEGER:
 		expected_color[2] = 0;
