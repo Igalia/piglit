@@ -36,6 +36,7 @@
 #include "tdepthstencil.h"
 #include "rand.h"
 #include "image.h"
+#include "piglit-util-gl-common.h"
 
 namespace GLEAN {
 
@@ -120,7 +121,7 @@ DepthStencilTest::testErrorDetection(void)
 	GLuint p[1];
 
 	glDrawPixels(1, 1, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT, p);
-	if (glGetError() != GL_INVALID_ENUM) {
+	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
 		sprintf(errorMsg,
 			"glDrawPixels(GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT)"
 			" failed to generate GL_INVALID_ENUM.");
@@ -128,7 +129,7 @@ DepthStencilTest::testErrorDetection(void)
 	}
 
 	glDrawPixels(1, 1, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT_24_8_EXT, p);
-	if (glGetError() != GL_INVALID_OPERATION) {
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		sprintf(errorMsg,
 			"glDrawPixels(GL_DEPTH_COMPONENT, GL_UNSIGNED_INT_24_8_EXT)"
 			" failed to generate GL_INVALID_OPERATION.");
@@ -136,7 +137,7 @@ DepthStencilTest::testErrorDetection(void)
 	}
 
 	glReadPixels(0, 0, 1, 1, GL_DEPTH_STENCIL_EXT, GL_FLOAT, p);
-	if (glGetError() != GL_INVALID_ENUM) {
+	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
 		sprintf(errorMsg,
 			"glReadPixels(GL_DEPTH_STENCIL_EXT, GL_FLOAT)"
 			" failed to generate GL_INVALID_ENUM.");
@@ -144,7 +145,7 @@ DepthStencilTest::testErrorDetection(void)
 	}
 
 	glReadPixels(0, 0, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT_24_8_EXT, p);
-	if (glGetError() != GL_INVALID_OPERATION) {
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
 		sprintf(errorMsg,
 			"glReadPixels(GL_STENCIL_INDEX, GL_UNSIGNED_INT_24_8_EXT)"
 			" failed to generate GL_INVALID_OPERATION.");
