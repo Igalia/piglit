@@ -220,7 +220,7 @@ print_usage_and_exit(char *prog_name)
 void
 piglit_init(int argc, char **argv)
 {
-	GLint vs, fs;
+	GLint vs, fs, max_samples;
 
 	if (argc != 5) {
 		print_usage_and_exit(argv[0]);
@@ -285,6 +285,13 @@ piglit_init(int argc, char **argv)
 	piglit_require_gl_version(21);
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_framebuffer_sRGB");
+
+	/* skip the test if we don't support multisampling */
+	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+	if (src_samples > max_samples ||
+	    dst_samples > max_samples) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
