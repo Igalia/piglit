@@ -77,16 +77,10 @@ test(void)
       }
    }
 
-   /*
-    * The GL spec is vague here.  But the GL man pages say glIsBuffer should
-    * return false in this case.  Mesa and NVIDIA's driver return true.
-    * Generate a warning, not an error, if the driver doesn't follow the
-    * GL docs here.
-    */
    if (glIsBuffer(buffers[1])) {
       printf("%s: glIsBuffer(%u) returned true instead of false.\n",
              TestName, buffers[1]);
-      return PIGLIT_WARN;
+      return PIGLIT_FAIL;
    }
 
    return PIGLIT_PASS;
