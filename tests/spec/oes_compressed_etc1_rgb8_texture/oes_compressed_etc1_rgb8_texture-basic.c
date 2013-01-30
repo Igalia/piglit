@@ -42,7 +42,12 @@ piglit_display(void)
 {
     const GLenum format = GL_ETC1_RGB8_OES;
     const GLsizei width = 8, height = 8;
-    const GLubyte fake_tex_data[4096];
+
+    /* Each ETC1 block encodes 4x4 pixels and is 8 bytes. Therefore this
+     * image size is 32 bytes.
+     */
+    const GLubyte fake_tex_data[32];
+
     GLuint t;
     int pass = GL_TRUE;
 
