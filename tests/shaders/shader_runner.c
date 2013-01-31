@@ -915,7 +915,17 @@ parse_required_versions(struct requirement_parse_results *results,
 
 	free(text);
 
-	if (results->found_glsl && results->glsl_version.es && !results->found_gl) {
+	if (!in_requirement_section) {
+		printf("[require] section missing\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (!results->found_glsl) {
+		printf("GLSL version requirement missing\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (results->glsl_version.es && !results->found_gl) {
 		printf("%s", "The test specifies a requirement for GLSL ES, "
 		       "but specifies no GL requirement\n.");
 		piglit_report_result(PIGLIT_FAIL);
