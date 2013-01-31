@@ -1,5 +1,6 @@
 [require]
 GL_ARB_draw_instanced
+GLSL >= 1.10
 
 [vertex shader]
 /* Verify that InstanceID is zero when drawing primitives using a

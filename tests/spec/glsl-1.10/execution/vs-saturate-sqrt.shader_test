@@ -1,3 +1,6 @@
+[require]
+GLSL >= 1.10
+
 [vertex shader]
 uniform vec4 v;
 varying vec4 color;

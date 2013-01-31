@@ -1,5 +1,7 @@
 # This test exercises a bug introduced in i965: Comparison of comparison
 # results to boolean values gave incorrect results.
+[require]
+GLSL >= 1.10
 
 [vertex shader]
 void main()

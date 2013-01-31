@@ -1,6 +1,8 @@
 # This test exercises a bug found in Mesa: if function inlining caused
 # an execution of notEqual() to be constant-folded, an assertion
 # failure would occur.
+[require]
+GLSL >= 1.10
 
 [vertex shader]
 bvec4 foo(vec4 x, vec4 y)

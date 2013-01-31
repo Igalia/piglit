@@ -1,5 +1,7 @@
 # This test contains a variety of loops that are likely to be unrolled
 # by the implementation, and verifies that they all execute correctly.
+[require]
+GLSL >= 1.10
 
 [vertex shader]
 void main()

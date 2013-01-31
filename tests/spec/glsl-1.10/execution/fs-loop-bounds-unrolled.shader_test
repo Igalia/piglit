@@ -1,6 +1,9 @@
 # This test verifies that loop unrolling properly interprets a variety
 # of ways of specifying loop bounds.
 
+[require]
+GLSL >= 1.10
+
 [vertex shader]
 void main()
 {

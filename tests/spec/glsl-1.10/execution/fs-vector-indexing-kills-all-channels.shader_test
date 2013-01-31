@@ -1,6 +1,8 @@
 # This test exercises a bug in mesa as of 5/19.12: constant
 # propagation fails to detect that array indexing into a vector might
 # kill any component of the vector.
+[require]
+GLSL >= 1.10
 
 [vertex shader]
 void main()

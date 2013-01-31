@@ -1,3 +1,6 @@
+[require]
+GLSL >= 1.10
+
 [vertex shader]
 uniform vec4 x;
 uniform vec4 y;

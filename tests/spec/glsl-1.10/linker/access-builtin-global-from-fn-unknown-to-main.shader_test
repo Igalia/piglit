@@ -1,6 +1,8 @@
 # Test that GLSL built-in global variables can be accessed from a
 # function that is neither defined nor declared in the compilation
 # unit that defines main().
+[require]
+GLSL >= 1.10
 
 [vertex shader]
 void f();
