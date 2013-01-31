@@ -964,9 +964,9 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 
 	/* Set type, cl_size, cl_mem_size and size (partially for buffers) */
 	regex_get_match_str(&type, src, pmatch, 2);
-	if(regex_match(type, "[[:digit:]]")) {
+	if(regex_match(type, "[[:digit:]]+")) {
 		char* type_size_str;
-		regex_get_str(&type_size_str, type, "[[:digit:]]", 0, REG_NEWLINE);
+		regex_get_str(&type_size_str, type, "[[:digit:]]+", 0, REG_NEWLINE);
 		test_arg.cl_size = get_int(type_size_str);
 		test_arg.cl_mem_size = test_arg.cl_size != 3 ? test_arg.cl_size : 4; // test if we have type3
 		free(type_size_str);
