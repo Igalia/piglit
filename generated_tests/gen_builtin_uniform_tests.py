@@ -257,7 +257,7 @@ class IntComparator(Comparator):
 
 
 class FloatComparator(Comparator):
-    """Comparator that tests functions returning ints or ivecs using a
+    """Comparator that tests functions returning floats or vecs using a
     strict equality test.
 
     This comparator causes code to be generated in the following form:
