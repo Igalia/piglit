@@ -1,8 +1,7 @@
 [require]
-GLSL >= 1.10
+GLSL >= 1.20
 
 [vertex shader]
-#version 120
 /* Verify that the uniform array can compare with non-uniform array correctly.
  */
 void main()
@@ -11,8 +10,6 @@ void main()
 }
 
 [fragment shader]
-#version 120
-
 uniform float ff[2] = float[2](3.3, 3.5);
 void main()
 {
