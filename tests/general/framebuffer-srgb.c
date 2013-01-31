@@ -293,8 +293,11 @@ framebuffer_srgb_fbo(void)
 
 	piglit_draw_rect(30, 30, 20, 20);
 
-	/* enable blending and draw a green square with sRGB enabled on top of the previous green square */
+	/* draw another green square */
 	piglit_draw_rect(20, 0, 20, 20);
+        /* enable blending and draw a green square with sRGB enabled on
+         * top of the previous green square
+         */
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
 	piglit_draw_rect(20, 0, 20, 20);
