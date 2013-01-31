@@ -231,6 +231,8 @@ vs_unpack_template = Template(dedent("""\
 
     uniform highp uint func_input;
 
+    uniform bool exact;
+
     % for j in range(func.num_valid_outputs):
     uniform ${func.result_precision} ${func.vector_type} expect${j};
     % endfor
@@ -245,8 +247,9 @@ vs_unpack_template = Template(dedent("""\
         ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
 
         if (false
-            % for j in range(func.num_valid_outputs):
-            || actual == expect${j}
+            % for i in range(func.num_valid_outputs):
+            || (exact ? actual == expect${i}
+                      : distance(actual, expect${i}) < 0.00001)
             % endfor
            ) {
             vert_color = green;
@@ -274,6 +277,9 @@ vs_unpack_template = Template(dedent("""\
     [test]
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
+    % if not func.exact:
+    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
+    % endif
     % for j in range(func.num_valid_outputs):
     uniform ${func.vector_type} expect${j} ${" ".join(io.valid_outputs[j])}
     % endfor
@@ -370,6 +376,8 @@ fs_unpack_template = Template(dedent("""\
 
     uniform highp uint func_input;
 
+    uniform bool exact;
+
     % for i in range(func.num_valid_outputs):
     uniform ${func.result_precision} ${func.vector_type} expect${i};
     % endfor
@@ -382,7 +390,8 @@ fs_unpack_template = Template(dedent("""\
 
         if (false
             % for i in range(func.num_valid_outputs):
-            || actual == expect${i}
+            || (exact ? actual == expect${i}
+                      : distance(actual, expect${i}) < 0.00001)
             % endfor
            ) {
             frag_color = green;
@@ -401,6 +410,9 @@ fs_unpack_template = Template(dedent("""\
     [test]
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
+    % if not func.exact:
+    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
+    % endif
     % for i in range(func.num_valid_outputs):
     uniform ${func.vector_type} expect${i} ${" ".join(io.valid_outputs[i])}
     % endfor
@@ -1271,6 +1283,9 @@ class FuncInfo:
 
     - requirements: A set of API/extension requirments to be listed in the
       .shader_test's [requires] section.
+
+    - exact: Whether the generated results must be exact (e.g., 0.0 and 1.0
+      should always be converted exactly).
     """
 
     def __init__(self, name, requirements):
@@ -1279,6 +1294,7 @@ class FuncInfo:
         self.inout_seq = inout_table[name]
         self.num_valid_outputs = len(self.inout_seq[0].valid_outputs)
         self.requirements = requirements
+        self.exact = name.endswith("unpackHalf2x16")
 
         if name.endswith("2x16"):
             self.dimension = "2x16"
