@@ -15,6 +15,11 @@ if(HAVE_LIBCACA)
     link_libraries(caca)
 endif()
 
+if(PNG_FOUND)
+	link_libraries(${PNG_LIBRARIES})
+	include_directories(${PNG_INCLUDE_DIRS})
+endif(PNG_FOUND)
+
 set(UTIL_INCLUDES
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
@@ -41,6 +46,7 @@ set(UTIL_GL_SOURCES
 	piglit-matrix.c
 	piglit-test-pattern.cpp
 	piglit-util-gl.c
+	piglit-util-png.c
 	piglit-vbo.cpp
 	piglit-framework-gl.c
 	piglit-framework-gl/piglit_gl_framework.c

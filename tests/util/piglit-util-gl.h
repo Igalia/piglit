@@ -284,6 +284,9 @@ static const GLint PIGLIT_ATTRIB_TEX = 1;
 unsigned
 required_gl_version_from_glsl_version(unsigned glsl_version);
 
+void
+piglit_write_png(const char *filename, GLenum base_format,
+                 int width, int height, GLubyte *data, bool flip_y);
 
 #ifdef __cplusplus
 } /* end extern "C" */

@@ -25,12 +25,15 @@ if (MSVC)
 endif ()
 
 find_package(Threads)
+find_package(PNG)
+if(PNG_FOUND)
+	add_definitions(-DPIGLIT_HAS_PNG)
+endif(PNG_FOUND)
 find_package(X11)
 if(X11_FOUND)
 	set(PIGLIT_HAS_X11 True)
 	add_definitions(-DPIGLIT_HAS_X11)
 endif()
-
 
 option(PIGLIT_BUILD_GL_TESTS "Build tests for OpenGL" ON)
 option(PIGLIT_BUILD_GLES1_TESTS "Build tests for OpenGL ES1" ON)
