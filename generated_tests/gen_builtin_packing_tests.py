@@ -121,7 +121,7 @@ const_unpack_template = Template(dedent("""\
         if (true
             % for v in io.valid_outputs:
             && actual != ${func.vector_type}(${', '.join(v)})
-	    % endfor
+            % endfor
            ) {
             vert_color = red;
         }
