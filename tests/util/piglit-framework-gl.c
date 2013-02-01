@@ -21,7 +21,9 @@
  * IN THE SOFTWARE.
  */
 
+#define _GNU_SOURCE
 #include <assert.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +34,8 @@
 
 struct piglit_gl_framework *gl_fw;
 
+const char *piglit_binary_name;
+bool piglit_dump_png = false;
 bool piglit_use_fbo = false;
 int piglit_automatic = 0;
 unsigned piglit_winsys_fbo = 0;
@@ -100,6 +104,8 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 {
 	int j;
 
+	piglit_binary_name = argv[0];
+
 	piglit_parse_subtest_args(argc, argv, config->subtests,
 				  &config->selected_subtests,
 				  &config->num_selected_subtests);
@@ -113,6 +119,10 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			*argc -= 1;
 		} else if (!strcmp(argv[j], "-fbo")) {
 			piglit_use_fbo = true;
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
+		} else if (!strcmp(argv[j], "-png")) {
+			piglit_dump_png = true;
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
 		} else if (!strcmp(argv[j], "-rlimit")) {
@@ -207,6 +217,36 @@ piglit_swap_buffers(void)
 void
 piglit_present_results(void)
 {
+	if (piglit_dump_png) {
+		static char *fileprefix = NULL;
+		static int frame = 0;
+		char *filename;
+		GLenum base_format = GL_RGBA;
+		GLubyte *image;
+		if (fileprefix == NULL) {
+			int i;
+			fileprefix = strdup(piglit_binary_name);
+			fileprefix = basename(fileprefix);
+			/* Strip potentially bad characters */
+			for (i = 0; fileprefix[i]; i++) {
+				if (!isalnum(fileprefix[i]) && fileprefix[i] != '-')
+					fileprefix[i] = '_';
+			}
+		}
+		image = malloc(4 * piglit_width * piglit_height);
+		glReadPixels(0, 0, piglit_width, piglit_height,
+			     base_format, GL_UNSIGNED_BYTE, image);
+		assert(glGetError() == GL_NO_ERROR);
+
+		asprintf(&filename, "%s%03d.png", fileprefix, frame++);
+
+		printf("Writing %s...\n", filename);
+		piglit_write_png(filename, base_format, piglit_width,
+				 piglit_height, image, true);
+		free(filename);
+		free(image);
+	}
+
 	if (!piglit_automatic)
 		piglit_swap_buffers();
 }
