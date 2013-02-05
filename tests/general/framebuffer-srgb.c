@@ -141,62 +141,99 @@ linear_to_nonlinear(GLfloat cl)
    return cs;
 }
 
+/**
+ * Common code for framebuffer and FBO tests.
+ */
 static GLboolean
-framebuffer_srgb_non_fbo(void)
+test_srgb(void)
 {
 	GLboolean pass = GL_TRUE;
-	GLboolean boolmode;
+	GLboolean srgb_capable;
 	float green[] = {0, 0.3, 0, 0};
 	float expected_green[4];
 	float expected_blend[4];
 
-	glGetBooleanv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &boolmode);
+	/*
+	 * Note: the window-system framebuffer may or may not be sRGB capable.
+	 * But the user-created FBO should be sRGB capable.
+	 */
+	glGetBooleanv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &srgb_capable);
 
-	/* drawing test */
-	/* draw two green squares without sRGB */
 	glDisable(GL_BLEND);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
 	glColor4fv(green);
+
+	/*
+	 * First square: draw green square without sRGB and no blending
+	 */
 	piglit_draw_rect(0, 0, 20, 20);
 
-	/* draw a green square with sRGB enabled and no blending */
+	/*
+	 * Second square: draw a green square with sRGB enabled and no blending
+	 */
 	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-
-	piglit_draw_rect(30, 30, 20, 20);
-
-	/* enable blending and draw a green square with sRGB enabled on top of the previous green square */
 	piglit_draw_rect(20, 0, 20, 20);
+
+	/*
+	 * Third square: draw green square, then blend/add another on top of it
+	 */
+	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+	piglit_draw_rect(40, 0, 20, 20);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
-	piglit_draw_rect(20, 0, 20, 20);
-
+	piglit_draw_rect(40, 0, 20, 20);
+	glDisable(GL_BLEND);
 	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
 
+	/*
+	 * Check first square.
+	 */
 	if (!piglit_probe_rect_rgb(0, 0, 20, 20, green))
 		pass = GL_FALSE;
-
 	/* check pixel path */
 	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
 	if (!piglit_probe_rect_rgb(0, 0, 20, 20, green))
 		pass = GL_FALSE;
 	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
 
+	/*
+	 * Check second square
+	 */
 	memcpy(expected_green, green, sizeof(float) * 4);
-	if (boolmode)
+	if (srgb_capable)
 		expected_green[1] = linear_to_nonlinear(green[1]);
+	if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_green))
+		pass = GL_FALSE;
+	/* check it doesn't affect the pixel path */
+	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+	if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_green))
+		pass = GL_FALSE;
+	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+
+	/*
+	 * Check third square
+	 */
 	memcpy(expected_blend, green, sizeof(float) * 4);
-	if (boolmode)
+	if (srgb_capable)
 		expected_blend[1] = linear_to_nonlinear(green[1] * 2.0);
 	else
 		expected_blend[1] = green[1] * 2.0;
-
-	if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_blend))
+	if (!piglit_probe_rect_rgb(40, 0, 20, 20, expected_blend))
 		pass = GL_FALSE;
 
-	if (!piglit_probe_rect_rgb(30, 30, 20, 20, expected_green))
-		pass = GL_FALSE;
+	return pass;
+}
 
+static GLboolean
+framebuffer_srgb_non_fbo(void)
+{
+	GLboolean pass;
+
+	glViewport(0, 0, piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	pass = test_srgb();
 	piglit_present_results();
 	return pass;
 }
@@ -252,6 +289,7 @@ draw_fbo(int x, int y)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+	glClear(GL_COLOR_BUFFER_BIT);
 	piglit_draw_rect_tex(x, y, FBO_SIZE, FBO_SIZE,
 			     0, 0, 1, 1);
 	glDisable(GL_TEXTURE_2D);
@@ -264,71 +302,15 @@ framebuffer_srgb_fbo(void)
 	int fbo_width = FBO_SIZE;
 	int fbo_height = FBO_SIZE;
 	GLuint fbo;
-	GLboolean boolmode;
-	float green[] = {0, 0.3, 0.0, 0};
-	float expected_green[4];
-	float expected_blend[4];
-
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
 
 	fbo = make_fbo(fbo_width, fbo_height);
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
-
-	glGetBooleanv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &boolmode);
-
-	assert(glGetError() == 0);
-
 	glViewport(0, 0, fbo_width, fbo_height);
+
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
 
-	glColor4fv(green);
-	piglit_draw_rect(0, 0, 20, 20);
-
-	/* draw a green square with sRGB enabled and no blending */
-	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-
-	piglit_draw_rect(30, 30, 20, 20);
-
-	/* draw another green square */
-	piglit_draw_rect(20, 0, 20, 20);
-        /* enable blending and draw a green square with sRGB enabled on
-         * top of the previous green square
-         */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_ONE, GL_ONE);
-	piglit_draw_rect(20, 0, 20, 20);
-
-	glDisable(GL_BLEND);
-	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-
-	if (!piglit_probe_rect_rgb(0, 0, 20, 20, green))
-		pass = GL_FALSE;
-
-	memcpy(expected_green, green, sizeof(float) * 4);
-	if (boolmode)
-		expected_green[1] = linear_to_nonlinear(green[1]);
-
-	if (!piglit_probe_rect_rgb(30, 30, 20, 20, expected_green))
-		pass = GL_FALSE;
-
-	/* check it doesn't affect the pixel path */
-	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-	if (!piglit_probe_rect_rgb(30, 30, 20, 20, expected_green))
-		pass = GL_FALSE;
-	glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-	
-	memcpy(expected_blend, green, sizeof(float) * 4);
-	if (boolmode)
-		expected_blend[1] = linear_to_nonlinear(green[1] * 2.0);
-	else
-		expected_blend[1] = green[1] * 2.0;
-
-	if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_blend))
-		pass = GL_FALSE;
+	pass = test_srgb();
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
@@ -380,4 +362,6 @@ piglit_init(int argc, char **argv)
 	reshape(piglit_width, piglit_height);
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_EXT_framebuffer_blit");
+
+	glClearColor(0.5, 0.5, 0.5, 1.0);
 }
