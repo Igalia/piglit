@@ -705,9 +705,11 @@ add_shader_test_dir(spec['glsl-1.10']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
 		    recursive=True)
 add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-render-after-bad-attach')
+spec['glsl-1.10']['execution']['clipping'] = Group()
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
 	cmdline = 'clip-plane-transformation ' + mode
 	spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
+spec['glsl-1.10']['execution']['varying-packing'] = Group()
 for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
              'ivec4', 'uvec2', 'uvec3', 'uvec4', 'mat2', 'mat3', 'mat4',
              'mat2x3', 'mat2x4', 'mat3x2', 'mat3x4', 'mat4x2', 'mat4x3']:
