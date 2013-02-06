@@ -170,12 +170,14 @@ show_window(struct piglit_winsys_framework *winsys_fw)
 
 	get_native(x11_fw);
 
-	/* Prevent the window from grabbing input. */
-	wm_hints = XAllocWMHints();
-	wm_hints->flags |= InputHint;
-	wm_hints->input = False;
-	XSetWMHints(x11_fw->display, x11_fw->window, wm_hints);
-	XFree(wm_hints);
+	if (piglit_automatic) {
+		/* Prevent the window from grabbing input. */
+		wm_hints = XAllocWMHints();
+		wm_hints->flags |= InputHint;
+		wm_hints->input = False;
+		XSetWMHints(x11_fw->display, x11_fw->window, wm_hints);
+		XFree(wm_hints);
+	}
 
 	waffle_window_show(wfl_fw->window);
 }
