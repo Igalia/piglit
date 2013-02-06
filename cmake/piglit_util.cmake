@@ -78,7 +78,7 @@ function(piglit_add_library name)
 
     list(REMOVE_AT ARGV 0)
     if(WIN32)
-        add_library(${name} ${ARGV})
+        add_library(${name} STATIC ${ARGV})
     else(WIN32)
         add_library(${name} SHARED ${ARGV})
         install(TARGETS ${name} DESTINATION lib)
