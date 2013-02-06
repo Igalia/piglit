@@ -273,3 +273,69 @@ include(cmake/piglit_dispatch.cmake)
 include_directories(src)
 add_subdirectory(cmake/target_api)
 add_subdirectory(generated_tests)
+
+
+##############################################################################
+# Packaging
+
+install (
+	FILES
+		COPYING
+		README
+		RELEASE
+	DESTINATION share/doc
+)
+
+install (
+	PROGRAMS
+		piglit-merge-results.py
+		piglit-print-commands.py
+		piglit-run.py
+		piglit-summary-html.py
+		piglit-summary-junit.py
+	DESTINATION .
+)
+
+install (
+	DIRECTORY framework
+	DESTINATION .
+	FILES_MATCHING PATTERN "*.py"
+)
+
+install (
+	DIRECTORY tests
+	DESTINATION .
+	FILES_MATCHING REGEX ".*\\.(tests|program_test|shader_test|frag|vert|ktx|cl)$"
+)
+
+install (
+	DIRECTORY generated_tests
+	DESTINATION .
+	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert)$"
+)
+
+
+set (CPACK_PACKAGE_VERSION_MAJOR "1")
+set (CPACK_PACKAGE_VERSION_MINOR "0")
+
+# Use current date in YYYYMMDD format as patch number
+execute_process (
+	COMMAND ${python} -c "import time, sys; sys.stdout.write(time.strftime('%Y%m%d'))"
+	OUTPUT_VARIABLE CPACK_PACKAGE_VERSION_PATCH
+)
+
+# cpack mistakenly detects Mingw-w64 as win32
+if (MINGW)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set (CPACK_SYSTEM_NAME win64)
+	endif ()
+endif ()
+
+# See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
+if (WIN32)
+	set (CPACK_GENERATOR "ZIP")
+else ()
+	set (CPACK_GENERATOR "TBZ2")
+endif ()
+
+include(CPack)

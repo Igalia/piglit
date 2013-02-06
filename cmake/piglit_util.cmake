@@ -62,6 +62,8 @@ function(piglit_add_executable name)
     add_executable(${name} ${ARGV})
     add_dependencies(${name} piglit_dispatch_gen)
 
+    install(TARGETS ${name} DESTINATION bin)
+
 endfunction(piglit_add_executable)
 
 #
@@ -79,6 +81,7 @@ function(piglit_add_library name)
         add_library(${name} ${ARGV})
     else(WIN32)
         add_library(${name} SHARED ${ARGV})
+        install(TARGETS ${name} DESTINATION lib)
     endif(WIN32)
     add_dependencies(${name} piglit_dispatch_gen)
 
