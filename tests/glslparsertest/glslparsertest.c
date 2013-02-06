@@ -339,10 +339,18 @@ int process_options(int argc, char **argv)
 static unsigned
 parse_glsl_version_number(const char *str)
 {
-	unsigned major;
-	unsigned minor;
+	unsigned major = 0;
+	unsigned minor = 0;
 
-	sscanf(str, "%u.%u", &major, &minor);
+	/* Accept a return value of either 1 or 2 from sscanf(), so
+	 * that the version number may be supplied as either "<int>"
+	 * or "<int>.<int>".
+	 */
+	if (sscanf(str, "%u.%u", &major, &minor) == 0) {
+		printf("Ill-formed GLSL version number: %s\n", str);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	return (major * 100) + minor;
 }
 
