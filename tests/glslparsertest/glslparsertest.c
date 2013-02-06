@@ -35,12 +35,13 @@
 
 #include "piglit-util-gl-common.h"
 
-static unsigned parse_glsl_version(const char *str);
+static unsigned parse_glsl_version_number(const char *str);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	if (argc > 3) {
-		const unsigned int int_version = parse_glsl_version(argv[3]);
+		const unsigned int int_version
+			= parse_glsl_version_number(argv[3]);
 		switch (int_version) {
 		case 100:
 			config.supports_gl_compat_version = 10;
@@ -336,13 +337,35 @@ int process_options(int argc, char **argv)
 }
 
 static unsigned
-parse_glsl_version(const char *str)
+parse_glsl_version_number(const char *str)
 {
 	unsigned major;
 	unsigned minor;
 
 	sscanf(str, "%u.%u", &major, &minor);
 	return (major * 100) + minor;
+}
+
+
+static unsigned
+parse_glsl_version_string(const char *str)
+{
+	if (piglit_is_gles()) {
+		/* In GLSL ES, the string returned by
+		 * glGetString(GL_SHADING_LANGUAGE_VERSION) is
+		 * prefixed by some text.  Verify that the expected
+		 * text is there and skip it before calling
+		 * parse_glsl_version_number().
+		 */
+		const char *expected_prefix = "OpenGL ES GLSL ES ";
+		if (strncmp(str, expected_prefix,
+			    strlen(expected_prefix)) != 0) {
+			printf("Ill-formed GLSL version string: %s\n", str);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		str += strlen(expected_prefix);
+	}
+	return parse_glsl_version_number(str);
 }
 
 void
@@ -368,7 +391,7 @@ piglit_init(int argc, char**argv)
 		usage(argv[0]);
 
 	if (argc > 3)
-		requested_version = parse_glsl_version(argv[3]);
+		requested_version = parse_glsl_version_number(argv[3]);
 
 	gl_version_times_10 = piglit_get_gl_version();
 
@@ -383,7 +406,7 @@ piglit_init(int argc, char**argv)
 		glGetString(GL_SHADING_LANGUAGE_VERSION);
 
 	if (glsl_version_string != NULL)
-		glsl_version = parse_glsl_version(glsl_version_string);
+		glsl_version = parse_glsl_version_string(glsl_version_string);
 
 	if (requested_version == 100) {
 		piglit_require_extension("GL_ARB_ES2_compatibility");
