@@ -61,8 +61,8 @@ GLuint prog[2];
 enum piglit_result
 piglit_display(void)
 {
-	static const float green[3] = { 0.0, 1.0, 0.0 };
 	enum piglit_result result = PIGLIT_PASS;
+	float junk[4];
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -70,11 +70,12 @@ piglit_display(void)
 	glUseShaderProgramEXT(GL_FRAGMENT_SHADER, prog[1]);
 	piglit_draw_rect(10, 10, 10, 10);
 
-	/* The vertex shader is passing green to the fragment shader in an
-	 * illegal way.  The rendered result must not be green!
+	/* The result is undefined (and in particular we may find
+	 * green since so many other tests happen to load our
+	 * registers with green), but the GPU shouldn't hang.
+	 * So we read the value, but don't test it for anything.
 	 */
-	if (piglit_probe_pixel_rgb(15, 15, green))
-		result = PIGLIT_FAIL;
+	glReadPixels(15, 15, 1, 1, GL_RGBA, GL_FLOAT, junk);
 
 	if (!piglit_automatic)
 		piglit_present_results();
@@ -110,7 +111,4 @@ piglit_init(int argc, char **argv)
 
 	if (!try_to_render)
 		piglit_report_result(PIGLIT_PASS);
-
-	printf("\"Probe at (.., ..)\" returning mismatched results is "
-	       "expected and correct.\n");
 }
