@@ -368,6 +368,30 @@ parse_glsl_version_string(const char *str)
 	return parse_glsl_version_number(str);
 }
 
+
+static void
+check_version(unsigned glsl_version)
+{
+	if (!piglit_is_gles()) {
+		if (requested_version == 100) {
+			piglit_require_extension("GL_ARB_ES2_compatibility");
+			return;
+		} else if (requested_version == 300) {
+			piglit_require_extension("GL_ARB_ES3_compatibility");
+			return;
+		}
+	}
+
+	if (glsl_version < requested_version) {
+		fprintf(stderr,
+			"GLSL version is %u.%u, but requested version %u.%u is required\n",
+			glsl_version / 100, glsl_version % 100,
+			requested_version / 100, requested_version % 100);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+
 void
 piglit_init(int argc, char**argv)
 {
@@ -408,17 +432,7 @@ piglit_init(int argc, char**argv)
 	if (glsl_version_string != NULL)
 		glsl_version = parse_glsl_version_string(glsl_version_string);
 
-	if (requested_version == 100) {
-		piglit_require_extension("GL_ARB_ES2_compatibility");
-	} else if (requested_version == 300) {
-		piglit_require_extension("GL_ARB_ES3_compatibility");
-	} else if (glsl_version < requested_version) {
-		fprintf(stderr,
-			"GLSL version is %u.%u, but requested version %u.%u is required\n",
-			glsl_version / 100, glsl_version % 100,
-			requested_version / 100, requested_version % 100);
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	check_version(glsl_version);
 
 	for (i = 4; i < argc; i++) {
 		if (argv[i][0] == '!') {
