@@ -48,9 +48,10 @@ PIGLIT_GL_TEST_CONFIG_END
 static const char *TestName = "getteximage-formats";
 
 static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
+static GLuint texture_id;
+static GLboolean init_by_rendering;
 
-#define TEX_WIDTH 128
-#define TEX_HEIGHT 128
+#define TEX_SIZE 128
 
 #define DO_BLEND 1
 
@@ -64,13 +65,14 @@ static const GLfloat clearColor[4] = { 0.4, 0.4, 0.4, 0.0 };
 static GLboolean
 make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 {
-	GLubyte tex[TEX_HEIGHT][TEX_WIDTH][4];
+	GLubyte tex[TEX_SIZE][TEX_SIZE][4];
 	int i, j;
+	GLuint fb, status;
 
-	for (i = 0; i < TEX_HEIGHT; i++) {
-		for (j = 0; j < TEX_WIDTH; j++) {
-			tex[i][j][0] = j * 255 / TEX_WIDTH;
-			tex[i][j][1] = i * 255 / TEX_HEIGHT;
+	for (i = 0; i < TEX_SIZE; i++) {
+		for (j = 0; j < TEX_SIZE; j++) {
+			tex[i][j][0] = j * 255 / TEX_SIZE;
+			tex[i][j][1] = i * 255 / TEX_SIZE;
 			tex[i][j][2] = 128;
 			if (((i >> 4) ^ (j >> 4)) & 1)
 				tex[i][j][3] = 255;  /* opaque */
@@ -79,10 +81,40 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 		}
 	}
 
-	memcpy(upperRightTexel, tex[TEX_HEIGHT-1][TEX_WIDTH-1], 4);
+	memcpy(upperRightTexel, tex[TEX_SIZE-1][TEX_SIZE-1], 4);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, intFormat, TEX_WIDTH, TEX_HEIGHT, 0,
-					 GL_RGBA, GL_UNSIGNED_BYTE, tex);
+	if (init_by_rendering) {
+		/* Initialize the mipmap levels. */
+		for (i = TEX_SIZE, j = 0; i; i >>= 1, j++) {
+			glTexImage2D(GL_TEXTURE_2D, j, intFormat, i, i, 0,
+				     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		}
+
+		/* Initialize the texture with glDrawPixels. */
+		glGenFramebuffers(1, &fb);
+		glBindFramebuffer(GL_FRAMEBUFFER, fb);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				       GL_TEXTURE_2D, texture_id, 0);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			glDeleteFramebuffers(1, &fb);
+			return GL_FALSE;
+		}
+
+		glViewport(0, 0, TEX_SIZE, TEX_SIZE);
+
+		glWindowPos2iARB(0, 0);
+		glDrawPixels(TEX_SIZE, TEX_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, tex);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glDeleteFramebuffers(1, &fb);
+		glViewport(0, 0, piglit_width, piglit_height);
+	}
+	else {
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexImage2D(GL_TEXTURE_2D, 0, intFormat, TEX_SIZE, TEX_SIZE, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, tex);
+	}
 
 	return glGetError() == GL_NO_ERROR;
 }
@@ -324,8 +356,8 @@ test_format(const struct test_desc *test,
 	    const struct format_desc *fmt)
 {
 	int x, y;
-	int w = TEX_WIDTH, h = TEX_HEIGHT;
-	GLfloat readback[TEX_HEIGHT][TEX_WIDTH][4];
+	int w = TEX_SIZE, h = TEX_SIZE;
+	GLfloat readback[TEX_SIZE][TEX_SIZE][4];
 	GLubyte upperRightTexel[4];
 	int level;
 	GLfloat expected[4], pix[4], tolerance[4];
@@ -357,7 +389,7 @@ test_format(const struct test_desc *test,
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_BLEND);
 
-		x += TEX_WIDTH + 20;
+		x += TEX_SIZE + 20;
 
 		level = 0;
 		while (w > 0) {
@@ -485,21 +517,29 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint t;
+	int i;
 
 	if ((piglit_get_gl_version() < 14) && !piglit_is_extension_supported("GL_ARB_window_pos")) {
 		printf("Requires GL 1.4 or GL_ARB_window_pos");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	fbo_formats_init(argc, argv, !piglit_automatic);
+	fbo_formats_init(1, argv, !piglit_automatic);
 	(void) fbo_formats_display;
 
-	glGenTextures(1, &t);
-	glBindTexture(GL_TEXTURE_2D, t);
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "init-by-rendering") == 0) {
+			init_by_rendering = GL_TRUE;
+			puts("The textures will be initialized by rendering "
+			     "to them using glDrawPixels.");
+			break;
+		}
+	}
+
+	glGenTextures(1, &texture_id);
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
