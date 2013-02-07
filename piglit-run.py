@@ -133,7 +133,7 @@ def main():
 			usage()
 		if len(args) != 1:
 			usage()
-		resultsDir = args[0]
+		resultsDir = path.realpath(args[0])
 
 		# Load settings from the old results JSON
 		old_results = core.loadTestResults(resultsDir)
