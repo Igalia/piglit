@@ -125,7 +125,8 @@ class ShaderTest(PlainExecTest):
         Test.__init__(self, runConcurrent=True)
 
         assert(isinstance(shader_runner_args, list))
-        assert(isinstance(shader_runner_args[0], str))
+        assert(isinstance(shader_runner_args[0], str) or \
+               isinstance(shader_runner_args[0], unicode))
 
         self.__run_standalone = run_standalone
         self.__shader_runner_args = shader_runner_args
