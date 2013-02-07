@@ -203,8 +203,12 @@ compile_glsl(GLenum target, bool release_text)
 		break;
 	}
 
-	if (glsl_req_version.num != 0 &&
-	    !strstr(shader_string, "#version ")) {
+	if (!glsl_req_version.num) {
+		printf("GLSL version requirement missing\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if (!strstr(shader_string, "#version ")) {
 		char *shader_strings[2];
 		char version_string[100];
 		GLint shader_string_sizes[2];
