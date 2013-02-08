@@ -101,7 +101,6 @@ enum states {
 	vertex_program,
 	geometry_shader,
 	geometry_shader_file,
-	geometry_program,
 	fragment_shader,
 	fragment_shader_file,
 	fragment_program,
@@ -648,9 +647,6 @@ leave_state(enum states state, const char *line)
 	case geometry_shader:
 		break;
 
-	case geometry_program:
-		break;
-
 	case fragment_shader:
 		shader_string_size = line - shader_string;
 		compile_glsl(GL_FRAGMENT_SHADER, false);
@@ -814,7 +810,6 @@ process_test_script(const char *script_name)
 			case vertex_shader:
 			case vertex_program:
 			case geometry_shader:
-			case geometry_program:
 			case fragment_shader:
 			case fragment_program:
 				if (shader_string == NULL)
