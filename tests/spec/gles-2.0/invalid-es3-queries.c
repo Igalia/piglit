@@ -92,6 +92,7 @@ piglit_init(int argc, char **argv)
 	},
 	GL_ARB_vertex_shader_enums[] = {
 		{ "GL_MAX_VERTEX_UNIFORM_COMPONENTS", 0x8B4A },
+		{ "GL_MAX_VARYING_COMPONENTS", 0x8B4B },
 	},
 	GL_EXT_framebuffer_blit_enums[] = {
 		{ "GL_READ_FRAMEBUFFER_BINDING", 0x8CAA },
