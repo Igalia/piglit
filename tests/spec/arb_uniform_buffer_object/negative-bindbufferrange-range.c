@@ -75,13 +75,19 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		pass = false;
 
-	glBindBufferRange(GL_UNIFORM_BUFFER, index, bo, 0, size + 1);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		pass = false;
-
-	glBindBufferRange(GL_UNIFORM_BUFFER, index, bo, 1, size);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		pass = false;
+	/* Note: we don't check the following condition (which is
+	 * specified in OpenGL specs from 3.0 through 4.1):
+	 *
+         *     "The error INVALID_VALUE is generated if size is less
+         *     than or equal to zero or if offset + size is greater
+         *     than the value of BUFFER_SIZE."
+	 *
+	 * This text was dropped from OpenGL 4.2, and it does not
+	 * appear in the GLES 3.0 spec.  Since this is a deliberate
+	 * relaxation of error conditions in order to allow clients to
+	 * work, it seems sensible to allow implementations to apply
+	 * this change even if the GL version is less than 4.2.
+	 */
 
 	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
 	for (i = 1; i < alignment; i++) {
