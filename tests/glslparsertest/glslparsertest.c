@@ -41,32 +41,24 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	if (argc > 3) {
 		const unsigned int int_version = parse_glsl_version(argv[3]);
-
 		switch (int_version) {
-		case 110:
-		case 120:
-		case 130:
-			config.supports_gl_compat_version = 10;
-			config.supports_gl_core_version = 0;
-			config.supports_gl_es_version = 0;
-			break;
-		case 140:
-		case 150:
-		case 330:
-			config.supports_gl_compat_version = 31;
-			config.supports_gl_core_version = 31;
-			config.supports_gl_es_version = 0;
-			break;
-		case 400:
-		case 410:
-		case 420:
-			config.supports_gl_compat_version = 40;
-			config.supports_gl_core_version = 40;
-			config.supports_gl_es_version = 0;
-			break;
-		default:
+		case 100:
 			config.supports_gl_compat_version = 10;
 			config.supports_gl_es_version = 20;
+			break;
+		case 300:
+			config.supports_gl_compat_version = 10;
+			config.supports_gl_es_version = 30;
+			break;
+		default: {
+			const unsigned int gl_version
+				= required_gl_version_from_glsl_version(int_version);
+			config.supports_gl_compat_version = gl_version;
+			if (gl_version < 31)
+				config.supports_gl_core_version = 0;
+			else
+				config.supports_gl_core_version = gl_version;
+		}
 			break;
 		}
 	} else {

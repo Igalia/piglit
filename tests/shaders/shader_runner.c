@@ -931,6 +931,7 @@ parse_required_versions(struct requirement_parse_results *results,
 	}
 }
 
+
 static void
 choose_required_gl_version(struct requirement_parse_results *parse_results,
                            struct component_version *gl_version)
@@ -946,19 +947,10 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
 		return;
 
 	/* Possibly promote the GL version. */
-	switch (parse_results->glsl_version.num) {
-	case 140:
-	case 150:
-	case 330:
-		if (gl_version->num < 31)
-			gl_version->num = 31;
-		break;
-	case 400:
-	case 410:
-	case 420:
-		if (gl_version->num < 40)
-			gl_version->num = 40;
-		break;
+	if (gl_version->num < required_gl_version_from_glsl_version(
+			parse_results->glsl_version.num)) {
+		gl_version->num = required_gl_version_from_glsl_version(
+			parse_results->glsl_version.num);
 	}
 }
 

@@ -567,3 +567,22 @@ piglit_ortho_uniform(GLint location, int w, int h)
 	piglit_gen_ortho_uniform(location, 0, w, 0, h, -1, 1);
 }
 #endif
+
+
+unsigned
+required_gl_version_from_glsl_version(unsigned glsl_version)
+{
+	switch (glsl_version) {
+	case 110: return 20;
+	case 120: return 21;
+	case 130: return 30;
+	case 140: return 31;
+	case 150: return 32;
+	case 330: return 33;
+	case 400: return 40;
+	case 410: return 41;
+	case 420: return 42;
+	case 430: return 43;
+	default: return 0;
+	}
+}

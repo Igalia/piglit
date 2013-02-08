@@ -219,6 +219,14 @@ extern GLint piglit_ARBfp_pass_through;
 static const GLint PIGLIT_ATTRIB_POS = 0;
 static const GLint PIGLIT_ATTRIB_TEX = 1;
 
+/**
+ * Given a GLSL version number, return the lowest-numbered GL version
+ * that is guaranteed to support it.
+ */
+unsigned
+required_gl_version_from_glsl_version(unsigned glsl_version);
+
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
