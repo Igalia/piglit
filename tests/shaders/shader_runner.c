@@ -41,6 +41,8 @@
 static void
 get_required_versions(const char *script_name,
 		      struct piglit_gl_test_config *config);
+GLenum
+decode_drawing_mode(const char *mode_str);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -85,6 +87,9 @@ GLuint fragment_shaders[256];
 unsigned num_fragment_shaders = 0;
 int num_uniform_blocks;
 GLuint *uniform_block_bos;
+GLenum geometry_layout_input_type = GL_TRIANGLES;
+GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
+GLint geometry_layout_vertices_out = 0;
 
 char *shader_string;
 GLint shader_string_size;
@@ -101,6 +106,7 @@ enum states {
 	vertex_program,
 	geometry_shader,
 	geometry_shader_file,
+	geometry_layout,
 	fragment_shader,
 	fragment_shader_file,
 	fragment_program,
@@ -183,6 +189,23 @@ string_match(const char *string, const char *line)
 	return (strncmp(string, line, strlen(string)) == 0);
 }
 
+
+const char *
+target_to_short_name(GLenum target)
+{
+	switch (target) {
+	case GL_VERTEX_SHADER:
+		return "VS";
+	case GL_FRAGMENT_SHADER:
+		return "FS";
+	case GL_GEOMETRY_SHADER:
+		return "GS";
+	default:
+		return "???";
+	}
+}
+
+
 void
 compile_glsl(GLenum target, bool release_text)
 {
@@ -247,7 +270,7 @@ compile_glsl(GLenum target, bool release_text)
 		glGetShaderInfoLog(shader, size, NULL, info);
 
 		fprintf(stderr, "Failed to compile %s: %s\n",
-			target == GL_FRAGMENT_SHADER ? "FS" : "VS",
+			target_to_short_name(target),
 			info);
 
 		free(info);
@@ -619,6 +642,32 @@ process_requirement(const char *line)
 }
 
 
+/**
+ * Process a line from the [geometry layout] section of a test
+ */
+void
+process_geometry_layout(const char *line)
+{
+	char s[32];
+	int x;
+
+	line = eat_whitespace(line);
+
+	if (line[0] == '\0' || line[0] == '\n') {
+		return;
+	} else if (sscanf(line, "input type %31s", s) == 1) {
+		geometry_layout_input_type = decode_drawing_mode(s);
+	} else if (sscanf(line, "output type %31s", s) == 1) {
+		geometry_layout_output_type = decode_drawing_mode(s);
+	} else if (sscanf(line, "vertices out %d", &x) == 1) {
+		geometry_layout_vertices_out = x;
+	} else {
+		printf("Could not parse geometry layout line: %s\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
+
 void
 leave_state(enum states state, const char *line)
 {
@@ -645,6 +694,15 @@ leave_state(enum states state, const char *line)
 		break;
 
 	case geometry_shader:
+		shader_string_size = line - shader_string;
+		compile_glsl(GL_GEOMETRY_SHADER, false);
+		break;
+
+	case geometry_shader_file:
+		compile_glsl(GL_GEOMETRY_SHADER, true);
+		break;
+
+	case geometry_layout:
 		break;
 
 	case fragment_shader:
@@ -700,6 +758,21 @@ link_and_use_shaders(void)
 	for (i = 0; i < num_fragment_shaders; i++) {
 		glAttachShader(prog, fragment_shaders[i]);
 	}
+
+#ifdef PIGLIT_USE_OPENGL
+	if (geometry_layout_input_type != GL_TRIANGLES) {
+		glProgramParameteriARB(prog, GL_GEOMETRY_INPUT_TYPE_ARB,
+				       geometry_layout_input_type);
+	}
+	if (geometry_layout_output_type != GL_TRIANGLE_STRIP) {
+		glProgramParameteriARB(prog, GL_GEOMETRY_OUTPUT_TYPE_ARB,
+				       geometry_layout_output_type);
+	}
+	if (geometry_layout_vertices_out != 0) {
+		glProgramParameteriARB(prog, GL_GEOMETRY_VERTICES_OUT_ARB,
+				       geometry_layout_vertices_out);
+	}
+#endif
 
 	glLinkProgram(prog);
 
@@ -780,6 +853,15 @@ process_test_script(const char *script_name)
 			} else if (string_match("[vertex shader file]", line)) {
 				state = vertex_shader_file;
 				shader_string = NULL;
+			} else if (string_match("[geometry shader]", line)) {
+				state = geometry_shader;
+				shader_string = NULL;
+			} else if (string_match("[geometry shader file]", line)) {
+				state = vertex_shader_file;
+				shader_string = NULL;
+			} else if (string_match("[geometry layout]", line)) {
+				state = geometry_layout;
+				shader_string = NULL;
 			} else if (string_match("[fragment shader]", line)) {
 				state = fragment_shader;
 				shader_string = NULL;
@@ -805,6 +887,10 @@ process_test_script(const char *script_name)
 
 			case requirements:
 				process_requirement(line);
+				break;
+
+			case geometry_layout:
+				process_geometry_layout(line);
 				break;
 
 			case vertex_shader:
