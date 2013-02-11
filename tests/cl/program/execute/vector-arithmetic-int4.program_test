@@ -103,21 +103,21 @@ arg_out: 0 buffer int4[1]  0  0  0  0
 ## Modulo ##
 
 [test]
-name: pos%pos=0, pos%neg=0, pos%pos=pos, pos%neg=pos
+name: pos mod pos=0, pos mod neg=0, pos mod pos=pos, pos mod neg=pos
 kernel_name: mod
 arg_in:  1 int4            8  12  8 16
 arg_in:  2 int4            4  -3  5 -3
 arg_out: 0 buffer int4[1]  0   0  3  1
 
 [test]
-name: neg%pos=0, neg%pos=neg, small_pos%big_pos, small_pos%big_pos
+name: neg mod pos=0, neg mod pos=neg, small_pos mod big_pos, small_pos mod big_pos
 kernel_name: mod
 arg_in:  1 int4          -30 -18     5       6
 arg_in:  2 int4           15   5 34343 3456676
 arg_out: 0 buffer int4[1]  0  -3     5       6
 
 [test]
-name: max_int%num, min_int%num
+name: max_int mod num, min_int mod num
 kernel_name: mod
 arg_in:  1 int4           0X7FFFFFFF 0X7FFFFFFF -0X80000000 -0X80000000
 arg_in:  2 int4                12345      12345         476         476

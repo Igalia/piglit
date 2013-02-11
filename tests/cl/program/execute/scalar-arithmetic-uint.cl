@@ -80,35 +80,35 @@ arg_out: 0 buffer uint[1] 0
 ## Modulo ##
 
 [test]
-name: pos%pos=0
+name: pos mod pos=0
 kernel_name: mod
 arg_in:  1 uint 8
 arg_in:  2 uint 4
 arg_out: 0 buffer uint[1] 0
 
 [test]
-name: pos%pos=pos
+name: pos mod pos=pos
 kernel_name: mod
 arg_in:  1 uint 8
 arg_in:  2 uint 5
 arg_out: 0 buffer uint[1] 3
 
 [test]
-name: small_pos%big_pos
+name: small_pos mod big_pos
 kernel_name: mod
 arg_in:  1 uint 6
 arg_in:  2 uint 32004351
 arg_out: 0 buffer uint[1] 6
 
 [test]
-name: max_uint%num
+name: max_uint mod num
 kernel_name: mod
 arg_in:  1 uint 4294967295
 arg_in:  2 uint 43563
 arg_out: 0 buffer uint[1] 3999
 
 [test]
-name: min_uint%num
+name: min_uint mod num
 kernel_name: mod
 arg_in:  1 uint 0
 arg_in:  2 uint 342346853

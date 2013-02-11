@@ -1113,9 +1113,22 @@ static char*
 parse_name(const char *input)
 {
 	char *name = add_dynamic_str_copy(input);
-	if (strrchr(name, '/')) {
-		fprintf(stderr,	"Illegal character in test name '%s': /\n",
-								input);
+	int error;
+	regex_t regex;
+	regmatch_t pmatch[1];
+
+
+	if ((error = regcomp(&regex, "\\([/%]\\)",0))) {
+		char errbuf[100];
+		regerror(error, &regex, errbuf, 100);
+		fprintf(stderr, "Failed to compile regex for parse_name():%s\n", errbuf);
+		return NULL;
+	}
+
+	if (!regexec(&regex, input, 1, &pmatch, 0)) {
+		char bad_char = *(input + pmatch[0].rm_so);
+		fprintf(stderr,	"Illegal character in test name '%s': %c\n",
+							input, bad_char);
 		return NULL;
 	}
 	return name;

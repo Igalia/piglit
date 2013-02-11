@@ -80,35 +80,35 @@ arg_out: 0 buffer ulong[1] 0
 ## Modulo ##
 
 [test]
-name: pos%pos=0
+name: pos mod pos=0
 kernel_name: mod
 arg_in:  1 ulong 8
 arg_in:  2 ulong 4
 arg_out: 0 buffer ulong[1] 0
 
 [test]
-name: pos%pos=pos
+name: pos mod pos=pos
 kernel_name: mod
 arg_in:  1 ulong 8
 arg_in:  2 ulong 5
 arg_out: 0 buffer ulong[1] 3
 
 [test]
-name: small_pos%big_pos
+name: small_pos mod big_pos
 kernel_name: mod
 arg_in:  1 ulong 7
 arg_in:  2 ulong 3200345334351
 arg_out: 0 buffer ulong[1] 7
 
 [test]
-name: max_ulong%num
+name: max_ulong mod num
 kernel_name: mod
 arg_in:  1 ulong 18446744073709551615
 arg_in:  2 ulong 7674334534554
 arg_out: 0 buffer ulong[1] 7547678378247
 
 [test]
-name: min_ulong%num
+name: min_ulong mod num
 kernel_name: mod
 arg_in:  1 ulong 0
 arg_in:  2 ulong 342346853345563
