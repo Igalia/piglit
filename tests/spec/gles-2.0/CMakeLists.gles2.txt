@@ -4,5 +4,6 @@ link_libraries(
 
 piglit_add_executable(invalid-es3-queries_gles2 invalid-es3-queries.c)
 piglit_add_executable(minmax_gles2 minmax.c)
+piglit_add_executable(multiple-shader-objects_gles2 multiple-shader-objects.c)
 
 # vim: ft=cmake:
