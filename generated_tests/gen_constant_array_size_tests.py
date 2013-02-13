@@ -44,8 +44,8 @@ import os.path
 
 class ParserTest(object):
     """Class used to build a test of a single built-in.  This is an
-    abstract base class--derived types should override test_suffix()
-    and output_var().
+    abstract base class--derived types should override test_suffix(),
+    output_var(), and other functions if necessary.
     """
 
     def __init__(self, signature, test_vectors):
@@ -71,6 +71,20 @@ class ParserTest(object):
 
     def version_directive(self):
 	return '#version {0}\n'.format(self.glsl_version())
+
+    def additional_declarations(self):
+	"""Return a string containing any additional declarations that
+	should be placed after the version directive.  Returns the
+	empty string by default.
+	"""
+	return ''
+
+    def additional_extensions(self):
+	"""Return a list (or other iterable) containing any additional
+	extension requirements that the test has.  Returns the empty
+	list by default.
+	"""
+	return []
 
     @abc.abstractmethod
     def test_suffix(self):
@@ -134,6 +148,7 @@ class ParserTest(object):
     def make_shader(self):
 	"""Generate the shader code necessary to test the built-in."""
 	shader = self.version_directive()
+	shader += self.additional_declarations()
 	shader += '\n'
 	shader += 'void main()\n'
 	shader += '{\n'
@@ -161,6 +176,10 @@ class ParserTest(object):
 	parser_test = '/* [config]\n'
 	parser_test += ' * expect_result: pass\n'
 	parser_test += ' * glsl_version: {0:1.2f}\n'.format(float(self.glsl_version()) / 100)
+	req_extensions = list(self.additional_extensions())
+	if req_extensions:
+	    parser_test += ' * require_extensions: {0}\n'.format(
+		' '.join(req_extensions))
 	parser_test += ' * [end config]\n'
 	parser_test += ' *\n'
 	parser_test += ' * Check that the following test vectors are constant folded correctly:\n'
@@ -192,6 +211,24 @@ class VertexParserTest(ParserTest):
 
 
 
+class GeometryParserTest(ParserTest):
+    """Derived class for tests that exercise the built-in in a geometry
+    shader.
+    """
+    def test_suffix(self):
+	return 'geom'
+
+    def additional_declarations(self):
+	return '#extension GL_ARB_geometry_shader4: enable\n'
+
+    def additional_extensions(self):
+	return ['GL_ARB_geometry_shader4']
+
+    def output_var(self):
+	return 'gl_Position'
+
+
+
 class FragmentParserTest(ParserTest):
     """Derived class for tests that exercise the built-in in a fagment
     shader.
@@ -207,6 +244,7 @@ class FragmentParserTest(ParserTest):
 def all_tests():
     for signature, test_vectors in sorted(test_suite.items()):
 	yield VertexParserTest(signature, test_vectors)
+	yield GeometryParserTest(signature, test_vectors)
 	yield FragmentParserTest(signature, test_vectors)
 
 

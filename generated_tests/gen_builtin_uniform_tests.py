@@ -21,14 +21,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# Generate a pair of shader_runner tests for every overloaded version
+# Generate a set of shader_runner tests for every overloaded version
 # of every built-in function, based on the test vectors computed by
 # builtin_function.py.
 #
-# In each pair of generated tests, one test exercises the built-in
-# function in vertex shaders, and the other exercises it in fragment
-# shaders.  In both cases, the inputs to the built-in function come
-# from uniforms, so that the effectiveness of the test won't be
+# In each set of generated tests, one test exercises the built-in
+# function in each type of shader (vertex, geometry, and fragment).
+# In all cases, the inputs to the built-in function come from
+# uniforms, so that the effectiveness of the test won't be
 # circumvented by constant folding in the GLSL compiler.
 #
 # The tests operate by invoking the built-in function in the
@@ -329,7 +329,8 @@ class FloatComparator(Comparator):
 class ShaderTest(object):
     """Class used to build a test of a single built-in.  This is an
     abstract base class--derived types should override test_prefix(),
-    make_vertex_shader(), and make_fragment_shader().
+    make_vertex_shader(), make_fragment_shader(), and other functions
+    if necessary.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -373,6 +374,12 @@ class ShaderTest(object):
         else:
             return 'draw rect -1 -1 2 2\n'
 
+    def make_additional_requirements(self):
+	"""Return a string that should be included in the test's
+	[require] section.
+	"""
+	return ''
+
     @abc.abstractmethod
     def test_prefix(self):
 	"""Return the prefix that should be used in the test file name
@@ -384,21 +391,39 @@ class ShaderTest(object):
     def make_vertex_shader(self):
 	"""Return the vertex shader for this test."""
 
+    def make_geometry_shader(self):
+	"""Return the geometry shader for this test (or None if this
+	test doesn't require a geometry shader).  No need to
+	reimplement this function in classes that don't use geometry
+	shaders.
+	"""
+	return None
+
+    def make_geometry_layout(self):
+	"""Return the geometry layout for this test (or None if this
+	test doesn't require a geometry layout section).  No need to
+	reimplement this function in classes that don't use geometry
+	shaders.
+	"""
+	return None
+
     @abc.abstractmethod
     def make_fragment_shader(self):
 	"""Return the fragment shader for this test."""
 
-    def make_test_shader(self, additional_declarations, additional_statements,
-			 output_var):
+    def make_test_shader(self, additional_declarations, prefix_statements,
+			 output_var, suffix_statements):
 	"""Generate the shader code necessary to test the built-in.
 	additional_declarations is a string containing any
 	declarations that need to be before the main() function of the
-	shader.  additional_statements is a string containing any
+	shader.  prefix_statements is a string containing any
 	additional statements than need to be inside the main()
 	function of the shader, before the built-in function is
 	called.  output_var is the variable that the result of the
 	built-in function should be assigned to, after conversion to a
-	vec4.
+	vec4.  suffix_statements is a string containing any additional
+	statements that need to be inside the main() funciton of the
+	shader, after the built-in function is called.
 	"""
 	shader = self.version_directive()
 	shader += additional_declarations
@@ -409,11 +434,12 @@ class ShaderTest(object):
 	shader += '\n'
 	shader += 'void main()\n'
 	shader += '{\n'
-	shader += additional_statements
+	shader += prefix_statements
 	invocation = self._signature.template.format(
 	    *['arg{0}'.format(i)
 	      for i in xrange(len(self._signature.argtypes))])
 	shader += self._comparator.make_result_handler(invocation, output_var)
+	shader += suffix_statements
 	shader += '}\n'
 	return shader
 
@@ -463,10 +489,21 @@ class ShaderTest(object):
 	"""Generate the test and write it to the output file."""
 	shader_test = '[require]\n'
 	shader_test += 'GLSL >= {0:1.2f}\n'.format(float(self.glsl_version()) / 100)
+	shader_test += self.make_additional_requirements()
 	shader_test += '\n'
 	shader_test += '[vertex shader]\n'
 	shader_test += self.make_vertex_shader()
 	shader_test += '\n'
+	gs = self.make_geometry_shader()
+	if gs:
+	    shader_test += '[geometry shader]\n'
+	    shader_test += gs
+	    shader_test += '\n'
+	gl = self.make_geometry_layout()
+	if gl:
+	    shader_test += '[geometry layout]\n'
+	    shader_test += gl
+	    shader_test += '\n'
 	shader_test += '[fragment shader]\n'
 	shader_test += self.make_fragment_shader()
 	shader_test += '\n'
@@ -495,12 +532,73 @@ class VertexShaderTest(ShaderTest):
                 'in vec4 vertex;\n' +
                 'out vec4 color;\n',
                 '  gl_Position = vertex;\n',
-                'color')
+                'color', '')
         else:
             return self.make_test_shader(
                 'varying vec4 color;\n',
                 '  gl_Position = gl_Vertex;\n',
-                'color')
+                'color', '')
+
+    def make_fragment_shader(self):
+	shader = self.version_directive()
+	shader += '''varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+'''
+	return shader
+
+
+
+class GeometryShaderTest(ShaderTest):
+    """Derived class for tests that exercise the built-in in a
+    geometry shader.
+    """
+    def test_prefix(self):
+	return 'gs'
+
+    def make_additional_requirements(self):
+	return 'GL_ARB_geometry_shader4\n'
+
+    def make_vertex_shader(self):
+	shader = self.version_directive()
+	if self.glsl_version() >= 140:
+	    shader += "in vec4 vertex;\n"
+
+	shader += "void main()\n"
+	shader += "{\n"
+        if self.glsl_version() >= 140:
+            shader += "	gl_Position = vertex;\n"
+        else:
+            shader += "	gl_Position = gl_Vertex;\n"
+        shader += "}\n"
+
+	return shader
+
+    def make_geometry_shader(self):
+	additional_declarations = \
+	    '#extension GL_ARB_geometry_shader4: enable\n'
+	if self.glsl_version() >= 130:
+	    additional_declarations += 'out vec4 color;\n'
+	else:
+	    additional_declarations += 'varying out vec4 color;\n'
+	return self.make_test_shader(
+	    additional_declarations,
+	    '  vec4 tmp_color;\n',
+	    'tmp_color',
+	    '  for (int i = 0; i < gl_PositionIn.length; i++) {\n'
+	    '    gl_Position = gl_PositionIn[i];\n'
+	    '    color = tmp_color;\n'
+	    '    EmitVertex();\n'
+	    '  }\n')
+
+    def make_geometry_layout(self):
+	layout = 'input type GL_TRIANGLES\n'
+	layout += 'output type GL_TRIANGLE_STRIP\n'
+	layout += 'vertices out 3\n'
+	return layout
 
     def make_fragment_shader(self):
 	shader = self.version_directive()
@@ -538,7 +636,7 @@ class FragmentShaderTest(ShaderTest):
 	return shader
 
     def make_fragment_shader(self):
-	return self.make_test_shader('', '', 'gl_FragColor')
+	return self.make_test_shader('', '', 'gl_FragColor', '')
 
 
 
@@ -548,6 +646,7 @@ def all_tests():
 	    if use_if and signature.rettype != glsl_bool:
 		continue
 	    yield VertexShaderTest(signature, test_vectors, use_if)
+	    yield GeometryShaderTest(signature, test_vectors, use_if)
 	    yield FragmentShaderTest(signature, test_vectors, use_if)
 
 
