@@ -2194,6 +2194,15 @@ arb_map_buffer_alignment = Group()
 spec['ARB_map_buffer_alignment'] = arb_map_buffer_alignment
 add_plain_test(arb_map_buffer_alignment, 'arb_map_buffer_alignment-sanity_test')
 
+arb_geometry_shader4 = Group()
+spec['ARB_geometry_shader4'] = arb_geometry_shader4
+add_shader_test_dir(spec['ARB_geometry_shader4'],
+                    os.path.join(testsDir, 'spec', 'arb_geometry_shader4'),
+                    recursive=True)
+import_glsl_parser_tests(spec['ARB_geometry_shader4'],
+                         os.path.join(testsDir, 'spec', 'arb_geometry_shader4'),
+                         ['compiler'])
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = Group()
 # Add all shader source files in the directories below.
