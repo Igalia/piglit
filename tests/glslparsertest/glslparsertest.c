@@ -77,6 +77,7 @@ static int expected_pass;
 static int gl_version_times_10 = 0;
 static int check_link = 0;
 static unsigned requested_version = 110;
+static bool test_requires_geometry_shader4 = false;
 
 static GLint
 get_shader_compile_status(GLuint shader)
@@ -118,6 +119,40 @@ get_shader_info_log_length(GLuint shader)
 	return length;
 }
 
+
+/**
+ * Attach a dumy shader of the given type.
+ */
+static void
+attach_dummy_shader(GLuint shader_prog, GLenum type)
+{
+	const char *shader_template;
+	char shader_text[128];
+	GLint shader;
+
+	switch (type) {
+	case GL_VERTEX_SHADER:
+		shader_template =
+			"#version %d\n"
+			"void main() { gl_Position = vec4(0.0); }";
+		break;
+	case GL_FRAGMENT_SHADER:
+		shader_template =
+			"#version %d\n"
+			"void main() { }";
+		break;
+	default:
+		printf("No dummy shader available for this shader type\n");
+		piglit_report_result(PIGLIT_FAIL);
+		break;
+	}
+
+	sprintf(shader_text, shader_template, requested_version);
+	shader = piglit_compile_shader_text(type, shader_text);
+	glAttachShader(shader_prog, shader);
+}
+
+
 /**
  * GLES requires both vertex and fragment shaders to be present in
  * order to link.  From section 2.10.3 (Program Objects) of the GLES 2.0 spec:
@@ -131,21 +166,12 @@ get_shader_info_log_length(GLuint shader)
 static void
 attach_complementary_shader(GLuint shader_prog, GLenum type)
 {
-	static const char *dummy_vertex_shader =
-		"#version 100\nvoid main() { gl_Position = vec4(0.0); }";
-	static const char *dummy_fragment_shader =
-		"#version 100\nvoid main() { }";
-
-	GLint shader;
-
 	switch (type) {
 	case GL_FRAGMENT_SHADER:
-		shader = piglit_compile_shader_text(GL_VERTEX_SHADER,
-						    dummy_vertex_shader);
+		attach_dummy_shader(shader_prog, GL_VERTEX_SHADER);
 		break;
 	case GL_VERTEX_SHADER:
-		shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-						    dummy_fragment_shader);
+		attach_dummy_shader(shader_prog, GL_FRAGMENT_SHADER);
 		break;
 	default:
 		fprintf(stderr,
@@ -153,7 +179,6 @@ attach_complementary_shader(GLuint shader_prog, GLenum type)
 		piglit_report_result(PIGLIT_FAIL);
 		exit(1);
 	}
-	glAttachShader(shader_prog, shader);
 }
 
 static void
@@ -173,6 +198,10 @@ test(void)
 		type = GL_FRAGMENT_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "vert") == 0)
 		type = GL_VERTEX_SHADER;
+#ifdef PIGLIT_USE_OPENGL
+	else if (strcmp(filename + strlen(filename) - 4, "geom") == 0)
+		type = GL_GEOMETRY_SHADER;
+#endif
 	else {
 		fprintf(stderr, "Couldn't determine type of program %s\n",
 			filename);
@@ -216,6 +245,19 @@ test(void)
 		glAttachShader(shader_prog, prog);
 		if (requested_version == 100)
 			attach_complementary_shader(shader_prog, type);
+#if PIGLIT_USE_OPENGL
+		if (type == GL_GEOMETRY_SHADER)
+			attach_dummy_shader(shader_prog, GL_VERTEX_SHADER);
+		if (test_requires_geometry_shader4) {
+			/* The default value of
+			 * GL_GEOMETRY_VERTICES_OUT_ARB is zero, which
+			 * is useless for testing.  Use a value of 3.
+			 */
+			glProgramParameteriARB(prog,
+					       GL_GEOMETRY_VERTICES_OUT_ARB,
+					       3);
+		}
+#endif
 		glLinkProgram(shader_prog);
 		if (check_link) {
 			ok = piglit_link_check_status_quiet(shader_prog);
@@ -356,10 +398,13 @@ piglit_init(int argc, char**argv)
 	}
 
 	for (i = 4; i < argc; i++) {
-		if (argv[i][0] == '!')
+		if (argv[i][0] == '!') {
 			piglit_require_not_extension(argv[i] + 1);
-		else
+		} else {
 			piglit_require_extension(argv[i]);
+			if (strstr(argv[i], "geometry_shader4") != NULL)
+				test_requires_geometry_shader4 = true;
+		}
 	}
 
 	test();
