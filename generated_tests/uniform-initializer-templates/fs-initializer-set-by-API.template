@@ -6,7 +6,6 @@ def constructor(type, values):
 GLSL >= ${"{0}.{1}".format(major, minor)}
 
 [vertex shader]
-#version ${"{0}{1}".format(major, minor)}
 
 void main()
 {
@@ -14,7 +13,6 @@ void main()
 }
 
 [fragment shader]
-#version ${"{0}{1}".format(major, minor)}
 
 % for (type, name, value) in type_list:
 uniform ${type} ${name} = ${value};

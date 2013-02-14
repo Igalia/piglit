@@ -362,12 +362,6 @@ class ShaderTest(object):
     def glsl_version(self):
 	return self._signature.version_introduced
 
-    def version_directive(self):
-	if self.glsl_version() == 110:
-	    return ''
-	else:
-	    return '#version {0}\n'.format(self.glsl_version())
-
     def draw_command(self):
         if self.glsl_version() >= 140:
             return 'draw arrays GL_TRIANGLE_FAN 0 4\n'
@@ -425,8 +419,7 @@ class ShaderTest(object):
 	statements that need to be inside the main() funciton of the
 	shader, after the built-in function is called.
 	"""
-	shader = self.version_directive()
-	shader += additional_declarations
+	shader = additional_declarations
 	for i in xrange(len(self._signature.argtypes)):
 	    shader += 'uniform {0} arg{1};\n'.format(
 		self._signature.argtypes[i], i)
@@ -540,8 +533,7 @@ class VertexShaderTest(ShaderTest):
                 'color', '')
 
     def make_fragment_shader(self):
-	shader = self.version_directive()
-	shader += '''varying vec4 color;
+	shader = '''varying vec4 color;
 
 void main()
 {
@@ -563,7 +555,7 @@ class GeometryShaderTest(ShaderTest):
 	return 'GL_ARB_geometry_shader4\n'
 
     def make_vertex_shader(self):
-	shader = self.version_directive()
+	shader = ''
 	if self.glsl_version() >= 140:
 	    shader += "in vec4 vertex;\n"
 
@@ -601,8 +593,7 @@ class GeometryShaderTest(ShaderTest):
 	return layout
 
     def make_fragment_shader(self):
-	shader = self.version_directive()
-	shader += '''varying vec4 color;
+	shader = '''varying vec4 color;
 
 void main()
 {
@@ -621,7 +612,7 @@ class FragmentShaderTest(ShaderTest):
 	return 'fs'
 
     def make_vertex_shader(self):
-	shader = self.version_directive()
+	shader = ""
         if self.glsl_version() >= 140:
             shader += "in vec4 vertex;\n"
 

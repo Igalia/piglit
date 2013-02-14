@@ -2,7 +2,6 @@
 GLSL >= ${"{0}.{1}".format(major, minor)}
 
 [vertex shader]
-#version ${"{0}{1}".format(major, minor)}
 varying vec4 color;
 
 % for (type, name, value) in type_list:
@@ -21,7 +20,6 @@ void main()
 }
 
 [fragment shader]
-#version ${"{0}{1}".format(major, minor)}
 varying vec4 color;
 
 void main()

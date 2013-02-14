@@ -114,18 +114,17 @@ class Test(object):
 	self.builtin_variable = variable[:3] == 'gl_'
 
 	# Determine whether the test requires GLSL 1.30.  If it does,
-	# use an appropriate version directive and use "in" and "out"
-	# to qualify shader inputs and outputs.  Otherwise use the old
-	# keywords "attribute" and "varying".
+	# use "in" and "out" to qualify shader inputs and outputs.
+	# Otherwise use the old keywords "attribute" and "varying".
+	# shader_runner will insert a #version directive based on
+	# glsl_version.
 	if self.interpolation_qualifier or self.clipping == 'distance':
 	    self.glsl_version = '1.30'
-	    self.version_directive = '#version 130\n'
 	    self.vs_input = 'in'
 	    self.vs_output = 'out'
 	    self.fs_input = 'in'
 	else:
 	    self.glsl_version = '1.10'
-	    self.version_directive = ''
 	    self.vs_input = 'attribute'
 	    self.vs_output = 'varying'
 	    self.fs_input = 'varying'
@@ -279,7 +278,6 @@ class Test(object):
 	test += 'GLSL >= {0}\n'.format(self.glsl_version)
 	test += '\n'
 	test += '[vertex shader]\n'
-	test += self.version_directive
 	test += '{0} vec4 vertex;\n'.format(self.vs_input)
 	test += '{0} vec4 input_data;\n'.format(self.vs_input)
 	if self.interpolation_qualifier or not self.builtin_variable:
@@ -297,7 +295,6 @@ class Test(object):
 	test += '}\n'
 	test += '\n'
 	test += '[fragment shader]\n'
-	test += self.version_directive
 	if self.interpolation_qualifier or not self.builtin_variable:
 	    test += '{0} {1} vec4 {2};'.format(
 		self.interpolation_qualifier or '',
