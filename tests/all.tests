@@ -998,6 +998,7 @@ add_plain_test(arb_fragment_program, 'fp-lit-mask')
 add_plain_test(arb_fragment_program, 'fp-lit-src-equals-dst')
 add_plain_test(arb_fragment_program, 'fp-long-alu')
 add_plain_test(arb_fragment_program, 'fp-set-01')
+arb_fragment_program['sparse-samplers'] = concurrent_test('arb_fragment_program-sparse-samplers')
 add_plain_test(arb_fragment_program, 'trinity-fp1')
 arb_fragment_program['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
 

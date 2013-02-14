@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_fragment_program-minmax minmax.c)
+piglit_add_executable (arb_fragment_program-sparse-samplers sparse-samplers.c)
 
 # vim: ft=cmake:
