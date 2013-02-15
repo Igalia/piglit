@@ -85,15 +85,4 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
-if(EGL_FOUND)
-	set(UTIL_GL_SOURCES
-	    ${UTIL_GL_SOURCES}
-	    piglit-util-egl.c
-	    )
-	set(UTIL_GL_LIBS
-		${UTIL_GL_LIBS}
-		${EGL_LDFLAGS}
-	)
-endif()
-
 piglit_include_target_api()

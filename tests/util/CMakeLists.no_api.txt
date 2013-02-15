@@ -2,6 +2,12 @@ include_directories(
 	${UTIL_INCLUDES}
 )
 
+if(EGL_FOUND)
+	list(APPEND UTIL_SOURCES
+		piglit-util-egl.c
+		)
+endif()
+
 piglit_add_library (piglitutil
 	${UTIL_SOURCES}
 )
@@ -9,5 +15,9 @@ piglit_add_library (piglitutil
 if(UNIX)
 	target_link_libraries(piglitutil m)
 endif(UNIX)
+
+if(EGL_FOUND)
+	target_link_libraries(piglitutil ${EGL_LDFLAGS})
+endif()
 
 # vim: ft=cmake:
