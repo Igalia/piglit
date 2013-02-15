@@ -16,4 +16,3 @@ f() {
     float x = 1.0 / 0.0;
     return x;
 }
-

@@ -684,11 +684,15 @@ spec['!OpenGL 3.1'] = gl31
 gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
 gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 
-# Group spec/glsl-1.00
-spec['glsl-1.00'] = Group()
-import_glsl_parser_tests(spec['glsl-1.00'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.00'),
+# Group spec/glsl-es-1.00
+spec['glsl-es-1.00'] = Group()
+import_glsl_parser_tests(spec['glsl-es-1.00'],
+			 os.path.join(testsDir, 'spec', 'glsl-es-1.00'),
 			 ['compiler'])
+spec['glsl-es-1.00']['execution'] = Group()
+add_shader_test_dir(spec['glsl-es-1.00']['execution'],
+			 os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
+			 recursive=True)
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = Group()
