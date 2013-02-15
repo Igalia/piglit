@@ -97,6 +97,9 @@ const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
 size_t num_vbo_rows = 0;
+bool link_ok = false;
+bool prog_in_use = false;
+GLchar *prog_err_info = NULL;
 
 enum states {
 	none = 0,
@@ -319,6 +322,8 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 
 	glEnable(target);
 	glBindProgramARB(target, prog);
+	link_ok = true;
+	prog_in_use = true;
 }
 
 /**
@@ -789,38 +794,31 @@ link_and_use_shaders(void)
 	}
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
-	if (!ok) {
-		GLchar *info;
+	if (ok) {
+		link_ok = true;
+	} else {
 		GLint size;
 
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		info = malloc(size);
+		prog_err_info = malloc(size);
 
-		glGetProgramInfoLog(prog, size, NULL, info);
+		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 
-		fprintf(stderr, "Failed to link:\n%s\n",
-			info);
-
-		free(info);
-		piglit_report_result(PIGLIT_FAIL);
+		return;
 	}
 
 	glUseProgram(prog);
 
 	err = glGetError();
-	if (err) {
-		GLchar *info;
+	if (!err) {
+		prog_in_use = true;
+	} else {
 		GLint size;
 
-		printf("GL error after linking program: 0x%04x\n", err);
-
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &size);
-		info = malloc(size);
+		prog_err_info = malloc(size);
 
-		glGetProgramInfoLog(prog, size, NULL, info);
-		fprintf(stderr, "Info log: %s\n", info);
-
-		piglit_report_result(PIGLIT_FAIL);
+		glGetProgramInfoLog(prog, size, NULL, prog_err_info);
 	}
 }
 
@@ -1624,6 +1622,19 @@ setup_ubos()
 	}
 }
 
+void
+program_must_be_in_use(void)
+{
+	if (!link_ok) {
+		fprintf(stderr, "Failed to link:\n%s\n", prog_err_info);
+		piglit_report_result(PIGLIT_FAIL);
+	} else if (!prog_in_use) {
+		fprintf(stderr, "Failed to use program: %s\n", prog_err_info);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -1634,6 +1645,7 @@ piglit_display(void)
 	if (test_start == NULL)
 		return PIGLIT_PASS;
 
+	program_must_be_in_use();
 
 	line = test_start;
 	while (line[0] != '\0') {
