@@ -20,8 +20,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(egl-create-surface pthread ${X11_X11_LIB})
 	piglit_add_executable (egl-query-surface egl-util.c egl-query-surface.c)
 	target_link_libraries(egl-query-surface pthread ${X11_X11_LIB})
-
-	add_subdirectory(spec)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:
