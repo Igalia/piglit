@@ -42,7 +42,7 @@ if not os.path.exists(os.path.join(testBinDir, 'GTF')):
 gtfroot = path.dirname(path.realpath(path.join(testBinDir, 'GTF')))
 
 class GTFTest(ExecTest):
-    pass_re = re.compile(r'Regression PASSED all 1 tests')
+    pass_re = re.compile(r'(Regression|Conformance) PASSED all 1 tests')
 
     def __init__(self, testpath):
         ExecTest.__init__(self, [path.join(testBinDir, 'GTF'), '-width=113', '-height=47', '-seed=2', '-minfmt', '-run=' + testpath])
