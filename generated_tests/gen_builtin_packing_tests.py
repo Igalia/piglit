@@ -277,7 +277,9 @@ vs_unpack_template = Template(dedent("""\
     [test]
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
-    % if not func.exact:
+    % if func.exact:
+    uniform int exact 1
+    % else:
     uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
     % endif
     % for j in range(func.num_valid_outputs):
@@ -410,7 +412,9 @@ fs_unpack_template = Template(dedent("""\
     [test]
     % for io in func.inout_seq:
     uniform uint func_input ${io.input}
-    % if not func.exact:
+    % if func.exact:
+    uniform int exact 1
+    % else:
     uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
     % endif
     % for i in range(func.num_valid_outputs):
