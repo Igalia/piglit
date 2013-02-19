@@ -62,7 +62,7 @@ test_format(const struct uniform_type *type, bool row_major)
 		"};\n"
 		"\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(pad + %s + size_test);\n"
+		"	gl_FragColor = vec4(pad) + vec4(%s) + vec4(size_test);\n"
 		"}\n";
 	char *fs_source;
 	GLuint fs, prog;
