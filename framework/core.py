@@ -268,6 +268,7 @@ class TestrunResult:
 			'options',
 			'name',
 			'tests',
+			'wglinfo',
 			'glxinfo',
 			'lspci',
 			'time_elapsed',
