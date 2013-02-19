@@ -124,6 +124,7 @@ static const char *source =
 	"		non_mat + \n"
 	"		a_cm1[0] + \n"
 	"		a_cm2[0] + \n"
+	"		a_rm1[0] + \n"
 	"		a_cm3[0] + \n"
 	"		b_cm1[0] + \n"
 	"		b_rm1[0] + \n"
