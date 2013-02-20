@@ -347,14 +347,13 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		ok = make_context_current_singlepass(wfl_fw, test_config,
 		                                     CONTEXT_GL_CORE,
 		                                     partial_config_attrib_list);
-		if (ok) {
+		if (ok)
 			return;
-		} else {
-			printf("piglit: info: Failed to create GL %d.%d "
-			       "core context\n",
-			       test_config->supports_gl_core_version / 10,
-			       test_config->supports_gl_core_version % 10);
-		}
+
+		printf("piglit: info: Failed to create GL %d.%d "
+		       "core context\n",
+		       test_config->supports_gl_core_version / 10,
+		       test_config->supports_gl_core_version % 10);
 	}
 
 	if (test_config->supports_gl_core_version &&
@@ -370,14 +369,13 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		ok = make_context_current_singlepass(wfl_fw, test_config,
 		                                     CONTEXT_GL_COMPAT,
 		                                     partial_config_attrib_list);
-		if (ok) {
-			return;
-		} else {
-			printf("piglit: info: Failed to create GL %d.%d "
-			       "compatibility context\n",
-			       test_config->supports_gl_compat_version / 10,
-			       test_config->supports_gl_compat_version % 10);
-		}
+		if (ok)
+		   return;
+
+		printf("piglit: info: Failed to create GL %d.%d "
+		       "compatibility context\n",
+		       test_config->supports_gl_compat_version / 10,
+		       test_config->supports_gl_compat_version % 10);
 	}
 
 #elif defined(PIGLIT_USE_OPENGL_ES1) || \
@@ -389,17 +387,14 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 
 	if (ok)
 		return;
-	else
-		printf("piglit: info: Failed to create GL ES context\n");
 
+	printf("piglit: info: Failed to create GL ES context\n");
 #else
 #	error
 #endif
 
-	if (!ok) {
-		printf("piglit: info: Failed to create any GL context\n");
-		piglit_report_result(PIGLIT_SKIP);
-	}
+	printf("piglit: info: Failed to create any GL context\n");
+	piglit_report_result(PIGLIT_SKIP);
 }
 
 
