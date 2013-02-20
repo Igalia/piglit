@@ -357,6 +357,15 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		}
 	}
 
+	if (test_config->supports_gl_core_version &&
+	    test_config->supports_gl_compat_version) {
+		/* The above attempt to create a core context failed. */
+		printf("piglit: info: Falling back to GL %d.%d "
+		       "compatibility context\n",
+		       test_config->supports_gl_compat_version / 10,
+		       test_config->supports_gl_compat_version % 10);
+        }
+
 	if (test_config->supports_gl_compat_version) {
 		ok = make_context_current_singlepass(wfl_fw, test_config,
 		                                     CONTEXT_GL_COMPAT,
