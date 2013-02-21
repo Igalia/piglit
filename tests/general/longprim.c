@@ -54,19 +54,6 @@ static const GLenum primTypes[] = {
    GL_POLYGON
 };
 
-static const char *primNames[] = {
-   "GL_POINTS",
-   "GL_LINES",
-   "GL_LINE_LOOP",
-   "GL_LINE_STRIP",
-   "GL_TRIANGLES",
-   "GL_TRIANGLE_STRIP",
-   "GL_TRIANGLE_FAN",
-   "GL_QUADS",
-   "GL_QUAD_STRIP",
-   "GL_POLYGON"
-};
-
 
 static void
 draw(GLenum mode, GLuint numVerts)
@@ -90,7 +77,8 @@ test_prims(void)
    for (len = 1000; len <= 1000 * 1000; len *= 10) {
       for (prim = 0; prim < ARRAY_SIZE(primTypes); prim++) {
          if (!piglit_automatic)
-            printf("%s: %s %u vertices\n", TestName, primNames[prim], len);
+            printf("%s: %s %u vertices\n", TestName,
+                   piglit_get_prim_name(prim), len);
          glClear(GL_COLOR_BUFFER_BIT);
          draw(primTypes[prim], len);
          piglit_present_results();
