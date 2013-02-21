@@ -80,6 +80,18 @@ const char* piglit_get_gl_error_name(GLenum error);
 const char *piglit_get_gl_enum_name(GLenum param);
 
 /**
+ * \brief Convert a GL primitive type enum value to a string.
+ *
+ * For example, given GL_POLYGON, return "GL_POLYGON".
+ * We don't use piglit_get_gl_enum_name() for this because there are
+ * other enums which alias the prim type enums (ex: GL_POINTS = GL_NONE);
+ *
+ * Return "(unrecognized enum)" if the enum is not recognized.
+ */
+const char *piglit_get_prim_name(GLenum prim);
+
+
+/**
  * \brief Check for unexpected GL errors.
  *
  * If glGetError() returns an error other than \c expected_error, then

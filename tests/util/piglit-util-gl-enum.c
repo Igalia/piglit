@@ -2986,3 +2986,44 @@ piglit_get_gl_enum_name(GLenum param)
 #undef CASE
 }
 
+
+const char *
+piglit_get_prim_name(GLenum prim)
+{
+	switch (prim) {
+	case GL_POINTS:
+		return "GL_POINTS";
+	case GL_LINES:
+		return "GL_LINES";
+	case GL_LINE_STRIP:
+		return "GL_LINE_STRIP";
+	case GL_LINE_LOOP:
+		return "GL_LINE_LOOP";
+	case GL_TRIANGLES:
+		return "GL_TRIANGLES";
+	case GL_TRIANGLE_STRIP:
+		return "GL_TRIANGLE_STRIP";
+	case GL_TRIANGLE_FAN:
+		return "GL_TRIANGLE_FAN";
+	case GL_QUADS:
+		return "GL_QUADS";
+	case GL_QUAD_STRIP:
+		return "GL_QUAD_STRIP";
+	case GL_POLYGON:
+		return "GL_POLYGON";
+	case GL_LINES_ADJACENCY:
+		return "GL_LINES_ADJACENCY";
+	case GL_LINE_STRIP_ADJACENCY:
+		return "GL_LINE_STRIP_ADJACENCY";
+	case GL_TRIANGLES_ADJACENCY:
+		return "GL_TRIANGLES_ADJACENCY";
+	case GL_TRIANGLE_STRIP_ADJACENCY:
+		return "GL_TRIANGLE_STRIP_ADJACENCY";
+	case GL_PATCHES:
+		return "GL_PATCHES";
+	default:
+		return "(unrecognized enum)";
+	}
+}
+
+
