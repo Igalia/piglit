@@ -1474,29 +1474,15 @@ struct string_to_enum {
 	GLenum token;
 };
 
-struct string_to_enum drawing_mode_table[] = {
-	{ "GL_POINTS",         GL_POINTS         },
-	{ "GL_LINE_STRIP",     GL_LINE_STRIP     },
-	{ "GL_LINE_LOOP",      GL_LINE_LOOP      },
-	{ "GL_LINES",          GL_LINES          },
-	{ "GL_POLYGON",        GL_POLYGON        },
-	{ "GL_TRIANGLE_STRIP", GL_TRIANGLE_STRIP },
-	{ "GL_TRIANGLE_FAN",   GL_TRIANGLE_FAN   },
-	{ "GL_TRIANGLES",      GL_TRIANGLES      },
-	{ "GL_QUAD_STRIP",     GL_QUAD_STRIP     },
-	{ "GL_QUADS",          GL_QUADS          },
-	{ NULL, 0 }
-};
-
-
 GLenum
 decode_drawing_mode(const char *mode_str)
 {
 	int i;
 
-	for (i = 0; drawing_mode_table[i].name; ++i) {
-		if (0 == strcmp(mode_str, drawing_mode_table[i].name))
-			return drawing_mode_table[i].token;
+	for (i = GL_POINTS; i <= GL_POLYGON; ++i) {
+		const char *name = piglit_get_prim_name(i);
+		if (0 == strcmp(mode_str, name))
+			return i;
 	}
 
 	printf("unknown drawing mode \"%s\"", mode_str);
