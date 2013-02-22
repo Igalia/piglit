@@ -580,7 +580,7 @@ class GeometryShaderTest(ShaderTest):
 	    additional_declarations,
 	    '  vec4 tmp_color;\n',
 	    'tmp_color',
-	    '  for (int i = 0; i < gl_PositionIn.length; i++) {\n'
+	    '  for (int i = 0; i < gl_VerticesIn; i++) {\n'
 	    '    gl_Position = gl_PositionIn[i];\n'
 	    '    color = tmp_color;\n'
 	    '    EmitVertex();\n'
