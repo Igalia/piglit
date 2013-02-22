@@ -52,6 +52,8 @@ PIGLIT_GL_TEST_CONFIG_END
 /* size of texture/renderbuffer (power of two) */
 #define FBO_SIZE 64
 
+static GLuint target = GL_TEXTURE_2D;
+
 
 static GLuint
 make_fbo(int w, int h)
@@ -64,17 +66,17 @@ make_fbo(int w, int h)
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+	glBindTexture(target, tex);
+	glTexImage2D(target, 0, GL_RGBA,
 		     w, h, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
 				  GL_COLOR_ATTACHMENT0_EXT,
-				  GL_TEXTURE_2D,
+				  target,
 				  tex,
 				  0);
 	assert(glGetError() == 0);
@@ -219,8 +221,18 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_EXT_framebuffer_blit");
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "rect") == 0) {
+			piglit_require_extension("GL_ARB_texture_rectangle");
+			target = GL_TEXTURE_RECTANGLE;
+			puts("Testing ARB_texture_rectangle");
+		}
+	}
 }
