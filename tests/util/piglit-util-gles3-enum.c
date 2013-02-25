@@ -704,3 +704,25 @@ piglit_get_gl_enum_name(GLenum param)
 #undef CASE
 }
 
+const char *
+piglit_get_prim_name(GLenum prim)
+{
+	switch (prim) {
+	case GL_POINTS:
+		return "GL_POINTS";
+	case GL_LINES:
+		return "GL_LINES";
+	case GL_LINE_STRIP:
+		return "GL_LINE_STRIP";
+	case GL_LINE_LOOP:
+		return "GL_LINE_LOOP";
+	case GL_TRIANGLES:
+		return "GL_TRIANGLES";
+	case GL_TRIANGLE_STRIP:
+		return "GL_TRIANGLE_STRIP";
+	case GL_TRIANGLE_FAN:
+		return "GL_TRIANGLE_FAN";
+	default:
+		return "(unrecognized enum)";
+	}
+}
