@@ -41,13 +41,18 @@ usage_error()
 {
    const char *message =
 	"usage:\n"
-	"    glx-query-drawable [-auto] --bad-drawable\n"
+	"    glx-query-drawable --bad-drawable\n"
 	"        Call glXQueryDrawable(drawable=0) and expect that error\n"
 	"        GLXBadDrawable is generated.\n"
 	"\n"
-	"    glx-query-drawable [-auto] --attr=GLX_WIDTH\n"
-	"    glx-query-drawable [-auto] --attr=GLX_HEIGHT\n"
-	"        Call glXQueryDrawable() with the given attribute.\n";
+	"    glx-query-drawable --attr=GLX_WIDTH\n"
+	"    glx-query-drawable --attr=GLX_HEIGHT\n"
+	"        Call glXQueryDrawable() with the given attribute.\n"
+	"\n"
+	"    Options:\n"
+	"        -auto"
+	"        --type={GLX{WINDOW,PIXMAP,PBUFFER},WINDOW}\n"
+	"    Default is: not -auto, WINDOW\n";
 	printf("%s", message);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -154,6 +159,15 @@ static void query_bad_drawable(Display *display, GLXDrawable draw) {
 
 /***************************************************************************/
 
+enum _drawable_type {
+    WINDOW,
+    GLXWINDOW,
+    GLXPIXMAP,
+    GLXPBUFFER,
+};
+
+int drawable_type /* = WINDOW */;
+
 static void
 parse_args(int argc, char **argv,
            void (**test_func)(Display*, GLXDrawable))
@@ -176,13 +190,25 @@ parse_args(int argc, char **argv,
 		} else if (!strncmp(arg, "--attr=GLX_HEIGHT", 17)) {
 			++num_parsed_args;
 			*test_func = query_height;
+		} else if (!strncmp(arg, "--type=GLXWINDOW", 16)) {
+			++num_parsed_args;
+			drawable_type = GLXWINDOW;
+		} else if (!strncmp(arg, "--type=GLXPIXMAP", 16)) {
+			++num_parsed_args;
+			drawable_type = GLXPIXMAP;
+		} else if (!strncmp(arg, "--type=GLXPBUFFER", 17)) {
+			++num_parsed_args;
+			drawable_type = GLXPBUFFER;
+		} else if (!strncmp(arg, "--type=WINDOW", 13)) {
+			++num_parsed_args;
+			drawable_type = WINDOW;
 		} else {
 		   /* Unrecognized argument. */
 		   usage_error();
 		}
 	}
 
-	if (num_parsed_args != 1) {
+	if (num_parsed_args < 1) {
 	   usage_error();
 	}
 }
@@ -191,7 +217,9 @@ int main(int argc, char **argv) {
 	Display *display;
 	XVisualInfo *visual;
 	Window window;
+	GLXDrawable draw;
 	GLXContext ctx;
+	GLXFBConfig config = None;
 	void (*test_func)(Display*, GLXDrawable);
 
 	parse_args(argc, argv, &test_func);
@@ -200,14 +228,41 @@ int main(int argc, char **argv) {
 	piglit_require_glx_version(display, 1, 3);
 
 	visual = piglit_get_glx_visual(display);
-	window = piglit_get_glx_window(display, visual);
+	config = piglit_glx_get_fbconfig_for_visinfo(display, visual);
 	ctx = piglit_get_glx_context(display, visual);
-	glXMakeCurrent(display, window, ctx);
+
+	switch (drawable_type) {
+	case GLXWINDOW:
+	    draw = glXCreateWindow(display, config,
+				   piglit_get_glx_window(display, visual),
+				   NULL);
+	    break;
+	case GLXPIXMAP:
+	    draw = glXCreatePixmap(display, config,
+				   XCreatePixmap(display,
+						 DefaultRootWindow(display),
+						 piglit_width, piglit_height,
+						 32),
+				   NULL);
+	    break;
+	case GLXPBUFFER: {
+	    int attribs[] = { GLX_PBUFFER_WIDTH, piglit_width,
+			      GLX_PBUFFER_HEIGHT, piglit_height,
+			      None };
+	    draw = glXCreatePbuffer(display, config, attribs);
+	    break;
+	    }
+	case WINDOW:
+	    draw = piglit_get_glx_window(display, visual);
+	    break;
+	}
+
+	glXMakeCurrent(display, draw, ctx);
 
 	/* Must initialize static variables of this function. */
 	piglit_glx_get_error(display, NULL);
 
-	test_func(display, window);
+	test_func(display, draw);
 
 	return 0;
 }
