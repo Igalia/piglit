@@ -90,8 +90,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 16;
-	config.window_height = 16;
+	config.window_width = 512;
+	config.window_height = 512;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -109,7 +109,8 @@ bool attach_stencil_first = false;
 GLenum depth_format;
 int miplevel0_size;
 int max_miplevel;
-
+float **depth_miplevel_data;
+uint8_t **stencil_miplevel_data;
 
 /**
  * Check if the given depth/stencil/rgba texture internal format is supported.
@@ -259,6 +260,9 @@ populate_miplevel(int level)
 /**
  * Test that every pixel in the depth and stencil buffers (if present)
  * is equal to the value set by populate_miplevel.
+ *
+ * If we're going to later render our results to the screen for
+ * debugging, then save off a copy of the data we read now.
  */
 bool
 test_miplevel(int level)
@@ -271,6 +275,14 @@ test_miplevel(int level)
 		printf("Probing miplevel %d depth\n", level);
 		pass = piglit_probe_rect_depth(0, 0, dim, dim, float_value)
 			&& pass;
+
+		if (!piglit_automatic) {
+			depth_miplevel_data[level] =
+				(float *)malloc(4 * dim * dim);
+			glReadPixels(0, 0, dim, dim,
+				     GL_DEPTH_COMPONENT, GL_FLOAT,
+				     depth_miplevel_data[level]);
+		}
 	}
 
 	if (attach_stencil) {
@@ -278,6 +290,14 @@ test_miplevel(int level)
 		pass = piglit_probe_rect_stencil(0, 0, dim, dim,
 						 stencil_for_level(level))
 			&& pass;
+
+		if (!piglit_automatic) {
+			stencil_miplevel_data[level] =
+				(uint8_t *)malloc(dim * dim);
+			glReadPixels(0, 0, dim, dim,
+				     GL_STENCIL_INDEX, GL_UNSIGNED_BYTE,
+				     stencil_miplevel_data[level]);
+		}
 	}
 
 	return pass;
@@ -331,6 +351,9 @@ piglit_init(int argc, char **argv)
 		while ((miplevel0_size >> (max_miplevel + 1)) > 0)
 			++max_miplevel;
 	}
+	depth_miplevel_data = (float **)calloc(max_miplevel, sizeof(float *));
+	stencil_miplevel_data = (uint8_t **)calloc(max_miplevel,
+						   sizeof(uint8_t *));
 
 	/* argv[2]: buffer combination */
 	if (strcmp(argv[2], "s=z24_s8") == 0) {
@@ -425,6 +448,85 @@ piglit_init(int argc, char **argv)
 	}
 }
 
+static void
+render_tex_to_screen(GLuint tex, int x, int y)
+{
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glEnable(GL_TEXTURE_2D);
+
+	for (int level = 0; level <= max_miplevel; ++level) {
+		int dim = miplevel0_size >> level;
+
+		piglit_draw_rect_tex(x, y, dim, dim,
+				     0, 0, 1, 1);
+
+		y += dim + 1;
+	}
+}
+
+/**
+ * Presents the results of the rendering on the screen.
+ */
+static void
+render_results_to_screen()
+{
+	GLuint tex;
+
+	printf("\n");
+	printf("Depth is on the left, stencil is on the right.\n");
+	printf("Colors should proceed from nearly-black to nearly-red.\n");
+
+	/* If the miptree is too large, scale things down. We don't
+	 * actually use miptrees to draw our miptree, so it'll work
+	 * out.
+	 */
+	piglit_ortho_projection(MAX2(piglit_width, 2 * miplevel0_size),
+				MAX2(piglit_height, 2 * miplevel0_size),
+				false);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glClearColor(0.5, 0.5, 0.5, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	if (attach_depth) {
+		for (int level = 0; level <= max_miplevel; ++level) {
+			int dim = miplevel0_size >> level;
+
+			glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
+				     dim, dim,
+				     0,
+				     GL_RED, GL_FLOAT,
+				     depth_miplevel_data[level]);
+			if (!piglit_check_gl_error(GL_NO_ERROR))
+				piglit_report_result(PIGLIT_FAIL);
+		}
+
+		render_tex_to_screen(tex, 0, 1);
+	}
+
+
+	if (attach_stencil) {
+		for (int level = 0; level <= max_miplevel; ++level) {
+			int dim = miplevel0_size >> level;
+
+			glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
+				     dim, dim,
+				     0,
+				     GL_RED, GL_UNSIGNED_BYTE,
+				     stencil_miplevel_data[level]);
+			if (!piglit_check_gl_error(GL_NO_ERROR))
+				piglit_report_result(PIGLIT_FAIL);
+		}
+
+		render_tex_to_screen(tex, miplevel0_size + 10, 1);
+	}
+
+	piglit_present_results();
+}
+
 extern "C" enum piglit_result
 piglit_display()
 {
@@ -465,6 +567,9 @@ piglit_display()
 		set_up_framebuffer_for_miplevel(level);
 		pass = test_miplevel(level) && pass;
 	}
+
+	if (!piglit_automatic)
+		render_results_to_screen();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
