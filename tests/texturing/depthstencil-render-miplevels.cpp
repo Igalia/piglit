@@ -227,6 +227,13 @@ set_up_framebuffer_for_miplevel(int level)
 	}
 }
 
+uint8_t
+stencil_for_level(int level)
+{
+	float float_value = float(level + 1) / (max_miplevel + 1);
+	return (uint8_t) round(float_value * 255.0);
+}
+
 /**
  * Using glClear, set the contents of the depth and stencil buffers
  * (if present) to a value that is unique to this miplevel.
@@ -242,7 +249,7 @@ populate_miplevel(int level)
 		clear_mask |= GL_DEPTH_BUFFER_BIT;
 	}
 	if (attach_stencil) {
-		glClearStencil(level + 1);
+		glClearStencil(stencil_for_level(level));
 		clear_mask |= GL_STENCIL_BUFFER_BIT;
 	}
 
@@ -268,7 +275,8 @@ test_miplevel(int level)
 
 	if (attach_stencil) {
 		printf("Probing miplevel %d stencil\n", level);
-		pass = piglit_probe_rect_stencil(0, 0, dim, dim, level + 1)
+		pass = piglit_probe_rect_stencil(0, 0, dim, dim,
+						 stencil_for_level(level))
 			&& pass;
 	}
 
