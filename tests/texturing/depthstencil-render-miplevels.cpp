@@ -415,7 +415,11 @@ piglit_init(int argc, char **argv)
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
+}
 
+extern "C" enum piglit_result
+piglit_display()
+{
 	bool pass = true;
 
 	color_tex = create_mipmapped_tex(GL_RGBA);
@@ -454,14 +458,7 @@ piglit_init(int argc, char **argv)
 		pass = test_miplevel(level) && pass;
 	}
 
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
-}
-
-extern "C" enum piglit_result
-piglit_display()
-{
-	/* Should never be reached */
-	return PIGLIT_FAIL;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 }; /* Anonymous namespace */
