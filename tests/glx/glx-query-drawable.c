@@ -197,6 +197,8 @@ int main(int argc, char **argv) {
 	parse_args(argc, argv, &test_func);
 
 	display = piglit_get_glx_display();
+	piglit_require_glx_version(display, 1, 3);
+
 	visual = piglit_get_glx_visual(display);
 	window = piglit_get_glx_window(display, visual);
 	ctx = piglit_get_glx_context(display, visual);
