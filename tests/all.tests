@@ -366,8 +366,14 @@ add_plain_test(glx, 'glx-window-life')
 glx['glx-window-life'].runConcurrent = True
 add_plain_test(glx, 'glx-pixmap-crosscheck')
 glx['glx-pixmap-crosscheck'].runConcurrent = True
-glx['glx-query-drawable-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH'])
-glx['glx-query-drawable-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT'])
+glx['glx-query-drawable-GLXWINDOW-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXWINDOW"])
+glx['glx-query-drawable-GLXWINDOW-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXWINDOW"])
+glx['glx-query-drawable-GLXPIXMAP-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXPIXMAP"])
+glx['glx-query-drawable-GLXPIXMAP-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXPIXMAP"])
+glx['glx-query-drawable-GLXPBUFFER-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXPBUFFER"])
+glx['glx-query-drawable-GLXPBUFFER-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXPBUFFER"])
+glx['glx-query-drawable-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=WINDOW"])
+glx['glx-query-drawable-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=WINDOW"])
 glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', '-auto', '--bad-drawable'])
 glx['extension string sanity'] = PlainExecTest(['glx-string-sanity'])
 glx['extension string sanity'].runConcurrent = True
