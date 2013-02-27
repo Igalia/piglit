@@ -1,0 +1,29 @@
+# Tests that a link error occurs when an uniform's type
+# differs between the vertex and fragment shaders.
+#
+# GLSLangSpec.Full.1.10.59, 4.3.5 Uniform:
+# "If multiple shaders are linked together, then they will
+#  share a single global uniform name space. Hence, types
+#  of uniforms with the same name must match across all
+#  shaders that are linked into a single executable."
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform vec4 a; // a is vec3 in FS
+
+void main()
+{
+    gl_Position = vec4(0.0);
+}
+
+[fragment shader]
+uniform vec3 a; // a is vec4 in VS
+
+void main()
+{
+}
+
+[test]
+link error
+
