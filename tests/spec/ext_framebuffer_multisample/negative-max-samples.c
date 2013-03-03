@@ -33,6 +33,11 @@
  *     "If either <width> or <height> is greater than
  *      MAX_RENDERBUFFER_SIZE_EXT, or if <samples> is greater than
  *      MAX_SAMPLES_EXT, then the error INVALID_VALUE is generated."
+ *
+ * Skips if ARB_texture_multisample or ARB_internalformat_query are
+ * supported. ARB_texture_multisample changes the error which should
+ * be generated; ARB_internalformat_query allows the limit for particular
+ * internalformats to be >MAX_SAMPLES.
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -59,6 +64,17 @@ piglit_init(int argc, char **argv)
 	GLuint rb;
 
 	piglit_require_extension("GL_EXT_framebuffer_multisample");
+
+	if (piglit_is_extension_supported("GL_ARB_internalformat_query")) {
+		printf("ARB_internalformat_query is supported and "
+		       "redefines this behavior; skipping\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+	if (piglit_is_extension_supported("GL_ARB_texture_multisample")) {
+		printf("ARB_texture_multisample is supposed and "
+		       "redefines this behavior; skipping\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 
