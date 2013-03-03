@@ -119,13 +119,13 @@ struct test_info tests[] = {
     },
     {   "msaa_color_layer", GL_FRAMEBUFFER_COMPLETE,
         {   { GL_TEXTURE_2D_MULTISAMPLE_ARRAY, GL_COLOR_ATTACHMENT0, GL_TRUE, GL_TRUE,
-                .layer=0 },
+              0 /* format */, 0 /* layer */ },
             { 0 },
         }
     },
     {   "msaa_color_nonzero_layer", GL_FRAMEBUFFER_COMPLETE,
         {   { GL_TEXTURE_2D_MULTISAMPLE_ARRAY, GL_COLOR_ATTACHMENT0, GL_TRUE, GL_TRUE,
-                .layer=1 },
+              0 /* format */, 1 /* layer */ },
             { 0 },
         }
     },
