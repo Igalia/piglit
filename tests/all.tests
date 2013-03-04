@@ -2802,13 +2802,21 @@ add_concurrent_test(gles20, 'fbo_discard_gles2')
 gles30 = Group()
 spec['!OpenGL ES 3.0'] = gles30
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
-	test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format])
+	test_name = ' ' .join(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
 	executable = '{0} -auto'.format(test_name)
 	gles30[test_name] = concurrent_test(executable)
 gles30['minmax'] = concurrent_test('minmax_gles3')
 for test_mode in ['teximage', 'texsubimage']:
         test_name = 'ext_texture_array-compressed_gles3 {0}'.format(test_mode)
         gles30[test_name] = PlainExecTest(test_name + ' -auto -fbo')
+
+arb_es3_compatibility = Group()
+spec['ARB_ES3_compatibility'] = arb_es3_compatibility
+for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
+	for context in ('core', 'compat'):
+		test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format, context])
+		executable = '{0}'.format(test_name)
+		arb_es3_compatibility[test_name] = concurrent_test(executable)
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)

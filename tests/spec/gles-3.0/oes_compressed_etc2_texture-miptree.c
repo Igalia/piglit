@@ -54,13 +54,6 @@ static const int num_vertices = 4;
 static const int window_width = 128;
 static const int window_height = 64;
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_es_version = 30;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
-
-PIGLIT_GL_TEST_CONFIG_END
-
-
 static GLuint prog;
 
 /* Texture objects. */
@@ -108,7 +101,7 @@ load_texture(const char *filename, GLuint *tex_name)
 void
 print_usage_and_exit(char *prog_name)
 {
-        printf("Usage: %s <format>\n"
+        printf("Usage: %s <format> %s\n"
                "  where <format> is one of:\n"
 	       "    rgb8\n"
 	       "    srgb8\n"
@@ -117,7 +110,14 @@ print_usage_and_exit(char *prog_name)
 	       "    r11\n"
 	       "    rg11\n"
 	       "    rgb8-punchthrough-alpha1\n"
-	       "    srgb8-punchthrough-alpha1\n", prog_name);
+	       "    srgb8-punchthrough-alpha1\n"
+#if defined(PIGLIT_USE_OPENGL)
+	       "  <profile> is one of:\n"
+	       "    compat\n"
+	       "    core\n", prog_name, "<profile>");
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+	       ,prog_name, "");
+#endif
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -173,9 +173,10 @@ piglit_init(int argc, char **argv)
 
 	GLint vertex_loc;
 	GLuint vertex_buf;
+	GLuint vao;
 
-	if (argc < 2)
-		print_usage_and_exit(argv[0]);
+	if (!piglit_is_gles())
+		piglit_require_extension("GL_ARB_ES3_compatibility");
 
 	if (strcmp(argv[1], "rgb8") == 0) {
 		compressed_filename =
@@ -245,6 +246,8 @@ piglit_init(int argc, char **argv)
 	glUseProgram(prog);
 
 	vertex_loc = glGetAttribLocation(prog, "vertex");
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 	glGenBuffers(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
 	glEnableVertexAttribArray(vertex_loc);
@@ -308,4 +311,45 @@ piglit_display(void)
 	piglit_present_results();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+int
+main(int argc, char *argv[])
+{
+	struct piglit_gl_test_config config;
+	bool test_compat = true;
+
+#if defined(PIGLIT_USE_OPENGL)
+	if (argc < 3)
+		print_usage_and_exit(argv[0]);
+
+	test_compat = strcmp(argv[2], "compat") == 0;
+
+	if (!test_compat && strcmp(argv[2], "core") != 0)
+		print_usage_and_exit(argv[0]);
+
+#elif defined(PIGLIT_USE_OPENGL_ES3)
+	if (argc < 2)
+		print_usage_and_exit(argv[0]);
+#endif
+
+	piglit_gl_test_config_init(&config);
+	config.init = piglit_init;
+	config.display = piglit_display;
+
+	if (test_compat)
+		config.supports_gl_compat_version = 10;
+	else
+		config.supports_gl_core_version = 31;
+
+	config.supports_gl_es_version = 30;
+
+	config.window_width = 150;
+	config.window_height = 150;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+
+	piglit_gl_test_run(argc, argv, &config);
+
+	assert(false);
+	return 0;
 }
