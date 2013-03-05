@@ -13,6 +13,7 @@ link_libraries (
 piglit_add_executable (fs-discard-exit-2 fs-discard-exit-2.c)
 piglit_add_executable (fs-texelFetch-2D fs-texelFetch-2D.c)
 piglit_add_executable (fs-texelFetchOffset-2D fs-texelFetchOffset-2D.c)
+piglit_add_executable (fs-textureOffset-2D fs-textureOffset-2D.c)
 IF (NOT MSVC)
 	piglit_add_executable (isinf-and-isnan isinf-and-isnan.c)
 ENDIF (NOT MSVC)
