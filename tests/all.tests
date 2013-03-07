@@ -392,6 +392,7 @@ import_context['query context info'] = PlainExecTest(['glx-query-context-info-ex
 
 create_context = Group();
 glx['GLX_ARB_create_context'] = create_context
+create_context['current with no framebuffer'] = concurrent_test('glx-create-context-current-no-framebuffer')
 create_context['default major version'] = concurrent_test('glx-create-context-default-major-version')
 create_context['default minor version'] = concurrent_test('glx-create-context-default-minor-version')
 create_context['invalid attribute'] = concurrent_test('glx-create-context-invalid-attribute')
