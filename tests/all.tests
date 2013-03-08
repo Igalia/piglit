@@ -85,6 +85,18 @@ def add_fbo_depthstencil_tests(group, format):
 	group[prefix + 'depthstencil-' + format + '-copypixels'] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format])
 	group[prefix + 'depthstencil-' + format + '-blit'] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format])
 
+
+def add_depthstencil_render_miplevels_tests(group, test_types):
+        # Note: the buffer sizes of 146, 292, 585, and 1024 have been
+        # chosen to exercise all possible combinations of buffer
+        # alignments on i965.
+        for texture_size in (146, 292, 585, 1024):
+                for test_type in test_types:
+                        test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                                texture_size, test_type)
+                        group[test_name] = PlainExecTest(test_name + ' -auto')
+
+
 glean = Group()
 glean['basic'] = GleanTest('basic')
 glean['api2'] = GleanTest('api2')
@@ -1251,13 +1263,7 @@ add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT32')
 add_plain_test(arb_depth_texture, 'depth-level-clamp')
 add_plain_test(arb_depth_texture, 'depth-tex-modes')
 add_plain_test(arb_depth_texture, 'texdepth')
-# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
-# exercise all possible combinations of buffer alignments on i965.
-for texture_size in (146, 292, 585, 1024):
-        for test_type in ('d=z24', 'd=z16'):
-                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                        texture_size, test_type)
-                arb_depth_texture[test_name] = PlainExecTest(test_name + ' -auto')
+add_depthstencil_render_miplevels_tests(arb_depth_texture, ('d=z24', 'd=z16'))
 
 arb_depth_buffer_float = Group()
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
@@ -1267,16 +1273,11 @@ add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
 add_texwrap_format_tests(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float')
-# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
-# exercise all possible combinations of buffer alignments on i965.
-for texture_size in (146, 292, 585, 1024):
-        for test_type in ('d=z32f_s8', 'd=z32f',
-                          'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
-                          's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f',
-                          'd=s=z32f_s8', 's=d=z32f_s8', 'ds=z32f_s8'):
-                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                        texture_size, test_type)
-                arb_depth_buffer_float[test_name] = PlainExecTest(test_name + ' -auto')
+add_depthstencil_render_miplevels_tests(
+        arb_depth_buffer_float,
+        ('d=z32f_s8', 'd=z32f', 'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
+         's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f', 'd=s=z32f_s8', 's=d=z32f_s8',
+         'ds=z32f_s8'))
 arb_depth_buffer_float['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_ARB_depth_buffer_float', 'stencil', '-auto'])
 
 arb_texture_env_crossbar = Group()
@@ -1668,17 +1669,11 @@ add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_sten
 add_texwrap_format_tests(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil')
 ext_packed_depth_stencil['readpixels-24_8'] = PlainExecTest(['ext_packed_depth_stencil-readpixels-24_8', '-auto'])
 add_plain_test(ext_packed_depth_stencil, 'fbo-blit-d24s8')
-# Note: the buffer sizes of 146, 292, 585, and 1024 hav been chosen to
-# exercise all possible combinations of buffer alignments on i965.
-for texture_size in (146, 292, 585, 1024):
-        for test_type in ('s=z24_s8', 'd=z24_s8',
-                          'd=z24_s8_s=z24_s8',
-                          'd=z24_s=z24_s8', 's=z24_s8_d=z24_s8',
-                          's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
-                          'ds=z24_s8'):
-                test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                        texture_size, test_type)
-                ext_packed_depth_stencil[test_name] = PlainExecTest(test_name + ' -auto')
+add_depthstencil_render_miplevels_tests(
+        ext_packed_depth_stencil,
+        ('s=z24_s8', 'd=z24_s8', 'd=z24_s8_s=z24_s8', 'd=z24_s=z24_s8',
+         's=z24_s8_d=z24_s8', 's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
+         'ds=z24_s8'))
 ext_packed_depth_stencil['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_EXT_packed_depth_stencil', 'stencil', '-auto'])
 
 ext_texture_array = Group()
