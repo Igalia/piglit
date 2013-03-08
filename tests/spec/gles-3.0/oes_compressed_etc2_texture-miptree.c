@@ -199,6 +199,13 @@ piglit_init(int argc, char **argv)
 		decompressed_filename =
 			"waffles-decompressed-etc2-srgb8-alpha8-64x32-miptree.ktx";
 	} else if (strcmp(argv[1], "r11") == 0){
+		/* waffles-decompressed-etc2-r11-64x32-miptree.ktx contains
+		 * per pixel RGBA data. But, glTexImage2D() in OpenGL ES 3.0
+		 * doesn't allow internalFormat = GL_R8 with format= GL_RGBA.
+		 * To workaround this issue use internalFormat = GL_RGBA and
+		 * mask all the color channels except Red.
+		 */
+		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 		compressed_filename =
 			"waffles-compressed-etc2-r11-64x32-miptree.ktx";
 		decompressed_filename =
