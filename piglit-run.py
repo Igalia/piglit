@@ -52,8 +52,11 @@ Options:
   -x regexp, --exclude-tests=regexp Excludey matching tests (can be used
                             more than once)
   -n name, --name=name      Name of the testrun
-  -c bool, --concurrent=bool  Enable/disable concurrent test runs. Valid
-			      option values are: 0, 1, on, off.  (default: on)
+  -c bool, --concurrent=    Enable/disable concurrent test runs. Valid
+                            option values are: 0, 1, on, off.  (default: on)
+							DEPRICATED: use --no-concurrency to turn
+							concurrent test runs off
+  --no-concurrency          Disables concurrent test runs
   --valgrind                Run tests in valgrind's memcheck.
   -p platform, --platform=platform  Name of the piglit platform to use.
 Example:
@@ -87,6 +90,7 @@ def main():
 			 "tests=",
 			 "name=",
 			 "exclude-tests=",
+			 "no-concurrency",
 			 "concurrent=",
 			 "platform=",
 			 ]
@@ -122,11 +126,17 @@ def main():
 			env.exclude_filter.append(re.compile(value))
 		elif name in ('-n', '--name'):
 			OptionName = value
-		elif name in ('-c, --concurrent'):
+		elif name in ('--no-concurrency'):
+			env.concurrent = False
+		elif name in ('-c', '--concurrent'):
 			if value in ('1', 'on'):
 				env.concurrent = True
+				print "Warning: Option -c, --concurrent is deprecated, " \
+						"concurrent test runs are on by default"
 			elif value in ('0', 'off'):
 				env.concurrent = False
+				print "Warning: Option -c, --concurrent is deprecated, " \
+						"use --no-concurrency for non-concurrent test runs"
 			else:
 				usage()
 		elif name in ('-p, --platform'):
