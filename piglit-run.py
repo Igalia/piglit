@@ -59,6 +59,8 @@ Options:
   --no-concurrency          Disables concurrent test runs
   --valgrind                Run tests in valgrind's memcheck.
   -p platform, --platform=platform  Name of the piglit platform to use.
+  --resume                  Resume and interupted test run
+
 Example:
   %(progName)s tests/all.tests results/all
          Run all tests, store the results in the directory results/all
