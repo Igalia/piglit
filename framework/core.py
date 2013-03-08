@@ -371,14 +371,26 @@ class TestrunResult:
 #############################################################################
 
 class Environment:
-	def __init__(self):
-		# If disabled, runs all tests serially from the main thread.
-		self.concurrent = True
-		self.execute = True
-		self.filter = []
+	def __init__(self, concurrent=True, execute=True, include_filter=[],
+			exclude_filter=[], valgrind=False):
+		self.concurrent     = concurrent
+		self.execute        = execute
+		self.filter         = []
 		self.exclude_filter = []
-		self.exclude_tests = set()
-		self.valgrind = False
+		self.exclude_tests  = set()
+		self.valgrind       = valgrind
+
+		"""
+		The filter lists that are read in should be a list of string objects,
+		however, the filters need to be a list or regex object.
+
+		This code uses re.compile to rebuild the lists and set self.filter
+		"""
+		for each in include_filter:
+			self.filter.append(re.compile(each))
+		for each in exclude_filter:
+			self.exclude_filter.append(re.compile(each))
+
 
 	def run(self, command):
 		try:

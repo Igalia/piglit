@@ -24,7 +24,6 @@
 
 import argparse
 import os.path as path
-import re
 import sys, os
 import time
 import traceback
@@ -64,25 +63,25 @@ def main():
 
 	args = parser.parse_args()
 
-	env = core.Environment()
-
-	# If --tests is called warn that it is deprecated
+	# Deprecated
+	# --include-tests is the standard going forward, but for backwards
+	# compatability merge args.tests into args.include_tests and drop
+	# duplicates
 	if args.tests != []:
-		print "Warning: Option --tests is deprecated. Use --include-tests"
-
-	# Append includes and excludes to env
-	for each in args.include_tests:
-		env.filter.append(re.compile(each))
-	for each in args.tests:
-		env.filter.append(re.compile(each))
-	for each in args.exclude_tests:
-		env.exclude_filter.append(re.compile(each))
+		print "Warnings: Option --tests is deprecated, use --include-tests"
+		args.include_tests = list(set(args.include_tests + args.tests))
+	
+	# Set the environment, pass in the included and excluded tests
+	env = core.Environment(
+			exclude_filter=args.exclude_tests,
+			include_filter=args.include_tests,
+			)
 
 	# Change to the piglit's path
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
 	os.chdir(piglit_dir)
 
-	profile = core.loadTestProfile(args.testFile)
+	profile = core.loadTestProfile(args.testProfile)
 
 	def getCommand(test):
 		command = ''
