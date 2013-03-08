@@ -22,7 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-from getopt import getopt, GetoptError
+import argparse
 import os.path as path
 import re
 import sys, os
@@ -37,123 +37,112 @@ from framework.threads import synchronized_self
 #############################################################################
 ##### Main program
 #############################################################################
-def usage():
-	USAGE = """\
-Usage: %(progName)s [options] [profile.tests] [results]
-       %(progName)s [options] -r [results]
-
-Options:
-  -h, --help                Show this message
-  -d, --dry-run             Do not execute the tests
-  -t regexp, --include-tests=regexp Run only matching tests (can be used more
-                            than once)
-  --tests=regexp            Run only matching tests (can be used more
-							than once) DEPRICATED: use --include-tests instead
-  -x regexp, --exclude-tests=regexp Excludey matching tests (can be used
-                            more than once)
-  -n name, --name=name      Name of the testrun
-  -c bool, --concurrent=    Enable/disable concurrent test runs. Valid
-                            option values are: 0, 1, on, off.  (default: on)
-							DEPRICATED: use --no-concurrency to turn
-							concurrent test runs off
-  --no-concurrency          Disables concurrent test runs
-  --valgrind                Run tests in valgrind's memcheck.
-  -p platform, --platform=platform  Name of the piglit platform to use.
-  --resume                  Resume and interupted test run
-
-Example:
-  %(progName)s tests/all.tests results/all
-         Run all tests, store the results in the directory results/all
-
-  %(progName)s -t basic tests/all.tests results/all
-         Run all tests whose path contains the word 'basic'
-
-  %(progName)s -t ^glean/ -t tex tests/all.tests results/all
-         Run all tests that are in the 'glean' group or whose path contains
-		 the substring 'tex'
-
-  %(progName)s -r -x bad-test results/all
-         Resume an interrupted test run whose results are stored in the
-         directory results/all, skipping bad-test.
-"""
-	print USAGE % {'progName': sys.argv[0]}
-	sys.exit(1)
 
 def main():
 	env = core.Environment()
 
-	try:
-		option_list = [
-			 "help",
-			 "dry-run",
-			 "resume",
-			 "valgrind",
-			 "include-tests=",
-			 "tests=",
-			 "name=",
-			 "exclude-tests=",
-			 "no-concurrency",
-			 "concurrent=",
-			 "platform=",
-			 ]
-		options, args = getopt(sys.argv[1:], "hdrt:n:x:c:p:", option_list)
-	except GetoptError:
-		usage()
+	parser = argparse.ArgumentParser(sys.argv)
 
-	OptionName = ''
-	OptionResume = False
-	test_filter = []
-	exclude_filter = []
-	platform = None
 
-	for name, value in options:
-		if name in ('-h', '--help'):
-			usage()
-		elif name in ('-d', '--dry-run'):
-			env.execute = False
-		elif name in ('-r', '--resume'):
-			OptionResume = True
-		elif name in ('--valgrind'):
-			env.valgrind = True
-		elif name in ('-t', '--include-tests'):
-			test_filter.append(value)
-			env.filter.append(re.compile(value))
-		elif name in ('--tests'):
-			test_filter.append(value)
-			env.filter.append(re.compile(value))
-			print "Warning: Option --tests is deprecated, " \
-					"use --include-tests instead"
-		elif name in ('-x', '--exclude-tests'):
-			exclude_filter.append(value)
-			env.exclude_filter.append(re.compile(value))
-		elif name in ('-n', '--name'):
-			OptionName = value
-		elif name in ('--no-concurrency'):
+	# Either require that a name for the test is passed or that
+	# resume is requested
+	excGroup1 = parser.add_mutually_exclusive_group()
+	excGroup1.add_argument("-n", "--name",
+			metavar = "<test name>",
+			default = None,
+			help    = "Name of this test run")
+	excGroup1.add_argument("-r", "--resume",
+			action  = "store_true",
+			help    = "Resume an interupted test run")
+
+	parser.add_argument("-d", "--dry-run",
+			action  = "store_true",
+			help    = "Do not execute the tests")
+	parser.add_argument("-t", "--include-tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Run only matching tests (can be used more than once)")
+	parser.add_argument("--tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Run only matching tests (can be used more than once) " \
+			          "DEPRECATED: use --include-tests instead")
+	parser.add_argument("-x", "--exclude-tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Exclude matching tests (can be used more than once)")
+
+	# The new option going forward should be --no-concurrency, but to
+	# maintain backwards compatability the --c, --concurrent option should
+	# also be maintained. This code allows only one of the two options to be
+	# supplied, or it throws an error
+	excGroup2 = parser.add_mutually_exclusive_group()
+	excGroup2.add_argument("--no-concurrency",
+			action  = "store_true",
+			help    = "Disable concurrent test runs")
+	excGroup2.add_argument("-c", "--concurrent",
+			action  = "store",
+			metavar = "<boolean>",
+			choices = ["1", "0", "on", "off"],
+			help    = "Deprecated: Turn concrrent runs on or off")
+
+	parser.add_argument("-p", "--platform",
+			choices = ["glx", "x11_egl", "wayland", "gbm"],
+			help    = "Name of windows system passed to waffle")
+	parser.add_argument("--valgrind",
+			action  =  "store_true",
+			help    = "Run tests in valgrind's memcheck")
+	parser.add_argument("testProfile",
+			metavar = "<Path to test profile>",
+			help    = "Path to testfile to run")
+	parser.add_argument("resultsPath",
+			metavar = "<Results Path>",
+			help    = "Path to results folder")
+
+	args = parser.parse_args()
+
+
+	# Set the platform to pass to waffle
+	if args.platform is not None:
+		os.environ['PIGLIT_PLATFORM'] = args.platform
+
+	# Set dry-run
+	if args.dry_run is True:
+		env.execute = False
+
+	# Set valgrind
+	if args.valgrind is True:
+		env.valgrind = True
+
+	# Turn concurency off if requested
+	# Deprecated
+	if args.concurrent is not None:
+		if (args.concurrent == '1' or args.concurrent == 'on'):
+			env.concurrent = True
+			print "Warning: Option -c, --concurrent is deprecated, " \
+					"concurrent test runs are on by default"
+		elif (args.concurrent == '0' or args.concurrent == 'off'):
 			env.concurrent = False
-		elif name in ('-c', '--concurrent'):
-			if value in ('1', 'on'):
-				env.concurrent = True
-				print "Warning: Option -c, --concurrent is deprecated, " \
-						"concurrent test runs are on by default"
-			elif value in ('0', 'off'):
-				env.concurrent = False
-				print "Warning: Option -c, --concurrent is deprecated, " \
-						"use --no-concurrency for non-concurrent test runs"
-			else:
-				usage()
-		elif name in ('-p, --platform'):
-			platform = value
+			print "Warning: Option -c, --concurrent is deprecated, " \
+					"use --no-concurrency for non-concurrent test runs"
+		# Ne need for else, since argparse restricts the arguments allowed
 
-	if platform is not None:
-		os.environ['PIGLIT_PLATFORM'] = platform
+	# Not deprecated
+	elif args.no_concurrency is True:
+		env.concurrent = False
 
-	if OptionResume:
-		if test_filter or OptionName:
-			print "-r is not compatible with -t or -n."
-			usage()
-		if len(args) != 1:
-			usage()
-		resultsDir = path.realpath(args[0])
+	# If the deprecated tests option was passed print a warning
+	if args.tests != []:
+		print "Warning: Option --tests is deprecated, use " \
+				"--include-tests instead"
+
+	# If resume is requested attempt to load the results file
+	# in the specified path
+	if args.resume is True:
+		resultsDir = path.realpath(args.resultsPath)
 
 		# Load settings from the old results JSON
 		old_results = core.loadTestResults(resultsDir)
@@ -164,14 +153,21 @@ def main():
 		for value in old_results.options['exclude_filter']:
 			exclude_filter.append(value)
 			env.exclude_filter.append(re.compile(value))
+
+	# Otherwise parse additional settings from the command line
 	else:
-		if len(args) != 2:
-			usage()
+		profileFilename = args.testProfile
+		resultsDir = args.resultsPath
 
-		profileFilename = args[0]
-		resultsDir = path.realpath(args[1])
+		# Set the excluded and included tests regex
+		for each in args.include_tests:
+			env.filter.append(re.compile(each))
+		for each in args.tests:
+			env.filter.append(re.compile(each))
+		for each in args.exclude_tests:
+			env.exclude_filter.append(re.compile(each))
 
-	# Change to the piglit's path
+	# Change working directory to the root of the piglit directory
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
 	os.chdir(piglit_dir)
 
@@ -180,10 +176,10 @@ def main():
 	results = core.TestrunResult()
 
 	# Set results.name
-	if OptionName is '':
-		results.name = path.basename(resultsDir)
+	if args.name is not None:
+		results.name = args.name
 	else:
-		results.name = OptionName
+		results.name = path.basename(resultsDir)
 
 	# Begin json.
 	result_filepath = os.path.join(resultsDir, 'main')
@@ -196,9 +192,9 @@ def main():
 	json_writer.open_dict()
 	json_writer.write_dict_item('profile', profileFilename)
 	json_writer.write_dict_key('filter')
-	result_file.write(json.dumps(test_filter))
+	result_file.write(json.dumps(args.include_tests))
 	json_writer.write_dict_key('exclude_filter')
-	result_file.write(json.dumps(exclude_filter))
+	result_file.write(json.dumps(args.exclude_tests))
 	json_writer.close_dict()
 
 	json_writer.write_dict_item('name', results.name)
@@ -212,7 +208,7 @@ def main():
 	# If resuming an interrupted test run, re-write all of the existing
 	# results since we clobbered the results file.  Also, exclude them
 	# from being run again.
-	if OptionResume:
+	if args.resume is True:
 		for (key, value) in old_results.tests.items():
 			if os.path.sep != '/':
 				key = key.replace(os.path.sep, '/', -1)
@@ -235,6 +231,7 @@ def main():
 	print
 	print 'Thank you for running Piglit!'
 	print 'Results have been written to ' + result_filepath
+
 
 if __name__ == "__main__":
 	main()

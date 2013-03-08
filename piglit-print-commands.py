@@ -22,7 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-from getopt import getopt, GetoptError
+import argparse
 import os.path as path
 import re
 import sys, os
@@ -38,77 +38,51 @@ from framework.gleantest import GleanTest
 #############################################################################
 ##### Main program
 #############################################################################
-def usage():
-	USAGE = """\
-Usage: %(progName)s [options] [profile.tests]
-
-Prints a list of all the tests and how to run them.  Ex:
-   piglit test name ::: /path/to/piglit/bin/program <args>
-   glean test name ::: PIGLIT_TEST='...' /path/to/piglit/bin/glean -v -v -v ...
-
-Options:
-  -h, --help                Show this message
-  -t regexp, --include-tests=regexp Run only matching tests (can be used more
-                            than once)
-  --tests=regexp            Run only matching tests (can be used more
-                            than once) DEPRICATED use --include-tests instead
-  -x regexp, --exclude-tests=regexp Exclude matching tests (can be used
-                            more than once)
-Example:
-  %(progName)s tests/all.tests
-  %(progName)s -t basic tests/all.tests
-         Print tests whose path contains the word 'basic'
-
-  %(progName)s -t ^glean/ -t tex tests/all.tests
-         Print tests that are in the 'glean' group or whose path contains
-         the substring 'tex'
-"""
-	print USAGE % {'progName': sys.argv[0]}
-	sys.exit(1)
 
 def main():
+	parser = argparse.ArgumentParser(sys.argv)
+
+	parser.add_argument("-t", "--include-tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Run only matching tests (can be used more than once)")
+	parser.add_argument("--tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Run only matching tests (can be used more than once)" \
+					  "Deprecated")
+	parser.add_argument("-x", "--exclude-tests",
+			default = [],
+			action  = "append",
+			metavar = "<regex>",
+			help    = "Exclude matching tests (can be used more than once)")
+	parser.add_argument("testProfile",
+			metavar = "<Path to testfile>",
+			help    = "Path to results folder")
+
+	args = parser.parse_args()
+
 	env = core.Environment()
 
-	try:
-		option_list = [
-			 "help",
-			 "tests=",
-			 "include-tests=",
-			 "exclude-tests=",
-			 ]
-		options, args = getopt(sys.argv[1:], "ht:x:", option_list)
-	except GetoptError:
-		usage()
+	# If --tests is called warn that it is deprecated
+	if args.tests != []:
+		print "Warning: Option --tests is deprecated. Use --include-tests"
 
-	OptionName = ''
-	test_filter = []
-	exclude_filter = []
-
-	for name, value in options:
-		if name in ('-h', '--help'):
-			usage()
-		elif name in ('-t', '--include-tests'):
-			test_filter.append(value)
-			env.filter.append(re.compile(value))
-		elif name in ('--tests'):
-			test_filter.append(value)
-			env.filter.append(re.compile(value))
-			print "Warning: Option --tets is deprecated, " \
-					"use --include-tests instead"
-		elif name in ('-x', '--exclude-tests'):
-			exclude_filter.append(value)
-			env.exclude_filter.append(re.compile(value))
-
-	if len(args) != 1:
-		usage()
-
-	profileFilename = args[0]
+	# Append includes and excludes to env
+	for each in args.include_tests:
+		env.filter.append(re.compile(each))
+	for each in args.tests:
+		env.filter.append(re.compile(each))
+	for each in args.exclude_tests:
+		env.exclude_filter.append(re.compile(each))
 
 	# Change to the piglit's path
 	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
 	os.chdir(piglit_dir)
 
-	profile = core.loadTestProfile(profileFilename)
+	profile = core.loadTestProfile(args.testFile)
 
 	def getCommand(test):
 		command = ''
