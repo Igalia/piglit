@@ -81,7 +81,6 @@ def main():
 		usage()
 
 	OptionName = ''
-	OptionResume = False
 	test_filter = []
 	exclude_filter = []
 
@@ -110,14 +109,6 @@ def main():
 	os.chdir(piglit_dir)
 
 	profile = core.loadTestProfile(profileFilename)
-
-	# If resuming an interrupted test run, re-write all of the existing
-	# results since we clobbered the results file.  Also, exclude them
-	# from being run again.
-	if OptionResume:
-		for (key, value) in old_results.tests.items():
-			json_writer.write_dict_item(key, value)
-			env.exclude_tests.add(key)
 
 	def getCommand(test):
 		command = ''
