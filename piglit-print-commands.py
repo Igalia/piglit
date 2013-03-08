@@ -48,8 +48,10 @@ Prints a list of all the tests and how to run them.  Ex:
 
 Options:
   -h, --help                Show this message
-  -t regexp, --tests=regexp Run only matching tests (can be used more
+  -t regexp, --include-tests=regexp Run only matching tests (can be used more
                             than once)
+  --tests=regexp            Run only matching tests (can be used more
+                            than once) DEPRICATED use --include-tests instead
   -x regexp, --exclude-tests=regexp Exclude matching tests (can be used
                             more than once)
 Example:
@@ -71,6 +73,7 @@ def main():
 		option_list = [
 			 "help",
 			 "tests=",
+			 "include-tests=",
 			 "exclude-tests=",
 			 ]
 		options, args = getopt(sys.argv[1:], "ht:x:", option_list)
@@ -85,9 +88,14 @@ def main():
 	for name, value in options:
 		if name in ('-h', '--help'):
 			usage()
-		elif name in ('-t', '--tests'):
+		elif name in ('-t', '--include-tests'):
 			test_filter.append(value)
 			env.filter.append(re.compile(value))
+		elif name in ('--tests'):
+			test_filter.append(value)
+			env.filter.append(re.compile(value))
+			print "Warning: Option --tets is deprecated, " \
+					"use --include-tests instead"
 		elif name in ('-x', '--exclude-tests'):
 			exclude_filter.append(value)
 			env.exclude_filter.append(re.compile(value))

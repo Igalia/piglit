@@ -45,8 +45,10 @@ Usage: %(progName)s [options] [profile.tests] [results]
 Options:
   -h, --help                Show this message
   -d, --dry-run             Do not execute the tests
-  -t regexp, --tests=regexp Run only matching tests (can be used more
+  -t regexp, --include-tests=regexp Run only matching tests (can be used more
                             than once)
+  --tests=regexp            Run only matching tests (can be used more
+							than once) DEPRICATED: use --include-tests instead
   -x regexp, --exclude-tests=regexp Excludey matching tests (can be used
                             more than once)
   -n name, --name=name      Name of the testrun
@@ -81,6 +83,7 @@ def main():
 			 "dry-run",
 			 "resume",
 			 "valgrind",
+			 "include-tests=",
 			 "tests=",
 			 "name=",
 			 "exclude-tests=",
@@ -106,9 +109,14 @@ def main():
 			OptionResume = True
 		elif name in ('--valgrind'):
 			env.valgrind = True
-		elif name in ('-t', '--tests'):
+		elif name in ('-t', '--include-tests'):
 			test_filter.append(value)
 			env.filter.append(re.compile(value))
+		elif name in ('--tests'):
+			test_filter.append(value)
+			env.filter.append(re.compile(value))
+			print "Warning: Option --tests is deprecated, " \
+					"use --include-tests instead"
 		elif name in ('-x', '--exclude-tests'):
 			exclude_filter.append(value)
 			env.exclude_filter.append(re.compile(value))
