@@ -104,3 +104,8 @@ program["Execute"] = program_execute
 add_program_test_dir(program_build, 'tests/cl/program/build')
 add_program_test_dir(program_build_fail, 'tests/cl/program/build/fail')
 add_program_test_dir(program_execute, 'tests/cl/program/execute')
+
+#Run generated built-in tests
+program_execute_builtin = Group()
+program["Execute"]["Builtin"] = program_execute_builtin
+add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/int')

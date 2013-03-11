@@ -48,6 +48,9 @@ piglit_make_generated_tests(
 	uniform-initializer-templates/fs-initializer-set-by-other-stage.template
 	uniform-initializer-templates/vs-initializer-set-by-other-stage.template
 	)
+piglit_make_generated_tests(
+	builtin_cl_int_tests.list
+	generate-cl-int-builtins.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
@@ -55,6 +58,7 @@ add_custom_target(gen-tests ALL
 	DEPENDS builtin_packing_tests.list
 		builtin_uniform_tests.list
 		constant_array_size_tests.list
+		builtin_cl_int_tests.list
 		interpolation_tests.list
 		non-lvalue_tests.list
 		uniform-initializer_tests.list)
