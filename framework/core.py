@@ -657,6 +657,8 @@ Test.ignoreErrors = map(re.compile, [
 	"stw_(init|cleanup).*",
 	"OpenGLInfo..*",
 	"AdapterInfo..*",
+	"frameThrottleRate.*",
+	".*DeviceName.*",
 	"No memory leaks detected.",
 	"libGL: Can't open configuration file.*",
 ])
