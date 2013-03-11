@@ -140,6 +140,9 @@ static int create_fbo(void)
 	glViewport(0, 0, maxsize, maxsize);
 	piglit_ortho_projection(maxsize, maxsize, GL_FALSE);
 
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	x0 = maxsize / 4;
 	x1 = maxsize * 3 / 4;
 	y0 = maxsize / 4;
@@ -188,10 +191,13 @@ piglit_display(void)
 	int x2 = (piglit_width / 4) * 3;
 	int y1 = piglit_height / 4;
 	int y2 = (piglit_height / 4) * 3;
+	int cx = piglit_width / 2;
+	int cy = piglit_height / 2;
 	float c1[3] = {0.25, 0.25, 0.25};
 	float c2[3] = {0.75, 0.25, 0.25};
 	float c3[3] = {0.25, 0.75, 0.75};
 	float c4[3] = {0.75, 0.75, 0.75};
+	float white[3] = {1.0, 1.0, 1.0};
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -212,11 +218,13 @@ piglit_display(void)
 	draw_tex_sub_rect(x2, y1);
 	draw_tex_sub_rect(x1, y2);
 	draw_tex_sub_rect(x2, y2);
+	draw_tex_sub_rect(cx, cy);
 
 	pass &= piglit_probe_pixel_rgb(x1, y1, c1);
 	pass &= piglit_probe_pixel_rgb(x2, y1, c2);
 	pass &= piglit_probe_pixel_rgb(x1, y2, c3);
 	pass &= piglit_probe_pixel_rgb(x2, y2, c4);
+	pass &= piglit_probe_pixel_rgb(cx, cy, white);
 
 	glDeleteTextures(1, &tex);
 	glDisable(GL_TEXTURE_2D);
