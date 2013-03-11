@@ -56,6 +56,15 @@ class ExecTest(Test):
 		return out
 
 	def run(self, valgrind):
+		"""
+		Run a test.  The return value will be a dictionary with keys
+		including 'result', 'info', 'returncode' and 'command'.
+		* For 'result', the value may be one of 'pass', 'fail', 'skip',
+		  'crash', or 'warn'.
+		* For 'info', the value will include stderr/out text.
+		* For 'returncode', the value will be the numeric exit code/value.
+		* For 'command', the value will be command line program and arguments.
+		"""
 		fullenv = os.environ.copy()
 		for e in self.env:
 			fullenv[e] = str(self.env[e])
