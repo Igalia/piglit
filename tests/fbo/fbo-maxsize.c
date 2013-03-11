@@ -119,7 +119,8 @@ static int create_fbo(void)
 		puts("Got GL_OUT_OF_MEMORY.");
 		piglit_report_result(PIGLIT_PASS);
 	default:
-		printf("Unexpected error: 0x%x\n", glerror);
+		printf("Unexpected error: %s\n",
+		       piglit_get_gl_enum_name(glerror));
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
