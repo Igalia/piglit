@@ -1,0 +1,158 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 vertex;
+
+uniform ublk {
+    uniform vec4 color;
+} c;
+
+out vblk1 {
+    vec4 r;
+};
+
+void vs2_set_gb();
+void vs2_set_a();
+void vs3_set_b();
+void vs4_set_a();
+
+void main()
+{
+    gl_Position = vertex;
+    r.r = c.color.r;
+    vs2_set_gb();
+    vs3_set_b();
+    vs4_set_a();
+    vs2_set_a();
+}
+
+[vertex shader]
+uniform ublk {
+    uniform vec4 color;
+} vs2ublk;
+
+out vblk2 {
+    float unused;
+    float a;
+    struct gb_struct {
+        vec2 gb;
+    } gb_array[3];
+} gb_blk;
+
+/* Use an array within an interface block.
+ */
+void vs2_set_gb()
+{
+    gb_blk.gb_array[1].gb = vs2ublk.color.gb;
+}
+
+/* Make sure that vblk2.a doesn't alias/overwrite vblk4.a.
+ * vblk4.a is used in the final result.
+ */
+void vs2_set_a()
+{
+    gb_blk.a = 0;
+}
+
+[vertex shader]
+uniform ublk {
+    uniform vec4 color;
+} vs3ublk;
+
+out vblk3 {
+    float b;
+} b_blk[3];
+
+/* Use an array of interface block instances.
+ */
+void vs3_set_b()
+{
+    b_blk[1].b = vs3ublk.color.b;
+    b_blk[0].b = b_blk[2].b = 0.0;
+}
+
+[vertex shader]
+uniform ublk {
+    uniform vec4 color;
+} vs4ublk;
+
+out vblk4 {
+    mat4 unused;
+    float a;
+} a_blk;
+
+void vs4_set_a()
+{
+    a_blk.a = vs4ublk.color.a;
+}
+
+[fragment shader]
+/* Note: vblk1 did not have an instance name in VS1
+ */
+in vblk1 {
+    vec4 r;
+} r_blk;
+
+in vblk2 {
+    float unused;
+    float a;
+    struct gb_struct {
+        vec2 gb;
+    } gb_array[3];
+} gb_blk;
+
+in vblk3 {
+    float b;
+} b_blk[3];
+
+/* Note: vblk4 had an instance name in VS4
+ */
+in vblk4 {
+    mat4 unused;
+    float a;
+};
+
+void main()
+{
+    /* Note: gl_FragColor is set to the uniform named color, but it is
+     * passed through several interface blocks.
+     */
+    gl_FragColor.r = r_blk.r.r;
+    gl_FragColor.gb = gb_blk.gb_array[1].gb;
+    gl_FragColor.b = b_blk[1].b;
+    gl_FragColor.a = a;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform vec4 ublk.color 1.0 0.0 0.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 0.0 0.0 0.0
+
+uniform vec4 ublk.color 0.0 1.0 0.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 0.0
+
+uniform vec4 ublk.color 0.0 0.0 1.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 0.0 1.0 0.0
+
+uniform vec4 ublk.color 0.0 0.0 0.0 1.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 0.0 0.0 1.0
+
+uniform vec4 ublk.color 1.0 0.0 1.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 0.0 1.0 0.0
+
+uniform vec4 ublk.color 0.0 1.0 0.0 1.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
