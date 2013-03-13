@@ -17,5 +17,6 @@ piglit_add_executable (arb_texture_multisample-texstate texstate.c)
 piglit_add_executable (arb_texture_multisample-sample-mask sample-mask.c)
 piglit_add_executable (arb_texture_multisample-sample-mask-value sample-mask-value.c)
 piglit_add_executable (arb_texture_multisample-sample-mask-execution sample-mask-execution.c)
+piglit_add_executable (arb_texture_multisample-negative-max-samples negative-max-samples.c)
 
 # vim: ft=cmake:

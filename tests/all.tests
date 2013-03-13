@@ -897,6 +897,7 @@ add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mas
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-value')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution -tex')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-negative-max-samples')
 for stage in ['vs', 'fs']:
 	# textureSize():
 	for sampler in samplers_atm:
