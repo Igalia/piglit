@@ -30,6 +30,7 @@ The original tests have been taken from
 First of all, you need to make sure that the following are installed:
 
   - Python 2.7 or greater
+  - Python Mako module
   - numpy (http://www.numpy.org)
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
@@ -61,7 +62,7 @@ invoke cmake with option "-DCMAKE_SYSTEM_PROCESSOR=i386".
 ----------
 
 Install development packages.
-  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy freeglut3-dev x11proto-gl-dev libxrender-dev
+  $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev
 
 Install additional components for which Ubuntu packages do not yet exist:
   - waffle (http://people.freedesktop.org/~chadversary/waffle)
