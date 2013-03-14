@@ -1669,6 +1669,11 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			glClipPlane(GL_CLIP_PLANE0 + x, d);
+		} else if (string_match("draw rect tex", line)) {
+			program_must_be_in_use();
+			get_floats(line + 13, c, 8);
+			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
+					     c[4], c[5], c[6], c[7]);
 		} else if (string_match("draw rect", line)) {
 			program_must_be_in_use();
 			get_floats(line + 9, c, 4);
