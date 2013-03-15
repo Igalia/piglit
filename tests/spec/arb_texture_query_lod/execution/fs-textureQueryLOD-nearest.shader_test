@@ -1,0 +1,192 @@
+# Create an 8x8 texture with four miplevels, colored red, green, blue, and
+# white, respectively.  Draw the following:
+#
+#            .0        .2        .4        .5        .6     .8
+#
+# miplevel 3 +         +         +         +
+#
+# miplevel 2 +-+       +-+       +-+       +-+
+#            +-+       +-+       +-+       +-+       +      +
+#
+# miplevel 1 +---+     +---+     +---+     +---+
+#            |1.0|     |1.2|     |1.4|     |1.5|     +-+    +-+
+#            +---+     +---+     +---+     +---+     +-+    +-+
+#
+#            +------+  +------+  +------+  +------+
+# miplevel 0 | 0.0  |  | 0.2  |  | 0.4  |  | 0.5  |  +---+  +---+
+#            |      |  |      |  |      |  |      |  |0.6|  |0.8|
+#            +------+  +------+  +------+  +------+  +---+  +---+
+#
+#
+# The ARB_texture_query_lod spec says:
+#
+#    "The x component of the result vector contains information on the mipmap
+#     array(s) that would be accessed by a normal texture lookup using the
+#     same coordinates. If a single level of detail would be accessed, the
+#     level-of-detail number relative to the base level is returned."
+#
+# The results of texture() are compared with textureLod() as a sanity check,
+# and then the x component of textureQueryLOD() is compared with what we
+# calculated to be the LOD when doing nearest filtering.
+#
+# Since this test uses no LOD-biasing, the base level is 0, and the
+# ARB_texture_query_lod spec says:
+#
+#    "The computed level of detail lambda_prime (equation 3.19), relative to
+#     the base level, is returned in the y component of the result vector."
+#
+# we also check that the y component returned by textureQueryLOD() is equal
+# to the x component.
+
+[require]
+GLSL >= 1.30
+GL_ARB_texture_query_lod
+
+[fragment shader]
+#extension GL_ARB_texture_query_lod : enable
+uniform sampler2D tex;
+uniform float lod;
+void main()
+{
+    /* The ARB_texture_query_lod spec says that if TEXTURE_MIN_FILTER is set
+     * to *_MIPMAP_NEAREST that the computed LOD is
+     *
+     *    ceil(computedLod + 0.5) - 1.0
+     *
+     * which is "round to nearest integer, and round down for 0.5."
+     */
+    float nearest_lod = ceil(lod + 0.5f) - 1.0f;
+
+    vec4 frag1 = texture(tex, gl_TexCoord[0].st);
+    vec4 frag2 = textureLod(tex, gl_TexCoord[0].st, nearest_lod);
+    if (frag1 != frag2) {
+	discard;
+    }
+
+    vec2 queried_lod = textureQueryLOD(tex, gl_TexCoord[0].st);
+    if (queried_lod.x != queried_lod.y) {
+	discard;
+    }
+    if (queried_lod.x != nearest_lod) {
+	discard;
+    }
+
+    gl_FragColor = frag1;
+}
+
+[vertex shader]
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+}
+
+[test]
+ortho
+clear color 0 0 0 0
+clear
+
+uniform int tex 0
+texture miptree 0
+
+# Draw the miptree: basic integer LODs.
+
+texparameter 2D min nearest_mipmap_nearest
+texparameter 2D mag nearest
+
+uniform float lod 0
+draw rect tex 10 10 8 8 0 0 1 1
+
+uniform float lod 1
+draw rect tex 10 28 4 4 0 0 1 1
+
+uniform float lod 2
+draw rect tex 10 42 2 2 0 0 1 1
+
+uniform float lod 3
+draw rect tex 10 54 1 1 0 0 1 1
+
+# Fractional LODs: nearest filtering between miplevels
+
+uniform float lod 0.2
+draw rect tex 28 10 8 8 0 0 1 1
+
+uniform float lod 0.4
+draw rect tex 46 10 8 8 0 0 1 1
+
+uniform float lod 0.5
+draw rect tex 64 10 8 8 0 0 1 1
+
+uniform float lod 0.6
+draw rect tex 82 10 4 4 0 0 1 1
+
+uniform float lod 0.8
+draw rect tex 100 10 4 4 0 0 1 1
+
+uniform float lod 1.2
+draw rect tex 28 28 4 4 0 0 1 1
+
+uniform float lod 1.4
+draw rect tex 46 28 4 4 0 0 1 1
+
+uniform float lod 1.5
+draw rect tex 64 28 4 4 0 0 1 1
+
+uniform float lod 1.6
+draw rect tex 82 28 2 2 0 0 1 1
+
+uniform float lod 1.8
+draw rect tex 100 28 2 2 0 0 1 1
+
+uniform float lod 2.2
+draw rect tex 28 42 2 2 0 0 1 1
+
+uniform float lod 2.4
+draw rect tex 46 42 2 2 0 0 1 1
+
+uniform float lod 2.5
+draw rect tex 64 42 2 2 0 0 1 1
+
+uniform float lod 2.6
+draw rect tex 82 42 1 1 0 0 1 1
+
+uniform float lod 2.8
+draw rect tex 100 42 1 1 0 0 1 1
+
+uniform float lod 3.2
+draw rect tex 28 54 1 1 0 0 1 1
+
+uniform float lod 3.4
+draw rect tex 46 54 1 1 0 0 1 1
+
+uniform float lod 3.5
+draw rect tex 64 54 1 1 0 0 1 1
+
+# Probes: integer LODs
+probe rgb 10 10 1.0 0.0 0.0
+probe rgb 10 28 0.0 1.0 0.0
+probe rgb 10 42 0.0 0.0 1.0
+probe rgb 10 54 1.0 1.0 1.0
+
+# Probes: nearest filtering
+probe rgb 28 10 1.0 0.0 0.0
+probe rgb 46 10 1.0 0.0 0.0
+probe rgb 64 10 1.0 0.0 0.0
+
+probe rgb 82 10 0.0 1.0 0.0
+probe rgb 100 10 0.0 1.0 0.0
+probe rgb 28 28 0.0 1.0 0.0
+probe rgb 46 28 0.0 1.0 0.0
+probe rgb 64 28 0.0 1.0 0.0
+
+probe rgb 82 28 0.0 0.0 1.0
+probe rgb 100 28 0.0 0.0 1.0
+probe rgb 28 42 0.0 0.0 1.0
+probe rgb 46 42 0.0 0.0 1.0
+probe rgb 64 42 0.0 0.0 1.0
+
+probe rgb 82 42 1.0 1.0 1.0
+probe rgb 100 42 1.0 1.0 1.0
+probe rgb 28 54 1.0 1.0 1.0
+probe rgb 46 54 1.0 1.0 1.0
+probe rgb 64 54 1.0 1.0 1.0
