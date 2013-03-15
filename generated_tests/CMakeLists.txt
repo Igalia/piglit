@@ -37,6 +37,9 @@ piglit_make_generated_tests(
 	non-lvalue_tests.list
 	gen_non-lvalue_tests.py)
 piglit_make_generated_tests(
+	texture_query_lod_tests.list
+	gen_texture_query_lod_tests.py)
+piglit_make_generated_tests(
 	uniform-initializer_tests.list
 	gen_uniform_initializer_tests.py
 	uniform-initializer-templates/fs-initializer.template
@@ -61,4 +64,5 @@ add_custom_target(gen-tests ALL
 		builtin_cl_int_tests.list
 		interpolation_tests.list
 		non-lvalue_tests.list
+		texture_query_lod_tests.list
 		uniform-initializer_tests.list)
