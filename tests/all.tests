@@ -1271,6 +1271,7 @@ arb_texture_storage['texture-storage'] = plain_test('arb_texture_storage-texture
 arb_texture_storage_multisample = Group()
 spec['ARB_texture_storage_multisample'] = arb_texture_storage_multisample
 arb_texture_storage_multisample['tex-storage'] = concurrent_test('arb_texture_storage_multisample-tex-storage')
+arb_texture_storage_multisample['tex-param'] = concurrent_test('arb_texture_storage_multisample-tex-param')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1

@@ -11,5 +11,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_texture_storage_multisample-tex-storage tex-storage.c)
+piglit_add_executable (arb_texture_storage_multisample-tex-param tex-param.c)
 
 # vim: ft=cmake:
