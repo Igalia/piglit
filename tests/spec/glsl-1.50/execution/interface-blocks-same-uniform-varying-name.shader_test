@@ -1,0 +1,63 @@
+# Tests that the same name can be used for 'different interfaces' where
+# different in this case means uniform vs. varying.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "A block name is allowed to have different definitions in different
+#  interfaces."
+#
+# And clarified in GLSLangSpec.4.30.8, 4.3.9 Interface Blocks:
+# "A block name is allowed to have different definitions in different
+#  interfaces within the same shader, allowing, for example, an input
+#  block and output block to have the same name."
+#
+# An input block and output block having the same name is only possible
+# for a geometry shader, but a uniform interface name matching a varying
+# interface name is possible without a geometry shader, and that is what
+# we test here.
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 vertex;
+
+uniform block {
+    uniform vec4 color;
+} ucolor;
+
+out block {
+    vec4 color;
+} vcolor;
+
+void main()
+{
+    gl_Position = vertex;
+    vcolor.color = ucolor.color;
+}
+
+[fragment shader]
+
+in block {
+    vec4 color;
+} vcolor;
+
+void main()
+{
+    gl_FragColor = vcolor.color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform vec4 block.color 1.0 0.0 1.0 0.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 0.0 1.0 0.0
+
+uniform vec4 block.color 0.0 1.0 0.0 1.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
