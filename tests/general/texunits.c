@@ -106,7 +106,6 @@ clear_errors()
 static GLboolean
 test_rasterpos(void)
 {
-   GLenum err;
    int i;
 
    clear_errors();
@@ -143,9 +142,8 @@ test_rasterpos(void)
    }
 
    /* there should be no errors at this point */
-   err = glGetError();
-   if (err != GL_NO_ERROR) {
-      printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
+   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+      return GL_FALSE;
    }
 
    /* this should generate an error */
@@ -154,17 +152,14 @@ test_rasterpos(void)
       glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
          /* INVALID_ENUM is expected */
-         err = glGetError();
-         if (err != GL_INVALID_ENUM) {
-            printf("GL failed to raise GL_INVALID_ENUM setting texture unit\n");
+         if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
             return GL_FALSE;
          }
       }
       else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_CURRENT_RASTER_TEXTURE_COORDS, v);
-         if (glGetError() != GL_INVALID_OPERATION) {
-            printf("GL failed to raise GL_INVALID_OPERATION quering invalid raster tex coords\n");
+         if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
             return GL_FALSE;
          }
       }
@@ -177,7 +172,6 @@ test_rasterpos(void)
 static GLboolean
 test_texture_matrix(void)
 {
-   GLenum err;
    int i;
 
    clear_errors();
@@ -201,9 +195,8 @@ test_texture_matrix(void)
    }
 
    /* there should be no errors at this point */
-   err = glGetError();
-   if (err != GL_NO_ERROR) {
-      printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
+   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+      return GL_FALSE;
    }
 
    /* this should generate an error */
@@ -212,17 +205,14 @@ test_texture_matrix(void)
       glActiveTexture(GL_TEXTURE0 + MaxTextureCoordUnits);
       if (MaxTextureCoordUnits == MaxTextureCombinedUnits) {
          /* INVALID_ENUM is expected */
-         err = glGetError();
-         if (err != GL_INVALID_ENUM) {
-            printf("GL failed to raise GL_INVALID_ENUM setting texture unit\n");
+         if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
             return GL_FALSE;
          }
       }
       else {
          /* INVALID_OPERATION is expected */
          glGetFloatv(GL_TEXTURE_MATRIX, m);
-         if (glGetError() != GL_INVALID_OPERATION) {
-            printf("GL failed to raise GL_INVALID_OPERATION querying invalid texture matrix\n");
+         if (!piglit_check_gl_error(GL_INVALID_OPERATION)) {
             return GL_FALSE;
          }
       }
@@ -236,7 +226,6 @@ static GLboolean
 test_texture_params(void)
 {
    GLuint tex[MAX_UNITS];
-   GLenum err;
    int i;
    int maxUnit;
 
@@ -266,9 +255,8 @@ test_texture_params(void)
    }
 
    /* there should be no errors at this point */
-   err = glGetError();
-   if (err != GL_NO_ERROR) {
-      printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
+   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+      return GL_FALSE;
    }
 
    maxUnit = MAX2(MaxTextureCombinedUnits, MaxTextureCoordUnits);
@@ -276,9 +264,7 @@ test_texture_params(void)
    /* this should generate an error */
    glActiveTexture(GL_TEXTURE0 + maxUnit);
    /* INVALID_ENUM is expected */
-   err = glGetError();
-   if (err != GL_INVALID_ENUM) {
-      printf("GL failed to raise GL_INVALID_ENUM setting texture unit\n");
+   if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
       return GL_FALSE;
    }
 
@@ -290,7 +276,6 @@ static GLboolean
 test_texture_env(void)
 {
    /* Texture Environment state is fixed-function; not used by shaders */
-   GLenum err;
    int i;
 
    clear_errors();
@@ -299,9 +284,7 @@ test_texture_env(void)
    for (i = 0; i < MaxTextureCombinedUnits; i++) {
       glActiveTexture(GL_TEXTURE0 + i);
       glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, Random[i]);
-      err = glGetError();
-      if (err) {
-         fprintf(stderr, "unit %d glTexEnvfv error: 0x%x\n", i, err);
+      if (!piglit_check_gl_error(GL_NO_ERROR)) {
          return GL_FALSE;
       }
    }
@@ -319,9 +302,8 @@ test_texture_env(void)
    }
 
    /* there should be no errors at this point */
-   err = glGetError();
-   if (err != GL_NO_ERROR) {
-      printf("Unexpected GL error in %s(): 0x%x\n", __FUNCTION__, err);
+   if (!piglit_check_gl_error(GL_NO_ERROR)) {
+      return GL_FALSE;
    }
 
    return GL_TRUE;
