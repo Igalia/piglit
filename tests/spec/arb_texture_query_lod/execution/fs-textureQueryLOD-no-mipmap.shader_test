@@ -1,0 +1,121 @@
+# Create an 8x8 texture with four miplevels, colored red, green, blue, and
+# white, respectively.  Set TEXTURE_MIN_FILTER to NEAREST/LINEAR. Draw the
+# following for each TEXTURE_MIN_FILTER:
+#
+#            NEAREST   LINEAR
+#            +         +
+#
+#            +-+       +-+
+#            +-+       +-+
+#
+#            +---+     +---+
+#            |   |     |   |
+#            +---+     +---+
+#
+#            +------+  +------+
+#            |      |  |      |
+#            |      |  |      |
+#            +------+  +------+
+#
+# Instead of seeing differently colored squares as we would with a min-filter
+# using mipmapping, we should see only red squares (textured from miplevel 0).
+#
+# The ARB_texture_query_lod spec says:
+#
+#    "The x component of the result vector contains information on the mipmap
+#     array(s) that would be accessed by a normal texture lookup using the
+#     same coordinates. If a single level of detail would be accessed, the
+#     level-of-detail number relative to the base level is returned."
+#
+# and also gives pseudo-code:
+#
+#    "if (TEXTURE_MIN_FILTER is LINEAR or NEAREST) {
+#       return 0.0;
+#     }"
+#
+# So the x component of textureQueryLOD() must be zero.
+#
+# The ARB_texture_query_lod spec says:
+#
+#    "The computed level of detail lambda_prime (equation 3.19), relative to
+#     the base level, is returned in the y component of the result vector."
+#
+# Since the base level is zero, the y component returned by textureQueryLOD()
+# should be equal to what the miplevel would have been, had we used mipmapping.
+
+[require]
+GLSL >= 1.30
+GL_ARB_texture_query_lod
+
+[fragment shader]
+#extension GL_ARB_texture_query_lod : enable
+uniform sampler2D tex;
+uniform float lambda_prime;
+void main()
+{
+    if (textureQueryLOD(tex, gl_TexCoord[0].st) != vec2(0.0f, lambda_prime)) {
+	discard;
+    }
+
+    gl_FragColor = texture(tex, gl_TexCoord[0].st);
+}
+
+[vertex shader]
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+}
+
+[test]
+ortho
+clear color 0 0 0 0
+clear
+
+uniform int tex 0
+texture miptree 0
+
+# Draw with TEXTURE_MIN_FILTER == NEAREST
+
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+uniform float lambda_prime 0
+draw rect tex 10 10 8 8 0 0 1 1
+
+uniform float lambda_prime 1
+draw rect tex 10 28 4 4 0 0 1 1
+
+uniform float lambda_prime 2
+draw rect tex 10 42 2 2 0 0 1 1
+
+uniform float lambda_prime 3
+draw rect tex 10 54 1 1 0 0 1 1
+
+# Draw with TEXTURE_MIN_FILTER == LINEAR
+
+texparameter 2D min linear
+texparameter 2D mag linear
+
+uniform float lambda_prime 0
+draw rect tex 28 10 8 8 0 0 1 1
+
+uniform float lambda_prime 1
+draw rect tex 28 28 4 4 0 0 1 1
+
+uniform float lambda_prime 2
+draw rect tex 28 42 2 2 0 0 1 1
+
+uniform float lambda_prime 3
+draw rect tex 28 54 1 1 0 0 1 1
+
+# Probes
+probe rgb 10 10 1.0 0.0 0.0
+probe rgb 10 28 1.0 0.0 0.0
+probe rgb 10 42 1.0 0.0 0.0
+probe rgb 10 54 1.0 0.0 0.0
+
+probe rgb 28 10 1.0 0.0 0.0
+probe rgb 28 28 1.0 0.0 0.0
+probe rgb 28 42 1.0 0.0 0.0
+probe rgb 28 54 1.0 0.0 0.0
