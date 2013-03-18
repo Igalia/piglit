@@ -40,8 +40,10 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#define MAX_UNITS 256
+
 /** random number for checking state */
-static GLfloat Random[128][4];
+static GLfloat Random[MAX_UNITS][4];
 
 static GLint MaxTextureCoordUnits;
 static GLint MaxTextureVertexUnits;
@@ -53,7 +55,7 @@ static void
 generate_random_numbers(void)
 {
    int i, j;
-   for (i = 0; i < 128; i++) {
+   for (i = 0; i < ARRAY_SIZE(Random); i++) {
       for (j = 0; j < 4; j++) {
          /* values in [0, 1] */
          Random[i][j] = (rand() % 1000) * .001;
@@ -233,7 +235,7 @@ test_texture_matrix(void)
 static GLboolean
 test_texture_params(void)
 {
-   GLuint tex[100];
+   GLuint tex[MAX_UNITS];
    GLenum err;
    int i;
    int maxUnit;
@@ -375,6 +377,11 @@ init(void)
    }
 
    report_info();
+
+   if (MaxTextureCombinedUnits > MAX_UNITS) {
+      /* Need to increase the MAX_UNITS limit */
+      piglit_report_result(PIGLIT_WARN);
+   }
 
    generate_random_numbers();
 
