@@ -1,0 +1,132 @@
+# Create an 8x8 texture with four miplevels, colored red, green, blue, and
+# white, respectively.  Draw the following:
+#
+#            .0        .5
+#
+# miplevel 3 +
+#
+# miplevel 2 +-+       +-+
+#            +-+       +-+
+#
+# miplevel 1 +---+     +---+
+#            |1.0|     |1.5|
+#            +---+     +---+
+#
+#            +------+  +------+
+# miplevel 0 | 0.0  |  | 0.5  |
+#            |      |  |      |
+#            +------+  +------+
+#
+#
+# The ARB_texture_query_lod spec says:
+#
+#    "The x component of the result vector contains information on the mipmap
+#     array(s) that would be accessed by a normal texture lookup using the
+#     same coordinates. If a single level of detail would be accessed, the
+#     level-of-detail number relative to the base level is returned."
+#
+# The results of texture() are compared with textureLod() as a sanity check,
+# and then the x component of textureQueryLOD() is compared with what we
+# calculated to be the LOD when doing linear filtering.
+#
+# Since this test uses no LOD-biasing, the base level is 0, and the
+# ARB_texture_query_lod spec says:
+#
+#    "The computed level of detail lambda_prime (equation 3.19), relative to
+#     the base level, is returned in the y component of the result vector."
+#
+# we also check that the y component returned by textureQueryLOD() is equal
+# to the x component.
+
+[require]
+GLSL >= 1.30
+GL_ARB_texture_query_lod
+
+[fragment shader]
+#extension GL_ARB_texture_query_lod : enable
+uniform sampler2D tex;
+uniform float lod;
+void main()
+{
+    vec4 frag1 = texture(tex, gl_TexCoord[0].st);
+    vec4 frag2 = textureLod(tex, gl_TexCoord[0].st, lod);
+    if (frag1 != frag2) {
+	discard;
+    }
+
+    vec2 queried_lod = textureQueryLOD(tex, gl_TexCoord[0].st);
+    if (queried_lod.x != queried_lod.y) {
+	discard;
+    }
+    if (queried_lod.x != lod) {
+	discard;
+    }
+
+    gl_FragColor = frag1;
+}
+
+[vertex shader]
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_TexCoord[0] = gl_MultiTexCoord0;
+}
+
+[test]
+ortho
+clear color 0 0 0 0
+clear
+
+uniform int tex 0
+texture miptree 0
+
+# Draw the miptree: basic integer LODs.
+
+texparameter 2D min linear_mipmap_linear
+texparameter 2D mag linear
+
+uniform float lod 0
+draw rect tex 10 10 8 8 0 0 1 1
+
+uniform float lod 1
+draw rect tex 10 28 4 4 0 0 1 1
+
+uniform float lod 2
+draw rect tex 10 42 2 2 0 0 1 1
+
+uniform float lod 3
+draw rect tex 10 54 1 1 0 0 1 1
+
+# Fractional LODs: linear filtering between miplevels
+#
+# Widths are calculated such that they correspond to fractional LODs. From the
+# GL spec (section: Scale Factor and Level of Detail):
+#
+#	lambda_base(x, y) = log2(rho(x, y))
+#
+# where rho() is the scale factor. Since we're texturing squares, x == y and
+# rho(x) is <width of base level> / x. Thus we can solve for x given lambda
+# with
+#	x = <width of base level> / (2^lambda)
+
+uniform float lod 0.5
+draw rect tex 28 10 5.65685424949238019521 5.65685424949238019521 0 0 1 1
+
+uniform float lod 1.5
+draw rect tex 28 28 2.82842712474619009761 2.82842712474619009761 0 0 1 1
+
+uniform float lod 2.5
+draw rect tex 28 42 1.41421356237309504880 1.41421356237309504880 0 0 1 1
+
+# Probes: integer LODs
+probe rgb 10 10 1.0 0.0 0.0
+probe rgb 10 28 0.0 1.0 0.0
+probe rgb 10 42 0.0 0.0 1.0
+probe rgb 10 54 1.0 1.0 1.0
+
+# Probes: linear filtering
+tolerance 0.05 0.05 0.05 0.05
+
+probe rgb 28 10 0.5 0.5 0.0
+probe rgb 28 28 0.0 0.5 0.5
+probe rgb 28 42 0.5 0.5 1.0
