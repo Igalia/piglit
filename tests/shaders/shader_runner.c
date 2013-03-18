@@ -1577,6 +1577,11 @@ handle_texparameter(const char *line)
 		parameter_name = "mag";
 		line += strlen("mag ");
 		strings = mag_filter_modes;
+	} else if (string_match("lod_bias ", line)) {
+		line += strlen("lod_bias ");
+		glTexParameterf(target, GL_TEXTURE_LOD_BIAS,
+				strtod(line, NULL));
+		return;
 	} else {
 		fprintf(stderr, "unknown texture parameter in `%s'\n", line);
 		piglit_report_result(PIGLIT_FAIL);
