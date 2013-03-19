@@ -64,10 +64,11 @@ void
 piglit_init(int argc, char **argv)
 {
 	unsigned i;
-	GLfloat result[4 * WIDTH * HEIGHT];
+	GLfloat *result;
 
 	piglit_require_extension("GL_ARB_texture_rg");
 
+	result = (GLfloat *) malloc(4 * WIDTH * HEIGHT * sizeof(GLfloat));
 	generate_rainbow_texture_data(WIDTH, HEIGHT, rgba_image);
 
 	glEnable(GL_TEXTURE_2D);
@@ -102,6 +103,8 @@ piglit_init(int argc, char **argv)
 				&& pass;
 		}
 	}
+
+	free(result);
 
 	if (piglit_automatic)
 		piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
