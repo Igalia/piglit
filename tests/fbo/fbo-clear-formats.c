@@ -218,7 +218,11 @@ do_stencil_clear(GLenum format, GLuint tex, int level, int size)
 
 	glDrawBuffer(draw_buffer);
 	glReadBuffer(read_buffer);
-	assert(glGetError() == 0);
+
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		/* Should be no error at this point.  If there is, report failure */
+		piglit_report_result(PIGLIT_FAIL);
+        }
 
 	return true;
 }
@@ -285,7 +289,11 @@ create_tex(GLenum internalformat, GLenum baseformat)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, level - 1);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 
-	assert(glGetError() == 0);
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		/* Should be no error at this point.  If there is, report failure */
+		piglit_report_result(PIGLIT_FAIL);
+        }
+           
 	return tex;
 }
 
@@ -323,13 +331,16 @@ draw_stencil_mipmap(int x, int y, int dim, GLuint tex, GLuint level)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, dim, dim, x, y, x+dim, y+dim,
 			  GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+        if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		/* The blit shouldn't generate an error.  If it does, report failure */
+		piglit_report_result(PIGLIT_FAIL);
+        }
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDeleteFramebuffers(1, &fbo);
 
 	glDrawBuffer(draw_buffer);
 	glReadBuffer(read_buffer);
-
-	assert(glGetError() == 0);
 }
 
 static void
