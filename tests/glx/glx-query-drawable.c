@@ -216,7 +216,6 @@ parse_args(int argc, char **argv,
 int main(int argc, char **argv) {
 	Display *display;
 	XVisualInfo *visual;
-	Window window;
 	GLXDrawable draw;
 	GLXContext ctx;
 	GLXFBConfig config = None;
