@@ -1176,6 +1176,12 @@ arb_texture_buffer_range['dlist'] = concurrent_test('arb_texture_buffer_range-dl
 arb_texture_buffer_range['errors'] = concurrent_test('arb_texture_buffer_range-errors')
 arb_texture_buffer_range['ranges'] = concurrent_test('arb_texture_buffer_range-ranges')
 
+arb_texture_query_lod = Group()
+spec['ARB_texture_query_lod'] = arb_texture_query_lod
+add_shader_test_dir(arb_texture_query_lod,
+                    testsDir + '/spec/arb_texture_query_lod',
+                    recursive=True)
+
 arb_texture_rectangle = Group()
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
