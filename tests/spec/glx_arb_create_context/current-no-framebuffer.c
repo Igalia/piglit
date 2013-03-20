@@ -32,8 +32,6 @@ int main(int argc, char **argv)
 		None
 	};
 	GLXContext ctx;
-	int major;
-	int minor;
 	int result = PIGLIT_PASS;
 
 	GLX_ARB_create_context_setup();
