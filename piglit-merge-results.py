@@ -22,7 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-from getopt import getopt, GetoptError
+import argparse
 import sys, os.path
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
@@ -33,38 +33,17 @@ import framework.core as core
 #############################################################################
 ##### Main program
 #############################################################################
-def usage():
-	USAGE = """\
-Usage: %(progName)s [options] [main results file]
-
-Options:
-  -h, --help                Show this message
-
-Example:
-  %(progName)s results/main > results/summary
-"""
-	print USAGE % {'progName': sys.argv[0]}
-	sys.exit(1)
-
 def main():
-	try:
-		options, args = getopt(sys.argv[1:], "h", [ "help" ])
-	except GetoptError:
-		usage()
+	parser = argparse.ArgumentParser()
+	parser.add_argument("results",
+						metavar = "<First Results File>",
+						nargs   = "*",
+			            help    = "Space seperated list of results files")
+	args = parser.parse_args()
 
-	OptionName = ''
+	combined = core.loadTestResults(args.results.pop(0))
 
-	for name, value in options:
-		if name in ('-h', '--help'):
-			usage()
-
-	if len(args) < 2:
-		usage()
-
-	combined = core.loadTestResults(args[0])
-	del args[0]
-
-	for resultsDir in args:
+	for resultsDir in args.results:
 		results = core.loadTestResults(resultsDir)
 
 		for testname, result in results.tests.items():
