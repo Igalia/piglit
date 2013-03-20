@@ -155,6 +155,7 @@ make_quiet_nan_double(double * /*dest*/)
 }
 
 
+#if 0
 static void
 print_float(float f)
 {
@@ -222,7 +223,6 @@ print_float(float f)
 
 /* Examine some interesting floats
  */
-#if 0
 int main() 
 {
    float f;
