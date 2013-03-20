@@ -47,8 +47,6 @@ Example:
 	sys.exit(1)
 
 def main():
-	env = core.Environment()
-
 	try:
 		options, args = getopt(sys.argv[1:], "h", [ "help" ])
 	except GetoptError:
