@@ -28,10 +28,6 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-glx-util.h"
 
-#ifndef GLXBadProfileARB
-#define GLXBadProfileARB 13
-#endif
-
 int piglit_automatic;
 
 #ifndef _WIN32

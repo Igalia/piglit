@@ -31,6 +31,10 @@
 #include "GL/glx.h"
 #include "GL/glxproto.h"
 
+#ifndef GLXBadProfileARB
+#define GLXBadProfileARB 13
+#endif
+
 Display *piglit_get_glx_display();
 XVisualInfo * piglit_get_glx_visual(Display *dpy);
 GLXContext piglit_get_glx_context(Display *dpy, XVisualInfo *visinfo);
