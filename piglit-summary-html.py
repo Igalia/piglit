@@ -21,7 +21,7 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from getopt import getopt, GetoptError
+import argparse
 import cgi
 import os, os.path
 import sys
@@ -263,87 +263,54 @@ results is an array containing the top-level results dictionarys.
 #############################################################################
 ##### Main program
 #############################################################################
-def usage():
-	USAGE = """\
-Usage: %(progName)s [options] [summary-dir] [test.results]...
-
-Options:
-  -h, --help            Show this message
-  -o, --overwrite       Overwrite existing directories
-  -l, --list=listfile   Use test results from a list file
-
-Example:
-  %(progName)s summary/mysum results/all.results
-
-Example list file:
-[
-	[ 'test.result', { name: 'override-name' } ],
-	[ 'other.result' ]
-]
-"""
-	print USAGE % {'progName': sys.argv[0]}
-	sys.exit(1)
-
-
 def parse_listfile(filename):
 	file = open(filename, "r")
 	code = "".join([s for s in file])
 	file.close()
 	return eval(code)
 
-def loadresult(descr):
-	result = core.loadTestResults(descr[0])
-	if len(descr) > 1:
-		result.__dict__.update(descr[1])
-	return result
-
 def main():
-	try:
-		options, args = getopt(sys.argv[1:], "hofl:", [ "help", "overwrite", "list" ])
-	except GetoptError:
-		usage()
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-o", "--overwrite",
+						action  = "store_true",
+						help    = "Overwrite existing directories")
+	parser.add_argument("-l", "--list",
+						action  = "store",
+						help    = "Use test results from a list file")
+	parser.add_argument("summaryDir",
+						metavar = "<Summary Directory>",
+						help    = "Directory to put HTML files in")
+	parser.add_argument("resultsFiles",
+						metavar = "<Results Files>",
+						nargs   = "+",
+						help    = "Results files to include in HTML")
+	args = parser.parse_args()
 
-	OptionOverwrite = False
-	OptionList = []
-	for name, value in options:
-		if name == "-h" or name == "--help":
-			usage()
-		elif name == "-o" or name == "--overwrite":
-			OptionOverwrite = True
-		elif name == "-l" or name == "--list":
-			OptionList += parse_listfile(value)
-
-	OptionList += [[name] for name in args[1:]]
-
-	if len(args) < 1 or len(OptionList) == 0:
-		usage()
-
-	summaryDir = args[0]
-	core.checkDir(summaryDir, not OptionOverwrite)
+	core.checkDir(args.summaryDir, not args.overwrite)
 
 	results = []
-	for result_dir in OptionList:
-		results.append(loadresult(result_dir))
+	for result_dir in args.resultsFiles:
+		results.append(core.loadTestResults(result_dir))
 
 	summary = framework.summary.Summary(results)
 	for j in range(len(summary.testruns)):
 		tr = summary.testruns[j]
 		tr.codename = filter(lambda s: s.isalnum(), tr.name)
-		dirname = summaryDir + '/' + tr.codename
+		dirname = args.summaryDir + '/' + tr.codename
 		core.checkDir(dirname, False)
 		writeTestrunHtml(tr, dirname + '/index.html')
 		for test in summary.allTests():
 			filename = dirname + '/' + testPathToHtmlFilename(test.path)
 			writeResultHtml(test, test.results[j], filename)
 
-	writefile(os.path.join(summaryDir, 'result.css'), readfile(os.path.join(templatedir, 'result.css')))
-	writefile(os.path.join(summaryDir, 'index.css'), readfile(os.path.join(templatedir, 'index.css')))
-	writeSummaryHtml(summary, summaryDir, 'all')
-	writeSummaryHtml(summary, summaryDir, 'problems')
-	writeSummaryHtml(summary, summaryDir, 'changes')
-	writeSummaryHtml(summary, summaryDir, 'regressions')
-	writeSummaryHtml(summary, summaryDir, 'fixes')
-	writeSummaryHtml(summary, summaryDir, 'skipped')
+	writefile(os.path.join(args.summaryDir, 'result.css'), readfile(os.path.join(templatedir, 'result.css')))
+	writefile(os.path.join(args.summaryDir, 'index.css'), readfile(os.path.join(templatedir, 'index.css')))
+	writeSummaryHtml(summary, args.summaryDir, 'all')
+	writeSummaryHtml(summary, args.summaryDir, 'problems')
+	writeSummaryHtml(summary, args.summaryDir, 'changes')
+	writeSummaryHtml(summary, args.summaryDir, 'regressions')
+	writeSummaryHtml(summary, args.summaryDir, 'fixes')
+	writeSummaryHtml(summary, args.summaryDir, 'skipped')
 
 
 if __name__ == "__main__":
