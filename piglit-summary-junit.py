@@ -24,7 +24,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import optparse
+import argparse
 import os
 import sys
 
@@ -109,21 +109,21 @@ class Writer:
 
 
 def main():
-	optparser = optparse.OptionParser(
-		usage="\n\t%prog [options] test.results",
-		version="%%prog")
-	optparser.add_option(
-		'-o', '--output', metavar='FILE',
-		type="string", dest="output", default='piglit.xml',
-		help="output filename")
-	(options, args) = optparser.parse_args(sys.argv[1:])
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-o", "--output",
+						metavar = "<Output File>",
+						action  = "store",
+						dest    = "output",
+						default = "piglit.xml",
+						help    = "Output filename")
+	parser.add_argument("testResults",
+						metavar = "<Input Files>",
+						help    = "JSON results file to be converted")
+	args = parser.parse_args()
 
-	if len(args) != 1:
-		optparser.error('need to specify one test result')
-		usage()
 
-	writer = Writer(options.output)
-	writer.write(args[0])
+	writer = Writer(args.output)
+	writer.write(args.testResults)
 
 
 if __name__ == "__main__":
