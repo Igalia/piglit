@@ -1,0 +1,13 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+piglit_add_executable (amd_performance_monitor_api api.c)
+piglit_add_executable (amd_performance_monitor_measure measure.c)

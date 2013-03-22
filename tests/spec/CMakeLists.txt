@@ -1,3 +1,4 @@
+add_subdirectory (amd_performance_monitor)
 add_subdirectory (arb_color_buffer_float)
 add_subdirectory (arb_debug_output)
 add_subdirectory (arb_draw_instanced)
