@@ -39,7 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = BUF_WIDTH;
 	config.window_height = BUF_WIDTH;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
 

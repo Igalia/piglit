@@ -106,7 +106,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = fbo_width;
 	config.window_height = fbo_height;
-	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 

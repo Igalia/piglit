@@ -92,14 +92,18 @@ choose_config_attribs(const struct piglit_gl_test_config *test_config)
 	static int32_t attrib_list[64];
 	int i = 0;
 
-	attrib_list[i++] = WAFFLE_RED_SIZE;
-	attrib_list[i++] = 1;
-	attrib_list[i++] = WAFFLE_GREEN_SIZE;
-	attrib_list[i++] = 1;
-	attrib_list[i++] = WAFFLE_BLUE_SIZE;
-	attrib_list[i++] = 1;
 
-	if (test_config->window_visual & PIGLIT_GL_VISUAL_ALPHA) {
+	if (test_config->window_visual &
+	    (PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_RGBA)) {
+		attrib_list[i++] = WAFFLE_RED_SIZE;
+		attrib_list[i++] = 1;
+		attrib_list[i++] = WAFFLE_GREEN_SIZE;
+		attrib_list[i++] = 1;
+		attrib_list[i++] = WAFFLE_BLUE_SIZE;
+		attrib_list[i++] = 1;
+	}
+
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_RGBA) {
 		attrib_list[i++] = WAFFLE_ALPHA_SIZE;
 		attrib_list[i++] = 1;
 	}

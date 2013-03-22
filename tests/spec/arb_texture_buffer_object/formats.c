@@ -754,7 +754,7 @@ main(int argc, char *argv[])
 
 	config.window_width = 200;
 	config.window_height = 500;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 	piglit_gl_test_run(argc, argv, &config);
 

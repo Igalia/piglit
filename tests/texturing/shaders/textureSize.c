@@ -53,7 +53,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 150;
 	config.window_height = 30;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 

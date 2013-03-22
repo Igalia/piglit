@@ -98,12 +98,27 @@ init_glut(void)
 	const struct piglit_gl_test_config *test_config = glut_fw.gl_fw.test_config;
 	char *argv[] = {"piglit"};
 	int argc = 1;
+	unsigned flags = GLUT_RGB;
+
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_RGBA)
+		flags |= GLUT_ALPHA;
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_DEPTH)
+		flags |= GLUT_DEPTH;
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_STENCIL)
+		flags |= GLUT_STENCIL;
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_ACCUM)
+		flags |= GLUT_ACCUM;
+
+	if (test_config->window_visual & PIGLIT_GL_VISUAL_DOUBLE)
+		flags |= GLUT_DOUBLE;
+	else
+		flags |= GLUT_SINGLE;
 
 	glutInit(&argc, argv);
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(test_config->window_width,
 	                   test_config->window_height);
-	glutInitDisplayMode(test_config->window_visual);
+	glutInitDisplayMode(flags);
 	glut_fw.window = glutCreateWindow("Piglit");
 
 	glutDisplayFunc(display);

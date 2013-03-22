@@ -6,7 +6,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 512;
 	config.window_height = 512;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
+	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
 

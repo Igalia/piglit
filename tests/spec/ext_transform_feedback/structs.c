@@ -110,7 +110,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 #else /* PIGLIT_USE_OPENGL_ES3 */
 	config.supports_gl_es_version = 30;
 #endif
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_ALPHA;
+	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
 
