@@ -1992,6 +1992,7 @@ piglit_init(int argc, char **argv)
 	process_test_script(argv[1]);
 	link_and_use_shaders();
 	if (vertex_data_start != NULL) {
+		program_must_be_in_use();
 		if (gl_version.num >= 31) {
 			GLuint vao;
 
