@@ -1578,10 +1578,15 @@ handle_texparameter(const char *line)
 		line += strlen("mag ");
 		strings = mag_filter_modes;
 	} else if (string_match("lod_bias ", line)) {
+#ifdef PIGLIT_USE_OPENGL
 		line += strlen("lod_bias ");
 		glTexParameterf(target, GL_TEXTURE_LOD_BIAS,
 				strtod(line, NULL));
 		return;
+#else
+		printf("lod_bias feature is only available in desktop GL\n");
+		piglit_report_result(PIGLIT_SKIP);
+#endif
 	} else {
 		fprintf(stderr, "unknown texture parameter in `%s'\n", line);
 		piglit_report_result(PIGLIT_FAIL);
