@@ -258,4 +258,29 @@ bool piglit_strip_arg(int *argc, char *argv[], const char *arg);
  */
 #define PIGLIT_STRIP_ARG(arg) piglit_strip_arg(&argc, argv, arg)
 
+struct piglit_dma_buf;
+
+/**
+ * Create buffer suitable for dma_buf importing and set its contents to the
+ * given data (src_data). Different hardware may have different alignment
+ * constraints and hence one can specify one stride for the source and get
+ * another for the final buffer to be given further to EGL.
+ * An opaque handle, file descriptor, stride and offset for the buffer are only
+ * returned upon success indicated by the return value PIGLIT_PASS, otherwise
+ * no buffer is created. In case the framework simply does not support dma
+ * buffers, the return value is PIGLIT_SKIP instead of PIGLIT_FAIL.
+ */
+enum piglit_result
+piglit_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
+		      const void *src_data, unsigned src_stride,
+		      struct piglit_dma_buf **buf, int *fd,
+		      unsigned *stride, unsigned *offset);
+
+/**
+ * Release all the resources allocated for the designated buffer. If the given
+ * pointer (buf) is NULL no action is taken.
+ */
+void
+piglit_destroy_dma_buf(struct piglit_dma_buf *buf);
+
 #endif /* PIGLIT_FRAMEWORK_H */

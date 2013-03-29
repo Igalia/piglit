@@ -71,6 +71,15 @@ struct piglit_gl_framework {
 
 	void
 	(*destroy)(struct piglit_gl_framework *gl_fw);
+
+	enum piglit_result
+	(*create_dma_buf)(unsigned w, unsigned h, unsigned cpp,
+			  const void *src_data, unsigned src_stride,
+			  struct piglit_dma_buf **buf, int *fd,
+			  unsigned *stride, unsigned *offset);
+
+	void
+	(*destroy_dma_buf)(struct piglit_dma_buf *buf);
 };
 
 struct piglit_gl_framework*
