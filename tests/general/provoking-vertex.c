@@ -58,33 +58,59 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
-	float red[3] = {1.0, 0.0, 0.0};
-	float blue[3] = {0.0, 0.0, 1.0};
+	static const float red[3] = {0.9, 0.0, 0.0};
+	static const float blue[3] = {0.0, 0.0, 0.9};
+	static const float green[3] = {0.0, 1.0, 0.0};
 	GLboolean pass = GL_TRUE;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
+        /* lower triangle: counter-clockwise */
 	glBegin(GL_TRIANGLES);
-		glColor3f(1.0, 0.0, 0.0);
-		glVertex3i(125, 125, 0);
-		glColor3f(0.0, 1.0, 0.0);
-		glVertex3i(175, 125, 0);
-		glColor3f(0.0, 0.0, 1.0);
-		glVertex3i(150, 150, 0);
+		glColor3fv(red);
+		glVertex3i(125, 85, 0);
+		glColor3fv(green);
+		glVertex3i(175, 85, 0);
+		glColor3fv(blue);
+		glVertex3i(150, 110, 0);
+	glEnd();
+
+        /* upper triangle: clockwise */
+	glBegin(GL_TRIANGLES);
+		glColor3fv(red);
+		glVertex3i(125, 165, 0);
+		glColor3fv(blue);
+		glVertex3i(150, 190, 0);
+		glColor3fv(green);
+		glVertex3i(175, 165, 0);
 	glEnd();
 
 	glProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
+        /* lower triangle: counter-clockwise */
 	glBegin(GL_TRIANGLES);
-		glColor3f(1.0, 0.0, 0.0);
-		glVertex3i(200, 125, 0);
-		glColor3f(0.0, 1.0, 0.0);
-		glVertex3i(250, 125, 0);
-		glColor3f(0.0, 0.0, 1.0);
-		glVertex3i(225, 150, 0);
+		glColor3fv(red);
+		glVertex3i(200, 85, 0);
+		glColor3fv(green);
+		glVertex3i(250, 85, 0);
+		glColor3fv(blue);
+		glVertex3i(225, 110, 0);
 	glEnd();
 
-	pass = pass && piglit_probe_pixel_rgb(150, 130, red);
-	pass = pass && piglit_probe_pixel_rgb(225, 130, blue);
+        /* upper triangle: clockwise */
+	glBegin(GL_TRIANGLES);
+		glColor3fv(green);
+		glVertex3i(250, 165, 0);
+		glColor3fv(red);
+		glVertex3i(200, 165, 0);
+		glColor3fv(blue);
+		glVertex3i(225, 190, 0);
+	glEnd();
+
+	pass = pass && piglit_probe_pixel_rgb(150, 90, red);
+	pass = pass && piglit_probe_pixel_rgb(150, 170, red);
+
+	pass = pass && piglit_probe_pixel_rgb(225, 90, blue);
+	pass = pass && piglit_probe_pixel_rgb(225, 170, blue);
 
 	glFinish();
 	piglit_present_results();
