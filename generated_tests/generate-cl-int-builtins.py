@@ -196,9 +196,16 @@ def pow(val,pow):
     return val ** pow
 
 def rotate_right(x, n, bits):
+    #Find all bits that will wrap
     mask = (2L**n) - 1
-    mask_bits = x & mask
-    return (x >> n) | (mask_bits << (bits - n))
+    wrapped_bits = x & mask
+
+    #sign extension needs to be masked out
+    se_mask = (1 << (bits - n)) - 1;
+    unwrapped_bits = x >> n;
+    unwrapped_bits &= se_mask;
+
+    return unwrapped_bits | (wrapped_bits << (bits - n))
 
 def rotate_left(x, n, bits):
     return rotate_right(x, bits - n, bits)
@@ -518,11 +525,11 @@ signed_generic_tests = {
         'function_type': 'ttt',
         'values': [
             [         MIN, MIN, [rot,1,-3,SIZE],             1,
-                      MIN,  [pow,2,[sub,SIZE,2]],          MIN],
+                      MIN,  [pow,2,[sub,SIZE,2]],          MIN, [rot,-2,-1,SIZE]],
             [           1,   1,               1,             1,
-                        1,                     1,            1],
+                        1,                     1,            1, -2],
             [[sub,SIZE,1],  -1,              -3, [mul,SIZE,-1],
-             [mul,[add,SIZE,1],-1], [mul,[add,SIZE,2],-1], [sub,SIZE,1]]
+             [mul,[add,SIZE,1],-1], [mul,[add,SIZE,2],-1], [sub,SIZE,1], -1]
         ]
     },
     'sub_sat': {
