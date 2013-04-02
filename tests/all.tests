@@ -864,10 +864,8 @@ add_shader_test_dir(spec['glsl-es-3.00'],
 add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_gles3')
 
 # AMD_performance_monitor
-profile.test_list['AMD_performance_monitor/api'] =
-	PlainExecTest('amd_performance_monitor_api -auto')
-profile.test_list['AMD_performance_monitor/measure'] =
-	PlainExecTest('amd_performance_monitor_measure -auto')
+profile.test_list['AMD_performance_monitor/api'] = PlainExecTest('amd_performance_monitor_api -auto')
+profile.test_list['AMD_performance_monitor/measure'] = PlainExecTest('amd_performance_monitor_measure -auto')
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = Group()
