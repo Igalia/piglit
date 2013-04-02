@@ -51,6 +51,34 @@ set(UTIL_GL_LIBS
 	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
+
+	# One needs to have at least one hardware driver present, otherwise
+	# there is no point compiling just the dispatcher.
+	if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND)
+		add_definitions(-DHAVE_LIBDRM)
+
+		list(APPEND UTIL_GL_SOURCES
+			piglit-framework-gl/piglit_drm_dma_buf.c
+		)
+
+		list(APPEND UTIL_GL_LIBS
+			${LIBDRM_LDFLAGS}
+		)
+
+		list(APPEND UTIL_GL_INCLUDES
+			${LIBDRM_INCLUDE_DIRS}
+		)
+
+		if(LIBDRM_INTEL_FOUND)
+			add_definitions(-DHAVE_LIBDRM_INTEL)
+
+			list(APPEND UTIL_GL_LIBS
+				${LIBDRM_INTEL_LDFLAGS}
+			)
+		endif()
+	endif()
+
 	set(UTIL_GL_LIBS
 		${UTIL_GL_LIBS}
 		${X11_X11_LIB}

@@ -34,6 +34,9 @@
 #else
 #	include "piglit_glut_framework.h"
 #endif
+#ifdef HAVE_LIBDRM
+#	include "piglit_drm_dma_buf.h"
+#endif
 
 struct piglit_gl_framework*
 piglit_gl_framework_factory(const struct piglit_gl_test_config *test_config)
@@ -100,6 +103,12 @@ piglit_gl_framework_init(struct piglit_gl_framework *gl_fw,
 {
 	validate_supported_apis(test_config);
 	memset(gl_fw, 0, sizeof(*gl_fw));
+
+#ifdef HAVE_LIBDRM
+	gl_fw->create_dma_buf = piglit_drm_create_dma_buf;
+	gl_fw->destroy_dma_buf = piglit_drm_destroy_dma_buf;
+#endif
+
 	gl_fw->test_config = test_config;
 	return true;
 }

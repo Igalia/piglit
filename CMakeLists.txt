@@ -88,6 +88,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set(PIGLIT_HAS_GLX True)
         add_definitions(-DPIGLIT_HAS_GLX)
 
+	pkg_check_modules(LIBDRM QUIET libdrm)
+
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" OFF)
