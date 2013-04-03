@@ -199,6 +199,7 @@ piglit_display(void)
 	data[(vec4s - 1) * 4 + 1] = 1.0;
 	data[(vec4s - 1) * 4 + 2] = 0.0;
 	data[(vec4s - 1) * 4 + 3] = 0.0;
+	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 	glUseProgram(prog);
 	i_location = glGetUniformLocation(prog, "i");
