@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_shader_texture_lod-texgrad texgrad.c)
+piglit_add_executable (arb_shader_texture_lod-texgradcube texgradcube.c)
 
 # vim: ft=cmake:
