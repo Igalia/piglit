@@ -167,8 +167,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLbyte));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++)
-				((GLbyte *)pixels)[i * components + j] =
-				0x23 << (6 - j);
+				((GLbyte *)pixels)[i * components + j] = 50 + j * 4;
 		}
 		break;
 
@@ -176,8 +175,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLubyte));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++)
-				((GLubyte *)pixels)[i * components + j] =
-				0x53 << (6 - j);
+				((GLubyte *)pixels)[i * components + j] = 100 + j * 4;
 		}
 		break;
 
@@ -193,12 +191,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLshort));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
-				if (format == GL_STENCIL_INDEX)
-					((GLshort *)pixels)[i * components + j] =
-					0x1 << 3;
-				else
-					((GLshort *)pixels)[i * components + j] =
-					0x1 << (14 - j);
+				((GLshort *)pixels)[i * components + j] = 0x1234;
 			}
 		}
 		break;
@@ -207,12 +200,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLushort));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
-				if (format == GL_STENCIL_INDEX)
-					((GLushort *)pixels)[i * components + j] =
-					0x37 << 7;
-				else
-					((GLushort *)pixels)[i * components + j] =
-						0x1a37 << (14 - j);
+				((GLushort *)pixels)[i * components + j] = 0x4321;
 			}
 		}
 		break;
@@ -232,12 +220,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLint));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
-				if (format == GL_STENCIL_INDEX)
-					((GLint *)pixels)[i * components + j] =
-					0x1 << 4;
-				else
-					((GLint *)pixels)[i * components + j] =
-					0x1 << (30 - j);
+				((GLint *)pixels)[i * components + j] = 0x12345678;
 			}
 		}
 		break;
@@ -246,12 +229,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 		pixels = calloc(npixels * components, sizeof(GLuint));
 		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
-				if (format == GL_STENCIL_INDEX)
-					((GLuint *)pixels)[i * components + j] =
-					0x1a324b11 << 5;
-				else
-					((GLuint *)pixels)[i * components + j] =
-					0x1a4b5a4b << (4 - j);
+				((GLuint *)pixels)[i * components + j] = 0x87654321;
 			}
 		}
 		break;
@@ -271,7 +249,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLfloat *)pixels)[i * components + j] =
-					0x1 << 3;
+					0x1020;
 				else
 					((GLfloat *)pixels)[i * components + j] =
 					0.5 - j * 0.1;
