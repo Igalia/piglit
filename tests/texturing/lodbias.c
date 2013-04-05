@@ -42,7 +42,7 @@
 
 #include "piglit-util-gl-common.h"
 
-#define SquareSize 32
+#define SquareSize 50
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
