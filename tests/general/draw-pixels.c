@@ -165,7 +165,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 	switch(type) {
 	case GL_BYTE:
 		pixels = calloc(npixels * components, sizeof(GLbyte));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++)
 				((GLbyte *)pixels)[i * components + j] =
 				0x23 << (6 - j);
@@ -174,7 +174,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 
 	case GL_UNSIGNED_BYTE:
 		pixels = calloc(npixels * components, sizeof(GLubyte));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++)
 				((GLubyte *)pixels)[i * components + j] =
 				0x53 << (6 - j);
@@ -184,14 +184,14 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 	case GL_UNSIGNED_BYTE_3_3_2:
 	case GL_UNSIGNED_BYTE_2_3_3_REV:
 		pixels = calloc(npixels, sizeof(GLubyte));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			((GLubyte *)pixels)[i] = 0x99;
 		}
 		break;
 
 	case GL_SHORT:
 		pixels = calloc(npixels * components, sizeof(GLshort));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLshort *)pixels)[i * components + j] =
@@ -205,7 +205,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 
 	case GL_UNSIGNED_SHORT:
 		pixels = calloc(npixels * components, sizeof(GLushort));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLushort *)pixels)[i * components + j] =
@@ -224,13 +224,13 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 	case GL_UNSIGNED_SHORT_5_5_5_1:
 	case GL_UNSIGNED_SHORT_1_5_5_5_REV:
 		pixels = calloc(npixels, sizeof(GLushort));
-		for (i = 0; i < (npixels); i++)
+		for (i = 0; i < npixels; i++)
 			((GLushort *)pixels)[i] = 0x9b59;
 		break;
 
 	case GL_INT:
 		pixels = calloc(npixels * components, sizeof(GLint));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLint *)pixels)[i * components + j] =
@@ -244,7 +244,7 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 
 	case GL_UNSIGNED_INT:
 		pixels = calloc(npixels * components, sizeof(GLuint));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLuint *)pixels)[i * components + j] =
@@ -261,13 +261,13 @@ allocPixels(GLenum format, GLenum type, GLuint components)
 	case GL_UNSIGNED_INT_10_10_10_2:
 	case GL_UNSIGNED_INT_2_10_10_10_REV:
 		pixels = calloc(npixels, sizeof(GLuint));
-		for (i = 0; i < (npixels); i++)
+		for (i = 0; i < npixels; i++)
 			((GLuint *)pixels)[i] = 0x1a4b5a4b;
 		break;
 
 	case GL_FLOAT:
 		pixels = calloc(npixels * components, sizeof(GLfloat));
-		for (i = 0; i < (npixels); i++) {
+		for (i = 0; i < npixels; i++) {
 			for (j = 0; j < components; j++) {
 				if (format == GL_STENCIL_INDEX)
 					((GLfloat *)pixels)[i * components + j] =
@@ -532,7 +532,7 @@ typeToFloat(GLenum format, GLenum type, GLvoid *src,
 		case GL_UNSIGNED_INT_8_8_8_8:
 			uisrc = (const GLuint *) src;
 			pui = uisrc[index];
-			if(swap)
+			if (swap)
 				Swap4Byte(&pui);
 			if (index == idx0)
 				return UBYTE_TO_FLOAT(((pui >> 24)       ));
@@ -595,7 +595,7 @@ typeToFloat(GLenum format, GLenum type, GLvoid *src,
 
 		case GL_FLOAT:
 			pf = ((GLfloat *)src)[index];
-			if(swap)
+			if (swap)
 				Swap4Byte(&pf);
 			return pf;
 		default:
@@ -743,7 +743,7 @@ piglit_display(void)
 	GLfloat red[4] = {1.0, 0.0, 0.0, 1.0};
 
 	for (i = 0; i < ARRAY_SIZE(data_types); i++) {
-		for(k = 0; k < ARRAY_SIZE(pixel_ops); k++) {
+		for (k = 0; k < ARRAY_SIZE(pixel_ops); k++) {
 			for (j = 0; j < ARRAY_SIZE(pixel_formats); j++) {
 
 				format = pixel_formats[j];
@@ -766,7 +766,6 @@ piglit_display(void)
 					piglit_set_tolerance_for_bits(7, 7, 7, 7);
 				else
 					piglit_set_tolerance_for_bits(8, 8, 8, 8);
-
 
 				if (!piglit_automatic)
 					printf("Format = %s, Type = %s,"
@@ -802,7 +801,6 @@ piglit_display(void)
 				case GL_BGR:
 				case GL_RGBA:
 				case GL_BGRA:
-
 					glDrawPixels(piglit_width, piglit_height,
 						     format, type, pixels);
 
