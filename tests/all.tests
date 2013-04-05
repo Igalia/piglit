@@ -2216,6 +2216,10 @@ amd_seamless_cubemap_per_texture = Group()
 spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture
 add_plain_test(amd_seamless_cubemap_per_texture, 'amd_seamless_cubemap_per_texture')
 
+amd_vertex_shader_layer = Group()
+spec['AMD_vertex_shader_layer'] = amd_vertex_shader_layer
+add_plain_test(amd_vertex_shader_layer, 'amd_vertex_shader_layer-layered-2d-texture-render')
+
 ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
