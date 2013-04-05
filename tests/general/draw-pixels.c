@@ -871,6 +871,10 @@ piglit_display(void)
 				}
 				free(pixels);
 				pixels = NULL;
+
+				if (!pass) {
+					piglit_present_results();
+				}
 			}
 		}
 	}
