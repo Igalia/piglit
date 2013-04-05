@@ -55,8 +55,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 16;
-	config.window_height = 16;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_ALPHA | PIGLIT_GL_VISUAL_DEPTH | PIGLIT_GL_VISUAL_STENCIL;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -719,6 +717,8 @@ piglit_display(void)
 	GLboolean pass = true;
 	GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
 	GLfloat red[4] = {1.0, 0.0, 0.0, 1.0};
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	for (i = 0; i < ARRAY_SIZE(data_types); i++) {
 		for (k = 0; k < ARRAY_SIZE(pixel_ops); k++) {
