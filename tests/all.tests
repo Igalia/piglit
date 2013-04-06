@@ -703,6 +703,9 @@ gl31 = Group()
 spec['!OpenGL 3.1'] = gl31
 gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
 gl31['minmax'] = concurrent_test('gl-3.1-minmax')
+for subtest in ['generated', 'written', 'flush']:
+        cmdline = 'primitive-restart-xfb {0}'.format(subtest)
+        gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
 
 # Group spec/glsl-es-1.00
 spec['glsl-es-1.00'] = Group()
