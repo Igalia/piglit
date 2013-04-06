@@ -897,6 +897,9 @@ for sample_count in MSAA_SAMPLE_COUNTS:
                 spec['ARB_texture_multisample/texelFetch/%d-%s-%s' % (
                     sample_count, stage, sampler)] = \
                     concurrent_test('texelFetch %s %s %d' % (stage, sampler, sample_count))
+    # sample positions
+    spec['ARB_texture_multisample/sample-position/%d' % (sample_count,)] = \
+        concurrent_test('arb_texture_multisample-sample-position %d' % (sample_count,))
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-texstate')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-errors')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask')
