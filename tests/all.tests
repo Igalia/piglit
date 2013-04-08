@@ -2246,6 +2246,11 @@ add_single_param_test_set(
     "DISABLE_VBO",
     "VBO_VERTEX_ONLY", "VBO_INDEX_ONLY",
     "VBO_SEPARATE_VERTEX_AND_INDEX", "VBO_COMBINED_VERTEX_AND_INDEX")
+add_single_param_test_set(
+        nv_primitive_restart,
+        'primitive-restart-draw-mode',
+        'points', 'lines', 'line_loop', 'line_strip', 'triangles',
+        'triangle_strip', 'triangle_fan', 'quads', 'quad_strip', 'polygon')
 
 ext_provoking_vertex = Group()
 spec['EXT_provoking_vertex'] = ext_provoking_vertex
