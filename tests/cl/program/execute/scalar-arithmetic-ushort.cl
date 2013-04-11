@@ -87,28 +87,28 @@ arg_in:  2 ushort 4
 arg_out: 0 buffer ushort[1] 0
 
 [test]
-name: pos%pos=pos
+name: pos mod pos=pos
 kernel_name: mod
 arg_in:  1 ushort 8
 arg_in:  2 ushort 5
 arg_out: 0 buffer ushort[1] 3
 
 [test]
-name: small_pos%big_pos
+name: small_pos mod big_pos
 kernel_name: mod
 arg_in:  1 ushort 5
 arg_in:  2 ushort 32001
 arg_out: 0 buffer ushort[1] 5
 
 [test]
-name: max_ushort%num
+name: max_ushort mod num
 kernel_name: mod
 arg_in:  1 ushort 65535
 arg_in:  2 ushort 334
 arg_out: 0 buffer ushort[1] 71
 
 [test]
-name: min_ushort%num
+name: min_ushort mod num
 kernel_name: mod
 arg_in:  1 ushort 0
 arg_in:  2 ushort 3453

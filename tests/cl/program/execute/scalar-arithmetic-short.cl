@@ -171,63 +171,63 @@ arg_out: 0 buffer short[1] 0
 ## Modulo ##
 
 [test]
-name: pos%pos=0
+name: pos mod pos=0
 kernel_name: mod
 arg_in:  1 short 8
 arg_in:  2 short 4
 arg_out: 0 buffer short[1] 0
 
 [test]
-name: pos%pos=pos
+name: pos mod pos=pos
 kernel_name: mod
 arg_in:  1 short 8
 arg_in:  2 short 5
 arg_out: 0 buffer short[1] 3
 
 [test]
-name: neg%pos=0
+name: neg mod pos=0
 kernel_name: mod
 arg_in:  1 short -30
 arg_in:  2 short 15
 arg_out: 0 buffer short[1] 0
 
 [test]
-name: neg%pos=neg
+name: neg mod pos=neg
 kernel_name: mod
 arg_in:  1 short -18
 arg_in:  2 short 5
 arg_out: 0 buffer short[1] -3
 
 [test]
-name: pos%neg=0
+name: pos mod neg=0
 kernel_name: mod
 arg_in:  1 short 12
 arg_in:  2 short -4
 arg_out: 0 buffer short[1] 0
 
 [test]
-name: pos%neg=pos
+name: pos mod neg=pos
 kernel_name: mod
 arg_in:  1 short 16
 arg_in:  2 short -3
 arg_out: 0 buffer short[1] 1
 
 [test]
-name: small_pos%big_pos
+name: small_pos mod big_pos
 kernel_name: mod
 arg_in:  1 short 5
 arg_in:  2 short 345
 arg_out: 0 buffer short[1] 5
 
 [test]
-name: max_short%num
+name: max_short mod num
 kernel_name: mod
 arg_in:  1 short 32767
 arg_in:  2 short 1234
 arg_out: 0 buffer short[1] 683
 
 [test]
-name: min_short%num
+name: min_short mod num
 kernel_name: mod
 arg_in:  1 short -32768
 arg_in:  2 short 475
