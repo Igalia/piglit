@@ -543,7 +543,8 @@ class TestProfile:
 		def matches_any_regexp(x, re_list):
 			return True in map(lambda r: r.search(x) != None, re_list)
 
-		def test_matches((path, test)):
+		def test_matches(item):
+			path, test = item
 			return ((not env.filter or matches_any_regexp(path, env.filter)) and
 			        not path in env.exclude_tests and
 			        not matches_any_regexp(path, env.exclude_filter))
