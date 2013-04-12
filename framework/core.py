@@ -395,7 +395,11 @@ class Environment:
 	def run(self, command):
 		try:
 			p = subprocess.Popen(
-				command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				command,
+				stdout=subprocess.PIPE,
+				stderr=subprocess.PIPE,
+				universal_newlines=True
+			)
 			(stdout, stderr) = p.communicate()
 		except:
 			return "Failed to run " + command
