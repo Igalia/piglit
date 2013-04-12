@@ -188,7 +188,7 @@ def checkDir(dirname, failifexists):
 	exists = True
 	try:
 		os.stat(dirname)
-	except OSError, e:
+	except OSError as e:
 		if e.errno == errno.ENOENT or e.errno == errno.ENOTDIR:
 			exists = False
 
@@ -198,7 +198,7 @@ def checkDir(dirname, failifexists):
 
 	try:
 		os.makedirs(dirname)
-	except OSError, e:
+	except OSError as e:
 		if e.errno != errno.EEXIST:
 			raise
 

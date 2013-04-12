@@ -307,9 +307,9 @@ class Test(BaseTest):
         try:
             try:
                 return self.test(report)
-            except Failure, ex:
+            except Failure as ex:
                 report.addFailure(*ex.args)
-            except Error, ex:
+            except Error as ex:
                 report.addError(*ex.args)
             except KeyboardInterrupt:
                 raise
