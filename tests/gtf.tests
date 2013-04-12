@@ -48,11 +48,11 @@ class GTFTest(ExecTest):
         ExecTest.__init__(self, [path.join(testBinDir, 'GTF'), '-width=113', '-height=47', '-seed=2', '-minfmt', '-run=' + testpath])
 
     def interpretResult(self, out, returncode, results):
-	if self.pass_re.search(out) is not None:
-		results['result'] = 'pass'
-	else:
-		results['result'] = 'fail'
-	return out
+        if self.pass_re.search(out) is not None:
+            results['result'] = 'pass'
+        else:
+            results['result'] = 'fail'
+        return out
 
 # Populate a group with tests in the given directory:
 #

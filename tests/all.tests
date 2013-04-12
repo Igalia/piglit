@@ -1488,7 +1488,7 @@ for num_samples in MSAA_SAMPLE_COUNTS:
 
 for num_samples in MSAA_SAMPLE_COUNTS:
         for test_mode in ('inverted', 'non-inverted'):
-	        test_name = ' '.join(['sample-coverage', str(num_samples), test_mode])
+                test_name = ' '.join(['sample-coverage', str(num_samples), test_mode])
                 executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                         test_name)
                 ext_framebuffer_multisample[test_name] = PlainExecTest(executable)

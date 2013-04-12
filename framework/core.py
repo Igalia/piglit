@@ -282,23 +282,23 @@ class TestrunResult:
 		'''
 		Reapair JSON file if necessary
 
-                If the JSON file is not closed properly, perhaps due a system
-                crash during a test run, then the JSON is repaired by
-                discarding the trailing, incomplete item and appending braces
-                to the file to close the JSON object.
+		If the JSON file is not closed properly, perhaps due a system
+		crash during a test run, then the JSON is repaired by
+		discarding the trailing, incomplete item and appending braces
+		to the file to close the JSON object.
 
-                The repair is performed on a string buffer, and the given file
-                is never written to. This allows the file to be safely read
-                during a test run.
+		The repair is performed on a string buffer, and the given file
+		is never written to. This allows the file to be safely read
+		during a test run.
 
-                :return: If no repair occured, then ``file`` is returned.
-                    Otherwise, a new file object containing the repaired JSON
-                    is returned.
+		:return: If no repair occured, then ``file`` is returned.
+			Otherwise, a new file object containing the repaired JSON
+			is returned.
 		'''
 
-                saved_position = file.tell()
+		saved_position = file.tell()
 		lines = file.readlines()
-                file.seek(saved_position)
+		file.seek(saved_position)
 
 		if lines[-1] == '}':
 			# JSON object was closed properly. No repair is
@@ -338,12 +338,12 @@ class TestrunResult:
 		lines.append(JSONWriter.INDENT * ' ' + '}\n')
 		lines.append('}')
 
-                # Return new file object containing the repaired JSON.
-                new_file = StringIO()
-                new_file.writelines(lines)
-                new_file.flush()
-                new_file.seek(0)
-                return new_file
+		# Return new file object containing the repaired JSON.
+		new_file = StringIO()
+		new_file.writelines(lines)
+		new_file.flush()
+		new_file.seek(0)
+		return new_file
 
 	def write(self, file):
 		# Serialize only the keys in serialized_keys.
