@@ -20,6 +20,7 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import errno
 import os
 import subprocess
 import shlex
@@ -196,7 +197,7 @@ class ExecTest(Test):
 			# a developer chooses to not build a test,
 			# Piglit should not report that test as having
 			# failed.
-			if e.strerror == "No such file or directory":
+			if e.errno == errno.ENOENT:
 				out = "PIGLIT: {'result': 'skip'}\n" \
 				    + "Test executable not found.\n"
 				err = ""
