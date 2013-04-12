@@ -224,7 +224,7 @@ class PlainExecTest(ExecTest):
 			try:
 				for piglit in outpiglit:
 					if piglit.startswith('subtest'):
-						if not results.has_key('subtest'):
+						if not 'subtest' in results:
 							results['subtest'] = {}
 						results['subtest'].update(eval(piglit[7:]))
 					else:

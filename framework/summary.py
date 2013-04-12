@@ -162,7 +162,7 @@ results is an array of GroupResult instances, one per testrun
 					# result 1:
 					#	test/group PASS
 					for r in self.results:
-						if r.has_key(name) and not isinstance(r[name], core.GroupResult):
+						if name in r and not isinstance(r[name], core.GroupResult):
 							self.createDummyGroup(r, name)
 
 					childresults = [r.get(name, core.GroupResult())
@@ -185,11 +185,11 @@ results is an array of GroupResult instances, one per testrun
 					#	test/group/c PASS
 					need_group = 0
 					for r in self.results:
-						if r.has_key(name) and not isinstance(r[name], core.TestResult):
+						if name in r and not isinstance(r[name], core.TestResult):
 							need_group = 1
 					if need_group:
 						for r in self.results:
-							if r.has_key(name) and isinstance(r[name], core.TestResult):
+							if name in r and isinstance(r[name], core.TestResult):
 								self.createDummyGroup(r, name)
 						childresults = [r.get(name, core.GroupResult())
 								for r in self.results]
