@@ -405,7 +405,7 @@ class Environment:
 		result = {}
 		system = platform.system()
 		if (system == 'Windows' or
-		    string.find(system, "CYGWIN_NT") == 0):
+		    system.find("CYGWIN_NT") == 0):
 			result['wglinfo'] = self.run('wglinfo')
 		else:
 			result['glxinfo'] = self.run('glxinfo')
