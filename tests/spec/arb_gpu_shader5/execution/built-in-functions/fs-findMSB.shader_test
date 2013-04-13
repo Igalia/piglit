@@ -1,0 +1,91 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 color;
+
+uniform bool signed;
+uniform ivec4 msb;
+uniform ivec4 iinput;
+uniform uvec4 uinput;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (signed && msb != findMSB(iinput))
+		/* Red if findMSB(ivec4) fails. */
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (!signed && msb != findMSB(uinput))
+		/* Blue if findMSB(uvec4) fails. */
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+# For a value of zero or negative one, -1 will be returned.
+uniform int signed 1
+uniform ivec4 msb -1 -1 -1 -1
+uniform ivec4 iinput 0 -1 -1 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform ivec4 msb -1 -1 -1 -1
+uniform uvec4 uinput 0 0 0 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Signed inputs
+uniform int signed 1
+
+uniform ivec4 msb 0 1 1 2
+uniform ivec4 iinput 1 2 3 4
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 30 29 28 27
+uniform ivec4 iinput 2147483647 1073741823 536870911 268435455
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Most significant bit in negative signed integers is actually a zero.
+uniform ivec4 msb 0 1 2 3
+uniform ivec4 iinput -2 -3 -5 -9
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 30 30 29 28
+uniform ivec4 iinput -2147483648 -1879048192 -1073741824 -536870912
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Unsigned inputs
+uniform int signed 0
+
+uniform ivec4 msb 0 1 1 2
+uniform uvec4 uinput 1 2 3 4
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 msb 31 30 29 28
+uniform uvec4 uinput 0xFFFFFFFF 0x7FFFFFFF 0x3FFFFFFF 0x1FFFFFFF
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
