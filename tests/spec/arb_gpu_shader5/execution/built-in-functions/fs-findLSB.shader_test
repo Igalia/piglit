@@ -1,0 +1,71 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 color;
+
+uniform ivec4 lsb;
+uniform ivec4 iinput;
+uniform uvec4 uinput;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (lsb != findLSB(iinput))
+		/* Red if findLSB(ivec4) fails. */
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (lsb != findLSB(uinput))
+		/* Blue if findLSB(uvec4) fails. */
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+# If value is zero, -1 will be returned.
+uniform ivec4 lsb -1 -1 -1 -1
+uniform ivec4 iinput 0 0 0 0
+uniform uvec4 uinput 0 0 0 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 lsb 0 1 0 2
+uniform ivec4 iinput 1 2 3 4
+uniform uvec4 uinput 1 2 3 4
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 lsb 10 9 8 7
+uniform ivec4 iinput 1024 512 256 128
+uniform uvec4 uinput 1024 512 256 128
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 lsb 0 1 0 2
+uniform ivec4 iinput -1 -2 -3 -4
+uniform uvec4 uinput 0xFFFFFFFF 0xFFFFFFFE 0xFFFFFFFD 0xFFFFFFFC
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 lsb 31 30 29 28
+uniform ivec4 iinput -2147483648 1073741824 536870912 268435456
+uniform uvec4 uinput 0x80000000 0x40000000 0x20000000 0x10000000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
