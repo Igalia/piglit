@@ -264,10 +264,10 @@ def getValue(type, val):
                 getValue(type, val[3]), getValue(type, val[4]))
 
     #At this point, we should have been passed a number
-    if (isinstance(val, int)):
+    if (isinstance(val, (int, long))):
         return val;
 
-    print('Invalid value '+val+' encountered in getValue\n')
+    print('Invalid value '+repr(val)+' encountered in getValue\n')
 
 def getStrVal(type, val):
     return str(getValue(type,val))
