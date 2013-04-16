@@ -1,0 +1,109 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 color;
+
+uniform bool signed;
+
+uniform ivec4 iinsert;
+uniform ivec4 ibase;
+uniform ivec4 iresult;
+uniform uvec4 uinsert;
+uniform uvec4 ubase;
+uniform uvec4 uresult;
+
+uniform int offset, bits;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (signed && iresult != bitfieldInsert(ibase, iinsert, offset, bits))
+		/* Red if bitfieldInsert(ivec4, ...) fails. */
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (!signed && uresult != bitfieldInsert(ubase, uinsert, offset, bits))
+		/* Blue if bitfieldInsert(uvec4, ...) fails. */
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+# Corner case: bits == 0 -> result == base
+uniform int bits 0
+uniform int offset 0
+
+uniform int signed 1
+uniform ivec4 iinsert 2147483647 15 7 3
+uniform ivec4 ibase 42 56 72 97
+uniform ivec4 iresult 42 56 72 97
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform uvec4 uinsert 0xFFFFFFFF 15 7 3
+uniform uvec4 ubase 42 56 72 97
+uniform uvec4 uresult 42 56 72 97
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test overwriting set bits in <base>.
+uniform int bits 4
+uniform int offset 16
+
+uniform int signed 1
+uniform ivec4 iinsert 9 4 1 0
+# 983055 is 0x000F000F
+uniform ivec4 ibase 983055 983055 983055 983055
+# 589839 is 0x0009000F.
+# 262159 is 0x0004000F.
+#  65551 is 0x0001000F.
+uniform ivec4 iresult 589839 262159 65551 15
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform uvec4 uinsert 0x9 0x4 0x1 0x0
+uniform uvec4 ubase 0x000F000F 0x000F000F 0x000F000F 0x000F000F
+uniform uvec4 uresult 0x0009000F 0x0004000F 0x0001000F 0x0000000F
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+## Test various cases.
+uniform int bits 4
+uniform int offset 16
+
+uniform int signed 1
+uniform ivec4 iinsert 14 9 4 1
+uniform ivec4 ibase 15 15 15 15
+# 917519 is 0x000E000F.
+# 589839 is 0x0009000F.
+# 262159 is 0x0004000F.
+#  65551 is 0x0001000F.
+uniform ivec4 iresult 917519 589839 262159 65551
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform uvec4 uinsert 0xE 0x9 0x4 0x1
+uniform uvec4 ubase 0xF 0xF 0xF 0xF
+uniform uvec4 uresult 0x000E000F 0x0009000F 0x0004000F 0x0001000F
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
