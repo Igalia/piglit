@@ -31,9 +31,6 @@
 /**
  * A bitmask of these enums specifies visual attributes for the test's window.
  *
- * Each enum has the same value of its corresponding GLUT enum. That is, for
- * each X, `PIGLIT_GL_VISUAL_X == GLUT_X`.
- *
  * \see piglit_gl_test_config::window_visual
  */
 enum piglit_gl_visual {
