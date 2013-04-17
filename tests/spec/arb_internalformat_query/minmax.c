@@ -103,7 +103,7 @@ try(GLenum target, GLenum format, GLint max_samples,
 {
 	bool pass = true;
 	GLint *buffer;
-	int buffer_size_in_elements;
+	int buffer_size_in_elements = 0;
 	size_t buffer_size_in_bytes;
 	unsigned i;
 	GLint previous;
