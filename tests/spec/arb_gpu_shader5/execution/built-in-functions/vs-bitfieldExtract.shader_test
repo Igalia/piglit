@@ -1,0 +1,113 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in vec4 vertex;
+out vec4 color;
+
+uniform bool signed;
+
+uniform ivec4 iextract;
+uniform ivec4 iinput;
+uniform uvec4 uextract;
+uniform uvec4 uinput;
+
+uniform int offset, bits;
+
+void main() {
+	gl_Position = vertex;
+
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (signed && iextract != bitfieldExtract(iinput, offset, bits))
+		/* Red if bitfieldExtract(ivec4, ...) fails. */
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (!signed && uextract != bitfieldExtract(uinput, offset, bits))
+		/* Blue if bitfieldExtract(uvec4, ...) fails. */
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+	frag_color = color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+# Corner case: bits == 0 -> result == 0
+uniform int bits 0
+uniform int offset 0
+
+uniform int signed 1
+uniform ivec4 iextract 0 0 0 0
+uniform ivec4 iinput 2147483647 15 7 3
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform uvec4 uextract 0 0 0 0
+uniform uvec4 uinput 0xFFFFFFFF 15 7 3
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test that the most significant bits of the result get the sign extension of
+# the bits extracted from <value>.
+uniform int bits 1
+uniform int offset 0
+
+# Extract a single signed "1"-bit and sign-extend it, yielding 0xFFFFFFFF (-1).
+uniform int signed 1
+uniform ivec4 iextract -1 -1 -1 -1
+uniform ivec4 iinput 1 1 1 1
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Extract a single unsigned "1"-bit and sign-extend it, yielding 0x00000001 (1).
+uniform int signed 0
+uniform uvec4 uextract 1 1 1 1
+uniform uvec4 uinput 1 1 1 1
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Extract two signed bits (01) and sign-extend it, yielding 0x00000001 (1).
+# Extract two signed bits (11) and sign-extend it, yielding 0xFFFFFFFF (1).
+uniform int bits 2
+uniform int signed 1
+uniform ivec4 iextract 1 -1 -1 1
+uniform ivec4 iinput 1 3 3 1
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+# Test some other various values.
+uniform int bits 4
+uniform int offset 16
+
+uniform int signed 1
+uniform ivec4 iextract -1 0 1 3
+# 983040 is 0x000F0000.
+#  61440 is 0x0000F000.
+# 114688 is 0x0001C000.
+# 229376 is 0x00038000.
+uniform ivec4 iinput 983040 61440 114688 229376
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform int signed 0
+uniform uvec4 uextract 0xF  0x0 0x1 0x3
+uniform uvec4 uinput 0x000F0000 0x0000F000 0x0001C000 0x00038000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
