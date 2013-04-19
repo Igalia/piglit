@@ -1,0 +1,73 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in vec4 vertex;
+out vec4 color;
+
+uniform ivec4 ireverse;
+uniform ivec4 iinput;
+uniform uvec4 ureverse;
+uniform uvec4 uinput;
+
+void main() {
+	gl_Position = vertex;
+
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (ireverse != bitfieldReverse(iinput))
+		/* Red if bitfieldReverse(ivec4) fails. */
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+	else if (ureverse != bitfieldReverse(uinput))
+		/* Blue if bitfieldReverse(uvec4) fails. */
+		color = vec4(0.0, 0.0, 1.0, 1.0);
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+	frag_color = color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform ivec4 iinput 0 -1 -1 0
+uniform ivec4 ireverse 0 -1 -1 0
+uniform uvec4 uinput 0 0xFFFFFFFF 0xFFFFFFFF 0
+uniform uvec4 ureverse 0 0xFFFFFFFF 0xFFFFFFFF 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 iinput 1 2 4 8
+uniform ivec4 ireverse -2147483648 1073741824 536870912 268435456
+uniform uvec4 uinput 1 2 4 8
+uniform uvec4 ureverse 0x80000000 0x40000000 0x20000000 0x10000000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 iinput -2147483648 1073741824 536870912 268435456
+uniform ivec4 ireverse 1 2 4 8
+uniform uvec4 uinput 0x80000000 0x40000000 0x20000000 0x10000000
+uniform uvec4 ureverse 1 2 4 8
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 iinput -255852544 -268435456 32768 25165824
+uniform ivec4 ireverse 783 15 65536 384
+uniform uvec4 uinput 783 15 0x00010000 0x01800000
+uniform uvec4 ureverse 0xF0C00000 0xF0000000 0x00008000 0x00000180
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
