@@ -30,8 +30,7 @@
 
 
 from getopt import getopt, GetoptError
-import cgi
-import os, os.path
+import os.path
 import sys
 import string
 
