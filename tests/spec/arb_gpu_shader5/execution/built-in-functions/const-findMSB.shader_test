@@ -1,0 +1,58 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+void bad_constant_folding();
+
+out vec4 color;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (ivec4(-1) != findMSB(ivec4(0, -1, -1, 0)))
+		bad_constant_folding();
+
+	if (ivec4(-1) != findMSB(uvec4(0u)))
+		bad_constant_folding();
+
+	if (ivec4(0, 1, 1, 2) != findMSB(ivec4(1, 2, 3, 4)))
+		bad_constant_folding();
+
+	if (ivec4(30, 29, 28, 27) != findMSB(ivec4(2147483647, 1073741823, 536870911, 268435455)))
+		bad_constant_folding();
+
+	if (ivec4(0, 1, 2, 3) != findMSB(ivec4(-2, -3, -5, -9)))
+		bad_constant_folding();
+
+	if (ivec4(30, 30, 29, 28) != findMSB(ivec4(-2147483648, -1879048192, -1073741824, -536870912)))
+		bad_constant_folding();
+
+	if (ivec4(0, 1, 1, 2) != findMSB(uvec4(1u, 2u, 3u, 4u)))
+		bad_constant_folding();
+
+	if (ivec4(31, 30, 29, 28) != findMSB(uvec4(0xFFFFFFFFu, 0x7FFFFFFFu, 0x3FFFFFFFu, 0x1FFFFFFFu)))
+		bad_constant_folding();
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
