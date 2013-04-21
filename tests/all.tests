@@ -1085,6 +1085,12 @@ for backing_type in ('texture', 'renderbuffer'):
                                         'arb_framebuffer_srgb-' + test_name)
 add_plain_test(arb_framebuffer_srgb, 'framebuffer-srgb')
 
+arb_gpu_shader5 = Group()
+spec['ARB_gpu_shader5'] = arb_gpu_shader5
+add_shader_test_dir(arb_gpu_shader5,
+                    testsDir + '/spec/arb_gpu_shader5',
+                    recursive=True)
+
 arb_occlusion_query = Group()
 spec['ARB_occlusion_query'] = arb_occlusion_query
 add_concurrent_test(arb_occlusion_query, 'occlusion_query')
