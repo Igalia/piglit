@@ -34,23 +34,23 @@ import framework.core as core
 ##### Main program
 #############################################################################
 def main():
-	parser = argparse.ArgumentParser()
-	parser.add_argument("results",
-						metavar = "<First Results File>",
-						nargs   = "*",
-			            help    = "Space seperated list of results files")
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("results",
+                                            metavar = "<First Results File>",
+                                            nargs   = "*",
+                                help    = "Space seperated list of results files")
+    args = parser.parse_args()
 
-	combined = core.loadTestResults(args.results.pop(0))
+    combined = core.loadTestResults(args.results.pop(0))
 
-	for resultsDir in args.results:
-		results = core.loadTestResults(resultsDir)
+    for resultsDir in args.results:
+        results = core.loadTestResults(resultsDir)
 
-		for testname, result in results.tests.items():
-			combined.tests[testname] = result
+        for testname, result in results.tests.items():
+            combined.tests[testname] = result
 
-	combined.write(sys.stdout)
+    combined.write(sys.stdout)
 
 
 if __name__ == "__main__":
-	main()
+    main()

@@ -30,26 +30,26 @@ from exectest import ExecTest
 ##### GleanTest: Execute a sub-test of Glean
 #############################################################################
 def gleanExecutable():
-	return testBinDir + 'glean'
+    return testBinDir + 'glean'
 
 class GleanTest(ExecTest):
-	globalParams = []
+    globalParams = []
 
-	def __init__(self, name):
-		ExecTest.__init__(self, \
-			[gleanExecutable(),
-			"-o",
-			"-v", "-v", "-v",
-			"-t", "+"+name])
-		self.name = name
+    def __init__(self, name):
+        ExecTest.__init__(self, \
+                [gleanExecutable(),
+                "-o",
+                "-v", "-v", "-v",
+                "-t", "+"+name])
+        self.name = name
 
-	def run(self, valgrind):
-                self.command += GleanTest.globalParams
-                return ExecTest.run(self, valgrind)
+    def run(self, valgrind):
+        self.command += GleanTest.globalParams
+        return ExecTest.run(self, valgrind)
 
-	def interpretResult(self, out, returncode, results):
-		if out.find('FAIL') >= 0:
-			results['result'] = 'fail'
-		else:
-			results['result'] = 'pass'
-		return out
+    def interpretResult(self, out, returncode, results):
+        if out.find('FAIL') >= 0:
+            results['result'] = 'fail'
+        else:
+            results['result'] = 'pass'
+        return out

@@ -39,62 +39,62 @@ from framework.gleantest import GleanTest
 #############################################################################
 
 def main():
-	parser = argparse.ArgumentParser(sys.argv)
+    parser = argparse.ArgumentParser(sys.argv)
 
-	parser.add_argument("-t", "--include-tests",
-			default = [],
-			action  = "append",
-			metavar = "<regex>",
-			help    = "Run only matching tests (can be used more than once)")
-	parser.add_argument("--tests",
-			default = [],
-			action  = "append",
-			metavar = "<regex>",
-			help    = "Run only matching tests (can be used more than once)" \
-					  "Deprecated")
-	parser.add_argument("-x", "--exclude-tests",
-			default = [],
-			action  = "append",
-			metavar = "<regex>",
-			help    = "Exclude matching tests (can be used more than once)")
-	parser.add_argument("testProfile",
-			metavar = "<Path to testfile>",
-			help    = "Path to results folder")
+    parser.add_argument("-t", "--include-tests",
+                    default = [],
+                    action  = "append",
+                    metavar = "<regex>",
+                    help    = "Run only matching tests (can be used more than once)")
+    parser.add_argument("--tests",
+                    default = [],
+                    action  = "append",
+                    metavar = "<regex>",
+                    help    = "Run only matching tests (can be used more than once)" \
+                                      "Deprecated")
+    parser.add_argument("-x", "--exclude-tests",
+                    default = [],
+                    action  = "append",
+                    metavar = "<regex>",
+                    help    = "Exclude matching tests (can be used more than once)")
+    parser.add_argument("testProfile",
+                    metavar = "<Path to testfile>",
+                    help    = "Path to results folder")
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	# Deprecated
-	# --include-tests is the standard going forward, but for backwards
-	# compatability merge args.tests into args.include_tests and drop
-	# duplicates
-	if args.tests != []:
-		print "Warnings: Option --tests is deprecated, use --include-tests"
-		args.include_tests = list(set(args.include_tests + args.tests))
-	
-	# Set the environment, pass in the included and excluded tests
-	env = core.Environment(
-			exclude_filter=args.exclude_tests,
-			include_filter=args.include_tests,
-			)
+    # Deprecated
+    # --include-tests is the standard going forward, but for backwards
+    # compatability merge args.tests into args.include_tests and drop
+    # duplicates
+    if args.tests != []:
+        print "Warnings: Option --tests is deprecated, use --include-tests"
+        args.include_tests = list(set(args.include_tests + args.tests))
 
-	# Change to the piglit's path
-	piglit_dir = path.dirname(path.realpath(sys.argv[0]))
-	os.chdir(piglit_dir)
+    # Set the environment, pass in the included and excluded tests
+    env = core.Environment(
+                    exclude_filter=args.exclude_tests,
+                    include_filter=args.include_tests,
+                    )
 
-	profile = core.loadTestProfile(args.testProfile)
+    # Change to the piglit's path
+    piglit_dir = path.dirname(path.realpath(sys.argv[0]))
+    os.chdir(piglit_dir)
 
-	def getCommand(test):
-		command = ''
-		if isinstance(test, GleanTest):
-			for var, val in test.env.items():
-				command += var + "='" + val + "' "
-		command += ' '.join(test.command)
-		return command
+    profile = core.loadTestProfile(args.testProfile)
 
-	profile.prepare_test_list(env)
-	for name, test in profile.test_list.items():
-		assert(isinstance(test, ExecTest))
-		print name, ':::', getCommand(test)
+    def getCommand(test):
+        command = ''
+        if isinstance(test, GleanTest):
+            for var, val in test.env.items():
+                command += var + "='" + val + "' "
+        command += ' '.join(test.command)
+        return command
+
+    profile.prepare_test_list(env)
+    for name, test in profile.test_list.items():
+        assert(isinstance(test, ExecTest))
+        print name, ':::', getCommand(test)
 
 if __name__ == "__main__":
-	main()
+    main()

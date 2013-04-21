@@ -28,32 +28,32 @@ from weakref import WeakKeyDictionary
 import multiprocessing
 
 def synchronized_self(function):
-	'''
-		A decorator function for providing multithreaded, synchronized access
-		amongst one or more functions within a class instance.
-	'''
-	def wrapper(self, *args, **kwargs):
-		synchronized_self.locks.setdefault(self, RLock()).acquire()
-		try:
-			return function(self, *args, **kwargs)
-		finally:
-			synchronized_self.locks[self].release()
-	return wrapper
+    '''
+            A decorator function for providing multithreaded, synchronized access
+            amongst one or more functions within a class instance.
+    '''
+    def wrapper(self, *args, **kwargs):
+        synchronized_self.locks.setdefault(self, RLock()).acquire()
+        try:
+            return function(self, *args, **kwargs)
+        finally:
+            synchronized_self.locks[self].release()
+    return wrapper
 
 synchronized_self.locks = WeakKeyDictionary() # track the locks for each instance
 
 class ConcurrentTestPool(Singleton):
-	@synchronized_self
-	def init(self):
-		self.pool = ThreadPool(multiprocessing.cpu_count())
+    @synchronized_self
+    def init(self):
+        self.pool = ThreadPool(multiprocessing.cpu_count())
 
-	@synchronized_self
-	def put(self, callable_, args = None, kwds = None):
-		self.pool.putRequest(
-			WorkRequest(
-				callable_, args = args, kwds = kwds
-			)
-		)
+    @synchronized_self
+    def put(self, callable_, args = None, kwds = None):
+        self.pool.putRequest(
+                WorkRequest(
+                        callable_, args = args, kwds = kwds
+                )
+        )
 
-	def join(self):
-		self.pool.wait()
+    def join(self):
+        self.pool.wait()

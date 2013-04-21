@@ -24,64 +24,64 @@
 import threading
 
 class Singleton(object):
-	'''
-		Modeled after http://www.python.org/download/releases/2.2.3/descrintro/*__new__
+    '''
+            Modeled after http://www.python.org/download/releases/2.2.3/descrintro/*__new__
 
-		A thread-safe (mostly -- see NOTE) Singleton class pattern.
+            A thread-safe (mostly -- see NOTE) Singleton class pattern.
 
-		NOTE: deleting a singleton instance (i.e. Singleton::delInstance) does not guarantee that something
-		else is currently using it. To reduce this risk, a program should not hold a reference to the
-		instance.  Rather, use the create/construct syntax (see example below) to access the instance.  Yet,
-		this still does not guarantee that this type of usage will result in a desired effect in a
-		multithreaded program.
-		You've been warned so use the singleton pattern wisely!
+            NOTE: deleting a singleton instance (i.e. Singleton::delInstance) does not guarantee that something
+            else is currently using it. To reduce this risk, a program should not hold a reference to the
+            instance.  Rather, use the create/construct syntax (see example below) to access the instance.  Yet,
+            this still does not guarantee that this type of usage will result in a desired effect in a
+            multithreaded program.
+            You've been warned so use the singleton pattern wisely!
 
-		Example:
+            Example:
 
-		class MySingletonClass(Singleton):
-			def init(self):
-				print "in MySingletonClass::init()", self
+            class MySingletonClass(Singleton):
+                    def init(self):
+                            print "in MySingletonClass::init()", self
 
-			def foo(self):
-				print "in MySingletonClass::foo()", self
+                    def foo(self):
+                            print "in MySingletonClass::foo()", self
 
-		MySingletonClass().foo()
-		MySingletonClass().foo()
-		MySingletonClass().foo()
+            MySingletonClass().foo()
+            MySingletonClass().foo()
+            MySingletonClass().foo()
 
-		---> output will look something like this:
-		in MySingletonClass::init() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
-		in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
-		in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
-		in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
-	'''
+            ---> output will look something like this:
+            in MySingletonClass::init() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
+            in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
+            in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
+            in MySingletonClass::foo() <__main__.MySingletonClass object at 0x7ff5b322f3d0>
+    '''
 
-	lock = threading.RLock()
+    lock = threading.RLock()
 
-	def __new__(cls, *args, **kwargs):
-		try:
-			cls.lock.acquire()
-			it = cls.__dict__.get('__it__')
-			if it is not None:
-				return it
-			cls.__it__ = it = object.__new__(cls)
-			it.init(*args, **kwargs)
-			return it
-		finally: # this always gets called, even when returning from within the try block
-			cls.lock.release()
+    def __new__(cls, *args, **kwargs):
+        try:
+            cls.lock.acquire()
+            it = cls.__dict__.get('__it__')
+            if it is not None:
+                return it
+            cls.__it__ = it = object.__new__(cls)
+            it.init(*args, **kwargs)
+            return it
+        finally: # this always gets called, even when returning from within the try block
+            cls.lock.release()
 
-	def init(self, *args, **kwargs):
-		'''
-			Derived classes should override this method to do its initializations
-			The derived class should not implement a '__init__' method.
-		'''
-		pass
+    def init(self, *args, **kwargs):
+        '''
+                Derived classes should override this method to do its initializations
+                The derived class should not implement a '__init__' method.
+        '''
+        pass
 
-	@classmethod
-	def delInstance(cls):
-		cls.lock.acquire()
-		try:
-			if cls.__dict__.get('__it__') is not None:
-				del cls.__it__
-		finally:
-			cls.lock.release()
+    @classmethod
+    def delInstance(cls):
+        cls.lock.acquire()
+        try:
+            if cls.__dict__.get('__it__') is not None:
+                del cls.__it__
+        finally:
+            cls.lock.release()

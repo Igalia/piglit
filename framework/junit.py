@@ -362,4 +362,3 @@ class Main:
 
         suite = self.create_suite()
         self.run_suite(suite)
-

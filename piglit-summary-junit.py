@@ -36,98 +36,98 @@ from framework import junit
 
 class Writer:
 
-	def __init__(self, filename):
-		self.report = junit.Report(filename)
-		self.path = []
+    def __init__(self, filename):
+        self.report = junit.Report(filename)
+        self.path = []
 
-	def write(self, arg):
-		results = [framework.core.loadTestResults(arg)]
-		summary = framework.summary.Summary(results)
+    def write(self, arg):
+        results = [framework.core.loadTestResults(arg)]
+        summary = framework.summary.Summary(results)
 
-		self.report.start()
-		self.report.startSuite('piglit')
-		try:
-			for test in summary.allTests():
-				self.write_test(summary, test)
-		finally:
-			self.enter_path([])
-			self.report.stopSuite()
-			self.report.stop()
+        self.report.start()
+        self.report.startSuite('piglit')
+        try:
+            for test in summary.allTests():
+                self.write_test(summary, test)
+        finally:
+            self.enter_path([])
+            self.report.stopSuite()
+            self.report.stop()
 
-	def write_test(self, summary, test):
-		test_path = test.path.split('/')
-		test_name = test_path.pop()
-		self.enter_path(test_path)
+    def write_test(self, summary, test):
+        test_path = test.path.split('/')
+        test_name = test_path.pop()
+        self.enter_path(test_path)
 
-		assert len(summary.testruns) == 1
-		tr = summary.testruns[0]
-		result = test.results[0]
+        assert len(summary.testruns) == 1
+        tr = summary.testruns[0]
+        result = test.results[0]
 
-		self.report.startCase(test_name)
-		duration = None
-		try:
-			try:
-				self.report.addStdout(result['command'] + '\n')
-			except KeyError:
-				pass
+        self.report.startCase(test_name)
+        duration = None
+        try:
+            try:
+                self.report.addStdout(result['command'] + '\n')
+            except KeyError:
+                pass
 
-			try:
-				self.report.addStderr(result['info'])
-			except KeyError:
-				pass
+            try:
+                self.report.addStderr(result['info'])
+            except KeyError:
+                pass
 
-			success = result.get('result')
-			if success in ('pass', 'warn'):
-				pass
-			elif success == 'skip':
-				self.report.addSkipped()
-			else:
-				self.report.addFailure(success)
+            success = result.get('result')
+            if success in ('pass', 'warn'):
+                pass
+            elif success == 'skip':
+                self.report.addSkipped()
+            else:
+                self.report.addFailure(success)
 
-			try:
-				duration = float(result['time'])
-			except KeyError:
-				pass
-		finally:
-			self.report.stopCase(duration)
+            try:
+                duration = float(result['time'])
+            except KeyError:
+                pass
+        finally:
+            self.report.stopCase(duration)
 
-	def enter_path(self, path):
-		ancestor = 0
-		try:
-			while self.path[ancestor] == path[ancestor]:
-				ancestor += 1
-		except IndexError:
-			pass
+    def enter_path(self, path):
+        ancestor = 0
+        try:
+            while self.path[ancestor] == path[ancestor]:
+                ancestor += 1
+        except IndexError:
+            pass
 
-		for dirname in self.path[ancestor:]:
-			self.report.stopSuite()
+        for dirname in self.path[ancestor:]:
+            self.report.stopSuite()
 
-		for dirname in path[ancestor:]:
-			self.report.startSuite(dirname)
+        for dirname in path[ancestor:]:
+            self.report.startSuite(dirname)
 
-		self.path = path
+        self.path = path
 
 
 def main():
-	parser = argparse.ArgumentParser()
-	parser.add_argument("-o", "--output",
-						metavar = "<Output File>",
-						action  = "store",
-						dest    = "output",
-						default = "piglit.xml",
-						help    = "Output filename")
-	parser.add_argument("testResults",
-						metavar = "<Input Files>",
-						help    = "JSON results file to be converted")
-	args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--output",
+                                            metavar = "<Output File>",
+                                            action  = "store",
+                                            dest    = "output",
+                                            default = "piglit.xml",
+                                            help    = "Output filename")
+    parser.add_argument("testResults",
+                                            metavar = "<Input Files>",
+                                            help    = "JSON results file to be converted")
+    args = parser.parse_args()
 
 
-	writer = Writer(args.output)
-	writer.write(args.testResults)
+    writer = Writer(args.output)
+    writer.write(args.testResults)
 
 
 if __name__ == "__main__":
-	main()
+    main()
 
 
 # vim:set sw=4 ts=4 noet:

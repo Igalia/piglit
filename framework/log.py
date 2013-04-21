@@ -26,24 +26,24 @@ from patterns import Singleton
 import logging
 
 class Logger(Singleton):
-	@synchronized_self
-	def __logMessage(self, logfunc, message, **kwargs):
-		[logfunc(line, **kwargs) for line in message.split('\n')]
+    @synchronized_self
+    def __logMessage(self, logfunc, message, **kwargs):
+        [logfunc(line, **kwargs) for line in message.split('\n')]
 
-	@synchronized_self
-	def getLogger(self, channel = None):
-		if 0 == len(logging.root.handlers):
-			logging.basicConfig(
-				format = "[%(asctime)s] :: %(message)+8s :: %(name)s",
-				datefmt = "%c",
-				level = logging.INFO,
-			)
-		if channel is None:
-			channel = "base"
-		logger = logging.getLogger(channel)
-		return logger
+    @synchronized_self
+    def getLogger(self, channel = None):
+        if 0 == len(logging.root.handlers):
+            logging.basicConfig(
+                    format = "[%(asctime)s] :: %(message)+8s :: %(name)s",
+                    datefmt = "%c",
+                    level = logging.INFO,
+            )
+        if channel is None:
+            channel = "base"
+        logger = logging.getLogger(channel)
+        return logger
 
-	def log(self, type = logging.INFO, msg = "", channel = None):
-		self.__logMessage(lambda m, **kwargs: self.getLogger(channel).log(type, m, **kwargs), msg)
+    def log(self, type = logging.INFO, msg = "", channel = None):
+        self.__logMessage(lambda m, **kwargs: self.getLogger(channel).log(type, m, **kwargs), msg)
 
 log = Logger().log

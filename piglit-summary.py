@@ -43,7 +43,7 @@ import framework.summary
 ##### Main program
 #############################################################################
 def usage():
-	USAGE = """\
+    USAGE = """\
 Usage: %(progName)s [options] resultsfile [...]
 
 Print path/name of each test and the result.
@@ -62,102 +62,102 @@ Example list file:
    [ 'other.result' ]
  ]
 """
-	print USAGE % {'progName': sys.argv[0]}
-	sys.exit(1)
+    print USAGE % {'progName': sys.argv[0]}
+    sys.exit(1)
 
 
 def parse_listfile(filename):
-	file = open(filename, "r")
-	code = file.read()
-	file.close()
-	return eval(code)
+    file = open(filename, "r")
+    code = file.read()
+    file.close()
+    return eval(code)
 
 def loadresult(descr):
-	result = core.loadTestResults(descr[0])
-	if len(descr) > 1:
-		result.__dict__.update(descr[1])
-	return result
+    result = core.loadTestResults(descr[0])
+    if len(descr) > 1:
+        result.__dict__.update(descr[1])
+    return result
 
 def main():
-	try:
-		options, args = getopt(sys.argv[1:], "hsdl:", [ "help", "summary", "diff", "list" ])
-	except GetoptError:
-		usage()
+    try:
+        options, args = getopt(sys.argv[1:], "hsdl:", [ "help", "summary", "diff", "list" ])
+    except GetoptError:
+        usage()
 
-	OptionList = []
-	CountsOnly = False
-	DiffOnly = False
-	for name, value in options:
-		if name == "-h" or name == "--help":
-			usage()
-		elif name == "-s" or name == "--summary":
-			CountsOnly = True
-		elif name == "-d" or name == "--diff":
-			DiffOnly = True
-		elif name == "-l" or name == "--list":
-			OptionList += parse_listfile(value)
+    OptionList = []
+    CountsOnly = False
+    DiffOnly = False
+    for name, value in options:
+        if name == "-h" or name == "--help":
+            usage()
+        elif name == "-s" or name == "--summary":
+            CountsOnly = True
+        elif name == "-d" or name == "--diff":
+            DiffOnly = True
+        elif name == "-l" or name == "--list":
+            OptionList += parse_listfile(value)
 
-	OptionList += [[name] for name in args[0:]]
+    OptionList += [[name] for name in args[0:]]
 
-	if len(args) == 0 and len(OptionList) == 0:
-		usage()
+    if len(args) == 0 and len(OptionList) == 0:
+        usage()
 
-	# make list of results
-	results = []
-	for result_dir in OptionList:
-		results.append(loadresult(result_dir))
+    # make list of results
+    results = []
+    for result_dir in OptionList:
+        results.append(loadresult(result_dir))
 
-	summary = framework.summary.Summary(results)
+    summary = framework.summary.Summary(results)
 
-	# possible test outcomes
-	possible_results = [ "pass", "fail", "crash", "skip", "warn" ]
-	if len(OptionList) > 1:
-			possible_results.append("changes")
+    # possible test outcomes
+    possible_results = [ "pass", "fail", "crash", "skip", "warn" ]
+    if len(OptionList) > 1:
+        possible_results.append("changes")
 
-	# init the summary counters
-	counts = {}
-	for result in possible_results:
-			counts[result] = 0
+    # init the summary counters
+    counts = {}
+    for result in possible_results:
+        counts[result] = 0
 
-	# get all results
-	all = summary.allTests()
+    # get all results
+    all = summary.allTests()
 
-	# sort the results list by path
-	all = sorted(all, key=lambda test: test.path)
+    # sort the results list by path
+    all = sorted(all, key=lambda test: test.path)
 
-	# loop over the tests
-	for test in all:
-		results = []
-		anyChange = False
-		# loop over the results for multiple runs
-		for j in range(len(summary.testruns)):
-			outcome = test.results[j]['result'] # 'pass', 'fail', etc.
-			# check for different results between multiple runs
-			if len(results) >= 1 and not outcome in results:
-				# something changed
-				counts["changes"] += 1
-				anyChange = True
-			results.append(outcome)
+    # loop over the tests
+    for test in all:
+        results = []
+        anyChange = False
+        # loop over the results for multiple runs
+        for j in range(len(summary.testruns)):
+            outcome = test.results[j]['result'] # 'pass', 'fail', etc.
+            # check for different results between multiple runs
+            if len(results) >= 1 and not outcome in results:
+                # something changed
+                counts["changes"] += 1
+                anyChange = True
+            results.append(outcome)
 
-		# if all test runs had the same outcome:
-		if not anyChange:
-			counts[outcome] += 1
+        # if all test runs had the same outcome:
+        if not anyChange:
+            counts[outcome] += 1
 
-		# print the individual test result line
-		if DiffOnly:
-			if anyChange:
-				print "%s: %s" % (test.path, string.join(results," "))
-		elif not CountsOnly:
-			print "%s: %s" % (test.path, string.join(results," "))
+        # print the individual test result line
+        if DiffOnly:
+            if anyChange:
+                print "%s: %s" % (test.path, string.join(results," "))
+        elif not CountsOnly:
+            print "%s: %s" % (test.path, string.join(results," "))
 
-	# print the summary info
-	print "summary:"
-	total = 0
-	for result in possible_results:
-		print " %7s: %5d" % (result, counts[result])
-		total += counts[result]
-	print "   total: %5d" % total
+    # print the summary info
+    print "summary:"
+    total = 0
+    for result in possible_results:
+        print " %7s: %5d" % (result, counts[result])
+        total += counts[result]
+    print "   total: %5d" % total
 
 
 if __name__ == "__main__":
-	main()
+    main()

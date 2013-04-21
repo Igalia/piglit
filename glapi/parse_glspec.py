@@ -202,28 +202,28 @@ def translate_category(category_name):
 # which names are synonymous with which other names.
 class SynonymMap(object):
     def __init__(self):
-	# __name_to_synonyms maps from a function name to the set of
-	# all names that are synonymous with it (including itself).
-	self.__name_to_synonyms = {}
+        # __name_to_synonyms maps from a function name to the set of
+        # all names that are synonymous with it (including itself).
+        self.__name_to_synonyms = {}
 
     # Add a single function name which is not (yet) known to be
     # synonymous with any other name.  No effect if the function name
     # is already known.
     def add_singleton(self, name):
-	if name not in self.__name_to_synonyms:
-	    self.__name_to_synonyms[name] = frozenset([name])
-	return self.__name_to_synonyms[name]
+        if name not in self.__name_to_synonyms:
+            self.__name_to_synonyms[name] = frozenset([name])
+        return self.__name_to_synonyms[name]
 
     # Add a pair of function names, and note that they are synonymous.
     # Synonymity is transitive, so if either of the two function names
     # previously had known synonyms, all synonyms are combined into a
     # single set.
     def add_alias(self, name, alias):
-	name_ss = self.add_singleton(name)
-	alias_ss = self.add_singleton(alias)
-	combined_set = name_ss | alias_ss
-	for n in combined_set:
-	    self.__name_to_synonyms[n] = combined_set
+        name_ss = self.add_singleton(name)
+        alias_ss = self.add_singleton(alias)
+        combined_set = name_ss | alias_ss
+        for n in combined_set:
+            self.__name_to_synonyms[n] = combined_set
 
     # Get a set of sets of synonymous functions.
     def get_synonym_sets(self):
@@ -233,56 +233,56 @@ class SynonymMap(object):
 # In-memory representation of the GL API.
 class Api(object):
     def __init__(self):
-	# Api.type_translation is a dict mapping abstract type names
-	# to C types.  It is based on the data in the gl.tm file.  For
-	# example, the dict entry for String is:
-	#
-	# 'String': 'const GLubyte *'
+        # Api.type_translation is a dict mapping abstract type names
+        # to C types.  It is based on the data in the gl.tm file.  For
+        # example, the dict entry for String is:
+        #
+        # 'String': 'const GLubyte *'
         self.type_translation = {}
 
-	# Api.enums is a dict mapping enum names (without the 'GL_'
-	# prefix) to a dict containing (a) the enum value expressed as
-	# an integer, and (b) the enum value expressed as a C literal.
-	# It is based on the data in the gl.spec file.  For example,
-	# the dict entry for GL_CLIENT_ALL_ATTRIB_BITS is:
-	#
-	# 'CLIENT_ALL_ATTRIB_BITS': { 'value_int': 4294967295,
-	#                             'value_str': "0xFFFFFFFF" }
+        # Api.enums is a dict mapping enum names (without the 'GL_'
+        # prefix) to a dict containing (a) the enum value expressed as
+        # an integer, and (b) the enum value expressed as a C literal.
+        # It is based on the data in the gl.spec file.  For example,
+        # the dict entry for GL_CLIENT_ALL_ATTRIB_BITS is:
+        #
+        # 'CLIENT_ALL_ATTRIB_BITS': { 'value_int': 4294967295,
+        #                             'value_str': "0xFFFFFFFF" }
         self.enums = {}
 
-	# Api.functions is a dict mapping function names (without the
-	# 'gl' prefix) to a dict containing (a) the name of the
-	# category the function is in, (b) the function call parameter
-	# names, (c) the function call parameter types, and (d) the
-	# function return type.  It is based on the data in the
-	# gl.spec file, cross-referenced against the type translations
-	# from the gl.tm file.  For example, the dict entry for
-	# glAreTexturesResident is:
-	#
-	# 'AreTexturesResident': {
-	#    'category': '1.1',
-	#    'param_names': ['n', 'textures', 'residences'],
-	#    'param_types': ['GLsizei', 'const GLuint *', 'GLboolean *'],
-	#    'return_type': ['GLboolean'] }
+        # Api.functions is a dict mapping function names (without the
+        # 'gl' prefix) to a dict containing (a) the name of the
+        # category the function is in, (b) the function call parameter
+        # names, (c) the function call parameter types, and (d) the
+        # function return type.  It is based on the data in the
+        # gl.spec file, cross-referenced against the type translations
+        # from the gl.tm file.  For example, the dict entry for
+        # glAreTexturesResident is:
+        #
+        # 'AreTexturesResident': {
+        #    'category': '1.1',
+        #    'param_names': ['n', 'textures', 'residences'],
+        #    'param_types': ['GLsizei', 'const GLuint *', 'GLboolean *'],
+        #    'return_type': ['GLboolean'] }
         self.functions = {}
 
-	# Api.synonyms is a SynonymMap object which records which
-	# function names are aliases of each other.  It is based on
-	# the "alias" declarations from the gl.spec file.
+        # Api.synonyms is a SynonymMap object which records which
+        # function names are aliases of each other.  It is based on
+        # the "alias" declarations from the gl.spec file.
         self.synonyms = SynonymMap()
 
-	# Api.categories is a dict mapping category names to a dict
-	# describing the category.  For categories representing a GL
-	# version, the dict entry looks like this:
-	#
-	# '2.1': { 'kind': 'GL', 'gl_10x_version': 21 }
-	#
-	# For categories representing an extension, the dict entry
-	# looks like this:
-	#
-	# 'GL_ARB_sync': { 'kind': 'extension',
-	#                  'extension_name': 'GL_ARB_sync' }
-	self.categories = {}
+        # Api.categories is a dict mapping category names to a dict
+        # describing the category.  For categories representing a GL
+        # version, the dict entry looks like this:
+        #
+        # '2.1': { 'kind': 'GL', 'gl_10x_version': 21 }
+        #
+        # For categories representing an extension, the dict entry
+        # looks like this:
+        #
+        # 'GL_ARB_sync': { 'kind': 'extension',
+        #                  'extension_name': 'GL_ARB_sync' }
+        self.categories = {}
 
     # Convert each line in the gl.tm file into a key/value pair in
     # self.type_translation, mapping an abstract type name to a C
@@ -391,11 +391,11 @@ class Api(object):
                             'Function {0!r} parameter {1!r} uses unrecognized '
                             'direction {2!r}'.format(
                                 name, param_name, param_dir))
-		else:
-		    raise Exception(
-			'Function {0!r} parameter {1!r} uses unrecognized '
-			'multiplicity {2!r}'.format(
-			    name, param_name, param_multiplicity))
+                else:
+                    raise Exception(
+                        'Function {0!r} parameter {1!r} uses unrecognized '
+                        'multiplicity {2!r}'.format(
+                            name, param_name, param_multiplicity))
                 param_types[param_index] = param_type
             if len(attributes['return']) != 1:
                 raise Exception(
@@ -413,7 +413,7 @@ class Api(object):
                 'return_type': self.type_translation[attributes['return'][0]],
                 'param_names': param_names,
                 'param_types': param_types,
-		'category': category,
+                'category': category,
                 }
             self.synonyms.add_singleton(name)
             for alias in attributes['alias']:
@@ -466,4 +466,4 @@ if __name__ == '__main__':
     with open(sys.argv[3]) as f:
         api.read_enumext_spec(f)
     with open(sys.argv[4], 'w') as f:
-	f.write(api.to_json())
+        f.write(api.to_json())
