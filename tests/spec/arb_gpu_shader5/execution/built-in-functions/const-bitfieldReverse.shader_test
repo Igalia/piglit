@@ -1,0 +1,54 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+void bad_constant_folding();
+
+out vec4 color;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (ivec4(0, -1, -1, 0) != bitfieldReverse(ivec4(0, -1, -1, 0)))
+		bad_constant_folding();
+	else if (uvec4(0u, 0xFFFFFFFFu, 0xFFFFFFFFu, 0u) != bitfieldReverse(uvec4(0u, 0xFFFFFFFFu, 0xFFFFFFFFu, 0u)))
+		bad_constant_folding();
+
+	if (ivec4(-2147483648, 1073741824, 536870912, 268435456) != bitfieldReverse(ivec4(1, 2, 4, 8)))
+		bad_constant_folding();
+	else if (uvec4(0x80000000u, 0x40000000u, 0x20000000u, 0x10000000u) != bitfieldReverse(uvec4(1u, 2u, 4u, 8u)))
+		bad_constant_folding();
+
+	if (ivec4(1, 2, 4, 8) != bitfieldReverse(ivec4(-2147483648, 1073741824, 536870912, 268435456)))
+		bad_constant_folding();
+	else if (uvec4(1u, 2u, 4u, 8u) != bitfieldReverse(uvec4(0x80000000u, 0x40000000u, 0x20000000u, 0x10000000u)))
+		bad_constant_folding();
+
+	if (ivec4(783, 15, 65536, 384) != bitfieldReverse(ivec4(-255852544, -268435456, 32768, 25165824)))
+		bad_constant_folding();
+	else if (uvec4(0xF0C00000u, 0xF0000000u, 0x00008000u, 0x00000180u) != bitfieldReverse(uvec4(783u, 15u, 0x00010000u, 0x01800000u)))
+		bad_constant_folding();
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
