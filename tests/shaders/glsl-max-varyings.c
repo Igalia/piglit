@@ -33,16 +33,16 @@
 
 #include "piglit-util-gl-common.h"
 
-#define MAX_VARYING 32
+#define MAX_VARYING 256
 
-/* 10x10 rectangles with 2 pixels of pad.  Deal with up to 32 varyings. */
+/* 2x2 rectangles with 2 pixels of pad.  Deal with up to 256 varyings. */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = (2+MAX_VARYING*12);
-	config.window_height = (2+MAX_VARYING*12);
+	config.window_width = (2+MAX_VARYING*4);
+	config.window_height = (2+MAX_VARYING*4);
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -57,7 +57,8 @@ static GLint get_vs(int num_varyings, int data_varying)
 {
 	GLuint shader;
 	unsigned i;
-	char code[2048], temp[2048];
+	char *code = malloc(4096);
+	char temp[2048];
 
 	code[0] = 0;
 	for (i = 0; i < num_varyings; i++) {
@@ -91,6 +92,7 @@ static GLint get_vs(int num_varyings, int data_varying)
 	shader = piglit_compile_shader_text(GL_VERTEX_SHADER, code);
 	/* printf("%s\n", code); */
 
+	free(code);
 	return shader;
 }
 
@@ -107,7 +109,8 @@ static GLint get_fs(int num_varyings, int data_varying)
 {
 	GLuint shader;
 	unsigned i;
-	char code[2048], temp[2048];
+	char *code = malloc(8192);
+	char temp[2048];
 
 	code[0] = 0;
 	for (i = 0; i < num_varyings; i++) {
@@ -141,13 +144,14 @@ static GLint get_fs(int num_varyings, int data_varying)
 	/* printf("%s\n", code); */
 	shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, code);
 
+	free(code);
 	return shader;
 }
 
 static int
 coord_from_index(int index)
 {
-	return 2 + 12 * index;
+	return 2 + 4 * index;
 }
 
 static bool
@@ -208,8 +212,8 @@ draw(int num_varyings)
 
 		piglit_draw_rect(coord_from_index(data_varying),
 				 coord_from_index(num_varyings - 1),
-				 10,
-				 10);
+				 2,
+				 2);
 
 		glDeleteShader(vs);
 		glDeleteShader(fs);
@@ -262,7 +266,7 @@ piglit_display(void)
 
 			ok = piglit_probe_rect_rgb(coord_from_index(col),
 						   coord_from_index(row),
-						   10, 10,
+						   2, 2,
 						   green);
 			if (!ok) {
 				printf("  Failure with %d vec4 varyings used "
