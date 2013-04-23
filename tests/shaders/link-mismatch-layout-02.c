@@ -43,7 +43,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char layout_greater[] =
 	"#extension GL_AMD_conservative_depth: require\n"
-	"layout(depth_greater) out float gl_FragDepth;\n"
+	"layout(depth_greater) float gl_FragDepth;\n"
 	"vec4 foo(void);\n"
 	"void main(void)\n"
 	"{\n"
@@ -52,7 +52,7 @@ static const char layout_greater[] =
 
 static const char layout_less[] =
 	"#extension GL_AMD_conservative_depth: require\n"
-	"layout(depth_less) out float gl_FragDepth;\n"
+	"layout(depth_less) float gl_FragDepth;\n"
 	"vec4 foo(void)\n"
 	"{\n"
 	"    return vec4(1.0);\n"
