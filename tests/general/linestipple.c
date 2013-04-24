@@ -38,15 +38,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static void
-probe_pixel(int x, int y, const float* expected)
-{
-	if (!piglit_probe_pixel_rgb(x, y, expected)) {
-		if (piglit_automatic)
-			piglit_report_result(PIGLIT_FAIL);
-	}
-}
-
 struct vertex {
 	GLuint x;
 	GLuint y;
@@ -70,12 +61,11 @@ static float background[3] = { 0, 0, 0 };
 /**
  * @note Only horizontal and vertical lines supported right now.
  */
-static GLuint
-probe_line(const struct stipple_line *line,
-	   const struct vertex *v1,
-	   const struct vertex *v2,
-	   GLuint fragment)
+static bool
+probe_line(const struct stipple_line *line, int v1i, int v2i, GLuint *fragment)
 {
+	const struct vertex *v1 = &line->vertices[v1i];
+	const struct vertex *v2 = &line->vertices[v2i];
 	int x = v1->x;
 	int y = v1->y;
 	int length, dx = 0, dy = 0;
@@ -95,22 +85,28 @@ probe_line(const struct stipple_line *line,
 	}
 
 	while (length) {
-		GLuint s = (fragment/line->factor) & 15;
+		GLuint s = ((*fragment) / line->factor) & 15;
+		const float *color;
+
 		if (line->pattern & (1 << s))
-			probe_pixel(basex + x, basey + y, line->color);
+			color = line->color;
 		else
-			probe_pixel(basex + x, basey + y, background);
+			color = background;
+
+		if (!piglit_probe_pixel_rgb(basex + x, basex + y, color)) {
+			return false;
+		}
 
 		length--;
-		fragment++;
+		(*fragment)++;
 		x += dx;
 		y += dy;
 	}
 
-	return fragment;
+	return true;
 }
 
-static void
+static bool
 test_line(const struct stipple_line *line)
 {
 	GLuint i;
@@ -125,20 +121,23 @@ test_line(const struct stipple_line *line)
 	glReadBuffer(GL_BACK);
 	if (line->primitive == GL_LINES) {
 		for (i = 0; i + 1 < line->nvertices; i += 2) {
-			probe_line(line, &line->vertices[i],
-				   &line->vertices[i+1], 0);
+			GLuint fragment = 0;
+			if (!probe_line(line, i, i + 1, &fragment))
+				return false;
 		}
 	} else {
 		GLuint fragment = 0;
 		for (i = 0; i + 1 < line->nvertices; ++i) {
-			fragment = probe_line(line, &line->vertices[i],
-					      &line->vertices[i+1], fragment);
+			if (!probe_line(line, i, i + 1, &fragment))
+				return false;
 		}
 		if (line->primitive == GL_LINE_LOOP) {
-			probe_line(line, &line->vertices[i],
-				   &line->vertices[0], fragment);
+			if (!probe_line(line, i, 0, &fragment))
+				return false;
 		}
 	}
+
+	return true;
 }
 
 static struct vertex BaselineVertices[] = { { 0, 0 },
@@ -170,7 +169,7 @@ static struct stipple_line Lines[] = {
 		BaselineVertices
 	},
 	{ /* Restarting lines within a single Begin/End block */
-		"Restarting lines within a single Begin/End block",
+		"Restarting lines within a single Begin-End block",
 		1, 0x00ff, { 1.0, 0.0, 0.0 },
 		GL_LINES, 4,
 		RestartVertices
@@ -201,9 +200,13 @@ static struct stipple_line Lines[] = {
 	}
 };
 
-static void test(void)
+enum piglit_result
+piglit_display(void)
 {
 	int i;
+	bool pass = true;
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -214,22 +217,19 @@ static void test(void)
 	glTranslatef(basex, basey, 0.0);
 
 	for (i = 0; i < ARRAY_SIZE(Lines); ++i) {
-		puts(Lines[i].name);
-		test_line(&Lines[i]);
+		printf("Testing %s:\n", Lines[i].name);
+		if (test_line(&Lines[i])) {
+			piglit_report_subtest_result(PIGLIT_PASS, Lines[i].name);
+		} else {
+			piglit_report_subtest_result(PIGLIT_FAIL, Lines[i].name);
+			pass = false;
+		}
 	}
 	glPopMatrix();
 
 	piglit_present_results();
-}
 
-
-enum piglit_result
-piglit_display(void)
-{
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
-	test();
-
-	return PIGLIT_PASS;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
