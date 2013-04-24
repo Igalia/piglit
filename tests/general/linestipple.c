@@ -38,7 +38,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static void probe_pixel(int x, int y, const float* expected)
+static void
+probe_pixel(int x, int y, const float* expected)
 {
 	if (!piglit_probe_pixel_rgb(x, y, expected)) {
 		if (piglit_automatic)
@@ -69,7 +70,11 @@ static float background[3] = { 0, 0, 0 };
 /**
  * @note Only horizontal and vertical lines supported right now.
  */
-static GLuint probe_line(const struct stipple_line *line, const struct vertex *v1, const struct vertex *v2, GLuint fragment)
+static GLuint
+probe_line(const struct stipple_line *line,
+	   const struct vertex *v1,
+	   const struct vertex *v2,
+	   GLuint fragment)
 {
 	int x = v1->x;
 	int y = v1->y;
@@ -89,12 +94,12 @@ static GLuint probe_line(const struct stipple_line *line, const struct vertex *v
 		length = (v2->y - v1->y)*dy;
 	}
 
-	while(length) {
+	while (length) {
 		GLuint s = (fragment/line->factor) & 15;
 		if (line->pattern & (1 << s))
-			probe_pixel(basex+x, basey+y, line->color);
+			probe_pixel(basex + x, basey + y, line->color);
 		else
-			probe_pixel(basex+x, basey+y, background);
+			probe_pixel(basex + x, basey + y, background);
 
 		length--;
 		fragment++;
@@ -105,36 +110,58 @@ static GLuint probe_line(const struct stipple_line *line, const struct vertex *v
 	return fragment;
 }
 
-static void test_line(const struct stipple_line *line)
+static void
+test_line(const struct stipple_line *line)
 {
 	GLuint i;
 
 	glLineStipple(line->factor, line->pattern);
 	glColor3f(line->color[0], line->color[1], line->color[2]);
 	glBegin(line->primitive);
-	for(i = 0; i < line->nvertices; ++i)
+	for (i = 0; i < line->nvertices; ++i)
 		glVertex2f(line->vertices[i].x + 0.5, line->vertices[i].y + 0.5);
 	glEnd();
 
 	glReadBuffer(GL_BACK);
 	if (line->primitive == GL_LINES) {
-		for(i = 0; i+1 < line->nvertices; i += 2)
-			probe_line(line, &line->vertices[i], &line->vertices[i+1], 0);
+		for (i = 0; i + 1 < line->nvertices; i += 2) {
+			probe_line(line, &line->vertices[i],
+				   &line->vertices[i+1], 0);
+		}
 	} else {
 		GLuint fragment = 0;
-		for(i = 0; i+1 < line->nvertices; ++i)
-			fragment = probe_line(line, &line->vertices[i], &line->vertices[i+1], fragment);
-		if (line->primitive == GL_LINE_LOOP)
-			probe_line(line, &line->vertices[i], &line->vertices[0], fragment);
+		for (i = 0; i + 1 < line->nvertices; ++i) {
+			fragment = probe_line(line, &line->vertices[i],
+					      &line->vertices[i+1], fragment);
+		}
+		if (line->primitive == GL_LINE_LOOP) {
+			probe_line(line, &line->vertices[i],
+				   &line->vertices[0], fragment);
+		}
 	}
 }
 
-static struct vertex BaselineVertices[] = { { 0, 0 }, { 24, 0 } };
-static struct vertex RestartVertices[] = { { 0, 2 }, { 24, 2 }, { 0, 4 }, { 24, 4 } };
-static struct vertex LinestripVertices[] = { { 0, 6 }, { 24, 6 }, { 24, 30 } };
-static struct vertex LineloopVertices[] = { { 26, 0 }, { 46, 0 }, { 46, 20 }, { 26, 20 } };
-static struct vertex Factor2Vertices[] = { { 0, 32 }, { 32, 32 }, { 32, 33 }, { 0, 33 } };
-static struct vertex Factor3Vertices[] = { { 0, 35 }, { 63, 35 }, { 63, 36 }, { 0, 36 } };
+static struct vertex BaselineVertices[] = { { 0, 0 },
+					    { 24, 0 } };
+static struct vertex RestartVertices[] = { { 0, 2 },
+					   { 24, 2 },
+					   { 0, 4 },
+					   { 24, 4 } };
+static struct vertex LinestripVertices[] = { { 0, 6 },
+					     { 24, 6 },
+					     { 24, 30 } };
+static struct vertex LineloopVertices[] = { { 26, 0 },
+					    { 46, 0 },
+					    { 46, 20 },
+					    { 26, 20 } };
+static struct vertex Factor2Vertices[] = { { 0, 32 },
+					   { 32, 32 },
+					   { 32, 33 },
+					   { 0, 33 } };
+static struct vertex Factor3Vertices[] = { { 0, 35 },
+					   { 63, 35 },
+					   { 63, 36 },
+					   { 0, 36 } };
 static struct stipple_line Lines[] = {
 	{ /* Baseline */
 		"Baseline",
@@ -186,7 +213,7 @@ static void test(void)
 	glPushMatrix();
 	glTranslatef(basex, basey, 0.0);
 
-	for(i = 0; i < sizeof(Lines)/sizeof(Lines[0]); ++i) {
+	for (i = 0; i < ARRAY_SIZE(Lines); ++i) {
 		puts(Lines[i].name);
 		test_line(&Lines[i]);
 	}
@@ -205,6 +232,7 @@ piglit_display(void)
 	return PIGLIT_PASS;
 }
 
-void piglit_init(int argc, char **argv)
+void
+piglit_init(int argc, char **argv)
 {
 }
