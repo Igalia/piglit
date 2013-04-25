@@ -59,7 +59,6 @@ struct test {
 	void (*func)(void);
 };
 
-extern bool piglit_use_fbo;
 static uint32_t junk_storage[1024];
 static void *junk = junk_storage;
 static const int onei = 1;
@@ -68,6 +67,7 @@ static GLuint some_dlist;
 static GLuint newlist_dlist;
 static GLuint deletelists_dlist;
 static GLuint fbo_attachment;
+static GLint fbo_binding;
 
 #define TEST_FUNC(name, args)			\
 	static void test_##name(void)		\
@@ -909,7 +909,12 @@ piglit_init(int argc, char **argv)
 	glNewList(some_dlist, GL_COMPILE);
 	glEndList();
 
-	if (piglit_use_fbo)
+	if (piglit_is_extension_supported("GL_ARB_framebuffer_object"))
+		glGetIntegerv(GL_FRAMEBUFFER_BINDING, &fbo_binding);
+	else
+		fbo_binding = 0;
+
+	if (fbo_binding)
 		fbo_attachment = GL_COLOR_ATTACHMENT0;
 	else
 		fbo_attachment = GL_FRONT;
