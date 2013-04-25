@@ -570,6 +570,7 @@ add_concurrent_test(gl11, 'getteximage-targets 2D')
 gl10 = Group()
 spec['!OpenGL 1.0'] = gl10
 add_concurrent_test(gl10, 'gl-1.0-beginend-coverage')
+add_concurrent_test(gl10, 'gl-1.0-dlist-shademodel')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag-quads')
 
