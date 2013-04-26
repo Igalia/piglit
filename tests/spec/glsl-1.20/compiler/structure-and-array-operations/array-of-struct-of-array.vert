@@ -23,5 +23,5 @@ struct s {
 void main()
 {
   s a[2];
-  gl_Position = vec4(a.length() + a.x.length());
+  gl_Position = vec4(a.length() + a[0].x.length());
 }
