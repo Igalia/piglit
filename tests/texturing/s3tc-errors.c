@@ -343,6 +343,104 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 
 
 static bool
+test_small_mipmap_level(void)
+{
+	bool pass;
+	GLuint tex;
+	GLubyte buf[100];
+	int width, height;
+	int format = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+
+	memset(buf, 0, sizeof(buf));
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	/* test sizes 1x1, 1x2, 2x1, .. 2x4, 4x4 */
+	for (width = 1; width <= 4; width *= 2) {
+		for (height = 1; height <= 4; height *= 2) {
+			/* Initial image */
+			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height,
+				     0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+			pass = piglit_check_gl_error(GL_NO_ERROR);
+
+			/* Try TexSubImage of whole texture */
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+					GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+			pass = piglit_check_gl_error(GL_NO_ERROR);
+		}
+	}
+
+	glDeleteTextures(1, &tex);
+
+	return pass;
+}
+
+
+static bool
+test_non_power_of_two(void)
+{
+	bool pass = true;
+
+	if (piglit_is_extension_supported("GL_ARB_texture_non_power_of_two")) {
+		GLuint tex;
+		GLubyte buf[800];
+		int width = 11, height = 14;
+		int format = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+
+		memset(buf, 0, sizeof(buf));
+
+		/* Setup initial texture */
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		/* Try TexSubImage of partial block on right edge */
+		glTexSubImage2D(GL_TEXTURE_2D, 0,
+				width-3, 0,  /* position */
+				3, 4,        /* size */
+				GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		/* Try TexSubImage of partial block on top edge */
+		glTexSubImage2D(GL_TEXTURE_2D, 0,
+				0, height-2,  /* position */
+				4, 2,         /* size */
+				GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		/* Try TexSubImage of larger partial block on right edge */
+		glTexSubImage2D(GL_TEXTURE_2D, 0,
+				width-3-4, 0,  /* position */
+				3+4, 4,        /* size */
+				GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		/* Try TexSubImage of larger partial block on top edge */
+		glTexSubImage2D(GL_TEXTURE_2D, 0,
+				0, height-2-4,  /* position */
+				4, 2+4,         /* size */
+				GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+		glDeleteTextures(1, &tex);
+
+	}
+
+	return pass;
+}
+
+
+static bool
 test_formats(void)
 {
 	const int num_formats = ARRAY_SIZE(s3tc_formats);
@@ -371,7 +469,11 @@ test_formats(void)
 enum piglit_result
 piglit_display(void)
 {
-	return test_formats() ? PIGLIT_PASS : PIGLIT_FAIL;
+	bool pass = test_formats();
+	pass = test_small_mipmap_level() && pass;
+	pass = test_non_power_of_two() && pass;
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
