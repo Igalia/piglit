@@ -51,8 +51,10 @@ static const float black[4] = {0.0, 0.0, 0.0, 0.0};
 static const float red[4] = {1.0, 0.0, 0.0, 0.0};
 static const float green[4] = {0.0, 1.0, 0.0, 0.0};
 static const float yellow[4] = {1.0, 1.0, 0.0, 0.0};
-static const float gray25[4] = {0.25, 0.25, 0.0, 0.0};
-static const float gray75[4] = {0.75, 0.75, 0.0, 0.0};
+static const float gray25_l[4] = {0.25, 0.25, 0.0, 0.0};
+static const float gray25_r[4] = {0.25, 0.25, 1.0, 0.0};
+static const float gray75_l[4] = {0.75, 0.75, 0.5, 0.0};
+static const float gray75_r[4] = {0.75, 0.75, 1.0, 0.0};
 
 static int test = 0;
 
@@ -111,7 +113,7 @@ piglit_display(void)
          "void main(void) \n"
          "{ \n"
          "   gl_FragColor = fract(gl_FragCoord) + 0.25; \n"
-         "   gl_FragColor.z = 0.0; \n"
+         "   gl_FragColor.z = (gl_FragCoord.x + gl_FragCoord.y) * 0.5; \n"
          "} \n";
 
       printf("Pixel center half integer\n");
@@ -125,10 +127,10 @@ piglit_display(void)
       piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
-      pass = piglit_probe_pixel_rgb(0, 0, gray75) && pass;
+      pass = piglit_probe_pixel_rgb(0, 0, gray75_l) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray75) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray75_r) && pass;
    }
 
    /* Pixel center integer */
@@ -140,7 +142,7 @@ piglit_display(void)
          "void main(void) \n"
          "{ \n"
          "   gl_FragColor = fract(gl_FragCoord) + 0.25; \n"
-         "   gl_FragColor.z = 0.0; \n"
+         "   gl_FragColor.z = (gl_FragCoord.x + gl_FragCoord.y) * 0.5; \n"
          "} \n";
 
       printf("Pixel center integer\n");
@@ -154,10 +156,10 @@ piglit_display(void)
       piglit_draw_rect(0, 0, WIDTH, HEIGHT);
 
       /* lower-left corner */
-      pass = piglit_probe_pixel_rgb(0, 0, gray25) && pass;
+      pass = piglit_probe_pixel_rgb(0, 0, gray25_l) && pass;
 
       /* upper-right corner */
-      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray25) && pass;
+      pass = piglit_probe_pixel_rgb(WIDTH - 1, HEIGHT - 1, gray25_r) && pass;
    }
 
    /* Pixel origin upper left */
