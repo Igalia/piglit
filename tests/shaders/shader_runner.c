@@ -1217,7 +1217,7 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 			}
 		}
 	} else {
-		printf("unknown uniform type \"%s\" for \"%s\"", type, name);
+		printf("unknown uniform type \"%s\" for \"%s\"\n", type, name);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
@@ -1367,7 +1367,7 @@ set_uniform(const char *line)
 	}
 
 	strcpy_to_space(name, type);
-	printf("unknown uniform type \"%s\"", name);
+	printf("unknown uniform type \"%s\"\n", name);
 	piglit_report_result(PIGLIT_FAIL);
 
 	return;
@@ -1435,7 +1435,7 @@ do_enable_disable(const char *line, bool enable_flag)
 		}
 	}
 
-	printf("unknown enable/disable enum \"%s\"", name);
+	printf("unknown enable/disable enum \"%s\"\n", name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -1488,7 +1488,7 @@ decode_drawing_mode(const char *mode_str)
 			return i;
 	}
 
-	printf("unknown drawing mode \"%s\"", mode_str);
+	printf("unknown drawing mode \"%s\"\n", mode_str);
 	piglit_report_result(PIGLIT_FAIL);
 
 	/* Should not be reached, but return 0 to avoid compiler warning */
@@ -1680,7 +1680,7 @@ piglit_display(void)
 				  "clip plane %d %lf %lf %lf %lf",
 				  &x, &d[0], &d[1], &d[2], &d[3])) {
 			if (x < 0 || x >= GL_MAX_CLIP_PLANES) {
-				printf("clip plane id %d out of range", x);
+				printf("clip plane id %d out of range\n", x);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			glClipPlane(GL_CLIP_PLANE0 + x, d);
@@ -1899,7 +1899,7 @@ piglit_display(void)
 			program_must_be_in_use();
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
-			printf("unknown command \"%s\"", line);
+			printf("unknown command \"%s\"\n", line);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 
