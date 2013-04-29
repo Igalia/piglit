@@ -8,7 +8,7 @@ table {
 }
 
 col:not(:first-child) {
-	width: 50pt;
+	width: 70pt;
 }
 
 tr {
