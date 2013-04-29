@@ -23,10 +23,12 @@
 import core
 
 
-#############################################################################
-##### Vector indicating the number of subtests that have passed/failed/etc.
-#############################################################################
 class PassVector:
+    """
+    Vector indicting the number of tests that have a particular status,
+    pass/fail/skip/etc.
+    """
+
     def __init__(self, p, w, f, s, c):
         self.passnr = p
         self.warnnr = w
@@ -42,11 +44,10 @@ class PassVector:
         self.crashnr += o.crashnr
 
 
-#############################################################################
-##### TestSummary: Summarize the results for one test across a
-##### number of testruns
-#############################################################################
 class TestSummary:
+    """
+    Summarize the results for one test across a number of testruns
+    """
     def isRegression(self, statiList):
         # Regression is:
         # - if an item is neither 'pass' nor 'skip'
@@ -102,10 +103,11 @@ results is an array of TestResult instances, one per testrun
     def allTests(self):
         return [self]
 
-#############################################################################
-##### GroupSummary: Summarize a group of tests
-#############################################################################
+
 class GroupSummary:
+    """
+    Summarize a group of tests
+    """
     def createDummyGroup(self, result, test_name):
         new_group = core.GroupResult()
         new_group[' ' + test_name + '(All Tests)'] = result[test_name]
@@ -225,10 +227,11 @@ Returns an array of all child TestSummary instances.
 """
         return [t for name in self.children for t in self.children[name].allTests()]
 
-#############################################################################
-##### Summary: Summarize an array of testruns
-#############################################################################
+
 class Summary:
+    """
+    Summarize an array of testruns
+    """
     def __init__(self, testruns):
         """\
 testruns is an array of TestrunResult instances
