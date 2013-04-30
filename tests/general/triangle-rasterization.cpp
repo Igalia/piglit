@@ -90,6 +90,18 @@ bool break_on_fail = false;
 bool print_triangle = false;
 int random_test_count = 100;
 
+/* filling convention */
+static enum filling_convention_t {
+	bottom_left = 0,
+	left_bottom,
+	right_bottom,
+	bottom_right,
+	top_right,
+	right_top,
+	left_top,
+	top_left,
+} filling_convention;
+
 /* Fixed point format */
 const int FIXED_SHIFT = 4;
 const int FIXED_ONE = 1 << FIXED_SHIFT;
@@ -192,9 +204,9 @@ void rast_triangle(uint8_t* buffer, uint32_t stride, const Triangle& tri)
 
 	/* Bounding rectangle */
 	int minx = std::min(x1, x2, x3) >> FIXED_SHIFT;
-	int maxx = (std::max(x1, x2, x3) - 1) >> FIXED_SHIFT;
+	int maxx = (std::max(x1, x2, x3)) >> FIXED_SHIFT;
 
-	int miny = (std::min(y1, y2, y3) + 1) >> FIXED_SHIFT;
+	int miny = (std::min(y1, y2, y3)) >> FIXED_SHIFT;
 	int maxy = std::max(y1, y2, y3) >> FIXED_SHIFT;
 
 	minx = std::max(minx, 0);
@@ -208,10 +220,49 @@ void rast_triangle(uint8_t* buffer, uint32_t stride, const Triangle& tri)
 	int c2 = dy23 * x2 - dx23 * y2;
 	int c3 = dy31 * x3 - dx31 * y3;
 
-	/* Correct for fill convention */
-	if (dy12 < 0 || (dy12 == 0 && dx12 > 0)) c1++;
-	if (dy23 < 0 || (dy23 == 0 && dx23 > 0)) c2++;
-	if (dy31 < 0 || (dy31 == 0 && dx31 > 0)) c3++;
+	/* Correct for filling convention */
+	switch (filling_convention) {
+		case bottom_right:
+			if (dy12 > 0 || (dy12 == 0 && dx12 > 0)) c1++;
+			if (dy23 > 0 || (dy23 == 0 && dx23 > 0)) c2++;
+			if (dy31 > 0 || (dy31 == 0 && dx31 > 0)) c3++;
+			break;
+		case right_bottom:
+			if (dx12 < 0 || (dx12 == 0 && dy12 < 0)) c1++;
+			if (dx23 < 0 || (dx23 == 0 && dy23 < 0)) c2++;
+			if (dx31 < 0 || (dx31 == 0 && dy31 < 0)) c3++;
+			break;
+		case left_bottom:
+			if (dx12 < 0 || (dx12 == 0 && dy12 > 0)) c1++;
+			if (dx23 < 0 || (dx23 == 0 && dy23 > 0)) c2++;
+			if (dx31 < 0 || (dx31 == 0 && dy31 > 0)) c3++;
+			break;
+		case bottom_left:
+			if (dy12 < 0 || (dy12 == 0 && dx12 > 0)) c1++;
+			if (dy23 < 0 || (dy23 == 0 && dx23 > 0)) c2++;
+			if (dy31 < 0 || (dy31 == 0 && dx31 > 0)) c3++;
+			break;
+		case top_left:
+			if (dy12 < 0 || (dy12 == 0 && dx12 < 0)) c1++;
+			if (dy23 < 0 || (dy23 == 0 && dx23 < 0)) c2++;
+			if (dy31 < 0 || (dy31 == 0 && dx31 < 0)) c3++;
+			break;
+		case left_top:
+			if (dx12 > 0 || (dx12 == 0 && dy12 > 0)) c1++;
+			if (dx23 > 0 || (dx23 == 0 && dy23 > 0)) c2++;
+			if (dx31 > 0 || (dx31 == 0 && dy31 > 0)) c3++;
+			break;
+		case right_top:
+			if (dx12 > 0 || (dx12 == 0 && dy12 < 0)) c1++;
+			if (dx23 > 0 || (dx23 == 0 && dy23 < 0)) c2++;
+			if (dx31 > 0 || (dx31 == 0 && dy31 < 0)) c3++;
+			break;
+		case top_right:
+			if (dy12 > 0 || (dy12 == 0 && dx12 < 0)) c1++;
+			if (dy23 > 0 || (dy23 == 0 && dx23 < 0)) c2++;
+			if (dy31 > 0 || (dy31 == 0 && dx31 < 0)) c3++;
+			break;
+	}
 
 	int cy1 = c1 + dx12 * (miny << FIXED_SHIFT) - dy12 * (minx << FIXED_SHIFT);
 	int cy2 = c2 + dx23 * (miny << FIXED_SHIFT) - dy23 * (minx << FIXED_SHIFT);
@@ -368,6 +419,102 @@ void random_triangle(Triangle& tri)
 }
 
 
+/* From the OpenGL 1.4 spec page 78 (page 91 of PDF):
+ * "Special treatment is given to a fragment whose center lies on a polygon
+ * boundary edge. In such a case we require that if two polygons lie on either
+ * side of a common edge (with identical endpoints) on which a fragment center
+ * lies, then exactly one of the polygons results in the production of the
+ * fragment during rasterization."
+ * Additionally rasterization is required to be invariant under translation
+ * along either axis by a multiple of the pixel size (page 63/76).
+ *
+ * We assume that the implementation adheres to a more stringent convention in
+ * which either top, left, bottom or right edges of a triangles 'belong' to it,
+ * that is, if one of those edges intersects with a fragment center, the
+ * fragment is produced. Additionally, for 'top' and 'bottom'-type triangles
+ * either left or right vertical edges 'belong' to it. Similarily the same is
+ * true with horizontal edges and 'left' and 'right'-type triangles.
+ *
+ * For example: consider these 8 triangles centered around a fragment center:
+ *   _____
+ *  |\2|1/|
+ *  |3\|/0|
+ *  |-- --|
+ *  |4/|\7|
+ *  |/5|6\|
+ *
+ * The rasterizer should produce exactly one fragment. If triangle no. 0
+ * produces the fragment, the rasterizer is said to follow the bottom-left
+ * convention (bottom because bottom horizontal edges 'belong' to the triangle
+ * and left because all left facing edges 'belong' to it).
+ *
+ * This function determines the convention by drawing the 8 triangles shown
+ * above in sub-pixel-size into 8 seperate pixels and checks which
+ * pixel is filled.
+ */
+void get_filling_convention(void)
+{
+	Triangle tests[8];
+
+	const float mid = 0.5f;
+	const float size  = 3.0f / FIXED_ONE;
+
+	const Vector v[] = {
+		Vector(mid + size, mid),
+		Vector(mid + size, mid + size),
+		Vector(mid, mid + size),
+		Vector(mid - size, mid + size),
+		Vector(mid - size, mid),
+		Vector(mid - size, mid - size),
+		Vector(mid, mid - size),
+		Vector(mid + size, mid - size),
+		Vector(mid + size, mid),
+	};
+	const Vector vm(mid, mid);
+
+	for (int i = 0; i < 8; ++i) {
+		tests[i][0] = v[i];
+		tests[i][1] = v[i+1];
+		tests[i][2] = vm;
+	}
+
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	piglit_ortho_projection(1, 1, GL_FALSE);
+
+	assert(piglit_width >= 8);
+	for (int i = 0; i < 8; ++i) {
+		glViewport(i, 0, 1, 1);
+
+		/* Draw OpenGL triangle */
+		glVertexPointer(2, GL_FLOAT, 0, tests[i].v);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glViewport(0, 0, fbo_width, fbo_height);
+	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
+
+	uint32_t buffer[8];
+	glReadPixels(0, 0, 8, 1, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer);
+
+	int produced_fragment_count = 0;
+	for (int i = 0; i < 8; ++i) {
+		if ((buffer[i] & 0xFFFFFF00) == 0xFFFFFF00) {
+			filling_convention = (filling_convention_t)i;
+			produced_fragment_count++;
+		}
+	}
+
+	if (produced_fragment_count != 1) {
+		printf("Unable to determine filling convention.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+
 /* Render */
 enum piglit_result
 piglit_display(void)
@@ -399,6 +546,8 @@ piglit_display(void)
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+
+	get_filling_convention();
 
 	/* Set render state */
 	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
