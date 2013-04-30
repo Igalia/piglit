@@ -707,7 +707,7 @@ class NewSummary:
         copy("templates/result.css", path.join(destination, "result.css"))
 
         # Create the mako object for creating the test/index.html file
-        testindex = Template(filename="templates/test_index.mako",
+        testindex = Template(filename="templates/testrun_info.mako",
                              output_encoding="utf-8",
                              module_directory=".makotmp")
 
