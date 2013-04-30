@@ -268,7 +268,7 @@ def sanitizePath(path):
     """
     Helper function to remove illegal characters from the names
     """
-    return filter(lambda s: s.isalnum() or s == '_', path.repalce('/', '__')) \
+    return filter(lambda s: s.isalnum() or s == '_', path.replace('/', '__')) \
            + '.html'
 
 
@@ -765,6 +765,5 @@ class NewSummary:
             file = open(path.join(destination, page + '.html'), 'w')
             file.write(index.render(results=HTMLIndex(self, page),
                                     page=page,
-                                    colnum=len(self.results),
-                                    exclude=exclude))
+                                    colnum=len(self.results)))
             file.close()
