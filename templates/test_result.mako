@@ -11,7 +11,6 @@
     <h1>Results for ${testname}</h1>
     <h2>Overview</h2>
     <div>
-      <p><b>Status:</b> ${status}</p>
       <p><b>Result:</b> ${status}</p>
     </div>
     <p><a href="${index}">Back to summary</a></p>
