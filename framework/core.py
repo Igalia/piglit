@@ -276,6 +276,7 @@ class TestrunResult:
         self.name = None
         self.glxinfo = None
         self.lspci = None
+        self.time_elapsed = None
         self.tests = {}
 
     def __repairFile(self, file):
