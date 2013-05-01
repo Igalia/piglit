@@ -194,7 +194,7 @@ Fbo::try_setup(const FboConfig &new_config)
 			glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
 						  GL_COLOR_ATTACHMENT0,
 						  GL_RENDERBUFFER, color_rb);
-		} else {
+		} else if (config.num_samples == 0) {
 			piglit_require_extension("GL_ARB_texture_rectangle");
 			glBindTexture(GL_TEXTURE_RECTANGLE, color_tex);
 			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
@@ -213,6 +213,21 @@ Fbo::try_setup(const FboConfig &new_config)
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
 					       GL_COLOR_ATTACHMENT0,
 					       GL_TEXTURE_RECTANGLE,
+					       color_tex,
+					       0 /* level */);
+		} else {
+			piglit_require_extension("GL_ARB_texture_multisample");
+			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex);
+			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+						config.num_samples,
+						config.color_internalformat,
+						config.width,
+						config.height,
+						GL_TRUE /* fixed sample locations */);
+
+			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+					       GL_COLOR_ATTACHMENT0,
+					       GL_TEXTURE_2D_MULTISAMPLE,
 					       color_tex,
 					       0 /* level */);
 		}
