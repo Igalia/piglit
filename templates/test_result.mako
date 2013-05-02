@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>${testname} - Details</title>
-    <link rel="stylesheet" href="../result.css" type="text/css" />
+    <link rel="stylesheet" href="${css}" type="text/css" />
   </head>
   <body>
     <h1>Results for ${testname}</h1>
@@ -14,7 +14,7 @@
       <p><b>Status:</b> ${status}</p>
       <p><b>Result:</b> ${status}</p>
     </div>
-    <p><a href="../index.html">Back to summary</a></p>
+    <p><a href="${index}">Back to summary</a></p>
     <h2>Details</h2>
     <table>
       <tr>
@@ -42,6 +42,6 @@
         </td>
       </tr>
     </table>
-    <p><a href="../index.html">Back to summary</a></p>
+    <p><a href="${index}">Back to summary</a></p>
   </body>
 </html>

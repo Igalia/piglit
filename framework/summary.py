@@ -264,14 +264,6 @@ Returns an array of all child TestSummary instances.
 
 ## New Summary
 
-def sanitizePath(path):
-    """
-    Helper function to remove illegal characters from the names
-    """
-    return filter(lambda s: s.isalnum() or s == '_', path.replace('/', '__')) \
-           + '.html'
-
-
 class Result(core.TestrunResult):
     """
     Object that opens, reads, and stores the data in a resultfile.
@@ -476,8 +468,7 @@ class HTMLIndex(list):
         """
         self.append({'type': 'testResult',
                      'class': text,
-                     'href': path.join(sanitizePath(group),
-                                       sanitizePath(href + ".html")),
+                     'href': path.join(group, href + ".html"),
                      'text': text})
 
 
@@ -716,6 +707,9 @@ class NewSummary:
                             output_encoding="utf-8",
                             module_directory=".makotmp")
 
+        resultCss = path.join(destination, "result.css")
+        index = path.join(destination, "index.html")
+
         # Iterate across the tests creating the various test specific files
         for each in self.results:
             os.mkdir(path.join(destination, each.name))
@@ -728,11 +722,19 @@ class NewSummary:
                                         lspci=each.lspci))
             file.close()
 
+
             # Then build the individual test results
             for key, value in each.tests.iteritems():
-                file = open(path.join(destination,
-                                      each.name,
-                                      sanitizePath(key + ".html")), 'w')
+                tPath = path.join(destination, each.name, path.dirname(key))
+
+                # os.makedirs is very annoying, it throws an OSError if the
+                # path requested already exists, so do this check to  ensure
+                # that it doesn't
+                if not path.exists(tPath):
+                    os.makedirs(tPath)
+
+                file = open(path.join(destination, each.name, key + ".html"),
+                            'w')
                 file.write(testfile.render(testname=key,
                                            status=value.get('result', 'None'),
                                            returncode=value.get('returncode',
@@ -740,7 +742,9 @@ class NewSummary:
                                            time=value.get('time', 'None'),
                                            info=value.get('info', 'None'),
                                            command=value.get('command',
-                                                             'None')))
+                                                             'None'),
+                                           css=path.relpath(resultCss, tPath),
+                                           index=index))
                 file.close()
 
         # Finally build the root html files: index, regressions, etc
