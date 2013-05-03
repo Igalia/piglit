@@ -68,7 +68,7 @@ test_call_list_inside_begin_end(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "glCallList inside glBegin/glEnd");
+				     "glCallList inside glBegin-glEnd");
 
 	return pass;
 }
@@ -114,7 +114,7 @@ test_call_list_inside_nested_begin_end(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "nested glCallList inside glBegin/glEnd");
+				     "nested glCallList inside glBegin-glEnd");
 
 	return pass;
 }
@@ -154,7 +154,7 @@ test_illegal_rect_list_inside_begin_end(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "illegal glRect inside glBegin/glEnd");
+				     "illegal glRect inside glBegin-glEnd");
 
 	return pass;
 }
@@ -200,7 +200,7 @@ test_illegal_drawarrays_list_inside_begin_end(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-		"illegal glDrawArrays inside glBegin/glEnd");
+		"illegal glDrawArrays inside glBegin-glEnd");
 
 	return pass;
 }
@@ -239,7 +239,7 @@ test_illegal_drawarrays_list_inside_begin_end2(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-		"illegal glDrawArrays inside glBegin/glEnd (2)");
+		"illegal glDrawArrays inside glBegin-glEnd (2)");
 
 	return pass;
 }
@@ -289,7 +289,7 @@ test_separate_begin_vertex_end_lists(void)
 
 	piglit_present_results();
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     "separate glBegin/glVertex/glEnd lists");
+				     "separate glBegin-glVertex-glEnd lists");
 
 	return pass;
 }
