@@ -1,0 +1,24 @@
+#add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
+
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+	)
+
+link_libraries(
+	${OPENGL_gles1_LIBRARY}
+	${OPENGL_egl_LIBRARY}
+	piglitutil_gles1
+	)
+
+# These tests rely on drm and are hence compiled only on linux/drm platforms
+if(LIBDRM_FOUND)
+	add_definitions(-DHAVE_LIBDRM)
+
+	include_directories(
+		${LIBDRM_INCLUDE_DIRS}
+	)
+
+	piglit_add_executable(ext_image_dma_buf_import-invalid_hints invalid_hints.c image_common.c)
+endif(LIBDRM_FOUND)
+
+# vim: ft=cmake:
