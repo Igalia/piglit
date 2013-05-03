@@ -29,7 +29,7 @@
 # April 2013
 
 
-from getopt import getopt, GetoptError
+import argparse
 import os.path
 import sys
 import string
@@ -39,79 +39,43 @@ import framework.core as core
 import framework.summary
 
 
-#############################################################################
-##### Main program
-#############################################################################
-def usage():
-    USAGE = """\
-Usage: %(progName)s [options] resultsfile [...]
-
-Print path/name of each test and the result.
-When multiple files are specified, count the number of differences in results.
-Tests are sorted by name.
-
-Options:
-  -h, --help            Show this message
-  -s, --summary         Only display pass/fail summary
-  -d, --diff            Only display the differences between multiple result files
-  -l, --list=listfile   Use test results from a list file
-
-Example list file:
- [
-   [ 'test.result', { name: 'override-name' } ],
-   [ 'other.result' ]
- ]
-"""
-    print USAGE % {'progName': sys.argv[0]}
-    sys.exit(1)
-
-
 def parse_listfile(filename):
-    file = open(filename, "r")
-    code = file.read()
-    file.close()
-    return eval(code)
+    """
+    Read a list of newline seperated file names and return them as a list
+    """
+    return open(filename, "r").read().rstrip().split('\n')
 
-def loadresult(descr):
-    result = core.loadTestResults(descr[0])
-    if len(descr) > 1:
-        result.__dict__.update(descr[1])
-    return result
 
 def main():
-    try:
-        options, args = getopt(sys.argv[1:], "hsdl:", [ "help", "summary", "diff", "list" ])
-    except GetoptError:
-        usage()
-
-    OptionList = []
-    CountsOnly = False
-    DiffOnly = False
-    for name, value in options:
-        if name == "-h" or name == "--help":
-            usage()
-        elif name == "-s" or name == "--summary":
-            CountsOnly = True
-        elif name == "-d" or name == "--diff":
-            DiffOnly = True
-        elif name == "-l" or name == "--list":
-            OptionList += parse_listfile(value)
-
-    OptionList += [[name] for name in args[0:]]
-
-    if len(args) == 0 and len(OptionList) == 0:
-        usage()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--diff",
+                        action  = "store_true",
+                        help    = "Only display the differences between"
+                                  "multiple result files")
+    parser.add_argument("-s", "--summary",
+                        action  = "store_true",
+                        help    = "Only display the summary, not the"
+                                  "individual test results")
+    parser.add_argument("-l", "--list",
+                        action  = "store",
+                        help    = "Use test results from a list file")
+    parser.add_argument("results",
+                        metavar = "<Results Path(s)>",
+                        nargs   = "+",
+                        help    = "Space seperated paths to at least one"
+                                  "results file")
+    args = parser.parse_args()
 
     # make list of results
-    results = []
-    for result_dir in OptionList:
-        results.append(loadresult(result_dir))
+    if args.list:
+        args.results.extend(parse_listfile(args.list))
+    results = [core.loadTestResults(i) for i in args.results]
 
     summary = framework.summary.Summary(results)
 
     # possible test outcomes
     possible_results = [ "pass", "fail", "crash", "skip", "warn" ]
-    if len(OptionList) > 1:
+    if len(args.results) > 1:
         possible_results.append("changes")
 
     # init the summary counters
@@ -144,10 +108,10 @@ def main():
             counts[outcome] += 1
 
         # print the individual test result line
-        if DiffOnly:
+        if args.diff:
             if anyChange:
                 print "%s: %s" % (test.path, string.join(results," "))
-        elif not CountsOnly:
+        elif not args.summary:
             print "%s: %s" % (test.path, string.join(results," "))
 
     # print the summary info
