@@ -84,3 +84,11 @@ piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name)
 
 	return piglit_is_extension_in_string(egl_extension_list, name);
 }
+
+void piglit_require_egl_extension(const char *name)
+{
+	if (!piglit_is_egl_extension_supported(eglGetCurrentDisplay(), name)) {
+		printf("Test requires %s\n", name);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
