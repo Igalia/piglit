@@ -64,13 +64,20 @@ test_linear(int x)
 	float average[4];
 	int i;
 
-	/* Figure out what the blended middle pixel of the magnified
-	 * texture ought to be.  Given a default piglit tolerance of
-	 * .02, the texture needs to be at least around 64x64 for this
-	 * to probably work out.
+	/* For an even framebuffer size we don't sample exactly at the center
+	 * of the texture. The centers of the texels are a quarter framebuffer
+	 * (25 pixels) to the sides of the center of the framebuffer. We sample
+	 * half a pixel off the center of the framebuffer. The lerp factors for
+	 * the expected color are thus 0.5 +/- 0.5/25.
 	 */
+	const float offset = 1.0f/(float)texrect_w;
+	const float lfm = 0.5f - offset;
+	const float lfp = 0.5f + offset;
 	for (i = 0; i < 4; i++)
-		average[i] = (r[i] + g[i] + b[i] + w[i]) / 4;
+		average[i] = (r[i] *lfm*lfm +
+			      g[i] *lfm*lfp +
+			      b[i] *lfp*lfm +
+			      w[i] *lfp*lfp);
 
 	return (piglit_probe_pixel_rgba(x,
 					0,
