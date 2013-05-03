@@ -52,6 +52,17 @@ def main():
                         help    = "Load a newline seperated list of results. "
                                   "These results will be prepended to any "
                                   "Results specified on the command line")
+    parser.add_argument("-e", "--exclude-details",
+                        default = [],
+                        action  = "append",
+                        choices = ['skip', 'pass', 'warn', 'crash' 'fail',
+                                  'all'],
+                        help    = "Optionally exclude the generation of HTML"
+                                  "pages for individual test pages with the"
+                                  "status(es) given as arguments. This speeds"
+                                  "up HTML generation, but reduces the info"
+                                  "in the HTML pages. May be used multiple"
+                                  "times")
     parser.add_argument("summaryDir",
                         metavar = "<Summary Directory>",
                         help    = "Directory to put HTML files in")
@@ -64,6 +75,10 @@ def main():
     # If args.list and args.resultsFiles are empty, then raise an error
     if not args.list and not args.resultsFiles:
         raise parser.error("Missing required option -l or <resultsFiles>")
+
+    # If exclude-results has all, then change it to be all
+    if 'all' in args.exclude_details:
+        args.exclude_details=['skip', 'pass', 'warn', 'crash', 'fail']
 
     # if overwrite is requested delete the output directory
     if path.exists(args.summaryDir) and args.overwrite:
@@ -78,7 +93,7 @@ def main():
 
     # Create the HTML output
     output = summary.NewSummary(args.resultsFiles)
-    output.generateHTML(args.summaryDir)
+    output.generateHTML(args.summaryDir, args.exclude_details)
 
 
 if __name__ == "__main__":

@@ -682,7 +682,7 @@ class NewSummary:
                 if status[i] > 1 and status[i + 1] == 1:
                     self.fixes.append(test)
 
-    def generateHTML(self, destination):
+    def generateHTML(self, destination, exclude):
         """
         Produce HTML summaries.
 
@@ -727,25 +727,29 @@ class NewSummary:
             for key, value in each.tests.iteritems():
                 tPath = path.join(destination, each.name, path.dirname(key))
 
-                # os.makedirs is very annoying, it throws an OSError if the
-                # path requested already exists, so do this check to  ensure
-                # that it doesn't
-                if not path.exists(tPath):
-                    os.makedirs(tPath)
+                if value['result'] not in exclude:
+                    # os.makedirs is very annoying, it throws an OSError if
+                    # the path requested already exists, so do this check to
+                    # ensure that it doesn't
+                    if not path.exists(tPath):
+                        os.makedirs(tPath)
 
-                file = open(path.join(destination, each.name, key + ".html"),
-                            'w')
-                file.write(testfile.render(testname=key,
-                                           status=value.get('result', 'None'),
-                                           returncode=value.get('returncode',
+                    file = open(path.join(destination,
+                                          each.name,
+                                          key + ".html"), 'w')
+                    file.write(testfile.render(testname=key,
+                                               status=value.get('result',
                                                                 'None'),
-                                           time=value.get('time', 'None'),
-                                           info=value.get('info', 'None'),
-                                           command=value.get('command',
-                                                             'None'),
-                                           css=path.relpath(resultCss, tPath),
-                                           index=index))
-                file.close()
+                                               returncode=value.get('returncode',
+                                                                    'None'),
+                                               time=value.get('time', 'None'),
+                                               info=value.get('info', 'None'),
+                                               command=value.get('command',
+                                                                 'None'),
+                                               css=path.relpath(resultCss,
+                                                                tPath),
+                                               index=index))
+                    file.close()
 
         # Finally build the root html files: index, regressions, etc
         index = Template(filename="templates/index.mako",
@@ -761,7 +765,8 @@ class NewSummary:
         file = open(path.join(destination, "index.html"), 'w')
         file.write(index.render(results=HTMLIndex(self, 'alltests'),
                                 page='all',
-                                colnum=len(self.results)))
+                                colnum=len(self.results),
+                                exclude=exclude))
         file.close()
 
         # Generate the rest of the pages
@@ -769,5 +774,6 @@ class NewSummary:
             file = open(path.join(destination, page + '.html'), 'w')
             file.write(index.render(results=HTMLIndex(self, page),
                                     page=page,
-                                    colnum=len(self.results)))
+                                    colnum=len(self.results),
+                                    exclude=exclude))
             file.close()

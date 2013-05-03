@@ -58,9 +58,15 @@
           </td>
         % elif line['type'] == "testResult":
           <td class="${line['class']}">
+          ## If the result is in the excluded results page list from
+          ## argparse, just print the text, otherwise add the link
+          % if line['class'] not in exclude:
             <a href="${line['href']}">
               ${line['text']}
             </a>
+          % else:
+            ${line['text']}
+          % endif
           </td>
         % elif line['type'] == "subtestResult":
           <td class="${line['class']}">
