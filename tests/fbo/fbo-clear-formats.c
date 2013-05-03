@@ -227,7 +227,7 @@ do_stencil_clear(GLenum format, GLuint tex, int level, int size)
 	return true;
 }
 
-static bool
+static GLuint
 create_tex(GLenum internalformat, GLenum baseformat)
 {
 	GLuint tex;
