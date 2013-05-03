@@ -1859,6 +1859,7 @@ spec['EXT_image_dma_buf_import'] = ext_image_dma_buf_import
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_hints')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_attributes')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-missing_attributes')
+add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-ownership_transfer')
 
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
