@@ -1857,6 +1857,7 @@ add_plain_test(ext_framebuffer_object, 'getteximage-formats init-by-rendering')
 ext_image_dma_buf_import = Group()
 spec['EXT_image_dma_buf_import'] = ext_image_dma_buf_import
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_hints')
+add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_attributes')
 
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
