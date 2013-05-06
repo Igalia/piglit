@@ -48,8 +48,8 @@ td.trap a, td.abort a, td.crash a {
 	color: #ffffff;
 }
 
-tr:nth-child(odd)  > td > div:not(.head) { background-color: #ffff95 }
-tr:nth-child(even) > td > div:not(.head) { background-color: #e1e183 }
+tr:nth-child(odd)  > td > div.group { background-color: #ffff95 }
+tr:nth-child(even) > td > div.group { background-color: #e1e183 }
 
 tr:nth-child(odd)  td.pass  { background-color: #20ff20; }
 tr:nth-child(even) td.pass  { background-color: #15e015; }
