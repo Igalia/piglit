@@ -78,7 +78,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char vs_text[] =
 	"#version 300 es\n"
-	"in vec4 vertex;\n"
+	"in vec4 piglit_vertex;\n"
 	"struct Foo {\n"
 	"  vec4 v;\n"
 	"};\n"
@@ -125,15 +125,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	/* Create the shaders */
-	prog = glCreateProgram();
-	glAttachShader(prog, piglit_compile_shader_text(GL_VERTEX_SHADER,
-							vs_text));
-	glAttachShader(prog, piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-							fs_text));
-	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "vertex");
-	glLinkProgram(prog);
-	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	/* Create the multisampled framebuffer */
 	glGenFramebuffers(1, &fbo);
