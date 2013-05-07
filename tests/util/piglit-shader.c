@@ -263,3 +263,38 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 
 	return prog;
 }
+
+/**
+ * Builds and links a program from optional VS and FS sources,
+ * throwing PIGLIT_FAIL on error.
+ */
+GLint
+piglit_build_simple_program(const char *vs_source, const char *fs_source)
+{
+	GLuint vs = 0, fs = 0, prog;
+
+	if (vs_source) {
+		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
+		if (!vs) {
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
+	if (fs_source) {
+		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
+		if (!fs) {
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
+	prog = piglit_link_simple_program(vs, fs);
+	if (!prog)
+		piglit_report_result(PIGLIT_FAIL);
+
+	if (fs)
+		glDeleteShader(fs);
+	if (vs)
+		glDeleteShader(vs);
+
+	return prog;
+}

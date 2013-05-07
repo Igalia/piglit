@@ -35,6 +35,7 @@ GLuint piglit_compile_shader_text(GLenum target, const char *text);
 GLboolean piglit_link_check_status(GLint prog);
 GLboolean piglit_link_check_status_quiet(GLint prog);
 GLint piglit_link_simple_program(GLint vs, GLint fs);
+GLint piglit_build_simple_program(const char *vs_source, const char *fs_source);
 
 #if defined(PIGLIT_USE_OPENGL_ES1)
 #define glAttachShader assert(!"glAttachShader does not exist in ES1")
