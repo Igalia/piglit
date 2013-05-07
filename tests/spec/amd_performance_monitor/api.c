@@ -113,8 +113,10 @@ find_invalid_counter(unsigned *counters, int num_counters)
 }
 
 #define report(pass) \
-    piglit_report_subtest_result((pass) ? PIGLIT_PASS : PIGLIT_FAIL, __FUNCTION__); \
-    return
+	do { \
+		piglit_report_subtest_result((pass) ? PIGLIT_PASS : PIGLIT_FAIL, __FUNCTION__); \
+		return; \
+	} while (0)
 
 /******************************************************************************/
 
