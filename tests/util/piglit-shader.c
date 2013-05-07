@@ -246,6 +246,14 @@ GLint piglit_link_simple_program(GLint vs, GLint fs)
 		glAttachShader(prog, vs);
 	if (fs)
 		glAttachShader(prog, fs);
+
+	/* If the shaders reference piglit_vertex or piglit_tex, bind
+	 * them to some fixed attribute locations so they can be used
+	 * with piglit_draw_rect_tex() in GLES.
+	 */
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_vertex");
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_texcoord");
+
 	glLinkProgram(prog);
 
 	if (!piglit_link_check_status(prog)) {
