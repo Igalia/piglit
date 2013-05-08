@@ -20,13 +20,10 @@ void main()
 	switch (i) {
 	case 0:
 		gl_FragColor.x = 1.0;
-		break;
 	default:
 		gl_FragColor.z = 1.0;
-		break;
 	case 1:
 		gl_FragColor.y = 1.0;
-		break;
 	}
 }
 
@@ -38,6 +35,6 @@ draw rect 0 -1 1 1
 uniform int i 2
 draw rect -1 0 1 1
 
-relative probe rgba (0, 0) (1, 0, 0, 0)
+relative probe rgba (0, 0) (1, 1, 1, 0)
 relative probe rgba (1, 0) (0, 1, 0, 0)
-relative probe rgba (0, 1) (0, 0, 1, 0)
+relative probe rgba (0, 1) (0, 1, 1, 0)
