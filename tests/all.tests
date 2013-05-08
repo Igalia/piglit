@@ -2351,6 +2351,7 @@ for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
                 test_name = ' '.join(
                         ['fcc-read-after-clear', subtest, buffer_type])
                 add_concurrent_test(fast_color_clear, test_name)
+add_concurrent_test(fast_color_clear, 'fcc-blit-between-clears')
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
