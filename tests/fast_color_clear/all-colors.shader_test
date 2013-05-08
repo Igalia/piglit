@@ -1,0 +1,140 @@
+# Test the "fast clear" functionality of i965/gen7+ for all supported
+# clear colors.
+#
+# Fast clear functionality on i965/gen7+ operates by deferring the
+# memory writes that would normally be done during a buffer clear so
+# that they happen either during rendering or at the time buffer data
+# is read (e.g. by glReadPixels).  It supports clearing to any color
+# where each component is either 0.0 or 1.0.
+#
+# This test validates each supported clear color by (a) setting the
+# clear color, (b) doing a clear, (c) making a draw call that touches
+# a small number of pixels and outputs the same color, and then (d)
+# reading the entire buffer to verify that it contains the desired
+# color.
+#
+# The purpose of step (c) is to ensure that some writes are deferred
+# to rendering time and others are deferred until glReadPixels time,
+# so that we verify that correct data is written in both
+# circumstances.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+attribute vec4 pos;
+
+void main()
+{
+  gl_Position = pos;
+}
+
+[fragment shader]
+uniform vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+pos/float/4
+0.0 0.0 0.0 1.0
+1.0 1.0 0.0 1.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+uniform vec4 color 0.0 0.0 0.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 0.0 0.0 0.0
+
+clear color 0.0 0.0 0.0 1.0
+clear
+uniform vec4 color 0.0 0.0 0.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 0.0 0.0 1.0
+
+clear color 0.0 0.0 1.0 0.0
+clear
+uniform vec4 color 0.0 0.0 1.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 0.0 1.0 0.0
+
+clear color 0.0 0.0 1.0 1.0
+clear
+uniform vec4 color 0.0 0.0 1.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 0.0 1.0 1.0
+
+clear color 0.0 1.0 0.0 0.0
+clear
+uniform vec4 color 0.0 1.0 0.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 1.0 0.0 0.0
+
+clear color 0.0 1.0 0.0 1.0
+clear
+uniform vec4 color 0.0 1.0 0.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 0.0 1.0 1.0 0.0
+clear
+uniform vec4 color 0.0 1.0 1.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 1.0 1.0 0.0
+
+clear color 0.0 1.0 1.0 1.0
+clear
+uniform vec4 color 0.0 1.0 1.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 1.0 1.0 1.0
+
+clear color 1.0 0.0 0.0 0.0
+clear
+uniform vec4 color 1.0 0.0 0.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 0.0 0.0 0.0
+
+clear color 1.0 0.0 0.0 1.0
+clear
+uniform vec4 color 1.0 0.0 0.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 0.0 0.0 1.0
+
+clear color 1.0 0.0 1.0 0.0
+clear
+uniform vec4 color 1.0 0.0 1.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 0.0 1.0 0.0
+
+clear color 1.0 0.0 1.0 1.0
+clear
+uniform vec4 color 1.0 0.0 1.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 0.0 1.0 1.0
+
+clear color 1.0 1.0 0.0 0.0
+clear
+uniform vec4 color 1.0 1.0 0.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 1.0 0.0 0.0
+
+clear color 1.0 1.0 0.0 1.0
+clear
+uniform vec4 color 1.0 1.0 0.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 1.0 0.0 1.0
+
+clear color 1.0 1.0 1.0 0.0
+clear
+uniform vec4 color 1.0 1.0 1.0 0.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 1.0 1.0 0.0
+
+clear color 1.0 1.0 1.0 1.0
+clear
+uniform vec4 color 1.0 1.0 1.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 1.0 1.0 1.0 1.0

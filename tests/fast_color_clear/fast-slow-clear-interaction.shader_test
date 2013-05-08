@@ -1,0 +1,39 @@
+# Test the "fast clear" functionality of i965/gen7+ when two clears
+# are done to the same buffer, but with drawing in between (so the
+# second clear is not redundant).
+#
+# Fast clear functionality on i965/gen7+ operates by deferring the
+# memory writes that would normally be done during a buffer clear so
+# that they happen either during rendering or at the time buffer data
+# is read (e.g. by glReadPixels).  If two fast clears appear in a row,
+# the second clear can be elided.  But if other rendering (in this
+# case a slow clear) occurrs between the two fast clears, the second
+# fast clear is necessary, since some of the first fast clear's writes
+# may already have been performed.
+#
+# In this test, we accomplish the slow clear by clearing to a color
+# which is not supported by fast clear (0.5, 0.0, 0.0, 1.0).
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = vec4(0.0);
+}
+
+[test]
+clear color 0.0 1.0 0.0 1.0
+clear
+clear color 0.5 0.0 0.0 1.0
+clear
+clear color 0.0 1.0 0.0 1.0
+clear
+probe all rgba 0.0 1.0 0.0 1.0

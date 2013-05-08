@@ -1,0 +1,50 @@
+# Test the "fast clear" functionality of i965/gen7+ when a redundant
+# clear is done, but to a different clear color.
+#
+# Fast clear functionality on i965/gen7+ operates by deferring the
+# memory writes that would normally be done during a buffer clear so
+# that they happen either during rendering or at the time buffer data
+# is read (e.g. by glReadPixels).  If two fast clears appear in a row,
+# the second clear can be elided (even if it clears to a different
+# color, since none of the color writes have occurred yet).
+#
+# This test verifies that if two fast clears are performed in a row,
+# the color that takes effect is the color from the second clear.  As
+# with fast-clear-all-colors.shader_test, we also make a draw call
+# that touches a small number of pixels and outputs the same color.
+# This is to ensure that some writes are deferred to rendering time
+# and others are deferred until glReadPixels time, so that we verify
+# that correct data is written in both circumstances.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+attribute vec4 pos;
+
+void main()
+{
+  gl_Position = pos;
+}
+
+[fragment shader]
+uniform vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+pos/float/4
+0.0 0.0 0.0 1.0
+1.0 1.0 0.0 1.0
+
+[test]
+clear color 1.0 0.0 0.0 1.0
+clear
+clear color 0.0 1.0 0.0 1.0
+clear
+uniform vec4 color 0.0 1.0 0.0 1.0
+draw arrays GL_LINES 0 2
+probe all rgba 0.0 1.0 0.0 1.0

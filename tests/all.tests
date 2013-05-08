@@ -2341,6 +2341,10 @@ add_plain_test(hiz, 'hiz-stencil-test-fbo-d24s8')
 add_plain_test(hiz, 'hiz-stencil-test-window-depth0')
 add_plain_test(hiz, 'hiz-stencil-test-window-depth1')
 
+fast_color_clear = Group()
+add_shader_test_dir(fast_color_clear, testsDir + '/fast_color_clear',
+                    recursive=True)
+
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
 	test = PlainExecTest(['asmparsertest', '-auto', group, testsDir + '/asmparsertest/shaders/' + group + '/' + shader])
@@ -2867,6 +2871,7 @@ add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
 profile.tests['hiz'] = hiz
+profile.tests['fast_color_clear'] = fast_color_clear
 profile.tests['glean'] = glean
 profile.tests['glslparsertest'] = glslparsertest
 profile.tests['asmparsertest'] = asmparsertest
