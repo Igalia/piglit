@@ -15,6 +15,7 @@ add_subdirectory (security)
 add_subdirectory (shaders)
 add_subdirectory (texturing)
 add_subdirectory (spec)
+add_subdirectory (fast_color_clear)
 
 add_subdirectory (glean)
 

@@ -2344,6 +2344,13 @@ add_plain_test(hiz, 'hiz-stencil-test-window-depth1')
 fast_color_clear = Group()
 add_shader_test_dir(fast_color_clear, testsDir + '/fast_color_clear',
                     recursive=True)
+for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
+        for buffer_type in ('rb', 'tex'):
+                if subtest == 'sample' and buffer_type == 'rb':
+                        continue
+                test_name = ' '.join(
+                        ['fcc-read-after-clear', subtest, buffer_type])
+                add_concurrent_test(fast_color_clear, test_name)
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
