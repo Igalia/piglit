@@ -136,7 +136,7 @@ choose_config_attribs(const struct piglit_gl_test_config *test_config)
 struct piglit_gl_framework*
 piglit_winsys_framework_factory(const struct piglit_gl_test_config *test_config)
 {
-	int32_t platform = piglit_wfl_framework_choose_platform();
+	int32_t platform = piglit_wfl_framework_choose_platform(test_config);
 
 	switch (platform) {
 #ifdef PIGLIT_HAS_X11

@@ -41,11 +41,19 @@ piglit_wfl_framework(struct piglit_gl_framework *gl_fw)
 }
 
 int32_t
-piglit_wfl_framework_choose_platform(void)
+piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_config)
 {
 	const char *env = getenv("PIGLIT_PLATFORM");
 
 	if (env == NULL) {
+#if defined(PIGLIT_HAS_X11) && defined(PIGLIT_HAS_EGL)
+		if (test_config->supports_gl_es_version) {
+			/* Some GLX implementations don't support creation of
+			 * ES1 and ES2 contexts, so use XEGL instead.
+			 */
+			return WAFFLE_PLATFORM_X11_EGL;
+		}
+#endif
 #ifdef PIGLIT_HAS_GLX
 		return WAFFLE_PLATFORM_GLX;
 #else

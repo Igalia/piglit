@@ -136,7 +136,7 @@ piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 	struct piglit_wfl_framework *wfl_fw;
 	struct piglit_gl_framework *gl_fw;
 
-	int32_t platform = piglit_wfl_framework_choose_platform();
+	int32_t platform = piglit_wfl_framework_choose_platform(test_config);
 	bool ok = true;
 
 	wfl_fw = calloc(1, sizeof(*wfl_fw));
