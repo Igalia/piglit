@@ -381,10 +381,10 @@ class HTMLIndex(list):
                 # Add the left-most column: the name of the group
                 self._groupRow("head", depth, localGroup)
 
-                # Add the group that we just opened to the currentDir,
-                # which will then be used to add that group to the
-                # HTML list. If there is a KeyError (the group doesn't
-                # exist), use (0, 0) which will result in skip
+                # Add the group that we just opened to the currentDir, which
+                # will then be used to add that group to the HTML list. If
+                # there is a KeyError (the group doesn't exist), use (0, 0)
+                # which will get skip. This sets the group coloring correctly
                 currentDir.append(localGroup)
                 for each in summary.results:
                     # Decide which fields need to be updated
@@ -405,15 +405,15 @@ class HTMLIndex(list):
             # Add the left-most column: the name of the test
             self._testRow("group", depth, test)
 
-            # Add the result from each test result to the HTML summary
-            # If there is a KeyError (a result doesn't contain a
-            # particular test), return skip
+            # Add the result from each test result to the HTML summary If there
+            # is a KeyError (a result doesn't contain a particular test),
+            # return Not Run, with clas skip for highlighting
             for each in summary.results:
                 try:
                     self._testResult(each.name, key, each.tests[key]['result'])
                 except KeyError:
                     self.append({'type': 'other',
-                                 'text': '<td class="skip">skip</td>'})
+                                 'text': '<td class="skip">Not Run</td>'})
             self._endRow()
 
     def _newRow(self):
@@ -539,12 +539,13 @@ class NewSummary:
 
             def status_to_number(status):
                 """
-                like status_to_number in the constructor, this function converts
-                statuses into numbers so they can be comapared
+                like status_to_number in the constructor, this function
+                converts statuses into numbers so they can be comapared
                 logically/mathematically. The only difference between this and
-                init::status_to_number is the values assigned. The reason for this
-                is that here we are looking for the 'worst' status, while in
-                init::status_to_number we are looking for regressions in status.
+                init::status_to_number is the values assigned. The reason for
+                this is that here we are looking for the 'worst' status, while
+                in init::status_to_number we are looking for regressions in
+                status.
                 """
                 if status == 'skip':
                     return 1
@@ -618,6 +619,8 @@ class NewSummary:
                 return 4
             elif status == 'crash':
                 return 5
+            elif status == 'special':
+                return 0
 
         # Create a Result object for each piglit result and append it to the
         # results list
@@ -644,14 +647,15 @@ class NewSummary:
             self.alltests = list(set(self.alltests) | set(each.tests))
 
         # Create lists similar to self.alltests, but for the other root pages,
-        # (regressions, skips, ect)
+        # (regressions, skips, ect). Special is used to makr things that cannot
+        # be comapred (like 'not run')
         for test in self.alltests:
             status = []
             for each in self.results:
                 try:
                     status.append(status_to_number(each.tests[test]['result']))
                 except KeyError:
-                    status.append(status_to_number("skip"))
+                    status.append(status_to_number("special"))
 
             # Check and append self.changes
             # A set cannot contain duplicate entries, so creating a set out
@@ -673,11 +677,12 @@ class NewSummary:
 
             # fixes and regressions
             # check each member against the next member. If the second member
-            # has a greater value it is a regression.
+            # has a greater value it is a regression, unless the first value i
+            # 0, which means it cannot be compared
             # Fixes on the other hand are a former non 1 value, followed by
             # a value of 1
             for i in xrange(len(status) - 1):
-                if status[i] < status[i + 1]:
+                if status[i] < status[i + 1] and status[i] != 0:
                     self.regressions.append(test)
                 if status[i] > 1 and status[i + 1] == 1:
                     self.fixes.append(test)
