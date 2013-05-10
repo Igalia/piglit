@@ -1956,11 +1956,19 @@ piglit_init(int argc, char **argv)
 	version_init(&glsl_version, VERSION_GLSL, es,
 	             (major * 100) + minor);
 
+#ifdef PIGLIT_USE_OPENGL
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
 		      &gl_max_fragment_uniform_components);
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
 		      &gl_max_vertex_uniform_components);
-
+#else
+	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
+		      &gl_max_fragment_uniform_components);
+	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS,
+		      &gl_max_vertex_uniform_components);
+	gl_max_fragment_uniform_components *= 4;
+	gl_max_vertex_uniform_components *= 4;
+#endif
 	if (argc > 2) {
 		path = argv[2];
 	} else if (argc > 1) {

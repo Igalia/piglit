@@ -42,7 +42,9 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#if defined(PIGLIT_USE_OPENGL)
+#if (defined(PIGLIT_USE_OPENGL) || \
+     defined(PIGLIT_USE_OPENGL_ES2) || \
+     defined(PIGLIT_USE_OPENGL_ES3))
 #	include "piglit-dispatch.h"
 
 #elif defined(PIGLIT_USE_OPENGL_ES1)
@@ -57,12 +59,6 @@ extern "C" {
 #       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Y GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_OES
 #       define GL_TEXTURE_CUBE_MAP_NEGATIVE_Z GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_OES
 
-#elif defined(PIGLIT_USE_OPENGL_ES2)
-#	include <GLES2/gl2.h>
-#	include <GLES2/gl2ext.h>
-#elif defined(PIGLIT_USE_OPENGL_ES3)
-#	include <GLES3/gl3.h>
-#	include <GLES3/gl3ext.h>
 #endif
 
 #ifdef __cplusplus

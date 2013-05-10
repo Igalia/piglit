@@ -362,6 +362,8 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 
 #ifdef PIGLIT_USE_OPENGL
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+#elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_ES2);
 #endif
 
 	ok = check_gl_version(test_config, flavor);

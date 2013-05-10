@@ -35,55 +35,6 @@
 #include <stdio.h>
 #include "piglit-util.h"
 
-#define GL_CLIP_PLANE0 0x3000
-#define GL_CLIP_PLANE1 0x3001
-#define GL_CLIP_PLANE2 0x3002
-#define GL_CLIP_PLANE3 0x3003
-#define GL_CLIP_PLANE4 0x3004
-#define GL_CLIP_PLANE5 0x3005
-#define GL_COMPARE_R_TO_TEXTURE 0x884E
-#define GL_DEPTH_TEXTURE_MODE 0x884B
-#define GL_FLAT 0x1D00
-#define GL_FRAGMENT_PROGRAM_ARB 0x8804
-#define GL_GEOMETRY_SHADER 0x8DD9
-#define GL_INTENSITY 0x8049
-#define GL_MAX_CLIP_PLANES 0x0D32
-#define GL_POLYGON 0x0009
-#define GL_POLYGON_OFFSET_EXT 0x8037
-#define GL_QUADS 0x0007
-#define GL_QUAD_STRIP 0x0008
-#define GL_SMOOTH 0x1D01
-#define GL_TEXTURE_1D 0x0DE0
-#define GL_TEXTURE_1D_ARRAY 0x8C18
-#define GL_TEXTURE_1D_ARRAY_EXT 0x8C18
-#define GL_TEXTURE_CUBE_MAP_ARRAY 0x9009
-#define GL_TEXTURE_RECTANGLE 0x84F5
-#define GL_VERTEX_ARRAY 0x8074
-#define GL_VERTEX_PROGRAM_ARB 0x8620
-#define GL_VERTEX_PROGRAM_ARB 0x8620
-#define GL_VERTEX_PROGRAM_TWO_SIDE 0x8643
-#define GL_WRITE_ONLY 0x88B9
-
-#if defined(PIGLIT_USE_OPENGL_ES2)
-#define GL_UNIFORM_BLOCK_INDEX 0x8A3A
-#define GL_UNIFORM_OFFSET 0x8A3B
-#define GL_UNIFORM_ARRAY_STRIDE 0x8A3C
-#define GL_UNIFORM_BUFFER 0x8A11
-#define GL_UNIFORM_MATRIX_STRIDE 0x8A3D
-#define GL_UNIFORM_IS_ROW_MAJOR 0x8A3E
-#define GL_UNIFORM_BLOCK_DATA_SIZE 0x8A40
-#define GL_TEXTURE_COMPARE_MODE 0x884C
-#define GL_TEXTURE_3D 0x806F
-#define GL_TEXTURE_2D_ARRAY 0x8C1A
-#define GL_RED 0x1903
-#define GL_TEXTURE_COMPARE_FUNC 0x884D
-#define GL_ACTIVE_UNIFORM_BLOCKS 0x8A36
-#define GL_INVALID_INDEX 0xFFFFFFFFu
-#define GL_UNSIGNED_NORMALIZED 0x8C17
-#define GL_MAX_FRAGMENT_UNIFORM_COMPONENTS GL_MAX_FRAGMENT_UNIFORM_VECTORS
-#define GL_MAX_VERTEX_UNIFORM_COMPONENTS GL_MAX_VERTEX_UNIFORM_VECTORS
-#endif /*PIGLIT_USE_OPENGL_ES2 */
-
 static void
 #if defined(__GNUC__)
 __attribute__((unused))
@@ -117,39 +68,9 @@ unsupported_function(const char *name, ...)
 #define piglit_ortho_projection(...) UNSUPPORTED_FUNCTION(piglit_ortho_projection, 0, __VA_ARGS__)
 #define piglit_compile_program(...) UNSUPPORTED_FUNCTION(piglit_compile_program, 0, __VA_ARGS__)
 
-#define glClipPlane(...) 				UNSUPPORTED_FUNCTION(glClipPlane, 0, __VA_ARGS__)
-#define glDisableClientState(...) 			UNSUPPORTED_FUNCTION(glDisableClientState, 0, __VA_ARGS__)
-#define glEnableClientState(...) 			UNSUPPORTED_FUNCTION(glEnableClientState, 0, __VA_ARGS__)
-#define glProgramEnvParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramEnvParameter4fvARB, 0, __VA_ARGS__)
-#define glProgramLocalParameter4fvARB(...) 		UNSUPPORTED_FUNCTION(glProgramLocalParameter4fvARB, 0, __VA_ARGS__)
-#define glShadeModel(...) 				UNSUPPORTED_FUNCTION(glShadeModel, 0, __VA_ARGS__)
-
-#if defined(PIGLIT_USE_OPENGL_ES2)
-#define glMapBuffer(...) UNSUPPORTED_FUNCTION(glMapBuffer, NULL, __VA_ARGS__)
-#define glUnmapBuffer(...) UNSUPPORTED_FUNCTION(glUnmapBuffer, 0, __VA_ARGS__)
-#define glUniform1ui(...) UNSUPPORTED_FUNCTION(glUniform1ui, 0, __VA_ARGS__)
-#define glUniform2uiv(...) UNSUPPORTED_FUNCTION(glUniform2uiv, 0, __VA_ARGS__)
-#define glUniform3uiv(...) UNSUPPORTED_FUNCTION(glUniform3uiv, 0, __VA_ARGS__)
-#define glUniform4uiv(...) UNSUPPORTED_FUNCTION(glUniform4uiv, 0, __VA_ARGS__)
-#define glUniformMatrix2x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x3fv, 0, __VA_ARGS__)
-#define glUniformMatrix2x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix2x4fv, 0, __VA_ARGS__)
-#define glUniformMatrix3x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x2fv, 0, __VA_ARGS__)
-#define glUniformMatrix3x4fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix3x4fv, 0, __VA_ARGS__)
-#define glUniformMatrix4x2fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x2fv, 0, __VA_ARGS__)
-#define glUniformMatrix4x3fv(...) UNSUPPORTED_FUNCTION(glUniformMatrix4x3fv, 0, __VA_ARGS__)
-#define glDrawArraysInstanced(...) UNSUPPORTED_FUNCTION(glDrawArrayInstanced, 0, __VA_ARGS__)
-#define glGetActiveUniformBlockiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformBlockiv, 0, __VA_ARGS__)
-#define glBindBufferBase(...) UNSUPPORTED_FUNCTION(glBindBufferiBase, 0, __VA_ARGS__)
-#define glGetUniformIndices(...) UNSUPPORTED_FUNCTION(glGetUniformIndices, 0, __VA_ARGS__)
-#define glGetActiveUniformsiv(...) UNSUPPORTED_FUNCTION(glGetActiveUniformsiv, 0, __VA_ARGS__)
-#define glGenVertexArrays(...) UNSUPPORTED_FUNCTION(glGenVertexArrays, 0, __VA_ARGS__)
-#define glBindVertexArray(...) UNSUPPORTED_FUNCTION(glBindVertexArray, 0, __VA_ARGS__)
-#endif /* PIGLIT_USE_OPENGL_ES2 */
-
-#define glBindProgramARB(...) UNSUPPORTED_FUNCTION(glBindProgramARB, 0, __VA_ARGS__)
-#define glVertexPointer(...) UNSUPPORTED_FUNCTION(glVertexPointer, 0, __VA_ARGS__)
-
 #if defined(PIGLIT_USE_OPENGL_ES3)
+#undef glMapBuffer
+
 static GLvoid*
 glMapBuffer(GLenum target, GLbitfield access)
 {

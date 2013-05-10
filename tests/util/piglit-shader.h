@@ -80,13 +80,6 @@ GLint piglit_build_simple_program(const char *vs_source, const char *fs_source);
 #define glUniformMatrix3x4fv assert(!"glUniformMatrix3x4fv does not exist in ES1")
 #define glUniformMatrix4x2fv assert(!"glUniformMatrix4x2fv does not exist in ES1")
 #define glUniformMatrix4x3fv assert(!"glUniformMatrix4x3fv does not exist in ES1")
-#elif defined(PIGLIT_USE_OPENGL_ES22)
-#define glUniformMatrix2x3fv assert(!"glUniformMatrix2x3fv does not exist in ES2")
-#define glUniformMatrix2x4fv assert(!"glUniformMatrix2x4fv does not exist in ES2")
-#define glUniformMatrix3x2fv assert(!"glUniformMatrix3x2fv does not exist in ES2")
-#define glUniformMatrix3x4fv assert(!"glUniformMatrix3x4fv does not exist in ES2")
-#define glUniformMatrix4x2fv assert(!"glUniformMatrix4x2fv does not exist in ES2")
-#define glUniformMatrix4x3fv assert(!"glUniformMatrix4x3fv does not exist in ES2")
 #endif
 
 /**

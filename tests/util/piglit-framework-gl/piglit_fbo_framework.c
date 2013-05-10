@@ -21,11 +21,6 @@
  * IN THE SOFTWARE.
  */
 
-#ifdef PIGLIT_USE_OPENGL_ES2
-#	define GL_DEPTH_STENCIL		GL_DEPTH_STENCIL_OES
-#	define GL_UNSIGNED_INT_24_8 	GL_UNSIGNED_INT_24_8_OES
-#endif
-
 #include "piglit-util-gl-common.h"
 #include "piglit-util-waffle.h"
 

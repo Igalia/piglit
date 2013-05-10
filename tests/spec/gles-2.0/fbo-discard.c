@@ -58,8 +58,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static PFNGLDISCARDFRAMEBUFFEREXTPROC glDiscardFramebufferEXT;
-
 static GLboolean
 run_test(void)
 {
@@ -146,10 +144,4 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_EXT_discard_framebuffer");
-
-	glDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC)
-		eglGetProcAddress("glDiscardFramebufferEXT");
-
-	if (!glDiscardFramebufferEXT)
-		piglit_report_result(PIGLIT_FAIL);
 }
