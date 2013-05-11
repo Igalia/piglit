@@ -30,7 +30,7 @@
 #include "piglit-util-gl-common.h"
 #include "piglit-framework-gl/piglit_gl_framework.h"
 
-static struct piglit_gl_framework *gl_fw;
+struct piglit_gl_framework *gl_fw;
 
 bool piglit_use_fbo = false;
 int piglit_automatic = 0;

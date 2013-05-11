@@ -235,6 +235,7 @@ extern int piglit_width;
 extern int piglit_height;
 extern bool piglit_use_fbo;
 extern unsigned int piglit_winsys_fbo;
+extern struct piglit_gl_framework *gl_fw;
 
 void piglit_swap_buffers(void);
 void piglit_present_results();
