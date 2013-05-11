@@ -72,7 +72,7 @@ thread_func(void *arg)
 		 * on the same type of context.
                  */
 		pthread_mutex_lock(&mutex);
-		piglit_dispatch_default_init();
+		piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 		pthread_mutex_unlock(&mutex);
 
 		vert_shader = piglit_compile_shader_text(GL_VERTEX_SHADER, vert_shader_text);

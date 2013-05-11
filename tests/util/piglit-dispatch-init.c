@@ -174,14 +174,14 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
  * on the first call.
  */
 void
-piglit_dispatch_default_init()
+piglit_dispatch_default_init(piglit_dispatch_api api)
 {
 	static bool already_initialized = false;
 
 	if (already_initialized)
 		return;
 
-	piglit_dispatch_init(PIGLIT_DISPATCH_GL,
+	piglit_dispatch_init(api,
 			     get_core_proc_address,
 			     get_ext_proc_address,
 			     default_unsupported,

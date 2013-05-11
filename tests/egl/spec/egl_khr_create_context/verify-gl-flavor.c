@@ -235,7 +235,7 @@ check_flavor(int requested_version, enum gl_api requested_api)
 		/* We must postpone initialization of piglit-dispatch until
 		 * a context is current.
 		 */
-		piglit_dispatch_default_init();
+		piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 		is_dispatch_init = true;
 	}
 

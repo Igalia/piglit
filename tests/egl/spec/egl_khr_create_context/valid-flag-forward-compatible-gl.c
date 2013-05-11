@@ -43,7 +43,7 @@ static bool try_flag(int flag)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
-			piglit_dispatch_default_init();
+			piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 			gl_version = piglit_get_gl_version();
 		}

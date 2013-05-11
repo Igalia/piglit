@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	glutInitWindowSize(MainWidth, MainHeight);
 	glutInitDisplayMode(PIGLIT_GL_VISUAL_RGB);
 	glutCreateWindow(argv[0]);
-	piglit_dispatch_default_init();
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 	glutReshapeFunc(Reshape);
 	glutDisplayFunc(RedisplayMain);
 	if (!Automatic)

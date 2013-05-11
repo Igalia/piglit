@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 	 */
 	ctx = glXCreateContextAttribsARB(dpy, fbconfig, NULL, True, attribs);
 	glXMakeContextCurrent(dpy, glxWin, glxWin, ctx);
-	piglit_dispatch_default_init();
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	version_string = (char *) glGetString(GL_VERSION);
 

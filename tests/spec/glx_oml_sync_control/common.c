@@ -80,7 +80,7 @@ piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy))
 	ctx = piglit_get_glx_context(dpy, visinfo);
 	glXMakeCurrent(dpy, win, ctx);
 
-	piglit_dispatch_default_init();
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	XMapWindow(dpy, win);
 
