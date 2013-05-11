@@ -447,6 +447,38 @@ class Api(object):
             for alias in attributes['alias']:
                 self.synonyms.add_alias(name, alias)
 
+    def read_gles_header(self, f):
+        category = 'GL_ES_VERSION_2_0'
+        for line in f:
+            # The GLES gl3.h has typedefs, tokens, and prototypes,
+            # each listed after a comment indicating whether they're
+            # part of 2.0 core or 3.0 core.
+            if re.match(r'/\* OpenGL ES 2.0 \*/', line):
+                category = 'GL_ES_VERSION_2_0'
+            elif re.match(r'/\* OpenGL ES 3.0 \*/', line):
+                category = 'GL_ES_VERSION_3_0'
+
+            m = re.match(r'GL_APICALL', line)
+            if m:
+                # We do the regexp in two parts to make sure that we
+                # actually do catch all the GL_APICALLs.
+                m = re.match(r'^GL_APICALL\s*(.*)\s*GL_APIENTRY\s*gl(\w*)\s\((.*)\).*$', line)
+                return_type, name, args = m.groups()
+
+                return_type = return_type.strip()
+                args = args.split(', ')
+
+                if args == ['void']:
+                    args = []
+                param_names = []
+                param_types = []
+                for arg in args:
+                    splitloc = max(arg.rfind(' '), arg.rfind('*'))
+                    param_types.append(arg[:splitloc + 1])
+                    param_names.append(arg[splitloc + 1:])
+
+                self.add_function(name, return_type, param_names, param_types, category)
+
     # Convert each line in the enumext.spec file into a key/value pair
     # in self.enums, mapping an enum name to a dict.  For example, the
     # following enumext.spec input:
@@ -495,5 +527,7 @@ if __name__ == '__main__':
         api.read_enumext_spec(f)
     with open(sys.argv[4]) as f:
         api.read_enumext_spec(f)
-    with open(sys.argv[5], 'w') as f:
+    with open(sys.argv[5]) as f:
+        api.read_gles_header(f)
+    with open(sys.argv[6], 'w') as f:
         f.write(api.to_json())
