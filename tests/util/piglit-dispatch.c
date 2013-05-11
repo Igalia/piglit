@@ -73,6 +73,8 @@ static int gl_version = 0;
  */
 static bool is_initialized = false;
 
+static piglit_dispatch_api dispatch_api;
+
 /**
  * Generated code calls this function to verify that the dispatch
  * mechanism has been properly initialized.
@@ -211,7 +213,7 @@ piglit_dispatch_init(piglit_dispatch_api api,
 		     piglit_error_function_ptr unsupported_proc,
 		     piglit_error_function_ptr failure_proc)
 {
-	(void) api; /* Not yet implemented--assume GL. */
+	dispatch_api = api;
 
 	get_core_proc_address = get_core_proc;
 	get_ext_proc_address = get_ext_proc;

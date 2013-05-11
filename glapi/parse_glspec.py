@@ -91,7 +91,7 @@
 # {
 #   "categories": {
 #     <category name>: {
-#       "kind": <"GL" for a GL version, "extension" for an extension>,
+#       "kind": <"GL" or "GLES" for a GL version, "extension" for an extension>,
 #       "gl_10x_version": <For a GL version, version number times 10>,
 #       "extension_name" <For an extension, name of the extension>
 #     }, ...
@@ -127,6 +127,7 @@ import sys
 GLSPEC_HEADER_REGEXP = re.compile(r'^(\w+)\((.*)\)$')
 GLSPEC_ATTRIBUTE_REGEXP = re.compile(r'^\s+(\w+)\s+(.*)$')
 GL_VERSION_REGEXP = re.compile('^VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
+GLES_VERSION_REGEXP = re.compile('^GL_ES_VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
 ENUM_REGEXP = re.compile(r'^\s+(\w+)\s+=\s+(\w+)$')
 
 
@@ -181,6 +182,9 @@ def filter_comments(f):
 # - "VERSION_2_1" is converted into { 'kind': 'GL', 'gl_10x_version': 21 }
 #
 # - "ARB_foo" is converted into { 'kind': 'extension', 'extension_name': 'GL_ARB_foo' }
+#
+# - "GL_ES_VERSION_2_0" is converted into { 'kind': 'GLES', 'gl_10x_version': 20 }
+#   (this category is a piglit extension for local-gl.spec)
 def translate_category(category_name):
     m = GL_VERSION_REGEXP.match(category_name)
     if m:
@@ -190,12 +194,21 @@ def translate_category(category_name):
             'kind': 'GL',
             'gl_10x_version': 10 * ones + tenths
             }
-    else:
-        extension_name = 'GL_' + category_name
-        return extension_name, {
-            'kind': 'extension',
-            'extension_name': extension_name
+
+    m = GLES_VERSION_REGEXP.match(category_name)
+    if m:
+        ones = int(m.group(1))
+        tenths = int(m.group(2))
+        return 'GLES{0}.{1}'.format(ones, tenths), {
+            'kind': 'GLES',
+            'gl_10x_version': 10 * ones + tenths
             }
+
+    extension_name = 'GL_' + category_name
+    return extension_name, {
+        'kind': 'extension',
+        'extension_name': extension_name
+        }
 
 
 # Data structure keeping track of which function names are known, and
@@ -276,6 +289,11 @@ class Api(object):
         # version, the dict entry looks like this:
         #
         # '2.1': { 'kind': 'GL', 'gl_10x_version': 21 }
+        #
+        # For categories representing a GLES version, the dict entry looks
+        # like this:
+        #
+        # 'GLES2.0': { 'kind': 'GLES', 'gl_10x_version': 20 }
         #
         # For categories representing an extension, the dict entry
         # looks like this:

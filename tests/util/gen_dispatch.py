@@ -32,7 +32,7 @@
 # {
 #   "categories": {
 #     <category name>: {
-#       "kind": <"GL" for a GL version, "extension" for an extension>,
+#       "kind": <"GL" or "GLES" for a GL spec API, "extension" for an extension>,
 #       "gl_10x_version": <For a GL version, version number times 10>,
 #       "extension_name" <For an extension, name of the extension>
 #     }, ...
@@ -216,6 +216,9 @@ class Category(object):
         if self.kind == 'GL':
             return 'GL {0}.{1}'.format(
                 self.gl_10x_version // 10, self.gl_10x_version % 10)
+        if self.kind == 'GLES':
+            return 'GLES {0}.{1}'.format(
+                self.gl_10x_version // 10, self.gl_10x_version % 10)
         elif self.kind == 'extension':
             return self.extension_name
         else:
@@ -300,7 +303,7 @@ class Enum(object):
 #
 # - DispatchSet.cat_fn_pairs is a list of pairs (category, function)
 #   for each category this function is defined in.  The list is sorted
-#   by category, with categories of kind 'GL' appearing first.
+#   by category, with categories of kind 'GL' and then 'GLES' appearing first.
 class DispatchSet(object):
     # Initialize a dispatch set given a list of synonymous function
     # names.
@@ -349,8 +352,10 @@ class DispatchSet(object):
     def __sort_key(cat_fn_pair):
         if cat_fn_pair[0].kind == 'GL':
             return 0, cat_fn_pair[0].gl_10x_version
+        elif cat_fn_pair[0].kind == 'GLES':
+            return 1, cat_fn_pair[0].gl_10x_version
         elif cat_fn_pair[0].kind == 'extension':
-            return 1, cat_fn_pair[0].extension_name
+            return 2, cat_fn_pair[0].extension_name
         else:
             raise Exception(
                 'Unexpected category kind {0!r}'.format(cat_fn_pair[0].kind))
@@ -439,20 +444,29 @@ def generate_resolve_function(ds):
     # execute in each case.
     condition_code_pairs = []
     for category, f in ds.cat_fn_pairs:
-        if category.kind == 'GL':
+        if category.kind in ('GL', 'GLES'):
             getter = 'get_core_proc("{0}", {1})'.format(
                 f.gl_name, category.gl_10x_version)
-            if category.gl_10x_version == 10:
-                # Function has always been available--no need to check
-                # a condition.
-                condition = 'true'
+
+            condition = ''
+            api_base_version = 0;
+            if category.kind == 'GL':
+                condition = 'dispatch_api == PIGLIT_DISPATCH_GL'
+                api_base_version = 10
+            elif category.gl_10x_version >= 20:
+                condition = 'dispatch_api == PIGLIT_DISPATCH_ES2'
+                api_base_version = 20
             else:
-                condition = 'check_version({0})'.format(
-                    category.gl_10x_version)
+                condition = 'dispatch_api == PIGLIT_DISPATCH_ES'
+                api_base_version = 11
+
+            # Only check the version for functions that aren't part of the
+            # core for the PIGLIT_DISPATCH api.
+            if category.gl_10x_version != api_base_version:
+                condition = condition + ' && check_version({0})'.format(category.gl_10x_version)
         elif category.kind == 'extension':
             getter = 'get_ext_proc("{0}")'.format(f.gl_name)
-            condition = 'check_extension("{0}")'.format(
-                category.extension_name)
+            condition = 'check_extension("{0}")'.format(category.extension_name)
         else:
             raise Exception(
                 'Unexpected category type {0!r}'.format(category.kind))
