@@ -140,7 +140,6 @@ typedef void (*piglit_error_function_ptr)(const char *);
 
 typedef enum {
 	PIGLIT_DISPATCH_GL,
-	PIGLIT_DISPATCH_GL_FWD,
 	PIGLIT_DISPATCH_ES1,
 	PIGLIT_DISPATCH_ES2
 } piglit_dispatch_api;
