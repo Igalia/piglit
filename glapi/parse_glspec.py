@@ -178,9 +178,9 @@ def filter_comments(f):
 # Convert a category name from the form used in the gl.spec file to
 # the form we want to output in JSON.  E.g.:
 #
-# - "2.1" is converted into { 'kind': 'GL', 'gl_10x_version': 21 }
+# - "VERSION_2_1" is converted into { 'kind': 'GL', 'gl_10x_version': 21 }
 #
-# - "FOO" is converted into { 'kind': 'extension', 'extension_name': 'GL_FOO' }
+# - "ARB_foo" is converted into { 'kind': 'extension', 'extension_name': 'GL_ARB_foo' }
 def translate_category(category_name):
     m = GL_VERSION_REGEXP.match(category_name)
     if m:
