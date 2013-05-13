@@ -336,6 +336,18 @@ class Api(object):
         if function_name:
             yield function_name, param_names, attributes
 
+    def add_function(self, name, return_type, param_names, param_types, category_string):
+        category, additional_data = translate_category(category_string)
+        if category not in self.categories:
+            self.categories[category] = additional_data
+        self.functions[name] = {
+            'return_type': return_type,
+            'param_names': param_names,
+            'param_types': param_types,
+            'category': category,
+            }
+        self.synonyms.add_singleton(name)
+
     # Process the data in gl.spec, and populate self.functions,
     # self.synonyms, and self.categories based on it.
     def read_gl_spec(self, f):
@@ -401,21 +413,13 @@ class Api(object):
                 raise Exception(
                     'Function {0!r} contains {1} return attributes'.format(
                         name, len(attributes['return'])))
+            return_type = self.type_translation[attributes['return'][0]]
             if len(attributes['category']) != 1:
                 raise Exception(
                     'Function {0!r} contains {1} category attributes'.format(
                         name, len(attributes['category'])))
-            category, additional_data = translate_category(
-                attributes['category'][0])
-            if category not in self.categories:
-                self.categories[category] = additional_data
-            self.functions[name] = {
-                'return_type': self.type_translation[attributes['return'][0]],
-                'param_names': param_names,
-                'param_types': param_types,
-                'category': category,
-                }
-            self.synonyms.add_singleton(name)
+            category = attributes['category'][0]
+            self.add_function(name, return_type, param_names, param_types, category)
             for alias in attributes['alias']:
                 self.synonyms.add_alias(name, alias)
 
