@@ -188,9 +188,9 @@ def generated_boilerplate():
 PARAM_NAME_FIXUPS = { 'near': 'hither', 'far': 'yon' }
 def fixup_param_name(name):
     if name in PARAM_NAME_FIXUPS:
-	return PARAM_NAME_FIXUPS[name]
+        return PARAM_NAME_FIXUPS[name]
     else:
-	return name
+        return name
 
 
 # Internal representation of a category.
@@ -204,23 +204,23 @@ def fixup_param_name(name):
 #   (including the 'GL_' prefix).
 class Category(object):
     def __init__(self, json_data):
-	self.kind = json_data['kind']
-	if 'gl_10x_version' in json_data:
-	    self.gl_10x_version = json_data['gl_10x_version']
-	if 'extension_name' in json_data:
-	    self.extension_name = json_data['extension_name']
+        self.kind = json_data['kind']
+        if 'gl_10x_version' in json_data:
+            self.gl_10x_version = json_data['gl_10x_version']
+        if 'extension_name' in json_data:
+            self.extension_name = json_data['extension_name']
 
     # Generate a human-readable representation of the category (for
     # use in generated comments).
     def __str__(self):
-	if self.kind == 'GL':
-	    return 'GL {0}.{1}'.format(
-		self.gl_10x_version // 10, self.gl_10x_version % 10)
-	elif self.kind == 'extension':
-	    return self.extension_name
-	else:
-	    raise Exception(
-		'Unexpected category kind {0!r}'.format(self.kind))
+        if self.kind == 'GL':
+            return 'GL {0}.{1}'.format(
+                self.gl_10x_version // 10, self.gl_10x_version % 10)
+        elif self.kind == 'extension':
+            return self.extension_name
+        else:
+            raise Exception(
+                'Unexpected category kind {0!r}'.format(self.kind))
 
 
 # Internal representation of a GL function.
@@ -241,24 +241,24 @@ class Category(object):
 #   GL version the function is defined in.
 class Function(object):
     def __init__(self, name, json_data):
-	self.name = name
-	self.param_names = [
-	    fixup_param_name(x) for x in json_data['param_names']]
-	self.param_types = json_data['param_types']
-	self.return_type = json_data['return_type']
-	self.category = json_data['category']
+        self.name = name
+        self.param_names = [
+            fixup_param_name(x) for x in json_data['param_names']]
+        self.param_types = json_data['param_types']
+        self.return_type = json_data['return_type']
+        self.category = json_data['category']
 
     # Name of the function, with the 'gl' prefix.
     @property
     def gl_name(self):
-	return 'gl' + self.name
+        return 'gl' + self.name
 
     # Name of the function signature typedef corresponding to this
     # function.  E.g. for the glGetString function, this is
     # 'PFNGLGETSTRINGPROC'.
     @property
     def typedef_name(self):
-	return 'pfn{0}proc'.format(self.gl_name).upper()
+        return 'pfn{0}proc'.format(self.gl_name).upper()
 
     # Generate a string representing the function signature in C.
     #
@@ -268,18 +268,18 @@ class Function(object):
     # - If anonymous_args is True, then the signature contains only
     #   the types of the arguments, not the names.
     def c_form(self, name, anonymous_args):
-	if self.param_types:
-	    if anonymous_args:
-		param_decls = ', '.join(self.param_types)
-	    else:
-		param_decls = ', '.join(
-		    '{0} {1}'.format(*p)
-		    for p in zip(self.param_types, self.param_names))
-	else:
-	    param_decls = 'void'
+        if self.param_types:
+            if anonymous_args:
+                param_decls = ', '.join(self.param_types)
+            else:
+                param_decls = ', '.join(
+                    '{0} {1}'.format(*p)
+                    for p in zip(self.param_types, self.param_names))
+        else:
+            param_decls = 'void'
         return '{rettype} {name}({param_decls})'.format(
-	    rettype = self.return_type, name = name,
-	    param_decls = param_decls)
+            rettype = self.return_type, name = name,
+            param_decls = param_decls)
 
 
 # Internal representation of an enum.
@@ -290,8 +290,8 @@ class Function(object):
 #   emitting as C code.
 class Enum(object):
     def __init__(self, json_data):
-	self.value_int = json_data['value_int']
-	self.value_str = json_data['value_str']
+        self.value_int = json_data['value_int']
+        self.value_str = json_data['value_str']
 
 
 # Data structure keeping track of a set of synonymous functions.  Such
@@ -311,49 +311,49 @@ class DispatchSet(object):
     # - all_categories is a dict mapping all possible category names
     #   to the Category object describing them.
     def __init__(self, synonym_set, all_functions, all_categories):
-	self.cat_fn_pairs = []
-	for function_name in synonym_set:
-	    function = all_functions[function_name]
-	    category_name = function.category
-	    category = all_categories[category_name]
-	    self.cat_fn_pairs.append((category, function))
-	# Sort by category, with GL categories preceding extensions.
-	self.cat_fn_pairs.sort(key = self.__sort_key)
+        self.cat_fn_pairs = []
+        for function_name in synonym_set:
+            function = all_functions[function_name]
+            category_name = function.category
+            category = all_categories[category_name]
+            self.cat_fn_pairs.append((category, function))
+        # Sort by category, with GL categories preceding extensions.
+        self.cat_fn_pairs.sort(key = self.__sort_key)
 
     # The first Function object in DispatchSet.functions.  This
     # "primary" function is used to name the dispatch pointer, the
     # stub function, and the resolve function.
     @property
     def primary_function(self):
-	return self.cat_fn_pairs[0][1]
+        return self.cat_fn_pairs[0][1]
 
     # The name of the dispatch pointer that should be generated for
     # this dispatch set.
     @property
     def dispatch_name(self):
-	return 'piglit_dispatch_' + self.primary_function.gl_name
+        return 'piglit_dispatch_' + self.primary_function.gl_name
 
     # The name of the stub function that should be generated for this
     # dispatch set.
     @property
     def stub_name(self):
-	return 'stub_' + self.primary_function.gl_name
+        return 'stub_' + self.primary_function.gl_name
 
     # The name of the resolve function that should be generated for
     # this dispatch set.
     @property
     def resolve_name(self):
-	return 'resolve_' + self.primary_function.gl_name
+        return 'resolve_' + self.primary_function.gl_name
 
     @staticmethod
     def __sort_key(cat_fn_pair):
-	if cat_fn_pair[0].kind == 'GL':
-	    return 0, cat_fn_pair[0].gl_10x_version
-	elif cat_fn_pair[0].kind == 'extension':
-	    return 1, cat_fn_pair[0].extension_name
-	else:
-	    raise Exception(
-		'Unexpected category kind {0!r}'.format(cat_fn_pair[0].kind))
+        if cat_fn_pair[0].kind == 'GL':
+            return 0, cat_fn_pair[0].gl_10x_version
+        elif cat_fn_pair[0].kind == 'extension':
+            return 1, cat_fn_pair[0].extension_name
+        else:
+            raise Exception(
+                'Unexpected category kind {0!r}'.format(cat_fn_pair[0].kind))
 
 
 # Data structure keeping track of all of the known functions and
@@ -370,24 +370,24 @@ class DispatchSet(object):
 #   object.
 class Api(object):
     def __init__(self, json_data):
-	self.enums = dict(
-	    (key, Enum(value))
-	    for key, value in json_data['enums'].items())
-	self.functions = dict(
-	    (key, Function(key, value))
-	    for key, value in json_data['functions'].items())
-	self.function_alias_sets = json_data['function_alias_sets']
-	self.categories = dict(
-	    (key, Category(value))
-	    for key, value in json_data['categories'].items())
+        self.enums = dict(
+            (key, Enum(value))
+            for key, value in json_data['enums'].items())
+        self.functions = dict(
+            (key, Function(key, value))
+            for key, value in json_data['functions'].items())
+        self.function_alias_sets = json_data['function_alias_sets']
+        self.categories = dict(
+            (key, Category(value))
+            for key, value in json_data['categories'].items())
 
     # Generate a list of (name, value) pairs representing all enums in
     # the API.  The resulting list is sorted by enum value.
     def compute_unique_enums(self):
-	enums_by_value = [(enum.value_int, (name, enum.value_str))
-			  for name, enum in self.enums.items()]
-	enums_by_value.sort()
-	return [item[1] for item in enums_by_value]
+        enums_by_value = [(enum.value_int, (name, enum.value_str))
+                          for name, enum in self.enums.items()]
+        enums_by_value.sort()
+        return [item[1] for item in enums_by_value]
 
     # A list of all of the extension names declared in the API, as
     # Python strings, sorted alphabetically.
@@ -411,23 +411,23 @@ class Api(object):
     # synonymous functions in the API.  The resulting list is sorted
     # by DispatchSet.stub_name.
     def compute_dispatch_sets(self):
-	sets = [DispatchSet(synonym_set, self.functions, self.categories)
-		for synonym_set in self.function_alias_sets]
-	sets.sort(key = lambda ds: ds.stub_name)
+        sets = [DispatchSet(synonym_set, self.functions, self.categories)
+                for synonym_set in self.function_alias_sets]
+        sets.sort(key = lambda ds: ds.stub_name)
 
-	return sets
+        return sets
 
     # Generate a list of Function objects representing all functions
     # in the API.  The resulting list is sorted by function name.
     def compute_unique_functions(self):
-	return [self.functions[key] for key in sorted(self.functions.keys())]
+        return [self.functions[key] for key in sorted(self.functions.keys())]
 
 
 # Read the given input file and return an Api object containing the
 # data in it.
 def read_api(filename):
     with open(filename, 'r') as f:
-	return Api(json.load(f))
+        return Api(json.load(f))
 
 
 # Generate the resolve function for a given DispatchSet.
@@ -439,58 +439,58 @@ def generate_resolve_function(ds):
     # execute in each case.
     condition_code_pairs = []
     for category, f in ds.cat_fn_pairs:
-	if category.kind == 'GL':
-	    getter = 'get_core_proc("{0}", {1})'.format(
-		f.gl_name, category.gl_10x_version)
-	    if category.gl_10x_version == 10:
-		# Function has always been available--no need to check
-		# a condition.
-		condition = 'true'
-	    else:
-		condition = 'check_version({0})'.format(
-		    category.gl_10x_version)
-	elif category.kind == 'extension':
-	    getter = 'get_ext_proc("{0}")'.format(f.gl_name)
-	    condition = 'check_extension("{0}")'.format(
-		category.extension_name)
-	else:
-	    raise Exception(
-		'Unexpected category type {0!r}'.format(category.kind))
+        if category.kind == 'GL':
+            getter = 'get_core_proc("{0}", {1})'.format(
+                f.gl_name, category.gl_10x_version)
+            if category.gl_10x_version == 10:
+                # Function has always been available--no need to check
+                # a condition.
+                condition = 'true'
+            else:
+                condition = 'check_version({0})'.format(
+                    category.gl_10x_version)
+        elif category.kind == 'extension':
+            getter = 'get_ext_proc("{0}")'.format(f.gl_name)
+            condition = 'check_extension("{0}")'.format(
+                category.extension_name)
+        else:
+            raise Exception(
+                'Unexpected category type {0!r}'.format(category.kind))
 
-	if f.name == 'TexImage3DEXT':
-	    # Special case: glTexImage3DEXT has a slightly different
-	    # type than glTexImage3D (argument 3 is a GLenum rather
-	    # than a GLint).  This is not a problem, since GLenum and
-	    # GLint are treated identically by function calling
-	    # conventions.  So when calling get_proc_address() on
-	    # glTexImage3DEXT, cast the result to PFNGLTEXIMAGE3DPROC
-	    # to avoid a warning.
-	    typedef_name = 'PFNGLTEXIMAGE3DPROC'
-	else:
-	    typedef_name = f.typedef_name
+        if f.name == 'TexImage3DEXT':
+            # Special case: glTexImage3DEXT has a slightly different
+            # type than glTexImage3D (argument 3 is a GLenum rather
+            # than a GLint).  This is not a problem, since GLenum and
+            # GLint are treated identically by function calling
+            # conventions.  So when calling get_proc_address() on
+            # glTexImage3DEXT, cast the result to PFNGLTEXIMAGE3DPROC
+            # to avoid a warning.
+            typedef_name = 'PFNGLTEXIMAGE3DPROC'
+        else:
+            typedef_name = f.typedef_name
 
-	code = '{0} = ({1}) {2};'.format(
-	    ds.dispatch_name, typedef_name, getter)
+        code = '{0} = ({1}) {2};'.format(
+            ds.dispatch_name, typedef_name, getter)
 
-	condition_code_pairs.append((condition, code))
+        condition_code_pairs.append((condition, code))
 
     # XXX: glDraw{Arrays,Elements}InstancedARB are exposed by
     # ARB_instanced_arrays in addition to ARB_draw_instanced, but neither
     # gl.spec nor gl.json can accomodate an extension with two categories, so
     # insert these cases here.
-	if f.gl_name in ('glDrawArraysInstancedARB', 'glDrawElementsInstancedARB'):
-	    condition = 'check_extension("GL_ARB_instanced_arrays")'
-	    condition_code_pairs.append((condition, code))
+        if f.gl_name in ('glDrawArraysInstancedARB', 'glDrawElementsInstancedARB'):
+            condition = 'check_extension("GL_ARB_instanced_arrays")'
+            condition_code_pairs.append((condition, code))
 
     # Finally, if none of the previous conditions were satisfied, then
     # the given dispatch set is not supported by the implementation,
     # so we want to call the unsupported() function.
     condition_code_pairs.append(
-	('true', 'unsupported("{0}");'.format(f0.name)))
+        ('true', 'unsupported("{0}");'.format(f0.name)))
 
     # Start the resolve function
     resolve_fn = 'static piglit_dispatch_function_ptr {0}()\n'.format(
-	ds.resolve_name)
+        ds.resolve_name)
     resolve_fn += '{\n'
 
     # Output code that checks each condition in turn and executes the
@@ -498,21 +498,21 @@ def generate_resolve_function(ds):
     # (and to avoid compiler warnings), we convert "if (true) FOO;" to
     # "FOO;" and "else if (true) FOO;" to "else FOO;".
     if condition_code_pairs[0][0] == 'true':
-	resolve_fn += '\t{0}\n'.format(condition_code_pairs[0][1])
+        resolve_fn += '\t{0}\n'.format(condition_code_pairs[0][1])
     else:
-	resolve_fn += '\tif ({0})\n\t\t{1}\n'.format(*condition_code_pairs[0])
-	for i in xrange(1, len(condition_code_pairs)):
-	    if condition_code_pairs[i][0] == 'true':
-		resolve_fn += '\telse\n\t\t{0}\n'.format(
-		    condition_code_pairs[i][1])
-		break
-	    else:
-		resolve_fn += '\telse if ({0})\n\t\t{1}\n'.format(
-		    *condition_code_pairs[i])
+        resolve_fn += '\tif ({0})\n\t\t{1}\n'.format(*condition_code_pairs[0])
+        for i in xrange(1, len(condition_code_pairs)):
+            if condition_code_pairs[i][0] == 'true':
+                resolve_fn += '\telse\n\t\t{0}\n'.format(
+                    condition_code_pairs[i][1])
+                break
+            else:
+                resolve_fn += '\telse if ({0})\n\t\t{1}\n'.format(
+                    *condition_code_pairs[i])
 
     # Output code to return the dispatch function.
     resolve_fn += '\treturn (piglit_dispatch_function_ptr) {0};\n'.format(
-	ds.dispatch_name)
+        ds.dispatch_name)
     resolve_fn += '}\n'
     return resolve_fn
 
@@ -523,15 +523,15 @@ def generate_stub_function(ds):
 
     # Start the stub function
     stub_fn = 'static {0}\n'.format(
-	f0.c_form('APIENTRY ' + ds.stub_name, anonymous_args = False))
+        f0.c_form('APIENTRY ' + ds.stub_name, anonymous_args = False))
     stub_fn += '{\n'
     stub_fn += '\tcheck_initialized();\n'
     stub_fn += '\t{0}();\n'.format(ds.resolve_name)
 
     # Output the call to the dispatch function.
     stub_fn += '\t{0}{1}({2});\n'.format(
-	'return ' if f0.return_type != 'void' else '',
-	ds.dispatch_name, ', '.join(f0.param_names))
+        'return ' if f0.return_type != 'void' else '',
+        ds.dispatch_name, ', '.join(f0.param_names))
     stub_fn += '}\n'
     return stub_fn
 
@@ -544,8 +544,8 @@ def generate_dispatch_pointer_resetter(dispatch_sets):
     result.append('reset_dispatch_pointers()\n')
     result.append('{\n')
     for ds in dispatch_sets:
-	result.append(
-	    '\t{0} = {1};\n'.format(ds.dispatch_name, ds.stub_name))
+        result.append(
+            '\t{0} = {1};\n'.format(ds.dispatch_name, ds.stub_name))
     result.append('}\n')
     return ''.join(result)
 
@@ -554,19 +554,19 @@ def generate_dispatch_pointer_resetter(dispatch_sets):
 def generate_function_names_and_resolvers(dispatch_sets):
     name_resolver_pairs = []
     for ds in dispatch_sets:
-	for _, f in ds.cat_fn_pairs:
-	    name_resolver_pairs.append((f.gl_name, ds.resolve_name))
+        for _, f in ds.cat_fn_pairs:
+            name_resolver_pairs.append((f.gl_name, ds.resolve_name))
     name_resolver_pairs.sort()
     result = []
     result.append('static const char * const function_names[] = {\n')
     for name, _ in name_resolver_pairs:
-	result.append('\t"{0}",\n'.format(name))
+        result.append('\t"{0}",\n'.format(name))
     result.append('};\n')
     result.append('\n')
     result.append('static const piglit_dispatch_resolver_ptr '
-		  'function_resolvers[] = {\n')
+                  'function_resolvers[] = {\n')
     for _, resolver in name_resolver_pairs:
-	result.append('\t{0},\n'.format(resolver))
+        result.append('\t{0},\n'.format(resolver))
     result.append('};\n')
     return ''.join(result)
 
@@ -580,43 +580,43 @@ def generate_code(api):
 
     # Emit typedefs for each name
     for f in unique_functions:
-	h_contents.append(
-	    'typedef {0};\n'.format(
-		f.c_form('(APIENTRY *{0})'.format(f.typedef_name),
-			 anonymous_args = True)))
+        h_contents.append(
+            'typedef {0};\n'.format(
+                f.c_form('(APIENTRY *{0})'.format(f.typedef_name),
+                         anonymous_args = True)))
 
     dispatch_sets = api.compute_dispatch_sets()
 
     for ds in dispatch_sets:
-	f0 = ds.primary_function
+        f0 = ds.primary_function
 
-	# Emit comment block
-	comments = '\n'
-	for cat, f in ds.cat_fn_pairs:
-	    comments += '/* {0} ({1}) */\n'.format(f.gl_name, cat)
-	c_contents.append(comments)
-	h_contents.append(comments)
+        # Emit comment block
+        comments = '\n'
+        for cat, f in ds.cat_fn_pairs:
+            comments += '/* {0} ({1}) */\n'.format(f.gl_name, cat)
+        c_contents.append(comments)
+        h_contents.append(comments)
 
-	# Emit extern declaration of dispatch pointer
-	h_contents.append(
-	    'extern {0} {1};\n'.format(f0.typedef_name, ds.dispatch_name))
+        # Emit extern declaration of dispatch pointer
+        h_contents.append(
+            'extern {0} {1};\n'.format(f0.typedef_name, ds.dispatch_name))
 
-	# Emit defines aliasing each GL function to the dispatch
-	# pointer
-	for _, f in ds.cat_fn_pairs:
-	    h_contents.append(
-		'#define {0} {1}\n'.format(f.gl_name, ds.dispatch_name))
+        # Emit defines aliasing each GL function to the dispatch
+        # pointer
+        for _, f in ds.cat_fn_pairs:
+            h_contents.append(
+                '#define {0} {1}\n'.format(f.gl_name, ds.dispatch_name))
 
-	# Emit resolve function
-	c_contents.append(generate_resolve_function(ds))
+        # Emit resolve function
+        c_contents.append(generate_resolve_function(ds))
 
-	# Emit stub function
-	c_contents.append(generate_stub_function(ds))
+        # Emit stub function
+        c_contents.append(generate_stub_function(ds))
 
-	# Emit initializer for dispatch pointer
-	c_contents.append(
-	    '{0} {1} = {2};\n'.format(
-		f0.typedef_name, ds.dispatch_name, ds.stub_name))
+        # Emit initializer for dispatch pointer
+        c_contents.append(
+            '{0} {1} = {2};\n'.format(
+                f0.typedef_name, ds.dispatch_name, ds.stub_name))
 
     # Emit dispatch pointer initialization function
     c_contents.append(generate_dispatch_pointer_resetter(dispatch_sets))
@@ -628,7 +628,7 @@ def generate_code(api):
 
     # Emit enum #defines
     for name, value in api.compute_unique_enums():
-	h_contents.append('#define GL_{0} {1}\n'.format(name, value))
+        h_contents.append('#define GL_{0} {1}\n'.format(name, value))
 
     # Emit extension #defines
     #
@@ -656,6 +656,6 @@ if __name__ == '__main__':
 
     c_contents, h_contents = generate_code(api)
     with open(sys.argv[2], 'w') as f:
-	f.write(c_contents)
+        f.write(c_contents)
     with open(sys.argv[3], 'w') as f:
-	f.write(h_contents)
+        f.write(h_contents)
