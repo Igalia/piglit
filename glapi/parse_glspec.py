@@ -104,7 +104,7 @@
 #   },
 #   "functions": {
 #     <function name, without "gl" prefix>: {
-#       "category": <category in which this function appears>,
+#       "categories": <list of categories in which this function appears>,
 #       "param_names": <list of param names>,
 #       "param_types": <list of param types>,
 #       "return_type": <type, or "void" if no return>
@@ -340,12 +340,18 @@ class Api(object):
         category, additional_data = translate_category(category_string)
         if category not in self.categories:
             self.categories[category] = additional_data
-        self.functions[name] = {
-            'return_type': return_type,
-            'param_names': param_names,
-            'param_types': param_types,
-            'category': category,
-            }
+
+        if name not in self.functions:
+            self.functions[name] = {
+                'return_type': return_type,
+                'param_names': param_names,
+                'param_types': param_types,
+                'categories': [category],
+                }
+        else:
+            if category not in self.functions[name]['categories']:
+                self.functions[name]['categories'].append(category)
+
         self.synonyms.add_singleton(name)
 
     # Process the data in gl.spec, and populate self.functions,
