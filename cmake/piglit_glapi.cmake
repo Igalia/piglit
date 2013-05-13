@@ -35,6 +35,7 @@ set(piglit_glapi_inputs
 	${piglit_glapi_src_dir}/enum.spec
 	${piglit_glapi_src_dir}/enumext.spec
 	${piglit_glapi_src_dir}/GLES3/gl3.h
+	${piglit_glapi_src_dir}/GLES2/gl2ext.h
 	)
 
 add_custom_command(

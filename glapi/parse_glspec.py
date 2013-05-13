@@ -129,7 +129,7 @@ GLSPEC_ATTRIBUTE_REGEXP = re.compile(r'^\s+(\w+)\s+(.*)$')
 GL_VERSION_REGEXP = re.compile('^VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
 GLES_VERSION_REGEXP = re.compile('^GL_ES_VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
 ENUM_REGEXP = re.compile(r'^\s+(\w+)\s+=\s+(\w+)$')
-
+EXTENSION_SUFFIX_REGEXP = re.compile(r'(ARB|EXT|KHR|OES|NV|AMD|IMG|QCOM|INTEL)$')
 
 # Convert a type into a canonical form that is consistent about its
 # use of spaces.
@@ -453,10 +453,17 @@ class Api(object):
             # The GLES gl3.h has typedefs, tokens, and prototypes,
             # each listed after a comment indicating whether they're
             # part of 2.0 core or 3.0 core.
+            #
+            # The gl2ext.h is split into groups of functions prefixed
+            # by the extension name in a comment.
             if re.match(r'/\* OpenGL ES 2.0 \*/', line):
                 category = 'GL_ES_VERSION_2_0'
             elif re.match(r'/\* OpenGL ES 3.0 \*/', line):
                 category = 'GL_ES_VERSION_3_0'
+            else:
+                m = re.match(r'/\* (GL_.*) \*/', line)
+                if m:
+                    category = m.group(1).replace('GL_', '')
 
             m = re.match(r'GL_APICALL', line)
             if m:
@@ -478,6 +485,18 @@ class Api(object):
                     param_names.append(arg[splitloc + 1:])
 
                 self.add_function(name, return_type, param_names, param_types, category)
+
+                # Since we don't have alias information for
+                # extensions, assume that pretty much anything
+                # with the same base name as a core function is
+                # aliased with it.
+                #
+                # glTexImage3DOES is an exception because it
+                # doesn't have the border argument.
+                if name != 'TexImage3DOES':
+                    corename = EXTENSION_SUFFIX_REGEXP.sub('', name)
+                    if corename in self.functions:
+                        self.synonyms.add_alias(corename, name)
 
     # Convert each line in the enumext.spec file into a key/value pair
     # in self.enums, mapping an enum name to a dict.  For example, the
@@ -529,5 +548,7 @@ if __name__ == '__main__':
         api.read_enumext_spec(f)
     with open(sys.argv[5]) as f:
         api.read_gles_header(f)
-    with open(sys.argv[6], 'w') as f:
+    with open(sys.argv[6]) as f:
+        api.read_gles_header(f)
+    with open(sys.argv[7], 'w') as f:
         f.write(api.to_json())
