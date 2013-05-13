@@ -11,6 +11,7 @@ link_libraries (
 )
 
 piglit_add_executable (fcc-read-after-clear read-after-clear.c)
+piglit_add_executable (fcc-read-to-pbo-after-clear read-to-pbo-after-clear.c)
 piglit_add_executable (fcc-blit-between-clears blit-between-clears.c)
 
 # vim: ft=cmake:
