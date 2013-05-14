@@ -465,5 +465,7 @@ if __name__ == '__main__':
         api.read_gl_spec(f)
     with open(sys.argv[3]) as f:
         api.read_enumext_spec(f)
-    with open(sys.argv[4], 'w') as f:
+    with open(sys.argv[4]) as f:
+        api.read_enumext_spec(f)
+    with open(sys.argv[5], 'w') as f:
         f.write(api.to_json())

@@ -32,6 +32,7 @@ set(piglit_glapi_inputs
 	${piglit_glapi_src_dir}/parse_glspec.py
 	${piglit_glapi_src_dir}/gl.tm
 	${piglit_glapi_src_dir}/gl.spec
+	${piglit_glapi_src_dir}/enum.spec
 	${piglit_glapi_src_dir}/enumext.spec
 	)
 

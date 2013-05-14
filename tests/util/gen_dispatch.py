@@ -83,11 +83,11 @@
 #
 # - A #define for each extension, e.g.:
 #
-#   #define GL_ARB_vertex_buffer_object
+#   #define GL_ARB_vertex_buffer_object 1
 #
 # - A #define for each known GL version, e.g.:
 #
-#   #define GL_VERSION_1_5
+#   #define GL_VERSION_1_5 1
 #
 #
 # The generated C file consists of the following:
@@ -631,14 +631,20 @@ def generate_code(api):
 	h_contents.append('#define GL_{0} {1}\n'.format(name, value))
 
     # Emit extension #defines
+    #
+    # While enum.ext lists some old extension names (defined to 1), it
+    # doesn't contain the full set that appears in glext.h.
     h_contents.append('\n')
     for ext in api.extensions:
-	h_contents.append('#define {0}\n'.format(ext))
+	h_contents.append('#define {0} 1\n'.format(ext))
 
     # Emit GL version #defines
+    #
+    # While enum.ext lists GL versions up to 3.2, it didn't continue
+    # adding them for later GL versions.
     h_contents.append('\n')
     for ver in api.gl_versions:
-	h_contents.append('#define GL_VERSION_{0}_{1}\n'.format(
+	h_contents.append('#define GL_VERSION_{0}_{1} 1\n'.format(
 		ver // 10, ver % 10))
 
     return ''.join(c_contents), ''.join(h_contents)
