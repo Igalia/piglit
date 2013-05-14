@@ -18,6 +18,7 @@ CheckedInt32,*,*,		    GLint,*,*
 ClampColorTargetARB,*,*,	    GLenum,*,*
 ClampColorModeARB,*,*,		    GLenum,*,*
 ClampedColorF,*,*,		    GLclampf,*,*
+ClampedFixed,*,*,		    GLfixed,*,*
 ClampedFloat32,*,*,		    GLclampf,*,*
 ClampedFloat64,*,*,		    GLclampd,*,*
 ClampedStencilValue,*,*,	    GLint,*,*
@@ -85,6 +86,8 @@ Float32,*,*,			    GLfloat,*,*
 Float32Pointer,*,*,		    GLfloat*,*,*
 Float64,*,*,			    GLdouble,*,*
 Float64Pointer,*,*,		    GLdouble*,*,*
+Fixed,*,*,			    GLfixed,*,*
+ConstFixed,*,*,			    GLfixed,*,*
 FogParameter,*,*,		    GLenum,*,*
 FogPointerTypeEXT,*,*,		    GLenum,*,*
 FogPointerTypeIBM,*,*,		    GLenum,*,*
@@ -233,6 +236,8 @@ WinCoord,*,*,			    GLint,*,*
 void,*,*,			    *,*,*
 ArrayObjectPNameATI,*,*,	    GLenum,*,*
 ArrayObjectUsageATI,*,*,	    GLenum,*,*,
+ConstByte,*,*,			    GLbyte,*,*
+ConstUByte,*,*,			    GLubyte,*,*
 ConstFloat32,*,*,		    GLfloat,*,*
 ConstInt32,*,*,			    GLint,*,*
 ConstUInt32,*,*,		    GLuint,*,*
@@ -293,7 +298,6 @@ UInt64,*,*,			    GLuint64,*,*
 handleARB,*,*,			    GLhandleARB,*,*
 charARB,*,*,			    GLcharARB,*,*
 charPointerARB,*,*,		    GLcharARB*,*,*
-constcharPointerARB,*,*,	    GLcharARB* const,*,*
 sync,*,*,			    GLsync,*,*,
 # EXT_timer_query
 Int64EXT,*,*,			    GLint64EXT,*,*
