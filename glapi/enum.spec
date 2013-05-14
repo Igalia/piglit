@@ -199,7 +199,7 @@ AttribMask enum:
 	LIST_BIT					= 0x00020000
 	TEXTURE_BIT					= 0x00040000
 	SCISSOR_BIT					= 0x00080000
-	ALL_ATTRIB_BITS					= 0xFFFFFFFF
+	ALL_ATTRIB_BITS					= 0x000FFFFF
 #??? ALL_ATTRIB_BITS mask value changed to all-1s in OpenGL 1.3 - this affects covgl.
 #	use ARB_multisample MULTISAMPLE_BIT_ARB
 #	use EXT_multisample MULTISAMPLE_BIT_EXT
