@@ -714,6 +714,8 @@ for subtest in ['generated', 'written', 'flush']:
         gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 
+spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
+
 spec['!OpenGL 3.3/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 33')
 
 spec['!OpenGL 4.2/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 42')
