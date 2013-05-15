@@ -46,6 +46,9 @@ static const struct {
 	{ 16, GL_INT },
 	{ 16, GL_UNSIGNED_INT },
 
+	{ 10, GL_UNSIGNED_INT },
+	{ 2, GL_UNSIGNED_INT },
+
 	{ 12, GL_UNSIGNED_NORMALIZED },
 	{ 10, GL_UNSIGNED_NORMALIZED },
 
@@ -54,6 +57,7 @@ static const struct {
 	{ 8, GL_INT },
 	{ 8, GL_UNSIGNED_INT },
 
+	{ 6, GL_UNSIGNED_NORMALIZED },
 	{ 5, GL_UNSIGNED_NORMALIZED },
 	{ 4, GL_UNSIGNED_NORMALIZED },
 	{ 3, GL_UNSIGNED_NORMALIZED },
@@ -92,6 +96,7 @@ const struct sized_internalformat sized_internalformats[] = {
 	FORMAT(GL_RGB5_A1, UN5, UN5, UN5, UN1, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA8, UN8, UN8, UN8, UN8, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGB10_A2, UN10, UN10, UN10, UN2, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGB10_A2UI, U10, U10, U10, U2, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA12, UN12, UN12, UN12, UN12, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA16, UN16, UN16, UN16, UN16, NONE, NONE, NONE, NONE),
 	FORMAT(GL_SRGB8, UN8, UN8, UN8, NONE, NONE, NONE, NONE, NONE),
@@ -105,6 +110,7 @@ const struct sized_internalformat sized_internalformats[] = {
 	FORMAT(GL_RGB32F, F32, F32, F32, NONE, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGBA32F, F32, F32, F32, F32, NONE, NONE, NONE, NONE),
 	FORMAT(GL_R11F_G11F_B10F, F11, F11, F10, NONE, NONE, NONE, NONE, NONE),
+	FORMAT(GL_RGB565, UN5, UN6, UN5, NONE, NONE, NONE, NONE, NONE),
 	FORMAT(GL_RGB9_E5, F9, F9, F9, NONE, NONE, NONE, NONE, NONE),
 	FORMAT(GL_R8I, I8, NONE, NONE, NONE, NONE, NONE, NONE, NONE),
 	FORMAT(GL_R8UI, U8, NONE, NONE, NONE, NONE, NONE, NONE, NONE),
@@ -210,8 +216,7 @@ const struct required_format required_formats[] = {
 
 	{ GL_R11F_G11F_B10F, 30, true },
 
-	/* Not in the headers! */
-	/* { GL_RGB565, 42 }, */
+	{ GL_RGB565, 42 },
 
 	{ GL_RG32F, 30, true },
 	{ GL_RG32I, 30, true },
@@ -363,7 +368,7 @@ valid_for_gl_version(const struct required_format *format, int target_version)
 static void
 usage(const char *name)
 {
-	fprintf(stderr, "usage: %s <30 | 31>\n", name);
+	fprintf(stderr, "usage: %s <30 | 31 | 33 | 42>\n", name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -389,6 +394,8 @@ setup_required_size_test(int argc, char **argv,
 		config->supports_gl_compat_version = 30;
 		break;
 	case 31:
+	case 33:
+	case 42:
 		config->supports_gl_core_version = target_version;
 		break;
 	default:

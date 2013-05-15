@@ -41,6 +41,9 @@ enum bits_types {
 	I16,
 	U16,
 
+	U10,
+	U2,
+
 	UN12,
 	UN10,
 
@@ -49,6 +52,7 @@ enum bits_types {
 	I8,
 	U8,
 
+	UN6,
 	UN5,
 	UN4,
 	UN3,
