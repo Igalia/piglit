@@ -7520,6 +7520,7 @@ ARB_ES3_compatibility enum:
 	PRIMITIVE_RESTART_FIXED_INDEX			= 0x8D69
 	ANY_SAMPLES_PASSED_CONSERVATIVE			= 0x8D6A
 	MAX_ELEMENT_INDEX				= 0x8D6B
+	FRAMEBUFFER_INCOMPLETE_DIMENSIONS		= 0x8CD9
 
 # Aliases VERSION_ES_FUTURE enum above
 EXT_occlusion_query_boolean enum: (OpenGL ES only; additional; see above)
