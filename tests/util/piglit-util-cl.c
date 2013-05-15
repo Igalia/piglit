@@ -139,7 +139,6 @@ piglit_cl_get_platform_version(cl_platform_id platform)
 		       version_string);
 		free(version_string);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 	free(version_string);
 
@@ -154,7 +153,6 @@ piglit_cl_require_platform_version(cl_platform_id platform,
 		printf("Test requires OpenCL version %g\n",
 		       required_version_times_10 / 10.0);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -183,7 +181,6 @@ piglit_cl_get_device_version(cl_device_id device)
 		       version_string);
 		free(version_string);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 	free(version_string);
 
@@ -198,7 +195,6 @@ piglit_cl_require_device_version(cl_device_id device,
 		printf("Test requires OpenCL version %g\n",
 		       required_version_times_10 / 10.0);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -233,7 +229,6 @@ piglit_cl_get_device_cl_c_version(cl_device_id device)
 		       version_string);
 		free(version_string);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 	free(version_string);
 
@@ -248,7 +243,6 @@ piglit_cl_require_device_cl_c_version(cl_device_id device,
 		printf("Test requires OpenCL C version %g\n",
 		       required_version_times_10 / 10.0);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -315,7 +309,6 @@ piglit_cl_get_info(void* fn_ptr, void* obj, cl_uint param)
 		        "Trying to get %s information from undefined function.\n",
 		        piglit_cl_get_enum_name(param));
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 
 	if(errNo == CL_SUCCESS) {
@@ -377,7 +370,6 @@ piglit_cl_get_info(void* fn_ptr, void* obj, cl_uint param)
 		        piglit_cl_get_enum_name(param),
 		        piglit_cl_get_error_name(errNo));
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 
 	return param_ptr;
@@ -480,7 +472,6 @@ piglit_cl_require_platform_extension(cl_platform_id platform, const char *name)
 	if (!piglit_cl_is_platform_extension_supported(platform, name)) {
 		printf("Test requires %s platform extension\n", name);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -491,7 +482,6 @@ piglit_cl_require_not_platform_extension(cl_platform_id platform,
 	if (piglit_cl_is_platform_extension_supported(platform, name)) {
 		printf("Test requires absence of %s\n platform extension\n", name);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -512,7 +502,6 @@ piglit_cl_require_device_extension(cl_device_id device, const char *name)
 	if (!piglit_cl_is_device_extension_supported(device, name)) {
 		printf("Test requires %s device extension\n", name);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -522,7 +511,6 @@ piglit_cl_require_not_device_extension(cl_device_id device, const char *name)
 	if (piglit_cl_is_device_extension_supported(device, name)) {
 		printf("Test requires absence of %s device extension\n", name);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 

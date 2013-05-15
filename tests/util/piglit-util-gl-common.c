@@ -57,7 +57,6 @@ int piglit_get_gl_version(void)
 		printf("Unable to interpret GL_VERSION string: %s\n",
 		       version_string);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 	return 10*major+minor;
 }
@@ -144,7 +143,6 @@ void piglit_require_gl_version(int required_version_times_10)
 		printf("Test requires GL version %g\n",
 		       required_version_times_10 / 10.0);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -153,7 +151,6 @@ void piglit_require_extension(const char *name)
 	if (!piglit_is_extension_supported(name)) {
 		printf("Test requires %s\n", name);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -161,7 +158,6 @@ void piglit_require_not_extension(const char *name)
 {
 	if (piglit_is_extension_supported(name)) {
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 

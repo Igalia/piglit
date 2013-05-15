@@ -111,7 +111,6 @@ get_gl_version(void)
 		printf("error: Unable to interpret GL_VERSION string: %s\n",
 		       version_string);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 
 	if (major >= 3) {

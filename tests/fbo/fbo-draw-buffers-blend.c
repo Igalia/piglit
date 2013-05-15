@@ -56,7 +56,6 @@ my_assert(int test, const char *text)
    if (!test) {
       printf("%s: assertion %s failed\n", TestName, text);
       piglit_report_result(PIGLIT_FAIL);
-      exit(1);
    }
 }
 

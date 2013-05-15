@@ -68,7 +68,6 @@ piglit_get_glx_visual(Display *dpy)
 		fprintf(stderr,
 			"Couldn't get an RGBA, double-buffered visual\n");
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 
 	return visinfo;

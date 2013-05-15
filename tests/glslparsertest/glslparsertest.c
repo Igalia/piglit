@@ -178,7 +178,6 @@ attach_complementary_shader(GLuint shader_prog, GLenum type)
 		fprintf(stderr,
 			"Unexpected type in attach_complementary_shader()");
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 }
 
@@ -207,7 +206,6 @@ test(void)
 		fprintf(stderr, "Couldn't determine type of program %s\n",
 			filename);
 		piglit_report_result(PIGLIT_FAIL);
-		exit(1);
 	}
 
 	piglit_require_vertex_shader();
@@ -431,7 +429,6 @@ piglit_init(int argc, char**argv)
 	    && !piglit_is_extension_supported("GL_ARB_shader_objects")) {
 		printf("Requires OpenGL 2.0\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 
 	glsl_version_string = (char *)

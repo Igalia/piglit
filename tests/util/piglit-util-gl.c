@@ -729,7 +729,6 @@ void piglit_require_fragment_program(void)
 	if (!piglit_use_fragment_program()) {
 		printf("GL_ARB_fragment_program not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -744,7 +743,6 @@ void piglit_require_vertex_program(void)
 	if (!piglit_use_vertex_program()) {
 		printf("GL_ARB_vertex_program not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -1423,6 +1421,5 @@ piglit_require_transform_feedback(void)
 	      piglit_is_extension_supported("GL_EXT_transform_feedback"))) {
 		printf("Transform feedback not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }

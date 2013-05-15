@@ -39,7 +39,6 @@ piglit_require_GLSL(void)
 	         && piglit_is_extension_supported("GL_ARB_shading_language_100"))) {
 		printf("GLSL not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -57,7 +56,6 @@ piglit_require_GLSL_version(int version)
 		printf("GLSL %d.%d not supported.\n",
 		       version / 100, version % 100);
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -69,7 +67,6 @@ piglit_require_vertex_shader(void)
 		 && piglit_is_extension_supported("GL_ARB_vertex_shader"))) {
 		printf("GLSL vertex shaders are not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }
 
@@ -81,6 +78,5 @@ piglit_require_fragment_shader(void)
 		 && piglit_is_extension_supported("GL_ARB_fragment_shader"))) {
 		printf("GLSL fragment shaders are not supported.\n");
 		piglit_report_result(PIGLIT_SKIP);
-		exit(1);
 	}
 }

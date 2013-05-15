@@ -457,7 +457,6 @@ exit_report_result(enum piglit_result result)
 	free_dynamic_strs();
 	free_tests();
 	piglit_report_result(result);
-	exit(1);
 }
 
 /* Regex functions */
