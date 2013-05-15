@@ -35,7 +35,8 @@
     find_path(OPENCL_INCLUDE_PATH CL/opencl.h)
   endif()
 
-  find_library(OPENCL_opencl_LIBRARY OpenCL)
+  find_library(OPENCL_opencl_LIBRARY
+      NAMES OpenCL CL cl)
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(OpenCL
