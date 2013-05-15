@@ -716,6 +716,7 @@ gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-
 
 spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
 
+spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
 spec['!OpenGL 3.3/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 33')
 
 spec['!OpenGL 4.2/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 42')
