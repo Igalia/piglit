@@ -32,6 +32,10 @@
 #include <string.h>
 #include <xf86drm.h>
 #include <stdbool.h>
+#ifdef HAVE_XCB_DRI2
+#include <xcb/dri2.h>
+#include <drm.h>
+#endif
 
 static const char *drm_device_filename = "/dev/dri/card0";
 
@@ -73,6 +77,47 @@ piglit_drm_device_get(void)
 	return fd;
 }
 
+#ifdef HAVE_XCB_DRI2
+static bool
+piglit_drm_x11_authenticate(void)
+{
+	drm_magic_t magic;
+	xcb_connection_t *conn;
+	int screen;
+	xcb_screen_iterator_t screen_iter;
+	xcb_dri2_authenticate_cookie_t auth_cookie;
+	xcb_dri2_authenticate_reply_t *auth_reply;
+	int ret = 0;
+
+	conn = xcb_connect(NULL, &screen);
+	if (!conn) {
+		printf("piglit: failed to connect to X server for DRI2 "
+		       "authentication\n");
+		return false;
+	}
+
+	ret = drmGetMagic(piglit_drm_device_get(), &magic);
+	if (ret) {
+		printf("piglit: failed to get DRM magic\n");
+		return false;
+	}
+
+	screen_iter = xcb_setup_roots_iterator(xcb_get_setup(conn));
+	auth_cookie = xcb_dri2_authenticate_unchecked(conn,
+	                                              screen_iter.data->root,
+	                                              magic);
+	auth_reply = xcb_dri2_authenticate_reply(conn, auth_cookie, NULL);
+
+	if (auth_reply == NULL || !auth_reply->authenticated) {
+		printf("piglit: failed to authenticate with DRI2\n");
+		return false;
+	}
+	free(auth_reply);
+
+	return true;
+}
+#endif /* HAVE_XCB_DRI2 */
+
 #ifdef HAVE_LIBDRM_INTEL
 static drm_intel_bufmgr *
 piglit_intel_bufmgr_get(void)
@@ -85,6 +130,11 @@ piglit_intel_bufmgr_get(void)
 
 	if (!piglit_drm_device_get())
 		return NULL;
+
+#ifdef HAVE_XCB_DRI2
+	if (!piglit_drm_x11_authenticate())
+		return NULL;
+#endif /* HAVE_XCB_DRI2 */
 
 	mgr = intel_bufmgr_gem_init(piglit_drm_device_get(), batch_sz);
 
