@@ -32,15 +32,7 @@
  * page 180 "Required Texture Formats".
  */
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
-
-	config.supports_gl_compat_version = 10;
-
-	config.window_width = 32;
-	config.window_height = 32;
-	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-
-PIGLIT_GL_TEST_CONFIG_END
+static int target_version;
 
 enum piglit_result
 piglit_display(void)
@@ -65,8 +57,7 @@ piglit_init(int argc, char **argv)
 		GLenum attachment, status;
 		const struct sized_internalformat *f;
 
-		/* FINISHME: Add support for future GL versions. */
-		if (required_formats[i].version != 30)
+		if (!valid_for_gl_version(&required_formats[i], target_version))
 			continue;
 
 		if (!required_formats[i].rb_required)
@@ -140,4 +131,21 @@ piglit_init(int argc, char **argv)
 	glDeleteRenderbuffers(1, &rb);
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+}
+
+int
+main(int argc, char *argv[])
+{
+	struct piglit_gl_test_config config;
+
+	setup_required_size_test(argc, argv, &config);
+	target_version = MAX2(config.supports_gl_compat_version,
+			      config.supports_gl_core_version);
+	config.init = piglit_init;
+	config.display = piglit_display;
+
+	piglit_gl_test_run(argc, argv, &config);
+
+	/* UNREACHED */
+	return 0;
 }

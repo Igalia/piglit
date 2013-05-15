@@ -697,7 +697,7 @@ add_concurrent_test(gl30, 'getfragdatalocation')
 add_concurrent_test(gl30, 'integer-errors')
 gl30['minmax'] = concurrent_test('gl-3.0-minmax')
 gl30['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 30')
-add_concurrent_test(gl30, 'gl-3.0-required-renderbuffer-attachment-formats')
+gl30['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 30')
 add_concurrent_test(gl30, 'gl-3.0-required-texture-attachment-formats')
 add_concurrent_test(gl30, 'gl-3.0-texture-integer')
 add_plain_test(gl30, 'gl30basic')
@@ -712,13 +712,16 @@ gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 for subtest in ['generated', 'written', 'flush']:
         cmdline = 'primitive-restart-xfb {0}'.format(subtest)
         gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
+gl31['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 31')
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 
 spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
 
 spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
+spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 33')
 spec['!OpenGL 3.3/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 33')
 
+spec['!OpenGL 4.2/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 42')
 spec['!OpenGL 4.2/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 42')
 
 # Group spec/glsl-es-1.00
