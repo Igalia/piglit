@@ -131,11 +131,12 @@ def main():
         print "Warning: Option --tests is deprecated, use " \
                         "--include-tests instead"
 
+    # Always Convert Results Path from Relative path to Actual Path.
+    resultsDir = path.realpath(args.resultsPath)
+
     # If resume is requested attempt to load the results file
     # in the specified path
     if args.resume is True:
-        resultsDir = path.realpath(args.resultsPath)
-
         # Load settings from the old results JSON
         old_results = core.loadTestResults(resultsDir)
         profileFilename = old_results.options['profile']
@@ -148,7 +149,6 @@ def main():
     # Otherwise parse additional settings from the command line
     else:
         profileFilename = args.testProfile
-        resultsDir = args.resultsPath
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
