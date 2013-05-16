@@ -607,7 +607,8 @@ def loadTestProfile(filename):
         raise Exception('Could not read tests profile')
     return ns['profile']
 
-def loadTestResults(path):
+def loadTestResults(relativepath):
+    path = os.path.realpath(relativepath)
     if os.path.isdir(path):
         filepath = os.path.join(path, 'main')
     else:
