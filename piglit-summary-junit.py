@@ -111,14 +111,14 @@ class Writer:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output",
-                                            metavar = "<Output File>",
-                                            action  = "store",
-                                            dest    = "output",
-                                            default = "piglit.xml",
-                                            help    = "Output filename")
+						metavar = "<Output File>",
+						action  = "store",
+						dest    = "output",
+						default = "piglit.xml",
+						help    = "Output filename")
     parser.add_argument("testResults",
-                                            metavar = "<Input Files>",
-                                            help    = "JSON results file to be converted")
+						metavar = "<Input Files>",
+						help    = "JSON results file to be converted")
     args = parser.parse_args()
 
 
