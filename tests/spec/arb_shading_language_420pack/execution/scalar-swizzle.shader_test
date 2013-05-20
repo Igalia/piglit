@@ -1,0 +1,46 @@
+/* The ARB_shading_language_420pack says:
+ *
+ *     "The component names x, r, and s are, for example, synonyms for the same
+ *      (first) component in a vector.  They are also the names of the only
+ *      component in a scalar.
+ *
+ *      Add to the example
+ *
+ *          float height;
+ *          height.x // is legal
+ *          height.y // is illegal"
+ *
+ * Verify that swizzles on scalars work.
+ */
+
+[require]
+GLSL >= 1.30
+GL_ARB_shading_language_420pack
+
+[vertex shader]
+attribute vec4 vertex;
+
+void main()
+{
+    gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_420pack: enable
+
+void main() {
+    float a = 1.0;
+
+    gl_FragColor = a.xxxx;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 1.0 1.0 1.0
