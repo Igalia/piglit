@@ -70,7 +70,7 @@ piglit_display(void)
 	};
 	uint32_t index_data[] = { 0, 1, 2, 3 };
 	uintptr_t index_offset = sizeof(vertex_data);
-	GLuint prog, vs;
+	GLuint prog;
 
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -79,8 +79,7 @@ piglit_display(void)
 	 * color data into a uniform in the fixed function vertex
 	 * shader.
 	 */
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	prog = piglit_link_simple_program(vs, 0);
+	prog = piglit_build_simple_program(vs_source, NULL);
 	glUseProgram(prog);
 
 	glGenBuffersARB(1, &vbo);

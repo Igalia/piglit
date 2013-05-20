@@ -195,8 +195,6 @@ char *setters;
 void
 setup_glsl_programs()
 {
-	GLuint vs;
-	GLuint fs;
 	GLuint prog;
 
 	char vert[4096];
@@ -234,14 +232,7 @@ setup_glsl_programs()
 		"}",
 		version_directive);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
-	glAttachShader(prog, fs);
-	glLinkProgram(prog);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	prog = piglit_build_simple_program(vert, frag);
 	glUseProgram(prog);
 	position_angle_loc = glGetUniformLocation(prog, "position_angle");
 	if (use_clip_vertex) {

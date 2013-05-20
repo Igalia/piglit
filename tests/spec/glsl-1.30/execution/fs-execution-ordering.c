@@ -90,13 +90,9 @@ static const char *fstext =
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs, fs;
-
 	piglit_require_GLSL_version(130);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vstext, fstext);
 	glGenBuffers(1, &vbo_handle);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))

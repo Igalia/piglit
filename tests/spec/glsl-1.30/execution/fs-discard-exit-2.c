@@ -145,15 +145,11 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	int vs, fs, prog;
+	int prog;
 
 	piglit_require_GLSL_version(130);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(vs, fs);
-	if (!vs || !fs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	coord1_location = glGetUniformLocation(prog, "coord1");
 	coord2_location = glGetUniformLocation(prog, "coord2");

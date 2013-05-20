@@ -90,23 +90,11 @@ struct {
 static bool
 test_shader(int test)
 {
-	GLuint fs, prog;
+	GLuint prog;
 	const char *source = tests[test].source;
 	int namelen = 9999, blocks = 9999;
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, source);
-	if (!fs) {
-		fprintf(stderr, "%d: Failed to compile shader:\n%s",
-			test, source);
-		return false;
-	}
-
-	prog = piglit_link_simple_program(fs, 0);
-	if (!prog) {
-		fprintf(stderr, "%d: Failed to link shader:\n%s", test, source);
-		glDeleteShader(fs);
-		return false;
-	}
+	prog = piglit_build_simple_program(NULL, source);
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_BLOCKS, &blocks);
 	if (blocks != tests[test].blocks) {
@@ -127,7 +115,6 @@ test_shader(int test)
 	}
 
 	glDeleteProgram(prog);
-	glDeleteShader(fs);
 
 	return true;
 }

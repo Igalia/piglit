@@ -64,7 +64,7 @@ static const char *FragShaderText =
 	"	gl_FragColor = gl_Color; \n"
 	"}\n";
 
-static GLuint VertShader, FragShader, Program;
+static GLuint Program;
 
 static uintptr_t ib_offset;
 
@@ -134,13 +134,7 @@ piglit_init(int argc, char **argv)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, user_va ? vb : NULL);
 
-	VertShader = piglit_compile_shader_text(GL_VERTEX_SHADER, VertShaderText);
-	assert(VertShader);
-
-	FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
-	assert(FragShader);
-
-	Program = piglit_link_simple_program(VertShader, FragShader);
+	Program = piglit_build_simple_program(VertShaderText, FragShaderText);
 
 	glUseProgram(Program);
 

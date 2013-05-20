@@ -304,19 +304,13 @@ static struct {
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs;
 	int i;
 	bool pass = true;
 
 	piglit_require_vertex_shader();
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, source);
-	assert(vs);
 
-	prog = piglit_link_simple_program(vs, 0);
+	prog = piglit_build_simple_program(source, NULL);
 	glUseProgram(prog);
-
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0; i < ARRAY_SIZE(uniforms); i++) {
 		const char *name = uniforms[i].name;

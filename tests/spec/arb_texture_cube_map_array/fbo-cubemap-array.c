@@ -88,7 +88,6 @@ static const char *frag_shader_cube_array_text =
    "   gl_FragColor = texture(tex, gl_TexCoord[0]); \n"
    "} \n";
 
-static GLuint frag_shader_cube_array;
 static GLuint program_cube_array;
 
 static int
@@ -248,14 +247,8 @@ void piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_texture_cube_map_array");
 
-	/* Make shader programs */
-	frag_shader_cube_array =
-		piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-					   frag_shader_cube_array_text);
-	piglit_check_gl_error(GL_NO_ERROR);
-
-	program_cube_array = piglit_link_simple_program(0, frag_shader_cube_array);
-	piglit_check_gl_error(GL_NO_ERROR);
+	program_cube_array =
+		piglit_build_simple_program(NULL, frag_shader_cube_array_text);
 
 	setup_texcoords();
 }

@@ -70,7 +70,7 @@ test_format(const struct uniform_type *type, bool row_major)
 		"	gl_FragColor = vec4(align_test);\n"
 		"}\n";
 	char *fs_source;
-	GLuint fs, prog;
+	GLuint prog;
 	GLint data_size;
 	int expected;
 	const struct uniform_type *transposed_type;
@@ -83,12 +83,7 @@ test_format(const struct uniform_type *type, bool row_major)
 	asprintf(&fs_source, fs_template,
 		 row_major ? "layout(row_major) " : "",
 		 type->type);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, fs_source);
 	free(fs_source);
 
 	/* There's only one block, so it's uniform block 0. */
@@ -96,7 +91,6 @@ test_format(const struct uniform_type *type, bool row_major)
 				  GL_UNIFORM_BLOCK_DATA_SIZE,
 				  &data_size);
 
-	glDeleteShader(fs);
 	glDeleteProgram(prog);
 
 	/* "align_test" at the start of the UBO is a float, so our

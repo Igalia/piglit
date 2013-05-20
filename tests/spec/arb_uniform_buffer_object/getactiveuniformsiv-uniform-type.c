@@ -57,7 +57,7 @@ test_format(const struct uniform_type *type)
 		"	gl_FragColor = vec4(align_test + float(%s));\n"
 		"}\n";
 	char *fs_source;
-	GLuint fs, prog;
+	GLuint prog;
 	const char *uniform_name = "u";
 	GLuint uniform_index;
 	GLint uniform_type;
@@ -72,21 +72,13 @@ test_format(const struct uniform_type *type)
 	}
 
 	asprintf(&fs_source, fs_template, type->type, deref);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", fs_source);
-		free(fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	} else {
-		free(fs_source);
-	}
+	prog = piglit_build_simple_program(NULL, fs_source);
+	free(fs_source);
 
 	glGetUniformIndices(prog, 1, &uniform_name, &uniform_index);
 	glGetActiveUniformsiv(prog, 1, &uniform_index,
 			      GL_UNIFORM_TYPE, &uniform_type);
 
-	glDeleteShader(fs);
 	glDeleteProgram(prog);
 
 	printf("%-20s %20s %20s%s\n",

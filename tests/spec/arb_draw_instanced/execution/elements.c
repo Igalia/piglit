@@ -113,20 +113,11 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs, fs, prog;
+	GLuint prog;
 
 	piglit_require_extension("GL_ARB_draw_instanced");
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-
-	prog = piglit_link_simple_program(vs, fs);
-
-	if (!vs || !fs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	glUseProgram(prog);
 }

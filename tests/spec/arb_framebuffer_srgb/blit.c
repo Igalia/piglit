@@ -220,7 +220,7 @@ print_usage_and_exit(char *prog_name)
 void
 piglit_init(int argc, char **argv)
 {
-	GLint vs, fs, max_samples;
+	GLint max_samples;
 
 	if (argc != 5) {
 		print_usage_and_exit(argv[0]);
@@ -293,11 +293,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	prog = piglit_link_simple_program(vs, fs);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	src_fbo = setup_fbo(src_format, src_samples);
 	dst_fbo = setup_fbo(dst_format, dst_samples);

@@ -58,13 +58,12 @@ setup(void)
 		"                + texture2D(tex1, coord);\n"
 		"}\n";
 	GLuint samplers[2];
-	GLuint frag, prog;
+	GLuint prog;
 	GLint u;
 	GLuint tex;
 
 	/* Create fragment shader that adds the two textures */
-	frag = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
-	prog = piglit_link_simple_program(0, frag);
+	prog = piglit_build_simple_program(NULL, fragShaderText);
 
 	glUseProgram(prog);
 	u = glGetUniformLocation(prog, "tex0");

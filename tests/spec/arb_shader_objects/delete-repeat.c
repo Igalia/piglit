@@ -52,7 +52,6 @@ static const char *fs_source =
 enum piglit_result
 piglit_display(void)
 {
-	GLuint vs, fs;
 	bool pass = true;
 	GLuint prog;
 	float green[] = {0.0, 1.0, 0.0, 0.0};
@@ -62,15 +61,8 @@ piglit_display(void)
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
-	if (!vs || !fs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
 	glUseProgram(prog);
 	glDeleteProgram(prog);
 

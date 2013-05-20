@@ -257,8 +257,6 @@ test(void)
 	static const GLfloat test_color1[4] = { 0.5, 0.5, 0.5, 0.5 };
 	GLfloat expected[4];
 	GLuint prog;
-	GLuint vs;
-	GLuint fs;
 	int i, j, k, o;
 
 	if (max_ds_buffers > 1) {
@@ -266,19 +264,11 @@ test(void)
 		max_ds_buffers = 1;
 	}
 
-	prog = glCreateProgram();
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	glAttachShader(prog, vs);
-	glAttachShader(prog, fs);
-	piglit_check_gl_error(GL_NO_ERROR);
-
 	create_fbo();
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
-	glLinkProgram(prog);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 	glUseProgram(prog);
 
 	uniform_src0 = glGetUniformLocation(prog, "src0");

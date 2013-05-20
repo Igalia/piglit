@@ -72,7 +72,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	int i;
-	GLuint fs, prog;
+	GLuint prog;
 	const char *source =
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"uniform a { float u1; };\n"
@@ -86,12 +86,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, source);
-	prog = piglit_link_simple_program(fs, 0);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, source);
 
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_BLOCKS, &blocks);
 	assert(blocks == 2);
@@ -151,7 +146,6 @@ piglit_init(int argc, char **argv)
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
 	glDeleteProgram(prog);
-	glDeleteShader(fs);
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }

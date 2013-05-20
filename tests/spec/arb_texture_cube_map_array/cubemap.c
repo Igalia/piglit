@@ -84,7 +84,6 @@ static const char *frag_shader =
  " gl_FragColor = texture(tex, gl_TexCoord[0]);\n"
   "}\n";
 
-static GLuint frag_shader_cube_array;
 static GLuint program_cube_array;
 
 #if defined(_MSC_VER)
@@ -351,10 +350,8 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	frag_shader_cube_array = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag_shader);
-	piglit_check_gl_error(GL_NO_ERROR);
-	program_cube_array = piglit_link_simple_program(0, frag_shader_cube_array);
-	piglit_check_gl_error(GL_NO_ERROR);
+	program_cube_array =
+		piglit_build_simple_program(NULL, frag_shader);
 
 	setup_texcoords();
 }

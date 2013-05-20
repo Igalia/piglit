@@ -85,7 +85,7 @@ enum piglit_result piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	unsigned int i, j, fs;
+	unsigned int i, j;
 
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_NV_texture_barrier");
@@ -115,8 +115,7 @@ void piglit_init(int argc, char **argv)
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 	assert(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
-	prog = piglit_link_simple_program(0, fs);
+	prog = piglit_build_simple_program(NULL, fstext);
 
 	texloc = glGetUniformLocation(prog, "fb");
 }

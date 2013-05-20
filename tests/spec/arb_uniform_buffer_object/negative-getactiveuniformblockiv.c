@@ -73,17 +73,12 @@ piglit_init(int argc, char **argv)
 		"void main() {\n"
 		"	gl_FragColor = vec4(u);\n"
 		"}\n";
-	GLuint fs, prog;
+	GLuint prog;
 	GLint junk = 0xd0d0, unwritten_junk = junk;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, fs_source);
 
 	/* Test a bad pname (it's one for glActiveUniformsiv). */
 	glGetActiveUniformBlockiv(prog, 0, GL_UNIFORM_TYPE, &junk);

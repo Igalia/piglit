@@ -101,19 +101,14 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
-	GLuint fs, prog;
+	GLuint prog;
 	GLuint bo[2];
 	GLint current_bo;
 	GLint list;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, source);
-	prog = piglit_link_simple_program(fs, 0);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, source);
 
 	/* Test that glUniformBlockBinding() goes into display lists. */
 	glUniformBlockBinding(prog, 0, 0);

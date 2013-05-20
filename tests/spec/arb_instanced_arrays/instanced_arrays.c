@@ -65,7 +65,7 @@ static const char *FragShaderText =
    "} \n";
 
 
-static GLuint VertShader, FragShader, Program;
+static GLuint Program;
 
 static GLboolean use_vbo = GL_FALSE;
 
@@ -199,13 +199,7 @@ piglit_init(int argc, char **argv)
    piglit_require_GLSL();
    piglit_require_extension("GL_ARB_instanced_arrays");
 
-   VertShader = piglit_compile_shader_text(GL_VERTEX_SHADER, VertShaderText);
-   assert(VertShader);
-
-   FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
-   assert(FragShader);
-
-   Program = piglit_link_simple_program(VertShader, FragShader);
+   Program = piglit_build_simple_program(VertShaderText, FragShaderText);
 
    glUseProgram(Program);
 

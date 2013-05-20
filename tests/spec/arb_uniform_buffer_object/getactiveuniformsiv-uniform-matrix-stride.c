@@ -65,7 +65,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
-	GLuint fs, prog;
+	GLuint prog;
 	const char *uniform_names[] = {
 		"v4",
 		"m4",
@@ -90,12 +90,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog) {
-		printf("Failed to compile FS:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, fs_source);
 
 	glGetUniformIndices(prog, ARRAY_SIZE(uniform_names), uniform_names,
 			    uniform_indices);

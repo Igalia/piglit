@@ -69,16 +69,9 @@ piglit_display(void)
 		-1,  1
 	};
 	int vertex_location;
-	GLuint fs, vs, prog;
+	GLuint prog;
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!vs || !fs)
-		piglit_report_result(PIGLIT_FAIL);
-
-	prog = piglit_link_simple_program(vs, fs);
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
 
 	vertex_location = glGetAttribLocation(prog, "vertex");

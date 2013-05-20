@@ -69,7 +69,7 @@ static const char *PassthroughFragShaderText =
    "   gl_FragColor = gl_Color; \n"
    "} \n";
 
-static GLuint PassthroughFragShader, PassthroughProgram;
+static GLuint PassthroughProgram;
 
 
 #if 0
@@ -289,10 +289,8 @@ piglit_init(int argc, char **argv)
    piglit_require_extension("GL_EXT_texture_integer");
    piglit_require_GLSL_version(130);
 
-   PassthroughFragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-                                                      PassthroughFragShaderText);
-   assert(PassthroughFragShader);
-   PassthroughProgram = piglit_link_simple_program(0, PassthroughFragShader);
+   PassthroughProgram =
+	   piglit_build_simple_program(NULL, PassthroughFragShaderText);
 
    (void) check_error(__FILE__, __LINE__);
 

@@ -57,18 +57,15 @@ const char *vs_source =
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs, prog;
+	GLuint prog;
 	char name[4];
 	GLint size, len;
 	GLenum type;
 
 	piglit_require_vertex_shader();
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 
-	prog = piglit_link_simple_program(vs, 0);
+	prog = piglit_build_simple_program(vs_source, NULL);
 	glUseProgram(prog);
-	if (!vs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
 
 	glGetActiveUniformARB(prog, 0, sizeof(name), &len, &size, &type, name);
 

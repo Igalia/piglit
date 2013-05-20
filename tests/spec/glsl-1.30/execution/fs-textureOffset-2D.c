@@ -132,7 +132,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	int vs, fs, prog;
+	int prog;
 
 	piglit_require_GLSL_version(130);
 
@@ -142,9 +142,7 @@ piglit_init(int argc, char **argv)
 			    GL_UNSIGNED_NORMALIZED);
 
 	/* TODO: test other texture instructions */
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragtexlodoffset);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vert, fragtexlodoffset);
 
 	lod_location = glGetUniformLocation(prog, "lod");
 	pos_location = glGetUniformLocation(prog, "pos");

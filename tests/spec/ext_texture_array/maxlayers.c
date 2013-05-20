@@ -132,7 +132,7 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint prog, fs;
+	GLuint prog;
 
 	piglit_require_extension("GL_EXT_texture_array");
 
@@ -144,10 +144,7 @@ piglit_init(int argc, char **argv)
 	printf("Testing %d texture layers\n", max_layers);
 
 	/* Make shader programs */
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(NULL, fs_source);
 
 	glUseProgram(prog);
 	layer_loc = glGetUniformLocation(prog, "layer");

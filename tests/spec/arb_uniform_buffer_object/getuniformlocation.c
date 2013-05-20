@@ -64,21 +64,11 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
-	GLuint fs;
 	int location;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!fs) {
-		printf("Failed to compile FS:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	prog = piglit_link_simple_program(0, fs);
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
-
+	prog = piglit_build_simple_program(NULL, fs_source);
 
 	location = glGetUniformLocation(prog, "a");
 	if (location != -1) {

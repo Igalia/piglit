@@ -62,20 +62,15 @@ static const char fs_text[] =
 void
 draw(const float *color, float x_offset)
 {
-	GLuint vs, fs, prog;
+	GLuint prog;
 	GLint color_location;
 	GLint offset_location;
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	glBindAttribLocation(prog, 0, "vertex");
 	glLinkProgram(prog);
 	piglit_link_check_status(prog);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
 
 	glUseProgram(prog);
 	color_location = glGetUniformLocation(prog, "color");

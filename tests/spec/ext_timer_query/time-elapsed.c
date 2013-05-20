@@ -310,15 +310,9 @@ retry:
 void
 piglit_init(int argc, char **argv)
 {
-	GLint vs, fs;
-
 	piglit_require_gl_version(20);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	prog = piglit_link_simple_program(vs, fs);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 	iters_loc = glGetUniformLocation(prog, "iters");
 
 	piglit_require_extension("GL_EXT_timer_query");

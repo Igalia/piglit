@@ -141,7 +141,7 @@ static const char *FragShaderText =
 	"   gl_FragColor = t + bias; \n"
 	"} \n";
 
-static GLuint FragShader, Program;
+static GLuint Program;
 
 
 static int
@@ -566,11 +566,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_GLSL_version(130);
 
-	FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-						FragShaderText);
-	assert(FragShader);
-
-	Program = piglit_link_simple_program(0, FragShader);
+	Program = piglit_build_simple_program(NULL, FragShaderText);
 
 	glUseProgram(Program);
 

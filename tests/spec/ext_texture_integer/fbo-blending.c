@@ -263,7 +263,7 @@ piglit_init(int argc, char **argv)
 		"{\n"
 		"   result = color;\n"
 		"}\n";
-	GLuint fs, vs, prog;
+	GLuint prog;
 	int f, i;
 	enum piglit_result result = PIGLIT_SKIP;
 	const struct format_info *test_formats = formats;
@@ -287,11 +287,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_texture_integer");
 	piglit_require_GLSL_version(130);
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	prog = piglit_link_simple_program(vs, fs);
-	if (!prog || !fs || !vs)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
 	color_loc = glGetUniformLocation(prog, "color");
 	glUniform4uiv(color_loc, 1, color);

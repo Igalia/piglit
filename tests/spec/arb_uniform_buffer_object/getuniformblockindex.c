@@ -57,19 +57,10 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	int expected_ub_b_index;
 	int index;
-	GLuint fs;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag_shader_text);
-	if (!fs) {
-		printf("Failed to compile FS:\n%s", frag_shader_text);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	prog = piglit_link_simple_program(0, fs);
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(NULL, frag_shader_text);
 
 	index = glGetUniformBlockIndex(prog, "ub_a");
 	printf("Uniform block \"ub_a\" index: 0x%08x\n", index);

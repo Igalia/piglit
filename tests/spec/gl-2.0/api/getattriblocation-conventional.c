@@ -50,13 +50,11 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	GLint vert;
 	GLint prog;
 	GLint loc;
 
 	piglit_require_vertex_shader();
-	vert = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
-	prog = piglit_link_simple_program(vert, 0);
+	prog = piglit_build_simple_program(vs_code, NULL);
 
 	loc = glGetAttribLocation(prog, "gl_Vertex");
 	printf("Attribute location reported for gl_Vertex is %d.\n", loc);

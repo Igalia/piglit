@@ -65,7 +65,7 @@ void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
-	GLuint fs, vs, prog;
+	GLuint prog;
 	const char *uniform_block_names[3] = { "ub_a", "ub_b", "ub_c" };
 	const char *uniform_names[4] = { "a", "b", "c", "d" };
 	GLuint block_indices[3];
@@ -75,21 +75,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	if (!vs) {
-		printf("Failed to compile VS:\n%s", vs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!fs) {
-		printf("Failed to compile FS:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	prog = piglit_link_simple_program(vs, fs);
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	for (i = 0; i < 3; i++) {
 		block_indices[i] =

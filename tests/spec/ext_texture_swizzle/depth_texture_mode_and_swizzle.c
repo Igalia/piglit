@@ -153,7 +153,7 @@ setup_texture()
 void
 setup_shaders()
 {
-	GLuint vs, fs, prog, tex_location;
+	GLuint prog, tex_location;
 
 	static const char *vs_code =
 		 "#version 120\n"
@@ -169,20 +169,7 @@ setup_shaders()
 		 "   gl_FragColor = texture2D(tex, vec2(0.5, 0.5));\n"
 		 "}\n";
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
-	if (!vs) {
-		printf("VS code:\n%s", vs_code);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
-	if (!fs) {
-		printf("FS code:\n%s", fs_code);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-	prog = piglit_link_simple_program(vs, fs);
-	if (!piglit_link_check_status(prog))
-		piglit_report_result(PIGLIT_FAIL);
-
+	prog = piglit_build_simple_program(vs_code, fs_code);
 	glUseProgram(prog);
 
 	tex_location = glGetUniformLocation(prog, "tex");

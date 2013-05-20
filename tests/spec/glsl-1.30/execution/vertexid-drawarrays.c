@@ -64,16 +64,11 @@ static const char fs_text[] =
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs, fs, prog;
+	GLuint prog;
 
 	piglit_require_GLSL_version(130);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_text);
-	prog = piglit_link_simple_program(vs, fs);
-
-	if (!vs || !fs || !prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	glUseProgram(prog);
 }

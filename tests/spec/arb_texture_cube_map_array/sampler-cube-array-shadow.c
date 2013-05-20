@@ -45,8 +45,6 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static GLuint tex;
 static GLint prog;
-static GLint fs;
-static GLint vs;
 
 /* grab the coordinates from the main definition, and grab the
    compvals from here */
@@ -97,9 +95,7 @@ static const char *fragShaderText =
 static void
 shaderSetup(void)
 {
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vertShaderText);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fragShaderText);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vertShaderText, fragShaderText);
 	glUseProgram(prog);
 }
 

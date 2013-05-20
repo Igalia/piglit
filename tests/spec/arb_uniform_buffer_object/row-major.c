@@ -193,20 +193,10 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	unsigned int i;
-	GLuint fs, prog;
+	GLuint prog;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
-
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, source);
-	if (!fs) {
-		fprintf(stderr, "Failed to compile shader:\n%s", source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-	prog = piglit_link_simple_program(fs, 0);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile/link shader:\n%s", source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, source);
 
 	for (i = 0; i < ARRAY_SIZE(uniforms); i++) {
 		GLuint index;

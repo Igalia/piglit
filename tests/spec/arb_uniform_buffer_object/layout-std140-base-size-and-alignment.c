@@ -65,7 +65,7 @@ test_format(const struct uniform_type *type, bool row_major)
 		"	gl_FragColor = vec4(pad) + vec4(%s) + vec4(size_test);\n"
 		"}\n";
 	char *fs_source;
-	GLuint fs, prog;
+	GLuint prog;
 	const char *uniform_names[] = { "u", "size_test" };
 	GLuint uniform_indices[2];
 	GLint offsets[2];
@@ -90,19 +90,13 @@ test_format(const struct uniform_type *type, bool row_major)
 		 row_major && type->size > 16 ? "layout(row_major) " : "",
 		 type->type,
 		 deref);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(0, fs);
-	if (!fs || !prog) {
-		fprintf(stderr, "Failed to compile shader:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	prog = piglit_build_simple_program(NULL, fs_source);
 	free(fs_source);
 
 	glGetUniformIndices(prog, 2, uniform_names, uniform_indices);
 	glGetActiveUniformsiv(prog, 2, uniform_indices,
 			      GL_UNIFORM_OFFSET, offsets);
 
-	glDeleteShader(fs);
 	glDeleteProgram(prog);
 
 	offset = offsets[0];

@@ -79,16 +79,13 @@ void piglit_init(int argc, char **argv)
 	GLuint tex, fb;
 	GLenum status;
 	int i, dim;
-	static GLuint fs_tex, fs_texgrad;
 
 	piglit_require_GLSL();
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_ARB_shader_texture_lod");
 
-	fs_tex = piglit_compile_shader_text(GL_FRAGMENT_SHADER, sh_tex);
-	fs_texgrad = piglit_compile_shader_text(GL_FRAGMENT_SHADER, sh_texgrad);
-	prog_tex = piglit_link_simple_program(0, fs_tex);
-	prog_texgrad = piglit_link_simple_program(0, fs_texgrad);
+	prog_tex = piglit_build_simple_program(NULL, sh_tex);
+	prog_texgrad = piglit_build_simple_program(NULL, sh_texgrad);
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);

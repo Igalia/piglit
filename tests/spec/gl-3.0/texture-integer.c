@@ -374,15 +374,13 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint fragShader, program;
+	GLuint program;
         static GLuint tex;
 
 	piglit_require_gl_version(30);
 	piglit_require_GLSL_version(130);
 
-	fragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
-
-	program = piglit_link_simple_program(0, fragShader);
+	program = piglit_build_simple_program(NULL, FragShaderText);
 	glUseProgram(program);
 
 	BiasUniform = glGetUniformLocation(program, "bias");

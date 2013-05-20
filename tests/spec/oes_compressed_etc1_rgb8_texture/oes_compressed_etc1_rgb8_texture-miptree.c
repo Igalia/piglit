@@ -157,9 +157,6 @@ piglit_init(int argc, char **argv)
 		0, 1,
 	};
 
-	GLuint vs;
-	GLuint fs;
-
 	GLint vertex_loc;
 	GLuint vertex_buf;
 
@@ -171,10 +168,7 @@ piglit_init(int argc, char **argv)
 	glClearColor(1.0, 0.0, 0.0, 1.0);
 	glViewport(0, 0, window_width, window_height);
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(vs, fs);
-	assert(prog != 0);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
 
 	vertex_loc = glGetAttribLocation(prog, "vertex");

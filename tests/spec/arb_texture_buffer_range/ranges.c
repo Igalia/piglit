@@ -156,22 +156,7 @@ static char *fs_source =
 static void
 init_program()
 {
-	GLuint vs, fs;
-
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	if (!vs) {
-		printf("VS source:\n%s\n", vs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!fs) {
-		printf("FS source:\n%s\n", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	prog = piglit_link_simple_program(vs, fs);
-	if (!prog)
-		piglit_report_result(PIGLIT_FAIL);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	vertex_location = glGetAttribLocation(prog, "vertex");
 }

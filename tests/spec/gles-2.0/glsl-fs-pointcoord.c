@@ -122,7 +122,6 @@ piglit_display(void)
 
 void piglit_init(int argc, char**argv)
 {
-	GLint vs, fs;
 	GLint point_size_limits[2];
 
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_limits);
@@ -133,9 +132,7 @@ void piglit_init(int argc, char**argv)
 	if (point_size > piglit_height)
 		point_size = piglit_height;
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	prog = piglit_link_simple_program(vs, fs);
+	prog = piglit_build_simple_program(vs_source, fs_source);
 
 	glUseProgram(prog);
 }

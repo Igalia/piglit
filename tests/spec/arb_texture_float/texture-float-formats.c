@@ -84,7 +84,7 @@ static const char *FragShaderText =
    "} \n";
 
 
-static GLuint FragShader, Program;
+static GLuint Program;
 
 
 
@@ -370,10 +370,7 @@ piglit_init(int argc, char **argv)
 
    HaveRG = piglit_is_extension_supported("GL_ARB_texture_rg");
 
-   FragShader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, FragShaderText);
-   assert(FragShader);
-
-   Program = piglit_link_simple_program(0, FragShader);
+   Program = piglit_build_simple_program(NULL, FragShaderText);
 
    glUseProgram(Program);
 

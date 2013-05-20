@@ -157,18 +157,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs;
-	GLuint fs;
-
 	piglit_require_GLSL();
 	piglit_require_GLSL_version(130);
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
-	glAttachShader(prog, fs);
-	glLinkProgram(prog);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	prog = piglit_build_simple_program(vert, frag);
 	glUseProgram(prog);
 }
