@@ -73,15 +73,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!fs) {
-		fprintf(stderr, "Failed to compile shader:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	if (!vs) {
-		fprintf(stderr, "Failed to compile shader:\n%s", vs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
 	prog = piglit_link_simple_program(vs, fs);
 	if (!prog) {
 		fprintf(stderr, "Failed to link shaders.\n");

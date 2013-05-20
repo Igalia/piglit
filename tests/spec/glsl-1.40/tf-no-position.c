@@ -76,8 +76,6 @@ void piglit_init(int argc, char **argv)
 	piglit_require_gl_version(30);
 	piglit_require_transform_feedback();
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	if (!vs)
-		piglit_report_result(PIGLIT_FAIL);
 
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);

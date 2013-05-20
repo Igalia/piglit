@@ -218,16 +218,7 @@ test_link_fail(struct test *test, GLenum a_target, GLenum b_target)
 	b_source = get_shader(b_target, test->b_header, test->b_body);
 
 	a = piglit_compile_shader_text(a_target, a_source);
-	if (!a) {
-		fprintf(stderr, "Failed to compile shader:\n%s", a_source);
-		return false;
-	}
-
 	b = piglit_compile_shader_text(b_target, b_source);
-	if (!b) {
-		fprintf(stderr, "Failed to compile shader:\n%s", b_source);
-		return false;
-	}
 
 	prog = glCreateProgram();
 	glAttachShader(prog, a);

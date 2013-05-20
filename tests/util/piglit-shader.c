@@ -160,8 +160,9 @@ piglit_compile_shader_text(GLenum target, const char *text)
 			fprintf(stderr, "Failed to compile %s shader: %s\n",
 				shader_name(target),
 				info);
-			glDeleteShader(prog);
-			prog = 0;
+
+			fprintf(stderr, "source:\n%s", text);
+			piglit_report_result(PIGLIT_FAIL);
 		}
 		else if (0) {
 			/* Enable this to get extra compilation info.
@@ -275,16 +276,10 @@ piglit_build_simple_program(const char *vs_source, const char *fs_source)
 
 	if (vs_source) {
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-		if (!vs) {
-			piglit_report_result(PIGLIT_FAIL);
-		}
 	}
 
 	if (fs_source) {
 		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-		if (!fs) {
-			piglit_report_result(PIGLIT_FAIL);
-		}
 	}
 
 	prog = piglit_link_simple_program(vs, fs);

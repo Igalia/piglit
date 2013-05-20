@@ -156,16 +156,7 @@ piglit_display(void)
 	}
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	if (!vs) {
-		fprintf(stderr, "Failed to compile VS:\n%s", vs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	if (!fs) {
-		fprintf(stderr, "Failed to compile FS:\n%s", fs_source);
-		piglit_report_result(PIGLIT_FAIL);
-	}
 
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);
