@@ -1194,6 +1194,16 @@ arb_shader_objects['getuniformlocation-array-of-struct-of-array'] = concurrent_t
 arb_shader_objects['clear-with-deleted'] = concurrent_test('arb_shader_objects-clear-with-deleted')
 arb_shader_objects['delete-repeat'] = concurrent_test('arb_shader_objects-delete-repeat')
 
+arb_shading_language_420pack = Group()
+spec['ARB_shading_language_420pack'] = arb_shading_language_420pack
+import_glsl_parser_tests(arb_shading_language_420pack,
+			 os.path.join(testsDir, 'spec', 'arb_shading_language_420pack'),
+			 ['compiler'])
+#arb_shading_language_420pack['execution'] = Group()
+#add_shader_test_dir(arb_shader_texture_lod['execution'],
+#	            os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
+#		    recursive=True)
+
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = Group()
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
