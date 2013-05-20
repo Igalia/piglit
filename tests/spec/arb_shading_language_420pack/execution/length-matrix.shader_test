@@ -1,0 +1,66 @@
+/* The ARB_shading_language_420pack spec says:
+ *
+ *     "The length method may be applied to matrices. The result is the number
+ *      of columns of the matrix. For example,
+ *
+ *          mat3x4 v;
+ *          const int L = v.length();
+ *
+ *      sets the constant L to 3. The type returned by .length() on a matrix
+ *      is *int*."
+ *
+ * Verify that mat.length() returns the number of columns and that the type is
+ * int.
+ */
+
+[require]
+GLSL >= 1.30
+GL_ARB_shading_language_420pack
+
+[vertex shader]
+attribute vec4 vertex;
+
+void main()
+{
+    gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_420pack: enable
+
+void main() {
+    mat2x2 m2x2;
+    mat2x3 m2x3;
+    mat2x4 m2x4;
+    mat3x2 m3x2;
+    mat3x3 m3x3;
+    mat3x4 m3x4;
+    mat4x2 m4x2;
+    mat4x3 m4x3;
+    mat4x4 m4x4;
+
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+
+    if (m2x2.length() != 2 ||
+        m2x3.length() != 2 ||
+        m2x4.length() != 2 ||
+        m3x2.length() != 3 ||
+        m3x3.length() != 3 ||
+        m3x4.length() != 3 ||
+        m4x2.length() != 4 ||
+        m4x3.length() != 4 ||
+        m4x4.length() != 4) {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
