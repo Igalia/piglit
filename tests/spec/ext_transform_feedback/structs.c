@@ -100,7 +100,6 @@
  * using interface blocks.
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

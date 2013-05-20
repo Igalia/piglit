@@ -47,7 +47,6 @@
  *      values."
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 #include "uniform-types.h"
 

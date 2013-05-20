@@ -28,7 +28,6 @@
  * that, thus testing the size and base alignment for them.
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 #include "uniform-types.h"
 

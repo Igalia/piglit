@@ -34,7 +34,6 @@
  *      next multiple of the base alignment required for a vec4."
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 #include "uniform-types.h"
 

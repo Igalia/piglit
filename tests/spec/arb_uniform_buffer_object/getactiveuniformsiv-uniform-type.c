@@ -27,7 +27,6 @@
  * GL_UNIFORM_TYPE for variables in a UBO.
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 #include "uniform-types.h"
 

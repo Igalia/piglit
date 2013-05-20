@@ -27,7 +27,6 @@
  * Common structures and functions used for GLSL 1.30+ texturing tests.
  */
 #pragma once
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
 /**

@@ -26,8 +26,6 @@
  * of the GL 3.0 spec.
  */
 
-#define _GNU_SOURCE
-
 #include <inttypes.h>
 #include <string.h>
 

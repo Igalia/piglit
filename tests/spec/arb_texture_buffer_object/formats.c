@@ -25,7 +25,6 @@
  * Test for the minimum maximum value in the GL_ARB_texture_buffer_object spec.
  */
 
-#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
 enum channels {

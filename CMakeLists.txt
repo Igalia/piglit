@@ -197,6 +197,10 @@ if (${CMAKE_C_COMPILER_ID} STREQUAL "SunPro")
 		"<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 endif()
 
+# Always enable GNU C extensions.  Non-GNU platforms will need to
+# define wrappers for them.
+add_definitions(-D_GNU_SOURCE)
+
 if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)

@@ -21,8 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define _GNU_SOURCE
-
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
