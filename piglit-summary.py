@@ -44,16 +44,22 @@ def parse_listfile(filename):
     return open(filename, "r").read().rstrip().split('\n')
 
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--diff",
+
+    # Set the -d and -s options as exclusive, since it's silly to call for diff
+    # and then call for only summary
+    excGroup1 = parser.add_mutually_exclusive_group()
+    excGroup1.add_argument("-d", "--diff",
                         action  = "store_true",
                         help    = "Only display the differences between"
                                   "multiple result files")
-    parser.add_argument("-s", "--summary",
+    excGroup1.add_argument("-s", "--summary",
                         action  = "store_true",
                         help    = "Only display the summary, not the"
                                   "individual test results")
+
     parser.add_argument("-l", "--list",
                         action  = "store",
                         help    = "Use test results from a list file")
