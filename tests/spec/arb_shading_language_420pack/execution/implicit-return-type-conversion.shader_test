@@ -1,0 +1,42 @@
+/* The ARB_shading_language_420pack says:
+ *
+ *     "If the type of returnValue does not match returnType, there must be an
+ *      implicit conversion in section 4.1.10 "Implicit Conversions" that
+ *      converts the type of returnValue to returnType, or a compile error will
+ *      result."
+ *
+ * Verify that implicit conversions of return values to match the function's
+ * return type work.
+ */
+
+[require]
+GLSL >= 1.30
+GL_ARB_shading_language_420pack
+
+[vertex shader]
+attribute vec4 vertex;
+
+void main()
+{
+    gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_shading_language_420pack: enable
+
+vec4 func() { return ivec4(1, 0, 0, 1); }
+
+void main() {
+    gl_FragColor = func();
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 0.0 0.0 1.0
