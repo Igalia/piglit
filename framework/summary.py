@@ -693,6 +693,16 @@ class NewSummary:
                         if status[i] > 1 and status[i + 1] == 1:
                             self.tests['fixes'].append(test)
 
+    def __find_totals(self):
+        """
+        Private: Find the total number of pass, fail, crash, skip, and warn in
+        the *last* set of results stored in self.results.
+        """
+        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn':0}
+
+        for test in self.results[-1].tests.values():
+            self.totals[test['result']] += 1
+
     def generateHTML(self, destination, exclude):
         """
         Produce HTML summaries.
@@ -808,3 +818,35 @@ class NewSummary:
                 file.write(empty_status.render(page=page, pages=pages))
 
             file.close()
+
+    def generateText(self, diff, summary):
+        self.__find_totals()
+
+        # If there are more than one set of results we need to find changes
+        if len(self.results) > 1:
+            self.__generate_lists(['changes'])
+
+        # Print the name of the test and the status from each test run
+        if not summary:
+            if diff:
+                for test in self.tests['changes']:
+                    print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
+                    ' '.join([i.tests.get(test, {'result': 'skip'})['result']
+                             for i in self.results])}
+            else:
+                for test in self.tests['all']:
+                    print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
+                    ' '.join([i.tests.get(test, {'result': 'skip'})['result']
+                             for i in self.results])}
+
+        # Print the summary
+        print "summary:"
+        print "   pass: %d" % self.totals['pass']
+        print "   fail: %d" % self.totals['fail']
+        print "  crash: %d" % self.totals['crash']
+        print "   skip: %d" % self.totals['skip']
+        print "   warn: %d" % self.totals['warn']
+        if self.tests['changes']:
+            print "changes: %d" % len(self.tests['changes'])
+
+        print "  total: %d" % sum(self.totals.values())
