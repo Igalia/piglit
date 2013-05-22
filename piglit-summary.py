@@ -32,11 +32,9 @@
 import argparse
 import os.path
 import sys
-import string
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
-import framework.core as core
-import framework.summary
+import framework.summary as summary
 
 
 def parse_listfile(filename):
@@ -66,61 +64,19 @@ def main():
                                   "results file")
     args = parser.parse_args()
 
+    # Throw an error if -d/--diff is called, but only one results file is
+    # provided
+    if args.diff and len(args.results) < 2:
+        parser.error('-d/--diff cannot be specified unless two or more '
+                     'results files are specified')
+
     # make list of results
     if args.list:
         args.results.extend(parse_listfile(args.list))
-    results = [core.loadTestResults(i) for i in args.results]
 
-    summary = framework.summary.Summary(results)
-
-    # possible test outcomes
-    possible_results = [ "pass", "fail", "crash", "skip", "warn" ]
-    if len(args.results) > 1:
-        possible_results.append("changes")
-
-    # init the summary counters
-    counts = {}
-    for result in possible_results:
-        counts[result] = 0
-
-    # get all results
-    all = summary.allTests()
-
-    # sort the results list by path
-    all = sorted(all, key=lambda test: test.path)
-
-    # loop over the tests
-    for test in all:
-        results = []
-        anyChange = False
-        # loop over the results for multiple runs
-        for j in range(len(summary.testruns)):
-            outcome = test.results[j]['result'] # 'pass', 'fail', etc.
-            # check for different results between multiple runs
-            if len(results) >= 1 and not outcome in results:
-                # something changed
-                counts["changes"] += 1
-                anyChange = True
-            results.append(outcome)
-
-        # if all test runs had the same outcome:
-        if not anyChange:
-            counts[outcome] += 1
-
-        # print the individual test result line
-        if args.diff:
-            if anyChange:
-                print "%s: %s" % (test.path, string.join(results," "))
-        elif not args.summary:
-            print "%s: %s" % (test.path, string.join(results," "))
-
-    # print the summary info
-    print "summary:"
-    total = 0
-    for result in possible_results:
-        print " %7s: %5d" % (result, counts[result])
-        total += counts[result]
-    print "   total: %5d" % total
+    # Generate the output
+    output = summary.NewSummary(args.results)
+    output.generateText(args.diff, args.summary)
 
 
 if __name__ == "__main__":
