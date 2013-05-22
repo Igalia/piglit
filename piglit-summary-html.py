@@ -245,33 +245,45 @@ results is an array containing the top-level results dictionarys.
 ##### Main program
 #############################################################################
 def parse_listfile(filename):
-    file = open(filename, "r")
-    code = "".join([s for s in file])
-    file.close()
-    return eval(code)
+    """
+    Read a list of newline seperated flies and return them as a python list.
+    strip the last newline character so the list doesn't have an extra ''
+    element at the end.
+    """
+    with open(filename, 'r') as file:
+        return file.read().rstrip().split('\n')
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--overwrite",
-                                            action  = "store_true",
-                                            help    = "Overwrite existing directories")
+                        action  = "store_true",
+                        help    = "Overwrite existing directories")
     parser.add_argument("-l", "--list",
-                                            action  = "store",
-                                            help    = "Use test results from a list file")
+                        action  = "store",
+                        help    = "Load a newline seperated list of results. "
+                                  "These results will be prepended to any "
+                                  "Results specified on the command line")
     parser.add_argument("summaryDir",
-                                            metavar = "<Summary Directory>",
-                                            help    = "Directory to put HTML files in")
+                        metavar = "<Summary Directory>",
+                        help    = "Directory to put HTML files in")
     parser.add_argument("resultsFiles",
-                                            metavar = "<Results Files>",
-                                            nargs   = "+",
-                                            help    = "Results files to include in HTML")
+                        metavar = "<Results Files>",
+                        nargs   = "+",
+                        help    = "Results files to include in HTML")
     args = parser.parse_args()
+
+    # If args.list and args.resultsFiles are empty, then raise an error
+    if not args.list and not args.resultsFiles:
+        raise parser.error("Missing required option -l or <resultsFiles>")
 
     core.checkDir(args.summaryDir, not args.overwrite)
 
     results = []
-    for result_dir in args.resultsFiles:
-        results.append(core.loadTestResults(result_dir))
+    if args.list:
+        for result in parse_listfile(args.list):
+            results.append(core.loadTestResults(os.path.expanduser(result)))
+
+    results.extend([core.loadTestResults(i) for i in args.resultsFiles])
 
     summary = framework.summary.Summary(results)
     for j in range(len(summary.testruns)):
