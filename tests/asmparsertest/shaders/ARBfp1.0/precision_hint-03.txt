@@ -1,5 +1,4 @@
 !!ARBfp1.0
-# FAIL
 	OPTION	ARB_precision_hint_nicest;
 	OPTION	ARB_precision_hint_nicest;
 	END
