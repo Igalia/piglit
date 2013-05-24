@@ -2329,6 +2329,9 @@ spec['ARB_map_buffer_alignment'] = arb_map_buffer_alignment
 add_plain_test(arb_map_buffer_alignment, 'arb_map_buffer_alignment-sanity_test')
 
 arb_geometry_shader4 = Group()
+for draw in ['', 'indexed']:
+    for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY', 'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
+        add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-ignore-adjacent-vertices {0} {1}'.format(draw, prim))
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type-draw')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-output-type')
