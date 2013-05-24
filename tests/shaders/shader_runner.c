@@ -1482,7 +1482,7 @@ decode_drawing_mode(const char *mode_str)
 {
 	int i;
 
-	for (i = GL_POINTS; i <= GL_POLYGON; ++i) {
+	for (i = GL_POINTS; i <= GL_PATCHES; ++i) {
 		const char *name = piglit_get_prim_name(i);
 		if (0 == strcmp(mode_str, name))
 			return i;
