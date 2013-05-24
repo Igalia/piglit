@@ -1,0 +1,47 @@
+# Try accessing more vertices than are available in gs and check for link error.
+#
+# ARB_geometry_shader4 spec 4.3.6:
+# "It is illegal to index these varying arrays, or in the case of two-
+# dimensional arrays, the first range of the array, with a negative integral
+# constant expression or an integral constant expression greater than or
+# equal to gl_VerticesIn. A link error will occur in these cases."
+[require]
+GL >= 2.0
+GLSL >= 1.10
+GL_ARB_geometry_shader4
+
+[vertex shader]
+#version 110
+
+attribute vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+[geometry shader]
+#version 110
+#extension GL_ARB_geometry_shader4: enable
+
+void main()
+{
+	gl_Position = gl_PositionIn[3];
+	EmitVertex();
+}
+
+[geometry layout]
+input type GL_TRIANGLES
+output type GL_POINTS
+vertices out 1
+
+[fragment shader]
+#version 110
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error
