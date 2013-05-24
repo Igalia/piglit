@@ -1751,7 +1751,7 @@ piglit_display(void)
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4, c + 5) == 6) {
 			x = c[0] * piglit_width;
-			y = c[1] * piglit_width;
+			y = c[1] * piglit_height;
 			if (x >= piglit_width)
 				x = piglit_width - 1;
 			if (y >= piglit_height)
@@ -1772,7 +1772,7 @@ piglit_display(void)
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4) == 5) {
 			x = c[0] * piglit_width;
-			y = c[1] * piglit_width;
+			y = c[1] * piglit_height;
 			if (x >= piglit_width)
 				x = piglit_width - 1;
 			if (y >= piglit_height)
