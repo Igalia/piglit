@@ -1,0 +1,48 @@
+[require]
+GL >= 2.0
+GLSL >= 1.10
+GL_ARB_geometry_shader4
+
+[vertex shader]
+#version 110
+
+attribute vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+[geometry shader]
+#version 110
+#extension GL_ARB_geometry_shader4: enable
+
+void main()
+{
+}
+
+[geometry layout]
+input type GL_TRIANGLES
+output type GL_TRIANGLE_STRIP
+vertices out 3
+
+[fragment shader]
+#version 110
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0 0 0 0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgb 0.0 0.0 0.0
