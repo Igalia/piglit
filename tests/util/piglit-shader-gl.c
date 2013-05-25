@@ -80,3 +80,54 @@ piglit_require_fragment_shader(void)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 }
+
+/* Same function as link_check_status but for program pipeline */
+static GLboolean
+program_pipeline_check_status(GLuint pipeline, FILE *output)
+{
+	GLchar *info = NULL;
+	GLint size;
+	GLint ok;
+
+	piglit_require_extension("GL_ARB_separate_shader_objects");
+
+	glValidateProgramPipeline(pipeline);
+	glGetProgramPipelineiv(pipeline, GL_VALIDATE_STATUS, &ok);
+
+	/* Some drivers return a size of 1 for an empty log.  This is the size
+	 * of a log that contains only a terminating NUL character.
+	 */
+	glGetProgramPipelineiv(pipeline, GL_INFO_LOG_LENGTH, &size);
+	if (size > 1) {
+		info = malloc(size);
+		glGetProgramPipelineInfoLog(pipeline, size, NULL, info);
+	}
+
+	if (!ok) {
+		fprintf(output, "Failed to validate the pipeline: %s\n",
+			(info != NULL) ? info : "<empty log>");
+	}
+	else if (0 && info != NULL) {
+		/* Enable this to get extra linking info.
+		 * Even if there's no link errors, the info log may
+		 * have some remarks.
+		 */
+		printf("Pipeline validation warning: %s\n", info);
+	}
+
+	free(info);
+
+	return ok;
+}
+
+GLboolean
+piglit_program_pipeline_check_status(GLuint pipeline)
+{
+	return program_pipeline_check_status(pipeline, stderr);
+}
+
+GLboolean
+piglit_program_pipeline_check_status_quiet(GLuint pipeline)
+{
+	return program_pipeline_check_status(pipeline, stdout);
+}

@@ -47,3 +47,19 @@ piglit_require_fragment_shader(void)
 	printf("GLES1 lacks GLSL\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
+
+GLboolean
+piglit_program_pipeline_check_status(GLuint pipeline)
+{
+	(void) pipeline;
+	piglit_report_result(PIGLIT_SKIP);
+	return GL_FALSE;
+}
+
+GLboolean
+piglit_program_pipeline_check_status_quiet(GLuint pipeline)
+{
+	(void) pipeline;
+	piglit_report_result(PIGLIT_SKIP);
+	return GL_FALSE;
+}
