@@ -48,6 +48,7 @@
  * implementation is not overly aggressive in flagging errors.
  */
 
+#define _GNU_SOURCE
 #include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -78,6 +79,9 @@ enum test_mode {
 	BIND_BAD_SIZE,
 	BIND_BAD_OFFSET,
 	NOT_A_PROGRAM,
+	USEPROGSTAGE_ACTIVE,
+	USEPROGSTAGE_NOACTIVE,
+	BIND_PIPELINE
 };
 
 enum bind_mode {
@@ -87,6 +91,28 @@ enum bind_mode {
 };
 
 static const char *vstext =
+	"varying vec4 foo;\n"
+	"varying vec4 bar;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  foo = vec4(1.0);\n"
+	"  bar = vec4(1.0);\n"
+	"  gl_Position = vec4(1.0);\n"
+	"}\n";
+
+static const char *vstext_sep_template =
+	"#version %d\n"
+	"#extension GL_ARB_separate_shader_objects : enable\n"
+	"#if __VERSION__ > 140\n"
+	"/* At least some versions of AMD's closed-source driver\n"
+	" * contain a bug that requires redeclaration of gl_PerVertex\n"
+	" * interface block in core profile shaders.\n"
+	" */\n"
+	"out gl_PerVertex {\n"
+	"    vec4 gl_Position;\n"
+	"};\n"
+	"#endif\n"
 	"varying vec4 foo;\n"
 	"varying vec4 bar;\n"
 	"\n"
@@ -151,6 +177,10 @@ static struct test_desc
 	{ "bind_offset_offset_3",    BIND_BAD_OFFSET,      3, OFFSET, GL_INTERLEAVED_ATTRIBS, 1 },
 	{ "bind_offset_offset_5",    BIND_BAD_OFFSET,      5, OFFSET, GL_INTERLEAVED_ATTRIBS, 1 },
 	{ "not_a_program",           NOT_A_PROGRAM,        0, BASE,   GL_INTERLEAVED_ATTRIBS, 1 },
+	{ "useprogstage_noactive",   USEPROGSTAGE_NOACTIVE,0, BASE,   GL_INTERLEAVED_ATTRIBS, 1 },
+	{ "useprogstage_active",     USEPROGSTAGE_ACTIVE,  0, BASE,   GL_INTERLEAVED_ATTRIBS, 1 },
+	{ "bind_pipeline",           BIND_PIPELINE,        0, BASE,   GL_INTERLEAVED_ATTRIBS, 1 },
+
 };
 
 static void
@@ -186,12 +216,25 @@ do_test(const struct test_desc *test)
 {
 	GLuint vs;
 	GLuint progs[2];
+	GLuint pipes[2];
 	GLuint bufs[NUM_BUFFERS];
 	float initial_xfb_buffer_contents[XFB_BUFFER_SIZE];
 	GLboolean pass = GL_TRUE;
 	int i;
 	int num_varyings = test->mode == NO_VARYINGS ? 0 : test->num_buffers;
 	GLint max_separate_attribs;
+	char* vstext_sep;
+
+	if (test->mode == USEPROGSTAGE_ACTIVE
+	    || test->mode == USEPROGSTAGE_NOACTIVE
+	    || test->mode == BIND_PIPELINE) {
+		piglit_require_extension("GL_ARB_separate_shader_objects");
+
+		if (piglit_get_gl_version() >= 32)
+			asprintf(&vstext_sep, vstext_sep_template, 150);
+		else
+			asprintf(&vstext_sep, vstext_sep_template, 110);
+	}
 
 	glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS,
 		      &max_separate_attribs);
@@ -200,7 +243,17 @@ do_test(const struct test_desc *test)
 
 	printf("Compile vertex shader\n");
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	if (test->mode == NOT_A_PROGRAM) {
+	if (test->mode == USEPROGSTAGE_ACTIVE
+	    || test->mode == USEPROGSTAGE_NOACTIVE
+	    || test->mode == BIND_PIPELINE) {
+		/* Note, we can't use glCreateShaderProgramv because the setup
+		 * of transform feedback must be done before linking
+		 */
+		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_sep);
+		progs[0] = glCreateProgram();
+		glProgramParameteri(progs[0], GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(progs[0], vs);
+	} else if (test->mode == NOT_A_PROGRAM) {
 		printf("Create a program and then delete it\n");
 		progs[0] = glCreateProgram();
 		glDeleteProgram(progs[0]);
@@ -227,6 +280,15 @@ do_test(const struct test_desc *test)
 	glLinkProgram(progs[0]);
 	pass = piglit_link_check_status(progs[0]) && pass;
 
+	if (test->mode == USEPROGSTAGE_ACTIVE
+	    || test->mode == USEPROGSTAGE_NOACTIVE
+	    || test->mode == BIND_PIPELINE) {
+		printf("Create 2nd program for the pipeline\n");
+		progs[1] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
+						  (const char **) &vstext_sep);
+		pass = piglit_link_check_status(progs[1]) && pass;
+	}
+
 	if (test->mode == USEPROG_ACTIVE || test->mode == LINK_OTHER_ACTIVE) {
 		printf("Prepare 2nd program\n");
 		progs[1] = glCreateProgram();
@@ -238,7 +300,15 @@ do_test(const struct test_desc *test)
 		pass = piglit_link_check_status(progs[1]) && pass;
 	}
 
-	if (test->mode == SKIP_USE_PROGRAM) {
+	if (test->mode == USEPROGSTAGE_ACTIVE
+	    || test->mode == USEPROGSTAGE_NOACTIVE
+	    || test->mode == BIND_PIPELINE) {
+		printf("Use pipeline\n");
+		glGenProgramPipelines(2, pipes);
+		glUseProgramStages(pipes[0], GL_VERTEX_SHADER_BIT, progs[0]);
+		glUseProgramStages(pipes[1], GL_VERTEX_SHADER_BIT, progs[1]);
+		glBindProgramPipeline(pipes[0]);
+	} else if (test->mode == SKIP_USE_PROGRAM) {
 		printf("Don't use program\n");
 	} else {
 		printf("Use program\n");
@@ -323,6 +393,21 @@ do_test(const struct test_desc *test)
 		break;
 	case BIND_ACTIVE:
 		do_bind(test, bufs[0], 0);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		break;
+	case USEPROGSTAGE_ACTIVE:
+		printf("Use new program stage\n");
+		glUseProgramStages(pipes[0], GL_VERTEX_SHADER_BIT, progs[1]);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		break;
+	case USEPROGSTAGE_NOACTIVE:
+		printf("Use new program stage\n");
+		glUseProgramStages(pipes[1], GL_VERTEX_SHADER_BIT, progs[1]);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+		break;
+	case BIND_PIPELINE:
+		printf("Bind a new pipeline\n");
+		glBindProgramPipeline(pipes[1]);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 		break;
 	default:

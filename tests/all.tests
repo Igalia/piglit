@@ -2142,7 +2142,9 @@ for mode in ['interleaved_ok_base', 'interleaved_ok_range',
              'bind_range_offset_2', 'bind_range_offset_3',
              'bind_range_offset_5', 'bind_offset_offset_1',
              'bind_offset_offset_2', 'bind_offset_offset_3',
-             'bind_offset_offset_5', 'not_a_program']:
+             'bind_offset_offset_5', 'not_a_program',
+             'useprogstage_noactive', 'useprogstage_active',
+             'bind_pipeline']:
     test_name = 'api-errors {0}'.format(mode)
     ext_transform_feedback[test_name] = concurrent_test(
             'ext_transform_feedback-{0}'.format(test_name))
