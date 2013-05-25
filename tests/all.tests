@@ -1271,6 +1271,7 @@ add_concurrent_test(arb_occlusion_query, 'occlusion_query_order')
 arb_separate_shader_objects = Group()
 spec['ARB_separate_shader_objects'] = arb_separate_shader_objects
 arb_separate_shader_objects['GetProgramPipelineiv'] = concurrent_test('arb_separate_shader_object-GetProgramPipelineiv')
+arb_separate_shader_objects['IsProgramPipeline'] = concurrent_test('arb_separate_shader_object-IsProgramPipeline')
 
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
