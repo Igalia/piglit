@@ -113,8 +113,11 @@ process_next_event(struct piglit_x11_framework *x11_fw)
 	}
 
 	if (winsys_fw->need_redisplay) {
+		enum piglit_result result = PIGLIT_PASS;
 		if (test_config->display)
-			test_config->display();
+			result = test_config->display();
+		if (piglit_automatic)
+			piglit_report_result(result);
 		winsys_fw->need_redisplay = false;
 	}
 }
