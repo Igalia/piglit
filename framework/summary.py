@@ -756,6 +756,10 @@ class NewSummary:
                          output_encoding="utf-8",
                          module_directory=".makotmp")
 
+        empty_status = Template(filename="templates/empty_status.mako",
+                                output_encoding="utf-8",
+                                module_directory=".makotmp")
+
         # A list of pages to be generated
         # If there is only one set of results, then there cannot be changes,
         # regressions or fixes, so don't generate those pages
@@ -778,9 +782,16 @@ class NewSummary:
         # Generate the rest of the pages
         for page in pages:
             file = open(path.join(destination, page + '.html'), 'w')
-            file.write(index.render(results=HTMLIndex(self, self.tests[page]),
-                                    page=page,
-                                    pages=pages,
-                                    colnum=len(self.results),
-                                    exclude=exclude))
+            # If there is information to display display it
+            if self.tests[page]:
+                file.write(index.render(results=HTMLIndex(self,
+                                                          self.tests[page]),
+                                        pages=pages,
+                                        page=page,
+                                        colnum=len(self.results),
+                                        exclude=exclude))
+            # otherwise provide an empty page
+            else:
+                file.write(empty_status.render(page=page, pages=pages))
+
             file.close()
