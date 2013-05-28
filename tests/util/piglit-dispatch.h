@@ -87,6 +87,7 @@ typedef unsigned int GLbitfield;
 typedef unsigned int GLuint;
 typedef int GLint;
 typedef int GLsizei;
+typedef int GLfixed;
 typedef unsigned char GLboolean;
 typedef signed char GLbyte;
 typedef short GLshort;
