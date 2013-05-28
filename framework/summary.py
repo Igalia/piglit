@@ -360,7 +360,7 @@ class HTMLIndex(list):
         self._endRow()
 
         # Add the groups and tests to the out list
-        for key in sorted(getattr(summary, page)):
+        for key in sorted(page):
 
             # Split the group names and test names, then determine
             # which groups to close and which to open
@@ -628,12 +628,8 @@ class NewSummary:
 
         self.status = {}
         self.fractions = {}
-        self.alltests = []
-        self.changes = []
-        self.problems = []
-        self.skipped = []
-        self.regressions = []
-        self.fixes = []
+        self.tests = {'all': [], 'changes': [], 'problems': [], 'skipped': [],
+                      'regressions': [], 'fixes': []}
 
         for each in self.results:
             # Build a dict of the status output of all of the tests, with the
@@ -644,12 +640,11 @@ class NewSummary:
             self.status.update({each.name: status})
 
             # Create a list with all the test names in it
-            self.alltests = list(set(self.alltests) | set(each.tests))
+            self.tests['all'] = list(set(self.tests['all']) | set(each.tests))
 
-        # Create lists similar to self.alltests, but for the other root pages,
-        # (regressions, skips, ect). Special is used to makr things that cannot
-        # be comapred (like 'not run')
-        for test in self.alltests:
+        # Create lists similar to self.tests['all'], but for the other root
+        # pages, (regressions, skips, ect)
+        for test in self.tests['all']:
             status = []
             for each in self.results:
                 try:
@@ -657,23 +652,23 @@ class NewSummary:
                 except KeyError:
                     status.append(status_to_number("special"))
 
-            # Check and append self.changes
+            # Check and append self.tests['changes']
             # A set cannot contain duplicate entries, so creating a set out
             # the list will reduce it's length to 1 if all entries are the
             # same, meaning it is not a change
             if len(set(status)) > 1:
-                self.changes.append(test)
+                self.tests['changes'].append(test)
 
             # Problems
             # If the result contains a value other than 1 (pass) or 4 (skip)
             # it is a problem. Skips are not problems becasuse they have
             # Their own page.
             if [i for e in [2, 3, 5] for i in status if e is i]:
-                self.problems.append(test)
+                self.tests['problems'].append(test)
 
             # skipped
             if 4 in status:
-                self.skipped.append(test)
+                self.tests['skipped'].append(test)
 
             # fixes and regressions
             # check each member against the next member. If the second member
@@ -683,9 +678,9 @@ class NewSummary:
             # a value of 1
             for i in xrange(len(status) - 1):
                 if status[i] < status[i + 1] and status[i] != 0:
-                    self.regressions.append(test)
+                    self.tests['regressions'].append(test)
                 if status[i] > 1 and status[i + 1] == 1:
-                    self.fixes.append(test)
+                    self.tests['fixes'].append(test)
 
     def generateHTML(self, destination, exclude):
         """
@@ -768,7 +763,7 @@ class NewSummary:
         # alltests, where the other pages all use the same name. ie,
         # changes.html, self.changes, and page=changes.
         file = open(path.join(destination, "index.html"), 'w')
-        file.write(index.render(results=HTMLIndex(self, 'alltests'),
+        file.write(index.render(results=HTMLIndex(self, self.tests['all']),
                                 page='all',
                                 colnum=len(self.results),
                                 exclude=exclude))
@@ -777,7 +772,7 @@ class NewSummary:
         # Generate the rest of the pages
         for page in pages:
             file = open(path.join(destination, page + '.html'), 'w')
-            file.write(index.render(results=HTMLIndex(self, page),
+            file.write(index.render(results=HTMLIndex(self, self.tests[page]),
                                     page=page,
                                     colnum=len(self.results),
                                     exclude=exclude))
