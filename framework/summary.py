@@ -757,7 +757,12 @@ class NewSummary:
                          module_directory=".makotmp")
 
         # A list of pages to be generated
-        pages = ['changes', 'problems', 'skipped', 'fixes', 'regressions']
+        # If there is only one set of results, then there cannot be changes,
+        # regressions or fixes, so don't generate those pages
+        if len(self.results) > 1:
+            pages = ['changes', 'problems', 'skipped', 'fixes', 'regressions']
+        else:
+            pages = ['problems', 'skipped']
 
         # Index.html is a bit of a special case since there is index, all, and
         # alltests, where the other pages all use the same name. ie,
@@ -765,6 +770,7 @@ class NewSummary:
         file = open(path.join(destination, "index.html"), 'w')
         file.write(index.render(results=HTMLIndex(self, self.tests['all']),
                                 page='all',
+                                pages=pages,
                                 colnum=len(self.results),
                                 exclude=exclude))
         file.close()
@@ -774,6 +780,7 @@ class NewSummary:
             file = open(path.join(destination, page + '.html'), 'w')
             file.write(index.render(results=HTMLIndex(self, self.tests[page]),
                                     page=page,
+                                    pages=pages,
                                     colnum=len(self.results),
                                     exclude=exclude))
             file.close()

@@ -16,7 +16,7 @@
       % else:
         <a href="index.html">all</a>
       % endif
-      % for i in ['changes', 'fixes', 'problems', 'regressions', 'skipped']:
+      % for i in pages:
         % if i == page:
           | ${i}
         % else:
