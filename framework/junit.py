@@ -56,10 +56,23 @@ class Error(Exception):
     pass
 
 
+# Not all valid Unicode characters are valid XML.
+# See http://www.w3.org/TR/xml/#charsets
+_validXmlAscii = ''.join([((_c >= 0x20 and _c < 0x80) or _c in (0x9, 0xA, 0xD)) and chr(_c) or '?' for _c in range(256)])
+_validXmlUnicode = {}
+for _c in range(20):
+    if _c not in (0x9, 0xA, 0xD):
+        _validXmlUnicode[_c] = ord('?')
+del _c
+
+
 def escape(s):
     '''Escape and encode a XML string.'''
-    if not isinstance(s, unicode):
+    if isinstance(s, unicode):
+        s = s.translate(_validXmlUnicode)
+    else:
         #s = s.decode(locale.getpreferredencoding(), 'replace')
+        s = s.translate(_validXmlAscii)
         s = s.decode('ascii', 'ignore')
     s = s.replace('&', '&amp;')
     s = s.replace('<', '&lt;')
