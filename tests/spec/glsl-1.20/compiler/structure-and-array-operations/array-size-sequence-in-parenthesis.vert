@@ -1,5 +1,5 @@
 /* [config]
- * expect_result: pass
+ * expect_result: fail
  * glsl_version: 1.20
  * [end config]
  *
@@ -27,6 +27,6 @@
  */
 #version 120
 
-uniform float a[(3,5)];
+uniform float a[(5,3)];
 
-void main() { gl_Position = vec4(a[4]); }
+void main() { gl_Position = vec4(0.0); }
