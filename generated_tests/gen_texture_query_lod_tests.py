@@ -84,7 +84,7 @@ template = Template(dedent("""\
 	% endif
 	 * glsl_version: ${version}
 	% if extensions:
-	 * required_extensions: ${" ".join(extensions)}
+	 * require_extensions: ${" ".join(extensions)}
 	% endif
 	 * [end config]
 	 */
