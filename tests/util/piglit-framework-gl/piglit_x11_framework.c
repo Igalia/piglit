@@ -80,9 +80,6 @@ process_next_event(struct piglit_x11_framework *x11_fw)
 	Display *dpy = x11_fw->display;
 	XEvent event;
 
-	if (!XPending(dpy))
-		return;
-
 	XNextEvent(dpy, &event);
 
 	switch (event.type) {
