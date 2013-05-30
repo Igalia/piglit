@@ -38,16 +38,26 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+extern float piglit_tolerance[4];
+
 static int texrect_w;
 static int texrect_h;
 static const float r[] = {1, 0, 0, 1};
 static const float g[] = {0, 1, 0, 1};
 static const float b[] = {0, 0, 1, 1};
 static const float w[] = {1, 1, 1, 1};
+static float linear_tolerance[4];
+static float nearest_tolerance[4];
 
 static bool
 test_nearest(int x)
 {
+	int i;
+
+	/* Set default tolerance for nearest filtering. */
+	for (i = 0; i < 4; i++)
+		piglit_tolerance[i] = nearest_tolerance[i];
+
 	return (piglit_probe_rect_rgba(x, 0,
 				       texrect_w, texrect_h, r) &&
 		piglit_probe_rect_rgba(x + texrect_w, 0,
@@ -73,6 +83,11 @@ test_linear(int x)
 	const float offset = 1.0f/(float)texrect_w;
 	const float lfm = 0.5f - offset;
 	const float lfp = 0.5f + offset;
+
+	/* Increase tolerance a bit for linear filtering. */
+	for (i = 0; i < 4; i++)
+		piglit_tolerance[i] = linear_tolerance[i];
+
 	for (i = 0; i < 4; i++)
 		average[i] = (r[i] *lfm*lfm +
 			      g[i] *lfm*lfp +
@@ -158,4 +173,10 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		nearest_tolerance[i] = piglit_tolerance[i];
+		linear_tolerance[i] = 0.02;
+	}
 }
