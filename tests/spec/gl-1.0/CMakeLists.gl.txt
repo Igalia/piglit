@@ -14,6 +14,7 @@ piglit_add_executable (gl-1.0-edgeflag edgeflag.c)
 piglit_add_executable (gl-1.0-edgeflag-quads edgeflag-quads.c)
 piglit_add_executable (gl-1.0-dlist-beginend dlist-beginend.c)
 piglit_add_executable (gl-1.0-dlist-shademodel dlist-shademodel.c)
+piglit_add_executable (gl-1.0-front-invalidate-back front-invalidate-back.c)
 piglit_add_executable (gl-1.0-rendermode-feedback rendermode-feedback.c)
 
 # vim: ft=cmake:
