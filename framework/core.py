@@ -297,14 +297,8 @@ class TestrunResult:
                 is returned.
         '''
 
-        saved_position = file.tell()
+        file.seek(0)
         lines = file.readlines()
-        file.seek(saved_position)
-
-        if lines[-1] == '}':
-            # JSON object was closed properly. No repair is
-            # necessary.
-            return file
 
         # JSON object was not closed properly.
         #
@@ -353,13 +347,17 @@ class TestrunResult:
         json.dump(raw_dict, file, indent=JSONWriter.INDENT)
 
     def parseFile(self, file):
-        file = self.__repairFile(file)
-        raw_dict = json.load(file)
+        # Attempt to open the json file normally, if it fails then attempt to
+        # repair it.
+        try:
+            raw_dict = json.load(file)
+        except ValueError:
+            raw_dict = json.load(self.__repairFile(file))
 
         # Check that only expected keys were unserialized.
         for key in raw_dict:
             if key not in self.serialized_keys:
-                raise Exception('unexpected key in results file: ' + str(key))
+                raise Exception('unexpected key in results file: ', str(key))
 
         self.__dict__.update(raw_dict)
 
