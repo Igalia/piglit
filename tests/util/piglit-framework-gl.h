@@ -140,6 +140,7 @@ struct piglit_gl_test_config {
 
 	int window_width;
 	int window_height;
+	int window_samples;
 
 	/**
 	 * A bitmask of `enum piglit_gl_visual`.

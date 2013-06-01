@@ -180,6 +180,11 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
+	if (test_config->window_samples > 1) {
+		printf("GLUT doesn't support MSAA visuals.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	ok = piglit_gl_framework_init(&glut_fw.gl_fw, test_config);
 	if (!ok)
 		return NULL;

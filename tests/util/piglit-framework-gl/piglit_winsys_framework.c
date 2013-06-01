@@ -125,6 +125,13 @@ choose_config_attribs(const struct piglit_gl_test_config *test_config)
 		attrib_list[i++] = true;
 	}
 
+	if (test_config->window_samples > 1) {
+		attrib_list[i++] = WAFFLE_SAMPLE_BUFFERS;
+		attrib_list[i++] = 1;
+		attrib_list[i++] = WAFFLE_SAMPLES;
+		attrib_list[i++] = test_config->window_samples;
+	}
+
 	attrib_list[i++] = WAFFLE_NONE;
 
 	return attrib_list;

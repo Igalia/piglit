@@ -60,7 +60,7 @@ delete_arg(char *argv[], int argc, int arg)
  * length is returned in @a argc.
  */
 static void
-process_args(int *argc, char *argv[])
+process_args(int *argc, char *argv[], unsigned *force_samples)
 {
 	int j;
 
@@ -104,6 +104,10 @@ process_args(int *argc, char *argv[])
 			}
 			*argc -= 2;
 			j -= 2;
+		} else if (!strncmp(argv[j], "-samples=", 9)) {
+			*force_samples = atoi(argv[j]+9);
+			delete_arg(argv, *argc, j--);
+			*argc -= 1;
 		}
 	}
 }
@@ -112,12 +116,18 @@ void
 piglit_gl_test_run(int argc, char *argv[],
 		   const struct piglit_gl_test_config *config)
 {
-	process_args(&argc, argv);
+	struct piglit_gl_test_config conf = *config;
+	unsigned force_samples = 0;
 
-	piglit_width = config->window_width;
-	piglit_height = config->window_height;
+	process_args(&argc, argv, &force_samples);
 
-	gl_fw = piglit_gl_framework_factory(config);
+	if (force_samples > 1)
+		conf.window_samples = force_samples;
+
+	piglit_width = conf.window_width;
+	piglit_height = conf.window_height;
+
+	gl_fw = piglit_gl_framework_factory(&conf);
 	if (gl_fw == NULL) {
 		printf("piglit: error: failed to create "
 		       "piglit_gl_framework\n");
