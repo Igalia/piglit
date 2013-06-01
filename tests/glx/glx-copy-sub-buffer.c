@@ -80,14 +80,45 @@ draw(Display *dpy)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+static XVisualInfo *
+get_glx_visual(Display *dpy, int samples)
+{
+	XVisualInfo *visinfo;
+	int attrib[] = {
+		GLX_RGBA,
+		GLX_RED_SIZE, 1,
+		GLX_GREEN_SIZE, 1,
+		GLX_BLUE_SIZE, 1,
+		GLX_DOUBLEBUFFER,
+		samples <= 1 ? None : GLX_SAMPLE_BUFFERS, 1,
+		GLX_SAMPLES, samples,
+		None
+	};
+	int screen = DefaultScreen(dpy);
+
+	visinfo = glXChooseVisual(dpy, screen, attrib);
+	if (visinfo == NULL) {
+		fprintf(stderr,
+			"Couldn't get an RGBA, double-buffered visual "
+			"with samples=%i\n", samples);
+		piglit_report_result(PIGLIT_SKIP);
+		exit(1);
+	}
+
+	return visinfo;
+}
+
 int
 main(int argc, char **argv)
 {
-	int i;
+	int i, samples = 0;
 
 	for(i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
 			piglit_automatic = 1;
+		else if (!strncmp(argv[i], "-samples=", 9)) {
+			samples = atoi(argv[i]+9);
+		}
 		else
 			fprintf(stderr, "Unknown option: %s\n", argv[i]);
 	}
@@ -102,7 +133,7 @@ main(int argc, char **argv)
 	CopySubBuffer = (PFNGLXCOPYSUBBUFFERMESAPROC)
 	    glXGetProcAddressARB((GLubyte *)"glXCopySubBufferMESA");
 
-	visinfo = piglit_get_glx_visual(dpy);
+	visinfo = get_glx_visual(dpy, samples);
 	win_one = piglit_get_glx_window(dpy, visinfo);
 
 	XMapWindow(dpy, win_one);
