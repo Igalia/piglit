@@ -46,6 +46,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static GLboolean clear_front_first;
+
 enum piglit_result
 piglit_display(void)
 {
@@ -55,7 +57,15 @@ piglit_display(void)
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	glClearColor(0.0, 0.0, 1.0, 0.0);
+	if (clear_front_first) {
+		/* This should allocate the front buffer in the driver
+		 * if it hasn't been allocated already.
+		 */
+		glDrawBuffer(GL_FRONT);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDrawBuffer(GL_BACK);
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor4fv(green);
 	piglit_draw_rect(0, piglit_height / 2, piglit_width, piglit_height);
@@ -78,4 +88,13 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
+	glClearColor(0.0, 0.0, 1.0, 0.0);
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "clear-front-first") == 0) {
+			clear_front_first = GL_TRUE;
+		}
+	}
 }
