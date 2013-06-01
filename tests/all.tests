@@ -70,21 +70,31 @@ except SystemExit:
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
-def add_fbo_depthstencil_tests(group, format):
+def add_fbo_depthstencil_tests(group, format, num_samples):
 	if format == 'default_fb':
 		prefix = ''
 	else:
 		prefix = 'fbo-'
-	group[prefix + 'depthstencil-' + format + '-clear'] = PlainExecTest(['fbo-depthstencil', '-auto', 'clear', format])
-	group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, 'FLOAT-and-USHORT'])
-	group[prefix + 'depthstencil-' + format + '-readpixels-24_8'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '24_8'])
-	group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV'] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '32F_24_8_REV'])
-	group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, 'FLOAT-and-USHORT'])
-	group[prefix + 'depthstencil-' + format + '-drawpixels-24_8'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '24_8'])
-	group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV'] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '32F_24_8_REV'])
-	group[prefix + 'depthstencil-' + format + '-copypixels'] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format])
-	group[prefix + 'depthstencil-' + format + '-blit'] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format])
+	if num_samples > 1:
+		suffix = ' samples=' + str(num_samples)
+		psamples = ['-samples=' + str(num_samples)]
+	else:
+		suffix = ''
+		psamples = []
+	group[prefix + 'depthstencil-' + format + '-clear' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'clear', format] + psamples)
+	group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, 'FLOAT-and-USHORT'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '24_8'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '32F_24_8_REV'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, 'FLOAT-and-USHORT'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '24_8'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '32F_24_8_REV'] + psamples)
+	group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format] + psamples)
+	group[prefix + 'depthstencil-' + format + '-blit' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format] + psamples)
 
+def add_fbo_depthstencil_msaa_visual_tests(group, format):
+	add_fbo_depthstencil_tests(group, format, 0)
+	for num_samples in MSAA_SAMPLE_COUNTS:
+		add_fbo_depthstencil_tests(group, format, num_samples)
 
 def add_depthstencil_render_miplevels_tests(group, test_types):
         # Note: the buffer sizes below have been chosen to exercise
@@ -95,6 +105,12 @@ def add_depthstencil_render_miplevels_tests(group, test_types):
                                 texture_size, test_type)
                         group[test_name] = PlainExecTest(test_name + ' -auto')
 
+def add_msaa_visual_plain_tests(group, args):
+	add_plain_test(group, args)
+	for num_samples in MSAA_SAMPLE_COUNTS:
+		group[args + ' samples=' + str(num_samples)] = PlainExecTest(
+			shlex.split(args) + ['-auto'] +
+			['-samples=' + str(num_samples)])
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
@@ -336,7 +352,7 @@ def add_vpfpgeneric(group, name):
 	group[name] = PlainExecTest(['vpfp-generic', '-auto', testsDir + '/shaders/generic/' + name + '.vpfp'])
 
 glx = Group()
-add_plain_test(glx, 'glx-copy-sub-buffer')
+add_msaa_visual_plain_tests(glx, 'glx-copy-sub-buffer')
 add_plain_test(glx, 'glx-destroycontext-1')
 add_plain_test(glx, 'glx-destroycontext-2')
 add_plain_test(glx, 'glx-dont-care-mask')
@@ -506,11 +522,11 @@ add_plain_test(gl11, 'dlist-fdo31590')
 add_plain_test(gl11, 'draw-arrays-colormaterial')
 add_plain_test(gl11, 'draw-copypixels-sync')
 add_concurrent_test(gl11, 'draw-pixel-with-texture')
-add_plain_test(gl11, 'draw-pixels')
+add_msaa_visual_plain_tests(gl11, 'draw-pixels')
 add_concurrent_test(gl11, 'drawpix-z')
 add_plain_test(gl11, 'fog-modes')
 add_plain_test(gl11, 'fragment-center')
-add_fbo_depthstencil_tests(gl11, 'default_fb')
+add_fbo_depthstencil_msaa_visual_tests(gl11, 'default_fb')
 add_plain_test(gl11, 'geterror-invalid-enum')
 add_plain_test(gl11, 'geterror-inside-begin')
 add_concurrent_test(gl11, 'glinfo')
@@ -525,8 +541,8 @@ add_plain_test(gl11, 'polygon-mode')
 add_concurrent_test(gl11, 'polygon-mode-offset')
 add_concurrent_test(gl11, 'push-pop-texture-state')
 add_concurrent_test(gl11, 'quad-invariance')
-add_plain_test(gl11, 'read-front')
-add_plain_test(gl11, 'read-front clear-front-first')
+add_msaa_visual_plain_tests(gl11, 'read-front')
+add_msaa_visual_plain_tests(gl11, 'read-front clear-front-first')
 add_concurrent_test(gl11, 'readpix-z')
 add_plain_test(gl11, 'roundmode-getintegerv')
 add_plain_test(gl11, 'roundmode-pixelstore')
@@ -580,7 +596,7 @@ add_concurrent_test(gl10, 'gl-1.0-rendermode-feedback')
 gl12 = Group()
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_target_tests(gl12, '3D')
-gl12['copyteximage 3D'] = PlainExecTest(['copyteximage', '-auto', '3D'])
+add_msaa_visual_plain_tests(gl12, 'copyteximage 3D')
 add_plain_test(gl12, 'crash-texparameter-before-teximage')
 add_plain_test(gl12, 'draw-elements-vs-inputs')
 add_plain_test(gl12, 'two-sided-lighting-separate-specular')
@@ -608,7 +624,7 @@ add_plain_test(gl14, 'fdo25614-genmipmap')
 add_plain_test(gl14, 'tex1d-2dborder')
 add_plain_test(gl14, 'blendminmax')
 add_plain_test(gl14, 'blendsquare')
-add_plain_test(gl14, 'copy-pixels')
+add_msaa_visual_plain_tests(gl14, 'copy-pixels')
 add_plain_test(gl14, 'draw-batch')
 add_plain_test(gl14, 'stencil-wrap')
 add_plain_test(gl14, 'triangle-rasterization')
@@ -1224,7 +1240,7 @@ add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
 add_shader_test_dir(arb_texture_rectangle,
                     testsDir + '/spec/arb_texture_rectangle',
                     recursive=True)
-arb_texture_rectangle['copyteximage RECT'] = PlainExecTest(['copyteximage', '-auto', 'RECT'])
+add_msaa_visual_plain_tests(arb_texture_rectangle, 'copyteximage RECT')
 add_concurrent_test(arb_texture_rectangle, '1-1-linear-texture')
 add_plain_test(arb_texture_rectangle, 'texrect-many')
 add_concurrent_test(arb_texture_rectangle, 'getteximage-targets RECT')
@@ -1313,7 +1329,7 @@ spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
-add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
+add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8', 0)
 add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
 add_texwrap_format_tests(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float')
 add_depthstencil_render_miplevels_tests(
@@ -1707,7 +1723,7 @@ ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
-add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
+add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8', 0)
 add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_stencil')
 add_texwrap_format_tests(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil')
 ext_packed_depth_stencil['readpixels-24_8'] = PlainExecTest(['ext_packed_depth_stencil-readpixels-24_8', '-auto'])
@@ -1726,8 +1742,8 @@ spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxl
 add_shader_test_dir(ext_texture_array,
                     testsDir + '/spec/ext_texture_array',
                     recursive=True)
-ext_texture_array['copyteximage 1D_ARRAY'] = PlainExecTest(['copyteximage', '-auto', '1D_ARRAY'])
-ext_texture_array['copyteximage 2D_ARRAY'] = PlainExecTest(['copyteximage', '-auto', '2D_ARRAY'])
+add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 1D_ARRAY')
+add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 2D_ARRAY')
 add_plain_test(ext_texture_array, 'fbo-array')
 add_plain_test(ext_texture_array, 'fbo-depth-array')
 add_plain_test(ext_texture_array, 'array-texture')
@@ -1739,7 +1755,7 @@ for test_mode in ['teximage', 'texsubimage']:
 
 arb_texture_cube_map = Group()
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
-arb_texture_cube_map['copyteximage CUBE'] = PlainExecTest(['copyteximage', '-auto', 'CUBE'])
+add_msaa_visual_plain_tests(arb_texture_cube_map, 'copyteximage CUBE')
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 add_plain_test(arb_texture_cube_map, 'cubemap')
 arb_texture_cube_map['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'])
