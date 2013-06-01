@@ -82,7 +82,7 @@ static GLboolean
 probe(int x, int y, uint32_t expected, uint32_t observed)
 {
 	if ((expected & 0xffffff) != (observed & 0xffffff)) {
-		printf("Probe at (%i,%i)\n", x, y);
+		printf("Probe color at (%i,%i)\n", x, y);
 		printf("  Expected: 0x%08x\n", expected);
 		printf("  Observed: 0x%08x\n", observed);
 

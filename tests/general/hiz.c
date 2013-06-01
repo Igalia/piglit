@@ -121,7 +121,7 @@ GLboolean pix_equal(int x, int y, const float probe[3], const float expected[3])
 	}
 
 	if (!ret) {
-		printf("Probe at (%i,%i)\n", x, y);
+		printf("Probe color at (%i,%i)\n", x, y);
 		printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
 		printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
 	}

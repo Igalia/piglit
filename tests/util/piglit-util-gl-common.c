@@ -421,7 +421,7 @@ piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h)
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe1[p] - probe2[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", x+i, x+j);
+					printf("Probe color at (%i,%i)\n", x+i, x+j);
 					printf("  Left: %f %f %f %f\n",
 					       probe1[0], probe1[1], probe1[2], probe1[3]);
 					printf("  Right: %f %f %f %f\n",

@@ -88,7 +88,7 @@ int piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	if (pass)
 		return 1;
 
-	printf("Probe at (%i,%i)\n", x, y);
+	printf("Probe color at (%i,%i)\n", x, y);
 	printf("  Expected: %f %f %f %f\n", expected[0], expected[1], expected[2], expected[3]);
 	printf("  Observed: %f %f %f %f\n", probe[0], probe[1], probe[2], probe[3]);
 
@@ -150,7 +150,7 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", x+i, y+j);
+					printf("Probe color at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f %f\n",
 					       expected[0], expected[1], expected[2], expected[3]);
 					printf("  Observed: %f %f %f %f\n",
@@ -182,7 +182,7 @@ piglit_probe_rect_rgba_int(int x, int y, int w, int h, const int *expected)
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%d,%d)\n", x+i, y+j);
+					printf("Probe color at (%d,%d)\n", x+i, y+j);
 					printf("  Expected: %d %d %d %d\n",
 					       expected[0], expected[1], expected[2], expected[3]);
 					printf("  Observed: %d %d %d %d\n",
@@ -215,7 +215,7 @@ piglit_probe_rect_rgba_uint(int x, int y, int w, int h,
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%d,%d)\n", x+i, y+j);
+					printf("Probe color at (%d,%d)\n", x+i, y+j);
 					printf("  Expected: %u %u %u %u\n",
 					       expected[0], expected[1], expected[2], expected[3]);
 					printf("  Observed: %u %u %u %u\n",
@@ -423,7 +423,7 @@ int piglit_probe_pixel_rgb(int x, int y, const float* expected)
 	if (pass)
 		return 1;
 
-	printf("Probe at (%i,%i)\n", x, y);
+	printf("Probe color at (%i,%i)\n", x, y);
 	printf("  Expected: %f %f %f\n", expected[0], expected[1], expected[2]);
 	printf("  Observed: %f %f %f\n", probe[0], probe[1], probe[2]);
 
@@ -445,7 +445,7 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", x+i, y+j);
+					printf("Probe color at (%i,%i)\n", x+i, y+j);
 					printf("  Expected: %f %f %f\n",
 					       expected[0], expected[1], expected[2]);
 					printf("  Observed: %f %f %f\n",
@@ -506,7 +506,7 @@ int piglit_probe_pixel_depth(int x, int y, float expected)
 	if (fabs(delta) < 0.01)
 		return 1;
 
-	printf("Probe at (%i,%i)\n", x, y);
+	printf("Probe depth at (%i,%i)\n", x, y);
 	printf("  Expected: %f\n", expected);
 	printf("  Observed: %f\n", probe);
 
@@ -526,7 +526,7 @@ int piglit_probe_rect_depth(int x, int y, int w, int h, float expected)
 			probe = &pixels[j*w+i];
 
 			if (fabs(*probe - expected) >= 0.01) {
-				printf("Probe at (%i,%i)\n", x+i, y+j);
+				printf("Probe depth at (%i,%i)\n", x+i, y+j);
 				printf("  Expected: %f\n", expected);
 				printf("  Observed: %f\n", *probe);
 
@@ -548,7 +548,7 @@ int piglit_probe_pixel_stencil(int x, int y, unsigned expected)
 	if (probe == expected)
 		return 1;
 
-	printf("Probe at (%i, %i)\n", x, y);
+	printf("Probe stencil at (%i, %i)\n", x, y);
 	printf("  Expected: %u\n", expected);
 	printf("  Observed: %u\n", probe);
 
@@ -566,7 +566,7 @@ int piglit_probe_rect_stencil(int x, int y, int w, int h, unsigned expected)
 		for (i = 0; i < w; i++) {
 			GLuint probe = pixels[j * w + i];
 			if (probe != expected) {
-				printf("Probe at (%i, %i)\n", x + i, y + j);
+				printf("Probe stencil at (%i, %i)\n", x + i, y + j);
 				printf("  Expected: %u\n", expected);
 				printf("  Observed: %u\n", probe);
 				free(pixels);
@@ -612,7 +612,7 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 
 			for (p = 0; p < 4; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", i, j);
+					printf("Probe color at (%i,%i)\n", i, j);
 					printf("  Expected: %f %f %f %f\n",
 					       expected[0], expected[1], expected[2], expected[3]);
 					printf("  Observed: %f %f %f %f\n",
@@ -676,7 +676,7 @@ int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
 
 			for (p = 0; p < 3; ++p) {
 				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
-					printf("Probe at (%i,%i)\n", i, j);
+					printf("Probe color at (%i,%i)\n", i, j);
 					printf("  Expected: %f %f %f\n",
 					       expected[0], expected[1], expected[2]);
 					printf("  Observed: %f %f %f\n",

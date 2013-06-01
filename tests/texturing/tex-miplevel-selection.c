@@ -308,7 +308,7 @@ piglit_display(void)
 										if (fabs(colors[expected_level][c] - (p[c]/255.0)) > 0.01) {
 											failed++;
 
-											printf("Probe at (%i,%i)\n", x, y);
+											printf("Probe color at (%i,%i)\n", x, y);
 											printf("  Expected: %f %f %f\n", colors[expected_level][0],
 											       colors[expected_level][1], colors[expected_level][2]);
 											printf("  Observed: %f %f %f\n", p[0]/255.0, p[1]/255.0, p[2]/255.0);
