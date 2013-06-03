@@ -441,19 +441,16 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 	GLboolean pass = GL_TRUE;
 	GLuint k;
 
-	if (!piglit_automatic)
-		printf("Texture target = %s, Internal format = %s",
-		       piglit_get_gl_enum_name(target),
-		       piglit_get_gl_enum_name(format));
+	printf("Texture target = %s, Internal format = %s",
+	       piglit_get_gl_enum_name(target),
+	       piglit_get_gl_enum_name(format));
 
 	if (!supported_format(format) ||
 	    !supported_target_format(target, format)) {
-		if (!piglit_automatic)
-			printf(" - skipped\n");
+		printf(" - skipped\n");
 		return GL_TRUE; /* not a failure */
 	} else {
-		if (!piglit_automatic)
-			printf("\n");
+		printf("\n");
 	}
 
 	/* To avoid failures not related to this test case,
