@@ -2200,6 +2200,10 @@ spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
 oes_compressed_paletted_texture['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'paletted'])
 oes_compressed_paletted_texture['invalid formats'].runConcurrent = True
 
+oes_fixed_point = Group()
+spec['OES_fixed_point'] = oes_fixed_point
+oes_fixed_point['attribute-arrays'] = concurrent_test('oes_fixed_point-attribute-arrays')
+
 spec['OES_standard_derivatives'] = Group()
 import_glsl_parser_tests(spec['OES_standard_derivatives'],
 			 os.path.join(testsDir, 'spec', 'oes_standard_derivatives'),
