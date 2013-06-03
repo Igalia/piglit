@@ -1454,11 +1454,11 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 	verts[1][1] = y;
 	verts[1][2] = 0.0;
 	verts[1][3] = 1.0;
-	verts[2][0] = x + w;
+	verts[2][0] = x;
 	verts[2][1] = y + h;
 	verts[2][2] = 0.0;
 	verts[2][3] = 1.0;
-	verts[3][0] = x;
+	verts[3][0] = x + w;
 	verts[3][1] = y + h;
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
@@ -1466,7 +1466,7 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 	glVertexPointer(4, GL_FLOAT, 0, verts);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	glDrawArraysInstanced(GL_QUADS, 0, 4, primcount);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, primcount);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
