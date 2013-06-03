@@ -855,11 +855,11 @@ piglit_draw_rect(float x, float y, float w, float h)
 	verts[1][1] = y;
 	verts[1][2] = 0.0;
 	verts[1][3] = 1.0;
-	verts[2][0] = x + w;
+	verts[2][0] = x;
 	verts[2][1] = y + h;
 	verts[2][2] = 0.0;
 	verts[2][3] = 1.0;
-	verts[3][0] = x;
+	verts[3][0] = x + w;
 	verts[3][1] = y + h;
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
@@ -867,7 +867,7 @@ piglit_draw_rect(float x, float y, float w, float h)
 	glVertexPointer(4, GL_FLOAT, 0, verts);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -888,11 +888,11 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	verts[1][1] = y;
 	verts[1][2] = z;
 	verts[1][3] = 1.0;
-	verts[2][0] = x + w;
+	verts[2][0] = x;
 	verts[2][1] = y + h;
 	verts[2][2] = z;
 	verts[2][3] = 1.0;
-	verts[3][0] = x;
+	verts[3][0] = x + w;
 	verts[3][1] = y + h;
 	verts[3][2] = z;
 	verts[3][3] = 1.0;
@@ -900,7 +900,7 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	glVertexPointer(4, GL_FLOAT, 0, verts);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -928,17 +928,17 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	verts[1][3] = 1.0;
 	tex[1][0] = tx + tw;
 	tex[1][1] = ty;
-	verts[2][0] = x + w;
+	verts[2][0] = x;
 	verts[2][1] = y + h;
 	verts[2][2] = 0.0;
 	verts[2][3] = 1.0;
-	tex[2][0] = tx + tw;
+	tex[2][0] = tx;
 	tex[2][1] = ty + th;
-	verts[3][0] = x;
+	verts[3][0] = x + w;
 	verts[3][1] = y + h;
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
-	tex[3][0] = tx;
+	tex[3][0] = tx + tw;
 	tex[3][1] = ty + th;
 
 	glVertexPointer(4, GL_FLOAT, 0, verts);
@@ -946,7 +946,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
