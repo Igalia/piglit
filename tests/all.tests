@@ -67,6 +67,11 @@ try:
 except SystemExit:
 	pass
 
+try:
+	execfile(path.join(testsDir, 'es3conform.tests'))
+except SystemExit:
+	pass
+
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
