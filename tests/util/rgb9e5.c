@@ -43,7 +43,7 @@
 #define EPSILON_RGB9E5               ((1.0/RGB9E5_MANTISSA_VALUES) / (1<<RGB9E5_EXP_BIAS))
 
 typedef struct {
-#ifdef MESA_BIG_ENDIAN
+#ifdef __BIG_ENDIAN__
    unsigned int negative:1;
    unsigned int biasedexponent:8;
    unsigned int mantissa:23;
@@ -61,7 +61,7 @@ typedef union {
 } float754;
 
 typedef struct {
-#ifdef MESA_BIG_ENDIAN
+#ifdef __BIG_ENDIAN__
    unsigned int biasedexponent:RGB9E5_EXPONENT_BITS;
    unsigned int b:RGB9E5_MANTISSA_BITS;
    unsigned int g:RGB9E5_MANTISSA_BITS;
