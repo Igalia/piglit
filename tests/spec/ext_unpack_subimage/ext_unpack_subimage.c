@@ -74,17 +74,17 @@ tex_data[] = {
 
 static const char
 vertex_shader[] =
-	"attribute vec4 pos_attrib;\n"
-	"attribute vec2 tex_attrib;\n"
+	"attribute vec4 piglit_vertex;\n"
+	"attribute vec4 piglit_texcoord;\n"
 	"varying vec2 tex_coord;\n"
 	"void main () {\n"
-	"gl_Position = pos_attrib;\n"
-	"tex_coord = tex_attrib;\n"
+	"gl_Position = piglit_vertex;\n"
+	"tex_coord = piglit_texcoord.xy;\n"
 	"}\n";
 
 static const char
 fragment_shader[] =
-	"uniform sampler2D tex;\n"
+	"uniform sampler2D tex; /* defaults to 0 */\n"
 	"varying vec2 tex_coord;\n"
 	"void main () {\n"
 	"gl_FragColor = texture2D(tex, tex_coord);\n"
@@ -102,53 +102,6 @@ check_error(void)
 	}
 }
 
-static GLuint
-make_shader(GLenum type,
-	    const char *source)
-{
-	GLuint shader;
-	GLint length = strlen (source);
-	GLint status;
-
-	shader = glCreateShader(type);
-	glShaderSource(shader, 1, &source, &length);
-	glCompileShader(shader);
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-	if (!status)
-		fprintf(stderr, "Shader compilation failed\n");
-
-	return shader;
-}
-
-static void
-make_program(const char *vertex_source,
-	     const char *fragment_source)
-{
-	GLuint program, shader;
-	GLuint uniform;
-	GLint status;
-
-	program = glCreateProgram();
-	shader = make_shader(GL_VERTEX_SHADER, vertex_source);
-	glAttachShader(program, shader);
-	shader = make_shader(GL_FRAGMENT_SHADER, fragment_source);
-	glAttachShader(program, shader);
-
-	glBindAttribLocation(program, PIGLIT_ATTRIB_POS, "pos_attrib");
-	glBindAttribLocation(program, PIGLIT_ATTRIB_TEX, "tex_attrib");
-
-	glLinkProgram(program);
-
-	glGetShaderiv(program, GL_LINK_STATUS, &status);
-	if (!status)
-		fprintf(stderr, "Program linking failed\n");
-
-	uniform = glGetUniformLocation(program, "tex");
-	glUseProgram(program);
-	glUniform1i(uniform, 0);
-}
-
 enum piglit_result
 piglit_display(void)
 {
@@ -157,6 +110,7 @@ piglit_display(void)
 	static const float green[] = { 0, 1, 0, 1 };
 	static const float blue[] = { 0, 0, 1, 1 };
 	static const float cyan[] = { 0, 1, 1, 1 };
+	GLuint program;
 
 	pass = GL_TRUE;
 
@@ -205,7 +159,8 @@ piglit_display(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	make_program(vertex_shader, fragment_shader);
+	program = piglit_build_simple_program(vertex_shader, fragment_shader);
+	glUseProgram(program);
 
 	piglit_draw_rect_tex(-1, -1, 2, 2,
 			     0, 0, 1, 1);
