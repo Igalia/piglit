@@ -82,6 +82,7 @@ add_plain_test(api, 'clRetainEvent and clReleaseEvent', ['cl-api-retain_release-
 
 # Program
 add_plain_test(program, 'Run kernel with max work item sizes', ['cl-program-max-work-item-sizes'])
+add_plain_test(program, 'Bitcoin: phatk kernel', ['cl-program-bitcoin-phatk'])
 
 # Program tester
 
