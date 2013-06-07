@@ -1,12 +1,12 @@
 if (WIN32)
 	add_definitions ( -D__WIN__ -D__MS__ )
-ELSEIF (APPLE)
+elseif (APPLE)
 	add_definitions ( -D__AGL__ -D__UNIX__ )
-	FIND_LIBRARY(CARBON_LIBRARY Carbon)
-	SET(CMAKE_OSX_ARCHITECTURES i386)
-ELSE ()
+	find_library (CARBON_LIBRARY Carbon)
+	set (CMAKE_OSX_ARCHITECTURES i386)
+else ()
 	add_definitions ( -D__X11__ -D__UNIX__ )
-ENDIF ()
+endif ()
 
 include_directories(
 	${GLEXT_INCLUDE_DIR}
@@ -77,6 +77,15 @@ target_link_libraries (glean
 	piglitutil_${piglit_target_api}
 	${OPENGL_gl_LIBRARY}
 	${OPENGL_glu_LIBRARY}
-	${X11_X11_LIB}
-	${CARBON_LIBRARY}
 )
+
+if (WIN32)
+elseif (APPLE)
+	target_link_libraries (glean
+		${CARBON_LIBRARY}
+	)
+else ()
+	target_link_libraries (glean
+		${X11_X11_LIB}
+	)
+endif ()
