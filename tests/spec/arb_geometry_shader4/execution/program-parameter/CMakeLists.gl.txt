@@ -11,5 +11,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_geometry_shader4-program-parameter-input-type input-type.c)
+piglit_add_executable (arb_geometry_shader4-program-parameter-input-type-draw input-type-draw.c)
 piglit_add_executable (arb_geometry_shader4-program-parameter-output-type output-type.c)
 piglit_add_executable (arb_geometry_shader4-program-parameter-vertices-out vertices-out.c)

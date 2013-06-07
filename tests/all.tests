@@ -2330,6 +2330,7 @@ add_plain_test(arb_map_buffer_alignment, 'arb_map_buffer_alignment-sanity_test')
 
 arb_geometry_shader4 = Group()
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type')
+add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type-draw')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-output-type')
 for mode in ['1', 'tf 1', 'max', 'tf max']:
 	add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-vertices-out {0}'.format(mode))
