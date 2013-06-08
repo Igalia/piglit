@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (attrib-assignments attrib-assignments.c)
 piglit_add_executable (getattriblocation-conventional getattriblocation-conventional.c)
 piglit_add_executable (clip-flag-behavior clip-flag-behavior.c)
 
