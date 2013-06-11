@@ -1,0 +1,98 @@
+# This test checks that the geometry shader can perform a bulk copy of
+# the entire gl_ClipDistance array from input to output.
+
+[require]
+GL >= 2.0
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+in float offset;
+out float offset_to_gs;
+out gl_PerVertex {
+  vec4 gl_Position;
+  float gl_ClipDistance[8];
+};
+
+void main()
+{
+  gl_Position = vertex;
+  offset_to_gs = offset;
+  for (int i = 0; i < 8; i++) {
+    gl_ClipDistance[i] = offset + float(i);
+  }
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in float offset_to_gs[3];
+in gl_PerVertex {
+  vec4 gl_Position;
+  float gl_ClipDistance[8];
+} gl_in[];
+out float offset_to_fs;
+out gl_PerVertex {
+  vec4 gl_Position;
+  float gl_ClipDistance[8];
+};
+
+void main()
+{
+  bool ok = true;
+  for (int i = 0; i < 3; i++) {
+    gl_Position = gl_in[i].gl_Position;
+    gl_ClipDistance = gl_in[i].gl_ClipDistance;
+    offset_to_fs = offset_to_gs[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+
+in gl_PerVertex {
+  float gl_ClipDistance[8];
+};
+in float offset_to_fs;
+
+void main()
+{
+  bool ok = true;
+  for (int i = 0; i < 8; i++) {
+    if (distance(gl_ClipDistance[i], offset_to_fs + float(i)) > 1e-6)
+      ok = false;
+  }
+  if (ok)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2  offset/float/1
+-1.0 -1.0       1.0
+ 1.0 -1.0       2.0
+ 1.0  1.0       3.0
+-1.0  1.0       4.0
+
+[test]
+# Since the fragment shader's gl_ClipDistance array is only defined
+# for elements that have clipping enabled, we need to enable all 8
+# clip planes.  Fortunately the values we use for gl_ClipDistance are
+# always positive, so no pixels are actually clipped.
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+enable GL_CLIP_PLANE6
+enable GL_CLIP_PLANE7
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
