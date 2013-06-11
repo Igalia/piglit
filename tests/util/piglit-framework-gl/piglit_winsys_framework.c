@@ -50,11 +50,27 @@ run_test(struct piglit_gl_framework *gl_fw,
          int argc, char *argv[])
 {
 	struct piglit_winsys_framework *winsys_fw = piglit_winsys_framework(gl_fw);
+	bool force_window = false;
+	const char *env_force_window = getenv("PIGLIT_FORCE_WINDOW");
+
+
+	if (env_force_window != NULL) {
+		if (strcmp(env_force_window, "0") == 0) {
+			force_window = false;
+		} else if (strcmp(env_force_window, "1") == 0) {
+			force_window = true;
+		} else {
+			fprintf(stderr, "PIGLIT_FORCE_WINDOW has invalid"
+				" value: %s\n", env_force_window);
+			abort();
+		}
+	}
 
 	if (gl_fw->test_config->init)
 		gl_fw->test_config->init(argc, argv);
 
-	if (!gl_fw->test_config->requires_displayed_window && piglit_automatic) {
+	if (!gl_fw->test_config->requires_displayed_window &&
+	    piglit_automatic && !force_window) {
 		enum piglit_result result = PIGLIT_PASS;
 		if (gl_fw->test_config->display)
 			result = gl_fw->test_config->display();
