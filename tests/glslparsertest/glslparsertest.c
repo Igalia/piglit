@@ -252,7 +252,7 @@ test(void)
 			 * GL_GEOMETRY_VERTICES_OUT_ARB is zero, which
 			 * is useless for testing.  Use a value of 3.
 			 */
-			glProgramParameteriARB(prog,
+			glProgramParameteriARB(shader_prog,
 					       GL_GEOMETRY_VERTICES_OUT_ARB,
 					       3);
 		}
