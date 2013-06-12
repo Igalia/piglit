@@ -369,6 +369,7 @@ glx['glx-fbconfig-compliance'].runConcurrent = True
 add_plain_test(glx, 'glx-fbo-binding')
 add_plain_test(glx, 'glx-multi-context-ib-1')
 add_plain_test(glx, 'glx-multithread')
+add_plain_test(glx, 'glx-multithread-texture')
 add_plain_test(glx, 'glx-multithread-makecurrent-1')
 add_plain_test(glx, 'glx-multithread-makecurrent-2')
 add_plain_test(glx, 'glx-multithread-makecurrent-3')
