@@ -1,0 +1,37 @@
+# Test accessing a constant array of structs with an array member.
+[require]
+GLSL >= 1.20
+
+
+[vertex shader]
+void
+main()
+{
+	gl_Position = gl_Vertex;
+}
+
+
+[fragment shader]
+struct S
+{
+	vec4 v;
+};
+
+uniform int zero;
+
+const S colors[1] = S[1](
+	S( vec4(0.0, 1.0, 0.0, 1.0))
+);
+
+void
+main()
+{
+	S c = colors[zero];
+	gl_FragColor = c.v;
+}
+
+
+[test]
+uniform int zero 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
