@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+
+# quick.tests minus compiler tests.
+
+from framework.glsl_parser_test import GLSLParserTest
+import os.path
+
+global profile
+
+execfile(os.path.dirname(__file__) + '/quick.tests')
+
+# Drop these as they're basically compiler tests and take forever.
+del profile.tests['shaders']['glsl-fs-inline-explosion']
+del profile.tests['shaders']['glsl-fs-unroll-explosion']
+del profile.tests['shaders']['glsl-vs-inline-explosion']
+del profile.tests['shaders']['glsl-vs-unroll-explosion']
+
+# Drop ARB_vertex_program/ARB_fragment_program compiler tests.
+del profile.tests['asmparsertest']
+
+# Flatten the tree of groups now so we can filter out tests more easily.
+profile.flatten_group_hierarchy()
+
+# Filter out any GLSLParserTest instances, as they're compiler tests.
+profile.test_list = dict([(n,t) for (n,t) in profile.test_list.items() if
+                          not isinstance(t, GLSLParserTest)])
+
