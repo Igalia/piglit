@@ -57,6 +57,10 @@ const char* invalid_strings[] = {
 	"kernel void dummy_kernel {}", // missing brackets intentionaly
 };
 
+const char* empty_strings[] = {
+	""
+};
+
 static bool
 test(cl_program program,
      cl_uint num_devices,
@@ -242,6 +246,22 @@ piglit_cl_test(const int argc,
 		     CL_INVALID_OPERATION, &result,
 		     "Trigger CL_INVALID_OPERATION if there are kernel objects attached to program");
 		clReleaseKernel(kernel);
+	}
+
+	/*
+	 * CL_SUCCESS when compiling an empty string
+	 */
+	temp_program = clCreateProgramWithSource(env->context->cl_ctx,
+	                                         1,
+	                                         empty_strings,
+	                                         NULL,
+	                                         &errNo);
+	if(piglit_cl_check_error(errNo, CL_SUCCESS)) {
+		test(temp_program, env->context->num_devices, env->context->device_ids,
+		     "", NULL, NULL,
+		     CL_SUCCESS, &result,
+		     "CL_SUCCESS when compiling an empty string.");
+		clReleaseProgram(temp_program);
 	}
 
 	/*
