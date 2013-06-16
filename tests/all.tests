@@ -2200,6 +2200,7 @@ arb_multisample['pushpop'] = concurrent_test('arb_multisample-pushpop')
 arb_seamless_cube_map = Group()
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
+add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap-initially-disabled')
 
 amd_seamless_cubemap_per_texture = Group()
 spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture

@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_seamless_cubemap arb_seamless_cubemap.c)
+piglit_add_executable (arb_seamless_cubemap-initially-disabled initially-disabled.c)
 
 # vim: ft=cmake:
