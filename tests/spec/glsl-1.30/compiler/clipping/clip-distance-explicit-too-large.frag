@@ -20,7 +20,7 @@
  */
 #version 130
 
-out float gl_ClipDistance[gl_MaxClipDistances+1];
+in float gl_ClipDistance[gl_MaxClipDistances+1];
 
 void main()
 {
