@@ -333,6 +333,9 @@ require_GL_features(enum shader_target test_stage)
 
 	piglit_require_GLSL_version(shader_version);
 
+	if (test_stage == GS)
+		piglit_require_extension("GL_ARB_geometry_shader4");
+
 	if (swizzling)
 		piglit_require_extension("GL_EXT_texture_swizzle");
 

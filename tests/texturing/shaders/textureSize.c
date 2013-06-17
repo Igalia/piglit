@@ -27,7 +27,7 @@
  * Tests the GLSL 1.30+ textureSize() built-in function.
  *
  * The test covers:
- * - All pipeline stages (VS, FS)
+ * - All pipeline stages (VS, GS, FS)
  * - Sampler data types (floating point, signed integer, unsigned integer)
  * - Sampler dimensionality (1D, 2D, 3D, Cube, 1DArray, 2DArray)
  * - Color and shadow samplers
@@ -235,9 +235,11 @@ has_lod(void)
 int
 generate_GLSL(enum shader_target test_stage)
 {
-	int vs, fs;
+	int vs, gs, fs;
+	int prog;
 
 	static char *vs_code;
+	static char *gs_code = NULL;
 	static char *fs_code;
 	char *lod_arg;
 	static const char *zeroes[3] = { "", "0, ", "0, 0, " };
@@ -265,6 +267,44 @@ generate_GLSL(enum shader_target test_stage)
 			 "    gl_Position = vertex;\n"
 			 "}\n",
 			 shader_version, extension, sampler.name, size, lod_arg);
+		asprintf(&fs_code,
+			 "#version %d\n"
+			 "#define ivec1 int\n"
+			 "#define vec1 float\n"
+			 "flat in ivec%d size;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_FragColor = vec4(0.01 * size,%s 1);\n"
+			 "}\n",
+			 shader_version, size, zeroes[3 - size]);
+		break;
+	case GS:
+		asprintf(&vs_code,
+			 "#version %d\n"
+			 "in vec4 vertex;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_Position = vertex;\n"
+			 "}\n",
+			 shader_version);
+		asprintf(&gs_code,
+			 "#version %d\n"
+			 "#extension GL_ARB_geometry_shader4: require\n"
+			 "%s\n"
+			 "#define ivec1 int\n"
+			 "uniform int lod;\n"
+			 "uniform %s tex;\n"
+			 "flat out ivec%d size;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    for (int i = 0; i < 3; i++) {\n"
+			 "        size = textureSize(tex%s);\n"
+			 "        gl_Position = gl_PositionIn[i];\n"
+			 "        EmitVertex();\n"
+			 "    }\n"
+			 "}\n",
+			 shader_version, extension, sampler.name, size,
+			 lod_arg);
 		asprintf(&fs_code,
 			 "#version %d\n"
 			 "#define ivec1 int\n"
@@ -304,18 +344,36 @@ generate_GLSL(enum shader_target test_stage)
 	}
 
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_code);
+	if (gs_code) {
+		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gs_code);
+	}
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
 
-	if (!vs || !fs)
+	if (!vs || (gs_code && !gs) || !fs)
 		return 0;
 
-	return piglit_link_simple_program(vs, fs);
+	prog = glCreateProgram();
+	glAttachShader(prog, vs);
+	if (gs_code) {
+		glAttachShader(prog, gs);
+		glProgramParameteri(prog, GL_GEOMETRY_INPUT_TYPE_ARB,
+				    GL_TRIANGLES);
+		glProgramParameteri(prog, GL_GEOMETRY_OUTPUT_TYPE_ARB,
+				    GL_TRIANGLE_STRIP);
+		glProgramParameteri(prog, GL_GEOMETRY_VERTICES_OUT_ARB, 3);
+	}
+	glAttachShader(prog, fs);
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog))
+		piglit_report_result(PIGLIT_FAIL);
+
+	return prog;
 }
 
 void
 fail_and_show_usage()
 {
-	printf("Usage: textureSize [140] <vs|fs> <sampler type> [piglit args...]\n");
+	printf("Usage: textureSize [140] <vs|gs|fs> <sampler type> [piglit args...]\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -333,6 +391,9 @@ piglit_init(int argc, char **argv)
 			/* Maybe it's the shader stage? */
 			if (strcmp(argv[i], "vs") == 0) {
 				test_stage = VS;
+				continue;
+			} else if (strcmp(argv[i], "gs") == 0) {
+				test_stage = GS;
 				continue;
 			} else if (strcmp(argv[i], "fs") == 0) {
 				test_stage = FS;

@@ -33,7 +33,7 @@
  * ./bin/texelFetch usampler3D vs
  *
  * The test covers:
- * - All pipeline stages (VS, FS)
+ * - All pipeline stages (VS, GS, FS)
  * - Integer and floating point texture formats
  * - Sampler dimensionality (1D, 2D, 3D, 1DArray, 2DArray)
  * - Mipmapping
@@ -556,9 +556,10 @@ coordinate_size()
 int
 generate_GLSL(enum shader_target test_stage)
 {
-	int vs, fs, prog;
+	int vs, gs, fs, prog;
 
 	static char *vs_code;
+	static char *gs_code = NULL;
 	static char *fs_code;
 	const char *offset_func, *offset_arg;
 
@@ -601,6 +602,52 @@ generate_GLSL(enum shader_target test_stage)
 			 "{\n"
 			 "    color = texelFetch%s(tex, ivec%d(texcoord)%s%s);\n"
 			 "    gl_Position = pos;\n"
+			 "}\n",
+			 shader_version,
+			 has_samples() ? "#extension GL_ARB_texture_multisample: require" : "",
+			 sampler.return_type, sampler.name,
+			 offset_func,
+			 coordinate_size(),
+			 ((sampler.target == GL_TEXTURE_RECTANGLE) ?
+			  "" : ", texcoord.w"),
+			 offset_arg);
+		asprintf(&fs_code,
+			 "#version %d\n"
+			 "flat in %s color;\n"
+			 "uniform vec4 divisor;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    gl_FragColor = vec4(color)/divisor;\n"
+			 "}\n",
+			 shader_version,
+			 sampler.return_type);
+		break;
+	case GS:
+		asprintf(&vs_code,
+			 "#version %d\n"
+			 "in vec4 pos;\n"
+			 "in ivec4 texcoord;\n"
+			 "flat out ivec4 texcoord_to_gs;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    texcoord_to_gs = texcoord;\n"
+			 "    gl_Position = pos;\n"
+			 "}\n",
+			 shader_version);
+		asprintf(&gs_code,
+			 "#version %d\n"
+			 "#extension GL_ARB_geometry_shader4: require\n"
+			 "%s\n"
+			 "#define ivec1 int\n"
+			 "flat out %s color;\n"
+			 "flat in ivec4 texcoord_to_gs[1];\n"
+			 "uniform %s tex;\n"
+			 "void main()\n"
+			 "{\n"
+			 "    ivec4 texcoord = texcoord_to_gs[0];\n"
+			 "    color = texelFetch%s(tex, ivec%d(texcoord)%s%s);\n"
+			 "    gl_Position = gl_PositionIn[0];\n"
+			 "    EmitVertex();\n"
 			 "}\n",
 			 shader_version,
 			 has_samples() ? "#extension GL_ARB_texture_multisample: require" : "",
@@ -665,6 +712,13 @@ generate_GLSL(enum shader_target test_stage)
 		printf("VS code:\n%s", vs_code);
 		piglit_report_result(PIGLIT_FAIL);
 	}
+	if (gs_code) {
+		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gs_code);
+		if (!gs) {
+			printf("GS code:\n%s", gs_code);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_code);
 	if (!fs) {
 		printf("FS code:\n%s", fs_code);
@@ -672,6 +726,12 @@ generate_GLSL(enum shader_target test_stage)
 	}
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);
+	if (gs_code) {
+		glAttachShader(prog, gs);
+		glProgramParameteri(prog, GL_GEOMETRY_INPUT_TYPE_ARB, GL_POINTS);
+		glProgramParameteri(prog, GL_GEOMETRY_OUTPUT_TYPE_ARB, GL_POINTS);
+		glProgramParameteri(prog, GL_GEOMETRY_VERTICES_OUT_ARB, 1);
+	}
 	glAttachShader(prog, fs);
 
 	glBindAttribLocation(prog, pos_loc, "pos");
@@ -718,7 +778,7 @@ supported_sampler()
 void
 fail_and_show_usage()
 {
-	printf("Usage: texelFetch [140] [offset] <vs|fs> <sampler type> "
+	printf("Usage: texelFetch [140] [offset] <vs|gs|fs> <sampler type> "
 	       "[sample_count] [swizzle] [piglit args...]\n");
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -737,6 +797,9 @@ piglit_init(int argc, char **argv)
 			/* Maybe it's the shader stage? */
 			if (strcmp(argv[i], "vs") == 0) {
 				test_stage = VS;
+				continue;
+			} else if (strcmp(argv[i], "gs") == 0) {
+				test_stage = GS;
 				continue;
 			} else if (strcmp(argv[i], "fs") == 0) {
 				test_stage = FS;

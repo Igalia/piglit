@@ -836,7 +836,7 @@ import_glsl_parser_tests(spec['glsl-1.30'],
 spec['glsl-1.30']['execution'] = Group()
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
-for stage in ['vs', 'fs']:
+for stage in ['vs', 'gs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_130:
 		spec['glsl-1.30/execution/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
@@ -883,7 +883,7 @@ add_shader_test_dir(spec['glsl-1.40'],
 spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
-for stage in ['vs', 'fs']:
+for stage in ['vs', 'gs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_140:
 		spec['glsl-1.40/execution/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize 140 ' + stage + ' ' + sampler)
@@ -936,7 +936,7 @@ for sample_count in MSAA_SAMPLE_COUNTS:
     spec['ARB_texture_multisample/fb-completeness/%d' % (sample_count,)] = \
         concurrent_test('arb_texture_multisample-fb-completeness %d' % (sample_count,))
     # texel-fetch execution
-    for stage in ['vs','fs']:
+    for stage in ['vs', 'gs', 'fs']:
         for sampler in samplers_atm:
                 spec['ARB_texture_multisample/texelFetch/%d-%s-%s' % (
                     sample_count, stage, sampler)] = \
@@ -951,7 +951,7 @@ add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mas
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask-execution -tex')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-negative-max-samples')
-for stage in ['vs', 'fs']:
+for stage in ['vs', 'gs', 'fs']:
 	# textureSize():
 	for sampler in samplers_atm:
 		spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
@@ -1795,7 +1795,7 @@ textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usampler
 import_glsl_parser_tests(arb_texture_cube_map_array,
 			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
 			 ['compiler'])
-for stage in ['vs', 'fs']:
+for stage in ['vs', 'gs', 'fs']:
 	# textureSize():
 	for sampler in textureSize_samplers_atcma:
 		spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
