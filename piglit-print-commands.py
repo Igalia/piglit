@@ -39,17 +39,10 @@ from framework.gleantest import GleanTest
 def main():
     parser = argparse.ArgumentParser(sys.argv)
     parser.add_argument("-t", "--include-tests",
-                        default=[],
-                        action="append",
-                        metavar="<regex>",
-                        help="Run only matching tests (can be used more than "
-                             "once)")
-    parser.add_argument("--tests",
-                        default=[],
-                        action="append",
-                        metavar="<regex>",
-                        help="Run only matching tests (can be used more than "
-                             "once) Deprecated")
+                        default = [],
+                        action  = "append",
+                        metavar = "<regex>",
+                        help    = "Run only matching tests (can be used more than once)")
     parser.add_argument("-x", "--exclude-tests",
                         default=[],
                         action="append",
@@ -60,14 +53,6 @@ def main():
                         metavar="<Path to testfile>",
                         help="Path to results folder")
     args = parser.parse_args()
-
-    # Deprecated
-    # --include-tests is the standard going forward, but for backwards
-    # compatability merge args.tests into args.include_tests and drop
-    # duplicates
-    if args.tests != []:
-        print "Warnings: Option --tests is deprecated, use --include-tests"
-        args.include_tests = list(set(args.include_tests + args.tests))
 
     # Set the environment, pass in the included and excluded tests
     env = core.Environment(exclude_filter=args.exclude_tests,
