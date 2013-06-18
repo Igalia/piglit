@@ -53,37 +53,19 @@ def main():
                         dest="execute",
                         help="Do not execute the tests")
     parser.add_argument("-t", "--include-tests",
-                        default=[],
-                        action="append",
-                        metavar="<regex>",
-                        help="Run only matching tests (can be used more than "
-                             "once)")
-    parser.add_argument("--tests",
-                        default=[],
-                        action="append",
-                        metavar="<regex>",
-                        help="Run only matching tests (can be used more than "
-                             "once)\nDEPRECATED: use --include-tests instead")
+                        default = [],
+                        action  = "append",
+                        metavar = "<regex>",
+                        help    = "Run only matching tests (can be used more than once)")
     parser.add_argument("-x", "--exclude-tests",
-                        default=[],
-                        action="append",
-                        metavar="<regex>",
-                        help="Exclude matching tests (can be used more than "
-                             "once)")
-    # The new option going forward should be --no-concurrency, but to
-    # maintain backwards compatability the --c, --concurrent option should
-    # also be maintained. This code allows only one of the two options to be
-    # supplied, or it throws an error
-    excGroup2 = parser.add_mutually_exclusive_group()
-    excGroup2.add_argument("--no-concurrency",
-                           action="store_false",
-                           dest="concurrency",
-                           help="Disable concurrent test runs")
-    excGroup2.add_argument("-c", "--concurrent",
-                           action="store",
-                           metavar="<boolean>",
-                           choices=["1", "0", "on", "off"],
-                           help="Deprecated: Turn concrrent runs on or off")
+                        default = [],
+                        action  = "append",
+                        metavar = "<regex>",
+                        help    = "Exclude matching tests (can be used more than once)")
+    parser.add_argument("--no-concurrency",
+                        action  = "store_false",
+                        dest    = "concurrency",
+                        help    = "Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
                         choices=["glx", "x11_egl", "wayland", "gbm"],
                         help="Name of windows system passed to waffle")
@@ -101,29 +83,6 @@ def main():
     # Set the platform to pass to waffle
     if args.platform is not None:
         os.environ['PIGLIT_PLATFORM'] = args.platform
-
-    # Deprecated:
-    # If the deprecated -c, --concurrent flag is passed, override
-    # args.concurrency (which would otherwise be set by the --no-concurrency)
-    # flag and print a warning.
-    if args.concurrent is not None:
-        if (args.concurrent == '1' or args.concurrent == 'on'):
-            args.concurrency = True
-            print "Warning: Option -c, --concurrent is deprecated, " \
-                  "concurrent test runs are on by default"
-        elif (args.concurrent == '0' or args.concurrent == 'off'):
-            args.concurrency = False
-            print "Warning: Option -c, --concurrent is deprecated, " \
-                  "use --no-concurrency for non-concurrent test runs"
-        # Ne need for else, since argparse restricts the arguments allowed
-
-    # If the deprecated tests option was passed print a warning
-    if args.tests != []:
-        # This merges any options passed into the --tests option into the
-        # ones passed into -t or --tests-include and throws out duplicates
-        args.include_tests = list(set(args.include_tests + args.tests))
-        print "Warning: Option --tests is deprecated, use " \
-              "--include-tests instead"
 
     # Always Convert Results Path from Relative path to Actual Path.
     resultsDir = path.realpath(args.resultsPath)
