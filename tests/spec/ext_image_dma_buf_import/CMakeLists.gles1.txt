@@ -22,6 +22,7 @@ if(LIBDRM_FOUND)
 	piglit_add_executable(ext_image_dma_buf_import-invalid_attributes invalid_attributes.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-missing_attributes missing_attributes.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-ownership_transfer ownership_transfer.c image_common.c)
+	piglit_add_executable(ext_image_dma_buf_import-intel_unsupported_format intel_unsupported_format.c image_common.c)
 endif(LIBDRM_FOUND)
 
 # vim: ft=cmake:

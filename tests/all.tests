@@ -1862,6 +1862,7 @@ add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-missing_attri
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-ownership_transfer')
 ext_image_dma_buf_import['ext_image_dma_buf_import-sample_argb8888'] = PlainExecTest(['ext_image_dma_buf_import-sample_rgb', '-fmt=AR24', '-auto'])
 ext_image_dma_buf_import['ext_image_dma_buf_import-sample_xrgb8888'] = PlainExecTest(['ext_image_dma_buf_import-sample_rgb', '-auto', '-fmt=XR24', '-alpha-one'])
+add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_unsupported_format')
 
 ext_packed_depth_stencil = Group()
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
