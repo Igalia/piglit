@@ -48,8 +48,10 @@ static GLint prog;
 
 /* grab the coordinates from the main definition, and grab the
    compvals from here */
-static GLfloat cube_shadow_texcoords[6][4][5];
+static GLfloat cube_shadow_attributes[6][4][9];
 
+static GLfloat verts[6][2] = { {100, 125}, {175, 125}, {250, 125},
+			       {100, 200}, {175, 200}, {250, 200} };
 static GLfloat compvals[6][4] = { { -0.50,  0.00,  0.50,  0.00 },
 				  {  0.90,  0.20, -0.50,  0.20 },
 				  {  0.35,  1.20,  0.35, -0.50 },
@@ -57,27 +59,43 @@ static GLfloat compvals[6][4] = { { -0.50,  0.00,  0.50,  0.00 },
 				  {  0.85,  0.85,  0.85,  0.85 },
 				  {  0.90,  0.90,  0.90,  0.90 } };
 
-#define STRIDE (5 * sizeof(GLfloat))
-void setup_texcoords(float layer_sample)
+#define STRIDE (9 * sizeof(GLfloat))
+/* Setup interleaved vertex attributes for 6 * 4 vertices:
+ * 4 float vertex coordinates for drawing 6 quads aligned in a 3x2 grid with
+ *   some space inbetween.
+ * 4 float texture coordinates for sampling one cube map face per quad.
+ * 1 float compare value for shadow texture fetch.
+ */
+void setup_attributes(float layer_sample)
 {
 	int i, j;
 	for (i = 0; i < 6; i++) {
 		for (j = 0; j < 4; j++) {
-			memcpy(cube_shadow_texcoords[i][j], cube_face_texcoords[i][j], 3 * sizeof(GLfloat));
-			cube_shadow_texcoords[i][j][3] = layer_sample;
-			cube_shadow_texcoords[i][j][4] = compvals[i][j];
+			cube_shadow_attributes[i][j][0] = verts[i][0];
+			cube_shadow_attributes[i][j][1] = verts[i][1];
+			cube_shadow_attributes[i][j][2] = 0.0;
+			cube_shadow_attributes[i][j][3] = 1.0;
+			if (j == 1 || j == 2)
+				cube_shadow_attributes[i][j][0] += 50.0;
+			if (j == 2 || j == 3)
+				cube_shadow_attributes[i][j][1] += 50.0;
+			memcpy(&cube_shadow_attributes[i][j][4], cube_face_texcoords[i][j], 3 * sizeof(GLfloat));
+			cube_shadow_attributes[i][j][7] = layer_sample;
+			cube_shadow_attributes[i][j][8] = compvals[i][j];
 		}
 	}
 }
 
 static const char *vertShaderText =
 	"#version 130\n"
+	"in vec4 vertex;\n"
+	"in vec4 texCoord;\n"
 	"in float compf;\n"
 	"out float compval;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	"	gl_TexCoord[0] = gl_MultiTexCoord0;\n"
+	"	gl_Position = gl_ModelViewProjectionMatrix * vertex;\n"
+	"	gl_TexCoord[0] = texCoord;\n"
 	"       compval = compf;\n"
 	"}\n";
 
@@ -169,59 +187,41 @@ piglit_init(int argc, char **argv)
 	glLoadIdentity();
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	shaderSetup();
-	setup_texcoords(1.0);
+	setup_attributes(1.0);
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	GLint loc1, loc2;
+	GLint cubeArrayShadow_loc, vertex_loc, texCoord_loc, compf_loc;
 	GLboolean pass = GL_TRUE;
 	GLfloat white[4] = {1.0, 1.0, 1.0, 1.0};
 	GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
+	int i;
 
-	loc1 = glGetUniformLocation(prog, "cubeArrayShadow");
-	loc2 = glGetAttribLocation(prog, "compf");
-	
+	cubeArrayShadow_loc = glGetUniformLocation(prog, "cubeArrayShadow");
+	vertex_loc = glGetAttribLocation(prog, "vertex");
+	texCoord_loc = glGetAttribLocation(prog, "texCoord");
+	compf_loc = glGetAttribLocation(prog, "compf");
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 
-	glUniform1i(loc1, 0);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableVertexAttribArray(loc2);
+	glUniform1i(cubeArrayShadow_loc, 0);
+	glEnableVertexAttribArray(vertex_loc);
+	glEnableVertexAttribArray(texCoord_loc);
+	glEnableVertexAttribArray(compf_loc);
 
 	/* Apply each face of cubemap as texture to a polygon */
-	/* Polygon 1 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[0]);
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[0][0][4]);
-	piglit_draw_rect(100, 125, 50, 50);
-	/* Polygon 2 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[1]);
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[1][0][4]);
-	piglit_draw_rect(175, 125, 50, 50);
-	/* Polygon 3 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[2]);
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[2][0][4]);
-	piglit_draw_rect(250, 125, 50, 50);
-	/* Polygon 4 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[3]);
-
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[3][0][4]);
-	piglit_draw_rect(100, 200, 50, 50);
-	/* Polygon 5 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[4]);
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[4][0][4]);
-	piglit_draw_rect(175, 200, 50, 50);
-	/* Polygon 6 */
-	glTexCoordPointer(4, GL_FLOAT, STRIDE, cube_shadow_texcoords[5]);
-	glVertexAttribPointer(loc2, 1, GL_FLOAT, GL_FALSE, STRIDE,
-			      &cube_shadow_texcoords[5][0][4]);
-	piglit_draw_rect(250, 200, 50, 50);
+	for (i = 0; i < 6; ++i) {
+		glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE,
+				      STRIDE, &cube_shadow_attributes[i][0][0]);
+		glVertexAttribPointer(texCoord_loc, 4, GL_FLOAT, GL_FALSE,
+				      STRIDE, &cube_shadow_attributes[i][0][4]);
+		glVertexAttribPointer(compf_loc, 1, GL_FLOAT, GL_FALSE,
+				      STRIDE, &cube_shadow_attributes[i][0][8]);
+		glDrawArrays(GL_QUADS, 0, 4);
+	}
 
 	/* Test the pixel color of polygons against the expected output */
 	/* Polygon 1 */
