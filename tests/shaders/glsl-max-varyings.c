@@ -67,12 +67,13 @@ static GLint get_vs(int num_varyings, int data_varying)
 	}
 
 	sprintf(temp,
+		"attribute vec4 vertex;\n"
 		"attribute vec4 green;\n"
 		"attribute vec4 red;\n"
 		"void main()\n"
 		"{\n"
 		"	gl_Position = (gl_ModelViewProjectionMatrix * \n"
-		"			gl_Vertex);\n"
+		"			vertex);\n"
 		);
 	strcat(code, temp);
 
@@ -158,6 +159,10 @@ static bool
 draw(int num_varyings)
 {
 	int data_varying;
+	float vertex[4][4] = { {0.0, 0.0, 0.0, 1.0},
+			       {0.0, 0.0, 0.0, 1.0},
+			       {0.0, 0.0, 0.0, 1.0},
+			       {0.0, 0.0, 0.0, 1.0} };
 	float green[4][4] = { {0.0, 1.0, 0.0, 0.0},
 			      {0.0, 1.0, 0.0, 0.0},
 			      {0.0, 1.0, 0.0, 0.0},
@@ -167,16 +172,20 @@ draw(int num_varyings)
 			    {1.0, 0.0, 0.0, 0.0},
 			    {1.0, 0.0, 0.0, 0.0} };
 
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+			      vertex);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
 			      green);
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
 			      red);
+	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 
 	for (data_varying = 0; data_varying < num_varyings; data_varying++) {
 		GLuint prog, vs, fs;
 		GLint loc;
+		float x, y;
 
 		vs = get_vs(num_varyings, data_varying);
 		fs = get_fs(num_varyings, data_varying);
@@ -185,6 +194,7 @@ draw(int num_varyings)
 		glAttachShader(prog, vs);
 		glAttachShader(prog, fs);
 
+		glBindAttribLocation(prog, 0, "vertex");
 		glBindAttribLocation(prog, 1, "green");
 		glBindAttribLocation(prog, 2, "red");
 
@@ -210,10 +220,17 @@ draw(int num_varyings)
 		assert(loc != -1); /* should always be used */
 		glUniform1f(loc, 1.0);
 
-		piglit_draw_rect(coord_from_index(data_varying),
-				 coord_from_index(num_varyings - 1),
-				 2,
-				 2);
+		x = coord_from_index(data_varying);
+		y = coord_from_index(num_varyings - 1);
+		vertex[0][0] = x;
+		vertex[0][1] = y;
+		vertex[1][0] = x + 2;
+		vertex[1][1] = y;
+		vertex[2][0] = x;
+		vertex[2][1] = y + 2;
+		vertex[3][0] = x + 2;
+		vertex[3][1] = y + 2;
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		glDeleteShader(vs);
 		glDeleteShader(fs);
