@@ -61,6 +61,7 @@ class Test(object):
         self.command = command
         self.env = {}
         self.result = TestResult({'result': 'fail'})
+        self.cwd = None
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
@@ -205,6 +206,7 @@ class Test(object):
             proc = subprocess.Popen(self.command,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
+                                    cwd=self.cwd,
                                     env=fullenv,
                                     universal_newlines=True)
             out, err = proc.communicate()
