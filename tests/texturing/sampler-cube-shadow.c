@@ -49,56 +49,86 @@ static GLint prog;
 static GLint fs;
 static GLint vs;
 
-/* These texture coordinates should have 1 or -1 in the major axis
+static const GLint stride = 8 * sizeof(GLfloat);
+/* These are interlaced vertex coordinates and texture coordinates.
+ * The vertex coordinates specify 6 quads set in a 3x2 grid with some space
+ * in between.
+ * The texture coordinates should have 1 or -1 in the major axis
  * ('r' coordinate) selecting the face, a nearly-1-or-negative-1 value
  * in the other two coordinates (s,t) and a reference value ('q' coordinate)
  * used for shadow comparisons
  */
-static GLfloat cube_shadow_texcoords[6][4][4] = {
+static GLfloat cube_shadow_attributes[6][8][4] = {
 	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_X */
+		{100,   125,     0,     1},
 		{1.0,  0.99,  0.99, -0.50},
+		{150,   125,     0,     1},
 		{1.0,  0.99, -0.99,  0.00},
+		{150,   175,     0,     1},
 		{1.0, -0.99, -0.99,  0.50},
+		{100,   175,     0,     1},
 		{1.0, -0.99,  0.99,  0.00},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */
+		{175,    125,     0,     1},
 		{-1.0,  0.99, -0.99,  0.90},
+		{225,    125,     0,     1},
 		{-1.0,  0.99,  0.99,  0.20},
+		{225,    175,     0,     1},
 		{-1.0, -0.99,  0.99, -0.50},
+		{175,    175,     0,     1},
 		{-1.0, -0.99, -0.99,  0.20},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */
+		{250,    125,     0,    1},
 		{-0.99, 1.0, -0.99,  0.35},
+		{300,    125,     0,    1},
 		{ 0.99, 1.0, -0.99,  1.20},
+		{300,    175,     0,    1},
 		{ 0.99, 1.0,  0.99,  0.35},
+		{250,    175,     0,    1},
 		{-0.99, 1.0,  0.99, -0.50},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */
+		{100,    200,     0,     1},
 		{-0.99, -1.0,  0.99,  0.50},
+		{150,    200,     0,     1},
 		{-0.99, -1.0, -0.99, -0.50},
+		{150,    250,     0,     1},
 		{ 0.99, -1.0, -0.99,  0.50},
+		{100,    250,     0,     1},
 		{ 0.99, -1.0,  0.99,  1.50},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */
+		{175,    200,     0,   1},
 		{-0.99,  0.99, 1.0, 0.85},
+		{225,    200,     0,   1},
 		{-0.99, -0.99, 1.0, 0.85},
+		{225,    250,     0,   1},
 		{ 0.99, -0.99, 1.0, 0.85},
+		{175,    250,     0,   1},
 		{ 0.99,  0.99, 1.0, 0.85},
 	},
 	{ /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */
+		{250,    200,     0,    1},
 		{ 0.99,  0.99, -1.0, 0.90},
+		{300,    200,     0,    1},
 		{-0.99,  0.99, -1.0, 0.90},
+		{300,    250,     0,    1},
 		{-0.99, -0.99, -1.0, 0.90},
+		{250,    250,     0,    1},
 		{ 0.99, -0.99, -1.0, 0.90},
 	},
 };
 
 static const char *vertShaderText =
 	"#version 130\n"
+	"in vec4 vertex;\n"
+	"in vec4 texCoord;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-	"	gl_TexCoord[0] = gl_MultiTexCoord0;\n"
+	"	gl_Position = gl_ModelViewProjectionMatrix * vertex;\n"
+	"	gl_TexCoord[0] = texCoord;\n"
 	"}\n";
 
 static const char *fragShaderText =
@@ -209,37 +239,31 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
-	GLint loc1;
+	GLint cubeShadow_loc, vertex_loc, texCoord_loc;
 	GLboolean pass = GL_TRUE;
 	GLfloat white[4] = {1.0, 1.0, 1.0, 1.0};
 	GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
+	GLint i;
 
-	loc1 = glGetUniformLocation(prog, "cubeShadow");
+	cubeShadow_loc = glGetUniformLocation(prog, "cubeShadow");
+	vertex_loc = glGetAttribLocation(prog, "vertex");
+	texCoord_loc = glGetAttribLocation(prog, "texCoord");
+
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 
-	glUniform1i(loc1, 0);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glUniform1i(cubeShadow_loc, 0);
+	glEnableVertexAttribArray(vertex_loc);
+	glEnableVertexAttribArray(texCoord_loc);
 
 	/* Apply each face of cubemap as texture to a polygon */
-	/* Polygon 1 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[0]);
-	piglit_draw_rect(100, 125, 50, 50);
-	/* Polygon 2 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[1]);
-	piglit_draw_rect(175, 125, 50, 50);
-	/* Polygon 3 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[2]);
-	piglit_draw_rect(250, 125, 50, 50);
-	/* Polygon 4 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[3]);
-	piglit_draw_rect(100, 200, 50, 50);
-	/* Polygon 5 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[4]);
-	piglit_draw_rect(175, 200, 50, 50);
-	/* Polygon 6 */
-	glTexCoordPointer(4, GL_FLOAT, 0, cube_shadow_texcoords[5]);
-	piglit_draw_rect(250, 200, 50, 50);
+	for (i = 0; i < 6; ++i) {
+		glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE,
+				      stride, cube_shadow_attributes[i][0]);
+		glVertexAttribPointer(texCoord_loc, 4, GL_FLOAT, GL_FALSE,
+				      stride, cube_shadow_attributes[i][1]);
+		glDrawArrays(GL_QUADS, 0, 4);
+	}
 
 	/* Test the pixel color of polygons against the expected output */
 	/* Polygon 1 */
@@ -289,7 +313,6 @@ piglit_display(void)
 	pass = pass && piglit_probe_rect_rgba(250, 200, 50, 50, white);
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 	piglit_present_results();
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
