@@ -120,172 +120,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float texCoords_1d[2] = { 0.0, 1.0 };
-static const float texCoords_2d[4][2] = {
-	{ 0.0, 0.0 },
-	{ 1.0, 0.0 },
-	{ 1.0, 1.0 },
-	{ 0.0, 1.0 } };
-
-static const float texCoords_3d[4][4][3] = {
-	{
-		{ 0.0, 0.0, 0.0 },
-		{ 1.0, 0.0, 0.0 },
-		{ 1.0, 1.0, 0.0 },
-		{ 0.0, 1.0, 0.0 }
-	},
-	{
-		{ 0.0, 0.0, 0.25 },
-		{ 1.0, 0.0, 0.25 },
-		{ 1.0, 1.0, 0.25 },
-		{ 0.0, 1.0, 0.25 }
-	},
-	{
-		{ 0.0, 0.0, 0.5 },
-		{ 1.0, 0.0, 0.5 },
-		{ 1.0, 1.0, 0.5 },
-		{ 0.0, 1.0, 0.5 }
-	},
-	{
-		{ 0.0, 0.0, 0.75 },
-		{ 1.0, 0.0, 0.75 },
-		{ 1.0, 1.0, 0.75 },
-		{ 0.0, 1.0, 0.75 }
-	}
-};
-
-static const float texCoords_1d_array[16][4][2] = {
-	{
-		{ 0.0, 0 },
-		{ 1.0, 0 },
-		{ 1.0, 0 },
-		{ 0.0, 0 }
-	},
-	{
-		{ 0.0, 1 },
-		{ 1.0, 1 },
-		{ 1.0, 1 },
-		{ 0.0, 1 }
-	},
-	{
-		{ 0.0, 2 },
-		{ 1.0, 2 },
-		{ 1.0, 2 },
-		{ 0.0, 2 }
-	},
-	{
-		{ 0.0, 3 },
-		{ 1.0, 3 },
-		{ 1.0, 3 },
-		{ 0.0, 3 }
-	},
-	{
-		{ 0.0, 4 },
-		{ 1.0, 4 },
-		{ 1.0, 4 },
-		{ 0.0, 4 }
-	},
-	{
-		{ 0.0, 5 },
-		{ 1.0, 5 },
-		{ 1.0, 5 },
-		{ 0.0, 5 }
-	},
-	{
-		{ 0.0, 6 },
-		{ 1.0, 6 },
-		{ 1.0, 6 },
-		{ 0.0, 6 }
-	},
-	{
-		{ 0.0, 7 },
-		{ 1.0, 7 },
-		{ 1.0, 7 },
-		{ 0.0, 7 }
-	},
-	{
-		{ 0.0, 8 },
-		{ 1.0, 8 },
-		{ 1.0, 8 },
-		{ 0.0, 8 }
-	},
-	{
-		{ 0.0, 9 },
-		{ 1.0, 9 },
-		{ 1.0, 9 },
-		{ 0.0, 9 }
-	},
-	{
-		{ 0.0, 10 },
-		{ 1.0, 10 },
-		{ 1.0, 10 },
-		{ 0.0, 10 }
-	},
-	{
-		{ 0.0, 11 },
-		{ 1.0, 11 },
-		{ 1.0, 11 },
-		{ 0.0, 11 }
-	},
-	{
-		{ 0.0, 12 },
-		{ 1.0, 12 },
-		{ 1.0, 12 },
-		{ 0.0, 12 }
-	},
-	{
-		{ 0.0, 13 },
-		{ 1.0, 13 },
-		{ 1.0, 13 },
-		{ 0.0, 13 }
-	},
-	{
-		{ 0.0, 14 },
-		{ 1.0, 14 },
-		{ 1.0, 14 },
-		{ 0.0, 14 }
-	},
-	{
-		{ 0.0, 15 },
-		{ 1.0, 15 },
-		{ 1.0, 15 },
-		{ 0.0, 15 }
-	}
-};
-
-static const float texCoords_2d_array[4][4][3] = {
-	{
-		{ 0.0, 0.0, 0 },
-		{ 1.0, 0.0, 0 },
-		{ 1.0, 1.0, 0 },
-		{ 0.0, 1.0, 0 }
-	},
-	{
-		{ 0.0, 0.0, 1 },
-		{ 1.0, 0.0, 1 },
-		{ 1.0, 1.0, 1 },
-		{ 0.0, 1.0, 1 }
-	},
-	{
-		{ 0.0, 0.0, 2 },
-		{ 1.0, 0.0, 2 },
-		{ 1.0, 1.0, 2 },
-		{ 0.0, 1.0, 2 }
-	},
-	{
-		{ 0.0, 0.0, 3 },
-		{ 1.0, 0.0, 3 },
-		{ 1.0, 1.0, 3 },
-		{ 0.0, 1.0, 3 }
-	}
-};
-
-static const float texCoords_rect[4][2] = {
-	{ 0.0, 0.0 },
-	{ IMAGE_SIZE-1, 0.0 },
-	{ IMAGE_SIZE-1, IMAGE_SIZE-1 },
-	{ 0.0, IMAGE_SIZE-1 } };
-
 static GLboolean
 is_compressed_format(GLenum format)
 {
@@ -432,6 +266,96 @@ static GLboolean probe_rect(int x, int y, int w, int h,
 
 
 /**
+ * Convenience function to draw an axis-aligned rectangle with 3 dimensional
+ * texture coordinates where the third coordinate is constant.
+ */
+static GLvoid
+draw_rect_tex_3d(float x, float y, float w, float h,
+                 float tx, float ty, float tz, float tw, float th)
+{
+	float verts[4][4];
+	float tex[4][3];
+
+	verts[0][0] = x;
+	verts[0][1] = y;
+	verts[0][2] = 0.0;
+	verts[0][3] = 1.0;
+	tex[0][0] = tx;
+	tex[0][1] = ty;
+	tex[0][2] = tz;
+	verts[1][0] = x + w;
+	verts[1][1] = y;
+	verts[1][2] = 0.0;
+	verts[1][3] = 1.0;
+	tex[1][0] = tx + tw;
+	tex[1][1] = ty;
+	tex[1][2] = tz;
+	verts[2][0] = x;
+	verts[2][1] = y + h;
+	verts[2][2] = 0.0;
+	verts[2][3] = 1.0;
+	tex[2][0] = tx;
+	tex[2][1] = ty + th;
+	tex[2][2] = tz;
+	verts[3][0] = x + w;
+	verts[3][1] = y + h;
+	verts[3][2] = 0.0;
+	verts[3][3] = 1.0;
+	tex[3][0] = tx + tw;
+	tex[3][1] = ty + th;
+	tex[3][2] = tz;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glTexCoordPointer(3, GL_FLOAT, 0, tex);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+
+/**
+ * Convenience function to draw an axis-aligned rectangle textured with one face
+ * of a cube map.
+ */
+static GLvoid
+draw_rect_tex_cube_face(float x, float y, float w, float h, int face)
+{
+	float verts[4][4];
+
+	verts[0][0] = x;
+	verts[0][1] = y;
+	verts[0][2] = 0.0;
+	verts[0][3] = 1.0;
+	verts[1][0] = x + w;
+	verts[1][1] = y;
+	verts[1][2] = 0.0;
+	verts[1][3] = 1.0;
+	verts[2][0] = x + w;
+	verts[2][1] = y + h;
+	verts[2][2] = 0.0;
+	verts[2][3] = 1.0;
+	verts[3][0] = x;
+	verts[3][1] = y + h;
+	verts[3][2] = 0.0;
+	verts[3][3] = 1.0;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glTexCoordPointer(3, GL_FLOAT, 0, cube_face_texcoords[face]);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+
+/**
  * Test a specific texture target and format combination.
  */
 static GLboolean
@@ -473,8 +397,8 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 			&& pass;
 
 		glEnable(target);
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
-		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		piglit_draw_rect_tex(x, y, IMAGE_SIZE, IMAGE_SIZE,
+				      0, 0, 1, 1);
 		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
 					      IMAGE_SIZE,
 					      expected)
@@ -488,9 +412,8 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 		glEnable(target);
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_2d);
-
-		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		piglit_draw_rect_tex(x, y, IMAGE_SIZE, IMAGE_SIZE,
+				      0, 0, 1, 1);
 		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
 					      IMAGE_SIZE,
 					      expected)
@@ -512,8 +435,9 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		glEnable(target);
 
 		for (k = 0; k < 4; k++) {
-			glTexCoordPointer(3, GL_FLOAT, 0, texCoords_3d[k]);
-			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			const float tz = k * 0.25;
+			draw_rect_tex_3d(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					 0, 0, tz, 1, 1);
 			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
 					  expected, 1.0 - k*0.2) && pass;
 		}
@@ -532,9 +456,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		glEnable(target);
 
 		for (k = 0; k < 6; k++) {
-			glTexCoordPointer(3, GL_FLOAT, 0,
-					  cube_face_texcoords[k]);
-			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			draw_rect_tex_cube_face(x, y, IMAGE_SIZE, IMAGE_SIZE, k);
 			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
 					  expected, 1.0 - k*0.15) && pass;
 		}
@@ -555,8 +477,8 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		glEnable(target);
 
 		for (k = 0; k < 16; k++) {
-			glTexCoordPointer(2, GL_FLOAT, 0, texCoords_1d_array[k]);
-			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			piglit_draw_rect_tex(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					      0, k, 1, 0);
 			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
 					  expected, 1.0 - 0.2*(k/4)) && pass;
 		}
@@ -577,8 +499,8 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		glEnable(target);
 
 		for (k = 0; k < 4; k++) {
-			glTexCoordPointer(3, GL_FLOAT, 0, texCoords_2d_array[k]);
-			piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+			draw_rect_tex_3d(x, y, IMAGE_SIZE, IMAGE_SIZE,
+					 0, 0, k, 1, 1);
 			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
 					  expected, 1.0 - k*0.2) && pass;
 		}
@@ -591,9 +513,8 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 		
 		glEnable(target);
-		glTexCoordPointer(2, GL_FLOAT, 0, texCoords_rect);
-
-		piglit_draw_rect(x, y, IMAGE_SIZE, IMAGE_SIZE);
+		piglit_draw_rect_tex(x, y, IMAGE_SIZE, IMAGE_SIZE,
+				      0, 0, IMAGE_SIZE - 1, IMAGE_SIZE - 1);
 		pass = piglit_probe_rect_rgba(x, y, IMAGE_SIZE,
 					      IMAGE_SIZE,
 					      expected)
@@ -632,6 +553,7 @@ piglit_display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	/* Do glCopyPixels and draw a textured rectangle for each format
