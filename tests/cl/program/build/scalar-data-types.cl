@@ -24,6 +24,6 @@ kernel void test(global int* out) {
 // Needs cl_khr_fp64 or OpenCL C 1.2
 #if __OPENCL_C_VERSION__ >= 120
 	double d;
-	double* d;
+	double* d1;
 #endif
 }
