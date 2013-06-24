@@ -80,7 +80,7 @@ arg_out: 0 buffer ushort[1] 0
 ## Modulo ##
 
 [test]
-name: pos%pos=0
+name: pos mod pos=0
 kernel_name: mod
 arg_in:  1 ushort 8
 arg_in:  2 ushort 4
