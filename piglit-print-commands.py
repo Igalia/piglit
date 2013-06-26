@@ -88,7 +88,12 @@ def main():
         if isinstance(test, GleanTest):
             for var, val in test.env.items():
                 command += var + "='" + val + "' "
-        command += ' '.join(test.command)
+
+        # Make the test command relative to the piglit_dir
+        testCommand = test.command[:]
+        testCommand[0] = os.path.relpath(testCommand[0], piglit_dir)
+
+        command += ' '.join(testCommand)
         return command
 
     profile.prepare_test_list(env)
