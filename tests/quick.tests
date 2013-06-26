@@ -6,8 +6,8 @@
 import os.path
 
 global profile
-global GleanTest
-
-execfile(os.path.dirname(__file__) + '/all.tests')
+from framework.gleantest import GleanTest
 
 GleanTest.globalParams += [ "--quick" ]
+
+execfile(os.path.dirname(__file__) + '/all.tests')

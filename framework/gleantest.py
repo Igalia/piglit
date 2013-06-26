@@ -40,12 +40,8 @@ class GleanTest(ExecTest):
                 [gleanExecutable(),
                 "-o",
                 "-v", "-v", "-v",
-                "-t", "+"+name])
+                "-t", "+"+name] + GleanTest.globalParams)
         self.name = name
-
-    def run(self, valgrind):
-        self.command += GleanTest.globalParams
-        return ExecTest.run(self, valgrind)
 
     def interpretResult(self, out, returncode, results):
         if out.find('FAIL') >= 0:
