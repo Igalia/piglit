@@ -23,11 +23,11 @@ testsDir = path.dirname(__file__)
 # Find the generated_tests directory, by looking either in
 # $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
 # parent directory of the directory containing this file.
-generatedTestDir = os.path.join(
+generatedTestDir = os.path.normpath(os.path.join(
 	os.environ.get(
 		'PIGLIT_BUILD_DIR',
 		os.path.join(testsDir, '..')),
-	'generated_tests')
+	'generated_tests'))
 
 # Quick wrapper for PlainExecTest for our usual concurrent args.
 def plain_test(args):
