@@ -351,4 +351,15 @@ piglit_cl_get_device_arg(const int argc,
                          cl_platform_id platform_id,
                          cl_device_id* device_id);
 
+/**
+ * \brief Check if the given local work demensions are supported on this device.
+ * @param device_id       Device to check
+ * @param local_work_size Local work dimensions
+ * @return                \c true if the local work dimensions are supported,
+ *                        \c false if they are not.
+ */
+bool piglit_cl_framework_check_local_work_size(
+	cl_device_id device_id,
+	size_t *local_work_size);
+
 #endif //PIGLIT_FRAMEWORK_CL_H

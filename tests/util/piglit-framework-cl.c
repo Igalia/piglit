@@ -552,3 +552,34 @@ piglit_cl_get_device_arg(const int argc, const char** argv,
 
 	return false;
 }
+
+bool piglit_cl_framework_check_local_work_size(
+	cl_device_id device_id,
+	size_t *local_work_size)
+{
+	unsigned i;
+	size_t workgroup_size = 1;
+	size_t max_workgroup_size = piglit_cl_get_device_info(device_id,
+						CL_DEVICE_MAX_WORK_GROUP_SIZE);
+	size_t *max_workitem_sizes = piglit_cl_get_device_info(device_id,
+						CL_DEVICE_MAX_WORK_ITEM_SIZES);
+
+	if (!local_work_size) {
+		return true;
+	}
+
+	for (i = 0; i < 3; i++) {
+		size_t local_size = local_work_size[i];
+		if (local_size > max_workitem_sizes[i]) {
+			return false;
+		}
+		if (local_size > 0) {
+			workgroup_size *= local_size;
+		}
+	}
+
+	if (workgroup_size > max_workgroup_size) {
+		return false;
+	}
+	return true;
+}

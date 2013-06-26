@@ -1700,6 +1700,12 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	struct buffer_arg* buffer_args = NULL;
 	unsigned int  num_buffer_args = 0;
 
+	/* Check if this device supports the local work size. */
+	if (!piglit_cl_framework_check_local_work_size(env->device_id,
+						test.local_work_size)) {
+		return PIGLIT_SKIP;
+	}
+
 	/* Create or use apropriate kernel */
 	if(test.kernel_name == NULL) {
 		kernel_name = config->kernel_name;
