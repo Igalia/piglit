@@ -1933,7 +1933,7 @@ piglit_cl_test(const int argc,
                const struct piglit_cl_program_test_config* config,
                const struct piglit_cl_program_test_env* env)
 {
-	enum piglit_result result = PIGLIT_PASS;
+	enum piglit_result result = PIGLIT_SKIP;
 
 	int i;
 
@@ -1942,6 +1942,14 @@ piglit_cl_test(const int argc,
 		printf("Program has been built successfully\n");
 	} else {
 		printf("Program has failed to build as expected\n");
+	}
+
+	/* If num_tests is 0, then we are running a build test and the fact
+	 * that we have made it this far means that the program has built
+	 * successfully, so we can report PIGLIT_PASS.
+	 */
+	if (num_tests == 0) {
+		result = PIGLIT_PASS;
 	}
 
 	/* Run the tests */
