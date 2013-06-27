@@ -30,7 +30,7 @@ from mako.template import Template
 import core
 
 __all__ = [
-    'NewSummary',
+    'Summary',
 ]
 
 
@@ -242,7 +242,7 @@ class HTMLIndex(list):
                      'text': text})
 
 
-class NewSummary:
+class Summary:
     """
     This Summary class creates an initial object containing lists of tests
     including all, changes, problems, skips, regressions, and fixes. It then

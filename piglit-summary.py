@@ -81,7 +81,7 @@ def main():
         args.results.extend(parse_listfile(args.list))
 
     # Generate the output
-    output = summary.NewSummary(args.results)
+    output = summary.Summary(args.results)
     output.generateText(args.diff, args.summary)
 
 
