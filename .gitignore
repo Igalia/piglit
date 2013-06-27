@@ -7,6 +7,7 @@
 /.ninja_log
 /build.ninja
 /rules.ninja
+.ninja_deps
 
 _CPack_Packages
 
