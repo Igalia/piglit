@@ -1,5 +1,5 @@
 /* [config]
- * expect_result: pass
+ * expect_result: fail
  * glsl_version: 1.30
  * require_extensions: GL_ARB_texture_cube_map_array
  * [end config]
