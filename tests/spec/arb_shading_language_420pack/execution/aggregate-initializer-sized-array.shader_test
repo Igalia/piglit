@@ -1,0 +1,64 @@
+/* The ARB_shading_language_420pack suggests:
+ *
+ *    Verify that the following two arrays are identical:
+ *
+ *        vec4 a[12] = vec4 [] (vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
+ *                              vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4),
+ *                              vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0));
+ *        vec4 b[12] =        { vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
+ *                              vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4) }; [sic]
+ *
+ * Of course, it means to include a final row of four vec4(0.0) in the initializer
+ * of b[12].
+ */
+
+[require]
+GLSL >= 1.30
+GL_ARB_shading_language_420pack
+
+[vertex shader]
+#extension GL_ARB_shading_language_420pack: enable
+
+in vec4 vertex;
+out vec4 color;
+
+void main()
+{
+    vec4 a[12] = vec4 [] (vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
+                          vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4),
+                          vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0));
+    vec4 b[12] =        { vec4(1.2), vec4(0.0), vec4(0.0), vec4(0.0),
+                          vec4(0.0), vec4(0.0), vec4(0.0), vec4(2.4),
+                          vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0) };
+
+    color = vec4(0.0, 1.0, 0.0, 1.0);
+
+    if (a.length() != b.length()) {
+        color = vec4(0.0, 0.0, 1.0, 1.0);
+    } else {
+        for (int i = 0; i < a.length(); i++) {
+            if (a[i] != b[i]) {
+                color = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        }
+    }
+    gl_Position = vertex;
+}
+
+[fragment shader]
+in vec4 color;
+
+void main() {
+    gl_FragColor = color;;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
