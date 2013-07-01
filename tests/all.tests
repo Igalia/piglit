@@ -1272,6 +1272,7 @@ arb_separate_shader_objects = Group()
 spec['ARB_separate_shader_objects'] = arb_separate_shader_objects
 arb_separate_shader_objects['GetProgramPipelineiv'] = concurrent_test('arb_separate_shader_object-GetProgramPipelineiv')
 arb_separate_shader_objects['IsProgramPipeline'] = concurrent_test('arb_separate_shader_object-IsProgramPipeline')
+arb_separate_shader_objects['UseProgramStages - non-separable program'] = concurrent_test('arb_separate_shader_object-UseProgramStages-non-separable')
 
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
