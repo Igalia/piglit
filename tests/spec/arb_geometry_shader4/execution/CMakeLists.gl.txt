@@ -11,3 +11,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_geometry_shader4-ignore-adjacent-vertices ignore-adjacent-vertices.c)
+piglit_add_executable (arb_geometry_shader4-vertices-in vertices-in.c)

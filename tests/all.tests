@@ -2346,6 +2346,7 @@ for draw in ['', 'indexed']:
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-input-type-draw')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-output-type')
+add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-vertices-in')
 for mode in ['1', 'tf 1', 'max', 'tf max']:
 	add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-vertices-out {0}'.format(mode))
 spec['ARB_geometry_shader4'] = arb_geometry_shader4
