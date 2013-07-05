@@ -44,7 +44,6 @@ def parse_listfile(filename):
     return open(filename, "r").read().rstrip().split('\n')
 
 
-
 def main():
     parser = argparse.ArgumentParser()
 
@@ -52,22 +51,21 @@ def main():
     # and then call for only summary
     excGroup1 = parser.add_mutually_exclusive_group()
     excGroup1.add_argument("-d", "--diff",
-                        action  = "store_true",
-                        help    = "Only display the differences between"
-                                  "multiple result files")
+                           action="store_true",
+                           help="Only display the differences between multiple"
+                                "result files")
     excGroup1.add_argument("-s", "--summary",
-                        action  = "store_true",
-                        help    = "Only display the summary, not the"
-                                  "individual test results")
-
+                           action="store_true",
+                           help="Only display the summary, not the individual "
+                                "test results")
     parser.add_argument("-l", "--list",
-                        action  = "store",
-                        help    = "Use test results from a list file")
+                        action="store",
+                        help="Use test results from a list file")
     parser.add_argument("results",
-                        metavar = "<Results Path(s)>",
-                        nargs   = "+",
-                        help    = "Space seperated paths to at least one"
-                                  "results file")
+                        metavar="<Results Path(s)>",
+                        nargs="+",
+                        help="Space seperated paths to at least one results "
+                             "file")
     args = parser.parse_args()
 
     # Throw an error if -d/--diff is called, but only one results file is
