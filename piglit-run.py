@@ -23,8 +23,9 @@
 
 
 import argparse
+import sys
+import os
 import os.path as path
-import sys, os
 import time
 import traceback
 import json
@@ -33,76 +34,69 @@ sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
 from framework.threads import synchronized_self
 
-#############################################################################
-##### Main program
-#############################################################################
 
 def main():
     parser = argparse.ArgumentParser(sys.argv)
-
     # Either require that a name for the test is passed or that
     # resume is requested
     excGroup1 = parser.add_mutually_exclusive_group()
     excGroup1.add_argument("-n", "--name",
-                    metavar = "<test name>",
-                    default = None,
-                    help    = "Name of this test run")
+                           metavar="<test name>",
+                           default=None,
+                           help="Name of this test run")
     excGroup1.add_argument("-r", "--resume",
-                    action  = "store_true",
-                    help    = "Resume an interupted test run")
-
+                           action="store_true",
+                           help="Resume an interupted test run")
     # Setting the --dry-run flag is equivalent to env.execute=false
     parser.add_argument("-d", "--dry-run",
-                    action  = "store_false",
-                    dest    = "execute",
-                    help    = "Do not execute the tests")
+                        action="store_false",
+                        dest="execute",
+                        help="Do not execute the tests")
     parser.add_argument("-t", "--include-tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Run only matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests (can be used more than "
+                             "once)")
     parser.add_argument("--tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Run only matching tests (can be used more than once) " \
-                              "DEPRECATED: use --include-tests instead")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests (can be used more than "
+                             "once)\nDEPRECATED: use --include-tests instead")
     parser.add_argument("-x", "--exclude-tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Exclude matching tests (can be used more than once)")
-
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Exclude matching tests (can be used more than "
+                             "once)")
     # The new option going forward should be --no-concurrency, but to
     # maintain backwards compatability the --c, --concurrent option should
     # also be maintained. This code allows only one of the two options to be
     # supplied, or it throws an error
     excGroup2 = parser.add_mutually_exclusive_group()
     excGroup2.add_argument("--no-concurrency",
-                    action  = "store_false",
-                    dest    = "concurrency",
-                    help    = "Disable concurrent test runs")
+                           action="store_false",
+                           dest="concurrency",
+                           help="Disable concurrent test runs")
     excGroup2.add_argument("-c", "--concurrent",
-                    action  = "store",
-                    metavar = "<boolean>",
-                    choices = ["1", "0", "on", "off"],
-                    help    = "Deprecated: Turn concrrent runs on or off")
-
+                           action="store",
+                           metavar="<boolean>",
+                           choices=["1", "0", "on", "off"],
+                           help="Deprecated: Turn concrrent runs on or off")
     parser.add_argument("-p", "--platform",
-                    choices = ["glx", "x11_egl", "wayland", "gbm"],
-                    help    = "Name of windows system passed to waffle")
+                        choices=["glx", "x11_egl", "wayland", "gbm"],
+                        help="Name of windows system passed to waffle")
     parser.add_argument("--valgrind",
-                    action  =  "store_true",
-                    help    = "Run tests in valgrind's memcheck")
+                        action="store_true",
+                        help="Run tests in valgrind's memcheck")
     parser.add_argument("testProfile",
-                    metavar = "<Path to test profile>",
-                    help    = "Path to testfile to run")
+                        metavar="<Path to test profile>",
+                        help="Path to testfile to run")
     parser.add_argument("resultsPath",
-                    metavar = "<Results Path>",
-                    help    = "Path to results folder")
-
+                        metavar="<Results Path>",
+                        help="Path to results folder")
     args = parser.parse_args()
-
 
     # Set the platform to pass to waffle
     if args.platform is not None:
@@ -116,11 +110,11 @@ def main():
         if (args.concurrent == '1' or args.concurrent == 'on'):
             args.concurrency = True
             print "Warning: Option -c, --concurrent is deprecated, " \
-                            "concurrent test runs are on by default"
+                  "concurrent test runs are on by default"
         elif (args.concurrent == '0' or args.concurrent == 'off'):
             args.concurrency = False
             print "Warning: Option -c, --concurrent is deprecated, " \
-                            "use --no-concurrency for non-concurrent test runs"
+                  "use --no-concurrency for non-concurrent test runs"
         # Ne need for else, since argparse restricts the arguments allowed
 
     # If the deprecated tests option was passed print a warning
@@ -129,7 +123,7 @@ def main():
         # ones passed into -t or --tests-include and throws out duplicates
         args.include_tests = list(set(args.include_tests + args.tests))
         print "Warning: Option --tests is deprecated, use " \
-                        "--include-tests instead"
+              "--include-tests instead"
 
     # Always Convert Results Path from Relative path to Actual Path.
     resultsDir = path.realpath(args.resultsPath)
@@ -152,10 +146,10 @@ def main():
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
-                    exclude_filter=args.exclude_tests,
-                    include_filter=args.include_tests,
-                    execute=args.execute,
-                    valgrind=args.valgrind)
+                           exclude_filter=args.exclude_tests,
+                           include_filter=args.include_tests,
+                           execute=args.execute,
+                           valgrind=args.valgrind)
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
