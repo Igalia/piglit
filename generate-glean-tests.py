@@ -31,6 +31,7 @@ import os
 import re
 import sys
 
+
 def usage():
     USAGE = """\
 Usage %(progName) [cppfile] [add_prefix]
@@ -38,13 +39,15 @@ Usage %(progName) [cppfile] [add_prefix]
 cppfile: path to glean cppfile to parse
 add_suffix: prefix to have in test name i.e. glsl1 -> add_glsl1
 """
-    print USAGE % {'progName':sys.argv[0]}
+    print USAGE % {'progName': sys.argv[0]}
     sys.exit(1)
 
-def main():
 
+def main():
     try:
-        options, args = getopt(sys.argv[1:], "hdt:n:x:", [ "help", "dry-run", "tests=", "name=", "exclude-tests=" ])
+        options, args = getopt(sys.argv[1:], "hdt:n:x:",
+                               ["help", "dry-run", "tests=", "name=",
+                                "exclude-tests="])
     except GetoptError:
         usage()
 
@@ -64,14 +67,13 @@ def main():
             if re.match(r'GLint stat', name):
                 break
             if not re.match(r'//', name):
-                name = re.sub(r'".*',
-                              r'',
-                              name)
+                name = re.sub(r'".*', r'', name)
                 print "add_" + suffix + "('" + name + "')"
                 next_is_name = False
         if line == "    {\n":
             next_is_name = True
         line = fileIN.readline()
+
 
 if __name__ == "__main__":
     main()
