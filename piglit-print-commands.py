@@ -23,8 +23,9 @@
 
 
 import argparse
+import sys
+import os
 import os.path as path
-import sys, os
 import time
 import traceback
 import json
@@ -34,33 +35,30 @@ import framework.core as core
 from framework.exectest import ExecTest
 from framework.gleantest import GleanTest
 
-#############################################################################
-##### Main program
-#############################################################################
 
 def main():
     parser = argparse.ArgumentParser(sys.argv)
-
     parser.add_argument("-t", "--include-tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Run only matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests (can be used more than "
+                             "once)")
     parser.add_argument("--tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Run only matching tests (can be used more than once)" \
-                                      "Deprecated")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests (can be used more than "
+                             "once) Deprecated")
     parser.add_argument("-x", "--exclude-tests",
-                    default = [],
-                    action  = "append",
-                    metavar = "<regex>",
-                    help    = "Exclude matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Exclude matching tests (can be used more than "
+                             "once)")
     parser.add_argument("testProfile",
-                    metavar = "<Path to testfile>",
-                    help    = "Path to results folder")
-
+                        metavar="<Path to testfile>",
+                        help="Path to results folder")
     args = parser.parse_args()
 
     # Deprecated
@@ -72,10 +70,8 @@ def main():
         args.include_tests = list(set(args.include_tests + args.tests))
 
     # Set the environment, pass in the included and excluded tests
-    env = core.Environment(
-                    exclude_filter=args.exclude_tests,
-                    include_filter=args.include_tests,
-                    )
+    env = core.Environment(exclude_filter=args.exclude_tests,
+                           include_filter=args.include_tests)
 
     # Change to the piglit's path
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -100,6 +96,7 @@ def main():
     for name, test in profile.test_list.items():
         assert(isinstance(test, ExecTest))
         print name, ':::', getCommand(test)
+
 
 if __name__ == "__main__":
     main()
