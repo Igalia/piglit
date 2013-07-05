@@ -45,31 +45,30 @@ def parse_listfile(filename):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--overwrite",
-                        action  = "store_true",
-                        help    = "Overwrite existing directories")
+                        action="store_true",
+                        help="Overwrite existing directories")
     parser.add_argument("-l", "--list",
-                        action  = "store",
-                        help    = "Load a newline seperated list of results. "
-                                  "These results will be prepended to any "
-                                  "Results specified on the command line")
+                        action="store",
+                        help="Load a newline seperated list of results. These "
+                             "results will be prepended to any Results "
+                             "specified on the command line")
     parser.add_argument("-e", "--exclude-details",
-                        default = [],
-                        action  = "append",
-                        choices = ['skip', 'pass', 'warn', 'crash' 'fail',
-                                  'all'],
-                        help    = "Optionally exclude the generation of HTML"
-                                  "pages for individual test pages with the"
-                                  "status(es) given as arguments. This speeds"
-                                  "up HTML generation, but reduces the info"
-                                  "in the HTML pages. May be used multiple"
-                                  "times")
+                        default=[],
+                        action="append",
+                        choices=['skip', 'pass', 'warn', 'crash' 'fail',
+                                 'all'],
+                        help="Optionally exclude the generation of HTML pages "
+                             "for individual test pages with the status(es) "
+                             "given as arguments. This speeds up HTML "
+                             "generation, but reduces the info in the HTML "
+                             "pages. May be used multiple times")
     parser.add_argument("summaryDir",
-                        metavar = "<Summary Directory>",
-                        help    = "Directory to put HTML files in")
+                        metavar="<Summary Directory>",
+                        help="Directory to put HTML files in")
     parser.add_argument("resultsFiles",
-                        metavar = "<Results Files>",
-                        nargs   = "*",
-                        help    = "Results files to include in HTML")
+                        metavar="<Results Files>",
+                        nargs="*",
+                        help="Results files to include in HTML")
     args = parser.parse_args()
 
     # If args.list and args.resultsFiles are empty, then raise an error
@@ -78,7 +77,7 @@ def main():
 
     # If exclude-results has all, then change it to be all
     if 'all' in args.exclude_details:
-        args.exclude_details=['skip', 'pass', 'warn', 'crash', 'fail']
+        args.exclude_details = ['skip', 'pass', 'warn', 'crash', 'fail']
 
     # if overwrite is requested delete the output directory
     if path.exists(args.summaryDir) and args.overwrite:
