@@ -40,18 +40,17 @@ from threads import ConcurrentTestPool
 from threads import synchronized_self
 import threading
 
-__all__ = [
-        'Environment',
-        'checkDir',
-        'loadTestProfile',
-        'TestrunResult',
-        'GroupResult',
-        'TestResult',
-        'TestProfile',
-        'Group',
-        'Test',
-        'testBinDir',
-]
+__all__ = ['Environment',
+           'checkDir',
+           'loadTestProfile',
+           'TestrunResult',
+           'GroupResult',
+           'TestResult',
+           'TestProfile',
+           'Group',
+           'Test',
+           'testBinDir']
+
 
 class JSONWriter:
     '''
@@ -179,9 +178,6 @@ class JSONWriter:
 
         self.__inhibit_next_indent = True
 
-#############################################################################
-##### Helper functions
-#############################################################################
 
 # Ensure the given directory exists
 def checkDir(dirname, failifexists):
@@ -193,7 +189,8 @@ def checkDir(dirname, failifexists):
             exists = False
 
     if exists and failifexists:
-        print >>sys.stderr, "%(dirname)s exists already.\nUse --overwrite if you want to overwrite it.\n" % locals()
+        print >>sys.stderr, "%(dirname)s exists already.\nUse --overwrite if" \
+                            "you want to overwrite it.\n" % locals()
         exit(1)
 
     try:
@@ -209,14 +206,13 @@ else:
 
 if 'PIGLIT_SOURCE_DIR' not in os.environ:
     p = os.path
-    os.environ['PIGLIT_SOURCE_DIR'] = p.abspath(p.join(p.dirname(__file__), '..'))
+    os.environ['PIGLIT_SOURCE_DIR'] = p.abspath(p.join(p.dirname(__file__),
+                                                       '..'))
 
-#############################################################################
-##### Result classes
-#############################################################################
 
 class TestResult(dict):
     pass
+
 
 class GroupResult(dict):
     def get_subgroup(self, path, create=True):
@@ -262,17 +258,16 @@ class GroupResult(dict):
 
         return root
 
+
 class TestrunResult:
     def __init__(self):
-        self.serialized_keys = [
-                'options',
-                'name',
-                'tests',
-                'wglinfo',
-                'glxinfo',
-                'lspci',
-                'time_elapsed',
-                ]
+        self.serialized_keys = ['options',
+                                'name',
+                                'tests',
+                                'wglinfo',
+                                'glxinfo',
+                                'lspci',
+                                'time_elapsed']
         self.name = None
         self.glxinfo = None
         self.lspci = None
@@ -311,7 +306,7 @@ class TestrunResult:
         #   5. Return a file object containing the repaired JSON.
 
         # Each non-terminal test result ends with this line:
-        safe_line =  3 * JSONWriter.INDENT * ' ' + '},\n'
+        safe_line = 3 * JSONWriter.INDENT * ' ' + '},\n'
 
         # Search for the last occurence of safe_line.
         safe_line_num = None
@@ -321,7 +316,8 @@ class TestrunResult:
                 break
 
         if safe_line_num is None:
-            raise Exception('failed to repair corrupt result file: ' + file.name)
+            raise Exception('failed to repair corrupt result file: ' +
+                            file.name)
 
         # Remove corrupt lines.
         lines = lines[0:(safe_line_num + 1)]
@@ -365,19 +361,16 @@ class TestrunResult:
         for (path, result) in self.tests.items():
             self.tests[path] = TestResult(result)
 
-#############################################################################
-##### Generic Test classes
-#############################################################################
 
 class Environment:
     def __init__(self, concurrent=True, execute=True, include_filter=[],
-                    exclude_filter=[], valgrind=False):
-        self.concurrent     = concurrent
-        self.execute        = execute
-        self.filter         = []
+                 exclude_filter=[], valgrind=False):
+        self.concurrent = concurrent
+        self.execute = execute
+        self.filter = []
         self.exclude_filter = []
-        self.exclude_tests  = set()
-        self.valgrind       = valgrind
+        self.exclude_tests = set()
+        self.valgrind = valgrind
 
         """
         The filter lists that are read in should be a list of string objects,
@@ -390,15 +383,12 @@ class Environment:
         for each in exclude_filter:
             self.exclude_filter.append(re.compile(each))
 
-
     def run(self, command):
         try:
-            p = subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    universal_newlines=True
-            )
+            p = subprocess.Popen(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 universal_newlines=True)
             (stdout, stderr) = p.communicate()
         except:
             return "Failed to run " + command
@@ -407,8 +397,7 @@ class Environment:
     def collectData(self):
         result = {}
         system = platform.system()
-        if (system == 'Windows' or
-            system.find("CYGWIN_NT") == 0):
+        if (system == 'Windows' or system.find("CYGWIN_NT") == 0):
             result['wglinfo'] = self.run('wglinfo')
         else:
             result['glxinfo'] = self.run('glxinfo')
@@ -416,10 +405,11 @@ class Environment:
             result['lspci'] = self.run('lspci')
         return result
 
+
 class Test:
     ignoreErrors = []
 
-    def __init__(self, runConcurrent = False):
+    def __init__(self, runConcurrent=False):
         '''
                 'runConcurrent' controls whether this test will
                 execute it's work (i.e. __doRunWork) on the calling thread
@@ -451,7 +441,7 @@ class Test:
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
         def status(msg):
-            log(msg = msg, channel = path)
+            log(msg=msg, channel=path)
 
         # Run the test
         if env.execute:
@@ -467,12 +457,15 @@ class Test:
                 if not isinstance(result, TestResult):
                     result = TestResult(result)
                     result['result'] = 'warn'
-                    result['note'] = 'Result not returned as an instance of TestResult'
+                    result['note'] = 'Result not returned as an instance ' \
+                                     'of TestResult'
             except:
                 result = TestResult()
                 result['result'] = 'fail'
-                result['exception'] = str(sys.exc_info()[0]) + str(sys.exc_info()[1])
-                result['traceback'] = "".join(traceback.format_tb(sys.exc_info()[2]))
+                result['exception'] = str(sys.exc_info()[0]) + \
+                    str(sys.exc_info()[1])
+                result['traceback'] = \
+                    "".join(traceback.format_tb(sys.exc_info()[2]))
 
             status(result['result'])
 
@@ -495,7 +488,8 @@ class Test:
 
     # Default handling for stderr messages
     def handleErr(self, results, err):
-        errors = filter(lambda s: len(s) > 0, map(lambda s: s.strip(), err.split('\n')))
+        errors = filter(lambda s: len(s) > 0,
+                        map(lambda s: s.strip(), err.split('\n')))
 
         ignored = [s for s in errors if self.isIgnored(s)]
         errors = [s for s in errors if s not in ignored]
@@ -513,6 +507,7 @@ class Test:
 class Group(dict):
     pass
 
+
 class TestProfile:
     def __init__(self):
         self.tests = Group()
@@ -524,9 +519,9 @@ class TestProfile:
         dictionary mapping from fully qualified test names to "Test" objects.
 
         For example,
-        tests['spec']['glsl-1.30']['preprocessor']['compiler']['keywords']['void.frag']
+        tests['spec']['glsl-1.30']['preprocessor']['compiler']['void.frag']
         would become:
-        test_list['spec/glsl-1.30/preprocessor/compiler/keywords/void.frag']
+        test_list['spec/glsl-1.30/preprocessor/compiler/void.frag']
         '''
 
         def f(prefix, group, test_dict):
@@ -544,12 +539,12 @@ class TestProfile:
         self.flatten_group_hierarchy()
 
         def matches_any_regexp(x, re_list):
-            return True in map(lambda r: r.search(x) != None, re_list)
+            return True in map(lambda r: r.search(x) is not None, re_list)
 
         def test_matches(item):
             path, test = item
-            return ((not env.filter or matches_any_regexp(path, env.filter)) and
-                    not path in env.exclude_tests and
+            return ((not env.filter or matches_any_regexp(path, env.filter))
+                    and not path in env.exclude_tests and
                     not matches_any_regexp(path, env.exclude_filter))
 
         # Filter out unwanted tests
@@ -591,20 +586,16 @@ class TestProfile:
             group = group[group_name]
         del group[l[-1]]
 
-#############################################################################
-##### Loaders
-#############################################################################
 
 def loadTestProfile(filename):
-    ns = {
-            '__file__': filename,
-    }
+    ns = {'__file__': filename}
     try:
         execfile(filename, ns)
     except:
         traceback.print_exc()
         raise Exception('Could not read tests profile')
     return ns['profile']
+
 
 def loadTestResults(relativepath):
     path = os.path.realpath(relativepath)
@@ -624,46 +615,47 @@ def loadTestResults(relativepath):
     assert(testrun.name is not None)
     return testrun
 
-#############################################################################
-##### Error messages to be ignored
-#############################################################################
-Test.ignoreErrors = map(re.compile, [
-        "couldn't open libtxc_dxtn.so",
-        "compression/decompression available",
-        "Mesa: .*build",
-        "Mesa: CPU.*",
-        "Mesa: .*cpu detected.",
-        "Mesa: Test.*",
-        "Mesa: Yes.*",
-        "libGL: XF86DRIGetClientDriverName.*",
-        "libGL: OpenDriver: trying.*",
-        "libGL: Warning in.*drirc*",
-        "ATTENTION.*value of option.*",
-        "drmOpen.*",
-        "Mesa: Not testing OS support.*",
-        "Mesa: User error:.*",
-        "Mesa: Initializing .* optimizations",
-        "debug_get_.*",
-        "util_cpu_caps.*",
-        "Mesa: 3Dnow! detected",
-        "r300:.*",
-        "radeon:.*",
-        "Warning:.*",
-        "0 errors, .*",
-        "Mesa.*",
-        "no rrb",
-        "; ModuleID.*",
-        "%.*",
-        ".*failed to translate tgsi opcode.*to SSE",
-        ".*falling back to interpreter",
-        "GLSL version is .*, but requested version .* is required",
-        "kCGErrorIllegalArgument: CGSOrderWindowList",
-        "kCGErrorFailure: Set a breakpoint @ CGErrorBreakpoint\(\) to catch errors as they are logged.",
-        "stw_(init|cleanup).*",
-        "OpenGLInfo..*",
-        "AdapterInfo..*",
-        "frameThrottleRate.*",
-        ".*DeviceName.*",
-        "No memory leaks detected.",
-        "libGL: Can't open configuration file.*",
-])
+
+# Error messages to be ignored
+Test.ignoreErrors = map(re.compile,
+                        ["couldn't open libtxc_dxtn.so",
+                         "compression/decompression available",
+                         "Mesa: .*build",
+                         "Mesa: CPU.*",
+                         "Mesa: .*cpu detected.",
+                         "Mesa: Test.*",
+                         "Mesa: Yes.*",
+                         "libGL: XF86DRIGetClientDriverName.*",
+                         "libGL: OpenDriver: trying.*",
+                         "libGL: Warning in.*drirc*",
+                         "ATTENTION.*value of option.*",
+                         "drmOpen.*",
+                         "Mesa: Not testing OS support.*",
+                         "Mesa: User error:.*",
+                         "Mesa: Initializing .* optimizations",
+                         "debug_get_.*",
+                         "util_cpu_caps.*",
+                         "Mesa: 3Dnow! detected",
+                         "r300:.*",
+                         "radeon:.*",
+                         "Warning:.*",
+                         "0 errors, .*",
+                         "Mesa.*",
+                         "no rrb",
+                         "; ModuleID.*",
+                         "%.*",
+                         ".*failed to translate tgsi opcode.*to SSE",
+                         ".*falling back to interpreter",
+                         "GLSL version is .*, but requested version .* is "
+                         "required",
+                         "kCGErrorIllegalArgument: CGSOrderWindowList",
+                         "kCGErrorFailure: Set a breakpoint @ "
+                         "CGErrorBreakpoint\(\) to catch errors as they are "
+                         "logged.",
+                         "stw_(init|cleanup).*",
+                         "OpenGLInfo..*",
+                         "AdapterInfo..*",
+                         "frameThrottleRate.*",
+                         ".*DeviceName.*",
+                         "No memory leaks detected.",
+                         "libGL: Can't open configuration file.*"])
