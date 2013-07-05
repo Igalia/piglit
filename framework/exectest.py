@@ -28,18 +28,15 @@ import types
 
 from core import Test, testBinDir, TestResult
 
-#############################################################################
-##### Platform global variables
-#############################################################################
+
+# Platform global variables
 if 'PIGLIT_PLATFORM' in os.environ:
     PIGLIT_PLATFORM = os.environ['PIGLIT_PLATFORM']
 else:
     PIGLIT_PLATFORM = ''
 
-#############################################################################
-##### ExecTest: A shared base class for tests that simply run an executable.
-#############################################################################
 
+# ExecTest: A shared base class for tests that simply run an executable.
 class ExecTest(Test):
     def __init__(self, command):
         Test.__init__(self)
@@ -74,7 +71,8 @@ class ExecTest(Test):
             command = self.command
 
             if valgrind:
-                command[:0] = ['valgrind', '--quiet', '--error-exitcode=1', '--tool=memcheck']
+                command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
+                               '--tool=memcheck']
 
             i = 0
             while True:
@@ -84,7 +82,7 @@ class ExecTest(Test):
                     returncode = None
                 else:
                     (out, err, returncode) = \
-                            self.get_command_result(command, fullenv)
+                        self.get_command_result(command, fullenv)
 
                 # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
                 # affecting many developers.  If we catch it
@@ -122,17 +120,17 @@ class ExecTest(Test):
                 out = self.interpretResult(out, returncode, results)
 
             crash_codes = [
-                    # Unix: terminated by a signal
-                    -5,  # SIGTRAP
-                    -6,  # SIGABRT
-                    -8,  # SIGFPE  (Floating point exception)
-                    -10, # SIGUSR1
-                    -11, # SIGSEGV (Segmentation fault)
-                    # Windows:
-                    # EXCEPTION_ACCESS_VIOLATION (0xc0000005):
-                    -1073741819,
-                    # EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
-                    -1073741676
+                # Unix: terminated by a signal
+                -5,   # SIGTRAP
+                -6,   # SIGABRT
+                -8,   # SIGFPE  (Floating point exception)
+                -10,  # SIGUSR1
+                -11,  # SIGSEGV (Segmentation fault)
+                # Windows:
+                # EXCEPTION_ACCESS_VIOLATION (0xc0000005):
+                -1073741819,
+                # EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
+                -1073741676
             ]
 
             if returncode in crash_codes:
@@ -158,7 +156,9 @@ class ExecTest(Test):
             if env:
                 results['environment'] = env
 
-            results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\nOutput:\n{2}").format(returncode, err, out)
+            results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\n"
+                                      "Output:\n{2}").format(returncode,
+                                                             err, out)
             results['returncode'] = returncode
             results['command'] = ' '.join(self.command)
 
@@ -182,13 +182,11 @@ class ExecTest(Test):
 
     def get_command_result(self, command, fullenv):
         try:
-            proc = subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    env=fullenv,
-                    universal_newlines=True
-                    )
+            proc = subprocess.Popen(command,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    env=fullenv,
+                                    universal_newlines=True)
             out, err = proc.communicate()
             returncode = proc.returncode
         except OSError as e:
@@ -206,12 +204,14 @@ class ExecTest(Test):
                 raise e
         return out, err, returncode
 
-#############################################################################
-##### PlainExecTest: Run a "native" piglit test executable
-##### Expect one line prefixed PIGLIT: in the output, which contains a
-##### result dictionary. The plain output is appended to this dictionary
-#############################################################################
+
 class PlainExecTest(ExecTest):
+    """
+    PlainExecTest: Run a "native" piglit test executable
+
+    Expect one line prefixed PIGLIT: in the output, which contains a result
+    dictionary. The plain output is appended to this dictionary
+    """
     def __init__(self, command):
         ExecTest.__init__(self, command)
         # Prepend testBinDir to the path.
@@ -219,7 +219,8 @@ class PlainExecTest(ExecTest):
 
     def interpretResult(self, out, returncode, results):
         outlines = out.split('\n')
-        outpiglit = map(lambda s: s[7:], filter(lambda s: s.startswith('PIGLIT:'), outlines))
+        outpiglit = map(lambda s: s[7:],
+                        filter(lambda s: s.startswith('PIGLIT:'), outlines))
 
         if len(outpiglit) > 0:
             try:
@@ -230,7 +231,8 @@ class PlainExecTest(ExecTest):
                         results['subtest'].update(eval(piglit[7:]))
                     else:
                         results.update(eval(piglit))
-                out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'), outlines))
+                out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'),
+                                       outlines))
             except:
                 results['result'] = 'fail'
                 results['note'] = 'Failed to parse result string'
