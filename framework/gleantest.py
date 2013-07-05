@@ -26,21 +26,19 @@ import subprocess
 from core import checkDir, testBinDir, Test, TestResult
 from exectest import ExecTest
 
-#############################################################################
-##### GleanTest: Execute a sub-test of Glean
-#############################################################################
+
 def gleanExecutable():
     return testBinDir + 'glean'
 
+
+# GleanTest: Execute a sub-test of Glean
 class GleanTest(ExecTest):
     globalParams = []
 
     def __init__(self, name):
-        ExecTest.__init__(self, \
-                [gleanExecutable(),
-                "-o",
-                "-v", "-v", "-v",
-                "-t", "+"+name] + GleanTest.globalParams)
+        ExecTest.__init__(self, [gleanExecutable(),
+                                 "-o", "-v", "-v", "-v", "-t",
+                                 "+"+name] + GleanTest.globalParams)
         self.name = name
 
     def interpretResult(self, out, returncode, results):
