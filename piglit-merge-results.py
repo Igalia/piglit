@@ -23,22 +23,19 @@
 
 
 import argparse
-import sys, os.path
+import sys
+import os.path
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 import framework.core as core
 
 
-
-#############################################################################
-##### Main program
-#############################################################################
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("results",
-                                            metavar = "<First Results File>",
-                                            nargs   = "*",
-                                help    = "Space seperated list of results files")
+                        metavar="<First Results File>",
+                        nargs="*",
+                        help="Space seperated list of results files")
     args = parser.parse_args()
 
     combined = core.loadTestResults(args.results.pop(0))
