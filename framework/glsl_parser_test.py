@@ -390,5 +390,3 @@ if __name__ == '__main__':
     test_file = sys.argv[1]
     test = GLSLParserTest(test_file)
     test.run_standalone()
-
-# vim: noet ts=8 sw=8:
