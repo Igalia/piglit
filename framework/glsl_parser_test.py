@@ -43,9 +43,11 @@ from core import Test, testBinDir, TestResult
 from cStringIO import StringIO
 from exectest import PlainExecTest
 
+
 def add_glsl_parser_test(group, filepath, test_name):
     """Add an instance of GLSLParserTest to the given group."""
     group[test_name] = GLSLParserTest(filepath)
+
 
 def import_glsl_parser_tests(group, basepath, subdirectories):
     """
@@ -72,15 +74,12 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
                     filepath = path.join(dirpath, f)
                     # testname := filepath relative to
                     # basepath.
-                    testname = os.path.relpath(
-                            filepath, basepath)
+                    testname = os.path.relpath(filepath, basepath)
                     if os.path.sep != '/':
                         testname = testname.replace(os.path.sep, '/', -1)
                     assert isinstance(testname, basestring)
-                    add_glsl_parser_test(
-                            group,
-                            filepath,
-                            testname)
+                    add_glsl_parser_test(group, filepath, testname)
+
 
 class GLSLParserTest(PlainExecTest):
     """Test for the GLSL parser (and more) on a GLSL source file.
@@ -183,17 +182,13 @@ class GLSLParserTest(PlainExecTest):
             // [end config]
     """
 
-    __required_opts = [
-            'expect_result',
-            'glsl_version'
-            ]
+    __required_opts = ['expect_result',
+                       'glsl_version']
 
-    __config_defaults = {
-            'require_extensions' : '',
-            'check_link' : 'false',
-            }
+    __config_defaults = {'require_extensions': '',
+                         'check_link': 'false'}
 
-    def __init__(self, filepath, runConcurrent = True):
+    def __init__(self, filepath, runConcurrent=True):
         """
         :filepath: Must end in one '.vert', '.geom', or '.frag'.
         """
@@ -226,17 +221,19 @@ class GLSLParserTest(PlainExecTest):
         parse_state = PARSE_FIND_START
 
         # Regexen that change parser state.
-        start = re.compile(r'\A(?P<indent>\s*(|//|/\*|\*)\s*)(?P<content>\[config\]\s*\n)\Z')
-        empty = None # Empty line in config body.
-        internal = None # Non-empty line in config body.
-        end = None # Marks end of config body.
+        start = re.compile(r'\A(?P<indent>\s*(|//|/\*|\*)\s*)'
+                           '(?P<content>\[config\]\s*\n)\Z')
+        empty = None  # Empty line in config body.
+        internal = None  # Non-empty line in config body.
+        end = None  # Marks end of config body.
 
         try:
             f = open(self.__filepath, 'r')
         except IOError:
             self.result = TestResult()
             self.result['result'] = 'fail'
-            self.result['errors'] = ["Failed to open test file '{0}'".format(self.__filepath)]
+            self.result['errors'] = \
+                ["Failed to open test file '{0}'".format(self.__filepath)]
             return
         for line in f:
             if parse_state == PARSE_FIND_START:
@@ -246,8 +243,10 @@ class GLSLParserTest(PlainExecTest):
                     text_io.write(m.group('content'))
                     indent = '.' * len(m.group('indent'))
                     empty = re.compile(r'\A\s*(|//|/\*|\*)\s*\n\Z')
-                    internal = re.compile(r'\A{indent}(?P<content>.*\n)\Z'.format(indent=indent))
-                    end = re.compile(r'\A{indent}\[end( |_)config\]\s*\n\Z'.format(indent=indent))
+                    internal = re.compile(r'\A{indent}(?P<content>'
+                                          '.*\n)\Z'.format(indent=indent))
+                    end = re.compile(r'\A{indent}\[end( |_)'
+                                     'config\]\s*\n\Z'.format(indent=indent))
             elif parse_state == PARSE_IN_CONFIG:
                 if start.match(line) is not None:
                     parse_state = PARSE_ERROR
@@ -273,22 +272,31 @@ class GLSLParserTest(PlainExecTest):
         elif parse_state == PARSE_FIND_START:
             self.result = TestResult()
             self.result['result'] = 'fail'
-            self.result['errors'] = ["Config section of test file '{0}' is missing".format(self.__filepath)]
-            self.result['errors'] += ["Failed to find initial line of config section '// [config]'"]
-            self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+            self.result['errors'] = ["Config section of test file '{0}' is "
+                                     "missing".format(self.__filepath)]
+            self.result['errors'] += ["Failed to find initial line of config "
+                                      "section '// [config]'"]
+            self.result['note'] = \
+                "See the docstring in file '{0}'".format(__file__)
             return
         elif parse_state == PARSE_IN_CONFIG:
             self.result = TestResult()
             self.result['result'] = 'fail'
-            self.result['errors'] = ["Config section of test file '{0}' does not terminate".format(self.__filepath)]
-            self.result['errors'] += ["Failed to find terminal line of config section '// [end config]'"]
-            self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+            self.result['errors'] = ["Config section of test file '{0}' does "
+                                     "not terminate".format(self.__filepath)]
+            self.result['errors'] += ["Failed to find terminal line of config "
+                                      "section '// [end config]'"]
+            self.result['note'] = \
+                "See the docstring in file '{0}'".format(__file__)
             return
         elif parse_state == PARSE_ERROR:
             self.result = TestResult()
             self.result['result'] = 'fail'
-            self.result['errors'] = ["Config section of test file '{0}' is ill formed, most likely due to whitespace".format(self.__filepath)]
-            self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+            self.result['errors'] = ["Config section of test file '{0}' is "
+                                     "ill formed, most likely due to "
+                                     "whitespace".format(self.__filepath)]
+            self.result['note'] = \
+                "See the docstring in file '{0}'".format(__file__)
             return
         else:
             assert(False)
@@ -301,9 +309,11 @@ class GLSLParserTest(PlainExecTest):
         except ConfigParser.Error as e:
             self.result = TestResult()
             self.result['result'] = 'fail'
-            self.result['errors'] = ['Errors exist in config section of test file']
+            self.result['errors'] = ['Errors exist in config section of test '
+                                     'file']
             self.result['errors'] += [e.message]
-            self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+            self.result['note'] = \
+                "See the docstring in file '{0}'".format(__file__)
             return
 
         self.__config = config
@@ -327,9 +337,11 @@ class GLSLParserTest(PlainExecTest):
             if not self.__config.has_option('config', o):
                 self.result = TestResult()
                 self.result['result'] = 'fail'
-                self.result['errors'] = ['Errors exist in config section of test file']
+                self.result['errors'] = ['Errors exist in config section of '
+                                         'test file']
                 self.result['errors'] += ["Option '{0}' is required".format(o)]
-                self.result['note'] = "See the docstring in file '{0}'".format(__file__)
+                self.result['note'] = \
+                    "See the docstring in file '{0}'".format(__file__)
                 return
 
     def run_standalone(self):
@@ -368,12 +380,11 @@ class GLSLParserTest(PlainExecTest):
             return None
 
         assert(self.config is not None)
-        command = [
-                path.join(testBinDir, 'glslparsertest'),
-                self.__filepath,
-                self.config.get('config', 'expect_result'),
-                self.config.get('config', 'glsl_version')
-                ]
+        command = [path.join(testBinDir, 'glslparsertest'),
+                   self.__filepath,
+                   self.config.get('config', 'expect_result'),
+                   self.config.get('config', 'glsl_version')
+                   ]
         if self.config.get('config', 'check_link').lower() == 'true':
             command.append('--check-link')
         command += self.config.get('config', 'require_extensions').split()
