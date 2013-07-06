@@ -159,9 +159,10 @@ class HTMLIndex(list):
                 for each in summary.results:
                     # Decide which fields need to be updated
                     try:
-                        self._groupResult(
-                            summary.fractions[each.name][path.join(*currentDir)],
-                            summary.status[each.name][path.join(*currentDir)])
+                        self._groupResult(summary.fractions[each.name]
+                                          [path.join(*currentDir)],
+                                          summary.status[each.name]
+                                          [path.join(*currentDir)])
                     except KeyError:
                         self._groupResult((0, 0), 'skip')
 
@@ -272,13 +273,13 @@ class Summary:
             lastGroup = ''
 
             # Build a dictionary of group stati, passing groupname = status.
-            # This is the "worst" status of the group in descending order: crash,
-            # skip, fail, warn, pass
+            # This is the "worst" status of the group in descending order:
+            # crash, skip, fail, warn, pass
             status = {}
 
-            # currentStack is a stack containing numerical values that that relate
-            # to a status output, 5 for crash, 4 for skip, 3 for fail, 2 for warn,
-            # 1 for pass
+            # currentStack is a stack containing numerical values that that
+            # relate to a status output, 5 for crash, 4 for skip, 3 for fail, 2
+            # for warn, 1 for pass
             currentStatus = []
 
             # Stack contains tuples like: (pass count, total count)
@@ -287,13 +288,13 @@ class Summary:
             def openGroup(name):
                 stack.append((0, 0))
 
-                # Since skip is the "lowest" status for HTML generation, if there
-                # is another status it will replace skip
+                # Since skip is the "lowest" status for HTML generation, if
+                # there is another status it will replace skip
                 currentStatus.append('skip')
 
             def closeGroup(group_name):
-                # We're done with this group, record the number of pass/total in
-                # the dictionary.
+                # We're done with this group, record the number of pass/total
+                # in the dictionary.
                 (nr_pass, nr_total) = stack.pop()
                 counts[group_name] = (nr_pass, nr_total)
 
@@ -335,7 +336,8 @@ class Summary:
             # fulltest is a full test name,
             # i.e. tests/shaders/glsl-algebraic-add-zero
             for fulltest in sorted(summary.tests):
-                group, test = path.split(fulltest) # or fulltest.rpartition('/')
+                # same as fulltest.rpartition('/')
+                group, test = path.split(fulltest)
 
                 if group != lastGroup:
                     # We're in a different group now.  Close the old ones
@@ -345,7 +347,8 @@ class Summary:
                             openGroup(x)
                         else:
                             closeGroup(lastGroup)
-                            lastGroup = path.normpath(path.join(lastGroup, ".."))
+                            lastGroup = path.normpath(path.join(lastGroup,
+                                                                ".."))
 
                     lastGroup = group
 
@@ -366,7 +369,7 @@ class Summary:
             # top, where we need to manually close this as "all"
             while len(stack) > 2:
                 closeGroup(lastGroup)
-                lastGroup =  path.dirname(lastGroup)
+                lastGroup = path.dirname(lastGroup)
             closeGroup("all")
 
             assert(len(stack) == 1)
@@ -410,9 +413,9 @@ class Summary:
         """
         def find_regressions(status):
             """
-            Helper function to convert named statuses into number, since number can
-            more easily be compared using logical/mathematical operators. The use of
-            this is to look for regressions in status.
+            Helper function to convert named statuses into number, since number
+            can more easily be compared using logical/mathematical operators.
+            The use of this is to look for regressions in status.
             """
             if status == 'pass':
                 return 1
@@ -477,7 +480,7 @@ class Summary:
         Private: Find the total number of pass, fail, crash, skip, and warn in
         the *last* set of results stored in self.results.
         """
-        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn':0}
+        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn': 0}
 
         for test in self.results[-1].tests.values():
             self.totals[test['result']] += 1
@@ -522,7 +525,6 @@ class Summary:
                                         lspci=each.lspci))
             file.close()
 
-
             # Then build the individual test results
             for key, value in each.tests.iteritems():
                 tPath = path.join(destination, each.name, path.dirname(key))
@@ -537,18 +539,15 @@ class Summary:
                     file = open(path.join(destination,
                                           each.name,
                                           key + ".html"), 'w')
-                    file.write(testfile.render(testname=key,
-                                               status=value.get('result',
-                                                                'None'),
-                                               returncode=value.get('returncode',
-                                                                    'None'),
-                                               time=value.get('time', 'None'),
-                                               info=value.get('info', 'None'),
-                                               command=value.get('command',
-                                                                 'None'),
-                                               css=path.relpath(resultCss,
-                                                                tPath),
-                                               index=index))
+                    file.write(testfile.render(
+                        testname=key,
+                        status=value.get('result', 'None'),
+                        returncode=value.get('returncode', 'None'),
+                        time=value.get('time', 'None'),
+                        info=value.get('info', 'None'),
+                        command=value.get('command', 'None'),
+                        css=path.relpath(resultCss, tPath),
+                        index=index))
                     file.close()
 
         # Finally build the root html files: index, regressions, etc
@@ -610,13 +609,13 @@ class Summary:
             if diff:
                 for test in self.tests['changes']:
                     print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                    ' '.join([i.tests.get(test, {'result': 'skip'})['result']
-                             for i in self.results])}
+                          ' '.join([i.tests.get(test, {'result': 'skip'})
+                                    ['result'] for i in self.results])}
             else:
                 for test in self.tests['all']:
                     print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                    ' '.join([i.tests.get(test, {'result': 'skip'})['result']
-                             for i in self.results])}
+                          ' '.join([i.tests.get(test, {'result': 'skip'})
+                                    ['result'] for i in self.results])}
 
         # Print the summary
         print "summary:"
