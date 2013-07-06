@@ -21,16 +21,18 @@
 # IN THE SOFTWARE.
 #
 
-from threadpool import ThreadPool, WorkRequest
-from patterns import Singleton
-from threading import RLock
 from weakref import WeakKeyDictionary
 import multiprocessing
 
+from threadpool import ThreadPool, WorkRequest
+from patterns import Singleton
+from threading import RLock
+
+
 def synchronized_self(function):
     '''
-            A decorator function for providing multithreaded, synchronized access
-            amongst one or more functions within a class instance.
+    A decorator function for providing multithreaded, synchronized access
+    amongst one or more functions within a class instance.
     '''
     def wrapper(self, *args, **kwargs):
         synchronized_self.locks.setdefault(self, RLock()).acquire()
@@ -40,7 +42,10 @@ def synchronized_self(function):
             synchronized_self.locks[self].release()
     return wrapper
 
-synchronized_self.locks = WeakKeyDictionary() # track the locks for each instance
+
+# track the locks for each instance
+synchronized_self.locks = WeakKeyDictionary()
+
 
 class ConcurrentTestPool(Singleton):
     @synchronized_self
@@ -48,12 +53,8 @@ class ConcurrentTestPool(Singleton):
         self.pool = ThreadPool(multiprocessing.cpu_count())
 
     @synchronized_self
-    def put(self, callable_, args = None, kwds = None):
-        self.pool.putRequest(
-                WorkRequest(
-                        callable_, args = args, kwds = kwds
-                )
-        )
+    def put(self, callable_, args=None, kwds=None):
+        self.pool.putRequest(WorkRequest(callable_, args=args, kwds=kwds))
 
     def join(self):
         self.pool.wait()
