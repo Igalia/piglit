@@ -53,12 +53,14 @@ _HELP_TEXT = textwrap.dedent("""\
 
     DESCRIPTION
         This script runs shader tests. Typically, the filename extension for
-        shader tests is ".shader_test". The extra_args are passed verbatim
-        to the shader_runner executable.
-    """.format(progname = _PROGNAME))
+        shader tests is ".shader_test". The extra_args are passed verbatim to
+        the shader_runner executable.
+    """.format(progname=_PROGNAME))
+
 
 def add_shader_test(group, testname, filepath):
     group[testname] = ShaderTest([filepath, '-auto'])
+
 
 def add_shader_test_dir(group, dirpath, recursive=False):
     """Add all shader tests in a directory to the given group."""
@@ -74,11 +76,11 @@ def add_shader_test_dir(group, dirpath, recursive=False):
             ext = filename.rsplit('.')[-1]
             if ext != 'shader_test':
                 continue
-            testname = filename[0:-(len(ext) + 1)] # +1 for '.'
+            testname = filename[0:-(len(ext) + 1)]  # +1 for '.'
             add_shader_test(group, testname, filepath)
 
-class ShaderTest(PlainExecTest):
 
+class ShaderTest(PlainExecTest):
     API_ERROR = 0
     API_GL = 1
     API_GLES2 = 2
@@ -105,18 +107,22 @@ class ShaderTest(PlainExecTest):
             return
 
         common = {
-            'cmp' : r'(<|<=|=|>=|>)',
-            'gl_version' : r'(\d.\d)',
-            'gles2_version' : r'(2.\d\s)',
-            'gles3_version' : r'(3.\d\s)',
-            'comment' : r'(#.*)',
+            'cmp': r'(<|<=|=|>=|>)',
+            'gl_version': r'(\d.\d)',
+            'gles2_version': r'(2.\d\s)',
+            'gles3_version': r'(3.\d\s)',
+            'comment': r'(#.*)'
         }
 
-        cls.__re_require_header = re.compile(r'^\s*\[require\]\s*{comment}?$'.format(**common))
+        cls.__re_require_header = re.compile(r'^\s*\[require\]'
+                                             '\s*{comment}?$'.format(**common))
         cls.__re_end_require_block = re.compile(r'^\s*\['.format(*common))
-        cls.__re_gl = re.compile(r'^\s*GL\s*{cmp}\s*{gl_version}\s*{comment}?$'.format(**common))
-        cls.__re_gles2 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles2_version}\s*{comment}?$'.format(**common))
-        cls.__re_gles3 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles3_version}\s*{comment}?$'.format(**common))
+        cls.__re_gl = re.compile(r'^\s*GL\s*{cmp}\s*{gl_version}\s*{comment}'
+                                 '?$'.format(**common))
+        cls.__re_gles2 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles2_version}'
+                                    '\s*{comment}?$'.format(**common))
+        cls.__re_gles3 = re.compile(r'^\s*GL ES\s*{cmp}\s*{gles3_version}'
+                                    '\s*{comment}?$'.format(**common))
         cls.__re_gl_unknown = re.compile(r'^\s*GL\s*{cmp}'.format(**common))
 
     def __init__(self, shader_runner_args, run_standalone=False):
@@ -125,7 +131,7 @@ class ShaderTest(PlainExecTest):
         Test.__init__(self, runConcurrent=True)
 
         assert(isinstance(shader_runner_args, list))
-        assert(isinstance(shader_runner_args[0], str) or \
+        assert(isinstance(shader_runner_args[0], str) or
                isinstance(shader_runner_args[0], unicode))
 
         self.__run_standalone = run_standalone
@@ -185,10 +191,11 @@ class ShaderTest(PlainExecTest):
                             self.__gl_api = ShaderTest.API_GLES3
                             return
                         elif cls.__re_gl_unknown.match(line) is not None:
-                            self.__report_failure("Failed to parse GL requirement: " + line)
+                            self.__report_failure("Failed to parse GL "
+                                                  "requirement: " + line)
                             self.__gl_api = ShaderTest.API_ERROR
                             return
-                        elif cls.__re_end_require_block.match(line) is not None:
+                        elif cls.__re_end_require_block.match(line):
                             # Default to GL if no API is given.
                             self.__gl_api = ShaderTest.API_GL
                             return
@@ -208,7 +215,8 @@ class ShaderTest(PlainExecTest):
                     assert(False)
 
         except IOError:
-            self._report_failure("Failed to read test file {0!r}".format(self.__test_filepath))
+            self._report_failure("Failed to read test file "
+                                 "{0!r}".format(self.__test_filepath))
             return
 
     @property
@@ -253,10 +261,12 @@ class ShaderTest(PlainExecTest):
 
             return PlainExecTest.run(self, valgrind)
 
+
 def _usage_error():
     sys.stdout.write("usage error: {0}\n\n".format(_PROGNAME))
     sys.stdout.write(_HELP_TEXT)
     sys.exit(1)
+
 
 def _main(args):
     if len(sys.argv) < 2:
@@ -264,6 +274,7 @@ def _main(args):
 
     test = ShaderTest(sys.argv[1:], run_standalone=True)
     test.run()
+
 
 if __name__ == "__main__":
     _main(sys.argv)
