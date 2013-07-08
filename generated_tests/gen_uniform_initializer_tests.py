@@ -54,16 +54,19 @@ def get_value(type, idx):
 def generate_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
         for t in all_templates:
-            template_file_name = "uniform-initializer-templates/{0}-initializer{1}.template".format(target, t)
+            template_file_name = (
+                "uniform-initializer-templates/"
+                "{0}-initializer{1}.template".format(target, t))
             f = open_src_file(template_file_name)
             template = f.read()
             f.close()
 
-            test_file_name = dirname = os.path.join('spec',
-                                                    'glsl-{0}.{1}'.format(major, minor),
-                                                    'execution',
-                                                    'uniform-initializer',
-                                                    '{0}-{1}{2}.shader_test'.format(target, base_name, t))
+            test_file_name = dirname = os.path.join(
+                'spec',
+                'glsl-{0}.{1}'.format(major, minor),
+                'execution',
+                'uniform-initializer',
+                '{0}-{1}{2}.shader_test'.format(target, base_name, t))
             print test_file_name
 
             dirname = os.path.dirname(test_file_name)
@@ -88,7 +91,7 @@ def generate_tests(type_list, base_name, major, minor):
 
                 value = "{0}({1})".format(type, ", ".join(numbers))
 
-                api_type = type;
+                api_type = type
                 if type == "bool":
                     api_type = "int"
                 elif type[0] == 'b':
@@ -104,30 +107,32 @@ def generate_tests(type_list, base_name, major, minor):
                 j = j + 1
 
             f = open(test_file_name, "w")
-            f.write(Template(template).render(type_list = test_vectors,
-                                              api_types = api_vectors,
-                                              major = major,
-                                              minor = minor))
+            f.write(Template(template).render(type_list=test_vectors,
+                                              api_types=api_vectors,
+                                              major=major,
+                                              minor=minor))
             f.close()
 
 
 def generate_array_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
-        template_file_name = "uniform-initializer-templates/{0}-initializer.template".format(target)
+        template_file_name = \
+            "uniform-initializer-templates/{0}-initializer.template".format(target)
         f = open_src_file(template_file_name)
         template = f.read()
         f.close()
 
-        test_file_name = dirname = os.path.join('spec',
-                                                'glsl-{0}.{1}'.format(major, minor),
-                                                'execution',
-                                                'uniform-initializer',
-                                                '{0}-{1}-array.shader_test'.format(target, base_name))
+        test_file_name = dirname = os.path.join(
+            'spec',
+            'glsl-{0}.{1}'.format(major, minor),
+            'execution',
+            'uniform-initializer',
+            '{0}-{1}-array.shader_test'.format(target, base_name))
         print test_file_name
 
-	dirname = os.path.dirname(test_file_name)
-	if not os.path.exists(dirname):
-	    os.makedirs(dirname)
+        dirname = os.path.dirname(test_file_name)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
 
         test_vectors = []
         j = 0
@@ -139,7 +144,8 @@ def generate_array_tests(type_list, base_name, major, minor):
                 for i in range(num_values):
                     numbers.append(get_value(type, i + element + j))
 
-                constructor_parts.append("{0}({1})".format(type, ", ".join(numbers)))
+                constructor_parts.append("{0}({1})".format(type,
+                                                           ", ".join(numbers)))
 
             if type[-1] in ["2", "3", "4"]:
                 name = "".join(["u", type[0], type[-1]])
@@ -152,9 +158,9 @@ def generate_array_tests(type_list, base_name, major, minor):
             j = j + 1
 
         f = open(test_file_name, "w")
-        f.write(Template(template).render(type_list = test_vectors,
-                                          major = major,
-                                          minor = minor))
+        f.write(Template(template).render(type_list=test_vectors,
+                                          major=major,
+                                          minor=minor))
         f.close()
 
 # These are a set of pseudo random values used by the number sequence
@@ -180,16 +186,15 @@ random_numbers = (0.78685, 0.89828, 0.36590, 0.92504, 0.48998, 0.27989,
 all_templates = ("",
                  "-from-const",
                  "-set-by-API",
-                 "-set-by-other-stage",
-                 )
+                 "-set-by-other-stage")
 
-bool_types =  [("bool", 1), ("bvec2", 2), ("bvec3", 3), ("bvec4", 4)]
-int_types =   [("int", 1), ("ivec2", 2), ("ivec3", 3), ("ivec4", 4)]
+bool_types = [("bool", 1), ("bvec2", 2), ("bvec3", 3), ("bvec4", 4)]
+int_types = [("int", 1), ("ivec2", 2), ("ivec3", 3), ("ivec4", 4)]
 float_types = [("float", 1), ("vec2", 2), ("vec3", 3), ("vec4", 4)]
-uint_types =  [("uint", 1), ("uvec2", 2), ("uvec3", 3), ("uvec4", 4)]
-mat2_types =  [("mat2x2", 4), ("mat2x3", 6), ("mat2x4", 8)]
-mat3_types =  [("mat3x2", 6), ("mat3x3", 9), ("mat3x4", 12)]
-mat4_types =  [("mat4x2", 8), ("mat4x3", 12), ("mat4x4", 16)]
+uint_types = [("uint", 1), ("uvec2", 2), ("uvec3", 3), ("uvec4", 4)]
+mat2_types = [("mat2x2", 4), ("mat2x3", 6), ("mat2x4", 8)]
+mat3_types = [("mat3x2", 6), ("mat3x3", 9), ("mat3x4", 12)]
+mat4_types = [("mat4x2", 8), ("mat4x3", 12), ("mat4x4", 16)]
 
 for (types, base_name, major, minor) in [(bool_types,  "bool",  1, 20),
                                          (int_types,   "int",   1, 20),
