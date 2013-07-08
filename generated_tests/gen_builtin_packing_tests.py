@@ -280,7 +280,8 @@ vs_unpack_template = Template(dedent("""\
     % if func.exact:
     uniform int exact 1
     % else:
-    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
+    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
+                                                   0x81818181))}
     % endif
     % for j in range(func.num_valid_outputs):
     uniform ${func.vector_type} expect${j} ${" ".join(io.valid_outputs[j])}
@@ -415,7 +416,8 @@ fs_unpack_template = Template(dedent("""\
     % if func.exact:
     uniform int exact 1
     % else:
-    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080, 0x81818181))}
+    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
+                                                   0x81818181))}
     % endif
     % for i in range(func.num_valid_outputs):
     uniform ${func.vector_type} expect${i} ${" ".join(io.valid_outputs[i])}
@@ -427,23 +429,24 @@ fs_unpack_template = Template(dedent("""\
 """))
 
 template_table = {
-    ("const", "p", "2x16") : const_pack_template,
-    ("const", "p",  "4x8") : const_pack_template,
-    ("const", "u", "2x16") : const_unpack_template,
-    ("const", "u",  "4x8") : const_unpack_template,
-    ("vs",    "p", "2x16") : vs_pack_template,
-    ("vs",    "p",  "4x8") : vs_pack_template,
-    ("vs",    "u", "2x16") : vs_unpack_template,
-    ("vs",    "u",  "4x8") : vs_unpack_template,
-    ("fs",    "p", "2x16") : fs_pack_template,
-    ("fs",    "p",  "4x8") : fs_pack_template,
-    ("fs",    "u", "2x16") : fs_unpack_template,
-    ("fs",    "u",  "4x8") : fs_unpack_template,
+    ("const", "p", "2x16"): const_pack_template,
+    ("const", "p",  "4x8"): const_pack_template,
+    ("const", "u", "2x16"): const_unpack_template,
+    ("const", "u",  "4x8"): const_unpack_template,
+    ("vs",    "p", "2x16"): vs_pack_template,
+    ("vs",    "p",  "4x8"): vs_pack_template,
+    ("vs",    "u", "2x16"): vs_unpack_template,
+    ("vs",    "u",  "4x8"): vs_unpack_template,
+    ("fs",    "p", "2x16"): fs_pack_template,
+    ("fs",    "p",  "4x8"): fs_pack_template,
+    ("fs",    "u", "2x16"): fs_unpack_template,
+    ("fs",    "u",  "4x8"): fs_unpack_template
 }
 
 # ----------------------------------------------------------------------------
 # Math for pack/unpack functions
 # ----------------------------------------------------------------------------
+
 
 class FuncOpts:
     """Options that modify the evaluation of the GLSL pack/unpack functions.
@@ -492,6 +495,7 @@ class FuncOpts:
         x = float32(x)
         return self.__round_func(x)
 
+
 def clamp(x, min, max):
     if x < min:
         return min
@@ -499,6 +503,7 @@ def clamp(x, min, max):
         return max
     else:
         return x
+
 
 def round_to_nearest(x):
     # Get fractional and integral parts.
@@ -508,6 +513,7 @@ def round_to_nearest(x):
         return i
     else:
         return i + copysign(1.0, x)
+
 
 def round_to_even(x):
     # Get fractional and integral parts.
@@ -519,6 +525,7 @@ def round_to_even(x):
         return i + fmod(i, 2.0)
     else:
         return i + copysign(1.0, x)
+
 
 def pack_2x16(pack_1x16_func, x, y, func_opts):
     """Evaluate a GLSL pack2x16 function.
@@ -538,6 +545,7 @@ def pack_2x16(pack_1x16_func, x, y, func_opts):
     assert(isinstance(uy, uint16))
 
     return uint32((uy << 16) | ux)
+
 
 def pack_4x8(pack_1x8_func, x, y, z, w, func_opts):
     """Evaluate a GLSL pack4x8 function.
@@ -564,6 +572,7 @@ def pack_4x8(pack_1x8_func, x, y, z, w, func_opts):
 
     return uint32((uw << 24) | (uz << 16) | (uy << 8) | ux)
 
+
 def unpack_2x16(unpack_1x16_func, u, func_opts):
     """Evaluate a GLSL unpack2x16 function.
 
@@ -584,6 +593,7 @@ def unpack_2x16(unpack_1x16_func, u, func_opts):
     assert(isinstance(y, float32))
 
     return (x, y)
+
 
 def unpack_4x8(unpack_1x8_func, u, func_opts):
     """Evaluate a GLSL unpack4x8 function.
@@ -612,45 +622,54 @@ def unpack_4x8(unpack_1x8_func, u, func_opts):
 
     return (x, y, z, w)
 
+
 def pack_snorm_1x8(f32, func_opts):
     """Component-wise function of packSnorm4x8."""
     assert(isinstance(f32, float32))
     return uint8(int8(func_opts.round(clamp(f32, -1.0, +1.0) * 127.0)))
+
 
 def pack_snorm_1x16(f32, func_opts):
     """Component-wise function of packSnorm2x16."""
     assert(isinstance(f32, float32))
     return uint16(int16(func_opts.round(clamp(f32, -1.0, +1.0) * 32767.0)))
 
+
 def unpack_snorm_1x8(u8):
     """Component-wise function of unpackSnorm4x8."""
     assert(isinstance(u8, uint8))
     return float32(clamp(int8(u8) / 127.0, -1.0, +1.0))
+
 
 def unpack_snorm_1x16(u16):
     """Component-wise function of unpackSnorm2x16."""
     assert(isinstance(u16, uint16))
     return float32(clamp(int16(u16) / 32767.0, -1.0, +1.0))
 
+
 def pack_unorm_1x8(f32, func_opts):
     """Component-wise function of packUnorm4x8."""
     assert(isinstance(f32, float32))
     return uint8(func_opts.round(clamp(f32, 0.0, 1.0) * 255.0))
+
 
 def pack_unorm_1x16(f32, func_opts):
     """Component-wise function of packUnorm2x16."""
     assert(isinstance(f32, float32))
     return uint16(func_opts.round(clamp(f32, 0.0, 1.0) * 65535.0))
 
+
 def unpack_unorm_1x8(u8):
     """Component-wise function of unpackUnorm4x8."""
     assert(isinstance(u8, uint8))
     return float32(u8 / 255.0)
 
+
 def unpack_unorm_1x16(u16):
     """Component-wise function of unpackUnorm2x16."""
     assert(isinstance(u16, uint16))
     return float32(u16 / 65535.0)
+
 
 def pack_half_1x16(f32, func_opts):
     """Component-wise function of packHalf2x16."""
@@ -664,11 +683,11 @@ def pack_half_1x16(f32, func_opts):
     #
     # The sign, exponent, and mantissa determine its value by:
     #
-    #  if e = 0 and m = 0, then zero:       (-1)^s * 0
-    #  if e = 0 and m != 0, then subnormal: (-1)^s * 2^(e - 14) * m / 2^10
-    #  if 0 < e < 31, then normal:          (-1)^s * 2^(e - 15) * (1 + m / 2^10)
-    #  if e = 31 and m = 0, then inf:       (-1)^s * inf
-    #  if e = 31 and m != 0, then nan
+    # if e = 0 and m = 0, then zero:       (-1)^s * 0
+    # if e = 0 and m != 0, then subnormal: (-1)^s * 2^(e - 14) * m / 2^10
+    # if 0 < e < 31, then normal:          (-1)^s * 2^(e - 15) * (1 + m / 2^10)
+    # if e = 31 and m = 0, then inf:       (-1)^s * inf
+    # if e = 31 and m != 0, then nan
     #
     # where 0 <= m < 2^10.
     #
@@ -697,7 +716,7 @@ def pack_half_1x16(f32, func_opts):
     # Calculate sign bit.
     # Use copysign() to handle the case where x is -0.0.
     if copysign(1.0, f32) < 0.0:
-        s =  1
+        s = 1
 
     # To reduce the number of cases in the if-tree below, decompose `abs(f32)`
     # rather than `f32`.
@@ -755,6 +774,7 @@ def pack_half_1x16(f32, func_opts):
 
     return uint16((s << 15) | (e << 10) | m)
 
+
 def unpack_half_1x16(u16):
     """Component-wise function of unpackHalf2x16."""
     assert(isinstance(u16, uint16))
@@ -767,11 +787,11 @@ def unpack_half_1x16(u16):
     #
     # The sign, exponent, and mantissa determine its value by:
     #
-    #  if e = 0 and m = 0, then zero:       (-1)^s * 0
-    #  if e = 0 and m != 0, then subnormal: (-1)^s * 2^(e - 14) * m / 2^10
-    #  if 0 < e < 31, then normal:          (-1)^s * 2^(e - 15) * (1 + m / 2^10)
-    #  if e = 31 and m = 0, then inf:       (-1)^s * inf
-    #  if e = 31 and m != 0, then nan
+    # if e = 0 and m = 0, then zero:       (-1)^s * 0
+    # if e = 0 and m != 0, then subnormal: (-1)^s * 2^(e - 14) * m / 2^10
+    # if 0 < e < 31, then normal:          (-1)^s * 2^(e - 15) * (1 + m / 2^10)
+    # if e = 31 and m = 0, then inf:       (-1)^s * inf
+    # if e = 31 and m != 0, then nan
     #
     # where 0 <= m < 2^10.
 
@@ -787,7 +807,7 @@ def unpack_half_1x16(u16):
     if e == 0:
         return float32(sign * 2.0**(-14) * (m / 2.0**10))
     elif 1 <= e and e <= 30:
-        return float32(sign * 2.0**(e - 15.0) * (1.0 +  m / 2.0**10))
+        return float32(sign * 2.0**(e - 15.0) * (1.0 + m / 2.0**10))
     elif e == 31 and m == 0:
         return float32(sign * float32("inf"))
     elif e == 31 and m != 0:
@@ -817,17 +837,18 @@ full_input_table = dict()
 #
 reduced_input_table = dict()
 
+
 def make_inputs_for_pack_snorm_2x16():
     # The domain of packSnorm2x16 is [-inf, +inf]^2. The function clamps
     # its input into the range [-1, +1]^2.
     pos = (
-        0.0, # zero
-        0.1, # near zero
-        0.9, # slightly below the clamp boundary
-        1.0, # the clamp boundary
-        1.1, # slightly above the clamp boundary
-        float("+inf"),
-        )
+        0.0,  # zero
+        0.1,  # near zero
+        0.9,  # slightly below the clamp boundary
+        1.0,  # the clamp boundary
+        1.1,  # slightly above the clamp boundary
+        float("+inf")
+    )
     neg = tuple(reversed(tuple(-x for x in pos)))
     return tuple(float32(x) for x in pos + neg)
 
@@ -842,8 +863,8 @@ full_input_table["unpackSnorm2x16"] = tuple(uint16(u) for u in (
     2**15 - 1,
     2**15,
     2**15 + 1,
-    2**16 - 1, # max uint16
-    ))
+    2**16 - 1  # max uint16
+))
 
 # XXX: Perhaps there is a better choice of test inputs?
 full_input_table["unpackSnorm4x8"] = tuple(uint8(u) for u in (
@@ -851,23 +872,23 @@ full_input_table["unpackSnorm4x8"] = tuple(uint8(u) for u in (
     2**7 - 1,
     2**7,
     2**7 + 1,
-    2**8 - 1, # max uint8
-    ))
+    2**8 - 1  # max uint8
+))
 
 full_input_table["packUnorm2x16"] = tuple(float32(x) for x in (
     # The domain of packUnorm2x16 is [-inf, +inf]^2. The function clamps its
     # input into the range [0, 1]^2.
 
     "-inf",
-    -0.1, # slightly below the inner clamp boundary
-    -0.0, # infintesimally below the inner clamp boundary
-    +0.0, # the inner clamp boundary
-    +0.1, # slightly above the inner clamp boundary
-    +0.9, # slightly below the outer clamp boundary
-    +1.0, # the outer clamp boundary
-    +1.1, # slightly above the outer clamp boundary
-    "+inf",
-    ))
+    -0.1,  # slightly below the inner clamp boundary
+    -0.0,  # infintesimally below the inner clamp boundary
+    +0.0,  # the inner clamp boundary
+    +0.1,  # slightly above the inner clamp boundary
+    +0.9,  # slightly below the outer clamp boundary
+    +1.0,  # the outer clamp boundary
+    +1.1,  # slightly above the outer clamp boundary
+    "+inf"
+))
 
 reduced_input_table["packUnorm2x16"] = None
 
@@ -876,6 +897,7 @@ full_input_table["packUnorm4x8"] = full_input_table["packUnorm2x16"]
 # XXX: Perhaps there is a better choice of test inputs?
 full_input_table["unpackUnorm2x16"] = full_input_table["unpackSnorm2x16"]
 full_input_table["unpackUnorm4x8"] = full_input_table["unpackSnorm4x8"]
+
 
 def make_inputs_for_pack_half_2x16():
     # The domain of packHalf2x16 is ([-inf, +inf] + {NaN})^2. The function
@@ -886,14 +908,13 @@ def make_inputs_for_pack_half_2x16():
 
     subnormal_min = 2.0**(-14) * (1.0 / 2.0**10)
     subnormal_max = 2.0**(-14) * (1023.0 / 2.0**10)
-    normal_min    = 2.0**(-14) * (1.0 + 0.0 / 2.0**10)
-    normal_max    = 2.0**15 * (1.0 + 1023.0 / 2.0**10)
-    min_step      = 2.0**(-24)
-    max_step      = 2.0**5
+    normal_min = 2.0**(-14) * (1.0 + 0.0 / 2.0**10)
+    normal_max = 2.0**15 * (1.0 + 1023.0 / 2.0**10)
+    min_step = 2.0**(-24)
+    max_step = 2.0**5
 
     pos = tuple(float32(x) for x in (
         # Inputs that result in 0.0 .
-        #
         0.0,
         0.0 + 0.25 * min_step,
 
@@ -906,7 +927,8 @@ def make_inputs_for_pack_half_2x16():
         #
         0.0 + 0.50 * min_step,
 
-        # Inputs that result in a subnormal float16.
+        # Inputs that result in a subnormal
+        # float16.
         #
         0.0 + 0.75 * min_step,
         subnormal_min + 0.00 * min_step,
@@ -966,8 +988,7 @@ def make_inputs_for_pack_half_2x16():
         normal_max + 1.00 * max_step,
         normal_max + 2.00 * max_step,
 
-        "+inf",
-    ))
+        "+inf"))
 
     neg = tuple(reversed([-x for x in pos]))
     return neg + pos
@@ -982,29 +1003,25 @@ reduced_input_table["packHalf2x16"] = tuple(float32(x) for x in (
     +0.0,
     +1.0,
     +2.0,
-    "+inf",
-    ))
+    "+inf"
+))
+
 
 def make_inputs_for_unpack_half_2x16():
     # For each of the two classes of float16 values, subnormal and normalized,
     # below are listed the exponent and mantissa of the class's boundary
     # values and some values slightly inside the bounds.
     bounds = (
-        ( 0,    0), # zero
-
-        ( 0,    1), # subnormal_min
-        ( 0,    2), # subnormal_min + min_step
-
-        ( 0, 1022), # subnormal_max - min_step
-        ( 0, 1023), # subnormal_max
-
-        ( 1,    0), # normal_min
-        ( 1,    1), # normal_min + min_step
-
-        (30, 1022), # normal_max - max_step
-        (30, 1023), # normal_max
-
-        (31,    0), # inf
+        (0,     0),  # zero
+        (0,     1),  # subnormal_min
+        (0,     2),  # subnormal_min + min_step
+        (0,  1022),  # subnormal_max - min_step
+        (0,  1023),  # subnormal_max
+        (1,     0),  # normal_min
+        (1,     1),  # normal_min + min_step
+        (30, 1022),  # normal_max - max_step
+        (30, 1023),  # normal_max
+        (31,    0)   # inf
     )
 
     def make_uint16(s, e, m):
@@ -1035,6 +1052,7 @@ full_input_table["unpackHalf2x16"] = make_inputs_for_unpack_half_2x16()
 #     valid_outputs=(("0.0", "-0.0"),))``.
 #
 InOutTuple = namedtuple("InOutTuple", ("input", "valid_outputs"))
+
 
 def glsl_literal(x):
     """Convert the given number to a string that represents a GLSL literal.
@@ -1069,6 +1087,7 @@ def glsl_literal(x):
             return repr(x)
     else:
         assert(False)
+
 
 def make_inouts_for_pack_2x16(pack_1x16_func,
                               all_float32_inputs,
@@ -1117,6 +1136,7 @@ def make_inouts_for_pack_2x16(pack_1x16_func,
 
     return inout_seq
 
+
 def make_inouts_for_pack_4x8(pack_1x8_func, float32_inputs):
     """Determine valid outputs for a given GLSL pack4x8 function.
 
@@ -1154,6 +1174,7 @@ def make_inouts_for_pack_4x8(pack_1x8_func, float32_inputs):
                            valid_outputs=valid_outputs_1))
     return inout_seq
 
+
 def make_inouts_for_unpack_2x16(unpack_1x16_func, uint16_inputs):
     """Determine expected outputs of a given GLSL unpack2x16 function.
 
@@ -1178,6 +1199,7 @@ def make_inouts_for_unpack_2x16(unpack_1x16_func, uint16_inputs):
                                            glsl_literal(vec2[1]))]))
 
     return inout_seq
+
 
 def make_inouts_for_unpack_4x8(unpack_1x8_func, uint8_inputs):
     """Determine expected outputs of a given GLSL unpack4x8 function.
@@ -1218,12 +1240,10 @@ def make_inouts_for_unpack_4x8(unpack_1x8_func, uint8_inputs):
                                     glsl_literal(vec4_1[2]),
                                     glsl_literal(vec4_1[3])))
 
-            inout_seq.append(
-                InOutTuple(input=glsl_literal(u32_0),
-                           valid_outputs=valid_outputs_0))
-            inout_seq.append(
-                InOutTuple(input=glsl_literal(u32_1),
-                           valid_outputs=valid_outputs_1))
+            inout_seq.append(InOutTuple(input=glsl_literal(u32_0),
+                                        valid_outputs=valid_outputs_0))
+            inout_seq.append(InOutTuple(input=glsl_literal(u32_1),
+                                        valid_outputs=valid_outputs_1))
 
     return inout_seq
 
@@ -1235,33 +1255,45 @@ result_precision_table = {
     "packUnorm2x16": "highp",
     "packUnorm4x8": "highp",
     "packHalf2x16":  "highp",
-
     "unpackSnorm2x16": "highp",
     "unpackSnorm4x8": "highp",
     "unpackUnorm2x16": "highp",
     "unpackUnorm4x8": "highp",
-    "unpackHalf2x16":  "mediump",
-    }
+    "unpackHalf2x16":  "mediump"
+}
 
 # This table maps GLSL pack/unpack function names to a sequence of InOutTuple.
 inout_table = {
-    "packSnorm2x16": make_inouts_for_pack_2x16(pack_snorm_1x16, full_input_table["packSnorm2x16"],  reduced_input_table["packSnorm2x16"]),
-    "packSnorm4x8": make_inouts_for_pack_4x8(pack_snorm_1x8, full_input_table["packSnorm4x8"]),
-    "packUnorm2x16": make_inouts_for_pack_2x16(pack_unorm_1x16, full_input_table["packUnorm2x16"],  reduced_input_table["packUnorm2x16"]),
-    "packUnorm4x8": make_inouts_for_pack_4x8(pack_unorm_1x8, full_input_table["packUnorm4x8"]),
-    "packHalf2x16":  make_inouts_for_pack_2x16(pack_half_1x16,  full_input_table["packHalf2x16"],   reduced_input_table["packHalf2x16"]),
+    "packSnorm2x16": make_inouts_for_pack_2x16(
+        pack_snorm_1x16, full_input_table["packSnorm2x16"],
+        reduced_input_table["packSnorm2x16"]),
+    "packSnorm4x8": make_inouts_for_pack_4x8(
+        pack_snorm_1x8, full_input_table["packSnorm4x8"]),
+    "packUnorm2x16": make_inouts_for_pack_2x16(
+        pack_unorm_1x16, full_input_table["packUnorm2x16"],
+        reduced_input_table["packUnorm2x16"]),
+    "packUnorm4x8": make_inouts_for_pack_4x8(
+        pack_unorm_1x8, full_input_table["packUnorm4x8"]),
+    "packHalf2x16":  make_inouts_for_pack_2x16(
+        pack_half_1x16, full_input_table["packHalf2x16"],
+        reduced_input_table["packHalf2x16"]),
+    "unpackSnorm2x16": make_inouts_for_unpack_2x16(
+        unpack_snorm_1x16, full_input_table["unpackSnorm2x16"]),
+    "unpackSnorm4x8": make_inouts_for_unpack_4x8(
+        unpack_snorm_1x8, full_input_table["unpackSnorm4x8"]),
+    "unpackUnorm2x16": make_inouts_for_unpack_2x16(
+        unpack_unorm_1x16, full_input_table["unpackUnorm2x16"]),
+    "unpackUnorm4x8": make_inouts_for_unpack_4x8(
+        unpack_unorm_1x8, full_input_table["unpackUnorm4x8"]),
+    "unpackHalf2x16": make_inouts_for_unpack_2x16(
+        unpack_half_1x16, full_input_table["unpackHalf2x16"])
+}
 
-
-    "unpackSnorm2x16": make_inouts_for_unpack_2x16(unpack_snorm_1x16, full_input_table["unpackSnorm2x16"]),
-    "unpackSnorm4x8": make_inouts_for_unpack_4x8(unpack_snorm_1x8, full_input_table["unpackSnorm4x8"]),
-    "unpackUnorm2x16": make_inouts_for_unpack_2x16(unpack_unorm_1x16, full_input_table["unpackUnorm2x16"]),
-    "unpackUnorm4x8": make_inouts_for_unpack_4x8(unpack_unorm_1x8, full_input_table["unpackUnorm4x8"]),
-    "unpackHalf2x16":  make_inouts_for_unpack_2x16(unpack_half_1x16,  full_input_table["unpackHalf2x16"]),
-    }
 
 # ----------------------------------------------------------------------------
 # Generate test files
 # ----------------------------------------------------------------------------
+
 
 class FuncInfo:
     """Information for a GLSL pack/unpack function.
@@ -1304,10 +1336,11 @@ class FuncInfo:
             self.dimension = "2x16"
             self.vector_type = "vec2"
         elif name.endswith("4x8"):
-            self.dimension =  "4x8"
+            self.dimension = "4x8"
             self.vector_type = "vec4"
         else:
             assert(False)
+
 
 class ShaderTest:
     """A .shader_test file."""
@@ -1321,12 +1354,11 @@ class ShaderTest:
             FuncInfo("packUnorm2x16", requirements),
             FuncInfo("packUnorm4x8", requirements),
             FuncInfo("packHalf2x16", requirements),
-
             FuncInfo("unpackSnorm2x16", requirements),
             FuncInfo("unpackSnorm4x8", requirements),
             FuncInfo("unpackUnorm2x16", requirements),
             FuncInfo("unpackUnorm4x8", requirements),
-            FuncInfo("unpackHalf2x16", requirements),
+            FuncInfo("unpackHalf2x16", requirements)
             )
 
         requirements = "GL ES >= 3.0\nGLSL ES >= 3.00"
@@ -1334,17 +1366,12 @@ class ShaderTest:
             FuncInfo("packSnorm2x16", requirements),
             FuncInfo("packUnorm2x16", requirements),
             FuncInfo("packHalf2x16", requirements),
-
             FuncInfo("unpackSnorm2x16", requirements),
             FuncInfo("unpackUnorm2x16", requirements),
-            FuncInfo("unpackHalf2x16", requirements),
+            FuncInfo("unpackHalf2x16", requirements)
             )
 
-        execution_stages = (
-            "const",
-            "vs",
-            "fs",
-            )
+        execution_stages = ("const", "vs", "fs")
 
         for s in execution_stages:
             for f in glsl_es_300_funcs:
@@ -1362,12 +1389,11 @@ class ShaderTest:
                                           func_info.dimension)]
         self.__func_info = func_info
         self.__filename = os.path.join(
-                            "spec",
-                            api,
-                            "execution",
-                            "built-in-functions",
-                            "{0}-{1}.shader_test"\
-                            .format(execution_stage, func_info.name))
+            "spec",
+            api,
+            "execution",
+            "built-in-functions",
+            "{0}-{1}.shader_test".format(execution_stage, func_info.name))
 
     @property
     def filename(self):
@@ -1382,11 +1408,12 @@ class ShaderTest:
             ctx = mako.runtime.Context(buffer, func=self.__func_info)
             self.__template.render_context(ctx)
 
+
 def main():
     parser = optparse.OptionParser(
-                description="Generate shader tests that test the built-in " + \
-                            "packing functions",
-                usage="usage: %prog [-h] [--names-only]")
+        description="Generate shader tests that test the built-inpacking "
+                    "functions",
+        usage="usage: %prog [-h] [--names-only]")
     parser.add_option(
         '--names-only',
         dest='names_only',
