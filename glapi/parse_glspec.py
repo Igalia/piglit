@@ -91,7 +91,7 @@
 # {
 #   "categories": {
 #     <category name>: {
-#       "kind": <"GL" or "GLES" for a GL version, "extension" for an extension>,
+#       "kind": <"GL" or "GLES" for a GL version, "extension" for an extension>
 #       "gl_10x_version": <For a GL version, version number times 10>,
 #       "extension_name" <For an extension, name of the extension>
 #     }, ...
@@ -116,7 +116,6 @@
 # }
 
 
-
 import collections
 import csv
 import json
@@ -130,6 +129,7 @@ GL_VERSION_REGEXP = re.compile('^VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
 GLES_VERSION_REGEXP = re.compile('^GL_ES_VERSION_([0-9])_([0-9])(_DEPRECATED)?$')
 ENUM_REGEXP = re.compile(r'^\s+(\w+)\s+=\s+(\w+)$')
 EXTENSION_SUFFIX_REGEXP = re.compile(r'(ARB|EXT|KHR|OES|NV|AMD|IMG|QCOM|INTEL)$')
+
 
 # Convert a type into a canonical form that is consistent about its
 # use of spaces.
@@ -181,34 +181,30 @@ def filter_comments(f):
 #
 # - "VERSION_2_1" is converted into { 'kind': 'GL', 'gl_10x_version': 21 }
 #
-# - "ARB_foo" is converted into { 'kind': 'extension', 'extension_name': 'GL_ARB_foo' }
+# - "ARB_foo" is converted into:
+#   { 'kind': 'extension', 'extension_name': 'GL_ARB_foo' }
 #
-# - "GL_ES_VERSION_2_0" is converted into { 'kind': 'GLES', 'gl_10x_version': 20 }
+# - "GL_ES_VERSION_2_0" is converted into:
+#     { 'kind': 'GLES', 'gl_10x_version': 20 }
 #   (this category is a piglit extension for local-gl.spec)
 def translate_category(category_name):
     m = GL_VERSION_REGEXP.match(category_name)
     if m:
         ones = int(m.group(1))
         tenths = int(m.group(2))
-        return '{0}.{1}'.format(ones, tenths), {
-            'kind': 'GL',
-            'gl_10x_version': 10 * ones + tenths
-            }
+        return ('{0}.{1}'.format(ones, tenths),
+                {'kind': 'GL', 'gl_10x_version': 10 * ones + tenths})
 
     m = GLES_VERSION_REGEXP.match(category_name)
     if m:
         ones = int(m.group(1))
         tenths = int(m.group(2))
-        return 'GLES{0}.{1}'.format(ones, tenths), {
-            'kind': 'GLES',
-            'gl_10x_version': 10 * ones + tenths
-            }
+        return ('GLES{0}.{1}'.format(ones, tenths),
+                {'kind': 'GLES', 'gl_10x_version': 10 * ones + tenths})
 
     extension_name = 'GL_' + category_name
-    return extension_name, {
-        'kind': 'extension',
-        'extension_name': extension_name
-        }
+    return (extension_name,
+            {'kind': 'extension', 'extension_name': extension_name})
 
 
 # Data structure keeping track of which function names are known, and
@@ -354,7 +350,8 @@ class Api(object):
         if function_name:
             yield function_name, param_names, attributes
 
-    def add_function(self, name, return_type, param_names, param_types, category_string):
+    def add_function(self, name, return_type, param_names, param_types,
+                     category_string):
         category, additional_data = translate_category(category_string)
         if category not in self.categories:
             self.categories[category] = additional_data
@@ -364,8 +361,8 @@ class Api(object):
                 'return_type': return_type,
                 'param_names': param_names,
                 'param_types': param_types,
-                'categories': [category],
-                }
+                'categories': [category]
+            }
         else:
             if category not in self.functions[name]['categories']:
                 self.functions[name]['categories'].append(category)
@@ -425,13 +422,13 @@ class Api(object):
                     else:
                         raise Exception(
                             'Function {0!r} parameter {1!r} uses unrecognized '
-                            'direction {2!r}'.format(
-                                name, param_name, param_dir))
+                            'direction {2!r}'.format(name, param_name,
+                                                     param_dir))
                 else:
                     raise Exception(
                         'Function {0!r} parameter {1!r} uses unrecognized '
-                        'multiplicity {2!r}'.format(
-                            name, param_name, param_multiplicity))
+                        'multiplicity {2!r}'.format(name, param_name,
+                                                    param_multiplicity))
                 param_types[param_index] = param_type
             if len(attributes['return']) != 1:
                 raise Exception(
@@ -443,7 +440,8 @@ class Api(object):
                     'Function {0!r} contains {1} category attributes'.format(
                         name, len(attributes['category'])))
             category = attributes['category'][0]
-            self.add_function(name, return_type, param_names, param_types, category)
+            self.add_function(name, return_type, param_names, param_types,
+                              category)
             for alias in attributes['alias']:
                 self.synonyms.add_alias(name, alias)
 
@@ -469,7 +467,8 @@ class Api(object):
             if m:
                 # We do the regexp in two parts to make sure that we
                 # actually do catch all the GL_APICALLs.
-                m = re.match(r'^GL_APICALL\s*(.*)\s*GL_APIENTRY\s*gl(\w*)\s\((.*)\).*$', line)
+                m = re.match(r'^GL_APICALL\s*(.*)\s*GL_APIENTRY'
+                             '\s*gl(\w*)\s\((.*)\).*$', line)
                 return_type, name, args = m.groups()
 
                 return_type = return_type.strip()
@@ -484,7 +483,8 @@ class Api(object):
                     param_types.append(arg[:splitloc + 1])
                     param_names.append(arg[splitloc + 1:])
 
-                self.add_function(name, return_type, param_names, param_types, category)
+                self.add_function(name, return_type, param_names, param_types,
+                                  category)
 
                 # Since we don't have alias information for
                 # extensions, assume that pretty much anything
@@ -518,22 +518,19 @@ class Api(object):
                     value_int = self.enums[value_rhs]['value_int']
                 else:
                     value_int = decode_enum_value(value)
-                self.enums[name] = {
-                    'value_str': value,
-                    'value_int': value_int
-                    }
+                self.enums[name] = {'value_str': value,
+                                    'value_int': value_int}
 
     # Convert the stored API into JSON.  To make diffing easier, all
     # dictionaries are sorted by key, and all sets are sorted by set
     # element.
     def to_json(self):
-        return json.dumps({
-                'categories': self.categories,
-                'enums': self.enums,
-                'functions': self.functions,
-                'function_alias_sets':
-                    self.synonyms.get_synonym_sets(),
-                }, indent = 2, sort_keys = True, default = jsonize)
+        return json.dumps({'categories': self.categories,
+                           'enums': self.enums,
+                           'functions': self.functions,
+                           'function_alias_sets':
+                           self.synonyms.get_synonym_sets()},
+                          indent=2, sort_keys=True, default=jsonize)
 
 
 if __name__ == '__main__':
