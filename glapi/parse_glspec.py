@@ -461,7 +461,8 @@ class Api(object):
             else:
                 m = re.match(r'/\* (GL_.*) \*/', line)
                 if m:
-                    category = m.group(1).replace('GL_', '')
+                    # replace only the first occurence of 'GL_'
+                    category = m.group(1).replace('GL_', '', 1)
 
             m = re.match(r'GL_APICALL', line)
             if m:
