@@ -68,283 +68,283 @@ import os
 
 class Test(object):
     def __init__(self, interpolation_qualifier, variable, shade_model,
-		 clipping):
-	"""Get ready to generate a test using the given settings.
+                 clipping):
+        """Get ready to generate a test using the given settings.
 
-	interpolation_qualifier is a string representing the desired
-	interpolation qualifier that should appear in GLSL code
-	('flat', 'noperspective', or 'smooth'), or None if no
-	qualifier should appear.
+        interpolation_qualifier is a string representing the desired
+        interpolation qualifier that should appear in GLSL code
+        ('flat', 'noperspective', or 'smooth'), or None if no
+        qualifier should appear.
 
-	variable is the name of the variable on which to test
-	interpolation.  If the name begins with 'gl_', it should be
-	one of the four vertex shader variables that are allowed to be
-	redeclared with an interpolation qualifier (see GLSL 1.30
-	section 4.3.7 "Interpolation").  Namely: gl_FrontColor,
-	gl_BackColor, gl_FrontSecondaryColor, or
-	gl_BackSecondaryColor.
+        variable is the name of the variable on which to test
+        interpolation.  If the name begins with 'gl_', it should be
+        one of the four vertex shader variables that are allowed to be
+        redeclared with an interpolation qualifier (see GLSL 1.30
+        section 4.3.7 "Interpolation").  Namely: gl_FrontColor,
+        gl_BackColor, gl_FrontSecondaryColor, or
+        gl_BackSecondaryColor.
 
-	shade_model is which shade model the GL state should be put in
-	using the glShadeModel() command--either 'smooth' or 'flat'.
+        shade_model is which shade model the GL state should be put in
+        using the glShadeModel() command--either 'smooth' or 'flat'.
 
-	clipping is the variety of clipping which should be tested:
-	either 'fixed' to test a triangle that extends beyond the
-	fixed view volume (we test clipping against the "near" plane),
-	'vertex' to test a triangle which has one corner clipped using
-	gl_ClipVertex, or 'distance' to test a triangle which has one
-	corner clipped using gl_ClipDistance.
-	"""
-	self.interpolation_qualifier = interpolation_qualifier
-	self.vs_variable = variable
-	self.shade_model = shade_model
-	self.clipping = clipping
+        clipping is the variety of clipping which should be tested:
+        either 'fixed' to test a triangle that extends beyond the
+        fixed view volume (we test clipping against the "near" plane),
+        'vertex' to test a triangle which has one corner clipped using
+        gl_ClipVertex, or 'distance' to test a triangle which has one
+        corner clipped using gl_ClipDistance.
+        """
+        self.interpolation_qualifier = interpolation_qualifier
+        self.vs_variable = variable
+        self.shade_model = shade_model
+        self.clipping = clipping
 
-	# When colors are mapped into the fragment shader, the string
-	# 'Front' or 'Back' is dropped from the variable name, since
-	# e.g. gl_Color is mapped to gl_FrontColor for front-facing
-	# triangles, and gl_BackColor for back-facing triangles.
-	self.fs_variable = variable.replace('Front', '').replace('Back', '')
+        # When colors are mapped into the fragment shader, the string
+        # 'Front' or 'Back' is dropped from the variable name, since
+        # e.g. gl_Color is mapped to gl_FrontColor for front-facing
+        # triangles, and gl_BackColor for back-facing triangles.
+        self.fs_variable = variable.replace('Front', '').replace('Back', '')
 
-	# True if we are testing a BackColor, so we'll need to draw a
-	# back-facing triangle.
-	self.backfacing = variable.find('Back') != -1
+        # True if we are testing a BackColor, so we'll need to draw a
+        # back-facing triangle.
+        self.backfacing = variable.find('Back') != -1
 
-	# True if we are testing a built-in color variable, False if
-	# we are testing a generic vertex shader output.
-	self.builtin_variable = variable[:3] == 'gl_'
+        # True if we are testing a built-in color variable, False if
+        # we are testing a generic vertex shader output.
+        self.builtin_variable = variable[:3] == 'gl_'
 
-	# Determine whether the test requires GLSL 1.30.  If it does,
-	# use "in" and "out" to qualify shader inputs and outputs.
-	# Otherwise use the old keywords "attribute" and "varying".
-	# shader_runner will insert a #version directive based on
-	# glsl_version.
-	if self.interpolation_qualifier or self.clipping == 'distance':
-	    self.glsl_version = '1.30'
-	    self.vs_input = 'in'
-	    self.vs_output = 'out'
-	    self.fs_input = 'in'
-	else:
-	    self.glsl_version = '1.10'
-	    self.vs_input = 'attribute'
-	    self.vs_output = 'varying'
-	    self.fs_input = 'varying'
+        # Determine whether the test requires GLSL 1.30.  If it does,
+        # use "in" and "out" to qualify shader inputs and outputs.
+        # Otherwise use the old keywords "attribute" and "varying".
+        # shader_runner will insert a #version directive based on
+        # glsl_version.
+        if self.interpolation_qualifier or self.clipping == 'distance':
+            self.glsl_version = '1.30'
+            self.vs_input = 'in'
+            self.vs_output = 'out'
+            self.fs_input = 'in'
+        else:
+            self.glsl_version = '1.10'
+            self.vs_input = 'attribute'
+            self.vs_output = 'varying'
+            self.fs_input = 'varying'
 
-	# Determine the location of the near and far planes for the
-	# frustum projection.  The triangle fits between z coordinates
-	# -1 and -3; we use 1.75 as the near plane when we want to
-	# force clipping.
-	if self.clipping == 'fixed':
-	    self.frustum_near = 1.75
-	else:
-	    self.frustum_near = 1.0
-	self.frustum_far = 3.0
+        # Determine the location of the near and far planes for the
+        # frustum projection.  The triangle fits between z coordinates
+        # -1 and -3; we use 1.75 as the near plane when we want to
+        # force clipping.
+        if self.clipping == 'fixed':
+            self.frustum_near = 1.75
+        else:
+            self.frustum_near = 1.0
+        self.frustum_far = 3.0
 
-	# Determine whether we expect the GL implementation to use
-	# flatshading, non-perspective interpolation, or perspective
-	# interpolation.
-	if self.interpolation_qualifier:
-	    # According to GLSL 1.30 section 4.3.7 ("Interpolation"),
-	    # "When an interpolation qualifier is used, it overrides
-	    # settings established through the OpenGL API."
-	    self.expected_behavior = self.interpolation_qualifier
-	elif self.builtin_variable:
-	    # According to GL 3.0 section 2.19.7 ("Flatshading"), "If
-	    # a vertex shader is active, the flat shading control
-	    # applies to the built-in varying variables gl FrontColor,
-	    # gl BackColor, gl FrontSecondaryColor and gl
-	    # BackSecondaryColor.  Non-color varying variables can be
-	    # specified as being flat-shaded via the flat qualifier,
-	    # as described in section 4.3.6 of the OpenGL Shading
-	    # Language Specification."
-	    self.expected_behavior = self.shade_model
-	else:
-	    # The specs do not explicitly state how non-built-in
-	    # variables are to be interpolated in the case where no
-	    # interpolation qualifier is used.  However, it seems to
-	    # be heavily implied by the text of GL 3.0 section 2.19.6
-	    # ("Flatshading"--see above) that smooth
-	    # (perspective-correct) interpolation is intended,
-	    # regardless of the setting of glShadeModel().
-	    self.expected_behavior = 'smooth'
+        # Determine whether we expect the GL implementation to use
+        # flatshading, non-perspective interpolation, or perspective
+        # interpolation.
+        if self.interpolation_qualifier:
+            # According to GLSL 1.30 section 4.3.7 ("Interpolation"),
+            # "When an interpolation qualifier is used, it overrides
+            # settings established through the OpenGL API."
+            self.expected_behavior = self.interpolation_qualifier
+        elif self.builtin_variable:
+            # According to GL 3.0 section 2.19.7 ("Flatshading"), "If
+            # a vertex shader is active, the flat shading control
+            # applies to the built-in varying variables gl FrontColor,
+            # gl BackColor, gl FrontSecondaryColor and gl
+            # BackSecondaryColor.  Non-color varying variables can be
+            # specified as being flat-shaded via the flat qualifier,
+            # as described in section 4.3.6 of the OpenGL Shading
+            # Language Specification."
+            self.expected_behavior = self.shade_model
+        else:
+            # The specs do not explicitly state how non-built-in
+            # variables are to be interpolated in the case where no
+            # interpolation qualifier is used.  However, it seems to
+            # be heavily implied by the text of GL 3.0 section 2.19.6
+            # ("Flatshading"--see above) that smooth
+            # (perspective-correct) interpolation is intended,
+            # regardless of the setting of glShadeModel().
+            self.expected_behavior = 'smooth'
 
     def filename(self):
-	return os.path.join(
-	    'spec', 'glsl-{0}'.format(self.glsl_version),
-	    'execution', 'interpolation',
-	    'interpolation-{0}-{1}-{2}-{3}.shader_test'.format(
-		self.interpolation_qualifier or 'none', self.vs_variable,
-		self.shade_model, self.clipping or 'none'))
+        return os.path.join(
+            'spec', 'glsl-{0}'.format(self.glsl_version),
+            'execution', 'interpolation',
+            'interpolation-{0}-{1}-{2}-{3}.shader_test'.format(
+                self.interpolation_qualifier or 'none', self.vs_variable,
+                self.shade_model, self.clipping or 'none'))
 
     def vertex_data(self):
-	table = ['vertex/float/3  input_data/float/4',
-		 '-1.0 -1.0 -1.0  1.0 0.0 0.0 1.0',
-		 ' 0.0  2.0 -2.0  0.0 1.0 0.0 1.0',
-		 ' 3.0 -3.0 -3.0  0.0 0.0 1.0 1.0']
-	if not self.backfacing:
-	    # The vertices above are ordered such that the front of
-	    # the triangle faces away from the viewer.  If we are
-	    # trying to render the front face, then swap the first two
-	    # vertices.  This shows us the front face of the triangle
-	    # without changing the provoking vertex (which is the
-	    # third vertex).
-	    table = [table[0], table[2], table[1], table[3]]
-	return table
+        table = ['vertex/float/3  input_data/float/4',
+                 '-1.0 -1.0 -1.0  1.0 0.0 0.0 1.0',
+                 ' 0.0  2.0 -2.0  0.0 1.0 0.0 1.0',
+                 ' 3.0 -3.0 -3.0  0.0 0.0 1.0 1.0']
+        if not self.backfacing:
+            # The vertices above are ordered such that the front of
+            # the triangle faces away from the viewer.  If we are
+            # trying to render the front face, then swap the first two
+            # vertices.  This shows us the front face of the triangle
+            # without changing the provoking vertex (which is the
+            # third vertex).
+            table = [table[0], table[2], table[1], table[3]]
+        return table
 
     def probe_data(self):
-	# Loop over possible barycentric coordinates with a spacing of
-	# 1/num_subdivisions.  Skip points on the triangle edges and
-	# corners so that rounding does not cause us to accidentally
-	# probe a pixel that's outside the triangle.
-	num_subdivisions = 6
-	for i in xrange(1, num_subdivisions - 1):
-	    for j in xrange(1, num_subdivisions - i):
-		# Compute 3D barycentric coordinates--these will be
-		# used to compute the expected interpolated values
-		# when using smooth (perspective-correct)
-		# interpolation.  The vertex associated with b3d_0=1.0
-		# is colored red, the vertex associated with b3d_1=1.0
-		# is colored green, and the vertex associated with
-		# b3d_2=1.0 is colored blue.
-		b3d_0 = float(num_subdivisions - i - j)/num_subdivisions
-		b3d_1 = float(i)/num_subdivisions
-		b3d_2 = float(j)/num_subdivisions
-		# Compute 3D coordinates based on those barycentric
-		# coordinates.  These will be used, among other
-		# things, to determine whether this part of the
-		# triangle is clipped.
-		x3d = -b3d_0 + 3.0*b3d_2
-		y3d = -b3d_0 + 2.0*b3d_1 - 3.0*b3d_2
-		z3d = -b3d_0 - 2.0*b3d_1 - 3.0*b3d_2
-		# Use perspective division to compute 2D screen
-		# coordinates.  These will be used with "relative
-		# probe rgba", which treats the lower left corner of
-		# the screen as (0, 0) and the upper right is (1, 1).
-		x2d = (-x3d/z3d + 1.0) / 2.0
-		y2d = (-y3d/z3d + 1.0) / 2.0
-		# Finally, compute a second set of barycentric
-		# coordinates based on the 2D screen
-		# coordinates--these will be used to compute the
-		# expected interpolated values when using
-		# noperspective (screen-coordinate) interpolation.
-		b2d_0 = 1.0 - x2d - 0.5*y2d
-		b2d_1 = y2d
-		b2d_2 = x2d - 0.5*y2d
+        # Loop over possible barycentric coordinates with a spacing of
+        # 1/num_subdivisions.  Skip points on the triangle edges and
+        # corners so that rounding does not cause us to accidentally
+        # probe a pixel that's outside the triangle.
+        num_subdivisions = 6
+        for i in xrange(1, num_subdivisions - 1):
+            for j in xrange(1, num_subdivisions - i):
+                # Compute 3D barycentric coordinates--these will be
+                # used to compute the expected interpolated values
+                # when using smooth (perspective-correct)
+                # interpolation.  The vertex associated with b3d_0=1.0
+                # is colored red, the vertex associated with b3d_1=1.0
+                # is colored green, and the vertex associated with
+                # b3d_2=1.0 is colored blue.
+                b3d_0 = float(num_subdivisions - i - j)/num_subdivisions
+                b3d_1 = float(i)/num_subdivisions
+                b3d_2 = float(j)/num_subdivisions
+                # Compute 3D coordinates based on those barycentric
+                # coordinates.  These will be used, among other
+                # things, to determine whether this part of the
+                # triangle is clipped.
+                x3d = -b3d_0 + 3.0*b3d_2
+                y3d = -b3d_0 + 2.0*b3d_1 - 3.0*b3d_2
+                z3d = -b3d_0 - 2.0*b3d_1 - 3.0*b3d_2
+                # Use perspective division to compute 2D screen
+                # coordinates.  These will be used with "relative
+                # probe rgba", which treats the lower left corner of
+                # the screen as (0, 0) and the upper right is (1, 1).
+                x2d = (-x3d/z3d + 1.0) / 2.0
+                y2d = (-y3d/z3d + 1.0) / 2.0
+                # Finally, compute a second set of barycentric
+                # coordinates based on the 2D screen
+                # coordinates--these will be used to compute the
+                # expected interpolated values when using
+                # noperspective (screen-coordinate) interpolation.
+                b2d_0 = 1.0 - x2d - 0.5*y2d
+                b2d_1 = y2d
+                b2d_2 = x2d - 0.5*y2d
 
-		if self.clipping and -z3d < 1.75:
-		    # Points whose -z coordinate is less than 1.75
-		    # should be clipped.
-		    yield x2d, y2d, 0.0, 0.0, 0.0, 0.0
-		elif self.expected_behavior == 'flat':
-		    # When flatshading, all points on the triangle
-		    # should inherit the color of the third vertex,
-		    # which is blue.
-		    yield x2d, y2d, 0.0, 0.0, 1.0, 1.0
-		elif self.expected_behavior == 'noperspective':
-		    # Since the 3 triangle vertices are red, green,
-		    # and blue, the interpolated color channels should
-		    # be exactly equal to the barycentric coordinates.
-		    # For "noperspective" shading, we use the
-		    # barycentric coordinates that we computed based
-		    # on 2D screen position.
-		    yield x2d, y2d, b2d_0, b2d_1, b2d_2, 1.0
-		else:
-		    # For "smooth" (perspective correct) shading, we
-		    # use the barycentric coordinates that we used to
-		    # compute the 3D position.
-		    assert self.expected_behavior == 'smooth'
-		    yield x2d, y2d, b3d_0, b3d_1, b3d_2, 1.0
+                if self.clipping and -z3d < 1.75:
+                    # Points whose -z coordinate is less than 1.75
+                    # should be clipped.
+                    yield x2d, y2d, 0.0, 0.0, 0.0, 0.0
+                elif self.expected_behavior == 'flat':
+                    # When flatshading, all points on the triangle
+                    # should inherit the color of the third vertex,
+                    # which is blue.
+                    yield x2d, y2d, 0.0, 0.0, 1.0, 1.0
+                elif self.expected_behavior == 'noperspective':
+                    # Since the 3 triangle vertices are red, green,
+                    # and blue, the interpolated color channels should
+                    # be exactly equal to the barycentric coordinates.
+                    # For "noperspective" shading, we use the
+                    # barycentric coordinates that we computed based
+                    # on 2D screen position.
+                    yield x2d, y2d, b2d_0, b2d_1, b2d_2, 1.0
+                else:
+                    # For "smooth" (perspective correct) shading, we
+                    # use the barycentric coordinates that we used to
+                    # compute the 3D position.
+                    assert self.expected_behavior == 'smooth'
+                    yield x2d, y2d, b3d_0, b3d_1, b3d_2, 1.0
 
     def generate(self):
-	if self.builtin_variable:
-	    test = '# Test proper interpolation of {0}\n'.format(
-		self.vs_variable)
-	else:
-	    test = '# Test proper interpolation of a non-built-in variable\n'
-	if self.interpolation_qualifier:
-	    test += '# When qualified with {0!r}\n'.format(
-		self.interpolation_qualifier)
-	else:
-	    test += '# When no interpolation qualifier present\n'
-	test += '# And ShadeModel is {0!r}\n'.format(self.shade_model)
-	if self.clipping == 'fixed':
-	    test += '# And clipping via fixed planes\n'
-	elif self.clipping == 'vertex':
-	    test += '# And clipping via gl_ClipVertex\n'
-	elif self.clipping == 'distance':
-	    test += '# And clipping via gl_ClipDistance\n'
-	else:
-	    assert self.clipping is None
-	test += '[require]\n'
-	test += 'GLSL >= {0}\n'.format(self.glsl_version)
-	test += '\n'
-	test += '[vertex shader]\n'
-	test += '{0} vec4 vertex;\n'.format(self.vs_input)
-	test += '{0} vec4 input_data;\n'.format(self.vs_input)
-	if self.interpolation_qualifier or not self.builtin_variable:
-	    test += '{0} {1} vec4 {2};'.format(
-		self.interpolation_qualifier or '',
-		self.vs_output, self.vs_variable).strip() + '\n'
-	test += 'void main()\n'
-	test += '{\n'
-	test += '  gl_Position = gl_ModelViewProjectionMatrix * vertex;\n'
-	test += '  {0} = input_data;\n'.format(self.vs_variable)
-	if self.clipping == 'distance':
-	    test += '  gl_ClipDistance[0] = -1.75 - vertex.z;\n'
-	elif self.clipping == 'vertex':
-	    test += '  gl_ClipVertex = vertex;\n'
-	test += '}\n'
-	test += '\n'
-	test += '[fragment shader]\n'
-	if self.interpolation_qualifier or not self.builtin_variable:
-	    test += '{0} {1} vec4 {2};'.format(
-		self.interpolation_qualifier or '',
-		self.fs_input, self.fs_variable).strip() + '\n'
-	test += 'void main()\n'
-	test += '{\n'
-	test += '  gl_FragColor = {0};\n'.format(self.fs_variable)
-	test += '}\n'
-	test += '\n'
-	test += '[vertex data]\n'
-	test += ''.join(s + '\n' for s in self.vertex_data())
-	test += '\n'
-	test += '[test]\n'
-	test += 'frustum -{0} {0} -{0} {0} {0} {1}\n'.format(
-	    self.frustum_near, self.frustum_far)
-	test += 'clear color 0.0 0.0 0.0 0.0\n'
-	test += 'clear\n'
-	test += 'enable GL_VERTEX_PROGRAM_TWO_SIDE\n'
-	test += 'shade model {0}\n'.format(self.shade_model)
-	if self.clipping == 'distance' or self.clipping == 'vertex':
-	    test += 'enable GL_CLIP_PLANE0\n'
-	if self.clipping == 'vertex':
-	    test += 'clip plane 0 0.0 0.0 -1.0 -1.75\n'
-	test += 'draw arrays GL_TRIANGLES 0 3\n'
-	for x, y, r, g, b, a in self.probe_data():
-	    test += ('relative probe rgba ({0}, {1}) ({2}, {3}, {4}, {5})\n'
-		     .format(x, y, r, g, b, a))
-	filename = self.filename()
-	dirname = os.path.dirname(filename)
-	if not os.path.exists(dirname):
-	    os.makedirs(dirname)
-	with open(filename, 'w') as f:
-	    f.write(test)
+        if self.builtin_variable:
+            test = '# Test proper interpolation of {0}\n'.format(
+                self.vs_variable)
+        else:
+            test = '# Test proper interpolation of a non-built-in variable\n'
+        if self.interpolation_qualifier:
+            test += '# When qualified with {0!r}\n'.format(
+                self.interpolation_qualifier)
+        else:
+            test += '# When no interpolation qualifier present\n'
+        test += '# And ShadeModel is {0!r}\n'.format(self.shade_model)
+        if self.clipping == 'fixed':
+            test += '# And clipping via fixed planes\n'
+        elif self.clipping == 'vertex':
+            test += '# And clipping via gl_ClipVertex\n'
+        elif self.clipping == 'distance':
+            test += '# And clipping via gl_ClipDistance\n'
+        else:
+            assert self.clipping is None
+        test += '[require]\n'
+        test += 'GLSL >= {0}\n'.format(self.glsl_version)
+        test += '\n'
+        test += '[vertex shader]\n'
+        test += '{0} vec4 vertex;\n'.format(self.vs_input)
+        test += '{0} vec4 input_data;\n'.format(self.vs_input)
+        if self.interpolation_qualifier or not self.builtin_variable:
+            test += '{0} {1} vec4 {2};'.format(
+                self.interpolation_qualifier or '',
+                self.vs_output, self.vs_variable).strip() + '\n'
+        test += 'void main()\n'
+        test += '{\n'
+        test += '  gl_Position = gl_ModelViewProjectionMatrix * vertex;\n'
+        test += '  {0} = input_data;\n'.format(self.vs_variable)
+        if self.clipping == 'distance':
+            test += '  gl_ClipDistance[0] = -1.75 - vertex.z;\n'
+        elif self.clipping == 'vertex':
+            test += '  gl_ClipVertex = vertex;\n'
+        test += '}\n'
+        test += '\n'
+        test += '[fragment shader]\n'
+        if self.interpolation_qualifier or not self.builtin_variable:
+            test += '{0} {1} vec4 {2};'.format(
+                self.interpolation_qualifier or '',
+                self.fs_input, self.fs_variable).strip() + '\n'
+        test += 'void main()\n'
+        test += '{\n'
+        test += '  gl_FragColor = {0};\n'.format(self.fs_variable)
+        test += '}\n'
+        test += '\n'
+        test += '[vertex data]\n'
+        test += ''.join(s + '\n' for s in self.vertex_data())
+        test += '\n'
+        test += '[test]\n'
+        test += 'frustum -{0} {0} -{0} {0} {0} {1}\n'.format(
+            self.frustum_near, self.frustum_far)
+        test += 'clear color 0.0 0.0 0.0 0.0\n'
+        test += 'clear\n'
+        test += 'enable GL_VERTEX_PROGRAM_TWO_SIDE\n'
+        test += 'shade model {0}\n'.format(self.shade_model)
+        if self.clipping == 'distance' or self.clipping == 'vertex':
+            test += 'enable GL_CLIP_PLANE0\n'
+        if self.clipping == 'vertex':
+            test += 'clip plane 0 0.0 0.0 -1.0 -1.75\n'
+        test += 'draw arrays GL_TRIANGLES 0 3\n'
+        for x, y, r, g, b, a in self.probe_data():
+            test += ('relative probe rgba ({0}, {1}) ({2}, {3}, {4}, {5})\n'
+                     .format(x, y, r, g, b, a))
+        filename = self.filename()
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(filename, 'w') as f:
+            f.write(test)
 
 
 def all_tests():
     for interpolation_qualifier in ['flat', 'smooth', 'noperspective', None]:
-	for variable in ['gl_FrontColor', 'gl_BackColor',
-			 'gl_FrontSecondaryColor', 'gl_BackSecondaryColor',
-			 'other']:
-	    for shade_model in ['smooth', 'flat']:
-		for clipping in ['vertex', 'distance', 'fixed', None]:
-		    yield Test(interpolation_qualifier, variable, shade_model,
-			       clipping)
+        for variable in ['gl_FrontColor', 'gl_BackColor',
+                         'gl_FrontSecondaryColor', 'gl_BackSecondaryColor',
+                         'other']:
+            for shade_model in ['smooth', 'flat']:
+                for clipping in ['vertex', 'distance', 'fixed', None]:
+                    yield Test(interpolation_qualifier, variable, shade_model,
+                               clipping)
 
 
 def main():
     for test in all_tests():
-	test.generate()
-	print test.filename()
+        test.generate()
+        print test.filename()
 
 
 if __name__ == '__main__':
