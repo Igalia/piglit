@@ -131,32 +131,33 @@ void main()
             mode = 'varying'
             dest = "gl_FragColor"
 
-        test = test.format(self = self,
-                           components = components,
-                           dest = dest,
-                           var_as_vec4 = var_as_vec4,
-                           mode = mode)
+        test = test.format(self=self,
+                           components=components,
+                           dest=dest,
+                           var_as_vec4=var_as_vec4,
+                           mode=mode)
 
         filename = self.filename()
-	dirname = os.path.dirname(filename)
-	if not os.path.exists(dirname):
-	    os.makedirs(dirname)
-	with open(filename, 'w') as f:
-	    f.write(test)
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(filename, 'w') as f:
+            f.write(test)
 
 
 def all_tests():
-    for type_name in ['float', 'vec2',  'vec3',  'vec4',
-                 'int',   'ivec2', 'ivec3', 'ivec4']:
+    for type_name in ['float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2', 'ivec3',
+                      'ivec4']:
         for op in ["++t", "--t", "t++", "t--"]:
             for usage in ['assignment', 'out-parameter']:
-                          for shader_target in ['vert', 'frag']:
-                              yield Test(type_name, op, usage, shader_target)
+                for shader_target in ['vert', 'frag']:
+                    yield Test(type_name, op, usage, shader_target)
+
 
 def main():
     for test in all_tests():
-	test.generate()
-	print test.filename()
+        test.generate()
+        print test.filename()
 
 
 if __name__ == '__main__':
