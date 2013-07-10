@@ -52,6 +52,7 @@ import os
 import os.path
 import sys
 
+
 def compute_offset_and_scale(test_vectors):
     """Compute scale and offset values such that for each result in
     test_vectors, (result - offset) * scale is in the range [0.25,
@@ -65,11 +66,10 @@ def compute_offset_and_scale(test_vectors):
     center = (hi + low)/2.0
     span *= 2.0
     if span < 1.0:
-	span = 1.0
+        span = 1.0
     offset = center - span/2.0
     scale = 1.0/span
     return offset, scale
-
 
 
 def shader_runner_format(values):
@@ -79,12 +79,11 @@ def shader_runner_format(values):
     """
     transformed_values = []
     for value in values:
-	if isinstance(value, (bool, np.bool_)):
-	    transformed_values.append(int(value))
-	else:
-	    transformed_values.append(value)
+        if isinstance(value, (bool, np.bool_)):
+            transformed_values.append(int(value))
+        else:
+            transformed_values.append(value)
     return ' '.join(repr(x) for x in transformed_values)
-
 
 
 def shader_runner_type(glsl_type):
@@ -94,15 +93,14 @@ def shader_runner_type(glsl_type):
     matrices are written in "matNxN" form.
     """
     if glsl_type.base_type == glsl_bool:
-	if glsl_type.is_scalar:
-	    return 'int'
-	else:
-	    return 'ivec{0}'.format(glsl_type.num_rows)
+        if glsl_type.is_scalar:
+            return 'int'
+        else:
+            return 'ivec{0}'.format(glsl_type.num_rows)
     elif glsl_type.is_matrix:
-	return 'mat{0}x{1}'.format(glsl_type.num_cols, glsl_type.num_rows)
+        return 'mat{0}x{1}'.format(glsl_type.num_cols, glsl_type.num_rows)
     else:
-	return str(glsl_type)
-
+        return str(glsl_type)
 
 
 class Comparator(object):
@@ -112,31 +110,30 @@ class Comparator(object):
     __metaclass__ = abc.ABCMeta
 
     def make_additional_declarations(self):
-	"""Return additional declarations, if any, that are needed in
-	the shader program.
-	"""
-	return ''
+        """Return additional declarations, if any, that are needed in
+        the shader program.
+        """
+        return ''
 
     @abc.abstractmethod
     def make_result_handler(self, invocation, output_var):
-	"""Return the shader code that is needed to produce the result
-	and store it in output_var.
+        """Return the shader code that is needed to produce the result
+        and store it in output_var.
 
-	invocation is the GLSL code to compute the output of the
-	built-in function.
-	"""
+        invocation is the GLSL code to compute the output of the
+        built-in function.
+        """
 
     @abc.abstractmethod
     def make_result_test(self, test_num, test_vector):
-	"""Return the shader_runner test code that is needed to test a
-	single test vector.
-	"""
+        """Return the shader_runner test code that is needed to test a
+        single test vector.
+        """
 
     def testname_suffix(self):
-	"""Return a string to be used as a suffix on the test name to
-	distinguish it from tests using other comparators."""
-	return ''
-
+        """Return a string to be used as a suffix on the test name to
+        distinguish it from tests using other comparators."""
+        return ''
 
 
 class BoolComparator(Comparator):
@@ -149,33 +146,32 @@ class BoolComparator(Comparator):
         output_var = vec4(result, 0.0, ...);
     """
     def __init__(self, signature):
-	assert not signature.rettype.is_matrix
-	self.__signature = signature
-	self.__padding = 4 - signature.rettype.num_rows
+        assert not signature.rettype.is_matrix
+        self.__signature = signature
+        self.__padding = 4 - signature.rettype.num_rows
 
     def make_result_handler(self, invocation, output_var):
-	statements = '  {0} result = {1};\n'.format(
-	    self.__signature.rettype, invocation)
-	statements += '  {0} = vec4(result{1});\n'.format(
-	    output_var, ', 0.0' * self.__padding)
-	return statements
+        statements = '  {0} result = {1};\n'.format(
+            self.__signature.rettype, invocation)
+        statements += '  {0} = vec4(result{1});\n'.format(
+            output_var, ', 0.0' * self.__padding)
+        return statements
 
     def convert_to_float(self, value):
-	"""Convert the given vector or scalar value to a list of
-	floats representing the expected color produced by the test.
-	"""
-	value = value*1.0 # convert bools to floats
-	value = column_major_values(value)
-	value += [0.0] * self.__padding
-	return value
+        """Convert the given vector or scalar value to a list of
+        floats representing the expected color produced by the test.
+        """
+        value = value*1.0  # convert bools to floats
+        value = column_major_values(value)
+        value += [0.0] * self.__padding
+        return value
 
     def make_result_test(self, test_num, test_vector, draw):
-	test = draw
-	test += 'probe rgba {0} 0 {1}\n'.format(
-	    test_num,
-	    shader_runner_format(self.convert_to_float(test_vector.result)))
-	return test
-
+        test = draw
+        test += 'probe rgba {0} 0 {1}\n'.format(
+            test_num,
+            shader_runner_format(self.convert_to_float(test_vector.result)))
+        return test
 
 
 class BoolIfComparator(Comparator):
@@ -190,35 +186,36 @@ class BoolIfComparator(Comparator):
           output_var = vecp(0.0, 0.0, 1.0, 1.0);
     """
     def __init__(self, signature):
-	assert signature.rettype == glsl_bool
-	self.__padding = 4 - signature.rettype.num_rows
+        assert signature.rettype == glsl_bool
+        self.__padding = 4 - signature.rettype.num_rows
 
     def make_result_handler(self, invocation, output_var):
-	statements = '  if({0})\n'.format(invocation)
-	statements += '    {0} = vec4(1.0, 1.0, 0.0, 1.0);\n'.format(output_var)
-	statements += '  else\n'
-	statements += '    {0} = vec4(0.0, 0.0, 1.0, 1.0);\n'.format(output_var)
-	return statements
+        statements = '  if({0})\n'.format(invocation)
+        statements += '    {0} = vec4(1.0, 1.0, 0.0, 1.0);\n'.format(
+            output_var)
+        statements += '  else\n'
+        statements += '    {0} = vec4(0.0, 0.0, 1.0, 1.0);\n'.format(
+            output_var)
+        return statements
 
     def convert_to_float(self, value):
-	"""Convert the given vector or scalar value to a list of
-	floats representing the expected color produced by the test.
-	"""
-	if value:
-	    return [1.0, 1.0, 0.0, 1.0]
-	else:
-	    return [0.0, 0.0, 1.0, 1.0]
+        """Convert the given vector or scalar value to a list of
+        floats representing the expected color produced by the test.
+        """
+        if value:
+            return [1.0, 1.0, 0.0, 1.0]
+        else:
+            return [0.0, 0.0, 1.0, 1.0]
 
     def make_result_test(self, test_num, test_vector, draw):
-	test = draw
-	test += 'probe rgba {0} 0 {1}\n'.format(
-	    test_num,
-	    shader_runner_format(self.convert_to_float(test_vector.result)))
-	return test
+        test = draw
+        test += 'probe rgba {0} 0 {1}\n'.format(
+            test_num,
+            shader_runner_format(self.convert_to_float(test_vector.result)))
+        return test
 
     def testname_suffix(self):
-	return '-using-if'
-
+        return '-using-if'
 
 
 class IntComparator(Comparator):
@@ -232,28 +229,27 @@ class IntComparator(Comparator):
                                         : vec4(1.0, 0.0, 0.0, 1.0);
     """
     def __init__(self, signature):
-	self.__signature = signature
+        self.__signature = signature
 
     def make_additional_declarations(self):
-	return 'uniform {0} expected;\n'.format(self.__signature.rettype)
+        return 'uniform {0} expected;\n'.format(self.__signature.rettype)
 
     def make_result_handler(self, invocation, output_var):
-	statements = '  {0} result = {1};\n'.format(
-	    self.__signature.rettype, invocation)
-	statements += '  {v} = {cond} ? {green} : {red};\n'.format(
-	    v=output_var, cond='result == expected',
-	    green='vec4(0.0, 1.0, 0.0, 1.0)',
-	    red='vec4(1.0, 0.0, 0.0, 1.0)')
-	return statements
+        statements = '  {0} result = {1};\n'.format(
+            self.__signature.rettype, invocation)
+        statements += '  {v} = {cond} ? {green} : {red};\n'.format(
+            v=output_var, cond='result == expected',
+            green='vec4(0.0, 1.0, 0.0, 1.0)',
+            red='vec4(1.0, 0.0, 0.0, 1.0)')
+        return statements
 
     def make_result_test(self, test_num, test_vector, draw):
-	test = 'uniform {0} expected {1}\n'.format(
-	    shader_runner_type(self.__signature.rettype),
-	    shader_runner_format(column_major_values(test_vector.result)))
-	test += draw
-	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
-	return test
-
+        test = 'uniform {0} expected {1}\n'.format(
+            shader_runner_type(self.__signature.rettype),
+            shader_runner_format(column_major_values(test_vector.result)))
+        test += draw
+        test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+        return test
 
 
 class FloatComparator(Comparator):
@@ -267,63 +263,62 @@ class FloatComparator(Comparator):
                      ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
     """
     def __init__(self, signature):
-	self.__signature = signature
+        self.__signature = signature
 
     def make_additional_declarations(self):
-	decls = 'uniform float tolerance;\n'
-	decls += 'uniform {0} expected;\n'.format(self.__signature.rettype)
-	return decls
+        decls = 'uniform float tolerance;\n'
+        decls += 'uniform {0} expected;\n'.format(self.__signature.rettype)
+        return decls
 
     def make_indexers(self):
-	"""Build a list of strings which index into every possible
-	value of the result.  For example, if the result is a vec2,
-	then build the indexers ['[0]', '[1]'].
-	"""
-	if self.__signature.rettype.num_cols == 1:
-	    col_indexers = ['']
-	else:
-	    col_indexers = ['[{0}]'.format(i)
-			    for i in xrange(self.__signature.rettype.num_cols)]
-	if self.__signature.rettype.num_rows == 1:
-	    row_indexers = ['']
-	else:
-	    row_indexers = ['[{0}]'.format(i)
-			    for i in xrange(self.__signature.rettype.num_rows)]
-	return [col_indexer + row_indexer
-		for col_indexer in col_indexers
-		for row_indexer in row_indexers]
+        """Build a list of strings which index into every possible
+        value of the result.  For example, if the result is a vec2,
+        then build the indexers ['[0]', '[1]'].
+        """
+        if self.__signature.rettype.num_cols == 1:
+            col_indexers = ['']
+        else:
+            col_indexers = ['[{0}]'.format(i)
+                            for i in xrange(self.__signature.rettype.num_cols)]
+        if self.__signature.rettype.num_rows == 1:
+            row_indexers = ['']
+        else:
+            row_indexers = ['[{0}]'.format(i)
+                            for i in xrange(self.__signature.rettype.num_rows)]
+        return [col_indexer + row_indexer
+                for col_indexer in col_indexers
+                for row_indexer in row_indexers]
 
     def make_result_handler(self, invocation, output_var):
-	statements = '  {0} result = {1};\n'.format(
-	    self.__signature.rettype, invocation)
-	# Can't use distance when testing itself, or when the rettype
-	# is a matrix.
-	if self.__signature.name == 'distance' or \
-		self.__signature.rettype.is_matrix:
-	    statements += '  {0} residual = result - expected;\n'.format(
-		self.__signature.rettype)
-	    statements += '  float error_sq = {0};\n'.format(
-		' + '.join(
-		    'residual{0} * residual{0}'.format(indexer)
-		    for indexer in self.make_indexers()))
-	    condition = 'error_sq <= tolerance * tolerance'
-	else:
-	    condition = 'distance(result, expected) <= tolerance'
-	statements += '  {v} = {cond} ? {green} : {red};\n'.format(
-	    v=output_var, cond=condition, green='vec4(0.0, 1.0, 0.0, 1.0)',
-	    red='vec4(1.0, 0.0, 0.0, 1.0)')
-	return statements
+        statements = '  {0} result = {1};\n'.format(
+            self.__signature.rettype, invocation)
+        # Can't use distance when testing itself, or when the rettype
+        # is a matrix.
+        if self.__signature.name == 'distance' or \
+                self.__signature.rettype.is_matrix:
+            statements += '  {0} residual = result - expected;\n'.format(
+                self.__signature.rettype)
+            statements += '  float error_sq = {0};\n'.format(
+                ' + '.join(
+                    'residual{0} * residual{0}'.format(indexer)
+                    for indexer in self.make_indexers()))
+            condition = 'error_sq <= tolerance * tolerance'
+        else:
+            condition = 'distance(result, expected) <= tolerance'
+        statements += '  {v} = {cond} ? {green} : {red};\n'.format(
+            v=output_var, cond=condition, green='vec4(0.0, 1.0, 0.0, 1.0)',
+            red='vec4(1.0, 0.0, 0.0, 1.0)')
+        return statements
 
     def make_result_test(self, test_num, test_vector, draw):
-	test = 'uniform {0} expected {1}\n'.format(
-	    shader_runner_type(self.__signature.rettype),
-	    shader_runner_format(column_major_values(test_vector.result)))
-	test += 'uniform float tolerance {0}\n'.format(
-	    shader_runner_format([test_vector.tolerance]))
-	test += draw
-	test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
-	return test
-
+        test = 'uniform {0} expected {1}\n'.format(
+            shader_runner_type(self.__signature.rettype),
+            shader_runner_format(column_major_values(test_vector.result)))
+        test += 'uniform float tolerance {0}\n'.format(
+            shader_runner_format([test_vector.tolerance]))
+        test += draw
+        test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+        return test
 
 
 class ShaderTest(object):
@@ -335,32 +330,32 @@ class ShaderTest(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, signature, test_vectors, use_if):
-	"""Prepare to build a test for a single built-in.  signature
-	is the signature of the built-in (a key from the
-	builtin_function.test_suite dict), and test_vectors is the
-	list of test vectors for testing the given builtin (the
-	corresponding value from the builtin_function.test_suite
-	dict).
+        """Prepare to build a test for a single built-in.  signature
+        is the signature of the built-in (a key from the
+        builtin_function.test_suite dict), and test_vectors is the
+        list of test vectors for testing the given builtin (the
+        corresponding value from the builtin_function.test_suite
+        dict).
 
-	If use_if is True, then the generated test checks the result
-	by using it in an if statement--this only works for builtins
-	returning bool.
-	"""
-	self._signature = signature
-	self._test_vectors = test_vectors
-	if use_if:
-	    self._comparator = BoolIfComparator(signature)
-	elif signature.rettype.base_type == glsl_bool:
-	    self._comparator = BoolComparator(signature)
-	elif signature.rettype.base_type == glsl_float:
-	    self._comparator = FloatComparator(signature)
-	elif signature.rettype.base_type in (glsl_int, glsl_uint):
-	    self._comparator = IntComparator(signature)
-	else:
-	    raise Exception('Unexpected rettype {0}'.format(signature.rettype))
+        If use_if is True, then the generated test checks the result
+        by using it in an if statement--this only works for builtins
+        returning bool.
+        """
+        self._signature = signature
+        self._test_vectors = test_vectors
+        if use_if:
+            self._comparator = BoolIfComparator(signature)
+        elif signature.rettype.base_type == glsl_bool:
+            self._comparator = BoolComparator(signature)
+        elif signature.rettype.base_type == glsl_float:
+            self._comparator = FloatComparator(signature)
+        elif signature.rettype.base_type in (glsl_int, glsl_uint):
+            self._comparator = IntComparator(signature)
+        else:
+            raise Exception('Unexpected rettype {0}'.format(signature.rettype))
 
     def glsl_version(self):
-	return self._signature.version_introduced
+        return self._signature.version_introduced
 
     def draw_command(self):
         if self.glsl_version() >= 140:
@@ -369,89 +364,89 @@ class ShaderTest(object):
             return 'draw rect -1 -1 2 2\n'
 
     def make_additional_requirements(self):
-	"""Return a string that should be included in the test's
-	[require] section.
-	"""
-	return ''
+        """Return a string that should be included in the test's
+        [require] section.
+        """
+        return ''
 
     @abc.abstractmethod
     def test_prefix(self):
-	"""Return the prefix that should be used in the test file name
-	to identify the type of test, e.g. "vs" for a vertex shader
-	test.
-	"""
+        """Return the prefix that should be used in the test file name
+        to identify the type of test, e.g. "vs" for a vertex shader
+        test.
+        """
 
     @abc.abstractmethod
     def make_vertex_shader(self):
-	"""Return the vertex shader for this test."""
+        """Return the vertex shader for this test."""
 
     def make_geometry_shader(self):
-	"""Return the geometry shader for this test (or None if this
-	test doesn't require a geometry shader).  No need to
-	reimplement this function in classes that don't use geometry
-	shaders.
-	"""
-	return None
+        """Return the geometry shader for this test (or None if this
+        test doesn't require a geometry shader).  No need to
+        reimplement this function in classes that don't use geometry
+        shaders.
+        """
+        return None
 
     def make_geometry_layout(self):
-	"""Return the geometry layout for this test (or None if this
-	test doesn't require a geometry layout section).  No need to
-	reimplement this function in classes that don't use geometry
-	shaders.
-	"""
-	return None
+        """Return the geometry layout for this test (or None if this
+        test doesn't require a geometry layout section).  No need to
+        reimplement this function in classes that don't use geometry
+        shaders.
+        """
+        return None
 
     @abc.abstractmethod
     def make_fragment_shader(self):
-	"""Return the fragment shader for this test."""
+        """Return the fragment shader for this test."""
 
     def make_test_shader(self, additional_declarations, prefix_statements,
-			 output_var, suffix_statements):
-	"""Generate the shader code necessary to test the built-in.
-	additional_declarations is a string containing any
-	declarations that need to be before the main() function of the
-	shader.  prefix_statements is a string containing any
-	additional statements than need to be inside the main()
-	function of the shader, before the built-in function is
-	called.  output_var is the variable that the result of the
-	built-in function should be assigned to, after conversion to a
-	vec4.  suffix_statements is a string containing any additional
-	statements that need to be inside the main() funciton of the
-	shader, after the built-in function is called.
-	"""
-	shader = additional_declarations
-	for i in xrange(len(self._signature.argtypes)):
-	    shader += 'uniform {0} arg{1};\n'.format(
-		self._signature.argtypes[i], i)
-	shader += self._comparator.make_additional_declarations()
-	shader += '\n'
-	shader += 'void main()\n'
-	shader += '{\n'
-	shader += prefix_statements
-	invocation = self._signature.template.format(
-	    *['arg{0}'.format(i)
-	      for i in xrange(len(self._signature.argtypes))])
-	shader += self._comparator.make_result_handler(invocation, output_var)
-	shader += suffix_statements
-	shader += '}\n'
-	return shader
+                         output_var, suffix_statements):
+        """Generate the shader code necessary to test the built-in.
+        additional_declarations is a string containing any
+        declarations that need to be before the main() function of the
+        shader.  prefix_statements is a string containing any
+        additional statements than need to be inside the main()
+        function of the shader, before the built-in function is
+        called.  output_var is the variable that the result of the
+        built-in function should be assigned to, after conversion to a
+        vec4.  suffix_statements is a string containing any additional
+        statements that need to be inside the main() funciton of the
+        shader, after the built-in function is called.
+        """
+        shader = additional_declarations
+        for i in xrange(len(self._signature.argtypes)):
+            shader += 'uniform {0} arg{1};\n'.format(
+                self._signature.argtypes[i], i)
+        shader += self._comparator.make_additional_declarations()
+        shader += '\n'
+        shader += 'void main()\n'
+        shader += '{\n'
+        shader += prefix_statements
+        invocation = self._signature.template.format(
+            *['arg{0}'.format(i)
+              for i in xrange(len(self._signature.argtypes))])
+        shader += self._comparator.make_result_handler(invocation, output_var)
+        shader += suffix_statements
+        shader += '}\n'
+        return shader
 
     def make_test(self):
-	"""Make the complete shader_runner test file, and return it as
-	a string.
-	"""
-	test = ''
-	for test_num, test_vector in enumerate(self._test_vectors):
-	    for i in xrange(len(test_vector.arguments)):
-		test += 'uniform {0} arg{1} {2}\n'.format(
-		    shader_runner_type(self._signature.argtypes[i]),
-		    i, shader_runner_format(
-			column_major_values(test_vector.arguments[i])))
-	    # Note: shader_runner uses a 250x250 window so we must
-	    # ensure that test_num <= 250.
-	    test += self._comparator.make_result_test(
-		test_num % 250, test_vector, self.draw_command())
-	return test
+        """Make the complete shader_runner test file, and return it as
+        a string.
+        """
+        test = ''
+        for test_num, test_vector in enumerate(self._test_vectors):
+            for i in xrange(len(test_vector.arguments)):
+                test += 'uniform {0} arg{1} {2}\n'.format(
+                    shader_runner_type(self._signature.argtypes[i]),
+                    i, shader_runner_format(
+                        column_major_values(test_vector.arguments[i])))
+            # Note: shader_runner uses a 250x250 window so we must
+            # ensure that test_num <= 250.
+            test += self._comparator.make_result_test(
+                test_num % 250, test_vector, self.draw_command())
+        return test
 
     def make_vbo_data(self):
         # Starting with GLSL 1.40/GL 3.1, we need to use VBOs and
@@ -469,47 +464,47 @@ class ShaderTest(object):
         return vbo
 
     def filename(self):
-	argtype_names = '-'.join(
-	    str(argtype) for argtype in self._signature.argtypes)
-	return os.path.join(
-	    'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
-	    'execution', 'built-in-functions',
-	    '{0}-{1}-{2}{3}.shader_test'.format(
-		self.test_prefix(), self._signature.name, argtype_names,
-		self._comparator.testname_suffix()))
+        argtype_names = '-'.join(
+            str(argtype) for argtype in self._signature.argtypes)
+        return os.path.join(
+            'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
+            'execution', 'built-in-functions',
+            '{0}-{1}-{2}{3}.shader_test'.format(
+                self.test_prefix(), self._signature.name, argtype_names,
+                self._comparator.testname_suffix()))
 
     def generate_shader_test(self):
-	"""Generate the test and write it to the output file."""
-	shader_test = '[require]\n'
-	shader_test += 'GLSL >= {0:1.2f}\n'.format(float(self.glsl_version()) / 100)
-	shader_test += self.make_additional_requirements()
-	shader_test += '\n'
-	shader_test += '[vertex shader]\n'
-	shader_test += self.make_vertex_shader()
-	shader_test += '\n'
-	gs = self.make_geometry_shader()
-	if gs:
-	    shader_test += '[geometry shader]\n'
-	    shader_test += gs
-	    shader_test += '\n'
-	gl = self.make_geometry_layout()
-	if gl:
-	    shader_test += '[geometry layout]\n'
-	    shader_test += gl
-	    shader_test += '\n'
-	shader_test += '[fragment shader]\n'
-	shader_test += self.make_fragment_shader()
-	shader_test += '\n'
+        """Generate the test and write it to the output file."""
+        shader_test = '[require]\n'
+        shader_test += 'GLSL >= {0:1.2f}\n'.format(
+            float(self.glsl_version()) / 100)
+        shader_test += self.make_additional_requirements()
+        shader_test += '\n'
+        shader_test += '[vertex shader]\n'
+        shader_test += self.make_vertex_shader()
+        shader_test += '\n'
+        gs = self.make_geometry_shader()
+        if gs:
+            shader_test += '[geometry shader]\n'
+            shader_test += gs
+            shader_test += '\n'
+        gl = self.make_geometry_layout()
+        if gl:
+            shader_test += '[geometry layout]\n'
+            shader_test += gl
+            shader_test += '\n'
+        shader_test += '[fragment shader]\n'
+        shader_test += self.make_fragment_shader()
+        shader_test += '\n'
         shader_test += self.make_vbo_data()
-	shader_test += '[test]\n'
-	shader_test += self.make_test()
-	filename = self.filename()
-	dirname = os.path.dirname(filename)
-	if not os.path.exists(dirname):
-	    os.makedirs(dirname)
-	with open(filename, 'w') as f:
-	    f.write(shader_test)
-
+        shader_test += '[test]\n'
+        shader_test += self.make_test()
+        filename = self.filename()
+        dirname = os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        with open(filename, 'w') as f:
+            f.write(shader_test)
 
 
 class VertexShaderTest(ShaderTest):
@@ -517,7 +512,7 @@ class VertexShaderTest(ShaderTest):
     shader.
     """
     def test_prefix(self):
-	return 'vs'
+        return 'vs'
 
     def make_vertex_shader(self):
         if self.glsl_version() >= 140:
@@ -533,15 +528,14 @@ class VertexShaderTest(ShaderTest):
                 'color', '')
 
     def make_fragment_shader(self):
-	shader = '''varying vec4 color;
+        shader = '''varying vec4 color;
 
 void main()
 {
   gl_FragColor = color;
 }
 '''
-	return shader
-
+        return shader
 
 
 class GeometryShaderTest(ShaderTest):
@@ -549,59 +543,58 @@ class GeometryShaderTest(ShaderTest):
     geometry shader.
     """
     def test_prefix(self):
-	return 'gs'
+        return 'gs'
 
     def make_additional_requirements(self):
-	return 'GL_ARB_geometry_shader4\n'
+        return 'GL_ARB_geometry_shader4\n'
 
     def make_vertex_shader(self):
-	shader = ''
-	if self.glsl_version() >= 140:
-	    shader += "in vec4 vertex;\n"
-
-	shader += "void main()\n"
-	shader += "{\n"
+        shader = ''
         if self.glsl_version() >= 140:
-            shader += "	gl_Position = vertex;\n"
+            shader += "in vec4 vertex;\n"
+
+        shader += "void main()\n"
+        shader += "{\n"
+        if self.glsl_version() >= 140:
+            shader += "        gl_Position = vertex;\n"
         else:
-            shader += "	gl_Position = gl_Vertex;\n"
+            shader += "        gl_Position = gl_Vertex;\n"
         shader += "}\n"
 
-	return shader
+        return shader
 
     def make_geometry_shader(self):
-	additional_declarations = \
-	    '#extension GL_ARB_geometry_shader4: enable\n'
-	if self.glsl_version() >= 130:
-	    additional_declarations += 'out vec4 color;\n'
-	else:
-	    additional_declarations += 'varying out vec4 color;\n'
-	return self.make_test_shader(
-	    additional_declarations,
-	    '  vec4 tmp_color;\n',
-	    'tmp_color',
-	    '  for (int i = 0; i < gl_VerticesIn; i++) {\n'
-	    '    gl_Position = gl_PositionIn[i];\n'
-	    '    color = tmp_color;\n'
-	    '    EmitVertex();\n'
-	    '  }\n')
+        additional_declarations = \
+            '#extension GL_ARB_geometry_shader4: enable\n'
+        if self.glsl_version() >= 130:
+            additional_declarations += 'out vec4 color;\n'
+        else:
+            additional_declarations += 'varying out vec4 color;\n'
+        return self.make_test_shader(
+            additional_declarations,
+            '  vec4 tmp_color;\n',
+            'tmp_color',
+            '  for (int i = 0; i < gl_VerticesIn; i++) {\n'
+            '    gl_Position = gl_PositionIn[i];\n'
+            '    color = tmp_color;\n'
+            '    EmitVertex();\n'
+            '  }\n')
 
     def make_geometry_layout(self):
-	layout = 'input type GL_TRIANGLES\n'
-	layout += 'output type GL_TRIANGLE_STRIP\n'
-	layout += 'vertices out 3\n'
-	return layout
+        layout = 'input type GL_TRIANGLES\n'
+        layout += 'output type GL_TRIANGLE_STRIP\n'
+        layout += 'vertices out 3\n'
+        return layout
 
     def make_fragment_shader(self):
-	shader = '''varying vec4 color;
+        shader = '''varying vec4 color;
 
 void main()
 {
   gl_FragColor = color;
 }
 '''
-	return shader
-
+        return shader
 
 
 class FragmentShaderTest(ShaderTest):
@@ -609,37 +602,35 @@ class FragmentShaderTest(ShaderTest):
     fragment shader.
     """
     def test_prefix(self):
-	return 'fs'
+        return 'fs'
 
     def make_vertex_shader(self):
-	shader = ""
+        shader = ""
         if self.glsl_version() >= 140:
             shader += "in vec4 vertex;\n"
 
-	shader += "void main()\n"
+        shader += "void main()\n"
         shader += "{\n"
         if self.glsl_version() >= 140:
-            shader += "	gl_Position = vertex;\n"
+            shader += "        gl_Position = vertex;\n"
         else:
-            shader += "	gl_Position = gl_Vertex;\n"
+            shader += "        gl_Position = gl_Vertex;\n"
         shader += "}\n"
 
-	return shader
+        return shader
 
     def make_fragment_shader(self):
-	return self.make_test_shader('', '', 'gl_FragColor', '')
-
+        return self.make_test_shader('', '', 'gl_FragColor', '')
 
 
 def all_tests():
     for use_if in [False, True]:
-	for signature, test_vectors in sorted(test_suite.items()):
-	    if use_if and signature.rettype != glsl_bool:
-		continue
-	    yield VertexShaderTest(signature, test_vectors, use_if)
-	    yield GeometryShaderTest(signature, test_vectors, use_if)
-	    yield FragmentShaderTest(signature, test_vectors, use_if)
-
+        for signature, test_vectors in sorted(test_suite.items()):
+            if use_if and signature.rettype != glsl_bool:
+                continue
+            yield VertexShaderTest(signature, test_vectors, use_if)
+            yield GeometryShaderTest(signature, test_vectors, use_if)
+            yield FragmentShaderTest(signature, test_vectors, use_if)
 
 
 def main():
@@ -647,14 +638,15 @@ def main():
     usage = 'usage: %prog [-h] [--names-only]'
     parser = optparse.OptionParser(description=desc, usage=usage)
     parser.add_option(
-	'--names-only', dest='names_only', action='store_true',
-	help="Don't output files, just generate a list of filenames to stdout")
+        '--names-only',
+        dest='names_only',
+        action='store_true',
+        help="Don't output files, just generate a list of filenames to stdout")
     options, args = parser.parse_args()
     for test in all_tests():
-	if not options.names_only:
-	    test.generate_shader_test()
-	print test.filename()
-
+        if not options.names_only:
+            test.generate_shader_test()
+        print test.filename()
 
 
 if __name__ == '__main__':
