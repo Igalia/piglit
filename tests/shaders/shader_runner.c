@@ -1723,7 +1723,6 @@ piglit_display(void)
 				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
 			}
-			/* TODO: wrapper? */
 			glDrawArrays(mode, first, count);
 		} else if (string_match("disable", line)) {
 			do_enable_disable(line + 7, false);
