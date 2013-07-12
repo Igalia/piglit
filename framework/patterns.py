@@ -32,7 +32,7 @@ class Singleton(object):
     A thread-safe (mostly -- see NOTE) Singleton class pattern.
 
     NOTE: deleting a singleton instance (i.e. Singleton::delInstance) does not
-    guarantee that something else is currently using it. To reduce this risk, a
+    guarantee that nothing else is currently using it. To reduce this risk, a
     program should not hold a reference to the instance.  Rather, use the
     create/construct syntax (see example below) to access the instance.  Yet,
     this still does not guarantee that this type of usage will result in a
