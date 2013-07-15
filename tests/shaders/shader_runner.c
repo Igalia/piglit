@@ -1110,7 +1110,7 @@ get_uints(const char *line, unsigned *uints, unsigned count)
 void
 check_unsigned_support()
 {
-	if (gl_version.num < 30)
+	if (gl_version.num < 30 && !piglit_is_extension_supported("GL_EXT_gpu_shader4"))
 		piglit_report_result(PIGLIT_SKIP);
 }
 
