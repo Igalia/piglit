@@ -208,7 +208,9 @@ vertex_attrib_description::vertex_attrib_description(GLuint prog,
 	 * present.
 	 */
 	if (this->data_type != GL_FLOAT &&
-	    (piglit_is_gles() || piglit_get_gl_version() < 30)) {
+	    (piglit_is_gles() ||
+	    (piglit_get_gl_version() < 30 &&
+		!piglit_is_extension_supported("GL_EXT_gpu_shader4")))) {
 		printf("Test uses glVertexAttribIPointer(),"
 		       " which is unsupported.\n");
 		piglit_report_result(PIGLIT_FAIL);
