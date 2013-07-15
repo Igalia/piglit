@@ -571,7 +571,11 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
 	switch (glsl_version) {
 	case 110: return 20;
 	case 120: return 21;
-	case 130: return 30;
+	/* GLSL 1.30 is naturally matched with GL3,
+	 * but is usefully supportable on GL2.1 if
+	 * EXT_gpu_shader4 is also supported.
+	 */
+	case 130: return 21;
 	case 140: return 31;
 	case 150: return 32;
 	case 330: return 33;
