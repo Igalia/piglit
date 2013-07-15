@@ -12,7 +12,6 @@
 # bit patterns that would represent Inf or NaN as floats.
 [require]
 GLSL >= 1.30
-GL >= 3.0
 
 [vertex shader]
 #version 130
