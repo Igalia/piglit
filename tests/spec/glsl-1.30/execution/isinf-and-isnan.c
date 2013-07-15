@@ -299,7 +299,12 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_GLSL();
 	piglit_require_GLSL_version(130);
-	piglit_require_gl_version(30);
+
+	if (piglit_is_extension_supported("GL_EXT_gpu_shader4")) {
+		piglit_require_gl_version(21);
+	} else {
+		piglit_require_gl_version(30);
+	}
 
 	if (use_fbo) {
 		setup_fbo();
