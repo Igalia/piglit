@@ -35,14 +35,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 import framework.summary as summary
-
-
-def parse_listfile(filename):
-    """
-    Read a list of newline seperated file names and return them as a list
-    """
-    with open(filename, 'r') as file:
-        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]
+from framework.core import parse_listfile
 
 def main():
     parser = argparse.ArgumentParser()

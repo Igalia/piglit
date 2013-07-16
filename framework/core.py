@@ -615,7 +615,6 @@ def loadTestResults(relativepath):
     assert(testrun.name is not None)
     return testrun
 
-
 # Error messages to be ignored
 Test.ignoreErrors = map(re.compile,
                         ["couldn't open libtxc_dxtn.so",
@@ -659,3 +658,21 @@ Test.ignoreErrors = map(re.compile,
                          ".*DeviceName.*",
                          "No memory leaks detected.",
                          "libGL: Can't open configuration file.*"])
+
+
+def parse_listfile(filename):
+    """
+    Parses a newline-seperated list in a text file and returns a python list
+    object. It will expand tildes on Unix-like system to the users home
+    directory.
+
+    ex file.txt:
+        ~/tests1
+        ~/tests2/main
+        /tmp/test3
+
+    returns:
+        ['/home/user/tests1', '/home/users/tests2/main', '/tmp/test3']
+    """
+    with open(filename, 'r') as file:
+        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]

@@ -27,19 +27,9 @@ import shutil
 import os.path as path
 
 import framework.summary as summary
-from framework.core import checkDir
+from framework.core import checkDir, parse_listfile
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
-
-
-def parse_listfile(filename):
-    """
-    Read a list of newline seperated flies and return them as a python list.
-    strip the last newline character so the list doesn't have an extra ''
-    element at the end.
-    """
-    with open(filename, 'r') as file:
-        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]
 
 
 def main():
