@@ -39,7 +39,7 @@ def parse_listfile(filename):
     element at the end.
     """
     with open(filename, 'r') as file:
-        return [path.expanduser(i) for i in file.read().rstrip().split('\n')]
+        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]
 
 
 def main():
