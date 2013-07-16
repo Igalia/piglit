@@ -464,6 +464,14 @@ class Summary:
                         if status[i] > 1 and status[i + 1] == 1:
                             self.tests['fixes'].append(test)
 
+        # Remove duplicate entries from the status lists
+        # If there are 4+ results can result in mutiple passes or regressions
+        # and changes # other words: "pass fail pass fail" will result in a
+        # regression, a fix, and a regression and it will be printed twice in
+        # the summary. Turning them into sets remove duplicates
+        for (result, value) in self.tests.items():
+            self.tests[result] = set(value)
+
     def __find_totals(self):
         """
         Private: Find the total number of pass, fail, crash, skip, and warn in
