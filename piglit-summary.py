@@ -41,8 +41,8 @@ def parse_listfile(filename):
     """
     Read a list of newline seperated file names and return them as a list
     """
-    return open(filename, "r").read().rstrip().split('\n')
-
+    with open(filename, 'r') as file:
+        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]
 
 def main():
     parser = argparse.ArgumentParser()
