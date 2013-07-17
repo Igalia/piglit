@@ -25,6 +25,10 @@
 /* This tests whether the invalidate map flags work as expected with rendering
  * between map calls.
  *
+ * An alternative approach to invalidating a buffer range with
+ * CopyBufferSubData while the destination buffer is bound as an array buffer
+ * is also tested.
+ *
  * The alignment of returned pointers is also checked
  * if ARB_map_buffer_alignment is supported.
  */
@@ -44,6 +48,7 @@ PIGLIT_GL_TEST_CONFIG_END
 enum {
 	TEST_MAP_INVALIDATE_RANGE_BIT,
 	TEST_MAP_INVALIDATE_BUFFER_BIT,
+	TEST_COPY_BUFFER_SUBDATA
 } test_flag;
 
 enum {
@@ -51,6 +56,8 @@ enum {
 	TEST_OFFSET_INCR,
 	TEST_OFFSET_DECR,
 } test_offset;
+
+#define TRI_SIZE (6*4)
 
 int alignment = 1;
 
@@ -63,6 +70,9 @@ void piglit_init(int argc, char **argv)
 			test_flag = TEST_MAP_INVALIDATE_BUFFER_BIT;
 		} else if (!strcmp(argv[i], "MAP_INVALIDATE_RANGE_BIT")) {
 			test_flag = TEST_MAP_INVALIDATE_RANGE_BIT;
+		} else if (!strcmp(argv[i], "CopyBufferSubData")) {
+			test_flag = TEST_COPY_BUFFER_SUBDATA;
+			piglit_require_extension("GL_ARB_copy_buffer");
 		} else if (!strcmp(argv[i], "offset=0")) {
 			test_offset = TEST_OFFSET_0;
 		} else if (!strcmp(argv[i], "increment-offset")) {
@@ -90,6 +100,9 @@ void piglit_init(int argc, char **argv)
 	case TEST_MAP_INVALIDATE_BUFFER_BIT:
 		puts("Testing GL_MAP_INVALIDATE_BUFFER_BIT.");
 		break;
+	case TEST_COPY_BUFFER_SUBDATA:
+		puts("Testing glCopyBufferSubData");
+		break;
 	default:
 		assert(0);
 	}
@@ -112,28 +125,52 @@ void piglit_init(int argc, char **argv)
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 }
 
-static void upload(unsigned slot, float x1, float y1, float x2, float y2)
+static void upload(GLuint buffer, unsigned slot, float x1, float y1, float x2, float y2)
 {
-	unsigned offset = slot * 6*4;
-	float *v = glMapBufferRange(GL_ARRAY_BUFFER, offset, 6*4,
-				    GL_MAP_WRITE_BIT |
-				    (test_flag == TEST_MAP_INVALIDATE_BUFFER_BIT ? GL_MAP_INVALIDATE_BUFFER_BIT : 0) |
-				    (test_flag == TEST_MAP_INVALIDATE_RANGE_BIT ? GL_MAP_INVALIDATE_RANGE_BIT : 0));
-	if (!v) {
-		printf("glMapBufferRange returned NULL.\n");
-		piglit_report_result(PIGLIT_FAIL);
+	unsigned offset = slot * TRI_SIZE;
+	float *v;
+	GLuint temp_buf;
+
+	if (test_flag == TEST_COPY_BUFFER_SUBDATA) {
+		glGenBuffers(1, &temp_buf);
+		glBindBuffer(GL_ARRAY_BUFFER, temp_buf);
+		glBufferData(GL_ARRAY_BUFFER, TRI_SIZE, NULL, GL_STATIC_DRAW);
+		v = glMapBufferRange(GL_ARRAY_BUFFER, 0, TRI_SIZE, GL_MAP_WRITE_BIT);
+	} else {
+		glBindBuffer(GL_ARRAY_BUFFER, buffer);
+		v = glMapBufferRange(GL_ARRAY_BUFFER, offset, TRI_SIZE,
+				     GL_MAP_WRITE_BIT |
+				     (test_flag == TEST_MAP_INVALIDATE_BUFFER_BIT ? GL_MAP_INVALIDATE_BUFFER_BIT : 0) |
+				     (test_flag == TEST_MAP_INVALIDATE_RANGE_BIT ? GL_MAP_INVALIDATE_RANGE_BIT : 0));
+		if (!v) {
+			printf("glMapBufferRange returned NULL.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		if (((uintptr_t)v - offset) % alignment != 0) {
+			printf("glMapBufferRange returned a pointer not aligned to GL_MIN_MAP_BUFFER_ALIGNMENT.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
-	if (((uintptr_t)v - offset) % alignment != 0) {
-		printf("glMapBufferRange returned a pointer not aligned to GL_MIN_MAP_BUFFER_ALIGNMENT.\n");
-		piglit_report_result(PIGLIT_FAIL);
-	}
+
 	*v++ = x1;
 	*v++ = y1;
 	*v++ = x1;
 	*v++ = y2;
 	*v++ = x2;
 	*v++ = y1;
+
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	if (test_flag == TEST_COPY_BUFFER_SUBDATA) {
+		glBindBuffer(GL_COPY_READ_BUFFER, temp_buf);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+				    0, offset, TRI_SIZE);
+		glBindBuffer(GL_COPY_READ_BUFFER, 0);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+		glDeleteBuffers(1, &temp_buf);
+	}
 }
 
 #define NUM_PRIMS 700
@@ -150,11 +187,11 @@ enum piglit_result piglit_display(void)
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, NUM_PRIMS * 6*4, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, NUM_PRIMS * TRI_SIZE, NULL, GL_STATIC_DRAW);
+	glVertexPointer(2, GL_FLOAT, 0, 0);
 
 	/* just make the GPU busy, render a degenerated triangle */
-	upload(0, 0, 0, 0, 0);
-	glVertexPointer(2, GL_FLOAT, 0, 0);
+	upload(vbo, 0, 0, 0, 0, 0);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	x = 0, y = 0;
@@ -174,7 +211,7 @@ enum piglit_result piglit_display(void)
 			assert(0);
 		}
 
-		upload(slot, x, y, x+20, y+20);
+		upload(vbo, slot, x, y, x+20, y+20);
 		glDrawArrays(GL_TRIANGLES, slot*3, 3);
 
 		x += 20;

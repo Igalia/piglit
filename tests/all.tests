@@ -2202,6 +2202,9 @@ arb_map_buffer_range['MAP_INVALIDATE_RANGE_BIT decrement-offset'] = concurrent_t
 arb_map_buffer_range['MAP_INVALIDATE_BUFFER_BIT offset=0'] = concurrent_test('map_buffer_range-invalidate MAP_INVALIDATE_BUFFER_BIT offset=0')
 arb_map_buffer_range['MAP_INVALIDATE_BUFFER_BIT increment-offset'] = concurrent_test('map_buffer_range-invalidate MAP_INVALIDATE_BUFFER_BIT increment-offset')
 arb_map_buffer_range['MAP_INVALIDATE_BUFFER_BIT decrement-offset'] = concurrent_test('map_buffer_range-invalidate MAP_INVALIDATE_BUFFER_BIT decrement-offset')
+arb_map_buffer_range['CopyBufferSubData offset=0'] = concurrent_test('map_buffer_range-invalidate CopyBufferSubData offset=0')
+arb_map_buffer_range['CopyBufferSubData increment-offset'] = concurrent_test('map_buffer_range-invalidate CopyBufferSubData increment-offset')
+arb_map_buffer_range['CopyBufferSubData decrement-offset'] = concurrent_test('map_buffer_range-invalidate CopyBufferSubData decrement-offset')
 
 arb_multisample = Group()
 spec['ARB_multisample'] = arb_multisample
