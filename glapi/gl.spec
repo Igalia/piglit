@@ -28154,8 +28154,12 @@ ProgramParameteriEXT(program, pname, value)
 
 ###############################################################################
 #
-# Extension #325
-# NV_vertex_program4 commands
+# Extension #326
+# EXT_gpu_shader4 commands
+#
+#   Note: these are also introduced by NV_vertex_program4 / NV_gpu_program4
+#   but the EXT* extension is most likely to be useful for non-NVIDIA
+#   implementations.
 #
 ###############################################################################
 
@@ -28163,7 +28167,7 @@ VertexAttribI1iEXT(index, x)
 	return		void
 	param		index		UInt32 in value
 	param		x		Int32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI1ivEXT
 	glxvectorequiv	VertexAttribI1ivEXT
@@ -28177,7 +28181,7 @@ VertexAttribI2iEXT(index, x, y)
 	param		index		UInt32 in value
 	param		x		Int32 in value
 	param		y		Int32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI2ivEXT
 	glxvectorequiv	VertexAttribI2ivEXT
@@ -28192,7 +28196,7 @@ VertexAttribI3iEXT(index, x, y, z)
 	param		x		Int32 in value
 	param		y		Int32 in value
 	param		z		Int32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI3ivEXT
 	glxvectorequiv	VertexAttribI3ivEXT
@@ -28208,7 +28212,7 @@ VertexAttribI4iEXT(index, x, y, z, w)
 	param		y		Int32 in value
 	param		z		Int32 in value
 	param		w		Int32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI4ivEXT
 	glxvectorequiv	VertexAttribI4ivEXT
@@ -28221,7 +28225,7 @@ VertexAttribI1uiEXT(index, x)
 	return		void
 	param		index		UInt32 in value
 	param		x		UInt32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI1uivEXT
 	glxvectorequiv	VertexAttribI1uivEXT
@@ -28235,7 +28239,7 @@ VertexAttribI2uiEXT(index, x, y)
 	param		index		UInt32 in value
 	param		x		UInt32 in value
 	param		y		UInt32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI2uivEXT
 	glxvectorequiv	VertexAttribI2uivEXT
@@ -28250,7 +28254,7 @@ VertexAttribI3uiEXT(index, x, y, z)
 	param		x		UInt32 in value
 	param		y		UInt32 in value
 	param		z		UInt32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI3uivEXT
 	glxvectorequiv	VertexAttribI3uivEXT
@@ -28266,7 +28270,7 @@ VertexAttribI4uiEXT(index, x, y, z, w)
 	param		y		UInt32 in value
 	param		z		UInt32 in value
 	param		w		UInt32 in value
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	vectorequiv	VertexAttribI4uivEXT
 	glxvectorequiv	VertexAttribI4uivEXT
@@ -28279,7 +28283,7 @@ VertexAttribI1ivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int32 in array [1]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28290,7 +28294,7 @@ VertexAttribI2ivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int32 in array [2]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28301,7 +28305,7 @@ VertexAttribI3ivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int32 in array [3]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28312,7 +28316,7 @@ VertexAttribI4ivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int32 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28323,7 +28327,7 @@ VertexAttribI1uivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt32 in array [1]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28334,7 +28338,7 @@ VertexAttribI2uivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt32 in array [2]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28345,7 +28349,7 @@ VertexAttribI3uivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt32 in array [3]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28356,7 +28360,7 @@ VertexAttribI4uivEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt32 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28367,7 +28371,7 @@ VertexAttribI4bvEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int8 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28378,7 +28382,7 @@ VertexAttribI4svEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		Int16 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28389,7 +28393,7 @@ VertexAttribI4ubvEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt8 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28400,7 +28404,7 @@ VertexAttribI4usvEXT(index, v)
 	return		void
 	param		index		UInt32 in value
 	param		v		UInt16 in array [4]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	beginend	allow-inside
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28414,7 +28418,7 @@ VertexAttribIPointerEXT(index, size, type, stride, pointer)
 	param		type		VertexAttribEnum in value
 	param		stride		SizeI in value
 	param		pointer		Void in array [COMPSIZE(size/type/stride)] retained
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	dlflags		notlistable
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28426,7 +28430,7 @@ GetVertexAttribIivEXT(index, pname, params)
 	param		index		UInt32 in value
 	param		pname		VertexAttribEnum in value
 	param		params		Int32 out array [1]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	dlflags		notlistable
 	extension	soft WINSOFT NV10
 	glfflags	ignore
@@ -28438,19 +28442,12 @@ GetVertexAttribIuivEXT(index, pname, params)
 	param		index		UInt32 in value
 	param		pname		VertexAttribEnum in value
 	param		params		UInt32 out array [1]
-	category	NV_vertex_program4
+	category	EXT_gpu_shader4
 	dlflags		notlistable
 	extension	soft WINSOFT NV10
 	glfflags	ignore
 	glxflags	ignore
 	alias		GetVertexAttribIuiv
-
-###############################################################################
-#
-# Extension #326
-# EXT_gpu_shader4 commands
-#
-###############################################################################
 
 GetUniformuivEXT(program, location, params)
 	return		void
