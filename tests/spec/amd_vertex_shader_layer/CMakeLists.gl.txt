@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (amd_vertex_shader_layer-layered-2d-texture-render layered-2d-texture-render.c)
+piglit_add_executable (amd_vertex_shader_layer-layered-depth-texture-render layered-depth-texture-render.c)
