@@ -99,6 +99,8 @@ main(int argc, char **argv)
 	int ret;
 	pthread_t thread1, thread2;
 
+	XInitThreads();
+
 	pthread_mutex_init(&mutex, NULL);
 
 	/* Now, spawn some threads that compile simple shaders.
