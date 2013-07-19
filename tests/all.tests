@@ -900,6 +900,7 @@ import_glsl_parser_tests(spec['glsl-1.50'],
 add_shader_test_dir(spec['glsl-1.50'],
 		    os.path.join(testsDir, 'spec', 'glsl-1.50'),
 		    recursive=True)
+spec['glsl-1.50']['execution']['get-active-attrib-array'] = concurrent_test('glsl-1.50-get-active-attrib-array')
 spec['glsl-1.50']['execution']['vs-input-arrays'] = concurrent_test('glsl-1.50-vs-input-arrays')
 for draw in ['', 'indexed']:
     for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY',
