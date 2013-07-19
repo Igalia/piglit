@@ -821,20 +821,34 @@ piglit_init(int argc, char **argv)
 		if (!sampler_found && (sampler_found = select_sampler(argv[i])))
 			continue;
 
-        /* Maybe it's the sample count? */
-        if (sampler_found && has_samples() && !sample_count) {
-            if ((sample_count = atoi(argv[i]))) {
-                /* check it */
-                GLint max_samples;
-                glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
-                if (sample_count > max_samples) {
-                    printf("Sample count of %d not supported, >MAX_SAMPLES\n",
-                            sample_count);
-                    piglit_report_result(PIGLIT_SKIP);
-                }
-            }
-            continue;
-        }
+		/* Maybe it's the sample count? */
+		if (sampler_found && has_samples() && !sample_count) {
+			if ((sample_count = atoi(argv[i]))) {
+				/* check it */
+				GLint max_samples;
+
+				if (sampler.data_type == GL_INT ||
+				    sampler.data_type == GL_UNSIGNED_INT) {
+					glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &max_samples);
+					if (sample_count > max_samples) {
+						printf("Sample count of %d not supported,"
+						       " >MAX_INTEGER_SAMPLES\n",
+						       sample_count);
+						piglit_report_result(PIGLIT_SKIP);
+					}
+				}
+				else {
+					glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+					if (sample_count > max_samples) {
+						printf("Sample count of %d not supported,"
+						       " >MAX_SAMPLES\n",
+						       sample_count);
+						piglit_report_result(PIGLIT_SKIP);
+					}
+				}
+			}
+			continue;
+		}
 
 		if (!swizzling && (swizzling = parse_swizzle(argv[i])))
 			continue;
