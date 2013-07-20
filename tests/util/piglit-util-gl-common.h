@@ -43,6 +43,8 @@ extern const uint8_t fdo_bitmap[];
 extern const unsigned int fdo_bitmap_width;
 extern const unsigned int fdo_bitmap_height;
 
+extern bool piglit_is_core_profile;
+
 /**
  * Determine if the API is OpenGL ES.
  */

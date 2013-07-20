@@ -34,6 +34,8 @@
  */
 static const char **gl_extensions = NULL;
 
+bool piglit_is_core_profile;
+
 bool piglit_is_gles(void)
 {
 	const char *version_string = (const char *) glGetString(GL_VERSION);

@@ -401,8 +401,10 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		ok = make_context_current_singlepass(wfl_fw, test_config,
 		                                     CONTEXT_GL_CORE,
 		                                     partial_config_attrib_list);
-		if (ok)
+		if (ok) {
+			piglit_is_core_profile = true;
 			return;
+		}
 
 		printf("piglit: info: Failed to create GL %d.%d "
 		       "core context\n",
