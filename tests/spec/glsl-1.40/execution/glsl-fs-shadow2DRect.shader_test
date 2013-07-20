@@ -19,7 +19,7 @@ uniform sampler2DRectShadow tex;
 
 void main()
 {
-	gl_FragColor = shadow2DRect(tex, texcoords.xyy * vec3(31.0, 31.0, 1.0));
+	gl_FragColor = vec4(shadow2DRect(tex, texcoords.xyy * vec3(31.0, 31.0, 1.0)).xxx, 1.0);
 }
 
 [vertex data]
