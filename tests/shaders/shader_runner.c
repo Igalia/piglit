@@ -1832,9 +1832,6 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_2D,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
-			glTexParameteri(GL_TEXTURE_2D,
-					GL_DEPTH_TEXTURE_MODE,
-					GL_INTENSITY);
 
 			glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
@@ -1849,9 +1846,6 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_RECTANGLE,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
-			glTexParameteri(GL_TEXTURE_RECTANGLE,
-					GL_DEPTH_TEXTURE_MODE,
-					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow1D %d ( %d )",
 				  &tex, &w) == 2) {
@@ -1864,9 +1858,6 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_1D,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
-			glTexParameteri(GL_TEXTURE_1D,
-					GL_DEPTH_TEXTURE_MODE,
-					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow1DArray %d ( %d , %d )",
 				  &tex, &w, &l) == 3) {
@@ -1879,9 +1870,6 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
-			glTexParameteri(GL_TEXTURE_1D_ARRAY,
-					GL_DEPTH_TEXTURE_MODE,
-					GL_INTENSITY);
 		} else if (sscanf(line,
 				  "texture shadow2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
@@ -1894,9 +1882,6 @@ piglit_display(void)
 			glTexParameteri(GL_TEXTURE_2D_ARRAY,
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY,
-					GL_DEPTH_TEXTURE_MODE,
-					GL_INTENSITY);
 		} else if (string_match("texparameter ", line)) {
 			handle_texparameter(line + strlen("texparameter "));
 		} else if (string_match("uniform", line)) {
