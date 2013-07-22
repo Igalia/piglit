@@ -1,0 +1,37 @@
+# Tests that a link error occurs when an interface block member's name
+# differs between the vertex and fragment shaders.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "Matched block names within an interface (as defined above) must match
+#  in terms of having the same number of declarations with the same
+#  sequence of types and the same sequence of member names, as well as
+#  having the same member-wise layout qualification (see next section)."
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+uniform block {
+	vec4 a; // a is named b in FS
+} inst_a;
+
+void main()
+{
+    gl_Position = vec4(0.0);
+}
+
+[fragment shader]
+#version 150
+
+uniform block {
+	vec4 b; // b is named a in VS
+} inst_b;
+
+void main()
+{
+}
+
+[test]
+link error
+
