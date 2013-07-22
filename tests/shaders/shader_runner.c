@@ -1907,7 +1907,7 @@ piglit_display(void)
 		} else if (string_match("link error", line)) {
 			link_error_expected = true;
 			if (link_ok) {
-				printf("shader link error expected, but it was sucessful!\n");
+				printf("shader link error expected, but it was successful!\n");
 				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else if (string_match("link success", line)) {
