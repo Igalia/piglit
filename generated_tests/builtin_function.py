@@ -53,7 +53,6 @@ import itertools
 import numpy as np
 
 
-
 # Floating point types used by Python and numpy
 FLOATING_TYPES = (float, np.float64, np.float32)
 
@@ -65,7 +64,6 @@ FLOATING_TYPES = (float, np.float64, np.float32)
 INT32_TYPES = tuple(set([np.int32, type(np.abs(np.int32(1)))]))
 UINT32_TYPES = tuple(set([np.uint32,
                           type(np.dot(np.uint32(0), np.uint32(0)))]))
-
 
 
 class GlslBuiltinType(object):
@@ -133,7 +131,6 @@ class GlslBuiltinType(object):
         return 'glsl_{0}'.format(self.__name)
 
 
-
 # Concrete declarations of GlslBuiltinType
 glsl_bool   = GlslBuiltinType('bool',   None,       1, 1, 110)
 glsl_int    = GlslBuiltinType('int',    None,       1, 1, 110)
@@ -165,7 +162,6 @@ glsl_mat3x4 = GlslBuiltinType('mat3x4', glsl_float, 3, 4, 120)
 glsl_mat4x4 = glsl_mat4
 
 
-
 # Named tuple representing the signature of a single overload of a
 # built-in GLSL function or operator:
 # - name is a name suitable for use in test filenames.  For functions,
@@ -194,7 +190,6 @@ Signature = collections.namedtuple(
     ('name', 'template', 'version_introduced', 'rettype', 'argtypes'))
 
 
-
 # Named tuple representing a single piece of test data for testing a
 # built-in GLSL function:
 # - arguments is a tuple containing the arguments to apply to the
@@ -210,7 +205,6 @@ Signature = collections.namedtuple(
 #   RMS error (as would be computed by the distance() function).
 TestVector = collections.namedtuple(
     'TestVector', ('arguments', 'result', 'tolerance'))
-
 
 
 def glsl_type_of(value):
@@ -256,7 +250,6 @@ def glsl_type_of(value):
             return matrix_types[matrix_columns - 2][matrix_rows - 2]
 
 
-
 def column_major_values(value):
     """Given a native numpy value, return a list of the scalar values
     comprising it, in column-major order."""
@@ -264,7 +257,6 @@ def column_major_values(value):
         return list(np.reshape(value, -1, 'F'))
     else:
         return [value]
-
 
 
 def glsl_constant(value):
@@ -283,7 +275,6 @@ def glsl_constant(value):
         return '{0}({1})'.format(glsl_type_of(value), ', '.join(values))
 
 
-
 def round_to_32_bits(value):
     """If value is a floating point type, round it down to 32 bits.
     Otherwise return it unchanged.
@@ -294,7 +285,6 @@ def round_to_32_bits(value):
         return np.array(value, dtype=np.float32)
     else:
         return value
-
 
 
 def extend_to_64_bits(value):
@@ -309,7 +299,6 @@ def extend_to_64_bits(value):
         return value
 
 
-
 # Dictionary containing the test vectors.  Each entry in the
 # dictionary represents a single overload of a single built-in
 # function.  Its key is a Signature tuple, and its value is a list of
@@ -318,7 +307,6 @@ def extend_to_64_bits(value):
 # Note: the dictionary is initialized to {} here, but it is filled
 # with test vectors by code later in this file.
 test_suite = {}
-
 
 
 # Implementation
@@ -344,6 +332,7 @@ def _multiply(x, y):
         # multiplication, which numpy calls "dot".
         return np.dot(x, y)
 
+
 def _divide(x, y):
     if any(y_element == 0 for y_element in column_major_values(y)):
         # Division by zero is undefined.
@@ -363,6 +352,7 @@ def _divide(x, y):
     else:
         return x / y
 
+
 def _modulus(x, y):
     if any(x_element < 0 for x_element in column_major_values(x)):
         # Modulus operation with a negative first operand is
@@ -373,6 +363,7 @@ def _modulus(x, y):
         # undefined.
         return None
     return x % y
+
 
 def _lshift(x, y):
     if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
@@ -393,6 +384,7 @@ def _lshift(x, y):
 
     return result
 
+
 def _rshift(x, y):
     if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
         # Shifts by less than 0 or more than the number of bits in the
@@ -412,55 +404,75 @@ def _rshift(x, y):
 
     return result
 
+
 def _equal(x, y):
     return all(column_major_values(x == y))
 
+
 def _not_equal(x, y):
     return not _equal(x, y)
+
 
 def _arctan2(y, x):
     if x == y == 0.0:
         return None
     return np.arctan2(y, x)
+
+
 def _pow(x, y):
     if x < 0.0:
         return None
     if x == 0.0 and y <= 0.0:
         return None
     return np.power(x, y)
+
+
 def _exp2(x):
     # exp2() is not available in versions of numpy < 1.3.0 so we
     # emulate it with power().
     return np.power(2, x)
+
+
 def _trunc(x):
     # trunc() rounds toward zero.  It is not available in version
     # 1.2.1 of numpy so we emulate it with floor(), sign(), and abs().
     return np.sign(x) * np.floor(np.abs(x))
+
+
 def _clamp(x, minVal, maxVal):
     if minVal > maxVal:
         return None
     return min(max(x, minVal), maxVal)
+
+
 def _smoothstep(edge0, edge1, x):
     if edge0 >= edge1:
         return None
     t = _clamp((x-edge0)/(edge1-edge0),0.0,1.0)
     return t*t*(3.0-2.0*t)
+
+
 def _normalize(x):
     return x/np.linalg.norm(x)
+
+
 def _faceforward(N, I, Nref):
     if np.dot(Nref, I) < 0.0:
         return N
     else:
         return -N
+
+
 def _reflect(I, N):
     return I-2*np.dot(N,I)*N
+
+
 def _refract(I, N, eta):
     k = 1.0-eta*eta*(1.0-np.dot(N,I)*np.dot(N,I))
     if k < 0.0:
         return I*0.0
     else:
         return eta*I-(eta*np.dot(N,I)+np.sqrt(k))*N
-
 
 
 def _change_signedness(x):
@@ -478,14 +490,12 @@ def _change_signedness(x):
     raise Exception('Unexpected type passed to _change_signedness')
 
 
-
 def _argument_types_match(arguments, argument_indices_to_match):
     """Return True if all of the arguments indexed by
     argument_indices_to_match have the same GLSL type.
     """
     types = [glsl_type_of(arguments[i]) for i in argument_indices_to_match]
     return all(x == types[0] for x in types)
-
 
 
 def _strict_tolerance(arguments, result):
@@ -528,7 +538,6 @@ def _strict_tolerance(arguments, result):
     return 1e-5 * np.linalg.norm(result)
 
 
-
 def _trig_tolerance(arguments, result):
     """Compute a more lenient tolerance bound for trig functions.
 
@@ -543,7 +552,6 @@ def _trig_tolerance(arguments, result):
     return max(1e-4, 1e-3 * np.linalg.norm(result))
 
 
-
 def _cross_product_tolerance(arguments, result):
     """Compute a more lenient tolerance bound for cross product.
 
@@ -556,7 +564,6 @@ def _cross_product_tolerance(arguments, result):
     """
     assert len(arguments) == 2
     return 1e-5 * np.linalg.norm(arguments[0]) * np.linalg.norm(arguments[1])
-
 
 
 def _simulate_function(test_inputs, python_equivalent, tolerance_function):
@@ -596,7 +603,6 @@ def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     return test_vectors
 
 
-
 def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
     """Build a new set of test vectors by combining elements of
     test_vectors into vectors of length vector_length. For example,
@@ -627,6 +633,7 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
                 groups[key] = []
             groups[key].append(tv)
         return groups
+
     def partition_vectors(test_vectors, partition_size):
         """Partition test_vectors into lists of length partition_size.
         If partition_size does not evenly divide the number of test
@@ -638,6 +645,7 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
             for j in xrange(partition_size):
                 partition.append(test_vectors[(i + j) % len(test_vectors)])
             yield partition
+
     def merge_vectors(test_vectors):
         """Merge the given set of test vectors (whose arguments and
         result are scalars) into a single test vector whose arguments
@@ -664,7 +672,6 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
             merge_vectors(partition)
             for partition in partition_vectors(test_vectors, vector_length))
     return vectorized_test_vectors
-
 
 
 def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
@@ -696,7 +703,6 @@ def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
     test_suite_dict[signature].append(test_vector)
 
 
-
 def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
                         template = None):
     """Store multiple test vectors in the appropriate places in
@@ -708,7 +714,6 @@ def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
     for test_vector in test_vectors:
         _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
                            template = template)
-
 
 
 def make_arguments(input_generators):
@@ -731,7 +736,6 @@ def make_arguments(input_generators):
     return list(itertools.product(*input_generators))
 
 
-
 def _make_componentwise_test_vectors(test_suite_dict):
     """Add test vectors to test_suite_dict for GLSL built-in
     functions that operate on vectors in componentwise fashion.
@@ -749,6 +753,7 @@ def _make_componentwise_test_vectors(test_suite_dict):
     ints = [np.int32(x) for x in [-5, -2, -1, 0, 1, 2, 5]]
     uints = [np.uint32(x) for x in [0, 1, 2, 5, 34]]
     bools = [True, False]
+
     def f(name, arity, glsl_version, python_equivalent,
           alternate_scalar_arg_indices, test_inputs,
           tolerance_function = _strict_tolerance):
@@ -847,7 +852,6 @@ def _make_componentwise_test_vectors(test_suite_dict):
 _make_componentwise_test_vectors(test_suite)
 
 
-
 def _make_vector_relational_test_vectors(test_suite_dict):
     """Add test vectors to test_suite_dict for GLSL built-in functions
     that operate on vectors of floats, ints, or bools, but not on
@@ -859,7 +863,8 @@ def _make_vector_relational_test_vectors(test_suite_dict):
         'i': np.array([-5, -2, -1, 0, 1, 2, 5], dtype=np.int32),
         'u': np.array([0, 1, 2, 5, 34], dtype=np.uint32),
         'b': np.array([False, True])
-        }
+    }
+
     def f(name, arity, glsl_version, python_equivalent, arg_types,
           tolerance_function = _strict_tolerance):
         """Make test vectors for the function with the given name and
@@ -897,7 +902,6 @@ def _make_vector_relational_test_vectors(test_suite_dict):
 _make_vector_relational_test_vectors(test_suite)
 
 
-
 def _make_vector_or_matrix_test_vectors(test_suite_dict):
     """Add test vectors to test_suite_dict for GLSL built-in functions
     that operate on vectors/matrices as a whole.  Examples include
@@ -916,6 +920,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
             lambda a, b, c, d: glsl_type_of(b) == glsl_type_of(d)
         """
         return lambda *args: _argument_types_match(args, indices)
+
     def match_simple_binop(x, y):
         """Detemine whether the type of the arguments is compatible
         for a simple binary operator (such as '+').
@@ -931,6 +936,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
         if x_type.is_scalar or y_type.is_scalar:
             return True
         return x_type == y_type
+
     def match_multiply(x, y):
         """Determine whether the type of the arguments is compatible
         for multiply.
@@ -961,6 +967,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
             # standard linear algebraic multiply is used, so x's
             # column count must match y's row count.
             return x_type.num_cols == y_type.num_rows
+
     def match_shift(x, y):
         """Determine whether the type of the arguments is compatible
         for shift operations.
@@ -1103,8 +1110,9 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
         np.array([[-1.72,  0.09,  0.45],
                   [-0.31, -1.58,  1.92],
                   [ 0.14,  0.18, -0.56],
-                  [ 0.40, -0.77,  1.76]]), # mat3x4
-        ]
+                  [ 0.40, -0.77,  1.76]]),  # mat3x4
+    ]
+
     def f(name, arity, glsl_version, python_equivalent,
           filter, test_inputs, tolerance_function = _strict_tolerance,
           template = None):
@@ -1192,7 +1200,6 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('determinant', 1, 150, np.linalg.det, None, [squaremats])
 
 _make_vector_or_matrix_test_vectors(test_suite)
-
 
 
 def _check_signature_safety(test_suite_dict):
