@@ -64,73 +64,73 @@ FLOATING_TYPES = (float, np.float64, np.float32)
 # bug, and one-element tuples on numpy implementations that don't.
 INT32_TYPES = tuple(set([np.int32, type(np.abs(np.int32(1)))]))
 UINT32_TYPES = tuple(set([np.uint32,
-			  type(np.dot(np.uint32(0), np.uint32(0)))]))
+                          type(np.dot(np.uint32(0), np.uint32(0)))]))
 
 
 
 class GlslBuiltinType(object):
     """Class representing a GLSL built-in type."""
     def __init__(self, name, base_type, num_cols, num_rows,
-		 version_introduced):
-	self.__name = name
-	if base_type is not None:
-	    self.__base_type = base_type
-	else:
-	    self.__base_type = self
-	self.__num_cols = num_cols
-	self.__num_rows = num_rows
-	self.__version_introduced = version_introduced
+                 version_introduced):
+        self.__name = name
+        if base_type is not None:
+            self.__base_type = base_type
+        else:
+            self.__base_type = self
+        self.__num_cols = num_cols
+        self.__num_rows = num_rows
+        self.__version_introduced = version_introduced
 
     @property
     def name(self):
-	"""The name of the type, as a string."""
-	return self.__name
+        """The name of the type, as a string."""
+        return self.__name
 
     @property
     def base_type(self):
-	"""For vectors and matrices, the type of data stored in each
-	element.  For scalars, equal to self.
-	"""
-	return self.__base_type
+        """For vectors and matrices, the type of data stored in each
+        element.  For scalars, equal to self.
+        """
+        return self.__base_type
 
     @property
     def num_cols(self):
-	"""For matrices, the number of columns.  For vectors and
-	scalars, 1.
-	"""
-	return self.__num_cols
+        """For matrices, the number of columns.  For vectors and
+        scalars, 1.
+        """
+        return self.__num_cols
 
     @property
     def num_rows(self):
-	"""For vectors and matrices, the number of rows.  For scalars,
-	1.
-	"""
-	return self.__num_rows
+        """For vectors and matrices, the number of rows.  For scalars,
+        1.
+        """
+        return self.__num_rows
 
     @property
     def is_scalar(self):
-	return self.__num_cols == 1 and self.__num_rows == 1
+        return self.__num_cols == 1 and self.__num_rows == 1
 
     @property
     def is_vector(self):
-	return self.__num_cols == 1 and self.__num_rows != 1
+        return self.__num_cols == 1 and self.__num_rows != 1
 
     @property
     def is_matrix(self):
-	return self.__num_cols != 1
+        return self.__num_cols != 1
 
     @property
     def version_introduced(self):
-	"""The earliest version of GLSL that this type appears in (as
-	a string, e.g. 110).
-	"""
-	return self.__version_introduced
+        """The earliest version of GLSL that this type appears in (as
+        a string, e.g. 110).
+        """
+        return self.__version_introduced
 
     def __str__(self):
-	return self.__name
+        return self.__name
 
     def __repr__(self):
-	return 'glsl_{0}'.format(self.__name)
+        return 'glsl_{0}'.format(self.__name)
 
 
 
@@ -218,42 +218,42 @@ def glsl_type_of(value):
     value, as a GlslBuiltinType.
     """
     if isinstance(value, FLOATING_TYPES):
-	return glsl_float
+        return glsl_float
     elif isinstance(value, (bool, np.bool_)):
-	return glsl_bool
+        return glsl_bool
     elif isinstance(value, INT32_TYPES):
-	return glsl_int
+        return glsl_int
     elif isinstance(value, UINT32_TYPES):
-	return glsl_uint
+        return glsl_uint
     else:
-	assert isinstance(value, np.ndarray)
-	if len(value.shape) == 1:
-	    # Vector
-	    vector_length = value.shape[0]
-	    assert 2 <= vector_length <= 4
-	    if value.dtype in FLOATING_TYPES:
-		return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
-	    elif value.dtype == bool:
-		return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
-	    elif value.dtype in INT32_TYPES:
-		return (glsl_ivec2, glsl_ivec3, glsl_ivec4)[vector_length - 2]
-	    elif value.dtype in UINT32_TYPES:
-		return (glsl_uvec2, glsl_uvec3, glsl_uvec4)[vector_length - 2]
-	    else:
-		raise Exception(
-		    'Unexpected vector base type {0}'.format(value.dtype))
-	else:
-	    # Matrix
-	    assert value.dtype in FLOATING_TYPES
-	    assert len(value.shape) == 2
-	    matrix_rows = value.shape[0]
-	    assert 2 <= matrix_rows <= 4
-	    matrix_columns = value.shape[1]
-	    assert 2 <= matrix_columns <= 4
-	    matrix_types = ((glsl_mat2x2, glsl_mat2x3, glsl_mat2x4),
-			    (glsl_mat3x2, glsl_mat3x3, glsl_mat3x4),
-			    (glsl_mat4x2, glsl_mat4x3, glsl_mat4x4))
-	    return matrix_types[matrix_columns - 2][matrix_rows - 2]
+        assert isinstance(value, np.ndarray)
+        if len(value.shape) == 1:
+            # Vector
+            vector_length = value.shape[0]
+            assert 2 <= vector_length <= 4
+            if value.dtype in FLOATING_TYPES:
+                return (glsl_vec2, glsl_vec3, glsl_vec4)[vector_length - 2]
+            elif value.dtype == bool:
+                return (glsl_bvec2, glsl_bvec3, glsl_bvec4)[vector_length - 2]
+            elif value.dtype in INT32_TYPES:
+                return (glsl_ivec2, glsl_ivec3, glsl_ivec4)[vector_length - 2]
+            elif value.dtype in UINT32_TYPES:
+                return (glsl_uvec2, glsl_uvec3, glsl_uvec4)[vector_length - 2]
+            else:
+                raise Exception(
+                    'Unexpected vector base type {0}'.format(value.dtype))
+        else:
+            # Matrix
+            assert value.dtype in FLOATING_TYPES
+            assert len(value.shape) == 2
+            matrix_rows = value.shape[0]
+            assert 2 <= matrix_rows <= 4
+            matrix_columns = value.shape[1]
+            assert 2 <= matrix_columns <= 4
+            matrix_types = ((glsl_mat2x2, glsl_mat2x3, glsl_mat2x4),
+                            (glsl_mat3x2, glsl_mat3x3, glsl_mat3x4),
+                            (glsl_mat4x2, glsl_mat4x3, glsl_mat4x4))
+            return matrix_types[matrix_columns - 2][matrix_rows - 2]
 
 
 
@@ -261,9 +261,9 @@ def column_major_values(value):
     """Given a native numpy value, return a list of the scalar values
     comprising it, in column-major order."""
     if isinstance(value, np.ndarray):
-	return list(np.reshape(value, -1, 'F'))
+        return list(np.reshape(value, -1, 'F'))
     else:
-	return [value]
+        return [value]
 
 
 
@@ -272,15 +272,15 @@ def glsl_constant(value):
     it."""
     column_major = np.reshape(np.array(value), -1, 'F')
     if column_major.dtype == bool:
-	values = ['true' if x else 'false' for x in column_major]
+        values = ['true' if x else 'false' for x in column_major]
     elif column_major.dtype in UINT32_TYPES:
-	values = [repr(x) + 'u' for x in column_major]
+        values = [repr(x) + 'u' for x in column_major]
     else:
-	values = [repr(x) for x in column_major]
+        values = [repr(x) for x in column_major]
     if len(column_major) == 1:
-	return values[0]
+        return values[0]
     else:
-	return '{0}({1})'.format(glsl_type_of(value), ', '.join(values))
+        return '{0}({1})'.format(glsl_type_of(value), ', '.join(values))
 
 
 
@@ -289,11 +289,11 @@ def round_to_32_bits(value):
     Otherwise return it unchanged.
     """
     if isinstance(value, float):
-	return np.float32(value)
+        return np.float32(value)
     elif isinstance(value, np.ndarray) and value.dtype == np.float64:
-	return np.array(value, dtype=np.float32)
+        return np.array(value, dtype=np.float32)
     else:
-	return value
+        return value
 
 
 
@@ -302,11 +302,11 @@ def extend_to_64_bits(value):
     Otherwise return it unchanged.
     """
     if isinstance(value, np.float32):
-	return np.float64(value)
+        return np.float64(value)
     elif isinstance(value, np.ndarray) and value.dtype == np.float32:
-	return np.array(value, dtype=np.float64)
+        return np.array(value, dtype=np.float64)
     else:
-	return value
+        return value
 
 
 
@@ -337,54 +337,54 @@ def _multiply(x, y):
     y_type = glsl_type_of(y)
 
     if x_type.is_vector and y_type.is_vector:
-	# vector * vector is done componentwise.
-	return x * y
+        # vector * vector is done componentwise.
+        return x * y
     else:
-	# All other cases are standard linear algebraic
-	# multiplication, which numpy calls "dot".
-	return np.dot(x, y)
+        # All other cases are standard linear algebraic
+        # multiplication, which numpy calls "dot".
+        return np.dot(x, y)
 
 def _divide(x, y):
     if any(y_element == 0 for y_element in column_major_values(y)):
-	# Division by zero is undefined.
-	return None
+        # Division by zero is undefined.
+        return None
     if glsl_type_of(x).base_type == glsl_int:
-	# The GLSL spec does not make it clear what the rounding rules
-	# are when performing integer division.  C99 requires
-	# round-toward-zero, so in the absence of any other
-	# information, assume that's the correct behavior for GLSL.
-	#
-	# Python and numpy's rounding rules are inconsistent, so to
-	# make sure we get round-toward-zero behavior, divide the
-	# absolute values of x and y, and then fix the sign.
-	return (np.abs(x) // np.abs(y)) * (np.sign(x) * np.sign(y))
+        # The GLSL spec does not make it clear what the rounding rules
+        # are when performing integer division.  C99 requires
+        # round-toward-zero, so in the absence of any other
+        # information, assume that's the correct behavior for GLSL.
+        #
+        # Python and numpy's rounding rules are inconsistent, so to
+        # make sure we get round-toward-zero behavior, divide the
+        # absolute values of x and y, and then fix the sign.
+        return (np.abs(x) // np.abs(y)) * (np.sign(x) * np.sign(y))
     elif glsl_type_of(x).base_type == glsl_uint:
-	return x // y
+        return x // y
     else:
-	return x / y
+        return x / y
 
 def _modulus(x, y):
     if any(x_element < 0 for x_element in column_major_values(x)):
-	# Modulus operation with a negative first operand is
-	# undefined.
-	return None
+        # Modulus operation with a negative first operand is
+        # undefined.
+        return None
     if any(y_element <= 0 for y_element in column_major_values(y)):
-	# Modulus operation with a negative or zero second operand is
-	# undefined.
-	return None
+        # Modulus operation with a negative or zero second operand is
+        # undefined.
+        return None
     return x % y
 
 def _lshift(x, y):
     if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
-	# Shifts by less than 0 or more than the number of bits in the
-	# type being shifted are undefined.
-	return None
+        # Shifts by less than 0 or more than the number of bits in the
+        # type being shifted are undefined.
+        return None
     # When the arguments to << don't have the same signedness, numpy
     # likes to promote them to int64.  To avoid this, convert y to be
     # the same type as x.
     y_orig = y
     if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
-	y = _change_signedness(y)
+        y = _change_signedness(y)
     result = x << y
 
     # Shifting should always produce a result with the same base type
@@ -395,15 +395,15 @@ def _lshift(x, y):
 
 def _rshift(x, y):
     if not all(0 <= y_element < 32 for y_element in column_major_values(y)):
-	# Shifts by less than 0 or more than the number of bits in the
-	# type being shifted are undefined.
-	return None
+        # Shifts by less than 0 or more than the number of bits in the
+        # type being shifted are undefined.
+        return None
     # When the arguments to >> don't have the same signedness, numpy
     # likes to promote them to int64.  To avoid this, convert y to be
     # the same type as x.
     y_orig = y
     if glsl_type_of(x).base_type != glsl_type_of(y).base_type:
-	y = _change_signedness(y)
+        y = _change_signedness(y)
     result = x >> y
 
     # Shifting should always produce a result with the same base type
@@ -420,13 +420,13 @@ def _not_equal(x, y):
 
 def _arctan2(y, x):
     if x == y == 0.0:
-	return None
+        return None
     return np.arctan2(y, x)
 def _pow(x, y):
     if x < 0.0:
-	return None
+        return None
     if x == 0.0 and y <= 0.0:
-	return None
+        return None
     return np.power(x, y)
 def _exp2(x):
     # exp2() is not available in versions of numpy < 1.3.0 so we
@@ -438,28 +438,28 @@ def _trunc(x):
     return np.sign(x) * np.floor(np.abs(x))
 def _clamp(x, minVal, maxVal):
     if minVal > maxVal:
-	return None
+        return None
     return min(max(x, minVal), maxVal)
 def _smoothstep(edge0, edge1, x):
     if edge0 >= edge1:
-	return None
+        return None
     t = _clamp((x-edge0)/(edge1-edge0),0.0,1.0)
     return t*t*(3.0-2.0*t)
 def _normalize(x):
     return x/np.linalg.norm(x)
 def _faceforward(N, I, Nref):
     if np.dot(Nref, I) < 0.0:
-	return N
+        return N
     else:
-	return -N
+        return -N
 def _reflect(I, N):
     return I-2*np.dot(N,I)*N
 def _refract(I, N, eta):
     k = 1.0-eta*eta*(1.0-np.dot(N,I)*np.dot(N,I))
     if k < 0.0:
-	return I*0.0
+        return I*0.0
     else:
-	return eta*I-(eta*np.dot(N,I)+np.sqrt(k))*N
+        return eta*I-(eta*np.dot(N,I)+np.sqrt(k))*N
 
 
 
@@ -467,14 +467,14 @@ def _change_signedness(x):
     """Change signed integer types to unsigned integer types and vice
     versa."""
     if isinstance(x, INT32_TYPES):
-	return np.uint32(x)
+        return np.uint32(x)
     elif isinstance(x, UINT32_TYPES):
-	return np.int32(x)
+        return np.int32(x)
     elif isinstance(x, np.ndarray):
-	if (x.dtype in INT32_TYPES):
-	    return np.array(x, dtype=np.uint32)
-	elif (x.dtype in UINT32_TYPES):
-	    return np.array(x, dtype=np.int32)
+        if (x.dtype in INT32_TYPES):
+            return np.array(x, dtype=np.uint32)
+        elif (x.dtype in UINT32_TYPES):
+            return np.array(x, dtype=np.int32)
     raise Exception('Unexpected type passed to _change_signedness')
 
 
@@ -584,15 +584,15 @@ def _simulate_function(test_inputs, python_equivalent, tolerance_function):
     """
     test_vectors = []
     for inputs in test_inputs:
-	expected_output = round_to_32_bits(
-	    python_equivalent(*[extend_to_64_bits(x) for x in inputs]))
-	if expected_output is not None:
-	    if glsl_type_of(expected_output).base_type != glsl_float:
-		tolerance = np.float32(0.0)
-	    else:
-		tolerance = np.float32(
-		    tolerance_function(inputs, expected_output))
-	    test_vectors.append(TestVector(inputs, expected_output, tolerance))
+        expected_output = round_to_32_bits(
+            python_equivalent(*[extend_to_64_bits(x) for x in inputs]))
+        if expected_output is not None:
+            if glsl_type_of(expected_output).base_type != glsl_float:
+                tolerance = np.float32(0.0)
+            else:
+                tolerance = np.float32(
+                    tolerance_function(inputs, expected_output))
+            test_vectors.append(TestVector(inputs, expected_output, tolerance))
     return test_vectors
 
 
@@ -617,58 +617,58 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
     [TestVector((vec2(10, 11), 20), vec2(30, 31), new_tolerance)].
     """
     def make_groups(test_vectors):
-	"""Group test vectors according to the values passed to the
-	arguments that should not be vectorized.
-	"""
-	groups = {}
-	for tv in test_vectors:
-	    key = tuple(tv.arguments[i] for i in scalar_arg_indices)
-	    if key not in groups:
-		groups[key] = []
-	    groups[key].append(tv)
-	return groups
+        """Group test vectors according to the values passed to the
+        arguments that should not be vectorized.
+        """
+        groups = {}
+        for tv in test_vectors:
+            key = tuple(tv.arguments[i] for i in scalar_arg_indices)
+            if key not in groups:
+                groups[key] = []
+            groups[key].append(tv)
+        return groups
     def partition_vectors(test_vectors, partition_size):
-	"""Partition test_vectors into lists of length partition_size.
-	If partition_size does not evenly divide the number of test
-	vectors, wrap around as necessary to ensure that every input
-	test vector is included.
-	"""
-	for i in xrange(0, len(test_vectors), partition_size):
-	    partition = []
-	    for j in xrange(partition_size):
-		partition.append(test_vectors[(i + j) % len(test_vectors)])
-	    yield partition
+        """Partition test_vectors into lists of length partition_size.
+        If partition_size does not evenly divide the number of test
+        vectors, wrap around as necessary to ensure that every input
+        test vector is included.
+        """
+        for i in xrange(0, len(test_vectors), partition_size):
+            partition = []
+            for j in xrange(partition_size):
+                partition.append(test_vectors[(i + j) % len(test_vectors)])
+            yield partition
     def merge_vectors(test_vectors):
-	"""Merge the given set of test vectors (whose arguments and
-	result are scalars) into a single test vector whose arguments
-	and result are vectors.  For argument indices in
-	scalar_arg_indices, leave the argument as a scalar.
-	"""
-	arity = len(test_vectors[0].arguments)
-	arguments = []
-	for j in xrange(arity):
-	    if j in scalar_arg_indices:
-		arguments.append(test_vectors[0].arguments[j])
-	    else:
-		arguments.append(
-		    np.array([tv.arguments[j] for tv in test_vectors]))
-	result = np.array([tv.result for tv in test_vectors])
-	tolerance = np.float32(
-	    np.linalg.norm([tv.tolerance for tv in test_vectors]))
-	return TestVector(arguments, result, tolerance)
+        """Merge the given set of test vectors (whose arguments and
+        result are scalars) into a single test vector whose arguments
+        and result are vectors.  For argument indices in
+        scalar_arg_indices, leave the argument as a scalar.
+        """
+        arity = len(test_vectors[0].arguments)
+        arguments = []
+        for j in xrange(arity):
+            if j in scalar_arg_indices:
+                arguments.append(test_vectors[0].arguments[j])
+            else:
+                arguments.append(
+                    np.array([tv.arguments[j] for tv in test_vectors]))
+        result = np.array([tv.result for tv in test_vectors])
+        tolerance = np.float32(
+            np.linalg.norm([tv.tolerance for tv in test_vectors]))
+        return TestVector(arguments, result, tolerance)
     vectorized_test_vectors = []
     groups = make_groups(test_vectors)
     for key in sorted(groups.keys()):
-	test_vectors = groups[key]
-	vectorized_test_vectors.extend(
-	    merge_vectors(partition)
-	    for partition in partition_vectors(test_vectors, vector_length))
+        test_vectors = groups[key]
+        vectorized_test_vectors.extend(
+            merge_vectors(partition)
+            for partition in partition_vectors(test_vectors, vector_length))
     return vectorized_test_vectors
 
 
 
 def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
-		       template = None):
+                       template = None):
     """Store a test vector in the appropriate place in
     test_suite_dict.  The dictionary key (which is a Signature tuple)
     is generated by consulting the argument and return types of the
@@ -681,24 +681,24 @@ def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
     Signature objects generated.
     """
     if template is None:
-	arg_indices = xrange(len(test_vector.arguments))
-	template = '{0}({1})'.format(
-	    name, ', '.join('{{{0}}}'.format(i) for i in arg_indices))
+        arg_indices = xrange(len(test_vector.arguments))
+        template = '{0}({1})'.format(
+            name, ', '.join('{{{0}}}'.format(i) for i in arg_indices))
     rettype = glsl_type_of(test_vector.result)
     argtypes = tuple(glsl_type_of(arg) for arg in test_vector.arguments)
     adjusted_glsl_version = max(
-	glsl_version, rettype.version_introduced,
-	*[t.version_introduced for t in argtypes])
+        glsl_version, rettype.version_introduced,
+        *[t.version_introduced for t in argtypes])
     signature = Signature(
-	name, template, adjusted_glsl_version, rettype, argtypes)
+        name, template, adjusted_glsl_version, rettype, argtypes)
     if signature not in test_suite_dict:
-	test_suite_dict[signature] = []
+        test_suite_dict[signature] = []
     test_suite_dict[signature].append(test_vector)
 
 
 
 def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
-			template = None):
+                        template = None):
     """Store multiple test vectors in the appropriate places in
     test_suite_dict.
 
@@ -706,8 +706,8 @@ def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
     Signature objects generated.
     """
     for test_vector in test_vectors:
-	_store_test_vector(test_suite_dict, name, glsl_version, test_vector,
-			   template = template)
+        _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
+                           template = template)
 
 
 
@@ -727,7 +727,7 @@ def make_arguments(input_generators):
     values are passed into OpenGL.
     """
     input_generators = [
-	[round_to_32_bits(x) for x in seq] for seq in input_generators]
+        [round_to_32_bits(x) for x in seq] for seq in input_generators]
     return list(itertools.product(*input_generators))
 
 
@@ -741,8 +741,8 @@ def _make_componentwise_test_vectors(test_suite_dict):
     # or very small input values.
     atan_inputs = [0.0]
     for exponent in (-10, -1, 0, 1, 10):
-	atan_inputs.append(pow(10.0, exponent))
-	atan_inputs.append(-pow(10.0, exponent))
+        atan_inputs.append(pow(10.0, exponent))
+        atan_inputs.append(-pow(10.0, exponent))
     # Make a similar set of inputs for acosh(), except don't use any
     # values < 1, since acosh() is only defined for x >= 1.
     acosh_inputs = [1.0 + x for x in atan_inputs if x >= 0]
@@ -750,44 +750,44 @@ def _make_componentwise_test_vectors(test_suite_dict):
     uints = [np.uint32(x) for x in [0, 1, 2, 5, 34]]
     bools = [True, False]
     def f(name, arity, glsl_version, python_equivalent,
-	  alternate_scalar_arg_indices, test_inputs,
-	  tolerance_function = _strict_tolerance):
-	"""Create test vectors for the function with the given name
-	and arity, which was introduced in the given glsl_version.
+          alternate_scalar_arg_indices, test_inputs,
+          tolerance_function = _strict_tolerance):
+        """Create test vectors for the function with the given name
+        and arity, which was introduced in the given glsl_version.
 
-	python_equivalent is a Python function which operates on scalars,
-	and simulates the GLSL function.  This function should return None
-	in any case where the output of the GLSL function is undefined.
+        python_equivalent is a Python function which operates on scalars,
+        and simulates the GLSL function.  This function should return None
+        in any case where the output of the GLSL function is undefined.
 
-	If alternate_scalar_arg_indices is not None, also create test
-	vectors for an alternate vectorized version of the function,
-	in which some arguments are scalars.
-	alternate_scalar_arg_indices is a sequence of the indices of
-	the arguments which are scalars.
+        If alternate_scalar_arg_indices is not None, also create test
+        vectors for an alternate vectorized version of the function,
+        in which some arguments are scalars.
+        alternate_scalar_arg_indices is a sequence of the indices of
+        the arguments which are scalars.
 
-	test_inputs is a list, the ith element of which is a list of
-	values that are suitable for use as the ith argument of the
-	function.
+        test_inputs is a list, the ith element of which is a list of
+        values that are suitable for use as the ith argument of the
+        function.
 
-	If tolerance_function is supplied, it is a function which
-	should be used to compute the tolerance for the test vectors.
-	Otherwise, _strict_tolerance is used.
-	"""
-	scalar_test_vectors = _simulate_function(
-	    make_arguments(test_inputs), python_equivalent, tolerance_function)
-	_store_test_vectors(
-	    test_suite_dict, name, glsl_version, scalar_test_vectors)
-	if alternate_scalar_arg_indices is None:
-	    scalar_arg_indices_list = [()]
-	else:
-	    scalar_arg_indices_list = [(), alternate_scalar_arg_indices]
-	for scalar_arg_indices in scalar_arg_indices_list:
-	    for vector_length in (2, 3, 4):
-		_store_test_vectors(
-		    test_suite_dict, name, glsl_version,
-		    _vectorize_test_vectors(
-			scalar_test_vectors, scalar_arg_indices,
-			vector_length))
+        If tolerance_function is supplied, it is a function which
+        should be used to compute the tolerance for the test vectors.
+        Otherwise, _strict_tolerance is used.
+        """
+        scalar_test_vectors = _simulate_function(
+            make_arguments(test_inputs), python_equivalent, tolerance_function)
+        _store_test_vectors(
+            test_suite_dict, name, glsl_version, scalar_test_vectors)
+        if alternate_scalar_arg_indices is None:
+            scalar_arg_indices_list = [()]
+        else:
+            scalar_arg_indices_list = [(), alternate_scalar_arg_indices]
+        for scalar_arg_indices in scalar_arg_indices_list:
+            for vector_length in (2, 3, 4):
+                _store_test_vectors(
+                    test_suite_dict, name, glsl_version,
+                    _vectorize_test_vectors(
+                        scalar_test_vectors, scalar_arg_indices,
+                        vector_length))
     f('radians', 1, 110, np.radians, None, [np.linspace(-180.0, 180.0, 4)])
     f('degrees', 1, 110, np.degrees, None, [np.linspace(-np.pi, np.pi, 4)])
     f('sin', 1, 110, np.sin, None, [np.linspace(-np.pi, np.pi, 4)], _trig_tolerance)
@@ -855,38 +855,38 @@ def _make_vector_relational_test_vectors(test_suite_dict):
     equal(), and not().
     """
     _default_inputs = {
-	'v': np.linspace(-1.5, 1.5, 4),
-	'i': np.array([-5, -2, -1, 0, 1, 2, 5], dtype=np.int32),
-	'u': np.array([0, 1, 2, 5, 34], dtype=np.uint32),
-	'b': np.array([False, True])
-	}
+        'v': np.linspace(-1.5, 1.5, 4),
+        'i': np.array([-5, -2, -1, 0, 1, 2, 5], dtype=np.int32),
+        'u': np.array([0, 1, 2, 5, 34], dtype=np.uint32),
+        'b': np.array([False, True])
+        }
     def f(name, arity, glsl_version, python_equivalent, arg_types,
-	  tolerance_function = _strict_tolerance):
-	"""Make test vectors for the function with the given name and
-	arity, which was introduced in the given glsl_version.
+          tolerance_function = _strict_tolerance):
+        """Make test vectors for the function with the given name and
+        arity, which was introduced in the given glsl_version.
 
-	python_equivalent is a Python function which operates on scalars,
-	and simulates the GLSL function.
+        python_equivalent is a Python function which operates on scalars,
+        and simulates the GLSL function.
 
-	arg_types is a string containing 'v' if the function supports
-	standard "vec" inputs, 'i' if it supports "ivec" inputs, and 'b'
-	if it supports "bvec" inputs.  The output type of the function is
-	assumed to be the same as its input type.
+        arg_types is a string containing 'v' if the function supports
+        standard "vec" inputs, 'i' if it supports "ivec" inputs, and 'b'
+        if it supports "bvec" inputs.  The output type of the function is
+        assumed to be the same as its input type.
 
-	If tolerance_function is supplied, it is a function which
-	should be used to compute the tolerance for the test vectors.
-	Otherwise, _strict_tolerance is used.
-	"""
-	for arg_type in arg_types:
-	    test_inputs = [_default_inputs[arg_type]]*arity
-	    scalar_test_vectors = _simulate_function(
-		make_arguments(test_inputs), python_equivalent,
-		tolerance_function)
-	    for vector_length in (2, 3, 4):
-		_store_test_vectors(
-		    test_suite_dict, name, glsl_version,
-		    _vectorize_test_vectors(
-			scalar_test_vectors, (), vector_length))
+        If tolerance_function is supplied, it is a function which
+        should be used to compute the tolerance for the test vectors.
+        Otherwise, _strict_tolerance is used.
+        """
+        for arg_type in arg_types:
+            test_inputs = [_default_inputs[arg_type]]*arity
+            scalar_test_vectors = _simulate_function(
+                make_arguments(test_inputs), python_equivalent,
+                tolerance_function)
+            for vector_length in (2, 3, 4):
+                _store_test_vectors(
+                    test_suite_dict, name, glsl_version,
+                    _vectorize_test_vectors(
+                        scalar_test_vectors, (), vector_length))
     f('lessThan', 2, 110, lambda x, y: x < y, 'viu')
     f('lessThanEqual', 2, 110, lambda x, y: x <= y, 'viu')
     f('greaterThan', 2, 110, lambda x, y: x > y, 'viu')
@@ -904,244 +904,244 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     length(), dot(), cross(), normalize(), and refract().
     """
     def match_args(*indices):
-	"""Return a function that determines whether the type of the
-	arguments at the given indices match.
+        """Return a function that determines whether the type of the
+        arguments at the given indices match.
 
-	For example:
+        For example:
 
             match(1, 3)
 
-	is equivalent to:
+        is equivalent to:
 
             lambda a, b, c, d: glsl_type_of(b) == glsl_type_of(d)
-	"""
-	return lambda *args: _argument_types_match(args, indices)
+        """
+        return lambda *args: _argument_types_match(args, indices)
     def match_simple_binop(x, y):
-	"""Detemine whether the type of the arguments is compatible
-	for a simple binary operator (such as '+').
+        """Detemine whether the type of the arguments is compatible
+        for a simple binary operator (such as '+').
 
-	Arguments are compatible if one is a scalar and the other is a
-	vector/matrix with the same base type, or if they are the same
-	type.
-	"""
-	x_type = glsl_type_of(x)
-	y_type = glsl_type_of(y)
-	if x_type.base_type != y_type.base_type:
-	    return False
-	if x_type.is_scalar or y_type.is_scalar:
-	    return True
-	return x_type == y_type
+        Arguments are compatible if one is a scalar and the other is a
+        vector/matrix with the same base type, or if they are the same
+        type.
+        """
+        x_type = glsl_type_of(x)
+        y_type = glsl_type_of(y)
+        if x_type.base_type != y_type.base_type:
+            return False
+        if x_type.is_scalar or y_type.is_scalar:
+            return True
+        return x_type == y_type
     def match_multiply(x, y):
-	"""Determine whether the type of the arguments is compatible
-	for multiply.
+        """Determine whether the type of the arguments is compatible
+        for multiply.
 
-	Arguments are compatible if they are scalars, vectors, or
-	matrices with the same base type, and the vector/matrix sizes
-	are properly matched.
-	"""
-	x_type = glsl_type_of(x)
-	y_type = glsl_type_of(y)
-	if x_type.base_type != y_type.base_type:
-	    return False
-	if x_type.is_scalar or y_type.is_scalar:
-	    return True
-	if x_type.is_vector and y_type.is_matrix:
-	    # When multiplying vector * matrix, the vector is
-	    # transposed to a row vector.  So its row count must match
-	    # the row count of the matrix.
-	    return x_type.num_rows == y_type.num_rows
-	elif x_type.is_vector:
-	    assert y_type.is_vector
-	    # When multiplying vector * vector, the multiplication is
-	    # done componentwise, so the types must match exactly.
-	    return x_type == y_type
-	else:
-	    assert x_type.is_matrix
-	    # When multiplying matrix * matrix or matrix * vector, a
-	    # standard linear algebraic multiply is used, so x's
-	    # column count must match y's row count.
-	    return x_type.num_cols == y_type.num_rows
+        Arguments are compatible if they are scalars, vectors, or
+        matrices with the same base type, and the vector/matrix sizes
+        are properly matched.
+        """
+        x_type = glsl_type_of(x)
+        y_type = glsl_type_of(y)
+        if x_type.base_type != y_type.base_type:
+            return False
+        if x_type.is_scalar or y_type.is_scalar:
+            return True
+        if x_type.is_vector and y_type.is_matrix:
+            # When multiplying vector * matrix, the vector is
+            # transposed to a row vector.  So its row count must match
+            # the row count of the matrix.
+            return x_type.num_rows == y_type.num_rows
+        elif x_type.is_vector:
+            assert y_type.is_vector
+            # When multiplying vector * vector, the multiplication is
+            # done componentwise, so the types must match exactly.
+            return x_type == y_type
+        else:
+            assert x_type.is_matrix
+            # When multiplying matrix * matrix or matrix * vector, a
+            # standard linear algebraic multiply is used, so x's
+            # column count must match y's row count.
+            return x_type.num_cols == y_type.num_rows
     def match_shift(x, y):
-	"""Determine whether the type of the arguments is compatible
-	for shift operations.
+        """Determine whether the type of the arguments is compatible
+        for shift operations.
 
-	Arguments are compatible if they are the same length or the
-	first one is a vector and the second is a scalar.  Their base
-	types need not be the same, but they both must be integral.
-	"""
-	x_type = glsl_type_of(x)
-	y_type = glsl_type_of(y)
-	if x_type.base_type not in (glsl_int, glsl_uint):
-	    return False
-	if y_type.base_type not in (glsl_int, glsl_uint):
-	    return False
-	if y_type.is_scalar:
-	    return True
-	assert not x_type.is_matrix
-	assert not y_type.is_matrix
-	return x_type.num_rows == y_type.num_rows
+        Arguments are compatible if they are the same length or the
+        first one is a vector and the second is a scalar.  Their base
+        types need not be the same, but they both must be integral.
+        """
+        x_type = glsl_type_of(x)
+        y_type = glsl_type_of(y)
+        if x_type.base_type not in (glsl_int, glsl_uint):
+            return False
+        if y_type.base_type not in (glsl_int, glsl_uint):
+            return False
+        if y_type.is_scalar:
+            return True
+        assert not x_type.is_matrix
+        assert not y_type.is_matrix
+        return x_type.num_rows == y_type.num_rows
 
     bools = [False, True]
     bvecs = [np.array(bs) for bs in itertools.product(bools, bools)] + \
-	[np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
-	[np.array(bs) for bs in itertools.product(bools, bools, bools, bools)]
+        [np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
+        [np.array(bs) for bs in itertools.product(bools, bools, bools, bools)]
     ints = [np.int32(x) for x in [12, -6, 74, -32, 0]]
     small_ints = [np.int32(x) for x in [-31, -25, -5, -2, -1, 0, 1, 2, 5, 25, 31]]
     ivecs = [
-	np.array([38, 35], dtype=np.int32),
-	np.array([64, -9], dtype=np.int32),
-	np.array([64, 9], dtype=np.int32),
-	np.array([-36, 32, -88], dtype=np.int32),
-	np.array([36, 32, 88], dtype=np.int32),
-	np.array([59, 77, 68], dtype=np.int32),
-	np.array([-66, 72, 87, -75], dtype=np.int32),
-	np.array([66, 72, 87, 75], dtype=np.int32),
-	np.array([-24, 40, -23, 74], dtype=np.int32),
-	np.array([24, 40, 23, 74], dtype=np.int32),
-	]
+        np.array([38, 35], dtype=np.int32),
+        np.array([64, -9], dtype=np.int32),
+        np.array([64, 9], dtype=np.int32),
+        np.array([-36, 32, -88], dtype=np.int32),
+        np.array([36, 32, 88], dtype=np.int32),
+        np.array([59, 77, 68], dtype=np.int32),
+        np.array([-66, 72, 87, -75], dtype=np.int32),
+        np.array([66, 72, 87, 75], dtype=np.int32),
+        np.array([-24, 40, -23, 74], dtype=np.int32),
+        np.array([24, 40, 23, 74], dtype=np.int32),
+        ]
     small_ivecs = [
-	np.array([13, 26], dtype=np.int32),
-	np.array([-2, 26], dtype=np.int32),
-	np.array([2, 26], dtype=np.int32),
-	np.array([22, -23, 4], dtype=np.int32),
-	np.array([22, 23, 4], dtype=np.int32),
-	np.array([-19, 1, -13], dtype=np.int32),
-	np.array([19, 1, 13], dtype=np.int32),
-	np.array([16, 24, -23, -25], dtype=np.int32),
-	np.array([16, 24, 23, 25], dtype=np.int32),
-	np.array([-23, -12, 14, 19], dtype=np.int32),
-	np.array([23, 12, 14, 19], dtype=np.int32),
-	]
+        np.array([13, 26], dtype=np.int32),
+        np.array([-2, 26], dtype=np.int32),
+        np.array([2, 26], dtype=np.int32),
+        np.array([22, -23, 4], dtype=np.int32),
+        np.array([22, 23, 4], dtype=np.int32),
+        np.array([-19, 1, -13], dtype=np.int32),
+        np.array([19, 1, 13], dtype=np.int32),
+        np.array([16, 24, -23, -25], dtype=np.int32),
+        np.array([16, 24, 23, 25], dtype=np.int32),
+        np.array([-23, -12, 14, 19], dtype=np.int32),
+        np.array([23, 12, 14, 19], dtype=np.int32),
+        ]
     uints = [np.uint32(x) for x in [0, 6, 12, 32, 74]]
     small_uints = [np.uint32(x) for x in [0, 1, 2, 5, 25, 31]]
     large_uints = [np.uint32(x) for x in [0xdeadbeef, 0xaffeaffe, 0xbadbad]]
     uvecs = [
-	np.array([38, 35], dtype=np.uint32),
-	np.array([64, 9], dtype=np.uint32),
-	np.array([36, 32, 88], dtype=np.uint32),
-	np.array([59, 77, 68], dtype=np.uint32),
-	np.array([66, 72, 87, 75], dtype=np.uint32),
-	np.array([24, 40, 23, 74], dtype=np.uint32)
-	]
+        np.array([38, 35], dtype=np.uint32),
+        np.array([64, 9], dtype=np.uint32),
+        np.array([36, 32, 88], dtype=np.uint32),
+        np.array([59, 77, 68], dtype=np.uint32),
+        np.array([66, 72, 87, 75], dtype=np.uint32),
+        np.array([24, 40, 23, 74], dtype=np.uint32)
+        ]
     small_uvecs = [
-	np.array([13, 26], dtype=np.uint32),
-	np.array([2, 26], dtype=np.uint32),
-	np.array([22, 23, 4], dtype=np.uint32),
-	np.array([19, 1, 13], dtype=np.uint32),
-	np.array([16, 24, 23, 25], dtype=np.uint32),
-	np.array([23, 12, 14, 19], dtype=np.uint32),
-	]
+        np.array([13, 26], dtype=np.uint32),
+        np.array([2, 26], dtype=np.uint32),
+        np.array([22, 23, 4], dtype=np.uint32),
+        np.array([19, 1, 13], dtype=np.uint32),
+        np.array([16, 24, 23, 25], dtype=np.uint32),
+        np.array([23, 12, 14, 19], dtype=np.uint32),
+        ]
     nz_floats = [-1.33, 0.85]
     floats = [0.0] + nz_floats
     vecs = [
-	 np.array([-0.10, -1.20]),
-	 np.array([-0.42, 0.48]),
-	 np.array([-0.03, -0.85, -0.94]),
-	 np.array([1.67, 0.66, 1.87]),
-	 np.array([-1.65, 1.33, 1.93, 0.76]),
-	 np.array([0.80, -0.15, -0.51, 0.0])
-	 ]
+         np.array([-0.10, -1.20]),
+         np.array([-0.42, 0.48]),
+         np.array([-0.03, -0.85, -0.94]),
+         np.array([1.67, 0.66, 1.87]),
+         np.array([-1.65, 1.33, 1.93, 0.76]),
+         np.array([0.80, -0.15, -0.51, 0.0])
+         ]
     nz_floats_vecs = nz_floats + vecs
     vec3s = [
-	np.array([-0.03, -0.85, -0.94]),
-	np.array([1.67, 0.66, 1.87]),
-	]
+        np.array([-0.03, -0.85, -0.94]),
+        np.array([1.67, 0.66, 1.87]),
+        ]
     norm_floats_vecs = [_normalize(x) for x in nz_floats_vecs]
     squaremats = [
-	np.array([[ 1.60,  0.76],
-		  [ 1.53, -1.00]]), # mat2
-	np.array([[-0.13, -0.87],
-		  [-1.40,  1.40]]), # mat2
-	np.array([[-1.11,  1.67, -0.41],
-		  [ 0.13,  1.09, -0.02],
-		  [ 0.56,  0.95,  0.24]]), # mat3
-	np.array([[-1.69, -0.46, -0.18],
-		  [-1.09,  1.75,  2.00],
-		  [-1.53, -0.70, -1.47]]), # mat3
-	np.array([[-1.00, -0.55, -1.08,  1.79],
-		  [ 1.77,  0.62,  0.48, -1.35],
-		  [ 0.09, -0.71, -1.39, -1.21],
-		  [-0.91, -1.82, -1.43,  0.72]]), # mat4
-	np.array([[ 0.06,  1.31,  1.52, -1.96],
-		  [ 1.60, -0.32,  0.51, -1.84],
-		  [ 1.25,  0.45,  1.90, -0.72],
-		  [-0.16,  0.45, -0.88,  0.39]]), # mat4
+        np.array([[ 1.60,  0.76],
+                  [ 1.53, -1.00]]), # mat2
+        np.array([[-0.13, -0.87],
+                  [-1.40,  1.40]]), # mat2
+        np.array([[-1.11,  1.67, -0.41],
+                  [ 0.13,  1.09, -0.02],
+                  [ 0.56,  0.95,  0.24]]), # mat3
+        np.array([[-1.69, -0.46, -0.18],
+                  [-1.09,  1.75,  2.00],
+                  [-1.53, -0.70, -1.47]]), # mat3
+        np.array([[-1.00, -0.55, -1.08,  1.79],
+                  [ 1.77,  0.62,  0.48, -1.35],
+                  [ 0.09, -0.71, -1.39, -1.21],
+                  [-0.91, -1.82, -1.43,  0.72]]), # mat4
+        np.array([[ 0.06,  1.31,  1.52, -1.96],
+                  [ 1.60, -0.32,  0.51, -1.84],
+                  [ 1.25,  0.45,  1.90, -0.72],
+                  [-0.16,  0.45, -0.88,  0.39]]), # mat4
         ]
     mats = squaremats + [
-	np.array([[ 0.09,  1.30,  1.25],
-		  [-1.19,  0.08,  1.08]]), # mat3x2
-	np.array([[-0.36, -1.08, -0.60],
-		  [-0.53,  0.88, -1.79]]), # mat3x2
-	np.array([[-0.46,  1.94],
-		  [-0.45, -0.75],
-		  [ 1.03, -0.50]]), # mat2x3
-	np.array([[ 1.38, -1.08],
-		  [-1.27,  1.83],
-		  [ 1.00, -0.74]]), # mat2x3
-	np.array([[ 1.81, -0.87,  0.81,  0.65],
-		  [-1.16, -1.52,  0.25, -1.51]]), # mat4x2
-	np.array([[ 1.93, -1.63,  0.29,  1.60],
-		  [ 0.49,  0.27,  0.14,  0.94]]), # mat4x2
-	np.array([[ 0.16, -1.69],
-		  [-0.80,  0.59],
-		  [-1.74, -1.43],
-		  [-0.02, -1.21]]), # mat2x4
-	np.array([[-1.02,  0.74],
-		  [-1.64, -0.13],
-		  [-1.59,  0.47],
-		  [ 0.30,  1.13]]), # mat2x4
-	np.array([[-0.27, -1.38, -1.41, -0.12],
-		  [-0.17, -0.56,  1.47,  1.86],
-		  [-1.85, -1.29,  1.77,  0.01]]), # mat4x3
-	np.array([[-0.47, -0.15,  1.97, -1.05],
-		  [-0.20,  0.53, -1.82, -1.41],
-		  [-1.39, -0.19,  1.62,  1.58]]), # mat4x3
-	np.array([[ 1.42, -0.86,  0.27],
-		  [ 1.80, -1.74,  0.04],
-		  [-1.88, -0.37,  0.43],
-		  [ 1.37,  1.90,  0.71]]), # mat3x4
-	np.array([[-1.72,  0.09,  0.45],
-		  [-0.31, -1.58,  1.92],
-		  [ 0.14,  0.18, -0.56],
-		  [ 0.40, -0.77,  1.76]]), # mat3x4
-	]
+        np.array([[ 0.09,  1.30,  1.25],
+                  [-1.19,  0.08,  1.08]]), # mat3x2
+        np.array([[-0.36, -1.08, -0.60],
+                  [-0.53,  0.88, -1.79]]), # mat3x2
+        np.array([[-0.46,  1.94],
+                  [-0.45, -0.75],
+                  [ 1.03, -0.50]]), # mat2x3
+        np.array([[ 1.38, -1.08],
+                  [-1.27,  1.83],
+                  [ 1.00, -0.74]]), # mat2x3
+        np.array([[ 1.81, -0.87,  0.81,  0.65],
+                  [-1.16, -1.52,  0.25, -1.51]]), # mat4x2
+        np.array([[ 1.93, -1.63,  0.29,  1.60],
+                  [ 0.49,  0.27,  0.14,  0.94]]), # mat4x2
+        np.array([[ 0.16, -1.69],
+                  [-0.80,  0.59],
+                  [-1.74, -1.43],
+                  [-0.02, -1.21]]), # mat2x4
+        np.array([[-1.02,  0.74],
+                  [-1.64, -0.13],
+                  [-1.59,  0.47],
+                  [ 0.30,  1.13]]), # mat2x4
+        np.array([[-0.27, -1.38, -1.41, -0.12],
+                  [-0.17, -0.56,  1.47,  1.86],
+                  [-1.85, -1.29,  1.77,  0.01]]), # mat4x3
+        np.array([[-0.47, -0.15,  1.97, -1.05],
+                  [-0.20,  0.53, -1.82, -1.41],
+                  [-1.39, -0.19,  1.62,  1.58]]), # mat4x3
+        np.array([[ 1.42, -0.86,  0.27],
+                  [ 1.80, -1.74,  0.04],
+                  [-1.88, -0.37,  0.43],
+                  [ 1.37,  1.90,  0.71]]), # mat3x4
+        np.array([[-1.72,  0.09,  0.45],
+                  [-0.31, -1.58,  1.92],
+                  [ 0.14,  0.18, -0.56],
+                  [ 0.40, -0.77,  1.76]]), # mat3x4
+        ]
     def f(name, arity, glsl_version, python_equivalent,
-	  filter, test_inputs, tolerance_function = _strict_tolerance,
-	  template = None):
-	"""Make test vectors for the function with the given name and
-	arity, which was introduced in the given glsl_version.
+          filter, test_inputs, tolerance_function = _strict_tolerance,
+          template = None):
+        """Make test vectors for the function with the given name and
+        arity, which was introduced in the given glsl_version.
 
-	python_equivalent is a Python function which simulates the GLSL
-	function.  This function should return None in any case where the
-	output of the GLSL function is undefined.  However, it need not
-	check that the lengths of the input vectors are all the same.
+        python_equivalent is a Python function which simulates the GLSL
+        function.  This function should return None in any case where the
+        output of the GLSL function is undefined.  However, it need not
+        check that the lengths of the input vectors are all the same.
 
-	If filter is not None, it will be called with each set of
-	arguments, and test cases will only be generated if the filter
-	returns True.
+        If filter is not None, it will be called with each set of
+        arguments, and test cases will only be generated if the filter
+        returns True.
 
-	test_inputs is a list, the ith element of which is a list of
-	vectors and/or scalars that are suitable for use as the ith
-	argument of the function.
+        test_inputs is a list, the ith element of which is a list of
+        vectors and/or scalars that are suitable for use as the ith
+        argument of the function.
 
-	If tolerance_function is supplied, it is a function which
-	should be used to compute the tolerance for the test vectors.
-	Otherwise, _strict_tolerance is used.
+        If tolerance_function is supplied, it is a function which
+        should be used to compute the tolerance for the test vectors.
+        Otherwise, _strict_tolerance is used.
 
-	If template is supplied, it is used insted as the template for
-	the Signature objects generated.
-	"""
-	test_inputs = make_arguments(test_inputs)
-	if filter is not None:
-	    test_inputs = [
-		arguments
-		for arguments in test_inputs
-		if filter(*arguments)]
-	_store_test_vectors(
-	    test_suite_dict, name, glsl_version,
-	    _simulate_function(
-		test_inputs, python_equivalent, tolerance_function),
-	    template = template)
+        If template is supplied, it is used insted as the template for
+        the Signature objects generated.
+        """
+        test_inputs = make_arguments(test_inputs)
+        if filter is not None:
+            test_inputs = [
+                arguments
+                for arguments in test_inputs
+                if filter(*arguments)]
+        _store_test_vectors(
+            test_suite_dict, name, glsl_version,
+            _simulate_function(
+                test_inputs, python_equivalent, tolerance_function),
+            template = template)
     f('op-add', 2, 110, lambda x, y: x + y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} + {1})')
     f('op-sub', 2, 110, lambda x, y: x - y, match_simple_binop, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} - {1})')
     f('op-mult', 2, 110, _multiply, match_multiply, [floats+vecs+mats+ints+ivecs+uints+uvecs, floats+vecs+mats+ints+ivecs+uints+uvecs], template = '({0} * {1})')
@@ -1202,9 +1202,9 @@ def _check_signature_safety(test_suite_dict):
     """
     name_argtype_combos = set()
     for signature in test_suite_dict:
-	name_argtype_combo = (signature.name, signature.argtypes)
-	if name_argtype_combo in name_argtype_combos:
-	    raise Exception(
-		'Duplicate signature found for {0}'.format(name_argtype_combo))
-	name_argtype_combos.add(name_argtype_combo)
+        name_argtype_combo = (signature.name, signature.argtypes)
+        if name_argtype_combo in name_argtype_combos:
+            raise Exception(
+                'Duplicate signature found for {0}'.format(name_argtype_combo))
+        name_argtype_combos.add(name_argtype_combo)
 _check_signature_safety(test_suite)
