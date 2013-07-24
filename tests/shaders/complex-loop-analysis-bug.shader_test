@@ -1,0 +1,33 @@
+# Validate a corner case of loop analysis that causes an assertion
+# failure as of Mesa commit 1903129.
+#
+# See https://bugs.freedesktop.org/show_bug.cgi?id=64330
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+varying vec4 foo[1];
+void main(){
+  gl_Position = gl_Vertex;
+  foo[0] = vec4(0.0);
+}
+
+[fragment shader]
+varying vec4 foo[1];
+void main()
+{
+  for (int i = 0; i < 1; i++)
+  {
+    if (foo[i > 0 ? 0 : i].x >= 0.0)
+    {
+      for (int j = 0; j < 4; j++)
+      {
+      }
+    }
+  }
+  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
