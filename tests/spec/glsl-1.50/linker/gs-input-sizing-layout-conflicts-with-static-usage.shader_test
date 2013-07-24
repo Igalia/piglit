@@ -1,0 +1,61 @@
+# Section 4.3.8.1 (Input Layout Qualifiers) of the GLSL 1.50 spec says:
+#
+# It is a link-time error if not all provided sizes (sized input
+# arrays and layout size) match across all geometry shaders in the
+# program.
+#
+# This test exercises the case where one compilation unit provides a
+# size via a layout declaration, and another provides a size
+# implicitly by accessing a member of an input array using a constant.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+out vec4 vertex_to_gs;
+
+void main()
+{
+  vertex_to_gs = vertex;
+}
+
+[geometry shader]
+#version 150
+
+layout(lines) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+void do_vertex();
+
+void main()
+{
+  for (int i = 0; i < 2; i++)
+    do_vertex();
+}
+
+[geometry shader]
+#version 150
+
+in vec4 vertex_to_gs[];
+
+void do_vertex()
+{
+  gl_Position = vertex_to_gs[2];
+  EmitVertex();
+}
+
+[fragment shader]
+#version 150
+
+out vec4 color;
+
+void main()
+{
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error

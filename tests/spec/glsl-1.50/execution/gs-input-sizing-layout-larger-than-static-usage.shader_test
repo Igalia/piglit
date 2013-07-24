@@ -1,0 +1,83 @@
+# Section 4.3.8.1 (Input Layout Qualifiers) of the GLSL 1.50 spec says:
+#
+# It is a link-time error if not all provided sizes (sized input
+# arrays and layout size) match across all geometry shaders in the
+# program.
+#
+# This test exercises the case where one compilation unit provides a
+# size via a layout declaration, and another provides a size
+# implicitly by accessing a member of an input array using a constant
+# that implies a size smaller than the size provided in the layout
+# declaration.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in int value;
+flat out int value_to_gs;
+
+void main()
+{
+  value_to_gs = value;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+void do_vertex();
+
+void main()
+{
+  gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
+  do_vertex();
+  gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
+  do_vertex();
+  gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
+  do_vertex();
+  gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
+  do_vertex();
+}
+
+[geometry shader]
+#version 150
+
+flat in int value_to_gs[];
+out vec4 color_to_fs;
+
+void do_vertex()
+{
+  if (value_to_gs[1] == 1)
+    color_to_fs = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    color_to_fs = vec4(1.0, 0.0, 0.0, 1.0);
+  EmitVertex();
+}
+
+[fragment shader]
+#version 150
+
+in vec4 color_to_fs;
+out vec4 color;
+
+void main()
+{
+  color = color_to_fs;
+}
+
+[vertex data]
+value/int/1
+0
+1
+2
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLES 0 3
+probe all rgba 0.0 1.0 0.0 1.0
