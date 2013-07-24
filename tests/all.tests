@@ -1860,6 +1860,7 @@ ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
 add_plain_test(ext_texture_array, 'fbo-generatemipmap-array')
 spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxlayers')
+spec['EXT_texture_array']['gen-mipmap'] = concurrent_test('ext_texture_array-gen-mipmap')
 add_shader_test_dir(ext_texture_array,
                     testsDir + '/spec/ext_texture_array',
                     recursive=True)
