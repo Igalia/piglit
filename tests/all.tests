@@ -900,6 +900,7 @@ import_glsl_parser_tests(spec['glsl-1.50'],
 add_shader_test_dir(spec['glsl-1.50'],
 		    os.path.join(testsDir, 'spec', 'glsl-1.50'),
 		    recursive=True)
+spec['glsl-1.50']['execution']['vs-input-arrays'] = concurrent_test('glsl-1.50-vs-input-arrays')
 
 # Group spec/glsl-es-3.00
 spec['glsl-es-3.00'] = Group()
