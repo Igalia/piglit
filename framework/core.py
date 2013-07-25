@@ -160,9 +160,7 @@ class JSONWriter:
         self.write_dict_key(key)
 
         # Write value.
-        self.__indent_level += 1
         self.__write(value)
-        self.__indent_level -= 1
 
     @synchronized_self
     def write_dict_key(self, key):
