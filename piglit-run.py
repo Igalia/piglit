@@ -134,10 +134,8 @@ def main():
     json_writer.write_dict_key('options')
     json_writer.open_dict()
     json_writer.write_dict_item('profile', profileFilename)
-    json_writer.write_dict_key('filter')
-    result_file.write(json.dumps(args.include_tests))
-    json_writer.write_dict_key('exclude_filter')
-    result_file.write(json.dumps(args.exclude_tests))
+    json_writer.write_dict_item('filter', args.include_tests)
+    json_writer.write_dict_item('exclude_filter', args.exclude_tests)
     json_writer.close_dict()
 
     json_writer.write_dict_item('name', results.name)
