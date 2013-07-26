@@ -214,14 +214,11 @@ class GeometryParserTest(ParserTest):
     """Derived class for tests that exercise the built-in in a geometry
     shader.
     """
+    def glsl_version(self):
+	return max(150, ParserTest.glsl_version(self))
+
     def test_suffix(self):
         return 'geom'
-
-    def additional_declarations(self):
-        return '#extension GL_ARB_geometry_shader4: enable\n'
-
-    def additional_extensions(self):
-        return ['GL_ARB_geometry_shader4']
 
     def output_var(self):
         return 'gl_Position'

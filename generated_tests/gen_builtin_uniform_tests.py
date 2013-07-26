@@ -545,46 +545,37 @@ class GeometryShaderTest(ShaderTest):
     def test_prefix(self):
         return 'gs'
 
-    def make_additional_requirements(self):
-        return 'GL_ARB_geometry_shader4\n'
+    def glsl_version(self):
+        return max(150, ShaderTest.glsl_version(self))
 
     def make_vertex_shader(self):
         shader = ''
-        if self.glsl_version() >= 140:
-            shader += "in vec4 vertex;\n"
+        shader += "in vec4 vertex;\n"
+        shader += "out vec4 vertex_to_gs;\n"
 
         shader += "void main()\n"
         shader += "{\n"
-        if self.glsl_version() >= 140:
-            shader += "        gl_Position = vertex;\n"
-        else:
-            shader += "        gl_Position = gl_Vertex;\n"
+        shader += "     vertex_to_gs = vertex;\n"
         shader += "}\n"
 
         return shader
 
     def make_geometry_shader(self):
-        additional_declarations = \
-            '#extension GL_ARB_geometry_shader4: enable\n'
-        if self.glsl_version() >= 130:
-            additional_declarations += 'out vec4 color;\n'
-        else:
-            additional_declarations += 'varying out vec4 color;\n'
+        additional_declarations = ''
+        additional_declarations += 'layout(triangles) in;\n'
+        additional_declarations \
+            += 'layout(triangle_strip, max_vertices = 3) out;\n'
+        additional_declarations += 'in vec4 vertex_to_gs[3];\n'
+        additional_declarations += 'out vec4 color;\n'
         return self.make_test_shader(
             additional_declarations,
             '  vec4 tmp_color;\n',
             'tmp_color',
-            '  for (int i = 0; i < gl_VerticesIn; i++) {\n'
-            '    gl_Position = gl_PositionIn[i];\n'
+            '  for (int i = 0; i < 3; i++) {\n'
+            '    gl_Position = vertex_to_gs[i];\n'
             '    color = tmp_color;\n'
             '    EmitVertex();\n'
             '  }\n')
-
-    def make_geometry_layout(self):
-        layout = 'input type GL_TRIANGLES\n'
-        layout += 'output type GL_TRIANGLE_STRIP\n'
-        layout += 'vertices out 3\n'
-        return layout
 
     def make_fragment_shader(self):
         shader = '''varying vec4 color;
