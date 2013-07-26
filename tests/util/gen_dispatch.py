@@ -457,7 +457,7 @@ def generate_resolve_function(ds):
                 condition = 'dispatch_api == PIGLIT_DISPATCH_ES2'
                 api_base_version = 20
             else:
-                condition = 'dispatch_api == PIGLIT_DISPATCH_ES'
+                condition = 'dispatch_api == PIGLIT_DISPATCH_ES1'
                 api_base_version = 11
 
             # Only check the version for functions that aren't part of the
