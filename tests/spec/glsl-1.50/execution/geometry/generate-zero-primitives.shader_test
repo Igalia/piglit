@@ -1,0 +1,44 @@
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+
+void main()
+{
+	gl_Position = vertex;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+void main()
+{
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+clear color 0 0 0 0
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgb 0.0 0.0 0.0
