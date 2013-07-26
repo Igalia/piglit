@@ -385,8 +385,6 @@ setup_required_size_test(int argc, char **argv,
 	if (argc < 2)
 		usage(argv[0]);
 
-	piglit_gl_test_config_init(config);
-
 	target_version = strtol(argv[1], NULL, 0);
 
 	switch (target_version) {

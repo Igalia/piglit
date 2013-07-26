@@ -314,10 +314,7 @@ piglit_display(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
-int
-main(int argc, char *argv[])
-{
-	struct piglit_gl_test_config config;
+PIGLIT_GL_TEST_CONFIG_BEGIN
 	bool test_compat = true;
 
 #if defined(PIGLIT_USE_OPENGL)
@@ -334,10 +331,6 @@ main(int argc, char *argv[])
 		print_usage_and_exit(argv[0]);
 #endif
 
-	piglit_gl_test_config_init(&config);
-	config.init = piglit_init;
-	config.display = piglit_display;
-
 	if (test_compat)
 		config.supports_gl_compat_version = 10;
 	else
@@ -348,9 +341,4 @@ main(int argc, char *argv[])
 	config.window_width = 150;
 	config.window_height = 150;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-
-	piglit_gl_test_run(argc, argv, &config);
-
-	assert(false);
-	return 0;
-}
+PIGLIT_GL_TEST_CONFIG_END

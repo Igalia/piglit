@@ -39,10 +39,22 @@ unsigned piglit_winsys_fbo = 0;
 int piglit_width;
 int piglit_height;
 
+static void
+process_args(int *argc, char *argv[], unsigned *force_samples);
+
 void
-piglit_gl_test_config_init(struct piglit_gl_test_config *config)
+piglit_gl_test_config_init(int *argc, char *argv[],
+			   struct piglit_gl_test_config *config)
 {
+	unsigned force_samples = 0;
+
 	memset(config, 0, sizeof(*config));
+
+	process_args(argc, argv, &force_samples);
+
+	if (force_samples > 1)
+		config->window_samples = force_samples;
+
 }
 
 static void
@@ -116,18 +128,10 @@ void
 piglit_gl_test_run(int argc, char *argv[],
 		   const struct piglit_gl_test_config *config)
 {
-	struct piglit_gl_test_config conf = *config;
-	unsigned force_samples = 0;
+	piglit_width = config->window_width;
+	piglit_height = config->window_height;
 
-	process_args(&argc, argv, &force_samples);
-
-	if (force_samples > 1)
-		conf.window_samples = force_samples;
-
-	piglit_width = conf.window_width;
-	piglit_height = conf.window_height;
-
-	gl_fw = piglit_gl_framework_factory(&conf);
+	gl_fw = piglit_gl_framework_factory(config);
 	if (gl_fw == NULL) {
 		printf("piglit: error: failed to create "
 		       "piglit_gl_framework\n");

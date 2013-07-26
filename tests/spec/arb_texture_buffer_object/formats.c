@@ -715,11 +715,7 @@ find_arg(int argc, char *argv[], const char *str)
 	return false;
 }
 
-int
-main(int argc, char *argv[])
-{
-	struct piglit_gl_test_config config;
-
+PIGLIT_GL_TEST_CONFIG_BEGIN
 	test_vs = find_arg(argc, argv, "vs");
 	if (!test_vs && !find_arg(argc, argv, "fs"))
 		usage(argv[0]);
@@ -727,11 +723,6 @@ main(int argc, char *argv[])
 	test_arb = find_arg(argc, argv, "arb");
 	if (!test_arb && !find_arg(argc, argv, "core"))
 		usage(argv[0]);
-
-	piglit_gl_test_config_init(&config);
-
-	config.init = piglit_init;
-	config.display = piglit_display;
 
 	if (test_arb)
 		config.supports_gl_compat_version = 10;
@@ -741,9 +732,4 @@ main(int argc, char *argv[])
 	config.window_width = 200;
 	config.window_height = 500;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
-
-	piglit_gl_test_run(argc, argv, &config);
-
-	assert(false);
-	return 0;
-}
+PIGLIT_GL_TEST_CONFIG_END

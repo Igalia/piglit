@@ -171,10 +171,12 @@ struct piglit_gl_test_config {
 };
 
 /**
- * Initialize @a config with default values.
+ * Initialize @a config with default values, some of which may come
+ * from command line arguments.
  */
 void
-piglit_gl_test_config_init(struct piglit_gl_test_config *config);
+piglit_gl_test_config_init(int *argc, char *argv[],
+			   struct piglit_gl_test_config *config);
 
 /**
  * Run the OpenGL test described by @a config. Does not return.
@@ -208,7 +210,7 @@ piglit_gl_test_run(int argc, char *argv[],
         {                                                                    \
                 struct piglit_gl_test_config config;                         \
                                                                              \
-                piglit_gl_test_config_init(&config);                         \
+                piglit_gl_test_config_init(&argc, argv, &config);            \
                                                                              \
                 config.init = piglit_init;                                   \
                 config.display = piglit_display;                             \

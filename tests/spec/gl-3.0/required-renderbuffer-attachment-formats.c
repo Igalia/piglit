@@ -133,19 +133,8 @@ piglit_init(int argc, char **argv)
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
-int
-main(int argc, char *argv[])
-{
-	struct piglit_gl_test_config config;
-
+PIGLIT_GL_TEST_CONFIG_BEGIN
 	setup_required_size_test(argc, argv, &config);
 	target_version = MAX2(config.supports_gl_compat_version,
 			      config.supports_gl_core_version);
-	config.init = piglit_init;
-	config.display = piglit_display;
-
-	piglit_gl_test_run(argc, argv, &config);
-
-	/* UNREACHED */
-	return 0;
-}
+PIGLIT_GL_TEST_CONFIG_END
