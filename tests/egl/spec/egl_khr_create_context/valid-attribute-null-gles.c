@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	/* FINISHME: Use PIGLIT_DISPATCH_ES1 when implemented. */
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
 	version_string = (char *) glGetString(GL_VERSION);
