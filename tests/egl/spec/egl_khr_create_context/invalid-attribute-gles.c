@@ -90,8 +90,6 @@ int main(int argc, char **argv)
 	unsigned i;
 
 	if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES_BIT)) {
-		fprintf(stderr, "ES 1 not available, trying ES 2.\n");
-
 		if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES2_BIT)) {
 			fprintf(stderr, "ES 2 not available.\n");
 			piglit_report_result(PIGLIT_SKIP);

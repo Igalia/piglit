@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 	int minor;
 
 	if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES_BIT)) {
-		fprintf(stderr, "ES 1 not available, trying ES 2.\n");
 		attribs[1] = 2;
 		if (!EGL_KHR_create_context_setup(EGL_OPENGL_ES2_BIT)) {
 			fprintf(stderr, "ES 2 not available.\n");
