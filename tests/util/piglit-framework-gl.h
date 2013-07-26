@@ -218,10 +218,15 @@ piglit_gl_test_run(int argc, char *argv[],
                 /* unexpectedly resized, tests are marked as "WARN". */      \
                 /* Let's use a larger default to avoid that. */              \
                 config.window_width = 150;                                   \
-                config.window_height = 150;
+                config.window_height = 150;                                  \
+                                                                             \
+                /* Open a new scope so that tests can declare locals */      \
+                /* between here and PIGLIT_GL_TEST_CONFIG_END. */            \
+                {
 
 
 #define PIGLIT_GL_TEST_CONFIG_END                                            \
+                }                                                            \
                                                                              \
                 piglit_gl_test_run(argc, argv, &config);                     \
                                                                              \
