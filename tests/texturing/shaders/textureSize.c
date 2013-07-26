@@ -46,10 +46,20 @@
  */
 #include "common.h"
 
+void
+parse_args(int argc, char **argv);
+static enum shader_target test_stage = UNKNOWN;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
+	parse_args(argc, argv);
+	if (test_stage == GS) {
+		config.supports_gl_compat_version = 32;
+		config.supports_gl_core_version = 32;
+	} else {
+		config.supports_gl_compat_version = 10;
+		config.supports_gl_core_version = 31;
+	}
 
 	config.window_width = 150;
 	config.window_height = 30;
@@ -282,24 +292,27 @@ generate_GLSL(enum shader_target test_stage)
 		asprintf(&vs_code,
 			 "#version %d\n"
 			 "in vec4 vertex;\n"
+			 "out vec4 pos_to_gs;\n"
 			 "void main()\n"
 			 "{\n"
-			 "    gl_Position = vertex;\n"
+			 "    pos_to_gs = vertex;\n"
 			 "}\n",
 			 shader_version);
 		asprintf(&gs_code,
 			 "#version %d\n"
-			 "#extension GL_ARB_geometry_shader4: require\n"
 			 "%s\n"
 			 "#define ivec1 int\n"
+			 "layout(triangles) in;\n"
+			 "layout(triangle_strip, max_vertices = 3) out;\n"
 			 "uniform int lod;\n"
 			 "uniform %s tex;\n"
+			 "in vec4 pos_to_gs[3];\n"
 			 "flat out ivec%d size;\n"
 			 "void main()\n"
 			 "{\n"
 			 "    for (int i = 0; i < 3; i++) {\n"
 			 "        size = textureSize(tex%s);\n"
-			 "        gl_Position = gl_PositionIn[i];\n"
+			 "        gl_Position = pos_to_gs[i];\n"
 			 "        EmitVertex();\n"
 			 "    }\n"
 			 "}\n",
@@ -354,14 +367,8 @@ generate_GLSL(enum shader_target test_stage)
 
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);
-	if (gs_code) {
+	if (gs_code)
 		glAttachShader(prog, gs);
-		glProgramParameteri(prog, GL_GEOMETRY_INPUT_TYPE_ARB,
-				    GL_TRIANGLES);
-		glProgramParameteri(prog, GL_GEOMETRY_OUTPUT_TYPE_ARB,
-				    GL_TRIANGLE_STRIP);
-		glProgramParameteri(prog, GL_GEOMETRY_VERTICES_OUT_ARB, 3);
-	}
 	glAttachShader(prog, fs);
 	glLinkProgram(prog);
 	if (!piglit_link_check_status(prog))
@@ -377,13 +384,11 @@ fail_and_show_usage()
 	piglit_report_result(PIGLIT_SKIP);
 }
 
+
 void
-piglit_init(int argc, char **argv)
+parse_args(int argc, char **argv)
 {
-	int prog;
-	int tex_location;
 	int i;
-	enum shader_target test_stage = UNKNOWN;
 	bool sampler_found = false;
 
 	for (i = 1; i < argc; i++) {
@@ -415,7 +420,18 @@ piglit_init(int argc, char **argv)
 
 	if (test_stage == UNKNOWN || !sampler_found)
 		fail_and_show_usage();
-		
+
+	if (test_stage == GS && shader_version < 150)
+		shader_version = 150;
+}
+
+
+void
+piglit_init(int argc, char **argv)
+{
+	int prog;
+	int tex_location;
+
 	require_GL_features(test_stage);
 
 	if (sampler.target == GL_TEXTURE_CUBE_MAP_ARRAY)
