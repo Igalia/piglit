@@ -901,6 +901,12 @@ add_shader_test_dir(spec['glsl-1.50'],
 		    os.path.join(testsDir, 'spec', 'glsl-1.50'),
 		    recursive=True)
 spec['glsl-1.50']['execution']['vs-input-arrays'] = concurrent_test('glsl-1.50-vs-input-arrays')
+for draw in ['', 'indexed']:
+    for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY',
+                 'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
+        add_concurrent_test(spec['glsl-1.50'],
+                            ('arb_geometry_shader4-ignore-adjacent-vertices '
+                             'core {0} {1}').format(draw, prim))
 
 # Group spec/glsl-es-3.00
 spec['glsl-es-3.00'] = Group()

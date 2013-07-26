@@ -93,9 +93,20 @@ static const char fs_text[] =
 
 static const struct primitives *test;
 static bool indexed = false;
+static bool use_core = false;
+
+static void
+parse_cmd_line(int argc, char **argv);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 20;
+	parse_cmd_line(argc, argv);
+	if (!use_core) {
+		config.supports_gl_compat_version = 20;
+		config.supports_gl_core_version = 31;
+	} else {
+		config.supports_gl_compat_version = 32;
+		config.supports_gl_core_version = 32;
+	}
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -140,6 +151,7 @@ check_framebuffer(void)
  *       GL_LINE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY or
  *       GL_TRIANGLE_STRIP_ADJACENCY).
  *     * The optional argument "indexed" to use indexed drawing.
+ *     * The optional argument "core" to use GLSL 1.50
  */
 static void
 parse_cmd_line(int argc, char **argv)
@@ -154,6 +166,8 @@ parse_cmd_line(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "indexed") == 0)
 			indexed = true;
+		else if (strcmp(argv[i], "core") == 0)
+			use_core = true;
 	}
 
 	if (test == NULL) {
@@ -170,9 +184,8 @@ piglit_init(int argc, char **argv)
 	GLuint array;
 	GLuint prog;
 
-	piglit_require_extension("GL_ARB_geometry_shader4");
-
-	parse_cmd_line(argc, argv);
+	if (!use_core)
+		piglit_require_extension("GL_ARB_geometry_shader4");
 
 	/* Bind Vertex Data */
 	glGenVertexArrays(1, &array);
