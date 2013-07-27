@@ -65,6 +65,7 @@ piglit_add_executable (fbo-generatemipmap-viewport fbo-generatemipmap-viewport.c
 piglit_add_executable (fbo-getframebufferattachmentparameter-01 fbo-getframebufferattachmentparameter-01.c)
 piglit_add_executable (fbo-gl_pointcoord fbo-gl_pointcoord.c)
 piglit_add_executable (fbo-incomplete fbo-incomplete.cpp)
+piglit_add_executable (fbo-incomplete-invalid-texture fbo-incomplete-invalid-texture.c)
 piglit_add_executable (fbo-incomplete-texture-01 fbo-incomplete-texture-01.c)
 piglit_add_executable (fbo-incomplete-texture-02 fbo-incomplete-texture-02.c)
 piglit_add_executable (fbo-incomplete-texture-03 fbo-incomplete-texture-03.c)
