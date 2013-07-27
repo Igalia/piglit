@@ -370,6 +370,83 @@ invalid_cube_array_layer(void)
 	return invalid_array_layer_common(t);
 }
 
+/**
+ * Verify that deleting the texture attached the currently bound FBO
+ * results in incompleteness.
+ */
+bool
+delete_texture_of_current_fbo(void)
+{
+	incomplete_fbo_test t("delete texture of bound FBO",
+			      GL_TEXTURE_2D);
+
+	/* Create a small color texture and attach it.  Everything should
+	 * be fine at this point.
+	 */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4, 4, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_2D, t.tex, 0);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_COMPLETE))
+		return t.fail();
+
+	/* Now unbind the texture and delete it.  t.rb is set to zero so
+	 * that the destructor won't try to delete it again.
+	 */
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &t.tex);
+	t.tex = 0;
+
+	/* Now the deleted attachment is "missing."
+	 */
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT))
+		return t.fail();
+
+	return t.pass();
+}
+
+/**
+ * Verify that deleting the renderbuffer attached the currently bound FBO
+ * results in incompleteness.
+ */
+bool
+delete_renderbuffer_of_current_fbo(void)
+{
+	incomplete_fbo_test t("delete renderbuffer of bound FBO",
+			      GL_RENDERBUFFER);
+
+	/* Create a small color renderbuffer and attach it.  Everything should
+	 * be fine at this point.
+	 */
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, 4, 4);
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  GL_RENDERBUFFER, t.rb);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_COMPLETE))
+		return t.fail();
+
+	/* Now unbind the renderbuffer and delete it.  t.rb is set to zero so
+	 * that the destructor won't try to delete it again.
+	 */
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glDeleteRenderbuffers(1, &t.rb);
+	t.rb = 0;
+
+	/* Now the deleted attachment is "missing."
+	 */
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT))
+		return t.fail();
+
+	return t.pass();
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -389,6 +466,8 @@ piglit_init(int argc, char **argv)
 	pass = invalid_1d_array_layer() && pass;
 	pass = invalid_2d_array_layer() && pass;
 	pass = invalid_cube_array_layer() && pass;
+	pass = delete_texture_of_current_fbo() && pass;
+	pass = delete_renderbuffer_of_current_fbo() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
