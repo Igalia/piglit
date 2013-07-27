@@ -200,6 +200,176 @@ incomplete_0_by_0_renderbuffer(void)
 	return t.pass();
 }
 
+/**
+ * Verify that attaching an invalid slice of a 3D texture results in
+ * incompleteness.
+ */
+bool
+invalid_3d_slice(void)
+{
+	incomplete_fbo_test t("invalid slice of 3D texture", GL_TEXTURE_3D);
+
+	/* Create a texture with only 8 slices (0 through 7), but try to
+	 * attach slice 8 and slice 9 to the FBO.
+	 */
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 8, 8, 8, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture3D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_3D, t.tex, 0, 8);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT))
+		return t.fail();
+
+	glFramebufferTexture3D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_3D, t.tex, 0, 9);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT))
+		return t.fail();
+
+	/* Now try slice 7.  This should work.
+	 */
+	glFramebufferTexture3D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_3D, t.tex, 0, 7);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_COMPLETE))
+		return t.fail();
+
+	return t.pass();
+}
+
+/**
+ * Common code the verify attaching an invalid layer of an array texture
+ * results in incompleteness.
+ */
+bool
+invalid_array_layer_common(incomplete_fbo_test &t)
+{
+	const unsigned scale = (t.target == GL_TEXTURE_CUBE_MAP_ARRAY) ? 6 : 1;
+
+	/* The texture has only 8 layers (0 through 7), but try to attach
+	 * layer 8 and layer 9 to the FBO.
+	 */
+	glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  t.tex, 0, 8 * scale);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT))
+		return t.fail();
+
+	glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  t.tex, 0, 9 * scale);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT))
+		return t.fail();
+
+	/* Now try layer 7.  This should work.
+	 */
+	glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+				  t.tex, 0, 7 * scale);
+
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return t.fail();
+
+	if (!t.check_fbo_status(GL_FRAMEBUFFER_COMPLETE))
+		return t.fail();
+	return t.pass();
+}
+
+/**
+ * Verify that attaching an invalid layer of a 1D array texture results in
+ * incompleteness.
+ */
+bool
+invalid_1d_array_layer(void)
+{
+	static const char subtest_name[] =
+		"invalid layer of a 1D-array texture";
+
+	if (!piglit_is_extension_supported("GL_EXT_texture_array")
+	    && piglit_get_gl_version() < 30) {
+		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		return true;
+	}
+
+	incomplete_fbo_test t(subtest_name, GL_TEXTURE_1D_ARRAY);
+
+	/* Create a texture with only 8 layers (0 through 7), but try to
+	 * attach layer 8 and layer 9 to the FBO.
+	 */
+	glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GL_RGBA, 8, 8, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+
+	return invalid_array_layer_common(t);
+}
+
+/**
+ * Verify that attaching an invalid layer of a 2D array texture results in
+ * incompleteness.
+ */
+bool
+invalid_2d_array_layer(void)
+{
+	static const char subtest_name[] =
+		"invalid layer of a 2D-array texture";
+
+	if (!piglit_is_extension_supported("GL_EXT_texture_array")
+	    && piglit_get_gl_version() < 30) {
+		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		return true;
+	}
+
+	incomplete_fbo_test t(subtest_name, GL_TEXTURE_2D_ARRAY);
+
+	/* Create a texture with only 8 layers (0 through 7), but try to
+	 * attach layer 8 and layer 9 to the FBO.
+	 */
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, 8, 8, 8, 0, GL_RGBA,
+		     GL_UNSIGNED_BYTE, NULL);
+
+	return invalid_array_layer_common(t);
+}
+
+/**
+ * Verify that attaching an invalid layer of a cube array texture results in
+ * incompleteness.
+ */
+bool
+invalid_cube_array_layer(void)
+{
+	static const char subtest_name[] =
+		"invalid layer of a cube-array texture";
+
+	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map_array")
+	    && piglit_get_gl_version() < 40) {
+		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		return true;
+	}
+
+	incomplete_fbo_test t(subtest_name, GL_TEXTURE_CUBE_MAP_ARRAY);
+
+	/* Create a texture with only 8 layers (0 through 7), but try to
+	 * attach layer 8 and layer 9 to the FBO.
+	 */
+	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_RGBA, 8, 8, 8 * 6, 0,
+		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	return invalid_array_layer_common(t);
+}
+
 enum piglit_result
 piglit_display(void)
 {
@@ -215,6 +385,10 @@ piglit_init(int argc, char **argv)
 
 	pass = incomplete_0_by_0_texture() && pass;
 	pass = incomplete_0_by_0_renderbuffer() && pass;
+	pass = invalid_3d_slice() && pass;
+	pass = invalid_1d_array_layer() && pass;
+	pass = invalid_2d_array_layer() && pass;
+	pass = invalid_cube_array_layer() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
