@@ -50,40 +50,40 @@ three_parameter_110 = [
     ]
 
 misc_parameter_110 = [
-    [ "genType", "mod", "genType", "float" ],
-    [ "genType", "min", "genType", "float" ],
-    [ "genType", "max", "genType", "float" ],
-    [ "genType", "clamp", "genType", "float", "float" ],
-    [ "genType", "mix", "genType", "genType", "float" ],
-    [ "genType", "step", "float", "genType" ],
-    [ "genType", "smoothstep", "float", "float", "genType" ],
-    [ "genType", "refract", "genType", "genType", "float" ],
-    [ "float", "noise1", "genType" ],
-    [ "vec2", "noise2", "genType" ],
-    [ "vec3", "noise3", "genType" ],
-    [ "vec4", "noise4", "genType" ],
+    ["genType", "mod", "genType", "float"],
+    ["genType", "min", "genType", "float"],
+    ["genType", "max", "genType", "float"],
+    ["genType", "clamp", "genType", "float", "float"],
+    ["genType", "mix", "genType", "genType", "float"],
+    ["genType", "step", "float", "genType"],
+    ["genType", "smoothstep", "float", "float", "genType"],
+    ["genType", "refract", "genType", "genType", "float"],
+    ["float", "noise1", "genType"],
+    ["vec2", "noise2", "genType"],
+    ["vec3", "noise3", "genType"],
+    ["vec4", "noise4", "genType"],
     ]
 
 vec_parameter_110 = [
-    ["bvec", "lessThan", "vecType", "vecType" ],
-    ["bvec", "lessThanEqual", "vecType", "vecType" ],
-    ["bvec", "greaterThan", "vecType", "vecType" ],
-    ["bvec", "greaterThanEqual", "vecType", "vecType" ],
-    ["bvec", "equal", "vecType", "vecType" ],
-    ["bvec", "notEqual", "vecType", "vecType" ],
+    ["bvec", "lessThan", "vecType", "vecType"],
+    ["bvec", "lessThanEqual", "vecType", "vecType"],
+    ["bvec", "greaterThan", "vecType", "vecType"],
+    ["bvec", "greaterThanEqual", "vecType", "vecType"],
+    ["bvec", "equal", "vecType", "vecType"],
+    ["bvec", "notEqual", "vecType", "vecType"],
     ]
 
 bvec_parameter_110 = [
-    ["bvec", "equal", "bvec", "bvec" ],
-    ["bvec", "notEqual", "bvec", "bvec" ],
-    ["bool", "any", "bvec" ],
-    ["bool", "all", "bvec" ],
-    ["bvec", "not", "bvec" ],
+    ["bvec", "equal", "bvec", "bvec"],
+    ["bvec", "notEqual", "bvec", "bvec"],
+    ["bool", "any", "bvec"],
+    ["bool", "all", "bvec"],
+    ["bvec", "not", "bvec"],
     ]
 
-genType = [ "float", "vec2", "vec3", "vec4" ]
-vecType = [ "vec2", "vec3", "vec4", "ivec2", "ivec3", "ivec4" ]
-bvecType = [ "bvec2", "bvec3", "bvec4" ]
+genType = ["float", "vec2", "vec3", "vec4"]
+vecType = ["vec2", "vec3", "vec4", "ivec2", "ivec3", "ivec4"]
+bvecType = ["bvec2", "bvec3", "bvec4"]
 
 
 def typename(t, gen):
@@ -120,7 +120,6 @@ def emit_matrixCompMult(f, matTypes):
 def emit_110_tests(f):
     f.write("/* PASS */\n#version 110\n\n")
     f.write("uniform float u_float;\n")
-
 
     for s in ["vec", "ivec", "bvec", "mat"]:
         for i in [2, 3, 4]:
@@ -171,7 +170,6 @@ def emit_110_fs_tests(f):
     f.write("/* PASS */\n#version 110\n\n")
     f.write("uniform float u_float;\n")
 
-
     for i in [2, 3, 4]:
         f.write("uniform vec%d u_vec%d;\n" % (i, i))
 
@@ -197,8 +195,8 @@ def emit_120_tests(f):
     f.write("/* PASS */\n#version 120\n\n")
 
     for cols in [2, 3, 4]:
-        f.write("uniform mat%d u_mat%d;\n" % (cols, cols));
-        f.write("uniform vec%d u_vec%d;\n" % (cols, cols));
+        f.write("uniform mat%d u_mat%d;\n" % (cols, cols))
+        f.write("uniform vec%d u_vec%d;\n" % (cols, cols))
 
         for rows in [2, 3, 4]:
             mat = "mat%dx%d" % (cols, rows)
@@ -211,7 +209,7 @@ def emit_120_tests(f):
 """)
 
     for cols in [2, 3, 4]:
-        f.write("  mat%d   t_mat%d   = mat%d  (0.0);\n" % (cols, cols, cols));
+        f.write("  mat%d   t_mat%d   = mat%d  (0.0);\n" % (cols, cols, cols))
 
         for rows in [2, 3, 4]:
             mat = "mat%dx%d" % (cols, rows)
@@ -222,22 +220,22 @@ def emit_120_tests(f):
     for cols in [2, 3, 4]:
         dst = "t_mat%d" % (cols)
         src = "u_mat%d" % (cols)
-        f.write("  %s   = transpose(%s);\n" % (dst, src));
+        f.write("  %s   = transpose(%s);\n" % (dst, src))
 
         for rows in [2, 3, 4]:
             dst = "t_mat%dx%d" % (cols, rows)
             src = "u_mat%dx%d" % (rows, cols)
-            f.write("  %s = transpose(%s);\n" % (dst, src));
+            f.write("  %s = transpose(%s);\n" % (dst, src))
 
     f.write("\n")
 
     for cols in [2, 3, 4]:
         f.write("  t_mat%d   = outerProduct(u_vec%d, u_vec%d);\n"
-                % (cols, cols, cols));
+                % (cols, cols, cols))
 
         for rows in [2, 3, 4]:
-             f.write("  t_mat%dx%d = outerProduct(u_vec%d, u_vec%d);\n"
-                     % (cols, rows, rows, cols));
+            f.write("  t_mat%dx%d = outerProduct(u_vec%d, u_vec%d);\n" %
+                    (cols, rows, rows, cols))
 
     f.write("\n")
 
@@ -259,4 +257,3 @@ f.close()
 f = open("builtin-functions-120.vert", "w")
 emit_120_tests(f)
 f.close()
-
