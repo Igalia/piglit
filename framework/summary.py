@@ -443,7 +443,7 @@ class Summary:
                     # A set cannot contain duplicate entries, so creating a set
                     # out the list will reduce it's length to 1 if all entries
                     # are the same, meaning it is not a change
-                    if len(set(status)) > 1 and not 0 in status:
+                    if len(set(status)) > 1:
                         self.tests['changes'].append(test)
 
                 if 'problems' in lists:
