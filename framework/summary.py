@@ -469,7 +469,7 @@ class Summary:
 
         # Remove duplicate entries from the status lists
         # If there are 4+ results can result in mutiple passes or regressions
-        # and changes # other words: "pass fail pass fail" will result in a
+        # and changes in other words: "pass fail pass fail" will result in a
         # regression, a fix, and a regression and it will be printed twice in
         # the summary. Turning them into sets remove duplicates
         for (result, value) in self.tests.items():
