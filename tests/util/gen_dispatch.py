@@ -398,19 +398,19 @@ class Api(object):
     # Python strings, sorted alphabetically.
     @property
     def extensions(self):
-	return sorted(
-	    [category_name
-	     for category_name, category in self.categories.items()
-	     if category.kind == 'extension'])
+        return sorted(
+            [category_name
+             for category_name, category in self.categories.items()
+             if category.kind == 'extension'])
 
     # A list of all of the GL versions declared in the API, as
     # integers (e.g. 13 represents GL version 1.3).
     @property
     def gl_versions(self):
-	return sorted(
-	    [category.gl_10x_version
-	     for category in self.categories.values()
-	     if category.kind == 'GL'])
+        return sorted(
+            [category.gl_10x_version
+             for category in self.categories.values()
+             if category.kind == 'GL'])
 
     # Generate a list of DispatchSet objects representing all sets of
     # synonymous functions in the API.  The resulting list is sorted
@@ -650,7 +650,7 @@ def generate_code(api):
     # doesn't contain the full set that appears in glext.h.
     h_contents.append('\n')
     for ext in api.extensions:
-	h_contents.append('#define {0} 1\n'.format(ext))
+        h_contents.append('#define {0} 1\n'.format(ext))
 
     # Emit GL version #defines
     #
@@ -658,8 +658,8 @@ def generate_code(api):
     # adding them for later GL versions.
     h_contents.append('\n')
     for ver in api.gl_versions:
-	h_contents.append('#define GL_VERSION_{0}_{1} 1\n'.format(
-		ver // 10, ver % 10))
+        h_contents.append('#define GL_VERSION_{0}_{1} 1\n'.format(
+                ver // 10, ver % 10))
 
     return ''.join(c_contents), ''.join(h_contents)
 
