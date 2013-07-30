@@ -12,4 +12,4 @@ link_libraries (
 piglit_add_executable (draw-elements-instanced-base-vertex draw-elements-instanced-base-vertex.c)
 piglit_add_executable (arb_draw_elements_base_vertex-dlist-arb_draw_instanced dlist-arb_draw_instanced.c)
 piglit_add_executable (multi-draw-elements-base-vertex multi-draw-elements-base-vertex.c)
-# vim: ft=cmake:
+piglit_add_executable (draw-range-elements-base-vertex draw-range-elements-base-vertex.c)
