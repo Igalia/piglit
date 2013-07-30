@@ -21,5 +21,6 @@ cmake_install.cmake
 CMakeCache.txt
 target_api
 tests/glslparsertest/glslcompiler
+generated_tests/cl
 
 .makotmp
