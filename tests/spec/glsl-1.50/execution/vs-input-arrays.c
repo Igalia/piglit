@@ -151,6 +151,12 @@ typedef struct vertex_inputs vertex_inputs;
 void
 piglit_init(int argc, char **argv)
 {
+	size_t stride;
+	GLint vertex_index;
+	GLint a_index;
+	GLint b_index;
+	GLint c_index;
+
 	prog = piglit_build_simple_program(vs_text, fs_text);
 
 	glLinkProgram( prog );
@@ -161,13 +167,13 @@ piglit_init(int argc, char **argv)
 	glBindVertexArray( vao );
 
 	/* stride */
-	size_t stride = sizeof( vertex_data[0] );
+	stride = sizeof( vertex_data[0] );
 
 	/* get locations */
-	GLint vertex_index = glGetAttribLocation( prog, "vertex" );
-	GLint a_index = glGetAttribLocation( prog, "a" );
-	GLint b_index = glGetAttribLocation( prog, "b" );
-	GLint c_index = glGetAttribLocation( prog, "c" );
+	vertex_index = glGetAttribLocation( prog, "vertex" );
+	a_index = glGetAttribLocation( prog, "a" );
+	b_index = glGetAttribLocation( prog, "b" );
+	c_index = glGetAttribLocation( prog, "c" );
 
 	/* create buffers */
 	glGenBuffers( 1, &vbo );
@@ -212,13 +218,13 @@ piglit_init(int argc, char **argv)
 enum piglit_result
 piglit_display(void)
 {
-	glClearColor( 0.5, 0.5, 0.5, 1.0 );
-
-	glClear( GL_COLOR_BUFFER_BIT );
-
 	bool pass = true;
 
 	float expected_color[3] = { 0.0, 1.0, 0.0 };
+
+	glClearColor( 0.5, 0.5, 0.5, 1.0 );
+
+	glClear( GL_COLOR_BUFFER_BIT );
 
 	glDrawArrays( GL_TRIANGLE_FAN, 0, 4 );
 
