@@ -1,5 +1,6 @@
 import re
 
+
 def emit_test(f, func, input1, input2, expected):
     # Determine the expected return type of the equal function by looking at
     # the string of the expected return value.
