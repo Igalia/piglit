@@ -1095,6 +1095,9 @@ arb_fragment_coord_conventions = Group()
 spec['ARB_fragment_coord_conventions'] = arb_fragment_coord_conventions
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-none')
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-integer')
+import_glsl_parser_tests(arb_fragment_coord_conventions,
+			 os.path.join(testsDir, 'spec',
+			  'arb_fragment_coord_conventions'), ['compiler'])
 
 ati_fragment_shader = Group()
 spec['ATI_fragment_shader'] = ati_fragment_shader
