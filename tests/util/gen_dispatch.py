@@ -185,7 +185,9 @@ def generated_boilerplate():
 
 # Certain param names used in OpenGL are reserved by some compilers.
 # Rename them.
-PARAM_NAME_FIXUPS = { 'near': 'hither', 'far': 'yon' }
+PARAM_NAME_FIXUPS = {'near': 'hither', 'far': 'yon'}
+
+
 def fixup_param_name(name):
     if name in PARAM_NAME_FIXUPS:
         return PARAM_NAME_FIXUPS[name]
@@ -281,8 +283,8 @@ class Function(object):
         else:
             param_decls = 'void'
         return '{rettype} {name}({param_decls})'.format(
-            rettype = self.return_type, name = name,
-            param_decls = param_decls)
+            rettype=self.return_type, name=name,
+            param_decls=param_decls)
 
 
 # Internal representation of an enum.
@@ -321,7 +323,7 @@ class DispatchSet(object):
                 category = all_categories[category_name]
                 self.cat_fn_pairs.append((category, function))
         # Sort by category, with GL categories preceding extensions.
-        self.cat_fn_pairs.sort(key = self.__sort_key)
+        self.cat_fn_pairs.sort(key=self.__sort_key)
 
     # The first Function object in DispatchSet.functions.  This
     # "primary" function is used to name the dispatch pointer, the
@@ -418,7 +420,7 @@ class Api(object):
     def compute_dispatch_sets(self):
         sets = [DispatchSet(synonym_set, self.functions, self.categories)
                 for synonym_set in self.function_alias_sets]
-        sets.sort(key = lambda ds: ds.stub_name)
+        sets.sort(key=lambda ds: ds.stub_name)
 
         return sets
 
@@ -449,7 +451,7 @@ def generate_resolve_function(ds):
                 f.gl_name, category.gl_10x_version)
 
             condition = ''
-            api_base_version = 0;
+            api_base_version = 0
             if category.kind == 'GL':
                 condition = 'dispatch_api == PIGLIT_DISPATCH_GL'
                 api_base_version = 10
@@ -463,7 +465,8 @@ def generate_resolve_function(ds):
             # Only check the version for functions that aren't part of the
             # core for the PIGLIT_DISPATCH api.
             if category.gl_10x_version != api_base_version:
-                condition = condition + ' && check_version({0})'.format(category.gl_10x_version)
+                condition = condition + ' && check_version({0})'.format(
+                    category.gl_10x_version)
         elif category.kind == 'extension':
             getter = 'get_ext_proc("{0}")'.format(f.gl_name)
             condition = 'check_extension("{0}")'.format(category.extension_name)
@@ -492,7 +495,8 @@ def generate_resolve_function(ds):
     # ARB_instanced_arrays in addition to ARB_draw_instanced, but neither
     # gl.spec nor gl.json can accomodate an extension with two categories, so
     # insert these cases here.
-        if f.gl_name in ('glDrawArraysInstancedARB', 'glDrawElementsInstancedARB'):
+        if f.gl_name in ('glDrawArraysInstancedARB',
+                         'glDrawElementsInstancedARB'):
             condition = 'check_extension("GL_ARB_instanced_arrays")'
             condition_code_pairs.append((condition, code))
 
@@ -537,7 +541,7 @@ def generate_stub_function(ds):
 
     # Start the stub function
     stub_fn = 'static {0}\n'.format(
-        f0.c_form('APIENTRY ' + ds.stub_name, anonymous_args = False))
+        f0.c_form('APIENTRY ' + ds.stub_name, anonymous_args=False))
     stub_fn += '{\n'
     stub_fn += '\tcheck_initialized();\n'
     stub_fn += '\t{0}();\n'.format(ds.resolve_name)
@@ -597,7 +601,7 @@ def generate_code(api):
         h_contents.append(
             'typedef {0};\n'.format(
                 f.c_form('(APIENTRY *{0})'.format(f.typedef_name),
-                         anonymous_args = True)))
+                         anonymous_args=True)))
 
     dispatch_sets = api.compute_dispatch_sets()
 
@@ -659,7 +663,7 @@ def generate_code(api):
     h_contents.append('\n')
     for ver in api.gl_versions:
         h_contents.append('#define GL_VERSION_{0}_{1} 1\n'.format(
-                ver // 10, ver % 10))
+            ver // 10, ver % 10))
 
     return ''.join(c_contents), ''.join(h_contents)
 
