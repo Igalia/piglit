@@ -105,8 +105,15 @@ test_one_level_errors(GLenum target)
 		}
 	}
 
-	/*
-	 * Test immutability.
+	/** Test immutability
+	 *
+	 * "Using any of the following commands with the same texture will result
+	 * in the error INVALID_OPERATION being generated, even if it does not
+	 * affect the dimensions or format:
+	 *     - TexImage*
+	 *     - CompressedTexImage*
+	 *     - CopyTexImage*
+	 *     - TexStorage*"
 	 */
 	if (target == GL_TEXTURE_2D) {
 		glTexImage2D(target, 0, GL_RGBA, width, height, 0,
@@ -421,7 +428,47 @@ test_internal_formats(void)
 	return pass;
 }
 	
+static bool
+test_immutablity(GLenum target)
+{
+	GLuint tex;
+	GLint level;
+	GLint immutable_format;
+	GLvoid *data;
 
+	bool pass = true;
+
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+
+	glTexStorage2D(target, 3, GL_RGBA8, 256, 256);
+	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 4);
+	glGetTexParameteriv(target, GL_TEXTURE_MAX_LEVEL, &level);
+	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT, &immutable_format);
+
+	if (immutable_format != GL_TRUE) {
+		printf("%s: GL_TEXTURE_IMMUTABLE_FORMAT was not set to GL_TRUE after"
+		       " glTexStorage2D\n", TestName);
+		pass = false;
+	}
+	if (level != 2) {
+		/**
+		 * "However, if TEXTURE_IMMUTABLE_FORMAT is TRUE, then level_base is
+		 * clamped to the range [0, <levels> - 1] and level_max is then
+		 * clamped to the range [level_base, <levels> - 1], where <levels> is
+		 * the parameter passed the call to TexStorage* for the texture
+		 * object"
+		 */
+		printf("%s: GL_TEXTURE_MAX_LEVEL changed to %d, which is outside"
+		       " the clamp range for immutables\n", TestName, level);
+		pass = false;
+	}
+
+	/* Other immutable tests happen per-format above */
+
+	glDeleteTextures(1, &tex);
+	return pass;
+}
 
 enum piglit_result
 piglit_display(void)
@@ -436,6 +483,7 @@ piglit_display(void)
 	pass = test_mipmap_errors(GL_TEXTURE_3D) && pass;
 	pass = test_2d_mipmap_rendering() && pass;
 	pass = test_internal_formats() && pass;
+	pass = test_immutablity(GL_TEXTURE_2D) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
