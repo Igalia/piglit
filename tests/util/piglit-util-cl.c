@@ -55,27 +55,67 @@ piglit_cl_probe_uinteger(uint64_t value, uint64_t expect, uint64_t tolerance)
 	return true;
 }
 
-bool
-piglit_cl_probe_floating(double value, double expect, double tolerance)
-{
-	double diff;
+# define probe_float_check_nan_inf(value, expect) \
+	((isnan(value) && isnan(expect)) || \
+	(isinf(value) && isinf(expect) && ((value > 0) == (expect > 0))))
 
+
+/* TODO: Tolerance should be specified in terms of ULP. */
+bool
+piglit_cl_probe_floating(float value, float expect,  float tolerance)
+{
+	float diff;
+	union {
+		float f;
+		unsigned u;
+	} v, e, t;
+
+	v.f = value;
+	e.f = expect;
+	t.f = tolerance;
 	/* Treat infinity and nan seperately */
-	if(   (isnan(value) && isnan(expect))
-	   || (isinf(value) && isinf(expect) && ((value > 0) == (expect > 0)))) {
+	if (probe_float_check_nan_inf(value, expect)) {
 		return true;
 	}
 
 	diff = value > expect ? value-expect : expect-value;
 
 	if(diff > tolerance || isnan(value)) {
-		printf("Expecting %f (0x%"PRIx64") with tolerance %f, but got %f (0x%"
-		       PRIx64")\n",
-		       expect, (uint64_t)expect, tolerance, value, (uint64_t)value);
+		printf("Expecting %f (0x%x) with tolerance %f, but got %f (0x%x)\n",
+		       e.f, e.u, t.f, v.f, v.u);
 		return false;
 	}
 
 	return true;
+}
+
+bool
+piglit_cl_probe_double(double value, double expect, double tolerance)
+{
+	double diff;
+	union {
+		double f;
+		uint64_t u;
+	} v, e, t;
+
+	v.f = value;
+	e.f = expect;
+	t.f = tolerance;
+	/* Treat infinity and nan seperately */
+	if (probe_float_check_nan_inf(value, expect)) {
+		return true;
+	}
+
+	diff = value > expect ? value-expect : expect-value;
+
+	if(diff > tolerance || isnan(value)) {
+		printf("Expecting %f (0x%lx) with tolerance %f, but got %f (0x%lx)\n",
+		       e.f, e.u, t.f, v.f, v.u);
+		return false;
+	}
+
+	return true;
+
 }
 
 bool
