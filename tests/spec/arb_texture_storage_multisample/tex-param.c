@@ -124,7 +124,6 @@ void
 piglit_init(int argc, char **argv)
 {
 	GLuint tex;
-	GLint param;
 	struct subtest *t;
 
 	piglit_require_extension("GL_ARB_texture_storage_multisample");
