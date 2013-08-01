@@ -158,7 +158,7 @@ piglit_display(void)
 
 	/* Bot Quad */
 	glDrawRangeElementsBaseVertex(GL_TRIANGLES, 4, 7, 6, GL_UNSIGNED_INT,
-				      NULL + sizeof(GLuint)*6, 2);
+				      (GLvoid *)(sizeof(GLuint)*6), 2);
 
 	/* Check for test pass */
 	pass = piglit_probe_pixel_rgb(100, 175, green) && pass;
