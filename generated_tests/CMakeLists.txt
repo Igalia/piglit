@@ -54,6 +54,9 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	builtin_cl_int_tests.list
 	generate-cl-int-builtins.py)
+piglit_make_generated_tests(
+	cl_store_tests.list
+	generate-cl-store-tests.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
@@ -62,6 +65,7 @@ add_custom_target(gen-tests ALL
 		builtin_uniform_tests.list
 		constant_array_size_tests.list
 		builtin_cl_int_tests.list
+		cl_store_tests.list
 		interpolation_tests.list
 		non-lvalue_tests.list
 		texture_query_lod_tests.list

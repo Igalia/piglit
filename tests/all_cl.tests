@@ -110,3 +110,6 @@ add_program_test_dir(program_execute, 'tests/cl/program/execute')
 program_execute_builtin = Group()
 program["Execute"]["Builtin"] = program_execute_builtin
 add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/int')
+program_execute_store = Group()
+program["Execute"]["Store"] = program_execute_store
+add_program_test_dir(program_execute_store, 'generated_tests/cl/store')
