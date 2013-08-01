@@ -366,11 +366,12 @@ require_GL_features(enum shader_target test_stage)
 		piglit_require_extension("GL_EXT_texture_array");
 		break;
 	case GL_TEXTURE_CUBE_MAP:
-		if (is_shadow_sampler())
+		if (is_shadow_sampler()) {
 			if (piglit_is_extension_supported("GL_EXT_gpu_shader4"))
 				piglit_require_gl_version(21);
 			else
 				piglit_require_gl_version(30);
+		}
 		break;
 	case GL_TEXTURE_RECTANGLE:
 		piglit_require_extension("GL_ARB_texture_rectangle");
