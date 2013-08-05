@@ -24,7 +24,7 @@
 from weakref import WeakKeyDictionary
 import multiprocessing
 
-from threadpool import ThreadPool, WorkRequest
+from threadpool import ThreadPool
 from patterns import Singleton
 from threading import RLock
 
@@ -53,8 +53,8 @@ class ConcurrentTestPool(Singleton):
         self.pool = ThreadPool(multiprocessing.cpu_count())
 
     @synchronized_self
-    def put(self, callable_, args=None, kwds=None):
-        self.pool.putRequest(WorkRequest(callable_, args=args, kwds=kwds))
+    def put(self, callable, args=None):
+        self.pool.add(callable, args)
 
     def join(self):
-        self.pool.wait()
+        self.pool.join()

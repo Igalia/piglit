@@ -436,9 +436,8 @@ class Test:
 
         See ``Test.doRun`` for a description of the parameters.
         '''
-        args = (env, path, json_writer)
         if self.runConcurrent:
-            ConcurrentTestPool().put(self.doRun, args=args)
+            ConcurrentTestPool().put(self.doRun, args=(env, path, json_writer))
 
     def doRun(self, env, path, json_writer):
         '''
