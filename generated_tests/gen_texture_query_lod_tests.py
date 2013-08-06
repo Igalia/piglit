@@ -131,7 +131,7 @@ for api, requirement in requirements.iteritems():
                 os.makedirs(dirname)
 
             version = requirement['version']
-            extensions = [requirement['extension']]
+            extensions = [requirement['extension']] if requirement['extension'] else []
 
             # samplerCubeArray types are part GLSL 4.00
             # or GL_ARB_texture_cube_map_array.
