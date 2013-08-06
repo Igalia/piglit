@@ -84,6 +84,8 @@ piglit_init(int argc, char **argv)
 	piglit_test_tf_bits(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
 	piglit_test_oq_bits();
 
+	piglit_test_min_int(GL_MAJOR_VERSION, 3);
+
 	piglit_test_min_int(GL_MAX_VERTEX_ATTRIBS, 16);
 	piglit_test_min_int(GL_MAX_VERTEX_UNIFORM_COMPONENTS, 1024);
 	piglit_test_min_int(GL_MAX_VERTEX_UNIFORM_BLOCKS, 12);
