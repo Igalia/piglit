@@ -1,0 +1,48 @@
+# Test that superfluous declarations are allowed
+#
+# GLSLangSpec.1.50, 4.3.6 ():
+# "Only output variables that are read by the subsequent pipeline stage need
+#  to be written; it is allowed to have superfluous declarations of output
+#  variables."
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+
+out float a;
+out float b;
+out vec2 c;
+
+void main()
+{
+	a = 3.0;
+	b = 1.0;
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 150
+
+in float b;
+in vec2 c;
+
+void main()
+{
+	gl_FragColor = vec4(0.0, b, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
+
