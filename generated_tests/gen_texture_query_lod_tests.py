@@ -112,6 +112,8 @@ template = Template(dedent("""\
 """))
 
 for api, requirement in requirements.iteritems():
+    Lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
+
     for sampler_type, coord_type in sampler_type_to_coord_type.iteritems():
         for execution_stage in ("vs", "fs"):
             file_extension = 'frag' if execution_stage == 'fs' else 'vert'
@@ -119,8 +121,9 @@ for api, requirement in requirements.iteritems():
                                     api,
                                     "compiler",
                                     "built-in-functions",
-                                    "{0}.{1}".format(sampler_type,
-                                                     file_extension))
+                                    "textureQuery{0}-{1}.{2}".format(Lod,
+                                                                     sampler_type,
+                                                                     file_extension))
             print filename
 
             dirname = os.path.dirname(filename)
@@ -136,8 +139,6 @@ for api, requirement in requirements.iteritems():
                     'samplerCubeArray', 'isamplerCubeArray',
                     'usamplerCubeArray', 'samplerCubeArrayShadow']:
                 extensions += ['GL_ARB_texture_cube_map_array']
-
-            Lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
 
             f = open(filename, "w")
             f.write(template.render(version=version,
