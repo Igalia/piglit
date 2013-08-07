@@ -2048,6 +2048,7 @@ for mode in ['output', 'prims_generated', 'prims_written']:
 ext_transform_feedback['max-varyings'] = concurrent_test('ext_transform_feedback-max-varyings')
 ext_transform_feedback['nonflat-integral'] = concurrent_test('ext_transform_feedback-nonflat-integral')
 ext_transform_feedback['overflow-edge-cases'] = concurrent_test('ext_transform_feedback-overflow-edge-cases')
+ext_transform_feedback['overflow-edge-cases use_gs'] = concurrent_test('ext_transform_feedback-overflow-edge-cases use_gs')
 ext_transform_feedback['position-readback-bufferbase'] = 		concurrent_test('ext_transform_feedback-position')
 ext_transform_feedback['position-readback-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position discard')
 ext_transform_feedback['position-readback-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position offset')

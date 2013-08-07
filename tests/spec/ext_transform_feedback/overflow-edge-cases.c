@@ -39,14 +39,29 @@
  * - The proper values were written to the transform feedback buffer.
  * - GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN is set correctly.
  * - GL_PRIMITIVES_GENERATED is set correctly.
+ *
+ * The optional argument "use_gs" causes the test to use a geometry
+ * shader.  When this argument is given, the number of vertices output
+ * by the geometry shader is in general different from the number of
+ * vertices sent down the pipeline by the glDrawArrays() command.
+ * Thus, the test verifies that the implementation does overflow
+ * checking based on the post-geometry-shader vertex count.
  */
 
 #include "piglit-util-gl-common.h"
 
+static bool use_gs;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
+	use_gs = PIGLIT_STRIP_ARG("use_gs");
+	if (use_gs) {
+		config.supports_gl_compat_version = 32;
+		config.supports_gl_core_version = 32;
+	} else {
+		config.supports_gl_compat_version = 10;
+		config.supports_gl_core_version = 31;
+	}
 
 	config.window_width = 16;
 	config.window_height = 16;
@@ -57,7 +72,10 @@ PIGLIT_GL_TEST_CONFIG_END
 #define XFB_BUFFER_SIZE 12
 #define MAX_VERTICES 9
 
-static const char *vstext =
+/**
+ * Vertex shader used when use_gs is false.
+ */
+static const char *vstext_nogs =
 	"attribute float vertex_num;\n"
 	"varying float varying1;\n"
 	"varying float varying2;\n"
@@ -69,35 +87,98 @@ static const char *vstext =
 	"  varying2 = 200.0 + vertex_num;\n"
 	"}\n";
 
+/**
+ * Vertex shader used when use_gs is true.
+ */
+static const char *vstext_gs =
+	"#version 150\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"}\n";
+
+/**
+ * Geometry shader used when use_gs is true.
+ */
+static const char *gstext_gs =
+	"#version 150\n"
+	"layout(points) in;\n"
+	"layout(%s, max_vertices=9) out;\n"
+	"uniform int num_primitives;\n"
+	"uniform int vertices_per_prim;\n"
+	"out float varying1;\n"
+	"out float varying2;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  int vertex_num = 0;\n"
+	"  for (int i = 0; i < num_primitives; i++) {\n"
+	"    for (int j = 0; j < vertices_per_prim; j++) {\n"
+	"      varying1 = 100.0 + float(vertex_num);\n"
+	"      varying2 = 200.0 + float(vertex_num);\n"
+	"      vertex_num++;\n"
+	"      EmitVertex();\n"
+	"    }\n"
+	"    EndPrimitive();\n"
+	"  }\n"
+	"}\n";
+
+
 static const char *varyings[] = { "varying1", "varying2" };
 
 static GLuint xfb_buf, vao, array_buf;
-static GLuint progs[2]; /* indexed by num_varyings - 1 */
+static GLuint progs[3][2]; /* indexed by (mode, num_varyings - 1) */
 static GLuint query_prims_generated;
 static GLuint query_prims_written;
+
+static GLenum modes[] = { GL_POINTS, GL_LINES, GL_TRIANGLES };
+static const char *mode_names[] = {
+	"GL_POINTS", "GL_LINES", "GL_TRIANGLES"
+};
+static const char *mode_gs_out_primtypes[] = {
+	"points", "line_strip", "triangle_strip"
+};
 
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs;
+	GLuint vs, gs;
 	int num_varyings;
+	int mode;
 
 	piglit_require_GLSL();
 	piglit_require_transform_feedback();
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	for (num_varyings = 1; num_varyings <= 2; ++num_varyings) {
-		GLuint prog = glCreateProgram();
-		glAttachShader(prog, vs);
-		glBindAttribLocation(prog, 0, "vertex_num");
-		glTransformFeedbackVaryings(prog, num_varyings, varyings,
-					    GL_INTERLEAVED_ATTRIBS);
-		glLinkProgram(prog);
-		if (!piglit_link_check_status(prog)) {
-			glDeleteProgram(prog);
-			piglit_report_result(PIGLIT_FAIL);
+	for (mode = 0; mode < ARRAY_SIZE(modes); mode++) {
+		if (use_gs) {
+			char *gstext;
+			vs = piglit_compile_shader_text(GL_VERTEX_SHADER,
+							vstext_gs);
+			asprintf(&gstext, gstext_gs,
+				 mode_gs_out_primtypes[mode]);
+			gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER,
+							gstext);
+		} else {
+			vs = piglit_compile_shader_text(GL_VERTEX_SHADER,
+							vstext_nogs);
 		}
-		progs[num_varyings - 1] = prog;
+		for (num_varyings = 1; num_varyings <= 2; ++num_varyings) {
+			GLuint prog = glCreateProgram();
+			glAttachShader(prog, vs);
+			if (use_gs)
+				glAttachShader(prog, gs);
+			else
+				glBindAttribLocation(prog, 0, "vertex_num");
+			glTransformFeedbackVaryings(prog, num_varyings,
+						    varyings,
+						    GL_INTERLEAVED_ATTRIBS);
+			glLinkProgram(prog);
+			if (!piglit_link_check_status(prog)) {
+				glDeleteProgram(prog);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			progs[mode][num_varyings - 1] = prog;
+		}
 	}
 
 	glGenBuffers(1, &xfb_buf);
@@ -111,10 +192,6 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-static GLenum modes[] = { GL_POINTS, GL_LINES, GL_TRIANGLES };
-static const char *mode_names[] = {
-	"GL_POINTS", "GL_LINES", "GL_TRIANGLES"
-};
 static int mode_vertices_per_prim[] = { 1, 2, 3 };
 
 static GLboolean
@@ -133,20 +210,29 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 	GLboolean pass = GL_TRUE;
 	float expected_xfb_results[XFB_BUFFER_SIZE];
 	float *readback;
+	GLuint prog;
 
 	printf("size=%d, num_varyings=%d, num_primitives=%d, mode=%s: ",
 	       bind_size, num_varyings, num_primitives,
 	       mode_names[mode_index]);
 
 	/* Setup program and initial buffer contents */
-	glUseProgram(progs[num_varyings - 1]);
-	for (i = 0; i < MAX_VERTICES; ++i)
-		vertex_data[i] = i;
-	glBindBuffer(GL_ARRAY_BUFFER, array_buf);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), &vertex_data,
-		     GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float), NULL);
-	glEnableVertexAttribArray(0);
+	prog = progs[mode_index][num_varyings - 1];
+	glUseProgram(prog);
+	if (use_gs) {
+		glUniform1i(glGetUniformLocation(prog, "num_primitives"),
+			    num_primitives);
+		glUniform1i(glGetUniformLocation(prog, "vertices_per_prim"),
+			    vertices_per_prim);
+	} else {
+		for (i = 0; i < MAX_VERTICES; ++i)
+			vertex_data[i] = i;
+		glBindBuffer(GL_ARRAY_BUFFER, array_buf);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data),
+			     &vertex_data, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float), NULL);
+		glEnableVertexAttribArray(0);
+	}
 	for (i = 0; i < XFB_BUFFER_SIZE; ++i)
 		initial_xfb_buf[i] = 0.0;
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf);
@@ -162,7 +248,12 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 	glBeginTransformFeedback(modes[mode_index]);
 
 	/* Draw */
-	glDrawArrays(modes[mode_index], 0, num_primitives * vertices_per_prim);
+	if (use_gs) {
+		glDrawArrays(GL_POINTS, 0, 1);
+	} else {
+		glDrawArrays(modes[mode_index], 0,
+			     num_primitives * vertices_per_prim);
+	}
 
 	/* Stop XFB and check queries */
 	glEndTransformFeedback();
