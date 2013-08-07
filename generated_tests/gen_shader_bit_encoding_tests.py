@@ -43,6 +43,12 @@ def uintBitsToFloat(u):
 def passthrough(f):
     return f
 
+def neg(num):
+    return -num
+
+def neg_abs(num):
+    return -abs(num)
+
 def vec4(f):
     return [f, f, f, f]
 
@@ -96,6 +102,13 @@ funcs = {
     }
 }
 
+modifier_funcs = {
+    '':            passthrough,
+    'abs':         abs,
+    'neg':         neg,
+    'neg_abs':     neg_abs
+}
+
 requirements = {
     'ARB_shader_bit_encoding': {
         'version': '1.30',
@@ -137,13 +150,13 @@ template = Template(dedent("""\
         % if execution_stage == 'vs':
         color = vec4(0.0, 1.0, 0.0, 1.0);
 
-        if (expected.x != ${func}(given.x))
+        if (expected.x != ${func}(${in_modifier_func}(given.x)))
                 color.r = 1.0;
-        if (expected.xy != ${func}(given.xy))
+        if (expected.xy != ${func}(${in_modifier_func}(given.xy)))
                 color.r = 1.0;
-        if (expected.xyz != ${func}(given.xyz))
+        if (expected.xyz != ${func}(${in_modifier_func}(given.xyz)))
                 color.r = 1.0;
-        if (expected != ${func}(given))
+        if (expected != ${func}(${in_modifier_func}(given)))
                 color.r = 1.0;
         % endif
     }
@@ -166,13 +179,13 @@ template = Template(dedent("""\
         % if execution_stage == 'fs':
         frag_color = vec4(0.0, 1.0, 0.0, 1.0);
 
-        if (expected.x != ${func}(given.x))
+        if (expected.x != ${func}(${in_modifier_func}(given.x)))
                 frag_color.r = 1.0;
-        if (expected.xy != ${func}(given.xy))
+        if (expected.xy != ${func}(${in_modifier_func}(given.xy)))
                 frag_color.r = 1.0;
-        if (expected.xyz != ${func}(given.xyz))
+        if (expected.xyz != ${func}(${in_modifier_func}(given.xyz)))
                 frag_color.r = 1.0;
-        if (expected != ${func}(given))
+        if (expected != ${func}(${in_modifier_func}(given)))
                 frag_color.r = 1.0;
         % else:
         frag_color = color;
@@ -188,12 +201,16 @@ template = Template(dedent("""\
 
     [test]
     % for name, data in sorted(test_data.iteritems()):
-
+    % if name == '-0.0' and in_modifier_func != '' and func == 'intBitsToFloat':
+    # ${in_modifier_func}(INT_MIN) doesn't fit in a 32-bit int. Cannot test.
+    % else:
     # ${name}
     uniform ${input_type} given ${' '.join(str(in_func(d)) for d in data)}
-    uniform ${output_type} expected ${' '.join(str(out_func(d)) for d in data)}
+    uniform ${output_type} expected ${' '.join(str(out_func(modifier_func(in_func(d)))) for d in data)}
     draw arrays GL_TRIANGLE_FAN 0 4
     probe all rgba 0.0 1.0 0.0 1.0
+    % endif
+
     % endfor
 """))
 
@@ -209,26 +226,41 @@ for api, requirement in requirements.iteritems():
 
         for execution_stage in ('vs', 'fs'):
             file_extension = 'frag' if execution_stage == 'fs' else 'vert'
-            filename = os.path.join('spec',
-                                    api,
-                                    'execution',
-                                    'built-in-functions',
-                                    "{0}-{1}.shader_test".format(execution_stage,
-                                                                 func))
-            print filename
 
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+            for in_modifier_func, modifier_func in modifier_funcs.iteritems():
+                # Modifying the sign of an unsigned number doesn't make sense.
+                if func == 'uintBitsToFloat' and in_modifier_func != '':
+                    continue
 
-            f = open(filename, 'w')
-            f.write(template.render(version=version,
-                                    extensions=extensions,
-                                    execution_stage=execution_stage,
-                                    func=func,
-                                    in_func=in_func,
-                                    out_func=out_func,
-                                    input_type=input_type,
-                                    output_type=output_type,
-                                    test_data=test_data))
-            f.close()
+                modifier_name = '-' + in_modifier_func if in_modifier_func != '' else ''
+                filename = os.path.join('spec',
+                                        api,
+                                        'execution',
+                                        'built-in-functions',
+                                        "{0}-{1}{2}.shader_test".format(execution_stage,
+                                                                        func,
+                                                                        modifier_name))
+                print filename
+
+                dirname = os.path.dirname(filename)
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
+
+                if in_modifier_func == 'neg':
+                    in_modifier_func = '-'
+                elif in_modifier_func == 'neg_abs':
+                    in_modifier_func = '-abs'
+
+                f = open(filename, 'w')
+                f.write(template.render(version=version,
+                                        extensions=extensions,
+                                        execution_stage=execution_stage,
+                                        func=func,
+                                        modifier_func=modifier_func,
+                                        in_modifier_func=in_modifier_func,
+                                        in_func=in_func,
+                                        out_func=out_func,
+                                        input_type=input_type,
+                                        output_type=output_type,
+                                        test_data=test_data))
+                f.close()
