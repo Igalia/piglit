@@ -21,6 +21,7 @@ piglit_add_executable (ext_transform_feedback-discard-copypixels discard-copypix
 piglit_add_executable (ext_transform_feedback-discard-drawarrays discard-drawarrays.c)
 piglit_add_executable (ext_transform_feedback-discard-drawpixels discard-drawpixels.c)
 piglit_add_executable (ext_transform_feedback-generatemipmap generatemipmap.c)
+piglit_add_executable (ext_transform_feedback-geometry-shaders-basic geometry-shaders-basic.c)
 piglit_add_executable (ext_transform_feedback-get-buffer-state get-buffer-state.c)
 piglit_add_executable (ext_transform_feedback-position position.c)
 piglit_add_executable (ext_transform_feedback-immediate-reuse immediate-reuse.c)
