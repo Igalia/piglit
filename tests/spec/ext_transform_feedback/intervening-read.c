@@ -44,14 +44,30 @@
  * but it requests that no more than 9 vertices be written to it.
  * This allows us to verify that the intervening glReadPixels call
  * doesn't interfere with overflow checking.
+ *
+ * The optional argument "use_gs" causes the test to use a geometry
+ * shader.  When this argument is given, the number of vertices output
+ * by the geometry shader is in general different from the number of
+ * vertices sent down the pipeline by the glDrawArrays() command.
+ * Thus, the test verifies that the implementation uses the
+ * post-geometry-shader vertex count to figure out where to resume
+ * transform feedback after the glReadPixels call.
  */
 
 #include "piglit-util-gl-common.h"
 
+static bool use_gs;
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
+	use_gs = PIGLIT_STRIP_ARG("use_gs");
+	if (use_gs) {
+		config.supports_gl_compat_version = 32;
+		config.supports_gl_core_version = 32;
+	} else {
+		config.supports_gl_compat_version = 10;
+		config.supports_gl_core_version = 31;
+	}
 
 	config.window_width = 64;
 	config.window_height = 32;
@@ -65,7 +81,10 @@ static enum test_mode {
 	TEST_MODE_PRIMS_WRITTEN
 } test_mode;
 
-static const char *vstext =
+/**
+ * Vertex shader used when use_gs is false.
+ */
+static const char *vstext_nogs =
 	"attribute vec4 in_position;\n"
 	"attribute vec4 in_color;\n"
 	"varying vec4 out_position;\n"
@@ -78,8 +97,78 @@ static const char *vstext =
 	"  out_color = in_color;\n"
 	"}\n";
 
-static const char *fstext =
+/**
+ * Fragment shader used when use_gs is false.
+ */
+static const char *fstext_nogs =
 	"varying vec4 out_color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  gl_FragColor = out_color;\n"
+	"}\n";
+
+/**
+ * Vertex shader used when use_gs is true.
+ */
+static const char *vstext_gs =
+	"#version 150\n"
+	"in vec4 in_color;\n"
+	"out vec4 color_to_gs;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  color_to_gs = in_color;\n"
+	"}\n";
+
+/**
+ * Geometry shader used when use_gs is true.
+ */
+static const char *gstext_gs =
+	"#version 150\n"
+	"layout(points) in;\n"
+	"layout(triangle_strip, max_vertices=6) out;\n"
+	"uniform int start_index;\n"
+	"in vec4 color_to_gs[1];\n"
+	"out vec4 out_position;\n"
+	"out vec4 out_color;\n"
+	"\n"
+	"void main()\n"
+	"{\n"
+	"  const vec2 positions[12] = vec2[12](\n"
+	"    vec2(-1.0, -1.0),\n"
+	"    vec2( 0.0, -1.0),\n"
+	"    vec2(-1.0,  1.0),\n"
+	"    vec2(-1.0,  1.0),\n"
+	"    vec2( 0.0, -1.0),\n"
+	"    vec2( 0.0,  1.0),\n"
+	"    vec2( 0.0, -1.0),\n"
+	"    vec2( 1.0, -1.0),\n"
+	"    vec2( 0.0,  1.0),\n"
+	"    vec2( 0.0,  1.0),\n"
+	"    vec2( 1.0, -1.0),\n"
+	"    vec2( 1.0,  1.0)\n"
+	"  );\n"
+	"  int index = start_index;\n"
+	"  for (int i = 0; i < 2; i++) {\n"
+	"    for (int j = 0; j < 3; j++) {\n"
+	"      vec4 position = vec4(positions[index], 0.0, 1.0);\n"
+	"      gl_Position = position;\n"
+	"      out_position = position;\n"
+	"      out_color = color_to_gs[0];\n"
+	"      EmitVertex();\n"
+	"      index++;\n"
+	"    }\n"
+	"    EndPrimitive();\n"
+	"  }\n"
+	"}\n";
+
+/**
+ * Fragment shader used when use_gs is false.
+ */
+static const char *fstext_gs =
+	"#version 150\n"
+	"in vec4 out_color;\n"
 	"\n"
 	"void main()\n"
 	"{\n"
@@ -106,7 +195,7 @@ print_usage_and_exit(char *prog_name)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs, fs;
+	GLuint vs, gs, fs;
 
 	/* Interpret command line args */
 	if (argc != 2)
@@ -123,12 +212,22 @@ piglit_init(int argc, char **argv)
 	piglit_require_GLSL();
 	piglit_require_transform_feedback();
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
+	if (use_gs) {
+		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_gs);
+		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, gstext_gs);
+		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext_gs);
+	} else {
+		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_nogs);
+		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
+						fstext_nogs);
+	}
 	prog = glCreateProgram();
 	glAttachShader(prog, vs);
+	if (use_gs)
+		glAttachShader(prog, gs);
 	glAttachShader(prog, fs);
-	glBindAttribLocation(prog, 0, "in_position");
+	if (!use_gs)
+		glBindAttribLocation(prog, 0, "in_position");
 	glBindAttribLocation(prog, 1, "in_color");
 	glTransformFeedbackVaryings(prog, 2, varyings, GL_INTERLEAVED_ATTRIBS);
 	glLinkProgram(prog);
@@ -224,14 +323,24 @@ piglit_display(void)
 	}
 
 	/* First draw call */
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	if (use_gs) {
+		glUniform1i(glGetUniformLocation(prog, "start_index"), 0);
+		glDrawArrays(GL_POINTS, 0, 1);
+	} else {
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 
 	/* Read pixels */
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width / 2, piglit_height,
 				      vertex_input[0].color) && pass;
 
 	/* Second draw call */
-	glDrawArrays(GL_TRIANGLES, 6, 6);
+	if (use_gs) {
+		glUniform1i(glGetUniformLocation(prog, "start_index"), 6);
+		glDrawArrays(GL_POINTS, 6, 1);
+	} else {
+		glDrawArrays(GL_TRIANGLES, 6, 6);
+	}
 
 	/* Finish transform feedback and test correct behavior. */
 	glEndTransformFeedback();
