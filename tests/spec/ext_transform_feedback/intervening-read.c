@@ -51,6 +51,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = 64;
 	config.window_height = 32;
@@ -87,7 +88,7 @@ static const char *fstext =
 
 static const char *varyings[] = { "out_position", "out_color" };
 
-static GLuint xfb_buf;
+static GLuint xfb_buf, vao, array_buf;
 static GLuint prog;
 static GLuint query;
 
@@ -137,7 +138,13 @@ piglit_init(int argc, char **argv)
 	}
 
 	glGenBuffers(1, &xfb_buf);
+	glGenBuffers(1, &array_buf);
 	glGenQueries(1, &query);
+	if (piglit_is_extension_supported("GL_ARB_vertex_array_object") ||
+	    piglit_get_gl_version() >= 30) {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
 }
 
 struct vertex_data {
@@ -180,12 +187,15 @@ piglit_display(void)
 	glUseProgram(prog);
 
 	/* Setup inputs */
+	glBindBuffer(GL_ARRAY_BUFFER, array_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_input), &vertex_input,
+		     GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,
 			      sizeof(struct vertex_data),
-			      &vertex_input[0].position);
+			      (void *) offsetof(struct vertex_data, position));
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
 			      sizeof(struct vertex_data),
-			      &vertex_input[0].color);
+			      (void *) offsetof(struct vertex_data, color));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
