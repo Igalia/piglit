@@ -176,3 +176,22 @@ piglit_set_reshape_func(void (*func)(int w, int h))
 	if (!gl_fw->set_reshape_func)
 		gl_fw->set_reshape_func(gl_fw, func);
 }
+
+
+/**
+ * Search for an argument with the given name in the argument list.
+ * If it is found, remove it and return true.
+ */
+bool
+piglit_strip_arg(int *argc, char *argv[], const char *arg)
+{
+	int i;
+	for (i = 1; i < *argc; i++) {
+		if (!strcmp(argv[i], arg)) {
+			delete_arg(argv, *argc, i);
+			*argc -= 1;
+			return true;
+		}
+	}
+	return false;
+}
