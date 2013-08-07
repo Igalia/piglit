@@ -46,6 +46,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = 16;
 	config.window_height = 16;
@@ -70,7 +71,7 @@ static const char *vstext =
 
 static const char *varyings[] = { "varying1", "varying2" };
 
-static GLuint xfb_buf;
+static GLuint xfb_buf, vao, array_buf;
 static GLuint progs[2]; /* indexed by num_varyings - 1 */
 static GLuint query_prims_generated;
 static GLuint query_prims_written;
@@ -100,8 +101,14 @@ piglit_init(int argc, char **argv)
 	}
 
 	glGenBuffers(1, &xfb_buf);
+	glGenBuffers(1, &array_buf);
 	glGenQueries(1, &query_prims_generated);
 	glGenQueries(1, &query_prims_written);
+	if (piglit_is_extension_supported("GL_ARB_vertex_array_object") ||
+	    piglit_get_gl_version() >= 30) {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
 }
 
 static GLenum modes[] = { GL_POINTS, GL_LINES, GL_TRIANGLES };
@@ -135,8 +142,10 @@ test(int bind_size, int num_varyings, int num_primitives, int mode_index)
 	glUseProgram(progs[num_varyings - 1]);
 	for (i = 0; i < MAX_VERTICES; ++i)
 		vertex_data[i] = i;
-	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float),
-			      &vertex_data);
+	glBindBuffer(GL_ARRAY_BUFFER, array_buf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), &vertex_data,
+		     GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(float), NULL);
 	glEnableVertexAttribArray(0);
 	for (i = 0; i < XFB_BUFFER_SIZE; ++i)
 		initial_xfb_buf[i] = 0.0;
