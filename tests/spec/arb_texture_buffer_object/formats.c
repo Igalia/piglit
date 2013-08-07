@@ -702,26 +702,13 @@ piglit_init(int argc, char **argv)
 	init_programs();
 }
 
-static bool
-find_arg(int argc, char *argv[], const char *str)
-{
-	int i;
-
-	for (i = 0; i < argc; i++) {
-		if (strcmp(argv[i], str) == 0)
-			return true;
-	}
-
-	return false;
-}
-
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	test_vs = find_arg(argc, argv, "vs");
-	if (!test_vs && !find_arg(argc, argv, "fs"))
+	test_vs = PIGLIT_STRIP_ARG("vs");
+	if (!test_vs && !PIGLIT_STRIP_ARG("fs"))
 		usage(argv[0]);
 
-	test_arb = find_arg(argc, argv, "arb");
-	if (!test_arb && !find_arg(argc, argv, "core"))
+	test_arb = PIGLIT_STRIP_ARG("arb");
+	if (!test_arb && !PIGLIT_STRIP_ARG("core"))
 		usage(argv[0]);
 
 	if (test_arb)
