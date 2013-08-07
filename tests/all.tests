@@ -1025,6 +1025,8 @@ add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-bounds'
 arb_draw_elements_base_vertex['draw-elements-base-vertex-neg-user_varrays'] = PlainExecTest(['draw-elements-base-vertex-neg', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-instanced-base-vertex')
 arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PlainExecTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
+add_plain_test(arb_draw_elements_base_vertex, 'draw-range-elements-base-vertex')
+add_plain_test(arb_draw_elements_base_vertex, 'multi-draw-elements-base-vertex')
 
 # Group ARB_draw_instanced
 arb_draw_instanced = Group()
@@ -1411,6 +1413,7 @@ add_plain_test(apple_vertex_array_object, 'vao-02')
 apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-isvertexarray apple')
 
 profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PlainExecTest('arb_vertex_array_bgra-api-errors -auto')
+profile.test_list['ARB_vertex_array_bgra/vertex-array-bgra'] = PlainExecTest('arb_vertex_array_bgra -auto')
 
 arb_vertex_array_object = Group()
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
