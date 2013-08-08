@@ -250,7 +250,7 @@ PointSpriteTest::CompareColor(GLfloat *actual, GLfloat *expected)
 }
 
 
-static void
+static bool
 FindNonBlack(const GLfloat *buf, GLint w, GLint h, GLint *x0, GLint *y0)
 {
 	GLint i, j;
@@ -262,11 +262,12 @@ FindNonBlack(const GLfloat *buf, GLint w, GLint h, GLint *x0, GLint *y0)
 				buf[k+2] != bgColor[2]) {
 				*x0 = j;
 				*y0 = i;
-				return;
+				return true;
 			}
 		}
 	}
-	abort();
+
+	return false;
 }
 
 
@@ -289,7 +290,11 @@ PointSpriteTest::ComparePixels(GLfloat *buf, int pSize, GLenum coordOrigin)
 	// Find first (lower-left) pixel that's not black.
 	// The pixels hit by sprite rasterization may vary from one GL to
 	// another so try to compensate for that.
-	FindNonBlack(buf, WINSIZE/2, WINSIZE/2, &x0, &y0);
+	if (!FindNonBlack(buf, WINSIZE/2, WINSIZE/2, &x0, &y0))
+	{
+		env->log << "Could not find any non-black pixels.\n";
+		return GL_FALSE;
+	}
 
 	for (i = 0; i < WINSIZE / 2; i++)
 	{
