@@ -24,8 +24,4 @@
 #version 130
 #extension GL_ARB_shading_language_420pack: enable
 void a(in const float x) {}
-void b(out const float x) {}
-void c(inout const float x) {}
 void d(const in float x) {}
-void e(const out float x) {}
-void f(const inout float x) {}
