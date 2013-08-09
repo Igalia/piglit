@@ -11,7 +11,6 @@
 
 #version 130
 
-float f() {
+void f() {
 	lowp bvec2 v;
-	return 0.0;
 }

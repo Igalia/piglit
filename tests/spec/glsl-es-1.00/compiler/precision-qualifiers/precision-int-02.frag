@@ -11,7 +11,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	mediump ivec2 v;
-	return 0.0;
 }

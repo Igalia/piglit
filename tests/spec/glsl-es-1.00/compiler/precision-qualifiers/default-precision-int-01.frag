@@ -16,6 +16,4 @@
 
 precision mediump int;
 
-float f() {
-	return 0.0;
-}
+void f() { }

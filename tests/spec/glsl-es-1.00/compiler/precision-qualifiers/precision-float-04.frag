@@ -11,7 +11,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	lowp mat4 m;
-	return 0.0;
 }

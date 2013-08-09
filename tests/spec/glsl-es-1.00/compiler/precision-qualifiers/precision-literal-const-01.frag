@@ -10,7 +10,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	lowp int x = lowp 1;
-	return 0.0;
 }

@@ -14,6 +14,4 @@
 uniform mediump float x;
 varying lowp float y;
 
-float f() {
-	return 0.0;
-}
+void f() { }

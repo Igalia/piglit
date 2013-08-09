@@ -13,6 +13,4 @@
 
 lowp int a[4];
 
-float f() {
-	return 0.0;
-}
+void f() { }

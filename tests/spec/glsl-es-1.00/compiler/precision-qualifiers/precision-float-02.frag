@@ -11,7 +11,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	lowp vec2 v;
-	return 0.0;
 }

@@ -11,7 +11,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	lowp bool b;
-	return 0.0;
 }

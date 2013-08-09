@@ -11,7 +11,6 @@
 
 #version 100
 
-float f() {
+void f() {
 	mediump float x;
-	return 0.0;
 }

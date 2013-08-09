@@ -11,6 +11,4 @@
 
 #version 100
 
-lowp float f(lowp int x) {
-	return 0.0;
-}
+void f(lowp int x) { }
