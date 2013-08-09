@@ -36,7 +36,10 @@
  * linux drivers.
  */
 
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 const int pattern_width = 258; const int pattern_height = 258;
 

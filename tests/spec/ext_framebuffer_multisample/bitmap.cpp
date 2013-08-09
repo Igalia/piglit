@@ -21,7 +21,10 @@
  * IN THE SOFTWARE.
  */
 
-#include "common.h"
+#include "piglit-fbo.h"
+#include "piglit-test-pattern.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 /**
  * \file bitmap.cpp

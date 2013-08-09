@@ -35,7 +35,8 @@
  *
  */
 
-#include "common.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
 
 const int pattern_width = 256; const int pattern_height = 256;
 

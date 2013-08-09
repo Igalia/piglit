@@ -55,10 +55,13 @@
  * blit to the screen and check that the resulting color is correct.
  * The extra work of converting depth/stencil values into colors is
  * done using the ManifestDepth and ManifestStencil programs from
- * common.h.
+ * piglit-test-pattern.h.
  */
 
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

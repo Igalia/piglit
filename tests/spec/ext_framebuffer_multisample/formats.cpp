@@ -45,6 +45,8 @@
 
 #include "common.h"
 #include "../../fbo/fbo-formats.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -6,6 +6,8 @@ set(UTIL_GL_SOURCES
 	piglit-shader-gl.c
 	piglit-util-gl-enum.c
 	piglit-util-gl.c
+	piglit-test-pattern.cpp
+	piglit-fbo.cpp
 	piglit-vbo.cpp
 	sized-internalformats.c
 	minmax-test.c

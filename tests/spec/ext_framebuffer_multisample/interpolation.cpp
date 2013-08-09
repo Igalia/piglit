@@ -121,7 +121,10 @@
  * comparison.
  */
 
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

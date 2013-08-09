@@ -22,6 +22,7 @@
  */
 
 #include "draw-buffers-common.h"
+using namespace piglit_util_fbo;
 
 /**
  * \file draw-buffers-common.cpp

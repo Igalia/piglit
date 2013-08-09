@@ -71,7 +71,10 @@
  * 8. Compare the test and reference images to make sure they match.
  */
 
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

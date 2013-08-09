@@ -22,6 +22,8 @@
  */
 
 #include "common.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 /**
  * \file polygon-smooth.cpp

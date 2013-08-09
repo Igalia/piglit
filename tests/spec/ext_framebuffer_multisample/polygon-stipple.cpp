@@ -21,7 +21,8 @@
  * IN THE SOFTWARE.
  */
 
-#include "common.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
 
 /**
  * \file polygon-stipple.cpp

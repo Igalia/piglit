@@ -20,7 +20,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
  */
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 /**
  * \file unaligned-blit.cpp

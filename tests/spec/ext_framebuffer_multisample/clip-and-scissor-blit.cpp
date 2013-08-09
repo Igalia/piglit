@@ -54,7 +54,8 @@
  *
  * 7. Verify that the test and reference images match.
  */
-#include "common.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

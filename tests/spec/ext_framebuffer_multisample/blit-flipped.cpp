@@ -48,7 +48,10 @@
  * and then a second blit that performs a flip.
  */
 
-#include "common.h"
+#include "piglit-test-pattern.h"
+#include "piglit-fbo.h"
+using namespace piglit_util_fbo;
+using namespace piglit_util_test_pattern;
 
 const int pattern_width = 256; const int pattern_height = 256;
 
