@@ -1116,6 +1116,7 @@ for format in ('rgba', 'depth', 'stencil'):
 add_plain_test(arb_framebuffer_object, 'fbo-alpha')
 add_plain_test(arb_framebuffer_object, 'fbo-blit-stretch')
 add_plain_test(arb_framebuffer_object, 'fbo-blit-scaled-linear')
+add_plain_test(arb_framebuffer_object, 'fbo-attachments-blit-scaled-linear')
 add_plain_test(arb_framebuffer_object, 'fbo-deriv')
 add_plain_test(arb_framebuffer_object, 'fbo-luminance-alpha')
 add_plain_test(arb_framebuffer_object, 'fbo-getframebufferattachmentparameter-01')
