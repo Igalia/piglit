@@ -40,6 +40,13 @@
           </pre>${command}</pre>
         </td>
       </tr>
+      <tr>
+        <td>Traceback</td>
+        <td>
+          <pre>${traceback}</pre>
+        </td>
+      </tr>
+
     </table>
     <p><a href="${index}">Back to summary</a></p>
   </body>

@@ -545,6 +545,7 @@ class Summary:
                         returncode=value.get('returncode', 'None'),
                         time=value.get('time', 'None'),
                         info=value.get('info', 'None'),
+                        traceback=value.get('traceback', 'None'),
                         command=value.get('command', 'None'),
                         css=path.relpath(resultCss, tPath),
                         index=index))
