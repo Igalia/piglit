@@ -3,20 +3,10 @@
  * glsl_version: 1.20
  * [end config]
  *
- * From page 19 (page 25 of the PDF) of the GLSL 1.20 spec:
+ * Section 6.1 (Function Definitions) of the GLSL 1.20 spec says:
  *
- *     "This type can be used anywhere any other type can be used, including
- *     as the return value from a function
- *
- *         float[5] foo() { }
- *
- *     as a constructor of an array
- *
- *         float[5](3.4, 4.2, 5.0, 5.2, 1.1)
- *
- *     as an unnamed parameter
- *
- *         void foo(float[5])"
+ *     "Arrays are allowed as arguments and as the return type. In
+ *     both cases, the array must be explicitly sized."
  */
 #version 120
 
