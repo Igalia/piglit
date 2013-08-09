@@ -15,5 +15,6 @@ piglit_add_executable(get-renderbuffer-internalformat get-renderbuffer-internalf
 piglit_add_executable(arb_framebuffer_object-negative-readpixels-no-rb negative-readpixels-no-rb.c)
 piglit_add_executable(same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT.c)
 piglit_add_executable(same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT.c)
+piglit_add_executable (fbo-blit-scaled-linear blit-scaled-linear.cpp)
 
 # vim: ft=cmake:
