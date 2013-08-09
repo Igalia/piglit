@@ -16,6 +16,7 @@
 //     target of an assignment.
 
 #version 100
+precision mediump float;
 
 void f(inout float x[2])
 {

@@ -10,6 +10,7 @@
 //     unspecified value.
 
 #version 100
+precision mediump float;
 
 float
 f() {

@@ -7,6 +7,7 @@
 //     A fragment shader can not write to a varying variable.
 
 #version 100
+precision mediump float;
 
 varying float x;
 
