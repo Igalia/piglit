@@ -134,12 +134,12 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 	switch (type) {
 	case GL_VERTEX_SHADER:
 		shader_template =
-			"#version %d\n"
+			"#version %d %s\n"
 			"void main() { gl_Position = vec4(0.0); }";
 		break;
 	case GL_FRAGMENT_SHADER:
 		shader_template =
-			"#version %d\n"
+			"#version %d %s\n"
 			"void main() { }";
 		break;
 	default:
@@ -148,7 +148,10 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 		break;
 	}
 
-	sprintf(shader_text, shader_template, requested_version);
+	sprintf(shader_text,
+		shader_template,
+		requested_version,
+		(requested_version == 300) ? "es" : "");
 	shader = piglit_compile_shader_text(type, shader_text);
 	glAttachShader(shader_prog, shader);
 }
@@ -242,7 +245,7 @@ test(void)
 
 		shader_prog = glCreateProgram();
 		glAttachShader(shader_prog, prog);
-		if (requested_version == 100)
+		if (requested_version == 100 || requested_version == 300)
 			attach_complementary_shader(shader_prog, type);
 #if PIGLIT_USE_OPENGL
 		if (type == GL_GEOMETRY_SHADER)
