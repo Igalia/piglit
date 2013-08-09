@@ -139,6 +139,7 @@ piglit_init(int argc, char **argv)
 
 	const char fs_source[] =
 		"#version 100\n"
+		"precision highp float;\n"
 		"\n"
 		"uniform sampler2D tex;\n"
 		"varying vec2 tex_coord;\n"
