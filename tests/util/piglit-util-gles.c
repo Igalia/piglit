@@ -162,6 +162,71 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	return 1;
 }
 
+static void
+print_pixel(const GLubyte *pixel, unsigned components)
+{
+	int p;
+	for (p = 0; p < components; ++p)
+		printf(" %u", pixel[p]);
+}
+
+unsigned
+piglit_num_components(GLenum base_format)
+{
+	switch (base_format) {
+	case GL_ALPHA:
+	case GL_LUMINANCE:
+		return 1;
+	case GL_LUMINANCE_ALPHA:
+		return 2;
+	case GL_RGB:
+		return 3;
+	case GL_RGBA:
+		return 4;
+	default:
+		printf("Unknown num_components for %s\n",
+		       piglit_get_gl_enum_name(base_format));
+		piglit_report_result(PIGLIT_FAIL);
+		return 0;
+	}
+}
+
+int
+piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
+			const GLubyte *image)
+{
+	const int c = piglit_num_components(format);
+	GLubyte *pixels = malloc(w * h * 4 * sizeof(GLubyte));
+	int i, j, p;
+
+	glReadPixels(x, y, w, h, format, GL_UNSIGNED_BYTE, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			const GLubyte *expected = &image[(j * w + i) * c];
+			const GLubyte *probe = &pixels[(j * w + i) * c];
+
+			for (p = 0; p < c; ++p) {
+				if (probe[p] == expected[p])
+					continue;
+
+				printf("Probe at (%i,%i)\n", x + i, y + j);
+				printf("  Expected:");
+				print_pixel(expected, c);
+				printf("\n  Observed:");
+				print_pixel(probe, c);
+				printf("\n");
+
+				free(pixels);
+				return 0;
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 void
 piglit_escape_exit_key(unsigned char key, int x, int y)
 {

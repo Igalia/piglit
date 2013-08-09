@@ -134,6 +134,8 @@ int piglit_probe_image_color(int x, int y, int w, int h, GLenum format, const fl
 int piglit_probe_image_rgb(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_rgba(int x, int y, int w, int h, const float *image);
 int piglit_probe_image_stencil(int x, int y, int w, int h, const GLubyte *image);
+int piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
+			     const GLubyte *image);
 int piglit_probe_texel_rect_rgb(int target, int level, int x, int y,
 				int w, int h, const float *expected);
 int piglit_probe_texel_rgb(int target, int level, int x, int y,
