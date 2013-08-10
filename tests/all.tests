@@ -938,6 +938,15 @@ for draw in ['', 'indexed']:
                             ('arb_geometry_shader4-ignore-adjacent-vertices '
                              'core {0} {1}').format(draw, prim))
 
+# max_vertices of 32 and 128 are important transition points for
+# mesa/i965 (they are the number of bits in a float and a vec4,
+# respectively), so test around there.  Also test 0, which means the
+# maximum number of geometry shader output vertices supported by the
+# hardware.
+for i in [31, 32, 33, 34, 127, 128, 129, 130, 0]:
+    add_concurrent_test(spec['glsl-1.50'],
+                        'glsl-1.50-geometry-end-primitive {0}'.format(i))
+
 spec['glsl-3.30'] = Group()
 import_glsl_parser_tests(spec['glsl-3.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
