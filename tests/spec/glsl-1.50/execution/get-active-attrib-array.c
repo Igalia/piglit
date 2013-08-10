@@ -103,6 +103,7 @@ getAttribLocTest(GLint program, int active_attribs, int max_name_length,
 			name, size, expected_size);
 	}
 
+	free(name);
 	return pass;
 }
 
