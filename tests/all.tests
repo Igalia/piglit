@@ -1095,6 +1095,26 @@ for stage in ['vs', 'gs', 'fs']:
     for sampler in samplers_atm:
         spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
+# Group ARB_texture_gather
+arb_texture_gather = Group()
+spec['ARB_texture_gather'] = arb_texture_gather
+for stage in ['vs', 'fs']:
+    for comps in ['r', 'rg', 'rgb', 'rgba']:
+        for swiz in ['red', 'green', 'blue', 'alpha'][:len(comps)] + ['', 'zero', 'one']:
+            for type in ['unorm', 'float', 'int', 'uint']:
+		for sampler in ['2D', '2DArray', 'Cube', 'CubeArray']:
+		    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+			testname = '%s/%s-%s-%s-%s-%s' % (
+			    func, stage, comps,
+			    swiz if len(swiz) else 'none',
+			    type, sampler)
+			cmd = 'textureGather %s %s %s %s %s %s' % (
+			    stage,
+			    'offset' if func == 'textureGatherOffset' else '',
+			    comps, swiz, type, sampler
+			    )
+			arb_texture_gather[testname] = concurrent_test(cmd)
+
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
