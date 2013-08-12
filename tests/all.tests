@@ -743,6 +743,8 @@ gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-
 gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 31')
 
 spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
+spec['!OpenGL 3.2/clear-no-buffers'] = concurrent_test('gl-3.2-clear-no-buffers')
+spec['!OpenGL 3.2/draw-buffers-errors'] = concurrent_test('gl-3.2-draw-buffers-errors')
 
 spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
 spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 33')
