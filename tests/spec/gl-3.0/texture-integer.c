@@ -287,7 +287,7 @@ test_format(const struct format_info *info)
 		/* nothing */
 		break;
 	case GL_RGB_INTEGER_EXT:
-		expected[3] = 0.0;
+		value[3] = 0.0;
 		break;
 	case GL_ALPHA_INTEGER_EXT:
 		expected[0] = expected[1] = expected[2] = 0.0;
