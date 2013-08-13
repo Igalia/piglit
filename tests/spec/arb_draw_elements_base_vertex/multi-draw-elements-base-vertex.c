@@ -105,8 +105,8 @@ static GLuint indices[] = {
 };
 static GLsizei indices_size = sizeof(indices);
 
-static int indices_offset[] = {
-	0, 6 * sizeof(GLuint)
+static const GLvoid * const indices_offset[] = {
+	(GLvoid*) 0, (GLvoid*)(6 * sizeof(GLuint))
 };
 static GLsizei indices_count[] = {
 	6, 6
@@ -123,8 +123,6 @@ piglit_init(int argc, char **argv)
 	if (piglit_get_gl_version() < 32) {
 		piglit_require_extension("GL_ARB_draw_elements_base_vertex");
 	}
-
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	/* Create program */
 	program = piglit_build_simple_program(vs_source, fs_source);
@@ -153,6 +151,9 @@ piglit_init(int argc, char **argv)
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glEnableVertexAttribArray(vertex_index);
 	glVertexAttribPointer(vertex_index, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	if(!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 enum piglit_result
@@ -177,6 +178,9 @@ piglit_display(void)
 	pass = piglit_probe_pixel_rgb(100, 125, green) && pass;
 	pass = piglit_probe_pixel_rgb(100,  75, blue) && pass;
 	pass = piglit_probe_pixel_rgb(100,  25, green) && pass;
+
+	if(!piglit_check_gl_error(GL_NO_ERROR))
+		pass = false;
 
 	piglit_present_results();
 
