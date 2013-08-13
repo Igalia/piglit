@@ -47,7 +47,7 @@ PIGLIT_GL_TEST_CONFIG_END
 enum piglit_result
 piglit_display(void)
 {
-	GLuint tex[3];
+	GLuint tex[5];
 	GLint level;
 	GLint num_level;
 
@@ -65,7 +65,7 @@ piglit_display(void)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	glGenTextures(5, tex);
+	glGenTextures(ARRAY_SIZE(tex), tex);
 
 	glBindTexture(GL_TEXTURE_1D, tex[0]);
 	glTexStorage1D(GL_TEXTURE_1D, 3, GL_RGBA8, 32);
