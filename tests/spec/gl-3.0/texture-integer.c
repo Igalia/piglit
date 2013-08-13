@@ -293,6 +293,7 @@ test_format(const struct format_info *info)
 		expected[0] = expected[1] = expected[2] = 0.0;
 		expected[3] = 0.25;
 		value[3] = value[0];
+		value[0] = value[1] = value[2] = 0.0;
 		break;
 	case GL_LUMINANCE_INTEGER_EXT:
 		expected[0] = expected[1] = expected[2] = 0.25;
