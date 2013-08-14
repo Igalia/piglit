@@ -1013,6 +1013,7 @@ arb_depth_clamp = Group()
 spec['ARB_depth_clamp'] = arb_depth_clamp
 add_plain_test(arb_depth_clamp, 'depth_clamp')
 add_plain_test(arb_depth_clamp, 'depth-clamp-range')
+add_plain_test(arb_depth_clamp, 'depth-clamp-status')
 
 # Group ARB_draw_elements_base_vertex
 arb_draw_elements_base_vertex = Group()
