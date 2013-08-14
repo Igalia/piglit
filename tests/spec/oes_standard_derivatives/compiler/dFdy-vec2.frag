@@ -6,6 +6,7 @@
  */
 #version 100
 #extension GL_OES_standard_derivatives: require
+precision mediump float;
 
 varying vec2 x;
 void main()
