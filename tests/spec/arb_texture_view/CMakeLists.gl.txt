@@ -1,5 +1,7 @@
 link_libraries(
 	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
 	)
 
 piglit_add_executable(arb_texture_view-texture-immutable-levels texture-immutable-levels.c)
