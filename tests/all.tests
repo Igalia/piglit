@@ -2277,6 +2277,7 @@ arb_seamless_cube_map = Group()
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap-initially-disabled')
+add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap-three-faces-average')
 
 amd_seamless_cubemap_per_texture = Group()
 spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture

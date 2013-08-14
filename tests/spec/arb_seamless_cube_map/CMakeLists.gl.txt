@@ -11,5 +11,6 @@ link_libraries (
 
 piglit_add_executable (arb_seamless_cubemap arb_seamless_cubemap.c)
 piglit_add_executable (arb_seamless_cubemap-initially-disabled initially-disabled.c)
+piglit_add_executable (arb_seamless_cubemap-three-faces-average three-faces-average.c)
 
 # vim: ft=cmake:
