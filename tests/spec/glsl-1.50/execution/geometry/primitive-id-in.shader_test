@@ -1,0 +1,79 @@
+# Check proper functioning of the gl_PrimitiveIDIn geometry shader
+# input.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+out int vertex_id_to_gs;
+out vec4 vertex_to_gs;
+
+void main()
+{
+  vertex_to_gs = vertex;
+  vertex_id_to_gs = gl_VertexID;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in vec4 vertex_to_gs[3];
+in int vertex_id_to_gs[3];
+out vec4 color;
+
+void main()
+{
+  /* We draw a triangle fan containing of 6 vertices, so the
+   * relationship between the primitive ID and the input vertex IDs
+   * should be:
+   *
+   * Primitive ID  Vertex ID's
+   *  0             0 1 2
+   *  1             0 2 3
+   *  2             0 3 4
+   *  3             0 4 5
+   *
+   * To avoid relying on the order in which vertices appear within
+   * each triangle, compute the maximum of the input vertex IDs, and
+   * subtract 2 from it.  That is the expected primitive ID.
+   */
+  int expected_primitive_id =
+    max(max(vertex_id_to_gs[0], vertex_id_to_gs[1]), vertex_id_to_gs[2]) - 2;
+  bool ok = expected_primitive_id == gl_PrimitiveIDIn;
+
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[i];
+    color = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+
+in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+-1.0  1.0
+ 0.0  1.0
+ 1.0  1.0
+ 1.0  0.0
+ 1.0 -1.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 6
+probe all rgba 0.0 1.0 0.0 1.0

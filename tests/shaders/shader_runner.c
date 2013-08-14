@@ -95,6 +95,7 @@ const char *vertex_data_start = NULL;
 const char *vertex_data_end = NULL;
 GLuint prog;
 size_t num_vbo_rows = 0;
+bool vbo_present = false;
 bool link_ok = false;
 bool prog_in_use = false;
 GLchar *prog_err_info = NULL;
@@ -1414,6 +1415,7 @@ struct enable_table {
 	{ "GL_CLIP_PLANE6", GL_CLIP_PLANE0+6 },
 	{ "GL_CLIP_PLANE7", GL_CLIP_PLANE0+7 },
 	{ "GL_VERTEX_PROGRAM_TWO_SIDE", GL_VERTEX_PROGRAM_TWO_SIDE },
+	{ "GL_PROGRAM_POINT_SIZE", GL_PROGRAM_POINT_SIZE },
 	{ NULL, 0 }
 };
 
@@ -1709,7 +1711,8 @@ piglit_display(void)
 			if (first < 0) {
 				printf("draw arrays 'first' must be >= 0\n");
 				piglit_report_result(PIGLIT_FAIL);
-			} else if ((size_t) first >= num_vbo_rows) {
+			} else if (vbo_present &&
+				   (size_t) first >= num_vbo_rows) {
 				printf("draw arrays 'first' must be < %lu\n",
 				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
@@ -1717,12 +1720,12 @@ piglit_display(void)
 			if (count <= 0) {
 				printf("draw arrays 'count' must be > 0\n");
 				piglit_report_result(PIGLIT_FAIL);
-			} else if (count > num_vbo_rows - (size_t) first) {
+			} else if (vbo_present &&
+				   count > num_vbo_rows - (size_t) first) {
 				printf("draw arrays cannot draw beyond %lu\n",
 				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
 			}
-			/* TODO: wrapper? */
 			glDrawArrays(mode, first, count);
 		} else if (string_match("disable", line)) {
 			do_enable_disable(line + 7, false);
@@ -1993,6 +1996,7 @@ piglit_init(int argc, char **argv)
 
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
+		vbo_present = true;
 	}
 	setup_ubos();
 }

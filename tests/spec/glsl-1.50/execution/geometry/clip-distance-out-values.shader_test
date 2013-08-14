@@ -1,0 +1,89 @@
+# This test checks that values emitted by the geometry shader to
+# gl_ClipDistance are properly used to clip primitives.
+#
+# It operates by using the 8 clip distances to clip the GS output
+# primitives (which constitute a tristrip covering the window) into an
+# octagon.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+void main()
+{
+}
+
+[geometry shader]
+#version 150
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+float gl_ClipDistance[8];
+
+struct vertex_data {
+  vec4 position;
+  float clip_distance[8];
+};
+
+void main()
+{
+  vertex_data vdata[4] = vertex_data[4](
+    vertex_data(vec4(-1.0, -1.0, 0.0, 1.0),
+                float[8](-1.0,  2.0,  4.0,  7.0,  4.0,  2.0, -1.0, -3.0)),
+    vertex_data(vec4(-1.0,  1.0, 0.0, 1.0),
+                float[8](-1.0, -3.0, -1.0,  2.0,  4.0,  7.0,  4.0,  2.0)),
+    vertex_data(vec4( 1.0, -1.0, 0.0, 1.0),
+                float[8]( 4.0,  7.0,  4.0,  2.0, -1.0, -3.0, -1.0,  2.0)),
+    vertex_data(vec4( 1.0,  1.0, 0.0, 1.0),
+                float[8]( 4.0,  2.0, -1.0, -3.0, -1.0,  2.0,  4.0,  7.0))
+  );
+
+  for (int i = 0; i < 4; i++) {
+    gl_Position = vdata[i].position;
+    gl_ClipDistance = vdata[i].clip_distance;
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+enable GL_CLIP_PLANE0
+enable GL_CLIP_PLANE1
+enable GL_CLIP_PLANE2
+enable GL_CLIP_PLANE3
+enable GL_CLIP_PLANE4
+enable GL_CLIP_PLANE5
+enable GL_CLIP_PLANE6
+enable GL_CLIP_PLANE7
+draw arrays GL_POINTS 0 1
+
+# Test points inside the octagon
+relative probe rgba (0.25, 0.50) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.35, 0.65) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.50, 0.75) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.65, 0.65) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.75, 0.50) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.65, 0.35) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.50, 0.25) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.35, 0.35) (1.0, 1.0, 1.0, 1.0)
+
+# Probe points outside the octagon
+relative probe rgba (0.15, 0.50) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.25, 0.75) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.50, 0.85) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.75, 0.75) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.85, 0.50) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.75, 0.25) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.50, 0.15) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.25, 0.25) (0.0, 0.0, 0.0, 0.0)

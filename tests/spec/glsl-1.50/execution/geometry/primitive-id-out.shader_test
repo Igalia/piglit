@@ -1,0 +1,71 @@
+# Basic test of the functionality of the geometry shader output
+# gl_PrimitiveID.
+#
+# As a geometry shader output, gl_PrimitiveID has no special behaviour
+# other than to be passed along to the fragment shader.
+#
+# Note: GL 3.2 specifies that the value received in the fragment
+# shader corresponds to the value of gl_PrimitiveID for the provoking
+# vertex.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+void main()
+{
+}
+
+[geometry shader]
+#version 150
+
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+flat out int vertex_counter;
+
+void main()
+{
+  gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);
+  gl_PrimitiveID = 1000; /* ignored--this isn't a provoking vertex */
+  vertex_counter = 0; /* ignored--this isn't a provoking vertex */
+  EmitVertex();
+  gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);
+  gl_PrimitiveID = 1000; /* ignored--this isn't a provoking vertex */
+  vertex_counter = 1; /* ignored--this isn't a provoking vertex */
+  EmitVertex();
+  gl_Position = vec4(1.0, -1.0, 0.0, 1.0);
+  gl_PrimitiveID = 10;
+  vertex_counter = 2;
+  EmitVertex();
+  gl_Position = vec4(1.0, 1.0, 0.0, 1.0);
+  gl_PrimitiveID = 20;
+  vertex_counter = 3;
+  EmitVertex();
+}
+
+[fragment shader]
+#version 150
+
+flat in int vertex_counter;
+
+void main()
+{
+  /* Only two of the vertices output by the GS are provoking vertices:
+   * - vertex 2, which has gl_PrimitiveID = 10
+   * - vertex 3, which has gl_PrimitiveID = 20
+   *
+   * So we expect gl_PrimitiveID to be (vertex_counter - 1) * 10.
+   */
+  int expected_primitive_id = (vertex_counter - 1) * 10;
+  if (expected_primitive_id == gl_PrimitiveID)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw arrays GL_POINTS 0 1
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,61 @@
+# Basic test of the functionality of the geometry shader output
+# gl_PointSize.
+#
+# This test draws a small point in the left half of the window and a
+# large point in the right half.  Then it probes the region around
+# each point to ensure that the point on the right is larger.
+#
+# NOTE: since gl_PointSize is expressed in pixels, but gl_Position is
+# expressed relative to the window size, this test is dependent upon
+# the window size.  It assumes a window size of 250x250, which is the
+# shader_runner default.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+void main()
+{
+}
+
+[geometry shader]
+#version 150
+
+layout(points) in;
+layout(points, max_vertices = 2) out;
+
+out vec4 color;
+
+void main()
+{
+  gl_Position = vec4(-0.5, 0.0, 0.0, 1.0);
+  gl_PointSize = 1.0;
+  color = vec4(1.0);
+  EmitVertex();
+  gl_Position = vec4(0.5, 0.0, 0.0, 1.0);
+  gl_PointSize = 13.0;
+  color = vec4(1.0);
+  EmitVertex();
+}
+
+[fragment shader]
+#version 150
+
+in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+enable GL_PROGRAM_POINT_SIZE
+draw arrays GL_POINTS 0 1
+relative probe rgba (0.24, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.26, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.74, 0.5) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.76, 0.5) (1.0, 1.0, 1.0, 1.0)
