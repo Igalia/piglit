@@ -74,15 +74,17 @@ Stencil2Result::Stencil2Result()
 void
 Stencil2Test::get_ext_functions(void)
 {
-	// ATI
-	glStencilOpSeparateATI_func = (PFNGLSTENCILOPSEPARATEATIPROC)
-		GLUtils::getProcAddress("glStencilOpSeparateATI");
-	glStencilFuncSeparateATI_func = (PFNGLSTENCILFUNCSEPARATEATIPROC)
-		GLUtils::getProcAddress("glStencilFuncSeparateATI");
+	if (have_ATI_separate_stencil()) {
+		glStencilOpSeparateATI_func = (PFNGLSTENCILOPSEPARATEATIPROC)
+			GLUtils::getProcAddress("glStencilOpSeparateATI");
+		glStencilFuncSeparateATI_func = (PFNGLSTENCILFUNCSEPARATEATIPROC)
+			GLUtils::getProcAddress("glStencilFuncSeparateATI");
+	}
 
-	// EXT
-	glActiveStencilFaceEXT_func = (PFNGLACTIVESTENCILFACEEXTPROC)
-		GLUtils::getProcAddress("glActiveStencilFaceEXT");
+	if (have_EXT_stencil_two_side()) {
+		glActiveStencilFaceEXT_func = (PFNGLACTIVESTENCILFACEEXTPROC)
+			GLUtils::getProcAddress("glActiveStencilFaceEXT");
+	}
 
 	// GL2
 	glStencilOpSeparate_func = (PFNGLSTENCILOPSEPARATEPROC)
