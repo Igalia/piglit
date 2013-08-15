@@ -706,10 +706,10 @@ Stencil2Test::test_stencil(int method)
 
 	// incr front to 4 (by z pass), decr back to 6 (by stencil fail)
 	pass = set_stencil_state(method,
-				 GL_DECR, GL_INCR,  // stencil fail
+				 GL_DECR, GL_DECR,  // stencil fail
 				 GL_KEEP, GL_KEEP,  // z fail
-				 GL_INCR, GL_DECR,  // z pass
-				 GL_EQUAL, GL_NOTEQUAL,  // stencil func
+				 GL_INCR, GL_REPLACE,  // z pass
+				 GL_EQUAL, GL_EQUAL,  // stencil func
 				 3, ~0);  // ref, mask
 	if (pass)
 		pass = render_test(4, 6);
