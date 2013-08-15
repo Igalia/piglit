@@ -582,7 +582,9 @@ get_bool(const char* src)
 int64_t
 get_int(const char* src)
 {
-	if(regex_match(src, REGEX_FULL_MATCH(REGEX_INT))) {
+	if(regex_match(src, REGEX_FULL_MATCH(REGEX_UINT))) {
+		return strtoull(src, NULL, 0);
+	} else if(regex_match(src, REGEX_FULL_MATCH(REGEX_INT))) {
 		return strtoll(src, NULL, 0);
 	} else {
 		fprintf(stderr,
