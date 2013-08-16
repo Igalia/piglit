@@ -88,15 +88,16 @@ static const char vs_text[] =
 	"centroid out vec4 ref_centroid;\n"
 	"void main()\n"
 	"{\n"
-	"  gl_Position = vertex;\n"
-	"  foo.v = vertex;\n"
-	"  foo_centroid.v = vertex;\n"
-	"  ref = vertex;\n"
-	"  ref_centroid = vertex;\n"
+	"  gl_Position = piglit_vertex;\n"
+	"  foo.v = piglit_vertex;\n"
+	"  foo_centroid.v = piglit_vertex;\n"
+	"  ref = piglit_vertex;\n"
+	"  ref_centroid = piglit_vertex;\n"
 	"}\n";
 
 static const char fs_text[] =
 	"#version 300 es\n"
+	"precision mediump float;\n"
 	"struct Foo {\n"
 	"  vec4 v;\n"
 	"};\n"
