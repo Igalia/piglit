@@ -69,6 +69,25 @@ static const struct result {
 	{ "o[1].l", 336, 2 },
 	{ "o[1].m", 368, 1 },
 	{ "o[1].n", 384, 2 },
+
+	/* Section 2.11.4 (Uniform Variables), subsection Standard Uniform
+	 * Block Layout, of the OpenGL 3.1 spec says (emphasis mine):
+	 *
+	 *     "(9) If the member is a structure, the base alignment of the
+	 *     structure is <N>, where <N> is the largest base alignment value
+	 *     of any of its members, and *rounded up to the base alignment of
+	 *     a vec4*. The individual members of this sub-structure are then
+	 *     assigned offsets by applying this set of rules recursively,
+	 *     where the base offset of the first member of the sub-structure
+	 *     is equal to the aligned offset of the structure. The structure
+	 *     may have padding at the end; the base offset of the member
+	 *     following the sub-structure is rounded up to the next multiple
+	 *     of the base alignment of the structure."
+	 */
+	{ "s.s1.r", 0, 1 },
+	{ "s.s2.g", 16, 1 },
+	{ "s.s2.b", 20, 1 },
+	{ "s.s2.a", 24, 1 },
 };
 
 static const char frag_shader_text[] =
@@ -95,9 +114,28 @@ static const char frag_shader_text[] =
 	"	} o[2];\n"
 	"};\n"
 	"\n"
+	"struct S1 {\n"
+	"	float r;\n"
+	"};\n"
+	"\n"
+	"struct S2 {\n"
+	"	float g;\n"
+	"	float b;\n"
+	"	float a;\n"
+	"};\n"
+	"\n"
+	"struct S {\n"
+	"       S1 s1;\n"
+	"       S2 s2;\n"
+	"};\n"
+	"\n"
+	"layout(std140) uniform ubo1 {\n"
+	"	S s;\n"
+	"};\n"
+	"\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = vec4(a + b.x + c.x + float(f.d) + g + h[0] + i[0].x + o[1].k.x);\n"
+	"	gl_FragColor = vec4(a + b.x + c.x + float(f.d) + g + h[0] + i[0].x + o[1].k.x + s.s1.r + s.s2.g + s.s2.b + s.s2.a);\n"
 	"}\n";
 
 static void
