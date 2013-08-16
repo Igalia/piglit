@@ -1,3 +1,7 @@
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+)
+
 link_libraries(
 	piglitutil_${piglit_target_api}
 	)
