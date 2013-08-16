@@ -14,18 +14,23 @@ void main()
 [fragment shader]
 #version 140
 
-uniform ubo1 {
-	struct S {
-		struct S1 {
-			float r;
-		} s1;
+struct S1 {
+	float r;
+};
 
-		struct S2 {
-			float g;
-			float b;
-			float a;
-		} s2;
-	} s;
+struct S2 {
+	float g;
+	float b;
+	float a;
+};
+
+struct S {
+       S1 s1;
+       S2 s2;
+};
+
+uniform ubo1 {
+	S s;
 };
 
 void main()
