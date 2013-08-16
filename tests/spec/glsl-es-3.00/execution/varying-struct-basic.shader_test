@@ -61,6 +61,7 @@ void main()
 
 [fragment shader]
 #version 300 es
+precision highp float;
 
 uniform float ref;
 

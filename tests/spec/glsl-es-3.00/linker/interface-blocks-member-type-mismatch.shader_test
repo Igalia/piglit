@@ -25,6 +25,7 @@ void main()
 
 [fragment shader]
 #version 300 es
+precision highp float;
 
 uniform block {
 	vec3 a; // a is vec4 in VS

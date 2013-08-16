@@ -12,6 +12,7 @@ void main() {
 }
 
 [fragment shader]
+precision highp float;
 uniform vec4 u_color;
 out vec4 color;
 

@@ -26,6 +26,7 @@ GLSL ES >= 3.00
 
 [vertex shader]
 #version 300 es
+precision highp float;
 
 in vec4 vertex;
 struct Foo
@@ -47,6 +48,7 @@ void main()
 
 [fragment shader]
 #version 300 es
+precision highp float;
 
 struct Foo
 {

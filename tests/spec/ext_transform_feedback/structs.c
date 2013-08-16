@@ -125,6 +125,7 @@ PIGLIT_GL_TEST_CONFIG_END
  */
 static const char gles3_header[] =
 	"#version 300 es\n"
+	"precision highp float;\n"
 	"#define DECLARE_VARYING(DIR, TYPE, NAME) flat DIR TYPE NAME\n"
 	"#define VARYING(NAME) NAME\n";
 
