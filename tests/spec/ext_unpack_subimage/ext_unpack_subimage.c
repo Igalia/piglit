@@ -85,6 +85,7 @@ vertex_shader[] =
 static const char
 fragment_shader[] =
 	"uniform sampler2D tex; /* defaults to 0 */\n"
+	"precision highp float;\n"
 	"varying vec2 tex_coord;\n"
 	"void main () {\n"
 	"gl_FragColor = texture2D(tex, tex_coord);\n"
