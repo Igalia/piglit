@@ -72,6 +72,10 @@ const_pack_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
     in vec4 vert_color;
     out vec4 frag_color;
 
@@ -130,6 +134,10 @@ const_unpack_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
     in vec4 vert_color;
     out vec4 frag_color;
 
@@ -189,6 +197,10 @@ vs_pack_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
     in vec4 vert_color;
     out vec4 frag_color;
 
@@ -259,6 +271,10 @@ vs_unpack_template = Template(dedent("""\
     }
 
     [fragment shader]
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
     in vec4 vert_color;
     out vec4 frag_color;
 
@@ -309,6 +325,8 @@ fs_pack_template = Template(dedent("""\
     [fragment shader]
     #ifndef GL_ES
     #extension GL_ARB_shading_language_packing : require
+    #else
+    precision highp float;
     #endif
 
     const vec4 red = vec4(1, 0, 0, 1);
@@ -372,6 +390,8 @@ fs_unpack_template = Template(dedent("""\
     [fragment shader]
     #ifndef GL_ES
     #extension GL_ARB_shading_language_packing : require
+    #else
+    precision highp float;
     #endif
 
     const vec4 red = vec4(1, 0, 0, 1);
