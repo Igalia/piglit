@@ -28,8 +28,6 @@
  * Test GL_EXT_unpack_subimage.
  */
 
-#include <EGL/egl.h>
-
 #include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
