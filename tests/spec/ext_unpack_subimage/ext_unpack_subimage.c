@@ -91,18 +91,6 @@ fragment_shader[] =
 	"gl_FragColor = texture2D(tex, tex_coord);\n"
 	"}\n";
 
-static void
-check_error(void)
-{
-	if (extension_supported) {
-		if (!piglit_check_gl_error(GL_NO_ERROR))
-			pass = GL_FALSE;
-	} else {
-		if (!piglit_check_gl_error(GL_INVALID_ENUM))
-			pass = GL_FALSE;
-	}
-}
-
 enum piglit_result
 piglit_display(void)
 {
@@ -112,11 +100,14 @@ piglit_display(void)
 	static const float blue[] = { 0, 0, 1, 1 };
 	static const float cyan[] = { 0, 1, 1, 1 };
 	GLuint program;
+	GLenum expected_error;
 
 	pass = GL_TRUE;
 
 	extension_supported =
 		piglit_is_extension_supported("GL_EXT_unpack_subimage");
+
+	expected_error = extension_supported ? GL_NO_ERROR : GL_INVALID_ENUM;
 
 	if (!piglit_automatic) {
 		if (extension_supported)
@@ -129,19 +120,19 @@ piglit_display(void)
 	if (!piglit_automatic)
 		printf("Trying GL_UNPACK_ROW_LENGTH\n");
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 2);
-	check_error();
+	pass = piglit_check_gl_error(expected_error) && pass;
 
 	piglit_reset_gl_error();
 	if (!piglit_automatic)
 		printf("Trying GL_UNPACK_SKIP_PIXELS\n");
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 1);
-	check_error();
+	pass = piglit_check_gl_error(expected_error) && pass;
 
 	piglit_reset_gl_error();
 	if (!piglit_automatic)
 		printf("Trying GL_UNPACK_SKIP_ROWS\n");
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 4);
-	check_error();
+	pass = piglit_check_gl_error(expected_error) && pass;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
