@@ -232,6 +232,35 @@ static const struct format_list etc1_formats = {
 };
 
 /**
+ * Formats belonging to OpenGL ES 3.0
+ *
+ * These formats are dragged into desktop OpenGL via GL_ARB_ES3_compatibility
+ * or OpenGL 4.3.  The extension spec says nothing about whether or not these
+ * must be advertised via GL_COMPRESSED_TEXTURE_FORMATS.  The OpenGL 4.3 spec
+ * requires these formats, but it says that GL_NUM_COMPRESSED_TEXTURE_FORMATS
+ * must be at least 0.  NVIDIA's driver exposes them, so we'll classify them
+ * as optional.
+ */
+static const struct format_list etc2_formats = {
+	{
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGB8_ETC2) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ETC2) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RGBA8_ETC2_EAC) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_R11_EAC) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_R11_EAC) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_RG11_EAC) },
+		{ ENUM_AND_STRING(GL_COMPRESSED_SIGNED_RG11_EAC) },
+		{ NULL, 0 },
+	},
+	{
+		{ NULL, 0 },
+	}
+};
+
+/**
  * List of all known compression methods to test
  *
  * The dummy first element is because this list is used by \c main to replace
@@ -248,6 +277,7 @@ const char *all_formats[] = {
 	"srgb",
 	"paletted",
 	"etc1",
+	"etc2",
 };
 
 enum piglit_result
@@ -475,6 +505,14 @@ piglit_init(int argc, char **argv)
 					   check_errors,
 					   piglit_is_extension_supported("GL_OES_compressed_ETC1_RGB8_texture"),
 					   false)
+				&& pass;
+		} else if (strcmp(argv[i], "etc2") == 0) {
+			pass = try_formats(&etc2_formats,
+					   compressed_formats,
+					   num_compressed_formats,
+					   check_errors,
+					   piglit_is_extension_supported("GL_ARB_ES3_compatibility"),
+					   true)
 				&& pass;
 		} else {
 			fprintf(stderr,
