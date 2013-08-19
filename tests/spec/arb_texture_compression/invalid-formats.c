@@ -81,6 +81,12 @@ struct format_list {
 
 /**
  * Formats belonging to GL_ARB_texture_comrpession_bptc
+ *
+ * The extension spec says nothing about whether or not these must be
+ * advertised via GL_COMPRESSED_TEXTURE_FORMATS.  The OpenGL 4.2 spec also
+ * requires these formats, but it says that GL_NUM_COMPRESSED_TEXTURE_FORMATS
+ * must be at least 0.  NVIDIA's driver does not expose them, so we'll
+ * classify them as optional.
  */
 static const struct format_list bptc_formats = {
 	{
@@ -438,7 +444,7 @@ piglit_init(int argc, char **argv)
 					   num_compressed_formats,
 					   check_errors,
 					   piglit_is_extension_supported("GL_ARB_texture_compression_bptc"),
-					   false)
+					   true)
 				&& pass;
 		} else if (strcmp(argv[i], "s3tc") == 0) {
 			pass = try_formats(&s3tc_formats,
