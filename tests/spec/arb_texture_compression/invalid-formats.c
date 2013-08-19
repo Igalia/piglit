@@ -212,6 +212,26 @@ static const struct format_list paletted_formats = {
 };
 
 /**
+ * Format belonging to GL_OES_compressed_ETC1_RGB8_texture.
+ *
+ * The GL_OES_compressed_ETC1_RGB8_texture spec says:
+ *
+ *     "New State
+ *
+ *         The queries for NUM_COMPRESSED_TEXTURE_FORMATS and
+ *         COMPRESSED_TEXTURE_FORMATS include ETC1_RGB8_OES."
+ */
+static const struct format_list etc1_formats = {
+	{
+		{ ENUM_AND_STRING(GL_ETC1_RGB8_OES) },
+		{ NULL, 0 },
+	},
+	{
+		{ NULL, 0 },
+	}
+};
+
+/**
  * List of all known compression methods to test
  *
  * The dummy first element is because this list is used by \c main to replace
@@ -226,7 +246,8 @@ const char *all_formats[] = {
 	"3dc",
 	"rgtc",
 	"srgb",
-	"paletted"
+	"paletted",
+	"etc1",
 };
 
 enum piglit_result
@@ -437,6 +458,13 @@ piglit_init(int argc, char **argv)
 					   num_compressed_formats,
 					   check_errors,
 					   piglit_is_extension_supported("GL_OES_compressed_paletted_texture"))
+				&& pass;
+		} else if (strcmp(argv[i], "etc1") == 0) {
+			pass = try_formats(&etc1_formats,
+					   compressed_formats,
+					   num_compressed_formats,
+					   check_errors,
+					   piglit_is_extension_supported("GL_OES_compressed_ETC1_RGB8_texture")
 				&& pass;
 		} else {
 			fprintf(stderr,
