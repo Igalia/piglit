@@ -145,11 +145,7 @@ DownsampleProg::compile(int supersample_factor)
 		"}\n";
 
 	/* Compile program */
-	prog = glCreateProgram();
-	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	glAttachShader(prog, vs);
-	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	glAttachShader(prog, fs);
+	prog = piglit_build_simple_program_unlinked(vert, frag);
 	glBindAttribLocation(prog, 0, "pos");
 	glBindAttribLocation(prog, 1, "texCoord");
 	glLinkProgram(prog);

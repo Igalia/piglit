@@ -243,11 +243,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	/* Create the shaders */
-	prog = glCreateProgram();
-	glAttachShader(prog, piglit_compile_shader_text(GL_VERTEX_SHADER,
-							vs_text));
-	glAttachShader(prog, piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-							fs_text));
+	prog = piglit_build_simple_program_unlinked(vs_text, fs_text);
 	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_Vertex");
 	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_MultiTexCoord0");
 	glLinkProgram(prog);

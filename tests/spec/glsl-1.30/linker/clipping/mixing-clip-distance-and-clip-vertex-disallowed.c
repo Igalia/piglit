@@ -77,8 +77,6 @@ piglit_init(int argc, char **argv)
 	float glsl_version;
 	GLint ok;
 	GLuint prog;
-	GLuint vs;
-	GLuint fs;
 
 
 	piglit_require_GLSL();
@@ -94,14 +92,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
-	glAttachShader(prog, fs);
+	prog = piglit_build_simple_program_unlinked(vert, frag);
 	glLinkProgram(prog);
-	glDeleteShader(vs);
-	glDeleteShader(fs);
 
 	ok = piglit_link_check_status_quiet(prog);
 	if (ok) {

@@ -80,10 +80,7 @@ piglit_init(int argc, char **argv)
 	GLuint buf;
 	void *initial_data;
 	int i;
-	GLuint prog = glCreateProgram();
-	GLuint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	glAttachShader(prog, vs);
-	glDeleteShader(vs);
+	GLuint prog = piglit_build_simple_program_unlinked(vs_text, NULL);
 	glTransformFeedbackVaryings(prog, ARRAY_SIZE(varyings), varyings,
 				    GL_INTERLEAVED_ATTRIBS);
 	glLinkProgram(prog);

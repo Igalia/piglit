@@ -153,7 +153,6 @@ check_xfb_result()
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs;
 	GLuint buf;
 	void *initial_data;
 	bool pass = true;
@@ -173,10 +172,7 @@ piglit_init(int argc, char **argv)
 	else
 		print_usage_and_exit(argv[0]);
 
-	prog = glCreateProgram();
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_text);
-	glAttachShader(prog, vs);
-	glDeleteShader(vs);
+	prog = piglit_build_simple_program_unlinked(vs_text, NULL);
 	glTransformFeedbackVaryings(prog, 1, varyings, GL_INTERLEAVED_ATTRIBS);
 	glBindAttribLocation(prog, 0, "x_in");
 	glLinkProgram(prog);

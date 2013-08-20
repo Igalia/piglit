@@ -195,7 +195,6 @@ interpret_test_case_arg(const char *arg)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint vs;
 	const char *varying_name = "output_value";
 
 	/* Parse args */
@@ -217,9 +216,7 @@ piglit_init(int argc, char **argv)
 	}
 
 	/* Create program and buffer */
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext);
-	prog = glCreateProgram();
-	glAttachShader(prog, vs);
+	prog = piglit_build_simple_program_unlinked(vstext, NULL);
 	glTransformFeedbackVaryings(prog, 1, &varying_name,
 				    GL_INTERLEAVED_ATTRIBS);
 	glLinkProgram(prog);
