@@ -208,6 +208,8 @@ piglit_visualize_image(float *img, GLenum base_internal_format,
 		       int image_width, int image_height,
 		       int image_count, bool rhs);
 
+float piglit_srgb_to_linear(float x);
+float piglit_linear_to_srgb(float x);
 
 extern GLfloat cube_face_texcoords[6][4][3];
 extern const char *cube_face_names[6];

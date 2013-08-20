@@ -1507,3 +1507,31 @@ piglit_visualize_image(float *img, GLenum base_internal_format,
 		     visualization);
 	free(visualization);
 }
+
+/**
+ * Convert from sRGB color space to linear color space, using the
+ * formula from the GL 3.0 spec, section 4.1.8 (sRGB Texture Color
+ * Conversion).
+ */
+float
+piglit_srgb_to_linear(float x)
+{
+        if (x <= 0.0405)
+                return x / 12.92;
+        else
+                return pow((x + 0.055) / 1.055, 2.4);
+}
+
+/* Convert from linear color space to sRGB color space. */
+float
+piglit_linear_to_srgb(float x)
+{
+   if (x < 0.0f)
+      return 0.0f;
+   else if (x < 0.0031308f)
+      return 12.92f * x;
+   else if (x < 1.0f)
+      return 1.055f * powf(x, 0.41666f) - 0.055f;
+   else
+      return 1.0f;
+}
