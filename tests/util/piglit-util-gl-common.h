@@ -203,6 +203,10 @@ unsigned
 piglit_compressed_pixel_offset(GLenum format, unsigned width,
 			       unsigned x, unsigned y);
 
+void
+piglit_visualize_image(float *img, GLenum base_internal_format,
+		       int image_width, int image_height,
+		       int image_count, bool rhs);
 
 
 extern GLfloat cube_face_texcoords[6][4][3];

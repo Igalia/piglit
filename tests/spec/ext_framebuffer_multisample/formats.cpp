@@ -538,14 +538,14 @@ test_format(const struct format_desc *format)
 	 * display image without any offset applied to raster position.
 	 */
 	glViewport(0, 0, piglit_width, piglit_height);
-	visualize_image(test_image, format->base_internal_format,
-			pattern_width, pattern_height,
-			0 /* image_count */,
-			false /* rhs */);
-	visualize_image(expected_image, format->base_internal_format,
-			pattern_width, pattern_height,
-			0 /* image_count */,
-			true /* rhs */);
+	piglit_visualize_image(test_image, format->base_internal_format,
+			       pattern_width, pattern_height,
+			       0 /* image_count */,
+			       false /* rhs */);
+	piglit_visualize_image(expected_image, format->base_internal_format,
+			       pattern_width, pattern_height,
+			       0 /* image_count */,
+			       true /* rhs */);
 
 	/* Finally, if any error occurred, count that as a failure. */
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;

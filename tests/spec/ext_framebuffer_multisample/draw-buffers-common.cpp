@@ -722,15 +722,15 @@ draw_image_to_window_system_fb(int draw_buffer_count, bool rhs)
 	}
 
 	/* Rendering using gldrawPixels() with dual source blending enabled
-	 * produces undefined results. So, disable blending in visualize_image
-	 * function to avoid undefined behavior.
+	 * produces undefined results. So, disable blending in
+	 * piglit_visualize_image function to avoid undefined behavior.
 	 */
 	GLboolean isBlending;
         glGetBooleanv(GL_BLEND, &isBlending);
 	glDisable(GL_BLEND);
-	visualize_image(image, GL_RGBA,
-			pattern_width, pattern_height,
-			draw_buffer_count + 1, rhs);
+	piglit_visualize_image(image, GL_RGBA,
+			       pattern_width, pattern_height,
+			       draw_buffer_count + 1, rhs);
 	if(isBlending)
 		glEnable(GL_BLEND);
 	free(image);
