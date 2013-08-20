@@ -31,91 +31,91 @@ generatedTestDir = os.path.normpath(os.path.join(
 
 # Quick wrapper for PlainExecTest for our usual concurrent args.
 def plain_test(args):
-	return PlainExecTest(shlex.split(args) + ['-auto'])
+    return PlainExecTest(shlex.split(args) + ['-auto'])
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
         group[name + '-' + param] = PlainExecTest([name, param, '-auto'])
 
 def add_plain_test(group, args):
-	group[args] = PlainExecTest(shlex.split(args) + ['-auto'])
+    group[args] = PlainExecTest(shlex.split(args) + ['-auto'])
 
 def concurrent_test(args):
-	test = PlainExecTest(shlex.split(args) + ['-auto', '-fbo'])
-	test.runConcurrent = True
-	return test
+    test = PlainExecTest(shlex.split(args) + ['-auto', '-fbo'])
+    test.runConcurrent = True
+    return test
 
 def add_concurrent_test(group, args):
-	group[args] = concurrent_test(args)
+    group[args] = concurrent_test(args)
 
 # Generate all possible subsets of the given set, including the empty set.
 def power_set(s):
-        if len(s) == 0:
-                return [[]]
-        result = []
-        for p in power_set(s[:-1]):
-                result.append(p)
-                result.append(p + [s[-1]])
-        return result
+    if len(s) == 0:
+        return [[]]
+    result = []
+    for p in power_set(s[:-1]):
+        result.append(p)
+        result.append(p + [s[-1]])
+    return result
 
 ######
 # Collecting all tests
 profile = TestProfile()
 
 try:
-	execfile(path.join(testsDir, 'gtf.tests'))
+    execfile(path.join(testsDir, 'gtf.tests'))
 except SystemExit:
-	pass
+    pass
 
 try:
-	execfile(path.join(testsDir, 'es3conform.tests'))
+    execfile(path.join(testsDir, 'es3conform.tests'))
 except SystemExit:
-	pass
+    pass
 
 # List of all of the MSAA sample counts we wish to test
 MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
 def add_fbo_depthstencil_tests(group, format, num_samples):
-	if format == 'default_fb':
-		prefix = ''
-	else:
-		prefix = 'fbo-'
-	if num_samples > 1:
-		suffix = ' samples=' + str(num_samples)
-		psamples = ['-samples=' + str(num_samples)]
-	else:
-		suffix = ''
-		psamples = []
-	group[prefix + 'depthstencil-' + format + '-clear' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'clear', format] + psamples)
-	group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, 'FLOAT-and-USHORT'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '24_8'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '32F_24_8_REV'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, 'FLOAT-and-USHORT'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '24_8'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '32F_24_8_REV'] + psamples)
-	group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format] + psamples)
-	group[prefix + 'depthstencil-' + format + '-blit' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format] + psamples)
+    if format == 'default_fb':
+        prefix = ''
+    else:
+        prefix = 'fbo-'
+    if num_samples > 1:
+        suffix = ' samples=' + str(num_samples)
+        psamples = ['-samples=' + str(num_samples)]
+    else:
+        suffix = ''
+        psamples = []
+    group[prefix + 'depthstencil-' + format + '-clear' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'clear', format] + psamples)
+    group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, 'FLOAT-and-USHORT'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '24_8'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'readpixels', format, '32F_24_8_REV'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, 'FLOAT-and-USHORT'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '24_8'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'drawpixels', format, '32F_24_8_REV'] + psamples)
+    group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'copypixels', format] + psamples)
+    group[prefix + 'depthstencil-' + format + '-blit' + suffix] = PlainExecTest(['fbo-depthstencil', '-auto', 'blit', format] + psamples)
 
 def add_fbo_depthstencil_msaa_visual_tests(group, format):
-	add_fbo_depthstencil_tests(group, format, 0)
-	for num_samples in MSAA_SAMPLE_COUNTS:
-		add_fbo_depthstencil_tests(group, format, num_samples)
+    add_fbo_depthstencil_tests(group, format, 0)
+    for num_samples in MSAA_SAMPLE_COUNTS:
+        add_fbo_depthstencil_tests(group, format, num_samples)
 
 def add_depthstencil_render_miplevels_tests(group, test_types):
-        # Note: the buffer sizes below have been chosen to exercise
-        # many possible combinations of buffer alignments on i965.
-        for texture_size in (146, 273, 292, 585, 1024):
-                for test_type in test_types:
-                        test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                                texture_size, test_type)
-                        group[test_name] = PlainExecTest(test_name + ' -auto')
+    # Note: the buffer sizes below have been chosen to exercise
+    # many possible combinations of buffer alignments on i965.
+    for texture_size in (146, 273, 292, 585, 1024):
+        for test_type in test_types:
+            test_name = 'depthstencil-render-miplevels {0} {1}'.format(
+                    texture_size, test_type)
+            group[test_name] = PlainExecTest(test_name + ' -auto')
 
 def add_msaa_visual_plain_tests(group, args):
-	add_plain_test(group, args)
-	for num_samples in MSAA_SAMPLE_COUNTS:
-		group[args + ' samples=' + str(num_samples)] = PlainExecTest(
-			shlex.split(args) + ['-auto'] +
-			['-samples=' + str(num_samples)])
+    add_plain_test(group, args)
+    for num_samples in MSAA_SAMPLE_COUNTS:
+        group[args + ' samples=' + str(num_samples)] = PlainExecTest(
+                shlex.split(args) + ['-auto'] +
+                ['-samples=' + str(num_samples)])
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
@@ -158,57 +158,57 @@ glean['vertArrayBGRA'] = GleanTest('vertArrayBGRA')
 glean['vertattrib'] = GleanTest('vertattrib')
 
 def add_glsl1(name):
-	testname = 'glsl1-' + name
-	glean[testname] = GleanTest('glsl1')
-	glean[testname].env['PIGLIT_TEST'] = name
+    testname = 'glsl1-' + name
+    glean[testname] = GleanTest('glsl1')
+    glean[testname].env['PIGLIT_TEST'] = name
 execfile(testsDir + '/glean-glsl1.tests')
 
 def add_fp1(name):
-	testname = 'fp1-' + name
-	glean[testname] = GleanTest('fragProg1')
-	glean[testname].env['PIGLIT_TEST'] = name
+    testname = 'fp1-' + name
+    glean[testname] = GleanTest('fragProg1')
+    glean[testname].env['PIGLIT_TEST'] = name
 execfile(testsDir + '/glean-fragProg1.tests')
 
 def add_vp1(name):
-	testname = 'vp1-' + name
-	glean[testname] = GleanTest('vertProg1')
-	glean[testname].env['PIGLIT_TEST'] = name
+    testname = 'vp1-' + name
+    glean[testname] = GleanTest('vertProg1')
+    glean[testname].env['PIGLIT_TEST'] = name
 execfile(testsDir + '/glean-vertProg1.tests')
 
 def add_fbo_formats_tests(path, extension, suffix=''):
-	profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = PlainExecTest('fbo-generatemipmap-formats -auto ' + extension)
-	profile.tests[path + '/fbo-clear-formats' + suffix] = PlainExecTest('fbo-clear-formats -auto ' + extension)
-	profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = concurrent_test('get-renderbuffer-internalformat ' + extension)
-	if 'depth' not in extension:
-		profile.tests[path + '/fbo-blending-formats' + suffix] = PlainExecTest('fbo-blending-formats -auto ' + extension)
-		profile.tests[path + '/fbo-alphatest-formats' + suffix] = PlainExecTest('fbo-alphatest-formats -auto ' + extension)
-		profile.tests[path + '/fbo-colormask-formats' + suffix] = PlainExecTest('fbo-colormask-formats -auto ' + extension)
+    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = PlainExecTest('fbo-generatemipmap-formats -auto ' + extension)
+    profile.tests[path + '/fbo-clear-formats' + suffix] = PlainExecTest('fbo-clear-formats -auto ' + extension)
+    profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = concurrent_test('get-renderbuffer-internalformat ' + extension)
+    if 'depth' not in extension:
+        profile.tests[path + '/fbo-blending-formats' + suffix] = PlainExecTest('fbo-blending-formats -auto ' + extension)
+        profile.tests[path + '/fbo-alphatest-formats' + suffix] = PlainExecTest('fbo-alphatest-formats -auto ' + extension)
+        profile.tests[path + '/fbo-colormask-formats' + suffix] = PlainExecTest('fbo-colormask-formats -auto ' + extension)
 
 def add_msaa_formats_tests(group, extension):
-        for num_samples in MSAA_SAMPLE_COUNTS:
-                args = [str(num_samples), extension]
-                test_name = ' '.join(['multisample-formats'] + args)
-                group[test_name] = PlainExecTest(
-                        ['ext_framebuffer_multisample-formats', '-auto']
-                        + args)
+    for num_samples in MSAA_SAMPLE_COUNTS:
+        args = [str(num_samples), extension]
+        test_name = ' '.join(['multisample-formats'] + args)
+        group[test_name] = PlainExecTest(
+                ['ext_framebuffer_multisample-formats', '-auto']
+                + args)
 
 def add_fbo_generatemipmap_extension(group, extension, name):
-	group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
-				     extension])
+    group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
+                                 extension])
 
 def add_fbo_clear_extension(group, extension, name):
-	group[name] = PlainExecTest(['fbo-clear-formats', '-auto', extension])
+    group[name] = PlainExecTest(['fbo-clear-formats', '-auto', extension])
 
 def add_fbo_blending_extension(group, extension, name):
-	group[name] = PlainExecTest(['fbo-blending-formats', '-auto', extension])
+    group[name] = PlainExecTest(['fbo-blending-formats', '-auto', extension])
 
 def add_fbo_alphatest_extension(group, extension, name):
-	group[name] = PlainExecTest(['fbo-alphatest-formats', '-auto', extension])
+    group[name] = PlainExecTest(['fbo-alphatest-formats', '-auto', extension])
 
 
 def add_fbo_rg(group, format):
-	name = "fbo-rg-" + format
-	group[name] = PlainExecTest(['fbo-rg', '-auto', format])
+    name = "fbo-rg-" + format
+    group[name] = PlainExecTest(['fbo-rg', '-auto', format])
 
 security = Group()
 add_plain_test(security, 'initialized-texmemory')
@@ -219,11 +219,11 @@ add_plain_test(security, 'initialized-vbo')
 shaders = Group()
 
 def add_getactiveuniform_count(group, name, expected):
-	path = 'shaders/'
-	group['glsl-getactiveuniform-count: ' + name] = PlainExecTest(['glsl-getactiveuniform-count',
-								   '-auto',
-								   path + name + '.vert',
-								   expected])
+    path = 'shaders/'
+    group['glsl-getactiveuniform-count: ' + name] = PlainExecTest(['glsl-getactiveuniform-count',
+                                                               '-auto',
+                                                               path + name + '.vert',
+                                                               expected])
 
 add_shader_test_dir(shaders,
                     testsDir + '/shaders',
@@ -354,7 +354,7 @@ add_plain_test(shaders, 'useshaderprogram-bad-program')
 add_plain_test(shaders, 'useshaderprogram-flushverts-1')
 
 def add_vpfpgeneric(group, name):
-	group[name] = PlainExecTest(['vpfp-generic', '-auto', testsDir + '/shaders/generic/' + name + '.vpfp'])
+    group[name] = PlainExecTest(['vpfp-generic', '-auto', testsDir + '/shaders/generic/' + name + '.vpfp'])
 
 glx = Group()
 add_msaa_visual_plain_tests(glx, 'glx-copy-sub-buffer')
@@ -464,36 +464,36 @@ oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx
 oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
 
 def texwrap_test(args):
-	test = PlainExecTest(['texwrap', '-fbo', '-auto'] + args)
-	test.runConcurrent = True
-	return test
+    test = PlainExecTest(['texwrap', '-fbo', '-auto'] + args)
+    test.runConcurrent = True
+    return test
 
 def add_texwrap_target_tests(group, target):
-	group['texwrap ' + target] = texwrap_test([target, 'GL_RGBA8'])
-	group['texwrap ' + target + ' bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
-	group['texwrap ' + target + ' proj'] = texwrap_test([target, 'GL_RGBA8', 'proj'])
-	group['texwrap ' + target + ' proj bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
+    group['texwrap ' + target] = texwrap_test([target, 'GL_RGBA8'])
+    group['texwrap ' + target + ' bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
+    group['texwrap ' + target + ' proj'] = texwrap_test([target, 'GL_RGBA8', 'proj'])
+    group['texwrap ' + target + ' proj bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
 
 def add_texwrap_format_tests(group, ext = '', suffix = ''):
-	args = [] if ext == '' else [ext]
-	group['texwrap formats' + suffix] = texwrap_test(args)
-	group['texwrap formats' + suffix + ' bordercolor'] = texwrap_test(args + ['bordercolor'])
-	group['texwrap formats' + suffix + ' bordercolor-swizzled'] = texwrap_test(args + ['bordercolor', 'swizzled'])
+    args = [] if ext == '' else [ext]
+    group['texwrap formats' + suffix] = texwrap_test(args)
+    group['texwrap formats' + suffix + ' bordercolor'] = texwrap_test(args + ['bordercolor'])
+    group['texwrap formats' + suffix + ' bordercolor-swizzled'] = texwrap_test(args + ['bordercolor', 'swizzled'])
 
 def add_fbo_depth_tests(group, format):
-	group['fbo-depth-' + format + '-tex1d'] = PlainExecTest(['fbo-depth-tex1d', '-auto', format])
-	group['fbo-depth-' + format + '-clear'] = PlainExecTest(['fbo-depth', '-auto', 'clear', format])
-	group['fbo-depth-' + format + '-readpixels'] = PlainExecTest(['fbo-depth', '-auto', 'readpixels', format])
-	group['fbo-depth-' + format + '-drawpixels'] = PlainExecTest(['fbo-depth', '-auto', 'drawpixels', format])
-	group['fbo-depth-' + format + '-copypixels'] = PlainExecTest(['fbo-depth', '-auto', 'copypixels', format])
-	group['fbo-depth-' + format + '-blit'] = PlainExecTest(['fbo-depth', '-auto', 'blit', format])
+    group['fbo-depth-' + format + '-tex1d'] = PlainExecTest(['fbo-depth-tex1d', '-auto', format])
+    group['fbo-depth-' + format + '-clear'] = PlainExecTest(['fbo-depth', '-auto', 'clear', format])
+    group['fbo-depth-' + format + '-readpixels'] = PlainExecTest(['fbo-depth', '-auto', 'readpixels', format])
+    group['fbo-depth-' + format + '-drawpixels'] = PlainExecTest(['fbo-depth', '-auto', 'drawpixels', format])
+    group['fbo-depth-' + format + '-copypixels'] = PlainExecTest(['fbo-depth', '-auto', 'copypixels', format])
+    group['fbo-depth-' + format + '-blit'] = PlainExecTest(['fbo-depth', '-auto', 'blit', format])
 
 def add_fbo_stencil_tests(group, format):
-	group['fbo-stencil-' + format + '-clear'] = PlainExecTest(['fbo-stencil', '-auto', 'clear', format])
-	group['fbo-stencil-' + format + '-readpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'readpixels', format])
-	group['fbo-stencil-' + format + '-drawpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'drawpixels', format])
-	group['fbo-stencil-' + format + '-copypixels'] = PlainExecTest(['fbo-stencil', '-auto', 'copypixels', format])
-	group['fbo-stencil-' + format + '-blit'] = PlainExecTest(['fbo-stencil', '-auto', 'blit', format])
+    group['fbo-stencil-' + format + '-clear'] = PlainExecTest(['fbo-stencil', '-auto', 'clear', format])
+    group['fbo-stencil-' + format + '-readpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'readpixels', format])
+    group['fbo-stencil-' + format + '-drawpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'drawpixels', format])
+    group['fbo-stencil-' + format + '-copypixels'] = PlainExecTest(['fbo-stencil', '-auto', 'copypixels', format])
+    group['fbo-stencil-' + format + '-blit'] = PlainExecTest(['fbo-stencil', '-auto', 'blit', format])
 
 spec = Group()
 
@@ -736,8 +736,8 @@ spec['!OpenGL 3.1'] = gl31
 gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
 gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 for subtest in ['generated', 'written', 'flush']:
-        cmdline = 'primitive-restart-xfb {0}'.format(subtest)
-        gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
+    cmdline = 'primitive-restart-xfb {0}'.format(subtest)
+    gl31[cmdline] = concurrent_test('gl-3.1-' + cmdline)
 gl31['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 31')
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 31')
@@ -784,16 +784,16 @@ add_shader_test_dir(spec['glsl-1.10']['execution'],
 add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-render-after-bad-attach')
 spec['glsl-1.10']['execution']['clipping'] = Group()
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
-	cmdline = 'clip-plane-transformation ' + mode
-	spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
+    cmdline = 'clip-plane-transformation ' + mode
+    spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
 spec['glsl-1.10']['execution']['varying-packing'] = Group()
 for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
              'ivec4', 'uvec2', 'uvec3', 'uvec4', 'mat2', 'mat3', 'mat4',
              'mat2x3', 'mat2x4', 'mat3x2', 'mat3x4', 'mat4x2', 'mat4x3']:
-        for arrayspec in ['array', 'separate']:
-                cmdline = 'simple {0} {1}'.format(type, arrayspec)
-                spec['glsl-1.10']['execution']['varying-packing'][cmdline] = \
-                    concurrent_test('varying-packing-' + cmdline)
+    for arrayspec in ['array', 'separate']:
+        cmdline = 'simple {0} {1}'.format(type, arrayspec)
+        spec['glsl-1.10']['execution']['varying-packing'][cmdline] = \
+            concurrent_test('varying-packing-' + cmdline)
 
 spec['glsl-1.10']['api'] = Group()
 add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
@@ -809,17 +809,17 @@ add_shader_test_dir(spec['glsl-1.20']['execution'],
 		    recursive=True)
 
 def add_recursion_test(group, name):
-	# When the recursion tests fail it is usually because the GLSL
-	# compiler tries to recursively inline the function until the process
-	# runs out of stack or the system runs out of memory.  Run the test
-	# with a low rlimit to (hopefully) avoid having the test adversely
-	# affect the rest of the system.  This is especially important since
-	# there may be other tests running in parallel.
-	#
-	# This may cause false negatives on systems that map the framebuffer
-	# into the processes address space.  This happens on X with DRI1 based
-	# drivers, for example.
-	group[name] = PlainExecTest(['recursion', '-auto', '-rlimit', '268435456', name])
+    # When the recursion tests fail it is usually because the GLSL
+    # compiler tries to recursively inline the function until the process
+    # runs out of stack or the system runs out of memory.  Run the test
+    # with a low rlimit to (hopefully) avoid having the test adversely
+    # affect the rest of the system.  This is especially important since
+    # there may be other tests running in parallel.
+    #
+    # This may cause false negatives on systems that map the framebuffer
+    # into the processes address space.  This happens on X with DRI1 based
+    # drivers, for example.
+    group[name] = PlainExecTest(['recursion', '-auto', '-rlimit', '268435456', name])
 
 rec = Group()
 spec['glsl-1.20']['recursion'] = rec
@@ -844,29 +844,29 @@ spec['glsl-1.30']['execution'] = Group()
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
 for stage in ['vs', 'gs', 'fs']:
-        if stage == 'gs':
-                version = '1.50'
-        else:
-                version = '1.30'
-	# textureSize():
-	for sampler in textureSize_samplers_130:
-                spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'textureSize {0} {1}'.format(stage, sampler))
-	# texelFetch():
-	for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
-                spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'texelFetch {0} {1}'.format(stage, sampler))
-                spec['glsl-{0}/execution/texelFetchOffset/{1}-texelFetch-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'texelFetch offset {0} {1}'.format(stage, sampler))
-	# texelFetch() with EXT_texture_swizzle mode "b0r1":
-	for type in ['i', 'u', '']:
-                spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}sampler2Darray-swizzle'.format(
-                        version, stage, type)] = concurrent_test(
-                        'texelFetch {0} {1}sampler2DArray b0r1'.format(
-                                stage, type))
+    if stage == 'gs':
+        version = '1.50'
+    else:
+        version = '1.30'
+    # textureSize():
+    for sampler in textureSize_samplers_130:
+        spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'textureSize {0} {1}'.format(stage, sampler))
+    # texelFetch():
+    for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
+        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'texelFetch {0} {1}'.format(stage, sampler))
+        spec['glsl-{0}/execution/texelFetchOffset/{1}-texelFetch-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'texelFetch offset {0} {1}'.format(stage, sampler))
+    # texelFetch() with EXT_texture_swizzle mode "b0r1":
+    for type in ['i', 'u', '']:
+        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}sampler2Darray-swizzle'.format(
+                version, stage, type)] = concurrent_test(
+                'texelFetch {0} {1}sampler2DArray b0r1'.format(
+                        stage, type))
 
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
@@ -878,8 +878,8 @@ spec['glsl-1.30']['linker']['clipping'] = Group()
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
 for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
-	test_name = 'isinf-and-isnan ' + arg
-	spec['glsl-1.30']['execution'][test_name] = PlainExecTest(test_name + ' -auto')
+    test_name = 'isinf-and-isnan ' + arg
+    spec['glsl-1.30']['execution'][test_name] = PlainExecTest(test_name + ' -auto')
 spec['glsl-1.30']['execution']['clipping']['clip-plane-transformation pos'] = \
     concurrent_test('clip-plane-transformation pos')
 spec['glsl-1.30']['texel-offset-limits'] = concurrent_test('glsl-1.30-texel-offset-limits')
@@ -904,23 +904,23 @@ spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
 for stage in ['vs', 'gs', 'fs']:
-        if stage == 'gs':
-                version = '1.50'
-        else:
-                version = '1.40'
-	# textureSize():
-	for sampler in textureSize_samplers_140:
-                spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'textureSize 140 {0} {1}'.format(stage, sampler))
-	# texelFetch():
-	for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
-                spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'texelFetch 140 {0} {1}'.format(stage, sampler))
-                spec['glsl-{0}/execution/texelFetchOffset/{1}-{2}'.format(
-                        version, stage, sampler)] = concurrent_test(
-                        'texelFetch offset 140 {0} {1}'.format(stage, sampler))
+    if stage == 'gs':
+        version = '1.50'
+    else:
+        version = '1.40'
+    # textureSize():
+    for sampler in textureSize_samplers_140:
+        spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'textureSize 140 {0} {1}'.format(stage, sampler))
+    # texelFetch():
+    for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
+        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'texelFetch 140 {0} {1}'.format(stage, sampler))
+        spec['glsl-{0}/execution/texelFetchOffset/{1}-{2}'.format(
+                version, stage, sampler)] = concurrent_test(
+                'texelFetch offset 140 {0} {1}'.format(stage, sampler))
 
 spec['glsl-1.50'] = Group()
 import_glsl_parser_tests(spec['glsl-1.50'],
@@ -976,9 +976,9 @@ for sample_count in MSAA_SAMPLE_COUNTS:
     # texel-fetch execution
     for stage in ['vs', 'gs', 'fs']:
         for sampler in samplers_atm:
-                spec['ARB_texture_multisample/texelFetch/%d-%s-%s' % (
-                    sample_count, stage, sampler)] = \
-                    concurrent_test('texelFetch %s %s %d' % (stage, sampler, sample_count))
+            spec['ARB_texture_multisample/texelFetch/%d-%s-%s' % (
+                sample_count, stage, sampler)] = \
+                concurrent_test('texelFetch %s %s %d' % (stage, sampler, sample_count))
     # sample positions
     spec['ARB_texture_multisample/sample-position/%d' % (sample_count,)] = \
         concurrent_test('arb_texture_multisample-sample-position %d' % (sample_count,))
@@ -993,9 +993,9 @@ add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-teximage-3
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-teximage-2d-multisample')
 
 for stage in ['vs', 'gs', 'fs']:
-	# textureSize():
-	for sampler in samplers_atm:
-		spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
+    # textureSize():
+    for sampler in samplers_atm:
+        spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = Group()
@@ -1163,17 +1163,17 @@ arb_framebuffer_object['negative-readpixels-no-rb'] = concurrent_test('arb_frame
 arb_framebuffer_srgb = Group()
 spec['ARB_framebuffer_sRGB'] = arb_framebuffer_srgb
 for backing_type in ('texture', 'renderbuffer'):
-        for srgb_types in ('linear', 'srgb', 'linear_to_srgb',
-                           'srgb_to_linear'):
-                for blit_type in ('single_sampled', 'upsample', 'downsample',
-                                  'msaa', 'scaled'):
-                        for framebuffer_srgb_setting in ('enabled',
-                                                         'disabled'):
-                                test_name = ' '.join(
-                                        ['blit', backing_type, srgb_types,
-                                         blit_type, framebuffer_srgb_setting])
-                                arb_framebuffer_srgb[test_name] = concurrent_test(
-                                        'arb_framebuffer_srgb-' + test_name)
+    for srgb_types in ('linear', 'srgb', 'linear_to_srgb',
+                       'srgb_to_linear'):
+        for blit_type in ('single_sampled', 'upsample', 'downsample',
+                          'msaa', 'scaled'):
+            for framebuffer_srgb_setting in ('enabled',
+                                             'disabled'):
+                test_name = ' '.join(
+                        ['blit', backing_type, srgb_types,
+                         blit_type, framebuffer_srgb_setting])
+                arb_framebuffer_srgb[test_name] = concurrent_test(
+                        'arb_framebuffer_srgb-' + test_name)
 add_plain_test(arb_framebuffer_srgb, 'framebuffer-srgb')
 
 arb_gpu_shader5 = Group()
@@ -1342,7 +1342,7 @@ tdfx_texture_compression_fxt1['invalid formats'].runConcurrent = True
 add_plain_test(tdfx_texture_compression_fxt1, 'fxt1-teximage')
 
 def add_color_buffer_float_test(name, format, p1, p2):
-	arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
+    arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PlainExecTest(['arb_color_buffer_float-' + name, format, p1, p2])
 
 arb_color_buffer_float = Group()
 spec['ARB_color_buffer_float'] = arb_color_buffer_float
@@ -1557,201 +1557,201 @@ ext_framebuffer_multisample['samples'] = concurrent_test('ext_framebuffer_multis
 ext_framebuffer_multisample['alpha-blending'] = PlainExecTest('ext_framebuffer_multisample-alpha-blending -auto')
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
-                          'depth_draw', 'depth_resolve'):
-                for options in power_set(('small', 'depthstencil')):
-                        test_name = ' '.join(['accuracy', str(num_samples), test_type]
-                                             + options)
-                        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                                test_name)
-                        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
+                      'depth_draw', 'depth_resolve'):
+        for options in power_set(('small', 'depthstencil')):
+            test_name = ' '.join(['accuracy', str(num_samples), test_type]
+                                 + options)
+            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                    test_name)
+            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['turn-on-off', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    test_name = ' '.join(['turn-on-off', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for buffer_type in ('color', 'depth', 'stencil'):
-                test_name = ' '.join(['upsample', str(num_samples), buffer_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        for buffer_type in ('color', 'depth', 'stencil'):
-                test_name = ' ' .join(['multisample-blit', str(num_samples), buffer_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        for buffer_type in ('color', 'depth', 'stencil'):
-                for blit_type in ('msaa', 'upsample', 'downsample'):
-                        test_name = ' '.join(['unaligned-blit', str(num_samples), buffer_type, blit_type])
-                        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                                test_name)
-                        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-	test_name = ' ' .join(['line-smooth', str(num_samples)])
-	executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-	        test_name)
-	ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-	test_name = ' ' .join(['point-smooth', str(num_samples)])
-	executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-	        test_name)
-	ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-	test_name = ' ' .join(['polygon-smooth', str(num_samples)])
-	executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-	        test_name)
-	ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['formats', str(num_samples)])
+    for buffer_type in ('color', 'depth', 'stencil'):
+        test_name = ' '.join(['upsample', str(num_samples), buffer_type])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
         ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for test_mode in ('inverted', 'non-inverted'):
-                test_name = ' '.join(['sample-coverage', str(num_samples), test_mode])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        for buffer_type in ('color', 'depth'):
-                test_name = ' '.join(['sample-alpha-to-coverage', str(num_samples), buffer_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['sample-alpha-to-one', str(num_samples)])
+    for buffer_type in ('color', 'depth', 'stencil'):
+        test_name = ' ' .join(['multisample-blit', str(num_samples), buffer_type])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
         ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['draw-buffers-alpha-to-one', str(num_samples)])
+    for buffer_type in ('color', 'depth', 'stencil'):
+        for blit_type in ('msaa', 'upsample', 'downsample'):
+            test_name = ' '.join(['unaligned-blit', str(num_samples), buffer_type, blit_type])
+            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                    test_name)
+            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' ' .join(['line-smooth', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' ' .join(['point-smooth', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' ' .join(['polygon-smooth', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['formats', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    for test_mode in ('inverted', 'non-inverted'):
+        test_name = ' '.join(['sample-coverage', str(num_samples), test_mode])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
         ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['draw-buffers-alpha-to-coverage', str(num_samples)])
+    for buffer_type in ('color', 'depth'):
+        test_name = ' '.join(['sample-alpha-to-coverage', str(num_samples), buffer_type])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
         ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['alpha-to-coverage-no-draw-buffer-zero', str(num_samples)])
+    test_name = ' '.join(['sample-alpha-to-one', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['draw-buffers-alpha-to-one', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['draw-buffers-alpha-to-coverage', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['alpha-to-coverage-no-draw-buffer-zero', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['alpha-to-coverage-dual-src-blend', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['alpha-to-one-dual-src-blend', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['int-draw-buffers-alpha-to-one', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['int-draw-buffers-alpha-to-coverage', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['alpha-to-one-msaa-disabled', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['alpha-to-one-single-sample-buffer', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['bitmap', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = ' '.join(['polygon-stipple', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+
+for num_samples in MSAA_SAMPLE_COUNTS:
+    for blit_type in ('msaa', 'upsample', 'downsample', 'normal'):
+        test_name = ' '.join(['clip-and-scissor-blit',
+                              str(num_samples), blit_type])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(
+                executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['alpha-to-coverage-dual-src-blend', str(num_samples)])
+    for flip_direction in ('x', 'y'):
+        test_name = ' '.join(['blit-flipped', str(num_samples),
+                              flip_direction])
         executable = 'ext_framebuffer_multisample-{0} -auto'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['alpha-to-one-dual-src-blend', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['int-draw-buffers-alpha-to-one', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['int-draw-buffers-alpha-to-coverage', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['alpha-to-one-msaa-disabled', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['alpha-to-one-single-sample-buffer', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['bitmap', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        test_name = ' '.join(['polygon-stipple', str(num_samples)])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        for blit_type in ('msaa', 'upsample', 'downsample', 'normal'):
-                test_name = ' '.join(['clip-and-scissor-blit',
-                                      str(num_samples), blit_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(
-                        executable)
-
-for num_samples in MSAA_SAMPLE_COUNTS:
-        for flip_direction in ('x', 'y'):
-                test_name = ' '.join(['blit-flipped', str(num_samples),
-                                      flip_direction])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(
-                        executable)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(
+                executable)
 
 # Note: the interpolation tests also check for sensible behaviour with
 # non-multisampled framebuffers, so go ahead and test them with
 # num_samples==0 as well.
 for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
-        for test_type in ('non-centroid-disabled', 'centroid-disabled',
-                          'centroid-edges', 'non-centroid-deriv',
-                          'non-centroid-deriv-disabled', 'centroid-deriv',
-                          'centroid-deriv-disabled'):
-                test_name = ' '.join(['interpolation', str(num_samples),
-                                      test_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(
-                        executable)
+    for test_type in ('non-centroid-disabled', 'centroid-disabled',
+                      'centroid-edges', 'non-centroid-deriv',
+                      'non-centroid-deriv-disabled', 'centroid-deriv',
+                      'centroid-deriv-disabled'):
+        test_name = ' '.join(['interpolation', str(num_samples),
+                              test_type])
+        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                test_name)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(
+                executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for buffer_type in ('color', 'depth', 'stencil'):
-                test_name = ' '.join(['clear', str(num_samples), buffer_type])
-                executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                        test_name)
-                ext_framebuffer_multisample[test_name] = PlainExecTest(
-                        executable)
+    for buffer_type in ('color', 'depth', 'stencil'):
+        test_name = ' '.join(['clear', str(num_samples), buffer_type])
+        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                test_name)
+        ext_framebuffer_multisample[test_name] = PlainExecTest(
+                executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
-        for test_type in ('depth', 'depth-computed', 'stencil'):
-                for buffer_config in ('combined', 'separate', 'single'):
-                        test_name = ' '.join(['no-color', str(num_samples),
-                                              test_type, buffer_config])
-                        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
-                                test_name)
-                        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    for test_type in ('depth', 'depth-computed', 'stencil'):
+        for buffer_config in ('combined', 'separate', 'single'):
+            test_name = ' '.join(['no-color', str(num_samples),
+                                  test_type, buffer_config])
+            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+                    test_name)
+            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
 
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
@@ -1835,8 +1835,8 @@ add_plain_test(ext_texture_array, 'array-texture')
 add_concurrent_test(ext_texture_array, 'getteximage-targets 1D_ARRAY')
 add_concurrent_test(ext_texture_array, 'getteximage-targets 2D_ARRAY')
 for test_mode in ['teximage', 'texsubimage']:
-        test_name = 'compressed {0}'.format(test_mode)
-        ext_texture_array[test_name] = PlainExecTest('ext_texture_array-' + test_name + ' -auto -fbo')
+    test_name = 'compressed {0}'.format(test_mode)
+    ext_texture_array[test_name] = PlainExecTest('ext_texture_array-' + test_name + ' -auto -fbo')
 
 arb_texture_cube_map = Group()
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
@@ -1864,9 +1864,9 @@ import_glsl_parser_tests(arb_texture_cube_map_array,
 			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
 			 ['compiler'])
 for stage in ['vs', 'gs', 'fs']:
-	# textureSize():
-	for sampler in textureSize_samplers_atcma:
-		spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
+    # textureSize():
+    for sampler in textureSize_samplers_atcma:
+        spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
 ext_texture_swizzle = Group()
 spec['EXT_texture_swizzle'] = ext_texture_swizzle
@@ -2044,9 +2044,9 @@ for mode in ['interleaved_ok_base', 'interleaved_ok_range',
              'bind_range_offset_5', 'bind_offset_offset_1',
              'bind_offset_offset_2', 'bind_offset_offset_3',
              'bind_offset_offset_5', 'not_a_program']:
-        test_name = 'api-errors {0}'.format(mode)
-        ext_transform_feedback[test_name] = concurrent_test(
-                'ext_transform_feedback-{0}'.format(test_name))
+    test_name = 'api-errors {0}'.format(mode)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_FogFragCoord', 'gl_Position', 'gl_PointSize',
                 'gl_ClipVertex', 'gl_ClipDistance',
@@ -2058,9 +2058,9 @@ for varying in ['gl_Color', 'gl_SecondaryColor', 'gl_TexCoord',
                 'gl_ClipDistance[6]-no-subscript',
                 'gl_ClipDistance[7]-no-subscript',
                 'gl_ClipDistance[8]-no-subscript']:
-        test_name = 'builtin-varyings {0}'.format(varying)
-        ext_transform_feedback[test_name] = concurrent_test(
-                'ext_transform_feedback-{0}'.format(test_name))
+    test_name = 'builtin-varyings {0}'.format(varying)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['buffer-usage'] = concurrent_test('ext_transform_feedback-buffer-usage')
 ext_transform_feedback['discard-api'] = concurrent_test('ext_transform_feedback-discard-api')
 ext_transform_feedback['discard-bitmap'] = concurrent_test('ext_transform_feedback-discard-bitmap')
@@ -2069,15 +2069,15 @@ ext_transform_feedback['discard-copypixels'] = concurrent_test('ext_transform_fe
 ext_transform_feedback['discard-drawarrays'] = concurrent_test('ext_transform_feedback-discard-drawarrays')
 ext_transform_feedback['discard-drawpixels'] = concurrent_test('ext_transform_feedback-discard-drawpixels')
 for mode in ['main_binding', 'indexed_binding', 'buffer_start', 'buffer_size']:
-        test_name = 'get-buffer-state {0}'.format(mode)
-        ext_transform_feedback[test_name] = concurrent_test(
-                'ext_transform_feedback-{0}'.format(test_name))
+    test_name = 'get-buffer-state {0}'.format(mode)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['immediate-reuse'] = concurrent_test('ext_transform_feedback-immediate-reuse')
 for mode in ['output', 'prims_generated', 'prims_written']:
-        for use_gs in ['', ' use_gs']:
-                test_name = 'intervening-read {0}{1}'.format(mode, use_gs)
-                ext_transform_feedback[test_name] = concurrent_test(
-                        'ext_transform_feedback-{0}'.format(test_name))
+    for use_gs in ['', ' use_gs']:
+        test_name = 'intervening-read {0}{1}'.format(mode, use_gs)
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['max-varyings'] = concurrent_test('ext_transform_feedback-max-varyings')
 ext_transform_feedback['nonflat-integral'] = concurrent_test('ext_transform_feedback-nonflat-integral')
 ext_transform_feedback['overflow-edge-cases'] = concurrent_test('ext_transform_feedback-overflow-edge-cases')
@@ -2116,58 +2116,58 @@ ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	concur
 ext_transform_feedback['interleaved-attribs'] = concurrent_test('ext_transform_feedback-interleaved')
 ext_transform_feedback['separate-attribs'] = concurrent_test('ext_transform_feedback-separate')
 for drawcall in ['arrays', 'elements']:
-        for mode in ['triangles', 'lines', 'points']:
-                test_name = 'order {0} {1}'.format(drawcall, mode)
-                ext_transform_feedback[test_name] = concurrent_test(
-                        'ext_transform_feedback-{0}'.format(test_name))
+    for mode in ['triangles', 'lines', 'points']:
+        test_name = 'order {0} {1}'.format(drawcall, mode)
+        ext_transform_feedback[test_name] = concurrent_test(
+                'ext_transform_feedback-{0}'.format(test_name))
 for draw_mode in ['points', 'lines', 'line_loop', 'line_strip',
                   'triangles', 'triangle_strip', 'triangle_fan',
                   'quads', 'quad_strip', 'polygon']:
-        for shade_mode in ['monochrome', 'smooth', 'flat_first', 'flat_last', 'wireframe']:
-                if shade_mode == 'wireframe' and \
-                            draw_mode in ['points', 'lines', 'line_loop', 'line_strip']:
-                        continue
-                test_name = 'tessellation {0} {1}'.format(
-                        draw_mode, shade_mode)
-                ext_transform_feedback[test_name] = concurrent_test(
-                        'ext_transform_feedback-{0}'.format(test_name))
-for alignment in [0, 4, 8, 12]:
-        test_name = 'alignment {0}'.format(alignment)
+    for shade_mode in ['monochrome', 'smooth', 'flat_first', 'flat_last', 'wireframe']:
+        if shade_mode == 'wireframe' and \
+                    draw_mode in ['points', 'lines', 'line_loop', 'line_strip']:
+            continue
+        test_name = 'tessellation {0} {1}'.format(
+                draw_mode, shade_mode)
         ext_transform_feedback[test_name] = concurrent_test(
                 'ext_transform_feedback-{0}'.format(test_name))
+for alignment in [0, 4, 8, 12]:
+    test_name = 'alignment {0}'.format(alignment)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 
 for output_type in ['float', 'vec2', 'vec3', 'vec4', 'mat2', 'mat2x3',
                     'mat2x4', 'mat3x2', 'mat3', 'mat3x4', 'mat4x2', 'mat4x3',
                     'mat4', 'int', 'ivec2', 'ivec3', 'ivec4', 'uint', 'uvec2',
                     'uvec3', 'uvec4']:
-        for suffix in ['', '[2]', '[2]-no-subscript']:
-                test_name = 'output-type {0}{1}'.format(output_type, suffix)
-                ext_transform_feedback[test_name] = concurrent_test(
-                        'ext_transform_feedback-{0}'.format(test_name))
-
-for mode in ['discard', 'buffer', 'prims_generated', 'prims_written']:
-        test_name = 'generatemipmap {0}'.format(mode)
+    for suffix in ['', '[2]', '[2]-no-subscript']:
+        test_name = 'output-type {0}{1}'.format(output_type, suffix)
         ext_transform_feedback[test_name] = concurrent_test(
                 'ext_transform_feedback-{0}'.format(test_name))
+
+for mode in ['discard', 'buffer', 'prims_generated', 'prims_written']:
+    test_name = 'generatemipmap {0}'.format(mode)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 
 for test_case in ['base-shrink', 'base-grow', 'offset-shrink', 'offset-grow',
                   'range-shrink', 'range-grow']:
-        test_name = 'change-size {0}'.format(test_case)
-        ext_transform_feedback[test_name] = concurrent_test(
-                'ext_transform_feedback-{0}'.format(test_name))
+    test_name = 'change-size {0}'.format(test_case)
+    ext_transform_feedback[test_name] = concurrent_test(
+            'ext_transform_feedback-{0}'.format(test_name))
 for api_suffix, possible_options in [('', [[], ['interface']]),
                                      ('_gles3', [[]])]:
-        for subtest in ['basic-struct', 'struct-whole-array',
-                        'struct-array-elem', 'array-struct',
-                        'array-struct-whole-array', 'array-struct-array-elem',
-                        'struct-struct', 'array-struct-array-struct']:
-                for mode in ['error', 'get', 'run', 'run-no-fs']:
-                        for options in possible_options:
-                                args = [subtest, mode] + options
-                                test_name = 'structs{0} {1}'.format(
-                                        api_suffix, ' '.join(args))
-                                ext_transform_feedback[test_name] = concurrent_test(
-                                        'ext_transform_feedback-{0}'.format(test_name))
+    for subtest in ['basic-struct', 'struct-whole-array',
+                    'struct-array-elem', 'array-struct',
+                    'array-struct-whole-array', 'array-struct-array-elem',
+                    'struct-struct', 'array-struct-array-struct']:
+        for mode in ['error', 'get', 'run', 'run-no-fs']:
+            for options in possible_options:
+                args = [subtest, mode] + options
+                test_name = 'structs{0} {1}'.format(
+                        api_suffix, ' '.join(args))
+                ext_transform_feedback[test_name] = concurrent_test(
+                        'ext_transform_feedback-{0}'.format(test_name))
 ext_transform_feedback['geometry-shaders-basic'] = concurrent_test(
         'ext_transform_feedback-geometry-shaders-basic')
 
@@ -2188,8 +2188,8 @@ for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
               'gl_SkipComponents3', 'gl_SkipComponents4',
               'gl_NextBuffer-gl_SkipComponents1-gl_NextBuffer',
               'gl_NextBuffer-gl_NextBuffer', 'gl_SkipComponents1234']:
-        arb_transform_feedback3[param] = concurrent_test(
-                'ext_transform_feedback-output-type {0}'.format(param))
+    arb_transform_feedback3[param] = concurrent_test(
+            'ext_transform_feedback-output-type {0}'.format(param))
 
 arb_uniform_buffer_object = Group()
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
@@ -2420,7 +2420,7 @@ add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-paramete
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-output-type')
 add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-vertices-in')
 for mode in ['1', 'tf 1', 'max', 'tf max']:
-	add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-vertices-out {0}'.format(mode))
+    add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-program-parameter-vertices-out {0}'.format(mode))
 spec['ARB_geometry_shader4'] = arb_geometry_shader4
 add_shader_test_dir(spec['ARB_geometry_shader4'],
                     os.path.join(testsDir, 'spec', 'arb_geometry_shader4'),
@@ -2433,13 +2433,13 @@ import_glsl_parser_tests(spec['ARB_geometry_shader4'],
 glslparsertest = Group()
 # Add all shader source files in the directories below.
 for filename in os.listdir(testsDir + '/glslparsertest/shaders'):
-	ext = filename.rsplit('.')[-1]
-	if ext in ['vert', 'geo', 'frag']:
-		add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/shaders', filename), filename)
+    ext = filename.rsplit('.')[-1]
+    if ext in ['vert', 'geo', 'frag']:
+        add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/shaders', filename), filename)
 for filename in os.listdir(testsDir + '/glslparsertest/glsl2'):
-	ext = filename.rsplit('.')[-1]
-	if ext in ['vert', 'geo', 'frag']:
-		add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
+    ext = filename.rsplit('.')[-1]
+    if ext in ['vert', 'geo', 'frag']:
+        add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
 # end group glslparsertest ---------------------------------------------------
 
 hiz = Group()
@@ -2472,20 +2472,20 @@ fast_color_clear = Group()
 add_shader_test_dir(fast_color_clear, testsDir + '/fast_color_clear',
                     recursive=True)
 for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
-        for buffer_type in ('rb', 'tex'):
-                if subtest == 'sample' and buffer_type == 'rb':
-                        continue
-                test_name = ' '.join(
-                        ['fcc-read-after-clear', subtest, buffer_type])
-                add_concurrent_test(fast_color_clear, test_name)
+    for buffer_type in ('rb', 'tex'):
+        if subtest == 'sample' and buffer_type == 'rb':
+            continue
+        test_name = ' '.join(
+                ['fcc-read-after-clear', subtest, buffer_type])
+        add_concurrent_test(fast_color_clear, test_name)
 add_concurrent_test(fast_color_clear, 'fcc-blit-between-clears')
 add_plain_test(fast_color_clear, 'fcc-read-to-pbo-after-clear')
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
-	test = PlainExecTest(['asmparsertest', '-auto', group, testsDir + '/asmparsertest/shaders/' + group + '/' + shader])
-	test.runConcurrent = True
-	asmparsertest[group + '/' + shader] = test
+    test = PlainExecTest(['asmparsertest', '-auto', group, testsDir + '/asmparsertest/shaders/' + group + '/' + shader])
+    test.runConcurrent = True
+    asmparsertest[group + '/' + shader] = test
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
 add_asmparsertest('ARBfp1.0', 'abs-02.txt')
@@ -2986,21 +2986,21 @@ add_concurrent_test(gles20, 'fbo_discard_gles2')
 gles30 = Group()
 spec['!OpenGL ES 3.0'] = gles30
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
-	test_name = ' ' .join(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
-	executable = '{0} -auto'.format(test_name)
-	gles30[test_name] = concurrent_test(executable)
+    test_name = ' ' .join(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
+    executable = '{0} -auto'.format(test_name)
+    gles30[test_name] = concurrent_test(executable)
 gles30['minmax'] = concurrent_test('minmax_gles3')
 for test_mode in ['teximage', 'texsubimage']:
-        test_name = 'ext_texture_array-compressed_gles3 {0}'.format(test_mode)
-        gles30[test_name] = PlainExecTest(test_name + ' -auto -fbo')
+    test_name = 'ext_texture_array-compressed_gles3 {0}'.format(test_mode)
+    gles30[test_name] = PlainExecTest(test_name + ' -auto -fbo')
 
 arb_es3_compatibility = Group()
 spec['ARB_ES3_compatibility'] = arb_es3_compatibility
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
-	for context in ('core', 'compat'):
-		test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format, context])
-		executable = '{0}'.format(test_name)
-		arb_es3_compatibility[test_name] = concurrent_test(executable)
+    for context in ('core', 'compat'):
+        test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format, context])
+        executable = '{0}'.format(test_name)
+        arb_es3_compatibility[test_name] = concurrent_test(executable)
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
@@ -3015,7 +3015,7 @@ profile.tests['shaders'] = shaders
 profile.tests['security'] = security
 profile.tests['spec'] = spec
 if platform.system() is not 'Windows':
-	profile.tests['glx'] = glx
+    profile.tests['glx'] = glx
 
 # Remove blacklisted tests
 for test_path in blacklist:
