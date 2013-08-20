@@ -473,20 +473,6 @@ Test::draw_reference_image()
 }
 
 /**
- * Convert from sRGB color space to linear color space, using the
- * formula from the GL 3.0 spec, section 4.1.8 (sRGB Texture Color
- * Conversion).
- */
-float
-decode_srgb(float x)
-{
-	if (x <= 0.0405)
-		return x / 12.92;
-	else
-		return pow((x + 0.055) / 1.055, 2.4);
-}
-
-/**
  * Measure the accuracy of MSAA downsampling.  Pixels that are fully
  * on or off in the reference image are required to be fully on or off
  * in the test image.  Pixels that are not fully on or off in the
@@ -524,8 +510,8 @@ Test::measure_accuracy()
 				 * is comparable to the non-sRGB case.
 				 */
 				if (srgb && c < 3) {
-					ref = decode_srgb(ref);
-					test = decode_srgb(test);
+					ref = piglit_srgb_to_linear(ref);
+					test = piglit_srgb_to_linear(test);
 				}
 				if (ref <= 0.0)
 					unlit_stats.record(test - ref);
