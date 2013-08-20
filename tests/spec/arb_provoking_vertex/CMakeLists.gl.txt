@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb-provoking-vertex-control provoking-vertex-control.c)
+piglit_add_executable (arb-provoking-vertex-initial provoking-vertex-initial.c)
 
 # vim: ft=cmake:
