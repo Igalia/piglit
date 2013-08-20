@@ -1219,6 +1219,11 @@ add_plain_test(arb_pixel_buffer_object, 'pbo-teximage')
 add_plain_test(arb_pixel_buffer_object, 'pbo-teximage-tiling')
 add_plain_test(arb_pixel_buffer_object, 'pbo-teximage-tiling-2')
 
+# Group ARB_provoking_vertex
+arb_provoking_vertex = Group()
+spec['ARB_provoking_vertex'] = arb_provoking_vertex;
+add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-control')
+
 # Group ARB_robustness
 arb_robustness = Group()
 spec['ARB_robustness'] = arb_robustness
