@@ -1224,6 +1224,7 @@ arb_provoking_vertex = Group()
 spec['ARB_provoking_vertex'] = arb_provoking_vertex;
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-control')
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-initial')
+add_plain_test(arb_provoking_vertex, 'arb-quads-follow-provoking-vertex')
 
 # Group ARB_robustness
 arb_robustness = Group()
