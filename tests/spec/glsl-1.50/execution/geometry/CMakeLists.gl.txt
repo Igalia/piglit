@@ -11,3 +11,4 @@ ${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (glsl-1.50-geometry-end-primitive end-primitive.c)
+piglit_add_executable (glsl-1.50-geometry-primitive-types primitive-types.c)
