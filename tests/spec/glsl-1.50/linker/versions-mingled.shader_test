@@ -1,0 +1,33 @@
+# Tests that GLSL 1.40 and GLSL 1.50 shaders may be linked together
+#
+# GLSL 1.50 Spec, 3.3 (Preprocessor):
+# "Shaders declaring version 1.40 of the shading language can be linked with
+#  shaders declaring version 1.50 in the same program."
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+/* This test can't use [vertex shader passthrough] because the vertex
+ * shader needs an explicit version instead of one implied by the GLSL
+ * line in the [require] section.
+ */
+#version 140
+
+in vec4 a;
+
+void main()
+{
+	gl_Position = a;
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+	gl_FragColor = vec4(1.);
+}
+
+[test]
+
+
