@@ -548,7 +548,7 @@ class Summary:
                         traceback=value.get('traceback', 'None'),
                         command=value.get('command', 'None'),
                         css=path.relpath(resultCss, tPath),
-                        index=index))
+                        index=path.relpath(index, tPath)))
                     file.close()
 
         # Finally build the root html files: index, regressions, etc
