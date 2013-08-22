@@ -9,8 +9,12 @@
 
 #version 150
 
+vec4 test(layout(pixel_center_integer) in float a)
+{
+	return vec4(a);
+}
+
 void main()
 {
-	layout(pixel_center_integer) vec4 b;
-	gl_Position = b;
+	gl_Position = test(.5);
 }

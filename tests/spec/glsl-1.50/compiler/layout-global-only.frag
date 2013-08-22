@@ -11,5 +11,6 @@
 
 void main()
 {
-	layout(pixel_center_integer) in vec4 gl_FragCoord;
+	layout(pixel_center_integer) vec4 fc;
+	gl_Position = fc;
 }
