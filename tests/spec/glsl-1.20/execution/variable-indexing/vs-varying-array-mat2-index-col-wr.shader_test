@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform mat2x2 src_matrix;
 uniform vec2 v;
 uniform vec2 expect;
@@ -42,9 +41,11 @@ uniform int col;
 uniform vec2 value;
 varying mat2x2[3] dst_matrix;
 
+float distanceSqr(vec2 a, vec2 b) { vec2 diff = a - b; return dot(diff, diff); }
+
 void main()
 {
-    gl_FragColor = (distance(dst_matrix[index] * v, expect) < 1e-6)
+    gl_FragColor = (distanceSqr(dst_matrix[index] * v, expect) < 4e-9)
         ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 

@@ -5,7 +5,6 @@
 GLSL >= 1.20
 
 [vertex shader]
-#version 120
 uniform mat4x4 src_matrix;
 uniform vec4 v;
 uniform vec4 expect;
@@ -13,6 +12,8 @@ uniform int index;
 uniform int row;
 uniform int col;
 uniform float value;
+
+float distanceSqr(vec4 a, vec4 b) { vec4 diff = a - b; return dot(diff, diff); }
 
 void main()
 {
@@ -31,12 +32,11 @@ void main()
      */
     dst_matrix[1] = src_matrix;
     dst_matrix[1][1][row] = value;
-    gl_FrontColor = (distance(dst_matrix[1] * v, expect) < 1e-6)
+    gl_FrontColor = (distanceSqr(dst_matrix[1] * v, expect) < 4e-9)
         ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
 [fragment shader]
-#version 120
 void main() { gl_FragColor = gl_Color; }
 
 [test]

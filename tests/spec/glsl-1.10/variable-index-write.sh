@@ -50,6 +50,13 @@ function emit_globals
 }
 
 
+function emit_distanceSqr_function
+{
+    dim=$1
+    echo "float distanceSqr(vec${dim} a, vec${dim} b) { vec${dim} diff = a - b; return dot(diff, diff); }"
+    echo
+}
+
 function emit_set_matrix
 {
     matrix_dim=$1
@@ -179,6 +186,7 @@ function emit_fs
     echo "[fragment shader]"
 
     emit_globals $*
+    emit_distanceSqr_function $matrix_dim
 
     echo "void main()"
     echo "{"
@@ -192,7 +200,7 @@ function emit_fs
 	emit_transform $*
     fi
 
-    echo "    gl_FragColor = (distance(dst_matrix${idx} * v, expect) < 1e-6)"
+    echo "    gl_FragColor = (distanceSqr(dst_matrix${idx} * v, expect) < 4e-9)"
     echo "        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);"
     echo "}"
     echo
@@ -352,6 +360,9 @@ function emit_vs_wr_test
 
     echo "[vertex shader]"
     emit_globals $*
+    if [ "x$mode" != "xvarying" ] ; then
+        emit_distanceSqr_function $matrix_dim
+    fi
 
     echo "void main()"
     echo "{"
@@ -362,7 +373,7 @@ function emit_vs_wr_test
     emit_transform $*
 
     if [ "x$mode" != "xvarying" ] ; then
-	echo "    gl_FrontColor = (distance(dst_matrix${idx} * v, expect) < 1e-6)"
+	echo "    gl_FrontColor = (distanceSqr(dst_matrix${idx} * v, expect) < 4e-9)"
 	echo "        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);"
     fi
 

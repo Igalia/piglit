@@ -14,6 +14,8 @@ uniform vec2 expect;
 uniform int col;
 uniform vec2 value;
 
+float distanceSqr(vec2 a, vec2 b) { vec2 diff = a - b; return dot(diff, diff); }
+
 void main()
 {
     mat2x2 dst_matrix;
@@ -25,7 +27,7 @@ void main()
      */
     dst_matrix = src_matrix;
     dst_matrix[col] = value;
-    gl_FragColor = (distance(dst_matrix * v, expect) < 1e-6)
+    gl_FragColor = (distanceSqr(dst_matrix * v, expect) < 4e-9)
         ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
 }
 
