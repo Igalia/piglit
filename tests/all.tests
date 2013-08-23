@@ -2350,6 +2350,7 @@ arb_vertex_type_2_10_10_10_rev['attribs'] = concurrent_test('attribs GL_ARB_vert
 arb_draw_buffers = Group()
 spec['ARB_draw_buffers'] = arb_draw_buffers
 add_plain_test(arb_draw_buffers, 'arb_draw_buffers-state_change')
+add_plain_test(arb_draw_buffers, 'fbo-mrt-alphatest')
 
 ext_draw_buffers2 = Group()
 spec['EXT_draw_buffers2'] = ext_draw_buffers2
