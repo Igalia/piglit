@@ -251,10 +251,10 @@ piglit_cl_test(const int argc,
 	test(context_properties, num_devices, NULL, NULL, NULL,
 	     CL_INVALID_VALUE, &result,
 	     "Trigger CL_INVALID_VALUE if devices is NULL");
-	test(context_properties, num_devices, devices, NULL, &context_properties,
+	test(context_properties, 0, devices, NULL, NULL,
 	     CL_INVALID_VALUE, &result,
 	     "Trigger CL_INVALID_VALUE if num_devices is equal to zero");
-	test(context_properties, 0, devices, NULL, NULL,
+	test(context_properties, num_devices, devices, NULL, &context_properties,
 	     CL_INVALID_VALUE, &result,
 	     "Trigger CL_INVALID_VALUE if pfn_notify is NULL but user_data is not NULL");
 
