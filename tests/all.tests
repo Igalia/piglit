@@ -938,6 +938,14 @@ for draw in ['', 'indexed']:
                             ('arb_geometry_shader4-ignore-adjacent-vertices '
                              'core {0} {1}').format(draw, prim))
 
+spec['glsl-3.30'] = Group()
+import_glsl_parser_tests(spec['glsl-3.30'],
+			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
+			 ['compiler'])
+add_shader_test_dir(spec['glsl-3.30'],
+		    os.path.join(testsDir, 'spec', 'glsl-3.30'),
+		    recursive=True)
+
 # Group spec/glsl-es-3.00
 spec['glsl-es-3.00'] = Group()
 import_glsl_parser_tests(spec['glsl-es-3.00'],
