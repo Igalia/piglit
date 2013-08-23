@@ -12,5 +12,5 @@
 void main()
 {
 	layout(pixel_center_integer) vec4 fc;
-	gl_Position = fc;
+	gl_FragColor = vec4(1.);
 }
