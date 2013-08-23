@@ -162,6 +162,7 @@ GLvoid piglit_draw_rect_z(float z, float x, float y, float w, float h);
 GLvoid piglit_draw_rect_tex(float x, float y, float w, float h,
                             float tx, float ty, float tw, float th);
 GLvoid piglit_draw_rect_back(float x, float y, float w, float h);
+void piglit_draw_rect_from_arrays(const void *verts, const void *tex);
 
 unsigned short piglit_half_from_float(float val);
 

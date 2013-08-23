@@ -588,3 +588,56 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
 	default: return 0;
 	}
 }
+
+/**
+ * Call glDrawArrays.  verts is expected to be
+ *
+ *   float verts[4][4];
+ *
+ * if not NULL; tex is expected to be
+ *
+ *   float tex[4][2];
+ *
+ * if not NULL.
+ */
+void
+piglit_draw_rect_from_arrays(const void *verts, const void *tex)
+{
+#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL)
+	if (verts) {
+		glVertexPointer(4, GL_FLOAT, 0, verts);
+		glEnableClientState(GL_VERTEX_ARRAY);
+	}
+
+	if (tex) {
+		glTexCoordPointer(2, GL_FLOAT, 0, tex);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	if (verts)
+		glDisableClientState(GL_VERTEX_ARRAY);
+	if (tex)
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+#elif defined(PIGLIT_USE_OPENGL_ES2) ||defined(PIGLIT_USE_OPENGL_ES3)
+	if (verts) {
+		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	}
+
+	if (tex) {
+		glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT, GL_FALSE, 0, tex);
+		glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+	}
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	if (verts)
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+	if (tex)
+		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+#else
+#	error "don't know how to draw arrays"
+#endif
+}
