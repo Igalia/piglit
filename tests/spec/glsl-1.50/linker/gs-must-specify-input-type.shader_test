@@ -1,0 +1,52 @@
+# Section 2.11.2 (Program Objects) of the GLSL 1.50 spec says:
+#
+# "Linking will also fail if the program object contains objects to form a
+#  geometry shader (see section 2.12), and
+#	• the program contains no objects to form a vertex shader;
+#	• the input primitive type, output primitive type, or maximum output
+#	  vertex count is not specified in any compiled geometry shader object;
+#	• the input primitive type, output primitive type, or maximum output
+#	  vertex count is specified differently in multiple geometry shader
+#	  objects."
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+out vec4 vertex_to_gs;
+
+void main()
+{
+	vertex_to_gs = vertex;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles, max_vertices = 3) out;
+
+in vec4 vertex_to_gs[3];
+
+void main()
+{
+	for(int i = 0; i < 3; i++) {
+		gl_Position = vertex_to_gs[i];
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+#version 150
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error
