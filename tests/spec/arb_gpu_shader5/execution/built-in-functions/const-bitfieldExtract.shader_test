@@ -12,7 +12,7 @@ void main() {
 [fragment shader]
 #extension GL_ARB_gpu_shader5 : enable
 
-void bad_constant_folding();
+#define STATIC_ASSERT(cond) { float array[(cond) ? -1 : 1]; }
 
 out vec4 color;
 
@@ -21,26 +21,19 @@ void main()
 	/* Green if both pass. */
 	color = vec4(0.0, 1.0, 0.0, 1.0);
 
-	if (ivec4(0) != bitfieldExtract(ivec4(2147483647, 15, 7, 3), 0, 0))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(0) != bitfieldExtract(ivec4(2147483647, 15, 7, 3), 0, 0));
 
-	if (uvec4(0u) != bitfieldExtract(uvec4(0xFFFFFFFFu, 15u, 7u, 3u), 0, 0))
-		bad_constant_folding();
+	STATIC_ASSERT(uvec4(0u) != bitfieldExtract(uvec4(0xFFFFFFFFu, 15u, 7u, 3u), 0, 0));
 
-	if (ivec4(-1) != bitfieldExtract(ivec4(1), 0, 1))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(-1) != bitfieldExtract(ivec4(1), 0, 1));
 
-	if (uvec4(1u) != bitfieldExtract(uvec4(1u), 0, 1))
-		bad_constant_folding();
+	STATIC_ASSERT(uvec4(1u) != bitfieldExtract(uvec4(1u), 0, 1));
 
-	if (ivec4(1, -1, -1, 1) != bitfieldExtract(ivec4(1, 3, 3, 1), 0, 2))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(1, -1, -1, 1) != bitfieldExtract(ivec4(1, 3, 3, 1), 0, 2));
 
-	if (ivec4(-1, 0, 1, 3) != bitfieldExtract(ivec4(983040, 61440, 114688, 229376), 16, 4))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(-1, 0, 1, 3) != bitfieldExtract(ivec4(983040, 61440, 114688, 229376), 16, 4));
 
-	if (uvec4(0xFu, 0x0u, 0x1u, 0x3u) != bitfieldExtract(uvec4(0x000F0000u, 0x0000F000u, 0x0001C000u, 0x00038000u), 16, 4))
-		bad_constant_folding();
+	STATIC_ASSERT(uvec4(0xFu, 0x0u, 0x1u, 0x3u) != bitfieldExtract(uvec4(0x000F0000u, 0x0000F000u, 0x0001C000u, 0x00038000u), 16, 4));
 }
 
 [vertex data]

@@ -12,7 +12,7 @@ void main() {
 [fragment shader]
 #extension GL_ARB_gpu_shader5 : enable
 
-void bad_constant_folding();
+#define STATIC_ASSERT(cond) { float array[(cond) ? -1 : 1]; }
 
 out vec4 color;
 
@@ -21,30 +21,20 @@ void main()
 	/* Green if both pass. */
 	color = vec4(0.0, 1.0, 0.0, 1.0);
 
-	if (ivec4(0) != bitCount(ivec4(0)))
-		bad_constant_folding();
-	else if (ivec4(0) != bitCount(uvec4(0u)))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(0) != bitCount(ivec4(0)));
+	STATIC_ASSERT(ivec4(0) != bitCount(uvec4(0u)));
 
-	if (ivec4(1) != bitCount(ivec4(1, 2, 4, 8)))
-		bad_constant_folding();
-	else if (ivec4(1) != bitCount(uvec4(1u, 2u, 4u, 8u)))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(1) != bitCount(ivec4(1, 2, 4, 8)));
+	STATIC_ASSERT(ivec4(1) != bitCount(uvec4(1u, 2u, 4u, 8u)));
 
-	if (ivec4(1, 2, 3, 4) != bitCount(ivec4(1, 3, 7, 15)))
-		bad_constant_folding();
-	else if (ivec4(1, 2, 3, 4) != bitCount(uvec4(1u, 3u, 7u, 15u)))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(1, 2, 3, 4) != bitCount(ivec4(1, 3, 7, 15)));
+	STATIC_ASSERT(ivec4(1, 2, 3, 4) != bitCount(uvec4(1u, 3u, 7u, 15u)));
 
-	if (ivec4(6, 6, 3, 5) != bitCount(ivec4(783, 111, 385, 484)))
-		bad_constant_folding();
-	else if (ivec4(6, 6, 3, 5) != bitCount(uvec4(783u, 111u, 385u, 484u)))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(6, 6, 3, 5) != bitCount(ivec4(783, 111, 385, 484)));
+	STATIC_ASSERT(ivec4(6, 6, 3, 5) != bitCount(uvec4(783u, 111u, 385u, 484u)));
 
-	if (ivec4(32, 31, 31, 30) != bitCount(ivec4(-1, -2, -3, -4)))
-		bad_constant_folding();
-	else if (ivec4(32, 31, 31, 30) != bitCount(uvec4(0xFFFFFFFFu, 0xFFFFFFFEu, 0xFFFFFFFDu, 0xFFFFFFFCu)))
-		bad_constant_folding();
+	STATIC_ASSERT(ivec4(32, 31, 31, 30) != bitCount(ivec4(-1, -2, -3, -4)));
+	STATIC_ASSERT(ivec4(32, 31, 31, 30) != bitCount(uvec4(0xFFFFFFFFu, 0xFFFFFFFEu, 0xFFFFFFFDu, 0xFFFFFFFCu)));
 }
 
 [vertex data]
