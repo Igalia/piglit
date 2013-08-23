@@ -209,7 +209,7 @@ test(void)
 
 	/* test formats that should fail */
 	for (i = 0; i < ARRAY_SIZE(invalid_formats); i++) {
-		const char *name = piglit_get_gl_enum_name(formats[i].format);
+		const char *name = piglit_get_gl_enum_name(invalid_formats[i]);
 
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
 					 invalid_formats[i],
