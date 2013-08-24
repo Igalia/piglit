@@ -24,13 +24,6 @@ void main() {
     gl_FragColor = func();
 }
 
-[vertex data]
-piglit_vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 1.0 0.0 0.0 1.0
