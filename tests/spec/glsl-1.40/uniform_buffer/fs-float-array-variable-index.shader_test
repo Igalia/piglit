@@ -1,15 +1,7 @@
 [require]
 GLSL >= 1.40
 
-[vertex shader]
-#version 140
-
-in vec4 vertex;
-
-void main()
-{
-	gl_Position = vertex;
-}
+[vertex shader passthrough]
 
 [fragment shader]
 #version 140
@@ -26,7 +18,7 @@ void main()
 }
 
 [vertex data]
-vertex/float/2
+piglit_vertex/float/2
 -1.0 -1.0
  1.0 -1.0
  1.0  1.0
