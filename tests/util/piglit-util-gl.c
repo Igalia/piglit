@@ -864,12 +864,7 @@ piglit_draw_rect(float x, float y, float w, float h)
 	verts[3][2] = 0.0;
 	verts[3][3] = 1.0;
 
-	glVertexPointer(4, GL_FLOAT, 0, verts);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
+	piglit_draw_rect_from_arrays(verts, NULL);
 }
 
 /**
@@ -897,12 +892,7 @@ piglit_draw_rect_z(float z, float x, float y, float w, float h)
 	verts[3][2] = z;
 	verts[3][3] = 1.0;
 
-	glVertexPointer(4, GL_FLOAT, 0, verts);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
+	piglit_draw_rect_from_arrays(verts, NULL);
 }
 
 /**
@@ -941,15 +931,7 @@ piglit_draw_rect_tex(float x, float y, float w, float h,
 	tex[3][0] = tx + tw;
 	tex[3][1] = ty + th;
 
-	glVertexPointer(4, GL_FLOAT, 0, verts);
-	glTexCoordPointer(2, GL_FLOAT, 0, tex);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	piglit_draw_rect_from_arrays(verts, tex);
 }
 
 
