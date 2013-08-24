@@ -24,6 +24,7 @@
 #include "piglit-util-gl-common.h"
 #include <ctype.h>
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 /**
  * An array of pointers to extension strings.
@@ -652,15 +653,58 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 #if defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3) \
 	|| defined(PIGLIT_USE_OPENGL)
 	if (!use_fixed_function_attributes) {
+		GLuint buf = 0;
+		GLuint old_buf = 0;
+		GLuint vao = 0;
+		GLuint old_vao = 0;
+
+		/* Vertex array objects were added in both OpenGL 3.0 and
+		 * OpenGL ES 3.0.  The use of VAOs is required in desktop
+		 * OpenGL 3.1 (without GL_ARB_compatibility) and all desktop
+		 * OpenGL core profiles.  If the functionality is supported,
+		 * just use it.
+		 */
+		if (piglit_get_gl_version() >= 30
+		    || piglit_is_extension_supported("GL_OES_vertex_array_object")
+		    || piglit_is_extension_supported("GL_ARB_vertex_array_object")) {
+			glGetIntegerv(GL_VERTEX_ARRAY_BINDING,
+				      (GLint *) &old_vao);
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
+		}
+
+		/* Assume that VBOs are supported in any implementation that
+		 * uses shaders.
+		 */
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING,
+			      (GLint *) &old_buf);
+		glGenBuffers(1, &buf);
+		glBindBuffer(GL_ARRAY_BUFFER, buf);
+		glBufferData(GL_ARRAY_BUFFER,
+			     (sizeof(GLfloat) * 4 * 4)
+			     + (sizeof(GLfloat) * 4 * 2),
+			     NULL,
+			     GL_STATIC_DRAW);
+
 		if (verts) {
+			glBufferSubData(GL_ARRAY_BUFFER,
+					0,
+					sizeof(GLfloat) * 4 * 4,
+					verts);
 			glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT,
-					      GL_FALSE, 0, verts);
+					      GL_FALSE, 0,
+					      BUFFER_OFFSET(0));
 			glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
 		}
 
 		if (tex) {
+			glBufferSubData(GL_ARRAY_BUFFER,
+					sizeof(GLfloat) * 4 * 4,
+					sizeof(GLfloat) * 4 * 2,
+					tex);
 			glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT,
-					      GL_FALSE, 0, tex);
+					      GL_FALSE, 0,
+					      BUFFER_OFFSET(sizeof(GLfloat) * 4 * 4));
 			glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
 		}
 
@@ -670,6 +714,14 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 			glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
 		if (tex)
 			glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+
+		glBindBuffer(GL_ARRAY_BUFFER, old_buf);
+		glDeleteBuffers(1, &buf);
+
+		if (vao != 0) {
+			glBindVertexArray(old_vao);
+			glDeleteVertexArrays(1, &vao);
+		}
 	}
 #endif
 }
