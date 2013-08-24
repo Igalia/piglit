@@ -24,7 +24,7 @@ GLSL >= 1.50
 
 uniform float ref;
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 struct Foo
 {
 	mat4 a;
@@ -39,7 +39,7 @@ out Foo foo;
 
 void main()
 {
-	gl_Position = vertex;
+	gl_Position = piglit_vertex;
 
 	foo.a = mat4(ref,        ref +  1.0, ref +  2.0, ref +  3.0,
 		     ref +  4.0, ref +  5.0, ref +  6.0, ref +  7.0,
@@ -108,14 +108,7 @@ void main()
 		color = vec4(0.0, 1.0, 0.0, 1.0);
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform float ref 137.035999074
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0

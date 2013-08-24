@@ -22,15 +22,8 @@ void main()
 	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
-[vertex data]
-piglit_vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 clear color 0 0 0 0
 clear
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgb 0.0 0.0 0.0

@@ -2,7 +2,7 @@
 GLSL >= 1.50
 
 [vertex shader]
-in vec4 vertex;
+in vec4 piglit_vertex;
 
 uniform ublk {
     uniform vec4 color;
@@ -19,7 +19,7 @@ void vs4_set_a();
 
 void main()
 {
-    gl_Position = vertex;
+    gl_Position = piglit_vertex;
     r.r = c.color.r;
     vs2_set_gb();
     vs3_set_b();
@@ -124,35 +124,28 @@ void main()
     gl_FragColor.a = a;
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform vec4 ublk.color 1.0 0.0 0.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 1.0 0.0 0.0 0.0
 
 uniform vec4 ublk.color 0.0 1.0 0.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 0.0
 
 uniform vec4 ublk.color 0.0 0.0 1.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 0.0 1.0 0.0
 
 uniform vec4 ublk.color 0.0 0.0 0.0 1.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 0.0 0.0 1.0
 
 uniform vec4 ublk.color 1.0 0.0 1.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 1.0 0.0 1.0 0.0
 
 uniform vec4 ublk.color 0.0 1.0 0.0 1.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 1.0
 
