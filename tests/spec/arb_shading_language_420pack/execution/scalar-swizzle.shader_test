@@ -17,13 +17,7 @@
 GLSL >= 1.30
 GL_ARB_shading_language_420pack
 
-[vertex shader]
-attribute vec4 vertex;
-
-void main()
-{
-    gl_Position = vertex;
-}
+[vertex shader passthrough]
 
 [fragment shader]
 #extension GL_ARB_shading_language_420pack: enable
@@ -35,7 +29,7 @@ void main() {
 }
 
 [vertex data]
-vertex/float/2
+piglit_vertex/float/2
 -1.0 -1.0
  1.0 -1.0
  1.0  1.0
