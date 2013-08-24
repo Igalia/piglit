@@ -603,42 +603,74 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
 void
 piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 {
-#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL)
-	if (verts) {
-		glVertexPointer(4, GL_FLOAT, 0, verts);
-		glEnableClientState(GL_VERTEX_ARRAY);
-	}
-
-	if (tex) {
-		glTexCoordPointer(2, GL_FLOAT, 0, tex);
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	if (verts)
-		glDisableClientState(GL_VERTEX_ARRAY);
-	if (tex)
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-#elif defined(PIGLIT_USE_OPENGL_ES2) ||defined(PIGLIT_USE_OPENGL_ES3)
-	if (verts) {
-		glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT, GL_FALSE, 0, verts);
-		glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
-	}
-
-	if (tex) {
-		glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT, GL_FALSE, 0, tex);
-		glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
-	}
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	if (verts)
-		glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
-	if (tex)
-		glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+#if defined(PIGLIT_USE_OPENGL_ES1)
+	const bool use_fixed_function_attributes = true;
+#elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
+	const bool use_fixed_function_attributes = false;
+#elif defined(PIGLIT_USE_OPENGL)
+	bool use_fixed_function_attributes = true;
 #else
-#	error "don't know how to draw arrays"
+#error "don't know how to draw arrays"
+#endif
+
+#if defined(PIGLIT_USE_OPENGL)
+	if (piglit_get_gl_version() >= 20
+	    || piglit_is_extension_supported("GL_ARB_shader_objects")) {
+		GLuint prog;
+
+		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
+
+		/* If there is a current program and that program has an
+		 * active attribute named piglit_vertex, don't use the fixed
+		 * function inputs.
+		 */
+		use_fixed_function_attributes = prog == 0
+			|| glGetAttribLocation(prog, "piglit_vertex") == -1;
+	}
+#endif
+
+#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL)
+	if (use_fixed_function_attributes) {
+		if (verts) {
+			glVertexPointer(4, GL_FLOAT, 0, verts);
+			glEnableClientState(GL_VERTEX_ARRAY);
+		}
+
+		if (tex) {
+			glTexCoordPointer(2, GL_FLOAT, 0, tex);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		}
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		if (verts)
+			glDisableClientState(GL_VERTEX_ARRAY);
+		if (tex)
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
+#endif
+#if defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3) \
+	|| defined(PIGLIT_USE_OPENGL)
+	if (!use_fixed_function_attributes) {
+		if (verts) {
+			glVertexAttribPointer(PIGLIT_ATTRIB_POS, 4, GL_FLOAT,
+					      GL_FALSE, 0, verts);
+			glEnableVertexAttribArray(PIGLIT_ATTRIB_POS);
+		}
+
+		if (tex) {
+			glVertexAttribPointer(PIGLIT_ATTRIB_TEX, 2, GL_FLOAT,
+					      GL_FALSE, 0, tex);
+			glEnableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+		}
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		if (verts)
+			glDisableVertexAttribArray(PIGLIT_ATTRIB_POS);
+		if (tex)
+			glDisableVertexAttribArray(PIGLIT_ATTRIB_TEX);
+	}
 #endif
 }
 
