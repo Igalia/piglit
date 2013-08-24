@@ -9,7 +9,7 @@ out vec2 texcoords;
 void main()
 {
 	gl_Position = piglit_vertex;
-	texcoords = texcoords = (piglit_vertex.xy + 1.0) / 2.0;
+	texcoords = (piglit_vertex.xy + 1.0) / 2.0;
 }
 
 [fragment shader]
