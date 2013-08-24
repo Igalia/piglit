@@ -85,13 +85,6 @@ void main()
 	gl_FragColor = v;
 }
 
-[vertex data]
-piglit_vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform vec2 s[0].arr[0].v2 0.99 0.99
 uniform mat2 s[0].arr[0].m22[0] 0.03 0.04 0.05 0.06
@@ -111,5 +104,5 @@ uniform mat2 s[1].arr[1].m22[1] 0.67 0.68 0.69 0.70
 uniform vec3 s[1].v3 0.71 0.72 0.73
 uniform int s[1].b 2
 
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 0.0

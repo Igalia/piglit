@@ -9,12 +9,12 @@ uniform ubo1 {
 	vec4 color2;
 };
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 v;
 
 void main()
 {
-	gl_Position = vertex;
+	gl_Position = piglit_vertex;
 	v = color1 + color2;
 }
 
@@ -28,15 +28,8 @@ void main()
 	gl_FragColor = v;
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform vec4 color1 0.5 0.0 0.0 0.0
 uniform vec4 color2 0.0 0.75 0.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.5 0.75 0.0 0.0

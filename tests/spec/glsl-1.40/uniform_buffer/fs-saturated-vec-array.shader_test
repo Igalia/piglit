@@ -19,16 +19,9 @@ void main()
 	gl_FragColor = 0.25 + 0.5 * clamp(color[i], 0.0, 1.0);
 }
 
-[vertex data]
-piglit_vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform int i 1
 uniform vec4 color[0] 0.5 0.5 0.5 0.5
 uniform vec4 color[1] -1 0 1 2
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.25 0.25 0.75 0.75

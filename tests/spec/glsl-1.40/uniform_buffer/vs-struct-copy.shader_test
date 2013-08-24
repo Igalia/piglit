@@ -10,12 +10,12 @@ uniform ubo1 {
 	} colors;
 };
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec4 v;
 
 void main()
 {
-	gl_Position = vertex;
+	gl_Position = piglit_vertex;
 
 	S temp = colors;
 	temp.c = vec4(0.0); /* try, but fail, to prevent copy prop */
@@ -32,17 +32,10 @@ void main()
 	gl_FragColor = v;
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform vec4 colors.a 0.0 0.0 0.0 0.0
 uniform vec4 colors.b 0.0 1.0 0.0 0.0
 uniform vec4 colors.c 1.0 0.0 0.0 0.0
 uniform vec4 colors.d 0.0 0.0 0.0 0.0
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 probe all rgba 0.0 1.0 0.0 0.0

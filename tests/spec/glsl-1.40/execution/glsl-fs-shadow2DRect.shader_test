@@ -4,12 +4,12 @@ GLSL >= 1.40
 [vertex shader]
 #version 140
 
-in vec4 vertex;
+in vec4 piglit_vertex;
 out vec2 texcoords;
 void main()
 {
-	gl_Position = vertex;
-	texcoords = texcoords = (vertex.xy + 1.0) / 2.0;
+	gl_Position = piglit_vertex;
+	texcoords = texcoords = (piglit_vertex.xy + 1.0) / 2.0;
 }
 
 [fragment shader]
@@ -22,17 +22,10 @@ void main()
 	gl_FragColor = vec4(shadow2DRect(tex, texcoords.xyy * vec3(31.0, 31.0, 1.0)).xxx, 1.0);
 }
 
-[vertex data]
-vertex/float/2
--1.0 -1.0
- 1.0 -1.0
- 1.0  1.0
--1.0  1.0
-
 [test]
 uniform int tex 0
 texture shadowRect 0 (32, 32)
-draw arrays GL_TRIANGLE_FAN 0 4
+draw rect -1 -1 2 2
 relative probe rgba (0.0, 0.1) (1.0, 1.0, 1.0, 1.0)
 relative probe rgba (0.0, 1.0) (1.0, 1.0, 1.0, 1.0)
 relative probe rgba (0.9, 1.0) (1.0, 1.0, 1.0, 1.0)
