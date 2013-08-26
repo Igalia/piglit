@@ -41,7 +41,7 @@ char *required_glsl_version_string = NULL;
 
 
 static const char *const uniform_template =
-	"uniform float f[%s >= %d ? 1 : -1];\n"
+	"uniform float f[%s %s %d ? 1 : -1];\n"
 	;
 
 static const char *const vertex_shader_body =
@@ -133,6 +133,7 @@ parse_file(const char *filename)
 	 * major.minor
 	 * gl_MaxFoo 8
 	 * gl_MaxBar 16
+	 * gl_MinAsdf -2
 	 */
 
 	/* Process the version requirement.
@@ -156,7 +157,8 @@ parse_file(const char *filename)
 
 		line = (char *) eat_whitespace(line);
 
-		if (string_match("gl_Max", line) != 0) {
+		if (string_match("gl_Max", line) != 0
+		    && string_match("gl_Min", line) != 0) {
 			char bad_name[80];
 
 			strcpy_to_space(bad_name, line);
@@ -273,13 +275,15 @@ piglit_init(int argc, char **argv)
 
 	for (i = 0; i < num_tests; i++) {
 		bool subtest_pass = true;
+		const char *comparitor =
+			string_match("gl_Min", tests[i].name) ? "<=" : ">=";
 
 		/* Generate the uniform declaration for the test.  This will
 		 * be shared by all shader stages.
 		 */
 		snprintf(uniform, sizeof(uniform),
 			 uniform_template,
-			 tests[i].name, tests[i].minimum);
+			 tests[i].name, comparitor, tests[i].minimum);
 
 		/* Try to compile the vertex shader.
 		 */
