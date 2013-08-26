@@ -832,6 +832,7 @@ add_recursion_test(rec, 'indirect-separate')
 add_recursion_test(rec, 'indirect-complex')
 add_recursion_test(rec, 'indirect-complex-separate')
 
+spec['glsl-1.20']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.20/minimum-maximums.txt')
 spec['glsl-1.20']['api'] = Group()
 add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 
