@@ -572,12 +572,6 @@ PIGLIT_GL_TEST_CONFIG_END
 
 extern int piglit_automatic;
 
-static float srgb_to_linear(float x)
-{
-	return x <= 0.04045 ? x / 12.92 :
-			      pow((x + 0.055)/1.055, 2.4);
-}
-
 static int get_int_format_bits(const struct format_desc *format)
 {
 	int maxbits = MAX2(format->red,
@@ -707,7 +701,7 @@ static void sample_nearest(int x, int y, int z,
 
 	if (format->srgb) {
 		for (i = 0; i < 3; i++) {
-			result[i] = srgb_to_linear(result[i]);
+			result[i] = piglit_srgb_to_linear(result[i]);
 		}
 	}
 

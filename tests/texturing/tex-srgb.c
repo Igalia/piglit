@@ -61,7 +61,7 @@ nonlinear_to_linear(GLubyte cs8)
 				table[i] = cs / 12.92;
 			}
 			else {
-				table[i] = pow((cs + 0.055) / 1.055, 2.4);
+				table[i] = piglit_srgb_to_linear(cs);
 			}
 		}
 		tableReady = GL_TRUE;

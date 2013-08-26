@@ -94,7 +94,7 @@ piglit_display(void)
 	int i;
 
 	for (i = 0; i < 3; i++) {
-		decoded_tex_data[i] = pow((tex_data[i] + 0.055) / 1.055, 2.4);
+		decoded_tex_data[i] = piglit_srgb_to_linear(tex_data[i]);
 	}
 	decoded_tex_data[3] = tex_data[3];
 
