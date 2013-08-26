@@ -39,6 +39,22 @@ unsigned num_tests = 0;
 int required_glsl_version = 0;
 char *required_glsl_version_string = NULL;
 
+/**
+ * List of extensions required by the current test set.
+ */
+char *required_extensions[32];
+unsigned num_required_extensions = 0;
+
+/**
+ * Array of extension enables for the shader code
+ *
+ * For each used entry in \c required_extensions, there is text in
+ * this string of the form "#extension ...: require\n".
+ */
+#define MAX_EXTENSION_ENABLE_LINE_LEN 80
+char extension_enables[ARRAY_SIZE(required_extensions)
+		       * MAX_EXTENSION_ENABLE_LINE_LEN];
+unsigned extension_enables_len = 0;
 
 static const char *const uniform_template =
 	"uniform float f[%s %s %d ? 1 : -1];\n"
@@ -131,6 +147,7 @@ parse_file(const char *filename)
 	/* The format of the test file is:
 	 *
 	 * major.minor
+	 * GL_ARB_some_extension
 	 * gl_MaxFoo 8
 	 * gl_MaxBar 16
 	 * gl_MinAsdf -2
@@ -151,6 +168,32 @@ parse_file(const char *filename)
 	line = strchrnul(line, '\n');
 	if (line[0] != '\0')
 		line++;
+
+	/* Process the list of required extensions.
+	 */
+	while (strncmp("GL_", line, 3) == 0) {
+		char *end_of_line = strchrnul(line, '\n');
+		const ptrdiff_t len = end_of_line - line;
+
+		assert(end_of_line[0] == '\n' || end_of_line[0] == '\0');
+
+		if (num_required_extensions >= ARRAY_SIZE(required_extensions)) {
+			fprintf(stderr, "Too many required extensions!\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		/* Copy the new extension to the list.
+		 */
+		required_extensions[num_required_extensions] =
+			strndup(line, len);
+		num_required_extensions++;
+
+		/* Advance to the next input line.
+		 */
+		line = end_of_line;
+		if (line[0] == '\n')
+			line++;
+	}
 
 	while (line[0] != '\0') {
 		char *endptr;
@@ -254,16 +297,53 @@ piglit_init(int argc, char **argv)
 	if (glsl_version < required_glsl_version)
 		piglit_report_result(PIGLIT_SKIP);
 
+	/* Process the list of required extensions.  While doing this,
+	 * generate the GLSL code that will enable those extensions in the
+	 * shaders.
+	 */
+	for (i = 0; i < num_required_extensions; i++) {
+		int len;
+
+		if (!piglit_is_extension_supported(required_extensions[i])) {
+			printf("%s not supported\n", required_extensions[i]);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+
+		if ((extension_enables_len + MAX_EXTENSION_ENABLE_LINE_LEN)
+		    >= sizeof(extension_enables)) {
+			printf("Extension enables too long.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		len = snprintf(&extension_enables[extension_enables_len],
+			       MAX_EXTENSION_ENABLE_LINE_LEN,
+			       "#extension %s: require\n",
+			       required_extensions[i]);
+
+		/* After the last use of the extension string, free it.
+		 */
+		free(required_extensions[i]);
+
+		if (len <= 0) {
+			printf("Extension enable snprintf failed.\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		extension_enables_len += len;
+	}
+
 	/* Generate the version declaration that will be used by all of the
 	 * shaders in the test run.
 	 */
 	asprintf(&version_string,
 		 "#version %d %s\n"
+		 "%s"
 		 "#ifdef GL_ES\n"
 		 "precision mediump float;\n"
 		 "#endif\n",
 		 required_glsl_version,
-		 required_glsl_version == 300 ? "es" : "");
+		 required_glsl_version == 300 ? "es" : "",
+		 extension_enables);
 
 	/* Create the shaders that will be used for the real part of the test.
 	 */
