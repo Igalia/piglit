@@ -1,0 +1,20 @@
+3.30
+gl_MaxVertexAttribs 16
+gl_MaxVertexUniformComponents 1024
+gl_MaxVaryingFloats 60
+gl_MaxVaryingComponents 60
+gl_MaxVertexOutputComponents 64
+gl_MaxGeometryInputComponents 64
+gl_MaxGeometryOutputComponents 128
+gl_MaxFragmentInputComponents 128
+gl_MaxVertexTextureImageUnits 16
+gl_MaxCombinedTextureImageUnits 48
+gl_MaxTextureImageUnits 16
+gl_MaxFragmentUniformComponents 1024
+gl_MaxDrawBuffers 8
+gl_MaxClipDistances 8
+gl_MaxGeometryTextureImageUnits 16
+gl_MaxGeometryOutputVertices 256
+gl_MaxGeometryTotalOutputComponents 1024
+gl_MaxGeometryUniformComponents 1024
+gl_MaxGeometryVaryingComponents 64

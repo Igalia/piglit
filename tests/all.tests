@@ -941,6 +941,10 @@ for draw in ['', 'indexed']:
         add_concurrent_test(spec['glsl-1.50'],
                             ('arb_geometry_shader4-ignore-adjacent-vertices '
                              'core {0} {1}').format(draw, prim))
+spec['glsl-1.50']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.50/minimum-maximums.txt')
+
+spec['glsl-3.30'] = Group()
+spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
 
 # max_vertices of 32 and 128 are important transition points for
 # mesa/i965 (they are the number of bits in a float and a vec4,
