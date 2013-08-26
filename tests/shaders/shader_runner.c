@@ -35,6 +35,7 @@
 #include "piglit-vbo.h"
 
 #include "shader_runner_gles_workarounds.h"
+#include "parser_utils.h"
 
 static void
 get_required_versions(const char *script_name,
@@ -185,12 +186,6 @@ version_string(struct component_version *v)
 	return v->_string;
 }
 
-static GLboolean
-string_match(const char *string, const char *line)
-{
-	return (strncmp(string, line, strlen(string)) == 0);
-}
-
 
 const char *
 target_to_short_name(GLenum target)
@@ -324,46 +319,6 @@ compile_and_bind_program(GLenum target, const char *start, int len)
 	link_ok = true;
 	prog_in_use = true;
 }
-
-/**
- * Copy a string until either whitespace or the end of the string
- */
-const char *
-strcpy_to_space(char *dst, const char *src)
-{
-	while (!isspace((int) *src) && (*src != '\0'))
-		*(dst++) = *(src++);
-
-	*dst = '\0';
-	return src;
-}
-
-
-/**
- * Skip over whitespace upto the end of line
- */
-const char *
-eat_whitespace(const char *src)
-{
-	while (isspace((int) *src) && (*src != '\n'))
-		src++;
-
-	return src;
-}
-
-
-/**
- * Skip over non-whitespace upto the end of line
- */
-const char *
-eat_text(const char *src)
-{
-	while (!isspace((int) *src) && (*src != '\0'))
-		src++;
-
-	return src;
-}
-
 
 /**
  * Compare two values given a specified comparison operator
