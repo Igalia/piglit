@@ -1,0 +1,13 @@
+1.10
+gl_MaxClipPlanes 6
+gl_MaxCombinedTextureImageUnits 2
+gl_MaxDrawBuffers 1
+gl_MaxFragmentUniformComponents 64
+gl_MaxLights 8
+gl_MaxTextureCoords 2
+gl_MaxTextureImageUnits 2
+gl_MaxTextureUnits 2
+gl_MaxVaryingFloats 32
+gl_MaxVertexAttribs 16
+gl_MaxVertexTextureImageUnits 0
+gl_MaxVertexUniformComponents 512

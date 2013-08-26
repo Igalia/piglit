@@ -794,6 +794,7 @@ for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
         cmdline = 'simple {0} {1}'.format(type, arrayspec)
         spec['glsl-1.10']['execution']['varying-packing'][cmdline] = \
             concurrent_test('varying-packing-' + cmdline)
+spec['glsl-1.10']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.10/minimum-maximums.txt')
 
 spec['glsl-1.10']['api'] = Group()
 add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
