@@ -38,6 +38,7 @@ profile.tests['Program'] = program
 
 # Custom
 add_plain_test(custom, 'Run simple kernel', ['cl-custom-run-simple-kernel'])
+add_plain_test(custom, 'Flush after enqueue kernel', ['cl-custom-flush-after-enqueue-kernel'])
 
 # API
 #  Platform
