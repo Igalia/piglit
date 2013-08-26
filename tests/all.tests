@@ -891,6 +891,7 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawarrays')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-execution-ordering')
 
+spec['glsl-1.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.30/minimum-maximums.txt')
 spec['glsl-1.30']['api'] = Group()
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
