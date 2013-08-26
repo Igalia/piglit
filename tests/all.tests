@@ -767,6 +767,7 @@ spec['glsl-es-1.00']['execution'] = Group()
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
 			 os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
 			 recursive=True)
+spec['glsl-es-1.00']['built-in constants'] = concurrent_test('built-in-constants_gles2 tests/spec/glsl-es-1.00/minimum-maximums.txt')
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = Group()
