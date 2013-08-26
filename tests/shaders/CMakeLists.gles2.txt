@@ -2,6 +2,7 @@ link_libraries(
 	piglitutil_${piglit_target_api}
 )
 
+piglit_add_executable (built-in-constants_${piglit_target_api} built-in-constants.c parser_utils.c)
 piglit_add_executable(shader_runner_gles2 shader_runner.c parser_utils.c)
 
 # vim: ft=cmake:
