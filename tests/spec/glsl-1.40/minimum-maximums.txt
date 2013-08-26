@@ -1,0 +1,11 @@
+1.40
+gl_MaxClipDistances 8
+gl_MaxCombinedTextureImageUnits 16
+gl_MaxDrawBuffers 8
+gl_MaxFragmentUniformComponents 1024
+gl_MaxTextureImageUnits 16
+gl_MaxVaryingComponents 64
+gl_MaxVaryingFloats 64
+gl_MaxVertexAttribs 16
+gl_MaxVertexTextureImageUnits 16
+gl_MaxVertexUniformComponents 1024
