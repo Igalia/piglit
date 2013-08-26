@@ -53,20 +53,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-
-static GLfloat
-linear_to_nonlinear(float x)
-{
-	if (x >= 1.0f)
-		return 255.0f;
-	else if (x >= 0.0031308f)
-		return 255.0f * (1.055f * powf(x, 0.41666666f) - 0.055f);
-	else if (x > 0.0f)
-		return 255.0f * (12.92f * x);
-	else
-		return 0.0f;
-}
-
 static enum piglit_result test_format(void)
 {
 	GLboolean pass = GL_TRUE;
@@ -144,10 +130,10 @@ static enum piglit_result test_format(void)
 	glReadPixels(0, 0, 16, 16, GL_RGBA, GL_FLOAT, &readf[0][0]);
 
 	for (i = 0; i < 256; i++) {
-		float err = fabs(linear_to_nonlinear(readf[i][0]) - (float)i);
+		float err = fabs(piglit_linear_to_srgb(readf[i][0]) - (float)i);
 		if (0)
 			printf("readback: %f observed: %f expected: %f\n", readf[i][0],
-				linear_to_nonlinear(readf[i][0]), (float)i);
+				piglit_linear_to_srgb(readf[i][0]), (float)i);
 		if (err > maxErr) {
 			maxErr = err;
 		}

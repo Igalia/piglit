@@ -125,22 +125,6 @@ framebuffer_srgb_api_ext(void)
 	return pass;
 }
 
-static GLfloat
-linear_to_nonlinear(GLfloat cl)
-{
-   /* can't have values outside [0, 1] */
-   GLfloat cs;
-
-   if (cl < 0.0031308f) {
-      cs = 12.92f * cl;
-   }
-   else {
-      cs = (GLfloat)(1.055 * pow(cl, 0.41666) - 0.055);
-   }
-   
-   return cs;
-}
-
 /**
  * Common code for framebuffer and FBO tests.
  */
@@ -202,7 +186,7 @@ test_srgb(void)
 	 */
 	memcpy(expected_green, green, sizeof(float) * 4);
 	if (srgb_capable)
-		expected_green[1] = linear_to_nonlinear(green[1]);
+		expected_green[1] = piglit_linear_to_srgb(green[1]);
 	if (!piglit_probe_rect_rgb(20, 0, 20, 20, expected_green))
 		pass = GL_FALSE;
 	/* check it doesn't affect the pixel path */
@@ -216,7 +200,7 @@ test_srgb(void)
 	 */
 	memcpy(expected_blend, green, sizeof(float) * 4);
 	if (srgb_capable)
-		expected_blend[1] = linear_to_nonlinear(green[1] * 2.0);
+		expected_blend[1] = piglit_linear_to_srgb(green[1] * 2.0);
 	else
 		expected_blend[1] = green[1] * 2.0;
 	if (!piglit_probe_rect_rgb(40, 0, 20, 20, expected_blend))
