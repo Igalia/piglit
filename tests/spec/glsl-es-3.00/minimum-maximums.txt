@@ -1,0 +1,12 @@
+3.00
+gl_MaxVertexAttribs 16
+gl_MaxVertexUniformVectors 256
+gl_MaxVertexOutputVectors 16
+gl_MaxFragmentInputVectors 15
+gl_MaxVertexTextureImageUnits 16
+gl_MaxCombinedTextureImageUnits 32
+gl_MaxTextureImageUnits 16
+gl_MaxFragmentUniformVectors 224
+gl_MaxDrawBuffers 4
+gl_MinProgramTexelOffset -8
+gl_MaxProgramTexelOffset 7

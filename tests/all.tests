@@ -981,6 +981,7 @@ add_shader_test_dir(spec['glsl-es-3.00'],
 		    os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
 		    recursive=True)
 add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_gles3')
+spec['glsl-es-3.00']['built-in constants'] = concurrent_test('built-in-constants_gles3 tests/spec/glsl-es-3.00/minimum-maximums.txt')
 
 # AMD_performance_monitor
 profile.test_list['spec/AMD_performance_monitor/api'] = PlainExecTest('amd_performance_monitor_api -auto')
