@@ -751,6 +751,7 @@ spec['!OpenGL 3.2/get-integer-64v'] = concurrent_test('gl-3.2-get-integer-64v')
 spec['!OpenGL 3.2/layered-rendering/blit'] = concurrent_test('gl-3.2-layered-rendering-blit')
 spec['!OpenGL 3.2/layered-rendering/clear-color'] = concurrent_test('gl-3.2-layered-rendering-clear-color')
 spec['!OpenGL 3.2/layered-rendering/framebuffertexture-buffer-textures'] = concurrent_test('gl-3.2-layered-rendering-framebuffertexture-buffer-textures')
+spec['!OpenGL 3.2/layered-rendering/readpixels'] = concurrent_test('gl-3.2-layered-rendering-readpixels')
 
 spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
 spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 33')
