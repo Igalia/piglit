@@ -56,6 +56,15 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+const char passthrough_vertex_shader_source[] =
+	"#if __VERSION__ >= 130\n"
+	"in vec4 piglit_vertex;\n"
+	"#else\n"
+	"attribute vec4 piglit_vertex;\n"
+	"#endif\n"
+	"void main() { gl_Position = piglit_vertex; }\n"
+	;
+
 struct component_version {
 	enum version_tag {
 		VERSION_GL,
@@ -106,6 +115,7 @@ enum states {
 	requirements,
 	vertex_shader,
 	vertex_shader_file,
+	vertex_shader_passthrough,
 	vertex_program,
 	geometry_shader,
 	geometry_shader_file,
@@ -642,6 +652,10 @@ leave_state(enum states state, const char *line)
 		compile_glsl(GL_VERTEX_SHADER, false);
 		break;
 
+	case vertex_shader_passthrough:
+		compile_glsl(GL_VERTEX_SHADER, false);
+		break;
+
 	case vertex_shader_file:
 		compile_glsl(GL_VERTEX_SHADER, true);
 		break;
@@ -809,6 +823,11 @@ process_test_script(const char *script_name)
 			} else if (string_match("[vertex program]", line)) {
 				state = vertex_program;
 				shader_string = NULL;
+			} else if (string_match("[vertex shader passthrough]", line)) {
+				state = vertex_shader_passthrough;
+				shader_string =
+					(char *) passthrough_vertex_shader_source;
+				shader_string_size = strlen(shader_string);
 			} else if (string_match("[vertex shader file]", line)) {
 				state = vertex_shader_file;
 				shader_string = NULL;
@@ -842,6 +861,7 @@ process_test_script(const char *script_name)
 		} else {
 			switch (state) {
 			case none:
+			case vertex_shader_passthrough:
 				break;
 
 			case requirements:
