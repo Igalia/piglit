@@ -11,5 +11,6 @@ ${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (glsl-1.50-geometry-end-primitive end-primitive.c)
+piglit_add_executable (glsl-1.50-geometry-primitive-id-restart primitive-id-restart.c)
 piglit_add_executable (glsl-1.50-geometry-primitive-types primitive-types.c)
 piglit_add_executable (glsl-1.50-gs-mismatch-prim-type gs-mismatch-prim-type.c)

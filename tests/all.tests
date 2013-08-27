@@ -968,6 +968,10 @@ for prim_type in ['GL_POINTS', 'GL_LINE_LOOP', 'GL_LINE_STRIP', 'GL_LINES',
     add_concurrent_test(spec['glsl-1.50'],
                         'glsl-1.50-geometry-primitive-types {0}'.format(
                             prim_type))
+    for restart_index in ['ffs', 'other']:
+        add_concurrent_test(spec['glsl-1.50'],
+                            'glsl-1.50-geometry-primitive-id-restart {0} {1}'.format(
+                                prim_type, restart_index))
 
 for layout_type in ['points', 'lines', 'lines_adjacency', 'triangles',
 			'triangles_adjacency']:
