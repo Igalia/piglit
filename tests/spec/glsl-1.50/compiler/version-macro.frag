@@ -4,4 +4,11 @@
 // [end config]
 
 #version 150
-int x[int(__VERSION__ == 150)];
+#if !defined __VERSION__
+#error __VERSION__ not defined.
+#endif
+#if __VERSION__ != 150
+#error __VERSION__ is not 150
+#endif
+
+void main() { }
