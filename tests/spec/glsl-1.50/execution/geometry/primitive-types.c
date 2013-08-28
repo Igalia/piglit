@@ -110,13 +110,13 @@ struct test_vector
 };
 
 static const struct test_vector points_tests[] = {
-	{ 0, 0, { } },
+	{ 0, 0, { 0 } },
 	{ 1, 1, { 1 } },
 	{ 2, 2, { 1, 2 } },
 };
 
 static const struct test_vector line_loop_tests[] = {
-	{ 1, 0, { } },
+	{ 1, 0, { 0 } },
 	{ 2, 2, { 1, 2,
 		  2, 1 } },
 	{ 3, 3, { 1, 2,
@@ -129,7 +129,7 @@ static const struct test_vector line_loop_tests[] = {
 };
 
 static const struct test_vector line_strip_tests[] = {
-	{ 1, 0, { } },
+	{ 1, 0, { 0 } },
 	{ 2, 1, { 1, 2 } },
 	{ 3, 2, { 1, 2,
 		  2, 3 } },
@@ -139,7 +139,7 @@ static const struct test_vector line_strip_tests[] = {
 };
 
 static const struct test_vector lines_tests[] = {
-	{ 1, 0, { } },
+	{ 1, 0, { 0 } },
 	{ 2, 1, { 1, 2 } },
 	{ 3, 1, { 1, 2 } },
 	{ 4, 2, { 1, 2,
@@ -147,7 +147,7 @@ static const struct test_vector lines_tests[] = {
 };
 
 static const struct test_vector triangles_tests[] = {
-	{ 2, 0, { } },
+	{ 2, 0, { 0 } },
 	{ 3, 1, { 1, 2, 3 } },
 	{ 5, 1, { 1, 2, 3 } },
 	{ 6, 2, { 1, 2, 3,
@@ -155,7 +155,7 @@ static const struct test_vector triangles_tests[] = {
 };
 
 static const struct test_vector triangle_strip_tests[] = {
-	{ 2, 0, { } },
+	{ 2, 0, { 0 } },
 	{ 3, 1, { 1, 2, 3 } },
 	{ 4, 2, { 1, 2, 3,
 		  3, 2, 4 } },
@@ -165,7 +165,7 @@ static const struct test_vector triangle_strip_tests[] = {
 };
 
 static const struct test_vector triangle_fan_tests[] = {
-	{ 2, 0, { } },
+	{ 2, 0, { 0 } },
 	{ 3, 1, { 1, 2, 3 } },
 	{ 4, 2, { 1, 2, 3,
 		  1, 3, 4 } },
@@ -175,7 +175,7 @@ static const struct test_vector triangle_fan_tests[] = {
 };
 
 static const struct test_vector lines_adjacency_tests[] = {
-	{ 3, 0, { } },
+	{ 3, 0, { 0 } },
 	{ 4, 1, { 1, 2, 3, 4 } },
 	{ 7, 1, { 1, 2, 3, 4 } },
 	{ 8, 2, { 1, 2, 3, 4,
@@ -183,7 +183,7 @@ static const struct test_vector lines_adjacency_tests[] = {
 };
 
 static const struct test_vector line_strip_adjacency_tests[] = {
-	{ 3, 0, { } },
+	{ 3, 0, { 0 } },
 	{ 4, 1, { 1, 2, 3, 4 } },
 	{ 5, 2, { 1, 2, 3, 4,
 		  2, 3, 4, 5 } },
@@ -193,7 +193,7 @@ static const struct test_vector line_strip_adjacency_tests[] = {
 };
 
 static const struct test_vector triangles_adjacency_tests[] = {
-	{ 5, 0, { } },
+	{ 5, 0, { 0 } },
 	{ 6, 1, { 1, 2, 3, 4, 5, 6 } },
 	{ 11, 1, { 1, 2, 3, 4, 5, 6 } },
 	{ 12, 2, { 1, 2, 3, 4, 5, 6,
@@ -249,7 +249,7 @@ static const struct test_vector triangles_adjacency_tests[] = {
  *      1     2     3     6     5     4
  */
 static const struct test_vector triangle_strip_adjacency_tests[] = {
-	{ 5, 0, { } },
+	{ 5, 0, { 0 } },
 	{ 6, 1, { 1, 2, 3, 6, 5, 4 } },
 	{ 7, 1, { 1, 2, 3, 6, 5, 4 } },
 	{ 8, 2, { 1, 2, 3, 7, 5, 4,
