@@ -1,0 +1,54 @@
+# Check that triangles delivered to the geometry shader using
+# GL_TRIANGLE_STRIP have the correct orientation.
+#
+# It works by rendering 4 triangles in a strip and using
+# gl_FrontFacing to check that they all have the same orientation.
+
+[require]
+GL >= 2.0
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 vertex;
+out vec4 vertex_to_gs;
+
+void main()
+{
+  vertex_to_gs = vertex;
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 vertex_to_gs[3];
+
+void main()
+{
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+void main()
+{
+  if (gl_FrontFacing)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  0.0
+ 1.0  0.0
+-1.0  1.0
+ 1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_STRIP 0 6
+probe all rgba 0.0 1.0 0.0 1.0

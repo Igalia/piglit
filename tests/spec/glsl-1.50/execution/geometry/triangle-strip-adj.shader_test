@@ -1,0 +1,112 @@
+# Check that triangles delivered to the geometry shader using
+# GL_TRIANGLE_STRIP_ADJACENCY have correct adjacency information.
+#
+# This test works by rendering 4 triangles with adjacency in a strip
+# and examining the relationship between the 6 vertices to each
+# geometry shader invocation.
+#
+# The layout of the vertices in space is chosen to match the drawing
+# in section 10.1.13 (Triangles with Adjacency) of the GL 4.4 spec,
+# namely (vertices count from 1 to match the diagram in the spec):
+#
+#     6  10
+#     |\ |\
+#     | \| \
+#  2--3--7--11
+#   \ |\ |\ |\
+#    \| \| \| \
+#     1--5--9--12
+#      \ |\ |
+#       \| \|
+#        4  8
+#
+# A given geometry shader invocation should see a pattern like this
+# (vertices count from 0 to match array indices in the geometry shader):
+#
+#  1--2--3
+#   \ |\ |
+#    \| \|
+#     0--4
+#      \ |
+#       \|
+#        5
+#
+# Therefore, the following mathematical relationships should be satisfied:
+#
+# v2 - v1 = v3 - v2 = v4 - v0
+# v0 - v1 = v4 - v2 = v5 - v0
+# v0 - v2 = v4 - v3 = v5 - v4
+
+[require]
+GL >= 2.0
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 vertex;
+out vec4 v;
+
+void main()
+{
+  v = vertex;
+}
+
+[geometry shader]
+layout(triangles_adjacency) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 v[6];
+flat out int pass_to_fs;
+
+void main()
+{
+  bool pass = true;
+  if (distance(v[2] - v[1], v[3] - v[2]) > 1e-5) pass = false;
+  if (distance(v[3] - v[2], v[4] - v[0]) > 1e-5) pass = false;
+  if (distance(v[0] - v[1], v[4] - v[2]) > 1e-5) pass = false;
+  if (distance(v[4] - v[2], v[5] - v[0]) > 1e-5) pass = false;
+  if (distance(v[0] - v[2], v[4] - v[3]) > 1e-5) pass = false;
+  if (distance(v[4] - v[3], v[5] - v[4]) > 1e-5) pass = false;
+
+  for (int i = 0; i < 3; i++) {
+    gl_Position = v[2*i];
+    pass_to_fs = int(pass);
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+flat in int pass_to_fs;
+
+void main()
+{
+  if (pass_to_fs != 0)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-0.5 -0.25 #1
+-1.0  0.25 #2
+-0.5  0.25 #3
+ 0.0 -0.75 #4
+ 0.0 -0.25 #5
+-0.5  0.75 #6
+ 0.0  0.25 #7
+ 0.5 -0.75 #8
+ 0.5 -0.25 #9
+ 0.0  0.75 #10
+ 0.5  0.25 #11
+ 1.0 -0.25 #12
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_STRIP_ADJACENCY 0 12
+
+# Probe inside each triangle
+relative probe rgba (0.33, 0.46) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.42, 0.54) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.58, 0.46) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.67, 0.54) (0.0, 1.0, 0.0, 1.0)

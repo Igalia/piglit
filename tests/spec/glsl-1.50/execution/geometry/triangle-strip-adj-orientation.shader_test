@@ -1,0 +1,90 @@
+# Check that triangles delivered to the geometry shader using
+# GL_TRIANGLE_STRIP_ADJACENCY have the correct orientation.
+#
+# This test works by rendering 4 triangles with adjacency in a strip
+# and using gl_FrontFacing to check that they all have the same
+# orientation.
+#
+# The layout of the vertices in space is chosen to match the drawing
+# in section 10.1.13 (Triangles with Adjacency) of the GL 4.4 spec,
+# namely:
+#
+#     6  10
+#     |\ |\
+#     | \| \
+#  2--3--7--11
+#   \ |\ |\ |\
+#    \| \| \| \
+#     1--5--9--12
+#      \ |\ |
+#       \| \|
+#        4  8
+#
+# Note that the only triangles drawn by this test are triangles 1-3-5,
+# 5-3-7, 5-7-9, and 9-7-11.  The other triangles shown in the diagram
+# are "adjacent triangles".
+#
+# Note also that triangles 1-3-5, 5-3-7, 5-7-9, and 9-7-11 are all
+# clockwise, so we expect gl_FrontFacing to be false.
+
+[require]
+GL >= 2.0
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 vertex;
+out vec4 vertex_to_gs;
+
+void main()
+{
+  vertex_to_gs = vertex;
+}
+
+[geometry shader]
+layout(triangles_adjacency) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 vertex_to_gs[6];
+
+void main()
+{
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[2*i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+void main()
+{
+  if (!gl_FrontFacing)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-0.5 -0.25 #1
+-1.0  0.25 #2
+-0.5  0.25 #3
+ 0.0 -0.75 #4
+ 0.0 -0.25 #5
+-0.5  0.75 #6
+ 0.0  0.25 #7
+ 0.5 -0.75 #8
+ 0.5 -0.25 #9
+ 0.0  0.75 #10
+ 0.5  0.25 #11
+ 1.0 -0.25 #12
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_STRIP_ADJACENCY 0 12
+
+# Probe inside each triangle
+relative probe rgba (0.33, 0.46) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.42, 0.54) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.58, 0.46) (0.0, 1.0, 0.0, 1.0)
+relative probe rgba (0.67, 0.54) (0.0, 1.0, 0.0, 1.0)
