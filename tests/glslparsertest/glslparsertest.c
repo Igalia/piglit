@@ -39,6 +39,7 @@ static unsigned parse_glsl_version_number(const char *str);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	argc = process_options(argc, argv);
 	if (argc > 3) {
 		const unsigned int int_version
 			= parse_glsl_version_number(argv[3]);
@@ -408,7 +409,6 @@ piglit_init(int argc, char**argv)
 	unsigned glsl_version = 0;
 	int i;
 
-	argc = process_options(argc, argv);
 	if (argc < 3)
 		usage(argv[0]);
 
