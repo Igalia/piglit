@@ -993,6 +993,12 @@ for layout_type in ['points', 'lines', 'lines_adjacency', 'triangles',
                         'glsl-1.50-gs-mismatch-prim-type {0}'.format(
                             layout_type))
 
+for prim_type in ['GL_TRIANGLE_STRIP', 'GL_TRIANGLE_STRIP_ADJACENCY']:
+    for restart_index in ['ffs', 'other']:
+        add_concurrent_test(spec['glsl-1.50'],
+                            'glsl-1.50-geometry-tri-strip-ordering-with-prim-restart {0} {1}'.format(
+                                prim_type, restart_index))
+
 spec['glsl-3.30'] = Group()
 import_glsl_parser_tests(spec['glsl-3.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
