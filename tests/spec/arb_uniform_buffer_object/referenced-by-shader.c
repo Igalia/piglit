@@ -1,5 +1,5 @@
 /*
- * Copyright © 2012 Intel Corporation
+ * Copyright © 2012, 2013 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,8 @@
 
 /** @file referenced-by-shader.c
  *
- * From the GL_ARB_uniform_buffer_object spec:
+ * From the GL_ARB_uniform_buffer_object spec and
+ * Section 2.11.4(Uniform Variables) of OpenGL 3.2 Core:
  *
  *     "If <pname> is UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER,
  *      UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER, or
@@ -39,10 +40,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
-
-	config.window_width = 10;
-	config.window_height = 10;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.supports_gl_core_version = 31;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -51,65 +49,121 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	unsigned int i;
-	GLuint vs, fs, prog;
+	GLuint vs, gs, fs, prog;
 	const char *vs_source =
-		"#extension GL_ARB_uniform_buffer_object : enable\n"
-		"uniform vs { float a; };\n"
-		"uniform vsfs { float c; };\n"
-		"uniform float dddd;\n"
+		"%s"
+		"uniform vs { float v; };\n"
+		"uniform vsgs { float vg; };\n"
+		"uniform vsfs { float vf; };\n"
+		"uniform vsgsfs { float vgf; };\n"
 		"void main() {\n"
-		"	gl_Position = gl_Vertex + vec4(a + c);\n"
+		"	gl_Position = vec4(v + vg + vf + vgf);\n"
 		"}\n";
+
+	const char *gs_source =
+		"%s"
+		"layout(triangles) in;\n"
+		"layout(triangle_strip, max_vertices=3) out;\n"
+		"uniform gs { float g; };\n"
+		"uniform vsgs { float vg; };\n"
+		"uniform gsfs { float gf; };\n"
+		"uniform vsgsfs { float vgf; };\n"
+		"void main() {\n"
+		"	for(int i = 0; i < 3; i++) {\n"
+		"		gl_Position = vec4(g + vg + gf + vgf);\n"
+		"		EmitVertex();\n"
+		"	}\n"
+		"}\n";
+
 	const char *fs_source =
-		"#extension GL_ARB_uniform_buffer_object : enable\n"
-		"uniform fs { float b; };\n"
-		"uniform vsfs { float c; };\n"
-		"uniform float dddd;\n"
+		"%s"
+		"uniform fs { float f; };\n"
+		"uniform vsfs { float vf; };\n"
+		"uniform gsfs { float gf; };\n"
+		"uniform vsgsfs { float vgf; };\n"
 		"void main() {\n"
-		"	gl_FragColor = vec4(b + c);\n"
+		"	gl_FragColor = vec4(f + vf + gf + vgf);\n"
 		"}\n";
+
 	char name[10];
+	bool use_gs = piglit_get_gl_version() >= 32;
+	const char *header;
+	char *temp_source;
+	int num_uniforms_used = 0;
 
-	piglit_require_extension("GL_ARB_uniform_buffer_object");
+	if (use_gs) {
+		header = "#version 150\n";
+	} else {
+		header = "#extension GL_ARB_uniform_buffer_object : enable\n";
+		piglit_require_extension("GL_ARB_uniform_buffer_object");
+	}
 
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fs_source);
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
-	prog = piglit_link_simple_program(vs, fs);
-	if (!prog) {
-		fprintf(stderr, "Failed to link shaders.\n");
+	prog = glCreateProgram();
+
+	asprintf(&temp_source, vs_source, header);
+	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, temp_source);
+	glAttachShader(prog, vs);
+	free(temp_source);
+
+	if (use_gs) {
+		asprintf(&temp_source, gs_source, header);
+		gs = piglit_compile_shader_text(GL_GEOMETRY_SHADER, temp_source);
+		glAttachShader(prog, gs);
+		free(temp_source);
+	}
+
+	asprintf(&temp_source, fs_source, header);
+	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, temp_source);
+	glAttachShader(prog, fs);
+	free(temp_source);
+
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	for (i = 0; i < 3; i++) {
-		GLint ref_vs, ref_fs;
+	if (use_gs) {
+		num_uniforms_used = 7;
+		printf("            v g f\n");
+	} else {
+		num_uniforms_used = 6;
+		printf("            v f\n");
+	}
+
+	for (i = 0; i < num_uniforms_used; i++) {
+		GLint ref_vs = 0, ref_gs = 0, ref_fs = 0;
+		bool block_fail = false;
 
 		glGetActiveUniformBlockName(prog, i, sizeof(name), NULL, name);
 
 		glGetActiveUniformBlockiv(prog, i,
 					  GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER,
 					  &ref_vs);
+		if (use_gs) {
+			glGetActiveUniformBlockiv(prog, i,
+						  GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER,
+						  &ref_gs);
+		}
 		glGetActiveUniformBlockiv(prog, i,
 					  GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER,
 					  &ref_fs);
 
-		printf("%10s: %d %d", name, ref_vs, ref_fs);
-
-		if (strcmp(name, "vs") == 0) {
-			if (!ref_vs || ref_fs) {
-				printf(" FAIL");
-				pass = false;
-			}
-		} else if (strcmp(name, "fs") == 0) {
-			if (ref_vs || !ref_fs) {
-				printf(" FAIL");
-				pass = false;
-			}
-		} else if (strcmp(name, "vsfs") == 0) {
-			if (!ref_vs || !ref_fs) {
-				printf(" FAIL");
-				pass = false;
-			}
+		if (use_gs) {
+			printf("%10s: %d %d %d", name, ref_vs, ref_gs, ref_fs);
 		} else {
+			printf("%10s: %d %d", name, ref_vs, ref_fs);
+		}
+
+		if ((strstr(name, "vs") != 0) != ref_vs)
+			block_fail = true;
+		if (use_gs) {
+			if ((strstr(name, "gs") != 0) != ref_gs)
+				block_fail = true;
+		}
+		if ((strstr(name, "fs") != 0) != ref_fs)
+			block_fail = true;
+
+		if (block_fail) {
 			printf(" FAIL");
 			pass = false;
 		}
