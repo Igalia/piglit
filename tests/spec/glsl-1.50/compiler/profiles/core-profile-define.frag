@@ -4,4 +4,11 @@
 // [end config]
 
 #version 150
-int x = GL_core_profile;
+#if !defined GL_core_profile
+#error GL_core_profile not defined.
+#endif
+#if GL_core_profile != 1
+#error GL_core_profile is not 1.
+#endif
+
+void main() { }
