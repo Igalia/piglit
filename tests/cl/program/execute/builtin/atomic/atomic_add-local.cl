@@ -34,6 +34,15 @@ local_size:  8 0 0
 arg_out: 0 buffer int[1] 28
 arg_in:  1 buffer int[1] NULL
 
+[test]
+name: threads
+kernel_name: threads_uint
+dimensions: 1
+global_size: 8 0 0
+local_size:  8 0 0
+arg_out: 0 buffer uint[1] 28
+arg_in:  1 buffer uint[1] NULL
+
 !*/
 
 #define SIMPLE_TEST(TYPE) \
