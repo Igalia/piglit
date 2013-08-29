@@ -946,6 +946,7 @@ for draw in ['', 'indexed']:
                             ('arb_geometry_shader4-ignore-adjacent-vertices '
                              'core {0} {1}').format(draw, prim))
 spec['glsl-1.50']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.50/minimum-maximums.txt')
+spec['glsl-1.50']['gs-emits-too-few-verts'] = concurrent_test('gs-emits-too-few-verts')
 
 spec['glsl-3.30'] = Group()
 spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
