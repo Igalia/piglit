@@ -66,6 +66,9 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	builtin_cl_relational_tests.list
 	generate-cl-relational-builtins.py)
+piglit_make_generated_tests(
+	interpolation-qualifier-built-in-variable.list
+	interpolation-qualifier-built-in-variable.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
@@ -81,4 +84,5 @@ add_custom_target(gen-tests ALL
 		non-lvalue_tests.list
 		texture_query_lod_tests.list
 		shader_bit_encoding_tests.list
-		uniform-initializer_tests.list)
+		uniform-initializer_tests.list
+		interpolation-qualifier-built-in-variable.list)
