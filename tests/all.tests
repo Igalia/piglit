@@ -950,6 +950,7 @@ for draw in ['', 'indexed']:
 spec['glsl-1.50']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.50/minimum-maximums.txt')
 spec['glsl-1.50']['gs-emits-too-few-verts'] = concurrent_test('glsl-1.50-gs-emits-too-few-verts')
 spec['glsl-1.50']['getshaderiv-may-return-GS'] = concurrent_test('glsl-1.50-getshaderiv-may-return-GS')
+spec['glsl-1.50']['query-gs-prim-types'] = concurrent_test('glsl-1.50-query-gs-prim-types')
 
 spec['glsl-3.30'] = Group()
 spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
