@@ -155,6 +155,10 @@ int piglit_probe_pixel_stencil(int x, int y, unsigned expected);
 int piglit_probe_rect_stencil(int x, int y, int w, int h, unsigned expected);
 int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h);
 
+bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
+			 unsigned n, unsigned num_components,
+			 const float *expected);
+
 int piglit_use_fragment_program(void);
 int piglit_use_vertex_program(void);
 void piglit_require_fragment_program(void);

@@ -706,6 +706,30 @@ int piglit_probe_texel_rgb(int target, int level, int x, int y,
 	return piglit_probe_texel_rect_rgb(target, level, x, y, 1, 1, expected);
 }
 
+bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
+		         unsigned n, unsigned num_components,
+			 const float *expected)
+{
+	float *ptr;
+	unsigned i;
+	bool status = true;
+
+	glBindBuffer(target, buf);
+	ptr = glMapBuffer(target, GL_READ_ONLY);
+
+	for (i = 0; i < n * num_components; i++) {
+		if (fabs(ptr[i] - expected[i % num_components]) > 0.01) {
+			printf("%s[%i]: %f, Expected: %f\n", label, i, ptr[i],
+				expected[i % num_components]);
+			status = false;
+		}
+	}
+
+	glUnmapBuffer(target);
+
+	return status;
+}
+
 int piglit_use_fragment_program(void)
 {
 	static const char source[] =
