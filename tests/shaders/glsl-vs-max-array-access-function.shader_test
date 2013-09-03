@@ -1,0 +1,33 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform float a[3];
+
+float func(float array[3])
+{
+	return array[2];
+}
+
+varying vec4 color;
+
+void main()
+{
+	gl_Position = gl_Vertex;
+	color = vec4(func(a), vec3(1.0));
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform float a[0] 0.25
+uniform float a[1] 0.5
+uniform float a[2] 0.75
+draw rect -1 -1 2 2
+probe all rgba 0.75 1.0 1.0 1.0
