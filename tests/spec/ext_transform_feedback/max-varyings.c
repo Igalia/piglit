@@ -260,10 +260,10 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for (row = 0; row < max_xfb_varyings; row++) {
-		pass = draw(vs, fs, row + 1, max_xfb_varyings) && pass;
+		pass = draw(vs, fs, row + 1, max_varyings) && pass;
 	}
 
-	for (row = 0; row < max_varyings; row++) {
+	for (row = 0; row < max_xfb_varyings; row++) {
 		for (col = 0; col < max_varyings - row; col++) {
 			GLboolean ok;
 			float green[3] = {0.0, 1.0, 0.0};
