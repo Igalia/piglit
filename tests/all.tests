@@ -2508,6 +2508,10 @@ arb_transform_feedback3['arb_transform_feedback3-draw_using_invalid_stream_index
 arb_transform_feedback3['arb_transform_feedback3-set_varyings_with_invalid_args'] = PlainExecTest(['arb_transform_feedback3-set_varyings_with_invalid_args', '-auto'])
 arb_transform_feedback3['arb_transform_feedback3-set_invalid_varyings'] = PlainExecTest(['arb_transform_feedback3-set_invalid_varyings', '-auto'])
 
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_vs'] = PlainExecTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'vs'])
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs'] = PlainExecTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs'])
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs_max'] = PlainExecTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs_max'])
+
 arb_uniform_buffer_object = Group()
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
 import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
