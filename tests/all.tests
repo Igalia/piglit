@@ -1273,6 +1273,7 @@ spec['ARB_separate_shader_objects'] = arb_separate_shader_objects
 arb_separate_shader_objects['GetProgramPipelineiv'] = concurrent_test('arb_separate_shader_object-GetProgramPipelineiv')
 arb_separate_shader_objects['IsProgramPipeline'] = concurrent_test('arb_separate_shader_object-IsProgramPipeline')
 arb_separate_shader_objects['UseProgramStages - non-separable program'] = concurrent_test('arb_separate_shader_object-UseProgramStages-non-separable')
+arb_separate_shader_objects['ProgramUniform coverage'] = concurrent_test('arb_separate_shader_object-ProgramUniform-coverage')
 arb_separate_shader_objects['ValidateProgramPipeline'] = concurrent_test('arb_separate_shader_object-ValidateProgramPipeline')
 
 # Group ARB_sampler_objects

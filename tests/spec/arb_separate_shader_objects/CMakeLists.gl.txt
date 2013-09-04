@@ -11,5 +11,6 @@ link_libraries (
 
 piglit_add_executable (arb_separate_shader_object-GetProgramPipelineiv GetProgramPipelineiv.c)
 piglit_add_executable (arb_separate_shader_object-IsProgramPipeline IsProgramPipeline.c)
+piglit_add_executable (arb_separate_shader_object-ProgramUniform-coverage ProgramUniform-coverage.c)
 piglit_add_executable (arb_separate_shader_object-UseProgramStages-non-separable UseProgramStages-non-separable.c)
 piglit_add_executable (arb_separate_shader_object-ValidateProgramPipeline ValidateProgramPipeline.c)
