@@ -38,6 +38,16 @@ GLint piglit_link_simple_program(GLint vs, GLint fs);
 GLint piglit_build_simple_program(const char *vs_source, const char *fs_source);
 GLuint piglit_build_simple_program_unlinked(const char *vs_source,
 					    const char *fs_source);
+GLint piglit_link_simple_program_multiple_shaders(GLint shader1, ...);
+GLint piglit_build_simple_program_unlinked_multiple_shaders_v(GLenum target1,
+							     const char*source1,
+							     va_list ap);
+GLint piglit_build_simple_program_unlinked_multiple_shaders(GLenum target1,
+							   const char *source1,
+							   ...);
+GLint piglit_build_simple_program_multiple_shaders(GLenum target1,
+						  const char *source1,
+						  ...);
 
 #if defined(PIGLIT_USE_OPENGL_ES1)
 #define glAttachShader assert(!"glAttachShader does not exist in ES1")

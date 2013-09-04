@@ -322,3 +322,136 @@ piglit_build_simple_program(const char *vs_source, const char *fs_source)
 
 	return prog;
 }
+
+GLint piglit_link_simple_program_multiple_shaders(GLint shader1, ...)
+{
+	va_list ap;
+	GLint prog, sh;
+
+	piglit_require_GLSL();
+
+	prog = glCreateProgram();
+
+	va_start(ap, shader1);
+	sh = shader1;
+
+	while (sh != 0) {
+		glAttachShader(prog, sh);
+		sh = va_arg(ap, GLint);
+	}
+
+	va_end(ap);
+
+	/* If the shaders reference piglit_vertex or piglit_tex, bind
+	 * them to some fixed attribute locations so they can be used
+	 * with piglit_draw_rect_tex() in GLES.
+	 */
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_vertex");
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_texcoord");
+
+	glLinkProgram(prog);
+
+	if (!piglit_link_check_status(prog)) {
+		glDeleteProgram(prog);
+		prog = 0;
+	}
+
+	return prog;
+}
+
+GLint
+piglit_build_simple_program_unlinked_multiple_shaders_v(GLenum target1,
+						        const char *source1,
+						        va_list ap)
+{
+	GLuint prog;
+	GLenum target;
+	const char *source;
+
+	piglit_require_GLSL();
+	prog = glCreateProgram();
+
+	source = source1;
+	target = target1;
+
+	while (target != 0) {
+		GLuint shader = piglit_compile_shader_text(target, source);
+
+		glAttachShader(prog, shader);
+		glDeleteShader(shader);
+
+		target  = va_arg(ap, GLenum);
+		if (target != 0)
+			source = va_arg(ap, char*);
+	}
+
+	return prog;
+}
+
+/**
+ * Builds and links a program from optional sources,  but does not link
+ * it. The last target must be 0. If there is a compile failure,
+ * the test is terminated.
+ *
+ * example:
+ * piglit_build_simple_program_unlinked_multiple_shaders(
+ *				GL_VERTEX_SHADER,   vs,
+ *				GL_GEOMETRY_SHADER, gs,
+ *				GL_FRAGMENT_SHADER, fs,
+ *				0);
+ */
+GLint
+piglit_build_simple_program_unlinked_multiple_shaders(GLenum target1,
+						      const char *source1,
+						      ...)
+{
+	GLuint prog;
+	va_list ap;
+
+	va_start(ap, source1);
+
+	prog = piglit_build_simple_program_unlinked_multiple_shaders_v(target1,
+								       source1,
+								       ap);
+	va_end(ap);
+
+	return prog;
+}
+
+/**
+ * Builds and links a program from optional sources, throwing
+ * PIGLIT_FAIL on error. The last target must be 0.
+ */
+GLint
+piglit_build_simple_program_multiple_shaders(GLenum target1,
+					    const char *source1,
+					    ...)
+{
+	va_list ap;
+	GLuint prog;
+
+	va_start(ap, source1);
+
+	prog = piglit_build_simple_program_unlinked_multiple_shaders_v(target1,
+								       source1,
+								       ap);
+
+	va_end(ap);
+
+	/* If the shaders reference piglit_vertex or piglit_tex, bind
+	 * them to some fixed attribute locations so they can be used
+	 * with piglit_draw_rect_tex() in GLES.
+	 */
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_POS, "piglit_vertex");
+	glBindAttribLocation(prog, PIGLIT_ATTRIB_TEX, "piglit_texcoord");
+
+	glLinkProgram(prog);
+
+	if (!piglit_link_check_status(prog)) {
+		glDeleteProgram(prog);
+		prog = 0;
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return prog;
+}
