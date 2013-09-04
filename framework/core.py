@@ -207,6 +207,15 @@ if 'PIGLIT_SOURCE_DIR' not in os.environ:
     os.environ['PIGLIT_SOURCE_DIR'] = p.abspath(p.join(p.dirname(__file__),
                                                        '..'))
 
+# In debug builds, Mesa will by default log GL API errors to stderr.
+# This is useful for application developers or driver developers
+# trying to debug applications that should execute correctly.  But for
+# piglit we expect to generate errors regularly as part of testing,
+# and for exhaustive error-generation tests (particularly some in
+# khronos's conformance suite), it can end up ooming your system
+# trying to parse the strings.
+if 'MESA_DEBUG' not in os.environ:
+    os.environ['MESA_DEBUG'] = 'silent'
 
 class TestResult(dict):
     pass
