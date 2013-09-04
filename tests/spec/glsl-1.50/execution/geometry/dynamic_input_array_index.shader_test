@@ -1,0 +1,71 @@
+# Verify that a geometry shader can access an input array using a
+# dynamic index rather than a constant index.
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+in ivec4 color;
+in ivec4 modulus;
+in int index;
+out vec4 vertex_to_gs;
+out ivec4 color_to_gs;
+out ivec4 modulus_to_gs;
+out int index_to_gs;
+
+void main()
+{
+  vertex_to_gs = vertex;
+  color_to_gs = color;
+  modulus_to_gs = modulus;
+  index_to_gs = index;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 vertex_to_gs[3];
+in ivec4 color_to_gs[3];
+in ivec4 modulus_to_gs[3];
+in int index_to_gs[3];
+out vec4 color_to_fs;
+
+void main()
+{
+  for (int i = 0; i < 3; i++) {
+    gl_Position = vertex_to_gs[i];
+    color_to_fs = vec4(mod(color_to_gs[i], modulus_to_gs[index_to_gs[i]]));
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+
+in vec4 color_to_fs;
+out vec4 color;
+
+void main()
+{
+  color = color_to_fs;
+}
+
+[vertex data]
+vertex/float/2  color/int/4  modulus/int/4  index/int/1
+-1.0 -1.0       5  7  9 10   4 7 5 2        2
+ 1.0 -1.0       2  3  4  3   2 2 2 2        1
+ 1.0  1.0       8 15 15 15   5 6 9 9        0
+-1.0 -1.0       5  7  9 10   4 7 5 2        2
+ 1.0  1.0       2  3  4  3   2 2 2 2        1
+-1.0  1.0       8 15 15 15   5 6 9 9        0
+
+[test]
+draw arrays GL_TRIANGLES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
