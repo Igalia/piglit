@@ -72,6 +72,23 @@ piglit_x11_framework(struct piglit_gl_framework *gl_fw)
 }
 
 static void
+get_window_size(struct piglit_x11_framework *x11_fw)
+{
+	unsigned width, height;
+
+	Window wjunk;
+	int ijunk;
+	unsigned ujunk;
+
+	XGetGeometry(x11_fw->display, x11_fw->window,
+		     &wjunk, &ijunk, &ijunk,
+		     &width, &height, &ujunk, &ujunk);
+
+	piglit_width = width;
+	piglit_height = height;
+}
+
+static void
 process_next_event(struct piglit_x11_framework *x11_fw)
 {
 	struct piglit_winsys_framework *winsys_fw = &x11_fw->winsys_fw;
@@ -84,9 +101,11 @@ process_next_event(struct piglit_x11_framework *x11_fw)
 
 	switch (event.type) {
 	case Expose:
+		get_window_size(x11_fw);
 		winsys_fw->need_redisplay = true;
 		break;
 	case ConfigureNotify:
+		get_window_size(x11_fw);
 		if (winsys_fw->user_reshape_func)
 			winsys_fw->user_reshape_func(event.xconfigure.width,
 			                             event.xconfigure.height);
