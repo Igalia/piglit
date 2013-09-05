@@ -218,14 +218,6 @@ class PlainExecTest(ExecTest):
         self.command[0] = testBinDir + self.command[0]
 
     def interpretResult(self, out, returncode, results):
-        def serious_level(result):
-            return {'skip':0, 'pass':1, 'warn':2, 'fail':3, 'crash':4}.get(result, 0)
-
-        def safe_update(dest, src):
-            for k in src:
-                if k not in dest or serious_level(src[k]) >= serious_level(dest[k]):
-                    dest[k] = src[k]
-
         outlines = out.split('\n')
         outpiglit = map(lambda s: s[7:],
                         filter(lambda s: s.startswith('PIGLIT:'), outlines))
@@ -236,7 +228,7 @@ class PlainExecTest(ExecTest):
                     if piglit.startswith('subtest'):
                         if not 'subtest' in results:
                             results['subtest'] = {}
-                        safe_update(results['subtest'], eval(piglit[7:]))
+                        results['subtest'].update(eval(piglit[7:]))
                     else:
                         results.update(eval(piglit))
                 out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'),

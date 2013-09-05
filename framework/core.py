@@ -470,12 +470,8 @@ class Test:
             status(result['result'])
 
             if 'subtest' in result and len(result['subtest'].keys()) > 1:
-                def serious_level(result):
-                    return {'skip':0, 'pass':1, 'warn':2, 'fail':3, 'crash':4}.get(result, 0)
-
                 for test in result['subtest'].keys():
-                    if serious_level(result['subtest'][test]) >= serious_level(result['result']):
-                        result['result'] = result['subtest'][test]
+                    result['result'] = result['subtest'][test]
                     json_writer.write_dict_item(path + '/' + test, result)
             else:
                 json_writer.write_dict_item(path, result)
