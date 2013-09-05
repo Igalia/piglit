@@ -216,6 +216,23 @@ char *strchrnul(const char *s, int c)
 #endif
 
 
+#ifndef HAVE_STRNDUP
+char *strndup(const char *s, size_t n)
+{
+	const size_t len = strlen(s);
+	const size_t size_to_copy = MIN2(n, len);
+
+	char *const copy = malloc(size_to_copy + 1);
+	if (copy != NULL) {
+		memcpy(copy, s, size_to_copy);
+		copy[size_to_copy] = '\0';
+	}
+
+	return copy;
+}
+#endif
+
+
 void
 piglit_set_rlimit(unsigned long lim)
 {

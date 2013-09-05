@@ -144,6 +144,10 @@ void piglit_report_subtest_result(enum piglit_result result,
 char *strchrnul(const char *s, int c);
 #endif
 
+#ifndef HAVE_STRNDUP
+char *strndup(const char *s, size_t n);
+#endif
+
 extern void piglit_set_rlimit(unsigned long lim);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);
