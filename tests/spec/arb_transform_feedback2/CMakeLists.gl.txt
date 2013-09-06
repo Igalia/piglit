@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (arb_transform_feedback2-api-queries api-queries.c)
 piglit_add_executable (arb_transform_feedback2-cannot-bind-when-active cannot-bind-when-active.c)
+piglit_add_executable (arb_transform_feedback2-change-objects-while-paused change-objects-while-paused.c)
 piglit_add_executable (arb_transform_feedback2-draw-auto draw-auto.c)
 piglit_add_executable (arb_transform_feedback2-gen-names-only gen-names-only.c)
 piglit_add_executable (arb_transform_feedback2-istransformfeedback istransformfeedback.c)

@@ -2286,6 +2286,8 @@ ext_transform_feedback['geometry-shaders-basic'] = concurrent_test(
 
 arb_transform_feedback2 = Group()
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
+arb_transform_feedback2['Change objects while paused'] = PlainExecTest(['arb_transform_feedback2-change-objects-while-paused', '-auto'])
+arb_transform_feedback2['Change objects while paused (GLES3)'] = PlainExecTest(['arb_transform_feedback2-change-objects-while-paused_gles3', '-auto'])
 arb_transform_feedback2['draw-auto'] = PlainExecTest(['arb_transform_feedback2-draw-auto', '-auto'])
 arb_transform_feedback2['istranformfeedback'] = PlainExecTest(['arb_transform_feedback2-istransformfeedback', '-auto'])
 arb_transform_feedback2['glGenTransformFeedbacks names only'] = concurrent_test('arb_transform_feedback2-gen-names-only')
