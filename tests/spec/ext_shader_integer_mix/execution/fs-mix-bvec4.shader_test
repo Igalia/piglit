@@ -1,0 +1,33 @@
+# From the EXT_shader_integer_mix spec:
+#
+#     Selects which vector each returned component comes
+#     from. For a component of a that is false, the
+#     corresponding component of x is returned. For a
+#     component of a that is true, the corresponding
+#     component of y is returned.
+
+[require]
+GLSL >= 1.30
+GL_EXT_shader_integer_mix
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_EXT_shader_integer_mix: enable
+
+out vec4 frag_color;
+uniform bvec4 a, b;
+uniform bvec4 selector;
+
+void main()
+{
+	frag_color = vec4(mix(a, b, selector));
+}
+
+[test]
+uniform ivec4 a 1 1 0 1
+uniform ivec4 b 0 1 1 0
+uniform ivec4 selector 1 1 0 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

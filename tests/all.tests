@@ -2359,6 +2359,12 @@ ext_fog_coord = Group()
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 
+ext_shader_integer_mix = Group()
+spec['EXT_shader_integer_mix'] = ext_shader_integer_mix
+add_shader_test_dir(spec['EXT_shader_integer_mix'],
+	            os.path.join(testsDir, 'spec', 'ext_shader_integer_mix'),
+		    recursive=True)
+
 nv_texture_barrier = Group()
 spec['NV_texture_barrier'] = nv_texture_barrier
 add_plain_test(nv_texture_barrier, 'blending-in-shader')
