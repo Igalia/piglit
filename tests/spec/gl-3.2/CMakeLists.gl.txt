@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (gl-get-active-attrib-returns-all-inputs get-active-attrib-returns-all-inputs.c)
 piglit_add_executable (gl-3.2-minmax minmax.c)
 piglit_add_executable (gl-3.2-clear-no-buffers clear-no-buffers.c)
 piglit_add_executable (gl-3.2-get-buffer-parameter-i64v get-buffer-parameter-i64v.c)

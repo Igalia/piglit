@@ -750,6 +750,8 @@ spec['!OpenGL 3.2/layered-rendering/clear-depth'] = concurrent_test('gl-3.2-laye
 spec['!OpenGL 3.2/layered-rendering/framebuffertexture-buffer-textures'] = concurrent_test('gl-3.2-layered-rendering-framebuffertexture-buffer-textures')
 spec['!OpenGL 3.2/layered-rendering/readpixels'] = concurrent_test('gl-3.2-layered-rendering-readpixels')
 
+spec['!OpenGL/get-active-attrib-returns-all-inputs'] = concurrent_test('gl-get-active-attrib-returns-all-inputs')
+
 spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
 spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 33')
 spec['!OpenGL 3.3/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 33')
