@@ -8,9 +8,6 @@ global profile
 
 execfile(os.path.dirname(__file__) + '/quick-driver.tests')
 
-from framework.core import *
-from framework.gleantest import *
-
 # glean/blendFunc
 #   R300 blending hardware appears to be bad
 env = profile.tests['glean']['blendFunc'].env
