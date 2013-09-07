@@ -26,8 +26,8 @@ import sys
 
 from os import path
 from glob import glob
-from framework.core import *
-from framework.exectest import *
+from framework.core import TestProfile, testBinDir
+from framework.exectest import ExecTest
 
 #############################################################################
 ##### GTFTest: Execute a sub-test of the Khronos ES 3.0 Conformance suite.
