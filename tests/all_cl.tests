@@ -5,8 +5,8 @@
 import os
 import os.path as path
 
-from framework.core import *
-from framework.exectest import *
+from framework.core import Group, TestProfile
+from framework.exectest import PlainExecTest
 
 ######
 # Helper functions
