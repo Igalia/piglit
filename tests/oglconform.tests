@@ -25,8 +25,8 @@ import os
 import re
 import sys
 
-from framework.core import *
-from framework.exectest import *
+from framework.core import TestProfile, testBinDir
+from framework.exectest import ExecTest
 from os import path
 
 bin_oglconform = path.join(testBinDir, 'oglconform')
