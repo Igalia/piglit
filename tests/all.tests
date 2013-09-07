@@ -7,9 +7,9 @@ import os.path as path
 import platform
 import shlex
 
-from framework.core import *
-from framework.exectest import *
-from framework.gleantest import *
+from framework.core import Group, TestProfile
+from framework.exectest import PlainExecTest
+from framework.gleantest import GleanTest
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
 from framework.shader_test import add_shader_test_dir
 
