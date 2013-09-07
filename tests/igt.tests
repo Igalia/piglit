@@ -28,8 +28,8 @@ import sys
 import subprocess
 
 from os import path
-from framework.core import *
-from framework.exectest import *
+from framework.core import testBinDir, TestProfile
+from framework.exectest import ExecTest
 
 #############################################################################
 ##### IGTTest: Execute an intel-gpu-tools test
