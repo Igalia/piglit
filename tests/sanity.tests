@@ -2,8 +2,8 @@
 # Minimal tests to check whether the installation is working
 #
 
-from framework.core import *
-from framework.gleantest import *
+from framework.core import Group, TestProfile
+from framework.gleantest import GleanTest
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
