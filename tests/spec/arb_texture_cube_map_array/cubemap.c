@@ -39,6 +39,8 @@
 
 #define NUM_LAYERS 2
 
+#define COORD_SCALE 0.5
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
     config.supports_gl_compat_version = 10;
@@ -68,10 +70,12 @@ GLfloat a_cube_face_texcoords[6][4][4];
 
 void setup_texcoords(void)
 {
-	int i, j;
+	int i, j, k;
 	for (i = 0; i < 6; i++) {
 		for (j = 0; j < 4; j++) {
-			memcpy(a_cube_face_texcoords[i][j], cube_face_texcoords[i][j], 3 * sizeof(GLfloat));
+			for (k = 0; k < 3; k++) {
+				a_cube_face_texcoords[i][j][k] = COORD_SCALE * cube_face_texcoords[i][j][k];
+			}
 		}
 	}
 }
