@@ -16,7 +16,7 @@ GLSL >= 1.50
 #version 150
 
 layout(triangles) in;
-layout(triangles, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 3) out;
 
 in vec4 vertex[3];
 

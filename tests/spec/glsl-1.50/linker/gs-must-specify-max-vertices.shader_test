@@ -27,7 +27,7 @@ void main()
 #version 150
 
 layout(triangles) in;
-layout(triangles) out;
+layout(triangle_strip) out;
 
 in vec4 vertex_to_gs[];
 

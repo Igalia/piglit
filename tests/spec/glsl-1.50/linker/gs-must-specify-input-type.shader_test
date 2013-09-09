@@ -26,7 +26,7 @@ void main()
 [geometry shader]
 #version 150
 
-layout(triangles, max_vertices = 3) out;
+layout(triangle_strip, max_vertices = 3) out;
 
 in vec4 vertex_to_gs[3];
 

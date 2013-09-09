@@ -11,5 +11,5 @@
 
 void main()
 {
-	layout(triangles) out;
+	layout(triangle_strip) out;
 }

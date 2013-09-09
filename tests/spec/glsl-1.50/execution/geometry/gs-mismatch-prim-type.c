@@ -66,7 +66,7 @@ static const char *gstemplate =
 	"#version 150\n"
 	"#define LAYOUT_TYPE %s\n"
 	"layout(LAYOUT_TYPE) in;\n"
-	"layout(triangles, max_vertices = 3) out;\n"
+	"layout(triangle_strip, max_vertices = 3) out;\n"
 	"in vec3 pos[];\n"
 	"void main() {\n"
 	"	for(int i = 0; i < pos.length(); i++) {\n"

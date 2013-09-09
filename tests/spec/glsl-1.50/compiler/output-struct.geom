@@ -18,7 +18,7 @@
 #version 150
 
 layout(triangles) in;
-layout(triangles) out;
+layout(triangle_strip) out;
 
 in int a[];
 in float b[];
