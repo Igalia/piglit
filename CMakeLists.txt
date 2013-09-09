@@ -89,11 +89,38 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         add_definitions(-DPIGLIT_HAS_GLX)
 
 	pkg_check_modules(LIBDRM QUIET libdrm)
+	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
+	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
 
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" OFF)
 ENDIF()
+
+# Choose to build tests that use dma_buf.
+#
+# The presence of libdrm is not sufficient. At least one libdrm_${hardware}
+# library is also needed.
+#
+if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND)
+	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
+else()
+	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID false)
+endif()
+
+if(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
+	option(PIGLIT_BUILD_DMA_BUF_TESTS "Build tests that use dma_buf" ON)
+else()
+	option(PIGLIT_BUILD_DMA_BUF_TESTS "Build tests that use dma_buf" OFF)
+endif()
+
+# If the users has updated PIGLIT_BUILD_DMA_BUF_TESTS in the CMakeCache, then
+# we need to validate it.
+if(PIGLIT_BUILD_DMA_BUF_TESTS AND NOT PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
+	message(FATAL_ERROR
+		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm and libdrm_intel")
+endif()
+
 IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()

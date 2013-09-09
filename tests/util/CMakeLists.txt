@@ -51,12 +51,9 @@ set(UTIL_GL_LIBS
 	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
-	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
-
 	# One needs to have at least one hardware driver present, otherwise
 	# there is no point compiling just the dispatcher.
-	if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND)
+	if(PIGLIT_BUILD_DMA_BUF_TESTS)
 		add_definitions(-DHAVE_LIBDRM)
 
 		list(APPEND UTIL_GL_SOURCES

@@ -9,8 +9,7 @@ link_libraries(
 	piglitutil_gles2
 	)
 
-# These tests rely on drm and are hence compiled only on linux/drm platforms
-if(LIBDRM_FOUND)
+if(PIGLIT_BUILD_DMA_BUF_TESTS)
 	add_definitions(-DHAVE_LIBDRM)
 
 	include_directories(
@@ -19,6 +18,6 @@ if(LIBDRM_FOUND)
 
 	piglit_add_executable(ext_image_dma_buf_import-sample_rgb sample_rgb.c sample_common.c image_common.c)
 	piglit_add_executable(ext_image_dma_buf_import-intel_external_sampler_with_dma_only intel_external_sampler_with_dma_only.c image_common.c)
-endif(LIBDRM_FOUND)
+endif()
 
 # vim: ft=cmake:
