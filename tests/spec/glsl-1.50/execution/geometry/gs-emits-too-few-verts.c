@@ -39,7 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const char *vstext = 
+static const char *vstext =
 	"#version 150\n"
 	"in vec3 vertex;\n"
 	"out vec3 pos;\n"
@@ -48,10 +48,10 @@ static const char *vstext =
 	"	pos = vertex;\n"
 	"}\n";
 
-static const char *gstext = 
+static const char *gstext =
 	"#version 150\n"
 	"layout(triangles) in;\n"
-	"layout(triangles, max_vertices = 3) out;\n"
+	"layout(triangle_strip, max_vertices = 3) out;\n"
 	"in vec3 pos[];\n"
 	"void main() {\n"
 	"	for(int i = 0; i < 2; i++) {\n"
@@ -60,7 +60,7 @@ static const char *gstext =
 	"	}\n"
 	"}\n";
 
-static const char *fstext = 
+static const char *fstext =
 	"#version 150\n"
 	"out vec4 color;\n"
 	"void main() {\n"

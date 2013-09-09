@@ -9,5 +9,4 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-piglit_add_executable (gs-emits-too-few-verts gs-emits-too-few-verts.c)
 # vim: ft=cmake:
