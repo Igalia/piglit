@@ -109,7 +109,9 @@ piglit_init(int argc, char **argv)
 {
 	int i, j;
 	GLenum fbstatus;
-	float colorLayers[layers][piglit_width*piglit_height*3];
+	float *colorLayers =
+		malloc(sizeof(float) * layers *
+		       piglit_width * piglit_height * 3);
 	float colors[3][3] = {
 		{0.0, 0.0, 1.0},
 		{0.0, 1.0, 0.0},
@@ -118,10 +120,12 @@ piglit_init(int argc, char **argv)
 
 	/* Create color data for texture */
 	for(j = 0; j < layers; j++) {
+		float *thisLayer =
+			&colorLayers[j * piglit_width * piglit_height * 3];
 		for(i = 0; i < piglit_width*piglit_height; i++) {
-			colorLayers[j][i*3+0] = colors[j][0];
-			colorLayers[j][i*3+1] = colors[j][1];
-			colorLayers[j][i*3+2] = colors[j][2];
+			thisLayer[i*3+0] = colors[j][0];
+			thisLayer[i*3+1] = colors[j][1];
+			thisLayer[i*3+2] = colors[j][2];
 		}
 	}
 
