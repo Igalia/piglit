@@ -67,5 +67,8 @@ with open(os.devnull, "w") as devnull:
 with open(testlist_file) as f:
 	testlist = f.read().splitlines()
 	for l in testlist:
-		category, test = l.split()
-		profile.test_list['oglconform/' + category + '/' + test] = OGLCTest(category, test)
+		try:
+			category, test = l.split()
+			profile.test_list['oglconform/' + category + '/' + test] = OGLCTest(category, test)
+		except:
+			continue
