@@ -1,0 +1,11 @@
+include_directories(
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries(
+	piglitutil_${piglit_target_api}
+	)
+
+piglit_add_executable(oes_matrix_get-api api.c)
+
+# vim: ft=cmake:

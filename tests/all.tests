@@ -2414,6 +2414,10 @@ spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
 oes_compressed_paletted_texture['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'paletted'])
 oes_compressed_paletted_texture['invalid formats'].runConcurrent = True
 
+oes_matrix_get = Group()
+spec['OES_matrix_get'] = oes_matrix_get
+oes_matrix_get['All queries'] = concurrent_test('oes_matrix_get-api')
+
 oes_fixed_point = Group()
 spec['OES_fixed_point'] = oes_fixed_point
 oes_fixed_point['attribute-arrays'] = concurrent_test('oes_fixed_point-attribute-arrays')
