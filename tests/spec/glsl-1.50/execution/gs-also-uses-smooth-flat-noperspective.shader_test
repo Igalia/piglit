@@ -1,0 +1,95 @@
+# Test that the qualifiers 'smooth', 'flat', and 'noperspective' can appear on
+#  geometry shader ins and outs.
+#
+# From the GLSL 1.50 specification, section 4.3 ("Storage Qualifiers"):
+#
+# "Outputs from shader (out) and inputs to a shader (in) can be further
+#  qualified with one of these interpolation qualifiers:
+#	smooth
+#	flat
+#	noperspective"
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+
+uniform mat4 mvp;
+
+in vec4 vertex;
+in vec3 input_data;
+
+out vec4 pos;
+flat out float a;
+smooth out float b;
+noperspective out float c;
+
+void main()
+{
+	gl_Position = vertex * mvp;
+	pos = vertex * mvp;
+	a = input_data.r;
+	b = input_data.g;
+	c = input_data.b;
+}
+
+[geometry shader]
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 pos[];
+flat in float a[];
+smooth in float b[];
+noperspective in float c[];
+
+flat out float aa;
+smooth out float bb;
+noperspective out float cc;
+
+void main()
+{
+	for(int i = 0; i < 3; i++) {
+		gl_Position = pos[i];
+		aa = a[i];
+		bb = b[i];
+		cc = c[i];
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+
+flat in float aa;
+smooth in float bb;
+noperspective in float cc;
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(aa, bb, cc, 1.0);
+}
+
+[vertex data]
+vertex/float/3  input_data/float/3
+ 0.0  6.0 -2.0  0.25 1.0 0.0
+-3.0 -3.0 -1.0  0.50 0.0 0.0
+ 9.0 -9.0 -3.0  0.75 0.0 1.0
+
+[test]
+uniform mat4 mvp 1 0 0 0 0 1 0 0 0 0 -2 -1 0 0 -3 0
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_FAN 0 3
+relative probe rgba (0.444444444444, 0.222222222222) (0.75, 0.166666666667, 0.333333333333, 1.0)
+relative probe rgba (0.636363636364, 0.181818181818) (0.75, 0.166666666667, 0.545454545455, 1.0)
+relative probe rgba (0.769230769231, 0.153846153846) (0.75, 0.166666666667, 0.692307692308, 1.0)
+relative probe rgba (0.866666666667, 0.133333333333) (0.75, 0.166666666667, 0.8,            1.0)
+relative probe rgba (0.5,            0.4           ) (0.75, 0.333333333333, 0.3,            1.0)
+relative probe rgba (0.666666666667, 0.333333333333) (0.75, 0.333333333333, 0.5,            1.0)
+relative probe rgba (0.785714285714, 0.285714285714) (0.75, 0.333333333333, 0.642857142857, 1.0)
+relative probe rgba (0.545454545455, 0.545454545455) (0.75, 0.5,            0.272727272727, 1.0)
+relative probe rgba (0.692307692308, 0.461538461538) (0.75, 0.5,            0.461538461538, 1.0)
+relative probe rgba (0.583333333333, 0.666666666667) (0.75, 0.666666666667, 0.25,           1.0)
