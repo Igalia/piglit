@@ -104,7 +104,11 @@ ENDIF()
 # The presence of libdrm is not sufficient. At least one libdrm_${hardware}
 # library is also needed.
 #
-if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND AND XCB_DRI2_FOUND)
+# When building for Intel, libdrm_intel>=2.4.38 is required because support for
+# drm-prime arrived in that version.
+#
+if(LIBDRM_FOUND AND XCB_DRI2_FOUND AND
+   (LIBDRM_INTEL_VERSION VERSION_GREATER "2.4.37"))
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
 else()
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID false)
@@ -120,8 +124,8 @@ endif()
 # we need to validate it.
 if(PIGLIT_BUILD_DMA_BUF_TESTS AND NOT PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
 	message(FATAL_ERROR
-		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm and libdrm_intel, "
-		"and xcb-dri2")
+		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm, "
+		"libdrm_intel>=2.4.38, and xcb-dri2")
 endif()
 
 IF(PIGLIT_BUILD_GLX_TESTS)
