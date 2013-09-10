@@ -53,7 +53,7 @@ piglit_init(int argc, char **argv)
 	int guniforms = 0, gblocks = 0;
 	int funiforms = 0, fblocks = 0;
 	int blocksize = 0;
-	bool gs = piglit_is_extension_supported("GL_ARB_geometry_shader4");
+	bool gs = (piglit_get_gl_version() >= 32) || piglit_is_extension_supported("GL_ARB_geometry_shader4");
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
