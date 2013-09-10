@@ -1,0 +1,48 @@
+# Test that between VS and GS varyings of the same name must match type.
+#
+# From the GLSL 1.50 specification, section 4.3.4 ("Inputs"):
+#
+# "For the interface between a vertex shader and a geometry shader, vertex
+#  shader output variables and geometry shader input variables of the same name
+#  must match in type and qualification, except that the vertex shader name
+#  cannot be declared as an array while the geometry shader name must be
+#  declared as an array. Otherwise, a link error will occur."
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+
+in vec4 piglit_vertex;
+
+out vec4 position;
+
+
+void main()
+{
+	position = piglit_vertex;
+}
+
+[geometry shader]
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec3 position[];
+
+void main()
+{
+}
+
+[fragment shader]
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error
