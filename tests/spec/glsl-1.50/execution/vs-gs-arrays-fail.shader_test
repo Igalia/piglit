@@ -1,0 +1,63 @@
+# Test that vertex array output (outside of an interface block) cannot be linked
+# to a geometry shader array input.
+#
+# From the GLSL 1.50 specification, section 4.3.4 ("Inputs"):
+#
+# "If the output of a vertex shader is itself an array to be consumed by a
+#  geometry shader, then it must appear in an output block (see interface blocks
+#  below) in the vertex shader and in an input block in the geometry shader with
+#  a block instance name declared as an array. This is required for arrays
+#  output from a vertex shader because two-dimensional arrays are not
+#  supported."
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+
+in vec4 vertex;
+
+out vec4 pos;
+out float a[3];
+
+void main()
+{
+	gl_Position = vertex;
+	pos = vertex;
+	for(int i = 0; i < 3; i++) {
+		a[i] = i+1;
+	}
+}
+
+[geometry shader]
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 pos[];
+in float a[3];
+
+
+void main()
+{
+}
+
+[fragment shader]
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+link error

@@ -1,0 +1,87 @@
+# Test that vertex array outputs that are passed to a geometry shader are
+#  valid if they are declared within an output block.
+#
+# From the GLSL 1.50 specification, section 4.3.4 ("Inputs"):
+#
+# "If the output of a vertex shader is itself an array to be consumed by a
+#  geometry shader, then it must appear in an output block (see interface blocks
+#  below) in the vertex shader and in an input block in the geometry shader with
+#  a block instance name declared as an array. This is required for arrays
+#  output from a vertex shader because two-dimensional arrays are not
+#  supported."
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+
+in vec4 vertex;
+in float offset;
+
+out vec4 pos;
+out block {
+	float a[4];
+};
+out float off;
+
+void main()
+{
+	gl_Position = vertex;
+	pos = vertex;
+	for(int i = 0; i < 4; i++) {
+		a[i] = offset + i;
+	}
+	off = offset;
+}
+
+[geometry shader]
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 pos[];
+in block {
+	float a[4];
+} b[];
+in float off[];
+
+out vec4 c;
+
+void main()
+{
+	bool pass = true;
+	for(int i = 0; i < 3; i++) {
+		for(int j = 0; j < 4; j++) {
+			if(b[i].a[j] != off[i] + j) pass = false;
+		}
+	}
+
+	for(int i = 0; i < 3; i++) {
+		gl_Position = pos[i];
+		c = pass ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+		EmitVertex();
+	}
+}
+
+[fragment shader]
+
+in vec4 c;
+
+out vec4 color;
+
+void main()
+{
+	color = c;
+}
+
+[vertex data]
+vertex/float/2	offset/float/1
+-1.0 -1.0	0.0
+ 1.0 -1.0	10.0
+ 1.0  1.0	20.0
+-1.0  1.0	30.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
