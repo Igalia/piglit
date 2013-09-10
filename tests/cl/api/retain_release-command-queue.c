@@ -139,25 +139,5 @@ piglit_cl_test(const int argc,
 		}
 	}
 
-	/*** Errors ***/
-
-	/*
-	 * CL_INVALID_COMMAND_QUEUE if command_queue is not a valid command-queue.
-	 */
-	errNo = clReleaseCommandQueue(command_queue);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_COMMAND_QUEUE)) {
-			fprintf(stderr,
-			        "clReleaseCommandQueue: Failed (error code: %s): Trigger CL_INVALID_COMMAND_QUEUE if command_queue is not a valid command-queue (already released).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-	errNo = clReleaseCommandQueue(NULL);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_COMMAND_QUEUE)) {
-			fprintf(stderr,
-			        "clReleaseCommandQueue: Failed (error code: %s): Trigger CL_INVALID_COMMAND_QUEUE if command_queue is not a valid command-queue (NULL).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-
 	return PIGLIT_PASS;
 }

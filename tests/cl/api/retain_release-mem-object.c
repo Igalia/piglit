@@ -138,26 +138,5 @@ piglit_cl_test(const int argc,
 		}
 	}
 
-	/*** Errors ***/
-
-	/*
-	 * CL_INVALID_MEM_OBJECT if mem_object is not a valid mem_object object
-	 * (buffer or image object).
-	 */
-	errNo = clReleaseMemObject(memobj);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_MEM_OBJECT)) {
-			fprintf(stderr,
-			        "clReleaseMemObject: Failed (error code: %s): Trigger CL_INVALID_MEM_OBJECT if memOBJ is not a valid memory object (already released).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-	errNo = clReleaseMemObject(NULL);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_MEM_OBJECT)) {
-			fprintf(stderr,
-			        "clReleaseMemObject: Failed (error code: %s): Trigger CL_INVALID_MEM_OBJECT if memobj is not a valid memory object (NULL).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-
 	return PIGLIT_PASS;
 }

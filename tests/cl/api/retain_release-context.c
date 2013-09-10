@@ -148,25 +148,5 @@ piglit_cl_test(const int argc,
 		}
 	}
 
-	/*** Errors ***/
-
-	/*
-	 * CL_INVALID_CONTEXT if context is not a valid OpenCL context.
-	 */
-	errNo = clReleaseContext(cl_ctx);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_CONTEXT)) {
-			fprintf(stderr,
-			        "clReleaseContext: Failed (error code: %s): Trigger CL_INVALID_CONTEXT if context is not a valid context (already released).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-	errNo = clReleaseContext(NULL);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_CONTEXT)) {
-			fprintf(stderr,
-			        "clReleaseContext: Failed (error code: %s): Trigger CL_INVALID_CONTEXT if context is not a valid context (NULL).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-
 	return PIGLIT_PASS;
 }

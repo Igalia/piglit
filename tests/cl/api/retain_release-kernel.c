@@ -137,25 +137,5 @@ piglit_cl_test(const int argc,
 		}
 	}
 
-	/*** Errors ***/
-
-	/*
-	 * CL_INVALID_KERNEL if kernel is not a valid kernel object.
-	 */
-	errNo = clReleaseKernel(kernel);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_KERNEL)) {
-			fprintf(stderr,
-			        "clReleaseKernel: Failed (error code: %s): Trigger CL_INVALID_KERNEL if kernel is not a valid kernel object (already released).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-	errNo = clReleaseKernel(NULL);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_KERNEL)) {
-			fprintf(stderr,
-			        "clReleaseKernel: Failed (error code: %s): Trigger CL_INVALID_KERNEL if kernel is not a valid kernel object (NULL).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-
 	return PIGLIT_PASS;
 }

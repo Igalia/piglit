@@ -149,27 +149,5 @@ piglit_cl_test(const int argc,
 		}
 	}
 
-	/*** Errors ***/
-
-	/*
-	 * CL_INVALID_EVENT if event is not a valid event object.
-	 */
-	errNo = clReleaseEvent(event);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_EVENT)) {
-			fprintf(stderr,
-			        "clReleaseEvent: Failed (error code: %s): Trigger CL_INVALID_EVENT if event is not a valid event object (already released).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-	errNo = clReleaseEvent(NULL);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_EVENT)) {
-			fprintf(stderr,
-			        "clReleaseEvent: Failed (error code: %s): Trigger CL_INVALID_EVENT if event is not a valid event object (NULL).\n",
-			        piglit_cl_get_error_name(errNo));
-		return PIGLIT_FAIL;
-	}
-
-	clReleaseMemObject(memobj);
-
 	return PIGLIT_PASS;
 }

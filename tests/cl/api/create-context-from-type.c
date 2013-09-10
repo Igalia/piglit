@@ -221,40 +221,7 @@ piglit_cl_test(const int argc,
 
 	/*** Errors ***/
 
-	/*
-	 * CL_INVALID_PLATFORM if properties is NULL and no platform 
-	 * could be selected or if platform value specified in properties
-	 * is not a valid platform.
-	 *
-	 * Note: Can not test implementation-defined behaviour on
-	 *       NULL context_properties.
-	 */
-	cl_ctx = clCreateContextFromType(invalid_platform_context_properties,
-	                                 CL_DEVICE_TYPE_ALL,
-	                                 NULL,
-	                                 NULL,
-	                                 &errNo);
-	if(   errNo != CL_INVALID_PLATFORM
-#if defined(CL_VERSION_1_1)
-	   && errNo != CL_INVALID_PROPERTY
-#endif
-	   ) {
-		test(invalid_platform_context_properties, CL_DEVICE_TYPE_ALL,
-		     NULL, NULL,
-		     CL_INVALID_PLATFORM, &result,
-		     "Trigger CL_INVALID_PLATFORM if platform value specified in properties is not a valid platform");
-#if defined(CL_VERSION_1_1)
-		printf("Another valid expected CL error: %d\n", CL_INVALID_PROPERTY);
-#endif
-		piglit_merge_result(&result, PIGLIT_FAIL);
-	} else if (cl_ctx != NULL) {
-		test(invalid_platform_context_properties, CL_DEVICE_TYPE_ALL,
-		     NULL, NULL,
-		     CL_INVALID_PLATFORM, &result,
-		     "Trigger CL_INVALID_PLATFORM if platform value specified in properties is not a valid platform");
-	}
-
-	/*
+    /*
 	 * CL_INVALID_VALUE if context property name in properties is
 	 * not a supported property name, or if pfn_notify is NULL but
 	 * user_data is not NULL.
@@ -276,6 +243,7 @@ piglit_cl_test(const int argc,
 	     CL_INVALID_VALUE, &result,
 	     "Trigger CL_INVALID_VALUE if pfn_notify is NULL and user_data is not NULL");
 
+
 	/*
 	 * CL_INVALID_PROPERTY if context property name in properties
 	 * is not a supported property name, if the value specified for
@@ -289,9 +257,6 @@ piglit_cl_test(const int argc,
 	 */
 #if defined(CL_VERSION_1_1)
 	if(env->version >= 11) {
-		test(invalid_context_properties, CL_DEVICE_TYPE_ALL, NULL, NULL,
-		     CL_INVALID_PROPERTY, &result,
-		     "Trigger CL_INVALID_PROPERTY if context property name in properties is not a supported property name");
 		test(multiple_platform_context_properties, CL_DEVICE_TYPE_ALL,
 		     NULL, NULL,
 		     CL_INVALID_PROPERTY, &result,

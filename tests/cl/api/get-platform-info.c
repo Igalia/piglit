@@ -154,21 +154,5 @@ piglit_cl_test(const int argc,
 		piglit_merge_result(&result, PIGLIT_FAIL);
 	}
 
-	/*
-	 * CL_INVALID_PLATFORM if platform is not a valid platform.
-	 */
-	errNo = clGetPlatformInfo(invalid_platform_id,
-	                          CL_PLATFORM_PROFILE,
-	                          0,
-	                          NULL,
-	                          &param_value_size);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_PLATFORM)) {
-		fprintf(stderr,
-		        "Failed (error code: %s): Trigger CL_INVALID_PLATFORM if platform is not a valid platform.\n",
-		        piglit_cl_get_error_name(errNo));
-		piglit_merge_result(&result, PIGLIT_FAIL);
-	}
-
-
-	return result;
+    return result;
 }
