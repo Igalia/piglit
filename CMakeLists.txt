@@ -99,10 +99,12 @@ ENDIF()
 
 # Choose to build tests that use dma_buf.
 #
+# Piglit's dma_buf utilities require xcb-dri2 to gain DRM authentication.
+#
 # The presence of libdrm is not sufficient. At least one libdrm_${hardware}
 # library is also needed.
 #
-if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND)
+if(LIBDRM_FOUND AND LIBDRM_INTEL_FOUND AND XCB_DRI2_FOUND)
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID true)
 else()
 	set(PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID false)
@@ -118,7 +120,8 @@ endif()
 # we need to validate it.
 if(PIGLIT_BUILD_DMA_BUF_TESTS AND NOT PIGLIT_BUILD_DMA_BUF_TESTS_IS_VALID)
 	message(FATAL_ERROR
-		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm and libdrm_intel")
+		"PIGLIT_BUILD_DMA_BUF_TESTS require libdrm and libdrm_intel, "
+		"and xcb-dri2")
 endif()
 
 IF(PIGLIT_BUILD_GLX_TESTS)

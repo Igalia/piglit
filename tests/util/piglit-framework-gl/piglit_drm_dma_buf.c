@@ -32,10 +32,8 @@
 #include <string.h>
 #include <xf86drm.h>
 #include <stdbool.h>
-#ifdef HAVE_XCB_DRI2
 #include <xcb/dri2.h>
 #include <drm.h>
-#endif
 
 static const char *drm_device_filename = "/dev/dri/card0";
 
@@ -77,7 +75,6 @@ piglit_drm_device_get(void)
 	return fd;
 }
 
-#ifdef HAVE_XCB_DRI2
 static bool
 piglit_drm_x11_authenticate(void)
 {
@@ -116,7 +113,6 @@ piglit_drm_x11_authenticate(void)
 
 	return true;
 }
-#endif /* HAVE_XCB_DRI2 */
 
 #ifdef HAVE_LIBDRM_INTEL
 static drm_intel_bufmgr *
@@ -131,10 +127,8 @@ piglit_intel_bufmgr_get(void)
 	if (!piglit_drm_device_get())
 		return NULL;
 
-#ifdef HAVE_XCB_DRI2
 	if (!piglit_drm_x11_authenticate())
 		return NULL;
-#endif /* HAVE_XCB_DRI2 */
 
 	mgr = intel_bufmgr_gem_init(piglit_drm_device_get(), batch_sz);
 

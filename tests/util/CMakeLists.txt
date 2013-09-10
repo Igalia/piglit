@@ -62,10 +62,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 		list(APPEND UTIL_GL_LIBS
 			${LIBDRM_LDFLAGS}
+			${XCB_DRI2_LDFLAGS}
 		)
 
 		list(APPEND UTIL_GL_INCLUDES
 			${LIBDRM_INCLUDE_DIRS}
+			${XCB_DRI2_INCLUDE_DIRS}
 		)
 
 		if(LIBDRM_INTEL_FOUND)
@@ -75,20 +77,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 				${LIBDRM_INTEL_LDFLAGS}
 			)
 		endif()
-
-		# xcb-dri2 is used to gain DRM authentication.
-		if(XCB_DRI2_FOUND)
-			add_definitions(-DHAVE_XCB_DRI2)
-
-			list(APPEND UTIL_GL_LIBS
-				${XCB_DRI2_LDFLAGS}
-			)
-
-			list(APPEND UTIL_GL_INCLUDES
-				${XCB_DRI2_INCLUDE_DIRS}
-			)
-		endif()
-
 	endif()
 
 	set(UTIL_GL_LIBS
