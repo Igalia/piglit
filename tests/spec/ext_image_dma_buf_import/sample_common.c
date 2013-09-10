@@ -22,9 +22,7 @@
  */
 
 #include "sample_common.h"
-#include "piglit-util-egl.h"
-#define EGL_EGLEXT_PROTOTYPES 1
-#include <EGL/eglext.h>
+#include "image_common.h"
 #include <unistd.h>
 
 static const char fs_src[] =
