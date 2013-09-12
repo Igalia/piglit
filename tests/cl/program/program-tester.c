@@ -76,7 +76,7 @@
 #define REGEX_BOOL_FALSE   "(0|false)"
 #define REGEX_INT          "(([+-]?[[:digit:]]+)|([+-]?0[Xx][[:digit:]abcdefABCDEF]+))"
 #define REGEX_UINT         "(([+]?[[:digit:]]+)|([+]?0[Xx][[:digit:]abcdefABCDEF]+))"
-#define REGEX_FLOAT        "(([+-]?[[:digit:]]+(\\.[[:digit:]]+)?)|"      \
+#define REGEX_FLOAT        "(([+-]?[[:digit:]]+(\\.[[:digit:]]+)?e*[+-]*[[:digit:]]*)|"      \
                              REGEX_PNAN "|" REGEX_NNAN "|" REGEX_PINF "|" \
                              REGEX_NINF ")"
 #define REGEX_BOOL_ARRAY   REGEX_DEFINE_ARRAY(REGEX_BOOL)
