@@ -252,7 +252,7 @@ def getValue(type, val):
                             getValue(type, val[3]), getValue(type, val[4]))
 
     # At this point, we should have been passed a number
-    if (isinstance(val, (int, long))):
+    if (isinstance(val, (int, long, float))):
         return val
 
     print('Invalid value '+repr(val)+' encountered in getValue\n')
