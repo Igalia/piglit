@@ -29,7 +29,8 @@ import os
 from genclbuiltins import gen
 
 CLC_VERSION_MIN = {
-    'nextafter' : 10
+    'nextafter' : 10,
+    'sign' : 10
 }
 
 DATA_TYPES = ['float']
@@ -46,6 +47,15 @@ tests = {
             [1.401298e-45, -1.401298e-45, 1.00000011920928955078125, 0.999999940395355224609375, float("nan"), float("nan"), 5.0 ], # Result
             [0.0,           0.0         , 1.0, 1.0, float("nan"), 2.5, 5.0], # Arg0
             [1.0,          -1.0         , 2.0, 0.0, 3.4, float("nan"), 5.0], # Arg1
+        ]
+    },
+    'sign' : { # This is really a Common function but it uses the same types
+               # as a lot of the math functions.
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [1.0, -1.0, 0.0, -0.0, 0.0],
+            [0.5, -0.5, 0.0, -0.0, float("nan")]
         ]
     }
 }
