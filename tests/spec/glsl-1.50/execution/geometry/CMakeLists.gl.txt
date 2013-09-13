@@ -19,3 +19,5 @@ piglit_add_executable (glsl-1.50-gs-emits-too-few-verts gs-emits-too-few-verts.c
 piglit_add_executable (glsl-1.50-getshaderiv-may-return-GS getshaderiv-may-return-GS.c)
 piglit_add_executable (glsl-1.50-gs-mismatch-prim-type gs-mismatch-prim-type.c)
 piglit_add_executable (glsl-1.50-query-gs-prim-types query-gs-prim-types.c)
+piglit_add_executable (glsl-1.50-gs-input-layout-qualifiers gs-input-layout-qualifiers.c)
+piglit_add_executable (glsl-1.50-gs-output-layout-qualifiers gs-output-layout-qualifiers.c)

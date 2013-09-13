@@ -1021,6 +1021,18 @@ for prim_type in ['GL_TRIANGLE_STRIP', 'GL_TRIANGLE_STRIP_ADJACENCY']:
                             'glsl-1.50-geometry-tri-strip-ordering-with-prim-restart {0} {1}'.format(
                                 prim_type, restart_index))
 
+for input_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
+			'triangles_adjacency', 'line_strip', 'triangle_strip']:
+    add_concurrent_test(spec['glsl-1.50'],
+                        'glsl-1.50-gs-input-layout-qualifiers {0}'.format(
+                            input_layout))
+
+for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
+			'triangles_adjacency', 'line_strip', 'triangle_strip']:
+    add_concurrent_test(spec['glsl-1.50'],
+                        'glsl-1.50-gs-output-layout-qualifiers {0}'.format(
+                            output_layout))
+
 spec['glsl-3.30'] = Group()
 import_glsl_parser_tests(spec['glsl-3.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
