@@ -185,6 +185,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_gl_version(21);
 	piglit_require_extension("GL_ARB_texture_compression");
 	piglit_require_extension("GL_EXT_texture_compression_s3tc");
+	piglit_require_extension("GL_EXT_texture_array");
 #endif
 
 	/* We're using texture unit 0 for this entire test */
