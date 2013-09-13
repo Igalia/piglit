@@ -243,6 +243,12 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_internalformat_query");
 
+	/* Need GL 3 or extensions to support the valid_formats[] above */
+        if (piglit_get_gl_version() < 30) {
+		piglit_require_extension("GL_ARB_texture_rg");
+		piglit_require_extension("GL_ARB_texture_float");
+	}
+
 	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 	for (i = 0; i < ARRAY_SIZE(valid_formats); i++) {
 		pass = try(GL_RENDERBUFFER,
