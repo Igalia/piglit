@@ -28,6 +28,9 @@ from json import loads
 from mako.template import Template
 
 import core
+# a local variable status exists, prevent accidental overloading by renaming
+# the module
+import status as so
 
 __all__ = [
     'Summary',
@@ -288,9 +291,9 @@ class Summary:
             def openGroup(name):
                 stack.append((0, 0))
 
-                # Since skip is the "lowest" status for HTML generation, if
+                # Since NotRun is the "lowest" status for HTML generation, if
                 # there is another status it will replace skip
-                currentStatus.append('skip')
+                currentStatus.append(so.NotRun())
 
             def closeGroup(group_name):
                 # We're done with this group, record the number of pass/total
@@ -304,35 +307,9 @@ class Summary:
                 stack[-1] = (parent_pass + nr_pass, parent_total + nr_total)
 
                 # Add the status back to the group hierarchy
-                if status_to_number(currentStatus[-2]) < \
-                        status_to_number(currentStatus[-1]):
+                if currentStatus[-2] < currentStatus[-1]:
                     currentStatus[-2] = currentStatus[-1]
                 status[group_name] = currentStatus.pop()
-
-            def status_to_number(status):
-                """
-                like status_to_number in the constructor, this function
-                converts statuses into numbers so they can be comapared
-                logically/mathematically. The only difference between this and
-                init::status_to_number is the values assigned. The reason for
-                this is that here we are looking for the 'worst' status, while
-                in init::status_to_number we are looking for regressions in
-                status.
-                """
-                if status == 'skip':
-                    return 1
-                elif status == 'pass':
-                    return 2
-                elif status == 'dmesg-warn':
-                    return 3
-                elif status == 'warn':
-                    return 4
-                elif status == 'dmesg-fail':
-                    return 5
-                elif status == 'fail':
-                    return 6
-                elif status == 'crash':
-                    return 7
 
             openGroup('fake')
             openGroup('all')
@@ -358,15 +335,14 @@ class Summary:
 
                 # Add the current test
                 (pass_so_far, total_so_far) = stack[-1]
-                if summary.tests[fulltest]['result'] == 'pass':
+                if summary.tests[fulltest]['result'] == so.Pass():
                     pass_so_far += 1
-                if summary.tests[fulltest]['result'] != 'skip':
+                if summary.tests[fulltest]['result'] != so.Skip():
                     total_so_far += 1
                 stack[-1] = (pass_so_far, total_so_far)
 
                 # compare the status
-                if status_to_number(summary.tests[fulltest]['result']) > \
-                        status_to_number(currentStatus[-1]):
+                if summary.tests[fulltest]['result'] > currentStatus[-1]:
                     currentStatus[-1] = summary.tests[fulltest]['result']
 
             # Work back up the stack closing groups as we go until we reach the
@@ -415,59 +391,38 @@ class Summary:
         file is provided), and for JUnit and text which only need a limited
         subset of these lists
         """
-        def find_regressions(status):
-            """
-            Helper function to convert named statuses into number, since number
-            can more easily be compared using logical/mathematical operators.
-            The use of this is to look for regressions in status.
-            """
-            if status == 'pass':
-                return 1
-            elif status == 'dmesg-warn':
-                return 2
-            elif status == 'warn':
-                return 3
-            elif status == 'dmesg-fail':
-                return 4
-            elif status == 'fail':
-                return 5
-            elif status == 'crash':
-                return 6
-            elif status == 'skip':
-                return 7
-            elif status == 'special':
-                return 0
-
         for test in self.tests['all']:
             status = []
             for each in self.results:
                 try:
-                    status.append(find_regressions(each.tests[test]['result']))
+                    status.append(each.tests[test]['result'])
                 except KeyError:
-                    status.append(find_regressions("special"))
+                    status.append(so.NotRun())
 
             if 'problems' in lists:
                 # Problems include: warn, dmesg-warn, fail, dmesg-fail, and
                 # crash. Skip does not go on this page, it has the 'skipped'
                 # page
-                if 7 > max(status) > 1:
+                if so.Skip() > max(status) > so.Pass():
                     self.tests['problems'].add(test)
 
             if 'skipped' in lists:
                 # Find all tests with a status of skip
-                if 7 in status:
+                if so.Skip() in status:
                     self.tests['skipped'].add(test)
 
             if 'fixes' in lists:
-                # Find both fixes and regressions, and append them to the
-                # proper lists
+                # find fixes, regressions, and changes
                 for i in xrange(len(status) - 1):
                     first = status[i]
                     last = status[i + 1]
-                    if first < last and 0 not in (first, last):
+                    if first < last and so.NotRun() not in (first, last):
                         self.tests['regressions'].add(test)
-                    if first > last and 0 not in (first, last):
+                    if first > last and so.NotRun() not in (first, last):
                         self.tests['fixes'].add(test)
+                    # Changes cannot be added in the fixes and regressions
+                    # passes becausue NotRun is a change, but not a regression
+                    # or fix
                     if first != last:
                         self.tests['changes'].add(test)
 
@@ -480,7 +435,7 @@ class Summary:
                        'dmesg-warn': 0, 'dmesg-fail': 0}
 
         for test in self.results[-1].tests.values():
-            self.totals[test['result']] += 1
+            self.totals[str(test['result'])] += 1
 
     def generateHTML(self, destination, exclude):
         """
@@ -608,13 +563,13 @@ class Summary:
             if diff:
                 for test in self.tests['changes']:
                     print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([i.tests.get(test, {'result': 'skip'})
-                                    ['result'] for i in self.results])}
+                          ' '.join([str(i.tests.get(test, {'result': so.Skip()})
+                                    ['result']) for i in self.results])}
             else:
                 for test in self.tests['all']:
                     print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([i.tests.get(test, {'result': 'skip'})
-                                    ['result'] for i in self.results])}
+                          ' '.join([str(i.tests.get(test, {'result': so.Skip()})
+                                    ['result']) for i in self.results])}
 
         # Print the summary
         print "summary:"

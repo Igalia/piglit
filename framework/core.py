@@ -1,4 +1,4 @@
-#
+
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
 # files (the "Software"), to deal in the Software without
@@ -40,8 +40,7 @@ from threads import synchronized_self
 import threading
 import multiprocessing
 
-from threadpool import ThreadPool
-
+import status
 
 __all__ = ['Environment',
            'checkDir',
@@ -221,7 +220,16 @@ if 'MESA_DEBUG' not in os.environ:
     os.environ['MESA_DEBUG'] = 'silent'
 
 class TestResult(dict):
-    pass
+    def __init__(self, *args):
+        dict.__init__(self, *args)
+
+        # Replace the result with a status object
+        try:
+            self['result'] = status.status_lookup(self['result'])
+        except KeyError:
+            # If there isn't a result (like when used by piglit-run), go on
+            # normally
+            pass
 
 
 class GroupResult(dict):
