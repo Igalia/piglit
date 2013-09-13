@@ -1017,7 +1017,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     bvecs = [np.array(bs) for bs in itertools.product(bools, bools)] + \
         [np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
         [np.array(bs) for bs in itertools.product(bools, bools, bools, bools)]
-    ints = [np.int32(x) for x in [12, -6, 74, -32, 0]]
+    ints = [np.int32(x) for x in [12, -6, 76, -32, 0]]
     small_ints = \
         [np.int32(x) for x in [-31, -25, -5, -2, -1, 0, 1, 2, 5, 25, 31]]
     ivecs = [
@@ -1027,10 +1027,10 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
         np.array([-36, 32, -88], dtype=np.int32),
         np.array([36, 32, 88], dtype=np.int32),
         np.array([59, 77, 68], dtype=np.int32),
-        np.array([-66, 72, 87, -75], dtype=np.int32),
-        np.array([66, 72, 87, 75], dtype=np.int32),
-        np.array([-24, 40, -23, 74], dtype=np.int32),
-        np.array([24, 40, 23, 74], dtype=np.int32),
+        np.array([-64, 72, 88, -76], dtype=np.int32),
+        np.array([64, 72, 88, 76], dtype=np.int32),
+        np.array([-24, 40, -23, 64], dtype=np.int32),
+        np.array([24, 40, 23, 64], dtype=np.int32),
         ]
     small_ivecs = [
         np.array([13, 26], dtype=np.int32),
