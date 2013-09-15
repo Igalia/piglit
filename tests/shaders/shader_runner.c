@@ -1585,6 +1585,11 @@ handle_texparameter(const char *line)
 		printf("lod_bias feature is only available in desktop GL\n");
 		piglit_report_result(PIGLIT_SKIP);
 #endif
+	} else if (string_match("max_level ", line)) {
+		line += strlen("max_level ");
+		glTexParameteri(target, GL_TEXTURE_MAX_LEVEL,
+				strtol(line, NULL, 10));
+		return;
 	} else if (string_match("base_level ", line)) {
 		line += strlen("base_level ");
 		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL,
