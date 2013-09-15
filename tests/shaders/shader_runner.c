@@ -1561,6 +1561,12 @@ handle_texparameter(const char *line)
 		{ "linear",                 GL_LINEAR                 },
 		{ NULL, 0 }
 	};
+	const struct string_to_enum swizzle_modes[] = {
+		{ "red", GL_RED },
+		{ "green", GL_GREEN },
+		{ "blue", GL_BLUE },
+		{ "alpha", GL_ALPHA },
+	};
 	GLenum target = 0;
 	GLenum parameter;
 	const char *parameter_name;
@@ -1609,6 +1615,11 @@ handle_texparameter(const char *line)
 		glTexParameteri(target, GL_TEXTURE_BASE_LEVEL,
 				strtol(line, NULL, 10));
 		return;
+	} else if (string_match("swizzle_r ", line)) {
+		parameter = GL_TEXTURE_SWIZZLE_R;
+		parameter_name = "swizzle_r";
+		line += strlen("swizzle_r ");
+		strings = swizzle_modes;
 	} else {
 		fprintf(stderr, "unknown texture parameter in `%s'\n", line);
 		piglit_report_result(PIGLIT_FAIL);
