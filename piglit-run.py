@@ -62,7 +62,7 @@ def main():
                         action  = "append",
                         metavar = "<regex>",
                         help    = "Exclude matching tests (can be used more than once)")
-    parser.add_argument("--no-concurrency",
+    parser.add_argument("-1", "--no-concurrency",
                         action  = "store_false",
                         dest    = "concurrency",
                         help    = "Disable concurrent test runs")
