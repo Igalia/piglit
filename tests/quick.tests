@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Testing drivers for Radeon hardware
-#
 
 import os.path
 
@@ -11,3 +8,9 @@ from framework.gleantest import GleanTest
 GleanTest.globalParams += [ "--quick" ]
 
 execfile(os.path.dirname(__file__) + '/all.tests')
+
+# These take too long
+del profile.tests['shaders']['glsl-fs-inline-explosion']
+del profile.tests['shaders']['glsl-fs-unroll-explosion']
+del profile.tests['shaders']['glsl-vs-inline-explosion']
+del profile.tests['shaders']['glsl-vs-unroll-explosion']
