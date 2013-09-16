@@ -754,6 +754,7 @@ spec['!OpenGL 3.2/layered-rendering/clear-color'] = concurrent_test('gl-3.2-laye
 spec['!OpenGL 3.2/layered-rendering/clear-depth'] = concurrent_test('gl-3.2-layered-rendering-clear-depth')
 spec['!OpenGL 3.2/layered-rendering/framebuffertexture-buffer-textures'] = concurrent_test('gl-3.2-layered-rendering-framebuffertexture-buffer-textures')
 spec['!OpenGL 3.2/layered-rendering/readpixels'] = concurrent_test('gl-3.2-layered-rendering-readpixels')
+spec['!OpenGL 3.2/layered-rendering/framebuffer-layered-attachments'] = concurrent_test('gl-3.2-layered-rendering-framebuffer-layered-attachments')
 
 spec['!OpenGL/get-active-attrib-returns-all-inputs'] = concurrent_test('gl-get-active-attrib-returns-all-inputs')
 
