@@ -314,8 +314,8 @@ test_format(GLenum target, GLenum intFormat)
 
 		if (!equal_images(ref, testImg, w, h)) {
 			printf("texsubimage failed\n");
-			printf("  target: 0x%x\n", target);
-			printf("  internal format: 0x%x\n", intFormat);
+			printf("  target: %s\n", piglit_get_gl_enum_name(target));
+			printf("  internal format: %s\n", piglit_get_gl_enum_name(intFormat));
 			printf("  region: %d, %d  %d x %d\n", tx, ty, tw, th);
 			pass = GL_FALSE;
 			break;
