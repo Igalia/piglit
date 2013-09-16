@@ -46,7 +46,12 @@
           <pre>${traceback}</pre>
         </td>
       </tr>
-
+      <tr>
+        <td>dmesg</td>
+        <td>
+          <pre>${dmesg}</pre>
+        </td>
+      </tr>
     </table>
     <p><a href="${index}">Back to summary</a></p>
   </body>

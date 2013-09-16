@@ -41,9 +41,9 @@ class GleanTest(ExecTest):
                                  "+"+name] + GleanTest.globalParams)
         self.name = name
 
-    def interpretResult(self, out, returncode, results):
+    def interpretResult(self, out, returncode, results, dmesg):
         if out.find('FAIL') >= 0:
-            results['result'] = 'fail'
+            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
         else:
-            results['result'] = 'pass'
+            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
         return out

@@ -52,13 +52,13 @@ class IGTTest(ExecTest):
     def __init__(self, binary, arguments=[]):
 	ExecTest.__init__(self, [path.join(igtTestRoot, binary)] + arguments)
 
-    def interpretResult(self, out, returncode, results):
+    def interpretResult(self, out, returncode, results, dmesg):
 	if returncode == 0:
-	    results['result'] = 'pass'
+	    results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
 	elif returncode == 77:
 	    results['result'] = 'skip'
 	else:
-	    results['result'] = 'fail'
+	    results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
 	return out
 
 def listTests(listname):

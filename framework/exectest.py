@@ -25,6 +25,7 @@ import os
 import subprocess
 import shlex
 import types
+import re
 
 from core import Test, testBinDir, TestResult
 
@@ -36,7 +37,35 @@ else:
     PIGLIT_PLATFORM = ''
 
 
-# ExecTest: A shared base class for tests that simply run an executable.
+def read_dmesg():
+    proc = subprocess.Popen('dmesg', stdout=subprocess.PIPE)
+    return proc.communicate()[0].rstrip('\n')
+
+def get_dmesg_diff(old, new):
+    # Note that dmesg is a ring buffer, i.e. lines at the beginning may
+    # be removed when new lines are added.
+
+    # Get the last dmesg timestamp from the old dmesg as string.
+    last = old.split('\n')[-1]
+    ts = last[:last.find(']')+1]
+    if ts == '':
+        return ''
+
+    # Find the last occurence of the timestamp.
+    pos = new.find(ts)
+    if pos == -1:
+        return new # dmesg was completely overwritten by new messages
+
+    while pos != -1:
+        start = pos
+        pos = new.find(ts, pos+len(ts))
+
+    # Find the next line and return the rest of the string.
+    nl = new.find('\n', start+len(ts))
+    return new[nl+1:] if nl != -1 else ''
+
+
+# ExecTest: A shared base class for tests that simply runs an executable.
 class ExecTest(Test):
     def __init__(self, command):
         Test.__init__(self)
@@ -49,11 +78,11 @@ class ExecTest(Test):
 
         self.skip_test = self.check_for_skip_scenario(command)
 
-    def interpretResult(self, out, returncode, results):
+    def interpretResult(self, out, returncode, results, dmesg):
         raise NotImplementedError
         return out
 
-    def run(self, valgrind):
+    def run(self, env):
         """
         Run a test.  The return value will be a dictionary with keys
         including 'result', 'info', 'returncode' and 'command'.
@@ -70,19 +99,24 @@ class ExecTest(Test):
         if self.command is not None:
             command = self.command
 
-            if valgrind:
+            if env.valgrind:
                 command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
                                '--tool=memcheck']
 
             i = 0
+            dmesg_diff = ''
             while True:
                 if self.skip_test:
                     out = "PIGLIT: {'result': 'skip'}\n"
                     err = ""
                     returncode = None
                 else:
+                    if env.dmesg:
+                        old_dmesg = read_dmesg()
                     (out, err, returncode) = \
                         self.get_command_result(command, fullenv)
+                    if env.dmesg:
+                        dmesg_diff = get_dmesg_diff(old_dmesg, read_dmesg())
 
                 # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
                 # affecting many developers.  If we catch it
@@ -117,7 +151,7 @@ class ExecTest(Test):
                 results['result'] = 'skip'
             else:
                 results['result'] = 'fail'
-                out = self.interpretResult(out, returncode, results)
+                out = self.interpretResult(out, returncode, results, dmesg_diff)
 
             crash_codes = [
                 # Unix: terminated by a signal
@@ -138,7 +172,7 @@ class ExecTest(Test):
             elif returncode != 0:
                 results['note'] = 'Returncode was {0}'.format(returncode)
 
-            if valgrind:
+            if env.valgrind:
                 # If the underlying test failed, simply report
                 # 'skip' for this valgrind test.
                 if results['result'] != 'pass':
@@ -161,6 +195,7 @@ class ExecTest(Test):
                                                              err, out)
             results['returncode'] = returncode
             results['command'] = ' '.join(self.command)
+            results['dmesg'] = dmesg_diff
 
             self.handleErr(results, err)
 
@@ -217,10 +252,15 @@ class PlainExecTest(ExecTest):
         # Prepend testBinDir to the path.
         self.command[0] = testBinDir + self.command[0]
 
-    def interpretResult(self, out, returncode, results):
+    def interpretResult(self, out, returncode, results, dmesg):
         outlines = out.split('\n')
         outpiglit = map(lambda s: s[7:],
                         filter(lambda s: s.startswith('PIGLIT:'), outlines))
+
+        if dmesg != '':
+            outpiglit = map(lambda s: s.replace("'pass'", "'dmesg-warn'"), outpiglit)
+            outpiglit = map(lambda s: s.replace("'warn'", "'dmesg-warn'"), outpiglit)
+            outpiglit = map(lambda s: s.replace("'fail'", "'dmesg-fail'"), outpiglit)
 
         if len(outpiglit) > 0:
             try:

@@ -362,13 +362,14 @@ class TestrunResult:
 
 class Environment:
     def __init__(self, concurrent=True, execute=True, include_filter=[],
-                 exclude_filter=[], valgrind=False):
+                 exclude_filter=[], valgrind=False, dmesg=False):
         self.concurrent = concurrent
         self.execute = execute
         self.filter = []
         self.exclude_filter = []
         self.exclude_tests = set()
         self.valgrind = valgrind
+        self.dmesg = dmesg
 
         """
         The filter lists that are read in should be a list of string objects,
@@ -446,7 +447,7 @@ class Test:
             try:
                 status("running")
                 time_start = time.time()
-                result = self.run(env.valgrind)
+                result = self.run(env)
                 time_end = time.time()
                 if 'time' not in result:
                     result['time'] = time_end - time_start

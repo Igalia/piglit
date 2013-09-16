@@ -36,7 +36,7 @@ td:first-child > div {
 	background-color: #c8c838
 }
 
-td.skip, td.warn, td.fail, td.pass, td.trap, td.abort, td.crash {
+td.skip, td.warn, td.fail, td.pass, td.trap, td.abort, td.crash, td.dmesg-warn, td.dmesg-fail {
 	text-align: right;
 }
 
@@ -59,9 +59,13 @@ tr:nth-child(even) td.skip  { background-color: #a0a0a0; }
 
 tr:nth-child(odd)  td.warn  { background-color: #ff9020; }
 tr:nth-child(even) td.warn  { background-color: #ef8010; }
+tr:nth-child(odd)  td.dmesg-warn  { background-color: #ff9020; }
+tr:nth-child(even) td.dmesg-warn  { background-color: #ef8010; }
 
 tr:nth-child(odd)  td.fail  { background-color: #ff2020; }
 tr:nth-child(even) td.fail  { background-color: #e00505; }
+tr:nth-child(odd)  td.dmesg-fail  { background-color: #ff2020; }
+tr:nth-child(even) td.dmesg-fail  { background-color: #e00505; }
 
 tr:nth-child(odd)  td.trap  { background-color: #111111; }
 tr:nth-child(even) td.trap  { background-color: #000000; }

@@ -72,6 +72,9 @@ def main():
     parser.add_argument("--valgrind",
                         action="store_true",
                         help="Run tests in valgrind's memcheck")
+    parser.add_argument("--dmesg",
+                        action="store_true",
+                        help="Capture a difference in dmesg before and after each test")
     parser.add_argument("testProfile",
                         metavar="<Path to test profile>",
                         help="Path to testfile to run")
@@ -108,7 +111,8 @@ def main():
                            exclude_filter=args.exclude_tests,
                            include_filter=args.include_tests,
                            execute=args.execute,
-                           valgrind=args.valgrind)
+                           valgrind=args.valgrind,
+                           dmesg=args.dmesg)
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))

@@ -31,7 +31,7 @@ import re
 import sys
 import textwrap
 
-from core import testBinDir, Group, Test, TestResult
+from core import testBinDir, Group, Test, TestResult, Environment
 from exectest import PlainExecTest
 
 """This module enables running shader tests.
@@ -243,7 +243,7 @@ class ShaderTest(PlainExecTest):
         self.__command = [runner] + self.__shader_runner_args
         return self.__command
 
-    def run(self, valgrind=False):
+    def run(self, env = Environment()):
         """ Parse the test file's [require] block to determine which
         executable is needed to run the test. Then run the executable on the
         test file."""
@@ -259,7 +259,7 @@ class ShaderTest(PlainExecTest):
                 # parsing the test file discovered an error.
                 return self.__result
 
-            return PlainExecTest.run(self, valgrind)
+            return PlainExecTest.run(self, env)
 
 
 def _usage_error():

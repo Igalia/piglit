@@ -323,9 +323,9 @@ class Summary:
                     return 1
                 elif status == 'pass':
                     return 2
-                elif status == 'warn':
+                elif status in ['warn', 'dmesg-warn']:
                     return 3
-                elif status == 'fail':
+                elif status in ['fail', 'dmesg-fail']:
                     return 4
                 elif status == 'crash':
                     return 5
@@ -419,9 +419,9 @@ class Summary:
             """
             if status == 'pass':
                 return 1
-            elif status == 'warn':
+            elif status in ['warn', 'dmesg-warn']:
                 return 2
-            elif status == 'fail':
+            elif status in ['fail', 'dmesg-fail']:
                 return 3
             elif status == 'skip':
                 return 4
@@ -480,7 +480,8 @@ class Summary:
         Private: Find the total number of pass, fail, crash, skip, and warn in
         the *last* set of results stored in self.results.
         """
-        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn': 0}
+        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn': 0,
+                       'dmesg-warn': 0, 'dmesg-fail': 0}
 
         for test in self.results[-1].tests.values():
             self.totals[test['result']] += 1
@@ -547,6 +548,7 @@ class Summary:
                         info=value.get('info', 'None'),
                         traceback=value.get('traceback', 'None'),
                         command=value.get('command', 'None'),
+                        dmesg=value.get('dmesg', 'None'),
                         css=path.relpath(resultCss, tPath),
                         index=path.relpath(index, tPath)))
                     file.close()
@@ -625,6 +627,8 @@ class Summary:
         print "      crash: %d" % self.totals['crash']
         print "       skip: %d" % self.totals['skip']
         print "       warn: %d" % self.totals['warn']
+        print "       dmesg-warn: %d" % self.totals['dmesg-warn']
+        print "       dmesg-fail: %d" % self.totals['dmesg-fail']
         if self.tests['changes']:
             print "    changes: %d" % len(self.tests['changes'])
             print "      fixes: %d" % len(self.tests['fixes'])
