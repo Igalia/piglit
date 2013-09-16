@@ -36,9 +36,12 @@ import traceback
 from log import log
 from cStringIO import StringIO
 from textwrap import dedent
-from threads import ConcurrentTestPool
 from threads import synchronized_self
 import threading
+import multiprocessing
+
+from threadpool import ThreadPool
+
 
 __all__ = ['Environment',
            'checkDir',
@@ -429,19 +432,9 @@ class Test:
     def run(self):
         raise NotImplementedError
 
-    def schedule(self, env, path, json_writer):
+    def execute(self, env, path, json_writer):
         '''
-        Schedule test to be run via the concurrent thread pool.
-        This is a no-op if the test isn't marked as concurrent.
-
-        See ``Test.doRun`` for a description of the parameters.
-        '''
-        if self.runConcurrent:
-            ConcurrentTestPool().put(self.doRun, args=(env, path, json_writer))
-
-    def doRun(self, env, path, json_writer):
-        '''
-        Run the test immediately.
+        Run the test.
 
         :path:
             Fully qualified test name as a string.  For example,
@@ -566,18 +559,22 @@ class TestProfile:
 
         self.prepare_test_list(env)
 
-        # Queue up all the concurrent tests, so the pool is filled
-        # at the start of the test run.
+        # If using concurrency, add all the concurrent tests to the pool and
+        # execute that pool
         if env.concurrent:
+            pool = ThreadPool(multiprocessing.cpu_count())
             for (path, test) in self.test_list.items():
-                test.schedule(env, path, json_writer)
+                if test.runConcurrent:
+                    pool.add(test.execute, (env, path, json_writer))
+            pool.join()
 
-        # Run any remaining non-concurrent tests serially from this
-        # thread, while the concurrent tests
+        # Run any remaining tests serially from a single thread pool after the
+        # concurrent tests have finished
+        pool = ThreadPool(1)
         for (path, test) in self.test_list.items():
             if not env.concurrent or not test.runConcurrent:
-                test.doRun(env, path, json_writer)
-        ConcurrentTestPool().join()
+                pool.add(test.execute, (env, path, json_writer))
+        pool.join()
 
     def remove_test(self, test_path):
         """Remove a fully qualified test from the profile.

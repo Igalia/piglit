@@ -22,10 +22,6 @@
 #
 
 from weakref import WeakKeyDictionary
-import multiprocessing
-
-from threadpool import ThreadPool
-from patterns import Singleton
 from threading import RLock
 
 
@@ -45,16 +41,3 @@ def synchronized_self(function):
 
 # track the locks for each instance
 synchronized_self.locks = WeakKeyDictionary()
-
-
-class ConcurrentTestPool(Singleton):
-    @synchronized_self
-    def init(self):
-        self.pool = ThreadPool(multiprocessing.cpu_count())
-
-    @synchronized_self
-    def put(self, callable, args=None):
-        self.pool.add(callable, args)
-
-    def join(self):
-        self.pool.join()
