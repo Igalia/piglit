@@ -11,6 +11,7 @@ ${OPENGL_glu_LIBRARY}
 )
 
 piglit_add_executable (glsl-1.50-geometry-end-primitive end-primitive.c)
+piglit_add_executable (glsl-1.50-geometry-end-primitive-optional-with-points-out geometry-end-primitive-optional-with-points-out.c)
 piglit_add_executable (glsl-1.50-geometry-primitive-id-restart primitive-id-restart.c)
 piglit_add_executable (glsl-1.50-geometry-primitive-types primitive-types.c)
 piglit_add_executable (glsl-1.50-geometry-tri-strip-ordering-with-prim-restart tri-strip-ordering-with-prim-restart.c)
