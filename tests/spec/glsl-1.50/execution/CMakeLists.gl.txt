@@ -12,3 +12,4 @@ ${OPENGL_glu_LIBRARY}
 
 piglit_add_executable (glsl-1.50-vs-input-arrays vs-input-arrays.c)
 piglit_add_executable (glsl-1.50-get-active-attrib-array get-active-attrib-array.c)
+piglit_add_executable (glsl-1.50-vs-named-block-no-modify vs-named-block-no-modify.c)
