@@ -60,7 +60,7 @@ class Error(Exception):
 # See http://www.w3.org/TR/xml/#charsets
 _validXmlAscii = ''.join([((_c >= 0x20 and _c < 0x80) or _c in (0x9, 0xA, 0xD)) and chr(_c) or '?' for _c in range(256)])
 _validXmlUnicode = {}
-for _c in range(20):
+for _c in range(0x20):
     if _c not in (0x9, 0xA, 0xD):
         _validXmlUnicode[_c] = ord('?')
 del _c
