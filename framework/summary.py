@@ -438,34 +438,34 @@ class Summary:
                 except KeyError:
                     status.append(find_regressions("special"))
 
-                if 'changes' in lists:
-                    # Check and append self.tests['changes']
-                    # A set cannot contain duplicate entries, so creating a set
-                    # out the list will reduce it's length to 1 if all entries
-                    # are the same, meaning it is not a change
-                    if len(set(status)) > 1:
-                        self.tests['changes'].append(test)
+            if 'changes' in lists:
+                # Check and append self.tests['changes']
+                # A set cannot contain duplicate entries, so creating a set
+                # out the list will reduce it's length to 1 if all entries
+                # are the same, meaning it is not a change
+                if len(set(status)) > 1:
+                    self.tests['changes'].append(test)
 
-                if 'problems' in lists:
-                    # If the result contains a value other than 1 (pass) or 4
-                    # (skip) it is a problem. Skips are not problems becasuse
-                    # they have Their own page.
-                    if [i for e in [2, 3, 5] for i in status if e is i]:
-                        self.tests['problems'].append(test)
+            if 'problems' in lists:
+                # If the result contains a value other than 1 (pass) or 4
+                # (skip) it is a problem. Skips are not problems becasuse
+                # they have Their own page.
+                if [i for e in [2, 3, 5] for i in status if e is i]:
+                    self.tests['problems'].append(test)
 
-                if 'skipped' in lists:
-                    # Find all tests with a status of skip
-                    if 4 in status:
-                        self.tests['skipped'].append(test)
+            if 'skipped' in lists:
+                # Find all tests with a status of skip
+                if 4 in status:
+                    self.tests['skipped'].append(test)
 
-                if 'fixes' in lists:
-                    # Find both fixes and regressions, and append them to the
-                    # proper lists
-                    for i in xrange(len(status) - 1):
-                        if status[i] < status[i + 1] and status[i] != 0:
-                            self.tests['regressions'].append(test)
-                        if status[i] > 1 and status[i + 1] == 1:
-                            self.tests['fixes'].append(test)
+            if 'fixes' in lists:
+                # Find both fixes and regressions, and append them to the
+                # proper lists
+                for i in xrange(len(status) - 1):
+                    if status[i] < status[i + 1] and status[i] != 0:
+                        self.tests['regressions'].append(test)
+                    if status[i] > 1 and status[i + 1] == 1:
+                        self.tests['fixes'].append(test)
 
         # Remove duplicate entries from the status lists
         # If there are 4+ results can result in mutiple passes or regressions
