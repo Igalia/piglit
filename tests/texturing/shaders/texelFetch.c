@@ -93,13 +93,13 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		config.supports_gl_core_version = 31;
 	}
 
-	config.window_width = 355;
-	config.window_height = 350;
+	config.window_width = 900;
+	config.window_height = 600;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define MAX_LOD_OR_SAMPLES  8.0
+#define MAX_LOD_OR_SAMPLES  10.0
 
 /** Vertex shader attribute locations */
 const int pos_loc = 0;
@@ -123,6 +123,10 @@ int divisor_loc;
  */
 float ***expected_colors;
 
+int prog;
+GLuint tex;
+GLuint pos_vbo, tc_vbo;
+
 /**
  * Return the divisors necessary to scale the unnormalized texture data to
  * a floating point color value in the range [0, 1].
@@ -139,21 +143,16 @@ compute_divisors(int lod, float *divisors)
 		divisors[0] = -divisors[0];
 }
 
-enum piglit_result
-piglit_display()
+static bool test_once()
 {
-	int i, l, z;
+	int i, l, z, level_y = 0;
 	bool pass = true;
-
-   glViewport(0, 0, piglit_width, piglit_height);
-
-	glClearColor(0.1, 0.1, 0.1, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glPointSize(1.0);
 
 	i = 0;
 	for (l = 0; l < miplevels; ++l) {
+		if (l && !has_samples())
+			level_y += 1 + MAX2(base_size[1] >> (l-1), 1);
+
 		for (z = 0; z < level_size[l][2]; z++) {
 			/* Draw the "rectangle" for this miplevel/slice. */
 			int points = level_size[l][0] * level_size[l][1];
@@ -168,17 +167,18 @@ piglit_display()
 			i += points;
 
 			/* Compare results against reference image. */
-			pass &= piglit_probe_image_rgba(5+(5+base_size[0]) * z,
-							5+(5+base_size[1]) * l,
+			pass &= piglit_probe_image_rgba(5+(1+base_size[0]) * z,
+							has_samples() ? 5+(1+base_size[1]) * l
+								      : 5 + level_y,
 							level_size[l][0],
 							level_size[l][1],
 							expected_colors[l][z]);
+			free(expected_colors[l][z]);
 		}
+		free(expected_colors[l]);
 	}
-
-	piglit_present_results();
-
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	free(expected_colors);
+	return pass;
 }
 
 /**
@@ -193,11 +193,11 @@ void
 generate_VBOs()
 {
 	int x, y, z, l;
-	GLuint pos_vbo, tc_vbo;
 	float *pos, *pos_data;
 	int *tc, *tc_data;
 	bool array_1D = sampler.target == GL_TEXTURE_1D_ARRAY;
 	int num_texels = 0;
+	int level_y = 0;
 
 	/* Calculate the # of texels a.k.a. size of the VBOs */
 	for (l = 0; l < miplevels; l++) {
@@ -208,12 +208,18 @@ generate_VBOs()
 	tc = tc_data = malloc(num_texels * 4 * sizeof(int));
 
 	for (l = 0; l < miplevels; l++) {
+		if (l && !has_samples())
+			level_y += 1 + MAX2(base_size[1] >> (l-1), 1);
+
 		for (z = 0; z < level_size[l][2]; z++) {
 			for (y = 0; y < level_size[l][1]; y++) {
 				for (x = 0; x < level_size[l][0]; x++) {
 					/* Assign pixel positions: */
-					pos[0] = 5.5 + (5 + base_size[0])*z + x;
-					pos[1] = 5.5 + (5 + base_size[1])*l + y;
+					pos[0] = 5.5 + (1 + base_size[0])*z + x;
+					if (has_samples())
+						pos[1] = 5.5 + (1 + base_size[1])*l + y;
+					else
+						pos[1] = 5.5 + level_y + y;
 					pos[2] = 0.0;
 					pos[3] = 1.0;
 
@@ -250,12 +256,6 @@ generate_VBOs()
 		}
 	}
 
-	if (piglit_get_gl_version() >= 31) {
-                GLuint vao;
-                glGenVertexArrays(1, &vao);
-                glBindVertexArray(vao);
-        }
-
 	/* Create VBO for pixel positions in NDC: */
 	glGenBuffers(1, &pos_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, pos_vbo);
@@ -273,6 +273,9 @@ generate_VBOs()
 		     tc_data, GL_STATIC_DRAW);
 	glVertexAttribIPointer(texcoord_loc, 4, GL_INT, 0, 0);
 	glEnableVertexAttribArray(texcoord_loc);
+
+	free(pos_data);
+	free(tc_data);
 }
 
 /* like piglit_draw_rect(), but works in a core context too.
@@ -281,7 +284,7 @@ static void
 draw_rect_core(int x, int y, int w, int h)
 {
     float verts[4][4];
-    GLuint bo, vao;
+    GLuint bo;
 
     verts[0][0] = x;
     verts[0][1] = y;
@@ -300,9 +303,6 @@ draw_rect_core(int x, int y, int w, int h)
     verts[3][2] = 0.0;
     verts[3][3] = 1.0;
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
     glGenBuffers(1, &bo);
     glBindBuffer(GL_ARRAY_BUFFER, bo);
     glBufferData(GL_ARRAY_BUFFER, 4 * 4 * sizeof(float),
@@ -312,9 +312,7 @@ draw_rect_core(int x, int y, int w, int h)
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-    glBindVertexArray(0);
     glDeleteBuffers(1, &bo);
-    glDeleteVertexArrays(1, &vao);
 }
 
 /**
@@ -417,6 +415,7 @@ upload_multisample_data(GLuint tex, int width, int height,
     glDisable(GL_SAMPLE_MASK);
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, oldFBO);
+    glDeleteFramebuffers(1, &FBO);
 }
 
 /**
@@ -432,7 +431,6 @@ generate_texture()
 	float    *expected_ptr;
 	void *level_image;
 	float divisors[4];
-	GLuint tex;
 	GLenum target = sampler.target;
 
 	glActiveTexture(GL_TEXTURE0);
@@ -528,6 +526,10 @@ generate_texture()
 
 		if (!has_samples())
 			upload_miplevel_data(target, l, level_image);
+
+		free(f_level);
+		free(u_level);
+		free(i_level);
 	}
 
 	if (has_samples())
@@ -754,17 +756,6 @@ generate_GLSL(enum shader_target test_stage)
 }
 
 /**
- * Set the size of the texture's base level.
- */
-void
-set_base_size()
-{
-	base_size[0] = 65;
-	base_size[1] = has_height() ? 32 : 1;
-	base_size[2] = has_slices() ?  5 : 1;
-}
-
-/**
  * Is this sampler supported by texelFetch?
  */
 static bool
@@ -798,8 +789,12 @@ parse_args(int argc, char **argv)
 {
 	int i;
 	bool sampler_found = false;
+	bool dim_range_found = false;
 
 	sample_count = 0;
+	minx = maxx = 65;
+	miny = maxy = 32;
+	minz = maxz = 5;
 
 	for (i = 1; i < argc; i++) {
 		if (test_stage == UNKNOWN) {
@@ -833,12 +828,44 @@ parse_args(int argc, char **argv)
 		/* Maybe it's the sample count? */
 		if (sampler_found && has_samples() && !sample_count) {
 			sample_count = atoi(argv[i]);
-
 			continue;
 		}
 
 		if (!swizzling && (swizzling = parse_swizzle(argv[i])))
 			continue;
+
+		if (!dim_range_found) {
+			if (sscanf(argv[i], "%ux%ux%u-%ux%ux%u",
+				   &minx, &miny, &minz, &maxx, &maxy, &maxz) == 6) {
+				dim_range_found = true;
+				continue;
+			}
+			if (sscanf(argv[i], "%ux%u-%ux%u",
+				   &minx, &miny, &maxx, &maxy) == 4) {
+				minz = maxz = 1;
+				dim_range_found = true;
+				continue;
+			}
+			if (sscanf(argv[i], "%u-%u", &minx, &maxx) == 2) {
+				miny = maxy = minz = maxz = 1;
+				dim_range_found = true;
+				continue;
+			}
+			if (sscanf(argv[i], "%ux%ux%u", &minx, &miny, &minz) == 3) {
+				maxx = minx;
+				maxy = miny;
+				maxz = minz;
+				dim_range_found = true;
+				continue;
+			}
+			if (sscanf(argv[i], "%ux%u", &minx, &miny) == 2) {
+				maxx = minx;
+				maxy = miny;
+				minz = maxz = 1;
+				dim_range_found = true;
+				continue;
+			}
+		}
 
 		fail_and_show_usage();
 	}
@@ -848,13 +875,75 @@ parse_args(int argc, char **argv)
 
 	if (test_stage == GS && shader_version < 150)
 		shader_version = 150;
+
+	if (!has_height()) {
+		miny = maxy = 1;
+	}
+
+	if (!has_slices()) {
+		minz = maxz = 1;
+	}
+
+	if (minx < maxx || miny < maxy || minz < maxz)
+		piglit_automatic = true;
 }
 
+enum piglit_result
+piglit_display()
+{
+	int x, y, z;
+	bool pass = true;
+
+	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glPointSize(1.0);
+
+	for (x = minx; x <= maxx; x++) {
+		for (y = miny; y <= maxy; y++) {
+			for (z = minz; z <= maxz; z++) {
+				printf("%ix%ix%i\n", x, y, z);
+
+				if (5 + (x+1) * z >= piglit_width) {
+					printf("Width or depth is too big.\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				if ((has_samples() && 5 + (y+1) * miplevels >= piglit_height) ||
+				    (!has_samples() && 5 + y*2 + miplevels-2 >= piglit_height)) {
+					printf("Height is too big or too many samples.\n");
+					piglit_report_result(PIGLIT_FAIL);
+				}
+
+				base_size[0] = x;
+				base_size[1] = y;
+				base_size[2] = z;
+
+				/* Create textures and set miplevel info */
+				compute_miplevel_info();
+				generate_texture();
+				generate_VBOs();
+
+				glViewport(0, 0, piglit_width, piglit_height);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glUseProgram(prog);
+
+				pass &= test_once();
+
+				glUseProgram(0);
+				glDeleteTextures(1, &tex);
+				glDeleteBuffers(1, &pos_vbo);
+				glDeleteBuffers(1, &tc_vbo);
+			}
+		}
+	}
+
+	piglit_present_results();
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
 
 void
 piglit_init(int argc, char **argv)
 {
-	int prog;
 	int tex_location;
 
 	if (!supported_sampler()) {
@@ -893,14 +982,12 @@ piglit_init(int argc, char **argv)
 	tex_location = glGetUniformLocation(prog, "tex");
 	divisor_loc = glGetUniformLocation(prog, "divisor");
 
-	/* Create textures and set miplevel info */
-	set_base_size();
-	compute_miplevel_info();
-	generate_texture();
-
-	generate_VBOs();
-
 	glUseProgram(prog);
-
 	glUniform1i(tex_location, 0);
+
+	if (piglit_get_gl_version() >= 31) {
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
 }

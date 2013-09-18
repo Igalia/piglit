@@ -872,6 +872,21 @@ for stage in ['vs', 'gs', 'fs']:
                 'texelFetch {0} {1}sampler2DArray b0r1'.format(
                         stage, type))
 
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler1D 1-513')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler1DArray 1x71-501x71')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler1DArray 1x281-501x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler1DArray 71x1-71x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler1DArray 281x1-281x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2D 1x71-501x71')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2D 1x281-501x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2D 71x1-71x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2D 281x1-281x281')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler3D 1x129x9-98x129x9')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler3D 98x1x9-98x129x9')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler3D 98x129x1-98x129x9')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 1x129x9-98x129x9')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 98x1x9-98x129x9')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 98x129x1-98x129x9')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
@@ -1031,6 +1046,13 @@ for sample_count in MSAA_SAMPLE_COUNTS:
     # sample positions
     spec['ARB_texture_multisample/sample-position/%d' % (sample_count,)] = \
         concurrent_test('arb_texture_multisample-sample-position %d' % (sample_count,))
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMS 4 1x71-501x71')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMS 4 1x130-501x130')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMS 4 71x1-71x130')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMS 4 281x1-281x130')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMSArray 4 1x129x9-98x129x9')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMSArray 4 98x1x9-98x129x9')
+add_concurrent_test(arb_texture_multisample, 'texelFetch fs sampler2DMSArray 4 98x129x1-98x129x9')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-texstate')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-errors')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mask')

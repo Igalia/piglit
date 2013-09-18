@@ -80,6 +80,7 @@ struct sampler_info
 
 /** Whether or not we're using GL_EXT_texture_swizzle */
 bool swizzling;
+int minx, miny, minz, maxx, maxy, maxz;
 int sample_count;
 extern int shader_version;
 
