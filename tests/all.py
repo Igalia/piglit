@@ -1586,6 +1586,11 @@ arb_draw_instanced['negative-elements-type'] = concurrent_test('arb_draw_instanc
 add_plain_test(arb_draw_instanced, 'draw-instanced')
 add_plain_test(arb_draw_instanced, 'draw-instanced-divisor')
 
+# Group ARB_draw_indirect
+arb_draw_indirect = Group()
+spec['ARB_draw_indirect'] = arb_draw_indirect
+add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-api-errors')
+
 # Group ARB_fragment_program
 arb_fragment_program = Group()
 spec['ARB_fragment_program'] = arb_fragment_program
