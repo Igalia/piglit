@@ -63,11 +63,6 @@ def power_set(s):
 profile = TestProfile()
 
 try:
-    execfile(path.join(testsDir, 'gtf.tests'))
-except SystemExit:
-    pass
-
-try:
     execfile(path.join(testsDir, 'es3conform.tests'))
 except SystemExit:
     pass
