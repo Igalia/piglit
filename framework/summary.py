@@ -383,8 +383,8 @@ class Summary:
 
         self.status = {}
         self.fractions = {}
-        self.tests = {'all': [], 'changes': [], 'problems': [], 'skipped': [],
-                      'regressions': [], 'fixes': []}
+        self.tests = {'all': set(), 'changes': set(), 'problems': set(), 'skipped': set(),
+                      'regressions': set(), 'fixes': set()}
 
         for each in self.results:
             # Build a dict of the status output of all of the tests, with the
@@ -395,7 +395,7 @@ class Summary:
             self.status.update({each.name: status})
 
             # Create a list with all the test names in it
-            self.tests['all'] = list(set(self.tests['all']) | set(each.tests))
+            self.tests['all'] = set(self.tests['all']) | set(each.tests)
 
     def __generate_lists(self, lists):
         """
@@ -444,36 +444,28 @@ class Summary:
                 # out the list will reduce it's length to 1 if all entries
                 # are the same, meaning it is not a change
                 if len(set(status)) > 1:
-                    self.tests['changes'].append(test)
+                    self.tests['changes'].add(test)
 
             if 'problems' in lists:
                 # If the result contains a value other than 1 (pass) or 4
                 # (skip) it is a problem. Skips are not problems becasuse
                 # they have Their own page.
                 if [i for e in [2, 3, 5] for i in status if e is i]:
-                    self.tests['problems'].append(test)
+                    self.tests['problems'].add(test)
 
             if 'skipped' in lists:
                 # Find all tests with a status of skip
                 if 4 in status:
-                    self.tests['skipped'].append(test)
+                    self.tests['skipped'].add(test)
 
             if 'fixes' in lists:
                 # Find both fixes and regressions, and append them to the
                 # proper lists
                 for i in xrange(len(status) - 1):
                     if status[i] < status[i + 1] and status[i] != 0:
-                        self.tests['regressions'].append(test)
+                        self.tests['regressions'].add(test)
                     if status[i] > 1 and status[i + 1] == 1:
-                        self.tests['fixes'].append(test)
-
-        # Remove duplicate entries from the status lists
-        # If there are 4+ results can result in mutiple passes or regressions
-        # and changes in other words: "pass fail pass fail" will result in a
-        # regression, a fix, and a regression and it will be printed twice in
-        # the summary. Turning them into sets remove duplicates
-        for (result, value) in self.tests.items():
-            self.tests[result] = set(value)
+                        self.tests['fixes'].add(test)
 
     def __find_totals(self):
         """
