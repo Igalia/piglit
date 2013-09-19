@@ -34,7 +34,6 @@
  *  with a constant (other than NONE) that does not indicate any of the color
  *  buffers allocated to the GL context by the window system, the error
  *  INVALID_OPERATION will be generated."
- *
  */
 
 #include "piglit-util-gl-common.h"
@@ -49,35 +48,43 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 
-static GLenum invalids[]={GL_FRONT,
-			GL_BACK,
-			GL_LEFT,
-			GL_RIGHT,
-			GL_FRONT_AND_BACK};
+static const GLenum invalids[] = {
+	GL_FRONT,
+	GL_BACK,
+	GL_LEFT,
+	GL_RIGHT,
+	GL_FRONT_AND_BACK
+};
 
-static GLenum valids[] = {GL_NONE,
-			GL_FRONT_LEFT,
-			GL_FRONT_RIGHT,
-			GL_BACK_LEFT,
-			GL_BACK_RIGHT};
+static const GLenum valids[] = {
+	GL_NONE,
+	GL_FRONT_LEFT,
+	GL_FRONT_RIGHT,
+	GL_BACK_LEFT,
+	GL_BACK_RIGHT
+};
 
 enum piglit_result
 piglit_display(void)
 {
+	/* UNREACHED */
+	return PIGLIT_FAIL;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
 	bool pass = true;
-	int i = 0;
+	unsigned i;
 
-	glClearColor(0, 1, 0 , 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < ARRAY_SIZE(valids); i++) {
 		GLenum err = 0;
 		glDrawBuffers(1, &valids[i]);
 		err = glGetError();
 		/* err = INVALID_OPERATION if that color buffer is not
 		 * allocated to the window system
 		 */
-		if(err != GL_NONE && err != GL_INVALID_OPERATION) {
+		if (err != GL_NONE && err != GL_INVALID_OPERATION) {
 			printf("Expected GL_NONE or GL_INVALID_OPERATION with"
 				" %s but received: %s\n",
 				piglit_get_gl_enum_name(valids[i]),
@@ -86,11 +93,11 @@ piglit_display(void)
 		}
 	}
 
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < ARRAY_SIZE(invalids); i++) {
 		GLenum err = 0;
 		glDrawBuffers(1, &invalids[i]);
 		err = glGetError();
-		if(err != GL_INVALID_ENUM) {
+		if (err != GL_INVALID_ENUM) {
 			printf("Expected GL_INVALID_ENUM with %s but "
 				"received: %s\n",
 				piglit_get_gl_enum_name(invalids[i]),
@@ -99,9 +106,5 @@ piglit_display(void)
 		}
 	}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
-}
-void
-piglit_init(int argc, char **argv)
-{
+	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
