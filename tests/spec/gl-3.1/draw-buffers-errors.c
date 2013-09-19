@@ -24,7 +24,7 @@
 /**
  * Test that DrawBuffers() returns correct error message for different values
  *
- * Section 4.2.1(Selecting a Buffer for Writing) of OpenGL 3.2 Core says:
+ * Section 4.2.1 (Selecting a Buffer for Writing) of OpenGL 3.1 spec says:
  *
  * "For both the default framebuffer and framebuffer objects, the constants
  *  FRONT, BACK, LEFT, RIGHT, and FRONT_AND_BACK are not valid in the bufs
@@ -40,8 +40,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 32;
-	config.supports_gl_core_version = 32;
+	config.supports_gl_compat_version = 31;
+	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE;
 

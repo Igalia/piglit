@@ -729,6 +729,7 @@ add_plain_test(gl30, 'sampler-cube-shadow')
 
 gl31 = Group()
 spec['!OpenGL 3.1'] = gl31
+gl31['draw-buffers-errors'] = concurrent_test('gl-3.1-draw-buffers-errors')
 gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
 gl31['minmax'] = concurrent_test('gl-3.1-minmax')
 for subtest in ['generated', 'written', 'flush']:
@@ -740,7 +741,6 @@ gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-t
 
 spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
 spec['!OpenGL 3.2/clear-no-buffers'] = concurrent_test('gl-3.2-clear-no-buffers')
-spec['!OpenGL 3.2/draw-buffers-errors'] = concurrent_test('gl-3.2-draw-buffers-errors')
 spec['!OpenGL 3.2/get-buffer-parameter-i64v'] = concurrent_test('gl-3.2-get-buffer-parameter-i64v')
 spec['!OpenGL 3.2/get-integer-64iv'] = concurrent_test('gl-3.2-get-integer-64iv')
 spec['!OpenGL 3.2/get-integer-64v'] = concurrent_test('gl-3.2-get-integer-64v')
