@@ -194,7 +194,6 @@ test_basic_measurement(unsigned group)
 		/* Counter values */
 		uint32_t u32 = p[2];
 		float f = ((float *) p)[2];
-		uint64_t u64 = ((uint64_t *) p)[1];
 
 		/* Query results */
 		GLenum counter_type = GL_NONE;
@@ -226,6 +225,7 @@ test_basic_measurement(unsigned group)
 			break;
 		}
 		case GL_UNSIGNED_INT64_AMD: {
+			uint64_t u64 = ((uint64_t *) p)[1];
 			verify(u64 >= range[0]);
 			verify(u64 <= range[1]);
 			break;
