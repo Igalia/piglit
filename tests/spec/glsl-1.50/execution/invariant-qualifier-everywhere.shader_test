@@ -1,0 +1,84 @@
+# Test that invariant qualifier is available to all shaders
+#
+# GLSL 1.50 section 4.6.1 (The Invariant Qualifier) says:
+#   To ensure that a particular output variable is invariant, it is necessary
+#   to use the invariant qualifier. It can either be used to qualify a
+#   previously declared variable as being invariant
+#       invariant gl_Position; // make existing gl_Position be invariant
+#       out vec3 Color; // make existing Color be invariant
+#       invariant Color;
+#   or as part of a declaration when a variable is declared
+#       invariant centroid out vec3 Color;
+#   The invariant qualifier must appear before any interpolation qualifiers or
+#   storage qualifiers when combined with a declaration. Only variables output
+#   from a shader (including those that are then input to a subsequent shader)
+#   can be candidates for invariance. This includes user-defined output variables
+#   and the built-in output variables. For variables leaving one shader and coming
+#   into another shader, the invariant keyword has to be used in both shaders,
+#   or a link error will result.
+#
+# Test is expected to pass.
+
+[require]
+GL >= 3.2
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 vertex;
+invariant out vec4 pos;
+invariant gl_Position;
+invariant out vec4 extra01;
+
+void main()
+{
+    gl_Position = vertex;
+    pos = vertex;
+    extra01 = vec4(1.0);
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangles, max_vertices=3) out;
+
+invariant in vec4 pos[];
+invariant in vec4 extra01[];
+invariant out vec4 extra02;
+
+
+void main()
+{
+    for(int i = 0; i < 3; i++) {
+        gl_Position = pos[i] * 0.5;
+        extra02 = extra01[i] * 0.5;
+        EmitVertex();
+    }
+
+}
+
+
+[fragment shader]
+#version 150
+
+in vec4 extra02;
+invariant extra02; //should be legal according to example
+out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(extra02);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.5 0.5 0.5 0.5
