@@ -21,7 +21,6 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-egl.h"
 #include "image_common.h"
 
 static void

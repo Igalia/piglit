@@ -31,9 +31,11 @@
  * checks the availability of the real extension and takes care of the linking.
  */
 
+#include <unistd.h>
+#include <drm_fourcc.h>
+
 #include "piglit-util-egl.h"
-#define EGL_EGLEXT_PROTOTYPES 1
-#include <EGL/eglext.h>
+#include "piglit-util-gl-common.h"
 
 /* We define here the enums for EGL_EXT_image_dma_buf_import because, as of
  * today (2013-09-10), the eglext.h on many systems lack them.  The first Mesa

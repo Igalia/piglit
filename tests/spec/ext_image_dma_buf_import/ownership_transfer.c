@@ -21,10 +21,8 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-egl.h"
-#include <drm_fourcc.h>
-#include <unistd.h>
 #include <errno.h>
+
 #include "image_common.h"
 
 /**

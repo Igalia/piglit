@@ -21,9 +21,9 @@
  * IN THE SOFTWARE.
  */
 
-#include "sample_common.h"
-#include "image_common.h"
 #include <unistd.h>
+
+#include "sample_common.h"
 
 static const char fs_src[] =
 	"#extension GL_OES_EGL_image_external : require\n"

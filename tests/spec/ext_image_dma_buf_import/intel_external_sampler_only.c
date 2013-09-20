@@ -21,12 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#define GL_GLEXT_PROTOTYPES 1
-#include "piglit-util-egl.h"
-#include <unistd.h>
-#include <drm_fourcc.h>
 #include "image_common.h"
-#include <GLES/glext.h>
 
 /**
  * @file intel_external_sampler_only.c

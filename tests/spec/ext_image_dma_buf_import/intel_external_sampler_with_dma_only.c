@@ -22,7 +22,6 @@
  */
 
 #include "image_common.h"
-#include <unistd.h>
 
 /**
  * @file intel_external_sampler_with_dma_only.c
