@@ -92,3 +92,34 @@ void piglit_require_egl_extension(const char *name)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 }
+
+bool
+piglit_egl_bind_api(EGLenum api)
+{
+	const char *api_string = "";
+
+	if (eglBindAPI(api))
+		return true;
+
+	if (api == EGL_OPENGL_API)
+		api_string = "EGL_OPENGL_API";
+	else if (api == EGL_OPENGL_ES_API)
+		api_string = "EGL_OPENGL_ES_API";
+	else
+		assert(0);
+
+	if (piglit_check_egl_error(EGL_BAD_PARAMETER)) {
+		fprintf(stderr, "eglBindAPI(%s) failed because EGL "
+				"does not support the API",
+			api_string);
+		return false;
+	} else {
+		fprintf(stderr, "unexpected error for "
+				"eglBindAPI(%s)\n",
+				api_string);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	assert(0);
+	return false;
+}

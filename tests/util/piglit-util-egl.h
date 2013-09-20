@@ -61,6 +61,18 @@ bool piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name);
  */
 void piglit_require_egl_extension(const char *name);
 
+/**
+ * \brief Wrapper for eglBindAPI().
+ *
+ * Return true if eglBindAPI succeeds. Return false if eglBindAPI fails
+ * because the EGL implementation does not support the API; in most cases,
+ * the caller should then report SKIP.
+ *
+ * If eglBindAPI fails for unexpected reasons, then the test fails.
+ */
+bool
+piglit_egl_bind_api(EGLenum api);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
