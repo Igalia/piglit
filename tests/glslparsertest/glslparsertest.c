@@ -36,6 +36,7 @@
 #include "piglit-util-gl-common.h"
 
 static unsigned parse_glsl_version_number(const char *str);
+static int process_options(int argc, char **argv);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -318,7 +319,8 @@ static void usage(char *name)
  * Process any options and remove them from the argv array.  Return
  * the new argc.
  */
-int process_options(int argc, char **argv)
+static int
+process_options(int argc, char **argv)
 {
 	int i = 1;
 	int new_argc = 1;
