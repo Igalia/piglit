@@ -57,24 +57,30 @@ static bool try_flag(uint32_t flag)
 int main(int argc, char **argv)
 {
 	bool pass = true;
-	uint32_t flag = 0x80000000;
+	uint32_t flag;
 	bool ran_test = false;
 
-	/* The EGL_KHR_create_context spec says:
+	/* According to the EGL_KHR_create_context spec, version 15, there
+	 * exists exactly one valid flag for OpenGL ES contexts: the debug
+	 * flag.
 	 *
-	 *     "The value for attribute EGL_CONTEXT_FLAGS_KHR specifies a set of
-	 *     flag bits affecting the context. Flags are only defined for OpenGL
-	 *     context creation, and specifying a flags value other than zero for
-	 *     other types of contexts, including OpenGL ES contexts, will generate
-	 *     an error."
+	 *     If the EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR flag bit is set in
+	 *     EGL_CONTEXT_FLAGS_KHR, then a <debug context> will be created.
+	 *     [...] This bit is supported for OpenGL and OpenGL ES contexts.
 	 */
-	uint32_t first_valid_flag = 0;
+	const EGLint valid_flags = EGL_CONTEXT_OPENGL_DEBUG_BIT_KHR;
+	const EGLint invalid_flags = ~valid_flags;
 
 	if (EGL_KHR_create_context_setup(EGL_OPENGL_ES_BIT)) {
 		ran_test = true;
-		while (flag != first_valid_flag) {
-			pass = pass && try_flag(flag);
-			flag >>= 1;
+		flag = 0x80000000;
+
+		while (flag) {
+			if (flag & invalid_flags) {
+                           pass = pass && try_flag(flag);
+			}
+
+                        flag >>= 1;
 		}
 
 		EGL_KHR_create_context_teardown();
@@ -83,8 +89,12 @@ int main(int argc, char **argv)
 	if (EGL_KHR_create_context_setup(EGL_OPENGL_ES2_BIT)) {
 		ran_test = true;
 		flag = 0x80000000;
-		while (flag != first_valid_flag) {
-			pass = pass && try_flag(flag);
+
+		while (flag) {
+			if (flag & invalid_flags) {
+				pass = pass && try_flag(flag);
+			}
+
 			flag >>= 1;
 		}
 
