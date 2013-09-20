@@ -1,0 +1,36 @@
+# The spec allows considerable leeway in how dFdy() is calculated,
+# however the expected implementation is via forward or backward
+# differencing.  (Implementations are permitted, for instance, to use
+# forward differencing for some pixels and backward differencing for
+# other pixels).
+#
+# This test computes dFdy(x*y), which should exactly equal x at every
+# pixel, regardless of whether forward or backward differencing is
+# used.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+	float x = gl_FragCoord.x;
+	float y = gl_FragCoord.y;
+	float xy = x * y;
+	float dxydy = dFdy(xy);
+	if (distance(dxydy, x) > 1.0e-3)
+		gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+hint GL_FRAGMENT_SHADER_DERIVATIVE_HINT GL_NICEST
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
