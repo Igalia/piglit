@@ -48,6 +48,7 @@ extern "C" {
 #	include "piglit-dispatch.h"
 
 #elif defined(PIGLIT_USE_OPENGL_ES1)
+#	define GL_GLEXT_PROTOTYPES
 #	include <GLES/gl.h>
 #	include <GLES/glext.h>
 
