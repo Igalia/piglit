@@ -1547,6 +1547,8 @@ arb_vertex_program = Group()
 spec['ARB_vertex_program'] = arb_vertex_program
 arb_vertex_program['getenv4d-with-error'] = PlainExecTest(['arb_vertex_program-getenv4d-with-error', '-auto'])
 arb_vertex_program['getlocal4d-with-error'] = PlainExecTest(['arb_vertex_program-getlocal4d-with-error', '-auto'])
+arb_vertex_program['getlocal4f-max'] = concurrent_test('arb_vertex_program-getlocal4f-max')
+arb_vertex_program['getlocal4-errors'] = concurrent_test('arb_vertex_program-getlocal4-errors')
 arb_vertex_program['clip-plane-transformation arb'] = concurrent_test('clip-plane-transformation arb')
 arb_vertex_program['minmax'] = concurrent_test('arb_vertex_program-minmax')
 add_plain_test(arb_vertex_program, 'fdo24066')
