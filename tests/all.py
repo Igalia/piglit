@@ -1590,6 +1590,7 @@ add_plain_test(arb_draw_instanced, 'draw-instanced-divisor')
 arb_draw_indirect = Group()
 spec['ARB_draw_indirect'] = arb_draw_indirect
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-api-errors')
+add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays')
 
 # Group ARB_fragment_program
 arb_fragment_program = Group()
