@@ -1,0 +1,67 @@
+# Test that when an interface block contains members which are unsized
+# arrays, the standard rules are applied in order to determine the
+# array sizes (namely, the sizes should be inferred from the maximum
+# array element accessed).
+#
+# In this test, there is a vertex shader output which uses an array
+# size of 2, and a geometry shader input that uses an array size of 2,
+# so there should be no error.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+in vec4 piglit_vertex;
+out blk {
+  float foo[];
+} ifc_name;
+
+void main()
+{
+  ifc_name.foo[0] = 1.0;
+  ifc_name.foo[1] = 10.0;
+  gl_Position = piglit_vertex;
+}
+
+[geometry shader]
+#version 150
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in blk {
+  float foo[];
+} ifc_name[];
+out float ok;
+
+void main()
+{
+  bool pass = true;
+  for (int i = 0; i < 3; i++) {
+    if (ifc_name[i].foo[0] != 1.0)
+      pass = false;
+    if (ifc_name[i].foo[1] != 10.0)
+      pass = false;
+  }
+  for (int i = 0; i < 3; i++) {
+    gl_Position = gl_in[i].gl_Position;
+    ok = pass ? 1.0 : 0.0;
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+#version 150
+in float ok;
+
+void main()
+{
+  bool pass = true;
+  if (ok == 1.0)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

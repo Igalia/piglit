@@ -1,0 +1,154 @@
+# Test that when an interface block contains members which are unsized
+# arrays, and that interface block is used across multiple shaders of
+# the same type, the size of the array is inferred from the maximum
+# array element accessed *across all shaders*.
+#
+# This test uses a vertex shader and a geometry shader (the geometry
+# shader allows us to conveniently test an array of interface blocks).
+# There are four varyings, all of which are float arrays:
+#
+# - blk1.var1
+# - blk1.var2
+# - blk2.var1
+# - blk2.var2
+#
+# The varyings in blk1 are declared unsized in the vs and declared
+# with size 2 in the gs.  The varyings in blk2 are declared unsized in
+# the gs and declared with size 2 in the vs.
+#
+# There are two vertex shader compilation units and two fragment
+# shader compilation units.  In each case, var1 has element 0 accessed
+# in the first compilation unit and element 1 accessed in the second
+# compilation unit; var2 has the reverse pattern.  This ensures that
+# the linker should infer a size of 2 for all varyings.
+#
+# This means that linking should only succeed if the linker properly
+# tracks the maximum array element accessed across all shaders.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+in vec4 piglit_vertex;
+out blk1 {
+  float var1[];
+  float var2[];
+} ifc1;
+out blk2 {
+  float var1[2];
+  float var2[2];
+} ifc2;
+
+void foo();
+
+void main()
+{
+  foo();
+  ifc1.var1[0] = 1.0;
+  ifc1.var2[1] = 2.0;
+  ifc2.var1[0] = 3.0;
+  ifc2.var2[1] = 4.0;
+  gl_Position = piglit_vertex;
+}
+
+[vertex shader]
+#version 150
+out blk1 {
+  float var1[];
+  float var2[];
+} ifc1;
+out blk2 {
+  float var1[2];
+  float var2[2];
+} ifc2;
+
+void foo()
+{
+  ifc1.var1[1] = 5.0;
+  ifc1.var2[0] = 6.0;
+  ifc2.var1[1] = 7.0;
+  ifc2.var2[0] = 8.0;
+}
+
+[geometry shader]
+#version 150
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in blk1 {
+  float var1[2];
+  float var2[2];
+} ifc1[];
+in blk2 {
+  float var1[];
+  float var2[];
+} ifc2[];
+out float ok;
+
+bool foo(int i);
+
+void main()
+{
+  bool pass = true;
+  for (int i = 0; i < 3; i++) {
+    if (!foo(i))
+      pass = false;
+    if (ifc1[i].var1[0] != 1.0)
+      pass = false;
+    if (ifc1[i].var2[1] != 2.0)
+      pass = false;
+    if (ifc2[i].var1[0] != 3.0)
+      pass = false;
+    if (ifc2[i].var2[1] != 4.0)
+      pass = false;
+  }
+  for (int i = 0; i < 3; i++) {
+    gl_Position = gl_in[i].gl_Position;
+    ok = pass ? 1.0 : 0.0;
+    EmitVertex();
+  }
+}
+
+[geometry shader]
+#version 150
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+in blk1 {
+  float var1[2];
+  float var2[2];
+} ifc1[];
+in blk2 {
+  float var1[];
+  float var2[];
+} ifc2[];
+
+bool foo(int i)
+{
+  bool pass = true;
+  if (ifc1[i].var1[1] != 5.0)
+    pass = false;
+  if (ifc1[i].var2[0] != 6.0)
+    pass = false;
+  if (ifc2[i].var1[1] != 7.0)
+    pass = false;
+  if (ifc2[i].var2[0] != 8.0)
+    pass = false;
+  return pass;
+}
+
+[fragment shader]
+#version 150
+in float ok;
+
+void main()
+{
+  bool pass = true;
+  if (ok == 1.0)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

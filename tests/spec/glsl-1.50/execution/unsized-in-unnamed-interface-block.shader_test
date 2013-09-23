@@ -1,0 +1,51 @@
+# Test that when an interface block contains members which are unsized
+# arrays, the standard rules are applied in order to determine the
+# array sizes (namely, the sizes should be inferred from the maximum
+# array element accessed).
+#
+# In this test, both the vertex shader and the fragment shader use
+# unnamed interface blocks containing an array size of 3, so there
+# should be no error.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+in vec4 piglit_vertex;
+out blk {
+  float foo[];
+};
+
+void main()
+{
+  foo[0] = 1.0;
+  foo[1] = 10.0;
+  foo[2] = 100.0;
+  gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 150
+in blk {
+  float foo[];
+};
+
+void main()
+{
+  bool pass = true;
+  if (foo[0] != 1.0)
+    pass = false;
+  if (foo[1] != 10.0)
+    pass = false;
+  if (foo[2] != 100.0)
+    pass = false;
+  if (pass)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
