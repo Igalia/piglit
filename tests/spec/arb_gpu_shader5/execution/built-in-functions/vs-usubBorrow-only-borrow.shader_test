@@ -1,0 +1,56 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+uniform uvec4 x, y;
+uniform uvec4 expected_borrow;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	/* Test that optimization passes like dead code elimination don't
+	 * eliminate the borrow if the subtraction result isn't used.
+	 */
+	uvec4 borrow;
+	usubBorrow(x, y, borrow);
+
+	if (borrow != expected_borrow)
+		color.b = 1.0;
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+	frag_color = color;
+}
+
+[test]
+uniform uvec4 x 1 2 3 4
+uniform uvec4 y 0 1 2 3
+uniform uvec4 expected_borrow 0 0 0 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 4 3 2 1
+uniform uvec4 y 4 4 4 4
+uniform uvec4 expected_borrow 0 1 1 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 0xFFFFFFFE 0xFFFFFFFF 0x80000000 0
+uniform uvec4 y 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFF 0
+uniform uvec4 expected_borrow 1 0 1 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
