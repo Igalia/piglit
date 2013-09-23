@@ -1,0 +1,52 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 frag_color;
+
+uniform uvec4 x, y;
+uniform uvec4 expected_carry;
+
+void main()
+{
+	frag_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	/* Test that optimization passes like dead code elimination don't
+	 * eliminate the carry if the addition result isn't used.
+	 */
+	uvec4 carry;
+	uaddCarry(x, y, carry);
+
+	if (carry != expected_carry)
+		frag_color.b = 1.0;
+}
+
+[test]
+uniform uvec4 x 0 1 2 3
+uniform uvec4 y 1 2 3 4
+uniform uvec4 expected_carry 0 0 0 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 0 1 1 2
+uniform uvec4 y 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFE 0xFFFFFFFE
+uniform uvec4 expected_carry 0 1 0 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 2 3 2 3
+uniform uvec4 y 0xFFFFFFFF 0xFFFFFFFF 0xFFFFFFFE 0xFFFFFFFE
+uniform uvec4 expected_carry 1 1 1 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 0x80000000 0x80000000 0x80000000 0x80000001
+uniform uvec4 y 0x80000000 0x80000001 0x7FFFFFFF 0x7FFFFFFF
+uniform uvec4 expected_carry 1 1 0 1
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
