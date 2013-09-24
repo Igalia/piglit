@@ -1316,6 +1316,11 @@ arb_debug_output = Group()
 spec['ARB_debug_output'] = arb_debug_output
 add_plain_test(arb_debug_output, 'arb_debug_output-api_error')
 
+# Group KHR_debug
+khr_debug = Group()
+spec['KHR_debug'] = khr_debug
+khr_debug['object-label'] = concurrent_test('khr_debug-object-label')
+
 # Group ARB_occlusion_query2
 arb_occlusion_query2 = Group()
 spec['ARB_occlusion_query2'] = arb_occlusion_query2
