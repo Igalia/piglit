@@ -323,12 +323,16 @@ class Summary:
                     return 1
                 elif status == 'pass':
                     return 2
-                elif status in ['warn', 'dmesg-warn']:
+                elif status == 'dmesg-warn':
                     return 3
-                elif status in ['fail', 'dmesg-fail']:
+                elif status == 'warn':
                     return 4
-                elif status == 'crash':
+                elif status == 'dmesg-fail':
                     return 5
+                elif status == 'fail':
+                    return 6
+                elif status == 'crash':
+                    return 7
 
             openGroup('fake')
             openGroup('all')
@@ -419,14 +423,18 @@ class Summary:
             """
             if status == 'pass':
                 return 1
-            elif status in ['warn', 'dmesg-warn']:
+            elif status == 'dmesg-warn':
                 return 2
-            elif status in ['fail', 'dmesg-fail']:
+            elif status == 'warn':
                 return 3
-            elif status == 'skip':
+            elif status == 'dmesg-fail':
                 return 4
-            elif status == 'crash':
+            elif status == 'fail':
                 return 5
+            elif status == 'crash':
+                return 6
+            elif status == 'skip':
+                return 7
             elif status == 'special':
                 return 0
 
@@ -438,34 +446,30 @@ class Summary:
                 except KeyError:
                     status.append(find_regressions("special"))
 
-            if 'changes' in lists:
-                # Check and append self.tests['changes']
-                # A set cannot contain duplicate entries, so creating a set
-                # out the list will reduce it's length to 1 if all entries
-                # are the same, meaning it is not a change
-                if len(set(status)) > 1:
-                    self.tests['changes'].add(test)
-
             if 'problems' in lists:
-                # If the result contains a value other than 1 (pass) or 4
-                # (skip) it is a problem. Skips are not problems becasuse
-                # they have Their own page.
-                if [i for e in [2, 3, 5] for i in status if e is i]:
+                # Problems include: warn, dmesg-warn, fail, dmesg-fail, and
+                # crash. Skip does not go on this page, it has the 'skipped'
+                # page
+                if 7 > max(status) > 1:
                     self.tests['problems'].add(test)
 
             if 'skipped' in lists:
                 # Find all tests with a status of skip
-                if 4 in status:
+                if 7 in status:
                     self.tests['skipped'].add(test)
 
             if 'fixes' in lists:
                 # Find both fixes and regressions, and append them to the
                 # proper lists
                 for i in xrange(len(status) - 1):
-                    if status[i] < status[i + 1] and status[i] != 0:
+                    first = status[i]
+                    last = status[i + 1]
+                    if first < last and 0 not in (first, last):
                         self.tests['regressions'].add(test)
-                    if status[i] > 1 and status[i + 1] == 1:
+                    if first > last and 0 not in (first, last):
                         self.tests['fixes'].add(test)
+                    if first != last:
+                        self.tests['changes'].add(test)
 
     def __find_totals(self):
         """
