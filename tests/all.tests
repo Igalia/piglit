@@ -760,6 +760,7 @@ spec['!OpenGL 3.2/layered-rendering/framebuffer-layered-attachments'] = concurre
 spec['!OpenGL 3.2/layered-rendering/gl-layer'] = concurrent_test('gl-3.2-layered-rendering-gl-layer')
 spec['!OpenGL 3.2/layered-rendering/gl-layer-cube-map'] = concurrent_test('gl-3.2-layered-rendering-gl-layer-cube-map')
 spec['!OpenGL 3.2/layered-rendering/gl-layer-not-layered'] = concurrent_test('gl-3.2-layered-rendering-gl-layer-not-layered')
+spec['!OpenGL 3.2/layered-rendering/gl-layer-render'] = concurrent_test('gl-3.2-layered-rendering-gl-layer-render')
 
 spec['!OpenGL/get-active-attrib-returns-all-inputs'] = concurrent_test('gl-get-active-attrib-returns-all-inputs')
 
