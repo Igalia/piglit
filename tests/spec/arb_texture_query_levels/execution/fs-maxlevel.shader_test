@@ -1,0 +1,35 @@
+[require]
+GLSL >= 1.30
+GL_ARB_texture_query_levels
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_texture_query_levels: require
+
+uniform sampler2D s;
+uniform int expected;
+
+void main() {
+       if (textureQueryLevels(s) == expected)
+           gl_FragColor = vec4(0,1,0,0);
+       else
+           gl_FragColor = vec4(1,0,0,0);
+}
+
+[test]
+ortho
+clear color 0.4 0.4 0.4 0
+clear
+
+texture miptree 0
+uniform int s 0
+
+texparameter 2D min nearest_mipmap_nearest
+texparameter 2D mag nearest
+texparameter 2D max_level 2
+
+uniform int expected 3
+
+draw rect 0 -1 1 1
+relative probe rgba (0.75, 0.25)   (0, 1, 0, 0)
