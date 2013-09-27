@@ -377,7 +377,7 @@ class Summary:
             # Create a list with all the test names in it
             self.tests['all'] = set(self.tests['all']) | set(each.tests)
 
-    def __generate_lists(self, lists):
+    def __generate_lists(self):
         """
         Private: Generate the lists of changes, problems, regressions, fixes,
         and skips
@@ -399,32 +399,27 @@ class Summary:
                 except KeyError:
                     status.append(so.NotRun())
 
-            if 'problems' in lists:
-                # Problems include: warn, dmesg-warn, fail, dmesg-fail, and
-                # crash. Skip does not go on this page, it has the 'skipped'
-                # page
-                if so.Skip() > max(status) > so.Pass():
-                    self.tests['problems'].add(test)
+            # Problems include: warn, dmesg-warn, fail, dmesg-fail, and crash.
+            # Skip does not go on this page, it has the 'skipped' page
+            if so.Skip() > max(status) > so.Pass():
+                self.tests['problems'].add(test)
 
-            if 'skipped' in lists:
-                # Find all tests with a status of skip
-                if so.Skip() in status:
-                    self.tests['skipped'].add(test)
+            # Find all tests with a status of skip
+            if so.Skip() in status:
+                self.tests['skipped'].add(test)
 
-            if 'fixes' in lists:
-                # find fixes, regressions, and changes
-                for i in xrange(len(status) - 1):
-                    first = status[i]
-                    last = status[i + 1]
-                    if first < last and so.NotRun() not in (first, last):
-                        self.tests['regressions'].add(test)
-                    if first > last and so.NotRun() not in (first, last):
-                        self.tests['fixes'].add(test)
-                    # Changes cannot be added in the fixes and regressions
-                    # passes becausue NotRun is a change, but not a regression
-                    # or fix
-                    if first != last:
-                        self.tests['changes'].add(test)
+            # find fixes, regressions, and changes
+            for i in xrange(len(status) - 1):
+                first = status[i]
+                last = status[i + 1]
+                if first < last and so.NotRun() not in (first, last):
+                    self.tests['regressions'].add(test)
+                if first > last and so.NotRun() not in (first, last):
+                    self.tests['fixes'].add(test)
+                # Changes cannot be added in the fixes and regressions passes
+                # becasue NotRun is a change, but not a regression or fix
+                if first != last:
+                    self.tests['changes'].add(test)
 
     def __find_totals(self):
         """
@@ -513,15 +508,8 @@ class Summary:
                                 output_encoding="utf-8",
                                 module_directory=".makotmp")
 
-        # A list of pages to be generated
-        # If there is only one set of results, then there cannot be changes,
-        # regressions or fixes, so don't generate those pages.
-        if len(self.results) > 1:
-            pages = ['changes', 'problems', 'skipped', 'fixes', 'regressions']
-        else:
-            pages = ['problems', 'skipped']
-
-        self.__generate_lists(pages)
+        self.__generate_lists()
+        pages = ('changes', 'problems', 'skipped', 'fixes', 'regressions')
 
         # Index.html is a bit of a special case since there is index, all, and
         # alltests, where the other pages all use the same name. ie,
@@ -556,7 +544,7 @@ class Summary:
 
         # If there are more than one set of results we need to find changes
         if len(self.results) > 1:
-            self.__generate_lists(['changes', 'fixes', 'regressions'])
+            self.__generate_lists()
 
         # Print the name of the test and the status from each test run
         if not summary:

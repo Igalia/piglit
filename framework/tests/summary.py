@@ -173,11 +173,7 @@ class SummaryTestBase(unittest.TestCase):
             pass
 
     def _generate_summary(self, files):
-        """ Create a summary object from temporary files """
-        result = summary.Summary([path.join(self.tmpdir, i) for i in files])
-        result._Summary__generate_lists(['changes', 'problems', 'skipped',
-                                         'fixes', 'regressions'])
-        return result
+        return summary.Summary([path.join(self.tmpdir, i) for i in files])
 
 
 class StatusTest(SummaryTestBase):
