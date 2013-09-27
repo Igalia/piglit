@@ -764,6 +764,7 @@ spec['!OpenGL 3.2/layered-rendering/gl-layer-not-layered'] = concurrent_test('gl
 spec['!OpenGL 3.2/layered-rendering/gl-layer-render'] = concurrent_test('gl-3.2-layered-rendering-gl-layer-render')
 
 spec['!OpenGL/get-active-attrib-returns-all-inputs'] = concurrent_test('gl-get-active-attrib-returns-all-inputs')
+spec['!OpenGL 3.2/texture-border-deprecated'] = concurrent_test('gl-3.2-texture-border-deprecated')
 
 spec['!OpenGL 3.3/minmax'] = concurrent_test('gl-3.3-minmax')
 spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 33')
