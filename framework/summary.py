@@ -363,8 +363,8 @@ class Summary:
 
         self.status = {}
         self.fractions = {}
-        self.tests = {'all': set(), 'changes': set(), 'problems': set(), 'skipped': set(),
-                      'regressions': set(), 'fixes': set()}
+        self.tests = {'all': set(), 'changes': set(), 'problems': set(),
+                      'skipped': set(), 'regressions': set(), 'fixes': set()}
 
         for each in self.results:
             # Build a dict of the status output of all of the tests, with the
@@ -377,20 +377,8 @@ class Summary:
             # Create a list with all the test names in it
             self.tests['all'] = set(self.tests['all']) | set(each.tests)
 
-    def __generate_lists(self):
-        """
-        Private: Generate the lists of changes, problems, regressions, fixes,
-        and skips
-
-        lists is a list contianing any of the following: changes, problems,
-        skips, fixes (which will also generate regressions)
-
-        This method has different code paths to allow the exclusion of certain
-        lists being generated. This is both useful for speeding up HTML
-        generation when a page isn't needed (regressions with only one test
-        file is provided), and for JUnit and text which only need a limited
-        subset of these lists
-        """
+        # Create the lists of statuses like problems, regressions, fixes,
+        # changes and skips
         for test in self.tests['all']:
             status = []
             for each in self.results:
@@ -508,7 +496,6 @@ class Summary:
                                 output_encoding="utf-8",
                                 module_directory=".makotmp")
 
-        self.__generate_lists()
         pages = ('changes', 'problems', 'skipped', 'fixes', 'regressions')
 
         # Index.html is a bit of a special case since there is index, all, and
@@ -541,10 +528,6 @@ class Summary:
 
     def generateText(self, diff, summary):
         self.__find_totals()
-
-        # If there are more than one set of results we need to find changes
-        if len(self.results) > 1:
-            self.__generate_lists()
 
         # Print the name of the test and the status from each test run
         if not summary:
