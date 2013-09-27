@@ -1,0 +1,37 @@
+# Test interface blocks declared as arrays must match array sizes.
+#
+# GLSLangSpec.1.50.11, 4.3.7 Interface Blocks:
+# "if a matching block is declared as an array, then the array sizes must
+#  also match"
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+
+out block {
+    vec4 a;
+    vec4 b;
+} vs_block[3];
+
+void main()
+{
+	for(int i = 0; i < 3; i++) {
+		vs_block[i].a = vec4(1., 0., 0., 1.);
+	}
+}
+
+[fragment shader]
+in block {
+    vec4 a;
+    vec4 b;
+} fs_block[2]; //different array size should fail to link
+
+out vec4 color;
+
+void main()
+{
+	color = fs_block[0].a;
+}
+
+[test]
+link error
