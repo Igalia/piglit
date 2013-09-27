@@ -1,0 +1,77 @@
+# From section 7.1 (Built-In Language Variables) of the GLSL 4.10
+# spec:
+#
+#   The gl_PerVertex block can be redeclared in a shader to explicitly
+#   indicate what subset of the fixed pipeline interface will be
+#   used. This is necessary to establish the interface between multiple
+#   programs.  For example:
+#
+#   out gl_PerVertex {
+#       vec4 gl_Position;    // will use gl_Position
+#       float gl_PointSize;  // will use gl_PointSize
+#       vec4 t;              // error, only gl_PerVertex members allowed
+#   };  // no other members of gl_PerVertex will be used
+#
+#   This establishes the output interface the shader will use with the
+#   subsequent pipeline stage. It must be a subset of the built-in members
+#   of gl_PerVertex.
+#
+# This appears to be a clarification to the behaviour established for
+# gl_PerVertex by GLSL 1.50, therefore we test it using GLSL version
+# 1.50.
+#
+# Note that this test is verifying functionality when gl_PerVertex is
+# correctly redeclared, so it doesn't include the erroneous "vec4 t"
+# declaration.
+#
+# This test verifies that the vertex shader can redeclare gl_PerVertex
+# specifying a subset of the built-in values (gl_Position and
+# gl_PointSize), and the subset works.
+#
+# This test draws a small point in the left half of the window and a
+# large point in the right half.  Then it probes the region around
+# each point to ensure that the point on the right is larger.
+#
+# NOTE: since gl_PointSize is expressed in pixels, but gl_Position is
+# expressed relative to the window size, this test is dependent upon
+# the window size.  It assumes a window size of 250x250, which is the
+# shader_runner default.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 pos;
+in float point_size;
+
+out gl_PerVertex {
+    vec4 gl_Position;
+    float gl_PointSize;
+};
+
+void main()
+{
+  gl_Position = pos;
+  gl_PointSize = point_size;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+[vertex data]
+pos/float/4       point_size/float/1
+-0.5 0.0 0.0 1.0   1.0
+ 0.5 0.0 0.0 1.0  13.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+enable GL_PROGRAM_POINT_SIZE
+draw arrays GL_POINTS 0 2
+relative probe rgba (0.24, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.26, 0.5) (0.0, 0.0, 0.0, 0.0)
+relative probe rgba (0.74, 0.5) (1.0, 1.0, 1.0, 1.0)
+relative probe rgba (0.76, 0.5) (1.0, 1.0, 1.0, 1.0)
