@@ -536,7 +536,7 @@ test_format(int format_index)
 	y_index++;
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     piglit_get_gl_enum_name(format->format));
+				     "%s", piglit_get_gl_enum_name(format->format));
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

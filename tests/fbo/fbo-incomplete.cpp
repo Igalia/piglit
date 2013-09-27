@@ -75,7 +75,7 @@ public:
 		glDeleteFramebuffers(1, &fbo);
 
 		piglit_report_subtest_result(_pass ? PIGLIT_PASS : PIGLIT_FAIL,
-					     name);
+					     "%s", name);
 	}
 
 	bool check_fbo_status(GLenum expect)

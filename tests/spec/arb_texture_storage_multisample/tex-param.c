@@ -83,7 +83,7 @@ check_subtest(struct subtest *t)
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("GetTexParameteriv failed\n");
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
 		return;
 	}
 
@@ -92,7 +92,7 @@ check_subtest(struct subtest *t)
 		       piglit_get_gl_enum_name(t->param),
 		       t->initial_value,
 		       val);
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
 		return;
 	}
 
@@ -101,7 +101,7 @@ check_subtest(struct subtest *t)
 	if (!piglit_check_gl_error(t->expected_error)) {
 		printf("error setting parameter %s\n",
 		       piglit_get_gl_enum_name(t->param));
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
 		return;
 	}
 
@@ -114,10 +114,10 @@ check_subtest(struct subtest *t)
 		       piglit_get_gl_enum_name(t->param),
 		       expected_val,
 		       val);
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
 	}
 
-	piglit_report_subtest_result(PIGLIT_PASS, test_name);
+	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
 }
 
 void

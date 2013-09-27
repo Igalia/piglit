@@ -106,7 +106,7 @@ check_subtest(struct subtest *t)
 
     piglit_report_subtest_result(
             piglit_check_gl_error(t->error) ? PIGLIT_PASS : PIGLIT_FAIL,
-            t->name);
+            "%s", t->name);
 }
 
 void

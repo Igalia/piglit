@@ -202,7 +202,7 @@ test_with_format(GLenum internal_format, const char *name)
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		fprintf(stderr, "framebuffer incomplete\n");
-		piglit_report_subtest_result(PIGLIT_SKIP, name);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", name);
 		goto done;
 	}
 

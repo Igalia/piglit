@@ -195,7 +195,7 @@ test(void)
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, formats[i].format,
 					 piglit_width, piglit_height);
 		if (!piglit_check_gl_error(GL_NO_ERROR)) {
-			piglit_report_subtest_result(PIGLIT_FAIL, name);
+			piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
 			pass = GL_FALSE;
 		} else {
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -215,10 +215,10 @@ test(void)
 					 invalid_formats[i],
 					 piglit_width, piglit_height);
 		if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
-			piglit_report_subtest_result(PIGLIT_FAIL, name);
+			piglit_report_subtest_result(PIGLIT_FAIL, "%s", name);
 			pass = GL_FALSE;
 		} else {
-			piglit_report_subtest_result(PIGLIT_PASS, name);
+			piglit_report_subtest_result(PIGLIT_PASS, "%s", name);
 		}
 	}
 

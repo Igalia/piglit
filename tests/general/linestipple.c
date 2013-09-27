@@ -219,9 +219,9 @@ piglit_display(void)
 	for (i = 0; i < ARRAY_SIZE(Lines); ++i) {
 		printf("Testing %s:\n", Lines[i].name);
 		if (test_line(&Lines[i])) {
-			piglit_report_subtest_result(PIGLIT_PASS, Lines[i].name);
+			piglit_report_subtest_result(PIGLIT_PASS, "%s", Lines[i].name);
 		} else {
-			piglit_report_subtest_result(PIGLIT_FAIL, Lines[i].name);
+			piglit_report_subtest_result(PIGLIT_FAIL, "%s", Lines[i].name);
 			pass = false;
 		}
 	}

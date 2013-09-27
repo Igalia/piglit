@@ -218,7 +218,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 	piglit_present_results();
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     format->name);
+				     "%s", format->name);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

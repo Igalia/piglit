@@ -845,7 +845,7 @@ run_tests(struct test *tests, int num_tests, GLenum expected_error)
 
 		piglit_report_subtest_result(test_pass ?
 					     PIGLIT_PASS : PIGLIT_FAIL,
-					     tests[i].name);
+					     "%s", tests[i].name);
 
 		pass = test_pass && pass;
 	}

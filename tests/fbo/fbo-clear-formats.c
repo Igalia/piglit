@@ -565,7 +565,7 @@ test_format(const struct format_desc *format)
 	glDeleteTextures(1, &tex);
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
-				     format->name);
+				     "%s", format->name);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

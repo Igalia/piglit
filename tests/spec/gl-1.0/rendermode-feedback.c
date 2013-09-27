@@ -171,10 +171,10 @@ piglit_display(void)
 			pass = false;
 			report_failure(&types[i], buffer, returned_count);
 			piglit_report_subtest_result(PIGLIT_FAIL,
-						     types[i].name);
+						     "%s", types[i].name);
 		} else {
 			piglit_report_subtest_result(PIGLIT_PASS,
-						     types[i].name);
+						     "%s", types[i].name);
 		}
 	}
 

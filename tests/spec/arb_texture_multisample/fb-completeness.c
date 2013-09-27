@@ -320,7 +320,7 @@ piglit_init(int argc, char **argv)
     }
 
     for (info = tests; info->name; info++)
-        piglit_report_subtest_result(exec_test(info, sample_count), info->name);
+        piglit_report_subtest_result(exec_test(info, sample_count), "%s", info->name);
 
     piglit_report_result(result);
 }
