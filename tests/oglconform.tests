@@ -24,6 +24,7 @@
 import os
 import re
 import sys
+import subprocess
 
 from framework.core import TestProfile, testBinDir
 from framework.exectest import ExecTest
