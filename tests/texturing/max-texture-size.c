@@ -180,7 +180,8 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 		pixels = initTexData(target, maxSide);
 
 		if (pixels == NULL) {
-			printf("Error allocating texture data array\n");
+			printf("Error allocating texture data array for target %s, size %d\n",
+			       piglit_get_gl_enum_name(target), maxSide);
 			piglit_report_result(PIGLIT_SKIP);
 		}
 	}
