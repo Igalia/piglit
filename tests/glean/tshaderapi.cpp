@@ -440,6 +440,7 @@ ShaderAPITest::test_uniform_neg_location(void)
 	GLfloat data[4];
 
 	program = make_program("#version 110\nvoid main() { gl_Position = vec4(1.0, 1.0, 1.0, 1.0); }\n", NULL);
+	(void) program;
 	assert_no_error();
 	glUniform1i_func(-1, 1);
 	assert_no_error();
