@@ -42,14 +42,16 @@ static const char vs_text[] =
 	"#version 120 \n"
 	"void main()\n"
 	"{\n"
-	"gl_Position = gl_Vertex;\n"
-	"}\n"
-	;
+	"   gl_Position = gl_Vertex;\n"
+	"}\n";
 
 static const char fs_text[] =
 	"#version 120 \n"
-	"void main() { gl_FragColor = vec4(gl_PointCoord.x, gl_PointCoord.y, 0.0, 1.0); }\n"
-	;
+	"void main()\n"
+	"{\n"
+	"   gl_FragColor = vec4(gl_PointCoord.x, gl_PointCoord.y, 0.0, 1.0);\n"
+	"}\n";
+
 static GLuint prog;
 static GLuint fb, rb;
 static GLuint testPoint_x, testPoint_y;
