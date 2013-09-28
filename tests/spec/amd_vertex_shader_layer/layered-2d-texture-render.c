@@ -123,7 +123,7 @@ static int get_y(int layer, int lod)
 	return PAD + (((1 << lod) - 1) * 2 * size);
 }
 
-static GLfloat *get_color(int num)
+static const GLfloat *get_color(int num)
 {
 	int color_index;
 
@@ -234,7 +234,7 @@ test_results(int layer, int lod)
 {
 	int x = get_x(layer);
 	int y = get_y(layer, lod);
-	GLfloat *expected_color3f = get_color((lod * LAYERS) + layer);
+	const GLfloat *expected_color3f = get_color((lod * LAYERS) + layer);
 	GLboolean pass;
 	int size = SIZE >> lod;
 
