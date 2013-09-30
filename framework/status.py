@@ -104,10 +104,11 @@ class Status(object):
 
     # Using __slots__ allows us to implement the flyweight pattern, limiting
     # the memory consumed for creating tens of thousands of these objects.
-    __slots__ = ['name', 'value']
+    __slots__ = ['name', 'value', 'fraction']
 
     name = None
     value = None
+    fraction = (0, 1)
 
     def __init__(self):
         raise NotImplementedError
@@ -149,6 +150,7 @@ class Status(object):
 class NotRun(Status):
     name = 'Not Run'
     value = 0
+    fraction = (0, 0)
 
     def __init__(self):
         pass
@@ -157,6 +159,7 @@ class NotRun(Status):
 class Pass(Status):
     name = 'pass'
     value = 10
+    fraction = (1, 1)
 
     def __init__(self):
         pass
@@ -205,6 +208,7 @@ class Crash(Status):
 class Skip(Status):
     name = 'skip'
     value = 50
+    fraction = (0, 0)
 
     def __init__(self):
         pass

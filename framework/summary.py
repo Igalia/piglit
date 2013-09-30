@@ -23,12 +23,14 @@ import os
 import os.path as path
 import itertools
 import shutil
+import collections
 from mako.template import Template
 
-import core
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import status as so
+import core
+
 
 __all__ = [
     'Summary',
@@ -141,13 +143,9 @@ class HTMLIndex(list):
                 currentDir.append(localGroup)
                 for each in summary.results:
                     # Decide which fields need to be updated
-                    try:
-                        self._groupResult(summary.fractions[each.name]
-                                          [path.join(*currentDir)],
-                                          summary.status[each.name]
-                                          [path.join(*currentDir)])
-                    except KeyError:
-                        self._groupResult((0, 0), 'skip')
+                    self._groupResult(
+                        summary.fractions[each.name][path.join(*currentDir)],
+                        summary.status[each.name][path.join(*currentDir)])
 
                 # After each group increase the depth by one
                 depth += 1
@@ -194,6 +192,9 @@ class HTMLIndex(list):
         Helper function for appending the results of groups to the
         HTML summary file.
         """
+        # "Not Run" is not a valid css class replace it with skip
+        if isinstance(css, so.NotRun):
+            css = 'skip'
 
         self.append({'type': "groupResult",
                      'class': css,
@@ -245,98 +246,6 @@ class Summary:
         piglit-run.
         """
 
-        def buildDictionary(summary):
-            # Build a dictionary from test name to pass count/total count, i.e.
-            # counts['spec/glsl/foo'] == (456, 800)
-            counts = {}
-
-            if not summary.tests:
-                return {}
-
-            lastGroup = ''
-
-            # Build a dictionary of group stati, passing groupname = status.
-            # This is the "worst" status of the group in descending order:
-            # crash, skip, fail, warn, pass
-            status = {}
-
-            # currentStack is a stack containing numerical values that that
-            # relate to a status output, 5 for crash, 4 for skip, 3 for fail, 2
-            # for warn, 1 for pass
-            currentStatus = []
-
-            # Stack contains tuples like: (pass count, total count)
-            stack = []
-
-            def openGroup(name):
-                stack.append((0, 0))
-
-                # Since NotRun is the "lowest" status for HTML generation, if
-                # there is another status it will replace skip
-                currentStatus.append(so.NotRun())
-
-            def closeGroup(group_name):
-                # We're done with this group, record the number of pass/total
-                # in the dictionary.
-                (nr_pass, nr_total) = stack.pop()
-                counts[group_name] = (nr_pass, nr_total)
-
-                # Also add our pass/total count to the parent group's counts
-                # (which are still being computed)
-                (parent_pass, parent_total) = stack[-1]
-                stack[-1] = (parent_pass + nr_pass, parent_total + nr_total)
-
-                # Add the status back to the group hierarchy
-                if currentStatus[-2] < currentStatus[-1]:
-                    currentStatus[-2] = currentStatus[-1]
-                status[group_name] = currentStatus.pop()
-
-            openGroup('fake')
-            openGroup('all')
-
-            # fulltest is a full test name,
-            # i.e. tests/shaders/glsl-algebraic-add-zero
-            for fulltest in sorted(summary.tests):
-                # same as fulltest.rpartition('/')
-                group, test = path.split(fulltest)
-
-                if group != lastGroup:
-                    # We're in a different group now.  Close the old ones
-                    # and open the new ones.
-                    for x in path.relpath(group, lastGroup).split('/'):
-                        if x != '..':
-                            openGroup(x)
-                        else:
-                            closeGroup(lastGroup)
-                            lastGroup = path.normpath(path.join(lastGroup,
-                                                                ".."))
-
-                    lastGroup = group
-
-                # Add the current test
-                (pass_so_far, total_so_far) = stack[-1]
-                if summary.tests[fulltest]['result'] == so.Pass():
-                    pass_so_far += 1
-                if summary.tests[fulltest]['result'] != so.Skip():
-                    total_so_far += 1
-                stack[-1] = (pass_so_far, total_so_far)
-
-                # compare the status
-                if summary.tests[fulltest]['result'] > currentStatus[-1]:
-                    currentStatus[-1] = summary.tests[fulltest]['result']
-
-            # Work back up the stack closing groups as we go until we reach the
-            # top, where we need to manually close this as "all"
-            while len(stack) > 2:
-                closeGroup(lastGroup)
-                lastGroup = path.dirname(lastGroup)
-            closeGroup("all")
-
-            assert(len(stack) == 1)
-            assert(len(currentStatus) == 1)
-
-            return counts, status
-
         # Create a Result object for each piglit result and append it to the
         # results list
         self.results = [core.load_results(i) for i in resultfiles]
@@ -347,16 +256,40 @@ class Summary:
         self.tests = {'all': set(), 'changes': set(), 'problems': set(),
                       'skipped': set(), 'regressions': set(), 'fixes': set()}
 
-        for each in self.results:
-            # Build a dict of the status output of all of the tests, with the
-            # name of the test run as the key for that result, this will be
-            # used to write pull the statuses later
-            fraction, status = buildDictionary(each)
-            self.fractions.update({each.name: fraction})
-            self.status.update({each.name: status})
+        def fgh(test, result):
+            """ Helper for updating the fractions and status lists """
+            fraction[test] = tuple(
+                [sum(i) for i in zip(fraction[test], result.fraction)])
+            if result != so.Skip() and status[test] < result:
+                status[test] = result
 
-            # Create a list with all the test names in it
-            self.tests['all'] = set(self.tests['all']) | set(each.tests)
+        for results in self.results:
+            # Create a set of all of the tset names across all of the runs
+            self.tests['all'] = set(self.tests['all'] | set(results.tests))
+
+            # Create two dictionaries that have a default factory: they return
+            # a default value instead of a key error.
+            # This default key must be callable
+            self.fractions[results.name] = collections.defaultdict(lambda: (0, 0))
+            self.status[results.name] = collections.defaultdict(so.NotRun)
+
+            # short names
+            fraction = self.fractions[results.name]
+            status = self.status[results.name]
+
+            for key, value in results.tests.iteritems():
+                #FIXME: Add subtest support
+
+                # Walk the test name as if it was a path, at each level update
+                # the tests passed over the total number of tests (fractions),
+                # and update the status of the current level if the status of
+                # the previous level was worse, but is not skip
+                while key != '':
+                    fgh(key, value['result'])
+                    key = path.dirname(key)
+
+                # when we hit the root update the 'all' group and stop
+                fgh('all', value['result'])
 
         # Create the lists of statuses like problems, regressions, fixes,
         # changes and skips
