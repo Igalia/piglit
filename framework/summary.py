@@ -21,10 +21,8 @@
 
 import os
 import os.path as path
-import string
 from itertools import izip_longest
 from shutil import copy
-from json import loads
 from mako.template import Template
 
 import core
