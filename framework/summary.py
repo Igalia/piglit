@@ -21,8 +21,8 @@
 
 import os
 import os.path as path
-from itertools import izip_longest
-from shutil import copy
+import itertools
+import shutil
 from mako.template import Template
 
 import core
@@ -93,7 +93,7 @@ class HTMLIndex(list):
             if open == close:
                 return [], []
             else:
-                for i, j in izip_longest(open, close):
+                for i, j in itertools.izip_longest(open, close):
                     if i != j:
                         for k in common:
                             open.remove(k)
@@ -430,8 +430,8 @@ class Summary:
         """
 
         # Copy static files
-        copy("templates/index.css", path.join(destination, "index.css"))
-        copy("templates/result.css", path.join(destination, "result.css"))
+        shutil.copy("templates/index.css", path.join(destination, "index.css"))
+        shutil.copy("templates/result.css", path.join(destination, "result.css"))
 
         # Create the mako object for creating the test/index.html file
         testindex = Template(filename="templates/testrun_info.mako",
