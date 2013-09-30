@@ -378,12 +378,7 @@ class Summary:
         # Create the lists of statuses like problems, regressions, fixes,
         # changes and skips
         for test in self.tests['all']:
-            status = []
-            for each in self.results:
-                try:
-                    status.append(each.tests[test]['result'])
-                except KeyError:
-                    status.append(so.NotRun())
+            status = [i.tests[test].get('result', so.NotRun()) for i in self.results]
 
             # Problems include: warn, dmesg-warn, fail, dmesg-fail, and crash.
             # Skip does not go on this page, it has the 'skipped' page
