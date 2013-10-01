@@ -365,13 +365,13 @@ install (
 install (
 	DIRECTORY tests
 	DESTINATION .
-	FILES_MATCHING REGEX ".*\\.(tests|program_test|shader_test|frag|vert|ktx|cl)$"
+	FILES_MATCHING REGEX ".*\\.(tests|program_test|shader_test|frag|vert|geom|ktx|cl)$"
 )
 
 install (
 	DIRECTORY ${CMAKE_BINARY_DIR}/generated_tests
 	DESTINATION .
-	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert)$"
+	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert|geom)$"
 )
 
 
