@@ -76,6 +76,11 @@ struct component_version {
 	char _string[100];
 };
 
+struct string_to_enum {
+	const char *name;
+	GLenum token;
+};
+
 extern float piglit_tolerance[4];
 
 static struct component_version gl_version;
@@ -1377,10 +1382,7 @@ set_parameter(const char *line)
 	}
 }
 
-struct enable_table {
-	const char *name;
-	GLenum value;
-} enable_table[] = {
+struct string_to_enum enable_table[] = {
 	{ "GL_CLIP_PLANE0", GL_CLIP_PLANE0 },
 	{ "GL_CLIP_PLANE1", GL_CLIP_PLANE1 },
 	{ "GL_CLIP_PLANE2", GL_CLIP_PLANE2 },
@@ -1404,9 +1406,9 @@ do_enable_disable(const char *line, bool enable_flag)
 	for (i = 0; enable_table[i].name; ++i) {
 		if (0 == strcmp(name, enable_table[i].name)) {
 			if (enable_flag) {
-				glEnable(enable_table[i].value);
+				glEnable(enable_table[i].token);
 			} else {
-				glDisable(enable_table[i].value);
+				glDisable(enable_table[i].token);
 			}
 			return;
 		}
@@ -1448,11 +1450,6 @@ draw_instanced_rect(int primcount, float x, float y, float w, float h)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-
-struct string_to_enum {
-	const char *name;
-	GLenum token;
-};
 
 GLenum
 decode_drawing_mode(const char *mode_str)
