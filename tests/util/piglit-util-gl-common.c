@@ -133,6 +133,14 @@ static void initialize_piglit_extension_support(void)
 #endif
 }
 
+void piglit_gl_reinitialize_extensions()
+{
+	if (gl_extensions != NULL) {
+		free(gl_extensions);
+		gl_extensions = NULL;
+	}
+}
+
 bool piglit_is_extension_supported(const char *name)
 {
 	initialize_piglit_extension_support();

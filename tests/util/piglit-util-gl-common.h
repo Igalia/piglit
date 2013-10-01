@@ -64,6 +64,11 @@ int piglit_get_gl_version(void);
 bool piglit_is_extension_supported(const char *name);
 
 /**
+ * reinitialize the supported extension List.
+ */
+void piglit_gl_reinitialize_extensions();
+
+/**
  * \brief Convert a GL error to a string.
  *
  * For example, given GL_INVALID_ENUM, return "GL_INVALID_ENUM".
