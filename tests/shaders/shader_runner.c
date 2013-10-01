@@ -1426,6 +1426,29 @@ do_enable_disable(const char *line, bool enable_flag)
 		glDisable(value);
 }
 
+#define ENUM_STRING(e) { #e, e }
+struct string_to_enum hint_target_table[] = {
+	ENUM_STRING(GL_LINE_SMOOTH_HINT),
+	ENUM_STRING(GL_POLYGON_SMOOTH_HINT),
+	ENUM_STRING(GL_TEXTURE_COMPRESSION_HINT),
+	ENUM_STRING(GL_FRAGMENT_SHADER_DERIVATIVE_HINT),
+};
+
+struct string_to_enum hint_param_table[] = {
+	ENUM_STRING(GL_FASTEST),
+	ENUM_STRING(GL_NICEST),
+	ENUM_STRING(GL_DONT_CARE),
+};
+
+void do_hint(const char *line)
+{
+	GLenum target = lookup_enum_string(hint_target_table, &line,
+					   "hint target");
+	GLenum param = lookup_enum_string(hint_param_table, &line,
+					  "hint param");
+	glHint(target, param);
+}
+
 static void
 draw_instanced_rect(int primcount, float x, float y, float w, float h)
 {
@@ -1696,6 +1719,8 @@ piglit_display(void)
 			get_floats(line + 7, c, 6);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
 						  c[3], c[4], c[5]);
+		} else if (string_match("hint", line)) {
+			do_hint(line + 4);
 		} else if (sscanf(line, "ortho %f %f %f %f",
 				  c + 0, c + 1, c + 2, c + 3) == 4) {
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
