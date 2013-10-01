@@ -72,7 +72,6 @@ static const char *fstext =
 	"}\n";
 
 static GLuint prog;
-const int bufSize = 100;
 
 bool
 check_that_attrib_is_active(const char *attrib_name)
@@ -82,11 +81,11 @@ check_that_attrib_is_active(const char *attrib_name)
 	GLsizei length;
 	GLint size;
 	GLenum type;
-	GLchar name[bufSize];
+	GLchar name[100];
 
 	glGetProgramiv(prog, GL_ACTIVE_ATTRIBUTES, &numAttribs);
 	for (i = 0; i < numAttribs; i++) {
-		glGetActiveAttrib(prog, i, bufSize, &length, &size,
+		glGetActiveAttrib(prog, i, sizeof(name), &length, &size,
 				  &type, name);
 		if (strcmp(name, attrib_name) == 0) {
 			return piglit_check_gl_error(GL_NO_ERROR);
