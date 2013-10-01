@@ -385,6 +385,8 @@ fail:
 	wfl_fw->context = NULL;
 	wfl_fw->config = NULL;
 
+	piglit_gl_reinitialize_extensions();
+
 	return false;
 }
 
