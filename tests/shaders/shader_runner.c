@@ -142,6 +142,25 @@ enum comparison {
 	less_equal
 };
 
+GLenum
+lookup_enum_string(const struct string_to_enum *table, const char **line,
+		   const char *error_desc)
+{
+	int i;
+	*line = eat_whitespace(*line);
+	for (i = 0; table[i].name; i++) {
+		size_t len = strlen(table[i].name);
+		if (strncmp(table[i].name, *line, len) == 0 &&
+		    ((*line)[len] == '\0' || isspace((*line)[len]))) {
+			*line = eat_whitespace(*line + len);
+			return table[i].token;
+		}
+	}
+	fprintf(stderr, "Bad %s at: %s\n", error_desc, *line);
+	piglit_report_result(PIGLIT_FAIL);
+	return 0;
+}
+
 bool
 compare(float ref, float value, enum comparison cmp);
 
@@ -1399,23 +1418,12 @@ struct string_to_enum enable_table[] = {
 void
 do_enable_disable(const char *line, bool enable_flag)
 {
-	char name[512];
-	int i;
-
-	strcpy_to_space(name, eat_whitespace(line));
-	for (i = 0; enable_table[i].name; ++i) {
-		if (0 == strcmp(name, enable_table[i].name)) {
-			if (enable_flag) {
-				glEnable(enable_table[i].token);
-			} else {
-				glDisable(enable_table[i].token);
-			}
-			return;
-		}
-	}
-
-	printf("unknown enable/disable enum \"%s\"\n", name);
-	piglit_report_result(PIGLIT_FAIL);
+	GLenum value = lookup_enum_string(enable_table, &line,
+					  "enable/disable enum");
+	if (enable_flag)
+		glEnable(value);
+	else
+		glDisable(value);
 }
 
 static void
@@ -1473,14 +1481,14 @@ static void
 handle_texparameter(const char *line)
 {
 	const struct string_to_enum texture_target[] = {
-		{ "1D ",        GL_TEXTURE_1D             },
-		{ "2D ",        GL_TEXTURE_2D             },
-		{ "3D ",        GL_TEXTURE_3D             },
-		{ "Rect ",      GL_TEXTURE_RECTANGLE      },
-		{ "Cube ",      GL_TEXTURE_CUBE_MAP       },
-		{ "1DArray ",   GL_TEXTURE_1D_ARRAY       },
-		{ "2DArray ",   GL_TEXTURE_2D_ARRAY       },
-		{ "CubeArray ", GL_TEXTURE_CUBE_MAP_ARRAY },
+		{ "1D",        GL_TEXTURE_1D             },
+		{ "2D",        GL_TEXTURE_2D             },
+		{ "3D",        GL_TEXTURE_3D             },
+		{ "Rect",      GL_TEXTURE_RECTANGLE      },
+		{ "Cube",      GL_TEXTURE_CUBE_MAP       },
+		{ "1DArray",   GL_TEXTURE_1D_ARRAY       },
+		{ "2DArray",   GL_TEXTURE_2D_ARRAY       },
+		{ "CubeArray", GL_TEXTURE_CUBE_MAP_ARRAY },
 		{ NULL, 0 }
 	};
 
@@ -1520,21 +1528,9 @@ handle_texparameter(const char *line)
 	GLenum parameter;
 	const char *parameter_name;
 	const struct string_to_enum *strings = NULL;
-	int i;
+	GLenum value;
 
-	for (i = 0; texture_target[i].name; i++) {
-		if (string_match(texture_target[i].name, line)) {
-			target = texture_target[i].token;
-			line += strlen(texture_target[i].name);
-			line = eat_whitespace(line);
-			break;
-		}
-	}
-
-	if (!target) {
-		fprintf(stderr, "bad texture target in `texparameter %s`\n", line);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	target = lookup_enum_string(texture_target, &line, "texture target");
 
 	if (string_match("compare_func ", line)) {
 		parameter = GL_TEXTURE_COMPARE_FUNC;
@@ -1571,15 +1567,8 @@ handle_texparameter(const char *line)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	for (i = 0; strings[i].name; i++) {
-		if (string_match(strings[i].name, line)) {
-			glTexParameteri(target, parameter, strings[i].token);
-			return;
-		}
-	}
-
-	fprintf(stderr, "Bad %s `%s'\n", parameter_name, line);
-	piglit_report_result(PIGLIT_FAIL);
+	value = lookup_enum_string(strings, &line, parameter_name);
+	glTexParameteri(target, parameter, value);
 }
 
 static void
