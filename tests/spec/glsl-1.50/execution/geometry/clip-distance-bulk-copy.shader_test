@@ -56,9 +56,7 @@ void main()
 [fragment shader]
 #version 150
 
-in gl_PerVertex {
-  float gl_ClipDistance[8];
-};
+in float gl_ClipDistance[8];
 in float offset_to_fs;
 
 void main()
