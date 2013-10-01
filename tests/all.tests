@@ -1316,6 +1316,8 @@ arb_separate_shader_objects['UseProgramStages - non-separable program'] = concur
 arb_separate_shader_objects['ProgramUniform coverage'] = concurrent_test('arb_separate_shader_object-ProgramUniform-coverage')
 arb_separate_shader_objects['Rendezvous by location'] = plain_test('arb_separate_shader_object-rendezvous_by_location -fbo')
 arb_separate_shader_objects['ValidateProgramPipeline'] = concurrent_test('arb_separate_shader_object-ValidateProgramPipeline')
+arb_separate_shader_objects['400 combinations by location'] = plain_test('arb_separate_shader_object-400-combinations -fbo --by-location')
+arb_separate_shader_objects['400 combinations by name'] = plain_test('arb_separate_shader_object-400-combinations -fbo')
 
 # Group ARB_sampler_objects
 arb_sampler_objects = Group()
