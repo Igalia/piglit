@@ -369,7 +369,7 @@ install (
 )
 
 install (
-	DIRECTORY generated_tests
+	DIRECTORY ${CMAKE_BINARY_DIR}/generated_tests
 	DESTINATION .
 	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert)$"
 )
