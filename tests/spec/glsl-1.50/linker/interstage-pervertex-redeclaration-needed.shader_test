@@ -1,0 +1,64 @@
+# From section 7.1 (Built-In Language Variables) of the GLSL 4.10
+# spec:
+#
+#     If multiple shaders using members of a built-in block belonging
+#     to the same interface are linked together in the same program,
+#     they must all redeclare the built-in block in the same way, as
+#     described in section 4.3.7 "Interface Blocks" for interface
+#     block matching, or a link error will result.  It will also be a
+#     link error if some shaders in a program redeclare a specific
+#     built-in interface block while another shader in that program
+#     does not redeclare that interface block yet still uses a member
+#     of that interface block.
+#
+# This appears to be a clarification to the behaviour established for
+# gl_PerVertex by GLSL 1.50, therefore we test it using GLSL version
+# 1.50.
+#
+# The definition of "interface" in section 4.3.7 that applies here is
+# as follows:
+#
+#     The boundary between adjacent programmable pipeline stages: This
+#     spans all the outputs in all compilation units of the first
+#     stage and all the inputs in all compilation units of the second
+#     stage.
+#
+# Therefore this rule applies to both inter- and intra-stage linking.
+#
+# In this test we exercise interstage linking of the gl_PerVertex
+# interface block between the vertex and geometry shader stages, and
+# we verify the link error that is supposed to occur if some shaders
+# redeclare gl_PerVertex and others do not.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 pos;
+out gl_PerVertex {
+  vec4 gl_Position;
+};
+
+void main()
+{
+  gl_Position = pos;
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+void main()
+{
+  gl_Position = gl_in[0].gl_Position;
+  EmitVertex();
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+[test]
+link error

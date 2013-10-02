@@ -1,0 +1,62 @@
+# From section 7.1 (Built-In Language Variables) of the GLSL 4.10
+# spec:
+#
+#     If multiple shaders using members of a built-in block belonging
+#     to the same interface are linked together in the same program,
+#     they must all redeclare the built-in block in the same way, as
+#     described in section 4.3.7 "Interface Blocks" for interface
+#     block matching, or a link error will result.
+#
+# This appears to be a clarification to the behaviour established for
+# gl_PerVertex by GLSL 1.50, therefore we test it using GLSL version
+# 1.50.
+#
+# The definition of "interface" in section 4.3.7 that applies here is
+# as follows:
+#
+#     The boundary between adjacent programmable pipeline stages: This
+#     spans all the outputs in all compilation units of the first
+#     stage and all the inputs in all compilation units of the second
+#     stage.
+#
+# Therefore this rule applies to both inter- and intra-stage linking.
+#
+# In this test we exercise intrastage linking of the gl_PerVertex
+# "out" interface block, and we use two compilation units that refer
+# to a non-overlapping set of built-in variables.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 pos;
+out gl_PerVertex {
+  vec4 gl_Position;
+};
+
+void foo();
+
+void main()
+{
+  gl_Position = pos;
+  foo();
+}
+
+[vertex shader]
+out gl_PerVertex {
+  float gl_PointSize;
+};
+
+void foo()
+{
+  gl_PointSize = 1.0;
+}
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = vec4(1.0);
+}
+
+[test]
+link error
