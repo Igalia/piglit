@@ -64,10 +64,10 @@ get_counters(unsigned group, unsigned **counters, int *num_counters,
 				    *num_counters, *counters);
 }
 
-#define verify(x)                                                     \
-	if (!(x)) {                                                   \
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name); \
-		return;                                               \
+#define verify(x)                                                           \
+	if (!(x)) {                                                         \
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name); \
+		return;                                                     \
 	}
 
 /******************************************************************************/
@@ -180,7 +180,7 @@ test_basic_measurement(unsigned group)
 
 	verify(bytes_written == result_size);
 
-	piglit_report_subtest_result(PIGLIT_PASS, test_name);
+	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
 
 	/**
 	 * Test #2: Verify counter results against specified range.
@@ -275,7 +275,7 @@ test_basic_measurement(unsigned group)
 	verify(piglit_check_gl_error(GL_NO_ERROR));
 	verify(value == 0);
 
-	piglit_report_subtest_result(PIGLIT_PASS, test_name);
+	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
 
 	glDeletePerfMonitorsAMD(1, &monitor);
 }
@@ -351,7 +351,7 @@ test_change_counters_while_active(unsigned group)
 	glDeletePerfMonitorsAMD(1, &monitor);
 	verify(piglit_check_gl_error(GL_NO_ERROR));
 
-	piglit_report_subtest_result(PIGLIT_PASS, test_name);
+	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
 }
 
 
