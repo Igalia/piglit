@@ -118,8 +118,8 @@ requirements = {
         'version': '1.50',
         'extension': 'GL_ARB_gpu_shader5'
     },
-    'glsl-4.00': {
-        'version': '4.00',
+    'glsl-3.30': {
+        'version': '3.30',
         'extension': ''
     }
 }
