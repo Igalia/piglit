@@ -35,6 +35,7 @@
 
 int piglit_width = 137;
 int piglit_height = 119;
+GLXFBConfig config = None;
 
 void
 usage_error()
@@ -47,6 +48,7 @@ usage_error()
 	"\n"
 	"    glx-query-drawable --attr=GLX_WIDTH\n"
 	"    glx-query-drawable --attr=GLX_HEIGHT\n"
+	"    glx-query-drawable --attr=GLX_FBCONFIG_ID\n"
 	"        Call glXQueryDrawable() with the given attribute.\n"
 	"\n"
 	"    Options:\n"
@@ -136,6 +138,30 @@ static void query_height(Display *display, GLXDrawable draw) {
 	piglit_report_result(PIGLIT_PASS);
 }
 
+static void query_fbconfig_id(Display *display, GLXDrawable draw) {
+	unsigned int id = 0, piglit_id = 0;
+	enum piglit_result result = PIGLIT_PASS;
+
+	XSetErrorHandler(expect_no_error);
+	glXQueryDrawable(display, draw, GLX_FBCONFIG_ID, &id);
+	glXGetFBConfigAttrib(display, config, GLX_FBCONFIG_ID, &piglit_id);
+
+	/* Sync before checking in order to catch X errors. */
+	XSync(display, 0);
+
+	if (id == 0) {
+		fprintf(stderr, "error: no fbconfig id returned\n");
+		result = PIGLIT_FAIL;
+	}
+	
+	if (id != piglit_id) {
+		fprintf(stderr, "error: id=%d but should be %d\n",
+		        id, piglit_id);
+		result = PIGLIT_FAIL;
+	}
+
+	piglit_report_result(result);
+}
 
 static void query_bad_drawable(Display *display, GLXDrawable draw) {
 	unsigned int width;
@@ -190,6 +216,9 @@ parse_args(int argc, char **argv,
 		} else if (!strncmp(arg, "--attr=GLX_HEIGHT", 17)) {
 			++num_parsed_args;
 			*test_func = query_height;
+		} else if (!strncmp(arg, "--attr=GLX_FBCONFIG_ID", 22)) {
+			++num_parsed_args;
+			*test_func = query_fbconfig_id;
 		} else if (!strncmp(arg, "--type=GLXWINDOW", 16)) {
 			++num_parsed_args;
 			drawable_type = GLXWINDOW;
@@ -218,7 +247,6 @@ int main(int argc, char **argv) {
 	XVisualInfo *visual;
 	GLXDrawable draw;
 	GLXContext ctx;
-	GLXFBConfig config = None;
 	void (*test_func)(Display*, GLXDrawable);
 
 	parse_args(argc, argv, &test_func);
