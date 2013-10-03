@@ -408,6 +408,7 @@ glx['glx-query-drawable-GLX_FBCONFIG_ID-WINDOW'] = PlainExecTest(['glx-query-dra
 glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXWINDOW'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXWINDOW"])
 glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPIXMAP'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPIXMAP"])
 glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPBUFFER'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPBUFFER"])
+glx['glx-query-drawable-GLX_PRESERVED_CONTENTS'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPBUFFER"])
 glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', '-auto', '--bad-drawable'])
 glx['extension string sanity'] = PlainExecTest(['glx-string-sanity'])
 glx['extension string sanity'].runConcurrent = True

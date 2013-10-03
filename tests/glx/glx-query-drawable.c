@@ -49,6 +49,7 @@ usage_error()
 	"    glx-query-drawable --attr=GLX_WIDTH\n"
 	"    glx-query-drawable --attr=GLX_HEIGHT\n"
 	"    glx-query-drawable --attr=GLX_FBCONFIG_ID\n"
+	"    glx-query-drawable --attr=GLX_PRESERVED_CONTENTS (pbuffer only)\n"
 	"        Call glXQueryDrawable() with the given attribute.\n"
 	"\n"
 	"    Options:\n"
@@ -163,6 +164,30 @@ static void query_fbconfig_id(Display *display, GLXDrawable draw) {
 	piglit_report_result(result);
 }
 
+static void query_preserved_contents(Display *display, GLXDrawable draw) {
+	unsigned int contents = 42;
+	enum piglit_result result = PIGLIT_PASS;
+
+	if ((contents == True) || (contents == False)) {
+		fprintf(stderr, "This is a very strange dojo\n");
+		piglit_report_result(PIGLIT_SKIP);
+		return;
+	}
+
+	XSetErrorHandler(expect_no_error);
+	glXQueryDrawable(display, draw, GLX_PRESERVED_CONTENTS, &contents);
+
+	/* Sync before checking in order to catch X errors. */
+	XSync(display, 0);
+
+	if ((contents != True) && (contents != False)) {
+		fprintf(stderr, "error: Unexpected value %d\n", contents);
+		result = PIGLIT_FAIL;
+	}
+
+	piglit_report_result(result);
+}
+
 static void query_bad_drawable(Display *display, GLXDrawable draw) {
 	unsigned int width;
 	(void) draw;
@@ -219,6 +244,9 @@ parse_args(int argc, char **argv,
 		} else if (!strncmp(arg, "--attr=GLX_FBCONFIG_ID", 22)) {
 			++num_parsed_args;
 			*test_func = query_fbconfig_id;
+		} else if (!strncmp(arg, "--attr=GLX_PRESERVED_CONTENTS", 29)) {
+			++num_parsed_args;
+			*test_func = query_preserved_contents;
 		} else if (!strncmp(arg, "--type=GLXWINDOW", 16)) {
 			++num_parsed_args;
 			drawable_type = GLXWINDOW;
@@ -236,6 +264,10 @@ parse_args(int argc, char **argv,
 		   usage_error();
 		}
 	}
+
+	if (*test_func == query_preserved_contents)
+	    if (drawable_type != GLXPBUFFER)
+		usage_error();
 
 	if (num_parsed_args < 1) {
 	   usage_error();
