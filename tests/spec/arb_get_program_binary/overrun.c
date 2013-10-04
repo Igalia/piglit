@@ -61,8 +61,8 @@ verify_no_overrun(const void *buffer, const void *buffer_scratch,
       size_t buffer_size_in_bytes, size_t data_size_in_bytes,
       const char *getter_name, const char *enum_name)
 {
-	if (memcmp(buffer + data_size_in_bytes,
-		   buffer_scratch + data_size_in_bytes,
+	if (memcmp((uint8_t *)buffer + data_size_in_bytes,
+		   (uint8_t *)buffer_scratch + data_size_in_bytes,
 		   buffer_size_in_bytes - data_size_in_bytes) == 0)
 		return true;
 
