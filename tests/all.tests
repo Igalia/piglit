@@ -2632,6 +2632,7 @@ arb_copy_buffer['negative-bounds'] = concurrent_test('arb_copy_buffer-negative-b
 arb_copy_buffer['negative-mapped'] = concurrent_test('arb_copy_buffer-negative-mapped')
 arb_copy_buffer['overlap'] = concurrent_test('arb_copy_buffer-overlap')
 arb_copy_buffer['targets'] = concurrent_test('arb_copy_buffer-targets')
+arb_copy_buffer['subdata-sync'] = concurrent_test('arb_copy_buffer-subdata-sync')
 
 arb_half_float_vertex = Group()
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
