@@ -19,5 +19,6 @@ piglit_add_executable (arb_texture_buffer_object-negative-bad-format negative-ba
 piglit_add_executable (arb_texture_buffer_object-negative-bad-target negative-bad-target.c)
 piglit_add_executable (arb_texture_buffer_object-negative-unsupported negative-unsupported.c)
 piglit_add_executable (arb_texture_buffer_object-render-no-bo render-no-bo.c)
+piglit_add_executable (arb_texture_buffer_object-subdata-sync subdata-sync.c)
 piglit_add_executable (arb_texture_buffer_object-unused-name unused-name.c)
 piglit_add_executable (arb_texture_buffer_object-fetch-outside-bounds fetch-outside-bounds.c)
