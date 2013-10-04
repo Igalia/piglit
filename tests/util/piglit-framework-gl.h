@@ -163,6 +163,15 @@ struct piglit_gl_test_config {
 	 */
 	int supports_gl_compat_version;
 
+	/**
+	 * If true, then this test requires a forward-compatible context.
+	 *
+	 * Piglit will choose a waffle_config with
+	 * WAFFLE_CONTEXT_FORWARD_COMPATIBLE set to true. If context creation
+	 * fails, then the test skips.
+	 */
+	bool require_forward_compatible_context;
+
 	int window_width;
 	int window_height;
 	int window_samples;

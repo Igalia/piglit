@@ -150,8 +150,9 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
 static void
 make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[])
 {
-	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0;
-	const char *api_str = NULL, *profile_str = NULL;
+	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0,
+		fwd_compat = 0;
+	const char *api_str = NULL, *profile_str = NULL, *fwd_compat_str = NULL;
 
 	if (bufsize == 0) {
 		return;
@@ -161,6 +162,7 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_PROFILE, &profile);
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &major_version);
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MINOR_VERSION, &minor_version);
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_FORWARD_COMPATIBLE, &fwd_compat);
 
 	switch (api) {
 	case WAFFLE_CONTEXT_OPENGL:
@@ -191,8 +193,15 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 		break;
 	}
 
-	snprintf(buf, bufsize, "%s %d.%d %sContext",
-		api_str, major_version, minor_version, profile_str);
+	if (fwd_compat) {
+		fwd_compat_str = "Forward-Compatible ";
+	} else {
+		fwd_compat_str = "";
+	}
+
+	snprintf(buf, bufsize, "%s %d.%d %s%sContext",
+		api_str, major_version, minor_version, fwd_compat_str,
+		profile_str);
 }
 
 /**
@@ -238,8 +247,6 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
 			head_attrib_list[i++] = test_config->supports_gl_core_version % 10;
-
-			head_attrib_list[i++] = 0;
 			break;
 
 		case CONTEXT_GL_COMPAT:
@@ -261,7 +268,6 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			i = 0;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
-			head_attrib_list[i++] = 0;
 			break;
 
 		case CONTEXT_GL_ES: {
@@ -290,7 +296,6 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			head_attrib_list[i++] = test_config->supports_gl_es_version / 10;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
 			head_attrib_list[i++] = test_config->supports_gl_es_version % 10;
-			head_attrib_list[i++] = 0;
 			break;
 			}
 
@@ -299,6 +304,12 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 			break;
 	}
 
+	if (test_config->require_forward_compatible_context) {
+		head_attrib_list[i++] = WAFFLE_CONTEXT_FORWARD_COMPATIBLE;
+		head_attrib_list[i++] = true;
+	}
+
+	head_attrib_list[i++] = 0;
 	return concat_attrib_lists(head_attrib_list, partial_attrib_list);
 }
 
