@@ -1509,6 +1509,7 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
 
 arb_texture_buffer_object = Group()
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
+arb_texture_buffer_object['data-sync'] = concurrent_test('arb_texture_buffer_object-data-sync')
 arb_texture_buffer_object['dlist'] = concurrent_test('arb_texture_buffer_object-dlist')
 arb_texture_buffer_object['formats (FS, 3.1 core)'] = concurrent_test('arb_texture_buffer_object-formats fs core')
 arb_texture_buffer_object['formats (VS, 3.1 core)'] = concurrent_test('arb_texture_buffer_object-formats vs core')

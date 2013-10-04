@@ -10,6 +10,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (arb_texture_buffer_object-data-sync data-sync.c)
 piglit_add_executable (arb_texture_buffer_object-dlist dlist.c)
 piglit_add_executable (arb_texture_buffer_object-formats formats.c)
 piglit_add_executable (arb_texture_buffer_object-get get.c)
