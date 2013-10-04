@@ -40,7 +40,8 @@ int piglit_width;
 int piglit_height;
 
 static void
-process_args(int *argc, char *argv[], unsigned *force_samples);
+process_args(int *argc, char *argv[], unsigned *force_samples,
+	     struct piglit_gl_test_config *config);
 
 void
 piglit_gl_test_config_init(struct piglit_gl_test_config *config)
@@ -63,7 +64,8 @@ delete_arg(char *argv[], int argc, int arg)
  * length is returned in @a argc.
  */
 static void
-process_args(int *argc, char *argv[], unsigned *force_samples)
+process_args(int *argc, char *argv[], unsigned *force_samples,
+	     struct piglit_gl_test_config *config)
 {
 	int j;
 
@@ -111,6 +113,33 @@ process_args(int *argc, char *argv[], unsigned *force_samples)
 			*force_samples = atoi(argv[j]+9);
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
+		} else if (!strcmp(argv[j], "-subtest")) {
+			int i;
+
+			j++;
+			if (j >= *argc) {
+				fprintf(stderr,
+					"-subtest requires an argument\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			config->selected_subtests =
+				realloc(config->selected_subtests,
+					sizeof(char *)
+					* (config->num_selected_subtests + 1));
+			config->selected_subtests[config->num_selected_subtests] =
+				argv[j];
+
+			config->num_selected_subtests++;
+
+			/* Remove 2 arguments (hence the 'i - 2') from the
+			 * command line.
+			 */
+			for (i = j + 1; i < *argc; i++) {
+				argv[i - 2] = argv[i];
+			}
+			*argc -= 2;
+			j -= 2;
 		}
 	}
 }
@@ -121,7 +150,7 @@ piglit_gl_process_args(int *argc, char *argv[],
 {
 	unsigned force_samples = 0;
 
-	process_args(argc, argv, &force_samples);
+	process_args(argc, argv, &force_samples, config);
 
 	if (force_samples > 1)
 		config->window_samples = force_samples;
@@ -222,4 +251,63 @@ piglit_destroy_dma_buf(struct piglit_dma_buf *buf)
 {
 	if (gl_fw->destroy_dma_buf)
 		gl_fw->destroy_dma_buf(buf);
+}
+
+const struct piglit_gl_subtest *
+piglit_find_subtest(const struct piglit_gl_subtest *subtests, const char *name)
+{
+	unsigned i;
+
+	for (i = 0; !PIGLIT_GL_SUBTEST_END(&subtests[i]); i++) {
+		if (strcmp(subtests[i].option, name) == 0)
+			return &subtests[i];
+	}
+
+	return NULL;
+}
+
+enum piglit_result
+piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
+			     const char **selected_subtests,
+			     size_t num_selected_subtests,
+			     enum piglit_result previous_result)
+{
+	enum piglit_result result = previous_result;
+
+	if (num_selected_subtests) {
+		unsigned i;
+
+		for (i = 0; i < num_selected_subtests; i++) {
+			enum piglit_result subtest_result;
+			const char *const name = selected_subtests[i];
+			const struct piglit_gl_subtest *subtest =
+				piglit_find_subtest(all_subtests, name);
+
+			if (subtest == NULL) {
+				fprintf(stderr,
+					"Unknown subtest \"%s\".\n",
+					name);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			subtest_result = subtest->subtest_func(subtest->data);
+			piglit_report_subtest_result(subtest_result,
+						     subtest->name);
+
+			piglit_merge_result(&result, subtest_result);
+		}
+	} else {
+		unsigned i;
+
+		for (i = 0; !PIGLIT_GL_SUBTEST_END(&all_subtests[i]); i++) {
+			const enum piglit_result subtest_result =
+				all_subtests[i].subtest_func(all_subtests[i].data);
+			piglit_report_subtest_result(subtest_result,
+						     all_subtests[i].name);
+
+			piglit_merge_result(&result, subtest_result);
+		}
+	}
+
+	return result;
 }
