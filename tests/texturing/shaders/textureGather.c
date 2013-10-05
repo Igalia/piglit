@@ -18,6 +18,7 @@ enum { UNORM, FLOAT, INT, UINT, NUM_COMPTYPES } comptype = UNORM;
 enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY } sampler = SAMPLER_2D;
 bool use_offset = false;
 int components = 0;
+int comp_select = -1;
 
 GLenum internalformat_for_components[][4] = {
 	{ GL_R16, GL_RG16, GL_RGB16, GL_RGBA16, },
@@ -49,7 +50,11 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	if (swizzle >= 0) {
-		GLint sw[] = { swizzles[swizzle], GL_ZERO, GL_ZERO, GL_ZERO };
+		GLint sw[] = { GL_ZERO, GL_ZERO, GL_ZERO, GL_ZERO };
+		if (comp_select != -1)
+			sw[comp_select] = swizzles[swizzle];
+		else
+			sw[0] = swizzles[swizzle];
 		glTexParameteriv(target_for_sampler[sampler], GL_TEXTURE_SWIZZLE_RGBA, sw);
 	}
 
@@ -184,6 +189,12 @@ do_requires(void)
 		printf("Offset is not supported with cube or cube array samplers.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+	/* if we are trying to specify the component from the shader,
+	 * check that we have ARB_gpu_shader5
+	 */
+	if (comp_select != -1)
+		piglit_require_extension("GL_ARB_gpu_shader5");
 }
 
 static void
@@ -215,6 +226,15 @@ upload_3d(GLenum target, void *pixels)
 		     GL_UNSIGNED_BYTE, pixels);
 }
 
+static int
+channel_to_fill(void) {
+	if (swizzle != NONE)
+		return swizzle;
+	if (comp_select != NONE)
+		return comp_select;
+	return 0;
+}
+
 static void
 do_texture_setup(void)
 {
@@ -226,7 +246,7 @@ do_texture_setup(void)
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 
-	make_image(components, swizzle != NONE ? swizzle : 0);
+	make_image(components, channel_to_fill());
 	make_expected();
 
 	switch(sampler) {
@@ -284,11 +304,13 @@ do_shader_setup(void)
 		"vec3(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1)",	/* cube */
 		"vec4(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1, 1)"	/* cube array */
 	};
+	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
 
 	if (stage == VS) {
 		asprintf(&vs_code, "#version 130\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
 				"#extension GL_ARB_texture_gather: require\n"
+				"%s"
 				"%s"
 				"\n"
 				"layout(location=0) in vec4 pos;\n"
@@ -297,15 +319,17 @@ do_shader_setup(void)
 				"\n"
 				"void main() {\n"
 				"	gl_Position = pos;\n"
-				"	c = %s * textureGather%s(s, %s %s);\n"
+				"	c = %s * textureGather%s(s, %s %s %s);\n"
 				"}\n",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
+				comp_select == -1 ? "" : "#extension GL_ARB_gpu_shader5: require\n",
 				prefix[comptype],
 				samplersuffix[sampler],
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				vs_tc_expr[sampler],
-				use_offset ? ", ivec2(-8,7)" : "");
+				use_offset ? ", ivec2(-8,7)" : "",
+				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
 				"#version 130\n"
 				"\n"
@@ -328,19 +352,22 @@ do_shader_setup(void)
 				"#version 130\n"
 				"#extension GL_ARB_texture_gather: require\n"
 				"%s"
+				"%s"
 				"\n"
 				"uniform %ssampler%s s;\n"
 				"\n"
 				"void main() {\n"
-				"	gl_FragColor = %s * textureGather%s(s, %s %s);\n"
+				"	gl_FragColor = %s * textureGather%s(s, %s %s %s);\n"
 				"}\n",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
+				comp_select == -1 ? "" : "#extension GL_ARB_gpu_shader5: require\n",
 				prefix[comptype],
 				samplersuffix[sampler],
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				fs_tc_expr[sampler],
-				use_offset ? ", ivec2(-8,7)" : "");
+				use_offset ? ", ivec2(-8,7)" : "",
+				comp_expr[1 + comp_select]);
 	}
 
 	prog = piglit_build_simple_program(vs_code, fs_code);
@@ -370,12 +397,13 @@ do_geometry_setup(void)
 void
 fail_with_usage(void)
 {
-	printf("Usage: textureGather <stage> [offset] <components> <swizzle> <comptype> <sampler>\n"
+	printf("Usage: textureGather <stage> [offset] <components> <swizzle> <comptype> <sampler> <compselect>\n"
 	       "	stage = vs|fs\n"
 	       "	components = r|rg|rgb|rgba\n"
 	       "	swizzle = red|green|blue|alpha|zero|one\n"
 	       "	comptype = unorm|float|uint|int\n"
-	       "	sampler = 2D|2DArray|Cube|CubeArray\n");
+	       "	sampler = 2D|2DArray|Cube|CubeArray\n"
+	       "	compselect = 0|1|2|3");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -406,6 +434,10 @@ piglit_init(int argc, char **argv)
 		else if (!strcmp(opt, "2DArray")) sampler = SAMPLER_2DARRAY;
 		else if (!strcmp(opt, "Cube")) sampler = SAMPLER_CUBE;
 		else if (!strcmp(opt, "CubeArray")) sampler = SAMPLER_CUBEARRAY;
+		else if (!strcmp(opt, "0")) comp_select = 0;
+		else if (!strcmp(opt, "1")) comp_select = 1;
+		else if (!strcmp(opt, "2")) comp_select = 2;
+		else if (!strcmp(opt, "3")) comp_select = 3;
 	}
 
 	if (stage == NOSTAGE) fail_with_usage();
