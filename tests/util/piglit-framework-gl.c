@@ -140,6 +140,23 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			}
 			*argc -= 2;
 			j -= 2;
+		} else if (!strcmp(argv[j], "-list-subtests")) {
+			unsigned i;
+
+			if (config->subtests == NULL) {
+				fprintf(stderr, "Test defines no subtests!\n");
+				exit(1);
+			}
+
+			for (i = 0;
+			     !PIGLIT_GL_SUBTEST_END(&config->subtests[i]);
+			     i++) {
+				printf("%s: %s\n",
+				       config->subtests[i].option,
+				       config->subtests[i].name);
+			}
+
+			exit(0);
 		}
 	}
 }

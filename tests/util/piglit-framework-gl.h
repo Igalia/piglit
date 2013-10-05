@@ -195,6 +195,14 @@ struct piglit_gl_test_config {
 	(*display)(void);
 
 	/**
+	 * List of subtests supported by this test case
+	 *
+	 * This is only used during command line argument parsing to implement
+	 * the -list-subtests option.
+	 */
+	const struct piglit_gl_subtest *subtests;
+
+	/**
 	 * Names of subtests supplied on the command line.
 	 *
 	 * The paramaters passed to each -subtest command line option is
