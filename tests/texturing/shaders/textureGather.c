@@ -17,6 +17,7 @@ enum { NONE = -1, RED, GREEN, BLUE, ALPHA, ZERO, ONE } swizzle = NONE;
 enum { UNORM, FLOAT, INT, UINT, NUM_COMPTYPES } comptype = UNORM;
 enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY } sampler = SAMPLER_2D;
 bool use_offset = false;
+bool use_nonconst = false;
 int components = 0;
 int comp_select = -1;
 
@@ -191,9 +192,9 @@ do_requires(void)
 	}
 
 	/* if we are trying to specify the component from the shader,
-	 * check that we have ARB_gpu_shader5
+	 * or use non-constant offsets, check that we have ARB_gpu_shader5
 	 */
-	if (comp_select != -1)
+	if (comp_select != -1 || use_nonconst)
 		piglit_require_extension("GL_ARB_gpu_shader5");
 }
 
@@ -282,7 +283,7 @@ static void
 do_shader_setup(void)
 {
 	GLint prog;
-	GLint sampler_loc;
+	GLint sampler_loc, offset_loc;
 	char *vs_code, *fs_code;
 	char *prefix[] = { "" /* unorm */, "" /* float */, "i" /* int */, "u" /* uint */ };
 	char *scale[] = {
@@ -305,6 +306,7 @@ do_shader_setup(void)
 		"vec4(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1, 1)"	/* cube array */
 	};
 	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
+	bool need_shader5 = (comp_select != -1) || use_nonconst;
 
 	if (stage == VS) {
 		asprintf(&vs_code, "#version 130\n"
@@ -315,6 +317,7 @@ do_shader_setup(void)
 				"\n"
 				"layout(location=0) in vec4 pos;\n"
 				"uniform %ssampler%s s;\n"
+				"%s"
 				"out vec4 c;\n"
 				"\n"
 				"void main() {\n"
@@ -322,13 +325,14 @@ do_shader_setup(void)
 				"	c = %s * textureGather%s(s, %s %s %s);\n"
 				"}\n",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
-				comp_select == -1 ? "" : "#extension GL_ARB_gpu_shader5: require\n",
+				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
 				samplersuffix[sampler],
+				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				vs_tc_expr[sampler],
-				use_offset ? ", ivec2(-8,7)" : "",
+				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
 				"#version 130\n"
@@ -355,18 +359,20 @@ do_shader_setup(void)
 				"%s"
 				"\n"
 				"uniform %ssampler%s s;\n"
+				"%s"
 				"\n"
 				"void main() {\n"
 				"	gl_FragColor = %s * textureGather%s(s, %s %s %s);\n"
 				"}\n",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
-				comp_select == -1 ? "" : "#extension GL_ARB_gpu_shader5: require\n",
+				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
 				samplersuffix[sampler],
+				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				fs_tc_expr[sampler],
-				use_offset ? ", ivec2(-8,7)" : "",
+				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 	}
 
@@ -375,6 +381,13 @@ do_shader_setup(void)
 	glUseProgram(prog);
 	sampler_loc = glGetUniformLocation(prog, "s");
 	glUniform1i(sampler_loc, 0);
+
+	if (use_nonconst) {
+		offset_loc = glGetUniformLocation(prog, "o1");
+		glUniform2i(offset_loc, -8, 0);
+		offset_loc = glGetUniformLocation(prog, "o2");
+		glUniform2i(offset_loc, 0, 7);
+	}
 }
 
 static void
@@ -397,7 +410,7 @@ do_geometry_setup(void)
 void
 fail_with_usage(void)
 {
-	printf("Usage: textureGather <stage> [offset] <components> <swizzle> <comptype> <sampler> <compselect>\n"
+	printf("Usage: textureGather <stage> [offset] [nonconst] <components> <swizzle> <comptype> <sampler> <compselect>\n"
 	       "	stage = vs|fs\n"
 	       "	components = r|rg|rgb|rgba\n"
 	       "	swizzle = red|green|blue|alpha|zero|one\n"
@@ -416,6 +429,7 @@ piglit_init(int argc, char **argv)
 		if (!strcmp(opt, "vs")) stage = VS;
 		else if (!strcmp(opt, "fs")) stage = FS;
 		else if (!strcmp(opt, "offset")) use_offset = true;
+		else if (!strcmp(opt, "nonconst")) use_nonconst = true;
 		else if (!strcmp(opt, "r")) components = 1;
 		else if (!strcmp(opt, "rg")) components = 2;
 		else if (!strcmp(opt, "rgb")) components = 3;
@@ -442,6 +456,8 @@ piglit_init(int argc, char **argv)
 
 	if (stage == NOSTAGE) fail_with_usage();
 	if (components == 0) fail_with_usage();
+
+	if (use_nonconst) use_offset = true;
 
 	do_requires();
 	do_texture_setup();
