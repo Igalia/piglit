@@ -25,7 +25,7 @@
 #include "piglit-util-gl-common.h"
 
 static const char *TestLabel = "Test Label";
-static const int TestLabelLen = 10;
+#define TestLabelLen 10
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -108,7 +108,7 @@ check_label_and_length(char *label, int length, char *object)
 static bool
 test_object_label_types()
 {
-	int numObjects = 12;
+	#define numObjects 12
 	GLsizei length[numObjects]; /* create a fresh variable for each object to test */
 	GLchar label[numObjects][TestLabelLen + 1];
 	bool pass = true;
@@ -363,7 +363,7 @@ test_object_label()
 static bool
 test_get_object_label()
 {
-	GLsizei numBuffers = 4;
+	#define numBuffers 4
 	GLsizei length;
 	GLuint buffers[numBuffers];
 	GLuint invalidBufferName;
