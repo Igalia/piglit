@@ -3866,6 +3866,7 @@ import_glsl_parser_tests(spec['ARB_shader_atomic_counters'],
 arb_shader_atomic_counters['active-counters'] = concurrent_test('arb_shader_atomic_counters-active-counters')
 arb_shader_atomic_counters['array-indexing'] = concurrent_test('arb_shader_atomic_counters-array-indexing')
 arb_shader_atomic_counters['buffer-binding'] = concurrent_test('arb_shader_atomic_counters-buffer-binding')
+arb_shader_atomic_counters['default-partition'] = concurrent_test('arb_shader_atomic_counters-default-partition')
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
