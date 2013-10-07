@@ -18,5 +18,6 @@ add_executable (arb_shader_atomic_counters-fragment-discard fragment-discard.c c
 add_executable (arb_shader_atomic_counters-function-argument function-argument.c common.c)
 add_executable (arb_shader_atomic_counters-max-counters max-counters.c common.c)
 add_executable (arb_shader_atomic_counters-minmax minmax.c common.c)
+add_executable (arb_shader_atomic_counters-multiple-defs multiple-defs.c common.c)
 
 # vim: ft=cmake:
