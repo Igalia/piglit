@@ -1106,6 +1106,7 @@ import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
 # Group ARB_sync
 arb_sync = Group()
 spec['ARB_sync'] = arb_sync
+arb_sync['ClientWaitSync-errors'] = concurrent_test('arb_sync-client-wait-errors')
 arb_sync['repeat-wait'] = concurrent_test('arb_sync-repeat-wait')
 arb_sync['timeout-zero'] = concurrent_test('arb_sync-timeout-zero')
 add_plain_test(arb_sync, 'sync_api')
