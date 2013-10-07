@@ -11,5 +11,6 @@ link_libraries (
 )
 
 add_executable (arb_shader_atomic_counters-active-counters active-counters.c common.c)
+add_executable (arb_shader_atomic_counters-array-indexing array-indexing.c common.c)
 
 # vim: ft=cmake:
