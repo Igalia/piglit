@@ -1110,6 +1110,7 @@ arb_sync['ClientWaitSync-errors'] = concurrent_test('arb_sync-client-wait-errors
 arb_sync['DeleteSync'] = concurrent_test('arb_sync-delete')
 arb_sync['FenceSync-errors'] = concurrent_test('arb_sync-fence-sync-errors')
 arb_sync['GetSynciv-errors'] = concurrent_test('arb_sync-get-sync-errors')
+arb_sync['IsSync'] = concurrent_test('arb_sync-is-sync')
 arb_sync['repeat-wait'] = concurrent_test('arb_sync-repeat-wait')
 arb_sync['timeout-zero'] = concurrent_test('arb_sync-timeout-zero')
 add_plain_test(arb_sync, 'sync_api')
