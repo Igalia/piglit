@@ -3870,6 +3870,7 @@ arb_shader_atomic_counters['default-partition'] = concurrent_test('arb_shader_at
 arb_shader_atomic_counters['fragment-discard'] = concurrent_test('arb_shader_atomic_counters-fragment-discard')
 arb_shader_atomic_counters['function-argument'] = concurrent_test('arb_shader_atomic_counters-function-argument')
 arb_shader_atomic_counters['max-counters'] = concurrent_test('arb_shader_atomic_counters-max-counters')
+arb_shader_atomic_counters['minmax'] = concurrent_test('arb_shader_atomic_counters-minmax')
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
