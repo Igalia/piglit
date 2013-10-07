@@ -10,4 +10,6 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+add_executable (arb_shader_atomic_counters-active-counters active-counters.c common.c)
+
 # vim: ft=cmake:
