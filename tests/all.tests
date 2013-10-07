@@ -1701,6 +1701,7 @@ arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PlainExecTest(['arb_vertex
 add_plain_test(arb_vertex_buffer_object, 'fdo14575')
 add_plain_test(arb_vertex_buffer_object, 'fdo22540')
 add_plain_test(arb_vertex_buffer_object, 'fdo31934')
+arb_vertex_buffer_object['ib-data-sync'] = concurrent_test('arb_vertex_buffer_object-ib-data-sync')
 arb_vertex_buffer_object['ib-subdata-sync'] = concurrent_test('arb_vertex_buffer_object-ib-subdata-sync')
 add_plain_test(arb_vertex_buffer_object, 'pos-array')
 add_plain_test(arb_vertex_buffer_object, 'vbo-bufferdata')
