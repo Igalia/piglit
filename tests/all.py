@@ -3858,6 +3858,9 @@ add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
+arb_shader_atomic_counters = Group()
+spec['ARB_shader_atomic_counters'] = arb_shader_atomic_counters
+
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
 profile.tests['glean'] = glean
