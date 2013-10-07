@@ -316,7 +316,7 @@ class TestrunResult:
         #   5. Return a file object containing the repaired JSON.
 
         # Each non-terminal test result ends with this line:
-        safe_line = 3 * JSONWriter.INDENT * ' ' + '},\n'
+        safe_line = 2 * JSONWriter.INDENT * ' ' + '},\n'
 
         # Search for the last occurence of safe_line.
         safe_line_num = None
@@ -333,7 +333,7 @@ class TestrunResult:
         lines = lines[0:(safe_line_num + 1)]
 
         # Remove trailing comma.
-        lines[-1] = 3 * JSONWriter.INDENT * ' ' + '}\n'
+        lines[-1] = 2 * JSONWriter.INDENT * ' ' + '}\n'
 
         # Close json object.
         lines.append(JSONWriter.INDENT * ' ' + '}\n')
