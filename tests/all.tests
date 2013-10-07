@@ -1112,6 +1112,7 @@ arb_sync['FenceSync-errors'] = concurrent_test('arb_sync-fence-sync-errors')
 arb_sync['GetSynciv-errors'] = concurrent_test('arb_sync-get-sync-errors')
 arb_sync['IsSync'] = concurrent_test('arb_sync-is-sync')
 arb_sync['repeat-wait'] = concurrent_test('arb_sync-repeat-wait')
+arb_sync['sync-initialize'] = concurrent_test('arb_sync-sync-initialize')
 arb_sync['timeout-zero'] = concurrent_test('arb_sync-timeout-zero')
 add_plain_test(arb_sync, 'sync_api')
 
