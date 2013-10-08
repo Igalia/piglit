@@ -1,0 +1,67 @@
+# This test verifies that a single geometry shader can redeclare both
+# the gl_PerVertex input and gl_PerVertex output interface blocks
+# without error, and that data is properly exchanged with the vertex
+# and fragment shaders.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+out gl_PerVertex {
+    float gl_PointSize;
+};
+
+void main()
+{
+  gl_PointSize = float(gl_VertexID);
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+in gl_PerVertex {
+  float gl_PointSize;
+} gl_in[];
+
+out gl_PerVertex {
+  vec4 gl_Position;
+};
+
+out vec4 color;
+
+void main()
+{
+  const vec4 vertices[4] = vec4[4](
+    vec4(-1.0, -1.0, 0.0, 1.0),
+    vec4(-1.0,  1.0, 0.0, 1.0),
+    vec4( 1.0, -1.0, 0.0, 1.0),
+    vec4( 1.0,  1.0, 0.0, 1.0)
+  );
+
+  bool pass = true;
+  for (int i = 0; i < 3; i++) {
+    if (gl_in[i].gl_PointSize != float(i))
+      pass = false;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    color = pass ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    gl_Position = vertices[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLES 0 3
+probe all rgba 0.0 1.0 0.0 1.0
