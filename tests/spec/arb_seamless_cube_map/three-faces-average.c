@@ -120,6 +120,7 @@ void piglit_init( int argc, char **argv)
 
 	if(piglit_get_gl_version() < 32) {
 		piglit_require_extension("GL_ARB_seamless_cube_map");
+		piglit_require_GLSL_version(130);
 	}
 
 	/* create program */
