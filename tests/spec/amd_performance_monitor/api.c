@@ -205,7 +205,7 @@ test_number_of_groups_partial_array(void)
 		pass = groups[i] != 0xdddddddd && pass;
 	}
 
-	/* Catalyst 12.6 on a Radeon 3650 appears to have a bug where this
+	/* Catalyst 13.10 on a Radeon 6870 appears to have a bug where this
 	 * returns 3 elements instead of 2.  According to the spec,
 	 * "The number of entries that will be returned in <groups> is
 	 *  determined by <groupSize>."
@@ -383,7 +383,7 @@ test_group_string_single_character_buffer(unsigned valid_group)
 	if (name[0] == '\0') {
 		pass = length == 0 && pass;
 	} else {
-		/* AMD Catalyst 12.06 (Radeon 3650) does not write a null
+		/* AMD Catalyst 13.10 (Radeon 6870) does not write a null
 		 * terminator.  Instead, it writes the first part of the name.
 		 */
 		pass = length == 1 && pass;
@@ -527,7 +527,7 @@ test_counter_string_single_character_buffer(unsigned group, unsigned counter)
 	if (name[0] == '\0') {
 		pass = length == 0 && pass;
 	} else {
-		/* AMD Catalyst 12.06 (Radeon 3650) does not write a null
+		/* AMD Catalyst 13.10 (Radeon 6870) does not write a null
 		 * terminator.  Instead, it writes the first part of the name.
 		 */
 		pass = length == 1 && pass;
@@ -760,7 +760,7 @@ test_begin_invalid_monitor(void)
  *
  * XXX: This isn't actually specified, but it seems like it ought to be.
  *
- * AMD Catalyst 12.6 (Radeon 3650) instead produces INVALID_OPERATION,
+ * AMD Catalyst 13.10 (Radeon 6870) instead produces INVALID_OPERATION,
  * presumably because the (invalid) monitor hasn't been started.  (See
  * test_end_without_begin.)  So we allow either here.
  */
@@ -808,7 +808,7 @@ test_select_counters_invalid_monitor(void)
  * "If a monitor ID in the list <monitors> does not reference a previously
  *  generated performance monitor, an INVALID_VALUE error is generated."
  *
- * AMD Catalyst 12.6 (Radeon 3650) fails this test, producing NO_ERROR.
+ * AMD Catalyst 13.10 (Radeon 6870) fails this test, producing NO_ERROR.
  */
 static void
 test_delete_monitor_invalid(void)
@@ -821,7 +821,7 @@ test_delete_monitor_invalid(void)
 /**
  * Mean tests for glGetPerfMonitorCounterDataAMD()'s data return mechanism.
  *
- * AMD Catalyst 12.6 (Radeon 3650) fails this test.  It does not set
+ * AMD Catalyst 13.10 (Radeon 6870) fails this test.  It does not set
  * bytes_written, yet writes 0 for each of these queries.  It apparently
  * interprets these fields as only relevant to the PERFMON_RESULT_AMD query.
  */
@@ -893,7 +893,7 @@ test_gen_initial_state(void)
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = value == 0 && pass;
 
-	/* AMD Catalyst 12.6 (Radeon 3650) actually does write 0 for the
+	/* AMD Catalyst 13.10 (Radeon 6870) actually does write 0 for the
 	 * PERFMON_RESULT query even though it isn't available.  This
 	 * matches the spec, but is strange.
 	 */
