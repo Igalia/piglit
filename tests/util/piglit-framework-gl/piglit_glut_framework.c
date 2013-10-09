@@ -169,6 +169,31 @@ set_reshape_func(struct piglit_gl_framework *gl_fw,
 	glutReshapeFunc(func);
 }
 
+/**
+ * Check that the context's actual version is no less than the
+ * requested version.
+ */
+static bool
+check_gl_version(const struct piglit_gl_test_config *test_config)
+{
+	int actual_version = piglit_get_gl_version();
+
+	/* GLUT only supports GL compatibility contexts, so we only
+	 * have to check supports_gl_compat_version.
+	 */
+	if (actual_version < test_config->supports_gl_compat_version) {
+		printf("Test requires GL version %d.%d, but actual version is "
+		       "%d.%d\n",
+		       test_config->supports_gl_compat_version / 10,
+		       test_config->supports_gl_compat_version % 10,
+		       actual_version / 10,
+		       actual_version % 10);
+		return false;
+	}
+
+	return true;
+}
+
 struct piglit_gl_framework*
 piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 {
@@ -190,6 +215,9 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 		return NULL;
 
 	init_glut();
+
+	if (!check_gl_version(test_config))
+		piglit_report_result(PIGLIT_SKIP);
 
 	glut_fw.gl_fw.swap_buffers = swap_buffers;
 	glut_fw.gl_fw.run_test = run_test;
