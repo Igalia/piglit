@@ -339,6 +339,9 @@ piglit_init(int argc, char **argv)
 		print_usage_and_exit(argv[0]);
 	}
 
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 	/* argv[1]: texture size */
 	{
 		char *endptr = NULL;
