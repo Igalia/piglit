@@ -260,22 +260,15 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 		case CONTEXT_GL_COMPAT:
 			assert(test_config->supports_gl_compat_version);
 
-			/* Don't supply a GL version to Waffle.  When no
-			 * version is specified, GLX and EGL should return the
-			 * latest supported version. Later, we compare the
-			 * actual version, as reported by glGetString, against
-			 * the version required by the test.
-			 *
-			 * If a version != 1.0 is given to
-			 * waffle_choose_config, then a code path in waffle is
-			 * taken that requires GLX_ARB_create_context or
-			 * EGL_KHR_create_context. This trick enables tests
-			 * for which supports_gl_compat_version > 1.0 to run
-			 * on drivers that lack those extensions.
-			 */
 			i = 0;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_API;
 			head_attrib_list[i++] = WAFFLE_CONTEXT_OPENGL;
+
+			head_attrib_list[i++] = WAFFLE_CONTEXT_MAJOR_VERSION;
+			head_attrib_list[i++] = test_config->supports_gl_compat_version / 10;
+
+			head_attrib_list[i++] = WAFFLE_CONTEXT_MINOR_VERSION;
+			head_attrib_list[i++] = test_config->supports_gl_compat_version % 10;
 			break;
 
 		case CONTEXT_GL_ES: {
@@ -344,10 +337,6 @@ check_gl_version(const struct piglit_gl_test_config *test_config,
 		 */
 		return true;
 	case CONTEXT_GL_COMPAT: {
-		/* Piglit did not supply a version to
-		 * waffle_config_choose(). We must check the context's
-		 * actual version.
-		 */
 		int actual_version = piglit_get_gl_version();
 		if (actual_version >= test_config->supports_gl_compat_version)
 		   return true;
