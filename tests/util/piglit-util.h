@@ -184,6 +184,9 @@ piglit_join_paths(char buf[], size_t buf_size, int n, ...);
 int64_t
 piglit_get_microseconds(void);
 
+const char**
+piglit_split_string_to_array(const char *string, const char *separators);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

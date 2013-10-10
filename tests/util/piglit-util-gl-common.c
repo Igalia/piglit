@@ -64,32 +64,11 @@ int piglit_get_gl_version(void)
 	return 10*major+minor;
 }
 
-static const char** split_string(const char *string)
-{
-	char **strings, *string_copy;
-	int i, length, max_words;
-
-	length = strlen(string);
-	max_words = length / 2;
-	strings = malloc ((sizeof(char*) * (max_words + 1)) +
-	                  (sizeof(char) * (length + 1)));
-	assert (strings != NULL);
-
-	string_copy = (char*) &strings[max_words + 1];
-	strcpy(string_copy, string);
-
-	strings[0] = strtok(string_copy, " ");
-	for (i = 0; strings[i] != NULL; ++i)
-		strings[i + 1] = strtok(NULL, " ");
-
-	return (const char**) strings;
-}
-
 static const char** gl_extension_array_from_getstring()
 {
 	const char *gl_extensions_string;
 	gl_extensions_string = (const char *) glGetString(GL_EXTENSIONS);
-	return split_string(gl_extensions_string);
+	return piglit_split_string_to_array(gl_extensions_string, " ");
 }
 
 #if defined(PIGLIT_USE_OPENGL)

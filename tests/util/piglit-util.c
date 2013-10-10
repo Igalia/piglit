@@ -105,6 +105,36 @@ int asprintf(char **strp, const char *fmt, ...)
 
 #endif /* _WIN32 */
 
+/**
+ * \brief Split \a string into an array of strings.
+ *
+ * The null-terminated string \a separators is a list of characters at
+ * which to perform the splits. For example, if separators is " ,", then
+ * the function will split the string at each occurence of ' ' and ','.
+ */
+const char**
+piglit_split_string_to_array(const char *string, const char *separators)
+{
+	char **strings, *string_copy;
+	int i, length, max_words;
+
+	length = strlen(string);
+	max_words = length / 2;
+	strings = malloc((sizeof(char*) * (max_words + 1)) +
+	                 (sizeof(char) * (length + 1)));
+	assert(strings != NULL);
+
+	string_copy = (char*) &strings[max_words + 1];
+	strcpy(string_copy, string);
+
+	strings[0] = strtok(string_copy, separators);
+	for (i = 0; strings[i] != NULL; ++i) {
+		strings[i + 1] = strtok(NULL, separators);
+	}
+
+	return (const char**) strings;
+}
+
 bool piglit_is_extension_in_array(const char **haystack, const char *needle)
 {
 	if (needle[0] == 0)
