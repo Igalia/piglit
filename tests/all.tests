@@ -3289,6 +3289,11 @@ egl_khr_create_context['verify GL flavor'] = plain_test('egl-create-context-veri
 for api in ('gl', 'gles1', 'gles2', 'gles3'):
     egl_khr_create_context['valid debug flag ' + api] = plain_test('egl-create-context-valid-flag-debug ' + api)
 
+egl_ext_client_extensions = Group()
+spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
+for i in [1, 2, 3]:
+    egl_ext_client_extensions['conformance test {0}'.format(i)] = concurrent_test('egl_ext_client_extensions {0}'.format(i))
+
 gles20 = Group()
 spec['!OpenGL ES 2.0'] = gles20
 gles20['glsl-fs-pointcoord'] = concurrent_test('glsl-fs-pointcoord_gles2')
