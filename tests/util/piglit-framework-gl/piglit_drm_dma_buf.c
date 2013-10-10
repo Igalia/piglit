@@ -145,7 +145,7 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned cpp,
 	unsigned stride = ALIGN(w * cpp, 4);
 	drm_intel_bufmgr *mgr = piglit_intel_bufmgr_get();
 
-	if (!mgr || src_stride > stride || h % 2)
+	if (!mgr || h % 2)
 		return false;
 
 	bo = drm_intel_bo_alloc(mgr, "piglit_dma_buf", h * stride, 4096);
@@ -153,7 +153,7 @@ piglit_intel_buf_create(unsigned w, unsigned h, unsigned cpp,
 		return false;
 
 	for (i = 0; i < h; ++i) {
-		if (drm_intel_bo_subdata(bo, i * stride, src_stride,
+		if (drm_intel_bo_subdata(bo, i * stride, w * cpp,
 			src_data + i * src_stride)) {
 			drm_intel_bo_unreference(bo);
 			return false;
