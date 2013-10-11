@@ -13,4 +13,5 @@ link_libraries (
 piglit_add_executable (arb_sample_shading-api api.c)
 piglit_add_executable (arb_sample_shading-builtin-gl-num-samples builtin-gl-num-samples.cpp)
 piglit_add_executable (arb_sample_shading-builtin-gl-sample-id builtin-gl-sample-id.cpp)
+piglit_add_executable (arb_sample_shading-builtin-gl-sample-mask builtin-gl-sample-mask.cpp)
 # vim: ft=cmake:
