@@ -174,6 +174,16 @@ piglit_source_dir(void);
 size_t
 piglit_join_paths(char buf[], size_t buf_size, int n, ...);
 
+/**
+ * \brief Get a monotonically increasing time in microseconds
+ *
+ * This time can be used for relative time measurements.
+ *
+ * A negative return value indicates an error.
+ */
+int64_t
+piglit_get_microseconds(void);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

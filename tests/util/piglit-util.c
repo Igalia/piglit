@@ -33,6 +33,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
+#include <time.h>
+#endif
+
 #include "config.h"
 #if defined(HAVE_SYS_TIME_H) && defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_SETRLIMIT)
 #include <sys/time.h>
@@ -462,3 +466,19 @@ write_null:
 	va_end(va);
 	return size_written;
 }
+
+int64_t
+piglit_get_microseconds(void)
+{
+#ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
+	struct timespec t;
+	int r = clock_gettime(CLOCK_MONOTONIC, &t);
+	if (r >= 0)
+		return (t.tv_sec * 1000000) + (t.tv_nsec / 1000);
+	else
+		return -1LL;
+#else
+	return -1LL;
+#endif
+}
+
