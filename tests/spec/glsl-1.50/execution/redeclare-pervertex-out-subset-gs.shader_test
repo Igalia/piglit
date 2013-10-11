@@ -34,11 +34,12 @@
 #
 # NOTE: since gl_PointSize is expressed in pixels, but gl_Position is
 # expressed relative to the window size, this test is dependent upon
-# the window size.  It assumes a window size of 250x250, which is the
-# shader_runner default.
+# the window size.  It uses a window size of 250x250, which is the
+# specified as the size requirement for the test.
 
 [require]
 GLSL >= 1.50
+SIZE 250 250
 
 [vertex shader]
 void main()
