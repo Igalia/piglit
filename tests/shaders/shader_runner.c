@@ -38,21 +38,24 @@
 #include "parser_utils.h"
 
 static void
-get_required_versions(const char *script_name,
-		      struct piglit_gl_test_config *config);
+get_required_config(const char *script_name,
+		    struct piglit_gl_test_config *config);
 GLenum
 decode_drawing_mode(const char *mode_str);
 
-PIGLIT_GL_TEST_CONFIG_BEGIN
+void
+get_uints(const char *line, unsigned *uints, unsigned count);
 
-	if (argc > 1)
-		get_required_versions(argv[1], &config);
-	else
-		config.supports_gl_compat_version = 10;
+PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_width = 250;
 	config.window_height = 250;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+	if (argc > 1)
+		get_required_config(argv[1], &config);
+	else
+		config.supports_gl_compat_version = 10;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -934,13 +937,15 @@ process_test_script(const char *script_name)
 struct requirement_parse_results {
 	bool found_gl;
 	bool found_glsl;
+	bool found_size;
 	struct component_version gl_version;
 	struct component_version glsl_version;
+	unsigned size[2];
 };
 
 static void
-parse_required_versions(struct requirement_parse_results *results,
-                        const char *script_name)
+parse_required_config(struct requirement_parse_results *results,
+		      const char *script_name)
 {
 	unsigned text_size;
 	char *text = piglit_load_text_file(script_name, &text_size);
@@ -949,6 +954,7 @@ parse_required_versions(struct requirement_parse_results *results,
 
 	results->found_gl = false;
 	results->found_glsl = false;
+	results->found_size = false;
 
 	if (line == NULL) {
 		printf("could not read file \"%s\"\n", script_name);
@@ -993,6 +999,9 @@ parse_required_versions(struct requirement_parse_results *results,
 					results->found_gl = true;
 					version_copy(&results->gl_version, &version);
 				}
+			} else if (string_match("SIZE", line)) {
+				results->found_size = true;
+				get_uints(line+4, results->size, 2);
 			}
 		}
 
@@ -1053,14 +1062,19 @@ choose_required_gl_version(struct requirement_parse_results *parse_results,
  * the GL and GLSL version requirements.  Use these to guide context creation.
  */
 void
-get_required_versions(const char *script_name,
-		      struct piglit_gl_test_config *config)
+get_required_config(const char *script_name,
+		    struct piglit_gl_test_config *config)
 {
 	struct requirement_parse_results parse_results;
 	struct component_version required_gl_version;
 
-	parse_required_versions(&parse_results, script_name);
+	parse_required_config(&parse_results, script_name);
 	choose_required_gl_version(&parse_results, &required_gl_version);
+
+	if (parse_results.found_size) {
+		config->window_width = parse_results.size[0];
+		config->window_height = parse_results.size[1];
+	}
 
 	if (required_gl_version.es) {
 		config->supports_gl_es_version = required_gl_version.num;
