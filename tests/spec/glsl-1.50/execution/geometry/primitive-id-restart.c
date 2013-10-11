@@ -262,6 +262,8 @@ piglit_init(int argc, char **argv)
 	}
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
