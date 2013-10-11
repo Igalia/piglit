@@ -11,4 +11,5 @@ link_libraries (
 )
 
 piglit_add_executable (arb_sample_shading-api api.c)
+piglit_add_executable (arb_sample_shading-builtin-gl-num-samples builtin-gl-num-samples.cpp)
 # vim: ft=cmake:
