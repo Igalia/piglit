@@ -53,19 +53,21 @@ def main():
                         dest="execute",
                         help="Do not execute the tests")
     parser.add_argument("-t", "--include-tests",
-                        default = [],
-                        action  = "append",
-                        metavar = "<regex>",
-                        help    = "Run only matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests "
+                             "(can be used more than once)")
     parser.add_argument("-x", "--exclude-tests",
-                        default = [],
-                        action  = "append",
-                        metavar = "<regex>",
-                        help    = "Exclude matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Exclude matching tests "
+                             "(can be used more than once)")
     parser.add_argument("-1", "--no-concurrency",
-                        action  = "store_false",
-                        dest    = "concurrency",
-                        help    = "Disable concurrent test runs")
+                        action="store_false",
+                        dest="concurrency",
+                        help="Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
                         choices=["glx", "x11_egl", "wayland", "gbm"],
                         help="Name of windows system passed to waffle")
@@ -74,7 +76,8 @@ def main():
                         help="Run tests in valgrind's memcheck")
     parser.add_argument("--dmesg",
                         action="store_true",
-                        help="Capture a difference in dmesg before and after each test")
+                        help="Capture a difference in dmesg before and "
+                             "after each test")
     parser.add_argument("testProfile",
                         metavar="<Path to test profile>",
                         help="Path to testfile to run")
