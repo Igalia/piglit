@@ -1437,6 +1437,10 @@ for num_samples in TEST_SAMPLE_COUNTS:
     executable = 'arb_sample_shading-{0} -auto'.format(test_name)
     arb_sample_shading[test_name] = PlainExecTest(executable)
 
+import_glsl_parser_tests(spec['ARB_sample_shading'],
+                         os.path.join(testsDir, 'spec', 'arb_sample_shading'),
+                         ['compiler'])
+
 # Group ARB_debug_output
 arb_debug_output = Group()
 spec['ARB_debug_output'] = arb_debug_output
