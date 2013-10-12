@@ -213,10 +213,21 @@ do_requires(void)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
+	if (comptype == SHADOW && components > 1) {
+		printf("Shadow supported with single-component textures only");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	if (comptype == SHADOW && comp_select != -1) {
+		printf("Shadow not supported with component select parameter");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	/* if we are trying to specify the component from the shader,
-	 * or use non-constant offsets, check that we have ARB_gpu_shader5
+	 * or use non-constant offsets, or use shadow comparitor,
+	 * check that we have ARB_gpu_shader5
 	 */
-	if (comp_select != -1 || use_nonconst)
+	if (comp_select != -1 || use_nonconst || comptype == SHADOW)
 		piglit_require_extension("GL_ARB_gpu_shader5");
 }
 
