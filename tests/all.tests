@@ -1316,6 +1316,47 @@ add_shader_test_dir(arb_gpu_shader5,
                     recursive=True)
 import_glsl_parser_tests(arb_gpu_shader5,
                          testsDir + '/spec/arb_gpu_shader5', [''])
+for stage in ['vs', 'fs']:
+    for type in ['unorm', 'float', 'int', 'uint']:
+        for comps in ['r', 'rg', 'rgb', 'rgba']:
+            for cs in [0, 1, 2, 3][:len(comps)]:
+                for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
+                    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+                        testname = '%s/%s-%s-%s-%s-%s' % (
+                                func, stage, comps,
+                                cs,
+                                type, sampler)
+                        address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
+                        cmd = 'textureGather %s %s %s %s %s %s %s' % (
+                                stage,
+                                'nonconst' if func == 'textureGatherOffset' else '',
+                                comps, cs, type, sampler, address_mode
+                                )
+                        arb_gpu_shader5[testname] = concurrent_test(cmd)
+
+                        if func == 'textureGatherOffset':
+                            # also add a constant offset version.
+                            testname = '%s/%s-%s-%s-%s-%s-const' % (
+                                    func, stage, comps,
+                                    cs,
+                                    type, sampler)
+                            cmd = 'textureGather %s %s %s %s %s %s %s' % (
+                                    stage,
+                                    'offset',
+                                    comps, cs, type, sampler, address_mode
+                                    )
+                            arb_gpu_shader5[testname] = concurrent_test(cmd)
+    # test shadow samplers
+    for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
+        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+            testname = '%s/%s-r-none-shadow-%s' % (func, stage, sampler)
+            address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
+            cmd = 'textureGather %s shadow r %s %s %s' % (
+                    stage,
+                    'nonconst' if func == 'textureGatherOffset' else '',
+                    sampler,
+                    address_mode)
+            arb_gpu_shader5[testname] = concurrent_test(cmd)
 
 arb_texture_query_levels = Group()
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
