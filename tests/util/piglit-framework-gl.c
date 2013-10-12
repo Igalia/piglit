@@ -228,24 +228,6 @@ piglit_set_reshape_func(void (*func)(int w, int h))
 }
 
 
-/**
- * Search for an argument with the given name in the argument list.
- * If it is found, remove it and return true.
- */
-bool
-piglit_strip_arg(int *argc, char *argv[], const char *arg)
-{
-	int i;
-	for (i = 1; i < *argc; i++) {
-		if (!strcmp(argv[i], arg)) {
-			delete_arg(argv, *argc, i);
-			*argc -= 1;
-			return true;
-		}
-	}
-	return false;
-}
-
 enum piglit_result
 piglit_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
 		      const void *src_data, unsigned src_stride,

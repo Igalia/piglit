@@ -187,6 +187,9 @@ piglit_get_microseconds(void);
 const char**
 piglit_split_string_to_array(const char *string, const char *separators);
 
+bool
+piglit_strip_arg(int *argc, char *argv[], const char *arg);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

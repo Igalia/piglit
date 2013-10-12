@@ -308,7 +308,6 @@ void piglit_present_results();
 void piglit_post_redisplay(void);
 void piglit_set_keyboard_func(void (*func)(unsigned char key, int x, int y));
 void piglit_set_reshape_func(void (*func)(int w, int h));
-bool piglit_strip_arg(int *argc, char *argv[], const char *arg);
 
 /**
  * Convenience macro for invoking piglit_strip_arg() from within

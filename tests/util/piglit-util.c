@@ -512,3 +512,24 @@ piglit_get_microseconds(void)
 #endif
 }
 
+/**
+ * Search for an argument with the given name in the argument list.
+ * If it is found, remove it and return true.
+ */
+bool
+piglit_strip_arg(int *argc, char *argv[], const char *arg)
+{
+        int i;
+        for (i = 1; i < *argc; i++) {
+                if (strcmp(argv[i], arg) != 0)
+                	continue;
+
+                for (i += 1; i < *argc; ++i)
+			argv[i-1] = argv[i];
+
+		*argc -= 1;
+		return true;
+	}
+
+        return false;
+}
