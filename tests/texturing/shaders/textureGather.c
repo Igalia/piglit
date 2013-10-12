@@ -15,7 +15,7 @@ PIGLIT_GL_TEST_CONFIG_END
 enum { NOSTAGE, VS, FS } stage = NOSTAGE;
 enum { NONE = -1, RED, GREEN, BLUE, ALPHA, ZERO, ONE } swizzle = NONE;
 enum { UNORM, FLOAT, INT, UINT, SHADOW, NUM_COMPTYPES } comptype = UNORM;
-enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY } sampler = SAMPLER_2D;
+enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY, SAMPLER_2DRECT } sampler = SAMPLER_2D;
 bool use_offset = false;
 bool use_nonconst = false;
 int components = 0;
@@ -36,8 +36,9 @@ GLenum format_for_components[][4] = {
 	{ GL_DEPTH_COMPONENT, 0, 0, 0 },
 };
 GLenum swizzles[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, GL_ZERO, GL_ONE };
-int slices_for_sampler[] = { 1, 3, 6, 12 };
-GLenum target_for_sampler[] = { GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_ARRAY };
+int slices_for_sampler[] = { 1, 3, 6, 12, 1 };
+GLenum target_for_sampler[] = { GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_RECTANGLE };
+GLenum address_mode = GL_REPEAT;
 
 unsigned char *pixels;
 float *expected;
@@ -59,13 +60,6 @@ piglit_display(void)
 		else
 			sw[0] = swizzles[swizzle];
 		glTexParameteriv(target_for_sampler[sampler], GL_TEXTURE_SWIZZLE_RGBA, sw);
-	}
-
-	if (comptype == SHADOW) {
-		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_MODE,
-				GL_COMPARE_R_TO_TEXTURE);
-		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_FUNC,
-				GL_LESS);
 	}
 
 	if (stage == FS)
@@ -99,13 +93,23 @@ pixel_value(int i, int j)
 
 	if (use_offset) {
 		/* apply texel offset */
-		i += TEXTURE_WIDTH + -8;
-		j += TEXTURE_HEIGHT + 7;
+		i += -8;
+		j += 7;
 	}
 
-	/* WRAP at border */
-	i %= TEXTURE_WIDTH;
-	j %= TEXTURE_HEIGHT;
+	if (address_mode == GL_REPEAT) {
+		/* WRAP at border */
+		i += TEXTURE_WIDTH;
+		j += TEXTURE_HEIGHT;
+		i %= TEXTURE_WIDTH;
+		j %= TEXTURE_HEIGHT;
+	}
+	else if (address_mode == GL_CLAMP_TO_EDGE) {
+		if (i < 0) i = 0;
+		if (j < 0) j = 0;
+		if (i > TEXTURE_WIDTH - 1) i = TEXTURE_WIDTH - 1;
+		if (j > TEXTURE_HEIGHT - 1) j = TEXTURE_HEIGHT - 1;
+	}
 
 	return i + j * TEXTURE_WIDTH;
 }
@@ -214,21 +218,27 @@ do_requires(void)
 	}
 
 	if (comptype == SHADOW && components > 1) {
-		printf("Shadow supported with single-component textures only");
+		printf("Shadow supported with single-component textures only\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	if (comptype == SHADOW && comp_select != -1) {
-		printf("Shadow not supported with component select parameter");
+		printf("Shadow not supported with component select parameter\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	/* if we are trying to specify the component from the shader,
-	 * or use non-constant offsets, or use shadow comparitor,
-	 * check that we have ARB_gpu_shader5
+	 * or use non-constant offsets, or use shadow comparitor, or
+	 * use gsampler2DRect, check that we have ARB_gpu_shader5
 	 */
-	if (comp_select != -1 || use_nonconst || comptype == SHADOW)
+	if (comp_select != -1 || use_nonconst || comptype == SHADOW || sampler == SAMPLER_2DRECT)
 		piglit_require_extension("GL_ARB_gpu_shader5");
+
+	/* if rect sampler, repeat is not available */
+	if (sampler == SAMPLER_2DRECT && address_mode == GL_REPEAT) {
+		printf("GL_REPEAT not supported with rectangle textures\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 }
 
 static void
@@ -285,6 +295,7 @@ do_texture_setup(void)
 
 	switch(sampler) {
 	case SAMPLER_2D:
+	case SAMPLER_2DRECT:
 		upload_2d(target, pixels);
 		break;
 	case SAMPLER_2DARRAY:
@@ -310,6 +321,17 @@ do_texture_setup(void)
 
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	if (comptype == SHADOW) {
+		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_MODE,
+				GL_COMPARE_R_TO_TEXTURE);
+		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_FUNC,
+				GL_LESS);
+	}
+
+	glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_WRAP_S, address_mode);
+	glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_WRAP_T, address_mode);
+	glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_WRAP_R, address_mode);
 }
 
 static void
@@ -326,24 +348,26 @@ do_shader_setup(void)
 		"vec4(1.0/255.0)",	/* uint */
 		"vec4(1)",		/* shadow */
 	};
-	char *samplersuffix[] = { "2D", "2DArray", "Cube", "CubeArray" };
+	char *samplersuffix[] = { "2D", "2DArray", "Cube", "CubeArray", "2DRect" };
 	char *vs_tc_expr[] = {
 		"0.5 * pos.xy + vec2(0.5)",
 		"vec3(0.5 * pos.xy + vec2(0.5), 1)",
 		"vec3(pos.x, -pos.y, 1)",		/* cube */
-		"vec4(pos.x, -pos.y, 1, 1)"		/* cube array */
+		"vec4(pos.x, -pos.y, 1, 1)",		/* cube array */
+		"textureSize(s).xy * (0.5 * pos.xy + vec2(0.5))",		/* 2drect */
 	};
 	char *fs_tc_expr[] = {
 		"gl_FragCoord.xy / textureSize(s, 0).xy",
 		"vec3(gl_FragCoord.xy / textureSize(s, 0).xy, 1)",
 		"vec3(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1)",	/* cube */
-		"vec4(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1, 1)"	/* cube array */
+		"vec4(vec2(2, -2) * (gl_FragCoord.xy / textureSize(s, 0).xy - vec2(0.5)), 1, 1)",	/* cube array */
+		"gl_FragCoord.xy",		/* 2drect */
 	};
 	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
-	bool need_shader5 = (comp_select != -1) || use_nonconst || (comptype == SHADOW);
+	bool need_shader5 = (comp_select != -1) || use_nonconst || (comptype == SHADOW) || sampler == SAMPLER_2DRECT;
 
 	if (stage == VS) {
-		asprintf(&vs_code, "#version 130\n"
+		asprintf(&vs_code, "#version %s\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
 				"#extension GL_ARB_texture_gather: require\n"
 				"%s"
@@ -358,6 +382,7 @@ do_shader_setup(void)
 				"	gl_Position = pos;\n"
 				"	c = %s * textureGather%s(s, %s %s %s %s);\n"
 				"}\n",
+				need_shader5 ? "150" : "130",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
 				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
@@ -371,25 +396,27 @@ do_shader_setup(void)
 				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
-				"#version 130\n"
+				"#version %s\n"
 				"\n"
 				"in vec4 c;\n"
 				"\n"
 				"void main() {\n"
 				"	gl_FragColor = c;\n"
-				"}\n");
+				"}\n",
+				need_shader5 ? "150" : "130");
 	}
 	else {
 		asprintf(&vs_code,
-				"#version 130\n"
+				"#version %s\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
 				"layout(location=0) in vec4 pos;\n"
 				"\n"
 				"void main() {\n"
 				"	gl_Position = pos;\n"
-				"}\n");
+				"}\n",
+				need_shader5 ? "150" : "130");
 		asprintf(&fs_code,
-				"#version 130\n"
+				"#version %s\n"
 				"#extension GL_ARB_texture_gather: require\n"
 				"%s"
 				"%s"
@@ -400,6 +427,7 @@ do_shader_setup(void)
 				"void main() {\n"
 				"	gl_FragColor = %s * textureGather%s(s, %s %s %s %s);\n"
 				"}\n",
+				need_shader5 ? "150" : "130",
 				sampler == SAMPLER_CUBEARRAY ? "#extension GL_ARB_texture_cube_map_array: require\n" : "",
 				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
@@ -448,13 +476,14 @@ do_geometry_setup(void)
 void
 fail_with_usage(void)
 {
-	printf("Usage: textureGather <stage> [offset] [nonconst] <components> <swizzle> <comptype> <sampler> <compselect>\n"
+	printf("Usage: textureGather <stage> [offset] [nonconst] <components> <swizzle> <comptype> <sampler> <compselect> <addressmode>\n"
 	       "	stage = vs|fs\n"
 	       "	components = r|rg|rgb|rgba\n"
 	       "	swizzle = red|green|blue|alpha|zero|one\n"
 	       "	comptype = unorm|float|uint|int|shadow\n"
-	       "	sampler = 2D|2DArray|Cube|CubeArray\n"
-	       "	compselect = 0|1|2|3\n");
+	       "	sampler = 2D|2DArray|Cube|CubeArray|2DRect\n"
+	       "	compselect = 0|1|2|3\n"
+	       "	addressmode = repeat|clamp\n");
 	piglit_report_result(PIGLIT_SKIP);
 }
 
@@ -487,10 +516,13 @@ piglit_init(int argc, char **argv)
 		else if (!strcmp(opt, "2DArray")) sampler = SAMPLER_2DARRAY;
 		else if (!strcmp(opt, "Cube")) sampler = SAMPLER_CUBE;
 		else if (!strcmp(opt, "CubeArray")) sampler = SAMPLER_CUBEARRAY;
+		else if (!strcmp(opt, "2DRect")) sampler = SAMPLER_2DRECT;
 		else if (!strcmp(opt, "0")) comp_select = 0;
 		else if (!strcmp(opt, "1")) comp_select = 1;
 		else if (!strcmp(opt, "2")) comp_select = 2;
 		else if (!strcmp(opt, "3")) comp_select = 3;
+		else if (!strcmp(opt, "repeat")) address_mode = GL_REPEAT;
+		else if (!strcmp(opt, "clamp")) address_mode = GL_CLAMP_TO_EDGE;
 	}
 
 	if (stage == NOSTAGE) fail_with_usage();
