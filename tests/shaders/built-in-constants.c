@@ -350,7 +350,7 @@ piglit_init(int argc, char **argv)
 	test_vs = glCreateShader(GL_VERTEX_SHADER);
 	test_fs = glCreateShader(GL_FRAGMENT_SHADER);
 
-	if (glsl_version >= 150)
+	if (required_glsl_version >= 150 && required_glsl_version != 300)
 		test_gs = glCreateShader(GL_GEOMETRY_SHADER);
 
 	for (i = 0; i < num_tests; i++) {
