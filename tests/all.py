@@ -1592,6 +1592,7 @@ spec['ARB_draw_indirect'] = arb_draw_indirect
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-api-errors')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements')
+add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays-base-instance')
 
 # Group ARB_fragment_program
 arb_fragment_program = Group()
