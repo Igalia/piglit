@@ -1594,6 +1594,7 @@ add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays-base-instance')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-base-instance')
+add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-prim-restart')
 
 # Group ARB_fragment_program
 arb_fragment_program = Group()
