@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
 INCLUDE (CheckCCompilerFlag)
+INCLUDE (CheckCSourceCompiles)
 INCLUDE (CheckCXXCompilerFlag)
 INCLUDE (CheckFunctionExists)
 INCLUDE (CheckIncludeFile)
@@ -265,6 +266,24 @@ else (APPLE)
 		DOC "Include for GL/glext.h"
 	)
 endif (APPLE)
+
+FIND_LIBRARY(HAVE_LIBRT NAMES rt)
+if(HAVE_LIBRT)
+    set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} rt)
+endif()
+check_c_source_compiles(
+	"
+	#define _POSIX_C_SOURCE 199309L
+	#include <time.h>
+	int main() { return clock_gettime(CLOCK_MONOTONIC, NULL); }
+	"
+	PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
+)
+set(CMAKE_REQUIRED_LIBRARIES)
+
+if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+    add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+endif()
 
 FIND_LIBRARY(OPENGL_egl_LIBRARY
       NAMES EGL
