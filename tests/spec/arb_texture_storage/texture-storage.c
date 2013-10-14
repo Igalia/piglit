@@ -221,6 +221,68 @@ test_mipmap_errors(GLenum target)
 }
 
 
+static enum piglit_result
+test_cube_texture(void)
+{
+	const GLint width = 16, height = 16;
+	const GLenum target = GL_TEXTURE_CUBE_MAP;
+	GLuint tex;
+
+	/* Test valid cube dimensions */
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexStorage2D(target, 1, GL_RGBA8, width, height);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+	glDeleteTextures(1, &tex);
+
+	/* Test invalid cube dimensions */
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexStorage2D(target, 1, GL_RGBA8, width, height+2);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		return PIGLIT_FAIL;
+	glDeleteTextures(1, &tex);
+
+	return PIGLIT_PASS;
+}
+
+
+static enum piglit_result
+test_cube_array_texture(void)
+{
+	const GLint width = 16, height = 16;
+	const GLenum target = GL_TEXTURE_CUBE_MAP_ARRAY;
+	GLuint tex;
+
+	/* Test valid cube array dimensions */
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexStorage3D(target, 1, GL_RGBA8, width, height, 12);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		return PIGLIT_FAIL;
+	glDeleteTextures(1, &tex);
+
+	/* Test invalid cube array width, height dimensions */
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexStorage3D(target, 1, GL_RGBA8, width, height+3, 12);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		return PIGLIT_FAIL;
+	glDeleteTextures(1, &tex);
+
+	/* Test invalid cube array depth */
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexStorage3D(target, 1, GL_RGBA8, width, height, 12+2);
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
+		return PIGLIT_FAIL;
+	glDeleteTextures(1, &tex);
+
+	return PIGLIT_PASS;
+}
+
+
 /**
  * Create a single-color image.
  */
@@ -484,6 +546,10 @@ piglit_display(void)
 	X(test_2d_mipmap_rendering(), "2D mipmap rendering");
 	X(test_internal_formats(), "internal formats");
 	X(test_immutablity(GL_TEXTURE_2D), "immutability");
+	X(test_cube_texture(), "cube texture");
+	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array")) {
+		X(test_cube_array_texture(), "cube array texture");
+	}
 #undef X
 	return pass;
 }
