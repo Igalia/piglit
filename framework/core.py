@@ -40,6 +40,8 @@ from threads import synchronized_self
 import threading
 import multiprocessing
 
+from threadpool import ThreadPool
+
 import status
 
 __all__ = ['Environment',
