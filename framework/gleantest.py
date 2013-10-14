@@ -42,7 +42,9 @@ class GleanTest(ExecTest):
         self.name = name
 
     def interpretResult(self, out, returncode, results, dmesg):
-        if out.find('FAIL') >= 0:
+        if "{'result': 'skip'}" in out:
+            results['result'] = 'skip'
+        elif out.find('FAIL') >= 0:
             results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
         else:
             results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
