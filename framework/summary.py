@@ -43,10 +43,10 @@ def load_result(resultfile):
     # is a folder containing a json file
     try:
         with open(resultfile, 'r') as file:
-            result.parseFile(file)
+            result = TestrunResult(file)
     except IOError:
         with open(path.join(resultfile, 'main'), 'r') as file:
-            result.parseFile(file)
+            result = TestrunResult(file)
 
     return result
 

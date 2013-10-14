@@ -280,7 +280,7 @@ class GroupResult(dict):
 
 
 class TestrunResult:
-    def __init__(self):
+    def __init__(self, resultfile=None):
         self.serialized_keys = ['options',
                                 'name',
                                 'tests',
@@ -293,6 +293,25 @@ class TestrunResult:
         self.lspci = None
         self.time_elapsed = None
         self.tests = {}
+
+        if resultfile:
+            # Attempt to open the json file normally, if it fails then attempt
+            # to repair it.
+            try:
+                raw_dict = json.load(resultfile)
+            except ValueError:
+                raw_dict = json.load(self.__repairFile(resultfile))
+
+            # Check that only expected keys were unserialized.
+            for key in raw_dict:
+                if key not in self.serialized_keys:
+                    raise Exception('unexpected key in results file: ', str(key))
+
+            self.__dict__.update(raw_dict)
+
+            # Replace each raw dict in self.tests with a TestResult.
+            for (path, result) in self.tests.items():
+                self.tests[path] = TestResult(result)
 
     def __repairFile(self, file):
         '''
@@ -361,25 +380,6 @@ class TestrunResult:
         keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
         raw_dict = dict([(k, self.__dict__[k]) for k in keys])
         json.dump(raw_dict, file, indent=JSONWriter.INDENT)
-
-    def parseFile(self, file):
-        # Attempt to open the json file normally, if it fails then attempt to
-        # repair it.
-        try:
-            raw_dict = json.load(file)
-        except ValueError:
-            raw_dict = json.load(self.__repairFile(file))
-
-        # Check that only expected keys were unserialized.
-        for key in raw_dict:
-            if key not in self.serialized_keys:
-                raise Exception('unexpected key in results file: ', str(key))
-
-        self.__dict__.update(raw_dict)
-
-        # Replace each raw dict in self.tests with a TestResult.
-        for (path, result) in self.tests.items():
-            self.tests[path] = TestResult(result)
 
 
 class Environment:
@@ -618,10 +618,9 @@ def loadTestResults(relativepath):
     else:
         filepath = path
 
-    testrun = TestrunResult()
     try:
-        with open(filepath, 'r') as file:
-            testrun.parseFile(file)
+        with open(filepath, 'r') as resultfile:
+            testrun = TestrunResult(resultfile)
     except OSError:
         traceback.print_exc()
         raise Exception('Could not read tests results')
