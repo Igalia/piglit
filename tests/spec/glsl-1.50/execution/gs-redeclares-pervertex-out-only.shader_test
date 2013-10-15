@@ -1,0 +1,53 @@
+# This test verifies that a geometry shader can redeclare just the
+# gl_PerVertex output block, but still use members of the gl_PerVertex
+# input block (whether or not those members were included in the
+# redeclaration of the output block).
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  gl_PointSize = dot(piglit_vertex, vec4(1.0));
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+out gl_PerVertex {
+  vec4 gl_Position;
+};
+out vec4 color;
+
+void main()
+{
+  bool ok = true;
+  for (int i = 0; i < 3; i++) {
+    if (gl_in[i].gl_PointSize != dot(gl_in[i].gl_Position, vec4(1.0)))
+      ok = false;
+  }
+  for (int i = 0; i < 3; i++) {
+    gl_Position = gl_in[i].gl_Position;
+    color = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
