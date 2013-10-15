@@ -35,22 +35,20 @@ __all__ = [
 ]
 
 
-class Result(core.TestrunResult):
-    """
-    Object that opens, reads, and stores the data in a resultfile.
-    """
-    def __init__(self, resultfile):
-        # Run the init from TestrunResult
-        core.TestrunResult.__init__(self)
+def load_result(resultfile):
+    # Run the init from TestrunResult
+    result = core.TestrunResult().
 
-        # Load the json file, or if that fails assume that the locations given
-        # is a folder containing a json file
-        try:
-            with open(resultfile, 'r') as file:
-                result = self.parseFile(file)
-        except IOError:
-            with open(path.join(resultfile, 'main'), 'r') as file:
-                result = self.parseFile(file)
+    # Load the json file, or if that fails assume that the locations given
+    # is a folder containing a json file
+    try:
+        with open(resultfile, 'r') as file:
+            result.parseFile(file)
+    except IOError:
+        with open(path.join(resultfile, 'main'), 'r') as file:
+            result.parseFile(file)
+
+    return result
 
 
 class HTMLIndex(list):
@@ -357,7 +355,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [Result(i) for i in resultfiles]
+        self.results = [load_result(i) for i in resultfiles]
 
         self.status = {}
         self.fractions = {}
