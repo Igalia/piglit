@@ -428,13 +428,12 @@ class Summary:
         for each in self.results:
             os.mkdir(path.join(destination, each.name))
 
-            file = open(path.join(destination, each.name, "index.html"), 'w')
-            file.write(testindex.render(name=each.name,
-                                        time=each.time_elapsed,
-                                        options=each.options,
-                                        glxinfo=each.glxinfo,
-                                        lspci=each.lspci))
-            file.close()
+            with open(path.join(destination, each.name, "index.html"), 'w') as out:
+                out.write(testindex.render(name=each.name,
+                                           time=each.time_elapsed,
+                                           options=each.options,
+                                           glxinfo=each.glxinfo,
+                                           lspci=each.lspci))
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
@@ -447,21 +446,19 @@ class Summary:
                     if not path.exists(temp_path):
                         os.makedirs(temp_path)
 
-                    file = open(path.join(destination,
-                                          each.name,
-                                          key + ".html"), 'w')
-                    file.write(testfile.render(
-                        testname=key,
-                        status=value.get('result', 'None'),
-                        returncode=value.get('returncode', 'None'),
-                        time=value.get('time', 'None'),
-                        info=value.get('info', 'None'),
-                        traceback=value.get('traceback', 'None'),
-                        command=value.get('command', 'None'),
-                        dmesg=value.get('dmesg', 'None'),
-                        css=path.relpath(result_css, temp_path),
-                        index=path.relpath(index, temp_path)))
-                    file.close()
+                    with open(path.join(destination, each.name, key + ".html"),
+                              'w') as out:
+                        out.write(testfile.render(
+                            testname=key,
+                            status=value.get('result', 'None'),
+                            returncode=value.get('returncode', 'None'),
+                            time=value.get('time', 'None'),
+                            info=value.get('info', 'None'),
+                            traceback=value.get('traceback', 'None'),
+                            command=value.get('command', 'None'),
+                            dmesg=value.get('dmesg', 'None'),
+                            css=path.relpath(result_css, temp_path),
+                            index=path.relpath(index, temp_path)))
 
         # Finally build the root html files: index, regressions, etc
         index = Template(filename="templates/index.mako",
@@ -477,30 +474,28 @@ class Summary:
         # Index.html is a bit of a special case since there is index, all, and
         # alltests, where the other pages all use the same name. ie,
         # changes.html, self.changes, and page=changes.
-        file = open(path.join(destination, "index.html"), 'w')
-        file.write(index.render(results=HTMLIndex(self, self.tests['all']),
-                                page='all',
-                                pages=pages,
-                                colnum=len(self.results),
-                                exclude=exclude))
-        file.close()
+        with open(path.join(destination, "index.html"), 'w') as out:
+            out.write(index.render(results=HTMLIndex(self, self.tests['all']),
+                                   page='all',
+                                   pages=pages,
+                                   colnum=len(self.results),
+                                   exclude=exclude))
 
         # Generate the rest of the pages
         for page in pages:
-            file = open(path.join(destination, page + '.html'), 'w')
+            with open(path.join(destination, page + '.html'), 'w') as out:
             # If there is information to display display it
-            if self.tests[page]:
-                file.write(index.render(results=HTMLIndex(self,
-                                                          self.tests[page]),
-                                        pages=pages,
-                                        page=page,
-                                        colnum=len(self.results),
-                                        exclude=exclude))
-            # otherwise provide an empty page
-            else:
-                file.write(empty_status.render(page=page, pages=pages))
+                if self.tests[page]:
+                    out.write(index.render(results=HTMLIndex(self,
+                                                             self.tests[page]),
+                                           pages=pages,
+                                           page=page,
+                                           colnum=len(self.results),
+                                           exclude=exclude))
+                # otherwise provide an empty page
+                else:
+                    out.write(empty_status.render(page=page, pages=pages))
 
-            file.close()
 
     def generate_text(self, diff, summary):
         """ Write summary information to the console """
