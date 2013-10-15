@@ -27,6 +27,7 @@ import shutil
 import os.path as path
 
 import framework.summary as summary
+import framework.status as status
 from framework.core import checkDir, parse_listfile
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
@@ -65,9 +66,17 @@ def main():
     if not args.list and not args.resultsFiles:
         raise parser.error("Missing required option -l or <resultsFiles>")
 
-    # If exclude-results has all, then change it to be all
-    if 'all' in args.exclude_details:
-        args.exclude_details = ['skip', 'pass', 'warn', 'crash', 'fail']
+    # Convert the exclude_details list to status objects, without this using
+    # the -e option will except
+    if args.exclude_details:
+        # If exclude-results has all, then change it to be all
+        if 'all' in args.exclude_details:
+            args.exclude_details = [status.Skip(), status.Pass(), status.Warn(),
+                                    status.Crash(), status.Fail()]
+        else:
+            args.exclude_details = [status.status_lookup(i) for i in
+                                    args.exclude_details]
+
 
     # if overwrite is requested delete the output directory
     if path.exists(args.summaryDir) and args.overwrite:
