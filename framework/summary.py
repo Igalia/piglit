@@ -343,6 +343,7 @@ class Summary:
 
         self.status = {}
         self.fractions = {}
+        self.totals = {}
         self.tests = {'all': set(), 'changes': set(), 'problems': set(),
                       'skipped': set(), 'regressions': set(), 'fixes': set()}
 
@@ -420,7 +421,7 @@ class Summary:
                             output_encoding="utf-8",
                             module_directory=".makotmp")
 
-        resultCss = path.join(destination, "result.css")
+        result_css = path.join(destination, "result.css")
         index = path.join(destination, "index.html")
 
         # Iterate across the tests creating the various test specific files
@@ -437,14 +438,14 @@ class Summary:
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
-                tPath = path.join(destination, each.name, path.dirname(key))
+                temp_path = path.join(destination, each.name, path.dirname(key))
 
                 if value['result'] not in exclude:
                     # os.makedirs is very annoying, it throws an OSError if
                     # the path requested already exists, so do this check to
                     # ensure that it doesn't
-                    if not path.exists(tPath):
-                        os.makedirs(tPath)
+                    if not path.exists(temp_path):
+                        os.makedirs(temp_path)
 
                     file = open(path.join(destination,
                                           each.name,
@@ -458,8 +459,8 @@ class Summary:
                         traceback=value.get('traceback', 'None'),
                         command=value.get('command', 'None'),
                         dmesg=value.get('dmesg', 'None'),
-                        css=path.relpath(resultCss, tPath),
-                        index=path.relpath(index, tPath)))
+                        css=path.relpath(result_css, temp_path),
+                        index=path.relpath(index, temp_path)))
                     file.close()
 
         # Finally build the root html files: index, regressions, etc
@@ -502,6 +503,7 @@ class Summary:
             file.close()
 
     def generateText(self, diff, summary):
+        """ Write summary information to the console """
         self.__find_totals()
 
         # Print the name of the test and the status from each test run
