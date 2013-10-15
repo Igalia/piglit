@@ -35,22 +35,6 @@ __all__ = [
 ]
 
 
-def load_result(resultfile):
-    # Run the init from TestrunResult
-    result = core.TestrunResult().
-
-    # Load the json file, or if that fails assume that the locations given
-    # is a folder containing a json file
-    try:
-        with open(resultfile, 'r') as file:
-            result = TestrunResult(file)
-    except IOError:
-        with open(path.join(resultfile, 'main'), 'r') as file:
-            result = TestrunResult(file)
-
-    return result
-
-
 class HTMLIndex(list):
     """
     Builds HTML output to be passed to the index mako template, which will be
@@ -355,7 +339,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [load_result(i) for i in resultfiles]
+        self.results = [core.loadTestResults(i) for i in resultfiles]
 
         self.status = {}
         self.fractions = {}

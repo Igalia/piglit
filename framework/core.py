@@ -611,22 +611,28 @@ def loadTestProfile(filename):
     return ns['profile']
 
 
-def loadTestResults(relativepath):
-    path = os.path.realpath(relativepath)
-    if os.path.isdir(path):
-        filepath = os.path.join(path, 'main')
-    else:
-        filepath = path
+def loadTestResults(filename):
+    """ Loader function for TestrunResult class
+    
+    This function takes a single argument of a results file.
+
+    It makes quite a few assumptions, first it assumes that it has been passed
+    a folder, if that fails then it looks for a plain text json file called
+    "main"
+    
+    """
+    filename = os.path.realpath(filename)
 
     try:
-        with open(filepath, 'r') as resultfile:
-            testrun = TestrunResult(resultfile)
-    except OSError:
-        traceback.print_exc()
-        raise Exception('Could not read tests results')
+        with open(filename, 'r') as resultsfile:
+            testrun = TestrunResult(resultsfile)
+    except IOError:
+        with open(os.path.join(filename, "main"), 'r') as resultsfile:
+            testrun = TestrunResult(resultsfile)
 
     assert(testrun.name is not None)
     return testrun
+
 
 # Error messages to be ignored
 Test.ignoreErrors = map(re.compile,
