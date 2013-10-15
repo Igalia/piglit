@@ -43,18 +43,9 @@ static void
 process_args(int *argc, char *argv[], unsigned *force_samples);
 
 void
-piglit_gl_test_config_init(int *argc, char *argv[],
-			   struct piglit_gl_test_config *config)
+piglit_gl_test_config_init(struct piglit_gl_test_config *config)
 {
-	unsigned force_samples = 0;
-
 	memset(config, 0, sizeof(*config));
-
-	process_args(argc, argv, &force_samples);
-
-	if (force_samples > 1)
-		config->window_samples = force_samples;
-
 }
 
 static void
@@ -122,6 +113,19 @@ process_args(int *argc, char *argv[], unsigned *force_samples)
 			*argc -= 1;
 		}
 	}
+}
+
+void
+piglit_gl_process_args(int *argc, char *argv[],
+		       struct piglit_gl_test_config *config)
+{
+	unsigned force_samples = 0;
+
+	process_args(argc, argv, &force_samples);
+
+	if (force_samples > 1)
+		config->window_samples = force_samples;
+
 }
 
 void

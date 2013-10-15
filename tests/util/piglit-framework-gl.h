@@ -175,8 +175,11 @@ struct piglit_gl_test_config {
  * from command line arguments.
  */
 void
-piglit_gl_test_config_init(int *argc, char *argv[],
-			   struct piglit_gl_test_config *config);
+piglit_gl_test_config_init(struct piglit_gl_test_config *config);
+
+void
+piglit_gl_process_args(int *argc, char *argv[],
+		       struct piglit_gl_test_config *config);
 
 /**
  * Run the OpenGL test described by @a config. Does not return.
@@ -210,7 +213,7 @@ piglit_gl_test_run(int argc, char *argv[],
         {                                                                    \
                 struct piglit_gl_test_config config;                         \
                                                                              \
-                piglit_gl_test_config_init(&argc, argv, &config);            \
+                piglit_gl_test_config_init(&config);                         \
                                                                              \
                 config.init = piglit_init;                                   \
                 config.display = piglit_display;                             \
@@ -230,6 +233,7 @@ piglit_gl_test_run(int argc, char *argv[],
 #define PIGLIT_GL_TEST_CONFIG_END                                            \
                 }                                                            \
                                                                              \
+                piglit_gl_process_args(&argc, argv, &config);                \
                 piglit_gl_test_run(argc, argv, &config);                     \
                                                                              \
                 assert(false);                                               \

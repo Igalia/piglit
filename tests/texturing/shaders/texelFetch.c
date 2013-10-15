@@ -84,6 +84,12 @@ static enum shader_target test_stage = UNKNOWN;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.window_width = 900;
+	config.window_height = 600;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+	piglit_gl_process_args(&argc, argv, &config);
+
 	parse_args(argc, argv);
 	if (test_stage == GS) {
 		config.supports_gl_compat_version = 32;
@@ -92,10 +98,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		config.supports_gl_compat_version = 10;
 		config.supports_gl_core_version = 31;
 	}
-
-	config.window_width = 900;
-	config.window_height = 600;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
