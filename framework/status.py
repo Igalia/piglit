@@ -106,6 +106,9 @@ class Status(object):
     # the memory consumed for creating tens of thousands of these objects.
     __slots__ = ['name', 'value']
 
+    name = None
+    value = None
+
     def __init__(self):
         raise NotImplementedError
 
@@ -144,48 +147,64 @@ class Status(object):
 
 
 class NotRun(Status):
+    name = 'Not Run'
+    value = 0
+
     def __init__(self):
-        self.name = 'Not Run'
-        self.value = 0
+        pass
 
 
 class Pass(Status):
+    name = 'pass'
+    value = 10
+
     def __init__(self):
-        self.name = 'pass'
-        self.value = 10
+        pass
 
 
 class DmesgWarn(Status):
+    name = 'dmesg-warn'
+    value = 20
+
     def __init__(self):
-        self.name = 'dmesg-warn'
-        self.value = 20
+        pass
 
 
 class Warn(Status):
+    name = 'warn'
+    value = 25
+
     def __init__(self):
-        self.name = 'warn'
-        self.value = 25
+        pass
 
 
 class DmesgFail(Status):
+    name = 'dmesg-fail'
+    value = 30
+
     def __init__(self):
-        self.name = 'dmesg-fail'
-        self.value = 30
+        pass
 
 
 class Fail(Status):
+    name = 'fail'
+    value = 35
+
     def __init__(self):
-        self.name = 'fail'
-        self.value = 35
+        pass
 
 
 class Crash(Status):
+    name = 'crash'
+    value = 40
+
     def __init__(self):
-        self.name = 'crash'
-        self.value = 40
+        pass
 
 
 class Skip(Status):
+    name = 'skip'
+    value = 50
+
     def __init__(self):
-        self.name = 'skip'
-        self.value = 50
+        pass
