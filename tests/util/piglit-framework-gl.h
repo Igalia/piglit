@@ -224,6 +224,19 @@ piglit_gl_process_args(int *argc, char *argv[],
 		       struct piglit_gl_test_config *config);
 
 /**
+ * Get the list of command-line selected tests from the piglit_gl_test_config
+ *
+ * If the config structure does not contain a list of subtests or if no tests
+ * were selected on the command line, this function will set \c
+ * *selected_subtests to \c NULL and will return zero.
+ *
+ * \returns
+ * The number of tests selected on the command line.
+ */
+size_t
+piglit_get_selected_tests(const char ***selected_subtests);
+
+/**
  * Run the OpenGL test described by @a config. Does not return.
  */
 void

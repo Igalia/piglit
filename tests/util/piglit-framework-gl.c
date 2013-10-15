@@ -328,3 +328,10 @@ piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
 
 	return result;
 }
+
+size_t
+piglit_get_selected_tests(const char ***selected_subtests)
+{
+	*selected_subtests = gl_fw->test_config->selected_subtests;
+	return gl_fw->test_config->num_selected_subtests;
+}
