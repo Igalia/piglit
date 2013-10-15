@@ -97,7 +97,7 @@ def main():
     # in the specified path
     if args.resume is True:
         # Load settings from the old results JSON
-        old_results = core.loadTestResults(resultsDir)
+        old_results = core.load_results(resultsDir)
         profileFilename = old_results.options['profile']
 
         # Changing the args to the old args allows us to set them

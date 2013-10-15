@@ -38,10 +38,10 @@ def main():
                         help="Space seperated list of results files")
     args = parser.parse_args()
 
-    combined = core.loadTestResults(args.results.pop(0))
+    combined = core.load_results(args.results.pop(0))
 
     for resultsDir in args.results:
-        results = core.loadTestResults(resultsDir)
+        results = core.load_results(resultsDir)
 
         for testname, result in results.tests.items():
             combined.tests[testname] = result

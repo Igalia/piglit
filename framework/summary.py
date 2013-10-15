@@ -339,7 +339,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [core.loadTestResults(i) for i in resultfiles]
+        self.results = [core.load_results(i) for i in resultfiles]
 
         self.status = {}
         self.fractions = {}

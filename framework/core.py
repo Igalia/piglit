@@ -611,7 +611,7 @@ def loadTestProfile(filename):
     return ns['profile']
 
 
-def loadTestResults(filename):
+def load_results(filename):
     """ Loader function for TestrunResult class
     
     This function takes a single argument of a results file.

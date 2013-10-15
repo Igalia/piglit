@@ -41,7 +41,7 @@ class Writer:
         self.path = []
 
     def write(self, arg):
-        testrun = core.loadTestResults(arg)
+        testrun = core.load_results(arg)
 
         self.report.start()
         self.report.startSuite('piglit')
