@@ -23,7 +23,10 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import json
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import os
 import os.path
 import os.path as path

@@ -118,9 +118,12 @@
 
 import collections
 import csv
-import json
 import re
 import sys
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
 GLSPEC_HEADER_REGEXP = re.compile(r'^(\w+)\((.*)\)$')

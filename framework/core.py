@@ -23,7 +23,6 @@
 # Piglit core
 
 import errno
-import json
 import os
 import platform
 import re
@@ -39,6 +38,10 @@ from textwrap import dedent
 from threads import synchronized_self
 import threading
 import multiprocessing
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from threadpool import ThreadPool
 

@@ -24,11 +24,14 @@
 
 import os
 import os.path as path
-import json
 import unittest
 import itertools
 import tempfile
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import framework.summary as summary
 from helpers import test_iterations, create_testresult, create_test
 

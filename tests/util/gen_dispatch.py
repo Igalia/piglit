@@ -143,9 +143,12 @@
 #   function corresponding to each entry in function_names.
 
 import collections
-import json
 import os.path
 import sys
+try:
+    import simplejson as json
+except:
+    import json
 
 
 # Generate a top-of-file comment cautioning that the file is
