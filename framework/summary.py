@@ -162,8 +162,17 @@ class HTMLIndex(list):
             # is a KeyError (a result doesn't contain a particular test),
             # return Not Run, with clas skip for highlighting
             for each in summary.results:
+                # If the "group" at the top of the key heirachy contains
+                # 'subtest' then it is really not a group, link to that page
                 try:
-                    self._testResult(each.name, key, each.tests[key]['result'])
+                    if each.tests[path.dirname(key)]['subtest']:
+                        href = path.dirname(key)
+                except KeyError:
+                    href = key
+
+                try:
+                    self._testResult(each.name, href,
+                                     summary.status[each.name][key])
                 except KeyError:
                     self.append({'type': 'other',
                                  'text': '<td class="skip">Not Run</td>'})
@@ -222,9 +231,17 @@ class HTMLIndex(list):
         displaying pass/fail/crash/etc and formatting the cell to the
         correct color.
         """
+        # "Not Run" is not a valid class, if it apears set the class to skip
+        if isinstance(text, so.NotRun):
+            css = 'skip'
+            href = None
+        else:
+            css = text
+            href = path.join(group, href + ".html")
+
         self.append({'type': 'testResult',
-                     'class': text,
-                     'href': path.join(group, href + ".html"),
+                     'class': css,
+                     'href': href,
                      'text': text})
 
 
@@ -280,19 +297,49 @@ class Summary:
             fraction = self.fractions[results.name]
             status = self.status[results.name]
 
+            # store the results to be appeneded to results. Adding them in the
+            # loop will cause a RuntimeError
+            temp_results = {}
+
             for key, value in results.tests.iteritems():
-                #FIXME: Add subtest support
+                # Treat a test with subtests as if it is a group, assign the
+                # subtests' statuses and fractions down to the test, and then
+                # proceed like normal.
+                try:
+                    for (subt, subv) in value['subtest'].iteritems():
+                        subt = path.join(key, subt)
+                        subv = so.status_lookup(subv)
 
-                # Walk the test name as if it was a path, at each level update
-                # the tests passed over the total number of tests (fractions),
-                # and update the status of the current level if the status of
-                # the previous level was worse, but is not skip
-                while key != '':
-                    fgh(key, value['result'])
-                    key = path.dirname(key)
+                        # Add the subtest to the fractions and status lists
+                        fraction[subt] = subv.fraction
+                        status[subt] = subv
+                        temp_results.update({subt: {'result': subv}})
 
-                # when we hit the root update the 'all' group and stop
-                fgh('all', value['result'])
+                        self.tests['all'].add(subt)
+                        while subt != '':
+                            fgh(subt, subv)
+                            subt = path.dirname(subt)
+                        fgh('all', subv)
+
+                    # remove the test from the 'all' list, this will cause to
+                    # be treated as a group
+                    self.tests['all'].discard(key)
+                except KeyError:
+                    # Walk the test name as if it was a path, at each level update
+                    # the tests passed over the total number of tests (fractions),
+                    # and update the status of the current level if the status of
+                    # the previous level was worse, but is not skip
+                    while key != '':
+                        fgh(key, value['result'])
+                        key = path.dirname(key)
+
+                    # when we hit the root update the 'all' group and stop
+                    fgh('all', value['result'])
+
+            # Update the the results.tests dictionary with the subtests so that
+            # they are entered into the appropriate pages other than all.
+            # Updating it in the loop will raise a RuntimeError
+            results.tests.update({k:v for k,v in temp_results.iteritems()})
 
         # Create the lists of statuses like problems, regressions, fixes,
         # changes and skips
