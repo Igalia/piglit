@@ -1,0 +1,54 @@
+# This test exercises a particular corner case involving interface
+# blocks and structs which is broken as of Mesa 975c6ce.
+#
+# The corner case occurs when an unnamed interface block contains a
+# struct (or an array of structs), and the struct contains an array.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+struct A {
+  float b[2];
+};
+out Block {
+  A a;
+  A aa[2];
+};
+in vec4 piglit_vertex;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  a.b[0] = 1.0;
+  a.b[1] = 2.0;
+  aa[0].b[0] = 3.0;
+  aa[0].b[1] = 4.0;
+  aa[1].b[0] = 5.0;
+  aa[1].b[1] = 6.0;
+}
+
+[fragment shader]
+struct A {
+  float b[2];
+};
+in Block {
+  A a;
+  A aa[2];
+};
+
+void main()
+{
+  bool ok = true;
+  if (a.b[0] != 1.0) ok = false;
+  if (a.b[1] != 2.0) ok = false;
+  if (aa[0].b[0] != 3.0) ok = false;
+  if (aa[0].b[1] != 4.0) ok = false;
+  if (aa[1].b[0] != 5.0) ok = false;
+  if (aa[1].b[1] != 6.0) ok = false;
+  gl_FragColor = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
