@@ -73,7 +73,7 @@ def main():
 
     # Generate the output
     output = summary.Summary(args.results)
-    output.generateText(args.diff, args.summary)
+    output.generate_text(args.diff, args.summary)
 
 
 if __name__ == "__main__":

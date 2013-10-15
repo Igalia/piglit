@@ -396,7 +396,7 @@ class Summary:
         for test in self.results[-1].tests.values():
             self.totals[str(test['result'])] += 1
 
-    def generateHTML(self, destination, exclude):
+    def generate_html(self, destination, exclude):
         """
         Produce HTML summaries.
 
@@ -502,7 +502,7 @@ class Summary:
 
             file.close()
 
-    def generateText(self, diff, summary):
+    def generate_text(self, diff, summary):
         """ Write summary information to the console """
         self.__find_totals()
 

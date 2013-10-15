@@ -91,7 +91,7 @@ def main():
 
     # Create the HTML output
     output = summary.Summary(args.resultsFiles)
-    output.generateHTML(args.summaryDir, args.exclude_details)
+    output.generate_html(args.summaryDir, args.exclude_details)
 
 
 if __name__ == "__main__":
