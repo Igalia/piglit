@@ -7,10 +7,10 @@ include_directories(
 
 link_libraries (
 	piglitutil_${piglit_target_api}
+	${EGL_LDFLAGS}
 	${OPENGL_gles1_LIBRARY}
 	${OPENGL_gles2_LIBRARY}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_egl_LIBRARY}
 )
 
 # Tests that use ES 1.

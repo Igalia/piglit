@@ -286,26 +286,26 @@ if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
     add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 endif()
 
-FIND_LIBRARY(OPENGL_egl_LIBRARY
-      NAMES EGL
-      PATHS /usr/lib
-)
-
-if(OPENGL_egl_LIBRARY)
-    add_definitions(-DPIGLIT_HAS_EGL)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	pkg_check_modules(EGL egl)
 endif()
 
-if(PIGLIT_BUILD_GLES1_TESTS AND NOT OPENGL_egl_LIBRARY)
+if(EGL_FOUND)
+	add_definitions(-DPIGLIT_HAS_EGL)
+	include_directories(${EGL_INCLUDE_DIRS})
+endif()
+
+if(PIGLIT_BUILD_GLES1_TESTS AND NOT EGL_FOUND)
 	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES1_TESTS requires EGL. "
 			    "Failed to find EGL library.")
 endif()
 
-if(PIGLIT_BUILD_GLES2_TESTS AND NOT OPENGL_egl_LIBRARY)
+if(PIGLIT_BUILD_GLES2_TESTS AND NOT EGL_FOUND)
 	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES2_TESTS requires EGL. "
 			    "Failed to find EGL library.")
 endif()
 
-if(PIGLIT_BUILD_GLES3_TESTS AND NOT OPENGL_egl_LIBRARY)
+if(PIGLIT_BUILD_GLES3_TESTS AND NOT EGL_FOUND)
 	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES3_TESTS requires EGL. "
 			    "Failed to find EGL library.")
 endif()

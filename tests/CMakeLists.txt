@@ -23,9 +23,9 @@ if (NOT APPLE)
 	add_subdirectory (glean)
 endif ()
 
-IF(OPENGL_egl_LIBRARY)
+IF(EGL_FOUND)
 	add_subdirectory (egl)
-ENDIF(OPENGL_egl_LIBRARY)
+ENDIF(EGL_FOUND)
 
 IF(PIGLIT_BUILD_CL_TESTS)
 	add_subdirectory (cl)

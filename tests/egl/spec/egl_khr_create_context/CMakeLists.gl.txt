@@ -6,8 +6,8 @@ include_directories(
 )
 
 link_libraries (
+	${EGL_LDFLAGS}
 	${OPENGL_gl_LIBRARY}
-	${OPENGL_egl_LIBRARY}
 )
 
 piglit_add_executable (egl-create-context-default-major-version-gl default-major-version-gl.c common.c)
