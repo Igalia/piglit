@@ -32,7 +32,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 12;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -551,10 +551,19 @@ piglit_display(void)
 	X(test_2d_mipmap_rendering(), "2D mipmap rendering");
 	X(test_internal_formats(), "internal formats");
 	X(test_immutablity(GL_TEXTURE_2D), "immutability");
-	X(test_cube_texture(), "cube texture");
-	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array")) {
+
+	if (piglit_get_gl_version() >= 13
+	    || piglit_is_extension_supported("GL_ARB_texture_cube_map"))
+		X(test_cube_texture(), "cube texture");
+	else
+		piglit_report_subtest_result(PIGLIT_SKIP,
+					     "cube texture");
+
+	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array"))
 		X(test_cube_array_texture(), "cube array texture");
-	}
+	else
+		piglit_report_subtest_result(PIGLIT_SKIP,
+					     "cube array texture");
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
