@@ -11,6 +11,8 @@
 #version 150
 
 layout(maX_VERTices = 50) out;
+layout(triangles) in;
+layout(triangle_strip) out;
 
 void main()
 {

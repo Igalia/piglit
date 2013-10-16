@@ -11,6 +11,8 @@
 #version 150
 
 layout(pOiNtS) out;
+layout(triangles) in;
+layout(max_vertices = 3) out;
 
 void main()
 {
