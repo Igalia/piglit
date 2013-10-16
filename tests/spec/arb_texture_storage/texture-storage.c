@@ -57,7 +57,7 @@ static GLubyte Colors[][4] = {
 /**
  * Do error-check tests for a non-mipmapped texture.
  */
-static enum piglit_result
+static bool
 test_one_level_errors(GLenum target)
 {
 	const GLint width = 64, height = 4, depth = 8;
@@ -86,14 +86,14 @@ test_one_level_errors(GLenum target)
 	glGetTexLevelParameteriv(target, 0, GL_TEXTURE_WIDTH, &v);
 	if (v != width) {
 		printf("%s: bad width: %d, should be %d\n", TestName, v, width);
-		return PIGLIT_FAIL;
+		return false;
 	}
 
 	if (target != GL_TEXTURE_1D) {
 		glGetTexLevelParameteriv(target, 0, GL_TEXTURE_HEIGHT, &v);
 		if (v != height) {
 			printf("%s: bad height: %d, should be %d\n", TestName, v, height);
-			return PIGLIT_FAIL;
+			return false;
 		}
 	}
 
@@ -101,7 +101,7 @@ test_one_level_errors(GLenum target)
 		glGetTexLevelParameteriv(target, 0, GL_TEXTURE_DEPTH, &v);
 		if (v != depth) {
 			printf("%s: bad depth: %d, should be %d\n", TestName, v, depth);
-			return PIGLIT_FAIL;
+			return false;
 		}
 	}
 
@@ -120,32 +120,32 @@ test_one_level_errors(GLenum target)
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		if (glGetError() != GL_INVALID_OPERATION) {
 			printf("%s: glTexImage2D failed to generate error\n", TestName);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		glTexStorage2D(target, 1, GL_RGBA8, width, height);
 		if (glGetError() != GL_INVALID_OPERATION) {
 			printf("%s: glTexStorage2D() failed to generate error\n", TestName);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		glCopyTexImage2D(target, 0, GL_RGBA, 0, 0, width, height, 0);
 		if (glGetError() != GL_INVALID_OPERATION) {
 			printf("%s: glCopyTexImage2D() failed to generate error\n", TestName);
-			return PIGLIT_FAIL;
+			return false;
 		}
 	}
 
 	glDeleteTextures(1, &tex);
 
-	return PIGLIT_PASS;
+	return true;
 }
 
 
 /**
  * Do error-check tests for a mipmapped texture.
  */
-static enum piglit_result
+static bool
 test_mipmap_errors(GLenum target)
 {
 	GLint width = 128, height = 64, depth = 4, levels = 8;
@@ -178,7 +178,7 @@ test_mipmap_errors(GLenum target)
 	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT, &v);
 	if (!v) {
 		printf("%s: %s GL_TEXTURE_IMMUTABLE_FORMAT query returned false\n",		       TestName, targetString);
-		return PIGLIT_FAIL;
+		return false;
 	}
 
 	for (l = 0; l < levels; l++) {
@@ -186,7 +186,7 @@ test_mipmap_errors(GLenum target)
 		if (v != width) {
 			printf("%s: %s level %d: bad width: %d, should be %d\n",
 			       TestName, targetString, l, v, width);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		if (target != GL_TEXTURE_1D) {
@@ -194,7 +194,7 @@ test_mipmap_errors(GLenum target)
 			if (v != height) {
 				printf("%s: %s level %d: bad height: %d, should be %d\n",
 				       TestName, targetString, l, v, height);
-				return PIGLIT_FAIL;
+				return false;
 			}
 		}
 
@@ -203,7 +203,7 @@ test_mipmap_errors(GLenum target)
 			if (v != depth) {
 				printf("%s: %s level %d: bad depth: %d, should be %d\n",
 				       TestName, targetString, l, v, depth);
-				return PIGLIT_FAIL;
+				return false;
 			}
 		}
 
@@ -217,69 +217,66 @@ test_mipmap_errors(GLenum target)
 
 	glDeleteTextures(1, &tex);
 
-	return PIGLIT_PASS;
+	return true;
 }
 
 
-static enum piglit_result
+static bool
 test_cube_texture(void)
 {
 	const GLint width = 16, height = 16;
 	const GLenum target = GL_TEXTURE_CUBE_MAP;
 	GLuint tex;
+	bool pass = true;
 
 	/* Test valid cube dimensions */
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 	glTexStorage2D(target, 1, GL_RGBA8, width, height);
-	if (!piglit_check_gl_error(GL_NO_ERROR))
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	glDeleteTextures(1, &tex);
 
 	/* Test invalid cube dimensions */
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 	glTexStorage2D(target, 1, GL_RGBA8, width, height+2);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 	glDeleteTextures(1, &tex);
 
-	return PIGLIT_PASS;
+	return pass;
 }
 
 
-static enum piglit_result
+static bool
 test_cube_array_texture(void)
 {
 	const GLint width = 16, height = 16;
 	const GLenum target = GL_TEXTURE_CUBE_MAP_ARRAY;
 	GLuint tex;
+	bool pass = true;
 
 	/* Test valid cube array dimensions */
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 	glTexStorage3D(target, 1, GL_RGBA8, width, height, 12);
-	if (!piglit_check_gl_error(GL_NO_ERROR))
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	glDeleteTextures(1, &tex);
 
 	/* Test invalid cube array width, height dimensions */
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 	glTexStorage3D(target, 1, GL_RGBA8, width, height+3, 12);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 	glDeleteTextures(1, &tex);
 
 	/* Test invalid cube array depth */
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
 	glTexStorage3D(target, 1, GL_RGBA8, width, height, 12+2);
-	if (!piglit_check_gl_error(GL_INVALID_VALUE))
-		return PIGLIT_FAIL;
+	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 	glDeleteTextures(1, &tex);
 
-	return PIGLIT_PASS;
+	return pass;
 }
 
 
@@ -304,7 +301,7 @@ create_image(GLint w, GLint h, const GLubyte color[4])
 /**
  * Test a mip-mapped texture w/ rendering.
  */
-static enum piglit_result
+static bool
 test_2d_mipmap_rendering(void)
 {
 	GLuint tex;
@@ -331,14 +328,14 @@ test_2d_mipmap_rendering(void)
 		if (v != width) {
 			printf("%s: level %d: bad width: %d, should be %d\n",
 					 TestName, l, v, width);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		glGetTexLevelParameteriv(GL_TEXTURE_2D, l, GL_TEXTURE_HEIGHT, &v);
 		if (v != height) {
 			printf("%s: level %d: bad height: %d, should be %d\n",
 					 TestName, l, v, height);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		if (width > 1)
@@ -359,7 +356,7 @@ test_2d_mipmap_rendering(void)
 		if (err == GL_NO_ERROR) {
 			printf("%s: glTexSubImage2D(illegal level) failed to generate an error.\n",
 			       TestName);
-			return PIGLIT_FAIL;
+			return false;
 		}
 
 		free(buf);
@@ -396,7 +393,7 @@ test_2d_mipmap_rendering(void)
 		if (!p) {
 			printf("%s: wrong color for mipmap level %d\n",
 			       TestName, l);
-			return PIGLIT_FAIL;
+			return false;
 		}
 	}
 
@@ -404,7 +401,7 @@ test_2d_mipmap_rendering(void)
 
 	glDeleteTextures(1, &tex);
 
-	return PIGLIT_PASS;
+	return true;
 }
 
 
@@ -415,7 +412,7 @@ test_2d_mipmap_rendering(void)
  * there are many extensions/versions that could effect the lists (ex:
  * integer formats, etc.)
  */
-static enum piglit_result
+static bool
 test_internal_formats(void)
 {
 	const GLenum target = GL_TEXTURE_2D;
@@ -487,10 +484,10 @@ test_internal_formats(void)
 		glDeleteTextures(1, &tex);
 	}
 
-	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	return pass;
 }
 	
-static enum piglit_result
+static bool
 test_immutablity(GLenum target)
 {
 	GLuint tex;
@@ -528,15 +525,23 @@ test_immutablity(GLenum target)
 	/* Other immutable tests happen per-format above */
 
 	glDeleteTextures(1, &tex);
-	return pass == true ? PIGLIT_PASS : PIGLIT_FAIL;
+	return pass;
 }
+
+#define X(f, n)								\
+	do {								\
+		const bool subtest_pass = (f);				\
+		piglit_report_subtest_result(subtest_pass		\
+					     ? PIGLIT_PASS : PIGLIT_FAIL, \
+					     (n));			\
+		pass = pass && subtest_pass;				\
+	} while (0)
 
 enum piglit_result
 piglit_display(void)
 {
-	enum piglit_result pass = PIGLIT_PASS;
-	enum piglit_result tmp;
-#define X(f, n) tmp = (f); pass = tmp != PIGLIT_PASS ? PIGLIT_FAIL : pass; piglit_report_subtest_result(tmp, (n))
+	bool pass = true;
+
 	X(test_one_level_errors(GL_TEXTURE_1D), "1D non-mipmapped");
 	X(test_one_level_errors(GL_TEXTURE_2D), "2D non-mipmapped");
 	X(test_one_level_errors(GL_TEXTURE_3D), "3D non-mipmapped");
@@ -550,8 +555,8 @@ piglit_display(void)
 	if (piglit_is_extension_supported("GL_ARB_texture_cube_map_array")) {
 		X(test_cube_array_texture(), "cube array texture");
 	}
-#undef X
-	return pass;
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
