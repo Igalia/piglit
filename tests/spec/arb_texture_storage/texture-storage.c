@@ -92,7 +92,8 @@ test_one_level_errors(GLenum target)
 	if (target != GL_TEXTURE_1D) {
 		glGetTexLevelParameteriv(target, 0, GL_TEXTURE_HEIGHT, &v);
 		if (v != height) {
-			printf("%s: bad height: %d, should be %d\n", TestName, v, height);
+			printf("%s: bad height: %d, should be %d\n", TestName,
+			       v, height);
 			return false;
 		}
 	}
@@ -100,38 +101,43 @@ test_one_level_errors(GLenum target)
 	if (target == GL_TEXTURE_3D) {
 		glGetTexLevelParameteriv(target, 0, GL_TEXTURE_DEPTH, &v);
 		if (v != depth) {
-			printf("%s: bad depth: %d, should be %d\n", TestName, v, depth);
+			printf("%s: bad depth: %d, should be %d\n", TestName,
+			       v, depth);
 			return false;
 		}
 	}
 
-	/** Test immutability
+	/* The ARB_texture_storage spec says:
 	 *
-	 * "Using any of the following commands with the same texture will result
-	 * in the error INVALID_OPERATION being generated, even if it does not
-	 * affect the dimensions or format:
-	 *     - TexImage*
-	 *     - CompressedTexImage*
-	 *     - CopyTexImage*
-	 *     - TexStorage*"
+	 *     "Using any of the following commands with the same texture will
+	 *     result in the error INVALID_OPERATION being generated, even if
+	 *     it does not affect the dimensions or format:
+	 *
+	 *         - TexImage*
+	 *         - CompressedTexImage*
+	 *         - CopyTexImage*
+	 *         - TexStorage*"
 	 */
 	if (target == GL_TEXTURE_2D) {
 		glTexImage2D(target, 0, GL_RGBA, width, height, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		if (glGetError() != GL_INVALID_OPERATION) {
-			printf("%s: glTexImage2D failed to generate error\n", TestName);
+			printf("%s: glTexImage2D failed to generate error\n",
+			       TestName);
 			return false;
 		}
 
 		glTexStorage2D(target, 1, GL_RGBA8, width, height);
 		if (glGetError() != GL_INVALID_OPERATION) {
-			printf("%s: glTexStorage2D() failed to generate error\n", TestName);
+			printf("%s: glTexStorage2D() failed to generate "
+			       "error\n", TestName);
 			return false;
 		}
 
 		glCopyTexImage2D(target, 0, GL_RGBA, 0, 0, width, height, 0);
 		if (glGetError() != GL_INVALID_OPERATION) {
-			printf("%s: glCopyTexImage2D() failed to generate error\n", TestName);
+			printf("%s: glCopyTexImage2D() failed to generate "
+			       "error\n", TestName);
 			return false;
 		}
 	}
@@ -177,7 +183,9 @@ test_mipmap_errors(GLenum target)
 
 	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT, &v);
 	if (!v) {
-		printf("%s: %s GL_TEXTURE_IMMUTABLE_FORMAT query returned false\n",		       TestName, targetString);
+		printf("%s: %s GL_TEXTURE_IMMUTABLE_FORMAT query returned "
+		       "false\n",
+		       TestName, targetString);
 		return false;
 	}
 
@@ -190,18 +198,22 @@ test_mipmap_errors(GLenum target)
 		}
 
 		if (target != GL_TEXTURE_1D) {
-			glGetTexLevelParameteriv(target, l, GL_TEXTURE_HEIGHT, &v);
+			glGetTexLevelParameteriv(target, l, GL_TEXTURE_HEIGHT,
+						 &v);
 			if (v != height) {
-				printf("%s: %s level %d: bad height: %d, should be %d\n",
+				printf("%s: %s level %d: bad height: %d, "
+				       "should be %d\n",
 				       TestName, targetString, l, v, height);
 				return false;
 			}
 		}
 
 		if (target == GL_TEXTURE_3D) {
-			glGetTexLevelParameteriv(target, l, GL_TEXTURE_DEPTH, &v);
+			glGetTexLevelParameteriv(target, l, GL_TEXTURE_DEPTH,
+						 &v);
 			if (v != depth) {
-				printf("%s: %s level %d: bad depth: %d, should be %d\n",
+				printf("%s: %s level %d: bad depth: %d, "
+				       "should be %d\n",
 				       TestName, targetString, l, v, depth);
 				return false;
 			}
@@ -324,14 +336,16 @@ test_2d_mipmap_rendering(void)
 
 		free(buf);
 
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, l, GL_TEXTURE_WIDTH, &v);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, l, GL_TEXTURE_WIDTH,
+					 &v);
 		if (v != width) {
 			printf("%s: level %d: bad width: %d, should be %d\n",
 					 TestName, l, v, width);
 			return false;
 		}
 
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, l, GL_TEXTURE_HEIGHT, &v);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, l, GL_TEXTURE_HEIGHT,
+					 &v);
 		if (v != height) {
 			printf("%s: level %d: bad height: %d, should be %d\n",
 					 TestName, l, v, height);
@@ -354,7 +368,8 @@ test_2d_mipmap_rendering(void)
 
 		err = glGetError();
 		if (err == GL_NO_ERROR) {
-			printf("%s: glTexSubImage2D(illegal level) failed to generate an error.\n",
+			printf("%s: glTexSubImage2D(illegal level) failed to "
+			       "generate an error.\n",
 			       TestName);
 			return false;
 		}
@@ -364,7 +379,8 @@ test_2d_mipmap_rendering(void)
 
 	/* now do a rendering test */
 	glEnable(GL_TEXTURE_2D);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* draw a quad using each texture mipmap level */
@@ -502,23 +518,26 @@ test_immutablity(GLenum target)
 	glTexStorage2D(target, 3, GL_RGBA8, 256, 256);
 	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 4);
 	glGetTexParameteriv(target, GL_TEXTURE_MAX_LEVEL, &level);
-	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT, &immutable_format);
+	glGetTexParameteriv(target, GL_TEXTURE_IMMUTABLE_FORMAT,
+			    &immutable_format);
 
 	if (immutable_format != GL_TRUE) {
-		printf("%s: GL_TEXTURE_IMMUTABLE_FORMAT was not set to GL_TRUE after"
-		       " glTexStorage2D\n", TestName);
+		printf("%s: GL_TEXTURE_IMMUTABLE_FORMAT was not set to "
+		       "GL_TRUE after glTexStorage2D\n", TestName);
 		pass = false;
 	}
 	if (level != 2) {
-		/**
-		 * "However, if TEXTURE_IMMUTABLE_FORMAT is TRUE, then level_base is
-		 * clamped to the range [0, <levels> - 1] and level_max is then
-		 * clamped to the range [level_base, <levels> - 1], where <levels> is
-		 * the parameter passed the call to TexStorage* for the texture
-		 * object"
+		/* The ARB_texture_storage spec says:
+		 *
+		 *     "However, if TEXTURE_IMMUTABLE_FORMAT is TRUE, then
+		 *     level_base is clamped to the range [0, <levels> - 1]
+		 *     and level_max is then clamped to the range [level_base,
+		 *     <levels> - 1], where <levels> is the parameter passed
+		 *     the call to TexStorage* for the texture object"
 		 */
-		printf("%s: GL_TEXTURE_MAX_LEVEL changed to %d, which is outside"
-		       " the clamp range for immutables\n", TestName, level);
+		printf("%s: GL_TEXTURE_MAX_LEVEL changed to %d, which is "
+		       "outside the clamp range for immutables\n",
+		       TestName, level);
 		pass = false;
 	}
 
