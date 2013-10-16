@@ -348,6 +348,9 @@ add_plain_test(shaders, 'useprogram-refcount-1')
 add_plain_test(shaders, 'useshaderprogram-bad-type')
 add_plain_test(shaders, 'useshaderprogram-bad-program')
 add_plain_test(shaders, 'useshaderprogram-flushverts-1')
+for subtest in ('interstage', 'intrastage'):
+    cmdline = 'version-mixing {0}'.format(subtest)
+    shaders[cmdline] = concurrent_test(cmdline)
 
 def add_vpfpgeneric(group, name):
     group[name] = PlainExecTest(['vpfp-generic', '-auto', testsDir + '/shaders/generic/' + name + '.vpfp'])
