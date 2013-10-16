@@ -292,7 +292,6 @@ FIND_LIBRARY(OPENGL_egl_LIBRARY
 )
 
 if(OPENGL_egl_LIBRARY)
-    set(PIGLIT_HAS_EGL True)
     add_definitions(-DPIGLIT_HAS_EGL)
 endif()
 
