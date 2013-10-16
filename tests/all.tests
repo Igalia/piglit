@@ -1549,6 +1549,11 @@ spec['ARB_texture_storage_multisample'] = arb_texture_storage_multisample
 arb_texture_storage_multisample['tex-storage'] = concurrent_test('arb_texture_storage_multisample-tex-storage')
 arb_texture_storage_multisample['tex-param'] = concurrent_test('arb_texture_storage_multisample-tex-param')
 
+arb_texture_view = Group()
+spec['ARB_texture_view'] = arb_texture_view
+arb_texture_view['immutable_levels'] = concurrent_test('arb_texture_view-texture-immutable-levels')
+arb_texture_view['params'] = concurrent_test('arb_texture_view-params')
+
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
 add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGB_FXT1_3DFX')
