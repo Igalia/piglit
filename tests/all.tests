@@ -1553,6 +1553,7 @@ arb_texture_view = Group()
 spec['ARB_texture_view'] = arb_texture_view
 arb_texture_view['immutable_levels'] = concurrent_test('arb_texture_view-texture-immutable-levels')
 arb_texture_view['params'] = concurrent_test('arb_texture_view-params')
+arb_texture_view['formats'] = concurrent_test('arb_texture_view-formats')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
