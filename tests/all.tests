@@ -2502,6 +2502,7 @@ for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
             'ext_transform_feedback-output-type {0}'.format(param))
 
 arb_transform_feedback3['arb_transform_feedback3-bind_buffer_invalid_index'] = PlainExecTest(['arb_transform_feedback3-bind_buffer_invalid_index', '-auto'])
+arb_transform_feedback3['arb_transform_feedback3-query_with_invalid_index'] = PlainExecTest(['arb_transform_feedback3-query_with_invalid_index', '-auto'])
 
 arb_uniform_buffer_object = Group()
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
