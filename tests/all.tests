@@ -2503,6 +2503,7 @@ for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
 
 arb_transform_feedback3['arb_transform_feedback3-bind_buffer_invalid_index'] = PlainExecTest(['arb_transform_feedback3-bind_buffer_invalid_index', '-auto'])
 arb_transform_feedback3['arb_transform_feedback3-query_with_invalid_index'] = PlainExecTest(['arb_transform_feedback3-query_with_invalid_index', '-auto'])
+arb_transform_feedback3['arb_transform_feedback3-end_query_with_name_zero'] = PlainExecTest(['arb_transform_feedback3-end_query_with_name_zero', '-auto'])
 
 arb_uniform_buffer_object = Group()
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object

@@ -10,5 +10,6 @@ link_libraries (
 
 piglit_add_executable (arb_transform_feedback3-bind_buffer_invalid_index bind_buffer_invalid_index.c)
 piglit_add_executable (arb_transform_feedback3-query_with_invalid_index query_with_invalid_index.c)
+piglit_add_executable (arb_transform_feedback3-end_query_with_name_zero end_query_with_name_zero.c)
 
 # vim: ft=cmake:
