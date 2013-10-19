@@ -140,7 +140,8 @@ static void query_height(Display *display, GLXDrawable draw) {
 }
 
 static void query_fbconfig_id(Display *display, GLXDrawable draw) {
-	unsigned int id = 0, piglit_id = 0;
+	unsigned int id = 0;
+	int piglit_id = 0;
 	enum piglit_result result = PIGLIT_PASS;
 
 	XSetErrorHandler(expect_no_error);
