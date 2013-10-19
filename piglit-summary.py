@@ -45,7 +45,7 @@ def main():
     excGroup1 = parser.add_mutually_exclusive_group()
     excGroup1.add_argument("-d", "--diff",
                            action="store_true",
-                           help="Only display the differences between multiple"
+                           help="Only display the differences between multiple "
                                 "result files")
     excGroup1.add_argument("-s", "--summary",
                            action="store_true",
