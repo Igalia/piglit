@@ -499,29 +499,30 @@ struct wrap_mode {
 	GLenum      mode;
 	const char  *name;
 	GLboolean   valid_for_rect;
-	const char  *extensions[2];
+	const char  *extensions[3];
 	GLboolean   supported;
 } wrap_modes[] = {
 	{GL_REPEAT,                     "REPEAT",                     GL_FALSE},
 	{GL_CLAMP,                      "CLAMP",                      GL_TRUE},
 
 	{GL_CLAMP_TO_EDGE,              "CLAMP_TO_EDGE",              GL_TRUE,
-		{"GL_EXT_texture_edge_clamp", "GL_SGIS_texture_edge_clamp"}},
+		{"GL_EXT_texture_edge_clamp", "GL_SGIS_texture_edge_clamp", NULL}},
 
 	{GL_CLAMP_TO_BORDER,            "CLAMP_TO_BORDER",            GL_TRUE,
-		{"GL_ARB_texture_border_clamp", "GL_SGIS_texture_border_clamp"}},
+		{"GL_ARB_texture_border_clamp", "GL_SGIS_texture_border_clamp", NULL}},
 
 	{GL_MIRRORED_REPEAT,            "MIRRORED_REPEAT",            GL_FALSE,
-		{"GL_ARB_texture_mirrored_repeat", "GL_IBM_texture_mirrored_repeat"}},
+		{"GL_ARB_texture_mirrored_repeat", "GL_IBM_texture_mirrored_repeat", NULL}},
 
 	{GL_MIRROR_CLAMP_EXT,           "MIRROR_CLAMP_EXT",           GL_FALSE,
-		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once"}},
+		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once", NULL}},
 
 	{GL_MIRROR_CLAMP_TO_EDGE_EXT,   "MIRROR_CLAMP_TO_EDGE_EXT",   GL_FALSE,
-		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once"}},
+		{"GL_EXT_texture_mirror_clamp", "GL_ATI_texture_mirror_once",
+		"GL_ARB_texture_mirror_clamp_to_edge"}},
 
 	{GL_MIRROR_CLAMP_TO_BORDER_EXT, "MIRROR_CLAMP_TO_BORDER_EXT", GL_FALSE,
-		{"GL_EXT_texture_mirror_clamp", NULL}},
+		{"GL_EXT_texture_mirror_clamp", NULL, NULL}},
 
 	{0}
 };
