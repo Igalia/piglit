@@ -2506,6 +2506,7 @@ arb_transform_feedback3['arb_transform_feedback3-query_with_invalid_index'] = Pl
 arb_transform_feedback3['arb_transform_feedback3-end_query_with_name_zero'] = PlainExecTest(['arb_transform_feedback3-end_query_with_name_zero', '-auto'])
 arb_transform_feedback3['arb_transform_feedback3-draw_using_invalid_stream_index'] = PlainExecTest(['arb_transform_feedback3-draw_using_invalid_stream_index', '-auto'])
 arb_transform_feedback3['arb_transform_feedback3-set_varyings_with_invalid_args'] = PlainExecTest(['arb_transform_feedback3-set_varyings_with_invalid_args', '-auto'])
+arb_transform_feedback3['arb_transform_feedback3-set_invalid_varyings'] = PlainExecTest(['arb_transform_feedback3-set_invalid_varyings', '-auto'])
 
 arb_uniform_buffer_object = Group()
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
