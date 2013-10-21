@@ -497,7 +497,6 @@ class Summary:
                 else:
                     out.write(empty_status.render(page=page, pages=pages))
 
-
     def generate_text(self, diff, summary):
         """ Write summary information to the console """
         self.__find_totals()
