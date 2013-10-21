@@ -389,6 +389,11 @@ class Summary:
                         out.write(testfile.render(
                             testname=key,
                             status=value.get('result', 'None'),
+                            # Returning a NoneType (instaed of 'None') prevents
+                            # this field from being generated.setting the
+                            # environment to run tests is ugly, and should
+                            # disapear at somepoint
+                            env=value.get('environment', None),
                             returncode=value.get('returncode', 'None'),
                             time=value.get('time', 'None'),
                             info=value.get('info', 'None'),

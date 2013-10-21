@@ -34,6 +34,14 @@
           <pre>${info | h}</pre>
         </td>
       </tr>
+      % if env:
+      <tr>
+        <td>Environment</td>
+        <td>
+          <pre>${env | h}</pre>
+        </td>
+      </tr>
+      % endif
       <tr>
         <td>Command</td>
         <td>
