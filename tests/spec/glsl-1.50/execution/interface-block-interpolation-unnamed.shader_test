@@ -1,0 +1,81 @@
+# Verify that interpolation qualifiers (flat, smooth, noperspective)
+# declared inside interface blocks are properly respected.
+#
+# This test operates by comparing varyings declared inside an
+# interface block with varyings declared outside an interface block.
+# We assume that interpolation qualifiers work properly when declared
+# outside interface blocks, because that is tested by other piglit
+# tests.
+#
+# In this test, we verify proper functioning of interpolation
+# qualifiers in an unnamed interface block.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+flat out float flat_var;
+smooth out float smooth_var;
+noperspective out float noperspective_var;
+out float unqualified_var;
+
+out Blk {
+  flat float ifc_flat_var;
+  smooth float ifc_smooth_var;
+  noperspective float ifc_noperspective_var;
+  float ifc_unqualified_var;
+};
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  float var = float(gl_VertexID);
+  flat_var = var;
+  smooth_var = var;
+  noperspective_var = var;
+  unqualified_var = var;
+  ifc_flat_var = var;
+  ifc_smooth_var = var;
+  ifc_noperspective_var = var;
+  ifc_unqualified_var = var;
+}
+
+[fragment shader]
+flat in float flat_var;
+smooth in float smooth_var;
+noperspective in float noperspective_var;
+in float unqualified_var;
+
+in Blk {
+  flat float ifc_flat_var;
+  smooth float ifc_smooth_var;
+  noperspective float ifc_noperspective_var;
+  float ifc_unqualified_var;
+};
+
+void main()
+{
+  bool ok = true;
+  if (flat_var != ifc_flat_var) ok = false;
+  if (smooth_var != ifc_smooth_var) ok = false;
+  if (noperspective_var != ifc_noperspective_var) ok = false;
+  if (unqualified_var != ifc_unqualified_var) ok = false;
+  gl_FragColor = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+piglit_vertex/float/4
+-1.0 -1.0 0.0 1.0
+ 0.0  2.0 0.0 2.0 # Note: different W's to ensure that smooth != noperspective
+ 3.0 -3.0 0.0 3.0
+
+[test]
+
+# Clear the background to green so that parts of the triangle which
+# aren't drawn won't cause the test to fail.
+clear color 0.0 1.0 0.0 1.0
+clear
+draw arrays GL_TRIANGLES 0 3
+probe all rgba 0.0 1.0 0.0 1.0
