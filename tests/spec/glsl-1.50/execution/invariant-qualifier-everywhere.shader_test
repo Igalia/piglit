@@ -42,7 +42,7 @@ void main()
 #version 150
 
 layout(triangles) in;
-layout(triangles, max_vertices=3) out;
+layout(triangle_strip, max_vertices=3) out;
 
 invariant in vec4 pos[];
 invariant in vec4 extra01[];
