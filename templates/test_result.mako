@@ -31,7 +31,7 @@
       <tr>
         <td>Info</td>
         <td>
-          <pre>${info}</pre>
+          <pre>${info | h}</pre>
         </td>
       </tr>
       <tr>
@@ -43,13 +43,13 @@
       <tr>
         <td>Traceback</td>
         <td>
-          <pre>${traceback}</pre>
+          <pre>${traceback | h}</pre>
         </td>
       </tr>
       <tr>
         <td>dmesg</td>
         <td>
-          <pre>${dmesg}</pre>
+          <pre>${dmesg | h}</pre>
         </td>
       </tr>
     </table>
