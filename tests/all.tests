@@ -984,6 +984,7 @@ spec['glsl-1.50']['gs-emits-too-few-verts'] = concurrent_test('glsl-1.50-gs-emit
 spec['glsl-1.50']['gs-end-primitive-optional-with-points-out'] = concurrent_test('glsl-1.50-geometry-end-primitive-optional-with-points-out')
 spec['glsl-1.50']['getshaderiv-may-return-GS'] = concurrent_test('glsl-1.50-getshaderiv-may-return-GS')
 spec['glsl-1.50']['query-gs-prim-types'] = concurrent_test('glsl-1.50-query-gs-prim-types')
+spec['glsl-1.50']['transform-feedback-type-and-size'] = concurrent_test('glsl-1.50-transform-feedback-type-and-size')
 
 spec['glsl-3.30'] = Group()
 spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
