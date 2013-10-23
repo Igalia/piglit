@@ -1741,6 +1741,10 @@ add_plain_test(arb_vertex_program, 'vp-address-04')
 add_plain_test(arb_vertex_program, 'vp-bad-program')
 add_plain_test(arb_vertex_program, 'vp-max-array')
 
+arb_viewport_array = Group()
+spec['ARB_viewport_array'] = arb_viewport_array
+arb_viewport_array['viewport-indices'] = concurrent_test('arb_viewport_array-viewport-indices')
+
 nv_vertex_program = Group()
 spec['NV_vertex_program'] = nv_vertex_program
 add_vpfpgeneric(nv_vertex_program, 'nv-mov')
