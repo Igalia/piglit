@@ -11,5 +11,6 @@ link_libraries(
 
 piglit_add_executable(arb_viewport_array-viewport-indices viewport_indices.c)
 piglit_add_executable(arb_viewport_array-depthrange-indices depth_range_indices.c)
+piglit_add_executable(arb_viewport_array-scissor-indices scissor_indices.c)
 
 # vim: ft=cmake:
