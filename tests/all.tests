@@ -1744,6 +1744,7 @@ add_plain_test(arb_vertex_program, 'vp-max-array')
 arb_viewport_array = Group()
 spec['ARB_viewport_array'] = arb_viewport_array
 arb_viewport_array['viewport-indices'] = concurrent_test('arb_viewport_array-viewport-indices')
+arb_viewport_array['depthrange-indices'] = concurrent_test('arb_viewport_array-depthrange-indices')
 
 nv_vertex_program = Group()
 spec['NV_vertex_program'] = nv_vertex_program
