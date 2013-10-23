@@ -1748,6 +1748,7 @@ arb_viewport_array['depthrange-indices'] = concurrent_test('arb_viewport_array-d
 arb_viewport_array['scissor-indices'] = concurrent_test('arb_viewport_array-scissor-indices')
 arb_viewport_array['bounds'] = concurrent_test('arb_viewport_array-bounds')
 arb_viewport_array['queries'] = concurrent_test('arb_viewport_array-queries')
+arb_viewport_array['minmax'] = concurrent_test('arb_viewport_array-minmax')
 
 nv_vertex_program = Group()
 spec['NV_vertex_program'] = nv_vertex_program
