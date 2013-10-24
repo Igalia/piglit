@@ -16,5 +16,6 @@ piglit_add_executable(arb_texture_view-targets targets.c common.c)
 piglit_add_executable(arb_texture_view-queries queries.c)
 piglit_add_executable(arb_texture_view-rendering-target rendering_target.c common.c)
 piglit_add_executable(arb_texture_view-rendering-levels rendering_levels.c common.c)
+piglit_add_executable(arb_texture_view-lifetime-format lifetime_format.c common.c)
 
 # vim: ft=cmake:
