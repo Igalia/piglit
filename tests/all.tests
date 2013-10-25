@@ -448,6 +448,10 @@ oml_sync_control['swapbuffersmsc-return swap_interval 0'] = concurrent_test('glx
 oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 1')
 oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
 
+mesa_query_renderer = Group()
+glx['GLX_MESA_query_renderer'] = mesa_query_renderer
+mesa_query_renderer['coverage'] = concurrent_test('glx-query-renderer-coverage')
+
 def texwrap_test(args):
     return concurrent_test('texwrap ' + ' '.join(args))
 
