@@ -525,8 +525,8 @@ class Summary:
         print "      crash: %d" % self.totals['crash']
         print "       skip: %d" % self.totals['skip']
         print "       warn: %d" % self.totals['warn']
-        print "       dmesg-warn: %d" % self.totals['dmesg-warn']
-        print "       dmesg-fail: %d" % self.totals['dmesg-fail']
+        print " dmesg-warn: %d" % self.totals['dmesg-warn']
+        print " dmesg-fail: %d" % self.totals['dmesg-fail']
         if self.tests['changes']:
             print "    changes: %d" % len(self.tests['changes'])
             print "      fixes: %d" % len(self.tests['fixes'])
