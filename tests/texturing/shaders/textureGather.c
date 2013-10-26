@@ -14,7 +14,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 enum { NOSTAGE, VS, FS } stage = NOSTAGE;
 enum { NONE = -1, RED, GREEN, BLUE, ALPHA, ZERO, ONE } swizzle = NONE;
-enum { UNORM, FLOAT, INT, UINT, SHADOW, NUM_COMPTYPES } comptype = UNORM;
+enum { UNORM_T, FLOAT_T, INT_T, UINT_T, SHADOW_T, NUM_COMPTYPES } comptype = UNORM_T;
 enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY, SAMPLER_2DRECT } sampler = SAMPLER_2D;
 bool use_offset = false;
 bool use_nonconst = false;
@@ -145,7 +145,7 @@ make_expected(void)
 
 	for (j = 0; j < TEXTURE_HEIGHT; j++)
 		for (i = 0; i < TEXTURE_WIDTH; i++) {
-			if (comptype == SHADOW) {
+			if (comptype == SHADOW_T) {
 				*pe++ = shadow_compare(norm_value(pixel_value(i, j + 1)));
 				*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j + 1)));
 				*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j)));
@@ -217,12 +217,12 @@ do_requires(void)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	if (comptype == SHADOW && components > 1) {
+	if (comptype == SHADOW_T && components > 1) {
 		printf("Shadow supported with single-component textures only\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	if (comptype == SHADOW && comp_select != -1) {
+	if (comptype == SHADOW_T && comp_select != -1) {
 		printf("Shadow not supported with component select parameter\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
@@ -231,7 +231,7 @@ do_requires(void)
 	 * or use non-constant offsets, or use shadow comparitor, or
 	 * use gsampler2DRect, check that we have ARB_gpu_shader5
 	 */
-	if (comp_select != -1 || use_nonconst || comptype == SHADOW || sampler == SAMPLER_2DRECT)
+	if (comp_select != -1 || use_nonconst || comptype == SHADOW_T || sampler == SAMPLER_2DRECT)
 		piglit_require_extension("GL_ARB_gpu_shader5");
 
 	/* if rect sampler, repeat is not available */
@@ -322,7 +322,7 @@ do_texture_setup(void)
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	if (comptype == SHADOW) {
+	if (comptype == SHADOW_T) {
 		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_MODE,
 				GL_COMPARE_R_TO_TEXTURE);
 		glTexParameteri(target_for_sampler[sampler], GL_TEXTURE_COMPARE_FUNC,
@@ -364,7 +364,7 @@ do_shader_setup(void)
 		"gl_FragCoord.xy",		/* 2drect */
 	};
 	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
-	bool need_shader5 = (comp_select != -1) || use_nonconst || (comptype == SHADOW) || sampler == SAMPLER_2DRECT;
+	bool need_shader5 = (comp_select != -1) || use_nonconst || (comptype == SHADOW_T) || sampler == SAMPLER_2DRECT;
 
 	if (stage == VS) {
 		asprintf(&vs_code, "#version %s\n"
@@ -387,12 +387,12 @@ do_shader_setup(void)
 				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
 				samplersuffix[sampler],
-				comptype == SHADOW ? "Shadow" : "",
+				comptype == SHADOW_T ? "Shadow" : "",
 				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				vs_tc_expr[sampler],
-				comptype == SHADOW ? ", 0.5" : "",
+				comptype == SHADOW_T ? ", 0.5" : "",
 				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
@@ -432,12 +432,12 @@ do_shader_setup(void)
 				need_shader5 ? "#extension GL_ARB_gpu_shader5: require\n" : "",
 				prefix[comptype],
 				samplersuffix[sampler],
-				comptype == SHADOW ? "Shadow" : "",
+				comptype == SHADOW_T ? "Shadow" : "",
 				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offset ? "Offset" : "",
 				fs_tc_expr[sampler],
-				comptype == SHADOW ? ", 0.5" : "",
+				comptype == SHADOW_T ? ", 0.5" : "",
 				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 	}
@@ -507,11 +507,11 @@ piglit_init(int argc, char **argv)
 		else if (!strcmp(opt, "alpha")) swizzle = 3;
 		else if (!strcmp(opt, "zero")) swizzle = 4;
 		else if (!strcmp(opt, "one")) swizzle = 5;
-		else if (!strcmp(opt, "unorm")) comptype = UNORM;
-		else if (!strcmp(opt, "float")) comptype = FLOAT;
-		else if (!strcmp(opt, "int")) comptype = INT;
-		else if (!strcmp(opt, "uint")) comptype = UINT;
-		else if (!strcmp(opt, "shadow")) comptype = SHADOW;
+		else if (!strcmp(opt, "unorm")) comptype = UNORM_T;
+		else if (!strcmp(opt, "float")) comptype = FLOAT_T;
+		else if (!strcmp(opt, "int")) comptype = INT_T;
+		else if (!strcmp(opt, "uint")) comptype = UINT_T;
+		else if (!strcmp(opt, "shadow")) comptype = SHADOW_T;
 		else if (!strcmp(opt, "2D")) sampler = SAMPLER_2D;
 		else if (!strcmp(opt, "2DArray")) sampler = SAMPLER_2DARRAY;
 		else if (!strcmp(opt, "Cube")) sampler = SAMPLER_CUBE;
