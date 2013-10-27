@@ -56,6 +56,7 @@ Fbo dst_fbo;
 TestPattern *test_pattern = NULL;
 ManifestProgram *manifest_program = NULL;
 GLbitfield buffer_to_test;
+GLenum filter_mode = GL_NEAREST;
 
 void
 print_usage_and_exit(char *prog_name)
@@ -64,7 +65,9 @@ print_usage_and_exit(char *prog_name)
 	       "  where <buffer_type> is one of:\n"
 	       "    color\n"
 	       "    stencil\n"
-	       "    depth\n",
+	       "    depth\n"
+	       "Available options:\n"
+	       "    linear: use GL_LINEAR filter mode\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -106,6 +109,14 @@ piglit_init(int argc, char **argv)
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
+
+	for (int i = 3; i < argc; i++) {
+		if (strcmp(argv[i], "linear") == 0)
+			filter_mode = GL_LINEAR;
+		else
+			print_usage_and_exit(argv[0]);
+	}
+
 	test_pattern->compile();
 	if (manifest_program)
 		manifest_program->compile();
@@ -129,7 +140,7 @@ piglit_display()
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dst_fbo.handle);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
-			  buffer_to_test, GL_NEAREST);
+			  buffer_to_test, filter_mode);
 
 	/* If necessary, manifest the depth/stencil image in dst_fbo
 	 * into a color image.  This ensures that the blit that
