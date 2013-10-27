@@ -101,7 +101,7 @@ public:
 	     bool test_resolve, GLbitfield blit_type, bool srgb);
 	void init(int num_samples, bool small, bool combine_depth_stencil,
 		  int pattern_width, int pattern_height,
-		  int supersample_factor);
+		  int supersample_factor, GLenum filter_mode);
 	bool run();
 	void draw_test_image(piglit_util_fbo::Fbo *fbo);
 	void draw_to_default_framebuffer();
@@ -173,9 +173,14 @@ private:
 	int supersample_factor;
 	bool srgb;
 	DownsampleProg downsample_prog;
+
+	/**
+	 * Filter mode to use when downsampling the image
+	 */
+	GLenum filter_mode;
 };
 
 Test *
 create_test(test_type_enum test_type, int n_samples, bool small,
 	    bool combine_depth_stencil, int pattern_width,
-	    int pattern_height, int supersample_factor);
+	    int pattern_height, int supersample_factor, GLenum filter_mode);

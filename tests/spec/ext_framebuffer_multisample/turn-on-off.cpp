@@ -151,5 +151,6 @@ piglit_init(int argc, char **argv)
 			   false /*small*/,
 			   true /* combine_depth_stencil */,
 			   pattern_width, pattern_height,
-			   16 /* supersample_factor */);
+			   16 /* supersample_factor */,
+			   GL_NEAREST);
 }

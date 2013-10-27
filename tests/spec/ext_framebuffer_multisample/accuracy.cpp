@@ -71,7 +71,8 @@ print_usage_and_exit(char *prog_name)
 	       "    depth_resolve: test resolve of MSAA depth buffer\n"
 	       "Available options:\n"
 	       "    small: use a very small (16x16) MSAA buffer\n"
-	       "    depthstencil: use a combined depth/stencil buffer\n",
+	       "    depthstencil: use a combined depth/stencil buffer\n"
+	       "    linear: use GL_LINEAR filter mode\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -83,6 +84,7 @@ piglit_init(int argc, char **argv)
 	int i, num_samples;
 	bool small = false;
 	bool combine_depth_stencil = false;
+	GLenum filter_mode = GL_NEAREST;
 
 	if (argc < 3)
 		print_usage_and_exit(argv[0]);
@@ -98,6 +100,8 @@ piglit_init(int argc, char **argv)
 			small = true;
 		} else if (strcmp(argv[i], "depthstencil") == 0) {
 			combine_depth_stencil = true;
+		} else if (strcmp(argv[i], "linear") == 0) {
+			filter_mode = GL_LINEAR;
 		} else {
 			print_usage_and_exit(argv[0]);
 		}
@@ -130,7 +134,8 @@ piglit_init(int argc, char **argv)
 	}
 	test = create_test(test_type, num_samples, small,
 			   combine_depth_stencil,
-			   pattern_width, pattern_height, supersample_factor);
+			   pattern_width, pattern_height, supersample_factor,
+			   filter_mode);
 }
 
 enum piglit_result

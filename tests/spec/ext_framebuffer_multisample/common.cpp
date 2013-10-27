@@ -266,12 +266,14 @@ Test::Test(TestPattern *pattern, ManifestProgram *manifest_program,
 
 void
 Test::init(int num_samples, bool small, bool combine_depth_stencil,
-	   int pattern_width, int pattern_height, int supersample_factor)
+	   int pattern_width, int pattern_height, int supersample_factor,
+	   GLenum filter_mode)
 {
 	this->num_samples = num_samples;
 	this->pattern_width = pattern_width;
 	this->pattern_height = pattern_height;
 	this->supersample_factor = supersample_factor;
+	this->filter_mode = filter_mode;
 
 	FboConfig test_fbo_config(0,
 				  small ? 16 : pattern_width,
@@ -322,7 +324,7 @@ Test::resolve(Fbo *fbo, GLbitfield which_buffers)
 	glBlitFramebuffer(0, 0, fbo->config.width, fbo->config.height,
 			  0, 0, resolve_fbo.config.width,
 			  resolve_fbo.config.height,
-			  which_buffers, GL_NEAREST);
+			  which_buffers, filter_mode);
 }
 
 /**
@@ -569,7 +571,7 @@ Test::run()
 Test *
 create_test(test_type_enum test_type, int n_samples, bool small,
 	    bool combine_depth_stencil, int pattern_width, int pattern_height,
-	    int supersample_factor)
+	    int supersample_factor, GLenum filter_mode)
 {
 	Test *test = NULL;
 	switch (test_type) {
@@ -608,6 +610,6 @@ create_test(test_type_enum test_type, int n_samples, bool small,
 	}
 
 	test->init(n_samples, small, combine_depth_stencil, pattern_width,
-		   pattern_height, supersample_factor);
+		   pattern_height, supersample_factor, filter_mode);
 	return test;
 }

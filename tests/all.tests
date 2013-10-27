@@ -1778,7 +1778,10 @@ ext_framebuffer_multisample['alpha-blending'] = PlainExecTest('ext_framebuffer_m
 for num_samples in MSAA_SAMPLE_COUNTS:
     for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
                       'depth_draw', 'depth_resolve'):
-        for options in power_set(('small', 'depthstencil')):
+        sensible_options = ['small', 'depthstencil']
+        if test_type in ('color', 'srgb'):
+            sensible_options.append('linear')
+        for options in power_set(sensible_options):
             test_name = ' '.join(['accuracy', str(num_samples), test_type]
                                  + options)
             executable = 'ext_framebuffer_multisample-{0} -auto'.format(
