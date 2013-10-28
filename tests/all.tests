@@ -1749,6 +1749,7 @@ arb_viewport_array['scissor-indices'] = concurrent_test('arb_viewport_array-scis
 arb_viewport_array['bounds'] = concurrent_test('arb_viewport_array-bounds')
 arb_viewport_array['queries'] = concurrent_test('arb_viewport_array-queries')
 arb_viewport_array['minmax'] = concurrent_test('arb_viewport_array-minmax')
+arb_viewport_array['render-viewport'] = concurrent_test('arb_viewport_array-render-viewport')
 
 nv_vertex_program = Group()
 spec['NV_vertex_program'] = nv_vertex_program
