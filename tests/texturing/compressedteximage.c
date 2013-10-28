@@ -28,7 +28,7 @@
  *
  * The other compressed texture tests are about decoding of data that
  * was uploaded from uncompressed, while this tries a round-trip after
- * the initial upload, tesitng glGetCompressedTexImage() and
+ * the initial upload, testing glGetCompressedTexImage() and
  * glCompressedTexImage2D().
  */
 
