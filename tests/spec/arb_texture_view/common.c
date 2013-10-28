@@ -26,6 +26,44 @@
 #include "piglit-util-gl-common.h"
 #include <stdarg.h>
 
+const GLubyte Colors[][8] = {
+		{127,	0,   0, 255,  0, 10, 20,  0},
+		{  0, 127,   0, 255,  0,  0, 80, 90},
+		{  0,	0, 127, 255, 25,  0,  0, 60},
+		{  0, 127, 127, 255, 15, 15,  0,  0},
+		{127,	0, 127, 255,  0,  2, 50,  0},
+		{127, 127,   0, 255, 80, 10, 70, 20},
+		{255,	0,   0, 255, 60,  0, 40, 30},
+		{  0, 255,   0, 255, 50, 20,  2, 40},
+		{  0,	0, 255, 255, 40,  0,  1,  0},
+		{  0, 255, 255, 255, 30,  5,  3,  8},
+		{255,	0, 255, 255, 20, 18,  4,  7},
+		{255, 255,   0, 255,  10, 24, 77, 67},
+		{255, 255, 255, 255,  5,  33, 88, 44}
+};
+
+/**
+ * Create a single-color image. Up to 64 bits per pixel depending upon bytes
+ */
+GLubyte *
+create_solid_image(GLint w, GLint h, GLint d, const unsigned int bytes,
+		   const unsigned int idx)
+{
+	GLubyte *buf = (GLubyte *) malloc(w * h * d * bytes);
+	int i,j;
+
+	if (buf == NULL || idx > (sizeof(Colors) / bytes - 1)) {
+		free(buf);
+		return NULL;
+	}
+	for (i = 0; i < w * h * d; i++) {
+		for (j = 0; j < bytes; j++) {
+			buf[i*bytes+j] = Colors[idx][j];
+		}
+	}
+	return buf;
+}
+
 /**
  * This function takes an array of valid and invalid GLenums.  The invalid
  * enums array starts fully populated and the valid  array is empty.
@@ -35,7 +73,6 @@
  * An variable argument equal to zero will signal the end of
  * the variable parameters.
  */
-
 unsigned int
 update_valid_arrays(GLenum *valid, GLenum *invalid, unsigned int numInvalid,
 		    ... )
@@ -58,4 +95,27 @@ update_valid_arrays(GLenum *valid, GLenum *invalid, unsigned int numInvalid,
 	}
 	va_end(args);
 	return num;
+}
+
+/**
+ *  Draw a textured quad, sampling only the given depth  of the 3D texture.
+ *  Use shader pipeline.
+ */
+void
+draw_3d_depth(float x, float y, float w, float h, int depth)
+{
+	const GLfloat vertices[12] =  {x, y, 0.0,
+				 x+w, y, 0.0,
+				 x+w, y+h, 0.0,
+				 x, y+h, 0.0};
+	const GLfloat texcoords[12] = {0.0, 0.0, depth,
+				 1.0, 0.0, depth,
+				 1.0, 1.0, depth,
+				 0.0, 1.0, depth};
+
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer(3, GL_FLOAT, 0, texcoords);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }

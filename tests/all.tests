@@ -1556,6 +1556,7 @@ arb_texture_view['params'] = concurrent_test('arb_texture_view-params')
 arb_texture_view['formats'] = concurrent_test('arb_texture_view-formats')
 arb_texture_view['targets'] = concurrent_test('arb_texture_view-targets')
 arb_texture_view['queries'] = concurrent_test('arb_texture_view-queries')
+arb_texture_view['rendering-target'] = concurrent_test('arb_texture_view-rendering-target')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1

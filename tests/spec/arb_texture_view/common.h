@@ -23,7 +23,18 @@
  * Author: Jon Ashburn <jon@lunarg.com>
  */
 
-
+#include "piglit-util-gl-common.h"
+ 
+GLubyte *
+create_solid_image(GLint w, GLint h, GLint d, const unsigned int bytes,
+		   const unsigned int idx);
 unsigned int
 update_valid_arrays(GLenum *valid, GLenum *invalid, unsigned int numInvalid,
 		    ... );
+void
+draw_3d_depth_fixed(float x, float y, float w, float h, int depth);
+
+void
+draw_3d_depth(float x, float y, float w, float h, int depth);
+
+extern GLubyte Colors[][8];
