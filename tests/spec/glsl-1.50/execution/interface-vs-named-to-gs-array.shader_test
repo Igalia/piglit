@@ -1,0 +1,77 @@
+# From the GLSL 1.50 spec, section 4.3.7 (Interface Blocks):
+#
+#     Matched block names within an interface (as defined above) must
+#     match in terms of having the same number of declarations with
+#     the same sequence of types and the same sequence of member
+#     names, as well as having the same member-wise layout
+#     qualification (see next section). Furthermore, if a matching
+#     block is declared as an array, then the array sizes must also
+#     match (or follow array matching rules for the interface between
+#     a vertex and a geometry shader).
+#
+# This test verifies that trying to link a named VS output interface
+# to a GS input interface array succeeds, even if the instance names
+# differ.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+out block {
+  vec4 a;
+  vec4 b;
+} vs_block;
+
+void main()
+{
+  vs_block.a = vec4(0.0, 1.0, 2.0, 3.0) + 10.0 * float(gl_VertexID);
+  vs_block.b = vec4(4.0, 5.0, 6.0, 7.0) + 10.0 * float(gl_VertexID);
+}
+
+[geometry shader]
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+in block {
+  vec4 a;
+  vec4 b;
+} gs_block[3];
+out vec4 color;
+
+void main()
+{
+  const vec4 vertices[4] = vec4[4](
+    vec4(-1.0, -1.0, 0.0, 1.0),
+    vec4(-1.0,  1.0, 0.0, 1.0),
+    vec4( 1.0, -1.0, 0.0, 1.0),
+    vec4( 1.0,  1.0, 0.0, 1.0)
+  );
+
+  bool ok = true;
+  for (int i = 0; i < 3; i++) {
+    if (gs_block[i].a != vec4(0.0, 1.0, 2.0, 3.0) + 10.0 * float(i))
+      ok = false;
+    if (gs_block[i].b != vec4(4.0, 5.0, 6.0, 7.0) + 10.0 * float(i))
+      ok = false;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    color = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    gl_Position = vertices[i];
+    EmitVertex();
+  }
+}
+
+[fragment shader]
+in vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLES 0 3
+probe all rgba 0.0 1.0 0.0 1.0
