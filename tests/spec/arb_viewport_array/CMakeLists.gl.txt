@@ -16,5 +16,6 @@ piglit_add_executable(arb_viewport_array-bounds bounds.c)
 piglit_add_executable(arb_viewport_array-queries queries.c)
 piglit_add_executable(arb_viewport_array-minmax minmax.c)
 piglit_add_executable(arb_viewport_array-render-viewport render_viewport.c)
+piglit_add_executable(arb_viewport_array-render-depthrange render_depthrange.c)
 
 # vim: ft=cmake:
