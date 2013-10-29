@@ -2098,6 +2098,7 @@ spec['ARB_texture_cube_map'] = arb_texture_cube_map
 add_msaa_visual_plain_tests(arb_texture_cube_map, 'copyteximage CUBE')
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 add_plain_test(arb_texture_cube_map, 'cubemap')
+add_concurrent_test(arb_texture_cube_map, 'cubemap-getteximage-pbo')
 arb_texture_cube_map['cubemap npot'] = PlainExecTest(['cubemap', '-auto', 'npot'])
 add_plain_test(arb_texture_cube_map, 'cubemap-shader')
 arb_texture_cube_map['cubemap-shader lod'] = PlainExecTest(['cubemap-shader', '-auto', 'lod'])
