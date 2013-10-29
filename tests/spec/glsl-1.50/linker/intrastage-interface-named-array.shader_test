@@ -1,0 +1,47 @@
+# From the GLSL 1.50 spec, section 4.3.7 (Interface Blocks):
+#
+#     Matched block names within an interface (as defined above) must
+#     match in terms of having the same number of declarations with
+#     the same sequence of types and the same sequence of member
+#     names, as well as having the same member-wise layout
+#     qualification (see next section). Furthermore, if a matching
+#     block is declared as an array, then the array sizes must also
+#     match (or follow array matching rules for the interface between
+#     a vertex and a geometry shader).
+#
+# Although it's not explicitly stated, it's clear that when doing
+# intrastage linking, interface block arrays can only match other
+# interface block arrays.
+#
+# This test verifies that a link error occurs if we try to do
+# intrastage linking of a named interface block to an interface block
+# array.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+out blk {
+  vec4 foo;
+} inst;
+
+void f()
+{
+  inst.foo = vec4(1.0);
+}
+
+[vertex shader]
+out blk {
+  vec4 foo;
+} inst[3];
+
+void f();
+
+void main()
+{
+  f();
+  inst[2].foo = vec4(1.0);
+}
+
+[test]
+link error
