@@ -38,6 +38,7 @@ from textwrap import dedent
 from threads import synchronized_self
 import multiprocessing
 import multiprocessing.dummy
+import importlib
 try:
     import simplejson as json
 except ImportError:
@@ -646,13 +647,22 @@ class TestProfile:
 
 
 def loadTestProfile(filename):
-    ns = {'__file__': filename}
+    """ Load a python module and return it's profile attribute
+
+    All of the python test files provide a profile attribute which is a
+    TestProfile instance. This loads that module and returns it or raises an
+    error.
+
+    """
+    mod = importlib.import_module('tests.{0}'.format(
+        os.path.splitext(os.path.basename(filename))[0]))
+
     try:
-        execfile(filename, ns)
-    except:
-        traceback.print_exc()
-        raise Exception('Could not read tests profile')
-    return ns['profile']
+        return mod.profile
+    except AttributeError:
+        print("Error: There is not profile attribute in module {0}."
+              "Did you specify the right file?".format(filename))
+        sys.exit(1)
 
 
 def merge_test_profiles(profiles):
