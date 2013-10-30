@@ -2,13 +2,9 @@
 # Testing the r300 DRI driver
 #
 
-import os.path
+from tests.quick import profile
 
 __all__ = ['profile']
-
-global profile
-
-execfile(os.path.dirname(__file__) + '/quick.tests')
 
 # glean/blendFunc
 #   R300 blending hardware appears to be bad
