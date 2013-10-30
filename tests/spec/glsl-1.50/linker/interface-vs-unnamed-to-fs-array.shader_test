@@ -1,0 +1,55 @@
+# From the GLSL 1.50 spec, section 4.3.7 (Interface Blocks):
+#
+#     Matched block names within an interface (as defined above) must
+#     match in terms of having the same number of declarations with
+#     the same sequence of types and the same sequence of member
+#     names, as well as having the same member-wise layout
+#     qualification (see next section). Furthermore, if a matching
+#     block is declared as an array, then the array sizes must also
+#     match (or follow array matching rules for the interface between
+#     a vertex and a geometry shader).
+#
+# This test verifies that trying to link an unnamed VS output interface
+# to an FS input interface array fails.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+in vec4 piglit_vertex;
+
+out block {
+  vec4 a;
+  vec4 b;
+};
+
+out float ref;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  ref = 10.0 * float(gl_VertexID);
+  a = ref + vec4(0.0, 1.0, 2.0, 3.0);
+  b = ref + vec4(4.0, 5.0, 6.0, 7.0);
+}
+
+[fragment shader]
+in block {
+  vec4 a;
+  vec4 b;
+} inst[2];
+
+in float ref;
+
+void main()
+{
+  bool ok = true;
+  if (distance(inst[0].a, ref + vec4(0.0, 1.0, 2.0, 3.0)) > 1.0e-5)
+    ok = false;
+  if (distance(inst[1].b, ref + vec4(4.0, 5.0, 6.0, 7.0)) > 1.0e-5)
+    ok = false;
+  gl_FragColor = ok ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+link error
