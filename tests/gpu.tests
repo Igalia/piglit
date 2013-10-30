@@ -18,12 +18,5 @@ framework.glsl_parser_test.add_glsl_parser_test = add_glsl_parser_test
 
 execfile(os.path.dirname(__file__) + '/quick.tests')
 
-# Drop these as they're basically compiler tests and take forever.
-del profile.tests['shaders']['glsl-fs-inline-explosion']
-del profile.tests['shaders']['glsl-fs-unroll-explosion']
-del profile.tests['shaders']['glsl-vs-inline-explosion']
-del profile.tests['shaders']['glsl-vs-unroll-explosion']
-
 # Drop ARB_vertex_program/ARB_fragment_program compiler tests.
 del profile.tests['asmparsertest']
-
