@@ -2,23 +2,15 @@
 
 # quick.tests minus compiler tests.
 
-import framework.glsl_parser_test
-import os.path
+from tests.all import profile
+from framework.glsl_parser_test import GLSLParserTest
 
 __all__ = ['profile']
 
-global profile
-
-# Filter out any GLSLParserTest instances, as they're compiler tests.
-def add_glsl_parser_test(group, filepath, test_name):
-    # Dummy version of framework.glsl_parser_test.add_glsl_parser_test
-    pass
-
-# This be done before executing the base test list script
-framework.glsl_parser_test.add_glsl_parser_test = add_glsl_parser_test
-
-
-execfile(os.path.dirname(__file__) + '/quick.py')
+# Remove all glsl_parser_tests, as they are compiler test
+profile.remove_tests(lambda x: not isinstance(x, GLSLParserTest))
 
 # Drop ARB_vertex_program/ARB_fragment_program compiler tests.
+del profile.tests['spec']['ARB_vertex_program']
+del profile.tests['spec']['ARB_fragment_program']
 del profile.tests['asmparsertest']

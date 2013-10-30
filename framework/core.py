@@ -616,6 +616,18 @@ class TestProfile:
             group = group[group_name]
         del group[l[-1]]
 
+    def remove_tests(self, function):
+        """ Remove tests that return true from function
+
+        This is a destructive method, and passing an incorrect function could
+        result in undesired behavior.
+
+        """
+        # What we really want is a dictionary comprehension, but since python
+        # 2.6 is officially supported we can't use one
+        # {k:v for k, v in self.tests.iteritems() if function(v)}
+        self.tests = dict((k,v) for k, v in self.tests.iteritems() if function(v))
+
     def update(self, *profiles):
         """ Updates the contents of this TestProfile instance with another
 
