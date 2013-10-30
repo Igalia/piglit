@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # All OpenCL tests that come with piglit, using default settings
 
+__all__ = ['profile']
+
 import os
 import os.path as path
 

@@ -5,6 +5,8 @@
 import framework.glsl_parser_test
 import os.path
 
+__all__ = ['profile']
+
 global profile
 
 # Filter out any GLSLParserTest instances, as they're compiler tests.

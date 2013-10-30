@@ -5,6 +5,8 @@
 from framework.core import Group, TestProfile
 from framework.gleantest import GleanTest
 
+__all__ = ['profile']
+
 glean = Group()
 glean['basic'] = GleanTest('basic')
 glean['readPixSanity'] = GleanTest('readPixSanity')

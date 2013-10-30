@@ -30,6 +30,8 @@ from framework.core import TestProfile, testBinDir
 from framework.exectest import ExecTest
 from os import path
 
+__all__ = ['profile']
+
 bin_oglconform = path.join(testBinDir, 'oglconform')
 
 if not os.path.exists(bin_oglconform):
