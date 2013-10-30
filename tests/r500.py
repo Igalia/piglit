@@ -2,13 +2,9 @@
 # Testing the r500 DRI driver
 #
 
-import os.path
+from test.quick import profile
 
 __all__ = ['profile']
-
-global profile
-
-execfile(os.path.dirname(__file__) + '/quick.tests')
 
 # glean/blendFunc
 #   R500 blending hardware appears to be a bit better than R300
