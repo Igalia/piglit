@@ -8,6 +8,10 @@ link_libraries (
 	${OPENCL_opencl_LIBRARY}
 )
 
+if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+    link_libraries(rt)
+endif()
+
 function(piglit_cl_add_test)
     add_executable(${ARGV})
 endfunction(piglit_cl_add_test)
