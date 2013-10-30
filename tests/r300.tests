@@ -6,7 +6,7 @@ import os.path
 
 global profile
 
-execfile(os.path.dirname(__file__) + '/quick-driver.tests')
+execfile(os.path.dirname(__file__) + '/quick.tests')
 
 # glean/blendFunc
 #   R300 blending hardware appears to be bad
