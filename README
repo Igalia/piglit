@@ -176,13 +176,10 @@ Use
 
   $ ./piglit-run.py
 
-to learn more about the command's syntax. Have a look into the tests/
+To learn more about the command's syntax. Have a look into the tests/
 directory to see what test profiles are available:
 
-  $ cd tests
-  $ ls *.tests
-     ...
-  $ cd ..
+  $ ls tests/*.py
 
 See also section 4.
 
@@ -227,25 +224,25 @@ The summary shows the 'status' of a test:
 Test sets are specified as Python scripts in the tests directory.
 The following test sets are currently available:
 
-sanity.tests
+sanity.py
     This suite contains minimal sanity tests. These tests must
     pass, otherwise the other tests will not generate reliable results.
 
-all.tests
-    This suite contains all tests.
+all.py
+    This suite contains all OpenGL tests.
 
-all_cl.tests
+all_cl.py
     This suite contains all OpenCL tests.
 
-quick.tests
+quick.py
     Run all tests, but cut down significantly on their runtime
     (and thus on the number of problems they can find).
     In particular, this runs Glean with the --quick option, which
     reduces the number of visuals and state combinations tested.
 
-radeon.tests
-r300.tests
-r500.tests
+radeon.py
+r300.py
+r500.py
     These test suites are adaptations of all.tests, with some tweaks
     to account for hardware limitations in Radeon chips.
 
@@ -260,7 +257,7 @@ Therefore, tests can be implemented in an arbitrary standalone language.
 I recommend C, C++ and Python, as these are the languages that are already
 used in Piglit.
 
-All new tests must be added to the all.tests profile. The test profiles
+All new tests must be added to the all.py profile. The test profiles
 are simply Python scripts. There are currently two supported test types:
 
  PlainExecTest

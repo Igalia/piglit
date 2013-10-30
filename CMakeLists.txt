@@ -403,7 +403,7 @@ install (
 install (
 	DIRECTORY tests
 	DESTINATION .
-	FILES_MATCHING REGEX ".*\\.(tests|program_test|shader_test|frag|vert|geom|ktx|cl|txt)$"
+	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|ktx|cl|txt)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 

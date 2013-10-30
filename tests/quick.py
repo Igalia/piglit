@@ -9,7 +9,7 @@ __all__ = ['profile']
 
 GleanTest.globalParams += [ "--quick" ]
 
-execfile(os.path.dirname(__file__) + '/all.tests')
+execfile(os.path.dirname(__file__) + '/all.py')
 
 # These take too long
 del profile.tests['shaders']['glsl-fs-inline-explosion']

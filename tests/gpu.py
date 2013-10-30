@@ -18,7 +18,7 @@ def add_glsl_parser_test(group, filepath, test_name):
 framework.glsl_parser_test.add_glsl_parser_test = add_glsl_parser_test
 
 
-execfile(os.path.dirname(__file__) + '/quick.tests')
+execfile(os.path.dirname(__file__) + '/quick.py')
 
 # Drop ARB_vertex_program/ARB_fragment_program compiler tests.
 del profile.tests['asmparsertest']
