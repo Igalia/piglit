@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import os.path
-
-global profile
 from framework.gleantest import GleanTest
+from tests.all import profile
 
 __all__ = ['profile']
 
-GleanTest.globalParams += [ "--quick" ]
-
-execfile(os.path.dirname(__file__) + '/all.py')
+GleanTest.globalParams += ["--quick"]
 
 # These take too long
 del profile.tests['shaders']['glsl-fs-inline-explosion']
