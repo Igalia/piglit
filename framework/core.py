@@ -205,9 +205,10 @@ def checkDir(dirname, failifexists):
             raise
 
 if 'PIGLIT_BUILD_DIR' in os.environ:
-    testBinDir = os.environ['PIGLIT_BUILD_DIR'] + '/bin/'
+    testBinDir = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
 else:
-    testBinDir = os.path.dirname(__file__) + '/../bin/'
+    testBinDir = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                               '../bin'))
 
 if 'PIGLIT_SOURCE_DIR' not in os.environ:
     p = os.path
