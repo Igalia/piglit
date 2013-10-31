@@ -377,8 +377,8 @@ bool OccluQryTest::conformOQ_EndAfter(GLuint id)
 }
 
 
-/* Calling either GenQueriesARB while any query of any target is active causes
- * an INVALID_OPERATION error to be generated. */
+/* Calling either GenQueriesARB while any query of any target is active
+ * should not cause any error to be generated. */
 bool OccluQryTest::conformOQ_GenIn(GLuint id)
 {
 	int pass = true;
@@ -386,9 +386,9 @@ bool OccluQryTest::conformOQ_GenIn(GLuint id)
 	START_QUERY(id);
 
 	glGenQueriesARB_func(1, &id);
-	if (glGetError() != GL_INVALID_OPERATION) {
-		reportError("No GL_INVALID_OPERATION generated if "
-			"GenQueries in the progress of another.");
+	if (glGetError() != GL_NO_ERROR) {
+		reportError("Error generated when GenQueries called "
+			    "in the progress of another.");
 		pass = false;
 	}
   
@@ -398,20 +398,22 @@ bool OccluQryTest::conformOQ_GenIn(GLuint id)
 }
 
 
-/* Calling either DeleteQueriesARB while any query of any target is active causes
- * an INVALID_OPERATION error to be generated. */
+/* Calling either DeleteQueriesARB while any query of any target is active
+ * should not cause any error to be generated. */
 bool OccluQryTest::conformOQ_DeleteIn(GLuint id)
 {
 	int pass = true;
+	unsigned int another_id;
 
 	START_QUERY(id);
 
 	if (id > 0) {
-		glDeleteQueriesARB_func(1, &id);
+		glGenQueriesARB_func(1, &another_id);
+		glDeleteQueriesARB_func(1, &another_id);
 
-		if (glGetError() != GL_INVALID_OPERATION) {
-			reportError("No GL_INVALID_OPERATION generated if "
-				"DeleteQueries in the progress of another.");
+		if (glGetError() != GL_NO_ERROR) {
+			reportError("Error generated when DeleteQueries called "
+				    "in the progress of another.");
 			pass = false;
 		}
 	}
