@@ -295,6 +295,21 @@ if(OPENGL_egl_LIBRARY)
     add_definitions(-DPIGLIT_HAS_EGL)
 endif()
 
+if(PIGLIT_BUILD_GLES1_TESTS AND NOT OPENGL_egl_LIBRARY)
+	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES1_TESTS requires EGL. "
+			    "Failed to find EGL library.")
+endif()
+
+if(PIGLIT_BUILD_GLES2_TESTS AND NOT OPENGL_egl_LIBRARY)
+	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES2_TESTS requires EGL. "
+			    "Failed to find EGL library.")
+endif()
+
+if(PIGLIT_BUILD_GLES3_TESTS AND NOT OPENGL_egl_LIBRARY)
+	message(FATAL_ERROR "Option PIGLIT_BUILD_GLES3_TESTS requires EGL. "
+			    "Failed to find EGL library.")
+endif()
+
 find_library(OPENGL_gles1_LIBRARY NAMES GLESv1_CM)
 find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
