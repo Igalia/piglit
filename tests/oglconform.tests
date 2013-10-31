@@ -33,7 +33,7 @@ from os import path
 bin_oglconform = path.join(testBinDir, 'oglconform')
 
 if not os.path.exists(bin_oglconform):
-	sys.exit(0)
+    sys.exit(0)
 
 profile = TestProfile()
 
@@ -44,32 +44,32 @@ profile = TestProfile()
 ##### will obtain a list of tests from oglconform and add them all.
 #############################################################################
 class OGLCTest(ExecTest):
-	skip_re = re.compile(r'Total Not run: 1|no test in schedule is compat|GLSL [13].[345]0 is not supported|wont be scheduled due to lack of compatible fbconfig')
+    skip_re = re.compile(r'Total Not run: 1|no test in schedule is compat|GLSL [13].[345]0 is not supported|wont be scheduled due to lack of compatible fbconfig')
 
-	def __init__(self, category, subtest):
-		ExecTest.__init__(self, [bin_oglconform, '-minFmt', '-v', '4', '-test', category, subtest])
+    def __init__(self, category, subtest):
+        ExecTest.__init__(self, [bin_oglconform, '-minFmt', '-v', '4', '-test', category, subtest])
 
-	def interpretResult(self, out, returncode, results, dmesg):
-		if self.skip_re.search(out) is not None:
-			results['result'] = 'skip'
-		elif re.search('Total Passed : 1', out) is not None:
-			results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
-		else:
-			results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
-		return out
+    def interpretResult(self, out, returncode, results, dmesg):
+        if self.skip_re.search(out) is not None:
+            results['result'] = 'skip'
+        elif re.search('Total Passed : 1', out) is not None:
+            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
+        else:
+            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
+        return out
 
 # Create a new top-level 'oglconform' category
 
 testlist_file = '/tmp/oglc.tests'
 
 with open(os.devnull, "w") as devnull:
-	subprocess.call([bin_oglconform, '-generateTestList', testlist_file], stdout=devnull.fileno(), stderr=devnull.fileno())
+    subprocess.call([bin_oglconform, '-generateTestList', testlist_file], stdout=devnull.fileno(), stderr=devnull.fileno())
 
 with open(testlist_file) as f:
-	testlist = f.read().splitlines()
-	for l in testlist:
-		try:
-			category, test = l.split()
-			profile.test_list['oglconform/' + category + '/' + test] = OGLCTest(category, test)
-		except:
-			continue
+    testlist = f.read().splitlines()
+    for l in testlist:
+        try:
+            category, test = l.split()
+            profile.test_list['oglconform/' + category + '/' + test] = OGLCTest(category, test)
+        except:
+            continue
