@@ -94,7 +94,7 @@ def listTests(listname):
 singleTests = listTests("list-single-tests")
 
 for test in singleTests:
-    profile.test_list['igt/' + test] = IGTTest(test)
+    profile.test_list[path.join('igt', test)] = IGTTest(test)
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
@@ -112,7 +112,8 @@ def addSubTestCases(test):
     for subtest in subtests:
 	if subtest == "":
 	    continue
-	profile.test_list['igt/' + test + '/' + subtest] = IGTTest(test, ['--run-subtest', subtest])
+	profile.test_list[path.join('igt', test, subtest)] = \
+            IGTTest(test, ['--run-subtest', subtest])
 
 multiTests = listTests("list-multi-tests")
 

@@ -73,7 +73,8 @@ def populateTests(runfile):
                 populateTests(newpath)
             else:
                 # Add the .test file
-                profile.test_list['es3conform/' + path.relpath(newpath, gtfroot)] = GTFTest(newpath)
+                group = path.join('es3conform', path.relpath(newpath, gtfroot))
+                profile.test_list[group] = GTFTest(newpath)
 
 
 # Populate the group with all the .test files

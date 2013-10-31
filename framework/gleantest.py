@@ -1,5 +1,6 @@
 #
 # Permission is hereby granted, free of charge, to any person
+
 # obtaining a copy of this software and associated documentation
 # files (the "Software"), to deal in the Software without
 # restriction, including without limitation the rights to use,
@@ -26,17 +27,14 @@ import subprocess
 from core import checkDir, testBinDir, Test, TestResult
 from exectest import ExecTest
 
-
-def gleanExecutable():
-    return testBinDir + 'glean'
-
+glean_executable = os.path.join(testBinDir, "glean")
 
 # GleanTest: Execute a sub-test of Glean
 class GleanTest(ExecTest):
     globalParams = []
 
     def __init__(self, name):
-        ExecTest.__init__(self, [gleanExecutable(),
+        ExecTest.__init__(self, [glean_executable,
                                  "-o", "-v", "-v", "-v", "-t",
                                  "+"+name] + GleanTest.globalParams)
         self.name = name

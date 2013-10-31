@@ -205,9 +205,10 @@ def checkDir(dirname, failifexists):
             raise
 
 if 'PIGLIT_BUILD_DIR' in os.environ:
-    testBinDir = os.environ['PIGLIT_BUILD_DIR'] + '/bin/'
+    testBinDir = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
 else:
-    testBinDir = os.path.dirname(__file__) + '/../bin/'
+    testBinDir = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                               '../bin'))
 
 if 'PIGLIT_SOURCE_DIR' not in os.environ:
     p = os.path
@@ -485,7 +486,7 @@ class Test:
             if 'subtest' in result and len(result['subtest'].keys()) > 1:
                 for test in result['subtest'].keys():
                     result['result'] = result['subtest'][test]
-                    json_writer.write_dict_item(path + '/' + test, result)
+                    json_writer.write_dict_item(os.path.join(path, test), result)
             else:
                 json_writer.write_dict_item(path, result)
         else:
@@ -539,7 +540,7 @@ class TestProfile:
 
         def f(prefix, group, test_dict):
             for key in group:
-                fullkey = key if prefix == '' else prefix + '/' + key
+                fullkey = key if prefix == '' else os.path.join(prefix, key)
                 if isinstance(group[key], dict):
                     f(fullkey, group[key], test_dict)
                 else:

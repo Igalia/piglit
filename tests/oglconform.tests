@@ -70,6 +70,6 @@ with open(testlist_file) as f:
     for l in testlist:
         try:
             category, test = l.split()
-            profile.test_list['oglconform/' + category + '/' + test] = OGLCTest(category, test)
+            profile.test_list[path.join('oglconform', category, test)] = OGLCTest(category, test)
         except:
             continue

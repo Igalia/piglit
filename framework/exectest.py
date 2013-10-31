@@ -250,7 +250,7 @@ class PlainExecTest(ExecTest):
     def __init__(self, command):
         ExecTest.__init__(self, command)
         # Prepend testBinDir to the path.
-        self.command[0] = testBinDir + self.command[0]
+        self.command[0] = os.path.join(testBinDir, self.command[0])
 
     def interpretResult(self, out, returncode, results, dmesg):
         outlines = out.split('\n')
