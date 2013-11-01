@@ -79,7 +79,9 @@ piglit_init(int argc, char **argv)
 	piglit_test_range_float(GL_POINT_SIZE_RANGE, 1, 1);
 	piglit_test_range_float(GL_ALIASED_LINE_WIDTH_RANGE, 1, 1);
 	piglit_test_range_float(GL_SMOOTH_LINE_WIDTH_RANGE, 1, 1);
-	piglit_test_min_int(GL_NUM_COMPRESSED_TEXTURE_FORMATS, 4);
+	/* The spec lists 4, but the number should be 0, because hw drivers
+	 * don't have to expose any non-core extensions like S3TC. */
+	piglit_test_min_int(GL_NUM_COMPRESSED_TEXTURE_FORMATS, 0);
 	piglit_test_min_int(GL_MAX_TEXTURE_BUFFER_SIZE, 65536);
 	piglit_test_min_int(GL_MAX_RECTANGLE_TEXTURE_SIZE, 1024);
 
