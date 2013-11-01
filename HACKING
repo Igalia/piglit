@@ -63,25 +63,56 @@ entirely new project. The most important reasons are:
 
 
 
+\ Coding style
+ -------------
 
-\ Ugly Things (or: Coding style)
- -------------------------------
+Basic formatting:
 
-As a rule of thumb, coding style should be preserved in test code taken from
-other projects, as long as that code is self-contained.
+* Indent with 8-column tabs
+* Limit lines to 78 characters or less
+* Function return type and name go on successive lines
+* Opening function brace goes on line by itself
+* Opening statement braces go on same line as the 'for' or 'else'
 
-Apart from that, the following rules are cast in stone:
+The following indent command will generally format your code for piglit's
+style:
 
-1. Use tabulators for indentation
-2. Use spaces for alignment
-3. No whitespace at the end of a line
+  indent -br -i8 -npcs -ce input.c -o output.c
 
-See http://electroly.com/mt/archives/000002.html for a well-written rationale.
+Though, that doesn't give perfect results.  It messes up the
+PIGLIT_GL_TEST_CONFIG_BEGIN/END section.  And array initializers sometimes
+come out funny.
 
-Use whatever tabulator size you want:
-If you adhere to the rules above, the tab size does not matter. Tab size 4
-is recommended because it keeps the line lengths reasonable, but in the end,
-that's purely a matter of personal taste.
+When in doubt see other recently added piglit tests for coding style.
+
+
+Code conventions:
+
+* Use "const" qualifiers whenever possible on array declarations, pointers
+  and global variables.
+* Use "static const" for initialized arrays whenever possible.
+* Preprocessor macros should be UPPER_CASE
+* Enumeration tokens should be UPPER_CASE
+* Most other identifiers are lower_case_with_underscores
+* Use int, float, bool except when GL types (GLint, GLfloat) are really needed
+* Don't put declarations after code.  For example:
+      if (x < 3)
+         x = 0;
+      int y = x * x;
+  This will not compile with MSVC.  The 'int y' declaration must be at the
+  top of the brace-block.
+* Don't use named/designated initializers.  They don't compile with MSVC.
+* Write tests that are easily read, understood and debugged.  Long, complicated
+  functions are frowned upon.
+* Don't try to test too much in a single test program.  Most piglit programs
+  are less than 300 lines long.
+
+
+Utility code:
+
+Piglit has a rich set of utility functions for basic drawing, setting
+up shaders, probing pixels, error checking, etc.  Try to use them before
+rolling your own.
 
 
 
