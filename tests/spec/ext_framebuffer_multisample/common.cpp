@@ -260,7 +260,8 @@ Test::Test(TestPattern *pattern, ManifestProgram *manifest_program,
 	  pattern_height(0),
 	  supersample_factor(0),
 	  srgb(srgb),
-	  downsample_prog()
+	  downsample_prog(),
+	  filter_mode(GL_NONE)
 {
 }
 
