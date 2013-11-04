@@ -32,6 +32,11 @@
  * incorrectly while drawing the first triangle of the fan.
  *
  * See also https://bugs.freedesktop.org/show_bug.cgi?id=53077
+ *
+ * Note: when fast color clears are implemented for MSAA buffers, it's
+ * possible that they will cover up this bug.  To avoid that, the test
+ * can be supplied a command-line option of "slow_cc", which causes it
+ * to use a clear color that cannot be fast cleared.
  */
 
 #include "piglit-util-gl-common.h"
@@ -40,6 +45,7 @@ GLuint framebuffer, renderbuffer;
 #define WIDTH 300
 #define HEIGHT 350
 int numSamples;
+static bool slow_color_clear = false;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -48,6 +54,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.window_width = WIDTH;
 	config.window_height = HEIGHT;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
+	slow_color_clear = PIGLIT_STRIP_ARG("slow_cc");
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -84,14 +91,20 @@ piglit_display()
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER,framebuffer);
 
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	if (slow_color_clear) {
+		glColor4f (0.0, 1.0, 0.5, 0.7);
+		glClearColor(0.0, 0.0, 0.5, 1.0);
+		expected_color[2] = 0.5;
+	} else {
+		glColor4f (0.0, 1.0, 0.0, 0.7);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glEnable(GL_BLEND);
 	src_factor = GL_SRC_ALPHA;
 	dst_factor = GL_ONE_MINUS_SRC_ALPHA;
 	glBlendFunc (src_factor, dst_factor);
-	glColor4f (0.0, 1.0, 0.0, 0.7);
 	glVertexPointer(2, GL_FLOAT, 0, vertex_data);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
