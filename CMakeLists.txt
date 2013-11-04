@@ -379,6 +379,11 @@ install (
 )
 
 install (
+        DIRECTORY templates
+        DESTINATION .
+)
+
+install (
 	DIRECTORY tests
 	DESTINATION .
 	FILES_MATCHING REGEX ".*\\.(tests|program_test|shader_test|frag|vert|geom|ktx|cl|txt)$"
