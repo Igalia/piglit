@@ -173,10 +173,10 @@ validate_pipe(GLuint pipe, bool expected, const char *test_name)
 			"Wrong pipeline validation status. Got %d, but "
 			"expected %d\n",
 			status, expected);
-		piglit_report_subtest_result(PIGLIT_FAIL, test_name);
+		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
 		pass = false;
 	} else {
-		piglit_report_subtest_result(PIGLIT_PASS, test_name);
+		piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
 	}
 }
 
