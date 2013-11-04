@@ -114,6 +114,12 @@ Piglit has a rich set of utility functions for basic drawing, setting
 up shaders, probing pixels, error checking, etc.  Try to use them before
 rolling your own.
 
+Python framework:
+
+Piglit uses python's PEP8 standard for formatting of python code; using only
+spaces with no tabs for indenting.  See
+http://www.python.org/dev/peps/pep-0008/ for more information.
+
 
 
 \ Release Philosophy
