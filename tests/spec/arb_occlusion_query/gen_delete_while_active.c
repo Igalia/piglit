@@ -47,7 +47,7 @@ enum piglit_result
 piglit_display(void)
 {
 	GLuint active, inactive;
-	GLint elapsed, done;
+	GLint elapsed;
  
 	/* Generate and start a query. */
 	glGenQueries(1, &active);
