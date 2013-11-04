@@ -286,7 +286,7 @@ if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
     add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 endif()
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+if(PIGLIT_USE_WAFFLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	pkg_check_modules(EGL egl)
 endif()
 
