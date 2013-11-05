@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main()
 {
    const vec2 v1 = clamp(vec2(-10.0, -15.0), vec2(-5.0, 5.0), vec2(1.0, 10.0));

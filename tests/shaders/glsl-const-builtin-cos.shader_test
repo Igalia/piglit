@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main() {
    const float sqrt_two_over_two = cos(0.785398163397448);
    const float one = cos(0.0);

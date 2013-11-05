@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main() {
    const float dx = dFdx(0.0);
    const float dy = dFdy(0.0);

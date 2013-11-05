@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main()
 {
     const mat2 m = mat2(1.0, 2.0, 4.0,  8.0);

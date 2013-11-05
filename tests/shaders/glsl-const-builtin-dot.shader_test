@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main()
 {
    const vec2 c1 = vec2(2.0, 4.0);

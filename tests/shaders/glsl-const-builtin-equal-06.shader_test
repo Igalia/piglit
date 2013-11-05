@@ -6,7 +6,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main()
 {
   const bvec3 res = equal(ivec3(0, 8, 89),

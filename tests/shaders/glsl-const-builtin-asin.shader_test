@@ -5,7 +5,6 @@ GLSL >= 1.20
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main() {
    const float zero = asin(0.0);
    const float pi_over_three = asin(0.866025403784439);
