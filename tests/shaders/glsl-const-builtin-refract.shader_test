@@ -15,8 +15,5 @@ void main()
 }
 
 [test]
-clear color 0.0 0.0 0.0 0.0
-clear
-ortho
-draw rect 10 10 10 10
-probe rgb 15 15 0.0885621726633092 0.588562172663309 0
+draw rect -1 -1 2 2
+probe all rgb 0.0885621726633092 0.588562172663309 0
