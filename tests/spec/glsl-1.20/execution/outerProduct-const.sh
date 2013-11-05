@@ -86,6 +86,7 @@ function emit_vs_test
     else
 	name="vs-outerProduct-const-${mat}.shader_test"
     fi
+    echo $name
 
     if [ $c -ne $r ]; then
 	GL_require="# glUniformMatrix${r}x${c}fv only exists in OpenGL 2.1 or later.
@@ -146,6 +147,7 @@ function emit_fs_test
     else
 	name="fs-outerProduct-const-${mat}.shader_test"
     fi
+    echo $name
 
     if [ $c -ne $r ]; then
 	GL_require="# glUniformMatrix${r}x${c}fv only exists in OpenGL 2.1 or later.
