@@ -425,57 +425,89 @@ for mode in temp uniform varying; do
 		arr="array-"
 		idx_txt="index-"
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-col-row-rd.shader_test"
 		emit_fs_rd_test $matrix_dim $array_dim $mode 1 col float \
-		    > fs-${mode}-${arr}mat${matrix_dim}-col-row-rd.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-row-rd.shader_test"
 		emit_fs_rd_test $matrix_dim $array_dim $mode 1 1   float \
-		    > fs-${mode}-${arr}mat${matrix_dim}-row-rd.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-col-rd.shader_test"
 		emit_fs_rd_test $matrix_dim $array_dim $mode 1 col vec${matrix_dim} \
-		    > fs-${mode}-${arr}mat${matrix_dim}-col-rd.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-rd.shader_test"
 		emit_fs_rd_test $matrix_dim $array_dim $mode 1 1   vec${matrix_dim} \
-		    > fs-${mode}-${arr}mat${matrix_dim}-rd.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-col-row-rd.shader_test"
 		emit_vs_rd_test $matrix_dim $array_dim $mode 1 col float \
-		    > vs-${mode}-${arr}mat${matrix_dim}-col-row-rd.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-row-rd.shader_test"
 		emit_vs_rd_test $matrix_dim $array_dim $mode 1 1   float \
-		    > vs-${mode}-${arr}mat${matrix_dim}-row-rd.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-col-rd.shader_test"
 		emit_vs_rd_test $matrix_dim $array_dim $mode 1 col vec${matrix_dim} \
-		    > vs-${mode}-${arr}mat${matrix_dim}-col-rd.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-rd.shader_test"
 		emit_vs_rd_test $matrix_dim $array_dim $mode 1 1   vec${matrix_dim} \
-		    > vs-${mode}-${arr}mat${matrix_dim}-rd.shader_test
+		    > $name
+		echo $name
 	    else
 		arr=""
 		idx_txt=""
 	    fi
 
+	    name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-rd.shader_test"
 	    emit_fs_rd_test $matrix_dim $array_dim $mode index col float \
-		> fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-rd.shader_test"
 	    emit_fs_rd_test $matrix_dim $array_dim $mode index 1   float \
-		> fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-rd.shader_test"
 	    emit_fs_rd_test $matrix_dim $array_dim $mode index col vec${matrix_dim} \
-		> fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}rd.shader_test"
 	    emit_fs_rd_test $matrix_dim $array_dim $mode index 1   vec${matrix_dim} \
-		> fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}rd.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-rd.shader_test"
 	    emit_vs_rd_test $matrix_dim $array_dim $mode index col float \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-rd.shader_test"
 	    emit_vs_rd_test $matrix_dim $array_dim $mode index 1   float \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-rd.shader_test"
 	    emit_vs_rd_test $matrix_dim $array_dim $mode index col vec${matrix_dim} \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-rd.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}rd.shader_test"
 	    emit_vs_rd_test $matrix_dim $array_dim $mode index 1   vec${matrix_dim} \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}rd.shader_test
+		> $name
+	    echo $name
 	done
     done
 done

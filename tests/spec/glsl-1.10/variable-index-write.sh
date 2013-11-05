@@ -421,57 +421,89 @@ for mode in temp varying; do
 	for matrix_dim in 2 3 4; do
 	    # Fragment shaders cannot write varyings
 	    if [ "x$mode" != "xvarying" ]; then
+		name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-wr.shader_test"
 		emit_fs_wr_test $matrix_dim $array_dim $mode index col float \
-		    > fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-wr.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-wr.shader_test"
 		emit_fs_wr_test $matrix_dim $array_dim $mode index 1   float \
-		    > fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-wr.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-wr.shader_test"
 		emit_fs_wr_test $matrix_dim $array_dim $mode index col vec${matrix_dim} \
-		    > fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-wr.shader_test
+		    > $name
+		echo $name
 
+		name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}wr.shader_test"
 		emit_fs_wr_test $matrix_dim $array_dim $mode index 1   vec${matrix_dim} \
-		    > fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}wr.shader_test
+		    > $name
+		echo $name
 
 		if [ $array_dim -ne 0 ]; then
+		    name="fs-${mode}-${arr}mat${matrix_dim}-col-row-wr.shader_test"
 		    emit_fs_wr_test $matrix_dim $array_dim $mode 1 col float \
-			> fs-${mode}-${arr}mat${matrix_dim}-col-row-wr.shader_test
+			> $name
+		    echo $name
 
+		    name="fs-${mode}-${arr}mat${matrix_dim}-row-wr.shader_test"
 		    emit_fs_wr_test $matrix_dim $array_dim $mode 1 1   float \
-			> fs-${mode}-${arr}mat${matrix_dim}-row-wr.shader_test
+			> $name
+		    echo $name
 
+		    name="fs-${mode}-${arr}mat${matrix_dim}-col-wr.shader_test"
 		    emit_fs_wr_test $matrix_dim $array_dim $mode 1 col vec${matrix_dim} \
-			> fs-${mode}-${arr}mat${matrix_dim}-col-wr.shader_test
+			> $name
+		    echo $name
 
+		    name="fs-${mode}-${arr}mat${matrix_dim}-wr.shader_test"
 		    emit_fs_wr_test $matrix_dim $array_dim $mode 1 1   vec${matrix_dim} \
-			> fs-${mode}-${arr}mat${matrix_dim}-wr.shader_test
+			> $name
+		    echo $name
 		fi
 	    fi
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-wr.shader_test"
 	    emit_vs_wr_test $matrix_dim $array_dim $mode index col float \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-wr.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-wr.shader_test"
 	    emit_vs_wr_test $matrix_dim $array_dim $mode index 1   float \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}row-wr.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-wr.shader_test"
 	    emit_vs_wr_test $matrix_dim $array_dim $mode index col vec${matrix_dim} \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-wr.shader_test
+		> $name
+	    echo $name
 
+	    name="vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}wr.shader_test"
 	    emit_vs_wr_test $matrix_dim $array_dim $mode index 1   vec${matrix_dim} \
-		> vs-${mode}-${arr}mat${matrix_dim}-${idx_txt}wr.shader_test
+		> $name
+	    echo $name
 
 	    if [ $array_dim -ne 0 ]; then
+		name="vs-${mode}-${arr}mat${matrix_dim}-col-row-wr.shader_test"
 		emit_vs_wr_test $matrix_dim $array_dim $mode 1 col float \
-		    > vs-${mode}-${arr}mat${matrix_dim}-col-row-wr.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-row-wr.shader_test"
 		emit_vs_wr_test $matrix_dim $array_dim $mode 1 1   float \
-		    > vs-${mode}-${arr}mat${matrix_dim}-row-wr.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-col-wr.shader_test"
 		emit_vs_wr_test $matrix_dim $array_dim $mode 1 col vec${matrix_dim} \
-		    > vs-${mode}-${arr}mat${matrix_dim}-col-wr.shader_test
+		    > $name
+		echo $name
 
+		name="vs-${mode}-${arr}mat${matrix_dim}-wr.shader_test"
 		emit_vs_wr_test $matrix_dim $array_dim $mode 1 1   vec${matrix_dim} \
-		    > vs-${mode}-${arr}mat${matrix_dim}-wr.shader_test
+		    > $name
+		echo $name
 	    fi
 	done
     done
