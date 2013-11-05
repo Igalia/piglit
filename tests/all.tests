@@ -2704,6 +2704,10 @@ add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-getfragdatainde
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend')
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend-explicit')
 
+arb_base_instance = Group()
+spec['ARB_base_instance'] = arb_base_instance
+add_plain_test(arb_base_instance, 'arb_base_instance-baseinstance-doesnt-affect-gl-instance-id')
+
 apple_object_purgeable = Group()
 spec['APPLE_object_purgeable'] = apple_object_purgeable
 add_plain_test(apple_object_purgeable, 'object_purgeable-api-pbo')
