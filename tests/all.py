@@ -3101,6 +3101,7 @@ arb_vertex_type_2_10_10_10_rev['attribs'] = concurrent_test('attribs GL_ARB_vert
 arb_vertex_type_10f_11f_11f_rev = Group()
 spec['ARB_vertex_type_10f_11f_11f_rev'] = arb_vertex_type_10f_11f_11f_rev
 add_plain_test(arb_vertex_type_10f_11f_11f_rev, 'arb_vertex_type_10f_11f_11f_rev-api-errors')
+add_concurrent_test(arb_vertex_type_10f_11f_11f_rev, 'arb_vertex_type_10f_11f_11f_rev-draw-vertices')
 
 arb_draw_buffers = Group()
 spec['ARB_draw_buffers'] = arb_draw_buffers
