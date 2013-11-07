@@ -44,6 +44,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#define MAX_TARGETS 16
+
 static GLint max_targets;
 
 static char *vs_source =
@@ -53,12 +55,36 @@ static char *vs_source =
 	"}\n";
 
 static char *fs_source =
+	"uniform vec4 colors[16]; \n"
 	"void main()\n"
 	"{\n"
 	"	for (int i = 0; i < %d; i++) {\n"
-	"		gl_FragData[i] = vec4(0.0, 1.0, 0.0, 0.0);\n"
+	"		gl_FragData[i] = colors[i];\n"
 	"	}\n"
 	"}\n";
+
+static const float colors[][4] = {
+	{ 1.0, 0.0, 0.0, 1.0 },  /* red */
+	{ 0.0, 1.0, 0.0, 1.0 },  /* green */
+	{ 0.0, 0.0, 1.0, 1.0 },  /* blue */
+	{ 0.0, 1.0, 1.0, 1.0 },  /* cyan */
+
+	{ 1.0, 0.0, 1.0, 1.0 },  /* purple */
+	{ 1.0, 1.0, 0.0, 1.0 },  /* green */
+	{ 0.5, 0.0, 0.0, 1.0 },  /* half red */
+	{ 0.0, 0.5, 0.0, 1.0 },  /* half green */
+
+	{ 0.0, 0.0, 0.5, 1.0 },  /* half blue */
+	{ 0.0, 0.5, 0.5, 1.0 },  /* half cyan */
+	{ 0.5, 0.0, 0.5, 1.0 },  /* half purple */
+	{ 0.5, 0.5, 0.0, 1.0 },  /* half green */
+
+	{ 1.0, 1.0, 1.0, 1.0 },    /* white */
+	{ 0.75, 0.75, 0.75, 1.0 }, /* 75% gray */
+	{ 0.5, 0.5, 0.5, 1.0 },    /* 50% gray */
+	{ 0.25, 0.25, 0.25, 1.0 }  /* 25% gray */
+};
+
 
 static GLuint
 attach_texture(int i)
@@ -87,10 +113,11 @@ attach_texture(int i)
 static void
 generate_and_display_drawbuffers(int count)
 {
-	GLuint tex[16], fb, fs, vs, prog;
-	GLenum attachments[16], status;
+	GLuint tex[MAX_TARGETS], fb, fs, vs, prog;
+	GLenum attachments[MAX_TARGETS], status;
 	char *fs_count_source;
 	int i;
+	int colors_uniform;
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -112,7 +139,7 @@ generate_and_display_drawbuffers(int count)
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	/* Build the shader that spams green to all outputs. */
+	/* Build the shader that writes different color to each buffer. */
 	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source);
 
 	fs_count_source = malloc(strlen(fs_source) + 5);
@@ -126,6 +153,9 @@ generate_and_display_drawbuffers(int count)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
+	colors_uniform = glGetUniformLocation(prog, "colors");
+	glUniform4fv(colors_uniform, MAX_TARGETS, (GLfloat *) colors);
+
 	/* Now render to all the color buffers. */
 	piglit_draw_rect(-1, -1, 2, 2);
 
@@ -135,6 +165,7 @@ generate_and_display_drawbuffers(int count)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glEnable(GL_TEXTURE_2D);
+	/* draw row of boxes, each with the color from texture/target[i] */
 	for (i = 0; i < count; i++) {
 		glBindTexture(GL_TEXTURE_2D, tex[i]);
 		piglit_draw_rect_tex(16 * i, 16 * (count - 1),
@@ -154,22 +185,24 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
-	float green[] = {0, 1, 0, 0};
 	int count, i;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	
 	for (count = 1; count <= max_targets; count++) {
 		generate_and_display_drawbuffers(count);
 	}
 
+	/* walk over rows */
 	for (count = 1; count <= max_targets; count++) {
+		/* walk over columns */
 		for (i = 0; i < count; i++) {
 			pass = pass &&
 				piglit_probe_pixel_rgb(16 * i + 8,
 						       16 * (count - 1) + 8,
-						       green);
+						       colors[i]);
 		}
 	}
 
@@ -183,9 +216,10 @@ piglit_init(int argc, char **argv)
 {
 	GLint max_attachments;
 
-	printf("The result should be increasing lengths of rows of green\n"
-	       "boxes as the test increases the number of drawbuffers \n"
-	       "targets used.\n");
+	assert(ARRAY_SIZE(colors) == MAX_TARGETS);
+
+	printf("Each row tests a different number of drawing buffers.\n");
+	printf("Each column tests a different color for a different buffer.\n");
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -195,13 +229,18 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_draw_buffers");
 
 	glGetIntegerv(GL_MAX_DRAW_BUFFERS_ARB, &max_targets);
+	printf("GL_MAX_DRAW_BUFFERS_ARB = %d\n", max_targets);
+
 	if (max_targets < 2)
 		piglit_report_result(PIGLIT_SKIP);
+	if (max_targets > MAX_TARGETS) {
+		printf("Warning: clamping GL_MAX_DRAW_BUFFERS to %d\n",
+		       MAX_TARGETS);
+		max_targets = MAX_TARGETS;
+	}
 
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &max_attachments);
+	printf("GL_MAX_COLOR_ATTACHMENTS_EXT = %d\n", max_attachments);
 	if (max_targets > max_attachments)
 		max_targets = max_attachments;
-
-	if (max_targets > 16)
-		max_targets = 16;
 }
