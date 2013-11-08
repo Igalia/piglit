@@ -1818,6 +1818,10 @@ add_concurrent_test(ext_framebuffer_blit, 'fbo-srgb-blit')
 add_plain_test(ext_framebuffer_blit, 'fbo-sys-blit') # must not be concurrent
 add_plain_test(ext_framebuffer_blit, 'fbo-sys-sub-blit') # must not be concurrent
 
+ext_framebuffer_multisample_blit_scaled = Group()
+spec['EXT_framebuffer_multisample_blit_scaled'] = ext_framebuffer_multisample_blit_scaled
+ext_framebuffer_multisample_blit_scaled['negative-blit-scaled'] = concurrent_test('ext_framebuffer_multisample_blit_scaled-negative-blit-scaled')
+
 ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
 ext_framebuffer_multisample['blit-mismatched-samples'] = concurrent_test('ext_framebuffer_multisample-blit-mismatched-samples')
@@ -1826,7 +1830,6 @@ ext_framebuffer_multisample['blit-mismatched-formats'] = concurrent_test('ext_fr
 ext_framebuffer_multisample['dlist'] = concurrent_test('ext_framebuffer_multisample-dlist')
 ext_framebuffer_multisample['enable-flag'] = concurrent_test('ext_framebuffer_multisample-enable-flag')
 ext_framebuffer_multisample['minmax'] = concurrent_test('ext_framebuffer_multisample-minmax')
-ext_framebuffer_multisample['negative-blit-scaled'] = concurrent_test('ext_framebuffer_multisample-negative-blit-scaled')
 ext_framebuffer_multisample['negative-copypixels'] = concurrent_test('ext_framebuffer_multisample-negative-copypixels')
 ext_framebuffer_multisample['negative-copyteximage'] = concurrent_test('ext_framebuffer_multisample-negative-copyteximage')
 ext_framebuffer_multisample['negative-max-samples'] = concurrent_test('ext_framebuffer_multisample-negative-max-samples')
