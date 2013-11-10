@@ -1132,6 +1132,8 @@ parse_name(const char *input)
 							input, bad_char);
 		return NULL;
 	}
+
+	regfree(&regex);
 	return name;
 }
 
