@@ -134,9 +134,9 @@ draw_multi_viewport(void)
 	 * Green color, and Blue is viewportIndex / 10.0
 	 */
 	for (i = 0; i < divX * divY; i++) {
-		GLfloat near = (GLfloat) depthRange[i][0];
-		GLfloat far = (GLfloat) depthRange[i][1];
-		colors[i][0] = (((far - near) * zVal)  + near + far) / 2.0f;
+		GLfloat nearZ = (GLfloat) depthRange[i][0];
+		GLfloat farZ = (GLfloat) depthRange[i][1];
+		colors[i][0] = (((farZ - nearZ) * zVal)  + nearZ + farZ) / 2.0f;
 		colors[i][1] = drFar;
 		colors[i][2] = (GLfloat) (i + 1) / 10.0f;
 	}
