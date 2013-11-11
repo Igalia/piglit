@@ -60,6 +60,9 @@ class IGTTest(ExecTest):
 	else:
 	    results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
 	return out
+    def run(self, env):
+        env.dmesg = True
+        return ExecTest.run(self, env)
 
 def listTests(listname):
     oldDir = os.getcwd()
