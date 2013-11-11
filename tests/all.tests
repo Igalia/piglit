@@ -999,20 +999,22 @@ spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants te
 # maximum number of geometry shader output vertices supported by the
 # hardware.
 for i in [31, 32, 33, 34, 127, 128, 129, 130, 0]:
-    add_concurrent_test(spec['glsl-1.50'],
-                        'glsl-1.50-geometry-end-primitive {0}'.format(i))
+    cmdline = 'end-primitive {0}'.format(i)
+    spec['glsl-1.50']['execution']['geometry'][cmdline] = \
+        concurrent_test('glsl-1.50-geometry-' + cmdline)
 
 for prim_type in ['GL_POINTS', 'GL_LINE_LOOP', 'GL_LINE_STRIP', 'GL_LINES',
                   'GL_TRIANGLES', 'GL_TRIANGLE_STRIP', 'GL_TRIANGLE_FAN',
                   'GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY',
                   'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
-    add_concurrent_test(spec['glsl-1.50'],
-                        'glsl-1.50-geometry-primitive-types {0}'.format(
-                            prim_type))
+    cmdline = 'primitive-types {0}'.format(prim_type)
+    spec['glsl-1.50']['execution']['geometry'][cmdline] = \
+        concurrent_test('glsl-1.50-geometry-' + cmdline)
     for restart_index in ['ffs', 'other']:
-        add_concurrent_test(spec['glsl-1.50'],
-                            'glsl-1.50-geometry-primitive-id-restart {0} {1}'.format(
-                                prim_type, restart_index))
+        cmdline = 'primitive-id-restart {0} {1}'.format(
+            prim_type, restart_index)
+        spec['glsl-1.50']['execution']['geometry'][cmdline] = \
+            concurrent_test('glsl-1.50-geometry-' + cmdline)
 
 for layout_type in ['points', 'lines', 'lines_adjacency', 'triangles',
 			'triangles_adjacency']:
@@ -1022,9 +1024,10 @@ for layout_type in ['points', 'lines', 'lines_adjacency', 'triangles',
 
 for prim_type in ['GL_TRIANGLE_STRIP', 'GL_TRIANGLE_STRIP_ADJACENCY']:
     for restart_index in ['ffs', 'other']:
-        add_concurrent_test(spec['glsl-1.50'],
-                            'glsl-1.50-geometry-tri-strip-ordering-with-prim-restart {0} {1}'.format(
-                                prim_type, restart_index))
+        cmdline = 'tri-strip-ordering-with-prim-restart {0} {1}'.format(
+            prim_type, restart_index)
+        spec['glsl-1.50']['execution']['geometry'][cmdline] = \
+            concurrent_test('glsl-1.50-geometry-' + cmdline)
 
 for input_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
 			'triangles_adjacency', 'line_strip', 'triangle_strip']:
