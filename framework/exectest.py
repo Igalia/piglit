@@ -38,7 +38,7 @@ else:
 
 
 def read_dmesg():
-    proc = subprocess.Popen('dmesg', stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['dmesg', '-l', 'emerg,alert,crit,err,warn,notice'], stdout=subprocess.PIPE)
     return proc.communicate()[0].rstrip('\n')
 
 def get_dmesg_diff(old, new):
