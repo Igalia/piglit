@@ -27,27 +27,30 @@ warn
 dmesg-fail
 fail
 crash
+timeout
 skip
 
 
 The following are regressions:
 
-pass|warn|dmesg-warn|fail|dmesg-fail|crash -> skip
-pass|warn|dmesg-warn|fail|dmesg-fail -> crash|skip
-pass|warn|dmesg-warn|fail -> dmesg-fail|crash|skip
-pass|warn|dmesg-warn -> fail|dmesg-fail|crash|skip
-pass|warn -> dmesg-warn|fail|dmesg-fail|crash|skip
-pass -> warn|dmesg-warn|fail|dmesg-fail|crash|skip
+pass|warn|dmesg-warn|fail|dmesg-fail|crash|timeout -> skip
+pass|warn|dmesg-warn|fail|dmesg-fail|crash -> timeout|skip
+pass|warn|dmesg-warn|fail|dmesg-fail -> crash|timeout|skip
+pass|warn|dmesg-warn|fail -> dmesg-fail|crash|timeout|skip
+pass|warn|dmesg-warn -> fail|dmesg-fail|crash|timeout|skip
+pass|warn -> dmesg-warn|fail|dmesg-fail|crash|timeout|skip
+pass -> warn|dmesg-warn|fail|dmesg-fail|crash|timeout|skip
 
 
 The following are fixes:
 
-skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash
-crash|skip - >pass|warn|dmesg-warn|fail|dmesg-fail
-dmesg-fail|crash|skip -> pass|warn|dmesg-warn|fail
-fail|dmesg-fail|crash|skip -> pass|warn|dmesg-warn
-dmesg-warn|fail|dmesg-fail|crash|skip -> pass|warn
-warn|dmesg-warn|fail|dmesg-fail|crash|skip -> pass
+skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash|timeout
+timeout|skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash
+crash|timeout|skip - >pass|warn|dmesg-warn|fail|dmesg-fail
+dmesg-fail|crash|timeout|skip -> pass|warn|dmesg-warn|fail
+fail|dmesg-fail|crash|timeout|skip -> pass|warn|dmesg-warn
+dmesg-warn|fail|dmesg-fail|crash|timeout|skip -> pass|warn
+warn|dmesg-warn|fail|dmesg-fail|crash|timeout|skip -> pass
 
 
 NotRun -> * and * -> NotRun is a change, but not a fix or a regression. This is
@@ -71,6 +74,7 @@ def status_lookup(status):
                    'crash': Crash,
                    'dmesg-warn': DmesgWarn,
                    'dmesg-fail': DmesgFail,
+                   'timeout' : Timeout,
                    'notrun': NotRun}
 
     try:
@@ -205,9 +209,17 @@ class Crash(Status):
         pass
 
 
+class Timeout(Status):
+    name = 'timeout'
+    value = 50
+
+    def __init__(self):
+        pass
+
+
 class Skip(Status):
     name = 'skip'
-    value = 50
+    value = 60
     fraction = (0, 0)
 
     def __init__(self):

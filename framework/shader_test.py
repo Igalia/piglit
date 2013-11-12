@@ -145,6 +145,7 @@ class ShaderTest(PlainExecTest):
         self.__gl_api = None
 
         self.env = {}
+        self.timeout = None
 
     def __report_failure(self, message):
         if self.__run_standalone:
