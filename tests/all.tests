@@ -1537,6 +1537,7 @@ add_concurrent_test(arb_texture_rectangle, '1-1-linear-texture')
 add_plain_test(arb_texture_rectangle, 'texrect-many')
 add_concurrent_test(arb_texture_rectangle, 'getteximage-targets RECT')
 add_plain_test(arb_texture_rectangle, 'texrect_simple_arb_texrect')
+add_plain_test(arb_texture_rectangle, 'arb_texrect-texture-base-level-error')
 add_plain_test(arb_texture_rectangle, 'fbo-blit rect')
 
 arb_texture_storage = Group()

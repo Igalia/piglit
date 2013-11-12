@@ -11,3 +11,4 @@ link_libraries (
 )
 
 piglit_add_executable (texrect_simple_arb_texrect texrect-simple.c)
+piglit_add_executable (arb_texrect-texture-base-level-error texture-base-level-error.c)
