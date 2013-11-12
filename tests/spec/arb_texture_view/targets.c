@@ -94,9 +94,8 @@ test_target_errors(GLenum target)
 	GLuint tex;
 	enum piglit_result pass = true;
 	GLenum legalTargets[4];
-	unsigned int numTargets;
+	unsigned int numTargets, numIllegalTargets;
 	GLenum illegalTargets[] = {
-		/* skip multisample */
 		GL_TEXTURE_1D,
 		GL_TEXTURE_2D,
 		GL_TEXTURE_3D,
@@ -105,7 +104,14 @@ test_target_errors(GLenum target)
 		GL_TEXTURE_1D_ARRAY,
 		GL_TEXTURE_2D_ARRAY,
 		GL_TEXTURE_CUBE_MAP_ARRAY,
+		GL_TEXTURE_2D_MULTISAMPLE,
+		GL_TEXTURE_2D_MULTISAMPLE_ARRAY
 	};
+	
+	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample"))
+		numIllegalTargets = ARRAY_SIZE(illegalTargets);
+	else
+		numIllegalTargets =  ARRAY_SIZE(illegalTargets) -2;
 
 	glGenTextures(1, &tex);   /* orig tex */
 	glBindTexture(target, tex);
@@ -113,34 +119,33 @@ test_target_errors(GLenum target)
 	switch (target) {
 	case GL_TEXTURE_1D:
 		glTexStorage1D(target, levels, GL_RGBA8, width);
-		numTargets = 2;
-		update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+		numTargets = update_valid_arrays(legalTargets, illegalTargets,
+				    numIllegalTargets,
 				    GL_TEXTURE_1D, GL_TEXTURE_1D_ARRAY, 0);
 		break;
 	case GL_TEXTURE_1D_ARRAY:
 		glTexStorage2D(target, levels, GL_RGBA8, width, height);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_1D, GL_TEXTURE_1D_ARRAY, 0);
 		break;
 	case GL_TEXTURE_2D:
 		glTexStorage2D(target, levels, GL_RGBA8, width, height);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, 0);
 		break;
 	case  GL_TEXTURE_RECTANGLE:
 		glTexStorage2D(target, levels, GL_RGBA8, width, height);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_RECTANGLE, 0);
 		break;
 	case GL_TEXTURE_CUBE_MAP:
 		width = height;
 		glTexStorage2D(target, levels, GL_RGBA8, width, height);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_CUBE_MAP, GL_TEXTURE_2D,
 				    GL_TEXTURE_2D_ARRAY,
 				    GL_TEXTURE_CUBE_MAP_ARRAY, 0);
@@ -148,7 +153,7 @@ test_target_errors(GLenum target)
 	case GL_TEXTURE_3D:
 		glTexStorage3D(target, levels, GL_RGBA8, width, height, depth);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_3D, 0);
 		break;
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
@@ -156,10 +161,26 @@ test_target_errors(GLenum target)
 		height = width;
 		glTexStorage3D(target, levels, GL_RGBA8, width, height, depth*6);
 		numTargets = update_valid_arrays(legalTargets, illegalTargets,
-				    ARRAY_SIZE(illegalTargets),
+				    numIllegalTargets,
 				    GL_TEXTURE_CUBE_MAP, GL_TEXTURE_2D,
 				    GL_TEXTURE_2D_ARRAY,
 				    GL_TEXTURE_CUBE_MAP_ARRAY, 0);
+		break;
+	case GL_TEXTURE_2D_MULTISAMPLE:
+		glTexStorage2DMultisample(target, 2, GL_RGBA8, width, height,
+					  GL_TRUE);
+		numTargets = update_valid_arrays(legalTargets, illegalTargets,
+				    numIllegalTargets,
+				    GL_TEXTURE_2D_MULTISAMPLE,
+				    GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
+		break;
+	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+		glTexStorage3DMultisample(target, 4, GL_RGBA8, width, height,
+					  depth, GL_TRUE);
+		numTargets = update_valid_arrays(legalTargets, illegalTargets,
+				    numIllegalTargets,
+				    GL_TEXTURE_2D_MULTISAMPLE,
+				    GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
 		break;
 	default:
 		assert(0);
@@ -178,7 +199,7 @@ test_target_errors(GLenum target)
 					  GL_RG16, tex, levels);
 	/* ensure TextureView  of illegal targets returns an error */
 	pass = pass && check_target_array(GL_INVALID_OPERATION,
-					  ARRAY_SIZE(illegalTargets),
+					  numIllegalTargets,
 					  illegalTargets,
 					  GL_RG16, tex, levels);
 err_out:
@@ -212,6 +233,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_cube_map_array");
 	piglit_require_extension("GL_EXT_texture_array");
 	piglit_require_extension("GL_ARB_texture_rectangle");
+
 	if (piglit_get_gl_version() < 31)
 	    piglit_require_extension("GL_ARB_texture_cube_map");
 
@@ -228,6 +250,12 @@ piglit_init(int argc, char **argv)
 		"2D Array tex target validity");
 	X(test_target_errors(GL_TEXTURE_CUBE_MAP_ARRAY),
 		"Cubemap Array tex target validity");
+	if (piglit_is_extension_supported("GL_ARB_texture_storage_multisample")) {
+		X(test_target_errors(GL_TEXTURE_2D_MULTISAMPLE),
+		  "Multisample 2D tex target validity");
+		X(test_target_errors(GL_TEXTURE_2D_MULTISAMPLE_ARRAY),
+		  "Multisample 2D array tex target validity");
+	}
 #undef X
     pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
     piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
