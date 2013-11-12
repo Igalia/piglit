@@ -88,6 +88,9 @@ const char *fsSource = {
 static GLint colorLoc;
 static GLint vpIndexLoc;
 
+#define DIVX 2
+#define DIVY 4
+
 /**
  * Draws a single quad into multiple viewport each with a different
  * depthRange and fixed Z plane.  Reads back the expected color (which is a
@@ -105,12 +108,11 @@ draw_multi_viewport(void)
 {
 	bool pass = true;
 	int i, j;
-	const int divX=2, divY=4;
-	GLfloat w = (GLfloat) piglit_width / (GLfloat) divX;
-	GLfloat h = (GLfloat) piglit_height / (GLfloat) divY;
-	GLfloat zVal = 0.25;
-	GLfloat drFar = 0.6;
-	GLfloat colors[divX*divY][3];
+	GLfloat w = (GLfloat) piglit_width / (GLfloat) DIVX;
+	GLfloat h = (GLfloat) piglit_height / (GLfloat) DIVY;
+	GLfloat zVal = 0.25f;
+	GLfloat drFar = 0.6f;
+	GLfloat colors[DIVX * DIVY][3];
 	const GLdouble depthRange[][2] = {{0.5, 1.0},
 				    {0.0, 0.8},
 				    {1.0, 0.75},
@@ -120,7 +122,7 @@ draw_multi_viewport(void)
 				    {0.1, 0.9},
 				    {0.2, 0.4}};
 
-	assert(ARRAY_SIZE(depthRange) == divX*divY);
+	assert(ARRAY_SIZE(depthRange) == DIVX*DIVY);
 
 	glViewport(0, 0, piglit_width, piglit_height); /* for glClear() */
 	glClearDepthf(1.0);
@@ -133,7 +135,7 @@ draw_multi_viewport(void)
 	 * Frag shader uses FragCoord.z for the Red, DepthRange[0].far for
 	 * Green color, and Blue is viewportIndex / 10.0
 	 */
-	for (i = 0; i < divX * divY; i++) {
+	for (i = 0; i < DIVX * DIVY; i++) {
 		GLfloat nearZ = (GLfloat) depthRange[i][0];
 		GLfloat farZ = (GLfloat) depthRange[i][1];
 		colors[i][0] = (((farZ - nearZ) * zVal)  + nearZ + farZ) / 2.0f;
@@ -142,13 +144,13 @@ draw_multi_viewport(void)
 	}
 
 	/* draw with varying viewports and depth ranges */
-	for (i = 0; i < divX; i++) {
-		for (j = 0; j < divY; j++) {
+	for (i = 0; i < DIVX; i++) {
+		for (j = 0; j < DIVY; j++) {
 			int p, idx;
 			/* start at index 1 instead of zero, since index 0
 			 *  contains the Frag Shader gl_DepthRange value
 			 */
-			idx = j + 1 + i*divY;
+			idx = j + 1 + i*DIVY;
 			glUniform3fv(colorLoc, 1, &colors[idx-1][0]);
 			glUniform1i(vpIndexLoc, idx);
 			glViewportIndexedf(idx, i * w, j * h, w, h);
