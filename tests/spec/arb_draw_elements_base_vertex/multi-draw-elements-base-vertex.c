@@ -120,6 +120,8 @@ piglit_init(int argc, char **argv)
 	GLuint program;
 	GLuint vertex_index;
 
+	piglit_require_GLSL_version(130);
+
 	if (piglit_get_gl_version() < 32) {
 		piglit_require_extension("GL_ARB_draw_elements_base_vertex");
 	}
