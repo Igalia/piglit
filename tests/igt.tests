@@ -51,6 +51,7 @@ profile = TestProfile()
 class IGTTest(ExecTest):
     def __init__(self, binary, arguments=[]):
         ExecTest.__init__(self, [path.join(igtTestRoot, binary)] + arguments)
+        self.timeout = 60*20 # 20 minutes deadline by default
 
     def interpretResult(self, out, returncode, results, dmesg):
         if returncode == 0:
