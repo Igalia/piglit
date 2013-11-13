@@ -24,6 +24,7 @@ import os.path as path
 import itertools
 import shutil
 import collections
+import tempfile
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
@@ -234,6 +235,8 @@ class Summary:
     uses methods to generate various kinds of output. The reference
     implementation is HTML output through mako, aptly named generateHTML().
     """
+    TEMP_DIR = path.join(tempfile.gettempdir(), "piglit/html-summary")
+    TEMPLATE_DIR = path.join(os.environ['PIGLIT_SOURCE_DIR'], 'templates')
 
     def __init__(self, resultfiles):
         """
@@ -346,18 +349,20 @@ class Summary:
         """
 
         # Copy static files
-        shutil.copy("templates/index.css", path.join(destination, "index.css"))
-        shutil.copy("templates/result.css", path.join(destination, "result.css"))
+        shutil.copy(path.join(self.TEMPLATE_DIR, "index.css"),
+                    path.join(destination, "index.css"))
+        shutil.copy(path.join(self.TEMPLATE_DIR, "result.css"),
+                    path.join(destination, "result.css"))
 
         # Create the mako object for creating the test/index.html file
-        testindex = Template(filename="templates/testrun_info.mako",
+        testindex = Template(filename=path.join(self.TEMPLATE_DIR, "testrun_info.mako"),
                              output_encoding="utf-8",
-                             module_directory=".makotmp")
+                             module_directory=self.TEMP_DIR)
 
         # Create the mako object for the individual result files
-        testfile = Template(filename="templates/test_result.mako",
+        testfile = Template(filename=path.join(self.TEMPLATE_DIR, "test_result.mako"),
                             output_encoding="utf-8",
-                            module_directory=".makotmp")
+                            module_directory=self.TEMP_DIR)
 
         result_css = path.join(destination, "result.css")
         index = path.join(destination, "index.html")
@@ -404,13 +409,13 @@ class Summary:
                             index=path.relpath(index, temp_path)))
 
         # Finally build the root html files: index, regressions, etc
-        index = Template(filename="templates/index.mako",
+        index = Template(filename=path.join(self.TEMPLATE_DIR, "index.mako"),
                          output_encoding="utf-8",
-                         module_directory=".makotmp")
+                         module_directory=self.TEMP_DIR)
 
-        empty_status = Template(filename="templates/empty_status.mako",
+        empty_status = Template(filename=path.join(self.TEMPLATE_DIR, "empty_status.mako"),
                                 output_encoding="utf-8",
-                                module_directory=".makotmp")
+                                module_directory=self.TEMP_DIR)
 
         pages = ('changes', 'problems', 'skipped', 'fixes', 'regressions')
 
