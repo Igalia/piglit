@@ -31,6 +31,20 @@
 static void
 enter_event_loop(struct piglit_winsys_framework *winsys_fw)
 {
+	const struct piglit_gl_test_config *test_config = winsys_fw->wfl_fw.gl_fw.test_config;
+
+	enum piglit_result result = PIGLIT_PASS;
+
+	if (test_config->display)
+		result = test_config->display();
+
+	if (piglit_automatic)
+		piglit_report_result(result);
+
+	/* gbm has no input, so we exit immediately, as if the user
+	 * had pressed escape.
+	 */
+	exit(0);
 }
 
 static void
