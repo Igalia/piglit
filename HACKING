@@ -159,6 +159,12 @@ a good place for general discussion about piglit development, such as
 future plans for the project, and coordinating work between
 developers.
 
+Note that Piglit patches use the terms "Reviewed-by", "Tested-by", and
+"Acked-by" in the same way as they are used for Linux kernel patches
+(see https://www.kernel.org/doc/Documentation/SubmittingPatches).  You
+are also welcome to add a "Signed-off-by" line to your patch, but it
+is not required.
+
 For developers who are new to piglit: when submitting a patch, it is
 helpful to add a note (after the "---" line in the patch file)
 indicating that you are new to the project and don't have commit
