@@ -146,3 +146,33 @@ RELEASE and create an appropriate tag in the git repository.
 This tag is the official way of marking a release, so the tarballs provided
 automatically by the cgit frontend are official release tarballs.
 
+
+\ Contributing Patches
+ ---------------------
+
+If you want to contribute patches, please subscribe to the piglit
+mailing list (http://lists.freedesktop.org/mailman/listinfo/piglit)
+and then send them to piglit@lists.freedesktop.org using "git
+send-email".  One of the core piglit developers should respond with
+comments and suggested improvements.  The piglit mailing list is also
+a good place for general discussion about piglit development, such as
+future plans for the project, and coordinating work between
+developers.
+
+For developers who are new to piglit: when submitting a patch, it is
+helpful to add a note (after the "---" line in the patch file)
+indicating that you are new to the project and don't have commit
+access; that way once your patch has been revised to meet our
+standards of correctness and coding style, we will know that we should
+commit it for you.  If we forget, please remind us!  Once you have
+successfully contributed a handful of patches, feel free to apply for
+commit access usind the process described here:
+http://www.freedesktop.org/wiki/AccountRequests/
+
+Please be patient--most of us develop graphics drivers (such as Mesa)
+as our primary job, so we have limited time to respond to your patches
+on the piglit mailing list.  If your patch hasn't received a reply in
+a week, send a follow-up email to make sure we haven't missed it.  If
+you have questions that are better discussed in real time, many piglit
+developers can also be found in the #dri-devel channel on Freenode
+IRC.
