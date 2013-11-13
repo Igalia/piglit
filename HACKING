@@ -73,6 +73,9 @@ Basic formatting:
 * Function return type and name go on successive lines
 * Opening function brace goes on line by itself
 * Opening statement braces go on same line as the 'for' or 'else'
+* Use /* C style comments */, not // C++ style
+* Don't write 'if (condition) statement;' on one line - put the statement on
+  a separate line.  Braces around a single statement are optional.
 
 The following indent command will generally format your code for piglit's
 style:
@@ -94,6 +97,9 @@ Code conventions:
 * Preprocessor macros should be UPPER_CASE
 * Enumeration tokens should be UPPER_CASE
 * Most other identifiers are lower_case_with_underscores
+* Library, executable, and source file names are '<base>_<api>.'
+  e.g. libpiglitutil_gles2
+* Test names are '<lowercasegroupname>-<testname>.'  e.g. glsl-novertexdata
 * Use int, float, bool except when GL types (GLint, GLfloat) are really needed
 * Don't put declarations after code.  For example:
       if (x < 3)
@@ -102,10 +108,26 @@ Code conventions:
   This will not compile with MSVC.  The 'int y' declaration must be at the
   top of the brace-block.
 * Don't use named/designated initializers.  They don't compile with MSVC.
+
+
+Test conventions:
+
+* The goal is to find bugs and demonstrate them as simply as possible, not
+  to measure performance or demonstrate features.
 * Write tests that are easily read, understood and debugged.  Long, complicated
   functions are frowned upon.
 * Don't try to test too much in a single test program.  Most piglit programs
   are less than 300 lines long.
+* If a test doesn't render anything, it doesn't need to set the window size.
+* Avoid changing an existing testing such that it might fail where it
+  previously passed.  Break it into subtests and add a new subtest, or add
+  a new test which supersedes the old one.
+* Things that should be seen are drawn in green (or blue as a second color)
+  while red is for things that shouldn't be seen.
+* Calculate drawing coordinates from piglit_width/piglit_height as needed,
+  instead of hard coding.
+* If a test can safely run at the same time as other tests, add it as a
+  concurrent test in 'all.tests' (or wherever you add it).
 
 
 Utility code:
