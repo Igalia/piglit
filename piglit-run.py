@@ -142,6 +142,7 @@ def main():
     json_writer.write_dict_item('profile', profileFilename)
     json_writer.write_dict_item('filter', args.include_tests)
     json_writer.write_dict_item('exclude_filter', args.exclude_tests)
+    json_writer.write_dict_item('concurrency', args.concurrency)
     json_writer.close_dict()
 
     json_writer.write_dict_item('name', results.name)
