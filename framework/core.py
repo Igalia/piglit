@@ -58,6 +58,11 @@ __all__ = ['Environment',
            'Test',
            'testBinDir']
 
+class PiglitJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, status.Status):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
 
 class JSONWriter:
     '''
@@ -108,7 +113,7 @@ class JSONWriter:
         self.file = file
         self.__indent_level = 0
         self.__inhibit_next_indent = False
-        self.__encoder = json.JSONEncoder(indent=self.INDENT)
+        self.__encoder = PiglitJSONEncoder(indent=self.INDENT)
 
         # self.__is_collection_empty
         #
