@@ -298,6 +298,7 @@ class TestrunResult:
                                 'lspci',
                                 'time_elapsed']
         self.name = None
+        self.options = None
         self.glxinfo = None
         self.lspci = None
         self.time_elapsed = None
