@@ -366,6 +366,7 @@ install (
 		piglit-merge-results.py
 		piglit-print-commands.py
 		piglit-run.py
+		piglit-resume.py
 		piglit-summary.py
 		piglit-summary-html.py
 		piglit-summary-junit.py

@@ -36,17 +36,10 @@ from framework.threads import synchronized_self
 
 def main():
     parser = argparse.ArgumentParser(sys.argv)
-    # Either require that a name for the test is passed or that
-    # resume is requested
-    excGroup1 = parser.add_mutually_exclusive_group()
-    excGroup1.add_argument("-n", "--name",
-                           metavar="<test name>",
-                           default=None,
-                           help="Name of this test run")
-    excGroup1.add_argument("-r", "--resume",
-                           action="store_true",
-                           help="Resume an interupted test run")
-    # Setting the --dry-run flag is equivalent to env.execute=false
+    parser.add_argument("-n", "--name",
+                        metavar="<test name>",
+                        default=None,
+                        help="Name of this test run")
     parser.add_argument("-d", "--dry-run",
                         action="store_false",
                         dest="execute",
@@ -90,21 +83,6 @@ def main():
     if args.platform:
         os.environ['PIGLIT_PLATFORM'] = args.platform
 
-    # If resume is requested attempt to load the results file
-    # in the specified path
-    if args.resume is True:
-        # Load settings from the old results JSON
-        old_results = core.load_results(args.results_path)
-        args.test_profile = old_results.options['profile']
-
-        # Changing the args to the old args allows us to set them
-        # all in one places down the way
-        args.exclude_tests = old_results.options['exclude_filter']
-        args.include_tests = old_results.options['filter']
-        args.concurrency = old_results.options['concurrency']
-
-    # Otherwise parse additional settings from the command line
-
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
                            exclude_filter=args.exclude_tests,
@@ -116,7 +94,6 @@ def main():
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
-
     core.checkDir(args.results_path, False)
 
     results = core.TestrunResult()
@@ -149,16 +126,6 @@ def main():
 
     json_writer.write_dict_key('tests')
     json_writer.open_dict()
-    # If resuming an interrupted test run, re-write all of the existing
-    # results since we clobbered the results file.  Also, exclude them
-    # from being run again.
-    if args.resume is True:
-        for (key, value) in old_results.tests.items():
-            if os.path.sep != '/':
-                key = key.replace(os.path.sep, '/', -1)
-            json_writer.write_dict_item(key, value)
-            env.exclude_tests.add(key)
-
     time_start = time.time()
     profile.run(env, json_writer)
     time_end = time.time()
