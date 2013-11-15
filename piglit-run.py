@@ -103,6 +103,7 @@ def main():
         # all in one places down the way
         args.exclude_tests = old_results.options['exclude_filter']
         args.include_tests = old_results.options['filter']
+        args.concurrency = old_results.options['concurrency']
 
     # Otherwise parse additional settings from the command line
     else:
