@@ -62,6 +62,8 @@ class PiglitJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, status.Status):
             return str(o)
+        elif isinstance(o, set):
+            return list(o)
         return json.JSONEncoder.default(self, o)
 
 class JSONWriter:
@@ -413,6 +415,9 @@ class Environment:
             self.filter.append(re.compile(each))
         for each in exclude_filter:
             self.exclude_filter.append(re.compile(each))
+
+    def __iter__(self):
+        return self.__dict__.iteritems()
 
     def run(self, command):
         try:

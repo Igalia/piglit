@@ -137,9 +137,8 @@ def main():
     json_writer.write_dict_key('options')
     json_writer.open_dict()
     json_writer.write_dict_item('profile', args.test_profile)
-    json_writer.write_dict_item('filter', args.include_tests)
-    json_writer.write_dict_item('exclude_filter', args.exclude_tests)
-    json_writer.write_dict_item('concurrency', args.concurrency)
+    for key, value in env:
+        json_writer.write_dict_item(key, value)
     json_writer.close_dict()
 
     json_writer.write_dict_item('name', results.name)
