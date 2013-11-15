@@ -233,8 +233,8 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	y = 8;
 	w = 4;
 	h = 4;
-	glPixelStorei(GL_UNPACK_SKIP_PIXELS, x);
-	glPixelStorei(GL_UNPACK_SKIP_ROWS, y);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 	glCompressedTexSubImage2D(GL_TEXTURE_2D, 0,
 				  x, y, w, h,
 				  format,
