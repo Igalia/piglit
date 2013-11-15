@@ -30,6 +30,12 @@
         <td>${options}</td>
       </tr>
       <tr>
+        <td>uname -a</td>
+        <td>
+          <pre>${uname}</pre>
+        </td>
+      </tr>
+      <tr>
         <td>lspci</td>
         <td>
           <pre>${lspci}</pre>

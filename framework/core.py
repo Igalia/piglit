@@ -244,11 +244,13 @@ class TestrunResult:
         self.serialized_keys = ['options',
                                 'name',
                                 'tests',
+                                'uname',
                                 'wglinfo',
                                 'glxinfo',
                                 'lspci',
                                 'time_elapsed']
         self.name = None
+        self.uname = None
         self.options = None
         self.glxinfo = None
         self.lspci = None
@@ -396,6 +398,7 @@ class Environment:
         else:
             result['glxinfo'] = self.run('glxinfo')
         if system == 'Linux':
+            result['uname'] = self.run(['uname', '-a'])
             result['lspci'] = self.run('lspci')
         return result
 
