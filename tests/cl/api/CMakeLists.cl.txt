@@ -15,6 +15,7 @@ piglit_cl_add_api_test (retain_release-command-queue retain_release-command-queu
 
 # Memory objects
 piglit_cl_add_api_test (create-buffer create-buffer.c)
+piglit_cl_add_api_test (enqueue-copy-buffer enqueue-copy-buffer.c)
 piglit_cl_add_api_test (enqueue-read_write-buffer enqueue-read_write-buffer.c)
 piglit_cl_add_api_test (retain_release-mem-object retain_release-mem-object.c)
 piglit_cl_add_api_test (get-mem-object-info get-mem-object-info.c)
