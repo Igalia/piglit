@@ -77,27 +77,25 @@ def main():
                         action="store_true",
                         help="Capture a difference in dmesg before and "
                              "after each test")
-    parser.add_argument("testProfile",
+    parser.add_argument("test_profile",
                         metavar="<Path to test profile>",
                         help="Path to testfile to run")
-    parser.add_argument("resultsPath",
+    parser.add_argument("results_path",
+                        type=path.realpath,
                         metavar="<Results Path>",
                         help="Path to results folder")
     args = parser.parse_args()
 
     # Set the platform to pass to waffle
-    if args.platform is not None:
+    if args.platform:
         os.environ['PIGLIT_PLATFORM'] = args.platform
-
-    # Always Convert Results Path from Relative path to Actual Path.
-    resultsDir = path.realpath(args.resultsPath)
 
     # If resume is requested attempt to load the results file
     # in the specified path
     if args.resume is True:
         # Load settings from the old results JSON
-        old_results = core.load_results(resultsDir)
-        profileFilename = old_results.options['profile']
+        old_results = core.load_results(args.results_path)
+        args.test_profile = old_results.options['profile']
 
         # Changing the args to the old args allows us to set them
         # all in one places down the way
@@ -106,8 +104,6 @@ def main():
         args.concurrency = old_results.options['concurrency']
 
     # Otherwise parse additional settings from the command line
-    else:
-        profileFilename = args.testProfile
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
@@ -121,7 +117,7 @@ def main():
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    core.checkDir(resultsDir, False)
+    core.checkDir(args.results_path, False)
 
     results = core.TestrunResult()
 
@@ -129,10 +125,10 @@ def main():
     if args.name is not None:
         results.name = args.name
     else:
-        results.name = path.basename(resultsDir)
+        results.name = path.basename(args.results_path)
 
     # Begin json.
-    result_filepath = os.path.join(resultsDir, 'main')
+    result_filepath = path.join(args.results_path, 'main')
     result_file = open(result_filepath, 'w')
     json_writer = core.JSONWriter(result_file)
     json_writer.open_dict()
@@ -140,7 +136,7 @@ def main():
     # Write out command line options for use in resuming.
     json_writer.write_dict_key('options')
     json_writer.open_dict()
-    json_writer.write_dict_item('profile', profileFilename)
+    json_writer.write_dict_item('profile', args.test_profile)
     json_writer.write_dict_item('filter', args.include_tests)
     json_writer.write_dict_item('exclude_filter', args.exclude_tests)
     json_writer.write_dict_item('concurrency', args.concurrency)
@@ -150,7 +146,7 @@ def main():
     for (key, value) in env.collectData().items():
         json_writer.write_dict_item(key, value)
 
-    profile = core.loadTestProfile(profileFilename)
+    profile = core.loadTestProfile(args.test_profile)
 
     json_writer.write_dict_key('tests')
     json_writer.open_dict()
