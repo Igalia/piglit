@@ -31,6 +31,7 @@ piglit_add_executable (ext_transform_feedback-intervening-read intervening-read.
 piglit_add_executable (ext_transform_feedback-max-varyings max-varyings.c)
 piglit_add_executable (ext_transform_feedback-negative-prims negative-prims.c)
 piglit_add_executable (ext_transform_feedback-nonflat-integral nonflat-integral.c)
+piglit_add_executable (ext_transform_feedback-pipeline-basic-primgen pipeline-basic-primgen.c)
 piglit_add_executable (ext_transform_feedback-primgen primgen.c)
 piglit_add_executable (ext_transform_feedback-separate separate.c)
 piglit_add_executable (ext_transform_feedback-output-type output-type.c)

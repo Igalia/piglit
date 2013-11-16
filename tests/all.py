@@ -3136,6 +3136,7 @@ ext_transform_feedback['position-readback-bufferrange-discard'] = PiglitGLTest('
 
 ext_transform_feedback['negative-prims'] = PiglitGLTest('ext_transform_feedback-negative-prims', run_concurrent=True)
 ext_transform_feedback['primgen-query transform-feedback-disabled'] = PiglitGLTest('ext_transform_feedback-primgen', run_concurrent=True)
+ext_transform_feedback['pipeline-basic-primgen'] = PiglitGLTest('ext_transform_feedback-pipeline-basic-primgen', run_concurrent=True)
 
 ext_transform_feedback['position-render-bufferbase'] = PiglitGLTest('ext_transform_feedback-position render', run_concurrent=True)
 ext_transform_feedback['position-render-bufferbase-discard'] = PiglitGLTest('ext_transform_feedback-position render discard', run_concurrent=True)
