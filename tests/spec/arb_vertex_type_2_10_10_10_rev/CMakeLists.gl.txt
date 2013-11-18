@@ -11,5 +11,6 @@ link_libraries (
 
 piglit_add_executable (draw-vertices-2101010 draw-vertices-2101010.c)
 piglit_add_executable (gl-3.3-vertex-attrib-p-types vertex-attrib-p-types.c)
+piglit_add_executable (gl-3.3-vertex-attrib-pointer-type-size-match vertex-attrib-pointer-type-size-match.c)
 
 # vim: ft=cmake:
