@@ -38,37 +38,7 @@ from helpers import test_iterations, create_testresult, create_test
 
 """ Status ordering from best to worst:
 
-pass
-dmesg-warn
-warn
-dmesg-fail
-fail
-crash
-skip
-
-
-The following are regressions:
-
-pass|warn|dmesg-warn|fail|dmesg-fail|crash -> skip
-pass|warn|dmesg-warn|fail|dmesg-fail -> crash|skip
-pass|warn|dmesg-warn|fail -> dmesg-fail|crash|skip
-pass|warn|dmesg-warn -> fail|dmesg-fail|crash|skip
-pass|warn -> dmesg-warn|fail|dmesg-fail|crash|skip
-pass -> warn|dmesg-warn|fail|dmesg-fail|crash|skip
-
-
-The following are fixes:
-
-skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash
-crash|skip - >pass|warn|dmesg-warn|fail|dmesg-fail
-dmesg-fail|crash|skip -> pass|warn|dmesg-warn|fail
-fail|dmesg-fail|crash|skip -> pass|warn|dmesg-warn
-dmesg-warn|fail|dmesg-fail|crash|skip -> pass|warn
-warn|dmesg-warn|fail|dmesg-fail|crash|skip -> pass
-
-
-NotRun -> * and * -> NotRun is a change, but not a fix or a regression. This is
-because NotRun is not a status, but a representation of an unknown status.
+See ../summary.py.
 
 """
 
@@ -85,47 +55,55 @@ REGRESSIONS = [("pass", "warn"),
                ("pass", "dmesg-warn"),
                ("pass", "fail"),
                ("pass", "dmesg-fail"),
-               ("pass", "skip"),
                ("pass", "crash"),
                ("dmesg-warn", "warn"),
                ("dmesg-warn", "dmesg-fail"),
                ("dmesg-warn", "fail"),
                ("dmesg-warn", "crash"),
-               ("dmesg-warn", "skip"),
                ("warn", "fail"),
                ("warn", "crash"),
-               ("warn", "skip"),
                ("warn", "dmesg-fail"),
                ("dmesg-fail", "crash"),
-               ("dmesg-fail", "skip"),
                ("dmesg-fail", "fail"),
                ("fail", "crash"),
-               ("fail", "skip"),
-               ("crash", "skip")]
+               ("skip", "crash"),
+               ("skip", "fail"),
+               ("skip", "dmesg-fail"),
+               ("skip", "warn"),
+               ("skip", "dmesg-warn"),
+               ("notrun", "crash"),
+               ("notrun", "fail"),
+               ("notrun", "dmesg-fail"),
+               ("notrun", "warn"),
+               ("notrun", "dmesg-warn")]
 
 
 # List of possible fixes
-FIXES = [("skip", "crash"),
-         ("skip", "fail"),
-         ("skip", "dmesg-fail"),
-         ("skip", "warn"),
-         ("skip", "dmesg-warn"),
-         ("skip", "pass"),
-         ("crash", "fail"),
+FIXES = [("crash", "fail"),
          ("crash", "dmesg-fail"),
          ("crash", "warn"),
          ("crash", "dmesg-warn"),
          ("crash", "pass"),
+         ("crash", "skip"),
+         ("crash", "notrun"),
          ("fail", "dmesg-fail"),
          ("fail", "warn"),
          ("fail", "dmesg-warn"),
          ("fail", "pass"),
+         ("fail", "skip"),
+         ("fail", "notrun"),
          ("dmesg-fail", "warn"),
          ("dmesg-fail", "dmesg-warn"),
          ("dmesg-fail", "pass"),
+         ("dmesg-fail", "skip"),
+         ("dmesg-fail", "notrun"),
          ("warn", "dmesg-warn"),
          ("warn", "pass"),
+         ("warn", "skip"),
+         ("warn", "notrun"),
          ("dmesg-warn", "pass")]
+         ("dmesg-warn", "skip")]
+         ("dmesg-warn", "notrun")]
 
 
 # List of statuses that should be problems.

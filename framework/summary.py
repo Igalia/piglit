@@ -306,7 +306,7 @@ class Summary:
 
             # Problems include: warn, dmesg-warn, fail, dmesg-fail, and crash.
             # Skip does not go on this page, it has the 'skipped' page
-            if so.Skip() > max(status) > so.Pass():
+            if max(status) > so.Pass():
                 self.tests['problems'].add(test)
 
             # Find all tests with a status of skip
@@ -317,9 +317,9 @@ class Summary:
             for i in xrange(len(status) - 1):
                 first = status[i]
                 last = status[i + 1]
-                if first < last and so.NotRun() not in (first, last):
+                if max(first, so.Pass()) < last:
                     self.tests['regressions'].add(test)
-                if first > last and so.NotRun() not in (first, last):
+                if first > max(last, so.Pass()):
                     self.tests['fixes'].add(test)
                 # Changes cannot be added in the fixes and regressions passes
                 # becasue NotRun is a change, but not a regression or fix

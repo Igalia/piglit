@@ -21,6 +21,8 @@
 
 """ Status ordering from best to worst:
 
+NotRun
+skip
 pass
 dmesg-warn
 warn
@@ -28,33 +30,21 @@ dmesg-fail
 fail
 crash
 timeout
-skip
 
+(NotRun, pass, skip) are considered equivalent for regression testing.
 
-The following are regressions:
+The motivation is if you accidentally expose a feature that doesn't work,
+you'll get skip->fail, which is a regression. If you disable the feature,
+you'll get fail->skip, which is a fix.
 
-pass|warn|dmesg-warn|fail|dmesg-fail|crash|timeout -> skip
-pass|warn|dmesg-warn|fail|dmesg-fail|crash -> timeout|skip
-pass|warn|dmesg-warn|fail|dmesg-fail -> crash|timeout|skip
-pass|warn|dmesg-warn|fail -> dmesg-fail|crash|timeout|skip
-pass|warn|dmesg-warn -> fail|dmesg-fail|crash|timeout|skip
-pass|warn -> dmesg-warn|fail|dmesg-fail|crash|timeout|skip
-pass -> warn|dmesg-warn|fail|dmesg-fail|crash|timeout|skip
+NotRun->fail should also be considered a regression for you not to miss
+new failing tests.
 
+The formula for determining regressions is:
+  max(old_status, pass) < new_status
 
-The following are fixes:
-
-skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash|timeout
-timeout|skip -> pass|warn|dmesg-warn|fail|dmesg-fail|crash
-crash|timeout|skip - >pass|warn|dmesg-warn|fail|dmesg-fail
-dmesg-fail|crash|timeout|skip -> pass|warn|dmesg-warn|fail
-fail|dmesg-fail|crash|timeout|skip -> pass|warn|dmesg-warn
-dmesg-warn|fail|dmesg-fail|crash|timeout|skip -> pass|warn
-warn|dmesg-warn|fail|dmesg-fail|crash|timeout|skip -> pass
-
-
-NotRun -> * and * -> NotRun is a change, but not a fix or a regression. This is
-because NotRun is not a status, but a representation of an unknown status.
+The formula for determining fixes is:
+  old_status > max(new_status, pass)
 
 """
 
@@ -159,6 +149,13 @@ class NotRun(Status):
     def __init__(self):
         pass
 
+class Skip(Status):
+    name = 'skip'
+    value = 5
+    fraction = (0, 0)
+
+    def __init__(self):
+        pass
 
 class Pass(Status):
     name = 'pass'
@@ -217,10 +214,3 @@ class Timeout(Status):
         pass
 
 
-class Skip(Status):
-    name = 'skip'
-    value = 60
-    fraction = (0, 0)
-
-    def __init__(self):
-        pass
