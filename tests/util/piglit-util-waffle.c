@@ -82,7 +82,8 @@ wfl_fatal_error(const char *func_name)
 
 	wfl_log_error(func_name);
 
-	if (info->code == WAFFLE_ERROR_UNSUPPORTED_ON_PLATFORM)
+	if (info->code == WAFFLE_ERROR_UNSUPPORTED_ON_PLATFORM ||
+	    info->code == WAFFLE_ERROR_BUILT_WITHOUT_SUPPORT)
 		piglit_report_result(PIGLIT_SKIP);
 	else
 		piglit_report_result(PIGLIT_FAIL);
