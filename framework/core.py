@@ -443,8 +443,6 @@ class Environment:
 
 
 class Test:
-    ignoreErrors = []
-
     def __init__(self, runConcurrent=False):
         '''
                 'runConcurrent' controls whether this test will
@@ -502,31 +500,6 @@ class Test:
                 json_writer.write_dict_item(path, result)
         else:
             status("dry-run")
-
-    # Returns True iff the given error message should be ignored
-    def isIgnored(self, error):
-        for pattern in Test.ignoreErrors:
-            if pattern.search(error):
-                return True
-
-        return False
-
-    # Default handling for stderr messages
-    def handleErr(self, results, err):
-        errors = filter(lambda s: len(s) > 0,
-                        map(lambda s: s.strip(), err.split('\n')))
-
-        ignored = [s for s in errors if self.isIgnored(s)]
-        errors = [s for s in errors if s not in ignored]
-
-        if len(errors) > 0:
-            results['errors'] = errors
-
-            if results['result'] == 'pass':
-                results['result'] = 'warn'
-
-        if len(ignored) > 0:
-            results['errors_ignored'] = ignored
 
 
 class Group(dict):
@@ -647,51 +620,6 @@ def load_results(filename):
 
     assert(testrun.name is not None)
     return testrun
-
-
-# Error messages to be ignored
-Test.ignoreErrors = map(re.compile,
-                        ["couldn't open libtxc_dxtn.so",
-                         "compression/decompression available",
-                         "Mesa: .*build",
-                         "Mesa: CPU.*",
-                         "Mesa: .*cpu detected.",
-                         "Mesa: Test.*",
-                         "Mesa: Yes.*",
-                         "libGL: XF86DRIGetClientDriverName.*",
-                         "libGL: OpenDriver: trying.*",
-                         "libGL: Warning in.*drirc*",
-                         "ATTENTION.*value of option.*",
-                         "drmOpen.*",
-                         "Mesa: Not testing OS support.*",
-                         "Mesa: User error:.*",
-                         "Mesa: Initializing .* optimizations",
-                         "debug_get_.*",
-                         "util_cpu_caps.*",
-                         "Mesa: 3Dnow! detected",
-                         "r300:.*",
-                         "radeon:.*",
-                         "Warning:.*",
-                         "0 errors, .*",
-                         "Mesa.*",
-                         "no rrb",
-                         "; ModuleID.*",
-                         "%.*",
-                         ".*failed to translate tgsi opcode.*to SSE",
-                         ".*falling back to interpreter",
-                         "GLSL version is .*, but requested version .* is "
-                         "required",
-                         "kCGErrorIllegalArgument: CGSOrderWindowList",
-                         "kCGErrorFailure: Set a breakpoint @ "
-                         "CGErrorBreakpoint\(\) to catch errors as they are "
-                         "logged.",
-                         "stw_(init|cleanup).*",
-                         "OpenGLInfo..*",
-                         "AdapterInfo..*",
-                         "frameThrottleRate.*",
-                         ".*DeviceName.*",
-                         "No memory leaks detected.",
-                         "libGL: Can't open configuration file.*"])
 
 
 def parse_listfile(filename):

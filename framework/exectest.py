@@ -203,8 +203,6 @@ class ExecTest(Test):
             results['dmesg'] = dmesg_diff
             results['timeout'] = timeout
 
-            self.handleErr(results, err)
-
         else:
             results = TestResult()
             if 'result' not in results:
