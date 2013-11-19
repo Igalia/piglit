@@ -102,9 +102,9 @@ test_genmipmap_errors(void)
 
 		/* Packed depth / stencil formats */
 		{ GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8,
-		{NULL, NULL} },
+		{"GL_EXT_packed_depth_stencil", NULL} },
 		{ GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
-		{"GL_ARB_texture_float", NULL} }
+		{"GL_ARB_depth_buffer_float", NULL} }
 	};
 	int i, j;
 	bool pass = true;
