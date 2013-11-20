@@ -1560,10 +1560,15 @@ PixelFormatsTest::setup(void)
 void
 PixelFormatsTest::runOne(MultiTestResult &r, Window &w)
 {
-	int testNum = 0;
+	int testNum = 0, testStride;
 	(void) w;  // silence warning
 
 	setup();
+
+	if (env->options.quick)
+		testStride = 13;  // a prime number
+	else
+		testStride = 1;
 
 	const unsigned numEnvModes = haveCombine ? 2 : 1;
 
@@ -1613,9 +1618,17 @@ PixelFormatsTest::runOne(MultiTestResult &r, Window &w)
 						env->log << "  IntFormat: " << InternalFormats[intFormat].Name << "\n";
 
 #endif
-						bool ok = TestCombination(Formats[formatIndex].Token,
-																			Types[typeIndex].Token,
-																			InternalFormats[intFormat].Token);
+						bool ok;
+
+						if (testNum % testStride == 0) {
+							ok = TestCombination(Formats[formatIndex].Token,
+												 Types[typeIndex].Token,
+												 InternalFormats[intFormat].Token);
+						}
+						else {
+							// skip
+							ok = true;
+						}
 
 						if (!ok) {
 							// error was reported to log, add format info here:
