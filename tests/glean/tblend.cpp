@@ -800,7 +800,7 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 
 	// If quick mode, run fewer tests
 	if (env->options.quick) {
-		testStride = 11;  // a prime number
+		testStride = 53;  // a prime number
 		assert(ELEMENTS(srcFactors) % testStride);
 		assert(ELEMENTS(dstFactors) % testStride);
 		assert(ELEMENTS(operators) % testStride);
