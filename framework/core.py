@@ -417,7 +417,14 @@ class Environment:
             self.exclude_filter.append(re.compile(each))
 
     def __iter__(self):
-        return self.__dict__.iteritems()
+        for key, values in self.__dict__.iteritems():
+            # If the values are regex compiled then yield their pattern
+            # attribute, which is the original plaintext they were compiled
+            # from, otherwise yield them normally.
+            if key in ['filter', 'exclude_filter']:
+                yield (key, [x.pattern for x in values])
+            else:
+                yield (key, values)
 
     def run(self, command):
         try:
