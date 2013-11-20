@@ -1639,6 +1639,11 @@ setup_ubos(void)
 		return;
 	}
 
+	if (prog == 0) {
+		/* probably running an ARB_vertex/fragment_program test */
+		return;
+	}
+
 	glGetProgramiv(prog, GL_ACTIVE_UNIFORM_BLOCKS, &num_uniform_blocks);
 	if (num_uniform_blocks == 0)
 		return;
