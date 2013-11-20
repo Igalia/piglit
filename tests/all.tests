@@ -348,7 +348,7 @@ add_plain_test(shaders, 'useprogram-refcount-1')
 add_plain_test(shaders, 'useshaderprogram-bad-type')
 add_plain_test(shaders, 'useshaderprogram-bad-program')
 add_plain_test(shaders, 'useshaderprogram-flushverts-1')
-for subtest in ('interstage', 'intrastage'):
+for subtest in ('interstage', 'intrastage', 'vs-gs'):
     cmdline = 'version-mixing {0}'.format(subtest)
     shaders[cmdline] = concurrent_test(cmdline)
 

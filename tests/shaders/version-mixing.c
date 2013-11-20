@@ -39,19 +39,39 @@
  * reasonable to expect all implementations to follow the new relaxed
  * rules.
  *
- * This test can be run in two ways: "interstage" and "intrastage".
- * "interstage" checks that a vertex shader of one version can be
- * linked with a fragment shader of another version.  "intrastage"
- * checks that two vertex shaders of different versions can be linked
- * together.
+ * This test can be run in the following ways:
+ *
+ * - "interstage" checks that a vertex shader of one version can be
+ * linked with a fragment shader of another version.
+ *
+ * - "intrastage" checks that two vertex shaders of different versions
+ * can be linked together.
+ *
+ * - "vs-gs" checks that a vertex shader of one version can be linked
+ * with a geometry shader of another version.
  */
 
 #include "piglit-util-gl-common.h"
 
+static enum test_type {
+	test_type_interstage,
+	test_type_intrastage,
+	test_type_vs_gs,
+} test_type;
+
+static void parse_params();
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-	config.supports_gl_core_version = 31;
+	piglit_gl_process_args(&argc, argv, &config);
+	parse_params(argc, argv);
+	if (test_type == test_type_vs_gs) {
+		config.supports_gl_compat_version = 32;
+		config.supports_gl_core_version = 32;
+	} else {
+		config.supports_gl_compat_version = 10;
+		config.supports_gl_core_version = 31;
+	}
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -61,6 +81,19 @@ static const char *interstage_vs =
 	"void main()\n"
 	"{\n"
 	"  gl_Position = vec4(0.0);\n"
+	"}\n";
+
+static const char *interstage_gs =
+	"#version %d\n"
+	"\n"
+	"layout(triangles) in;\n"
+	"layout(triangle_strip, max_vertices = 3) out;\n"
+	"void main()\n"
+	"{\n"
+	"  for (int i = 0; i < 3; i++) {\n"
+	"    gl_Position = gl_in[i].gl_Position;\n"
+	"    EmitVertex();\n"
+	"  }\n"
 	"}\n";
 
 static const char *interstage_fs =
@@ -99,7 +132,8 @@ print_usage_and_exit(const char *prog_name)
 	printf("Usage: %s <subtest>\n"
 	       "  where <subtest> is one of:\n"
 	       "    interstage: test interstage linking (vs-to-fs)\n"
-	       "    intrastage: test intrastage linking (vs-to-vs)\n",
+	       "    intrastage: test intrastage linking (vs-to-vs)\n"
+	       "    vs-gs: test interstage linking (vs-to-gs)\n",
 	       prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
@@ -156,7 +190,7 @@ try_attach_shader(GLuint prog, const char *shader_desc, GLenum target,
  * succeeded.
  */
 static bool
-test_interstage(int version_vs, int version_fs)
+test_interstage(int version_vs, int version_other, bool use_gs)
 {
 	GLuint prog = glCreateProgram();
 	GLint ok;
@@ -166,10 +200,25 @@ test_interstage(int version_vs, int version_fs)
 		glDeleteProgram(prog);
 		return false;
 	}
-	if (!try_attach_shader(prog, "fragment shader", GL_FRAGMENT_SHADER,
-			       interstage_fs, version_fs)) {
-		glDeleteProgram(prog);
-		return false;
+	if (use_gs) {
+		if (version_other < 150) {
+			printf("Not tested (GS requires GLSL 1.50).\n");
+			glDeleteProgram(prog);
+			return true;
+		}
+		if (!try_attach_shader(prog, "geometry shader",
+				       GL_GEOMETRY_SHADER, interstage_gs,
+				       version_other)) {
+			glDeleteProgram(prog);
+			return false;
+		}
+	} else {
+		if (!try_attach_shader(prog, "fragment shader",
+				       GL_FRAGMENT_SHADER, interstage_fs,
+				       version_other)) {
+			glDeleteProgram(prog);
+			return false;
+		}
 	}
 	glLinkProgram(prog);
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
@@ -213,22 +262,27 @@ test_intrastage(int version_vs1, int version_vs2)
 
 
 void
+parse_params(int argc, char **argv)
+{
+	if (argc != 2)
+		print_usage_and_exit(argv[0]);
+	if (strcmp(argv[1], "interstage") == 0)
+		test_type = test_type_interstage;
+	else if (strcmp(argv[1], "intrastage") == 0)
+		test_type = test_type_intrastage;
+	else if (strcmp(argv[1], "vs-gs") == 0)
+		test_type = test_type_vs_gs;
+	else
+		print_usage_and_exit(argv[0]);
+}
+
+
+void
 piglit_init(int argc, char **argv)
 {
 	int i, j;
 	bool pass = true;
-	bool interstage;
 	int max_glsl_version;
-
-	/* Parse params */
-	if (argc != 2)
-		print_usage_and_exit(argv[0]);
-	if (strcmp(argv[1], "interstage") == 0)
-		interstage = true;
-	else if (strcmp(argv[1], "intrastage") == 0)
-		interstage = false;
-	else
-		print_usage_and_exit(argv[0]);
 
 	piglit_require_GLSL();
 	max_glsl_version = get_max_glsl_version();
@@ -241,14 +295,29 @@ piglit_init(int argc, char **argv)
 				continue;
 			printf("Testing versions %d and %d: ",
 			       all_glsl_versions[i], all_glsl_versions[j]);
-			if (interstage)
+			switch (test_type) {
+			case test_type_interstage:
 				pass = test_interstage(all_glsl_versions[i],
-						       all_glsl_versions[j])
+						       all_glsl_versions[j],
+						       false /* use_gs */)
 					&& pass;
-			else
+				break;
+			case test_type_vs_gs:
+				pass = test_interstage(all_glsl_versions[i],
+						       all_glsl_versions[j],
+						       true /* use_gs */)
+					&& pass;
+				break;
+			case test_type_intrastage:
 				pass = test_intrastage(all_glsl_versions[i],
 						       all_glsl_versions[j])
 					&& pass;
+				break;
+			default:
+				/* Should never occur */
+				piglit_report_result(PIGLIT_FAIL);
+				break;
+			}
 		}
 	}
 
