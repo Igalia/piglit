@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (gl-3.2-layered-rendering-blit blit.c)
 piglit_add_executable (gl-3.2-layered-rendering-clear-color clear-color.c)
+piglit_add_executable (gl-3.2-layered-rendering-clear-color-all-types clear-color-all-types.c)
 piglit_add_executable (gl-3.2-layered-rendering-clear-depth clear-depth.c)
 piglit_add_executable (gl-3.2-layered-rendering-framebuffer-layered-attachments framebuffer-layered-attachments.c)
 piglit_add_executable (gl-3.2-layered-rendering-framebuffer-layer-complete framebuffer-layer-complete.c)
