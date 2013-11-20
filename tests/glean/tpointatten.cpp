@@ -169,10 +169,18 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 	const GLfloat epsilon = (smooth ? 1.5 : 1.0) + 0.0;
 	GLfloat atten[3];
 	int count = 0;
+	unsigned testNo, testStride;
 
 	// Enable front buffer if you want to see the rendering
 	glDrawBuffer(GL_FRONT);
 	glReadBuffer(GL_FRONT);
+
+	if (env->options.quick)
+		testStride = 5;  // a prime number
+	else
+		testStride = 1;
+	testNo = 0;
+	printf("stride %u\n", testStride);
 
 	if (smooth) {
 		glEnable(GL_POINT_SMOOTH);
@@ -197,6 +205,12 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 						PointParameterfARB(GL_POINT_SIZE_MAX_ARB, max);
 						for (float size = 1.0; size < MAX_SIZE; size += 8) {
 							glPointSize(size);
+
+							testNo++;
+							if (testNo % testStride != 0) {
+								// skip this test
+								continue;
+							}
 
 							// draw column of points
 							glClear(GL_COLOR_BUFFER_BIT);
@@ -230,6 +244,8 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 			}
 		}
 	}
+	printf("Tested %u\n", testNo);
+
 	reportSuccess(count, smooth);
 	return true;
 }
