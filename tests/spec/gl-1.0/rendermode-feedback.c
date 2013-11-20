@@ -54,31 +54,31 @@ static float texcoord_array[] = {
 	109.0, 110.0, 111.0, 112.0,
 };
 
-float gl_2d_values[] =
+static const float gl_2d_values[] =
 	{GL_POLYGON_TOKEN, 3,
 	 1.0, 2.0,
 	 3.0, 4.0,
 	 5.0, 6.0};
 
-float gl_3d_values[] =
+static const float gl_3d_values[] =
 	{GL_POLYGON_TOKEN, 3,
 	 1.0, 2.0, 0.3,
 	 3.0, 4.0, 0.2,
 	 5.0, 6.0, 0.1};
 
-float gl_3d_color_values[] =
+static const float gl_3d_color_values[] =
 	{GL_POLYGON_TOKEN, 3,
 	 1.0, 2.0, 0.3, 0.01, 0.02, 0.03, 0.04,
 	 3.0, 4.0, 0.2, 0.05, 0.06, 0.07, 0.08,
 	 5.0, 6.0, 0.1, 0.09, 0.10, 0.11, 0.12};
 
-float gl_3d_color_texture_values[] =
+static const float gl_3d_color_texture_values[] =
 	{GL_POLYGON_TOKEN, 3,
 	 1.0, 2.0, 0.3, 0.01, 0.02, 0.03, 0.04, 101.0, 102.0, 103.0, 104.0,
 	 3.0, 4.0, 0.2, 0.05, 0.06, 0.07, 0.08, 105.0, 106.0, 107.0, 108.0,
 	 5.0, 6.0, 0.1, 0.09, 0.10, 0.11, 0.12, 109.0, 110.0, 111.0, 112.0};
 
-float gl_4d_color_texture_values[] =
+static const float gl_4d_color_texture_values[] =
 	{GL_POLYGON_TOKEN, 3,
 	 1.0, 2.0, 0.3, 1.0, 0.01, 0.02, 0.03, 0.04, 101.0, 102.0, 103.0, 104.0,
 	 3.0, 4.0, 0.2, 1.0, 0.05, 0.06, 0.07, 0.08, 105.0, 106.0, 107.0, 108.0,
@@ -87,7 +87,7 @@ float gl_4d_color_texture_values[] =
 struct type {
 	GLenum type;
 	char *name;
-	float *values;
+	const float *values;
 	int count;
 } types[] = {
 	{ GL_2D, "GL_2D",
