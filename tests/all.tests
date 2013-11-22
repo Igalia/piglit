@@ -755,6 +755,7 @@ spec['!OpenGL 3.2/layered-rendering/framebuffertexture-defaults'] = concurrent_t
 spec['!OpenGL 3.2/layered-rendering/readpixels'] = concurrent_test('gl-3.2-layered-rendering-readpixels')
 spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-attachment-mismatch'] = concurrent_test('gl-3.2-layered-rendering-framebuffer-layer-attachment-mismatch')
 spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-complete'] = concurrent_test('gl-3.2-layered-rendering-framebuffer-layer-complete')
+spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-count-mismatch'] = concurrent_test('gl-3.2-layered-rendering-framebuffer-layer-count-mismatch')
 spec['!OpenGL 3.2/layered-rendering/framebuffer-layered-attachments'] = concurrent_test('gl-3.2-layered-rendering-framebuffer-layered-attachments')
 spec['!OpenGL 3.2/layered-rendering/gl-layer'] = concurrent_test('gl-3.2-layered-rendering-gl-layer')
 spec['!OpenGL 3.2/layered-rendering/gl-layer-cube-map'] = concurrent_test('gl-3.2-layered-rendering-gl-layer-cube-map')
