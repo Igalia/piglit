@@ -581,6 +581,7 @@ add_concurrent_test(gl10, 'gl-1.0-dlist-beginend')
 add_concurrent_test(gl10, 'gl-1.0-dlist-shademodel')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag')
 add_concurrent_test(gl10, 'gl-1.0-edgeflag-quads')
+add_concurrent_test(gl10, 'gl-1.0-long-dlist')
 add_concurrent_test(gl10, 'gl-1.0-rendermode-feedback')
 add_plain_test(gl10, 'gl-1.0-front-invalidate-back')
 
