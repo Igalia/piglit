@@ -35,13 +35,13 @@ def plain_test(args):
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
-        group[name + '-' + param] = PlainExecTest([name, param, '-auto'])
+        group[name + '-' + param] = plain_test(name + ' ' + param)
 
 def add_plain_test(group, args):
-    group[args] = PlainExecTest(shlex.split(args) + ['-auto'])
+    group[args] = plain_test(args)
 
 def concurrent_test(args):
-    test = PlainExecTest(shlex.split(args) + ['-auto', '-fbo'])
+    test = plain_test(args + ' -fbo')
     test.runConcurrent = True
     return test
 
@@ -110,9 +110,7 @@ def add_depthstencil_render_miplevels_tests(group, test_types):
 def add_msaa_visual_plain_tests(group, args):
     add_plain_test(group, args)
     for num_samples in MSAA_SAMPLE_COUNTS:
-        group[args + ' samples=' + str(num_samples)] = PlainExecTest(
-                shlex.split(args) + ['-auto'] +
-                ['-samples=' + str(num_samples)])
+        group[args + ' samples=' + str(num_samples)] = plain_test(args + ' -samples=' + str(num_samples))
 
 glean = Group()
 glean['basic'] = GleanTest('basic')
@@ -352,10 +350,8 @@ add_plain_test(glx, 'glx-destroycontext-1')
 add_plain_test(glx, 'glx-destroycontext-2')
 add_plain_test(glx, 'glx-dont-care-mask')
 add_plain_test(glx, 'glx-close-display')
-add_plain_test(glx, 'glx-fbconfig-sanity')
-glx['glx-fbconfig-sanity'].runConcurrent = True
-add_plain_test(glx, 'glx-fbconfig-compliance')
-glx['glx-fbconfig-compliance'].runConcurrent = True
+add_concurrent_test(glx, 'glx-fbconfig-sanity')
+add_concurrent_test(glx, 'glx-fbconfig-compliance')
 add_plain_test(glx, 'glx-fbo-binding')
 add_plain_test(glx, 'glx-multi-context-ib-1')
 add_plain_test(glx, 'glx-multithread')
@@ -367,45 +363,39 @@ add_plain_test(glx, 'glx-multithread-makecurrent-4')
 add_concurrent_test(glx, 'glx-multithread-shader-compile')
 add_plain_test(glx, 'glx-shader-sharing')
 add_plain_test(glx, 'glx-swap-exchange')
-glx['glx-swap-event_event'] = PlainExecTest(['glx-swap-event', '-auto', '--event'])
-glx['glx-swap-event_async'] = PlainExecTest(['glx-swap-event', '-auto', '--async'])
-glx['glx-swap-event_interval'] = PlainExecTest(['glx-swap-event', '-auto', '--interval'])
+glx['glx-swap-event_event'] = plain_test('glx-swap-event --event')
+glx['glx-swap-event_async'] = plain_test('glx-swap-event --async')
+glx['glx-swap-event_interval'] = plain_test('glx-swap-event --interval')
 add_plain_test(glx, 'glx-swap-pixmap')
 add_plain_test(glx, 'glx-swap-pixmap-bad')
 add_plain_test(glx, 'glx-swap-singlebuffer')
 add_plain_test(glx, 'glx-make-current')
 add_plain_test(glx, 'glx-make-glxdrawable-current')
-add_plain_test(glx, 'glx-pixmap-life')
-glx['glx-pixmap-life'].runConcurrent = True
-add_plain_test(glx, 'glx-pixmap13-life')
-glx['glx-pixmap13-life'].runConcurrent = True
-add_plain_test(glx, 'glx-pixmap-multi')
-glx['glx-pixmap-multi'].runConcurrent = True
+add_concurrent_test(glx, 'glx-pixmap-life')
+add_concurrent_test(glx, 'glx-pixmap13-life')
+add_concurrent_test(glx, 'glx-pixmap-multi')
 add_plain_test(glx, 'glx-tfp')
 add_plain_test(glx, 'glx-visuals-depth')
 add_concurrent_test(glx, 'glx-visuals-depth -pixmap')
 add_plain_test(glx, 'glx-visuals-stencil')
 add_concurrent_test(glx, 'glx-visuals-stencil -pixmap')
-add_plain_test(glx, 'glx-window-life')
-glx['glx-window-life'].runConcurrent = True
-add_plain_test(glx, 'glx-pixmap-crosscheck')
-glx['glx-pixmap-crosscheck'].runConcurrent = True
-glx['glx-query-drawable-GLXWINDOW-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXWINDOW"])
-glx['glx-query-drawable-GLXWINDOW-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXWINDOW"])
-glx['glx-query-drawable-GLXPIXMAP-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXPIXMAP"])
-glx['glx-query-drawable-GLXPIXMAP-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXPIXMAP"])
-glx['glx-query-drawable-GLXPBUFFER-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=GLXPBUFFER"])
-glx['glx-query-drawable-GLXPBUFFER-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=GLXPBUFFER"])
-glx['glx-query-drawable-GLX_WIDTH'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_WIDTH', "--type=WINDOW"])
-glx['glx-query-drawable-GLX_HEIGHT'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_HEIGHT', "--type=WINDOW"])
-glx['glx-query-drawable-GLX_FBCONFIG_ID-WINDOW'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=WINDOW"])
-glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXWINDOW'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXWINDOW"])
-glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPIXMAP'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPIXMAP"])
-glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPBUFFER'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPBUFFER"])
-glx['glx-query-drawable-GLX_PRESERVED_CONTENTS'] = PlainExecTest(['glx-query-drawable', '-auto', '--attr=GLX_FBCONFIG_ID', "--type=GLXPBUFFER"])
-glx['glx-query-drawable-GLXBadDrawable'] = PlainExecTest(['glx-query-drawable', '-auto', '--bad-drawable'])
-glx['extension string sanity'] = PlainExecTest(['glx-string-sanity'])
-glx['extension string sanity'].runConcurrent = True
+add_concurrent_test(glx, 'glx-window-life')
+add_concurrent_test(glx, 'glx-pixmap-crosscheck')
+glx['glx-query-drawable-GLXWINDOW-GLX_WIDTH'] = plain_test('glx-query-drawable --attr=GLX_WIDTH --type=GLXWINDOW')
+glx['glx-query-drawable-GLXWINDOW-GLX_HEIGHT'] = plain_test('glx-query-drawable --attr=GLX_HEIGHT --type=GLXWINDOW')
+glx['glx-query-drawable-GLXPIXMAP-GLX_WIDTH'] = plain_test('glx-query-drawable --attr=GLX_WIDTH --type=GLXPIXMAP')
+glx['glx-query-drawable-GLXPIXMAP-GLX_HEIGHT'] = plain_test('glx-query-drawable --attr=GLX_HEIGHT --type=GLXPIXMAP')
+glx['glx-query-drawable-GLXPBUFFER-GLX_WIDTH'] = plain_test('glx-query-drawable --attr=GLX_WIDTH --type=GLXPBUFFER')
+glx['glx-query-drawable-GLXPBUFFER-GLX_HEIGHT'] = plain_test('glx-query-drawable --attr=GLX_HEIGHT --type=GLXPBUFFER')
+glx['glx-query-drawable-GLX_WIDTH'] = plain_test('glx-query-drawable --attr=GLX_WIDTH --type=WINDOW')
+glx['glx-query-drawable-GLX_HEIGHT'] = plain_test('glx-query-drawable --attr=GLX_HEIGHT --type=WINDOW')
+glx['glx-query-drawable-GLX_FBCONFIG_ID-WINDOW'] = plain_test('glx-query-drawable --attr=GLX_FBCONFIG_ID --type=WINDOW')
+glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXWINDOW'] = plain_test('glx-query-drawable --attr=GLX_FBCONFIG_ID --type=GLXWINDOW')
+glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPIXMAP'] = plain_test('glx-query-drawable --attr=GLX_FBCONFIG_ID --type=GLXPIXMAP')
+glx['glx-query-drawable-GLX_FBCONFIG_ID-GLXPBUFFER'] = plain_test('glx-query-drawable --attr=GLX_FBCONFIG_ID --type=GLXPBUFFER')
+glx['glx-query-drawable-GLX_PRESERVED_CONTENTS'] = plain_test('glx-query-drawable --attr=GLX_FBCONFIG_ID --type=GLXPBUFFER')
+glx['glx-query-drawable-GLXBadDrawable'] = plain_test('glx-query-drawable --bad-drawable')
+glx['extension string sanity'] = concurrent_test('glx-string-sanity')
 
 import_context = Group();
 glx['GLX_EXT_import_context'] = import_context
@@ -459,9 +449,7 @@ oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx
 oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
 
 def texwrap_test(args):
-    test = PlainExecTest(['texwrap', '-fbo', '-auto'] + args)
-    test.runConcurrent = True
-    return test
+    return concurrent_test('texwrap ' + ' '.join(args))
 
 def add_texwrap_target_tests(group, target):
     group['texwrap ' + target] = texwrap_test([target, 'GL_RGBA8'])
@@ -1476,8 +1464,7 @@ arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bia
 # Group ARB_shader_objects
 arb_shader_objects = Group()
 spec['ARB_shader_objects'] = arb_shader_objects
-arb_shader_objects['getuniform'] = PlainExecTest(['arb_shader_objects-getuniform', '-auto'])
-arb_shader_objects['getuniform'].runConcurrent = True
+arb_shader_objects['getuniform'] = concurrent_test('arb_shader_objects-getuniform')
 arb_shader_objects['bindattriblocation-scratch-name'] = concurrent_test('arb_shader_objects-bindattriblocation-scratch-name')
 arb_shader_objects['getactiveuniform-beginend'] = concurrent_test('arb_shader_objects-getactiveuniform-beginend')
 arb_shader_objects['getuniformlocation-array-of-struct-of-array'] = concurrent_test('arb_shader_objects-getuniformlocation-array-of-struct-of-array')
@@ -1577,8 +1564,7 @@ spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
 add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGB_FXT1_3DFX')
 add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGBA_FXT1_3DFX')
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
-tdfx_texture_compression_fxt1['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'fxt1'])
-tdfx_texture_compression_fxt1['invalid formats'].runConcurrent = True
+tdfx_texture_compression_fxt1['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats fxt1')
 add_plain_test(tdfx_texture_compression_fxt1, 'fxt1-teximage')
 
 def add_color_buffer_float_test(name, format, p1, p2):
@@ -1668,15 +1654,12 @@ arb_texture_compression = Group()
 spec['ARB_texture_compression'] = arb_texture_compression
 add_fbo_generatemipmap_extension(arb_texture_compression, 'GL_ARB_texture_compression', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(arb_texture_compression, 'GL_ARB_texture_compression')
-arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'] = PlainExecTest(['arb_texture_compression-internal-format-query', '-auto'])
-arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'].runConcurrent = True
-arb_texture_compression['unknown formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'unknown'])
-arb_texture_compression['unknown formats'].runConcurrent = True
+arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'] = concurrent_test('arb_texture_compression-internal-format-query')
+arb_texture_compression['unknown formats'] = concurrent_test('arb_texture_compression-invalid-formats unknown')
 
 arb_texture_compression_bptc = Group()
 spec['ARB_texture_compression_bptc'] = arb_texture_compression_bptc
-arb_texture_compression_bptc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'bptc'])
-arb_texture_compression_bptc['invalid formats'].runConcurrent = True
+arb_texture_compression_bptc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats bptc')
 
 ext_vertex_array_bgra = Group()
 spec['EXT_vertex_array_bgra'] = ext_vertex_array_bgra
@@ -2172,8 +2155,7 @@ spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
 add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_format_tests(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc')
-ext_texture_compression_latc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'latc'])
-ext_texture_compression_latc['invalid formats'].runConcurrent = True
+ext_texture_compression_latc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats latc')
 
 ext_texture_compression_rgtc = Group()
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
@@ -2184,8 +2166,7 @@ add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRES
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_format_tests(ext_texture_compression_rgtc, 'GL_EXT_texture_compression_rgtc')
-ext_texture_compression_rgtc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'rgtc'])
-ext_texture_compression_rgtc['invalid formats'].runConcurrent = True
+ext_texture_compression_rgtc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats rgtc')
 add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-01')
 add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-02')
 
@@ -2197,8 +2178,7 @@ add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRES
 add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGBA_S3TC_DXT5_EXT')
 add_fbo_generatemipmap_extension(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(ext_texture_compression_s3tc, 'GL_EXT_texture_compression_s3tc')
-ext_texture_compression_s3tc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 's3tc'])
-ext_texture_compression_s3tc['invalid formats'].runConcurrent = True
+ext_texture_compression_s3tc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats s3tc')
 add_plain_test(ext_texture_compression_s3tc, 'gen-compressed-teximage')
 add_concurrent_test(ext_texture_compression_s3tc, 's3tc-errors')
 add_plain_test(ext_texture_compression_s3tc, 's3tc-teximage')
@@ -2212,8 +2192,7 @@ ati_texture_compression_3dc = Group()
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
 add_fbo_generatemipmap_extension(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc')
-ati_texture_compression_3dc['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', '3dc'])
-ati_texture_compression_3dc['invalid formats'].runConcurrent = True
+ati_texture_compression_3dc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats 3dc')
 
 ext_packed_float = Group()
 spec['EXT_packed_float'] = ext_packed_float
@@ -2302,8 +2281,7 @@ add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-g
 #add_fbo_blending_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-blending-formats')
 add_fbo_alphatest_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB', 'fbo-alphatest-formats')
 add_fbo_generatemipmap_extension(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', 'fbo-generatemipmap-formats-s3tc')
-ext_texture_srgb['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'srgb'])
-ext_texture_srgb['invalid formats'].runConcurrent = True
+ext_texture_srgb['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats srgb')
 add_msaa_formats_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB')
 add_texwrap_format_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB')
 add_texwrap_format_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
@@ -2633,8 +2611,7 @@ nv_conditional_render['vertex_array'] = PlainExecTest(['nv_conditional_render-ve
 
 oes_compressed_paletted_texture = Group()
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
-oes_compressed_paletted_texture['invalid formats'] = PlainExecTest(['arb_texture_compression-invalid-formats', 'paletted'])
-oes_compressed_paletted_texture['invalid formats'].runConcurrent = True
+oes_compressed_paletted_texture['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats paletted')
 
 oes_matrix_get = Group()
 spec['OES_matrix_get'] = oes_matrix_get
@@ -2815,9 +2792,8 @@ add_plain_test(fast_color_clear, 'fcc-read-to-pbo-after-clear')
 
 asmparsertest = Group()
 def add_asmparsertest(group, shader):
-    test = PlainExecTest(['asmparsertest', '-auto', group, testsDir + '/asmparsertest/shaders/' + group + '/' + shader])
-    test.runConcurrent = True
-    asmparsertest[group + '/' + shader] = test
+    asmparsertest[group + '/' + shader] = concurrent_test(
+        'asmparsertest ' + group + ' ' + testsDir + '/asmparsertest/shaders/' + group + '/' + shader)
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
 add_asmparsertest('ARBfp1.0', 'abs-02.txt')
