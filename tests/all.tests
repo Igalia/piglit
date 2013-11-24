@@ -215,10 +215,8 @@ shaders = Group()
 
 def add_getactiveuniform_count(group, name, expected):
     path = 'shaders/'
-    group['glsl-getactiveuniform-count: ' + name] = PlainExecTest(['glsl-getactiveuniform-count',
-                                                               '-auto',
-                                                               path + name + '.vert',
-                                                               expected])
+    group['glsl-getactiveuniform-count: ' + name] = concurrent_test(
+        'glsl-getactiveuniform-count ' + path + name + '.vert ' + expected)
 
 add_shader_test_dir(shaders,
                     testsDir + '/shaders',
