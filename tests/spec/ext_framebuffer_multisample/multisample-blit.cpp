@@ -154,7 +154,7 @@ piglit_display()
 	 * framebuffer.  This is the test image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -168,7 +168,7 @@ piglit_display()
 	if (manifest_program)
 		manifest_program->run();
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  pattern_width, 0, 2*pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -177,7 +177,7 @@ piglit_display()
 	 * If they don't, then there must have been a problem blitting
 	 * from src_fbo to dst_fbo.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						   piglit_height) && pass;
 

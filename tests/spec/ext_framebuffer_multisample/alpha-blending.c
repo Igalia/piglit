@@ -110,9 +110,9 @@ piglit_display()
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER, framebuffer);
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 	pass = piglit_probe_rect_rgba(x0, y0, x1 - x0, y1 - y0, expected_color)
 		&& pass;

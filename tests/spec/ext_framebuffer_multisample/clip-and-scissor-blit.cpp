@@ -278,7 +278,7 @@ do_test(int coord, bool clip_low, test_type_enum test_type,
 
 	/* Transfer the test image to the screen */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, dst_size[0], dst_size[1],
 			  display_x, display_y,
 			  display_x + dst_size[0], display_y + dst_size[1],
@@ -299,14 +299,14 @@ do_test(int coord, bool clip_low, test_type_enum test_type,
 
 	/* Transfer the reference image to the screen */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, dst_size[0], dst_size[1],
 			  display_x + dst_size[0], display_y,
 			  display_x + 2 * dst_size[0], display_y + dst_size[1],
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	/* Compare the test and reference images */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	return piglit_probe_rect_halves_equal_rgba(display_x, display_y,
 						   2 * dst_size[0],
 						   dst_size[1]);

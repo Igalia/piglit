@@ -193,7 +193,7 @@ Fbo::try_setup(const FboConfig &new_config)
 	bool success = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)
 		== GL_FRAMEBUFFER_COMPLETE;
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 
 	return success;
 }

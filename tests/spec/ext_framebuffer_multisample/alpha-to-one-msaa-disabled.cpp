@@ -103,7 +103,7 @@ enum piglit_result
 piglit_display()
 {
 	bool pass = true;
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 	allocate_data_arrays();
@@ -123,7 +123,7 @@ piglit_display()
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0,
 						   piglit_width,
 						   piglit_height)

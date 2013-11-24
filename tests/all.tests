@@ -1797,8 +1797,8 @@ ext_framebuffer_multisample['negative-readpixels'] = concurrent_test('ext_frameb
 ext_framebuffer_multisample['renderbufferstorage-samples'] = concurrent_test('ext_framebuffer_multisample-renderbufferstorage-samples')
 ext_framebuffer_multisample['renderbuffer-samples'] = concurrent_test('ext_framebuffer_multisample-renderbuffer-samples')
 ext_framebuffer_multisample['samples'] = concurrent_test('ext_framebuffer_multisample-samples')
-ext_framebuffer_multisample['alpha-blending'] = PlainExecTest('ext_framebuffer_multisample-alpha-blending -auto')
-ext_framebuffer_multisample['alpha-blending slow_cc'] = PlainExecTest('ext_framebuffer_multisample-alpha-blending slow_cc -auto')
+ext_framebuffer_multisample['alpha-blending'] = concurrent_test('ext_framebuffer_multisample-alpha-blending')
+ext_framebuffer_multisample['alpha-blending slow_cc'] = concurrent_test('ext_framebuffer_multisample-alpha-blending slow_cc')
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     if num_samples % 2 != 0:
@@ -1833,9 +1833,9 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         for options in power_set(sensible_options):
             test_name = ' '.join(['upsample', str(num_samples), buffer_type]
                                  + options)
-            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+            ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for buffer_type in ('color', 'depth', 'stencil'):
@@ -1845,144 +1845,144 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         for options in power_set(sensible_options):
             test_name = ' ' .join(['multisample-blit', str(num_samples),
                                    buffer_type] + options)
-            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+            ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for buffer_type in ('color', 'depth', 'stencil'):
         for blit_type in ('msaa', 'upsample', 'downsample'):
             test_name = ' '.join(['unaligned-blit', str(num_samples), buffer_type, blit_type])
-            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            executable = 'ext_framebuffer_multisample-{0}'.format(
                     test_name)
-            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+            ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' ' .join(['line-smooth', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' ' .join(['point-smooth', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' ' .join(['polygon-smooth', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['formats', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for test_mode in ('inverted', 'non-inverted'):
         test_name = ' '.join(['sample-coverage', str(num_samples), test_mode])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+        ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for buffer_type in ('color', 'depth'):
         test_name = ' '.join(['sample-alpha-to-coverage', str(num_samples), buffer_type])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+        ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['sample-alpha-to-one', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['draw-buffers-alpha-to-one', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['draw-buffers-alpha-to-coverage', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['alpha-to-coverage-no-draw-buffer-zero', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['alpha-to-coverage-dual-src-blend', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['alpha-to-one-dual-src-blend', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['int-draw-buffers-alpha-to-one', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['int-draw-buffers-alpha-to-coverage', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['alpha-to-one-msaa-disabled', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['alpha-to-one-single-sample-buffer', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['bitmap', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['polygon-stipple', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+    executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)
-    ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for blit_type in ('msaa', 'upsample', 'downsample', 'normal'):
         test_name = ' '.join(['clip-and-scissor-blit',
                               str(num_samples), blit_type])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(
+        ext_framebuffer_multisample[test_name] = concurrent_test(
                 executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for flip_direction in ('x', 'y'):
         test_name = ' '.join(['blit-flipped', str(num_samples),
                               flip_direction])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(
+        ext_framebuffer_multisample[test_name] = concurrent_test(
                 executable)
 
 # Note: the interpolation tests also check for sensible behaviour with
@@ -1995,17 +1995,16 @@ for num_samples in (0,) + MSAA_SAMPLE_COUNTS:
                       'centroid-deriv-disabled'):
         test_name = ' '.join(['interpolation', str(num_samples),
                               test_type])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(
-                executable)
+        ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     for buffer_type in ('color', 'depth', 'stencil'):
         test_name = ' '.join(['clear', str(num_samples), buffer_type])
-        executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+        executable = 'ext_framebuffer_multisample-{0}'.format(
                 test_name)
-        ext_framebuffer_multisample[test_name] = PlainExecTest(
+        ext_framebuffer_multisample[test_name] = concurrent_test(
                 executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
@@ -2013,9 +2012,9 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         for buffer_config in ('combined', 'separate', 'single'):
             test_name = ' '.join(['no-color', str(num_samples),
                                   test_type, buffer_config])
-            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            executable = 'ext_framebuffer_multisample-{0}'.format(
                     test_name)
-            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+            ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 ext_framebuffer_object = Group()
 spec['EXT_framebuffer_object'] = ext_framebuffer_object

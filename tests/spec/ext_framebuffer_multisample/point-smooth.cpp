@@ -128,7 +128,7 @@ piglit_display()
 	 * This is the reference image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, test_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  pattern_width, 0, 2*pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -150,7 +150,7 @@ piglit_display()
 	 * This is the test image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, test_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -159,7 +159,7 @@ piglit_display()
 	 * don't, then GL_POINT_SMOOTH is not ignored with multisample
 	 * rendering.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						   piglit_height) && pass;
 

@@ -191,7 +191,7 @@ piglit_display()
 	 * framebuffer, unscrambling as we go.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	scrambling_blit(inverse_permutation);
 
 	/* Blit from src_fbo to dst_fbo with no scrambling. */
@@ -205,7 +205,7 @@ piglit_display()
 	 * framebuffer, with no scrambling.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_size, pattern_size,
 			  pattern_size, 0, pattern_size*2, pattern_size,
 			  buffer_to_test, GL_NEAREST);
@@ -218,7 +218,7 @@ piglit_display()
 		manifest_program->run();
 
 	/* Check that the left and right halves of the screen match. */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						   piglit_height) && pass;
 

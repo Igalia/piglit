@@ -251,7 +251,7 @@ probe_framebuffer_color(void)
 		for (int i = 0; i < num_rects; i++)
 			coverage[i] = cov[i];
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 
 	for (int i = 0; i < num_rects; i++) {
 		float samples_used = coverage[i] * num_samples;
@@ -298,7 +298,7 @@ test_sample_coverage(void)
 	 * This is the test image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  buffer_to_test, GL_NEAREST);
@@ -412,7 +412,7 @@ piglit_display()
 	bool pass = true;
 	allocate_data_arrays();
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(buffer_to_test);
 
@@ -428,7 +428,7 @@ piglit_display()
 	 * sample coverage.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0,
 			  pattern_width, pattern_height,
 			  0, pattern_height,

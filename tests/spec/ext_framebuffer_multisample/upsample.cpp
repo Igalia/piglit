@@ -158,14 +158,14 @@ piglit_display()
 		{ 0,   0, 1, 0   },
 		{ 0,   0, 0, 1   }
 	};
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 	test_pattern->draw(proj);
 
 	/* Blit the test pattern to multisample_fbo, forcing the
 	 * implementation to upsample it.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisample_fbo.handle);
 	glBlitFramebuffer(pattern_width, 0, pattern_width*2, pattern_height,
 			  0, 0, pattern_width, pattern_height,
@@ -173,7 +173,7 @@ piglit_display()
 
 	if (manifest_program) {
 		/* Manifest the test pattern in the main framebuffer. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		manifest_program->run();
 
 		/* Manifest the test pattern in the multisample
@@ -189,7 +189,7 @@ piglit_display()
 	 * it.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, multisample_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -200,7 +200,7 @@ piglit_display()
 	 * tested by accuracy.cpp, we'll assume that any problem we
 	 * see here is due to upsampling.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						   piglit_height) && pass;
 

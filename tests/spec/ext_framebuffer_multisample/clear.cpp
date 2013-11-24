@@ -195,7 +195,7 @@ piglit_display()
 	 * screen, forcing a resolve.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -239,7 +239,7 @@ piglit_display()
 	 * corresponding to each pixel, this effectively verifies that
 	 * all samples of every pixel were correctly cleared.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      expected) && pass;
 

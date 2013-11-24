@@ -190,18 +190,18 @@ test_polygon_stipple()
 	 * This is the test image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  buffer_to_test, GL_NEAREST);
 
 	/* Check that the left and right halves of the screen match */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	result = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						     piglit_height)
 		 && result;
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	result = piglit_check_gl_error(GL_NO_ERROR) && result;
 	return result;
 }
@@ -265,7 +265,7 @@ piglit_display()
 	 * is a reference image.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, resolve_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  pattern_width, 0, 2 * pattern_width, pattern_height,
 			  buffer_to_test, GL_NEAREST);
