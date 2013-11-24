@@ -352,7 +352,7 @@ void
 Test::show(Fbo *src_fbo, int x_offset, int y_offset)
 {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, src_fbo->handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 	glBlitFramebuffer(0, 0, src_fbo->config.width, src_fbo->config.height,
 			  x_offset, y_offset,
@@ -438,7 +438,7 @@ Test::draw_test_image(Fbo *fbo)
 void
 Test::draw_to_default_framebuffer()
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, pattern_width, pattern_height);
 	draw_pattern(0, 0, pattern_width, pattern_height);
 }
@@ -487,8 +487,8 @@ Test::measure_accuracy()
 {
 	bool pass = true;
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 			glViewport(0, 0, piglit_width, piglit_height);
 
 	float *reference_data = new float[pattern_width * pattern_height * 4];

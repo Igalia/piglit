@@ -185,9 +185,8 @@ def add_msaa_formats_tests(group, extension):
     for num_samples in MSAA_SAMPLE_COUNTS:
         args = [str(num_samples), extension]
         test_name = ' '.join(['multisample-formats'] + args)
-        group[test_name] = PlainExecTest(
-                ['ext_framebuffer_multisample-formats', '-auto']
-                + args)
+        group[test_name] = concurrent_test(
+                'ext_framebuffer_multisample-formats ' + ' '.join(args))
 
 def add_fbo_generatemipmap_extension(group, extension, name):
     group[name] = concurrent_test('fbo-generatemipmap-formats ' + extension)
