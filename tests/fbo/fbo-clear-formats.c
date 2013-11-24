@@ -329,8 +329,8 @@ draw_stencil_mipmap(int x, int y, int dim, GLuint tex, GLuint level)
 	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
 			       GL_TEXTURE_2D, tex, level);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, dim, dim, x, y, x+dim, y+dim,
-			  GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+        glWindowPos2i(x, y);
+        glCopyPixels(0, 0, dim, dim, GL_STENCIL);
         if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		/* The blit shouldn't generate an error.  If it does, report failure */
 		piglit_report_result(PIGLIT_FAIL);
