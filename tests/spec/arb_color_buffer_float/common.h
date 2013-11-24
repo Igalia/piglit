@@ -254,7 +254,7 @@ static GLboolean run_test()
 
 	glDeleteTextures(1, &tex);
 	tex = 0;
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	if (fb)
 	{
 		glDeleteFramebuffersEXT(1, &fb);
