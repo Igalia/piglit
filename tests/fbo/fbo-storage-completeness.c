@@ -169,6 +169,7 @@ test(void)
 			incomplete = i;
 		}
 
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fbo);
 		glDeleteRenderbuffersEXT(1, &rb);
 
@@ -219,6 +220,7 @@ test(void)
 		return PIGLIT_FAIL;
 	}
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fbo);
 	glDeleteRenderbuffersEXT(1, &rb);
 

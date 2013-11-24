@@ -107,6 +107,7 @@ piglit_init(int argc, char **argv)
 		assert(glGetError() == 0);
 	}
 done:
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 	glBindTexture(GL_TEXTURE_2D, tex);
 }

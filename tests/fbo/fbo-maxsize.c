@@ -153,6 +153,7 @@ static int create_fbo(void)
 	draw_color_sub_rect(x1, y1, maxsize);
 	draw_color_sub_rect(x0, y1, maxsize);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return tex;

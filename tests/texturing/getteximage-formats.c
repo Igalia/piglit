@@ -97,6 +97,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 				       GL_TEXTURE_2D, texture_id, 0);
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 			glDeleteFramebuffers(1, &fb);
 			return GL_FALSE;
 		}
@@ -107,6 +108,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 		glDrawPixels(TEX_SIZE, TEX_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, tex);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffers(1, &fb);
 		glViewport(0, 0, piglit_width, piglit_height);
 	}

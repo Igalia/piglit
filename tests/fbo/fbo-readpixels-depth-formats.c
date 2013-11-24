@@ -246,6 +246,7 @@ test_with_format(GLenum internal_format, const char *name)
 	}
 
 done:
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 	glDeleteRenderbuffersEXT(1, &rb);
 	return pass;

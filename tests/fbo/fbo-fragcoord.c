@@ -75,6 +75,7 @@ create_fbo(unsigned width, unsigned height, GLuint *out_tex)
 				" (0x%04x)\n",
 				internal_format, status);
 
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fb);
 		glDeleteTextures(1, &tex);
 		piglit_report_result((status == GL_FRAMEBUFFER_UNSUPPORTED_EXT)

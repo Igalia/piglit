@@ -107,6 +107,7 @@ static void create_fbo(GLuint *out_tex)
 	piglit_draw_rect_z(1.0,
 			   0.0, -1.0, 1.0, 2.0);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	glDisable(GL_ALPHA_TEST);

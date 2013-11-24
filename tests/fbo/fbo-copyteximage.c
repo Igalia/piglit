@@ -102,6 +102,7 @@ create_fbo(void)
 	glBindTexture(GL_TEXTURE_2D, copied_tex);
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, draw_w, draw_h, 0);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 	glDeleteTextures(1, &tex);
 

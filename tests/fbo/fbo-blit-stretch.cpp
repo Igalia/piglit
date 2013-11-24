@@ -377,6 +377,7 @@ run_test(const TestCase &test)
 		}
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &tex);
 

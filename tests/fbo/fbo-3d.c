@@ -108,6 +108,7 @@ create_3d_fbo(void)
 
 
 done:
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return tex;

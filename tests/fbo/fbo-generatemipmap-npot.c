@@ -97,6 +97,7 @@ create_fbo(void)
 
 	glGenerateMipmapEXT(GL_TEXTURE_2D);
 done:
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return tex;

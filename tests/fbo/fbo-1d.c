@@ -87,6 +87,7 @@ create_1d_fbo(void)
 	piglit_draw_rect(BUF_WIDTH / 2, 0, BUF_WIDTH, 1);
 
 done:
+	glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return tex;
