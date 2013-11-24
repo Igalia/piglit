@@ -476,19 +476,19 @@ def add_texwrap_format_tests(group, ext = '', suffix = ''):
     group['texwrap formats' + suffix + ' bordercolor-swizzled'] = texwrap_test(args + ['bordercolor', 'swizzled'])
 
 def add_fbo_depth_tests(group, format):
-    group['fbo-depth-' + format + '-tex1d'] = PlainExecTest(['fbo-depth-tex1d', '-auto', format])
-    group['fbo-depth-' + format + '-clear'] = PlainExecTest(['fbo-depth', '-auto', 'clear', format])
-    group['fbo-depth-' + format + '-readpixels'] = PlainExecTest(['fbo-depth', '-auto', 'readpixels', format])
-    group['fbo-depth-' + format + '-drawpixels'] = PlainExecTest(['fbo-depth', '-auto', 'drawpixels', format])
-    group['fbo-depth-' + format + '-copypixels'] = PlainExecTest(['fbo-depth', '-auto', 'copypixels', format])
-    group['fbo-depth-' + format + '-blit'] = PlainExecTest(['fbo-depth', '-auto', 'blit', format])
+    group['fbo-depth-' + format + '-tex1d'] = concurrent_test('fbo-depth-tex1d ' + format)
+    group['fbo-depth-' + format + '-clear'] = concurrent_test('fbo-depth clear ' + format)
+    group['fbo-depth-' + format + '-readpixels'] = concurrent_test('fbo-depth readpixels ' + format)
+    group['fbo-depth-' + format + '-drawpixels'] = concurrent_test('fbo-depth drawpixels ' + format)
+    group['fbo-depth-' + format + '-copypixels'] = concurrent_test('fbo-depth copypixels ' + format)
+    group['fbo-depth-' + format + '-blit'] = concurrent_test('fbo-depth blit ' + format)
 
 def add_fbo_stencil_tests(group, format):
-    group['fbo-stencil-' + format + '-clear'] = PlainExecTest(['fbo-stencil', '-auto', 'clear', format])
-    group['fbo-stencil-' + format + '-readpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'readpixels', format])
-    group['fbo-stencil-' + format + '-drawpixels'] = PlainExecTest(['fbo-stencil', '-auto', 'drawpixels', format])
-    group['fbo-stencil-' + format + '-copypixels'] = PlainExecTest(['fbo-stencil', '-auto', 'copypixels', format])
-    group['fbo-stencil-' + format + '-blit'] = PlainExecTest(['fbo-stencil', '-auto', 'blit', format])
+    group['fbo-stencil-' + format + '-clear'] = concurrent_test('fbo-stencil clear ' + format)
+    group['fbo-stencil-' + format + '-readpixels'] = concurrent_test('fbo-stencil readpixels ' + format)
+    group['fbo-stencil-' + format + '-drawpixels'] = concurrent_test('fbo-stencil drawpixels ' + format)
+    group['fbo-stencil-' + format + '-copypixels'] = concurrent_test('fbo-stencil copypixels ' + format)
+    group['fbo-stencil-' + format + '-blit'] = concurrent_test('fbo-stencil blit ' + format)
 
 spec = Group()
 

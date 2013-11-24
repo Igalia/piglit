@@ -136,6 +136,7 @@ static void create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 	glColor4f(0.0, 1.0, 0.0, 0.0);
 	piglit_draw_rect(0, 0, BUF_WIDTH, 1);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	*out_tex = tex;
@@ -147,7 +148,7 @@ static void draw_fbo_1d(int x, int y)
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	glEnable(GL_TEXTURE_1D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
