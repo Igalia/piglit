@@ -128,6 +128,7 @@ create_fbo(unsigned width, unsigned height, GLenum internal_format)
 				" (0x%04x)\n",
 				internal_format, status);
 
+		glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fb);
 		glDeleteTextures(1, &tex);
 		piglit_report_result((status == GL_FRAMEBUFFER_UNSUPPORTED_EXT)
@@ -386,7 +387,7 @@ render_and_check_textures(GLenum internal_format)
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, other_image);
 
 	glUseProgram(0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	return compare_texture(rgba_image, other_image,

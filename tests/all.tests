@@ -204,7 +204,7 @@ def add_fbo_alphatest_extension(group, extension, name):
 
 def add_fbo_rg(group, format):
     name = "fbo-rg-" + format
-    group[name] = PlainExecTest(['fbo-rg', '-auto', format])
+    group[name] = concurrent_test('fbo-rg ' + format)
 
 security = Group()
 add_plain_test(security, 'initialized-texmemory')
