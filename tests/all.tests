@@ -173,13 +173,13 @@ def add_vp1(name):
 execfile(testsDir + '/glean-vertProg1.tests')
 
 def add_fbo_formats_tests(path, extension, suffix=''):
-    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = PlainExecTest('fbo-generatemipmap-formats -auto ' + extension)
-    profile.tests[path + '/fbo-clear-formats' + suffix] = PlainExecTest('fbo-clear-formats -auto ' + extension)
+    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = concurrent_test('fbo-generatemipmap-formats ' + extension)
+    profile.tests[path + '/fbo-clear-formats' + suffix] = concurrent_test('fbo-clear-formats ' + extension)
     profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = concurrent_test('get-renderbuffer-internalformat ' + extension)
     if 'depth' not in extension:
-        profile.tests[path + '/fbo-blending-formats' + suffix] = PlainExecTest('fbo-blending-formats -auto ' + extension)
-        profile.tests[path + '/fbo-alphatest-formats' + suffix] = PlainExecTest('fbo-alphatest-formats -auto ' + extension)
-        profile.tests[path + '/fbo-colormask-formats' + suffix] = PlainExecTest('fbo-colormask-formats -auto ' + extension)
+        profile.tests[path + '/fbo-blending-formats' + suffix] = concurrent_test('fbo-blending-formats ' + extension)
+        profile.tests[path + '/fbo-alphatest-formats' + suffix] = concurrent_test('fbo-alphatest-formats ' + extension)
+        profile.tests[path + '/fbo-colormask-formats' + suffix] = concurrent_test('fbo-colormask-formats ' + extension)
 
 def add_msaa_formats_tests(group, extension):
     for num_samples in MSAA_SAMPLE_COUNTS:
@@ -190,17 +190,16 @@ def add_msaa_formats_tests(group, extension):
                 + args)
 
 def add_fbo_generatemipmap_extension(group, extension, name):
-    group[name] = PlainExecTest(['fbo-generatemipmap-formats', '-auto',
-                                 extension])
+    group[name] = concurrent_test('fbo-generatemipmap-formats ' + extension)
 
 def add_fbo_clear_extension(group, extension, name):
-    group[name] = PlainExecTest(['fbo-clear-formats', '-auto', extension])
+    group[name] = concurrent_test('fbo-clear-formats ' + extension)
 
 def add_fbo_blending_extension(group, extension, name):
-    group[name] = PlainExecTest(['fbo-blending-formats', '-auto', extension])
+    group[name] = concurrent_test('fbo-blending-formats ' + extension)
 
 def add_fbo_alphatest_extension(group, extension, name):
-    group[name] = PlainExecTest(['fbo-alphatest-formats', '-auto', extension])
+    group[name] = concurrent_test('fbo-alphatest-formats ' + extension)
 
 
 def add_fbo_rg(group, format):
@@ -1669,7 +1668,7 @@ add_depthstencil_render_miplevels_tests(
         ('d=z32f_s8', 'd=z32f', 'd=z32f_s8_s=z24_s8', 'd=z32f_s=z24_s8',
          's=z24_s8_d=z32f_s8', 's=z24_s8_d=z32f', 'd=s=z32f_s8', 's=d=z32f_s8',
          'ds=z32f_s8'))
-arb_depth_buffer_float['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_ARB_depth_buffer_float', 'stencil', '-auto'])
+arb_depth_buffer_float['fbo-clear-formats stencil'] = concurrent_test('fbo-clear-formats GL_ARB_depth_buffer_float stencil')
 
 arb_texture_env_crossbar = Group()
 spec['ARB_texture_env_crossbar'] = arb_texture_env_crossbar
@@ -2055,13 +2054,13 @@ add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-noimage')
 add_plain_test(ext_framebuffer_object, 'fdo20701')
 add_plain_test(ext_framebuffer_object, 'fbo-1d')
 add_plain_test(ext_framebuffer_object, 'fbo-3d')
-add_plain_test(ext_framebuffer_object, 'fbo-alphatest-formats')
+add_concurrent_test(ext_framebuffer_object, 'fbo-alphatest-formats')
 add_plain_test(ext_framebuffer_object, 'fbo-alphatest-nocolor')
 add_plain_test(ext_framebuffer_object, 'fbo-alphatest-nocolor-ff')
-add_plain_test(ext_framebuffer_object, 'fbo-blending-formats')
+add_concurrent_test(ext_framebuffer_object, 'fbo-blending-formats')
 add_plain_test(ext_framebuffer_object, 'fbo-bind-renderbuffer')
 add_plain_test(ext_framebuffer_object, 'fbo-clearmipmap')
-add_plain_test(ext_framebuffer_object, 'fbo-clear-formats')
+add_concurrent_test(ext_framebuffer_object, 'fbo-clear-formats')
 add_plain_test(ext_framebuffer_object, 'fbo-copyteximage')
 add_plain_test(ext_framebuffer_object, 'fbo-copyteximage-simple')
 add_plain_test(ext_framebuffer_object, 'fbo-cubemap')
@@ -2080,7 +2079,7 @@ add_plain_test(ext_framebuffer_object, 'fbo-fragcoord')
 add_plain_test(ext_framebuffer_object, 'fbo-fragcoord2')
 add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap')
 add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap-filtering')
-add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap-formats')
+add_concurrent_test(ext_framebuffer_object, 'fbo-generatemipmap-formats')
 add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap-scissor')
 add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap-nonsquare')
 add_plain_test(ext_framebuffer_object, 'fbo-generatemipmap-npot')
@@ -2121,7 +2120,7 @@ add_depthstencil_render_miplevels_tests(
         ('s=z24_s8', 'd=z24_s8', 'd=z24_s8_s=z24_s8', 'd=z24_s=z24_s8',
          's=z24_s8_d=z24_s8', 's=z24_s8_d=z24', 'd=s=z24_s8', 's=d=z24_s8',
          'ds=z24_s8'))
-ext_packed_depth_stencil['fbo-clear-formats stencil'] = PlainExecTest(['fbo-clear-formats', 'GL_EXT_packed_depth_stencil', 'stencil', '-auto'])
+ext_packed_depth_stencil['fbo-clear-formats stencil'] = concurrent_test('fbo-clear-formats GL_EXT_packed_depth_stencil stencil')
 
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array

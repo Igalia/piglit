@@ -74,6 +74,7 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fb);
 		return false;
 	}
@@ -121,6 +122,7 @@ do_rgba_clear(GLenum format, GLuint tex, int level, int size)
 
 	glDisable(GL_SCISSOR_TEST);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	return true;
@@ -151,6 +153,7 @@ do_depth_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fb);
 		return false;
 	}
@@ -166,6 +169,7 @@ do_depth_clear(GLenum format, GLuint tex, int level, int size)
 
 	glDisable(GL_SCISSOR_TEST);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	glDrawBuffer(draw_buffer);
@@ -199,6 +203,7 @@ do_stencil_clear(GLenum format, GLuint tex, int level, int size)
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffersEXT(1, &fb);
 		return false;
 	}
@@ -214,6 +219,7 @@ do_stencil_clear(GLenum format, GLuint tex, int level, int size)
 
 	glDisable(GL_SCISSOR_TEST);
 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	glDrawBuffer(draw_buffer);
@@ -328,7 +334,7 @@ draw_stencil_mipmap(int x, int y, int dim, GLuint tex, GLuint level)
 
 	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
 			       GL_TEXTURE_2D, tex, level);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
         glWindowPos2i(x, y);
         glCopyPixels(0, 0, dim, dim, GL_STENCIL);
         if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -336,7 +342,7 @@ draw_stencil_mipmap(int x, int y, int dim, GLuint tex, GLuint level)
 		piglit_report_result(PIGLIT_FAIL);
         }
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &fbo);
 
 	glDrawBuffer(draw_buffer);

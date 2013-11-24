@@ -632,7 +632,7 @@ static enum piglit_result fbo_formats_display(test_func test_format)
 	bool all_skip = true;
 	unsigned i;
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 

@@ -198,7 +198,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 	/*
 	 * Display the texture.
 	 */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
@@ -213,6 +213,7 @@ static enum piglit_result test_format(const struct format_desc *format)
 
 	glDisable(GL_TEXTURE_2D);
 	glDeleteTextures(1, &tex);
+	glBindFramebufferEXT(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
 
 	piglit_present_results();
