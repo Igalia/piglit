@@ -105,7 +105,7 @@ def add_depthstencil_render_miplevels_tests(group, test_types):
         for test_type in test_types:
             test_name = 'depthstencil-render-miplevels {0} {1}'.format(
                     texture_size, test_type)
-            group[test_name] = PlainExecTest(test_name + ' -auto')
+            add_concurrent_test(group, test_name)
 
 def add_msaa_visual_plain_tests(group, args):
     add_plain_test(group, args)
