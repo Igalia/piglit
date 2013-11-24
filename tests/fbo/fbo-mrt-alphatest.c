@@ -120,7 +120,7 @@ piglit_display(void)
 
 	/* visualize it */
 	glUseProgram(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, 128, 64);
 	glClearColor(0,0,0.5,0);
 	glClear(GL_COLOR_BUFFER_BIT);

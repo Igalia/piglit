@@ -317,7 +317,7 @@ piglit_init(int argc, char **argv)
 	for (f = 0; f < num_test_formats; f++)
 		piglit_merge_result(&result, test_format(&test_formats[f]));
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &fbo);
 
 	piglit_report_result(result);

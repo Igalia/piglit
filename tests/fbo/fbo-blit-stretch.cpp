@@ -363,7 +363,7 @@ run_test(const TestCase &test)
 		piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 
 		blit(test);
 

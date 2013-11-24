@@ -104,7 +104,7 @@ display_texture(int x, int y, int w, int h,
 				       GL_TEXTURE_2D, tex, 0);
 
 		/* Blit layer to screen */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, tempFBO);
 		glBlitFramebuffer(0, 0, texWidth, texHeight,
 				  dx1, dy1, dx2, dy2,
@@ -129,7 +129,7 @@ display_texture(int x, int y, int w, int h,
 			}
 
 			/* Blit layer to screen */
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, tempFBO);
 			glBlitFramebuffer(0, 0, texWidth, texHeight,
 					  dx1, dy1, dx2, dy2,
@@ -138,7 +138,7 @@ display_texture(int x, int y, int w, int h,
 	}
 
 	/* Cleanup temp fbo */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &tempFBO);
 
 	return piglit_check_gl_error(GL_NO_ERROR);
@@ -293,7 +293,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 	}
 
 	/* Clean up */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &srcFBO);
 	glDeleteFramebuffers(1, &dstFBO);
 	glDeleteTextures(1, &srcTex);
@@ -321,7 +321,7 @@ piglit_display(void)
 	int hw = piglit_width/2;
 	int hh = piglit_height/2;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(1,1,1,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 

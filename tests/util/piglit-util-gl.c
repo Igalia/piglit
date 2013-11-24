@@ -1395,7 +1395,7 @@ piglit_visualize_image(float *img, GLenum base_internal_format,
 			visualization[(y * image_width + x) * 3 + 2] = b;
 		}
 	}
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glUseProgram(0);
 
 	/* To simultaneously display multiple images on window system

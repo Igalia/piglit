@@ -121,7 +121,7 @@ piglit_display(void)
 		expected = green;
 	}
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	/* Draw the two green textures to halves of the window. */
 	glEnable(GL_TEXTURE_2D);

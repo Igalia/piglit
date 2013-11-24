@@ -181,7 +181,7 @@ piglit_display(void)
 	if (dst_fbo != 0) {
 		/* Show the contents of dst_fbo in the window */
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, dst_fbo);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, width, height,
 				  0, 0, width, height,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);

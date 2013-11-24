@@ -129,7 +129,7 @@ piglit_display(void)
 	glUseProgram(prog);
 
 	/* Draw a square to the left half of the window */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 	piglit_draw_rect(-1, -1, 1, 2);
 
@@ -140,13 +140,13 @@ piglit_display(void)
 
 	/* Blit the square from the FBO to the right half of the window */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, fbo_width, fbo_height,
 			  piglit_width/2, 0, piglit_width, piglit_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	/* Check that both squares have the correct color */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height,
 				     expected) && pass;
 

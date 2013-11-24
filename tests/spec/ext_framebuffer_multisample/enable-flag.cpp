@@ -106,7 +106,7 @@ piglit_display()
 {
 	bool pass = true;
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -128,7 +128,7 @@ piglit_display()
 	 * (which is not multisampled) to resolve it.
 	 */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  0, 0, pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -140,7 +140,7 @@ piglit_display()
 
 	/* Blit this image to the right half of the piglit window. */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, singlesampled_fbo.handle);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, pattern_width, pattern_height,
 			  pattern_width, 0, 2*pattern_width, pattern_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -149,7 +149,7 @@ piglit_display()
 	 * they don't, then presumably the disabling of GL_MULTISAMPLE
 	 * failed to take effect.
 	 */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, 2*pattern_width,
 						   pattern_height) && pass;
 

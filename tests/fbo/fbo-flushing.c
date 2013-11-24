@@ -97,7 +97,7 @@ piglit_display(void)
 		piglit_ortho_projection(TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
 		piglit_draw_rect(0, y, size, size);
 
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
  		piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -109,7 +109,7 @@ piglit_display(void)
 		piglit_ortho_projection(TEX_WIDTH, TEX_HEIGHT, GL_FALSE);
 		piglit_draw_rect(0, y, size, size);
 
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
  		piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

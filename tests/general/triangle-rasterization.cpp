@@ -594,7 +594,7 @@ piglit_display(void)
 
 		/* If using FBO, draw the fbo to screen */
 		if (use_fbo) {
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 			glViewport(0, 0, piglit_width, piglit_height);
 			piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -618,7 +618,7 @@ piglit_display(void)
 	if (use_fbo) {
 		glDeleteTextures(1, &tex);
 		glDeleteFramebuffersEXT(1, &fb);
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	}
 
 	assert(glGetError() == 0);

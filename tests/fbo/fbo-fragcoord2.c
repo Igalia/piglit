@@ -166,7 +166,7 @@ test(void)
       buf = malloc(piglit_width * piglit_height * 4);
       glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
-      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
       glDrawBuffer(GL_BACK);
       glClear(GL_COLOR_BUFFER_BIT);
       glDrawPixels(piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, buf);

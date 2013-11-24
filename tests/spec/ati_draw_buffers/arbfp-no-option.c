@@ -113,7 +113,7 @@ piglit_display(void)
 	piglit_draw_rect(-1, -1, 2, 2);
         glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	/* Draw the two green textures to top/bottom halves of the window. */
 	glEnable(GL_TEXTURE_2D);

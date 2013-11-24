@@ -110,7 +110,7 @@ piglit_display(void)
 	glColor4fv(green);
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDisable(GL_BLEND);
 
 	/* Draw the two textures to halves of the window. */

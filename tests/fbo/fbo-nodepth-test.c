@@ -85,7 +85,7 @@ piglit_display(void)
 	pass = pass && piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, green);
 
 	glDisable(GL_DEPTH_TEST);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	piglit_draw_rect_tex(0, 0, piglit_width, piglit_height,

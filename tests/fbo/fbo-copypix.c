@@ -162,7 +162,7 @@ run_test(void)
 	fbo = make_fbo(fbo_width, fbo_height);
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, fbo_width, fbo_height);
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
 	glClearColor(1.0, 0.0, 1.0, 0.0);
@@ -174,25 +174,25 @@ run_test(void)
 	/* Now that we have correct samples, blit things around.
 	 * FBO(bottom) -> WIN(middle)
 	 */
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
  	     x0, y1, x0 + SIZE, y1 + SIZE);
 
 	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, piglit_winsys_fbo);
  	copy(x0, y0, x0 + SIZE, y0 + SIZE,
  	     x0, y1, x0 + SIZE, y1 + SIZE);
 
 	/* FBO(middle) -> WIN(top) back to verify WIN -> FBO */
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
  	copy(x0, y1, x0 + SIZE, y1 + SIZE,
  	     x0, y2, x0 + SIZE, y2 + SIZE);
 
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	pass = verify_color_rect(PAD, y0, SIZE, SIZE) && pass;
 	pass = verify_color_rect(PAD, y1, SIZE, SIZE) && pass;

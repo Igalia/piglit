@@ -87,7 +87,7 @@ piglit_init(int argc, char **argv)
 	/* Unbind and rebind the FBO.  At one point on Mesa this triggered a
 	 * segfault down inside the glBindFramebuffer code.
 	 */
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
 	status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
@@ -104,7 +104,7 @@ piglit_init(int argc, char **argv)
 
 cleanup:
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 
 	glDeleteTextures(1, &tex);
 	glDeleteFramebuffers(1, &fbo);

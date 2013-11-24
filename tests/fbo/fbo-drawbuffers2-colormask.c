@@ -115,7 +115,7 @@ piglit_display(void)
 		piglit_draw_rect(0, 0, piglit_width, piglit_height);
 	}
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	/* Draw the two textures to halves of the window. */

@@ -90,7 +90,7 @@ display_layered_texture(int x, int y, int w, int h, int texWidth, int texHeight,
 			return false;
 		}
 
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, tempFBO);
 		glBlitFramebuffer(0, 0, texWidth, texHeight,
 				  dx1, dy1, dx2, dy2, GL_COLOR_BUFFER_BIT,
@@ -98,7 +98,7 @@ display_layered_texture(int x, int y, int w, int h, int texWidth, int texHeight,
 	}
 
 	/* Cleanup temp fbo */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &tempFBO);
 
 	return piglit_check_gl_error(GL_NO_ERROR);
@@ -166,7 +166,7 @@ piglit_display(void)
 	const float clearColor[3] = { 1, 1, 0 };
 
 	/* Clear Defualt Framebuffer */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(1,1,0,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 

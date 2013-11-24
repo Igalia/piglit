@@ -84,7 +84,7 @@ read_samples(int step, int axis)
 {
 	int index = step + axis * NUM_STEPS;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 	glUseProgram(prog_rd);
 

@@ -124,7 +124,7 @@ piglit_display(void)
 	glEnd();
 
 	/* bind back the backbuffer and display the depthmap */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, 600, 600);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

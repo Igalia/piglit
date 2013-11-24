@@ -123,7 +123,7 @@ static enum piglit_result test_clear(void)
 
 	/* Display the colorbuffer. */
 	if (!piglit_automatic && f.iformat) {
-		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glBlitFramebufferEXT(0, 0, BUF_SIZE, BUF_SIZE, 0, 0, BUF_SIZE, BUF_SIZE,
 				     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	}

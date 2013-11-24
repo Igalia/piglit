@@ -113,7 +113,7 @@ enum piglit_result piglit_display(void)
 
 	/* Draw with the texture to make sure a sampler view is created for
 	 * it before it's used as depth buffer by the FBO. */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glBindTexture(GL_TEXTURE_2D, db_tex);
 	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, frag);
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
@@ -140,7 +140,7 @@ enum piglit_result piglit_display(void)
 	glEnd();
 
 	/* Draw the depth texture as greyscale to the backbuffer. */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 	glEnable(GL_TEXTURE_2D);
 	piglit_draw_rect_tex(-1.0f, -1.0f, 2.0f, 2.0f,

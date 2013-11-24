@@ -126,7 +126,7 @@ piglit_display(void)
 	pass = piglit_probe_pixel_rgba(fbo_width * 7 / 8, 0, fbo_blend2) && pass;
 
 	/* Draw the two textures to halves of the window. */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	glColor4f(1, 1, 1, 1);

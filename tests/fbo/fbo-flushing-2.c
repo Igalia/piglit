@@ -95,7 +95,7 @@ piglit_display(void)
 			glColor4fv(draw_colors[draw_green]);
 			piglit_draw_rect(-1, -1, 2, 2);
 
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 			glEnable(GL_TEXTURE_2D);
 			piglit_draw_rect_tex(x_screen, y_screen,
 					     w_screen, h_screen,

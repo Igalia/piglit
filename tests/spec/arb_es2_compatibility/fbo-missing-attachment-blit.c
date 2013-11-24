@@ -183,8 +183,8 @@ do_blit_test(bool use_es2, bool from_missing_to_complete)
 				       0.0)
 		&& pass;
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(ARRAY_SIZE(fb), fb);
 	glDeleteRenderbuffers(ARRAY_SIZE(rb), rb);
 

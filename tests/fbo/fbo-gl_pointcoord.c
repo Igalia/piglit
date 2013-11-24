@@ -89,7 +89,7 @@ piglit_display(void)
 
 	/* Draw the point out if want to have a look. */
 	if (!piglit_automatic){
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glBlitFramebuffer(0, 0, rb_size, rb_size,
 				  0, 0, rb_size, rb_size,

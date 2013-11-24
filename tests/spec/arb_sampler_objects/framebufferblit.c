@@ -79,12 +79,12 @@ piglit_display(void)
 	glBindSampler(0, sampler);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glBlitFramebuffer(0, 0, 1, 1,
 			  0, 0, piglit_width, piglit_height,
 			  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 	piglit_present_results();
 

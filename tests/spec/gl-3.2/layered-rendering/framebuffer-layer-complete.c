@@ -164,7 +164,7 @@ test_fbo_attachment_targets(GLenum texOneType, GLenum texTwoType,
 	pass = CheckFramebufferStatus(expectedFbStatus) && pass;
 
 	/* Clean up */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(2, texture);
 

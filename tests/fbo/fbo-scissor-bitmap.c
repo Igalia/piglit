@@ -370,7 +370,7 @@ piglit_display()
 
 	pass &= draw_and_test("FBO", fbo_width, fbo_height);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	display_texture_to_window(texture);
 

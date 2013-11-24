@@ -76,7 +76,7 @@ static void blit_rect(GLenum src_format, GLenum dst_format, float x, float y, fl
 		glBlitFramebufferEXT(8, 0, 16, 16, 8, 0, 16, 16, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	}
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
 	glBindTexture(GL_TEXTURE_2D, dst_tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

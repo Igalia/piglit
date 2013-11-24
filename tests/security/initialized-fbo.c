@@ -59,7 +59,7 @@ piglit_display(void)
 	/* read from fbo, draw to window */
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 	glReadBuffer(GL_COLOR_ATTACHMENT0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glDrawBuffer(GL_BACK);
 
         /* init color buffer to red */
@@ -70,7 +70,7 @@ piglit_display(void)
 	glWindowPos2i(0, 0);
 	glCopyPixels(0, 0, piglit_width, piglit_height, GL_COLOR);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	glReadBuffer(GL_BACK);
 
 	glReadPixels(0, 0, 1, 1, GL_RGBA, GL_FLOAT, firstPixel);

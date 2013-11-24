@@ -176,7 +176,7 @@ render_tex_layers(GLuint tex)
 		color_index += LAYERS;
 	}
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glDisableVertexAttribArray(vertex_loc);
 
 	return true;

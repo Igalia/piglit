@@ -161,7 +161,7 @@ generate_and_display_drawbuffers(int count)
 
 	/* OK, now draw each of these textures to the winsys framebuffer. */
 	glUseProgram(0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glEnable(GL_TEXTURE_2D);

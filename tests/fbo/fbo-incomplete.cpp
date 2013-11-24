@@ -67,8 +67,8 @@ public:
 		else
 			glBindTexture(target, 0);
 
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 
 		glDeleteTextures(1, &tex);
 		glDeleteRenderbuffers(1, &rb);

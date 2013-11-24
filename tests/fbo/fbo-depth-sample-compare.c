@@ -259,7 +259,7 @@ render_to_fbo(void)
 
    glDisable(GL_DEPTH_TEST);
 
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 }
 
 
@@ -298,7 +298,7 @@ show_depth_fbo(void)
    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBO);
    zf = read_float_z_image(0, 0);
 
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
    glWindowPos2i(SIZE, 0);
    glDrawPixels(SIZE, SIZE, GL_LUMINANCE, GL_FLOAT, zf);
@@ -317,7 +317,7 @@ show_depth_fbo(void)
 
       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBO);
       zi = read_uint_z_image(0, 0);
-      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+      glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
       find_uint_min_max_center(zi, SIZE * SIZE, &min, &max, &center);
       printf("depth fbo min 0x%x  max 0x%x  center 0x%x\n", min, max, center);
@@ -343,7 +343,7 @@ draw_quad_with_depth_texture(void)
       t1 = SIZE;
    }
 
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
@@ -382,7 +382,7 @@ draw_quad_with_depth_texture(void)
 static void
 draw_sphere_with_fragment_shader_compare(void)
 {
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 
    glViewport(0 * SIZE, 0, SIZE, SIZE);
 

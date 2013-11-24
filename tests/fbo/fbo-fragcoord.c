@@ -104,7 +104,7 @@ piglit_display(void)
 	piglit_draw_rect(-1, -1, 2, 2);
 
 	/* Draw the FBO to the screen. */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	glClearColor(0.0, 0.0, 1.0, 0.0);

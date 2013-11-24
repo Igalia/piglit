@@ -73,7 +73,7 @@ enum piglit_result piglit_display(void)
 	pass = piglit_probe_image_rgba(0, 0, 16, 16, res_data);
 
 	glUseProgram(0);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, piglit_width, piglit_height);
 
 	piglit_draw_rect_tex(-1, -1, 2, 2, 0, 0, 1, 1);

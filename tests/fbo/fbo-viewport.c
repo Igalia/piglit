@@ -133,7 +133,7 @@ piglit_display(void)
 			 GL_FRAMEBUFFER_COMPLETE_EXT);
 
 	/* draw reference image in the window */
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	draw_test_image();
 	glReadPixels(0, 0, piglit_width, piglit_height,
 		     GL_RGB, GL_UNSIGNED_BYTE, win_image);
@@ -162,7 +162,7 @@ piglit_display(void)
 		printf("Image comparison passed.\n");
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
 #if 0	/* for debug/compare (alternate diplaying Window vs. FBO image) */
 	{

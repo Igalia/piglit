@@ -178,8 +178,8 @@ hiz_delete_fbo(GLuint fbo)
 
 	glDeleteFramebuffers(1, &fbo);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 
  	if (!piglit_check_gl_error(0))
 		piglit_report_result(PIGLIT_FAIL);
@@ -254,7 +254,7 @@ hiz_run_test_depth_test_fbo(const struct hiz_fbo_options *fbo_options)
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -358,7 +358,7 @@ hiz_run_test_depth_read_fbo(const struct hiz_fbo_options *fbo_options)
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -465,7 +465,7 @@ hiz_run_test_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -580,7 +580,7 @@ hiz_run_test_stencil_read_fbo(const struct hiz_fbo_options *fbo_options)
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -704,7 +704,7 @@ hiz_run_test_depth_stencil_test_fbo(const struct hiz_fbo_options *fbo_options)
 
 	if (!piglit_automatic) {
 		/* Blit the FBO to the window FB so we can see the results. */
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, piglit_width, piglit_height,
 			          0, 0, piglit_width, piglit_height,
 			          GL_COLOR_BUFFER_BIT, GL_NEAREST);

@@ -133,11 +133,11 @@ piglit_display(void)
 					  0);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBlitFramebuffer(0, 0, 2, 2,
 				  2, 2, 20, 20,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	}
 	glEndQuery(GL_SAMPLES_PASSED);
 	test_pass &= verify_no_fragments(query, "glBlitFramebuffer");
@@ -169,7 +169,7 @@ piglit_display(void)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fb);
 		glCopyTexSubImage2D(GL_TEXTURE_2D, 0,
 				    1, 1, 0, 0, 1, 1);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	}
 	glEndQuery(GL_SAMPLES_PASSED);
 	test_pass &= verify_no_fragments(query, "glCopyTexImage2D");

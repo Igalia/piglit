@@ -179,7 +179,7 @@ run_test(void)
 	fbo = make_fbo(fbo_width, fbo_height);
 
 	/* query depth/stencil sizes */
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glGetIntegerv(GL_DEPTH_BITS, &win_depth_bits);
 	glGetIntegerv(GL_STENCIL_BITS, &win_stencil_bits);
 
@@ -196,7 +196,7 @@ run_test(void)
 	}
 
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glViewport(0, 0, fbo_width, fbo_height);
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);
 	glClearDepth(0.54321);
@@ -211,7 +211,7 @@ run_test(void)
 	 * Also blit with stencil to exercise this path.
 	 * Not that we need it for this test.
 	 */
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
 	copy(x0, y0, x0 + SIZE, y0 + SIZE,
 	     x0, y1, x0 + SIZE, y1 + SIZE,
@@ -222,19 +222,19 @@ run_test(void)
 
 	/* WIN(bottom) -> FBO(middle) */
 	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, fbo);
-	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	copy(x0, y0, x0 + SIZE, y0 + SIZE,
 	     x0, y1, x0 + SIZE, y1 + SIZE,
 	     GL_DEPTH_BUFFER_BIT);
 
 	/* FBO(middle) -> WIN(top) back to verify WIN -> FBO */
-	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo);
 	copy(x0, y1, x0 + SIZE, y1 + SIZE,
 	     x0, y2, x0 + SIZE, y2 + SIZE,
 	     GL_DEPTH_BUFFER_BIT);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	assert(glGetError() == 0);
 
 	printf("Verify 1\n");
@@ -248,7 +248,7 @@ run_test(void)
 	pass = verify_depth_rect(PAD, y0, SIZE, SIZE) && pass;
 	printf("Verify 5 (FBO)\n");
 	pass = verify_depth_rect(PAD, y1, SIZE, SIZE) && pass;
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	assert(glGetError() == 0);
 
 	piglit_present_results();

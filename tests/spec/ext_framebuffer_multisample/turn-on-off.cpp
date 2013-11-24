@@ -71,7 +71,7 @@ piglit_display(void)
 	test->draw_to_default_framebuffer();
 
 	/* Read color buffer */
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	color_buffer = (GLfloat *) malloc(w * h * 4 * sizeof(float));
 	glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, color_buffer);
 
