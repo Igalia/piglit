@@ -1833,9 +1833,9 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         for options in power_set(sensible_options):
             test_name = ' '.join(['accuracy', str(num_samples), test_type]
                                  + options)
-            executable = 'ext_framebuffer_multisample-{0} -auto'.format(
+            executable = 'ext_framebuffer_multisample-{0}'.format(
                     test_name)
-            ext_framebuffer_multisample[test_name] = PlainExecTest(executable)
+            ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['turn-on-off', str(num_samples)])
