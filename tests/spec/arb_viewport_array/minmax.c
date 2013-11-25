@@ -56,6 +56,7 @@ piglit_init(int argc, char **argv)
 {
 	GLint layer, index;
 
+	piglit_require_extension("GL_ARB_viewport_array");
 	piglit_print_minmax_header();
 
 	piglit_test_min_viewport_dimensions(); /* GL_MAX_VIEWPORT_DIMS */
