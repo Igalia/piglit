@@ -28,7 +28,7 @@ import sys
 import subprocess
 
 from os import path
-from framework.core import testBinDir, TestProfile
+from framework.core import testBinDir, TestProfile, TestResult
 from framework.exectest import ExecTest
 
 #############################################################################
@@ -39,12 +39,32 @@ from framework.exectest import ExecTest
 ##### automatically add all tests into the 'igt' category.
 #############################################################################
 
+def checkEnvironment():
+    debugfs_path = "/sys/kernel/debug/dri"
+    if os.getuid() != 0:
+        print "Test Environment check: not root!"
+        return False
+    if not os.path.isdir(debugfs_path):
+        print "Test Environment check: debugfs not mounted properly!"
+        return False
+    for subdir in os.listdir(debugfs_path):
+        clients = open(os.path.join(debugfs_path, subdir, "clients"), 'r')
+        lines = clients.readlines()
+        if len(lines) > 2:
+            print "Test Environment check: other drm clients running!"
+            return False
+
+    print "Test Environment check: Succeeded."
+    return True
+
 if not os.path.exists(os.path.join(testBinDir, 'igt')):
     print "igt symlink not found!"
     sys.exit(0)
 
 # Chase the piglit/bin/igt symlink to find where the tests really live.
 igtTestRoot = path.join(path.realpath(path.join(testBinDir, 'igt')), 'tests')
+
+igtEnvironmentOk = checkEnvironment()
 
 profile = TestProfile()
 
@@ -54,6 +74,9 @@ class IGTTest(ExecTest):
         self.timeout = 60*20 # 20 minutes deadline by default
 
     def interpretResult(self, out, returncode, results, dmesg):
+        if not igtEnvironmentOk:
+            return out
+
         if returncode == 0:
             results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
         elif returncode == 77:
@@ -63,6 +86,13 @@ class IGTTest(ExecTest):
         return out
     def run(self, env):
         env.dmesg = True
+        if not igtEnvironmentOk:
+            results = TestResult()
+            results['result'] = 'fail'
+            results['info'] = unicode("Test Environment isn't OK")
+
+            return results
+
         return ExecTest.run(self, env)
 
 def listTests(listname):
