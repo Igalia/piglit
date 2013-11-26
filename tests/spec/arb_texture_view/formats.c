@@ -50,6 +50,7 @@ PIGLIT_GL_TEST_CONFIG_END
 static const char *TestName = "arb_texture_view-formats";
 
 #define MAX_ILLEGAL_FORMATS 17
+#define VIEW_CLASS_NOT_IN_TABLE 0xfffffff
 
 /**
  * Iterate through array of texture formats and check if call to TextureView
@@ -75,6 +76,8 @@ check_format_array(const GLenum err, const unsigned int numFormats,
 			      layers);
 		glDeleteTextures(1, &newTex);
 		if (!piglit_check_gl_error(err)) {
+			printf("failing texView format=%s\n",
+			       piglit_get_gl_enum_name(format));
 			pass = false;
 			break;
 		}
@@ -178,6 +181,8 @@ test_format_errors(GLenum format_class)
 		GL_COMPRESSED_SRGB_ALPHA,
 		GL_COMPRESSED_SLUMINANCE,
 		GL_COMPRESSED_SLUMINANCE_ALPHA,
+		/* format that is legal for TexStorage but not in table */
+		GL_RGB12
 	};
 
 	glGenTextures(1, &tex);   /* orig tex */
@@ -243,8 +248,14 @@ test_format_errors(GLenum format_class)
 				    ARRAY_SIZE(illegalFormats),
 				    GL_R8UI, GL_R8I, GL_R8, GL_R8_SNORM, 0);
 		break;
+	case VIEW_CLASS_NOT_IN_TABLE:
+		glTexStorage2D(target, levels, GL_RGB12, width, height);
+		numFormats = update_valid_arrays(legalFormats, illegalFormats,
+				    ARRAY_SIZE(illegalFormats),
+				    GL_RGB12, 0);
+		break;
 	default:
-	    assert(0);
+	    assert(!"Invalid format_class\n");
 	}
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
@@ -304,6 +315,7 @@ piglit_init(int argc, char **argv)
 	X(test_format_errors(GL_VIEW_CLASS_24_BITS), "Format 24 bits validity");
 	X(test_format_errors(GL_VIEW_CLASS_16_BITS), "Format 16 bits validity");
 	X(test_format_errors(GL_VIEW_CLASS_8_BITS), "Format 8 bits validity");
+	X(test_format_errors(VIEW_CLASS_NOT_IN_TABLE), "Format misc validity");
 #undef X
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
