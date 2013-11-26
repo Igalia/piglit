@@ -207,14 +207,15 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_viewport_array");
 
 	asprintf(&vsSource,
-		 "#version 410\n"
+		 "#version 150\n"
 		 "in vec4 piglit_vertex;\n"
 		 "void main() {\n"
 		 "	gl_Position = piglit_vertex;\n"
 		 "}\n");
 
 	asprintf(&gsSource,
-		 "#version 410\n"
+		 "#version 150\n"
+		 "#extension GL_ARB_viewport_array : enable\n"
 		 "layout(triangles) in;\n"
 		 "layout(triangle_strip, max_vertices = 18) out;\n"
 		 "out vec3 color;\n"
@@ -233,7 +234,7 @@ piglit_init(int argc, char **argv)
 		 "}\n", divX * divY);
 
 	asprintf(&fsSource,
-		 "#version 410\n"
+		 "#version 150\n"
 		 "in vec3 color;\n"
 		 "void main() {\n"
 		 "	gl_FragColor = vec4(color.xyz, 1.0);\n"

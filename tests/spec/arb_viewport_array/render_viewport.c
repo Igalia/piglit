@@ -48,7 +48,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 const char *vsSource = {
-	"#version 410\n"
+	"#version 150\n"
 	"in vec4 piglit_vertex;\n"
 	"void main() {\n"
 	"	gl_Position = piglit_vertex;\n"
@@ -56,7 +56,8 @@ const char *vsSource = {
 };
 
 const char *gsSource = {
-	"#version 410\n"
+	"#version 150\n"
+	"#extension GL_ARB_viewport_array : enable\n"
 	"layout(triangles) in;\n"
 	"layout(triangle_strip, max_vertices = 3) out;\n"
 	"uniform int idx;\n"
@@ -73,7 +74,7 @@ const char *gsSource = {
 };
 
 const char *fsSource = {
-	"#version 410\n"
+	"#version 150\n"
 	"uniform vec3 color;\n"
 	"void main() {\n"
 	"	gl_FragColor = vec4(color.xyz, 1.0);\n"
