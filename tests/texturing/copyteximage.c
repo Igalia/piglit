@@ -120,6 +120,25 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static const char array1D_shader_text[] =
+	"#extension GL_EXT_texture_array: require\n"
+	"uniform sampler1DArray s;\n"
+	"void main()\n"
+	"{\n"
+	"    gl_FragColor = texture1DArray(s, gl_TexCoord[0].xy);\n"
+	"}\n"
+	;
+
+static const char array2D_shader_text[] =
+	"#extension GL_EXT_texture_array: require\n"
+	"uniform sampler2DArray s;\n"
+	"void main()\n"
+	"{\n"
+	"    gl_FragColor = texture2DArray(s, gl_TexCoord[0].xyz);\n"
+	"}\n"
+	;
+
+
 static GLboolean
 is_compressed_format(GLenum format)
 {
@@ -188,6 +207,14 @@ supported_target_format(GLenum target, GLenum format)
 static bool
 supported_target(unsigned i)
 {
+	/* Array targets are only supported if GLSL is available.
+	 */
+	if ((target[i].target == GL_TEXTURE_1D_ARRAY
+	     || target[i].target == GL_TEXTURE_2D_ARRAY)
+	    && (piglit_get_gl_version() < 20
+		&& !piglit_is_extension_supported("GL_ARB_fragment_shader")))
+		return false;
+
 	return piglit_get_gl_version() >= target[i].gl_version ||
 		(target[i].extension &&
 		 piglit_is_extension_supported(target[i].extension));
@@ -364,6 +391,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 {
 	GLboolean pass = GL_TRUE;
 	GLuint k;
+	GLuint prog = 0;
 
 	printf("Texture target = %s, Internal format = %s",
 	       piglit_get_gl_enum_name(target),
@@ -474,7 +502,9 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-		glEnable(target);
+		prog = piglit_build_simple_program(NULL, array1D_shader_text);
+		glUseProgram(prog);
+		glDeleteProgram(prog);
 
 		for (k = 0; k < 16; k++) {
 			piglit_draw_rect_tex(x, y, IMAGE_SIZE, IMAGE_SIZE,
@@ -496,7 +526,9 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
-		glEnable(target);
+		prog = piglit_build_simple_program(NULL, array2D_shader_text);
+		glUseProgram(prog);
+		glDeleteProgram(prog);
 
 		for (k = 0; k < 4; k++) {
 			draw_rect_tex_3d(x, y, IMAGE_SIZE, IMAGE_SIZE,
@@ -522,7 +554,15 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		break;
 	}
 
-	glDisable(target);
+	/* If a GLSL program is in use, then the preceeding code should not
+	 * have called glEnable(target).  In that case, this code should not
+	 * disable it.  For some targets, like GL_TEXTURE_1D_ARRAY,
+	 * glDisable(target) will generate an error.
+	 */
+	if (prog == 0)
+		glDisable(target);
+	else
+		glUseProgram(0);
 
 	return pass;
 }
