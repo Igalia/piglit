@@ -1,0 +1,45 @@
+# Check that loop analysis properly accounts for the side effects of a
+# function call, even if that function call appears inside a nested
+# loop.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+int i;
+int num_calls_to_foo;
+attribute vec4 piglit_vertex;
+varying vec4 color;
+
+void foo()
+{
+  num_calls_to_foo++;
+  i = 2;
+}
+
+void main()
+{
+  num_calls_to_foo = 0;
+  for (i = 0; i < 3; i++) { // Executes once, since foo() sets i to 2
+    for (int j = 0; j < 3; j++) { // Executes 3 times
+      foo();
+    }
+  }
+  gl_Position = piglit_vertex;
+  if (num_calls_to_foo == 3)
+    color = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1

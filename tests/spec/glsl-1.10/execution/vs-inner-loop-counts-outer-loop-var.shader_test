@@ -1,0 +1,39 @@
+# Check that when computing the number of iterations executed by
+# nested loops, loop analysis doesn't assume that an increment in the
+# inner loop executes once per invocation of the outer loop.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+attribute vec4 piglit_vertex;
+varying vec4 color;
+
+void main()
+{
+  int num_total_iterations = 0;
+  int i = 0;
+  while (i < 6) { // Executes twice, since inner loop increments i each time through
+    for (int j = 0; j < 3; j++) { // Executes 3 times
+      num_total_iterations++;
+      i++;
+    }
+  }
+  gl_Position = piglit_vertex;
+  if (num_total_iterations == 6)
+    color = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
