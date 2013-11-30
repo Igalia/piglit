@@ -111,13 +111,11 @@
 //       http://www.bytereef.org/mpdecimal/index.html
 //#define REGEX_TYPE_HALF       "buffer half[1]"
 #define REGEX_TYPE_FLOAT      REGEX_DEFINE_TYPE("float")
-// TODO: at runtime check if device supports OpenCL C 1.2
-//       or is cl_khr_fp64
-//#define REGEX_TYPE_DOUBLE     "double"
+#define REGEX_TYPE_DOUBLE      REGEX_DEFINE_TYPE("double")
 #define REGEX_TYPE  REGEX_TYPE_CHAR "|" REGEX_TYPE_UCHAR "|" \
                     REGEX_TYPE_SHORT "|" REGEX_TYPE_USHORT "|" \
                     REGEX_TYPE_INT "|" REGEX_TYPE_UINT "|" REGEX_TYPE_LONG "|" \
-                    REGEX_TYPE_ULONG "|" REGEX_TYPE_FLOAT
+                    REGEX_TYPE_ULONG "|" REGEX_TYPE_FLOAT "|" REGEX_TYPE_DOUBLE
 
 /*
  * Value argument:
@@ -210,6 +208,7 @@ enum cl_type {
 	TYPE_LONG,
 	TYPE_ULONG,
 	TYPE_FLOAT,
+	TYPE_DOUBLE,
 };
 
 struct test_arg {
@@ -886,6 +885,7 @@ get_test_arg_value(struct test_arg* test_arg, const char* value, size_t length)
 		CASE(TYPE_LONG,   cl_long,    get_int_array,    int_array)
 		CASE(TYPE_ULONG,  cl_ulong,   get_uint_array,   uint_array)
 		CASE(TYPE_FLOAT,  cl_float,   get_float_array,  float_array)
+		CASE(TYPE_DOUBLE,  cl_double,   get_float_array,  float_array)
 	}
 
 #undef CASE
@@ -922,6 +922,7 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 			test_arg->tolu = get_uint(value_str);
 			break;
 		case TYPE_FLOAT:
+		case TYPE_DOUBLE:
 			test_arg->tolf = get_float(value_str);
 			break;
 		}
@@ -993,6 +994,7 @@ get_test_arg(const char* src, struct test* test, bool arg_in)
 	ELSEIF(REGEX_TYPE_LONG,   TYPE_LONG,   cl_long)
 	ELSEIF(REGEX_TYPE_ULONG,  TYPE_ULONG,  cl_ulong)
 	ELSEIF(REGEX_TYPE_FLOAT,  TYPE_FLOAT,  cl_float)
+	ELSEIF(REGEX_TYPE_DOUBLE,  TYPE_DOUBLE,  cl_double)
 
 #undef IF
 #undef ELSEIF
@@ -1678,6 +1680,7 @@ check_test_arg_value(struct test_arg test_arg,
 		CASEI(TYPE_LONG,   "long",   cl_long)
 		CASEU(TYPE_ULONG,  "ulong",  cl_ulong)
 		CASEF(TYPE_FLOAT,  "float",  cl_float)
+		CASEF(TYPE_DOUBLE,  "double",  cl_double)
 	}
 
 #undef CASEF
