@@ -36,11 +36,16 @@ PIGLIT_GL_TEST_CONFIG_END
  * - set mask to the other half of the samples
  * - render a green thing
  *
- * - blit from the MSAA buffer to the winsys buffer
+ * - blit from the MSAA buffer to the single-sampled FBO
+ * - blit from the single-sampled FBO to the winsys buffer
  * - ensure that the pixels are yellow
+ *
+ *   note the intermediate single-sampled FBO is only necessary so that
+ *   the resolve is always happening FBO->FBO; if we resolve into a winsys
+ *   buffer, there are sRGB interactions.
  */
 
-GLuint fbo, tex;
+GLuint fbo, ss_fbo, tex, ss_rb;
 
 enum piglit_result
 piglit_display(void)
@@ -67,10 +72,16 @@ piglit_display(void)
     if (!piglit_check_gl_error(GL_NO_ERROR))
         piglit_report_result(PIGLIT_FAIL);
 
-    glFinish();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+    /* resolve */
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ss_fbo);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glBlitFramebuffer(0, 0, 64, 64, 0, 0, 64, 64,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+
+    /* single-sampled blit */
+    glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, ss_fbo);
     glBlitFramebuffer(0, 0, 64, 64, 0, 0, 64, 64,
                       GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
@@ -125,4 +136,12 @@ piglit_init(int argc, char **argv)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                   GL_RENDERBUFFER, tex);
     }
+
+    glGenFramebuffers(1, &ss_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, ss_fbo);
+    glGenRenderbuffers(1, &ss_rb);
+    glBindRenderbuffer(GL_RENDERBUFFER, ss_rb);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, 64, 64);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                              GL_RENDERBUFFER, ss_rb);
 }
