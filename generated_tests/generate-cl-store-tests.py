@@ -39,15 +39,21 @@ if not os.path.exists(dirName):
 def gen_array(size):
     return ' '.join([str(i) for i in xrange(size * 8)])
 
+def ext_req(type_name):
+    if type_name[:6] == "double":
+        return "require_device_extensions: cl_khr_fp64"
+    return ""
+
 
 def print_config(f, type_name, addr_space):
-    f.write(textwrap.dedent("""
+    f.write(textwrap.dedent(("""
     [config]
     name: Store {type_name}
     program_source_file: store-kernels-{addr_space}.inc
     build_options: -D TYPE={type_name}
     dimensions: 1
-    """.format(type_name=type_name, addr_space=addr_space)))
+    """ + ext_req(type_name))
+    .format(type_name=type_name, addr_space=addr_space)))
 
 
 def begin_test(type_name, addr_space):
