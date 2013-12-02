@@ -748,6 +748,7 @@ for texture_type in ['3d', '2d_array', '2d_multisample_array', '1d_array',
             texture_type, test_type)
         spec['!OpenGL 3.2/layered-rendering/' + cmdline] = \
             concurrent_test('gl-3.2-layered-rendering-' + cmdline)
+spec['!OpenGL 3.2/layered-rendering/clear-color-mismatched-layer-count'] = concurrent_test('gl-3.2-layered-rendering-clear-color-mismatched-layer-count')
 spec['!OpenGL 3.2/layered-rendering/clear-depth'] = concurrent_test('gl-3.2-layered-rendering-clear-depth')
 spec['!OpenGL 3.2/layered-rendering/framebuffertexture'] = concurrent_test('gl-3.2-layered-rendering-framebuffertexture')
 spec['!OpenGL 3.2/layered-rendering/framebuffertexture-buffer-textures'] = concurrent_test('gl-3.2-layered-rendering-framebuffertexture-buffer-textures')
