@@ -115,38 +115,65 @@ test_extension_list(void)
 enum piglit_result
 test_clearing(void)
 {
-#if 0
-   static const GLfloat purple[4] = {1.0, 0.0, 1.0, 1.0};
-   GLuint buf = GL_FRONT;
-   GLfloat color[4], z;
-#endif
-   GLfloat z;
-   GLint stencil;
+   static const GLfloat purple[] = {1.0, 0.0, 1.0};
+   static const GLfloat blue[] = {0.0, 0.0, 1.0};
+   static const GLfloat green[] = {0.0, 1.0, 0.0};
    GLenum err;
+   GLboolean pass = GL_TRUE;
 
    while (glGetError() != GL_NO_ERROR)
       ;
 
-   /* XXX this fails with NVIDIA's driver.  Is this test correct?? */
-#if 0
-   /* Color */
-   glClearBufferfv(GL_COLOR, buf, purple);
+   /* Front buffer. */
+   glDrawBuffer(GL_FRONT);
+   glClearBufferfv(GL_COLOR, 0, purple);
    err = glGetError();
    if (err) {
-      printf("%s: glClearBufferfv() generated error 0x%x.\n", Prog, err);
+      printf("%s: glClearBufferfv(GL_FRONT) generated error 0x%x.\n", Prog, err);
       return PIGLIT_FAIL;
    }
 
-   glReadBuffer(buf);
-   glReadPixels(20, 20, 1, 1, GL_RGBA, GL_FLOAT, color);
-   if (color[0] != purple[0] ||
-       color[1] != purple[1] ||
-       color[2] != purple[2] ||
-       color[3] != purple[3]) {
-      printf("%s: glClearBufferfv() failed.\n", Prog);
+   glReadBuffer(GL_FRONT);
+   if (!piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, purple)) {
+      printf("  from glClearBufferfv(GL_FRONT) failed.\n");
+      pass = GL_FALSE;
+   }
+
+   /* Back buffer. */
+   glDrawBuffer(GL_BACK);
+   glClearBufferfv(GL_COLOR, 0, blue);
+   err = glGetError();
+   if (err) {
+      printf("%s: glClearBufferfv(GL_BACK) generated error 0x%x.\n", Prog, err);
       return PIGLIT_FAIL;
    }
-#endif
+
+   glReadBuffer(GL_BACK);
+   if (!piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, blue)) {
+      printf("  from glClearBufferfv(GL_BACK) failed.\n");
+      pass = GL_FALSE;
+   }
+
+   /* Front and back buffer. */
+   glDrawBuffer(GL_FRONT_AND_BACK);
+   glClearBufferfv(GL_COLOR, 0, green);
+   err = glGetError();
+   if (err) {
+      printf("%s: glClearBufferfv(GL_FRONT_AND_BACK) generated error 0x%x.\n", Prog, err);
+      return PIGLIT_FAIL;
+   }
+
+   glReadBuffer(GL_FRONT);
+   if (!piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, green)) {
+      printf("  the front buffer from glClearBufferfv(GL_FRONT_AND_BACK) failed.\n");
+      pass = GL_FALSE;
+   }
+
+   glReadBuffer(GL_BACK);
+   if (!piglit_probe_rect_rgb(0, 0, piglit_width, piglit_height, green)) {
+      printf("  the back buffer from glClearBufferfv(GL_FRONT_AND_BACK) failed.\n");
+      pass = GL_FALSE;
+   }
 
    /* Depth & Stencil */
    glClearBufferfi(GL_DEPTH_STENCIL, 0, 0.5, 3);
@@ -156,20 +183,17 @@ test_clearing(void)
       return PIGLIT_FAIL;
    }
 
-   glReadPixels(20, 20, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
-   if (fabs(z - 0.5) > 0.001) {
-      printf("%s: glClearBufferfi() failed (z was %f, expected 0.5).\n", Prog, z);
-      return PIGLIT_FAIL;
+   if (!piglit_probe_rect_depth(0, 0, piglit_width, piglit_height, 0.5)) {
+      printf("  from glClearBufferfi() failed.\n");
+      pass = GL_FALSE;
    }
 
-   glReadPixels(20, 20, 1, 1, GL_STENCIL_INDEX, GL_INT, &stencil);
-   if (stencil != 3) {
-      printf("%s: glClearBufferfi() failed (stencil was %d, expected 3).\n",
-             Prog, stencil);
-      return PIGLIT_FAIL;
+   if (!piglit_probe_rect_stencil(0, 0, piglit_width, piglit_height, 3)) {
+      printf("  from glClearBufferfi() failed.\n");
+      pass = GL_FALSE;
    }
 
-   return PIGLIT_PASS;
+   return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
