@@ -1,3 +1,4 @@
 piglit_cl_add_custom_test (run-simple-kernel run-simple-kernel.c)
 piglit_cl_add_custom_test (flush-after-enqueue-kernel flush-after-enqueue-kernel.c)
 piglit_cl_add_custom_test (r600-create-release-buffer-bug r600-create-release-buffer-bug.c)
+piglit_cl_add_custom_test (buffer-flags buffer-flags.c)

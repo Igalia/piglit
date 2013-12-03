@@ -40,6 +40,7 @@ profile.tests['Program'] = program
 add_plain_test(custom, 'Run simple kernel', ['cl-custom-run-simple-kernel'])
 add_plain_test(custom, 'Flush after enqueue kernel', ['cl-custom-flush-after-enqueue-kernel'])
 add_plain_test(custom, 'r600 create release buffer bug', ['cl-custom-r600-create-release-buffer-bug'])
+add_plain_test(custom, 'Buffer flags', ['cl-custom-buffer-flags'])
 
 # API
 #  Platform
