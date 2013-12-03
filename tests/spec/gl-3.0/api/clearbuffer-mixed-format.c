@@ -94,6 +94,7 @@ generate_fbo(void)
 	GLuint rb[COUNT];
 	GLuint i;
 	GLenum status;
+	GLenum drawbuffers[COUNT];
 
 	/* Generate a frame buffer object */
 	glGenFramebuffers(1, &fb);
@@ -102,6 +103,8 @@ generate_fbo(void)
 	glGenRenderbuffers(COUNT, rb);
 
 	for(i = 0; i < COUNT; i++) {
+		drawbuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+
 		glBindRenderbuffer(GL_RENDERBUFFER, rb[i]);
 		/* Buffer storage is allocated based on render buffer format */
 		glRenderbufferStorage(GL_RENDERBUFFER,
@@ -135,10 +138,9 @@ generate_fbo(void)
 	/* All the color render buffers are cleared to default RGBA
 	 * (0.0, 0.0, 0.0, 1.0) color
 	 */
-	for (i = 0; i < COUNT; i++) {
-		glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+	glDrawBuffers(COUNT, drawbuffers);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 	return fb;
@@ -148,7 +150,7 @@ void piglit_init(int argc, char **argv)
 {
 	GLuint fb;
 	bool pass = true;
-	int i, j;
+	int i;
 
 	piglit_require_gl_version(30);
 	fb = generate_fbo();
@@ -163,14 +165,8 @@ void piglit_init(int argc, char **argv)
 		       " attachments\n");
 
         for (i = 0; i < COUNT; i++) {
-
-		/* Set the draw buffer and read buffer */
-		glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
-
 		/* Clear the color buffer to a unique color */
 		switch (test_vectors[i].type) {
-
 		/* Float buffer types */
 		case GL_FLOAT:
 			glClearBufferfv(GL_COLOR,
@@ -192,34 +188,19 @@ void piglit_init(int argc, char **argv)
 
 			break;
 		}
-		/* Test the pixel values of color buffer against
-		 * expected color values
-		 */
-		pass = pass &&
-		       probe_rect_color(0,
-					0,
-					piglit_width,
-					piglit_height,
-					test_vectors[i].type,
-					test_vectors[i].clear_color);
+	}
 
-		/* Verify that glClearBuffer[uif]v functions only modify the
-		 * color data of current draw buffer. Other color buffers stay
-		 * uneffected
-		 */
-		for (j = 0; j < i; j++) {
-			/* Set the read buffer */
-			glReadBuffer(GL_COLOR_ATTACHMENT0 + j);
-			/* Test the pixel values of color buffer against
-			 * expected color values
-			 */
-			pass = pass &&
-			       probe_rect_color(0,
-						0,
-						piglit_width,
-						piglit_height,
-						test_vectors[j].type,
-						test_vectors[j].clear_color);
+	/* Now test pixels of all color attachments. */
+	for (i = 0; i < COUNT; i++) {
+		glReadBuffer(GL_COLOR_ATTACHMENT0 + i);
+		if (!probe_rect_color(0,
+				      0,
+				      piglit_width,
+				      piglit_height,
+				      test_vectors[i].type,
+				      test_vectors[i].clear_color)) {
+			printf("  from color attachment %i.\n", i);
+			pass = GL_FALSE;
 		}
 	}
 
@@ -230,8 +211,6 @@ void piglit_init(int argc, char **argv)
 	 * Buffers"
 	 */
 	for (i = 0; i < COUNT; i++) {
-		glDrawBuffer(GL_COLOR_ATTACHMENT0 + i);
-
 		glClearBufferuiv(GL_COLOR,
 				 i,
 				 uicolor[0]);
