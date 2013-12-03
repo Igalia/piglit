@@ -1458,6 +1458,7 @@ add_shader_test_dir(arb_shader_texture_lod['execution'],
 	            os.path.join(testsDir, 'spec', 'arb_shader_texture_lod', 'execution'),
 		    recursive=True)
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgrad')
+add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgradcube')
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod', '-GL_ARB_shader_texture_lod'])
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-nobias', '-GL_ARB_shader_texture_lod'])
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = PlainExecTest(['tex-miplevel-selection', '-auto', '-GL_ARB_shader_texture_lod'])
