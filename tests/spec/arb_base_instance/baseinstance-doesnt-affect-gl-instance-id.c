@@ -30,14 +30,14 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 32; //what settings should be here?
+	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vstext =
-	"#version 150\n"
+	"#version 140\n"
 	"in vec3 vertex;\n"
 	"out vec4 passColor;\n"
 	"void main() {\n"
@@ -47,7 +47,7 @@ static const char *vstext =
 	"}\n";
 
 static const char *fstext =
-	"#version 150\n"
+	"#version 140\n"
 	"in vec4 passColor;\n"
 	"out vec4 color;\n"
 	"void main() {\n"
@@ -78,9 +78,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint vertIndex;
 
-	if (piglit_get_gl_version() < 32) {
-		piglit_require_extension("GL_ARB_base_instance");
-	}
+	piglit_require_extension("GL_ARB_base_instance");
 
 	prog = piglit_build_simple_program(vstext, fstext);
 
