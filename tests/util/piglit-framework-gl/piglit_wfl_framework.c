@@ -245,8 +245,9 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 
 	config = waffle_config_choose(wfl_fw->display,
 	                              full_attrib_list);
-	if (!config)
-		wfl_log_debug("waffle_config_choose");
+	if (!config) {
+		wfl_log_error("waffle_config_choose");
+	}
 
 	free(full_attrib_list);
 	return config;
@@ -348,7 +349,7 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 
 	wfl_fw->context = waffle_context_create(wfl_fw->config, NULL);
 	if (!wfl_fw->context) {
-		wfl_log_debug("waffle_context_create");
+		wfl_log_error("waffle_context_create");
 		goto fail;
 	}
 
