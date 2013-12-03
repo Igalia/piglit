@@ -143,6 +143,59 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
 }
 
 /**
+ * Return a human-readable description of the context specified by an \a
+ * attrib_list suitable for waffle_config_choose(). At most \a bufsize bytes,
+ * including the terminal null, are written to \a buf.
+ */
+static void
+make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[])
+{
+	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0;
+	const char *api_str = NULL, *profile_str = NULL;
+
+	if (bufsize == 0) {
+		return;
+	}
+
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_API, &api);
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_PROFILE, &profile);
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &major_version);
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MINOR_VERSION, &minor_version);
+
+	switch (api) {
+	case WAFFLE_CONTEXT_OPENGL:
+		api_str = "OpenGL";
+		break;
+	case WAFFLE_CONTEXT_OPENGL_ES1:
+	case WAFFLE_CONTEXT_OPENGL_ES2:
+	case WAFFLE_CONTEXT_OPENGL_ES3:
+		api_str = "OpenGL ES";
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	switch (profile) {
+	case WAFFLE_CONTEXT_CORE_PROFILE:
+		profile_str = "Core ";
+		break;
+	case WAFFLE_CONTEXT_COMPATIBILITY_PROFILE:
+		profile_str = "Compatibility ";
+		break;
+	case 0:
+		profile_str = "";
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	snprintf(buf, bufsize, "%s %d.%d %sContext",
+		api_str, major_version, minor_version, profile_str);
+}
+
+/**
  * \brief Return a attribute list suitable for waffle_config_choose().
  *
  * The funcion deduces the values of WAFFLE_CONTEXT_API,
@@ -255,7 +308,8 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
  */
 static bool
 check_gl_version(const struct piglit_gl_test_config *test_config,
-                 enum context_flavor flavor)
+                 enum context_flavor flavor,
+		 const char *context_description)
 {
 	switch (flavor) {
 	case CONTEXT_GL_CORE:
@@ -274,10 +328,9 @@ check_gl_version(const struct piglit_gl_test_config *test_config,
 		if (actual_version >= test_config->supports_gl_compat_version)
 		   return true;
 
-		printf("piglit: info: Requested a GL %d.%d compatibility "
-		       "context, but actual context version is %d.%d\n",
-		       test_config->supports_gl_compat_version / 10,
-		       test_config->supports_gl_compat_version % 10,
+		printf("piglit: info: Requested a %s, but actual context "
+		       "version is %d.%d\n",
+		       context_description,
 		       actual_version / 10,
 		       actual_version % 10);
 		return false;
@@ -293,7 +346,8 @@ check_gl_version(const struct piglit_gl_test_config *test_config,
  */
 static bool
 special_case_gl_31(const struct piglit_gl_test_config *test_config,
-                   enum context_flavor flavor)
+                   enum context_flavor flavor,
+		   const char *context_description)
 {
 	int gl_version;
 
@@ -304,10 +358,15 @@ special_case_gl_31(const struct piglit_gl_test_config *test_config,
 		assert(gl_version >= 31);
 
 		if (gl_version == 31
-		    && piglit_is_extension_supported("GL_ARB_compatibility"))
+		    && piglit_is_extension_supported("GL_ARB_compatibility")) {
+			printf("piglit: info: Requested a %s, but the actual "
+			       "context is a 3.1 context that exposes the "
+			       "GL_ARB_compatibility extension\n",
+			       context_description);
 			return false;
-		else
+		} else {
 			return true;
+		}
 
 	} else if (flavor == CONTEXT_GL_COMPAT
 	           && test_config->supports_gl_compat_version == 31) {
@@ -316,10 +375,15 @@ special_case_gl_31(const struct piglit_gl_test_config *test_config,
 		assert(gl_version >= 31);
 
 		if (gl_version == 31
-		    && !piglit_is_extension_supported("GL_ARB_compatibility"))
+		    && !piglit_is_extension_supported("GL_ARB_compatibility")) {
+			printf("piglit: info: Requested a %s, but the actual "
+			       "context is a 3.1 context that lacks the "
+			       "GL_ARB_compatibility extension\n",
+			       context_description);
 			return false;
-		else
+		} else {
 			return true;
+		}
 	} else {
 		/* No need to check the special case. */
 		return true;
@@ -334,6 +398,7 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 {
 	bool ok;
 	int32_t *attrib_list = NULL;
+	char ctx_desc[1024];
 
 	assert(wfl_fw->config == NULL);
 	assert(wfl_fw->context == NULL);
@@ -342,17 +407,21 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	attrib_list = make_config_attrib_list(test_config, flavor,
 					      partial_config_attrib_list);
 	assert(attrib_list);
-
+	make_context_description(ctx_desc, sizeof(ctx_desc), attrib_list);
 	wfl_fw->config = waffle_config_choose(wfl_fw->display, attrib_list);
 	free(attrib_list);
 	if (!wfl_fw->config) {
 		wfl_log_error("waffle_config_choose");
+		fprintf(stderr, "piglit: error: Failed to create "
+			"waffle_config for %s\n", ctx_desc);
 		goto fail;
 	}
 
 	wfl_fw->context = waffle_context_create(wfl_fw->config, NULL);
 	if (!wfl_fw->context) {
 		wfl_log_error("waffle_context_create");
+		fprintf(stderr, "piglit: error: Failed to create "
+			"waffle_context for %s\n", ctx_desc);
 		goto fail;
 	}
 
@@ -370,11 +439,11 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_ES2);
 #endif
 
-	ok = check_gl_version(test_config, flavor);
+	ok = check_gl_version(test_config, flavor, ctx_desc);
 	if (!ok)
 	   goto fail;
 
-	ok = special_case_gl_31(test_config, flavor);
+	ok = special_case_gl_31(test_config, flavor, ctx_desc);
 	if (!ok)
 		goto fail;
 
@@ -411,11 +480,6 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 			piglit_is_core_profile = true;
 			return;
 		}
-
-		printf("piglit: info: Failed to create GL %d.%d "
-		       "core context\n",
-		       test_config->supports_gl_core_version / 10,
-		       test_config->supports_gl_core_version % 10);
 	}
 
 	if (test_config->supports_gl_core_version &&
@@ -433,11 +497,6 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 		                                     partial_config_attrib_list);
 		if (ok)
 		   return;
-
-		printf("piglit: info: Failed to create GL %d.%d "
-		       "compatibility context\n",
-		       test_config->supports_gl_compat_version / 10,
-		       test_config->supports_gl_compat_version % 10);
 	}
 
 #elif defined(PIGLIT_USE_OPENGL_ES1) || \
@@ -449,8 +508,6 @@ make_context_current(struct piglit_wfl_framework *wfl_fw,
 
 	if (ok)
 		return;
-
-	printf("piglit: info: Failed to create GL ES context\n");
 #else
 #	error
 #endif
