@@ -58,7 +58,7 @@ void piglit_init(int argc, char **argv)
 	/* Create a new list in compile mode */
 	glNewList(index, GL_COMPILE);
 	glClearBufferfv(GL_COLOR,
-			GL_BACK,
+			0,
 			first);
 	glEndList();
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
@@ -82,7 +82,7 @@ void piglit_init(int argc, char **argv)
 	/* Create a new list in compile and execute mode */
 	glNewList(index + 1, GL_COMPILE_AND_EXECUTE);
 	glClearBufferfv(GL_COLOR,
-			GL_BACK,
+			0,
 			second);
 	glEndList();
 
@@ -96,7 +96,7 @@ void piglit_init(int argc, char **argv)
 	 * call glCallList() and probe the color buffer again
 	 */
 	glClearBufferfv(GL_COLOR,
-			GL_BACK,
+			0,
 			third);
 	/* Probe the color buffer before glCallList() */
 	pass = piglit_probe_rect_rgba(0, 0,
