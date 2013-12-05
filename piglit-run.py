@@ -56,10 +56,19 @@ def main():
                         metavar="<regex>",
                         help="Exclude matching tests "
                              "(can be used more than once)")
-    parser.add_argument("-1", "--no-concurrency",
-                        action="store_false",
-                        dest="concurrency",
-                        help="Disable concurrent test runs")
+    conc_parser = parser.add_mutually_exclusive_group()
+    conc_parser.add_argument('-c', '--all-concurrent',
+                             action="store_const",
+                             default="some",
+                             const="all",
+                             dest="concurrency",
+                             help="Run all tests concurrently")
+    conc_parser.add_argument("-1", "--no-concurrency",
+                             action="store_const",
+                             default="some",
+                             const="none",
+                             dest="concurrency",
+                             help="Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
                         choices=["glx", "x11_egl", "wayland", "gbm"],
                         help="Name of windows system passed to waffle")

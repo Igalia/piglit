@@ -564,22 +564,32 @@ class TestProfile:
 
         self.prepare_test_list(env)
 
-        # If using concurrency, add all the concurrent tests to the pool and
-        # execute that pool
-        if env.concurrent:
+        # If concurrency is set to 'all' run all tests out of a concurrent
+        # threadpool, if it's none, then run evey test serially. otherwise mix
+        # and match them
+        if env.concurrent == "all":
+            pool = ThreadPool(multiprocessing.cpu_count())
+            for (path, test) in self.test_list.items():
+                pool.add(test.execute, (env, path, json_writer))
+            pool.join()
+        elif env.concurrent == "none":
+            pool = ThreadPool(1)
+            for (path, test) in self.test_list.items():
+                if not env.concurrent or not test.runConcurrent:
+                    pool.add(test.execute, (env, path, json_writer))
+            pool.join()
+        else:
             pool = ThreadPool(multiprocessing.cpu_count())
             for (path, test) in self.test_list.items():
                 if test.runConcurrent:
                     pool.add(test.execute, (env, path, json_writer))
             pool.join()
 
-        # Run any remaining tests serially from a single thread pool after the
-        # concurrent tests have finished
-        pool = ThreadPool(1)
-        for (path, test) in self.test_list.items():
-            if not env.concurrent or not test.runConcurrent:
-                pool.add(test.execute, (env, path, json_writer))
-        pool.join()
+            pool = ThreadPool(1)
+            for (path, test) in self.test_list.items():
+                if not test.runConcurrent:
+                    pool.add(test.execute, (env, path, json_writer))
+            pool.join()
 
     def remove_test(self, test_path):
         """Remove a fully qualified test from the profile.
