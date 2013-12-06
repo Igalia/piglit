@@ -65,11 +65,6 @@ piglit_init(int argc, char **argv)
 		piglit_require_extension("GL_ARB_sync");
 	}
 
-	/* Start some rendering that will not end before this test finishes
-	 * in order to make sure the fence sync is still set to initial values
-	 */
-	piglit_draw_rect(-1, -1, 2, 2);
-
 	/* Create a new fence sync */
 	sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
@@ -108,8 +103,12 @@ piglit_init(int argc, char **argv)
 			length);
 		pass = false;
 	}
-	if (value != GL_UNSIGNALED) {
-		printf("Expected GL_UNSIGNALED but returned: %s\n",
+	/* We can't test for just GL_UNSIGNALED here, since the driver
+	 * may have actually completed any previous rendering (or, in
+	 * our case, no rendering at all) already.
+	 */
+	if (value != GL_UNSIGNALED && value != GL_SIGNALED) {
+		printf("Expected GL_UNSIGNALED or GL_SIGNALED but returned: %s\n",
 			piglit_get_gl_enum_name(value));
 		pass = false;
 	}
