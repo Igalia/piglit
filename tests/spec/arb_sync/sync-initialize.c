@@ -75,12 +75,12 @@ piglit_init(int argc, char **argv)
 
 	/* Test initialized as fence type */
 	glGetSynciv(sync, GL_OBJECT_TYPE, 1, &length, &value);
-	if(length != 1) {
+	if (length != 1) {
 		printf("length should be 1 but incorrectly returned: %d\n",
 			length);
 		pass = false;
 	}
-	if(value != GL_SYNC_FENCE) {
+	if (value != GL_SYNC_FENCE) {
 		printf("Expected GL_SYNC_FENCE but returned: %s\n",
 			piglit_get_gl_enum_name(value));
 		pass = false;
@@ -89,12 +89,12 @@ piglit_init(int argc, char **argv)
 	/* Test initialized to given condition */
 	length = -5;
 	glGetSynciv(sync, GL_SYNC_CONDITION, 1, &length, &value);
-	if(length != 1) {
+	if (length != 1) {
 		printf("length should be 1 but incorrectly returned: %d\n",
 			length);
 		pass = false;
 	}
-	if(value != GL_SYNC_GPU_COMMANDS_COMPLETE) {
+	if (value != GL_SYNC_GPU_COMMANDS_COMPLETE) {
 		printf("Expected GL_SYNC_GPU_COMMANDS_COMPLETE but returned: %s\n",
 			piglit_get_gl_enum_name(value));
 		pass = false;
@@ -103,12 +103,12 @@ piglit_init(int argc, char **argv)
 	/* Test initialized to unsignaled */
 	length = -5;
 	glGetSynciv(sync, GL_SYNC_STATUS, 1, &length, &value);
-	if(length != 1) {
+	if (length != 1) {
 		printf("length should be 1 but incorrectly returned: %d\n",
 			length);
 		pass = false;
 	}
-	if(value != GL_UNSIGNALED) {
+	if (value != GL_UNSIGNALED) {
 		printf("Expected GL_UNSIGNALED but returned: %s\n",
 			piglit_get_gl_enum_name(value));
 		pass = false;
@@ -117,12 +117,12 @@ piglit_init(int argc, char **argv)
 	/* Test initialized with given flag */
 	length = -5;
 	glGetSynciv(sync, GL_SYNC_FLAGS, 1, &length, &value);
-	if(length != 1) {
+	if (length != 1) {
 		printf("length should be 1 but incorrectly returned: %d\n",
 			length);
 		pass = false;
 	}
-	if(value != 0) {
+	if (value != 0) {
 		printf("Expected GL_SYNC_FLAGS == 0 but returned: %d\n",
 			value);
 		pass = false;
