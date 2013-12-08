@@ -176,7 +176,7 @@ make_1d_array_texture(void)
 static GLboolean
 test_2d_array_texture(GLuint tex)
 {
-   GLboolean pass;
+   GLboolean pass, ret = GL_TRUE;
    int i;
    float width = piglit_width / NUM_COLORS;
    float x = 0.0;
@@ -200,18 +200,20 @@ test_2d_array_texture(GLuint tex)
       if (!pass) {
          printf("%s: failed for 2D image/slice %d\n", prog, i);
       }
+
+      ret &= pass;
    }
 
    glBindTexture(GL_TEXTURE_2D_ARRAY_EXT, 0);
 
-   return pass;
+   return ret;
 }
 
 
 static GLboolean
 test_1d_array_texture(GLuint tex)
 {
-   GLboolean pass;
+   GLboolean pass, ret = GL_TRUE;
    int i;
    float width = piglit_width / NUM_COLORS;
    float x = 0.0;
@@ -239,11 +241,13 @@ test_1d_array_texture(GLuint tex)
       if (!pass) {
          printf("%s: failed for 1D image/slice %d\n", prog, i);
       }
+
+      ret &= pass;
    }
 
    glBindTexture(GL_TEXTURE_1D_ARRAY_EXT, 0);
 
-   return pass;
+   return ret;
 }
 
 
