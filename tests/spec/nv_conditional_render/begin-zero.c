@@ -27,17 +27,15 @@
  * @file begin-zero.c
  *
  * Tests that starting conditional rendering on a 0 query object
- * results in INVALID_OPERATION.
+ * results in INVALID_VALUE.
  *
  * From the NV_conditional_render spec:
  *
- *     "BeginQuery sets the active query object name for the query
- *      type given by <target> to <id>.  If BeginQuery is called with
- *      an <id> of zero, if the active query object name for <target>
- *      is non-zero, if <id> is the active query object name for any
- *      query type, or if <id> is the active query object for
- *      condtional rendering (Section 2.X), the error INVALID
- *      OPERATION is generated."
+ *     "If BeginConditionalRenderNV is called while conditional rendering is
+ *     in progress, or if EndConditionalRenderNV is called while conditional
+ *     rendering is not in progress, the error INVALID_OPERATION is
+ *     generated.  The error INVALID_VALUE is generated if <id> is not the
+ *     name of an existing query object query."
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -64,7 +62,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_NV_conditional_render");
 
 	glBeginConditionalRenderNV(0, GL_QUERY_WAIT_NV);
-	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	if (!piglit_check_gl_error(GL_INVALID_VALUE))
 		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
