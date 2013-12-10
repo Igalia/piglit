@@ -21,9 +21,15 @@
  * IN THE SOFTWARE.
  */
 
-/*
- * Does this sequence generate GL_INVALID_VALUE for the last command?
- * It should generate an error since the renderbuffer was never bound.
+/* The GL_EXT_framebuffer_object spec says:
+ *
+ *    "<renderbuffer> must be either zero or the name of an existing
+ *    renderbuffer object of type <renderbuffertarget>, otherwise
+ *    INVALID_OPERATION is generated."
+ *
+ * This sequence should generate GL_INVALID_OPERATION since the renderbuffer
+ * was never bound:
+ *
  *   glGenFramebuffers(1, &fb);
  *   glGenRenderbuffers(1, &rb);
  *   glBindFramebuffer(GL_FRAMEBUFFER, fb);
@@ -77,7 +83,7 @@ piglit_display(void)
       return PIGLIT_FAIL;
    }
 
-   if (test_binding(GL_FALSE) != GL_INVALID_VALUE) {
+   if (test_binding(GL_FALSE) != GL_INVALID_OPERATION) {
       printf("fbo-bind-renderbuffer: failed to generate expected error\n");
       return PIGLIT_FAIL;
    }
