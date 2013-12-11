@@ -37,6 +37,7 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  height(height),
 	  combine_depth_stencil(true),
 	  attach_texture(false),
+	  color_format(GL_RGBA),
 	  color_internalformat(GL_RGBA),
 	  depth_internalformat(GL_DEPTH_COMPONENT24),
 	  stencil_internalformat(GL_STENCIL_INDEX8)
@@ -127,7 +128,7 @@ Fbo::try_setup(const FboConfig &new_config)
 				     config.width,
 				     config.height,
 				     0 /* border */,
-				     GL_RGBA /* format */,
+				     config.color_format /* format */,
 				     GL_BYTE /* type */,
 				     NULL /* data */);
 			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,

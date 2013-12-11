@@ -58,6 +58,14 @@ namespace piglit_util_fbo {
 		bool attach_texture;
 
 		/**
+		 * Useful if attach_texture is true and color buffer is
+		 * non-multisample. Specifies the format that should be used
+		 * for the color buffer, or GL_NONE if no color buffer should
+		 * be used. Defaults to GL_RGBA.
+		 */
+		GLenum color_format;
+
+		/**
 		 * Internalformat that should be used for the color buffer, or
 		 * GL_NONE if no color buffer should be used.  Defaults to
 		 * GL_RGBA.
