@@ -34,7 +34,7 @@ const int pattern_width = 128; const int pattern_height = 128;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 21;
+	config.supports_gl_compat_version = 31;
 	config.supports_gl_core_version = 31;
 
 	config.window_width = pattern_width;
@@ -58,7 +58,7 @@ void
 compile_shader(void)
 {
 	static const char *vert =
-		"#version 130\n"
+		"#version 140\n"
 		"in vec4 piglit_vertex;\n"
 		"void main()\n"
 		"{\n"
@@ -68,33 +68,30 @@ compile_shader(void)
 		"#version 130\n"
 		"#extension GL_ARB_sample_shading : enable\n"
 		"uniform int samples;\n"
-		"out vec4 out_color;\n"
+		"out ivec4 out_color;\n"
 		"void main()\n"
 		"{\n"
-		"  if (samples == 0)\n"
-		"    out_color = vec4(0.0, 1.0, 0.0, 1.0);\n"
-		"  else\n"
-		"    out_color = vec4(0.0, float(gl_SampleID) / samples, 0.0, 1.0);\n"
+		"    out_color = ivec4(0, gl_SampleID, 0, 1);\n"
 		"}\n";
 
-	static const char *frag_1 =
-		"#version 130\n"
-		"#extension GL_ARB_texture_multisample : require\n"
-		"uniform sampler2DMS ms_tex;\n"
+	static const char *frag_template =
+		"#version 140\n"
+		"%s\n"
+		"uniform %s ms_tex;\n"
 		"uniform int samples;\n"
 		"out vec4 out_color;\n"
 		"void main()\n"
 		"{\n"
-		"  int i;\n"
+		"  int i = 0;\n"
 		"  bool pass = true;\n"
-		"  for (i = 0; i < samples; i++) {\n"
-		"    vec4 sample_color =\n"
-		"    texelFetch(ms_tex, ivec2(gl_FragCoord.xy), i);\n"
-		"  float sample_id_float = sample_color.g * samples;\n"
-		"  int sample_id_int = int(round(sample_id_float));\n"
-		"  if (sample_id_int != i)\n"
-		"    pass = false;\n"
-		"  }\n"
+		   /* Use do-while to include 'samples = 0' case. */
+		"  do {\n"
+		"    ivec4 sample_color =\n"
+		"    texelFetch(ms_tex, ivec2(gl_FragCoord.xy)%s);\n"
+		"    if (sample_color.g != i)\n"
+		"      pass = false;\n"
+		"    i++;\n"
+		"  } while (i < samples);\n"
 		"\n"
 		"  if (pass)\n"
 		"    out_color = vec4(0.0, 1.0, 0.0, 1.0);\n"
@@ -107,6 +104,15 @@ compile_shader(void)
 	if (!piglit_link_check_status(prog_0)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
+
+
+	char *frag_1;
+	if (num_samples)
+		asprintf(&frag_1, frag_template,
+			 "#extension GL_ARB_texture_multisample : require",
+			 "isampler2DMS", ", i");
+	else
+		asprintf(&frag_1, frag_template, "", "isampler2DRect", "");
 
 	prog_1 = piglit_build_simple_program(vert, frag_1);
 	if (!piglit_link_check_status(prog_1)) {
@@ -128,7 +134,7 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_extension("GL_ARB_texture_multisample");
 	piglit_require_extension("GL_ARB_sample_shading");
-	piglit_require_GLSL_version(130);
+	piglit_require_GLSL_version(140);
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
 	GLint max_samples;
@@ -138,6 +144,8 @@ piglit_init(int argc, char **argv)
 
 	FboConfig msConfig(num_samples, pattern_width, pattern_height);
         msConfig.attach_texture = true;
+	msConfig.color_format = GL_RGBA_INTEGER;
+	msConfig.color_internalformat = GL_RGBA8UI;
 	multisampled_tex.setup(msConfig);
 
 	compile_shader();
@@ -151,7 +159,7 @@ piglit_display()
 {
 	bool pass = true;
 	int samples;
-        float expected[4] = {0.0, 1.0, 0.0, 1.0};
+	float expected[4] = {0.0, 1.0, 0.0, 1.0};
 
 	glUseProgram(prog_0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_tex.handle);
@@ -163,19 +171,12 @@ piglit_display()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_tex.handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 	glClear(GL_COLOR_BUFFER_BIT);
-	if (samples == 0) {
-		glBlitFramebuffer(0, 0,
-				  pattern_width, pattern_height,
-				  0, 0,
-				  pattern_width, pattern_height,
-				  GL_COLOR_BUFFER_BIT,
-				  GL_NEAREST);
-	} else {
-		glUseProgram(prog_1);
-		glUniform1i(glGetUniformLocation(prog_1, "ms_tex"), 0);
-		glUniform1i(glGetUniformLocation(prog_1, "samples"), samples);
-		piglit_draw_rect(-1, -1, 2, 2);
-	}
+
+	glUseProgram(prog_1);
+	glUniform1i(glGetUniformLocation(prog_1, "ms_tex"), 0);
+	glUniform1i(glGetUniformLocation(prog_1, "samples"), samples);
+	piglit_draw_rect(-1, -1, 2, 2);
+
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
 	pass = piglit_probe_rect_rgba(0, 0, pattern_width,
                                       pattern_width, expected)
