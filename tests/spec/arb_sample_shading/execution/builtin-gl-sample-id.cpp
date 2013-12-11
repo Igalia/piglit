@@ -45,7 +45,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static int num_samples;
 static unsigned prog_0, prog_1;
-static Fbo multisampled_tex;
+static Fbo multisampled_fbo, multisampled_tex;
 
 static void
 print_usage_and_exit(char *prog_name)
@@ -143,9 +143,11 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 
 	FboConfig msConfig(num_samples, pattern_width, pattern_height);
-        msConfig.attach_texture = true;
 	msConfig.color_format = GL_RGBA_INTEGER;
 	msConfig.color_internalformat = GL_RGBA8UI;
+	multisampled_fbo.setup(msConfig);
+
+	msConfig.attach_texture = true;
 	multisampled_tex.setup(msConfig);
 
 	compile_shader();
@@ -154,19 +156,34 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-enum piglit_result
-piglit_display()
+bool test_builtin_sample_id(Fbo ms_fbo)
 {
-	bool pass = true;
 	int samples;
+	bool result = true;
 	float expected[4] = {0.0, 1.0, 0.0, 1.0};
 
 	glUseProgram(prog_0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_tex.handle);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ms_fbo.handle);
 	glGetIntegerv(GL_SAMPLES, &samples);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUniform1i(glGetUniformLocation(prog_0, "samples"), samples);
         piglit_draw_rect(-1, -1, 2, 2);
+
+	if(!ms_fbo.config.attach_texture) {
+		/* Blit the framebuffer with multisample renderbuffer attachment
+		 * into the framebuffer with multisample texture attachment.
+		 */
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_fbo.handle);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_tex.handle);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glBlitFramebuffer(0, 0,
+				  ms_fbo.config.width,
+				  ms_fbo.config.height,
+				  0, 0,
+				  ms_fbo.config.width,
+				  ms_fbo.config.height,
+				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	}
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_tex.handle);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
@@ -178,9 +195,23 @@ piglit_display()
 	piglit_draw_rect(-1, -1, 2, 2);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
-	pass = piglit_probe_rect_rgba(0, 0, pattern_width,
-                                      pattern_width, expected)
-               && pass;
+	result = piglit_probe_rect_rgba(0, 0, pattern_width,
+					pattern_width, expected)
+               && result;
 	piglit_present_results();
+	printf("FBO attachment = %s, result = %s\n",
+	       ms_fbo.config.attach_texture ?
+	       "TEXTURE" :
+	       "RENDERBUFFER",
+	       result ? "pass" : "fail");
+	return result;
+}
+
+enum piglit_result
+piglit_display()
+{
+	bool pass = true;
+	pass = test_builtin_sample_id(multisampled_tex) && pass;
+	pass = test_builtin_sample_id(multisampled_fbo) && pass;
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
