@@ -114,10 +114,7 @@ compile_shader(void)
 		"}\n";
 
 	/* Compile program */
-	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag_0);
-	piglit_check_gl_error(GL_NO_ERROR);
-	prog_0 = piglit_link_simple_program(vs, fs);
+	prog_0 = piglit_build_simple_program(vert, frag_0);
 	if (!piglit_link_check_status(prog_0)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -130,10 +127,7 @@ compile_shader(void)
 	else
 	        asprintf(&frag_1, frag_template, "", "sampler2DRect", "");
 
-	vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag_1);
-	piglit_check_gl_error(GL_NO_ERROR);
-	prog_1 = piglit_link_simple_program(vs, fs);
+	prog_1 = piglit_build_simple_program(vert, frag_1);
 	if (!piglit_link_check_status(prog_1)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}

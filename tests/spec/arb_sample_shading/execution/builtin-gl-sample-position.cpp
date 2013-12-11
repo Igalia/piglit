@@ -36,6 +36,7 @@ const int pattern_width = 128; const int pattern_height = 128;
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 21;
+	config.supports_gl_core_version = 31;
 
 	config.window_width = pattern_width;
 	config.window_height = pattern_height;
@@ -59,10 +60,10 @@ compile_shader(void)
 {
 	static const char *vert =
 		"#version 130\n"
-		"in vec2 pos;\n"
+		"in vec4 piglit_vertex;\n"
 		"void main()\n"
 		"{\n"
-		"  gl_Position = vec4(pos, 0.0, 1.0);\n"
+		"  gl_Position = piglit_vertex;\n"
 		"}\n";
 	static const char *frag =
 		"#version 130\n"
@@ -79,14 +80,7 @@ compile_shader(void)
 		"    out_color = vec4(1.0, 0.0, 0.0, 1.0);\n"
 		"}\n";
 	/* Compile program */
-	prog = glCreateProgram();
-	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
-	glAttachShader(prog, vs);
-	piglit_check_gl_error(GL_NO_ERROR);
-	GLint fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, frag);
-	glAttachShader(prog, fs);
-	glBindAttribLocation(prog, 0, "pos");
-	glLinkProgram(prog);
+	prog = piglit_build_simple_program(vert, frag);
 	if (!piglit_link_check_status(prog)) {
 		piglit_report_result(PIGLIT_FAIL);
 	}
