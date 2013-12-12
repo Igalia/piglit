@@ -36,7 +36,7 @@ def main():
                         metavar="<Results Path>",
                         help="Path to results folder")
     args = parser.parse_args()
-    
+
     results = core.load_results(args.results_path)
     env = core.Environment(concurrent=results.options['concurrent'],
                            exclude_filter=results.options['exclude_filter'],
@@ -44,10 +44,10 @@ def main():
                            execute=results.options['execute'],
                            valgrind=results.options['valgrind'],
                            dmesg=results.options['dmesg'])
-    
+
     # Change working directory to the piglit directory
     os.chdir(path.dirname(path.realpath(sys.argv[0])))
-    
+
     results_path = path.join(args.results_path, "main")
     json_writer = core.JSONWriter(open(results_path, 'w+'))
     json_writer.open_dict()
@@ -56,11 +56,11 @@ def main():
     for key, value in results.options.iteritems():
         json_writer.write_dict_item(key, value)
     json_writer.close_dict()
-    
+
     json_writer.write_dict_item('name', results.name)
     for (key, value) in env.collectData().items():
         json_writer.write_dict_item(key, value)
-    
+
     json_writer.write_dict_key('tests')
     json_writer.open_dict()
     for key, value in results.tests.iteritems():
@@ -70,14 +70,14 @@ def main():
     profile = core.loadTestProfile(results.options['profile'])
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(env, json_writer)
-    
+
     json_writer.close_dict()
     json_writer.close_dict()
     json_writer.file.close()
-    
+
     print("\n"
           "Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))
-    
+
 if __name__ == "__main__":
     main()
