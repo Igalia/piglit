@@ -44,7 +44,6 @@ except ImportError:
     import json
 
 from threadpool import ThreadPool
-
 import status
 
 __all__ = ['Environment',
@@ -58,6 +57,7 @@ __all__ = ['Environment',
            'Test',
            'testBinDir']
 
+
 class PiglitJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, status.Status):
@@ -65,6 +65,7 @@ class PiglitJSONEncoder(json.JSONEncoder):
         elif isinstance(o, set):
             return list(o)
         return json.JSONEncoder.default(self, o)
+
 
 class JSONWriter:
     '''
@@ -231,6 +232,7 @@ if 'PIGLIT_SOURCE_DIR' not in os.environ:
 # trying to parse the strings.
 if 'MESA_DEBUG' not in os.environ:
     os.environ['MESA_DEBUG'] = 'silent'
+
 
 class TestResult(dict):
     def __init__(self, *args):
@@ -617,13 +619,13 @@ def loadTestProfile(filename):
 
 def load_results(filename):
     """ Loader function for TestrunResult class
-    
+
     This function takes a single argument of a results file.
 
     It makes quite a few assumptions, first it assumes that it has been passed
     a folder, if that fails then it looks for a plain text json file called
     "main"
-    
+
     """
     filename = os.path.realpath(filename)
 
