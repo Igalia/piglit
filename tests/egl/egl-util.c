@@ -30,6 +30,7 @@
  * \author Kristian Høgsberg <krh@bitplanet.net>
  */
 
+#include <X11/XKBlib.h>
 #include "piglit-util-gl-common.h"
 #include "egl-util.h"
 
@@ -154,8 +155,9 @@ event_loop(struct egl_state *state, const struct egl_test *test)
 		}
 
 		if (event.type == KeyPress) {
-			KeySym sym = XKeycodeToKeysym (state->dpy,
-						       event.xkey.keycode, 0);
+			KeySym sym = XkbKeycodeToKeysym (state->dpy,
+							 event.xkey.keycode,
+							 0, 0);
 
 			if (sym == XK_Escape || sym == XK_q || sym == XK_Q)
 				break;
