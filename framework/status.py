@@ -51,11 +51,11 @@ The formula for determining fixes is:
 
 def status_lookup(status):
     """ Provided a string return a status object instance
-    
+
     When provided a string that corresponds to a key in it's status_dict
     variable, this function returns a status object instance. If the string
     does not correspond to a key it will raise an exception
-    
+
     """
     status_dict = {'skip': Skip,
                    'pass': Pass,
@@ -64,7 +64,7 @@ def status_lookup(status):
                    'crash': Crash,
                    'dmesg-warn': DmesgWarn,
                    'dmesg-fail': DmesgFail,
-                   'timeout' : Timeout,
+                   'timeout': Timeout,
                    'notrun': NotRun}
 
     try:
@@ -77,12 +77,12 @@ def status_lookup(status):
 class StatusException(LookupError):
     """ Raise this exception when a string is passed to status_lookup that
     doesn't exists
-    
+
     The primary reason to have a special exception is that otherwise
     status_lookup returns a KeyError, but there are many cases where it is
     desireable to except a KeyError and have an exception path. Using a custom
     Error class here allows for more fine-grained control.
-    
+
     """
     pass
 
@@ -149,6 +149,7 @@ class NotRun(Status):
     def __init__(self):
         pass
 
+
 class Skip(Status):
     name = 'skip'
     value = 5
@@ -156,6 +157,7 @@ class Skip(Status):
 
     def __init__(self):
         pass
+
 
 class Pass(Status):
     name = 'pass'
@@ -212,5 +214,3 @@ class Timeout(Status):
 
     def __init__(self):
         pass
-
-
