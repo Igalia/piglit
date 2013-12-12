@@ -37,6 +37,7 @@ sys.path.append(os.path.dirname(os.path.realpath(sys.argv[0])))
 import framework.summary as summary
 from framework.core import parse_listfile
 
+
 def main():
     parser = argparse.ArgumentParser()
 
