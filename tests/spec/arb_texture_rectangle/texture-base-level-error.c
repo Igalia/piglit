@@ -34,6 +34,28 @@
  *     TEXTURE_MIN_FILTER is set to a value other than NEAREST or LINEAR (no
  *     mipmap filtering is permitted). The error INVALID_VALUE is generated if
  *     TEXTURE_BASE_LEVEL is set to any value other than zero."
+ *
+ * The GL_ATI_texture_mirror_repeat_once spec is silent on the topic of
+ * rectangle textures, but GL_ARB_texture_mirror_clamp_to_edge says:
+ *
+ *     "The error INVALID_ENUM is generated when TexParameter* is called with
+ *     a target of TEXTURE_RECTANGLE and the TEXTURE_WRAP_S, TEXTURE_WRAP_T,
+ *     or TEXTURE_WRAP_R parameter is set to REPEAT, MIRRORED_REPEAT, or
+ *     MIRROR_CLAMP_TO_EDGE."
+ *
+ * And GL_NV_texture_mirror_clamp says:
+ *
+ *     "Certain texture parameter values may not be specified for textures
+ *     with a target of TEXTURE_RECTANGLE_NV.  The error INVALID_ENUM is
+ *     generated if the target is TEXTURE_RECTANGLE_NV and the TEXTURE_WRAP_S,
+ *     TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set to REPEAT,
+ *     MIRRORED_REPEAT_IBM, MIRROR_CLAMP_EXT, MIRROR_CLAMP_TO_EDGE_EXT, and
+ *     MIRROR_CLAMP_TO_BORDER_EXT."
+ *
+ * So also verify that the GL_MIRROR_CLAMP_* values also generate
+ * GL_INVALID_ENUM.  Note that we don't need to check for the extensions for
+ * this test.  If the extensions are not supported, the values should generate
+ * GL_INVALID_ENUM anyway!
  */
 
 #include "piglit-util-gl-common.h"
@@ -52,7 +74,14 @@ piglit_init(int argc, char **argv)
 	int i;
 	static const GLenum invalidWrapParams[] = {
 		GL_REPEAT,
-		GL_MIRRORED_REPEAT
+		GL_MIRRORED_REPEAT,
+		GL_MIRROR_CLAMP_EXT,
+		GL_MIRROR_CLAMP_TO_BORDER_EXT,
+
+		/* This has the same value as GL_MIRROR_CLAMP_TO_EDGE, but
+		 * glext.h may not be new enough.  Just use the _EXT version.
+		 */
+		GL_MIRROR_CLAMP_TO_EDGE_EXT,
 	};
 	static const GLenum invalidFilterParams[] = {
 		GL_NEAREST_MIPMAP_NEAREST,
