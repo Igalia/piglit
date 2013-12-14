@@ -23,17 +23,17 @@
 
 /**
  * Test that when target is TEXTURE_RECTANGLE, the correct error messages are
- *  generated when certain texture parameter values are specified.
+ * generated when certain texture parameter values are specified.
  *
  * Section 3.8.8(Texture Parameters) of OpenGL 3.3 Core says:
- * "When target is TEXTURE_RECTANGLE, certain texture parameter values may
- *  not be specified. In this case, the error INVALID_ENUM is generated if the
- *  TEXTURE_WRAP_S, TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set
- *  to REPEAT or MIRRORED_REPEAT. The error INVALID_ENUM is generated if
- *  TEXTURE_MIN_FILTER is set to a value other than NEAREST or LINEAR (no
- *  mipmap filtering is permitted). The error INVALID_VALUE is generated if
- *  TEXTURE_BASE_LEVEL is set to any value other than zero."
  *
+ *     "When target is TEXTURE_RECTANGLE, certain texture parameter values may
+ *     not be specified. In this case, the error INVALID_ENUM is generated if
+ *     the TEXTURE_WRAP_S, TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set
+ *     to REPEAT or MIRRORED_REPEAT. The error INVALID_ENUM is generated if
+ *     TEXTURE_MIN_FILTER is set to a value other than NEAREST or LINEAR (no
+ *     mipmap filtering is permitted). The error INVALID_VALUE is generated if
+ *     TEXTURE_BASE_LEVEL is set to any value other than zero."
  */
 
 #include "piglit-util-gl-common.h"
@@ -50,44 +50,49 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	int i;
-	GLenum invalidWrapParams[] = {GL_REPEAT, GL_MIRRORED_REPEAT};
-	GLenum invalidFilterParams[] = {GL_NEAREST_MIPMAP_NEAREST,
-					GL_NEAREST_MIPMAP_LINEAR,
-					GL_LINEAR_MIPMAP_NEAREST,
-					GL_LINEAR_MIPMAP_LINEAR};
+	static const GLenum invalidWrapParams[] = {
+		GL_REPEAT,
+		GL_MIRRORED_REPEAT
+	};
+	static const GLenum invalidFilterParams[] = {
+		GL_NEAREST_MIPMAP_NEAREST,
+		GL_NEAREST_MIPMAP_LINEAR,
+		GL_LINEAR_MIPMAP_NEAREST,
+		GL_LINEAR_MIPMAP_LINEAR
+	};
 
-	if(piglit_get_gl_version() < 33)
+	if (piglit_get_gl_version() < 33)
 		piglit_require_extension("ARB_texture_rectangle");
 
-	/*  the error INVALID_ENUM is generated if the
-	 *  TEXTURE_WRAP_S, TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set
-	 *  to REPEAT or MIRRORED_REPEAT
+	/* "...the error INVALID_ENUM is generated if the TEXTURE_WRAP_S,
+	 * TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set to REPEAT or
+	 * MIRRORED_REPEAT."
 	 */
 	for(i = 0; i < ARRAY_SIZE(invalidWrapParams); i++) {
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S,
-					 invalidWrapParams[i]);
+				invalidWrapParams[i]);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T,
-					 invalidWrapParams[i]);
+				invalidWrapParams[i]);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_R,
-					 invalidWrapParams[i]);
+				invalidWrapParams[i]);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 	}
 
-	/*  The error INVALID_ENUM is generated if
-	 *  TEXTURE_MIN_FILTER is set to a value other than NEAREST or LINEAR
+	/* "The error INVALID_ENUM is generated if TEXTURE_MIN_FILTER is set
+	 * to a value other than NEAREST or LINEAR."
 	 */
-	for(i = 0; i < ARRAY_SIZE(invalidFilterParams); i++) {
+	for (i = 0; i < ARRAY_SIZE(invalidFilterParams); i++) {
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
-					 invalidFilterParams[i]);
+				invalidFilterParams[i]);
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 	}
 
-	/*  The error INVALID_VALUE is generated if
-	 *  TEXTURE_BASE_LEVEL is set to any value other than zero
+	/* "The error INVALID_VALUE is generated if TEXTURE_BASE_LEVEL is set
+	 * to any value other than zero."
 	 */
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BASE_LEVEL, 37);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
