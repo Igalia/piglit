@@ -262,7 +262,15 @@ piglit_init(int argc, char **argv)
 		if (strcmp(argv[i], "S3TC") == 0) {
 			internalformat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 			tolerance = 8;
-			piglit_require_extension("GL_EXT_texture_compression_s3tc");
+			if (!piglit_is_extension_supported("GL_EXT_texture_compression_s3tc")
+			    && !piglit_is_extension_supported("GL_ANGLE_texture_compression_dxt5")) {
+				fprintf(stderr,
+					"S3TC testing requires either "
+					"GL_EXT_texture_compression_s3tc or "
+					"GL_ANGLE_texture_compression_dxt5 "
+					"extension be supported.\n");
+				piglit_report_result(PIGLIT_SKIP);
+			}
 			puts("Testing S3TC.");
 		}
 	}
