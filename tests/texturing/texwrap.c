@@ -1660,7 +1660,9 @@ void piglit_init(int argc, char **argv)
 	texture_npot = 0;
 	texture_proj = 0;
 	texture_swizzle = 0;
-	has_texture_swizzle = piglit_is_extension_supported("GL_ARB_texture_swizzle");
+	has_texture_swizzle = piglit_get_gl_version() >= 33
+		|| piglit_is_extension_supported("GL_ARB_texture_swizzle")
+		|| piglit_is_extension_supported("GL_EXT_texture_swizzle");
 	has_npot = piglit_is_extension_supported("GL_ARB_texture_non_power_of_two");
 	test = &test_sets[0];
 
@@ -1703,6 +1705,12 @@ void piglit_init(int argc, char **argv)
 			continue;
 		}
 		if (strcmp(argv[p], "swizzled") == 0) {
+			if (!has_texture_swizzle) {
+				printf("OpenGL 3.3, GL_ARB_texture_swizzle, or "
+				       "GL_EXT_texture_swizzle is required for "
+				       "\"swizzled\".\n");
+				piglit_report_result(PIGLIT_SKIP);
+			}
 			texture_swizzle = 1;
 			printf("Using texture swizzling.\n");
 			continue;
