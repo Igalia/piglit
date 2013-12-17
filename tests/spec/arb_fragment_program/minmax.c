@@ -66,7 +66,7 @@ min_test_program(GLenum token, GLint min, const char *name)
 {
 	GLint val;
 
-	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, token, &val);
+	glGetProgramivARB(GL_FRAGMENT_PROGRAM_ARB, token, &val);
 
 	if (val < min) {
 		fprintf(stderr, "%-50s %8d %8d (ERROR)\n", name, min, val);
@@ -81,7 +81,7 @@ min_test_program(GLenum token, GLint min, const char *name)
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_extension("GL_ARB_vertex_program");
+	piglit_require_extension("GL_ARB_fragment_program");
 
 	printf("%-50s %8s %8s\n", "token", "minimum", "value");
 
@@ -108,7 +108,7 @@ piglit_init(int argc, char **argv)
 	MIN_PROGRAM_TEST(GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB, 0);
 
 	if (piglit_is_extension_supported("GL_ARB_vertex_program")) {
-		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB, 1);
+		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB, 0);
 		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB, 0);
 	}
 
