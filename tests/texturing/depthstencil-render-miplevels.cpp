@@ -354,6 +354,11 @@ piglit_init(int argc, char **argv)
 		while ((miplevel0_size >> (max_miplevel + 1)) > 0)
 			++max_miplevel;
 	}
+
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_depth_texture");
+	piglit_require_extension("GL_ARB_texture_non_power_of_two");
+
 	depth_miplevel_data = (float **)calloc(max_miplevel, sizeof(float *));
 	stencil_miplevel_data = (uint8_t **)calloc(max_miplevel,
 						   sizeof(uint8_t *));
