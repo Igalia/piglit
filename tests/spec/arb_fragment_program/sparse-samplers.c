@@ -175,6 +175,8 @@ piglit_init(int argc, char **argv)
 {
 	int i;
 
+	piglit_require_extension("GL_ARB_fragment_program");
+
 	for (i = 0; i < 4; i++) {
 		nearest_tolerance[i] = piglit_tolerance[i];
 		linear_tolerance[i] = 0.02;
