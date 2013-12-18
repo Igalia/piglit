@@ -2485,6 +2485,10 @@ add_depthstencil_render_miplevels_tests(
 ext_packed_depth_stencil['fbo-clear-formats stencil'] = concurrent_test('fbo-clear-formats GL_EXT_packed_depth_stencil stencil')
 ext_packed_depth_stencil['DEPTH_STENCIL texture'] = concurrent_test('ext_packed_depth_stencil-depth-stencil-texture')
 
+oes_packed_depth_stencil = Group()
+spec['OES_packed_depth_stencil'] = oes_packed_depth_stencil
+oes_packed_depth_stencil['DEPTH_STENCIL texture GLES2'] = concurrent_test('oes_packed_depth_stencil-depth-stencil-texture_gles2')
+
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
 add_plain_test(ext_texture_array, 'fbo-generatemipmap-array')
