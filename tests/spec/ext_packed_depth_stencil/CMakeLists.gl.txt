@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (ext_packed_depth_stencil-depth-stencil-texture depth-stencil-texture.c)
 piglit_add_executable (ext_packed_depth_stencil-readpixels-24_8 readpixels-24_8.c)
 
 # vim: ft=cmake:
