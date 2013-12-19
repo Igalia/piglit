@@ -2488,6 +2488,7 @@ ext_packed_depth_stencil['DEPTH_STENCIL texture'] = concurrent_test('ext_packed_
 oes_packed_depth_stencil = Group()
 spec['OES_packed_depth_stencil'] = oes_packed_depth_stencil
 oes_packed_depth_stencil['DEPTH_STENCIL texture GLES2'] = concurrent_test('oes_packed_depth_stencil-depth-stencil-texture_gles2')
+oes_packed_depth_stencil['DEPTH_STENCIL texture GLES1'] = concurrent_test('oes_packed_depth_stencil-depth-stencil-texture_gles1')
 
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array

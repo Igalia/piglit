@@ -48,11 +48,22 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;
 #elif defined PIGLIT_USE_OPENGL_ES2
 	config.supports_gl_es_version = 20;
+#elif defined PIGLIT_USE_OPENGL_ES1
+	config.supports_gl_es_version = 11;
 #endif
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
+
+#if defined PIGLIT_USE_OPENGL_ES1
+#define GL_TEXTURE_CUBE_MAP  GL_TEXTURE_CUBE_MAP_OES
+#define GL_DEPTH_STENCIL     GL_DEPTH_STENCIL_OES
+#define GL_DEPTH24_STENCIL8  GL_DEPTH24_STENCIL8_OES
+#define GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_24_8_OES
+#define GL_TEXTURE_3D        0x806F
+#define glTexStorage2D       glTexStorage2DEXT
+#endif
 
 static bool has_texture_3d = false;
 static bool has_texture_cube_map = false;
@@ -275,6 +286,7 @@ try_TexImage(GLenum internalFormat)
 	 * The OpenGL 4.4 spec lists the same error, but it greatly expands
 	 * the list of valid texture targets.
 	 */
+#if !defined PIGLIT_USE_OPENGL_ES1
 	if (has_texture_3d) {
 		glBindTexture(GL_TEXTURE_3D, tex[2]);
 		glTexImage3D(GL_TEXTURE_3D, 0, internalFormat,
@@ -282,6 +294,12 @@ try_TexImage(GLenum internalFormat)
 			     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 		pass = check_gl_error2(expected_3D_error, alt_3D_error) && pass;
 	}
+#else
+	/* Silence "variable ‘expected_3D_error’ set but not used" warnings.
+	 */
+	(void) expected_3D_error;
+	(void) alt_3D_error;
+#endif
 
 	if (has_texture_cube_map) {
 		unsigned i;
@@ -316,6 +334,7 @@ try_TexImage(GLenum internalFormat)
 	return pass;
 }
 
+#if !defined PIGLIT_USE_OPENGL_ES1
 static bool
 try_TexStorage(GLenum internalFormat)
 {
@@ -364,11 +383,17 @@ try_TexStorage(GLenum internalFormat)
 	glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, 16, 16);
 	pass = piglit_check_gl_error(expected_error) && pass;
 
+#if !defined PIGLIT_USE_OPENGL_ES1
 	if (has_texture_3d) {
 		glBindTexture(GL_TEXTURE_3D, tex[2]);
 		glTexStorage3D(GL_TEXTURE_3D, 1, internalFormat, 8, 8, 8);
 		pass = piglit_check_gl_error(expected_3D_error) && pass;
 	}
+#else
+	/* Silence "variable ‘expected_3D_error’ set but not used" warnings.
+	 */
+	(void) expected_3D_error;
+#endif
 
 	if (has_texture_cube_map) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, tex[3]);
@@ -391,6 +416,7 @@ try_TexStorage(GLenum internalFormat)
 
 	return pass;
 }
+#endif /* !defined PIGLIT_USE_OPENGL_ES1 */
 
 void piglit_init(int argc, char **argv)
 {
@@ -441,15 +467,38 @@ void piglit_init(int argc, char **argv)
 
 	has_texture_storage = piglit_get_gl_version() >= 30
 		|| piglit_is_extension_supported("GL_EXT_texture_storage");
+#elif defined PIGLIT_USE_OPENGL_ES1
+	piglit_require_extension("GL_OES_packed_depth_stencil");
+
+	has_depth_texture = false;
+
+	has_texture_3d = false;
+
+	has_texture_cube_map =
+		piglit_is_extension_supported("GL_OES_texture_cube_map");
+
+	has_depth_texture_cube_map = false;
+
+	has_texture_storage =
+		piglit_is_extension_supported("GL_EXT_texture_storage");
 #endif
 
 	pass = try_TexImage(GL_DEPTH_STENCIL) && pass;
 	pass = try_TexImage(GL_DEPTH24_STENCIL8) && pass;
 
+	/* Disable this path for OpenGL ES 1.x because piglit dispatch doesn't
+	 * seem to support it yet.
+	 */
+#if !defined PIGLIT_USE_OPENGL_ES1
 	if (has_texture_storage) {
 		pass = try_TexStorage(GL_DEPTH_STENCIL) && pass;
 		pass = try_TexStorage(GL_DEPTH24_STENCIL8) && pass;
 	}
+#else
+	/* Silence "variable ‘has_texture_storage’ set but not used" warnings.
+	 */
+	(void) has_texture_storage;
+#endif
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
