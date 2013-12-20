@@ -142,16 +142,22 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
 	return r;
 }
 
-static struct waffle_config*
-choose_config(struct piglit_wfl_framework *wfl_fw,
-              enum context_flavor flavor,
-              const int32_t partial_attrib_list[])
+/**
+ * \brief Return a attribute list suitable for waffle_config_choose().
+ *
+ * The funcion deduces the values of WAFFLE_CONTEXT_API,
+ * WAFFLE_CONTEXT_PROFILE, WAFFLE_CONTEXT_MAJOR_VERSION, and
+ * WAFFLE_CONTEXT_MINOR_VERSION from the given context \a flavor and \a
+ * test_config. The \a partial_attrib_list must not contain any of those
+ * attributes. Any attributes in \a partial_attrib_list are added to the
+ * returned attribute list.
+ */
+static int32_t*
+make_config_attrib_list(const struct piglit_gl_test_config *test_config,
+              	        enum context_flavor flavor,
+              	        const int32_t partial_attrib_list[])
 {
-	const struct piglit_gl_test_config *test_config = wfl_fw->gl_fw.test_config;
-
-	struct waffle_config *config;
 	int32_t head_attrib_list[64];
-	int32_t *full_attrib_list;
 	int32_t junk;
 	int i;
 
@@ -240,17 +246,7 @@ choose_config(struct piglit_wfl_framework *wfl_fw,
 			break;
 	}
 
-	full_attrib_list = concat_attrib_lists(head_attrib_list,
-	                                       partial_attrib_list);
-
-	config = waffle_config_choose(wfl_fw->display,
-	                              full_attrib_list);
-	if (!config) {
-		wfl_log_error("waffle_config_choose");
-	}
-
-	free(full_attrib_list);
-	return config;
+	return concat_attrib_lists(head_attrib_list, partial_attrib_list);
 }
 
 /**
@@ -337,15 +333,22 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
                                 const int32_t partial_config_attrib_list[])
 {
 	bool ok;
+	int32_t *attrib_list = NULL;
 
 	assert(wfl_fw->config == NULL);
 	assert(wfl_fw->context == NULL);
 	assert(wfl_fw->window == NULL);
 
-	wfl_fw->config = choose_config(wfl_fw, flavor,
-	                               partial_config_attrib_list);
-	if (!wfl_fw->config)
+	attrib_list = make_config_attrib_list(test_config, flavor,
+					      partial_config_attrib_list);
+	assert(attrib_list);
+
+	wfl_fw->config = waffle_config_choose(wfl_fw->display, attrib_list);
+	free(attrib_list);
+	if (!wfl_fw->config) {
+		wfl_log_error("waffle_config_choose");
 		goto fail;
+	}
 
 	wfl_fw->context = waffle_context_create(wfl_fw->config, NULL);
 	if (!wfl_fw->context) {
