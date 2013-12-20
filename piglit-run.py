@@ -125,9 +125,12 @@ def main():
     json_writer.write_dict_item('profile', args.test_profile)
     for key, value in env:
         json_writer.write_dict_item(key, value)
+    if args.platform:
+        json_writer.write_dict_item('platform', args.platform)
     json_writer.close_dict()
 
     json_writer.write_dict_item('name', results.name)
+
     for (key, value) in env.collectData().items():
         json_writer.write_dict_item(key, value)
 

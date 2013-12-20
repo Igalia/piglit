@@ -48,6 +48,13 @@ def main():
     # Change working directory to the piglit directory
     os.chdir(path.dirname(path.realpath(sys.argv[0])))
 
+    # attempt to restore a saved platform, if there is no saved platform just
+    # go on
+    try:
+        os.environ['PIGLIT_PLATFORM'] = results.options['platform']
+    except KeyError:
+        pass
+
     results_path = path.join(args.results_path, "main")
     json_writer = core.JSONWriter(open(results_path, 'w+'))
     json_writer.open_dict()
