@@ -151,8 +151,9 @@ static void
 make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[])
 {
 	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0,
-		fwd_compat = 0;
-	const char *api_str = NULL, *profile_str = NULL, *fwd_compat_str = NULL;
+		fwd_compat = 0, debug = 0;
+	const char *api_str = NULL, *profile_str = NULL, *fwd_compat_str = NULL,
+	           *debug_str = NULL;
 
 	if (bufsize == 0) {
 		return;
@@ -163,6 +164,7 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MAJOR_VERSION, &major_version);
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_MINOR_VERSION, &minor_version);
 	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_FORWARD_COMPATIBLE, &fwd_compat);
+	waffle_attrib_list_get(attrib_list, WAFFLE_CONTEXT_DEBUG, &debug);
 
 	switch (api) {
 	case WAFFLE_CONTEXT_OPENGL:
@@ -199,9 +201,15 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 		fwd_compat_str = "";
 	}
 
-	snprintf(buf, bufsize, "%s %d.%d %s%sContext",
+	if (debug) {
+		debug_str = "Debug ";
+	} else {
+		debug_str = "";
+	}
+
+	snprintf(buf, bufsize, "%s %d.%d %s%s%sContext",
 		api_str, major_version, minor_version, fwd_compat_str,
-		profile_str);
+		profile_str, debug_str);
 }
 
 /**
@@ -306,6 +314,11 @@ make_config_attrib_list(const struct piglit_gl_test_config *test_config,
 
 	if (test_config->require_forward_compatible_context) {
 		head_attrib_list[i++] = WAFFLE_CONTEXT_FORWARD_COMPATIBLE;
+		head_attrib_list[i++] = true;
+	}
+
+	if (test_config->require_debug_context) {
+		head_attrib_list[i++] = WAFFLE_CONTEXT_DEBUG;
 		head_attrib_list[i++] = true;
 	}
 

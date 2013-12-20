@@ -172,6 +172,14 @@ struct piglit_gl_test_config {
 	 */
 	bool require_forward_compatible_context;
 
+	/**
+	 * If true, then this test requires a debug context.
+	 *
+	 * Piglit will choose a waffle_config with WAFFLE_CONTEXT_DEBUG set to
+	 * true. If context creation fails, then the test skips.
+	 */
+	bool require_debug_context;
+
 	int window_width;
 	int window_height;
 	int window_samples;
