@@ -56,7 +56,14 @@
 #include "piglit-util.h"
 
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
+
+/* Some versions of MinGW are missing _vscprintf's declaration, although they
+ * still provide the symbol in the import library.
+ */
+#ifdef __MINGW32__
+_CRTIMP int _vscprintf(const char *format, va_list argptr);
+#endif
 
 int asprintf(char **strp, const char *fmt, ...)
 {
@@ -69,10 +76,15 @@ int asprintf(char **strp, const char *fmt, ...)
 
 	va_copy(args_copy, args);
 
+#ifdef _WIN32
 	/* We need to use _vcsprintf to calculate the length as vsnprintf returns -1
 	 * if the number of characters to write is greater than count.
 	 */
 	length = _vscprintf(fmt, args_copy);
+#else
+	char dummy;
+	length = vsnprintf(&dummy, sizeof dummy, fmt, args_copy);
+#endif
 
 	va_end(args_copy);
 
@@ -91,7 +103,7 @@ int asprintf(char **strp, const char *fmt, ...)
 	return length;
 }
 
-#endif /* _MSC_VER */
+#endif /* _WIN32 */
 
 /**
  * \brief Split \a string into an array of strings.
