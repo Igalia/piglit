@@ -290,7 +290,7 @@ piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
 			}
 
 			subtest_result = subtest->subtest_func(subtest->data);
-			piglit_report_subtest_result(subtest_result,
+			piglit_report_subtest_result(subtest_result, "%s",
 						     subtest->name);
 
 			piglit_merge_result(&result, subtest_result);
@@ -301,7 +301,7 @@ piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
 		for (i = 0; !PIGLIT_GL_SUBTEST_END(&all_subtests[i]); i++) {
 			const enum piglit_result subtest_result =
 				all_subtests[i].subtest_func(all_subtests[i].data);
-			piglit_report_subtest_result(subtest_result,
+			piglit_report_subtest_result(subtest_result, "%s",
 						     all_subtests[i].name);
 
 			piglit_merge_result(&result, subtest_result);
