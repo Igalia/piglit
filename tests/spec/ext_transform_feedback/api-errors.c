@@ -48,7 +48,9 @@
  * implementation is not overly aggressive in flagging errors.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
