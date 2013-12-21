@@ -56,7 +56,7 @@
 #include "piglit-util.h"
 
 
-#if defined(_WIN32)
+#ifndef HAVE_ASPRINTF
 
 /* Some versions of MinGW are missing _vscprintf's declaration, although they
  * still provide the symbol in the import library.
@@ -103,7 +103,7 @@ int asprintf(char **strp, const char *fmt, ...)
 	return length;
 }
 
-#endif /* _WIN32 */
+#endif /* HAVE_ASPRINTF */
 
 /**
  * \brief Split \a string into an array of strings.

@@ -84,9 +84,9 @@ lround(double x) {
 #define PRINTFLIKE(f, a)
 #endif
 
-#ifdef _WIN32
+#ifndef HAVE_ASPRINTF
 int asprintf(char **strp, const char *fmt, ...) PRINTFLIKE(2, 3);
-#endif /* _WIN32 */
+#endif /* HAVE_ASPRINTF */
 
 // Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
 #ifndef INFINITY
