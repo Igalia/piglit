@@ -3724,6 +3724,7 @@ add_plain_test(sgis_generate_mipmap, ['gen-texsubimage'])
 arb_map_buffer_alignment = {}
 spec['ARB_map_buffer_alignment'] = arb_map_buffer_alignment
 add_plain_test(arb_map_buffer_alignment, ['arb_map_buffer_alignment-sanity_test'])
+add_concurrent_test(arb_map_buffer_alignment, ['arb_map_buffer_alignment-map-invalidate-range'])
 
 arb_geometry_shader4 = {}
 for draw in ['', 'indexed']:

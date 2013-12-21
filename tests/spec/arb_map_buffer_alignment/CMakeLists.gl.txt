@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (arb_map_buffer_alignment-map-invalidate-range map-invalidate-range.c)
 piglit_add_executable (arb_map_buffer_alignment-sanity_test sanity_test.c)
 
 # vim: ft=cmake:
