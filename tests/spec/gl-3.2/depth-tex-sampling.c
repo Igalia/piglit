@@ -22,18 +22,12 @@
  */
 
 /*
- * In the GL 3.2 core profile, GL_DEPTH_TEXTURE_MODE is deprecated.
- * Sampling a depth texture should always return (d, d, d, 1) which
- * corresponds to the legacy GL_DEPTH_TEXTURE_MODE = GL_LUMINANCE.
+ * The section 3.8.7 (page 160) of the GL 3.2 core specification says:
  *
- * NVIDIA's driver, however, seems to return (d, 0, 0, 1).
- *
- * From the OpenGL 3.2 specification, page 332:
- *  "Depth texture mode - DEPTH_TEXTURE_MODE. Section 3.8.15 is to be
- *   changed so that r is returned to texture samplers directly, and
- *   the OpenGL Shading Language 1.30 Specification is to be changed
- *   so that (r,r,r,1) is always returned from depth texture samplers
- *   in this case."
+ * "Depth textures and the depth components of depth/stencil textures can
+ * be treated as RED textures during texture filtering and application
+ * (see section 3.8.15). The initial state for depth and depth/stencil
+ * textures treats them as RED textures."
  *
  * Brian Paul
  * 5 Dec 2013
@@ -181,14 +175,14 @@ enum piglit_result
 piglit_display(void)
 {
 	static const float black[4] = { 0.0, 0.0, 0.0, 1.0 };
-	static const float white[4] = { 1.0, 1.0, 1.0, 1.0 };
-	static const float gray[4] = { 0.5, 0.5, 0.5, 1.0 };
+	static const float red50[4] = { 0.5, 0.0, 0.0, 1.0 };
+	static const float red100[4] = { 1.0, 0.0, 0.0, 1.0 };
 	bool pass = true;
 
 	glViewport(0, 0, piglit_width, piglit_height);
 
-	/* This should draw a grayscale gradient ranging from black
-	 * at the bottom of the window to white at the top.
+	/* This should draw a red gradient ranging from black
+	 * at the bottom of the window to full red at the top.
 	 */
 	glClearColor(0.2, 0.2, 0.8, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -197,10 +191,10 @@ piglit_display(void)
 	if (!piglit_probe_pixel_rgba(0, 0, black))
 		pass = false;
 
-	if (!piglit_probe_pixel_rgba(0, piglit_height/2, gray))
+	if (!piglit_probe_pixel_rgba(0, piglit_height/2, red50))
 		pass = false;
 
-	if (!piglit_probe_pixel_rgba(0, piglit_height-1, white))
+	if (!piglit_probe_pixel_rgba(0, piglit_height-1, red100))
 		pass = false;
 
 	piglit_present_results();
