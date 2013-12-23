@@ -3928,6 +3928,11 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'mesa_pack_invert')) as g:
+    g(['mesa_pack_invert-readpixels'])
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'oes_read_format')) as g:
     g(['oes-read-format'], run_concurrent=False)
 
