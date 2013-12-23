@@ -80,7 +80,8 @@ def main():
                         help="Capture a difference in dmesg before and "
                              "after each test")
     parser.add_argument("test_profile",
-                        metavar="<Path to test profile>",
+                        metavar="<Path to one or more test profile(s)>",
+                        nargs='+',
                         help="Path to testfile to run")
     parser.add_argument("results_path",
                         type=path.realpath,
@@ -134,7 +135,7 @@ def main():
     for (key, value) in env.collectData().items():
         json_writer.write_dict_item(key, value)
 
-    profile = core.loadTestProfile(args.test_profile)
+    profile = core.merge_test_profiles(args.test_profile)
 
     json_writer.write_dict_key('tests')
     json_writer.open_dict()

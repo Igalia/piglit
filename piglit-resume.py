@@ -74,7 +74,7 @@ def main():
         json_writer.write_dict_item(key, value)
         env.exclude_tests.add(key)
     
-    profile = core.loadTestProfile(results.options['profile'])
+    profile = core.merge_test_profiles(results.options['profile'])
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(env, json_writer)
 

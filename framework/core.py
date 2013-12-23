@@ -616,6 +616,22 @@ class TestProfile:
             group = group[group_name]
         del group[l[-1]]
 
+    def update(self, *profiles):
+        """ Updates the contents of this TestProfile instance with another
+
+        This method overwrites key:value pairs in self with those in the
+        provided profiles argument. This allows multiple TestProfiles to be
+        called in the same run; which could be used to run piglit and external
+        suites at the same time.
+
+        Arguments:
+        profiles -- one or more TestProfile-like objects to be merged.
+
+        """
+        for profile in profiles:
+            self.tests.update(profile.tests)
+            self.test_list.update(profile.test_list)
+
 
 def loadTestProfile(filename):
     ns = {'__file__': filename}
@@ -625,6 +641,22 @@ def loadTestProfile(filename):
         traceback.print_exc()
         raise Exception('Could not read tests profile')
     return ns['profile']
+
+
+def merge_test_profiles(profiles):
+    """ Helper for loading and merging TestProfile instances
+
+    Takes paths to test profiles as arguments and returns a single merged
+    TestPRofile instance.
+
+    Arguments:
+    profiles -- a list of one or more paths to profile files.
+
+    """
+    profile = loadTestProfile(profiles.pop())
+    for p in profiles:
+        profile.update(loadTestProfile(p))
+    return profile
 
 
 def load_results(filename):
