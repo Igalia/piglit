@@ -301,6 +301,7 @@ enum piglit_result piglit_display(void)
 		break;
 	default:
 		assert(0);
+		res = PIGLIT_SKIP;
 	}
 
 	/* Cleanup. */
