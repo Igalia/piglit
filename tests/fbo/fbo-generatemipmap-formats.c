@@ -94,6 +94,8 @@ create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 			type = GL_FLOAT;
 		} else {
 			assert(0);
+			format = GL_NONE;
+			type = GL_NONE;
 		}
 	} else {
 		tex = piglit_rgbw_texture(internalformat,
