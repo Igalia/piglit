@@ -36,7 +36,6 @@ piglit_add_executable (glean
 	tfbo.cpp
 	tfpexceptions.cpp
 	tfragprog1.cpp
-	tgetstr.cpp
 	tglsl1.cpp
 	tlogicop.cpp
 	tmultitest.cpp
