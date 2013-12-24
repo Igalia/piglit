@@ -359,6 +359,7 @@ reportFailure(GLenum mode, int drawMode, GLuint facing,
 		break;
 	default:
 		assert(0);
+		d = "???";
 	}
 
 	if (facing == 0)
