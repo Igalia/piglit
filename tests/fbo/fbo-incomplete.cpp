@@ -301,7 +301,7 @@ invalid_1d_array_layer(void)
 
 	if (!piglit_is_extension_supported("GL_EXT_texture_array")
 	    && piglit_get_gl_version() < 30) {
-		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
 		return true;
 	}
 
@@ -328,7 +328,7 @@ invalid_2d_array_layer(void)
 
 	if (!piglit_is_extension_supported("GL_EXT_texture_array")
 	    && piglit_get_gl_version() < 30) {
-		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
 		return true;
 	}
 
@@ -355,7 +355,7 @@ invalid_cube_array_layer(void)
 
 	if (!piglit_is_extension_supported("GL_ARB_texture_cube_map_array")
 	    && piglit_get_gl_version() < 40) {
-		piglit_report_subtest_result(PIGLIT_SKIP, subtest_name);
+		piglit_report_subtest_result(PIGLIT_SKIP, "%s", subtest_name);
 		return true;
 	}
 
