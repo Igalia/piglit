@@ -66,7 +66,6 @@ def main():
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)
         env.exclude_tests.add(key)
-    json_writer.close_dict()
     
     profile = core.loadTestProfile(results.options['profile'])
     # This is resumed, don't bother with time since it wont be accurate anyway
