@@ -575,8 +575,7 @@ class TestProfile:
         elif env.concurrent == "none":
             pool = ThreadPool(1)
             for (path, test) in self.test_list.items():
-                if not env.concurrent or not test.runConcurrent:
-                    pool.add(test.execute, (env, path, json_writer))
+                pool.add(test.execute, (env, path, json_writer))
             pool.join()
         else:
             pool = ThreadPool(multiprocessing.cpu_count())
