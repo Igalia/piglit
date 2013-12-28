@@ -3175,6 +3175,7 @@ with profile.test_list.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ext_packed_float')) as g:
     g(['ext_packed_float-pack'], 'pack')
+    g(['query-rgba-signed-components'], 'query-rgba-signed-components')
     g(['getteximage-invalid-format-for-packed-type'],
       'getteximage-invalid-format-for-packed-type')
     add_msaa_formats_tests(g, 'GL_EXT_packed_float')

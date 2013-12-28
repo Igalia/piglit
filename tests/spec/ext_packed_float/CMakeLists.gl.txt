@@ -10,5 +10,6 @@ link_libraries (
 
 piglit_add_executable (ext_packed_float-pack pack.c)
 piglit_add_executable (getteximage-invalid-format-for-packed-type getteximage-invalid-format-for-packed-type.c)
+piglit_add_executable (query-rgba-signed-components query-rgba-signed-components.c)
 
 # vim: ft=cmake:
