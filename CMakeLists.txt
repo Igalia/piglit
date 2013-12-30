@@ -50,13 +50,14 @@ if(PIGLIT_USE_WAFFLE)
 	# validates the required version at most once for the lifetime of the
 	# source tree.  If someone changes the required version by editing the
 	# CMakeLists, CMake fails to detect the new requirement.
-	set(WAFFLE_REQUIRED_VERSION "1.2.2")
+	set(WAFFLE_REQUIRED_VERSION "1.3.0")
 	if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
 		message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
 		"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
         endif()
 
 	add_definitions(-DPIGLIT_USE_WAFFLE)
+	add_definitions(-DWAFFLE_API_VERSION=0x0103)
 	add_definitions(-DPIGLIT_HAS_WAYLAND)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WAFFLE_CFLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WAFFLE_CFLAGS}")
