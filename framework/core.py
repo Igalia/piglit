@@ -36,14 +36,13 @@ from log import log
 from cStringIO import StringIO
 from textwrap import dedent
 from threads import synchronized_self
-import threading
 import multiprocessing
+import multiprocessing.dummy
 try:
     import simplejson as json
 except ImportError:
     import json
 
-from threadpool import ThreadPool
 import status
 
 __all__ = ['Environment',
@@ -566,31 +565,42 @@ class TestProfile:
 
         self.prepare_test_list(env)
 
-        # If concurrency is set to 'all' run all tests out of a concurrent
-        # threadpool, if it's none, then run evey test serially. otherwise mix
-        # and match them
-        if env.concurrent == "all":
-            pool = ThreadPool(multiprocessing.cpu_count())
-            for (path, test) in self.test_list.items():
-                pool.add(test.execute, (env, path, json_writer))
-            pool.join()
-        elif env.concurrent == "none":
-            pool = ThreadPool(1)
-            for (path, test) in self.test_list.items():
-                pool.add(test.execute, (env, path, json_writer))
-            pool.join()
-        else:
-            pool = ThreadPool(multiprocessing.cpu_count())
-            for (path, test) in self.test_list.items():
-                if test.runConcurrent:
-                    pool.add(test.execute, (env, path, json_writer))
-            pool.join()
+        def test(pair):
+            """ Function to call test.execute from .map
 
-            pool = ThreadPool(1)
-            for (path, test) in self.test_list.items():
-                if not test.runConcurrent:
-                    pool.add(test.execute, (env, path, json_writer))
-            pool.join()
+            adds env and json_writer which are needed by Test.execute()
+
+            """
+            name, test = pair
+            test.execute(env, name, json_writer)
+
+        # Multiprocessing.dummy is a wrapper around Threading that provides a
+        # multiprocessing compatible API
+        #
+        # The default value of pool is the number of virtual processor cores
+        single = multiprocessing.dummy.Pool(1)
+        multi = multiprocessing.dummy.Pool()
+        chunksize = 50
+
+        if env.concurrent == "all":
+            multi.imap(test, self.test_list.iteritems(), chunksize)
+        elif env.concurrent == "none":
+            single.imap(test, self.test_list.iteritems(), chunksize)
+        else:
+            # Filter and return only thread safe tests to the threaded pool
+            multi.imap(test, (x for x in self.test_list.iteritems() if
+                              x[1].runConcurrent), chunksize)
+            # Filter and return the non thread safe tests to the single pool
+            single.imap(test, (x for x in self.test_list.iteritems() if not
+                               x[1].runConcurrent), chunksize)
+
+        # Close and join the pools
+        # If we don't close and the join the pools the script will exit before
+        # the pools finish running
+        multi.close()
+        single.close()
+        multi.join()
+        single.join()
 
     def remove_test(self, test_path):
         """Remove a fully qualified test from the profile.
