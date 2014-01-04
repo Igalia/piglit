@@ -28,12 +28,24 @@
         <td>Time</td>
         <td>${value.get('time', 'None')}</b>
       </tr>
-    ## Info is deprecated and may disapear someday
-    % if value.get('info') is not None:
+    % if value.get('images', None):
       <tr>
-        <td>Info</td>
+        <td>Images</td>
         <td>
-          <pre>${value.get('info') | h}</pre>
+          <table>
+            <tr>
+              <td/>
+              <td>reference</td>
+              <td>rendered</td>
+            </tr>
+          % for image in images:
+            <tr>
+              <td>${image['image_desc']}</td>
+              <td><img src="file://${image['image_ref']}" /></td>
+              <td><img src="file://${image['image_render']}" /></td>
+            </tr>
+          % endfor
+          </table>
         </td>
       </tr>
     % endif

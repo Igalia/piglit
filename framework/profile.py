@@ -37,6 +37,7 @@ from framework.dmesg import get_dmesg
 from framework.log import Log
 import framework.exectest
 
+
 class TestProfile(object):
     def __init__(self):
         self.tests = {}
