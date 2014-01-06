@@ -70,7 +70,11 @@ piglit_display(void)
     pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
 
     glCopyTexImage2D(GL_TEXTURE_2D, 0, format, 0, 0, width, height, 0);
+#if defined(PIGLIT_USE_OPENGL) || defined(PIGLIT_USE_OPENGL_ES3)
     pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+#else  /* defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2) */
+    pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
+#endif
 
     /* From the GL_OES_compressed_ETC1_RGB8_texture spec:
      *
