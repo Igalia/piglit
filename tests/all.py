@@ -3704,6 +3704,7 @@ gles30['minmax'] = concurrent_test('minmax_gles3')
 for test_mode in ['teximage', 'texsubimage']:
     test_name = 'ext_texture_array-compressed_gles3 {0}'.format(test_mode)
     gles30[test_name] = PlainExecTest(test_name + ' -auto -fbo')
+gles30['texture-immutable-levels'] = concurrent_test('texture-immutable-levels_gles3')
 
 arb_es3_compatibility = Group()
 spec['ARB_ES3_compatibility'] = arb_es3_compatibility
