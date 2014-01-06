@@ -113,6 +113,20 @@ piglit_test_int(GLenum token, GLint limit, bool max)
 }
 
 static void
+piglit_test_int_v(GLenum token, GLuint index, GLint limit, bool max)
+{
+	char *name;
+	GLint val = 9999;
+	asprintf(&name, "%s[%d]", piglit_get_gl_enum_name(token), index);
+
+	glGetIntegeri_v(token, index, &val);
+
+	piglit_report_int(name, limit, val,
+			  (max && val <= limit) ||
+			  (!max && val >= limit));
+}
+
+static void
 piglit_test_uint(GLenum token, GLuint limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
@@ -165,6 +179,16 @@ piglit_test_uint64(GLenum token, GLuint64 limit, bool max)
 			     (!max && val >= limit));
 }
 #endif /* !PIGLIT_USE_OPENGL_ES2 */
+
+void piglit_test_min_int_v(GLenum token, GLuint index, GLint min)
+{
+	piglit_test_int_v(token, index, min, false);
+}
+
+void piglit_test_max_int_v(GLenum token, GLuint index, GLint max)
+{
+	piglit_test_int_v(token, index, max, true);
+}
 
 void piglit_test_min_int(GLenum token, GLint min)
 {

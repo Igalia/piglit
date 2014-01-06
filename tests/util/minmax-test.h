@@ -25,6 +25,8 @@ extern bool piglit_minmax_pass;
 void piglit_print_minmax_header(void);
 void piglit_test_min_int(GLenum token, GLint val);
 void piglit_test_max_int(GLenum token, GLint val);
+void piglit_test_min_int_v(GLenum token, GLuint index, GLint val);
+void piglit_test_max_int_v(GLenum token, GLuint index, GLint val);
 void piglit_test_min_uint(GLenum token, GLuint val);
 void piglit_test_max_uint(GLenum token, GLuint val);
 void piglit_test_min_float(GLenum token, GLfloat val);
