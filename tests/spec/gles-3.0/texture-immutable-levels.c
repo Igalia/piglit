@@ -47,7 +47,7 @@ PIGLIT_GL_TEST_CONFIG_END
 enum piglit_result
 piglit_display(void)
 {
-	GLuint tex[3];
+	GLuint tex[4];
 	GLint level;
 
 	/* The GL ES 3.0 spec says:
