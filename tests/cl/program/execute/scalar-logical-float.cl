@@ -5,7 +5,7 @@
 
 [config]
 name: Float logical operators
-clc_version_min: 10
+clc_version_min: 12
 
 dimensions: 1
 global_size: 1 0 0
