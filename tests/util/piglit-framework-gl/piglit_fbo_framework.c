@@ -128,6 +128,9 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 struct piglit_gl_framework*
 piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 {
+#ifdef PIGLIT_USE_OPENGL_ES1
+	return NULL;
+#else
 	struct piglit_wfl_framework *wfl_fw;
 	struct piglit_gl_framework *gl_fw;
 
@@ -158,4 +161,5 @@ piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 fail:
 	destroy(gl_fw);
 	return NULL;
+#endif /* PIGLIT_USE_OPENGL_ES1 */
 }
