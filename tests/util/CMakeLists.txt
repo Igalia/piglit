@@ -1,5 +1,9 @@
 add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
 
+if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+    link_libraries(rt)
+endif()
+
 set(UTIL_INCLUDES
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
