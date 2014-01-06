@@ -206,6 +206,8 @@ test(void)
 #ifdef PIGLIT_USE_OPENGL
 	else if (strcmp(filename + strlen(filename) - 4, "geom") == 0)
 		type = GL_GEOMETRY_SHADER;
+	else if (strcmp(filename + strlen(filename) - 4, "comp") == 0)
+		type = GL_COMPUTE_SHADER;
 #endif
 	else {
 		fprintf(stderr, "Couldn't determine type of program %s\n",
@@ -215,6 +217,15 @@ test(void)
 
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
+
+	if (type == GL_COMPUTE_SHADER) {
+		if (!piglit_is_extension_supported("GL_ARB_compute_shader") &&
+		    (piglit_is_gles() || piglit_get_gl_version() < 43)) {
+			printf("Test requires GL version 4.3 or "
+			       "GL_ARB_compute_shader\n");
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	}
 
 	prog_string = piglit_load_text_file(filename, NULL);
 	if (prog_string == NULL) {

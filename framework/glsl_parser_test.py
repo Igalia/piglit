@@ -70,7 +70,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
             for f in filenames:
                 # Add f as a test if its file extension is good.
                 ext = f.rsplit('.')[-1]
-                if ext in ['vert', 'geom', 'frag']:
+                if ext in ['vert', 'geom', 'frag', 'comp']:
                     filepath = path.join(dirpath, f)
                     # testname := filepath relative to
                     # basepath.
