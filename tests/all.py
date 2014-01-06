@@ -1319,6 +1319,13 @@ import_glsl_parser_tests(spec['AMD_conservative_depth'],
 			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
 			 [''])
 
+# Group ARB_arrays_of_arrays
+arb_arrays_of_arrays = {}
+spec['ARB_arrays_of_arrays'] = arb_arrays_of_arrays
+import_glsl_parser_tests(arb_arrays_of_arrays,
+			 os.path.join(testsDir, 'spec', 'arb_arrays_of_arrays'),
+			 ['compiler'])
+
 # Group AMD_shader_trinary_minmax
 spec['AMD_shader_trinary_minmax'] = {}
 import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
