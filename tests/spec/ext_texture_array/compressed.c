@@ -116,6 +116,7 @@ static const char fs_text[] =
 #else // PIGLIT_USE_OPENGL_ES3
 	"#version 300 es\n"
 	"precision mediump float;\n"
+	"precision mediump sampler2DArray;\n"
 	"#define piglit_in in\n"
 	"#define piglit_texture2DArray texture\n"
 	"out vec4 piglit_FragColor;\n"
