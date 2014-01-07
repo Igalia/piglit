@@ -1646,6 +1646,14 @@ arb_framebuffer_object['FBO blit from missing attachment'] = concurrent_test('fb
 arb_framebuffer_object['fbo-scissor-blit fbo'] = concurrent_test('fbo-scissor-blit fbo')
 arb_framebuffer_object['fbo-scissor-blit window'] = plain_test('fbo-scissor-blit window')
 arb_framebuffer_object['negative-readpixels-no-rb'] = concurrent_test('arb_framebuffer_object-negative-readpixels-no-rb')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glClear')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glClearBuffer')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none gl_FragColor')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none gl_FragData')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glColorMaskIndexed')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glBlendFunci')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glDrawPixels')
+add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glBlitFramebuffer')
 
 # Group ARB_framebuffer_sRGB
 arb_framebuffer_srgb = Group()
