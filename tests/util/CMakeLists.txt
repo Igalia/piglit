@@ -1,6 +1,6 @@
 add_definitions(-DSOURCE_DIR="${piglit_SOURCE_DIR}/")
 
-if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC AND HAVE_LIBRT)
     link_libraries(rt)
 endif()
 
