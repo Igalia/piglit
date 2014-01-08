@@ -3130,6 +3130,8 @@ import_glsl_parser_tests(spec['ARB_geometry_shader4'],
 arb_compute_shader = Group()
 spec['ARB_compute_shader'] = arb_compute_shader
 arb_compute_shader['minmax'] = concurrent_test('arb_compute_shader-minmax')
+arb_compute_shader['compiler/work_group_size_too_large'] = \
+    concurrent_test('arb_compute_shader-work_group_size_too_large')
 import_glsl_parser_tests(spec['ARB_compute_shader'],
                          os.path.join(testsDir, 'spec', 'arb_compute_shader'),
                          ['compiler'])
