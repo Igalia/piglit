@@ -101,6 +101,8 @@ GLuint geometry_shaders[256];
 unsigned num_geometry_shaders = 0;
 GLuint fragment_shaders[256];
 unsigned num_fragment_shaders = 0;
+GLuint compute_shaders[256];
+unsigned num_compute_shaders = 0;
 int num_uniform_blocks;
 GLuint *uniform_block_bos;
 GLenum geometry_layout_input_type = GL_TRIANGLES;
@@ -131,6 +133,8 @@ enum states {
 	fragment_shader,
 	fragment_shader_file,
 	fragment_program,
+	compute_shader,
+	compute_shader_file,
 	vertex_data,
 	test,
 };
@@ -234,6 +238,8 @@ target_to_short_name(GLenum target)
 		return "FS";
 	case GL_GEOMETRY_SHADER:
 		return "GS";
+	case GL_COMPUTE_SHADER:
+		return "CS";
 	default:
 		return "???";
 	}
@@ -256,6 +262,10 @@ compile_glsl(GLenum target, bool release_text)
 	case GL_GEOMETRY_SHADER:
 		if (gl_version.num < 32)
 			piglit_require_extension("GL_ARB_geometry_shader4");
+		break;
+	case GL_COMPUTE_SHADER:
+		if (gl_version.num < 43)
+			piglit_require_extension("GL_ARB_compute_shader");
 		break;
 	}
 
@@ -327,6 +337,10 @@ compile_glsl(GLenum target, bool release_text)
 	case GL_FRAGMENT_SHADER:
 		fragment_shaders[num_fragment_shaders] = shader;
 		num_fragment_shaders++;
+		break;
+	case GL_COMPUTE_SHADER:
+		compute_shaders[num_compute_shaders] = shader;
+		num_compute_shaders++;
 		break;
 	}
 }
@@ -722,6 +736,15 @@ leave_state(enum states state, const char *line)
 					 line - shader_string);
 		break;
 
+	case compute_shader:
+		shader_string_size = line - shader_string;
+		compile_glsl(GL_COMPUTE_SHADER, false);
+		break;
+
+	case compute_shader_file:
+		compile_glsl(GL_COMPUTE_SHADER, true);
+		break;
+
 	case vertex_data:
 		vertex_data_end = line;
 		break;
@@ -744,7 +767,8 @@ link_and_use_shaders(void)
 
 	if ((num_vertex_shaders == 0)
 	    && (num_fragment_shaders == 0)
-	    && (num_geometry_shaders == 0))
+	    && (num_geometry_shaders == 0)
+	    && (num_compute_shaders == 0))
 		return;
 
 	prog = glCreateProgram();
@@ -759,6 +783,10 @@ link_and_use_shaders(void)
 
 	for (i = 0; i < num_fragment_shaders; i++) {
 		glAttachShader(prog, fragment_shaders[i]);
+	}
+
+	for (i = 0; i < num_compute_shaders; i++) {
+		glAttachShader(prog, compute_shaders[i]);
 	}
 
 #ifdef PIGLIT_USE_OPENGL
@@ -795,6 +823,10 @@ link_and_use_shaders(void)
 
 	for (i = 0; i < num_fragment_shaders; i++) {
 		glDeleteShader(fragment_shaders[i]);
+	}
+
+	for (i = 0; i < num_compute_shaders; i++) {
+		glDeleteShader(compute_shaders[i]);
 	}
 
 	glGetProgramiv(prog, GL_LINK_STATUS, &ok);
@@ -864,7 +896,7 @@ process_test_script(const char *script_name)
 				state = geometry_shader;
 				shader_string = NULL;
 			} else if (string_match("[geometry shader file]", line)) {
-				state = vertex_shader_file;
+				state = geometry_shader_file;
 				shader_string = NULL;
 			} else if (string_match("[geometry layout]", line)) {
 				state = geometry_layout;
@@ -877,6 +909,12 @@ process_test_script(const char *script_name)
 				shader_string = NULL;
 			} else if (string_match("[fragment shader file]", line)) {
 				state = fragment_shader_file;
+				shader_string = NULL;
+			} else if (string_match("[compute shader]", line)) {
+				state = compute_shader;
+				shader_string = NULL;
+			} else if (string_match("[compute shader file]", line)) {
+				state = compute_shader_file;
 				shader_string = NULL;
 			} else if (string_match("[vertex data]", line)) {
 				state = vertex_data;
@@ -906,6 +944,7 @@ process_test_script(const char *script_name)
 			case geometry_shader:
 			case fragment_shader:
 			case fragment_program:
+			case compute_shader:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
 				break;
@@ -913,6 +952,7 @@ process_test_script(const char *script_name)
 			case vertex_shader_file:
 			case geometry_shader_file:
 			case fragment_shader_file:
+			case compute_shader_file:
 				line = eat_whitespace(line);
 				if ((line[0] != '\n') && (line[0] != '#'))
 					load_shader_file(line);
