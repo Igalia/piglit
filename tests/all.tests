@@ -15,10 +15,6 @@ from framework.gleantest import GleanTest
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
 from framework.shader_test import add_shader_test_dir
 
-# Blacklisted tests are removed from the test profile.
-blacklist = [
-	]
-
 # Path to tests dir, correct even when not running from the top directory.
 testsDir = path.dirname(__file__)
 
@@ -3381,8 +3377,3 @@ profile.tests['security'] = security
 profile.tests['spec'] = spec
 if platform.system() is not 'Windows':
     profile.tests['glx'] = glx
-
-# Remove blacklisted tests
-for test_path in blacklist:
-    profile.remove_test(test_path)
-
