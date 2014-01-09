@@ -44,7 +44,7 @@ except ImportError:
 import framework.status as status
 from .dmesg import get_dmesg
 from .threads import synchronized_self
-from .log import log
+from .log import Log
 
 __all__ = ['PIGLIT_CONFIG',
            'Environment',
@@ -425,7 +425,7 @@ class Test(object):
     def run(self):
         raise NotImplementedError
 
-    def execute(self, env, path, json_writer, dmesg):
+    def execute(self, env, path, log, json_writer, dmesg):
         '''
         Run the test.
 
@@ -433,13 +433,12 @@ class Test(object):
             Fully qualified test name as a string.  For example,
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
-        def status(msg):
-            log(msg=msg, channel=path)
 
+        log_current = log.get_current()
         # Run the test
         if env.execute:
             try:
-                status("running")
+                log.log()
                 time_start = time.time()
                 dmesg.update_dmesg()
                 self._test_hook_execute_run()
@@ -463,8 +462,6 @@ class Test(object):
                 result['traceback'] = \
                     "".join(traceback.format_tb(sys.exc_info()[2]))
 
-            status(result['result'])
-
             if 'subtest' in result and len(result['subtest'].keys()) > 1:
                 for test in result['subtest'].keys():
                     result['result'] = result['subtest'][test]
@@ -472,7 +469,8 @@ class Test(object):
             else:
                 json_writer.write_dict_item(path, result)
         else:
-            status("dry-run")
+            log.log()
+        log.mark_complete(log_current)
 
 
 class Group(dict):
@@ -557,6 +555,7 @@ class TestProfile(object):
         '''
 
         self.prepare_test_list(env)
+        log = Log(len(self.test_list))
 
         def test(pair):
             """ Function to call test.execute from .map
@@ -565,7 +564,7 @@ class TestProfile(object):
 
             """
             name, test = pair
-            test.execute(env, name, json_writer, self.dmesg)
+            test.execute(env, name, log, json_writer, self.dmesg)
 
         # Multiprocessing.dummy is a wrapper around Threading that provides a
         # multiprocessing compatible API

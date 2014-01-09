@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2010 Intel Corporation
+# Copyright (c) 2013 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,33 +20,60 @@
 # IN THE SOFTWARE.
 #
 
-import logging
-
+import sys
 from .threads import synchronized_self
-from .patterns import Singleton
 
 
-class Logger(Singleton):
+class Log(object):
+    """ Print Progress to stdout
+
+    Arguments:
+    total -- The total number of tests to run.
+
+    """
+    def __init__(self, total):
+        self.__total = total
+        self.__complete = 1
+        self.__running = []
+        self.__generator = (x for x in xrange(self.__total))
+        self.__pad = len(str(self.__total))
+
+    def _running(self):
+        return "Running Test(s): {}".format(
+            " ".join([str(x).zfill(self.__pad) for x in self.__running]))
+
+    def _percent(self):
+        return "[{0}/{1}]".format(str(self.__complete).zfill(self.__pad),
+                                  str(self.__total).zfill(self.__pad))
+
     @synchronized_self
-    def __logMessage(self, logfunc, message, **kwargs):
-        [logfunc(line, **kwargs) for line in message.split('\n')]
+    def mark_complete(self, value):
+        """ Used to mark a test as complete in the log
+
+        Arguments:
+        value -- the test number to mark complete
+        
+        """
+        # Mark running complete
+        assert value in self.__running
+        self.__running.remove(value)
+
+        # increment the number of completed tests
+        self.__complete += 1
 
     @synchronized_self
-    def getLogger(self, channel=None):
-        if 0 == len(logging.root.handlers):
-            logging.basicConfig(format="[%(asctime)s] :: %(message)+8s "
-                                       ":: %(name)s",
-                                datefmt="%c",
-                                level=logging.INFO)
-        if channel is None:
-            channel = "base"
-        logger = logging.getLogger(channel)
-        return logger
+    def log(self):
+        """ Print to the screen 
 
-    def log(self, type=logging.INFO, msg="", channel=None):
-        self.__logMessage(lambda m,
-                          **kwargs: self.getLogger(channel).log(type,
-                                                                m,
-                                                                **kwargs), msg)
+        Works by moving the cursor back to the front of the line and printing
+        over it.
+        
+        """
+        sys.stdout.write("{0} {1} \r".format(self._percent(), self._running()))
 
-log = Logger().log
+    @synchronized_self
+    def get_current(self):
+        """ Returns a new number to know what processes are running """
+        x = self.__generator.next()
+        self.__running.append(x)
+        return x
