@@ -83,6 +83,9 @@ piglit_init(int argc, char **argv)
 	 *    LAST_VERTEX_CONVENTION, PROVOKING_VERTEX, UNDEFINED_VERTEX."
 	 */
 	glGetIntegerv(GL_LAYER_PROVOKING_VERTEX, &layer);
+	piglit_minmax_pass = piglit_check_gl_error(GL_NO_ERROR)
+		&& piglit_minmax_pass;
+
 	switch (layer) {
 	case GL_FIRST_VERTEX_CONVENTION:
 	case GL_LAST_VERTEX_CONVENTION:
@@ -99,6 +102,9 @@ piglit_init(int argc, char **argv)
 	}
 
 	glGetIntegerv(GL_VIEWPORT_INDEX_PROVOKING_VERTEX, &index);
+	piglit_minmax_pass = piglit_check_gl_error(GL_NO_ERROR)
+		&& piglit_minmax_pass;
+
 	switch (index) {
 	case GL_FIRST_VERTEX_CONVENTION:
 	case GL_LAST_VERTEX_CONVENTION:
@@ -113,9 +119,6 @@ piglit_init(int argc, char **argv)
 		printf("Invalid value for GL_VIEWPORT_INDEX_PROVOKING_VERTEX\n");
 		break;
 	}
-
-	if (!piglit_check_gl_error(GL_NO_ERROR))
-		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(piglit_minmax_pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
