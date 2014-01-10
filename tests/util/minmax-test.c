@@ -99,17 +99,24 @@ piglit_report_float(const char *name, GLfloat limit, GLfloat val, bool pass)
 	}
 }
 
+#define SENTINEL  0xDEADBEEF
+
 static void
 piglit_test_int(GLenum token, GLint limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLint val = 9999;
+	GLint val = SENTINEL;
+	bool pass;
 
 	glGetIntegerv(token, &val);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	piglit_report_int(name, limit, val,
-			  (max && val <= limit) ||
-			  (!max && val >= limit));
+			  pass &&
+			  val != SENTINEL &&
+			  ((max && val <= limit) ||
+			   (!max && val >= limit)));
 }
 
 static void
@@ -130,13 +137,18 @@ static void
 piglit_test_uint(GLenum token, GLuint limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLuint val = 9999;
+	GLuint val = SENTINEL;
+	bool pass;
 
 	glGetIntegerv(token, (GLint*) &val);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	piglit_report_uint(name, limit, val,
-			   (max && val <= limit) ||
-			   (!max && val >= limit));
+			   pass &&
+			   val != SENTINEL &&
+			   ((max && val <= limit) ||
+			    (!max && val >= limit)));
 }
 
 #if !defined(PIGLIT_USE_OPENGL_ES2)
@@ -144,20 +156,26 @@ static void
 piglit_test_int64(GLenum token, GLint64 limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLint64 val = 9999;
+	GLint64 val = SENTINEL;
+	bool pass;
 
 	glGetInteger64v(token, &val);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	piglit_report_int64(name, limit, val,
-			    (max && val <= limit) ||
-			    (!max && val >= limit));
+			    pass &&
+			    val != SENTINEL &&
+			    ((max && val <= limit) ||
+			     (!max && val >= limit)));
 }
 
 static void
 piglit_test_uint64(GLenum token, GLuint64 limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLuint64 val;
+	GLuint64 val = SENTINEL;
+	bool pass;
 
 	/* To obtain GLuint64 values, we must use glGetInteger64v.
 	 * Justification is found in the GL_ARB_sync spec:
@@ -174,9 +192,13 @@ piglit_test_uint64(GLenum token, GLuint64 limit, bool max)
 
 	glGetInteger64v(token, (GLint64*) &val);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	piglit_report_uint64(name, limit, val,
-			     (max && val <= limit) ||
-			     (!max && val >= limit));
+			     pass &&
+			     val != SENTINEL &&
+			     ((max && val <= limit) ||
+			      (!max && val >= limit)));
 }
 #endif /* !PIGLIT_USE_OPENGL_ES2 */
 
@@ -236,13 +258,18 @@ static void
 piglit_test_float(GLenum token, GLfloat limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLfloat val = -9999;
+	GLfloat val = -SENTINEL;
+	bool pass;
 
 	glGetFloatv(token, &val);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	piglit_report_float(name, limit, val,
-			    (max && val <= limit) ||
-			    (!max && val >= limit));
+			    pass &&
+			    val != SENTINEL &&
+			    ((max && val <= limit) ||
+			     (!max && val >= limit)));
 }
 
 void piglit_test_min_float(GLenum token, GLfloat min)
@@ -260,16 +287,19 @@ void piglit_test_range_float(GLenum token, GLfloat low, GLfloat high)
 {
 	const char *name = piglit_get_gl_enum_name(token);
 	char *temp;
-	GLfloat vals[2] = {9999, 9999};
+	GLfloat vals[2] = {SENTINEL, SENTINEL};
+	bool pass;
 
 	glGetFloatv(token, vals);
 
+	pass = piglit_check_gl_error(GL_NO_ERROR);
+
 	asprintf(&temp, "%s[0]", name);
-	piglit_report_float(temp, low, vals[0], vals[0] <= low);
+	piglit_report_float(temp, low, vals[0], pass && vals[0] <= low);
 	free(temp);
 
 	asprintf(&temp, "%s[1]", name);
-	piglit_report_float(temp, high, vals[1], vals[1] >= high);
+	piglit_report_float(temp, high, vals[1], pass && vals[1] >= high);
 	free(temp);
 }
 
