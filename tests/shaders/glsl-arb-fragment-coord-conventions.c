@@ -35,7 +35,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -242,8 +242,6 @@ static void key_func(unsigned char key, int x, int y)
 
 void piglit_init(int argc, char **argv)
 {
-	piglit_require_gl_version(20);
-
 	piglit_require_extension("GL_ARB_fragment_coord_conventions");
 
 	if (!piglit_automatic) {
