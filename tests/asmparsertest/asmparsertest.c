@@ -236,6 +236,7 @@ piglit_init(int argc, char **argv)
 		piglit_require_extension("GL_NV_fragment_program");
 		use_ARB = 0;
 	} else {
+		target = GL_NONE;
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
