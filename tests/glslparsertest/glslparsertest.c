@@ -145,6 +145,7 @@ attach_dummy_shader(GLuint shader_prog, GLenum type)
 			"void main() { }";
 		break;
 	default:
+		shader_template = NULL;
 		printf("No dummy shader available for this shader type\n");
 		piglit_report_result(PIGLIT_FAIL);
 		break;
@@ -210,6 +211,7 @@ test(void)
 		type = GL_COMPUTE_SHADER;
 #endif
 	else {
+		type = GL_NONE;
 		fprintf(stderr, "Couldn't determine type of program %s\n",
 			filename);
 		piglit_report_result(PIGLIT_FAIL);
