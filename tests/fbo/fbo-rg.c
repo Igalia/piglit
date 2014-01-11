@@ -409,7 +409,7 @@ usage(const char *name)
 void
 piglit_init(int argc, char **argv)
 {
-	GLenum internal_format;
+	GLenum internal_format = GL_NONE;
 	const char *fmt;
 
 	if ((argc == 1) || (strncmp(argv[1], "GL_R", 4) != 0))
