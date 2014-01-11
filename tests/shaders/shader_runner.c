@@ -373,6 +373,7 @@ compare(float ref, float value, enum comparison cmp)
 	}
 
 	assert(!"Should not get here.");
+	return false;
 }
 
 
@@ -392,6 +393,7 @@ comparison_string(enum comparison cmp)
 	}
 
 	assert(!"Should not get here.");
+	return false;
 }
 
 
@@ -1568,8 +1570,8 @@ handle_texparameter(const char *line)
 		{ "alpha", GL_ALPHA },
 	};
 	GLenum target = 0;
-	GLenum parameter;
-	const char *parameter_name;
+	GLenum parameter = GL_NONE;
+	const char *parameter_name = NULL;
 	const struct string_to_enum *strings = NULL;
 	GLenum value;
 
