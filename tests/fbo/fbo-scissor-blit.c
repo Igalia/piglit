@@ -99,8 +99,10 @@ piglit_init(int argc, char **argv)
 		blit_to_fbo = false;
 	else if (strcmp(argv[1], "fbo") == 0)
 		blit_to_fbo = true;
-	else
+	else {
+		blit_to_fbo = false;
 		print_usage_and_exit(argv[0]);
+	}
 
 	piglit_require_extension("GL_ARB_framebuffer_object");
 
