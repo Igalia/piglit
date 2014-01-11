@@ -47,7 +47,7 @@ piglit_display(void)
 void piglit_init(int argc, char **argv)
 {
 	GLint program;
-	bool expect;
+	bool expect = false;
 	bool result;
 	unsigned i;
 	const char *invalid_file = NULL;
