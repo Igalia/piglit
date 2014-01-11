@@ -249,6 +249,7 @@ static GLuint read_index_value(const GLvoid *indices, GLenum type, GLuint index)
       return ((GLuint*)indices)[index];
    default:
       assert(0);
+      return 0;
    }
 }
 
@@ -337,6 +338,7 @@ test_draw_by_index(VBO_CFG vbo_cfg, GLboolean one_by_one, GLenum primMode, GLenu
       break;
    default:
       assert(0);
+      restart_index = 0;
    }
 
    x = 0.0;
