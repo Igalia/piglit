@@ -112,7 +112,7 @@ test_render_with_targets(GLenum target)
 			width /= 2;
 		if (height > 1)
 			height /= 2;
-		if (depth > 1)
+		if (depth > 1 && target == GL_TEXTURE_3D)
 			depth /= 2;
 	}
 
