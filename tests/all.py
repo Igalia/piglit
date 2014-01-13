@@ -3676,8 +3676,9 @@ egl_khr_create_context['invalid profile'] = plain_test('egl-create-context-inval
 egl_khr_create_context['3.2 core profile required'] = plain_test('egl-create-context-core-profile')
 egl_khr_create_context['pre-GL3.2 profile'] = plain_test('egl-create-context-pre-GL32-profile')
 egl_khr_create_context['verify GL flavor'] = plain_test('egl-create-context-verify-gl-flavor')
-for api in ('gl', 'gles1', 'gles2', 'gles3'):
-    egl_khr_create_context['valid debug flag ' + api] = plain_test('egl-create-context-valid-flag-debug ' + api)
+egl_khr_create_context['valid debug flag GL'] = plain_test('egl-create-context-valid-flag-debug-gl gl')
+for api in ('gles1', 'gles2', 'gles3'):
+    egl_khr_create_context['valid debug flag ' + api] = plain_test('egl-create-context-valid-flag-debug-gles ' + api)
 
 egl_ext_client_extensions = Group()
 spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
