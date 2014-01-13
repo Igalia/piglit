@@ -219,8 +219,8 @@ class ShaderTest(PlainExecTest):
                     assert(False)
 
         except IOError:
-            self._report_failure("Failed to read test file "
-                                 "{0!r}".format(self.__test_filepath))
+            self.__report_failure("Failed to read test file "
+                                  "{0!r}".format(self.__test_filepath))
             return
 
     @property
