@@ -451,7 +451,7 @@ class Environment:
         return result
 
 
-class Test:
+class Test(object):
     def __init__(self, runConcurrent=False):
         '''
                 'runConcurrent' controls whether this test will

@@ -71,14 +71,23 @@ class ExecTest(Test):
     def __init__(self, command):
         Test.__init__(self)
         self.command = command
-        self.split_command = os.path.split(self.command[0])[1]
+        self.split_command = os.path.split(self._command[0])[1]
         self.env = {}
         self.timeout = None
 
-        if isinstance(self.command, basestring):
-            self.command = shlex.split(str(self.command))
 
         self.skip_test = self.check_for_skip_scenario(command)
+
+    @property
+    def command(self):
+        return self._command
+
+    @command.setter
+    def command(self, value):
+        if isinstance(value, basestring):
+            self._command = shlex.split(str(value))
+            return
+        self._command = value
 
     def interpretResult(self, out, returncode, results, dmesg):
         raise NotImplementedError
@@ -270,7 +279,7 @@ class PlainExecTest(ExecTest):
     def __init__(self, command):
         ExecTest.__init__(self, command)
         # Prepend testBinDir to the path.
-        self.command[0] = os.path.join(testBinDir, self.command[0])
+        self._command[0] = os.path.join(testBinDir, self._command[0])
 
     def interpretResult(self, out, returncode, results, dmesg):
         outlines = out.split('\n')

@@ -35,9 +35,12 @@ class GleanTest(ExecTest):
 
     def __init__(self, name):
         ExecTest.__init__(self, [glean_executable,
-                                 "-o", "-v", "-v", "-v", "-t",
-                                 "+"+name] + GleanTest.globalParams)
+                                 "-o", "-v", "-v", "-v", "-t", "+" + name])
         self.name = name
+
+    @ExecTest.command.getter
+    def command(self):
+        return self._command + self.globalParams
 
     def interpretResult(self, out, returncode, results, dmesg):
         if "{'result': 'skip'}" in out:
