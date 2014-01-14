@@ -2140,6 +2140,7 @@ arb_viewport_array['minmax'] = concurrent_test('arb_viewport_array-minmax')
 arb_viewport_array['render-viewport'] = concurrent_test('arb_viewport_array-render-viewport')
 arb_viewport_array['render-depthrange'] = concurrent_test('arb_viewport_array-render-depthrange')
 arb_viewport_array['render-scissor'] = concurrent_test('arb_viewport_array-render-scissor')
+arb_viewport_array['clear'] =  concurrent_test('arb_viewport_array-clear')
 
 nv_vertex_program = Group()
 spec['NV_vertex_program'] = nv_vertex_program

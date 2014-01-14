@@ -9,6 +9,7 @@ link_libraries(
 	${OPENGL_glu_LIBRARY}
 	)
 
+piglit_add_executable(arb_viewport_array-clear clear.c)
 piglit_add_executable(arb_viewport_array-viewport-indices viewport_indices.c)
 piglit_add_executable(arb_viewport_array-depthrange-indices depth_range_indices.c)
 piglit_add_executable(arb_viewport_array-scissor-check scissor_check.c)
