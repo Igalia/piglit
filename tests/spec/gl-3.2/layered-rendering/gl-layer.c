@@ -157,6 +157,8 @@ bool test_gl_layer(GLint prog, int layers, float *expected)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glUseProgram(prog);
 
 	piglit_draw_rect(-1, -1, 2, 2);
