@@ -36,6 +36,8 @@ First of all, you need to make sure that the following are installed:
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
   - waffle (http://people.freedesktop.org/~chadversary/waffle)
+  - nose. Only needed for python framework tests
+    (https://nose.readthedocs.org/en/latest/)
 
 Now configure the build system:
 
