@@ -101,8 +101,8 @@ FIXES = [("crash", "fail"),
          ("warn", "pass"),
          ("warn", "skip"),
          ("warn", "notrun"),
-         ("dmesg-warn", "pass")]
-         ("dmesg-warn", "skip")]
+         ("dmesg-warn", "pass"),
+         ("dmesg-warn", "skip"),
          ("dmesg-warn", "notrun")]
 
 
