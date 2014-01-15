@@ -7,6 +7,8 @@ __all__ = ['profile']
 import os
 import os.path as path
 
+from framework.opencv import add_opencv_tests
+
 from framework.core import Group, TestProfile
 from framework.exectest import PlainExecTest
 
@@ -122,3 +124,5 @@ add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/relati
 program_execute_store = Group()
 program["Execute"]["Store"] = program_execute_store
 add_program_test_dir(program_execute_store, 'generated_tests/cl/store')
+
+add_opencv_tests(profile)

@@ -1,0 +1,5 @@
+;[opencv]
+; Set the opencv_test_ocl_bindir variable to run the OpenCV OpenCL tests.
+;opencv_test_ocl_bindir=/home/user/opencv/build/bin
+;opencv_workdir=/home/user/opencv/samples/c/
+;
