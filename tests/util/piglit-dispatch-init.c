@@ -33,7 +33,9 @@
 
 #else /* Linux */
 
+#ifdef PIGLIT_HAS_GLX
 #include "glxew.h"
+#endif
 
 #endif
 
@@ -143,7 +145,12 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 static piglit_dispatch_function_ptr
 get_ext_proc_address(const char *function_name)
 {
+#ifdef PIGLIT_HAS_GLX
 	return glXGetProcAddressARB((const GLubyte *) function_name);
+#else
+	(void)function_name;
+	return (piglit_dispatch_function_ptr)NULL;
+#endif
 }
 
 /**
