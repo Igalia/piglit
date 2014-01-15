@@ -12,6 +12,10 @@ INCLUDE (FindPkgConfig)
 project (piglit)
 
 find_package(X11)
+if(X11_FOUND)
+	set(PIGLIT_HAS_X11 True)
+	add_definitions(-DPIGLIT_HAS_X11)
+endif()
 
 
 option(PIGLIT_BUILD_GL_TESTS "Build tests for OpenGL" ON)
@@ -110,9 +114,6 @@ endif(PIGLIT_BUILD_CL_TESTS)
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(PIGLIT_HAS_GBM True)
 	add_definitions(-DPIGLIT_HAS_GBM)
-
-	set(PIGLIT_HAS_X11 True)
-	add_definitions(-DPIGLIT_HAS_X11)
 
 	set(PIGLIT_HAS_GLX True)
 	add_definitions(-DPIGLIT_HAS_GLX)
