@@ -24,7 +24,7 @@ set(UTIL_GL_SOURCES
 	piglit-util-gl-common.c
 	piglit-framework-gl/piglit_gl_framework.c
 	piglit-framework-gl.c
-        piglit_ktx.c
+	piglit_ktx.c
 	rgb9e5.c
 	)
 
@@ -51,7 +51,7 @@ endif()
 
 set(UTIL_GL_LIBS
 	piglitutil
-        ${WAFFLE_LDFLAGS}
+	${WAFFLE_LDFLAGS}
 	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

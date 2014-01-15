@@ -5,9 +5,9 @@ include_directories(
 )
 
 if(PIGLIT_BUILD_GLX_TESTS)
-    link_libraries (
-        piglitglxutil
-    )
+	link_libraries (
+		piglitglxutil
+	)
 endif(PIGLIT_BUILD_GLX_TESTS)
 
 link_libraries (

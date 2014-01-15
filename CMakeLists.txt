@@ -40,7 +40,21 @@ if(PIGLIT_USE_WAFFLE)
 		"packaged for your distribution, you can get it at "
 		"http://people.freedesktop.org/~chadversary/waffle."
 	)
-        endif()
+	endif()
+
+	# Check the installed waffle version.
+	#
+	# We cannot reliably check the version with pkg_check_modules(), but
+	# instead must check the version manually as below. The problem is that,
+	# if one passes a required version to pkg_check_modules(), CMake
+	# validates the required version at most once for the lifetime of the
+	# source tree.  If someone changes the required version by editing the
+	# CMakeLists, CMake fails to detect the new requirement.
+	set(WAFFLE_REQUIRED_VERSION "1.3.0")
+	if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
+		message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
+		"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
+	endif()
 
 	# Check the installed waffle version.
 	#
@@ -96,14 +110,14 @@ if(PIGLIT_BUILD_CL_TESTS)
 endif(PIGLIT_BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-        set(PIGLIT_HAS_GBM True)
-        add_definitions(-DPIGLIT_HAS_GBM)
+	set(PIGLIT_HAS_GBM True)
+	add_definitions(-DPIGLIT_HAS_GBM)
 
 	set(PIGLIT_HAS_X11 True)
 	add_definitions(-DPIGLIT_HAS_X11)
 
-        set(PIGLIT_HAS_GLX True)
-        add_definitions(-DPIGLIT_HAS_GLX)
+	set(PIGLIT_HAS_GLX True)
+	add_definitions(-DPIGLIT_HAS_GLX)
 
 	pkg_check_modules(LIBDRM QUIET libdrm)
 	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
@@ -258,8 +272,8 @@ if (WIN32)
 	# MSVC & MinGW only define & use APIENTRY
 	add_definitions (-DGLAPIENTRY=__stdcall)
 
-        # Avoid namespace pollution when including windows.h
-        # http://support.microsoft.com/kb/166474
+	# Avoid namespace pollution when including windows.h
+	# http://support.microsoft.com/kb/166474
 	add_definitions (-DWIN32_LEAN_AND_MEAN=1)
 
 	# Don't define min/max macros
@@ -285,7 +299,7 @@ endif (APPLE)
 
 FIND_LIBRARY(HAVE_LIBRT NAMES rt)
 if(HAVE_LIBRT)
-    set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} rt)
+	set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} rt)
 endif()
 check_c_source_compiles(
 	"
@@ -298,7 +312,7 @@ check_c_source_compiles(
 set(CMAKE_REQUIRED_LIBRARIES)
 
 if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
-    add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+	add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 endif()
 
 if(PIGLIT_USE_WAFFLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
@@ -396,8 +410,8 @@ install (
 )
 
 install (
-        DIRECTORY templates
-        DESTINATION .
+	DIRECTORY templates
+	DESTINATION .
 )
 
 install (

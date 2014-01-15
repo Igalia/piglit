@@ -1,7 +1,7 @@
 link_libraries(
 	piglitutil_${piglit_target_api}
-        ${EGL_LDFLAGS}
-        )
+	${EGL_LDFLAGS}
+)
 
 piglit_add_executable(egl-terminate-then-unbind-context egl-terminate-then-unbind-context.c)
 
