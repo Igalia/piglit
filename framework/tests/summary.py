@@ -219,20 +219,6 @@ class StatusTest(SummaryTestBase):
             len(result.tests['regressions']), 1,
             "{0} -> {1} is not a regression but should be".format(x, y))
 
-    @test_iterations(*[i for i in itertools.product(STATUSES, STATUSES)
-                       if i not in REGRESSIONS])
-    def test_is_not_regression(self, x, y):
-        """ Test statuses which are not explicitly regressions 
-
-        Test that all combinations that are not explicitly a regression are not
-        treated as regressions
-
-        """
-        result = self._generate_summary([x, y])
-        self.assertEqual(
-            len(result.tests['regressions']), 0,
-            "{0} -> {1} is a regression but should not be".format(x, y))
-
     @test_iterations(*FIXES)
     def test_is_fix(self, x, y):
         """ Statuses that are explicitly defined as fixes should be fixes
@@ -244,22 +230,6 @@ class StatusTest(SummaryTestBase):
         self.assertEqual(
             len(result.tests['fixes']), 1,
             "{0} -> {1} is not a fix but should be".format(x, y))
-
-
-    @test_iterations(*[i for i in itertools.product(STATUSES, STATUSES)
-                       if i not in FIXES])
-    def test_is_not_fix(self, x, y):
-        """ unless explicitly defined as fixes statuses should not be treated as
-        fixes
-
-        Test that all combinations that are not explicitly a fix are not treated as
-        fixes
-
-        """
-        result = self._generate_summary([x, y])
-        self.assertEqual(
-            len(result.tests['fixes']), 0,
-            "{0} -> {1} is a fix but should not be".format(x, y))
 
     #XXX: is "notrun" -> not(notrun) a change?
     @test_iterations(*[i for i in itertools.product(STATUSES[:-1], STATUSES[:-1])
@@ -275,14 +245,6 @@ class StatusTest(SummaryTestBase):
             len(result.tests['changes']), 1,
             "{0} -> {1} is a not a change but should be".format(x, y))
 
-    @test_iterations(*itertools.izip(STATUSES, STATUSES))
-    def test_is_not_change(self, x, y):
-        """ Tests that two equal statues are not changes """
-        result = self._generate_summary([x, y])
-        self.assertEqual(
-            len(result.tests['changes']), 0,
-            "{0} -> {1} is a change but should not be".format(x, y))
-
     @test_iterations(*PROBLEMS)
     def test_is_problem(self, x):
         """ Only statuses in the PROBLEMS list should be added to problems """
@@ -291,23 +253,6 @@ class StatusTest(SummaryTestBase):
             len(result.tests['problems']), 1,
             "{0} is not a problem but should be".format(x))
 
-    @test_iterations(*[i for i in STATUSES if i not in PROBLEMS])
-    def test_is_not_problem(self, x):
-        """ Any statuses not in the PROBLEMS list should not be a problem """
-        result = self._generate_summary([x])
-        self.assertEqual(
-            len(result.tests['problems']), 0,
-            "{0} is a problem but should not be".format(x))
-
-    @test_iterations(*[i for i in STATUSES if i != "skip"])
-    def test_is_not_skip(self, x):
-        """ Ensure that no status except for skip is being added to the skip
-        list """
-        result = self._generate_summary([x])
-        self.assertEqual(
-            len(result.tests['skipped']), 0,
-            "{0} is a skip but should not be".format(x))
-                        
     @test_iterations("skip")
     def test_is_skip(self, x):
         """ Ensure that skip is being added to the skip list """
