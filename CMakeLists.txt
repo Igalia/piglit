@@ -281,19 +281,21 @@ if (WIN32)
 	add_definitions (-D_USE_MATH_DEFINES)
 endif (WIN32)
 
-if (APPLE)
-	find_path(GLEXT_INCLUDE_DIR
-		NAMES OpenGL/glext.h
-		PATHS ${OPENGL_INCLUDE_DIR}
-		DOC "Include for OpenGL/glext.h on OSX"
-	)
-else (APPLE)
-	find_path(GLEXT_INCLUDE_DIR
-		NAMES GL/glext.h
-		PATHS ${OPENGL_INCLUDE_DIR}
-		DOC "Include for GL/glext.h"
-	)
-endif (APPLE)
+if (OPENGL_FOUND)
+	if (APPLE)
+		find_path(GLEXT_INCLUDE_DIR
+			NAMES OpenGL/glext.h
+			PATHS ${OPENGL_INCLUDE_DIR}
+			DOC "Include for OpenGL/glext.h on OSX"
+		)
+	else (APPLE)
+		find_path(GLEXT_INCLUDE_DIR
+			NAMES GL/glext.h
+			PATHS ${OPENGL_INCLUDE_DIR}
+			DOC "Include for GL/glext.h"
+		)
+	endif (APPLE)
+endif()
 
 FIND_LIBRARY(HAVE_LIBRT NAMES rt)
 if(HAVE_LIBRT)
