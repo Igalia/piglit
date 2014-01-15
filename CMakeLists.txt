@@ -112,8 +112,11 @@ if(PIGLIT_BUILD_CL_TESTS)
 endif(PIGLIT_BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	set(PIGLIT_HAS_GBM True)
-	add_definitions(-DPIGLIT_HAS_GBM)
+	pkg_check_modules(GBM QUIET gbm)
+	if(GBM_FOUND)
+		set(PIGLIT_HAS_GBM True)
+		add_definitions(-DPIGLIT_HAS_GBM)
+	endif(GBM_FOUND)
 
 	set(PIGLIT_HAS_GLX True)
 	add_definitions(-DPIGLIT_HAS_GLX)
