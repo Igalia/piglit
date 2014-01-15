@@ -24,11 +24,11 @@
 import argparse
 import unittest
 
-import framework.tests.summary
+import framework.tests.status
 
 # Create a dictionary of all of tests. Do this before the parser so we can use
 # it as a list of optional arguments for the parser
-tests = {"summary": unittest.TestLoader().loadTestsFromModule(framework.tests.summary)}
+tests = {"status": unittest.TestLoader().loadTestsFromModule(framework.tests.status)}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("tests",
