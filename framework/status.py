@@ -106,9 +106,6 @@ class Status(object):
     def __init__(self):
         raise NotImplementedError
 
-    def split(self, spliton):
-        return (self.name.split(spliton))
-
     def __repr__(self):
         return self.name
 
