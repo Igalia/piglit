@@ -22,8 +22,6 @@ option(PIGLIT_BUILD_CL_TESTS "Build tests for OpenCL" OFF)
 
 if(PIGLIT_BUILD_GL_TESTS)
 	find_package(OpenGL REQUIRED)
-else()
-	find_package(OpenGL)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
