@@ -16,4 +16,5 @@ piglit_add_executable (arb_sample_shading-builtin-gl-sample-id builtin-gl-sample
 piglit_add_executable (arb_sample_shading-builtin-gl-sample-mask builtin-gl-sample-mask.cpp)
 piglit_add_executable (arb_sample_shading-builtin-gl-sample-position builtin-gl-sample-position.cpp)
 piglit_add_executable (arb_sample_shading-interpolate-at-sample-position interpolate-at-sample-position.cpp)
+piglit_add_executable (arb_sample_shading-ignore-centroid-qualifier ignore-centroid-qualifier.cpp)
 # vim: ft=cmake:

@@ -1801,6 +1801,11 @@ for num_samples in MSAA_SAMPLE_COUNTS:
     executable = 'arb_sample_shading-{0} -auto'.format(test_name)
     arb_sample_shading[test_name] = PlainExecTest(executable)
 
+for num_samples in MSAA_SAMPLE_COUNTS:
+    test_name = 'ignore-centroid-qualifier {0}'.format(num_samples)
+    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    arb_sample_shading[test_name] = PlainExecTest(executable)
+
 import_glsl_parser_tests(spec['ARB_sample_shading'],
                          os.path.join(testsDir, 'spec', 'arb_sample_shading'),
                          ['compiler'])
