@@ -22,9 +22,8 @@
 # DEALINGS IN THE SOFTWARE.
 
 import os
-import subprocess
 
-from core import checkDir, testBinDir, Test, TestResult
+from core import testBinDir
 from exectest import ExecTest
 
 glean_executable = os.path.join(testBinDir, "glean")
