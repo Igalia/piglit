@@ -29,8 +29,8 @@ from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
-import status as so
-import core
+import framework.status as so
+import framework.core as core
 
 
 __all__ = [
