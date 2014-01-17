@@ -26,8 +26,6 @@ import argparse
 import sys
 import os
 import os.path as path
-import time
-import traceback
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
