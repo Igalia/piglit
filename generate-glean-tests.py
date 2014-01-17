@@ -27,7 +27,6 @@
 
 from getopt import getopt, GetoptError
 
-import os
 import re
 import sys
 
