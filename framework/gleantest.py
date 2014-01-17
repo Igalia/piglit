@@ -23,8 +23,8 @@
 
 import os
 
-from core import testBinDir
-from exectest import ExecTest
+from .core import testBinDir
+from .exectest import ExecTest
 
 glean_executable = os.path.join(testBinDir, "glean")
 
