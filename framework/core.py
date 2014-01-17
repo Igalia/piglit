@@ -26,16 +26,11 @@ import errno
 import os
 import platform
 import re
-import stat
 import subprocess
-import string
 import sys
 import time
 import traceback
-from log import log
 from cStringIO import StringIO
-from textwrap import dedent
-from threads import synchronized_self
 import multiprocessing
 import multiprocessing.dummy
 import importlib
