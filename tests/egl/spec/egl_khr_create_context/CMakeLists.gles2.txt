@@ -1,16 +1,6 @@
-
-include_directories(
-	${GLEXT_INCLUDE_DIR}
-	${OPENGL_INCLUDE_PATH}
-	${GLPROTO_INCLUDE_DIRS}
-)
-
 link_libraries (
 	piglitutil_${piglit_target_api}
 	${EGL_LDFLAGS}
-	${OPENGL_gles1_LIBRARY}
-	${OPENGL_gles2_LIBRARY}
-	${OPENGL_gl_LIBRARY}
 )
 
 # Tests that use ES 1.
