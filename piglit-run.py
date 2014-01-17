@@ -27,12 +27,9 @@ import sys
 import os
 import os.path as path
 import time
-import traceback
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
-from framework.core import PIGLIT_CONFIG
-from framework.threads import synchronized_self
 
 
 def main():
@@ -101,10 +98,11 @@ def main():
 
     # Read the config file
     if args.config_file:
-        PIGLIT_CONFIG.readfp(args.config_file)
+        core.PIGLIT_CONFIG.readfp(args.config_file)
         args.config_file.close()
     else:
-        PIGLIT_CONFIG.read(os.path.join(os.path.dirname(__file__), 'piglit.conf'))
+        core.PIGLIT_CONFIG.read(os.path.join(os.path.dirname(__file__),
+                                'piglit.conf'))
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
