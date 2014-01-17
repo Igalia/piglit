@@ -38,6 +38,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 
+#undef NUMCOLORS
 #define NUMCOLORS        7
 #define TEX_WIDTH        32
 #define TEX_HEIGHT       32
