@@ -38,7 +38,6 @@ import re
 import subprocess
 import sys
 
-from ConfigParser import SafeConfigParser
 from core import Test, testBinDir, TestResult
 from cStringIO import StringIO
 from exectest import PlainExecTest
