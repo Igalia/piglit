@@ -23,8 +23,8 @@
 
 import logging
 
-from threads import synchronized_self
-from patterns import Singleton
+from .threads import synchronized_self
+from .patterns import Singleton
 
 
 class Logger(Singleton):
