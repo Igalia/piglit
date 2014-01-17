@@ -29,8 +29,8 @@ import re
 import sys
 import textwrap
 
-from core import testBinDir, Group, Test, TestResult, Environment
-from exectest import PlainExecTest
+from .core import testBinDir, Group, Test, TestResult, Environment
+from .exectest import PlainExecTest
 
 """This module enables running shader tests.
 
