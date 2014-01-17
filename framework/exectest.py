@@ -24,8 +24,6 @@ import errno
 import os
 import subprocess
 import shlex
-import types
-import re
 
 from core import Test, testBinDir, TestResult
 
