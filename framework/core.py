@@ -41,7 +41,9 @@ try:
 except ImportError:
     import json
 
-import status
+import framework.status as status
+from .threads import synchronized_self
+from .log import log
 
 __all__ = ['PIGLIT_CONFIG',
            'Environment',
