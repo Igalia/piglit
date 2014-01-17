@@ -50,7 +50,6 @@ __all__ = ['PIGLIT_CONFIG',
            'checkDir',
            'loadTestProfile',
            'TestrunResult',
-           'GroupResult',
            'TestResult',
            'TestProfile',
            'Group',
@@ -247,51 +246,6 @@ class TestResult(dict):
             # If there isn't a result (like when used by piglit-run), go on
             # normally
             pass
-
-
-class GroupResult(dict):
-    def get_subgroup(self, path, create=True):
-        '''
-        Retrieve subgroup specified by path
-
-        For example, ``self.get_subgroup('a/b/c')`` will attempt to
-        return ``self['a']['b']['c']``. If any subgroup along ``path``
-        does not exist, then it will be created if ``create`` is true;
-        otherwise, ``None`` is returned.
-        '''
-        group = self
-        for subname in path.split('/'):
-            if subname not in group:
-                if create:
-                    group[subname] = GroupResult()
-                else:
-                    return None
-            group = group[subname]
-            assert(isinstance(group, GroupResult))
-        return group
-
-    @staticmethod
-    def make_tree(tests):
-        '''
-        Convert a flat dict of test results to a hierarchical tree
-
-        ``tests`` is a dict whose items have form ``(path, TestResult)``,
-        where path is a string with form ``group1/group2/.../test_name``.
-
-        Return a tree whose leaves are the values of ``tests`` and
-        whose nodes, which have type ``GroupResult``, reflect the
-        paths in ``tests``.
-        '''
-        root = GroupResult()
-
-        for (path, result) in tests.items():
-            group_path = os.path.dirname(path)
-            test_name = os.path.basename(path)
-
-            group = root.get_subgroup(group_path)
-            group[test_name] = TestResult(result)
-
-        return root
 
 
 class TestrunResult:
@@ -615,20 +569,6 @@ class TestProfile:
         multi.join()
         single.join()
 
-    def remove_test(self, test_path):
-        """Remove a fully qualified test from the profile.
-
-        ``test_path`` is a string with slash ('/') separated
-        components. It has no leading slash. For example::
-                test_path = 'spec/glsl-1.30/linker/do-stuff'
-        """
-
-        l = test_path.split('/')
-        group = self.tests[l[0]]
-        for group_name in l[1:-2]:
-            group = group[group_name]
-        del group[l[-1]]
-
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
 
@@ -729,4 +669,4 @@ def parse_listfile(filename):
         ['/home/user/tests1', '/home/users/tests2/main', '/tmp/test3']
     """
     with open(filename, 'r') as file:
-        return [path.expanduser(i.rstrip('\n')) for i in file.readlines()]
+        return [os.path.expanduser(i.rstrip('\n')) for i in file.readlines()]
