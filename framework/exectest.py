@@ -25,7 +25,7 @@ import os
 import subprocess
 import shlex
 
-from core import Test, testBinDir, TestResult
+from .core import Test, testBinDir, TestResult
 
 
 # Platform global variables
