@@ -37,10 +37,10 @@ import os.path as path
 import re
 import subprocess
 import sys
-
-from core import Test, testBinDir, TestResult
 from cStringIO import StringIO
-from exectest import PlainExecTest
+
+from .core import Test, testBinDir, TestResult
+from .exectest import PlainExecTest
 
 
 def add_glsl_parser_test(group, filepath, test_name):
