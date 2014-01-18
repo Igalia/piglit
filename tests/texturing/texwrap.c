@@ -1342,7 +1342,7 @@ static void init_int_texture(const struct format_desc *format,
 	unsigned *ui1010102colors[7] = {ui1010102red, ui1010102cyan, ui1010102blue, ui1010102orange,
 					ui1010102white, ui1010102black, (unsigned*)border_real};
 
-	int **colors;
+	int **colors = { 0 };
 	int *red, *cyan, *blue, *orange, *white, *black;
 
 	switch (format->type) {
