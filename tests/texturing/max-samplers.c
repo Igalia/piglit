@@ -82,11 +82,12 @@ GLuint prog;
 static int max_vs_textures, max_fs_textures;
 
 static void
-get_texture_color(int unit, float out[3])
+get_texture_color(int unit, float out[4])
 {
 	out[0] = (unit % 16) / 15.0;
 	out[1] = (unit / 16) / 15.0;
 	out[2] = 0;
+	out[3] = 1;
 }
 
 static void
@@ -140,7 +141,7 @@ draw_rect_core(int ix, int iy, int iw, int ih)
 static GLboolean
 probe_pixel(int unit, int x, int y)
 {
-	float expected[3];
+	float expected[4];
 
 	get_texture_color(unit, expected);
 
@@ -201,7 +202,7 @@ static void
 set_texture(int unit)
 {
 	GLuint tex;
-	float color[3];
+	float color[4];
 
 	get_texture_color(unit, color);
 
