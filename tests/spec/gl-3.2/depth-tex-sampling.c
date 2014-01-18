@@ -199,7 +199,7 @@ piglit_display(void)
 
 	piglit_present_results();
 
-	piglit_check_gl_error(GL_NO_ERROR);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
