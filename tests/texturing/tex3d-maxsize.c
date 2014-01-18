@@ -118,6 +118,7 @@ piglit_display(void)
 	if (err == GL_OUT_OF_MEMORY) {
 
 		/* use proxy texture to find working max texture size */
+		width = height = depth = 0;
 		find_max_tex3d_size(maxsize, &width, &height, &depth);
 
 		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, width, height, depth, 0,
