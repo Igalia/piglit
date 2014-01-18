@@ -519,6 +519,7 @@ class TestProfile:
     def __init__(self):
         self.tests = Group()
         self.test_list = {}
+        self.filters = []
 
     def flatten_group_hierarchy(self):
         '''
@@ -548,14 +549,23 @@ class TestProfile:
         def matches_any_regexp(x, re_list):
             return True in map(lambda r: r.search(x) is not None, re_list)
 
-        def test_matches(item):
-            path, test = item
+        def test_matches(path, test):
+            """Filter for user-specified restrictions"""
             return ((not env.filter or matches_any_regexp(path, env.filter))
                     and not path in env.exclude_tests and
                     not matches_any_regexp(path, env.exclude_filter))
 
+        filters = self.filters + [test_matches]
+        def check_all(item):
+            path, test = item
+            for f in filters:
+                if not f(path, test):
+                    return False
+            return True
+
         # Filter out unwanted tests
-        self.test_list = dict(filter(test_matches, self.test_list.items()))
+        self.test_list = dict(item for item in self.test_list.iteritems()
+                              if check_all(item))
 
     def run(self, env, json_writer):
         '''
@@ -617,17 +627,15 @@ class TestProfile:
             group = group[group_name]
         del group[l[-1]]
 
-    def remove_tests(self, function):
-        """ Remove tests that return true from function
+    def filter_tests(self, function):
+        """Filter out tests that return false from the supplied function
 
-        This is a destructive method, and passing an incorrect function could
-        result in undesired behavior.
-
+        Arguments:
+        function -- a callable that takes two parameters: path, test and
+                    returns whether the test should be included in the test
+                    run or not.
         """
-        # What we really want is a dictionary comprehension, but since python
-        # 2.6 is officially supported we can't use one
-        # {k:v for k, v in self.tests.iteritems() if function(v)}
-        self.tests = dict((k,v) for k, v in self.tests.iteritems() if function(v))
+        self.filters.append(function)
 
     def update(self, *profiles):
         """ Updates the contents of this TestProfile instance with another
