@@ -70,12 +70,12 @@ piglit_init(int argc, char **argv)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(invalid_sizes); i++) {
-		glVertexAttribPointer(0, valid_sizes[i],
+		glVertexAttribPointer(0, invalid_sizes[i],
 					GL_INT_2_10_10_10_REV, GL_TRUE,
 					0, NULL);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
-		glVertexAttribPointer(0, valid_sizes[i],
+		glVertexAttribPointer(0, invalid_sizes[i],
 					GL_UNSIGNED_INT_2_10_10_10_REV, GL_TRUE,
 					0, NULL);
 		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
