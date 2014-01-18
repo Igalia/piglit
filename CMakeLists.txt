@@ -112,19 +112,27 @@ if(PIGLIT_BUILD_CL_TESTS)
 endif(PIGLIT_BUILD_CL_TESTS)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if(X11_FOUND AND OPENGL_gl_LIBRARY)
+		# Assume the system has GLX. In the future, systems may exist
+		# with libGL and libX11 but no GLX, but that world hasn't
+		# arrived yet.
+		set(PIGLIT_HAS_GLX True)
+		add_definitions(-DPIGLIT_HAS_GLX)
+	endif()
+
 	pkg_check_modules(GBM QUIET gbm)
 	if(GBM_FOUND)
 		set(PIGLIT_HAS_GBM True)
 		add_definitions(-DPIGLIT_HAS_GBM)
 	endif(GBM_FOUND)
 
-	set(PIGLIT_HAS_GLX True)
-	add_definitions(-DPIGLIT_HAS_GLX)
-
 	pkg_check_modules(LIBDRM QUIET libdrm)
 	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
 	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
+	pkg_check_modules(GLPROTO QUIET glproto)
+ENDIF()
 
+IF(PIGLIT_HAS_GLX)
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" ON)
 ELSE()
 	option(PIGLIT_BUILD_GLX_TESTS "Build tests that require GLX" OFF)
