@@ -83,10 +83,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		endif()
 	endif()
 
-	set(UTIL_GL_LIBS
-		${UTIL_GL_LIBS}
-		${X11_X11_LIB}
-	)
+	if(PIGLIT_HAS_X11)
+		list(APPEND UTIL_GL_LIBS ${X11_X11_LIB})
+	endif()
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 piglit_include_target_api()
