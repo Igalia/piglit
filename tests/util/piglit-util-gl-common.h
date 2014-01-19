@@ -150,6 +150,8 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 				 int w, int h, const float *expected);
 int piglit_probe_texel_rgba(int target, int level, int x, int y,
 			    const float* expected);
+int piglit_probe_texel_volume_rgba(int target, int level, int x, int y, int z,
+				 int w, int h, int d, const float *expected);
 int piglit_probe_pixel_depth(int x, int y, float expected);
 int piglit_probe_rect_depth(int x, int y, int w, int h, float expected);
 int piglit_probe_pixel_stencil(int x, int y, unsigned expected);

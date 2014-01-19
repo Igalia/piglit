@@ -732,6 +732,62 @@ int piglit_probe_texel_rect_rgba(int target, int level, int x, int y,
 }
 
 /**
+ * Read a texel rectangle from the given location and compare its RGBA value to
+ * the given expected values.
+ *
+ * Print a log message if the color value deviates from the expected value.
+ * \return true if the color values match, false otherwise
+ */
+int piglit_probe_texel_volume_rgba(int target, int level, int x, int y, int z,
+				 int w, int h, int d, const float* expected)
+{
+	GLfloat *buffer;
+	GLfloat *probe;
+	int i, j, k, p;
+	GLint width;
+	GLint height;
+	GLint depth;
+
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_HEIGHT, &height);
+	glGetTexLevelParameteriv(target, level, GL_TEXTURE_DEPTH, &depth);
+	buffer = malloc(width * height * depth * 4 * sizeof(GLfloat));
+
+	glGetTexImage(target, level, GL_RGBA, GL_FLOAT, buffer);
+
+	assert(x >= 0);
+	assert(y >= 0);
+	assert(d >= 0);
+	assert(x+w <= width);
+	assert(y+h <= height);
+	assert(z+d <= depth);
+
+	for (k = z; k < z+d; ++k) {
+		for (j = y; j < y+h; ++j) {
+			for (i = x; i < x+w; ++i) {
+				probe = &buffer[(k * width * height + j * width + i) * 4];
+
+				for (p = 0; p < 4; ++p) {
+					if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
+						printf("Probe color at (%i,%i,%i)\n", i, j, k);
+						printf("  Expected: %f %f %f %f\n",
+						       expected[0], expected[1], expected[2], expected[3]);
+						printf("  Observed: %f %f %f %f\n",
+						       probe[0], probe[1], probe[2], probe[3]);
+
+						free(buffer);
+						return 0;
+					}
+				}
+			}
+		}
+	}
+
+	free(buffer);
+	return 1;
+}
+
+/**
  * Read a texel from the given location and compare its RGBA value to the
  * given expected values.
  *
