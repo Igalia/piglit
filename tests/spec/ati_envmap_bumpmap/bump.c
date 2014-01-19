@@ -216,7 +216,7 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	units = malloc(num_units * sizeof(GLenum));
+	units = malloc(num_units * sizeof(int));
 	glGetTexBumpParameterivATI(GL_BUMP_TEX_UNITS_ATI, units);
 	found_unit_1 = GL_FALSE;
 	for (i = 0; i < num_units; i++) {
