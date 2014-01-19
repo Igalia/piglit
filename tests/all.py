@@ -2013,6 +2013,7 @@ arb_texture_view['rendering-levels'] = concurrent_test('arb_texture_view-renderi
 arb_texture_view['lifetime-format'] = concurrent_test('arb_texture_view-lifetime-format')
 arb_texture_view['getteximage-srgb'] = concurrent_test('arb_texture_view-getteximage-srgb')
 arb_texture_view['texsubimage-levels'] = concurrent_test('arb_texture_view-texsubimage-levels')
+arb_texture_view['texsubimage-layers'] = concurrent_test('arb_texture_view-texsubimage-layers')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
