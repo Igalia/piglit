@@ -162,7 +162,7 @@ GLboolean test_less()
 	glVertex3fv(v23);
 	glEnd();
 
-	pix = malloc(piglit_width * piglit_height * 12);
+	pix = malloc(piglit_width * piglit_height * 3 * sizeof(float));
 	glReadPixels(0, 0, piglit_width, piglit_height, GL_RGB, GL_FLOAT, pix);
 
 	/* check pixels */
