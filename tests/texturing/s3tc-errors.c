@@ -345,7 +345,7 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 static bool
 test_small_mipmap_level(void)
 {
-	bool pass;
+	bool pass = true;
 	GLuint tex;
 	GLubyte buf[100];
 	int width, height;
@@ -363,13 +363,13 @@ test_small_mipmap_level(void)
 			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height,
 				     0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
-			pass = piglit_check_gl_error(GL_NO_ERROR);
+			pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 			/* Try TexSubImage of whole texture */
 			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
 					GL_RGBA, GL_UNSIGNED_BYTE, buf);
 
-			pass = piglit_check_gl_error(GL_NO_ERROR);
+			pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 		}
 	}
 
