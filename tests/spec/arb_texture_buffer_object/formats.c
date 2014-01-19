@@ -186,7 +186,7 @@ transform_y(float y)
 static bool
 get_expected_f(const struct format *format, int sample, float *expected)
 {
-	float chans[4];
+	float chans[4] = { 0 };
 	int i;
 
 	for (i = 0; i < format->components; i++) {
