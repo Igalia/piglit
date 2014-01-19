@@ -1022,6 +1022,7 @@ add_plain_test(gl20, 'fragment-and-vertex-texturing')
 gl20['incomplete-texture-glsl'] = concurrent_test('incomplete-texture -auto glsl')
 add_plain_test(gl20, 'tex3d-npot')
 add_concurrent_test(gl20, 'max-samplers')
+add_concurrent_test(gl20, 'max-samplers border')
 
 gl21 = Group()
 spec['!OpenGL 2.1'] = gl21

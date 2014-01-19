@@ -52,7 +52,7 @@ static const char *vs_source =
 	"	vertex_tex_color = vec3(0.0); \n"
 	"	for (i = 0; i < NUM; i++) \n"
 	"		if (i == vertex_index) \n"
-	"			vertex_tex_color = texture2DLod(vertex_tex[i], vec2(0.5), 0.0).xyz; \n"
+	"			vertex_tex_color = texture2DLod(vertex_tex[i], vec2(%f), 0.0).xyz; \n"
 	"} \n";
 
 static const char *vs_source_no_textures =
@@ -74,7 +74,7 @@ static const char *fs_source =
 	"	vec3 fragment_tex_color = vec3(0.0); \n"
 	"	for (i = 0; i < NUM; i++) \n"
 	"		if (i == fragment_index) \n"
-	"			fragment_tex_color = texture2D(fragment_tex[i], vec2(0.5), 0.0).xyz; \n"
+	"			fragment_tex_color = texture2D(fragment_tex[i], vec2(%f), 0.0).xyz; \n"
 	"	gl_FragColor = vec4(fragment_tex_color + vertex_tex_color, 1.0); \n"
 	"} \n";
 
@@ -213,6 +213,9 @@ set_texture(int unit)
 		     GL_RGB, GL_FLOAT, color);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 
 	piglit_check_gl_error(GL_NO_ERROR);
 }
@@ -223,6 +226,15 @@ piglit_init(int argc, char **argv)
 	GLuint vs, fs, vao;
 	int max_combined_textures, i, unit;
 	char str[2048];
+	float texcoord = 0.5;
+
+	if (argc == 2 && strcmp(argv[1], "border") == 0) {
+		/* Sample outside of the texture, testing border color. */
+		texcoord = 5.0;
+	} else if (argc != 1) {
+		printf("Usage: max-samples [border]\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
 	/* get limits */
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_fs_textures);
@@ -238,14 +250,14 @@ piglit_init(int argc, char **argv)
 
 	/* compile shaders */
 	if (max_vs_textures) {
-		sprintf(str, vs_source, max_vs_textures);
+		sprintf(str, vs_source, max_vs_textures, texcoord);
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, str);
 	}
 	else {
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vs_source_no_textures);
 	}
 
-	sprintf(str, fs_source, max_fs_textures);
+	sprintf(str, fs_source, max_fs_textures, texcoord);
 	fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, str);
 
 	prog = piglit_link_simple_program(vs, fs);
