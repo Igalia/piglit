@@ -2016,6 +2016,7 @@ arb_texture_view['texsubimage-levels'] = concurrent_test('arb_texture_view-texsu
 arb_texture_view['texsubimage-layers'] = concurrent_test('arb_texture_view-texsubimage-layers')
 arb_texture_view['clear-into-view-2d'] = concurrent_test('arb_texture_view-clear-into-view-2d')
 arb_texture_view['clear-into-view-2d-array'] = concurrent_test('arb_texture_view-clear-into-view-2d-array')
+arb_texture_view['clear-into-view-layered'] = concurrent_test('arb_texture_view-clear-into-view-layered')
 
 tdfx_texture_compression_fxt1 = Group()
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
