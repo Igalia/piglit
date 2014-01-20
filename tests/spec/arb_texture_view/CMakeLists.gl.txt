@@ -20,5 +20,6 @@ piglit_add_executable(arb_texture_view-rendering-levels rendering_levels.c commo
 piglit_add_executable(arb_texture_view-lifetime-format lifetime_format.c common.c)
 piglit_add_executable(arb_texture_view-texsubimage-levels texsubimage-levels.c common.c)
 piglit_add_executable(arb_texture_view-texsubimage-layers texsubimage-layers.c common.c)
+piglit_add_executable(arb_texture_view-clear-into-view-2d clear-into-view-2d.c common.c)
 
 # vim: ft=cmake:
