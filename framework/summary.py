@@ -281,6 +281,12 @@ class Summary:
             status = self.status[results.name]
 
             for key, value in results.tests.iteritems():
+                # if the first character of key is a / then our while loop will
+                # become an infinite loop. Beyond that / should never be the
+                # leading character, if it is then there is a bug in one of the
+                # test profiles.
+                assert key[0] != '/'
+
                 #FIXME: Add subtest support
 
                 # Walk the test name as if it was a path, at each level update
