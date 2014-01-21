@@ -340,7 +340,7 @@ class Summary:
         self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn': 0,
                        'dmesg-warn': 0, 'dmesg-fail': 0}
 
-        for test in self.results[-1].tests.values():
+        for test in self.results[-1].tests.itervalues():
             self.totals[str(test['result'])] += 1
 
     def generate_html(self, destination, exclude):
@@ -481,4 +481,4 @@ class Summary:
             print "      fixes: %d" % len(self.tests['fixes'])
             print "regressions: %d" % len(self.tests['regressions'])
 
-        print "      total: %d" % sum(self.totals.values())
+        print "      total: %d" % sum(self.totals.itervalues())
