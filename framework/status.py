@@ -64,7 +64,6 @@ def status_lookup(status):
                    'crash': Crash,
                    'dmesg-warn': DmesgWarn,
                    'dmesg-fail': DmesgFail,
-                   'timeout': Timeout,
                    'notrun': NotRun}
 
     try:
@@ -203,14 +202,6 @@ class Fail(Status):
 class Crash(Status):
     name = 'crash'
     value = 40
-
-    def __init__(self):
-        pass
-
-
-class Timeout(Status):
-    name = 'timeout'
-    value = 50
 
     def __init__(self):
         pass

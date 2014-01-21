@@ -197,7 +197,6 @@ class GLSLParserTest(PlainExecTest):
         self.__command = None
         self.__filepath = filepath
         self.result = None
-        self.timeout = None
 
     def __get_config(self):
         """Extract the config section from the test file.
