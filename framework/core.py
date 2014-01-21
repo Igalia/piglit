@@ -39,6 +39,8 @@ from threads import synchronized_self
 import multiprocessing
 import multiprocessing.dummy
 import importlib
+# TODO: ConfigParser is known as configparser in python3
+import ConfigParser
 try:
     import simplejson as json
 except ImportError:
@@ -46,7 +48,8 @@ except ImportError:
 
 import status
 
-__all__ = ['Environment',
+__all__ = ['PIGLIT_CONFIG',
+           'Environment',
            'checkDir',
            'loadTestProfile',
            'TestrunResult',
@@ -57,6 +60,8 @@ __all__ = ['Environment',
            'Test',
            'testBinDir']
 
+
+PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
 
 class PiglitJSONEncoder(json.JSONEncoder):
     def default(self, o):

@@ -31,6 +31,7 @@ import traceback
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
+from framework.core import PIGLIT_CONFIG
 from framework.threads import synchronized_self
 
 
@@ -72,6 +73,11 @@ def main():
     parser.add_argument("-p", "--platform",
                         choices=["glx", "x11_egl", "wayland", "gbm"],
                         help="Name of windows system passed to waffle")
+    parser.add_argument("-f", "--config",
+                        dest="config_file",
+                        type=argparse.FileType("r"),
+                        help="Optionally specify a piglit config file to use. "
+                             "Default is piglit.conf")
     parser.add_argument("--valgrind",
                         action="store_true",
                         help="Run tests in valgrind's memcheck")
@@ -92,6 +98,13 @@ def main():
     # Set the platform to pass to waffle
     if args.platform:
         os.environ['PIGLIT_PLATFORM'] = args.platform
+
+    # Read the config file
+    if args.config_file:
+        PIGLIT_CONFIG.readfp(args.config_file)
+        args.config_file.close()
+    else:
+        PIGLIT_CONFIG.read(os.path.join(os.path.dirname(__file__), 'piglit.conf'))
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
