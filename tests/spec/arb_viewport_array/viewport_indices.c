@@ -219,7 +219,7 @@ piglit_init(int argc, char **argv)
 
 	pass = test_preserve_invalid_index(maxVP) && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-	pass = test_vp_indices(maxVP);
+	pass = test_vp_indices(maxVP) && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
