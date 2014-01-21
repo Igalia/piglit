@@ -419,7 +419,7 @@ install (
 install (
 	DIRECTORY tests
 	DESTINATION .
-	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|ktx|cl|txt)$"
+	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|ktx|cl|txt|vpfp)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 
