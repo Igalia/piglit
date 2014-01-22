@@ -40,23 +40,6 @@
 
 namespace GLEAN {
 
-
-// GL_ARB_vertex/fragment_program
-static PFNGLGENBUFFERSARBPROC glGenBuffersARB_func = NULL;
-static PFNGLDELETEBUFFERSARBPROC glDeleteBuffersARB_func = NULL;
-static PFNGLBINDBUFFERARBPROC glBindBufferARB_func = NULL;
-static PFNGLBUFFERDATAARBPROC glBufferDataARB_func = NULL;
-static PFNGLMAPBUFFERARBPROC glMapBufferARB_func = NULL;
-static PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB_func = NULL;
-
-// GL_ARB_copy_buffer
-static PFNGLCOPYBUFFERSUBDATAPROC glCopyBufferSubData_func = NULL;
-
-// GL_ARB_map_buffer_range
-static PFNGLMAPBUFFERRANGEPROC glMapBufferRange_func = NULL;
-static PFNGLFLUSHMAPPEDBUFFERRANGEPROC glFlushMappedBufferRange_func = NULL;
-
-
 BufferObjectResult::BufferObjectResult()
 {
    pass = false;
@@ -83,23 +66,6 @@ BufferObjectTest::setup(void)
       return false;
    }
 
-
-   glGenBuffersARB_func = (PFNGLGENBUFFERSARBPROC) GLUtils::getProcAddress("glGenBuffersARB");
-   glDeleteBuffersARB_func = (PFNGLDELETEBUFFERSARBPROC) GLUtils::getProcAddress("glDeleteBuffersARB");
-   glBindBufferARB_func = (PFNGLBINDBUFFERARBPROC) GLUtils::getProcAddress("glBindBufferARB");
-   glBufferDataARB_func = (PFNGLBUFFERDATAARBPROC) GLUtils::getProcAddress("glBufferDataARB");
-   glMapBufferARB_func = (PFNGLMAPBUFFERARBPROC) GLUtils::getProcAddress("glMapBufferARB");
-   glUnmapBufferARB_func = (PFNGLUNMAPBUFFERARBPROC) GLUtils::getProcAddress("glUnmapBufferARB");
-
-   if (have_ARB_copy_buffer) {
-      glCopyBufferSubData_func = (PFNGLCOPYBUFFERSUBDATAPROC) GLUtils::getProcAddress("glCopyBufferSubData");
-   }
-
-   if (have_ARB_map_buffer_range) {
-      glMapBufferRange_func = (PFNGLMAPBUFFERRANGEPROC) GLUtils::getProcAddress("glMapBufferRange");
-      glFlushMappedBufferRange_func = (PFNGLFLUSHMAPPEDBUFFERRANGEPROC) GLUtils::getProcAddress("glFlushMappedBufferRange");
-   }
-
    return true;
 }
 
@@ -115,25 +81,25 @@ BufferObjectTest::testCopyBuffer(void)
    GLint i;
    bool pass;
 
-   glGenBuffersARB_func(2, bufs);
+   glGenBuffersARB(2, bufs);
 
    // setup first buffer
-   glBindBufferARB_func(target1, bufs[0]);
-   glBufferDataARB_func(target1, size1, NULL, GL_STATIC_DRAW);
-   map = (GLubyte *) glMapBufferARB_func(target1, GL_WRITE_ONLY_ARB);
+   glBindBufferARB(target1, bufs[0]);
+   glBufferDataARB(target1, size1, NULL, GL_STATIC_DRAW);
+   map = (GLubyte *) glMapBufferARB(target1, GL_WRITE_ONLY_ARB);
    for (i = 0; i < size1; i++) {
       map[i] = buf1[i] = i & 0xff;
    }
-   glUnmapBufferARB_func(target1);
+   glUnmapBufferARB(target1);
 
    // setup second buffer
-   glBindBufferARB_func(target2, bufs[1]);
-   glBufferDataARB_func(target2, size2, NULL, GL_STATIC_DRAW);
-   map = (GLubyte *) glMapBufferARB_func(target2, GL_WRITE_ONLY_ARB);
+   glBindBufferARB(target2, bufs[1]);
+   glBufferDataARB(target2, size2, NULL, GL_STATIC_DRAW);
+   map = (GLubyte *) glMapBufferARB(target2, GL_WRITE_ONLY_ARB);
    for (i = 0; i < size2; i++) {
       map[i] = buf2[i] = 0;
    }
-   glUnmapBufferARB_func(target2);
+   glUnmapBufferARB(target2);
 
    // copy random sections of first buffer to second buffer
    for (i = 0; i < 50; i++) {
@@ -146,7 +112,7 @@ BufferObjectTest::testCopyBuffer(void)
       assert(dstOffset + size <= size2);
 
       // test copy from first buffer to second
-      glCopyBufferSubData_func(target1,   // src target
+      glCopyBufferSubData(target1,   // src target
                                target2,   // dst target
                                srcOffset, // src start
                                dstOffset, // dst start
@@ -163,7 +129,7 @@ BufferObjectTest::testCopyBuffer(void)
    }
 
    // check results in second buffer object
-   map = (GLubyte *) glMapBufferARB_func(target2, GL_READ_ONLY_ARB);
+   map = (GLubyte *) glMapBufferARB(target2, GL_READ_ONLY_ARB);
    pass = true;
    for (i = 0; i < size2; i++) {
       if (map[i] != buf2[i]) {
@@ -172,9 +138,9 @@ BufferObjectTest::testCopyBuffer(void)
          break;
       }
    }
-   glUnmapBufferARB_func(target2);
+   glUnmapBufferARB(target2);
 
-   glDeleteBuffersARB_func(2, bufs);
+   glDeleteBuffersARB(2, bufs);
 
    return pass;
 }
@@ -193,16 +159,16 @@ BufferObjectTest::testMapBufferRange(void)
    bool pass = true;
 
    // create buffer
-   glGenBuffersARB_func(1, &buffer);
-   glBindBufferARB_func(target1, buffer);
-   glBufferDataARB_func(target1, size, NULL, GL_STATIC_DRAW);
+   glGenBuffersARB(1, &buffer);
+   glBindBufferARB(target1, buffer);
+   glBufferDataARB(target1, size, NULL, GL_STATIC_DRAW);
 
    // initialize to zeros
-   map = (GLubyte *) glMapBufferRange_func(target1, 0, size, GL_MAP_WRITE_BIT);
+   map = (GLubyte *) glMapBufferRange(target1, 0, size, GL_MAP_WRITE_BIT);
    for (i = 0; i < size; i++) {
       map[i] = buf[i] = 0;
    }
-   glUnmapBufferARB_func(target1);
+   glUnmapBufferARB(target1);
 
    // write to random ranges
    for (i = 0; i < 50; i++) {
@@ -212,16 +178,16 @@ BufferObjectTest::testMapBufferRange(void)
       assert(mapOffset + mapSize <= size);
 
       map = (GLubyte *)
-         glMapBufferRange_func(target1, mapOffset, mapSize,
+         glMapBufferRange(target1, mapOffset, mapSize,
                                GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
       for (j = 0; j < mapSize; j++) {
          map[j] = buf[mapOffset + j] = (mapOffset + j) & 0xff;
       }
 
-      glFlushMappedBufferRange_func(target1, 0, mapSize);
+      glFlushMappedBufferRange(target1, 0, mapSize);
 
-      glUnmapBufferARB_func(target1);
+      glUnmapBufferARB(target1);
    }
 
    if (glGetError())
@@ -234,7 +200,7 @@ BufferObjectTest::testMapBufferRange(void)
 
       assert(mapOffset + mapSize <= size);
 
-      map = (GLubyte *) glMapBufferRange_func(target1, mapOffset,
+      map = (GLubyte *) glMapBufferRange(target1, mapOffset,
                                               mapSize, GL_MAP_READ_BIT);
 
       for (j = 0; j < mapSize; j++) {
@@ -243,10 +209,10 @@ BufferObjectTest::testMapBufferRange(void)
             break;
          }
       }
-      glUnmapBufferARB_func(target1);
+      glUnmapBufferARB(target1);
    }
 
-   glDeleteBuffersARB_func(1, &buffer);
+   glDeleteBuffersARB(1, &buffer);
 
    if (glGetError())
       pass = false;

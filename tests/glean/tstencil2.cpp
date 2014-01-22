@@ -46,19 +46,6 @@
 
 namespace GLEAN {
 
-// ATI
-static PFNGLSTENCILOPSEPARATEATIPROC glStencilOpSeparateATI_func;
-static PFNGLSTENCILFUNCSEPARATEATIPROC glStencilFuncSeparateATI_func;
-
-// EXT
-static PFNGLACTIVESTENCILFACEEXTPROC glActiveStencilFaceEXT_func;
-
-// GL2
-static PFNGLSTENCILOPSEPARATEPROC glStencilOpSeparate_func;
-static PFNGLSTENCILFUNCSEPARATEPROC glStencilFuncSeparate_func;
-static PFNGLSTENCILMASKSEPARATEPROC glStencilMaskSeparate_func;
-
-
 // two-sided methods:
 #define ATI 1
 #define EXT 2
@@ -68,33 +55,6 @@ static PFNGLSTENCILMASKSEPARATEPROC glStencilMaskSeparate_func;
 Stencil2Result::Stencil2Result()
 {
 	pass = false;
-}
-
-
-void
-Stencil2Test::get_ext_functions(void)
-{
-	if (have_ATI_separate_stencil()) {
-		glStencilOpSeparateATI_func = (PFNGLSTENCILOPSEPARATEATIPROC)
-			GLUtils::getProcAddress("glStencilOpSeparateATI");
-		glStencilFuncSeparateATI_func = (PFNGLSTENCILFUNCSEPARATEATIPROC)
-			GLUtils::getProcAddress("glStencilFuncSeparateATI");
-	}
-
-	if (have_EXT_stencil_two_side()) {
-		glActiveStencilFaceEXT_func = (PFNGLACTIVESTENCILFACEEXTPROC)
-			GLUtils::getProcAddress("glActiveStencilFaceEXT");
-	}
-
-	// GL2
-	glStencilOpSeparate_func = (PFNGLSTENCILOPSEPARATEPROC)
-		GLUtils::getProcAddress("glStencilOpSeparate");
-
-	glStencilFuncSeparate_func = (PFNGLSTENCILFUNCSEPARATEPROC)
-		GLUtils::getProcAddress("glStencilFuncSeparate");
-
-	glStencilMaskSeparate_func= (PFNGLSTENCILMASKSEPARATEPROC)
-		GLUtils::getProcAddress("glStencilMaskSeparate");
 }
 
 
@@ -312,17 +272,17 @@ Stencil2Test::set_stencil_state(int method,
 		assert(frontWriteMask == backWriteMask);
 
 		// set state
-		glStencilOpSeparateATI_func(GL_FRONT,
-					    frontStencilFail,
-					    frontZFail,
-					    frontZPass);
+		glStencilOpSeparateATI(GL_FRONT,
+				       frontStencilFail,
+				       frontZFail,
+				       frontZPass);
 
-		glStencilOpSeparateATI_func(GL_BACK,
-					    backStencilFail,
-					    backZFail,
-					    backZPass);
+		glStencilOpSeparateATI(GL_BACK,
+				       backStencilFail,
+				       backZFail,
+				       backZPass);
 
-		glStencilFuncSeparateATI_func(frontFunc, backFunc, frontRef, frontMask);
+		glStencilFuncSeparateATI(frontFunc, backFunc, frontRef, frontMask);
 
 		glStencilMask(frontWriteMask);
 
@@ -349,18 +309,18 @@ Stencil2Test::set_stencil_state(int method,
 		// set state
 		glEnable(GL_STENCIL_TEST_TWO_SIDE_EXT);
 
-		glActiveStencilFaceEXT_func(GL_FRONT);
+		glActiveStencilFaceEXT(GL_FRONT);
 		glStencilOp(frontStencilFail, frontZFail, frontZPass);
 		glStencilFunc(frontFunc, frontRef, frontMask);
 		glStencilMask(frontWriteMask);
 
-		glActiveStencilFaceEXT_func(GL_BACK);
+		glActiveStencilFaceEXT(GL_BACK);
 		glStencilOp(backStencilFail, backZFail, backZPass);
 		glStencilFunc(backFunc, backRef, backMask);
 		glStencilMask(backWriteMask);
 
 		// get state
-		glActiveStencilFaceEXT_func(GL_FRONT);
+		glActiveStencilFaceEXT(GL_FRONT);
 		glGetIntegerv(GL_STENCIL_FAIL, &get_frontStencilFail);
 		glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &get_frontZFail);
 		glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &get_frontZPass);
@@ -368,7 +328,7 @@ Stencil2Test::set_stencil_state(int method,
 		glGetIntegerv(GL_STENCIL_REF, &get_frontRef);
 		glGetIntegerv(GL_STENCIL_VALUE_MASK, &get_frontMask);
 		glGetIntegerv(GL_STENCIL_WRITEMASK, &get_frontWriteMask);
-		glActiveStencilFaceEXT_func(GL_BACK);
+		glActiveStencilFaceEXT(GL_BACK);
 		glGetIntegerv(GL_STENCIL_FAIL, &get_backStencilFail);
 		glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &get_backZFail);
 		glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &get_backZPass);
@@ -381,18 +341,18 @@ Stencil2Test::set_stencil_state(int method,
 
 	case GL2:
 		// set state
-		glStencilOpSeparate_func(GL_FRONT,
-					 frontStencilFail,
-					 frontZFail,
-					 frontZPass);
-		glStencilOpSeparate_func(GL_BACK,
-					 backStencilFail,
-					 backZFail,
-					 backZPass);
-		glStencilFuncSeparate_func(GL_FRONT, frontFunc, frontRef, frontMask);
-		glStencilFuncSeparate_func(GL_BACK, backFunc, backRef, backMask);
-		glStencilMaskSeparate_func(GL_FRONT, frontWriteMask);
-		glStencilMaskSeparate_func(GL_BACK, backWriteMask);
+		glStencilOpSeparate(GL_FRONT,
+				    frontStencilFail,
+				    frontZFail,
+				    frontZPass);
+		glStencilOpSeparate(GL_BACK,
+				    backStencilFail,
+				    backZFail,
+				    backZPass);
+		glStencilFuncSeparate(GL_FRONT, frontFunc, frontRef, frontMask);
+		glStencilFuncSeparate(GL_BACK, backFunc, backRef, backMask);
+		glStencilMaskSeparate(GL_FRONT, frontWriteMask);
+		glStencilMaskSeparate(GL_BACK, backWriteMask);
 
 		// get state
 		glGetIntegerv(GL_STENCIL_FAIL, &get_frontStencilFail);
@@ -539,7 +499,7 @@ Stencil2Test::reset_stencil_state(int method)
 		break;
 	case EXT:
 		glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
-		glActiveStencilFaceEXT_func(GL_FRONT);
+		glActiveStencilFaceEXT(GL_FRONT);
 		break;
 	case GL2:
 		break;
@@ -798,8 +758,6 @@ Stencil2Test::runOne(Stencil2Result &r, Window &w)
 {
 	(void) w;  // silence warning
 	r.pass = true;
-
-	get_ext_functions();
 
 	// how many stencil bits (we assume at least 8 above)
 	glGetIntegerv(GL_STENCIL_BITS, &stencilBits);

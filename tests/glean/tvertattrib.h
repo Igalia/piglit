@@ -83,7 +83,6 @@ private:
 			 const char *ext, int dlistMode) const;
 	bool TestAttribs(VertAttribResult &r,
 			 int attribFunc,
-			 PFNGLGETVERTEXATTRIBFVARBPROC getAttribfv,
 			 Aliasing aliasing,
 			 int numAttribs);
 	bool TestNVfuncs(VertAttribResult &r);

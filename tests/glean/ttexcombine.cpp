@@ -994,7 +994,7 @@ TexCombineTest::TexEnv(glmachine &machine, int texUnit,
 	GLenum target, GLenum value) {
 
 	if (machine.NumTexUnits > 1)
-		p_glActiveTextureARB(GL_TEXTURE0_ARB + texUnit);
+		glActiveTextureARB(GL_TEXTURE0_ARB + texUnit);
 
 	glTexEnvi(GL_TEXTURE_ENV, target, value);
 	int err = glGetError();
@@ -1109,7 +1109,7 @@ TexCombineTest::SetupColors(glmachine &machine) {
 
 	for (int u = 0; u < machine.NumTexUnits; u++) {
 		if (machine.NumTexUnits > 1)
-			p_glActiveTextureARB(GL_TEXTURE0_ARB + u);
+			glActiveTextureARB(GL_TEXTURE0_ARB + u);
 		glBindTexture(GL_TEXTURE_2D, mTextures[u]);
 		glEnable(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
@@ -1370,7 +1370,7 @@ TexCombineTest::RunMultiTextureTest(glmachine &machine, BasicResult &r,
 		GLfloat renderedResult[4];
 		// use texcoord (0,0) for all vertices
 		for (int u = 0; u < machine.NumTexUnits; u++)
-			p_glMultiTexCoord2fARB(GL_TEXTURE0_ARB + u, 0, 0);
+			glMultiTexCoord2fARB(GL_TEXTURE0_ARB + u, 0, 0);
 		glBegin(GL_POLYGON);
 		glVertex2f(-1.0, -1.0);
 		glVertex2f( 1.0, -1.0);
@@ -1465,7 +1465,7 @@ TexCombineTest::RunCrossbarTest(glmachine &machine, BasicResult &r, Window& w) {
 		machine.EnvColor[unit][1] = 0.0F;
 		machine.EnvColor[unit][2] = 0.0F;
 		machine.EnvColor[unit][3] = 0.0F;
-		p_glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+		glActiveTextureARB(GL_TEXTURE0_ARB + unit);
 		glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR,
 				   machine.EnvColor[unit]);
 	}
@@ -1490,7 +1490,7 @@ TexCombineTest::RunCrossbarTest(glmachine &machine, BasicResult &r, Window& w) {
 		GLfloat renderedResult[4];
 		// texcoord (0,) for all vertices is OK
 		for (unit = 0; unit < machine.NumTexUnits; unit++)
-			p_glMultiTexCoord2fARB(GL_TEXTURE0_ARB + unit, 0, 0);
+			glMultiTexCoord2fARB(GL_TEXTURE0_ARB + unit, 0, 0);
 		glColor4fv(machine.FragColor);
 		glBegin(GL_POLYGON);
 		glVertex2f(-1.0, -1.0);
@@ -1544,10 +1544,6 @@ TexCombineTest::runOne(BasicResult& r, Window& w) {
 	// these without testing them because we already know that we
 	// won't be invoked except on contexts that support the
 	// extension.
-	p_glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)
-		(GLUtils::getProcAddress("glActiveTextureARB"));
-	p_glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)
-		(GLUtils::getProcAddress("glMultiTexCoord2fARB"));
 
 	// Test the availability of the DOT3 extenstion
 	haveDot3 = GLUtils::haveExtensions("GL_EXT_texture_env_dot3");

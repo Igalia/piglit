@@ -60,8 +60,6 @@ public:
 private:
 	GLint stencilBits, stencilMax;
 
-	void get_ext_functions();
-
 	bool have_ATI_separate_stencil(void) const;
 	bool have_EXT_stencil_two_side(void) const;
 	bool have_GL2_stencil_two_side(void) const;

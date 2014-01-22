@@ -40,13 +40,6 @@
 
 #define HUGE_STEP 1000
 
-namespace GLEAN {
-static PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate_func = NULL;
-static PFNGLBLENDCOLORPROC glBlendColor_func = NULL;
-static PFNGLBLENDEQUATIONPROC glBlendEquation_func = NULL;
-static PFNGLBLENDEQUATIONSEPARATEPROC glBlendEquationSeparate_func = NULL;
-}
-
 //namespace {
 
 struct enumNameMapping {
@@ -520,15 +513,15 @@ BlendFuncTest::runFactors(GLenum srcFactorRGB, GLenum srcFactorA,
 	RandomBitsDouble srcARand(16, 42);
 
 	if (haveSepFunc)
-		glBlendFuncSeparate_func(srcFactorRGB, dstFactorRGB,
-					 srcFactorA, dstFactorA);
+		glBlendFuncSeparate(srcFactorRGB, dstFactorRGB,
+                                    srcFactorA, dstFactorA);
 	else
 		glBlendFunc(srcFactorRGB, dstFactorRGB);
 
 	if (haveBlendEquationSep)
-		glBlendEquationSeparate_func(opRGB, opA);
+		glBlendEquationSeparate(opRGB, opA);
 	else if (haveBlendEquation)
-		glBlendEquation_func(opRGB);
+		glBlendEquation(opRGB);
 
 	glEnable(GL_BLEND);
 
@@ -725,49 +718,29 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 	unsigned testNo, testStride;
 
 	// test for features, get function pointers
-	if (GLUtils::getVersion() >= 1.4) {
+	if (GLUtils::getVersion() >= 1.4 ||
+            GLUtils::haveExtension("GL_EXT_blend_func_separate")) {
 		haveSepFunc = true;
-		glBlendFuncSeparate_func = (PFNGLBLENDFUNCSEPARATEPROC)
-			GLUtils::getProcAddress("glBlendFuncSeparate");
-	}
-	else if (GLUtils::haveExtension("GL_EXT_blend_func_separate")) {
-		haveSepFunc = true;
-		glBlendFuncSeparate_func = (PFNGLBLENDFUNCSEPARATEPROC)
-			GLUtils::getProcAddress("glBlendFuncSeparateEXT");
 	}
 
-	if (GLUtils::getVersion() >= 1.4) {
+	if (GLUtils::getVersion() >= 1.4 ||
+            GLUtils::haveExtension("GL_EXT_blend_color")) {
 		haveBlendColor = true;
-		glBlendColor_func = (PFNGLBLENDCOLORPROC)
-			GLUtils::getProcAddress("glBlendColor");
-	}
-	else if (GLUtils::haveExtension("GL_EXT_blend_color")) {
-		haveBlendColor = true;
-		glBlendColor_func = (PFNGLBLENDCOLORPROC)
-			GLUtils::getProcAddress("glBlendColorEXT");
 	}
 
 	if (GLUtils::getVersion() >= 1.4) {
 		haveBlendEquation = true;
-		glBlendEquation_func = (PFNGLBLENDEQUATIONPROC)
-			GLUtils::getProcAddress("glBlendEquation");
 	}
 	else if (GLUtils::haveExtension("GL_EXT_blend_subtract") &&
 		 GLUtils::haveExtension("GL_EXT_blend_min_max")) {
 		haveBlendEquation = true;
-		glBlendEquation_func = (PFNGLBLENDEQUATIONPROC)
-			GLUtils::getProcAddress("glBlendEquationEXT");
 	}
 
 	if (GLUtils::getVersion() >= 2.0) {
 		haveBlendEquationSep = true;
-		glBlendEquationSeparate_func = (PFNGLBLENDEQUATIONSEPARATEPROC)
-			GLUtils::getProcAddress("glBlendEquationSeparate");
 	}
 	else if (GLUtils::haveExtension("GL_EXT_blend_equation_separate")) {
 		haveBlendEquationSep = true;
-		glBlendEquationSeparate_func = (PFNGLBLENDEQUATIONSEPARATEPROC)
-			GLUtils::getProcAddress("glBlendEquationSeparateEXT");
 	}
 
 	if (haveBlendColor) {
@@ -776,8 +749,8 @@ BlendFuncTest::runOne(BlendFuncResult& r, Window& w) {
 		p.constColor[1] = 0.0;
 		p.constColor[2] = 1.0;
 		p.constColor[3] = 0.75;
-		glBlendColor_func(p.constColor[0], p.constColor[1],
-				  p.constColor[2], p.constColor[3]);
+		glBlendColor(p.constColor[0], p.constColor[1],
+                             p.constColor[2], p.constColor[3]);
 	}
 
 	if (haveSepFunc) {

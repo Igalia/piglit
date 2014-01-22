@@ -110,19 +110,6 @@ getVersion()
    return atof((const char *) version);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// getProcAddress: Get address of an OpenGL or window-system-binding function.
-//	This belongs here, rather than as a member of RenderingContext, because
-//	on Windows it must only be applied to the *current* context.  (The
-//	return value on Windows is context-dependent, and wglGetProcAddress
-//	doesn't take a rendering context as an argument.)
-///////////////////////////////////////////////////////////////////////////////
-void
-(APIENTRY *getProcAddress(const char* name))() {
-	return piglit_get_proc_address(name);
-} // getProcAddress
-
 ///////////////////////////////////////////////////////////////////////////////
 // logGLErrors: Check for OpenGL errors and log any that have occurred.
 ///////////////////////////////////////////////////////////////////////////////

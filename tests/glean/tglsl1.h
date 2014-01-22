@@ -75,7 +75,6 @@ private:
 	GLfloat looseTolerance[5];
         bool glsl_120;   // GLSL 1.20 or higher supported?
         bool glsl_130;   // GLSL 1.30 or higher supported?
-        bool getFunctions(void);
         void setupTextures(void);
         void setupTextureMatrix1(void);
 	bool setup(void);

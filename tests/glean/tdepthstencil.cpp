@@ -40,9 +40,6 @@
 
 namespace GLEAN {
 
-static PFNGLWINDOWPOS2IARBPROC WindowPos2i = NULL;
-
-
 DepthStencilResult::DepthStencilResult()
 {
 	pass = false;
@@ -69,10 +66,6 @@ DepthStencilTest::setup(void)
 {
 	glGetIntegerv(GL_DEPTH_BITS, &depthBits);
 	glGetIntegerv(GL_STENCIL_BITS, &stencilBits);
-
-        WindowPos2i = (PFNGLWINDOWPOS2IARBPROC)
-		GLUtils::getProcAddress("glWindowPos2iARB");
-        assert(WindowPos2i);
 }
 
 
@@ -168,7 +161,7 @@ DepthStencilTest::testDrawAndRead(void)
 	};
 	GLuint readback[4];
 
-	WindowPos2i(0, 0);
+	glWindowPos2i(0, 0);
 	glDrawPixels(2, 2, GL_DEPTH_STENCIL_EXT,
 		     GL_UNSIGNED_INT_24_8_EXT, image);
 	if (checkError("glDrawPixels in testDrawAndRead"))

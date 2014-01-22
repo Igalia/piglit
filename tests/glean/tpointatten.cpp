@@ -44,21 +44,9 @@ namespace GLEAN {
 /* Clamp X to [MIN,MAX] */
 #define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
 
-
-static PFNGLPOINTPARAMETERFVARBPROC PointParameterfvARB = NULL;
-static PFNGLPOINTPARAMETERFARBPROC PointParameterfARB = NULL;
-
-
 void
 PointAttenuationTest::setup(void)
 {
-	PointParameterfvARB = (PFNGLPOINTPARAMETERFVARBPROC)
-		GLUtils::getProcAddress("glPointParameterfvARB");
-	assert(PointParameterfvARB);
-	PointParameterfARB = (PFNGLPOINTPARAMETERFARBPROC)
-		GLUtils::getProcAddress("glPointParameterfARB");
-	assert(PointParameterfARB);
-
 	glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, aliasedLimits);
 	glGetFloatv(GL_SMOOTH_POINT_SIZE_RANGE, smoothLimits);
 	glMatrixMode(GL_PROJECTION);
@@ -198,11 +186,11 @@ PointAttenuationTest::testPointRendering(GLboolean smooth)
 			atten[1] = (b == -1) ? 0.0 : pow(10.0, -b);
 			for (int c = -2; c < 3; c++) {
 				atten[2] = (c == -1) ? 0.0 : pow(10.0, -c);
-				PointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
+				glPointParameterfvARB(GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
 				for (float min = 1.0; min < MAX_SIZE; min += 10) {
-					PointParameterfARB(GL_POINT_SIZE_MIN_ARB, min);
+					glPointParameterfARB(GL_POINT_SIZE_MIN_ARB, min);
 					for (float max = min; max < MAX_SIZE; max += 10) {
-						PointParameterfARB(GL_POINT_SIZE_MAX_ARB, max);
+						glPointParameterfARB(GL_POINT_SIZE_MAX_ARB, max);
 						for (float size = 1.0; size < MAX_SIZE; size += 8) {
 							glPointSize(size);
 

@@ -90,8 +90,6 @@ private:
 	void test_uniform_bool_conversion(void);
 	void test_uniform_multiple_samplers(void);
 	void run_tests(void);
-
-	void get_ext_procs(void);
 };
 
 } // namespace GLEAN

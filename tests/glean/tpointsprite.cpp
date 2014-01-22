@@ -50,8 +50,6 @@
 
 namespace GLEAN {
 
-static PFNGLPOINTPARAMETERIPROC glPointParameteri_func = NULL;
-
 //background color
 static GLfloat   bgColor[4] = {0.0, 0.0, 0.0, 0.0};
 
@@ -350,12 +348,6 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 	(void) w;
 
 	have_2_0 = (strtod((const char *) glGetString(GL_VERSION), NULL) > 2.0);
-	if (have_2_0) {
-		glPointParameteri_func = (PFNGLPOINTPARAMETERIPROC)
-			GLUtils::getProcAddress("glPointParameteri");
-
-		assert(glPointParameteri_func);
-	}
 
 	CheckDefaultState(r);
 	
@@ -399,8 +391,8 @@ PointSpriteTest::runOne(MultiTestResult &r, Window &w)
 		for (coordOrigin = 0; coordOrigin < numOrigin; coordOrigin++)
 		{
 			if (have_2_0) {
-				glPointParameteri_func(GL_POINT_SPRITE_COORD_ORIGIN,
-						       origin[coordOrigin]);
+				glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN,
+						  origin[coordOrigin]);
 			}
 
 			pointSize = 1.85;

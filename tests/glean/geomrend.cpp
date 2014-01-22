@@ -247,10 +247,7 @@ bool GeomRenderer::renderPrimitives(GLenum mode)
         // Should we lock?
         if (compileArrays)
         {
-            PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = 0;
             assert(GLUtils::haveExtension("GL_EXT_compiled_vertex_array"));
-            glLockArraysEXT = reinterpret_cast<PFNGLLOCKARRAYSEXTPROC>
-                (GLUtils::getProcAddress("glLockArraysEXT"));
             glLockArraysEXT(0, arrayLength);
         }
 
@@ -277,10 +274,7 @@ bool GeomRenderer::renderPrimitives(GLenum mode)
         // Done.  If we locked, unlock.
         if (compileArrays)
         {
-            PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = 0;
             assert(GLUtils::haveExtension("GL_EXT_compiled_vertex_array"));
-            glUnlockArraysEXT = reinterpret_cast<PFNGLUNLOCKARRAYSEXTPROC>
-                (GLUtils::getProcAddress("glUnlockArraysEXT"));
             glUnlockArraysEXT();
         }
     }

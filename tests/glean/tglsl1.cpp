@@ -41,52 +41,6 @@
 
 namespace GLEAN {
 
-static PFNGLTEXIMAGE3DPROC glTexImage3D_func = NULL;
-
-static PFNGLACTIVETEXTUREPROC glActiveTexture_func = NULL;
-
-static PFNGLPOINTPARAMETERFPROC glPointParameterf_func = NULL;
-static PFNGLPOINTPARAMETERFVPROC glPointParameterfv_func = NULL;
-static PFNGLSECONDARYCOLOR3FVPROC glSecondaryColor3fv_func = NULL;
-
-static PFNGLATTACHSHADERPROC glAttachShader_func = NULL;
-static PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation_func = NULL;
-static PFNGLCOMPILESHADERPROC glCompileShader_func = NULL;
-static PFNGLCREATEPROGRAMPROC glCreateProgram_func = NULL;
-static PFNGLCREATESHADERPROC glCreateShader_func = NULL;
-static PFNGLDELETEPROGRAMPROC glDeleteProgram_func = NULL;
-static PFNGLDELETESHADERPROC glDeleteShader_func = NULL;
-static PFNGLGETATTACHEDSHADERSPROC glGetAttachedShaders_func = NULL;
-static PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation_func = NULL;
-static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog_func = NULL;
-static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog_func = NULL;
-static PFNGLGETSHADERIVPROC glGetShaderiv_func = NULL;
-static PFNGLGETPROGRAMIVPROC glGetProgramiv_func = NULL;
-static PFNGLGETSHADERSOURCEPROC glGetShaderSource_func = NULL;
-static PFNGLGETUNIFORMFVPROC glGetUniformfv_func = NULL;
-static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation_func = NULL;
-static PFNGLISPROGRAMPROC glIsProgram_func = NULL;
-static PFNGLISSHADERPROC glIsShader_func = NULL;
-static PFNGLLINKPROGRAMPROC glLinkProgram_func = NULL;
-static PFNGLSHADERSOURCEPROC glShaderSource_func = NULL;
-static PFNGLUNIFORM1IPROC glUniform1i_func = NULL;
-static PFNGLUNIFORM1FVPROC glUniform1fv_func = NULL;
-static PFNGLUNIFORM2FVPROC glUniform2fv_func = NULL;
-static PFNGLUNIFORM3FVPROC glUniform3fv_func = NULL;
-static PFNGLUNIFORM4FVPROC glUniform4fv_func = NULL;
-static PFNGLUNIFORMMATRIX2FVPROC glUniformMatrix2fv_func = NULL;
-static PFNGLUNIFORMMATRIX3FVPROC glUniformMatrix3fv_func = NULL;
-static PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_func = NULL;
-static PFNGLUSEPROGRAMPROC glUseProgram_func = NULL;
-static PFNGLVERTEXATTRIB1FPROC glVertexAttrib1f_func = NULL;
-static PFNGLVERTEXATTRIB2FPROC glVertexAttrib2f_func = NULL;
-static PFNGLVERTEXATTRIB3FPROC glVertexAttrib3f_func = NULL;
-static PFNGLVERTEXATTRIB4FPROC glVertexAttrib4f_func = NULL;
-
-static PFNGLUNIFORMMATRIX2X4FVPROC glUniformMatrix2x4fv_func = NULL;
-static PFNGLUNIFORMMATRIX4X3FVPROC glUniformMatrix4x3fv_func = NULL;
-
-
 #define FLAG_NONE             0x0
 #define FLAG_LOOSE            0x1 // to indicate a looser tolerance test is needed
 #define FLAG_ILLEGAL_SHADER   0x2  // the shader test should not compile
@@ -4067,138 +4021,6 @@ static const ShaderProgram Programs[] = {
 };
 
 
-
-// Get ptrs to API functions.
-bool
-GLSLTest::getFunctions(void)
-{
-	glTexImage3D_func = (PFNGLTEXIMAGE3DPROC) GLUtils::getProcAddress("glTexImage3D");
-	if (!glTexImage3D_func)
-		return false;
-	glActiveTexture_func = (PFNGLACTIVETEXTUREPROC) GLUtils::getProcAddress("glActiveTexture");
-	if (!glActiveTexture_func)
-		return false;
-	glPointParameterf_func = (PFNGLPOINTPARAMETERFPROC) GLUtils::getProcAddress("glPointParameterf");
-	if (!glPointParameterf_func)
-		return false;
-	glPointParameterfv_func = (PFNGLPOINTPARAMETERFVPROC) GLUtils::getProcAddress("glPointParameterfv");
-	if (!glPointParameterfv_func)
-		return false;
-	glSecondaryColor3fv_func = (PFNGLSECONDARYCOLOR3FVPROC) GLUtils::getProcAddress("glSecondaryColor3fv");
-	if (!glSecondaryColor3fv_func)
-		return false;
-	glAttachShader_func = (PFNGLATTACHSHADERPROC) GLUtils::getProcAddress("glAttachShader");
-	if (!glAttachShader_func)
-		return false;
-	glBindAttribLocation_func = (PFNGLBINDATTRIBLOCATIONPROC) GLUtils::getProcAddress("glBindAttribLocation");
-	if (!glBindAttribLocation_func)
-		return false;
-	glCompileShader_func = (PFNGLCOMPILESHADERPROC) GLUtils::getProcAddress("glCompileShader");
-	if (!glCompileShader_func)
-		return false;
-	glCreateProgram_func = (PFNGLCREATEPROGRAMPROC) GLUtils::getProcAddress("glCreateProgram");
-	if (!glCreateProgram_func)
-		return false;
-	glCreateShader_func = (PFNGLCREATESHADERPROC) GLUtils::getProcAddress("glCreateShader");
-	if (!glCreateShader_func)
-		return false;
-	glDeleteProgram_func = (PFNGLDELETEPROGRAMPROC) GLUtils::getProcAddress("glDeleteProgram");
-	if (!glDeleteProgram_func)
-		return false;
-	glDeleteShader_func = (PFNGLDELETESHADERPROC) GLUtils::getProcAddress("glDeleteShader");
-	if (!glDeleteShader_func)
-		return false;
-	glGetAttachedShaders_func = (PFNGLGETATTACHEDSHADERSPROC) GLUtils::getProcAddress("glGetAttachedShaders");
-	if (!glGetAttachedShaders_func)
-		return false;
-	glGetAttribLocation_func = (PFNGLGETATTRIBLOCATIONPROC) GLUtils::getProcAddress("glGetAttribLocation");
-	if (!glGetAttribLocation_func)
-		return false;
-	glGetProgramInfoLog_func = (PFNGLGETPROGRAMINFOLOGPROC) GLUtils::getProcAddress("glGetProgramInfoLog");
-	if (!glGetProgramInfoLog_func)
-		return false;
-	glGetShaderInfoLog_func = (PFNGLGETSHADERINFOLOGPROC) GLUtils::getProcAddress("glGetShaderInfoLog");
-	if (!glGetShaderInfoLog_func)
-		return false;
-	glGetProgramiv_func = (PFNGLGETPROGRAMIVPROC) GLUtils::getProcAddress("glGetProgramiv");
-	if (!glGetProgramiv_func)
-		return false;
-	glGetShaderiv_func = (PFNGLGETSHADERIVPROC) GLUtils::getProcAddress("glGetShaderiv");
-	if (!glGetShaderiv_func)
-		return false;
-	glGetShaderSource_func = (PFNGLGETSHADERSOURCEPROC) GLUtils::getProcAddress("glGetShaderSource");
-	if (!glGetShaderSource_func)
-		return false;
-	glGetUniformLocation_func = (PFNGLGETUNIFORMLOCATIONPROC) GLUtils::getProcAddress("glGetUniformLocation");
-	if (!glGetUniformLocation_func)
-		return false;
-	glGetUniformfv_func = (PFNGLGETUNIFORMFVPROC) GLUtils::getProcAddress("glGetUniformfv");
-	if (!glGetUniformfv_func)
-		return false;
-	glIsProgram_func = (PFNGLISPROGRAMPROC) GLUtils::getProcAddress("glIsProgram");
-	if (!glIsProgram_func)
-		return false;
-	glIsShader_func = (PFNGLISSHADERPROC) GLUtils::getProcAddress("glIsShader");
-	if (!glIsShader_func)
-		return false;
-	glLinkProgram_func = (PFNGLLINKPROGRAMPROC) GLUtils::getProcAddress("glLinkProgram");
-	if (!glLinkProgram_func)
-		return false;
-	glShaderSource_func = (PFNGLSHADERSOURCEPROC) GLUtils::getProcAddress("glShaderSource");
-	if (!glShaderSource_func)
-		return false;
-	glUniform1i_func = (PFNGLUNIFORM1IPROC) GLUtils::getProcAddress("glUniform1i");
-	if (!glUniform1i_func)
-		return false;
-	glUniform1fv_func = (PFNGLUNIFORM1FVPROC) GLUtils::getProcAddress("glUniform1fv");
-	if (!glUniform1fv_func)
-		return false;
-	glUniform2fv_func = (PFNGLUNIFORM2FVPROC) GLUtils::getProcAddress("glUniform2fv");
-	if (!glUniform2fv_func)
-		return false;
-	glUniform3fv_func = (PFNGLUNIFORM3FVPROC) GLUtils::getProcAddress("glUniform3fv");
-	if (!glUniform3fv_func)
-		return false;
-	glUniform4fv_func = (PFNGLUNIFORM3FVPROC) GLUtils::getProcAddress("glUniform4fv");
-	if (!glUniform4fv_func)
-		return false;
-	glUniformMatrix2fv_func = (PFNGLUNIFORMMATRIX2FVPROC) GLUtils::getProcAddress("glUniformMatrix2fv");
-	if (!glUniformMatrix2fv_func)
-		return false;
-	glUniformMatrix3fv_func = (PFNGLUNIFORMMATRIX3FVPROC) GLUtils::getProcAddress("glUniformMatrix3fv");
-	if (!glUniformMatrix3fv_func)
-		return false;
-	glUniformMatrix4fv_func = (PFNGLUNIFORMMATRIX4FVPROC) GLUtils::getProcAddress("glUniformMatrix4fv");
-	if (!glUniformMatrix4fv_func)
-		return false;
-	glUseProgram_func = (PFNGLUSEPROGRAMPROC) GLUtils::getProcAddress("glUseProgram");
-	if (!glUseProgram_func)
-		return false;
-	glVertexAttrib1f_func = (PFNGLVERTEXATTRIB1FPROC) GLUtils::getProcAddress("glVertexAttrib1f");
-	if (!glVertexAttrib1f_func)
-		return false;
-	glVertexAttrib2f_func = (PFNGLVERTEXATTRIB2FPROC) GLUtils::getProcAddress("glVertexAttrib2f");
-	if (!glVertexAttrib2f_func)
-		return false;
-	glVertexAttrib3f_func = (PFNGLVERTEXATTRIB3FPROC) GLUtils::getProcAddress("glVertexAttrib3f");
-	if (!glVertexAttrib3f_func)
-		return false;
-	glVertexAttrib4f_func = (PFNGLVERTEXATTRIB4FPROC) GLUtils::getProcAddress("glVertexAttrib4f");
-	if (!glVertexAttrib4f_func)
-		return false;
-
-	/* 2.1 */
-	glUniformMatrix2x4fv_func = (PFNGLUNIFORMMATRIX2X4FVPROC) GLUtils::getProcAddress("glUniformMatrix2x4fv");
-	if (!glUniformMatrix2x4fv_func)
-		return false;
-	glUniformMatrix4x3fv_func = (PFNGLUNIFORMMATRIX4X3FVPROC) GLUtils::getProcAddress("glUniformMatrix4x3fv");
-	if (!glUniformMatrix4x3fv_func)
-		return false;
-
-	return true;
-}
-
-
 void
 GLSLTest::setupTextures(void)
 {
@@ -4215,7 +4037,7 @@ GLSLTest::setupTextures(void)
 	glGenTextures(1, &obj3D);
 	glGenTextures(1, &objZ);
 
-	glActiveTexture_func(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 
 	//
 	// 2D texture, w/ mipmap
@@ -4334,7 +4156,7 @@ GLSLTest::setupTextures(void)
 		}
 	}
 	glBindTexture(GL_TEXTURE_3D, obj3D);
-	glTexImage3D_func(GL_TEXTURE_3D, 0, GL_RGBA, 16, 16, 16, 0,
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, 16, 16, 16, 0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, teximage3D);
 
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -4352,7 +4174,7 @@ GLSLTest::setupTextures(void)
 				teximageZ[i][j] = 0.75;
 		}
 	}
-	glActiveTexture_func(GL_TEXTURE1); // NOTE: Unit 1
+	glActiveTexture(GL_TEXTURE1); // NOTE: Unit 1
 	glBindTexture(GL_TEXTURE_2D, objZ);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 16, 16, 0,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, teximageZ);
@@ -4361,7 +4183,7 @@ GLSLTest::setupTextures(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB,
 					GL_COMPARE_R_TO_TEXTURE_ARB);
 	
-	glActiveTexture_func(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 
@@ -4376,9 +4198,9 @@ GLSLTest::setupTextureMatrix1(void)
 		0.1, 0.2, 0.3, 1.0   // col 3
 	};
 	glMatrixMode(GL_TEXTURE);
-	glActiveTexture_func(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE1);
 	glLoadMatrixf(m);
-	glActiveTexture_func(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -4400,27 +4222,22 @@ GLSLTest::setup(void)
 	glsl_120 = version >= 1.20;
 	glsl_130 = version >= 1.30;
 
-	if (!getFunctions()) {
-		env->log << "Unable to get pointer to an OpenGL 2.0 API function\n";
-		return false;
-	}
-
 	setupTextures();
 	setupTextureMatrix1();
 
 	// load program inputs
 	glColor4fv(PrimaryColor);
-	glSecondaryColor3fv_func(SecondaryColor);
+	glSecondaryColor3fv(SecondaryColor);
 
 	// other GL state
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MatDiffuse);
 	glPointSize(PSIZE);
-	glPointParameterf_func(GL_POINT_SIZE_MIN, PSIZE_MIN);
-	glPointParameterf_func(GL_POINT_SIZE_MAX, PSIZE_MAX);
-	glPointParameterf_func(GL_POINT_FADE_THRESHOLD_SIZE, PSIZE_THRESH);
-	glPointParameterfv_func(GL_POINT_DISTANCE_ATTENUATION, PointAtten);
+	glPointParameterf(GL_POINT_SIZE_MIN, PSIZE_MIN);
+	glPointParameterf(GL_POINT_SIZE_MAX, PSIZE_MAX);
+	glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, PSIZE_THRESH);
+	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, PointAtten);
 	glFogf(GL_FOG_START, FOG_START);
 	glFogf(GL_FOG_END, FOG_END);
 	glFogfv(GL_FOG_COLOR, FogColor);
@@ -4529,10 +4346,9 @@ GLuint
 GLSLTest::loadAndCompileShader(GLenum target, const char *str)
 {
 	GLuint shader;
-	shader = glCreateShader_func(target);
-	glShaderSource_func(shader, 1,
-			    (const GLchar **) &str, NULL);
-	glCompileShader_func(shader);
+	shader = glCreateShader(target);
+	glShaderSource(shader, 1, (const GLchar **) &str, NULL);
+	glCompileShader(shader);
 	return shader;
 }
 
@@ -4547,9 +4363,9 @@ GLSLTest::checkCompileStatus(GLenum target, GLuint shader,
 	GLchar infoLog[1000];
 	GLsizei len;
 
-	glGetShaderiv_func(shader, GL_COMPILE_STATUS, &stat);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &stat);
 	if (!stat) {
-		glGetShaderInfoLog_func(shader, 1000, &len, infoLog);
+		glGetShaderInfoLog(shader, 1000, &len, infoLog);
 		// env->log << infoLog << "\n";
 	}
 
@@ -4636,17 +4452,17 @@ GLSLTest::testProgram(const ShaderProgram &p)
 		goto cleanup;
 	}
 
-	program = glCreateProgram_func();
+	program = glCreateProgram();
 	if (fragShader)
-		glAttachShader_func(program, fragShader);
+		glAttachShader(program, fragShader);
 	if (vertShader)
-		glAttachShader_func(program, vertShader);
-	glLinkProgram_func(program);
+		glAttachShader(program, vertShader);
+	glLinkProgram(program);
 
 	// check link
 	{
 		GLint stat;
-		glGetProgramiv_func(program, GL_LINK_STATUS, &stat);
+		glGetProgramiv(program, GL_LINK_STATUS, &stat);
 		if (!stat) {
 			if (p.flags & FLAG_ILLEGAL_LINK) {
 				// this is the expected outcome
@@ -4656,7 +4472,7 @@ GLSLTest::testProgram(const ShaderProgram &p)
 			else {
 				GLchar log[1000];
 				GLsizei len;
-				glGetProgramInfoLog_func(program, 1000, &len, log);
+				glGetProgramInfoLog(program, 1000, &len, log);
 				env->log << "FAILURE:\n";
 				env->log << "  Shader test: " << p.name << "\n";
 				env->log << "  Link error: ";
@@ -4678,7 +4494,7 @@ GLSLTest::testProgram(const ShaderProgram &p)
 		}
 	}
 
-	glUseProgram_func(program);
+	glUseProgram(program);
 
 	if (p.flags & FLAG_VERTEX_TEXTURE) {
 		// check if vertex texture units are available
@@ -4692,57 +4508,57 @@ GLSLTest::testProgram(const ShaderProgram &p)
 	}
 
 	// load uniform vars
-	u1 = glGetUniformLocation_func(program, "uniform1");
+	u1 = glGetUniformLocation(program, "uniform1");
 	if (u1 >= 0)
-		glUniform4fv_func(u1, 1, Uniform1);
+		glUniform4fv(u1, 1, Uniform1);
 
-	uArray = glGetUniformLocation_func(program, "uniformArray");
+	uArray = glGetUniformLocation(program, "uniformArray");
 	if (uArray >= 0)
-		glUniform1fv_func(uArray, 4, UniformArray);
+		glUniform1fv(uArray, 4, UniformArray);
 
-	uArray4 = glGetUniformLocation_func(program, "uniformArray4");
+	uArray4 = glGetUniformLocation(program, "uniformArray4");
 	if (uArray4 >= 0)
-		glUniform4fv_func(uArray4, 4, (float *) UniformArray4);
+		glUniform4fv(uArray4, 4, (float *) UniformArray4);
 
-	utex1d = glGetUniformLocation_func(program, "tex1d");
+	utex1d = glGetUniformLocation(program, "tex1d");
 	if (utex1d >= 0)
-		glUniform1i_func(utex1d, 0);  // bind to tex unit 0
+		glUniform1i(utex1d, 0);  // bind to tex unit 0
 
-	utex2d = glGetUniformLocation_func(program, "tex2d");
+	utex2d = glGetUniformLocation(program, "tex2d");
 	if (utex2d >= 0)
-		glUniform1i_func(utex2d, 0);  // bind to tex unit 0
+		glUniform1i(utex2d, 0);  // bind to tex unit 0
 
-	utex3d = glGetUniformLocation_func(program, "tex3d");
+	utex3d = glGetUniformLocation(program, "tex3d");
 	if (utex3d >= 0)
-		glUniform1i_func(utex3d, 0);  // bind to tex unit 0
+		glUniform1i(utex3d, 0);  // bind to tex unit 0
 
-	utexZ = glGetUniformLocation_func(program, "texZ");
+	utexZ = glGetUniformLocation(program, "texZ");
 	if (utexZ >= 0)
-		glUniform1i_func(utexZ, 1);  // bind to tex unit 1
+		glUniform1i(utexZ, 1);  // bind to tex unit 1
 
-	umat4 = glGetUniformLocation_func(program, "uniformMat4");
+	umat4 = glGetUniformLocation(program, "uniformMat4");
 	if (umat4 >= 0)
-		glUniformMatrix4fv_func(umat4, 1, GL_FALSE, uniformMatrix);
+		glUniformMatrix4fv(umat4, 1, GL_FALSE, uniformMatrix);
 
-	umat4t = glGetUniformLocation_func(program, "uniformMat4t");
+	umat4t = glGetUniformLocation(program, "uniformMat4t");
 	if (umat4t >= 0)
-		glUniformMatrix4fv_func(umat4t, 1, GL_TRUE, uniformMatrix);
+		glUniformMatrix4fv(umat4t, 1, GL_TRUE, uniformMatrix);
 
-	umat2x4 = glGetUniformLocation_func(program, "uniformMat2x4");
+	umat2x4 = glGetUniformLocation(program, "uniformMat2x4");
 	if (umat2x4 >= 0)
-		glUniformMatrix2x4fv_func(umat2x4, 1, GL_FALSE, uniformMatrix2x4);
+		glUniformMatrix2x4fv(umat2x4, 1, GL_FALSE, uniformMatrix2x4);
 
-	umat2x4t = glGetUniformLocation_func(program, "uniformMat2x4t");
+	umat2x4t = glGetUniformLocation(program, "uniformMat2x4t");
 	if (umat2x4t >= 0)
-		glUniformMatrix2x4fv_func(umat2x4t, 1, GL_TRUE, uniformMatrix2x4);
+		glUniformMatrix2x4fv(umat2x4t, 1, GL_TRUE, uniformMatrix2x4);
 
-	umat4x3 = glGetUniformLocation_func(program, "uniformMat4x3");
+	umat4x3 = glGetUniformLocation(program, "uniformMat4x3");
 	if (umat4x3 >= 0)
-		glUniformMatrix4x3fv_func(umat4x3, 1, GL_FALSE, uniformMatrix4x3);
+		glUniformMatrix4x3fv(umat4x3, 1, GL_FALSE, uniformMatrix4x3);
 
-	umat4x3t = glGetUniformLocation_func(program, "uniformMat4x3t");
+	umat4x3t = glGetUniformLocation(program, "uniformMat4x3t");
 	if (umat4x3t >= 0)
-		glUniformMatrix4x3fv_func(umat4x3t, 1, GL_TRUE, uniformMatrix4x3);
+		glUniformMatrix4x3fv(umat4x3t, 1, GL_TRUE, uniformMatrix4x3);
 
 
 	// to avoid potential issue with undefined result.depth.z
@@ -4810,10 +4626,10 @@ GLSLTest::testProgram(const ShaderProgram &p)
 
  cleanup:
 	if (fragShader)
-		glDeleteShader_func(fragShader);
+		glDeleteShader(fragShader);
 	if (vertShader)
-		glDeleteShader_func(vertShader);
-	glDeleteProgram_func(program);
+		glDeleteShader(vertShader);
+	glDeleteProgram(program);
 
 	return retVal;
 }

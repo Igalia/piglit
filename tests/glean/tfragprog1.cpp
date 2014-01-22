@@ -48,17 +48,6 @@
 
 namespace GLEAN {
 
-
-static PFNGLPROGRAMLOCALPARAMETER4FVARBPROC glProgramLocalParameter4fvARB_func;
-static PFNGLGENPROGRAMSARBPROC glGenProgramsARB_func;
-static PFNGLPROGRAMSTRINGARBPROC glProgramStringARB_func;
-static PFNGLBINDPROGRAMARBPROC glBindProgramARB_func;
-static PFNGLISPROGRAMARBPROC glIsProgramARB_func;
-static PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB_func;
-static PFNGLGETPROGRAMIVARBPROC glGetProgramivARB_func;
-static PFNGLFOGCOORDFPROC glFogCoordf_func;
-
-
 // Clamp X to [0, 1]
 #define CLAMP01( X )  ( (X)<(0.0) ? (0.0) : ((X)>(1.0) ? (1.0) : (X)) )
 // Absolute value
@@ -911,41 +900,18 @@ FragmentProgramTest::setup(void)
 	InfNan[3] = 1.0 / HUGE_VAL;
 
 	// get function pointers
-	glProgramLocalParameter4fvARB_func = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) GLUtils::getProcAddress("glProgramLocalParameter4fvARB");
-	assert(glProgramLocalParameter4fvARB_func);
-
-	glGenProgramsARB_func = (PFNGLGENPROGRAMSARBPROC) GLUtils::getProcAddress("glGenProgramsARB");
-	assert(glGenProgramsARB_func);
-
-	glProgramStringARB_func = (PFNGLPROGRAMSTRINGARBPROC) GLUtils::getProcAddress("glProgramStringARB");
-	assert(glProgramStringARB_func);
-
-	glBindProgramARB_func = (PFNGLBINDPROGRAMARBPROC) GLUtils::getProcAddress("glBindProgramARB");
-	assert(glBindProgramARB_func);
-
-	glIsProgramARB_func = (PFNGLISPROGRAMARBPROC) GLUtils::getProcAddress("glIsProgramARB");
-	assert(glIsProgramARB_func);
-
-	glDeleteProgramsARB_func = (PFNGLDELETEPROGRAMSARBPROC) GLUtils::getProcAddress("glDeleteProgramsARB");
-	assert(glDeleteProgramsARB_func);
-
-	glGetProgramivARB_func = (PFNGLGETPROGRAMIVARBPROC) GLUtils::getProcAddress("glGetProgramivARB");
-	assert(glGetProgramivARB_func);
-
-	glFogCoordf_func = (PFNGLFOGCOORDFPROC) GLUtils::getProcAddress("glFogCoordf");
-	assert(glFogCoordf_func);
 
 	GLuint progID;
-	glGenProgramsARB_func(1, &progID);
-	glBindProgramARB_func(GL_FRAGMENT_PROGRAM_ARB, progID);
+	glGenProgramsARB(1, &progID);
+	glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, progID);
 	glEnable(GL_FRAGMENT_PROGRAM_ARB);
 
 	// load program inputs
 	glColor4fv(FragColor);
-	glProgramLocalParameter4fvARB_func(GL_FRAGMENT_PROGRAM_ARB, 0, Param0);
-	glProgramLocalParameter4fvARB_func(GL_FRAGMENT_PROGRAM_ARB, 1, Param1);
-	glProgramLocalParameter4fvARB_func(GL_FRAGMENT_PROGRAM_ARB, 2, Param2);
-	glProgramLocalParameter4fvARB_func(GL_FRAGMENT_PROGRAM_ARB, 9, InfNan);
+	glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 0, Param0);
+	glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 1, Param1);
+	glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 2, Param2);
+	glProgramLocalParameter4fvARB(GL_FRAGMENT_PROGRAM_ARB, 9, InfNan);
 
 	GLenum err = glGetError();
 	assert(!err);  // should be OK
@@ -969,7 +935,7 @@ FragmentProgramTest::setup(void)
 	glFogf(GL_FOG_DENSITY, FogDensity);
 	glFogfv(GL_FOG_COLOR, FogColor);
 	glFogi(GL_FOG_COORDINATE_SOURCE_EXT, GL_FOG_COORDINATE_EXT);
-	glFogCoordf_func(FogCoord);
+	glFogCoordf(FogCoord);
 
 	// compute error tolerances (may need fine-tuning)
 	int bufferBits[5];
@@ -1053,10 +1019,10 @@ FragmentProgramTest::equalDepth(GLfloat z0, GLfloat z1) const
 bool
 FragmentProgramTest::testProgram(const FragmentProgram &p)
 {
-	glProgramStringARB_func(GL_FRAGMENT_PROGRAM_ARB,
-				GL_PROGRAM_FORMAT_ASCII_ARB,
-				strlen(p.progString),
-				(const GLubyte *) p.progString);
+	glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
+                           GL_PROGRAM_FORMAT_ASCII_ARB,
+                           strlen(p.progString),
+                           (const GLubyte *) p.progString);
 
 	GLenum err = glGetError();
 	if (err) {

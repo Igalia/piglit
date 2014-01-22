@@ -40,10 +40,6 @@
 
 namespace GLEAN {
 
-static PFNGLACTIVETEXTUREPROC glActiveTexture_func = NULL;
-static PFNGLCLIENTACTIVETEXTUREPROC glClientActiveTexture_func = NULL;
-
-
 void
 TexUnitsTest::reportFailure(const char *msg) const
 {
@@ -80,11 +76,6 @@ TexUnitsTest::setup(void)
    glGetIntegerv(GL_MAX_TEXTURE_COORDS, &maxCoordUnits);
    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &maxUnits);
 
-   glActiveTexture_func = (PFNGLACTIVETEXTUREPROC) GLUtils::getProcAddress("glActiveTexture");
-   assert(glActiveTexture_func);
-   glClientActiveTexture_func = (PFNGLCLIENTACTIVETEXTUREPROC) GLUtils::getProcAddress("glClientActiveTexture");
-   assert(glClientActiveTexture_func);
-
    return true;
 }
 
@@ -115,7 +106,7 @@ TexUnitsTest::testActiveTexture(void)
 
    // test glActiveTexture()
    for (i = 0; i < maxCombinedUnits; i++) {
-      glActiveTexture_func(GL_TEXTURE0 + i);
+      glActiveTexture(GL_TEXTURE0 + i);
       if (glGetError()) {
          reportFailure("glActiveTexture(GL_TEXTURE%d) failed", i);
          return false;
@@ -130,7 +121,7 @@ TexUnitsTest::testActiveTexture(void)
    }
 
    // this should fail:
-   glActiveTexture_func(GL_TEXTURE0 + maxCombinedUnits);
+   glActiveTexture(GL_TEXTURE0 + maxCombinedUnits);
    if (glGetError() != GL_INVALID_ENUM) {
       reportFailure("glActiveTexture(GL_TEXTURE%d) failed to generate an error",
                     maxCombinedUnits);
@@ -140,7 +131,7 @@ TexUnitsTest::testActiveTexture(void)
 
    // test glClientActiveTexture()
    for (i = 0; i < maxCoordUnits; i++) {
-      glClientActiveTexture_func(GL_TEXTURE0 + i);
+      glClientActiveTexture(GL_TEXTURE0 + i);
       if (glGetError()) {
          reportFailure("glClientActiveTexture(GL_TEXTURE%d) failed", i);
          return false;
@@ -155,7 +146,7 @@ TexUnitsTest::testActiveTexture(void)
    }
 
    // this should fail:
-   glClientActiveTexture_func(GL_TEXTURE0 + maxCoordUnits);
+   glClientActiveTexture(GL_TEXTURE0 + maxCoordUnits);
    if (glGetError() != GL_INVALID_ENUM) {
       reportFailure("glClientActiveTexture(GL_TEXTURE%d) failed to generate an error", maxCoordUnits);
       return false;
@@ -170,12 +161,12 @@ TexUnitsTest::testTextureMatrices(void)
 {
    GLint i;
 
-   glActiveTexture_func(GL_TEXTURE0);
+   glActiveTexture(GL_TEXTURE0);
    glMatrixMode(GL_TEXTURE);
 
    // set texture matrices
    for (i = 0; i < maxCoordUnits; i++) {
-      glActiveTexture_func(GL_TEXTURE0 + i);
+      glActiveTexture(GL_TEXTURE0 + i);
 
       // generate matrix
       GLfloat m[16];
@@ -188,7 +179,7 @@ TexUnitsTest::testTextureMatrices(void)
 
    // query texture matrices
    for (i = 0; i < maxCoordUnits; i++) {
-      glActiveTexture_func(GL_TEXTURE0 + i);
+      glActiveTexture(GL_TEXTURE0 + i);
 
       // get matrix and check it
       GLfloat m[16];
@@ -222,12 +213,12 @@ TexUnitsTest::testTextureCoordGen(void)
 {
    GLint i;
 
-   glActiveTexture_func(GL_TEXTURE0);
+   glActiveTexture(GL_TEXTURE0);
    glMatrixMode(GL_TEXTURE);
 
    // test texgen enable/disable
    for (i = 0; i < maxCombinedUnits; i++) {
-      glActiveTexture_func(GL_TEXTURE0 + i);
+      glActiveTexture(GL_TEXTURE0 + i);
 
       glEnable(GL_TEXTURE_GEN_S);
       glEnable(GL_TEXTURE_GEN_T);
@@ -263,7 +254,7 @@ TexUnitsTest::testTexcoordArrays(void)
    GLint i;
 
    for (i = 0; i < maxCoordUnits; i++) {
-      glClientActiveTexture_func(GL_TEXTURE0 + i);
+      glClientActiveTexture(GL_TEXTURE0 + i);
 
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       if (glGetError()) {

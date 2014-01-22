@@ -55,7 +55,6 @@ private:
         typedef bool (API2Test::*TestFunc)(void);
 
 	GLfloat tolerance[5];
-        bool getFunctions_2_0(const char **errorFunc);
 
         GLuint loadAndCompileShader(GLenum target, const char *str);
         GLuint createProgram(GLuint vertShader, GLuint fragShader);

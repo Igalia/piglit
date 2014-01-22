@@ -41,14 +41,6 @@
 
 namespace GLEAN {
 
-
-static PFNGLPROGRAMLOCALPARAMETER4FVARBPROC glProgramLocalParameter4fvARB_func;
-static PFNGLGENPROGRAMSARBPROC glGenProgramsARB_func;
-static PFNGLPROGRAMSTRINGARBPROC glProgramStringARB_func;
-static PFNGLBINDPROGRAMARBPROC glBindProgramARB_func;
-static PFNGLISPROGRAMARBPROC glIsProgramARB_func;
-static PFNGLDELETEPROGRAMSARBPROC glDeleteProgramsARB_func;
-
 static GLuint progID;
 
 
@@ -810,35 +802,16 @@ VertexProgramTest::setup(void)
 	       InfNan[0], InfNan[1], InfNan[2], InfNan[3]);
 	*/
 
-	// get function pointers
-	glProgramLocalParameter4fvARB_func = (PFNGLPROGRAMLOCALPARAMETER4FVARBPROC) GLUtils::getProcAddress("glProgramLocalParameter4fvARB");
-	assert(glProgramLocalParameter4fvARB_func);
-
-	glGenProgramsARB_func = (PFNGLGENPROGRAMSARBPROC) GLUtils::getProcAddress("glGenProgramsARB");
-	assert(glGenProgramsARB_func);
-
-	glProgramStringARB_func = (PFNGLPROGRAMSTRINGARBPROC) GLUtils::getProcAddress("glProgramStringARB");
-	assert(glProgramStringARB_func);
-
-	glBindProgramARB_func = (PFNGLBINDPROGRAMARBPROC) GLUtils::getProcAddress("glBindProgramARB");
-	assert(glBindProgramARB_func);
-
-	glIsProgramARB_func = (PFNGLISPROGRAMARBPROC) GLUtils::getProcAddress("glIsProgramARB");
-	assert(glIsProgramARB_func);
-
-	glDeleteProgramsARB_func = (PFNGLDELETEPROGRAMSARBPROC) GLUtils::getProcAddress("glDeleteProgramsARB");
-	assert(glDeleteProgramsARB_func);
-
-	glGenProgramsARB_func(1, &progID);
-	glBindProgramARB_func(GL_VERTEX_PROGRAM_ARB, progID);
+	glGenProgramsARB(1, &progID);
+	glBindProgramARB(GL_VERTEX_PROGRAM_ARB, progID);
 	glEnable(GL_VERTEX_PROGRAM_ARB);
 
 	// load program inputs
 	glColor4fv(VertColor);
-	glProgramLocalParameter4fvARB_func(GL_VERTEX_PROGRAM_ARB, 0, Param0);
-	glProgramLocalParameter4fvARB_func(GL_VERTEX_PROGRAM_ARB, 1, Param1);
-	glProgramLocalParameter4fvARB_func(GL_VERTEX_PROGRAM_ARB, 2, Param2);
-	glProgramLocalParameter4fvARB_func(GL_VERTEX_PROGRAM_ARB, 9, InfNan);
+	glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 0, Param0);
+	glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 1, Param1);
+	glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 2, Param2);
+	glProgramLocalParameter4fvARB(GL_VERTEX_PROGRAM_ARB, 9, InfNan);
 
 	// other GL state
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ambient);
@@ -952,10 +925,10 @@ VertexProgramTest::testProgram(const VertexProgram &p)
 {
 	const GLfloat r = 0.25;
 
-	glProgramStringARB_func(GL_VERTEX_PROGRAM_ARB,
-				GL_PROGRAM_FORMAT_ASCII_ARB,
-				strlen(p.progString),
-				(const GLubyte *) p.progString);
+	glProgramStringARB(GL_VERTEX_PROGRAM_ARB,
+			   GL_PROGRAM_FORMAT_ASCII_ARB,
+			   strlen(p.progString),
+			   (const GLubyte *) p.progString);
 
 	GLenum err = glGetError();
 	if (err) {
@@ -1027,7 +1000,7 @@ VertexProgramTest::testBadProgram(MultiTestResult &result)
 			"NOTANOPCODE;\n"
 			"MOV result.position, vertex.position;\n";
 
-		glProgramStringARB_func(GL_VERTEX_PROGRAM_ARB,
+		glProgramStringARB(GL_VERTEX_PROGRAM_ARB,
 					GL_PROGRAM_FORMAT_ASCII_ARB,
 					strlen(badprog),
 					(const GLubyte *) badprog);
@@ -1052,7 +1025,7 @@ VertexProgramTest::testBadProgram(MultiTestResult &result)
 	 * with an invalid (non-existant in this case) program.
 	 */
 	{
-		glBindProgramARB_func(GL_VERTEX_PROGRAM_ARB, 99);
+		glBindProgramARB(GL_VERTEX_PROGRAM_ARB, 99);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBegin(GL_POLYGON);
