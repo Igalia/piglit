@@ -1240,8 +1240,8 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler3D 98x
 add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 1x129x9-98x129x9')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 98x1x9-98x129x9')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'texelFetch fs sampler2DArray 98x129x1-98x129x9')
-add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
-add_plain_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-textureOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
