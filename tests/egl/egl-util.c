@@ -187,7 +187,13 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	struct egl_state state;
 	EGLint count;
 	enum piglit_result result;
-	int i;
+	int i, dispatch_api, api_bit = EGL_OPENGL_BIT;
+
+	EGLint ctxAttribsES[] = {
+		EGL_CONTEXT_CLIENT_VERSION, 0,
+		EGL_NONE
+	};
+	EGLint *ctxAttribs = NULL;
 
 	for (i = 1; i < argc; ++i) {
 		if (!strcmp(argv[i], "-auto"))
@@ -202,11 +208,33 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
+	/* read api_bit if EGL_RENDERABLE_TYPE set in the attribs */
 	for (count = 0; test->config_attribs[count] != EGL_NONE; count += 2) {
-		if (test->config_attribs[count] == EGL_RENDERABLE_TYPE &&
-		    test->config_attribs[count+1] == EGL_OPENGL_BIT) {
-			eglBindAPI(EGL_OPENGL_API);
+		if (test->config_attribs[count] == EGL_RENDERABLE_TYPE) {
+			api_bit = test->config_attribs[count+1];
 		}
+	}
+
+	/* bind chosen API and set ctxattribs if using ES */
+	if (api_bit == EGL_OPENGL_BIT)
+		eglBindAPI(EGL_OPENGL_API);
+	else {
+		eglBindAPI(EGL_OPENGL_ES_API);
+		ctxAttribs = ctxAttribsES;
+	}
+
+	/* choose dispatch_api and set ctx version to ctxAttribs if using ES */
+	switch (api_bit) {
+	case EGL_OPENGL_ES_BIT:
+		dispatch_api = PIGLIT_DISPATCH_ES1;
+		ctxAttribsES[1] = 1;
+		break;
+	case EGL_OPENGL_ES2_BIT:
+		dispatch_api = PIGLIT_DISPATCH_ES2;
+		ctxAttribsES[1] = 2;
+		break;
+	default:
+		dispatch_api = PIGLIT_DISPATCH_GL;
 	}
 
 
@@ -230,7 +258,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 	}
 
 	state.ctx = eglCreateContext(state.egl_dpy, state.cfg,
-				     EGL_NO_CONTEXT, NULL);
+				     EGL_NO_CONTEXT, ctxAttribs);
 	if (state.ctx == EGL_NO_CONTEXT) {
 		fprintf(stderr, "eglCreateContext() failed\n");
 		piglit_report_result(PIGLIT_FAIL);
@@ -253,7 +281,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+	piglit_dispatch_default_init(dispatch_api);
 
 	result = event_loop(&state, test);
 
