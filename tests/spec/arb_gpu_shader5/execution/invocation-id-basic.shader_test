@@ -25,11 +25,11 @@ void emit(vec2 v2)
 
 void main()
 {
-  uint i = gl_InvocationID;
+  int i = gl_InvocationID;
 
   vec2 v;
-  v.x = -1.0 + float(i & 1u);
-  v.y = -1.0 + float((i & 2u) / 2u);
+  v.x = -1.0 + float(i & 1);
+  v.y = -1.0 + float((i & 2) / 2);
 
   emit(v);
   emit(v + vec2(1, 0));
