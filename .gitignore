@@ -24,3 +24,5 @@ tests/glslparsertest/glslcompiler
 generated_tests/cl
 
 .makotmp
+
+main
