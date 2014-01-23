@@ -149,7 +149,7 @@ event_loop(struct egl_state *state, const struct egl_test *test)
 
 		if (event.type == Expose) {
 			result = test->draw(state);
-			if (automatic)
+			if (automatic || piglit_automatic)
 				break;
 		}
 
