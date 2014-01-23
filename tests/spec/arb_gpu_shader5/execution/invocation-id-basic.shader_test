@@ -31,11 +31,13 @@ void main()
   v.x = -1.0 + float(i & 1);
   v.y = -1.0 + float((i & 2) / 2);
 
-  emit(v);
-  emit(v + vec2(1, 0));
-  emit(v + vec2(0, 1));
-  emit(v + vec2(1, 1));
-  EndPrimitive();
+  if (i >= 0 && i < 4) {
+    emit(v);
+    emit(v + vec2(1, 0));
+    emit(v + vec2(0, 1));
+    emit(v + vec2(1, 1));
+    EndPrimitive();
+  }
 }
 
 [fragment shader]
