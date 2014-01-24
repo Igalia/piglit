@@ -414,7 +414,10 @@ class ShaderTest(object):
         statements that need to be inside the main() funciton of the
         shader, after the built-in function is called.
         """
-        shader = additional_declarations
+        shader = ''
+        if self._signature.extension:
+            shader += '#extension GL_{0} : require\n'.format(self._signature.extension)
+        shader += additional_declarations
         for i in xrange(len(self._signature.argtypes)):
             shader += 'uniform {0} arg{1};\n'.format(
                 self._signature.argtypes[i], i)
@@ -466,9 +469,12 @@ class ShaderTest(object):
     def filename(self):
         argtype_names = '-'.join(
             str(argtype) for argtype in self._signature.argtypes)
+        if self._signature.extension:
+            subdir = self._signature.extension
+        else:
+            subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
         return os.path.join(
-            'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
-            'execution', 'built-in-functions',
+            'spec', subdir, 'execution', 'built-in-functions',
             '{0}-{1}-{2}{3}.shader_test'.format(
                 self.test_prefix(), self._signature.name, argtype_names,
                 self._comparator.testname_suffix()))

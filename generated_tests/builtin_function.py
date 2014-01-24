@@ -187,7 +187,7 @@ glsl_mat4x4 = glsl_mat4
 #           argtypes=('float', 'vec3'))
 Signature = collections.namedtuple(
     'Signature',
-    ('name', 'template', 'version_introduced', 'rettype', 'argtypes'))
+    ('name', 'template', 'version_introduced', 'extension', 'rettype', 'argtypes'))
 
 
 # Named tuple representing a single piece of test data for testing a
@@ -674,7 +674,7 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
     return vectorized_test_vectors
 
 
-def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
+def _store_test_vector(test_suite_dict, name, glsl_version, extension, test_vector,
                        template=None):
     """Store a test vector in the appropriate place in
     test_suite_dict.  The dictionary key (which is a Signature tuple)
@@ -697,14 +697,14 @@ def _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
         glsl_version, rettype.version_introduced,
         *[t.version_introduced for t in argtypes])
     signature = Signature(
-        name, template, adjusted_glsl_version, rettype, argtypes)
+        name, template, adjusted_glsl_version, extension, rettype, argtypes)
     if signature not in test_suite_dict:
         test_suite_dict[signature] = []
     test_suite_dict[signature].append(test_vector)
 
 
-def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
-                        template=None):
+def _store_test_vectors(test_suite_dict, name, glsl_version, extension,
+                        test_vectors, template=None):
     """Store multiple test vectors in the appropriate places in
     test_suite_dict.
 
@@ -712,8 +712,8 @@ def _store_test_vectors(test_suite_dict, name, glsl_version, test_vectors,
     Signature objects generated.
     """
     for test_vector in test_vectors:
-        _store_test_vector(test_suite_dict, name, glsl_version, test_vector,
-                           template=template)
+        _store_test_vector(test_suite_dict, name, glsl_version, extension,
+                           test_vector, template=template)
 
 
 def make_arguments(input_generators):
@@ -756,7 +756,8 @@ def _make_componentwise_test_vectors(test_suite_dict):
 
     def f(name, arity, glsl_version, python_equivalent,
           alternate_scalar_arg_indices, test_inputs,
-          tolerance_function=_strict_tolerance):
+          tolerance_function=_strict_tolerance,
+          extension=None):
         """Create test vectors for the function with the given name
         and arity, which was introduced in the given glsl_version.
 
@@ -781,7 +782,7 @@ def _make_componentwise_test_vectors(test_suite_dict):
         scalar_test_vectors = _simulate_function(
             make_arguments(test_inputs), python_equivalent, tolerance_function)
         _store_test_vectors(
-            test_suite_dict, name, glsl_version, scalar_test_vectors)
+            test_suite_dict, name, glsl_version, extension, scalar_test_vectors)
         if alternate_scalar_arg_indices is None:
             scalar_arg_indices_list = [()]
         else:
@@ -789,7 +790,7 @@ def _make_componentwise_test_vectors(test_suite_dict):
         for scalar_arg_indices in scalar_arg_indices_list:
             for vector_length in (2, 3, 4):
                 _store_test_vectors(
-                    test_suite_dict, name, glsl_version,
+                    test_suite_dict, name, glsl_version, extension,
                     _vectorize_test_vectors(
                         scalar_test_vectors, scalar_arg_indices,
                         vector_length))
@@ -890,7 +891,8 @@ def _make_vector_relational_test_vectors(test_suite_dict):
         }
 
     def f(name, arity, glsl_version, python_equivalent, arg_types,
-          tolerance_function=_strict_tolerance):
+          tolerance_function=_strict_tolerance,
+          extension=None):
         """Make test vectors for the function with the given name and
         arity, which was introduced in the given glsl_version.
 
@@ -913,7 +915,7 @@ def _make_vector_relational_test_vectors(test_suite_dict):
                 tolerance_function)
             for vector_length in (2, 3, 4):
                 _store_test_vectors(
-                    test_suite_dict, name, glsl_version,
+                    test_suite_dict, name, glsl_version, extension,
                     _vectorize_test_vectors(
                         scalar_test_vectors, (), vector_length))
 
@@ -1141,7 +1143,8 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
 
     def f(name, arity, glsl_version, python_equivalent,
           filter, test_inputs, tolerance_function=_strict_tolerance,
-          template=None):
+          template=None,
+          extension=None):
         """Make test vectors for the function with the given name and
         arity, which was introduced in the given glsl_version.
 
@@ -1170,7 +1173,7 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
             test_inputs = \
                 [arguments for arguments in test_inputs if filter(*arguments)]
         _store_test_vectors(
-            test_suite_dict, name, glsl_version,
+            test_suite_dict, name, glsl_version, extension,
             _simulate_function(
                 test_inputs, python_equivalent, tolerance_function),
             template=template)
