@@ -70,7 +70,7 @@ const int texelsPerLayer = 32 * 32;
 const int floatPerLayer  = 32 * 32 * 3;
 
 static const float srcColors[2][3] = {
-	{1, 0, 0}, {0, 1, 0}
+	{0.5, 0.4, 0.3}, {0, 1, 0}
 };
 
 static const float dstColors[2][3] = {
