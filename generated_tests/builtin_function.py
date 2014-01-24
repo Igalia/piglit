@@ -445,6 +445,10 @@ def _clamp(x, minVal, maxVal):
     return min(max(x, minVal), maxVal)
 
 
+# Inefficient, but obvious
+def _mid3(x, y, z):
+    return np.sort([x, y, z])[1]
+
 def _smoothstep(edge0, edge1, x):
     if edge0 >= edge1:
         return None
@@ -860,6 +864,30 @@ def _make_componentwise_test_vectors(test_suite_dict):
       [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4)])
     f('max', 2, 130, max, [1], [ints, ints])
     f('max', 2, 130, max, [1], [uints, uints])
+    f('min3', 2, 110, min, None,
+      [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4),
+       np.linspace(-2.0, 2.0, 4)],
+      extension="AMD_shader_trinary_minmax")
+    f('min3', 2, 130, min, None, [ints, ints, ints],
+      extension="AMD_shader_trinary_minmax")
+    f('min3', 2, 130, min, None, [uints, uints, uints],
+      extension="AMD_shader_trinary_minmax")
+    f('max3', 2, 110, max, None,
+      [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4),
+       np.linspace(-2.0, 2.0, 4)],
+      extension="AMD_shader_trinary_minmax")
+    f('max3', 2, 130, max, None, [ints, ints, ints],
+      extension="AMD_shader_trinary_minmax")
+    f('max3', 2, 130, max, None, [uints, uints, uints],
+      extension="AMD_shader_trinary_minmax")
+    f('mid3', 2, 110, _mid3, None,
+      [np.linspace(-2.0, 2.0, 4), np.linspace(-2.0, 2.0, 4),
+       np.linspace(-2.0, 2.0, 4)],
+      extension="AMD_shader_trinary_minmax")
+    f('mid3', 2, 130, _mid3, None, [ints, ints, ints],
+      extension="AMD_shader_trinary_minmax")
+    f('mid3', 2, 130, _mid3, None, [uints, uints, uints],
+      extension="AMD_shader_trinary_minmax")
     f('clamp', 3, 110, _clamp, [1, 2], [np.linspace(-2.0, 2.0, 4),
       np.linspace(-1.5, 1.5, 3), np.linspace(-1.5, 1.5, 3)])
     f('clamp', 3, 130, _clamp, [1, 2], [ints, ints, ints])
