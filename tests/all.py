@@ -1406,6 +1406,12 @@ import_glsl_parser_tests(spec['AMD_conservative_depth'],
 			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
 			 [''])
 
+# Group AMD_shader_trinary_minmax
+spec['AMD_shader_trinary_minmax'] = Group()
+import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
+			 os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
+			 [''])
+
 # Group ARB_point_sprite
 arb_point_sprite = Group()
 spec['ARB_point_sprite'] = arb_point_sprite
