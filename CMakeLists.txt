@@ -356,6 +356,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${piglit_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${piglit_BINARY_DIR}/bin)
 
 check_function_exists(asprintf  HAVE_ASPRINTF)
+check_function_exists(ffs       HAVE_FFS)
 check_function_exists(strchrnul HAVE_STRCHRNUL)
 check_function_exists(strndup   HAVE_STRNDUP)
 check_function_exists(fopen_s   HAVE_FOPEN_S)

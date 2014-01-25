@@ -1,4 +1,5 @@
 #cmakedefine HAVE_ASPRINTF
+#cmakedefine HAVE_FFS
 #cmakedefine HAVE_STRCHRNUL
 #cmakedefine HAVE_FOPEN_S
 #cmakedefine HAVE_SETRLIMIT
