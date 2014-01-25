@@ -138,6 +138,10 @@ piglit_display(void)
 		may_link_fail = true;
 		vec4s++;
 		break;
+	default:
+		assert(false);
+		target = GL_NONE;
+		may_link_fail = false;
 	}
 
 	switch (target) {
