@@ -256,6 +256,7 @@ test_format_errors(GLenum format_class)
 		break;
 	default:
 	    assert(!"Invalid format_class\n");
+	    numFormats = 0;
 	}
 
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
