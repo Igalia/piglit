@@ -138,7 +138,7 @@ supported_format(GLenum internal_format)
 GLuint
 create_mipmapped_tex(GLenum internal_format)
 {
-	GLenum format;
+	GLenum format = GL_NONE;
 
 	if (!supported_format(internal_format))
 		return 0;
