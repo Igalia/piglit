@@ -184,6 +184,7 @@ test_target_errors(GLenum target)
 		break;
 	default:
 		assert(0);
+		numTargets = 0;
 		break;
 	}
 
