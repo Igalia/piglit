@@ -59,7 +59,7 @@ PIGLIT_GL_TEST_CONFIG_END
 static char *
 get_shader(GLenum target, const char *block_prefix, int blocks)
 {
-	char *shader;
+	char *shader = NULL;
 	const char *vs_source =
 		"#extension GL_ARB_uniform_buffer_object : enable\n"
 		"\n"
