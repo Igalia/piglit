@@ -175,9 +175,6 @@ create_bind_texture(GLenum textureType, bool useSrcTex)
 
 	glTexParameteri(textureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(textureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(textureType, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(textureType, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
 	switch (textureType) {
 	case GL_TEXTURE_2D:
