@@ -63,9 +63,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 /* Values Set in piglit init */
-const int texWidth  = 32;
-const int texHeight = 32;
-const int texDepth  = 2;
+static const int texWidth  = 32;
+static const int texHeight = 32;
+static const int texDepth  = 2;
 
 static const float srcColors[2][3] = {
 	{0.5, 0.4, 0.3}, {0, 1, 0}
