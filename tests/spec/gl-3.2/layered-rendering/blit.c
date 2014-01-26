@@ -95,7 +95,7 @@ display_texture(int x, int y, int w, int h,
 	/* Gen temp fbo to work with */
 	glGenFramebuffers(1, &tempFBO);
 
-	if(layers == 1) {
+	if (layers == 1) {
 		dy1 = y;
 		dy2 = y+h;
 
@@ -111,7 +111,7 @@ display_texture(int x, int y, int w, int h,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	} else {
 		/* loop through each layer */
-		for( i = 0; i < layers; i++) {
+		for (i = 0; i < layers; i++) {
 			dy1 = y + i*(h/layers);
 			dy2 = y + (i+1)*(h/layers);
 
@@ -122,7 +122,7 @@ display_texture(int x, int y, int w, int h,
 						  tex, 0, i);
 
 			fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			if(fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+			if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
 				printf("Framebuffer Status: %s\n",
 				       piglit_get_gl_enum_name(fbStatus));
 				return false;
@@ -148,10 +148,10 @@ void
 gen_color_data(float *colorData, int texelsPerLayer, int layers, bool useSrcTex)
 {
 	int i, j;
-	for(j = 0; j < layers; j++) {
-		for(i = 0; i < texelsPerLayer; i++) {
+	for (j = 0; j < layers; j++) {
+		for (i = 0; i < texelsPerLayer; i++) {
 			int offset = j * texelsPerLayer * 3 + i * 3;
-			if(useSrcTex) {
+			if (useSrcTex) {
 				colorData[offset + 0] = srcColors[j][0];
 				colorData[offset + 1] = srcColors[j][1];
 				colorData[offset + 2] = srcColors[j][2];
@@ -181,7 +181,7 @@ create_bind_texture(GLenum textureType, bool useSrcTex)
 	glTexParameteri(textureType, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(textureType, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
-	switch(textureType) {
+	switch (textureType) {
 	case GL_TEXTURE_2D:
 		colorData = malloc(floatPerLayer * sizeof(float));
 		gen_color_data(colorData, texelsPerLayer, 1, useSrcTex);
@@ -196,12 +196,12 @@ create_bind_texture(GLenum textureType, bool useSrcTex)
 		break;
 	}
 
-	if(!piglit_check_gl_error(GL_NO_ERROR)) {
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		glDeleteTextures(1, &texture);
 		texture = 0;
 	}
 
-	if(colorData != NULL)
+	if (colorData != NULL)
 		free(colorData);
 
 	return texture;
@@ -223,7 +223,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 	glBindFramebuffer(GL_FRAMEBUFFER, srcFBO);
 
 	piglit_check_gl_error(GL_NO_ERROR);
-	if(srcLayered) {
+	if (srcLayered) {
 		srcTex = create_bind_texture(GL_TEXTURE_3D, true);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				     srcTex, 0);
@@ -235,7 +235,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 
 	/* Check source framebuffer status */
 	fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if(fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+	if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
 		printf("testFramebufferBlitLayered srcFBO Status: %s\n",
 		       piglit_get_gl_enum_name(fbStatus));
 		return false;
@@ -245,7 +245,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 	glGenFramebuffers(1, &dstFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, dstFBO);
 
-	if(dstLayered) {
+	if (dstLayered) {
 		dstTex = create_bind_texture(GL_TEXTURE_3D, false);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				     dstTex, 0);
@@ -257,14 +257,14 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 
 	/* Check destination framebuffer status */
 	fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if(fbStatus != GL_FRAMEBUFFER_COMPLETE) {
+	if (fbStatus != GL_FRAMEBUFFER_COMPLETE) {
 		printf("testFramebufferBlitLayered dstFBO Status: %s\n",
 		       piglit_get_gl_enum_name(fbStatus));
 		return false;
 	}
 
 	/* Check for if any errors have occured */
-	if(!piglit_check_gl_error(GL_NO_ERROR)) {
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Error setting up framebuffers for test.\n");
 		return false;
 	}
@@ -281,7 +281,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 	display_texture(x+w/2, y, w/2, h, dstTex, dstlayers);
 
 	/* Check for pass condition */
-	if(dstLayered) {
+	if (dstLayered) {
 		pass = piglit_probe_rect_rgb(x+w/2, y, w/2, h/2, srcColors[0])
 		       && pass;
 		pass = piglit_probe_rect_rgb(x+w/2, y+h/2, w/2, h/2,
@@ -300,7 +300,7 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 	glDeleteTextures(1, &dstTex);
 
 	/* Check for if any errors have occured */
-	if(!piglit_check_gl_error(GL_NO_ERROR)) {
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("Error setting up framebuffers for test.\n");
 		return false;
 	}
