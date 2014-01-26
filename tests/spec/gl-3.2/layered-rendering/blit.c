@@ -77,26 +77,19 @@ static const float dstColors[2][3] = {
 
 /*
  * Blit the passed texture to the screen. If texture is layered,
- * loops through each layer and blit it to the screen.
+ * loops through each layer and blit it to the screen. Otherwise scales
+ * the layer zero vertically with a factor of texDepth.
  */
 bool
-display_texture(int x, int y, int w, int h,
-		     GLuint tex, int layers)
+display_texture(int x, int y, GLuint tex, int layers)
 {
 	GLuint tempFBO;
-	int i, dx1, dy1, dx2, dy2;
 	GLenum fbStatus;
-
-	dx1 = x;
-	dx2 = x+w;
 
 	/* Gen temp fbo to work with */
 	glGenFramebuffers(1, &tempFBO);
 
 	if (layers == 1) {
-		dy1 = y;
-		dy2 = y+h;
-
 		glBindFramebuffer(GL_FRAMEBUFFER, tempFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				       GL_TEXTURE_2D, tex, 0);
@@ -105,14 +98,13 @@ display_texture(int x, int y, int w, int h,
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, tempFBO);
 		glBlitFramebuffer(0, 0, texWidth, texHeight,
-				  dx1, dy1, dx2, dy2,
+				  x, y, x + texWidth, y + texDepth * texHeight,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	} else {
+	        int i;
+
 		/* loop through each layer */
 		for (i = 0; i < layers; i++) {
-			dy1 = y + i*(h/layers);
-			dy2 = y + (i+1)*(h/layers);
-
 			/* Bind new layer to display */
 			glBindFramebuffer(GL_FRAMEBUFFER, tempFBO);
 			glFramebufferTextureLayer(GL_FRAMEBUFFER,
@@ -130,7 +122,10 @@ display_texture(int x, int y, int w, int h,
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, piglit_winsys_fbo);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, tempFBO);
 			glBlitFramebuffer(0, 0, texWidth, texHeight,
-					  dx1, dy1, dx2, dy2,
+					  x,
+                                          y + i * texHeight,
+					  x + texWidth,
+                                          y + (i + 1) * texHeight,
 					  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		}
 	}
@@ -209,8 +204,7 @@ create_bind_texture(GLenum textureType, bool useSrcTex)
 }
 
 bool
-testFramebufferBlitLayered(int x, int y, int w, int h,
-			   bool srcLayered, bool dstLayered)
+testFramebufferBlitLayered(int x, int y, bool srcLayered, bool dstLayered)
 {
 	bool pass = true;
 	GLuint srcFBO, dstFBO;
@@ -278,19 +272,18 @@ testFramebufferBlitLayered(int x, int y, int w, int h,
 			  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	/* Display the results */
-	display_texture(x, y, w/2, h, srcTex, srclayers);
-	display_texture(x+w/2, y, w/2, h, dstTex, dstlayers);
+	display_texture(x, y, srcTex, srclayers);
+	display_texture(x + texWidth, y, dstTex, dstlayers);
 
 	/* Check for pass condition */
 	if (dstLayered) {
-		pass = piglit_probe_rect_rgb(x+w/2, y, w/2, h/2, srcColors[0])
-		       && pass;
-		pass = piglit_probe_rect_rgb(x+w/2, y+h/2, w/2, h/2,
-					     dstColors[1])
-		       && pass;
+		pass = piglit_probe_rect_rgb(x + texWidth, y,
+                                texWidth, texHeight, srcColors[0]) && pass;
+		pass = piglit_probe_rect_rgb(x + texWidth, y + texHeight,
+                                texWidth, texHeight, dstColors[1]) && pass;
 	} else {
-		pass = piglit_probe_rect_rgb(x+w/2, y, w/2, h, srcColors[0])
-		       && pass;
+		pass = piglit_probe_rect_rgb(x + texWidth, y, texWidth,
+                                texDepth * texHeight, srcColors[0]) && pass;
 	}
 
 	/* Clean up */
@@ -319,24 +312,24 @@ enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
-	int hw = piglit_width/2;
-	int hh = piglit_height/2;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	glClearColor(1,1,1,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	/* Source is layered, destination is layered */
-	pass = testFramebufferBlitLayered( 0,  0, hw, hh, true,  true)  && pass;
+	pass = testFramebufferBlitLayered(0, 0, true, true) && pass;
 
 	/* Source is layered, destination is not layered */
-	pass = testFramebufferBlitLayered(hw,  0, hw, hh, true,  false) && pass;
+	pass = testFramebufferBlitLayered(2 * texWidth, 0, true, false) && pass;
 
 	/* Source not is layered, destination is layered */
-	pass = testFramebufferBlitLayered( 0, hh, hw, hh, false, true)  && pass;
+	pass = testFramebufferBlitLayered(0, texDepth * texHeight, false,
+                                        true) && pass;
 
 	/* Source not is layered, destination is not layered */
-	pass = testFramebufferBlitLayered(hw, hh, hw, hh, false, false) && pass;
+	pass = testFramebufferBlitLayered(2 * texWidth, texDepth * texHeight,
+                                        false, false) && pass;
 
 	/* Check for if any errors have occured */
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
