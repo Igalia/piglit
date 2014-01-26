@@ -66,7 +66,6 @@ PIGLIT_GL_TEST_CONFIG_END
 const int texWidth  = 32;
 const int texHeight = 32;
 const int texDepth  = 2;
-const int texelsPerLayer = 32 * 32;
 const int floatPerLayer  = 32 * 32 * 3;
 
 static const float srcColors[2][3] = {
@@ -145,12 +144,12 @@ display_texture(int x, int y, int w, int h,
 }
 
 void
-gen_color_data(float *colorData, int texelsPerLayer, int layers, bool useSrcTex)
+gen_color_data(float *colorData, int layers, bool useSrcTex)
 {
 	int i, j;
 	for (j = 0; j < layers; j++) {
-		for (i = 0; i < texelsPerLayer; i++) {
-			int offset = j * texelsPerLayer * 3 + i * 3;
+		for (i = 0; i < texWidth * texHeight; i++) {
+			int offset = j * texWidth * texHeight * 3 + i * 3;
 			if (useSrcTex) {
 				colorData[offset + 0] = srcColors[j][0];
 				colorData[offset + 1] = srcColors[j][1];
@@ -184,13 +183,13 @@ create_bind_texture(GLenum textureType, bool useSrcTex)
 	switch (textureType) {
 	case GL_TEXTURE_2D:
 		colorData = malloc(floatPerLayer * sizeof(float));
-		gen_color_data(colorData, texelsPerLayer, 1, useSrcTex);
+		gen_color_data(colorData, 1, useSrcTex);
 		glTexImage2D(textureType, 0, GL_RGB, texWidth, texHeight, 0,
 			     GL_RGB, GL_FLOAT, colorData);
 		break;
 	case GL_TEXTURE_3D:
 		colorData = malloc(texDepth * floatPerLayer * sizeof(float));
-		gen_color_data(colorData, texelsPerLayer, texDepth, useSrcTex);
+		gen_color_data(colorData, texDepth, useSrcTex);
 		glTexImage3D(textureType, 0, GL_RGB, texWidth, texHeight,
 			     texDepth, 0, GL_RGB, GL_FLOAT, colorData);
 		break;
