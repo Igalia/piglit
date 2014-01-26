@@ -207,8 +207,6 @@ testFramebufferBlitLayered(int x, int y, bool srcLayered, bool dstLayered)
 	GLuint srcFBO, dstFBO;
 	GLuint srcTex, dstTex;
 	GLenum fbStatus;
-	int srclayers = (srcLayered) ? (texDepth) : (1);
-	int dstlayers = (dstLayered) ? (texDepth) : (1);
 
 	/* Set up source fbo */
 	glGenFramebuffers(1, &srcFBO);
@@ -269,8 +267,8 @@ testFramebufferBlitLayered(int x, int y, bool srcLayered, bool dstLayered)
 			  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	/* Display the results */
-	display_texture(x, y, srcTex, srclayers);
-	display_texture(x + texWidth, y, dstTex, dstlayers);
+	display_texture(x, y, srcTex, srcLayered ? texDepth : 1);
+	display_texture(x + texWidth, y, dstTex, dstLayered ? texDepth : 1);
 
 	/* Check for pass condition */
 	if (dstLayered) {
