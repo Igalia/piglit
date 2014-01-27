@@ -1,0 +1,40 @@
+# Tests that scalar operations in different basic blocks
+# are not combined incorrectly into a vector operation.
+#
+# Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=74113
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int n;
+uniform vec2 v;
+
+attribute vec4 piglit_vertex;
+varying vec2 color;
+
+void main()
+{
+    color = vec2(0.0);
+
+    for (int i = 0; i < n; i++) {
+	color.x += v.x;
+    }
+    color.y += v.y;
+
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+varying vec2 color;
+
+void main()
+{
+  gl_FragColor = vec4(color, 0.0, 1.0);
+}
+
+[test]
+uniform int n 3
+uniform vec2 v 0.25 0.25
+draw rect -1 -1 2 2
+probe all rgba 0.75 0.25 0 1
