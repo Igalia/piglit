@@ -241,7 +241,7 @@ class ShaderTest(PlainExecTest):
         self.__command = [runner] + self.__shader_runner_args
         return self.__command
 
-    def run(self, env = Environment()):
+    def run(self, env):
         """ Parse the test file's [require] block to determine which
         executable is needed to run the test. Then run the executable on the
         test file."""

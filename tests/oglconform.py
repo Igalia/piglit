@@ -51,13 +51,13 @@ class OGLCTest(ExecTest):
     def __init__(self, category, subtest):
         ExecTest.__init__(self, [bin_oglconform, '-minFmt', '-v', '4', '-test', category, subtest])
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         if self.skip_re.search(out) is not None:
             results['result'] = 'skip'
         elif re.search('Total Passed : 1', out) is not None:
-            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
+            results['result'] = 'pass'
         else:
-            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
+            results['result'] = 'fail'
         return out
 
 # Create a new top-level 'oglconform' category

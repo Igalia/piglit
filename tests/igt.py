@@ -74,19 +74,19 @@ class IGTTest(ExecTest):
     def __init__(self, binary, arguments=[]):
         ExecTest.__init__(self, [path.join(igtTestRoot, binary)] + arguments)
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         if not igtEnvironmentOk:
             return out
 
         if returncode == 0:
-            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
+            results['result'] = 'pass'
         elif returncode == 77:
             results['result'] = 'skip'
         else:
-            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
+            results['result'] = 'fail'
         return out
+
     def run(self, env):
-        env.dmesg = True
         if not igtEnvironmentOk:
             results = TestResult()
             results['result'] = 'fail'

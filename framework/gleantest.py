@@ -41,11 +41,11 @@ class GleanTest(ExecTest):
     def command(self):
         return self._command + self.globalParams
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         if "{'result': 'skip'}" in out:
             results['result'] = 'skip'
         elif out.find('FAIL') >= 0:
-            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
+            results['result'] = 'fail'
         else:
-            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
+            results['result'] = 'pass'
         return out

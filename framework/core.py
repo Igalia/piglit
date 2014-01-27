@@ -42,6 +42,7 @@ except ImportError:
     import json
 
 import framework.status as status
+from .dmesg import get_dmesg
 from .threads import synchronized_self
 from .log import log
 
@@ -424,7 +425,7 @@ class Test(object):
     def run(self):
         raise NotImplementedError
 
-    def execute(self, env, path, json_writer):
+    def execute(self, env, path, json_writer, dmesg):
         '''
         Run the test.
 
@@ -440,8 +441,10 @@ class Test(object):
             try:
                 status("running")
                 time_start = time.time()
+                dmesg.update_dmesg()
                 self._test_hook_execute_run()
                 result = self.run(env)
+                result = dmesg.update_result(result)
                 time_end = time.time()
                 if 'time' not in result:
                     result['time'] = time_end - time_start
@@ -476,11 +479,29 @@ class Group(dict):
     pass
 
 
-class TestProfile:
+class TestProfile(object):
     def __init__(self):
         self.tests = Group()
         self.test_list = {}
         self.filters = []
+        # Sets a default of a Dummy
+        self.dmesg = False
+
+    @property
+    def dmesg(self):
+        """ Return dmesg """
+        return self.__dmesg
+
+    @dmesg.setter
+    def dmesg(self, not_dummy):
+        """ Set dmesg
+
+        Argumnts:
+        not_dummy -- if Truthy dmesg will try to get a PosixDmesg, if Falsy it
+                     will get a DummyDmesg
+
+        """
+        self.__dmesg = get_dmesg(not_dummy)
 
     def flatten_group_hierarchy(self):
         '''
@@ -544,7 +565,7 @@ class TestProfile:
 
             """
             name, test = pair
-            test.execute(env, name, json_writer)
+            test.execute(env, name, json_writer, self.dmesg)
 
         # Multiprocessing.dummy is a wrapper around Threading that provides a
         # multiprocessing compatible API

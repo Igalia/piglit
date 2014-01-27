@@ -151,6 +151,8 @@ def main():
     json_writer.write_dict_key('tests')
     json_writer.open_dict()
     time_start = time.time()
+    # Set the dmesg type
+    profile.dmesg = args.dmesg
     profile.run(env, json_writer)
     time_end = time.time()
 

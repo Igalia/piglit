@@ -35,34 +35,6 @@ else:
     PIGLIT_PLATFORM = ''
 
 
-def read_dmesg():
-    proc = subprocess.Popen(['dmesg', '-l', 'emerg,alert,crit,err,warn,notice'], stdout=subprocess.PIPE)
-    return proc.communicate()[0].rstrip('\n')
-
-def get_dmesg_diff(old, new):
-    # Note that dmesg is a ring buffer, i.e. lines at the beginning may
-    # be removed when new lines are added.
-
-    # Get the last dmesg timestamp from the old dmesg as string.
-    last = old.split('\n')[-1]
-    ts = last[:last.find(']')+1]
-    if ts == '':
-        return ''
-
-    # Find the last occurence of the timestamp.
-    pos = new.find(ts)
-    if pos == -1:
-        return new # dmesg was completely overwritten by new messages
-
-    while pos != -1:
-        start = pos
-        pos = new.find(ts, pos+len(ts))
-
-    # Find the next line and return the rest of the string.
-    nl = new.find('\n', start+len(ts))
-    return new[nl+1:] if nl != -1 else ''
-
-
 # ExecTest: A shared base class for tests that simply runs an executable.
 class ExecTest(Test):
     def __init__(self, command):
@@ -85,7 +57,7 @@ class ExecTest(Test):
             return
         self._command = value
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         raise NotImplementedError
         return out
 
@@ -111,19 +83,14 @@ class ExecTest(Test):
                                '--tool=memcheck']
 
             i = 0
-            dmesg_diff = ''
             while True:
                 if self.skip_test:
                     out = "PIGLIT: {'result': 'skip'}\n"
                     err = ""
                     returncode = None
                 else:
-                    if env.dmesg:
-                        old_dmesg = read_dmesg()
-                    (out, err, returncode) = \
-                        self.get_command_result(command, fullenv)
-                    if env.dmesg:
-                        dmesg_diff = get_dmesg_diff(old_dmesg, read_dmesg())
+                    out, err, returncode = self.get_command_result(command,
+                                                                   fullenv)
 
                 # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
                 # affecting many developers.  If we catch it
@@ -158,7 +125,7 @@ class ExecTest(Test):
                 results['result'] = 'skip'
             else:
                 results['result'] = 'fail'
-                out = self.interpretResult(out, returncode, results, dmesg_diff)
+                out = self.interpretResult(out, returncode, results)
 
             crash_codes = [
                 # Unix: terminated by a signal
@@ -202,7 +169,6 @@ class ExecTest(Test):
                                                              err, out)
             results['returncode'] = returncode
             results['command'] = ' '.join(self.command)
-            results['dmesg'] = dmesg_diff
 
         else:
             results = TestResult()
@@ -257,15 +223,10 @@ class PlainExecTest(ExecTest):
         # Prepend testBinDir to the path.
         self._command[0] = os.path.join(testBinDir, self._command[0])
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         outlines = out.split('\n')
         outpiglit = map(lambda s: s[7:],
                         filter(lambda s: s.startswith('PIGLIT:'), outlines))
-
-        if dmesg != '':
-            outpiglit = map(lambda s: s.replace("'pass'", "'dmesg-warn'"), outpiglit)
-            outpiglit = map(lambda s: s.replace("'warn'", "'dmesg-warn'"), outpiglit)
-            outpiglit = map(lambda s: s.replace("'fail'", "'dmesg-fail'"), outpiglit)
 
         if len(outpiglit) > 0:
             try:
@@ -284,4 +245,5 @@ class PlainExecTest(ExecTest):
 
         if 'result' not in results:
             results['result'] = 'fail'
+
         return out

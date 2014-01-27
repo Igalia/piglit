@@ -53,12 +53,12 @@ class GTFTest(ExecTest):
     def __init__(self, testpath):
         ExecTest.__init__(self, [path.join(testBinDir, 'GTF3'), '-minfmt', '-width=113', '-height=47', '-run=' + testpath])
 
-    def interpretResult(self, out, returncode, results, dmesg):
+    def interpretResult(self, out, returncode, results):
         mo = self.pass_re.search(out)
         if mo is not None and int(mo.group('passed')) > 0:
-            results['result'] = 'dmesg-warn' if dmesg != '' else 'pass'
+            results['result'] = 'pass'
         else:
-            results['result'] = 'dmesg-fail' if dmesg != '' else 'fail'
+            results['result'] = 'fail'
         return out
 
 def populateTests(runfile):
