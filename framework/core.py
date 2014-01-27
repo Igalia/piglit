@@ -417,6 +417,10 @@ class Test(object):
         self.runConcurrent = runConcurrent
         self.skip_test = False
 
+        # This is a hook for doing some testing on execute right before
+        # self.run is called.
+        self._test_hook_execute_run = lambda: None
+
     def run(self):
         raise NotImplementedError
 
@@ -436,6 +440,7 @@ class Test(object):
             try:
                 status("running")
                 time_start = time.time()
+                self._test_hook_execute_run()
                 result = self.run(env)
                 time_end = time.time()
                 if 'time' not in result:
