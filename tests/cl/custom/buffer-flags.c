@@ -219,7 +219,6 @@ piglit_cl_test(const int argc,
 			piglit_merge_result(&ret, part_ret);
 		}
 
-out:
 	clReleaseProgram(program);
 	piglit_cl_release_context(context);
 	return ret;
