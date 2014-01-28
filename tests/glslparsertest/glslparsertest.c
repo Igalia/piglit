@@ -122,6 +122,24 @@ get_shader_info_log_length(GLuint shader)
 	return length;
 }
 
+static char*
+get_shader_name(GLenum type)
+{
+	switch(type) {
+	case GL_VERTEX_SHADER:
+		return "vertex";
+	case GL_GEOMETRY_SHADER:
+		return "geometry";
+	case GL_FRAGMENT_SHADER:
+		return "fragment";
+	case GL_COMPUTE_SHADER:
+		return "compute";
+	default:
+		fprintf(stderr, "Unexpected type in get_shader_name()\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	return NULL;
+}
 
 /**
  * Attach a dumy shader of the given type.
@@ -295,7 +313,7 @@ test(void)
 	if (!ok) {
 		fprintf(out, "Failed to %s %s shader %s: %s\n",
 			failing_stage,
-			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
+			get_shader_name(type),
 			filename, info);
 		if (expected_pass) {
 			printf("Shader source:\n");
@@ -304,7 +322,7 @@ test(void)
 	} else {
 		fprintf(out, "Successfully %s %s shader %s: %s\n",
 			check_link ? "compiled and linked" : "compiled",
-			type == GL_FRAGMENT_SHADER ? "fragment" : "vertex",
+			get_shader_name(type),
 			filename, info);
 		if (!expected_pass) {
 			printf("Shader source:\n");
