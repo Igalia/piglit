@@ -316,7 +316,7 @@ piglit_cl_test(const int argc,
 							sprintf(test_str_read,
 							        "Data read from buffer is not the same as data written to buffer using 0x%X as memory flags",
 							        (unsigned int)mixed_mem_flags);
-							fprintf(stderr, test_str_read);
+							fprintf(stderr, "%s", test_str_read);
 
 							printf("  Device: %s\n    mem_flags: 0x%x, offset: %d, bytes: %d \n",
 							       device_name,
