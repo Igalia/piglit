@@ -112,7 +112,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	endif(GBM_FOUND)
 
 	pkg_check_modules(WAYLAND QUIET wayland-client wayland-egl)
-	if (WAYLAND_wayland-client_FOUND AND WAYLAND_wayland-egl_FOUND)
+	if (WAYLAND_FOUND)
+		set(PIGLIT_HAS_WAYLAND True)
 		add_definitions(-DPIGLIT_HAS_WAYLAND)
 	endif()
 
