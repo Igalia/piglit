@@ -215,7 +215,7 @@ piglit_cl_program_test_run(const int argc,
 		char* old = build_options;
 		build_options = malloc((strlen(old) + strlen(config->build_options) + 1) * sizeof(char));
 		strcpy(build_options, old);
-		sprintf(build_options+strlen(old), config->build_options);
+		sprintf(build_options+strlen(old), "%s", config->build_options);
 		free(old);
 	}
 	if(version > 10) {
