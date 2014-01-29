@@ -1,5 +1,6 @@
 add_subdirectory (amd_performance_monitor)
 add_subdirectory (arb_base_instance)
+add_subdirectory (arb_buffer_storage)
 add_subdirectory (arb_color_buffer_float)
 add_subdirectory (arb_compute_shader)
 add_subdirectory (arb_debug_output)

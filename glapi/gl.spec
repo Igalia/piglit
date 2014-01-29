@@ -35888,3 +35888,22 @@ DrawTextureNV(texture, sampler, x0, y0, x1, y1, z, s0, t0, s1, t1)
 	glxropcode	?
 	glxflags	ignore
 	offset		?
+
+###############################################################################
+#
+# ARB_buffer_storage commands
+#
+###############################################################################
+
+BufferStorage(target, size, data, flags)
+	return		void
+	param		target		BufferTargetARB in value
+	param		size		BufferSize in value
+	param		data		ConstVoid in array [size]
+	param		flags		GLbitfield in value
+	category	ARB_buffer_storage
+	version		4.4
+	extension
+	glxropcode	?
+	glxflags	ignore
+	offset		?

@@ -3094,6 +3094,17 @@ arb_base_instance = Group()
 spec['ARB_base_instance'] = arb_base_instance
 add_plain_test(arb_base_instance, 'arb_base_instance-baseinstance-doesnt-affect-gl-instance-id')
 
+arb_buffer_storage = Group()
+spec['ARB_buffer_storage'] = arb_buffer_storage
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw coherent')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw client-storage')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw coherent client-storage')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read coherent')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read client-storage')
+add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read coherent client-storage')
+
 apple_object_purgeable = Group()
 spec['APPLE_object_purgeable'] = apple_object_purgeable
 add_plain_test(apple_object_purgeable, 'object_purgeable-api-pbo')
