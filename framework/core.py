@@ -547,7 +547,7 @@ class TestProfile:
         # The default value of pool is the number of virtual processor cores
         single = multiprocessing.dummy.Pool(1)
         multi = multiprocessing.dummy.Pool()
-        chunksize = 50
+        chunksize = 1
 
         if env.concurrent == "all":
             multi.imap(test, self.test_list.iteritems(), chunksize)
