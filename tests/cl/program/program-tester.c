@@ -1975,7 +1975,7 @@ piglit_cl_test(const int argc,
 		test_result = test_kernel(config, env, tests[i]);
 		piglit_merge_result(&result, test_result);
 
-		piglit_report_subtest_result(test_result, tests[i].name);
+		piglit_report_subtest_result(test_result, "%s", tests[i].name);
 	}
 
 	/* Print result */
