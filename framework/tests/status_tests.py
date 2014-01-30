@@ -31,7 +31,7 @@ import framework.status as status
 # Statuses from worst to last. NotRun is intentionally not in this list and
 # tested separately because of upcoming features for it
 STATUSES = ["notrun", "pass", "dmesg-warn", "warn", "dmesg-fail", "fail",
-            "crash", "timeout"]
+            "crash"]
 
 # Create lists of fixes and regressions programmatically based on the STATUSES
 # list. This means less code, and easier expansion changes.
