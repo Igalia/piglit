@@ -70,6 +70,9 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 
 	if (piglit_get_gl_version() < 20)
 		return false;
+
+	if (!piglit_is_extension_supported("GL_ARB_framebuffer_object"))
+		return false;
 #endif
 
 	glGenFramebuffers(1, &piglit_winsys_fbo);
