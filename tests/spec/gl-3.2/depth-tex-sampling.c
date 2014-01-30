@@ -73,7 +73,9 @@ make_depth_texture(void)
 		     TEX_SIZE, TEX_SIZE, 0,
 		     format, GL_FLOAT, texels);
 
-	piglit_check_gl_error(GL_NO_ERROR);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	/* this call should generate an error in the core profile */
 	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
@@ -124,7 +126,9 @@ make_shader_program(void)
 
 	glLinkProgram(prog);
 
-	piglit_check_gl_error(GL_NO_ERROR);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	return prog;
 }
@@ -156,7 +160,9 @@ make_vao(void)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	piglit_check_gl_error(GL_NO_ERROR);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		piglit_report_result(PIGLIT_FAIL);
+	}
 
 	return vbo;
 }
