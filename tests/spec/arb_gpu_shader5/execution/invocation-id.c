@@ -104,6 +104,8 @@ piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
+	piglit_require_extension("GL_ARB_gpu_shader5");
+
 	pass = test_gs_invocations(gs_source1, 1) && pass;
 	pass = test_gs_invocations(gs_source4, 4) && pass;
 
