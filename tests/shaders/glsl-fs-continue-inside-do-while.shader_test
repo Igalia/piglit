@@ -1,0 +1,51 @@
+# From the GLSL 4.40 spec, section 6.4 (Jumps):
+#
+#     The continue jump is used only in loops. It skips the remainder
+#     of the body of the inner most loop of which it is inside. For
+#     while and do-while loops, this jump is to the next evaluation of
+#     the loop condition-expression from which the loop continues as
+#     previously defined.
+#
+# As of 1/31/2014 (commit db8b6fb), Mesa handles "continue" inside a
+# do-while loop incorrectly; instead of jumping to the loop
+# condition-expression, it jumps to the top of the loop.  This is
+# particularly problematic because it can lead to infinite loops.
+#
+# This test verifies correct behaviour of "continue" inside do-while
+# loops without risking an infinite loop.
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+  int x = 0;
+  int y = 0;
+  do {             // 1st iteration  2nd iteration  3rd iteration
+    ++x;           // x <- 1         x <- 2         x <- 3
+    if (x >= 4)    // false          false          false
+      break;
+    if (x >= 2)    // false          true           true
+      continue;
+    ++y;           // y=1            skipped        skipped
+  } while (x < 3); // true           true           false
+
+  // The "continue" should skip ++y on all iterations but the first,
+  // so y should now be 1.  The "continue" should not skip (x < 3)
+  // ever, so the loop should terminate when x == 3 (not 4).
+  if (x == 3 && y == 1)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
