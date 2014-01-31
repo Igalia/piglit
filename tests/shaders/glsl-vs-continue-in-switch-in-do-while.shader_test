@@ -1,0 +1,95 @@
+# From the GLSL 4.40 spec, section 6.4 (Jumps):
+#
+#     The continue jump is used only in loops. It skips the remainder
+#     of the body of the inner most loop of which it is inside. For
+#     while and do-while loops, this jump is to the next evaluation of
+#     the loop condition-expression from which the loop continues as
+#     previously defined.
+#
+# One way that do-while loops might be implemented is to convert them
+# to infinite loops that terminate in a conditional break (this is
+# what Mesa does).  In such an implementation, an easy way to
+# implement the proper behaviour of "continue" in a do-while loop is
+# to replicate the conditional break at the site of the "continue".
+# For example, this code:
+#
+#     do {
+#       ...
+#       if (...) {
+#         ...
+#         continue;
+#       }
+#       ...
+#     } while (condition);
+#
+# would get translated to:
+#
+#     loop {
+#       ...
+#       if (...) {
+#         ...
+#         if (!condition)
+#           break;
+#         continue;
+#       }
+#       ...
+#       if (!condition)
+#         break;
+#     }
+#
+# However, we must be careful in making this transformation if the
+# "continue" occurs inside a switch statement, since "break" inside a
+# switch statement normally exits the switch statement, not the
+# surrounding loop.
+#
+# This test verifies that "continue" behaves properly when invoked
+# inside a switch statement which is itself inside a do-while loop.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+  gl_Position = gl_Vertex;
+  int w = 0;
+  int x = 0;
+  int y = 0;
+  int z = 0;
+  do {             // 1st iteration   2nd iteration
+    ++w;           // w <- 1          w <- 2
+    switch (w) {   // Jump to case 1  Jump to case 2
+      case 1:
+        ++x;       // x <- 1
+        break;     // Jump to ++z
+      case 2:
+        continue;  //                 Jump to (w < 2)
+      case 3:
+        ++y;       // (this case is never executed)
+        break;
+    }
+    ++z;           // z <- 1          skipped
+  } while (w < 2); // true            false
+
+  // The loop should execute for two iterations, so w should be 2.  X
+  // should be incremented on the first iteration only, so it should
+  // be 1.  Y should never be incremented (since w never reaches 3),
+  // so it should be 0.  The "continue" should skip ++z on the second
+  // iteration, so z should be 1.
+  if (w == 2 && x == 1 && y == 0 && z == 1)
+    gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FrontColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+#version 130
+void main()
+{
+  gl_FragColor = gl_Color;
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
