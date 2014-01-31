@@ -1,0 +1,53 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[geometry shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+// Note: invocations = 4 is set in a separate GS (below)
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+
+void emit(vec2 v2)
+{
+  gl_Position.xy = v2;
+  gl_Position.zw = vec2(0, 1);
+  EmitVertex();
+}
+
+void main()
+{
+  int i = gl_InvocationID;
+
+  vec2 v;
+  v.x = -1.0 + float(i & 1);
+  v.y = -1.0 + float((i & 2) / 2);
+
+  if (i >= 0 && i < 4) {
+    emit(v);
+    emit(v + vec2(1, 0));
+    emit(v + vec2(0, 1));
+    emit(v + vec2(1, 1));
+    EndPrimitive();
+  }
+}
+
+[geometry shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+layout(invocations = 4) in;
+
+[fragment shader]
+void main()
+{
+  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_POINTS 0 1
+probe all rgba 0.0 1.0 0.0 1.0
