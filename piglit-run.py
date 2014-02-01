@@ -81,7 +81,7 @@ def main():
     parser.add_argument("--dmesg",
                         action="store_true",
                         help="Capture a difference in dmesg before and "
-                             "after each test")
+                             "after each test. Implies -1/--no-concurrency")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -95,6 +95,11 @@ def main():
     # Set the platform to pass to waffle
     if args.platform:
         os.environ['PIGLIT_PLATFORM'] = args.platform
+
+    # If dmesg is requested we must have serial run, this is becasue dmesg
+    # isn't reliable with threaded run
+    if args.dmesg:
+        args.concurrency = "none"
 
     # Read the config file
     if args.config_file:
