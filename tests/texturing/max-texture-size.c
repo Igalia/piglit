@@ -231,6 +231,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 	GLfloat *pixels = NULL;
 	GLenum err = GL_NO_ERROR;
 	GLboolean first_oom;
+	bool success = false;
 
 	/* Query the largest supported texture size */
 	glGetIntegerv(getMaxTarget(target), &maxSide);
@@ -257,9 +258,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		first_oom = err == GL_OUT_OF_MEMORY;
 		/* Report a GL error other than GL_OUT_OF_MEMORY */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			free(pixels);
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
+			goto out;
 		}
 
 		glTexSubImage1D(target, 0, 0, maxSide/2, GL_RGBA,
@@ -270,9 +269,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		 * INVALID_VALUE */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
 		    (!first_oom || err != GL_INVALID_VALUE)) {
-			free(pixels);
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
+			goto out;
 		}
 		break;
 
@@ -284,9 +281,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		first_oom = err == GL_OUT_OF_MEMORY;
 		/* Report a GL error other than GL_OUT_OF_MEMORY */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			free(pixels);
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
+			goto out;
 		}
 
 		glTexSubImage2D(target, 0, 0, 0, maxSide/2, maxSide/2,
@@ -297,9 +292,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		 * INVALID_VALUE */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
 		    (!first_oom || err != GL_INVALID_VALUE)) {
-			free(pixels);
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
+			goto out;
 		}
 		break;
 
@@ -310,9 +303,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		err = glGetError();
 		/* Report a GL error other than GL_OUT_OF_MEMORY */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			free(pixels);
-			return false;
+			goto out;
 		}
 		break;
 
@@ -325,9 +316,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		first_oom = err == GL_OUT_OF_MEMORY;
 		/* Report a GL error other than GL_OUT_OF_MEMORY */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			free(pixels);
-			return false;
+			goto out;
 		}
 
 		glTexSubImage3D(target, 0, 0, 0, 0, maxSide/2,
@@ -338,9 +327,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		 * INVALID_VALUE */
 		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
 		    (!first_oom || err != GL_INVALID_VALUE)) {
-			free(pixels);
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
+			goto out;
 		}
 		break;
 
@@ -355,11 +342,8 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 			err = glGetError();
 			first_oom = first_oom || err == GL_OUT_OF_MEMORY;
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				free(pixels);
-				return false;
-			}
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY)
+				goto out;
 		}
 
 		for (k = 0; k < 6; k++) {
@@ -370,25 +354,30 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 
 			err = glGetError();
 			if (err == GL_OUT_OF_MEMORY) {
-				free(pixels);
-				return true;
+				success = true;
+				goto out;
 			}
 
 			/* Report a GL error other than GL_OUT_OF_MEMORY and
 			 * INVALID_VALUE */
 			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
 			    (!first_oom || err != GL_INVALID_VALUE)) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				free(pixels);
-				return false;
+				goto out;
 			}
 		}
 		break;
 	}
-	if (pixels)
-		free(pixels);
-	/* If execution reaches this point, return true */
-	return true;
+
+	/* Apparently we succeeded. */
+	success = true;
+
+out:
+	if (!success)
+		printf("Unexpected GL error: 0x%x\n", err);
+
+	free(pixels);
+	return success;
+
 }
 
 static bool
