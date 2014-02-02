@@ -227,11 +227,17 @@ test_proxy_texture_size(GLenum target, GLenum internalformat)
 static bool
 test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 {
+	GLuint tex;
 	int maxSide, k;
 	GLfloat *pixels = NULL;
 	GLenum err = GL_NO_ERROR;
 	GLboolean first_oom;
 	bool success = false;
+
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Query the largest supported texture size */
 	glGetIntegerv(getMaxTarget(target), &maxSide);
@@ -375,6 +381,7 @@ out:
 	if (!success)
 		printf("Unexpected GL error: 0x%x\n", err);
 
+	glDeleteTextures(1, &tex);
 	free(pixels);
 	return success;
 
@@ -392,24 +399,11 @@ ValidateTexSize(GLenum target, GLenum internalformat, bool useProxy)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint tex;
 	GLboolean pass = true;
 	int i, j, useProxy;
 
 	for (useProxy = 1; useProxy >= 0; useProxy--) {
 		for (i = 0; i < ARRAY_SIZE(target); i++) {
-
-			if (!useProxy) {
-				glGenTextures(1, &tex);
-				glBindTexture(target[i], tex);
-				glTexParameteri(target[i],
-						GL_TEXTURE_MIN_FILTER,
-						GL_NEAREST);
-				glTexParameteri(target[i],
-						GL_TEXTURE_MAG_FILTER,
-						GL_NEAREST);
-			}
-
 			for (j = 0; j < ARRAY_SIZE(internalformat); j++) {
 				/* Skip floating point formats if
 				 * GL_ARB_texture_float is not supported
@@ -425,9 +419,6 @@ piglit_init(int argc, char **argv)
 							 useProxy)
 					&& pass;
 			}
-
-			if (!useProxy)
-				glDeleteTextures(1, &tex);
 		}
 	}
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
