@@ -334,11 +334,8 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 				     GL_FLOAT, NULL);
 
 			err = glGetError();
-			if (err == GL_OUT_OF_MEMORY)
-				return true;
-
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR) {
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 				printf("Unexpected GL error: 0x%x\n", err);
 				return false;
 			}
