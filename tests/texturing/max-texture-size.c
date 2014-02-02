@@ -160,8 +160,99 @@ initTexData (GLenum target, int sideLength)
 	return ((GLfloat *) calloc(nPixels * COLOR_COMPONENTS, sizeof(float)));
 }
 
-static GLboolean
-ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
+static bool
+test_proxy_texture_size(GLenum target, GLenum internalformat)
+{
+	int maxSide;
+	GLenum err = GL_NO_ERROR;
+
+	/* Query the largest supported texture size */
+	glGetIntegerv(getMaxTarget(target), &maxSide);
+
+	/* Compute largest supported texture size using proxy textures */
+	while (isValidTexSize(target, internalformat, maxSide))
+		maxSide *= 2;
+	/* First unsupported size */
+	while (!isValidTexSize(target, internalformat, maxSide))
+		maxSide /= 2;
+	while (isValidTexSize(target, internalformat, maxSide))
+		maxSide += 1;
+	/* Last supported texture size */
+	maxSide -= 1;
+	printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
+	       piglit_get_gl_enum_name(getProxyTarget(target)),
+	       piglit_get_gl_enum_name(internalformat),
+	       maxSide);
+
+	switch (target) {
+	case GL_TEXTURE_1D:
+		glTexImage1D(GL_PROXY_TEXTURE_1D, 0, internalformat,
+			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
+		}
+		break;
+
+	case GL_TEXTURE_2D:
+		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, internalformat,
+			     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
+			     NULL);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
+		}
+		break;
+
+	case GL_TEXTURE_RECTANGLE:
+		glTexImage2D(target, 0, internalformat, maxSide,
+			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
+		}
+		break;
+
+	case GL_TEXTURE_3D:
+		glTexImage3D(GL_PROXY_TEXTURE_3D, 0, internalformat,
+			     maxSide, maxSide, maxSide, 0, GL_RGBA,
+			     GL_FLOAT, NULL);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
+		}
+		break;
+
+	case GL_TEXTURE_CUBE_MAP:
+		glTexImage2D(GL_PROXY_TEXTURE_CUBE_MAP, 0,
+			     internalformat, maxSide, maxSide, 0,
+			     GL_RGBA, GL_FLOAT, NULL);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
+		}
+		break;
+	}
+	return true;
+}
+
+static bool
+test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 {
 	int maxSide, k;
 	GLfloat *pixels = NULL;
@@ -171,117 +262,71 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 	/* Query the largest supported texture size */
 	glGetIntegerv(getMaxTarget(target), &maxSide);
 
-	if (!useProxy) {
-		printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
-                       piglit_get_gl_enum_name(target),
-		       piglit_get_gl_enum_name(internalformat),
-		       maxSide);
-		/* Allocate and initialize texture data array */
-		pixels = initTexData(target, maxSide);
+	printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
+	       piglit_get_gl_enum_name(target),
+	       piglit_get_gl_enum_name(internalformat),
+	       maxSide);
+	/* Allocate and initialize texture data array */
+	pixels = initTexData(target, maxSide);
 
-		if (pixels == NULL) {
-			printf("Error allocating texture data array for target %s, size %d\n",
-			       piglit_get_gl_enum_name(target), maxSide);
-			piglit_report_result(PIGLIT_SKIP);
-		}
-	}
-	else {
-		/* Compute largest supported texture size using proxy textures */
-		while (isValidTexSize(target, internalformat, maxSide))
-			maxSide *= 2;
-		/* First unsupported size */
-		while (!isValidTexSize(target, internalformat, maxSide))
-			maxSide /= 2;
-		while (isValidTexSize(target, internalformat, maxSide))
-			maxSide += 1;
-		/* Last supported texture size */
-		maxSide -= 1;
-		printf("%s, Internal Format = %s, Largest Texture Size = %d\n",
-                       piglit_get_gl_enum_name(getProxyTarget(target)),
-		       piglit_get_gl_enum_name(internalformat),
-		       maxSide);
+	if (pixels == NULL) {
+		printf("Error allocating texture data array for target %s, size %d\n",
+		       piglit_get_gl_enum_name(target), maxSide);
+		piglit_report_result(PIGLIT_SKIP);
 	}
 
 	switch (target) {
 	case GL_TEXTURE_1D:
-		if (!useProxy) {
-			glTexImage1D(target, 0, internalformat, maxSide,
-				     0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage1D(target, 0, internalformat, maxSide,
+			     0, GL_RGBA, GL_FLOAT, NULL);
 
-			err = glGetError();
-			first_oom = err == GL_OUT_OF_MEMORY;
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				free(pixels);
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
-
-			glTexSubImage1D(target, 0, 0, maxSide/2, GL_RGBA,
-					GL_FLOAT, pixels);
-
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY and
-                         * INVALID_VALUE */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
-                            (!first_oom || err != GL_INVALID_VALUE)) {
-				free(pixels);
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		err = glGetError();
+		first_oom = err == GL_OUT_OF_MEMORY;
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			free(pixels);
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
 		}
-		else {
-			glTexImage1D(GL_PROXY_TEXTURE_1D, 0, internalformat,
-				     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		glTexSubImage1D(target, 0, 0, maxSide/2, GL_RGBA,
+				GL_FLOAT, pixels);
+
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY and
+		 * INVALID_VALUE */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+		    (!first_oom || err != GL_INVALID_VALUE)) {
+			free(pixels);
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
 		}
 		break;
 
 	case GL_TEXTURE_2D:
-		if (!useProxy) {
-			glTexImage2D(target, 0, internalformat, maxSide,
-				     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(target, 0, internalformat, maxSide,
+			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 
-			err = glGetError();
-			first_oom = err == GL_OUT_OF_MEMORY;
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				free(pixels);
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
-
-			glTexSubImage2D(target, 0, 0, 0, maxSide/2, maxSide/2,
-					GL_RGBA, GL_FLOAT, pixels);
-
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY and
-                         * INVALID_VALUE */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
-                            (!first_oom || err != GL_INVALID_VALUE)) {
-				free(pixels);
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		err = glGetError();
+		first_oom = err == GL_OUT_OF_MEMORY;
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			free(pixels);
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
 		}
 
-		else {
-			glTexImage2D(GL_PROXY_TEXTURE_2D, 0, internalformat,
-				     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
-				     NULL);
+		glTexSubImage2D(target, 0, 0, 0, maxSide/2, maxSide/2,
+				GL_RGBA, GL_FLOAT, pixels);
 
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY and
+		 * INVALID_VALUE */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+		    (!first_oom || err != GL_INVALID_VALUE)) {
+			free(pixels);
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
 		}
 		break;
 
@@ -299,99 +344,69 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 		break;
 
 	case GL_TEXTURE_3D:
-		//printf("Width = %d, Height = %d, Depth =  %d\n", maxSide,
-		//       maxSide, maxSide);
-		if (!useProxy) {
-			glTexImage3D(target, 0, internalformat, maxSide,
-				     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
-				     NULL);
+		glTexImage3D(target, 0, internalformat, maxSide,
+			     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
+			     NULL);
 
-			err = glGetError();
-			first_oom = err == GL_OUT_OF_MEMORY;
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				free(pixels);
-				return false;
-			}
-
-			glTexSubImage3D(target, 0, 0, 0, 0, maxSide/2,
-					maxSide/2, maxSide/2, GL_RGBA,
-					GL_FLOAT, pixels);
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY and
-                         * INVALID_VALUE */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
-                            (!first_oom || err != GL_INVALID_VALUE)) {
-				free(pixels);
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		err = glGetError();
+		first_oom = err == GL_OUT_OF_MEMORY;
+		/* Report a GL error other than GL_OUT_OF_MEMORY */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+			printf("Unexpected GL error: 0x%x\n", err);
+			free(pixels);
+			return false;
 		}
-		else {
-			glTexImage3D(GL_PROXY_TEXTURE_3D, 0, internalformat,
-				     maxSide, maxSide, maxSide, 0, GL_RGBA,
-				     GL_FLOAT, NULL);
 
-			err = glGetError();
-			/* Report a GL error other than GL_OUT_OF_MEMORY */
-			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-				printf("Unexpected GL error: 0x%x\n", err);
-				return false;
-			}
+		glTexSubImage3D(target, 0, 0, 0, 0, maxSide/2,
+				maxSide/2, maxSide/2, GL_RGBA,
+				GL_FLOAT, pixels);
+		err = glGetError();
+		/* Report a GL error other than GL_OUT_OF_MEMORY and
+		 * INVALID_VALUE */
+		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+		    (!first_oom || err != GL_INVALID_VALUE)) {
+			free(pixels);
+			printf("Unexpected GL error: 0x%x\n", err);
+			return false;
 		}
 		break;
 
 	case GL_TEXTURE_CUBE_MAP_ARB:
-		if (!useProxy) {
-			first_oom = GL_FALSE;
-			for (k = 0; k < 6; k++) {
-				glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
-				0, internalformat, maxSide, maxSide, 0,
-				GL_RGBA, GL_FLOAT, NULL);
-
-				err = glGetError();
-				first_oom = first_oom || err == GL_OUT_OF_MEMORY;
-				/* Report a GL error other than GL_OUT_OF_MEMORY */
-				if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-					printf("Unexpected GL error: 0x%x\n", err);
-					free(pixels);
-					return false;
-				}
-			}
-
-			for (k = 0; k < 6; k++) {
-				glTexSubImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
-				0, 0, 0, maxSide/2, maxSide/2, GL_RGBA,
-				GL_FLOAT, pixels);
-
-				err = glGetError();
-				if (err == GL_OUT_OF_MEMORY) {
-					free(pixels);
-					return true;
-				}
-
-				/* Report a GL error other than GL_OUT_OF_MEMORY and
-                                 * INVALID_VALUE */
-				if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
-                                    (!first_oom || err != GL_INVALID_VALUE)) {
-					printf("Unexpected GL error: 0x%x\n", err);
-					free(pixels);
-					return false;
-				}
-			}
-		}
-		else {
-			glTexImage2D(GL_PROXY_TEXTURE_CUBE_MAP, 0,
-			internalformat, maxSide, maxSide, 0,
+		first_oom = GL_FALSE;
+		for (k = 0; k < 6; k++) {
+			glTexImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
+			0, internalformat, maxSide, maxSide, 0,
 			GL_RGBA, GL_FLOAT, NULL);
 
 			err = glGetError();
+			first_oom = first_oom || err == GL_OUT_OF_MEMORY;
 			/* Report a GL error other than GL_OUT_OF_MEMORY */
 			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 				printf("Unexpected GL error: 0x%x\n", err);
+				free(pixels);
+				return false;
+			}
+		}
+
+		for (k = 0; k < 6; k++) {
+			glTexSubImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
+			0, 0, 0, maxSide/2, maxSide/2, GL_RGBA,
+			GL_FLOAT, pixels);
+
+			err = glGetError();
+			if (err == GL_OUT_OF_MEMORY) {
+				free(pixels);
+				return true;
+			}
+
+			/* Report a GL error other than GL_OUT_OF_MEMORY and
+			 * INVALID_VALUE */
+			if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY &&
+			    (!first_oom || err != GL_INVALID_VALUE)) {
+				printf("Unexpected GL error: 0x%x\n", err);
+				free(pixels);
 				return false;
 			}
 		}
@@ -401,6 +416,15 @@ ValidateTexSize (GLenum target,  GLenum internalformat, bool useProxy)
 		free(pixels);
 	/* If execution reaches this point, return true */
 	return true;
+}
+
+static bool
+ValidateTexSize(GLenum target, GLenum internalformat, bool useProxy)
+{
+	if (useProxy)
+		return test_proxy_texture_size(target, internalformat);
+	else
+		return test_non_proxy_texture_size(target, internalformat);
 }
 
 void
