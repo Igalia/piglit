@@ -1732,6 +1732,7 @@ for stage in ['vs', 'fs']:
             arb_gpu_shader5[testname] = concurrent_test(cmd)
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-minmax')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocation-id')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocations_count_too_large')
 
 arb_texture_query_levels = Group()
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
