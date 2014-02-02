@@ -388,39 +388,31 @@ out:
 }
 
 static bool
-ValidateTexSize(GLenum target, GLenum internalformat, bool useProxy)
+for_targets_and_formats(bool(*test)(GLenum, GLenum))
 {
-	if (useProxy)
-		return test_proxy_texture_size(target, internalformat);
-	else
-		return test_non_proxy_texture_size(target, internalformat);
+	bool pass = true;
+	int i, j;
+	for (i = 0; i < ARRAY_SIZE(target); i++) {
+		for (j = 0; j < ARRAY_SIZE(internalformat); j++) {
+			/* Skip floating point formats if
+			 * GL_ARB_texture_float is not supported
+			 */
+			if ((internalformat[j] == GL_RGBA16F ||
+			    internalformat[j] == GL_RGBA32F) &&
+			    !piglit_is_extension_supported("GL_ARB_texture_float"))
+				continue;
+			 pass = test(target[i], internalformat[j]) && pass;
+		}
+	}
+	return pass;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	GLboolean pass = true;
-	int i, j, useProxy;
+	bool pass = for_targets_and_formats(test_proxy_texture_size) &&
+		    for_targets_and_formats(test_non_proxy_texture_size);
 
-	for (useProxy = 1; useProxy >= 0; useProxy--) {
-		for (i = 0; i < ARRAY_SIZE(target); i++) {
-			for (j = 0; j < ARRAY_SIZE(internalformat); j++) {
-				/* Skip floating point formats if
-				 * GL_ARB_texture_float is not supported
-				 */
-				if ((internalformat[j] == GL_RGBA16F ||
-				    internalformat[j] == GL_RGBA32F) &&
-				    !piglit_is_extension_supported(
-				    "GL_ARB_texture_float"))
-					continue;
-				/* Test using proxy textures */
-				 pass = ValidateTexSize (target[i],
-							 internalformat[j],
-							 useProxy)
-					&& pass;
-			}
-		}
-	}
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
 
