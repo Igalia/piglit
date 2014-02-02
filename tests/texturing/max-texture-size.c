@@ -160,10 +160,11 @@ initTexData (GLenum target, int sideLength)
 	return ((GLfloat *) calloc(nPixels * COLOR_COMPONENTS, sizeof(float)));
 }
 
-static bool
+static void
 test_proxy_texture_size(GLenum target, GLenum internalformat)
 {
 	int maxSide;
+	enum piglit_result result;
 	GLenum err = GL_NO_ERROR;
 
 	/* Query the largest supported texture size */
@@ -218,13 +219,17 @@ test_proxy_texture_size(GLenum target, GLenum internalformat)
 	/* Report a GL error other than GL_OUT_OF_MEMORY */
 	if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
 		printf("Unexpected GL error: 0x%x\n", err);
-		return false;
+		result = PIGLIT_FAIL;
+	} else {
+		result = PIGLIT_PASS;
 	}
 
-	return true;
+	piglit_report_subtest_result(result, "%s-%s",
+				     piglit_get_gl_enum_name(getProxyTarget(target)),
+				     piglit_get_gl_enum_name(internalformat));
 }
 
-static bool
+static void
 test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 {
 	GLuint tex;
@@ -232,7 +237,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 	GLfloat *pixels = NULL;
 	GLenum err = GL_NO_ERROR;
 	GLboolean first_oom;
-	bool success = false;
+	enum piglit_result result = PIGLIT_FAIL;
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
@@ -252,7 +257,8 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 	if (pixels == NULL) {
 		printf("Error allocating texture data array for target %s, size %d\n",
 		       piglit_get_gl_enum_name(target), maxSide);
-		piglit_report_result(PIGLIT_SKIP);
+		result = PIGLIT_SKIP;
+		goto out;
 	}
 
 	switch (target) {
@@ -360,7 +366,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 
 			err = glGetError();
 			if (err == GL_OUT_OF_MEMORY) {
-				success = true;
+				result = PIGLIT_PASS;
 				goto out;
 			}
 
@@ -375,22 +381,23 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 	}
 
 	/* Apparently we succeeded. */
-	success = true;
+	result = PIGLIT_PASS;
 
 out:
-	if (!success)
+	if (result == PIGLIT_FAIL)
 		printf("Unexpected GL error: 0x%x\n", err);
 
 	glDeleteTextures(1, &tex);
 	free(pixels);
-	return success;
 
+	piglit_report_subtest_result(result, "%s-%s",
+				     piglit_get_gl_enum_name(target),
+				     piglit_get_gl_enum_name(internalformat));
 }
 
-static bool
-for_targets_and_formats(bool(*test)(GLenum, GLenum))
+static void
+for_targets_and_formats(void(*test)(GLenum, GLenum))
 {
-	bool pass = true;
 	int i, j;
 	for (i = 0; i < ARRAY_SIZE(target); i++) {
 		for (j = 0; j < ARRAY_SIZE(internalformat); j++) {
@@ -401,19 +408,17 @@ for_targets_and_formats(bool(*test)(GLenum, GLenum))
 			    internalformat[j] == GL_RGBA32F) &&
 			    !piglit_is_extension_supported("GL_ARB_texture_float"))
 				continue;
-			 pass = test(target[i], internalformat[j]) && pass;
+			 test(target[i], internalformat[j]);
 		}
 	}
-	return pass;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass = for_targets_and_formats(test_proxy_texture_size) &&
-		    for_targets_and_formats(test_non_proxy_texture_size);
-
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
+	for_targets_and_formats(test_proxy_texture_size);
+	for_targets_and_formats(test_non_proxy_texture_size);
+	exit(0);
 }
 
 enum piglit_result
