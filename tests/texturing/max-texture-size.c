@@ -265,7 +265,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 	       piglit_get_gl_enum_name(internalformat),
 	       maxSide);
 	/* Allocate and initialize texture data array */
-	pixels = initTexData(target, maxSide);
+	pixels = initTexData(target, maxSide/2);
 
 	if (pixels == NULL) {
 		printf("Error allocating texture data array for target %s, size %d\n",
