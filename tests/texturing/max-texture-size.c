@@ -137,20 +137,17 @@ isValidTexSize(GLenum target, GLenum internalFormat, int sideLength)
 }
 
 static GLfloat *
-initTexData (GLenum target, int sideLength)
+initTexData(GLenum target, uint64_t sideLength)
 {
 	uint64_t nPixels;
 	if (target == GL_TEXTURE_1D)
-		nPixels = (uint64_t)(sideLength);
+		nPixels = sideLength;
 	else if (target == GL_TEXTURE_2D ||
 		 target == GL_TEXTURE_RECTANGLE ||
 		 target == GL_TEXTURE_CUBE_MAP)
-		nPixels = (uint64_t)(sideLength) *
-			  (uint64_t)(sideLength);
+		nPixels = sideLength * sideLength;
 	else if (target == GL_TEXTURE_3D)
-		nPixels = (uint64_t)(sideLength) *
-			  (uint64_t)(sideLength) *
-			  (uint64_t)(sideLength);
+		nPixels = sideLength * sideLength * sideLength;
 	else {
 		assert(!"Unexpected target");
 		return NULL;
