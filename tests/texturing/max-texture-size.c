@@ -188,66 +188,39 @@ test_proxy_texture_size(GLenum target, GLenum internalformat)
 	case GL_TEXTURE_1D:
 		glTexImage1D(GL_PROXY_TEXTURE_1D, 0, internalformat,
 			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
-
-		err = glGetError();
-		/* Report a GL error other than GL_OUT_OF_MEMORY */
-		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
-		}
 		break;
 
 	case GL_TEXTURE_2D:
 		glTexImage2D(GL_PROXY_TEXTURE_2D, 0, internalformat,
 			     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT,
 			     NULL);
-
-		err = glGetError();
-		/* Report a GL error other than GL_OUT_OF_MEMORY */
-		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
-		}
 		break;
 
 	case GL_TEXTURE_RECTANGLE:
 		glTexImage2D(target, 0, internalformat, maxSide,
 			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
-
-		err = glGetError();
-		/* Report a GL error other than GL_OUT_OF_MEMORY */
-		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
-		}
 		break;
 
 	case GL_TEXTURE_3D:
 		glTexImage3D(GL_PROXY_TEXTURE_3D, 0, internalformat,
 			     maxSide, maxSide, maxSide, 0, GL_RGBA,
 			     GL_FLOAT, NULL);
-
-		err = glGetError();
-		/* Report a GL error other than GL_OUT_OF_MEMORY */
-		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
-		}
 		break;
 
 	case GL_TEXTURE_CUBE_MAP:
 		glTexImage2D(GL_PROXY_TEXTURE_CUBE_MAP, 0,
 			     internalformat, maxSide, maxSide, 0,
 			     GL_RGBA, GL_FLOAT, NULL);
-
-		err = glGetError();
-		/* Report a GL error other than GL_OUT_OF_MEMORY */
-		if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
-			printf("Unexpected GL error: 0x%x\n", err);
-			return false;
-		}
 		break;
 	}
+
+	err = glGetError();
+	/* Report a GL error other than GL_OUT_OF_MEMORY */
+	if (err != GL_NO_ERROR && err != GL_OUT_OF_MEMORY) {
+		printf("Unexpected GL error: 0x%x\n", err);
+		return false;
+	}
+
 	return true;
 }
 
