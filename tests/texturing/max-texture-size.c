@@ -58,13 +58,13 @@ static const GLenum target[] = {
 	GL_TEXTURE_RECTANGLE,
 	GL_TEXTURE_CUBE_MAP,
 	GL_TEXTURE_3D,
-	};
+};
 
 static const GLenum internalformat[] = {
 	GL_RGBA8,
 	GL_RGBA16,
 	GL_RGBA32F,
-	};
+};
 
 static GLenum
 getMaxTarget(GLenum target)
@@ -312,19 +312,17 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 
 	case GL_TEXTURE_CUBE_MAP_ARB:
 		for (k = 0; k < 6; k++) {
-			glTexImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
-			0, internalformat, maxSide, maxSide, 0,
-			GL_RGBA, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
+				     0, internalformat, maxSide, maxSide, 0,
+				     GL_RGBA, GL_FLOAT, NULL);
 
 			STOP_ON_ERRORS;
 		}
 
 		for (k = 0; k < 6; k++) {
-			glTexSubImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
-			0, 0, 0, maxSide/2, maxSide/2, GL_RGBA,
-			GL_FLOAT, pixels);
+			glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + k,
+					0, 0, 0, maxSide/2, maxSide/2, GL_RGBA,
+					GL_FLOAT, pixels);
 
 			STOP_ON_ERRORS;
 		}
