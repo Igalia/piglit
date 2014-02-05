@@ -154,3 +154,5 @@ multiTests = listTests("list-multi-tests")
 
 for test in multiTests:
     addSubTestCases(test)
+
+profile.dmesg = True

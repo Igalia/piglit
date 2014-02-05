@@ -75,7 +75,9 @@ def main():
         env.exclude_tests.add(key)
     
     profile = core.merge_test_profiles(results.options['profile'])
-    profile.dmesg = env.dmesg
+    if env.dmesg:
+        profile.dmesg = env.dmesg
+
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(env, json_writer)
 
