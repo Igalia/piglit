@@ -28,17 +28,20 @@ import framework.tests.utils as utils
 
 def test_initialize_shader_test():
     """ Test that ShaderTest initializes """
-    test = shader_test.ShaderTest(['loopfunc.shader_test'])
-    assert test
+    shader_test.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
 
 
-@nt.raises(AssertionError)
 def test_parse_gl_test_no_decimal():
     """ The GL Parser raises an exception if GL version lacks decimal """
     data = ('[require]\n'
             'GL = 2\n')
     with utils.with_tempfile(data) as temp:
-        test = shader_test.ShaderTest([temp])
+        with nt.assert_raises(shader_test.ShaderTestParserException) as exc:
+            shader_test.ShaderTest(temp)
+            nt.assert_equal(exc.exception, "No GL version set",
+                            msg="A GL version was passed without a decimal, "
+                                "which should have raised an exception, but "
+                                "did not")
 
 
 def test_parse_gles2_test():
@@ -47,7 +50,7 @@ def test_parse_gles2_test():
             'GL ES >= 2.0\n'
             'GLSL ES >= 1.00\n')
     with utils.with_tempfile(data) as temp:
-        test = shader_test.ShaderTest([temp])
+        test = shader_test.ShaderTest(temp)
 
     nt.assert_equal(
         os.path.basename(test.command[0]), "shader_runner_gles2",
@@ -61,7 +64,7 @@ def test_parse_gles3_test():
             'GL ES >= 3.0\n'
             'GLSL ES >= 3.00\n')
     with utils.with_tempfile(data) as temp:
-        test = shader_test.ShaderTest([temp])
+        test = shader_test.ShaderTest(temp)
 
     nt.assert_equal(
         os.path.basename(test.command[0]), "shader_runner_gles3",

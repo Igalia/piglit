@@ -233,8 +233,7 @@ def test_testclasses_dmesg():
 
     lists = [(PlainExecTest, ['attribs', '-auto', '-fbo'], 'PlainExecTest'),
              (GleanTest, 'basic', "GleanTest"),
-             (ShaderTest,
-              ['tests/shaders/loopfunc.shader_test', '-auto', '-fbo'],
+             (ShaderTest, 'tests/shaders/loopfunc.shader_test',
               'ShaderTest'),
              (GLSLParserTest, 'tests/glslparsertest/shaders/main1.vert',
               'GLSLParserTest')]
