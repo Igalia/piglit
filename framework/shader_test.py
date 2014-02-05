@@ -1,6 +1,4 @@
-#!/usr/bin/env python2
-
-# Copyright (C) 2012 Intel Corporation
+# Copyright (C) 2012, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,38 +21,14 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-from __future__ import print_function
+""" This module enables running shader tests. """
+
 import os
 import os.path as path
 import re
-import sys
-import textwrap
 
-from .core import testBinDir, Group, Test, TestResult, Environment
+from .core import testBinDir, Group, Test, TestResult
 from .exectest import PlainExecTest
-
-"""This module enables running shader tests.
-
-This module can be used to add shader tests to a Piglit test group or to run
-standalone shader tests on the command line. To add shader tests to a Piglit
-test group, use ``add_shader_test()`` or ``add_shader_test_dir()``. To run
-a single standalone test, execute ``shader_test.py FILENAME``.
-"""
-
-_PROGNAME = "shader_test.py"
-
-_HELP_TEXT = textwrap.dedent("""\
-    NAME
-        {progname} - run a shader test
-
-    SYNOPSIS
-        {progname} <filename> <extra_args>
-
-    DESCRIPTION
-        This script runs shader tests. Typically, the filename extension for
-        shader tests is ".shader_test". The extra_args are passed verbatim to
-        the shader_runner executable.
-    """.format(progname=_PROGNAME))
 
 
 def add_shader_test(group, testname, filepath):
@@ -124,16 +98,13 @@ class ShaderTest(PlainExecTest):
                                     '\s*{comment}?$'.format(**common))
         cls.__re_gl_unknown = re.compile(r'^\s*GL\s*{cmp}'.format(**common))
 
-    def __init__(self, shader_runner_args, run_standalone=False):
-        """run_standalone: Run the test outside the Python framework."""
-
+    def __init__(self, shader_runner_args):
         Test.__init__(self, runConcurrent=True)
 
         assert(isinstance(shader_runner_args, list))
         assert(isinstance(shader_runner_args[0], str) or
                isinstance(shader_runner_args[0], unicode))
 
-        self.__run_standalone = run_standalone
         self.__shader_runner_args = shader_runner_args
         self.__test_filepath = shader_runner_args[0]
         self.__result = None
@@ -143,14 +114,10 @@ class ShaderTest(PlainExecTest):
         self.env = {}
 
     def __report_failure(self, message):
-        if self.__run_standalone:
-            print("error: " + message)
-            sys.exit(1)
-        else:
-            assert(self.__result is None)
-            self.__result = TestResult()
-            self.__result["result"] = "fail"
-            self.__result["errors"] = [message]
+        assert(self.__result is None)
+        self.__result = TestResult()
+        self.__result["result"] = "fail"
+        self.__result["errors"] = [message]
 
     def __parse_test_file(self):
         self.__set_gl_api()
@@ -250,30 +217,9 @@ class ShaderTest(PlainExecTest):
         # Parse the test file to discover any errors.
         self.__parse_test_file()
 
-        if self.__run_standalone:
-            os.execv(self.command[0], self.command)
-        else:
-            if self.__result is not None:
-                # We've already decided the test result, most likely because
-                # parsing the test file discovered an error.
-                return self.__result
+        if self.__result is not None:
+            # We've already decided the test result, most likely because
+            # parsing the test file discovered an error.
+            return self.__result
 
-            return PlainExecTest.run(self, env)
-
-
-def _usage_error():
-    sys.stdout.write("usage error: {0}\n\n".format(_PROGNAME))
-    sys.stdout.write(_HELP_TEXT)
-    sys.exit(1)
-
-
-def _main(args):
-    if len(sys.argv) < 2:
-        _usage_error()
-
-    test = ShaderTest(sys.argv[1:], run_standalone=True)
-    test.run()
-
-
-if __name__ == "__main__":
-    _main(sys.argv)
+        return PlainExecTest.run(self, env)
