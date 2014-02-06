@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
 # files (the "Software"), to deal in the Software without
@@ -21,22 +19,12 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-"""This module enables the running of GLSL parser tests.
-
-This module can be used to add parser tests to a Piglit test group or to run
-standalone tests on the command line. To add a test to a Piglit group, us
-``add_glsl_parser_test()``. To run a single standalone test, execute
-``glsl_parser_test.py TEST_FILE``.
-"""
-
-usage_message = "usage: glsl_parser_test.py TEST_FILE"
+""" This module enables the running of GLSL parser tests. """
 
 import ConfigParser
 import os
 import os.path as path
 import re
-import subprocess
-import sys
 from cStringIO import StringIO
 
 from .core import Test, testBinDir, TestResult
@@ -343,19 +331,6 @@ class GLSLParserTest(PlainExecTest):
                     "See the docstring in file '{0}'".format(__file__)
                 return
 
-    def run_standalone(self):
-        """Run the test as a standalone process outside of Piglit."""
-        if self.result is not None:
-            sys.stdout.write(self.result)
-            sys.exit(1)
-
-        assert(self.command is not None)
-        env = os.environ.copy()
-        for e in self.env:
-            env[e] = str(self.env[e])
-        p = subprocess.Popen(self.command, env=env)
-        p.communicate()
-
     @property
     def config(self):
         if self.__config is None:
@@ -392,11 +367,3 @@ class GLSLParserTest(PlainExecTest):
     @property
     def env(self):
         return dict()
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        sys.stderr.write("{0}: usage error\n\n".format(sys.argv[0]))
-        sys.stderr.write(usage_message)
-    test_file = sys.argv[1]
-    test = GLSLParserTest(test_file)
-    test.run_standalone()
