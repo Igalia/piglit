@@ -41,7 +41,7 @@ draw(Display *dpy)
 
 	if (!glXGetMscRateOML(dpy, win, &numerator, &denominator)) {
 		printf("glXGetMscRateOML returned failure.\n");
-		return PIGLIT_FAIL;
+		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	if (numerator == 0xDEADBEEF) {
