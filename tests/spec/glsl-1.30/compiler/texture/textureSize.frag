@@ -1,7 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.30
-// [end_config]
+// [end config]
 
 #version 130
 

@@ -2,7 +2,7 @@
  * [config]
  * glsl_version: 1.20
  * expect_result: pass
- * [end_config]
+ * [end config]
  *
  * Test that implicit type conversion of out parameters is properly
  * used to match function calls to callees.
