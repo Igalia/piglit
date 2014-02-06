@@ -1070,6 +1070,18 @@ gl31['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-requi
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 31')
 
+gl32 = Group()
+spec['!OpenGL 3.2'] = gl32
+add_concurrent_test(gl32, 'glsl-resource-not-bound 1D')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 2D')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 3D')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 2DRect')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 1DArray')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 2DArray')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 2DMS')
+add_concurrent_test(gl32, 'glsl-resource-not-bound 2DMSArray')
+add_concurrent_test(gl32, 'glsl-resource-not-bound Buffer')
+add_concurrent_test(gl32, 'glsl-resource-not-bound Cube')
 spec['!OpenGL 3.2/minmax'] = concurrent_test('gl-3.2-minmax')
 spec['!OpenGL 3.2/clear-no-buffers'] = concurrent_test('gl-3.2-clear-no-buffers')
 spec['!OpenGL 3.2/depth-tex-sampling'] = concurrent_test('gl-3.2-depth-tex-sampling')
@@ -2556,6 +2568,7 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-cubemap-l
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubemap-array')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
 add_concurrent_test(arb_texture_cube_map_array, 'getteximage-targets CUBE_ARRAY')
+add_concurrent_test(arb_texture_cube_map_array, 'glsl-resource-not-bound CubeArray')
 textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray', 'samplerCubeArrayShadow' ];
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
