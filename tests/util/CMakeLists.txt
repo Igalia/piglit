@@ -11,6 +11,10 @@ set_source_files_properties(
 	PROPERTIES GENERATED 1
 	)
 
+if(HAVE_LIBCACA)
+    link_libraries(caca)
+endif()
+
 set(UTIL_INCLUDES
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}

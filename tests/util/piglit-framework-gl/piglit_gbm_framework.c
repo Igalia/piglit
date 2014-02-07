@@ -29,6 +29,9 @@
 #include "piglit_gbm_framework.h"
 
 static void
+piglit_gbm_console_display(void);
+
+static void
 enter_event_loop(struct piglit_winsys_framework *winsys_fw)
 {
 	const struct piglit_gl_test_config *test_config = winsys_fw->wfl_fw.gl_fw.test_config;
@@ -40,6 +43,8 @@ enter_event_loop(struct piglit_winsys_framework *winsys_fw)
 
 	if (piglit_automatic)
 		piglit_report_result(result);
+
+	piglit_gbm_console_display();
 
 	/* gbm has no input, so we exit immediately, as if the user
 	 * had pressed escape.
@@ -89,4 +94,84 @@ piglit_gbm_framework_create(const struct piglit_gl_test_config *test_config)
 fail:
 	destroy(gl_fw);
 	return NULL;
+}
+
+#ifdef PIGLIT_HAS_LIBCACA
+#include <caca.h>
+#endif
+
+static void
+piglit_gbm_console_display(void)
+{
+#ifdef PIGLIT_HAS_LIBCACA
+	caca_canvas_t *canvas;
+	caca_dither_t *dither;
+	void *export;
+	uint32_t *pixels;
+	size_t export_size;
+	int width = 40, height = 20;
+	int i;
+
+	canvas = caca_create_canvas(width, height);
+	if (!canvas) {
+		printf("Failed to get canvas for gbm console display!\n");
+		return;
+	}
+
+	caca_set_color_ansi(canvas, CACA_DEFAULT, CACA_TRANSPARENT);
+
+	dither = caca_create_dither(32, piglit_width, piglit_height,
+				    4 * piglit_width,
+				    0x000000ff, 0x0000ff00,
+				    0x00ff0000, 0xff000000);
+	if (!dither) {
+		caca_free_canvas(canvas);
+		printf("Failed to get dither object for gbm console display!\n");
+		return;
+	}
+
+	/* Note: we allocate memory for 1 extra row */
+	pixels = malloc(4 * piglit_width * (piglit_height + 1));
+
+	while (!piglit_check_gl_error(GL_NO_ERROR)) {
+		/* Clear any OpenGL errors */
+	}
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, piglit_winsys_fbo);
+	glReadPixels(0, 0, piglit_width, piglit_height,
+		     GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) pixels);
+	if (!piglit_check_gl_error(GL_NO_ERROR)) {
+		caca_free_dither(dither);
+		caca_free_canvas(canvas);
+		printf("Error reading pixels for gbm console display!\n");
+		return;
+	}
+
+	/* Swap the image's pixels vertically using the extra
+	 * row of pixels that we allocated as swap space.
+	 */
+	for (i = 0; i < (piglit_height / 2); i++) {
+		memcpy(&pixels[piglit_width * piglit_height],
+		       &pixels[piglit_width * i],
+		       4 * piglit_width);
+		memcpy(&pixels[piglit_width * i],
+		       &pixels[piglit_width * (piglit_height - i)],
+		       4 * piglit_width);
+		memcpy(&pixels[piglit_width * (piglit_height - i)],
+		       &pixels[piglit_width * piglit_height],
+		       4 * piglit_width);
+	}
+
+	caca_dither_bitmap(canvas, 0, 0, width, height, dither, pixels);
+	caca_free_dither(dither);
+	free(pixels);
+
+	export = caca_export_canvas_to_memory(canvas, "ansi", &export_size);
+	caca_free_canvas(canvas);
+	if (!export) {
+		printf("Failed to export image for gbm console display!\n");
+	} else {
+		fwrite(export, export_size, 1, stdout);
+		free(export);
+	}
+#endif
 }
