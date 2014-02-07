@@ -269,7 +269,7 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 
 	if (pixels == NULL) {
 		printf("Error allocating texture data array for target %s, size %d\n",
-		       piglit_get_gl_enum_name(target), maxSide);
+		       piglit_get_gl_enum_name(target), maxSide/2);
 		result = PIGLIT_SKIP;
 		goto out;
 	}
