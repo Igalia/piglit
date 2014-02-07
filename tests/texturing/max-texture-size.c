@@ -297,6 +297,9 @@ test_non_proxy_texture_size(GLenum target, GLenum internalformat)
 		glTexImage2D(target, 0, internalformat, maxSide,
 			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 		STOP_ON_ERRORS;
+
+		glTexSubImage2D(target, 0, 0, 0, maxSide/2, maxSide/2,
+				GL_RGBA, GL_FLOAT, pixels);
 		break;
 
 	case GL_TEXTURE_3D:
