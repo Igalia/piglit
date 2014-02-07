@@ -18,6 +18,7 @@ enum { UNORM_T, FLOAT_T, INT_T, UINT_T, SHADOW_T, NUM_COMPTYPES } comptype = UNO
 enum { SAMPLER_2D, SAMPLER_2DARRAY, SAMPLER_CUBE, SAMPLER_CUBEARRAY, SAMPLER_2DRECT } sampler = SAMPLER_2D;
 bool use_offset = false;
 bool use_nonconst = false;
+bool use_offsets = false;
 int components = 0;
 int comp_select = -1;
 
@@ -84,7 +85,7 @@ piglit_display(void)
  */
 
 static unsigned char
-pixel_value(int i, int j)
+pixel_value(int i, int j, int offset_sel)
 {
 	if (swizzle == ZERO)
 		return 0;
@@ -95,6 +96,25 @@ pixel_value(int i, int j)
 		/* apply texel offset */
 		i += -8;
 		j += 7;
+	} else if (use_offsets) {
+		switch (offset_sel) {
+		case 0:
+			i += -8;
+			j += 7;
+			break;
+		case 1:
+			i += 7;
+			j += -8;
+			break;
+		case 2:
+			i += 3;
+			j += 3;
+			break;
+		case 3:
+			i += -3;
+			j += -3;
+			break;
+		}
 	}
 
 	if (address_mode == GL_REPEAT) {
@@ -146,16 +166,30 @@ make_expected(void)
 	for (j = 0; j < TEXTURE_HEIGHT; j++)
 		for (i = 0; i < TEXTURE_WIDTH; i++) {
 			if (comptype == SHADOW_T) {
-				*pe++ = shadow_compare(norm_value(pixel_value(i, j + 1)));
-				*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j + 1)));
-				*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j)));
-				*pe++ = shadow_compare(norm_value(pixel_value(i, j)));
+				if (use_offsets) {
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 0)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 1)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 2)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 3)));
+				} else {
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j + 1, 0)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j + 1, 0)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i + 1, j, 0)));
+					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 0)));
+				}
 			}
 			else {
-				*pe++ = norm_value(pixel_value(i, j + 1));
-				*pe++ = norm_value(pixel_value(i + 1, j + 1));
-				*pe++ = norm_value(pixel_value(i + 1, j));
-				*pe++ = norm_value(pixel_value(i, j));
+				if (use_offsets) {
+					*pe++ = norm_value(pixel_value(i, j, 0));
+					*pe++ = norm_value(pixel_value(i, j, 1));
+					*pe++ = norm_value(pixel_value(i, j, 2));
+					*pe++ = norm_value(pixel_value(i, j, 3));
+				} else {
+					*pe++ = norm_value(pixel_value(i, j + 1, 0));
+					*pe++ = norm_value(pixel_value(i + 1, j + 1, 0));
+					*pe++ = norm_value(pixel_value(i + 1, j, 0));
+					*pe++ = norm_value(pixel_value(i, j, 0));
+				}
 			}
 		}
 }
@@ -212,7 +246,7 @@ do_requires(void)
 	if (sampler == SAMPLER_CUBEARRAY)
 		piglit_require_extension("GL_ARB_texture_cube_map_array");
 
-	if (use_offset && (sampler == SAMPLER_CUBE || sampler == SAMPLER_CUBEARRAY)) {
+	if ((use_offsets || use_offset) && (sampler == SAMPLER_CUBE || sampler == SAMPLER_CUBEARRAY)) {
 		printf("Offset is not supported with cube or cube array samplers.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
@@ -231,7 +265,7 @@ do_requires(void)
 	 * or use non-constant offsets, or use shadow comparitor, or
 	 * use gsampler2DRect, check that we have ARB_gpu_shader5
 	 */
-	if (comp_select != -1 || use_nonconst || comptype == SHADOW_T || sampler == SAMPLER_2DRECT)
+	if (comp_select != -1 || use_offsets || use_nonconst || comptype == SHADOW_T || sampler == SAMPLER_2DRECT)
 		piglit_require_extension("GL_ARB_gpu_shader5");
 
 	/* if rect sampler, repeat is not available */
@@ -364,7 +398,7 @@ do_shader_setup(void)
 		"gl_FragCoord.xy",		/* 2drect */
 	};
 	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
-	bool need_shader5 = (comp_select != -1) || use_nonconst || (comptype == SHADOW_T) || sampler == SAMPLER_2DRECT;
+	bool need_shader5 = (comp_select != -1) || use_offsets || use_nonconst || (comptype == SHADOW_T) || sampler == SAMPLER_2DRECT;
 
 	if (stage == VS) {
 		asprintf(&vs_code, "#version %s\n"
@@ -388,12 +422,12 @@ do_shader_setup(void)
 				prefix[comptype],
 				samplersuffix[sampler],
 				comptype == SHADOW_T ? "Shadow" : "",
-				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
+				use_offsets ? "const ivec2 osets[4] = ivec2[4](ivec2(-8,7), ivec2(7, -8), ivec2(3, 3), ivec2(-3, -3));\n" :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
-				use_offset ? "Offset" : "",
+				use_offsets ? "Offsets" : (use_offset ? "Offset" : ""),
 				vs_tc_expr[sampler],
 				comptype == SHADOW_T ? ", 0.5" : "",
-				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
+				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
 				"#version %s\n"
@@ -433,12 +467,12 @@ do_shader_setup(void)
 				prefix[comptype],
 				samplersuffix[sampler],
 				comptype == SHADOW_T ? "Shadow" : "",
-				use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
+				use_offsets ? "const ivec2 osets[4] = ivec2[4](ivec2(-8,7), ivec2(7, -8), ivec2(3, 3), ivec2(-3, -3));\n" :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
-				use_offset ? "Offset" : "",
+				use_offsets ? "Offsets" : (use_offset ? "Offset" : ""),
 				fs_tc_expr[sampler],
 				comptype == SHADOW_T ? ", 0.5" : "",
-				use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
+				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
 				comp_expr[1 + comp_select]);
 	}
 
@@ -476,7 +510,7 @@ do_geometry_setup(void)
 void
 fail_with_usage(void)
 {
-	printf("Usage: textureGather <stage> [offset] [nonconst] <components> <swizzle> <comptype> <sampler> <compselect> <addressmode>\n"
+	printf("Usage: textureGather <stage> [offset] [nonconst] [offsets] <components> <swizzle> <comptype> <sampler> <compselect> <addressmode>\n"
 	       "	stage = vs|fs\n"
 	       "	components = r|rg|rgb|rgba\n"
 	       "	swizzle = red|green|blue|alpha|zero|one\n"
@@ -497,6 +531,7 @@ piglit_init(int argc, char **argv)
 		else if (!strcmp(opt, "fs")) stage = FS;
 		else if (!strcmp(opt, "offset")) use_offset = true;
 		else if (!strcmp(opt, "nonconst")) use_nonconst = true;
+		else if (!strcmp(opt, "offsets")) use_offsets = true;
 		else if (!strcmp(opt, "r")) components = 1;
 		else if (!strcmp(opt, "rg")) components = 2;
 		else if (!strcmp(opt, "rgb")) components = 3;

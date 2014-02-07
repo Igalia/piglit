@@ -1694,7 +1694,7 @@ for stage in ['vs', 'fs']:
         for comps in ['r', 'rg', 'rgb', 'rgba']:
             for cs in [0, 1, 2, 3][:len(comps)]:
                 for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
-                    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+                    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
                         testname = '%s/%s-%s-%s-%s-%s' % (
                                 func, stage, comps,
                                 cs,
@@ -1702,7 +1702,7 @@ for stage in ['vs', 'fs']:
                         address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
                         cmd = 'textureGather %s %s %s %s %s %s %s' % (
                                 stage,
-                                'nonconst' if func == 'textureGatherOffset' else '',
+                                'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
                                 comps, cs, type, sampler, address_mode
                                 )
                         arb_gpu_shader5[testname] = concurrent_test(cmd)
@@ -1721,12 +1721,12 @@ for stage in ['vs', 'fs']:
                             arb_gpu_shader5[testname] = concurrent_test(cmd)
     # test shadow samplers
     for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
-        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+        for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
             testname = '%s/%s-r-none-shadow-%s' % (func, stage, sampler)
             address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
             cmd = 'textureGather %s shadow r %s %s %s' % (
                     stage,
-                    'nonconst' if func == 'textureGatherOffset' else '',
+                    'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
                     sampler,
                     address_mode)
             arb_gpu_shader5[testname] = concurrent_test(cmd)
