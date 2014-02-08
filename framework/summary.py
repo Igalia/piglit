@@ -395,6 +395,10 @@ class Summary:
                     if not path.exists(temp_path):
                         os.makedirs(temp_path)
 
+                    dmesg = value.get('dmesg', 'None')
+                    if isinstance(dmesg, list):
+                        dmesg = "\n".join(dmesg)
+
                     with open(path.join(destination, each.name, key + ".html"),
                               'w') as out:
                         out.write(testfile.render(
@@ -410,7 +414,7 @@ class Summary:
                             info=value.get('info', 'None'),
                             traceback=value.get('traceback', 'None'),
                             command=value.get('command', 'None'),
-                            dmesg=value.get('dmesg', 'None'),
+                            dmesg=dmesg,
                             css=path.relpath(result_css, temp_path),
                             index=path.relpath(index, temp_path)))
 

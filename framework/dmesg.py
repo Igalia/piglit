@@ -109,7 +109,7 @@ class LinuxDmesg(object):
                     result['subtest'][key] = replace(value)
 
             # Add the dmesg values to the result
-            result['dmesg'] = self._new_messages
+            result['dmesg'] = "\n".join(self._new_messages)
 
         return result
 
