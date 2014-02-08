@@ -55,7 +55,7 @@ static bool have_pv = false;
 static bool
 test_one(int order, const float expected[3])
 {
-	bool pass;
+	bool pass = false;
 	int dy, y = piglit_height / 2;
 
 	glClear(GL_COLOR_BUFFER_BIT);
