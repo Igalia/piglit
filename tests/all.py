@@ -1609,6 +1609,7 @@ add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-mas
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-negative-max-samples')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-teximage-3d-multisample')
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-teximage-2d-multisample')
+add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-sample-depth')
 
 for stage in ['vs', 'gs', 'fs']:
     # textureSize():

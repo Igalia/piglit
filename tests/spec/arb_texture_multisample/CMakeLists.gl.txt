@@ -22,4 +22,5 @@ piglit_add_executable (arb_texture_multisample-negative-max-samples negative-max
 piglit_add_executable (arb_texture_multisample-sample-position sample-position.c)
 piglit_add_executable (arb_texture_multisample-teximage-2d-multisample teximage-2d-multisample.c)
 piglit_add_executable (arb_texture_multisample-teximage-3d-multisample teximage-3d-multisample.c)
+piglit_add_executable (arb_texture_multisample-sample-depth sample-depth.c)
 # vim: ft=cmake:
