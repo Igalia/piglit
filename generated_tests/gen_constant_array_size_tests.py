@@ -147,6 +147,8 @@ class ParserTest(object):
     def make_shader(self):
         """Generate the shader code necessary to test the built-in."""
         shader = self.version_directive()
+        if self.__signature.extension:
+            shader += '#extension GL_{0} : require\n'.format(self.__signature.extension)
         shader += self.additional_declarations()
         shader += '\n'
         shader += 'void main()\n'
@@ -164,9 +166,12 @@ class ParserTest(object):
     def filename(self):
         argtype_names = '-'.join(
             str(argtype) for argtype in self.__signature.argtypes)
+        if self.__signature.extension:
+            subdir = self.__signature.extension
+        else:
+            subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
         return os.path.join(
-            'spec', 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100),
-            'compiler', 'built-in-functions',
+            'spec', subdir, 'compiler', 'built-in-functions',
             '{0}-{1}.{2}'.format(
                 self.__signature.name, argtype_names, self.test_suffix()))
 
