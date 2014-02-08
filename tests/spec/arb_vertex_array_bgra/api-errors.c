@@ -37,8 +37,18 @@ PIGLIT_GL_TEST_CONFIG_END
 void
 piglit_init(int argc, char **argv)
 {
-	static GLuint uints[4] = { 255, 0, 0, 127 };
 	static GLubyte ubytes[4] = { 255, 0, 0, 127 };
+	static const GLenum invalid_types[] = {
+		GL_BYTE,
+		GL_SHORT,
+		GL_UNSIGNED_SHORT,
+		GL_INT,
+		GL_UNSIGNED_INT,
+		GL_FLOAT,
+		GL_DOUBLE,
+	};
+	unsigned i;
+
 	bool pass = true;
 
 	piglit_require_gl_version(20);
@@ -64,16 +74,17 @@ piglit_init(int argc, char **argv)
 	 *  SecondaryPointer, or VertexAttribPointer is called with size
 	 *  set to BGRA and type is not UNSIGNED_BYTE."
 	 */
-	glColorPointer(GL_BGRA, GL_UNSIGNED_INT, 4 * sizeof(GLuint), NULL);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	for (i = 0; i < ARRAY_SIZE(invalid_types); i++) {
+		glColorPointer(GL_BGRA, invalid_types[i], 0, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
-	glSecondaryColorPointer(GL_BGRA, GL_UNSIGNED_INT,
-				4 * sizeof(GLuint), NULL);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		glSecondaryColorPointer(GL_BGRA, invalid_types[i], 0, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
-	glVertexAttribPointer(1, GL_BGRA, GL_UNSIGNED_INT, GL_TRUE,
-			      4 * sizeof(GLuint), uints);
-	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+		glVertexAttribPointer(1, GL_BGRA, invalid_types[i], GL_TRUE,
+				      0, NULL);
+		pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+	}
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
