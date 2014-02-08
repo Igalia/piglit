@@ -666,8 +666,6 @@ def load_results(filename):
     "main"
 
     """
-    filename = os.path.realpath(filename)
-
     try:
         with open(filename, 'r') as resultsfile:
             testrun = TestrunResult(resultsfile)
