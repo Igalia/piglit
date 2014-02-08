@@ -59,61 +59,6 @@ VertArrayBGRATest::reportError(const char *msg)
 }
 
 
-bool
-VertArrayBGRATest::testAPI(void)
-{
-	// Get glSecondaryColorPointer() functon
-	PFNGLSECONDARYCOLORPOINTERPROC SecondaryColorPointer = NULL;
-	SecondaryColorPointer = (PFNGLSECONDARYCOLORPOINTERPROC)
-			GLUtils::getProcAddress("glSecondaryColorPointer");
-
-	// Get glVertexAttrib() function
-	PFNGLVERTEXATTRIBPOINTERARBPROC VertexAttribPointer = NULL;
-	if (GLUtils::getVersion() >= 2.0) {
-		VertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERARBPROC)
-			GLUtils::getProcAddress("glVertexAttribPointer");
-	}
-		
-	GLubyte array[4];
-
-	if (glGetError()) {
-		reportError("initial error state is not GL_NO_ERROR.");
-		return false;
-	}
-
-	glColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, array);
-	if (glGetError()) {
-		reportError("glColorPointer(size=GL_BGRA) generated an error.");
-		return false;
-	}
-
-	if (SecondaryColorPointer) {
-		SecondaryColorPointer(GL_BGRA, GL_UNSIGNED_BYTE, 0, array);
-		if (glGetError()) {
-			reportError("glSecondaryColorPointer(size=GL_BGRA) generated an error.");
-			return false;
-		}
-	}
-
-	if (VertexAttribPointer) {
-		VertexAttribPointer(2, GL_BGRA, GL_UNSIGNED_BYTE, GL_TRUE, 0, array);
-		if (glGetError()) {
-			reportError("glVertexAttribPointer(size=GL_BGRA) generated an error.");
-			return false;
-		}
-	}
-
-	// this _should_ generate an error
-	glColorPointer(GL_BGRA, GL_FLOAT, 0, array);
-	if (glGetError() != GL_INVALID_VALUE) {
-		reportError("glColorPointer(size=GL_BGRA, type=GL_FLOAT) did not generate expected error.");
-		return false;
-	}
-
-	return true;
-}
-
-
 void
 VertArrayBGRATest::setupPoints()
 {
@@ -159,10 +104,6 @@ VertArrayBGRATest::runOne(VertArrayBGRAResult &r, Window &w)
 	(void) w;  // silence warning
 	Image rgbaImage(WINDOW_SIZE, WINDOW_SIZE, GL_RGBA, GL_UNSIGNED_BYTE);
 	Image bgraImage(WINDOW_SIZE, WINDOW_SIZE, GL_RGBA, GL_UNSIGNED_BYTE);
-
-	r.pass = testAPI();
-	if (!r.pass)
-		return;
 
 	setupPoints();
 #if 0 // test lighting path too (debug only)
