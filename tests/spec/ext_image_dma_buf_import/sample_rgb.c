@@ -77,8 +77,9 @@ void
 piglit_init(int argc, char **argv)
 {
 	unsigned i;
+	EGLDisplay egl_dpy = eglGetCurrentDisplay();
 
-	piglit_require_egl_extension("EGL_EXT_image_dma_buf_import");
+	piglit_require_egl_extension(egl_dpy, "EGL_EXT_image_dma_buf_import");
 	piglit_require_extension("GL_OES_EGL_image_external");
 
 	for (i = 1; i < argc; i++) {

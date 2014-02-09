@@ -62,7 +62,7 @@ bool piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name);
 /**
  * \brief Checks for EGL extension and skips if not supported
  */
-void piglit_require_egl_extension(const char *name);
+void piglit_require_egl_extension(EGLDisplay dpy, const char *name);
 
 /**
  * \brief Wrapper for eglBindAPI().

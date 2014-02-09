@@ -91,9 +91,10 @@ piglit_init(int argc, char **argv)
 {
 	static const char intel_id[] = "Intel Open Source Technology Center";
 	const char *vendor_str;
+	EGLDisplay egl_dpy = eglGetCurrentDisplay();
 
-	piglit_require_egl_extension("EGL_EXT_image_dma_buf_import");
-	piglit_require_egl_extension("EGL_KHR_image_base");
+	piglit_require_egl_extension(egl_dpy, "EGL_EXT_image_dma_buf_import");
+	piglit_require_egl_extension(egl_dpy, "EGL_KHR_image_base");
 
 	vendor_str = (const char *)glGetString(GL_VENDOR);
 	if (strncmp(vendor_str, intel_id, sizeof(intel_id) - 1) != 0) {

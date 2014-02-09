@@ -254,5 +254,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_require_egl_extension("EGL_EXT_image_dma_buf_import");
+	EGLDisplay egl_dpy = eglGetCurrentDisplay();
+	piglit_require_egl_extension(egl_dpy, "EGL_EXT_image_dma_buf_import");
 }
