@@ -80,6 +80,12 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
+			if (!piglit_find_subtest(subtests, argv[j])) {
+				fprintf(stderr, "Test defines no subtest with "
+					"name '%s'\n", argv[j]);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
 			selected_subtests =
 				realloc(selected_subtests,
 					(num_selected_subtests + 1)
