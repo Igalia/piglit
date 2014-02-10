@@ -59,6 +59,62 @@ delete_arg(char *argv[], int argc, int arg)
 	}
 }
 
+static void
+piglit_parse_subtest_args(int *argc, char *argv[],
+			  const struct piglit_gl_subtest *subtests,
+			  const char ***out_selected_subtests,
+			  size_t *out_num_selected_subtests)
+{
+	int j;
+	const char **selected_subtests = NULL;
+	size_t num_selected_subtests = 0;
+
+	for (j = 1; j < *argc; j++) {
+		if (streq(argv[j], "-subtest")) {
+			int i;
+
+			++j;
+			if (j >= *argc) {
+				fprintf(stderr,
+					"-subtest requires an argument\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			selected_subtests =
+				realloc(selected_subtests,
+					(num_selected_subtests + 1)
+					* sizeof(char*));
+			selected_subtests[num_selected_subtests] = argv[j];
+			++num_selected_subtests;
+
+			/* Remove 2 arguments from the command line. */
+			for (i = j + 1; i < *argc; i++) {
+				argv[i - 2] = argv[i];
+			}
+			*argc -= 2;
+			j -= 2;
+		} else if (streq(argv[j], "-list-subtests")) {
+			int i;
+
+			if (subtests == NULL) {
+				fprintf(stderr, "Test defines no subtests!\n");
+				exit(EXIT_FAILURE);
+			}
+
+			for (i = 0; !PIGLIT_GL_SUBTEST_END(&subtests[i]); ++i) {
+				printf("%s: %s\n",
+				       subtests[i].option,
+				       subtests[i].name);
+			}
+
+			exit(EXIT_SUCCESS);
+		}
+	}
+
+	*out_selected_subtests = selected_subtests;
+	*out_num_selected_subtests = num_selected_subtests;
+}
+
 /**
  * Recognized arguments are removed from @a argv. The updated array
  * length is returned in @a argc.
@@ -68,6 +124,10 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 	     struct piglit_gl_test_config *config)
 {
 	int j;
+
+	piglit_parse_subtest_args(argc, argv, config->subtests,
+				  &config->selected_subtests,
+				  &config->num_selected_subtests);
 
 	/* Find/remove "-auto" and "-fbo" from the argument vector.
 	 */
@@ -113,50 +173,6 @@ process_args(int *argc, char *argv[], unsigned *force_samples,
 			*force_samples = atoi(argv[j]+9);
 			delete_arg(argv, *argc, j--);
 			*argc -= 1;
-		} else if (!strcmp(argv[j], "-subtest")) {
-			int i;
-
-			j++;
-			if (j >= *argc) {
-				fprintf(stderr,
-					"-subtest requires an argument\n");
-				piglit_report_result(PIGLIT_FAIL);
-			}
-
-			config->selected_subtests =
-				realloc(config->selected_subtests,
-					sizeof(char *)
-					* (config->num_selected_subtests + 1));
-			config->selected_subtests[config->num_selected_subtests] =
-				argv[j];
-
-			config->num_selected_subtests++;
-
-			/* Remove 2 arguments (hence the 'i - 2') from the
-			 * command line.
-			 */
-			for (i = j + 1; i < *argc; i++) {
-				argv[i - 2] = argv[i];
-			}
-			*argc -= 2;
-			j -= 2;
-		} else if (!strcmp(argv[j], "-list-subtests")) {
-			unsigned i;
-
-			if (config->subtests == NULL) {
-				fprintf(stderr, "Test defines no subtests!\n");
-				exit(1);
-			}
-
-			for (i = 0;
-			     !PIGLIT_GL_SUBTEST_END(&config->subtests[i]);
-			     i++) {
-				printf("%s: %s\n",
-				       config->subtests[i].option,
-				       config->subtests[i].name);
-			}
-
-			exit(0);
 		}
 	}
 }
