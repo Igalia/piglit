@@ -65,7 +65,7 @@ struct piglit_subtest {
  * The array of subtests is terminated by structure with a \c NULL \c
  * name pointer.
  */
-#define PIGLIT_GL_SUBTEST_END(s) ((s)->name == NULL)
+#define PIGLIT_SUBTEST_END(s) ((s)->name == NULL)
 
 /**
  * @brief Configuration for running an OpenGL test.

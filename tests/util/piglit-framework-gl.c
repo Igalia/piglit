@@ -107,7 +107,7 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 				exit(EXIT_FAILURE);
 			}
 
-			for (i = 0; !PIGLIT_GL_SUBTEST_END(&subtests[i]); ++i) {
+			for (i = 0; !PIGLIT_SUBTEST_END(&subtests[i]); ++i) {
 				printf("%s: %s\n",
 				       subtests[i].option,
 				       subtests[i].name);
@@ -279,7 +279,7 @@ piglit_find_subtest(const struct piglit_subtest *subtests, const char *name)
 {
 	unsigned i;
 
-	for (i = 0; !PIGLIT_GL_SUBTEST_END(&subtests[i]); i++) {
+	for (i = 0; !PIGLIT_SUBTEST_END(&subtests[i]); i++) {
 		if (strcmp(subtests[i].option, name) == 0)
 			return &subtests[i];
 	}
@@ -320,7 +320,7 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 	} else {
 		unsigned i;
 
-		for (i = 0; !PIGLIT_GL_SUBTEST_END(&all_subtests[i]); i++) {
+		for (i = 0; !PIGLIT_SUBTEST_END(&all_subtests[i]); i++) {
 			const enum piglit_result subtest_result =
 				all_subtests[i].subtest_func(all_subtests[i].data);
 			piglit_report_subtest_result(subtest_result, "%s",
