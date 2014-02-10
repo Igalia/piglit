@@ -59,68 +59,6 @@ delete_arg(char *argv[], int argc, int arg)
 	}
 }
 
-static void
-piglit_parse_subtest_args(int *argc, char *argv[],
-			  const struct piglit_subtest *subtests,
-			  const char ***out_selected_subtests,
-			  size_t *out_num_selected_subtests)
-{
-	int j;
-	const char **selected_subtests = NULL;
-	size_t num_selected_subtests = 0;
-
-	for (j = 1; j < *argc; j++) {
-		if (streq(argv[j], "-subtest")) {
-			int i;
-
-			++j;
-			if (j >= *argc) {
-				fprintf(stderr,
-					"-subtest requires an argument\n");
-				piglit_report_result(PIGLIT_FAIL);
-			}
-
-			if (!piglit_find_subtest(subtests, argv[j])) {
-				fprintf(stderr, "Test defines no subtest with "
-					"name '%s'\n", argv[j]);
-				piglit_report_result(PIGLIT_FAIL);
-			}
-
-			selected_subtests =
-				realloc(selected_subtests,
-					(num_selected_subtests + 1)
-					* sizeof(char*));
-			selected_subtests[num_selected_subtests] = argv[j];
-			++num_selected_subtests;
-
-			/* Remove 2 arguments from the command line. */
-			for (i = j + 1; i < *argc; i++) {
-				argv[i - 2] = argv[i];
-			}
-			*argc -= 2;
-			j -= 2;
-		} else if (streq(argv[j], "-list-subtests")) {
-			int i;
-
-			if (subtests == NULL) {
-				fprintf(stderr, "Test defines no subtests!\n");
-				exit(EXIT_FAILURE);
-			}
-
-			for (i = 0; !PIGLIT_SUBTEST_END(&subtests[i]); ++i) {
-				printf("%s: %s\n",
-				       subtests[i].option,
-				       subtests[i].name);
-			}
-
-			exit(EXIT_SUCCESS);
-		}
-	}
-
-	*out_selected_subtests = selected_subtests;
-	*out_num_selected_subtests = num_selected_subtests;
-}
-
 /**
  * Recognized arguments are removed from @a argv. The updated array
  * length is returned in @a argc.
@@ -272,65 +210,6 @@ piglit_destroy_dma_buf(struct piglit_dma_buf *buf)
 {
 	if (gl_fw->destroy_dma_buf)
 		gl_fw->destroy_dma_buf(buf);
-}
-
-const struct piglit_subtest *
-piglit_find_subtest(const struct piglit_subtest *subtests, const char *name)
-{
-	unsigned i;
-
-	for (i = 0; !PIGLIT_SUBTEST_END(&subtests[i]); i++) {
-		if (strcmp(subtests[i].option, name) == 0)
-			return &subtests[i];
-	}
-
-	return NULL;
-}
-
-enum piglit_result
-piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
-			     const char **selected_subtests,
-			     size_t num_selected_subtests,
-			     enum piglit_result previous_result)
-{
-	enum piglit_result result = previous_result;
-
-	if (num_selected_subtests) {
-		unsigned i;
-
-		for (i = 0; i < num_selected_subtests; i++) {
-			enum piglit_result subtest_result;
-			const char *const name = selected_subtests[i];
-			const struct piglit_subtest *subtest =
-				piglit_find_subtest(all_subtests, name);
-
-			if (subtest == NULL) {
-				fprintf(stderr,
-					"Unknown subtest \"%s\".\n",
-					name);
-				piglit_report_result(PIGLIT_FAIL);
-			}
-
-			subtest_result = subtest->subtest_func(subtest->data);
-			piglit_report_subtest_result(subtest_result, "%s",
-						     subtest->name);
-
-			piglit_merge_result(&result, subtest_result);
-		}
-	} else {
-		unsigned i;
-
-		for (i = 0; !PIGLIT_SUBTEST_END(&all_subtests[i]); i++) {
-			const enum piglit_result subtest_result =
-				all_subtests[i].subtest_func(all_subtests[i].data);
-			piglit_report_subtest_result(subtest_result, "%s",
-						     all_subtests[i].name);
-
-			piglit_merge_result(&result, subtest_result);
-		}
-	}
-
-	return result;
 }
 
 size_t
