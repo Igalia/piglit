@@ -3831,6 +3831,10 @@ spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
 for i in [1, 2, 3]:
     egl_ext_client_extensions['conformance test {0}'.format(i)] = concurrent_test('egl_ext_client_extensions {0}'.format(i))
 
+egl_khr_fence_sync = {}
+spec['EGL_KHR_fence_sync'] = egl_khr_fence_sync
+egl_khr_fence_sync['conformance'] = concurrent_test('egl_khr_fence_sync')
+
 gles20 = {}
 spec['!OpenGL ES 2.0'] = gles20
 gles20['glsl-fs-pointcoord'] = concurrent_test('glsl-fs-pointcoord_gles2')
