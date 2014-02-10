@@ -61,7 +61,7 @@ delete_arg(char *argv[], int argc, int arg)
 
 static void
 piglit_parse_subtest_args(int *argc, char *argv[],
-			  const struct piglit_gl_subtest *subtests,
+			  const struct piglit_subtest *subtests,
 			  const char ***out_selected_subtests,
 			  size_t *out_num_selected_subtests)
 {
@@ -274,8 +274,8 @@ piglit_destroy_dma_buf(struct piglit_dma_buf *buf)
 		gl_fw->destroy_dma_buf(buf);
 }
 
-const struct piglit_gl_subtest *
-piglit_find_subtest(const struct piglit_gl_subtest *subtests, const char *name)
+const struct piglit_subtest *
+piglit_find_subtest(const struct piglit_subtest *subtests, const char *name)
 {
 	unsigned i;
 
@@ -288,7 +288,7 @@ piglit_find_subtest(const struct piglit_gl_subtest *subtests, const char *name)
 }
 
 enum piglit_result
-piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
+piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 			     const char **selected_subtests,
 			     size_t num_selected_subtests,
 			     enum piglit_result previous_result)
@@ -301,7 +301,7 @@ piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
 		for (i = 0; i < num_selected_subtests; i++) {
 			enum piglit_result subtest_result;
 			const char *const name = selected_subtests[i];
-			const struct piglit_gl_subtest *subtest =
+			const struct piglit_subtest *subtest =
 				piglit_find_subtest(all_subtests, name);
 
 			if (subtest == NULL) {

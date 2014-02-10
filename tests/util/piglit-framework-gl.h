@@ -45,7 +45,7 @@ enum piglit_gl_visual {
 /**
  * An idividual subtest that makes up part of a test group.
  */
-struct piglit_gl_subtest {
+struct piglit_subtest {
 	/** Name of the subtest as it will appear in the log. */
 	const char *name;
 
@@ -60,7 +60,7 @@ struct piglit_gl_subtest {
 };
 
 /**
- * Detect the end of an array of piglit_gl_subtest structures
+ * Detect the end of an array of piglit_subtest structures
  *
  * The array of subtests is terminated by structure with a \c NULL \c
  * name pointer.
@@ -217,7 +217,7 @@ struct piglit_gl_test_config {
 	 * This is only used during command line argument parsing to implement
 	 * the -list-subtests option.
 	 */
-	const struct piglit_gl_subtest *subtests;
+	const struct piglit_subtest *subtests;
 
 	/**
 	 * Names of subtests supplied on the command line.
@@ -358,11 +358,11 @@ piglit_create_dma_buf(unsigned w, unsigned h, unsigned cpp,
 void
 piglit_destroy_dma_buf(struct piglit_dma_buf *buf);
 
-const struct piglit_gl_subtest *
-piglit_find_subtest(const struct piglit_gl_subtest *subtests, const char *name);
+const struct piglit_subtest *
+piglit_find_subtest(const struct piglit_subtest *subtests, const char *name);
 
 enum piglit_result
-piglit_run_selected_subtests(const struct piglit_gl_subtest *all_subtests,
+piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 			     const char **selected_subtests,
 			     size_t num_selected_subtests,
 			     enum piglit_result previous_result);

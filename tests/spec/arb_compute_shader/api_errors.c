@@ -162,7 +162,7 @@ query_work_group_size_no_compute(void *data)
 }
 
 
-static const struct piglit_gl_subtest subtests[] = {
+static const struct piglit_subtest subtests[] = {
 	{
 		"Query COMPUTE_WORK_GROUP_SIZE on unlinked program",
 		"query-work-group-size-unlinked",
