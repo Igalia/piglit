@@ -20,17 +20,12 @@
 
 """ Tests for the exectest module """
 
-from framework.exectest import PlainExecTest, ExecTest, Test
+from framework.exectest import PlainExecTest, Test
 
 
 def test_initialize_test():
     """ Test initializes """
     Test('/bin/true')
-
-
-def test_initialize_exectest():
-    """ ExecTest initializes """
-    ExecTest('/bin/true')
 
 
 def test_initialize_plainexectest():

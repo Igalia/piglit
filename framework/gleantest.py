@@ -23,20 +23,20 @@
 
 import os
 
-from .exectest import ExecTest, testBinDir
+from .exectest import Test, testBinDir
 
 glean_executable = os.path.join(testBinDir, "glean")
 
 # GleanTest: Execute a sub-test of Glean
-class GleanTest(ExecTest):
+class GleanTest(Test):
     globalParams = []
 
-    def __init__(self, name):
-        ExecTest.__init__(self, [glean_executable,
-                                 "-o", "-v", "-v", "-v", "-t", "+" + name])
+    def __init__(self, name, **kwargs):
+        super(GleanTest, self).__init__([glean_executable, "-o", "-v", "-v",
+                                       "-v", "-t", "+" + name])
         self.name = name
 
-    @ExecTest.command.getter
+    @Test.command.getter
     def command(self):
         return self._command + self.globalParams
 

@@ -29,7 +29,7 @@ import subprocess
 
 from os import path
 from framework.core import TestProfile, TestResult
-from framework.exectest import ExecTest, testBinDir
+from framework.exectest import Test, testBinDir
 
 __all__ = ['profile']
 
@@ -70,9 +70,10 @@ igtEnvironmentOk = checkEnvironment()
 
 profile = TestProfile()
 
-class IGTTest(ExecTest):
+class IGTTest(Test):
     def __init__(self, binary, arguments=[]):
-        ExecTest.__init__(self, [path.join(igtTestRoot, binary)] + arguments)
+        super(IGTTest, self).__init__(
+            [path.join(igtTestRoot, binary)] + arguments)
 
     def interpretResult(self, out, returncode, results):
         if not igtEnvironmentOk:
@@ -94,7 +95,7 @@ class IGTTest(ExecTest):
 
             return results
 
-        return ExecTest.run(self, env)
+        return super(IGTTest, self).run(env)
 
 def listTests(listname):
     oldDir = os.getcwd()

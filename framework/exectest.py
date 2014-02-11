@@ -32,7 +32,6 @@ from .core import TestResult
 
 
 __all__ = ['Test',
-           'ExecTest',
            'PlainExecTest',
            'testBinDir']
 
@@ -50,7 +49,7 @@ else:
 
 
 class Test(object):
-    def __init__(self, runConcurrent=False):
+    def __init__(self, command, runConcurrent=False):
         '''
                 'runConcurrent' controls whether this test will
                 execute it's work (i.e. __doRunWork) on the calling thread
@@ -58,13 +57,14 @@ class Test(object):
         '''
         self.runConcurrent = runConcurrent
         self.skip_test = False
+        self.command = command
+        self.split_command = os.path.split(self._command[0])[1]
+        self.env = {}
+        self.skip_test = self.check_for_skip_scenario(command)
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
         self._test_hook_execute_run = lambda: None
-
-    def run(self):
-        raise NotImplementedError
 
     def execute(self, env, path, log, json_writer, dmesg):
         '''
@@ -114,18 +114,6 @@ class Test(object):
         else:
             log.log(path, 'dry-run')
             log.post_log(log_current, 'dry-run')
-
-
-# ExecTest: A shared base class for tests that simply runs an executable.
-class ExecTest(Test):
-    def __init__(self, command):
-        Test.__init__(self)
-        self.command = command
-        self.split_command = os.path.split(self._command[0])[1]
-        self.env = {}
-
-
-        self.skip_test = self.check_for_skip_scenario(command)
 
     @property
     def command(self):
@@ -292,15 +280,16 @@ class ExecTest(Test):
         return out, err, returncode
 
 
-class PlainExecTest(ExecTest):
+class PlainExecTest(Test):
     """
     PlainExecTest: Run a "native" piglit test executable
 
     Expect one line prefixed PIGLIT: in the output, which contains a result
     dictionary. The plain output is appended to this dictionary
     """
-    def __init__(self, command):
-        ExecTest.__init__(self, command)
+    def __init__(self, *args, **kwargs):
+        super(PlainExecTest, self).__init__(*args, **kwargs)
+
         # Prepend testBinDir to the path.
         self._command[0] = os.path.join(testBinDir, self._command[0])
 

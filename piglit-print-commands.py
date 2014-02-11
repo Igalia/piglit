@@ -30,7 +30,7 @@ import os.path as path
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
-from framework.exectest import ExecTest
+from framework.exectest import Test
 from framework.gleantest import GleanTest
 
 
@@ -77,7 +77,7 @@ def main():
 
     profile.prepare_test_list(env)
     for name, test in profile.test_list.items():
-        assert(isinstance(test, ExecTest))
+        assert(isinstance(test, Test))
         print(name, ':::', getCommand(test))
 
 

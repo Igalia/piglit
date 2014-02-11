@@ -27,7 +27,7 @@ import sys
 import subprocess
 
 from framework.core import TestProfile
-from framework.exectest import ExecTest, testBinDir
+from framework.exectest import Test, testBinDir
 from os import path
 
 __all__ = ['profile']
@@ -45,11 +45,12 @@ profile = TestProfile()
 ##### To use this, create an 'oglconform' symlink in piglit/bin.  Piglit
 ##### will obtain a list of tests from oglconform and add them all.
 #############################################################################
-class OGLCTest(ExecTest):
+class OGLCTest(Test):
     skip_re = re.compile(r'Total Not run: 1|no test in schedule is compat|GLSL [13].[345]0 is not supported|wont be scheduled due to lack of compatible fbconfig')
 
     def __init__(self, category, subtest):
-        ExecTest.__init__(self, [bin_oglconform, '-minFmt', '-v', '4', '-test', category, subtest])
+        super(OGLCTest, self).__init__([bin_oglconform, '-minFmt', '-v', '4',
+                                        '-test', category, subtest])
 
     def interpretResult(self, out, returncode, results):
         if self.skip_re.search(out) is not None:
