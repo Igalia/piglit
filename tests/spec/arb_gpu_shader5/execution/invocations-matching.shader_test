@@ -1,0 +1,46 @@
+# ARB_gpu_shader5 spec says:
+#   "If an invocation count is declared, all such declarations
+#    must specify the same count."
+#
+# This test verifies the link success if two compilation units
+# declare the same number of invocations.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[geometry shader]
+
+#extension GL_ARB_gpu_shader5 : enable
+layout(lines, invocations=4) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+void do_vertex(int i);
+
+void main()
+{
+  for (int i = 0; i < 2; i++)
+    do_vertex(i);
+}
+
+[geometry shader]
+
+#extension GL_ARB_gpu_shader5 : enable
+layout(invocations=4) in;
+void do_vertex(int i)
+{
+}
+
+[fragment shader]
+
+out vec4 color;
+
+void main()
+{
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link success
