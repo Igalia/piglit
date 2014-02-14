@@ -2191,6 +2191,8 @@ add_plain_test(ext_framebuffer_blit, 'fbo-sys-sub-blit') # must not be concurren
 ext_framebuffer_multisample_blit_scaled = Group()
 spec['EXT_framebuffer_multisample_blit_scaled'] = ext_framebuffer_multisample_blit_scaled
 ext_framebuffer_multisample_blit_scaled['negative-blit-scaled'] = concurrent_test('ext_framebuffer_multisample_blit_scaled-negative-blit-scaled')
+for num_samples in MSAA_SAMPLE_COUNTS:
+    ext_framebuffer_multisample_blit_scaled['blit-scaled samples=' + str(num_samples)] = concurrent_test('ext_framebuffer_multisample_blit_scaled-blit-scaled ' + str(num_samples))
 
 ext_framebuffer_multisample = Group()
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
