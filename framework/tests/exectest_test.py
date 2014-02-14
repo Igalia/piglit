@@ -18,31 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Tests for the glean class. Requires Nose """
+""" Tests for the exectest module """
 
-from framework.gleantest import GleanTest
+from framework.exectest import PlainExecTest
 
 
-def test_initialize_gleantest():
-    """ Test that GleanTest initilizes """
-    test = GleanTest('name')
+def test_initialize_plainexectest():
+    """ Test that PlainExecTest initializes correctly """
+    test = PlainExecTest('/bin/true')
     assert test
-
-
-def test_globalParams_assignment():
-    """ Test to ensure that GleanTest.globalParams are correctly assigned
-
-    Specifically this tests for a bug where globalParams only affected
-    instances of GleanTest created after globalParams were set, so changing the
-    globalParams value had unexpected results.
-
-    If this test passes the GleanTest.command attributes will be the same in
-    the instance created before the globalParams assignment and the one created
-    after. A failure means the that globalParams are not being added to tests
-    initialized before it is set.
-
-    """
-    test1 = GleanTest('basic')
-    GleanTest.globalParams = ['--quick']
-    test2 = GleanTest('basic')
-    assert test1.command == test2.command
