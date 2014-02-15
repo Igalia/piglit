@@ -33,7 +33,7 @@ class Log(object):
     """
     def __init__(self, total):
         self.__total = total
-        self.__complete = 1
+        self.__complete = 0
         self.__running = []
         self.__generator = (x for x in xrange(self.__total))
         self.__pad = len(str(self.__total))
