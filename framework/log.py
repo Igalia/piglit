@@ -70,6 +70,9 @@ class Log(object):
         
         """
         sys.stdout.write("{0} {1} \r".format(self._percent(), self._running()))
+        # Need to flush explicitly, otherwise it all gets buffered without a
+        # newline.
+        sys.stdout.flush()
 
     @synchronized_self
     def get_current(self):
