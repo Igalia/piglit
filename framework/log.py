@@ -37,6 +37,11 @@ class Log(object):
         self.__running = []
         self.__generator = (x for x in xrange(self.__total))
         self.__pad = len(str(self.__total))
+        self.__summary = {}
+
+    def _summary(self):
+        return ", ".join("{0}: {1}".format(k, self.__summary[k])
+                         for k in sorted(self.__summary))
 
     def _running(self):
         return "Running Test(s): {}".format(
@@ -47,12 +52,13 @@ class Log(object):
                                   str(self.__total).zfill(self.__pad))
 
     @synchronized_self
-    def mark_complete(self, value):
+    def mark_complete(self, value, result):
         """ Used to mark a test as complete in the log
 
         Arguments:
         value -- the test number to mark complete
-        
+        result -- the result of the completed test
+
         """
         # Mark running complete
         assert value in self.__running
@@ -60,6 +66,9 @@ class Log(object):
 
         # increment the number of completed tests
         self.__complete += 1
+
+        if result:
+            self.__summary[result] = self.__summary.get(result, 0) + 1
 
     @synchronized_self
     def log(self):
@@ -69,7 +78,8 @@ class Log(object):
         over it.
         
         """
-        sys.stdout.write("{0} {1} \r".format(self._percent(), self._running()))
+        sys.stdout.write("{0} {1} {2}\r".format(
+            self._percent(), self._summary(), self._running()))
         # Need to flush explicitly, otherwise it all gets buffered without a
         # newline.
         sys.stdout.flush()

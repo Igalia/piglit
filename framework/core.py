@@ -435,6 +435,7 @@ class Test(object):
         '''
 
         log_current = log.get_current()
+        test_result = None
         # Run the test
         if env.execute:
             try:
@@ -462,15 +463,16 @@ class Test(object):
                 result['traceback'] = \
                     "".join(traceback.format_tb(sys.exc_info()[2]))
 
-            if 'subtest' in result and len(result['subtest'].keys()) > 1:
-                for test in result['subtest'].keys():
+            test_result = result['result']
+            if 'subtest' in result and len(result['subtest']) > 1:
+                for test in result['subtest']:
                     result['result'] = result['subtest'][test]
                     json_writer.write_dict_item(os.path.join(path, test), result)
             else:
                 json_writer.write_dict_item(path, result)
         else:
             log.log()
-        log.mark_complete(log_current)
+        log.mark_complete(log_current, test_result)
 
 
 class Group(dict):
