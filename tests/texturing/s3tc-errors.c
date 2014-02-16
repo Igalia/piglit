@@ -125,14 +125,17 @@ check_gl_error2_(GLenum err1, GLenum err2, int line)
 
 
 static bool
-test_format(int width, int height, GLfloat *image, GLenum format)
+test_format(int width, int height, GLfloat *image, GLenum requested_format)
 {
-	GLubyte *compressed_image =
-		malloc(piglit_compressed_image_size(format, width, height));
+	GLubyte *compressed_image;
 	GLenum format2;
 	int x, y, w, h;
 	GLuint tex;
 	bool pass = true;
+	GLuint expected_size;
+	bool is_compressed;
+	GLuint compressed_size;
+	GLenum format;
 
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
@@ -143,11 +146,46 @@ test_format(int width, int height, GLfloat *image, GLenum format)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0,
+	glTexImage2D(GL_TEXTURE_2D, 0, requested_format, width, height, 0,
 		     GL_RGBA, GL_FLOAT, image);
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	pass = check_rendering(width, height) && pass;
+
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED,
+				 &is_compressed);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
+				 &format);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+				 GL_TEXTURE_COMPRESSED_IMAGE_SIZE,
+				 &compressed_size);
+
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+	if (!is_compressed) {
+		printf("Image was not compressed\n");
+		pass = false;
+	}
+
+	if (format != requested_format) {
+		printf("Internal Format mismatch. Found: 0x%04x Expected: 0x%04x\n",
+		       format, requested_format);
+		pass = false;
+	}
+
+	expected_size = piglit_compressed_image_size(requested_format, width,
+			height);
+
+	if (compressed_size != expected_size) {
+		printf("Compressed image size mismatch. Found: %u Expected: %u\n",
+		       compressed_size, expected_size);
+		pass = false;
+	}
+
+	/* Use GL_TEXTURE_COMPRESSED_IMAGE_SIZE even if it wasn't what we
+	 * expected to avoid corruption due to under-allocated buffer.
+	 */
+	compressed_image = malloc(compressed_size);
 
 	/* Read back the compressed image data */
 	glGetCompressedTexImage(GL_TEXTURE_2D, 0, compressed_image);
