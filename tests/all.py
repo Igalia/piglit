@@ -1835,6 +1835,7 @@ add_plain_test(arb_debug_output, 'arb_debug_output-api_error')
 khr_debug = Group()
 spec['KHR_debug'] = khr_debug
 khr_debug['object-label'] = concurrent_test('khr_debug-object-label')
+khr_debug['push-pop-group'] = concurrent_test('khr_debug-push-pop-group')
 
 # Group ARB_occlusion_query2
 arb_occlusion_query2 = Group()

@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (khr_debug-object-label debug-object-label.c)
+piglit_add_executable (khr_debug-push-pop-group debug-push-pop-group.c)
 
 # vim: ft=cmake:
