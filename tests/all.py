@@ -3060,6 +3060,10 @@ import_glsl_parser_tests(spec['OES_standard_derivatives'],
 			 os.path.join(testsDir, 'spec', 'oes_standard_derivatives'),
 			 ['compiler'])
 
+arb_clear_buffer_object = Group()
+spec['ARB_clear_buffer_object'] = arb_clear_buffer_object
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-formats')
+
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer
 add_plain_test(arb_copy_buffer, 'copy_buffer_coherency')
