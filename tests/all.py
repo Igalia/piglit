@@ -3070,6 +3070,7 @@ add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-no-bound-b
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-null-data')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-invalid-size')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-mapped')
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-overlap')
 
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer
