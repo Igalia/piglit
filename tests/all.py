@@ -3063,6 +3063,7 @@ import_glsl_parser_tests(spec['OES_standard_derivatives'],
 arb_clear_buffer_object = Group()
 spec['ARB_clear_buffer_object'] = arb_clear_buffer_object
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-formats')
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-invalid-internal-format')
 
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer

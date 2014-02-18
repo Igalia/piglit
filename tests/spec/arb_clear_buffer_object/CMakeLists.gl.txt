@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_clear_buffer_object-formats formats.c common.c)
+piglit_add_executable (arb_clear_buffer_object-invalid-internal-format invalid-internal-format.c)
 
 # vim: ft=cmake:
