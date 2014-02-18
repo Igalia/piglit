@@ -3066,6 +3066,9 @@ add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-formats')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-invalid-internal-format')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-invalid-size')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-mapped')
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-no-bound-buffer')
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-null-data')
+add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-invalid-size')
 
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer
