@@ -2,7 +2,7 @@
 # Testing the r500 DRI driver
 #
 
-from test.quick import profile
+from tests.quick import profile
 
 __all__ = ['profile']
 
