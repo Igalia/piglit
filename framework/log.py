@@ -55,7 +55,7 @@ class Log(object):
                                   str(self.__total).zfill(self.__pad))
 
     @synchronized_self
-    def mark_complete(self, value, result):
+    def post_log(self, value, result):
         """ Used to mark a test as complete in the log
 
         Arguments:
@@ -89,7 +89,7 @@ class Log(object):
         sys.stdout.flush()
 
     @synchronized_self
-    def get_current(self):
+    def pre_log(self):
         """ Returns a new number to know what processes are running """
         x = self.__generator.next()
         self.__running.append(x)

@@ -35,58 +35,58 @@ def test_initialize_log():
     assert log
 
 
-def test_get_current_return():
+def test_pre_log_return():
     """ Test that pre_log returns a number """
     log = Log(100)
 
-    ret = log.get_current()
+    ret = log.pre_log()
     nt.assert_true(isinstance(ret, (IntType, FloatType, LongType)),
-                   msg="Log.get_current() didn't return a numeric type!")
+                   msg="Log.pre_log() didn't return a numeric type!")
 
 
-def test_mark_complete_increment_complete():
-    """ Tests that Log.mark_complete() increments self.__complete """
+def test_post_log_increment_complete():
+    """ Tests that Log.post_log() increments self.__complete """
     log = Log(100)
-    ret = log.get_current()
-    log.mark_complete(ret, 'pass')
+    ret = log.pre_log()
+    log.post_log(ret, 'pass')
     nt.assert_equal(log._Log__complete, 1,
-                    msg="Log.mark_complete() did not properly incremented "
+                    msg="Log.post_log() did not properly incremented "
                         "Log.__current")
 
 
-def check_mark_complete_increment_summary(stat):
-    """ Test that passing a result to mark_complete works correctly """
+def check_post_log_increment_summary(stat):
+    """ Test that passing a result to post_log works correctly """
     log = Log(100)
-    ret = log.get_current()
-    log.mark_complete(ret, stat)
+    ret = log.pre_log()
+    log.post_log(ret, stat)
     print log._Log__summary
     nt.assert_equal(log._Log__summary[stat], 1,
                     msg="Log.__summary[{}] was not properly "
                         "incremented".format(stat))
 
 
-def test_mark_complete_increment_summary():
+def test_post_log_increment_summary():
     """ Generator that creates tests for self.__summary """
-    yieldable = check_mark_complete_increment_summary
+    yieldable = check_post_log_increment_summary
 
     for stat in valid_statuses:
-        yieldable.description = ("Test that Log.mark_complete increments "
+        yieldable.description = ("Test that Log.post_log increments "
                                  "self._summary[{}]".format(stat))
         yield yieldable, stat
 
 
-def test_mark_complete_removes_complete():
-    """ Test that Log.mark_complete() removes finished tests from __running """
+def test_post_log_removes_complete():
+    """ Test that Log.post_log() removes finished tests from __running """
     log = Log(100)
-    ret = log.get_current()
-    log.mark_complete(ret, 'pass')
+    ret = log.pre_log()
+    log.post_log(ret, 'pass')
     nt.assert_not_in(ret, log._Log__running,
                      msg="Running tests not removed from running list")
 
 
 @nt.raises(AssertionError)
-def test_mark_complete_increment_summary_bad():
-    """ Only statuses in self.__summary_keys are valid for mark_complete """
+def test_post_log_increment_summary_bad():
+    """ Only statuses in self.__summary_keys are valid for post_log """
     log = Log(100)
-    ret = log.get_current()
-    log.mark_complete(ret, 'fails')
+    ret = log.pre_log()
+    log.post_log(ret, 'fails')

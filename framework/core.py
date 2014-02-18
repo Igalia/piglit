@@ -434,7 +434,7 @@ class Test(object):
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
 
-        log_current = log.get_current()
+        log_current = log.pre_log()
         # Run the test
         if env.execute:
             try:
@@ -472,7 +472,7 @@ class Test(object):
         else:
             test_result = 'dry-run'
             log.log()
-        log.mark_complete(log_current, test_result)
+        log.post_log(log_current, test_result)
 
 
 class Group(dict):
