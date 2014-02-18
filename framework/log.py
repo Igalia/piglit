@@ -32,7 +32,7 @@ class Log(object):
     total -- The total number of tests to run.
 
     """
-    def __init__(self, total):
+    def __init__(self, total, verbose):
         self.__total = total
         self.__complete = 0
         self.__running = []
@@ -42,17 +42,37 @@ class Log(object):
                                    'dmesg-warn', 'dmesg-fail', 'dry-run'])
         self.__summary = collections.defaultdict(lambda: 0)
 
+        self.__output = "[{percent}] {summary} {running}\r"
+        if verbose:
+            self.__output = "{result} :: {name}\n" + self.__output
+
+
     def _summary(self):
+        """ return a summary of the statuses """
         return ", ".join("{0}: {1}".format(k, self.__summary[k])
                          for k in sorted(self.__summary))
 
     def _running(self):
+        """ return running tests """
         return "Running Test(s): {}".format(
             " ".join([str(x).zfill(self.__pad) for x in self.__running]))
 
     def _percent(self):
-        return "[{0}/{1}]".format(str(self.__complete).zfill(self.__pad),
-                                  str(self.__total).zfill(self.__pad))
+        """ return the percentage of tess completed """
+        return "{0}/{1}".format(str(self.__complete).zfill(self.__pad),
+                                str(self.__total).zfill(self.__pad))
+
+    def __print(self, name, result):
+        """ Do the actual printing """
+        sys.stdout.write(self.__output.format(**{'percent': self._percent(),
+                                                 'running': self._running(),
+                                                 'summary': self._summary(),
+                                                 'name': name,
+                                                 'result': result}))
+
+        # Need to flush explicitly, otherwise it all gets buffered without a
+        # newline.
+        sys.stdout.flush()
 
     @synchronized_self
     def post_log(self, value, result):
@@ -74,23 +94,31 @@ class Log(object):
         self.__summary[result] += 1
 
     @synchronized_self
-    def log(self):
+    def log(self, name, result):
         """ Print to the screen 
 
         Works by moving the cursor back to the front of the line and printing
         over it.
-        
-        """
-        sys.stdout.write("{0} {1} {2}\r".format(
-            self._percent(), self._summary(), self._running()))
 
-        # Need to flush explicitly, otherwise it all gets buffered without a
-        # newline.
-        sys.stdout.flush()
+        """
+        assert result in self.__summary_keys
+        self.__print(name, result)
 
     @synchronized_self
-    def pre_log(self):
-        """ Returns a new number to know what processes are running """
+    def pre_log(self, running=None):
+        """ Hook to run before log()
+        
+        Returns a new number to know what processes are running, if running is
+        set it will print a running message for the test
+
+        Keyword Arguments:
+        running -- the name of a test to print is running. If Falsy then
+                   nothing will be printed. Default: None
+        
+        """
+        if running:
+            self.__print(running, 'running')
+
         x = self.__generator.next()
         self.__running.append(x)
         return x

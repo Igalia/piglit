@@ -29,15 +29,21 @@ from framework.log import Log
 valid_statuses = ('pass', 'fail', 'crash', 'warn', 'dmesg-warn',
                   'dmesg-fail', 'skip', 'dry-run')
 
-def test_initialize_log():
-    """ Test that Log initializes with """
-    log = Log(100)
+def test_initialize_log_terse():
+    """ Test that Log initializes with verbose=False """
+    log = Log(100, False)
+    assert log
+
+
+def test_initialize_log_verbose():
+    """ Test that Log initializes with verbose=True """
+    log = Log(100, True)
     assert log
 
 
 def test_pre_log_return():
     """ Test that pre_log returns a number """
-    log = Log(100)
+    log = Log(100, False)
 
     ret = log.pre_log()
     nt.assert_true(isinstance(ret, (IntType, FloatType, LongType)),
@@ -46,7 +52,7 @@ def test_pre_log_return():
 
 def test_post_log_increment_complete():
     """ Tests that Log.post_log() increments self.__complete """
-    log = Log(100)
+    log = Log(100, False)
     ret = log.pre_log()
     log.post_log(ret, 'pass')
     nt.assert_equal(log._Log__complete, 1,
@@ -56,7 +62,7 @@ def test_post_log_increment_complete():
 
 def check_post_log_increment_summary(stat):
     """ Test that passing a result to post_log works correctly """
-    log = Log(100)
+    log = Log(100, False)
     ret = log.pre_log()
     log.post_log(ret, stat)
     print log._Log__summary
@@ -77,7 +83,7 @@ def test_post_log_increment_summary():
 
 def test_post_log_removes_complete():
     """ Test that Log.post_log() removes finished tests from __running """
-    log = Log(100)
+    log = Log(100, False)
     ret = log.pre_log()
     log.post_log(ret, 'pass')
     nt.assert_not_in(ret, log._Log__running,
@@ -87,6 +93,6 @@ def test_post_log_removes_complete():
 @nt.raises(AssertionError)
 def test_post_log_increment_summary_bad():
     """ Only statuses in self.__summary_keys are valid for post_log """
-    log = Log(100)
+    log = Log(100, False)
     ret = log.pre_log()
     log.post_log(ret, 'fails')

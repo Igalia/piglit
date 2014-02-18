@@ -82,6 +82,10 @@ def main():
                         action="store_true",
                         help="Capture a difference in dmesg before and "
                              "after each test. Implies -1/--no-concurrency")
+    parser.add_argument("-v", "--verbose",
+                        action="store_true",
+                        help="Produce a line of output for each test before "
+                             "and after it runs")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -115,7 +119,8 @@ def main():
                            include_filter=args.include_tests,
                            execute=args.execute,
                            valgrind=args.valgrind,
-                           dmesg=args.dmesg)
+                           dmesg=args.dmesg,
+                           verbose=args.verbose)
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))

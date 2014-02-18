@@ -43,7 +43,8 @@ def main():
                            include_filter=results.options['filter'],
                            execute=results.options['execute'],
                            valgrind=results.options['valgrind'],
-                           dmesg=results.options['dmesg'])
+                           dmesg=results.options['dmesg'],
+                           verbose=results.options['verbose'])
 
     # Change working directory to the piglit directory
     os.chdir(path.dirname(path.realpath(sys.argv[0])))

@@ -355,7 +355,7 @@ class TestrunResult:
 
 class Environment:
     def __init__(self, concurrent=True, execute=True, include_filter=[],
-                 exclude_filter=[], valgrind=False, dmesg=False):
+                 exclude_filter=[], valgrind=False, dmesg=False, verbose=False):
         self.concurrent = concurrent
         self.execute = execute
         self.filter = []
@@ -363,6 +363,7 @@ class Environment:
         self.exclude_tests = set()
         self.valgrind = valgrind
         self.dmesg = dmesg
+        self.verbose = verbose
 
         """
         The filter lists that are read in should be a list of string objects,
@@ -433,12 +434,11 @@ class Test(object):
             Fully qualified test name as a string.  For example,
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
+        log_current = log.pre_log(path if env.verbose else None)
 
-        log_current = log.pre_log()
         # Run the test
         if env.execute:
             try:
-                log.log()
                 time_start = time.time()
                 dmesg.update_dmesg()
                 self._test_hook_execute_run()
@@ -462,7 +462,9 @@ class Test(object):
                 result['traceback'] = \
                     "".join(traceback.format_tb(sys.exc_info()[2]))
 
-            test_result = result['result']
+            log.log(path, result['result'])
+            log.post_log(log_current, result['result'])
+
             if 'subtest' in result and len(result['subtest']) > 1:
                 for test in result['subtest']:
                     result['result'] = result['subtest'][test]
@@ -470,9 +472,8 @@ class Test(object):
             else:
                 json_writer.write_dict_item(path, result)
         else:
-            test_result = 'dry-run'
-            log.log()
-        log.post_log(log_current, test_result)
+            log.log(path, 'dry-run')
+            log.post_log(log_current, 'dry-run')
 
 
 class Group(dict):
@@ -557,7 +558,7 @@ class TestProfile(object):
         '''
 
         self.prepare_test_list(env)
-        log = Log(len(self.test_list))
+        log = Log(len(self.test_list), env.verbose)
 
         def test(pair):
             """ Function to call test.execute from .map
