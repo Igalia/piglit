@@ -15,5 +15,6 @@ piglit_add_executable (arb_clear_buffer_object-mapped mapped.c)
 piglit_add_executable (arb_clear_buffer_object-no-bound-buffer no-bound-buffer.c)
 piglit_add_executable (arb_clear_buffer_object-null-data null-data.c common.c)
 piglit_add_executable (arb_clear_buffer_object-sub-invalid-size sub-invalid-size.c)
+piglit_add_executable (arb_clear_buffer_object-sub-mapped sub-mapped.c common.c)
 
 # vim: ft=cmake:
