@@ -20,10 +20,14 @@
 
 """ Module provides tests for log.py module """
 
+import sys
+import itertools
 from types import *  # This is a special * safe module
 import nose.tools as nt
 from framework.log import Log
 
+valid_statuses = ('pass', 'fail', 'crash', 'warn', 'dmesg-warn',
+                  'dmesg-fail', 'skip', 'dry-run')
 
 def test_initialize_log():
     """ Test that Log initializes with """
@@ -63,11 +67,6 @@ def check_mark_complete_increment_summary(stat):
 
 def test_mark_complete_increment_summary():
     """ Generator that creates tests for self.__summary """
-
-
-    valid_statuses = ('pass', 'fail', 'crash', 'warn', 'dmesg-warn',
-                      'dmesg-fail', 'skip')
-
     yieldable = check_mark_complete_increment_summary
 
     for stat in valid_statuses:
@@ -83,3 +82,11 @@ def test_mark_complete_removes_complete():
     log.mark_complete(ret, 'pass')
     nt.assert_not_in(ret, log._Log__running,
                      msg="Running tests not removed from running list")
+
+
+@nt.raises(AssertionError)
+def test_mark_complete_increment_summary_bad():
+    """ Only statuses in self.__summary_keys are valid for mark_complete """
+    log = Log(100)
+    ret = log.get_current()
+    log.mark_complete(ret, 'fails')

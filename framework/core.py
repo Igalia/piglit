@@ -435,7 +435,6 @@ class Test(object):
         '''
 
         log_current = log.get_current()
-        test_result = None
         # Run the test
         if env.execute:
             try:
@@ -471,6 +470,7 @@ class Test(object):
             else:
                 json_writer.write_dict_item(path, result)
         else:
+            test_result = 'dry-run'
             log.log()
         log.mark_complete(log_current, test_result)
 

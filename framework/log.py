@@ -21,6 +21,7 @@
 #
 
 import sys
+import collections
 from .threads import synchronized_self
 
 
@@ -37,7 +38,9 @@ class Log(object):
         self.__running = []
         self.__generator = (x for x in xrange(self.__total))
         self.__pad = len(str(self.__total))
-        self.__summary = {}
+        self.__summary_keys = set(['pass', 'fail', 'warn', 'crash', 'skip',
+                                   'dmesg-warn', 'dmesg-fail', 'dry-run'])
+        self.__summary = collections.defaultdict(lambda: 0)
 
     def _summary(self):
         return ", ".join("{0}: {1}".format(k, self.__summary[k])
@@ -67,8 +70,8 @@ class Log(object):
         # increment the number of completed tests
         self.__complete += 1
 
-        if result:
-            self.__summary[result] = self.__summary.get(result, 0) + 1
+        assert result in self.__summary_keys
+        self.__summary[result] += 1
 
     @synchronized_self
     def log(self):
@@ -80,6 +83,7 @@ class Log(object):
         """
         sys.stdout.write("{0} {1} {2}\r".format(
             self._percent(), self._summary(), self._running()))
+
         # Need to flush explicitly, otherwise it all gets buffered without a
         # newline.
         sys.stdout.flush()
