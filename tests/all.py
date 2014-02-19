@@ -1491,6 +1491,8 @@ import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
 			 os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
 			 [''])
 
+profile.test_list['spec/ARB_stencil_texturing/draw'] = concurrent_test('arb_stencil_texturing-draw')
+
 # Group ARB_sync
 arb_sync = Group()
 spec['ARB_sync'] = arb_sync
