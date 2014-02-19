@@ -115,6 +115,7 @@ TexSwizzleTest::Swizzle(const GLubyte *texColor, GLenum swizzle)
 		return 0;
 	default:
 		assert(0);
+		return 0;
 	}
 }
 
