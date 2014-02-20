@@ -151,7 +151,7 @@ enum piglit_result piglit_display(void)
 	GLuint *readback;
 	GLuint buffer[BUFFER_SIZE];
 	GLuint expected[BUFFER_SIZE];
-	int i;
+	unsigned int i;
 	GLboolean pass = GL_TRUE;
 
 	glUseProgram(prog);
@@ -181,7 +181,7 @@ enum piglit_result piglit_display(void)
 	memset(expected, 0xffffffff, sizeof(expected));
 	for (i = 0; i < EXPECTED_NUM_OUTPUTS; ++i) {
 		expected[i + additional_offset / 4] =
-			0x00010203 + 0x04040404 * i;
+			0x00010203u + 0x04040404u * i;
 	}
 
 	/* Check output */
