@@ -36,6 +36,9 @@
  *      the internal component sizes and types shown for that format
  *      in tables 3.16- 3.17:"
  *
+ * Note that table 3.18, sized internal depth and stencil formats, is
+ * excluded.
+ *
  * In GL 3.1 this is changed to allow increased precision for the
  * required sized formats.  From page 118 of the GL 3.1 core spec PDF
  * (20090528):
@@ -194,7 +197,14 @@ piglit_init(int argc, char **argv)
 					format_pass = false;
 			} else if (target_version == 30) {
 				if (sizes[c] != get_channel_size(f, c)) {
-					format_pass = false;
+					if ((c == D || c == S) &&
+					    get_channel_size(f, c) > 0) {
+						/* any non-zero size will do */
+						if (sizes[c] <= 0)
+							format_pass = false;
+					} else {
+						format_pass = false;
+					}
 				}
 			} else {
 				if (sizes[c] < get_channel_size(f, c)) {
