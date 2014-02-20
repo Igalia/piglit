@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_separate_shader_object-400-combinations 400-combinations.c)
+piglit_add_executable (arb_separate_shader_object-ActiveShaderProgram-invalid-program ActiveShaderProgram-invalid-program.c)
 piglit_add_executable (arb_separate_shader_object-GetProgramPipelineiv GetProgramPipelineiv.c)
 piglit_add_executable (arb_separate_shader_object-IsProgramPipeline IsProgramPipeline.c)
 piglit_add_executable (arb_separate_shader_object-ProgramUniform-coverage ProgramUniform-coverage.c)

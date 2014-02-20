@@ -1756,6 +1756,7 @@ add_concurrent_test(arb_occlusion_query, 'gen_delete_while_active')
 # Group ARB_separate_shader_objects
 arb_separate_shader_objects = Group()
 spec['ARB_separate_shader_objects'] = arb_separate_shader_objects
+arb_separate_shader_objects['ActiveShaderProgram with invalid program'] = concurrent_test('arb_separate_shader_object-ActiveShaderProgram-invalid-program')
 arb_separate_shader_objects['GetProgramPipelineiv'] = concurrent_test('arb_separate_shader_object-GetProgramPipelineiv')
 arb_separate_shader_objects['IsProgramPipeline'] = concurrent_test('arb_separate_shader_object-IsProgramPipeline')
 arb_separate_shader_objects['UseProgramStages - non-separable program'] = concurrent_test('arb_separate_shader_object-UseProgramStages-non-separable')
