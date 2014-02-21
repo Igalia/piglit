@@ -56,7 +56,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
             for f in filenames:
                 # Add f as a test if its file extension is good.
                 ext = f.rsplit('.')[-1]
-                if ext in ['vert', 'geom', 'frag', 'comp']:
+                if ext in ['vert', 'tesc', 'tese', 'geom', 'frag', 'comp']:
                     filepath = path.join(dirpath, f)
                     # testname := filepath relative to
                     # basepath.
@@ -76,8 +76,8 @@ class GLSLParserTest(PiglitTest):
     to sort in the profile.
 
     Arguments:
-    filepath -- the path to a glsl_parser_test which must end in .frag, .vert,
-                or .geom
+    filepath -- the path to a glsl_parser_test which must end in .vert,
+                .tesc, .tese, .geom or .frag
 
     """
     def __init__(self, filepath):

@@ -128,6 +128,10 @@ get_shader_name(GLenum type)
 	switch(type) {
 	case GL_VERTEX_SHADER:
 		return "vertex";
+	case GL_TESS_CONTROL_SHADER:
+		return "tessellation control";
+	case GL_TESS_EVALUATION_SHADER:
+		return "tessellation evaluation";
 	case GL_GEOMETRY_SHADER:
 		return "geometry";
 	case GL_FRAGMENT_SHADER:
@@ -223,6 +227,10 @@ test(void)
 	else if (strcmp(filename + strlen(filename) - 4, "vert") == 0)
 		type = GL_VERTEX_SHADER;
 #ifdef PIGLIT_USE_OPENGL
+	else if (strcmp(filename + strlen(filename) - 4, "tesc") == 0)
+		type = GL_TESS_CONTROL_SHADER;
+	else if (strcmp(filename + strlen(filename) - 4, "tese") == 0)
+		type = GL_TESS_EVALUATION_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "geom") == 0)
 		type = GL_GEOMETRY_SHADER;
 	else if (strcmp(filename + strlen(filename) - 4, "comp") == 0)
@@ -237,6 +245,15 @@ test(void)
 
 	piglit_require_vertex_shader();
 	piglit_require_fragment_shader();
+
+	if (type == GL_TESS_CONTROL_SHADER || type == GL_TESS_EVALUATION_SHADER) {
+		if (!piglit_is_extension_supported("GL_ARB_tessellation_shader") &&
+		    (piglit_is_gles() || piglit_get_gl_version() < 40)) {
+			printf("Test requires GL version 4.0 or "
+			       "GL_ARB_tessellation_shader\n");
+			piglit_report_result(PIGLIT_SKIP);
+		}
+	}
 
 	if (type == GL_COMPUTE_SHADER) {
 		if (!piglit_is_extension_supported("GL_ARB_compute_shader") &&
@@ -281,7 +298,9 @@ test(void)
 		if (requested_version == 100 || requested_version == 300)
 			attach_complementary_shader(shader_prog, type);
 #if PIGLIT_USE_OPENGL
-		if (type == GL_GEOMETRY_SHADER)
+		if (type == GL_GEOMETRY_SHADER ||
+		    type == GL_TESS_CONTROL_SHADER ||
+		    type == GL_TESS_EVALUATION_SHADER)
 			attach_dummy_shader(shader_prog, GL_VERTEX_SHADER);
 		if (test_requires_geometry_shader4) {
 			/* The default value of
