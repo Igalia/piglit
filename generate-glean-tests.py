@@ -25,6 +25,7 @@
 # Authors:
 #    Eric Anholt <eric@anholt.net>
 
+from __future__ import print_function
 from getopt import getopt, GetoptError
 
 import re
@@ -38,7 +39,7 @@ Usage %(progName) [cppfile] [add_prefix]
 cppfile: path to glean cppfile to parse
 add_suffix: prefix to have in test name i.e. glsl1 -> add_glsl1
 """
-    print USAGE % {'progName': sys.argv[0]}
+    print(USAGE % {'progName': sys.argv[0]})
     sys.exit(1)
 
 
@@ -67,7 +68,7 @@ def main():
                 break
             if not re.match(r'//', name):
                 name = re.sub(r'".*', r'', name)
-                print "add_" + suffix + "('" + name + "')"
+                print("add_" + suffix + "('" + name + "')")
                 next_is_name = False
         if line == "    {\n":
             next_is_name = True

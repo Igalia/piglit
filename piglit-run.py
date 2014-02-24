@@ -22,6 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
+from __future__ import print_function
 import argparse
 import sys
 import os
@@ -176,9 +177,9 @@ def main():
     json_writer.close_dict()
     json_writer.file.close()
 
-    print
-    print 'Thank you for running Piglit!'
-    print 'Results have been written to ' + result_filepath
+    print('\n'
+          'Thank you for running Piglit!\n'
+          'Results have been written to ' + result_filepath)
 
 
 if __name__ == "__main__":

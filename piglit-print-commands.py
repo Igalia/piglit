@@ -22,6 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 
 
+from __future__ import print_function
 import argparse
 import sys
 import os
@@ -77,7 +78,7 @@ def main():
     profile.prepare_test_list(env)
     for name, test in profile.test_list.items():
         assert(isinstance(test, ExecTest))
-        print name, ':::', getCommand(test)
+        print(name, ':::', getCommand(test))
 
 
 if __name__ == "__main__":

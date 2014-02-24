@@ -18,7 +18,8 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
+ 
+from __future__ import print_function
 import os
 import os.path as path
 import itertools
@@ -462,27 +463,28 @@ class Summary:
         if not summary:
             if diff:
                 for test in self.tests['changes']:
-                    print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
+                    print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
                           ' '.join([str(i.tests.get(test, {'result': so.Skip()})
-                                    ['result']) for i in self.results])}
+                                    ['result']) for i in self.results])})
             else:
                 for test in self.tests['all']:
-                    print "%(test)s: %(statuses)s" % {'test': test, 'statuses':
+                    print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
                           ' '.join([str(i.tests.get(test, {'result': so.Skip()})
-                                    ['result']) for i in self.results])}
+                                    ['result']) for i in self.results])})
 
         # Print the summary
-        print "summary:"
-        print "       pass: %d" % self.totals['pass']
-        print "       fail: %d" % self.totals['fail']
-        print "      crash: %d" % self.totals['crash']
-        print "       skip: %d" % self.totals['skip']
-        print "       warn: %d" % self.totals['warn']
-        print " dmesg-warn: %d" % self.totals['dmesg-warn']
-        print " dmesg-fail: %d" % self.totals['dmesg-fail']
+        print("summary:\n"
+              "       pass: {pass}\n"
+              "       fail: {fail}\n"
+              "      crash: {crash}\n"
+              "       skip: {skip}\n"
+              "       warn: {warn}\n"
+              " dmesg-warn: {dmesg-warn}\n"
+              " dmesg-fail: {dmesg-fail}".format(**self.totals))
         if self.tests['changes']:
-            print "    changes: %d" % len(self.tests['changes'])
-            print "      fixes: %d" % len(self.tests['fixes'])
-            print "regressions: %d" % len(self.tests['regressions'])
+            print("    changes: {changes}\n"
+                  "      fixes: {fixes}\n"
+                  "regressions: {regressions}".format(
+                      **dict((k, len(v)) for k, v in self.tests.iteritems())))
 
-        print "      total: %d" % sum(self.totals.itervalues())
+        print("      total: {}".format(sum(self.totals.itervalues())))

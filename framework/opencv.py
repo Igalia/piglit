@@ -24,6 +24,7 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
+from __future__ import print_function
 import re
 import subprocess
 from os import path
@@ -46,7 +47,8 @@ def add_opencv_tests(profile, individual = False):
     opencv_test_ocl = path.join(PIGLIT_CONFIG.get('opencv',
         'opencv_test_ocl_bindir'), 'opencv_test_ocl')
     if not path.isfile(opencv_test_ocl):
-        print 'Warning: ', opencv_test_ocl, 'does not exist.\nSkipping OpenCV tests...'
+        print('Warning: {} does not exist.\nSkipping OpenCV '
+              'tests...'.format(opencv_test_ocl))
         return
     tests = subprocess.check_output([opencv_test_ocl, '--gtest_list_tests'])
     test_list = tests.splitlines()

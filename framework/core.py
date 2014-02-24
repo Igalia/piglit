@@ -22,6 +22,7 @@
 
 # Piglit core
 
+from __future__ import print_function
 import errno
 import os
 import platform
@@ -204,8 +205,8 @@ def checkDir(dirname, failifexists):
             exists = False
 
     if exists and failifexists:
-        print >>sys.stderr, "%(dirname)s exists already.\nUse --overwrite if" \
-                            "you want to overwrite it.\n" % locals()
+        print("%(dirname)s exists already.\nUse --overwrite if "
+              "you want to overwrite it.\n" % locals(), file=sys.stderr)
         exit(1)
 
     try:
