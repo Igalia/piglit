@@ -39,7 +39,7 @@ check_array_buffer_sub_data(const int ofs, const int length,
 	bool pass = true;
 	int i;
 	int buffer_size;
-	void *buffer_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+	char *buffer_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_size);
 
 	assert(length % expected_data_size == 0);
@@ -78,7 +78,7 @@ fill_array_buffer(const int data_size, const void *const data)
 {
 	int i;
 	int buffer_size;
-	void *buffer_data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	char *buffer_data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &buffer_size);
 
 	assert (buffer_size % data_size == 0);
