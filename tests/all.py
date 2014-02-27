@@ -2522,6 +2522,7 @@ add_depthstencil_render_miplevels_tests(
          'ds=z24_s8'))
 ext_packed_depth_stencil['fbo-clear-formats stencil'] = concurrent_test('fbo-clear-formats GL_EXT_packed_depth_stencil stencil')
 ext_packed_depth_stencil['DEPTH_STENCIL texture'] = concurrent_test('ext_packed_depth_stencil-depth-stencil-texture')
+ext_packed_depth_stencil['getteximage'] = concurrent_test('ext_packed_depth_stencil-getteximage')
 
 oes_packed_depth_stencil = Group()
 spec['OES_packed_depth_stencil'] = oes_packed_depth_stencil
