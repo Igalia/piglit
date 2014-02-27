@@ -22,7 +22,7 @@
  */
 
 /**
- * \file negative-texture
+ * \file depth-stencil-texture.c
  * Create a depth-stencil texture when ARB_depth_texture is not supported.
  *
  * The EXT_packed_depth_stencil spec neglects to mention an interaction

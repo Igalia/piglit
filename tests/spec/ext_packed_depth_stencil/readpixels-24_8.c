@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-/** @file fbo-readpixels-depth-formats.c
+/** @file readpixels-24_8.c
  *
  * Tests that various formats of depth renderbuffers can be read
  * correctly using glReadPixels() with various format/type
