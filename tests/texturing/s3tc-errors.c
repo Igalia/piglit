@@ -133,9 +133,9 @@ test_format(int width, int height, GLfloat *image, GLenum requested_format)
 	GLuint tex;
 	bool pass = true;
 	GLuint expected_size;
-	bool is_compressed;
-	GLuint compressed_size;
-	GLenum format;
+	GLint is_compressed;
+	GLint compressed_size;
+	GLint format;
 
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
