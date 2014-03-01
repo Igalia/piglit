@@ -152,8 +152,6 @@ piglit_cl_test(const int argc,
 	char test_str[1024];
 
 	int i, mask;
-	cl_int errNo;
-	cl_context cl_ctx;
 	cl_device_type mixed_device_types;
 
 	bool found_invalid_platform = false;
@@ -168,10 +166,6 @@ piglit_cl_test(const int argc,
 	};
 	cl_context_properties invalid_context_properties[] = {
 		CL_DEVICE_NAME, (cl_context_properties)env->platform_id,
-		0
-	};
-	cl_context_properties invalid_platform_context_properties[] = {
-		CL_CONTEXT_PLATFORM, (cl_context_properties)NULL,
 		0
 	};
 	cl_context_properties multiple_platform_context_properties[] = {
@@ -197,8 +191,6 @@ piglit_cl_test(const int argc,
 		}
 	}
 	free(platform_ids);
-	invalid_platform_context_properties[1] =
-		(cl_context_properties)invalid_platform_id;
 
 	/*** Normal usage ***/
 
