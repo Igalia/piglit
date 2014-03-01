@@ -1129,7 +1129,7 @@ parse_name(const char *input)
 		return NULL;
 	}
 
-	if (!regexec(&regex, input, 1, &pmatch, 0)) {
+	if (!regexec(&regex, input, 1, pmatch, 0)) {
 		char bad_char = *(input + pmatch[0].rm_so);
 		fprintf(stderr,	"Illegal character in test name '%s': %c\n",
 							input, bad_char);
