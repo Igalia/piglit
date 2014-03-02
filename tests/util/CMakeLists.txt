@@ -26,6 +26,7 @@ set(UTIL_GL_SOURCES
 	piglit-framework-gl.c
 	piglit_ktx.c
 	rgb9e5.c
+	r11g11b10f.c
 	)
 
 if(PIGLIT_USE_WAFFLE)
