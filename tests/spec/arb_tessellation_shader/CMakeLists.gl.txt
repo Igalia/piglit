@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (arb_tessellation_shader-get-tcs-params get-tcs-params.c)
 piglit_add_executable (arb_tessellation_shader-get-tes-params get-tes-params.c)
 
 # vim: ft=cmake:
