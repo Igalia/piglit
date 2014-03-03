@@ -227,8 +227,9 @@ def test_testclasses_dmesg():
              (GLSLParserTest, 'tests/glslparsertest/shaders/main1.vert',
               'GLSLParserTest')]
 
+    yieldable = check_classes_dmesg
+
     for tclass, tfile, desc in lists:
-        yieldable = check_classes_dmesg
         yieldable.description = "Test dmesg in {}".format(desc)
         yield yieldable, tclass, tfile, env
 
@@ -247,6 +248,19 @@ def check_classes_dmesg(test_class, test_args, env):
         def write_dict_item(self, path, result):
             self.result = result
 
+    class DummyLog(object):
+        def __init__(self):
+            pass
+
+        def pre_log(*args):
+            return None
+
+        def log(*args):
+            pass
+
+        def post_log(*args):
+            pass
+
     def _write_dmesg():
         """ Small helper to write dmesg """
         subprocess.call(['sudo', 'sh', '-c', 'echo "piglit test" > /dev/kmsg'])
@@ -259,7 +273,7 @@ def check_classes_dmesg(test_class, test_args, env):
 
     json = DummyJsonWriter()
 
-    test.execute(env, None, json, dmesg)
+    test.execute(env, None, DummyLog(), json, dmesg)
 
     nt.assert_in(json.result['result'], ['dmesg-warn', 'dmesg-fail'],
                  msg="{0} did not update status with dmesg".format(type(test)))
