@@ -1332,6 +1332,11 @@ arb_point_sprite = {}
 spec['ARB_point_sprite'] = arb_point_sprite
 add_plain_test(arb_point_sprite, 'point-sprite')
 
+# Group ARB_tessellation_shader
+arb_tessellation_shader = {}
+spec['ARB_tessellation_shader'] = arb_tessellation_shader
+add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-get-tes-params')
+
 # Group ARB_texture_multisample
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
 				'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
