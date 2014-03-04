@@ -65,7 +65,7 @@ static const struct {
 	{GL_LUMINANCE32F_ARB,		GL_LUMINANCE_INTEGER_EXT,	GL_FLOAT,		4,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
 	{GL_LUMINANCE_ALPHA32F_ARB,	GL_LUMINANCE_ALPHA,		GL_FLOAT,		8,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
 	{GL_INTENSITY32F_ARB,		GL_INTENSITY,			GL_FLOAT,		4,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
-	{GL_RGB32F,			GL_RGB,				GL_FLOAT,		12,	true,	{NULL,	"GL_ARB_texture_float",	NULL}},
+	{GL_RGB32F,			GL_RGB,				GL_FLOAT,		12,	true,	{NULL,	"GL_ARB_texture_float",	"ARB_texture_buffer_object_rgb32"}},
 	{GL_RGBA32F_ARB,		GL_RGBA,			GL_FLOAT,		16,	true,	{NULL,	"GL_ARB_texture_float",	NULL}},
 /* texture_half_float */
 	{GL_ALPHA16F_ARB,		GL_ALPHA,			GL_HALF_FLOAT,		2,	false,	{NULL,	"GL_ARB_texture_float",	"GL_ARB_half_float_pixel"}},
@@ -102,8 +102,8 @@ static const struct {
 	{GL_INTENSITY16UI_EXT,		GL_RED_INTEGER,			GL_UNSIGNED_SHORT,	2,	false,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 	{GL_INTENSITY32UI_EXT,		GL_RED_INTEGER,			GL_UNSIGNED_INT,	4,	false,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 
-	{GL_RGB32I,			GL_RGB_INTEGER,			GL_INT,			12,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},
-	{GL_RGB32UI,			GL_RGB_INTEGER,			GL_UNSIGNED_INT,	12,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},
+	{GL_RGB32I,			GL_RGB_INTEGER,			GL_INT,			12,	true,	{NULL,	"GL_EXT_texture_integer",	"ARB_texture_buffer_object_rgb32"}},
+	{GL_RGB32UI,			GL_RGB_INTEGER,			GL_UNSIGNED_INT,	12,	true,	{NULL,	"GL_EXT_texture_integer",	"ARB_texture_buffer_object_rgb32"}},
 
 	{GL_RGBA8I_EXT,			GL_RGBA_INTEGER,		GL_BYTE,		4,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 	{GL_RGBA16I_EXT,		GL_RGBA_INTEGER,		GL_SHORT,		8,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},
@@ -187,19 +187,17 @@ test_format(const int i)
 					     "\xd3\xe4\xe3\x5b"
 					     "\x79\x1e\x21\x39"
 					     "\xa8\xfa\x69\x6a";
+	int j;
 
 
 	if (piglit_is_core_profile && !formats[i].core_profile)
 		return true;
-	/* All required extensions are included in GL 3.0. */
-	if (piglit_get_gl_version() < 30) {
-		int j;
-		for (j = 0; j < 3; ++j)
-			if (formats[i].ext[j])
-				if (!piglit_is_extension_supported(
-							formats[i].ext[j]))
-					return true;
-	}
+
+	for (j = 0; j < 3; ++j)
+		if (formats[i].ext[j])
+			if (!piglit_is_extension_supported(
+						formats[i].ext[j]))
+				return true;
 
 	printf("Testing %s... ",
 			piglit_get_gl_enum_name(formats[i].internal_format));
