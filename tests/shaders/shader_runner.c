@@ -98,6 +98,10 @@ const char *test_start = NULL;
 
 GLuint vertex_shaders[256];
 unsigned num_vertex_shaders = 0;
+GLuint tess_ctrl_shaders[256];
+unsigned num_tess_ctrl_shaders = 0;
+GLuint tess_eval_shaders[256];
+unsigned num_tess_eval_shaders = 0;
 GLuint geometry_shaders[256];
 unsigned num_geometry_shaders = 0;
 GLuint fragment_shaders[256];
@@ -131,6 +135,10 @@ enum states {
 	vertex_shader_file,
 	vertex_shader_passthrough,
 	vertex_program,
+	tess_ctrl_shader,
+	tess_ctrl_shader_file,
+	tess_eval_shader,
+	tess_eval_shader_file,
 	geometry_shader,
 	geometry_shader_file,
 	geometry_layout,
@@ -240,6 +248,10 @@ target_to_short_name(GLenum target)
 		return "VS";
 	case GL_FRAGMENT_SHADER:
 		return "FS";
+	case GL_TESS_CONTROL_SHADER:
+		return "TCS";
+	case GL_TESS_EVALUATION_SHADER:
+		return "TES";
 	case GL_GEOMETRY_SHADER:
 		return "GS";
 	case GL_COMPUTE_SHADER:
@@ -262,6 +274,11 @@ compile_glsl(GLenum target, bool release_text)
 		break;
 	case GL_FRAGMENT_SHADER:
 		piglit_require_fragment_shader();
+		break;
+	case GL_TESS_CONTROL_SHADER:
+	case GL_TESS_EVALUATION_SHADER:
+		if (gl_version.num < 40)
+			piglit_require_extension("GL_ARB_tessellation_shader");
 		break;
 	case GL_GEOMETRY_SHADER:
 		if (gl_version.num < 32)
@@ -333,6 +350,14 @@ compile_glsl(GLenum target, bool release_text)
 	case GL_VERTEX_SHADER:
 		vertex_shaders[num_vertex_shaders] = shader;
 		num_vertex_shaders++;
+		break;
+	case GL_TESS_CONTROL_SHADER:
+		tess_ctrl_shaders[num_tess_ctrl_shaders] = shader;
+		num_tess_ctrl_shaders++;
+		break;
+	case GL_TESS_EVALUATION_SHADER:
+		tess_eval_shaders[num_tess_eval_shaders] = shader;
+		num_tess_eval_shaders++;
 		break;
 	case GL_GEOMETRY_SHADER:
 		geometry_shaders[num_geometry_shaders] = shader;
@@ -713,6 +738,24 @@ leave_state(enum states state, const char *line)
 					 line - shader_string);
 		break;
 
+	case tess_ctrl_shader:
+		shader_string_size = line - shader_string;
+		compile_glsl(GL_TESS_CONTROL_SHADER, false);
+		break;
+
+	case tess_ctrl_shader_file:
+		compile_glsl(GL_TESS_CONTROL_SHADER, true);
+		break;
+
+	case tess_eval_shader:
+		shader_string_size = line - shader_string;
+		compile_glsl(GL_TESS_EVALUATION_SHADER, false);
+		break;
+
+	case tess_eval_shader_file:
+		compile_glsl(GL_TESS_EVALUATION_SHADER, true);
+		break;
+
 	case geometry_shader:
 		shader_string_size = line - shader_string;
 		compile_glsl(GL_GEOMETRY_SHADER, false);
@@ -771,6 +814,8 @@ link_and_use_shaders(void)
 
 	if ((num_vertex_shaders == 0)
 	    && (num_fragment_shaders == 0)
+	    && (num_tess_ctrl_shaders == 0)
+	    && (num_tess_eval_shaders == 0)
 	    && (num_geometry_shaders == 0)
 	    && (num_compute_shaders == 0))
 		return;
@@ -779,6 +824,14 @@ link_and_use_shaders(void)
 
 	for (i = 0; i < num_vertex_shaders; i++) {
 		glAttachShader(prog, vertex_shaders[i]);
+	}
+
+	for (i = 0; i < num_tess_ctrl_shaders; i++) {
+		glAttachShader(prog, tess_ctrl_shaders[i]);
+	}
+
+	for (i = 0; i < num_tess_eval_shaders; i++) {
+		glAttachShader(prog, tess_eval_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
@@ -819,6 +872,14 @@ link_and_use_shaders(void)
 
 	for (i = 0; i < num_vertex_shaders; i++) {
 		glDeleteShader(vertex_shaders[i]);
+	}
+
+	for (i = 0; i < num_tess_ctrl_shaders; i++) {
+		glDeleteShader(tess_ctrl_shaders[i]);
+	}
+
+	for (i = 0; i < num_tess_eval_shaders; i++) {
+		glDeleteShader(tess_eval_shaders[i]);
 	}
 
 	for (i = 0; i < num_geometry_shaders; i++) {
@@ -896,6 +957,18 @@ process_test_script(const char *script_name)
 			} else if (string_match("[vertex shader file]", line)) {
 				state = vertex_shader_file;
 				shader_string = NULL;
+			} else if (string_match("[tessellation control shader]", line)) {
+				state = tess_ctrl_shader;
+				shader_string = NULL;
+			} else if (string_match("[tessellation control shader file]", line)) {
+				state = tess_ctrl_shader_file;
+				shader_string = NULL;
+			} else if (string_match("[tessellation evaluation shader]", line)) {
+				state = tess_eval_shader;
+				shader_string = NULL;
+			} else if (string_match("[tessellation evaluation shader file]", line)) {
+				state = tess_eval_shader_file;
+				shader_string = NULL;
 			} else if (string_match("[geometry shader]", line)) {
 				state = geometry_shader;
 				shader_string = NULL;
@@ -945,6 +1018,8 @@ process_test_script(const char *script_name)
 
 			case vertex_shader:
 			case vertex_program:
+			case tess_ctrl_shader:
+			case tess_eval_shader:
 			case geometry_shader:
 			case fragment_shader:
 			case fragment_program:
@@ -954,6 +1029,8 @@ process_test_script(const char *script_name)
 				break;
 
 			case vertex_shader_file:
+			case tess_ctrl_shader_file:
+			case tess_eval_shader_file:
 			case geometry_shader_file:
 			case fragment_shader_file:
 			case compute_shader_file:
