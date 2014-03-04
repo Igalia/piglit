@@ -53,7 +53,7 @@ piglit_init(int argc, char **argv)
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_BUFFER, tex);
 
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, buff);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, buff);
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
