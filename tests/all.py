@@ -1337,6 +1337,7 @@ arb_tessellation_shader = {}
 spec['ARB_tessellation_shader'] = arb_tessellation_shader
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-get-tcs-params')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-get-tes-params')
+add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-primitive')
 import_glsl_parser_tests(arb_tessellation_shader,
                          os.path.join(testsDir, 'spec',
                          'arb_tessellation_shader'), ['compiler'])
