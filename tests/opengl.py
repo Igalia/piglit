@@ -259,6 +259,7 @@ with profile.test_list.group_manager(PiglitGLTest, 'shaders') as g:
     g(['glsl-fs-bug25902'])
     g(['glsl-fs-color-matrix'])
     g(['glsl-fs-discard-02'])
+    g(['glsl-fs-discard-mrt'])
     g(['glsl-fs-exp2'])
     g(['glsl-fs-flat-color'])
     g(['glsl-fs-fogcolor-statechange'])
