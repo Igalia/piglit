@@ -983,6 +983,7 @@ gl20 = Group()
 spec['!OpenGL 2.0'] = gl20
 add_concurrent_test(gl20, 'attribs')
 add_concurrent_test(gl20, 'gl-2.0-edgeflag')
+add_concurrent_test(gl20, 'gl-2.0-edgeflag-immediate')
 add_plain_test(gl20, 'attrib-assignments')
 add_plain_test(gl20, 'getattriblocation-conventional')
 add_plain_test(gl20, 'clip-flag-behavior')
