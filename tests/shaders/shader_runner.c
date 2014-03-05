@@ -91,6 +91,7 @@ static struct component_version glsl_version;
 static struct component_version glsl_req_version;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
+static int gl_max_clip_planes;
 
 const char *path = NULL;
 const char *test_start = NULL;
@@ -1747,7 +1748,7 @@ piglit_display(void)
 		} else if (sscanf(line,
 				  "clip plane %d %lf %lf %lf %lf",
 				  &x, &d[0], &d[1], &d[2], &d[3])) {
-			if (x < 0 || x >= GL_MAX_CLIP_PLANES) {
+			if (x < 0 || x >= gl_max_clip_planes) {
 				printf("clip plane id %d out of range\n", x);
 				piglit_report_result(PIGLIT_FAIL);
 			}
@@ -2017,6 +2018,7 @@ piglit_init(int argc, char **argv)
 		      &gl_max_fragment_uniform_components);
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
 		      &gl_max_vertex_uniform_components);
+	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
 		      &gl_max_fragment_uniform_components);
@@ -2024,6 +2026,7 @@ piglit_init(int argc, char **argv)
 		      &gl_max_vertex_uniform_components);
 	gl_max_fragment_uniform_components *= 4;
 	gl_max_vertex_uniform_components *= 4;
+	gl_max_clip_planes = 0;
 #endif
 	if (argc > 2) {
 		path = argv[2];
