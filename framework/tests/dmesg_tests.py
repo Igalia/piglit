@@ -59,6 +59,18 @@ def _write_dev_kmesg():
         raise SkipTest("Writing to the ringbuffer failed")
 
 
+def test_linux_initialization():
+    """ Test that LinuxDmesg initializes """
+    dmesg = LinuxDmesg()
+    assert dmesg
+
+
+def test_dummy_initialization():
+    """ Test that DummyDmesg initializes """
+    dmesg = DummyDmesg()
+    assert dmesg
+
+
 def test_get_dmesg_dummy():
     """ Test that get_dmesg function returns a Dummy when asked """
     dummy = get_dmesg(not_dummy=False)
