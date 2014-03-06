@@ -21,47 +21,12 @@
 
 """ Module providing tests for the summary module """
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-import os
-import tempfile
-from contextlib import contextmanager
 import framework.summary as summary
-
-
-JSON_DATA = {
-    "options": {
-        "profile": "tests/fake.py",
-        "filter": [],
-        "exclude_filter": []
-    },
-    "name": "fake-tests",
-    "lspci": "fake",
-    "glxinfo": "fake",
-    "tests": {
-        "sometest": {
-            "result": "pass",
-            "time": 0.01
-        }
-    }
-}
-
-
-@contextmanager
-def _resultfile():
-    """ Create a stringio with some json in it and pass that as results """
-    with tempfile.NamedTemporaryFile(delete=False) as output:
-        json.dump(JSON_DATA, output)
-
-    yield output
-
-    os.remove(output.name)
+import framework.tests.utils as utils
 
 
 def test_initialize_summary():
     """ Test that Summary initializes """
-    with _resultfile() as files:
-        test = summary.Summary([files.name])
+    with utils.resultfile() as tfile:
+        test = summary.Summary([tfile.name])
         assert test

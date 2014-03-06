@@ -26,16 +26,55 @@ in a single place.
 """
 
 import os
+import shutil
 import tempfile
 from contextlib import contextmanager
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 
-__all__ = ['with_tempfile']
+__all__ = [
+    'with_tempfile',
+    'resultfile',
+    'tempdir',
+    'JSON_DATA'
+]
+
+
+JSON_DATA = {
+    "options": {
+        "profile": "tests/fake.py",
+        "filter": [],
+        "exclude_filter": []
+    },
+    "name": "fake-tests",
+    "lspci": "fake",
+    "glxinfo": "fake",
+    "tests": {
+        "sometest": {
+            "result": "pass",
+            "time": 0.01
+        }
+    }
+}
 
 
 class UtilsException(Exception):
     """ An exception to be raised by utils """
     pass
+
+
+@contextmanager
+def resultfile():
+    """ Create a stringio with some json in it and pass that as results """
+    with tempfile.NamedTemporaryFile(delete=False) as output:
+        json.dump(JSON_DATA, output)
+
+    yield output
+
+    os.remove(output.name)
 
 
 @contextmanager
@@ -59,3 +98,11 @@ def with_tempfile(contents):
     yield temp.name
 
     os.remove(temp.name)
+
+
+@contextmanager
+def tempdir():
+    """ Creates a temporary directory, returns it, and then deletes it """
+    tdir = tempfile.mkdtemp()
+    yield tdir
+    shutil.rmtree(tdir)
