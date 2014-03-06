@@ -1838,6 +1838,10 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-02')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-03')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-04')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
+for test_type in ('shader', 'api'):
+    test_name = 'overlapping-locations-input-attribs {0}'.format(test_type)
+    executable = '{0} -auto'.format(test_name)
+    arb_explicit_attrib_location[test_name] = PiglitTest(executable)
 
 # Group ARB_explicit_uniform_location
 arb_explicit_uniform_location = {}
