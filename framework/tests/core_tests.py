@@ -27,6 +27,7 @@ import collections
 import json
 import framework.tests.utils as utils
 import framework.core as core
+import framework.status as status
 
 
 def check_initialize(target):
@@ -143,3 +144,11 @@ def test_load_results_file():
     with utils.resultfile() as tfile:
         results = core.load_results(tfile.name)
         assert results
+
+
+def test_testresult_to_status():
+    """ TestResult initialized with result key converts the value to a Status
+    """
+    result = core.TestResult({'result': 'pass'})
+    assert isinstance(result['result'], status.Status), \
+        "Result key not converted to a status object"
