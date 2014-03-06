@@ -21,7 +21,10 @@
 """ Module providing tests for the core module """
 
 
+import os
 import tempfile
+import collections
+import framework.tests.utils as utils
 import framework.core as core
 
 
@@ -62,3 +65,63 @@ def test_initialize_jsonwriter():
     with tempfile.TemporaryFile() as tfile:
         func = core.JSONWriter(tfile)
         assert isinstance(func, core.JSONWriter)
+
+
+def test_parse_listfile_return():
+    """ Test that parse_listfile returns a container
+
+    Given a file with a newline seperated list of results, parse_listfile
+    should return a list of files with no whitespace
+
+    """
+    contents = "/tmp/foo\n/tmp/bar\n"
+
+    with utils.with_tempfile(contents) as tfile:
+        results = core.parse_listfile(tfile)
+
+    assert isinstance(results, collections.Container)
+
+
+def check_whitespace(actual, base, message):
+    """ check that the string has not trailing whitespace """
+    assert base == actual, message
+
+
+def test_parse_listfile_whitespace():
+    """ Test that parse_listfile remove whitespace """
+    contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
+
+    with utils.with_tempfile(contents) as tfile:
+        results = core.parse_listfile(tfile)
+
+    yld = check_whitespace
+
+    # Test for newlines
+    yld.description = ("Test that trailing newlines are removed by "
+                       "parse_listfile")
+    yield yld, results[0], "/tmp/foo", "Trailing newline not removed!"
+
+    # test for normal spaces
+    yld.description = "Test that trailing spaces are removed by parse_listfile"
+    yield yld, results[1], "/tmp/foo", "Trailing spaces not removed!"
+
+    # test for tabs
+    yld.description = "Test that trailing tabs are removed by parse_listfile"
+    yield yld, results[2], "/tmp/foo", "Trailing tab not removed!"
+
+
+def test_parse_listfile_tilde():
+    """ Test that parse_listfile properly expands tildes
+
+    According to the python docs for python 2.7
+    (http://docs.python.org/2/library/os.path.html#module-os.path), both
+    os.path.expanduser and os.path.expandvars work on both *nix systems (Linux,
+    *BSD, OSX) and Windows.
+
+    """
+    contents = "~/foo\n"
+
+    with utils.with_tempfile(contents) as tfile:
+        results = core.parse_listfile(tfile)
+
+    assert results[0] == os.path.expandvars("$HOME/foo")
