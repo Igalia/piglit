@@ -24,6 +24,7 @@
 import os
 import tempfile
 import collections
+import json
 import framework.tests.utils as utils
 import framework.core as core
 
@@ -125,3 +126,20 @@ def test_parse_listfile_tilde():
         results = core.parse_listfile(tfile)
 
     assert results[0] == os.path.expandvars("$HOME/foo")
+
+
+def test_load_results_folder():
+    """ Test that load_results takes a folder with a file named main in it """
+    with utils.tempdir() as tdir:
+        with open(os.path.join(tdir, 'main'), 'w') as tfile:
+            tfile.write(json.dumps(utils.JSON_DATA))
+
+        results = core.load_results(tdir)
+        assert results
+
+
+def test_load_results_file():
+    """ Test that load_results takes a file """
+    with utils.resultfile() as tfile:
+        results = core.load_results(tfile.name)
+        assert results
