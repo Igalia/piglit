@@ -695,4 +695,4 @@ def parse_listfile(filename):
         ['/home/user/tests1', '/home/users/tests2/main', '/tmp/test3']
     """
     with open(filename, 'r') as file:
-        return [os.path.expanduser(i.rstrip('\n')) for i in file.readlines()]
+        return [os.path.expanduser(i.strip()) for i in file.readlines()]
