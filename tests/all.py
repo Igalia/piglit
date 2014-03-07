@@ -706,6 +706,8 @@ add_plain_test(glx, 'glx-swap-singlebuffer')
 add_plain_test(glx, 'glx-make-current')
 add_plain_test(glx, 'glx-make-glxdrawable-current')
 add_plain_test(glx, 'glx-buffer-age')
+glx['glx-buffer-age vblank_mode=0'] = plain_test('glx-buffer-age')
+glx['glx-buffer-age vblank_mode=0'].env['vblank_mode'] = '0'
 add_concurrent_test(glx, 'glx-pixmap-life')
 add_concurrent_test(glx, 'glx-pixmap13-life')
 add_concurrent_test(glx, 'glx-pixmap-multi')
