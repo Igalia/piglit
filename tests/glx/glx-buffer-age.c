@@ -52,43 +52,57 @@ enum piglit_result
 draw(Display *dpy)
 {
 	GLXContext ctx;
-	GLboolean pass;
+	bool pass = true;
 	unsigned int age;
 	int i;
-	static GLfloat colors[3][4] = {{1.0, 0.0, 0.0, 1.0},
-				       {0.0, 1.0, 0.0, 1.0},
-				       {0.0, 0.0, 1.0, 1.0}};
-	GLfloat probe[4];
-	enum piglit_result result;
+	static GLfloat colors[5][4] = {
+		{1.0, 0.0, 0.0, 1.0},
+		{0.0, 1.0, 0.0, 1.0},
+		{0.0, 0.0, 1.0, 1.0},
+		{1.0, 0.0, 1.0, 1.0},
+		{0.0, 1.0, 1.0, 1.0}
+	};
 
 	ctx = piglit_get_glx_context(dpy, visinfo);
 	glXMakeCurrent(dpy, window, ctx);
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
-	for (i = 0; i < 3; i++) {
+	glXQueryDrawable(dpy, window, GLX_BACK_BUFFER_AGE_EXT, &age);
+	if (age != 0) {
+		fprintf(stderr, "Initial age was %d, should be 0\n", age);
+		pass = false;
+	}
+
+	for (i = 0; i < 5; i++) {
 		glClearColor(colors[i][0],
 			     colors[i][1],
 			     colors[i][2],
 			     colors[i][3]);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glXSwapBuffers(dpy, window);
+
+		glXQueryDrawable(dpy, window, GLX_BACK_BUFFER_AGE_EXT, &age);
+		printf("Frame %d: age %d\n", i + 1, age);
+
+		if (age > 0) {
+			int color_i = i - (age - 1);
+			if (color_i < 0) {
+				fprintf(stderr, "too old\n");
+				pass = false;
+			} else {
+				pass = piglit_probe_rect_rgba(0, 0,
+							      piglit_width,
+							      piglit_height,
+							      colors[color_i])
+					&& pass;
+			}
+		}
 	}
 
-	glXQueryDrawable(dpy, window, GLX_BACK_BUFFER_AGE_EXT, &age);
-
-	if (age == 0 || age > 3) {
-		result = PIGLIT_SKIP;
-		goto out;
-	}
-
-	pass = piglit_probe_pixel_rgba_silent(0, 0, colors[3 - age], probe);
-	result = pass ? PIGLIT_PASS : PIGLIT_FAIL;
-
-out:
 	glXMakeCurrent(dpy, None, NULL);
 	glXDestroyContext(dpy, ctx);
 
-	return result;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
