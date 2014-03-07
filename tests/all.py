@@ -3133,6 +3133,10 @@ add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-overla
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-simple')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-zero-size')
 
+arb_clear_texture = Group()
+spec['ARB_clear_texture'] = arb_clear_texture
+add_concurrent_test(arb_clear_texture, 'arb_clear_texture-simple')
+
 arb_copy_buffer = Group()
 spec['ARB_copy_buffer'] = arb_copy_buffer
 add_plain_test(arb_copy_buffer, 'copy_buffer_coherency')

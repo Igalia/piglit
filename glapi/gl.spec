@@ -16410,6 +16410,47 @@ TextureStorage3DMultisampleEXT(texture, target, samples, internalformat, width, 
 	glxflags	ignore
 	offset		?
 
+###############################################################################
+#
+# Extension #ARB145
+# ARB_clear_texture commands
+#
+###############################################################################
+
+ClearTexImage(texture, level, format, type, data)
+	return		void
+	param		texture		UInt32 in value
+	param		level		Int32 in value
+	param		format		GLenum in value
+	param		type		GLenum in value
+	param		data		Void in array [COMPSIZE(format/type)]
+	category	ARB_clear_texture
+	version		4.4
+	extension
+	glxropcode	?
+	glxflags	ignore
+	offset		?
+
+ClearTexSubImage(texture, level, xoffset, yoffset, zoffset, width, height, depth, format, type, data)
+	return		void
+	param		texture		UInt32 in value
+	param		level		Int32 in value
+	param		xoffset		Int32 in value
+	param		yoffset		Int32 in value
+	param		zoffset		Int32 in value
+	param		width		Int32 in value
+	param		height		Int32 in value
+	param		depth		Int32 in value
+	param		format		GLenum in value
+	param		type		GLenum in value
+	param		data		Void in array [COMPSIZE(format/type)]
+	category	ARB_clear_texture
+	version		4.4
+	extension
+	glxropcode	?
+	glxflags	ignore
+	offset		?
+
 
 ###############################################################################
 ###############################################################################
