@@ -58,15 +58,15 @@ static GLboolean fetch_one_log_message()
 static bool check_inheritance_messages(int expectedCount, GLuint* expectedIds)
 {
 	bool pass = true;
-	int max_messages = 5;
-	int bufSize = 1280;
+#define MAX_MESSAGES 5
+#define BUF_SIZE 1280
 	int i;
 	GLuint count;
-	GLuint ids[max_messages];
-	GLchar messageLog[bufSize];
+	GLuint ids[MAX_MESSAGES];
+	GLchar messageLog[BUF_SIZE];
 
-	count = glGetDebugMessageLog(max_messages,
-				     bufSize,
+	count = glGetDebugMessageLog(MAX_MESSAGES,
+				     BUF_SIZE,
 				     NULL,
 				     NULL,
 				     ids,
@@ -177,16 +177,16 @@ static bool test_push_pop_group_inheritance()
 static bool test_push_pop_debug_group()
 {
 	bool pass = true;
-	int max_messages = 5;
-	int bufSize = 1280;
+#define MAX_MESSAGES 5
+#define BUF_SIZE 1280
 	int i, nextMessage = 0;
 	int messageLen;
 	GLuint count;
 	GLint maxMessageLength;
 	GLint maxMessageLogLength;
 
-	GLsizei lengths[max_messages];
-	GLchar messageLog[bufSize];
+	GLsizei lengths[MAX_MESSAGES];
+	GLchar messageLog[BUF_SIZE];
 
 	/* Make sure the implementation has max values big enough to run this test
 	 * since the spec only mandates GL_MAX_DEBUG_MESSAGE_LENGTH and
@@ -201,8 +201,8 @@ static bool test_push_pop_debug_group()
 		printf("push_pop_debug_group test skipped implementations MAX_DEBUG_MESSAGE_LENGTH=%i and max piglit test length=%i\n", maxMessageLength, messageLen);
 		return pass;
 	}
-	if (maxMessageLogLength < max_messages) {
-		printf("push_pop_debug_group test skipped implementations MAX_DEBUG_LOGGED_MESSAGES=%i and max piglit test length=%i\n", maxMessageLogLength, max_messages);
+	if (maxMessageLogLength < MAX_MESSAGES) {
+		printf("push_pop_debug_group test skipped implementations MAX_DEBUG_LOGGED_MESSAGES=%i and max piglit test length=%i\n", maxMessageLogLength, MAX_MESSAGES);
 		return pass;
 	}
 
@@ -243,8 +243,8 @@ static bool test_push_pop_debug_group()
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage4);
 
 	/* Check that message log has done correct filtering */
-	count = glGetDebugMessageLog(max_messages,
-				     bufSize,
+	count = glGetDebugMessageLog(MAX_MESSAGES,
+				     BUF_SIZE,
 				     NULL,
 				     NULL,
 				     NULL,
