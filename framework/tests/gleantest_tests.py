@@ -20,6 +20,10 @@
 
 """ Tests for the glean class. Requires Nose """
 
+from __future__ import print_function
+import os
+from nose.plugins.skip import SkipTest
+from framework.core import Environment
 from framework.gleantest import GleanTest
 
 
@@ -46,3 +50,24 @@ def test_globalParams_assignment():
     GleanTest.globalParams = ['--quick']
     test2 = GleanTest('basic')
     assert test1.command == test2.command
+
+
+def test_bad_returncode():
+    """ If glean doesn't return zero it should be a fail
+
+    Currently clean returns 127 if piglit can't find it's libs (LD_LIBRARY_PATH
+    isn't set properly), and then marks such tests as pass, when they obviously
+    are not.
+
+    """
+    if not os.path.exists('bin'):
+        raise SkipTest("This test requires a working, built version of piglit")
+
+    # Clearing the environment should remove the piglit/lib from
+    # LD_LIBRARY_PATH
+    os.environ = {}
+
+    test = GleanTest('basic')
+    result = test.run(Environment())
+    print("result: {result}\nreturncode: {returncode}".format(**result))
+    assert result['result'] == 'fail', "Result should have been fail"
