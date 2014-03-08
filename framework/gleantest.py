@@ -44,7 +44,7 @@ class GleanTest(ExecTest):
     def interpretResult(self, out, returncode, results):
         if "{'result': 'skip'}" in out:
             results['result'] = 'skip'
-        elif out.find('FAIL') >= 0:
+        elif out.find('FAIL') >= 0 or returncode != 0:
             results['result'] = 'fail'
         else:
             results['result'] = 'pass'
