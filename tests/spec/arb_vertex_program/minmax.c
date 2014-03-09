@@ -45,6 +45,7 @@ piglit_display(void)
 }
 
 static bool pass = true;
+static GLenum target;
 
 static void
 min_test_i(GLenum token, GLint min, const char *name)
@@ -66,7 +67,7 @@ min_test_program(GLenum token, GLint min, const char *name)
 {
 	GLint val;
 
-	glGetProgramivARB(GL_VERTEX_PROGRAM_ARB, token, &val);
+	glGetProgramivARB(target, token, &val);
 
 	if (val < min) {
 		fprintf(stderr, "%-50s %8d %8d (ERROR)\n", name, min, val);
@@ -85,6 +86,7 @@ piglit_init(int argc, char **argv)
 
 	printf("%-50s %8s %8s\n", "token", "minimum", "value");
 
+	target = GL_VERTEX_PROGRAM_ARB;
 	MIN_PROGRAM_TEST(GL_MAX_PROGRAM_ENV_PARAMETERS_ARB, 96);
 	MIN_PROGRAM_TEST(GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, 96);
 	MIN_INTEGER_TEST(GL_MAX_PROGRAM_MATRICES_ARB, 8);
@@ -105,6 +107,7 @@ piglit_init(int argc, char **argv)
 	 * consistency requirement.
 	 */
 	if (piglit_is_extension_supported("GL_ARB_fragment_program")) {
+		target = GL_FRAGMENT_PROGRAM_ARB;
 		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB, 0);
 		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB, 0);
 		MIN_PROGRAM_TEST(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB, 0);
