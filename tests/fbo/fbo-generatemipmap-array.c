@@ -1,6 +1,7 @@
 /*
  * Copyright © 2009 Intel Corporation
  * Copyright © 2011 Red Hat Inc.
+ * Copyright © 2014 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -23,6 +24,7 @@
  *
  * Authors:
  *     Dave Airlie
+ *     Marek Olšák <maraeo@gmail.com>
  *
  */
 
@@ -38,7 +40,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	config.supports_gl_compat_version = 20;
 
 	config.window_width = 600;
 	config.window_height = 560;
@@ -86,16 +88,42 @@ static GLuint program_1d_array;
 
 #define NUM_LAYERS	4
 
-float layer_color[NUM_LAYERS][4] = {
-	{1.0, 0.0, 0.0, 0.0},
-	{0.0, 1.0, 0.0, 0.0},
-	{0.0, 0.0, 1.0, 0.0},
-	{1.0, 0.0, 1.0, 0.0},
+static float layer_color[NUM_LAYERS][4] = {
+	{1.0, 0.0, 0.0, 1.0},
+	{0.0, 1.0, 0.0, 1.0},
+	{0.0, 0.0, 1.0, 1.0},
+	{1.0, 0.0, 1.0, 1.0},
 };
 
-int num_layers = NUM_LAYERS;
+static int num_layers = NUM_LAYERS;
+static GLenum format;
 
-static int
+static void
+load_texture_1d_array(void)
+{
+	float *p = malloc(TEX_WIDTH * num_layers * 4 * sizeof(float));
+	int x,y;
+
+	for (y = 0; y < num_layers; y++) {
+		for (x = 0; x < TEX_WIDTH; x++) {
+			if (x < TEX_WIDTH/2)
+				memcpy(&p[(y*TEX_WIDTH+x)*4],
+				       layer_color[y],
+				       sizeof(float) * 4);
+			else
+				memcpy(&p[(y*TEX_WIDTH+x)*4],
+				       layer_color[(y+1) % num_layers],
+				       sizeof(float) * 4);
+		}
+	}
+
+
+	glTexSubImage2D(GL_TEXTURE_1D_ARRAY, 0, 0, 0, TEX_WIDTH, num_layers,
+			GL_RGBA, GL_FLOAT, p);
+	free(p);
+}
+
+static GLuint
 create_array_fbo_1d(void)
 {
 	GLuint tex, fb;
@@ -103,12 +131,15 @@ create_array_fbo_1d(void)
 	int i, dim;
 	int layer;
 
+	if (format == GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
+		return 0;
+
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_1D_ARRAY_EXT, tex);
 	assert(glGetError() == 0);
 
 	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
-		glTexImage2D(GL_TEXTURE_1D_ARRAY_EXT, i, GL_RGBA,
+		glTexImage2D(GL_TEXTURE_1D_ARRAY_EXT, i, format,
 			     dim, num_layers, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	}
@@ -127,7 +158,7 @@ create_array_fbo_1d(void)
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-			fprintf(stderr, "FBO incomplete\n");
+			load_texture_1d_array();
 			goto done;
 		}
 
@@ -140,14 +171,49 @@ create_array_fbo_1d(void)
 		piglit_draw_rect(TEX_WIDTH / 2, 0, TEX_WIDTH, 1);
 	}
 
-	glGenerateMipmapEXT(GL_TEXTURE_1D_ARRAY_EXT);
 done:
 	glDeleteFramebuffersEXT(1, &fb);
-
+	glGenerateMipmapEXT(GL_TEXTURE_1D_ARRAY_EXT);
 	return tex;
 }
 
-static int
+static void
+load_texture_2d_array(void)
+{
+	float *p = malloc(TEX_WIDTH * TEX_HEIGHT * num_layers * 4 * sizeof(float));
+	int x,y,z;
+
+	for (z = 0; z < num_layers; z++) {
+		for (y = 0; y < TEX_HEIGHT; y++) {
+			for (x = 0; x < TEX_WIDTH; x++) {
+				int quadrant = y < TEX_HEIGHT/2 ? (x < TEX_WIDTH/2 ? 0 : 1) :
+								  (x < TEX_WIDTH/2 ? 2 : 3);
+				float *dest = &p[(z*TEX_HEIGHT*TEX_WIDTH + y*TEX_WIDTH + x)*4];
+
+				switch (quadrant) {
+				case 0:
+					memcpy(dest, layer_color[z], 4 * sizeof(float));
+					break;
+				case 1:
+					memcpy(dest, green, 4 * sizeof(float));
+					break;
+				case 2:
+					memcpy(dest, blue, 4 * sizeof(float));
+					break;
+				case 3:
+					memcpy(dest, white, 4 * sizeof(float));
+					break;
+				}
+			}
+		}
+	}
+
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, TEX_WIDTH, TEX_HEIGHT,
+			num_layers, GL_RGBA, GL_FLOAT, p);
+	free(p);
+}
+
+static GLuint
 create_array_fbo_2d(void)
 {
 	GLuint tex, fb;
@@ -160,7 +226,7 @@ create_array_fbo_2d(void)
 	assert(glGetError() == 0);
 
 	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
-		glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, i, GL_RGBA,
+		glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, i, format,
 			     dim, dim, num_layers, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	}
@@ -179,7 +245,7 @@ create_array_fbo_2d(void)
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-			fprintf(stderr, "FBO incomplete\n");
+			load_texture_2d_array();
 			goto done;
 		}
 
@@ -196,10 +262,9 @@ create_array_fbo_2d(void)
 		piglit_draw_rect(TEX_WIDTH / 2, TEX_HEIGHT / 2, TEX_WIDTH, TEX_HEIGHT);
 	}
 
-	glGenerateMipmapEXT(GL_TEXTURE_2D_ARRAY_EXT);
 done:
+	glGenerateMipmapEXT(GL_TEXTURE_2D_ARRAY_EXT);
 	glDeleteFramebuffersEXT(1, &fb);
-
 	return tex;
 }
 
@@ -277,6 +342,9 @@ draw_mipmap_1d(int x, int y, int dim, int layer)
 {
 	int loc;
 
+	if (format == GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
+		return;
+
 	glUseProgram(program_1d_array);
 	loc = glGetUniformLocation(program_1d_array, "tex");
 	glUniform1i(loc, 0); /* texture unit p */
@@ -314,6 +382,10 @@ static GLboolean
 test_mipmap_drawing_1d(int start_x, int start_y, int dim, int layer)
 {
 	GLboolean pass = GL_TRUE;
+
+	if (format == GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
+		return GL_TRUE;
+
 	pass = pass && piglit_probe_rect_rgb(
 			start_x, start_y, dim/2, dim/2, layer_color[layer]);
 	pass = pass && piglit_probe_rect_rgb(
@@ -365,6 +437,11 @@ piglit_display(void)
 	y = 1;
 	for (layer = 0; layer < num_layers; layer++) {
 		for (dim = TEX_WIDTH; dim > 1; dim /= 2) {
+			if (format == GL_COMPRESSED_RGB_S3TC_DXT1_EXT &&
+			    dim < 8) {
+				break;
+			}
+
 			pass &= test_mipmap_drawing_2d(x, y, dim, layer);
 			x += dim + 1;
 		}
@@ -383,8 +460,8 @@ piglit_display(void)
 		x = 270;
 	}
 
-
-	glDeleteTextures(1, &tex1d);
+	if (tex1d)
+		glDeleteTextures(1, &tex1d);
 	glDeleteTextures(1, &tex2d);
 
 	piglit_present_results();
@@ -394,8 +471,28 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	int i;
+
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_EXT_texture_array");
+
+	format = GL_RGBA8;
+
+	for (i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "RGB9_E5") == 0) {
+			/* Test a non-renderable format. */
+			piglit_require_extension("GL_EXT_texture_shared_exponent");
+			format = GL_RGB9_E5;
+		}
+		else if (strcmp(argv[i], "S3TC_DXT1") == 0) {
+			/* Test a compressed format. */
+			piglit_require_extension("GL_EXT_texture_compression_s3tc");
+			format = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+		}
+		else {
+			assert(0);
+		}
+	}
 
 	/* Make shader programs */
 	frag_shader_2d_array =

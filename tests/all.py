@@ -2555,7 +2555,9 @@ oes_packed_depth_stencil['DEPTH_STENCIL texture GLES1'] = concurrent_test('oes_p
 
 ext_texture_array = Group()
 spec['EXT_texture_array'] = ext_texture_array
-add_plain_test(ext_texture_array, 'fbo-generatemipmap-array')
+add_concurrent_test(ext_texture_array, 'fbo-generatemipmap-array')
+add_concurrent_test(ext_texture_array, 'fbo-generatemipmap-array RGB9_E5')
+add_concurrent_test(ext_texture_array, 'fbo-generatemipmap-array S3TC_DXT1')
 spec['EXT_texture_array']['maxlayers'] = concurrent_test('ext_texture_array-maxlayers')
 spec['EXT_texture_array']['gen-mipmap'] = concurrent_test('ext_texture_array-gen-mipmap')
 add_shader_test_dir(ext_texture_array,
