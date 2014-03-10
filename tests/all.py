@@ -1684,6 +1684,9 @@ add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glColorMaskInd
 add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glBlendFunci')
 add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glDrawPixels')
 add_concurrent_test(arb_framebuffer_object, 'fbo-drawbuffers-none glBlitFramebuffer')
+add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-cubemap')
+add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-cubemap RGB9_E5')
+add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-cubemap S3TC_DXT1')
 
 # Group ARB_framebuffer_sRGB
 arb_framebuffer_srgb = Group()
@@ -2597,6 +2600,9 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-c
 add_concurrent_test(arb_texture_cube_map_array, 'getteximage-targets CUBE_ARRAY')
 add_concurrent_test(arb_texture_cube_map_array, 'glsl-resource-not-bound CubeArray')
 textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray', 'samplerCubeArrayShadow' ];
+add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array')
+add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array RGB9_E5')
+add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array S3TC_DXT1')
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
 			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
