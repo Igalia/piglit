@@ -68,7 +68,7 @@ def add_opencv_tests(profile, individual = False):
             continue
 
         # Test names are indent by 2 spaces
-        m = re.match('  (.+)', line)
+        m = re.match('  ([^ ]+)', line)
         if m:
             test_name = m.group(1)
             profile.tests['{}/{}'.format(full_test_name,test_name)] = \
