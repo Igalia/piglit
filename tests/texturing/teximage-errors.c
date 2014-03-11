@@ -36,7 +36,37 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+struct format_desc {
+   GLenum internalformat;
+   GLenum format;
+   GLenum type;
+};
 
+static const struct format_desc formats_allowed[] = {
+   {GL_DEPTH_COMPONENT16, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8},
+   {GL_DEPTH_COMPONENT24, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8},
+   {GL_DEPTH_COMPONENT32F, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8},
+
+   {GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_FLOAT},
+   {GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_FLOAT},
+   {GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT},
+
+   {GL_DEPTH24_STENCIL8, GL_DEPTH_COMPONENT, GL_FLOAT},
+   {GL_DEPTH32F_STENCIL8, GL_DEPTH_COMPONENT, GL_FLOAT},
+
+   {GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8},
+   {GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8}};
+
+static const struct format_desc formats_not_allowed[] = {
+   {GL_DEPTH_COMPONENT16, GL_STENCIL_INDEX, GL_INT},
+   {GL_DEPTH_COMPONENT24, GL_STENCIL_INDEX, GL_INT},
+   {GL_DEPTH_COMPONENT32F, GL_STENCIL_INDEX, GL_INT},
+
+   {GL_DEPTH24_STENCIL8, GL_STENCIL_INDEX, GL_INT},
+   {GL_DEPTH32F_STENCIL8, GL_STENCIL_INDEX, GL_INT},
+
+   {GL_RGBA8, GL_DEPTH_COMPONENT, GL_FLOAT},
+   {GL_RGBA8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8}};
 
 /** Test target params to glTexImage functions */
 static GLboolean
@@ -167,7 +197,37 @@ test_pos_and_sizes(void)
    return GL_TRUE;
 }
 
+/* Test the combinations of depth formats in glTexImage{123}D() */
+static bool
+test_depth_formats(const struct format_desc *test, GLenum expected_error,
+                   GLint n_tests)
+{
+   int i;
+   bool result = true;
 
+   for (i = 0; i < n_tests; i++) {
+      if ((test[i].internalformat == GL_DEPTH_COMPONENT32F ||
+           test[i].internalformat == GL_DEPTH32F_STENCIL8) &&
+           !piglit_is_extension_supported("GL_ARB_depth_buffer_float"))
+         continue;
+
+      glTexImage1D(GL_TEXTURE_1D, 0, test[i].internalformat, 16, 0,
+                   test[i].format, test[i].type, NULL);
+      result = piglit_check_gl_error(expected_error) && result;
+
+      glTexImage2D(GL_TEXTURE_2D, 0, test[i].internalformat, 16, 16,
+                   0, test[i].format, test[i].type, NULL);
+      result = piglit_check_gl_error(expected_error) && result;
+
+      if (!piglit_is_extension_supported("GL_EXT_texture_array"))
+         continue;
+
+      glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, test[i].internalformat,
+                   16, 16, 16, 0, test[i].format, test[i].type, NULL);
+      result = piglit_check_gl_error(expected_error) && result;
+   }
+   return result;
+}
 enum piglit_result
 piglit_display(void)
 {
@@ -175,6 +235,20 @@ piglit_display(void)
    pass = test_targets() && pass;
    pass = test_pos_and_sizes() && pass;
 
+  /*  From OpenGL 3.3 spec, page 141:
+   *    "Textures with a base internal format of DEPTH_COMPONENT or
+   *     DEPTH_STENCIL require either depth component data or depth/stencil
+   *     component data. Textures with other base internal formats require
+   *     RGBA component data. The error INVALID_OPERATION is generated if
+   *     one of the base internal format and format is DEPTH_COMPONENT or
+   *     DEPTH_STENCIL, and the other is neither of these values."
+   */
+   pass = test_depth_formats(formats_allowed, GL_NO_ERROR,
+                             ARRAY_SIZE(formats_allowed))
+          && pass;
+   pass = test_depth_formats(formats_not_allowed, GL_INVALID_OPERATION,
+                             ARRAY_SIZE(formats_not_allowed))
+          && pass;
    return pass ? PIGLIT_PASS: PIGLIT_FAIL;
 }
 
