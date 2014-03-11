@@ -171,13 +171,11 @@ test_pos_and_sizes(void)
 enum piglit_result
 piglit_display(void)
 {
-   if (!test_targets())
-      return PIGLIT_FAIL;
+   bool pass = true;
+   pass = test_targets() && pass;
+   pass = test_pos_and_sizes() && pass;
 
-   if (!test_pos_and_sizes())
-      return PIGLIT_FAIL;
-
-   return PIGLIT_PASS;
+   return pass ? PIGLIT_PASS: PIGLIT_FAIL;
 }
 
 
