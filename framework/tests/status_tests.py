@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Tests for the Status module 
+""" Tests for the Status module
 
 Note: see framework/status.py for the authoritative list of fixes, regression,
 etc
@@ -42,22 +42,24 @@ FIXES = itertools.combinations(reversed(STATUSES), 2)
 PROBLEMS = STATUSES[1:]
 
 
-def check_initialize(stat):
-    """ Initialize the object """
+def initialize_status():
+    """ status.Status inializes """
+    test = status.Status('test', 1)
+    assert test
+
+
+def check_lookup(stat):
+    """ Lookup a status """
     stt = status.status_lookup(stat)
     assert stt
 
 
-def test_gen_initialize():
-    """ Generator that attempts to initialize all of the status classes
-
-    This test relies on status.status_lookup working correctly
-
-    """
-    yieldable = check_initialize
+def test_gen_lookup():
+    """ Generator that attempts to do a lookup on all statuses """
+    yieldable = check_lookup
 
     for stat in STATUSES + ['skip']:
-        yieldable.description = "Initialize {}".format(stat)
+        yieldable.description = "Lookup: {}".format(stat)
         yield yieldable, stat
 
 
