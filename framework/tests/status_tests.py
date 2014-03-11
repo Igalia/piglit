@@ -71,33 +71,46 @@ def test_status_in():
     assert stat in slist
 
 
-def is_regression(x, y):
-    # Test for regressions
-    assert status.status_lookup(x) < status.status_lookup(y)
+def is_regression(new, old):
+    """ Test that old -> new is a regression """
+    assert status.status_lookup(new) < status.status_lookup(old)
 
 
-def is_fix(x, y):
-    # Test for fix
-    assert status.status_lookup(x) > status.status_lookup(y)
+def is_fix(new, old):
+    """ Test that new -> old is a fix """
+    assert status.status_lookup(new) > status.status_lookup(old)
 
 
-def is_not_equivalent(x, y):
-    # Test that status is not equivalent. 
-    assert status.status_lookup(x) != status.status_lookup(y)
+def is_not_equivalent(new, old):
+    """ Test that new != old """
+    assert status.status_lookup(new) != status.status_lookup(old)
 
 
 def test_is_regression():
-    # Generate all tests for regressions
-    for x, y in REGRESSIONS:
-        yield is_regression, x, y
+    """ Generate all tests for regressions """
+    yieldable = is_regression
+
+    for new, old in REGRESSIONS:
+        yieldable.description = ("Test that {0} -> {1} is a "
+                                 "regression".format(old, new))
+        yield yieldable, new, old
 
 
 def test_is_fix():
-    # Generates all tests for fixes
-    for x, y in FIXES:
-        yield is_fix, x, y
+    """ Generates all tests for fixes """
+    yieldable = is_fix
+
+    for new, old in FIXES:
+        yieldable.description = ("Test that {0} -> {1} is a "
+                                 "fix".format(new, old))
+        yield yieldable, new, old
 
 
 def test_is_change():
-    for x, y in itertools.permutations(STATUSES, 2):
-        yield is_not_equivalent, x, y
+    """ Test that status -> !status is a change """
+    yieldable = is_not_equivalent
+
+    for new, old in itertools.permutations(STATUSES, 2):
+        yieldable.description = ("Test that {0} -> {1} is a "
+                                 "change".format(new, old))
+        yield yieldable, new, old
