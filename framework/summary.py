@@ -195,7 +195,7 @@ class HTMLIndex(list):
         HTML summary file.
         """
         # "Not Run" is not a valid css class replace it with skip
-        if isinstance(css, so.NotRun):
+        if css == so.NOTRUN:
             css = 'skip'
 
         self.append({'type': "groupResult",
@@ -264,7 +264,7 @@ class Summary:
             """ Helper for updating the fractions and status lists """
             fraction[test] = tuple(
                 [sum(i) for i in zip(fraction[test], result.fraction)])
-            if result != so.Skip() and status[test] < result:
+            if result != so.SKIP and status[test] < result:
                 status[test] = result
 
         for results in self.results:
@@ -275,7 +275,7 @@ class Summary:
             # a default value instead of a key error.
             # This default key must be callable
             self.fractions[results.name] = collections.defaultdict(lambda: (0, 0))
-            self.status[results.name] = collections.defaultdict(so.NotRun)
+            self.status[results.name] = collections.defaultdict(lambda: so.NOTRUN)
 
             # short names
             fraction = self.fractions[results.name]
@@ -309,24 +309,24 @@ class Summary:
                 try:
                     status.append(each.tests[test]['result'])
                 except KeyError:
-                    status.append(so.NotRun())
+                    status.append(so.NOTRUN)
 
             # Problems include: warn, dmesg-warn, fail, dmesg-fail, and crash.
             # Skip does not go on this page, it has the 'skipped' page
-            if max(status) > so.Pass():
+            if max(status) > so.PASS:
                 self.tests['problems'].add(test)
 
             # Find all tests with a status of skip
-            if so.Skip() in status:
+            if so.SKIP in status:
                 self.tests['skipped'].add(test)
 
             # find fixes, regressions, and changes
             for i in xrange(len(status) - 1):
                 first = status[i]
                 last = status[i + 1]
-                if max(first, so.Pass()) < last:
+                if max(first, so.PASS) < last:
                     self.tests['regressions'].add(test)
-                if first > max(last, so.Pass()):
+                if first > max(last, so.PASS):
                     self.tests['fixes'].add(test)
                 # Changes cannot be added in the fixes and regressions passes
                 # becasue NotRun is a change, but not a regression or fix
@@ -464,12 +464,12 @@ class Summary:
             if diff:
                 for test in self.tests['changes']:
                     print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([str(i.tests.get(test, {'result': so.Skip()})
+                          ' '.join([str(i.tests.get(test, {'result': so.SKIP})
                                     ['result']) for i in self.results])})
             else:
                 for test in self.tests['all']:
                     print("%(test)s: %(statuses)s" % {'test': test, 'statuses':
-                          ' '.join([str(i.tests.get(test, {'result': so.Skip()})
+                          ' '.join([str(i.tests.get(test, {'result': so.SKIP})
                                     ['result']) for i in self.results])})
 
         # Print the summary

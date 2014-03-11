@@ -62,6 +62,14 @@ The formula for determining fixes is:
 
 """
 
+__all__ = ['NOTRUN',
+           'PASS',
+           'FAIL',
+           'WARN',
+           'CRASH',
+           'DMESG_WARN',
+           'DMESG_FAIL',
+           'SKIP']
 
 def status_lookup(status):
     """ Provided a string return a status object instance
@@ -71,17 +79,17 @@ def status_lookup(status):
     does not correspond to a key it will raise an exception
 
     """
-    status_dict = {'skip': Skip,
-                   'pass': Pass,
-                   'warn': Warn,
-                   'fail': Fail,
-                   'crash': Crash,
-                   'dmesg-warn': DmesgWarn,
-                   'dmesg-fail': DmesgFail,
-                   'notrun': NotRun}
+    status_dict = {'skip': SKIP,
+                   'pass': PASS,
+                   'warn': WARN,
+                   'fail': FAIL,
+                   'crash': CRASH,
+                   'dmesg-warn': DMESG_WARN,
+                   'dmesg-fail': DMESG_FAIL,
+                   'notrun': NOTRUN}
 
     try:
-        return status_dict[status]()
+        return status_dict[status]
     except KeyError:
         # Raise a StatusException rather than a key error
         raise StatusException
@@ -101,26 +109,50 @@ class StatusException(LookupError):
 
 
 class Status(object):
+    """ A simple class for representing the output values of tests.
+
+    This class creatse the necessary magic values to use python's rich
+    comparison methods. This allows two objects to be compared using common
+    operators like <. >, ==, etc. It also alows them to be looked up in
+    containers using ``for x in []`` syntax.
+
+    This class is meant to be immutable, it (ab)uses two tools to provide this
+    psuedo-immutability: the property decorator, and the __slots__ attribute to
+    1: make the three attributes getters, therefor unwritable, and 2: make
+    adding additional attributes impossible
+
+    Arguments:
+    name -- the name of the status
+    value -- an int used to sort statuses from best to worst (0 -> inf)
+    fraction -- a tuple with two ints representing
+                [0]: 1 if the status is 'passing', else 0
+                [1]: 1 if the status counts toward the total number of tests,
+                     else 0
+
     """
-    A simple class for representing the output values of tests.
+    __slots__ = ['__name', '__value', '__fraction']
 
-    This class implements a flyweight pattern, limiting the memory footprint of
-    initializing thousands of these objects.
+    def __init__(self, name, value, fraction=(0, 1)):
+        # The object is immutable, so calling self.foo = foo will raise a
+        # TypeError. Using setattr from the parrent object works around this.
+        self.__name = name
+        self.__value = value
+        self.__fraction = fraction
 
-    This is a base class, and should not be directly called. Instead a child
-    class should be created and called, there are many provided in this module.
+    @property
+    def name(self):
+        """ Return the value of name """
+        return self.__name
 
-    """
-    # Using __slots__ allows us to implement the flyweight pattern, limiting
-    # the memory consumed for creating tens of thousands of these objects.
-    __slots__ = ['name', 'value', 'fraction']
+    @property
+    def value(self):
+        """ Return the sorting value """
+        return self.__value
 
-    name = None
-    value = None
-    fraction = (0, 1)
-
-    def __init__(self):
-        raise NotImplementedError
+    @property
+    def fraction(self):
+        """ Return the totals of the test as a tuple: (<pass>. <total>) """
+        return self.__fraction
 
     def __repr__(self):
         return self.name
@@ -153,68 +185,18 @@ class Status(object):
         return self.value
 
 
-class NotRun(Status):
-    name = 'Not Run'
-    value = 0
-    fraction = (0, 0)
+NOTRUN = Status('Not Run', 0, (0, 0))
 
-    def __init__(self):
-        pass
+SKIP = Status('skip', 10, (0, 0))
 
+PASS = Status('pass', 20, (1, 1))
 
-class Skip(Status):
-    name = 'skip'
-    value = 5
-    fraction = (0, 0)
+DMESG_WARN = Status('dmesg-warn', 30)
 
-    def __init__(self):
-        pass
+WARN = Status('warn', 40)
 
+DMESG_FAIL = Status('dmesg-fail', 50)
 
-class Pass(Status):
-    name = 'pass'
-    value = 10
-    fraction = (1, 1)
+FAIL = Status('fail', 60)
 
-    def __init__(self):
-        pass
-
-
-class DmesgWarn(Status):
-    name = 'dmesg-warn'
-    value = 20
-
-    def __init__(self):
-        pass
-
-
-class Warn(Status):
-    name = 'warn'
-    value = 25
-
-    def __init__(self):
-        pass
-
-
-class DmesgFail(Status):
-    name = 'dmesg-fail'
-    value = 30
-
-    def __init__(self):
-        pass
-
-
-class Fail(Status):
-    name = 'fail'
-    value = 35
-
-    def __init__(self):
-        pass
-
-
-class Crash(Status):
-    name = 'crash'
-    value = 40
-
-    def __init__(self):
-        pass
+CRASH = Status('crash', 70)
