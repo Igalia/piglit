@@ -63,6 +63,14 @@ def test_gen_lookup():
         yield yieldable, stat
 
 
+def test_status_in():
+    """ A status can be compared to a str with `x in container` syntax """
+    stat = status.PASS
+    slist = ['pass']
+
+    assert stat in slist
+
+
 def is_regression(x, y):
     # Test for regressions
     assert status.status_lookup(x) < status.status_lookup(y)
