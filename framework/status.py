@@ -170,7 +170,13 @@ class Status(object):
         return int(self) <= int(other)
 
     def __eq__(self, other):
-        return int(self) == int(other)
+        # This must be int or status, since status comparisons are done using
+        # the __int__ magic method
+        if isinstance(other, (int, Status)):
+            return int(self) == int(other)
+        elif isinstance(other, (str, unicode)):
+            return unicode(self) == unicode(other)
+        raise TypeError("Cannot compare type: {}".format(type(other)))
 
     def __ne__(self, other):
         return int(self) != int(other)
