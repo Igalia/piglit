@@ -1689,6 +1689,8 @@ add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-cubemap RGB9_E5'
 add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-cubemap S3TC_DXT1')
 add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-1d')
 add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-1d RGB9_E5')
+add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-3d')
+add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-3d RGB9_E5')
 
 # Group ARB_framebuffer_sRGB
 arb_framebuffer_srgb = Group()
