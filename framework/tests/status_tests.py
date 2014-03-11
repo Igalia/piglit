@@ -81,13 +81,6 @@ def is_fix(x, y):
     assert status.status_lookup(x) > status.status_lookup(y)
 
 
-def is_equivalent(x, y):
-    # Test if status is equivalent. Note that this does not mean 'same', two
-    # statuses could be equivalent in terms of fixes and regressions, but that
-    # doesn't require that they are the same status
-    assert status.status_lookup(x) == status.status_lookup(y)
-
-
 def is_not_equivalent(x, y):
     # Test that status is not equivalent. 
     assert status.status_lookup(x) != status.status_lookup(y)
@@ -103,13 +96,6 @@ def test_is_fix():
     # Generates all tests for fixes
     for x, y in FIXES:
         yield is_fix, x, y
-
-
-def test_is_equivalent():
-    # test the assertion that NotRun, Pass and Skip should be considered
-    # equivalent for regression testing.
-    for x, y in itertools.izip(STATUSES, STATUSES):
-        yield is_equivalent, x, y
 
 
 def test_is_change():
