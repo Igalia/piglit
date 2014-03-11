@@ -42,6 +42,25 @@ FIXES = itertools.combinations(reversed(STATUSES), 2)
 PROBLEMS = STATUSES[1:]
 
 
+def check_initialize(stat):
+    """ Initialize the object """
+    stt = status.status_lookup(stat)
+    assert stt
+
+
+def test_gen_initialize():
+    """ Generator that attempts to initialize all of the status classes
+
+    This test relies on status.status_lookup working correctly
+
+    """
+    yieldable = check_initialize
+
+    for stat in STATUSES + ['skip']:
+        yieldable.description = "Initialize {}".format(stat)
+        yield yieldable, stat
+
+
 def is_regression(x, y):
     # Test for regressions
     assert status.status_lookup(x) < status.status_lookup(y)
