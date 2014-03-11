@@ -2732,7 +2732,7 @@ add_texwrap_format_tests(arb_texture_rgb10_a2ui, 'GL_ARB_texture_rgb10_a2ui')
 
 ext_texture_shared_exponent = Group()
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
-add_fbo_formats_tests('spec/EXT_texture_shared_exponent', 'GL_EXT_texture_shared_exponent')
+ext_texture_shared_exponent['fbo-generatemipmap-formats'] = concurrent_test('fbo-generatemipmap-formats GL_EXT_texture_shared_exponent')
 add_texwrap_format_tests(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent')
 
 ext_texture_snorm = Group()
