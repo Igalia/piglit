@@ -19,7 +19,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-""" Status ordering from best to worst:
+""" Provides classes that represent test statuses
+
+These classes work similar to enums in other languages. They provide a limited
+set of attributes that are defined per status:
+
+A name -- a string representation of the values
+An integer -- a value that allows classes to be compared using python's rich
+comparisons
+A tuple representing :
+  [0] -- whether the test is considered a passing status
+  [1] -- whether the test should be added to the total number of tests. This
+         allows statuses like 'skip' to not affect the total percentage.
+
+
+Status ordering from best to worst:
 
 NotRun
 skip
@@ -90,11 +104,13 @@ class Status(object):
     """
     A simple class for representing the output values of tests.
 
-    This is a base class, and should not be directly called. Instead a child
-    class should be created and called. This module provides 8 of them: Skip,
-    Pass, Warn, Fail, Crash, NotRun, DmesgWarn, and DmesgFail.
-    """
+    This class implements a flyweight pattern, limiting the memory footprint of
+    initializing thousands of these objects.
 
+    This is a base class, and should not be directly called. Instead a child
+    class should be created and called, there are many provided in this module.
+
+    """
     # Using __slots__ allows us to implement the flyweight pattern, limiting
     # the memory consumed for creating tens of thousands of these objects.
     __slots__ = ['name', 'value', 'fraction']
