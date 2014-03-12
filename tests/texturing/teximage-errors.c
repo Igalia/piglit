@@ -32,6 +32,7 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
+	config.supports_gl_core_version = 31;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -256,5 +257,4 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-   piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 }
