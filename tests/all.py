@@ -1924,6 +1924,7 @@ spec['ARB_explicit_uniform_location'] = arb_explicit_uniform_location
 import_glsl_parser_tests(arb_explicit_uniform_location,
                          os.path.join(testsDir, 'spec', 'arb_explicit_uniform_location'),
                          [''])
+add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-minmax')
 
 arb_texture_buffer_object = Group()
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
