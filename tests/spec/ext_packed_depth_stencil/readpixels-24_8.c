@@ -75,7 +75,7 @@ test_pixel(int x, int y, uint32_t value)
 static bool
 test()
 {
-	GLuint tex, fb;
+	GLuint rb, fb;
 	GLenum status;
 	bool pass = true;
 	uint32_t values[BUF_WIDTH * BUF_HEIGHT];
@@ -85,24 +85,20 @@ test()
 	glBindFramebufferEXT(GL_FRAMEBUFFER, fb);
 	assert(glGetError() == 0);
 
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8,
-		     BUF_WIDTH, BUF_HEIGHT, 0,
-		     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glGenRenderbuffersEXT(1, &rb);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
+				 GL_DEPTH24_STENCIL8,
+				 BUF_WIDTH, BUF_HEIGHT);
 
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-				  GL_DEPTH_ATTACHMENT_EXT,
-				  GL_TEXTURE_2D,
-				  tex,
-				  0);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-				  GL_STENCIL_ATTACHMENT_EXT,
-				  GL_TEXTURE_2D,
-				  tex,
-				  0);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
+				     GL_DEPTH_ATTACHMENT_EXT,
+				     GL_RENDERBUFFER_EXT,
+				     rb);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
+				     GL_STENCIL_ATTACHMENT_EXT,
+				     GL_RENDERBUFFER_EXT,
+				     rb);
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -147,7 +143,7 @@ test()
 
 done:
 	glDeleteFramebuffersEXT(1, &fb);
-	glDeleteTextures(1, &tex);
+	glDeleteRenderbuffersEXT(1, &rb);
 	return pass;
 }
 
