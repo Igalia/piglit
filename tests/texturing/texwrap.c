@@ -370,7 +370,8 @@ static const struct test_desc test_sets[] = {
 		ext_packed_depth_stencil,
 		ARRAY_SIZE(ext_packed_depth_stencil),
 		"GL_EXT_packed_depth_stencil",
-		{"GL_EXT_packed_depth_stencil"},
+		{"GL_EXT_packed_depth_stencil",
+		 "GL_ARB_depth_texture"},
 	},
 	{
 		ext_texture_srgb,
