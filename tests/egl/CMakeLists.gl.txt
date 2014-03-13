@@ -22,6 +22,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	target_link_libraries(egl-query-surface pthread ${X11_X11_LIB})
 	piglit_add_executable (egl-create-pbuffer-surface egl-util.c egl-create-pbuffer-surface.c)
 	target_link_libraries(egl-create-pbuffer-surface pthread ${X11_X11_LIB})
+	piglit_add_executable (egl-configless-context egl-configless-context.c)
+	target_link_libraries(egl-configless-context pthread ${X11_X11_LIB})
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 # vim: ft=cmake:

@@ -4197,6 +4197,10 @@ egl_khr_create_context['valid debug flag GL'] = PiglitGLTest('egl-create-context
 for api in ('gles1', 'gles2', 'gles3'):
     egl_khr_create_context['valid debug flag ' + api] = PiglitGLTest('egl-create-context-valid-flag-debug-gles ' + api, exclude_platforms=['glx'])
 
+egl_mesa_configless_context = {}
+spec['EGL_MESA_configless_context'] = egl_mesa_configless_context
+egl_mesa_configless_context['basic'] = PiglitGLTest('egl-configless-context', run_concurrent=True, exclude_platforms=['glx'])
+
 egl_ext_client_extensions = {}
 spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
 for i in [1, 2, 3]:
