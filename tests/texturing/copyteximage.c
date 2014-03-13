@@ -184,8 +184,13 @@ supported_format(GLenum format)
 	case GL_COMPRESSED_RED:
 	case GL_COMPRESSED_RG:
 		return piglit_is_extension_supported("GL_ARB_texture_rg");
+	case GL_DEPTH_COMPONENT:
+	case GL_DEPTH_COMPONENT16:
+	case GL_DEPTH_COMPONENT24:
+		return piglit_is_extension_supported("GL_ARB_depth_texture");
 	case GL_DEPTH24_STENCIL8:
-		return piglit_is_extension_supported("GL_EXT_packed_depth_stencil");
+		return piglit_is_extension_supported("GL_EXT_packed_depth_stencil") &&
+			piglit_is_extension_supported("GL_ARB_depth_texture");
 	case GL_DEPTH_COMPONENT32F:
 	case GL_DEPTH32F_STENCIL8:
 		return piglit_is_extension_supported("GL_ARB_depth_buffer_float");
