@@ -58,33 +58,29 @@ PIGLIT_GL_TEST_CONFIG_END
 static GLuint
 make_fbo(int w, int h)
 {
-	GLuint tex;
+	GLuint rb;
 	GLuint fb;
  	GLenum status;
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
 
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8_EXT,
-		     w, h, 0,
-		     GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, NULL);
+	glGenRenderbuffersEXT(1, &rb);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
+				 GL_DEPTH24_STENCIL8,
+				 w, h);
 
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-				  GL_DEPTH_ATTACHMENT_EXT,
-				  GL_TEXTURE_2D,
-				  tex,
-				  0);
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-				  GL_STENCIL_ATTACHMENT_EXT,
-				  GL_TEXTURE_2D,
-				  tex,
-				  0);
-				  
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
+				     GL_DEPTH_ATTACHMENT_EXT,
+				     GL_RENDERBUFFER_EXT,
+				     rb);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
+				     GL_STENCIL_ATTACHMENT_EXT,
+				     GL_RENDERBUFFER_EXT,
+				     rb);
+
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	assert(glGetError() == 0);
