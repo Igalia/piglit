@@ -168,18 +168,28 @@ PatternRenderer::try_setup(GLenum internalformat)
 		GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE,
 		(GLint *) &component_type);
 
+	piglit_get_luminance_intensity_bits(internalformat, color_bits);
+
+	int num_bits = 0;
+	for (int i = 0; i < 4 && !num_bits; i++)
+		num_bits = color_bits[i];
+	if (!num_bits) {
+		printf("Red, green, blue, and alpha sizes are all zero.\n");
+		return false;
+	}
+
 	color_clamping_mode = GL_FIXED_ONLY;
 	switch (component_type) {
 	case GL_INT:
 		assert(test_pattern_ivec4);
 		test_pattern = test_pattern_ivec4;
-		color_offset = 1.0 - pow(2.0, color_bits[0] - 1);
+		color_offset = 1.0 - pow(2.0, num_bits - 1);
 		color_scale = -2.0 * color_offset;
 		break;
 	case GL_UNSIGNED_INT:
 		assert(test_pattern_uvec4);
 		test_pattern = test_pattern_uvec4;
-		color_scale = pow(2.0, color_bits[0]) - 1.0;
+		color_scale = pow(2.0, num_bits) - 1.0;
 		color_offset = 0.0;
 		break;
 	case GL_UNSIGNED_NORMALIZED:
