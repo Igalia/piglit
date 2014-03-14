@@ -20,10 +20,19 @@
 
 """ Tests for the exectest module """
 
-from framework.exectest import PlainExecTest
+from framework.exectest import PlainExecTest, ExecTest, Test
+
+
+def test_initialize_test():
+    """ Test initializes """
+    Test('/bin/true')
+
+
+def test_initialize_exectest():
+    """ ExecTest initializes """
+    ExecTest('/bin/true')
 
 
 def test_initialize_plainexectest():
     """ Test that PlainExecTest initializes correctly """
-    test = PlainExecTest('/bin/true')
-    assert test
+    PlainExecTest('/bin/true')

@@ -29,8 +29,6 @@ import platform
 import re
 import subprocess
 import sys
-import time
-import traceback
 from cStringIO import StringIO
 import multiprocessing
 import multiprocessing.dummy
@@ -55,7 +53,6 @@ __all__ = ['PIGLIT_CONFIG',
            'TestResult',
            'TestProfile',
            'Group',
-           'Test',
            'testBinDir']
 
 
@@ -408,73 +405,6 @@ class Environment:
         if system == 'Linux':
             result['lspci'] = self.run('lspci')
         return result
-
-
-class Test(object):
-    def __init__(self, runConcurrent=False):
-        '''
-                'runConcurrent' controls whether this test will
-                execute it's work (i.e. __doRunWork) on the calling thread
-                (i.e. the main thread) or from the ConcurrentTestPool threads.
-        '''
-        self.runConcurrent = runConcurrent
-        self.skip_test = False
-
-        # This is a hook for doing some testing on execute right before
-        # self.run is called.
-        self._test_hook_execute_run = lambda: None
-
-    def run(self):
-        raise NotImplementedError
-
-    def execute(self, env, path, log, json_writer, dmesg):
-        '''
-        Run the test.
-
-        :path:
-            Fully qualified test name as a string.  For example,
-            ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
-        '''
-        log_current = log.pre_log(path if env.verbose else None)
-
-        # Run the test
-        if env.execute:
-            try:
-                time_start = time.time()
-                dmesg.update_dmesg()
-                self._test_hook_execute_run()
-                result = self.run(env)
-                result = dmesg.update_result(result)
-                time_end = time.time()
-                if 'time' not in result:
-                    result['time'] = time_end - time_start
-                if 'result' not in result:
-                    result['result'] = 'fail'
-                if not isinstance(result, TestResult):
-                    result = TestResult(result)
-                    result['result'] = 'warn'
-                    result['note'] = 'Result not returned as an instance ' \
-                                     'of TestResult'
-            except:
-                result = TestResult()
-                result['result'] = 'fail'
-                result['exception'] = str(sys.exc_info()[0]) + \
-                    str(sys.exc_info()[1])
-                result['traceback'] = \
-                    "".join(traceback.format_tb(sys.exc_info()[2]))
-
-            log.log(path, result['result'])
-            log.post_log(log_current, result['result'])
-
-            if 'subtest' in result and len(result['subtest']) > 1:
-                for test in result['subtest']:
-                    result['result'] = result['subtest'][test]
-                    json_writer.write_dict_item(os.path.join(path, test), result)
-            else:
-                json_writer.write_dict_item(path, result)
-        else:
-            log.log(path, 'dry-run')
-            log.post_log(log_current, 'dry-run')
 
 
 class Group(dict):
