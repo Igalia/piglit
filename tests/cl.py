@@ -65,6 +65,7 @@ add_plain_test(api, 'clGetCommandQueueInfo', ['cl-api-get-command-queue-info'])
 #  Memory objects
 add_plain_test(api, 'clCreateBuffer', ['cl-api-create-buffer'])
 add_plain_test(api, 'clEnqueueCopyBuffer', ['cl-api-enqueue-copy-buffer'])
+add_plain_test(api, 'clEnqueueCopyBufferRect', ['cl-api-enqueue-copy-buffer-rect'])
 add_plain_test(api, 'clEnqueueReadBuffer and clEnqueueWriteBuffer', ['cl-api-enqueue-read_write-buffer'])
 add_plain_test(api, 'clGetMemObjectInfo', ['cl-api-get-mem-object-info'])
 add_plain_test(api, 'clGetImageInfo', ['cl-api-get-image-info'])
