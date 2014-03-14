@@ -52,8 +52,7 @@ __all__ = ['PIGLIT_CONFIG',
            'TestrunResult',
            'TestResult',
            'TestProfile',
-           'Group',
-           'testBinDir']
+           'Group']
 
 
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
@@ -211,12 +210,6 @@ def checkDir(dirname, failifexists):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-
-if 'PIGLIT_BUILD_DIR' in os.environ:
-    testBinDir = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
-else:
-    testBinDir = os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                               '../bin'))
 
 if 'PIGLIT_SOURCE_DIR' not in os.environ:
     p = os.path

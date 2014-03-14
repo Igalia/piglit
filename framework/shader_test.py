@@ -27,8 +27,8 @@ import os
 import os.path as path
 import re
 
-from .core import testBinDir, Group
-from .exectest import PlainExecTest
+from .core import Group
+from .exectest import PlainExecTest, testBinDir
 
 __all__ = ['add_shader_test', 'add_shader_test_dir']
 

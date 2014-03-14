@@ -26,8 +26,8 @@ import sys
 
 from os import path
 from glob import glob
-from framework.core import TestProfile, testBinDir
-from framework.exectest import ExecTest
+from framework.core import TestProfile
+from framework.exectest import ExecTest, testBinDir
 
 __all__ = ['profile']
 

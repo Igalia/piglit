@@ -26,8 +26,8 @@ import re
 import sys
 import subprocess
 
-from framework.core import TestProfile, testBinDir
-from framework.exectest import ExecTest
+from framework.core import TestProfile
+from framework.exectest import ExecTest, testBinDir
 from os import path
 
 __all__ = ['profile']

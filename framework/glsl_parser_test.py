@@ -27,8 +27,7 @@ import os.path as path
 import re
 from cStringIO import StringIO
 
-from .core import testBinDir
-from .exectest import PlainExecTest
+from .exectest import PlainExecTest, testBinDir
 
 
 def add_glsl_parser_test(group, filepath, test_name):

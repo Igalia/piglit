@@ -28,14 +28,25 @@ import time
 import sys
 import traceback
 
-from .core import testBinDir, TestResult
+from .core import TestResult
 
+
+__all__ = ['Test',
+           'ExecTest',
+           'PlainExecTest',
+           'testBinDir']
 
 # Platform global variables
 if 'PIGLIT_PLATFORM' in os.environ:
     PIGLIT_PLATFORM = os.environ['PIGLIT_PLATFORM']
 else:
     PIGLIT_PLATFORM = ''
+
+if 'PIGLIT_BUILD_DIR' in os.environ:
+    testBinDir = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
+else:
+    testBinDir = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                               '../bin'))
 
 
 class Test(object):

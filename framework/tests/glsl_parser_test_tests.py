@@ -24,7 +24,7 @@ import os
 import nose.tools as nt
 import framework.glsl_parser_test as glsl
 import framework.tests.utils as utils
-from framework.core import testBinDir
+from framework.exectest import testBinDir
 
 
 def _check_config(content):

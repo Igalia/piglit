@@ -28,8 +28,8 @@ import sys
 import subprocess
 
 from os import path
-from framework.core import testBinDir, TestProfile, TestResult
-from framework.exectest import ExecTest
+from framework.core import TestProfile, TestResult
+from framework.exectest import ExecTest, testBinDir
 
 __all__ = ['profile']
 
