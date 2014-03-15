@@ -1804,6 +1804,7 @@ arb_separate_shader_objects['Rendezvous by location'] = plain_test('arb_separate
 arb_separate_shader_objects['ValidateProgramPipeline'] = concurrent_test('arb_separate_shader_object-ValidateProgramPipeline')
 arb_separate_shader_objects['400 combinations by location'] = plain_test('arb_separate_shader_object-400-combinations -fbo --by-location')
 arb_separate_shader_objects['400 combinations by name'] = plain_test('arb_separate_shader_object-400-combinations -fbo')
+arb_separate_shader_objects['active sampler conflict'] = concurrent_test('arb_separate_shader_object-active-sampler-conflict')
 
 # Group ARB_sampler_objects
 arb_sampler_objects = {}
