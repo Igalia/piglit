@@ -249,20 +249,26 @@ piglit_display(void)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(prog);
-	glUniform2f(window_size_loc, piglit_width, piglit_height);
+	glUniform2f(window_size_loc, piglit_width/2, piglit_height);
 	glVertexAttribPointer(vertex_attr, 2, GL_FLOAT, GL_FALSE,
 			      sizeof(vertex_patterns[test->pattern][0]),
 			      vertex_patterns[test->pattern]);
 	glEnableVertexAttribArray(vertex_attr);
 
 	for (col = 0; col < NUM_COLS; col++) {
+		if (col == 0)
+			glViewport(0, 0, piglit_width/2, piglit_height);
+		else
+			glViewport(piglit_width/2, 0, piglit_width/2, piglit_height);
+
 		for (row = 0; row < NUM_ROWS; row++) {
-			glUniform2f(offset_loc, col * PATTERN_SIZE,
+			glUniform2f(offset_loc, 0,
 				    (NUM_ROWS - 1 - row) * PATTERN_SIZE);
 			draw_pattern(row + 1, col == 0);
 		}
 	}
 
+	glViewport(0, 0, piglit_width, piglit_height);
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, piglit_width,
 						   piglit_height) && pass;
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
