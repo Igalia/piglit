@@ -1,0 +1,28 @@
+#
+# Tests overlapping uniform location with array. Note that this test does
+# not include testing for overlaps with unused uniform locations.
+#
+# The GL_ARB_explicit_uniform_location spec says:
+#     "No two default-block uniform variables in the program can have the same
+#     location, even if they are unused, otherwise a compiler or linker error
+#     will be generated"
+
+[require]
+GLSL >= 1.20
+GL_ARB_explicit_uniform_location
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 120
+#extension GL_ARB_explicit_uniform_location: require
+layout(location = 0) uniform float a[16];
+layout(location = 2) uniform float r;
+
+void main()
+{
+  gl_FragColor = vec4(r, 1.0, 1.0, a[a.length() - 1]);
+}
+
+[test]
+link error

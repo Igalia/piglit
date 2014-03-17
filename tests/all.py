@@ -1929,6 +1929,9 @@ spec['ARB_explicit_uniform_location'] = arb_explicit_uniform_location
 import_glsl_parser_tests(arb_explicit_uniform_location,
                          os.path.join(testsDir, 'spec', 'arb_explicit_uniform_location'),
                          [''])
+add_shader_test_dir(arb_explicit_uniform_location,
+                    os.path.join(testsDir, 'spec', 'arb_explicit_uniform_location'),
+                    recursive=True)
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-minmax')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-boundaries')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-array-elements')
