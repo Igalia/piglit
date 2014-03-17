@@ -36,18 +36,39 @@ static const int MessageId4 = 404;
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 11;
 	config.require_debug_context = true;
+#else /* using GLES */
+	config.supports_gl_es_version = 20;
+#endif
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#ifdef PIGLIT_USE_OPENGL
+#define GET_FUNC(x) x
+#else /* using GLES */
+#define GET_FUNC(x) x ## KHR
+#endif
+
+static GLuint (*GetDebugMessageLog)(GLuint count, GLsizei bufSize, GLenum *sources,
+                                    GLenum *types, GLuint *ids, GLenum *severities,
+                                    GLsizei *lengths, GLchar *messageLog);
+static void (*DebugMessageInsert)(GLenum source, GLenum type, GLuint id,
+                                  GLenum severity, GLsizei length, const GLchar *buf);
+static void (*DebugMessageControl)(GLenum source, GLenum type, GLenum severity,
+                                   GLsizei count, const GLuint *ids, GLboolean enabled);
+static void (*PushDebugGroup)(GLenum source, GLuint id, GLsizei length,
+                              const GLchar *message);
+static void (*PopDebugGroup)(void);
+
 static GLboolean fetch_one_log_message()
 {
 	char log[4096];
 	GLboolean ret =
-		!!glGetDebugMessageLog(1, 4096, NULL, NULL, NULL, NULL, NULL, log);
+		!!GetDebugMessageLog(1, 4096, NULL, NULL, NULL, NULL, NULL, log);
 
 	if (ret) {
 		printf("Log: %s\n", log);
@@ -65,7 +86,7 @@ static bool check_inheritance_messages(int expectedCount, GLuint* expectedIds)
 	GLuint ids[MAX_MESSAGES];
 	GLchar messageLog[BUF_SIZE];
 
-	count = glGetDebugMessageLog(MAX_MESSAGES,
+	count = GetDebugMessageLog(MAX_MESSAGES,
 				     BUF_SIZE,
 				     NULL,
 				     NULL,
@@ -93,16 +114,16 @@ static bool check_inheritance_messages(int expectedCount, GLuint* expectedIds)
 
 static void insert_inheritance_messages()
 {
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage1);
 
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId2,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId2,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage2);
 
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId3,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId3,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage3);
 
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId4,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId4,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage4);
 }
 
@@ -123,26 +144,26 @@ static bool test_push_pop_group_inheritance()
 	puts("Testing Push debug group inheritance");
 
 	/* Setup of the default active debug group: Filter everything out */
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
+	DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
 			      GL_DONT_CARE, 0, NULL, GL_FALSE);
 
 	/* Push debug group 1 and allow messages with the id 101*/
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 1");
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
+	PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 1");
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
 			      GL_DONT_CARE, 1, allowedIds1, GL_TRUE);
 	insert_inheritance_messages();
 	pass = check_inheritance_messages(1, expectedIds1);
 
 	/* Push debug group 1 and allow messages with the id 101 and 202*/
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 2");
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
+	PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 2");
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
 			      GL_DONT_CARE, 1, allowedIds2, GL_TRUE);
 	insert_inheritance_messages();
 	pass = check_inheritance_messages(2, expectedIds2) && pass;
 
 	/* Push debug group 1 and allow messages with the id 101, 202 and 303*/
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 3");
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
+	PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Push_Pop 3");
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
 			      GL_DONT_CARE, 1, allowedIds3, GL_TRUE);
 	insert_inheritance_messages();
 	pass = check_inheritance_messages(3, expectedIds3) && pass;
@@ -150,17 +171,17 @@ static bool test_push_pop_group_inheritance()
 	puts("Testing Pop debug group inheritance");
 
 	/* Pop debug group 3 */
-	glPopDebugGroup();
+	PopDebugGroup();
 	insert_inheritance_messages();
 	pass = check_inheritance_messages(2, expectedIds2) && pass;
 
 	/* Pop debug group 2 */
-	glPopDebugGroup();
+	PopDebugGroup();
 	insert_inheritance_messages();
 	pass = check_inheritance_messages(1, expectedIds1) && pass;
 
 	/* Pop group 1, restore the volume control of the default debug group. */
-	glPopDebugGroup();
+	PopDebugGroup();
 	insert_inheritance_messages();
 	/* check message log is empty, all messages should have been filtered */
 	if (fetch_one_log_message()) {
@@ -211,39 +232,39 @@ static bool test_push_pop_debug_group()
 	/* Setup of the default active debug group, only enabling
 	 * the messages we will be interested in.
 	 */
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
+	DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE,
 			      GL_DONT_CARE, 0, NULL, GL_FALSE);
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PUSH_GROUP,
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_PUSH_GROUP,
 			      GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_TRUE);
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_POP_GROUP,
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_POP_GROUP,
 			      GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_TRUE);
-	glDebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
+	DebugMessageControl(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER,
 			      GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_TRUE);
 
 	/* Generate a debug marker debug output message */
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage1);
 
 	/* Push debug group 1 */
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, TestMessage2);
+	PushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, TestMessage2);
 
 	/* Setup of the debug group 1: Filter everything out */
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE,
+	DebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE,
 			      0, NULL, GL_FALSE);
 
 	/* This message shouldn't appear in the debug output log */
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage3);
 
 	/* Pop group 1, restore the volume control of the default debug group. */
-	glPopDebugGroup();
+	PopDebugGroup();
 
 	/* Generate a debug marker debug output message */
-	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
+	DebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, MessageId1,
 			     GL_DEBUG_SEVERITY_NOTIFICATION, -1, TestMessage4);
 
 	/* Check that message log has done correct filtering */
-	count = glGetDebugMessageLog(MAX_MESSAGES,
+	count = GetDebugMessageLog(MAX_MESSAGES,
 				     BUF_SIZE,
 				     NULL,
 				     NULL,
@@ -263,7 +284,7 @@ static bool test_push_pop_debug_group()
 	}
 
 	if (pass) {
-		/* the thrid message should contain TestMessage2 from glPopDebugGroup() */
+		/* the third message should contain TestMessage2 from PopDebugGroup() */
 		nextMessage = lengths[0] + lengths[1];
 		if (strstr(messageLog+nextMessage, TestMessage2) == NULL) {
 			fprintf(stderr, "Expected: %s Message: %s\n", TestMessage2, messageLog+nextMessage);
@@ -295,6 +316,12 @@ static bool test_push_pop_debug_group()
 void piglit_init(int argc, char **argv)
 {
 	bool pass = true;
+
+	GetDebugMessageLog = GET_FUNC(glGetDebugMessageLog);
+	DebugMessageInsert = GET_FUNC(glDebugMessageInsert);
+	DebugMessageControl = GET_FUNC(glDebugMessageControl);
+	PushDebugGroup = GET_FUNC(glPushDebugGroup);
+	PopDebugGroup = GET_FUNC(glPopDebugGroup);
 
 	piglit_require_extension("GL_KHR_debug");
 

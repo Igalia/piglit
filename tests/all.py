@@ -1843,7 +1843,9 @@ spec['KHR_debug'] = khr_debug
 khr_debug['object-label_gl'] = concurrent_test('khr_debug-object-label_gl')
 khr_debug['object-label_gles2'] = concurrent_test('khr_debug-object-label_gles2')
 khr_debug['object-label_gles3'] = concurrent_test('khr_debug-object-label_gles3')
-khr_debug['push-pop-group'] = concurrent_test('khr_debug-push-pop-group')
+khr_debug['push-pop-group_gl'] = concurrent_test('khr_debug-push-pop-group_gl')
+khr_debug['push-pop-group_gles2'] = concurrent_test('khr_debug-push-pop-group_gles2')
+khr_debug['push-pop-group_gles3'] = concurrent_test('khr_debug-push-pop-group_gles3')
 
 # Group ARB_occlusion_query2
 arb_occlusion_query2 = Group()
