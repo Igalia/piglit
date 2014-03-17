@@ -26,12 +26,12 @@ etc
 """
 
 import itertools
+import nose.tools as nt
 import framework.status as status
 
 # Statuses from worst to last. NotRun is intentionally not in this list and
 # tested separately because of upcoming features for it
-STATUSES = ["notrun", "pass", "dmesg-warn", "warn", "dmesg-fail", "fail",
-            "crash"]
+STATUSES = ["pass", "dmesg-warn", "warn", "dmesg-fail", "fail", "crash"]
 
 # Create lists of fixes and regressions programmatically based on the STATUSES
 # list. This means less code, and easier expansion changes.
@@ -58,7 +58,7 @@ def test_gen_lookup():
     """ Generator that attempts to do a lookup on all statuses """
     yieldable = check_lookup
 
-    for stat in STATUSES + ['skip']:
+    for stat in STATUSES + ['skip', 'notrun']:
         yieldable.description = "Lookup: {}".format(stat)
         yield yieldable, stat
 
@@ -114,3 +114,29 @@ def test_is_change():
         yieldable.description = ("Test that {0} -> {1} is a "
                                  "change".format(new, old))
         yield yieldable, new, old
+
+
+def check_not_change(new, old):
+    """ Check that a status doesn't count as a change 
+
+    This checks that new < old and old < new do not return true. This is meant
+    for checking skip and notrun, which we don't want to show up as regressions
+    and fixes, but to go in their own special catagories.
+
+    """
+    nt.assert_false(new < old,
+                    msg="{new} -> {old}, is a change "
+                        "but shouldn't be".format(**locals()))
+    nt.assert_false(new > old,
+                    msg="{new} <- {old}, is a change "
+                        "but shouldn't be".format(**locals()))
+
+
+def test_not_change():
+    """ Skip and NotRun should not count as changes """
+    yieldable = check_not_change
+
+    for nochange, stat in itertools.product(['skip', 'notrun'], STATUSES):
+        yieldable.description = "{0} -> {1} should not be a change".format(
+                nochange, stat)
+        yield yieldable, status.status_lookup(nochange), status.status_lookup(stat)

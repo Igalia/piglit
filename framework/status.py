@@ -35,8 +35,6 @@ A tuple representing :
 
 Status ordering from best to worst:
 
-NotRun
-skip
 pass
 dmesg-warn
 warn
@@ -45,20 +43,14 @@ fail
 crash
 timeout
 
-(NotRun, pass, skip) are considered equivalent for regression testing.
-
-The motivation is if you accidentally expose a feature that doesn't work,
-you'll get skip->fail, which is a regression. If you disable the feature,
-you'll get fail->skip, which is a fix.
-
-NotRun->fail should also be considered a regression for you not to miss
-new failing tests.
+SKIP and NOTRUN are not factored into regressions and fixes, they are counted
+seperately.
 
 The formula for determining regressions is:
-  max(old_status, pass) < new_status
+  max(PASS, old_status) < new_status
 
 The formula for determining fixes is:
-  old_status > max(new_status, pass)
+  max(PASS, old_status) > new_status
 
 """
 
