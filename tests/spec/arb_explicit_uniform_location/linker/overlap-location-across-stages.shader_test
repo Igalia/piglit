@@ -1,0 +1,33 @@
+#
+# Tests overlapping uniform location among 2 shader stages, both shaders
+# define same explicit location. Note, this test does not include testing
+# for overlaps with unused uniform locations.
+#
+# The GL_ARB_explicit_uniform_location spec says:
+#     "No two default-block uniform variables in the program can have the same
+#     location, even if they are unused, otherwise a compiler or linker error
+#     will be generated"
+
+[require]
+GLSL >= 1.20
+GL_ARB_explicit_uniform_location
+
+[vertex shader]
+#extension GL_ARB_explicit_uniform_location: require
+layout(location = 42) uniform vec4 offset;
+vec4 vertex;
+void main()
+{
+  gl_Position = vertex + offset;
+}
+
+[fragment shader]
+#extension GL_ARB_explicit_uniform_location: require
+layout(location = 42) uniform vec4 color;
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+link error
