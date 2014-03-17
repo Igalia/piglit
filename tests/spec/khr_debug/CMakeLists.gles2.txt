@@ -5,11 +5,10 @@ include_directories(
 
 link_libraries (
 	piglitutil_${piglit_target_api}
-	${OPENGL_gl_LIBRARY}
-	${OPENGL_glu_LIBRARY}
+	${OPENGL_gles2_LIBRARY}
+	${EGL_LDFLAGS}
 )
 
 piglit_add_executable (khr_debug-object-label_${piglit_target_api} debug-object-label.c)
-piglit_add_executable (khr_debug-push-pop-group debug-push-pop-group.c)
 
 # vim: ft=cmake:

@@ -29,11 +29,31 @@ static const char *TestLabel = "Test Label";
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+#ifdef PIGLIT_USE_OPENGL
 	config.supports_gl_compat_version = 11;
+#else /* using GLES */
+	config.supports_gl_es_version = 20;
+#endif
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
+
+#ifdef PIGLIT_USE_OPENGL
+#define GET_FUNC(x) x
+#else /* using GLES */
+#define GET_FUNC(x) x ## KHR
+#endif
+
+/* These functions are assigned in the init function */
+static void (*ObjectPtrLabel)(const void *ptr, GLsizei length,
+                              const GLchar *label);
+static void (*GetObjectPtrLabel)(const void *ptr, GLsizei bufSize,
+                                 GLsizei *length, GLchar *label);
+static void (*ObjectLabel)(GLenum identifier, GLuint name, GLsizei length,
+                           const GLchar *label);
+static void (*GetObjectLabel)(GLenum identifier, GLuint name, GLsizei bufSize,
+                              GLsizei *length, GLchar *label);
 
 enum piglit_result
 piglit_display(void)
@@ -55,8 +75,8 @@ test_object_ptr_label()
 	 * set/get the label
 	 */
 	sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	glObjectPtrLabel(sync, -1, TestLabel);
-	glGetObjectPtrLabel(sync, TestLabelLen + 1, &length, label);
+	ObjectPtrLabel(sync, -1, TestLabel);
+	GetObjectPtrLabel(sync, TestLabelLen + 1, &length, label);
 
 	if (length != TestLabelLen || (strcmp(TestLabel, label) != 0)) {
 		fprintf(stderr, "Label or length does not match\n");
@@ -69,7 +89,7 @@ test_object_ptr_label()
 	/* An INVALID_VALUE is generated if the <ptr> parameter of ObjectPtrLabel
 	 * is not the name of a sync object.
 	 */
-	glObjectPtrLabel(NULL, length, label);
+	ObjectPtrLabel(NULL, length, label);
 
 	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 		fprintf(stderr, "GL_INVALID_VALUE should be generated when ObjectPtrLabel()"
@@ -124,19 +144,23 @@ test_object_label_types()
 	GLuint program;
 	GLuint vertexArray;
 	GLuint query;
+#ifdef PIGLIT_USE_OPENGL
 	GLuint programPipeline;
+#endif
 	GLuint transformFeedback;
 	GLuint sampler;
 	GLuint texture;
 	GLuint renderbuffer;
 	GLuint framebuffer;
+#ifdef PIGLIT_USE_OPENGL
 	GLuint displayList;
+#endif
 
 	/* Test BUFFER */
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glObjectLabel(GL_BUFFER, buffer, -1, TestLabel);
-	glGetObjectLabel(GL_BUFFER, buffer, TestLabelLen + 1, &length[BUFFER_IDX], label[BUFFER_IDX]);
+	ObjectLabel(GL_BUFFER, buffer, -1, TestLabel);
+	GetObjectLabel(GL_BUFFER, buffer, TestLabelLen + 1, &length[BUFFER_IDX], label[BUFFER_IDX]);
 
 	check_label_and_length(label[BUFFER_IDX], length[BUFFER_IDX], "GL_BUFFER");
 
@@ -145,8 +169,8 @@ test_object_label_types()
 	if (piglit_get_gl_version() >= 20) {
 		/* Test SHADER */
 		shader = glCreateShader(GL_FRAGMENT_SHADER);
-		glObjectLabel(GL_SHADER, shader, -1, TestLabel);
-		glGetObjectLabel(GL_SHADER, shader, TestLabelLen + 1,
+		ObjectLabel(GL_SHADER, shader, -1, TestLabel);
+		GetObjectLabel(GL_SHADER, shader, TestLabelLen + 1,
 				 &length[SHADER_IDX], label[SHADER_IDX]);
 
 		check_label_and_length(label[SHADER_IDX], length[SHADER_IDX], "GL_SHADER");
@@ -155,8 +179,8 @@ test_object_label_types()
 
 		/* Test PROGRAM */
 		program = glCreateProgram();
-		glObjectLabel(GL_PROGRAM, program, -1, TestLabel);
-		glGetObjectLabel(GL_PROGRAM, program, TestLabelLen + 1,
+		ObjectLabel(GL_PROGRAM, program, -1, TestLabel);
+		GetObjectLabel(GL_PROGRAM, program, TestLabelLen + 1,
 				 &length[PROGRAM_IDX], label[PROGRAM_IDX]);
 
 		check_label_and_length(label[PROGRAM_IDX], length[PROGRAM_IDX], "GL_PROGRAM");
@@ -164,23 +188,27 @@ test_object_label_types()
 		glDeleteProgram(program);
 	}
 
+	/* GL or GLES >= 3.0 supports vertex arrays*/
 	if (piglit_get_gl_version() >= 30) {
 		/* Test VERTEX_ARRAY */
 		glGenVertexArrays(1, &vertexArray);
 		glBindVertexArray(vertexArray);
-		glObjectLabel(GL_VERTEX_ARRAY, vertexArray, -1, TestLabel);
-		glGetObjectLabel(GL_VERTEX_ARRAY, vertexArray, TestLabelLen + 1,
+		ObjectLabel(GL_VERTEX_ARRAY, vertexArray, -1, TestLabel);
+		GetObjectLabel(GL_VERTEX_ARRAY, vertexArray, TestLabelLen + 1,
 				 &length[VERTEX_ARRAY_IDX], label[VERTEX_ARRAY_IDX]);
 
 		check_label_and_length(label[VERTEX_ARRAY_IDX], length[VERTEX_ARRAY_IDX], "GL_VERTEX_ARRAY");
 
 		glDeleteVertexArrays(1, &vertexArray);
+	}
 
+	/* GLES supports render buffer and frame buffer since 2.0 */
+	if (piglit_is_gles() || piglit_get_gl_version() >= 30) {
 		/* Test RENDERBUFFER */
 		glGenRenderbuffers(1, &renderbuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
-		glObjectLabel(GL_RENDERBUFFER, renderbuffer, -1, TestLabel);
-		glGetObjectLabel(GL_RENDERBUFFER, renderbuffer, TestLabelLen + 1,
+		ObjectLabel(GL_RENDERBUFFER, renderbuffer, -1, TestLabel);
+		GetObjectLabel(GL_RENDERBUFFER, renderbuffer, TestLabelLen + 1,
 				 &length[RENDERBUFFER_IDX], label[RENDERBUFFER_IDX]);
 
 		check_label_and_length(label[RENDERBUFFER_IDX], length[RENDERBUFFER_IDX], "GL_RENDERBUFFER");
@@ -190,8 +218,8 @@ test_object_label_types()
 		/* Test FRAMEBUFFER */
 		glGenFramebuffers(1, &framebuffer);
 		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glObjectLabel(GL_FRAMEBUFFER, framebuffer, -1, TestLabel);
-		glGetObjectLabel(GL_FRAMEBUFFER, framebuffer, TestLabelLen + 1,
+		ObjectLabel(GL_FRAMEBUFFER, framebuffer, -1, TestLabel);
+		GetObjectLabel(GL_FRAMEBUFFER, framebuffer, TestLabelLen + 1,
 				 &length[FRAMEBUFFER_IDX], label[FRAMEBUFFER_IDX]);
 
 		check_label_and_length(label[FRAMEBUFFER_IDX], length[FRAMEBUFFER_IDX], "GL_FRAMEBUFFER");
@@ -199,36 +227,42 @@ test_object_label_types()
 		glDeleteFramebuffers(1, &framebuffer);
 	}
 
-	/* Test QUERY */
-	glGenQueries(1, &query);
-	glBeginQuery(GL_TIME_ELAPSED, query);
-	glEndQuery(GL_TIME_ELAPSED);
-	glObjectLabel(GL_QUERY, query, -1, TestLabel);
-	glGetObjectLabel(GL_QUERY, query, TestLabelLen + 1, &length[QUERY_IDX], label[QUERY_IDX]);
+	/* GLES >= 3.0 or GL compat */
+	if (!piglit_is_gles() || piglit_get_gl_version() >= 30) {
+		/* Test QUERY */
+		glGenQueries(1, &query);
+		glBeginQuery(GL_TIME_ELAPSED, query);
+		glEndQuery(GL_TIME_ELAPSED);
+		ObjectLabel(GL_QUERY, query, -1, TestLabel);
+		GetObjectLabel(GL_QUERY, query, TestLabelLen + 1, &length[QUERY_IDX], label[QUERY_IDX]);
 
-	check_label_and_length(label[QUERY_IDX], length[QUERY_IDX], "GL_TEST_QUERY");
+		check_label_and_length(label[QUERY_IDX], length[QUERY_IDX], "GL_TEST_QUERY");
 
-	glDeleteQueries(1, &query);
+		glDeleteQueries(1, &query);
+	}
 
+#ifdef PIGLIT_USE_OPENGL
 	/* Test PROGRAM_PIPELINE */
 	if (piglit_is_extension_supported("GL_ARB_separate_shader_objects")) {
 		glGenProgramPipelines(1, &programPipeline);
 		glBindProgramPipeline(programPipeline);
-		glObjectLabel(GL_PROGRAM_PIPELINE, programPipeline, -1, TestLabel);
-		glGetObjectLabel(GL_PROGRAM_PIPELINE, programPipeline, TestLabelLen + 1,
+		ObjectLabel(GL_PROGRAM_PIPELINE, programPipeline, -1, TestLabel);
+		GetObjectLabel(GL_PROGRAM_PIPELINE, programPipeline, TestLabelLen + 1,
 				 &length[PROGRAM_PIPELINE_IDX], label[PROGRAM_PIPELINE_IDX]);
 
 		check_label_and_length(label[PROGRAM_PIPELINE_IDX], length[PROGRAM_PIPELINE_IDX], "GL_PROGRAM_PIPELINE");
 
 		glDeleteProgramPipelines(1, &programPipeline);
 	}
+#endif /* PIGLIT_USE_OPENGL */
 
 	/* Test TRANSFORM_FEEDBACK */
-	if (piglit_is_extension_supported("GL_ARB_transform_feedback2")) {
+	if ((piglit_is_gles() && piglit_get_gl_version() >= 30) ||
+		piglit_is_extension_supported("GL_ARB_transform_feedback2")) {
 		glGenTransformFeedbacks(1, &transformFeedback);
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, transformFeedback);
-		glObjectLabel(GL_TRANSFORM_FEEDBACK, transformFeedback, -1, TestLabel);
-		glGetObjectLabel(GL_TRANSFORM_FEEDBACK, transformFeedback, TestLabelLen + 1,
+		ObjectLabel(GL_TRANSFORM_FEEDBACK, transformFeedback, -1, TestLabel);
+		GetObjectLabel(GL_TRANSFORM_FEEDBACK, transformFeedback, TestLabelLen + 1,
 				 &length[TRANSFORM_FEEDBACK_IDX], label[TRANSFORM_FEEDBACK_IDX]);
 
 		check_label_and_length(label[TRANSFORM_FEEDBACK_IDX], length[TRANSFORM_FEEDBACK_IDX], "GL_TRANSFORM_FEEDBACK");
@@ -237,11 +271,12 @@ test_object_label_types()
 	}
 
 	/* Test SAMPLER */
-	if (piglit_is_extension_supported("GL_ARB_sampler_objects")) {
+	if ((piglit_is_gles() && piglit_get_gl_version() >= 30) ||
+		piglit_is_extension_supported("GL_ARB_sampler_objects")) {
 		glGenSamplers(1, &sampler);
 		glBindSampler(0, sampler);
-		glObjectLabel(GL_SAMPLER, sampler, -1, TestLabel);
-		glGetObjectLabel(GL_SAMPLER, sampler, TestLabelLen + 1, &length[SAMPLER_IDX], label[SAMPLER_IDX]);
+		ObjectLabel(GL_SAMPLER, sampler, -1, TestLabel);
+		GetObjectLabel(GL_SAMPLER, sampler, TestLabelLen + 1, &length[SAMPLER_IDX], label[SAMPLER_IDX]);
 
 		check_label_and_length(label[SAMPLER_IDX], length[SAMPLER_IDX], "GL_SAMPLER");
 
@@ -251,23 +286,25 @@ test_object_label_types()
 	/* Test TEXTURE */
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glObjectLabel(GL_TEXTURE, texture, -1, TestLabel);
-	glGetObjectLabel(GL_TEXTURE, texture, TestLabelLen + 1, &length[TEXTURE_IDX], label[TEXTURE_IDX]);
+	ObjectLabel(GL_TEXTURE, texture, -1, TestLabel);
+	GetObjectLabel(GL_TEXTURE, texture, TestLabelLen + 1, &length[TEXTURE_IDX], label[TEXTURE_IDX]);
 
 	check_label_and_length(label[TEXTURE_IDX], length[TEXTURE_IDX], "GL_TEXTURE");
 
 	glDeleteTextures(1, &texture);
 
+#ifdef PIGLIT_USE_OPENGL
 	/* Test DISPLAY_LIST - Compatibility Profile */
 	displayList = glGenLists(1);
 	glNewList(displayList, GL_COMPILE_AND_EXECUTE);
 	glEndList();
-	glObjectLabel(GL_DISPLAY_LIST, displayList, -1, TestLabel);
-	glGetObjectLabel(GL_DISPLAY_LIST, displayList, TestLabelLen + 1, &length[DISPLAY_LIST_IDX], label[DISPLAY_LIST_IDX]);
+	ObjectLabel(GL_DISPLAY_LIST, displayList, -1, TestLabel);
+	GetObjectLabel(GL_DISPLAY_LIST, displayList, TestLabelLen + 1, &length[DISPLAY_LIST_IDX], label[DISPLAY_LIST_IDX]);
 
 	check_label_and_length(label[DISPLAY_LIST_IDX], length[DISPLAY_LIST_IDX], "GL_DISPLAY_LIST");
 
 	glDeleteLists(displayList, 1);
+#endif /* PIGLIT_USE_OPENGL */
 
 	return pass;
 }
@@ -301,7 +338,7 @@ test_object_label()
 
 			/* Test when length -1 */
 			glBindBuffer(GL_ARRAY_BUFFER, buffer);
-			glObjectLabel(GL_BUFFER, buffer, -1, bigLabel);
+			ObjectLabel(GL_BUFFER, buffer, -1, bigLabel);
 
 			if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 				fprintf(stderr, "GL_INVALID_VALUE should be generated when label >= MAX_LABEL_LENGTH\n");
@@ -310,7 +347,7 @@ test_object_label()
 
 			/* test with large client defined length */
 			glBindBuffer(GL_ARRAY_BUFFER, buffer);
-			glObjectLabel(GL_BUFFER, buffer, maxLabelLength, bigLabel);
+			ObjectLabel(GL_BUFFER, buffer, maxLabelLength, bigLabel);
 
 			if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 				fprintf(stderr, "GL_INVALID_VALUE should be generated when label length >= MAX_LABEL_LENGTH\n");
@@ -325,9 +362,9 @@ test_object_label()
 
 	/* If <label> is NULL, any debug label is effectively removed from the object.
 	 */
-	glObjectLabel(GL_BUFFER, buffer, -1, TestLabel);
-	glObjectLabel(GL_BUFFER, buffer, -1, NULL);
-	glGetObjectLabel(GL_BUFFER, buffer, TestLabelLen + 1, &length, label);
+	ObjectLabel(GL_BUFFER, buffer, -1, TestLabel);
+	ObjectLabel(GL_BUFFER, buffer, -1, NULL);
+	GetObjectLabel(GL_BUFFER, buffer, TestLabelLen + 1, &length, label);
 
 	if (length != 0 || (strcmp("", label) != 0)) {
 		fprintf(stderr, "Setting label to NULL should remove the label\n");
@@ -338,7 +375,7 @@ test_object_label()
 	/* An INVALID_ENUM error is generated by ObjectLabel if <identifier> is not
 	 * one of the object types.
 	 */
-	glObjectLabel(GL_ARRAY_BUFFER, buffer, -1, TestLabel);
+	ObjectLabel(GL_ARRAY_BUFFER, buffer, -1, TestLabel);
 
 	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
 		fprintf(stderr, "GL_INVALID_ENUM should be generated when the ObjectLabel identifier is invalid\n");
@@ -350,7 +387,7 @@ test_object_label()
 	 */
 	invalidBufferName = buffer;
 	glDeleteBuffers(1, &buffer);
-	glObjectLabel(GL_BUFFER, invalidBufferName, -1, TestLabel);
+	ObjectLabel(GL_BUFFER, invalidBufferName, -1, TestLabel);
 
 	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 		fprintf(stderr, "GL_INVALID_VALUE should be generated when the ObjectLabel name is invalid\n");
@@ -383,8 +420,8 @@ test_get_object_label()
 	 * <bufSize>.
 	 */
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[TEST_BUFSIZE_IDX]);
-	glObjectLabel(GL_BUFFER, buffers[TEST_BUFSIZE_IDX], -1, TestLabel);
-	glGetObjectLabel(GL_BUFFER, buffers[TEST_BUFSIZE_IDX], TestLabelLen, &length, label);
+	ObjectLabel(GL_BUFFER, buffers[TEST_BUFSIZE_IDX], -1, TestLabel);
+	GetObjectLabel(GL_BUFFER, buffers[TEST_BUFSIZE_IDX], TestLabelLen, &length, label);
 
 	if (length != 9 || (strcmp("Test Labe", label) != 0)) {
 		fprintf(stderr, "BufSize should limit the maximum label length to 9\n");
@@ -397,7 +434,7 @@ test_get_object_label()
 	 * in <length>.
 	 */
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[TEST_NO_LABEL_IDX]);
-	glGetObjectLabel(GL_BUFFER, buffers[TEST_NO_LABEL_IDX], TestLabelLen + 1, &length, label);
+	GetObjectLabel(GL_BUFFER, buffers[TEST_NO_LABEL_IDX], TestLabelLen + 1, &length, label);
 
 	if (length != 0 || (strcmp("", label) != 0)) {
 		fprintf(stderr, "Label should be empty and length 0\n");
@@ -410,8 +447,8 @@ test_get_object_label()
 	 * <length>.
 	 */
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[TEST_NULL_LABEL_IDX]);
-	glObjectLabel(GL_BUFFER, buffers[TEST_NULL_LABEL_IDX], -1, TestLabel);
-	glGetObjectLabel(GL_BUFFER, buffers[TEST_NULL_LABEL_IDX], TestLabelLen + 1, &length, NULL);
+	ObjectLabel(GL_BUFFER, buffers[TEST_NULL_LABEL_IDX], -1, TestLabel);
+	GetObjectLabel(GL_BUFFER, buffers[TEST_NULL_LABEL_IDX], TestLabelLen + 1, &length, NULL);
 
 	if (length != TestLabelLen) {
 		fprintf(stderr, "Label length should be %i\n", TestLabelLen);
@@ -422,8 +459,8 @@ test_get_object_label()
 	/* If <length> is NULL, no length is returned.
 	 */
 	glBindBuffer(GL_ARRAY_BUFFER, buffers[TEST_NULL_LENGTH_IDX]);
-	glObjectLabel(GL_BUFFER, buffers[TEST_NULL_LENGTH_IDX], -1, TestLabel);
-	glGetObjectLabel(GL_BUFFER, buffers[TEST_NULL_LENGTH_IDX], TestLabelLen + 1, NULL, label);
+	ObjectLabel(GL_BUFFER, buffers[TEST_NULL_LENGTH_IDX], -1, TestLabel);
+	GetObjectLabel(GL_BUFFER, buffers[TEST_NULL_LENGTH_IDX], TestLabelLen + 1, NULL, label);
 
 	if (strcmp(TestLabel, label) != 0) {
 		fprintf(stderr, "Label doent match expected string when length NULL\n");
@@ -434,7 +471,7 @@ test_get_object_label()
 	/* An INVALID_ENUM error is generated by GetObjectLabel if identifier is not
 	 * one of the valid object types
 	 */
-	glGetObjectLabel(GL_ARRAY_BUFFER, buffers[TEST_NULL_LENGTH_IDX], TestLabelLen + 1, &length, label);
+	GetObjectLabel(GL_ARRAY_BUFFER, buffers[TEST_NULL_LENGTH_IDX], TestLabelLen + 1, &length, label);
 
 	if (!piglit_check_gl_error(GL_INVALID_ENUM)) {
 		fprintf(stderr, "GL_INVALID_ENUM should be generated when GetObjectLabel identifier is invalid\n");
@@ -446,7 +483,7 @@ test_get_object_label()
 	 */
 	invalidBufferName = buffers[TEST_NULL_LENGTH_IDX];
 	glDeleteBuffers(numBuffers, buffers);
-	glGetObjectLabel(GL_BUFFER, invalidBufferName, TestLabelLen + 1, &length, label);
+	GetObjectLabel(GL_BUFFER, invalidBufferName, TestLabelLen + 1, &length, label);
 
 	if (!piglit_check_gl_error(GL_INVALID_VALUE)) {
 		fprintf(stderr, "GL_INVALID_VALUE should be generated when GetObjectLabel name is invalid\n");
@@ -460,13 +497,24 @@ void piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 
+	ObjectPtrLabel = GET_FUNC(glObjectPtrLabel);
+	GetObjectPtrLabel = GET_FUNC(glGetObjectPtrLabel);
+	ObjectLabel = GET_FUNC(glObjectLabel);
+	GetObjectLabel = GET_FUNC(glGetObjectLabel);
+
+#ifdef PIGLIT_USE_OPENGL
 	piglit_require_gl_version(15);
+#endif
 	piglit_require_extension("GL_KHR_debug");
 
 	pass = test_object_label_types() && pass;
 	pass = test_object_label() && pass;
 	pass = test_get_object_label() && pass;
-	if (piglit_get_gl_version() >= 32 || piglit_is_extension_supported("GL_ARB_sync"))
+
+	/* Test only if is GLES 3.0 or GL 3.2 or has ARB_sync */
+	if ((piglit_is_gles() && piglit_get_gl_version() >= 30) ||
+	    piglit_get_gl_version() >= 32 ||
+	    piglit_is_extension_supported("GL_ARB_sync"))
 		pass = test_object_ptr_label() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
