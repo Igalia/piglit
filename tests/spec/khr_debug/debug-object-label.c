@@ -466,7 +466,7 @@ void piglit_init(int argc, char **argv)
 	pass = test_object_label_types() && pass;
 	pass = test_object_label() && pass;
 	pass = test_get_object_label() && pass;
-	if (piglit_is_extension_supported("GL_ARB_sync"))
+	if (piglit_get_gl_version() >= 32 || piglit_is_extension_supported("GL_ARB_sync"))
 		pass = test_object_ptr_label() && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
