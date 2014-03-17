@@ -72,9 +72,9 @@ class Writer:
                 pass
 
             success = result.get('result')
-            if success in (status.Pass(), status.Warn()):
+            if success in (status.PASS, status.WARN):
                 pass
-            elif success == status.Skip():
+            elif success == status.SKIP:
                 self.report.addSkipped()
             else:
                 self.report.addFailure(success.name)
