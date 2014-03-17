@@ -99,21 +99,26 @@ class IGTTest(Test):
 
 def listTests(listname):
     oldDir = os.getcwd()
-    try:
-        os.chdir(igtTestRoot)
-        proc = subprocess.Popen(
-                ['make', listname ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                env=os.environ.copy(),
-                universal_newlines=True
-                )
-        out, err = proc.communicate()
-        returncode = proc.returncode
-    finally:
-        os.chdir(oldDir)
 
-    lines = out.split('\n')
+    try:
+        with open(path.join(igtTestRoot, listname + '.txt'), 'r') as f:
+            lines = (line.rstrip() for line in f.readlines())
+    except IOError:
+        try:
+            os.chdir(igtTestRoot)
+            proc = subprocess.Popen(
+                    ['make', 'list-' + listname],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=os.environ.copy(),
+                    universal_newlines=True
+                    )
+            out, err = proc.communicate()
+            lines = out.split('\n')
+            returncode = proc.returncode
+        finally:
+            os.chdir(oldDir)
+
     found_header = False
     progs = ""
 
@@ -127,7 +132,7 @@ def listTests(listname):
 
     return progs
 
-singleTests = listTests("list-single-tests")
+singleTests = listTests("single-tests")
 
 for test in singleTests:
     profile.test_list[path.join('igt', test)] = IGTTest(test)
@@ -151,7 +156,7 @@ def addSubTestCases(test):
         profile.test_list[path.join('igt', test, subtest)] = \
             IGTTest(test, ['--run-subtest', subtest])
 
-multiTests = listTests("list-multi-tests")
+multiTests = listTests("multi-tests")
 
 for test in multiTests:
     addSubTestCases(test)
