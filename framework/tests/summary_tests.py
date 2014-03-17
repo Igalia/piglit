@@ -44,6 +44,10 @@ def test_summary_add_to_set():
                                ('pass', 'warn', 'regressions'),
                                ('dmesg-fail', 'warn', 'changes'),
                                ('dmesg-warn', 'crash', 'problems'),
+                               ('notrun', 'pass', 'enabled'),
+                               ('skip', 'dmesg-warn', 'enabled'),
+                               ('fail', 'notrun', 'disabled'),
+                               ('crash', 'skip', 'disabled'),
                                ('skip', 'skip', 'skipped')]:
         check_sets.description = "{0} -> {1} should be added to {2}".format(
                 ostat, nstat, set_)
