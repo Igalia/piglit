@@ -48,6 +48,17 @@ def initialize_status():
     assert test
 
 
+def initialize_nochangestatus():
+    """ NoChangeStatus initializes """
+    nc = status.NoChangeStatus('test')
+    assert nc
+
+
+def compare_status_nochangestatus():
+    """ Status and NoChangeStatus can be compared with < """
+    status.CRASH < status.PASS
+
+
 def check_lookup(stat):
     """ Lookup a status """
     stt = status.status_lookup(stat)
@@ -140,3 +151,9 @@ def test_not_change():
         yieldable.description = "{0} -> {1} should not be a change".format(
                 nochange, stat)
         yield yieldable, status.status_lookup(nochange), status.status_lookup(stat)
+
+
+def test_compare_statuses():
+    """ Compare NOTRUN -> PASS returns false """
+    nt.assert_equal(False, status.NOTRUN < status.PASS,
+                   msg="NOTRUN -> PASS returned True but should return False")

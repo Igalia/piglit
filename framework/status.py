@@ -44,13 +44,14 @@ crash
 timeout
 
 SKIP and NOTRUN are not factored into regressions and fixes, they are counted
-seperately.
+seperately. They also derive from a sublcass of Status, which always returns
+False
 
 The formula for determining regressions is:
-  max(PASS, old_status) < new_status
+  old_status < new_status
 
 The formula for determining fixes is:
-  max(PASS, old_status) > new_status
+  old_status > new_status
 
 """
 
@@ -125,6 +126,7 @@ class Status(object):
     __slots__ = ['__name', '__value', '__fraction']
 
     def __init__(self, name, value, fraction=(0, 1)):
+        assert isinstance(value, int), type(value)
         # The object is immutable, so calling self.foo = foo will raise a
         # TypeError. Using setattr from the parrent object works around this.
         self.__name = name
@@ -183,18 +185,51 @@ class Status(object):
         return self.value
 
 
-NOTRUN = Status('Not Run', 0, (0, 0))
+class NoChangeStatus(Status):
+    """ Special sublcass of status that overides rich comparison methods
 
-SKIP = Status('skip', 10, (0, 0))
+    This special class of a Status is for use with NOTRUN and SKIP, it never
+    returns that it is a pass or regression
 
-PASS = Status('pass', 20, (1, 1))
+    """
+    def __init__(self, name, value=0, fraction=(0, 0)):
+        super(NoChangeStatus, self).__init__(name, value, fraction)
 
-DMESG_WARN = Status('dmesg-warn', 30)
+    def __lt__(self, other):
+        return False
 
-WARN = Status('warn', 40)
+    def __le__(self, other):
+        return False
 
-DMESG_FAIL = Status('dmesg-fail', 50)
+    def __eq__(self, other):
+        if isinstance(other, (str, unicode, Status)):
+            return unicode(self) == unicode(other)
+        raise TypeError("Cannot compare type: {}".format(type(other)))
 
-FAIL = Status('fail', 60)
+    def __ne__(self, other):
+        if isinstance(other, (str, unicode, Status)):
+            return unicode(self) != unicode(other)
+        raise TypeError("Cannot compare type: {}".format(type(other)))
 
-CRASH = Status('crash', 70)
+    def __ge__(self, other):
+        return False
+
+    def __gt__(self, other):
+        return False
+
+
+NOTRUN = NoChangeStatus('Not Run')
+
+SKIP = NoChangeStatus('skip')
+
+PASS = Status('pass', 0, (1, 1))
+
+DMESG_WARN = Status('dmesg-warn', 10)
+
+WARN = Status('warn', 20)
+
+DMESG_FAIL = Status('dmesg-fail', 30)
+
+FAIL = Status('fail', 40)
+
+CRASH = Status('crash', 50)
