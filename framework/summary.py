@@ -258,7 +258,8 @@ class Summary:
         self.fractions = {}
         self.totals = {}
         self.tests = {'all': set(), 'changes': set(), 'problems': set(),
-                      'skipped': set(), 'regressions': set(), 'fixes': set()}
+                      'skipped': set(), 'regressions': set(), 'fixes': set(),
+                      'enabled': set(), 'disabled': set()}
 
         def fgh(test, result):
             """ Helper for updating the fractions and status lists """
@@ -324,13 +325,20 @@ class Summary:
             for i in xrange(len(status) - 1):
                 first = status[i]
                 last = status[i + 1]
-                if max(first, so.PASS) < last:
+                if first < last:
                     self.tests['regressions'].add(test)
-                if first > max(last, so.PASS):
+                    self.tests['changes'].add(test)
+                    continue
+                elif first > last:
                     self.tests['fixes'].add(test)
-                # Changes cannot be added in the fixes and regressions passes
-                # becasue NotRun is a change, but not a regression or fix
-                if first != last:
+                    self.tests['changes'].add(test)
+                    continue
+
+                if first in [so.SKIP, so.NOTRUN] and last not in [so.SKIP, so.NOTRUN]:
+                    self.tests['enabled'].add(test)
+                    self.tests['changes'].add(test)
+                elif last in [so.SKIP, so.NOTRUN] and first not in [so.SKIP, so.NOTRUN]:
+                    self.tests['disabled'].add(test)
                     self.tests['changes'].add(test)
 
     def __find_totals(self):
@@ -428,7 +436,8 @@ class Summary:
                                 output_encoding="utf-8",
                                 module_directory=self.TEMP_DIR)
 
-        pages = ('changes', 'problems', 'skipped', 'fixes', 'regressions')
+        pages = frozenset(['changes', 'problems', 'skipped', 'fixes',
+                           'regressions', 'enabled', 'disabled'])
 
         # Index.html is a bit of a special case since there is index, all, and
         # alltests, where the other pages all use the same name. ie,
