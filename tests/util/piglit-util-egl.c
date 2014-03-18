@@ -110,7 +110,7 @@ piglit_egl_bind_api(EGLenum api)
 
 	if (piglit_check_egl_error(EGL_BAD_PARAMETER)) {
 		fprintf(stderr, "eglBindAPI(%s) failed because EGL "
-				"does not support the API",
+				"does not support the API\n",
 			api_string);
 		return false;
 	} else {
