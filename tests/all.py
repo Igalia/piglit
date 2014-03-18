@@ -1701,6 +1701,7 @@ with profile.group_manager(
        os.path.join(TESTS_DIR, 'spec', 'arb_tessellation_shader',
                     'minimum-maximums.txt')],
       'built-in-constants')
+    g(['arb_tessellation_shader-layout-mismatch'])
 
 # Group ARB_texture_multisample
 with profile.group_manager(

@@ -16,5 +16,6 @@ piglit_add_executable (arb_tessellation_shader-invalid-get-program-params invali
 piglit_add_executable (arb_tessellation_shader-invalid-patch-vertices-range invalid-patch-vertices-range.c)
 piglit_add_executable (arb_tessellation_shader-invalid-primitive invalid-primitive.c)
 piglit_add_executable (arb_tessellation_shader-minmax minmax.c)
+piglit_add_executable (arb_tessellation_shader-layout-mismatch layout-mismatch.c)
 
 # vim: ft=cmake:
