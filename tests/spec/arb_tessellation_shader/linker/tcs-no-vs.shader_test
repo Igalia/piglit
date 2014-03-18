@@ -1,0 +1,33 @@
+# From the ARB_tessellation_shader spec (Section 2.14.2):
+#
+#   Linking will fail if the program object contains objects to form a
+#   tessellation control shader (see section 2.X.1), and
+#
+#     * the program contains no objects to form a vertex shader;
+#
+
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+layout(vertices = 3) out;
+
+void main() {
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+}
+
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0);
+}
+
+
+[test]
+link error
