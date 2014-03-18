@@ -569,6 +569,7 @@ class TestProfile(object):
             """
             name, test = pair
             test.execute(env, name, log, json_writer, self.dmesg)
+            time.sleep(0.1)
 
         # Multiprocessing.dummy is a wrapper around Threading that provides a
         # multiprocessing compatible API

@@ -44,9 +44,6 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass = true;
-	int maxloc;
-
 	piglit_require_extension("GL_ARB_explicit_uniform_location");
 	piglit_print_minmax_header();
 
