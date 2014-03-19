@@ -76,6 +76,61 @@ piglit_check_egl_error(EGLint expected_error)
 	return false;
 }
 
+EGLDisplay
+piglit_egl_get_default_display(EGLenum platform)
+{
+	static bool once = true;
+
+	static bool has_base = false;
+	static bool has_x11 = false;
+	static bool has_wayland = false;
+	static bool has_gbm = false;
+
+	static EGLDisplay (*peglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
+
+	if (platform == EGL_NONE) {
+		return eglGetDisplay(EGL_DEFAULT_DISPLAY);
+	}
+
+	if (once) {
+		once = false;
+
+		has_base = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_base");
+		has_x11 = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_x11");
+		has_wayland = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_wayland");
+		has_gbm = piglit_is_egl_extension_supported(EGL_NO_DISPLAY, "EGL_EXT_platform_gbm");
+
+		peglGetPlatformDisplayEXT = (void*) eglGetProcAddress("eglGetPlaformDisplayEXT");
+	}
+
+	if (!has_base) {
+		return EGL_NO_DISPLAY;
+	}
+
+	switch (platform) {
+	case EGL_PLATFORM_X11_EXT:
+		if (!has_x11) {
+			return EGL_NO_DISPLAY;
+		}
+		break;
+	case EGL_PLATFORM_WAYLAND_EXT:
+		if (!has_wayland) {
+			return EGL_NO_DISPLAY;
+		}
+		break;
+	case EGL_PLATFORM_GBM_MESA:
+		if (!has_gbm) {
+			return EGL_NO_DISPLAY;
+		}
+		break;
+	default:
+		fprintf(stderr, "%s: unrecognized platform %#x\n", __func__, platform);
+		return EGL_NO_DISPLAY;
+	}
+
+	return peglGetPlatformDisplayEXT(platform, EGL_DEFAULT_DISPLAY, NULL);
+}
+
 bool
 piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name)
 {

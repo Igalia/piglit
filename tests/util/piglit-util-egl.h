@@ -55,6 +55,20 @@ bool
 piglit_check_egl_error(EGLint expected_error);
 
 /**
+ * \brief Get default display for given platform.
+ *
+ * If \a platform is EGL_NONE, the this function wraps eglGetDisplay().
+ * Otherwise, it wraps eglGetPlatformDisplayEXT().
+ *
+ * On failure, return EGL_NO_DISPLAY.
+ *
+ * If EGL does not support the platform extension for the given \a platform,
+ * then return EGL_NO_DISPLAY.
+ */
+EGLDisplay
+piglit_egl_get_default_display(EGLenum platform);
+
+/**
  * \brief Checks whether an EGL extension is supported.
  */
 bool piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name);
