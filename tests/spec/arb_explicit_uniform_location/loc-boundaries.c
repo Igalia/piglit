@@ -28,11 +28,14 @@
  * for the locations, every check here is expected to pass.
  *
  * The GL_ARB_explicit_uniform_location spec says:
+ *     "The explicitly defined locations and the generated locations must be
+ *     in the range of 0 to MAX_UNIFORM_LOCATIONS minus one."
+ *
  *     "Valid locations for default-block uniform variable locations are in
  *     the range of 0 to the implementation-defined maximum number of
  *     uniform locations."
  *
- * This test tests 0, MAX and a single value in between, shader contains
+ * This test tests 0, MAX - 1 and a single value in between, shader contains
  * also uniform without explicit location to see that it does not affect
  * getting the wanted locations.
  */
@@ -81,15 +84,15 @@ piglit_init(int argc, char **argv)
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
 
-	/* test GL_MAX_UNIFORM_LOCATIONS, 0, and a loc in between (1) */
-	if (asprintf(&f_sha, fs_template, maxloc, 0, 1) == -1)
+	/* test GL_MAX_UNIFORM_LOCATIONS - 1, 0, and a loc in between (1) */
+	if (asprintf(&f_sha, fs_template, maxloc - 1, 0, 1) == -1)
 		piglit_report_result(PIGLIT_FAIL);
 
 	prog = piglit_build_simple_program(vs_text, f_sha);
 
 	free(f_sha);
 
-	if (glGetUniformLocation(prog, "r") != maxloc)
+	if (glGetUniformLocation(prog, "r") != maxloc - 1)
 		piglit_report_result(PIGLIT_FAIL);
 	if (glGetUniformLocation(prog, "g") != 0)
 		piglit_report_result(PIGLIT_FAIL);
