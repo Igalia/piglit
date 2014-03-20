@@ -33,13 +33,72 @@ def _check_config(content):
         return glsl.GLSLParserTest(tfile), tfile
 
 
-def test_glslparser_initializer():
-    """ Test that GLSLParserTest initializes """
-    glsl.GLSLParserTest('spec/glsl-es-1.00/execution/sanity.shader_test')
+def test_no_config_start():
+    """ GLSLParserTest requires [config] """
+    content = ('// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '// [end config]\n')
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(glsl.GLSLParserException) as exc:
+            glsl.GLSLParserTest(tfile)
+            nt.assert_equal(
+                exc.exception, 'No [config] section found!',
+                msg="No config section found, no exception raised")
+
+
+def test_find_config_start():
+    """ GLSLParserTest finds [config] """
+    content = ('// [config]\n'
+               '// glsl_version: 1.00\n'
+               '//\n')
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(glsl.GLSLParserException) as exc:
+            glsl.GLSLParserTest(tfile)
+            nt.assert_not_equal(
+                exc.exception, 'No [config] section found!',
+                msg="Config section not parsed")
+
+
+def test_no_config_end():
+    """ GLSLParserTest requires [end config] """
+    with utils.with_tempfile('// [config]\n') as tfile:
+        with nt.assert_raises(glsl.GLSLParserException) as exc:
+            glsl.GLSLParserTest(tfile)
+            nt.assert_equal(
+                exc.exception, 'No [end config] section found!',
+                msg="config section not closed, no exception raised")
+
+
+def test_no_expect_result():
+    """ expect_result section is required """
+    content = ('// [config]\n'
+               '// glsl_version: 1.00\n'
+               '//\n')
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(glsl.GLSLParserException) as exc:
+            glsl.GLSLParserTest(tfile)
+            nt.assert_equal(
+                exc.exception,
+                'Missing required section expect_result from config',
+                msg="config section not closed, no exception raised")
+
+
+def test_no_glsl_version():
+    """ glsl_version section is required """
+    content = ('//\n'
+               '// expect_result: pass\n'
+               '// [end config]\n')
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(glsl.GLSLParserException) as exc:
+            glsl.GLSLParserTest(tfile)
+            nt.assert_equal(
+                exc.exception,
+                'Missing required section glsl_version from config',
+                msg="config section not closed, no exception raised")
 
 
 def test_cpp_comments():
-    """ Test C++ style comments """
+    """ Parses C++ style comments """
     content = ('// [config]\n'
                '// expect_result: pass\n'
                '// glsl_version: 1.00\n'
@@ -52,7 +111,7 @@ def test_cpp_comments():
 
 
 def test_c_comments():
-    """ Test C style comments """
+    """ Parses C style comments """
     content = ('/*\n'
                ' * [config]\n'
                ' * expect_result: pass\n'
@@ -64,44 +123,6 @@ def test_c_comments():
     nt.assert_equal(test.command, [os.path.join(testBinDir, 'glslparsertest'),
                                    name, 'pass', '1.00'],
                     msg="C style comments were not properly parsed")
-
-
-@nt.raises(Exception)
-def test_no_config_end():
-    """ end_config section is required """
-    content = ('// [config]\n'
-               '// expect_result: pass\n'
-               '// glsl_version: 1.00\n'
-               '//\n')
-    _, _ = _check_config(content)
-
-
-@nt.raises(Exception)
-def test_no_expecte_result():
-    """ expect_result section is required """
-    content = ('// [config]\n'
-               '// glsl_version: 1.00\n'
-               '//\n')
-    _, _ = _check_config(content)
-
-
-@nt.raises(Exception)
-def test_no_required_glsl_version():
-    """ glsl_version section is required """
-    content = ('//\n'
-               '// expect_result: pass\n'
-               '// [end config]\n')
-    _, _ = _check_config(content)
-
-
-@nt.raises(Exception)
-def test_no_config_start():
-    """ Config section is required """
-    content = ('//\n'
-               '// expect_result: pass\n'
-               '// glsl_version: 1.00\n'
-               '// [end config]\n')
-    _, _ = _check_config(content)
 
 
 def test_blank_in_config():
@@ -118,3 +139,8 @@ def test_blank_in_config():
                                    name, 'pass', '1.00'],
                     msg="A newline in a C++ style comment was not properly "
                         "parsed.")
+
+
+def test_glslparser_initializer():
+    """ GLSLParserTest initializes """
+    glsl.GLSLParserTest('tests/spec/glsl-es-1.00/compiler/version-macro.frag')
