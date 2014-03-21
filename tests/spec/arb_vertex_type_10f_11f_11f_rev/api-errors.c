@@ -30,7 +30,7 @@
 #include "piglit-util-gl-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 30;
+	config.supports_gl_compat_version = 20;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -147,8 +147,10 @@ test_vertex_attribs()
 	 * VertexAttribLPointer, ... if <type> is UNSIGNED_INT_10F_11F_11F_REV.
 	 */
 
-	glVertexAttribIPointer(0, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, 0, (GLvoid *)0);
-	TEST("VertexAttribIPointer-not-allowed", GL_INVALID_ENUM);
+	if (piglit_get_gl_version() >= 30) {
+		glVertexAttribIPointer(0, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, 0, (GLvoid *)0);
+		TEST("VertexAttribIPointer-not-allowed", GL_INVALID_ENUM);
+	}
 
 	if (piglit_is_extension_supported("GL_ARB_vertex_attrib_64bit")) {
 		glVertexAttribLPointer(0, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, 0, (GLvoid *)0);

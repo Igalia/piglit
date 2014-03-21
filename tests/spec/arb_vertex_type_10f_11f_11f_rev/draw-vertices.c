@@ -32,7 +32,7 @@
 #include "r11g11b10f.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
-	config.supports_gl_compat_version = 30;
+	config.supports_gl_compat_version = 20;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 	config.window_width = 128;
 	config.window_height = 128;
@@ -93,7 +93,6 @@ piglit_init(int argc, char **argv)
 	for (n = 0; n < 16; n++)
 		colors[n] = float3_to_r11g11b10f(unpacked_colors[n/4]);
 
-	piglit_require_extension("GL_ARB_explicit_attrib_location");
 	piglit_require_extension("GL_ARB_vertex_type_10f_11f_11f_rev");
 
 	glGenBuffers(1, &bo_pos);
@@ -110,20 +109,24 @@ piglit_init(int argc, char **argv)
 	glVertexAttribPointer(1, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_FALSE, 0, (GLvoid const *)0);
 	glEnableVertexAttribArray(1);
 
-	prog = piglit_build_simple_program(
-		"#version 130\n"
-		"#extension GL_ARB_explicit_attrib_location: require\n"
-		"layout(location=0) in vec2 p;\n"
-		"layout(location=1) in vec3 c;\n"
-		"out vec3 color;\n"
+	prog = piglit_build_simple_program_unlinked(
+		"attribute vec2 p;\n"
+		"attribute vec3 c;\n"
+		"varying vec3 color;\n"
 		"void main() { gl_Position = vec4(p, 0, 1); color = c; }\n",
 
-		"#version 130\n"
-		"in vec3 color;\n"
+		"varying vec3 color;\n"
 		"void main() { gl_FragColor = vec4(color,1); }\n"
 		);
 	if (!prog)
 		piglit_report_result(PIGLIT_FAIL);
+
+	glBindAttribLocation(prog, 0, "p");
+	glBindAttribLocation(prog, 1, "c");
+	glLinkProgram(prog);
+	if (!piglit_link_check_status(prog))
+		piglit_report_result(PIGLIT_FAIL);
+
 	glUseProgram(prog);
 }
 
