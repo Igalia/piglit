@@ -1669,6 +1669,51 @@ set_parameter(const char *line)
 	}
 }
 
+void
+set_patch_parameter(const char *line)
+{
+#ifdef PIGLIT_USE_OPENGL
+	float f[4];
+	int i, count;
+	const char *const line0 = line;
+
+	if (gl_version.num < 40)
+		piglit_require_extension("GL_ARB_tessellation_shader");
+
+	if (string_match("vertices ", line)) {
+		line += strlen("vertices ");
+		count = sscanf(line, "%d", &i);
+		if (count != 1) {
+			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		glPatchParameteri(GL_PATCH_VERTICES, i);
+	} else if (string_match("default level outer ", line)) {
+		line += strlen("default level outer ");
+		count = sscanf(line, "%f %f %f %f", &f[0], &f[1], &f[2], &f[3]);
+		if (count != 4) {
+			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, f);
+	} else if (string_match("default level inner ", line)) {
+		line += strlen("default level inner ");
+		count = sscanf(line, "%f %f", &f[0], &f[1]);
+		if (count != 2) {
+			fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line0);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+		glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, f);
+	} else {
+		fprintf(stderr, "Couldn't parse patch parameter command:\n%s\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+#else
+	printf("patch parameters are only available in desktop GL\n");
+	piglit_report_result(PIGLIT_SKIP);
+#endif
+}
+
 struct string_to_enum enable_table[] = {
 	{ "GL_CLIP_PLANE0", GL_CLIP_PLANE0 },
 	{ "GL_CLIP_PLANE1", GL_CLIP_PLANE1 },
@@ -2230,6 +2275,8 @@ piglit_display(void)
 			set_uniform(line + 7);
 		} else if (string_match("parameter ", line)) {
 			set_parameter(line + strlen("parameter "));
+		} else if (string_match("patch parameter ", line)) {
+			set_patch_parameter(line + strlen("patch parameter "));
 		} else if (string_match("link error", line)) {
 			link_error_expected = true;
 			if (link_ok) {
