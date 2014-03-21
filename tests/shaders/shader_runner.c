@@ -2506,6 +2506,15 @@ piglit_display(void)
 			get_floats(line + 13, c, 8);
 			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
 					     c[4], c[5], c[6], c[7]);
+		} else if (string_match("draw rect ortho patch", line)) {
+			program_must_be_in_use();
+			program_subroutine_uniforms();
+			get_floats(line + 21, c, 4);
+
+			piglit_draw_rect_custom(-1.0 + 2.0 * (c[0] / piglit_width),
+						-1.0 + 2.0 * (c[1] / piglit_height),
+						2.0 * (c[2] / piglit_width),
+						2.0 * (c[3] / piglit_height), true);
 		} else if (string_match("draw rect ortho", line)) {
 			program_must_be_in_use();
 			program_subroutine_uniforms();

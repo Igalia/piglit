@@ -397,6 +397,12 @@ class ShaderTest(object):
             self.rect_height,
             probe_vector[0], probe_vector[1], probe_vector[2], probe_vector[3])
 
+    def extensions(self):
+        ext = []
+        if self._signature.extension:
+            ext.append(self._signature.extension)
+        return ext
+
     def make_additional_requirements(self):
         """Return a string that should be included in the test's
         [require] section.
@@ -415,6 +421,22 @@ class ShaderTest(object):
         test doesn't require a vertex shader).  No need to
         reimplement this function in classes that don't use vertex
         shaders.
+        """
+        return None
+
+    def make_tess_ctrl_shader(self):
+        """Return the tessellation control shader for this test
+        (or None if this test doesn't require a geometry shader).
+        No need to reimplement this function in classes that don't
+        use geometry shaders.
+        """
+        return None
+
+    def make_tess_eval_shader(self):
+        """Return the tessellation evaluation shader for this test
+        (or None if this test doesn't require a geometry shader).
+        No need to reimplement this function in classes that don't
+        use geometry shaders.
         """
         return None
 
@@ -471,8 +493,8 @@ class ShaderTest(object):
         shader, after the built-in function is called.
         """
         shader = ''
-        if self._signature.extension:
-            shader += '#extension GL_{0} : require\n'.format(self._signature.extension)
+        for ext in self.extensions():
+            shader += '#extension GL_{0} : require\n'.format(ext)
         shader += additional_declarations
         for i in range(len(self._signature.argtypes)):
             shader += 'uniform {0} arg{1};\n'.format(
@@ -521,8 +543,8 @@ class ShaderTest(object):
     def filename(self):
         argtype_names = '-'.join(
             str(argtype) for argtype in self._signature.argtypes)
-        if self._signature.extension:
-            subdir = self._signature.extension.lower()
+        if self.extensions():
+            subdir = self.extensions()[0].lower()
         else:
             subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
         return os.path.join(
@@ -542,6 +564,16 @@ class ShaderTest(object):
         if vs:
             shader_test += '[vertex shader]\n'
             shader_test += vs
+            shader_test += '\n'
+        tcs = self.make_tess_ctrl_shader()
+        if tcs:
+            shader_test += '[tessellation control shader]\n'
+            shader_test += tcs
+            shader_test += '\n'
+        tes = self.make_tess_eval_shader()
+        if tes:
+            shader_test += '[tessellation evaluation shader]\n'
+            shader_test += tes
             shader_test += '\n'
         gs = self.make_geometry_shader()
         if gs:
@@ -602,6 +634,102 @@ void main()
   gl_FragColor = color;
 }
 '''
+        return shader
+
+
+class TessellationShaderTest(ShaderTest):
+    """Abstract class for tests that exercise the built-in in
+    tessellation shaders.
+    """
+
+    def glsl_version(self):
+        return max(150, ShaderTest.glsl_version(self))
+
+    def make_additional_requirements(self):
+        return 'GL_ARB_tessellation_shader'
+
+    def extensions(self):
+        ext = []
+        if self._signature.extension:
+            ext.append(self._signature.extension)
+        ext.append("ARB_tessellation_shader")
+        return ext
+
+    def draw_command(self, test_num):
+        x = (test_num % self.tests_per_row) * self.rect_width
+        y = (test_num // self.tests_per_row) * self.rect_height
+        assert(y < self.test_rows)
+        return 'draw rect ortho patch {0} {1} {2} {3}\n'.format(x, y,
+                                                                self.rect_width,
+                                                                self.rect_height)
+
+    def make_vertex_shader(self):
+        shader = \
+"""in vec4 piglit_vertex;
+out vec4 vertex_to_tcs;
+
+void main()
+{
+     vertex_to_tcs = piglit_vertex;
+}
+"""
+        return shader
+
+    def make_fragment_shader(self):
+        shader = \
+"""in vec4 color_to_fs;
+
+void main()
+{
+  gl_FragColor = color_to_fs;
+}
+"""
+        return shader
+
+
+class TessCtrlShaderTest(TessellationShaderTest):
+    """Derived class for tests that exercise the built-in in a
+    tessellation control shader.
+    """
+
+    def test_prefix(self):
+        return 'tcs'
+
+    def make_tess_ctrl_shader(self):
+        additional_declarations = \
+"""layout(vertices = 4) out;
+in vec4 vertex_to_tcs[];
+out vec4 vertex_to_tes[];
+patch out vec4 color_to_tes;
+"""
+        body = \
+"""  vertex_to_tes[gl_InvocationID] = vertex_to_tcs[gl_InvocationID];
+  color_to_tes = tmp_color;
+  gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
+  gl_TessLevelInner = float[2](1.0, 1.0);
+"""
+        shader = self.make_test_shader(
+            additional_declarations,
+            '  vec4 tmp_color;\n',
+            'tmp_color',
+            body)
+        return shader
+
+    def make_tess_eval_shader(self):
+        shader = \
+"""#extension GL_ARB_tessellation_shader : require
+layout(quads) in;
+
+in vec4 vertex_to_tes[];
+patch in vec4 color_to_tes;
+out vec4 color_to_fs;
+void main() {
+  gl_Position = mix(mix(vertex_to_tes[0], vertex_to_tes[1], gl_TessCoord.x),
+                    mix(vertex_to_tes[2], vertex_to_tes[3], gl_TessCoord.x),
+                    gl_TessCoord.y);
+  color_to_fs = color_to_tes;
+}
+"""
         return shader
 
 
@@ -731,6 +859,7 @@ def all_tests():
             if use_if and signature.rettype != glsl_bool:
                 continue
             yield VertexShaderTest(signature, test_vectors, use_if)
+            yield TessCtrlShaderTest(signature, test_vectors, use_if)
             yield GeometryShaderTest(signature, test_vectors, use_if)
             yield FragmentShaderTest(signature, test_vectors, use_if)
             yield ComputeShaderTest(signature, test_vectors, use_if)
