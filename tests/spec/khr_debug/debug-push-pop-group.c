@@ -53,16 +53,11 @@ PIGLIT_GL_TEST_CONFIG_END
 #define GET_FUNC(x) x ## KHR
 #endif
 
-static GLuint (*GetDebugMessageLog)(GLuint count, GLsizei bufSize, GLenum *sources,
-                                    GLenum *types, GLuint *ids, GLenum *severities,
-                                    GLsizei *lengths, GLchar *messageLog);
-static void (*DebugMessageInsert)(GLenum source, GLenum type, GLuint id,
-                                  GLenum severity, GLsizei length, const GLchar *buf);
-static void (*DebugMessageControl)(GLenum source, GLenum type, GLenum severity,
-                                   GLsizei count, const GLuint *ids, GLboolean enabled);
-static void (*PushDebugGroup)(GLenum source, GLuint id, GLsizei length,
-                              const GLchar *message);
-static void (*PopDebugGroup)(void);
+static PFNGLGETDEBUGMESSAGELOGPROC GetDebugMessageLog;
+static PFNGLDEBUGMESSAGEINSERTPROC DebugMessageInsert;
+static PFNGLDEBUGMESSAGECONTROLPROC DebugMessageControl;
+static PFNGLPUSHDEBUGGROUPPROC PushDebugGroup;
+static PFNGLPOPDEBUGGROUPPROC PopDebugGroup;
 
 static GLboolean fetch_one_log_message()
 {

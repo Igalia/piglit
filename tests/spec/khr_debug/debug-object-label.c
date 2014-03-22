@@ -46,14 +46,10 @@ PIGLIT_GL_TEST_CONFIG_END
 #endif
 
 /* These functions are assigned in the init function */
-static void (*ObjectPtrLabel)(const void *ptr, GLsizei length,
-                              const GLchar *label);
-static void (*GetObjectPtrLabel)(const void *ptr, GLsizei bufSize,
-                                 GLsizei *length, GLchar *label);
-static void (*ObjectLabel)(GLenum identifier, GLuint name, GLsizei length,
-                           const GLchar *label);
-static void (*GetObjectLabel)(GLenum identifier, GLuint name, GLsizei bufSize,
-                              GLsizei *length, GLchar *label);
+static PFNGLOBJECTPTRLABELPROC ObjectPtrLabel;
+static PFNGLGETOBJECTPTRLABELPROC GetObjectPtrLabel;
+static PFNGLOBJECTLABELPROC ObjectLabel;
+static PFNGLGETOBJECTLABELPROC GetObjectLabel;
 
 enum piglit_result
 piglit_display(void)
