@@ -28,12 +28,19 @@
 #include <windows.h>
 #endif
 
+#ifdef __linux__
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#endif
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
 #include <time.h>
@@ -656,4 +663,14 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 	}
 
 	return result;
+}
+
+uint64_t
+piglit_gettid(void)
+{
+#ifdef __linux__
+	return syscall(SYS_gettid);
+#else
+	return 0;
+#endif
 }

@@ -254,7 +254,14 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 			  const char ***out_selected_subtests,
 			  size_t *out_num_selected_subtests);
 
-
+/**
+ * \brief Return the thread id.
+ *
+ * On Linux, this functions wraps the gettid() syscall.
+ * On unsupported systems, this returns 0.
+ */
+uint64_t
+piglit_gettid(void);
 
 #ifdef __cplusplus
 } /* end extern "C" */
