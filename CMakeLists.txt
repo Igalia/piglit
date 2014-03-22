@@ -11,6 +11,7 @@ INCLUDE (FindPkgConfig)
 
 project (piglit)
 
+find_package(Threads)
 find_package(X11)
 if(X11_FOUND)
 	set(PIGLIT_HAS_X11 True)
@@ -316,6 +317,11 @@ set(CMAKE_REQUIRED_LIBRARIES)
 
 if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 	add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+endif()
+
+if(CMAKE_USE_PTHREADS_INIT)
+	set(PIGLIT_HAS_PTHREADS true)
+	add_definitions(-DPIGLIT_HAS_PTHREADS)
 endif()
 
 if(PIGLIT_USE_WAFFLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
