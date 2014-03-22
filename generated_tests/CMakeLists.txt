@@ -43,6 +43,9 @@ piglit_make_generated_tests(
 	templates/gen_const_builtin_equal_tests/template.shader_test.mako
 	)
 piglit_make_generated_tests(
+	tes_input_tests.list
+	gen_tes_input_tests.py)
+piglit_make_generated_tests(
 	interpolation_tests.list
 	gen_interpolation_tests.py
 	templates/gen_interpolation_tests/template.shader_test.mako
@@ -156,6 +159,7 @@ add_custom_target(gen-gl-tests
 			constant_array_size_tests.list
 			const_builtin_equal_tests.list
 			builtin_packing_tests.list
+			tes_input_tests.list
 			interpolation_tests.list
 			non-lvalue_tests.list
 			texture_query_lod_tests.list
