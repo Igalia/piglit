@@ -282,26 +282,24 @@ piglit_set_rlimit(unsigned long lim)
 #if defined(USE_SETRLIMIT) && defined(RLIMIT_AS)
 	struct rlimit rl;
 	if (getrlimit(RLIMIT_AS, &rl) != -1) {
-		printf("Address space limit = %lu, max = %lu\n",
+		piglit_logi("Address space limit = %lu, max = %lu",
 		       (unsigned long) rl.rlim_cur,
 		       (unsigned long) rl.rlim_max);
 
 		if (rl.rlim_max > lim) {
-			printf("Resetting limit to %lu.\n", lim);
+			piglit_logi("Resetting limit to %lu", lim);
 
 			rl.rlim_cur = lim;
 			rl.rlim_max = lim;
 			if (setrlimit(RLIMIT_AS, &rl) == -1) {
-				printf("Could not set rlimit "
-				       "due to: %s (%d)\n",
+				piglit_loge("Could not set rlimit "
+				       "due to: %s (%d)",
 				       strerror(errno), errno);
 			}
 		}
 	}
-
-	printf("\n");
 #else
-	printf("Cannot reset rlimit on this platform.\n\n");
+	piglit_loge("Cannot reset rlimit on this platform");
 #endif
 }
 
@@ -448,7 +446,7 @@ piglit_source_dir(void)
     const char *s = getenv("PIGLIT_SOURCE_DIR");
 
     if (s == NULL) {
-        printf("error: env var PIGLIT_SOURCE_DIR is undefined\n");
+        piglit_loge("env var PIGLIT_SOURCE_DIR is undefined");
         piglit_report_result(PIGLIT_FAIL);
     }
 
@@ -559,14 +557,13 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 
 			++j;
 			if (j >= *argc) {
-				fprintf(stderr,
-					"-subtest requires an argument\n");
+				piglit_loge("-subtest requires an argument");
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
 			if (!piglit_find_subtest(subtests, argv[j])) {
-				fprintf(stderr, "Test defines no subtest with "
-					"name '%s'\n", argv[j]);
+				piglit_loge("Test defines no subtest with "
+					"name '%s'", argv[j]);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
@@ -587,7 +584,7 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 			int i;
 
 			if (subtests == NULL) {
-				fprintf(stderr, "Test defines no subtests!\n");
+				piglit_loge("Test defines no subtests!");
 				exit(EXIT_FAILURE);
 			}
 
@@ -637,9 +634,7 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 				piglit_find_subtest(all_subtests, name);
 
 			if (subtest == NULL) {
-				fprintf(stderr,
-					"Unknown subtest \"%s\".\n",
-					name);
+				piglit_loge("Unknown subtest \"%s\"", name);
 				piglit_report_result(PIGLIT_FAIL);
 			}
 
