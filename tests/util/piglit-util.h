@@ -49,6 +49,8 @@ extern "C" {
 #include <math.h>
 #include <float.h>
 
+#include "piglit-log.h"
+
 #if defined(_MSC_VER)
 
 #define snprintf sprintf_s
