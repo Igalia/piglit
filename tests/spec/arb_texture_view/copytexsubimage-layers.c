@@ -121,11 +121,12 @@ piglit_init(int argc, char **argv)
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 	for (i = 0; i < NUM_LAYERS; i++) {
 		/* only the layer in the view should have been touched. */
+		int color_index;
+		float expected_color[4];
 
-		int color_index = i;
+		color_index = i;
 		if (i >= VIEW_MIN_LAYER && i < VIEW_MIN_LAYER + VIEW_NUM_LAYERS)
 			color_index = i + NUM_LAYERS - VIEW_MIN_LAYER;
-		float expected_color[4];
 
 		printf("Testing layer %d\n", i);
 
