@@ -1218,6 +1218,7 @@ FBOTest::testErrorHandling(void)
 {
         GLuint fbs[1];
         GLuint textures[2];
+	GLuint renderbuffer;
         GLenum status;
 	bool have_ARB_ES2 = GLUtils::haveExtension("GL_ARB_ES2_compatibility");
 
@@ -1309,13 +1310,25 @@ FBOTest::testErrorHandling(void)
                 // The value of FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not
                 // be NONE for any color attachment point(s) named by
 		// DRAW_BUFFERi.
+		// [Note: to avoid being caught by the no-attachments
+		// case above, we attach a depth renderbuffer.]
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT +
                              maxColorAttachment - 1);
+		glGenRenderbuffers(1, &renderbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER_EXT, renderbuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
+				      TEXSIZE, TEXSIZE);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER_EXT,
+					  GL_DEPTH_ATTACHMENT_EXT,
+					  GL_RENDERBUFFER_EXT,
+					  renderbuffer);
                 status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT(1, fbs);
+		glDeleteTextures(1, textures);
+		glDeleteRenderbuffers(1, &renderbuffer);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT &&
 		    !have_ARB_ES2) {
                         REPORT_FAILURE
@@ -1326,14 +1339,25 @@ FBOTest::testErrorHandling(void)
                 // If READ_BUFFER is not NONE, then the value of
                 // FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT must not be NONE for
                 // the color attachment point named by READ_BUFFER.
+		// [Note: to avoid being caught by the no-attachments
+		// case above, we attach a depth renderbuffer.]
                 glGenFramebuffersEXT(1, fbs);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[0]);
                 glDrawBuffer(GL_NONE);
                 glReadBuffer(GL_COLOR_ATTACHMENT0_EXT +
                              maxColorAttachment - 1);
+		glGenRenderbuffers(1, &renderbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER_EXT, renderbuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
+				      TEXSIZE, TEXSIZE);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER_EXT,
+					  GL_DEPTH_ATTACHMENT_EXT,
+					  GL_RENDERBUFFER_EXT,
+					  renderbuffer);
                 status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                 glDeleteFramebuffersEXT(1, fbs);
+		glDeleteRenderbuffers(1, &renderbuffer);
                 if (status != GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT &&
 		    !have_ARB_ES2) {
                         REPORT_FAILURE
