@@ -103,13 +103,14 @@ max(int x, int y)
 }
 
 static bool
-getTexImage(GLenum target, GLubyte data[][IMAGE_SIZE],
+getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 	    GLenum internalformat, int tolerance)
 {
 	int i;
 	int num_layers=1, num_faces=1, layer_size;
 	GLubyte data2[18][IMAGE_SIZE];
 	GLubyte *dataGet;
+	GLuint packPBO;
 	bool pass = true;
 
 	switch (target) {
@@ -179,21 +180,50 @@ getTexImage(GLenum target, GLubyte data[][IMAGE_SIZE],
 
 	}
 
-	memset(data2, 123, sizeof(data2));
+	/* Setup the PBO or data array to read into from glGetTexImage */
+	if (doPBO) {
+		glGenBuffers(1, &packPBO);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, packPBO);
+		glBufferData(GL_PIXEL_PACK_BUFFER,
+				     layer_size * max(num_faces,num_layers),
+				     NULL, GL_STREAM_READ);
+	} else {
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+		memset(data2, 123, sizeof(data2));
+	}
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 	assert(num_layers * num_faces * layer_size <= sizeof(data2));
 
 	for (i = 0; i < num_faces; i++) {
-		glGetTexImage(target + i, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2[i]);
+		if (doPBO) {
+			glGetTexImage(target + i, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+				      (GLvoid *) (long) (i * layer_size));
+		} else {
+			glGetTexImage(target + i, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+				      data2[i]);
+		}
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
 	}
-	dataGet = data2[0];
+	if (doPBO)
+		dataGet = (GLubyte *) glMapBufferRange(
+					       GL_PIXEL_PACK_BUFFER, 0,
+					       layer_size *
+					       max(num_faces,num_layers),
+					       GL_MAP_READ_BIT);
+	else
+		dataGet = data2[0];
+
 	for (i = 0; i < max(num_faces,num_layers); i++) {
 		pass = compare_layer(i, layer_size, tolerance, dataGet,
 				     data[i]) && pass;
 		dataGet += layer_size;
 	}
 
+	if (doPBO) {
+		glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+		glDeleteBuffers(1, &packPBO);
+	}
 	return pass;
 }
 
@@ -245,8 +275,12 @@ piglit_init(int argc, char **argv)
 
 	init_layer_data(data[0], 18);
 
-	printf("Testing %s\n", piglit_get_gl_enum_name(target));
-	pass = getTexImage(target, data, internalformat, tolerance) &&
+	printf("Testing %s into PBO\n", piglit_get_gl_enum_name(target));
+	pass = getTexImage(true, target, data, internalformat, tolerance) &&
+				pass;
+
+	printf("Testing %s into client array\n", piglit_get_gl_enum_name(target));
+	pass = getTexImage(false, target, data, internalformat, tolerance) &&
 				pass;
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
