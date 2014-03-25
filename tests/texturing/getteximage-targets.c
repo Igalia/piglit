@@ -41,29 +41,34 @@ piglit_display(void)
 
 #define IMAGE_WIDTH 32
 #define IMAGE_HEIGHT 32
-#define IMAGE_SIZE (IMAGE_WIDTH*IMAGE_HEIGHT*4)
+#define IMAGE_SIZE (IMAGE_WIDTH * IMAGE_HEIGHT * 4)
 
-static void init_layer_data(GLubyte *layer_data, int num_layers)
+static void
+init_layer_data(GLubyte *layer_data, int num_layers)
 {
 	int x, y, z, i, j;
 
 	for (z = 0; z < num_layers; z++) {
-		GLubyte *data = layer_data + IMAGE_SIZE*z;
+		GLubyte *data = layer_data + IMAGE_SIZE * z;
 
 		for (x = 0; x < IMAGE_WIDTH; x += 4) {
 			for (y = 0; y < IMAGE_HEIGHT; y += 4) {
-				int r = (x+1) * 255 / (IMAGE_WIDTH - 1);
-				int g = (y+1) * 255 / (IMAGE_HEIGHT - 1);
-				int b = (z+1) * 255 / (num_layers-1);
+				int r = (x + 1) * 255 / (IMAGE_WIDTH - 1);
+				int g = (y + 1) * 255 / (IMAGE_HEIGHT - 1);
+				int b = (z + 1) * 255 / (num_layers - 1);
 				int a = x ^ y ^ z;
 
 				/* each 4x4 block constains only one color (for S3TC) */
 				for (i = 0; i < 4; i++) {
 					for (j = 0; j < 4; j++) {
-						data[((y+j)*IMAGE_WIDTH + x+i)*4 + 0] = r;
-						data[((y+j)*IMAGE_WIDTH + x+i)*4 + 1] = g;
-						data[((y+j)*IMAGE_WIDTH + x+i)*4 + 2] = b;
-						data[((y+j)*IMAGE_WIDTH + x+i)*4 + 3] = a;
+						data[((y + j) * IMAGE_WIDTH + x
+						      + i) * 4 + 0] = r;
+						data[((y + j) * IMAGE_WIDTH + x
+						      + i) * 4 + 1] = g;
+						data[((y + j) * IMAGE_WIDTH + x
+						      + i) * 4 + 2] = b;
+						data[((y + j) * IMAGE_WIDTH + x
+						      + i) * 4 + 3] = a;
 					}
 				}
 			}
@@ -71,7 +76,8 @@ static void init_layer_data(GLubyte *layer_data, int num_layers)
 	}
 }
 
-static void compare_layer(int layer, int num_elements, int tolerance,
+static bool
+compare_layer(int layer, int num_elements, int tolerance,
 			  GLubyte *data, GLubyte *expected)
 {
 	int i;
@@ -84,17 +90,122 @@ static void compare_layer(int layer, int num_elements, int tolerance,
 			       (i / 4) / IMAGE_WIDTH, (i / 4) % IMAGE_HEIGHT, i % 4);
 			printf("    expected: %i\n", expected[i]);
 			printf("    got: %i\n", data[i]);
-			piglit_report_result(PIGLIT_FAIL);
+			return false;
 		}
 	}
+	return true;
 }
 
-void piglit_init(int argc, char **argv)
+static int
+max(int x, int y)
 {
-	int i, tolerance = 0, num_layers;
+	return (x > y) ? x : y;
+}
+
+static bool
+getTexImage(GLenum target, GLubyte data[][IMAGE_SIZE],
+	    GLenum internalformat, int tolerance)
+{
+	int i;
+	int num_layers=1, num_faces=1, layer_size;
+	GLubyte data2[18][IMAGE_SIZE];
+	GLubyte *dataGet;
+	bool pass = true;
+
+	switch (target) {
+	case GL_TEXTURE_1D:
+		glTexImage1D(GL_TEXTURE_1D, 0, internalformat, IMAGE_WIDTH, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, data);
+		layer_size = IMAGE_WIDTH * 4;
+		break;
+
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_RECTANGLE:
+		glTexImage2D(target, 0, internalformat, IMAGE_WIDTH,
+			     IMAGE_HEIGHT, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, data);
+		layer_size = IMAGE_SIZE;
+		break;
+
+	case GL_TEXTURE_3D:
+		num_layers = 16;
+		glTexImage3D(GL_TEXTURE_3D, 0, internalformat,
+			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0, GL_RGBA,
+			     GL_UNSIGNED_BYTE, data);
+		layer_size = IMAGE_SIZE;
+		break;
+
+	case GL_TEXTURE_CUBE_MAP:
+		num_faces = 6;
+		for (i = 0; i < num_faces; i++) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+				     internalformat, IMAGE_WIDTH, IMAGE_HEIGHT,
+				     0, GL_RGBA,
+				     GL_UNSIGNED_BYTE, data[i]);
+		}
+		target = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+		layer_size = IMAGE_SIZE;
+		break;
+
+	case GL_TEXTURE_1D_ARRAY:
+		num_layers = 7;
+		glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, internalformat,
+			     IMAGE_WIDTH, num_layers, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, data);
+		// test as a single layer 2D image
+		layer_size = IMAGE_WIDTH * 4 * num_layers;
+		num_layers = 1;
+		break;
+
+	case GL_TEXTURE_2D_ARRAY:
+		num_layers = 7;
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalformat,
+			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0,
+			     GL_RGBA, GL_UNSIGNED_BYTE, data);
+		layer_size = IMAGE_SIZE;
+		break;
+
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
+		num_layers = 6 * 3;
+		glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, internalformat,
+			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0, GL_RGBA,
+			     GL_UNSIGNED_BYTE, data);
+		layer_size = IMAGE_SIZE;
+		break;
+
+	default:
+		puts("Invalid texture target.");
+		return false;
+
+	}
+
+	memset(data2, 123, sizeof(data2));
+	assert(num_layers * num_faces * layer_size <= sizeof(data2));
+
+	for (i = 0; i < num_faces; i++) {
+		glGetTexImage(target + i, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2[i]);
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+
+	}
+	dataGet = data2[0];
+	for (i = 0; i < max(num_faces,num_layers); i++) {
+		pass = compare_layer(i, layer_size, tolerance, dataGet,
+				     data[i]) && pass;
+		dataGet += layer_size;
+	}
+
+	return pass;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	int i;
 	GLenum target = GL_TEXTURE_2D;
+	bool pass = true;
 	GLenum internalformat = GL_RGBA8;
-	GLubyte data[18][IMAGE_SIZE], data2[18][IMAGE_SIZE];
+	GLubyte data[18][IMAGE_SIZE];
+	int tolerance = 0;
 
 	for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "1D") == 0) {
@@ -133,89 +244,14 @@ void piglit_init(int argc, char **argv)
 	}
 
 	init_layer_data(data[0], 18);
-	memset(data2, 123, sizeof(data2));
 
 	printf("Testing %s\n", piglit_get_gl_enum_name(target));
+	pass = getTexImage(target, data, internalformat, tolerance) &&
+				pass;
 
-	switch (target) {
-	case GL_TEXTURE_1D:
-		glTexImage1D(GL_TEXTURE_1D, 0, internalformat, IMAGE_WIDTH, 0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGetTexImage(GL_TEXTURE_1D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		compare_layer(0, 128, tolerance, data2[0], data[0]);
+	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+	if (pass)
 		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_2D:
-	case GL_TEXTURE_RECTANGLE:
-		glTexImage2D(target, 0, internalformat, IMAGE_WIDTH, IMAGE_HEIGHT, 0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGetTexImage(target, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		compare_layer(0, IMAGE_SIZE, tolerance, data2[0], data[0]);
-		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_3D:
-		num_layers = 16;
-		glTexImage3D(GL_TEXTURE_3D, 0, internalformat,
-			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0, GL_RGBA,
-			     GL_UNSIGNED_BYTE, data);
-		glGetTexImage(GL_TEXTURE_3D, 0,
-			      GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		for (i = 0; i < num_layers; i++) {
-			compare_layer(i, IMAGE_SIZE, tolerance, data2[i], data[i]);
-		}
-		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_CUBE_MAP:
-		for (i = 0; i < 6; i++) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-				     internalformat, IMAGE_WIDTH, IMAGE_HEIGHT, 0, GL_RGBA,
-				     GL_UNSIGNED_BYTE, data[i]);
-		}
-		for (i = 0; i < 6; i++) {
-			glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
-				      GL_RGBA, GL_UNSIGNED_BYTE, data2[i]);
-			piglit_check_gl_error(GL_NO_ERROR);
-			compare_layer(i, IMAGE_SIZE, tolerance, data2[i], data[i]);
-		}
-		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_1D_ARRAY:
-		num_layers = 7;
-		glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, internalformat, IMAGE_WIDTH, num_layers, 0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGetTexImage(GL_TEXTURE_1D_ARRAY, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		compare_layer(0, IMAGE_WIDTH*4*num_layers, tolerance, data2[0], data[0]);
-		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_2D_ARRAY:
-		num_layers = 7;
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalformat,
-			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGetTexImage(GL_TEXTURE_2D_ARRAY, 0,
-			      GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		for (i = 0; i < num_layers; i++) {
-			compare_layer(i, IMAGE_SIZE, tolerance, data2[i], data[i]);
-		}
-		piglit_report_result(PIGLIT_PASS);
-
-	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		num_layers = 6*3;
-		glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, internalformat,
-			     IMAGE_WIDTH, IMAGE_HEIGHT, num_layers, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGetTexImage(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
-			      GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		piglit_check_gl_error(GL_NO_ERROR);
-		for (i = 0; i < num_layers; i++) {
-			compare_layer(i, IMAGE_SIZE, tolerance, data2[i], data[i]);
-		}
-		piglit_report_result(PIGLIT_PASS);
-	}
-
-	puts("Invalid texture target.");
-	piglit_report_result(PIGLIT_FAIL);
+	else
+		piglit_report_result(PIGLIT_FAIL);
 }
