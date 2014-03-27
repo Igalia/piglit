@@ -27,7 +27,7 @@ import os.path as path
 import re
 from cStringIO import StringIO
 
-from .exectest import PlainExecTest, testBinDir
+from .exectest import PiglitTest, testBinDir
 
 
 def add_glsl_parser_test(group, filepath, test_name):
@@ -67,11 +67,11 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
                     add_glsl_parser_test(group, filepath, testname)
 
 
-class GLSLParserTest(PlainExecTest):
+class GLSLParserTest(PiglitTest):
     """ Read the options in a glsl parser test and create a Test object
 
     Specifically it is necessary to parse a glsl_parser_test to get information
-    about it before actually creating a PlainExecTest. Even though this could
+    about it before actually creating a PiglitTest. Even though this could
     be done with a funciton wrapper, making it a distinct class makes it easier
     to sort in the profile.
 
@@ -145,7 +145,7 @@ class GLSLParserTest(PlainExecTest):
                     raise GLSLParserException("Missing required section {} "
                                               "from config".format(opt))
 
-            # Create the command and pass it into a PlainExecTest()
+            # Create the command and pass it into a PiglitTest()
             command = [path.join(testBinDir, 'glslparsertest'),
                        filepath,
                        config.get('config', 'expect_result'),

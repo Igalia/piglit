@@ -10,18 +10,18 @@ import os.path as path
 from framework.opencv import add_opencv_tests
 
 from framework.core import Group, TestProfile
-from framework.exectest import PlainExecTest
+from framework.exectest import PiglitTest
 
 ######
 # Helper functions
 
 def add_plain_test(group, name, args):
-	group[name] = PlainExecTest(args)
+	group[name] = PiglitTest(args)
 
 def add_concurrent_test(group, name, args):
-	test = PlainExecTest(args)
+	test = PiglitTest(args)
 	test.runConcurrent = true;
-	group[name] = PlainExecTest(args)
+	group[name] = PiglitTest(args)
 
 def add_plain_program_tester_test(group, name, path):
 	add_plain_test(group, name, ['cl-program-tester', path])

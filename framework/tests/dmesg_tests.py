@@ -27,7 +27,7 @@ import nose.tools as nt
 from nose.plugins.skip import SkipTest
 from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg, DmesgError
 from framework.core import TestResult, PiglitJSONEncoder, Environment
-from framework.exectest import PlainExecTest
+from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
 from framework.shader_test import ShaderTest
 from framework.glsl_parser_test import GLSLParserTest
@@ -231,7 +231,7 @@ def test_testclasses_dmesg():
     """ Generator that creates tests for """
     env = Environment()
 
-    lists = [(PlainExecTest, ['attribs', '-auto', '-fbo'], 'PlainExecTest'),
+    lists = [(PiglitTest, ['attribs', '-auto', '-fbo'], 'PiglitTest'),
              (GleanTest, 'basic', "GleanTest"),
              (ShaderTest, 'tests/shaders/loopfunc.shader_test',
               'ShaderTest'),

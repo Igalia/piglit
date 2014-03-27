@@ -20,7 +20,7 @@
 
 """ Tests for the exectest module """
 
-from framework.exectest import PlainExecTest, Test
+from framework.exectest import PiglitTest, Test
 
 
 def test_initialize_test():
@@ -28,6 +28,6 @@ def test_initialize_test():
     Test('/bin/true')
 
 
-def test_initialize_plainexectest():
-    """ Test that PlainExecTest initializes correctly """
-    PlainExecTest('/bin/true')
+def test_initialize_piglittest():
+    """ Test that PiglitTest initializes correctly """
+    PiglitTest('/bin/true')

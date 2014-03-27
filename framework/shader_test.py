@@ -28,16 +28,16 @@ import os.path as path
 import re
 
 from .core import Group
-from .exectest import PlainExecTest, testBinDir
+from .exectest import PiglitTest, testBinDir
 
 __all__ = ['add_shader_test', 'add_shader_test_dir']
 
 
-class ShaderTest(PlainExecTest):
-    """ Parse a shader test file and return a PlainExecTest instance
+class ShaderTest(PiglitTest):
+    """ Parse a shader test file and return a PiglitTest instance
 
     This function parses a shader test to determine if it's a GL, GLES2 or
-    GLES3 test, and then returns a PlainExecTest setup properly.
+    GLES3 test, and then returns a PiglitTest setup properly.
 
     """
     def __init__(self, arguments):

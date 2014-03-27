@@ -32,7 +32,7 @@ from .core import TestResult
 
 
 __all__ = ['Test',
-           'PlainExecTest',
+           'PiglitTest',
            'testBinDir']
 
 # Platform global variables
@@ -280,15 +280,15 @@ class Test(object):
         return out, err, returncode
 
 
-class PlainExecTest(Test):
+class PiglitTest(Test):
     """
-    PlainExecTest: Run a "native" piglit test executable
+    PiglitTest: Run a "native" piglit test executable
 
     Expect one line prefixed PIGLIT: in the output, which contains a result
     dictionary. The plain output is appended to this dictionary
     """
     def __init__(self, *args, **kwargs):
-        super(PlainExecTest, self).__init__(*args, **kwargs)
+        super(PiglitTest, self).__init__(*args, **kwargs)
 
         # Prepend testBinDir to the path.
         self._command[0] = os.path.join(testBinDir, self._command[0])
