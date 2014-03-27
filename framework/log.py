@@ -47,6 +47,24 @@ class Log(object):
         if verbose:
             self.__output = "{result} :: {name}\n" + self.__output
 
+        self.__summary_output = "[{percent}] {summary}\n"
+
+    def _write_output(self, output):
+        """ write the output to stdout, ensuring any previous line is cleared """
+
+        length = len(output)
+        if self.__lastlength > length:
+            output = "{0}{1}{2}".format(output[:-1],
+                                        " " * (self.__lastlength - length),
+                                        output[-1])
+
+        self.__lastlength = length
+
+        sys.stdout.write(output)
+
+        # Need to flush explicitly, otherwise it all gets buffered without a
+        # newline.
+        sys.stdout.flush()
 
     def _summary(self):
         """ return a summary of the statuses """
@@ -65,23 +83,11 @@ class Log(object):
 
     def __print(self, name, result):
         """ Do the actual printing """
-        output = self.__output.format(**{'percent': self._percent(),
-                                         'running': self._running(),
-                                         'summary': self._summary(),
-                                         'name': name,
-                                         'result': result})
-        length = len(output)
-        if self.__lastlength > length:
-            output = "{0}{1}\r".format(output[:-1],
-                                       " " * (self.__lastlength - length))
-
-        self.__lastlength = length
-
-        sys.stdout.write(output)
-
-        # Need to flush explicitly, otherwise it all gets buffered without a
-        # newline.
-        sys.stdout.flush()
+        self._write_output(self.__output.format(**{'percent': self._percent(),
+                                                   'running': self._running(),
+                                                   'summary': self._summary(),
+                                                   'name': name,
+                                                   'result': result}))
 
     @synchronized_self
     def post_log(self, value, result):
@@ -131,3 +137,7 @@ class Log(object):
         x = self.__generator.next()
         self.__running.append(x)
         return x
+
+    def summary(self):
+        self._write_output(self.__summary_output.format(**{'percent': self._percent(),
+                                                           'summary': self._summary()}))

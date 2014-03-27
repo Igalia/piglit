@@ -598,6 +598,8 @@ class TestProfile(object):
         multi.join()
         single.join()
 
+        log.summary()
+
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
 
