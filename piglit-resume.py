@@ -87,8 +87,7 @@ def main():
     json_writer.close_dict()
     json_writer.file.close()
 
-    print("\n"
-          "Thank you for running Piglit!\n"
+    print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))
 
 if __name__ == "__main__":
