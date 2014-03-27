@@ -41,6 +41,7 @@ class Log(object):
         self.__summary_keys = set(['pass', 'fail', 'warn', 'crash', 'skip',
                                    'dmesg-warn', 'dmesg-fail', 'dry-run'])
         self.__summary = collections.defaultdict(lambda: 0)
+        self.__lastlength = 0
 
         self.__output = "[{percent}] {summary} {running}\r"
         if verbose:
@@ -64,11 +65,19 @@ class Log(object):
 
     def __print(self, name, result):
         """ Do the actual printing """
-        sys.stdout.write(self.__output.format(**{'percent': self._percent(),
-                                                 'running': self._running(),
-                                                 'summary': self._summary(),
-                                                 'name': name,
-                                                 'result': result}))
+        output = self.__output.format(**{'percent': self._percent(),
+                                         'running': self._running(),
+                                         'summary': self._summary(),
+                                         'name': name,
+                                         'result': result})
+        length = len(output)
+        if self.__lastlength > length:
+            output = "{0}{1}\r".format(output[:-1],
+                                       " " * (self.__lastlength - length))
+
+        self.__lastlength = length
+
+        sys.stdout.write(output)
 
         # Need to flush explicitly, otherwise it all gets buffered without a
         # newline.
