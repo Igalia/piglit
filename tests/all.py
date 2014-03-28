@@ -1959,6 +1959,7 @@ add_shader_test_dir(arb_explicit_uniform_location,
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-minmax')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-boundaries')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-array-elements')
+add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-inactive-uniform')
 
 arb_texture_buffer_object = Group()
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
