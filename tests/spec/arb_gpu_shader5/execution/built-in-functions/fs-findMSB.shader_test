@@ -14,7 +14,7 @@ void main() {
 
 out vec4 color;
 
-uniform bool signed;
+uniform bool test_signed;
 uniform ivec4 msb;
 uniform ivec4 iinput;
 uniform uvec4 uinput;
@@ -24,10 +24,10 @@ void main()
 	/* Green if both pass. */
 	color = vec4(0.0, 1.0, 0.0, 1.0);
 
-	if (signed && msb != findMSB(iinput))
+	if (test_signed && msb != findMSB(iinput))
 		/* Red if findMSB(ivec4) fails. */
 		color = vec4(1.0, 0.0, 0.0, 1.0);
-	else if (!signed && msb != findMSB(uinput))
+	else if (!test_signed && msb != findMSB(uinput))
 		/* Blue if findMSB(uvec4) fails. */
 		color = vec4(0.0, 0.0, 1.0, 1.0);
 }
@@ -41,20 +41,20 @@ vertex/float/2
 
 [test]
 # For a value of zero or negative one, -1 will be returned.
-uniform int signed 1
+uniform int test_signed 1
 uniform ivec4 msb -1 -1 -1 -1
 uniform ivec4 iinput 0 -1 -1 0
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
 
-uniform int signed 0
+uniform int test_signed 0
 uniform ivec4 msb -1 -1 -1 -1
 uniform uvec4 uinput 0 0 0 0
 draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
 
 # Signed inputs
-uniform int signed 1
+uniform int test_signed 1
 
 uniform ivec4 msb 0 1 1 2
 uniform ivec4 iinput 1 2 3 4
@@ -78,7 +78,7 @@ draw arrays GL_TRIANGLE_FAN 0 4
 probe all rgba 0.0 1.0 0.0 1.0
 
 # Unsigned inputs
-uniform int signed 0
+uniform int test_signed 0
 
 uniform ivec4 msb 0 1 1 2
 uniform uvec4 uinput 1 2 3 4
