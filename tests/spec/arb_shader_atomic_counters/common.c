@@ -104,6 +104,8 @@ bool
 atomic_counters_draw_point(GLuint prog, unsigned buf_size,
                            const uint32_t *buf)
 {
+        GLuint vao;
+
         /* Initialize the atomic counter buffer. */
         glBufferData(GL_ATOMIC_COUNTER_BUFFER,
                      buf_size * sizeof(uint32_t),
@@ -117,8 +119,13 @@ atomic_counters_draw_point(GLuint prog, unsigned buf_size,
         glClearColor(0.5, 0.5, 0.5, 0.5);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
         glVertexAttrib4f(0, 0, 0, 0, 1);
+
         glDrawArrays(GL_POINTS, 0, 1);
+
+        glDeleteVertexArrays(1, &vao);
 
         return piglit_check_gl_error(GL_NO_ERROR);
 }
