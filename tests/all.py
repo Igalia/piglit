@@ -3880,6 +3880,7 @@ arb_shader_atomic_counters['minmax'] = concurrent_test('arb_shader_atomic_counte
 arb_shader_atomic_counters['multiple-defs'] = concurrent_test('arb_shader_atomic_counters-multiple-defs')
 arb_shader_atomic_counters['semantics'] = concurrent_test('arb_shader_atomic_counters-semantics')
 arb_shader_atomic_counters['unique-id'] = concurrent_test('arb_shader_atomic_counters-unique-id')
+arb_shader_atomic_counters['unused-result'] = concurrent_test('arb_shader_atomic_counters-unused-result')
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear

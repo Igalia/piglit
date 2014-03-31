@@ -21,5 +21,6 @@ add_executable (arb_shader_atomic_counters-minmax minmax.c common.c)
 add_executable (arb_shader_atomic_counters-multiple-defs multiple-defs.c common.c)
 add_executable (arb_shader_atomic_counters-semantics semantics.c common.c)
 add_executable (arb_shader_atomic_counters-unique-id unique-id.c common.c)
+add_executable (arb_shader_atomic_counters-unused-result unused-result.c common.c)
 
 # vim: ft=cmake:
