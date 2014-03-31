@@ -1,0 +1,72 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+/* On Sandybridge and newer chips in the i965 family, writes into separate
+ * channels of the same register stall. The compiler marks independent writes
+ * with NoDDClr and/or NoDDChk to allow the instructions to issue without
+ * stalling.
+ *
+ * Empirically, marking "math" instructions with these dependency control
+ * hints leads to broken dependency tracking. The following shader, compiled
+ * with the i965/vec4 backend unaware of this fact generates the following
+ * assembly:
+ *
+ * math exp(8)     g3<1>.xF        g1<0,4,1>.xF    null            { align16 WE_normal NoDDClr 1Q };
+ * add(8)          g7<1>F          g1<0,4,1>.yF    1e-08F          { align16 WE_normal 1Q };
+ * math exp(8)     g3<1>.yF        g7<4,4,1>F      null            { align16 WE_normal NoDDClr,NoDDChk 1Q };
+ * math exp(8)     g3<1>.zF        g1<0,4,1>.zF    null            { align16 WE_normal NoDDChk 1Q };
+ * mul.sat(8)      g116<1>.xyzF    g3<4,4,1>.xyzzF 0.5F            { align16 WE_normal NoDDClr 1Q };
+ * mov.sat(8)      g116<1>.wF      1F                              { align16 WE_normal NoDDChk 1Q };
+ * mov(8)          g114<1>D        0D                              { align16 WE_normal 1Q };
+ * mov(8)          g115<1>F        g2<4,4,1>F                      { align16 WE_normal 1Q };
+ * mov(8)          g113<1>UD       g0<4,4,1>UD                     { align16 WE_all 1Q };
+ * or(1)           g113.5<1>UD     g0.5<0,1,0>UD   0x0000ff00UD    { align1 WE_all };
+ * send(8)         null            g113<4,4,1>F
+ *                 urb 0 urb_write used complete mlen 5 rlen 0     { align16 WE_normal 1Q EOT };
+ *
+ * The shader calculates the color exp2(vec3(0.1, 0.2 + 0.00000001, 0.3)) * 0.5
+ * and expects to read back (0.535886, 0.5743491, 0.6155722).
+ *
+ * On affected platforms, the .x and .y components are correctly calculated,
+ * but .z is left to be 0.0.
+ */
+
+uniform vec3 exp;
+
+void main(){
+   gl_Position = gl_Vertex;
+
+   /* Calling exp2() on a single component swizzle and then picking a single
+    * channel from its result works around the vec4 backend's inability to
+    * properly register coalesce.
+    */
+   gl_FrontColor.x = exp2(exp.xxxx).x;
+
+   /* Adding 0.00000001 is essentially a no-op, but it prevents the GLSL
+    * compiler's opt_vectorize pass from combining the three exp2() calls
+    * into a single one.
+    */
+   gl_FrontColor.y = exp2(exp.yyyy + 0.00000001).y;
+
+   gl_FrontColor.z = exp2(exp.zzzz).z;
+
+   /* Scale the result back into the 0.0 to 1.0 range */
+   gl_FrontColor.xyz *= 0.5;
+
+   /* Moving this assignment before the previous statement causes the test
+    * to sporadically fail, returning 1.0 (unrelated to value stored in .w)
+    * in all channels.
+    */
+   gl_FrontColor.w = 1.0;
+}
+
+[fragment shader]
+void main() {
+   gl_FragColor = gl_Color;
+}
+
+[test]
+uniform vec3 exp 0.1 0.2 0.3
+draw rect -1 -1 2 2
+probe rgb 1 1 0.535886 0.5743491 0.6155722
