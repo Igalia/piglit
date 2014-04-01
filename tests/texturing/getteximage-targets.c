@@ -96,12 +96,6 @@ compare_layer(int layer, int num_elements, int tolerance,
 	return true;
 }
 
-static int
-max(int x, int y)
-{
-	return (x > y) ? x : y;
-}
-
 static bool
 getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 	    GLenum internalformat, int tolerance)
@@ -185,7 +179,7 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 		glGenBuffers(1, &packPBO);
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, packPBO);
 		glBufferData(GL_PIXEL_PACK_BUFFER,
-				     layer_size * max(num_faces,num_layers),
+				     layer_size * MAX2(num_faces,num_layers),
 				     NULL, GL_STREAM_READ);
 	} else {
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -209,12 +203,12 @@ getTexImage(bool doPBO, GLenum target, GLubyte data[][IMAGE_SIZE],
 		dataGet = (GLubyte *) glMapBufferRange(
 					       GL_PIXEL_PACK_BUFFER, 0,
 					       layer_size *
-					       max(num_faces,num_layers),
+					       MAX2(num_faces,num_layers),
 					       GL_MAP_READ_BIT);
 	else
 		dataGet = data2[0];
 
-	for (i = 0; i < max(num_faces,num_layers); i++) {
+	for (i = 0; i < MAX2(num_faces,num_layers); i++) {
 		pass = compare_layer(i, layer_size, tolerance, dataGet,
 				     data[i]) && pass;
 		dataGet += layer_size;
