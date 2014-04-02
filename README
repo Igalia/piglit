@@ -141,6 +141,12 @@ C:\Program Files\Microsoft Visual Studio 10.0\VC\include\GL
 Download freeglut for MSVC.
 http://www.transmissionzero.co.uk/software/freeglut-devel
 
+Install pip.
+http://www.pip-installer.org/en/latest/installing.html
+
+Install python mako.
+  > c:\Python27\Scripts\pip.exe install mako
+
 Open Visual Studio Command Prompt.
 Start Menu->All Programs->Microsoft Visual Studio 2010->Visual Studio Tools->Visual Studio Command Prompt (2010)
 CD to piglit directory.
