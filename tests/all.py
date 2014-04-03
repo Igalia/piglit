@@ -1866,6 +1866,7 @@ add_shader_test_dir(arb_shading_language_420pack['execution'],
 	            os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
 		    recursive=True)
 spec['ARB_shading_language_420pack']['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_shading_language_420pack/minimum-maximums.txt')
+spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = concurrent_test('arb_shading_language_420pack-multiple-layout-qualifiers')
 
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = {}
