@@ -34,6 +34,11 @@ sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 
 
 def main():
+    # Make a copy of the status text list and add all. This is used as the
+    # argument list for -e/--exclude
+    statuses = set(str(s) for s in status.ALL)
+    statuses.add('all')
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--overwrite",
                         action="store_true",
@@ -46,8 +51,7 @@ def main():
     parser.add_argument("-e", "--exclude-details",
                         default=[],
                         action="append",
-                        choices=['skip', 'pass', 'warn', 'crash' 'fail',
-                                 'all'],
+                        choices=statuses,
                         help="Optionally exclude the generation of HTML pages "
                              "for individual test pages with the status(es) "
                              "given as arguments. This speeds up HTML "
@@ -71,11 +75,10 @@ def main():
     if args.exclude_details:
         # If exclude-results has all, then change it to be all
         if 'all' in args.exclude_details:
-            args.exclude_details = [status.SKIP, status.PASS, status.WARN,
-                                    status.CRASH, status.FAIL]
+            args.exclude_details = status.ALL
         else:
-            args.exclude_details = [status.status_lookup(i) for i in
-                                    args.exclude_details]
+            args.exclude_details = frozenset(
+                status.status_lookup(i) for i in args.exclude_details)
 
 
     # if overwrite is requested delete the output directory

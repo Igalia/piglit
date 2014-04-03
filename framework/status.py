@@ -62,7 +62,9 @@ __all__ = ['NOTRUN',
            'CRASH',
            'DMESG_WARN',
            'DMESG_FAIL',
-           'SKIP']
+           'SKIP',
+           'ALL']
+
 
 def status_lookup(status):
     """ Provided a string return a status object instance
@@ -222,3 +224,6 @@ FAIL = Status('fail', 30)
 DMESG_FAIL = Status('dmesg-fail', 40)
 
 CRASH = Status('crash', 50)
+
+# A tuple (ordered, immutable) of all statuses in this module
+ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, CRASH, SKIP, NOTRUN)
