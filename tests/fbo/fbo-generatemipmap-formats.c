@@ -430,6 +430,11 @@ test_format(const struct format_desc *format, GLenum basetype)
 	int level;
 	GLboolean pass = GL_TRUE;
 
+	if (basetype == GL_INT) {
+		printf("Skipping mipmap generation for integer texture.\n");
+		return GL_TRUE;
+	}
+
 	printf("Testing %s%s\n", format->name, tex_width == 256 ? "" : " (NPOT)");
 	tex = create_tex(format->internalformat, format->base_internal_format,
 			 basetype);
