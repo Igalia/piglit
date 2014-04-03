@@ -213,6 +213,10 @@ retry:
 	for (iters = 1; ; iters *= 2) {
 		if (draw(q, iters) > 0.1)
 			break;
+		if (iters * 2 <= iters) {
+			printf("Couldn't find appropriate number of iterations\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
 	}
 
 	/* Now, do several runs like this so we can determine if the
