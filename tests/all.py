@@ -2261,6 +2261,7 @@ spec['ARB_shading_language_420pack']['built-in constants'] = PiglitGLTest(
      os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack', 'minimum-maximums.txt')],
     run_concurrent=True)
 spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = PiglitGLTest(['arb_shading_language_420pack-multiple-layout-qualifiers'], run_concurrent=True)
+spec['ARB_shading_language_420pack']['binding layout'] = PiglitGLTest(['arb_shading_language_420pack-binding-layout'], run_concurrent=True)
 
 # Group ARB_explicit_attrib_location
 arb_explicit_attrib_location = {}

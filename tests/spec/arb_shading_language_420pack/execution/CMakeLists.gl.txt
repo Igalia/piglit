@@ -10,6 +10,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (arb_shading_language_420pack-binding-layout binding-layout.c)
 piglit_add_executable (arb_shading_language_420pack-multiple-layout-qualifiers multiple-layout-qualifiers.c)
 
 # vim: ft=cmake:
