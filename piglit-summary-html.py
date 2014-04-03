@@ -71,8 +71,8 @@ def main():
     if args.exclude_details:
         # If exclude-results has all, then change it to be all
         if 'all' in args.exclude_details:
-            args.exclude_details = [status.Skip(), status.Pass(), status.Warn(),
-                                    status.Crash(), status.Fail()]
+            args.exclude_details = [status.SKIP, status.PASS, status.WARN,
+                                    status.CRASH, status.FAIL]
         else:
             args.exclude_details = [status.status_lookup(i) for i in
                                     args.exclude_details]
