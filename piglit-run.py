@@ -159,6 +159,7 @@ def main():
         json_writer.write_dict_item(key, value)
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
+    profile.results_dir = args.results_path
 
     json_writer.write_dict_key('tests')
     json_writer.open_dict()

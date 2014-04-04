@@ -78,6 +78,7 @@ def main():
         env.exclude_tests.add(key)
     
     profile = framework.profile.merge_test_profiles(results.options['profile'])
+    profile.results_dir = args.results_path
     if env.dmesg:
         profile.dmesg = env.dmesg
 

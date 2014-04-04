@@ -44,6 +44,7 @@ class TestProfile(object):
         self.filters = []
         # Sets a default of a Dummy
         self.dmesg = False
+        self.results_dir = None
 
     @property
     def dmesg(self):
