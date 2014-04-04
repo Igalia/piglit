@@ -107,16 +107,35 @@ class TestProfile(object):
         self.test_list = dict(item for item in self.test_list.iteritems()
                               if check_all(item))
 
+    def pre_run_hook(self):
+        """ Hook executed at the start of TestProfile.run
+
+        To make use of this hook one will need to subclass TestProfile, and
+        set this to do something, as be dfault it will no-op
+
+        """
+        pass
+
+    def post_run_hook(self):
+        """ Hook executed at the end of TestProfile.run
+
+        To make use of this hook one will need to subclass TestProfile, and
+        set this to do something, as be dfault it will no-op
+
+        """
+        pass
+
     def run(self, env, json_writer):
         '''
         Schedule all tests in profile for execution.
 
         See ``Test.schedule`` and ``Test.run``.
         '''
+        self.prepare_test_list(env)
 
+        self.pre_run_hook()
         framework.exectest.Test.ENV = env
 
-        self.prepare_test_list(env)
         log = Log(len(self.test_list), env.verbose)
 
         def test(pair):
@@ -142,11 +161,11 @@ class TestProfile(object):
             single.imap(test, self.test_list.iteritems(), chunksize)
         else:
             # Filter and return only thread safe tests to the threaded pool
-            multi.imap(test, (x for x in self.test_list.iteritems() if
-                              x[1].run_concurrent), chunksize)
+            multi.imap(test, (x for x in self.test_list.iteritems()
+                              if x[1].run_concurrent), chunksize)
             # Filter and return the non thread safe tests to the single pool
-            single.imap(test, (x for x in self.test_list.iteritems() if not
-                               x[1].run_concurrent), chunksize)
+            single.imap(test, (x for x in self.test_list.iteritems()
+                               if not x[1].run_concurrent), chunksize)
 
         # Close and join the pools
         # If we don't close and the join the pools the script will exit before
@@ -157,6 +176,8 @@ class TestProfile(object):
         single.join()
 
         log.summary()
+
+        self.post_run_hook()
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
