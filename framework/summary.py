@@ -325,20 +325,16 @@ class Summary:
             for i in xrange(len(status) - 1):
                 first = status[i]
                 last = status[i + 1]
-                if first < last:
-                    self.tests['regressions'].add(test)
-                    self.tests['changes'].add(test)
-                    continue
-                elif first > last:
-                    self.tests['fixes'].add(test)
-                    self.tests['changes'].add(test)
-                    continue
-
                 if first in [so.SKIP, so.NOTRUN] and last not in [so.SKIP, so.NOTRUN]:
                     self.tests['enabled'].add(test)
                     self.tests['changes'].add(test)
                 elif last in [so.SKIP, so.NOTRUN] and first not in [so.SKIP, so.NOTRUN]:
                     self.tests['disabled'].add(test)
+                elif first < last:
+                    self.tests['regressions'].add(test)
+                    self.tests['changes'].add(test)
+                elif first > last:
+                    self.tests['fixes'].add(test)
                     self.tests['changes'].add(test)
 
     def __find_totals(self):

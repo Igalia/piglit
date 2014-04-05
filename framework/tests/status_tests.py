@@ -33,13 +33,18 @@ import framework.status as status
 # tested separately because of upcoming features for it
 STATUSES = ["pass", "dmesg-warn", "warn", "dmesg-fail", "fail", "crash"]
 
-# Create lists of fixes and regressions programmatically based on the STATUSES
-# list. This means less code, and easier expansion changes.
-REGRESSIONS = itertools.combinations(STATUSES, 2)
-FIXES = itertools.combinations(reversed(STATUSES), 2)
-
 # all statuses except pass are problems
 PROBLEMS = STATUSES[1:]
+
+# Create lists of fixes and regressions programmatically based on the STATUSES
+# list. This means less code, and easier expansion changes.
+REGRESSIONS = list(itertools.combinations(STATUSES, 2)) + \
+              list(itertools.combinations(["skip"] + PROBLEMS, 2))
+FIXES = list(itertools.combinations(reversed(STATUSES), 2)) + \
+        list(itertools.combinations(list(reversed(PROBLEMS)) + ["skip"], 2))
+
+# The statuses that don't cause changes when transitioning from one another
+NO_OPS = ('skip', 'notrun')
 
 
 def initialize_status():
@@ -147,13 +152,20 @@ def test_not_change():
     """ Skip and NotRun should not count as changes """
     yieldable = check_not_change
 
-    for nochange, stat in itertools.product(['skip', 'notrun'], STATUSES):
+    for nochange, stat in itertools.permutations(NO_OPS, 2):
         yieldable.description = "{0} -> {1} should not be a change".format(
                 nochange, stat)
         yield yieldable, status.status_lookup(nochange), status.status_lookup(stat)
 
 
-def test_compare_statuses():
-    """ Compare NOTRUN -> PASS returns false """
-    nt.assert_equal(False, status.NOTRUN < status.PASS,
-                   msg="NOTRUN -> PASS returned True but should return False")
+def test_max_statuses():
+    """ Verify that max() works between skip and non-skip statuses """
+    for nochange, stat in itertools.product(NO_OPS, STATUSES):
+        nochange = status.status_lookup(nochange)
+        stat = status.status_lookup(stat)
+        nt.assert_equal(
+            stat, max(nochange, stat),
+            msg="max({nochange}, {stat}) = {stat}".format(**locals()))
+        nt.assert_equal(
+            stat, max(stat, nochange),
+            msg="max({stat}, {nochange}) = {stat}".format(**locals()))

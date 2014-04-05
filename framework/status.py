@@ -158,10 +158,10 @@ class Status(object):
         return unicode(self.name)
 
     def __lt__(self, other):
-        return int(self) < int(other)
+        return not self.__ge__(other)
 
     def __le__(self, other):
-        return int(self) <= int(other)
+        return not self.__gt__(other)
 
     def __eq__(self, other):
         # This must be int or status, since status comparisons are done using
@@ -173,13 +173,14 @@ class Status(object):
         raise TypeError("Cannot compare type: {}".format(type(other)))
 
     def __ne__(self, other):
-        return int(self) != int(other)
+        return self.fraction != other.fraction or int(self) != int(other)
 
     def __ge__(self, other):
-        return int(self) >= int(other)
+        return self.fraction[1] > other.fraction[1] or (
+            self.fraction[1] == other.fraction[1] and int(self) >= int(other))
 
     def __gt__(self, other):
-        return int(self) > int(other)
+        return self.fraction[1] > other.fraction[1] or int(self) > int(other)
 
     def __int__(self):
         return self.value
@@ -195,12 +196,6 @@ class NoChangeStatus(Status):
     def __init__(self, name, value=0, fraction=(0, 0)):
         super(NoChangeStatus, self).__init__(name, value, fraction)
 
-    def __lt__(self, other):
-        return False
-
-    def __le__(self, other):
-        return False
-
     def __eq__(self, other):
         if isinstance(other, (str, unicode, Status)):
             return unicode(self) == unicode(other)
@@ -210,12 +205,6 @@ class NoChangeStatus(Status):
         if isinstance(other, (str, unicode, Status)):
             return unicode(self) != unicode(other)
         raise TypeError("Cannot compare type: {}".format(type(other)))
-
-    def __ge__(self, other):
-        return False
-
-    def __gt__(self, other):
-        return False
 
 
 NOTRUN = NoChangeStatus('Not Run')
