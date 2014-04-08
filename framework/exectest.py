@@ -57,7 +57,6 @@ class Test(object):
         '''
         self.run_concurrent = run_concurrent
         self.command = command
-        self.split_command = os.path.split(self._command[0])[1]
         self.env = {}
 
         # This is a hook for doing some testing on execute right before
@@ -299,9 +298,10 @@ class PiglitTest(Test):
 
         """
         if PIGLIT_PLATFORM == 'gbm':
-            if 'glean' == self.split_command:
+            split_command = os.path.split(self._command[0])[1]
+            if 'glean' == split_command:
                 return True
-            if self.split_command.startswith('glx-'):
+            if split_command.startswith('glx-'):
                 return True
         return False
 
