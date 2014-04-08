@@ -52,7 +52,7 @@ class OGLCTest(Test):
         super(OGLCTest, self).__init__([bin_oglconform, '-minFmt', '-v', '4',
                                         '-test', category, subtest])
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         if self.skip_re.search(out) is not None:
             results['result'] = 'skip'
         elif re.search('Total Passed : 1', out) is not None:

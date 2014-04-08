@@ -40,7 +40,7 @@ class GleanTest(Test):
     def command(self):
         return self._command + self.globalParams
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         if "{'result': 'skip'}" in out:
             results['result'] = 'skip'
         elif out.find('FAIL') >= 0 or returncode != 0:

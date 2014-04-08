@@ -126,7 +126,7 @@ class Test(object):
             return
         self._command = value
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         raise NotImplementedError
         return out
 
@@ -194,7 +194,7 @@ class Test(object):
                 results['result'] = 'skip'
             else:
                 results['result'] = 'fail'
-                out = self.interpretResult(out, returncode, results)
+                out = self.interpret_result(out, returncode, results)
 
             crash_codes = [
                 # Unix: terminated by a signal
@@ -293,7 +293,7 @@ class PiglitTest(Test):
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         outlines = out.split('\n')
         outpiglit = map(lambda s: s[7:],
                         filter(lambda s: s.startswith('PIGLIT:'), outlines))

@@ -75,7 +75,7 @@ class IGTTest(Test):
         super(IGTTest, self).__init__(
             [path.join(igtTestRoot, binary)] + arguments)
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         if not igtEnvironmentOk:
             return out
 

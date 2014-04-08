@@ -55,7 +55,7 @@ class GTFTest(Test):
                                        '-minfmt', '-width=113', '-height=47',
                                        '-run=' + testpath])
 
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         mo = self.pass_re.search(out)
         if mo is not None and int(mo.group('passed')) > 0:
             results['result'] = 'pass'

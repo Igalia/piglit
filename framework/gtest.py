@@ -29,7 +29,7 @@ import re
 from framework.exectest import Test
 
 class GTest(Test):
-    def interpretResult(self, out, returncode, results):
+    def interpret_result(self, out, returncode, results):
         # Since gtests can have several subtets, if any of the subtests fail
         # then we need to report fail.
         if len(re.findall('FAILED', out, re.MULTILINE)) > 0:
