@@ -90,15 +90,14 @@ class Test(object):
                 if not isinstance(result, TestResult):
                     result = TestResult(result)
                     result['result'] = 'warn'
-                    result['note'] = 'Result not returned as an instance ' \
-                                     'of TestResult'
+                    result['note'] = ('Result not returned as an instance '
+                                      'of TestResult')
             except:
                 result = TestResult()
+                exception = sys.exc_info()
                 result['result'] = 'fail'
-                result['exception'] = str(sys.exc_info()[0]) + \
-                    str(sys.exc_info()[1])
-                result['traceback'] = \
-                    "".join(traceback.format_tb(sys.exc_info()[2]))
+                result['exception'] = "{}{}".format(*exception[:2])
+                result['traceback'] = "".join(traceback.format_tb(exception[2]))
 
             log.log(path, result['result'])
             log.post_log(log_current, result['result'])
@@ -253,8 +252,8 @@ class Test(object):
             # Piglit should not report that test as having
             # failed.
             if e.errno == errno.ENOENT:
-                out = "PIGLIT: {'result': 'skip'}\n" \
-                    + "Test executable not found.\n"
+                out = ("PIGLIT: {'result': 'skip'}\n"
+                       "Test executable not found.\n")
                 err = ""
                 returncode = None
             else:
