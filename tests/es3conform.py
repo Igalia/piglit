@@ -27,7 +27,7 @@ import sys
 from os import path
 from glob import glob
 from framework.core import TestProfile
-from framework.exectest import Test, testBinDir
+from framework.exectest import Test, TEST_BIN_DIR
 
 __all__ = ['profile']
 
@@ -39,19 +39,19 @@ __all__ = ['profile']
 ##### files into the 'gtf' category.
 #############################################################################
 
-if not path.exists(path.join(testBinDir, 'GTF3')):
+if not path.exists(path.join(TEST_BIN_DIR, 'GTF3')):
     sys.exit(0)
 
 profile = TestProfile()
 
 # Chase the piglit/bin/GTF symlink to find where the tests really live.
-gtfroot = path.dirname(path.realpath(path.join(testBinDir, 'GTF3')))
+gtfroot = path.dirname(path.realpath(path.join(TEST_BIN_DIR, 'GTF3')))
 
 class GTFTest(Test):
     pass_re = re.compile(r'(Conformance|Regression) PASSED all (?P<passed>\d+) tests')
 
     def __init__(self, testpath):
-        super(GTFTest, self).__init__([path.join(testBinDir, 'GTF3'),
+        super(GTFTest, self).__init__([path.join(TEST_BIN_DIR, 'GTF3'),
                                        '-minfmt', '-width=113', '-height=47',
                                        '-run=' + testpath])
 

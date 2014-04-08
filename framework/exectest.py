@@ -33,7 +33,7 @@ from .core import TestResult
 
 __all__ = ['Test',
            'PiglitTest',
-           'testBinDir']
+           'TEST_BIN_DIR']
 
 # Platform global variables
 if 'PIGLIT_PLATFORM' in os.environ:
@@ -42,9 +42,9 @@ else:
     PIGLIT_PLATFORM = ''
 
 if 'PIGLIT_BUILD_DIR' in os.environ:
-    testBinDir = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
+    TEST_BIN_DIR = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
 else:
-    testBinDir = os.path.normpath(os.path.join(os.path.dirname(__file__),
+    TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                '../bin'))
 
 
@@ -290,8 +290,8 @@ class PiglitTest(Test):
     def __init__(self, *args, **kwargs):
         super(PiglitTest, self).__init__(*args, **kwargs)
 
-        # Prepend testBinDir to the path.
-        self._command[0] = os.path.join(testBinDir, self._command[0])
+        # Prepend TEST_BIN_DIR to the path.
+        self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
     def interpretResult(self, out, returncode, results):
         outlines = out.split('\n')

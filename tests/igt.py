@@ -29,7 +29,7 @@ import subprocess
 
 from os import path
 from framework.core import TestProfile, TestResult
-from framework.exectest import Test, testBinDir
+from framework.exectest import Test, TEST_BIN_DIR
 
 __all__ = ['profile']
 
@@ -59,12 +59,12 @@ def checkEnvironment():
     print "Test Environment check: Succeeded."
     return True
 
-if not os.path.exists(os.path.join(testBinDir, 'igt')):
+if not os.path.exists(os.path.join(TEST_BIN_DIR, 'igt')):
     print "igt symlink not found!"
     sys.exit(0)
 
 # Chase the piglit/bin/igt symlink to find where the tests really live.
-igtTestRoot = path.join(path.realpath(path.join(testBinDir, 'igt')), 'tests')
+igtTestRoot = path.join(path.realpath(path.join(TEST_BIN_DIR, 'igt')), 'tests')
 
 igtEnvironmentOk = checkEnvironment()
 

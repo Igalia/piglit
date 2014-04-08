@@ -24,7 +24,7 @@ import os
 import nose.tools as nt
 import framework.glsl_parser_test as glsl
 import framework.tests.utils as utils
-from framework.exectest import testBinDir
+from framework.exectest import TEST_BIN_DIR
 
 
 def _check_config(content):
@@ -105,7 +105,7 @@ def test_cpp_comments():
                '// [end config]\n')
     test, name = _check_config(content)
 
-    nt.assert_equal(test.command, [os.path.join(testBinDir, 'glslparsertest'),
+    nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
                                    name, 'pass', '1.00'],
                     msg="C++ style comments were not properly parsed")
 
@@ -120,7 +120,7 @@ def test_c_comments():
                ' */\n')
     test, name = _check_config(content)
 
-    nt.assert_equal(test.command, [os.path.join(testBinDir, 'glslparsertest'),
+    nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
                                    name, 'pass', '1.00'],
                     msg="C style comments were not properly parsed")
 
@@ -135,7 +135,7 @@ def test_blank_in_config():
 
     test, name = _check_config(content)
 
-    nt.assert_equal(test.command, [os.path.join(testBinDir, 'glslparsertest'),
+    nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
                                    name, 'pass', '1.00'],
                     msg="A newline in a C++ style comment was not properly "
                         "parsed.")

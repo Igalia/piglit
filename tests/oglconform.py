@@ -27,12 +27,12 @@ import sys
 import subprocess
 
 from framework.core import TestProfile
-from framework.exectest import Test, testBinDir
+from framework.exectest import Test, TEST_BIN_DIR
 from os import path
 
 __all__ = ['profile']
 
-bin_oglconform = path.join(testBinDir, 'oglconform')
+bin_oglconform = path.join(TEST_BIN_DIR, 'oglconform')
 
 if not os.path.exists(bin_oglconform):
     sys.exit(0)

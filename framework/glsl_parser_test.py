@@ -27,7 +27,7 @@ import os.path as path
 import re
 from cStringIO import StringIO
 
-from .exectest import PiglitTest, testBinDir
+from .exectest import PiglitTest, TEST_BIN_DIR
 
 
 def add_glsl_parser_test(group, filepath, test_name):
@@ -146,7 +146,7 @@ class GLSLParserTest(PiglitTest):
                                               "from config".format(opt))
 
             # Create the command and pass it into a PiglitTest()
-            command = [path.join(testBinDir, 'glslparsertest'),
+            command = [path.join(TEST_BIN_DIR, 'glslparsertest'),
                        filepath,
                        config.get('config', 'expect_result'),
                        config.get('config', 'glsl_version')]

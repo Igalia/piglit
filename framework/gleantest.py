@@ -23,9 +23,9 @@
 
 import os
 
-from .exectest import Test, testBinDir
+from .exectest import Test, TEST_BIN_DIR
 
-glean_executable = os.path.join(testBinDir, "glean")
+glean_executable = os.path.join(TEST_BIN_DIR, "glean")
 
 # GleanTest: Execute a sub-test of Glean
 class GleanTest(Test):
