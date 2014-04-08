@@ -295,23 +295,21 @@ class PiglitTest(Test):
 
     def interpret_result(self, out, returncode, results):
         outlines = out.split('\n')
-        outpiglit = map(lambda s: s[7:],
-                        filter(lambda s: s.startswith('PIGLIT:'), outlines))
+        outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
 
-        if len(outpiglit) > 0:
-            try:
-                for piglit in outpiglit:
-                    if piglit.startswith('subtest'):
-                        if not 'subtest' in results:
-                            results['subtest'] = {}
-                        results['subtest'].update(eval(piglit[7:]))
-                    else:
-                        results.update(eval(piglit))
-                out = '\n'.join(filter(lambda s: not s.startswith('PIGLIT:'),
-                                       outlines))
-            except:
-                results['result'] = 'fail'
-                results['note'] = 'Failed to parse result string'
+        try:
+            for piglit in outpiglit:
+                if piglit.startswith('subtest'):
+                    if not 'subtest' in results:
+                        results['subtest'] = {}
+                    results['subtest'].update(eval(piglit[7:]))
+                else:
+                    results.update(eval(piglit))
+            out = '\n'.join(
+                s for s in outlines if not s.startswith('PIGLIT:'))
+        except:
+            results['result'] = 'fail'
+            results['note'] = 'Failed to parse result string'
 
         if 'result' not in results:
             results['result'] = 'fail'
