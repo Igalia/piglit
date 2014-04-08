@@ -56,11 +56,9 @@ class Test(object):
                 (i.e. the main thread) or from the ConcurrentTestPool threads.
         '''
         self.run_concurrent = run_concurrent
-        self.skip_test = False
         self.command = command
         self.split_command = os.path.split(self._command[0])[1]
         self.env = {}
-        self.skip_test = self.check_for_skip_scenario(command)
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
@@ -152,8 +150,9 @@ class Test(object):
                                '--tool=memcheck']
 
             i = 0
+            skip = self.check_for_skip_scenario()
             while True:
-                if self.skip_test:
+                if skip:
                     out = "PIGLIT: {'result': 'skip'}\n"
                     err = ""
                     returncode = None
@@ -190,7 +189,7 @@ class Test(object):
 
             results = TestResult()
 
-            if self.skip_test:
+            if skip:
                 results['result'] = 'skip'
             else:
                 results['result'] = 'fail'
@@ -246,13 +245,13 @@ class Test(object):
 
         return results
 
-    def check_for_skip_scenario(self, command):
-        global PIGLIT_PLATFORM
-        if PIGLIT_PLATFORM == 'gbm':
-            if 'glean' == self.split_command:
-                return True
-            if self.split_command.startswith('glx-'):
-                return True
+    def check_for_skip_scenario(self):
+        """ Application specific check for skip
+
+        If this function returns a truthy value then the current test will be
+        skipped. The base version will always return False
+
+        """
         return False
 
     def get_command_result(self, command, fullenv):
@@ -292,6 +291,19 @@ class PiglitTest(Test):
 
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
+
+    def check_for_skip_scenario(self):
+        """ Native Piglit-test specific skip checking
+
+        If we are running on gbm don't run glean or glx- tests
+
+        """
+        if PIGLIT_PLATFORM == 'gbm':
+            if 'glean' == self.split_command:
+                return True
+            if self.split_command.startswith('glx-'):
+                return True
+        return False
 
     def interpret_result(self, out, returncode, results):
         outlines = out.split('\n')
