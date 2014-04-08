@@ -20,7 +20,7 @@ def add_plain_test(group, name, args):
 
 def add_concurrent_test(group, name, args):
 	test = PiglitTest(args)
-	test.runConcurrent = true;
+	test.run_concurrent = true;
 	group[name] = PiglitTest(args)
 
 def add_plain_program_tester_test(group, name, path):

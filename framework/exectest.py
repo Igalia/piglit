@@ -49,13 +49,13 @@ else:
 
 
 class Test(object):
-    def __init__(self, command, runConcurrent=False):
+    def __init__(self, command, run_concurrent=False):
         '''
-                'runConcurrent' controls whether this test will
+                'run_concurrent' controls whether this test will
                 execute it's work (i.e. __doRunWork) on the calling thread
                 (i.e. the main thread) or from the ConcurrentTestPool threads.
         '''
-        self.runConcurrent = runConcurrent
+        self.run_concurrent = run_concurrent
         self.skip_test = False
         self.command = command
         self.split_command = os.path.split(self._command[0])[1]

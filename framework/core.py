@@ -508,10 +508,10 @@ class TestProfile(object):
         else:
             # Filter and return only thread safe tests to the threaded pool
             multi.imap(test, (x for x in self.test_list.iteritems() if
-                              x[1].runConcurrent), chunksize)
+                              x[1].run_concurrent), chunksize)
             # Filter and return the non thread safe tests to the single pool
             single.imap(test, (x for x in self.test_list.iteritems() if not
-                               x[1].runConcurrent), chunksize)
+                               x[1].run_concurrent), chunksize)
 
         # Close and join the pools
         # If we don't close and the join the pools the script will exit before

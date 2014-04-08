@@ -39,7 +39,7 @@ def add_plain_test(group, args):
 
 def concurrent_test(args):
     test = plain_test(args + ' -fbo')
-    test.runConcurrent = True
+    test.run_concurrent = True
     return test
 
 def add_concurrent_test(group, args):
