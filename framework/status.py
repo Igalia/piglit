@@ -213,12 +213,12 @@ SKIP = NoChangeStatus('skip')
 
 PASS = Status('pass', 0, (1, 1))
 
-DMESG_WARN = Status('dmesg-warn', 10)
+WARN = Status('warn', 10)
 
-WARN = Status('warn', 20)
+DMESG_WARN = Status('dmesg-warn', 20)
 
-DMESG_FAIL = Status('dmesg-fail', 30)
+FAIL = Status('fail', 30)
 
-FAIL = Status('fail', 40)
+DMESG_FAIL = Status('dmesg-fail', 40)
 
 CRASH = Status('crash', 50)

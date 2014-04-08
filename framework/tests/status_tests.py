@@ -31,7 +31,7 @@ import framework.status as status
 
 # Statuses from worst to last. NotRun is intentionally not in this list and
 # tested separately because of upcoming features for it
-STATUSES = ["pass", "dmesg-warn", "warn", "dmesg-fail", "fail", "crash"]
+STATUSES = ["pass", "warn", "dmesg-warn", "fail", "dmesg-fail", "crash"]
 
 # all statuses except pass are problems
 PROBLEMS = STATUSES[1:]
