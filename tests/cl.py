@@ -9,7 +9,7 @@ import os.path as path
 
 from framework.opencv import add_opencv_tests
 
-from framework.core import Group, TestProfile
+from framework.core import TestProfile
 from framework.exectest import PiglitTest
 
 ######
@@ -30,9 +30,9 @@ def add_plain_program_tester_test(group, name, path):
 # Collecting all tests
 profile = TestProfile()
 
-custom = Group()
-api = Group()
-program = Group()
+custom = {}
+api = {}
+program = {}
 profile.tests['Custom'] = custom
 profile.tests['API'] = api
 profile.tests['Program'] = program
@@ -103,9 +103,9 @@ def add_program_test_dir(group, dirpath):
 		testname = filename[0:-(len(ext) + 1)]
 		add_plain_program_tester_test(group, testname, filepath)
 
-program_build = Group()
-program_build_fail = Group()
-program_execute = Group()
+program_build = {}
+program_build_fail = {}
+program_execute = {}
 program["Build"] = program_build
 program["Build"]["Fail"] = program_build_fail
 program["Execute"] = program_execute
@@ -116,11 +116,11 @@ add_program_test_dir(program_execute, 'tests/cl/program/execute')
 add_program_test_dir(program_execute, 'tests/cl/program/execute/builtin/atomic')
 
 #Run generated built-in tests
-program_execute_builtin = Group()
+program_execute_builtin = {}
 program["Execute"]["Builtin"] = program_execute_builtin
 add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/int')
 add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/math')
 add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/relational')
-program_execute_store = Group()
+program_execute_store = {}
 program["Execute"]["Store"] = program_execute_store
 add_program_test_dir(program_execute_store, 'generated_tests/cl/store')

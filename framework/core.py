@@ -51,8 +51,7 @@ __all__ = ['PIGLIT_CONFIG',
            'loadTestProfile',
            'TestrunResult',
            'TestResult',
-           'TestProfile',
-           'Group']
+           'TestProfile']
 
 
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
@@ -400,13 +399,9 @@ class Environment:
         return result
 
 
-class Group(dict):
-    pass
-
-
 class TestProfile(object):
     def __init__(self):
-        self.tests = Group()
+        self.tests = {}
         self.test_list = {}
         self.filters = []
         # Sets a default of a Dummy
@@ -430,7 +425,7 @@ class TestProfile(object):
 
     def flatten_group_hierarchy(self):
         '''
-        Convert Piglit's old hierarchical Group() structure into a flat
+        Convert Piglit's old hierarchical {} structure into a flat
         dictionary mapping from fully qualified test names to "Test" objects.
 
         For example,
@@ -447,8 +442,8 @@ class TestProfile(object):
                 else:
                     test_dict[fullkey] = group[key]
         f('', self.tests, self.test_list)
-        # Clear out the old Group()
-        self.tests = Group()
+        # Clear out the old {}
+        self.tests = {}
 
     def prepare_test_list(self, env):
         self.flatten_group_hierarchy()

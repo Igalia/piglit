@@ -9,7 +9,7 @@ import os.path as path
 import platform
 import shlex
 
-from framework.core import Group, TestProfile
+from framework.core import TestProfile
 from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
@@ -104,7 +104,7 @@ def add_msaa_visual_plain_tests(group, args):
     for num_samples in MSAA_SAMPLE_COUNTS:
         group[args + ' samples=' + str(num_samples)] = plain_test(args + ' -samples=' + str(num_samples))
 
-glean = Group()
+glean = {}
 glean['basic'] = GleanTest('basic')
 glean['api2'] = GleanTest('api2')
 glean['makeCurrent'] = GleanTest('makeCurrent')
@@ -537,13 +537,13 @@ def add_fbo_rg(group, format):
     name = "fbo-rg-" + format
     group[name] = concurrent_test('fbo-rg ' + format)
 
-security = Group()
+security = {}
 add_plain_test(security, 'initialized-texmemory')
 add_plain_test(security, 'initialized-fbo')
 add_plain_test(security, 'initialized-vbo')
 
 
-shaders = Group()
+shaders = {}
 
 def add_getactiveuniform_count(group, name, expected):
     path = 'shaders/'
@@ -678,7 +678,7 @@ for subtest in ('interstage', 'intrastage', 'vs-gs'):
 def add_vpfpgeneric(group, name):
     group[name] = concurrent_test('vpfp-generic ' + testsDir + '/shaders/generic/' + name + '.vpfp')
 
-glx = Group()
+glx = {}
 add_msaa_visual_plain_tests(glx, 'glx-copy-sub-buffer')
 add_plain_test(glx, 'glx-destroycontext-1')
 add_plain_test(glx, 'glx-destroycontext-2')
@@ -734,7 +734,7 @@ glx['glx-query-drawable-GLX_PRESERVED_CONTENTS'] = plain_test('glx-query-drawabl
 glx['glx-query-drawable-GLXBadDrawable'] = plain_test('glx-query-drawable --bad-drawable')
 glx['extension string sanity'] = concurrent_test('glx-string-sanity')
 
-import_context = Group();
+import_context = {};
 glx['GLX_EXT_import_context'] = import_context
 import_context['free context'] = PiglitTest(['glx-free-context'])
 import_context['get context ID'] = PiglitTest(['glx-get-context-id'])
@@ -746,7 +746,7 @@ import_context['make current, multi process'] = PiglitTest(['glx-make-current-mu
 import_context['make current, single process'] = PiglitTest(['glx-make-current-single-process'])
 import_context['query context info'] = PiglitTest(['glx-query-context-info-ext'])
 
-create_context = Group();
+create_context = {};
 glx['GLX_ARB_create_context'] = create_context
 create_context['current with no framebuffer'] = concurrent_test('glx-create-context-current-no-framebuffer')
 create_context['default major version'] = concurrent_test('glx-create-context-default-major-version')
@@ -761,23 +761,23 @@ create_context['empty attribute list'] = concurrent_test('glx-create-context-val
 create_context['NULL attribute list'] = concurrent_test('glx-create-context-valid-attribute-null')
 create_context['forward-compatible flag with 3.0'] = concurrent_test('glx-create-context-valid-flag-forward-compatible')
 
-create_context_profile = Group();
+create_context_profile = {};
 glx['GLX_ARB_create_context_profile'] = create_context_profile
 create_context_profile['3.2 core profile required'] = concurrent_test('glx-create-context-core-profile')
 create_context_profile['invalid profile'] = concurrent_test('glx-create-context-invalid-profile')
 create_context_profile['pre-GL3.2 profile'] = concurrent_test('glx-create-context-pre-GL32-profile')
 
-create_context_robustness = Group();
+create_context_robustness = {};
 glx['GLX_ARB_create_context_robustness'] = create_context_robustness
 create_context_robustness['invalid reset notification strategy'] = concurrent_test('glx-create-context-invalid-reset-strategy')
 create_context_robustness['require GL_ARB_robustness'] = concurrent_test('glx-create-context-require-robustness')
 
-create_context_es2_profile = Group();
+create_context_es2_profile = {};
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = concurrent_test('glx-create-context-indirect-es2-profile')
 create_context_es2_profile['invalid OpenGL ES version'] = concurrent_test('glx-create-context-invalid-es-version')
 
-oml_sync_control = Group();
+oml_sync_control = {};
 glx['GLX_OML_sync_control'] = oml_sync_control
 oml_sync_control['glXGetMscRateOML'] = concurrent_test('glx-oml-sync-control-getmscrate')
 oml_sync_control['swapbuffersmsc-divisor-zero'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-divisor-zero')
@@ -786,7 +786,7 @@ oml_sync_control['swapbuffersmsc-return swap_interval 0'] = concurrent_test('glx
 oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 1')
 oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
 
-mesa_query_renderer = Group()
+mesa_query_renderer = {}
 glx['GLX_MESA_query_renderer'] = mesa_query_renderer
 mesa_query_renderer['coverage'] = concurrent_test('glx-query-renderer-coverage')
 
@@ -820,9 +820,9 @@ def add_fbo_stencil_tests(group, format):
     group['fbo-stencil-' + format + '-copypixels'] = concurrent_test('fbo-stencil copypixels ' + format)
     group['fbo-stencil-' + format + '-blit'] = concurrent_test('fbo-stencil blit ' + format)
 
-spec = Group()
+spec = {}
 
-gl11 = Group()
+gl11 = {}
 spec['!OpenGL 1.1'] = gl11
 add_texwrap_target_tests(gl11, '1D')
 add_texwrap_target_tests(gl11, '2D')
@@ -917,7 +917,7 @@ add_concurrent_test(gl11, 'triangle-guardband-viewport')
 add_concurrent_test(gl11, 'getteximage-targets 1D')
 add_concurrent_test(gl11, 'getteximage-targets 2D')
 
-gl10 = Group()
+gl10 = {}
 spec['!OpenGL 1.0'] = gl10
 add_concurrent_test(gl10, 'gl-1.0-beginend-coverage')
 add_concurrent_test(gl10, 'gl-1.0-dlist-beginend')
@@ -929,7 +929,7 @@ add_concurrent_test(gl10, 'gl-1.0-long-dlist')
 add_concurrent_test(gl10, 'gl-1.0-rendermode-feedback')
 add_plain_test(gl10, 'gl-1.0-front-invalidate-back')
 
-gl12 = Group()
+gl12 = {}
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_target_tests(gl12, '3D')
 add_msaa_visual_plain_tests(gl12, 'copyteximage 3D')
@@ -948,13 +948,13 @@ add_plain_test(gl12, 'teximage-errors')
 add_plain_test(gl12, 'texture-packed-formats')
 add_concurrent_test(gl12, 'getteximage-targets 3D')
 
-gl13 = Group()
+gl13 = {}
 spec['!OpenGL 1.3'] = gl13
 add_plain_test(gl13, 'texunits')
 add_plain_test(gl13, 'tex-border-1')
 add_concurrent_test(gl13, 'tex3d-depth1')
 
-gl14 = Group()
+gl14 = {}
 spec['!OpenGL 1.4'] = gl14
 add_plain_test(gl14, 'fdo25614-genmipmap')
 add_plain_test(gl14, 'tex1d-2dborder')
@@ -971,7 +971,7 @@ gl14['tex-miplevel-selection'] = PiglitTest(['tex-miplevel-selection', '-auto', 
 gl14['tex-miplevel-selection-lod'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias'])
 gl14['tex-miplevel-selection-lod-bias'] = PiglitTest(['tex-miplevel-selection', '-auto'])
 
-gl15 = Group()
+gl15 = {}
 spec['!OpenGL 1.5'] = gl15
 add_plain_test(gl15, 'draw-elements')
 gl15['draw-elements-user'] = PiglitTest(['draw-elements', '-auto', 'user'])
@@ -980,7 +980,7 @@ gl15['draw-vertices-user'] = PiglitTest(['draw-vertices', '-auto', 'user'])
 add_plain_test(gl15, 'isbufferobj')
 add_plain_test(gl15, 'depth-tex-compare')
 
-gl20 = Group()
+gl20 = {}
 spec['!OpenGL 2.0'] = gl20
 add_concurrent_test(gl20, 'attribs')
 add_concurrent_test(gl20, 'gl-2.0-edgeflag')
@@ -1032,11 +1032,11 @@ add_plain_test(gl20, 'tex3d-npot')
 add_concurrent_test(gl20, 'max-samplers')
 add_concurrent_test(gl20, 'max-samplers border')
 
-gl21 = Group()
+gl21 = {}
 spec['!OpenGL 2.1'] = gl21
 gl21['minmax'] = concurrent_test('gl-2.1-minmax')
 
-gl30 = Group()
+gl30 = {}
 spec['!OpenGL 3.0'] = gl30
 gl30['attribs'] = concurrent_test('attribs GL3')
 add_concurrent_test(gl30, 'bindfragdata-invalid-parameters')
@@ -1064,7 +1064,7 @@ add_plain_test(gl30, 'array-depth-roundtrip')
 add_plain_test(gl30, 'depth-cube-map')
 add_plain_test(gl30, 'sampler-cube-shadow')
 
-gl31 = Group()
+gl31 = {}
 spec['!OpenGL 3.1'] = gl31
 gl31['draw-buffers-errors'] = concurrent_test('gl-3.1-draw-buffers-errors')
 gl31['genned-names'] = concurrent_test('gl-3.1-genned-names')
@@ -1076,7 +1076,7 @@ gl31['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-requi
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 31')
 
-gl32 = Group()
+gl32 = {}
 spec['!OpenGL 3.2'] = gl32
 add_concurrent_test(gl32, 'glsl-resource-not-bound 1D')
 add_concurrent_test(gl32, 'glsl-resource-not-bound 2D')
@@ -1133,35 +1133,35 @@ spec['!OpenGL 4.2/required-sized-texture-formats'] = concurrent_test('gl-3.0-req
 spec['!OpenGL 4.2/required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 42')
 
 # Group spec/glsl-es-1.00
-spec['glsl-es-1.00'] = Group()
+spec['glsl-es-1.00'] = {}
 import_glsl_parser_tests(spec['glsl-es-1.00'],
 			 os.path.join(testsDir, 'spec', 'glsl-es-1.00'),
 			 ['compiler'])
-spec['glsl-es-1.00']['execution'] = Group()
+spec['glsl-es-1.00']['execution'] = {}
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
 			 os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
 			 recursive=True)
 spec['glsl-es-1.00']['built-in constants'] = concurrent_test('built-in-constants_gles2 tests/spec/glsl-es-1.00/minimum-maximums.txt')
 
 # Group spec/glsl-1.10
-spec['glsl-1.10'] = Group()
+spec['glsl-1.10'] = {}
 import_glsl_parser_tests(spec['glsl-1.10'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.10'),
 			 ['preprocessor', 'compiler'])
-spec['glsl-1.10']['linker'] = Group()
+spec['glsl-1.10']['linker'] = {}
 add_shader_test_dir(spec['glsl-1.10']['linker'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'linker'),
 		    recursive=True)
-spec['glsl-1.10']['execution'] = Group()
+spec['glsl-1.10']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.10']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
 		    recursive=True)
 add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-render-after-bad-attach')
-spec['glsl-1.10']['execution']['clipping'] = Group()
+spec['glsl-1.10']['execution']['clipping'] = {}
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
     cmdline = 'clip-plane-transformation ' + mode
     spec['glsl-1.10']['execution']['clipping'][cmdline] = concurrent_test(cmdline)
-spec['glsl-1.10']['execution']['varying-packing'] = Group()
+spec['glsl-1.10']['execution']['varying-packing'] = {}
 for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
              'ivec4', 'uvec2', 'uvec3', 'uvec4', 'mat2', 'mat3', 'mat4',
              'mat2x3', 'mat2x4', 'mat3x2', 'mat3x4', 'mat4x2', 'mat4x3']:
@@ -1171,15 +1171,15 @@ for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
             concurrent_test('varying-packing-' + cmdline)
 spec['glsl-1.10']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.10/minimum-maximums.txt')
 
-spec['glsl-1.10']['api'] = Group()
+spec['glsl-1.10']['api'] = {}
 add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
 
 # Group spec/glsl-1.20
-spec['glsl-1.20'] = Group()
+spec['glsl-1.20'] = {}
 import_glsl_parser_tests(spec['glsl-1.20'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
 			 ['preprocessor', 'compiler'])
-spec['glsl-1.20']['execution'] = Group()
+spec['glsl-1.20']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
 		    recursive=True)
@@ -1197,7 +1197,7 @@ def add_recursion_test(group, name):
     # drivers, for example.
     group[name] = PiglitTest(['recursion', '-auto', '-rlimit', '268435456', name])
 
-rec = Group()
+rec = {}
 spec['glsl-1.20']['recursion'] = rec
 add_recursion_test(rec, 'simple')
 add_recursion_test(rec, 'unreachable')
@@ -1208,16 +1208,16 @@ add_recursion_test(rec, 'indirect-complex')
 add_recursion_test(rec, 'indirect-complex-separate')
 
 spec['glsl-1.20']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.20/minimum-maximums.txt')
-spec['glsl-1.20']['api'] = Group()
+spec['glsl-1.20']['api'] = {}
 add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 
 
 # Group spec/glsl-1.30
-spec['glsl-1.30'] = Group()
+spec['glsl-1.30'] = {}
 import_glsl_parser_tests(spec['glsl-1.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.30'),
 			 ['preprocessor', 'compiler'])
-spec['glsl-1.30']['execution'] = Group()
+spec['glsl-1.30']['execution'] = {}
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
 for stage in ['vs', 'gs', 'fs']:
@@ -1266,8 +1266,8 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-textureOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
 		    recursive=True)
-spec['glsl-1.30']['linker'] = Group()
-spec['glsl-1.30']['linker']['clipping'] = Group()
+spec['glsl-1.30']['linker'] = {}
+spec['glsl-1.30']['linker']['clipping'] = {}
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
 for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
@@ -1283,11 +1283,11 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-execution-ordering')
 
 spec['glsl-1.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.30/minimum-maximums.txt')
-spec['glsl-1.30']['api'] = Group()
+spec['glsl-1.30']['api'] = {}
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
 # Group spec/glsl-1.40
-spec['glsl-1.40'] = Group()
+spec['glsl-1.40'] = {}
 import_glsl_parser_tests(spec['glsl-1.40'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.40'),
 			 ['compiler'])
@@ -1317,7 +1317,7 @@ for stage in ['vs', 'gs', 'fs']:
                 version, stage, sampler)] = concurrent_test(
                 'texelFetch offset 140 {0} {1}'.format(stage, sampler))
 
-spec['glsl-1.50'] = Group()
+spec['glsl-1.50'] = {}
 import_glsl_parser_tests(spec['glsl-1.50'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.50'),
 			 ['compiler'])
@@ -1345,7 +1345,7 @@ for subtest in ['unnamed', 'named', 'array']:
         spec['glsl-1.50'],
         'glsl-1.50-interface-block-centroid {0}'.format(subtest))
 
-spec['glsl-3.30'] = Group()
+spec['glsl-3.30'] = {}
 spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
 
 # max_vertices of 32 and 128 are important transition points for
@@ -1396,7 +1396,7 @@ for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
                         'glsl-1.50-gs-output-layout-qualifiers {0}'.format(
                             output_layout))
 
-spec['glsl-3.30'] = Group()
+spec['glsl-3.30'] = {}
 import_glsl_parser_tests(spec['glsl-3.30'],
 			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
 			 ['compiler'])
@@ -1405,7 +1405,7 @@ add_shader_test_dir(spec['glsl-3.30'],
 		    recursive=True)
 
 # Group spec/glsl-es-3.00
-spec['glsl-es-3.00'] = Group()
+spec['glsl-es-3.00'] = {}
 import_glsl_parser_tests(spec['glsl-es-3.00'],
 			 os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
 			 ['compiler'])
@@ -1420,26 +1420,26 @@ profile.test_list['spec/AMD_performance_monitor/api'] = PiglitTest('amd_performa
 profile.test_list['spec/AMD_performance_monitor/measure'] = PiglitTest('amd_performance_monitor_measure -auto')
 
 # Group AMD_conservative_depth
-spec['AMD_conservative_depth'] = Group()
+spec['AMD_conservative_depth'] = {}
 import_glsl_parser_tests(spec['AMD_conservative_depth'],
 			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
 			 [''])
 
 # Group AMD_shader_trinary_minmax
-spec['AMD_shader_trinary_minmax'] = Group()
+spec['AMD_shader_trinary_minmax'] = {}
 import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
 			 os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
 			 [''])
 
 # Group ARB_point_sprite
-arb_point_sprite = Group()
+arb_point_sprite = {}
 spec['ARB_point_sprite'] = arb_point_sprite
 add_plain_test(arb_point_sprite, 'point-sprite')
 
 # Group ARB_texture_multisample
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
 				'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
-arb_texture_multisample = Group()
+arb_texture_multisample = {}
 spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-minmax')
 for sample_count in MSAA_SAMPLE_COUNTS:
@@ -1478,7 +1478,7 @@ for stage in ['vs', 'gs', 'fs']:
         spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
 # Group ARB_texture_gather
-arb_texture_gather = Group()
+arb_texture_gather = {}
 spec['ARB_texture_gather'] = arb_texture_gather
 for stage in ['vs', 'fs']:
     for comps in ['r', 'rg', 'rgb', 'rgba']:
@@ -1498,13 +1498,13 @@ for stage in ['vs', 'fs']:
 			arb_texture_gather[testname] = concurrent_test(cmd)
 
 # Group AMD_shader_stencil_export
-spec['AMD_shader_stencil_export'] = Group()
+spec['AMD_shader_stencil_export'] = {}
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
 			 os.path.join(testsDir, 'spec', 'amd_shader_stencil_export'),
 			 [''])
 
 # Group ARB_shader_stencil_export
-spec['ARB_shader_stencil_export'] = Group()
+spec['ARB_shader_stencil_export'] = {}
 import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
 			 os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
 			 [''])
@@ -1512,7 +1512,7 @@ import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
 profile.test_list['spec/ARB_stencil_texturing/draw'] = concurrent_test('arb_stencil_texturing-draw')
 
 # Group ARB_sync
-arb_sync = Group()
+arb_sync = {}
 spec['ARB_sync'] = arb_sync
 arb_sync['ClientWaitSync-errors'] = concurrent_test('arb_sync-client-wait-errors')
 arb_sync['DeleteSync'] = concurrent_test('arb_sync-delete')
@@ -1526,7 +1526,7 @@ arb_sync['WaitSync-errors'] = concurrent_test('arb_sync-WaitSync-errors')
 add_plain_test(arb_sync, 'sync_api')
 
 # Group ARB_ES2_compatibility
-arb_es2_compatibility = Group()
+arb_es2_compatibility = {}
 spec['ARB_ES2_compatibility'] = arb_es2_compatibility
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-depthrangef')
 add_plain_test(arb_es2_compatibility, 'arb_es2_compatibility-drawbuffers')
@@ -1544,20 +1544,20 @@ arb_es2_compatibility['NUM_SHADER_BINARY_FORMATS over-run check'] = concurrent_t
 
 
 # Group ARB_get_program_binary
-arb_get_program_binary = Group()
+arb_get_program_binary = {}
 spec['ARB_get_program_binary'] = arb_get_program_binary
 arb_get_program_binary['misc. API error checks'] = concurrent_test('arb_get_program_binary-api-errors')
 arb_get_program_binary['NUM_PROGRAM_BINARY_FORMATS over-run check'] = concurrent_test('arb_get_program_binary-overrun program')
 arb_get_program_binary['PROGRAM_BINARY_RETRIEVABLE_HINT'] = concurrent_test('arb_get_program_binary-retrievable_hint')
 
-arb_depth_clamp = Group()
+arb_depth_clamp = {}
 spec['ARB_depth_clamp'] = arb_depth_clamp
 add_plain_test(arb_depth_clamp, 'depth_clamp')
 add_plain_test(arb_depth_clamp, 'depth-clamp-range')
 add_plain_test(arb_depth_clamp, 'depth-clamp-status')
 
 # Group ARB_draw_elements_base_vertex
-arb_draw_elements_base_vertex = Group()
+arb_draw_elements_base_vertex = {}
 spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
 arb_draw_elements_base_vertex['dlist-arb_draw_instanced'] = concurrent_test('arb_draw_elements_base_vertex-dlist-arb_draw_instanced')
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
@@ -1571,7 +1571,7 @@ add_plain_test(arb_draw_elements_base_vertex, 'draw-range-elements-base-vertex')
 add_plain_test(arb_draw_elements_base_vertex, 'multi-draw-elements-base-vertex')
 
 # Group ARB_draw_instanced
-arb_draw_instanced = Group()
+arb_draw_instanced = {}
 spec['ARB_draw_instanced'] = arb_draw_instanced
 import_glsl_parser_tests(arb_draw_instanced,
                         testsDir + '/spec/arb_draw_instanced',
@@ -1588,7 +1588,7 @@ add_plain_test(arb_draw_instanced, 'draw-instanced')
 add_plain_test(arb_draw_instanced, 'draw-instanced-divisor')
 
 # Group ARB_draw_indirect
-arb_draw_indirect = Group()
+arb_draw_indirect = {}
 spec['ARB_draw_indirect'] = arb_draw_indirect
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-api-errors')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays')
@@ -1600,7 +1600,7 @@ add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-prim-res
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays-instances')
 
 # Group ARB_fragment_program
-arb_fragment_program = Group()
+arb_fragment_program = {}
 spec['ARB_fragment_program'] = arb_fragment_program
 add_shader_test_dir(spec['ARB_fragment_program'],
 	            os.path.join(testsDir, 'spec', 'arb_fragment_program'),
@@ -1631,13 +1631,13 @@ add_plain_test(arb_fragment_program, 'trinity-fp1')
 arb_fragment_program['incomplete-texture-arb_fp'] = concurrent_test('incomplete-texture -auto arb_fp')
 
 # Group ARB_fragment_program_shadow
-arb_fragment_program_shadow = Group()
+arb_fragment_program_shadow = {}
 spec['ARB_fragment_program_shadow'] = arb_fragment_program_shadow
 add_shader_test_dir(spec['ARB_fragment_program_shadow'],
 	            os.path.join(testsDir, 'spec', 'arb_fragment_program_shadow'),
 		    recursive=True)
 
-nv_fragment_program_option = Group()
+nv_fragment_program_option = {}
 spec['NV_fragment_program_option'] = nv_fragment_program_option
 add_plain_test(nv_fragment_program_option, 'fp-abs-02')
 add_plain_test(nv_fragment_program_option, 'fp-condition_codes-01')
@@ -1645,7 +1645,7 @@ add_plain_test(nv_fragment_program_option, 'fp-rfl')
 add_plain_test(nv_fragment_program_option, 'fp-set-02')
 add_plain_test(nv_fragment_program_option, 'fp-unpack-01')
 
-arb_fragment_coord_conventions = Group()
+arb_fragment_coord_conventions = {}
 spec['ARB_fragment_coord_conventions'] = arb_fragment_coord_conventions
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-none')
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-integer')
@@ -1653,12 +1653,12 @@ import_glsl_parser_tests(arb_fragment_coord_conventions,
 			 os.path.join(testsDir, 'spec',
 			  'arb_fragment_coord_conventions'), ['compiler'])
 
-ati_fragment_shader = Group()
+ati_fragment_shader = {}
 spec['ATI_fragment_shader'] = ati_fragment_shader
 add_plain_test(ati_fragment_shader, 'ati-fs-bad-delete')
 
 # Group ARB_framebuffer_object
-arb_framebuffer_object = Group()
+arb_framebuffer_object = {}
 spec['ARB_framebuffer_object'] = arb_framebuffer_object
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferTexture2D-GL_DEPTH_STENCIL_ATTACHMENT')
 add_concurrent_test(arb_framebuffer_object, 'same-attachment-glFramebufferRenderbuffer-GL_DEPTH_STENCIL_ATTACHMENT')
@@ -1706,7 +1706,7 @@ add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-3d')
 add_concurrent_test(arb_framebuffer_object, 'fbo-generatemipmap-3d RGB9_E5')
 
 # Group ARB_framebuffer_sRGB
-arb_framebuffer_srgb = Group()
+arb_framebuffer_srgb = {}
 spec['ARB_framebuffer_sRGB'] = arb_framebuffer_srgb
 for backing_type in ('texture', 'renderbuffer'):
     for srgb_types in ('linear', 'srgb', 'linear_to_srgb',
@@ -1722,7 +1722,7 @@ for backing_type in ('texture', 'renderbuffer'):
                         'arb_framebuffer_srgb-' + test_name)
 add_plain_test(arb_framebuffer_srgb, 'framebuffer-srgb') # must not be concurrent
 
-arb_gpu_shader5 = Group()
+arb_gpu_shader5 = {}
 spec['ARB_gpu_shader5'] = arb_gpu_shader5
 add_shader_test_dir(arb_gpu_shader5,
                     testsDir + '/spec/arb_gpu_shader5',
@@ -1774,7 +1774,7 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-minmax')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocation-id')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocations_count_too_large')
 
-arb_texture_query_levels = Group()
+arb_texture_query_levels = {}
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
 add_shader_test_dir(arb_texture_query_levels,
                     testsDir + '/spec/arb_texture_query_levels',
@@ -1782,7 +1782,7 @@ add_shader_test_dir(arb_texture_query_levels,
 import_glsl_parser_tests(arb_texture_query_levels,
 			 testsDir + '/spec/arb_texture_query_levels', [''])
 
-arb_occlusion_query = Group()
+arb_occlusion_query = {}
 spec['ARB_occlusion_query'] = arb_occlusion_query
 add_concurrent_test(arb_occlusion_query, 'occlusion_query')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_lifetime')
@@ -1792,7 +1792,7 @@ add_concurrent_test(arb_occlusion_query, 'occlusion_query_order')
 add_concurrent_test(arb_occlusion_query, 'gen_delete_while_active')
 
 # Group ARB_separate_shader_objects
-arb_separate_shader_objects = Group()
+arb_separate_shader_objects = {}
 spec['ARB_separate_shader_objects'] = arb_separate_shader_objects
 arb_separate_shader_objects['ActiveShaderProgram with invalid program'] = concurrent_test('arb_separate_shader_object-ActiveShaderProgram-invalid-program')
 arb_separate_shader_objects['GetProgramPipelineiv'] = concurrent_test('arb_separate_shader_object-GetProgramPipelineiv')
@@ -1805,7 +1805,7 @@ arb_separate_shader_objects['400 combinations by location'] = plain_test('arb_se
 arb_separate_shader_objects['400 combinations by name'] = plain_test('arb_separate_shader_object-400-combinations -fbo')
 
 # Group ARB_sampler_objects
-arb_sampler_objects = Group()
+arb_sampler_objects = {}
 spec['ARB_sampler_objects'] = arb_sampler_objects
 arb_sampler_objects['sampler-objects'] = concurrent_test('arb_sampler_objects-sampler-objects')
 arb_sampler_objects['sampler-incomplete'] = concurrent_test('arb_sampler_objects-sampler-incomplete')
@@ -1813,7 +1813,7 @@ arb_sampler_objects['GL_EXT_texture_sRGB_decode'] = concurrent_test('arb_sampler
 arb_sampler_objects['framebufferblit'] = plain_test('arb_sampler_objects-framebufferblit')
 
 # Group ARB_sample_shading
-arb_sample_shading = Group()
+arb_sample_shading = {}
 spec['ARB_sample_shading'] = arb_sample_shading
 add_plain_test(arb_sample_shading, 'arb_sample_shading-api')
 
@@ -1853,12 +1853,12 @@ import_glsl_parser_tests(spec['ARB_sample_shading'],
                          ['compiler'])
 
 # Group ARB_debug_output
-arb_debug_output = Group()
+arb_debug_output = {}
 spec['ARB_debug_output'] = arb_debug_output
 add_plain_test(arb_debug_output, 'arb_debug_output-api_error')
 
 # Group KHR_debug
-khr_debug = Group()
+khr_debug = {}
 spec['KHR_debug'] = khr_debug
 khr_debug['object-label_gl'] = concurrent_test('khr_debug-object-label_gl')
 khr_debug['object-label_gles2'] = concurrent_test('khr_debug-object-label_gles2')
@@ -1868,12 +1868,12 @@ khr_debug['push-pop-group_gles2'] = concurrent_test('khr_debug-push-pop-group_gl
 khr_debug['push-pop-group_gles3'] = concurrent_test('khr_debug-push-pop-group_gles3')
 
 # Group ARB_occlusion_query2
-arb_occlusion_query2 = Group()
+arb_occlusion_query2 = {}
 spec['ARB_occlusion_query2'] = arb_occlusion_query2
 arb_occlusion_query2['api'] = concurrent_test('arb_occlusion_query2-api')
 arb_occlusion_query2['render'] = concurrent_test('arb_occlusion_query2-render')
 
-arb_pixel_buffer_object = Group()
+arb_pixel_buffer_object = {}
 spec['ARB_pixel_buffer_object'] = arb_pixel_buffer_object
 add_plain_test(arb_pixel_buffer_object, 'fbo-pbo-readpixels-small')
 add_plain_test(arb_pixel_buffer_object, 'pbo-drawpixels')
@@ -1884,7 +1884,7 @@ add_plain_test(arb_pixel_buffer_object, 'pbo-teximage-tiling')
 add_plain_test(arb_pixel_buffer_object, 'pbo-teximage-tiling-2')
 
 # Group ARB_provoking_vertex
-arb_provoking_vertex = Group()
+arb_provoking_vertex = {}
 spec['ARB_provoking_vertex'] = arb_provoking_vertex;
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-control')
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-initial')
@@ -1892,19 +1892,19 @@ add_plain_test(arb_provoking_vertex, 'arb-quads-follow-provoking-vertex')
 add_plain_test(arb_provoking_vertex, 'arb-xfb-before-flatshading')
 
 # Group ARB_robustness
-arb_robustness = Group()
+arb_robustness = {}
 spec['ARB_robustness'] = arb_robustness
 add_plain_test(arb_robustness, 'arb_robustness_client-mem-bounds')
 # TODO: robust vertex buffer access
 #add_plain_test(arb_robustness, 'arb_robustness_draw-vbo-bounds')
 
 # Group ARB_shader_texture_lod
-arb_shader_texture_lod = Group()
+arb_shader_texture_lod = {}
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
 import_glsl_parser_tests(arb_shader_texture_lod,
 			 os.path.join(testsDir, 'spec', 'arb_shader_texture_lod'),
 			 ['compiler'])
-arb_shader_texture_lod['execution'] = Group()
+arb_shader_texture_lod['execution'] = {}
 add_shader_test_dir(arb_shader_texture_lod['execution'],
 	            os.path.join(testsDir, 'spec', 'arb_shader_texture_lod', 'execution'),
 		    recursive=True)
@@ -1915,7 +1915,7 @@ arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] =
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = PiglitTest(['tex-miplevel-selection', '-auto', '-GL_ARB_shader_texture_lod'])
 
 # Group ARB_shader_objects
-arb_shader_objects = Group()
+arb_shader_objects = {}
 spec['ARB_shader_objects'] = arb_shader_objects
 arb_shader_objects['getuniform'] = concurrent_test('arb_shader_objects-getuniform')
 arb_shader_objects['bindattriblocation-scratch-name'] = concurrent_test('arb_shader_objects-bindattriblocation-scratch-name')
@@ -1924,19 +1924,19 @@ arb_shader_objects['getuniformlocation-array-of-struct-of-array'] = concurrent_t
 arb_shader_objects['clear-with-deleted'] = concurrent_test('arb_shader_objects-clear-with-deleted')
 arb_shader_objects['delete-repeat'] = concurrent_test('arb_shader_objects-delete-repeat')
 
-arb_shading_language_420pack = Group()
+arb_shading_language_420pack = {}
 spec['ARB_shading_language_420pack'] = arb_shading_language_420pack
 import_glsl_parser_tests(arb_shading_language_420pack,
 			 os.path.join(testsDir, 'spec', 'arb_shading_language_420pack'),
 			 ['compiler'])
-arb_shading_language_420pack['execution'] = Group()
+arb_shading_language_420pack['execution'] = {}
 add_shader_test_dir(arb_shading_language_420pack['execution'],
 	            os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
 		    recursive=True)
 spec['ARB_shading_language_420pack']['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_shading_language_420pack/minimum-maximums.txt')
 
 # Group ARB_explicit_attrib_location
-arb_explicit_attrib_location = Group()
+arb_explicit_attrib_location = {}
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
 import_glsl_parser_tests(arb_explicit_attrib_location,
 			 os.path.join(testsDir,
@@ -1949,7 +1949,7 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-04')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
 
 # Group ARB_explicit_uniform_location
-arb_explicit_uniform_location = Group()
+arb_explicit_uniform_location = {}
 spec['ARB_explicit_uniform_location'] = arb_explicit_uniform_location
 import_glsl_parser_tests(arb_explicit_uniform_location,
                          os.path.join(testsDir, 'spec', 'arb_explicit_uniform_location'),
@@ -1962,7 +1962,7 @@ add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-bou
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-array-elements')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-inactive-uniform')
 
-arb_texture_buffer_object = Group()
+arb_texture_buffer_object = {}
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
 arb_texture_buffer_object['data-sync'] = concurrent_test('arb_texture_buffer_object-data-sync')
 arb_texture_buffer_object['dlist'] = concurrent_test('arb_texture_buffer_object-dlist')
@@ -1980,19 +1980,19 @@ arb_texture_buffer_object['negative-unsupported'] = concurrent_test('arb_texture
 arb_texture_buffer_object['subdata-sync'] = concurrent_test('arb_texture_buffer_object-subdata-sync')
 arb_texture_buffer_object['unused-name'] = concurrent_test('arb_texture_buffer_object-unused-name')
 
-arb_texture_buffer_range = Group()
+arb_texture_buffer_range = {}
 spec['ARB_texture_buffer_range'] = arb_texture_buffer_range
 arb_texture_buffer_range['dlist'] = concurrent_test('arb_texture_buffer_range-dlist')
 arb_texture_buffer_range['errors'] = concurrent_test('arb_texture_buffer_range-errors')
 arb_texture_buffer_range['ranges'] = concurrent_test('arb_texture_buffer_range-ranges')
 
-arb_texture_query_lod = Group()
+arb_texture_query_lod = {}
 spec['ARB_texture_query_lod'] = arb_texture_query_lod
 add_shader_test_dir(arb_texture_query_lod,
                     testsDir + '/spec/arb_texture_query_lod',
                     recursive=True)
 
-arb_texture_rectangle = Group()
+arb_texture_rectangle = {}
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
 add_shader_test_dir(arb_texture_rectangle,
@@ -2006,16 +2006,16 @@ add_plain_test(arb_texture_rectangle, 'texrect_simple_arb_texrect')
 add_plain_test(arb_texture_rectangle, 'arb_texrect-texture-base-level-error')
 add_plain_test(arb_texture_rectangle, 'fbo-blit rect')
 
-arb_texture_storage = Group()
+arb_texture_storage = {}
 spec['ARB_texture_storage'] = arb_texture_storage
 arb_texture_storage['texture-storage'] = plain_test('arb_texture_storage-texture-storage')
 
-arb_texture_storage_multisample = Group()
+arb_texture_storage_multisample = {}
 spec['ARB_texture_storage_multisample'] = arb_texture_storage_multisample
 arb_texture_storage_multisample['tex-storage'] = concurrent_test('arb_texture_storage_multisample-tex-storage')
 arb_texture_storage_multisample['tex-param'] = concurrent_test('arb_texture_storage_multisample-tex-param')
 
-arb_texture_view = Group()
+arb_texture_view = {}
 spec['ARB_texture_view'] = arb_texture_view
 arb_texture_view['immutable_levels'] = concurrent_test('arb_texture_view-texture-immutable-levels')
 arb_texture_view['params'] = concurrent_test('arb_texture_view-params')
@@ -2035,7 +2035,7 @@ arb_texture_view['clear-into-view-2d-array'] = concurrent_test('arb_texture_view
 arb_texture_view['clear-into-view-layered'] = concurrent_test('arb_texture_view-clear-into-view-layered')
 arb_texture_view['copytexsubimage-layers'] = concurrent_test('arb_texture_view-copytexsubimage-layers')
 
-tdfx_texture_compression_fxt1 = Group()
+tdfx_texture_compression_fxt1 = {}
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1
 add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGB_FXT1_3DFX')
 add_concurrent_test(tdfx_texture_compression_fxt1, 'compressedteximage GL_COMPRESSED_RGBA_FXT1_3DFX')
@@ -2046,7 +2046,7 @@ add_plain_test(tdfx_texture_compression_fxt1, 'fxt1-teximage')
 def add_color_buffer_float_test(name, format, p1, p2):
     arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = concurrent_test(' '.join(['arb_color_buffer_float-' + name, format, p1, p2]))
 
-arb_color_buffer_float = Group()
+arb_color_buffer_float = {}
 spec['ARB_color_buffer_float'] = arb_color_buffer_float
 add_color_buffer_float_test('mrt', 'mixed', '', '')
 
@@ -2095,7 +2095,7 @@ add_color_buffer_float_test('render', 'GL_RGBA32F', 'sanity', '')
 add_color_buffer_float_test('render', 'GL_RGBA32F', 'sanity', 'fog')
 
 
-arb_depth_texture = Group()
+arb_depth_texture = {}
 spec['ARB_depth_texture'] = arb_depth_texture
 add_fbo_formats_tests('spec/ARB_depth_texture', 'GL_ARB_depth_texture')
 add_texwrap_format_tests(arb_depth_texture, 'GL_ARB_depth_texture')
@@ -2107,7 +2107,7 @@ add_plain_test(arb_depth_texture, 'depth-tex-modes')
 add_plain_test(arb_depth_texture, 'texdepth')
 add_depthstencil_render_miplevels_tests(arb_depth_texture, ('d=z24', 'd=z16'))
 
-arb_depth_buffer_float = Group()
+arb_depth_buffer_float = {}
 spec['ARB_depth_buffer_float'] = arb_depth_buffer_float
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
@@ -2122,27 +2122,27 @@ add_depthstencil_render_miplevels_tests(
          'ds=z32f_s8'))
 arb_depth_buffer_float['fbo-clear-formats stencil'] = concurrent_test('fbo-clear-formats GL_ARB_depth_buffer_float stencil')
 
-arb_texture_env_crossbar = Group()
+arb_texture_env_crossbar = {}
 spec['ARB_texture_env_crossbar'] = arb_texture_env_crossbar
 add_plain_test(arb_texture_env_crossbar, 'crossbar')
 
-arb_texture_compression = Group()
+arb_texture_compression = {}
 spec['ARB_texture_compression'] = arb_texture_compression
 add_fbo_generatemipmap_extension(arb_texture_compression, 'GL_ARB_texture_compression', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(arb_texture_compression, 'GL_ARB_texture_compression')
 arb_texture_compression['GL_TEXTURE_INTERNAL_FORMAT query'] = concurrent_test('arb_texture_compression-internal-format-query')
 arb_texture_compression['unknown formats'] = concurrent_test('arb_texture_compression-invalid-formats unknown')
 
-arb_texture_compression_bptc = Group()
+arb_texture_compression_bptc = {}
 spec['ARB_texture_compression_bptc'] = arb_texture_compression_bptc
 arb_texture_compression_bptc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats bptc')
 
-ext_vertex_array_bgra = Group()
+ext_vertex_array_bgra = {}
 spec['EXT_vertex_array_bgra'] = ext_vertex_array_bgra
 add_plain_test(ext_vertex_array_bgra, 'bgra-sec-color-pointer')
 add_plain_test(ext_vertex_array_bgra, 'bgra-vert-attrib-pointer')
 
-apple_vertex_array_object = Group()
+apple_vertex_array_object = {}
 spec['APPLE_vertex_array_object'] = apple_vertex_array_object
 add_plain_test(apple_vertex_array_object, 'vao-01')
 add_plain_test(apple_vertex_array_object, 'vao-02')
@@ -2150,12 +2150,12 @@ apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-i
 
 profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PiglitTest('arb_vertex_array_bgra-api-errors -auto')
 
-arb_vertex_array_object = Group()
+arb_vertex_array_object = {}
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
 add_concurrent_test(arb_vertex_array_object, 'vao-element-array-buffer')
 arb_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-isvertexarray')
 
-arb_vertex_buffer_object = Group()
+arb_vertex_buffer_object = {}
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
 arb_vertex_buffer_object['elements-negative-offset'] = PiglitTest(['arb_vertex_buffer_object-elements-negative-offset', '-auto'])
 arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PiglitTest(['arb_vertex_buffer_object-mixed-immediate-and-vbo', '-auto'])
@@ -2174,7 +2174,7 @@ arb_vertex_buffer_object['vbo-subdata-many drawrangeelements'] = concurrent_test
 add_plain_test(arb_vertex_buffer_object, 'vbo-subdata-sync')
 add_plain_test(arb_vertex_buffer_object, 'vbo-subdata-zero')
 
-arb_vertex_program = Group()
+arb_vertex_program = {}
 spec['ARB_vertex_program'] = arb_vertex_program
 arb_vertex_program['getenv4d-with-error'] = PiglitTest(['arb_vertex_program-getenv4d-with-error', '-auto'])
 arb_vertex_program['getlocal4d-with-error'] = PiglitTest(['arb_vertex_program-getlocal4d-with-error', '-auto'])
@@ -2215,7 +2215,7 @@ add_plain_test(arb_vertex_program, 'vp-address-04')
 add_plain_test(arb_vertex_program, 'vp-bad-program')
 add_plain_test(arb_vertex_program, 'vp-max-array')
 
-arb_viewport_array = Group()
+arb_viewport_array = {}
 spec['ARB_viewport_array'] = arb_viewport_array
 arb_viewport_array['viewport-indices'] = concurrent_test('arb_viewport_array-viewport-indices')
 arb_viewport_array['depthrange-indices'] = concurrent_test('arb_viewport_array-depthrange-indices')
@@ -2229,7 +2229,7 @@ arb_viewport_array['render-depthrange'] = concurrent_test('arb_viewport_array-re
 arb_viewport_array['render-scissor'] = concurrent_test('arb_viewport_array-render-scissor')
 arb_viewport_array['clear'] =  concurrent_test('arb_viewport_array-clear')
 
-nv_vertex_program = Group()
+nv_vertex_program = {}
 spec['NV_vertex_program'] = nv_vertex_program
 add_vpfpgeneric(nv_vertex_program, 'nv-mov')
 add_vpfpgeneric(nv_vertex_program, 'nv-add')
@@ -2237,7 +2237,7 @@ add_vpfpgeneric(nv_vertex_program, 'nv-arl')
 add_vpfpgeneric(nv_vertex_program, 'nv-init-zero-reg')
 add_vpfpgeneric(nv_vertex_program, 'nv-init-zero-addr')
 
-nv_vertex_program2_option = Group()
+nv_vertex_program2_option = {}
 spec['NV_vertex_program2_option'] = nv_vertex_program2_option
 add_plain_test(nv_vertex_program2_option, 'vp-address-03')
 add_plain_test(nv_vertex_program2_option, 'vp-address-05')
@@ -2247,7 +2247,7 @@ add_plain_test(nv_vertex_program2_option, 'vp-clipdistance-02')
 add_plain_test(nv_vertex_program2_option, 'vp-clipdistance-03')
 add_plain_test(nv_vertex_program2_option, 'vp-clipdistance-04')
 
-ext_framebuffer_blit = Group()
+ext_framebuffer_blit = {}
 spec['EXT_framebuffer_blit'] = ext_framebuffer_blit
 add_plain_test(ext_framebuffer_blit, 'fbo-blit') # must not be concurrent
 add_plain_test(ext_framebuffer_blit, 'fbo-copypix') # must not be concurrent
@@ -2256,13 +2256,13 @@ add_concurrent_test(ext_framebuffer_blit, 'fbo-srgb-blit')
 add_plain_test(ext_framebuffer_blit, 'fbo-sys-blit') # must not be concurrent
 add_plain_test(ext_framebuffer_blit, 'fbo-sys-sub-blit') # must not be concurrent
 
-ext_framebuffer_multisample_blit_scaled = Group()
+ext_framebuffer_multisample_blit_scaled = {}
 spec['EXT_framebuffer_multisample_blit_scaled'] = ext_framebuffer_multisample_blit_scaled
 ext_framebuffer_multisample_blit_scaled['negative-blit-scaled'] = concurrent_test('ext_framebuffer_multisample_blit_scaled-negative-blit-scaled')
 for num_samples in MSAA_SAMPLE_COUNTS:
     ext_framebuffer_multisample_blit_scaled['blit-scaled samples=' + str(num_samples)] = concurrent_test('ext_framebuffer_multisample_blit_scaled-blit-scaled ' + str(num_samples))
 
-ext_framebuffer_multisample = Group()
+ext_framebuffer_multisample = {}
 spec['EXT_framebuffer_multisample'] = ext_framebuffer_multisample
 ext_framebuffer_multisample['blit-mismatched-samples'] = concurrent_test('ext_framebuffer_multisample-blit-mismatched-samples')
 ext_framebuffer_multisample['blit-mismatched-sizes'] = concurrent_test('ext_framebuffer_multisample-blit-mismatched-sizes')
@@ -2497,7 +2497,7 @@ for num_samples in MSAA_SAMPLE_COUNTS:
                     test_name)
             ext_framebuffer_multisample[test_name] = concurrent_test(executable)
 
-ext_framebuffer_object = Group()
+ext_framebuffer_object = {}
 spec['EXT_framebuffer_object'] = ext_framebuffer_object
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX1')
 add_fbo_stencil_tests(ext_framebuffer_object, 'GL_STENCIL_INDEX4')
@@ -2547,7 +2547,7 @@ add_concurrent_test(ext_framebuffer_object, 'fbo-storage-completeness')
 add_concurrent_test(ext_framebuffer_object, 'fbo-storage-formats')
 add_concurrent_test(ext_framebuffer_object, 'getteximage-formats init-by-rendering')
 
-ext_image_dma_buf_import = Group()
+ext_image_dma_buf_import = {}
 spec['EXT_image_dma_buf_import'] = ext_image_dma_buf_import
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_hints')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_attributes')
@@ -2559,7 +2559,7 @@ add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_unsuppo
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_external_sampler_only')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_external_sampler_with_dma_only')
 
-ext_packed_depth_stencil = Group()
+ext_packed_depth_stencil = {}
 spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
@@ -2577,12 +2577,12 @@ ext_packed_depth_stencil['fbo-clear-formats stencil'] = concurrent_test('fbo-cle
 ext_packed_depth_stencil['DEPTH_STENCIL texture'] = concurrent_test('ext_packed_depth_stencil-depth-stencil-texture')
 ext_packed_depth_stencil['getteximage'] = concurrent_test('ext_packed_depth_stencil-getteximage')
 
-oes_packed_depth_stencil = Group()
+oes_packed_depth_stencil = {}
 spec['OES_packed_depth_stencil'] = oes_packed_depth_stencil
 oes_packed_depth_stencil['DEPTH_STENCIL texture GLES2'] = concurrent_test('oes_packed_depth_stencil-depth-stencil-texture_gles2')
 oes_packed_depth_stencil['DEPTH_STENCIL texture GLES1'] = concurrent_test('oes_packed_depth_stencil-depth-stencil-texture_gles1')
 
-ext_texture_array = Group()
+ext_texture_array = {}
 spec['EXT_texture_array'] = ext_texture_array
 add_concurrent_test(ext_texture_array, 'fbo-generatemipmap-array')
 add_concurrent_test(ext_texture_array, 'fbo-generatemipmap-array RGB9_E5')
@@ -2603,7 +2603,7 @@ for test_mode in ['teximage', 'texsubimage']:
     test_name = 'compressed {0}'.format(test_mode)
     ext_texture_array[test_name] = PiglitTest('ext_texture_array-' + test_name + ' -auto -fbo')
 
-arb_texture_cube_map = Group()
+arb_texture_cube_map = {}
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
 add_msaa_visual_plain_tests(arb_texture_cube_map, 'copyteximage CUBE')
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
@@ -2615,7 +2615,7 @@ arb_texture_cube_map['cubemap-shader lod'] = PiglitTest(['cubemap-shader', '-aut
 arb_texture_cube_map['cubemap-shader bias'] = PiglitTest(['cubemap-shader', '-auto', 'bias'])
 add_concurrent_test(arb_texture_cube_map, 'getteximage-targets CUBE')
 
-arb_texture_cube_map_array = Group()
+arb_texture_cube_map_array = {}
 spec['ARB_texture_cube_map_array'] = arb_texture_cube_map_array
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-get')
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-teximage3d-invalid-values')
@@ -2638,19 +2638,19 @@ for stage in ['vs', 'gs', 'fs']:
     for sampler in textureSize_samplers_atcma:
         spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = concurrent_test('textureSize ' + stage + ' ' + sampler)
 
-ext_texture_swizzle = Group()
+ext_texture_swizzle = {}
 spec['EXT_texture_swizzle'] = ext_texture_swizzle
 add_plain_test(ext_texture_swizzle, 'tex-swizzle')
 ext_texture_swizzle['depth_texture_mode_and_swizzle'] = concurrent_test('depth_texture_mode_and_swizzle')
 
-ext_texture_compression_latc = Group()
+ext_texture_compression_latc = {}
 spec['EXT_texture_compression_latc'] = ext_texture_compression_latc
 add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc-signed', 'fbo-generatemipmap-formats-signed')
 add_texwrap_format_tests(ext_texture_compression_latc, 'GL_EXT_texture_compression_latc')
 ext_texture_compression_latc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats latc')
 
-ext_texture_compression_rgtc = Group()
+ext_texture_compression_rgtc = {}
 spec['EXT_texture_compression_rgtc'] = ext_texture_compression_rgtc
 add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_RED_RGTC1_EXT')
 add_concurrent_test(ext_texture_compression_rgtc, 'compressedteximage GL_COMPRESSED_RED_GREEN_RGTC2_EXT')
@@ -2663,7 +2663,7 @@ ext_texture_compression_rgtc['invalid formats'] = concurrent_test('arb_texture_c
 add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-01')
 add_plain_test(ext_texture_compression_rgtc, 'rgtc-teximage-02')
 
-ext_texture_compression_s3tc = Group()
+ext_texture_compression_s3tc = {}
 spec['EXT_texture_compression_s3tc'] = ext_texture_compression_s3tc
 add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGB_S3TC_DXT1_EXT')
 add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_RGBA_S3TC_DXT1_EXT')
@@ -2681,13 +2681,13 @@ add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC 2D_A
 add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC CUBE')
 add_concurrent_test(ext_texture_compression_s3tc, 'getteximage-targets S3TC CUBE_ARRAY')
 
-ati_texture_compression_3dc = Group()
+ati_texture_compression_3dc = {}
 spec['ATI_texture_compression_3dc'] = ati_texture_compression_3dc
 add_fbo_generatemipmap_extension(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(ati_texture_compression_3dc, 'GL_ATI_texture_compression_3dc')
 ati_texture_compression_3dc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats 3dc')
 
-ext_packed_float = Group()
+ext_packed_float = {}
 spec['EXT_packed_float'] = ext_packed_float
 add_fbo_formats_tests('spec/EXT_packed_float', 'GL_EXT_packed_float')
 add_texwrap_format_tests(ext_packed_float, 'GL_EXT_packed_float')
@@ -2695,14 +2695,14 @@ ext_packed_float['pack'] = concurrent_test('ext_packed_float-pack')
 ext_packed_float['getteximage-invalid-format-for-packed-type'] = concurrent_test('getteximage-invalid-format-for-packed-type')
 add_msaa_formats_tests(ext_packed_float, 'GL_EXT_packed_float')
 
-arb_texture_float = Group()
+arb_texture_float = {}
 spec['ARB_texture_float'] = arb_texture_float
 add_fbo_formats_tests('spec/ARB_texture_float', 'GL_ARB_texture_float')
 add_texwrap_format_tests(arb_texture_float, 'GL_ARB_texture_float')
 add_plain_test(arb_texture_float, 'arb_texture_float-texture-float-formats')
 add_msaa_formats_tests(arb_texture_float, 'GL_ARB_texture_float')
 
-ext_texture_integer = Group()
+ext_texture_integer = {}
 spec['EXT_texture_integer'] = ext_texture_integer
 # unsupported for int yet
 #add_fbo_clear_extension(ext_texture_integer, 'GL_EXT_texture_integer', 'fbo-clear-formats')
@@ -2720,7 +2720,7 @@ add_msaa_formats_tests(ext_texture_integer, 'GL_EXT_texture_integer')
 add_texwrap_format_tests(ext_texture_integer, 'GL_EXT_texture_integer')
 add_plain_test(ext_texture_integer, 'fbo-integer')
 
-arb_texture_rg = Group()
+arb_texture_rg = {}
 spec['ARB_texture_rg'] = arb_texture_rg
 add_shader_test_dir(arb_texture_rg,
                     testsDir + '/spec/arb_texture_rg/execution',
@@ -2747,23 +2747,23 @@ add_plain_test(arb_texture_rg, 'rg-teximage-01')
 add_plain_test(arb_texture_rg, 'rg-teximage-02')
 add_plain_test(arb_texture_rg, 'texture-rg')
 
-arb_texture_rgb10_a2ui = Group()
+arb_texture_rgb10_a2ui = {}
 spec['ARB_texture_rgb10_a2ui'] = arb_texture_rgb10_a2ui
 arb_texture_rgb10_a2ui['fbo-blending'] = concurrent_test('ext_texture_integer-fbo-blending GL_ARB_texture_rgb10_a2ui')
 add_texwrap_format_tests(arb_texture_rgb10_a2ui, 'GL_ARB_texture_rgb10_a2ui')
 
-ext_texture_shared_exponent = Group()
+ext_texture_shared_exponent = {}
 spec['EXT_texture_shared_exponent'] = ext_texture_shared_exponent
 ext_texture_shared_exponent['fbo-generatemipmap-formats'] = concurrent_test('fbo-generatemipmap-formats GL_EXT_texture_shared_exponent')
 add_texwrap_format_tests(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exponent')
 
-ext_texture_snorm = Group()
+ext_texture_snorm = {}
 spec['EXT_texture_snorm'] = ext_texture_snorm
 add_fbo_formats_tests('spec/EXT_texture_snorm', 'GL_EXT_texture_snorm')
 add_msaa_formats_tests(ext_texture_snorm, 'GL_EXT_texture_snorm')
 add_texwrap_format_tests(ext_texture_snorm, 'GL_EXT_texture_snorm')
 
-ext_texture_srgb = Group()
+ext_texture_srgb = {}
 spec['EXT_texture_sRGB'] = ext_texture_srgb
 add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_S3TC_DXT1_EXT')
 add_concurrent_test(ext_texture_compression_s3tc, 'compressedteximage GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT')
@@ -2781,18 +2781,18 @@ add_texwrap_format_tests(ext_texture_srgb, 'GL_EXT_texture_sRGB-s3tc', '-s3tc')
 add_plain_test(ext_texture_srgb, 'fbo-srgb')
 add_plain_test(ext_texture_srgb, 'tex-srgb')
 
-ext_timer_query = Group()
+ext_timer_query = {}
 spec['EXT_timer_query'] = ext_timer_query
 ext_timer_query['time-elapsed'] = concurrent_test('ext_timer_query-time-elapsed')
 add_plain_test(ext_timer_query, 'timer_query')
 
-arb_timer_query = Group()
+arb_timer_query = {}
 spec['ARB_timer_query'] = arb_timer_query
 arb_timer_query['query GL_TIMESTAMP'] = concurrent_test('ext_timer_query-time-elapsed timestamp')
 arb_timer_query['query-lifetime'] = concurrent_test('ext_timer_query-lifetime')
 arb_timer_query['timestamp-get'] = concurrent_test('arb_timer_query-timestamp-get')
 
-ext_transform_feedback = Group()
+ext_transform_feedback = {}
 spec['EXT_transform_feedback'] = ext_transform_feedback
 for mode in ['interleaved_ok_base', 'interleaved_ok_range',
              'interleaved_ok_offset', 'interleaved_unbound',
@@ -2938,7 +2938,7 @@ for api_suffix, possible_options in [('', [[], ['interface']]),
 ext_transform_feedback['geometry-shaders-basic'] = concurrent_test(
         'ext_transform_feedback-geometry-shaders-basic')
 
-arb_transform_feedback2 = Group()
+arb_transform_feedback2 = {}
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
 arb_transform_feedback2['Change objects while paused'] = PiglitTest(['arb_transform_feedback2-change-objects-while-paused', '-auto'])
 arb_transform_feedback2['Change objects while paused (GLES3)'] = PiglitTest(['arb_transform_feedback2-change-objects-while-paused_gles3', '-auto'])
@@ -2949,11 +2949,11 @@ arb_transform_feedback2['cannot bind when another object is active'] = concurren
 arb_transform_feedback2['misc. API queries'] = concurrent_test('arb_transform_feedback2-api-queries')
 arb_transform_feedback2['counting with pause'] = concurrent_test('arb_transform_feedback2-pause-counting')
 
-arb_transform_feedback_instanced = Group()
+arb_transform_feedback_instanced = {}
 spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
 arb_transform_feedback_instanced['draw-auto instanced'] = PiglitTest(['arb_transform_feedback2-draw-auto', '-auto', 'instanced'])
 
-arb_transform_feedback3 = Group()
+arb_transform_feedback3 = {}
 spec['ARB_transform_feedback3'] = arb_transform_feedback3
 
 for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
@@ -2975,7 +2975,7 @@ arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_vs'] =
 arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs'] = PiglitTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs'])
 arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs_max'] = PiglitTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs_max'])
 
-arb_uniform_buffer_object = Group()
+arb_uniform_buffer_object = {}
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
 import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
 			 os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
@@ -3017,29 +3017,29 @@ arb_uniform_buffer_object['referenced-by-shader'] = concurrent_test('arb_uniform
 arb_uniform_buffer_object['row-major'] = concurrent_test('arb_uniform_buffer_object-row-major')
 arb_uniform_buffer_object['uniformblockbinding'] = concurrent_test('arb_uniform_buffer_object-uniformblockbinding')
 
-ati_draw_buffers = Group()
+ati_draw_buffers = {}
 spec['ATI_draw_buffers'] = ati_draw_buffers
 add_plain_test(ati_draw_buffers, 'ati_draw_buffers-arbfp')
 ati_draw_buffers['arbfp-no-index'] = PiglitTest(['ati_draw_buffers-arbfp-no-index', '-auto'])
 ati_draw_buffers['arbfp-no-option'] = PiglitTest(['ati_draw_buffers-arbfp-no-option', '-auto'])
 
-ati_envmap_bumpmap = Group()
+ati_envmap_bumpmap = {}
 spec['ATI_envmap_bumpmap'] = ati_envmap_bumpmap
 add_plain_test(ati_envmap_bumpmap, 'ati_envmap_bumpmap-bump')
 
-arb_instanced_arrays = Group()
+arb_instanced_arrays = {}
 spec['ARB_instanced_arrays'] = arb_instanced_arrays
 add_plain_test(arb_instanced_arrays, 'vertex-attrib-divisor-index-error')
 add_plain_test(arb_instanced_arrays, 'instanced_arrays')
 add_single_param_test_set(arb_instanced_arrays, 'instanced_arrays', 'vbo')
 
-arb_internalformat_query = Group()
+arb_internalformat_query = {}
 spec['ARB_internalformat_query'] = arb_internalformat_query
 arb_internalformat_query['misc. API error checks'] = concurrent_test('arb_internalformat_query-api-errors')
 arb_internalformat_query['buffer over-run checks'] = concurrent_test('arb_internalformat_query-overrun')
 arb_internalformat_query['minmax'] = concurrent_test('arb_internalformat_query-minmax')
 
-arb_map_buffer_range = Group()
+arb_map_buffer_range = {}
 spec['ARB_map_buffer_range'] = arb_map_buffer_range
 add_plain_test(arb_map_buffer_range, 'map_buffer_range_error_check')
 add_plain_test(arb_map_buffer_range, 'map_buffer_range_test')
@@ -3053,41 +3053,41 @@ arb_map_buffer_range['CopyBufferSubData offset=0'] = concurrent_test('map_buffer
 arb_map_buffer_range['CopyBufferSubData increment-offset'] = concurrent_test('map_buffer_range-invalidate CopyBufferSubData increment-offset')
 arb_map_buffer_range['CopyBufferSubData decrement-offset'] = concurrent_test('map_buffer_range-invalidate CopyBufferSubData decrement-offset')
 
-arb_multisample = Group()
+arb_multisample = {}
 spec['ARB_multisample'] = arb_multisample
 arb_multisample['beginend'] = concurrent_test('arb_multisample-beginend')
 arb_multisample['pushpop'] = concurrent_test('arb_multisample-pushpop')
 
-arb_seamless_cube_map = Group()
+arb_seamless_cube_map = {}
 spec['ARB_seamless_cube_map'] = arb_seamless_cube_map
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap')
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap-initially-disabled')
 add_plain_test(arb_seamless_cube_map, 'arb_seamless_cubemap-three-faces-average')
 
-amd_seamless_cubemap_per_texture = Group()
+amd_seamless_cubemap_per_texture = {}
 spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture
 add_plain_test(amd_seamless_cubemap_per_texture, 'amd_seamless_cubemap_per_texture')
 
-amd_vertex_shader_layer = Group()
+amd_vertex_shader_layer = {}
 spec['AMD_vertex_shader_layer'] = amd_vertex_shader_layer
 add_plain_test(amd_vertex_shader_layer, 'amd_vertex_shader_layer-layered-2d-texture-render')
 add_plain_test(amd_vertex_shader_layer, 'amd_vertex_shader_layer-layered-depth-texture-render')
 
-ext_fog_coord = Group()
+ext_fog_coord = {}
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 
-ext_shader_integer_mix = Group()
+ext_shader_integer_mix = {}
 spec['EXT_shader_integer_mix'] = ext_shader_integer_mix
 add_shader_test_dir(spec['EXT_shader_integer_mix'],
 	            os.path.join(testsDir, 'spec', 'ext_shader_integer_mix'),
 		    recursive=True)
 
-nv_texture_barrier = Group()
+nv_texture_barrier = {}
 spec['NV_texture_barrier'] = nv_texture_barrier
 add_plain_test(nv_texture_barrier, 'blending-in-shader')
 
-nv_conditional_render = Group()
+nv_conditional_render = {}
 spec['NV_conditional_render'] = nv_conditional_render
 nv_conditional_render['begin-while-active'] = concurrent_test('nv_conditional_render-begin-while-active')
 nv_conditional_render['begin-zero'] = concurrent_test('nv_conditional_render-begin-zero')
@@ -3102,24 +3102,24 @@ nv_conditional_render['drawpixels'] = PiglitTest(['nv_conditional_render-drawpix
 nv_conditional_render['generatemipmap'] = PiglitTest(['nv_conditional_render-generatemipmap', '-auto'])
 nv_conditional_render['vertex_array'] = PiglitTest(['nv_conditional_render-vertex_array', '-auto'])
 
-oes_compressed_paletted_texture = Group()
+oes_compressed_paletted_texture = {}
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
 oes_compressed_paletted_texture['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats paletted')
 
-oes_matrix_get = Group()
+oes_matrix_get = {}
 spec['OES_matrix_get'] = oes_matrix_get
 oes_matrix_get['All queries'] = concurrent_test('oes_matrix_get-api')
 
-oes_fixed_point = Group()
+oes_fixed_point = {}
 spec['OES_fixed_point'] = oes_fixed_point
 oes_fixed_point['attribute-arrays'] = concurrent_test('oes_fixed_point-attribute-arrays')
 
-spec['OES_standard_derivatives'] = Group()
+spec['OES_standard_derivatives'] = {}
 import_glsl_parser_tests(spec['OES_standard_derivatives'],
 			 os.path.join(testsDir, 'spec', 'oes_standard_derivatives'),
 			 ['compiler'])
 
-arb_clear_buffer_object = Group()
+arb_clear_buffer_object = {}
 spec['ARB_clear_buffer_object'] = arb_clear_buffer_object
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-formats')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-invalid-internal-format')
@@ -3133,11 +3133,11 @@ add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-overla
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-sub-simple')
 add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-zero-size')
 
-arb_clear_texture = Group()
+arb_clear_texture = {}
 spec['ARB_clear_texture'] = arb_clear_texture
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-simple')
 
-arb_copy_buffer = Group()
+arb_copy_buffer = {}
 spec['ARB_copy_buffer'] = arb_copy_buffer
 add_plain_test(arb_copy_buffer, 'copy_buffer_coherency')
 add_plain_test(arb_copy_buffer, 'copybuffersubdata')
@@ -3151,37 +3151,37 @@ arb_copy_buffer['overlap'] = concurrent_test('arb_copy_buffer-overlap')
 arb_copy_buffer['targets'] = concurrent_test('arb_copy_buffer-targets')
 arb_copy_buffer['subdata-sync'] = concurrent_test('arb_copy_buffer-subdata-sync')
 
-arb_half_float_vertex = Group()
+arb_half_float_vertex = {}
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
 add_plain_test(arb_half_float_vertex, 'draw-vertices-half-float')
 arb_half_float_vertex['draw-vertices-half-float-user'] = PiglitTest(['draw-vertices-half-float', '-auto', 'user'])
 
-arb_vertex_type_2_10_10_10_rev = Group()
+arb_vertex_type_2_10_10_10_rev = {}
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev
 add_plain_test(arb_vertex_type_2_10_10_10_rev, 'draw-vertices-2101010')
 arb_vertex_type_2_10_10_10_rev['attribs'] = concurrent_test('attribs GL_ARB_vertex_type_2_10_10_10_rev')
 
-arb_vertex_type_10f_11f_11f_rev = Group()
+arb_vertex_type_10f_11f_11f_rev = {}
 spec['ARB_vertex_type_10f_11f_11f_rev'] = arb_vertex_type_10f_11f_11f_rev
 add_plain_test(arb_vertex_type_10f_11f_11f_rev, 'arb_vertex_type_10f_11f_11f_rev-api-errors')
 add_concurrent_test(arb_vertex_type_10f_11f_11f_rev, 'arb_vertex_type_10f_11f_11f_rev-draw-vertices')
 
-arb_draw_buffers = Group()
+arb_draw_buffers = {}
 spec['ARB_draw_buffers'] = arb_draw_buffers
 add_plain_test(arb_draw_buffers, 'arb_draw_buffers-state_change')
 add_plain_test(arb_draw_buffers, 'fbo-mrt-alphatest')
 
-ext_draw_buffers2 = Group()
+ext_draw_buffers2 = {}
 spec['EXT_draw_buffers2'] = ext_draw_buffers2
 add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-blend')
 add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-colormask')
 add_plain_test(ext_draw_buffers2, 'fbo-drawbuffers2-colormask clear')
 
-arb_draw_buffers_blend = Group()
+arb_draw_buffers_blend = {}
 spec['ARB_draw_buffers_blend'] = arb_draw_buffers_blend
 add_plain_test(arb_draw_buffers_blend, 'fbo-draw-buffers-blend')
 
-arb_blend_func_extended = Group()
+arb_blend_func_extended = {}
 spec['ARB_blend_func_extended'] = arb_blend_func_extended
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-bindfragdataindexed-invalid-parameters')
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-blend-api')
@@ -3190,11 +3190,11 @@ add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-getfragdatainde
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend')
 add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-blend-explicit')
 
-arb_base_instance = Group()
+arb_base_instance = {}
 spec['ARB_base_instance'] = arb_base_instance
 add_plain_test(arb_base_instance, 'arb_base_instance-baseinstance-doesnt-affect-gl-instance-id')
 
-arb_buffer_storage = Group()
+arb_buffer_storage = {}
 spec['ARB_buffer_storage'] = arb_buffer_storage
 add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw')
 add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent draw coherent')
@@ -3205,17 +3205,17 @@ add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read coherent'
 add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read client-storage')
 add_concurrent_test(arb_buffer_storage, 'bufferstorage-persistent read coherent client-storage')
 
-apple_object_purgeable = Group()
+apple_object_purgeable = {}
 spec['APPLE_object_purgeable'] = apple_object_purgeable
 add_plain_test(apple_object_purgeable, 'object_purgeable-api-pbo')
 add_plain_test(apple_object_purgeable, 'object_purgeable-api-texture')
 add_plain_test(apple_object_purgeable, 'object_purgeable-api-vbo')
 
-oes_read_format = Group()
+oes_read_format = {}
 spec['OES_read_format'] = oes_read_format
 add_plain_test(oes_read_format, 'oes-read-format')
 
-nv_primitive_restart = Group()
+nv_primitive_restart = {}
 spec['NV_primitive_restart'] = nv_primitive_restart
 add_single_param_test_set(
     nv_primitive_restart,
@@ -3229,25 +3229,25 @@ add_single_param_test_set(
         'points', 'lines', 'line_loop', 'line_strip', 'triangles',
         'triangle_strip', 'triangle_fan', 'quads', 'quad_strip', 'polygon')
 
-ext_provoking_vertex = Group()
+ext_provoking_vertex = {}
 spec['EXT_provoking_vertex'] = ext_provoking_vertex
 add_plain_test(ext_provoking_vertex, 'provoking-vertex')
 
-ext_texture_lod_bias = Group()
+ext_texture_lod_bias = {}
 spec['EXT_texture_lod_bias'] = ext_texture_lod_bias
 add_plain_test(ext_texture_lod_bias, 'lodbias')
 
-sgis_generate_mipmap = Group()
+sgis_generate_mipmap = {}
 spec['SGIS_generate_mipmap'] = sgis_generate_mipmap
 add_plain_test(sgis_generate_mipmap, 'gen-nonzero-unit')
 add_plain_test(sgis_generate_mipmap, 'gen-teximage')
 add_plain_test(sgis_generate_mipmap, 'gen-texsubimage')
 
-arb_map_buffer_alignment = Group()
+arb_map_buffer_alignment = {}
 spec['ARB_map_buffer_alignment'] = arb_map_buffer_alignment
 add_plain_test(arb_map_buffer_alignment, 'arb_map_buffer_alignment-sanity_test')
 
-arb_geometry_shader4 = Group()
+arb_geometry_shader4 = {}
 for draw in ['', 'indexed']:
     for prim in ['GL_LINES_ADJACENCY', 'GL_LINE_STRIP_ADJACENCY', 'GL_TRIANGLES_ADJACENCY', 'GL_TRIANGLE_STRIP_ADJACENCY']:
         add_concurrent_test(arb_geometry_shader4, 'arb_geometry_shader4-ignore-adjacent-vertices {0} {1}'.format(draw, prim))
@@ -3265,7 +3265,7 @@ import_glsl_parser_tests(spec['ARB_geometry_shader4'],
                          os.path.join(testsDir, 'spec', 'arb_geometry_shader4'),
                          ['compiler'])
 
-arb_compute_shader = Group()
+arb_compute_shader = {}
 spec['ARB_compute_shader'] = arb_compute_shader
 arb_compute_shader['api_errors'] = concurrent_test('arb_compute_shader-api_errors')
 arb_compute_shader['minmax'] = concurrent_test('arb_compute_shader-minmax')
@@ -3279,7 +3279,7 @@ import_glsl_parser_tests(spec['ARB_compute_shader'],
                          ['compiler'])
 
 # group glslparsertest ------------------------------------------------------
-glslparsertest = Group()
+glslparsertest = {}
 # Add all shader source files in the directories below.
 for filename in os.listdir(testsDir + '/glslparsertest/shaders'):
     ext = filename.rsplit('.')[-1]
@@ -3291,7 +3291,7 @@ for filename in os.listdir(testsDir + '/glslparsertest/glsl2'):
         add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
 # end group glslparsertest ---------------------------------------------------
 
-hiz = Group()
+hiz = {}
 add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d0-s8')
 add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24-s0')
 add_plain_test(hiz, 'hiz-depth-stencil-test-fbo-d24-s8')
@@ -3317,7 +3317,7 @@ add_plain_test(hiz, 'hiz-stencil-test-fbo-d24s8')
 add_plain_test(hiz, 'hiz-stencil-test-window-depth0')
 add_plain_test(hiz, 'hiz-stencil-test-window-depth1')
 
-fast_color_clear = Group()
+fast_color_clear = {}
 add_shader_test_dir(fast_color_clear, testsDir + '/fast_color_clear',
                     recursive=True)
 for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
@@ -3330,7 +3330,7 @@ for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
 add_concurrent_test(fast_color_clear, 'fcc-blit-between-clears')
 add_plain_test(fast_color_clear, 'fcc-read-to-pbo-after-clear')
 
-asmparsertest = Group()
+asmparsertest = {}
 def add_asmparsertest(group, shader):
     asmparsertest[group + '/' + shader] = concurrent_test(
         'asmparsertest ' + group + ' ' + testsDir + '/asmparsertest/shaders/' + group + '/' + shader)
@@ -3768,24 +3768,24 @@ add_asmparsertest('ARBvp1.0', 'txq-19.txt')
 add_asmparsertest('ARBvp1.0', 'txq-20.txt')
 add_asmparsertest('ARBvp1.0', 'xpd.txt')
 
-ext_unpack_subimage = Group()
+ext_unpack_subimage = {}
 spec['EXT_unpack_subimage'] = ext_unpack_subimage
 ext_unpack_subimage['basic'] = concurrent_test('ext_unpack_subimage')
 
-oes_draw_texture = Group()
+oes_draw_texture = {}
 spec['OES_draw_texture'] = oes_draw_texture
 oes_draw_texture['oes_draw_texture'] = concurrent_test('oes_draw_texture')
 
-oes_compressed_etc1_rgb8_texture = Group()
+oes_compressed_etc1_rgb8_texture = {}
 spec['OES_compressed_ETC1_RGB8_texture'] = oes_compressed_etc1_rgb8_texture
 oes_compressed_etc1_rgb8_texture['basic'] = concurrent_test('oes_compressed_etc1_rgb8_texture-basic')
 oes_compressed_etc1_rgb8_texture['miptree'] = concurrent_test('oes_compressed_etc1_rgb8_texture-miptree')
 
-oes_compressed_paletted_texture = Group()
+oes_compressed_paletted_texture = {}
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
 oes_compressed_paletted_texture['basic API'] = concurrent_test('oes_compressed_paletted_texture-api')
 
-egl14 = Group()
+egl14 = {}
 spec['EGL 1.4'] = egl14
 egl14['eglCreateSurface'] = plain_test('egl-create-surface')
 egl14['eglQuerySurface EGL_BAD_ATTRIBUTE'] = plain_test('egl-query-surface --bad-attr')
@@ -3794,15 +3794,15 @@ egl14['eglQuerySurface EGL_HEIGHT'] = plain_test('egl-query-surface --attr=EGL_H
 egl14['eglQuerySurface EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WIDTH')
 egl14['eglTerminate then unbind context'] = plain_test('egl-terminate-then-unbind-context')
 
-egl_nok_swap_region = Group()
+egl_nok_swap_region = {}
 spec['EGL_NOK_swap_region'] = egl_nok_swap_region
 egl_nok_swap_region['basic']  = plain_test('egl-nok-swap-region')
 
-egl_nok_texture_from_pixmap = Group()
+egl_nok_texture_from_pixmap = {}
 spec['EGL_NOK_texture_from_pixmap'] = egl_nok_texture_from_pixmap
 egl_nok_texture_from_pixmap['basic'] = plain_test('egl-nok-texture-from-pixmap')
 
-egl_khr_create_context = Group();
+egl_khr_create_context = {};
 spec['EGL_KHR_create_context'] = egl_khr_create_context
 egl_khr_create_context['default major version GLES'] = plain_test('egl-create-context-default-major-version-gles')
 egl_khr_create_context['default major version GL'] = plain_test('egl-create-context-default-major-version-gl')
@@ -3826,12 +3826,12 @@ egl_khr_create_context['valid debug flag GL'] = plain_test('egl-create-context-v
 for api in ('gles1', 'gles2', 'gles3'):
     egl_khr_create_context['valid debug flag ' + api] = plain_test('egl-create-context-valid-flag-debug-gles ' + api)
 
-egl_ext_client_extensions = Group()
+egl_ext_client_extensions = {}
 spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
 for i in [1, 2, 3]:
     egl_ext_client_extensions['conformance test {0}'.format(i)] = concurrent_test('egl_ext_client_extensions {0}'.format(i))
 
-gles20 = Group()
+gles20 = {}
 spec['!OpenGL ES 2.0'] = gles20
 gles20['glsl-fs-pointcoord'] = concurrent_test('glsl-fs-pointcoord_gles2')
 add_concurrent_test(gles20, 'invalid-es3-queries_gles2')
@@ -3840,7 +3840,7 @@ add_concurrent_test(gles20, 'minmax_gles2')
 add_concurrent_test(gles20, 'multiple-shader-objects_gles2')
 add_concurrent_test(gles20, 'fbo_discard_gles2')
 
-gles30 = Group()
+gles30 = {}
 spec['!OpenGL ES 3.0'] = gles30
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
     test_name = ' ' .join(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
@@ -3852,7 +3852,7 @@ for test_mode in ['teximage', 'texsubimage']:
     gles30[test_name] = PiglitTest(test_name + ' -auto -fbo')
 gles30['texture-immutable-levels'] = concurrent_test('texture-immutable-levels_gles3')
 
-arb_es3_compatibility = Group()
+arb_es3_compatibility = {}
 spec['ARB_ES3_compatibility'] = arb_es3_compatibility
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
     for context in ('core', 'compat'):
@@ -3864,7 +3864,7 @@ add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
 		    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
-arb_shader_atomic_counters = Group()
+arb_shader_atomic_counters = {}
 spec['ARB_shader_atomic_counters'] = arb_shader_atomic_counters
 import_glsl_parser_tests(spec['ARB_shader_atomic_counters'],
 			 os.path.join(testsDir, 'spec', 'arb_shader_atomic_counters'),

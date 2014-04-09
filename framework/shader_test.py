@@ -27,7 +27,6 @@ import os
 import os.path as path
 import re
 
-from .core import Group
 from .exectest import PiglitTest, TEST_BIN_DIR
 
 __all__ = ['add_shader_test', 'add_shader_test_dir']
@@ -112,7 +111,7 @@ def add_shader_test_dir(group, dirpath, recursive=False):
             if not recursive:
                 continue
             if not filename in group:
-                group[filename] = Group()
+                group[filename] = {}
             add_shader_test_dir(group[filename], filepath, recursive)
         else:
             ext = filename.rsplit('.')[-1]
