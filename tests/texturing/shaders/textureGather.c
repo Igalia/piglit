@@ -9,9 +9,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define TEXTURE_WIDTH 32
-#define TEXTURE_HEIGHT 32
-
 enum { NOSTAGE, VS, FS } stage = NOSTAGE;
 enum { NONE = -1, RED, GREEN, BLUE, ALPHA, ZERO, ONE } swizzle = NONE;
 enum { UNORM_T, FLOAT_T, INT_T, UINT_T, SHADOW_T, NUM_COMPTYPES } comptype = UNORM_T;
@@ -21,6 +18,12 @@ bool use_nonconst = false;
 bool use_offsets = false;
 int components = 0;
 int comp_select = -1;
+
+int min_offset = 0;
+int max_offset = 0;
+
+int texture_width = 32;
+int texture_height = 32;
 
 GLenum internalformat_for_components[][4] = {
 	{ GL_R16, GL_RG16, GL_RGB16, GL_RGBA16, },
@@ -50,7 +53,7 @@ piglit_display(void)
 	int i, j;
 	bool pass = true;
 
-	glViewport(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+	glViewport(0, 0, texture_width, texture_height);
 	glClearColor(0.4, 0.4, 0.4, 0.4);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -66,11 +69,11 @@ piglit_display(void)
 	if (stage == FS)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	else
-		glDrawArrays(GL_POINTS, 0, TEXTURE_WIDTH * TEXTURE_HEIGHT);
+		glDrawArrays(GL_POINTS, 0, texture_width * texture_height);
 
-	for (j = 1; j < TEXTURE_HEIGHT - 1; j++)
-		for (i = 1; i < TEXTURE_WIDTH - 1; i++) {
-			float *pe = &expected[4 * (j * TEXTURE_WIDTH + i)];
+	for (j = 1; j < texture_height - 1; j++)
+		for (i = 1; i < texture_width - 1; i++) {
+			float *pe = &expected[4 * (j * texture_width + i)];
 			pass = piglit_probe_pixel_rgba(i, j, pe) && pass;
 		}
 
@@ -94,17 +97,17 @@ pixel_value(int i, int j, int offset_sel)
 
 	if (use_offset) {
 		/* apply texel offset */
-		i += -8;
-		j += 7;
+		i += min_offset;
+		j += max_offset;
 	} else if (use_offsets) {
 		switch (offset_sel) {
 		case 0:
-			i += -8;
-			j += 7;
+			i += min_offset;
+			j += max_offset;
 			break;
 		case 1:
-			i += 7;
-			j += -8;
+			i += max_offset;
+			j += min_offset;
 			break;
 		case 2:
 			i += 3;
@@ -119,19 +122,19 @@ pixel_value(int i, int j, int offset_sel)
 
 	if (address_mode == GL_REPEAT) {
 		/* WRAP at border */
-		i += TEXTURE_WIDTH;
-		j += TEXTURE_HEIGHT;
-		i %= TEXTURE_WIDTH;
-		j %= TEXTURE_HEIGHT;
+		i += texture_width;
+		j += texture_height;
+		i %= texture_width;
+		j %= texture_height;
 	}
 	else if (address_mode == GL_CLAMP_TO_EDGE) {
 		if (i < 0) i = 0;
 		if (j < 0) j = 0;
-		if (i > TEXTURE_WIDTH - 1) i = TEXTURE_WIDTH - 1;
-		if (j > TEXTURE_HEIGHT - 1) j = TEXTURE_HEIGHT - 1;
+		if (i > texture_width - 1) i = texture_width - 1;
+		if (j > texture_height - 1) j = texture_height - 1;
 	}
 
-	return i + j * TEXTURE_WIDTH;
+	return i + j * texture_width;
 }
 
 static float
@@ -146,10 +149,10 @@ make_image(int num_channels, int use_channel)
 	unsigned char *pp = pixels;
 	int i, j, ch;
 
-	for (j = 0; j < TEXTURE_HEIGHT; j++)
-		for (i = 0; i < TEXTURE_WIDTH; i++)
+	for (j = 0; j < texture_height; j++)
+		for (i = 0; i < texture_width; i++)
 			for (ch = 0; ch < num_channels; ch++)
-				*pp++ = (ch == use_channel) ? (i+j*TEXTURE_WIDTH) : 128;
+				*pp++ = (ch == use_channel) ? (i+j*texture_width) : 128;
 }
 
 static float shadow_compare(float x)
@@ -163,8 +166,8 @@ make_expected(void)
 	float *pe = expected;
 	int i, j;
 
-	for (j = 0; j < TEXTURE_HEIGHT; j++)
-		for (i = 0; i < TEXTURE_WIDTH; i++) {
+	for (j = 0; j < texture_height; j++)
+		for (i = 0; i < texture_width; i++) {
 			if (comptype == SHADOW_T) {
 				if (use_offsets) {
 					*pe++ = shadow_compare(norm_value(pixel_value(i, j, 0)));
@@ -198,12 +201,12 @@ static void
 upload_verts(void)
 {
 	if (stage == VS) {
-		float v[4 * TEXTURE_WIDTH * TEXTURE_HEIGHT], *pv = v;
+		float v[4 * texture_width * texture_height], *pv = v;
 		int i, j;
-		for (j = 0; j < TEXTURE_HEIGHT; j++)
-			for (i = 0; i < TEXTURE_WIDTH; i++) {
-				*pv++ = (i + 0.5f) * 2 / TEXTURE_WIDTH - 1;
-				*pv++ = (j + 0.5f) * 2 / TEXTURE_HEIGHT - 1;
+		for (j = 0; j < texture_height; j++)
+			for (i = 0; i < texture_width; i++) {
+				*pv++ = (i + 0.5f) * 2 / texture_width - 1;
+				*pv++ = (j + 0.5f) * 2 / texture_height - 1;
 				*pv++ = 0;
 				*pv++ = 1;
 			}
@@ -237,6 +240,16 @@ do_requires(void)
 		       components, max_components);
 		piglit_report_result(PIGLIT_SKIP);
 	}
+
+        /* get the offset limits */
+        glGetIntegerv(GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_ARB, &min_offset);
+        glGetIntegerv(GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_ARB, &max_offset);
+
+        /* increase width/height if necessary */
+        if (use_offset || use_offsets) {
+           texture_width = MAX2(texture_width, (max_offset + 1) * 2);
+           texture_height = MAX2(texture_height, (max_offset + 1) * 2);
+        }
 
 	/* if we are trying to swizzle, check that we can! */
 	if (swizzle != -1)
@@ -280,7 +293,7 @@ upload_2d(GLenum target, void *pixels)
 {
 	glTexImage2D(target, 0,
 		     internalformat_for_components[comptype][components - 1],
-		     TEXTURE_WIDTH, TEXTURE_HEIGHT,
+		     texture_width, texture_height,
 		     0, format_for_components[comptype][components-1],
 		     GL_UNSIGNED_BYTE, pixels);
 }
@@ -288,7 +301,7 @@ upload_2d(GLenum target, void *pixels)
 static void
 upload_array_slice(GLenum target, int slice, void *pixels)
 {
-	glTexSubImage3D(target, 0, 0, 0, slice, TEXTURE_WIDTH, TEXTURE_HEIGHT, 1,
+	glTexSubImage3D(target, 0, 0, 0, slice, texture_width, texture_height, 1,
 			format_for_components[comptype][components-1],
 			GL_UNSIGNED_BYTE, pixels);
 }
@@ -298,7 +311,7 @@ upload_3d(GLenum target, void *pixels)
 {
 	glTexImage3D(target, 0,
 		     internalformat_for_components[comptype][components - 1],
-		     TEXTURE_WIDTH, TEXTURE_HEIGHT,
+		     texture_width, texture_height,
 		     slices_for_sampler[sampler], 0,
 		     format_for_components[comptype][components-1],
 		     GL_UNSIGNED_BYTE, pixels);
@@ -318,8 +331,8 @@ do_texture_setup(void)
 {
 	GLuint tex;
 	GLenum target = target_for_sampler[sampler];
-	pixels = malloc(components * sizeof(unsigned char) * TEXTURE_WIDTH * TEXTURE_HEIGHT);
-	expected = malloc(4 * sizeof(float) * TEXTURE_WIDTH * TEXTURE_HEIGHT);
+	pixels = malloc(components * sizeof(unsigned char) * texture_width * texture_height);
+	expected = malloc(4 * sizeof(float) * texture_width * texture_height);
 
 	glGenTextures(1, &tex);
 	glBindTexture(target, tex);
@@ -374,6 +387,7 @@ do_shader_setup(void)
 	GLint prog;
 	GLint sampler_loc, offset_loc;
 	char *vs_code, *fs_code;
+	char *offset_coords;
 	char *prefix[] = { "" /* unorm */, "" /* float */, "i" /* int */, "u" /* uint */, "" /* shadow */ };
 	char *scale[] = {
 		"vec4(1)",		/* unorm + GL_ONE swizzle */
@@ -400,6 +414,12 @@ do_shader_setup(void)
 	char *comp_expr[] = {"", ", 0", ", 1", ", 2", ", 3"};
 	bool need_shader5 = (comp_select != -1) || use_offsets || use_nonconst || (comptype == SHADOW_T) || sampler == SAMPLER_2DRECT;
 
+	if (use_offsets)
+		asprintf(&offset_coords, "const ivec2 osets[4] = ivec2[4](ivec2(%d, %d), ivec2(%d, %d), ivec2(3, 3), ivec2(-3, -3));\n",
+			 min_offset, max_offset, max_offset, min_offset);
+	else if (use_offset)
+		asprintf(&offset_coords, ", ivec2(%d,%d)", min_offset, max_offset);
+
 	if (stage == VS) {
 		asprintf(&vs_code, "#version %s\n"
 				"#extension GL_ARB_explicit_attrib_location: require\n"
@@ -422,12 +442,12 @@ do_shader_setup(void)
 				prefix[comptype],
 				samplersuffix[sampler],
 				comptype == SHADOW_T ? "Shadow" : "",
-				use_offsets ? "const ivec2 osets[4] = ivec2[4](ivec2(-8,7), ivec2(7, -8), ivec2(3, 3), ivec2(-3, -3));\n" :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
+				use_offsets ? offset_coords :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offsets ? "Offsets" : (use_offset ? "Offset" : ""),
 				vs_tc_expr[sampler],
 				comptype == SHADOW_T ? ", 0.5" : "",
-				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
+				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? offset_coords :  "",
 				comp_expr[1 + comp_select]);
 		asprintf(&fs_code,
 				"#version %s\n"
@@ -467,12 +487,12 @@ do_shader_setup(void)
 				prefix[comptype],
 				samplersuffix[sampler],
 				comptype == SHADOW_T ? "Shadow" : "",
-				use_offsets ? "const ivec2 osets[4] = ivec2[4](ivec2(-8,7), ivec2(7, -8), ivec2(3, 3), ivec2(-3, -3));\n" :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
+				use_offsets ? offset_coords :use_nonconst ? "uniform ivec2 o1,o2;\n" : "",
 				swizzle == ONE ? scale[0] : scale[comptype],
 				use_offsets ? "Offsets" : (use_offset ? "Offset" : ""),
 				fs_tc_expr[sampler],
 				comptype == SHADOW_T ? ", 0.5" : "",
-				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? ", ivec2(-8,7)" :  "",
+				use_offsets ? ", osets" : use_nonconst ? ", o1+o2" : use_offset ? offset_coords :  "",
 				comp_expr[1 + comp_select]);
 	}
 
@@ -484,9 +504,9 @@ do_shader_setup(void)
 
 	if (use_nonconst) {
 		offset_loc = glGetUniformLocation(prog, "o1");
-		glUniform2i(offset_loc, -8, 0);
+		glUniform2i(offset_loc, min_offset, 0);
 		offset_loc = glGetUniformLocation(prog, "o2");
-		glUniform2i(offset_loc, 0, 7);
+		glUniform2i(offset_loc, 0, max_offset);
 	}
 }
 
