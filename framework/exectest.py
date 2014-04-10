@@ -142,15 +142,21 @@ class Test(object):
         * For 'returncode', the value will be the numeric exit code/value.
         * For 'command', the value will be command line program and arguments.
         """
+        results = TestResult()
+        results['command'] = ' '.join(self.command)
+        results['environment'] = " ".join(
+            '{0}="{1}"'.format(k, v) for k, v in self.env.iteritems())
+
+        if self.check_for_skip_scenario():
+            results['result'] = 'skip'
+            results['out'] = "PIGLIT: {'result': 'skip'}\n"
+            results['err'] = ""
+            results['returncode'] = None
+            return results
+
         i = 0
-        skip = self.check_for_skip_scenario()
         while True:
-            if skip:
-                out = "PIGLIT: {'result': 'skip'}\n"
-                err = ""
-                returncode = None
-            else:
-                out, err, returncode = self.get_command_result()
+            out, err, returncode = self.get_command_result()
 
             # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
             # affecting many developers.  If we catch it
@@ -162,13 +168,8 @@ class Test(object):
             else:
                 break
 
-        results = TestResult()
-
-        if skip:
-            results['result'] = 'skip'
-        else:
-            results['result'] = 'fail'
-            out = self.interpret_result(out, returncode, results)
+        results['result'] = 'fail'
+        out = self.interpret_result(out, returncode, results)
 
         crash_codes = [
             # Unix: terminated by a signal
@@ -201,18 +202,10 @@ class Test(object):
                 # Test passed but has valgrind errors.
                 results['result'] = 'fail'
 
-        env = ''
-        for key in self.env:
-            env = env + key + '="' + self.env[key] + '" '
-        if env:
-            results['environment'] = env
-
+        results['returncode'] = returncode
         results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\n"
                                   "Output:\n{2}").format(returncode,
                                                          err, out)
-        results['returncode'] = returncode
-        results['command'] = ' '.join(self.command)
-
         return results
 
     def check_for_skip_scenario(self):
