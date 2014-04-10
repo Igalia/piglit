@@ -67,6 +67,5 @@ def test_bad_returncode():
     os.environ = {}
 
     test = GleanTest('basic')
-    result = test.run()
-    print("result: {result}\nreturncode: {returncode}".format(**result))
-    assert result['result'] == 'fail', "Result should have been fail"
+    test.run()
+    assert test.result['result'] == 'fail', "Result should have been fail"

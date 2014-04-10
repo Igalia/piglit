@@ -60,6 +60,7 @@ class Test(object):
         self.run_concurrent = run_concurrent
         self.command = command
         self.env = {}
+        self.result = TestResult()
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
@@ -81,34 +82,35 @@ class Test(object):
                 time_start = time.time()
                 dmesg.update_dmesg()
                 self._test_hook_execute_run()
-                result = self.run()
-                result = dmesg.update_result(result)
+                self.run()
+                self.result = dmesg.update_result(self.result)
                 time_end = time.time()
-                if 'time' not in result:
-                    result['time'] = time_end - time_start
-                if 'result' not in result:
-                    result['result'] = 'fail'
-                if not isinstance(result, TestResult):
-                    result = TestResult(result)
-                    result['result'] = 'warn'
-                    result['note'] = ('Result not returned as an instance '
-                                      'of TestResult')
+                if 'time' not in self.result:
+                    self.result['time'] = time_end - time_start
+                if 'result' not in self.result:
+                    self.result['result'] = 'fail'
+                if not isinstance(self.result, TestResult):
+                    self.result = TestResult(self.result)
+                    self.result['result'] = 'warn'
+                    self.result['note'] = ('Result not returned as an '
+                                            'instance of TestResult')
             except:
-                result = TestResult()
                 exception = sys.exc_info()
-                result['result'] = 'fail'
-                result['exception'] = "{}{}".format(*exception[:2])
-                result['traceback'] = "".join(traceback.format_tb(exception[2]))
+                self.result['result'] = 'fail'
+                self.result['exception'] = "{}{}".format(*exception[:2])
+                self.result['traceback'] = "".join(
+                    traceback.format_tb(exception[2]))
 
-            log.log(path, result['result'])
-            log.post_log(log_current, result['result'])
+            log.log(path, self.result['result'])
+            log.post_log(log_current, self.result['result'])
 
-            if 'subtest' in result and len(result['subtest']) > 1:
-                for test in result['subtest']:
-                    result['result'] = result['subtest'][test]
-                    json_writer.write_dict_item(os.path.join(path, test), result)
+            if 'subtest' in self.result and len(self.result['subtest']) > 1:
+                for test in self.result['subtest']:
+                    self.result['result'] = self.result['subtest'][test]
+                    json_writer.write_dict_item(os.path.join(path, test),
+                                                self.result)
             else:
-                json_writer.write_dict_item(path, result)
+                json_writer.write_dict_item(path, self.result)
         else:
             log.log(path, 'dry-run')
             log.post_log(log_current, 'dry-run')
@@ -128,7 +130,7 @@ class Test(object):
             return
         self._command = value
 
-    def interpret_result(self, out, returncode, results):
+    def interpret_result(self):
         raise NotImplementedError
         return out
 
@@ -142,27 +144,26 @@ class Test(object):
         * For 'returncode', the value will be the numeric exit code/value.
         * For 'command', the value will be command line program and arguments.
         """
-        results = TestResult()
-        results['command'] = ' '.join(self.command)
-        results['environment'] = " ".join(
-            '{0}="{1}"'.format(k, v) for k, v in self.env.iteritems())
+        self.result['command'] = ' '.join(self.command)
+        self.result['environment'] = " ".join(
+            '{0}="{1}"'.format(k, v) for k, v in  self.env.iteritems())
 
         if self.check_for_skip_scenario():
-            results['result'] = 'skip'
-            results['out'] = "PIGLIT: {'result': 'skip'}\n"
-            results['err'] = ""
-            results['returncode'] = None
-            return results
+            self.result['result'] = 'skip'
+            self.result['out'] = ""
+            self.result['err'] = ""
+            self.result['returncode'] = None
+            return
 
         # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
         # developers. If we catch it happening, try just re-running the test.
         for _ in xrange(5):
-            out, err, returncode = self.get_command_result()
-            if "Got spurious window resize" not in out:
+            self.get_command_result()
+            if "Got spurious window resize" not in self.result['out']:
                 break
 
-        results['result'] = 'fail'
-        out = self.interpret_result(out, returncode, results)
+        self.result['result'] = 'fail'
+        self.interpret_result()
 
         crash_codes = [
             # Unix: terminated by a signal
@@ -178,28 +179,22 @@ class Test(object):
             -1073741676
         ]
 
-        if returncode in crash_codes:
-            results['result'] = 'crash'
-        elif returncode != 0 and results['result'] == 'pass':
-            results['result'] = 'warn'
+        if self.result['returncode'] in crash_codes:
+            self.result['result'] = 'crash'
+        elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
+            self.result['result'] = 'warn'
 
         if self.ENV.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
-            if results['result'] != 'pass':
-                results['result'] = 'skip'
-            elif returncode == 0:
+            if self.result['result'] != 'pass':
+                self.result['result'] = 'skip'
+            elif self.result['returncode'] == 0:
                 # Test passes and is valgrind clean.
-                results['result'] = 'pass'
+                self.result['result'] = 'pass'
             else:
                 # Test passed but has valgrind errors.
-                results['result'] = 'fail'
-
-        results['returncode'] = returncode
-        results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\n"
-                                  "Output:\n{2}").format(returncode,
-                                                         err, out)
-        return results
+                self.result['result'] = 'fail'
 
     def check_for_skip_scenario(self):
         """ Application specific check for skip
@@ -251,10 +246,9 @@ class Test(object):
         # replaces erroneous charcters with the Unicode
         # "replacement character" (a white question mark inside
         # a black diamond).
-        out = out.decode('utf-8', 'replace')
-        err = err.decode('utf-8', 'replace')
-
-        return out, err, returncode
+        self.result['out'] = out.decode('utf-8', 'replace')
+        self.result['err'] = err.decode('utf-8', 'replace')
+        self.result['returncode'] = returncode
 
 
 class PiglitTest(Test):
@@ -284,25 +278,23 @@ class PiglitTest(Test):
                 return True
         return False
 
-    def interpret_result(self, out, returncode, results):
-        outlines = out.split('\n')
+    def interpret_result(self):
+        outlines = self.result['out'].split('\n')
         outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
 
         try:
             for piglit in outpiglit:
                 if piglit.startswith('subtest'):
-                    if not 'subtest' in results:
-                        results['subtest'] = {}
-                    results['subtest'].update(eval(piglit[7:]))
+                    if not 'subtest' in self.result:
+                        self.result['subtest'] = {}
+                    self.result['subtest'].update(eval(piglit[7:]))
                 else:
-                    results.update(eval(piglit))
-            out = '\n'.join(
+                    self.result.update(eval(piglit))
+            self.result['out'] = '\n'.join(
                 s for s in outlines if not s.startswith('PIGLIT:'))
         except:
-            results['result'] = 'fail'
-            results['note'] = 'Failed to parse result string'
+            self.result['result'] = 'fail'
+            self.result['note'] = 'Failed to parse result string'
 
-        if 'result' not in results:
-            results['result'] = 'fail'
-
-        return out
+        if 'result' not in self.result:
+            self.result['result'] = 'fail'

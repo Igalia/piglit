@@ -52,14 +52,13 @@ class OGLCTest(Test):
         super(OGLCTest, self).__init__([bin_oglconform, '-minFmt', '-v', '4',
                                         '-test', category, subtest])
 
-    def interpret_result(self, out, returncode, results):
-        if self.skip_re.search(out) is not None:
-            results['result'] = 'skip'
-        elif re.search('Total Passed : 1', out) is not None:
-            results['result'] = 'pass'
+    def interpret_result(self):
+        if self.skip_re.search(self.result['out']) is not None:
+            self.result['result'] = 'skip'
+        elif re.search('Total Passed : 1', self.result['out']) is not None:
+            self.result['result'] = 'pass'
         else:
-            results['result'] = 'fail'
-        return out
+            self.result['result'] = 'fail'
 
 # Create a new top-level 'oglconform' category
 

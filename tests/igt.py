@@ -76,27 +76,24 @@ class IGTTest(Test):
         super(IGTTest, self).__init__(
             [path.join(igtTestRoot, binary)] + arguments)
 
-    def interpret_result(self, out, returncode, results):
+    def interpret_result(self):
         if not igtEnvironmentOk:
-            return out
+            return
 
-        if returncode == 0:
-            results['result'] = 'pass'
-        elif returncode == 77:
-            results['result'] = 'skip'
+        if self.result['returncode'] == 0:
+            self.result['result'] = 'pass'
+        elif self.result['returncode'] == 77:
+            self.result['result'] = 'skip'
         else:
-            results['result'] = 'fail'
-        return out
+            self.result['result'] = 'fail'
 
     def run(self):
         if not igtEnvironmentOk:
-            results = TestResult()
-            results['result'] = 'fail'
-            results['info'] = unicode("Test Environment isn't OK")
+            self.result['result'] = 'fail'
+            self.result['info'] = unicode("Test Environment isn't OK")
+            return
 
-            return results
-
-        return super(IGTTest, self).run()
+        super(IGTTest, self).run()
 
 def listTests(listname):
     oldDir = os.getcwd()

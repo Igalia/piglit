@@ -55,13 +55,12 @@ class GTFTest(Test):
                                        '-minfmt', '-width=113', '-height=47',
                                        '-run=' + testpath])
 
-    def interpret_result(self, out, returncode, results):
-        mo = self.pass_re.search(out)
+    def interpret_result(self):
+        mo = self.pass_re.search(self.result['out'])
         if mo is not None and int(mo.group('passed')) > 0:
-            results['result'] = 'pass'
+            self.result['result'] = 'pass'
         else:
-            results['result'] = 'fail'
-        return out
+            self.result['result'] = 'fail'
 
 def populateTests(runfile):
     "Read a .run file, adding any .test files to the profile"
