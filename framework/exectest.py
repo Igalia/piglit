@@ -273,16 +273,12 @@ class PiglitTest(Test):
         outlines = self.result['out'].split('\n')
         outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
 
-        try:
-            for piglit in outpiglit:
-                if piglit.startswith('subtest'):
-                    if not 'subtest' in self.result:
-                        self.result['subtest'] = {}
-                    self.result['subtest'].update(eval(piglit[7:]))
-                else:
-                    self.result.update(eval(piglit))
-            self.result['out'] = '\n'.join(
-                s for s in outlines if not s.startswith('PIGLIT:'))
-        except:
-            self.result['result'] = 'fail'
-            self.result['note'] = 'Failed to parse result string'
+        for piglit in outpiglit:
+            if piglit.startswith('subtest'):
+                if not 'subtest' in self.result:
+                    self.result['subtest'] = {}
+                self.result['subtest'].update(eval(piglit[7:]))
+            else:
+                self.result.update(eval(piglit))
+        self.result['out'] = '\n'.join(
+            s for s in outlines if not s.startswith('PIGLIT:'))
