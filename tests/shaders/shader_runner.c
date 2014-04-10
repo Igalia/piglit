@@ -1138,6 +1138,15 @@ get_floats(const char *line, float *f, unsigned count)
 		f[i] = strtod(line, (char **) &line);
 }
 
+void
+get_doubles(const char *line, double *d, unsigned count)
+{
+	unsigned i;
+
+	for (i = 0; i < count; i++)
+		d[i] = strtod(line, (char **) &line);
+}
+
 
 void
 get_ints(const char *line, int *ints, unsigned count)
@@ -1172,6 +1181,18 @@ check_unsigned_support(void)
 }
 
 /**
+ * Check that the GL implementation supports double uniforms
+ * (e.g. through glUniform1d).  If not, terminate the test with a
+ * SKIP.
+ */
+void
+check_double_support(void)
+{
+	if (gl_version.num < 40 && !piglit_is_extension_supported("GL_ARB_gpu_shader_fp64"))
+		piglit_report_result(PIGLIT_SKIP);
+}
+
+/**
  * Handles uploads of UBO uniforms by mapping the buffer and storing
  * the data.  If the uniform is not in a uniform block, returns false.
  */
@@ -1183,6 +1204,7 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 	GLint offset;
 	char *data;
 	float f[16];
+	double d[16];
 	int ints[16];
 	unsigned uints[16];
 	int name_len = strlen(name);
@@ -1231,6 +1253,9 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 	} else if (string_match("uint", type)) {
 		get_uints(line, uints, 1);
 		memcpy(data, uints, sizeof(int));
+	} else if (string_match("double", type)) {
+		get_doubles(line, d, 1);
+		memcpy(data, d, sizeof(double));
 	} else if (string_match("vec", type)) {
 		int elements = type[3] - '0';
 		get_floats(line, f, elements);
@@ -1243,6 +1268,10 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 		int elements = type[4] - '0';
 		get_uints(line, uints, elements);
 		memcpy(data, uints, elements * sizeof(unsigned));
+	} else if (string_match("dvec", type)) {
+		int elements = type[3] - '0';
+		get_doubles(line, d, elements);
+		memcpy(data, d, elements * sizeof(double));
 	} else if (string_match("mat", type)) {
 		GLint matrix_stride, row_major;
 		int cols = type[3] - '0';
@@ -1273,6 +1302,36 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 				}
 			}
 		}
+	} else if (string_match("dmat", type)) {
+		GLint matrix_stride, row_major;
+		int cols = type[3] - '0';
+		int rows = type[4] == 'x' ? type[5] - '0' : cols;
+		int r, c;
+		double *matrixdata = (double *)data;
+
+		assert(cols >= 2 && cols <= 4);
+		assert(rows >= 2 && rows <= 4);
+
+		get_doubles(line, d, rows * cols);
+
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_MATRIX_STRIDE, &matrix_stride);
+		glGetActiveUniformsiv(prog, 1, &uniform_index,
+				      GL_UNIFORM_IS_ROW_MAJOR, &row_major);
+
+		matrix_stride /= sizeof(double);
+
+		for (c = 0; c < cols; c++) {
+			for (r = 0; r < rows; r++) {
+				if (row_major) {
+					matrixdata[matrix_stride * c + r] =
+						d[r * rows + c];
+				} else {
+					matrixdata[matrix_stride * r + c] =
+						d[r * rows + c];
+				}
+			}
+		}
 	} else {
 		printf("unknown uniform type \"%s\" for \"%s\"\n", type, name);
 		piglit_report_result(PIGLIT_FAIL);
@@ -1288,6 +1347,7 @@ set_uniform(const char *line)
 {
 	char name[512];
 	float f[16];
+	double d[16];
 	int ints[16];
 	unsigned uints[16];
 	GLuint prog;
@@ -1324,6 +1384,11 @@ set_uniform(const char *line)
 		check_unsigned_support();
 		val = strtoul(line, NULL, 0);
 		glUniform1ui(loc, val);
+		return;
+	} else if (string_match("double", type)) {
+		check_double_support();
+		get_doubles(line, d, 1);
+		glUniform1dv(loc, 1, d);
 		return;
 	} else if (string_match("vec", type)) {
 		switch (type[3]) {
@@ -1369,6 +1434,22 @@ set_uniform(const char *line)
 		case '4':
 			get_uints(line, uints, 4);
 			glUniform4uiv(loc, 1, uints);
+			return;
+		}
+	} else if (string_match("dvec", type)) {
+		check_double_support();
+		switch (type[4]) {
+		case '2':
+			get_doubles(line, d, 2);
+			glUniform2dv(loc, 1, d);
+			return;
+		case '3':
+			get_doubles(line, d, 3);
+			glUniform3dv(loc, 1, d);
+			return;
+		case '4':
+			get_doubles(line, d, 4);
+			glUniform4dv(loc, 1, d);
 			return;
 		}
 	} else if (string_match("mat", type) && type[3] != '\0') {
@@ -1418,6 +1499,56 @@ set_uniform(const char *line)
 			case '4':
 				get_floats(line, f, 16);
 				glUniformMatrix4fv(loc, 1, GL_FALSE, f);
+				return;
+			}
+		}
+	} else if (string_match("dmat", type) && type[3] != '\0') {
+		char cols = type[3];
+		char rows = type[4] == 'x' ? type[5] : cols;
+		switch (cols) {
+		case '2':
+			switch (rows) {
+			case '2':
+				get_doubles(line, d, 4);
+				glUniformMatrix2dv(loc, 1, GL_FALSE, d);
+				return;
+			case '3':
+				get_doubles(line, d, 6);
+				glUniformMatrix2x3dv(loc, 1, GL_FALSE, d);
+				return;
+			case '4':
+				get_doubles(line, d, 8);
+				glUniformMatrix2x4dv(loc, 1, GL_FALSE, d);
+				return;
+			}
+		case '3':
+			switch (rows) {
+			case '2':
+				get_doubles(line, d, 6);
+				glUniformMatrix3x2dv(loc, 1, GL_FALSE, d);
+				return;
+			case '3':
+				get_doubles(line, d, 9);
+				glUniformMatrix3dv(loc, 1, GL_FALSE, d);
+				return;
+			case '4':
+				get_doubles(line, d, 12);
+				glUniformMatrix3x4dv(loc, 1, GL_FALSE, d);
+				return;
+			}
+		case '4':
+			switch (rows) {
+			case '2':
+				get_doubles(line, d, 8);
+				glUniformMatrix4x2dv(loc, 1, GL_FALSE, d);
+				return;
+			case '3':
+				get_doubles(line, d, 12);
+				glUniformMatrix4x3dv(loc, 1, GL_FALSE, d);
+				return;
+			case '4':
+				get_doubles(line, d, 16);
+				glUniformMatrix4dv(loc, 1, GL_FALSE, d);
 				return;
 			}
 		}
