@@ -83,17 +83,10 @@ class Test(object):
                 dmesg.update_dmesg()
                 self._test_hook_execute_run()
                 self.run()
+                self.result['time'] = time.time() - time_start
                 self.result = dmesg.update_result(self.result)
-                time_end = time.time()
-                if 'time' not in self.result:
-                    self.result['time'] = time_end - time_start
                 if 'result' not in self.result:
                     self.result['result'] = 'fail'
-                if not isinstance(self.result, TestResult):
-                    self.result = TestResult(self.result)
-                    self.result['result'] = 'warn'
-                    self.result['note'] = ('Result not returned as an '
-                                            'instance of TestResult')
             except:
                 exception = sys.exc_info()
                 self.result['result'] = 'fail'
