@@ -35,8 +35,7 @@ import importlib
 
 from framework.dmesg import get_dmesg
 from framework.log import Log
-
-
+import framework.exectest
 
 class TestProfile(object):
     def __init__(self):
@@ -115,6 +114,8 @@ class TestProfile(object):
         See ``Test.schedule`` and ``Test.run``.
         '''
 
+        framework.exectest.Test.ENV = env
+
         self.prepare_test_list(env)
         log = Log(len(self.test_list), env.verbose)
 
@@ -125,7 +126,7 @@ class TestProfile(object):
 
             """
             name, test = pair
-            test.execute(env, name, log, json_writer, self.dmesg)
+            test.execute(name, log, json_writer, self.dmesg)
 
         # Multiprocessing.dummy is a wrapper around Threading that provides a
         # multiprocessing compatible API

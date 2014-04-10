@@ -88,7 +88,7 @@ class IGTTest(Test):
             results['result'] = 'fail'
         return out
 
-    def run(self, env):
+    def run(self):
         if not igtEnvironmentOk:
             results = TestResult()
             results['result'] = 'fail'
@@ -96,7 +96,7 @@ class IGTTest(Test):
 
             return results
 
-        return super(IGTTest, self).run(env)
+        return super(IGTTest, self).run()
 
 def listTests(listname):
     oldDir = os.getcwd()

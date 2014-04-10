@@ -28,7 +28,7 @@ import time
 import sys
 import traceback
 
-from .core import TestResult
+from .core import TestResult, Environment
 
 
 __all__ = ['Test',
@@ -49,6 +49,8 @@ else:
 
 
 class Test(object):
+    ENV = Environment()
+
     def __init__(self, command, run_concurrent=False):
         '''
                 'run_concurrent' controls whether this test will
@@ -63,7 +65,7 @@ class Test(object):
         # self.run is called.
         self._test_hook_execute_run = lambda: None
 
-    def execute(self, env, path, log, json_writer, dmesg):
+    def execute(self, path, log, json_writer, dmesg):
         '''
         Run the test.
 
@@ -71,15 +73,15 @@ class Test(object):
             Fully qualified test name as a string.  For example,
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
-        log_current = log.pre_log(path if env.verbose else None)
+        log_current = log.pre_log(path if self.ENV.verbose else None)
 
         # Run the test
-        if env.execute:
+        if self.ENV.execute:
             try:
                 time_start = time.time()
                 dmesg.update_dmesg()
                 self._test_hook_execute_run()
-                result = self.run(env)
+                result = self.run()
                 result = dmesg.update_result(result)
                 time_end = time.time()
                 if 'time' not in result:
@@ -127,7 +129,7 @@ class Test(object):
         raise NotImplementedError
         return out
 
-    def run(self, env):
+    def run(self):
         """
         Run a test.  The return value will be a dictionary with keys
         including 'result', 'info', 'returncode' and 'command'.
@@ -143,7 +145,7 @@ class Test(object):
 
         command = self.command
 
-        if env.valgrind:
+        if self.ENV.valgrind:
             command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
                            '--tool=memcheck']
 
@@ -195,7 +197,7 @@ class Test(object):
         elif returncode != 0:
             results['note'] = 'Returncode was {0}'.format(returncode)
 
-        if env.valgrind:
+        if self.ENV.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
             if results['result'] != 'pass':

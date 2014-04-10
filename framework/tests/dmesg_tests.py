@@ -26,7 +26,7 @@ import subprocess
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg, DmesgError
-from framework.core import TestResult, PiglitJSONEncoder, Environment
+from framework.core import TestResult, PiglitJSONEncoder
 from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
 from framework.shader_test import ShaderTest
@@ -229,8 +229,6 @@ def test_json_serialize_updated_result():
 
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
-    env = Environment()
-
     lists = [(PiglitTest, ['attribs', '-auto', '-fbo'], 'PiglitTest'),
              (GleanTest, 'basic', "GleanTest"),
              (ShaderTest, 'tests/shaders/loopfunc.shader_test',
@@ -242,10 +240,10 @@ def test_testclasses_dmesg():
 
     for tclass, tfile, desc in lists:
         yieldable.description = "Test dmesg in {}".format(desc)
-        yield yieldable, tclass, tfile, env
+        yield yieldable, tclass, tfile
 
 
-def check_classes_dmesg(test_class, test_args, env):
+def check_classes_dmesg(test_class, test_args):
     """ Do the actual check on the provided test class for dmesg """
     if not os.path.exists('bin'):
         raise SkipTest("This tests requires a working, built version of "
@@ -284,7 +282,7 @@ def check_classes_dmesg(test_class, test_args, env):
 
     json = DummyJsonWriter()
 
-    test.execute(env, None, DummyLog(), json, dmesg)
+    test.execute(None, DummyLog(), json, dmesg)
 
     nt.assert_in(json.result['result'], ['dmesg-warn', 'dmesg-fail'],
                  msg="{0} did not update status with dmesg".format(type(test)))
