@@ -60,7 +60,7 @@ class Test(object):
         self.run_concurrent = run_concurrent
         self.command = command
         self.env = {}
-        self.result = TestResult()
+        self.result = TestResult({'result': 'fail'})
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
@@ -85,8 +85,6 @@ class Test(object):
                 self.run()
                 self.result['time'] = time.time() - time_start
                 self.result = dmesg.update_result(self.result)
-                if 'result' not in self.result:
-                    self.result['result'] = 'fail'
             except:
                 exception = sys.exc_info()
                 self.result['result'] = 'fail'
@@ -288,6 +286,3 @@ class PiglitTest(Test):
         except:
             self.result['result'] = 'fail'
             self.result['note'] = 'Failed to parse result string'
-
-        if 'result' not in self.result:
-            self.result['result'] = 'fail'
