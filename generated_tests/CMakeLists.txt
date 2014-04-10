@@ -83,6 +83,14 @@ piglit_make_generated_tests(
 	gen_outerproduct_tests.py
 	gen_outerproduct_template.mako)
 
+piglit_make_generated_tests(
+	builtin_uniform_tests_fp64.list
+	gen_builtin_uniform_tests_fp64.py
+	builtin_function_fp64.py)
+piglit_make_generated_tests(
+	constant_array_size_tests_fp64.list
+	gen_constant_array_size_tests_fp64.py
+	builtin_function_fp64.py)
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
@@ -103,4 +111,6 @@ add_custom_target(gen-tests ALL
 		texture_lod_tests.list
 		shader_bit_encoding_tests.list
 		uniform-initializer_tests.list
-		interpolation-qualifier-built-in-variable.list)
+		interpolation-qualifier-built-in-variable.list
+		builtin_uniform_tests_fp64.list
+		constant_array_size_tests_fp64.list)
