@@ -9,7 +9,7 @@ import os.path as path
 
 from framework.opencv import add_opencv_tests
 
-from framework.core import TestProfile
+from framework.profile import TestProfile
 from framework.exectest import PiglitTest
 
 ######

@@ -28,6 +28,7 @@ import os.path as path
 import argparse
 
 import framework.core as core
+import framework.profile
 
 
 def main():
@@ -76,7 +77,7 @@ def main():
         json_writer.write_dict_item(key, value)
         env.exclude_tests.add(key)
     
-    profile = core.merge_test_profiles(results.options['profile'])
+    profile = framework.profile.merge_test_profiles(results.options['profile'])
     if env.dmesg:
         profile.dmesg = env.dmesg
 

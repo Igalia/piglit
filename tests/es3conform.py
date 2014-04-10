@@ -26,7 +26,7 @@ import sys
 
 from os import path
 from glob import glob
-from framework.core import TestProfile
+from framework.profile import TestProfile
 from framework.exectest import Test, TEST_BIN_DIR
 
 __all__ = ['profile']

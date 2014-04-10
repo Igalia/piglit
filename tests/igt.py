@@ -28,7 +28,8 @@ import sys
 import subprocess
 
 from os import path
-from framework.core import TestProfile, TestResult
+from framework.core import TestResult
+from framework.profile import TestProfile
 from framework.exectest import Test, TEST_BIN_DIR
 
 __all__ = ['profile']

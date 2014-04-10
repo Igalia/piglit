@@ -9,7 +9,7 @@ import os.path as path
 import platform
 import shlex
 
-from framework.core import TestProfile
+from framework.profile import TestProfile
 from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
 from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests

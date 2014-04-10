@@ -31,6 +31,7 @@ import time
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
+import framework.profile
 
 
 def main():
@@ -157,7 +158,7 @@ def main():
     for (key, value) in env.collectData().items():
         json_writer.write_dict_item(key, value)
 
-    profile = core.merge_test_profiles(args.test_profile)
+    profile = framework.profile.merge_test_profiles(args.test_profile)
 
     json_writer.write_dict_key('tests')
     json_writer.open_dict()

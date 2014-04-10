@@ -2,7 +2,7 @@
 # Minimal tests to check whether the installation is working
 #
 
-from framework.core import TestProfile
+from framework.profile import TestProfile
 from framework.gleantest import GleanTest
 
 __all__ = ['profile']

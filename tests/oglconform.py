@@ -26,7 +26,7 @@ import re
 import sys
 import subprocess
 
-from framework.core import TestProfile
+from framework.profile import TestProfile
 from framework.exectest import Test, TEST_BIN_DIR
 from os import path
 
