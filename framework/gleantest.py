@@ -38,7 +38,7 @@ class GleanTest(Test):
 
     @Test.command.getter
     def command(self):
-        return self._command + self.globalParams
+        return super(GleanTest, self).command + self.globalParams
 
     def interpret_result(self, out, returncode, results):
         if "{'result': 'skip'}" in out:

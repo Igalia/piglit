@@ -116,6 +116,9 @@ class Test(object):
     @property
     def command(self):
         assert self._command
+        if self.ENV.valgrind:
+            return ['valgrind', '--quiet', '--error-exitcode=1',
+                    '--tool=memcheck'] + self._command
         return self._command
 
     @command.setter
@@ -144,10 +147,6 @@ class Test(object):
             fullenv[e] = str(self.env[e])
 
         command = self.command
-
-        if self.ENV.valgrind:
-            command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
-                           '--tool=memcheck']
 
         i = 0
         skip = self.check_for_skip_scenario()
