@@ -187,8 +187,8 @@ class Test(object):
 
         if returncode in crash_codes:
             results['result'] = 'crash'
-        elif returncode != 0:
-            results['note'] = 'Returncode was {0}'.format(returncode)
+        elif returncode != 0 and results['result'] == 'pass':
+            results['result'] = 'warn'
 
         if self.ENV.valgrind:
             # If the underlying test failed, simply report
