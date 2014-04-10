@@ -154,18 +154,11 @@ class Test(object):
             results['returncode'] = None
             return results
 
-        i = 0
-        while True:
+        # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
+        # developers. If we catch it happening, try just re-running the test.
+        for _ in xrange(5):
             out, err, returncode = self.get_command_result()
-
-            # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
-            # affecting many developers.  If we catch it
-            # happening, try just re-running the test.
-            if out.find("Got spurious window resize") >= 0:
-                i = i + 1
-                if i >= 5:
-                    break
-            else:
+            if "Got spurious window resize" not in out:
                 break
 
         results['result'] = 'fail'
