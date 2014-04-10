@@ -142,12 +142,6 @@ class Test(object):
         * For 'returncode', the value will be the numeric exit code/value.
         * For 'command', the value will be command line program and arguments.
         """
-        fullenv = os.environ.copy()
-        for e in self.env:
-            fullenv[e] = str(self.env[e])
-
-        command = self.command
-
         i = 0
         skip = self.check_for_skip_scenario()
         while True:
@@ -156,8 +150,7 @@ class Test(object):
                 err = ""
                 returncode = None
             else:
-                out, err, returncode = self.get_command_result(command,
-                                                               fullenv)
+                out, err, returncode = self.get_command_result()
 
             # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
             # affecting many developers.  If we catch it
@@ -231,9 +224,13 @@ class Test(object):
         """
         return False
 
-    def get_command_result(self, command, fullenv):
+    def get_command_result(self):
+        fullenv = os.environ.copy()
+        for key, value in self.env.iteritems():
+            fullenv[key] = str(value)
+
         try:
-            proc = subprocess.Popen(command,
+            proc = subprocess.Popen(self.command,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE,
                                     env=fullenv,
