@@ -10,7 +10,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-add_executable (arb_compute_shader-api_errors api_errors.c)
-add_executable (arb_compute_shader-minmax minmax.c)
+piglit_add_executable (arb_compute_shader-api_errors api_errors.c)
+piglit_add_executable (arb_compute_shader-minmax minmax.c)
 
 # vim: ft=cmake:
