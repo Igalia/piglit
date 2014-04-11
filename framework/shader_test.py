@@ -83,7 +83,8 @@ class ShaderTest(PiglitTest):
             else:
                 raise ShaderTestParserException("No GL version set")
 
-        super(ShaderTest, self).__init__([prog, arguments, '-auto'])
+        super(ShaderTest, self).__init__([prog, arguments, '-auto'],
+                                         run_concurrent=True)
 
 
 class ShaderTestParserException(Exception):

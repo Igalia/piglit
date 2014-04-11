@@ -154,7 +154,7 @@ class GLSLParserTest(PiglitTest):
                 command.append('--check-link')
             command.extend(config.get('config', 'require_extensions').split())
 
-            super(GLSLParserTest, self).__init__(command)
+            super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
 
 class GLSLParserException(Exception):
