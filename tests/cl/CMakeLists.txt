@@ -13,7 +13,7 @@ if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 endif()
 
 function(piglit_cl_add_test)
-	add_executable(${ARGV})
+	piglit_add_executable(${ARGV})
 endfunction(piglit_cl_add_test)
 
 function(piglit_cl_add_custom_test name)
