@@ -979,6 +979,8 @@ add_plain_test(gl15, 'draw-vertices')
 gl15['draw-vertices-user'] = PiglitTest(['draw-vertices', '-auto', 'user'])
 add_plain_test(gl15, 'isbufferobj')
 add_plain_test(gl15, 'depth-tex-compare')
+gl15['normal3b3s-invariance-byte'] = PiglitTest(['gl-1.5-normal3b3s-invariance', 'GL_BYTE', '-auto'])
+gl15['normal3b3s-invariance-short'] = PiglitTest(['gl-1.5-normal3b3s-invariance', 'GL_SHORT', '-auto'])
 
 gl20 = {}
 spec['!OpenGL 2.0'] = gl20
