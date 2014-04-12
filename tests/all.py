@@ -928,6 +928,7 @@ add_concurrent_test(gl10, 'gl-1.0-edgeflag-quads')
 add_concurrent_test(gl10, 'gl-1.0-long-dlist')
 add_concurrent_test(gl10, 'gl-1.0-rendermode-feedback')
 add_plain_test(gl10, 'gl-1.0-front-invalidate-back')
+add_plain_test(gl10, 'gl-1.0-swapbuffers-behavior')
 
 gl12 = {}
 spec['!OpenGL 1.2'] = gl12
