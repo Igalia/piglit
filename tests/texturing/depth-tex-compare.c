@@ -47,15 +47,6 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static GLuint tex;
 
-static const char *const compare_names[8] = {
-	"GL_NEVER", "GL_LESS", "GL_EQUAL", "GL_LEQUAL",
-	"GL_GREATER", "GL_NOTEQUAL", "GL_GEQUAL", "GL_ALWAYS"
-};
-
-static const char *const mode_names[3] = {
-	"GL_ALPHA", "GL_LUMINANCE", "GL_INTENSITY"
-};
-
 void
 piglit_init(int argc, char **argv)
 {
@@ -235,8 +226,8 @@ piglit_display(void)
 							    color)) {
 					if (!piglit_automatic) {
 						printf("compare = %s, mode = %s\n",
-						       compare_names[compare - GL_NEVER],
-						       mode_names[col]);
+						       piglit_get_gl_enum_name(compare),
+						       piglit_get_gl_enum_name(modes[col]));
 					}
 
 					pass = GL_FALSE;
