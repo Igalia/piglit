@@ -33,7 +33,7 @@
 
 #include "piglit-util-gl-common.h"
 
-#define BOX_SIZE 25
+#define BOX_SIZE 24
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -111,70 +111,70 @@ piglit_display(void)
 		GLenum compare;
 		float r0;
 		float r1;
-		const GLfloat *probes[9];
+		const GLfloat *probes[12];
 	} tests[] = {
 		{
 			GL_LESS,     2.0, 0.0,
 			{
-				pink, white, white,
-				pink, black, black,
-				pink, green, green
+				pink, white, white, white,
+				pink, black, black, black,
+				pink, green, green, green,
 			}
 		},
 		{
 			GL_LEQUAL,   2.0, 0.0,
 			{
-				pink, white, pink,
-				pink, black, pink,
-				pink, green, pink,
+				pink, white, pink, pink,
+				pink, black, pink, pink,
+				pink, green, pink, pink,
 			}
 		},
 		{
 			GL_GREATER,  2.0, 0.0,
 			{
-				white, pink, white,
-				black, pink, black,
-				green, pink, green,
+				white, pink, white, white,
+				black, pink, black, black,
+				green, pink, green, green,
 			}
 		},
 		{
 			GL_GEQUAL,   2.0, 0.0,
 			{
-				white, pink, pink,
-				black, pink, pink,
-				green, pink, pink,
+				white, pink, pink, pink,
+				black, pink, pink, pink,
+				green, pink, pink, pink,
 			}
 		},
 		{
 			GL_ALWAYS,   2.0, 0.0,
 			{
-				pink, pink, pink,
-				pink, pink, pink,
-				pink, pink, pink,
+				pink, pink, pink, pink,
+				pink, pink, pink, pink,
+				pink, pink, pink, pink,
 			}
 		},
 		{
 			GL_NEVER,    2.0, 0.0,
 			{
-				white, white, white,
-				black, black, black,
-				green, green, green,
+				white, white, white, white,
+				black, black, black, black,
+				green, green, green, green,
 			}
 		},
 		{
-			GL_NOTEQUAL, 0.5, 0.5,
+			GL_NOTEQUAL, 2.0, 0.0,
 			{
-				white, white, pink,
-				black, black, pink,
-				green, green, pink,
+				pink, pink, white, white,
+				pink, pink, black, black,
+				pink, pink, green, green,
 			}
 		},
 		{
-			GL_EQUAL,    0.5, 0.5,
+			GL_EQUAL,    2.0, 0.0,
 			{
-				pink, pink, white,
-				pink, pink, black,
-				pink, pink, green,
+				white, white, pink, pink,
+				black, black, pink, pink,
+				green, green, pink, pink,
 			}
 		},
 	};
@@ -196,7 +196,7 @@ piglit_display(void)
 		const GLenum compare = tests[row].compare;
 
 		for (col = 0; col < 3; col++) {
-			const int x = 150 + (col * 50);
+			const int x = 20 + (col * 50);
 			unsigned i;
 
 			glTexParameteri(GL_TEXTURE_2D,
@@ -217,11 +217,11 @@ piglit_display(void)
 			glVertex2f(x,            y + BOX_SIZE);
 			glEnd();
 
-			for (i = 0; i < 3; i++) {
+			for (i = 0; i < 4; i++) {
 				const GLfloat *const color =
-					tests[row].probes[(3 * col) + i];
+					tests[row].probes[(4 * col) + i];
 
-				if (!piglit_probe_pixel_rgb(x + 5 + (i * 5),
+				if (!piglit_probe_pixel_rgb(x + 3 + (i * 6),
 							    y + 10,
 							    color)) {
 					if (!piglit_automatic) {
