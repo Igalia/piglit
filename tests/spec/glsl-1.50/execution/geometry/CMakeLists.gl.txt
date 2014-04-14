@@ -23,3 +23,4 @@ piglit_add_executable (glsl-1.50-gs-input-layout-qualifiers gs-input-layout-qual
 piglit_add_executable (glsl-1.50-gs-output-layout-qualifiers gs-output-layout-qualifiers.c)
 piglit_add_executable (glsl-1.50-transform-feedback-type-and-size transform-feedback-type-and-size.c)
 piglit_add_executable (glsl-1.50-transform-feedback-vertex-id transform-feedback-vertex-id.c)
+piglit_add_executable (glsl-1.50-transform-feedback-builtins transform-feedback-builtins.c)
