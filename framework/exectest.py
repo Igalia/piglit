@@ -113,6 +113,7 @@ class Test(object):
 
     @property
     def command(self):
+        assert self._command
         return self._command
 
     @command.setter
@@ -140,89 +141,83 @@ class Test(object):
         for e in self.env:
             fullenv[e] = str(self.env[e])
 
-        if self.command is not None:
-            command = self.command
+        command = self.command
 
-            if env.valgrind:
-                command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
-                               '--tool=memcheck']
+        if env.valgrind:
+            command[:0] = ['valgrind', '--quiet', '--error-exitcode=1',
+                           '--tool=memcheck']
 
-            i = 0
-            skip = self.check_for_skip_scenario()
-            while True:
-                if skip:
-                    out = "PIGLIT: {'result': 'skip'}\n"
-                    err = ""
-                    returncode = None
-                else:
-                    out, err, returncode = self.get_command_result(command,
-                                                                   fullenv)
-
-                # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
-                # affecting many developers.  If we catch it
-                # happening, try just re-running the test.
-                if out.find("Got spurious window resize") >= 0:
-                    i = i + 1
-                    if i >= 5:
-                        break
-                else:
-                    break
-
-            results = TestResult()
-
+        i = 0
+        skip = self.check_for_skip_scenario()
+        while True:
             if skip:
-                results['result'] = 'skip'
+                out = "PIGLIT: {'result': 'skip'}\n"
+                err = ""
+                returncode = None
             else:
-                results['result'] = 'fail'
-                out = self.interpret_result(out, returncode, results)
+                out, err, returncode = self.get_command_result(command,
+                                                               fullenv)
 
-            crash_codes = [
-                # Unix: terminated by a signal
-                -5,   # SIGTRAP
-                -6,   # SIGABRT
-                -8,   # SIGFPE  (Floating point exception)
-                -10,  # SIGUSR1
-                -11,  # SIGSEGV (Segmentation fault)
-                # Windows:
-                # EXCEPTION_ACCESS_VIOLATION (0xc0000005):
-                -1073741819,
-                # EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
-                -1073741676
-            ]
+            # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is
+            # affecting many developers.  If we catch it
+            # happening, try just re-running the test.
+            if out.find("Got spurious window resize") >= 0:
+                i = i + 1
+                if i >= 5:
+                    break
+            else:
+                break
 
-            if returncode in crash_codes:
-                results['result'] = 'crash'
-            elif returncode != 0:
-                results['note'] = 'Returncode was {0}'.format(returncode)
+        results = TestResult()
 
-            if env.valgrind:
-                # If the underlying test failed, simply report
-                # 'skip' for this valgrind test.
-                if results['result'] != 'pass':
-                    results['result'] = 'skip'
-                elif returncode == 0:
-                    # Test passes and is valgrind clean.
-                    results['result'] = 'pass'
-                else:
-                    # Test passed but has valgrind errors.
-                    results['result'] = 'fail'
-
-            env = ''
-            for key in self.env:
-                env = env + key + '="' + self.env[key] + '" '
-            if env:
-                results['environment'] = env
-
-            results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\n"
-                                      "Output:\n{2}").format(returncode,
-                                                             err, out)
-            results['returncode'] = returncode
-            results['command'] = ' '.join(self.command)
-
+        if skip:
+            results['result'] = 'skip'
         else:
-            results = TestResult()
-            if 'result' not in results:
+            results['result'] = 'fail'
+            out = self.interpret_result(out, returncode, results)
+
+        crash_codes = [
+            # Unix: terminated by a signal
+            -5,   # SIGTRAP
+            -6,   # SIGABRT
+            -8,   # SIGFPE  (Floating point exception)
+            -10,  # SIGUSR1
+            -11,  # SIGSEGV (Segmentation fault)
+            # Windows:
+            # EXCEPTION_ACCESS_VIOLATION (0xc0000005):
+            -1073741819,
+            # EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
+            -1073741676
+        ]
+
+        if returncode in crash_codes:
+            results['result'] = 'crash'
+        elif returncode != 0:
+            results['note'] = 'Returncode was {0}'.format(returncode)
+
+        if env.valgrind:
+            # If the underlying test failed, simply report
+            # 'skip' for this valgrind test.
+            if results['result'] != 'pass':
                 results['result'] = 'skip'
+            elif returncode == 0:
+                # Test passes and is valgrind clean.
+                results['result'] = 'pass'
+            else:
+                # Test passed but has valgrind errors.
+                results['result'] = 'fail'
+
+        env = ''
+        for key in self.env:
+            env = env + key + '="' + self.env[key] + '" '
+        if env:
+            results['environment'] = env
+
+        results['info'] = unicode("Returncode: {0}\n\nErrors:\n{1}\n\n"
+                                  "Output:\n{2}").format(returncode,
+                                                         err, out)
+        results['returncode'] = returncode
+        results['command'] = ' '.join(self.command)
 
         return results
 
