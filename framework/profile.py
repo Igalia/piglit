@@ -138,6 +138,9 @@ class TestProfile(object):
         self.pre_run_hook()
         framework.exectest.Test.ENV = env
 
+        chunksize = 1
+
+        self.prepare_test_list(env)
         log = Log(len(self.test_list), env.verbose)
 
         def test(pair):
@@ -149,33 +152,30 @@ class TestProfile(object):
             name, test = pair
             test.execute(name, log, json_writer, self.dmesg)
 
+        def run_threads(pool, testlist):
+            """ Open a pool, close it, and join it """
+            pool.imap(test, testlist, chunksize)
+            pool.close()
+            pool.join()
+
         # Multiprocessing.dummy is a wrapper around Threading that provides a
         # multiprocessing compatible API
         #
         # The default value of pool is the number of virtual processor cores
         single = multiprocessing.dummy.Pool(1)
         multi = multiprocessing.dummy.Pool()
-        chunksize = 1
 
         if env.concurrent == "all":
-            multi.imap(test, self.test_list.iteritems(), chunksize)
+            run_threads(multi, self.test_list.iteritems())
         elif env.concurrent == "none":
-            single.imap(test, self.test_list.iteritems(), chunksize)
+            run_threads(single, self.test_list.iteritems())
         else:
             # Filter and return only thread safe tests to the threaded pool
-            multi.imap(test, (x for x in self.test_list.iteritems()
-                              if x[1].run_concurrent), chunksize)
+            run_threads(multi, (x for x in self.test_list.iteritems()
+                                if x[1].run_concurrent))
             # Filter and return the non thread safe tests to the single pool
-            single.imap(test, (x for x in self.test_list.iteritems()
-                               if not x[1].run_concurrent), chunksize)
-
-        # Close and join the pools
-        # If we don't close and the join the pools the script will exit before
-        # the pools finish running
-        multi.close()
-        single.close()
-        multi.join()
-        single.join()
+            run_threads(single, (x for x in self.test_list.iteritems()
+                                 if not x[1].run_concurrent))
 
         log.summary()
 
