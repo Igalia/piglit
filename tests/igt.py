@@ -72,7 +72,9 @@ igtEnvironmentOk = checkEnvironment()
 profile = TestProfile()
 
 class IGTTest(Test):
-    def __init__(self, binary, arguments=[]):
+    def __init__(self, binary, arguments=None):
+        if arguments is None:
+            arguments = []
         super(IGTTest, self).__init__(
             [path.join(igtTestRoot, binary)] + arguments)
 

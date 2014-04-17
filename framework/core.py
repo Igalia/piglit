@@ -344,8 +344,9 @@ class TestrunResult:
 
 
 class Environment:
-    def __init__(self, concurrent=True, execute=True, include_filter=[],
-                 exclude_filter=[], valgrind=False, dmesg=False, verbose=False):
+    def __init__(self, concurrent=True, execute=True, include_filter=None,
+                 exclude_filter=None, valgrind=False, dmesg=False,
+                 verbose=False):
         self.concurrent = concurrent
         self.execute = execute
         self.filter = []
@@ -361,9 +362,9 @@ class Environment:
 
         This code uses re.compile to rebuild the lists and set self.filter
         """
-        for each in include_filter:
+        for each in include_filter or []:
             self.filter.append(re.compile(each))
-        for each in exclude_filter:
+        for each in exclude_filter or []:
             self.exclude_filter.append(re.compile(each))
 
     def __iter__(self):
