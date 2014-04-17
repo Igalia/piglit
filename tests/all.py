@@ -1350,6 +1350,7 @@ spec['glsl-1.50']['gs-end-primitive-optional-with-points-out'] = concurrent_test
 spec['glsl-1.50']['getshaderiv-may-return-GS'] = concurrent_test('glsl-1.50-getshaderiv-may-return-GS')
 spec['glsl-1.50']['query-gs-prim-types'] = concurrent_test('glsl-1.50-query-gs-prim-types')
 spec['glsl-1.50']['transform-feedback-type-and-size'] = concurrent_test('glsl-1.50-transform-feedback-type-and-size')
+spec['glsl-1.50']['transform-feedback-vertex-id'] = concurrent_test('glsl-1.50-transform-feedback-vertex-id')
 for subtest in ['unnamed', 'named', 'array']:
     add_concurrent_test(
         spec['glsl-1.50'],
