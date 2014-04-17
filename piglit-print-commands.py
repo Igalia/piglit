@@ -30,6 +30,7 @@ import os.path as path
 
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
+import framework.profile
 from framework.exectest import Test
 from framework.gleantest import GleanTest
 
@@ -60,7 +61,7 @@ def main():
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    profile = core.loadTestProfile(args.testProfile)
+    profile = framework.profile.loadTestProfile(args.testProfile)
 
     def getCommand(test):
         command = ''
