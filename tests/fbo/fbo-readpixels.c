@@ -74,9 +74,10 @@ test_with_format(GLenum internal_format, GLenum format,
 	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_ALPHA_SIZE,
 				 &abits);
 
-	printf("testing with format 0x%04x, 0x%04x "
+	printf("testing with format %s, %s "
 	       "(%d,%d,%d,%d rgba)\n",
-	       internal_format, format,
+	       piglit_get_gl_enum_name(internal_format),
+	       piglit_get_gl_enum_name(format),
 	       rbits, gbits, bbits, abits);
 
 	glGenFramebuffersEXT(1, &fb);
@@ -90,10 +91,12 @@ test_with_format(GLenum internal_format, GLenum format,
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-		fprintf(stderr, "texture for internalformat 0x%04x. "
-			"format 0x%04x is framebuffer "
-			"incomplete (status = 0x%04x)\n",
-			internal_format, format, status);
+		fprintf(stderr, "texture for internalformat %s. "
+			"format %s is framebuffer "
+			"incomplete (status = %s)\n",
+			piglit_get_gl_enum_name(internal_format),
+			piglit_get_gl_enum_name(format),
+			piglit_get_gl_enum_name(status));
 		goto done;
 	}
 
