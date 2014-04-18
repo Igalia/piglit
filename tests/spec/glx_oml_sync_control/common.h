@@ -1,8 +1,8 @@
-#define glXGetSyncValuesOML __piglit_glXGetSyncValuesOML
-#define glXGetMscRateOML __piglit_glXGetMscRateOML
-#define glXSwapBuffersMscOML __piglit_glXSwapBuffersMscOML
-#define glXWaitForMscOML __piglit_glXWaitForMscOML
-#define glXWaitForSbcOML __piglit_glXWaitForSbcOML
+#define glXGetSyncValuesOML(dpy, drawable, ust, msc, sbc) __piglit_glXGetSyncValuesOML(dpy, drawable, ust, msc, sbc)
+#define glXGetMscRateOML(dpy, drawable, numerator, denominator) __piglit_glXGetMscRateOML(dpy, drawable, numerator, denominator)
+#define glXSwapBuffersMscOML(dpy, drawable, target_msc, divisor, remainder) __piglit_glXSwapBuffersMscOML(dpy, drawable, target_msc, divisor, remainder)
+#define glXWaitForMscOML(dpy, drawable, target_msc, divisor, remainder, ust, msc, sbc) __piglit_glXWaitForMscOML(dpy, drawable, target_msc, divisor, remainder, ust, msc, sbc)
+#define glXWaitForSbcOML(dpy, drawable, target_sbc, ust, msc, sbc) __piglit_glXWaitForSbcOML(dpy, drawable, target_sbc, ust, msc, sbc)
 
 extern PFNGLXGETSYNCVALUESOMLPROC __piglit_glXGetSyncValuesOML;
 extern PFNGLXGETMSCRATEOMLPROC __piglit_glXGetMscRateOML;

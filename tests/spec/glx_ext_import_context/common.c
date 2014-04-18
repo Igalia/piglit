@@ -31,6 +31,15 @@ PFNGLXGETCONTEXTIDEXTPROC __piglit_glXGetContextIDEXT = NULL;
 PFNGLXIMPORTCONTEXTEXTPROC __piglit_glXImportContextEXT = NULL;
 PFNGLXFREECONTEXTEXTPROC __piglit_glXFreeContextEXT = NULL;
 
+#define ADD_FUNC(name) PIGLIT_GLX_PROC(__piglit_##name, name)
+static const struct piglit_glx_proc_reference procedures[] = {
+	ADD_FUNC(glXGetCurrentDisplayEXT),
+	ADD_FUNC(glXQueryContextInfoEXT),
+	ADD_FUNC(glXGetContextIDEXT),
+	ADD_FUNC(glXImportContextEXT),
+	ADD_FUNC(glXFreeContextEXT),
+};
+
 Display *dpy = NULL;
 XVisualInfo *visinfo = NULL;
 GLXContext directCtx = NULL;
@@ -63,22 +72,6 @@ void GLX_EXT_import_context_setup_for_child(void)
 
 void GLX_EXT_import_context_setup(void)
 {
-	const char *const names[] = {
-		"glXGetCurrentDisplayEXT",
-		"glXQueryContextInfoEXT",
-		"glXGetContextIDEXT",
-		"glXImportContextEXT",
-		"glXFreeContextEXT"
-	};
-
-	__GLXextFuncPtr *procedures[ARRAY_SIZE(names)] = {
-		(__GLXextFuncPtr *) & __piglit_glXGetCurrentDisplayEXT,
-		(__GLXextFuncPtr *) & __piglit_glXQueryContextInfoEXT,
-		(__GLXextFuncPtr *) & __piglit_glXGetContextIDEXT,
-		(__GLXextFuncPtr *) & __piglit_glXImportContextEXT,
-		(__GLXextFuncPtr *) & __piglit_glXFreeContextEXT
-	};
-
 	const char *vendor;
 
 	dpy = piglit_get_glx_display();
@@ -113,7 +106,7 @@ void GLX_EXT_import_context_setup(void)
 		piglit_require_glx_extension(dpy, "GLX_EXT_import_context");
 	}
 
-	piglit_glx_get_all_proc_addresses(procedures, names, ARRAY_SIZE(names));
+	piglit_glx_get_all_proc_addresses(procedures, ARRAY_SIZE(procedures));
 
 	visinfo = piglit_get_glx_visual(dpy);
 

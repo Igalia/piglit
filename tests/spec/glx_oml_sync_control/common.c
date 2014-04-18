@@ -39,6 +39,16 @@ PFNGLXGETMSCRATEOMLPROC __piglit_glXGetMscRateOML;
 PFNGLXSWAPBUFFERSMSCOMLPROC __piglit_glXSwapBuffersMscOML;
 PFNGLXWAITFORMSCOMLPROC __piglit_glXWaitForMscOML;
 PFNGLXWAITFORSBCOMLPROC __piglit_glXWaitForSbcOML;
+
+#define ADD_FUNC(name) PIGLIT_GLX_PROC(__piglit_##name, name)
+static const struct piglit_glx_proc_reference procs[] = {
+	ADD_FUNC(glXGetSyncValuesOML),
+	ADD_FUNC(glXGetMscRateOML),
+	ADD_FUNC(glXSwapBuffersMscOML),
+	ADD_FUNC(glXWaitForMscOML),
+	ADD_FUNC(glXWaitForSbcOML),
+};
+
 Window win;
 XVisualInfo *visinfo;
 
@@ -47,24 +57,6 @@ piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy))
 {
 	Display *dpy;
 	GLXContext ctx;
-	const int proc_count = 5;
-	__GLXextFuncPtr *procs[proc_count];
-	const char *names[proc_count];
-	int i;
-
-#define ADD_FUNC(name)							\
-	do {								\
-		procs[i] = (__GLXextFuncPtr *)&(__piglit_##name);	\
-		names[i] = #name;					\
-		i++;							\
-	} while (0)
-
-	i = 0;
-	ADD_FUNC(glXGetSyncValuesOML);
-	ADD_FUNC(glXGetMscRateOML);
-	ADD_FUNC(glXSwapBuffersMscOML);
-	ADD_FUNC(glXWaitForMscOML);
-	ADD_FUNC(glXWaitForSbcOML);
 
 	dpy = XOpenDisplay(NULL);
 	if (dpy == NULL) {
@@ -73,7 +65,7 @@ piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy))
 	}
 
 	piglit_require_glx_extension(dpy, "GLX_OML_sync_control");
-	piglit_glx_get_all_proc_addresses(procs, names, ARRAY_SIZE(procs));
+	piglit_glx_get_all_proc_addresses(procs, ARRAY_SIZE(procs));
 
 	visinfo = piglit_get_glx_visual(dpy);
 	win = piglit_get_glx_window(dpy, visinfo);

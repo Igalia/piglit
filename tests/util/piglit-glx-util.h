@@ -65,7 +65,13 @@ piglit_glx_get_error(Display *dpy, XErrorEvent *err);
 const char *
 piglit_glx_error_string(int err);
 
+struct piglit_glx_proc_reference {
+	__GLXextFuncPtr *procedure;
+	const char *name;
+};
+
+#define PIGLIT_GLX_PROC(var, name) { (__GLXextFuncPtr *)&(var), #name }
+
 void
-piglit_glx_get_all_proc_addresses(__GLXextFuncPtr **procedures,
-				  const char *const *names,
+piglit_glx_get_all_proc_addresses(const struct piglit_glx_proc_reference *procedures,
 				  unsigned num);

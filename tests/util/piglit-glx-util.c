@@ -468,19 +468,18 @@ piglit_glx_error_string(int err)
  * \c piglit_report_result with \c PIGLIT_FAIL.
  */
 void
-piglit_glx_get_all_proc_addresses(__GLXextFuncPtr **procedures,
-				  const char *const *names,
+piglit_glx_get_all_proc_addresses(const struct piglit_glx_proc_reference *procedures,
 				  unsigned num)
 {
 	unsigned i;
 
 	for (i = 0; i < num; i++) {
-		*(procedures[i]) =
-			glXGetProcAddress((const GLubyte *) names[i]);
-		if (procedures[i] == NULL) {
+		*procedures[i].procedure =
+			glXGetProcAddress((const GLubyte *) procedures[i].name);
+		if (*procedures[i].procedure == NULL) {
 			fprintf(stderr,
 				"Failed to get function pointer for %s.\n",
-				names[i]);
+				procedures[i].name);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
