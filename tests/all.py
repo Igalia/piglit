@@ -616,12 +616,12 @@ create_context_es2_profile['invalid OpenGL ES version'] = concurrent_test('glx-c
 
 oml_sync_control = {};
 glx['GLX_OML_sync_control'] = oml_sync_control
-oml_sync_control['glXGetMscRateOML'] = concurrent_test('glx-oml-sync-control-getmscrate')
-oml_sync_control['swapbuffersmsc-divisor-zero'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-divisor-zero')
-oml_sync_control['swapbuffersmsc-return'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return')
-oml_sync_control['swapbuffersmsc-return swap_interval 0'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 0')
-oml_sync_control['swapbuffersmsc-return swap_interval 1'] = concurrent_test('glx-oml-sync-control-swapbuffersmsc-return 1')
-oml_sync_control['waitformsc'] = concurrent_test('glx-oml-sync-control-waitformsc')
+oml_sync_control['glXGetMscRateOML'] = PiglitTest(['glx-oml-sync-control-getmscrate'])
+oml_sync_control['swapbuffersmsc-divisor-zero'] = PiglitTest(['glx-oml-sync-control-swapbuffersmsc-divisor-zero'])
+oml_sync_control['swapbuffersmsc-return'] = PiglitTest(['glx-oml-sync-control-swapbuffersmsc-return'])
+oml_sync_control['swapbuffersmsc-return swap_interval 0'] = PiglitTest(['glx-oml-sync-control-swapbuffersmsc-return', '0'])
+oml_sync_control['swapbuffersmsc-return swap_interval 1'] = PiglitTest(['glx-oml-sync-control-swapbuffersmsc-return', '1'])
+oml_sync_control['waitformsc'] = PiglitTest(['glx-oml-sync-control-waitformsc'])
 
 mesa_query_renderer = {}
 glx['GLX_MESA_query_renderer'] = mesa_query_renderer
