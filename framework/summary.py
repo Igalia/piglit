@@ -400,28 +400,14 @@ class Summary:
                     if not path.exists(temp_path):
                         os.makedirs(temp_path)
 
-                    dmesg = value.get('dmesg', 'None')
-                    if isinstance(dmesg, list):
-                        dmesg = "\n".join(dmesg)
+                    if isinstance(value.get('dmesg'), list):
+                        value['dmesg'] = "\n".join(value['dmesg'])
 
                     with open(path.join(destination, each.name, key + ".html"),
                               'w') as out:
                         out.write(testfile.render(
                             testname=key,
-                            status=value.get('result', 'None'),
-                            # Returning a NoneType (instaed of 'None') prevents
-                            # this field from being generated.setting the
-                            # environment to run tests is ugly, and should
-                            # disapear at somepoint
-                            env=value.get('environment', None),
-                            returncode=value.get('returncode', 'None'),
-                            time=value.get('time', 'None'),
-                            info=value.get('info', None), # deprecated
-                            out=value.get('out', 'None'),
-                            err=value.get('err', 'None'),
-                            traceback=value.get('traceback', 'None'),
-                            command=value.get('command', 'None'),
-                            dmesg=dmesg,
+                            value=value,
                             css=path.relpath(result_css, temp_path),
                             index=path.relpath(index, temp_path)))
 
