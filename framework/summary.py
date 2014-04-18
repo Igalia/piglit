@@ -416,7 +416,9 @@ class Summary:
                             env=value.get('environment', None),
                             returncode=value.get('returncode', 'None'),
                             time=value.get('time', 'None'),
-                            info=value.get('info', 'None'),
+                            info=value.get('info', None), # deprecated
+                            out=value.get('out', 'None'),
+                            err=value.get('err', 'None'),
                             traceback=value.get('traceback', 'None'),
                             command=value.get('command', 'None'),
                             dmesg=dmesg,

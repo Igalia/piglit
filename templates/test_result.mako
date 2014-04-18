@@ -28,10 +28,25 @@
         <td>Time</td>
         <td>${time}</b>
       </tr>
+    ## Info is deprecated and may disapear someday
+    % if info is not None:
       <tr>
         <td>Info</td>
         <td>
           <pre>${info | h}</pre>
+        </td>
+      </tr>
+    % endif
+      <tr>
+        <td>Stdout</td>
+        <td>
+          <pre>${out | h}</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>Stderr</td>
+        <td>
+          <pre>${err | h}</pre>
         </td>
       </tr>
       % if env:
