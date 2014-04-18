@@ -1,6 +1,7 @@
 // [config]
 // expect_result: fail
 // glsl_version: 1.50
+// require_extensions: GL_ARB_gpu_shader5
 // check_link: false
 // [end config]
 //
