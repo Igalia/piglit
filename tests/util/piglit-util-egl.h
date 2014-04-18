@@ -34,6 +34,10 @@
 extern "C" {
 #endif
 
+#define EGL_PLATFORM_WAYLAND_EXT          0x31D8
+#define EGL_PLATFORM_X11_EXT              0x31D5
+#define EGL_PLATFORM_GBM_MESA             0x31D7
+
 /**
  * \brief Convert an EGL error to a string.
  *
