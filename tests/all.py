@@ -623,6 +623,15 @@ oml_sync_control['swapbuffersmsc-return swap_interval 0'] = PiglitTest(['glx-oml
 oml_sync_control['swapbuffersmsc-return swap_interval 1'] = PiglitTest(['glx-oml-sync-control-swapbuffersmsc-return', '1'])
 oml_sync_control['waitformsc'] = PiglitTest(['glx-oml-sync-control-waitformsc'])
 
+oml_sync_control_nonzeros = [
+    mode + [kind, period]
+    for mode in [[], ['-fullscreen'], ['-waitformsc']]
+    for kind in ['-divisor', '-msc-delta']
+    for period in ['1', '2']
+]
+for arg in oml_sync_control_nonzeros:
+    oml_sync_control[' '.join(['timing'] + arg)] = PiglitTest(['glx-oml-sync-control-timing'] + arg)
+
 mesa_query_renderer = {}
 glx['GLX_MESA_query_renderer'] = mesa_query_renderer
 mesa_query_renderer['coverage'] = concurrent_test('glx-query-renderer-coverage')

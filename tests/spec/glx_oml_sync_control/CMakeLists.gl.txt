@@ -26,6 +26,7 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	piglit_add_executable (glx-oml-sync-control-swapbuffersmsc-divisor-zero swapbuffersmsc-divisor-zero.c common.c)
 	piglit_add_executable (glx-oml-sync-control-swapbuffersmsc-return swapbuffersmsc-return.c common.c)
 	piglit_add_executable (glx-oml-sync-control-waitformsc waitformsc.c common.c)
+	piglit_add_executable (glx-oml-sync-control-timing timing.c common.c)
 ENDIF(PIGLIT_BUILD_GLX_TESTS)
 
 # vim: ft=cmake:
