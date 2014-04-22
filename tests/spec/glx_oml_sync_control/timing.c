@@ -92,6 +92,9 @@ draw(Display *dpy)
 		expected_msc_wallclock_duration = 1e6 * rate_den / rate_num;
 	}
 
+	piglit_set_timeout(5, PIGLIT_FAIL);
+
+
 	for (i = 0; i < loops; i++) {
 		int64_t new_ust = 0xd0, new_msc = 0xd0, new_sbc = 0xd0;
 		int64_t check_ust = 0xd0, check_msc = 0xd0, check_sbc = 0xd0;

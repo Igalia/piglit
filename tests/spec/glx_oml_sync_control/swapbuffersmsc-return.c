@@ -51,6 +51,8 @@ draw(Display *dpy)
 	bool pass = true;
 	int i;
 
+	piglit_set_timeout(5, PIGLIT_FAIL);
+
 	if (swap_interval != -1) {
 #if defined(GLX_MESA_swap_control)
 		PFNGLXSWAPINTERVALMESAPROC pglXSwapIntervalMESA;

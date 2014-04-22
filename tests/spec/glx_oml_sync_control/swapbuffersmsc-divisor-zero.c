@@ -49,6 +49,8 @@ draw(Display *dpy)
 	int64_t target_msc, outstanding_sbc;
 	bool already_wrapped = false;
 
+	piglit_set_timeout(5, PIGLIT_FAIL);
+
 	glXGetSyncValuesOML(dpy, win, &start_ust, &start_msc, &start_sbc);
 	if (start_sbc != 0) {
 		fprintf(stderr,
