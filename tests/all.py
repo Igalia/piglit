@@ -1078,6 +1078,7 @@ for subtest in ['generated', 'written', 'flush']:
 gl31['required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 31')
 gl31['required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 31')
 gl31['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 31')
+gl31['attributeless-vertexid'] = concurrent_test('gl-3.1-attributeless-vertexid')
 
 gl32 = {}
 spec['!OpenGL 3.2'] = gl32
