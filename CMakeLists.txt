@@ -302,10 +302,16 @@ if (OPENGL_FOUND)
 	endif (APPLE)
 endif()
 
+if(CMAKE_USE_PTHREADS_INIT)
+	set(PIGLIT_HAS_PTHREADS true)
+	add_definitions(-DPIGLIT_HAS_PTHREADS)
+endif()
+
 FIND_LIBRARY(HAVE_LIBRT NAMES rt)
 if(HAVE_LIBRT)
 	set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} rt)
 endif()
+
 check_c_source_compiles(
 	"
 	#define _POSIX_C_SOURCE 199309L
@@ -314,15 +320,34 @@ check_c_source_compiles(
 	"
 	PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
 )
+
+if(PIGLIT_HAS_PTHREADS AND PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
+	check_c_source_compiles(
+		"
+		#include <signal.h>
+		#include <time.h>
+		static void timeout(union sigval val) { }
+		int main() {
+			struct sigevent sev = {
+				.sigev_notify = SIGEV_THREAD,
+				.sigev_notify_function = timeout,
+			};
+			timer_t timerid;
+			return timer_create(CLOCK_MONOTONIC, &sev, &timerid);
+		}
+		"
+		PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD
+	)
+endif()
+
 set(CMAKE_REQUIRED_LIBRARIES)
 
 if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 	add_definitions(-DPIGLIT_HAS_POSIX_CLOCK_MONOTONIC)
 endif()
 
-if(CMAKE_USE_PTHREADS_INIT)
-	set(PIGLIT_HAS_PTHREADS true)
-	add_definitions(-DPIGLIT_HAS_PTHREADS)
+if(PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD)
+	add_definitions(-DPIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD)
 endif()
 
 if(PIGLIT_USE_WAFFLE AND ${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

@@ -43,6 +43,10 @@
 #include <inttypes.h>
 
 #ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
+#ifdef PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD
+#include <pthread.h>
+#include <signal.h>
+#endif
 #include <time.h>
 #endif
 
@@ -218,6 +222,12 @@ piglit_report_result(enum piglit_result result)
 {
 	const char *result_str = piglit_result_to_string(result);
 
+#ifdef PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD
+	/* Ensure we only report one result in case we race with timeout */
+	static pthread_mutex_t result_lock = PTHREAD_MUTEX_INITIALIZER;
+	pthread_mutex_lock(&result_lock);
+#endif
+
 	fflush(stderr);
 
 	printf("PIGLIT: {\"result\": \"%s\" }\n", result_str);
@@ -231,6 +241,36 @@ piglit_report_result(enum piglit_result result)
 	default:
 		exit(1);
 	}
+}
+
+#ifdef PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD
+static void
+timeout_expired(union sigval val)
+{
+	piglit_loge("Test timed out.");
+	piglit_report_result(val.sival_int);
+}
+#endif
+
+void
+piglit_set_timeout(double seconds, enum piglit_result timeout_result)
+{
+#ifdef PIGLIT_HAS_POSIX_TIMER_NOTIFY_THREAD
+	struct sigevent sev = {
+		.sigev_notify = SIGEV_THREAD,
+		.sigev_notify_function = timeout_expired,
+		.sigev_value = { .sival_int = timeout_result },
+	};
+	time_t sec = seconds;
+	struct itimerspec spec = {
+		.it_value = { .tv_sec = sec, .tv_nsec = (seconds - sec) * 1e9 },
+	};
+	timer_t timerid;
+	timer_create(CLOCK_MONOTONIC, &sev, &timerid);
+	timer_settime(timerid, 0, &spec, NULL);
+#else
+	piglit_logi("Cannot abort this test for timeout on this platform");
+#endif
 }
 
 void
