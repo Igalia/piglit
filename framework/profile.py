@@ -89,7 +89,7 @@ class TestProfile(object):
         self.flatten_group_hierarchy()
 
         def matches_any_regexp(x, re_list):
-            return True in map(lambda r: r.search(x) is not None, re_list)
+            return any(r.search(x) for r in re_list)
 
         def test_matches(path, test):
             """Filter for user-specified restrictions"""
