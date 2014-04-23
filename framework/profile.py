@@ -75,12 +75,12 @@ class TestProfile(object):
         '''
 
         def f(prefix, group, test_dict):
-            for key in group.iterkeys():
+            for key, value in group.iteritems():
                 fullkey = key if prefix == '' else os.path.join(prefix, key)
-                if isinstance(group[key], dict):
-                    f(fullkey, group[key], test_dict)
+                if isinstance(value, dict):
+                    f(fullkey, value, test_dict)
                 else:
-                    test_dict[fullkey] = group[key]
+                    test_dict[fullkey] = value
         f('', self.tests, self.test_list)
         # Clear out the old Group()
         self.tests = {}
