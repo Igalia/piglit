@@ -26,6 +26,10 @@ import os
 import re
 import sys
 import subprocess
+import threading
+import time
+import signal
+from datetime import datetime, timedelta
 
 from os import path
 from framework.core import TestResult
@@ -71,6 +75,47 @@ igtEnvironmentOk = checkEnvironment()
 
 profile = TestProfile()
 
+# This class is for timing out tests that hang. Create an instance by passing
+# it a timeout in seconds and the Popen object that is running your test. Then
+# call the start method (inherited from Thread) to start the timer. The Popen
+# object is killed if the timeout is reached and it has not completed. Wait for
+# the outcome by calling the join() method from the parent.
+
+class ProcessTimeout (threading.Thread):
+    def __init__ (self, timeout, proc):
+       threading.Thread.__init__(self)
+       self.proc = proc
+       self.timeout = timeout
+       self.status = 0
+
+    def run(self):
+        start_time = datetime.now()
+        delta = 0
+        while (delta < self.timeout) and (self.proc.poll() == None):
+            time.sleep(1)
+            delta = (datetime.now() - start_time).total_seconds()
+
+        # if the test is not finished after timeout, first try to terminate it
+        # and if that fails, send SIGKILL to all processes in the test's
+        # process group
+
+        if self.proc.poll() == None:
+            self.status = 1
+            self.proc.terminate()
+            time.sleep(5)
+
+        if self.proc.poll() == None:
+            self.status = 2
+            os.killpg(self.proc.pid, signal.SIGKILL)
+            self.proc.wait()
+
+
+    def join(self):
+      threading.Thread.join(self)
+      return self.status
+
+
+
 class IGTTest(Test):
     def __init__(self, binary, arguments=None):
         if arguments is None:
@@ -86,6 +131,8 @@ class IGTTest(Test):
             self.result['result'] = 'pass'
         elif self.result['returncode'] == 77:
             self.result['result'] = 'skip'
+        elif self.result['returncode'] == 78:
+            self.result['result'] = 'timeout'
         else:
             self.result['result'] = 'fail'
 
@@ -96,6 +143,53 @@ class IGTTest(Test):
             return
 
         super(IGTTest, self).run()
+
+
+    def get_command_result(self):
+        out = ""
+        err = ""
+        returncode = 0
+        fullenv = os.environ.copy()
+        for key, value in self.env.iteritems():
+            fullenv[key] = str(value)
+
+        try:
+            proc = subprocess.Popen(self.command,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,
+                                    env=fullenv,
+                                    universal_newlines=True,
+                                    preexec_fn=os.setpgrp)
+
+            # create a ProcessTimeout object to watch out for test hang if the
+            # process is still going after the timeout, then it will be killed
+            # forcing the communicate function (which is a blocking call) to
+            # return
+            timeout = ProcessTimeout(600, proc)
+            timeout.start()
+            out, err = proc.communicate()
+            if (timeout.join() > 0):
+                returncode = 78
+            else:
+                returncode = proc.returncode
+
+        except OSError as e:
+            # Different sets of tests get built under
+            # different build configurations.  If
+            # a developer chooses to not build a test,
+            # Piglit should not report that test as having
+            # failed.
+            if e.errno == errno.ENOENT:
+                out = "PIGLIT: {'result': 'skip'}\n" \
+                    + "Test executable not found.\n"
+                err = ""
+                returncode = None
+            else:
+                raise e
+        self.result['out'] = out.decode('utf-8', 'replace')
+        self.result['err'] = err.decode('utf-8', 'replace')
+        self.result['returncode'] = returncode
+
 
 def listTests(listname):
     oldDir = os.getcwd()
