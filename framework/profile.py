@@ -75,7 +75,7 @@ class TestProfile(object):
         '''
 
         def f(prefix, group, test_dict):
-            for key in group:
+            for key in group.iterkeys():
                 fullkey = key if prefix == '' else os.path.join(prefix, key)
                 if isinstance(group[key], dict):
                     f(fullkey, group[key], test_dict)
