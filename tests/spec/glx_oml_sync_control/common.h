@@ -13,4 +13,4 @@ extern PFNGLXWAITFORSBCOMLPROC __piglit_glXWaitForSbcOML;
 extern Window win;
 extern XVisualInfo *visinfo;
 
-void piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy));
+void piglit_oml_sync_control_test_run(bool fullscreen, enum piglit_result (*draw)(Display *dpy));

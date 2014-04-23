@@ -53,7 +53,7 @@ Window win;
 XVisualInfo *visinfo;
 
 void
-piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy))
+piglit_oml_sync_control_test_run(bool fullscreen, enum piglit_result (*draw)(Display *dpy))
 {
 	Display *dpy;
 	GLXContext ctx;
@@ -68,7 +68,10 @@ piglit_oml_sync_control_test_run(enum piglit_result (*draw)(Display *dpy))
 	piglit_glx_get_all_proc_addresses(procs, ARRAY_SIZE(procs));
 
 	visinfo = piglit_get_glx_visual(dpy);
-	win = piglit_get_glx_window(dpy, visinfo);
+	if (fullscreen)
+		win = piglit_get_glx_window_fullscreen(dpy, visinfo);
+	else
+		win = piglit_get_glx_window(dpy, visinfo);
 	ctx = piglit_get_glx_context(dpy, visinfo);
 	glXMakeCurrent(dpy, win, ctx);
 

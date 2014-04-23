@@ -82,7 +82,7 @@ draw(Display *dpy)
 int
 main(int argc, char **argv)
 {
-	piglit_oml_sync_control_test_run(draw);
+	piglit_oml_sync_control_test_run(false, draw);
 
 	return 0;
 }
