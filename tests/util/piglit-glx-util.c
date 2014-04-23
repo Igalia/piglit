@@ -93,8 +93,8 @@ piglit_get_glx_context_share(Display *dpy, XVisualInfo *visinfo, GLXContext shar
 	return ctx;
 }
 
-Window
-_piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo, bool map)
+static Window
+_piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo, bool map, bool fullscreen)
 {
 	XSetWindowAttributes window_attr;
 	unsigned long mask;
@@ -109,6 +109,14 @@ _piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo, bool map)
 	window_attr.event_mask = StructureNotifyMask | ExposureMask |
 		KeyPressMask;
 	mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+
+	if (fullscreen) {
+		window_attr.override_redirect = True;
+		mask |= CWOverrideRedirect;
+		piglit_width = DisplayWidth(dpy, screen);
+		piglit_height = DisplayHeight(dpy, screen);
+	}
+
 	win = XCreateWindow(dpy, root_win, 0, 0,
 			    piglit_width, piglit_height,
 			    0, visinfo->depth, InputOutput,
@@ -126,13 +134,19 @@ _piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo, bool map)
 Window
 piglit_get_glx_window_unmapped(Display *dpy, XVisualInfo *visinfo)
 {
-	return _piglit_get_glx_window(dpy, visinfo, false);
+	return _piglit_get_glx_window(dpy, visinfo, false, false);
+}
+
+Window
+piglit_get_glx_window_fullscreen(Display *dpy, XVisualInfo *visinfo)
+{
+	return _piglit_get_glx_window(dpy, visinfo, true, true);
 }
 
 Window
 piglit_get_glx_window(Display *dpy, XVisualInfo *visinfo)
 {
-	return _piglit_get_glx_window(dpy, visinfo, true);
+	return _piglit_get_glx_window(dpy, visinfo, true, false);
 }
 
 bool
