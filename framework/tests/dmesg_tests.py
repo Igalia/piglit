@@ -26,7 +26,7 @@ import subprocess
 import re
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
-from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg, DmesgError
+from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg
 from framework.core import TestResult, PiglitJSONEncoder
 from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
@@ -322,34 +322,3 @@ def check_classes_dmesg(test_class, test_args):
 
     nt.assert_in(json.result['result'], ['dmesg-warn', 'dmesg-fail'],
                  msg="{0} did not update status with dmesg".format(type(test)))
-
-
-@nt.timed(.015)
-def test_dmesg_performance():
-    """ Test that update_dmesg returns in less than .015 seconds on large loads
-    
-    One of the largest problems with dmesg is that there are 16000+ tests
-    already, and more will be added. Since dmesg runs serially minimizing the
-    amount of time spend on setup and teardown of tests is paramount, even at 1
-    second the results will add 4 minutes to the test run with 16000 tests.
-    
-    For the purpose of this test we won't actually read dmesg, it's not nice to
-    keep trashing dmesg, and this test needs to see that a large list, say 7000
-    items, won't take forever.
-
-    This was tested on an ivybridge i3-3217U where ~.013 was a common value,
-    most modern systems with a desktop Intel or AMD processor should be able to
-    hit this number. Systems with very low power CPUs may not be able to hit
-    this number.
-
-    """
-    dmesg = LinuxDmesg()
-    # 7000 is an arbitrary big number
-    length = 7000 - len(dmesg._new_messages)
-    # make new messages really big
-    dmesg._new_messages = ["piglit test {}".format(x) for x in xrange(length)] + dmesg._new_messages
-
-    result = TestResult()
-    result['result'] = 'pass'
-
-    result = dmesg.update_result(result)
