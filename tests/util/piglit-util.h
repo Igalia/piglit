@@ -53,6 +53,10 @@ extern "C" {
 
 #if defined(_MSC_VER)
 
+#if !defined(__cplusplus) && !defined(inline)
+#define inline __inline
+#endif
+
 #define snprintf sprintf_s
 
 static __inline double

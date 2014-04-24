@@ -29,10 +29,6 @@
 #include "piglit-framework-gl.h"
 #endif
 
-#ifdef _WIN32
-#define inline __inline
-#endif
-
 /* Global state maintained by the Piglit dispatch mechanism: */
 
 /**
