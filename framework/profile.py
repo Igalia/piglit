@@ -39,7 +39,25 @@ import framework.exectest
 
 
 class TestProfile(object):
+    """ Class that holds a list of tests for execution
+
+    This class provides a container for storing tests in either a nested
+    dictionary structure (deprecated), or a flat dictionary structure with '/'
+    delimited groups.
+
+    Once a TestProfile object is created tests can be added to the test_list
+    name as a key/value pair, the key should be a fully qualified name for the
+    test, including it's group hierarchy and should be '/' delimited, with no
+    leading or trailing '/', the value should be an exectest.Test derived
+    object.
+
+    When the test list is filled calling TestProfile.run() will set the
+    execution of these tests off, and will flatten the nested group hierarchy
+    of self.tests and merge it with self.test_list
+
+    """
     def __init__(self):
+        # Self.tests is deprecated, see above
         self.tests = {}
         self.test_list = {}
         self.filters = []
@@ -56,7 +74,7 @@ class TestProfile(object):
     def dmesg(self, not_dummy):
         """ Set dmesg
 
-        Argumnts:
+        Arguments:
         not_dummy -- if Truthy dmesg will try to get a PosixDmesg, if Falsy it
                      will get a DummyDmesg
 
@@ -64,17 +82,20 @@ class TestProfile(object):
         self.__dmesg = get_dmesg(not_dummy)
 
     def flatten_group_hierarchy(self):
-        '''
+        """ Flatten nested dictionary structure
+
         Convert Piglit's old hierarchical Group() structure into a flat
         dictionary mapping from fully qualified test names to "Test" objects.
 
         For example,
-        tests['spec']['glsl-1.30']['preprocessor']['compiler']['void.frag']
+        self.tests['spec']['glsl-1.30']['preprocessor']['compiler']['void.frag']
         would become:
-        test_list['spec/glsl-1.30/preprocessor/compiler/void.frag']
-        '''
+        self.test_list['spec/glsl-1.30/preprocessor/compiler/void.frag']
+
+        """
 
         def f(prefix, group, test_dict):
+            """ Recursively flatter nested dictionary tree """
             for key, value in group.iteritems():
                 fullkey = os.path.join(prefix, key)
                 if isinstance(value, dict):
@@ -86,11 +107,22 @@ class TestProfile(object):
         self.tests = {}
 
     def prepare_test_list(self, env):
+        """ Prepare tests for running
+
+        Flattens the nested group hierarchy into a flat dictionary using '/'
+        delimited groups by calling self.flatten_group_hierarchy(), then
+        runs it's own filters plus the filters in the self.filters name
+
+        Arguments:
+        env - a core.Environment instance
+
+        """
         self.flatten_group_hierarchy()
 
         def matches_any_regexp(x, re_list):
             return any(r.search(x) for r in re_list)
 
+        # The extra argument is needed to match check_all's API
         def test_matches(path, test):
             """Filter for user-specified restrictions"""
             return ((not env.filter or matches_any_regexp(path, env.filter))
@@ -99,6 +131,7 @@ class TestProfile(object):
 
         filters = self.filters + [test_matches]
         def check_all(item):
+            """ Checks group and test name against all filters """
             path, test = item
             for f in filters:
                 if not f(path, test):
@@ -113,7 +146,7 @@ class TestProfile(object):
         """ Hook executed at the start of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
-        set this to do something, as be dfault it will no-op
+        set this to do something, as be default it will no-op
 
         """
         pass
@@ -122,18 +155,29 @@ class TestProfile(object):
         """ Hook executed at the end of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
-        set this to do something, as be dfault it will no-op
+        set this to do something, as be default it will no-op
 
         """
         pass
 
     def run(self, env, json_writer):
-        '''
-        Schedule all tests in profile for execution.
+        """ Runs all tests using Thread pool
 
-        See ``Test.schedule`` and ``Test.run``.
-        '''
-        self.prepare_test_list(env)
+        When called this method will flatten out self.tests into
+        self.test_list, then will prepare a logger, pass env to the Test class,
+        and begin executing tests through it's Thread pools.
+
+        Based on the value of env.concurrent it will either run all the tests
+        concurrently, all serially, or first the thread safe tests then the
+        serial tests.
+
+        Finally it will print a final summary of the tests
+
+        Arguments:
+        env -- a core.Environment instance
+        json_writer -- a core.JSONWriter instance
+
+        """
 
         self.pre_run_hook()
         framework.exectest.Test.ENV = env
@@ -146,7 +190,7 @@ class TestProfile(object):
         def test(pair):
             """ Function to call test.execute from .map
 
-            adds env and json_writer which are needed by Test.execute()
+            Adds env and json_writer which are needed by Test.execute()
 
             """
             name, test = pair
@@ -215,6 +259,13 @@ def loadTestProfile(filename):
     TestProfile instance. This loads that module and returns it or raises an
     error.
 
+    This method doesn't care about file extensions as a way to be backwards
+    compatible with script wrapping piglit. 'tests/quick', 'tests/quick.tests',
+    and 'tests/quick.py' are all equally valid for filename
+
+    Arguments:
+    filename -- the name of a python module to get a 'profile' from
+
     """
     mod = importlib.import_module('tests.{0}'.format(
         os.path.splitext(os.path.basename(filename))[0]))
@@ -231,7 +282,7 @@ def merge_test_profiles(profiles):
     """ Helper for loading and merging TestProfile instances
 
     Takes paths to test profiles as arguments and returns a single merged
-    TestPRofile instance.
+    TestProfile instance.
 
     Arguments:
     profiles -- a list of one or more paths to profile files.
