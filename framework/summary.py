@@ -342,8 +342,9 @@ class Summary:
         Private: Find the total number of pass, fail, crash, skip, and warn in
         the *last* set of results stored in self.results.
         """
-        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0, 'warn': 0,
-                       'dmesg-warn': 0, 'dmesg-fail': 0}
+        self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0,
+                       'timeout': 0, 'warn': 0, 'dmesg-warn': 0,
+                       'dmesg-fail': 0}
 
         for test in self.results[-1].tests.itervalues():
             self.totals[str(test['result'])] += 1
@@ -472,6 +473,7 @@ class Summary:
               "       fail: {fail}\n"
               "      crash: {crash}\n"
               "       skip: {skip}\n"
+              "    timeout: {timeout}\n"
               "       warn: {warn}\n"
               " dmesg-warn: {dmesg-warn}\n"
               " dmesg-fail: {dmesg-fail}".format(**self.totals))

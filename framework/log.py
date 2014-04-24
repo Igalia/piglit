@@ -39,7 +39,8 @@ class Log(object):
         self.__generator = (x for x in xrange(self.__total))
         self.__pad = len(str(self.__total))
         self.__summary_keys = set(['pass', 'fail', 'warn', 'crash', 'skip',
-                                   'dmesg-warn', 'dmesg-fail', 'dry-run'])
+                                   'dmesg-warn', 'dmesg-fail', 'dry-run',
+                                   'timeout'])
         self.__summary = collections.defaultdict(lambda: 0)
         self.__lastlength = 0
 

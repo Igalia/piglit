@@ -40,8 +40,8 @@ dmesg-warn
 warn
 dmesg-fail
 fail
-crash
 timeout
+crash
 
 SKIP and NOTRUN are not factored into regressions and fixes, they are counted
 seperately. They also derive from a sublcass of Status, which always returns
@@ -63,6 +63,7 @@ __all__ = ['NOTRUN',
            'DMESG_WARN',
            'DMESG_FAIL',
            'SKIP',
+           'TIMEOUT',
            'ALL']
 
 
@@ -81,7 +82,8 @@ def status_lookup(status):
                    'crash': CRASH,
                    'dmesg-warn': DMESG_WARN,
                    'dmesg-fail': DMESG_FAIL,
-                   'notrun': NOTRUN}
+                   'notrun': NOTRUN,
+                   'timeout': TIMEOUT}
 
     try:
         return status_dict[status]
@@ -223,7 +225,9 @@ FAIL = Status('fail', 30)
 
 DMESG_FAIL = Status('dmesg-fail', 40)
 
-CRASH = Status('crash', 50)
+TIMEOUT = Status('timeout', 50)
+
+CRASH = Status('crash', 60)
 
 # A tuple (ordered, immutable) of all statuses in this module
-ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, CRASH, SKIP, NOTRUN)
+ALL = (PASS, WARN, DMESG_WARN, FAIL, DMESG_FAIL, TIMEOUT, CRASH, SKIP, NOTRUN)
