@@ -62,13 +62,14 @@ class TestProfile(object):
         self.test_list = {}
         self.filters = []
         # Sets a default of a Dummy
+        self._dmesg = None
         self.dmesg = False
         self.results_dir = None
 
     @property
     def dmesg(self):
         """ Return dmesg """
-        return self.__dmesg
+        return self._dmesg
 
     @dmesg.setter
     def dmesg(self, not_dummy):
@@ -79,7 +80,7 @@ class TestProfile(object):
                      will get a DummyDmesg
 
         """
-        self.__dmesg = get_dmesg(not_dummy)
+        self._dmesg = get_dmesg(not_dummy)
 
     def flatten_group_hierarchy(self):
         """ Flatten nested dictionary structure
