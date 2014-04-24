@@ -2646,6 +2646,7 @@ for stage in ['vs', 'gs', 'fs']:
 ext_texture_swizzle = {}
 spec['EXT_texture_swizzle'] = ext_texture_swizzle
 add_plain_test(ext_texture_swizzle, 'tex-swizzle')
+add_concurrent_test(ext_texture_swizzle, 'ext_texture_swizzle-api')
 add_concurrent_test(ext_texture_swizzle, 'ext_texture_swizzle-swizzle')
 ext_texture_swizzle['depth_texture_mode_and_swizzle'] = concurrent_test('depth_texture_mode_and_swizzle')
 
