@@ -62,14 +62,35 @@ class Writer:
         duration = None
         try:
             try:
-                self.report.addStdout(result['command'] + '\n')
+                command = result['command']
             except KeyError:
                 pass
+            else:
+                self.report.addStdout(command + '\n')
 
             try:
-                self.report.addStderr(result['info'])
+                stdout = result['out']
             except KeyError:
                 pass
+            else:
+                if stdout:
+                    self.report.addStdout(stdout + '\n')
+
+            try:
+                stderr = result['err']
+            except KeyError:
+                pass
+            else:
+                if stderr:
+                    self.report.addStderr(stderr + '\n')
+
+            try:
+                returncode = result['returncode']
+            except KeyError:
+                pass
+            else:
+                if returncode:
+                    self.report.addStderr('returncode = %s\n' % returncode)
 
             success = result.get('result')
             if success in (status.PASS, status.WARN):
