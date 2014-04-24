@@ -38,7 +38,7 @@ X_TEST_SUITE = os.path.join(TEST_BIN_DIR, 'xtest')
 
 class XTSProfile(TestProfile):
     """ A subclass of TestProfile that provides a setup hook for XTS """
-    def pre_run_hook(self):
+    def _pre_run_hook(self):
         """ This hook sets the XTSTest.results_path variable
 
         Setting this variable allows images created by XTS to moved into the

@@ -87,7 +87,7 @@ def test_testprofile_flatten():
     profile_.tests['group1']['group2']['test2'] = 'thing'
     profile_.tests['group1']['group2']['group3']['test3'] = 'thing'
 
-    profile_.flatten_group_hierarchy()
+    profile_._flatten_group_hierarchy()
 
     baseline = {
         'group1/test1': 'thing',
@@ -160,7 +160,7 @@ def check_flatten(tests, testlist):
     """ TestProfile.prepare_test_list flattens TestProfile.tests """
     profile_ = profile.TestProfile()
     profile_.tests = tests
-    profile_.flatten_group_hierarchy()
+    profile_._flatten_group_hierarchy()
 
     nt.assert_dict_equal(profile_.test_list, testlist)
 
@@ -171,7 +171,7 @@ def check_mixed_flatten(tests, testlist):
     profile_ = profile.TestProfile()
     profile_.tests = tests
     profile_.test_list['test8'] = 'other'
-    profile_.flatten_group_hierarchy()
+    profile_._flatten_group_hierarchy()
 
     baseline = {'test8': 'other'}
     baseline.update(testlist)
@@ -215,7 +215,7 @@ def test_matches_filter_mar_1(data):
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
-    profile_.prepare_test_list(env)
+    profile_._prepare_test_list(env)
 
     nt.assert_dict_equal(profile_.test_list, data)
 
@@ -227,7 +227,7 @@ def test_matches_filter_mar_2(data):
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
-    profile_.prepare_test_list(env)
+    profile_._prepare_test_list(env)
 
     baseline = {'group3/test5': 'other'}
 
@@ -242,7 +242,7 @@ def test_matches_env_exclude(data):
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
-    profile_.prepare_test_list(env)
+    profile_._prepare_test_list(env)
 
     baseline = copy.deepcopy(data)
     del baseline['group3/test5']
@@ -257,7 +257,7 @@ def test_matches_exclude_mar(data):
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
-    profile_.prepare_test_list(env)
+    profile_._prepare_test_list(env)
 
     baseline = copy.deepcopy(data)
     del baseline['group3/test5']

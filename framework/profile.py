@@ -82,7 +82,7 @@ class TestProfile(object):
         """
         self._dmesg = get_dmesg(not_dummy)
 
-    def flatten_group_hierarchy(self):
+    def _flatten_group_hierarchy(self):
         """ Flatten nested dictionary structure
 
         Convert Piglit's old hierarchical Group() structure into a flat
@@ -107,7 +107,7 @@ class TestProfile(object):
         # Clear out the old Group()
         self.tests = {}
 
-    def prepare_test_list(self, env):
+    def _prepare_test_list(self, env):
         """ Prepare tests for running
 
         Flattens the nested group hierarchy into a flat dictionary using '/'
@@ -118,7 +118,7 @@ class TestProfile(object):
         env - a core.Environment instance
 
         """
-        self.flatten_group_hierarchy()
+        self._flatten_group_hierarchy()
 
         def matches_any_regexp(x, re_list):
             return any(r.search(x) for r in re_list)
@@ -143,7 +143,7 @@ class TestProfile(object):
         self.test_list = dict(item for item in self.test_list.iteritems()
                               if check_all(item))
 
-    def pre_run_hook(self):
+    def _pre_run_hook(self):
         """ Hook executed at the start of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
@@ -152,7 +152,7 @@ class TestProfile(object):
         """
         pass
 
-    def post_run_hook(self):
+    def _post_run_hook(self):
         """ Hook executed at the end of TestProfile.run
 
         To make use of this hook one will need to subclass TestProfile, and
@@ -180,12 +180,12 @@ class TestProfile(object):
 
         """
 
-        self.pre_run_hook()
+        self._pre_run_hook()
         framework.exectest.Test.ENV = env
 
         chunksize = 1
 
-        self.prepare_test_list(env)
+        self._prepare_test_list(env)
         log = Log(len(self.test_list), env.verbose)
 
         def test(pair):
@@ -224,7 +224,7 @@ class TestProfile(object):
 
         log.summary()
 
-        self.post_run_hook()
+        self._post_run_hook()
 
     def filter_tests(self, function):
         """Filter out tests that return false from the supplied function
