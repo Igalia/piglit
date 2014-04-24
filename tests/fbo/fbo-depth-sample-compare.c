@@ -39,6 +39,12 @@
 #include <assert.h>
 #include "piglit-util-gl-common.h"
 
+#if defined(__APPLE__)
+#  include <OpenGL/glu.h>
+#else
+#  include <GL/glu.h>
+#endif
+
 
 /** Set DEBUG to 1 to enable extra output when trying to debug failures */
 #define DEBUG 0
@@ -60,6 +66,7 @@ static GLuint ColorTex, DepthTex, FBO;
 static GLuint ShaderProg;
 static GLint Zbits;
 static GLenum TexTarget = GL_TEXTURE_2D;
+static GLUquadricObj *sphereObj = NULL;
 
 
 static void
@@ -233,7 +240,13 @@ find_uint_min_max_center(const GLuint *buf, GLuint n,
 static void
 draw_sphere(void)
 {
-   glutSolidSphere(0.95, 40, 20);
+   GLdouble radius = 0.95;
+   GLint slices = 40;
+   GLint stacks = 20;
+
+   gluQuadricDrawStyle(sphereObj, GLU_FILL);
+   gluQuadricNormals(sphereObj, GLU_SMOOTH);
+   gluSphere(sphereObj, radius, slices, stacks);
 }
 
 
@@ -525,6 +538,8 @@ piglit_init(int argc, char **argv)
    }
 
    create_frag_shader();
+
+   sphereObj = gluNewQuadric();
 
    if (!piglit_automatic) {
       printf("GL_RENDERER = %s\n", (char *) glGetString(GL_RENDERER));

@@ -11,11 +11,6 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-if(NOT PIGLIT_USE_WAFFLE)
-	# This test uses glutSolidSphere.
-	piglit_add_executable (fbo-depth-sample-compare fbo-depth-sample-compare.c)
-endif(NOT PIGLIT_USE_WAFFLE)
-
 piglit_add_executable (fbo-1d fbo-1d.c)
 piglit_add_executable (fbo-alphatest-formats fbo-alphatest-formats.c)
 piglit_add_executable (fbo-alphatest-nocolor fbo-alphatest-nocolor.c)
@@ -27,6 +22,7 @@ piglit_add_executable (fbo-depthtex fbo-depthtex.c)
 piglit_add_executable (fbo-3d fbo-3d.c)
 piglit_add_executable (fbo-array fbo-array.c)
 piglit_add_executable (fbo-depth-array fbo-depth-array.c)
+piglit_add_executable (fbo-depth-sample-compare fbo-depth-sample-compare.c)
 piglit_add_executable (fbo-alpha fbo-alpha.c)
 piglit_add_executable (fbo-luminance-alpha fbo-luminance-alpha.c)
 piglit_add_executable (fbo-bind-renderbuffer fbo-bind-renderbuffer.c)
