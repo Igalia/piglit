@@ -38,17 +38,17 @@ def test_initialize_testprofile():
 def test_load_test_profile_no_profile():
     """ Loading a module with no profile name exits
 
-    Beacuse loadTestProfile uses test.{} to load a module we need a module in
+    Beacuse load_test_profile uses test.{} to load a module we need a module in
     tests that doesn't have a profile attribute. The only module that currently
     meets that requirement is __init__.py
 
     """
-    profile.loadTestProfile('__init__')
+    profile.load_test_profile('__init__')
 
 
 def test_load_test_profile_returns():
-    """ loadTestProfile returns a TestProfile instance """
-    profile_ = profile.loadTestProfile('sanity')
+    """ load_test_profile returns a TestProfile instance """
+    profile_ = profile.load_test_profile('sanity')
     assert isinstance(profile_, profile.TestProfile)
 
 

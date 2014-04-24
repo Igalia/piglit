@@ -39,7 +39,7 @@ import framework.exectest
 
 __all__ = [
     'TestProfile',
-    'loadTestProfile',
+    'load_test_profile',
     'merge_test_profiles'
 ]
 
@@ -259,7 +259,7 @@ class TestProfile(object):
             self.test_list.update(profile.test_list)
 
 
-def loadTestProfile(filename):
+def load_test_profile(filename):
     """ Load a python module and return it's profile attribute
 
     All of the python test files provide a profile attribute which is a
@@ -295,7 +295,7 @@ def merge_test_profiles(profiles):
     profiles -- a list of one or more paths to profile files.
 
     """
-    profile = loadTestProfile(profiles.pop())
+    profile = load_test_profile(profiles.pop())
     for p in profiles:
-        profile.update(TestProfile(p))
+        profile.update(load_test_profile(p))
     return profile

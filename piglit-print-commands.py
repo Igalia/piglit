@@ -61,7 +61,7 @@ def main():
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
     os.chdir(piglit_dir)
 
-    profile = framework.profile.loadTestProfile(args.testProfile)
+    profile = framework.profile.load_test_profile(args.testProfile)
 
     def getCommand(test):
         command = ''
