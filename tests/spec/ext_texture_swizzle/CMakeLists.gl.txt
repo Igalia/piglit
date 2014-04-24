@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (depth_texture_mode_and_swizzle depth_texture_mode_and_swizzle.c)
+piglit_add_executable (ext_texture_swizzle-swizzle swizzle.c)
 
 # vim: ft=cmake:
