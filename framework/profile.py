@@ -37,6 +37,12 @@ from framework.dmesg import get_dmesg
 from framework.log import Log
 import framework.exectest
 
+__all__ = [
+    'TestProfile',
+    'loadTestProfile',
+    'merge_test_profiles'
+]
+
 
 class TestProfile(object):
     """ Class that holds a list of tests for execution
