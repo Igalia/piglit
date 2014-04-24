@@ -30,9 +30,6 @@ import re
 import subprocess
 import sys
 from cStringIO import StringIO
-import multiprocessing
-import multiprocessing.dummy
-import importlib
 # TODO: ConfigParser is known as configparser in python3
 import ConfigParser
 try:
@@ -41,17 +38,16 @@ except ImportError:
     import json
 
 import framework.status as status
-from .dmesg import get_dmesg
 from .threads import synchronized_self
-from .log import Log
 
 __all__ = ['PIGLIT_CONFIG',
            'Environment',
-           'checkDir',
-           'loadTestProfile',
            'TestrunResult',
            'TestResult',
-           'TestProfile']
+           'JSONWriter',
+           'checkDir',
+           'load_results',
+           'parse_listfile']
 
 
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
