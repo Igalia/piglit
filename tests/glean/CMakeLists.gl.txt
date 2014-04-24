@@ -56,7 +56,6 @@ piglit_add_executable (glean
 	ttexcube.cpp
 	ttexenv.cpp
 	ttexgen.cpp
-	ttexswizzle.cpp
 	ttexture_srgb.cpp
 	ttexunits.cpp
 	tvertarraybgra.cpp
