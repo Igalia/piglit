@@ -96,13 +96,7 @@ class Test(object):
             log.log(path, self.result['result'])
             log.post_log(log_current, self.result['result'])
 
-            if 'subtest' in self.result and len(self.result['subtest']) > 1:
-                for test in self.result['subtest']:
-                    self.result['result'] = self.result['subtest'][test]
-                    json_writer.write_dict_item(os.path.join(path, test),
-                                                self.result)
-            else:
-                json_writer.write_dict_item(path, self.result)
+            json_writer.write_dict_item(path, self.result)
         else:
             log.log(path, 'dry-run')
             log.post_log(log_current, 'dry-run')
