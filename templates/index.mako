@@ -60,7 +60,7 @@
           <td class="${line['class']}">
           ## If the result is in the excluded results page list from
           ## argparse, just print the text, otherwise add the link
-          % if line['class'] not in exclude:
+          % if line['class'] not in exclude and line['href'] is not None:
             <a href="${line['href']}">
               ${line['text']}
             </a>
