@@ -21,6 +21,7 @@
 
 """ Module providing tests for the summary module """
 
+from __future__ import print_function
 import json
 import copy
 import nose.tools as nt
@@ -70,6 +71,80 @@ def check_sets(old, ostat, new, nstat, set_):
         with utils.with_tempfile(json.dumps(new)) as nfile:
             summ = summary.Summary([ofile, nfile])
 
-            print summ.tests
+            print(summ.tests)
             nt.assert_equal(1, len(summ.tests[set_]),
                             msg="{0} was not appended".format(set_))
+
+
+def test_subtest_handling():
+    data = copy.deepcopy(utils.JSON_DATA)
+    data['tests']['with_subtests'] = {}
+    data['tests']['with_subtests']['result'] = 'pass'
+
+    data['tests']['with_subtests']['subtest'] = {}
+    data['tests']['with_subtests']['subtest']['subtest1'] = 'fail'
+    data['tests']['with_subtests']['subtest']['subtest2'] = 'warn'
+    data['tests']['with_subtests']['subtest']['subtest3'] = 'crash'
+    data['tests']['is_skip'] = {}
+    data['tests']['is_skip']['result'] = 'skip'
+
+    with utils.with_tempfile(json.dumps(data)) as sumfile:
+        summ = summary.Summary([sumfile])
+
+        check_subtests_are_tests.description = \
+            "Subtests should be treated as full tests "
+        yield check_subtests_are_tests, summ
+
+        check_tests_w_subtests_are_groups.description = \
+            "Tests with subtests should be a group"
+        yield check_tests_w_subtests_are_groups, summ
+
+        test_removed_from_all.description = \
+            "Tests with subtests should not be in the tests['all'] name"
+        yield test_removed_from_all, summ
+
+        subtest_not_skip_notrun.description = \
+            "Skip's should not become NotRun"
+        yield subtest_not_skip_notrun, summ
+
+
+@nt.nottest
+def check_subtests_are_tests(summary_):
+    """ Subtests should be treated as full tests """
+    print(summary_.fractions)
+    nt.assert_equal(summary_.fractions['fake-tests']['with_subtests'], (0, 3),
+        msg="Summary.fraction['fake-tests']['with_subtests'] should "
+            "be (0, 3), but isn't")
+
+
+@nt.nottest
+def check_tests_w_subtests_are_groups(summary_):
+    """ Tests with subtests should be a group
+
+    We know that the status will be 'pass' if it's not being overwritten, and
+    will be 'crash' if it has. (since we set the data that way)
+
+    """
+    print(summary_.status)
+    nt.assert_equal(
+        str(summary_.status['fake-tests']['with_subtests']), 'crash',
+        msg="Summary.status['fake-tests']['with_subtests'] should "
+            "be crash, but isn't")
+
+
+@nt.nottest
+def test_removed_from_all(summary_):
+    """ Tests with subtests should not be in the all results """
+    print(summary_.tests['all'])
+    nt.assert_not_in('with_subtests', summary_.tests['all'],
+        msg="Test with subtests should have been removed from "
+            "self.tests['all'], but wasn't")
+
+
+@nt.nottest
+def subtest_not_skip_notrun(summary_):
+    """ Ensure that skips are not changed to notruns """
+    print(summary_.status['fake-tests']['is_skip'])
+    print(summary_.results[0].tests['is_skip'])
+    nt.eq_(summary_.status['fake-tests']['is_skip'], 'skip',
+        msg="Status should be skip but was changed")
