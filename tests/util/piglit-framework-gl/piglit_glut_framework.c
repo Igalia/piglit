@@ -119,6 +119,18 @@ init_glut(void)
 	glutInitWindowSize(test_config->window_width,
 	                   test_config->window_height);
 	glutInitDisplayMode(flags);
+
+#ifdef GLUT_CORE_PROFILE
+	if (test_config->supports_gl_core_version) {
+		glutInitContextVersion(test_config->supports_gl_core_version / 10,
+				       test_config->supports_gl_core_version % 10);
+		glutInitContextFlags(GLUT_CORE_PROFILE);
+	} else {
+		glutInitContextVersion(test_config->supports_gl_compat_version / 10,
+				       test_config->supports_gl_compat_version % 10);
+	}
+#endif
+
 	glut_fw.window = glutCreateWindow("Piglit");
 
 	glutDisplayFunc(display);
@@ -178,9 +190,19 @@ check_gl_version(const struct piglit_gl_test_config *test_config)
 {
 	int actual_version = piglit_get_gl_version();
 
-	/* GLUT only supports GL compatibility contexts, so we only
-	 * have to check supports_gl_compat_version.
-	 */
+	if (test_config->supports_gl_core_version) {
+		if (actual_version < test_config->supports_gl_core_version) {
+			printf("Test requires GL version %d.%d, but actual version is "
+			       "%d.%d\n",
+			       test_config->supports_gl_core_version / 10,
+			       test_config->supports_gl_core_version % 10,
+			       actual_version / 10,
+			       actual_version % 10);
+			return false;
+		}
+		return true;
+	}
+
 	if (actual_version < test_config->supports_gl_compat_version) {
 		printf("Test requires GL version %d.%d, but actual version is "
 		       "%d.%d\n",
@@ -199,11 +221,13 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 {
 	bool ok = true;
 
+#ifndef GLUT_CORE_PROFILE
 	if (!test_config->supports_gl_compat_version) {
 		printf("GLUT can create only GL compatibility contexts, "
 			"which the test does not support running under.\n");
 		piglit_report_result(PIGLIT_SKIP);
 	}
+#endif
 
 	if (test_config->window_samples > 1) {
 		printf("GLUT doesn't support MSAA visuals.\n");
