@@ -239,5 +239,5 @@ def merge_test_profiles(profiles):
     """
     profile = loadTestProfile(profiles.pop())
     for p in profiles:
-        profile.update(loadTestProfile(p))
+        profile.update(TestProfile(p))
     return profile

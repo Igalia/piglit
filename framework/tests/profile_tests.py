@@ -20,9 +20,28 @@
 
 """ Provides test for the framework.profile modules """
 
+import nose.tools as nt
 import framework.profile as profile
 
 
 def test_initialize_testprofile():
     """ TestProfile initializes """
     profile.TestProfile()
+
+
+@nt.raises(SystemExit)
+def test_load_test_profile_no_profile():
+    """ Loading a module with no profile name exits
+
+    Beacuse loadTestProfile uses test.{} to load a module we need a module in
+    tests that doesn't have a profile attribute. The only module that currently
+    meets that requirement is __init__.py
+
+    """
+    profile.loadTestProfile('__init__')
+
+
+def test_load_test_profile_returns():
+    """ loadTestProfile returns a TestProfile instance """
+    profile_ = profile.loadTestProfile('sanity')
+    assert isinstance(profile_, profile.TestProfile)
