@@ -64,3 +64,14 @@ def test_igt_igttest():
     """ igt.IGTTest initializes """
     mod = _import('tests.igt')
     mod.IGTTest('foo')
+
+
+def test_es3conform_import():
+    """ es3conform.py can be imported """
+    _import('tests.es3conform')
+
+
+def test_es3conform_gtftest():
+    """ es3conform.GTFTest initializes """
+    mod = _import('tests.es3conform')
+    mod.GTFTest('testpath')
