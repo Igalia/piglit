@@ -53,3 +53,14 @@ def test_xts_xtsprofile():
     """ xts.XTSProfile initializes """
     mod = _import('tests.xts')
     mod.XTSProfile()
+
+
+def test_igt_import():
+    """ igt.py can be imported """
+    _import('tests.igt')
+
+
+def test_igt_igttest():
+    """ igt.IGTTest initializes """
+    mod = _import('tests.igt')
+    mod.IGTTest('foo')
