@@ -75,3 +75,14 @@ def test_es3conform_gtftest():
     """ es3conform.GTFTest initializes """
     mod = _import('tests.es3conform')
     mod.GTFTest('testpath')
+
+
+def test_oglconform_import():
+    """ oglconform.py can be imported """
+    _import('tests.oglconform')
+
+
+def test_oglconform_oglctest():
+    """ oglconform.OGLCTest initializes """
+    mod = _import('tests.oglconform')
+    mod.OGLCTest('catagory', 'subtest')
