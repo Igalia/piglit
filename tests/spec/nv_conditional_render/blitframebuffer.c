@@ -27,11 +27,11 @@
 /**
  * @file blitframebuffer.c
  *
- * Tests that conditional rendering does not affect glBlitFramebuffer().
+ * Tests that conditional rendering also affects glBlitFramebuffer().
  *
- * It's something that would be likely to be implemented through
- * normal rendering inside of the driver, and thus easy to
- * accidentally disable during conditional rendering.
+ * It is clarified on page 679 of OpenGL 4.4 spec:
+ *    "Added BlitFramebuffer to commands affected by conditional rendering in
+ *     section 10.10 (Bug 9562)."
  */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
@@ -71,7 +71,7 @@ static void blit_window_to_tex(GLuint tex, int w, int h)
 
 	assert(glCheckFramebufferStatusEXT(GL_DRAW_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
 
-	glBlitFramebufferEXT(0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBlitFramebufferEXT(0, h, w, 2 * h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	glDeleteFramebuffersEXT(1, &fb);
@@ -93,7 +93,7 @@ piglit_display(void)
 	piglit_draw_rect(-1, -1, 2, 1);
 	glColor4f(1, 1, 1, 1);
 
-	/* Set up a red texture. */
+	/* Set up a green texture. */
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -104,7 +104,7 @@ piglit_display(void)
 			GL_LINEAR_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
-	fill_tex(0, piglit_width, piglit_height / 2, red);
+	fill_tex(0, piglit_width, piglit_height / 2, green);
 
 	glGenQueries(1, &q);
 
@@ -112,18 +112,20 @@ piglit_display(void)
 	glBeginQuery(GL_SAMPLES_PASSED, q);
 	glEndQuery(GL_SAMPLES_PASSED);
 
-	/* This should not be affected by conditional rendering. */
+	/* BlitFramebuffer() should be affected by conditional rendering. */
 	glBeginConditionalRenderNV(q, GL_QUERY_WAIT_NV);
+	/* Blit top half of the window to texture. */
 	blit_window_to_tex(texture, piglit_width, piglit_height / 2);
 	glEndConditionalRenderNV();
 
-	/* Draw the texture. */
+	/* Draw the texture to top half of the window. */
 	glEnable(GL_TEXTURE_2D);
 	piglit_draw_rect_tex(-1, 0, 2, 1,
 			     0, 0, 1, 1);
 	glDisable(GL_TEXTURE_2D);
 
-	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
+	pass = piglit_probe_rect_rgba(0, piglit_width / 2,
+				      piglit_width, piglit_height / 2,
 				      green);
 
 	piglit_present_results();
