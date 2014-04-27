@@ -40,6 +40,7 @@
  * (with --by-location command line parameter).
  */
 #include "piglit-util-gl.h"
+#include "sso-common.h"
 
 /**
  * Size of each square that will be drawn.
@@ -199,9 +200,6 @@ piglit_init(int argc, char **argv)
 	unsigned i;
 	unsigned j;
 	unsigned idx;
-	bool es;
-	int glsl_major;
-	int glsl_minor;
 	const char *location;
 	const char *vertex_name;
 	const char *fragment_name;
@@ -227,14 +225,7 @@ piglit_init(int argc, char **argv)
 		fragment_name = "in_color";
 	}
 
-	/* Some NVIDIA drivers have issues with layout qualifiers, 'in'
-	 * keywords, and 'out' keywords in "lower" GLSL versions.  If the
-	 * driver supports GLSL >= 1.40, use 1.40.  Otherwise, pick the
-	 * highest version that the driver supports.
-	 */
-	piglit_get_glsl_version(&es, &glsl_major, &glsl_minor);
-	glsl_version = ((glsl_major * 100) + glsl_minor) >= 140
-		? 140 : ((glsl_major * 100) + glsl_minor);
+	glsl_version = pick_a_glsl_version();
 
 	/* Generate the vertex shader programs.  Each vertex shader is
 	 * hardcoded to select a specific column on the display.

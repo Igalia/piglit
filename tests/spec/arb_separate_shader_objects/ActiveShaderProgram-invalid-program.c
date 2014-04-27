@@ -40,6 +40,7 @@
  */
 
 #include "piglit-util-gl.h"
+#include "sso-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -68,16 +69,11 @@ piglit_init(int argc, char **argv)
 	GLuint unlinked_prog;
 	GLuint shader;
 	unsigned glsl_version;
-	bool es;
-	int glsl_major;
-	int glsl_minor;
 	char *source;
 
 	piglit_require_extension("GL_ARB_separate_shader_objects");
 
-	piglit_get_glsl_version(&es, &glsl_major, &glsl_minor);
-	glsl_version = ((glsl_major * 100) + glsl_minor) >= 140
-		? 140 : ((glsl_major * 100) + glsl_minor);
+	glsl_version = pick_a_glsl_version();
 
 	glGenProgramPipelines(1, &pipe);
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;

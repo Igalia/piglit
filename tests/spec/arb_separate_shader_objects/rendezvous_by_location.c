@@ -42,6 +42,7 @@
  * shader.
  */
 #include "piglit-util-gl.h"
+#include "sso-common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -140,9 +141,6 @@ void piglit_init(int argc, char **argv)
 	GLuint vs_prog;
 	GLuint fs_prog_same_declaration_order;
 	GLuint fs_prog_same_location_order;
-	bool es;
-	int glsl_major;
-	int glsl_minor;
 	char *source;
 
 	piglit_require_vertex_shader();
@@ -150,14 +148,7 @@ void piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_separate_shader_objects");
 	piglit_require_extension("GL_ARB_explicit_attrib_location");
 
-	/* Some NVIDIA drivers have issues with layout qualifiers, 'in'
-	 * keywords, and 'out' keywords in "lower" GLSL versions.  If the
-	 * driver supports GLSL >= 1.40, use 1.40.  Otherwise, pick the
-	 * highest version that the driver supports.
-	 */
-	piglit_get_glsl_version(&es, &glsl_major, &glsl_minor);
-	glsl_version = ((glsl_major * 100) + glsl_minor) >= 140
-		? 140 : ((glsl_major * 100) + glsl_minor);
+	glsl_version = pick_a_glsl_version();
 
 	asprintf(&source, vs_code_template, glsl_version);
 	vs_prog = glCreateShaderProgramv(GL_VERTEX_SHADER, 1,
