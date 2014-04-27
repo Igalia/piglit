@@ -2210,6 +2210,8 @@ with profile.group_manager(
     g(['arb_separate_shader_object-compat-builtins'], 'compat-builtins')
     g(['arb_separate_shader_object-rendezvous_by_location-3-stages'],
        'rendezvous_by_location-3-stages')
+    g(['arb_separate_shader_object-uniform-namespace'],
+       'uniform namespace is per-program')
 
 # Group ARB_sampler_objects
 with profile.group_manager(
