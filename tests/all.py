@@ -2212,6 +2212,8 @@ with profile.group_manager(
        'rendezvous_by_location-3-stages')
     g(['arb_separate_shader_object-uniform-namespace'],
        'uniform namespace is per-program')
+    g(['arb_separate_shader_object-xfb-rendezvous_by_location'],
+       'Transform feedback with rendezvous by location')
 
 # Group ARB_sampler_objects
 with profile.group_manager(
