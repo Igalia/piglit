@@ -28,6 +28,11 @@ unsigned pick_a_glsl_version(void);
 
 void configure_transform_feedback_object(GLuint *xfb, GLuint *buf);
 
+bool CreateShaderProgram_with_xfb(const char *source,
+				  const char **varyings,
+				  unsigned num_varyings,
+				  GLuint *vs_prog);
+
 GLuint format_and_link_program(GLenum type, const char* code,
                                unsigned glsl_version);
 

@@ -91,3 +91,30 @@ configure_transform_feedback_object(GLuint *xfb, GLuint *buf)
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, *xfb);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, *buf);
 }
+
+/**
+ * Create a separable vertex shader program with transform feedback output
+ *
+ * A vertex shader must be created using the "traditional" API because
+ * \c glTransformFeedbackVaryings must be called before linking.  There is no
+ * way to do that with \c glCreateShaderProgramv.
+ */
+bool
+CreateShaderProgram_with_xfb(const char *source,
+			     const char **varyings,
+			     unsigned num_varyings,
+			     GLuint *vs_prog)
+{
+	GLuint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, source);
+
+	*vs_prog = glCreateProgram();
+	glAttachShader(*vs_prog, vs);
+
+	glProgramParameteri(*vs_prog, GL_PROGRAM_SEPARABLE, GL_TRUE);
+	glTransformFeedbackVaryings(*vs_prog, num_varyings, varyings,
+				    GL_INTERLEAVED_ATTRIBS);
+	glLinkProgram(*vs_prog);
+	glDeleteShader(vs);
+
+	return piglit_link_check_status(*vs_prog);
+}
