@@ -2178,6 +2178,7 @@ with profile.group_manager(
       'ActiveShaderProgram with invalid program')
     g(['arb_separate_shader_object-GetProgramPipelineiv'],
       'GetProgramPipelineiv')
+    g(['arb_separate_shader_object-dlist'], 'Display lists (Compat)')
     g(['arb_separate_shader_object-IsProgramPipeline'],
       'IsProgramPipeline')
     g(['arb_separate_shader_object-UseProgramStages-non-separable'],
