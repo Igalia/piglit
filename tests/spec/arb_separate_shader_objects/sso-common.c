@@ -70,3 +70,24 @@ format_and_link_program(GLenum type, const char* code, unsigned glsl_version)
 
 	return prog;
 }
+
+/**
+ * Create a transform feedback object and some storage for the data
+ *
+ * \note
+ * The XFB object will be bound on exit.  The buffer object for the XFB data
+ * will be bound to the XFB object and the \c GL_TRANSFORM_FEEDBACK_BUFFER
+ * binding on exit.
+ */
+void
+configure_transform_feedback_object(GLuint *xfb, GLuint *buf)
+{
+	glGenBuffers(1, buf);
+	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, *buf);
+	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER, 1024, NULL, GL_STREAM_READ);
+
+	glGenTransformFeedbacks(1, xfb);
+
+	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, *xfb);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, *buf);
+}

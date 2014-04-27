@@ -26,6 +26,8 @@
 
 unsigned pick_a_glsl_version(void);
 
+void configure_transform_feedback_object(GLuint *xfb, GLuint *buf);
+
 GLuint format_and_link_program(GLenum type, const char* code,
                                unsigned glsl_version);
 
