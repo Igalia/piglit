@@ -21,7 +21,6 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <sys/stat.h>
 #include <errno.h>
 
 #include "piglit-util-gl-common.h"
@@ -66,10 +65,7 @@ GLuint
 piglit_compile_shader(GLenum target, const char *filename)
 {
 	GLuint prog;
-	struct stat st;
-	int err;
 	GLchar *prog_string;
-	FILE *f;
 	const char *source_dir;
 	char filename_with_path[FILENAME_MAX];
 
@@ -82,27 +78,14 @@ piglit_compile_shader(GLenum target, const char *filename)
 		 "%s/tests/%s", source_dir, filename);
 	filename_with_path[FILENAME_MAX - 1] = 0;
 
-	err = stat(filename_with_path, &st);
-	if (err == -1) {
-		fprintf(stderr, "Couldn't stat program %s: %s\n", filename_with_path, strerror(errno));
-		fprintf(stderr, "You can override the source dir by setting the PIGLIT_SOURCE_DIR environment variable.\n");
+	prog_string = piglit_load_text_file(filename_with_path, NULL);
+	if (!prog_string) {
+		fprintf(stderr, "Couldn't read shader %s: %s\n",
+			filename_with_path, strerror(errno));
+		fprintf(stderr, "You can override the source dir by setting the"
+			" PIGLIT_SOURCE_DIR environment variable.\n");
 		exit(1);
 	}
-
-	prog_string = malloc(st.st_size + 1);
-	if (prog_string == NULL) {
-		fprintf(stderr, "malloc\n");
-		exit(1);
-	}
-
-	f = fopen(filename_with_path, "r");
-	if (f == NULL) {
-		fprintf(stderr, "Couldn't open program: %s\n", strerror(errno));
-		exit(1);
-	}
-	fread(prog_string, 1, st.st_size, f);
-	prog_string[st.st_size] = '\0';
-	fclose(f);
 
 	prog = piglit_compile_shader_text(target, prog_string);
 
