@@ -201,7 +201,9 @@ static void
 upload_verts(void)
 {
 	if (stage == VS) {
-		float v[4 * texture_width * texture_height], *pv = v;
+		size_t size = 4 * texture_width * texture_height * sizeof(float);
+		float *v = (float *)malloc(size);
+		float *pv = v;
 		int i, j;
 		for (j = 0; j < texture_height; j++)
 			for (i = 0; i < texture_width; i++) {
@@ -210,7 +212,8 @@ upload_verts(void)
 				*pv++ = 0;
 				*pv++ = 1;
 			}
-		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, size, v, GL_STATIC_DRAW);
+		free(v);
 	}
 	else {
 		static const float verts[] = {
