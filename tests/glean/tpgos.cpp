@@ -35,6 +35,7 @@
 #include "image.h"
 #include "misc.h"
 #include <cmath>
+#include <algorithm>
 
 
 namespace {

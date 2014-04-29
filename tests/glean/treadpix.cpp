@@ -34,6 +34,7 @@
 #endif
 #include <iomanip>
 #include <cstdlib>
+#include <algorithm>
 #include "misc.h"
 #include "rand.h"
 #include "treadpix.h"

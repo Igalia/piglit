@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <cmath>
+#include <algorithm> // max
 #include "tlogicop.h"
 #include "rand.h"
 #include "image.h"

@@ -35,6 +35,7 @@
 #include "image.h"
 #include <cmath>
 #include <cstdlib>
+#include <algorithm> // min, max
 
 #define ELEMENTS(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
 

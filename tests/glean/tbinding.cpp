@@ -32,6 +32,7 @@
 #include "image.h"
 #include "rand.h"
 #include <cmath>
+#include <algorithm> // max
 
 #if 0
 #ifdef __UNIX__
@@ -40,7 +41,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <cmath>
 #include "dsconfig.h"
 #include "dsfilt.h"
