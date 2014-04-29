@@ -76,7 +76,7 @@ def main():
         command += ' '.join(testCommand)
         return command
 
-    profile.prepare_test_list(env)
+    profile._prepare_test_list(env)
     for name, test in profile.test_list.items():
         assert(isinstance(test, Test))
         print(name, ':::', getCommand(test))
