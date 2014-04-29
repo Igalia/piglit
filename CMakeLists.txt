@@ -220,7 +220,7 @@ if (NOT MSVC)
 	# Unfortunately MSVC does not support C99.  Among all features enabled
 	# by C99, declarations after statements is the most frequently used.
 	# For portability sake, we request gcc to warn when this is used.
-	CHECK_C_COMPILER_FLAG("-Wall" C_COMPILER_FLAG_WDECL_AFTER_STMT)
+	CHECK_C_COMPILER_FLAG("-Wdeclaration-after-statement" C_COMPILER_FLAG_WDECL_AFTER_STMT)
 	IF (C_COMPILER_FLAG_WDECL_AFTER_STMT)
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wdeclaration-after-statement")
 	ENDIF (C_COMPILER_FLAG_WDECL_AFTER_STMT)
