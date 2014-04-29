@@ -242,15 +242,15 @@ TEST_FUNC(glPixelTransferf, (GL_MAP_COLOR, 0))
 TEST_FUNC(glPixelTransferi, (GL_MAP_COLOR, 0))
 TEST_FUNC(glPixelZoom, (0, 0))
 TEST_FUNC(glPointSize, (1))
-static void test_glPushAttrib() {
+static void test_glPushAttrib(void) {
 	glPushAttrib(GL_COLOR_BUFFER_BIT);
 	glPopAttrib();
 }
-static void test_glPushClientAttrib() {
+static void test_glPushClientAttrib(void) {
 	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 	glPopClientAttrib();
 }
-static void test_glPushMatrix() {
+static void test_glPushMatrix(void) {
 	glPushMatrix();
 	glPopMatrix();
 }
