@@ -32,9 +32,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 128;
-	config.window_height = 128;
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -50,17 +48,8 @@ static int nrcomponents(GLenum format)
 	}
 }
 
-static const char* formatname(GLenum format)
-{
-	switch(format) {
-	case GL_RGBA: return "GL_RGBA";
-	case GL_RGB: return "GL_RGB";
-	case GL_ALPHA: return "GL_ALPHA";
-	default: abort();
-	}
-}
-
-static void expected_rgba(GLenum format, const unsigned char* texdata, unsigned char* expected)
+static void
+expected_rgba(GLenum format, const GLubyte *texdata, GLubyte *expected)
 {
 	switch(format) {
 	case GL_RGBA:
@@ -84,13 +73,15 @@ static void expected_rgba(GLenum format, const unsigned char* texdata, unsigned 
 	}
 }
 
-static int render_and_check(int w, int h, int d, GLenum format, float q, unsigned char* data, const char* test)
+static bool
+render_and_check(int w, int h, int d, GLenum format, float q,
+		 const GLubyte *data, const char* test)
 {
 	int x, y, z;
 	int layer;
-	unsigned char* readback;
-	unsigned char* texp;
-	unsigned char* readp;
+	GLubyte *readback;
+	const GLubyte *texp;
+	GLubyte *readp;
 	int ncomp = 0;
 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -111,18 +102,18 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 			glVertex2f(x, y+h);
 		glEnd();
 		x += w;
-		if (x >= piglit_width) {
+		if (x + w >= piglit_width) {
 			y += h;
 			x = 0;
 		}
 	}
 
-	readback = (unsigned char*)malloc(w*h*d*4);
+	readback = (GLubyte*)malloc(w*h*d*4);
 	x = y = 0;
 	for(layer = 0; layer < d; ++layer) {
 		glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, readback+layer*w*h*4);
 		x += w;
-		if (x >= piglit_width) {
+		if (x + w >= piglit_width) {
 			y += h;
 			x = 0;
 		}
@@ -134,7 +125,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 	for(z = 0; z < d; ++z) {
 		for(y = 0; y < h; ++y) {
 			for(x = 0; x < w; ++x, readp += 4, texp += ncomp) {
-				unsigned char expected[4];
+				GLubyte expected[4];
 				int i;
 				expected_rgba(format, texp, expected);
 				for(i = 0; i < 4; ++i) {
@@ -145,7 +136,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 						fprintf(stderr, " Readback: %i,%i,%i,%i\n",
 							readp[0], readp[1], readp[2], readp[3]);
 						free(readback);
-						return 0;
+						return false;
 					}
 				}
 			}
@@ -155,7 +146,7 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
 
 	piglit_present_results();
 
-	return 1;
+	return true;
 }
 
 
@@ -163,12 +154,13 @@ static int render_and_check(int w, int h, int d, GLenum format, float q, unsigne
  * Load non-mipmapped 3D texture of the given size
  * and check whether it is rendered correctly.
  */
-static void test_simple(int w, int h, int d, GLenum format)
+static bool
+test_simple(int w, int h, int d, GLenum format)
 {
 	int size;
-	unsigned char *data;
+	GLubyte *data;
 	int i;
-	int success = 1;
+	bool success = true;
 
 	assert(1 <= w && w <= 16);
 	assert(1 <= h && h <= 16);
@@ -176,7 +168,7 @@ static void test_simple(int w, int h, int d, GLenum format)
 	assert(format == GL_RGBA || format == GL_RGB || format == GL_ALPHA);
 
 	size = w*h*d*nrcomponents(format);
-	data = (unsigned char*)malloc(size);
+	data = (GLubyte*)malloc(size);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -194,17 +186,20 @@ static void test_simple(int w, int h, int d, GLenum format)
 	free(data);
 
 	if (!success) {
-		fprintf(stderr, "Failure with texture size %ix%ix%i, format = %s\n",
-			w, h, d, formatname(format));
-		piglit_report_result(PIGLIT_FAIL);
+		fprintf(stderr,
+			"Failure with texture size %ix%ix%i, format = %s\n",
+			w, h, d, piglit_get_gl_enum_name(format));
 	}
+
+        return success;
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	GLenum formats[] = { GL_RGBA, GL_RGB, GL_ALPHA };
+	static const GLenum formats[] = { GL_RGBA, GL_RGB, GL_ALPHA };
 	int w, h, d, fmt;
+	bool pass = true;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
@@ -212,13 +207,16 @@ piglit_display(void)
 		for(w = 1; w <= 16; w *= 2) {
 			for(h = 1; h <= 16; h *= 2) {
 				for(d = 1; d <= 16; d *= 2) {
-					test_simple(w, h, d, formats[fmt]);
+					pass = test_simple(w, h, d, formats[fmt]);
+					if (!pass)
+						goto end;
 				}
 			}
 		}
 	}
 
-	return PIGLIT_PASS;
+end:
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 void
@@ -226,10 +224,9 @@ piglit_init(int argc, char **argv)
 {
 	piglit_require_gl_version(12);
 
-	piglit_automatic = GL_TRUE;
-
 	glDisable(GL_DITHER);
 
 	glGenTextures(1, &Texture);
 	glBindTexture(GL_TEXTURE_3D, Texture);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 }
