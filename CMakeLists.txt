@@ -230,7 +230,13 @@ if (NOT MSVC)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-narrowing")
 	ENDIF (CXX_COMPILER_FLAG_WNO_NARROWING)
 else ()
-	include_directories("include/msvc/c99")
+	# Use bundled stdbool.h and stdint.h headers for older MSVC versions.
+	# stdint.h was introduced in MSVC 2010, but stdbool.h was only
+	# introduced in MSVC 2013.
+	check_include_file (stdbool.h HAVE_STDBOOL_H)
+	if (NOT HAVE_STDBOOL_H)
+		include_directories ("include/msvc/c99")
+	endif ()
 
 	# -Wall or (/Wall) is actually supported by MSVC and would be detected
 	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
