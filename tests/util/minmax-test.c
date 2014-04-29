@@ -114,7 +114,7 @@ piglit_test_int(GLenum token, GLint limit, bool max)
 
 	piglit_report_int(name, limit, val,
 			  pass &&
-			  val != SENTINEL &&
+			  val != (GLint)SENTINEL &&
 			  ((max && val <= limit) ||
 			   (!max && val >= limit)));
 }
@@ -258,7 +258,7 @@ static void
 piglit_test_float(GLenum token, GLfloat limit, bool max)
 {
 	const char *name = piglit_get_gl_enum_name(token);
-	GLfloat val = -SENTINEL;
+	GLfloat val = SENTINEL;
 	bool pass;
 
 	glGetFloatv(token, &val);
@@ -267,7 +267,7 @@ piglit_test_float(GLenum token, GLfloat limit, bool max)
 
 	piglit_report_float(name, limit, val,
 			    pass &&
-			    val != SENTINEL &&
+			    val != (GLfloat)SENTINEL &&
 			    ((max && val <= limit) ||
 			     (!max && val >= limit)));
 }
