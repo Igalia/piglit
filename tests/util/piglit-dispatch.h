@@ -56,21 +56,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef _WIN32
 
 /* APIENTRY and GLAPIENTRY are not used on Linux or Mac. */
 #define APIENTRY
 #define GLAPIENTRY
 
-#else
+#else /* _WIN32 */
 
-#ifndef APIENTRY
-#define APIENTRY __stdcall
-#endif
+#include <windows.h> // APIENTRY
 
 #ifndef GLAPIENTRY
 #define GLAPIENTRY APIENTRY
@@ -80,6 +74,10 @@ extern "C" {
 #define GLAPI extern
 #endif
 
+#endif /* _WIN32 */
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef unsigned int GLenum;
