@@ -26,6 +26,7 @@ import itertools
 import shutil
 import collections
 import tempfile
+import datetime
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
@@ -383,9 +384,14 @@ class Summary:
         for each in self.results:
             os.mkdir(path.join(destination, each.name))
 
+            if each.time_elapsed is not None:
+                time = datetime.timedelta(0, each.time_elapsed)
+            else:
+                time = None
+
             with open(path.join(destination, each.name, "index.html"), 'w') as out:
                 out.write(testindex.render(name=each.name,
-                                           time=each.time_elapsed,
+                                           time=time,
                                            options=each.options,
                                            uname=each.uname,
                                            glxinfo=each.glxinfo,
@@ -404,6 +410,9 @@ class Summary:
 
                     if isinstance(value.get('dmesg'), list):
                         value['dmesg'] = "\n".join(value['dmesg'])
+
+                    if value.get('time') is not None:
+                        value['time'] = datetime.timedelta(0, value['time'])
 
                     with open(path.join(destination, each.name, key + ".html"),
                               'w') as out:
