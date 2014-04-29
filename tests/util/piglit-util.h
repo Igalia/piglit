@@ -35,10 +35,6 @@ extern "C" {
 #include <windows.h>
 #endif
 
-#if defined(_MSC_VER)
-#define log2(x) (log(x) / log(2))
-#endif
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -59,6 +55,18 @@ extern "C" {
 
 #define snprintf sprintf_s
 
+#if _MSC_VER < 1800
+
+static __inline double
+log2(double x) {
+	return log(x) * M_LOG2E;
+}
+
+static __inline float
+log2f(float x) {
+	return (float) log2(x);
+}
+
 static __inline double
 round(double x) {
 	return x >= 0.0 ? floor(x + 0.5) : ceil(x - 0.5);
@@ -73,6 +81,8 @@ static __inline long
 lround(double x) {
 	return (long)round(x);
 }
+
+#endif /* _MSC_VER < 1800 */
 
 #ifndef va_copy
 #ifdef __va_copy
