@@ -238,11 +238,12 @@ else ()
 		include_directories ("include/msvc/c99")
 	endif ()
 
-	# -Wall or (/Wall) is actually supported by MSVC and would be detected
-	# by CHECK_C_COMPILER_FLAG above, but is very pedantic, causing
-	# thousand of warnings when including windows.h.
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W4")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W4")
+	# Adjust warnings
+	add_definitions (-W3)
+	add_definitions (-wd4018) # signed/unsigned mismatch
+	add_definitions (-wd4244) # conversion from 'type1' to 'type2', possible loss of data
+	add_definitions (-wd4305) # truncation from 'type1' to 'type2'
+	add_definitions (-wd4800) # forcing value to bool 'true' or 'false' (performance warning)
 
 	add_definitions (-D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS)
 	add_definitions (-D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
