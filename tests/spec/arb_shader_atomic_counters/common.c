@@ -228,6 +228,7 @@ atomic_counters_supported(GLenum shader_stage)
 
         default:
                 assert(!"Unreachable");
+                abort();
         }
 }
 
