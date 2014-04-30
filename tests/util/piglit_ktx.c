@@ -436,7 +436,7 @@ piglit_ktx_read_file(const char *filename)
 	if (self == NULL)
 		goto out_of_memory;
 
-	file = fopen(filename, "r");
+	file = fopen(filename, "rb");
 	if (file == NULL)
 		goto bad_open;
 
@@ -521,7 +521,7 @@ piglit_ktx_write_file(struct piglit_ktx *self, const char *filename)
 	size_t size_written = 0;
 	bool ok = true;
 
-	file = fopen(filename, "w");
+	file = fopen(filename, "wb");
 	if (file == NULL)
 		goto bad_open;
 
