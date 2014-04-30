@@ -23,6 +23,7 @@
 import os
 import sys
 import subprocess
+import re
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg, DmesgError
@@ -164,16 +165,19 @@ def test_dmesg_wrap_complete():
 
 def test_update_result_replace():
     """ Generates tests for update_result """
-    dmesg = _get_dmesg()
 
-    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
+    def create_test_result(res):
         result = TestResult()
         result['result'] = res
         result['subtest'] = {}
         result['subtest']['test'] = res
+        return result
 
+    dmesg = _get_dmesg()
+
+    for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
         _write_dev_kmesg()
-        new_result = dmesg.update_result(result)
+        new_result = dmesg.update_result(create_test_result(res))
 
         # Create a yieldable and set the description for useful per-test names
         yieldable = check_update_result
@@ -183,6 +187,38 @@ def test_update_result_replace():
         yieldable.description = "Test update_result subtest: {0}".format(res)
         yield yieldable, new_result['subtest']['test'], res
 
+        # check that the status is not updated when Dmesg.regex is set and does
+        # not match the dmesg output
+        dmesg.regex = re.compile("(?!)")
+        _write_dev_kmesg()
+        new_result = dmesg.update_result(create_test_result(res))
+
+        yieldable = check_equal_result
+        yieldable.description = ("Test update_result with non-matching regex: "
+                                 "{0}".format(res))
+        yield yieldable, new_result['result'], res
+
+        # check that the status is updated when Dmesg.regex is set and matches
+        # the dmesg output
+        dmesg.regex = re.compile("piglit.*test")
+        _write_dev_kmesg()
+        new_result = dmesg.update_result(create_test_result(res))
+
+        yieldable = check_update_result
+        yieldable.description = ("Test update_result with matching regex: "
+                                "{0} ".format(res))
+        yield yieldable, new_result['result'], res
+
+def check_equal_result(result, status):
+    """ Tests that the result and status are equal
+
+    Dmesg.update_results() should not change the status if Dmesg.regex is set
+    and the dmesg output did not match it.
+
+    """
+
+    nt.assert_equal(result, status, msg="status should not have changed "
+                                        "from {} to {}".format(status, result))
 
 def check_update_result(result, status):
     """ Tests that update result replaces results correctly

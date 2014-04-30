@@ -53,6 +53,7 @@ class LinuxDmesg(object):
         """ Create a dmesg instance """
         self._last_message = None
         self._new_messages = []
+        self.regex = None
 
         # Populate self.dmesg initially, otherwise the first test will always
         # be full of dmesg crud.
@@ -101,6 +102,14 @@ class LinuxDmesg(object):
         # if update_dmesg() found new entries replace the results of the test
         # and subtests
         if self._new_messages:
+
+            if self.regex:
+                for line in self._new_messages:
+                    if self.regex.search(line):
+                        break
+                else:
+                    return result
+
             result['result'] = replace(result['result'])
 
             # Replace any subtests
