@@ -206,7 +206,7 @@ check_draw_elements_no_indices(void)
 static bool
 report(bool result, char const *name)
 {
-	piglit_report_subtest_result(result ? PIGLIT_PASS : PIGLIT_FAIL, name);
+	piglit_report_subtest_result(result ? PIGLIT_PASS : PIGLIT_FAIL, "%s", name);
 	return result;
 }
 
