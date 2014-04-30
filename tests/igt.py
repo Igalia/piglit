@@ -256,3 +256,6 @@ for test in multiTests:
     addSubTestCases(test)
 
 profile.dmesg = True
+
+# the dmesg property of TestProfile returns a Dmesg object
+profile.dmesg.regex = re.compile("(\[drm:|drm_|intel_|i915_)")
