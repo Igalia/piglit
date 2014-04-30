@@ -1434,6 +1434,9 @@ spec['AMD_shader_trinary_minmax'] = {}
 import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
 			 os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
 			 [''])
+add_shader_test_dir(spec['AMD_shader_trinary_minmax'],
+                    os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
+                    recursive=True)
 
 # Group ARB_point_sprite
 arb_point_sprite = {}

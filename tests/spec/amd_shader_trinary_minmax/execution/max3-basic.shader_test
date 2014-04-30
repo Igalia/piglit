@@ -1,0 +1,50 @@
+[require]
+GLSL >= 1.10
+GL_AMD_shader_trinary_minmax
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#extension GL_AMD_shader_trinary_minmax : require
+
+uniform float zero;
+uniform float one;
+uniform float middle;
+
+float test_all_constants()
+{
+	return max3(0.0, 1.0, 0.5);
+}
+
+float test_two_constants()
+{
+	return max3(0.5, one, 0.0);
+}
+
+float test_one_constant()
+{
+	return max3(one, zero, 0.5);
+}
+
+float test_no_constants()
+{
+	return max3(middle, one, zero);
+}
+
+void main()
+{
+	float r = test_all_constants();
+	float g = test_two_constants();
+	float b = test_one_constant();
+	float a = test_no_constants();
+
+	gl_FragColor = vec4(r, g, b, a);
+}
+
+[test]
+uniform float zero 0.0
+uniform float one 1.0
+uniform float middle 0.5
+draw rect -1 -1 2 2
+probe all rgba 1.0 1.0 1.0 1.0
