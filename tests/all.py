@@ -1910,7 +1910,7 @@ add_plain_test(arb_robustness, 'arb_robustness_client-mem-bounds')
 arb_shader_texture_lod = {}
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
 import_glsl_parser_tests(arb_shader_texture_lod,
-			 os.path.join(testsDir, 'spec', 'arb_shader_texture_lod'),
+			 os.path.join(generatedTestDir, 'spec', 'arb_shader_texture_lod'),
 			 ['compiler'])
 arb_shader_texture_lod['execution'] = {}
 add_shader_test_dir(arb_shader_texture_lod['execution'],
