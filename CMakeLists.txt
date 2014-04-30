@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
+INCLUDE (GNUInstallDirs)
 INCLUDE (CheckCCompilerFlag)
 INCLUDE (CheckCSourceCompiles)
 INCLUDE (CheckCXXCompilerFlag)
@@ -383,6 +384,16 @@ check_include_file(sys/stat.h  HAVE_SYS_STAT_H)
 check_include_file(unistd.h    HAVE_UNISTD_H)
 check_include_file(fcntl.h     HAVE_FCNTL_H)
 
+set(PIGLIT_INSTALL_LIBDIR
+    "${CMAKE_INSTALL_LIBDIR}/piglit")
+if(NOT IS_ABSOLUTE ${PIGLIT_INSTALL_LIBDIR})
+	set(PIGLIT_INSTALL_FULL_LIBDIR "${CMAKE_INSTALL_PREFIX}/${PIGLIT_INSTALL_LIBDIR}")
+else()
+	set(PIGLIT_INSTALL_FULL_LIBDIR "${PIGLIT_INSTALL_LIBDIR}")
+endif()
+
+SET(CMAKE_INSTALL_RPATH "${PIGLIT_INSTALL_FULL_LIBDIR}/lib")
+
 configure_file(
 	"${piglit_SOURCE_DIR}/tests/util/config.h.in"
 	"${piglit_BINARY_DIR}/tests/util/config.h"
@@ -405,7 +416,7 @@ install (
 		COPYING
 		README
 		RELEASE
-	DESTINATION share/doc
+	DESTINATION share/doc/piglit
 )
 
 install (
@@ -417,30 +428,30 @@ install (
 		piglit-summary.py
 		piglit-summary-html.py
 		piglit-summary-junit.py
-	DESTINATION .
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 )
 
 install (
 	DIRECTORY framework
-	DESTINATION .
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING PATTERN "*.py"
 )
 
 install (
 	DIRECTORY templates
-	DESTINATION .
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 )
 
 install (
 	DIRECTORY tests
-	DESTINATION .
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|ktx|cl|txt|vpfp)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 
 install (
 	DIRECTORY ${CMAKE_BINARY_DIR}/generated_tests
-	DESTINATION .
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert|geom|cl|txt)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
