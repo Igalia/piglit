@@ -426,18 +426,6 @@ install (
 )
 
 install (
-	PROGRAMS
-		piglit-merge-results.py
-		piglit-print-commands.py
-		piglit-run.py
-		piglit-resume.py
-		piglit-summary.py
-		piglit-summary-html.py
-		piglit-summary-junit.py
-	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
-)
-
-install (
 	DIRECTORY framework
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING PATTERN "*.py"
@@ -460,6 +448,11 @@ install (
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert|geom|cl|txt)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
+)
+
+install (
+	PROGRAMS piglit RENAME piglit${PIGLIT_INSTALL_VERSION_SUFFIX}
+	DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 

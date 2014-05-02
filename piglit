@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2014 Intel Corporation
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+""" Wrapper for piglit executables
+
+This imports functions from the framework and calls them with the argument
+parts that the parser defined here doesn't konw how to parse.
+
+It is very important that the final parser not generate a help message
+(add_help=False in the constructor arguments), otherwise this parser will
+capture -h/--help and the results will not be useful.
+
+"""
+
+import os
+import os.path as path
+import sys
+import argparse
+
+# If running in the source directory there will be a HACKING file, don't
+# muck with things, if not we need to screw with the python path
+if not path.exists('HACKING'):
+    _binpath, _bin = path.split(__file__)
+    _libdir = path.abspath(path.join(_binpath, '..', 'lib', _bin))
+    sys.path.append(_libdir)
+    os.environ['PIGLIT_SOURCE_DIR'] = _libdir
+
+import framework.programs.run as run
+import framework.programs.summary as summary
+
+
+def main():
+    """ Parse argument and call other executables """
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+
+    parse_run = subparsers.add_parser('run',
+                                      add_help=False,
+                                      help="Run a piglit test")
+    parse_run.set_defaults(func=run.run)
+    resume = subparsers.add_parser('resume',
+                                   add_help=False,
+                                   help="resume an interrupted piglit run")
+    resume.set_defaults(func=run.resume)
+    parse_summary = subparsers.add_parser('summary', help='summary generators')
+    summary_parser = parse_summary.add_subparsers()
+    html = summary_parser.add_parser('html',
+                                     add_help=False,
+                                     help='generate html reports from results')
+    html.set_defaults(func=summary.html)
+    console = summary_parser.add_parser('console',
+                                        add_help=False,
+                                        help='print results to terminal')
+    console.set_defaults(func=summary.console)
+    junit = summary_parser.add_parser('junit',
+                                      add_help=False,
+                                      help='generate junit xml from results')
+    junit.set_defaults(func=summary.junit)
+
+    # Parse the known arguments (piglit run or piglit summary html for
+    # example), and then pass the arguments that this parser doesn't know about
+    # to that executable
+    parsed, args = parser.parse_known_args()
+    returncode = parsed.func(args)
+    sys.exit(returncode)
+
+
+if __name__ == '__main__':
+    main()
