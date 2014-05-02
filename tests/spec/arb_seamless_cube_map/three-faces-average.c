@@ -183,6 +183,10 @@ void piglit_init( int argc, char **argv)
 enum piglit_result piglit_display(void)
 {
 	bool pass = true;
+	int w = piglit_width / 2;
+	int h = piglit_height / 2;
+
+	glViewport(0, 0, piglit_width, piglit_height);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -193,14 +197,14 @@ enum piglit_result piglit_display(void)
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	/* expect red */
-	pass = piglit_probe_rect_rgb(0, 0, 75, 75, red) && pass;
+	pass = piglit_probe_rect_rgb(0, 0, w, h, red) && pass;
 
 	/* texcoords should target vector to bottom corner */
 	glUniform3fv(cubeVec_loc, 1, cubeVecNegative);
 	glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
 
 	/* expect blue */
-	pass = piglit_probe_rect_rgb(75, 75, 75,75, blue) && pass;
+	pass = piglit_probe_rect_rgb(w, h, w, h, blue) && pass;
 
 	piglit_present_results();
 
