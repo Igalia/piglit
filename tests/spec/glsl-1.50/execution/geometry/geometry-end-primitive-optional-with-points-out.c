@@ -128,11 +128,42 @@ piglit_init(int argc, char **argv)
 	glVertexAttribPointer(vertIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
+/**
+ * Probe a 5x5 region of pixels around (x,y) looking for expected color.
+ */
+static bool
+probe_pixel_rgb_neighborhood(int x, int y, const float expected[3])
+{
+	GLfloat pixels[5][5][4];  /* 5x5 pixel block */
+	int i, j, k;
+
+	glReadPixels(x - 2, y - 2, 5, 5, GL_RGBA, GL_FLOAT, pixels);
+	for (j = 0; j < 5; j++) {
+		for (i = 0; i <= 5; i++) {
+			float *p = pixels[j][i];
+
+			for (k = 0; k < 3; k++) {
+				if (fabs(p[k] - expected[k])
+				    <= piglit_tolerance[k]) {
+					/* found matching pixel */
+					return true;
+				}
+			}
+		}
+	}
+
+	/* pixel not found */
+	return false;
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
 	float green[] = {0, 1, 0};
+
+	glViewport(0, 0, piglit_width, piglit_height);
 
 	glClearColor(0, 0, 0, 1.);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -143,15 +174,15 @@ piglit_display(void)
 	glDrawElements(GL_TRIANGLES, ARRAY_SIZE(indices),
 			GL_UNSIGNED_INT, NULL);
 
-	pass = piglit_probe_pixel_rgb(.05 * piglit_width,
-				      .95 * piglit_height,
-				      green) && pass;
-	pass = piglit_probe_pixel_rgb(.95 * piglit_width,
-				      .95 * piglit_height,
-				      green) && pass;
-	pass = piglit_probe_pixel_rgb(.95 * piglit_width,
-				      .05 * piglit_height,
-				      green) && pass;
+	pass = probe_pixel_rgb_neighborhood((int) (.05 * piglit_width),
+					    (int) (.95 * piglit_height),
+					    green) && pass;
+	pass = probe_pixel_rgb_neighborhood((int) (.95 * piglit_width),
+					    (int) (.95 * piglit_height),
+					    green) && pass;
+	pass = probe_pixel_rgb_neighborhood((int) (.95 * piglit_width),
+					    (int) (.05 * piglit_height),
+					    green) && pass;
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
 
