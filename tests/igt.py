@@ -168,7 +168,11 @@ class IGTTest(Test):
             timeout = ProcessTimeout(600, proc)
             timeout.start()
             out, err = proc.communicate()
-            if (timeout.join() > 0):
+
+            # check for pass or skip first
+            if proc.returncode in (0, 77):
+                returncode = proc.returncode
+            elif timeout.join() > 0:
                 returncode = 78
             else:
                 returncode = proc.returncode
