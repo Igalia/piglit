@@ -78,8 +78,8 @@ draw_check_pixels(void)
 			expected[1] =
 			expected[2] = 1.0 / (GLfloat) (1 + j + i*divY);
 			expected[3] = 1.0;
-			p = piglit_probe_rect_rgba(i * w, j * h, w, h,
-						   expected);
+			p = piglit_probe_rect_rgba(i * w + 1, j * h + 1,
+						   w-2, h-2, expected);
 			if (!p) {
 				printf("Wrong color for viewport i,j %d %d\n",
 				       i, j);
