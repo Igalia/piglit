@@ -242,7 +242,6 @@ piglit_init(int argc, char **argv)
 	load_texture(decompressed_filename, &decompressed_tex);
 
 	glClearColor(0.3, 0.5, 1.0, 1.0);
-	glViewport(0, 0, window_width, window_height);
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
@@ -287,6 +286,8 @@ piglit_display(void)
 	int y_offset = 0;
 
 	bool pass = true;
+
+	glViewport(0, 0, window_width, window_height);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	for (level = 0; level < num_levels; ++level) {
@@ -339,7 +340,5 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_es_version = 30;
 
-	config.window_width = 150;
-	config.window_height = 150;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 PIGLIT_GL_TEST_CONFIG_END
