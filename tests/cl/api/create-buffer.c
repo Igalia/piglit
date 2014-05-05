@@ -174,6 +174,10 @@ piglit_cl_test(const int argc,
 
 	/*** Normal usage ***/
 
+	for (i = 0; i < BUFFER_SIZE; i++){
+		host_buffer[i] = (unsigned char)i;
+	}
+
 	/*
 	 * For each memory flags mix.
 	 * There are 2^(num_mem_flags)-1 possible options without
