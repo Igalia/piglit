@@ -115,6 +115,7 @@ add_program_test_dir(program_build, 'tests/cl/program/build')
 add_program_test_dir(program_build_fail, 'tests/cl/program/build/fail')
 add_program_test_dir(program_execute, 'tests/cl/program/execute')
 add_program_test_dir(program_execute, 'tests/cl/program/execute/builtin/atomic')
+add_program_test_dir(program_execute, 'tests/cl/program/execute/builtin/convert')
 
 #Run generated built-in tests
 program_execute_builtin = {}
