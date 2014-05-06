@@ -3851,6 +3851,10 @@ egl_khr_fence_sync = {}
 spec['EGL_KHR_fence_sync'] = egl_khr_fence_sync
 egl_khr_fence_sync['conformance'] = concurrent_test('egl_khr_fence_sync')
 
+egl_chromium_sync_control = {}
+spec['EGL_CHROMIUM_sync_control'] = egl_chromium_sync_control
+egl_chromium_sync_control['conformance'] = concurrent_test('egl_chromium_sync_control')
+
 gles20 = {}
 spec['!OpenGL ES 2.0'] = gles20
 gles20['glsl-fs-pointcoord'] = concurrent_test('glsl-fs-pointcoord_gles2')

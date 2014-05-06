@@ -1,0 +1,7 @@
+link_libraries(
+	piglitutil_${piglit_target_api}
+)
+
+piglit_add_executable(egl_chromium_sync_control ../../egl-util.c egl_chromium_sync_control.c)
+
+# vim: ft=cmake:
