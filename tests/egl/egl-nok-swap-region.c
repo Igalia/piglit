@@ -106,7 +106,9 @@ main(int argc, char *argv[])
 	test.extensions = extensions;
 	test.draw = draw;
 
-	return egl_util_run(&test, argc, argv);
+	if (egl_util_run(&test, argc, argv) != PIGLIT_PASS)
+		return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
 
 #else

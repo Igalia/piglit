@@ -204,5 +204,7 @@ main(int argc, char *argv[])
 	test.window_width = window_width;
 	test.window_height = window_height;
 
-	return egl_util_run(&test, argc, argv);
+	if (egl_util_run(&test, argc, argv) != PIGLIT_PASS)
+		return EXIT_FAILURE;
+	return EXIT_SUCCESS;
 }
