@@ -28,9 +28,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 20;
 	config.supports_gl_core_version = 31;
 
-	config.window_width = 32;
-	config.window_height = 32;
-
 PIGLIT_GL_TEST_CONFIG_END
 
 static bool pass;
