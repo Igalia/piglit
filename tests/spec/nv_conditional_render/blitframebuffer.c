@@ -81,7 +81,6 @@ enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
-	float red[4] = {1.0, 0.0, 0.0, 0.0};
 	float green[4] = {0.0, 1.0, 0.0, 0.0};
 	GLuint q, texture;
 
