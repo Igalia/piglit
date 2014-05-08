@@ -140,8 +140,9 @@ piglit_init(int argc, char **argv)
 }
 
 
-extern "C" enum piglit_result
-piglit_display()
+bool
+test_clear(const float r, const float g, const float b,
+	   const float a, const bool fast_clear_compatible)
 {
 	bool pass = true;
 
@@ -159,7 +160,7 @@ piglit_display()
 	 * GL_SAMPLE_ALPHA_TO_COVERAGE and GL_SAMPLE_ALPHA_TO_ONE
 	 * don't take effect.
 	 */
-	glClearColor(1.0, 1.0, 1.0, 0.5);
+	glClearColor(r, g, b, a);
 	glClearDepth(0.5);
 	glClearStencil(1);
 
@@ -214,7 +215,7 @@ piglit_display()
          *   blue, since the ManifestStencil program converts a
          *   stencil value of 1 to blue.
 	 */
-	static const float expected_color[4] = { 1.0, 1.0, 1.0, 0.5 };
+	const float expected_color[4] = { r, g, b, a };
 	static const float expected_depth[4] = { 1.0, 0.0, 0.0, 1.0 };
 	static const float expected_stencil[4] = { 0.0, 0.0, 1.0, 1.0 };
 	const float *expected = NULL;
@@ -243,7 +244,29 @@ piglit_display()
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height,
 				      expected) && pass;
 
+	if (buffer_to_test == GL_COLOR_BUFFER_BIT)
+		printf("fast_clear_compatible = %s, result = %s\n",
+		       fast_clear_compatible ? "true" : "false",
+		       pass ? "pass" : "fail");
+
 	piglit_present_results();
+
+	return pass;
+}
+
+extern "C" enum piglit_result
+piglit_display()
+{
+	bool pass =true;
+
+	/* Non 'fast clear' path. */
+	pass = test_clear(1.0, 1.0, 1.0, 0.5, false) && pass;
+
+	/* Test with color values compatible with Intel's i965 driver's
+	 * 'fast clear' constraints. It varifies the 'fast clear' path
+	 * if supported by the implementation.
+	 */
+	pass = test_clear(1.0, 1.0, 1.0, 0.0, true) && pass;
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
