@@ -25,4 +25,4 @@
 import sys
 from framework.programs.summary import console
 
-console(sys.argv)
+console(sys.argv[1:])

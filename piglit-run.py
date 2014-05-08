@@ -29,4 +29,4 @@ Deprecated compatability wrapper
 import sys
 from framework.programs.run import run
 
-run(sys.argv)
+run(sys.argv[1:])

@@ -25,4 +25,4 @@
 import sys
 from framework.programs.summary import html
 
-html(sys.argv)
+html(sys.argv[1:])

@@ -25,4 +25,4 @@
 import sys
 from framework.programs.summary import junit
 
-junit(sys.argv)
+junit(sys.argv[1:])
