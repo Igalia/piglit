@@ -22,6 +22,8 @@
  */
 
 #pragma once
+#ifndef PIGLIT_LOG_H
+#define PIGLIT_LOG_H
 
 #include <stdint.h>
 
@@ -65,3 +67,5 @@ piglit_logi(const char *fmt, ...);
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
+
+#endif /* PIGLIT_LOG_H */
