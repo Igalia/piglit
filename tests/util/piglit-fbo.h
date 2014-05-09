@@ -30,6 +30,11 @@
 #include "math.h"
 
 namespace piglit_util_fbo {
+/* I think 16 is the sufficient number of color attachments which tests would
+ * want to use in near future.
+ */
+#define PIGLIT_MAX_COLOR_ATTACHMENTS 16
+
 	/**
 	 * Information needed to configure a framebuffer object for MSAA
 	 * testing.
@@ -40,6 +45,8 @@ namespace piglit_util_fbo {
 		FboConfig(int num_samples, int width, int height);
 
 		int num_samples;
+		int num_rb_attachments; /* Default value is 1 */
+		int num_tex_attachments; /* Default value is 0 */
 		int width;
 		int height;
 
@@ -56,6 +63,10 @@ namespace piglit_util_fbo {
 		 * be used.  Defaults to false.
 		 */
 		bool attach_texture;
+
+		/* Set color attachments */
+		GLuint rb_attachment[PIGLIT_MAX_COLOR_ATTACHMENTS];
+		GLuint tex_attachment[PIGLIT_MAX_COLOR_ATTACHMENTS];
 
 		/**
 		 * Useful if attach_texture is true and color buffer is

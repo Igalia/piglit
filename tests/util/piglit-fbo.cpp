@@ -33,6 +33,8 @@ using namespace piglit_util_fbo;
 
 FboConfig::FboConfig(int num_samples, int width, int height)
 	: num_samples(num_samples),
+	  num_rb_attachments(1),
+	  num_tex_attachments(0),
 	  width(width),
 	  height(height),
 	  combine_depth_stencil(true),
@@ -42,6 +44,12 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  depth_internalformat(GL_DEPTH_COMPONENT24),
 	  stencil_internalformat(GL_STENCIL_INDEX8)
 {
+	memset(rb_attachment, 0, PIGLIT_MAX_COLOR_ATTACHMENTS * sizeof(GLuint));
+	memset(tex_attachment, 0, PIGLIT_MAX_COLOR_ATTACHMENTS * sizeof(GLuint));
+
+	/* Set default values for single renderbuffer and texture attachment. */
+	rb_attachment[0] = GL_COLOR_ATTACHMENT0;
+	tex_attachment[0] = GL_COLOR_ATTACHMENT0;
 }
 
 Fbo::Fbo()
@@ -138,6 +146,19 @@ Fbo::set_samples(int num_samples)
 void
 Fbo::setup(const FboConfig &new_config)
 {
+	GLint max_attachments;
+	GLint requested_attachments = new_config.num_rb_attachments +
+		new_config.num_tex_attachments;
+	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_attachments);
+
+	if (requested_attachments > max_attachments) {
+		printf("Number of color attachments are not supported by the"
+		       " implementation.\nattachments requested = %d,"
+		       " max attachments supported = %d\n",
+		       requested_attachments, max_attachments);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
 	if (!try_setup(new_config)) {
 		printf("Framebuffer not complete\n");
 		piglit_report_result(PIGLIT_SKIP);
