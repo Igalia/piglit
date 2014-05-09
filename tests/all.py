@@ -2649,6 +2649,12 @@ for num_samples in MSAA_SAMPLE_COUNTS:
         ext_framebuffer_multisample[test_name] = concurrent_test(
                 executable)
 
+for num_samples in TEST_SAMPLE_COUNTS:
+    test_name = ' '.join(['blit-multiple-render-targets', str(num_samples)])
+    executable = 'ext_framebuffer_multisample-{0}'.format(
+            test_name)
+    ext_framebuffer_multisample[test_name] = concurrent_test(executable)
+
 # Note: the interpolation tests also check for sensible behaviour with
 # non-multisampled framebuffers, so go ahead and test them with
 # num_samples==0 as well.

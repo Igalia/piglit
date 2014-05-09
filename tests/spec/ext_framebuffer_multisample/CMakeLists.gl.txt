@@ -24,6 +24,7 @@ piglit_add_executable (ext_framebuffer_multisample-alpha-to-one-msaa-disabled co
 piglit_add_executable (ext_framebuffer_multisample-alpha-to-one-single-sample-buffer common.cpp
 		       draw-buffers-common.cpp alpha-to-one-single-sample-buffer.cpp)
 piglit_add_executable (ext_framebuffer_multisample-bitmap common.cpp bitmap.cpp)
+piglit_add_executable (ext_framebuffer_multisample-blit-multiple-render-targets blit-multiple-render-targets.cpp)
 piglit_add_executable (ext_framebuffer_multisample-blit-flipped common.cpp blit-flipped.cpp)
 piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-samples common.cpp blit-mismatched-samples.cpp)
 piglit_add_executable (ext_framebuffer_multisample-blit-mismatched-sizes common.cpp blit-mismatched-sizes.cpp)
