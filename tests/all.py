@@ -1183,6 +1183,9 @@ spec['glsl-1.20'] = {}
 import_glsl_parser_tests(spec['glsl-1.20'],
 			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
 			 ['preprocessor', 'compiler'])
+import_glsl_parser_tests(spec['glsl-1.20'],
+			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
+			 ['compiler'])
 spec['glsl-1.20']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
