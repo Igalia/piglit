@@ -1190,6 +1190,9 @@ spec['glsl-1.20']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.20']['execution'],
 	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
 		    recursive=True)
+add_shader_test_dir(spec['glsl-1.20']['execution'],
+	            os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
+		    recursive=True)
 
 def add_recursion_test(group, name):
     # When the recursion tests fail it is usually because the GLSL

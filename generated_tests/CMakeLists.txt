@@ -75,12 +75,17 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	outerproduct_invalid_params.list
 	gen_outerproduct_invalid_params.py)
+piglit_make_generated_tests(
+	outerproduct_tests.list
+	gen_outerproduct_tests.py
+	gen_outerproduct_template.mako)
 
 
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
 add_custom_target(gen-tests ALL
 	DEPENDS builtin_packing_tests.list
+		outerproduct_tests.list
 		outerproduct_invalid_params.list
 		builtin_uniform_tests.list
 		constant_array_size_tests.list
