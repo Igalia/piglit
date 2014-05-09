@@ -112,8 +112,8 @@ def run(input_):
         core.PIGLIT_CONFIG.readfp(args.config_file)
         args.config_file.close()
     else:
-        core.PIGLIT_CONFIG.read(os.path.join(os.path.dirname(__file__),
-                                'piglit.conf'))
+        core.PIGLIT_CONFIG.read(os.path.join(os.environ['PIGLIT_SOURCE_DIR'],
+	                        'piglit.conf'))
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
