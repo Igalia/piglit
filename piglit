@@ -42,7 +42,8 @@ if not path.exists('HACKING'):
     _binpath, _bin = path.split(__file__)
     _libdir = path.abspath(path.join(_binpath, '..', 'lib', _bin))
     sys.path.append(_libdir)
-    os.environ['PIGLIT_SOURCE_DIR'] = _libdir
+    if 'PIGLIT_SOURCE_DIR' not in os.environ:
+        os.environ['PIGLIT_SOURCE_DIR'] = _libdir
 
 import framework.programs.run as run
 import framework.programs.summary as summary
