@@ -139,6 +139,9 @@ namespace piglit_util_fbo {
 
 	private:
 		void generate_gl_objects();
+		void attach_color_renderbuffer(const FboConfig &config);
+		void attach_color_texture(const FboConfig &config);
+		void attach_multisample_color_texture(const FboConfig &config);
 
 		/**
 		 * True if generate_gl_objects has been called and color_tex,

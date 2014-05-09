@@ -67,6 +67,62 @@ Fbo::generate_gl_objects(void)
 }
 
 void
+Fbo::attach_color_renderbuffer(const FboConfig &config)
+{
+	glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER,
+					 config.num_samples,
+					 config.color_internalformat,
+					 config.width,
+					 config.height);
+	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
+				  GL_COLOR_ATTACHMENT0,
+				  GL_RENDERBUFFER, color_rb);
+}
+
+void
+Fbo::attach_color_texture(const FboConfig &config)
+{
+	glBindTexture(GL_TEXTURE_RECTANGLE, color_tex);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
+			GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER,
+			GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_RECTANGLE,
+		     0 /* level */,
+		     config.color_internalformat,
+		     config.width,
+		     config.height,
+		     0 /* border */,
+		     config.color_format /* format */,
+		     GL_BYTE /* type */,
+		     NULL /* data */);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+			       GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_RECTANGLE,
+			       color_tex,
+			       0 /* level */);
+}
+
+void
+Fbo::attach_multisample_color_texture(const FboConfig &config)
+{
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+				config.num_samples,
+				config.color_internalformat,
+				config.width,
+				config.height,
+				GL_TRUE /* fixed sample locations */);
+
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+			       GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_2D_MULTISAMPLE,
+			       color_tex,
+			       0 /* level */);
+}
+
+void
 Fbo::set_samples(int num_samples)
 {
 	FboConfig new_config = this->config;
@@ -106,51 +162,13 @@ Fbo::try_setup(const FboConfig &new_config)
 	/* Color buffer */
 	if (config.color_internalformat != GL_NONE) {
 		if (!config.attach_texture) {
-			glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
-			glRenderbufferStorageMultisample(GL_RENDERBUFFER,
-							 config.num_samples,
-							 config.color_internalformat,
-							 config.width,
-							 config.height);
-			glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-						  GL_COLOR_ATTACHMENT0,
-						  GL_RENDERBUFFER, color_rb);
+			attach_color_renderbuffer(new_config);
 		} else if (config.num_samples == 0) {
+			attach_color_texture(new_config);
 			piglit_require_extension("GL_ARB_texture_rectangle");
-			glBindTexture(GL_TEXTURE_RECTANGLE, color_tex);
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
-					GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER,
-					GL_NEAREST);
-			glTexImage2D(GL_TEXTURE_RECTANGLE,
-				     0 /* level */,
-				     config.color_internalformat,
-				     config.width,
-				     config.height,
-				     0 /* border */,
-				     config.color_format /* format */,
-				     GL_BYTE /* type */,
-				     NULL /* data */);
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
-					       GL_TEXTURE_RECTANGLE,
-					       color_tex,
-					       0 /* level */);
 		} else {
 			piglit_require_extension("GL_ARB_texture_multisample");
-			glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex);
-			glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-						config.num_samples,
-						config.color_internalformat,
-						config.width,
-						config.height,
-						GL_TRUE /* fixed sample locations */);
-
-			glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-					       GL_COLOR_ATTACHMENT0,
-					       GL_TEXTURE_2D_MULTISAMPLE,
-					       color_tex,
-					       0 /* level */);
+			attach_multisample_color_texture(new_config);
 		}
 	}
 
