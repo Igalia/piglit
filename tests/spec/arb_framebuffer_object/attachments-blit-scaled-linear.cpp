@@ -61,10 +61,10 @@ piglit_init(int argc, char **argv)
 	 * different color attachment types.
 	 */
 	FboConfig Config(0, pattern_width, pattern_height);
-	Config.attach_texture = true;
-	fbo_tex.setup(Config);
-	Config.attach_texture = false;
 	fbo_rb.setup(Config);
+	Config.num_rb_attachments = 0;
+	Config.num_tex_attachments = 1;
+	fbo_tex.setup(Config);
 
 	test_pattern = new Triangles();
 	test_pattern->compile();

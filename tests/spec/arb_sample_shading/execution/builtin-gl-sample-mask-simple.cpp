@@ -141,7 +141,8 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 
 	FboConfig msConfig(num_samples, 1 << MAX2(num_samples, 1), 1);
-        msConfig.attach_texture = true;
+	msConfig.num_rb_attachments = 0;
+	msConfig.num_tex_attachments = 1;
 	multisampled_tex.setup(msConfig);
 
 	compile_shader();

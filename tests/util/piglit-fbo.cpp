@@ -38,7 +38,6 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 	  width(width),
 	  height(height),
 	  combine_depth_stencil(true),
-	  attach_texture(false),
 	  color_format(GL_RGBA),
 	  color_internalformat(GL_RGBA),
 	  depth_internalformat(GL_DEPTH_COMPONENT24),
@@ -55,43 +54,45 @@ FboConfig::FboConfig(int num_samples, int width, int height)
 Fbo::Fbo()
 	: config(0, 0, 0), /* will be overwritten on first call to setup() */
 	  handle(0),
-	  color_tex(0),
-	  color_rb(0),
 	  depth_rb(0),
 	  stencil_rb(0),
 	  gl_objects_generated(false)
 {
+	memset(color_tex, 0, PIGLIT_MAX_COLOR_ATTACHMENTS * sizeof(GLuint));
+	memset(color_rb, 0, PIGLIT_MAX_COLOR_ATTACHMENTS * sizeof(GLuint));
 }
 
 void
 Fbo::generate_gl_objects(void)
 {
+	GLint max_color_attachments;
+	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &max_color_attachments);
 	glGenFramebuffers(1, &handle);
-	glGenTextures(1, &color_tex);
-	glGenRenderbuffers(1, &color_rb);
+	glGenTextures(max_color_attachments, color_tex);
+	glGenRenderbuffers(max_color_attachments, color_rb);
 	glGenRenderbuffers(1, &depth_rb);
 	glGenRenderbuffers(1, &stencil_rb);
 	gl_objects_generated = true;
 }
 
 void
-Fbo::attach_color_renderbuffer(const FboConfig &config)
+Fbo::attach_color_renderbuffer(const FboConfig &config, int index)
 {
-	glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
+	glBindRenderbuffer(GL_RENDERBUFFER, color_rb[index]);
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER,
 					 config.num_samples,
 					 config.color_internalformat,
 					 config.width,
 					 config.height);
 	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER,
-				  GL_COLOR_ATTACHMENT0,
-				  GL_RENDERBUFFER, color_rb);
+				  config.rb_attachment[index],
+				  GL_RENDERBUFFER, color_rb[index]);
 }
 
 void
-Fbo::attach_color_texture(const FboConfig &config)
+Fbo::attach_color_texture(const FboConfig &config, int index)
 {
-	glBindTexture(GL_TEXTURE_RECTANGLE, color_tex);
+	glBindTexture(GL_TEXTURE_RECTANGLE, color_tex[index]);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER,
 			GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER,
@@ -106,16 +107,16 @@ Fbo::attach_color_texture(const FboConfig &config)
 		     GL_BYTE /* type */,
 		     NULL /* data */);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-			       GL_COLOR_ATTACHMENT0,
+			       config.tex_attachment[index],
 			       GL_TEXTURE_RECTANGLE,
-			       color_tex,
+			       color_tex[index],
 			       0 /* level */);
 }
 
 void
-Fbo::attach_multisample_color_texture(const FboConfig &config)
+Fbo::attach_multisample_color_texture(const FboConfig &config, int index)
 {
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, color_tex[index]);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 				config.num_samples,
 				config.color_internalformat,
@@ -124,9 +125,9 @@ Fbo::attach_multisample_color_texture(const FboConfig &config)
 				GL_TRUE /* fixed sample locations */);
 
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
-			       GL_COLOR_ATTACHMENT0,
+			       config.tex_attachment[index],
 			       GL_TEXTURE_2D_MULTISAMPLE,
-			       color_tex,
+			       color_tex[index],
 			       0 /* level */);
 }
 
@@ -182,14 +183,24 @@ Fbo::try_setup(const FboConfig &new_config)
 
 	/* Color buffer */
 	if (config.color_internalformat != GL_NONE) {
-		if (!config.attach_texture) {
-			attach_color_renderbuffer(new_config);
-		} else if (config.num_samples == 0) {
-			attach_color_texture(new_config);
-			piglit_require_extension("GL_ARB_texture_rectangle");
-		} else {
+
+		/* Attach renderbuffers as color attachments */
+		for (int i = 0; i < config.num_rb_attachments; i++)
+			attach_color_renderbuffer(new_config, i);
+
+		if (config.num_samples == 0) {
+
+			/* Attach textures as color attachments */
 			piglit_require_extension("GL_ARB_texture_multisample");
-			attach_multisample_color_texture(new_config);
+			for (int i = 0; i < config.num_tex_attachments; i++)
+				attach_color_texture(new_config, i);
+
+		} else {
+
+			/* Attach multisample textures as color attachments */
+			piglit_require_extension("GL_ARB_texture_rectangle");
+			for (int i = 0; i < config.num_tex_attachments; i++)
+				attach_multisample_color_texture(new_config, i);
 		}
 	}
 

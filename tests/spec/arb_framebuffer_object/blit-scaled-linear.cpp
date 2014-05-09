@@ -156,7 +156,7 @@ blit_scaled_linear_glsl(const Fbo *src_fbo, GLint samples)
 		{  1, -1, srcX1, srcY0 }};
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_RECTANGLE, src_fbo->color_tex);
+	glBindTexture(GL_TEXTURE_RECTANGLE, src_fbo->color_tex[0]);
 	glUseProgram(prog);
 	glBindVertexArray(vao);
 
@@ -189,10 +189,10 @@ piglit_init(int argc, char **argv)
 	 * different color attachment types.
 	 */
 	FboConfig Config(0, pattern_width / 2, pattern_height / 2);
-	Config.attach_texture = true;
-	fbo_tex.setup(Config);
-	Config.attach_texture = false;
 	fbo_rb.setup(Config);
+	Config.num_rb_attachments = 0;
+	Config.num_tex_attachments = 1;
+	fbo_tex.setup(Config);
 
 	test_pattern = new Triangles();
 	test_pattern->compile();
@@ -218,7 +218,7 @@ bool test_blit_scaled_linear(Fbo fbo_test)
 	glClear(GL_COLOR_BUFFER_BIT);
 	test_pattern->draw(TestPattern::no_projection);
 
-	if(!fbo_test.config.attach_texture) {
+	if(fbo_test.config.num_tex_attachments == 0) {
 		/* Blit the framebuffer with texture attachment into the
 		 * framebuffer with renderbuffer attachment.
 		 */
@@ -272,7 +272,7 @@ bool test_blit_scaled_linear(Fbo fbo_test)
 		pass = result && pass;
 		piglit_present_results();
 		printf("Attachment = %12s, scale = %f, result = %s\n",
-		       fbo_test.config.attach_texture ?
+		       fbo_test.config.num_tex_attachments  > 0 ?
 		       "TEXTURE" :
 		       "RENDERBUFFER",
 		       scale, result ? "pass" : "fail");

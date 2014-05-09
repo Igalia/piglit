@@ -58,18 +58,15 @@ namespace piglit_util_fbo {
 		bool combine_depth_stencil;
 
 		/**
-		 * True if a texture should be used as the backing store for
-		 * the color attachment point, false if a renderbuffer should
-		 * be used.  Defaults to false.
+		 * Set color attachment points for color_tex[i] or color_rb[i].
+		 * Default value for color_tex[0] and color_rb[0] is
+		 * GL_COLOR_ATTACHMENT0.
 		 */
-		bool attach_texture;
-
-		/* Set color attachments */
 		GLuint rb_attachment[PIGLIT_MAX_COLOR_ATTACHMENTS];
 		GLuint tex_attachment[PIGLIT_MAX_COLOR_ATTACHMENTS];
 
 		/**
-		 * Useful if attach_texture is true and color buffer is
+		 * Useful if num_tex_attachments > 0 and color buffer is
 		 * non-multisample. Specifies the format that should be used
 		 * for the color buffer, or GL_NONE if no color buffer should
 		 * be used. Defaults to GL_RGBA.
@@ -123,16 +120,16 @@ namespace piglit_util_fbo {
 		GLuint handle;
 
 		/**
-		 * If config.attach_texture is true, the backing store for the
-		 * color buffer.
+		 * If config.num_tex_attachments > 0, the backing store for the
+		 * color buffers.
 		 */
-		GLuint color_tex;
+		GLuint color_tex[PIGLIT_MAX_COLOR_ATTACHMENTS];
 
 		/**
-		 * If config.attach_texture is false, the backing store for
-		 * the color buffer.
+		 * If config.num_rb_attachments > 0, the backing store for the
+		 * color buffers.
 		 */
-		GLuint color_rb;
+		GLuint color_rb[PIGLIT_MAX_COLOR_ATTACHMENTS];
 
 		/**
 		 * If config.combine_depth_stencil is true, the backing store
@@ -150,9 +147,11 @@ namespace piglit_util_fbo {
 
 	private:
 		void generate_gl_objects();
-		void attach_color_renderbuffer(const FboConfig &config);
-		void attach_color_texture(const FboConfig &config);
-		void attach_multisample_color_texture(const FboConfig &config);
+		void attach_color_renderbuffer(const FboConfig &config,
+					       int index);
+		void attach_color_texture(const FboConfig &config, int index);
+		void attach_multisample_color_texture(const FboConfig &config,
+						      int index);
 
 		/**
 		 * True if generate_gl_objects has been called and color_tex,

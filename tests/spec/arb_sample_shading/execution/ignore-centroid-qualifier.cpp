@@ -127,7 +127,8 @@ piglit_init(int argc, char**argv)
 		piglit_report_result(PIGLIT_SKIP);
 
 	FboConfig msConfig(num_samples, piglit_width, piglit_height);
-        msConfig.attach_texture = true;
+	msConfig.num_rb_attachments = 0;
+	msConfig.num_tex_attachments = 1;
 	multisampled_fbo.setup(msConfig);
 
 	/* Reduced tolerence for stricter color matching */

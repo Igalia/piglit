@@ -215,7 +215,7 @@ ms_blit_scaled_glsl(const Fbo *src_fbo, GLint samples)
 		{  1, -1, srcX1, srcY0 }};
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, src_fbo->color_tex);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, src_fbo->color_tex[0]);
 	glUseProgram(prog);
 	glBindVertexArray(vao);
 
@@ -267,10 +267,10 @@ piglit_init(int argc, char **argv)
 	 * but different color attachment types.
 	 */
 	FboConfig msConfig(num_samples, pattern_width, pattern_height);
-	msConfig.attach_texture = true;
-	multisampled_tex.setup(msConfig);
-	msConfig.attach_texture = false;
 	multisampled_fbo.setup(msConfig);
+	msConfig.num_tex_attachments = 1;
+	msConfig.num_rb_attachments = 0; /* default value is 1 */
+	multisampled_tex.setup(msConfig);
 
 	test_pattern = new Triangles();
 	test_pattern->compile();
@@ -296,7 +296,7 @@ bool test_ms_blit_scaled(Fbo ms_fbo)
 	glClear(GL_COLOR_BUFFER_BIT);
 	test_pattern->draw(TestPattern::no_projection);
 
-	if(!ms_fbo.config.attach_texture) {
+	if(ms_fbo.config.num_tex_attachments == 0) {
 		/* Blit the framebuffer with multisample texture attachment
 		 * into the framebuffer with multisample renderbuffer attachment.
 		 */
@@ -356,7 +356,7 @@ bool test_ms_blit_scaled(Fbo ms_fbo)
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		piglit_present_results();
 		printf("MS attachment = %24s, scale = %f, result = %s\n",
-		       ms_fbo.config.attach_texture ?
+		       ms_fbo.config.num_tex_attachments > 0 ?
 		       "MULTISAMPLE_TEXTURE" :
 		       "MULTISAMPLE_RENDERBUFFER",
 		       scale, result ? "pass" : "fail");

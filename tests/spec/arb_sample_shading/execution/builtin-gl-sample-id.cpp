@@ -147,7 +147,8 @@ piglit_init(int argc, char **argv)
 	msConfig.color_internalformat = GL_RGBA8UI;
 	multisampled_fbo.setup(msConfig);
 
-	msConfig.attach_texture = true;
+	msConfig.num_tex_attachments = 1;
+	msConfig.num_rb_attachments = 0; /* default value is 1 */
 	multisampled_tex.setup(msConfig);
 
 	compile_shader();
@@ -169,7 +170,7 @@ bool test_builtin_sample_id(Fbo ms_fbo)
 	glUniform1i(glGetUniformLocation(prog_0, "samples"), samples);
         piglit_draw_rect(-1, -1, 2, 2);
 
-	if(!ms_fbo.config.attach_texture) {
+	if(ms_fbo.config.num_tex_attachments == 0) {
 		/* Blit the framebuffer with multisample renderbuffer attachment
 		 * into the framebuffer with multisample texture attachment.
 		 */
@@ -200,7 +201,7 @@ bool test_builtin_sample_id(Fbo ms_fbo)
                && result;
 	piglit_present_results();
 	printf("FBO attachment = %s, result = %s\n",
-	       ms_fbo.config.attach_texture ?
+	       ms_fbo.config.num_tex_attachments > 0 ?
 	       "TEXTURE" :
 	       "RENDERBUFFER",
 	       result ? "pass" : "fail");

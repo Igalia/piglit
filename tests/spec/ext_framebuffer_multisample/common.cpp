@@ -192,7 +192,7 @@ DownsampleProg::run(const Fbo *src_fbo, int dest_width, int dest_height,
 	float h = dest_height;
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_RECTANGLE, src_fbo->color_tex);
+	glBindTexture(GL_TEXTURE_RECTANGLE, src_fbo->color_tex[0]);
 
 	glUseProgram(prog);
 	glBindVertexArray(vao);
@@ -293,7 +293,8 @@ Test::init(int num_samples, bool small, bool combine_depth_stencil,
 	FboConfig supersample_fbo_config = test_fbo_config;
 	supersample_fbo_config.width = 1024;
 	supersample_fbo_config.height = 1024;
-	supersample_fbo_config.attach_texture = true;
+	supersample_fbo_config.num_tex_attachments = 1;
+	supersample_fbo_config.num_rb_attachments = 0;
 	supersample_fbo.setup(supersample_fbo_config);
 
 	FboConfig downsample_fbo_config = test_fbo_config;

@@ -397,7 +397,7 @@ piglit_init(int argc, char **argv)
 	/* Query the number of samples used in ms_fbo. OpenGL implementation
 	 * may create FBO with more samples per pixel than what is requested.
 	 */
-	glBindRenderbuffer(GL_RENDERBUFFER, ms_fbo.color_rb);
+	glBindRenderbuffer(GL_RENDERBUFFER, ms_fbo.color_rb[0]);
 	glGetRenderbufferParameteriv(GL_RENDERBUFFER,
 				     GL_RENDERBUFFER_SAMPLES,
 				     &num_samples);
