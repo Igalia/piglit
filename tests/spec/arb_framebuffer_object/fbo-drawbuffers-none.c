@@ -381,16 +381,30 @@ test_glBlitFramebuffer(const GLenum drawbufs[4])
 	return probe_buffers(drawbufs, colors_all_red);
 }
 
+static void
+print_usage_and_exit(const char *prog_name)
+{
+	printf("Usage: %s <test_name>\n"
+	       "  where <test_name> is one of:\n"
+	       "    glClear\n"
+	       "    glClearBuffer\n"
+	       "    gl_FragColor\n"
+	       "    gl_FragData\n"
+	       "    glColorMaskIndexed\n"
+	       "    glBlendFunci\n"
+	       "    glDrawPixels\n"
+	       "    glBlitFramebuffer\n", prog_name);
+	piglit_report_result(PIGLIT_FAIL);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
 	bool pass = true;
 	int i, max_draw_bufs;
 
-	if (argc != 2) {
-		printf("Expected one parameter, got %i.\n", argc-1);
-		piglit_report_result(PIGLIT_FAIL);
-	}
+	if (argc != 2)
+		print_usage_and_exit(argv[0]);
 	test_name = argv[1];
 
 	piglit_require_gl_version(21);
