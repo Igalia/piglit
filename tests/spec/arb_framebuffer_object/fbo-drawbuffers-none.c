@@ -115,7 +115,7 @@ static const char *fs_write_different =
 	"   gl_FragData[3] = vec4(1.0, 1.0, 0.0, 1.0); \n"
 	"}\n";
 
-static const char *test_name;
+static char *test_name, *prog_name;
 static GLuint fb, prog_write_all_red, prog_write_all_different;
 
 
@@ -382,7 +382,7 @@ test_glBlitFramebuffer(const GLenum drawbufs[4])
 }
 
 static void
-print_usage_and_exit(const char *prog_name)
+print_usage_and_exit(void)
 {
 	printf("Usage: %s <test_name>\n"
 	       "  where <test_name> is one of:\n"
@@ -400,12 +400,18 @@ print_usage_and_exit(const char *prog_name)
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass = true;
-	int i, max_draw_bufs;
+	int max_draw_bufs;
+
+	prog_name = malloc((strlen(argv[0]) + 1));
+	assert(prog_name);
+	strcpy(prog_name, argv[0]);
 
 	if (argc != 2)
-		print_usage_and_exit(argv[0]);
-	test_name = argv[1];
+		print_usage_and_exit();
+
+	test_name = malloc((strlen(argv[1]) + 1));
+	assert(test_name);
+	strcpy(test_name, argv[1]);
 
 	piglit_require_gl_version(21);
 	piglit_require_extension("GL_ARB_framebuffer_object");
@@ -416,11 +422,16 @@ piglit_init(int argc, char **argv)
 		piglit_report_result(PIGLIT_SKIP);
 	}
 
-	printf("Testing %s.\n", test_name);
-
-	/* Begin testing. */
 	create_shaders();
 	create_and_bind_fbo();
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	int i;
+	bool pass = true;
+	printf("Testing %s.\n", test_name);
 
 	for (i = 0; i < ARRAY_SIZE(drawbuf_config); i++) {
 		clear_all_attachments_to_initial_value();
@@ -456,16 +467,10 @@ piglit_init(int argc, char **argv)
 		}
 		else {
 			printf("Unknown subtest: %s\n", test_name);
-			piglit_report_result(PIGLIT_FAIL);
+			print_usage_and_exit();
 		}
 	}
 
 	pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
-	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
-}
-
-enum piglit_result
-piglit_display(void)
-{
-	return PIGLIT_FAIL;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
