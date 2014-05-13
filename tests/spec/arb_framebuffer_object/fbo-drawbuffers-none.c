@@ -106,15 +106,17 @@ static const char *fs_write_red =
 	"   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
 	"}\n";
 
-static const char *fs_write_different =
+static const char *fs_template_write_different =
+	"#define OUTVAR %s \n"
 	"void main() \n"
 	"{ \n"
-	"   gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0); \n"
-	"   gl_FragData[1] = vec4(0.0, 1.0, 0.0, 1.0); \n"
-	"   gl_FragData[2] = vec4(0.0, 0.0, 1.0, 1.0); \n"
-	"   gl_FragData[3] = vec4(1.0, 1.0, 0.0, 1.0); \n"
+	"   OUTVAR[0] = vec4(1.0, 0.0, 0.0, 1.0); \n"
+	"   OUTVAR[1] = vec4(0.0, 1.0, 0.0, 1.0); \n"
+	"   OUTVAR[2] = vec4(0.0, 0.0, 1.0, 1.0); \n"
+	"   OUTVAR[3] = vec4(1.0, 1.0, 0.0, 1.0); \n"
 	"}\n";
 
+static char *fs_write_different;
 static char *test_name, *prog_name;
 static GLuint fb, prog_write_all_red, prog_write_all_different;
 
@@ -126,6 +128,9 @@ create_shaders(void)
 				GL_VERTEX_SHADER, vs,
 				GL_FRAGMENT_SHADER, fs_write_red,
 				0);
+
+	asprintf(&fs_write_different, fs_template_write_different,
+		 "gl_FragData");
 
 	prog_write_all_different = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs,
