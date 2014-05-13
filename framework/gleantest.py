@@ -34,7 +34,6 @@ class GleanTest(Test):
     def __init__(self, name, **kwargs):
         super(GleanTest, self).__init__([glean_executable, "-o", "-v", "-v",
                                        "-v", "-t", "+" + name])
-        self.name = name
 
     @Test.command.getter
     def command(self):

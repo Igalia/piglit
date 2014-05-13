@@ -50,6 +50,8 @@ else:
 
 class Test(object):
     ENV = Environment()
+    __slots__ = ['ENV', 'run_concurrent', 'env', 'result', 'cwd', '_command',
+                 '_test_hook_execute_run']
 
     def __init__(self, command, run_concurrent=False):
         '''
