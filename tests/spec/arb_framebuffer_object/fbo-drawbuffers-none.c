@@ -107,6 +107,7 @@ static const char *fs_write_red =
 	"}\n";
 
 static const char *fs_template_write_different =
+	"%s \n"
 	"#define OUTVAR %s \n"
 	"void main() \n"
 	"{ \n"
@@ -124,13 +125,17 @@ static GLuint fb, prog_write_all_red, prog_write_all_different;
 static void
 create_shaders(void)
 {
+	bool fs_uses_out_variables = streq(test_name, "use_frag_out");
+
 	prog_write_all_red = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs,
 				GL_FRAGMENT_SHADER, fs_write_red,
 				0);
 
 	asprintf(&fs_write_different, fs_template_write_different,
-		 "gl_FragData");
+		 fs_uses_out_variables ?
+		 "#version 130 \nout vec4[4] color;" : "",
+		 fs_uses_out_variables ? "color" : "gl_FragData");
 
 	prog_write_all_different = piglit_build_simple_program_multiple_shaders(
 				GL_VERTEX_SHADER, vs,
@@ -267,6 +272,16 @@ test_fragcolor(const GLenum drawbufs[4])
 }
 
 static bool
+test_fragout(const GLenum drawbufs[4])
+{
+	glUseProgram(prog_write_all_different);
+	piglit_draw_rect(-1, -1, 2, 2);
+	glUseProgram(0);
+
+	return probe_buffers(drawbufs, colors_all_different);
+}
+
+static bool
 test_fragdata(const GLenum drawbufs[4])
 {
 	glUseProgram(prog_write_all_different);
@@ -395,6 +410,7 @@ print_usage_and_exit(void)
 	       "    glClearBuffer\n"
 	       "    gl_FragColor\n"
 	       "    gl_FragData\n"
+	       "    use_frag_out\n"
 	       "    glColorMaskIndexed\n"
 	       "    glBlendFunci\n"
 	       "    glDrawPixels\n"
@@ -455,6 +471,10 @@ piglit_display(void)
 		}
 		else if (strcmp(test_name, "gl_FragData") == 0) {
 			pass = test_fragdata(drawbuf_config[i]) && pass;
+		}
+		else if (strcmp(test_name, "use_frag_out") == 0) {
+			piglit_require_GLSL_version(130);
+			pass = test_fragout(drawbuf_config[i]) && pass;
 		}
 		else if (strcmp(test_name, "glColorMaskIndexed") == 0) {
 			piglit_require_extension("GL_EXT_draw_buffers2");
