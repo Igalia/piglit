@@ -459,35 +459,35 @@ piglit_display(void)
 
 		glDrawBuffers(4, drawbuf_config[i]);
 
-		if (strcmp(test_name, "glClear") == 0) {
+		if (streq(test_name, "glClear")) {
 			pass = test_glClear(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "glClearBuffer") == 0) {
+		else if (streq(test_name, "glClearBuffer")) {
 			piglit_require_gl_version(30);
 			pass = test_glClearBuffer(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "gl_FragColor") == 0) {
+		else if (streq(test_name, "gl_FragColor")) {
 			pass = test_fragcolor(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "gl_FragData") == 0) {
+		else if (streq(test_name, "gl_FragData")) {
 			pass = test_fragdata(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "use_frag_out") == 0) {
+		else if (streq(test_name, "use_frag_out")) {
 			piglit_require_GLSL_version(130);
 			pass = test_fragout(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "glColorMaskIndexed") == 0) {
+		else if (streq(test_name, "glColorMaskIndexed")) {
 			piglit_require_extension("GL_EXT_draw_buffers2");
 			pass = test_glColorMaskIndexed(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "glBlendFunci") == 0) {
+		else if (streq(test_name, "glBlendFunci")) {
 			piglit_require_extension("GL_ARB_draw_buffers_blend");
 			pass = test_glBlendFunci(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "glDrawPixels") == 0) {
+		else if (streq(test_name, "glDrawPixels")) {
 			pass = test_glDrawPixels(drawbuf_config[i]) && pass;
 		}
-		else if (strcmp(test_name, "glBlitFramebuffer") == 0) {
+		else if (streq(test_name, "glBlitFramebuffer")) {
 			pass = test_glBlitFramebuffer(drawbuf_config[i]) && pass;
 		}
 		else {
