@@ -45,7 +45,7 @@ if 'PIGLIT_BUILD_DIR' in os.environ:
     TEST_BIN_DIR = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
 else:
     TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                               '../bin'))
+                                                 '../bin'))
 
 
 class Test(object):
@@ -57,6 +57,7 @@ class Test(object):
                 execute it's work (i.e. __doRunWork) on the calling thread
                 (i.e. the main thread) or from the ConcurrentTestPool threads.
         '''
+        self._command = None
         self.run_concurrent = run_concurrent
         self.command = command
         self.env = {}
@@ -86,6 +87,8 @@ class Test(object):
                 self.run()
                 self.result['time'] = time.time() - time_start
                 self.result = dmesg.update_result(self.result)
+            # This is a rare case where a bare exception is okay, since we're
+            # using it to log exceptions
             except:
                 exception = sys.exc_info()
                 self.result['result'] = 'fail'
@@ -118,7 +121,6 @@ class Test(object):
 
     def interpret_result(self):
         raise NotImplementedError
-        return out
 
     def run(self):
         """
