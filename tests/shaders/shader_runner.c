@@ -120,6 +120,7 @@ bool vbo_present = false;
 bool link_ok = false;
 bool prog_in_use = false;
 GLchar *prog_err_info = NULL;
+GLuint vao = 0;
 
 enum states {
 	none = 0,
@@ -1850,6 +1851,16 @@ program_must_be_in_use(void)
 
 }
 
+void
+bind_vao_if_supported()
+{
+	if (vao == 0 && gl_version.num >= 31) {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
+}
+
+
 enum piglit_result
 piglit_display(void)
 {
@@ -1924,6 +1935,7 @@ piglit_display(void)
 				       (unsigned long) num_vbo_rows);
 				piglit_report_result(PIGLIT_FAIL);
 			}
+			bind_vao_if_supported();
 			glDrawArrays(mode, first, count);
 		} else if (string_match("disable", line)) {
 			do_enable_disable(line + 7, false);
@@ -2189,12 +2201,7 @@ piglit_init(int argc, char **argv)
 	link_and_use_shaders();
 	if (link_ok && vertex_data_start != NULL) {
 		program_must_be_in_use();
-		if (gl_version.num >= 31) {
-			GLuint vao;
-
-			glGenVertexArrays(1, &vao);
-			glBindVertexArray(vao);
-		}
+		bind_vao_if_supported();
 
 		num_vbo_rows = setup_vbo_from_text(prog, vertex_data_start,
 						   vertex_data_end);
