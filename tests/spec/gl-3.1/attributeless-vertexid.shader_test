@@ -1,0 +1,31 @@
+# Test that rendering with no vertex attributes (but only using gl_VertexID)
+# works in the core profile.
+
+[require]
+GL CORE >= 3.1
+GLSL >= 1.40
+
+[vertex shader]
+
+const vec2 verts[4] = vec2[](
+	vec2(-1, 1),
+	vec2(-1,-1),
+	vec2( 1,-1),
+	vec2( 1, 1)
+	);
+
+void main() {
+	gl_Position = vec4(verts[gl_VertexID], 0, 1);
+}
+
+[fragment shader]
+
+void main() {
+	gl_FragColor = vec4(1,0,0,1);
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 1.0 0.0 0.0 1.0
