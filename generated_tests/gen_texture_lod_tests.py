@@ -149,7 +149,7 @@ def main():
 
     """
     try:
-        os.makedirs('spec/arb_shader_texture_lod/compiler')
+        os.makedirs('spec/ARB_shader_texture_lod/compiler')
     except OSError:
         pass
 
