@@ -49,7 +49,7 @@ def main():
                   'mat2x2', 'mat2x3', 'mat2x4', 'mat3', 'mat3x2', 'mat3x3',
                   'mat3x4', 'mat4', 'mat4x2', 'mat4x3', 'mat4x4']:
         name = ('spec/glsl-1.20/compiler/built-in-functions/'
-                'outerProduct-{}.vert'.format(type_))
+                'outerProduct-{0}.vert'.format(type_))
         print(name)
         with open(name, 'w+') as f:
             f.write(template.render_unicode(type=type_))
