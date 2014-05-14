@@ -223,14 +223,14 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 				fprintf(stderr,
 					"%s did compress, but it got an "
 					"internal\n"
-					"format of 0x%04x when "
+					"format of %s when "
 					"one of the supported compressed "
 					"formats was expected.\n"
 					"This may just mean the test does not "
 					"know about the compessed format that\n"
 					"was selected by the driver.\n",
 					t[i].generic_compressed_format_string,
-					format);
+					piglit_get_gl_enum_name(format));
 			}
 		} else if (format != t[i].base_format) {
 			if (format == t[i].generic_compressed_format) {
@@ -243,12 +243,11 @@ try_formats(const struct test_vector *t, unsigned num_tests,
 			} else {
 				fprintf(stderr,
 					"%s did not compress, but it got an "
-					"internal\n"
-					"format of 0x%04x when "
-					"0x%04x was expected.\n",
+					"internal format of %s when "
+					"%s was expected.\n",
 					t[i].generic_compressed_format_string,
-					format,
-					t[i].base_format);
+					piglit_get_gl_enum_name(format),
+					piglit_get_gl_enum_name(t[i].base_format));
 			}
 
 			pass = false;
@@ -292,7 +291,9 @@ piglit_init(int argc, char **argv)
 
 		printf("Driver reported the following compressed formats:\n");
 		for (i = 0; i < num_compressed_formats; i++) {
-			printf("    0x%04x\n", compressed_formats[i]);
+			printf("    0x%04x %s\n",
+			       compressed_formats[i],
+			       piglit_get_gl_enum_name(compressed_formats[i]));
 		}
 		printf("\n");
 		fflush(stdout);
