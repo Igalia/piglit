@@ -46,13 +46,13 @@ def main():
 
     for c, r in itertools.product(xrange(2, 5), repeat=2):
         vecs = [
-            Parameters(c, r, 'vec', 'mat{}x{}'.format(r, c)),
-            Parameters(c, r, 'ivec', 'mat{}x{}'.format(r, c))
+            Parameters(c, r, 'vec', 'mat{0}x{1}'.format(r, c)),
+            Parameters(c, r, 'ivec', 'mat{0}x{1}'.format(r, c))
         ]
         if r == c:
             vecs.extend([
-                Parameters(c, r, 'vec', 'mat{}'.format(r)),
-                Parameters(c, r, 'ivec', 'mat{}'.format(r))
+                Parameters(c, r, 'vec', 'mat{0}'.format(r)),
+                Parameters(c, r, 'ivec', 'mat{0}'.format(r))
             ])
 
         for shader in ['vs', 'fs']:
