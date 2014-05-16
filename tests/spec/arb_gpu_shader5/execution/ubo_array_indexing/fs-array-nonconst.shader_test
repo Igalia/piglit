@@ -1,0 +1,68 @@
+# This test verifies that dynamically uniform indexing of UBO arrays
+# in the fragment shader behaves correctly, when the block member is a
+# nonconst-indexed array.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader5: require
+
+uniform block {
+	vec4 color[2];
+} arr[4];
+
+uniform int n;
+uniform int m;
+
+out vec4 color;
+
+void main()
+{
+	color = arr[n].color[m];
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+ubo array index 0
+uniform vec4 block.color[0] 0.0 1.0 1.0 0.0
+uniform vec4 block.color[1] 1.0 0.0 0.0 0.0
+ubo array index 1
+uniform vec4 block.color[0] 0.0 1.0 0.0 0.0
+uniform vec4 block.color[1] 0.0 1.0 1.0 0.0
+ubo array index 2
+uniform vec4 block.color[0] 0.0 1.0 1.0 0.0
+uniform vec4 block.color[1] 0.0 0.0 1.0 0.0
+ubo array index 3
+uniform vec4 block.color[0] 1.0 1.0 1.0 1.0
+uniform vec4 block.color[1] 0.0 1.0 1.0 0.0
+
+uniform int n 0
+uniform int m 1
+draw rect -1 -1 1 1
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
+
+uniform int n 1
+uniform int m 0
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int n 2
+uniform int m 1
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 1.0)
+
+uniform int n 3
+uniform int m 0
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)
