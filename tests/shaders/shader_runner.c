@@ -1335,7 +1335,7 @@ check_double_support(void)
  * the data.  If the uniform is not in a uniform block, returns false.
  */
 bool
-set_ubo_uniform(const char *name, const char *type, const char *line)
+set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_array_index)
 {
 	GLuint uniform_index;
 	GLint block_index;
@@ -1361,6 +1361,12 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 
 	if (block_index == -1)
 		return false;
+
+	/* if the uniform block is an array, then GetActiveUniformsiv with
+	 * UNIFORM_BLOCK_INDEX will have given us the index of the first
+	 * element in the array.
+	 */
+	block_index += ubo_array_index;
 
 	glGetActiveUniformsiv(prog, 1, &uniform_index,
 			      GL_UNIFORM_OFFSET, &offset);
@@ -1481,7 +1487,7 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 }
 
 void
-set_uniform(const char *line)
+set_uniform(const char *line, int ubo_array_index)
 {
 	char name[512];
 	float f[16];
@@ -1499,7 +1505,7 @@ set_uniform(const char *line)
 
 	line = strcpy_to_space(name, eat_whitespace(line));
 
-	if (set_ubo_uniform(name, type, line))
+	if (set_ubo_uniform(name, type, line, ubo_array_index))
 		return;
 
 	loc = glGetUniformLocation(prog, name);
@@ -2084,6 +2090,7 @@ piglit_display(void)
 	bool pass = true;
 	GLbitfield clear_bits = 0;
 	bool link_error_expected = false;
+	int ubo_array_index = 0;
 
 	if (test_start == NULL)
 		return PIGLIT_PASS;
@@ -2417,7 +2424,7 @@ piglit_display(void)
 			handle_texparameter(line + strlen("texparameter "));
 		} else if (string_match("uniform", line)) {
 			program_must_be_in_use();
-			set_uniform(line + 7);
+			set_uniform(line + 7, ubo_array_index);
 		} else if (string_match("parameter ", line)) {
 			set_parameter(line + strlen("parameter "));
 		} else if (string_match("patch parameter ", line)) {
@@ -2430,6 +2437,8 @@ piglit_display(void)
 			}
 		} else if (string_match("link success", line)) {
 			program_must_be_in_use();
+		} else if (string_match("ubo array index ", line)) {
+			get_ints(line + strlen("ubo array index "), &ubo_array_index, 1);
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
