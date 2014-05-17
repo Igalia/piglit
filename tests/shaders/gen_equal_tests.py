@@ -10,14 +10,12 @@ def emit_test(f, func, input1, input2, expected):
 
     test = """
 [require]
-GL >= 2.0
 GLSL >= 1.20
 
 [vertex shader file]
 glsl-mvp.vert
 
 [fragment shader]
-#version 120
 void main()
 {
   const %s res = %s(%s,
@@ -27,11 +25,8 @@ void main()
 }
 
 [test]
-clear color 0.0 0.0 0.0 0.0
-clear
-ortho
-draw rect 10 10 10 10
-probe rgb 15 15 0.0 1.0 0.0
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
 """ % (s[0], func, input1, spaces, input2, expected)
     f.write(test)
 
