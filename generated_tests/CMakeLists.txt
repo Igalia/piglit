@@ -31,6 +31,9 @@ piglit_make_generated_tests(
 	gen_constant_array_size_tests.py
 	builtin_function.py)
 piglit_make_generated_tests(
+	const_builtin_equal_tests.list
+	gen_const_builtin_equal_tests.py)
+piglit_make_generated_tests(
 	interpolation_tests.list
 	gen_interpolation_tests.py)
 piglit_make_generated_tests(
@@ -89,6 +92,7 @@ add_custom_target(gen-tests ALL
 		outerproduct_invalid_params.list
 		builtin_uniform_tests.list
 		constant_array_size_tests.list
+		const_builtin_equal_tests.list
 		builtin_cl_int_tests.list
 		builtin_cl_math_tests.list
 		builtin_cl_relational_tests.list
