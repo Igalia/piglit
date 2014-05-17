@@ -1,6 +1,6 @@
 from __future__ import print_function
 import re
-
+import os
 
 def emit_test(f, func, input1, input2, expected):
     # Determine the expected return type of the equal function by looking at
@@ -13,8 +13,11 @@ def emit_test(f, func, input1, input2, expected):
 [require]
 GLSL >= 1.20
 
-[vertex shader file]
-glsl-mvp.vert
+[vertex shader]
+void main()
+{
+  gl_Position = gl_Vertex;
+}
 
 [fragment shader]
 void main()
@@ -80,9 +83,15 @@ test_vectors = [
         ]
     ]
 
+try:
+    os.makedirs('spec/glsl-1.20/execution/built-in-functions')
+except OSError:
+    pass
+
+
 test_id = 2
 for x in test_vectors:
-    name = "glsl-const-builtin-%s-%02d.shader_test" % ("equal", test_id)
+    name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-equal-%02d.shader_test" % test_id
     test_id = test_id + 1
 
     print(name)
@@ -94,7 +103,7 @@ for x in test_vectors:
 
 test_id = 2
 for x in test_vectors:
-    name = "glsl-const-builtin-%s-%02d.shader_test" % ("notEqual", test_id)
+    name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-notEqual-%02d.shader_test" % test_id
     test_id = test_id + 1
 
     # When generating the notEqual tests, each of the values in the expected
