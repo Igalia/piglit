@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re
 
 
@@ -83,6 +84,9 @@ test_id = 2
 for x in test_vectors:
     name = "glsl-const-builtin-%s-%02d.shader_test" % ("equal", test_id)
     test_id = test_id + 1
+
+    print(name)
+
     f = open(name, "w")
     emit_test(f, "equal", x[0], x[1], x[2])
     f.close()
@@ -99,6 +103,8 @@ for x in test_vectors:
     expected = re.sub("true", "FALSE", x[2])
     expected = re.sub("false", "TRUE", expected)
     expected = expected.lower()
+
+    print(name)
 
     f = open(name, "w")
     emit_test(f, "notEqual", x[0], x[1], expected)
