@@ -1305,8 +1305,8 @@ set_ubo_uniform(const char *name, const char *type, const char *line)
 		}
 	} else if (string_match("dmat", type)) {
 		GLint matrix_stride, row_major;
-		int cols = type[3] - '0';
-		int rows = type[4] == 'x' ? type[5] - '0' : cols;
+		int cols = type[4] - '0';
+		int rows = type[5] == 'x' ? type[6] - '0' : cols;
 		int r, c;
 		double *matrixdata = (double *)data;
 
@@ -1503,9 +1503,9 @@ set_uniform(const char *line)
 				return;
 			}
 		}
-	} else if (string_match("dmat", type) && type[3] != '\0') {
-		char cols = type[3];
-		char rows = type[4] == 'x' ? type[5] : cols;
+	} else if (string_match("dmat", type) && type[4] != '\0') {
+		char cols = type[4];
+		char rows = type[5] == 'x' ? type[6] : cols;
 		switch (cols) {
 		case '2':
 			switch (rows) {
