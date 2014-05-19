@@ -1374,36 +1374,6 @@ static const ShaderProgram Programs[] = {
 
 	// Logical operators =================================================
 	{
-		"&& operator (1)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be true \n"
-		"   if (gl_FragCoord.x >= 0.0 && gl_FragCoord.y >= 0.0) { \n"
-		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
-		"   } \n"
-		"} \n",
-		{ 0.5, 0.0, 0.5, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"&& operator (2)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be false \n"
-		"   if (gl_FragCoord.x >= 0.0 && gl_FragCoord.y < 0.0) { \n"
-		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
-		"   } \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"&& operator, short-circuit",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -1415,35 +1385,6 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor = vec4(x); \n"
 		"} \n",
 		{ 0.75, 0.75, 0.75, 0.75 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-	{
-		"|| operator (1)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be true \n"
-		"   if (gl_FragCoord.x < 0.0 || gl_FragCoord.y >= 0.0) { \n"
-		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
-		"   } \n"
-		"} \n",
-		{ 0.5, 0.0, 0.5, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"|| operator (2)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be false \n"
-		"   if (gl_FragCoord.x < 0.0 || gl_FragCoord.y < 0.0) { \n"
-		"      gl_FragColor = vec4(0.5, 0.0, 0.5, 0.0); \n"
-		"   } \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -1464,90 +1405,6 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
-	{
-		"^^ operator (1)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be true \n"
-		"   if (gl_FragCoord.x < 0.0 ^^ gl_FragCoord.y >= 0.0) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"^^ operator (2)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25); \n"
-		"   // this should always be false \n"
-		"   if (gl_FragCoord.x >= 0.0 ^^ gl_FragCoord.y >= 0.0) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"! (not) operator (1, pass)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0); \n"
-		"   bool b = gl_FragCoord.x < 0.0; \n"
-		"   if (!b) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-	{
-		"! (not) operator (1, fail)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0); \n"
-		"   bool b = gl_FragCoord.x > 0.0; \n"
-		"   if (!b) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.0, 0.0, 0.0, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-	{
-		"! (not) operator (2, pass)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0); \n"
-		"   if (!(gl_FragCoord.x < 0.0)) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-	{
-		"! (not) operator (2, fail)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0); \n"
-		"   if (!(gl_FragCoord.x > 0.0)) { \n"
-		"      gl_FragColor = vec4(0.5); \n"
-		"   } \n"
-		"} \n",
-		{ 0.0, 0.0, 0.0, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
 
 	// Uniform & Varying vars ============================================
 	{
