@@ -104,21 +104,19 @@ def main():
     except OSError:
         pass
 
-    test_id = 2
-    for x in test_vectors:
-        name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-equal-%02d.shader_test" % test_id
-        test_id = test_id + 1
-
+    for test_id, x in enumerate(test_vectors, start=2):
+        # make equal tests
+        name = ("spec/glsl-1.20/execution/built-in-functions/"
+                "glsl-const-builtin-equal-{0:02d}.shader_test".format(test_id))
         print(name)
 
         with open(name, 'w') as f:
             f.write(TEMPLATE.render_unicode(
                 func='equal', input=x[0:2], expected=x[2]))
 
-    test_id = 2
-    for x in test_vectors:
-        name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-notEqual-%02d.shader_test" % test_id
-        test_id = test_id + 1
+        # make notEqual tests
+        name = ("spec/glsl-1.20/execution/built-in-functions/"
+                "glsl-const-builtin-notEqual-{0:02d}.shader_test".format(test_id))
 
         # When generating the notEqual tests, each of the values in the
         # expected result vector need to be inverted
