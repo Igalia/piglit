@@ -408,62 +408,6 @@ static const ShaderProgram Programs[] = {
 
 	// Basic arithmetic ===================================================
 	{
-		"Addition",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   vec4 a = vec4(0.5,  0.25, 0.0, 0.0); \n"
-		"   vec4 b = vec4(0.25, 0.0,  0.2, 0.0); \n"
-		"   gl_FragColor = a + b; \n"
-		"} \n",
-		{ 0.75, 0.25, 0.2, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"vec4, scalar arithmetic",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   vec4 a = vec4(0.5,  0.25, 0.2, 0.0); \n"
-		"   vec4 b = vec4(0.25, 0.0,  0.0, 0.0); \n"
-		"   gl_FragColor = a * 2.0 - b; \n"
-		"} \n",
-		{ 0.75, 0.50, 0.4, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"Negation",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   vec4 a = vec4(0.5,  0.25, 0.0, 0.0); \n"
-		"   vec4 b = uniform1; \n"
-                "   vec4 na = -a; \n"
-                "   vec4 nb = -b; \n"
-                "   vec4 x = na + nb; \n"
-		"   gl_FragColor = -x; \n"
-		"} \n",
-		{ 1.0, 0.5, 0.75, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"Negation2",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   vec4 a = -uniform1; \n"
-		"   gl_FragColor = -a; \n"
-		"} \n",
-		UNIFORM1,
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"chained assignment",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
@@ -472,63 +416,6 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor = vec4(x + y + z); \n"
 		"} \n",
 		{ 0.75, 0.75, 0.75, 0.75 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"integer, float arithmetic",
-		NO_VERTEX_SHADER,
-                "#version 120 \n"
-		"void main() { \n"
-		"   int k = 100; \n"
-		"   gl_FragColor.x = k * 0.01; \n"
-		"   gl_FragColor.y = k * 0.005; \n"
-		"   gl_FragColor.z = k * 0.0025; \n"
-		"   gl_FragColor.w = k * 0.0; \n"
-		"} \n",
-		{ 1.0, 0.5, 0.25, 0.0 },
-		DONT_CARE_Z,
-		FLAG_VERSION_1_20
-	},
-
-	{
-		"unary negation",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   vec4 v = vec4(-1.0, -0.5, 0.5, -0.25); \n"
-		"   gl_FragColor = -v; \n"
-		"} \n",
-		{ 1.0, 0.5, 0.0, 0.25 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"integer division",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   int i = 15, j = 6; \n"
-		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(float(k) * 0.1); \n"
-		"} \n",
-		{ 0.2, 0.2, 0.2, 0.2 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"integer division with uniform var",
-		NO_VERTEX_SHADER,
-		"// as above, but prevent compile-time evaluation \n"
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   int i = int(15.0 * uniform1.x); \n"
-		"   int j = 6; \n"
-		"   int k = i / j; \n"
-		"   gl_FragColor = vec4(float(k) * 0.1); \n"
-		"} \n",
-		{ 0.2, 0.2, 0.2, 0.2 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
@@ -543,62 +430,6 @@ static const ShaderProgram Programs[] = {
 		"   gl_FragColor = v; \n"
 		"} \n",
 		{ 0.5, 0.5, 0.75, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"post increment (x++)",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   float x = uniform1.y; // should be 0.25 \n"
-		"   float y = x++; // y should be 0.25 \n"
-		"   gl_FragColor = vec4(y); \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"pre increment (++x)",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   float x = uniform1.y; // should be 0.25 \n"
-		"   float y = ++x; // y should be 1.25 \n"
-		"   gl_FragColor = vec4(y); \n"
-		"} \n",
-		{ 1.0, 1.0, 1.0, 1.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"post decrement (x--)",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   float x = uniform1.y; // should be 0.25 \n"
-		"   float y = x--; // y should be 0.25 \n"
-		"   gl_FragColor = vec4(y); \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"pre decrement (--x)",
-		NO_VERTEX_SHADER,
-		"uniform vec4 uniform1; \n"
-		"void main() { \n"
-		"   float x = uniform1.y; // should be 0.25 \n"
-		"   float y = --x; // y should be -0.75 \n"
-		"   gl_FragColor = vec4(-y); // negate \n"
-		"} \n",
-		{ 0.75, 0.75, 0.75, 0.75 },
 		DONT_CARE_Z,
 		FLAG_NONE
 	},
