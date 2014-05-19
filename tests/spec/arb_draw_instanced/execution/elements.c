@@ -36,9 +36,6 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
-
-	config.window_width = 70;
-	config.window_height = 30;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -86,6 +83,8 @@ piglit_display(void)
 	enum piglit_result result = PIGLIT_PASS;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	glViewport(0, 0, piglit_width, piglit_height);
 
 	glClearColor(0.5, 0.5, 0.5, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
