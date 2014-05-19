@@ -96,38 +96,41 @@ test_vectors = [
         ]
     ]
 
-try:
-    os.makedirs('spec/glsl-1.20/execution/built-in-functions')
-except OSError:
-    pass
 
+def main():
+    """ Main function """
+    try:
+        os.makedirs('spec/glsl-1.20/execution/built-in-functions')
+    except OSError:
+        pass
 
-test_id = 2
-for x in test_vectors:
-    name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-equal-%02d.shader_test" % test_id
-    test_id = test_id + 1
+    test_id = 2
+    for x in test_vectors:
+        name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-equal-%02d.shader_test" % test_id
+        test_id = test_id + 1
 
-    print(name)
+        print(name)
 
-    with open(name, 'w') as f:
-        f.write(TEMPLATE.render_unicode(
-            func='equal', input=x[0:2], expected=x[2]))
+        with open(name, 'w') as f:
+            f.write(TEMPLATE.render_unicode(
+                func='equal', input=x[0:2], expected=x[2]))
 
+    test_id = 2
+    for x in test_vectors:
+        name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-notEqual-%02d.shader_test" % test_id
+        test_id = test_id + 1
 
-test_id = 2
-for x in test_vectors:
-    name = "spec/glsl-1.20/execution/built-in-functions/glsl-const-builtin-notEqual-%02d.shader_test" % test_id
-    test_id = test_id + 1
+        # When generating the notEqual tests, each of the values in the
+        # expected result vector need to be inverted
+        expected = re.sub("true", "FALSE", x[2])
+        expected = re.sub("false", "TRUE", expected)
+        expected = expected.lower()
 
-    # When generating the notEqual tests, each of the values in the expected
-    # result vector need to be inverted
+        print(name)
 
-    expected = re.sub("true", "FALSE", x[2])
-    expected = re.sub("false", "TRUE", expected)
-    expected = expected.lower()
+        with open(name, 'w') as f:
+            f.write(TEMPLATE.render_unicode(
+                func='notEqual', input=x[0:2], expected=expected))
 
-    print(name)
-
-    with open(name, 'w') as f:
-        f.write(TEMPLATE.render_unicode(
-            func='notEqual', input=x[0:2], expected=expected))
+if __name__ == "__main__":
+    main()
