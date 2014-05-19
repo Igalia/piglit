@@ -1,39 +1,52 @@
+# Copyright (c) 2010, 2014 Intel Corporation
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+""" Generate tests for builtin const equality tests """
+
 from __future__ import print_function
 import re
 import os
+import textwrap
+import mako.template
 
-def emit_test(f, func, input1, input2, expected):
-    # Determine the expected return type of the equal function by looking at
-    # the string of the expected return value.
-    s = expected.split("(")
+TEMPLATE = mako.template.Template(textwrap.dedent("""
+    [require]
+    GLSL >= 1.20
 
-    spaces = re.sub("[^ ]", " ", func+s[0])
+    [vertex shader]
+    void main()
+    {
+      gl_Position = gl_Vertex;
+    }
 
-    test = """
-[require]
-GLSL >= 1.20
+    [fragment shader]
+    void main()
+    {
+      const ${expected.split('(')[0]} res = ${func}(${input[0]}, ${input[1]});
+      gl_FragColor = (res == ${expected})
+        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+    }
 
-[vertex shader]
-void main()
-{
-  gl_Position = gl_Vertex;
-}
-
-[fragment shader]
-void main()
-{
-  const %s res = %s(%s,
-                %s%s);
-  gl_FragColor = (res == %s)
-    ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
-}
-
-[test]
-draw rect -1 -1 2 2
-probe all rgb 0.0 1.0 0.0
-""" % (s[0], func, input1, spaces, input2, expected)
-    f.write(test)
-
+    [test]
+    draw rect -1 -1 2 2
+    probe all rgb 0.0 1.0 0.0"""))
 
 test_vectors = [
     [
@@ -96,9 +109,9 @@ for x in test_vectors:
 
     print(name)
 
-    f = open(name, "w")
-    emit_test(f, "equal", x[0], x[1], x[2])
-    f.close()
+    with open(name, 'w') as f:
+        f.write(TEMPLATE.render_unicode(
+            func='equal', input=x[0:2], expected=x[2]))
 
 
 test_id = 2
@@ -115,6 +128,6 @@ for x in test_vectors:
 
     print(name)
 
-    f = open(name, "w")
-    emit_test(f, "notEqual", x[0], x[1], expected)
-    f.close()
+    with open(name, 'w') as f:
+        f.write(TEMPLATE.render_unicode(
+            func='notEqual', input=x[0:2], expected=expected))
