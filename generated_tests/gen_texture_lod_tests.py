@@ -149,18 +149,18 @@ def main():
 
     """
     try:
-        os.makedirs('spec/ARB_shader_texture_lod/compiler')
+        os.makedirs('spec/arb_shader_texture_lod/compiler')
     except OSError:
         pass
 
     for count, params in enumerate(LOD_TESTS, start=1):
-        name = ("spec/ARB_shader_texture_lod/compiler/"
+        name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_lod-{0:02d}.frag".format(count))
         print(name)
         gen_frag_lod_test(params, name)
 
     for count, params in enumerate(GRAD_TESTS, start=1):
-        name = ("spec/ARB_shader_texture_lod/compiler/"
+        name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_grad-{0:02d}.frag".format(count))
         print(name)
         gen_frag_grad_test(params, name)
@@ -168,7 +168,7 @@ def main():
     # Start the count at len(GRAD_TESTS) + 1 so that the frag and vertex tests
     # are sequentially numbered.
     for count, params in enumerate(GRAD_TESTS, start=len(GRAD_TESTS) + 1):
-        name = ("spec/ARB_shader_texture_lod/compiler/"
+        name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_grad-{0:02d}.vert".format(count))
         print(name)
         gen_vert_grad_test(params, name)
