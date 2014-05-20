@@ -1599,7 +1599,6 @@ arb_draw_instanced['elements'] = concurrent_test('arb_draw_instanced-elements')
 arb_draw_instanced['negative-arrays-first-negative'] = concurrent_test('arb_draw_instanced-negative-arrays-first-negative')
 arb_draw_instanced['negative-elements-type'] = concurrent_test('arb_draw_instanced-negative-elements-type')
 add_plain_test(arb_draw_instanced, 'arb_draw_instanced-drawarrays')
-add_plain_test(arb_draw_instanced, 'draw-instanced-divisor')
 
 # Group ARB_draw_indirect
 arb_draw_indirect = {}
@@ -3047,6 +3046,7 @@ arb_instanced_arrays = {}
 spec['ARB_instanced_arrays'] = arb_instanced_arrays
 add_plain_test(arb_instanced_arrays, 'vertex-attrib-divisor-index-error')
 add_plain_test(arb_instanced_arrays, 'instanced_arrays')
+add_plain_test(arb_instanced_arrays, 'arb_instanced_arrays-drawarrays')
 add_single_param_test_set(arb_instanced_arrays, 'instanced_arrays', 'vbo')
 
 arb_internalformat_query = {}
