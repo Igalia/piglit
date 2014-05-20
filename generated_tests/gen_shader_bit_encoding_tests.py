@@ -234,7 +234,7 @@ for api, requirement in requirements.iteritems():
 
                 modifier_name = '-' + in_modifier_func if in_modifier_func != '' else ''
                 filename = os.path.join('spec',
-                                        api,
+                                        api.lower(),
                                         'execution',
                                         'built-in-functions',
                                         "{0}-{1}{2}.shader_test".format(execution_stage,
