@@ -15,3 +15,4 @@ piglit_add_executable (arb_draw_elements_base_vertex-drawelements-instanced draw
 piglit_add_executable (arb_draw_elements_base_vertex-dlist dlist.c)
 piglit_add_executable (arb_draw_elements_base_vertex-multidrawelements multidrawelements.c)
 piglit_add_executable (arb_draw_elements_base_vertex-drawrangeelements drawrangeelements.c)
+piglit_add_executable (arb_draw_elements_base_vertex-negative-index negative-index.c)
