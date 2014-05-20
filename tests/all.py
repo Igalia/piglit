@@ -1598,7 +1598,7 @@ arb_draw_instanced['dlist'] = concurrent_test('arb_draw_instanced-dlist')
 arb_draw_instanced['elements'] = concurrent_test('arb_draw_instanced-elements')
 arb_draw_instanced['negative-arrays-first-negative'] = concurrent_test('arb_draw_instanced-negative-arrays-first-negative')
 arb_draw_instanced['negative-elements-type'] = concurrent_test('arb_draw_instanced-negative-elements-type')
-add_plain_test(arb_draw_instanced, 'draw-instanced')
+add_plain_test(arb_draw_instanced, 'arb_draw_instanced-drawarrays')
 add_plain_test(arb_draw_instanced, 'draw-instanced-divisor')
 
 # Group ARB_draw_indirect
