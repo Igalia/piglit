@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_draw_elements_base_vertex-bounds bounds.c)
+piglit_add_executable (arb_draw_elements_base_vertex-drawelements drawelements.c)
 piglit_add_executable (arb_draw_elements_base_vertex-drawelements-instanced drawelements-instanced.c)
 piglit_add_executable (arb_draw_elements_base_vertex-dlist dlist.c)
 piglit_add_executable (arb_draw_elements_base_vertex-multidrawelements multidrawelements.c)

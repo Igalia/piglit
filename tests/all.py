@@ -1574,13 +1574,12 @@ add_plain_test(arb_depth_clamp, 'depth-clamp-status')
 arb_draw_elements_base_vertex = {}
 spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
 arb_draw_elements_base_vertex['dlist'] = concurrent_test('arb_draw_elements_base_vertex-dlist')
-add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
-arb_draw_elements_base_vertex['draw-elements-base-vertex-user_varrays'] = PiglitTest(['draw-elements-base-vertex', '-auto', 'user_varrays'])
+add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements')
+arb_draw_elements_base_vertex['arb_draw_elements_base_vertex-drawelements-user_varrays'] = PiglitTest(['arb_draw_elements_base_vertex-drawelements', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-neg')
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-bounds')
 arb_draw_elements_base_vertex['draw-elements-base-vertex-neg-user_varrays'] = PiglitTest(['draw-elements-base-vertex-neg', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements-instanced')
-arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PiglitTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawrangeelements')
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-multidrawelements')
 
