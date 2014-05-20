@@ -1410,7 +1410,7 @@ class ShaderTest:
         self.__func_info = func_info
         self.__filename = os.path.join(
             "spec",
-            api,
+            api.lower(),
             "execution",
             "built-in-functions",
             "{0}-{1}.shader_test".format(execution_stage, func_info.name))
