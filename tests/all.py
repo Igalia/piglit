@@ -3044,10 +3044,10 @@ add_plain_test(ati_envmap_bumpmap, 'ati_envmap_bumpmap-bump')
 
 arb_instanced_arrays = {}
 spec['ARB_instanced_arrays'] = arb_instanced_arrays
-add_plain_test(arb_instanced_arrays, 'vertex-attrib-divisor-index-error')
-add_plain_test(arb_instanced_arrays, 'instanced_arrays')
+add_plain_test(arb_instanced_arrays, 'arb_instanced_arrays-vertex-attrib-divisor-index-error')
+add_plain_test(arb_instanced_arrays, 'arb_instanced_arrays-instanced_arrays')
 add_plain_test(arb_instanced_arrays, 'arb_instanced_arrays-drawarrays')
-add_single_param_test_set(arb_instanced_arrays, 'instanced_arrays', 'vbo')
+add_single_param_test_set(arb_instanced_arrays, 'arb_instanced_arrays-instanced_arrays', 'vbo')
 
 arb_internalformat_query = {}
 spec['ARB_internalformat_query'] = arb_internalformat_query
