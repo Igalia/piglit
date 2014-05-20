@@ -1577,7 +1577,7 @@ arb_draw_elements_base_vertex['dlist'] = concurrent_test('arb_draw_elements_base
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
 arb_draw_elements_base_vertex['draw-elements-base-vertex-user_varrays'] = PiglitTest(['draw-elements-base-vertex', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-neg')
-add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-bounds')
+add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-bounds')
 arb_draw_elements_base_vertex['draw-elements-base-vertex-neg-user_varrays'] = PiglitTest(['draw-elements-base-vertex-neg', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements-instanced')
 arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PiglitTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
