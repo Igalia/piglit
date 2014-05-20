@@ -470,7 +470,7 @@ class ShaderTest(object):
         argtype_names = '-'.join(
             str(argtype) for argtype in self._signature.argtypes)
         if self._signature.extension:
-            subdir = self._signature.extension
+            subdir = self._signature.extension.lower()
         else:
             subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
         return os.path.join(
