@@ -118,7 +118,7 @@ for api, requirement in requirements.iteritems():
         for execution_stage in ("vs", "fs"):
             file_extension = 'frag' if execution_stage == 'fs' else 'vert'
             filename = os.path.join("spec",
-                                    api,
+                                    api.lower(),
                                     "compiler",
                                     "built-in-functions",
                                     "textureQuery{0}-{1}.{2}".format(Lod,
