@@ -1573,7 +1573,7 @@ add_plain_test(arb_depth_clamp, 'depth-clamp-status')
 # Group ARB_draw_elements_base_vertex
 arb_draw_elements_base_vertex = {}
 spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
-arb_draw_elements_base_vertex['dlist-arb_draw_instanced'] = concurrent_test('arb_draw_elements_base_vertex-dlist-arb_draw_instanced')
+arb_draw_elements_base_vertex['dlist'] = concurrent_test('arb_draw_elements_base_vertex-dlist')
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex')
 arb_draw_elements_base_vertex['draw-elements-base-vertex-user_varrays'] = PiglitTest(['draw-elements-base-vertex', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'draw-elements-base-vertex-neg')
