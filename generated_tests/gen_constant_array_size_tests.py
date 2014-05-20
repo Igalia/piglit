@@ -167,7 +167,7 @@ class ParserTest(object):
         argtype_names = '-'.join(
             str(argtype) for argtype in self.__signature.argtypes)
         if self.__signature.extension:
-            subdir = self.__signature.extension
+            subdir = self.__signature.extension.lower()
         else:
             subdir = 'glsl-{0:1.2f}'.format(float(self.glsl_version()) / 100)
         return os.path.join(
