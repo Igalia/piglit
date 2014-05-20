@@ -1582,7 +1582,7 @@ arb_draw_elements_base_vertex['draw-elements-base-vertex-neg-user_varrays'] = Pi
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements-instanced')
 arb_draw_elements_base_vertex['draw-elements-instanced-base-vertex-user_varrays'] = PiglitTest(['draw-elements-instanced-base-vertex', '-auto', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawrangeelements')
-add_plain_test(arb_draw_elements_base_vertex, 'multi-draw-elements-base-vertex')
+add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-multidrawelements')
 
 # Group ARB_draw_instanced
 arb_draw_instanced = {}
