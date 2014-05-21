@@ -153,23 +153,25 @@ def main():
     except OSError:
         pass
 
-    for count, params in enumerate(LOD_TESTS, start=1):
+    for params in LOD_TESTS:
         name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_lod-{0:02d}.frag".format(count))
+                "tex_lod-{mode}-{dimensions}-{coord}.frag".format(
+                    **params.__dict__))
         print(name)
         gen_frag_lod_test(params, name)
 
-    for count, params in enumerate(GRAD_TESTS, start=1):
+    for params in GRAD_TESTS:
+        # Generate fragment shader test
         name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_grad-{0:02d}.frag".format(count))
+                "tex_grad-{mode}-{dimensions}-{coord}.frag".format(
+                    **params.__dict__))
         print(name)
         gen_frag_grad_test(params, name)
 
-    # Start the count at len(GRAD_TESTS) + 1 so that the frag and vertex tests
-    # are sequentially numbered.
-    for count, params in enumerate(GRAD_TESTS, start=len(GRAD_TESTS) + 1):
+        # Generate vertex shader test
         name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_grad-{0:02d}.vert".format(count))
+                "tex_grad-{mode}-{dimensions}-{coord}.vert".format(
+                    **params.__dict__))
         print(name)
         gen_vert_grad_test(params, name)
 
