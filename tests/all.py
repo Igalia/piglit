@@ -3097,6 +3097,7 @@ add_plain_test(arb_blend_func_extended, 'arb_blend_func_extended-fbo-extended-bl
 arb_base_instance = {}
 spec['ARB_base_instance'] = arb_base_instance
 add_plain_test(arb_base_instance, 'arb_base_instance-baseinstance-doesnt-affect-gl-instance-id')
+add_concurrent_test(arb_base_instance, 'arb_base_instance-drawarrays')
 
 arb_buffer_storage = {}
 spec['ARB_buffer_storage'] = arb_buffer_storage

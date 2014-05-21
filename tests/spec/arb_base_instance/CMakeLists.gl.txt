@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_base_instance-baseinstance-doesnt-affect-gl-instance-id baseinstance-doesnt-affect-gl-instance-id.c)
+piglit_add_executable (arb_base_instance-drawarrays drawarrays.c)
 
 # vim: ft=cmake:
