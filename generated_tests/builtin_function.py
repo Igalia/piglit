@@ -1043,6 +1043,55 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
         assert not y_type.is_matrix
         return x_type.num_rows == y_type.num_rows
 
+    def match_assignment_operators(x, y):
+        """ Determine when scalar and matrix arithmetic works
+
+        A matrix and a scalar can be combined, but only when being assigned
+        into a large enough type.
+
+        """
+        x_type = glsl_type_of(x)
+        y_type = glsl_type_of(y)
+        if x_type.base_type != y_type.base_type:
+            return False
+        if y_type.is_scalar:
+            return True
+        return x_type == y_type
+
+    def match_assignment_multiply(x, y):
+        """Determine whether the type of the arguments is compatible
+        for multiply.
+
+        Arguments are compatible if they are scalars, vectors, or
+        matrices with the same base type, and the vector/matrix sizes
+        are properly matched, and that y is scalar
+        """
+        x_type = glsl_type_of(x)
+        y_type = glsl_type_of(y)
+        if x_type.base_type != y_type.base_type:
+            return False
+        if y_type.is_scalar:
+            return True
+        if x_type.is_scalar:
+            return False
+        if x_type.is_vector and y_type.is_matrix:
+            # When multiplying vector * matrix, the vector is
+            # transposed to a row vector.  So its row count must match
+            # the row count of the matrix.
+            return x_type.num_rows == y_type.num_rows == y_type.num_cols
+        elif x_type.is_vector:
+            assert y_type.is_vector
+            # When multiplying vector * vector, the multiplication is
+            # done componentwise, so the types must match exactly.
+            return x_type == y_type
+        else:
+            assert x_type.is_matrix
+            # When multiplying matrix * matrix or matrix * vector, a
+            # standard linear algebraic multiply is used, so x's
+            # column count must match y's row count.
+            return (x_type.num_cols == y_type.num_rows and
+                    x_type.num_cols == y_type.num_cols)
+
     bools = [False, True]
     bvecs = [np.array(bs) for bs in itertools.product(bools, bools)] + \
         [np.array(bs) for bs in itertools.product(bools, bools, bools)] + \
@@ -1206,6 +1255,48 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
                 test_inputs, python_equivalent, tolerance_function),
             template=template)
 
+    f('op-assign-add', 2, 110, lambda x, y: x + y, match_assignment_operators,
+      [floats+vecs+mats+ints+ivecs+uints+uvecs,
+       floats+vecs+mats+ints+ivecs+uints+uvecs],
+      template='{0};\n  result += {1}')
+    f('op-assign-sub', 2, 110, lambda x, y: x - y, match_assignment_operators,
+      [floats+vecs+mats+ints+ivecs+uints+uvecs,
+       floats+vecs+mats+ints+ivecs+uints+uvecs],
+      template='{0};\n  result -= {1}')
+    f('op-assign-mult', 2, 110, _multiply, match_assignment_multiply,
+      [floats+vecs+mats+ints+ivecs+uints+uvecs,
+       floats+vecs+mats+ints+ivecs+uints+uvecs],
+      template='{0};\n  result *= {1}')
+    f('op-assign-div', 2, 110, _divide, match_assignment_operators,
+      [floats+vecs+mats+ints+ivecs+uints+uvecs,
+       floats+vecs+mats+ints+ivecs+uints+uvecs],
+      template='{0};\n  result /= {1}')
+    f('op-assign-div-large', 2, 130, _divide, match_assignment_operators,
+      [large_uints, large_uints+small_uints],
+      template='{0};\n  result /= {1}')
+    f('op-assign-mod', 2, 130, _modulus, match_assignment_operators,
+      [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs],
+      template='{0};\n result %= {1}')
+    f('op-assign-bitand', 2, 130, lambda x, y: x & y,
+      match_assignment_operators,
+      [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs],
+      template='{0};  result &= {1}')
+    f('op-assign-bitor', 2, 130, lambda x, y: x | y,
+      match_assignment_operators,
+      [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs],
+      template='{0};\n  result |= {1}')
+    f('op-assign-bitxor', 2, 130, lambda x, y: x ^ y,
+      match_assignment_operators,
+      [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs],
+      template='{0};\n  result ^= {1}')
+    f('op-assign-lshift', 2, 130, _lshift, match_shift,
+      [small_ints+small_ivecs+small_uints+small_uvecs,
+       small_ints+small_ivecs+small_uints+small_uvecs],
+      template='{0};  result <<= {1}')
+    f('op-assign-rshift', 2, 130, _rshift, match_shift,
+      [small_ints+small_ivecs+small_uints+small_uvecs,
+       small_ints+small_ivecs+small_uints+small_uvecs],
+      template='{0};  result >>= {1}')
     f('op-add', 2, 110, lambda x, y: x + y, match_simple_binop,
       [floats+vecs+mats+ints+ivecs+uints+uvecs,
        floats+vecs+mats+ints+ivecs+uints+uvecs],
@@ -1305,7 +1396,6 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('inverse', 1, 140, np.linalg.inv, None, [squaremats])
 
     f('determinant', 1, 150, np.linalg.det, None, [squaremats])
-
 _make_vector_or_matrix_test_vectors(test_suite)
 
 

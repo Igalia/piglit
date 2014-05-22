@@ -242,9 +242,12 @@ class FragmentParserTest(ParserTest):
 
 def all_tests():
     for signature, test_vectors in sorted(test_suite.items()):
-        yield VertexParserTest(signature, test_vectors)
-        yield GeometryParserTest(signature, test_vectors)
-        yield FragmentParserTest(signature, test_vectors)
+        # Assignment operators other than = cannot be used in the constant
+        # array size tests
+        if not signature.name.startswith('op-assign'):
+            yield VertexParserTest(signature, test_vectors)
+            yield GeometryParserTest(signature, test_vectors)
+            yield FragmentParserTest(signature, test_vectors)
 
 
 def main():
