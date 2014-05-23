@@ -156,7 +156,9 @@ def main():
     for params in LOD_TESTS:
         name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_lod-{mode}-{dimensions}-{coord}.frag".format(
-                    **params.__dict__))
+                    mode=params.mode,
+                    dimensions=params.dimensions,
+                    coord=params.coord))
         print(name)
         gen_frag_lod_test(params, name)
 
@@ -164,14 +166,18 @@ def main():
         # Generate fragment shader test
         name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_grad-{mode}-{dimensions}-{coord}.frag".format(
-                    **params.__dict__))
+                    mode=params.mode,
+                    dimensions=params.dimensions,
+                    coord=params.coord))
         print(name)
         gen_frag_grad_test(params, name)
 
         # Generate vertex shader test
         name = ("spec/arb_shader_texture_lod/compiler/"
                 "tex_grad-{mode}-{dimensions}-{coord}.vert".format(
-                    **params.__dict__))
+                    mode=params.mode,
+                    dimensions=params.dimensions,
+                    coord=params.coord))
         print(name)
         gen_vert_grad_test(params, name)
 
