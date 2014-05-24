@@ -129,7 +129,7 @@ main(int argc, char **argv)
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
-	piglit_require_glx_extension(dpy, "MESA_copy_sub_buffer");
+	piglit_require_glx_extension(dpy, "GLX_MESA_copy_sub_buffer");
 	CopySubBuffer = (PFNGLXCOPYSUBBUFFERMESAPROC)
 	    glXGetProcAddressARB((GLubyte *)"glXCopySubBufferMESA");
 

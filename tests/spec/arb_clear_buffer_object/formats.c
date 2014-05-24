@@ -65,7 +65,7 @@ static const struct {
 	{GL_LUMINANCE32F_ARB,		GL_LUMINANCE,			GL_FLOAT,		4,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
 	{GL_LUMINANCE_ALPHA32F_ARB,	GL_LUMINANCE_ALPHA,		GL_FLOAT,		8,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
 	{GL_INTENSITY32F_ARB,		GL_RED,				GL_FLOAT,		4,	false,	{NULL,	"GL_ARB_texture_float",	NULL}},
-	{GL_RGB32F,			GL_RGB,				GL_FLOAT,		12,	true,	{NULL,	"GL_ARB_texture_float",	"ARB_texture_buffer_object_rgb32"}},
+	{GL_RGB32F,			GL_RGB,				GL_FLOAT,		12,	true,	{NULL,	"GL_ARB_texture_float",	"GL_ARB_texture_buffer_object_rgb32"}},
 	{GL_RGBA32F_ARB,		GL_RGBA,			GL_FLOAT,		16,	true,	{NULL,	"GL_ARB_texture_float",	NULL}},
 /* texture_half_float */
 	{GL_ALPHA16F_ARB,		GL_ALPHA,			GL_HALF_FLOAT,		2,	false,	{NULL,	"GL_ARB_texture_float",	"GL_ARB_half_float_pixel"}},
@@ -102,8 +102,8 @@ static const struct {
 	{GL_INTENSITY16UI_EXT,		GL_RED_INTEGER,			GL_UNSIGNED_SHORT,	2,	false,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 	{GL_INTENSITY32UI_EXT,		GL_RED_INTEGER,			GL_UNSIGNED_INT,	4,	false,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 
-	{GL_RGB32I,			GL_RGB_INTEGER,			GL_INT,			12,	true,	{NULL,	"GL_EXT_texture_integer",	"ARB_texture_buffer_object_rgb32"}},
-	{GL_RGB32UI,			GL_RGB_INTEGER,			GL_UNSIGNED_INT,	12,	true,	{NULL,	"GL_EXT_texture_integer",	"ARB_texture_buffer_object_rgb32"}},
+	{GL_RGB32I,			GL_RGB_INTEGER,			GL_INT,			12,	true,	{NULL,	"GL_EXT_texture_integer",	"GL_ARB_texture_buffer_object_rgb32"}},
+	{GL_RGB32UI,			GL_RGB_INTEGER,			GL_UNSIGNED_INT,	12,	true,	{NULL,	"GL_EXT_texture_integer",	"GL_ARB_texture_buffer_object_rgb32"}},
 
 	{GL_RGBA8I_EXT,			GL_RGBA_INTEGER,		GL_BYTE,		4,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},
 	{GL_RGBA16I_EXT,		GL_RGBA_INTEGER,		GL_SHORT,		8,	true,	{NULL,	"GL_EXT_texture_integer",	NULL}},

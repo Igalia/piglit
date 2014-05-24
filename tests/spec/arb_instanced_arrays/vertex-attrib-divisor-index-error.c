@@ -46,7 +46,7 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 
 	if(piglit_get_gl_version() < 33)
-		piglit_require_extension("ARB_instanced_arrays");
+		piglit_require_extension("GL_ARB_instanced_arrays");
 
 	glVertexAttribDivisor(GL_MAX_VERTEX_ATTRIBS, 0);
 	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;

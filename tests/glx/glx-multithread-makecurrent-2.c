@@ -110,7 +110,7 @@ draw(Display *dpy)
 	glXMakeCurrent(dpy, win, ctx);
 	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
 
-	piglit_require_glx_extension(dpy, "MESA_multithread_makecurrent");
+	piglit_require_glx_extension(dpy, "GLX_MESA_multithread_makecurrent");
 
 	/* Clear background to gray */
 	glClearColor(0.5, 0.5, 0.5, 1.0);

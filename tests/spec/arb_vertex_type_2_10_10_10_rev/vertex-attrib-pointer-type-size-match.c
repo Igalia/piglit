@@ -55,7 +55,7 @@ piglit_init(int argc, char **argv)
 	};
 
 	if(piglit_get_gl_version() < 33)
-		piglit_require_extension("ARB_vertex_type_2_10_10_10_rev");
+		piglit_require_extension("GL_ARB_vertex_type_2_10_10_10_rev");
 
 	for (i = 0; i < ARRAY_SIZE(valid_sizes); i++) {
 		glVertexAttribPointer(0, valid_sizes[i],

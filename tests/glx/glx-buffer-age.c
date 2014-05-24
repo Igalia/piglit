@@ -119,7 +119,7 @@ main(int argc, char **argv)
 	}
 
 	dpy = piglit_get_glx_display();
-	piglit_require_glx_extension(dpy, "EXT_buffer_age");
+	piglit_require_glx_extension(dpy, "GLX_EXT_buffer_age");
 	visinfo = piglit_get_glx_visual(dpy);
 	window = piglit_get_glx_window(dpy, visinfo);
 

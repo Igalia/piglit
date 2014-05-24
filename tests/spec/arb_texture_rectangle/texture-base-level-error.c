@@ -91,7 +91,7 @@ piglit_init(int argc, char **argv)
 	};
 
 	if (piglit_get_gl_version() < 33)
-		piglit_require_extension("ARB_texture_rectangle");
+		piglit_require_extension("GL_ARB_texture_rectangle");
 
 	/* "...the error INVALID_ENUM is generated if the TEXTURE_WRAP_S,
 	 * TEXTURE_WRAP_T, or TEXTURE_WRAP_R parameter is set to REPEAT or
