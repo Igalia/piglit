@@ -224,7 +224,7 @@ def test_update_result_replace():
     """ Generates tests for update_result """
 
     def create_test_result(res):
-        result = framework.core.TestResult()
+        result = framework.results.TestResult()
         result['result'] = res
         result['subtest'] = {}
         result['subtest']['test'] = res
@@ -303,7 +303,7 @@ def test_update_result_add_dmesg():
     """ Tests update_result's addition of dmesg attribute """
     test = TestDmesg()
 
-    result = framework.core.TestResult()
+    result = framework.results.TestResult()
     result['result'] = 'pass'
 
     test._new_messages = ['some', 'new', 'messages']
@@ -317,13 +317,13 @@ def test_json_serialize_updated_result():
     """ Test that a TestResult that has been updated is json serializable """
     test = TestDmesg()
 
-    result = framework.core.TestResult()
+    result = framework.results.TestResult()
     result['result'] = 'pass'
 
     test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
-    encoder = framework.core.PiglitJSONEncoder()
+    encoder = framework.results.PiglitJSONEncoder()
     encoder.encode(result)
 
 

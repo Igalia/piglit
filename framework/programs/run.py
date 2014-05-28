@@ -28,6 +28,7 @@ import os.path as path
 import time
 
 import framework.core as core
+import framework.results
 import framework.profile
 
 __all__ = ['run',
@@ -132,12 +133,12 @@ def run(input_):
 
     # Pass arguments into Options
     opts = core.Options(concurrent=args.concurrency,
-                       exclude_filter=args.exclude_tests,
-                       include_filter=args.include_tests,
-                       execute=args.execute,
-                       valgrind=args.valgrind,
-                       dmesg=args.dmesg,
-                       verbose=args.verbose)
+                        exclude_filter=args.exclude_tests,
+                        include_filter=args.include_tests,
+                        execute=args.execute,
+                        valgrind=args.valgrind,
+                        dmesg=args.dmesg,
+                        verbose=args.verbose)
 
     # Set the platform to pass to waffle
     if args.platform:
@@ -148,7 +149,7 @@ def run(input_):
     os.chdir(piglit_dir)
     core.checkDir(args.results_path, False)
 
-    results = core.TestrunResult()
+    results = framework.results.TestrunResult()
 
     # Set results.name
     if args.name is not None:
@@ -159,7 +160,7 @@ def run(input_):
     # Begin json.
     result_filepath = path.join(args.results_path, 'main')
     result_file = open(result_filepath, 'w')
-    json_writer = core.JSONWriter(result_file)
+    json_writer = framework.results.JSONWriter(result_file)
     json_writer.open_dict()
 
     # Write out command line options for use in resuming.
@@ -210,20 +211,20 @@ def resume(input_):
                         help="Path to results folder")
     args = parser.parse_args(input_)
 
-    results = core.load_results(args.results_path)
+    results = framework.results.load_results(args.results_path)
     opts = core.Options(concurrent=results.options['concurrent'],
-                       exclude_filter=results.options['exclude_filter'],
-                       include_filter=results.options['filter'],
-                       execute=results.options['execute'],
-                       valgrind=results.options['valgrind'],
-                       dmesg=results.options['dmesg'],
-                       verbose=results.options['verbose'])
+                        exclude_filter=results.options['exclude_filter'],
+                        include_filter=results.options['filter'],
+                        execute=results.options['execute'],
+                        valgrind=results.options['valgrind'],
+                        dmesg=results.options['dmesg'],
+                        verbose=results.options['verbose'])
 
     if results.options.get('platform'):
         opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, "main")
-    json_writer = core.JSONWriter(open(results_path, 'w+'))
+    json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
     json_writer.open_dict()
     json_writer.write_dict_key("options")
     json_writer.open_dict()

@@ -29,7 +29,8 @@ import sys
 import traceback
 import itertools
 
-from .core import TestResult, Options
+from framework.core import Options
+from framework.results import TestResult
 
 
 __all__ = ['Test',

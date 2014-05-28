@@ -26,6 +26,7 @@ import os.path as path
 import framework.summary as summary
 import framework.status as status
 import framework.core as core
+import framework.results
 import framework.junit 
 
 __all__ = ['html',
@@ -104,7 +105,7 @@ class _Writer:
         self.path = []
 
     def write(self, arg):
-        testrun = core.load_results(arg)
+        testrun = framework.results.load_results(arg)
 
         self.report.start()
         self.report.startSuite('piglit')

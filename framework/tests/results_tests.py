@@ -22,9 +22,11 @@
 
 
 import os
-import collections
+import tempfile
+import json
 import framework.tests.utils as utils
-import framework.core as core
+import framework.results as results
+import framework.status as status
 
 
 def check_initialize(target):
@@ -35,7 +37,6 @@ def check_initialize(target):
     assert isinstance(func, target)
 
 
-@utils.nose_generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
 
@@ -47,67 +48,44 @@ def test_generate_initialize():
     """
     yieldable = check_initialize
 
-    for target in [core.Options]:
+    for target in [results.TestrunResult, results.TestResult]:
         yieldable.description = "Test that {} initializes".format(
             target.__name__)
         yield yieldable, target
 
 
-def test_parse_listfile_return():
-    """ Test that parse_listfile returns a container
+def test_initialize_jsonwriter():
+    """ Test that JSONWriter initializes
 
-    Given a file with a newline seperated list of results, parse_listfile
-    should return a list of files with no whitespace
-
-    """
-    contents = "/tmp/foo\n/tmp/bar\n"
-
-    with utils.with_tempfile(contents) as tfile:
-        results = core.parse_listfile(tfile)
-
-    assert isinstance(results, collections.Container)
-
-
-def check_whitespace(actual, base, message):
-    """ check that the string has not trailing whitespace """
-    assert base == actual, message
-
-
-def test_parse_listfile_whitespace():
-    """ Test that parse_listfile remove whitespace """
-    contents = "/tmp/foo\n/tmp/foo  \n/tmp/foo\t\n"
-
-    with utils.with_tempfile(contents) as tfile:
-        results = core.parse_listfile(tfile)
-
-    yld = check_whitespace
-
-    # Test for newlines
-    yld.description = ("Test that trailing newlines are removed by "
-                       "parse_listfile")
-    yield yld, results[0], "/tmp/foo", "Trailing newline not removed!"
-
-    # test for normal spaces
-    yld.description = "Test that trailing spaces are removed by parse_listfile"
-    yield yld, results[1], "/tmp/foo", "Trailing spaces not removed!"
-
-    # test for tabs
-    yld.description = "Test that trailing tabs are removed by parse_listfile"
-    yield yld, results[2], "/tmp/foo", "Trailing tab not removed!"
-
-
-def test_parse_listfile_tilde():
-    """ Test that parse_listfile properly expands tildes
-
-    According to the python docs for python 2.7
-    (http://docs.python.org/2/library/os.path.html#module-os.path), both
-    os.path.expanduser and os.path.expandvars work on both *nix systems (Linux,
-    *BSD, OSX) and Windows.
+    This needs to be handled separately from the others because it requires
+    arguments
 
     """
-    contents = "~/foo\n"
+    with tempfile.TemporaryFile() as tfile:
+        func = results.JSONWriter(tfile)
+        assert isinstance(func, results.JSONWriter)
 
-    with utils.with_tempfile(contents) as tfile:
-        results = core.parse_listfile(tfile)
 
-    assert results[0] == os.path.expandvars("$HOME/foo")
+def test_load_results_folder():
+    """ Test that load_results takes a folder with a file named main in it """
+    with utils.tempdir() as tdir:
+        with open(os.path.join(tdir, 'main'), 'w') as tfile:
+            tfile.write(json.dumps(utils.JSON_DATA))
+
+        results_ = results.load_results(tdir)
+        assert results_
+
+
+def test_load_results_file():
+    """ Test that load_results takes a file """
+    with utils.resultfile() as tfile:
+        results_ = results.load_results(tfile.name)
+        assert results_
+
+
+def test_testresult_to_status():
+    """ TestResult initialized with result key converts the value to a Status
+    """
+    result = results.TestResult({'result': 'pass'})
+    assert isinstance(result['result'], status.Status), \
+        "Result key not converted to a status object"

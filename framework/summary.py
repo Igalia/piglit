@@ -34,7 +34,7 @@ from mako.template import Template
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
-import framework.core as core
+import framework.results
 
 
 __all__ = [
@@ -287,7 +287,7 @@ class Summary:
 
         # Create a Result object for each piglit result and append it to the
         # results list
-        self.results = [core.load_results(i) for i in resultfiles]
+        self.results = [framework.results.load_results(i) for i in resultfiles]
 
         self.status = {}
         self.fractions = {}
