@@ -40,13 +40,17 @@ __all__ = [
 ]
 
 
-class PiglitJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, status.Status):
-            return str(o)
-        elif isinstance(o, set):
-            return list(o)
-        return json.JSONEncoder.default(self, o)
+def _piglit_encoder(obj):
+    """ Encoder for piglit that can transform additional classes into json
+
+    Adds support for status.Status objects and for set() instances
+
+    """
+    if isinstance(obj, status.Status):
+        return str(obj)
+    elif isinstance(obj, set):
+        return list(obj)
+    return obj
 
 
 class JSONWriter:
@@ -98,7 +102,8 @@ class JSONWriter:
         self.file = file
         self.__indent_level = 0
         self.__inhibit_next_indent = False
-        self.__encoder = PiglitJSONEncoder(indent=self.INDENT)
+        self.__encoder = json.JSONEncoder(indent=self.INDENT,
+                                          default=_piglit_encoder)
 
         # self.__is_collection_empty
         #

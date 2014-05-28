@@ -29,6 +29,7 @@ import os
 import sys
 import subprocess
 import re
+import json
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
 import framework.dmesg as dmesg
@@ -323,7 +324,7 @@ def test_json_serialize_updated_result():
     test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
-    encoder = framework.results.PiglitJSONEncoder()
+    encoder = json.JSONEncoder(default=framework.results._piglit_encoder)
     encoder.encode(result)
 
 
