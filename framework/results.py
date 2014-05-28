@@ -98,8 +98,8 @@ class JSONWriter(object):
 
     INDENT = 4
 
-    def __init__(self, file):
-        self.file = file
+    def __init__(self, f):
+        self.file = f
         self.__indent_level = 0
         self.__inhibit_next_indent = False
         self.__encoder = json.JSONEncoder(indent=self.INDENT,
@@ -115,8 +115,6 @@ class JSONWriter(object):
         # When the close_dict is called, the stack is popped.
         #
         # The top of the stack is element -1.
-        #
-        # XXX: How does one attach docstrings to member variables?
         #
         self.__is_collection_empty = []
 
@@ -148,7 +146,7 @@ class JSONWriter(object):
         self.__is_collection_empty.append(True)
 
     @synchronized_self
-    def close_dict(self, comma=True):
+    def close_dict(self):
         self.__indent_level -= 1
         self.__is_collection_empty.pop()
 
@@ -216,12 +214,13 @@ class TestrunResult(object):
             try:
                 raw_dict = json.load(resultfile)
             except ValueError:
-                raw_dict = json.load(self.__repairFile(resultfile))
+                raw_dict = json.load(self.__repair_file(resultfile))
 
             # Check that only expected keys were unserialized.
             for key in raw_dict:
                 if key not in self.serialized_keys:
-                    raise Exception('unexpected key in results file: ', str(key))
+                    raise Exception('unexpected key in results file: ',
+                                    str(key))
 
             self.__dict__.update(raw_dict)
 
@@ -229,7 +228,7 @@ class TestrunResult(object):
             for (path, result) in self.tests.items():
                 self.tests[path] = TestResult(result)
 
-    def __repairFile(self, file):
+    def __repair_file(self, file_):
         '''
         Reapair JSON file if necessary
 
@@ -247,8 +246,8 @@ class TestrunResult(object):
                 is returned.
         '''
 
-        file.seek(0)
-        lines = file.readlines()
+        file_.seek(0)
+        lines = file_.readlines()
 
         # JSON object was not closed properly.
         #
@@ -272,7 +271,7 @@ class TestrunResult(object):
 
         if safe_line_num is None:
             raise Exception('failed to repair corrupt result file: ' +
-                            file.name)
+                            file_.name)
 
         # Remove corrupt lines.
         lines = lines[0:(safe_line_num + 1)]
@@ -291,11 +290,11 @@ class TestrunResult(object):
         new_file.seek(0)
         return new_file
 
-    def write(self, file):
+    def write(self, file_):
         # Serialize only the keys in serialized_keys.
         keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
         raw_dict = dict([(k, self.__dict__[k]) for k in keys])
-        json.dump(raw_dict, file, indent=JSONWriter.INDENT)
+        json.dump(raw_dict, file_, indent=JSONWriter.INDENT)
 
 
 def load_results(filename):
@@ -315,5 +314,5 @@ def load_results(filename):
         with open(os.path.join(filename, "main"), 'r') as resultsfile:
             testrun = TestrunResult(resultsfile)
 
-    assert(testrun.name is not None)
+    assert testrun.name is not None
     return testrun
