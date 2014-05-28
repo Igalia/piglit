@@ -161,28 +161,18 @@ def run(input_):
     result_filepath = path.join(args.results_path, 'main')
     result_file = open(result_filepath, 'w')
     json_writer = framework.results.JSONWriter(result_file)
-    json_writer.open_dict()
 
-    # Write out command line options for use in resuming.
-    json_writer.write_dict_key('options')
-    json_writer.open_dict()
-    json_writer.write_dict_item('profile', args.test_profile)
-    for key, value in opts:
-        json_writer.write_dict_item(key, value)
+    # Create a dictionary to pass to initialize json, it needs the contents of
+    # the env dictionary and profile and platform information
+    options = {'profile': args.test_profile}
     if args.platform:
-        json_writer.write_dict_item('platform', args.platform)
-    json_writer.close_dict()
-
-    json_writer.write_dict_item('name', results.name)
-
-    for key, value in core.collect_system_info().iteritems():
-        json_writer.write_dict_item(key, value)
+        options['platform'] = args.platform
+    json_writer.initialize_json(options, results.name,
+                                core.collect_system_info())
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
 
-    json_writer.write_dict_key('tests')
-    json_writer.open_dict()
     time_start = time.time()
     # Set the dmesg type
     if args.dmesg:
@@ -196,8 +186,7 @@ def run(input_):
     json_writer.write_dict_item('time_elapsed', results.time_elapsed)
 
     # End json.
-    json_writer.close_dict()
-    json_writer.file.close()
+    json_writer.close_json()
 
     print('Thank you for running Piglit!\n'
           'Results have been written to ' + result_filepath)
@@ -225,19 +214,9 @@ def resume(input_):
 
     results_path = path.join(args.results_path, "main")
     json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
-    json_writer.open_dict()
-    json_writer.write_dict_key("options")
-    json_writer.open_dict()
-    for key, value in results.options.iteritems():
-        json_writer.write_dict_item(key, value)
-    json_writer.close_dict()
+    json_writer.initialize_json(results.options, results.name,
+                                core.collect_system_info())
 
-    json_writer.write_dict_item('name', results.name)
-    for key, value in core.collect_system_info().iteritems():
-        json_writer.write_dict_item(key, value)
-
-    json_writer.write_dict_key('tests')
-    json_writer.open_dict()
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)
         opts.exclude_tests.add(key)
@@ -250,9 +229,7 @@ def resume(input_):
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(opts, json_writer)
 
-    json_writer.close_dict()
-    json_writer.close_dict()
-    json_writer.file.close()
+    json_writer.close_json()
 
     print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))

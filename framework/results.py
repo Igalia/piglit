@@ -118,6 +118,59 @@ class JSONWriter(object):
         #
         self.__is_collection_empty = []
 
+        # self._open_containers
+        #
+        # A FILO stack that stores container information, each time
+        # self.open_dict() 'dict' is added to the stack, (other elements like
+        # 'list' could be added if support was added to JSONWriter for handling
+        # them), each to time self.close_dict() is called an element is
+        # removed. When self.close_json() is called each element of the stack
+        # is popped and written into the json
+        self._open_containers = []
+
+    def initialize_json(self, options, name, env):
+        """ Write boilerplate json code 
+
+        This writes all of the json except the actual tests.
+
+        Arguments:
+        options -- any values to be put in the options dictionary, must be a
+                   dict-like object
+        name -- the name of the test
+        env -- any environment information to be written into the results, must
+               be a dict-like object
+
+        """
+        self.open_dict()
+        self.write_dict_item('name', name)
+
+        self.write_dict_key('options')
+        self.open_dict()
+        for key, value in options.iteritems():
+            # Loading a NoneType will break resume, and are a bug
+            assert value is not None, "Value {} is NoneType".format(key)
+            self.write_dict_item(key, value)
+        self.close_dict()
+
+        for key, value in env.iteritems():
+            self.write_dict_item(key, value)
+
+        self.write_dict_key('tests')
+        self.open_dict()
+
+    def close_json(self):
+        """ End json serialization and cleanup
+
+        This method is called after all of tests are written, it closes any
+        containers that are still open and closes the file
+
+        """
+        self.close_dict()
+        self.close_dict()
+        assert self._open_containers == []
+
+        self.file.close()
+
     @synchronized_self
     def __write_indent(self):
         if self.__inhibit_next_indent:
@@ -144,6 +197,7 @@ class JSONWriter(object):
 
         self.__indent_level += 1
         self.__is_collection_empty.append(True)
+        self._open_containers.append('dict')
 
     @synchronized_self
     def close_dict(self):
@@ -153,6 +207,8 @@ class JSONWriter(object):
         self.file.write('\n')
         self.__write_indent()
         self.file.write('}')
+        assert self._open_containers[-1] == 'dict'
+        self._open_containers.pop()
 
     @synchronized_self
     def write_dict_item(self, key, value):
