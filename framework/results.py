@@ -53,7 +53,7 @@ def _piglit_encoder(obj):
     return obj
 
 
-class JSONWriter:
+class JSONWriter(object):
     '''
     Writes to a JSON file stream
 
@@ -181,7 +181,7 @@ class JSONWriter:
 
 class TestResult(dict):
     def __init__(self, *args):
-        dict.__init__(self, *args)
+        super(TestResult, self).__init__(*args)
 
         # Replace the result with a status object
         try:
@@ -192,7 +192,7 @@ class TestResult(dict):
             pass
 
 
-class TestrunResult:
+class TestrunResult(object):
     def __init__(self, resultfile=None):
         self.serialized_keys = ['options',
                                 'name',
