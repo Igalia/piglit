@@ -35,7 +35,7 @@ First of all, you need to make sure that the following are installed:
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
-  - waffle (http://people.freedesktop.org/~chadversary/waffle)
+  - waffle (http://www.waffle-gl.org)
   - nose. Only needed for python framework tests
     (https://nose.readthedocs.org/en/latest/)
 
@@ -67,7 +67,7 @@ Install development packages.
   $ sudo apt-get install cmake g++ mesa-common-dev libgl1-mesa-dev python-numpy python-mako freeglut3-dev x11proto-gl-dev libxrender-dev
 
 Install additional components for which Ubuntu packages do not yet exist:
-  - waffle (http://people.freedesktop.org/~chadversary/waffle)
+  - waffle (http://www.waffle-gl.org)
 
 Configure and build.
   $ cmake .

@@ -42,7 +42,7 @@ if(PIGLIT_USE_WAFFLE)
 	if(NOT WAFFLE_FOUND)
 		message(FATAL_ERROR "Failed to find Waffle. If Waffle is not "
 		"packaged for your distribution, you can get it at "
-		"http://people.freedesktop.org/~chadversary/waffle."
+		"http://www.waffle-gl.org."
 	)
 	endif()
 
