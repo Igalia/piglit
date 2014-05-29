@@ -340,7 +340,7 @@ test(void)
 static void usage(char *name)
 {
 	printf("%s {options} <filename.frag|filename.vert> <pass|fail> "
-	       "{requested GLSL vesion} {list of required GL extensions}\n", name);
+	       "{requested GLSL version} {list of required GL extensions}\n", name);
 	printf("\nSupported options:\n");
 	printf("  --check-link: also detect link failures\n");
 	exit(1);
