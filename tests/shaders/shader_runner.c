@@ -121,6 +121,7 @@ bool link_ok = false;
 bool prog_in_use = false;
 GLchar *prog_err_info = NULL;
 GLuint vao = 0;
+GLint render_width, render_height;
 
 enum states {
 	none = 0,
@@ -1952,7 +1953,7 @@ piglit_display(void)
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
 						    -1, 1, GL_FALSE);
 		} else if (string_match("ortho", line)) {
-			piglit_ortho_projection(piglit_width, piglit_height,
+			piglit_ortho_projection(render_width, render_height,
 						GL_FALSE);
 		} else if (string_match("probe rgba", line)) {
 			get_floats(line + 10, c, 6);
@@ -1965,12 +1966,12 @@ piglit_display(void)
 				  "( %f , %f , %f , %f )",
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4, c + 5) == 6) {
-			x = c[0] * piglit_width;
-			y = c[1] * piglit_height;
-			if (x >= piglit_width)
-				x = piglit_width - 1;
-			if (y >= piglit_height)
-				y = piglit_height - 1;
+			x = c[0] * render_width;
+			y = c[1] * render_height;
+			if (x >= render_width)
+				x = render_width - 1;
+			if (y >= render_height)
+				y = render_height - 1;
 
 			if (!piglit_probe_pixel_rgba(x, y, &c[2])) {
 				pass = false;
@@ -1986,12 +1987,12 @@ piglit_display(void)
 				  "( %f , %f , %f )",
 				  c + 0, c + 1,
 				  c + 2, c + 3, c + 4) == 5) {
-			x = c[0] * piglit_width;
-			y = c[1] * piglit_height;
-			if (x >= piglit_width)
-				x = piglit_width - 1;
-			if (y >= piglit_height)
-				y = piglit_height - 1;
+			x = c[0] * render_width;
+			y = c[1] * render_height;
+			if (x >= render_width)
+				x = render_width - 1;
+			if (y >= render_height)
+				y = render_height - 1;
 
 			if (!piglit_probe_pixel_rgb(x, y, &c[2])) {
 				pass = false;
@@ -1999,13 +2000,13 @@ piglit_display(void)
 		} else if (string_match("probe all rgba", line)) {
 			get_floats(line + 14, c, 4);
 			pass = pass &&
-				piglit_probe_rect_rgba(0, 0, piglit_width,
-						       piglit_height, c);
+				piglit_probe_rect_rgba(0, 0, render_width,
+						       render_height, c);
 		} else if (string_match("probe all rgb", line)) {
 			get_floats(line + 13, c, 3);
 			pass = pass &&
-				piglit_probe_rect_rgb(0, 0, piglit_width,
-						      piglit_height, c);
+				piglit_probe_rect_rgb(0, 0, render_width,
+						      render_height, c);
 		} else if (string_match("tolerance", line)) {
 			get_floats(line + strlen("tolerance"), piglit_tolerance, 4);
 		} else if (string_match("shade model smooth", line)) {
@@ -2212,4 +2213,7 @@ piglit_init(int argc, char **argv)
 		vbo_present = true;
 	}
 	setup_ubos();
+
+	render_width = piglit_width;
+	render_height = piglit_height;
 }
