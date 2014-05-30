@@ -11,6 +11,6 @@ link_libraries (
 
 piglit_add_executable (arb_instanced_arrays-instanced_arrays instanced_arrays.c)
 piglit_add_executable (arb_instanced_arrays-drawarrays drawarrays.c)
-piglit_add_executable (arb_istnanced_arrays-vertex-attrib-divisor-index-error vertex-attrib-divisor-index-error.c)
+piglit_add_executable (arb_instanced_arrays-vertex-attrib-divisor-index-error vertex-attrib-divisor-index-error.c)
 
 # vim: ft=cmake:
