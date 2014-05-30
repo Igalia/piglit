@@ -1878,7 +1878,7 @@ piglit_display(void)
 	while (line[0] != '\0') {
 		float c[32];
 		double d[4];
-		int x, y, w, h, l, tex, level;
+		int x, y, z, w, h, l, tex, level;
 		char s[32];
 
 		line = eat_whitespace(line);
@@ -1897,6 +1897,13 @@ piglit_display(void)
 				piglit_report_result(PIGLIT_FAIL);
 			}
 			glClipPlane(GL_CLIP_PLANE0 + x, d);
+		} else if (sscanf(line,
+				  "compute %d %d %d",
+				  &x, &y, &z) == 3) {
+			program_must_be_in_use();
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			glDispatchCompute(x, y, z);
+			glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		} else if (string_match("draw rect tex", line)) {
 			program_must_be_in_use();
 			get_floats(line + 13, c, 8);
