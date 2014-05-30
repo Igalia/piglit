@@ -121,6 +121,7 @@ bool link_ok = false;
 bool prog_in_use = false;
 GLchar *prog_err_info = NULL;
 GLuint vao = 0;
+GLuint fbo = 0;
 GLint render_width, render_height;
 
 enum states {
@@ -1942,6 +1943,34 @@ piglit_display(void)
 			do_enable_disable(line + 7, false);
 		} else if (string_match("enable", line)) {
 			do_enable_disable(line + 6, true);
+		} else if (sscanf(line, "fb tex 2d %d", &tex) == 1) {
+			GLenum status;
+			GLint tex_num;
+
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex_num);
+
+			if (fbo == 0) {
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			}
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER,
+					       GL_COLOR_ATTACHMENT0,
+					       GL_TEXTURE_2D, tex_num, 0);
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr, "glFramebufferTexture2D error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				fprintf(stderr, "incomplete fbo (status 0x%x)\n", status);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &render_width);
+			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &render_height);
 		} else if (string_match("frustum", line)) {
 			get_floats(line + 7, c, 6);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
