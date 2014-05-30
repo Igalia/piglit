@@ -2017,11 +2017,13 @@ piglit_display(void)
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_rgbw_texture(GL_RGBA, w, h, GL_FALSE, GL_FALSE, GL_UNSIGNED_NORMALIZED);
-			glEnable(GL_TEXTURE_2D);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line, "texture miptree %d", &tex) == 1) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_miptree_texture();
-			glEnable(GL_TEXTURE_2D);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture checkerboard %d %d ( %d , %d ) "
 				  "( %f , %f , %f , %f ) "
@@ -2034,7 +2036,8 @@ piglit_display(void)
 						    w, h,
 						    w / 2, h / 2,
 						    c + 0, c + 4);
-			glEnable(GL_TEXTURE_2D);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
@@ -2048,7 +2051,8 @@ piglit_display(void)
 					GL_TEXTURE_COMPARE_FUNC,
 					GL_GREATER);
 
-			glEnable(GL_TEXTURE_2D);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
 				  "texture shadowRect %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
