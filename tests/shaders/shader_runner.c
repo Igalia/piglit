@@ -1977,6 +1977,14 @@ piglit_display(void)
 						  c[3], c[4], c[5]);
 		} else if (string_match("hint", line)) {
 			do_hint(line + 4);
+		} else if (sscanf(line,
+				  "image texture %d",
+				  &tex) == 1) {
+			GLint tex_num;
+
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGetIntegerv(GL_TEXTURE_BINDING_2D, &tex_num);
+			glBindImageTexture(tex, tex_num, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
 		} else if (sscanf(line, "ortho %f %f %f %f",
 				  c + 0, c + 1, c + 2, c + 3) == 4) {
 			piglit_gen_ortho_projection(c[0], c[1], c[2], c[3],
