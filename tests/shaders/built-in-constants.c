@@ -38,6 +38,7 @@ unsigned num_tests = 0;
 
 int required_glsl_version = 0;
 char *required_glsl_version_string = NULL;
+GLenum shader_type = 0;
 
 /**
  * List of extensions required by the current test set.
@@ -68,6 +69,11 @@ static const char *const geometry_shader_body =
 	"layout(points) in;\n"
 	"layout(points, max_vertices = 1) out;\n"
 	"void main() { gl_Position = vec4(f[0]); EmitVertex(); }\n"
+	;
+
+static const char *const compute_shader_body =
+	"layout(local_size_x = 1) in;\n"
+	"void main() { }\n"
 	;
 
 /* The __VERSION__ stuff is to work-around gl_FragColor not existing in GLSL
@@ -131,6 +137,30 @@ compar(const void *_a, const void *_b)
 	return strcmp(a->name, b->name);
 }
 
+static GLenum
+parse_shader_type(const char *line, ptrdiff_t len)
+{
+	int i;
+	static struct {
+		const char *name;
+		GLenum type;
+	} shader_types[] = {
+		{ "GL_VERTEX_SHADER", GL_VERTEX_SHADER },
+		{ "GL_GEOMETRY_SHADER", GL_GEOMETRY_SHADER },
+		{ "GL_FRAGMENT_SHADER", GL_FRAGMENT_SHADER },
+		{ "GL_COMPUTE_SHADER", GL_COMPUTE_SHADER },
+	};
+
+	for (i = 0; i < ARRAY_SIZE(shader_types); i++) {
+		if (len == strlen(shader_types[i].name) &&
+		    strncmp(shader_types[i].name, line, 3) == 0) {
+			return shader_types[i].type;
+		}
+	}
+
+	return 0;
+}
+
 /**
  * Parse the file of values to test, fill in test vector list.
  */
@@ -143,10 +173,13 @@ parse_file(const char *filename)
 	int count;
 	int major;
 	int minor;
+	char *end_of_line;
+	ptrdiff_t len;
 
 	/* The format of the test file is:
 	 *
 	 * major.minor
+	 * GL_VERTEX_SHADER|GL_GEOMETRY_SHADER|GL_FRAGMENT_SHADER|GL_COMPUTE_SHADER
 	 * GL_ARB_some_extension
 	 * gl_MaxFoo 8
 	 * gl_MaxBar 16
@@ -169,11 +202,26 @@ parse_file(const char *filename)
 	if (line[0] != '\0')
 		line++;
 
+	end_of_line = strchrnul(line, '\n');
+	len = end_of_line - line;
+	assert(end_of_line[0] == '\n' || end_of_line[0] == '\0');
+
+	/* Process the shader type.
+	 */
+	shader_type = parse_shader_type(line, len);
+	if (shader_type != 0) {
+		/* Advance to the next input line.
+		 */
+		line = end_of_line;
+		if (line[0] == '\n')
+			line++;
+	}
+
 	/* Process the list of required extensions.
 	 */
 	while (strncmp("GL_", line, 3) == 0) {
-		char *end_of_line = strchrnul(line, '\n');
-		const ptrdiff_t len = end_of_line - line;
+		end_of_line = strchrnul(line, '\n');
+		len = end_of_line - line;
 
 		assert(end_of_line[0] == '\n' || end_of_line[0] == '\0');
 
@@ -273,6 +321,21 @@ check_compile_status(const char *name, GLuint sh)
 	return !!ok;
 }
 
+static GLuint
+create_shader(GLenum type)
+{
+	if (shader_type != 0 && shader_type != type)
+		return 0;
+	if (type == GL_GEOMETRY_SHADER &&
+	    (required_glsl_version < 150 || required_glsl_version == 300))
+		return 0;
+	/* Only create compute shaders when explicitly requested
+	 */
+	if (type == GL_COMPUTE_SHADER && shader_type != type)
+		return 0;
+	return glCreateShader(type);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -284,8 +347,9 @@ piglit_init(int argc, char **argv)
 	const char *shader_source[3];
 
 	GLuint test_vs;
-	GLuint test_gs = 0;
+	GLuint test_gs;
 	GLuint test_fs;
+	GLuint test_cs;
 
 	bool is_es;
 	int major;
@@ -347,11 +411,10 @@ piglit_init(int argc, char **argv)
 
 	/* Create the shaders that will be used for the real part of the test.
 	 */
-	test_vs = glCreateShader(GL_VERTEX_SHADER);
-	test_fs = glCreateShader(GL_FRAGMENT_SHADER);
-
-	if (required_glsl_version >= 150 && required_glsl_version != 300)
-		test_gs = glCreateShader(GL_GEOMETRY_SHADER);
+	test_vs = create_shader(GL_VERTEX_SHADER);
+	test_gs = create_shader(GL_GEOMETRY_SHADER);
+	test_fs = create_shader(GL_FRAGMENT_SHADER);
+	test_cs = create_shader(GL_COMPUTE_SHADER);
 
 	for (i = 0; i < num_tests; i++) {
 		bool subtest_pass = true;
@@ -367,15 +430,17 @@ piglit_init(int argc, char **argv)
 
 		/* Try to compile the vertex shader.
 		 */
-		shader_source[0] = version_string;
-		shader_source[1] = uniform;
-		shader_source[2] = vertex_shader_body;
+		if (test_vs != 0) {
+			shader_source[0] = version_string;
+			shader_source[1] = uniform;
+			shader_source[2] = vertex_shader_body;
 
-		glShaderSource(test_vs, 3, shader_source, NULL);
-		glCompileShader(test_vs);
+			glShaderSource(test_vs, 3, shader_source, NULL);
+			glCompileShader(test_vs);
 
-		subtest_pass = check_compile_status(tests[i].name, test_vs)
-			&& subtest_pass;
+			subtest_pass = check_compile_status(tests[i].name, test_vs)
+				&& subtest_pass;
+		}
 
 		/* Try to compile the geometry shader.
 		 */
@@ -393,15 +458,31 @@ piglit_init(int argc, char **argv)
 
 		/* Try to compile the fragment shader.
 		 */
-		shader_source[0] = version_string;
-		shader_source[1] = uniform;
-		shader_source[2] = fragment_shader_body;
+		if (test_fs != 0) {
+			shader_source[0] = version_string;
+			shader_source[1] = uniform;
+			shader_source[2] = fragment_shader_body;
 
-		glShaderSource(test_fs, 3, shader_source, NULL);
-		glCompileShader(test_fs);
+			glShaderSource(test_fs, 3, shader_source, NULL);
+			glCompileShader(test_fs);
 
-		subtest_pass = check_compile_status(tests[i].name, test_fs)
-			&& subtest_pass;
+			subtest_pass = check_compile_status(tests[i].name, test_fs)
+				&& subtest_pass;
+		}
+
+		/* Try to compile the compute shader.
+		 */
+		if (test_cs != 0) {
+			shader_source[0] = version_string;
+			shader_source[1] = uniform;
+			shader_source[2] = compute_shader_body;
+
+			glShaderSource(test_cs, 3, shader_source, NULL);
+			glCompileShader(test_cs);
+
+			subtest_pass = check_compile_status(tests[i].name, test_cs)
+				&& subtest_pass;
+		}
 
 		/* If both compilation phases passed, try to link the shaders
 		 * together.
@@ -409,11 +490,14 @@ piglit_init(int argc, char **argv)
 		if (subtest_pass) {
 			GLuint prog = glCreateProgram();
 
-			glAttachShader(prog, test_vs);
-			glAttachShader(prog, test_fs);
-
+			if (test_vs != 0)
+				glAttachShader(prog, test_vs);
 			if (test_gs != 0)
 				glAttachShader(prog, test_gs);
+			if (test_fs != 0)
+				glAttachShader(prog, test_fs);
+			if (test_cs != 0)
+				glAttachShader(prog, test_cs);
 
 			glLinkProgram(prog);
 			subtest_pass = !!piglit_link_check_status(prog);
