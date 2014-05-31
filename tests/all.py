@@ -3176,6 +3176,7 @@ add_shader_test_dir(spec['ARB_compute_shader'],
 import_glsl_parser_tests(spec['ARB_compute_shader'],
                          os.path.join(testsDir, 'spec', 'arb_compute_shader'),
                          ['compiler'])
+arb_compute_shader['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_compute_shader/minimum-maximums.txt')
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
