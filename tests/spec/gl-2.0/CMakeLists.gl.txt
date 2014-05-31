@@ -13,3 +13,4 @@ link_libraries (
 piglit_add_executable (vertex-program-two-side vertex-program-two-side.c)
 piglit_add_executable (gl-2.0-edgeflag edgeflag.c)
 piglit_add_executable (gl-2.0-edgeflag-immediate edgeflag-immediate.c)
+piglit_add_executable (gl-2.0-vertexattribpointer vertexattribpointer.c)
