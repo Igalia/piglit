@@ -32,7 +32,7 @@ generatedTestDir = path.normpath(path.join(
 
 # Quick wrapper for PiglitTest for our usual concurrent args.
 def plain_test(args):
-    return PiglitTest(shlex.split(args) + ['-auto'])
+    return PiglitTest(args.split() + ['-auto'])
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
@@ -557,7 +557,8 @@ for subtest in ('interstage', 'intrastage', 'vs-gs'):
     shaders[cmdline] = concurrent_test(cmdline)
 
 def add_vpfpgeneric(group, name):
-    group[name] = concurrent_test('vpfp-generic ' + testsDir + '/shaders/generic/' + name + '.vpfp')
+    group[name] = concurrent_test('vpfp-generic ' +
+        os.path.join(testsDir, 'shaders', 'generic', name + '.vpfp'))
 
 glx = {}
 add_msaa_visual_plain_tests(glx, 'glx-copy-sub-buffer')
@@ -1470,11 +1471,11 @@ add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-mul
 arb_draw_instanced = {}
 spec['ARB_draw_instanced'] = arb_draw_instanced
 import_glsl_parser_tests(arb_draw_instanced,
-                        testsDir + '/spec/arb_draw_instanced',
+                        os.path.join(testsDir, 'spec', 'arb_draw_instanced'),
                         [''])
 
 add_shader_test_dir(arb_draw_instanced,
-                    testsDir + '/spec/arb_draw_instanced/execution',
+                    os.path.join(testsDir, 'spec', 'arb_draw_instanced', 'execution'),
                     recursive=True)
 arb_draw_instanced['dlist'] = concurrent_test('arb_draw_instanced-dlist')
 arb_draw_instanced['elements'] = concurrent_test('arb_draw_instanced-elements')
@@ -1621,7 +1622,7 @@ add_plain_test(arb_framebuffer_srgb, 'framebuffer-srgb') # must not be concurren
 arb_gpu_shader5 = {}
 spec['ARB_gpu_shader5'] = arb_gpu_shader5
 add_shader_test_dir(arb_gpu_shader5,
-                    testsDir + '/spec/arb_gpu_shader5',
+                    os.path.join(testsDir, 'spec', 'arb_gpu_shader5'),
                     recursive=True)
 import_glsl_parser_tests(arb_gpu_shader5,
                          testsDir + '/spec/arb_gpu_shader5', [''])
@@ -3244,7 +3245,8 @@ add_plain_test(fast_color_clear, 'fcc-read-to-pbo-after-clear')
 asmparsertest = {}
 def add_asmparsertest(group, shader):
     asmparsertest[group + '/' + shader] = concurrent_test(
-        'asmparsertest ' + group + ' ' + testsDir + '/asmparsertest/shaders/' + group + '/' + shader)
+        'asmparsertest ' + group + ' ' +
+        os.path.join(testsDir, 'asmparsertest', 'shaders', group, shader))
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
 add_asmparsertest('ARBfp1.0', 'abs-02.txt')
