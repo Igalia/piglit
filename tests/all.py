@@ -7,7 +7,8 @@ import itertools
 import os
 import os.path as path
 import platform
-import shlex
+import subprocess
+import sys
 
 from framework.profile import TestProfile
 from framework.exectest import PiglitTest
@@ -17,6 +18,9 @@ from framework.shader_test import add_shader_test_dir
 
 # Path to tests dir, correct even when not running from the top directory.
 testsDir = path.dirname(__file__)
+if sys.platform == "cygwin":
+    # convert the path to DOS style so it's parsable by shader_runner, etc.
+    testsDir = subprocess.check_output(['cygpath', '-d', testsDir]).rstrip()
 
 # Find the generated_tests directory, by looking either in
 # $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
