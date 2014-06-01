@@ -361,12 +361,12 @@ piglit_init(int argc, char **argv)
                                 run_test_geometry);
 
         atomic_counters_subtest(&status, GL_TESS_CONTROL_SHADER,
-                                "Tesselation control shader atomic built-in "
+                                "Tessellation control shader atomic built-in "
                                 "semantics",
                                 run_test_tess_control);
 
         atomic_counters_subtest(&status, GL_TESS_EVALUATION_SHADER,
-                                "Tesselation evaluation shader atomic built-in "
+                                "Tessellation evaluation shader atomic built-in "
                                 "semantics",
                                 run_test_tess_evaluation);
 

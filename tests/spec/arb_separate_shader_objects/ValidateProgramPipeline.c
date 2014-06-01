@@ -313,7 +313,7 @@ piglit_init(int argc, char **argv)
 		} else {
 			if (!has_tess)
 				printf("INFO: GL_ARB_tessellation_shader / "
-				       "OpenGL 4.0 not supported: tesselation "
+				       "OpenGL 4.0 not supported: tessellation "
 				       "test disabled\n");
 			if (!has_geo)
 				printf("INFO: OpenGL 3.2 not "

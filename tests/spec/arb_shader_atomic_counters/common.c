@@ -216,12 +216,12 @@ atomic_counters_supported(GLenum shader_stage)
                 return n;
 
         case GL_TESS_CONTROL_SHADER:
-                if (piglit_is_extension_supported("GL_ARB_tesselation_shader"))
+                if (piglit_is_extension_supported("GL_ARB_tessellation_shader"))
                         glGetIntegerv(GL_MAX_TESS_CONTROL_ATOMIC_COUNTERS, &n);
                 return n;
 
         case GL_TESS_EVALUATION_SHADER:
-                if (piglit_is_extension_supported("GL_ARB_tesselation_shader"))
+                if (piglit_is_extension_supported("GL_ARB_tessellation_shader"))
                         glGetIntegerv(GL_MAX_TESS_EVALUATION_ATOMIC_COUNTERS,
                                       &n);
                 return n;

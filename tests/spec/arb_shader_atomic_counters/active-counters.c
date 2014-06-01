@@ -241,7 +241,7 @@ piglit_init(int argc, char **argv)
                         &ref);
                 if (!piglit_check_gl_error(GL_NO_ERROR) || ref) {
                         fprintf(stderr, "Buffer incorrectly reported to be "
-                                "referenced by tesselation control shader.\n");
+                                "referenced by tessellation control shader.\n");
                         piglit_report_result(PIGLIT_FAIL);
                 }
 
@@ -250,7 +250,7 @@ piglit_init(int argc, char **argv)
                         &ref);
                 if (!piglit_check_gl_error(GL_NO_ERROR) || ref) {
                         fprintf(stderr, "Buffer incorrectly reported to be "
-                                "referenced by tesselation evaluation shader."
+                                "referenced by tessellation evaluation shader."
                                 "\n");
                         piglit_report_result(PIGLIT_FAIL);
                 }
