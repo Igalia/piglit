@@ -120,6 +120,7 @@ compile(const char *filename, GLenum target, int use_ARB)
 
 	buf = piglit_load_text_file(filename, &sz);
 	if (buf == NULL) {
+		fprintf(stderr, "Failed to open %s\n", filename);
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
