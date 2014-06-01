@@ -61,7 +61,20 @@ static const char *const uniform_template =
 	"uniform float f[%s %s %d ? 1 : -1];\n"
 	;
 
+static const char *const passthrough_uniform =
+	"uniform float f[1];\n"
+	;
+
 static const char *const vertex_shader_body =
+	"void main() { gl_Position = vec4(f[0]); }\n"
+	;
+
+static const char *const tessellation_control_shader_body =
+	"layout(vertices = 1) out;\n"
+	"void main() { gl_TessLevelInner[0] = vec4(f[0]); }\n"
+	;
+
+static const char *const tessellation_evaluation_shader_body =
 	"void main() { gl_Position = vec4(f[0]); }\n"
 	;
 
@@ -146,6 +159,8 @@ parse_shader_type(const char *line, ptrdiff_t len)
 		GLenum type;
 	} shader_types[] = {
 		{ "GL_VERTEX_SHADER", GL_VERTEX_SHADER },
+		{ "GL_TESS_CONTROL_SHADER", GL_TESS_CONTROL_SHADER },
+		{ "GL_TESS_EVALUATION_SHADER", GL_TESS_EVALUATION_SHADER },
 		{ "GL_GEOMETRY_SHADER", GL_GEOMETRY_SHADER },
 		{ "GL_FRAGMENT_SHADER", GL_FRAGMENT_SHADER },
 		{ "GL_COMPUTE_SHADER", GL_COMPUTE_SHADER },
@@ -321,10 +336,21 @@ check_compile_status(const char *name, GLuint sh)
 	return !!ok;
 }
 
+static bool
+is_tessellation_type(GLenum type)
+{
+	return type == GL_TESS_CONTROL_SHADER ||
+		type == GL_TESS_EVALUATION_SHADER;
+}
+
 static GLuint
 create_shader(GLenum type)
 {
-	if (shader_type != 0 && shader_type != type)
+	if (shader_type != 0 && shader_type != type && !is_tessellation_type(shader_type))
+		return 0;
+	if (is_tessellation_type(type) &&
+	    (required_glsl_version < 400 &&
+	     !piglit_is_extension_supported("GL_ARB_tessellation_shader")))
 		return 0;
 	if (type == GL_GEOMETRY_SHADER &&
 	    (required_glsl_version < 150 || required_glsl_version == 300))
@@ -342,11 +368,14 @@ piglit_init(int argc, char **argv)
 	bool pass = true;
 	char uniform[80];
 	char *version_string = NULL;
+	char *passthrough_version_string = NULL;
 	unsigned i;
 
 	const char *shader_source[3];
 
 	GLuint test_vs;
+	GLuint test_tcs;
+	GLuint test_tes;
 	GLuint test_gs;
 	GLuint test_fs;
 	GLuint test_cs;
@@ -409,9 +438,20 @@ piglit_init(int argc, char **argv)
 		 required_glsl_version == 300 ? "es" : "",
 		 extension_enables);
 
+	asprintf(&passthrough_version_string,
+		 "#version %d %s\n"
+		 "#ifdef GL_ES\n"
+		 "precision mediump float;\n"
+		 "#endif\n",
+		 required_glsl_version,
+		 required_glsl_version == 300 ? "es" : "");
+
+
 	/* Create the shaders that will be used for the real part of the test.
 	 */
 	test_vs = create_shader(GL_VERTEX_SHADER);
+	test_tcs = create_shader(GL_TESS_CONTROL_SHADER);
+	test_tes = create_shader(GL_TESS_EVALUATION_SHADER);
 	test_gs = create_shader(GL_GEOMETRY_SHADER);
 	test_fs = create_shader(GL_FRAGMENT_SHADER);
 	test_cs = create_shader(GL_COMPUTE_SHADER);
@@ -431,8 +471,13 @@ piglit_init(int argc, char **argv)
 		/* Try to compile the vertex shader.
 		 */
 		if (test_vs != 0) {
-			shader_source[0] = version_string;
-			shader_source[1] = uniform;
+			if (!is_tessellation_type(shader_type)) {
+				shader_source[0] = version_string;
+				shader_source[1] = uniform;
+			} else {
+				shader_source[0] = passthrough_version_string;
+				shader_source[1] = passthrough_uniform;
+			}
 			shader_source[2] = vertex_shader_body;
 
 			glShaderSource(test_vs, 3, shader_source, NULL);
@@ -442,11 +487,44 @@ piglit_init(int argc, char **argv)
 				&& subtest_pass;
 		}
 
+		/* Try to compile the tessellation control shader.
+		 */
+		if (test_tcs != 0) {
+			shader_source[0] = version_string;
+			shader_source[1] = uniform;
+			shader_source[2] = tessellation_control_shader_body;
+
+			glShaderSource(test_tcs, 3, shader_source, NULL);
+			glCompileShader(test_tcs);
+
+			subtest_pass = check_compile_status(tests[i].name, test_tcs)
+				&& subtest_pass;
+		}
+
+		/* Try to compile the tessellation evaluation shader.
+		 */
+		if (test_tes != 0) {
+			shader_source[0] = version_string;
+			shader_source[1] = uniform;
+			shader_source[2] = tessellation_evaluation_shader_body;
+
+			glShaderSource(test_tes, 3, shader_source, NULL);
+			glCompileShader(test_tes);
+
+			subtest_pass = check_compile_status(tests[i].name, test_tes)
+				&& subtest_pass;
+		}
+
 		/* Try to compile the geometry shader.
 		 */
 		if (test_gs != 0) {
-			shader_source[0] = version_string;
-			shader_source[1] = uniform;
+			if (!is_tessellation_type(shader_type)) {
+				shader_source[0] = version_string;
+				shader_source[1] = uniform;
+			} else {
+				shader_source[0] = passthrough_version_string;
+				shader_source[1] = passthrough_uniform;
+			}
 			shader_source[2] = geometry_shader_body;
 
 			glShaderSource(test_gs, 3, shader_source, NULL);
@@ -459,8 +537,13 @@ piglit_init(int argc, char **argv)
 		/* Try to compile the fragment shader.
 		 */
 		if (test_fs != 0) {
-			shader_source[0] = version_string;
-			shader_source[1] = uniform;
+			if (!is_tessellation_type(shader_type)) {
+				shader_source[0] = version_string;
+				shader_source[1] = uniform;
+			} else {
+				shader_source[0] = passthrough_version_string;
+				shader_source[1] = passthrough_uniform;
+			}
 			shader_source[2] = fragment_shader_body;
 
 			glShaderSource(test_fs, 3, shader_source, NULL);
