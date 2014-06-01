@@ -385,6 +385,7 @@ class Summary:
                     self.tests['changes'].add(test)
                 elif last in [so.SKIP, so.NOTRUN] and first not in [so.SKIP, so.NOTRUN]:
                     self.tests['disabled'].add(test)
+                    self.tests['changes'].add(test)
                 elif first < last:
                     self.tests['regressions'].add(test)
                     self.tests['changes'].add(test)
