@@ -2045,6 +2045,7 @@ add_plain_test(apple_vertex_array_object, 'vao-02')
 apple_vertex_array_object['isvertexarray'] = concurrent_test('arb_vertex_array-isvertexarray apple')
 
 profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PiglitTest('arb_vertex_array_bgra-api-errors -auto')
+profile.test_list['spec/ARB_vertex_array_bgra/get'] = PiglitTest('arb_vertex_array_bgra-get -auto')
 
 arb_vertex_array_object = {}
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
