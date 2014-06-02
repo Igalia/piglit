@@ -1,0 +1,63 @@
+# Test a set of simple pass-through tessellation shaders
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+#[vertex shader passthrough]
+
+[vertex shader]
+#version 150
+
+const vec2 verts[] = vec2[](vec2(-1, 1),
+                            vec2(-1, -1),
+                            vec2(1, -1),
+                            vec2(1, 1));
+const int elts[] = int[](0, 1, 2,
+                         0, 2, 3);
+
+void main()
+{
+	gl_Position = vec4(verts[elts[gl_VertexID]], 0, 1);
+}
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(vertices = 3) out;
+
+void main()
+{
+	gl_TessLevelInner[0] = 1.0;
+	gl_TessLevelInner[1] = 1.0;
+	gl_TessLevelOuter[0] = 1.0;
+	gl_TessLevelOuter[1] = 1.0;
+	gl_TessLevelOuter[2] = 1.0;
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(triangles, equal_spacing) in;
+
+void main()
+{
+	int index = int(gl_TessCoord.y + (2 * gl_TessCoord.z));
+	gl_Position = gl_in[index].gl_Position;
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
