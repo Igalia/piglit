@@ -64,12 +64,21 @@ def checkEnvironment():
     print "Test Environment check: Succeeded."
     return True
 
-if not os.path.exists(os.path.join(TEST_BIN_DIR, 'igt')):
-    print "igt symlink not found!"
-    sys.exit(0)
+if 'IGT_TEST_ROOT' in os.environ:
+    igtTestRoot = os.environ['IGT_TEST_ROOT']
+else:
+    # Chase the piglit/bin/igt symlink to find where the tests really live.
+    if os.path.exists(path.join(TEST_BIN_DIR, 'igt')):
+        igtTestRoot = path.join(path.realpath(path.join(TEST_BIN_DIR, 'igt')),
+                                'tests')
+    else:
+        igtTestRoot=''
 
-# Chase the piglit/bin/igt symlink to find where the tests really live.
-igtTestRoot = path.join(path.realpath(path.join(TEST_BIN_DIR, 'igt')), 'tests')
+# check for the test lists
+if not (os.path.exists(os.path.join(igtTestRoot, 'single-tests.txt'))
+        and os.path.exists(os.path.join(igtTestRoot, 'multi-tests.txt'))):
+    print "intel-gpu-tools test lists not found."
+    sys.exit(0)
 
 igtEnvironmentOk = checkEnvironment()
 
