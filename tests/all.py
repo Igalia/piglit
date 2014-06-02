@@ -1507,6 +1507,7 @@ arb_tessellation_shader = {}
 spec['ARB_tessellation_shader'] = arb_tessellation_shader
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-get-tcs-params')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-get-tes-params')
+add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-minmax')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-get-program-params')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-patch-vertices-range')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-primitive')
