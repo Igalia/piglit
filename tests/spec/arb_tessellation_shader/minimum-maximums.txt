@@ -1,0 +1,16 @@
+3.30
+GL_TESS_CONTROL_SHADER
+GL_ARB_tessellation_shader
+gl_MaxTessControlInputComponents 128
+gl_MaxTessControlOutputComponents 128
+gl_MaxTessControlTextureImageUnits 16
+gl_MaxTessControlUniformComponents 1024
+gl_MaxTessControlTotalOutputComponents 4096
+gl_MaxTessEvaluationInputComponents 128
+gl_MaxTessEvaluationOutputComponents 128
+gl_MaxTessEvaluationTextureImageUnits 16
+gl_MaxTessEvaluationUniformComponents 1024
+gl_MaxTessPatchComponents 120
+gl_MaxPatchVertices 32
+gl_MaxTessGenLevel 64
+gl_MaxCombinedTextureImageUnits 80
