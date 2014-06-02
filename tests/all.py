@@ -3085,6 +3085,7 @@ add_concurrent_test(arb_clear_texture, 'arb_clear_texture-simple')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-3d')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-cube')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-base-formats')
+add_concurrent_test(arb_clear_texture, 'arb_clear_texture-depth-stencil')
 
 arb_copy_buffer = {}
 spec['ARB_copy_buffer'] = arb_copy_buffer
