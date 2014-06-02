@@ -1725,6 +1725,11 @@ for num_samples in TEST_SAMPLE_COUNTS:
     executable = 'arb_sample_shading-{0} -auto'.format(test_name)
     arb_sample_shading[test_name] = PiglitTest(executable)
 
+for num_samples in (0,2,4,6,8):
+    test_name = 'builtin-gl-sample-mask-simple {0}'.format(num_samples)
+    executable = 'arb_sample_shading-' + test_name
+    arb_sample_shading[test_name] = concurrent_test(executable)
+
 for num_samples in TEST_SAMPLE_COUNTS:
     test_name = 'builtin-gl-sample-position {0}'.format(num_samples)
     executable = 'arb_sample_shading-{0} -auto'.format(test_name)
