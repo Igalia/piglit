@@ -207,24 +207,8 @@ class IGTTest(Test):
 def listTests(listname):
     oldDir = os.getcwd()
 
-    try:
-        with open(path.join(igtTestRoot, listname + '.txt'), 'r') as f:
-            lines = (line.rstrip() for line in f.readlines())
-    except IOError:
-        try:
-            os.chdir(igtTestRoot)
-            proc = subprocess.Popen(
-                    ['make', 'list-' + listname],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    env=os.environ.copy(),
-                    universal_newlines=True
-                    )
-            out, err = proc.communicate()
-            lines = out.split('\n')
-            returncode = proc.returncode
-        finally:
-            os.chdir(oldDir)
+    with open(path.join(igtTestRoot, listname + '.txt'), 'r') as f:
+        lines = (line.rstrip() for line in f.readlines())
 
     found_header = False
     progs = ""
