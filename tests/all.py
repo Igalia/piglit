@@ -3082,6 +3082,7 @@ add_concurrent_test(arb_clear_buffer_object, 'arb_clear_buffer_object-zero-size'
 arb_clear_texture = {}
 spec['ARB_clear_texture'] = arb_clear_texture
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-simple')
+add_concurrent_test(arb_clear_texture, 'arb_clear_texture-3d')
 
 arb_copy_buffer = {}
 spec['ARB_copy_buffer'] = arb_copy_buffer
