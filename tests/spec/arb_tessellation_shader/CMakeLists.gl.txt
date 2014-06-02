@@ -1,6 +1,7 @@
 include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
+	${piglit_SOURCE_DIR}/tests/util
 )
 
 link_libraries (
@@ -14,5 +15,6 @@ piglit_add_executable (arb_tessellation_shader-get-tes-params get-tes-params.c)
 piglit_add_executable (arb_tessellation_shader-invalid-get-program-params invalid-get-program-params.c)
 piglit_add_executable (arb_tessellation_shader-invalid-patch-vertices-range invalid-patch-vertices-range.c)
 piglit_add_executable (arb_tessellation_shader-invalid-primitive invalid-primitive.c)
+piglit_add_executable (arb_tessellation_shader-minmax minmax.c)
 
 # vim: ft=cmake:
