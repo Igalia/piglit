@@ -26,9 +26,8 @@ if sys.platform == "cygwin":
 # $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
 # parent directory of the directory containing this file.
 generatedTestDir = path.normpath(path.join(
-    os.environ.get('PIGLIT_BUILD_DIR',
-                   path.join(testsDir, '..')),
-                   'generated_tests'))
+    os.environ.get('PIGLIT_BUILD_DIR', path.join(testsDir, '..')),
+    'generated_tests'))
 
 # Quick wrapper for PiglitTest for our usual concurrent args.
 def plain_test(args):
