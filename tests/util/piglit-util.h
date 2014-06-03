@@ -222,6 +222,8 @@ char *strchrnul(const char *s, int c);
 char *strndup(const char *s, size_t n);
 #endif
 
+void piglit_disable_error_message_boxes(void);
+
 extern void piglit_set_rlimit(unsigned long lim);
 
 char *piglit_load_text_file(const char *file_name, unsigned *size);

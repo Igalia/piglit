@@ -98,6 +98,24 @@ def run(input_):
                         help="Path to results folder")
     args = parser.parse_args(input_)
 
+    # Disable Windows error message boxes for this and all child processes.
+    if sys.platform == 'win32':
+        # This disables messages boxes for uncaught exceptions, but it will not
+        # disable the message boxes for assertion failures or abort().  Those
+        # are created not by the system but by the CRT itself, and must be
+        # disabled by the child processes themselves.
+        import ctypes
+        SEM_FAILCRITICALERRORS     = 0x0001
+        SEM_NOALIGNMENTFAULTEXCEPT = 0x0004
+        SEM_NOGPFAULTERRORBOX      = 0x0002
+        SEM_NOOPENFILEERRORBOX     = 0x8000
+        uMode = ctypes.windll.kernel32.SetErrorMode(0)
+        uMode |= SEM_FAILCRITICALERRORS \
+              |  SEM_NOALIGNMENTFAULTEXCEPT \
+              |  SEM_NOGPFAULTERRORBOX \
+              |  SEM_NOOPENFILEERRORBOX
+        ctypes.windll.kernel32.SetErrorMode(uMode)
+
     # Set the platform to pass to waffle
     if args.platform:
         os.environ['PIGLIT_PLATFORM'] = args.platform

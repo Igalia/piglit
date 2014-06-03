@@ -277,6 +277,43 @@ char *strndup(const char *s, size_t n)
 
 
 void
+piglit_disable_error_message_boxes(void)
+{
+	/* When Windows' error message boxes are disabled for this process (as
+	 * is always the case when running through `piglit run`) we disable CRT
+	 * message boxes too.
+	 *
+	 * This will disable the CRT message boxes for the main executable, but
+	 * it will not disable message boxes for assertion failures inside
+	 * OpenGL ICD, unless this test's executable and the OpenGL ICD DLL are
+	 * both dynamically linked to the same CRT DLL.  If the OpenGL ICD is
+	 * statically linked to the CRT then it must do these calls itself.
+	 */
+#ifdef _WIN32
+	UINT uMode;
+#if _WIN32_WINNT >= 0x0600
+	uMode = GetErrorMode();
+#else
+	uMode = SetErrorMode(0);
+	SetErrorMode(uMode);
+#endif
+	if (uMode & SEM_FAILCRITICALERRORS) {
+		/* Disable assertion failure message box.
+		 * http://msdn.microsoft.com/en-us/library/sas1dkb2.aspx
+		 */
+		_set_error_mode(_OUT_TO_STDERR);
+#ifdef _MSC_VER
+		/* Disable abort message box.
+		 * http://msdn.microsoft.com/en-us/library/e631wekh.aspx
+		 */
+		_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
+	}
+#endif /* _WIN32 */
+}
+
+
+void
 piglit_set_rlimit(unsigned long lim)
 {
 #if defined(USE_SETRLIMIT) && defined(RLIMIT_AS)

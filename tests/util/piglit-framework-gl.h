@@ -260,6 +260,8 @@ piglit_gl_test_run(int argc, char *argv[],
         {                                                                    \
                 struct piglit_gl_test_config config;                         \
                                                                              \
+                piglit_disable_error_message_boxes();                        \
+                                                                             \
                 piglit_gl_test_config_init(&config);                         \
                                                                              \
                 config.init = piglit_init;                                   \
