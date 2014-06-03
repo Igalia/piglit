@@ -5,7 +5,6 @@ __all__ = ['profile']
 
 import itertools
 import os
-import os.path as path
 import platform
 import subprocess
 import sys
@@ -17,7 +16,7 @@ from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, imp
 from framework.shader_test import add_shader_test_dir
 
 # Path to tests dir, correct even when not running from the top directory.
-testsDir = path.dirname(__file__)
+testsDir = os.path.dirname(__file__)
 if sys.platform == "cygwin":
     # convert the path to DOS style so it's parsable by shader_runner, etc.
     testsDir = subprocess.check_output(['cygpath', '-d', testsDir]).rstrip()
@@ -25,8 +24,8 @@ if sys.platform == "cygwin":
 # Find the generated_tests directory, by looking either in
 # $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
 # parent directory of the directory containing this file.
-generatedTestDir = path.normpath(path.join(
-    os.environ.get('PIGLIT_BUILD_DIR', path.join(testsDir, '..')),
+generatedTestDir = os.path.normpath(os.path.join(
+    os.environ.get('PIGLIT_BUILD_DIR', os.path.join(testsDir, '..')),
     'generated_tests'))
 
 # Quick wrapper for PiglitTest for our usual concurrent args.
@@ -3195,11 +3194,11 @@ glslparsertest = {}
 for filename in os.listdir(testsDir + '/glslparsertest/shaders'):
     ext = filename.rsplit('.')[-1]
     if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/shaders', filename), filename)
+        add_glsl_parser_test(glslparsertest, os.path.join(testsDir, 'glslparsertest/shaders', filename), filename)
 for filename in os.listdir(testsDir + '/glslparsertest/glsl2'):
     ext = filename.rsplit('.')[-1]
     if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(glslparsertest, path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
+        add_glsl_parser_test(glslparsertest, os.path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
 # end group glslparsertest ---------------------------------------------------
 
 hiz = {}
