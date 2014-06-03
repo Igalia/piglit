@@ -40,6 +40,10 @@ import argparse
 # muck with things, if not we need to screw with the python path
 if not path.exists('HACKING'):
     _binpath, _bin = path.split(__file__)
+    _binname, _binext = path.splitext(_bin)
+    if _binext == '.py':
+        # Drop .py extension (used on Windows)
+        _bin = _binname
     _libdir = path.abspath(path.join(_binpath, '..', 'lib', _bin))
     sys.path.append(_libdir)
     if 'PIGLIT_SOURCE_DIR' not in os.environ:

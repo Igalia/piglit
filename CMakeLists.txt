@@ -450,8 +450,13 @@ install (
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 
+if (WIN32)
+	set (PYTHON_SUFFIX ".py")
+else ()
+	set (PYTHON_SUFFIX "")
+endif ()
 install (
-	PROGRAMS piglit RENAME piglit${PIGLIT_INSTALL_VERSION_SUFFIX}
+	PROGRAMS piglit RENAME piglit${PIGLIT_INSTALL_VERSION_SUFFIX}${PYTHON_SUFFIX}
 	DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
