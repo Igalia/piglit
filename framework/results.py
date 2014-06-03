@@ -291,10 +291,11 @@ class TestrunResult(object):
         return new_file
 
     def write(self, file_):
-        # Serialize only the keys in serialized_keys.
-        keys = set(self.__dict__.keys()).intersection(self.serialized_keys)
-        raw_dict = dict([(k, self.__dict__[k]) for k in keys])
-        json.dump(raw_dict, file_, indent=JSONWriter.INDENT)
+        """ Write only values of the serialized_keys out to file """
+        with open(file_, 'w') as f:
+            json.dump(dict((k, v) for k, v in self.__dict__.iteritems()
+                           if k in self.serialized_keys),
+                      f, default=_piglit_encoder, indent=JSONWriter.INDENT)
 
 
 def load_results(filename):

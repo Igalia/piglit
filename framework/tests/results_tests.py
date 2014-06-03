@@ -24,6 +24,7 @@
 import os
 import tempfile
 import json
+import nose.tools as nt
 import framework.tests.utils as utils
 import framework.results as results
 import framework.status as status
@@ -89,3 +90,20 @@ def test_testresult_to_status():
     result = results.TestResult({'result': 'pass'})
     assert isinstance(result['result'], status.Status), \
         "Result key not converted to a status object"
+
+
+def test_testrunresult_write():
+    """ TestrunResult.write() works
+
+    This tests for a bug where TestrunResult.write() wrote a file containing
+    {}, essentially if it dumps a file that is equal to what was provided then
+    it's probably working
+
+    """
+    with utils.resultfile() as f:
+        result = results.load_results(f.name)
+        with utils.tempdir() as tdir:
+            result.write(os.path.join(tdir, 'results.json'))
+            new = results.load_results(os.path.join(tdir, 'results.json'))
+
+    nt.assert_dict_equal(result.__dict__, new.__dict__)
