@@ -158,7 +158,7 @@ def run(input_):
         results.name = path.basename(args.results_path)
 
     # Begin json.
-    result_filepath = path.join(args.results_path, 'main')
+    result_filepath = path.join(args.results_path, 'results.json')
     result_file = open(result_filepath, 'w')
     json_writer = framework.results.JSONWriter(result_file)
 
@@ -212,7 +212,7 @@ def resume(input_):
     if results.options.get('platform'):
         opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
-    results_path = path.join(args.results_path, "main")
+    results_path = path.join(args.results_path, 'results.json')
     json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
     json_writer.initialize_json(results.options, results.name,
                                 core.collect_system_info())

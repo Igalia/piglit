@@ -23,6 +23,7 @@
 
 from __future__ import print_function
 import os
+import sys
 from cStringIO import StringIO
 try:
     import simplejson as json
@@ -38,6 +39,9 @@ __all__ = [
     'JSONWriter',
     'load_results',
 ]
+
+# The current version of the JSON results
+CURRENT_JSON_VERSION = 1
 
 
 def _piglit_encoder(obj):
@@ -129,7 +133,7 @@ class JSONWriter(object):
         self._open_containers = []
 
     def initialize_json(self, options, name, env):
-        """ Write boilerplate json code 
+        """ Write boilerplate json code
 
         This writes all of the json except the actual tests.
 
@@ -142,6 +146,7 @@ class JSONWriter(object):
 
         """
         self.open_dict()
+        self.write_dict_item('results_version', CURRENT_JSON_VERSION)
         self.write_dict_item('name', name)
 
         self.write_dict_key('options')
@@ -255,6 +260,7 @@ class TestrunResult(object):
                                 'wglinfo',
                                 'glxinfo',
                                 'lspci',
+                                'results_version',
                                 'time_elapsed']
         self.name = None
         self.uname = None
@@ -262,6 +268,7 @@ class TestrunResult(object):
         self.glxinfo = None
         self.lspci = None
         self.time_elapsed = None
+        self.results_version = CURRENT_JSON_VERSION
         self.tests = {}
 
         if resultfile:
@@ -271,6 +278,9 @@ class TestrunResult(object):
                 raw_dict = json.load(resultfile)
             except ValueError:
                 raw_dict = json.load(self.__repair_file(resultfile))
+
+            # If there is no results version in the json, put set it to zero
+            self.results_version = getattr(raw_dict, 'results_version', 0)
 
             # Check that only expected keys were unserialized.
             for key in raw_dict:
@@ -364,12 +374,179 @@ def load_results(filename):
     "main"
 
     """
-    try:
-        with open(filename, 'r') as resultsfile:
-            testrun = TestrunResult(resultsfile)
-    except IOError:
-        with open(os.path.join(filename, "main"), 'r') as resultsfile:
-            testrun = TestrunResult(resultsfile)
+    # This will load any file or file-like thing. That would include pipes and
+    # file descriptors
+    if not os.path.isdir(filename):
+        filepath = filename
+    else:
+        # If there are both old and new results in a directory pick the new
+        # ones first
+        if os.path.exists(os.path.join(filename, 'results.json')):
+            filepath = os.path.join(filename, 'results.json')
+        # Version 0 results are called 'main'
+        elif os.path.exists(os.path.join(filename, 'main')):
+            filepath = os.path.join(filename, 'main')
+        else:
+            raise Exception("No results found")
 
-    assert testrun.name is not None
-    return testrun
+    with open(filepath, 'r') as f:
+        testrun = TestrunResult(f)
+
+    return update_results(testrun, filepath)
+
+
+def update_results(results, filepath):
+    """ Update results to the lastest version
+
+    This function is a wraper for other update_* functions, providing
+    incremental updates from one version to another.
+
+    Arguments:
+    results -- a TestrunResults instance
+    filepath -- the name of the file that the Testrunresults instance was
+                created from
+
+    """
+
+    def loop_updates(results):
+        """ Helper to select the proper update sequence """
+        # Python lacks a switch statement, the workaround is to use a
+        # dictionary
+        updates = {
+            0: _update_zero_to_one,
+        }
+
+        while results.results_version < CURRENT_JSON_VERSION:
+            results = updates[results.results_version](results)
+
+        return results
+
+    # If the results version is the current version there is no need to
+    # update, just return the results
+    if results.results_version == CURRENT_JSON_VERSION:
+        return results
+
+    results = loop_updates(results)
+
+    # Move the old results, and write the current results
+    filedir = os.path.dirname(filepath)
+    try:
+        os.rename(filepath, os.path.join(filedir, 'results.json.old'))
+        results.write(os.path.join(filedir, 'results.json'))
+    except OSError:
+        print("WARNING: Could not write updated results {}".format(filepath),
+              file=sys.stderr)
+
+    return results
+
+
+def _update_zero_to_one(results):
+    """ Update version zero results to version 1 results
+
+    Changes from version 0 to version 1
+
+    - dmesg is sometimes stored as a list, sometimes stored as a string. In
+      version 1 it is always stored as a string
+    - in version 0 subtests are somtimes stored as duplicates, sometimes stored
+      only with a single entry, in version 1 tests with subtests are only
+      recorded once, always.
+    - Version 0 can have an info entry, or returncode, out, and err entries,
+      Version 1 will only have the latter
+    - version 0 results are called 'main', while version 1 results are called
+      'results.json' (This is not handled internally, it's either handled by
+      update_results() which will write the file back to disk, or needs to be
+      handled manually by the user)
+
+    """
+    updated_results = {}
+    remove = set()
+
+    for name, test in results.tests.iteritems():
+        # fix dmesg errors if any
+        if isinstance(test.get('dmesg'), list):
+            test['dmesg'] = '\n'.join(test['dmesg'])
+
+        # If a test as an info attribute, we want to remove it, if it doesn't
+        # have a returncode, out, or attribute we'll want to get those out of
+        # info first
+        #
+        # This expects that the order of info is rougly returncode, errors,
+        # output, *extra it can handle having extra information in the middle,
+        if (None in [test.get('out'), test.get('err'), test.get('returncode')]
+                and test.get('info')):
+
+            # This attempts to split everything before Errors: as a returncode,
+            # and everything before Output: as Errors, and everything else as
+            # output. This may result in extra info being put in out, this is
+            # actually fine since out is only parsed by humans.
+            returncode, split = test['info'].split('\n\nErrors:')
+            err, out = split.split('\n\nOutput:')
+
+            # returncode can be 0, and 0 is falsy, so ensure it is actually
+            # None
+            if test.get('returncode') is None:
+                # In some cases the returncode might not be set (like the test
+                # skipped), in that case it will be None, so set it
+                # apropriately
+                try:
+                    test['returncode'] = int(
+                        returncode[len('returncode: '):].strip())
+                except ValueError:
+                    test['returncode'] = None
+            if not test.get('err'):
+                test['err'] = err.strip()
+            if not test.get('out'):
+                test['out'] = out.strip()
+
+        # Remove the unused info key
+        if test.get('info'):
+            del test['info']
+
+        # If there is more than one subtest written in version 0 results that
+        # entry will be a complete copy of the original entry with '/{name}'
+        # appended. This loop looks for tests with subtests, removes the
+        # duplicate entries, and creates a new entry in update_results for the
+        # single full tests.
+        #
+        # this must be the last thing done in this loop, or there will be pain
+        if test.get('subtest'):
+            for sub in test['subtest'].iterkeys():
+                # adding the leading / ensures that we get exactly what we
+                # expect, since endswith does a character by chacter match, if
+                # the subtest name is duplicated it wont match, and if there
+                # are more trailing characters it will not match
+                #
+                # We expect duplicate names like this:
+                #  "group1/groupA/test1/subtest 1": <thing>,
+                #  "group1/groupA/test1/subtest 2": <thing>,
+                #  "group1/groupA/test1/subtest 3": <thing>,
+                #  "group1/groupA/test1/subtest 4": <thing>,
+                #  "group1/groupA/test1/subtest 5": <thing>,
+                #  "group1/groupA/test1/subtest 6": <thing>,
+                #  "group1/groupA/test1/subtest 7": <thing>,
+                # but what we want is groupg1/groupA/test1 and none of the
+                # subtest as keys in the dictionary at all
+                if name.endswith('/{0}'.format(sub)):
+                    testname = name[:-(len(sub) + 1)]  # remove leading /
+                    assert testname[-1] != '/'
+
+                    remove.add(name)
+                    break
+            else:
+                # This handles two cases, first that the results have only
+                # single entries for each test, regardless of subtests (new
+                # style), or that the test onhly as a single subtest and thus
+                # was recorded correctly
+                testname = name
+
+            if testname not in updated_results:
+                updated_results[testname] = test
+
+    for name in remove:
+        del results.tests[name]
+    results.tests.update(updated_results)
+
+    # set the results version
+    results.results_version = 1
+
+    return results

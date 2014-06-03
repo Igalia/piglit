@@ -67,21 +67,28 @@ def test_initialize_jsonwriter():
         assert isinstance(func, results.JSONWriter)
 
 
-def test_load_results_folder():
+def test_load_results_folder_as_main():
     """ Test that load_results takes a folder with a file named main in it """
     with utils.tempdir() as tdir:
         with open(os.path.join(tdir, 'main'), 'w') as tfile:
             tfile.write(json.dumps(utils.JSON_DATA))
 
-        results_ = results.load_results(tdir)
-        assert results_
+        results.load_results(tdir)
+
+
+def test_load_results_folder():
+    """ Test that load_results takes a folder with a file named results.json """
+    with utils.tempdir() as tdir:
+        with open(os.path.join(tdir, 'results.json'), 'w') as tfile:
+            tfile.write(json.dumps(utils.JSON_DATA))
+
+        results.load_results(tdir)
 
 
 def test_load_results_file():
     """ Test that load_results takes a file """
     with utils.resultfile() as tfile:
-        results_ = results.load_results(tfile.name)
-        assert results_
+        results.load_results(tfile.name)
 
 
 def test_testresult_to_status():
@@ -107,3 +114,48 @@ def test_testrunresult_write():
             new = results.load_results(os.path.join(tdir, 'results.json'))
 
     nt.assert_dict_equal(result.__dict__, new.__dict__)
+
+
+def test_update_results_current():
+    """ update_results() returns early when the results_version is current """
+    data = utils.JSON_DATA.copy()
+    data['results_version'] = results.CURRENT_JSON_VERSION
+
+    with utils.tempdir() as d:
+        with open(os.path.join(d, 'main'), 'w') as f:
+            json.dump(data, f)
+
+        with open(os.path.join(d, 'main'), 'r') as f:
+            base = results.TestrunResult(f)
+
+        res = results.update_results(base, f.name)
+
+    nt.assert_dict_equal(res.__dict__, base.__dict__)
+
+
+def test_update_results_old():
+    """ update_results() updates results
+
+    Because of the design of the our updates (namely that they silently
+    incrementally update from x to y) it's impossible to konw exactly what
+    we'll get at th end without having tests that have to be reworked each time
+    updates are run. Since there already is (at least for v0 -> v1) a fairly
+    comprehensive set of tests, this test only tests that update_results() has
+    been set equal to the CURRENT_JSON_VERSION, (which is one of the effects of
+    runing update_results() with the assumption that there is sufficient other
+    testing of the update process.
+
+    """
+    data = utils.JSON_DATA.copy()
+    data['results_version'] = 0
+
+    with utils.tempdir() as d:
+        with open(os.path.join(d, 'main'), 'w') as f:
+            json.dump(data, f)
+
+        with open(os.path.join(d, 'main'), 'r') as f:
+            base = results.TestrunResult(f)
+
+        res = results.update_results(base, f.name)
+
+    nt.assert_equal(res.results_version, results.CURRENT_JSON_VERSION)
