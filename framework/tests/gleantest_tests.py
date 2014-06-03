@@ -52,20 +52,14 @@ def test_globalParams_assignment():
 
 
 def test_bad_returncode():
-    """ If glean doesn't return zero it should be a fail
+    """ Result is 'Fail' when returncode is not 0
 
     Currently clean returns 127 if piglit can't find it's libs (LD_LIBRARY_PATH
     isn't set properly), and then marks such tests as pass, when they obviously
     are not.
 
     """
-    if not os.path.exists('bin'):
-        raise SkipTest("This test requires a working, built version of piglit")
-
-    # Clearing the environment should remove the piglit/lib from
-    # LD_LIBRARY_PATH
-    os.environ = {}
-
     test = GleanTest('basic')
-    test.run()
+    test.result['returncode'] = 1
+    test.interpret_result()
     assert test.result['result'] == 'fail', "Result should have been fail"
