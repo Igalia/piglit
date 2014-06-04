@@ -14,5 +14,6 @@ piglit_add_executable (gl-3.0-required-sized-texture-formats required-sized-text
 piglit_add_executable (gl-3.0-required-renderbuffer-attachment-formats required-renderbuffer-attachment-formats.c)
 piglit_add_executable (gl-3.0-required-texture-attachment-formats required-texture-attachment-formats.c)
 piglit_add_executable (gl-3.0-texture-integer texture-integer.c)
+piglit_add_executable (gl-3.0-vertexattribipointer vertexattribipointer.c)
 
 # vim: ft=cmake:

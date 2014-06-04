@@ -944,6 +944,7 @@ gl30['required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-t
 gl30['forward-compatible-bit yes'] = concurrent_test('gl-3.0-forward-compatible-bit yes')
 gl30['forward-compatible-bit no'] = concurrent_test('gl-3.0-forward-compatible-bit no')
 add_concurrent_test(gl30, 'gl-3.0-texture-integer')
+add_concurrent_test(gl30, 'gl-3.0-vertexattribipointer')
 add_plain_test(gl30, 'gl30basic')
 add_plain_test(gl30, 'array-depth-roundtrip')
 add_plain_test(gl30, 'depth-cube-map')
