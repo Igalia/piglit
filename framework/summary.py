@@ -452,8 +452,11 @@ class Summary:
             else:
                 time = None
 
+            self.__find_totals()
+
             with open(path.join(destination, each.name, "index.html"), 'w') as out:
                 out.write(testindex.render(name=each.name,
+                                           totals=self.totals,
                                            time=time,
                                            options=each.options,
                                            uname=each.uname,

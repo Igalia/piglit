@@ -18,6 +18,17 @@
         <th>Value</th>
       </tr>
       <tr>
+        <td>totals</td>
+        <td>
+          <table>
+            % for key, value in sorted(totals.iteritems(), key=lambda (k,v): (v,k), reverse=True):
+            <tr><td>${key}</td><td>${value}</td></tr>
+            % endfor
+            <tr><td>total</td><td>${sum(totals.itervalues())}</td></tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
         <td>time_elapsed</td>
         <td>${time}</td>
       </tr>
