@@ -33,9 +33,6 @@
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
-
-	config.window_width = 64;
-	config.window_height = 32;
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -204,8 +201,19 @@ enum piglit_result piglit_display(void)
 		break;
 	}
 
-	/* Render into TFBO. */
+	/* Setup projection for a 64 x 32 window region.  That's what
+	 * the expected coords above assume.
+	 * XXX it would be better if the position coords in the above
+	 * array were compute instead of fixed.
+	 */
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glOrtho(0, 64, 0, 32, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+        glViewport(0, 0, 64, 32);
+
+	/* Render into TFBO. */
 	glUseProgram(prog);
 	if (discard)
 		glEnable(GL_RASTERIZER_DISCARD_EXT);
