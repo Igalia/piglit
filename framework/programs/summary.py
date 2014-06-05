@@ -117,7 +117,7 @@ class _Writer:
             self.report.stop()
 
     def write_test(self, testrun, test_path, result):
-        test_path = test_path.split('/')
+        test_path = test_path.replace('\\', '/').split('/')
         test_name = test_path.pop()
         self.enter_path(test_path)
 
