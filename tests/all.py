@@ -2508,6 +2508,7 @@ ext_packed_depth_stencil['DEPTH_STENCIL texture'] = concurrent_test('ext_packed_
 ext_packed_depth_stencil['errors'] = concurrent_test('ext_packed_depth_stencil-errors')
 ext_packed_depth_stencil['getteximage'] = concurrent_test('ext_packed_depth_stencil-getteximage')
 ext_packed_depth_stencil['readdrawpixels'] = concurrent_test('ext_packed_depth_stencil-readdrawpixels')
+ext_packed_depth_stencil['texsubimage'] = concurrent_test('ext_packed_depth_stencil-texsubimage')
 
 oes_packed_depth_stencil = {}
 spec['OES_packed_depth_stencil'] = oes_packed_depth_stencil
