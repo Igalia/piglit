@@ -484,9 +484,6 @@ class Summary:
                     if not path.exists(temp_path):
                         os.makedirs(temp_path)
 
-                    if isinstance(value.get('dmesg'), list):
-                        value['dmesg'] = "\n".join(value['dmesg'])
-
                     if value.get('time') is not None:
                         value['time'] = datetime.timedelta(0, value['time'])
 
