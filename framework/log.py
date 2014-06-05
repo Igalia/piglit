@@ -43,8 +43,18 @@ class Log(object):
                                    'timeout'])
         self.__summary = collections.defaultdict(lambda: 0)
         self.__lastlength = 0
+        self.__tty = sys.stdout.isatty()
 
-        self.__output = "[{percent}] {summary} {running}\r"
+        self.__output = "[{percent}] {summary} {running}"
+
+        # Some automation tools (e.g, Jenkins) will buffer all output until
+        # newline, so don't use carriage return character if the stdout is not
+        # a TTY.
+        if self.__tty:
+            self.__output += "\r"
+        else:
+            self.__output += "\n"
+
         if verbose:
             self.__output = "{result} :: {name}\n" + self.__output
 
@@ -53,13 +63,14 @@ class Log(object):
     def _write_output(self, output):
         """ write the output to stdout, ensuring any previous line is cleared """
 
-        length = len(output)
-        if self.__lastlength > length:
-            output = "{0}{1}{2}".format(output[:-1],
-                                        " " * (self.__lastlength - length),
-                                        output[-1])
+        if self.__tty:
+            length = len(output)
+            if self.__lastlength > length:
+                output = "{0}{1}{2}".format(output[:-1],
+                                            " " * (self.__lastlength - length),
+                                            output[-1])
 
-        self.__lastlength = length
+            self.__lastlength = length
 
         sys.stdout.write(output)
 
