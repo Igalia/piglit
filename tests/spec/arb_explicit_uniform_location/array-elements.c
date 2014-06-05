@@ -34,7 +34,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_core_version = 33;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -52,6 +52,7 @@ static const char vs_text[] =
 	"}";
 
 static const char fs_text[] =
+	"#version 330\n"
 	"#extension GL_ARB_explicit_uniform_location: require\n"
 	"#define ARRAY_SIZE 16\n"
 	"layout(location = 1) uniform float r;\n"

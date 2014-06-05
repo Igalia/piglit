@@ -2,10 +2,11 @@
 # Tests setting 2 different explicit locations to same uniform variable.
 
 [require]
-GLSL >= 1.10
+GLSL >= 3.30
 GL_ARB_explicit_uniform_location
 
 [vertex shader]
+#version 330
 #extension GL_ARB_explicit_uniform_location: require
 layout(location = 0) uniform vec4 foo;
 vec4 vertex;
@@ -15,6 +16,7 @@ void main()
 }
 
 [fragment shader]
+#version 330
 #extension GL_ARB_explicit_uniform_location: require
 layout(location = 1) uniform vec4 foo;
 void main()

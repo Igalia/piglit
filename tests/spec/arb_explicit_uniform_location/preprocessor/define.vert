@@ -1,10 +1,10 @@
 // [config]
 // expect_result: pass
-// glsl_version: 1.10
+// glsl_version: 3.30
 // require_extensions: GL_ARB_explicit_uniform_location
 // [end config]
 
-#version 110
+#version 330
 #extension GL_ARB_explicit_uniform_location: require
 
 #if !defined GL_ARB_explicit_uniform_location
