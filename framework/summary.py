@@ -27,6 +27,7 @@ import shutil
 import collections
 import tempfile
 import datetime
+import re
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
@@ -38,6 +39,11 @@ import framework.core as core
 __all__ = [
     'Summary',
 ]
+
+
+def escape_filename(key):
+    """Avoid reserved characters in filenames."""
+    return re.sub(r'[<>:"|?*]', '_', key)
 
 
 class HTMLIndex(list):
@@ -122,7 +128,7 @@ class HTMLIndex(list):
 
             # Split the group names and test names, then determine
             # which groups to close and which to open
-            openList = key.split('/')
+            openList = key.replace('\\', '/').split('/')
             test = openList.pop()
             openList, closeList = returnList(openList, list(currentDir))
 
@@ -171,6 +177,8 @@ class HTMLIndex(list):
                         href = path.dirname(key)
                 except KeyError:
                     href = key
+
+                href = escape_filename(href)
 
                 try:
                     self._testResult(each.name, href,
@@ -454,7 +462,8 @@ class Summary:
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
-                temp_path = path.join(destination, each.name, path.dirname(key))
+                html_path = path.join(destination, each.name, escape_filename(key + ".html"))
+                temp_path = path.dirname(html_path)
 
                 if value['result'] not in exclude:
                     # os.makedirs is very annoying, it throws an OSError if
@@ -469,8 +478,7 @@ class Summary:
                     if value.get('time') is not None:
                         value['time'] = datetime.timedelta(0, value['time'])
 
-                    with open(path.join(destination, each.name, key + ".html"),
-                              'w') as out:
+                    with open(html_path, 'w') as out:
                         out.write(testfile.render(
                             testname=key,
                             value=value,
