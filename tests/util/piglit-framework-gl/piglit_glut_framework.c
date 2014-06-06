@@ -93,6 +93,14 @@ default_reshape_func(int w, int h)
 }
 
 static void
+error_func(const char *fmt, va_list ap)
+{
+	vfprintf(stderr, fmt, ap);
+	fprintf(stderr, "\n");
+	piglit_report_result(PIGLIT_SKIP);
+}
+
+static void
 init_glut(void)
 {
 	const struct piglit_gl_test_config *test_config = glut_fw.gl_fw.test_config;
@@ -121,6 +129,7 @@ init_glut(void)
 	glutInitDisplayMode(flags);
 
 #ifdef GLUT_CORE_PROFILE
+	glutInitErrorFunc(error_func);
 	if (test_config->supports_gl_core_version) {
 		glutInitContextVersion(test_config->supports_gl_core_version / 10,
 				       test_config->supports_gl_core_version % 10);
@@ -129,6 +138,8 @@ init_glut(void)
 		glutInitContextVersion(test_config->supports_gl_compat_version / 10,
 				       test_config->supports_gl_compat_version % 10);
 	}
+#else
+	(void)error_func;
 #endif
 
 	glut_fw.window = glutCreateWindow("Piglit");
