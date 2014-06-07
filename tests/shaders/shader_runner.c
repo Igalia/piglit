@@ -184,6 +184,9 @@ lookup_enum_string(const struct string_to_enum *table, const char **line,
 bool
 compare(float ref, float value, enum comparison cmp);
 
+static bool
+compare_uint(GLuint ref, GLuint value, enum comparison cmp);
+
 static void
 version_init(struct component_version *v, enum version_tag tag, bool es, unsigned num)
 {
@@ -420,6 +423,21 @@ compare(float ref, float value, enum comparison cmp)
 	return false;
 }
 
+static bool
+compare_uint(GLuint ref, GLuint value, enum comparison cmp)
+{
+	switch (cmp) {
+	case equal:         return value == ref;
+	case not_equal:     return value != ref;
+	case less:          return value <  ref;
+	case greater_equal: return value >= ref;
+	case greater:       return value >  ref;
+	case less_equal:    return value <= ref;
+	}
+
+	assert(!"Should not get here.");
+	return false;
+}
 
 /**
  * Get the string representation of a comparison operator
@@ -1985,6 +2003,38 @@ bind_vao_if_supported()
 	}
 }
 
+static bool
+probe_atomic_counter(GLint counter_num, const char *op, uint32_t value)
+{
+        uint32_t *p;
+	enum comparison cmp;
+	bool result;
+
+	process_comparison(op, &cmp);
+
+	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
+	p = glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, counter_num * sizeof(uint32_t),
+			     sizeof(uint32_t), GL_MAP_READ_BIT);
+
+        if (!p) {
+                printf("Couldn't map atomic counter to verify expected value.\n");
+                return false;
+        }
+
+	result = compare_uint(value, *p, cmp);
+
+	if (!result) {
+		printf("Atomic counter %d test failed: Reference %s Observed\n",
+		       counter_num, comparison_string(cmp));
+		printf("  Reference: %u\n", value);
+		printf("  Observed:  %u\n", *p);
+		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+		return false;
+        }
+
+        glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+        return true;
+}
 
 enum piglit_result
 piglit_display(void)
@@ -2135,6 +2185,12 @@ piglit_display(void)
 			if (!piglit_probe_pixel_rgba((int) c[0], (int) c[1],
 						    & c[2])) {
 				pass = false;
+			}
+		} else if (sscanf(line,
+				  "probe atomic counter %d %s %d",
+				  &x, s, &y) == 3) {
+			if (!probe_atomic_counter(x, s, y)) {
+				piglit_report_result(PIGLIT_FAIL);
 			}
 		} else if (sscanf(line,
 				  "relative probe rgba ( %f , %f ) "
