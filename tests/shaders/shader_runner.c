@@ -113,6 +113,7 @@ GLuint *uniform_block_bos;
 GLenum geometry_layout_input_type = GL_TRIANGLES;
 GLenum geometry_layout_output_type = GL_TRIANGLE_STRIP;
 GLint geometry_layout_vertices_out = 0;
+GLuint atomics_bo = 0;
 
 char *shader_string;
 GLint shader_string_size;
@@ -2005,7 +2006,15 @@ piglit_display(void)
 
 		line = eat_whitespace(line);
 
-		if (string_match("clear color", line)) {
+		if (sscanf(line, "atomic counters %d", &x) == 1) {
+			GLuint *atomics_buf = calloc(x, sizeof(GLuint));
+			glGenBuffers(1, &atomics_bo);
+			glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, atomics_bo);
+			glBufferData(GL_ATOMIC_COUNTER_BUFFER,
+				     sizeof(GLuint) * x,
+				     atomics_buf, GL_STATIC_DRAW);
+			free(atomics_buf);
+		} else if (string_match("clear color", line)) {
 			get_floats(line + 11, c, 4);
 			glClearColor(c[0], c[1], c[2], c[3]);
 			clear_bits |= GL_COLOR_BUFFER_BIT;
