@@ -28,11 +28,13 @@ in a single place.
 import os
 import shutil
 import tempfile
+import functools
 from contextlib import contextmanager
 try:
     import simplejson as json
 except ImportError:
     import json
+import nose.tools as nt
 
 
 __all__ = [
@@ -106,3 +108,59 @@ def tempdir():
     tdir = tempfile.mkdtemp()
     yield tdir
     shutil.rmtree(tdir)
+
+
+@nt.nottest
+class GeneratedTestWrapper(object):
+    """ An object proxy for nose test instances
+
+    Nose uses python generators to create test generators, the drawback of this
+    is that unless the generator is very specifically engineered it yeilds the
+    same instance multiple times. Since nose uses an instance attribute to
+    display the name of the test on a failure, and it prints the failure
+    dialogue after the run is complete all failing tests from a single
+    generator will end up with the name of the last test generated. This
+    generator is used in conjunction with the nose_generator() decorator to
+    create multiple objects each with a unique description attribute, working
+    around the bug.
+    Upstream bug: https://code.google.com/p/python-nose/issues/detail?id=244
+
+    This uses functoos.update_wrapper to proxy the underlying object, and
+    provides a __call__ method (which allows it to be called like a function)
+    that calls the underling function.
+
+    This class can also be used to wrap a class, but that class needs to
+    provide a __call__ method, and use that to return results.
+
+    Arguments:
+    wrapped -- A function or function-like-class
+
+    """
+    def __init__(self, wrapped):
+        self._wrapped = wrapped
+        functools.update_wrapper(self, self._wrapped)
+
+    def __call__(self, *args, **kwargs):
+        """ calls the wrapped function
+
+        Arguments:
+        *args -- arguments to be passed to the wrapped function
+        **kwargs -- keyword arguments to be passed to the wrapped function
+        """
+        return self._wrapped(*args, **kwargs)
+
+
+def nose_generator(func):
+    """ Decorator for nose test generators to us GeneratedTestWrapper
+
+    This decorator replaces each function yeilded by a test generator with a
+    GeneratedTestWrapper reverse-proxy object
+
+    """
+    def test_wrapper(*args, **kwargs):
+        for x in func(*args, **kwargs):
+            x = list(x)
+            x[0] = GeneratedTestWrapper(x[0])
+            yield tuple(x)  # This must be a tuple for some reason
+
+    return test_wrapper
