@@ -160,6 +160,8 @@ class _Writer:
                 pass
             elif success == status.SKIP:
                 self.report.addSkipped()
+            elif success == status.CRASH:
+                self.report.addError(success.name)
             else:
                 self.report.addFailure(success.name)
 
