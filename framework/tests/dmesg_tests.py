@@ -61,6 +61,30 @@ def _write_dev_kmesg():
         raise SkipTest("Writing to the ringbuffer failed")
 
 
+class DummyJsonWriter(object):
+    """ A very simple dummy for json writer """
+    def __init__(self):
+        pass
+
+    def write_dict_item(self, path, result):
+        self.result = result
+
+
+class DummyLog(object):
+    """ A very smiple dummy for the Logger """
+    def __init__(self):
+        pass
+
+    def pre_log(self, *args):
+        return None
+
+    def log(self, *args):
+        pass
+
+    def post_log(self, *args):
+        pass
+
+
 def test_linux_initialization():
     """ Test that LinuxDmesg initializes """
     LinuxDmesg()
@@ -288,27 +312,6 @@ def check_classes_dmesg(test_class, test_args):
     if not os.path.exists('bin'):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
-
-    class DummyJsonWriter(object):
-        """ A very simple dummy for json writer """
-        def __init__(self):
-            pass
-
-        def write_dict_item(self, path, result):
-            self.result = result
-
-    class DummyLog(object):
-        def __init__(self):
-            pass
-
-        def pre_log(self, *args):
-            return None
-
-        def log(self, *args):
-            pass
-
-        def post_log(self, *args):
-            pass
 
     def _write_dmesg():
         """ Small helper to write dmesg """
