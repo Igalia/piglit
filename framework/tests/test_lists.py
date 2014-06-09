@@ -29,21 +29,21 @@ es3conform, etc)
 import importlib
 import os.path as path
 from nose.plugins.skip import SkipTest
+import framework.tests.utils as utils
 
 
+@utils.nose_generator
 def gen_test_import():
     """ Generates a bunch of tests to import the various test modules """
-    yieldable = check_import
-
     # Test the various OpenGL modules
     for module in ['all', 'quick', 'gpu', 'sanity', 'r500', 'r300']:
-        yieldable.description = "Test import of tests.{}".format(module)
-        yield yieldable, "tests." + module
+        check_import.description = "Test import of tests.{}".format(module)
+        yield check_import, "tests." + module
 
     # Test the various OpenCL modules
     for module in ['cl', 'all_cl', 'quick_cl']:
-        yieldable.description = "Test import of tests.{}".format(module)
-        yield yieldable, "tests." + module
+        check_import.description = "Test import of tests.{}".format(module)
+        yield check_import, "tests." + module
 
 
 def check_import(module):
