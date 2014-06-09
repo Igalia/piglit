@@ -313,15 +313,11 @@ def check_classes_dmesg(test_class, test_args):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
 
-    def _write_dmesg():
-        """ Small helper to write dmesg """
-        subprocess.call(['sudo', 'sh', '-c', 'echo "piglit test" > /dev/kmsg'])
-
     dmesg = _get_dmesg()
 
     # Create the test and then write to dmesg to ensure that it actually works
     test = test_class(test_args)
-    test._test_hook_execute_run = _write_dmesg
+    test._test_hook_execute_run = _write_dev_kmesg
 
     json = DummyJsonWriter()
 
