@@ -56,7 +56,8 @@ def _write_dev_kmesg():
 
     If we anything goes wrong here just skip.
     """
-    err = subprocess.call(['sudo', 'sh', '-c', 'echo "piglit dmesg test" > /dev/kmsg'])
+    err = subprocess.call(['sudo', 'sh', '-c',
+                           'echo "piglit dmesg test" > /dev/kmsg'])
     if err != 0:
         raise SkipTest("Writing to the ringbuffer failed")
 
@@ -64,9 +65,9 @@ def _write_dev_kmesg():
 class DummyJsonWriter(object):
     """ A very simple dummy for json writer """
     def __init__(self):
-        pass
+        self.result = None
 
-    def write_dict_item(self, path, result):
+    def write_dict_item(self, _, result):
         self.result = result
 
 
@@ -99,8 +100,8 @@ def test_get_dmesg_dummy():
     """ Test that get_dmesg function returns a Dummy when asked """
     dummy = dmesg.get_dmesg(not_dummy=False)
     nt.assert_is(type(dummy), dmesg.DummyDmesg,
-                 msg="Error: get_dmesg should have returned DummyDmesg, "
-                     "but it actually returned {}".format(type(dummy)))
+                 msg=("Error: get_dmesg should have returned DummyDmesg, "
+                      "but it actually returned {}".format(type(dummy))))
 
 
 def test_get_dmesg_linux():
@@ -109,8 +110,8 @@ def test_get_dmesg_linux():
         raise SkipTest("Cannot test a LinuxDmesg on a non linux system")
     posix = _get_dmesg()
     nt.assert_is(type(posix), dmesg.LinuxDmesg,
-                 msg="Error: get_dmesg should have returned LinuxDmesg, "
-                     "but it actually returned {}".format(type(posix)))
+                 msg=("Error: get_dmesg should have returned LinuxDmesg, "
+                      "but it actually returned {}".format(type(posix))))
 
 
 def sudo_test_update_dmesg():
@@ -130,8 +131,8 @@ def sudo_test_update_dmesg():
 
     test.update_dmesg()
     nt.assert_is_not_none(test._new_messages,
-                          msg="LinuxDmesg does not return updates, even when "
-                              "dmesg has been updated.")
+                          msg=("LinuxDmesg does not return updates, even when "
+                               "dmesg has been updated."))
 
 
 def test_dmesg_wrap_partial():
@@ -158,8 +159,8 @@ def test_dmesg_wrap_partial():
     test.update_dmesg()
 
     nt.assert_items_equal(test._new_messages, ['d'],
-                          msg="_new_messages should be equal to ['d'], but is "
-                              "{} instead.".format(test._new_messages))
+                          msg=("_new_messages should be equal to ['d'], but is"
+                               " {} instead.".format(test._new_messages)))
 
 
 def test_dmesg_wrap_complete():
@@ -181,9 +182,9 @@ def test_dmesg_wrap_complete():
     test.update_dmesg()
 
     nt.assert_items_equal(test._new_messages, ['1', '2', '3'],
-                          msg="_new_messages should be equal to "
-                              "['1', '2', '3'], but is {} instead".format(
-                                  test._new_messages))
+                          msg=("_new_messages should be equal to "
+                               "['1', '2', '3'], but is {} instead".format(
+                                   test._new_messages)))
 
 
 @utils.privileged_test
@@ -240,8 +241,9 @@ def check_equal_result(result, status):
 
     """
 
-    nt.assert_equal(result, status, msg="status should not have changed "
-                                        "from {} to {}".format(status, result))
+    nt.assert_equal(result, status,
+                    msg="status should not have changed from {} to {}".format(
+                        status, result))
 
 
 def check_update_result(result, status):
@@ -257,12 +259,12 @@ def check_update_result(result, status):
                         msg="pass should be replaced with dmesg-warn")
     elif status in ['warn', 'fail']:
         nt.assert_equal(result, 'dmesg-fail',
-                        msg="{} should be replaced with "
-                            "dmesg-fail".format(status))
+                        msg="{} should be replaced with dmesg-fail".format(
+                            status))
     else:
         nt.assert_equal(result, status,
-                        msg="{} should not have changed, but it "
-                            "did.".format(result))
+                        msg="{} should not have changed, but it did.".format(
+                            result))
 
 
 def test_update_result_add_dmesg():
