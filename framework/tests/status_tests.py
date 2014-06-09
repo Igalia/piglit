@@ -28,6 +28,7 @@ etc
 import itertools
 import nose.tools as nt
 import framework.status as status
+import framework.tests.utils as utils
 
 # Statuses from worst to last. NotRun is intentionally not in this list and
 # tested separately because of upcoming features for it
@@ -71,13 +72,12 @@ def check_lookup(stat):
     assert stt
 
 
+@utils.nose_generator
 def test_gen_lookup():
     """ Generator that attempts to do a lookup on all statuses """
-    yieldable = check_lookup
-
     for stat in STATUSES + ['skip', 'notrun']:
-        yieldable.description = "Lookup: {}".format(stat)
-        yield yieldable, stat
+        check_lookup.description = "Lookup: {}".format(stat)
+        yield check_lookup, stat
 
 
 def test_status_in():
@@ -103,34 +103,31 @@ def is_not_equivalent(new, old):
     assert status.status_lookup(new) != status.status_lookup(old)
 
 
+@utils.nose_generator
 def test_is_regression():
     """ Generate all tests for regressions """
-    yieldable = is_regression
-
     for new, old in REGRESSIONS:
-        yieldable.description = ("Test that {0} -> {1} is a "
-                                 "regression".format(old, new))
-        yield yieldable, new, old
+        is_regression.description = ("Test that {0} -> {1} is a "
+                                     "regression".format(old, new))
+        yield is_regression, new, old
 
 
+@utils.nose_generator
 def test_is_fix():
     """ Generates all tests for fixes """
-    yieldable = is_fix
-
     for new, old in FIXES:
-        yieldable.description = ("Test that {0} -> {1} is a "
-                                 "fix".format(new, old))
-        yield yieldable, new, old
+        is_fix.description = ("Test that {0} -> {1} is a "
+                              "fix".format(new, old))
+        yield is_fix, new, old
 
 
+@utils.nose_generator
 def test_is_change():
     """ Test that status -> !status is a change """
-    yieldable = is_not_equivalent
-
     for new, old in itertools.permutations(STATUSES, 2):
-        yieldable.description = ("Test that {0} -> {1} is a "
-                                 "change".format(new, old))
-        yield yieldable, new, old
+        is_not_equivalent.description = ("Test that {0} -> {1} is a "
+                                         "change".format(new, old))
+        yield is_not_equivalent, new, old
 
 
 def check_not_change(new, old):
@@ -149,14 +146,14 @@ def check_not_change(new, old):
                         "but shouldn't be".format(**locals()))
 
 
+@utils.nose_generator
 def test_not_change():
     """ Skip and NotRun should not count as changes """
-    yieldable = check_not_change
-
     for nochange, stat in itertools.permutations(NO_OPS, 2):
-        yieldable.description = "{0} -> {1} should not be a change".format(
-                nochange, stat)
-        yield yieldable, status.status_lookup(nochange), status.status_lookup(stat)
+        check_not_change.description = \
+            "{0} -> {1} should not be a change".format(nochange, stat)
+        yield (check_not_change, status.status_lookup(nochange),
+               status.status_lookup(stat))
 
 
 def test_max_statuses():
