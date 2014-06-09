@@ -26,12 +26,12 @@ import subprocess
 import re
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
-from framework.dmesg import DummyDmesg, LinuxDmesg, get_dmesg
-from framework.core import TestResult, PiglitJSONEncoder
-from framework.exectest import PiglitTest
-from framework.gleantest import GleanTest
-from framework.shader_test import ShaderTest
-from framework.glsl_parser_test import GLSLParserTest
+import framework.dmesg as dmesg
+import framework.core
+import framework.exectest
+import framework.gleantest
+import framework.shader_test
+import framework.glsl_parser_test
 import framework.tests.utils as utils
 
 
@@ -41,8 +41,8 @@ def _get_dmesg():
     If we are on a non-posix system we will get a dummy dmesg, go ahead and
     skip in that case
     """
-    test = get_dmesg()
-    if isinstance(test, DummyDmesg):
+    test = dmesg.get_dmesg()
+    if isinstance(test, dmesg.DummyDmesg):
         raise SkipTest("A DummyDmesg was returned, testing dmesg impossible.")
     return test
 
@@ -87,18 +87,18 @@ class DummyLog(object):
 
 def test_linux_initialization():
     """ Test that LinuxDmesg initializes """
-    LinuxDmesg()
+    dmesg.LinuxDmesg()
 
 
 def test_dummy_initialization():
     """ Test that DummyDmesg initializes """
-    DummyDmesg()
+    dmesg.DummyDmesg()
 
 
 def test_get_dmesg_dummy():
     """ Test that get_dmesg function returns a Dummy when asked """
-    dummy = get_dmesg(not_dummy=False)
-    nt.assert_is(type(dummy), DummyDmesg,
+    dummy = dmesg.get_dmesg(not_dummy=False)
+    nt.assert_is(type(dummy), dmesg.DummyDmesg,
                  msg="Error: get_dmesg should have returned DummyDmesg, "
                      "but it actually returned {}".format(type(dummy)))
 
@@ -108,7 +108,7 @@ def test_get_dmesg_linux():
     if not sys.platform.startswith('linux'):
         raise SkipTest("Cannot test a LinuxDmesg on a non linux system")
     posix = _get_dmesg()
-    nt.assert_is(type(posix), LinuxDmesg,
+    nt.assert_is(type(posix), dmesg.LinuxDmesg,
                  msg="Error: get_dmesg should have returned LinuxDmesg, "
                      "but it actually returned {}".format(type(posix)))
 
@@ -148,7 +148,7 @@ def test_dmesg_wrap_partial():
     # We don't want weird side effects of changing DMESG_COMMAND globally, so
     # instead we set it as a class instance and manually clear the
     # _last_messages attribute
-    test = LinuxDmesg()
+    test = dmesg.LinuxDmesg()
     test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
     test.update_dmesg()
 
@@ -171,7 +171,7 @@ def test_dmesg_wrap_complete():
     # We don't want weird side effects of changing DMESG_COMMAND globally, so
     # instead we set it as a class instance and manually clear the
     # _last_messages attribute
-    test = LinuxDmesg()
+    test = dmesg.LinuxDmesg()
     test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
     test.update_dmesg()
 
@@ -192,7 +192,7 @@ def test_update_result_replace():
     """ Generates tests for update_result """
 
     def create_test_result(res):
-        result = TestResult()
+        result = framework.core.TestResult()
         result['result'] = res
         result['subtest'] = {}
         result['subtest']['test'] = res
@@ -269,7 +269,7 @@ def test_update_result_add_dmesg():
     """ Tests update_result's addition of dmesg attribute """
     test = _get_dmesg()
 
-    result = TestResult()
+    result = framework.core.TestResult()
     result['result'] = 'pass'
 
     _write_dev_kmesg()
@@ -283,25 +283,26 @@ def test_json_serialize_updated_result():
     """ Test that a TestResult that has been updated is json serializable """
     test = _get_dmesg()
 
-    result = TestResult()
+    result = framework.core.TestResult()
     result['result'] = 'pass'
 
     _write_dev_kmesg()
     result = test.update_result(result)
 
-    encoder = PiglitJSONEncoder()
+    encoder = framework.core.PiglitJSONEncoder()
     encoder.encode(result)
 
 
 @utils.nose_generator
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
-    lists = [(PiglitTest, ['attribs', '-auto', '-fbo'], 'PiglitTest'),
-             (GleanTest, 'basic', "GleanTest"),
-             (ShaderTest, 'tests/shaders/loopfunc.shader_test',
-              'ShaderTest'),
-             (GLSLParserTest, 'tests/glslparsertest/shaders/main1.vert',
-              'GLSLParserTest')]
+    lists = [(framework.exectest.PiglitTest,
+              ['attribs', '-auto', '-fbo'], 'PiglitTest'),
+             (framework.gleantest.GleanTest, 'basic', "GleanTest"),
+             (framework.shader_test.ShaderTest,
+              'tests/shaders/loopfunc.shader_test', 'ShaderTest'),
+             (framework.glsl_parser_test.GLSLParserTest,
+              'tests/glslparsertest/shaders/main1.vert', 'GLSLParserTest')]
 
     for tclass, tfile, desc in lists:
         check_classes_dmesg.description = "Test dmesg in {}".format(desc)
