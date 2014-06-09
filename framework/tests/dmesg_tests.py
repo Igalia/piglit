@@ -289,7 +289,7 @@ def check_classes_dmesg(test_class, test_args):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
 
-    class DummyJsonWriter():
+    class DummyJsonWriter(object):
         """ A very simple dummy for json writer """
         def __init__(self):
             pass
@@ -301,13 +301,13 @@ def check_classes_dmesg(test_class, test_args):
         def __init__(self):
             pass
 
-        def pre_log(*args):
+        def pre_log(self, *args):
             return None
 
-        def log(*args):
+        def log(self, *args):
             pass
 
-        def post_log(*args):
+        def post_log(self, *args):
             pass
 
     def _write_dmesg():
