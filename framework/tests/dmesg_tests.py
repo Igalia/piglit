@@ -125,11 +125,11 @@ def sudo_test_update_dmesg():
     get sudo it will skip.
 
     """
-    dmesg = _get_dmesg()
+    test = _get_dmesg()
     _write_dev_kmesg()
 
-    dmesg.update_dmesg()
-    nt.assert_is_not_none(dmesg._new_messages,
+    test.update_dmesg()
+    nt.assert_is_not_none(test._new_messages,
                           msg="LinuxDmesg does not return updates, even when "
                               "dmesg has been updated.")
 
@@ -148,18 +148,18 @@ def test_dmesg_wrap_partial():
     # We don't want weird side effects of changing DMESG_COMMAND globally, so
     # instead we set it as a class instance and manually clear the
     # _last_messages attribute
-    dmesg = LinuxDmesg()
-    dmesg.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
-    dmesg.update_dmesg()
+    test = LinuxDmesg()
+    test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
+    test.update_dmesg()
 
     # Update the DMESG_COMMAND to add d\n and remove a\n, this simluates the
     # wrap
-    dmesg.DMESG_COMMAND = ['echo', 'b\nc\nd\n']
-    dmesg.update_dmesg()
+    test.DMESG_COMMAND = ['echo', 'b\nc\nd\n']
+    test.update_dmesg()
 
-    nt.assert_items_equal(dmesg._new_messages, ['d'],
+    nt.assert_items_equal(test._new_messages, ['d'],
                           msg="_new_messages should be equal to ['d'], but is "
-                              "{} instead.".format(dmesg._new_messages))
+                              "{} instead.".format(test._new_messages))
 
 
 def test_dmesg_wrap_complete():
@@ -171,19 +171,19 @@ def test_dmesg_wrap_complete():
     # We don't want weird side effects of changing DMESG_COMMAND globally, so
     # instead we set it as a class instance and manually clear the
     # _last_messages attribute
-    dmesg = LinuxDmesg()
-    dmesg.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
-    dmesg.update_dmesg()
+    test = LinuxDmesg()
+    test.DMESG_COMMAND = ['echo', 'a\nb\nc\n']
+    test.update_dmesg()
 
     # Udamte the DMESG_COMMAND to add d\n and remove a\n, this simluates the
     # wrap
-    dmesg.DMESG_COMMAND = ['echo', '1\n2\n3\n']
-    dmesg.update_dmesg()
+    test.DMESG_COMMAND = ['echo', '1\n2\n3\n']
+    test.update_dmesg()
 
-    nt.assert_items_equal(dmesg._new_messages, ['1', '2', '3'],
+    nt.assert_items_equal(test._new_messages, ['1', '2', '3'],
                           msg="_new_messages should be equal to "
                               "['1', '2', '3'], but is {} instead".format(
-                                  dmesg._new_messages))
+                                  test._new_messages))
 
 
 @utils.privileged_test
@@ -267,13 +267,13 @@ def check_update_result(result, status):
 
 def test_update_result_add_dmesg():
     """ Tests update_result's addition of dmesg attribute """
-    dmesg = _get_dmesg()
+    test = _get_dmesg()
 
     result = TestResult()
     result['result'] = 'pass'
 
     _write_dev_kmesg()
-    result = dmesg.update_result(result)
+    result = test.update_result(result)
 
     nt.assert_in('dmesg', result,
                  msg="result does not have dmesg member but should")
@@ -281,13 +281,13 @@ def test_update_result_add_dmesg():
 
 def test_json_serialize_updated_result():
     """ Test that a TestResult that has been updated is json serializable """
-    dmesg = _get_dmesg()
+    test = _get_dmesg()
 
     result = TestResult()
     result['result'] = 'pass'
 
     _write_dev_kmesg()
-    result = dmesg.update_result(result)
+    result = test.update_result(result)
 
     encoder = PiglitJSONEncoder()
     encoder.encode(result)
@@ -314,7 +314,7 @@ def check_classes_dmesg(test_class, test_args):
         raise SkipTest("This tests requires a working, built version of "
                        "piglit")
 
-    dmesg = _get_dmesg()
+    test = _get_dmesg()
 
     # Create the test and then write to dmesg to ensure that it actually works
     test = test_class(test_args)
@@ -322,7 +322,7 @@ def check_classes_dmesg(test_class, test_args):
 
     json = DummyJsonWriter()
 
-    test.execute(None, DummyLog(), json, dmesg)
+    test.execute(None, DummyLog(), json, test)
 
     nt.assert_in(json.result['result'], ['dmesg-warn', 'dmesg-fail'],
                  msg="{0} did not update status with dmesg".format(type(test)))
