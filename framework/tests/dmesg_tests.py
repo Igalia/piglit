@@ -113,7 +113,7 @@ def test_get_dmesg_linux():
                      "but it actually returned {}".format(type(posix)))
 
 
-def test_update_dmesg():
+def sudo_test_update_dmesg():
     """ Tests that update_dmesg actually updates
 
     This will skip on non-Posix systems, since there is no way to actually test
@@ -186,6 +186,7 @@ def test_dmesg_wrap_complete():
                                   dmesg._new_messages))
 
 
+@utils.privileged_test
 @utils.nose_generator
 def test_update_result_replace():
     """ Generates tests for update_result """

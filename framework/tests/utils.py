@@ -164,3 +164,16 @@ def nose_generator(func):
             yield tuple(x)  # This must be a tuple for some reason
 
     return test_wrapper
+
+
+def privileged_test(func):
+    """ Wrapper to name the tests as sudo
+
+    This makes the name of the function contain sudo, which is useful for
+    excluding tests with privileged execution requirements
+
+    """
+    def sudo_wrapper(*args, **kwargs):
+        func(*args, **kwargs)
+
+    return sudo_wrapper
