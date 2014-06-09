@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (ext_packed_depth_stencil-depth-stencil-texture depth-stencil-texture.c)
 piglit_add_executable (ext_packed_depth_stencil-errors errors.c)
+piglit_add_executable (ext_packed_depth_stencil-readdrawpixels readdrawpixels.c)
 piglit_add_executable (ext_packed_depth_stencil-readpixels-24_8 readpixels-24_8.c)
 piglit_add_executable (ext_packed_depth_stencil-getteximage getteximage.c)
 
