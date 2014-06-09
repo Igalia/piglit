@@ -128,8 +128,12 @@ init_glut(void)
 	                   test_config->window_height);
 	glutInitDisplayMode(flags);
 
-#ifdef GLUT_CORE_PROFILE
+#ifdef PIGLIT_USE_GLUT_INIT_ERROR_FUNC
 	glutInitErrorFunc(error_func);
+#else
+	(void)error_func;
+#endif
+#ifdef GLUT_CORE_PROFILE
 	if (test_config->supports_gl_core_version) {
 		glutInitContextVersion(test_config->supports_gl_core_version / 10,
 				       test_config->supports_gl_core_version % 10);
@@ -138,8 +142,6 @@ init_glut(void)
 		glutInitContextVersion(test_config->supports_gl_compat_version / 10,
 				       test_config->supports_gl_compat_version % 10);
 	}
-#else
-	(void)error_func;
 #endif
 
 	glut_fw.window = glutCreateWindow("Piglit");
