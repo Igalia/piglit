@@ -36,6 +36,7 @@ def test_initialize_summary():
         assert test
 
 
+@utils.nose_generator
 def test_summary_add_to_set():
     """ Generate tests for testing Summary.test sets """
     old = copy.deepcopy(utils.JSON_DATA)
@@ -76,6 +77,7 @@ def check_sets(old, ostat, new, nstat, set_):
                             msg="{0} was not appended".format(set_))
 
 
+@utils.nose_generator
 def test_subtest_handling():
     data = copy.deepcopy(utils.JSON_DATA)
     data['tests']['with_subtests'] = {}
