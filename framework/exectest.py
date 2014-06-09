@@ -155,21 +155,7 @@ class Test(object):
         self.result['result'] = 'fail'
         self.interpret_result()
 
-        crash_codes = [
-            # Unix: terminated by a signal
-            -5,   # SIGTRAP
-            -6,   # SIGABRT
-            -8,   # SIGFPE  (Floating point exception)
-            -10,  # SIGUSR1
-            -11,  # SIGSEGV (Segmentation fault)
-            # Windows:
-            # EXCEPTION_ACCESS_VIOLATION (0xc0000005):
-            -1073741819,
-            # EXCEPTION_INT_DIVIDE_BY_ZERO (0xc0000094):
-            -1073741676
-        ]
-
-        if self.result['returncode'] in crash_codes:
+        if self.result['returncode'] < 0:
             self.result['result'] = 'crash'
         elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
             self.result['result'] = 'warn'
