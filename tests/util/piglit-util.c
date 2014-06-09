@@ -307,9 +307,13 @@ exception_handler(PEXCEPTION_POINTERS pExceptionInfo)
 		return EXCEPTION_CONTINUE_SEARCH;
 	}
 
-	fprintf(stderr, "warning: uncaught exception 0x%08lx\n", pExceptionRecord->ExceptionCode);
+	fflush(stdout);
+	fprintf(stderr, "error: uncaught exception 0x%08lx\n",
+		pExceptionRecord->ExceptionCode);
+	fflush(stderr);
 
-	TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
+	TerminateProcess(GetCurrentProcess(),
+			 pExceptionRecord->ExceptionCode);
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
