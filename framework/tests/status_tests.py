@@ -156,14 +156,30 @@ def test_not_change():
                status.status_lookup(stat))
 
 
+@utils.nose_generator
 def test_max_statuses():
     """ Verify that max() works between skip and non-skip statuses """
     for nochange, stat in itertools.product(NO_OPS, STATUSES):
         nochange = status.status_lookup(nochange)
         stat = status.status_lookup(stat)
-        nt.assert_equal(
-            stat, max(nochange, stat),
-            msg="max({nochange}, {stat}) = {stat}".format(**locals()))
-        nt.assert_equal(
-            stat, max(stat, nochange),
-            msg="max({stat}, {nochange}) = {stat}".format(**locals()))
+        _max_nochange_stat.description = \
+            "max({nochange}, {stat}) = {stat}".format(**locals())
+        yield _max_nochange_stat, nochange, stat
+
+        _max_stat_nochange.description = \
+            "max({stat}, {nochange}) = {stat}".format(**locals())
+        yield _max_stat_nochange, nochange, stat
+
+
+def _max_nochange_stat(nochange, stat):
+    """ max(nochange, stat) should = stat """
+    nt.assert_equal(
+        stat, max(nochange, stat),
+        msg="max({nochange}, {stat}) = {stat}".format(**locals()))
+
+
+def _max_stat_nochange(nochange, stat):
+    """ max(stat, nochange) should = stat """
+    nt.assert_equal(
+        stat, max(stat, nochange),
+        msg="max({stat}, {nochange}) = {stat}".format(**locals()))
