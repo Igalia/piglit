@@ -32,6 +32,7 @@ from framework.exectest import PiglitTest
 from framework.gleantest import GleanTest
 from framework.shader_test import ShaderTest
 from framework.glsl_parser_test import GLSLParserTest
+import framework.tests.utils as utils
 
 
 def _get_dmesg():
@@ -163,6 +164,7 @@ def test_dmesg_wrap_complete():
                                   dmesg._new_messages))
 
 
+@utils.nose_generator
 def test_update_result_replace():
     """ Generates tests for update_result """
 
@@ -179,13 +181,12 @@ def test_update_result_replace():
         _write_dev_kmesg()
         new_result = dmesg.update_result(create_test_result(res))
 
-        # Create a yieldable and set the description for useful per-test names
-        yieldable = check_update_result
-        yieldable.description = "Test update_result: {0}".format(res)
-        yield yieldable, new_result['result'], res
+        check_update_result.description = "Test update_result: {0}".format(res)
+        yield check_update_result, new_result['result'], res
 
-        yieldable.description = "Test update_result subtest: {0}".format(res)
-        yield yieldable, new_result['subtest']['test'], res
+        check_update_result.description = \
+            "Test update_result subtest: {0}".format(res)
+        yield check_update_result, new_result['subtest']['test'], res
 
         # check that the status is not updated when Dmesg.regex is set and does
         # not match the dmesg output
@@ -193,10 +194,9 @@ def test_update_result_replace():
         _write_dev_kmesg()
         new_result = dmesg.update_result(create_test_result(res))
 
-        yieldable = check_equal_result
-        yieldable.description = ("Test update_result with non-matching regex: "
-                                 "{0}".format(res))
-        yield yieldable, new_result['result'], res
+        check_equal_result.description = \
+            "Test update_result with non-matching regex: {0}".format(res)
+        yield check_equal_result, new_result['result'], res
 
         # check that the status is updated when Dmesg.regex is set and matches
         # the dmesg output
@@ -204,10 +204,10 @@ def test_update_result_replace():
         _write_dev_kmesg()
         new_result = dmesg.update_result(create_test_result(res))
 
-        yieldable = check_update_result
-        yieldable.description = ("Test update_result with matching regex: "
-                                "{0} ".format(res))
-        yield yieldable, new_result['result'], res
+        check_update_result.description = \
+            "Test update_result with matching regex: {0} ".format(res)
+        yield check_update_result, new_result['result'], res
+
 
 def check_equal_result(result, status):
     """ Tests that the result and status are equal
@@ -219,6 +219,7 @@ def check_equal_result(result, status):
 
     nt.assert_equal(result, status, msg="status should not have changed "
                                         "from {} to {}".format(status, result))
+
 
 def check_update_result(result, status):
     """ Tests that update result replaces results correctly
@@ -263,6 +264,7 @@ def test_json_serialize_updated_result():
     encoded = encoder.encode(result)
 
 
+@utils.nose_generator
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
     lists = [(PiglitTest, ['attribs', '-auto', '-fbo'], 'PiglitTest'),
@@ -272,11 +274,9 @@ def test_testclasses_dmesg():
              (GLSLParserTest, 'tests/glslparsertest/shaders/main1.vert',
               'GLSLParserTest')]
 
-    yieldable = check_classes_dmesg
-
     for tclass, tfile, desc in lists:
-        yieldable.description = "Test dmesg in {}".format(desc)
-        yield yieldable, tclass, tfile
+        check_classes_dmesg.description = "Test dmesg in {}".format(desc)
+        yield check_classes_dmesg, tclass, tfile
 
 
 def check_classes_dmesg(test_class, test_args):
