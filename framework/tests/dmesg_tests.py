@@ -63,14 +63,12 @@ def _write_dev_kmesg():
 
 def test_linux_initialization():
     """ Test that LinuxDmesg initializes """
-    dmesg = LinuxDmesg()
-    assert dmesg
+    LinuxDmesg()
 
 
 def test_dummy_initialization():
     """ Test that DummyDmesg initializes """
-    dmesg = DummyDmesg()
-    assert dmesg
+    DummyDmesg()
 
 
 def test_get_dmesg_dummy():
@@ -254,14 +252,20 @@ def test_update_result_add_dmesg():
 
     nt.assert_in('dmesg', result,
                  msg="result does not have dmesg member but should")
-    return result
 
 
 def test_json_serialize_updated_result():
     """ Test that a TestResult that has been updated is json serializable """
+    dmesg = _get_dmesg()
+
+    result = TestResult()
+    result['result'] = 'pass'
+
+    _write_dev_kmesg()
+    result = dmesg.update_result(result)
+
     encoder = PiglitJSONEncoder()
-    result = test_update_result_add_dmesg()
-    encoded = encoder.encode(result)
+    encoder.encode(result)
 
 
 @utils.nose_generator
