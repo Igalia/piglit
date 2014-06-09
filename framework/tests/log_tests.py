@@ -25,6 +25,7 @@ import itertools
 from types import *  # This is a special * safe module
 import nose.tools as nt
 from framework.log import Log
+import framework.tests.utils as utils
 
 valid_statuses = ('pass', 'fail', 'crash', 'warn', 'dmesg-warn',
                   'dmesg-fail', 'skip', 'dry-run')
@@ -71,14 +72,13 @@ def check_post_log_increment_summary(stat):
                         "incremented".format(stat))
 
 
+@utils.nose_generator
 def test_post_log_increment_summary():
     """ Generator that creates tests for self.__summary """
-    yieldable = check_post_log_increment_summary
-
     for stat in valid_statuses:
-        yieldable.description = ("Test that Log.post_log increments "
-                                 "self._summary[{}]".format(stat))
-        yield yieldable, stat
+        check_post_log_increment_summary.description = \
+            "Test that Log.post_log increments self._summary[{}]".format(stat)
+        yield check_post_log_increment_summary, stat
 
 
 def test_post_log_removes_complete():
