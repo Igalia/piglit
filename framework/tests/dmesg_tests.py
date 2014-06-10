@@ -18,7 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Provides tests for the dmesg class """
+""" Provides tests for the dmesg class
+
+Tests that require sudo have sudo in their name, if you don't have sudo or
+don't want to run them use '-e sudo' with nosetests
+
+"""
 
 import os
 import sys
@@ -35,6 +40,7 @@ import framework.glsl_parser_test
 import framework.tests.utils as utils
 
 
+# Helpers
 def _get_dmesg():
     """ checks to ensure dmesg is not DummyDmesg, raises skip if it is
 
@@ -86,6 +92,13 @@ class DummyLog(object):
         pass
 
 
+class TestDmesg(dmesg.BaseDmesg):
+    """ A special implementation of Dmesg that is easy to test with """
+    def update_dmesg(self):
+        pass
+
+
+# Tests
 def test_linux_initialization():
     """ Test that LinuxDmesg initializes """
     dmesg.LinuxDmesg()
@@ -114,8 +127,8 @@ def test_get_dmesg_linux():
                       "but it actually returned {}".format(type(posix))))
 
 
-def sudo_test_update_dmesg():
-    """ Tests that update_dmesg actually updates
+def sudo_test_update_dmesg_with_updates():
+    """ update_dmesg() updates results when there is a new entry in dmesg
 
     This will skip on non-Posix systems, since there is no way to actually test
     it.
@@ -130,9 +143,28 @@ def sudo_test_update_dmesg():
     _write_dev_kmesg()
 
     test.update_dmesg()
-    nt.assert_is_not_none(test._new_messages,
-                          msg=("LinuxDmesg does not return updates, even when "
-                               "dmesg has been updated."))
+    nt.assert_not_equal(test._new_messages, [],
+                        msg=("{0} does not return updates, even when dmesg "
+                             "has been updated.".format(test.__class__)))
+
+
+def sudo_test_update_dmesg_without_updates():
+    """ update_dmesg() does not update results when there is no change in dmesg
+
+    This will skip on non-Posix systems, since there is no way to actually test
+    it.
+
+    Because this test needs to write into the dmesg ringbuffer to assure that
+    the ringbuffer has changed and that our class successfully catches that
+    change it requires root access, gained by sudo. In the event that it cannot
+    get sudo it will skip.
+
+    """
+    test = _get_dmesg()
+    test.update_dmesg()
+    nt.assert_equal(test._new_messages, [],
+                    msg=("{0} returned updates, even when dmesg has not been "
+                         "updated.".format(test.__class__)))
 
 
 def test_dmesg_wrap_partial():
@@ -187,7 +219,6 @@ def test_dmesg_wrap_complete():
                                    test._new_messages)))
 
 
-@utils.privileged_test
 @utils.nose_generator
 def test_update_result_replace():
     """ Generates tests for update_result """
@@ -199,10 +230,11 @@ def test_update_result_replace():
         result['subtest']['test'] = res
         return result
 
-    dmesg = _get_dmesg()
+    dmesg = TestDmesg()
 
     for res in ['pass', 'fail', 'crash', 'warn', 'skip', 'notrun']:
-        _write_dev_kmesg()
+        dmesg.regex = None
+        dmesg._new_messages = ['add', 'some', 'stuff']
         new_result = dmesg.update_result(create_test_result(res))
 
         check_update_result.description = "Test update_result: {0}".format(res)
@@ -215,7 +247,7 @@ def test_update_result_replace():
         # check that the status is not updated when Dmesg.regex is set and does
         # not match the dmesg output
         dmesg.regex = re.compile("(?!)")
-        _write_dev_kmesg()
+        dmesg._new_messages = ['more', 'new', 'stuff']
         new_result = dmesg.update_result(create_test_result(res))
 
         check_equal_result.description = \
@@ -225,7 +257,7 @@ def test_update_result_replace():
         # check that the status is updated when Dmesg.regex is set and matches
         # the dmesg output
         dmesg.regex = re.compile("piglit.*test")
-        _write_dev_kmesg()
+        dmesg._new_messages = ['piglit.awesome.test', 'and', 'stuff']
         new_result = dmesg.update_result(create_test_result(res))
 
         check_update_result.description = \
@@ -269,12 +301,12 @@ def check_update_result(result, status):
 
 def test_update_result_add_dmesg():
     """ Tests update_result's addition of dmesg attribute """
-    test = _get_dmesg()
+    test = TestDmesg()
 
     result = framework.core.TestResult()
     result['result'] = 'pass'
 
-    _write_dev_kmesg()
+    test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
     nt.assert_in('dmesg', result,
@@ -283,18 +315,19 @@ def test_update_result_add_dmesg():
 
 def test_json_serialize_updated_result():
     """ Test that a TestResult that has been updated is json serializable """
-    test = _get_dmesg()
+    test = TestDmesg()
 
     result = framework.core.TestResult()
     result['result'] = 'pass'
 
-    _write_dev_kmesg()
+    test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
     encoder = framework.core.PiglitJSONEncoder()
     encoder.encode(result)
 
 
+@utils.privileged_test
 @utils.nose_generator
 def test_testclasses_dmesg():
     """ Generator that creates tests for """

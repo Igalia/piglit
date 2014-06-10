@@ -173,7 +173,7 @@ def privileged_test(func):
     excluding tests with privileged execution requirements
 
     """
-    def sudo_wrapper(*args, **kwargs):
+    def sudo_test_wrapper(*args, **kwargs):
         func(*args, **kwargs)
 
-    return sudo_wrapper
+    return sudo_test_wrapper
