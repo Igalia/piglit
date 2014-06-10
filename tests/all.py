@@ -1815,6 +1815,14 @@ add_plain_test(arb_robustness, 'arb_robustness_client-mem-bounds')
 # TODO: robust vertex buffer access
 #add_plain_test(arb_robustness, 'arb_robustness_draw-vbo-bounds')
 
+# Group ARB_shader_bit_encoding
+arb_shader_bit_encoding = {}
+spec['ARB_shader_bit_encoding'] = arb_shader_bit_encoding
+arb_shader_bit_encoding['execution'] = {}
+add_shader_test_dir(arb_shader_bit_encoding['execution'],
+	            os.path.join(testsDir, 'spec', 'arb_shader_bit_encoding', 'execution'),
+		    recursive=True)
+
 # Group ARB_shader_texture_lod
 arb_shader_texture_lod = {}
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
