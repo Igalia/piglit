@@ -29,49 +29,69 @@ On OSX and *BSD one would likely want to implement a system that reads the
 sysloger, since timestamps can be added by the sysloger, and are not inserted
 by dmesg.
 
+Most users do not want to call a specific dmesg implementation themselves,
+they will want to use the get_dmesg() helper, which provides the proper
+dmesg implementation for their OS.
+
 """
 
 import re
 import sys
 import subprocess
 import warnings
+import abc
 
-__all__ = ['LinuxDmesg', 'DummyDmesg', 'get_dmesg']
+__all__ = [
+    'BaseDmesg',
+    'LinuxDmesg',
+    'DummyDmesg',
+    'get_dmesg',
+]
 
 
-class LinuxDmesg(object):
-    """ Read dmesg on posix systems
+class BaseDmesg(object):
+    """ Abstract base class for Dmesg derived objects
 
-    This reads the dmesg ring buffer, stores the contents of the buffer, and
-    then compares it whenever called, returning the difference between the
-    calls. It requires timestamps to be enabled.
+    This provides the bases of the constructor, and most subclasses should call
+    super() in __init__(). It provides a concrete implementation of the
+    update_result() method, which should be suitible for all subclasses.
+
+    The update_dmesg() method is the primary method that each subclass needs to
+    override, as this method is used to to actually read the dmesg ringbuffer,
+    and the command used, and the options given are OS dependent.
+
+    This class is not thread safe, becasue it does not black between the start
+    of the test and the reading of dmesg, which means that if two tests run at
+    the same time, and test A creates an entri in dmesg, but test B finishes
+    first, test B will be marked as having the dmesg error.
 
     """
-    DMESG_COMMAND = ['dmesg', '--level', 'emerg,alert,crit,err,warn,notice']
-
+    @abc.abstractmethod
     def __init__(self):
-        """ Create a dmesg instance """
-        self._last_message = None
+        # A list containing all messages since the last time dmesg was read.
+        # This is used by update result, and then emptied
         self._new_messages = []
+
+        # If this is set it should be an re.compile() object, which matches
+        # entries that are to be considered failures. If an entry does not
+        # match the regex it will be ignored. By default (None) all entries are
+        # considered
         self.regex = None
 
         # Populate self.dmesg initially, otherwise the first test will always
-        # be full of dmesg crud.
+        # be full of false positives.
         self.update_dmesg()
 
-        if not self._last_message:
-            # We need to ensure that there is something in dmesg to check
-            # timestamps.
-            warnings.warn("Cannot check dmesg for timestamp support. If you "
-                          "do not have timestamps enabled in your kernel you "
-                          "get incomplete dmesg captures", RuntimeWarning)
-        elif not re.match(r'\[\s*\d+\.\d+\]', self._last_message):
-            # Do an initial check to ensure that dmesg has timestamps, we need
-            # timestamps to work correctly. A proper linux dmesg timestamp
-            # looks like this: [    0.00000]
-            raise DmesgError(
-                "Your kernel does not seem to support timestamps, which "
-                "are required by the --dmesg option")
+    @abc.abstractmethod
+    def update_dmesg(self):
+        """ Update _new_messages list
+
+        This method should read dmesg, determine which entries are new since
+        the last read of dmesg, and update self._new_messages with those
+        entries.
+
+        """
+        pass
 
     def update_result(self, result):
         """ Takes a TestResult object and updates it with dmesg statuses
@@ -84,7 +104,6 @@ class LinuxDmesg(object):
         result -- A TestResult instance
 
         """
-
         def replace(res):
             """ helper to replace statuses with the new dmesg status
 
@@ -92,9 +111,11 @@ class LinuxDmesg(object):
             otherwise returns the input
 
             """
-            return {"pass": "dmesg-warn",
-                    "warn": "dmesg-fail",
-                    "fail": "dmesg-fail"}.get(res, res)
+            return {
+                "pass": "dmesg-warn",
+                "warn": "dmesg-fail",
+                "fail": "dmesg-fail"
+            }.get(res, res)
 
         # Get a new snapshot of dmesg
         self.update_dmesg()
@@ -112,7 +133,7 @@ class LinuxDmesg(object):
 
             result['result'] = replace(result['result'])
 
-            # Replace any subtests
+            # Replace the results of any subtests
             if 'subtest' in result:
                 for key, value in result['subtest'].iteritems():
                     result['subtest'][key] = replace(value)
@@ -121,6 +142,41 @@ class LinuxDmesg(object):
             result['dmesg'] = "\n".join(self._new_messages)
 
         return result
+
+
+class LinuxDmesg(BaseDmesg):
+    """ Read dmesg on posix systems
+
+    This reads the dmesg ring buffer, stores the contents of the buffer, and
+    then compares it whenever called, returning the difference between the
+    calls. It requires timestamps to be enabled.
+
+    """
+    DMESG_COMMAND = ['dmesg', '--level', 'emerg,alert,crit,err,warn,notice']
+
+    def __init__(self):
+        """ Create a dmesg instance """
+        # _last_message store the contents of the last entry in dmesg the last
+        # time it was read. Because dmesg is a ringbuffer old entries can fall
+        # off the end if it becomes too full. To track new entries search for
+        # this entry and take any entries that were added after it. This works
+        # on Linux because each entry is guaranteed unique by timestamps.
+        self._last_message = None
+        super(LinuxDmesg, self).__init__()
+
+        if not self._last_message:
+            # We need to ensure that there is something in dmesg to check
+            # timestamps.
+            warnings.warn("Cannot check dmesg for timestamp support. If you "
+                          "do not have timestamps enabled in your kernel you "
+                          "get incomplete dmesg captures", RuntimeWarning)
+        elif not re.match(r'\[\s*\d+\.\d+\]', self._last_message):
+            # Do an initial check to ensure that dmesg has timestamps, we need
+            # timestamps to work correctly. A proper linux dmesg timestamp
+            # looks like this: [    0.00000]
+            raise DmesgError(
+                "Your kernel does not seem to support timestamps, which "
+                "are required by the --dmesg option")
 
     def update_dmesg(self):
         """ Call dmesg using subprocess.check_output
@@ -145,7 +201,7 @@ class LinuxDmesg(object):
         self._last_message = dmesg[-1] if dmesg else None
 
 
-class DummyDmesg(object):
+class DummyDmesg(BaseDmesg):
     """ An dummy class for dmesg on non unix-like systems
 
     This implements a dummy version of the LinuxDmesg, and can be used anytime
