@@ -80,6 +80,12 @@ def test_gen_lookup():
         yield check_lookup, stat
 
 
+@nt.raises(status.StatusException)
+def test_bad_lookup():
+    """ A bad status raises a StatusException """
+    status.status_lookup('foobar')
+
+
 def test_status_in():
     """ A status can be compared to a str with `x in container` syntax """
     stat = status.PASS
@@ -183,3 +189,119 @@ def _max_stat_nochange(nochange, stat):
     nt.assert_equal(
         stat, max(stat, nochange),
         msg="max({stat}, {nochange}) = {stat}".format(**locals()))
+
+
+def check_operator(obj, op, result):
+    """ Test that the result of running an operator on an object is expected
+
+    Arguments:
+    obj -- an instance to test
+    operator -- the operator to test on the object
+    result -- the expected result
+
+    """
+    nt.assert_equal(op(obj), result)
+
+
+def check_operator_equal(obj, comp, op, result):
+    """ Test that the result of running an operator on an object is expected
+
+    Arguments:
+    obj -- an instance to test
+    operator -- the operator to test on the object
+    result -- the expected result
+
+    """
+    nt.assert_equal(op(obj, comp), result)
+
+
+def check_operator_not_equal(obj, comp, op, result):
+    """ Test that the result of running an operator on an object is expected
+
+    Arguments:
+    obj -- an instance to test
+    operator -- the operator to test on the object
+    result -- the expected result
+
+    """
+    nt.assert_not_equal(op(obj, comp), result)
+
+
+@utils.nose_generator
+def test_nochangestatus_magic():
+    """ Test that operators unique to NoChangeStatus work """
+    obj = status.NoChangeStatus('Test')
+    stat = status.Status('Test', 0, (0, 0))
+
+    # generator equality tests
+    for comp, type_ in [(obj, 'status.NoChangeStatus'),
+                        (stat, 'status.Status'),
+                        (u'Test', 'unicode'),
+                        ('Test', 'str')]:
+        check_operator_equal.description = (
+            'Operator eq works with type: {0} on class '
+            'status.NoChangeStatus'.format(type_)
+        )
+        yield check_operator_equal, obj, comp, lambda x, y: x.__eq__(y), True
+
+        check_operator_not_equal.description = (
+            'Operator ne works with type: {0} on class '
+            'status.NoChangeStatus'.format(type_)
+        )
+        yield check_operator_not_equal, obj, comp, lambda x, y: x.__ne__(y), True
+
+
+@utils.nose_generator
+def test_status_magic():
+    """ Generator for testing magic methods in the Status class """
+    obj = status.Status('foo', 0, (0, 0))
+    comparitor = status.Status('bar', 10, (0, 0))
+
+    for func, name, result in [
+            (str, 'str', 'foo'),
+            (unicode, 'unicode', u'foo'),
+            (repr, 'repr', 'foo'),
+            (int, 'int', 0)]:
+        check_operator.description = 'Operator {0} works on class {1}'.format(
+            str(func), 'status.Status')
+        yield check_operator, obj, func, result
+
+    for func, name in [
+            (lambda x, y: x.__lt__(y), 'lt'),
+            (lambda x, y: y.__gt__(x), 'gt')]:
+
+        check_operator_equal.description = \
+            'Operator {0} works on class {1} when True'.format(
+                name, 'status.Status')
+        yield check_operator_equal, obj, comparitor, func, True
+
+    for func, name in [
+            (lambda x, y: x.__le__(x), 'le, when ='),
+            (lambda x, y: x.__le__(y), 'le, when !='),
+            (lambda x, y: x.__eq__(x), 'eq'),
+            (lambda x, y: x.__ge__(x), 'ge, when ='),
+            (lambda x, y: y.__ge__(x), 'ge, when !='),
+            (lambda x, y: x.__ne__(y), 'ne'),
+            (lambda x, y: x.__eq__(x), 'eq')]:
+        check_operator_not_equal.description = \
+            'Operator {0} works on class {1} when False'.format(
+                name, 'status.Status')
+        yield check_operator_not_equal, obj, comparitor, func, False
+
+
+@nt.raises(TypeError)
+def test_status_eq_raises():
+    """ Comparing Status and an unlike object with eq raises a TypeError """
+    status.PASS == dict()
+
+
+@nt.raises(TypeError)
+def test_nochangestatus_eq_raises():
+    """ NoChangeStatus == !(str, unicode, Status) raises TypeError """
+    status.NOTRUN == dict()
+
+
+@nt.raises(TypeError)
+def test_nochangestatus_ne_raises():
+    """ NoChangeStatus != (str, unicode, Status) raises TypeError """
+    status.NOTRUN != dict()
