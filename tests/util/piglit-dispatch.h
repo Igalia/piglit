@@ -96,6 +96,7 @@ typedef float GLfloat;
 typedef float GLclampf;
 typedef double GLdouble;
 typedef double GLclampd;
+typedef int32_t GLclampx;
 typedef void GLvoid;
 typedef int64_t GLint64EXT;
 typedef uint64_t GLuint64EXT;
@@ -135,8 +136,6 @@ typedef void (APIENTRY *piglit_dispatch_function_ptr)(void);
 typedef piglit_dispatch_function_ptr (*piglit_get_core_proc_address_function_ptr)(const char *, int);
 
 typedef piglit_dispatch_function_ptr (*piglit_get_ext_proc_address_function_ptr)(const char *);
-
-typedef piglit_dispatch_function_ptr (*piglit_dispatch_resolver_ptr)();
 
 typedef void (*piglit_error_function_ptr)(const char *);
 

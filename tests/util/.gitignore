@@ -1,3 +1,2 @@
 config.h
-piglit-dispatch-gen.c
-piglit-dispatch-gen.h
+piglit-dispatch-gen.[ch]

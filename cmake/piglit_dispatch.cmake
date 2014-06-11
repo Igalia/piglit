@@ -19,6 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+set(piglit_dispatch_gen_script ${CMAKE_SOURCE_DIR}/tests/util/gen_dispatch.py)
 set(piglit_dispatch_gen_output_dir ${CMAKE_BINARY_DIR}/tests/util)
 
 file(MAKE_DIRECTORY ${piglit_dispatch_gen_output_dir})
@@ -28,15 +29,19 @@ set(piglit_dispatch_gen_outputs
 	${piglit_dispatch_gen_output_dir}/piglit-dispatch-gen.h
 	)
 
-set(piglit_dispatch_gen_inputs
+set(piglit_dispatch_gen_depends
+	${CMAKE_SOURCE_DIR}/registry/__init__.py
+	${CMAKE_SOURCE_DIR}/registry/gl.py
+	${CMAKE_SOURCE_DIR}/registry/gl.xml
 	${CMAKE_SOURCE_DIR}/tests/util/gen_dispatch.py
-	${CMAKE_BINARY_DIR}/glapi/glapi.json
+	${CMAKE_SOURCE_DIR}/tests/util/piglit-dispatch-gen.c.mako
+	${CMAKE_SOURCE_DIR}/tests/util/piglit-dispatch-gen.h.mako
 	)
 
 add_custom_command(
 	OUTPUT ${piglit_dispatch_gen_outputs}
-	DEPENDS ${piglit_dispatch_gen_inputs}
-	COMMAND ${python} ${piglit_dispatch_gen_inputs} ${piglit_dispatch_gen_outputs}
+	DEPENDS ${piglit_dispatch_gen_depends}
+	COMMAND ${python} ${piglit_dispatch_gen_script} --out-dir ${piglit_dispatch_gen_output_dir}
 	)
 
 add_custom_target(piglit_dispatch_gen
