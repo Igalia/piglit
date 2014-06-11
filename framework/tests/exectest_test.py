@@ -72,6 +72,6 @@ def test_piglittest_interpret_result_subtest():
     """ PiglitTest.interpret_result() works with subtests """
     test = PiglitTest('foo')
     test.result['out'] = ('PIGLIT: {"result": "pass"}\n'
-                          'PIGLIT:subtest {"subtest": "pass"}\n')
+                          'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
     test.interpret_result()
     assert test.result['subtest']['subtest'] == 'pass'

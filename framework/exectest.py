@@ -279,12 +279,6 @@ class PiglitTest(Test):
         outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
 
         for piglit in outpiglit:
-            if piglit.startswith('subtest'):
-                if not 'subtest' in self.result:
-                    self.result['subtest'] = {}
-                self.result['subtest'].update(
-                    json.loads(piglit[7:]))
-            else:
-                self.result.update(json.loads(piglit))
+            self.result.update(json.loads(piglit))
         self.result['out'] = '\n'.join(
             s for s in outlines if not s.startswith('PIGLIT:'))

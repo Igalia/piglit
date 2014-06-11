@@ -241,9 +241,9 @@ piglit_report_subtest_result(enum piglit_result result, const char *format, ...)
 
 	va_start(ap, format);
 
-	printf("PIGLIT:subtest {\"");
+	printf("PIGLIT: {\"subtest\": {\"");
 	vprintf(format, ap);
-	printf("\" : \"%s\"}\n", result_str);
+	printf("\" : \"%s\"}}\n", result_str);
 	fflush(stdout);
 
 	va_end(ap);
