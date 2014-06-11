@@ -168,19 +168,15 @@ def gen_kernel_3_arg_same_type(f, fnName, inType, outType):
                    [vecSize, vecSize, vecSize], ''
         )
 
-
-def gen_kernel_3_arg_mixed_size_vector(f, fnName, inType, outType, vecSize):
-    f.write('kernel void test_tss_' + vecSize + '_' + fnName + '_' + inType +
-            '(global ' + outType + '* out, global ' + inType + '* in1, global '
-            + inType+'* in2, global '+inType+'* in3){\n' + '  vstore' + vecSize
-            + '(' + fnName + '(vload' + vecSize +
-            '(0, in1), *in2, *in3), 0, out);\n' + '}\n\n')
-
-
-def gen_kernel_3_arg_mixed_size(f, fnName, inType, outType):
+def gen_kernel_3_arg_mixed_size_tss(f, fnName, inType, outType):
     for vecSize in VEC_WIDTHS:
         gen_kernel(f, fnName, [inType, inType, inType], outType,
                    [vecSize, 1, 1], 'tss_')
+
+def gen_kernel_3_arg_mixed_size_tts(f, fnName, inType, outType):
+    for vecSize in VEC_WIDTHS:
+        gen_kernel(f, fnName, [inType, inType, inType], outType,
+                   [vecSize, vecSize, 1], 'tts_')
 
 
 def generate_kernels(f, dataType, fnName, fnDef):
@@ -200,7 +196,9 @@ def generate_kernels(f, dataType, fnName, fnDef):
     if (len(argTypes) == 4):
         gen_kernel_3_arg_same_type(f, fnName, argTypes[1], argTypes[0])
         if (fnDef['function_type'] is 'tss'):
-            gen_kernel_3_arg_mixed_size(f, fnName, argTypes[1], argTypes[0])
+            gen_kernel_3_arg_mixed_size_tss(f, fnName, argTypes[1], argTypes[0])
+        if (fnDef['function_type'] is 'tts'):
+            gen_kernel_3_arg_mixed_size_tts(f, fnName, argTypes[1], argTypes[0])
         return
 
     if (fnName is 'upsample'):
