@@ -152,6 +152,12 @@ class Test(object):
             if "Got spurious window resize" not in self.result['out']:
                 break
 
+        # If the result is skip then the test wasn't run, return early
+        # This usually is triggered when a test is not built for a specific
+        # platform
+        if self.result['result'] == 'skip':
+            return
+
         self.result['result'] = 'fail'
         self.interpret_result()
 
@@ -202,6 +208,7 @@ class Test(object):
             # Piglit should not report that test as having
             # failed.
             if e.errno == errno.ENOENT:
+                self.result['result'] = 'skip'
                 out = ("PIGLIT: {'result': 'skip'}\n"
                        "Test executable not found.\n")
                 err = ""

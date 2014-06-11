@@ -23,6 +23,21 @@
 from framework.exectest import PiglitTest, Test
 
 
+# Helpers
+class TestTest(Test):
+    """ A class for testing that implements a dummy interpret_result
+
+    interpret_result() can ve overwritten by setting the
+    self.test_interpret_result name
+
+    """
+    test_interpret_result = lambda: None
+
+    def interpret_result(self):
+        self.test_interpret_result()
+
+
+# Tests
 def test_initialize_test():
     """ Test initializes """
     Test('/bin/true')
@@ -31,3 +46,15 @@ def test_initialize_test():
 def test_initialize_piglittest():
     """ Test that PiglitTest initializes correctly """
     PiglitTest('/bin/true')
+
+
+def test_run_return_early():
+    """ Test.run() exits early when Test._run_command() has exception """
+    def helper():
+        raise AssertionError("The test didn't return early")
+
+    # Of course, this won't work if you actually have a foobarcommand in your
+    # path...
+    test = TestTest(['foobarcommand'])
+    test.test_interpret_result = helper
+    test.run()
