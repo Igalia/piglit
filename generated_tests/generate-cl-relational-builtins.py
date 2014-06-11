@@ -22,14 +22,16 @@
 # SOFTWARE.
 #
 # Authors: Tom Stellard <thomas.stellard@amd.com>
+#          Aaron Watry  <awatry@gmail.com>
 #
 
 import os
 
-from genclbuiltins import gen
+from genclbuiltins import gen, TRUE
 
 CLC_VERSION_MIN = {
-    'isnan' : 10
+    'isnan' : 10,
+    'isgreater' : 10
 }
 
 DATA_TYPES = ['float']
@@ -49,6 +51,15 @@ tests = {
         'values': [
             [0,   1,            0,   0],            # Result
             [0.0, float("nan"), 1.0, float("inf") ] # Arg0
+        ]
+    },
+    'isgreater' : {
+        'arg_types': [I, F, F],
+        'function_type': 'ttt',
+        'values': [
+            [0,   0,            0,   0,            0,            0,            TRUE, 0],    # Result
+            [0.0, float("nan"), 1.0, 1,            float("nan"), float("inf"), 1.0,  0.5 ], # Arg0
+            [0.0, float("nan"), 1.0, float("nan"), 1,            float("inf"), 0.5,  1.0 ]  # Arg1
         ]
     }
 }
