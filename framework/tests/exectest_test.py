@@ -58,3 +58,20 @@ def test_run_return_early():
     test = TestTest(['foobarcommand'])
     test.test_interpret_result = helper
     test.run()
+
+
+def test_piglittest_interpret_result():
+    """ PiglitTest.interpret_result() works no subtests """
+    test = PiglitTest('foo')
+    test.result['out'] = 'PIGLIT: {"result": "pass"}\n'
+    test.interpret_result()
+    assert test.result['result'] == 'pass'
+
+
+def test_piglittest_interpret_result_subtest():
+    """ PiglitTest.interpret_result() works with subtests """
+    test = PiglitTest('foo')
+    test.result['out'] = ('PIGLIT: {"result": "pass"}\n'
+                          'PIGLIT:subtest {"subtest": "pass"}\n')
+    test.interpret_result()
+    assert test.result['subtest']['subtest'] == 'pass'

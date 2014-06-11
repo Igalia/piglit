@@ -28,6 +28,10 @@ import time
 import sys
 import traceback
 import itertools
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 from framework.core import Options
 from framework.results import TestResult
@@ -278,8 +282,9 @@ class PiglitTest(Test):
             if piglit.startswith('subtest'):
                 if not 'subtest' in self.result:
                     self.result['subtest'] = {}
-                self.result['subtest'].update(eval(piglit[7:]))
+                self.result['subtest'].update(
+                    json.loads(piglit[7:]))
             else:
-                self.result.update(eval(piglit))
+                self.result.update(json.loads(piglit))
         self.result['out'] = '\n'.join(
             s for s in outlines if not s.startswith('PIGLIT:'))
