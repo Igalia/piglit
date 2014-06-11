@@ -31,6 +31,7 @@ from genclbuiltins import gen, TRUE
 
 CLC_VERSION_MIN = {
     'isnan' : 10,
+    'isequal' : 10,
     'isgreater' : 10,
     'isgreaterequal' : 10,
     'isnotequal' : 10,
@@ -53,6 +54,15 @@ tests = {
         'values': [
             [0,   1,            0,   0],            # Result
             [0.0, float("nan"), 1.0, float("inf") ] # Arg0
+        ]
+    },
+    'isequal' : {
+        'arg_types': [I, F, F],
+        'function_type': 'ttt',
+        'values': [
+            [TRUE, 0,            TRUE, 0,            0,            TRUE,         0,    TRUE ],    # Result
+            [0.0,  float("nan"), 1.0,  1,            float("nan"), float("inf"), 1.0,  123.0 ], # Arg0
+            [0.0,  float("nan"), 1.0,  float("nan"), 1,            float("inf"), 0.5,  123.0 ]  # Arg1
         ]
     },
     'isgreater' : {
