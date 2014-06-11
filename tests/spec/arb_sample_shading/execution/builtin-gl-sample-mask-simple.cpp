@@ -190,11 +190,14 @@ piglit_display()
 	else
 		assert(0 && "Unimplemented");
 
-	for (i = 0; i < (1 << multisampled_tex.config.num_samples); i++) {
+	for (i = 0; i < multisampled_tex.config.width; i++) {
 		float color[4];
 		unsigned full_mask = (1 << samples) - 1;
 		unsigned expected_mask = i & full_mask;
 		unsigned observed_mask = 0;
+
+		if (multisampled_tex.config.num_samples == 0)
+			expected_mask = full_mask;
 
 		glReadPixels((i % 16) * 8 + 4,
 			     (i / 16) * 8 + 4,

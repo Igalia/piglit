@@ -93,6 +93,7 @@ compile_shader(void)
 		"             (int(gl_FragCoord.y) * 0x01010101);\n"
 		"  vec4 green = vec4(0.0, 1.0, 0.0, 1.0);\n"
 		"  vec4 black = vec4(0.0, 0.0, 0.0, 0.0);\n"
+		"  if (samples == 0) mask = 1;\n"
 		   /* Use do-while to include 'samples = 0' case. */
 		"  do {\n"
 		"    bool is_sample_mask_set = ((mask >> i) & 0x1) == 0x1;\n"
