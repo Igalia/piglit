@@ -29,6 +29,7 @@ import os
 from genclbuiltins import gen
 
 CLC_VERSION_MIN = {
+    'mix' : 10,
     'nextafter' : 10,
     'sign' : 10
 }
@@ -40,6 +41,16 @@ F = {
 }
 
 tests = {
+    'mix' : { #x + (y - x) * a
+        'arg_types': [F, F, F, F],
+        'function_type': 'tts',
+        'values': [
+            [float("nan"), float("nan"), 1.0, 3.0, 10.0  ], # Result
+            [1.0         , 1.0,          1.0, 4.0, 15.0 ], # Arg0
+            [2.0         , float("nan"), 2.0, 2.0, 10.0 ], # Arg1
+            [float("nan"), 0.0,          0.0, 0.5, 1.0  ], # Arg2
+        ]
+    },
     'nextafter' : {
         'arg_types': [F, F, F],
         'function_type': 'ttt',
