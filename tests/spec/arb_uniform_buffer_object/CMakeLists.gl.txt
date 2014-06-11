@@ -38,6 +38,7 @@ piglit_add_executable (arb_uniform_buffer_object-negative-bindbufferrange-range 
 piglit_add_executable (arb_uniform_buffer_object-negative-getactiveuniformblockiv negative-getactiveuniformblockiv.c)
 piglit_add_executable (arb_uniform_buffer_object-negative-getactiveuniformsiv negative-getactiveuniformsiv.c)
 piglit_add_executable (arb_uniform_buffer_object-referenced-by-shader referenced-by-shader.c)
+piglit_add_executable (arb_uniform_buffer_object-rendering rendering.c)
 piglit_add_executable (arb_uniform_buffer_object-row-major row-major.c)
 piglit_add_executable (arb_uniform_buffer_object-uniformblockbinding uniformblockbinding.c)
 
