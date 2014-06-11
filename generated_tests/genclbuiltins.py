@@ -55,6 +55,7 @@ UMIN = 'unsigned_min_for_type'
 UMAX = 'unsigned_max_for_type'
 TYPE = 'TYPE'
 SIZE = 'SIZE'
+TRUE = 'true_value_for_type' #1 for scalar, -1 for vector
 
 # Identity type list
 T = {
@@ -207,7 +208,7 @@ def generate_kernels(f, dataType, fnName, fnDef):
                                     argTypes[0])
         return
 
-def getValue(type, val):
+def getValue(type, val, isVector):
     # Check if val is a str, list, or value
     if (isinstance(val, str)):
         if (val == MIN):
@@ -230,6 +231,11 @@ def getValue(type, val):
             return type
         elif (val == SIZE):
             return DATA_SIZES[type]
+        elif (val == TRUE):
+            if (isVector):
+                return -1
+            else:
+                return 1
         else:
             print('Unknown string value: ' + val + '\n')
     elif (isinstance(val, list)):
@@ -241,15 +247,15 @@ def getValue(type, val):
         # Evaluate the value of the requested function and arguments
         # TODO: Change to varargs calls after unshifting the first list element
         if (len(val) == 2):
-            return (val[0])(getValue(type, val[1]))
+            return (val[0])(getValue(type, val[1], isVector))
         elif (len(val) == 3):
-            return (val[0])(getValue(type, val[1]), getValue(type, val[2]))
+            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector))
         elif (len(val) == 4):
-            return (val[0])(getValue(type, val[1]), getValue(type, val[2]),
-                            getValue(type, val[3]))
+            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
+                            getValue(type, val[3], isVector))
         else:
-            return (val[0])(getValue(type, val[1]), getValue(type, val[2]),
-                            getValue(type, val[3]), getValue(type, val[4]))
+            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
+                            getValue(type, val[3], isVector), getValue(type, val[4], isVector))
 
     # At this point, we should have been passed a number
     if (isinstance(val, (int, long, float))):
@@ -259,8 +265,8 @@ def getValue(type, val):
 
 
 
-def getStrVal(type, val):
-    return str(getValue(type, val))
+def getStrVal(type, val, isVector):
+    return str(getValue(type, val, isVector))
 
 
 def getArgType(baseType, argType):
@@ -308,7 +314,7 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
     # For each argument, write a line containing its type, index, and values
     for arg in range(0, argCount):
         argInOut = ''
-        argVal = getStrVal(argType, tests[arg][testIdx])
+        argVal = getStrVal(argType, tests[arg][testIdx], (vecSize > 1))
         if arg == 0:
             argInOut = 'arg_out: '
         else:
