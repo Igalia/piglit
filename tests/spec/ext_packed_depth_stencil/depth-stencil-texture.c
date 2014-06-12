@@ -56,15 +56,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#if defined PIGLIT_USE_OPENGL_ES1
-#define GL_TEXTURE_CUBE_MAP  GL_TEXTURE_CUBE_MAP_OES
-#define GL_DEPTH_STENCIL     GL_DEPTH_STENCIL_OES
-#define GL_DEPTH24_STENCIL8  GL_DEPTH24_STENCIL8_OES
-#define GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_24_8_OES
-#define GL_TEXTURE_3D        0x806F
-#define glTexStorage2D       glTexStorage2DEXT
-#endif
-
 static bool has_texture_3d = false;
 static bool has_texture_cube_map = false;
 static bool has_depth_texture_cube_map = false;

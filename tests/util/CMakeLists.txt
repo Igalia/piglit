@@ -29,6 +29,8 @@ set(UTIL_GL_INCLUDES
 
 set(UTIL_GL_SOURCES
 	fdo-bitmap.c
+	piglit-dispatch.c
+	piglit-dispatch-init.c
 	piglit-util-gl-common.c
 	piglit-framework-gl/piglit_gl_framework.c
 	piglit-framework-gl.c

@@ -1,7 +1,5 @@
 set(UTIL_GL_SOURCES
 	${UTIL_GL_SOURCES}
-	piglit-dispatch.c
-	piglit-dispatch-init.c
 	piglit-matrix.c
 	piglit-shader.c
 	piglit-shader-gl.c
