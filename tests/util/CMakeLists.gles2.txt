@@ -5,7 +5,6 @@ set(UTIL_GL_SOURCES
 	piglit-dispatch-init.c
 	piglit-shader.c
 	piglit-shader-gles2.c
-	piglit-util-gl-enum.c
 	piglit-util-gles.c
 	minmax-test.c
 	)

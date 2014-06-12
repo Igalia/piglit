@@ -27,6 +27,7 @@ file(MAKE_DIRECTORY ${piglit_dispatch_gen_output_dir})
 set(piglit_dispatch_gen_outputs
 	${piglit_dispatch_gen_output_dir}/piglit-dispatch-gen.c
 	${piglit_dispatch_gen_output_dir}/piglit-dispatch-gen.h
+	${piglit_dispatch_gen_output_dir}/piglit-util-gl-enum-gen.c
 	)
 
 set(piglit_dispatch_gen_depends
@@ -36,6 +37,7 @@ set(piglit_dispatch_gen_depends
 	${CMAKE_SOURCE_DIR}/tests/util/gen_dispatch.py
 	${CMAKE_SOURCE_DIR}/tests/util/piglit-dispatch-gen.c.mako
 	${CMAKE_SOURCE_DIR}/tests/util/piglit-dispatch-gen.h.mako
+	${CMAKE_SOURCE_DIR}/tests/util/piglit-util-gl-enum-gen.c.mako
 	)
 
 add_custom_command(

@@ -5,7 +5,6 @@ list(APPEND UTIL_GL_SOURCES
 	piglit-shader.c
 	piglit-shader-gles2.c # Compatible with gles3.
 	piglit-util-gles.c
-	piglit-util-gles3-enum.c
 	piglit-vbo.cpp
 	)
 

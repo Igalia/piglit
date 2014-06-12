@@ -5,7 +5,6 @@ set(UTIL_GL_SOURCES
 	piglit-matrix.c
 	piglit-shader.c
 	piglit-shader-gl.c
-	piglit-util-gl-enum.c
 	piglit-util-gl.c
 	piglit-test-pattern.cpp
 	piglit-fbo.cpp
@@ -34,12 +33,12 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 		    piglit-shader.c
 		    piglit-shader-gl.c
 		    piglit-util-gl-common.c
-		    piglit-util-gl-enum.c
 		    piglit-util-gl.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
 		    piglit-dispatch.c
 		    piglit-dispatch-init.c
+		    ${piglit_dispatch_gen_output_dir}/piglit-util-gl-enum-gen.c
 	)
 	target_link_libraries(piglitglxutil
 		piglitutil_${piglit_target_api}

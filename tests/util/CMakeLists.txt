@@ -4,6 +4,13 @@ if(PIGLIT_HAS_POSIX_CLOCK_MONOTONIC AND HAVE_LIBRT)
     link_libraries(rt)
 endif()
 
+# CMake requires that source file properties be set in the same directory where
+# the property is used.
+set_source_files_properties(
+	${piglit_dispatch_gen_outputs}
+	PROPERTIES GENERATED 1
+	)
+
 set(UTIL_INCLUDES
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
@@ -28,6 +35,7 @@ set(UTIL_GL_SOURCES
 	piglit_ktx.c
 	rgb9e5.c
 	r11g11b10f.c
+	${CMAKE_BINARY_DIR}/tests/util/piglit-util-gl-enum-gen.c
 	)
 
 if(PIGLIT_USE_WAFFLE)

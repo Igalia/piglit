@@ -27,6 +27,7 @@ Generate C source code from Khronos XML.
 from __future__ import print_function
 
 import argparse
+import functools
 import mako.runtime
 import mako.template
 import os.path
@@ -40,7 +41,7 @@ PIGLIT_TOP_DIR = os.path.join(os.path.dirname(__file__), '..', '..')
 sys.path.append(PIGLIT_TOP_DIR)
 
 import registry.gl
-from registry.gl import OrderedKeyedSet, ImmutableOrderedKeyedSet
+from registry.gl import Extension, OrderedKeyedSet, ImmutableOrderedKeyedSet
 
 
 debug = False
@@ -65,6 +66,7 @@ def main():
 
     gl_registry = registry.gl.parse()
     DispatchCode.emit(args.out_dir, gl_registry)
+    EnumCode.emit(args.out_dir, gl_registry)
 
 
 class DispatchCode(object):
@@ -123,6 +125,76 @@ def render_template(filename, out_dir, **context_vars):
             fake_whitespace=fake_whitespace,
             **context_vars)
         template.render_context(ctx)
+
+
+class EnumCode(object):
+
+    C_TEMPLATE = 'piglit-util-gl-enum-gen.c.mako'
+
+    @classmethod
+    def emit(cls, out_dir, gl_registry):
+        assert(isinstance(gl_registry, registry.gl.Registry))
+        enums = cls.get_unique_enums_in_default_namespace(gl_registry)
+        render_template(
+            cls.C_TEMPLATE,
+            out_dir,
+            gl_registry=gl_registry,
+            sorted_unique_enums_in_default_namespace=enums)
+
+
+    @classmethod
+    def get_unique_enums_in_default_namespace(cls, gl_registry):
+        def cmp_enums(x, y):
+            # Sort enums by numerical value, then by vendor namespace, then by
+            # full name. Given a set of synonymous names for a given enum
+            # value, this sort order ensures that names provided by core
+            # specifications precede those provided by ratified extensions,
+            # which precede thos provided by unratified extensions.
+            #
+            # For example, GL_RED will precede GL_RED_EXT will precede
+            # GL_RED_INTEL.
+            #
+            c = cmp(x.num_value, y.num_value)
+            if c != 0:
+                return c
+
+            c = cmp(y.vendor_namespace is None,
+                    x.vendor_namespace is None)
+            if c != 0:
+                return c
+
+            c = cmp(y.vendor_namespace in Extension.RATIFIED_NAMESPACES,
+                    x.vendor_namespace in Extension.RATIFIED_NAMESPACES)
+            if c != 0:
+                return c
+
+            c = cmp(y.vendor_namespace == 'EXT',
+                    x.vendor_namespace == 'EXT')
+            if c != 0:
+                return c
+
+            c = cmp(x.name, y.name)
+            if c != 0:
+                return c
+
+            return cmp(x.api, y.api)
+
+        def append_enum_if_new_value(enum_list, enum):
+            diff = cmp(enum_list[-1].num_value, enum.num_value)
+            assert(diff <= 0)
+            if diff < 0:
+                enum_list.append(enum)
+            return enum_list
+
+        enums = (
+            enum
+            for enum_group in gl_registry.enum_groups
+            if enum_group.type == 'default_namespace'
+            for enum in enum_group.enums
+        )
+        enums = sorted(enums, cmp=cmp_enums)
+        enums = reduce(append_enum_if_new_value, enums[1:], [enums[0]])
+        return enums
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 set(UTIL_GL_SOURCES
 	${UTIL_GL_SOURCES}
-	piglit-util-gl-enum.c
 	piglit-util-gles.c
 	)
 
