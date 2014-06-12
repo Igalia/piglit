@@ -36,18 +36,39 @@ import os.path as path
 import sys
 import argparse
 
-# If running in the source directory there will be a HACKING file, don't
-# muck with things, if not we need to screw with the python path
-if not path.exists('HACKING'):
-    _binpath, _bin = path.split(__file__)
-    _binname, _binext = path.splitext(_bin)
-    if _binext == '.py':
-        # Drop .py extension (used on Windows)
-        _bin = _binname
-    _libdir = path.abspath(path.join(_binpath, '..', 'lib', _bin))
-    sys.path.append(_libdir)
-    if 'PIGLIT_SOURCE_DIR' not in os.environ:
-        os.environ['PIGLIT_SOURCE_DIR'] = _libdir
+# Setting PIGLIT_SOURCE_DIR (and by extension sys.path) is actually pretty
+# complicated, since there are three seperate uses we need to detect:
+# 1) piglit is being run in the source directory, built in tree
+# 2) piglit is being run from the source directory outside of it, built in tree
+# 3) piglit has been built out of tree and installed, and is being run in or
+#    out of the install directory
+
+# It is critical that this block be run before importing anything from
+# framework (as there is no gaurantee that framework will be in python's path
+# before this blck is run)
+
+# Case 1
+if path.exists('framework/exectest.py'):
+    os.environ['PIGLIT_SOURCE_DIR'] = path.abspath(path.curdir)
+else:
+    dirpath = path.dirname(path.abspath(__file__))
+    # Case 2
+    if path.exists(path.join(dirpath, 'framework/exectest.py')):
+        os.environ['PIGLIT_SOURCE_DIR'] = dirpath
+        sys.path.append(dirpath)
+    # Case 3
+    else:
+        # In the case of windows piglit is called
+        # piglit${the_date_of_install}.py, and the .py needs to be thrown away
+        piglit = path.splitext(path.basename(__file__))[0]
+
+        # In the install case we have another problem, one could have multiple
+        # piglits installed as piglit${the_date_of_install}, and we need to
+        # detect that.
+        install_path = path.abspath(path.join(dirpath, '..', 'lib', piglit))
+
+        os.environ['PIGLIT_SOURCE_DIR'] = install_path
+        sys.path.append(install_path)
 
 import framework.programs.run as run
 import framework.programs.summary as summary
