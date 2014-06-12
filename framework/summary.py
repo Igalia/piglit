@@ -22,6 +22,7 @@
 from __future__ import print_function
 import os
 import os.path as path
+import posixpath
 import itertools
 import shutil
 import collections
@@ -44,6 +45,11 @@ __all__ = [
 def escape_filename(key):
     """Avoid reserved characters in filenames."""
     return re.sub(r'[<>:"|?*]', '_', key)
+
+
+def normalize_href(href):
+    """Force backward slashes in URLs."""
+    return href.replace('\\', '/')
 
 
 class HTMLIndex(list):
@@ -107,12 +113,13 @@ class HTMLIndex(list):
         self._newRow()
         self.append({'type': 'other', 'text': '<td />'})
         for each in summary.results:
+            href = posixpath.join(each.name, "index.html")
+            href = normalize_href(href)
             self.append({'type': 'other',
                          'text': '<td class="head"><b>%(name)s</b><br />'
                                  '(<a href="%(href)s">info</a>)'
                                  '</td>' % {'name': each.name,
-                                            'href': path.join(each.name,
-                                                              "index.html")}})
+                                            'href': href}})
         self._endRow()
 
         # Add the toplevel 'all' group
@@ -247,7 +254,8 @@ class HTMLIndex(list):
             href = None
         else:
             css = text
-            href = path.join(group, href + ".html")
+            href = posixpath.join(group, href + ".html")
+            href = normalize_href(href)
 
         self.append({'type': 'testResult',
                      'class': css,
