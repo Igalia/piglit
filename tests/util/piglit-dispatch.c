@@ -169,7 +169,7 @@ check_extension(const char *name)
 	return piglit_is_extension_supported(name);
 }
 
-#include "generated_dispatch.c"
+#include "piglit-dispatch-gen.c"
 
 /**
  * Initialize the dispatch mechanism.

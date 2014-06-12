@@ -24,8 +24,8 @@ set(piglit_dispatch_gen_output_dir ${CMAKE_BINARY_DIR}/tests/util)
 file(MAKE_DIRECTORY ${piglit_dispatch_gen_output_dir})
 
 set(piglit_dispatch_gen_outputs
-	${piglit_dispatch_gen_output_dir}/generated_dispatch.c
-	${piglit_dispatch_gen_output_dir}/generated_dispatch.h
+	${piglit_dispatch_gen_output_dir}/piglit-dispatch-gen.c
+	${piglit_dispatch_gen_output_dir}/piglit-dispatch-gen.h
 	)
 
 set(piglit_dispatch_gen_inputs

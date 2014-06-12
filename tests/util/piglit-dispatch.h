@@ -155,7 +155,7 @@ void piglit_dispatch_init(piglit_dispatch_api api,
 piglit_dispatch_function_ptr
 piglit_dispatch_resolve_function(const char *name);
 
-#include "generated_dispatch.h"
+#include "piglit-dispatch-gen.h"
 
 void piglit_dispatch_default_init(piglit_dispatch_api api);
 

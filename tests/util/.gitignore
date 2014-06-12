@@ -1,3 +1,3 @@
 config.h
-generated_dispatch.c
-generated_dispatch.h
+piglit-dispatch-gen.c
+piglit-dispatch-gen.h
