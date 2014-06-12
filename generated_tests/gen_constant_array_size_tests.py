@@ -220,7 +220,7 @@ class GeometryParserTest(ParserTest):
     shader.
     """
     def glsl_version(self):
-	return max(150, ParserTest.glsl_version(self))
+        return max(150, ParserTest.glsl_version(self))
 
     def test_suffix(self):
         return 'geom'

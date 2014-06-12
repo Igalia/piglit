@@ -16,15 +16,15 @@ from framework.exectest import PiglitTest
 # Helper functions
 
 def add_plain_test(group, name, args):
-	group[name] = PiglitTest(args)
+        group[name] = PiglitTest(args)
 
 def add_concurrent_test(group, name, args):
-	test = PiglitTest(args)
-	test.run_concurrent = true;
-	group[name] = PiglitTest(args)
+        test = PiglitTest(args)
+        test.run_concurrent = true;
+        group[name] = PiglitTest(args)
 
 def add_plain_program_tester_test(group, name, path):
-	add_plain_test(group, name, ['cl-program-tester', path])
+        add_plain_test(group, name, ['cl-program-tester', path])
 
 ######
 # Collecting all tests
@@ -96,13 +96,13 @@ add_plain_test(program, 'Bitcoin: phatk kernel', ['cl-program-bitcoin-phatk'])
 # Program tester
 
 def add_program_test_dir(group, dirpath):
-	for filename in os.listdir(dirpath):
-		filepath = path.join(dirpath, filename)
-		ext = filename.rsplit('.')[-1]
-		if ext != 'cl' and ext != 'program_test':
-			continue
-		testname = filename[0:-(len(ext) + 1)]
-		add_plain_program_tester_test(group, testname, filepath)
+        for filename in os.listdir(dirpath):
+                filepath = path.join(dirpath, filename)
+                ext = filename.rsplit('.')[-1]
+                if ext != 'cl' and ext != 'program_test':
+                        continue
+                testname = filename[0:-(len(ext) + 1)]
+                add_plain_program_tester_test(group, testname, filepath)
 
 program_build = {}
 program_build_fail = {}

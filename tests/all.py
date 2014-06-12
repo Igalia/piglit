@@ -1022,27 +1022,27 @@ spec['!OpenGL 4.2/required-texture-attachment-formats'] = concurrent_test('gl-3.
 # Group spec/glsl-es-1.00
 spec['glsl-es-1.00'] = {}
 import_glsl_parser_tests(spec['glsl-es-1.00'],
-			 os.path.join(testsDir, 'spec', 'glsl-es-1.00'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-es-1.00'),
+                         ['compiler'])
 spec['glsl-es-1.00']['execution'] = {}
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
-			 os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
-			 recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
+                    recursive=True)
 spec['glsl-es-1.00']['built-in constants'] = concurrent_test('built-in-constants_gles2 tests/spec/glsl-es-1.00/minimum-maximums.txt')
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = {}
 import_glsl_parser_tests(spec['glsl-1.10'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.10'),
-			 ['preprocessor', 'compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.10'),
+                         ['preprocessor', 'compiler'])
 spec['glsl-1.10']['linker'] = {}
 add_shader_test_dir(spec['glsl-1.10']['linker'],
-	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'linker'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.10', 'linker'),
+                    recursive=True)
 spec['glsl-1.10']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.10']['execution'],
-	            os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
+                    recursive=True)
 add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-render-after-bad-attach')
 spec['glsl-1.10']['execution']['clipping'] = {}
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
@@ -1064,18 +1064,18 @@ add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = {}
 import_glsl_parser_tests(spec['glsl-1.20'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
-			 ['preprocessor', 'compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.20'),
+                         ['preprocessor', 'compiler'])
 import_glsl_parser_tests(spec['glsl-1.20'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.20'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.20'),
+                         ['compiler'])
 spec['glsl-1.20']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.20']['execution'],
-	            os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
+                    recursive=True)
 add_shader_test_dir(spec['glsl-1.20']['execution'],
-	            os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
-		    recursive=True)
+                    os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
+                    recursive=True)
 
 def add_recursion_test(group, name):
     # When the recursion tests fail it is usually because the GLSL
@@ -1108,8 +1108,8 @@ add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = {}
 import_glsl_parser_tests(spec['glsl-1.30'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.30'),
-			 ['preprocessor', 'compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.30'),
+                         ['preprocessor', 'compiler'])
 spec['glsl-1.30']['execution'] = {}
 
 textureSize_samplers_130 = ['sampler1D', 'sampler2D', 'sampler3D', 'samplerCube', 'sampler1DShadow', 'sampler2DShadow', 'samplerCubeShadow', 'sampler1DArray', 'sampler2DArray', 'sampler1DArrayShadow', 'sampler2DArrayShadow', 'isampler1D', 'isampler2D', 'isampler3D', 'isamplerCube', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usamplerCube', 'usampler1DArray', 'usampler2DArray']
@@ -1157,8 +1157,8 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-texelFetch-2D')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-texelFetchOffset-2D')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-textureOffset-2D')
 add_shader_test_dir(spec['glsl-1.30']['execution'],
-	            os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.30', 'execution'),
+                    recursive=True)
 spec['glsl-1.30']['linker'] = {}
 spec['glsl-1.30']['linker']['clipping'] = {}
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-and-clip-vertex-disallowed')
@@ -1182,11 +1182,11 @@ add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 # Group spec/glsl-1.40
 spec['glsl-1.40'] = {}
 import_glsl_parser_tests(spec['glsl-1.40'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.40'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.40'),
+                         ['compiler'])
 add_shader_test_dir(spec['glsl-1.40'],
-	            os.path.join(testsDir, 'spec', 'glsl-1.40'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.40'),
+                    recursive=True)
 spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
 spec['glsl-1.40']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.40/minimum-maximums.txt')
 
@@ -1212,11 +1212,11 @@ for stage in ['vs', 'gs', 'fs']:
 
 spec['glsl-1.50'] = {}
 import_glsl_parser_tests(spec['glsl-1.50'],
-			 os.path.join(testsDir, 'spec', 'glsl-1.50'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-1.50'),
+                         ['compiler'])
 add_shader_test_dir(spec['glsl-1.50'],
-		    os.path.join(testsDir, 'spec', 'glsl-1.50'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-1.50'),
+                    recursive=True)
 spec['glsl-1.50']['execution']['interface-blocks-api-access-members'] = concurrent_test('glsl-1.50-interface-blocks-api-access-members')
 spec['glsl-1.50']['execution']['get-active-attrib-array'] = concurrent_test('glsl-1.50-get-active-attrib-array')
 spec['glsl-1.50']['execution']['vs-input-arrays'] = concurrent_test('glsl-1.50-vs-input-arrays')
@@ -1266,7 +1266,7 @@ for prim_type in ['GL_POINTS', 'GL_LINE_LOOP', 'GL_LINE_STRIP', 'GL_LINES',
             concurrent_test('glsl-1.50-geometry-' + cmdline)
 
 for layout_type in ['points', 'lines', 'lines_adjacency', 'triangles',
-			'triangles_adjacency']:
+                    'triangles_adjacency']:
     add_concurrent_test(spec['glsl-1.50'],
                         'glsl-1.50-gs-mismatch-prim-type {0}'.format(
                             layout_type))
@@ -1279,33 +1279,33 @@ for prim_type in ['GL_TRIANGLE_STRIP', 'GL_TRIANGLE_STRIP_ADJACENCY']:
             concurrent_test('glsl-1.50-geometry-' + cmdline)
 
 for input_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
-			'triangles_adjacency', 'line_strip', 'triangle_strip']:
+                     'triangles_adjacency', 'line_strip', 'triangle_strip']:
     add_concurrent_test(spec['glsl-1.50'],
                         'glsl-1.50-gs-input-layout-qualifiers {0}'.format(
                             input_layout))
 
 for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
-			'triangles_adjacency', 'line_strip', 'triangle_strip']:
+                      'triangles_adjacency', 'line_strip', 'triangle_strip']:
     add_concurrent_test(spec['glsl-1.50'],
                         'glsl-1.50-gs-output-layout-qualifiers {0}'.format(
                             output_layout))
 
 spec['glsl-3.30'] = {}
 import_glsl_parser_tests(spec['glsl-3.30'],
-			 os.path.join(testsDir, 'spec', 'glsl-3.30'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-3.30'),
+                         ['compiler'])
 add_shader_test_dir(spec['glsl-3.30'],
-		    os.path.join(testsDir, 'spec', 'glsl-3.30'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-3.30'),
+                    recursive=True)
 
 # Group spec/glsl-es-3.00
 spec['glsl-es-3.00'] = {}
 import_glsl_parser_tests(spec['glsl-es-3.00'],
-			 os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
+                         ['compiler'])
 add_shader_test_dir(spec['glsl-es-3.00'],
-		    os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
+                    recursive=True)
 add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_gles3')
 spec['glsl-es-3.00']['built-in constants'] = concurrent_test('built-in-constants_gles3 tests/spec/glsl-es-3.00/minimum-maximums.txt')
 
@@ -1316,21 +1316,21 @@ profile.test_list['spec/AMD_performance_monitor/measure'] = PiglitTest('amd_perf
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = {}
 import_glsl_parser_tests(spec['AMD_conservative_depth'],
-			 os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
+                         [''])
 
 # Group ARB_arrays_of_arrays
 arb_arrays_of_arrays = {}
 spec['ARB_arrays_of_arrays'] = arb_arrays_of_arrays
 import_glsl_parser_tests(arb_arrays_of_arrays,
-			 os.path.join(testsDir, 'spec', 'arb_arrays_of_arrays'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'arb_arrays_of_arrays'),
+                         ['compiler'])
 
 # Group AMD_shader_trinary_minmax
 spec['AMD_shader_trinary_minmax'] = {}
 import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
-			 os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
+                         [''])
 add_shader_test_dir(spec['AMD_shader_trinary_minmax'],
                     os.path.join(testsDir, 'spec', 'amd_shader_trinary_minmax'),
                     recursive=True)
@@ -1357,7 +1357,7 @@ add_shader_test_dir(arb_tessellation_shader,
 
 # Group ARB_texture_multisample
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
-				'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
+                'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
 arb_texture_multisample = {}
 spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, 'arb_texture_multisample-minmax')
@@ -1403,30 +1403,30 @@ for stage in ['vs', 'fs']:
     for comps in ['r', 'rg', 'rgb', 'rgba']:
         for swiz in ['red', 'green', 'blue', 'alpha'][:len(comps)] + ['', 'zero', 'one']:
             for type in ['unorm', 'float', 'int', 'uint']:
-		for sampler in ['2D', '2DArray', 'Cube', 'CubeArray']:
-		    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
-			testname = '%s/%s-%s-%s-%s-%s' % (
-			    func, stage, comps,
-			    swiz if len(swiz) else 'none',
-			    type, sampler)
-			cmd = 'textureGather %s %s %s %s %s %s' % (
-			    stage,
-			    'offset' if func == 'textureGatherOffset' else '',
-			    comps, swiz, type, sampler
-			    )
-			arb_texture_gather[testname] = concurrent_test(cmd)
+                for sampler in ['2D', '2DArray', 'Cube', 'CubeArray']:
+                    for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
+                        testname = '%s/%s-%s-%s-%s-%s' % (
+                            func, stage, comps,
+                            swiz if len(swiz) else 'none',
+                            type, sampler)
+                        cmd = 'textureGather %s %s %s %s %s %s' % (
+                            stage,
+                            'offset' if func == 'textureGatherOffset' else '',
+                            comps, swiz, type, sampler
+                            )
+                        arb_texture_gather[testname] = concurrent_test(cmd)
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = {}
 import_glsl_parser_tests(spec['AMD_shader_stencil_export'],
-			 os.path.join(testsDir, 'spec', 'amd_shader_stencil_export'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'amd_shader_stencil_export'),
+                         [''])
 
 # Group ARB_shader_stencil_export
 spec['ARB_shader_stencil_export'] = {}
 import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
-			 os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
+                         [''])
 
 profile.test_list['spec/ARB_stencil_texturing/draw'] = concurrent_test('arb_stencil_texturing-draw')
 
@@ -1520,8 +1520,8 @@ add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays-instances'
 arb_fragment_program = {}
 spec['ARB_fragment_program'] = arb_fragment_program
 add_shader_test_dir(spec['ARB_fragment_program'],
-	            os.path.join(testsDir, 'spec', 'arb_fragment_program'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_fragment_program'),
+                    recursive=True)
 arb_fragment_program['minmax'] = concurrent_test('arb_fragment_program-minmax')
 add_vpfpgeneric(arb_fragment_program, 'fdo30337a')
 add_vpfpgeneric(arb_fragment_program, 'fdo30337b')
@@ -1551,8 +1551,8 @@ arb_fragment_program['incomplete-texture-arb_fp'] = concurrent_test('incomplete-
 arb_fragment_program_shadow = {}
 spec['ARB_fragment_program_shadow'] = arb_fragment_program_shadow
 add_shader_test_dir(spec['ARB_fragment_program_shadow'],
-	            os.path.join(testsDir, 'spec', 'arb_fragment_program_shadow'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_fragment_program_shadow'),
+                    recursive=True)
 
 nv_fragment_program_option = {}
 spec['NV_fragment_program_option'] = nv_fragment_program_option
@@ -1567,8 +1567,9 @@ spec['ARB_fragment_coord_conventions'] = arb_fragment_coord_conventions
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-none')
 add_vpfpgeneric(arb_fragment_coord_conventions, 'fp-arb-fragment-coord-conventions-integer')
 import_glsl_parser_tests(arb_fragment_coord_conventions,
-			 os.path.join(testsDir, 'spec',
-			  'arb_fragment_coord_conventions'), ['compiler'])
+                         os.path.join(testsDir, 'spec',
+                                      'arb_fragment_coord_conventions'),
+                         ['compiler'])
 
 ati_fragment_shader = {}
 spec['ATI_fragment_shader'] = ati_fragment_shader
@@ -1698,7 +1699,7 @@ add_shader_test_dir(arb_texture_query_levels,
                     testsDir + '/spec/arb_texture_query_levels',
                     recursive=True)
 import_glsl_parser_tests(arb_texture_query_levels,
-			 testsDir + '/spec/arb_texture_query_levels', [''])
+                         testsDir + '/spec/arb_texture_query_levels', [''])
 
 arb_occlusion_query = {}
 spec['ARB_occlusion_query'] = arb_occlusion_query
@@ -1827,19 +1828,19 @@ arb_shader_bit_encoding = {}
 spec['ARB_shader_bit_encoding'] = arb_shader_bit_encoding
 arb_shader_bit_encoding['execution'] = {}
 add_shader_test_dir(arb_shader_bit_encoding['execution'],
-	            os.path.join(testsDir, 'spec', 'arb_shader_bit_encoding', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_shader_bit_encoding', 'execution'),
+                    recursive=True)
 
 # Group ARB_shader_texture_lod
 arb_shader_texture_lod = {}
 spec['ARB_shader_texture_lod'] = arb_shader_texture_lod
 import_glsl_parser_tests(arb_shader_texture_lod,
-			 os.path.join(generatedTestDir, 'spec', 'arb_shader_texture_lod'),
-			 ['compiler'])
+                         os.path.join(generatedTestDir, 'spec', 'arb_shader_texture_lod'),
+                         ['compiler'])
 arb_shader_texture_lod['execution'] = {}
 add_shader_test_dir(arb_shader_texture_lod['execution'],
-	            os.path.join(testsDir, 'spec', 'arb_shader_texture_lod', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_shader_texture_lod', 'execution'),
+                    recursive=True)
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgrad')
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgradcube')
 arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod', '-GL_ARB_shader_texture_lod'])
@@ -1859,12 +1860,12 @@ arb_shader_objects['delete-repeat'] = concurrent_test('arb_shader_objects-delete
 arb_shading_language_420pack = {}
 spec['ARB_shading_language_420pack'] = arb_shading_language_420pack
 import_glsl_parser_tests(arb_shading_language_420pack,
-			 os.path.join(testsDir, 'spec', 'arb_shading_language_420pack'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'arb_shading_language_420pack'),
+                         ['compiler'])
 arb_shading_language_420pack['execution'] = {}
 add_shader_test_dir(arb_shading_language_420pack['execution'],
-	            os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
+                    recursive=True)
 spec['ARB_shading_language_420pack']['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_shading_language_420pack/minimum-maximums.txt')
 spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = concurrent_test('arb_shading_language_420pack-multiple-layout-qualifiers')
 
@@ -1872,9 +1873,9 @@ spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = concurrent_
 arb_explicit_attrib_location = {}
 spec['ARB_explicit_attrib_location'] = arb_explicit_attrib_location
 import_glsl_parser_tests(arb_explicit_attrib_location,
-			 os.path.join(testsDir,
-			 'spec', 'arb_explicit_attrib_location'),
-			 [''])
+                         os.path.join(testsDir,
+                         'spec', 'arb_explicit_attrib_location'),
+                         [''])
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-01')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-02')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-03')
@@ -2572,8 +2573,8 @@ add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap arra
 add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array S3TC_DXT1')
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
-			 os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
+                         ['compiler'])
 for stage in ['vs', 'gs', 'fs']:
     # textureSize():
     for sampler in textureSize_samplers_atcma:
@@ -2791,36 +2792,36 @@ ext_transform_feedback['max-varyings'] = concurrent_test('ext_transform_feedback
 ext_transform_feedback['nonflat-integral'] = concurrent_test('ext_transform_feedback-nonflat-integral')
 ext_transform_feedback['overflow-edge-cases'] = concurrent_test('ext_transform_feedback-overflow-edge-cases')
 ext_transform_feedback['overflow-edge-cases use_gs'] = concurrent_test('ext_transform_feedback-overflow-edge-cases use_gs')
-ext_transform_feedback['position-readback-bufferbase'] = 		concurrent_test('ext_transform_feedback-position')
-ext_transform_feedback['position-readback-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position discard')
-ext_transform_feedback['position-readback-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position offset')
-ext_transform_feedback['position-readback-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position offset discard')
-ext_transform_feedback['position-readback-bufferrange'] = 		concurrent_test('ext_transform_feedback-position range')
-ext_transform_feedback['position-readback-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position range discard')
+ext_transform_feedback['position-readback-bufferbase'] = concurrent_test('ext_transform_feedback-position')
+ext_transform_feedback['position-readback-bufferbase-discard'] = concurrent_test('ext_transform_feedback-position discard')
+ext_transform_feedback['position-readback-bufferoffset'] = concurrent_test('ext_transform_feedback-position offset')
+ext_transform_feedback['position-readback-bufferoffset-discard'] = concurrent_test('ext_transform_feedback-position offset discard')
+ext_transform_feedback['position-readback-bufferrange'] = concurrent_test('ext_transform_feedback-position range')
+ext_transform_feedback['position-readback-bufferrange-discard'] = concurrent_test('ext_transform_feedback-position range discard')
 
-ext_transform_feedback['negative-prims'] = 				concurrent_test('ext_transform_feedback-negative-prims')
-ext_transform_feedback['primgen-query transform-feedback-disabled'] = 	concurrent_test('ext_transform_feedback-primgen')
+ext_transform_feedback['negative-prims'] = concurrent_test('ext_transform_feedback-negative-prims')
+ext_transform_feedback['primgen-query transform-feedback-disabled'] = concurrent_test('ext_transform_feedback-primgen')
 
-ext_transform_feedback['position-render-bufferbase'] = 			concurrent_test('ext_transform_feedback-position render')
-ext_transform_feedback['position-render-bufferbase-discard'] = 		concurrent_test('ext_transform_feedback-position render discard')
-ext_transform_feedback['position-render-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position render offset')
-ext_transform_feedback['position-render-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position render offset discard')
-ext_transform_feedback['position-render-bufferrange'] = 		concurrent_test('ext_transform_feedback-position render range')
-ext_transform_feedback['position-render-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position render range discard')
+ext_transform_feedback['position-render-bufferbase'] = concurrent_test('ext_transform_feedback-position render')
+ext_transform_feedback['position-render-bufferbase-discard'] = concurrent_test('ext_transform_feedback-position render discard')
+ext_transform_feedback['position-render-bufferoffset'] = concurrent_test('ext_transform_feedback-position render offset')
+ext_transform_feedback['position-render-bufferoffset-discard'] = concurrent_test('ext_transform_feedback-position render offset discard')
+ext_transform_feedback['position-render-bufferrange'] = concurrent_test('ext_transform_feedback-position render range')
+ext_transform_feedback['position-render-bufferrange-discard'] = concurrent_test('ext_transform_feedback-position render range discard')
 
-ext_transform_feedback['query-primitives_generated-bufferbase'] = 		concurrent_test('ext_transform_feedback-position primgen')
-ext_transform_feedback['query-primitives_generated-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position primgen discard')
-ext_transform_feedback['query-primitives_generated-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position primgen offset')
-ext_transform_feedback['query-primitives_generated-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position primgen offset discard')
-ext_transform_feedback['query-primitives_generated-bufferrange'] = 		concurrent_test('ext_transform_feedback-position primgen range')
-ext_transform_feedback['query-primitives_generated-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position primgen range discard')
+ext_transform_feedback['query-primitives_generated-bufferbase'] = concurrent_test('ext_transform_feedback-position primgen')
+ext_transform_feedback['query-primitives_generated-bufferbase-discard'] = concurrent_test('ext_transform_feedback-position primgen discard')
+ext_transform_feedback['query-primitives_generated-bufferoffset'] = concurrent_test('ext_transform_feedback-position primgen offset')
+ext_transform_feedback['query-primitives_generated-bufferoffset-discard'] = concurrent_test('ext_transform_feedback-position primgen offset discard')
+ext_transform_feedback['query-primitives_generated-bufferrange'] = concurrent_test('ext_transform_feedback-position primgen range')
+ext_transform_feedback['query-primitives_generated-bufferrange-discard'] = concurrent_test('ext_transform_feedback-position primgen range discard')
 
-ext_transform_feedback['query-primitives_written-bufferbase'] = 		concurrent_test('ext_transform_feedback-position primwritten')
-ext_transform_feedback['query-primitives_written-bufferbase-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten discard')
-ext_transform_feedback['query-primitives_written-bufferoffset'] = 		concurrent_test('ext_transform_feedback-position primwritten offset')
-ext_transform_feedback['query-primitives_written-bufferoffset-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten offset discard')
-ext_transform_feedback['query-primitives_written-bufferrange'] = 		concurrent_test('ext_transform_feedback-position primwritten range')
-ext_transform_feedback['query-primitives_written-bufferrange-discard'] = 	concurrent_test('ext_transform_feedback-position primwritten range discard')
+ext_transform_feedback['query-primitives_written-bufferbase'] = concurrent_test('ext_transform_feedback-position primwritten')
+ext_transform_feedback['query-primitives_written-bufferbase-discard'] = concurrent_test('ext_transform_feedback-position primwritten discard')
+ext_transform_feedback['query-primitives_written-bufferoffset'] = concurrent_test('ext_transform_feedback-position primwritten offset')
+ext_transform_feedback['query-primitives_written-bufferoffset-discard'] = concurrent_test('ext_transform_feedback-position primwritten offset discard')
+ext_transform_feedback['query-primitives_written-bufferrange'] = concurrent_test('ext_transform_feedback-position primwritten range')
+ext_transform_feedback['query-primitives_written-bufferrange-discard'] = concurrent_test('ext_transform_feedback-position primwritten range discard')
 
 ext_transform_feedback['interleaved-attribs'] = concurrent_test('ext_transform_feedback-interleaved')
 ext_transform_feedback['separate-attribs'] = concurrent_test('ext_transform_feedback-separate')
@@ -2920,11 +2921,11 @@ arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs_max
 arb_uniform_buffer_object = {}
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
 import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
-			 os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
+                         [''])
 add_shader_test_dir(spec['ARB_uniform_buffer_object'],
-	            os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'arb_uniform_buffer_object'),
+                    recursive=True)
 arb_uniform_buffer_object['bindbuffer-general-point'] = concurrent_test('arb_uniform_buffer_object-bindbuffer-general-point')
 arb_uniform_buffer_object['buffer-targets'] = concurrent_test('arb_uniform_buffer_object-buffer-targets')
 arb_uniform_buffer_object['deletebuffers'] = concurrent_test('arb_uniform_buffer_object-deletebuffers')
@@ -3024,8 +3025,8 @@ add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
 ext_shader_integer_mix = {}
 spec['EXT_shader_integer_mix'] = ext_shader_integer_mix
 add_shader_test_dir(spec['EXT_shader_integer_mix'],
-	            os.path.join(testsDir, 'spec', 'ext_shader_integer_mix'),
-		    recursive=True)
+                    os.path.join(testsDir, 'spec', 'ext_shader_integer_mix'),
+                    recursive=True)
 
 nv_texture_barrier = {}
 spec['NV_texture_barrier'] = nv_texture_barrier
@@ -3060,8 +3061,8 @@ oes_fixed_point['attribute-arrays'] = concurrent_test('oes_fixed_point-attribute
 
 spec['OES_standard_derivatives'] = {}
 import_glsl_parser_tests(spec['OES_standard_derivatives'],
-			 os.path.join(testsDir, 'spec', 'oes_standard_derivatives'),
-			 ['compiler'])
+                         os.path.join(testsDir, 'spec', 'oes_standard_derivatives'),
+                         ['compiler'])
 
 arb_clear_buffer_object = {}
 spec['ARB_clear_buffer_object'] = arb_clear_buffer_object
@@ -3816,14 +3817,14 @@ for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb
         arb_es3_compatibility[test_name] = concurrent_test(executable)
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
-		    recursive=True)
+                    recursive=True)
 import_glsl_parser_tests(profile.tests, generatedTestDir, ['spec'])
 
 arb_shader_atomic_counters = {}
 spec['ARB_shader_atomic_counters'] = arb_shader_atomic_counters
 import_glsl_parser_tests(spec['ARB_shader_atomic_counters'],
-			 os.path.join(testsDir, 'spec', 'arb_shader_atomic_counters'),
-			 [''])
+                         os.path.join(testsDir, 'spec', 'arb_shader_atomic_counters'),
+                         [''])
 arb_shader_atomic_counters['active-counters'] = concurrent_test('arb_shader_atomic_counters-active-counters')
 arb_shader_atomic_counters['array-indexing'] = concurrent_test('arb_shader_atomic_counters-array-indexing')
 arb_shader_atomic_counters['buffer-binding'] = concurrent_test('arb_shader_atomic_counters-buffer-binding')

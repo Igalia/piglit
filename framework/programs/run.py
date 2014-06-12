@@ -131,7 +131,7 @@ def run(input_):
         args.config_file.close()
     else:
         core.PIGLIT_CONFIG.read(os.path.join(os.environ['PIGLIT_SOURCE_DIR'],
-	                        'piglit.conf'))
+                                             'piglit.conf'))
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
