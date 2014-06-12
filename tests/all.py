@@ -1732,7 +1732,8 @@ with profile.group_manager(
     g(['arb_texture_multisample-negative-max-samples'])
     g(['arb_texture_multisample-teximage-3d-multisample'])
     g(['arb_texture_multisample-teximage-2d-multisample'])
-    g(['arb_texture_multisample-sample-depth'])
+    g(['arb_texture_multisample-sample-depth']),
+    g(['arb_texture_multisample-clear'])
 
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
                 'sampler2DMSArray', 'isampler2DMSArray', 'usampler2DMSArray']
