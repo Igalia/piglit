@@ -9,11 +9,13 @@ in vec4 vertex;
 out vec4 color;
 
 uniform sampler2D s;
-uniform int expected;
+
+// The only thing the spec says about textures without a minification filter is:
+//   "If the texture is complete, a non-zero value must be returned."
 
 void main() {
     gl_Position = vertex;
-   if (textureQueryLevels(s) == expected)
+   if (textureQueryLevels(s) != 0)
        color = vec4(0,1,0,0);
    else
        color = vec4(1,0,0,0);
@@ -36,8 +38,6 @@ uniform int s 0
 
 texparameter 2D min nearest
 texparameter 2D mag nearest
-
-uniform int expected 1
 
 draw rect -1 -1 2 2
 relative probe rgba (0.5, 0.5)  (0, 1, 0, 0)
