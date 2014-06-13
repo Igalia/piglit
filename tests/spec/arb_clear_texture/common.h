@@ -56,3 +56,14 @@ test_format(GLenum internalFormat,
 bool
 test_formats(const struct format *formats,
 	     int n_formats);
+
+/**
+ * Creates a 1x1 texture with the one format and asserts that trying
+ * to clear using another format results in GL_INVALID_OPERATION
+ */
+bool
+test_invalid_format(GLenum internalFormat,
+		    GLenum texImageFormat,
+		    GLenum texImageType,
+		    GLenum clearValueFormat,
+		    GLenum clearValueType);

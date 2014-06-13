@@ -9,6 +9,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_clear_texture-simple simple.c)
+piglit_add_executable (arb_clear_texture-error error.c common.c)
 piglit_add_executable (arb_clear_texture-3d 3d.c)
 piglit_add_executable (arb_clear_texture-cube cube.c)
 piglit_add_executable (arb_clear_texture-multisample multisample.c)

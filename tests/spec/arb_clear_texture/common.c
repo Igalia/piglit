@@ -247,3 +247,37 @@ test_formats(const struct format *formats,
 
 	return overallResult;
 }
+
+bool
+test_invalid_format(GLenum internalFormat,
+		    GLenum texImageFormat,
+		    GLenum texImageType,
+		    GLenum clearValueFormat,
+		    GLenum clearValueType)
+{
+	static const GLubyte dummy_data[sizeof (float) * 4];
+	bool pass = true;
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D,
+		     0, /* level */
+		     internalFormat,
+		     1, 1, /* width/height */
+		     0, /* border */
+		     texImageFormat,
+		     texImageType,
+		     dummy_data);
+
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	glClearTexImage(tex, 0, clearValueFormat, clearValueType, dummy_data);
+
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+
+	return pass;
+}
