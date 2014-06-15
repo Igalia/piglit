@@ -4,10 +4,12 @@ GLSL >= 1.40
 [vertex shader]
 #version 140
 
+struct S {
+	vec4 a, b, c, d;
+};
+
 uniform ubo1 {
-	struct S {
-		vec4 a, b, c, d;
-	} colors;
+	S colors;
 };
 
 in vec4 piglit_vertex;

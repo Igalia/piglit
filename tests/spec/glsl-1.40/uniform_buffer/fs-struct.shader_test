@@ -6,13 +6,15 @@ GLSL >= 1.40
 [fragment shader]
 #version 140
 
+struct S {
+	float r;
+	float g;
+	float b;
+	float a;
+};
+
 uniform ubo1 {
-	struct S {
-		float r;
-		float g;
-		float b;
-		float a;
-	} s;
+	S s;
 };
 
 void main()

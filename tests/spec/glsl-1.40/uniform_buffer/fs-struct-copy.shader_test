@@ -6,10 +6,12 @@ GLSL >= 1.40
 [fragment shader]
 #version 140
 
+struct S {
+	vec4 a, b, c, d;
+};
+
 uniform ubo1 {
-	struct S {
-		vec4 a, b, c, d;
-	} colors;
+	S colors;
 };
 
 void main()

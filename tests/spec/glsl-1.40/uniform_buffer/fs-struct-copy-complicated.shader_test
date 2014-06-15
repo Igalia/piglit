@@ -11,12 +11,14 @@ struct S2 {
 	mat2 m22[2];
 };
 
+struct S {
+	S2 arr[2];
+	vec3 v3;
+	bool b;
+};
+
 uniform ubo1 {
-	struct S {
-		S2 arr[2];
-		vec3 v3;
-		bool b;
-	} s[2];
+	S s[2];
 };
 
 void main()
