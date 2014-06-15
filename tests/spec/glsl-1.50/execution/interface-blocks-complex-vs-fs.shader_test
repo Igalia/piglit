@@ -32,12 +32,14 @@ uniform ublk {
     uniform vec4 color;
 } vs2ublk;
 
+struct gb_struct {
+    vec2 gb;
+};
+
 out vblk2 {
     float unused;
     float a;
-    struct gb_struct {
-        vec2 gb;
-    } gb_array[3];
+    gb_struct gb_array[3];
 } gb_blk;
 
 /* Use an array within an interface block.
@@ -94,12 +96,14 @@ in vblk1 {
     vec4 r;
 } r_blk;
 
+struct gb_struct {
+    vec2 gb;
+};
+
 in vblk2 {
     float unused;
     float a;
-    struct gb_struct {
-        vec2 gb;
-    } gb_array[3];
+    gb_struct gb_array[3];
 } gb_blk;
 
 in vblk3 {
