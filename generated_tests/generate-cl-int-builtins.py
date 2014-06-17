@@ -1,5 +1,3 @@
-# !/usr/bin/env python
-
 import os
 from genclbuiltins import gen, DATA_SIZES, MAX_VALUES, MAX, MIN, BMIN, BMAX, \
                           SMIN, SMAX, UMIN, UMAX, TYPE, SIZE, T, U, B
