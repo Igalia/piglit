@@ -71,9 +71,9 @@ atomic_counters_compile(GLuint prog, GLuint stage, const char *src)
         if (status) {
                 glAttachShader(prog, shader);
         } else {
-                glGetShaderiv(prog, GL_INFO_LOG_LENGTH, &log_size);
+                glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_size);
                 log = malloc(log_size);
-                glGetShaderInfoLog(prog, log_size, NULL, log);
+                glGetShaderInfoLog(shader, log_size, NULL, log);
 
                 printf("Failed to compile shader: %s\n", log);
                 printf("source:\n%s", src);
