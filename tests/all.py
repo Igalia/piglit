@@ -1238,9 +1238,6 @@ for subtest in ['unnamed', 'named', 'array']:
         spec['glsl-1.50'],
         'glsl-1.50-interface-block-centroid {0}'.format(subtest))
 
-spec['glsl-3.30'] = {}
-spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
-
 # max_vertices of 32 and 128 are important transition points for
 # mesa/i965 (they are the number of bits in a float and a vec4,
 # respectively), so test around there.  Also test 0, which means the
@@ -1290,6 +1287,8 @@ for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
                             output_layout))
 
 spec['glsl-3.30'] = {}
+spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
+
 import_glsl_parser_tests(spec['glsl-3.30'],
                          os.path.join(testsDir, 'spec', 'glsl-3.30'),
                          ['compiler'])
