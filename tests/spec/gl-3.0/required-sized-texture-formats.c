@@ -82,6 +82,28 @@ piglit_display(void)
 	return PIGLIT_FAIL;
 }
 
+static void
+GetTexLevelParameteriv(GLenum target, GLuint level, GLenum pname, GLint *value)
+{
+	const bool compat_profile = !piglit_is_gles() &&
+		!piglit_is_core_profile;
+
+	if (!compat_profile) {
+		switch (pname) {
+		case GL_TEXTURE_LUMINANCE_SIZE:
+		case GL_TEXTURE_INTENSITY_SIZE:
+		case GL_TEXTURE_LUMINANCE_TYPE:
+		case GL_TEXTURE_INTENSITY_TYPE:
+			*value = 0;
+			return;
+		default:
+			break;
+		}
+	}
+
+	glGetTexLevelParameteriv(target, level, pname, value);
+}
+
 void
 piglit_init(int argc, char **argv)
 {
@@ -146,12 +168,13 @@ piglit_init(int argc, char **argv)
 		}
 
 		for (c = 0; c < CHANNELS; c++) {
-			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-						 size_queries[c], &sizes[c]);
+			GetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+					       size_queries[c], &sizes[c]);
+
 			if (c != S) {
-				glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-							 type_queries[c],
-							 &types[c]);
+				GetTexLevelParameteriv(GL_TEXTURE_2D, 0,
+						       type_queries[c],
+						       &types[c]);
 			} else {
 				/* For stencil, there's no query for
 				 * the type, so our table above
