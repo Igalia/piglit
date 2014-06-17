@@ -126,7 +126,7 @@ run_test_geometry(void)
                 "void main() {\n"
                 "       fcolor = gcolor;\n"
                 "}\n";
-        const char *gs_source = "#version 140\n"
+        const char *gs_source = "#version 150\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
                 "layout(points) in;\n"
@@ -178,7 +178,7 @@ run_test_tess_control(void)
                 "void main() {\n"
                 "       fg = tecolor;\n"
                 "}\n";
-        const char *tes_source = "#version 140\n"
+        const char *tes_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(triangles, point_mode) in;\n"
@@ -193,7 +193,7 @@ run_test_tess_control(void)
                 "       \n"
                 "       tecolor = tccolor;\n"
                 "}\n";
-        const char *tcs_source = "#version 140\n"
+        const char *tcs_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -257,7 +257,8 @@ run_test_tess_evaluation(void)
                 "void main() {\n"
                 "       fg = tecolor;\n"
                 "}\n";
-        const char *tes_source = "#version 140\n"
+        const char *tes_source = "#version 150\n"
+                "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(triangles, point_mode) in;\n"
@@ -280,8 +281,7 @@ run_test_tess_evaluation(void)
                 "               tecolor = ivec4(0);\n"
                 "       }\n"
                 "}\n";
-        const char *tcs_source = "#version 140\n"
-                "#extension GL_ARB_shader_atomic_counters : enable\n"
+        const char *tcs_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(vertices=3) out;\n"

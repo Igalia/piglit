@@ -118,7 +118,7 @@ run_test_geometry(void)
                 "void main() {\n"
                 "       fcolor = ivec4(0);\n"
                 "}\n";
-        const char *gs_source = "#version 140\n"
+        const char *gs_source = "#version 150\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
                 "layout(points) in;\n"
@@ -132,7 +132,6 @@ run_test_geometry(void)
                 "       EmitVertex();\n"
                 "}\n";
         const char *vs_source = "#version 140\n"
-                "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
                 "in vec4 piglit_vertex;\n"
                 "\n"
@@ -163,7 +162,7 @@ run_test_tess_control(void)
                 "void main() {\n"
                 "       fg = ivec4(0);\n"
                 "}\n";
-        const char *tes_source = "#version 140\n"
+        const char *tes_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(triangles, point_mode) in;\n"
@@ -175,7 +174,7 @@ run_test_tess_control(void)
                 "               gl_in[2].gl_Position * gl_TessCoord.z;\n"
                 "       \n"
                 "}\n";
-        const char *tcs_source = "#version 140\n"
+        const char *tcs_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
@@ -198,7 +197,6 @@ run_test_tess_control(void)
                 "               gl_in[gl_InvocationID].gl_Position;\n"
                 "}\n";
         const char *vs_source = "#version 140\n"
-                "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
                 "in vec4 piglit_vertex;\n"
                 "\n"
@@ -232,7 +230,8 @@ run_test_tess_evaluation(void)
                 "void main() {\n"
                 "       fg = ivec4(0);\n"
                 "}\n";
-        const char *tes_source = "#version 140\n"
+        const char *tes_source = "#version 150\n"
+                "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(triangles, point_mode) in;\n"
@@ -248,8 +247,7 @@ run_test_tess_evaluation(void)
                 "               atomicCounterIncrement(x);\n"
                 "       }\n"
                 "}\n";
-        const char *tcs_source = "#version 140\n"
-                "#extension GL_ARB_shader_atomic_counters : enable\n"
+        const char *tcs_source = "#version 150\n"
                 "#extension GL_ARB_tessellation_shader : enable\n"
                 "\n"
                 "layout(vertices=3) out;\n"
@@ -267,7 +265,6 @@ run_test_tess_evaluation(void)
                 "               gl_in[gl_InvocationID].gl_Position;\n"
                 "}\n";
         const char *vs_source = "#version 140\n"
-                "#extension GL_ARB_shader_atomic_counters : enable\n"
                 "\n"
                 "in vec4 piglit_vertex;\n"
                 "\n"
