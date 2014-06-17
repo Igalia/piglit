@@ -211,7 +211,7 @@ atomic_counters_supported(GLenum shader_stage)
                 return n;
 
         case GL_GEOMETRY_SHADER:
-                if (piglit_is_extension_supported("GL_ARB_geometry_shader4"))
+                if (piglit_get_gl_version() >= 32)
                         glGetIntegerv(GL_MAX_GEOMETRY_ATOMIC_COUNTERS, &n);
                 return n;
 
