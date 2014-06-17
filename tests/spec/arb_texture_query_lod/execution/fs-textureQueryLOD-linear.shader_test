@@ -46,11 +46,16 @@ GL_ARB_texture_query_lod
 #extension GL_ARB_texture_query_lod : enable
 uniform sampler2D tex;
 uniform float lod;
+
+#define tolerance (1.0/255.0)
+#define equal_v4(x,y) all(lessThanEqual(abs((x) - (y)), vec4(tolerance)))
+#define equal(x,y) (abs((x) - (y)) <= tolerance)
+
 void main()
 {
     vec4 frag1 = texture(tex, gl_TexCoord[0].st);
     vec4 frag2 = textureLod(tex, gl_TexCoord[0].st, lod);
-    if (frag1 != frag2) {
+    if (!equal_v4(frag1, frag2)) {
 	discard;
     }
 
@@ -58,7 +63,7 @@ void main()
     if (queried_lod.x != queried_lod.y) {
 	discard;
     }
-    if (queried_lod.x != lod) {
+    if (!equal(queried_lod.x, lod)) {
 	discard;
     }
 

@@ -46,6 +46,10 @@ GL_ARB_texture_query_lod
 #extension GL_ARB_texture_query_lod : enable
 uniform sampler2D tex;
 uniform float lod;
+
+#define tolerance (1.0/255.0)
+#define equal(x,y) (abs((x) - (y)) <= tolerance)
+
 void main()
 {
     /* The ARB_texture_query_lod spec says that if TEXTURE_MIN_FILTER is set
@@ -64,7 +68,7 @@ void main()
     }
 
     vec2 queried_lod = textureQueryLOD(tex, gl_TexCoord[0].st);
-    if (queried_lod.x != queried_lod.y) {
+    if (!equal(queried_lod.x, queried_lod.y)) {
 	discard;
     }
     if (queried_lod.x != nearest_lod) {
