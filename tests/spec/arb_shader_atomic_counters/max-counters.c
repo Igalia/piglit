@@ -158,7 +158,8 @@ run_test_fragment_max_buffers(unsigned num_buffers)
         char *src = atomic_counters_generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
-                "#define Y(I) y##I\n"
+                "#define PASTE(A,B) A ## B\n"
+                "#define Y(I) PASTE(y, I)\n"
                 "\n"
                 "out ivec4 fcolor;\n"
                 "\n"
@@ -190,7 +191,8 @@ run_test_vertex_max_buffers(unsigned num_buffers)
         char *src = atomic_counters_generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
-                "#define X(I) x##I\n"
+                "#define PASTE(A,B) A ## B\n"
+                "#define X(I) PASTE(x, I)\n"
                 "\n"
                 "in vec4 position;\n"
                 "flat out ivec4 vcolor;\n"
@@ -225,7 +227,8 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
         char *fs_source = atomic_counters_generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
-                "#define Y(I) y##I\n"
+                "#define PASTE(A,B) A ## B\n"
+                "#define Y(I) PASTE(y, I)\n"
                 "\n"
                 "out ivec4 fcolor;\n"
                 "\n"
@@ -245,7 +248,8 @@ run_test_combined_max_buffers(unsigned num_fragment_buffers,
         char *vs_source = atomic_counters_generate_source(
                 "#version 140\n"
                 "#extension GL_ARB_shader_atomic_counters : enable\n"
-                "#define X(I) x##I\n"
+                "#define PASTE(A,B) A ## B\n"
+                "#define X(I) PASTE(x, I)\n"
                 "\n"
                 "in vec4 position;\n"
                 "flat out ivec4 vcolor;\n"
