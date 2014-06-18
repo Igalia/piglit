@@ -34,6 +34,12 @@ enum context_flavor {
 	CONTEXT_GL_ES,
 };
 
+static bool
+make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
+                                const struct piglit_gl_test_config *test_config,
+                                enum context_flavor flavor,
+                                const int32_t partial_config_attrib_list[]);
+
 struct piglit_wfl_framework*
 piglit_wfl_framework(struct piglit_gl_framework *gl_fw)
 {
@@ -148,7 +154,8 @@ concat_attrib_lists(const int32_t a[], const int32_t b[])
  * including the terminal null, are written to \a buf.
  */
 static void
-make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[])
+make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[],
+			 enum context_flavor flavor)
 {
 	int32_t api = 0, profile = 0, major_version = 0, minor_version = 0,
 		fwd_compat = 0, debug = 0;
@@ -181,6 +188,9 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 	}
 
 	switch (profile) {
+	default:
+		assert(0);
+		break;
 	case WAFFLE_CONTEXT_CORE_PROFILE:
 		profile_str = "Core ";
 		break;
@@ -188,10 +198,20 @@ make_context_description(char buf[], size_t bufsize, const int32_t attrib_list[]
 		profile_str = "Compatibility ";
 		break;
 	case 0:
-		profile_str = "";
-		break;
-	default:
-		assert(0);
+		switch (flavor) {
+			default:
+				assert(0);
+				break;
+			case CONTEXT_GL_CORE:
+				profile_str = "Core ";
+				break;
+			case CONTEXT_GL_COMPAT:
+				profile_str = "Compatibility ";
+				break;
+			case CONTEXT_GL_ES:
+				profile_str = "";
+				break;
+		}
 		break;
 	}
 
@@ -355,52 +375,99 @@ check_gl_version(const struct piglit_gl_test_config *test_config,
 }
 
 /**
- * Handle the special case when a test requests GL 3.1.
+ * \brief Handle requests for OpenGL 3.1 profiles.
+ *
+ * Strictly speaking, an OpenGL 3.1 context has no profile. (See the
+ * EGL_KHR_create_context spec for the ugly details [1]). If the user does
+ * request a specific OpenGL 3.1 profile, though, then let's do what the user
+ * wants.
+ *
+ * If the user requests a OpenGL 3.1 Core Context, and the returned context is
+ * exactly an OpenGL 3.1 context but it exposes GL_ARB_compatibility, then
+ * fallback to requesting an OpenGL 3.2 Core Context because, if context
+ * creation succeeds, then Waffle guarantees that an OpenGL 3.2 Context will
+ * have the requested profile. Likewise for OpenGL 3.1 Compatibility Contexts.
+ *
+ * [1] http://www.khronos.org/registry/egl/extensions/KHR/EGL_KHR_create_context.txt
  */
 static bool
-special_case_gl_31(const struct piglit_gl_test_config *test_config,
-                   enum context_flavor flavor,
-		   const char *context_description)
+special_case_gl31(struct piglit_wfl_framework *wfl_fw,
+		  const struct piglit_gl_test_config *test_config,
+		  enum context_flavor flavor,
+		  const char *context_description,
+		  const int32_t partial_config_attrib_list[])
 {
-	int gl_version;
+	int requested_gl_version, actual_gl_version;
+	bool has_core_profile;
+	struct piglit_gl_test_config fallback_config = *test_config;
+	const char *error_verb = NULL;
 
-	if (flavor == CONTEXT_GL_CORE
-	    && test_config->supports_gl_core_version == 31) {
+	switch (flavor) {
+	case CONTEXT_GL_CORE:
+	     requested_gl_version = test_config->supports_gl_core_version;
+	     fallback_config.supports_gl_core_version = 32;
+	     error_verb = "exposes";
+	     break;
+	case CONTEXT_GL_COMPAT:
+	     requested_gl_version = test_config->supports_gl_compat_version;
+	     fallback_config.supports_gl_compat_version = 32;
+	     error_verb = "lacks";
+	     break;
+	case CONTEXT_GL_ES:
+	     return true;
+	default:
+	     assert(false);
+	     return false;
+	}
 
-		gl_version = piglit_get_gl_version();
-		assert(gl_version >= 31);
-
-		if (gl_version == 31
-		    && piglit_is_extension_supported("GL_ARB_compatibility")) {
-			printf("piglit: info: Requested a %s, but the actual "
-			       "context is a 3.1 context that exposes the "
-			       "GL_ARB_compatibility extension\n",
-			       context_description);
-			return false;
-		} else {
-			return true;
-		}
-
-	} else if (flavor == CONTEXT_GL_COMPAT
-	           && test_config->supports_gl_compat_version == 31) {
-
-		gl_version = piglit_get_gl_version();
-		assert(gl_version >= 31);
-
-		if (gl_version == 31
-		    && !piglit_is_extension_supported("GL_ARB_compatibility")) {
-			printf("piglit: info: Requested a %s, but the actual "
-			       "context is a 3.1 context that lacks the "
-			       "GL_ARB_compatibility extension\n",
-			       context_description);
-			return false;
-		} else {
-			return true;
-		}
-	} else {
-		/* No need to check the special case. */
+	if (requested_gl_version < 31) {
+		/* For context versions < 3.1, the GLX, EGL, and CGL specs
+		 * promise that the returned context will have the
+		 * compatibility profile.  So Piglit has no need to check the
+		 * profile here.
+		 */
+		assert(flavor == CONTEXT_GL_COMPAT);
 		return true;
 	}
+
+	actual_gl_version = piglit_get_gl_version();
+	assert(actual_gl_version >= 31);
+
+	if (actual_gl_version >= 32) {
+		/* For context versions >= 3.2, the GLX, EGL, and CGL specs
+		 * promise that the returned context will have the requested
+		 * profile.  So Piglit has no need to check the profile here.
+		 */
+		piglit_logi("Requested an %s, and received a matching "
+			    "%d.%d context\n", context_description,
+			    actual_gl_version / 10, actual_gl_version % 10);
+		return true;
+	}
+
+	has_core_profile = !piglit_is_extension_supported("GL_ARB_compatibility");
+	if (flavor == CONTEXT_GL_CORE && has_core_profile) {
+		return true;
+	} else if (flavor == CONTEXT_GL_COMPAT && !has_core_profile) {
+		return true;
+	}
+
+	piglit_logi("Requested an %s, and the returned context is exactly a 3.1 "
+		    "context. But it has the wrong profile because it %s the "
+		    "GL_ARB_compatibility extension. Fallback to requesting a "
+		    "3.2 context, which is guaranteed to have the correct "
+		    "profile if context creation succeeds.",
+		    context_description, error_verb);
+
+	waffle_config_destroy(wfl_fw->config);
+	waffle_context_destroy(wfl_fw->context);
+	waffle_window_destroy(wfl_fw->window);
+	wfl_fw->config = NULL;
+	wfl_fw->context = NULL;
+	wfl_fw->window = NULL;
+
+	return make_context_current_singlepass(
+			wfl_fw, &fallback_config, flavor,
+			partial_config_attrib_list);
 }
 
 static bool
@@ -420,7 +487,8 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	attrib_list = make_config_attrib_list(test_config, flavor,
 					      partial_config_attrib_list);
 	assert(attrib_list);
-	make_context_description(ctx_desc, sizeof(ctx_desc), attrib_list);
+	make_context_description(ctx_desc, sizeof(ctx_desc),
+				 attrib_list, flavor);
 	wfl_fw->config = waffle_config_choose(wfl_fw->display, attrib_list);
 	free(attrib_list);
 	if (!wfl_fw->config) {
@@ -456,7 +524,8 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	if (!ok)
 	   goto fail;
 
-	ok = special_case_gl_31(test_config, flavor, ctx_desc);
+	ok = special_case_gl31(wfl_fw, test_config, flavor, ctx_desc,
+			       partial_config_attrib_list);
 	if (!ok)
 		goto fail;
 
