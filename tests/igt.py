@@ -29,10 +29,10 @@ import subprocess
 import threading
 import time
 import signal
-from datetime import datetime, timedelta
+import errno
+from datetime import datetime
 
 from os import path
-from framework.core import TestResult
 from framework.profile import TestProfile
 from framework.exectest import Test, TEST_BIN_DIR
 
@@ -72,7 +72,7 @@ else:
         igtTestRoot = path.join(path.realpath(path.join(TEST_BIN_DIR, 'igt')),
                                 'tests')
     else:
-        igtTestRoot=''
+        igtTestRoot = ''
 
 # check for the test lists
 if not (os.path.exists(os.path.join(igtTestRoot, 'single-tests.txt'))
@@ -90,17 +90,17 @@ profile = TestProfile()
 # object is killed if the timeout is reached and it has not completed. Wait for
 # the outcome by calling the join() method from the parent.
 
-class ProcessTimeout (threading.Thread):
-    def __init__ (self, timeout, proc):
-       threading.Thread.__init__(self)
-       self.proc = proc
-       self.timeout = timeout
-       self.status = 0
+class ProcessTimeout(threading.Thread):
+    def __init__(self, timeout, proc):
+        threading.Thread.__init__(self)
+        self.proc = proc
+        self.timeout = timeout
+        self.status = 0
 
     def run(self):
         start_time = datetime.now()
         delta = 0
-        while (delta < self.timeout) and (self.proc.poll() == None):
+        while (delta < self.timeout) and (self.proc.poll() is None):
             time.sleep(1)
             delta = (datetime.now() - start_time).total_seconds()
 
@@ -108,20 +108,20 @@ class ProcessTimeout (threading.Thread):
         # and if that fails, send SIGKILL to all processes in the test's
         # process group
 
-        if self.proc.poll() == None:
+        if self.proc.poll() is None:
             self.status = 1
             self.proc.terminate()
             time.sleep(5)
 
-        if self.proc.poll() == None:
+        if self.proc.poll() is None:
             self.status = 2
             os.killpg(self.proc.pid, signal.SIGKILL)
             self.proc.wait()
 
 
     def join(self):
-      threading.Thread.join(self)
-      return self.status
+        threading.Thread.join(self)
+        return self.status
 
 
 
@@ -205,8 +205,6 @@ class IGTTest(Test):
 
 
 def listTests(listname):
-    oldDir = os.getcwd()
-
     with open(path.join(igtTestRoot, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
@@ -219,7 +217,7 @@ def listTests(listname):
             break
 
         if "TESTLIST" in line:
-            found_header = True;
+            found_header = True
 
     return progs
 
@@ -230,14 +228,13 @@ for test in singleTests:
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
-            [path.join(igtTestRoot, test), '--list-subtests' ],
+            [path.join(igtTestRoot, test), '--list-subtests'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=os.environ.copy(),
             universal_newlines=True
             )
     out, err = proc.communicate()
-    returncode = proc.returncode
 
     subtests = out.split("\n")
 
@@ -255,4 +252,4 @@ for test in multiTests:
 profile.dmesg = True
 
 # the dmesg property of TestProfile returns a Dmesg object
-profile.dmesg.regex = re.compile("(\[drm:|drm_|intel_|i915_)")
+profile.dmesg.regex = re.compile(r"(\[drm:|drm_|intel_|i915_)")
