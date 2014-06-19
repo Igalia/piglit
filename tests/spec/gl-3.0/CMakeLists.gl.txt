@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (gl-3.0-minmax minmax.c)
+piglit_add_executable (gl-3.0-render-integer render-integer.c)
 piglit_add_executable (gl-3.0-required-sized-texture-formats required-sized-texture-formats.c)
 piglit_add_executable (gl-3.0-required-renderbuffer-attachment-formats required-renderbuffer-attachment-formats.c)
 piglit_add_executable (gl-3.0-required-texture-attachment-formats required-texture-attachment-formats.c)
