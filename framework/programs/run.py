@@ -174,7 +174,7 @@ def run(input_):
 
     json_writer.write_dict_item('name', results.name)
 
-    for (key, value) in env.collectData().items():
+    for key, value in core.collect_system_info().iteritems():
         json_writer.write_dict_item(key, value)
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
@@ -232,7 +232,7 @@ def resume(input_):
     json_writer.close_dict()
 
     json_writer.write_dict_item('name', results.name)
-    for (key, value) in env.collectData().items():
+    for key, value in core.collect_system_info().iteritems():
         json_writer.write_dict_item(key, value)
 
     json_writer.write_dict_key('tests')

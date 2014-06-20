@@ -25,7 +25,6 @@
 from __future__ import print_function
 import errno
 import os
-import platform
 import re
 import subprocess
 import sys
@@ -46,6 +45,7 @@ __all__ = ['PIGLIT_CONFIG',
            'TestResult',
            'JSONWriter',
            'checkDir',
+           'collect_system_info',
            'load_results',
            'parse_listfile']
 
@@ -368,28 +368,33 @@ class Environment:
             else:
                 yield (key, values)
 
-    def run(self, command):
-        try:
-            p = subprocess.Popen(command,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 universal_newlines=True)
-            (stdout, stderr) = p.communicate()
-        except:
-            return "Failed to run " + command
-        return stderr+stdout
 
-    def collectData(self):
-        result = {}
-        system = platform.system()
-        if (system == 'Windows' or system.find("CYGWIN_NT") == 0):
-            result['wglinfo'] = self.run('wglinfo')
-        else:
-            result['glxinfo'] = self.run('glxinfo')
-        if system == 'Linux':
-            result['uname'] = self.run(['uname', '-a'])
-            result['lspci'] = self.run('lspci')
-        return result
+def collect_system_info():
+    """ Get relavent information about the system running piglit
+
+    This method runs through a list of tuples, where element 1 is the name of
+    the program being run, and elemnt 2 is a command to run (in a form accepted
+    by subprocess.Popen)
+
+    """
+    progs = [('wglinfo', ['wglinfo']),
+             ('glxinfo', ['glxinfo']),
+             ('uname', ['uname', '-a']),
+             ('lspci', ['lspci'])]
+
+    result = {}
+
+    for name, command in progs:
+        try:
+            result[name] = subprocess.check_output(command,
+                                                   stderr=subprocess.STDOUT)
+        except OSError as e:
+            # If we get the 'no file or directory' error then pass, that means
+            # that the binary isn't installed or isn't relavent to the system
+            if e.errno != 2:
+                raise
+
+    return result
 
 
 def load_results(filename):
