@@ -50,7 +50,7 @@ def test_generate_initialize():
     """
     yieldable = check_initialize
 
-    for target in [core.Environment, core.TestrunResult, core.TestResult,
+    for target in [core.Options, core.TestrunResult, core.TestResult,
                    core.PiglitJSONEncoder]:
         yieldable.description = "Test that {} initializes".format(
             target.__name__)

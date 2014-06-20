@@ -29,7 +29,7 @@ import sys
 import traceback
 import itertools
 
-from .core import TestResult, Environment
+from .core import TestResult, Options
 
 
 __all__ = ['Test',
@@ -50,8 +50,8 @@ else:
 
 
 class Test(object):
-    ENV = Environment()
-    __slots__ = ['ENV', 'run_concurrent', 'env', 'result', 'cwd', '_command',
+    OPTS = Options()
+    __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
                  '_test_hook_execute_run']
 
     def __init__(self, command, run_concurrent=False):
@@ -79,10 +79,10 @@ class Test(object):
             Fully qualified test name as a string.  For example,
             ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
         '''
-        log_current = log.pre_log(path if self.ENV.verbose else None)
+        log_current = log.pre_log(path if self.OPTS.verbose else None)
 
         # Run the test
-        if self.ENV.execute:
+        if self.OPTS.execute:
             try:
                 time_start = time.time()
                 dmesg.update_dmesg()
@@ -110,7 +110,7 @@ class Test(object):
     @property
     def command(self):
         assert self._command
-        if self.ENV.valgrind:
+        if self.OPTS.valgrind:
             return ['valgrind', '--quiet', '--error-exitcode=1',
                     '--tool=memcheck'] + self._command
         return self._command
@@ -138,7 +138,7 @@ class Test(object):
         self.result['command'] = ' '.join(self.command)
         self.result['environment'] = " ".join(
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
-                self.ENV.env.iteritems(), self.env.iteritems()))
+                self.OPTS.env.iteritems(), self.env.iteritems()))
 
         if self.check_for_skip_scenario():
             self.result['result'] = 'skip'
@@ -168,7 +168,7 @@ class Test(object):
         elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
             self.result['result'] = 'warn'
 
-        if self.ENV.valgrind:
+        if self.OPTS.valgrind:
             # If the underlying test failed, simply report
             # 'skip' for this valgrind test.
             if self.result['result'] != 'pass':
@@ -191,10 +191,10 @@ class Test(object):
 
     def get_command_result(self):
         # Set the environment for the tests. Use the default settings created
-        # in the Environment constructor first, then use any user defined
+        # in the Options constructor first, then use any user defined
         # variables, finally, use any variables set for the test in the test
         # profile
-        fullenv = self.ENV.env.copy()
+        fullenv = self.OPTS.env.copy()
         for key, value in itertools.chain(self.env.iteritems(),
                                           os.environ.iteritems()):
             fullenv[key] = str(value)

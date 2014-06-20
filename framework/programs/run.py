@@ -130,18 +130,18 @@ def run(input_):
             os.path.join(
                 os.path.dirname(__file__), '..', '..', 'piglit.conf')))
 
-    # Pass arguments into Environment
-    env = core.Environment(concurrent=args.concurrency,
-                           exclude_filter=args.exclude_tests,
-                           include_filter=args.include_tests,
-                           execute=args.execute,
-                           valgrind=args.valgrind,
-                           dmesg=args.dmesg,
-                           verbose=args.verbose)
+    # Pass arguments into Options
+    opts = core.Options(concurrent=args.concurrency,
+                       exclude_filter=args.exclude_tests,
+                       include_filter=args.include_tests,
+                       execute=args.execute,
+                       valgrind=args.valgrind,
+                       dmesg=args.dmesg,
+                       verbose=args.verbose)
 
     # Set the platform to pass to waffle
     if args.platform:
-        env.env['PIGLIT_PLATFORM'] = args.platform
+        opts.env['PIGLIT_PLATFORM'] = args.platform
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -166,7 +166,7 @@ def run(input_):
     json_writer.write_dict_key('options')
     json_writer.open_dict()
     json_writer.write_dict_item('profile', args.test_profile)
-    for key, value in env:
+    for key, value in opts:
         json_writer.write_dict_item(key, value)
     if args.platform:
         json_writer.write_dict_item('platform', args.platform)
@@ -186,7 +186,7 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
-    profile.run(env, json_writer)
+    profile.run(opts, json_writer)
     time_end = time.time()
 
     json_writer.close_dict()
@@ -211,16 +211,16 @@ def resume(input_):
     args = parser.parse_args(input_)
 
     results = core.load_results(args.results_path)
-    env = core.Environment(concurrent=results.options['concurrent'],
-                           exclude_filter=results.options['exclude_filter'],
-                           include_filter=results.options['filter'],
-                           execute=results.options['execute'],
-                           valgrind=results.options['valgrind'],
-                           dmesg=results.options['dmesg'],
-                           verbose=results.options['verbose'])
+    opts = core.Options(concurrent=results.options['concurrent'],
+                       exclude_filter=results.options['exclude_filter'],
+                       include_filter=results.options['filter'],
+                       execute=results.options['execute'],
+                       valgrind=results.options['valgrind'],
+                       dmesg=results.options['dmesg'],
+                       verbose=results.options['verbose'])
 
     if results.options.get('platform'):
-        env.env['PIGLIT_PLATFORM'] = results.options['platform']
+        opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, "main")
     json_writer = core.JSONWriter(open(results_path, 'w+'))
@@ -239,15 +239,15 @@ def resume(input_):
     json_writer.open_dict()
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)
-        env.exclude_tests.add(key)
+        opts.exclude_tests.add(key)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
     profile.results_dir = args.results_path
-    if env.dmesg:
-        profile.dmesg = env.dmesg
+    if opts.dmesg:
+        profile.dmesg = opts.dmesg
 
     # This is resumed, don't bother with time since it wont be accurate anyway
-    profile.run(env, json_writer)
+    profile.run(opts, json_writer)
 
     json_writer.close_dict()
     json_writer.close_dict()

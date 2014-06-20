@@ -40,7 +40,7 @@ import framework.status as status
 from .threads import synchronized_self
 
 __all__ = ['PIGLIT_CONFIG',
-           'Environment',
+           'Options',
            'TestrunResult',
            'TestResult',
            'JSONWriter',
@@ -326,7 +326,20 @@ class TestrunResult:
         json.dump(raw_dict, file, indent=JSONWriter.INDENT)
 
 
-class Environment:
+class Options(object):
+    """ Contains options for a piglit run
+
+    Options are as follows:
+    concurrent -- True if concurrency is to be used
+    execute -- False for dry run
+    filter -- list of compiled regex which include exclusively tests that match
+    exclude_filter -- list of compiled regex which exclude tests that match
+    valgrind -- True if valgrind is to be used
+    dmesg -- True if dmesg checking is desired. This forces concurrency off
+    verbose -- verbosity level.
+    env -- environment variables set for each test before run
+
+    """
     def __init__(self, concurrent=True, execute=True, include_filter=None,
                  exclude_filter=None, valgrind=False, dmesg=False,
                  verbose=False):

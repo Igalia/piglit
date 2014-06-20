@@ -211,7 +211,7 @@ def test_matches_filter_mar_1(data):
     Nothing should be filtered.
 
     """
-    env = core.Environment()
+    env = core.Options()
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
@@ -223,7 +223,7 @@ def test_matches_filter_mar_1(data):
 @nt.nottest
 def test_matches_filter_mar_2(data):
     """ Tests 'not env.filter or matches_any_regex() mar is False"""
-    env = core.Environment(include_filter=['test5'])
+    env = core.Options(include_filter=['test5'])
 
     profile_ = profile.TestProfile()
     profile_.test_list = data
@@ -237,7 +237,7 @@ def test_matches_filter_mar_2(data):
 @nt.nottest
 def test_matches_env_exclude(data):
     """ Tests 'not path in env.exclude_tests  """
-    env = core.Environment()
+    env = core.Options()
     env.exclude_tests.add('group3/test5')
 
     profile_ = profile.TestProfile()
@@ -253,7 +253,7 @@ def test_matches_env_exclude(data):
 @nt.nottest
 def test_matches_exclude_mar(data):
     """ Tests 'not matches_any_regexp() """
-    env = core.Environment(exclude_filter=['test5'])
+    env = core.Options(exclude_filter=['test5'])
 
     profile_ = profile.TestProfile()
     profile_.test_list = data

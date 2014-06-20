@@ -113,7 +113,7 @@ class TestProfile(object):
         # Clear out the old Group()
         self.tests = {}
 
-    def _prepare_test_list(self, env):
+    def _prepare_test_list(self, opts):
         """ Prepare tests for running
 
         Flattens the nested group hierarchy into a flat dictionary using '/'
@@ -121,7 +121,7 @@ class TestProfile(object):
         runs it's own filters plus the filters in the self.filters name
 
         Arguments:
-        env - a core.Environment instance
+        opts - a core.Options instance
 
         """
         self._flatten_group_hierarchy()
@@ -132,9 +132,9 @@ class TestProfile(object):
         # The extra argument is needed to match check_all's API
         def test_matches(path, test):
             """Filter for user-specified restrictions"""
-            return ((not env.filter or matches_any_regexp(path, env.filter))
-                    and not path in env.exclude_tests and
-                    not matches_any_regexp(path, env.exclude_filter))
+            return ((not opts.filter or matches_any_regexp(path, opts.filter))
+                    and not path in opts.exclude_tests and
+                    not matches_any_regexp(path, opts.exclude_filter))
 
         filters = self.filters + [test_matches]
         def check_all(item):
@@ -167,37 +167,37 @@ class TestProfile(object):
         """
         pass
 
-    def run(self, env, json_writer):
+    def run(self, opts, json_writer):
         """ Runs all tests using Thread pool
 
         When called this method will flatten out self.tests into
-        self.test_list, then will prepare a logger, pass env to the Test class,
-        and begin executing tests through it's Thread pools.
+        self.test_list, then will prepare a logger, pass opts to the Test
+        class, and begin executing tests through it's Thread pools.
 
-        Based on the value of env.concurrent it will either run all the tests
+        Based on the value of opts.concurrent it will either run all the tests
         concurrently, all serially, or first the thread safe tests then the
         serial tests.
 
         Finally it will print a final summary of the tests
 
         Arguments:
-        env -- a core.Environment instance
+        opts -- a core.Options instance
         json_writer -- a core.JSONWriter instance
 
         """
 
         self._pre_run_hook()
-        framework.exectest.Test.ENV = env
+        framework.exectest.Test.Opts = opts
 
         chunksize = 1
 
-        self._prepare_test_list(env)
-        log = Log(len(self.test_list), env.verbose)
+        self._prepare_test_list(opts)
+        log = Log(len(self.test_list), opts.verbose)
 
         def test(pair):
             """ Function to call test.execute from .map
 
-            Adds env and json_writer which are needed by Test.execute()
+            Adds opts and json_writer which are needed by Test.execute()
 
             """
             name, test = pair
@@ -216,9 +216,9 @@ class TestProfile(object):
         single = multiprocessing.dummy.Pool(1)
         multi = multiprocessing.dummy.Pool()
 
-        if env.concurrent == "all":
+        if opts.concurrent == "all":
             run_threads(multi, self.test_list.iteritems())
-        elif env.concurrent == "none":
+        elif opts.concurrent == "none":
             run_threads(single, self.test_list.iteritems())
         else:
             # Filter and return only thread safe tests to the threaded pool

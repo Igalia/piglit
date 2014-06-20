@@ -53,9 +53,8 @@ def main():
                         help="Path to results folder")
     args = parser.parse_args()
 
-    # Set the environment, pass in the included and excluded tests
-    env = core.Environment(exclude_filter=args.exclude_tests,
-                           include_filter=args.include_tests)
+    opts = core.Options(exclude_filter=args.exclude_tests,
+                       include_filter=args.include_tests)
 
     # Change to the piglit's path
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -76,7 +75,7 @@ def main():
         command += ' '.join(testCommand)
         return command
 
-    profile._prepare_test_list(env)
+    profile._prepare_test_list(opts)
     for name, test in profile.test_list.items():
         assert(isinstance(test, Test))
         print(name, ':::', getCommand(test))
