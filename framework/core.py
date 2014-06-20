@@ -206,21 +206,6 @@ def checkDir(dirname, failifexists):
         if e.errno != errno.EEXIST:
             raise
 
-if 'PIGLIT_SOURCE_DIR' not in os.environ:
-    p = os.path
-    os.environ['PIGLIT_SOURCE_DIR'] = p.abspath(p.join(p.dirname(__file__),
-                                                       '..'))
-
-# In debug builds, Mesa will by default log GL API errors to stderr.
-# This is useful for application developers or driver developers
-# trying to debug applications that should execute correctly.  But for
-# piglit we expect to generate errors regularly as part of testing,
-# and for exhaustive error-generation tests (particularly some in
-# khronos's conformance suite), it can end up ooming your system
-# trying to parse the strings.
-if 'MESA_DEBUG' not in os.environ:
-    os.environ['MESA_DEBUG'] = 'silent'
-
 
 class TestResult(dict):
     def __init__(self, *args):
@@ -353,6 +338,14 @@ class Environment:
         self.valgrind = valgrind
         self.dmesg = dmesg
         self.verbose = verbose
+        # env is used to set some base environment variables that are not going
+        # to change across runs, without sending them to os.environ which is
+        # fickle as easy to break
+        self.env = {
+            'PIGLIT_SOURCE_DIR': os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '..')),
+            'MESA_DEBUG': 'silent',
+        }
 
         """
         The filter lists that are read in should be a list of string objects,

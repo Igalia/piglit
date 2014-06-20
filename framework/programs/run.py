@@ -116,10 +116,6 @@ def run(input_):
               |  SEM_NOOPENFILEERRORBOX
         ctypes.windll.kernel32.SetErrorMode(uMode)
 
-    # Set the platform to pass to waffle
-    if args.platform:
-        os.environ['PIGLIT_PLATFORM'] = args.platform
-
     # If dmesg is requested we must have serial run, this is becasue dmesg
     # isn't reliable with threaded run
     if args.dmesg:
@@ -130,8 +126,9 @@ def run(input_):
         core.PIGLIT_CONFIG.readfp(args.config_file)
         args.config_file.close()
     else:
-        core.PIGLIT_CONFIG.read(os.path.join(os.environ['PIGLIT_SOURCE_DIR'],
-                                             'piglit.conf'))
+        core.PIGLIT_CONFIG.read(os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), '..', '..', 'piglit.conf')))
 
     # Pass arguments into Environment
     env = core.Environment(concurrent=args.concurrency,
@@ -141,6 +138,10 @@ def run(input_):
                            valgrind=args.valgrind,
                            dmesg=args.dmesg,
                            verbose=args.verbose)
+
+    # Set the platform to pass to waffle
+    if args.platform:
+        env.env['PIGLIT_PLATFORM'] = args.platform
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -218,12 +219,8 @@ def resume(input_):
                            dmesg=results.options['dmesg'],
                            verbose=results.options['verbose'])
 
-    # attempt to restore a saved platform, if there is no saved platform just
-    # go on
-    try:
-        os.environ['PIGLIT_PLATFORM'] = results.options['platform']
-    except KeyError:
-        pass
+    if results.options.get('platform'):
+        env.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, "main")
     json_writer = core.JSONWriter(open(results_path, 'w+'))

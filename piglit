@@ -36,25 +36,24 @@ import os.path as path
 import sys
 import argparse
 
-# Setting PIGLIT_SOURCE_DIR (and by extension sys.path) is actually pretty
-# complicated, since there are three seperate uses we need to detect:
+# Setting sys.path is actually pretty complicated, since there are three
+# seperate uses we need to detect:
 # 1) piglit is being run in the source directory, built in tree
 # 2) piglit is being run from the source directory outside of it, built in tree
 # 3) piglit has been built out of tree and installed, and is being run in or
 #    out of the install directory
 
+# Case one is the implicit case. In this event nothing needs to be set, it
+# should "just work" (tm)
+
 # It is critical that this block be run before importing anything from
 # framework (as there is no gaurantee that framework will be in python's path
 # before this blck is run)
 
-# Case 1
-if path.exists('framework/exectest.py'):
-    os.environ['PIGLIT_SOURCE_DIR'] = path.abspath(path.curdir)
-else:
+if not path.exists('framework/exectest.py'):
     dirpath = path.dirname(path.abspath(__file__))
     # Case 2
     if path.exists(path.join(dirpath, 'framework/exectest.py')):
-        os.environ['PIGLIT_SOURCE_DIR'] = dirpath
         sys.path.append(dirpath)
     # Case 3
     else:
@@ -66,8 +65,6 @@ else:
         # piglits installed as piglit${the_date_of_install}, and we need to
         # detect that.
         install_path = path.abspath(path.join(dirpath, '..', 'lib', piglit))
-
-        os.environ['PIGLIT_SOURCE_DIR'] = install_path
         sys.path.append(install_path)
 
 import framework.programs.run as run

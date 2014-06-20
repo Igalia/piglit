@@ -27,6 +27,7 @@ import shlex
 import time
 import sys
 import traceback
+import itertools
 
 from .core import TestResult, Environment
 
@@ -136,7 +137,8 @@ class Test(object):
         """
         self.result['command'] = ' '.join(self.command)
         self.result['environment'] = " ".join(
-            '{0}="{1}"'.format(k, v) for k, v in  self.env.iteritems())
+            '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
+                self.ENV.env.iteritems(), self.env.iteritems()))
 
         if self.check_for_skip_scenario():
             self.result['result'] = 'skip'
@@ -188,8 +190,13 @@ class Test(object):
         return False
 
     def get_command_result(self):
-        fullenv = os.environ.copy()
-        for key, value in self.env.iteritems():
+        # Set the environment for the tests. Use the default settings created
+        # in the Environment constructor first, then use any user defined
+        # variables, finally, use any variables set for the test in the test
+        # profile
+        fullenv = self.ENV.env.copy()
+        for key, value in itertools.chain(self.env.iteritems(),
+                                          os.environ.iteritems()):
             fullenv[key] = str(value)
 
         try:
