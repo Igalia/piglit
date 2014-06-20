@@ -27,7 +27,7 @@
 
 import os
 
-from genclbuiltins import gen, TRUE
+from genclbuiltins import gen, TRUE, NEGNAN
 
 CLC_VERSION_MIN = {
     'isnan' : 10,
@@ -35,6 +35,7 @@ CLC_VERSION_MIN = {
     'isgreater' : 10,
     'isgreaterequal' : 10,
     'isnotequal' : 10,
+    'signbit' : 10
 }
 
 DATA_TYPES = ['float']
@@ -90,6 +91,14 @@ tests = {
             [0,    TRUE,         0,    TRUE,         TRUE,         0,            TRUE, TRUE],    # Result
             [0.0,  float("nan"), 1.0,  1,            float("nan"), float("inf"), 1.0,  0.5 ], # Arg0
             [0.0,  float("nan"), 1.0,  float("nan"), 1,            float("inf"), 0.5,  1.0 ]  # Arg1
+        ]
+    },
+    'signbit' : {
+        'arg_types': [I, F],
+        'function_type': 'ttt',
+        'values': [
+            [0,   TRUE,        0,   0, TRUE,          0,            TRUE, 0           , TRUE    ], # Result
+            [0.0, float(0)*-1, 1.0, 1, float("-inf"), float("inf"), -1.0, float("nan"), NEGNAN ]  # Arg0
         ]
     }
 }

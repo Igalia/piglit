@@ -56,6 +56,7 @@ UMAX = 'unsigned_max_for_type'
 TYPE = 'TYPE'
 SIZE = 'SIZE'
 TRUE = 'true_value_for_type' #1 for scalar, -1 for vector
+NEGNAN = 'Negative NAN as a string, because float("-nan") just produces nan'
 
 # Identity type list
 T = {
@@ -234,6 +235,8 @@ def getValue(type, val, isVector):
                 return -1
             else:
                 return 1
+        elif (val == NEGNAN):
+            return '-nan' #cl-program-tester translates this for us
         else:
             print('Unknown string value: ' + val + '\n')
     elif (isinstance(val, list)):
