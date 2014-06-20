@@ -24,10 +24,27 @@
 
 /** @file tex-miplevel-selection.c
  *
- * Tests the interaction between GL_TEXTURE_BASE/MAX_LEVEL
- * GL_TEXTURE_MIN/MAX_LOD, TEXTURE_LOD_BIAS, mipmap
- * filtering on/off, and variable texture scaling.
- * Also tests ARB_shader_texture_lod if requested.
+ * This tests interactions between GL_TEXTURE_BASE/MAX_LEVEL GL_TEXTURE_MIN/
+ * MAX_LOD, TEXTURE_LOD_BIAS, mipmap filtering on/off, and scaling of texture
+ * coordinates as a means to "bias" the LOD.
+ *
+ * On top of that, test as many texture GLSL functions, sampler types, and
+ * texture targets which allow mipmapping as possible, e.g. with an explicit
+ * LOD, bias, and derivatives.
+ *
+ * Each mipmap level is set to a different color/depth value, so that we can
+ * check that the correct level is read.
+ *
+ * Texture targets with multiple layers/slices/faces have only one layer/etc
+ * set to the expected value. The other layers are black, so that we can check
+ * that the correct layer is read.
+ *
+ * Shadow samplers are tricky because we can't use the GL_EQUAL compare mode
+ * because of precision issues. Therefore, we bind the same texture twice:
+ * the first unit uses GL_LESS and a small number (tolerance) is subtracted
+ * from Z, and the second unit uses GL_GREATER and a small number (tolerance)
+ * is added to Z. If both shadow samplers return 1, which means the texel
+ * value lies in between, the test passes.
  */
 
 #include "piglit-util-gl-common.h"
@@ -42,11 +59,11 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define TEX_WIDTH 32
-#define TEX_HEIGHT 32
+#define TEX_SIZE 32
+#define TEST_LAYER 9 // the layer index used for testing
 #define LAST_LEVEL 5
 
-static const float colors[][3] = {
+static const float clear_colors[][3] = {
 	{1.0, 0.0, 0.0},
 	{0.0, 1.0, 0.0},
 	{0.0, 0.0, 1.0},
@@ -54,24 +71,98 @@ static const float colors[][3] = {
 	{0.0, 1.0, 1.0},
 	{1.0, 0.0, 1.0},
 };
-static GLboolean in_place_probing, no_bias, no_lod, ARB_shader_texture_lod;
-static GLuint loc_lod;
 
-static const char *fscode =
+static const float shadow_colors[][3] = {
+	{1.0, 1.0, 1.0},
+	{1.0, 1.0, 1.0},
+	{1.0, 1.0, 1.0},
+	{1.0, 1.0, 1.0},
+	{1.0, 1.0, 1.0},
+	{1.0, 1.0, 1.0},
+};
+
+static const float clear_depths[] = {
+	0.1,
+	0.2,
+	0.3,
+	0.4,
+	0.5,
+	0.6
+};
+
+enum target_type {
+	TEX_1D,
+	TEX_2D,
+	TEX_3D,
+	TEX_CUBE,
+	TEX_1D_ARRAY,
+	TEX_2D_ARRAY,
+	TEX_CUBE_ARRAY,
+	TEX_1D_SHADOW,
+	TEX_2D_SHADOW,
+	TEX_CUBE_SHADOW,
+	TEX_1D_ARRAY_SHADOW,
+	TEX_2D_ARRAY_SHADOW,
+	TEX_CUBE_ARRAY_SHADOW,
+};
+
+#define IS_SHADOW(t) ((t) >= TEX_1D_SHADOW)
+
+enum shader_type {
+	FIXED_FUNCTION,
+	ARB_SHADER_TEXTURE_LOD,
+	GL3_TEXTURE_LOD,
+};
+
+static enum shader_type test = FIXED_FUNCTION;
+static enum target_type target = TEX_2D;
+static GLenum gltarget;
+static GLboolean in_place_probing, no_bias, no_lod;
+static GLuint loc_lod;
+static GLuint samp[2];
+
+static const char *fscode_arb_lod =
 	"#extension GL_ARB_shader_texture_lod : require\n"
 	"uniform sampler2D tex;\n"
 	"uniform float lod;\n"
 	"void main() {\n"
-	"  gl_FragColor = texture2DLod(tex, gl_TexCoord[0].xy, lod);"
+	"  gl_FragColor = texture2DLod(tex, gl_TexCoord[0].xy, lod); \n"
 	"}\n";
+
+static const char *fscode_gl3_lod =
+	"#version 130 \n"
+	"#extension GL_ARB_texture_cube_map_array : enable \n"
+	"uniform sampler%s tex; \n"
+	"uniform float lod; \n"
+	"void main() { \n"
+	"  gl_FragColor = textureLod(tex, %s(gl_TexCoord[0]), lod); \n"
+	"} \n";
+
+static const char *fscode_gl3_lod_shadow =
+	"#version 130 \n"
+	"#extension GL_ARB_texture_cube_map_array : enable \n"
+	"uniform sampler%s tex, tex2; \n"
+	"uniform float lod; \n"
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureLod(tex, %s(gl_TexCoord[0]) - 0.05 * %s, lod) * \n"
+	"                      textureLod(tex2, %s(gl_TexCoord[0]) + 0.05 * %s, lod)); \n"
+	"} \n";
+
+static void set_sampler_parameter(GLenum pname, GLint value)
+{
+	glSamplerParameteri(samp[0], pname, value);
+	glSamplerParameteri(samp[1], pname, value);
+}
 
 void
 piglit_init(int argc, char **argv)
 {
 	GLuint tex, fb;
 	GLenum status;
-	int i, dim;
-	GLuint fs, prog, loc_tex;
+	int i, level, layer, dim, num_layers;
+	GLuint prog, loc_tex, loc_tex2;
+	const char *target_str, *type_str, *compare_index_str;
+	GLenum format, attachment, clearbits;
 
         for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-inplace") == 0)
@@ -81,107 +172,380 @@ piglit_init(int argc, char **argv)
 		else if (strcmp(argv[i], "-nolod") == 0)
 			no_lod = GL_TRUE;
 		else if (strcmp(argv[i], "-GL_ARB_shader_texture_lod") == 0)
-			ARB_shader_texture_lod = GL_TRUE;
+			test = ARB_SHADER_TEXTURE_LOD;
+		else if (strcmp(argv[i], "textureLod") == 0)
+			test = GL3_TEXTURE_LOD;
+		else if (strcmp(argv[i], "1D") == 0)
+			target = TEX_1D;
+		else if (strcmp(argv[i], "2D") == 0)
+			target = TEX_2D;
+		else if (strcmp(argv[i], "3D") == 0)
+			target = TEX_3D;
+		else if (strcmp(argv[i], "Cube") == 0)
+			target = TEX_CUBE;
+		else if (strcmp(argv[i], "1DArray") == 0)
+			target = TEX_1D_ARRAY;
+		else if (strcmp(argv[i], "2DArray") == 0)
+			target = TEX_2D_ARRAY;
+		else if (strcmp(argv[i], "CubeArray") == 0)
+			target = TEX_CUBE_ARRAY;
+		else if (strcmp(argv[i], "1DShadow") == 0)
+			target = TEX_1D_SHADOW;
+		else if (strcmp(argv[i], "2DShadow") == 0)
+			target = TEX_2D_SHADOW;
+		else if (strcmp(argv[i], "CubeShadow") == 0)
+			target = TEX_CUBE_SHADOW;
+		else if (strcmp(argv[i], "1DArrayShadow") == 0)
+			target = TEX_1D_ARRAY_SHADOW;
+		else if (strcmp(argv[i], "2DArrayShadow") == 0)
+			target = TEX_2D_ARRAY_SHADOW;
+		else if (strcmp(argv[i], "CubeArrayShadow") == 0)
+			target = TEX_CUBE_ARRAY_SHADOW;
+		else {
+			printf("Unknown parameter: %s\n", argv[i]);
+			piglit_report_result(PIGLIT_FAIL);
+		}
         }
 
-	piglit_require_extension("GL_EXT_framebuffer_object");
+	piglit_require_extension("GL_ARB_framebuffer_object");
+	piglit_require_extension("GL_ARB_sampler_objects");
+	piglit_require_extension("GL_ARB_texture_storage");
 	if (piglit_get_gl_version() < 14)
 		piglit_report_result(PIGLIT_SKIP);
 
-	if (ARB_shader_texture_lod) {
+	switch (target) {
+	case TEX_1D:
+		gltarget = GL_TEXTURE_1D;
+		target_str = "1D";
+		type_str = "float";
+		break;
+	case TEX_2D:
+		gltarget = GL_TEXTURE_2D;
+		target_str = "2D";
+		type_str = "vec2";
+		break;
+	case TEX_3D:
+		gltarget = GL_TEXTURE_3D;
+		target_str = "3D";
+		type_str = "vec3";
+		break;
+	case TEX_CUBE:
+		gltarget = GL_TEXTURE_CUBE_MAP;
+		target_str = "Cube";
+		type_str = "vec3";
+		break;
+	case TEX_1D_ARRAY:
+		piglit_require_gl_version(30);
+		gltarget = GL_TEXTURE_1D_ARRAY;
+		target_str = "1DArray";
+		type_str = "vec2";
+		break;
+	case TEX_2D_ARRAY:
+		piglit_require_gl_version(30);
+		gltarget = GL_TEXTURE_2D_ARRAY;
+		target_str = "2DArray";
+		type_str = "vec3";
+		break;
+	case TEX_CUBE_ARRAY:
+		piglit_require_gl_version(30);
+		piglit_require_extension("GL_ARB_texture_cube_map_array");
+		gltarget = GL_TEXTURE_CUBE_MAP_ARRAY;
+		target_str = "CubeArray";
+		type_str = "vec4";
+		break;
+	case TEX_1D_SHADOW:
+		gltarget = GL_TEXTURE_1D;
+		target_str = "1DShadow";
+		type_str = "vec3";
+		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		break;
+	case TEX_2D_SHADOW:
+		gltarget = GL_TEXTURE_2D;
+		target_str = "2DShadow";
+		type_str = "vec3";
+		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		break;
+	case TEX_CUBE_SHADOW:
+		piglit_require_gl_version(30);
+		gltarget = GL_TEXTURE_CUBE_MAP;
+		target_str = "CubeShadow";
+		type_str = "vec4";
+		break;
+	case TEX_1D_ARRAY_SHADOW:
+		piglit_require_gl_version(30);
+		gltarget = GL_TEXTURE_1D_ARRAY;
+		target_str = "1DArrayShadow";
+		type_str = "vec3";
+		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		break;
+	case TEX_2D_ARRAY_SHADOW:
+		piglit_require_gl_version(30);
+		gltarget = GL_TEXTURE_2D_ARRAY;
+		target_str = "2DArrayShadow";
+		type_str = "vec4";
+		break;
+	case TEX_CUBE_ARRAY_SHADOW:
+		piglit_require_gl_version(30);
+		piglit_require_extension("GL_ARB_texture_cube_map_array");
+		gltarget = GL_TEXTURE_CUBE_MAP_ARRAY;
+		target_str = "CubeArrayShadow";
+		type_str = "vec4";
+		break;
+	}
+
+	if (test == ARB_SHADER_TEXTURE_LOD) {
 		piglit_require_GLSL();
 		piglit_require_extension("GL_ARB_shader_texture_lod");
 
-		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fscode);
-		prog = piglit_link_simple_program(0, fs);
+		prog = piglit_build_simple_program(NULL, fscode_arb_lod);
 		glUseProgram(prog);
+
 		loc_tex = glGetUniformLocation(prog, "tex");
 		loc_lod = glGetUniformLocation(prog, "lod");
 		glUniform1i(loc_tex, 0);
 
 		puts("Testing GL_ARB_shader_texture_lod.");
 	}
+	else if (test == GL3_TEXTURE_LOD) {
+		char fscode[2048];
+
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_lod_shadow, target_str,
+				type_str, compare_index_str,
+				type_str, compare_index_str);
+		else
+			sprintf(fscode, fscode_gl3_lod, target_str, type_str);
+
+		piglit_require_gl_version(30);
+		prog = piglit_build_simple_program(NULL, fscode);
+		glUseProgram(prog);
+
+		loc_lod = glGetUniformLocation(prog, "lod");
+		loc_tex = glGetUniformLocation(prog, "tex");
+		glUniform1i(loc_tex, 0);
+
+		if (IS_SHADOW(target)) {
+			loc_tex2 = glGetUniformLocation(prog, "tex2");
+			glUniform1i(loc_tex2, 1);
+		}
+
+		printf("Testing textureLod(%s)\n", target_str);
+	}
 
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glBindTexture(gltarget, tex);
 
-	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
-		glTexImage2D(GL_TEXTURE_2D, i, GL_RGBA,
-			     dim, dim,
-			     0,
-			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	if (IS_SHADOW(target)) {
+		format = GL_DEPTH_COMPONENT24;
+		attachment = GL_DEPTH_ATTACHMENT;
+		clearbits = GL_DEPTH_BUFFER_BIT;
+	}
+	else {
+		format = GL_RGBA8;
+		attachment = GL_COLOR_ATTACHMENT0;
+		clearbits = GL_COLOR_BUFFER_BIT;
+	}
+
+	switch (gltarget) {
+	case GL_TEXTURE_1D:
+		num_layers = 1;
+		glTexStorage1D(gltarget, 6, format, TEX_SIZE);
+		break;
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_CUBE_MAP:
+	case GL_TEXTURE_1D_ARRAY:
+		num_layers = gltarget == GL_TEXTURE_CUBE_MAP ? 6 :
+			     gltarget == GL_TEXTURE_1D_ARRAY ? TEX_SIZE : 1;
+		glTexStorage2D(gltarget, 6, format, TEX_SIZE, TEX_SIZE);
+		break;
+	case GL_TEXTURE_3D:
+	case GL_TEXTURE_2D_ARRAY:
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
+		num_layers = gltarget == GL_TEXTURE_CUBE_MAP_ARRAY ? 36 : TEX_SIZE;
+		glTexStorage3D(gltarget, 6, format, TEX_SIZE, TEX_SIZE, num_layers);
+		break;
+	default:
+		assert(0);
 	}
 	assert(glGetError() == 0);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
+	if (test == FIXED_FUNCTION)
+		glDisable(gltarget);
 
-	glGenFramebuffersEXT(1, &fb);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	glGenFramebuffers(1, &fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
-	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-					  GL_COLOR_ATTACHMENT0_EXT,
-					  GL_TEXTURE_2D,
-					  tex,
-					  i);
+	/* set one layer/face to the expected color and the other layers/faces to black */
+	for (level = 0, dim = TEX_SIZE; dim > 0; level++, dim /= 2) {
+		if (gltarget == GL_TEXTURE_3D)
+			num_layers = dim;
 
+		for (layer = 0; layer < num_layers; layer++) {
+			switch (gltarget) {
+			case GL_TEXTURE_1D:
+				glFramebufferTexture1D(GL_FRAMEBUFFER, attachment,
+						       gltarget, tex, level);
+				break;
+			case GL_TEXTURE_2D:
+				glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,
+						       gltarget, tex, level);
+				break;
+			case GL_TEXTURE_CUBE_MAP:
+				glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,
+						       GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer,
+						       tex, level);
+				break;
+			case GL_TEXTURE_3D:
+				glFramebufferTexture3D(GL_FRAMEBUFFER, attachment,
+						       gltarget, tex, level, layer);
+				break;
+			case GL_TEXTURE_1D_ARRAY:
+			case GL_TEXTURE_2D_ARRAY:
+			case GL_TEXTURE_CUBE_MAP_ARRAY:
+				glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment,
+							  tex, level, layer);
+				break;
+			}
+			assert(glGetError() == 0);
 
-		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
-		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-			fprintf(stderr, "FBO incomplete\n");
-			piglit_report_result(PIGLIT_SKIP);
+			status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				fprintf(stderr, "FBO incomplete status 0x%X for level %i, layer %i\n",
+					status, level, layer);
+				piglit_report_result(PIGLIT_SKIP);
+			}
+
+			/* For array and cube textures, only TEST_LAYER is
+			 * cleared to the expected value.
+			 * For 3D textures, the middle slice is cleared. */
+			if (num_layers == 1 ||
+			    (gltarget == GL_TEXTURE_3D && layer == num_layers/2) ||
+			    (gltarget != GL_TEXTURE_3D && layer == TEST_LAYER % num_layers)) {
+				glClearColor(clear_colors[level][0],
+						clear_colors[level][1],
+						clear_colors[level][2],
+						0.0);
+				glClearDepth(clear_depths[level]);
+			}
+			else {
+				glClearColor(0, 0, 0, 0);
+				glClearDepth(0);
+			}
+			glClear(clearbits);
+
+			assert(glGetError() == 0);
 		}
-
-		glClearColor(colors[i][0],
-			     colors[i][1],
-			     colors[i][2],
-			     0.0);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		assert(glGetError() == 0);
 	}
 
-	glDeleteFramebuffersEXT(1, &fb);
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	glViewport(0, 0, piglit_width, piglit_height);
-
+	glDeleteFramebuffers(1, &fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
+	if (test == FIXED_FUNCTION)
+		glEnable(gltarget);
 
-	glEnable(GL_TEXTURE_2D);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glGenSamplers(2, samp);
+	glBindSampler(0, samp[0]);
+
+	set_sampler_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	set_sampler_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	if (IS_SHADOW(target)) {
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(gltarget, tex);
+		glActiveTexture(GL_TEXTURE0);
+		glBindSampler(1, samp[1]);
+
+		set_sampler_parameter(GL_TEXTURE_COMPARE_MODE,
+				      GL_COMPARE_REF_TO_TEXTURE);
+		glSamplerParameteri(samp[0], GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+		glSamplerParameteri(samp[1], GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
+	}
+
+	assert(glGetError() == 0);
 }
 
+#define SET_VEC(c, x, y, z, w) do { c[0] = x; c[1] = y; c[2] = z; c[3] = w; } while (0)
+
 static void
-draw_quad(int x, int y, int w, int h, int level)
+draw_quad(int x, int y, int w, int h, int baselevel, int fetch_level, int expected_level)
 {
-	float s, t;
+	float s = (float)w / TEX_SIZE;
+	float t = (float)h / TEX_SIZE;
+	float z = clear_depths[expected_level];
+	float c0[4], c1[4], c2[4], c3[4];
 
-	if (ARB_shader_texture_lod) {
-		float lod = level;
+	if (test == ARB_SHADER_TEXTURE_LOD ||
+	    test == GL3_TEXTURE_LOD) {
+		/* set an explicit LOD */
+		float lod = fetch_level - baselevel;
 		glUniform1fv(loc_lod, 1, &lod);
+	}
+	else {
+		/* scale the coordinates (decrease the texel size),
+		 * so that the texture fetch selects this level
+		 */
+		s *= 1 << fetch_level;
+		t *= 1 << fetch_level;
+	}
 
-		s = w/(float)TEX_WIDTH;
-		t = h/(float)TEX_HEIGHT;
-	} else {
-		s = (w/(float)TEX_WIDTH) * (1<<level);
-		t = (h/(float)TEX_HEIGHT) * (1<<level);
+	switch (target) {
+	case TEX_1D:
+	case TEX_2D:
+	case TEX_2D_ARRAY:
+		SET_VEC(c0, 0, 0, TEST_LAYER, 1);
+		SET_VEC(c1, s, 0, TEST_LAYER, 1);
+		SET_VEC(c2, s, t, TEST_LAYER, 1);
+		SET_VEC(c3, 0, t, TEST_LAYER, 1);
+		break;
+	case TEX_1D_SHADOW:
+	case TEX_2D_SHADOW:
+		SET_VEC(c0, 0, 0, z, 1);
+		SET_VEC(c1, s, 0, z, 1);
+		SET_VEC(c2, s, t, z, 1);
+		SET_VEC(c3, 0, t, z, 1);
+		break;
+	case TEX_1D_ARRAY_SHADOW:
+		SET_VEC(c0, 0, TEST_LAYER, z, 1);
+		SET_VEC(c1, s, TEST_LAYER, z, 1);
+		SET_VEC(c2, s, TEST_LAYER, z, 1);
+		SET_VEC(c3, 0, TEST_LAYER, z, 1);
+		break;
+	case TEX_3D:
+		SET_VEC(c0, 0, 0, 0.5, 1);
+		SET_VEC(c1, s, 0, 0.5, 1);
+		SET_VEC(c2, s, t, 0.5, 1);
+		SET_VEC(c3, 0, t, 0.5, 1);
+		break;
+	case TEX_1D_ARRAY:
+		SET_VEC(c0, 0, TEST_LAYER, 0, 1);
+		SET_VEC(c1, s, TEST_LAYER, 0, 1);
+		SET_VEC(c2, s, TEST_LAYER, 0, 1);
+		SET_VEC(c3, 0, TEST_LAYER, 0, 1);
+		break;
+	case TEX_CUBE:
+	case TEX_CUBE_ARRAY:
+		assert(TEST_LAYER % 6 == 3); /* negative Y */
+		SET_VEC(c0, 0, -1, 0, TEST_LAYER / 6);
+		SET_VEC(c1, 0, -1, 0, TEST_LAYER / 6);
+		SET_VEC(c2, 0, -1, 0, TEST_LAYER / 6);
+		SET_VEC(c3, 0, -1, 0, TEST_LAYER / 6);
+		break;
+	default:
+		assert(0);
 	}
 
 	glBegin(GL_QUADS);
 
-	glTexCoord2f(0, 0);
+	glTexCoord4fv(c0);
 	glVertex2f(x, y);
-	glTexCoord2f(s, 0);
+	glTexCoord4fv(c1);
 	glVertex2f(x + w, y);
-	glTexCoord2f(s, t);
+	glTexCoord4fv(c2);
 	glVertex2f(x + w, y + h);
-	glTexCoord2f(0, t);
+	glTexCoord4fv(c3);
 	glVertex2f(x, y + h);
 
 	glEnd();
@@ -190,11 +554,12 @@ draw_quad(int x, int y, int w, int h, int level)
 enum piglit_result
 piglit_display(void)
 {
-	int scale_to_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
+	int fetch_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
 	int expected_level, x, y, total, failed, c;
 	int start_bias, end_bias;
 	int start_min_lod, end_min_lod, end_max_lod;
 	unsigned char *pix, *p;
+	const float (*colors)[3] = IS_SHADOW(target) ? shadow_colors : clear_colors;
 
 	if (no_bias) {
 		start_bias = 0;
@@ -219,54 +584,51 @@ piglit_display(void)
 
 	total = 0;
 	failed = 0;
-	for (scale_to_level = 0; scale_to_level <= LAST_LEVEL; scale_to_level++)
+	for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
 		for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
 			for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
 				for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
 					for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 						for (bias = start_bias; bias <= end_bias; bias++)
 							for (mipfilter = 0; mipfilter < 2; mipfilter++) {
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, baselevel);
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxlevel);
+								glTexParameteri(gltarget, GL_TEXTURE_BASE_LEVEL, baselevel);
+								glTexParameteri(gltarget, GL_TEXTURE_MAX_LEVEL, maxlevel);
 								if (!no_lod) {
-									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, minlod);
-									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, maxlod);
+									set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
+									set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
 								}
 								if (!no_bias)
-									glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, bias);
-								glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
+								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
 										mipfilter ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
 
 								x = (total % (piglit_width/3)) * 3;
 								y = (total / (piglit_width/3)) * 3;
 
-								if (ARB_shader_texture_lod)
-									draw_quad(x, y, 3, 3, scale_to_level - baselevel);
-								else
-									draw_quad(x, y, 3, 3, scale_to_level);
-
 								if (mipfilter) {
 									if (no_lod) {
-										expected_level = CLAMP(scale_to_level + bias,
+										expected_level = CLAMP(fetch_level + bias,
 												       baselevel,
 												       maxlevel);
 									} else {
-										expected_level = CLAMP(scale_to_level + bias,
+										expected_level = CLAMP(fetch_level + bias,
 												       MIN2(baselevel + minlod, maxlevel),
 												       MIN2(baselevel + maxlod, maxlevel));
 									}
 								} else {
 									expected_level = baselevel;
 								}
-								assert(expected_level <= 5);
+								assert(expected_level <= LAST_LEVEL);
+
+								draw_quad(x, y, 3, 3, baselevel, fetch_level, expected_level);
 
                                                                 if (in_place_probing &&
                                                                     !piglit_probe_pixel_rgb(x, y, colors[expected_level])) {
 									failed++;
 									printf("  Expected mipmap level: %i\n", expected_level);
-									printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
+									printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
 									       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
-									       scale_to_level, baselevel, maxlevel, minlod,
+									       fetch_level, baselevel, maxlevel, minlod,
 									       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
                                                                 }
 
@@ -278,7 +640,7 @@ piglit_display(void)
 		glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
 
 		total = 0;
-		for (scale_to_level = 0; scale_to_level <= LAST_LEVEL; scale_to_level++)
+		for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
 			for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
 				for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
 					for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
@@ -287,11 +649,11 @@ piglit_display(void)
 								for (mipfilter = 0; mipfilter < 2; mipfilter++) {
 									if (mipfilter) {
 										if (no_lod) {
-											expected_level = CLAMP(scale_to_level + bias,
+											expected_level = CLAMP(fetch_level + bias,
 													       baselevel,
 													       maxlevel);
 										} else {
-											expected_level = CLAMP(scale_to_level + bias,
+											expected_level = CLAMP(fetch_level + bias,
 													       MIN2(baselevel + minlod, maxlevel),
 													       MIN2(baselevel + maxlod, maxlevel));
 										}
@@ -313,9 +675,9 @@ piglit_display(void)
 											       colors[expected_level][1], colors[expected_level][2]);
 											printf("  Observed: %f %f %f\n", p[0]/255.0, p[1]/255.0, p[2]/255.0);
 											printf("  Expected mipmap level: %i\n", expected_level);
-											printf("  Scale to level: %i, baselevel: %i, maxlevel: %i, "
+											printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
 											       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
-											       scale_to_level, baselevel, maxlevel, minlod,
+											       fetch_level, baselevel, maxlevel, minlod,
 											       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
 											break;
 										}
@@ -324,6 +686,8 @@ piglit_display(void)
 								}
 		free(pix);
 	}
+
+	assert(glGetError() == 0);
 	printf("Summary: %i/%i passed\n", total-failed, total);
 
 	piglit_present_results();

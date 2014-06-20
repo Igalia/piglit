@@ -1134,6 +1134,17 @@ spec['glsl-1.30']['built-in constants'] = concurrent_test('built-in-constants ' 
 spec['glsl-1.30']['api'] = {}
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 1D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 2D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 3D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod Cube')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 1DShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 2DShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 1DArray')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 2DArray')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 1DArrayShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod CubeArray')
+
 # Group spec/glsl-1.40
 spec['glsl-1.40'] = {}
 import_glsl_parser_tests(spec['glsl-1.40'],
