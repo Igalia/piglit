@@ -271,7 +271,8 @@ class Summary:
     implementation is HTML output through mako, aptly named generateHTML().
     """
     TEMP_DIR = path.join(tempfile.gettempdir(), "piglit/html-summary")
-    TEMPLATE_DIR = path.join(os.environ['PIGLIT_SOURCE_DIR'], 'templates')
+    TEMPLATE_DIR = path.abspath(
+        path.join(path.dirname(__file__), '..', 'templates'))
 
     def __init__(self, resultfiles):
         """
