@@ -10,6 +10,7 @@ link_libraries (
 )
 
 piglit_add_executable (gl-3.2-minmax minmax.c)
+piglit_add_executable (gl-3.2-basevertex-vertexid basevertex-vertexid.c)
 piglit_add_executable (gl-3.2-clear-no-buffers clear-no-buffers.c)
 piglit_add_executable (gl-3.2-depth-tex-sampling depth-tex-sampling.c)
 piglit_add_executable (gl-3.2-get-buffer-parameter-i64v get-buffer-parameter-i64v.c)
