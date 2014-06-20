@@ -332,8 +332,8 @@ class Environment:
                  verbose=False):
         self.concurrent = concurrent
         self.execute = execute
-        self.filter = []
-        self.exclude_filter = []
+        self.filter = [re.compile(x) for x in include_filter or []]
+        self.exclude_filter = [re.compile(x) for x in exclude_filter or []]
         self.exclude_tests = set()
         self.valgrind = valgrind
         self.dmesg = dmesg
@@ -346,17 +346,6 @@ class Environment:
                 os.path.join(os.path.dirname(__file__), '..')),
             'MESA_DEBUG': 'silent',
         }
-
-        """
-        The filter lists that are read in should be a list of string objects,
-        however, the filters need to be a list or regex object.
-
-        This code uses re.compile to rebuild the lists and set self.filter
-        """
-        for each in include_filter or []:
-            self.filter.append(re.compile(each))
-        for each in exclude_filter or []:
-            self.exclude_filter.append(re.compile(each))
 
     def __iter__(self):
         for key, values in self.__dict__.iteritems():
