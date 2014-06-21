@@ -551,15 +551,97 @@ draw_quad(int x, int y, int w, int h, int baselevel, int fetch_level, int expect
 	glEnd();
 }
 
+static bool
+colors_equal(const float *c1, const unsigned char *c2)
+{
+	int i;
+
+	for (i = 0; i < 3; i++)
+		if (fabs(c1[i] - (c2[i]/255.0)) > 0.01)
+			return false;
+	return true;
+}
+
+static bool
+check_result(const unsigned char *probed, int expected_level,
+	     int fetch_level, int baselevel, int maxlevel, int minlod, int maxlod,
+	     int bias, int mipfilter)
+{
+	const float (*colors)[3] = IS_SHADOW(target) ? shadow_colors : clear_colors;
+
+	if (!colors_equal(colors[expected_level], probed)) {
+		int i;
+		static const float black[] = {0, 0, 0};
+
+		printf("Failure:\n");
+#if 0 /* disabled, not needed unless you are debugging the test */
+		printf("  Expected: %f %f %f\n", colors[expected_level][0],
+				colors[expected_level][1], colors[expected_level][2]);
+		printf("  Observed: %f %f %f\n", probed[0]/255.0,
+				probed[1]/255.0, probed[2]/255.0);
+#endif
+		printf("  Expected level: %i\n", expected_level);
+
+		if (IS_SHADOW(target)) {
+			if (colors_equal(black, probed))
+				puts("  Observed: shadow comparison failed");
+			else
+				puts("  Observed: unknown value (broken driver?)");
+		}
+		else {
+			for (i = 0; i < LAST_LEVEL; i++) {
+				if (colors_equal(colors[i], probed)) {
+					printf("  Observed level: %i\n", i);
+					break;
+				}
+			}
+			if (i == LAST_LEVEL) {
+				if (colors_equal(black, probed))
+					puts("  Observed: wrong layer/face/slice or wrong level");
+				else
+					puts("  Observed: unknown value (broken driver?)");
+			}
+		}
+
+		printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
+		       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
+		       fetch_level, baselevel, maxlevel, minlod,
+		       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
+		return false;
+	}
+	return true;
+}
+
+static int
+calc_expected_level(int fetch_level, int baselevel, int maxlevel, int minlod,
+		    int maxlod, int bias, int mipfilter)
+{
+	int expected_level;
+
+	if (mipfilter) {
+		if (no_lod) {
+			expected_level = CLAMP(fetch_level + bias,
+					       baselevel,
+					       maxlevel);
+		} else {
+			expected_level = CLAMP(fetch_level + bias,
+					       MIN2(baselevel + minlod, maxlevel),
+					       MIN2(baselevel + maxlod, maxlevel));
+		}
+	} else {
+		expected_level = baselevel;
+	}
+	assert(expected_level >= 0 && expected_level <= LAST_LEVEL);
+	return expected_level;
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	int fetch_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
-	int expected_level, x, y, total, failed, c;
+	int expected_level, x, y, total, failed;
 	int start_bias, end_bias;
 	int start_min_lod, end_min_lod, end_max_lod;
-	unsigned char *pix, *p;
-	const float (*colors)[3] = IS_SHADOW(target) ? shadow_colors : clear_colors;
 
 	if (no_bias) {
 		start_bias = 0;
@@ -597,45 +679,42 @@ piglit_display(void)
 									set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
 									set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
 								}
-								if (!no_bias)
+								if (!no_bias && test != GL3_TEXTURE_BIAS)
 									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
 								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
-										mipfilter ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+										mipfilter ? GL_NEAREST_MIPMAP_NEAREST
+											  : GL_NEAREST);
 
 								x = (total % (piglit_width/3)) * 3;
 								y = (total / (piglit_width/3)) * 3;
 
-								if (mipfilter) {
-									if (no_lod) {
-										expected_level = CLAMP(fetch_level + bias,
-												       baselevel,
-												       maxlevel);
-									} else {
-										expected_level = CLAMP(fetch_level + bias,
-												       MIN2(baselevel + minlod, maxlevel),
-												       MIN2(baselevel + maxlod, maxlevel));
+								expected_level = calc_expected_level(fetch_level, baselevel,
+											maxlevel, minlod, maxlod, bias,
+											mipfilter);
+
+								draw_quad(x, y, 3, 3, baselevel, bias,
+									  fetch_level, expected_level);
+
+								if (in_place_probing) {
+									unsigned char probe[3];
+
+									glReadPixels(x, y, 1, 1, GL_RGB,
+										     GL_UNSIGNED_BYTE, probe);
+
+									if (!check_result(probe, expected_level,
+											  fetch_level, baselevel,
+											  maxlevel, minlod, maxlod,
+											  bias, mipfilter)) {
+										failed++;
 									}
-								} else {
-									expected_level = baselevel;
 								}
-								assert(expected_level <= LAST_LEVEL);
-
-								draw_quad(x, y, 3, 3, baselevel, fetch_level, expected_level);
-
-                                                                if (in_place_probing &&
-                                                                    !piglit_probe_pixel_rgb(x, y, colors[expected_level])) {
-									failed++;
-									printf("  Expected mipmap level: %i\n", expected_level);
-									printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
-									       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
-									       fetch_level, baselevel, maxlevel, minlod,
-									       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
-                                                                }
 
 								total++;
 							}
 
 	if (!in_place_probing) {
+		unsigned char *pix, *p;
+
 		pix = malloc(piglit_width * piglit_height * 4);
 		glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
 
@@ -647,40 +726,18 @@ piglit_display(void)
 						for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 							for (bias = start_bias; bias <= end_bias; bias++)
 								for (mipfilter = 0; mipfilter < 2; mipfilter++) {
-									if (mipfilter) {
-										if (no_lod) {
-											expected_level = CLAMP(fetch_level + bias,
-													       baselevel,
-													       maxlevel);
-										} else {
-											expected_level = CLAMP(fetch_level + bias,
-													       MIN2(baselevel + minlod, maxlevel),
-													       MIN2(baselevel + maxlod, maxlevel));
-										}
-									} else {
-										expected_level = baselevel;
-									}
-									assert(expected_level <= 5);
+									expected_level = calc_expected_level(fetch_level,
+												baselevel, maxlevel, minlod,
+												maxlod, bias, mipfilter);
 
 									x = (total % (piglit_width/3)) * 3;
 									y = (total / (piglit_width/3)) * 3;
 									p = pix + (y*piglit_width + x)*4;
 
-									for (c = 0; c < 3; c++) {
-										if (fabs(colors[expected_level][c] - (p[c]/255.0)) > 0.01) {
-											failed++;
-
-											printf("Probe color at (%i,%i)\n", x, y);
-											printf("  Expected: %f %f %f\n", colors[expected_level][0],
-											       colors[expected_level][1], colors[expected_level][2]);
-											printf("  Observed: %f %f %f\n", p[0]/255.0, p[1]/255.0, p[2]/255.0);
-											printf("  Expected mipmap level: %i\n", expected_level);
-											printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
-											       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
-											       fetch_level, baselevel, maxlevel, minlod,
-											       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
-											break;
-										}
+									if (!check_result(p, expected_level, fetch_level,
+											  baselevel, maxlevel, minlod,
+											  maxlod, bias, mipfilter)) {
+										failed++;
 									}
 									total++;
 								}
