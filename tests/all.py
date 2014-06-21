@@ -803,9 +803,9 @@ add_plain_test(gl14, 'stencil-wrap')
 add_plain_test(gl14, 'triangle-rasterization')
 gl14['triangle-rasterization-fbo'] = PiglitTest(['triangle-rasterization', '-auto', '-use_fbo'])
 add_plain_test(gl14, 'triangle-rasterization-overdraw')
-gl14['tex-miplevel-selection'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod'])
-gl14['tex-miplevel-selection-lod'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias'])
-gl14['tex-miplevel-selection-lod-bias'] = PiglitTest(['tex-miplevel-selection', '-auto'])
+gl14['tex-miplevel-selection'] = concurrent_test('tex-miplevel-selection -nobias -nolod')
+gl14['tex-miplevel-selection-lod'] = concurrent_test('tex-miplevel-selection -nobias')
+gl14['tex-miplevel-selection-lod-bias'] = concurrent_test('tex-miplevel-selection')
 
 gl15 = {}
 spec['!OpenGL 1.5'] = gl15
@@ -1818,9 +1818,9 @@ add_shader_test_dir(arb_shader_texture_lod['execution'],
                     recursive=True)
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgrad')
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgradcube')
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias', '-nolod', '-GL_ARB_shader_texture_lod'])
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] = PiglitTest(['tex-miplevel-selection', '-auto', '-nobias', '-GL_ARB_shader_texture_lod'])
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = PiglitTest(['tex-miplevel-selection', '-auto', '-GL_ARB_shader_texture_lod'])
+arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = concurrent_test('tex-miplevel-selection -nobias -nolod -GL_ARB_shader_texture_lod')
+arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] = concurrent_test('tex-miplevel-selection -nobias -GL_ARB_shader_texture_lod')
+arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = concurrent_test('tex-miplevel-selection -GL_ARB_shader_texture_lod')
 
 # Group ARB_shader_objects
 arb_shader_objects = {}
