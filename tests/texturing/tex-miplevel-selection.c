@@ -112,14 +112,31 @@ enum shader_type {
 	FIXED_FUNCTION,
 	ARB_SHADER_TEXTURE_LOD,
 	GL3_TEXTURE_LOD,
+	GL3_TEXTURE_BIAS,
+	GL3_TEXTURE,
 };
+
+#define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
 
 static enum shader_type test = FIXED_FUNCTION;
 static enum target_type target = TEX_2D;
 static GLenum gltarget;
 static GLboolean in_place_probing, no_bias, no_lod;
-static GLuint loc_lod;
+static GLuint loc_lod, loc_bias, loc_z;
 static GLuint samp[2];
+
+#define GL3_FS_PREAMBLE \
+	"#version 130 \n" \
+	"#extension GL_ARB_texture_cube_map_array : enable \n" \
+	"uniform sampler%s tex; \n"
+
+#define GL3_FS_SHADOW_PREAMBLE \
+	"#version 130 \n" \
+	"#extension GL_ARB_texture_cube_map_array : enable \n" \
+	"uniform sampler%s tex, tex2; \n" \
+	"uniform float z; \n" \
+	"#define TYPE %s \n" \
+	"#define MASK %s \n"
 
 static const char *fscode_arb_lod =
 	"#extension GL_ARB_shader_texture_lod : require\n"
@@ -130,22 +147,54 @@ static const char *fscode_arb_lod =
 	"}\n";
 
 static const char *fscode_gl3_lod =
-	"#version 130 \n"
-	"#extension GL_ARB_texture_cube_map_array : enable \n"
-	"uniform sampler%s tex; \n"
+	GL3_FS_PREAMBLE
 	"uniform float lod; \n"
 	"void main() { \n"
 	"  gl_FragColor = textureLod(tex, %s(gl_TexCoord[0]), lod); \n"
 	"} \n";
 
 static const char *fscode_gl3_lod_shadow =
-	"#version 130 \n"
-	"#extension GL_ARB_texture_cube_map_array : enable \n"
-	"uniform sampler%s tex, tex2; \n"
+	GL3_FS_SHADOW_PREAMBLE
 	"uniform float lod; \n"
 	"void main() { \n"
-	"  gl_FragColor = vec4(textureLod(tex, %s(gl_TexCoord[0]) - 0.05 * %s, lod) * \n"
-	"                      textureLod(tex2, %s(gl_TexCoord[0]) + 0.05 * %s, lod)); \n"
+	"  gl_FragColor = vec4(textureLod(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, lod) * \n"
+	"                      textureLod(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, lod)); \n"
+	"} \n";
+
+static const char *fscode_gl3_bias =
+	GL3_FS_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = texture(tex, %s(gl_TexCoord[0]), bias); \n"
+	"} \n";
+
+static const char *fscode_gl3_bias_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = vec4(texture(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, bias) * \n"
+	"                      texture(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, bias)); \n"
+	"} \n";
+
+static const char *fscode_gl3_simple =
+	GL3_FS_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = texture(tex, %s(gl_TexCoord[0])); \n"
+	"} \n";
+
+static const char *fscode_gl3_simple_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = vec4(texture(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK) * \n"
+	"                      texture(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK)); \n"
+	"} \n";
+
+static const char *fscode_gl3_simple_shadow_cubearray =
+	GL3_FS_SHADOW_PREAMBLE
+	"uniform float z; \n"
+	"void main() { \n"
+	"  gl_FragColor = vec4(texture(tex, gl_TexCoord[0], z - 0.05) * \n"
+	"                      texture(tex2, gl_TexCoord[0], z + 0.05)); \n"
 	"} \n";
 
 static void set_sampler_parameter(GLenum pname, GLint value)
@@ -157,12 +206,12 @@ static void set_sampler_parameter(GLenum pname, GLint value)
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint tex, fb;
+	GLuint tex, fb, prog;
 	GLenum status;
 	int i, level, layer, dim, num_layers;
-	GLuint prog, loc_tex, loc_tex2;
-	const char *target_str, *type_str, *compare_index_str;
+	const char *target_str, *type_str, *compare_value_mask;
 	GLenum format, attachment, clearbits;
+	char fscode[2048];
 
         for (i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-inplace") == 0)
@@ -175,6 +224,10 @@ piglit_init(int argc, char **argv)
 			test = ARB_SHADER_TEXTURE_LOD;
 		else if (strcmp(argv[i], "textureLod") == 0)
 			test = GL3_TEXTURE_LOD;
+		else if (strcmp(argv[i], "texture(bias)") == 0)
+			test = GL3_TEXTURE_BIAS;
+		else if (strcmp(argv[i], "texture()") == 0)
+			test = GL3_TEXTURE;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "2D") == 0)
@@ -210,8 +263,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_sampler_objects");
 	piglit_require_extension("GL_ARB_texture_storage");
-	if (piglit_get_gl_version() < 14)
-		piglit_report_result(PIGLIT_SKIP);
+	piglit_require_gl_version(NEED_GL3(test) ? 30 : 14);
 
 	switch (target) {
 	case TEX_1D:
@@ -257,32 +309,34 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1DShadow";
 		type_str = "vec3";
-		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_2D_SHADOW:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2DShadow";
 		type_str = "vec3";
-		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_CUBE_SHADOW:
 		piglit_require_gl_version(30);
 		gltarget = GL_TEXTURE_CUBE_MAP;
 		target_str = "CubeShadow";
 		type_str = "vec4";
+		compare_value_mask = "vec4(0.0, 0.0, 0.0, 1.0)";
 		break;
 	case TEX_1D_ARRAY_SHADOW:
 		piglit_require_gl_version(30);
 		gltarget = GL_TEXTURE_1D_ARRAY;
 		target_str = "1DArrayShadow";
 		type_str = "vec3";
-		compare_index_str = "vec3(0.0, 0.0, 1.0)";
+		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_2D_ARRAY_SHADOW:
 		piglit_require_gl_version(30);
 		gltarget = GL_TEXTURE_2D_ARRAY;
 		target_str = "2DArrayShadow";
 		type_str = "vec4";
+		compare_value_mask = "vec4(0.0, 0.0, 0.0, 1.0)";
 		break;
 	case TEX_CUBE_ARRAY_SHADOW:
 		piglit_require_gl_version(30);
@@ -293,34 +347,60 @@ piglit_init(int argc, char **argv)
 		break;
 	}
 
-	if (test == ARB_SHADER_TEXTURE_LOD) {
+	switch (test) {
+	case FIXED_FUNCTION:
+		break;
+	case ARB_SHADER_TEXTURE_LOD:
 		piglit_require_GLSL();
 		piglit_require_extension("GL_ARB_shader_texture_lod");
 
 		prog = piglit_build_simple_program(NULL, fscode_arb_lod);
-		glUseProgram(prog);
-
-		loc_tex = glGetUniformLocation(prog, "tex");
 		loc_lod = glGetUniformLocation(prog, "lod");
-		glUniform1i(loc_tex, 0);
-
-		puts("Testing GL_ARB_shader_texture_lod.");
-	}
-	else if (test == GL3_TEXTURE_LOD) {
-		char fscode[2048];
-
+		break;
+	case GL3_TEXTURE_LOD:
 		if (IS_SHADOW(target))
 			sprintf(fscode, fscode_gl3_lod_shadow, target_str,
-				type_str, compare_index_str,
-				type_str, compare_index_str);
+				type_str, compare_value_mask);
 		else
 			sprintf(fscode, fscode_gl3_lod, target_str, type_str);
 
-		piglit_require_gl_version(30);
 		prog = piglit_build_simple_program(NULL, fscode);
-		glUseProgram(prog);
-
 		loc_lod = glGetUniformLocation(prog, "lod");
+		break;
+	case GL3_TEXTURE_BIAS:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_bias_shadow, target_str,
+				type_str, compare_value_mask);
+		else
+			sprintf(fscode, fscode_gl3_bias, target_str, type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+		loc_bias = glGetUniformLocation(prog, "bias");
+		break;
+	case GL3_TEXTURE:
+		if (target == TEX_CUBE_ARRAY_SHADOW)
+			sprintf(fscode,
+				fscode_gl3_simple_shadow_cubearray,
+				target_str, type_str);
+		else if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_simple_shadow,
+				target_str, type_str, compare_value_mask);
+		else
+			sprintf(fscode, fscode_gl3_simple, target_str,
+				type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+		if (target == TEX_CUBE_ARRAY_SHADOW)
+			loc_z = glGetUniformLocation(prog, "z");
+		break;
+	default:
+		assert(0);
+	}
+
+	if (test != FIXED_FUNCTION) {
+		GLuint loc_tex, loc_tex2;
+
+		glUseProgram(prog);
 		loc_tex = glGetUniformLocation(prog, "tex");
 		glUniform1i(loc_tex, 0);
 
@@ -328,8 +408,6 @@ piglit_init(int argc, char **argv)
 			loc_tex2 = glGetUniformLocation(prog, "tex2");
 			glUniform1i(loc_tex2, 1);
 		}
-
-		printf("Testing textureLod(%s)\n", target_str);
 	}
 
 	glGenTextures(1, &tex);
@@ -470,25 +548,40 @@ piglit_init(int argc, char **argv)
 #define SET_VEC(c, x, y, z, w) do { c[0] = x; c[1] = y; c[2] = z; c[3] = w; } while (0)
 
 static void
-draw_quad(int x, int y, int w, int h, int baselevel, int fetch_level, int expected_level)
+draw_quad(int x, int y, int w, int h, int baselevel, int bias, int fetch_level, int expected_level)
 {
+	/* 2D coordinates */
 	float s = (float)w / TEX_SIZE;
 	float t = (float)h / TEX_SIZE;
+	/* Cube coordinates */
+	float s0 = 2*0 - 1;
+	float t0 = 2*0 - 1;
+	float s1 = 2*s - 1;
+	float t1 = 2*t - 1;
+	/* shadow compare value */
 	float z = clear_depths[expected_level];
 	float c0[4], c1[4], c2[4], c3[4];
 
-	if (test == ARB_SHADER_TEXTURE_LOD ||
-	    test == GL3_TEXTURE_LOD) {
+	switch (test) {
+	case ARB_SHADER_TEXTURE_LOD:
+	case GL3_TEXTURE_LOD:
 		/* set an explicit LOD */
-		float lod = fetch_level - baselevel;
-		glUniform1fv(loc_lod, 1, &lod);
-	}
-	else {
+		glUniform1f(loc_lod, fetch_level - baselevel);
+		break;
+	case GL3_TEXTURE_BIAS:
+		/* set a bias */
+		glUniform1f(loc_bias, bias);
+		/* fall through to scale the coordinates */
+	case GL3_TEXTURE:
+	case FIXED_FUNCTION:
 		/* scale the coordinates (decrease the texel size),
 		 * so that the texture fetch selects this level
 		 */
 		s *= 1 << fetch_level;
 		t *= 1 << fetch_level;
+		break;
+	default:
+		assert(0);
 	}
 
 	switch (target) {
@@ -513,6 +606,12 @@ draw_quad(int x, int y, int w, int h, int baselevel, int fetch_level, int expect
 		SET_VEC(c2, s, TEST_LAYER, z, 1);
 		SET_VEC(c3, 0, TEST_LAYER, z, 1);
 		break;
+	case TEX_2D_ARRAY_SHADOW:
+		SET_VEC(c0, 0, 0, TEST_LAYER, z);
+		SET_VEC(c1, s, 0, TEST_LAYER, z);
+		SET_VEC(c2, s, t, TEST_LAYER, z);
+		SET_VEC(c3, 0, t, TEST_LAYER, z);
+		break;
 	case TEX_3D:
 		SET_VEC(c0, 0, 0, 0.5, 1);
 		SET_VEC(c1, s, 0, 0.5, 1);
@@ -525,13 +624,25 @@ draw_quad(int x, int y, int w, int h, int baselevel, int fetch_level, int expect
 		SET_VEC(c2, s, TEST_LAYER, 0, 1);
 		SET_VEC(c3, 0, TEST_LAYER, 0, 1);
 		break;
+	case TEX_CUBE_ARRAY_SHADOW:
+		/* Set the compare value through a uniform, because all
+		 * components of TexCoord0 are taken. */
+		glUniform1f(loc_z, z);
+		/* fall through */
 	case TEX_CUBE:
 	case TEX_CUBE_ARRAY:
 		assert(TEST_LAYER % 6 == 3); /* negative Y */
-		SET_VEC(c0, 0, -1, 0, TEST_LAYER / 6);
-		SET_VEC(c1, 0, -1, 0, TEST_LAYER / 6);
-		SET_VEC(c2, 0, -1, 0, TEST_LAYER / 6);
-		SET_VEC(c3, 0, -1, 0, TEST_LAYER / 6);
+		SET_VEC(c0, s0, -1,  t0, TEST_LAYER / 6);
+		SET_VEC(c1, s1, -1,  t0, TEST_LAYER / 6);
+		SET_VEC(c2, s1, -1, -t1, TEST_LAYER / 6);
+		SET_VEC(c3, s0, -1, -t1, TEST_LAYER / 6);
+		break;
+	case TEX_CUBE_SHADOW:
+		assert(TEST_LAYER % 6 == 3); /* negative Y */
+		SET_VEC(c0, s0, -1,  t0, z);
+		SET_VEC(c1, s1, -1,  t0, z);
+		SET_VEC(c2, s1, -1, -t1, z);
+		SET_VEC(c3, s0, -1, -t1, z);
 		break;
 	default:
 		assert(0);
