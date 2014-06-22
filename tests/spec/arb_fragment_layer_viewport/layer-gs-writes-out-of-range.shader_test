@@ -1,0 +1,72 @@
+[require]
+GLSL >= 1.50
+GL_ARB_fragment_layer_viewport
+GL_ARB_shader_atomic_counters
+
+#
+# Ensure that the fragment stage reads the same value for gl_Layer as was
+# written by the geometry stage.
+#
+# This test covers the case where the value written is out of range.
+#
+
+[vertex shader]
+#version 150
+in vec4 piglit_vertex;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+}
+
+[geometry shader]
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices=9) out;
+
+const int layers[] = int[]( -1, 4, 2048 );
+flat out int layer_written;
+
+void main()
+{
+	for (int layer = 0; layer < layers.length(); layer++) {
+
+		for (int i = 0; i < 3; i++) {
+			gl_Position = gl_in[i].gl_Position;
+			layer_written = layers[layer];
+			gl_Layer = layers[layer];
+			EmitVertex();
+		}
+
+		EndPrimitive();
+	}
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_fragment_layer_viewport: require
+#extension GL_ARB_shader_atomic_counters: require
+
+flat in int layer_written;
+
+layout(binding = 0) uniform atomic_uint mismatches;
+
+void main()
+{
+	if (layer_written != gl_Layer)
+		atomicCounterIncrement(mismatches);
+
+	gl_FragColor = vec4(0);
+}
+
+[test]
+texture junk 2DArray 0 ( 64 , 64 , 4 )
+fb tex layered 2DArray 0
+
+atomic counters 1
+
+
+draw rect -1 -1 2 2
+
+probe atomic counter 0 == 0
