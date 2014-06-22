@@ -2167,6 +2167,34 @@ piglit_display(void)
 
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &render_width);
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &render_height);
+		} else if (sscanf(line, "fb tex layered 2DArray %d", &tex) == 1) {
+			GLenum status;
+			GLint tex_num;
+
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGetIntegerv(GL_TEXTURE_BINDING_2D_ARRAY, &tex_num);
+
+			if (fbo == 0) {
+				glGenFramebuffers(1, &fbo);
+				glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			}
+
+			glFramebufferTexture(GL_FRAMEBUFFER,
+					     GL_COLOR_ATTACHMENT0,
+					     tex_num, 0);
+			if (!piglit_check_gl_error(GL_NO_ERROR)) {
+				fprintf(stderr, "glFramebufferTexture error\n");
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				fprintf(stderr, "incomplete fbo (status 0x%x)\n", status);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+
+			glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_WIDTH, &render_width);
+			glGetTexLevelParameteriv(GL_TEXTURE_2D_ARRAY, 0, GL_TEXTURE_HEIGHT, &render_height);
 		} else if (string_match("frustum", line)) {
 			get_floats(line + 7, c, 6);
 			piglit_frustum_projection(false, c[0], c[1], c[2],
