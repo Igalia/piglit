@@ -1570,6 +1570,12 @@ import_glsl_parser_tests(arb_fragment_coord_conventions,
                                       'arb_fragment_coord_conventions'),
                          ['compiler'])
 
+arb_fragment_layer_viewport = {}
+spec['ARB_fragment_layer_viewport'] = arb_fragment_layer_viewport
+add_shader_test_dir(arb_fragment_layer_viewport,
+                    os.path.join(testsDir, 'spec', 'arb_fragment_layer_viewport'),
+                    recursive=True)
+
 ati_fragment_shader = {}
 spec['ATI_fragment_shader'] = ati_fragment_shader
 add_plain_test(ati_fragment_shader, 'ati-fs-bad-delete')
