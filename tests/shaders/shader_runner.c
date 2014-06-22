@@ -2307,6 +2307,17 @@ piglit_display(void)
 			if (!piglit_is_core_profile)
 				glEnable(GL_TEXTURE_2D);
 		} else if (sscanf(line,
+				  "texture junk 2DArray %d ( %d , %d , %d )",
+				  &tex, &w, &h, &l) == 4) {
+			GLint texobj;
+			glActiveTexture(GL_TEXTURE0 + tex);
+			glGenTextures(1, &texobj);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
+			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
+				     w, h, l, 0, GL_RGBA, GL_FLOAT, 0);
+			if (!piglit_is_core_profile)
+				glEnable(GL_TEXTURE_2D_ARRAY);
+		} else if (sscanf(line,
 				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
