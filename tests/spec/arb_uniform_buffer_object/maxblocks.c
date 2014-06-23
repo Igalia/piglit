@@ -297,7 +297,6 @@ piglit_display(void)
 	}
 
 	pass = pass_link_test(0,
-
 			      "vs", max_vs,
 			      "vs", 0) && pass;
 
