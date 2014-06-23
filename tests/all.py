@@ -1718,6 +1718,8 @@ add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-base-ins
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-prim-restart')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-elements-prim-restart-ugly')
 add_concurrent_test(arb_draw_indirect, 'arb_draw_indirect-draw-arrays-instances')
+arb_draw_indirect['gl_VertexID used with glDrawArraysIndirect'] = concurrent_test('arb_draw_indirect-vertexid')
+arb_draw_indirect['gl_VertexID used with glDrawElementsIndirect'] = concurrent_test('arb_draw_indirect-vertexid elements')
 
 # Group ARB_fragment_program
 arb_fragment_program = {}
