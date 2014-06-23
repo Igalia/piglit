@@ -1,0 +1,48 @@
+[require]
+GLSL >= 1.40
+GL_ARB_fragment_layer_viewport
+GL_AMD_vertex_shader_layer
+
+[vertex shader]
+#version 140
+#extension GL_AMD_vertex_shader_layer: enable
+in vec4 piglit_vertex;
+uniform int layer;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	gl_Layer = layer;
+}
+
+[fragment shader]
+#version 140
+#extension GL_ARB_fragment_layer_viewport: require
+
+uniform int layer;
+
+void main()
+{
+	if (gl_Layer == layer)
+		gl_FragColor = vec4(0,1,0,0);
+	else
+		gl_FragColor = vec4(1,0,0,0);
+}
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+
+uniform int layer 0
+draw rect -1 -1 1 1
+
+uniform int layer 1
+draw rect 0 -1 1 1
+
+uniform int layer 10000
+draw rect -1 0 1 1
+
+uniform int layer -10000
+draw rect 0 0 1 1
+
+probe all rgb 0.0 1.0 0.0
