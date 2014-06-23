@@ -103,8 +103,8 @@ static enum filling_convention_t {
 } filling_convention;
 
 /* Fixed point format */
-const int FIXED_SHIFT = 4;
-const int FIXED_ONE = 1 << FIXED_SHIFT;
+static int FIXED_SHIFT;
+static int FIXED_ONE;
 
 /* Default test size */
 int fbo_width = 256;
@@ -144,13 +144,13 @@ namespace std {
 }
 
 /* Proper rounding of float to integer */
-int iround(float v)
+int64_t iround(float v)
 {
 	if (v > 0.0f)
 		v += 0.5f;
 	if (v < 0.0f)
 		v -= 0.5f;
-	return (int)v;
+	return (int64_t)v;
 }
 
 /* Calculate log2 for integers */
@@ -168,57 +168,57 @@ void rast_triangle(uint8_t* buffer, uint32_t stride, const Triangle& tri)
 {
 	float center_offset = -0.5f;
 
-	/* 28.4 fixed point coordinates */
-	int x1 = iround(FIXED_ONE * (tri[0].x + center_offset));
-	int x2 = iround(FIXED_ONE * (tri[1].x + center_offset));
-	int x3 = iround(FIXED_ONE * (tri[2].x + center_offset));
+	/* fixed point coordinates */
+	int64_t x1 = iround(FIXED_ONE * (tri[0].x + center_offset));
+	int64_t x2 = iround(FIXED_ONE * (tri[1].x + center_offset));
+	int64_t x3 = iround(FIXED_ONE * (tri[2].x + center_offset));
 
-	int y1 = iround(FIXED_ONE * (tri[0].y + center_offset));
-	int y2 = iround(FIXED_ONE * (tri[1].y + center_offset));
-	int y3 = iround(FIXED_ONE * (tri[2].y + center_offset));
+	int64_t y1 = iround(FIXED_ONE * (tri[0].y + center_offset));
+	int64_t y2 = iround(FIXED_ONE * (tri[1].y + center_offset));
+	int64_t y3 = iround(FIXED_ONE * (tri[2].y + center_offset));
 
 	/* Force correct vertex order */
-	const int cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
+	const int64_t cross = (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2);
 	if (cross > 0) {
 		std::swap(x1, x3);
 		std::swap(y1, y3);
 	}
 
 	/* Deltas */
-	const int dx12 = x1 - x2;
-	const int dx23 = x2 - x3;
-	const int dx31 = x3 - x1;
+	const int64_t dx12 = x1 - x2;
+	const int64_t dx23 = x2 - x3;
+	const int64_t dx31 = x3 - x1;
 
-	const int dy12 = y1 - y2;
-	const int dy23 = y2 - y3;
-	const int dy31 = y3 - y1;
+	const int64_t dy12 = y1 - y2;
+	const int64_t dy23 = y2 - y3;
+	const int64_t dy31 = y3 - y1;
 
 	/* Fixed-point deltas */
-	const int fdx12 = dx12 << FIXED_SHIFT;
-	const int fdx23 = dx23 << FIXED_SHIFT;
-	const int fdx31 = dx31 << FIXED_SHIFT;
+	const int64_t fdx12 = dx12 << FIXED_SHIFT;
+	const int64_t fdx23 = dx23 << FIXED_SHIFT;
+	const int64_t fdx31 = dx31 << FIXED_SHIFT;
 
-	const int fdy12 = dy12 << FIXED_SHIFT;
-	const int fdy23 = dy23 << FIXED_SHIFT;
-	const int fdy31 = dy31 << FIXED_SHIFT;
+	const int64_t fdy12 = dy12 << FIXED_SHIFT;
+	const int64_t fdy23 = dy23 << FIXED_SHIFT;
+	const int64_t fdy31 = dy31 << FIXED_SHIFT;
 
 	/* Bounding rectangle */
-	int minx = std::min(x1, x2, x3) >> FIXED_SHIFT;
-	int maxx = (std::max(x1, x2, x3)) >> FIXED_SHIFT;
+	int64_t minx = std::min(x1, x2, x3) >> FIXED_SHIFT;
+	int64_t maxx = (std::max(x1, x2, x3)) >> FIXED_SHIFT;
 
-	int miny = (std::min(y1, y2, y3)) >> FIXED_SHIFT;
-	int maxy = std::max(y1, y2, y3) >> FIXED_SHIFT;
+	int64_t miny = (std::min(y1, y2, y3)) >> FIXED_SHIFT;
+	int64_t maxy = std::max(y1, y2, y3) >> FIXED_SHIFT;
 
-	minx = std::max(minx, 0);
-	maxx = std::min(maxx, fbo_width - 1);
+	minx = std::max(minx, (int64_t)0);
+	maxx = std::min(maxx, (int64_t)fbo_width - 1);
 
-	miny = std::max(miny, 0);
-	maxy = std::min(maxy, fbo_height - 1);
+	miny = std::max(miny, (int64_t)0);
+	maxy = std::min(maxy, (int64_t)fbo_height - 1);
 
 	/* Half-edge constants */
-	int c1 = dy12 * x1 - dx12 * y1;
-	int c2 = dy23 * x2 - dx23 * y2;
-	int c3 = dy31 * x3 - dx31 * y3;
+	int64_t c1 = dy12 * x1 - dx12 * y1;
+	int64_t c2 = dy23 * x2 - dx23 * y2;
+	int64_t c3 = dy31 * x3 - dx31 * y3;
 
 	/* Correct for filling convention */
 	switch (filling_convention) {
@@ -264,18 +264,18 @@ void rast_triangle(uint8_t* buffer, uint32_t stride, const Triangle& tri)
 			break;
 	}
 
-	int cy1 = c1 + dx12 * (miny << FIXED_SHIFT) - dy12 * (minx << FIXED_SHIFT);
-	int cy2 = c2 + dx23 * (miny << FIXED_SHIFT) - dy23 * (minx << FIXED_SHIFT);
-	int cy3 = c3 + dx31 * (miny << FIXED_SHIFT) - dy31 * (minx << FIXED_SHIFT);
+	int64_t cy1 = c1 + dx12 * (miny << FIXED_SHIFT) - dy12 * (minx << FIXED_SHIFT);
+	int64_t cy2 = c2 + dx23 * (miny << FIXED_SHIFT) - dy23 * (minx << FIXED_SHIFT);
+	int64_t cy3 = c3 + dx31 * (miny << FIXED_SHIFT) - dy31 * (minx << FIXED_SHIFT);
 
 	/* Perform rasterization */
 	buffer += miny * stride;
-	for (int y = miny; y <= maxy; y++) {
-		int cx1 = cy1;
-		int cx2 = cy2;
-		int cx3 = cy3;
+	for (int64_t y = miny; y <= maxy; y++) {
+		int64_t cx1 = cy1;
+		int64_t cx2 = cy2;
+		int64_t cx3 = cy3;
 
-		for (int x = minx; x <= maxx; x++) {
+		for (int64_t x = minx; x <= maxx; x++) {
 			if (cx1 > 0 && cx2 > 0 && cx3 > 0) {
 				((uint32_t*)buffer)[x] = 0x00FF00FF;
 			}
@@ -684,6 +684,9 @@ void
 piglit_init(int argc, char **argv)
 {
 	uint32_t seed = 0xfacebeef ^ time(NULL);
+	GLint gl_subpixel_bits, in_subpixel_bits;
+	glGetIntegerv(GL_SUBPIXEL_BITS, &gl_subpixel_bits);
+	in_subpixel_bits = gl_subpixel_bits;
 
 	for (int i = 1; i < argc; ++i) {
 		if (strcmp(argv[i], "-break_on_fail") == 0){
@@ -705,10 +708,17 @@ piglit_init(int argc, char **argv)
 				random_test_count = strtoul(argv[++i], NULL, 0);
 			} else if (strcmp(argv[i], "-seed") == 0) {
 				seed = strtoul(argv[++i], NULL, 0);
+			} else if (strcmp(argv[i], "-subpixel_bits") == 0) {
+				in_subpixel_bits = strtoul(argv[++i], NULL, 0);
 			}
 		}
 	}
 
+	FIXED_SHIFT = in_subpixel_bits;
+	FIXED_ONE = 1 << FIXED_SHIFT;
+
+	printf("GL indicates %d subpixel bits, using %d subpixel bits\n",
+		gl_subpixel_bits, in_subpixel_bits);
 	printf("Random seed: 0x%08X\n", seed);
 	mersenne.init(seed);
 
