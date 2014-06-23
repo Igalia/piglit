@@ -6,7 +6,6 @@ include_directories(
 
 link_libraries(
 	${EGL_LDFLAGS}
-	${OPENGL_gles1_LIBRARY}
 	piglitutil_gles1
 	)
 

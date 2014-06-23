@@ -5,7 +5,6 @@ include_directories(
 
 link_libraries (
 	piglitutil_${piglit_target_api}
-	${OPENGL_gles1_LIBRARY}
 )
 
 piglit_add_executable (oes_packed_depth_stencil-depth-stencil-texture_${piglit_target_api} depth-stencil-texture.c)

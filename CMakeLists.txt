@@ -356,7 +356,6 @@ if(PIGLIT_BUILD_GLES3_TESTS AND NOT EGL_FOUND)
 			    "Failed to find EGL library.")
 endif()
 
-find_library(OPENGL_gles1_LIBRARY NAMES GLESv1_CM)
 find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
 
 # Put all executables into the bin subdirectory

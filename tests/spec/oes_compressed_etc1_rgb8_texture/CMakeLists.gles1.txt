@@ -5,7 +5,6 @@ include_directories(
 
 link_libraries(
 	piglitutil_${piglit_target_api}
-	${OPENGL_gles1_LIBRARY}
 )
 
 piglit_add_executable (oes_compressed_etc1_rgb8_texture-basic oes_compressed_etc1_rgb8_texture-basic.c)

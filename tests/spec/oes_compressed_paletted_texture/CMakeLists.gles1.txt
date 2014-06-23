@@ -5,7 +5,6 @@ include_directories(
 
 link_libraries(
 	piglitutil_${piglit_target_api}
-	${OPENGL_gles1_LIBRARY}
 )
 
 piglit_add_executable (oes_compressed_paletted_texture-api oes_compressed_paletted_texture-api.c)
