@@ -114,6 +114,7 @@ enum shader_type {
 	GL3_TEXTURE_LOD,
 	GL3_TEXTURE_BIAS,
 	GL3_TEXTURE,
+	GL3_TEXTURE_OFFSET,
 };
 
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
@@ -121,22 +122,28 @@ enum shader_type {
 static enum shader_type test = FIXED_FUNCTION;
 static enum target_type target = TEX_2D;
 static GLenum gltarget;
-static GLboolean in_place_probing, no_bias, no_lod;
+static GLboolean has_offset;
+static GLboolean in_place_probing, no_bias, no_lod_clamp;
 static GLuint loc_lod, loc_bias, loc_z;
 static GLuint samp[2];
 
+static int offset[] = {3, -1, 2};
+
 #define GL3_FS_PREAMBLE \
-	"#version 130 \n" \
+	"#version %s \n" \
 	"#extension GL_ARB_texture_cube_map_array : enable \n" \
-	"uniform sampler%s tex; \n"
+	"uniform sampler%s tex; \n" \
+	"#define TYPE %s \n" \
+	"#define OFFSET %s(ivec3(3, -1, 2)) \n"
 
 #define GL3_FS_SHADOW_PREAMBLE \
-	"#version 130 \n" \
+	"#version %s \n" \
 	"#extension GL_ARB_texture_cube_map_array : enable \n" \
 	"uniform sampler%s tex, tex2; \n" \
 	"uniform float z; \n" \
 	"#define TYPE %s \n" \
-	"#define MASK %s \n"
+	"#define MASK %s \n" \
+	"#define OFFSET %s(ivec3(3, -1, 2)) \n"
 
 static const char *fscode_arb_lod =
 	"#extension GL_ARB_shader_texture_lod : require\n"
@@ -150,7 +157,7 @@ static const char *fscode_gl3_lod =
 	GL3_FS_PREAMBLE
 	"uniform float lod; \n"
 	"void main() { \n"
-	"  gl_FragColor = textureLod(tex, %s(gl_TexCoord[0]), lod); \n"
+	"  gl_FragColor = textureLod(tex, TYPE(gl_TexCoord[0]), lod); \n"
 	"} \n";
 
 static const char *fscode_gl3_lod_shadow =
@@ -165,7 +172,7 @@ static const char *fscode_gl3_bias =
 	GL3_FS_PREAMBLE
 	"uniform float bias; \n"
 	"void main() { \n"
-	"  gl_FragColor = texture(tex, %s(gl_TexCoord[0]), bias); \n"
+	"  gl_FragColor = texture(tex, TYPE(gl_TexCoord[0]), bias); \n"
 	"} \n";
 
 static const char *fscode_gl3_bias_shadow =
@@ -179,7 +186,7 @@ static const char *fscode_gl3_bias_shadow =
 static const char *fscode_gl3_simple =
 	GL3_FS_PREAMBLE
 	"void main() { \n"
-	"  gl_FragColor = texture(tex, %s(gl_TexCoord[0])); \n"
+	"  gl_FragColor = texture(tex, TYPE(gl_TexCoord[0])); \n"
 	"} \n";
 
 static const char *fscode_gl3_simple_shadow =
@@ -197,6 +204,21 @@ static const char *fscode_gl3_simple_shadow_cubearray =
 	"                      texture(tex2, gl_TexCoord[0], z + 0.05)); \n"
 	"} \n";
 
+static const char *fscode_gl3_offset =
+	GL3_FS_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = textureOffset(tex, TYPE(gl_TexCoord[0]), OFFSET); \n"
+	"} \n";
+
+static const char *fscode_gl3_offset_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, \n"
+	"                                    OFFSET) * \n"
+	"                      textureOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, \n"
+	"                                    OFFSET)); \n"
+	"} \n";
+
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
 	glSamplerParameteri(samp[0], pname, value);
@@ -209,7 +231,8 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fb, prog;
 	GLenum status;
 	int i, level, layer, dim, num_layers;
-	const char *target_str, *type_str, *compare_value_mask;
+	const char *target_str, *type_str, *compare_value_mask, *offset_type_str;
+	const char *version = "130";
 	GLenum format, attachment, clearbits;
 	char fscode[2048];
 
@@ -219,7 +242,7 @@ piglit_init(int argc, char **argv)
 		else if (strcmp(argv[i], "-nobias") == 0)
 			no_bias = GL_TRUE;
 		else if (strcmp(argv[i], "-nolod") == 0)
-			no_lod = GL_TRUE;
+			no_lod_clamp = GL_TRUE;
 		else if (strcmp(argv[i], "-GL_ARB_shader_texture_lod") == 0)
 			test = ARB_SHADER_TEXTURE_LOD;
 		else if (strcmp(argv[i], "textureLod") == 0)
@@ -228,6 +251,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_BIAS;
 		else if (strcmp(argv[i], "texture()") == 0)
 			test = GL3_TEXTURE;
+		else if (strcmp(argv[i], "textureOffset") == 0)
+			test = GL3_TEXTURE_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "2D") == 0)
@@ -265,21 +290,30 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_texture_storage");
 	piglit_require_gl_version(NEED_GL3(test) ? 30 : 14);
 
+	if (target == TEX_2D_ARRAY_SHADOW &&
+	    test == GL3_TEXTURE_OFFSET) {
+		piglit_require_GLSL_version(430);
+		version = "430";
+	}
+
 	switch (target) {
 	case TEX_1D:
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1D";
 		type_str = "float";
+		offset_type_str = "int";
 		break;
 	case TEX_2D:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2D";
 		type_str = "vec2";
+		offset_type_str = "ivec2";
 		break;
 	case TEX_3D:
 		gltarget = GL_TEXTURE_3D;
 		target_str = "3D";
 		type_str = "vec3";
+		offset_type_str = "ivec3";
 		break;
 	case TEX_CUBE:
 		gltarget = GL_TEXTURE_CUBE_MAP;
@@ -291,12 +325,14 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D_ARRAY;
 		target_str = "1DArray";
 		type_str = "vec2";
+		offset_type_str = "int";
 		break;
 	case TEX_2D_ARRAY:
 		piglit_require_gl_version(30);
 		gltarget = GL_TEXTURE_2D_ARRAY;
 		target_str = "2DArray";
 		type_str = "vec3";
+		offset_type_str = "ivec2";
 		break;
 	case TEX_CUBE_ARRAY:
 		piglit_require_gl_version(30);
@@ -309,12 +345,14 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1DShadow";
 		type_str = "vec3";
+		offset_type_str = "int";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_2D_SHADOW:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2DShadow";
 		type_str = "vec3";
+		offset_type_str = "ivec2";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_CUBE_SHADOW:
@@ -329,6 +367,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D_ARRAY;
 		target_str = "1DArrayShadow";
 		type_str = "vec3";
+		offset_type_str = "int";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
 	case TEX_2D_ARRAY_SHADOW:
@@ -336,6 +375,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_2D_ARRAY;
 		target_str = "2DArrayShadow";
 		type_str = "vec4";
+		offset_type_str = "ivec2";
 		compare_value_mask = "vec4(0.0, 0.0, 0.0, 1.0)";
 		break;
 	case TEX_CUBE_ARRAY_SHADOW:
@@ -359,20 +399,20 @@ piglit_init(int argc, char **argv)
 		break;
 	case GL3_TEXTURE_LOD:
 		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_lod_shadow, target_str,
+			sprintf(fscode, fscode_gl3_lod_shadow, version, target_str,
 				type_str, compare_value_mask);
 		else
-			sprintf(fscode, fscode_gl3_lod, target_str, type_str);
+			sprintf(fscode, fscode_gl3_lod, version, target_str, type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		loc_lod = glGetUniformLocation(prog, "lod");
 		break;
 	case GL3_TEXTURE_BIAS:
 		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_bias_shadow, target_str,
+			sprintf(fscode, fscode_gl3_bias_shadow, version, target_str,
 				type_str, compare_value_mask);
 		else
-			sprintf(fscode, fscode_gl3_bias, target_str, type_str);
+			sprintf(fscode, fscode_gl3_bias, version, target_str, type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		loc_bias = glGetUniformLocation(prog, "bias");
@@ -381,17 +421,31 @@ piglit_init(int argc, char **argv)
 		if (target == TEX_CUBE_ARRAY_SHADOW)
 			sprintf(fscode,
 				fscode_gl3_simple_shadow_cubearray,
-				target_str, type_str);
+				version, target_str, type_str);
 		else if (IS_SHADOW(target))
 			sprintf(fscode, fscode_gl3_simple_shadow,
-				target_str, type_str, compare_value_mask);
+				version, target_str, type_str, compare_value_mask);
 		else
-			sprintf(fscode, fscode_gl3_simple, target_str,
+			sprintf(fscode, fscode_gl3_simple, version, target_str,
 				type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		if (target == TEX_CUBE_ARRAY_SHADOW)
 			loc_z = glGetUniformLocation(prog, "z");
+		break;
+	case GL3_TEXTURE_OFFSET:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_offset_shadow,
+				version, target_str, type_str, compare_value_mask,
+				offset_type_str);
+		else
+			sprintf(fscode, fscode_gl3_offset, version, target_str,
+				type_str, offset_type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+
+		has_offset = GL_TRUE;
+		no_lod_clamp = GL_TRUE;
 		break;
 	default:
 		assert(0);
@@ -497,19 +551,44 @@ piglit_init(int argc, char **argv)
 			 * cleared to the expected value.
 			 * For 3D textures, the middle slice is cleared. */
 			if (num_layers == 1 ||
-			    (gltarget == GL_TEXTURE_3D && layer == num_layers/2) ||
+			    (gltarget == GL_TEXTURE_3D && layer == num_layers/2 + (has_offset ? offset[2] : 0)) ||
 			    (gltarget != GL_TEXTURE_3D && layer == TEST_LAYER % num_layers)) {
-				glClearColor(clear_colors[level][0],
-						clear_colors[level][1],
-						clear_colors[level][2],
-						0.0);
-				glClearDepth(clear_depths[level]);
+				if (has_offset) {
+					/* For testing the shader-provided texture offset,
+					 * only clear the texel which is expected
+					 * to be fetched. The other texels are black. */
+					glClearColor(0, 0, 0, 0);
+					glClearDepth(0);
+					glClear(clearbits);
+
+					glClearColor(clear_colors[level][0],
+							clear_colors[level][1],
+							clear_colors[level][2],
+							0.0);
+					glClearDepth(clear_depths[level]);
+					glEnable(GL_SCISSOR_TEST);
+					/* Add +1, because the probed texel is at (1,1). */
+					glScissor(offset[0]+1,
+						  gltarget == GL_TEXTURE_1D ||
+						  gltarget == GL_TEXTURE_1D_ARRAY ? 0 : offset[1]+1,
+						  1, 1);
+					glClear(clearbits);
+					glDisable(GL_SCISSOR_TEST);
+				}
+				else {
+					glClearColor(clear_colors[level][0],
+							clear_colors[level][1],
+							clear_colors[level][2],
+							0.0);
+					glClearDepth(clear_depths[level]);
+					glClear(clearbits);
+				}
 			}
 			else {
 				glClearColor(0, 0, 0, 0);
 				glClearDepth(0);
+				glClear(clearbits);
 			}
-			glClear(clearbits);
 
 			assert(glGetError() == 0);
 		}
@@ -548,19 +627,23 @@ piglit_init(int argc, char **argv)
 #define SET_VEC(c, x, y, z, w) do { c[0] = x; c[1] = y; c[2] = z; c[3] = w; } while (0)
 
 static void
-draw_quad(int x, int y, int w, int h, int baselevel, int bias, int fetch_level, int expected_level)
+draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
+	  int baselevel, int maxlevel, int bias, int mipfilter)
 {
 	/* 2D coordinates */
-	float s = (float)w / TEX_SIZE;
-	float t = (float)h / TEX_SIZE;
+	float s0 = 0;
+	float t0 = 0;
+	float s1 = (float)w / TEX_SIZE;
+	float t1 = (float)h / TEX_SIZE;
 	/* Cube coordinates */
-	float s0 = 2*0 - 1;
-	float t0 = 2*0 - 1;
-	float s1 = 2*s - 1;
-	float t1 = 2*t - 1;
+	float x0 = 2*s0 - 1;
+	float z0 = 2*t0 - 1;
+	float x1 = 2*s1 - 1;
+	float z1 = 2*t1 - 1;
+	/* Final coordinates */
+	float c0[4], c1[4], c2[4], c3[4];
 	/* shadow compare value */
 	float z = clear_depths[expected_level];
-	float c0[4], c1[4], c2[4], c3[4];
 
 	switch (test) {
 	case ARB_SHADER_TEXTURE_LOD:
@@ -577,9 +660,45 @@ draw_quad(int x, int y, int w, int h, int baselevel, int bias, int fetch_level, 
 		/* scale the coordinates (decrease the texel size),
 		 * so that the texture fetch selects this level
 		 */
-		s *= 1 << fetch_level;
-		t *= 1 << fetch_level;
+		s1 *= 1 << fetch_level;
+		t1 *= 1 << fetch_level;
 		break;
+	case GL3_TEXTURE_OFFSET: {
+		/* Things get quite complicated with offsets.
+		 *
+		 * The single pixel which is not black has the same integer
+		 * coordinates in every mipmap level, but not the same normalized
+		 * coordinates. Therefore we have to fix the normalized ones, so
+		 * that GLSL always reads from the same integer coordinates.
+		 */
+		int maxlevel_clamped = mipfilter ? maxlevel : baselevel;
+		int bias_clamped =
+			CLAMP(fetch_level + bias, baselevel, maxlevel_clamped) - fetch_level;
+
+		/* scale the coordinates */
+		s1 *= 1 << fetch_level;
+		t1 *= 1 << fetch_level;
+
+		if (bias_clamped > 0) {
+			float pixsize_before_bias = 1.0 / (TEX_SIZE >> fetch_level);
+			float offset = pixsize_before_bias * ((1 << (bias_clamped-1))*3 - 1.5);
+
+			s0 += offset;
+			t0 += offset;
+			s1 += offset;
+			t1 += offset;
+		}
+		else if (bias_clamped < 0) {
+			float pixsize_after_bias = 1.0 / (TEX_SIZE >> (fetch_level + bias_clamped));
+			float offset = -pixsize_after_bias * ((1 << (-bias_clamped-1))*3 - 1.5);
+
+			s0 += offset;
+			t0 += offset;
+			s1 += offset;
+			t1 += offset;
+		}
+		break;
+	}
 	default:
 		assert(0);
 	}
@@ -588,41 +707,41 @@ draw_quad(int x, int y, int w, int h, int baselevel, int bias, int fetch_level, 
 	case TEX_1D:
 	case TEX_2D:
 	case TEX_2D_ARRAY:
-		SET_VEC(c0, 0, 0, TEST_LAYER, 1);
-		SET_VEC(c1, s, 0, TEST_LAYER, 1);
-		SET_VEC(c2, s, t, TEST_LAYER, 1);
-		SET_VEC(c3, 0, t, TEST_LAYER, 1);
+		SET_VEC(c0, s0, t0, TEST_LAYER, 1);
+		SET_VEC(c1, s1, t0, TEST_LAYER, 1);
+		SET_VEC(c2, s1, t1, TEST_LAYER, 1);
+		SET_VEC(c3, s0, t1, TEST_LAYER, 1);
 		break;
 	case TEX_1D_SHADOW:
 	case TEX_2D_SHADOW:
-		SET_VEC(c0, 0, 0, z, 1);
-		SET_VEC(c1, s, 0, z, 1);
-		SET_VEC(c2, s, t, z, 1);
-		SET_VEC(c3, 0, t, z, 1);
+		SET_VEC(c0, s0, t0, z, 1);
+		SET_VEC(c1, s1, t0, z, 1);
+		SET_VEC(c2, s1, t1, z, 1);
+		SET_VEC(c3, s0, t1, z, 1);
 		break;
 	case TEX_1D_ARRAY_SHADOW:
-		SET_VEC(c0, 0, TEST_LAYER, z, 1);
-		SET_VEC(c1, s, TEST_LAYER, z, 1);
-		SET_VEC(c2, s, TEST_LAYER, z, 1);
-		SET_VEC(c3, 0, TEST_LAYER, z, 1);
+		SET_VEC(c0, s0, TEST_LAYER, z, 1);
+		SET_VEC(c1, s1, TEST_LAYER, z, 1);
+		SET_VEC(c2, s1, TEST_LAYER, z, 1);
+		SET_VEC(c3, s0, TEST_LAYER, z, 1);
 		break;
 	case TEX_2D_ARRAY_SHADOW:
-		SET_VEC(c0, 0, 0, TEST_LAYER, z);
-		SET_VEC(c1, s, 0, TEST_LAYER, z);
-		SET_VEC(c2, s, t, TEST_LAYER, z);
-		SET_VEC(c3, 0, t, TEST_LAYER, z);
+		SET_VEC(c0, s0, t0, TEST_LAYER, z);
+		SET_VEC(c1, s1, t0, TEST_LAYER, z);
+		SET_VEC(c2, s1, t1, TEST_LAYER, z);
+		SET_VEC(c3, s0, t1, TEST_LAYER, z);
 		break;
 	case TEX_3D:
-		SET_VEC(c0, 0, 0, 0.5, 1);
-		SET_VEC(c1, s, 0, 0.5, 1);
-		SET_VEC(c2, s, t, 0.5, 1);
-		SET_VEC(c3, 0, t, 0.5, 1);
+		SET_VEC(c0, s0, t0, 0.5, 1);
+		SET_VEC(c1, s1, t0, 0.5, 1);
+		SET_VEC(c2, s1, t1, 0.5, 1);
+		SET_VEC(c3, s0, t1, 0.5, 1);
 		break;
 	case TEX_1D_ARRAY:
-		SET_VEC(c0, 0, TEST_LAYER, 0, 1);
-		SET_VEC(c1, s, TEST_LAYER, 0, 1);
-		SET_VEC(c2, s, TEST_LAYER, 0, 1);
-		SET_VEC(c3, 0, TEST_LAYER, 0, 1);
+		SET_VEC(c0, s0, TEST_LAYER, 0, 1);
+		SET_VEC(c1, s1, TEST_LAYER, 0, 1);
+		SET_VEC(c2, s1, TEST_LAYER, 0, 1);
+		SET_VEC(c3, s0, TEST_LAYER, 0, 1);
 		break;
 	case TEX_CUBE_ARRAY_SHADOW:
 		/* Set the compare value through a uniform, because all
@@ -632,17 +751,17 @@ draw_quad(int x, int y, int w, int h, int baselevel, int bias, int fetch_level, 
 	case TEX_CUBE:
 	case TEX_CUBE_ARRAY:
 		assert(TEST_LAYER % 6 == 3); /* negative Y */
-		SET_VEC(c0, s0, -1,  t0, TEST_LAYER / 6);
-		SET_VEC(c1, s1, -1,  t0, TEST_LAYER / 6);
-		SET_VEC(c2, s1, -1, -t1, TEST_LAYER / 6);
-		SET_VEC(c3, s0, -1, -t1, TEST_LAYER / 6);
+		SET_VEC(c0, x0, -1,  z0, TEST_LAYER / 6);
+		SET_VEC(c1, x1, -1,  z0, TEST_LAYER / 6);
+		SET_VEC(c2, x1, -1, -z1, TEST_LAYER / 6);
+		SET_VEC(c3, x0, -1, -z1, TEST_LAYER / 6);
 		break;
 	case TEX_CUBE_SHADOW:
 		assert(TEST_LAYER % 6 == 3); /* negative Y */
-		SET_VEC(c0, s0, -1,  t0, z);
-		SET_VEC(c1, s1, -1,  t0, z);
-		SET_VEC(c2, s1, -1, -t1, z);
-		SET_VEC(c3, s0, -1, -t1, z);
+		SET_VEC(c0, x0, -1,  z0, z);
+		SET_VEC(c1, x1, -1,  z0, z);
+		SET_VEC(c2, x1, -1, -z1, z);
+		SET_VEC(c3, x0, -1, -z1, z);
 		break;
 	default:
 		assert(0);
@@ -708,7 +827,7 @@ check_result(const unsigned char *probed, int expected_level,
 			}
 			if (i == LAST_LEVEL) {
 				if (colors_equal(black, probed))
-					puts("  Observed: wrong layer/face/slice or wrong level");
+					puts("  Observed: wrong layer/face/slice or wrong level or wrong offset");
 				else
 					puts("  Observed: unknown value (broken driver?)");
 			}
@@ -717,7 +836,7 @@ check_result(const unsigned char *probed, int expected_level,
 		printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
 		       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
 		       fetch_level, baselevel, maxlevel, minlod,
-		       no_lod ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
+		       no_lod_clamp ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
 		return false;
 	}
 	return true;
@@ -730,7 +849,7 @@ calc_expected_level(int fetch_level, int baselevel, int maxlevel, int minlod,
 	int expected_level;
 
 	if (mipfilter) {
-		if (no_lod) {
+		if (no_lod_clamp) {
 			expected_level = CLAMP(fetch_level + bias,
 					       baselevel,
 					       maxlevel);
@@ -752,7 +871,7 @@ piglit_display(void)
 	int fetch_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
 	int expected_level, x, y, total, failed;
 	int start_bias, end_bias;
-	int start_min_lod, end_min_lod, end_max_lod;
+	int end_min_lod, end_max_lod;
 
 	if (no_bias) {
 		start_bias = 0;
@@ -762,12 +881,10 @@ piglit_display(void)
 		end_bias = LAST_LEVEL;
 	}
 
-	if (no_lod) {
-		start_min_lod = 0;
+	if (no_lod_clamp) {
 		end_min_lod = 0;
 		end_max_lod = 0;
 	} else {
-		start_min_lod = 0;
 		end_min_lod = LAST_LEVEL;
 		end_max_lod = LAST_LEVEL;
 	}
@@ -780,13 +897,22 @@ piglit_display(void)
 	for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
 		for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
 			for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
-				for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
+				for (minlod = 0; minlod <= end_min_lod; minlod++)
 					for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 						for (bias = start_bias; bias <= end_bias; bias++)
 							for (mipfilter = 0; mipfilter < 2; mipfilter++) {
+								expected_level = calc_expected_level(fetch_level, baselevel,
+											maxlevel, minlod, maxlod, bias,
+											mipfilter);
+
+								/* Skip this if the offset pixel lies outside of the texture. */
+								if (has_offset &&
+								    (TEX_SIZE >> expected_level) <= 1+MAX2(offset[0], offset[1]))
+									continue;
+
 								glTexParameteri(gltarget, GL_TEXTURE_BASE_LEVEL, baselevel);
 								glTexParameteri(gltarget, GL_TEXTURE_MAX_LEVEL, maxlevel);
-								if (!no_lod) {
+								if (!no_lod_clamp) {
 									set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
 									set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
 								}
@@ -799,17 +925,13 @@ piglit_display(void)
 								x = (total % (piglit_width/3)) * 3;
 								y = (total / (piglit_width/3)) * 3;
 
-								expected_level = calc_expected_level(fetch_level, baselevel,
-											maxlevel, minlod, maxlod, bias,
-											mipfilter);
-
-								draw_quad(x, y, 3, 3, baselevel, bias,
-									  fetch_level, expected_level);
+								draw_quad(x, y, 3, 3, expected_level, fetch_level,
+									  baselevel, maxlevel, bias, mipfilter);
 
 								if (in_place_probing) {
 									unsigned char probe[3];
 
-									glReadPixels(x, y, 1, 1, GL_RGB,
+									glReadPixels(x+1, y+1, 1, 1, GL_RGB,
 										     GL_UNSIGNED_BYTE, probe);
 
 									if (!check_result(probe, expected_level,
@@ -819,7 +941,6 @@ piglit_display(void)
 										failed++;
 									}
 								}
-
 								total++;
 							}
 
@@ -833,7 +954,7 @@ piglit_display(void)
 		for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
 			for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
 				for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
-					for (minlod = start_min_lod; minlod <= end_min_lod; minlod++)
+					for (minlod = 0; minlod <= end_min_lod; minlod++)
 						for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 							for (bias = start_bias; bias <= end_bias; bias++)
 								for (mipfilter = 0; mipfilter < 2; mipfilter++) {
@@ -841,8 +962,13 @@ piglit_display(void)
 												baselevel, maxlevel, minlod,
 												maxlod, bias, mipfilter);
 
-									x = (total % (piglit_width/3)) * 3;
-									y = (total / (piglit_width/3)) * 3;
+									/* Skip this if the offset pixel lies outside of the texture. */
+									if (has_offset &&
+									    (TEX_SIZE >> expected_level) <= 1+MAX2(offset[0], offset[1]))
+										continue;
+
+									x = (total % (piglit_width/3)) * 3 + 1;
+									y = (total / (piglit_width/3)) * 3 + 1;
 									p = pix + (y*piglit_width + x)*4;
 
 									if (!check_result(p, expected_level, fetch_level,

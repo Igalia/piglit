@@ -1171,6 +1171,16 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection text
 add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection texture() 2DArrayShadow')
 #add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection texture() CubeArrayShadow')
 
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 1D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 2D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 3D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 1DShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 2DShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 1DArray')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 2DArray')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 1DArrayShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureOffset 2DArrayShadow')
+
 # Group spec/glsl-1.40
 spec['glsl-1.40'] = {}
 import_glsl_parser_tests(spec['glsl-1.40'],
