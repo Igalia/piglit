@@ -349,8 +349,6 @@ if(PIGLIT_BUILD_GLES3_TESTS AND NOT EGL_FOUND)
 			    "Failed to find EGL library.")
 endif()
 
-find_library(OPENGL_gles2_LIBRARY NAMES GLESv2)
-
 # Put all executables into the bin subdirectory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${piglit_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${piglit_BINARY_DIR}/lib)

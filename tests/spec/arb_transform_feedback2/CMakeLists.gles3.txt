@@ -2,12 +2,7 @@ include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
 )
-
-link_libraries (
-	piglitutil_${piglit_target_api}
-	${OPENGL_gles2_LIBRARY}
-)
-
+link_libraries(piglitutil_${piglit_target_api})
 piglit_add_executable (arb_transform_feedback2-change-objects-while-paused_${piglit_target_api} change-objects-while-paused.c)
 
 # vim: ft=cmake:

@@ -2,10 +2,5 @@ include_directories(
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
 )
-
-link_libraries(
-	piglitutil_${piglit_target_api}
-	${OPENGL_gles2_LIBRARY}
-)
-
+link_libraries(piglitutil_${piglit_target_api})
 piglit_add_executable(oes_compressed_etc1_rgb8_texture-miptree oes_compressed_etc1_rgb8_texture-miptree.c)

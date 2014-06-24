@@ -1,8 +1,4 @@
-link_libraries(
-	piglitutil_${piglit_target_api}
-	${OPENGL_gles2_LIBRARY}
-	)
-
+link_libraries(piglitutil_${piglit_target_api})
 piglit_add_executable (varying-struct-centroid_${piglit_target_api} varying-struct-centroid.c)
 
 # vim: ft=cmake:

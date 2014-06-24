@@ -15,7 +15,6 @@ include_directories(
 
 link_libraries(
 	${UTIL_GL_LIBS}
-	${OPENGL_gles2_LIBRARY}
 	piglitutil_${piglit_target_api}
 	)
 
