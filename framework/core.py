@@ -130,6 +130,10 @@ def collect_system_info():
             # that the binary isn't installed or isn't relavent to the system
             if e.errno != 2:
                 raise
+        except subprocess.CalledProcessError:
+            # If the binary is installed by doesn't work on the window system
+            # (glxinfo) it will raise this error. go on
+            pass
 
     return result
 
