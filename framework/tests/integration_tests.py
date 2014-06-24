@@ -27,15 +27,20 @@ errors and to ensure that the API hasn't changed without fixing these modules
 """
 
 import importlib
+import ConfigParser
 from nose.plugins.skip import SkipTest
+from framework.programs.run import _get_config
+
+
+_get_config(None)
 
 
 def _import(name):
     """ Helper for importing modules """
     try:
         return importlib.import_module(name)
-    except SystemExit:
-        raise SkipTest('Missing symlink, unable to test')
+    except (ConfigParser.NoOptionError, SystemExit):
+        raise SkipTest('No config section for {}'.format(name))
 
 
 def test_xts_import():

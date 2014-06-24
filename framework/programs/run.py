@@ -123,13 +123,7 @@ def run(input_):
         args.concurrency = "none"
 
     # Read the config file
-    if args.config_file:
-        core.PIGLIT_CONFIG.readfp(args.config_file)
-        args.config_file.close()
-    else:
-        core.PIGLIT_CONFIG.read(os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__), '..', '..', 'piglit.conf')))
+    _get_config(args.config_file)
 
     # Pass arguments into Options
     opts = core.Options(concurrent=args.concurrency,
@@ -203,6 +197,11 @@ def resume(input_):
                         type=path.realpath,
                         metavar="<Results Path>",
                         help="Path to results folder")
+    parser.add_argument("-f", "--config",
+                        dest="config_file",
+                        type=argparse.FileType("r"),
+                        help="Optionally specify a piglit config file to use. "
+                             "Default is piglit.conf")
     args = parser.parse_args(input_)
 
     results = framework.results.load_results(args.results_path)
@@ -213,6 +212,8 @@ def resume(input_):
                         valgrind=results.options['valgrind'],
                         dmesg=results.options['dmesg'],
                         verbose=results.options['verbose'])
+
+    _get_config(args.config_file)
 
     if results.options.get('platform'):
         opts.env['PIGLIT_PLATFORM'] = results.options['platform']
@@ -242,3 +243,28 @@ def resume(input_):
 
     print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))
+
+
+def _get_config(arg):
+    if arg:
+        core.PIGLIT_CONFIG.readfp(arg)
+    else:
+        # Load the piglit.conf. First try looking in the current directory,
+        # then trying the XDG_CONFIG_HOME, then $HOME/.config/, finally try the
+        # piglit root dir
+        for d in ['.',
+                  os.environ.get('XDG_CONFIG_HOME',
+                                 os.path.expandvars('$HOME/.config')),
+                  os.path.join(os.path.dirname(__file__), '..', '..')]:
+            try:
+                with open(os.path.join(d, 'piglit.conf'), 'r') as f:
+                    core.PIGLIT_CONFIG.readfp(f)
+                break
+            except IOError:
+                pass
+        else:
+            if __debug__:
+                print('Warning: piglit.conf not found!\n'
+                      '(searching current dir, $HOME/.config, '
+                      '$XDG_CONFIG_HOME, and piglit source dir)',
+                      file=sys.stderr)
