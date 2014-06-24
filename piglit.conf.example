@@ -3,3 +3,6 @@
 ;opencv_test_ocl_bindir=/home/user/opencv/build/bin
 ;opencv_workdir=/home/user/opencv/samples/c/
 ;
+[xts]
+; Set bindir equal to the root of the xts directory
+;path=/home/user/src/xts

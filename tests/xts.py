@@ -28,12 +28,13 @@ import re
 import sys
 import subprocess
 import itertools
+import framework.core
 from framework.profile import TestProfile
-from framework.exectest import Test, TEST_BIN_DIR
+from framework.exectest import Test
 
 __all__ = ['profile']
 
-X_TEST_SUITE = os.path.join(TEST_BIN_DIR, 'xtest')
+X_TEST_SUITE = framework.core.PIGLIT_CONFIG.get('xts', 'path')
 
 
 class XTSProfile(TestProfile):
