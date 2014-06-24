@@ -1,8 +1,7 @@
 /* [config]
  * expect_result: pass
  * glsl_version: 1.20
- * require_extensions: GL_ARB_arrays_of_arrays
- * require_extensions: GL_ARB_shading_language_420pack
+ * require_extensions: GL_ARB_arrays_of_arrays GL_ARB_shading_language_420pack
  * [end config]
  */
 #version 120
