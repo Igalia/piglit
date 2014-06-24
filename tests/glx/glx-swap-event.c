@@ -379,7 +379,6 @@ void
 handle_event(Display *dpy, Window win, XEvent *event)
 {
     (void) dpy;
-    (void) win;
 
     if ( Glx_event == event->type) {
         XEvent * event_p=event;
@@ -398,6 +397,11 @@ handle_event(Display *dpy, Window win, XEvent *event)
 swap_start[count], swap_returned[count], (time_fin-swap_start[count]));
             }
             t_last=time_fin;
+        }
+
+        if (glx_event->drawable != win) {
+            printf("Error: swap event was not on X11 Drawable\n");
+            piglit_report_result(PIGLIT_FAIL);
         }
 
 	if (glx_event->sbc == 0) {
@@ -442,7 +446,7 @@ swap_start[count], swap_returned[count], (time_fin-swap_start[count]));
 
 
 static void
-event_loop(Display *dpy, GLXWindow win)
+event_loop(Display *dpy, GLXWindow glxWin, Window win)
 {
     while (1) {
         while (XPending(dpy) > 0) {
@@ -452,7 +456,7 @@ event_loop(Display *dpy, GLXWindow win)
             handle_event(dpy, win, &event);
         }
         
-        draw_frame(dpy, win);
+        draw_frame(dpy, glxWin);
     }
 }
 
@@ -534,7 +538,7 @@ main(int argc, char *argv[])
         }
     }
     piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
-    event_loop(dpy, glxWin);
+    event_loop(dpy, glxWin, win);
     
     glXDestroyContext(dpy, ctx);
     XDestroyWindow(dpy, win);
