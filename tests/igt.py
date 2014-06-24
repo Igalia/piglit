@@ -33,8 +33,9 @@ import errno
 from datetime import datetime
 
 from os import path
+import framework.core
 from framework.profile import TestProfile
-from framework.exectest import Test, TEST_BIN_DIR
+from framework.exectest import Test
 
 __all__ = ['profile']
 
@@ -67,12 +68,9 @@ def checkEnvironment():
 if 'IGT_TEST_ROOT' in os.environ:
     igtTestRoot = os.environ['IGT_TEST_ROOT']
 else:
-    # Chase the piglit/bin/igt symlink to find where the tests really live.
-    if os.path.exists(path.join(TEST_BIN_DIR, 'igt')):
-        igtTestRoot = path.join(path.realpath(path.join(TEST_BIN_DIR, 'igt')),
-                                'tests')
-    else:
-        igtTestRoot = ''
+    igtTestRoot = os.path.join(framework.core.PIGLIT_CONFIG.get('igt', 'path'),
+                               'tests')
+    assert os.path.exists(igtTestRoot)
 
 # check for the test lists
 if not (os.path.exists(os.path.join(igtTestRoot, 'single-tests.txt'))

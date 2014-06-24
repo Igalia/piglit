@@ -6,3 +6,7 @@
 [xts]
 ; Set bindir equal to the root of the xts directory
 ;path=/home/user/src/xts
+
+[igt]
+; Set bindir equal to the absolute root of the igt directory
+;path=/home/user/src/igt
