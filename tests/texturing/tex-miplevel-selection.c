@@ -521,6 +521,12 @@ piglit_init(int argc, char **argv)
 		case TEX_2D_SHADOW:
 			instruction = "shadow2D";
 			break;
+		case TEX_RECT:
+			instruction = "texture2DRect";
+			break;
+		case TEX_RECT_SHADOW:
+			instruction = "shadow2DRect";
+			break;
 		default:
 			assert(0);
 		}
@@ -547,6 +553,13 @@ piglit_init(int argc, char **argv)
 			break;
 		case TEX_2D_SHADOW:
 			instruction = "shadow2DProj";
+			break;
+		case TEX_RECT:
+		case TEX_RECT_PROJ_VEC4:
+			instruction = "texture2DRectProj";
+			break;
+		case TEX_RECT_SHADOW:
+			instruction = "shadow2DRectProj";
 			break;
 		default:
 			assert(0);

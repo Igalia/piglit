@@ -2142,6 +2142,11 @@ add_concurrent_test(arb_texture_rectangle, 'getteximage-targets RECT')
 add_plain_test(arb_texture_rectangle, 'texrect_simple_arb_texrect')
 add_plain_test(arb_texture_rectangle, 'arb_texrect-texture-base-level-error')
 add_plain_test(arb_texture_rectangle, 'fbo-blit rect')
+add_concurrent_test(spec['ARB_texture_rectangle'], 'tex-miplevel-selection GL2:texture() 2DRect')
+add_concurrent_test(spec['ARB_texture_rectangle'], 'tex-miplevel-selection GL2:texture() 2DRectShadow')
+add_concurrent_test(spec['ARB_texture_rectangle'], 'tex-miplevel-selection GL2:textureProj 2DRect')
+add_concurrent_test(spec['ARB_texture_rectangle'], 'tex-miplevel-selection GL2:textureProj 2DRect_ProjVec4')
+add_concurrent_test(spec['ARB_texture_rectangle'], 'tex-miplevel-selection GL2:textureProj 2DRectShadow')
 
 arb_texture_storage = {}
 spec['ARB_texture_storage'] = arb_texture_storage
