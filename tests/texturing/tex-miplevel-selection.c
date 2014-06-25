@@ -126,6 +126,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_BIAS,
 	GL3_TEXTURE_PROJ_OFFSET,
 	GL3_TEXTURE_PROJ_OFFSET_BIAS,
+	GL3_TEXTURE_LOD_OFFSET,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -136,7 +137,7 @@ static enum target_type target = TEX_2D;
 static GLenum gltarget;
 static GLboolean has_offset;
 static GLboolean in_place_probing, no_bias, no_lod_clamp;
-static GLuint loc_lod, loc_bias, loc_z;
+static GLint loc_lod = -1, loc_bias = -1, loc_z = -1;
 static GLuint samp[2];
 
 static int offset[] = {3, -1, 2};
@@ -217,6 +218,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ_OFFSET;
 		else if (strcmp(argv[i], "textureProjOffset(bias)") == 0)
 			test = GL3_TEXTURE_PROJ_OFFSET_BIAS;
+		else if (strcmp(argv[i], "textureLodOffset") == 0)
+			test = GL3_TEXTURE_LOD_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -428,6 +431,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureProjOffset";
 		other_params = ", OFFSET, bias";
 		break;
+	case GL3_TEXTURE_LOD_OFFSET:
+		instruction = "textureLodOffset";
+		other_params = ", lod, OFFSET";
+		break;
 	default:
 		assert(0);
 	}
@@ -466,7 +473,8 @@ piglit_init(int argc, char **argv)
 			loc_z = glGetUniformLocation(prog, "z");
 
 		if (test == ARB_SHADER_TEXTURE_LOD ||
-		    test == GL3_TEXTURE_LOD)
+		    test == GL3_TEXTURE_LOD ||
+		    test == GL3_TEXTURE_LOD_OFFSET)
 			loc_lod = glGetUniformLocation(prog, "lod");
 
 		if (test == GL3_TEXTURE_BIAS ||
@@ -478,7 +486,8 @@ piglit_init(int argc, char **argv)
 		if (test == GL3_TEXTURE_OFFSET ||
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
 		    test == GL3_TEXTURE_PROJ_OFFSET ||
-		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS) {
+		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
+		    test == GL3_TEXTURE_LOD_OFFSET) {
 			has_offset = GL_TRUE;
 			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
@@ -691,8 +700,11 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 
 	case GL3_TEXTURE_OFFSET_BIAS:
 	case GL3_TEXTURE_PROJ_OFFSET_BIAS:
-		/* set a bias */
-		glUniform1f(loc_bias, bias);
+	case GL3_TEXTURE_LOD_OFFSET:
+		if (loc_bias != -1)
+			glUniform1f(loc_bias, bias);
+		if (loc_lod != -1)
+			glUniform1f(loc_lod, fetch_level - baselevel);
 		/* fall through */
 	case GL3_TEXTURE_OFFSET:
 	case GL3_TEXTURE_PROJ_OFFSET:
