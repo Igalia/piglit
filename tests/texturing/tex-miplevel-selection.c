@@ -127,6 +127,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_OFFSET,
 	GL3_TEXTURE_PROJ_OFFSET_BIAS,
 	GL3_TEXTURE_LOD_OFFSET,
+	GL3_TEXTURE_PROJ_LOD,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -220,6 +221,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ_OFFSET_BIAS;
 		else if (strcmp(argv[i], "textureLodOffset") == 0)
 			test = GL3_TEXTURE_LOD_OFFSET;
+		else if (strcmp(argv[i], "textureProjLod") == 0)
+			test = GL3_TEXTURE_PROJ_LOD;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -377,7 +380,8 @@ piglit_init(int argc, char **argv)
 	if (test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
-	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS) {
+	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
+	    test == GL3_TEXTURE_PROJ_LOD) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -435,6 +439,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureLodOffset";
 		other_params = ", lod, OFFSET";
 		break;
+	case GL3_TEXTURE_PROJ_LOD:
+		instruction = "textureProjLod";
+		other_params = ", lod";
+		break;
 	default:
 		assert(0);
 	}
@@ -474,7 +482,8 @@ piglit_init(int argc, char **argv)
 
 		if (test == ARB_SHADER_TEXTURE_LOD ||
 		    test == GL3_TEXTURE_LOD ||
-		    test == GL3_TEXTURE_LOD_OFFSET)
+		    test == GL3_TEXTURE_LOD_OFFSET ||
+		    test == GL3_TEXTURE_PROJ_LOD)
 			loc_lod = glGetUniformLocation(prog, "lod");
 
 		if (test == GL3_TEXTURE_BIAS ||
@@ -679,6 +688,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	switch (test) {
 	case ARB_SHADER_TEXTURE_LOD:
 	case GL3_TEXTURE_LOD:
+	case GL3_TEXTURE_PROJ_LOD:
 		/* set an explicit LOD */
 		glUniform1f(loc_lod, fetch_level - baselevel);
 		break;
@@ -751,7 +761,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	if (test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
-	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
+	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
+	    test == GL3_TEXTURE_PROJ_LOD)
 		p = 7;
 
 	switch (target) {
