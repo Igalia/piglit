@@ -130,6 +130,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_LOD,
 	GL3_TEXTURE_PROJ_LOD_OFFSET,
 	GL3_TEXTURE_GRAD,
+	GL3_TEXTURE_GRAD_OFFSET,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -231,6 +232,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ_LOD_OFFSET;
 		else if (strcmp(argv[i], "textureGrad") == 0)
 			test = GL3_TEXTURE_GRAD;
+		else if (strcmp(argv[i], "textureGradOffset") == 0)
+			test = GL3_TEXTURE_GRAD_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -475,6 +478,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureGrad";
 		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
 		break;
+	case GL3_TEXTURE_GRAD_OFFSET:
+		instruction = "textureGradOffset";
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy), OFFSET";
+		break;
 	default:
 		assert(0);
 	}
@@ -527,7 +534,8 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
 			loc_bias = glGetUniformLocation(prog, "bias");
 
-		if (test == GL3_TEXTURE_GRAD) {
+		if (test == GL3_TEXTURE_GRAD ||
+		    test == GL3_TEXTURE_GRAD_OFFSET) {
 			loc_dx = glGetUniformLocation(prog, "dx");
 			loc_dy = glGetUniformLocation(prog, "dy");
 		}
@@ -537,7 +545,8 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_OFFSET ||
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 		    test == GL3_TEXTURE_LOD_OFFSET ||
-		    test == GL3_TEXTURE_PROJ_LOD_OFFSET) {
+		    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
+		    test == GL3_TEXTURE_GRAD_OFFSET) {
 			has_offset = GL_TRUE;
 			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
@@ -706,6 +715,27 @@ piglit_init(int argc, char **argv)
 #define SET_VEC(c, x, y, z, w) do { c[0] = x; c[1] = y; c[2] = z; c[3] = w; } while (0)
 
 static void
+fix_normalized_coordinates(int expected_level,
+			   float *s0, float *t0, float *s1, float *t1)
+{
+	/* When testing the texture offset, there is only one pixel which
+	 * is not black and it has the same integer coordinates in every
+	 * mipmap level, but not the same normalized coordinates. Therefore,
+	 * we have to fix the normalized ones, so that GLSL always reads
+	 * from the same integer coordinates.
+	 */
+	if (expected_level > 0) {
+		float pixsize_base = 1.0 / TEX_SIZE;
+		float offset = pixsize_base * ((1 << (expected_level-1))*3 - 1.5);
+
+		*s0 += offset;
+		*t0 += offset;
+		*s1 += offset;
+		*t1 += offset;
+	}
+}
+
+static void
 draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	  int baselevel, int maxlevel, int bias, int mipfilter)
 {
@@ -751,6 +781,9 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		t1 *= 1 << fetch_level;
 		break;
 
+	case GL3_TEXTURE_GRAD_OFFSET:
+		fix_normalized_coordinates(expected_level, &s0, &t0, &s1, &t1);
+		/* fall through */
 	case GL3_TEXTURE_GRAD:
 		if (gltarget == GL_TEXTURE_3D) {
 			glUniform3f(loc_dx, 0, 0, deriv);
@@ -812,22 +845,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	case GL3_TEXTURE_LOD_OFFSET:
 	case GL3_TEXTURE_PROJ_LOD_OFFSET:
 		glUniform1f(loc_lod, fetch_level - baselevel);
-
-		/* When testing the texture offset, there is only one pixel which
-		 * is not black and it has the same integer coordinates in every
-		 * mipmap level, but not the same normalized coordinates. Therefore,
-		 * we have to fix the normalized ones, so that GLSL always reads
-		 * from the same integer coordinates.
-		 */
-		if (expected_level > 0) {
-			float pixsize_base = 1.0 / TEX_SIZE;
-			float offset = pixsize_base * ((1 << (expected_level-1))*3 - 1.5);
-
-			s0 += offset;
-			t0 += offset;
-			s1 += offset;
-			t1 += offset;
-		}
+		fix_normalized_coordinates(expected_level, &s0, &t0, &s1, &t1);
 		break;
 	default:
 		assert(0);
