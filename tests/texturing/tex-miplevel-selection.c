@@ -131,6 +131,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_LOD_OFFSET,
 	GL3_TEXTURE_GRAD,
 	GL3_TEXTURE_GRAD_OFFSET,
+	GL3_TEXTURE_PROJ_GRAD,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -234,6 +235,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_GRAD;
 		else if (strcmp(argv[i], "textureGradOffset") == 0)
 			test = GL3_TEXTURE_GRAD_OFFSET;
+		else if (strcmp(argv[i], "textureProjGrad") == 0)
+			test = GL3_TEXTURE_PROJ_GRAD;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -408,7 +411,8 @@ piglit_init(int argc, char **argv)
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 	    test == GL3_TEXTURE_PROJ_LOD ||
-	    test == GL3_TEXTURE_PROJ_LOD_OFFSET) {
+	    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
+	    test == GL3_TEXTURE_PROJ_GRAD) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -482,6 +486,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureGradOffset";
 		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy), OFFSET";
 		break;
+	case GL3_TEXTURE_PROJ_GRAD:
+		instruction = "textureProjGrad";
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
+		break;
 	default:
 		assert(0);
 	}
@@ -535,7 +543,8 @@ piglit_init(int argc, char **argv)
 			loc_bias = glGetUniformLocation(prog, "bias");
 
 		if (test == GL3_TEXTURE_GRAD ||
-		    test == GL3_TEXTURE_GRAD_OFFSET) {
+		    test == GL3_TEXTURE_GRAD_OFFSET ||
+		    test == GL3_TEXTURE_PROJ_GRAD) {
 			loc_dx = glGetUniformLocation(prog, "dx");
 			loc_dy = glGetUniformLocation(prog, "dy");
 		}
@@ -785,6 +794,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		fix_normalized_coordinates(expected_level, &s0, &t0, &s1, &t1);
 		/* fall through */
 	case GL3_TEXTURE_GRAD:
+	case GL3_TEXTURE_PROJ_GRAD:
 		if (gltarget == GL_TEXTURE_3D) {
 			glUniform3f(loc_dx, 0, 0, deriv);
 			glUniform3f(loc_dy, 0, 0, deriv);
@@ -856,7 +866,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 	    test == GL3_TEXTURE_PROJ_LOD ||
-	    test == GL3_TEXTURE_PROJ_LOD_OFFSET)
+	    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
+	    test == GL3_TEXTURE_PROJ_GRAD)
 		p = 7;
 
 	switch (target) {
