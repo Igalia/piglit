@@ -2309,7 +2309,7 @@ piglit_display(void)
 		} else if (sscanf(line,
 				  "texture junk 2DArray %d ( %d , %d , %d )",
 				  &tex, &w, &h, &l) == 4) {
-			GLint texobj;
+			GLuint texobj;
 			glActiveTexture(GL_TEXTURE0 + tex);
 			glGenTextures(1, &texobj);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
