@@ -165,6 +165,8 @@ def run(input_):
     # Create a dictionary to pass to initialize json, it needs the contents of
     # the env dictionary and profile and platform information
     options = {'profile': args.test_profile}
+    for key, value in opts:
+        options[key] = value
     if args.platform:
         options['platform'] = args.platform
     json_writer.initialize_json(options, results.name,
