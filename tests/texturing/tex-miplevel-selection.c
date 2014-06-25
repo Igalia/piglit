@@ -120,6 +120,7 @@ enum shader_type {
 	GL3_TEXTURE_OFFSET_BIAS,
 	GL3_TEXTURE_PROJ,
 	GL3_TEXTURE_PROJ_BIAS,
+	GL3_TEXTURE_PROJ_OFFSET,
 };
 
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
@@ -269,6 +270,19 @@ static const char *fscode_gl3_proj_bias_shadow =
 	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, bias)); \n"
 	"} \n";
 
+static const char *fscode_gl3_proj_offset =
+	GL3_FS_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = textureProjOffset(tex, TYPE(gl_TexCoord[0]), OFFSET); \n"
+	"} \n";
+
+static const char *fscode_gl3_proj_offset_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureProjOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, OFFSET) * \n"
+	"                      textureProjOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, OFFSET)); \n"
+	"} \n";
+
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
 	glSamplerParameteri(samp[0], pname, value);
@@ -309,6 +323,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ;
 		else if (strcmp(argv[i], "textureProj(bias)") == 0)
 			test = GL3_TEXTURE_PROJ_BIAS;
+		else if (strcmp(argv[i], "textureProjOffset") == 0)
+			test = GL3_TEXTURE_PROJ_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -460,7 +476,8 @@ piglit_init(int argc, char **argv)
 	}
 
 	if (test == GL3_TEXTURE_PROJ ||
-	    test == GL3_TEXTURE_PROJ_BIAS) {
+	    test == GL3_TEXTURE_PROJ_BIAS ||
+	    test == GL3_TEXTURE_PROJ_OFFSET) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -571,6 +588,19 @@ piglit_init(int argc, char **argv)
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		loc_bias = glGetUniformLocation(prog, "bias");
+		break;
+	case GL3_TEXTURE_PROJ_OFFSET:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_proj_offset_shadow, version, target_str,
+				type_str, compare_value_mask, offset_type_str);
+		else
+			sprintf(fscode, fscode_gl3_proj_offset, version, target_str, type_str,
+				offset_type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+
+		has_offset = GL_TRUE;
+		no_lod_clamp = GL_TRUE;
 		break;
 	default:
 		assert(0);
@@ -798,7 +828,9 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		/* set a bias */
 		glUniform1f(loc_bias, bias);
 		/* fall through */
-	case GL3_TEXTURE_OFFSET: {
+	case GL3_TEXTURE_OFFSET:
+	case GL3_TEXTURE_PROJ_OFFSET:
+	{
 		/* Things get quite complicated with offsets.
 		 *
 		 * The single pixel which is not black has the same integer
@@ -839,7 +871,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	}
 
 	if (test == GL3_TEXTURE_PROJ ||
-	    test == GL3_TEXTURE_PROJ_BIAS)
+	    test == GL3_TEXTURE_PROJ_BIAS ||
+	    test == GL3_TEXTURE_PROJ_OFFSET)
 		p = 7;
 
 	switch (target) {
