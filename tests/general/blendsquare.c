@@ -44,8 +44,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const GLfloat Near = 5.0, Far = 25.0;
-
 enum piglit_result
 piglit_display(void)
 {
