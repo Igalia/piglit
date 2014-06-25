@@ -91,8 +91,10 @@ static const float clear_depths[] = {
 };
 
 enum target_type {
-	TEX_1D,
-	TEX_2D,
+	TEX_1D,		  /* proj. coords = vec2(x,w) */
+	TEX_1D_PROJ_VEC4, /* proj. coords = vec4(x,0,0,w) */
+	TEX_2D,		  /* proj. coords = vec3(x,y,w) */
+	TEX_2D_PROJ_VEC4, /* proj. coords = vec4(x,y,0,w) */
 	TEX_3D,
 	TEX_CUBE,
 	TEX_1D_ARRAY,
@@ -115,7 +117,8 @@ enum shader_type {
 	GL3_TEXTURE_BIAS,
 	GL3_TEXTURE,
 	GL3_TEXTURE_OFFSET,
-	GL3_TEXTURE_OFFSET_BIAS
+	GL3_TEXTURE_OFFSET_BIAS,
+	GL3_TEXTURE_PROJ,
 };
 
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
@@ -237,6 +240,19 @@ static const char *fscode_gl3_offset_bias_shadow =
 	"                                    OFFSET, bias)); \n"
 	"} \n";
 
+static const char *fscode_gl3_proj =
+	GL3_FS_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = textureProj(tex, TYPE(gl_TexCoord[0])); \n"
+	"} \n";
+
+static const char *fscode_gl3_proj_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureProj(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK) * \n"
+	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK)); \n"
+	"} \n";
+
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
 	glSamplerParameteri(samp[0], pname, value);
@@ -273,10 +289,16 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_OFFSET;
 		else if (strcmp(argv[i], "textureOffset(bias)") == 0)
 			test = GL3_TEXTURE_OFFSET_BIAS;
+		else if (strcmp(argv[i], "textureProj") == 0)
+			test = GL3_TEXTURE_PROJ;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
+		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
+			target = TEX_1D_PROJ_VEC4;
 		else if (strcmp(argv[i], "2D") == 0)
 			target = TEX_2D;
+		else if (strcmp(argv[i], "2D_ProjVec4") == 0)
+			target = TEX_2D_PROJ_VEC4;
 		else if (strcmp(argv[i], "3D") == 0)
 			target = TEX_3D;
 		else if (strcmp(argv[i], "Cube") == 0)
@@ -323,10 +345,22 @@ piglit_init(int argc, char **argv)
 		type_str = "float";
 		offset_type_str = "int";
 		break;
+	case TEX_1D_PROJ_VEC4:
+		gltarget = GL_TEXTURE_1D;
+		target_str = "1D";
+		type_str = "vec4";
+		offset_type_str = "int";
+		break;
 	case TEX_2D:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2D";
 		type_str = "vec2";
+		offset_type_str = "ivec2";
+		break;
+	case TEX_2D_PROJ_VEC4:
+		gltarget = GL_TEXTURE_2D;
+		target_str = "2D";
+		type_str = "vec4";
 		offset_type_str = "ivec2";
 		break;
 	case TEX_3D:
@@ -407,6 +441,18 @@ piglit_init(int argc, char **argv)
 		break;
 	}
 
+	if (test == GL3_TEXTURE_PROJ) {
+		if (!strcmp(type_str, "float"))
+			type_str = "vec2";
+		else if (!strcmp(type_str, "vec2"))
+			type_str = "vec3";
+		else if (!strcmp(type_str, "vec3"))
+			type_str = "vec4";
+
+		if (!strcmp(compare_value_mask, "vec3(0.0, 0.0, 1.0)"))
+			compare_value_mask = "vec4(0.0, 0.0, 1.0, 0.0)";
+	}
+
 	switch (test) {
 	case FIXED_FUNCTION:
 		break;
@@ -485,6 +531,16 @@ piglit_init(int argc, char **argv)
 
 		has_offset = GL_TRUE;
 		no_lod_clamp = GL_TRUE;
+		break;
+	case GL3_TEXTURE_PROJ:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_proj_shadow, version, target_str,
+				type_str, compare_value_mask, offset_type_str);
+		else
+			sprintf(fscode, fscode_gl3_proj, version, target_str, type_str,
+				offset_type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
 		break;
 	default:
 		assert(0);
@@ -683,6 +739,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	float c0[4], c1[4], c2[4], c3[4];
 	/* shadow compare value */
 	float z = clear_depths[expected_level];
+	/* multiplier for textureProj */
+	float p = 1;
 
 	switch (test) {
 	case ARB_SHADER_TEXTURE_LOD:
@@ -696,6 +754,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		glUniform1f(loc_bias, bias);
 		/* fall through to scale the coordinates */
 	case GL3_TEXTURE:
+	case GL3_TEXTURE_PROJ:
 	case FIXED_FUNCTION:
 		/* scale the coordinates (decrease the texel size),
 		 * so that the texture fetch selects this level
@@ -748,9 +807,29 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		assert(0);
 	}
 
+	if (test == GL3_TEXTURE_PROJ)
+		p = 7;
+
 	switch (target) {
 	case TEX_1D:
+		SET_VEC(c0, s0*p, p, 0, 1);
+		SET_VEC(c1, s1*p, p, 0, 1);
+		SET_VEC(c2, s1*p, p, 0, 1);
+		SET_VEC(c3, s0*p, p, 0, 1);
+		break;
 	case TEX_2D:
+		SET_VEC(c0, s0*p, t0*p, p, 1);
+		SET_VEC(c1, s1*p, t0*p, p, 1);
+		SET_VEC(c2, s1*p, t1*p, p, 1);
+		SET_VEC(c3, s0*p, t1*p, p, 1);
+		break;
+	case TEX_1D_PROJ_VEC4:
+	case TEX_2D_PROJ_VEC4:
+		SET_VEC(c0, s0*p, t0*p, 0, p);
+		SET_VEC(c1, s1*p, t0*p, 0, p);
+		SET_VEC(c2, s1*p, t1*p, 0, p);
+		SET_VEC(c3, s0*p, t1*p, 0, p);
+		break;
 	case TEX_2D_ARRAY:
 		SET_VEC(c0, s0, t0, TEST_LAYER, 1);
 		SET_VEC(c1, s1, t0, TEST_LAYER, 1);
@@ -759,10 +838,10 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		break;
 	case TEX_1D_SHADOW:
 	case TEX_2D_SHADOW:
-		SET_VEC(c0, s0, t0, z, 1);
-		SET_VEC(c1, s1, t0, z, 1);
-		SET_VEC(c2, s1, t1, z, 1);
-		SET_VEC(c3, s0, t1, z, 1);
+		SET_VEC(c0, s0*p, t0*p, z*p, p);
+		SET_VEC(c1, s1*p, t0*p, z*p, p);
+		SET_VEC(c2, s1*p, t1*p, z*p, p);
+		SET_VEC(c3, s0*p, t1*p, z*p, p);
 		break;
 	case TEX_1D_ARRAY_SHADOW:
 		SET_VEC(c0, s0, TEST_LAYER, z, 1);
@@ -777,10 +856,10 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		SET_VEC(c3, s0, t1, TEST_LAYER, z);
 		break;
 	case TEX_3D:
-		SET_VEC(c0, s0, t0, 0.5, 1);
-		SET_VEC(c1, s1, t0, 0.5, 1);
-		SET_VEC(c2, s1, t1, 0.5, 1);
-		SET_VEC(c3, s0, t1, 0.5, 1);
+		SET_VEC(c0, s0*p, t0*p, 0.5*p, p);
+		SET_VEC(c1, s1*p, t0*p, 0.5*p, p);
+		SET_VEC(c2, s1*p, t1*p, 0.5*p, p);
+		SET_VEC(c3, s0*p, t1*p, 0.5*p, p);
 		break;
 	case TEX_1D_ARRAY:
 		SET_VEC(c0, s0, TEST_LAYER, 0, 1);
