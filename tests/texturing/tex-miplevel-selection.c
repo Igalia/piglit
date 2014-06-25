@@ -39,6 +39,9 @@
  * expected to be fetched is set to the correct color. All other texels are
  * black. This trivially verifies that the texture offset works.
  *
+ * When testing GL_TEXTURE_RECTANGLE, only the texel which is expected to be
+ * fetched is set to the correct color.
+ *
  * Texture targets with multiple layers/slices/faces have only one layer/etc
  * set to the expected value. The other layers are black, so that we can check
  * that the correct layer is read.
@@ -99,6 +102,8 @@ enum target_type {
 	TEX_1D_PROJ_VEC4, /* proj. coords = vec4(x,0,0,w) */
 	TEX_2D,		  /* proj. coords = vec3(x,y,w) */
 	TEX_2D_PROJ_VEC4, /* proj. coords = vec4(x,y,0,w) */
+	TEX_RECT,         /* proj. coords = vec3(x,y,w) */
+	TEX_RECT_PROJ_VEC4, /* proj. coords = vec4(x,y,0,w) */
 	TEX_3D,
 	TEX_CUBE,
 	TEX_1D_ARRAY,
@@ -106,6 +111,7 @@ enum target_type {
 	TEX_CUBE_ARRAY,
 	TEX_1D_SHADOW,
 	TEX_2D_SHADOW,
+	TEX_RECT_SHADOW,
 	TEX_CUBE_SHADOW,
 	TEX_1D_ARRAY_SHADOW,
 	TEX_2D_ARRAY_SHADOW,
@@ -145,13 +151,14 @@ static GLboolean has_offset;
 static GLboolean in_place_probing, no_bias, no_lod_clamp;
 static GLint loc_lod = -1, loc_bias = -1, loc_z = -1, loc_dx = -1, loc_dy = -1;
 static GLuint samp[2];
-
+static int last_level = LAST_LEVEL;
 static int offset[] = {3, -1, 2};
 
 #define GL3_FS_PREAMBLE \
 	"#version %s \n" \
 	"#extension GL_ARB_texture_cube_map_array : enable \n" \
 	"#extension GL_ARB_shader_texture_lod : enable\n" \
+	"#extension GL_ARB_texture_rectangle : enable\n" \
 	"uniform sampler%s tex, tex2; \n" \
 	"uniform float z, lod, bias; \n" \
 	"uniform vec3 dx, dy; \n" \
@@ -248,6 +255,10 @@ piglit_init(int argc, char **argv)
 			target = TEX_2D;
 		else if (strcmp(argv[i], "2D_ProjVec4") == 0)
 			target = TEX_2D_PROJ_VEC4;
+		else if (strcmp(argv[i], "2DRect") == 0)
+			target = TEX_RECT;
+		else if (strcmp(argv[i], "2DRect_ProjVec4") == 0)
+			target = TEX_RECT_PROJ_VEC4;
 		else if (strcmp(argv[i], "3D") == 0)
 			target = TEX_3D;
 		else if (strcmp(argv[i], "Cube") == 0)
@@ -262,6 +273,8 @@ piglit_init(int argc, char **argv)
 			target = TEX_1D_SHADOW;
 		else if (strcmp(argv[i], "2DShadow") == 0)
 			target = TEX_2D_SHADOW;
+		else if (strcmp(argv[i], "2DRectShadow") == 0)
+			target = TEX_RECT_SHADOW;
 		else if (strcmp(argv[i], "CubeShadow") == 0)
 			target = TEX_CUBE_SHADOW;
 		else if (strcmp(argv[i], "1DArrayShadow") == 0)
@@ -320,6 +333,22 @@ piglit_init(int argc, char **argv)
 		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		break;
+	case TEX_RECT:
+		piglit_require_extension("GL_ARB_texture_rectangle");
+		gltarget = GL_TEXTURE_RECTANGLE;
+		target_str = "2DRect";
+		type_str = "vec2";
+		deriv_type = "vec2";
+		offset_type_str = "ivec2";
+		break;
+	case TEX_RECT_PROJ_VEC4:
+		piglit_require_extension("GL_ARB_texture_rectangle");
+		gltarget = GL_TEXTURE_RECTANGLE;
+		target_str = "2DRect";
+		type_str = "vec4";
+		deriv_type = "vec2";
+		offset_type_str = "ivec2";
+		break;
 	case TEX_3D:
 		gltarget = GL_TEXTURE_3D;
 		target_str = "3D";
@@ -368,6 +397,15 @@ piglit_init(int argc, char **argv)
 	case TEX_2D_SHADOW:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2DShadow";
+		type_str = "vec3";
+		deriv_type = "vec2";
+		offset_type_str = "ivec2";
+		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
+		break;
+	case TEX_RECT_SHADOW:
+		piglit_require_extension("GL_ARB_texture_rectangle");
+		gltarget = GL_TEXTURE_RECTANGLE;
+		target_str = "2DRectShadow";
 		type_str = "vec3";
 		deriv_type = "vec2";
 		offset_type_str = "ivec2";
@@ -597,6 +635,11 @@ piglit_init(int argc, char **argv)
 			     gltarget == GL_TEXTURE_1D_ARRAY ? TEX_SIZE : 1;
 		glTexStorage2D(gltarget, 6, format, TEX_SIZE, TEX_SIZE);
 		break;
+	case GL_TEXTURE_RECTANGLE:
+		num_layers = 1;
+		last_level = 0;
+		glTexStorage2D(gltarget, 1, format, TEX_SIZE, TEX_SIZE);
+		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
@@ -626,6 +669,7 @@ piglit_init(int argc, char **argv)
 						       gltarget, tex, level);
 				break;
 			case GL_TEXTURE_2D:
+			case GL_TEXTURE_RECTANGLE:
 				glFramebufferTexture2D(GL_FRAMEBUFFER, attachment,
 						       gltarget, tex, level);
 				break;
@@ -660,7 +704,7 @@ piglit_init(int argc, char **argv)
 			if (num_layers == 1 ||
 			    (gltarget == GL_TEXTURE_3D && layer == num_layers/2 + (has_offset ? offset[2] : 0)) ||
 			    (gltarget != GL_TEXTURE_3D && layer == TEST_LAYER % num_layers)) {
-				if (has_offset) {
+				if (has_offset || gltarget == GL_TEXTURE_RECTANGLE) {
 					/* For testing the shader-provided texture offset,
 					 * only clear the texel which is expected
 					 * to be fetched. The other texels are black. */
@@ -675,10 +719,18 @@ piglit_init(int argc, char **argv)
 					glClearDepth(clear_depths[level]);
 					glEnable(GL_SCISSOR_TEST);
 					/* Add +1, because the probed texel is at (1,1). */
-					glScissor(offset[0]+1,
-						  gltarget == GL_TEXTURE_1D ||
-						  gltarget == GL_TEXTURE_1D_ARRAY ? 0 : offset[1]+1,
-						  1, 1);
+					if (has_offset) {
+						glScissor(offset[0]+1,
+							  gltarget == GL_TEXTURE_1D ||
+							  gltarget == GL_TEXTURE_1D_ARRAY ? 0 : offset[1]+1,
+							  1, 1);
+					}
+					else {
+						glScissor(1,
+							  gltarget == GL_TEXTURE_1D ||
+							  gltarget == GL_TEXTURE_1D_ARRAY ? 0 : 1,
+							  1, 1);
+					}
 					glClear(clearbits);
 					glDisable(GL_SCISSOR_TEST);
 				}
@@ -699,6 +751,9 @@ piglit_init(int argc, char **argv)
 
 			assert(glGetError() == 0);
 		}
+
+		if (gltarget == GL_TEXTURE_RECTANGLE)
+			break;
 	}
 
 	glDeleteFramebuffers(1, &fb);
@@ -713,7 +768,7 @@ piglit_init(int argc, char **argv)
 	glGenSamplers(2, samp);
 	glBindSampler(0, samp[0]);
 
-	set_sampler_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	set_sampler_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	set_sampler_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	if (IS_SHADOW(target)) {
@@ -902,6 +957,18 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		SET_VEC(c2, s1*p, t1*p, 0, p);
 		SET_VEC(c3, s0*p, t1*p, 0, p);
 		break;
+	case TEX_RECT:
+		SET_VEC(c0, 0*p, 0*p, p, 1);
+		SET_VEC(c1, w*p, 0*p, p, 1);
+		SET_VEC(c2, w*p, h*p, p, 1);
+		SET_VEC(c3, 0*p, h*p, p, 1);
+		break;
+	case TEX_RECT_PROJ_VEC4:
+		SET_VEC(c0, 0*p, 0*p, 0, p);
+		SET_VEC(c1, w*p, 0*p, 0, p);
+		SET_VEC(c2, w*p, h*p, 0, p);
+		SET_VEC(c3, 0*p, h*p, 0, p);
+		break;
 	case TEX_2D_ARRAY:
 		SET_VEC(c0, s0, t0, TEST_LAYER, 1);
 		SET_VEC(c1, s1, t0, TEST_LAYER, 1);
@@ -914,6 +981,12 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		SET_VEC(c1, s1*p, t0*p, z*p, p);
 		SET_VEC(c2, s1*p, t1*p, z*p, p);
 		SET_VEC(c3, s0*p, t1*p, z*p, p);
+		break;
+	case TEX_RECT_SHADOW:
+		SET_VEC(c0, 0*p, 0*p, z*p, p);
+		SET_VEC(c1, w*p, 0*p, z*p, p);
+		SET_VEC(c2, w*p, h*p, z*p, p);
+		SET_VEC(c3, 0*p, h*p, z*p, p);
 		break;
 	case TEX_1D_ARRAY_SHADOW:
 		SET_VEC(c0, s0, TEST_LAYER, z, 1);
@@ -1015,13 +1088,13 @@ check_result(const unsigned char *probed, int expected_level,
 				puts("  Observed: unknown value (broken driver?)");
 		}
 		else {
-			for (i = 0; i < LAST_LEVEL; i++) {
+			for (i = 0; i <= last_level; i++) {
 				if (colors_equal(colors[i], probed)) {
 					printf("  Observed level: %i\n", i);
 					break;
 				}
 			}
-			if (i == LAST_LEVEL) {
+			if (i == last_level+1) {
 				if (colors_equal(black, probed))
 					puts("  Observed: wrong layer/face/slice or wrong level or wrong offset");
 				else
@@ -1032,7 +1105,7 @@ check_result(const unsigned char *probed, int expected_level,
 		printf("  Fetch level: %i, baselevel: %i, maxlevel: %i, "
 		       "minlod: %i, maxlod: %i, bias: %i, mipfilter: %s\n",
 		       fetch_level, baselevel, maxlevel, minlod,
-		       no_lod_clamp ? LAST_LEVEL : maxlod, bias, mipfilter ? "yes" : "no");
+		       no_lod_clamp ? last_level : maxlod, bias, mipfilter ? "yes" : "no");
 		return false;
 	}
 	return true;
@@ -1057,7 +1130,7 @@ calc_expected_level(int fetch_level, int baselevel, int maxlevel, int minlod,
 	} else {
 		expected_level = baselevel;
 	}
-	assert(expected_level >= 0 && expected_level <= LAST_LEVEL);
+	assert(expected_level >= 0 && expected_level <= last_level);
 	return expected_level;
 }
 
@@ -1067,36 +1140,38 @@ piglit_display(void)
 	int fetch_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
 	int expected_level, x, y, total, failed;
 	int start_bias, end_bias;
-	int end_min_lod, end_max_lod;
+	int end_min_lod, end_max_lod, end_mipfilter;
 
 	if (no_bias) {
 		start_bias = 0;
 		end_bias = 0;
 	} else {
-		start_bias = -LAST_LEVEL;
-		end_bias = LAST_LEVEL;
+		start_bias = -last_level;
+		end_bias = last_level;
 	}
 
 	if (no_lod_clamp) {
 		end_min_lod = 0;
 		end_max_lod = 0;
 	} else {
-		end_min_lod = LAST_LEVEL;
-		end_max_lod = LAST_LEVEL;
+		end_min_lod = last_level;
+		end_max_lod = last_level;
 	}
+
+	end_mipfilter = gltarget == GL_TEXTURE_RECTANGLE ? 0 : 1;
 
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	total = 0;
 	failed = 0;
-	for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
-		for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
-			for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
+	for (fetch_level = 0; fetch_level <= last_level; fetch_level++)
+		for (baselevel = 0; baselevel <= last_level; baselevel++)
+			for (maxlevel = baselevel; maxlevel <= last_level; maxlevel++)
 				for (minlod = 0; minlod <= end_min_lod; minlod++)
 					for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 						for (bias = start_bias; bias <= end_bias; bias++)
-							for (mipfilter = 0; mipfilter < 2; mipfilter++) {
+							for (mipfilter = 0; mipfilter <= end_mipfilter; mipfilter++) {
 								expected_level = calc_expected_level(fetch_level, baselevel,
 											maxlevel, minlod, maxlod, bias,
 											mipfilter);
@@ -1106,21 +1181,23 @@ piglit_display(void)
 								    (TEX_SIZE >> expected_level) <= 1+MAX2(offset[0], offset[1]))
 									continue;
 
-								glTexParameteri(gltarget, GL_TEXTURE_BASE_LEVEL, baselevel);
-								glTexParameteri(gltarget, GL_TEXTURE_MAX_LEVEL, maxlevel);
-								if (!no_lod_clamp) {
-									set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
-									set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
+								if (gltarget != GL_TEXTURE_RECTANGLE) {
+									glTexParameteri(gltarget, GL_TEXTURE_BASE_LEVEL, baselevel);
+									glTexParameteri(gltarget, GL_TEXTURE_MAX_LEVEL, maxlevel);
+									if (!no_lod_clamp) {
+										set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
+										set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
+									}
+									if (!no_bias &&
+									    test != GL3_TEXTURE_BIAS &&
+									    test != GL3_TEXTURE_PROJ_BIAS &&
+									    test != GL3_TEXTURE_OFFSET_BIAS &&
+									    test != GL3_TEXTURE_PROJ_OFFSET_BIAS)
+										set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
+									set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
+											mipfilter ? GL_NEAREST_MIPMAP_NEAREST
+												  : GL_NEAREST);
 								}
-								if (!no_bias &&
-								    test != GL3_TEXTURE_BIAS &&
-								    test != GL3_TEXTURE_PROJ_BIAS &&
-								    test != GL3_TEXTURE_OFFSET_BIAS &&
-								    test != GL3_TEXTURE_PROJ_OFFSET_BIAS)
-									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
-								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
-										mipfilter ? GL_NEAREST_MIPMAP_NEAREST
-											  : GL_NEAREST);
 
 								x = (total % (piglit_width/3)) * 3;
 								y = (total / (piglit_width/3)) * 3;
@@ -1151,13 +1228,13 @@ piglit_display(void)
 		glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
 
 		total = 0;
-		for (fetch_level = 0; fetch_level <= LAST_LEVEL; fetch_level++)
-			for (baselevel = 0; baselevel <= LAST_LEVEL; baselevel++)
-				for (maxlevel = baselevel; maxlevel <= LAST_LEVEL; maxlevel++)
+		for (fetch_level = 0; fetch_level <= last_level; fetch_level++)
+			for (baselevel = 0; baselevel <= last_level; baselevel++)
+				for (maxlevel = baselevel; maxlevel <= last_level; maxlevel++)
 					for (minlod = 0; minlod <= end_min_lod; minlod++)
 						for (maxlod = minlod; maxlod <= end_max_lod; maxlod++)
 							for (bias = start_bias; bias <= end_bias; bias++)
-								for (mipfilter = 0; mipfilter < 2; mipfilter++) {
+								for (mipfilter = 0; mipfilter <= end_mipfilter; mipfilter++) {
 									expected_level = calc_expected_level(fetch_level,
 												baselevel, maxlevel, minlod,
 												maxlod, bias, mipfilter);
