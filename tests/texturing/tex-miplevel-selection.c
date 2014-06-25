@@ -35,6 +35,10 @@
  * Each mipmap level is set to a different color/depth value, so that we can
  * check that the correct level is read.
  *
+ * When testing the shader-provided texture offset, only the texel which is
+ * expected to be fetched is set to the correct color. All other texels are
+ * black. This trivially verifies that the texture offset works.
+ *
  * Texture targets with multiple layers/slices/faces have only one layer/etc
  * set to the expected value. The other layers are black, so that we can check
  * that the correct layer is read.
@@ -121,6 +125,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ,
 	GL3_TEXTURE_PROJ_BIAS,
 	GL3_TEXTURE_PROJ_OFFSET,
+	GL3_TEXTURE_PROJ_OFFSET_BIAS,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -210,6 +215,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ_BIAS;
 		else if (strcmp(argv[i], "textureProjOffset") == 0)
 			test = GL3_TEXTURE_PROJ_OFFSET;
+		else if (strcmp(argv[i], "textureProjOffset(bias)") == 0)
+			test = GL3_TEXTURE_PROJ_OFFSET_BIAS;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -366,7 +373,8 @@ piglit_init(int argc, char **argv)
 
 	if (test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
-	    test == GL3_TEXTURE_PROJ_OFFSET) {
+	    test == GL3_TEXTURE_PROJ_OFFSET ||
+	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -416,6 +424,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureProjOffset";
 		other_params = ", OFFSET";
 		break;
+	case GL3_TEXTURE_PROJ_OFFSET_BIAS:
+		instruction = "textureProjOffset";
+		other_params = ", OFFSET, bias";
+		break;
 	default:
 		assert(0);
 	}
@@ -459,12 +471,14 @@ piglit_init(int argc, char **argv)
 
 		if (test == GL3_TEXTURE_BIAS ||
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
-		    test == GL3_TEXTURE_PROJ_BIAS)
+		    test == GL3_TEXTURE_PROJ_BIAS ||
+		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
 			loc_bias = glGetUniformLocation(prog, "bias");
 
 		if (test == GL3_TEXTURE_OFFSET ||
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
-		    test == GL3_TEXTURE_PROJ_OFFSET) {
+		    test == GL3_TEXTURE_PROJ_OFFSET ||
+		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS) {
 			has_offset = GL_TRUE;
 			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
@@ -676,6 +690,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		break;
 
 	case GL3_TEXTURE_OFFSET_BIAS:
+	case GL3_TEXTURE_PROJ_OFFSET_BIAS:
 		/* set a bias */
 		glUniform1f(loc_bias, bias);
 		/* fall through */
@@ -723,7 +738,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 
 	if (test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
-	    test == GL3_TEXTURE_PROJ_OFFSET)
+	    test == GL3_TEXTURE_PROJ_OFFSET ||
+	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
 		p = 7;
 
 	switch (target) {
@@ -959,7 +975,8 @@ piglit_display(void)
 								if (!no_bias &&
 								    test != GL3_TEXTURE_BIAS &&
 								    test != GL3_TEXTURE_PROJ_BIAS &&
-								    test != GL3_TEXTURE_OFFSET_BIAS)
+								    test != GL3_TEXTURE_OFFSET_BIAS &&
+								    test != GL3_TEXTURE_PROJ_OFFSET_BIAS)
 									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
 								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
 										mipfilter ? GL_NEAREST_MIPMAP_NEAREST
