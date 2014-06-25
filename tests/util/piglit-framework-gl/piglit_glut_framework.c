@@ -226,6 +226,20 @@ check_gl_version(const struct piglit_gl_test_config *test_config)
 		return false;
 	}
 
+	if (piglit_is_core_profile &&
+	    test_config->supports_gl_core_version == 0) {
+		/* We have a core profile context but the test needs a
+		 * compat profile.  We can't run the test.
+		 */
+		printf("Test requires compat version %d.%d or later but "
+		       "context is core profile %d.%d.\n",
+		       test_config->supports_gl_compat_version / 10,
+		       test_config->supports_gl_compat_version % 10,
+		       actual_version / 10,
+		       actual_version % 10);
+		return false;
+	}
+
 	return true;
 }
 
@@ -252,6 +266,14 @@ piglit_glut_framework_create(const struct piglit_gl_test_config *test_config)
 		return NULL;
 
 	init_glut();
+
+        /* Check if we actually have a core profile */
+	{
+		int actual_version = piglit_get_gl_version();
+		if (actual_version >= 31 &&
+		    !piglit_is_extension_supported("GL_ARB_compatibility"))
+			piglit_is_core_profile = true;
+	}
 
 	if (!check_gl_version(test_config))
 		piglit_report_result(PIGLIT_SKIP);
