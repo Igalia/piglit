@@ -119,6 +119,7 @@ enum shader_type {
 	GL3_TEXTURE_OFFSET,
 	GL3_TEXTURE_OFFSET_BIAS,
 	GL3_TEXTURE_PROJ,
+	GL3_TEXTURE_PROJ_BIAS,
 };
 
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
@@ -253,6 +254,21 @@ static const char *fscode_gl3_proj_shadow =
 	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK)); \n"
 	"} \n";
 
+static const char *fscode_gl3_proj_bias =
+	GL3_FS_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = textureProj(tex, TYPE(gl_TexCoord[0]), bias); \n"
+	"} \n";
+
+static const char *fscode_gl3_proj_bias_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureProj(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, bias) * \n"
+	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, bias)); \n"
+	"} \n";
+
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
 	glSamplerParameteri(samp[0], pname, value);
@@ -291,6 +307,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_OFFSET_BIAS;
 		else if (strcmp(argv[i], "textureProj") == 0)
 			test = GL3_TEXTURE_PROJ;
+		else if (strcmp(argv[i], "textureProj(bias)") == 0)
+			test = GL3_TEXTURE_PROJ_BIAS;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -441,7 +459,8 @@ piglit_init(int argc, char **argv)
 		break;
 	}
 
-	if (test == GL3_TEXTURE_PROJ) {
+	if (test == GL3_TEXTURE_PROJ ||
+	    test == GL3_TEXTURE_PROJ_BIAS) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -541,6 +560,17 @@ piglit_init(int argc, char **argv)
 				offset_type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
+		break;
+	case GL3_TEXTURE_PROJ_BIAS:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_proj_bias_shadow, version, target_str,
+				type_str, compare_value_mask, offset_type_str);
+		else
+			sprintf(fscode, fscode_gl3_proj_bias, version, target_str, type_str,
+				offset_type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+		loc_bias = glGetUniformLocation(prog, "bias");
 		break;
 	default:
 		assert(0);
@@ -750,6 +780,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		break;
 
 	case GL3_TEXTURE_BIAS:
+	case GL3_TEXTURE_PROJ_BIAS:
 		/* set a bias */
 		glUniform1f(loc_bias, bias);
 		/* fall through to scale the coordinates */
@@ -807,7 +838,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		assert(0);
 	}
 
-	if (test == GL3_TEXTURE_PROJ)
+	if (test == GL3_TEXTURE_PROJ ||
+	    test == GL3_TEXTURE_PROJ_BIAS)
 		p = 7;
 
 	switch (target) {
@@ -1042,6 +1074,7 @@ piglit_display(void)
 								}
 								if (!no_bias &&
 								    test != GL3_TEXTURE_BIAS &&
+								    test != GL3_TEXTURE_PROJ_BIAS &&
 								    test != GL3_TEXTURE_OFFSET_BIAS)
 									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
 								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
