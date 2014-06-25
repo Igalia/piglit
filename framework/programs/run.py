@@ -170,6 +170,9 @@ def run(input_):
     json_writer.initialize_json(options, results.name,
                                 core.collect_system_info())
 
+    json_writer.write_dict_key('tests')
+    json_writer.open_dict()
+
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
 
@@ -216,6 +219,9 @@ def resume(input_):
     json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
     json_writer.initialize_json(results.options, results.name,
                                 core.collect_system_info())
+
+    json_writer.write_dict_key('tests')
+    json_writer.open_dict()
 
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)

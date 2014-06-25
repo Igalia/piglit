@@ -160,9 +160,6 @@ class JSONWriter(object):
         for key, value in env.iteritems():
             self.write_dict_item(key, value)
 
-        self.write_dict_key('tests')
-        self.open_dict()
-
     def close_json(self):
         """ End json serialization and cleanup
 
@@ -170,7 +167,6 @@ class JSONWriter(object):
         containers that are still open and closes the file
 
         """
-        self.close_dict()
         self.close_dict()
         assert self._open_containers == []
 
