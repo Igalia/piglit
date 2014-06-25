@@ -90,5 +90,6 @@ ENDIF (UNIX)
 piglit_add_executable (texsubimage texsubimage.c)
 piglit_add_executable (texture-al texture-al.c)
 piglit_add_executable (texture-rg texture-rg.c)
+piglit_add_executable (teximage-colors teximage-colors.c)
 
 # vim: ft=cmake:
