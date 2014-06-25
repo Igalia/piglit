@@ -37,8 +37,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float green[] = { 0.f, 1.f, 0.f, 1.f };
-
 enum piglit_result
 piglit_display(void)
 {
