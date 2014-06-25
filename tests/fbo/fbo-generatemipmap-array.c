@@ -48,7 +48,6 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static const float red[] =   {1, 0, 0, 0};
 static const float green[] = {0, 1, 0, 0};
 static const float blue[] =  {0, 0, 1, 0};
 static const float white[] = {1, 1, 1, 1};
