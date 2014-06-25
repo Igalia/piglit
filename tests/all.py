@@ -1059,6 +1059,36 @@ spec['glsl-1.20']['built-in constants'] = concurrent_test('built-in-constants ' 
 spec['glsl-1.20']['api'] = {}
 add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 1D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 2D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 3D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() Cube')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 1DShadow')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 2DShadow')
+
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) 1D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) 2D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) 3D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) Cube')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) 1DShadow')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture(bias) 2DShadow')
+
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 1D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 1D_ProjVec4')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 2D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 2D_ProjVec4')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 3D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 1DShadow')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj 2DShadow')
+
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 1D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 1D_ProjVec4')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 2D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 2D_ProjVec4')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 3D')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 1DShadow')
+add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:textureProj(bias) 2DShadow')
+
 
 # Group spec/glsl-1.30
 spec['glsl-1.30'] = {}

@@ -122,6 +122,10 @@ enum target_type {
 
 enum shader_type {
 	FIXED_FUNCTION,
+	GL2_TEXTURE,
+	GL2_TEXTURE_BIAS,
+	GL2_TEXTURE_PROJ,
+	GL2_TEXTURE_PROJ_BIAS,
 	ARB_TEXTURE_LOD,
 	ARB_TEXTURE_PROJ_LOD,
 	ARB_TEXTURE_GRAD,
@@ -216,6 +220,14 @@ piglit_init(int argc, char **argv)
 			no_bias = GL_TRUE;
 		else if (strcmp(argv[i], "-nolod") == 0)
 			no_lod_clamp = GL_TRUE;
+		else if (strcmp(argv[i], "GL2:texture()") == 0)
+			test = GL2_TEXTURE;
+		else if (strcmp(argv[i], "GL2:texture(bias)") == 0)
+			test = GL2_TEXTURE_BIAS;
+		else if (strcmp(argv[i], "GL2:textureProj") == 0)
+			test = GL2_TEXTURE_PROJ;
+		else if (strcmp(argv[i], "GL2:textureProj(bias)") == 0)
+			test = GL2_TEXTURE_PROJ_BIAS;
 		else if (strcmp(argv[i], "*Lod") == 0)
 			test = ARB_TEXTURE_LOD;
 		else if (strcmp(argv[i], "*ProjLod") == 0)
@@ -301,8 +313,11 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_sampler_objects");
 	piglit_require_extension("GL_ARB_texture_storage");
-	if (NEED_ARB_LOD(test)) {
+	if (test != FIXED_FUNCTION) {
+		piglit_require_gl_version(20);
 		piglit_require_GLSL_version(120);
+	}
+	if (NEED_ARB_LOD(test)) {
 		piglit_require_extension("GL_ARB_shader_texture_lod");
 	}
 	piglit_require_gl_version(NEED_GL3(test) ? 30 : 14);
@@ -456,7 +471,9 @@ piglit_init(int argc, char **argv)
 		break;
 	}
 
-	if (test == ARB_TEXTURE_PROJ_LOD ||
+	if (test == GL2_TEXTURE_PROJ ||
+	    test == GL2_TEXTURE_PROJ_BIAS ||
+	    test == ARB_TEXTURE_PROJ_LOD ||
 	    test == ARB_TEXTURE_PROJ_GRAD ||
 	    test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
@@ -479,6 +496,61 @@ piglit_init(int argc, char **argv)
 
 	switch (test) {
 	case FIXED_FUNCTION:
+		break;
+	case GL2_TEXTURE_BIAS:
+		other_params = ", bias";
+		/* fall through */
+	case GL2_TEXTURE:
+		version = "120";
+		switch (target) {
+		case TEX_1D:
+			instruction = "texture1D";
+			break;
+		case TEX_2D:
+			instruction = "texture2D";
+			break;
+		case TEX_3D:
+			instruction = "texture3D";
+			break;
+		case TEX_CUBE:
+			instruction = "textureCube";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1D";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2D";
+			break;
+		default:
+			assert(0);
+		}
+		break;
+	case GL2_TEXTURE_PROJ_BIAS:
+		other_params = ", bias";
+		/* fall through */
+	case GL2_TEXTURE_PROJ:
+		version = "120";
+		switch (target) {
+		case TEX_1D:
+		case TEX_1D_PROJ_VEC4:
+			instruction = "texture1DProj";
+			break;
+		case TEX_2D:
+		case TEX_2D_PROJ_VEC4:
+			instruction = "texture2DProj";
+			break;
+		case TEX_3D:
+			instruction = "texture3DProj";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1DProj";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2DProj";
+			break;
+		default:
+			assert(0);
+		}
 		break;
 	case ARB_TEXTURE_LOD:
 		version = "120";
@@ -704,7 +776,9 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_LOD_OFFSET)
 			loc_lod = glGetUniformLocation(prog, "lod");
 
-		if (test == GL3_TEXTURE_BIAS ||
+		if (test == GL2_TEXTURE_BIAS ||
+		    test == GL2_TEXTURE_PROJ_BIAS ||
+		    test == GL3_TEXTURE_BIAS ||
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
 		    test == GL3_TEXTURE_PROJ_BIAS ||
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
@@ -961,11 +1035,15 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		glUniform1f(loc_lod, fetch_level - baselevel);
 		break;
 
+	case GL2_TEXTURE_BIAS:
+	case GL2_TEXTURE_PROJ_BIAS:
 	case GL3_TEXTURE_BIAS:
 	case GL3_TEXTURE_PROJ_BIAS:
 		/* set a bias */
 		glUniform1f(loc_bias, bias);
 		/* fall through to scale the coordinates */
+	case GL2_TEXTURE:
+	case GL2_TEXTURE_PROJ:
 	case GL3_TEXTURE:
 	case GL3_TEXTURE_PROJ:
 	case FIXED_FUNCTION:
@@ -1050,7 +1128,9 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		assert(0);
 	}
 
-	if (test == ARB_TEXTURE_PROJ_LOD ||
+	if (test == GL2_TEXTURE_PROJ ||
+	    test == GL2_TEXTURE_PROJ_BIAS ||
+	    test == ARB_TEXTURE_PROJ_LOD ||
 	    test == ARB_TEXTURE_PROJ_GRAD ||
 	    test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
@@ -1295,7 +1375,9 @@ piglit_display(void)
 	 * level of a cubemap on a 3x3 quad. */
 	if ((gltarget == GL_TEXTURE_CUBE_MAP ||
 	     gltarget == GL_TEXTURE_CUBE_MAP_ARRAY) &&
-	    (test == GL3_TEXTURE ||
+	    (test == GL2_TEXTURE ||
+	     test == GL2_TEXTURE_BIAS ||
+	     test == GL3_TEXTURE ||
 	     test == GL3_TEXTURE_BIAS)) {
 		end_fetch_level = last_level - 1;
 	}
@@ -1332,6 +1414,8 @@ piglit_display(void)
 										set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
 									}
 									if (!no_bias &&
+									    test != GL2_TEXTURE_BIAS &&
+									    test != GL2_TEXTURE_PROJ_BIAS &&
 									    test != GL3_TEXTURE_BIAS &&
 									    test != GL3_TEXTURE_PROJ_BIAS &&
 									    test != GL3_TEXTURE_OFFSET_BIAS &&
