@@ -29,7 +29,7 @@ The original tests have been taken from
 
 First of all, you need to make sure that the following are installed:
 
-  - Python 2.7 or greater
+  - Python 2.7.x
   - Python Mako module
   - numpy (http://www.numpy.org)
   - cmake (http://www.cmake.org)

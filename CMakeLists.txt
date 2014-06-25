@@ -169,7 +169,7 @@ ENDIF()
 # Check for presence of Python 2.6 or greater.
 foreach(python_cmd python2 python)
 	execute_process(
-		COMMAND ${python_cmd} -c "import sys; assert '2.6' <= sys.version < '3'"
+		COMMAND ${python_cmd} -c "import sys; assert '2.7' <= sys.version < '3'"
 		OUTPUT_QUIET
 		ERROR_QUIET
 		RESULT_VARIABLE python_version_check_error_code)
