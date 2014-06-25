@@ -128,6 +128,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_OFFSET_BIAS,
 	GL3_TEXTURE_LOD_OFFSET,
 	GL3_TEXTURE_PROJ_LOD,
+	GL3_TEXTURE_PROJ_LOD_OFFSET,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -223,6 +224,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_LOD_OFFSET;
 		else if (strcmp(argv[i], "textureProjLod") == 0)
 			test = GL3_TEXTURE_PROJ_LOD;
+		else if (strcmp(argv[i], "textureProjLodOffset") == 0)
+			test = GL3_TEXTURE_PROJ_LOD_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -381,7 +384,8 @@ piglit_init(int argc, char **argv)
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
-	    test == GL3_TEXTURE_PROJ_LOD) {
+	    test == GL3_TEXTURE_PROJ_LOD ||
+	    test == GL3_TEXTURE_PROJ_LOD_OFFSET) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -443,6 +447,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureProjLod";
 		other_params = ", lod";
 		break;
+	case GL3_TEXTURE_PROJ_LOD_OFFSET:
+		instruction = "textureProjLodOffset";
+		other_params = ", lod, OFFSET";
+		break;
 	default:
 		assert(0);
 	}
@@ -483,7 +491,8 @@ piglit_init(int argc, char **argv)
 		if (test == ARB_SHADER_TEXTURE_LOD ||
 		    test == GL3_TEXTURE_LOD ||
 		    test == GL3_TEXTURE_LOD_OFFSET ||
-		    test == GL3_TEXTURE_PROJ_LOD)
+		    test == GL3_TEXTURE_PROJ_LOD ||
+		    test == GL3_TEXTURE_PROJ_LOD_OFFSET)
 			loc_lod = glGetUniformLocation(prog, "lod");
 
 		if (test == GL3_TEXTURE_BIAS ||
@@ -496,7 +505,8 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
 		    test == GL3_TEXTURE_PROJ_OFFSET ||
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
-		    test == GL3_TEXTURE_LOD_OFFSET) {
+		    test == GL3_TEXTURE_LOD_OFFSET ||
+		    test == GL3_TEXTURE_PROJ_LOD_OFFSET) {
 			has_offset = GL_TRUE;
 			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
@@ -710,21 +720,16 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 
 	case GL3_TEXTURE_OFFSET_BIAS:
 	case GL3_TEXTURE_PROJ_OFFSET_BIAS:
-	case GL3_TEXTURE_LOD_OFFSET:
-		if (loc_bias != -1)
-			glUniform1f(loc_bias, bias);
-		if (loc_lod != -1)
-			glUniform1f(loc_lod, fetch_level - baselevel);
+		glUniform1f(loc_bias, bias);
 		/* fall through */
 	case GL3_TEXTURE_OFFSET:
 	case GL3_TEXTURE_PROJ_OFFSET:
 	{
-		/* Things get quite complicated with offsets.
-		 *
-		 * The single pixel which is not black has the same integer
-		 * coordinates in every mipmap level, but not the same normalized
-		 * coordinates. Therefore we have to fix the normalized ones, so
-		 * that GLSL always reads from the same integer coordinates.
+		/* When testing the texture offset, there is only one pixel which
+		 * is not black and it has the same integer coordinates in every
+		 * mipmap level, but not the same normalized coordinates. Therefore,
+		 * we have to fix the normalized ones, so that GLSL always reads
+		 * from the same integer coordinates.
 		 */
 		int maxlevel_clamped = mipfilter ? maxlevel : baselevel;
 		int bias_clamped =
@@ -754,6 +759,27 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		}
 		break;
 	}
+
+	case GL3_TEXTURE_LOD_OFFSET:
+	case GL3_TEXTURE_PROJ_LOD_OFFSET:
+		glUniform1f(loc_lod, fetch_level - baselevel);
+
+		/* When testing the texture offset, there is only one pixel which
+		 * is not black and it has the same integer coordinates in every
+		 * mipmap level, but not the same normalized coordinates. Therefore,
+		 * we have to fix the normalized ones, so that GLSL always reads
+		 * from the same integer coordinates.
+		 */
+		if (expected_level > 0) {
+			float pixsize_base = 1.0 / TEX_SIZE;
+			float offset = pixsize_base * ((1 << (expected_level-1))*3 - 1.5);
+
+			s0 += offset;
+			t0 += offset;
+			s1 += offset;
+			t1 += offset;
+		}
+		break;
 	default:
 		assert(0);
 	}
@@ -762,7 +788,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
-	    test == GL3_TEXTURE_PROJ_LOD)
+	    test == GL3_TEXTURE_PROJ_LOD ||
+	    test == GL3_TEXTURE_PROJ_LOD_OFFSET)
 		p = 7;
 
 	switch (target) {
