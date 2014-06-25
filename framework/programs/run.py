@@ -237,6 +237,7 @@ def resume(input_):
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(opts, json_writer)
 
+    json_writer.close_dict()
     json_writer.close_json()
 
     print("Thank you for running Piglit!\n"
