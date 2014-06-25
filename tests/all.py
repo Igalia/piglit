@@ -1979,9 +1979,42 @@ add_shader_test_dir(arb_shader_texture_lod['execution'],
                     recursive=True)
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgrad')
 add_plain_test(arb_shader_texture_lod['execution'], 'arb_shader_texture_lod-texgradcube')
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod'] = concurrent_test('tex-miplevel-selection -nobias -nolod -GL_ARB_shader_texture_lod')
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod'] = concurrent_test('tex-miplevel-selection -nobias -GL_ARB_shader_texture_lod')
-arb_shader_texture_lod['execution']['tex-miplevel-selection-texture2DLod-lod-bias'] = concurrent_test('tex-miplevel-selection -GL_ARB_shader_texture_lod')
+
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod 1D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod 2D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod 3D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod Cube')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod 1DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *Lod 2DShadow')
+
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 1D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 1D_ProjVec4')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 2D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 2D_ProjVec4')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 3D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 1DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjLod 2DShadow')
+
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 1D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 2D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 3D')
+#add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB Cube')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 1DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 2DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 2DRect')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *GradARB 2DRectShadow')
+
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 1D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 1D_ProjVec4')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2D_ProjVec4')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 3D')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 1DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2DShadow')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2DRect')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2DRect_ProjVec4')
+add_concurrent_test(arb_shader_texture_lod['execution'], 'tex-miplevel-selection *ProjGradARB 2DRectShadow')
+
 
 # Group ARB_shader_objects
 arb_shader_objects = {}

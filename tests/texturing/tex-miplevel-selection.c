@@ -122,7 +122,10 @@ enum target_type {
 
 enum shader_type {
 	FIXED_FUNCTION,
-	ARB_SHADER_TEXTURE_LOD,
+	ARB_TEXTURE_LOD,
+	ARB_TEXTURE_PROJ_LOD,
+	ARB_TEXTURE_GRAD,
+	ARB_TEXTURE_PROJ_GRAD,
 	GL3_TEXTURE_LOD,
 	GL3_TEXTURE_BIAS,
 	GL3_TEXTURE,
@@ -141,7 +144,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_GRAD_OFFSET,
 };
 
-#define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
+#define NEED_ARB_LOD(t) ((t) >= ARB_TEXTURE_LOD && (t) < GL3_TEXTURE_LOD)
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
 
 static enum shader_type test = FIXED_FUNCTION;
@@ -213,8 +216,14 @@ piglit_init(int argc, char **argv)
 			no_bias = GL_TRUE;
 		else if (strcmp(argv[i], "-nolod") == 0)
 			no_lod_clamp = GL_TRUE;
-		else if (strcmp(argv[i], "-GL_ARB_shader_texture_lod") == 0)
-			test = ARB_SHADER_TEXTURE_LOD;
+		else if (strcmp(argv[i], "*Lod") == 0)
+			test = ARB_TEXTURE_LOD;
+		else if (strcmp(argv[i], "*ProjLod") == 0)
+			test = ARB_TEXTURE_PROJ_LOD;
+		else if (strcmp(argv[i], "*GradARB") == 0)
+			test = ARB_TEXTURE_GRAD;
+		else if (strcmp(argv[i], "*ProjGradARB") == 0)
+			test = ARB_TEXTURE_PROJ_GRAD;
 		else if (strcmp(argv[i], "textureLod") == 0)
 			test = GL3_TEXTURE_LOD;
 		else if (strcmp(argv[i], "texture(bias)") == 0)
@@ -293,7 +302,7 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_sampler_objects");
 	piglit_require_extension("GL_ARB_texture_storage");
 	if (NEED_ARB_LOD(test)) {
-		piglit_require_GLSL();
+		piglit_require_GLSL_version(120);
 		piglit_require_extension("GL_ARB_shader_texture_lod");
 	}
 	piglit_require_gl_version(NEED_GL3(test) ? 30 : 14);
@@ -447,7 +456,9 @@ piglit_init(int argc, char **argv)
 		break;
 	}
 
-	if (test == GL3_TEXTURE_PROJ ||
+	if (test == ARB_TEXTURE_PROJ_LOD ||
+	    test == ARB_TEXTURE_PROJ_GRAD ||
+	    test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
@@ -469,10 +480,120 @@ piglit_init(int argc, char **argv)
 	switch (test) {
 	case FIXED_FUNCTION:
 		break;
-	case ARB_SHADER_TEXTURE_LOD:
+	case ARB_TEXTURE_LOD:
 		version = "120";
-		instruction = "texture2DLod";
+		switch (target) {
+		case TEX_1D:
+			instruction = "texture1DLod";
+			break;
+		case TEX_2D:
+			instruction = "texture2DLod";
+			break;
+		case TEX_3D:
+			instruction = "texture3DLod";
+			break;
+		case TEX_CUBE:
+			instruction = "textureCubeLod";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1DLod";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2DLod";
+			break;
+		default:
+			assert(0);
+		}
 		other_params = ", lod";
+		break;
+	case ARB_TEXTURE_PROJ_LOD:
+		version = "120";
+		switch (target) {
+		case TEX_1D:
+		case TEX_1D_PROJ_VEC4:
+			instruction = "texture1DProjLod";
+			break;
+		case TEX_2D:
+		case TEX_2D_PROJ_VEC4:
+			instruction = "texture2DProjLod";
+			break;
+		case TEX_3D:
+			instruction = "texture3DProjLod";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1DProjLod";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2DProjLod";
+			break;
+		default:
+			assert(0);
+		}
+		other_params = ", lod";
+		break;
+	case ARB_TEXTURE_GRAD:
+		version = "120";
+		switch (target) {
+		case TEX_1D:
+			instruction = "texture1DGradARB";
+			break;
+		case TEX_2D:
+			instruction = "texture2DGradARB";
+			break;
+		case TEX_3D:
+			instruction = "texture3DGradARB";
+			break;
+		case TEX_CUBE:
+			instruction = "textureCubeGradARB";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1DGradARB";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2DGradARB";
+			break;
+		case TEX_RECT:
+			instruction = "texture2DRectGradARB";
+			break;
+		case TEX_RECT_SHADOW:
+			instruction = "shadow2DRectGradARB";
+			break;
+		default:
+			assert(0);
+		}
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
+		break;
+	case ARB_TEXTURE_PROJ_GRAD:
+		version = "120";
+		switch (target) {
+		case TEX_1D:
+		case TEX_1D_PROJ_VEC4:
+			instruction = "texture1DProjGradARB";
+			break;
+		case TEX_2D:
+		case TEX_2D_PROJ_VEC4:
+			instruction = "texture2DProjGradARB";
+			break;
+		case TEX_3D:
+			instruction = "texture3DProjGradARB";
+			break;
+		case TEX_1D_SHADOW:
+			instruction = "shadow1DProjGradARB";
+			break;
+		case TEX_2D_SHADOW:
+			instruction = "shadow2DProjGradARB";
+			break;
+		case TEX_RECT:
+		case TEX_RECT_PROJ_VEC4:
+			instruction = "texture2DRectProjGradARB";
+			break;
+		case TEX_RECT_SHADOW:
+			instruction = "shadow2DRectProjGradARB";
+			break;
+		default:
+			assert(0);
+		}
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
 		break;
 	case GL3_TEXTURE_LOD:
 		instruction = "textureLod";
@@ -575,7 +696,8 @@ piglit_init(int argc, char **argv)
 		    target == TEX_CUBE_ARRAY_SHADOW)
 			loc_z = glGetUniformLocation(prog, "z");
 
-		if (test == ARB_SHADER_TEXTURE_LOD ||
+		if (test == ARB_TEXTURE_LOD ||
+		    test == ARB_TEXTURE_PROJ_LOD ||
 		    test == GL3_TEXTURE_LOD ||
 		    test == GL3_TEXTURE_LOD_OFFSET ||
 		    test == GL3_TEXTURE_PROJ_LOD ||
@@ -588,7 +710,9 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
 			loc_bias = glGetUniformLocation(prog, "bias");
 
-		if (test == GL3_TEXTURE_GRAD ||
+		if (test == ARB_TEXTURE_GRAD ||
+		    test == ARB_TEXTURE_PROJ_GRAD ||
+		    test == GL3_TEXTURE_GRAD ||
 		    test == GL3_TEXTURE_GRAD_OFFSET ||
 		    test == GL3_TEXTURE_PROJ_GRAD ||
 		    test == GL3_TEXTURE_PROJ_GRAD_OFFSET) {
@@ -829,7 +953,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	float deriv = 1.0 / (TEX_SIZE >> fetch_level);
 
 	switch (test) {
-	case ARB_SHADER_TEXTURE_LOD:
+	case ARB_TEXTURE_LOD:
+	case ARB_TEXTURE_PROJ_LOD:
 	case GL3_TEXTURE_LOD:
 	case GL3_TEXTURE_PROJ_LOD:
 		/* set an explicit LOD */
@@ -855,6 +980,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	case GL3_TEXTURE_PROJ_GRAD_OFFSET:
 		fix_normalized_coordinates(expected_level, &s0, &t0, &s1, &t1);
 		/* fall through */
+	case ARB_TEXTURE_GRAD:
+	case ARB_TEXTURE_PROJ_GRAD:
 	case GL3_TEXTURE_GRAD:
 	case GL3_TEXTURE_PROJ_GRAD:
 		if (gltarget == GL_TEXTURE_3D) {
@@ -923,7 +1050,9 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		assert(0);
 	}
 
-	if (test == GL3_TEXTURE_PROJ ||
+	if (test == ARB_TEXTURE_PROJ_LOD ||
+	    test == ARB_TEXTURE_PROJ_GRAD ||
+	    test == GL3_TEXTURE_PROJ ||
 	    test == GL3_TEXTURE_PROJ_BIAS ||
 	    test == GL3_TEXTURE_PROJ_OFFSET ||
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
