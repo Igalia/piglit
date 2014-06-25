@@ -1,0 +1,28 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform ivec4 v;
+varying vec4 color;
+
+void main()
+{
+	int i = v.x + v.y + v.z + v.w;
+
+	color = (i == 27) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+uniform ivec4 v -2 -1 25 5
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
