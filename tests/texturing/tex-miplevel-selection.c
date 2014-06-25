@@ -132,6 +132,7 @@ enum shader_type {
 	GL3_TEXTURE_GRAD,
 	GL3_TEXTURE_GRAD_OFFSET,
 	GL3_TEXTURE_PROJ_GRAD,
+	GL3_TEXTURE_PROJ_GRAD_OFFSET,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -237,6 +238,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_GRAD_OFFSET;
 		else if (strcmp(argv[i], "textureProjGrad") == 0)
 			test = GL3_TEXTURE_PROJ_GRAD;
+		else if (strcmp(argv[i], "textureProjGradOffset") == 0)
+			test = GL3_TEXTURE_PROJ_GRAD_OFFSET;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -412,7 +415,8 @@ piglit_init(int argc, char **argv)
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 	    test == GL3_TEXTURE_PROJ_LOD ||
 	    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
-	    test == GL3_TEXTURE_PROJ_GRAD) {
+	    test == GL3_TEXTURE_PROJ_GRAD ||
+	    test == GL3_TEXTURE_PROJ_GRAD_OFFSET) {
 		if (!strcmp(type_str, "float"))
 			type_str = "vec2";
 		else if (!strcmp(type_str, "vec2"))
@@ -490,6 +494,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureProjGrad";
 		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
 		break;
+	case GL3_TEXTURE_PROJ_GRAD_OFFSET:
+		instruction = "textureProjGradOffset";
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy), OFFSET";
+		break;
 	default:
 		assert(0);
 	}
@@ -544,7 +552,8 @@ piglit_init(int argc, char **argv)
 
 		if (test == GL3_TEXTURE_GRAD ||
 		    test == GL3_TEXTURE_GRAD_OFFSET ||
-		    test == GL3_TEXTURE_PROJ_GRAD) {
+		    test == GL3_TEXTURE_PROJ_GRAD ||
+		    test == GL3_TEXTURE_PROJ_GRAD_OFFSET) {
 			loc_dx = glGetUniformLocation(prog, "dx");
 			loc_dy = glGetUniformLocation(prog, "dy");
 		}
@@ -555,7 +564,8 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 		    test == GL3_TEXTURE_LOD_OFFSET ||
 		    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
-		    test == GL3_TEXTURE_GRAD_OFFSET) {
+		    test == GL3_TEXTURE_GRAD_OFFSET ||
+		    test == GL3_TEXTURE_PROJ_GRAD_OFFSET) {
 			has_offset = GL_TRUE;
 			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
@@ -791,6 +801,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		break;
 
 	case GL3_TEXTURE_GRAD_OFFSET:
+	case GL3_TEXTURE_PROJ_GRAD_OFFSET:
 		fix_normalized_coordinates(expected_level, &s0, &t0, &s1, &t1);
 		/* fall through */
 	case GL3_TEXTURE_GRAD:
@@ -867,7 +878,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	    test == GL3_TEXTURE_PROJ_OFFSET_BIAS ||
 	    test == GL3_TEXTURE_PROJ_LOD ||
 	    test == GL3_TEXTURE_PROJ_LOD_OFFSET ||
-	    test == GL3_TEXTURE_PROJ_GRAD)
+	    test == GL3_TEXTURE_PROJ_GRAD ||
+	    test == GL3_TEXTURE_PROJ_GRAD_OFFSET)
 		p = 7;
 
 	switch (target) {

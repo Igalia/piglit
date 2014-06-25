@@ -1278,6 +1278,14 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection text
 add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGrad 1DShadow')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGrad 2DShadow')
 
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 1D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 1D_ProjVec4')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 2D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 2D_ProjVec4')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 3D')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 1DShadow')
+add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureProjGradOffset 2DShadow')
+
 # Group spec/glsl-1.40
 spec['glsl-1.40'] = {}
 import_glsl_parser_tests(spec['glsl-1.40'],
