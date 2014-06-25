@@ -129,6 +129,7 @@ enum shader_type {
 	GL3_TEXTURE_LOD_OFFSET,
 	GL3_TEXTURE_PROJ_LOD,
 	GL3_TEXTURE_PROJ_LOD_OFFSET,
+	GL3_TEXTURE_GRAD,
 };
 
 #define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
@@ -139,7 +140,7 @@ static enum target_type target = TEX_2D;
 static GLenum gltarget;
 static GLboolean has_offset;
 static GLboolean in_place_probing, no_bias, no_lod_clamp;
-static GLint loc_lod = -1, loc_bias = -1, loc_z = -1;
+static GLint loc_lod = -1, loc_bias = -1, loc_z = -1, loc_dx = -1, loc_dy = -1;
 static GLuint samp[2];
 
 static int offset[] = {3, -1, 2};
@@ -150,7 +151,9 @@ static int offset[] = {3, -1, 2};
 	"#extension GL_ARB_shader_texture_lod : enable\n" \
 	"uniform sampler%s tex, tex2; \n" \
 	"uniform float z, lod, bias; \n" \
+	"uniform vec3 dx, dy; \n" \
 	"#define TYPE %s \n" \
+	"#define DERIV_TYPE %s \n" \
 	"#define MASK %s \n" \
 	"#define OFFSET %s(ivec3(3, -1, 2)) \n" \
 	"%s" \
@@ -189,7 +192,7 @@ piglit_init(int argc, char **argv)
 	int i, level, layer, dim, num_layers;
 	const char *target_str, *type_str, *compare_value_mask = "";
 	const char *offset_type_str = "", *declaration = "", *instruction;
-	const char *version = "130", *other_params = "";
+	const char *version = "130", *other_params = "", *deriv_type = "";
 	GLenum format, attachment, clearbits;
 	char fscode[2048];
 
@@ -226,6 +229,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE_PROJ_LOD;
 		else if (strcmp(argv[i], "textureProjLodOffset") == 0)
 			test = GL3_TEXTURE_PROJ_LOD_OFFSET;
+		else if (strcmp(argv[i], "textureGrad") == 0)
+			test = GL3_TEXTURE_GRAD;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "1D_ProjVec4") == 0)
@@ -282,42 +287,49 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1D";
 		type_str = "float";
+		deriv_type = "float";
 		offset_type_str = "int";
 		break;
 	case TEX_1D_PROJ_VEC4:
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1D";
 		type_str = "vec4";
+		deriv_type = "float";
 		offset_type_str = "int";
 		break;
 	case TEX_2D:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2D";
 		type_str = "vec2";
+		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		break;
 	case TEX_2D_PROJ_VEC4:
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2D";
 		type_str = "vec4";
+		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		break;
 	case TEX_3D:
 		gltarget = GL_TEXTURE_3D;
 		target_str = "3D";
 		type_str = "vec3";
+		deriv_type = "vec3";
 		offset_type_str = "ivec3";
 		break;
 	case TEX_CUBE:
 		gltarget = GL_TEXTURE_CUBE_MAP;
 		target_str = "Cube";
 		type_str = "vec3";
+		deriv_type = "vec3";
 		break;
 	case TEX_1D_ARRAY:
 		piglit_require_gl_version(30);
 		gltarget = GL_TEXTURE_1D_ARRAY;
 		target_str = "1DArray";
 		type_str = "vec2";
+		deriv_type = "float";
 		offset_type_str = "int";
 		break;
 	case TEX_2D_ARRAY:
@@ -325,6 +337,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_2D_ARRAY;
 		target_str = "2DArray";
 		type_str = "vec3";
+		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		break;
 	case TEX_CUBE_ARRAY:
@@ -333,11 +346,13 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_CUBE_MAP_ARRAY;
 		target_str = "CubeArray";
 		type_str = "vec4";
+		deriv_type = "vec3";
 		break;
 	case TEX_1D_SHADOW:
 		gltarget = GL_TEXTURE_1D;
 		target_str = "1DShadow";
 		type_str = "vec3";
+		deriv_type = "float";
 		offset_type_str = "int";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
@@ -345,6 +360,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_2D;
 		target_str = "2DShadow";
 		type_str = "vec3";
+		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
@@ -353,6 +369,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_CUBE_MAP;
 		target_str = "CubeShadow";
 		type_str = "vec4";
+		deriv_type = "vec3";
 		compare_value_mask = "vec4(0.0, 0.0, 0.0, 1.0)";
 		break;
 	case TEX_1D_ARRAY_SHADOW:
@@ -360,6 +377,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_1D_ARRAY;
 		target_str = "1DArrayShadow";
 		type_str = "vec3";
+		deriv_type = "float";
 		offset_type_str = "int";
 		compare_value_mask = "vec3(0.0, 0.0, 1.0)";
 		break;
@@ -368,6 +386,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_2D_ARRAY;
 		target_str = "2DArrayShadow";
 		type_str = "vec4";
+		deriv_type = "vec2";
 		offset_type_str = "ivec2";
 		compare_value_mask = "vec4(0.0, 0.0, 0.0, 1.0)";
 		break;
@@ -377,6 +396,7 @@ piglit_init(int argc, char **argv)
 		gltarget = GL_TEXTURE_CUBE_MAP_ARRAY;
 		target_str = "CubeArrayShadow";
 		type_str = "vec4";
+		deriv_type = "vec3";
 		break;
 	}
 
@@ -451,6 +471,10 @@ piglit_init(int argc, char **argv)
 		instruction = "textureProjLodOffset";
 		other_params = ", lod, OFFSET";
 		break;
+	case GL3_TEXTURE_GRAD:
+		instruction = "textureGrad";
+		other_params = ", DERIV_TYPE(dx), DERIV_TYPE(dy)";
+		break;
 	default:
 		assert(0);
 	}
@@ -461,17 +485,19 @@ piglit_init(int argc, char **argv)
 		if (test == GL3_TEXTURE &&
 		    target == TEX_CUBE_ARRAY_SHADOW)
 			sprintf(fscode, GL3_FS_CODE_SHADOW_CUBEARRAY,
-				version, target_str, type_str,
+				version, target_str, type_str, deriv_type,
 				compare_value_mask, offset_type_str,
 				declaration, instruction, other_params);
 		else if (IS_SHADOW(target))
 			sprintf(fscode, GL3_FS_CODE_SHADOW, version, target_str,
-				type_str, compare_value_mask, offset_type_str,
-				declaration, instruction, other_params);
+				type_str, deriv_type, compare_value_mask,
+				offset_type_str, declaration, instruction,
+				other_params);
 		else
 			sprintf(fscode, GL3_FS_CODE, version, target_str,
-				type_str, compare_value_mask, offset_type_str,
-				declaration, instruction, other_params);
+				type_str, deriv_type, compare_value_mask,
+				offset_type_str, declaration, instruction,
+				other_params);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 
@@ -500,6 +526,11 @@ piglit_init(int argc, char **argv)
 		    test == GL3_TEXTURE_PROJ_BIAS ||
 		    test == GL3_TEXTURE_PROJ_OFFSET_BIAS)
 			loc_bias = glGetUniformLocation(prog, "bias");
+
+		if (test == GL3_TEXTURE_GRAD) {
+			loc_dx = glGetUniformLocation(prog, "dx");
+			loc_dy = glGetUniformLocation(prog, "dy");
+		}
 
 		if (test == GL3_TEXTURE_OFFSET ||
 		    test == GL3_TEXTURE_OFFSET_BIAS ||
@@ -694,6 +725,8 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	float z = clear_depths[expected_level];
 	/* multiplier for textureProj */
 	float p = 1;
+	/* explicit derivative */
+	float deriv = 1.0 / (TEX_SIZE >> fetch_level);
 
 	switch (test) {
 	case ARB_SHADER_TEXTURE_LOD:
@@ -716,6 +749,22 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		 */
 		s1 *= 1 << fetch_level;
 		t1 *= 1 << fetch_level;
+		break;
+
+	case GL3_TEXTURE_GRAD:
+		if (gltarget == GL_TEXTURE_3D) {
+			glUniform3f(loc_dx, 0, 0, deriv);
+			glUniform3f(loc_dy, 0, 0, deriv);
+		}
+		else if (gltarget == GL_TEXTURE_1D ||
+			 gltarget == GL_TEXTURE_1D_ARRAY) {
+			glUniform3f(loc_dx, deriv, 0, 0);
+			glUniform3f(loc_dy, deriv, 0, 0);
+		}
+		else {
+			glUniform3f(loc_dx, 0, deriv, 0);
+			glUniform3f(loc_dy, 0, deriv, 0);
+		}
 		break;
 
 	case GL3_TEXTURE_OFFSET_BIAS:
