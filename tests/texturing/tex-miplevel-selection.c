@@ -115,6 +115,7 @@ enum shader_type {
 	GL3_TEXTURE_BIAS,
 	GL3_TEXTURE,
 	GL3_TEXTURE_OFFSET,
+	GL3_TEXTURE_OFFSET_BIAS
 };
 
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
@@ -219,6 +220,23 @@ static const char *fscode_gl3_offset_shadow =
 	"                                    OFFSET)); \n"
 	"} \n";
 
+static const char *fscode_gl3_offset_bias =
+	GL3_FS_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = textureOffset(tex, TYPE(gl_TexCoord[0]), OFFSET, bias); \n"
+	"} \n";
+
+static const char *fscode_gl3_offset_bias_shadow =
+	GL3_FS_SHADOW_PREAMBLE
+	"uniform float bias; \n"
+	"void main() { \n"
+	"  gl_FragColor = vec4(textureOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, \n"
+	"                                    OFFSET, bias) * \n"
+	"                      textureOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, \n"
+	"                                    OFFSET, bias)); \n"
+	"} \n";
+
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
 	glSamplerParameteri(samp[0], pname, value);
@@ -231,7 +249,7 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fb, prog;
 	GLenum status;
 	int i, level, layer, dim, num_layers;
-	const char *target_str, *type_str, *compare_value_mask, *offset_type_str;
+	const char *target_str, *type_str, *compare_value_mask = "", *offset_type_str = "";
 	const char *version = "130";
 	GLenum format, attachment, clearbits;
 	char fscode[2048];
@@ -253,6 +271,8 @@ piglit_init(int argc, char **argv)
 			test = GL3_TEXTURE;
 		else if (strcmp(argv[i], "textureOffset") == 0)
 			test = GL3_TEXTURE_OFFSET;
+		else if (strcmp(argv[i], "textureOffset(bias)") == 0)
+			test = GL3_TEXTURE_OFFSET_BIAS;
 		else if (strcmp(argv[i], "1D") == 0)
 			target = TEX_1D;
 		else if (strcmp(argv[i], "2D") == 0)
@@ -400,9 +420,10 @@ piglit_init(int argc, char **argv)
 	case GL3_TEXTURE_LOD:
 		if (IS_SHADOW(target))
 			sprintf(fscode, fscode_gl3_lod_shadow, version, target_str,
-				type_str, compare_value_mask);
+				type_str, compare_value_mask, offset_type_str);
 		else
-			sprintf(fscode, fscode_gl3_lod, version, target_str, type_str);
+			sprintf(fscode, fscode_gl3_lod, version, target_str, type_str,
+				offset_type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		loc_lod = glGetUniformLocation(prog, "lod");
@@ -410,9 +431,10 @@ piglit_init(int argc, char **argv)
 	case GL3_TEXTURE_BIAS:
 		if (IS_SHADOW(target))
 			sprintf(fscode, fscode_gl3_bias_shadow, version, target_str,
-				type_str, compare_value_mask);
+				type_str, compare_value_mask, offset_type_str);
 		else
-			sprintf(fscode, fscode_gl3_bias, version, target_str, type_str);
+			sprintf(fscode, fscode_gl3_bias, version, target_str, type_str,
+				offset_type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		loc_bias = glGetUniformLocation(prog, "bias");
@@ -421,13 +443,15 @@ piglit_init(int argc, char **argv)
 		if (target == TEX_CUBE_ARRAY_SHADOW)
 			sprintf(fscode,
 				fscode_gl3_simple_shadow_cubearray,
-				version, target_str, type_str);
+				version, target_str, type_str, compare_value_mask,
+				offset_type_str);
 		else if (IS_SHADOW(target))
 			sprintf(fscode, fscode_gl3_simple_shadow,
-				version, target_str, type_str, compare_value_mask);
+				version, target_str, type_str, compare_value_mask,
+				offset_type_str);
 		else
 			sprintf(fscode, fscode_gl3_simple, version, target_str,
-				type_str);
+				type_str, offset_type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
 		if (target == TEX_CUBE_ARRAY_SHADOW)
@@ -443,6 +467,21 @@ piglit_init(int argc, char **argv)
 				type_str, offset_type_str);
 
 		prog = piglit_build_simple_program(NULL, fscode);
+
+		has_offset = GL_TRUE;
+		no_lod_clamp = GL_TRUE;
+		break;
+	case GL3_TEXTURE_OFFSET_BIAS:
+		if (IS_SHADOW(target))
+			sprintf(fscode, fscode_gl3_offset_bias_shadow,
+				version, target_str, type_str, compare_value_mask,
+				offset_type_str);
+		else
+			sprintf(fscode, fscode_gl3_offset_bias, version, target_str,
+				type_str, offset_type_str);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+		loc_bias = glGetUniformLocation(prog, "bias");
 
 		has_offset = GL_TRUE;
 		no_lod_clamp = GL_TRUE;
@@ -651,6 +690,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		/* set an explicit LOD */
 		glUniform1f(loc_lod, fetch_level - baselevel);
 		break;
+
 	case GL3_TEXTURE_BIAS:
 		/* set a bias */
 		glUniform1f(loc_bias, bias);
@@ -663,6 +703,11 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 		s1 *= 1 << fetch_level;
 		t1 *= 1 << fetch_level;
 		break;
+
+	case GL3_TEXTURE_OFFSET_BIAS:
+		/* set a bias */
+		glUniform1f(loc_bias, bias);
+		/* fall through */
 	case GL3_TEXTURE_OFFSET: {
 		/* Things get quite complicated with offsets.
 		 *
@@ -916,7 +961,9 @@ piglit_display(void)
 									set_sampler_parameter(GL_TEXTURE_MIN_LOD, minlod);
 									set_sampler_parameter(GL_TEXTURE_MAX_LOD, maxlod);
 								}
-								if (!no_bias && test != GL3_TEXTURE_BIAS)
+								if (!no_bias &&
+								    test != GL3_TEXTURE_BIAS &&
+								    test != GL3_TEXTURE_OFFSET_BIAS)
 									set_sampler_parameter(GL_TEXTURE_LOD_BIAS, bias);
 								set_sampler_parameter(GL_TEXTURE_MIN_FILTER,
 										mipfilter ? GL_NEAREST_MIPMAP_NEAREST
