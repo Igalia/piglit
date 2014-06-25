@@ -53,9 +53,11 @@ _expect(int line, GLenum token, GLint val)
 	glGetIntegerv(token, &ret);
 	if (ret != val) {
 		fprintf(stderr,
-			"line %d: %s was %d, expected %d\n",
+			"line %d: %s was %s, expected %s\n",
 			line,
-			piglit_get_gl_enum_name(token), ret, val);
+			piglit_get_gl_enum_name(token),
+			piglit_get_gl_enum_name(ret),
+			piglit_get_gl_enum_name(val));
 		return false;
 	}
 
