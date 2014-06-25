@@ -818,11 +818,7 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	float t0 = 0;
 	float s1 = (float)w / TEX_SIZE;
 	float t1 = (float)h / TEX_SIZE;
-	/* Cube coordinates */
-	float x0 = 2*s0 - 1;
-	float z0 = 2*t0 - 1;
-	float x1 = 2*s1 - 1;
-	float z1 = 2*t1 - 1;
+	float x0, z0, x1, z1;
 	/* Final coordinates */
 	float c0[4], c1[4], c2[4], c3[4];
 	/* shadow compare value */
@@ -937,6 +933,12 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	    test == GL3_TEXTURE_PROJ_GRAD_OFFSET)
 		p = 7;
 
+	/* Cube coordinates */
+	x0 = 2*s0 - 1;
+	z0 = 2*t0 - 1;
+	x1 = 2*s1 - 1;
+	z1 = 2*t1 - 1;
+
 	switch (target) {
 	case TEX_1D:
 		SET_VEC(c0, s0*p, p, 0, 1);
@@ -1020,17 +1022,17 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	case TEX_CUBE:
 	case TEX_CUBE_ARRAY:
 		assert(TEST_LAYER % 6 == 3); /* negative Y */
-		SET_VEC(c0, x0, -1,  z0, TEST_LAYER / 6);
-		SET_VEC(c1, x1, -1,  z0, TEST_LAYER / 6);
-		SET_VEC(c2, x1, -1, -z1, TEST_LAYER / 6);
-		SET_VEC(c3, x0, -1, -z1, TEST_LAYER / 6);
+		SET_VEC(c0, x0, -1, z0, TEST_LAYER / 6);
+		SET_VEC(c1, x1, -1, z0, TEST_LAYER / 6);
+		SET_VEC(c2, x1, -1, z1, TEST_LAYER / 6);
+		SET_VEC(c3, x0, -1, z1, TEST_LAYER / 6);
 		break;
 	case TEX_CUBE_SHADOW:
 		assert(TEST_LAYER % 6 == 3); /* negative Y */
-		SET_VEC(c0, x0, -1,  z0, z);
-		SET_VEC(c1, x1, -1,  z0, z);
-		SET_VEC(c2, x1, -1, -z1, z);
-		SET_VEC(c3, x0, -1, -z1, z);
+		SET_VEC(c0, x0, -1, z0, z);
+		SET_VEC(c1, x1, -1, z0, z);
+		SET_VEC(c2, x1, -1, z1, z);
+		SET_VEC(c3, x0, -1, z1, z);
 		break;
 	default:
 		assert(0);
@@ -1140,7 +1142,7 @@ piglit_display(void)
 	int fetch_level, baselevel, maxlevel, minlod, maxlod, bias, mipfilter;
 	int expected_level, x, y, total, failed;
 	int start_bias, end_bias;
-	int end_min_lod, end_max_lod, end_mipfilter;
+	int end_min_lod, end_max_lod, end_mipfilter, end_fetch_level;
 
 	if (no_bias) {
 		start_bias = 0;
@@ -1160,12 +1162,24 @@ piglit_display(void)
 
 	end_mipfilter = gltarget == GL_TEXTURE_RECTANGLE ? 0 : 1;
 
+	/* It's impossible to scale texture coordinates to fetch the last
+	 * level of a cubemap on a 3x3 quad. */
+	if ((gltarget == GL_TEXTURE_CUBE_MAP ||
+	     gltarget == GL_TEXTURE_CUBE_MAP_ARRAY) &&
+	    (test == GL3_TEXTURE ||
+	     test == GL3_TEXTURE_BIAS)) {
+		end_fetch_level = last_level - 1;
+	}
+	else {
+		end_fetch_level = last_level;
+	}
+
 	glClearColor(0.5, 0.5, 0.5, 0.5);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	total = 0;
 	failed = 0;
-	for (fetch_level = 0; fetch_level <= last_level; fetch_level++)
+	for (fetch_level = 0; fetch_level <= end_fetch_level; fetch_level++)
 		for (baselevel = 0; baselevel <= last_level; baselevel++)
 			for (maxlevel = baselevel; maxlevel <= last_level; maxlevel++)
 				for (minlod = 0; minlod <= end_min_lod; minlod++)
@@ -1228,7 +1242,7 @@ piglit_display(void)
 		glReadPixels(0, 0, piglit_width, piglit_height, GL_RGBA, GL_UNSIGNED_BYTE, pix);
 
 		total = 0;
-		for (fetch_level = 0; fetch_level <= last_level; fetch_level++)
+		for (fetch_level = 0; fetch_level <= end_fetch_level; fetch_level++)
 			for (baselevel = 0; baselevel <= last_level; baselevel++)
 				for (maxlevel = baselevel; maxlevel <= last_level; maxlevel++)
 					for (minlod = 0; minlod <= end_min_lod; minlod++)
