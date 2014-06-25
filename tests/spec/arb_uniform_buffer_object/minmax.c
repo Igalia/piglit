@@ -81,9 +81,9 @@ piglit_init(int argc, char **argv)
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &funiforms);
 	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &blocksize);
 	piglit_test_min_int(GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS,
-			 vblocks * blocksize + vuniforms);
+			 vblocks * blocksize / 4 + vuniforms);
 	piglit_test_min_int(GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS,
-			 fblocks * blocksize + funiforms);
+			 fblocks * blocksize / 4 + funiforms);
 	if (gs) {
 		if (piglit_get_gl_version() >= 31) {
 			glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, &gblocks);
@@ -91,7 +91,7 @@ piglit_init(int argc, char **argv)
 		glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &guniforms);
 
 		piglit_test_min_int(GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS,
-				    gblocks * blocksize + guniforms);
+				    gblocks * blocksize / 4 + guniforms);
 	}
 
 	piglit_test_min_int(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, 1);
