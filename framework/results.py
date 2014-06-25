@@ -168,7 +168,9 @@ class JSONWriter(object):
 
         """
         self.close_dict()
-        assert self._open_containers == []
+        # Parens make this evaluate differently?
+        assert self._open_containers == [], \
+            "containers stack: {0}".format(self._open_containers)
 
         self.file.close()
 
