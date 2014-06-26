@@ -123,6 +123,7 @@ enum shader_type {
 	GL3_TEXTURE_PROJ_OFFSET,
 };
 
+#define NEED_ARB_LOD(t) ((t) == ARB_SHADER_TEXTURE_LOD)
 #define NEED_GL3(t) ((t) >= GL3_TEXTURE_LOD)
 
 static enum shader_type test = FIXED_FUNCTION;
@@ -138,150 +139,33 @@ static int offset[] = {3, -1, 2};
 #define GL3_FS_PREAMBLE \
 	"#version %s \n" \
 	"#extension GL_ARB_texture_cube_map_array : enable \n" \
-	"uniform sampler%s tex; \n" \
-	"#define TYPE %s \n" \
-	"#define OFFSET %s(ivec3(3, -1, 2)) \n"
-
-#define GL3_FS_SHADOW_PREAMBLE \
-	"#version %s \n" \
-	"#extension GL_ARB_texture_cube_map_array : enable \n" \
+	"#extension GL_ARB_shader_texture_lod : enable\n" \
 	"uniform sampler%s tex, tex2; \n" \
-	"uniform float z; \n" \
+	"uniform float z, lod, bias; \n" \
 	"#define TYPE %s \n" \
 	"#define MASK %s \n" \
-	"#define OFFSET %s(ivec3(3, -1, 2)) \n"
-
-static const char *fscode_arb_lod =
-	"#extension GL_ARB_shader_texture_lod : require\n"
-	"uniform sampler2D tex;\n"
-	"uniform float lod;\n"
+	"#define OFFSET %s(ivec3(3, -1, 2)) \n" \
+	"%s" \
+	"#define textureInst %s \n" \
+	"#define PARAMS %s \n" \
 	"void main() {\n"
-	"  gl_FragColor = texture2DLod(tex, gl_TexCoord[0].xy, lod); \n"
-	"}\n";
 
-static const char *fscode_gl3_lod =
-	GL3_FS_PREAMBLE
-	"uniform float lod; \n"
-	"void main() { \n"
-	"  gl_FragColor = textureLod(tex, TYPE(gl_TexCoord[0]), lod); \n"
-	"} \n";
+#define GL3_FS_CODE \
+	GL3_FS_PREAMBLE \
+	"  gl_FragColor = textureInst(tex, TYPE(gl_TexCoord[0]) PARAMS); \n" \
+	"} \n"
 
-static const char *fscode_gl3_lod_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"uniform float lod; \n"
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureLod(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, lod) * \n"
-	"                      textureLod(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, lod)); \n"
-	"} \n";
+#define GL3_FS_CODE_SHADOW \
+	GL3_FS_PREAMBLE \
+	"  gl_FragColor = vec4(textureInst(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK PARAMS) * \n" \
+	"                      textureInst(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK PARAMS)); \n" \
+	"} \n"
 
-static const char *fscode_gl3_bias =
-	GL3_FS_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = texture(tex, TYPE(gl_TexCoord[0]), bias); \n"
-	"} \n";
-
-static const char *fscode_gl3_bias_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = vec4(texture(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, bias) * \n"
-	"                      texture(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, bias)); \n"
-	"} \n";
-
-static const char *fscode_gl3_simple =
-	GL3_FS_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = texture(tex, TYPE(gl_TexCoord[0])); \n"
-	"} \n";
-
-static const char *fscode_gl3_simple_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = vec4(texture(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK) * \n"
-	"                      texture(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK)); \n"
-	"} \n";
-
-static const char *fscode_gl3_simple_shadow_cubearray =
-	GL3_FS_SHADOW_PREAMBLE
-	"uniform float z; \n"
-	"void main() { \n"
-	"  gl_FragColor = vec4(texture(tex, gl_TexCoord[0], z - 0.05) * \n"
-	"                      texture(tex2, gl_TexCoord[0], z + 0.05)); \n"
-	"} \n";
-
-static const char *fscode_gl3_offset =
-	GL3_FS_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = textureOffset(tex, TYPE(gl_TexCoord[0]), OFFSET); \n"
-	"} \n";
-
-static const char *fscode_gl3_offset_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, \n"
-	"                                    OFFSET) * \n"
-	"                      textureOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, \n"
-	"                                    OFFSET)); \n"
-	"} \n";
-
-static const char *fscode_gl3_offset_bias =
-	GL3_FS_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = textureOffset(tex, TYPE(gl_TexCoord[0]), OFFSET, bias); \n"
-	"} \n";
-
-static const char *fscode_gl3_offset_bias_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, \n"
-	"                                    OFFSET, bias) * \n"
-	"                      textureOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, \n"
-	"                                    OFFSET, bias)); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj =
-	GL3_FS_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = textureProj(tex, TYPE(gl_TexCoord[0])); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureProj(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK) * \n"
-	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK)); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj_bias =
-	GL3_FS_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = textureProj(tex, TYPE(gl_TexCoord[0]), bias); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj_bias_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"uniform float bias; \n"
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureProj(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, bias) * \n"
-	"                      textureProj(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, bias)); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj_offset =
-	GL3_FS_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = textureProjOffset(tex, TYPE(gl_TexCoord[0]), OFFSET); \n"
-	"} \n";
-
-static const char *fscode_gl3_proj_offset_shadow =
-	GL3_FS_SHADOW_PREAMBLE
-	"void main() { \n"
-	"  gl_FragColor = vec4(textureProjOffset(tex, TYPE(gl_TexCoord[0]) - 0.05 * MASK, OFFSET) * \n"
-	"                      textureProjOffset(tex2, TYPE(gl_TexCoord[0]) + 0.05 * MASK, OFFSET)); \n"
-	"} \n";
+#define GL3_FS_CODE_SHADOW_CUBEARRAY \
+	GL3_FS_PREAMBLE \
+	"  gl_FragColor = vec4(textureInst(tex, gl_TexCoord[0], z - 0.05) * \n" \
+	"                      textureInst(tex2, gl_TexCoord[0], z + 0.05)); \n" \
+	"} \n"
 
 static void set_sampler_parameter(GLenum pname, GLint value)
 {
@@ -295,8 +179,9 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fb, prog;
 	GLenum status;
 	int i, level, layer, dim, num_layers;
-	const char *target_str, *type_str, *compare_value_mask = "", *offset_type_str = "";
-	const char *version = "130";
+	const char *target_str, *type_str, *compare_value_mask = "";
+	const char *offset_type_str = "", *declaration = "", *instruction;
+	const char *version = "130", *other_params = "";
 	GLenum format, attachment, clearbits;
 	char fscode[2048];
 
@@ -364,6 +249,10 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_framebuffer_object");
 	piglit_require_extension("GL_ARB_sampler_objects");
 	piglit_require_extension("GL_ARB_texture_storage");
+	if (NEED_ARB_LOD(test)) {
+		piglit_require_GLSL();
+		piglit_require_extension("GL_ARB_shader_texture_lod");
+	}
 	piglit_require_gl_version(NEED_GL3(test) ? 30 : 14);
 
 	if (target == TEX_2D_ARRAY_SHADOW &&
@@ -493,114 +382,39 @@ piglit_init(int argc, char **argv)
 	case FIXED_FUNCTION:
 		break;
 	case ARB_SHADER_TEXTURE_LOD:
-		piglit_require_GLSL();
-		piglit_require_extension("GL_ARB_shader_texture_lod");
-
-		prog = piglit_build_simple_program(NULL, fscode_arb_lod);
-		loc_lod = glGetUniformLocation(prog, "lod");
+		version = "120";
+		instruction = "texture2DLod";
+		other_params = ", lod";
 		break;
 	case GL3_TEXTURE_LOD:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_lod_shadow, version, target_str,
-				type_str, compare_value_mask, offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_lod, version, target_str, type_str,
-				offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-		loc_lod = glGetUniformLocation(prog, "lod");
+		instruction = "textureLod";
+		other_params = ", lod";
 		break;
 	case GL3_TEXTURE_BIAS:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_bias_shadow, version, target_str,
-				type_str, compare_value_mask, offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_bias, version, target_str, type_str,
-				offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-		loc_bias = glGetUniformLocation(prog, "bias");
+		instruction = "texture";
+		other_params = ", bias";
 		break;
 	case GL3_TEXTURE:
-		if (target == TEX_CUBE_ARRAY_SHADOW)
-			sprintf(fscode,
-				fscode_gl3_simple_shadow_cubearray,
-				version, target_str, type_str, compare_value_mask,
-				offset_type_str);
-		else if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_simple_shadow,
-				version, target_str, type_str, compare_value_mask,
-				offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_simple, version, target_str,
-				type_str, offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-		if (target == TEX_CUBE_ARRAY_SHADOW)
-			loc_z = glGetUniformLocation(prog, "z");
+		instruction = "texture";
 		break;
 	case GL3_TEXTURE_OFFSET:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_offset_shadow,
-				version, target_str, type_str, compare_value_mask,
-				offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_offset, version, target_str,
-				type_str, offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-
-		has_offset = GL_TRUE;
-		no_lod_clamp = GL_TRUE;
+		instruction = "textureOffset";
+		other_params = ", OFFSET";
 		break;
 	case GL3_TEXTURE_OFFSET_BIAS:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_offset_bias_shadow,
-				version, target_str, type_str, compare_value_mask,
-				offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_offset_bias, version, target_str,
-				type_str, offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-		loc_bias = glGetUniformLocation(prog, "bias");
-
-		has_offset = GL_TRUE;
-		no_lod_clamp = GL_TRUE;
+		instruction = "textureOffset";
+		other_params = ", OFFSET, bias";
 		break;
 	case GL3_TEXTURE_PROJ:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_proj_shadow, version, target_str,
-				type_str, compare_value_mask, offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_proj, version, target_str, type_str,
-				offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
+		instruction = "textureProj";
 		break;
 	case GL3_TEXTURE_PROJ_BIAS:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_proj_bias_shadow, version, target_str,
-				type_str, compare_value_mask, offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_proj_bias, version, target_str, type_str,
-				offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-		loc_bias = glGetUniformLocation(prog, "bias");
+		instruction = "textureProj";
+		other_params = ", bias";
 		break;
 	case GL3_TEXTURE_PROJ_OFFSET:
-		if (IS_SHADOW(target))
-			sprintf(fscode, fscode_gl3_proj_offset_shadow, version, target_str,
-				type_str, compare_value_mask, offset_type_str);
-		else
-			sprintf(fscode, fscode_gl3_proj_offset, version, target_str, type_str,
-				offset_type_str);
-
-		prog = piglit_build_simple_program(NULL, fscode);
-
-		has_offset = GL_TRUE;
-		no_lod_clamp = GL_TRUE;
+		instruction = "textureProjOffset";
+		other_params = ", OFFSET";
 		break;
 	default:
 		assert(0);
@@ -609,6 +423,23 @@ piglit_init(int argc, char **argv)
 	if (test != FIXED_FUNCTION) {
 		GLuint loc_tex, loc_tex2;
 
+		if (test == GL3_TEXTURE &&
+		    target == TEX_CUBE_ARRAY_SHADOW)
+			sprintf(fscode, GL3_FS_CODE_SHADOW_CUBEARRAY,
+				version, target_str, type_str,
+				compare_value_mask, offset_type_str,
+				declaration, instruction, other_params);
+		else if (IS_SHADOW(target))
+			sprintf(fscode, GL3_FS_CODE_SHADOW, version, target_str,
+				type_str, compare_value_mask, offset_type_str,
+				declaration, instruction, other_params);
+		else
+			sprintf(fscode, GL3_FS_CODE, version, target_str,
+				type_str, compare_value_mask, offset_type_str,
+				declaration, instruction, other_params);
+
+		prog = piglit_build_simple_program(NULL, fscode);
+
 		glUseProgram(prog);
 		loc_tex = glGetUniformLocation(prog, "tex");
 		glUniform1i(loc_tex, 0);
@@ -616,6 +447,26 @@ piglit_init(int argc, char **argv)
 		if (IS_SHADOW(target)) {
 			loc_tex2 = glGetUniformLocation(prog, "tex2");
 			glUniform1i(loc_tex2, 1);
+		}
+
+		if (test == GL3_TEXTURE &&
+		    target == TEX_CUBE_ARRAY_SHADOW)
+			loc_z = glGetUniformLocation(prog, "z");
+
+		if (test == ARB_SHADER_TEXTURE_LOD ||
+		    test == GL3_TEXTURE_LOD)
+			loc_lod = glGetUniformLocation(prog, "lod");
+
+		if (test == GL3_TEXTURE_BIAS ||
+		    test == GL3_TEXTURE_OFFSET_BIAS ||
+		    test == GL3_TEXTURE_PROJ_BIAS)
+			loc_bias = glGetUniformLocation(prog, "bias");
+
+		if (test == GL3_TEXTURE_OFFSET ||
+		    test == GL3_TEXTURE_OFFSET_BIAS ||
+		    test == GL3_TEXTURE_PROJ_OFFSET) {
+			has_offset = GL_TRUE;
+			no_lod_clamp = GL_TRUE; /* not implemented for now */
 		}
 	}
 
