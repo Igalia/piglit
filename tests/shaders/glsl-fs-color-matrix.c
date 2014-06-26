@@ -81,7 +81,6 @@ static const GLfloat tex_coord[] = {
 	0.0, 1.0,
 };
 
-static const GLfloat black[4] = { 0.0, 0.0, 0.0, 1.0 };
 static const GLfloat white[4] = { 1.0, 1.0, 1.0, 1.0 };
 static const GLfloat red[4]   = { 1.0, 0.0, 0.0, 1.0 };
 static const GLfloat green[4] = { 0.0, 1.0, 0.0, 1.0 };
