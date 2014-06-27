@@ -35,7 +35,7 @@ from copy import copy, deepcopy
 
 
 # Export 'debug' so other Piglit modules can easily enable it.
-debug = True
+debug = False
 
 
 def _log_debug(msg):
