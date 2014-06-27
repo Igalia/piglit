@@ -9,5 +9,6 @@ link_libraries (
 )
 
 piglit_add_executable (arb_copy_image-simple simple.c)
+piglit_add_executable (arb_copy_image-targets targets.c)
 
 # vim: ft=cmake:
