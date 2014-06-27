@@ -31,23 +31,30 @@ resolve_${f0.name}(void)
 {
 % for req in alias_set.requirements:
 >-------/* ${req.command.name} (${req.provider.name}) */
-% for api in sorted(set(dispatch.APIS[x] for x in req.apis)):
+<% apis = sorted(set(dispatch.APIS[x] for x in req.apis)) %>
+% for api in apis:
 % if loop.first:
->-------if ((
-% else:
->-------     .
+>-------if (
+% if req.has_extension:
+............(
 % endif
-.............(dispatch_api == ${api.c_piglit_token}
+% endif
+% if len(apis) > 1:
+............(
+% endif
+.............dispatch_api == ${api.c_piglit_token}
 % if req.has_feature and req.feature.version_int > api.base_version_int:
 ................................................... && check_version(${req.feature.version_int})
 % endif
+% if len(apis) > 1:
 ................................................................................................)
+% endif
 % if not loop.last:
-................................................................................................. ||
+................................................................................................. || .
 % endif
 % endfor
-....................................................................................................)
 % if req.has_extension:
+....................................................................................................)
 >-------    && check_extension("${req.extension.name}")
 % endif
 ...............................................................) {
