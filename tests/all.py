@@ -3357,6 +3357,12 @@ arb_copy_buffer['overlap'] = concurrent_test('arb_copy_buffer-overlap')
 arb_copy_buffer['targets'] = concurrent_test('arb_copy_buffer-targets')
 arb_copy_buffer['subdata-sync'] = concurrent_test('arb_copy_buffer-subdata-sync')
 
+arb_copy_image = {}
+spec['ARB_copy_image'] = arb_copy_image
+add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --tex-to-tex')
+add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --rb-to-tex')
+add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --rb-to-rb')
+
 arb_half_float_vertex = {}
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
 add_plain_test(arb_half_float_vertex, 'draw-vertices-half-float')
