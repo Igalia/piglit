@@ -3435,6 +3435,11 @@ add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_3D 32 32 
 add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_3D 32 32 17 GL_TEXTURE_CUBE_MAP_ARRAY 16 16 18 11 5 2 5 9 7 5 7 11')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_3D 32 32 17 GL_TEXTURE_3D 32 16 18 11 5 2 5 9 7 14 7 11')
 
+add_concurrent_test(arb_copy_image, 'arb_copy_image-formats')
+add_concurrent_test(arb_copy_image, 'arb_copy_image-formats --samples=2')
+add_concurrent_test(arb_copy_image, 'arb_copy_image-formats --samples=4')
+add_concurrent_test(arb_copy_image, 'arb_copy_image-formats --samples=8')
+
 arb_half_float_vertex = {}
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
 add_plain_test(arb_half_float_vertex, 'draw-vertices-half-float')
