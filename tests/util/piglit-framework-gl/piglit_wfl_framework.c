@@ -438,9 +438,11 @@ special_case_gl31(struct piglit_wfl_framework *wfl_fw,
 		 * promise that the returned context will have the requested
 		 * profile.  So Piglit has no need to check the profile here.
 		 */
+#if 0
 		piglit_logi("Requested an %s, and received a matching "
 			    "%d.%d context\n", context_description,
 			    actual_gl_version / 10, actual_gl_version % 10);
+#endif
 		return true;
 	}
 
@@ -451,12 +453,14 @@ special_case_gl31(struct piglit_wfl_framework *wfl_fw,
 		return true;
 	}
 
+#if 0
 	piglit_logi("Requested an %s, and the returned context is exactly a 3.1 "
 		    "context. But it has the wrong profile because it %s the "
 		    "GL_ARB_compatibility extension. Fallback to requesting a "
 		    "3.2 context, which is guaranteed to have the correct "
 		    "profile if context creation succeeds.",
 		    context_description, error_verb);
+#endif
 
 	waffle_config_destroy(wfl_fw->config);
 	waffle_context_destroy(wfl_fw->context);
