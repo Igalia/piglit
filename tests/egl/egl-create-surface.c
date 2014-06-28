@@ -37,12 +37,6 @@
 #include "piglit-util-gl-common.h"
 #include "egl-util.h"
 
-static const EGLint pixmap_attribs[] = {
-	EGL_TEXTURE_FORMAT,	EGL_TEXTURE_RGB,
-	EGL_TEXTURE_TARGET,	EGL_TEXTURE_2D,
-	EGL_NONE
-};
-
 static enum piglit_result
 draw(struct egl_state *state)
 {
