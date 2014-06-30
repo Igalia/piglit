@@ -52,3 +52,9 @@ class GleanTest(Test):
             self.result['result'] = 'fail'
         else:
             self.result['result'] = 'pass'
+
+    def is_skip(self):
+        # Glean tests require glx
+        if self.OPTS.env['PIGLIT_PLATFORM'] not in ['glx', 'mixed_glx_egl']:
+            return True
+        return super(GleanTest, self).is_skip()
