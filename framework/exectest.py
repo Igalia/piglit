@@ -165,7 +165,7 @@ class Test(object):
             '{0}="{1}"'.format(k, v) for k, v in itertools.chain(
                 self.OPTS.env.iteritems(), self.env.iteritems()))
 
-        if self.check_for_skip_scenario():
+        if self.is_skip():
             self.result['result'] = 'skip'
             self.result['out'] = "skipped by self.is_skip()"
             self.result['err'] = ""
@@ -205,7 +205,7 @@ class Test(object):
                 # Test passed but has valgrind errors.
                 self.result['result'] = 'fail'
 
-    def check_for_skip_scenario(self):
+    def is_skip(self):
         """ Application specific check for skip
 
         If this function returns a truthy value then the current test will be
@@ -295,7 +295,7 @@ class PiglitTest(Test):
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
-    def check_for_skip_scenario(self):
+    def is_skip(self):
         """ Native Piglit-test specific skip checking
 
         If we are running on gbm don't run glean or glx- tests
