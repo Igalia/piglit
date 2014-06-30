@@ -64,6 +64,12 @@ piglit_loge(const char *fmt, ...);
 void
 piglit_logi(const char *fmt, ...);
 
+/**
+ * Log a debug message if environment variable PIGLIT_DEBUG is "1" or "true".
+ */
+void
+piglit_logd(const char *fmt, ...);
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

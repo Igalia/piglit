@@ -115,3 +115,40 @@ piglit_logi(const char *fmt, ...)
 	piglit_log_tagv("info", fmt, ap);
 	va_end(ap);
 }
+
+void
+piglit_logd(const char *fmt, ...)
+{
+	static bool once = true;
+	static bool debug = false;
+	va_list ap;
+
+	if (once) {
+		const char *env;
+
+		once = false;
+		env = getenv("PIGLIT_DEBUG");
+
+		if (env == NULL
+		    || streq(env, "")
+		    || streq(env, "0")
+		    || streq(env, "false")) {
+			debug = false;
+		} else if (streq(env, "1")
+			   || streq(env, "true")) {
+			debug = true;
+		} else {
+			piglit_loge("PIGLIT_DEBUG has invalid value: "
+				    "%s\n", env);
+			abort();
+		}
+	}
+
+	if (!debug) {
+		return;
+	}
+
+	va_start(ap, fmt);
+	piglit_log_tagv("debug", fmt, ap);
+	va_end(ap);
+}
