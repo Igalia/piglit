@@ -43,12 +43,6 @@ __all__ = ['Test',
            'PiglitTest',
            'TEST_BIN_DIR']
 
-# Platform global variables
-if 'PIGLIT_PLATFORM' in os.environ:
-    PIGLIT_PLATFORM = os.environ['PIGLIT_PLATFORM']
-else:
-    PIGLIT_PLATFORM = ''
-
 if 'PIGLIT_BUILD_DIR' in os.environ:
     TEST_BIN_DIR = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
 else:
@@ -298,13 +292,13 @@ class PiglitTest(Test):
     def is_skip(self):
         """ Native Piglit-test specific skip checking
 
-        If we are running on gbm don't run glean or glx- tests
+        If the platform for the run doesn't suppoprt glx (either directly as
+        glx or through the hybrid glx/x11_egl setup that is default), then skip
+        any glx specific tests.
 
         """
-        if PIGLIT_PLATFORM == 'gbm':
+        if self.OPTS.env['PIGLIT_PLATFORM'] not in ['glx', 'mixed_glx_egl']:
             split_command = os.path.split(self._command[0])[1]
-            if 'glean' == split_command:
-                return True
             if split_command.startswith('glx-'):
                 return True
         return False
