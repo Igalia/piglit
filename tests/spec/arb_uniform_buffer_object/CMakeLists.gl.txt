@@ -12,6 +12,7 @@ link_libraries (
 
 piglit_add_executable (arb_uniform_buffer_object-bindbuffer-general-point bindbuffer-general-point.c)
 piglit_add_executable (arb_uniform_buffer_object-buffer-targets buffer-targets.c)
+piglit_add_executable (arb_uniform_buffer_object-bufferstorage bufferstorage.c)
 piglit_add_executable (arb_uniform_buffer_object-deletebuffers deletebuffers.c)
 piglit_add_executable (arb_uniform_buffer_object-dlist dlist.c)
 piglit_add_executable (arb_uniform_buffer_object-getactiveuniformblockiv-uniform-block-data-size getactiveuniformblockiv-uniform-block-data-size.c uniform-types.c)

@@ -2935,6 +2935,7 @@ add_shader_test_dir(spec['ARB_uniform_buffer_object'],
                     recursive=True)
 arb_uniform_buffer_object['bindbuffer-general-point'] = concurrent_test('arb_uniform_buffer_object-bindbuffer-general-point')
 arb_uniform_buffer_object['buffer-targets'] = concurrent_test('arb_uniform_buffer_object-buffer-targets')
+arb_uniform_buffer_object['bufferstorage'] = concurrent_test('arb_uniform_buffer_object-bufferstorage')
 arb_uniform_buffer_object['deletebuffers'] = concurrent_test('arb_uniform_buffer_object-deletebuffers')
 arb_uniform_buffer_object['dlist'] = concurrent_test('arb_uniform_buffer_object-dlist')
 arb_uniform_buffer_object['getactiveuniformblockiv-uniform-block-data-size'] = concurrent_test('arb_uniform_buffer_object-getactiveuniformblockiv-uniform-block-data-size')
