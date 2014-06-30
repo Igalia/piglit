@@ -69,7 +69,7 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 #endif
 	}
 
-	else if (strcmp(env, "gbm") == 0) {
+	else if (streq(env, "gbm")) {
 #ifdef PIGLIT_HAS_GBM
 		return WAFFLE_PLATFORM_GBM;
 #else
@@ -79,7 +79,7 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 #endif
 	}
 
-	else if (strcmp(env, "glx") == 0) {
+	else if (streq(env, "glx")) {
 #ifdef PIGLIT_HAS_GLX
 		return WAFFLE_PLATFORM_GLX;
 #else
@@ -89,7 +89,7 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 #endif
 	}
 
-	else if (strcmp(env, "x11_egl") == 0) {
+	else if (streq(env, "x11_egl")) {
 #if defined(PIGLIT_HAS_X11) && defined(PIGLIT_HAS_EGL)
 		return WAFFLE_PLATFORM_X11_EGL;
 #else
@@ -99,7 +99,7 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 #endif
 	}
 
-	else if (strcmp(env, "wayland") == 0) {
+	else if (streq(env, "wayland")) {
 #ifdef PIGLIT_HAS_WAYLAND
 		return WAFFLE_PLATFORM_WAYLAND;
 #else
