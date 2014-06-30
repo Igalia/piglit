@@ -1,4 +1,3 @@
-#
 # Permission is hereby granted, free of charge, to any person
 
 # obtaining a copy of this software and associated documentation
@@ -21,6 +20,8 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+""" Glean support """
+
 import os
 
 from .exectest import Test, TEST_BIN_DIR
@@ -28,6 +29,12 @@ from .exectest import Test, TEST_BIN_DIR
 
 # GleanTest: Execute a sub-test of Glean
 class GleanTest(Test):
+    """ Execute a glean subtest
+
+    This class descendes from exectest.Test, and provides methods for running
+    glean tests.
+
+    """
     GLOBAL_PARAMS = []
     _EXECUTABLE = os.path.join(TEST_BIN_DIR, "glean")
 
