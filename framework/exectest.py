@@ -221,8 +221,7 @@ class Test(object):
             # failed.
             if e.errno == errno.ENOENT:
                 self.result['result'] = 'skip'
-                out = ("PIGLIT: {'result': 'skip'}\n"
-                       "Test executable not found.\n")
+                out = "Test executable not found.\n"
                 err = ""
                 returncode = None
             else:
