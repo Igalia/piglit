@@ -71,7 +71,8 @@ def run(input_):
                              dest="concurrency",
                              help="Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
-                        choices=["glx", "x11_egl", "wayland", "gbm"],
+                        choices=["glx", "x11_egl", "wayland", "gbm",
+                                 "mixed_glx_egl"],
                         help="Name of windows system passed to waffle")
     parser.add_argument("-f", "--config",
                         dest="config_file",
