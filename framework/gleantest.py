@@ -27,13 +27,15 @@ from .exectest import Test, TEST_BIN_DIR
 
 glean_executable = os.path.join(TEST_BIN_DIR, "glean")
 
+
 # GleanTest: Execute a sub-test of Glean
 class GleanTest(Test):
     globalParams = []
 
     def __init__(self, name, **kwargs):
-        super(GleanTest, self).__init__([glean_executable, "-o", "-v", "-v",
-                                       "-v", "-t", "+" + name])
+        super(GleanTest, self).__init__(
+            [glean_executable, "-o", "-v", "-v", "-v", "-t", "+" + name],
+            **kwargs)
 
     @Test.command.getter
     def command(self):
