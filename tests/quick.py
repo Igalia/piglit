@@ -5,7 +5,7 @@ from tests.all import profile
 
 __all__ = ['profile']
 
-GleanTest.globalParams += ["--quick"]
+GleanTest.GLOBAL_PARAMS += ["--quick"]
 
 # These take too long
 del profile.tests['shaders']['glsl-fs-inline-explosion']

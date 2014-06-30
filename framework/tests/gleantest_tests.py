@@ -32,21 +32,21 @@ def test_initialize_gleantest():
     assert test
 
 
-def test_globalParams_assignment():
-    """ Test to ensure that GleanTest.globalParams are correctly assigned
+def test_GLOBAL_PARAMS_assignment():
+    """ Test to ensure that GleanTest.GLOBAL_PARAMS are correctly assigned
 
-    Specifically this tests for a bug where globalParams only affected
-    instances of GleanTest created after globalParams were set, so changing the
-    globalParams value had unexpected results.
+    Specifically this tests for a bug where GLOBAL_PARAMS only affected
+    instances of GleanTest created after GLOBAL_PARAMS were set, so changing the
+    GLOBAL_PARAMS value had unexpected results.
 
     If this test passes the GleanTest.command attributes will be the same in
-    the instance created before the globalParams assignment and the one created
-    after. A failure means the that globalParams are not being added to tests
+    the instance created before the GLOBAL_PARAMS assignment and the one created
+    after. A failure means the that GLOBAL_PARAMS are not being added to tests
     initialized before it is set.
 
     """
     test1 = GleanTest('basic')
-    GleanTest.globalParams = ['--quick']
+    GleanTest.GLOBAL_PARAMS = ['--quick']
     test2 = GleanTest('basic')
     assert test1.command == test2.command
 

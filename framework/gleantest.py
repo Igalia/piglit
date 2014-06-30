@@ -30,7 +30,7 @@ glean_executable = os.path.join(TEST_BIN_DIR, "glean")
 
 # GleanTest: Execute a sub-test of Glean
 class GleanTest(Test):
-    globalParams = []
+    GLOBAL_PARAMS = []
 
     def __init__(self, name, **kwargs):
         super(GleanTest, self).__init__(
@@ -39,7 +39,7 @@ class GleanTest(Test):
 
     @Test.command.getter
     def command(self):
-        return super(GleanTest, self).command + self.globalParams
+        return super(GleanTest, self).command + self.GLOBAL_PARAMS
 
     def interpret_result(self):
         if self.result['returncode'] != 0 or 'FAIL' in self.result['out']:
