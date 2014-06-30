@@ -10,3 +10,7 @@
 [igt]
 ; Set bindir equal to the absolute root of the igt directory
 ;path=/home/user/src/igt
+
+[oglconform]
+; Set bindir equal to the absolute root of the oglconform directory
+;path=/home/usr/src/oglconform

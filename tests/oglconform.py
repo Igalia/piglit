@@ -26,13 +26,14 @@ import re
 import sys
 import subprocess
 
+import framework.core
 from framework.profile import TestProfile
-from framework.exectest import Test, TEST_BIN_DIR
+from framework.exectest import Test
 from os import path
 
 __all__ = ['profile']
 
-bin_oglconform = path.join(TEST_BIN_DIR, 'oglconform')
+bin_oglconform = framework.core.PIGLIT_CONFIG.get('oglconform', 'path')
 
 if not os.path.exists(bin_oglconform):
     sys.exit(0)
