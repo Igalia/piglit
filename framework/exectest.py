@@ -147,7 +147,7 @@ class Test(object):
 
         if self.check_for_skip_scenario():
             self.result['result'] = 'skip'
-            self.result['out'] = ""
+            self.result['out'] = "skipped by self.is_skip()"
             self.result['err'] = ""
             self.result['returncode'] = None
             return
