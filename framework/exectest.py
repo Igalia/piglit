@@ -20,6 +20,8 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+""" Module provides a base class for Tests """
+
 import errno
 import os
 import subprocess
@@ -55,16 +57,29 @@ else:
 
 
 class Test(object):
+    """ Abstract base class for Test classes
+
+    This class provides the framework for running tests, with several methods
+    and properties that can be overwritten to produce a specialized class for
+    running test suites other than piglit.
+
+    It provides two methods for running tests, excecute and run.
+    execute() provides lots of features, and is invoced when running piglit
+    from the command line, run() is a more basic method for running the test,
+    and is called internally by execute(), but is can be useful outside of it.
+
+    Arguments:
+    command -- a value to be passed to subprocess.Popen
+
+    Keyword Arguments:
+    run_concurrent -- If True the test is thread safe. Default: False
+
+    """
     OPTS = Options()
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
                  '_test_hook_execute_run']
 
     def __init__(self, command, run_concurrent=False):
-        '''
-                'run_concurrent' controls whether this test will
-                execute it's work (i.e. __doRunWork) on the calling thread
-                (i.e. the main thread) or from the ConcurrentTestPool threads.
-        '''
         self._command = None
         self.run_concurrent = run_concurrent
         self.command = command
@@ -77,13 +92,18 @@ class Test(object):
         self._test_hook_execute_run = lambda: None
 
     def execute(self, path, log, json_writer, dmesg):
-        '''
-        Run the test.
+        """ Run a test
 
-        :path:
-            Fully qualified test name as a string.  For example,
-            ``spec/glsl-1.30/preprocessor/compiler/keywords/void.frag``.
-        '''
+        Run a test, but with features. This times the test, uses dmesg checking
+        (if requested), and runs the logger.
+
+        Arguments:
+        path -- the name of the test
+        log -- a log.Log instance
+        json_writer -- a results.JSONWriter instance
+        dmesg -- a dmesg.BaseDmesg derived class
+
+        """
         log_current = log.pre_log(path if self.OPTS.verbose else None)
 
         # Run the test
@@ -195,6 +215,12 @@ class Test(object):
         return False
 
     def __run_command(self):
+        """ Run the test command and get the result
+
+        This method sets environment options, then runs the executable. If the
+        executable isn't found it sets the result to skip.
+
+        """
         # Set the environment for the tests. Use the default settings created
         # in the Options constructor first, then use any user defined
         # variables, finally, use any variables set for the test in the test
