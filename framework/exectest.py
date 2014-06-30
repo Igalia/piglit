@@ -155,7 +155,7 @@ class Test(object):
         # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
         # developers. If we catch it happening, try just re-running the test.
         for _ in xrange(5):
-            self.get_command_result()
+            self.__run_command()
             if "Got spurious window resize" not in self.result['out']:
                 break
 
@@ -194,7 +194,7 @@ class Test(object):
         """
         return False
 
-    def get_command_result(self):
+    def __run_command(self):
         # Set the environment for the tests. Use the default settings created
         # in the Options constructor first, then use any user defined
         # variables, finally, use any variables set for the test in the test
