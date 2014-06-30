@@ -187,7 +187,7 @@ class TestProfile(object):
         """
 
         self._pre_run_hook()
-        framework.exectest.Test.Opts = opts
+        framework.exectest.Test.OPTS = opts
 
         chunksize = 1
 
