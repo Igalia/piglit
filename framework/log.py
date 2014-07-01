@@ -95,11 +95,12 @@ class Log(object):
 
     def __print(self, name, result):
         """ Do the actual printing """
-        self._write_output(self.__output.format(**{'percent': self._percent(),
-                                                   'running': self._running(),
-                                                   'summary': self._summary(),
-                                                   'name': name,
-                                                   'result': result}))
+        self._write_output(self.__output.format(
+            percent=self._percent(),
+            running=self._running(),
+            summary=self._summary(),
+            name=name,
+            result=result))
 
     @synchronized_self
     def log(self, name, result, value):
@@ -147,5 +148,6 @@ class Log(object):
         return x
 
     def summary(self):
-        self._write_output(self.__summary_output.format(**{'percent': self._percent(),
-                                                           'summary': self._summary()}))
+        self._write_output(self.__summary_output.format(
+            percent=self._percent(),
+            summary=self._summary()))
