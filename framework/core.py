@@ -89,13 +89,11 @@ class Options(object):
     exclude_filter -- list of compiled regex which exclude tests that match
     valgrind -- True if valgrind is to be used
     dmesg -- True if dmesg checking is desired. This forces concurrency off
-    verbose -- verbosity level.
     env -- environment variables set for each test before run
 
     """
     def __init__(self, concurrent=True, execute=True, include_filter=None,
-                 exclude_filter=None, valgrind=False, dmesg=False,
-                 verbose=False, sync=False):
+                 exclude_filter=None, valgrind=False, dmesg=False, sync=False):
         self.concurrent = concurrent
         self.execute = execute
         self.filter = [re.compile(x) for x in include_filter or []]
@@ -103,8 +101,8 @@ class Options(object):
         self.exclude_tests = set()
         self.valgrind = valgrind
         self.dmesg = dmesg
-        self.verbose = verbose
         self.sync = sync
+
         # env is used to set some base environment variables that are not going
         # to change across runs, without sending them to os.environ which is
         # fickle and easy to break

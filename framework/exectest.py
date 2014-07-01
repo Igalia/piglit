@@ -99,8 +99,7 @@ class Test(object):
         dmesg -- a dmesg.BaseDmesg derived class
 
         """
-        log_current = log.pre_log(path if self.OPTS.verbose else None)
-
+        log.start(path)
         # Run the test
         if self.OPTS.execute:
             try:
@@ -119,9 +118,9 @@ class Test(object):
                 self.result['traceback'] = "".join(
                     traceback.format_tb(exception[2]))
 
-            log.log(path, self.result['result'], log_current)
+            log.log(self.result['result'])
         else:
-            log.log(path, 'dry-run', log_current)
+            log.log('dry-run')
 
     @property
     def command(self):

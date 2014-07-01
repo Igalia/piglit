@@ -155,10 +155,6 @@ def _run_parser(input_):
                         action="store_true",
                         help="Capture a difference in dmesg before and "
                              "after each test. Implies -1/--no-concurrency")
-    parser.add_argument("-v", "--verbose",
-                        action="store_true",
-                        help="Produce a line of output for each test before "
-                             "and after it runs")
     parser.add_argument("-s", "--sync",
                         action="store_true",
                         help="Sync results to disk after every test")
@@ -172,6 +168,20 @@ def _run_parser(input_):
                         metavar="config_file",
                         dest="__unused",
                         help="override piglit.conf search path")
+    log_parser = parser.add_mutually_exclusive_group()
+    log_parser.add_argument('-v', '--verbose',
+                            action='store_const',
+                            const='verbose',
+                            default='quiet',
+                            dest='log_level',
+                            help='DEPRECATED! Print more information during '
+                                 'test runs. Use -l/--log-level instead')
+    log_parser.add_argument("-l", "--log-level",
+                            dest="log_level",
+                            action="store",
+                            choices=['quiet', 'verbose', 'dummy'],
+                            default='quiet',
+                            help="Set the logger verbosity level")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -222,7 +232,6 @@ def run(input_):
                         execute=args.execute,
                         valgrind=args.valgrind,
                         dmesg=args.dmesg,
-                        verbose=args.verbose,
                         sync=args.sync)
 
     # Set the platform to pass to waffle
@@ -255,6 +264,7 @@ def run(input_):
     # part of profile.run
     options['test_count'] = 0
     options['test_suffix'] = args.junit_suffix
+    options['log_level'] = args.log_level
 
     # Begin json.
     backend = framework.results.get_backend(args.backend)(
@@ -269,7 +279,7 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
-    profile.run(opts, backend)
+    profile.run(opts, args.log_level, backend)
     time_end = time.time()
 
     results.time_elapsed = time_end - time_start
@@ -299,7 +309,6 @@ def resume(input_):
                         execute=results.options['execute'],
                         valgrind=results.options['valgrind'],
                         dmesg=results.options['dmesg'],
-                        verbose=results.options['verbose'],
                         sync=results.options['sync'])
 
     core.get_config(args.config_file)
@@ -324,7 +333,7 @@ def resume(input_):
         profile.dmesg = opts.dmesg
 
     # This is resumed, don't bother with time since it wont be accurate anyway
-    profile.run(opts, backend)
+    profile.run(opts, results.options['log_level'], backend)
 
     backend.finalize()
 

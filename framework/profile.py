@@ -34,7 +34,7 @@ import multiprocessing.dummy
 import importlib
 
 from framework.dmesg import get_dmesg
-from framework.log import Log
+from framework.log import LogManager
 import framework.exectest
 
 __all__ = [
@@ -167,7 +167,7 @@ class TestProfile(object):
         """
         pass
 
-    def run(self, opts, backend):
+    def run(self, opts, logger, backend):
         """ Runs all tests using Thread pool
 
         When called this method will flatten out self.tests into
@@ -193,7 +193,7 @@ class TestProfile(object):
         chunksize = 1
 
         self._prepare_test_list(opts)
-        log = Log(len(self.test_list), opts.verbose)
+        log = LogManager(logger, len(self.test_list))
 
         def test(pair):
             """ Function to call test.execute from .map
@@ -202,7 +202,7 @@ class TestProfile(object):
 
             """
             name, test = pair
-            test.execute(name, log, self.dmesg)
+            test.execute(name, log.get(), self.dmesg)
             backend.write_test(name, test.result)
 
         def run_threads(pool, testlist):
@@ -230,7 +230,7 @@ class TestProfile(object):
             run_threads(single, (x for x in self.test_list.iteritems()
                                  if not x[1].run_concurrent))
 
-        log.summary()
+        log.get().summary()
 
         self._post_run_hook()
 
