@@ -102,14 +102,21 @@ class Log(object):
                                                    'result': result}))
 
     @synchronized_self
-    def post_log(self, value, result):
-        """ Used to mark a test as complete in the log
+    def log(self, name, result, value):
+        """ Print to the screen
+
+        Works by moving the cursor back to the front of the line and printing
+        over it.
 
         Arguments:
-        value -- the test number to mark complete
-        result -- the result of the completed test
+        name -- the name of the test
+        result -- the result of the test
+        value -- the number of the test to remove
 
         """
+        assert result in self.__summary_keys
+        self.__print(name, result)
+
         # Mark running complete
         assert value in self.__running
         self.__running.remove(value)
@@ -121,27 +128,16 @@ class Log(object):
         self.__summary[result] += 1
 
     @synchronized_self
-    def log(self, name, result):
-        """ Print to the screen 
-
-        Works by moving the cursor back to the front of the line and printing
-        over it.
-
-        """
-        assert result in self.__summary_keys
-        self.__print(name, result)
-
-    @synchronized_self
     def pre_log(self, running=None):
         """ Hook to run before log()
-        
+
         Returns a new number to know what processes are running, if running is
         set it will print a running message for the test
 
         Keyword Arguments:
         running -- the name of a test to print is running. If Falsy then
                    nothing will be printed. Default: None
-        
+
         """
         if running:
             self.__print(running, 'running')

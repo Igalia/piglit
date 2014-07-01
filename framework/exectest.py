@@ -119,11 +119,9 @@ class Test(object):
                 self.result['traceback'] = "".join(
                     traceback.format_tb(exception[2]))
 
-            log.log(path, self.result['result'])
-            log.post_log(log_current, self.result['result'])
+            log.log(path, self.result['result'], log_current)
         else:
-            log.log(path, 'dry-run')
-            log.post_log(log_current, 'dry-run')
+            log.log(path, 'dry-run', log_current)
 
     @property
     def command(self):

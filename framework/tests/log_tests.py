@@ -20,8 +20,6 @@
 
 """ Module provides tests for log.py module """
 
-import sys
-import itertools
 from types import *  # This is a special * safe module
 import nose.tools as nt
 from framework.log import Log
@@ -51,21 +49,20 @@ def test_pre_log_return():
                    msg="Log.pre_log() didn't return a numeric type!")
 
 
-def test_post_log_increment_complete():
-    """ Tests that Log.post_log() increments self.__complete """
+def test_log_increment_complete():
+    """ Tests that Log.log() increments self.__complete """
     log = Log(100, False)
     ret = log.pre_log()
-    log.post_log(ret, 'pass')
+    log.log('test', 'pass', ret)
     nt.assert_equal(log._Log__complete, 1,
-                    msg="Log.post_log() did not properly incremented "
-                        "Log.__current")
+                    msg="Log.log() did not properly incremented Log.__current")
 
 
-def check_post_log_increment_summary(stat):
-    """ Test that passing a result to post_log works correctly """
+def check_log_increment_summary(stat):
+    """ Test that passing a result to log works correctly """
     log = Log(100, False)
     ret = log.pre_log()
-    log.post_log(ret, stat)
+    log.log('test', stat, ret)
     print log._Log__summary
     nt.assert_equal(log._Log__summary[stat], 1,
                     msg="Log.__summary[{}] was not properly "
@@ -73,26 +70,26 @@ def check_post_log_increment_summary(stat):
 
 
 @utils.nose_generator
-def test_post_log_increment_summary():
+def test_log_increment_summary():
     """ Generator that creates tests for self.__summary """
     for stat in valid_statuses:
-        check_post_log_increment_summary.description = \
-            "Test that Log.post_log increments self._summary[{}]".format(stat)
-        yield check_post_log_increment_summary, stat
+        check_log_increment_summary.description = \
+            "Test that Log.log increments self._summary[{}]".format(stat)
+        yield check_log_increment_summary, stat
 
 
-def test_post_log_removes_complete():
-    """ Test that Log.post_log() removes finished tests from __running """
+def test_log_removes_complete():
+    """ Test that Log.log() removes finished tests from __running """
     log = Log(100, False)
     ret = log.pre_log()
-    log.post_log(ret, 'pass')
+    log.log('test', 'pass', ret)
     nt.assert_not_in(ret, log._Log__running,
                      msg="Running tests not removed from running list")
 
 
 @nt.raises(AssertionError)
-def test_post_log_increment_summary_bad():
-    """ Only statuses in self.__summary_keys are valid for post_log """
+def test_log_increment_summary_bad():
+    """ Only statuses in self.__summary_keys are valid for log """
     log = Log(100, False)
     ret = log.pre_log()
-    log.post_log(ret, 'fails')
+    log.log('test', 'fails', ret)
