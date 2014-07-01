@@ -78,17 +78,17 @@ class Log(object):
         # newline.
         sys.stdout.flush()
 
-    def _summary(self):
+    def _format_summary(self):
         """ return a summary of the statuses """
         return ", ".join("{0}: {1}".format(k, self.__summary[k])
                          for k in sorted(self.__summary))
 
-    def _running(self):
+    def _format_running(self):
         """ return running tests """
         return "Running Test(s): {}".format(
             " ".join([str(x).zfill(self.__pad) for x in self.__running]))
 
-    def _percent(self):
+    def _format_percent(self):
         """ return the percentage of tess completed """
         return "{0}/{1}".format(str(self.__complete).zfill(self.__pad),
                                 str(self.__total).zfill(self.__pad))
@@ -96,9 +96,9 @@ class Log(object):
     def __print(self, name, result):
         """ Do the actual printing """
         self._write_output(self.__output.format(
-            percent=self._percent(),
-            running=self._running(),
-            summary=self._summary(),
+            percent=self._format_percent(),
+            running=self._format_running(),
+            summary=self._format_summary(),
             name=name,
             result=result))
 
@@ -149,5 +149,5 @@ class Log(object):
 
     def summary(self):
         self._write_output(self.__summary_output.format(
-            percent=self._percent(),
-            summary=self._summary()))
+            percent=self._format_percent(),
+            summary=self._format_summary()))
