@@ -52,7 +52,7 @@ static enum {
 static void
 usage(const char *name)
 {
-	fprintf(stderr, "usage: %s <vs | vs_exceed | fs | fs_exceed>\n",
+	fprintf(stderr, "usage: %s <vs | vsexceed | fs | fsexceed>\n",
 		name);
 	piglit_report_result(PIGLIT_FAIL);
 }
