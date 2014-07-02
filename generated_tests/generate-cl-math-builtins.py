@@ -25,14 +25,15 @@
 import os
 
 from genclbuiltins import gen
-from math import atan, pi, cos
+from math import atan, pi, sin, cos
 
 CLC_VERSION_MIN = {
     'atan' : 10,
     'cos' : 10,
     'mix' : 10,
     'nextafter' : 10,
-    'sign' : 10
+    'sign' : 10,
+    'sin' : 10
 }
 
 DATA_TYPES = ['float']
@@ -87,6 +88,15 @@ tests = {
             [1.0, -1.0, 0.0, -0.0, 0.0],
             [0.5, -0.5, 0.0, -0.0, float("nan")]
         ]
+    },
+    'sin' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, 1.0,   0.0, -1.0,       0.0,    sin(2.234567)], # Result
+            [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567] # Arg0
+        ],
+        'tolerance': 2
     }
 }
 
