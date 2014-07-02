@@ -25,10 +25,11 @@
 import os
 
 from genclbuiltins import gen
-from math import atan, pi
+from math import atan, pi, cos
 
 CLC_VERSION_MIN = {
     'atan' : 10,
+    'cos' : 10,
     'mix' : 10,
     'nextafter' : 10,
     'sign' : 10
@@ -50,6 +51,15 @@ tests = {
         ],
         'tolerance' : 2
      },
+    'cos' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345)], # Result
+            [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345] # Arg0
+        ],
+        'tolerance' : 2
+    },
     'mix' : { #x + (y - x) * a
         'arg_types': [F, F, F, F],
         'function_type': 'tts',
