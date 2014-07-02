@@ -311,6 +311,7 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
 
     argTypes = getArgTypes(argType, functionDef['arg_types'])
     argCount = len(argTypes)
+    tolerance = functionDef['tolerance'] if 'tolerance' in functionDef else 0
 
     # For each argument, write a line containing its type, index, and values
     for arg in range(0, argCount):
@@ -326,9 +327,11 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
         # width
         if (arg < 2 or not tss):
             f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] +
-                    '[' + str(vecSize) + '] ' + ' '.join([argVal]*vecSize) +
-                    '\n'
+                    '[' + str(vecSize) + '] ' + ' '.join([argVal]*vecSize)
             )
+            if arg == 0:
+                f.write(' tolerance {} ulp'.format(tolerance))
+            f.write('\n')
         else:
             argInOut = 'arg_in: '
             f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] + '[1] ' +

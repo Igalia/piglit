@@ -903,7 +903,6 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 	regmatch_t pmatch[2];
 	char* value_str = NULL;
 
-        fprintf(stderr, "tolerance = %s\n", tolerance_str);
         if(regex_get_matches(tolerance_str,
 	                     REGEX_ARG_TOLERANCE_ULP,
 	                     pmatch,
