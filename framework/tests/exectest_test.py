@@ -20,6 +20,7 @@
 
 """ Tests for the exectest module """
 
+import nose.tools as nt
 from framework.exectest import PiglitTest, Test
 
 
@@ -75,3 +76,17 @@ def test_piglittest_interpret_result_subtest():
                           'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
     test.interpret_result()
     assert test.result['subtest']['subtest'] == 'pass'
+
+
+def test_piglitest_no_clobber():
+    """ PiglitTest.interpret_result() does not clobber subtest entires """
+    test = PiglitTest(['a', 'command'])
+    test.result['out'] = (
+        'PIGLIT: {"result": "pass"}\n'
+        'PIGLIT: {"subtest": {"test1": "pass"}}\n'
+        'PIGLIT: {"subtest": {"test2": "pass"}}\n'
+    )
+    test.interpret_result()
+
+    nt.assert_dict_equal(test.result['subtest'],
+                         {'test1': 'pass', 'test2': 'pass'})
