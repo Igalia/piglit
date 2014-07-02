@@ -63,15 +63,15 @@ bool piglit_cl_probe_uinteger(uint64_t value,
 
 /**
  * \brief Probe floating-point \c value if it compares equal to \c expect with
- *        tolerance \c tolerance.
+ *        tolerance \c ulp.
  */
-bool piglit_cl_probe_floating(float value, float expect, float tolerance);
+bool piglit_cl_probe_floating(float value, float expect, uint32_t ulp);
 
 /**
  * \brief Probe double \c value if it compares equal to \c expect with
- *        tolerance \c tolerance.
+ *        tolerance \c ulp.
  */
-bool piglit_cl_probe_double(double value, double expect, double tolerance);
+bool piglit_cl_probe_double(double value, double expect, uint64_t ulp);
 
 /**
  * \brief Check for unexpected GL error and report it.

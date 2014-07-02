@@ -127,10 +127,11 @@
 #define REGEX_DEFINE_ARG(type, value)  "([[:digit:]]+)[[:space:]]+" type \
                                        "[[:space:]]+(" value ")"
 #define REGEX_ARG_TOLERANCE            "tolerance[[:space:]]+(" REGEX_VALUE ")"
+#define REGEX_ARG_TOLERANCE_ULP        REGEX_ARG_TOLERANCE "[[:space:]]+ulp"
 #define REGEX_ARG_VALUE   REGEX_DEFINE_ARG( "(" REGEX_TYPE ")", REGEX_ARRAY )
 #define REGEX_ARG_BUFFER  REGEX_DEFINE_ARG( "buffer[[:space:]]+(" REGEX_TYPE ")\\[([[:digit:]]+)\\]", \
                                             REGEX_ARRAY "|" REGEX_RANDOM "|" REGEX_REPEAT )           \
-                          "([[:space:]]+" REGEX_ARG_TOLERANCE ")?"
+                          "([[:space:]]+" "("REGEX_ARG_TOLERANCE "|" REGEX_ARG_TOLERANCE_ULP")" ")?"
 #define REGEX_ARG         "(" REGEX_ARG_VALUE "|" REGEX_ARG_BUFFER ")"
 
 /* Match whole line */
@@ -228,7 +229,7 @@ struct test_arg {
 	/* tolerance */
 	int64_t toli;
 	uint64_t tolu;
-	double tolf;
+	uint64_t ulp;
 };
 
 struct test_arg create_test_arg()
@@ -247,7 +248,7 @@ struct test_arg create_test_arg()
 
 		.toli = 0,
 		.tolu = 0,
-		.tolf = 0,
+		.ulp = 0,
 	};
 
 	return ta;
@@ -902,6 +903,24 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 	regmatch_t pmatch[2];
 	char* value_str = NULL;
 
+        fprintf(stderr, "tolerance = %s\n", tolerance_str);
+        if(regex_get_matches(tolerance_str,
+	                     REGEX_ARG_TOLERANCE_ULP,
+	                     pmatch,
+	                     2,
+	                     REG_NEWLINE)) {
+		regex_get_match_str(&value_str, tolerance_str, pmatch, 1);
+		switch(test_arg->cl_type) {
+		case TYPE_FLOAT:
+		case TYPE_DOUBLE:
+			test_arg->ulp = get_uint(value_str);
+			return;
+		default:
+			fprintf(stderr, "ulp not value for integer types\n");
+			exit_report_result(PIGLIT_WARN);
+                }
+	}
+
 	if(regex_get_matches(tolerance_str,
 	                     REGEX_ARG_TOLERANCE,
 	                     pmatch,
@@ -923,9 +942,11 @@ get_test_arg_tolerance(struct test_arg* test_arg, const char* tolerance_str)
 			test_arg->tolu = get_uint(value_str);
 			break;
 		case TYPE_FLOAT:
-		case TYPE_DOUBLE:
-			test_arg->tolf = get_float(value_str);
+		case TYPE_DOUBLE: {
+			float value = get_float(value_str);
+			test_arg->ulp = *((uint64_t*)(&value));
 			break;
+			}
 		}
 
 		free(value_str);
@@ -1662,7 +1683,7 @@ check_test_arg_value(struct test_arg test_arg,
 				rb = i*test_arg.cl_mem_size + c;                             \
 				if(!piglit_cl_probe_floating(((cl_type*)value)[rb],          \
 				                             ((cl_type*)test_arg.value)[rb], \
-				                             test_arg.tolf)) {               \
+				                             test_arg.ulp)) {               \
 					ra = i*test_arg.cl_size + c;                             \
 					printf("Error at %s[%zu]\n", type, ra);                  \
 					return false;                                            \
