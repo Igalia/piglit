@@ -155,6 +155,12 @@ def test_noprint_when_expected():
     quiet = log.QuietLog(TEST_STATE)
     printing.append(('QuietLog.start', quiet.start, ['name']))
 
+    # Test DummyLog
+    dummy = log.DummyLog(TEST_STATE)
+    printing.append(('DummyLog.start', dummy.start, ['name']))
+    printing.append(('DummyLog.log', dummy.log, ['pass']))
+    printing.append(('DummyLog.summary', dummy.summary, []))
+
     for name, func, args in printing:
         check_no_output.description = "{} produces no output".format(name)
         yield check_no_output, func, args

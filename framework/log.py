@@ -234,6 +234,21 @@ class VerboseLog(QuietLog):
         super(VerboseLog, self)._log(value)
 
 
+class DummyLog(BaseLog):
+    """ A Logger that does nothing """
+    def __init__(self, state):
+        pass
+
+    def start(self, name):
+        pass
+
+    def log(self, status):
+        pass
+
+    def summary(self):
+        pass
+
+
 class LogManager(object):
     """ Creates new log objects
 
@@ -255,6 +270,7 @@ class LogManager(object):
     LOG_MAP = {
         'quiet': QuietLog,
         'verbose': VerboseLog,
+        'dummy': DummyLog,
     }
 
     def __init__(self, logger, total):
