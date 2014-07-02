@@ -3026,6 +3026,10 @@ spec['AMD_vertex_shader_layer'] = amd_vertex_shader_layer
 add_plain_test(amd_vertex_shader_layer, 'amd_vertex_shader_layer-layered-2d-texture-render')
 add_plain_test(amd_vertex_shader_layer, 'amd_vertex_shader_layer-layered-depth-texture-render')
 
+amd_vertex_shader_viewport_index = {}
+spec['AMD_vertex_shader_viewport_index'] = amd_vertex_shader_viewport_index
+add_concurrent_test(amd_vertex_shader_viewport_index, 'amd_vertex_shader_viewport_index-render')
+
 ext_fog_coord = {}
 spec['EXT_fog_coord'] = ext_fog_coord
 add_plain_test(ext_fog_coord, 'ext_fog_coord-modes')
