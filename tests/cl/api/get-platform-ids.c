@@ -53,7 +53,7 @@ piglit_cl_test(const int argc,
 	int i;
 	cl_int errNo;
 	cl_uint num_platforms;
-	cl_platform_id* platforms;
+	cl_platform_id* platforms = NULL;
 
 	/*** Normal usage ***/
 
