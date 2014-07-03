@@ -35,18 +35,6 @@
 
 #include "piglit-util-gl-common.h"
 
-void
-piglit_escape_exit_key(unsigned char key, int x, int y)
-{
-	(void) x;
-	(void) y;
-	switch (key) {
-		case 27:
-			exit(0);
-			break;
-	}
-}
-
 /**
  * Generates a texture with the given internalFormat, w, h with a
  * teximage of r, g, b w quadrants.

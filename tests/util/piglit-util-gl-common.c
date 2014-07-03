@@ -520,6 +520,20 @@ piglit_compressed_pixel_offset(GLenum format, unsigned width,
 	return offset;
 }
 
+void
+piglit_escape_exit_key(unsigned char key, int x, int y)
+{
+	(void) x;
+	(void) y;
+	switch (key) {
+		case 27:
+			exit(0);
+			break;
+	}
+	if (!piglit_is_gles())
+		piglit_post_redisplay();
+}
+
 /**
  * Convenience function to configure an abitrary orthogonal projection matrix
  */
