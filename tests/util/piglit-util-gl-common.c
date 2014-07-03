@@ -2227,9 +2227,22 @@ GLuint
 piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype)
 {
-	GLenum data_format;
 	int size, level;
 	GLuint tex;
+	GLenum teximage_type;
+
+	switch (basetype) {
+	case GL_UNSIGNED_NORMALIZED:
+	case GL_SIGNED_NORMALIZED:
+	case GL_FLOAT:
+		teximage_type = GL_FLOAT;
+		break;
+	case GL_UNSIGNED_BYTE:
+		teximage_type = GL_UNSIGNED_BYTE;
+		break;
+	default:
+		assert(0);
+	}
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -2247,12 +2260,10 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 				GL_NEAREST);
 	}
 
-	data_format = piglit_is_gles() ? GL_UNSIGNED_BYTE : GL_FLOAT;
-
 	for (level = 0, size = w > h ? w : h; size > 0; level++, size >>= 1) {
 		void *data;
 
-		if (piglit_is_gles())
+		if (teximage_type == GL_UNSIGNED_BYTE)
 			data = piglit_rgbw_image_ubyte(w, h, alpha);
 		else
 			data = piglit_rgbw_image(internalFormat, w, h,
@@ -2261,7 +2272,7 @@ piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		glTexImage2D(GL_TEXTURE_2D, level,
 			     internalFormat,
 			     w, h, 0,
-			     GL_RGBA, data_format, data);
+			     GL_RGBA, teximage_type, data);
 		free(data);
 
 		if (!mip)
