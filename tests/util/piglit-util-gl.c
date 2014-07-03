@@ -894,60 +894,6 @@ piglit_draw_triangle_z(float z, float x1, float y1, float x2, float y2,
 }
 
 /**
- * Convenience function to configure an abitrary orthogonal projection matrix
- */
-void
-piglit_gen_ortho_projection(double left, double right, double bottom,
-			    double top, double near_val, double far_val,
-			    GLboolean push)
-{
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-	if (push)
-		glPushMatrix();
-        glOrtho(left, right, bottom, top, near_val, far_val);
-
-        glMatrixMode(GL_MODELVIEW);
-	if (push)
-		glPushMatrix();
-        glLoadIdentity();
-}
-
-
-/**
- * Convenience function to configure projection matrix for window coordinates
- */
-void
-piglit_ortho_projection(int w, int h, GLboolean push)
-{
-        /* Set up projection matrix so we can just draw using window
-         * coordinates.
-         */
-	piglit_gen_ortho_projection(0, w, 0, h, -1, 1, push);
-}
-
-/**
- * Convenience function to configure frustum projection.
- */
-void
-piglit_frustum_projection(GLboolean push, double l, double r, double b,
-			  double t, double n, double f)
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	if (push)
-		glPushMatrix();
-	glFrustum(l, r, b, t, n, f);
-
-	glMatrixMode(GL_MODELVIEW);
-	if (push)
-		glPushMatrix();
-	glLoadIdentity();
-}
-
-
-
-/**
  * Generate a checkerboard texture
  *
  * \param tex                Name of the texture to be used.  If \c tex is
