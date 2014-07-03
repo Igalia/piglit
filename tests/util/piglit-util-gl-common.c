@@ -1917,3 +1917,113 @@ piglit_draw_triangle_z(float z, float x1, float y1, float x2, float y2,
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
+
+/**
+ * Generate a checkerboard texture
+ *
+ * \param tex                Name of the texture to be used.  If \c tex is
+ *                           zero, a new texture name will be generated.
+ * \param level              Mipmap level the checkerboard should be written to
+ * \param width              Width of the texture image
+ * \param height             Height of the texture image
+ * \param horiz_square_size  Size of each checkerboard tile along the X axis
+ * \param vert_square_size   Size of each checkerboard tile along the Y axis
+ * \param black              RGBA color to be used for "black" tiles
+ * \param white              RGBA color to be used for "white" tiles
+ *
+ * A texture with alternating black and white squares in a checkerboard
+ * pattern is generated.  The texture data is written to LOD \c level of
+ * the texture \c tex.
+ *
+ * If \c tex is zero, a new texture created.  This texture will have several
+ * texture parameters set to non-default values:
+ *
+ *  - Min and mag filter will be set to \c GL_NEAREST.
+ *  - For GL:
+ *    - S and T wrap modes will be set to \c GL_CLAMP_TO_BORDER.
+ *    - Border color will be set to { 1.0, 0.0, 0.0, 1.0 }.
+ *  - For GLES:
+ *    - S and T wrap modes will be set to \c GL_CLAMP_TO_EDGE.
+ *
+ * \return
+ * Name of the texture.  In addition, this texture will be bound to the
+ * \c GL_TEXTURE_2D target of the currently active texture unit.
+ */
+GLuint
+piglit_checkerboard_texture(GLuint tex, unsigned level,
+			    unsigned width, unsigned height,
+			    unsigned horiz_square_size,
+			    unsigned vert_square_size,
+			    const float *black, const float *white)
+{
+	static const GLfloat border_color[4] = { 1.0, 0.0, 0.0, 1.0 };
+	unsigned i;
+	unsigned j;
+	void *tex_data;
+	char *texel;
+	unsigned pixel_size;
+	GLubyte black_b[4], white_b[4];
+	const void *black_data, *white_data;
+
+	if (piglit_is_gles()) {
+		pixel_size = 4 * sizeof(GLubyte);
+		for (i = 0; i < 4; i++) {
+			black_b[i] = black[i] * 255;
+			white_b[i] = white[i] * 255;
+		}
+		black_data = black_b;
+		white_data = white_b;
+	} else {
+		pixel_size = 4 * sizeof(float);
+		black_data = black;
+		white_data = white;
+	}
+	texel = tex_data = malloc(width * height * pixel_size);
+
+	for (i = 0; i < height; i++) {
+		const unsigned row = i / vert_square_size;
+
+		for (j = 0; j < width; j++) {
+			const unsigned col = j / horiz_square_size;
+
+			if ((row ^ col) & 1) {
+				memcpy(texel, white_data, pixel_size);
+			} else {
+				memcpy(texel, black_data, pixel_size);
+			}
+
+			texel += pixel_size;
+		}
+	}
+
+	if (tex == 0) {
+		glGenTextures(1, &tex);
+
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_NEAREST);
+		if (piglit_is_gles()) {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+					GL_CLAMP_TO_EDGE);
+		} else {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+					GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+					GL_CLAMP_TO_BORDER);
+			glTexParameterfv(GL_TEXTURE_2D,
+					 GL_TEXTURE_BORDER_COLOR,
+					 border_color);
+		}
+	} else {
+		glBindTexture(GL_TEXTURE_2D, tex);
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, width, height, 0, GL_RGBA,
+		     piglit_is_gles() ? GL_UNSIGNED_BYTE : GL_FLOAT, tex_data);
+
+	return tex;
+}
