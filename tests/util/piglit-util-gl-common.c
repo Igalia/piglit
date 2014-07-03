@@ -1877,3 +1877,43 @@ GLuint piglit_compile_program(GLenum target, const char* text)
 
 	return program;
 }
+
+/**
+ * Convenience function to draw a triangle.
+ */
+GLvoid
+piglit_draw_triangle(float x1, float y1, float x2, float y2,
+		     float x3, float y3)
+{
+	piglit_draw_triangle_z(0.0, x1, y1, x2, y2, x3, y3);
+}
+
+/**
+ * Convenience function to draw a triangle at a given depth.
+ */
+GLvoid
+piglit_draw_triangle_z(float z, float x1, float y1, float x2, float y2,
+		     float x3, float y3)
+{
+	float verts[3][4];
+
+	verts[0][0] = x1;
+	verts[0][1] = y1;
+	verts[0][2] = z;
+	verts[0][3] = 1.0;
+	verts[1][0] = x2;
+	verts[1][1] = y2;
+	verts[1][2] = z;
+	verts[1][3] = 1.0;
+	verts[2][0] = x3;
+	verts[2][1] = y3;
+	verts[2][2] = z;
+	verts[2][3] = 1.0;
+
+	glVertexPointer(4, GL_FLOAT, 0, verts);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
