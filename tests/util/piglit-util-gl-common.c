@@ -1796,3 +1796,84 @@ bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
 	return status;
 }
 
+GLint piglit_ARBfp_pass_through = 0;
+
+int piglit_use_fragment_program(void)
+{
+	static const char source[] =
+		"!!ARBfp1.0\n"
+		"MOV	result.color, fragment.color;\n"
+		"END\n"
+		;
+
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+	if (!piglit_is_extension_supported("GL_ARB_fragment_program"))
+		return 0;
+
+	piglit_ARBfp_pass_through =
+		piglit_compile_program(GL_FRAGMENT_PROGRAM_ARB, source);
+
+	return (piglit_ARBfp_pass_through != 0);
+}
+
+void piglit_require_fragment_program(void)
+{
+	if (!piglit_use_fragment_program()) {
+		printf("GL_ARB_fragment_program not supported.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+int piglit_use_vertex_program(void)
+{
+	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+	return piglit_is_extension_supported("GL_ARB_vertex_program");
+}
+
+void piglit_require_vertex_program(void)
+{
+	if (!piglit_use_vertex_program()) {
+		printf("GL_ARB_vertex_program not supported.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+}
+
+GLuint piglit_compile_program(GLenum target, const char* text)
+{
+	GLuint program;
+	GLint errorPos;
+
+	glGenProgramsARB(1, &program);
+	glBindProgramARB(target, program);
+	glProgramStringARB(
+			target,
+			GL_PROGRAM_FORMAT_ASCII_ARB,
+			strlen(text),
+			(const GLubyte *)text);
+	glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorPos);
+	if (glGetError() != GL_NO_ERROR || errorPos != -1) {
+		int l = piglit_find_line(text, errorPos);
+		int a;
+
+		fprintf(stderr, "Compiler Error (pos=%d line=%d): %s\n",
+			errorPos, l,
+			(char *) glGetString(GL_PROGRAM_ERROR_STRING_ARB));
+
+		for (a=-10; a<10; a++)
+		{
+			if (errorPos+a < 0)
+				continue;
+			if (errorPos+a >= strlen(text))
+				break;
+			fprintf(stderr, "%c", text[errorPos+a]);
+		}
+		fprintf(stderr, "\nin program:\n%s", text);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+	if (!glIsProgramARB(program)) {
+		fprintf(stderr, "glIsProgramARB failed\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	return program;
+}
