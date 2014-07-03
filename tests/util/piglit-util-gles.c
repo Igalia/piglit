@@ -35,6 +35,46 @@
 
 #include "piglit-util-gl-common.h"
 
+static GLubyte *
+piglit_rgbw_image_ubyte(int w, int h, GLboolean alpha)
+{
+	GLubyte red[4]   = {255, 0, 0, 0};
+	GLubyte green[4] = {0, 255, 0, 64};
+	GLubyte blue[4]  = {0, 0, 255, 128};
+	GLubyte white[4] = {255, 255, 255, 255};
+	GLubyte *data;
+	int x, y;
+
+	if (!alpha) {
+		red[3] = 255;
+		green[3] = 255;
+		blue[3] = 255;
+		white[3] = 255;
+	}
+
+	data = malloc(w * h * 4 * sizeof(GLubyte));
+
+	for (y = 0; y < h; y++) {
+		for (x = 0; x < w; x++) {
+			const GLubyte *color;
+
+			if (x < w / 2 && y < h / 2)
+				color = red;
+			else if (y < h / 2)
+				color = green;
+			else if (x < w / 2)
+				color = blue;
+			else
+				color = white;
+
+			memcpy(data + (y * w + x) * 4, color,
+			       4 * sizeof(GLubyte));
+		}
+	}
+
+	return data;
+}
+
 /**
  * Generates a texture with the given internalFormat, w, h with a
  * teximage of r, g, b w quadrants.
@@ -47,20 +87,8 @@ GLuint
 piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype)
 {
-	GLubyte *data;
-	int size, x, y, level;
+	int size, level;
 	GLuint tex;
-	GLubyte red[4]   = {255, 0, 0, 0};
-	GLubyte green[4] = {0, 255, 0, 64};
-	GLubyte blue[4]  = {0, 0, 255, 128};
-	GLubyte white[4] = {255, 255, 255, 255};
-
-	if (!alpha) {
-		red[3] = 255;
-		green[3] = 255;
-		blue[3] = 255;
-		white[3] = 255;
-	}
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -77,33 +105,14 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
 				GL_NEAREST);
 	}
-	data = malloc(w * h * 4 * sizeof(GLubyte));
 
-	/* XXX: Do we want non-square textures?  Surely some day. */
-	assert(w == h);
-
-	for (level = 0, size = w; size > 0; level++, size >>= 1) {
-		for (y = 0; y < size; y++) {
-			for (x = 0; x < size; x++) {
-				const GLubyte *color;
-
-				if (x < size / 2 && y < size / 2)
-					color = red;
-				else if (y < size / 2)
-					color = green;
-				else if (x < size / 2)
-					color = blue;
-				else
-					color = white;
-
-				memcpy(data + (y * size + x) * 4, color,
-				       4 * sizeof(GLubyte));
-			}
-		}
+	for (level = 0, size = w > h ? w : h; size > 0; level++, size >>= 1) {
+		GLubyte *data = piglit_rgbw_image_ubyte(w, h, alpha);
 		glTexImage2D(GL_TEXTURE_2D, level,
 			     format,
-			     size, size, 0,
+			     w, h, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, data);
+		free(data);
 
 		if (!mip)
 			break;
@@ -113,6 +122,5 @@ piglit_rgbw_texture(GLenum format, int w, int h, GLboolean mip,
 		if (h > 1)
 			h >>= 1;
 	}
-	free(data);
 	return tex;
 }
