@@ -37,46 +37,6 @@
 
 
 /**
- * Generates a 8x8 mipmapped texture whose layers contain solid r, g, b, and w.
- */
-GLuint
-piglit_miptree_texture()
-{
-	GLfloat *data;
-	int size, i, level;
-	GLuint tex;
-	const float color_wheel[4][4] = {
-		{1, 0, 0, 1}, /* red */
-		{0, 1, 0, 1}, /* green */
-		{0, 0, 1, 1}, /* blue */
-		{1, 1, 1, 1}, /* white */
-	};
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST_MIPMAP_NEAREST);
-
-	for (level = 0; level < 4; ++level) {
-		size = 8 >> level;
-
-		data = malloc(size*size*4*sizeof(GLfloat));
-		for (i = 0; i < size * size; ++i) {
-			memcpy(data + 4 * i, color_wheel[level],
-			       4 * sizeof(GLfloat));
-		}
-		glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA,
-			     size, size, 0, GL_RGBA, GL_FLOAT, data);
-		free(data);
-	}
-	return tex;
-}
-
-
-/**
  * Generates an image of the given size with quadrants of red, green,
  * blue and white.
  * Note that for compressed teximages, where the blocking would be
