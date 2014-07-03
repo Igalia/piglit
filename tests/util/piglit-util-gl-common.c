@@ -833,3 +833,105 @@ piglit_num_components(GLenum base_format)
 		return 0;
 	}
 }
+
+/* This function only handles formats not supported by the OpenGL framebuffer
+ * size queries, which only support querying the R,G,B,A sizes.
+ *
+ * The function doesn't change the bits for formats it doesn't handle.
+ *
+ * The returned number of bits is an approximation but should be no less than
+ * the actual number of bits for the format chosen by OpenGL.
+ *
+ * The combination of the OpenGL framebuffer queries size and calling
+ * this function without checking the return value should give you reasonable
+ * values for any format.
+ */
+bool
+piglit_get_luminance_intensity_bits(GLenum internalformat, int *bits)
+{
+	switch (internalformat) {
+	case GL_LUMINANCE4:
+		bits[0] = bits[1] = bits[2] = 4;
+		bits[3] = 0;
+		return true;
+
+	case GL_LUMINANCE:
+	case GL_LUMINANCE_SNORM:
+	case GL_LUMINANCE8:
+	case GL_LUMINANCE8_SNORM:
+	case GL_LUMINANCE8I_EXT:
+	case GL_LUMINANCE8UI_EXT:
+		bits[0] = bits[1] = bits[2] = 8;
+		bits[3] = 0;
+		return true;
+
+	case GL_LUMINANCE12:
+		bits[0] = bits[1] = bits[2] = 12;
+		bits[3] = 0;
+		return true;
+
+	case GL_LUMINANCE16:
+	case GL_LUMINANCE16_SNORM:
+	case GL_LUMINANCE16I_EXT:
+	case GL_LUMINANCE16UI_EXT:
+	case GL_LUMINANCE16F_ARB:
+		bits[0] = bits[1] = bits[2] = 16;
+		bits[3] = 0;
+		return true;
+
+	case GL_LUMINANCE32I_EXT:
+	case GL_LUMINANCE32UI_EXT:
+	case GL_LUMINANCE32F_ARB:
+		bits[0] = bits[1] = bits[2] = 32;
+		bits[3] = 0;
+		return true;
+
+	case GL_LUMINANCE4_ALPHA4:
+	case GL_INTENSITY4:
+		bits[0] = bits[1] = bits[2] = bits[3] = 4;
+		return true;
+
+	case GL_LUMINANCE_ALPHA:
+	case GL_LUMINANCE_ALPHA_SNORM:
+	case GL_LUMINANCE8_ALPHA8:
+	case GL_LUMINANCE8_ALPHA8_SNORM:
+	case GL_LUMINANCE_ALPHA8I_EXT:
+	case GL_LUMINANCE_ALPHA8UI_EXT:
+	case GL_INTENSITY:
+	case GL_INTENSITY_SNORM:
+	case GL_INTENSITY8:
+	case GL_INTENSITY8_SNORM:
+	case GL_INTENSITY8I_EXT:
+	case GL_INTENSITY8UI_EXT:
+		bits[0] = bits[1] = bits[2] = bits[3] = 8;
+		return true;
+
+	case GL_LUMINANCE12_ALPHA12:
+	case GL_INTENSITY12:
+		bits[0] = bits[1] = bits[2] = bits[3] = 12;
+		return true;
+
+	case GL_LUMINANCE16_ALPHA16:
+	case GL_LUMINANCE16_ALPHA16_SNORM:
+	case GL_LUMINANCE_ALPHA16I_EXT:
+	case GL_LUMINANCE_ALPHA16UI_EXT:
+	case GL_LUMINANCE_ALPHA16F_ARB:
+	case GL_INTENSITY16:
+	case GL_INTENSITY16_SNORM:
+	case GL_INTENSITY16I_EXT:
+	case GL_INTENSITY16UI_EXT:
+	case GL_INTENSITY16F_ARB:
+		bits[0] = bits[1] = bits[2] = bits[3] = 16;
+		return true;
+
+	case GL_LUMINANCE_ALPHA32I_EXT:
+	case GL_LUMINANCE_ALPHA32UI_EXT:
+	case GL_LUMINANCE_ALPHA32F_ARB:
+	case GL_INTENSITY32I_EXT:
+	case GL_INTENSITY32UI_EXT:
+	case GL_INTENSITY32F_ARB:
+		bits[0] = bits[1] = bits[2] = bits[3] = 32;
+		return true;
+	}
+	return false;
+}
