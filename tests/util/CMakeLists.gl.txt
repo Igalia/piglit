@@ -3,7 +3,6 @@ set(UTIL_GL_SOURCES
 	piglit-matrix.c
 	piglit-shader.c
 	piglit-shader-gl.c
-	piglit-util-gl.c
 	piglit-test-pattern.cpp
 	piglit-fbo.cpp
 	piglit-vbo.cpp
@@ -31,7 +30,6 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 		    piglit-shader.c
 		    piglit-shader-gl.c
 		    piglit-util-gl-common.c
-		    piglit-util-gl.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
 		    piglit-dispatch.c
