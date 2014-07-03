@@ -452,7 +452,7 @@ clean(const int argc,
 	free_tests();
 }
 
-void
+NORETURN void
 exit_report_result(enum piglit_result result)
 {
 	free_dynamic_strs();
