@@ -1,8 +1,3 @@
-set(UTIL_GL_SOURCES
-	${UTIL_GL_SOURCES}
-	piglit-util-gles.c
-	)
-
 include_directories(
 	${UTIL_GL_INCLUDES}
 	)

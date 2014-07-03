@@ -4,7 +4,6 @@ list(APPEND UTIL_GL_SOURCES
 	piglit-dispatch-init.c
 	piglit-shader.c
 	piglit-shader-gles2.c # Compatible with gles3.
-	piglit-util-gles.c
 	piglit-vbo.cpp
 	)
 
