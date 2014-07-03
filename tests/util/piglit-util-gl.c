@@ -38,32 +38,6 @@
 
 GLint piglit_ARBfp_pass_through = 0;
 
-unsigned
-piglit_num_components(GLenum base_format)
-{
-	switch (base_format) {
-	case GL_ALPHA:
-	case GL_DEPTH_COMPONENT:
-	case GL_INTENSITY:
-	case GL_LUMINANCE:
-	case GL_RED:
-		return 1;
-	case GL_DEPTH_STENCIL:
-	case GL_LUMINANCE_ALPHA:
-	case GL_RG:
-		return 2;
-	case GL_RGB:
-		return 3;
-	case GL_RGBA:
-		return 4;
-	default:
-		printf("Unknown num_components for %s\n",
-		       piglit_get_gl_enum_name(base_format));
-		piglit_report_result(PIGLIT_FAIL);
-		return 0;
-	}
-}
-
 /* This function only handles formats not supported by the OpenGL framebuffer
  * size queries, which only support querying the R,G,B,A sizes.
  *

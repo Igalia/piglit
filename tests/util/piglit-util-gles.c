@@ -170,27 +170,6 @@ print_pixel(const GLubyte *pixel, unsigned components)
 		printf(" %u", pixel[p]);
 }
 
-unsigned
-piglit_num_components(GLenum base_format)
-{
-	switch (base_format) {
-	case GL_ALPHA:
-	case GL_LUMINANCE:
-		return 1;
-	case GL_LUMINANCE_ALPHA:
-		return 2;
-	case GL_RGB:
-		return 3;
-	case GL_RGBA:
-		return 4;
-	default:
-		printf("Unknown num_components for %s\n",
-		       piglit_get_gl_enum_name(base_format));
-		piglit_report_result(PIGLIT_FAIL);
-		return 0;
-	}
-}
-
 int
 piglit_probe_image_ubyte(int x, int y, int w, int h, GLenum format,
 			const GLubyte *image)
