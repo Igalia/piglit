@@ -237,7 +237,8 @@ piglit_init(int argc, char **argv)
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
 
 	tex = piglit_rgbw_texture(GL_RGBA,
-			TEXTURE_SIZE, TEXTURE_SIZE, GL_FALSE, GL_TRUE, 0);
+			TEXTURE_SIZE, TEXTURE_SIZE, GL_FALSE, GL_TRUE,
+			GL_UNSIGNED_BYTE);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glEnable(GL_TEXTURE_2D);
