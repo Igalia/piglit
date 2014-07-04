@@ -14,11 +14,25 @@
 GLSL >= 1.10
 GL_ARB_texture_rg
 
-[vertex shader file]
-fs-shadow2d.vert
+[vertex shader]
+#version 110
 
-[fragment shader file]
-fs-shadow2d.frag
+varying vec4 tex_coord;
+
+void main() {
+    gl_Position = gl_Vertex;
+	tex_coord = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+#version 110
+
+uniform sampler2DShadow tex;
+varying vec4 tex_coord;
+
+void main() {
+	gl_FragColor = shadow2D(tex, tex_coord.xyy);
+}
 
 [test]
 uniform int tex 0

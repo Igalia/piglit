@@ -6,11 +6,23 @@
 [require]
 GLSL >= 1.30
 
-[vertex shader file]
-fs-texture-sampler2dshadow.vert
+[vertex shader]
+#version 130
+out vec4 tex_coord;
+void main() {
+	gl_Position = gl_Vertex;
+	tex_coord = (gl_Vertex + 1.0) / 2.0;
+}
 
-[fragment shader file]
-fs-texture-sampler2dshadow.frag
+[fragment shader]
+#version 130
+const float canary = 0.125;
+uniform sampler2DShadow tex;
+in vec4 tex_coord;
+void main() {
+	float s = texture(tex, tex_coord.xyy);
+	gl_FragColor = vec4(s, canary, canary, canary);
+}
 
 [test]
 uniform int tex 0

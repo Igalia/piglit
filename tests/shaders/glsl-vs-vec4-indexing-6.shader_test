@@ -10,8 +10,11 @@ void main()
 	gl_Position = gl_Vertex;
 }
 
-[fragment shader file]
-glsl-color.frag
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
 
 [test]
 uniform vec4 val 0.0 0.0 0.5 0.0

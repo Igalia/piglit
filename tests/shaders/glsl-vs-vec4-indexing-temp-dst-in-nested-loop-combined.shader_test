@@ -28,8 +28,11 @@ void main()
          array[5] + array[6] + array[7] + array[8] + array[9] + array[10];
 }
 
-[fragment shader file]
-glsl-color.frag
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
 
 [test]
 ortho

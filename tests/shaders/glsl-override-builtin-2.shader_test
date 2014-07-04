@@ -5,8 +5,11 @@ GLSL >= 1.10
    another shader.
 */
 
-[vertex shader file]
-glsl-mvp.vert
+[vertex shader]
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
 
 [fragment shader]
 float myfunc(float);

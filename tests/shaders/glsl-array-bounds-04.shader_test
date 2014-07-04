@@ -22,8 +22,11 @@ void main()
       gl_FrontColor = vec4(0.0, 1.0, 0.0, 1.0);
 }
 
-[fragment shader file]
-glsl-color.frag
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
 
 [test]
 uniform int idx 20

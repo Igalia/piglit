@@ -1,8 +1,11 @@
 [require]
 GLSL >= 1.20
 
-[vertex shader file]
-glsl-mvp.vert
+[vertex shader]
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
 
 [fragment shader]
 /* Verify that out-of-bounds access to an array does not result in any sort of

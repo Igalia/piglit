@@ -10,8 +10,11 @@ void main()
 	gl_Position = gl_Vertex;
 }
 
-[fragment shader file]
-glsl-color.frag
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
 
 [test]
 draw rect -1 -1 2 2

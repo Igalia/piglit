@@ -2,8 +2,11 @@
 GLSL >= 1.30
 GL_ARB_texture_gather
 
-[vertex shader file]
-glsl-mvp.vert
+[vertex shader]
+void main()
+{
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}
 
 [fragment shader]
 #extension GL_ARB_texture_gather: require
