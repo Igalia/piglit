@@ -58,7 +58,7 @@ const int pattern_width = 256; const int pattern_height = 256;
 const int supersample_factor = 16;
 Test *test = NULL;
 
-void
+NORETURN void
 print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <num_samples> <test_type> [options]\n"
