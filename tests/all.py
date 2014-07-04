@@ -3306,6 +3306,7 @@ add_concurrent_test(arb_clear_texture, 'arb_clear_texture-sized-formats')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-float')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-rg')
 add_concurrent_test(arb_clear_texture, 'arb_clear_texture-depth-stencil')
+add_concurrent_test(arb_clear_texture, 'arb_clear_texture-srgb')
 
 arb_copy_buffer = {}
 spec['ARB_copy_buffer'] = arb_copy_buffer
