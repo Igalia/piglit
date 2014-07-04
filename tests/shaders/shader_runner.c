@@ -134,21 +134,15 @@ enum states {
 	none = 0,
 	requirements,
 	vertex_shader,
-	vertex_shader_file,
 	vertex_shader_passthrough,
 	vertex_program,
 	tess_ctrl_shader,
-	tess_ctrl_shader_file,
 	tess_eval_shader,
-	tess_eval_shader_file,
 	geometry_shader,
-	geometry_shader_file,
 	geometry_layout,
 	fragment_shader,
-	fragment_shader_file,
 	fragment_program,
 	compute_shader,
-	compute_shader_file,
 	vertex_data,
 	test,
 };
@@ -269,7 +263,7 @@ target_to_short_name(GLenum target)
 
 
 void
-compile_glsl(GLenum target, bool release_text)
+compile_glsl(GLenum target)
 {
 	GLuint shader = glCreateShader(target);
 	GLint ok;
@@ -346,10 +340,6 @@ compile_glsl(GLenum target, bool release_text)
 
 		free(info);
 		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	if (release_text) {
-		free(shader_string);
 	}
 
 	switch (target) {
@@ -458,42 +448,6 @@ comparison_string(enum comparison cmp)
 
 	assert(!"Should not get here.");
 	return false;
-}
-
-
-void
-load_shader_file(const char *line)
-{
-	GLsizei *const size = &shader_string_size;
-	char buf[256];
-	char *text;
-
-	if (shader_string) {
-		printf("Multiple shader files in same section: %s\n", line);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	strcpy_to_space(buf, line);
-
-	text = piglit_load_text_file(buf, (unsigned *) size);
-	if ((text == NULL) && (path != NULL)) {
-		const size_t len = strlen(path);
-
-		memcpy(buf, path, len);
-		buf[len] = '/';
-		strcpy_to_space(&buf[len + 1], line);
-
-		text = piglit_load_text_file(buf, (unsigned *) size);
-	}
-
-	if (text == NULL) {
-		strcpy_to_space(buf, line);
-
-		printf("could not load file \"%s\"\n", buf);
-		piglit_report_result(PIGLIT_FAIL);
-	}
-
-	shader_string = text;
 }
 
 
@@ -747,15 +701,11 @@ leave_state(enum states state, const char *line)
 
 	case vertex_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_VERTEX_SHADER, false);
+		compile_glsl(GL_VERTEX_SHADER);
 		break;
 
 	case vertex_shader_passthrough:
-		compile_glsl(GL_VERTEX_SHADER, false);
-		break;
-
-	case vertex_shader_file:
-		compile_glsl(GL_VERTEX_SHADER, true);
+		compile_glsl(GL_VERTEX_SHADER);
 		break;
 
 	case vertex_program:
@@ -766,29 +716,17 @@ leave_state(enum states state, const char *line)
 
 	case tess_ctrl_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_TESS_CONTROL_SHADER, false);
-		break;
-
-	case tess_ctrl_shader_file:
-		compile_glsl(GL_TESS_CONTROL_SHADER, true);
+		compile_glsl(GL_TESS_CONTROL_SHADER);
 		break;
 
 	case tess_eval_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_TESS_EVALUATION_SHADER, false);
-		break;
-
-	case tess_eval_shader_file:
-		compile_glsl(GL_TESS_EVALUATION_SHADER, true);
+		compile_glsl(GL_TESS_EVALUATION_SHADER);
 		break;
 
 	case geometry_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_GEOMETRY_SHADER, false);
-		break;
-
-	case geometry_shader_file:
-		compile_glsl(GL_GEOMETRY_SHADER, true);
+		compile_glsl(GL_GEOMETRY_SHADER);
 		break;
 
 	case geometry_layout:
@@ -796,11 +734,7 @@ leave_state(enum states state, const char *line)
 
 	case fragment_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_FRAGMENT_SHADER, false);
-		break;
-
-	case fragment_shader_file:
-		compile_glsl(GL_FRAGMENT_SHADER, true);
+		compile_glsl(GL_FRAGMENT_SHADER);
 		break;
 
 	case fragment_program:
@@ -811,11 +745,7 @@ leave_state(enum states state, const char *line)
 
 	case compute_shader:
 		shader_string_size = line - shader_string;
-		compile_glsl(GL_COMPUTE_SHADER, false);
-		break;
-
-	case compute_shader_file:
-		compile_glsl(GL_COMPUTE_SHADER, true);
+		compile_glsl(GL_COMPUTE_SHADER);
 		break;
 
 	case vertex_data:
@@ -980,26 +910,14 @@ process_test_script(const char *script_name)
 				shader_string =
 					(char *) passthrough_vertex_shader_source;
 				shader_string_size = strlen(shader_string);
-			} else if (string_match("[vertex shader file]", line)) {
-				state = vertex_shader_file;
-				shader_string = NULL;
 			} else if (string_match("[tessellation control shader]", line)) {
 				state = tess_ctrl_shader;
-				shader_string = NULL;
-			} else if (string_match("[tessellation control shader file]", line)) {
-				state = tess_ctrl_shader_file;
 				shader_string = NULL;
 			} else if (string_match("[tessellation evaluation shader]", line)) {
 				state = tess_eval_shader;
 				shader_string = NULL;
-			} else if (string_match("[tessellation evaluation shader file]", line)) {
-				state = tess_eval_shader_file;
-				shader_string = NULL;
 			} else if (string_match("[geometry shader]", line)) {
 				state = geometry_shader;
-				shader_string = NULL;
-			} else if (string_match("[geometry shader file]", line)) {
-				state = geometry_shader_file;
 				shader_string = NULL;
 			} else if (string_match("[geometry layout]", line)) {
 				state = geometry_layout;
@@ -1010,14 +928,8 @@ process_test_script(const char *script_name)
 			} else if (string_match("[fragment program]", line)) {
 				state = fragment_program;
 				shader_string = NULL;
-			} else if (string_match("[fragment shader file]", line)) {
-				state = fragment_shader_file;
-				shader_string = NULL;
 			} else if (string_match("[compute shader]", line)) {
 				state = compute_shader;
-				shader_string = NULL;
-			} else if (string_match("[compute shader file]", line)) {
-				state = compute_shader_file;
 				shader_string = NULL;
 			} else if (string_match("[vertex data]", line)) {
 				state = vertex_data;
@@ -1052,17 +964,6 @@ process_test_script(const char *script_name)
 			case compute_shader:
 				if (shader_string == NULL)
 					shader_string = (char *) line;
-				break;
-
-			case vertex_shader_file:
-			case tess_ctrl_shader_file:
-			case tess_eval_shader_file:
-			case geometry_shader_file:
-			case fragment_shader_file:
-			case compute_shader_file:
-				line = eat_whitespace(line);
-				if ((line[0] != '\n') && (line[0] != '#'))
-					load_shader_file(line);
 				break;
 
 			case vertex_data:
@@ -2523,29 +2424,8 @@ piglit_init(int argc, char **argv)
 	gl_max_vertex_uniform_components *= 4;
 	gl_max_clip_planes = 0;
 #endif
-	if (argc > 2) {
-		path = argv[2];
-	} else if (argc > 1) {
-#if defined(_WIN32)
-		char drive[_MAX_DRIVE];
-		char dir[_MAX_DIR];
-		char fname[_MAX_FNAME];
-		char ext[_MAX_EXT];
-		char* scriptpath;
-		_splitpath(argv[1], drive, dir, fname, ext);
-		scriptpath = malloc(strlen(drive) + strlen(dir) + 1);
-		strcpy(scriptpath, drive);
-		strcat(scriptpath, dir);
-		path = scriptpath;
-#else
-		/* Because dirname()'s memory handling is unpredictable, we
-		 * must copy both its input and ouput. */
-		char* scriptpath = strdup(argv[1]);
-		path = strdup(dirname(scriptpath));
-		free(scriptpath);
-#endif
-	} else {
-		printf("shader_runner: missing arguments\n");
+	if (argc < 2) {
+		printf("usage: shader_runner <test.shader_test>\n");
 		exit(1);
 	}
 
