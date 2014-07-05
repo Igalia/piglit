@@ -36,7 +36,7 @@
 # performing the check the check only if the cached MAKO_VERSION does not
 # satisfy the current value of MAKO_REQUIRED_VERSION.
 
-set(MAKO_REQUIRED_VERSION "0.7")
+set(MAKO_REQUIRED_VERSION "0.7.3")
 
 set(__MAKO_CHECK_VERSION_PY "
 try:
