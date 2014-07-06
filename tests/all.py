@@ -147,7 +147,6 @@ glean['vertattrib'] = GleanTest('vertattrib')
 
 glean_glsl_tests = [
                     'Primary plus secondary color',
-                    'Empty blocks ({}), nil (;) statements',
                     'Global vars and initializers',
                     'Global vars and initializers (2)',
                     'Integer Literals',

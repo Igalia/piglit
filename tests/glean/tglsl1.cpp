@@ -131,19 +131,6 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"Empty blocks ({}), nil (;) statements",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   {} \n"   // empty block
-		"   ; \n"    // nil statement
-		"   gl_FragColor = vec4(1.0, 0.5, 0.25, 0.0); \n"
-		"} \n",
-		{ 1.0, 0.5, 0.25, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"Global vars and initializers",
 		NO_VERTEX_SHADER,
 		"vec4 c = vec4(1.0, 0.5, 0.25, 0.0); \n"
