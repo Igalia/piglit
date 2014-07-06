@@ -157,21 +157,6 @@ static const ShaderProgram Programs[] = {
 	},
 
 	{
-		"Integer Literals",
-		"void main() { \n"
-		"   int i = 16;   // Decimal \n"
-		"   int j = 0x10; // Hexadecimal \n"
-		"   int k = 020;  // Octal \n"
-		"   gl_FrontColor = vec4(i, j, k, 16) / 32.0; \n"
-		"   gl_Position = ftransform(); \n"
-		"} \n",
-		NO_FRAGMENT_SHADER,
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"Float Literals",
 		"void main() { \n"
 		"   float x = 0.5e0; \n"
