@@ -145,9 +145,7 @@ glean['texUnits'] = GleanTest('texUnits')
 glean['vertArrayBGRA'] = GleanTest('vertArrayBGRA')
 glean['vertattrib'] = GleanTest('vertattrib')
 
-glean_glsl_tests = ['Directly set fragment color',
-                    'Directly set vertex color',
-                    'Pass-through vertex color',
+glean_glsl_tests = [
                     'Primary plus secondary color',
                     'Empty blocks ({}), nil (;) statements',
                     'Global vars and initializers',

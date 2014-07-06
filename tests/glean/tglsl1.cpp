@@ -112,46 +112,6 @@ static const GLfloat FogColor[4] = { FOG_R, FOG_G, FOG_B, FOG_A };
 static const ShaderProgram Programs[] = {
 	// Simple tests =======================================================
 	{
-		"Directly set fragment color",  // name
-		NO_VERTEX_SHADER,  // vertex shader
-		// fragment shader:
-		"void main() { \n"
-		"   gl_FragColor = vec4(1.0, 0.5, 0.25, 0.0); \n"
-		"} \n",
-		{ 1.0, 0.5, 0.25, 0.0 }, // expectedColor
-		DONT_CARE_Z,  // expectedZ
-		FLAG_NONE  // flags
-	},
-
-	{
-		"Directly set vertex color",
-		"void main() { \n"
-		"   gl_Position = ftransform(); \n"
-		"   gl_FrontColor = vec4(0.5, 1.0, 0.25, 0.0); \n"
-		"} \n",
-		NO_FRAGMENT_SHADER,
-		{ 0.5, 1.0, 0.25, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"Pass-through vertex color",
-		// vert shader:
-		"void main() { \n"
-		"   gl_Position = ftransform(); \n"
-		"   gl_FrontColor = vec4(0.25, 1.0, 0.75, 0.0); \n"
-		"} \n",
-		// frag shader:
-		"void main() { \n"
-		"   gl_FragColor = gl_Color; \n"
-		"} \n",
-		{ 0.25, 1.0, 0.75, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"Primary plus secondary color",
 		// vert shader:
 		"void main() { \n"
