@@ -149,7 +149,6 @@ glean_glsl_tests = [
                     'Primary plus secondary color',
                     'Global vars and initializers',
                     'Global vars and initializers (2)',
-                    'Float Literals',
                     'Swizzle',
                     'Swizzle (rgba)',
                     'Swizzle (stpq)',

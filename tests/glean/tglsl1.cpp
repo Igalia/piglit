@@ -156,22 +156,6 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
-	{
-		"Float Literals",
-		"void main() { \n"
-		"   float x = 0.5e0; \n"
-		"   float y = 5.0e-1; \n"
-		"   float z = -(-0.05e1); \n"
-		"   float w = 0.5; \n"
-		"   gl_FrontColor = vec4(x, y, z, w); \n"
-		"   gl_Position = ftransform(); \n"
-		"} \n",
-		NO_FRAGMENT_SHADER,
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
 	// Swizzle, writemask =================================================
 	{
 		"Swizzle",
