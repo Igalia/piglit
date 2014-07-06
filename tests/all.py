@@ -492,7 +492,6 @@ add_concurrent_test(shaders, 'glsl-max-vertex-attrib')
 add_concurrent_test(shaders, 'glsl-kwin-blur-1')
 add_concurrent_test(shaders, 'glsl-kwin-blur-2')
 add_concurrent_test(shaders, 'gpu_shader4_attribs')
-add_concurrent_test(shaders, 'link-mismatch-layout-02')
 add_concurrent_test(shaders, 'link-unresolved-function')
 add_concurrent_test(shaders, 'sso-simple')
 add_concurrent_test(shaders, 'sso-uniforms-01')
@@ -1273,6 +1272,9 @@ spec['AMD_conservative_depth'] = {}
 import_glsl_parser_tests(spec['AMD_conservative_depth'],
                          os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
                          [''])
+add_shader_test_dir(spec['AMD_conservative_depth'],
+                    os.path.join(testsDir, 'spec', 'amd_conservative_depth'),
+                    recursive=True)
 
 # Group ARB_arrays_of_arrays
 arb_arrays_of_arrays = {}

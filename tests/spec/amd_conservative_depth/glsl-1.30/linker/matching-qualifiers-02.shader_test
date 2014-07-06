@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.30
+GL_AMD_conservative_depth
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#extension GL_AMD_conservative_depth: require
+layout(depth_less) out float gl_FragDepth;
+
+void foo();
+void main()
+{
+     gl_FragDepth = gl_FragCoord.z;
+     foo();
+}
+
+[fragment shader]
+
+/* this shader contains no static write to gl_FragDepth,
+ * so need not redeclare it
+ */
+
+void foo()
+{
+     gl_FragColor = vec4(1);
+}
+
+[test]
+link success
+

@@ -1,0 +1,31 @@
+[require]
+GLSL >= 1.30
+GL_AMD_conservative_depth
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+#extension GL_AMD_conservative_depth: require
+layout(depth_less) out float gl_FragDepth;
+
+void foo();
+void main()
+{
+     gl_FragDepth = gl_FragCoord.z;
+     foo();
+}
+
+[fragment shader]
+
+#extension GL_AMD_conservative_depth: require
+layout(depth_greater) out float gl_FragDepth;
+
+void foo()
+{
+     if (gl_FragCoord.z > 0.5)
+	 gl_FragDepth = 0.5;
+}
+
+[test]
+link error
