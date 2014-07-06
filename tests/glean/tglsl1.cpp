@@ -336,20 +336,6 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
-	{
-		"assignment operators",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   vec4 v = vec4(0.0, 0.25, 0.5, 0.75); \n"
-		"   v *= 2.0; \n"
-		"   v -= vec4(-0.5, 0.0, 0.25, 1.0); \n"
-		"   gl_FragColor = v; \n"
-		"} \n",
-		{ 0.5, 0.5, 0.75, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
 	// built-in functions ================================================
 	{
 		// This is a Mesa regression test (bump.c)

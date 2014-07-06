@@ -163,7 +163,6 @@ glean_glsl_tests = [
                     'Swizzled swizzled swizzle',
                     'gl_FragDepth writing',
                     'chained assignment',
-                    'assignment operators',
                     'cross() function, in-place',
                     'discard statement (1)',
                     'discard statement (2)',
