@@ -1986,6 +1986,8 @@ setup_ubos(void)
 		glBindBuffer(GL_UNIFORM_BUFFER, uniform_block_bos[i]);
 		glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
 		glBindBufferBase(GL_UNIFORM_BUFFER, i, uniform_block_bos[i]);
+
+		glUniformBlockBinding(prog, i, i);
 	}
 }
 
