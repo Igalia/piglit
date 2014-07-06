@@ -168,8 +168,6 @@ glean_glsl_tests = [
                     'chained assignment',
                     'assignment operators',
                     'cross() function, in-place',
-                    'precision exp2',
-                    'precision log2',
                     'discard statement (1)',
                     'discard statement (2)',
                     'discard statement in for loop',
