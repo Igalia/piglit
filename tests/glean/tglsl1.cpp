@@ -508,28 +508,6 @@ static const ShaderProgram Programs[] = {
 		FLAG_NONE
 	},
 
-	{
-		"gl_FrontFacing var (1)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.5 * float(gl_FrontFacing)); \n"
-		"} \n",
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"gl_FrontFacing var (2)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.25 + float(gl_FrontFacing)); \n"
-		"} \n",
-		{ 0.25, 0.25, 0.25, 0.25 },
-		DONT_CARE_Z,
-		FLAG_WINDING_CW
-	},
-
 	// Texture functions ==================================================
 	{
 		"texture2D()",

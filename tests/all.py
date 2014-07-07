@@ -174,8 +174,6 @@ glean_glsl_tests = [
                     'GL state variable reference (point attenuation)',
                     'linear fog',
                     'built-in constants',
-                    'gl_FrontFacing var (1)',
-                    'gl_FrontFacing var (2)',
                     'texture2D()',
                     'texture2D(), computed coordinate',
                     'texture2D(), with bias',
