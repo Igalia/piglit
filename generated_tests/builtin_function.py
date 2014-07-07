@@ -1385,6 +1385,42 @@ def _make_vector_or_matrix_test_vectors(test_suite_dict):
     f('op-bitxor-not', 2, 130, lambda x, y: x ^ (~y), match_simple_binop,
       [ints+ivecs+uints+uvecs, ints+ivecs+uints+uvecs],
       template='({0} ^ (~ {1}))')
+    f('op-bitand-neg-abs', 2, 130, lambda x, y: x & (-abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} & (- abs({1})))')
+    f('op-bitand-not-abs', 2, 130, lambda x, y: x & (~abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} & (~ abs({1})))')
+    f('op-bitor-neg-abs', 2, 130, lambda x, y: x | (-abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} | (- abs({1})))')
+    f('op-bitor-not-abs', 2, 130, lambda x, y: x | (~abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} | (~ abs({1})))')
+    f('op-bitxor-neg-abs', 2, 130, lambda x, y: x ^ (-abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} ^ (- abs({1})))')
+    f('op-bitxor-not-abs', 2, 130, lambda x, y: x ^ (~abs(y)), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} ^ (~ abs({1})))')
+    f('op-bitand-abs-neg', 2, 130, lambda x, y: x & abs(-y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} & abs(- {1}))')
+    f('op-bitand-abs-not', 2, 130, lambda x, y: x & abs(~y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} & abs(~ {1}))')
+    f('op-bitor-abs-neg', 2, 130, lambda x, y: x | abs(-y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} | abs(- {1}))')
+    f('op-bitor-abs-not', 2, 130, lambda x, y: x | abs(~y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} | abs(~ {1}))')
+    f('op-bitxor-abs-neg', 2, 130, lambda x, y: x ^ abs(-y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} ^ abs(- {1}))')
+    f('op-bitxor-abs-not', 2, 130, lambda x, y: x ^ abs(~y), match_simple_binop,
+      [ints+ivecs, ints+ivecs],
+      template='({0} ^ abs(~ {1}))')
     f('length', 1, 110, np.linalg.norm, None, [floats+vecs])
     f('distance', 2, 110, lambda x, y: np.linalg.norm(x-y), match_args(0, 1),
       [floats+vecs, floats+vecs])
