@@ -1,0 +1,45 @@
+# Test proper behavior of the modf(vec3) function.
+#
+# test modf splits the input values into the two pieces and
+# returns them correctly.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+void main()
+{
+  gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+uniform vec3 value;
+uniform vec3 expected1;
+uniform vec3 expected2;
+uniform float tolerance;
+void main()
+{
+  vec3 temp, tempi;
+  bool b1, b2;
+  temp = modf(value, tempi);
+  b1 = distance(tempi, expected1) < tolerance;
+  b2 = distance(temp, expected2) < tolerance;
+  gl_FragColor = vec4(b1, b2, 0.0, 1.0);
+}
+
+[test]
+uniform vec3 value 1.5 0.5 2.5
+uniform vec3 expected1 1.0 0.0 2.0
+uniform vec3 expected2 0.5 0.5 0.5
+uniform float tolerance 0.0041452078
+draw rect -1 -1 2 2
+probe rgba 0 0 1.0 1.0 0.0 1.0
+
+uniform vec3 value -1.33 0.75 10.3333
+uniform vec3 expected1 -1.0 0.0 10.0
+uniform vec3 expected2 -0.33 0.75 0.3333
+uniform float tolerance 0.0041452078
+draw rect -1 -1 2 2
+probe rgba 1 0 1.0 1.0 0.0 1.0

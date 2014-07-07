@@ -1,0 +1,49 @@
+# Test proper behavior of the modf(float) function.
+#
+# test modf splits the input values into the two pieces and
+# returns them correctly.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+varying vec4 color;
+uniform float value;
+uniform float expected1;
+uniform float expected2;
+uniform float tolerance;
+
+void main()
+{
+  gl_Position = gl_Vertex;
+  float temp, tempi;
+  bool b1, b2;
+  temp = modf(value, tempi);
+  b1 = distance(tempi, expected1) < tolerance;
+  b2 = distance(temp, expected2) < tolerance;
+  color = vec4(b1, b2, 0.0, 1.0);
+}
+
+[fragment shader]
+varying vec4 color;
+
+void main()
+{
+  gl_FragColor = color;
+}
+
+[test]
+uniform float value 1.5
+uniform float expected1 1.0
+uniform float expected2 0.5
+uniform float tolerance 0.0041452078
+draw rect -1 -1 2 2
+probe rgba 0 0 1.0 1.0 0.0 1.0
+
+uniform float value -1.33
+uniform float expected1 -1.0
+uniform float expected2 -0.33
+uniform float tolerance 0.0041452078
+draw rect -1 -1 2 2
+probe rgba 1 0 1.0 1.0 0.0 1.0
