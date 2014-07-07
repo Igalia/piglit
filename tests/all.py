@@ -164,8 +164,6 @@ glean_glsl_tests = [
                     'gl_FragDepth writing',
                     'chained assignment',
                     'cross() function, in-place',
-                    'conditional expression',
-                    'conditional expression (2)',
                     'sequence (comma) operator',
                     'constant array with constant indexing, fragment shader',
                     'temp array with constant indexing, fragment shader',

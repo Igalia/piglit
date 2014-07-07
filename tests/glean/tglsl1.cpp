@@ -360,30 +360,6 @@ static const ShaderProgram Programs[] = {
 
 	// Flow Control ======================================================
 	{
-		"conditional expression",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = gl_FragCoord.x < 0.0 ? vec4(0.0) : vec4(0.5); \n"
-		"} \n",
-		{ 0.5, 0.5, 0.5, 0.5 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
-		"conditional expression (2)",
-		NO_VERTEX_SHADER,
-		"void main() { \n"
-		"   gl_FragColor = vec4(0.0); \n"
-		"   bool b = true; \n"
-		"   gl_FragColor.y = b ? 1.0 : 0.5; \n"
-		"} \n",
-		{ 0.0, 1.0, 0.0, 0.0 },
-		DONT_CARE_Z,
-		FLAG_NONE
-	},
-
-	{
 		"sequence (comma) operator",
 		NO_VERTEX_SHADER,
 		"void main() { \n"
