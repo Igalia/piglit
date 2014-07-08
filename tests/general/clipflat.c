@@ -295,7 +295,7 @@ checkResult(GLfloat badColor[3])
 			}
 			else if (image[k + 0] == 0 &&
 				 image[k + 1] >= 254 &&
-				 image[k + 0] == 0) {
+				 image[k + 2] == 0) {
 				// green - OK
 				anyGreen = true;
 			}
