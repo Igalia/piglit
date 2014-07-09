@@ -22,23 +22,3 @@
  */
 
 #include "piglit-util-gl-common.h"
-
-void piglit_require_GLSL(void) {}
-void piglit_require_vertex_shader(void) {}
-void piglit_require_fragment_shader(void) {}
-
-GLboolean
-piglit_program_pipeline_check_status(GLuint pipeline)
-{
-	(void) pipeline;
-	piglit_report_result(PIGLIT_SKIP);
-	return GL_FALSE;
-}
-
-GLboolean
-piglit_program_pipeline_check_status_quiet(GLuint pipeline)
-{
-	(void) pipeline;
-	piglit_report_result(PIGLIT_SKIP);
-	return GL_FALSE;
-}
