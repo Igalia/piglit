@@ -1,13 +1,3 @@
-set(UTIL_GL_SOURCES
-	${UTIL_GL_SOURCES}
-	piglit-matrix.c
-	piglit-test-pattern.cpp
-	piglit-fbo.cpp
-	piglit-vbo.cpp
-	sized-internalformats.c
-	minmax-test.c
-	)
-
 include_directories(
 	${UTIL_GL_INCLUDES}
 	)

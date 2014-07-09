@@ -1,10 +1,3 @@
-list(APPEND UTIL_GL_SOURCES
-	minmax-test.c
-	piglit-dispatch.c
-	piglit-dispatch-init.c
-	piglit-vbo.cpp
-	)
-
 include_directories(
 	${UTIL_GL_INCLUDES}
 	)

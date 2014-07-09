@@ -1,11 +1,3 @@
-set(UTIL_GL_SOURCES
-	${UTIL_GL_SOURCES}
-	piglit-vbo.cpp
-	piglit-dispatch.c
-	piglit-dispatch-init.c
-	minmax-test.c
-	)
-
 include_directories(
 	${UTIL_GL_INCLUDES}
 	)

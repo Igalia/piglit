@@ -29,15 +29,21 @@ set(UTIL_GL_INCLUDES
 
 set(UTIL_GL_SOURCES
 	fdo-bitmap.c
+	minmax-test.c
 	piglit-dispatch.c
 	piglit-dispatch-init.c
+	piglit-fbo.cpp
+	piglit-matrix.c
+	piglit-test-pattern.cpp
 	piglit-util-gl.c
+	piglit-vbo.cpp
 	piglit-framework-gl.c
 	piglit-framework-gl/piglit_gl_framework.c
 	piglit-shader.c
 	piglit_ktx.c
 	rgb9e5.c
 	r11g11b10f.c
+	sized-internalformats.c
 	${CMAKE_BINARY_DIR}/tests/util/piglit-util-gl-enum-gen.c
 	)
 
