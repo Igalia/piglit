@@ -71,7 +71,6 @@ static const char** gl_extension_array_from_getstring()
 	return piglit_split_string_to_array(gl_extensions_string, " ");
 }
 
-#if defined(PIGLIT_USE_OPENGL)
 static const char** gl_extension_array_from_getstringi()
 {
 	const char **strings;
@@ -89,7 +88,6 @@ static const char** gl_extension_array_from_getstringi()
 
 	return (const char**) strings;
 }
-#endif
 
 static void initialize_piglit_extension_support(void)
 {
@@ -97,19 +95,11 @@ static void initialize_piglit_extension_support(void)
 		return;
 	}
 
-#if defined(PIGLIT_USE_OPENGL_ES1) || \
-    defined(PIGLIT_USE_OPENGL_ES2) || \
-    defined(PIGLIT_USE_OPENGL_ES3)
-	gl_extensions = gl_extension_array_from_getstring();
-#elif defined(PIGLIT_USE_OPENGL)
 	if (piglit_get_gl_version() < 30) {
 		gl_extensions = gl_extension_array_from_getstring();
 	} else {
 		gl_extensions = gl_extension_array_from_getstringi();
 	}
-#else
-#error Need code implemented to read extensions
-#endif
 }
 
 void piglit_gl_reinitialize_extensions()
