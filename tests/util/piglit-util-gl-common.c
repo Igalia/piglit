@@ -579,7 +579,6 @@ piglit_frustum_projection(GLboolean push, double l, double r, double b,
 	glLoadIdentity();
 }
 
-#ifndef PIGLIT_USE_OPENGL_ES1
 /**
  * Convenience function to configure a shader uniform variable as an
  * arbitrary orthogonal projection matrix.
@@ -610,7 +609,6 @@ piglit_ortho_uniform(GLint location, int w, int h)
          */
 	piglit_gen_ortho_uniform(location, 0, w, 0, h, -1, 1);
 }
-#endif
 
 
 unsigned
