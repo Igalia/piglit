@@ -647,19 +647,15 @@ required_gl_version_from_glsl_version(unsigned glsl_version)
 void
 piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 {
-#if defined(PIGLIT_USE_OPENGL_ES1)
-	const bool use_fixed_function_attributes = true;
-#elif defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3)
-	const bool use_fixed_function_attributes = false;
-#elif defined(PIGLIT_USE_OPENGL)
-	bool use_fixed_function_attributes = true;
-#else
-#error "don't know how to draw arrays"
-#endif
+	bool use_fixed_function_attributes;
 
-#if defined(PIGLIT_USE_OPENGL)
-	if (piglit_get_gl_version() >= 20
-	    || piglit_is_extension_supported("GL_ARB_shader_objects")) {
+	bool gles = piglit_is_gles();
+	int version = piglit_get_gl_version();
+
+	if (gles) {
+		use_fixed_function_attributes = (version < 20);
+	}  else if (version >= 20 ||
+		    piglit_is_extension_supported("GL_ARB_shader_objects")) {
 		GLuint prog;
 
 		glGetIntegerv(GL_CURRENT_PROGRAM, (GLint *) &prog);
@@ -668,12 +664,12 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 		 * active attribute named piglit_vertex, don't use the fixed
 		 * function inputs.
 		 */
-		use_fixed_function_attributes = prog == 0
+		use_fixed_function_attributes = (prog == 0)
 			|| glGetAttribLocation(prog, "piglit_vertex") == -1;
+	} else {
+		use_fixed_function_attributes = true;
 	}
-#endif
 
-#if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL)
 	if (use_fixed_function_attributes) {
 		if (verts) {
 			glVertexPointer(4, GL_FLOAT, 0, verts);
@@ -691,11 +687,7 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 			glDisableClientState(GL_VERTEX_ARRAY);
 		if (tex)
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	}
-#endif
-#if defined(PIGLIT_USE_OPENGL_ES2) || defined(PIGLIT_USE_OPENGL_ES3) \
-	|| defined(PIGLIT_USE_OPENGL)
-	if (!use_fixed_function_attributes) {
+	} else {
 		GLuint buf = 0;
 		GLuint old_buf = 0;
 		GLuint vao = 0;
@@ -766,7 +758,6 @@ piglit_draw_rect_from_arrays(const void *verts, const void *tex)
 			glDeleteVertexArrays(1, &vao);
 		}
 	}
-#endif
 }
 
 /**
