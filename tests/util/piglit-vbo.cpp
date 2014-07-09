@@ -284,14 +284,12 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 		glVertexAttribPointer(this->index, this->count,
 				      this->data_type, GL_FALSE, stride,
 				      (void *) *offset);
-	} else {
-#if defined(PIGLIT_USE_OPENGL_ES2)
+	} else if (piglit_is_gles() and piglit_get_gl_version() < 30) {
 		fprintf(stderr,"vertex_attrib_description fail. no int support\n");
-#else
+	} else {
 		glVertexAttribIPointer(this->index, this->count,
 				       this->data_type, stride,
 				       (void *) *offset);
-#endif
 	}
 	glEnableVertexAttribArray(index);
 	*offset += ATTRIBUTE_SIZE * this->count;
