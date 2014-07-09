@@ -1270,7 +1270,7 @@ piglit_probe_rect_rgba_uint(int x, int y, int w, int h,
 			probe = &pixels[(j*w+i)*4];
 
 			for (p = 0; p < 4; ++p) {
-				if (fabs(probe[p] - expected[p]) >= piglit_tolerance[p]) {
+				if (abs((int) (probe[p] - expected[p])) >= piglit_tolerance[p]) {
 					printf("Probe color at (%d,%d)\n", x+i, y+j);
 					printf("  Expected: %u %u %u %u\n",
 					       expected[0], expected[1], expected[2], expected[3]);
