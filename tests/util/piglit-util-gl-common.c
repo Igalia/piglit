@@ -431,14 +431,11 @@ piglit_get_compressed_block_size(GLenum format,
 				 unsigned *bw, unsigned *bh, unsigned *bytes)
 {
 	switch (format) {
-#if defined(PIGLIT_USE_OPENGL) || defined(PIGLIT_USE_OPENGL_ES2)
 	case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
 		*bw = *bh = 4;
 		*bytes = 8;
 		return true;
-#endif
-#if defined(PIGLIT_USE_OPENGL)
 	case GL_COMPRESSED_SRGB_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT:
 	case GL_COMPRESSED_RED_RGTC1:
@@ -465,7 +462,6 @@ piglit_get_compressed_block_size(GLenum format,
 		*bh = 4;
 		*bytes = 16;
 		return true;
-#endif
 	default:
 		/* return something rather than uninitialized values */
 		*bw = *bh = *bytes = 1;
