@@ -26,7 +26,7 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	add_definitions ( -DPIGLIT_USE_GLX )
 	piglit_add_library (piglitglxutil
 		    piglit-shader.c
-		    piglit-util-gl-common.c
+		    piglit-util-gl.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c
 		    piglit-dispatch.c
