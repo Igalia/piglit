@@ -60,7 +60,7 @@ get_env_overrides(void)
 static bool
 is_opt_oob(enum piglit_log_opt opt)
 {
-	return opt < 0 || opt > PIGLIT_LOG_OPT_MAX;
+	return opt > PIGLIT_LOG_OPT_MAX;
 }
 
 intptr_t
