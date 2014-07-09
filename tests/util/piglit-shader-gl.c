@@ -21,10 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef PIGLIT_USE_OPENGL
-#	error PIGLIT_USE_OPENGL is undefined
-#endif
-
 #if defined(_MSC_VER)
 #include <windows.h>
 #endif
