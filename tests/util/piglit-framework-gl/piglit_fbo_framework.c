@@ -66,8 +66,6 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 	GLenum status;
 
 #ifdef PIGLIT_USE_OPENGL
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
-
 	if (piglit_get_gl_version() < 20)
 		return false;
 
