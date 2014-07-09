@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include "piglit_ktx.h"
+#include "piglit-util-gl-common.h"
 
 /* FIXME: Remove #defines when piglit-dispatch gains support for GLES. */
 #define GL_TEXTURE_1D				0x0DE0
@@ -631,8 +632,9 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 
 	switch (info->target) {
 	case GL_TEXTURE_1D:
-#ifdef PIGLIT_USE_OPENGL
-		if (info->gl_type == 0)
+		if (piglit_is_gles())
+			goto unsupported_on_gles;
+		else if (info->gl_type == 0)
 			glCompressedTexImage1D(info->target,
 					       level,
 					       info->gl_internal_format,
@@ -650,9 +652,6 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 				     info->gl_type,
 				     img->data);
 		break;
-#else
-		goto unsupported_on_gles;
-#endif
 	case GL_TEXTURE_1D_ARRAY:
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_CUBE_MAP:
@@ -679,8 +678,9 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 	case GL_TEXTURE_2D_ARRAY:
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-#ifdef PIGLIT_USE_OPENGL
-		if (info->gl_type == 0)
+		if (piglit_is_gles())
+			goto unsupported_on_gles;
+		else if (info->gl_type == 0)
 			glCompressedTexImage3D(info->target,
 					       level,
 					       info->gl_internal_format,
@@ -702,9 +702,6 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 				     info->gl_type,
 				     img->data);
 		break;
-#else
-		goto unsupported_on_gles;
-#endif
 	default:
 		*gl_error = 0;
 		piglit_ktx_error("bad texture target 0x%x",
@@ -715,13 +712,11 @@ piglit_ktx_load_noncubeface(struct piglit_ktx *self,
 	*gl_error = glGetError();
 	return *gl_error == 0;
 
-#ifndef PIGLIT_USE_OPENGL
 unsupported_on_gles:
 	*gl_error = 0;
 	piglit_ktx_error("%s", "GLES supports only GL_TEXTURE_2D and "
 			 "GL_TEXTURE_CUBE_MAP");
 	return false;
-#endif
 }
 
 static bool
