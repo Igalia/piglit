@@ -110,7 +110,7 @@
  * exhaustively test a wide variety of scaling behaviours.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 const int PATTERN_WIDTH = 256;
 const int PATTERN_HEIGHT = 64;

@@ -35,7 +35,7 @@
  * miptree copying for relayout that occurs due to the clamping.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define MAX_SIZE	64
 #define MAX_LOD	6

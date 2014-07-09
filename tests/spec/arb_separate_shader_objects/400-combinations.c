@@ -39,7 +39,7 @@
  * test can use either rendezvous-by-name (default) or rendezvous-by-location
  * (with --by-location command line parameter).
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /**
  * Size of each square that will be drawn.

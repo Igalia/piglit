@@ -21,7 +21,7 @@
  */
 
 #include <assert.h>
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 #include "common.h"
 

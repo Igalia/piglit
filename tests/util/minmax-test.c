@@ -29,7 +29,7 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "minmax-test.h"
 
 bool piglit_minmax_pass = true;

@@ -28,7 +28,7 @@
  * LLVMpipe crash which only seems to happen when SSE4.1 is not used.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -34,7 +34,7 @@
  * way, there's a reasonable chance it has bugs without its developers even
  * knowing.
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

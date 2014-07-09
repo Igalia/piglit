@@ -32,7 +32,7 @@
  * Modified by Marek Olšák <maraeo@gmail.com> to reproduce FDO bug #27338.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 64

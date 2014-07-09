@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "parser_utils.h"
 
 static void parse_file(const char *filename);

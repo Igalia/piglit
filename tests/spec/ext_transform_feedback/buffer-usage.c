@@ -28,7 +28,7 @@
  * segfault on certain buffer object allocation 'usage' arguments.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define NUM_POINTS 10002
 #define SHIFT_COUNT 64

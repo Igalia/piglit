@@ -59,7 +59,7 @@
  *   has been cleared to the expected color.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util.h"
 
 #define TEX_LEVELS 6

@@ -35,7 +35,7 @@
  * if we try to enable it.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 20;

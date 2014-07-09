@@ -33,7 +33,7 @@
  * This test checks that GL_INVALID_OPERATION is generated.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

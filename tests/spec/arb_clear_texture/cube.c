@@ -28,7 +28,7 @@
  * the faces are rendered and probed.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 struct vertex {
 	float pos;

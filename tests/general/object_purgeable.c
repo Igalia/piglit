@@ -25,7 +25,7 @@
  *    Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "object_purgeable.h"
 
 #define FAIL_ON_ERROR(string)						\

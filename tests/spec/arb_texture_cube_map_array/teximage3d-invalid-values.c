@@ -30,7 +30,7 @@
  * TEXTURE_CUBE_MAP_ARRAY_ARB and <width> and <height> are not equal.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

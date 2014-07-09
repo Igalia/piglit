@@ -39,7 +39,7 @@
  * to use a clear color that cannot be fast cleared.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 GLuint framebuffer, renderbuffer;
 #define WIDTH 300

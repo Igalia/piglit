@@ -37,7 +37,7 @@
  * 5			TEXTURE_CUBE_MAP_NEGATIVE_Z
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

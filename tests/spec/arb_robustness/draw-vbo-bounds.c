@@ -45,7 +45,7 @@
  * - provide a command line option to actually enable ARB_robustness
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

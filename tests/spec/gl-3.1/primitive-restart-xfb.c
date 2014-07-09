@@ -50,7 +50,7 @@
  *   location in the transform feedback buffer.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_core_version = 31;

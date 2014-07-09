@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <unistd.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util-waffle.h"
 
 #include "piglit_gbm_framework.h"

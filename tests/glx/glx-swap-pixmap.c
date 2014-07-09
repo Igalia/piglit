@@ -32,7 +32,7 @@
  *     non-double-buffered GLXFBConfig, or if draw is a GLXPixmap.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 50, piglit_height = 50;

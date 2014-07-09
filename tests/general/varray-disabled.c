@@ -34,7 +34,7 @@
  * http://bugs.freedesktop.org/show_bug.cgi?id=19911
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

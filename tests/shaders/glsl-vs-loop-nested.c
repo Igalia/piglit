@@ -37,7 +37,7 @@
  * This was conceived as a test case for freedesktop.org bug #25173.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

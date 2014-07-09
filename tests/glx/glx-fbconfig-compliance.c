@@ -27,7 +27,7 @@
  * minimum requirements specified by GLX 1.4 section 3.3.3
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 static PFNGLXGETFBCONFIGSPROC GetFBConfigs = NULL;

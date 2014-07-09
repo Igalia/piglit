@@ -24,7 +24,7 @@
  * \file clearbuffer-common.c
  * Common code and data for the basic glClearBuffer tests
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 const float default_color[4] = { 0.2, 0.4, 0.6, 1.0 };
 const float default_depth = 0.2;

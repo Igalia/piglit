@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "r11g11b10f.h"
 #include <math.h>
 #include <assert.h>

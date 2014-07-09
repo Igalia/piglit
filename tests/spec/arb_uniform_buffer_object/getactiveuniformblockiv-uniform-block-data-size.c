@@ -34,7 +34,7 @@
  *      next multiple of the base alignment required for a vec4."
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "uniform-types.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

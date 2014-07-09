@@ -35,7 +35,7 @@
  *   2. Randomised triangle drawing to attempt to test all possible triangles
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "mersenne.hpp"
 
 #include <time.h>

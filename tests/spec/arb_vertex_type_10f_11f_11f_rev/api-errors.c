@@ -27,7 +27,7 @@
  * This tests a few error conditions from the ARB_vertex_type_10f_11f_11f_rev extension.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 20;

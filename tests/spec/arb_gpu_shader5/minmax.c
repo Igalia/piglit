@@ -25,7 +25,7 @@
  * Test for the minimum maximum values in GL_ARB_gpu_shader5.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "minmax-test.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

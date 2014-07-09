@@ -39,7 +39,7 @@
  *         for (uint i = 0; i < MAX_VIEWPORTS; i++)
  *         DepthRangeIndexed(i, n, f );"
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

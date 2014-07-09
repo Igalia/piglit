@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const GLint tests[][8] = {
    { 1, GL_REPLACE,  GL_PRIMARY_COLOR, GL_PRIMARY_COLOR,

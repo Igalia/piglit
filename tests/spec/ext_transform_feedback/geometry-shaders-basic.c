@@ -38,7 +38,7 @@
  *   transform feedback buffer.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define GEOM_OUT_VERTS 10
 

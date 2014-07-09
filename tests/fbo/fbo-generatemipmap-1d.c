@@ -28,7 +28,7 @@
  *
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_SIZE 128
 #define TEX_LEVELS 8

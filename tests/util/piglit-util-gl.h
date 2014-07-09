@@ -22,8 +22,8 @@
  */
 
 #pragma once
-#ifndef PIGLIT_UTIL_GL_COMMON_H
-#define PIGLIT_UTIL_GL_COMMON_H
+#ifndef __PIGLIT_UTIL_GL_H__
+#define __PIGLIT_UTIL_GL_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -266,4 +266,4 @@ required_gl_version_from_glsl_version(unsigned glsl_version);
 } /* end extern "C" */
 #endif
 
-#endif /* PIGLIT_UTIL_GL_COMMON_H */
+#endif /* __PIGLIT_UTIL_GL_H__ */

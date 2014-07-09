@@ -22,7 +22,7 @@
  *
  * Authors: Christoph Bumiller
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* File: sample-position.c
  *

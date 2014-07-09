@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit_drm_dma_buf.h"
 #ifdef HAVE_LIBDRM_INTEL
 #include <libdrm/intel_bufmgr.h>

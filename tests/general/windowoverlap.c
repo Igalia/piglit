@@ -30,7 +30,7 @@
  * This test was prompted by http://bugs.freedesktop.org/show_bug.cgi?id=16123
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const int MainWidth = 128, MainHeight = 128;
 static const int SubX = 32, SubY = 32;

@@ -30,7 +30,7 @@
  *     "Individual elements of a uniform array are assigned consecutive
  *     locations with the first element taking location <location>."
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

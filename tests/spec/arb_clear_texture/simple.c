@@ -37,7 +37,7 @@
  * With the boxes from left to right being green, blue, and yellow.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

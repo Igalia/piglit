@@ -35,7 +35,7 @@
  * had been removed.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_WIDTH 8
 #define TEX_HEIGHT 8

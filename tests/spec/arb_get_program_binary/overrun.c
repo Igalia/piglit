@@ -26,7 +26,7 @@
  * Verify that queries don't over-run the size of the supplied buffer.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <stdlib.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

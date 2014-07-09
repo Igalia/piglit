@@ -28,7 +28,7 @@
  * Scissor Box bounds with viewport arrays (0 to GL_MAX_VIEWPORTS-1).
  * "Bounds" are the rectangle or range (eg x, y, width, height).
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

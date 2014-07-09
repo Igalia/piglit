@@ -36,7 +36,7 @@
  *      the passed value is rounded to the nearest integer."
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #include <fenv.h>
 

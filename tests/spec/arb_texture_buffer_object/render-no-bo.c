@@ -35,7 +35,7 @@
  * but don't test the values returned.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 enum piglit_result
 piglit_display(void)

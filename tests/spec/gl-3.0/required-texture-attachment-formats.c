@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "sized-internalformats.h"
 
 /**

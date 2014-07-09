@@ -27,7 +27,7 @@
  * XXX we should also do some rendering with the texture and check the results.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -26,7 +26,7 @@
  * Tests that the three fog modes work with fog enabled using the depth value.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #if defined(_WIN32)
 #undef near

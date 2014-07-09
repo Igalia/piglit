@@ -31,7 +31,7 @@
  * color clear will take effect.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define RB_WIDTH 512
 #define RB_HEIGHT 512

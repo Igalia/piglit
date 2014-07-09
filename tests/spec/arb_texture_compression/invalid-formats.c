@@ -37,7 +37,7 @@
  * All texture compression extensions have taken this to mean only linear RGB
  * and linear RGBA formats should be exposed.
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

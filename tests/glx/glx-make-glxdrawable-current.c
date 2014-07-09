@@ -33,7 +33,7 @@
  * https://bugs.freedesktop.org/show_bug.cgi?id=30457
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 50, piglit_height = 50;

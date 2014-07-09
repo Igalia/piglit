@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit_wl_framework.h"
 
 static void

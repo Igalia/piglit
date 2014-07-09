@@ -36,7 +36,7 @@
  * (without scissoring it) so that failures can be easily diagnosed.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const int width = 128, height = 128;
 

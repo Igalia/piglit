@@ -27,7 +27,7 @@
  * Tests that rendering to a texture of maximum size works.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

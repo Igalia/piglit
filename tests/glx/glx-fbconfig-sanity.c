@@ -27,7 +27,7 @@
  * This reproduces X.org bugzilla #34265, among much else.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 10;

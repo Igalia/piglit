@@ -24,7 +24,7 @@
 #define SAMPLE_COMMON_H
 
 #include "piglit-util-egl.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /**
  * Create a dma buffer with format 'fourcc' setting the given pixels as its

@@ -33,7 +33,7 @@
  * Compare this test to fbo-generatemipmap.c.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_WIDTH 256
 #define TEX_HEIGHT 256

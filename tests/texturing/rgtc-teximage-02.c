@@ -33,7 +33,7 @@
  * modified by Dave Airlie for RGTC
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "rg-teximage-common.h"
 
 #define WIDTH  256

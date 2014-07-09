@@ -30,7 +30,7 @@
  * Tests use of a temporary array as a source/destination in the VS.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

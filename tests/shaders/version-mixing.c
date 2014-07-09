@@ -51,7 +51,7 @@
  * with a geometry shader of another version.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static enum test_type {
 	test_type_interstage,

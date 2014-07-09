@@ -29,7 +29,7 @@
  * This test just checks and reports which behavior is found.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

@@ -30,7 +30,7 @@
  * (GL_ARB_vertex_program or GL_ARB_fragment_program) program.  This test
  * attempts to reproduce this failure using an assembly fragment program.
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const char vs_text[] =
 	"void main() { gl_Position = gl_Vertex;"

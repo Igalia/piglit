@@ -29,7 +29,7 @@
  * \author Ian Romanick
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "depth-tex-modes-common.h"
 
 static void loadTex(void);

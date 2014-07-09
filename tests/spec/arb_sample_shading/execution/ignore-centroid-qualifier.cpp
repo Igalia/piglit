@@ -29,7 +29,7 @@
  * used with 'in' variable.
  *
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-fbo.h"
 
 using namespace piglit_util_fbo;

@@ -45,7 +45,7 @@
  *  (0, 1, 0), and the remaining layers will be not set.
  */
 
- #include "piglit-util-gl-common.h"
+ #include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

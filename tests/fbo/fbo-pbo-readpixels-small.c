@@ -34,7 +34,7 @@
  * https://bugs.freedesktop.org/show_bug.cgi?id=25921
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define BUF_WIDTH 8
 #define BUF_HEIGHT 8

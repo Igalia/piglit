@@ -32,7 +32,7 @@
  */
 
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "../fbo/fbo-formats.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

@@ -39,7 +39,7 @@
  *    polygons, the scissor rectangle for a primitive is selected in the same
  *    manner as the viewport (see section 13.6.1)."
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

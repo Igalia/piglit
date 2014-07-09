@@ -30,7 +30,7 @@
  * GL_TEXTURE_MAX_LOD work on a mipmapped 2D texture.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define MAX_SIZE	32
 #define MAX_LOD	5

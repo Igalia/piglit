@@ -30,7 +30,7 @@
  * Tests that using a PBO as the unpack buffer for glTexImage works correctly.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

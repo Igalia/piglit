@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const char *TestLabel = "Test Label";
 #define TestLabelLen 10

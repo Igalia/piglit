@@ -26,7 +26,7 @@
  * Test of ATI_envmap_bumpmap texture combiners.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEXSIZE 32
 

@@ -28,7 +28,7 @@
  * Test EGL_NOK_swap_region.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "egl-util.h"
 
 #ifdef EGL_NOK_swap_region

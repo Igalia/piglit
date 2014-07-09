@@ -31,7 +31,7 @@
  */
 
 #include <assert.h>
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "hiz/hiz-util.h"
 
 #define hiz_probe_common(probe_func, expect) \

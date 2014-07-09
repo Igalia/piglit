@@ -56,7 +56,7 @@
  * specification and check that impleentations follow that.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

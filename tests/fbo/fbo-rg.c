@@ -35,7 +35,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 
 #define EPSILON (1.0 / 255.0)

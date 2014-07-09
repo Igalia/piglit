@@ -32,7 +32,7 @@
  * and then drawing both to the framebuffer succeeds.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define BUF_WIDTH 16
 

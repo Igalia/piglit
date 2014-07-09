@@ -32,7 +32,7 @@
  * while the lower half is mapped.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

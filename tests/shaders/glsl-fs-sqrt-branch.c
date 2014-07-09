@@ -31,7 +31,7 @@
  * containing a conditional branch.  Catches a bug in the 965 driver.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

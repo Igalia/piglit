@@ -34,7 +34,7 @@
  * Wine likes to do that to us to see how strict we are on the VP language.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

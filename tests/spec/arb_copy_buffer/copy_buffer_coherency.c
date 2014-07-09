@@ -25,7 +25,7 @@
  *
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define COPY_BUFFER_SIZE (4<<20)
 uint8_t src_data[COPY_BUFFER_SIZE];

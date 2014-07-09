@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "piglit_glut_framework.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 struct piglit_glut_framework {
 	struct piglit_gl_framework gl_fw;

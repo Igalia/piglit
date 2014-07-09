@@ -28,7 +28,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const GLfloat attrib[] = {
 	1.0,

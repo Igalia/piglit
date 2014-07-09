@@ -34,7 +34,7 @@
  * overlap, but with one buffer being both src and dst.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

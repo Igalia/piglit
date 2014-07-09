@@ -44,7 +44,7 @@
  *        Layer 1-4 of both tex1 and tex2 should be the clearDepth
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

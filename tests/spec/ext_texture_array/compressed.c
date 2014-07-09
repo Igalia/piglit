@@ -50,7 +50,7 @@
  * desktop GL, it is performed using S3TC textures.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util-compressed-grays.h"
 
 #ifdef PIGLIT_USE_OPENGL

@@ -91,7 +91,7 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
 /**

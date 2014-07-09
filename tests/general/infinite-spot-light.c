@@ -39,7 +39,7 @@
  *      infinite light is met. This is somehow not permitted by glSpec.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

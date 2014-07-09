@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit_gl_framework.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #ifdef PIGLIT_USE_WAFFLE
 #	include "piglit_fbo_framework.h"

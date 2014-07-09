@@ -28,7 +28,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEST_ROWS  1
 #define TEST_COLS  2

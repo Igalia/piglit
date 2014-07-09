@@ -64,7 +64,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util-egl.h"
 #include "common.h"
 

@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "piglit_ktx.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* FIXME: Remove #defines when piglit-dispatch gains support for GLES. */
 #define GL_TEXTURE_1D				0x0DE0

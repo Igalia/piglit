@@ -24,7 +24,7 @@
  */
 
 <%block filter='fake_whitespace'>\
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 const char*
 piglit_get_gl_enum_name(GLenum param)

@@ -48,7 +48,7 @@
  * buffer.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_WIDTH 512
 #define TEX_HEIGHT 512

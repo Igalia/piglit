@@ -21,7 +21,7 @@
  */
 
 #include "piglit-dispatch.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #if defined(PIGLIT_USE_WAFFLE)
 #include <waffle.h>

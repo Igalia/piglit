@@ -21,7 +21,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /**
  * @file bind_buffer_invalid_index.c

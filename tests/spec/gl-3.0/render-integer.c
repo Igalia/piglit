@@ -27,7 +27,7 @@
  * 19 June 2014
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 	config.supports_gl_compat_version = 30;

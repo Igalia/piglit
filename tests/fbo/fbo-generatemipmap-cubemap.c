@@ -24,7 +24,7 @@
  *     Marek Olšák <maraeo@gmail.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_SIZE 32
 #define TEX_HALF (TEX_SIZE / 2)

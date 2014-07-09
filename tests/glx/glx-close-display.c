@@ -31,7 +31,7 @@
  * Test that calling XCloseDisplay after using GLX context works correctly.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 /**

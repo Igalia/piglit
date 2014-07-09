@@ -31,7 +31,7 @@
 #include <libgen.h>
 #endif
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
 #include "shader_runner_gles_workarounds.h"

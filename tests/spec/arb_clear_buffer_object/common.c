@@ -27,7 +27,7 @@
  * Common routines to fill or check array buffer data.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* Check that the range of ARRAY_BUFFER specified with <ofs> and <length>
  * is filled with chunks of data of length <expected_data_size>.

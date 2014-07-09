@@ -33,7 +33,7 @@
 
 #include <errno.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static unsigned parse_glsl_version_number(const char *str);
 static int process_options(int argc, char **argv);

@@ -25,7 +25,7 @@
  * Test for the minimum maximum value in the GL_ARB_texture_buffer_object spec.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "minmax-test.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <X11/Xlib.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>

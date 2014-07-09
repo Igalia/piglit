@@ -25,7 +25,7 @@
  * Test some tricky cases of display lists and glBegin/End.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

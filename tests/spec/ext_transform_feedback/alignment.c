@@ -32,7 +32,7 @@
  * glBindBufferRange().  This value may be 0, 4, 8, or 12.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define BUFFER_SIZE 0x40
 

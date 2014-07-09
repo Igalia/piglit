@@ -30,7 +30,7 @@
  * Tests that we can access gl_TextureMatrix[1] in the vertex shader.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

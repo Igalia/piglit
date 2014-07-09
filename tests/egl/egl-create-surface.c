@@ -34,7 +34,7 @@
  *   error is generated.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "egl-util.h"
 
 static enum piglit_result

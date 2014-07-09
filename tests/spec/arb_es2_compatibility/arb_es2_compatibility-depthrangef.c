@@ -27,7 +27,7 @@
  * glDepthRange) and that it works.  Based on general/depth-clamp-range.c.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

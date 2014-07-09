@@ -47,7 +47,7 @@
  *    (8)-------(9)   while 4 will be green.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

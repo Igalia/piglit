@@ -38,7 +38,7 @@
  * assume that this is reported at compile time as well.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <math.h>
 #include <limits.h>
 

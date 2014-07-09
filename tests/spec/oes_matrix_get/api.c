@@ -25,7 +25,7 @@
  * Test the queries added by GL_OES_matrix_get.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

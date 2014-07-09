@@ -32,7 +32,7 @@
  * Catches a bug in the X Server when a swap interval of 0 is used.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 #include "common.h"
 

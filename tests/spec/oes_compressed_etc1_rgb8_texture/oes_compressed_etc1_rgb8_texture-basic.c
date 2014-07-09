@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #ifndef GL_OES_compressed_ETC1_RGB8_texture
 #define GL_ETC1_RGB8_OES                                        0x8D64

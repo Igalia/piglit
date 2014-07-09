@@ -28,7 +28,7 @@
  * None of these subtests is large enough to warrant a separate test case.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -23,7 +23,7 @@
  * Author: Neil Roberts <neil@linux.intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 struct format {
 	GLenum internalFormat;

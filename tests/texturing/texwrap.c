@@ -62,7 +62,7 @@
  *   2D GL_RGBA8
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <limits.h>
 
 /* Only *_ARB versions of these exist. I am lazy to add the suffix. */

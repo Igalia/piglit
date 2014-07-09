@@ -24,7 +24,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util-waffle.h"
 
 static void

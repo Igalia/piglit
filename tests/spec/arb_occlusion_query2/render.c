@@ -27,7 +27,7 @@
  * Simple test for getting query results with GL_ARB_occlusion_query2.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

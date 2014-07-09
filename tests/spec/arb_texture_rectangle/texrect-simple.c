@@ -31,7 +31,7 @@
  * \author: Eric Anholt <eric@anholt.net> (original)
  * \author: Tom Gall <tom.gall@linaro.org> (port)
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEXTURE_WIDTH   255
 #define TEXTURE_HEIGHT  127

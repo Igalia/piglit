@@ -23,7 +23,7 @@
 
 #include <errno.h>
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 void piglit_get_glsl_version(bool *es, int* major, int* minor)
 {

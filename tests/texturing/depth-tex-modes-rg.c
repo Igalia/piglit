@@ -28,7 +28,7 @@
  * \author Ian Romanick <ian.d.romanick@intel.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "depth-tex-modes-common.h"
 
 static const GLenum depth_texture_modes[] = {

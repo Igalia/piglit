@@ -35,7 +35,7 @@
 #include <drm_fourcc.h>
 
 #include "piglit-util-egl.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* We define here the enums for EGL_EXT_image_dma_buf_import because, as of
  * today (2013-09-10), the eglext.h on many systems lack them.  The first Mesa

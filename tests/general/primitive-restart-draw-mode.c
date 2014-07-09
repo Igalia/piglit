@@ -53,7 +53,7 @@
  * GL_POINTS.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 
 #define NUM_VERTICES 8

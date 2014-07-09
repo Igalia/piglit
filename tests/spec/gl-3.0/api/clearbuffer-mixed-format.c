@@ -44,7 +44,7 @@
  * \author Anuj Phogat
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "clearbuffer-common.h"
 
 #define COUNT ARRAY_SIZE(test_vectors)

@@ -54,7 +54,7 @@
  * transform feedback after the glReadPixels call.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static bool use_gs;
 

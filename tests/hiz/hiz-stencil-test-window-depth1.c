@@ -32,7 +32,7 @@
  * framebuffer with a depth buffer.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "hiz/hiz-util.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

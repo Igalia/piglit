@@ -28,7 +28,7 @@
  *
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "r11g11b10f.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

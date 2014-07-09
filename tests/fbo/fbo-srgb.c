@@ -33,7 +33,7 @@
  * To get SRGB blending EXT_framebuffer_sRGB is required.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

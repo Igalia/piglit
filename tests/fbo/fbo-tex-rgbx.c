@@ -33,7 +33,7 @@
  * sample from it.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_SIZE 256
 

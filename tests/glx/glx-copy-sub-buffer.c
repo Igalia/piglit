@@ -33,7 +33,7 @@
  * Test that GLX_MESA_copy_sub_buffer works as advertised
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 int piglit_width = 100, piglit_height = 100;

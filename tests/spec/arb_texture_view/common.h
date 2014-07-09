@@ -23,7 +23,7 @@
  * Author: Jon Ashburn <jon@lunarg.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
  
 GLubyte *
 create_solid_image(GLint w, GLint h, GLint d, const unsigned int bytes,

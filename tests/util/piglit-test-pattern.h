@@ -26,7 +26,7 @@
  * test patterns in to color, depth or stencil buffers.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "math.h"
 
 namespace piglit_util_test_pattern

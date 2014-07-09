@@ -25,7 +25,7 @@
  * Test for the minimum maximum values in GL_ARB_vertex_program.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

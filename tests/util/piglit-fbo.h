@@ -26,7 +26,7 @@
  * test's requirements.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "math.h"
 
 namespace piglit_util_fbo {

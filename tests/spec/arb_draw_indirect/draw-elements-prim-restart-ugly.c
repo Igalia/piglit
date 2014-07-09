@@ -25,7 +25,7 @@
 /* Basic test of glDrawElementsIndirect interaction with primitive restart,
  * with a weird cut index. This requires a fallback on Ivybridge. */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

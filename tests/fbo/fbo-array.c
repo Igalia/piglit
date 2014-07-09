@@ -33,7 +33,7 @@
  * based on fbo-3d.c and array-texture.c
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define BUF_WIDTH 32
 #define BUF_HEIGHT 32

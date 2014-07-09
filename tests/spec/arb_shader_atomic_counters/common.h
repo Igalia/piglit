@@ -29,7 +29,7 @@
 #ifndef __PIGLIT_ARB_SHADER_ATOMIC_COUNTERS_COMMON_H__
 #define __PIGLIT_ARB_SHADER_ATOMIC_COUNTERS_COMMON_H__
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 bool
 atomic_counters_probe_buffer(unsigned base, unsigned count,

@@ -31,7 +31,7 @@
  */
 
 #include <X11/XKBlib.h>
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "egl-util.h"
 
 static int automatic;

@@ -45,7 +45,7 @@
  * an array of images, and the framebuffer attachment is considered layered.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

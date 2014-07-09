@@ -27,7 +27,7 @@
  * generate an error.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-shader.h"
 
 

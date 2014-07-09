@@ -23,7 +23,7 @@
  * Author: Jon Ashburn <jon@lunarg.com>
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <stdarg.h>
 
 const GLubyte Colors[][8] = {

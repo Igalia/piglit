@@ -68,7 +68,7 @@
  *     and the texture image will not be compressed by the GL."
  */
 #include <stdarg.h>
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

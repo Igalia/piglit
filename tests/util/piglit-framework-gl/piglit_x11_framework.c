@@ -53,7 +53,7 @@
 #	include <waffle_x11_egl.h>
 #endif
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #include "piglit_gl_framework.h"
 #include "piglit_x11_framework.h"

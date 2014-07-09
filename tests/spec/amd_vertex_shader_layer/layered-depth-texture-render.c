@@ -36,7 +36,7 @@
  * then verifies the depth value in each array slice & LOD.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define PAD		5
 #define SIZE		64

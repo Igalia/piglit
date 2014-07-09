@@ -31,7 +31,7 @@
  * sampling.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define SIZE 32
 

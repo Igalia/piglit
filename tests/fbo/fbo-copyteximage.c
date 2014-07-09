@@ -31,7 +31,7 @@
  * This tries to catch a bug with the Intel driver and texture tiling.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define TEX_WIDTH 254
 #define TEX_HEIGHT 254

@@ -31,7 +31,7 @@
  *     - GL_STENCIL_ATTACHMENT: GL_STENCIL_INDEX8
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "hiz/hiz-util.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

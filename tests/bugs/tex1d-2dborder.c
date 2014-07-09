@@ -30,7 +30,7 @@
  * 2D textures, which caused incorrect sampling of border colors.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -31,7 +31,7 @@
  * clear color (green) using the alpha value.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define BOX_SIZE 24
 

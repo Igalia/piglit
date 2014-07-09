@@ -26,7 +26,7 @@
  * Tests that the getters for the new binding points in GL_ARB_copy_buffer work.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

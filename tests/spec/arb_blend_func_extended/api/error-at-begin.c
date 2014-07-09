@@ -32,7 +32,7 @@
  * ONE_MINUS_SRC1_ALPHA), and a framebuffer is bound that has more than
  * the value of MAX_DUAL_SOURCE_DRAW_BUFFERS-1 active color attachements."
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

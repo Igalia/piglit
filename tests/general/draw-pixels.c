@@ -30,7 +30,7 @@
  * author: Anuj Phogat
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* Data conversions as used in mesa */
 /** Convert GLubyte in [0,255] to GLfloat in [0.0,1.0] */

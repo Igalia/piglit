@@ -28,7 +28,7 @@
  * contain GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static void
 usage_error(void)

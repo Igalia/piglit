@@ -44,7 +44,7 @@
  * http://devtools.ericsson.com/etc.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit_ktx.h"
 
 static const int num_levels = 7;

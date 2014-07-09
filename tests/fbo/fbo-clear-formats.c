@@ -31,7 +31,7 @@
  * texture-based FBOs of various internalformats.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "fbo-formats.h"
 
 #define TEX_WIDTH 256

@@ -29,7 +29,7 @@
  * the same texture coordinate), but it reproduces a bug in the Mesa i915
  * driver.  See Meego bug #13005 (https://bugs.meego.com/show_bug.cgi?id=13005).
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -27,7 +27,7 @@
  * Common code for glProgramParameter testing.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 
 struct primitive_geom_info {

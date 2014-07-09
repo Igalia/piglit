@@ -27,7 +27,7 @@
  * Clear with size set to zero and verify that the buffer data was not altered.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "common.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

@@ -41,7 +41,7 @@
  * [2] etcpack is the reference ETC1 compression tool, available at http://devtools.ericsson.com/etc.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit_ktx.h"
 
 #define num_levels 7

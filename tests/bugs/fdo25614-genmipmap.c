@@ -31,7 +31,7 @@
  * \author Ian Romanick
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 /* Pick the number of LODs to examine and the size of the texture so that the
  * smallest LOD is the one where each of the 4x4 tiles in the checkerboard

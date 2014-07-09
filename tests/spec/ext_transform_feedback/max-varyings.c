@@ -37,7 +37,7 @@
  * possible lengths and offsets.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define MAX_VARYING 32
 

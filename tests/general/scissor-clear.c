@@ -30,7 +30,7 @@
  * Tests that glScissor properly affects glClear(GL_COLOR_BUFFER_BIT)().
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -48,7 +48,7 @@
  * checking based on the post-geometry-shader vertex count.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static bool use_gs;
 

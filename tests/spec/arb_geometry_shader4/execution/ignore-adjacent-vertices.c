@@ -33,7 +33,7 @@
  * "If a geometry shader is not active, the "adjacent" vertices are ignored."
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 struct primitive {
 	GLenum type;

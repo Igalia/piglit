@@ -26,7 +26,7 @@
  * test cases.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-test-pattern.h"
 #include "piglit-fbo.h"
 #include "math.h"

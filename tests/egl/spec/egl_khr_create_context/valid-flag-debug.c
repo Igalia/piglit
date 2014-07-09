@@ -48,7 +48,7 @@
  */
 
 #include "piglit-util-egl.h"
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "common.h"
 
 const char *progname;

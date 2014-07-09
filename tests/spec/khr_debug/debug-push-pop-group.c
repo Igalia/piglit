@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 static const char *TestMessage1 = "Piglit Message 1";
 static const char *TestMessage2 = "Piglit Message 2";

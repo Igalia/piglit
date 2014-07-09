@@ -40,7 +40,7 @@
  *     - Transpose matrices set by \c glProgramUniformMatrix*v with \c transpose
  *       set to \c GL_TRUE.
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

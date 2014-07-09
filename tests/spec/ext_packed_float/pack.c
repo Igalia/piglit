@@ -27,7 +27,7 @@
  * GL_UNSIGNED_INT_10F_11F_11F_REV format.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

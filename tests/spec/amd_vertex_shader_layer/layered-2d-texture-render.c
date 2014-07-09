@@ -37,7 +37,7 @@
  * that the expected colors appear.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define PAD		5
 #define SIZE		64

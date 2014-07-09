@@ -32,7 +32,7 @@
 
 #pragma once
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 struct hiz_fbo_options {
 	GLenum color_format;

@@ -30,7 +30,7 @@
  * Support code for running tests of GLX_OML_sync_control.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 #include "common.h"
 

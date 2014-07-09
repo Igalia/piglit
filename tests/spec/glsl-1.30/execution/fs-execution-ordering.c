@@ -33,7 +33,7 @@
  * of a race condition occurring.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define SHIFT_COUNT 64
 

@@ -36,7 +36,7 @@
  * Test that GLX_EXT_buffer_age works as advertised
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 
 #ifndef GLX_BACK_BUFFER_AGE_EXT

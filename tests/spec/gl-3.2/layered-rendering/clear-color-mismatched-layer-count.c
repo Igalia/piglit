@@ -44,7 +44,7 @@
  *   been cleared to green.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-util.h"
 
 #define TEX_SIZE 128

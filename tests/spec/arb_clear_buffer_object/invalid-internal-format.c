@@ -41,7 +41,7 @@
  * Test that the required GL_INVALID_ENUM error is generated for these formats.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -40,7 +40,7 @@
  * - Partially covered by one color, partially by another color
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

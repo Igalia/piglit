@@ -33,7 +33,7 @@
  * deleted with DeleteRenderbuffers."
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "minmax-test.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

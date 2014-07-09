@@ -28,7 +28,7 @@
  * textures and texture rectangles.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "depth-tex-modes-common.h"
 
 static const GLenum depth_texture_modes[] = {

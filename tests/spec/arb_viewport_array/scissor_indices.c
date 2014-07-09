@@ -32,7 +32,7 @@
  * Also test SCISSOR_TEST indices with glEnablei and others.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include <stdarg.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

@@ -43,7 +43,7 @@
 #if defined(__AGL__)
 #   include <cstring>
 #endif
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 namespace GLEAN {
 

@@ -28,7 +28,7 @@
  * Tests that GLSL 1.30 exposes the GL_MIN/MAX_PROGRAM_OFFSET_LIMITS.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

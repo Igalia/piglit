@@ -26,7 +26,7 @@
  * \author Dave Airlie
  * Test additions to blending API from ARB_blend_func_extended
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

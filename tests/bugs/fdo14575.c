@@ -30,7 +30,7 @@
  *
  * Tests that the driver doesn't fail when deleting a mapped buffer object.
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

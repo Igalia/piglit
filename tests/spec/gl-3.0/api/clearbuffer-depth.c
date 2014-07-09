@@ -47,7 +47,7 @@
  *
  * \author Ian Romanick
  */
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "clearbuffer-common.h"
 
 void piglit_init(int argc, char **argv)

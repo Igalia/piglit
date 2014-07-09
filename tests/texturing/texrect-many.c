@@ -6,7 +6,7 @@
  * (Prompted by a bug in R300 where the driver ran out of indirections).
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

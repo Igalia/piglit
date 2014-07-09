@@ -27,7 +27,7 @@
  * and GL_ARB_instanced_arrays
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-matrix.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN

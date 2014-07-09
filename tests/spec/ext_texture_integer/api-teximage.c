@@ -28,7 +28,7 @@
  * Tests GL_EXT_texture_integer's error behavior with glTexImage2D().
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

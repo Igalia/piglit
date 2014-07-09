@@ -35,7 +35,7 @@
  * error checking doesn't fail copies within the bounds.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

@@ -42,7 +42,7 @@
  *  for the TRIANGLES_ADJACENCY and TRIANGLE_STRIP_ADJACENCY primitive types."
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 

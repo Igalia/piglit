@@ -31,7 +31,7 @@
  * internalformats.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "fbo-formats.h"
 
 static bool npot;

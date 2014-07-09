@@ -31,7 +31,7 @@
  * to the same GLX window works correctly.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 #include "piglit-glx-util.h"
 #include "pthread.h"
 

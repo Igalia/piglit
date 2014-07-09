@@ -27,7 +27,7 @@
 
 /* this test does some basic tests of ARB_vertex_type_2_10_10_10 vbos */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
