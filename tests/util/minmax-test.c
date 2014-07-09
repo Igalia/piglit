@@ -63,7 +63,6 @@ piglit_report_uint(const char *name, GLuint limit, GLuint val, bool pass)
 	printf("\n");
 }
 
-#if !defined(PIGLIT_USE_OPENGL_ES2)
 static void
 piglit_report_int64(const char *name, GLint64 limit, GLint64 val, bool pass)
 {
@@ -85,7 +84,6 @@ piglit_report_uint64(const char *name, GLuint64 limit, GLuint64 val, bool pass)
 	}
 	printf("\n");
 }
-#endif /* !PIGLIT_USE_OPENGL_ES2 */
 
 static void
 piglit_report_float(const char *name, GLfloat limit, GLfloat val, bool pass)
@@ -151,7 +149,6 @@ piglit_test_uint(GLenum token, GLuint limit, bool max)
 			    (!max && val >= limit)));
 }
 
-#if !defined(PIGLIT_USE_OPENGL_ES2)
 static void
 piglit_test_int64(GLenum token, GLint64 limit, bool max)
 {
@@ -200,7 +197,6 @@ piglit_test_uint64(GLenum token, GLuint64 limit, bool max)
 			     ((max && val <= limit) ||
 			      (!max && val >= limit)));
 }
-#endif /* !PIGLIT_USE_OPENGL_ES2 */
 
 void piglit_test_min_int_v(GLenum token, GLuint index, GLint min)
 {
@@ -232,7 +228,6 @@ void piglit_test_max_uint(GLenum token, GLuint max)
 	piglit_test_uint(token, max, true);
 }
 
-#if !defined(PIGLIT_USE_OPENGL_ES2)
 void piglit_test_min_int64(GLenum token, GLint64 min)
 {
 	piglit_test_int64(token, min, false);
@@ -252,7 +247,6 @@ void piglit_test_max_uint64(GLenum token, GLuint64 max)
 {
 	piglit_test_uint64(token, max, true);
 }
-#endif /* !PIGLIT_USE_OPENGL_ES2 */
 
 static void
 piglit_test_float(GLenum token, GLfloat limit, bool max)
@@ -349,7 +343,6 @@ void piglit_test_min_viewport_dimensions(void)
 			  dims[1] >= min_h);
 }
 
-#ifdef PIGLIT_USE_OPENGL
 void
 piglit_test_oq_bits()
 {
@@ -423,4 +416,3 @@ piglit_test_tf_bits(GLenum target)
 		piglit_minmax_pass = false;
 	}
 }
-#endif /*PIGLIT_USE_OPENGL*/
