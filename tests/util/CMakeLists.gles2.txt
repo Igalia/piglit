@@ -3,8 +3,6 @@ set(UTIL_GL_SOURCES
 	piglit-vbo.cpp
 	piglit-dispatch.c
 	piglit-dispatch-init.c
-	piglit-shader.c
-	piglit-shader-gles2.c
 	minmax-test.c
 	)
 

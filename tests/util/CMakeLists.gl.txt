@@ -1,8 +1,6 @@
 set(UTIL_GL_SOURCES
 	${UTIL_GL_SOURCES}
 	piglit-matrix.c
-	piglit-shader.c
-	piglit-shader-gl.c
 	piglit-test-pattern.cpp
 	piglit-fbo.cpp
 	piglit-vbo.cpp
@@ -28,7 +26,6 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	add_definitions ( -DPIGLIT_USE_GLX )
 	piglit_add_library (piglitglxutil
 		    piglit-shader.c
-		    piglit-shader-gl.c
 		    piglit-util-gl-common.c
 		    piglit-glx-framework.c
 		    piglit-glx-util.c

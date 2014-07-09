@@ -2,8 +2,6 @@ list(APPEND UTIL_GL_SOURCES
 	minmax-test.c
 	piglit-dispatch.c
 	piglit-dispatch-init.c
-	piglit-shader.c
-	piglit-shader-gles2.c # Compatible with gles3.
 	piglit-vbo.cpp
 	)
 
