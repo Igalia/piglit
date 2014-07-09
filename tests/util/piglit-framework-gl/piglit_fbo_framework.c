@@ -131,14 +131,17 @@ init_gl(struct piglit_wfl_framework *wfl_fw)
 struct piglit_gl_framework*
 piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 {
-#ifdef PIGLIT_USE_OPENGL_ES1
-	return NULL;
-#else
 	struct piglit_wfl_framework *wfl_fw;
 	struct piglit_gl_framework *gl_fw;
 
-	int32_t platform = piglit_wfl_framework_choose_platform(test_config);
+	int32_t platform;
 	bool ok = true;
+
+#ifdef PIGLIT_USE_OPENGL_ES1
+	return NULL;
+#endif
+
+	platform = piglit_wfl_framework_choose_platform(test_config);
 
 	if (test_config->window_samples > 1) {
 		puts("The FBO mode doesn't support multisampling\n");
@@ -164,5 +167,4 @@ piglit_fbo_framework_create(const struct piglit_gl_test_config *test_config)
 fail:
 	destroy(gl_fw);
 	return NULL;
-#endif /* PIGLIT_USE_OPENGL_ES1 */
 }
