@@ -986,7 +986,7 @@ spec['glsl-es-1.00']['execution'] = {}
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
                     os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
                     recursive=True)
-spec['glsl-es-1.00']['built-in constants'] = concurrent_test('built-in-constants_gles2 tests/spec/glsl-es-1.00/minimum-maximums.txt')
+spec['glsl-es-1.00']['built-in constants'] = concurrent_test('built-in-constants_gles2 ' + os.path.join(testsDir, 'spec/glsl-es-1.00/minimum-maximums.txt'))
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = {}
@@ -1014,7 +1014,7 @@ for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
         cmdline = 'simple {0} {1}'.format(type, arrayspec)
         spec['glsl-1.10']['execution']['varying-packing'][cmdline] = \
             concurrent_test('varying-packing-' + cmdline)
-spec['glsl-1.10']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.10/minimum-maximums.txt')
+spec['glsl-1.10']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-1.10/minimum-maximums.txt'))
 
 spec['glsl-1.10']['api'] = {}
 add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
@@ -1058,7 +1058,7 @@ add_recursion_test(rec, 'indirect-separate')
 add_recursion_test(rec, 'indirect-complex')
 add_recursion_test(rec, 'indirect-complex-separate')
 
-spec['glsl-1.20']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.20/minimum-maximums.txt')
+spec['glsl-1.20']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-1.20/minimum-maximums.txt'))
 spec['glsl-1.20']['api'] = {}
 add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
 
@@ -1133,7 +1133,7 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawarrays')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'vertexid-drawelements')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-execution-ordering')
 
-spec['glsl-1.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.30/minimum-maximums.txt')
+spec['glsl-1.30']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-1.30/minimum-maximums.txt'))
 spec['glsl-1.30']['api'] = {}
 add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
 
@@ -1146,7 +1146,7 @@ add_shader_test_dir(spec['glsl-1.40'],
                     os.path.join(testsDir, 'spec', 'glsl-1.40'),
                     recursive=True)
 spec['glsl-1.40']['execution']['tf-no-position'] = concurrent_test('glsl-1.40-tf-no-position')
-spec['glsl-1.40']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.40/minimum-maximums.txt')
+spec['glsl-1.40']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-1.40/minimum-maximums.txt'))
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
 for stage in ['vs', 'gs', 'fs']:
@@ -1185,7 +1185,7 @@ for draw in ['', 'indexed']:
         add_concurrent_test(spec['glsl-1.50'],
                             ('arb_geometry_shader4-ignore-adjacent-vertices '
                              'core {0} {1}').format(draw, prim))
-spec['glsl-1.50']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-1.50/minimum-maximums.txt')
+spec['glsl-1.50']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-1.50/minimum-maximums.txt'))
 spec['glsl-1.50']['gs-emits-too-few-verts'] = concurrent_test('glsl-1.50-gs-emits-too-few-verts')
 spec['glsl-1.50']['gs-end-primitive-optional-with-points-out'] = concurrent_test('glsl-1.50-geometry-end-primitive-optional-with-points-out')
 spec['glsl-1.50']['getshaderiv-may-return-GS'] = concurrent_test('glsl-1.50-getshaderiv-may-return-GS')
@@ -1246,7 +1246,7 @@ for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
                             output_layout))
 
 spec['glsl-3.30'] = {}
-spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants tests/spec/glsl-3.30/minimum-maximums.txt')
+spec['glsl-3.30']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/glsl-3.30/minimum-maximums.txt'))
 
 import_glsl_parser_tests(spec['glsl-3.30'],
                          os.path.join(testsDir, 'spec', 'glsl-3.30'),
@@ -1264,7 +1264,7 @@ add_shader_test_dir(spec['glsl-es-3.00'],
                     os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
                     recursive=True)
 add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_gles3')
-spec['glsl-es-3.00']['built-in constants'] = concurrent_test('built-in-constants_gles3 tests/spec/glsl-es-3.00/minimum-maximums.txt')
+spec['glsl-es-3.00']['built-in constants'] = concurrent_test('built-in-constants_gles3 ' + os.path.join(testsDir, 'spec/glsl-es-3.00/minimum-maximums.txt'))
 
 # AMD_performance_monitor
 profile.test_list['spec/AMD_performance_monitor/api'] = PiglitTest('amd_performance_monitor_api -auto')
@@ -1830,7 +1830,7 @@ arb_shading_language_420pack['execution'] = {}
 add_shader_test_dir(arb_shading_language_420pack['execution'],
                     os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
                     recursive=True)
-spec['ARB_shading_language_420pack']['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_shading_language_420pack/minimum-maximums.txt')
+spec['ARB_shading_language_420pack']['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/arb_shading_language_420pack/minimum-maximums.txt'))
 spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = concurrent_test('arb_shading_language_420pack-multiple-layout-qualifiers')
 
 # Group ARB_explicit_attrib_location
@@ -3200,7 +3200,7 @@ add_shader_test_dir(spec['ARB_compute_shader'],
 import_glsl_parser_tests(spec['ARB_compute_shader'],
                          os.path.join(testsDir, 'spec', 'arb_compute_shader'),
                          ['compiler'])
-arb_compute_shader['built-in constants'] = concurrent_test('built-in-constants tests/spec/arb_compute_shader/minimum-maximums.txt')
+arb_compute_shader['built-in constants'] = concurrent_test('built-in-constants ' + os.path.join(testsDir, 'spec/arb_compute_shader/minimum-maximums.txt'))
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
