@@ -105,9 +105,8 @@ class GLSLParserTest(PiglitTest):
             defaults={'require_extensions': '', 'check_link': 'false'})
 
         # Verify that the config was valid
-        text = text_io.getvalue()
-        text_io.close()
-        config.readfp(StringIO(text))
+        text_io.seek(0)
+        config.readfp(text_io)
 
         for opt in ['expect_result', 'glsl_version']:
             if not config.has_option('config', opt):
