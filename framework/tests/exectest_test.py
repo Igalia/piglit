@@ -39,11 +39,6 @@ class TestTest(Test):
 
 
 # Tests
-def test_initialize_test():
-    """ Test initializes """
-    Test('/bin/true')
-
-
 def test_initialize_piglittest():
     """ Test that PiglitTest initializes correctly """
     PiglitTest('/bin/true')

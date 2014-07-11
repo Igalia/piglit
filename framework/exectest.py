@@ -30,6 +30,7 @@ import time
 import sys
 import traceback
 import itertools
+import abc
 try:
     import simplejson as json
 except ImportError:
@@ -70,6 +71,7 @@ class Test(object):
 
     """
     OPTS = Options()
+    __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
                  '_test_hook_execute_run']
 
@@ -141,8 +143,10 @@ class Test(object):
             return
         self._command = value
 
+    @abc.abstractmethod
     def interpret_result(self):
-        raise NotImplementedError
+        """ Convert the raw output of the test into a form piglit understands
+        """
 
     def run(self):
         """
