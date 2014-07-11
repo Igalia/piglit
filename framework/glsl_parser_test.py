@@ -21,11 +21,9 @@
 
 """ This module enables the running of GLSL parser tests. """
 
-import ConfigParser
 import os
 import os.path as path
 import re
-from cStringIO import StringIO
 
 from .exectest import PiglitTest
 
@@ -86,12 +84,12 @@ class GLSLParserTest(PiglitTest):
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
         with open(filepath, 'r') as testfile:
-            text_io = self.__parser(testfile, filepath)
+            config = self.__parser(testfile, filepath)
 
-        command = self.__get_command(text_io, filepath)
+        command = self.__get_command(config, filepath)
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
-    def __get_command(self, text_io, filepath):
+    def __get_command(self, config, filepath):
         """ Create the command argument to pass to super()
 
         This private helper creates a configparser object, then reads in the
@@ -101,26 +99,22 @@ class GLSLParserTest(PiglitTest):
         super()
 
         """
-        config = ConfigParser.SafeConfigParser(
-            defaults={'require_extensions': '', 'check_link': 'false'})
-
-        # Verify that the config was valid
-        text_io.seek(0)
-        config.readfp(text_io)
-
         for opt in ['expect_result', 'glsl_version']:
-            if not config.has_option('config', opt):
+            if not config.get(opt):
                 raise GLSLParserException("Missing required section {} "
                                           "from config".format(opt))
 
         # Create the command and pass it into a PiglitTest()
-        command = ['glslparsertest',
-                   filepath,
-                   config.get('config', 'expect_result'),
-                   config.get('config', 'glsl_version')]
-        if config.get('config', 'check_link').lower() == 'true':
+        command = [
+            'glslparsertest',
+            filepath,
+            config['expect_result'],
+            config['glsl_version']
+        ]
+
+        if config['check_link'].lower() == 'true':
             command.append('--check-link')
-        command.extend(config.get('config', 'require_extensions').split())
+        command.extend(config['require_extensions'].split())
 
         return command
 
@@ -129,15 +123,14 @@ class GLSLParserTest(PiglitTest):
 
         This method parses the lines of text file, and then returns a
         StrinIO instance suitable to be parsed by a configparser class.
-        
+
         It will raise GLSLParserExceptions if any part of the parsing
         fails.
 
         """
-        # Text of config section.
-        text_io = StringIO()
-        text_io.write('[config]\n')
+        keys = {'require_extensions': '', 'check_link': 'false'}
 
+        # Text of config section.
         # Create a generator that iterates over the lines in the test file.
         # This allows us to run the loop until we find the header, stop and
         # then run again looking for the config sections.
@@ -166,8 +159,7 @@ class GLSLParserTest(PiglitTest):
 
             match = is_metadata.match(line)
             if match:
-                # Match 1 will be the comment, so skip that.
-                text_io.write('{0}: {1}\n'.format(*match.group(2, 3)))
+                keys[match.group('key')] = match.group('value')
             else:
                 raise GLSLParserException(
                     "The config section is malformed."
@@ -175,7 +167,7 @@ class GLSLParserTest(PiglitTest):
         else:
             raise GLSLParserException("No [end config] section found!")
 
-        return text_io
+        return keys
 
 
 class GLSLParserException(Exception):
