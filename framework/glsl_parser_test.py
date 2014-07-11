@@ -81,59 +81,15 @@ class GLSLParserTest(PiglitTest):
 
     """
     def __init__(self, filepath):
-        # Text of config section.
-        text_io = StringIO()
-        text_io.write('[config]\n')
-
         os.stat(filepath)
 
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
         with open(filepath, 'r') as testfile:
-
-            # Create a generator that iterates over the lines in the test file.
-            # This allows us to run the loop until we find the header, stop and
-            # then run again looking for the config sections. This reduces if
-            # checking substantially.
-            lines = (l for l in testfile)
-
-            is_header = re.compile(r'\s*(//|/\*|\*)\s*\[config\]')
-            for line in lines:
-                if is_header.match(line):
-                    break
-            else:
-                raise GLSLParserException("No [config] section found!")
-
-            is_header = re.compile(r'\s*(//|/\*|\*)\s*\[end config\]')
-            for line in lines:
-                # Remove all leading whitespace
-                line = line.strip()
-
-                # If strip renendered '' that means we had a blank newline,
-                # just go on
-                if line == '':
-                    continue
-                # If we get to the end of the config break
-                elif is_header.match(line):
-                    break
-                # If the starting character is a two character comment
-                # remove that and any newly revealed whitespace, then write
-                # it into the StringIO
-                elif line[:2] in ['//', '/*', '*/']:
-                    text_io.write(line[2:].lstrip() + '\n')
-                # If we have just * then we're in the middle of a C style
-                # comment, do like above
-                elif line[:1] == '*':
-                    text_io.write(line[1:].lstrip() + '\n')
-                else:
-                    raise GLSLParserException(
-                        "The config section is malformed."
-                        "Check file {0}".format(filepath))
-            else:
-                raise GLSLParserException("No [end config] section found!")
+            text_io = self.__parser(testfile, filepath)
 
             config = ConfigParser.SafeConfigParser(
-                    defaults={'require_extensions': '', 'check_link': 'false'})
+                defaults={'require_extensions': '', 'check_link': 'false'})
 
             # Verify that the config was valid
             text = text_io.getvalue()
@@ -155,6 +111,63 @@ class GLSLParserTest(PiglitTest):
             command.extend(config.get('config', 'require_extensions').split())
 
             super(GLSLParserTest, self).__init__(command, run_concurrent=True)
+
+    def __parser(self, testfile, filepath):
+        """ Private helper that parses the config file
+
+        This method parses the lines of text file, and then returns a
+        StrinIO instance suitable to be parsed by a configparser class.
+        
+        It will raise GLSLParserExceptions if any part of the parsing
+        fails.
+
+        """
+        # Text of config section.
+        text_io = StringIO()
+        text_io.write('[config]\n')
+
+        # Create a generator that iterates over the lines in the test file.
+        # This allows us to run the loop until we find the header, stop and
+        # then run again looking for the config sections.
+        # This reduces the need for if statements substantially
+        lines = (l for l in testfile)
+
+        is_header = re.compile(r'\s*(//|/\*|\*)\s*\[config\]')
+        for line in lines:
+            if is_header.match(line):
+                break
+        else:
+            raise GLSLParserException("No [config] section found!")
+
+        is_header = re.compile(r'\s*(//|/\*|\*)\s*\[end config\]')
+        for line in lines:
+            # Remove all leading whitespace
+            line = line.strip()
+
+            # If strip renendered '' that means we had a blank newline,
+            # just go on
+            if line == '':
+                continue
+            # If we get to the end of the config break
+            elif is_header.match(line):
+                break
+            # If the starting character is a two character comment
+            # remove that and any newly revealed whitespace, then write
+            # it into the StringIO
+            elif line[:2] in ['//', '/*', '*/']:
+                text_io.write(line[2:].lstrip() + '\n')
+            # If we have just * then we're in the middle of a C style
+            # comment, do like above
+            elif line[:1] == '*':
+                text_io.write(line[1:].lstrip() + '\n')
+            else:
+                raise GLSLParserException(
+                    "The config section is malformed."
+                    "Check file {0}".format(filepath))
+        else:
+            raise GLSLParserException("No [end config] section found!")
+
+        return text_io
 
 
 class GLSLParserException(Exception):
