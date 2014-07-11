@@ -78,8 +78,14 @@ class GLSLParserTest(PiglitTest):
                 .tesc, .tese, .geom or .frag
 
     """
+    _CONFIG_KEYS = frozenset(['expect_result', 'glsl_version',
+                              'require_extensions', 'check_link'])
+
     def __init__(self, filepath):
         os.stat(filepath)
+
+        # a set that stores a list of keys that have been found already
+        self.__found_keys = set()
 
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
@@ -159,11 +165,16 @@ class GLSLParserTest(PiglitTest):
 
             match = is_metadata.match(line)
             if match:
+                if match.group('key') not in GLSLParserTest._CONFIG_KEYS:
+                    raise GLSLParserException(
+                        "Key {0} in file {1} is not a valid key for a "
+                        "glslparser test config block".format(
+                            match.group('key'), filepath))
                 keys[match.group('key')] = match.group('value')
             else:
                 raise GLSLParserException(
                     "The config section is malformed."
-                    "Check file {0}".format(filepath))
+                    "Check file {0} for line {1}".format(filepath, line))
         else:
             raise GLSLParserException("No [end config] section found!")
 

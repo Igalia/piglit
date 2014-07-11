@@ -195,3 +195,34 @@ def test_config_to_command():
         check_config_to_command.description = \
             'Command correctly generated for {}'.format(desc)
         yield check_config_to_command, config, result
+
+
+def test_bad_section_name():
+    """ A section name not in the _CONFIG_KEYS name raises an error """
+    content = ('// [config]\n'
+               '// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '// new_awesome_key: foo\n'
+               '// [end config]\n')
+
+    with nt.assert_raises(glsl.GLSLParserException) as e:
+        _, name = _check_config(content)
+
+        nt.eq_(e.exception.message,
+               'Key new_awesome_key in file {0 is not a valid key for a '
+               'glslparser test config block'.format(name))
+
+
+def test_good_section_names():
+    """ A section name in the _CONFIG_KEYS does not raise an error """
+    content = ('// [config]\n'
+               '// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '// require_extensions: EXT_foo\n'
+               '// check_link: True\n'
+               '// [end config]\n')
+
+    try:
+        _check_config(content)
+    except glsl.GLSLParserException as e:
+        raise AssertionError(e)
