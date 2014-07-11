@@ -807,11 +807,25 @@ static GLboolean skip_test(GLenum mode, GLenum filter)
 	return test_border_color;
 }
 
+/**
+ * For a given wrap mode index, filter mode index and npot flag, return
+ * the (x,y) position for drawing the test pattern.
+ */
+static void
+test_to_xy(unsigned mode, unsigned filter, unsigned npot, int *x, int *y)
+{
+	assert(mode < ARRAY_SIZE(wrap_modes));
+	assert(filter < 2);
+	assert(npot < 2);
+	*x = mode * (TILE_SIZE(npot) + TILE_SPACE) + 5;
+	*y = filter * (TILE_SIZE(npot) + TILE_SPACE) + 35;
+}
+
+
 static void draw(const struct format_desc *format,
 		 GLboolean npot, GLboolean texproj)
 {
 	unsigned i, j;
-	int offset;
 	int num_filters = format->type == FLOAT_TYPE ? 2 : 1;
 	int bits = get_int_format_bits(format);
 	float scale[4];
@@ -840,13 +854,12 @@ static void draw(const struct format_desc *format,
 	for (i = 0; i < num_filters; i++) {
 		GLenum filter = i ? GL_LINEAR : GL_NEAREST;
 
-		offset = 0;
-
 		glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, filter);
 		glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, filter);
 
 		/* Loop over wrap modes. */
 		for (j = 0; wrap_modes[j].mode != 0; j++) {
+			int xpos, ypos;
 			float x0 = 0;
 			float y0 = 0;
 			float x1 = TILE_SIZE(npot);
@@ -861,13 +874,8 @@ static void draw(const struct format_desc *format,
 			if (!wrap_modes[j].supported)
 				continue;
 
-			if (skip_test(wrap_modes[j].mode, filter)) {
-				if (skip_test(wrap_modes[j].mode, GL_LINEAR) !=
-				    skip_test(wrap_modes[j].mode, GL_NEAREST)) {
-					offset++;
-				}
+			if (skip_test(wrap_modes[j].mode, filter))
 				continue;
-			}
 
 			/* Projective texturing. */
 			if (texproj) {
@@ -895,10 +903,8 @@ static void draw(const struct format_desc *format,
 					wrap_modes[j].mode);
 
 			glPushMatrix();
-			glTranslatef(offset * (TILE_SIZE(npot) + TILE_SPACE) + 5,
-				     i * (TILE_SIZE(npot) + TILE_SPACE) + 35,
-				     0);
-			offset++;
+			test_to_xy(j, i, npot, &xpos, &ypos);
+			glTranslatef(xpos, ypos, 0.0);
 
 			glEnable(texture_target);
 			glColor3f(1, 1, 1);
@@ -939,21 +945,14 @@ static void draw(const struct format_desc *format,
 
 	glDisable(texture_target);
 	glColor3f(1, 1, 1);
-	offset = 0;
 
 	if (!piglit_automatic) {
+		printf("modes: ");
 		for (i = 0; wrap_modes[i].mode != 0; i++) {
-			if (wrap_modes[i].supported) {
-				if (skip_test(wrap_modes[i].mode, GL_LINEAR) &&
-				    skip_test(wrap_modes[i].mode, GL_NEAREST)) {
-					continue;
-				}
-
-				glWindowPos2iARB(offset * (TILE_SIZE(npot) + TILE_SPACE) + 5,
-						 5 + ((offset & 1) * 15));
-				offset++;
-			}
+			printf("%s, ",
+			       piglit_get_gl_enum_name(wrap_modes[i].mode));
 		}
+		printf("\n");
 	}
 }
 
@@ -978,7 +977,6 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 		unsigned deltamax[4] = {0};
 		unsigned deltamax_swizzled[4] = {0};
 		unsigned *deltamax_lut = i ? linear_deltamax : nearest_deltamax;
-		unsigned offset = 0;
 
 		/* Get the deltamax for each channel. */
 		if (format->intensity) {
@@ -1012,20 +1010,16 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 		/* Loop over all wrap modes. */
 		for (j = 0; wrap_modes[j].mode != 0; j++) {
 			unsigned char expected[4];
-			int x0 = offset * (TILE_SIZE(npot) + TILE_SPACE) + 5;
-			int y0 = i * (TILE_SIZE(npot) + TILE_SPACE) + 35;
+			int x0, y0;
 			int a, b;
+
+			test_to_xy(j, i, npot, &x0, &y0);
 
 			if (!wrap_modes[j].supported)
 				continue;
 
-			if (skip_test(wrap_modes[j].mode, filter)) {
-				if (skip_test(wrap_modes[j].mode, GL_LINEAR) !=
-				    skip_test(wrap_modes[j].mode, GL_NEAREST)) {
-					offset++;
-				}
+			if (skip_test(wrap_modes[j].mode, filter))
 				continue;
-			}
 
 			for (b = 0; b < (TEXTURE_SIZE(npot) + BIAS_INT(npot)*2); b++) {
 				for (a = 0; a < (TEXTURE_SIZE(npot) + BIAS_INT(npot)*2); a++) {
@@ -1047,7 +1041,7 @@ static GLboolean probe_pixels(const struct format_desc *format, GLboolean npot, 
 			}
 
 tile_done:
-			offset++;
+			;
 		}
 	}
 
