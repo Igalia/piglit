@@ -152,7 +152,8 @@ class GLSLParserTest(PiglitTest):
 
         is_header = re.compile(r'(//|/\*|\*)\s*\[end config\]')
         is_metadata = re.compile(
-            r'(//|/\*|\*)\s*(?P<key>[a-z_]*)\:\s(?P<value>[A-Za-z0-9._ ]*)')
+            r'(//|/\*|\*)\s*(?P<key>[a-z_]*)\:\s(?P<value>.*)')
+        bad_values = re.compile(r'(?![\w\.\! ]).*')
 
         for line in lines:
             # If strip renendered '' that means we had a blank newline,
@@ -177,6 +178,16 @@ class GLSLParserTest(PiglitTest):
                         'Duplicate entry for key {0} in file {1}'.format(
                             match.group('key'), filepath))
                 else:
+                    bad = bad_values.search(match.group('value'))
+                    # XXX: this always seems to return a match object, even
+                    # when the match is ''
+                    if bad.group():
+                        raise GLSLParserException(
+                            'Bad character "{0}" in file: "{1}", '
+                            'line: "{2}". Only alphanumerics, _, and space '
+                            'are allowed'.format(
+                                bad.group()[0], filepath, line))
+
                     # Otherwise add the key to the set of found keys, and add
                     # it to the dictionary that will be returned
                     self.__found_keys.add(match.group('key'))

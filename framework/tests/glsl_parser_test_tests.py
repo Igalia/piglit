@@ -255,3 +255,76 @@ def test_duplicate_entries():
             ''.join(x[1] for x in content), value)
 
         yield check_no_duplicates, test, name
+
+
+def check_bad_character(tfile):
+    """ Check for bad characters """
+    with nt.assert_raises(glsl.GLSLParserException) as e:
+        glsl.GLSLParserTest(tfile)
+
+        # Obviously this isn't a perfect check, but it should be close enough
+        if not e.exception.message.startswith('Bad character "'):
+            raise AssertionError(e.exception)
+
+
+@utils.nose_generator
+def glslparser_exetensions_seperators():
+    """ GlslParserTest() can only have [A-Za-z_] as characters
+
+    This test generates a number of tests that should catch the majority of
+    errors relating to seperating extensions in the config block of a
+    glslparser test
+
+    """
+    problems = [
+        ('comma seperator', '// require_extensions: ARB_ham, ARB_turkey\n'),
+        ('semi-colon seperator', '// require_extensions: ARB_ham; ARB_turkey\n'),
+        ('trailing semi-colon', '// require_extensions: ARB_ham ARB_turkey\n;'),
+        ('Non-alpha character', '// require_extensions: ARB_$$$\n'),
+    ]
+
+    content = ('// [config]\n'
+               '// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '{}'
+               '// [end config]\n')
+
+    for name, value in problems:
+        test = content.format(value)
+        with utils.with_tempfile(test) as tfile:
+            check_bad_character.description = (
+                'require_extensions: {0} should raise an error'.format(name))
+            yield check_bad_character, tfile
+
+
+def check_good_extension(file_, desc):
+    """ A good extension should not raise a GLSLParserException """
+    try:
+        glsl.GLSLParserTest(file_)
+    except glsl.GLSLParserException:
+        nt.ok_(False,
+               'GLSLParserException was raised by "required_extensions: {}"'
+               ', but should not'.format(desc))
+
+
+@utils.nose_generator
+def test_good_extensions():
+    """ Generates tests with good extensions which shouldn't raise errors """
+    content = ('// [config]\n'
+               '// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '// require_extensions: {}\n'
+               '// [end config]\n')
+    options = [
+        'GL_EXT_texture_array',
+        'GL_EXT_texture_array ARB_example',
+        '!GL_ARB_ham_sandwhich',
+    ]
+
+    for x in options:
+        test = content.format(x)
+        check_good_extension.description = \
+            'require_extension {} is valid'.format(x)
+
+        with utils.with_tempfile(test) as tfile:
+            yield check_good_extension, tfile, x
