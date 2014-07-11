@@ -226,3 +226,32 @@ def test_good_section_names():
         _check_config(content)
     except glsl.GLSLParserException as e:
         raise AssertionError(e)
+
+
+def check_no_duplicates(content, dup):
+    """ Ensure that duplicate entries raise an error """
+    with nt.assert_raises(glsl.GLSLParserException) as e:
+        with utils.with_tempfile(content) as tfile:
+            glsl.GLSLParserTest(tfile)
+
+            nt.eq_(
+                e.exception.message,
+                'Duplicate entry for key {0} in file {1}'.format(dup, tfile))
+
+
+@utils.nose_generator
+def test_duplicate_entries():
+    """ Generate tests for duplicate keys in the config block """
+    content = [
+        ('expect_result', '// expect_result: pass\n'),
+        ('glsl_version', '// glsl_version: 1.00\n'),
+        ('require_extensions', '// require_extensions: ARB_ham_sandwhich\n')
+    ]
+
+    for name, value in content:
+        check_no_duplicates.description = \
+            "duplicate values of {0} raise an exception".format(name)
+        test = '// [config]\n{0}{1}// [end config]'.format(
+            ''.join(x[1] for x in content), value)
+
+        yield check_no_duplicates, test, name

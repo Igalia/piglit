@@ -170,7 +170,17 @@ class GLSLParserTest(PiglitTest):
                         "Key {0} in file {1} is not a valid key for a "
                         "glslparser test config block".format(
                             match.group('key'), filepath))
-                keys[match.group('key')] = match.group('value')
+                elif match.group('key') in self.__found_keys:
+                    # If this key has already been encountered throw an error,
+                    # there are no duplicate keys allows
+                    raise GLSLParserException(
+                        'Duplicate entry for key {0} in file {1}'.format(
+                            match.group('key'), filepath))
+                else:
+                    # Otherwise add the key to the set of found keys, and add
+                    # it to the dictionary that will be returned
+                    self.__found_keys.add(match.group('key'))
+                    keys[match.group('key')] = match.group('value')
             else:
                 raise GLSLParserException(
                     "The config section is malformed."
