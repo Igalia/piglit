@@ -142,20 +142,20 @@ class GLSLParserTest(PiglitTest):
         # This allows us to run the loop until we find the header, stop and
         # then run again looking for the config sections.
         # This reduces the need for if statements substantially
-        lines = (l for l in testfile)
+        lines = (l.strip() for l in testfile)
 
-        is_header = re.compile(r'\s*(//|/\*|\*)\s*\[config\]')
+        is_header = re.compile(r'(//|/\*|\*)\s*\[config\]')
         for line in lines:
             if is_header.match(line):
                 break
         else:
             raise GLSLParserException("No [config] section found!")
 
-        is_header = re.compile(r'\s*(//|/\*|\*)\s*\[end config\]')
-        for line in lines:
-            # Remove all leading whitespace
-            line = line.strip()
+        is_header = re.compile(r'(//|/\*|\*)\s*\[end config\]')
+        is_metadata = re.compile(
+            r'(//|/\*|\*)\s*(?P<key>[a-z_]*)\:\s(?P<value>[A-Za-z0-9._ ]*)')
 
+        for line in lines:
             # If strip renendered '' that means we had a blank newline,
             # just go on
             if line in ['', '//']:
@@ -163,15 +163,11 @@ class GLSLParserTest(PiglitTest):
             # If we get to the end of the config break
             elif is_header.match(line):
                 break
-            # If the starting character is a two character comment
-            # remove that and any newly revealed whitespace, then write
-            # it into the StringIO
-            elif line[:2] in ['//', '/*', '*/']:
-                text_io.write(line[2:].lstrip() + '\n')
-            # If we have just * then we're in the middle of a C style
-            # comment, do like above
-            elif line[:1] == '*':
-                text_io.write(line[1:].lstrip() + '\n')
+
+            match = is_metadata.match(line)
+            if match:
+                # Match 1 will be the comment, so skip that.
+                text_io.write('{0}: {1}\n'.format(*match.group(2, 3)))
             else:
                 raise GLSLParserException(
                     "The config section is malformed."
