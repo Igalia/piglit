@@ -144,3 +144,38 @@ def test_blank_in_config():
 def test_glslparser_initializer():
     """ GLSLParserTest initializes """
     glsl.GLSLParserTest('tests/spec/glsl-es-1.00/compiler/version-macro.frag')
+
+
+def check_config_to_command(config, result):
+    """ Check that the config is correctly converted """
+    inst, f = _check_config(config)
+    result.insert(1, f)  # Add the file name
+
+    nt.eq_(inst.command, result)
+
+
+@utils.nose_generator
+def test_config_to_command():
+    """ Generate tests that confirm the config file is correctly parsed """
+    content = [
+        ('// [config]\n// expect_result: pass\n// glsl_version: 1.00\n// [end config]\n',
+         [os.path.join(TEST_BIN_DIR, 'glslparsertest'), 'pass', '1.00'],
+         'all required options'),
+        ('// [config]\n// expect_result: pass\n// glsl_version: 1.00\n//check_link: true\n// [end config]\n',
+         [os.path.join(TEST_BIN_DIR, 'glslparsertest'), 'pass', '1.00', '--check-link'],
+         'check_link true'),
+        ('// [config]\n// expect_result: pass\n// glsl_version: 1.00\n//check_link: false\n// [end config]\n',
+         [os.path.join(TEST_BIN_DIR, 'glslparsertest'), 'pass', '1.00'],
+         'check_link false'),
+        ('// [config]\n// expect_result: pass\n// glsl_version: 1.00\n//require_extensions: ARB_foo\n// [end config]\n',
+         [os.path.join(TEST_BIN_DIR, 'glslparsertest'), 'pass', '1.00', 'ARB_foo'],
+         'one required_extension'),
+        ('// [config]\n// expect_result: pass\n// glsl_version: 1.00\n//require_extensions: ARB_foo ARB_bar\n// [end config]\n',
+         [os.path.join(TEST_BIN_DIR, 'glslparsertest'), 'pass', '1.00', 'ARB_foo', 'ARB_bar'],
+         'multiple required_extensions'),
+    ]
+
+    for config, result, desc in content:
+        check_config_to_command.description = \
+            'Command correctly generated for {}'.format(desc)
+        yield check_config_to_command, config, result
