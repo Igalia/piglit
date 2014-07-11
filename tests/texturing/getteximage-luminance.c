@@ -39,7 +39,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *TestName = "getteximage-luminance";
-static float tolerance = 2.0 / 255.0;
+static float tolerance = 3.0 / 255.0;
 
 
 static bool
