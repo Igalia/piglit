@@ -55,7 +55,7 @@ tests = {
         'arg_types': [I, F],
         'function_type': 'ttt',
         'values': [
-            [0,   1,            0,   0],            # Result
+            [0,   TRUE,         0,   0],            # Result
             [0.0, float("nan"), 1.0, float("inf") ] # Arg0
         ]
     },
