@@ -33,6 +33,7 @@ CLC_VERSION_MIN = {
     'isfinite' : 10,
     'isgreater' : 10,
     'isgreaterequal' : 10,
+    'isinf' : 10,
     'isless' : 10,
     'islessequal' : 10,
     'islessgreater' : 10,
@@ -92,6 +93,14 @@ tests = {
             [TRUE, 0,            TRUE, 0,            0,            TRUE,         TRUE, 0],    # Result
             [0.0,  float("nan"), 1.0,  1,            float("nan"), float("inf"), 1.0,  0.5 ], # Arg0
             [0.0,  float("nan"), 1.0,  float("nan"), 1,            float("inf"), 0.5,  1.0 ]  # Arg1
+        ]
+    },
+    'isinf' : {
+        'arg_types': [I, F],
+        'function_type': 'ttt',
+        'values': [
+            [0,   0,            0,   0,    TRUE,         TRUE,          0 ],      # Result
+            [0.0, float("nan"), 1.0, 1.0,  float("inf"), float("-inf"), -123.0 ], # Arg0
         ]
     },
     'isless' : {
