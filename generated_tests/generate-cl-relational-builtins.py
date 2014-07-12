@@ -39,6 +39,7 @@ CLC_VERSION_MIN = {
     'islessgreater' : 10,
     'isnormal' : 10,
     'isnotequal' : 10,
+    'isordered' : 10,
     'signbit' : 10
 }
 
@@ -146,6 +147,15 @@ tests = {
             [0,    TRUE,         0,    TRUE,         TRUE,         0,            TRUE, TRUE],    # Result
             [0.0,  float("nan"), 1.0,  1,            float("nan"), float("inf"), 1.0,  0.5 ], # Arg0
             [0.0,  float("nan"), 1.0,  float("nan"), 1,            float("inf"), 0.5,  1.0 ]  # Arg1
+        ]
+    },
+    'isordered' : {
+        'arg_types': [I, F, F],
+        'function_type': 'ttt',
+        'values': [
+            [TRUE, 0,            TRUE, 0,            0,            TRUE,        TRUE, TRUE],  # Result
+            [0.0,  float("nan"), 1.0,  1.0,          float("nan"), float("inf"), 1.0,  0.5 ], # Arg0
+            [0.0,  float("nan"), 1.0,  float("nan"), 1.0,          float("inf"), 0.5,  1.0 ]  # Arg1
         ]
     },
     'signbit' : {
