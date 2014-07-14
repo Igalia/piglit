@@ -410,16 +410,16 @@ class Summary:
                     self.tests['fixes'].add(test)
                     self.tests['changes'].add(test)
 
-    def __find_totals(self):
+    def __find_totals(self, results):
         """
         Private: Find the total number of pass, fail, crash, skip, and warn in
-        the *last* set of results stored in self.results.
+        the specified results.
         """
         self.totals = {'pass': 0, 'fail': 0, 'crash': 0, 'skip': 0,
                        'timeout': 0, 'warn': 0, 'dmesg-warn': 0,
                        'dmesg-fail': 0}
 
-        for test in self.results[-1].tests.itervalues():
+        for test in results.tests.itervalues():
             self.totals[str(test['result'])] += 1
 
     def generate_html(self, destination, exclude):
@@ -461,7 +461,7 @@ class Summary:
             else:
                 time = None
 
-            self.__find_totals()
+            self.__find_totals(each)
 
             with open(path.join(destination, each.name, "index.html"), 'w') as out:
                 out.write(testindex.render(name=each.name,
@@ -533,7 +533,7 @@ class Summary:
 
     def generate_text(self, diff, summary):
         """ Write summary information to the console """
-        self.__find_totals()
+        self.__find_totals(self.results[-1])
 
         # Print the name of the test and the status from each test run
         if not summary:
