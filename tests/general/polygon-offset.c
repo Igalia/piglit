@@ -92,6 +92,9 @@ piglit_display(void)
 	glGetIntegerv(GL_ALIASED_POINT_SIZE_RANGE, point_size_range);
 	if (line_width > point_size_range[1])
 		line_width = point_size_range[1];
+
+        line_width = MIN2(line_width, 12);
+
 	glLineWidth(line_width);
 	glPointSize(line_width);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
