@@ -1336,14 +1336,18 @@ set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_ar
 
 		matrix_stride /= sizeof(float);
 
+		/* Expect the data in the .shader_test file to be listed in
+		 * column-major order no matter what the layout of the data in
+		 * the UBO will be.
+		 */
 		for (c = 0; c < cols; c++) {
 			for (r = 0; r < rows; r++) {
 				if (row_major) {
-					matrixdata[matrix_stride * c + r] =
-						f[r * rows + c];
-				} else {
 					matrixdata[matrix_stride * r + c] =
-						f[r * rows + c];
+						f[c * rows + r];
+				} else {
+					matrixdata[matrix_stride * c + r] =
+						f[c * rows + r];
 				}
 			}
 		}
@@ -1366,14 +1370,18 @@ set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_ar
 
 		matrix_stride /= sizeof(double);
 
+		/* Expect the data in the .shader_test file to be listed in
+		 * column-major order no matter what the layout of the data in
+		 * the UBO will be.
+		 */
 		for (c = 0; c < cols; c++) {
 			for (r = 0; r < rows; r++) {
 				if (row_major) {
-					matrixdata[matrix_stride * c + r] =
-						d[r * rows + c];
-				} else {
 					matrixdata[matrix_stride * r + c] =
-						d[r * rows + c];
+						d[c * rows + r];
+				} else {
+					matrixdata[matrix_stride * c + r] =
+						d[c * rows + r];
 				}
 			}
 		}
