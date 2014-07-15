@@ -1,0 +1,700 @@
+/*
+ * Copyright © 2014 Intel Corporation
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice (including the next
+ * paragraph) shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ * Authors:
+ *    Neil Roberts <neil@linux.intel.com>
+ *
+ */
+
+/** @file bptc-modes.c
+ *
+ * Tests BPTC-compressed RGBA_UNORM textures that with a block for
+ * each of the possible 8 modes. The texture is both rendered and
+ * retrieved with glGetTexImage and verified that it has the expected
+ * values.
+ */
+
+#include "piglit-util-gl.h"
+
+PIGLIT_GL_TEST_CONFIG_BEGIN
+
+	config.supports_gl_compat_version = 10;
+
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+
+PIGLIT_GL_TEST_CONFIG_END
+
+#define BLOCK_SIZE 4
+#define BLOCK_BYTES 16
+#define N_PARTITIONS 64
+
+struct bptc_mode {
+   int n_subsets;
+   int n_partition_bits;
+   bool has_rotation_bits;
+   bool has_index_selection_bit;
+   int n_color_bits;
+   int n_alpha_bits;
+   bool has_endpoint_pbits;
+   bool has_shared_pbits;
+   int n_index_bits;
+   int n_secondary_index_bits;
+};
+
+static const struct bptc_mode
+bptc_modes[] = {
+   /* 0 */ { 3, 4, false, false, 4, 0, true,  false, 3, 0 },
+   /* 1 */ { 2, 6, false, false, 6, 0, false, true,  3, 0 },
+   /* 2 */ { 3, 6, false, false, 5, 0, false, false, 2, 0 },
+   /* 3 */ { 2, 6, false, false, 7, 0, true,  false, 2, 0 },
+   /* 4 */ { 1, 0, true,  true,  5, 6, false, false, 2, 3 },
+   /* 5 */ { 1, 0, true,  false, 7, 8, false, false, 2, 2 },
+   /* 6 */ { 1, 0, false, false, 7, 7, true,  false, 4, 0 },
+   /* 7 */ { 2, 6, false, false, 5, 5, true,  false, 2, 0 }
+};
+
+static const uint8_t
+anchor_indices[][N_PARTITIONS] = {
+   /* Anchor index values for the second subset of two-subset partitioning */
+   {
+      0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,
+      0xf,0x2,0x8,0x2,0x2,0x8,0x8,0xf,0x2,0x8,0x2,0x2,0x8,0x8,0x2,0x2,
+      0xf,0xf,0x6,0x8,0x2,0x8,0xf,0xf,0x2,0x8,0x2,0x2,0x2,0xf,0xf,0x6,
+      0x6,0x2,0x6,0x8,0xf,0xf,0x2,0x2,0xf,0xf,0xf,0xf,0xf,0x2,0x2,0xf
+   },
+
+   /* Anchor index values for the second subset of three-subset partitioning */
+   {
+      0x3,0x3,0xf,0xf,0x8,0x3,0xf,0xf,0x8,0x8,0x6,0x6,0x6,0x5,0x3,0x3,
+      0x3,0x3,0x8,0xf,0x3,0x3,0x6,0xa,0x5,0x8,0x8,0x6,0x8,0x5,0xf,0xf,
+      0x8,0xf,0x3,0x5,0x6,0xa,0x8,0xf,0xf,0x3,0xf,0x5,0xf,0xf,0xf,0xf,
+      0x3,0xf,0x5,0x5,0x5,0x8,0x5,0xa,0x5,0xa,0x8,0xd,0xf,0xc,0x3,0x3
+   },
+
+   /* Anchor index values for the third subset of three-subset
+    * partitioning
+    */
+   {
+      0xf,0x8,0x8,0x3,0xf,0xf,0x3,0x8,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0x8,
+      0xf,0x8,0xf,0x3,0xf,0x8,0xf,0x8,0x3,0xf,0x6,0xa,0xf,0xf,0xa,0x8,
+      0xf,0x3,0xf,0xa,0xa,0x8,0x9,0xa,0x6,0xf,0x8,0xf,0x3,0x6,0x6,0x8,
+      0xf,0x3,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0xf,0x3,0xf,0xf,0x8
+   }
+};
+
+struct bptc_block {
+	int mode;
+	int partition;
+	int rotation;
+	int index_selection;
+	uint8_t endpoints[2 * 3][4];
+	uint8_t pbits[3 * 2];
+	uint8_t primary_indices[BLOCK_SIZE * BLOCK_SIZE];
+	uint8_t secondary_indices[BLOCK_SIZE * BLOCK_SIZE];
+	uint8_t expected_values[BLOCK_SIZE * BLOCK_SIZE * 4];
+};
+
+static const struct bptc_block
+bptc_blocks[] = {
+	{
+		0, /* mode */
+		2, /* partition */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #000000ff #ffffffff */
+			{ 0x0, 0x0, 0x0, 0x0 }, { 0xf, 0xf, 0xf, 0x0 },
+			/* #100010ff #ef08efff */
+			{ 0x1, 0x0, 0x1, 0x0 }, { 0xe, 0x0, 0xe, 0x0 },
+			/* #001010ff #08dedeff */
+			{ 0x0, 0x1, 0x1, 0x0 }, { 0x0, 0xd, 0xd, 0x0 }
+		},
+		/* pbits */
+		{ 0, 1, 0, 1, 0, 1 },
+		/* primary indices */
+		{
+			0x0, 0x2, 0x4, 0x7, /* subsets 0(a) 0    0    0    */
+			0x0, 0x0, 0x7, 0x7, /* subsets 2    0    0    1    */
+			0x0, 0x7, 0x0, 0x7, /* subsets 2(a) 2    1    1    */
+			0x4, 0x2, 0x4, 0x2  /* subsets 2    2    1    1(a) */
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x00, 0x00, 0x00, 0xff, 0x48, 0x48, 0x48, 0xff,
+			0x93, 0x93, 0x93, 0xff, 0xff, 0xff, 0xff, 0xff,
+			0x00, 0x10, 0x10, 0xff, 0x00, 0x00, 0x00, 0xff,
+			0xff, 0xff, 0xff, 0xff, 0xef, 0x08, 0xef, 0xff,
+			0x00, 0x10, 0x10, 0xff, 0x08, 0xde, 0xde, 0xff,
+			0x10, 0x00, 0x10, 0xff, 0xef, 0x08, 0xef, 0xff,
+			0x05, 0x87, 0x87, 0xff, 0x02, 0x4a, 0x4a, 0xff,
+			0x91, 0x05, 0x91, 0xff, 0x4f, 0x02, 0x4f, 0xff
+		},
+	},
+	{
+		1, /* mode */
+		63, /* partition */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #000000ff #fdfdfdff */
+			{ 0x00, 0x00, 0x00, 0x00 }, { 0x3f, 0x3f, 0x3f, 0x00 },
+			/* #060206ff #bb02bbff */
+			{ 0x01, 0x00, 0x01, 0x00 }, { 0x2e, 0x00, 0x2e, 0x00 },
+		},
+		/* pbits */
+		{ 0, 1 },
+		/* primary indices */
+		{
+			0x0, 0x2, 0x4, 0x7, /* subsets 0(a) 1    0    0    */
+			0x0, 0x0, 0x7, 0x7, /* subsets 0    1    0    0    */
+			0x0, 0x7, 0x0, 0x7, /* subsets 0    1    1    1    */
+			0x4, 0x2, 0x4, 0x2  /* subsets 0    1    1    1(a) */
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x00, 0x00, 0x00, 0xff, 0x39, 0x02, 0x39, 0xff,
+			0x92, 0x92, 0x92, 0xff, 0xfd, 0xfd, 0xfd, 0xff,
+			0x00, 0x00, 0x00, 0xff, 0x06, 0x02, 0x06, 0xff,
+			0xfd, 0xfd, 0xfd, 0xff, 0xfd, 0xfd, 0xfd, 0xff,
+			0x00, 0x00, 0x00, 0xff, 0xbb, 0x02, 0xbb, 0xff,
+			0x06, 0x02, 0x06, 0xff, 0xbb, 0x02, 0xbb, 0xff,
+			0x92, 0x92, 0x92, 0xff, 0x39, 0x02, 0x39, 0xff,
+			0x6f, 0x02, 0x6f, 0xff, 0x39, 0x02, 0x39, 0xff,
+		},
+	},
+	{
+		2, /* mode */
+		52, /* partition */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #000000ff #ffffffff */
+			{ 0x00, 0x00, 0x00, 0x00 }, { 0x1f, 0x1f, 0x1f, 0x00 },
+			/* #080008ff #730073ff */
+			{ 0x01, 0x00, 0x01, 0x00 }, { 0x0e, 0x00, 0x0e, 0x00 },
+			/* #008484ff #006b6bff */
+			{ 0x00, 0x10, 0x10, 0x00 }, { 0x00, 0x0d, 0x0d, 0x00 }
+		},
+		/* pbits */
+		{ },
+		/* primary indices */
+		{
+			0x0, 0x0, 0x1, 0x2, /* subsets 0(a) 2    2    2    */
+			0x1, 0x0, 0x1, 0x2, /* subsets 0    1(a) 1    1    */
+			0x2, 0x3, 0x0, 0x0, /* subsets 0    1    1    1    */
+			0x3, 0x3, 0x0, 0x0  /* subsets 0    2    2    2(a) */
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x00, 0x00, 0x00, 0xff, 0x00, 0x84, 0x84, 0xff,
+			0x00, 0x7c, 0x7c, 0xff, 0x00, 0x73, 0x73, 0xff,
+			0x54, 0x54, 0x54, 0xff, 0x08, 0x00, 0x08, 0xff,
+			0x2b, 0x00, 0x2b, 0xff, 0x50, 0x00, 0x50, 0xff,
+			0xab, 0xab, 0xab, 0xff, 0x73, 0x00, 0x73, 0xff,
+			0x08, 0x00, 0x08, 0xff, 0x08, 0x00, 0x08, 0xff,
+			0xff, 0xff, 0xff, 0xff, 0x00, 0x6b, 0x6b, 0xff,
+			0x00, 0x84, 0x84, 0xff, 0x00, 0x84, 0x84, 0xff,
+		},
+	},
+	{
+		3, /* mode */
+		1, /* partition */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #000000ff #ffffffff */
+			{ 0x00, 0x00, 0x00, 0x00 }, { 0x7f, 0x7f, 0x7f, 0x00 },
+			/* #840084ff #e101e1ff */
+			{ 0x42, 0x00, 0x42, 0x00 }, { 0x70, 0x00, 0x70, 0x00 },
+		},
+		/* pbits */
+		{ 0, 1, 0, 1 },
+		/* primary indices */
+		{
+			0x0, 0x0, 0x0, 0x3, /* subsets 0(a) 0    0    1    */
+			0x1, 0x1, 0x1, 0x2, /* subsets 0    0    0    1    */
+			0x2, 0x2, 0x2, 0x1, /* subsets 0    0    0    1    */
+			0x3, 0x3, 0x3, 0x0  /* subsets 0    0    0    1(a) */
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0xff,
+			0x00, 0x00, 0x00, 0xff, 0xe1, 0x01, 0xe1, 0xff,
+			0x54, 0x54, 0x54, 0xff, 0x54, 0x54, 0x54, 0xff,
+			0x54, 0x54, 0x54, 0xff, 0xc2, 0x01, 0xc2, 0xff,
+			0xab, 0xab, 0xab, 0xff, 0xab, 0xab, 0xab, 0xff,
+			0xab, 0xab, 0xab, 0xff, 0xa3, 0x00, 0xa3, 0xff,
+			0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+			0xff, 0xff, 0xff, 0xff, 0x84, 0x00, 0x84, 0xff,
+		},
+	},
+	{
+		4, /* mode */
+		0, /* partition (not used) */
+		1, /* rotation */
+		1, /* index selection */
+		/* endpoints */
+		{
+			/* #007bff41 #ff7b00ff */
+			{ 0x00, 0x0f, 0x1f, 0x10 }, { 0x1f, 0x0f, 0x00, 0x3f },
+		},
+		/* pbits */
+		{ },
+		/* primary indices */
+		{
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3
+		},
+		/* secondary indices */
+		{
+			0x0, 0x1, 0x2, 0x3,
+			0x4, 0x5, 0x6, 0x7,
+			0x0, 0x1, 0x2, 0x3,
+			0x4, 0x5, 0x6, 0x7
+		},
+		/* expected results */
+		{
+			0x41, 0x7b, 0xff, 0x00, 0x7f, 0x7b, 0xdb, 0x24,
+			0xc1, 0x7b, 0xb7, 0x48, 0xff, 0x7b, 0x93, 0x6c,
+			0x41, 0x7b, 0x6c, 0x93, 0x7f, 0x7b, 0x48, 0xb7,
+			0xc1, 0x7b, 0x24, 0xdb, 0xff, 0x7b, 0x00, 0xff,
+			0x41, 0x7b, 0xff, 0x00, 0x7f, 0x7b, 0xdb, 0x24,
+			0xc1, 0x7b, 0xb7, 0x48, 0xff, 0x7b, 0x93, 0x6c,
+			0x41, 0x7b, 0x6c, 0x93, 0x7f, 0x7b, 0x48, 0xb7,
+			0xc1, 0x7b, 0x24, 0xdb, 0xff, 0x7b, 0x00, 0xff,
+		},
+	},
+	{
+		5, /* mode */
+		0, /* partition (not used) */
+		3, /* rotation */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #0081ff10 #ff8100ff */
+			{ 0x00, 0x40, 0x7f, 0x10 }, { 0x7f, 0x40, 0x00, 0xff },
+		},
+		/* pbits */
+		{ },
+		/* primary indices */
+		{
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3,
+			0x0, 0x1, 0x2, 0x3
+		},
+		/* secondary indices */
+		{
+			0x0, 0x0, 0x0, 0x0,
+			0x1, 0x1, 0x1, 0x1,
+			0x2, 0x2, 0x2, 0x2,
+			0x3, 0x3, 0x3, 0x3
+		},
+		/* expected results */
+		{
+			0x00, 0x81, 0x10, 0xff, 0x54, 0x81, 0x10, 0xab,
+			0xab, 0x81, 0x10, 0x54, 0xff, 0x81, 0x10, 0x00,
+			0x00, 0x81, 0x5e, 0xff, 0x54, 0x81, 0x5e, 0xab,
+			0xab, 0x81, 0x5e, 0x54, 0xff, 0x81, 0x5e, 0x00,
+			0x00, 0x81, 0xb1, 0xff, 0x54, 0x81, 0xb1, 0xab,
+			0xab, 0x81, 0xb1, 0x54, 0xff, 0x81, 0xb1, 0x00,
+			0x00, 0x81, 0xff, 0xff, 0x54, 0x81, 0xff, 0xab,
+			0xab, 0x81, 0xff, 0x54, 0xff, 0x81, 0xff, 0x00,
+		},
+	},
+	{
+		6, /* mode */
+		0, /* partition (not used) */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #0181ff21 #fe8000fe */
+			{ 0x00, 0x40, 0x7f, 0x10 }, { 0x7f, 0x40, 0x00, 0x7f },
+		},
+		/* pbits */
+		{ 1, 0 },
+		/* primary indices */
+		{
+			0x0, 0x1, 0x2, 0x3,
+			0x4, 0x5, 0x6, 0x7,
+			0x8, 0x9, 0xa, 0xb,
+			0xc, 0xd, 0xe, 0xf
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x01, 0x81, 0xff, 0x21, 0x11, 0x81, 0xef, 0x2f,
+			0x25, 0x81, 0xdb, 0x40, 0x34, 0x81, 0xcb, 0x4e,
+			0x44, 0x81, 0xbb, 0x5c, 0x54, 0x81, 0xab, 0x6a,
+			0x68, 0x81, 0x97, 0x7b, 0x78, 0x81, 0x87, 0x89,
+			0x87, 0x80, 0x78, 0x96, 0x97, 0x80, 0x68, 0xa4,
+			0xab, 0x80, 0x54, 0xb5, 0xbb, 0x80, 0x44, 0xc3,
+			0xcb, 0x80, 0x34, 0xd1, 0xda, 0x80, 0x24, 0xdf,
+			0xee, 0x80, 0x10, 0xf0, 0xfe, 0x80, 0x00, 0xfe,
+		},
+	},
+	{
+		7, /* mode */
+		8, /* partition */
+		0, /* rotation (not used) */
+		0, /* index selection (not used) */
+		/* endpoints */
+		{
+			/* #00000000 #ffffffff */
+			{ 0x00, 0x00, 0x00, 0x00 }, { 0x1f, 0x1f, 0x1f, 0x1f },
+			/* #040c141c #fbf3ebe3 */
+			{ 0x00, 0x01, 0x02, 0x03 }, { 0x1f, 0x1e, 0x1d, 0x1c },
+		},
+		/* pbits */
+		{ 0, 1, 1, 0 },
+		/* primary indices */
+		{
+			0x0, 0x1, 0x2, 0x3, /* subsets 0(a) 0    0    0    */
+			0x0, 0x1, 0x2, 0x3, /* subsets 0    0    0    0    */
+			0x0, 0x1, 0x2, 0x3, /* subsets 0    0    0    1    */
+			0x0, 0x1, 0x1, 0x0  /* subsets 0    0    1    1(a) */
+		},
+		/* secondary indices */
+		{ },
+		/* expected results */
+		{
+			0x00, 0x00, 0x00, 0x00, 0x54, 0x54, 0x54, 0x54,
+			0xab, 0xab, 0xab, 0xab, 0xff, 0xff, 0xff, 0xff,
+			0x00, 0x00, 0x00, 0x00, 0x54, 0x54, 0x54, 0x54,
+			0xab, 0xab, 0xab, 0xab, 0xff, 0xff, 0xff, 0xff,
+			0x00, 0x00, 0x00, 0x00, 0x54, 0x54, 0x54, 0x54,
+			0xab, 0xab, 0xab, 0xab, 0xfb, 0xf3, 0xeb, 0xe3,
+			0x00, 0x00, 0x00, 0x00, 0x54, 0x54, 0x54, 0x54,
+			0x55, 0x58, 0x5b, 0x5d, 0x04, 0x0c, 0x14, 0x1c,
+		},
+	},
+};
+
+#define N_BLOCKS ARRAY_SIZE(bptc_blocks)
+
+static void
+write_bits(uint8_t *out,
+	   int *offset,
+	   int value,
+	   int n_bits)
+{
+	int bit_index = *offset % 8;
+	int byte_index = *offset / 8;
+	int n_bits_in_byte = MIN2(n_bits, 8 - bit_index);
+
+	*offset += n_bits;
+
+	while (n_bits > 0) {
+		out[byte_index] |= ((value & ((1 << n_bits_in_byte) - 1)) <<
+				    bit_index);
+
+		n_bits -= n_bits_in_byte;
+		value >>= n_bits_in_byte;
+		byte_index++;
+		bit_index = 0;
+		n_bits_in_byte = MIN2(n_bits, 8);
+	}
+}
+
+static void
+write_component(uint8_t *out,
+		int *offset,
+		const struct bptc_block *block,
+		int component, int subset, int endpoint)
+{
+	write_bits(out, offset,
+		   block->endpoints[subset * 2 + endpoint][component],
+		   bptc_modes[block->mode].n_color_bits);
+}
+
+static bool
+is_anchor(const struct bptc_block *block,
+          int texel)
+{
+	if (texel == 0)
+		return true;
+
+	switch (bptc_modes[block->mode].n_subsets) {
+	case 1:
+		return false;
+	case 2:
+		return anchor_indices[0][block->partition] == texel;
+	case 3:
+		return (anchor_indices[1][block->partition] == texel ||
+			anchor_indices[2][block->partition] == texel);
+	default:
+		assert(false);
+		return false;
+	}
+}
+
+static void
+make_block(const struct bptc_block *block,
+	   uint8_t *out)
+{
+	const struct bptc_mode *mode = bptc_modes + block->mode;
+	int offset = 0;
+	int component;
+	int subset;
+	int endpoint;
+	int n_bits;
+	int i;
+
+	memset(out, 0, BLOCK_SIZE * BLOCK_SIZE);
+
+	write_bits(out, &offset, 1 << block->mode, block->mode + 1);
+
+	write_bits(out, &offset, block->partition, mode->n_partition_bits);
+
+	write_bits(out, &offset, block->rotation,
+		   mode->has_rotation_bits ? 2 : 0);
+
+	write_bits(out, &offset, block->index_selection,
+		   mode->has_index_selection_bit);
+
+	for (component = 0; component < 3; component++) {
+		for (subset = 0; subset < mode->n_subsets; subset++) {
+			for (endpoint = 0; endpoint < 2; endpoint++) {
+				write_component(out, &offset, block,
+						component, subset, endpoint);
+			}
+		}
+	}
+
+	for (subset = 0; subset < mode->n_subsets; subset++) {
+		for (endpoint = 0; endpoint < 2; endpoint++) {
+			write_bits(out, &offset,
+				   block->endpoints[subset * 2 + endpoint][3],
+				   mode->n_alpha_bits);
+		}
+	}
+
+	for (subset = 0; subset < mode->n_subsets; subset++) {
+		for (endpoint = 0; endpoint < 2; endpoint++) {
+			write_bits(out, &offset,
+				   block->pbits[subset * 2 + endpoint],
+				   mode->has_endpoint_pbits);
+		}
+	}
+
+	for (subset = 0; subset < mode->n_subsets; subset++) {
+		write_bits(out, &offset,
+			   block->pbits[subset],
+			   mode->has_shared_pbits);
+	}
+
+	for (i = 0; i < BLOCK_SIZE * BLOCK_SIZE; i++) {
+		n_bits = mode->n_index_bits;
+
+		if (is_anchor(block, i))
+			n_bits--;
+
+		write_bits(out, &offset, block->primary_indices[i], n_bits);
+	}
+
+	if (mode->n_secondary_index_bits) {
+		for (i = 0; i < BLOCK_SIZE * BLOCK_SIZE; i++) {
+			n_bits = mode->n_secondary_index_bits;
+
+			if (is_anchor(block, i))
+				n_bits--;
+
+			write_bits(out, &offset,
+				   block->secondary_indices[i], n_bits);
+		}
+	}
+
+	assert(offset == BLOCK_BYTES * 8);
+}
+
+static GLuint
+make_tex(void)
+{
+	GLuint tex;
+	uint8_t data[BLOCK_BYTES * N_BLOCKS];
+	int i;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	for (i = 0; i < N_BLOCKS; i++)
+		make_block(bptc_blocks + i, data + i * BLOCK_BYTES);
+
+	glCompressedTexImage2D(GL_TEXTURE_2D,
+			       0, /* level */
+			       GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,
+			       BLOCK_SIZE * 2, BLOCK_SIZE * N_BLOCKS / 2,
+			       0, /* border */
+			       sizeof data,
+			       data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	return tex;
+}
+
+static bool
+compare_results(const uint8_t *expected,
+		const uint8_t *observed,
+		int observed_rowstride)
+{
+	int y, x;
+
+	for (y = 0; y < BLOCK_SIZE; y++) {
+		for (x = 0; x < BLOCK_SIZE; x++) {
+			if (memcmp(expected, observed, 4)) {
+				printf("Unexpected color at %i,%i:\n"
+				       "  expected %02x%02x%02x%02x\n"
+				       "  observed %02x%02x%02x%02x\n",
+				       x, y,
+				       expected[0], expected[1],
+				       expected[2], expected[3],
+				       observed[0], observed[1],
+				       observed[2], observed[3]);
+				return false;
+			}
+			expected += 4;
+			observed += 4;
+		}
+
+		observed += observed_rowstride - 4 * BLOCK_SIZE;
+	}
+
+	return true;
+}
+
+static void
+render_texture(uint8_t *render_data,
+	       uint8_t *get_data)
+{
+	GLuint tex;
+
+	tex = make_tex();
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glEnable(GL_TEXTURE_2D);
+
+	piglit_draw_rect_tex(0, 0, BLOCK_SIZE * 2, BLOCK_SIZE * N_BLOCKS / 2,
+			     0.0f, 0.0f, 1.0f, 1.0f);
+
+	glDisable(GL_TEXTURE_2D);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, BLOCK_SIZE * 2, BLOCK_SIZE * N_BLOCKS / 2,
+		     GL_RGBA, GL_UNSIGNED_BYTE, render_data);
+
+	glGetTexImage(GL_TEXTURE_2D,
+		      0, /* level */
+		      GL_RGBA,
+		      GL_UNSIGNED_BYTE,
+		      get_data);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDeleteTextures(1, &tex);
+}
+
+static GLboolean
+check_block(const struct bptc_block *block,
+	    const uint8_t *render_data,
+	    const uint8_t *get_data)
+{
+	GLboolean overall_result = GL_TRUE;
+	GLboolean pass;
+
+	printf("mode %i, partition %i, rotation %i, index %i\n",
+	       block->mode,
+	       block->partition,
+	       block->rotation,
+	       block->index_selection);
+
+	pass = compare_results(block->expected_values,
+			       render_data,
+			       BLOCK_SIZE * 2 * 4);
+	printf("render: %s\n", pass ? "pass" : "fail");
+
+	overall_result &= pass;
+
+	pass = compare_results(block->expected_values,
+			       get_data,
+			       BLOCK_SIZE * 2 * 4);
+	printf("glGetTexImage: %s\n", pass ? "pass" : "fail");
+
+	overall_result &= pass;
+
+	return overall_result;
+}
+
+enum piglit_result
+piglit_display(void)
+{
+	GLboolean pass = GL_TRUE;
+	uint8_t render_data[BLOCK_SIZE * BLOCK_SIZE * N_BLOCKS * 4];
+	uint8_t get_data[BLOCK_SIZE * BLOCK_SIZE * N_BLOCKS * 4];
+	int offset;
+	int i;
+
+	glClearColor(0, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	render_texture(render_data, get_data);
+
+	for (i = 0; i < N_BLOCKS; i++) {
+		offset = (i % 2 * BLOCK_SIZE * 4 +
+			  i / 2 * BLOCK_SIZE * BLOCK_SIZE * 2 * 4);
+		pass &= check_block(bptc_blocks + i,
+				    render_data + offset,
+				    get_data + offset);
+	}
+
+	piglit_present_results();
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	if (piglit_get_gl_version() < 42 &&
+	    !piglit_is_extension_supported("GL_ARB_texture_compression_bptc")) {
+		printf("OpenGL 4.2 or GL_ARB_texture_compression_bptc "
+		       "is required.\n");
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+}

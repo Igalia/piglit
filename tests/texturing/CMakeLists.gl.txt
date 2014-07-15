@@ -13,6 +13,7 @@ link_libraries (
 piglit_add_executable (1-1-linear-texture 1-1-linear-texture.c)
 piglit_add_executable (array-depth-roundtrip array-depth-roundtrip.c)
 piglit_add_executable (array-texture array-texture.c)
+piglit_add_executable (bptc-modes bptc-modes.c)
 piglit_add_executable (compressedteximage compressedteximage.c)
 piglit_add_executable (copytexsubimage copytexsubimage.c)
 piglit_add_executable (copyteximage copyteximage.c)
