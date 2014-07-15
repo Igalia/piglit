@@ -1236,13 +1236,44 @@ get_required_config(const char *script_name,
 	}
 }
 
+/**
+ * Wrapper for strtod() which also handles +/-inf with MSVC.
+ * Note: we only check for "inf" and not "INF".
+ */
+static double
+strtod_inf(const char *nptr, char **endptr)
+{
+#if defined(_MSC_VER)
+	/* Define our own infinty value here */
+	const unsigned inf_u = 0x7f800000;
+	const float inf = *((float *) &inf_u);
+
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (nptr[0] == 'i' && nptr[1] == 'n' && nptr[2] == 'f') {
+		/* +infinity */
+		*endptr = (char *) (nptr + 3);
+		return inf;
+	}
+	else if (nptr[0] == '-' && nptr[1] == 'i' && nptr[2] == 'n' && nptr[3] == 'f') {
+		/* -infinity */
+		*endptr = (char *) (nptr + 4);
+		return -inf;
+	}
+	/* fall-through */
+#endif
+	return strtod(nptr, endptr);
+}
+
 void
 get_floats(const char *line, float *f, unsigned count)
 {
 	unsigned i;
 
 	for (i = 0; i < count; i++)
-		f[i] = strtod(line, (char **) &line);
+		f[i] = strtod_inf(line, (char **) &line);
 }
 
 void
@@ -1251,7 +1282,7 @@ get_doubles(const char *line, double *d, unsigned count)
 	unsigned i;
 
 	for (i = 0; i < count; i++)
-		d[i] = strtod(line, (char **) &line);
+		d[i] = strtod_inf(line, (char **) &line);
 }
 
 
