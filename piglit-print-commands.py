@@ -36,6 +36,7 @@ from framework.gleantest import GleanTest
 
 
 def main():
+    core.get_config()
     parser = argparse.ArgumentParser(sys.argv)
     parser.add_argument("-t", "--include-tests",
                         default = [],
