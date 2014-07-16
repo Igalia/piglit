@@ -27,7 +27,7 @@ import os
 import os.path as path
 import re
 
-from .exectest import PiglitTest, TEST_BIN_DIR
+from .exectest import PiglitTest
 
 __all__ = ['add_shader_test', 'add_shader_test_dir']
 
@@ -65,9 +65,9 @@ class ShaderTest(PiglitTest):
                 line = line.strip()
                 if line.startswith('GL ES'):
                     if line.endswith('3.0'):
-                        prog = path.join(TEST_BIN_DIR, 'shader_runner_gles3')
+                        prog = 'shader_runner_gles3'
                     elif line.endswith('2.0'):
-                        prog = path.join(TEST_BIN_DIR, 'shader_runner_gles2')
+                        prog = 'shader_runner_gles2'
                     # If we don't set gles2 or gles3 continue the loop,
                     # probably htting the exception in the for/else
                     else:
@@ -77,7 +77,7 @@ class ShaderTest(PiglitTest):
                     # In the event that we reach the end of the config black
                     # and an API hasn't been found, it's an old test and uses
                     # "GL"
-                    prog = path.join(TEST_BIN_DIR, 'shader_runner')
+                    prog = 'shader_runner'
                     break
             else:
                 raise ShaderTestParserException("No GL version set")
