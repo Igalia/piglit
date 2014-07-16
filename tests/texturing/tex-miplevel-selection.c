@@ -1456,6 +1456,10 @@ piglit_display(void)
 											  maxlevel, minlod, maxlod,
 											  bias, mipfilter)) {
 										failed++;
+										if (failed > 100) {
+											printf("Stopping after 100 failures\n");
+											goto end;
+										}
 									}
 								}
 								total++;
@@ -1492,12 +1496,17 @@ piglit_display(void)
 											  baselevel, maxlevel, minlod,
 											  maxlod, bias, mipfilter)) {
 										failed++;
+										if (failed > 100) {
+											printf("Stopping after 100 failures\n");
+											goto end;
+										}
 									}
 									total++;
 								}
 		free(pix);
 	}
 
+end:
 	assert(glGetError() == 0);
 	printf("Summary: %i/%i passed\n", total-failed, total);
 
