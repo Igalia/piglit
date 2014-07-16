@@ -39,6 +39,29 @@ __all__ = ['PIGLIT_CONFIG',
 
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
 
+def get_config(arg=None):
+    if arg:
+        PIGLIT_CONFIG.readfp(arg)
+    else:
+        # Load the piglit.conf. First try looking in the current directory,
+        # then trying the XDG_CONFIG_HOME, then $HOME/.config/, finally try the
+        # piglit root dir
+        for d in ['.',
+                  os.environ.get('XDG_CONFIG_HOME',
+                                 os.path.expandvars('$HOME/.config')),
+                  os.path.join(os.path.dirname(__file__), '..', '..')]:
+            try:
+                with open(os.path.join(d, 'piglit.conf'), 'r') as f:
+                    PIGLIT_CONFIG.readfp(f)
+                break
+            except IOError:
+                pass
+        else:
+            if __debug__:
+                print('Warning: piglit.conf not found!\n'
+                      '(searching current dir, $HOME/.config, '
+                      '$XDG_CONFIG_HOME, and piglit source dir)',
+                      file=sys.stderr)
 
 # Ensure the given directory exists
 def checkDir(dirname, failifexists):

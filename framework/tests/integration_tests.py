@@ -29,10 +29,10 @@ errors and to ensure that the API hasn't changed without fixing these modules
 import importlib
 import ConfigParser
 from nose.plugins.skip import SkipTest
-from framework.programs.run import _get_config
+import framework.core
 
 
-_get_config(None)
+framework.core.get_config()
 
 
 def _import(name):

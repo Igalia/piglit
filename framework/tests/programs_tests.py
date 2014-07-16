@@ -96,7 +96,7 @@ class _TestWithEnvClean(object):
 # Tests
 class TestGetConfigEnv(_TestWithEnvClean):
     def test(self):
-        """ _get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
         self.add_teardown('XDG_CONFIG_HOME')
         if os.path.exists('piglit.conf'):
@@ -107,7 +107,7 @@ class TestGetConfigEnv(_TestWithEnvClean):
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(CONF_FILE)
-            run._get_config(None)
+            core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='$XDG_CONFIG_HOME not found')
@@ -115,7 +115,7 @@ class TestGetConfigEnv(_TestWithEnvClean):
 
 class TestGetConfigHomeFallback(_TestWithEnvClean):
     def test(self):
-        """ _get_config() finds $HOME/.config/piglit.conf """
+        """ get_config() finds $HOME/.config/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
@@ -136,7 +136,7 @@ class TestGetConfigHomeFallback(_TestWithEnvClean):
 class TestGetConfigLocal(_TestWithEnvClean):
     # These need to be empty to force '.' to be used
     def test(self):
-        """ _get_config() finds ./piglit.conf """
+        """ get_config() finds ./piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
@@ -151,7 +151,7 @@ class TestGetConfigLocal(_TestWithEnvClean):
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write(CONF_FILE)
 
-            run._get_config(None)
+            core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='./piglit.conf not found')
@@ -159,7 +159,7 @@ class TestGetConfigLocal(_TestWithEnvClean):
 
 class TestGetConfigRoot(_TestWithEnvClean):
     def test(self):
-        """ _get_config() finds "piglit root"/piglit.conf """
+        """ get_config() finds "piglit root"/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
@@ -174,7 +174,7 @@ class TestGetConfigRoot(_TestWithEnvClean):
         self.defer(os.chdir, os.getcwd())
         os.chdir('..')
 
-        run._get_config(None)
+        core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='$PIGLIT_ROOT not found')
