@@ -53,6 +53,12 @@ piglit_init(int argc, char **argv)
 	GLint invalid_sizes[] = {
 		1, 2, 3
 	};
+	GLuint array_obj;
+
+	if (piglit_is_core_profile) {
+		glGenVertexArrays(1, &array_obj);
+		glBindVertexArray(array_obj);
+	}
 
 	if(piglit_get_gl_version() < 33)
 		piglit_require_extension("GL_ARB_vertex_type_2_10_10_10_rev");
