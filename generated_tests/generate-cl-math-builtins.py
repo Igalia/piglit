@@ -29,11 +29,15 @@ from math import atan, pi, sin, cos
 
 CLC_VERSION_MIN = {
     'atan' : 10,
+    'ceil' : 10,
     'cos' : 10,
+    'floor' : 10,
     'mix' : 10,
     'nextafter' : 10,
+    'round' : 10,
     'sign' : 10,
-    'sin' : 10
+    'sin' : 10,
+    'trunc' : 10
 }
 
 DATA_TYPES = ['float']
@@ -52,6 +56,14 @@ tests = {
         ],
         'tolerance' : 2
      },
+    'ceil' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [1.0,  0.0, 0.0, -0.0, float("nan"), -3.0],
+            [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99]
+        ]
+    },
     'cos' : {
         'arg_types' : [F, F],
         'function_type': 'ttt',
@@ -60,6 +72,14 @@ tests = {
             [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345] # Arg0
         ],
         'tolerance' : 2
+    },
+    'floor' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [0.0, -1.0, 0.0, -0.0, float("nan"), -4.0,  1.0],
+            [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5]
+        ]
     },
     'mix' : { #x + (y - x) * a
         'arg_types': [F, F, F, F],
@@ -80,6 +100,14 @@ tests = {
             [1.0,          -1.0         , 2.0, 0.0, 3.4, float("nan"), 5.0], # Arg1
         ]
     },
+    'round' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [1.0, -1.0, 0.0, -0.0, float("nan"), -4.0,  2.0, 0.0, 1.0],
+            [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5, 0.4, 0.6]
+        ]
+    },
     'sign' : { # This is really a Common function but it uses the same types
                # as a lot of the math functions.
         'arg_types': [F, F],
@@ -97,6 +125,14 @@ tests = {
             [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567] # Arg0
         ],
         'tolerance': 2
+    },
+    'trunc' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [0.0, -0.0, 0.0, -0.0, float("nan"), -3.0,  1.0],
+            [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5]
+        ]
     }
 }
 
