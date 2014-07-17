@@ -130,9 +130,6 @@ class TexCombineTest: public BasicTest {
 	int CountCrossbarCombinations() const;
 	bool RunCrossbarTest(glmachine &machine, BasicResult &r, Window &w);
 
-	PFNGLACTIVETEXTUREARBPROC p_glActiveTextureARB;
-	PFNGLMULTITEXCOORD2FARBPROC p_glMultiTexCoord2fARB;
-
 }; // class TexCombineTest
 
 } // namespace GLEAN
