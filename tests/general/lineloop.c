@@ -28,7 +28,7 @@
  * No additional lines should appear due to buffer splitting.
  */
 
-#include "piglit-util-gl-common.h"
+#include "piglit-util-gl.h"
 
 #define WSIZE 400
 
