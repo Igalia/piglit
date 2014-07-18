@@ -112,6 +112,7 @@ piglit_display(void)
 	bool pass = true;
 	bool may_link_fail;
 	const float green[4] = { 0, 1, 0, 0 };
+	int test_index;
 
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
 
@@ -123,20 +124,24 @@ piglit_display(void)
 	case VS:
 		target = GL_VERTEX_SHADER;
 		may_link_fail = false;
+		test_index = vec4s - 1;
 		break;
 	case VS_EXCEED:
 		target = GL_VERTEX_SHADER;
 		may_link_fail = true;
 		vec4s++;
+		test_index = vec4s - 2;
 		break;
 	case FS:
 		target = GL_FRAGMENT_SHADER;
 		may_link_fail = false;
+		test_index = vec4s - 1;
 		break;
 	case FS_EXCEED:
 		target = GL_FRAGMENT_SHADER;
 		may_link_fail = true;
 		vec4s++;
+		test_index = vec4s - 2;
 		break;
 	default:
 		assert(false);
@@ -189,15 +194,18 @@ piglit_display(void)
 	data = glMapBuffer(GL_UNIFORM_BUFFER, GL_READ_WRITE);
 	memset(data, 0, size);
 
-	data[(vec4s - 1) * 4 + 0] = 0.0;
-	data[(vec4s - 1) * 4 + 1] = 1.0;
-	data[(vec4s - 1) * 4 + 2] = 0.0;
-	data[(vec4s - 1) * 4 + 3] = 0.0;
+	/* The whole uniform buffer will be zeros, except for the
+	 * entry at v[test_index] which will be green.
+	 */
+	data[test_index * 4 + 0] = green[0];
+	data[test_index * 4 + 1] = green[1];
+	data[test_index * 4 + 2] = green[2];
+	data[test_index * 4 + 3] = green[3];
 	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 	glUseProgram(prog);
 	i_location = glGetUniformLocation(prog, "i");
-	glUniform1i(i_location, vec4s - 1);
+	glUniform1i(i_location, test_index);
 
 	glUniformBlockBinding(prog, 0, 0);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, bo);
