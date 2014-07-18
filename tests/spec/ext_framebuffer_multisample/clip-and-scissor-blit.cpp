@@ -312,7 +312,7 @@ do_test(int coord, bool clip_low, test_type_enum test_type,
 						   dst_size[1]);
 }
 
-void
+NORETURN void
 print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <num_samples> <blit_type>\n"
