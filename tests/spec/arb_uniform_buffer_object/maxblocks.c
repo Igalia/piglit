@@ -48,6 +48,8 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
+	config.window_width = 800;
+	config.window_height = 100;
 	config.supports_gl_compat_version = 10;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -195,6 +197,10 @@ test_draw(int y_index, GLuint prog,
 	int i;
 	float *expected_color;
 
+	assert(test_block < active_blocks);
+
+	glViewport(0, 0, piglit_width, piglit_height);
+
 	expected_color = other_colors[test_block % ARRAY_SIZE(other_colors)];
 
 	for (i = 0; i < active_blocks; i++) {
@@ -212,6 +218,7 @@ test_draw(int y_index, GLuint prog,
 
 	if (screen_x + screen_w >= piglit_width ||
 	    screen_y + screen_h >= piglit_height) {
+		printf("warning: window too small to display test rect.\n");
 		return true;
 	}
 
