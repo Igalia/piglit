@@ -2304,6 +2304,19 @@ piglit_display(void)
 			if (!piglit_probe_pixel_rgb(x, y, &c[2])) {
 				pass = false;
 			}
+		} else if (sscanf(line, "relative probe rect rgb "
+				  "( %f , %f , %f , %f ) "
+				  "( %f , %f , %f )",
+				  c + 0, c + 1, c + 2, c + 3,
+				  c + 4, c + 5, c + 6) == 7) {
+			x = c[0] * render_width;
+			y = c[1] * render_height;
+			w = c[2] * render_width;
+			h = c[3] * render_height;
+
+			if (!piglit_probe_rect_rgb(x, y, w, h, &c[4])) {
+				pass = false;
+			}
 		} else if (string_match("probe all rgba", line)) {
 			get_floats(line + 14, c, 4);
 			pass = pass &&
