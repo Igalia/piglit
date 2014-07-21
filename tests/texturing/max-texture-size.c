@@ -195,8 +195,8 @@ test_proxy_texture_size(GLenum target, GLenum internalformat)
 		break;
 
 	case GL_TEXTURE_RECTANGLE:
-		glTexImage2D(target, 0, internalformat, maxSide,
-			     maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_PROXY_TEXTURE_RECTANGLE, 0, internalformat,
+			     maxSide, maxSide, 0, GL_RGBA, GL_FLOAT, NULL);
 		break;
 
 	case GL_TEXTURE_3D:
