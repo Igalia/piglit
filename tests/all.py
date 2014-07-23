@@ -1868,6 +1868,12 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocation-id')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocations_count_too_large')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-xfb-streams')
 
+arb_gpu_shader_fp64 = {}
+spec['ARB_gpu_shader_fp64'] = arb_gpu_shader_fp64
+add_shader_test_dir(arb_gpu_shader_fp64,
+                    os.path.join(testsDir, 'spec', 'arb_gpu_shader_fp64'),
+                    recursive=True)
+
 arb_texture_query_levels = {}
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
 add_shader_test_dir(arb_texture_query_levels,
