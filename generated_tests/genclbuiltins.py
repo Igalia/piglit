@@ -284,6 +284,8 @@ def getArgTypes(baseType, argTypes):
         ret.append(getArgType(baseType, argType))
     return ret
 
+def isFloatType(t):
+    return t not in U
 
 # Print a test with all-vector inputs/outputs and/or mixed vector/scalar args
 def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
@@ -330,7 +332,10 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
                     '[' + str(vecSize) + '] ' + ' '.join([argVal]*vecSize)
             )
             if arg == 0:
-                f.write(' tolerance {} ulp'.format(tolerance))
+                f.write(' tolerance {} '.format(tolerance))
+	        # Use ulp tolerance for float types
+	        if isFloatType(argTypes[arg]):
+                    f.write('ulp')
             f.write('\n')
         else:
             argInOut = 'arg_in: '
