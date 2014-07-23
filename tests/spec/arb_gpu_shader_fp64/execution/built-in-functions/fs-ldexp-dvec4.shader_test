@@ -1,0 +1,109 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 130
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+out vec4 color;
+
+uniform dvec4 expected_double;
+uniform dvec4 given_double;
+uniform ivec4 given_exponent;
+
+void main()
+{
+	int i;
+	dvec4 result;
+	/* Green if both pass. */
+	color = vec4(0.0, 0.0, 0.0, 0.0);
+
+	/* Compare the results after going through floatBitsToInt() allows us
+	 * to distinguish -0.0f from 0.0f.
+	 */
+	result = ldexp(given_double, given_exponent);
+	for (i = 0; i < 4; i++) {
+		if (unpackDouble2x32(expected_double[i]) !=
+		    unpackDouble2x32(result[i])) {
+			color[i] = 1.0;
+		}
+	}
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+# Basic tests with exponent = 0.
+uniform dvec4 expected_double 0.0 -0.0 0.5 -0.5
+uniform dvec4 given_double 0.0 -0.0 0.5 -0.5
+uniform ivec4 given_exponent 0 0 0 0
+#draw arrays GL_TRIANGLE_FAN 0 4
+#probe rgba 0 0 0.0 0.0 0.0 0.0
+
+# Basic tests.
+uniform dvec4 expected_double 0.49 1.0 25.0 100
+uniform dvec4 given_double 0.98 0.5 0.78125 0.78125
+uniform ivec4 given_exponent -1 1 5 7
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 1 0 0.0 0.0 0.0 0.0
+
+# Test generating FLT_MIN (1.1754944e-38) and FLT_MAX (3.40282347e38).
+uniform dvec4 expected_double 1.1754943508222875e-38 -1.1754943508222875e-38 3.4028234699999998e+38 -3.4028234699999998e+38
+uniform dvec4 given_double 0.5 -0.5 0.99999994145762339 -0.99999994145762339
+uniform ivec4 given_exponent -125 -125 128 128
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 2 0 0.0 0.0 0.0 0.0
+
+# Test FLT_MIN (1.1754944e-38) and FLT_MAX (3.40282347e38) as inputs.
+uniform dvec4 expected_double 0.5 -0.5 0.99999994145762339 -0.99999994145762339
+uniform dvec4 given_double 1.1754943508222875e-38 -1.1754943508222875e-38 3.4028234699999998e+38 -3.4028234699999998e+38
+uniform ivec4 given_exponent 125 125 -128 -128
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 3 0 0.0 0.0 0.0 0.0
+
+# Test DBL_MIN (2.2250738585072014E-308) and DBL_MAX (1.7976931348623157E+308)
+uniform dvec4 expected_double 2.2250738585072014e-308 -2.2250738585072014e-308 1.7976931348623157e+308 -1.7976931348623157e+308
+uniform dvec4 given_double 0.5 -0.5 0.99999999999999989 -0.99999999999999989
+uniform ivec4 given_exponent -1021 -1021 1024 1024
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 4 0 0.0 0.0 0.0 0.0
+
+# Test DBL_MIN (2.2250738585072014E-308) and DBL_MAX (1.7976931348623157E+308) as inputs.
+uniform dvec4 expected_double 0.5 -0.5 0.99999999999999989 -0.99999999999999989
+uniform dvec4 given_double 2.2250738585072014E-308 -2.2250738585072014E-308 1.7976931348623157E+308 -1.7976931348623157E+308
+uniform ivec4 given_exponent 1021 1021 -1024 -1024
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 5 0 0.0 0.0 0.0 0.0
+
+# Test underflow generates zero with sign of x.
+uniform dvec4 expected_double 0.0 -0.0 0.0 -0.0
+uniform dvec4 given_double 0.0 -0.0 0.5 -0.5
+uniform ivec4 given_exponent -1028 -1028 -1028 -1028
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 6 0 0.0 0.0 0.0 0.0
+
+uniform dvec4 expected_double 0.0 -0.0 0.0 -0.0
+uniform dvec4 given_double 2.2250738585072014E-308 -2.2250738585072014E-308 1.7976931348623157E+308 -1.7976931348623157E+308
+# For the FLT_MAX case -255 comes from (-127 + -127 + -1).
+#   ldexp(FLT_MAX, -127)           = 0x1.fffffep+0 (1.999999881)
+#   ldexp(FLT_MAX, -127 - 127)     = 0x1p-126 (epsilon above FLT_MIN)
+#   ldexp(FLT_MAX, -127 - 127 - 1) = 0.0
+uniform ivec4 given_exponent -1 -1 -2048 -2048
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 7 0 0.0 0.0 0.0 0.0
+
+# Overflow is undefined according to the GLSL spec, so nothing to test.
