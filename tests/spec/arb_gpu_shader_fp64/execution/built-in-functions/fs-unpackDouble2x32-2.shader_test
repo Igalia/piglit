@@ -1,0 +1,52 @@
+# test unpack with a single channel specified
+# to demonstrate a bug in glsl->tgsi dead-code elimination
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+out vec4 color;
+
+uniform double given_doub;
+uniform uint expected_uval;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	uint packval;
+
+	packval = unpackDouble2x32(abs(given_doub)).y;
+
+	if (packval != expected_uval) {
+		color.r = 1.0;
+	}
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform double given_doub 0.0
+uniform uint expected_uval 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
+
+uniform double given_doub 1.5
+uniform uint expected_uval 1073217536
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 1 0 0.0 1.0 0.0 1.0

@@ -1,0 +1,55 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+out vec4 color;
+
+uniform double expected_doub;
+uniform uvec2 given_uval;
+
+void main()
+{
+	/* Green if both pass. */
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	double packval;
+
+	packval = packDouble2x32(given_uval);
+
+	if (packval != expected_doub) {
+		color.r = 1.0;
+	}
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform double expected_doub 0.0
+uniform uvec2 given_uval 0 0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
+
+uniform double expected_doub 1.5
+uniform uvec2 given_uval 0 1073217536
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 1 0 0.0 1.0 0.0 1.0
+
+uniform double expected_doub 2.122e-311
+uniform uvec2 given_uval 8519181 1000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 2 0 0.0 1.0 0.0 1.0

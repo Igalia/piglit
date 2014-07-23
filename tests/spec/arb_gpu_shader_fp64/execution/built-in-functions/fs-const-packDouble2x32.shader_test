@@ -1,0 +1,40 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+#define STATIC_ASSERT(cond) { float array[(cond) ? -1 : 1]; }
+
+out vec4 color;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	/* Compare the results after going through unpackDouble2x32() allows us
+	 * to distinguish -0.0f from 0.0f.
+	 */
+	STATIC_ASSERT((packDouble2x32(uvec2(0, 0)) != 0.0lf));
+	STATIC_ASSERT((packDouble2x32(uvec2(0, 1073217536)) != 1.5lf));
+	STATIC_ASSERT((packDouble2x32(uvec2(1, 1000)) != 2.1219957909657664e-311lf));
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
