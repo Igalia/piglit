@@ -332,7 +332,7 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
                     '[' + str(vecSize) + '] ' + ' '.join([argVal]*vecSize)
             )
             if arg == 0:
-                f.write(' tolerance {} '.format(tolerance))
+                f.write(' tolerance {0} '.format(tolerance))
 	        # Use ulp tolerance for float types
 	        if isFloatType(argTypes[arg]):
                     f.write('ulp')
