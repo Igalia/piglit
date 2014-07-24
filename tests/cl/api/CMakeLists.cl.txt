@@ -16,6 +16,7 @@ piglit_cl_add_api_test (retain_release-command-queue retain_release-command-queu
 # Memory objects
 piglit_cl_add_api_test (create-buffer create-buffer.c)
 piglit_cl_add_api_test (create-image create-image.c)
+piglit_cl_add_api_test (create-sampler create-sampler.c)
 piglit_cl_add_api_test (enqueue-copy-buffer enqueue-copy-buffer.c)
 piglit_cl_add_api_test (enqueue-map-buffer enqueue-map-buffer.c)
 piglit_cl_add_api_test (enqueue-copy-buffer-rect enqueue-copy-buffer-rect.c)
