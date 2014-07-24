@@ -7,7 +7,7 @@ gl_MaxComputeWorkGroupCount.z 65535
 gl_MaxComputeWorkGroupSize.x 1024
 gl_MaxComputeWorkGroupSize.y 1024
 gl_MaxComputeWorkGroupSize.z 64
-gl_MaxComputeUniformComponents 1024
+gl_MaxComputeUniformComponents 512
 gl_MaxComputeTextureImageUnits 16
 gl_MaxComputeImageUniforms 8
 gl_MaxComputeAtomicCounters 8
