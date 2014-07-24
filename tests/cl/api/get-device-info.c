@@ -59,6 +59,7 @@ piglit_cl_test(const int argc,
 
 	size_t param_value_size;
 	void* param_value;
+	int* int_value;
 
 	int num_device_infos = PIGLIT_CL_ENUM_NUM(cl_device_info, env->version);
 	const cl_device_info *device_infos = PIGLIT_CL_ENUM_ARRAY(cl_device_info);
@@ -148,6 +149,18 @@ piglit_cl_test(const int argc,
 		piglit_merge_result(&result, PIGLIT_FAIL);
 	}
 
+
+	/*
+	 * Checks for minimum required values.
+	 */
+
+	int_value =  piglit_cl_get_device_info(env->device_id,
+				CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE);
+	if (*int_value < 64 * 1024) {
+		fprintf(stderr, "CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE must be "
+		                "at least 64 KB\n");
+		piglit_merge_result(&result, PIGLIT_FAIL);
+	}
 
 	return result;
 }
