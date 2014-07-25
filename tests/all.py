@@ -2310,6 +2310,10 @@ add_concurrent_test(arb_texture_compression_bptc, 'bptc-modes')
 add_fbo_generatemipmap_extension(arb_texture_compression_bptc, 'GL_ARB_texture_compression_bptc-unorm', 'fbo-generatemipmap-formats')
 add_fbo_generatemipmap_extension(arb_texture_compression_bptc, 'GL_ARB_texture_compression_bptc-float', 'fbo-generatemipmap-formats')
 add_texwrap_format_tests(arb_texture_compression_bptc, 'GL_ARB_texture_compression_bptc')
+add_concurrent_test(arb_texture_compression_bptc, 'compressedteximage GL_COMPRESSED_RGBA_BPTC_UNORM')
+add_concurrent_test(arb_texture_compression_bptc, 'compressedteximage GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM')
+add_concurrent_test(arb_texture_compression_bptc, 'compressedteximage GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT')
+add_concurrent_test(arb_texture_compression_bptc, 'compressedteximage GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT')
 
 ext_vertex_array_bgra = {}
 spec['EXT_vertex_array_bgra'] = ext_vertex_array_bgra
