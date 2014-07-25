@@ -1,0 +1,58 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+in vec4 vertex;
+
+void main() {
+	gl_Position = vertex;
+}
+
+[fragment shader]
+#extension GL_ARB_gpu_shader_fp64 : enable
+
+out vec4 color;
+
+uniform dvec4 a, b, c;
+uniform dvec4 expected;
+
+void main()
+{
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	if (expected.x != fma(a.x, b.x, c.x)) {
+		color.r = 1.0;
+	}
+	if (expected.xy != fma(a.xy, b.xy, c.xy)) {
+		color.r = 1.0;
+	}
+	if (expected.xyz != fma(a.xyz, b.xyz, c.xyz)) {
+		color.r = 1.0;
+	}
+	if (expected != fma(a, b, c)) {
+		color.r = 1.0;
+	}
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform dvec4 a 0.0 0.0 2.0 2.0
+uniform dvec4 b 1.0 1.0 2.0 2.0
+uniform dvec4 c 0.0 1.0 0.0 3.0
+uniform dvec4 expected 0.0 1.0 4.0 7.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
+
+uniform dvec4 a  0.0 -1.0  2.0  2.0
+uniform dvec4 b  1.0  1.0 -2.0  2.0
+uniform dvec4 c -1.0  1.0  0.0 -3.0
+uniform dvec4 expected -1.0 0.0 -4.0 1.0
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 1 0 0.0 1.0 0.0 1.0
