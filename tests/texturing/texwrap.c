@@ -190,6 +190,13 @@ static const struct format_desc ext_texture_compression_s3tc[] = {
 	{FORMAT(GL_COMPRESSED_RGBA_S3TC_DXT5), 4, 4, 4, 4, 0, 0, 0, 0, 1},
 };
 
+static const struct format_desc arb_texture_compression_bptc[] = {
+	{FORMAT(GL_COMPRESSED_RGBA_BPTC_UNORM), 4, 4, 4, 4, 0, 0, 0, 0, 1},
+	{FORMAT(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
+	{FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT), 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
+	{FORMAT(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT), 4, 4, 4, 0, 0, 0, 0, 0, 1, 0, FLOAT_TYPE},
+};
+
 static const struct format_desc ext_texture_srgb_compressed[] = {
 	{FORMAT(GL_COMPRESSED_SRGB), 4, 4, 4, 0, 0, 0, 0, 0, 1, 1},
 	{FORMAT(GL_COMPRESSED_SRGB_ALPHA), 4, 4, 4, 4, 0, 0, 0, 0, 1, 1},
@@ -359,6 +366,12 @@ static const struct test_desc test_sets[] = {
 		ARRAY_SIZE(ext_texture_compression_s3tc),
 		"GL_EXT_texture_compression_s3tc",
 		{"GL_EXT_texture_compression_s3tc"},
+	},
+	{
+		arb_texture_compression_bptc,
+		ARRAY_SIZE(arb_texture_compression_bptc),
+		"GL_ARB_texture_compression_bptc",
+		{"GL_ARB_texture_compression_bptc"},
 	},
 	{
 		arb_depth_texture,
