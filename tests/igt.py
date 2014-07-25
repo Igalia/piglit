@@ -219,10 +219,8 @@ def listTests(listname):
 
     return progs
 
-singleTests = listTests("single-tests")
-
-for test in singleTests:
-    profile.test_list[path.join('igt', test)] = IGTTest(test)
+tests = listTests("single-tests")
+tests.extend(listTests("multi-tests"))
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
@@ -234,6 +232,15 @@ def addSubTestCases(test):
             )
     out, err = proc.communicate()
 
+    # a return code of 79 indicates there are no subtests
+    if proc.returncode == 79:
+         profile.test_list[path.join('igt', test)] = IGTTest(test)
+         return
+
+    if proc.returncode != 0:
+         print "Error: Could not list subtests for " + test
+         return
+
     subtests = out.split("\n")
 
     for subtest in subtests:
@@ -242,9 +249,7 @@ def addSubTestCases(test):
         profile.test_list[path.join('igt', test, subtest)] = \
             IGTTest(test, ['--run-subtest', subtest])
 
-multiTests = listTests("multi-tests")
-
-for test in multiTests:
+for test in tests:
     addSubTestCases(test)
 
 profile.dmesg = True
