@@ -2307,6 +2307,8 @@ arb_texture_compression_bptc = {}
 spec['ARB_texture_compression_bptc'] = arb_texture_compression_bptc
 arb_texture_compression_bptc['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats bptc')
 add_concurrent_test(arb_texture_compression_bptc, 'bptc-modes')
+add_fbo_generatemipmap_extension(arb_texture_compression_bptc, 'GL_ARB_texture_compression_bptc-unorm', 'fbo-generatemipmap-formats')
+add_fbo_generatemipmap_extension(arb_texture_compression_bptc, 'GL_ARB_texture_compression_bptc-float', 'fbo-generatemipmap-formats')
 
 ext_vertex_array_bgra = {}
 spec['EXT_vertex_array_bgra'] = ext_vertex_array_bgra

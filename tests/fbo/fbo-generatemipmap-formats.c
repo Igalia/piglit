@@ -393,6 +393,13 @@ test_mipmap_drawing(int x, int y, int level, GLuint internalformat)
 		g[0] = g[1] = g[2] = g[3] = 0;
 		/* If alpha in DXT1 is >= 0.5, it should be white. */
 		b[3] = 1;
+	} else if (internalformat == GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT) {
+		/* The texture is uploaded with values in the range
+		 * -5->+5 and these get mapped to 0,1 when drawing.
+		 * However when compressing to the unsigned float
+		 * compressed format the -5 values will get clamped to
+		 * 0 which comes out as 0.5 */
+		r[1] = r[2] = g[0] = g[2] = b[0] = b[1] = 0.5f;
 	}
 
 	if (tex_width == 256) {
