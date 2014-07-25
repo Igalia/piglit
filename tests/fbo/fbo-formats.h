@@ -296,6 +296,16 @@ static const struct format_desc ext_texture_snorm[] = {
         FORMAT(GL_INTENSITY16_SNORM, GL_INTENSITY)
 };
 
+static const struct format_desc arb_texture_compression_bptc_unorm[] = {
+	FORMAT(GL_COMPRESSED_RGBA_BPTC_UNORM, GL_RGBA),
+	FORMAT(GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM, GL_RGBA)
+};
+
+static const struct format_desc arb_texture_compression_bptc_float[] = {
+	FORMAT(GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT, GL_RGB),
+	FORMAT(GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT, GL_RGB)
+};
+
 static const struct format_desc arb_es2_compatibility[] = {
 	FORMAT(GL_RGB565, GL_RGB)
 };
@@ -474,7 +484,21 @@ static const struct test_desc test_sets[] = {
 		"GL_ARB_ES2_compatibility",
 		GL_UNSIGNED_NORMALIZED,
 		{"GL_ARB_ES2_compatibility"}
-	}
+	},
+	{
+		arb_texture_compression_bptc_unorm,
+		ARRAY_SIZE(arb_texture_compression_bptc_unorm),
+		"GL_ARB_texture_compression_bptc-unorm",
+		GL_UNSIGNED_NORMALIZED,
+		{"GL_ARB_texture_compression_bptc"}
+	},
+	{
+		arb_texture_compression_bptc_float,
+		ARRAY_SIZE(arb_texture_compression_bptc_float),
+		"GL_ARB_texture_compression_bptc-float",
+		GL_FLOAT,
+		{"GL_ARB_texture_compression_bptc"}
+	},
 };
 
 static GLboolean
