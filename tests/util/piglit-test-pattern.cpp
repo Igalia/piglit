@@ -817,7 +817,7 @@ ManifestStencil::compile()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
 			      (void *) 0);
 
-	/* Set up element input buffer to tesselate a quad into
+	/* Set up element input buffer to tessellate a quad into
 	 * triangles
 	 */
 	unsigned int indices[6] = { 0, 1, 2, 0, 2, 3 };
@@ -918,7 +918,7 @@ ManifestDepth::compile()
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
 			      (void *) 0);
 
-	/* Set up element input buffer to tesselate a quad into
+	/* Set up element input buffer to tessellate a quad into
 	 * triangles
 	 */
 	unsigned int indices[6] = { 0, 1, 2, 0, 2, 3 };

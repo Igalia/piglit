@@ -140,7 +140,7 @@ compile_shader(void)
 			      (void *) 0);
 	glEnableVertexAttribArray(1);
 
-	/* Set up element input buffer to tesselate a quad into
+	/* Set up element input buffer to tessellate a quad into
 	 * triangles
 	 */
 	glGenBuffers(1, &element_buf);

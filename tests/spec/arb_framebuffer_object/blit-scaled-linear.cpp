@@ -129,7 +129,7 @@ compile_shader(void)
 	glVertexAttribPointer(1, 2, GL_INT, GL_FALSE, 4*sizeof(float),
 			      (void *) (2*sizeof(float)));
 
-	/* Set up element input buffer to tesselate a quad into
+	/* Set up element input buffer to tessellate a quad into
 	 * triangles
 	 */
 	unsigned int indices[6] = { 0, 1, 2, 0, 2, 3 };
