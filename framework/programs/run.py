@@ -73,6 +73,11 @@ def run(input_):
     parser.add_argument("-p", "--platform",
                         choices=["glx", "x11_egl", "wayland", "gbm",
                                  "mixed_glx_egl"],
+                        # If an explicit choice isn't made check the
+                        # environment, and if that fails select the glx/x11_egl
+                        # mixed profile
+                        default=os.environ.get("PIGLIT_PLATFORM",
+                                               "mixed_glx_egl"),
                         help="Name of windows system passed to waffle")
     parser.add_argument("-f", "--config",
                         dest="config_file",
@@ -136,8 +141,7 @@ def run(input_):
                         verbose=args.verbose)
 
     # Set the platform to pass to waffle
-    if args.platform:
-        opts.env['PIGLIT_PLATFORM'] = args.platform
+    opts.env['PIGLIT_PLATFORM'] = args.platform
 
     # Change working directory to the root of the piglit directory
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
@@ -216,8 +220,7 @@ def resume(input_):
 
     core.get_config(args.config_file)
 
-    if results.options.get('platform'):
-        opts.env['PIGLIT_PLATFORM'] = results.options['platform']
+    opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, 'results.json')
     json_writer = framework.results.JSONWriter(open(results_path, 'w+'))
