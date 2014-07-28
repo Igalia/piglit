@@ -1,9 +1,7 @@
 /* [config]
  * expect_result: pass
  * glsl_version: 1.50
- * require_extensions: GL_ARB_arrays_of_arrays
- * require_extensions: GL_ARB_shader_subroutine
- * require_extensions: GL_ARB_gpu_shader5
+ * require_extensions: GL_ARB_arrays_of_arrays GL_ARB_shader_subroutine GL_ARB_gpu_shader5
  * [end config]
  */
 #version 150
