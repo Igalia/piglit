@@ -141,6 +141,22 @@ def test_blank_in_config():
                         "parsed.")
 
 
+def test_empty_in_config():
+    """ C++ sytle comments can have blank commented lines """
+    content = ('// [config]\n'
+               '//\n'
+               '// expect_result: pass\n'
+               '// glsl_version: 1.00\n'
+               '// [end config]\n')
+
+    test, name = _check_config(content)
+
+    nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
+                                   name, 'pass', '1.00'],
+                    msg="A blank commented line in a C++ style comment was not"
+                        " properly parsed.")
+
+
 def test_glslparser_initializer():
     """ GLSLParserTest initializes """
     glsl.GLSLParserTest('tests/spec/glsl-es-1.00/compiler/version-macro.frag')
