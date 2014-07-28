@@ -1,7 +1,7 @@
 /* [config]
  * expect_result: pass
  * glsl_version: 1.30
- * equire_extensions: GL_ARB_shading_language_420pack
+ * require_extensions: GL_ARB_shading_language_420pack
  * [end config]
  */
 
