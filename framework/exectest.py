@@ -221,13 +221,23 @@ class Test(object):
         executable isn't found it sets the result to skip.
 
         """
-        # Set the environment for the tests. Use the default settings created
-        # in the Options constructor first, then use any user defined
-        # variables, finally, use any variables set for the test in the test
-        # profile
-        fullenv = self.OPTS.env.copy()
-        for key, value in itertools.chain(self.env.iteritems(),
-                                          os.environ.iteritems()):
+        # Setup the environment for the test. Environment variables are taken
+        # from the following sources, listed in order of increasing precedence:
+        #
+        #   1. This process's current environment.
+        #   2. Global test options. (Some of these are command line options to
+        #      Piglit's runner script).
+        #   3. Per-test environment variables set in all.py.
+        #
+        # Piglit chooses this order because Unix tradition dictates that
+        # command line options (2) override environment variables (1); and
+        # Piglit considers environment variables set in all.py (3) to be test
+        # requirements.
+        #
+        fullenv = dict()
+        for key, value in itertools.chain(os.environ.iteritems(),
+                                          self.OPTS.env.iteritems(),
+                                          self.env.iteritems()):
             fullenv[key] = str(value)
 
         try:
