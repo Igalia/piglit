@@ -204,6 +204,11 @@ GLuint piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype);
 GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
 GLuint piglit_array_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);
+GLuint piglit_multisample_texture(GLenum target, GLenum tex,
+				  GLenum internalFormat,
+				  unsigned width, unsigned height,
+				  unsigned depth, unsigned samples,
+				  GLenum format, GLenum type, void *data);
 extern float piglit_tolerance[4];
 void piglit_set_tolerance_for_bits(int rbits, int gbits, int bbits, int abits);
 extern void piglit_require_transform_feedback(void);

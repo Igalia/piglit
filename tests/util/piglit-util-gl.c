@@ -2470,6 +2470,208 @@ piglit_array_texture(GLenum target, GLenum internalformat,
 	return tex;
 }
 
+static const char multisample_texture_vs_source[] =
+"#version 130\n"
+"in vec2 vertex;\n"
+"out vec2 tex_coords;\n"
+"void main()\n"
+"{\n"
+"	tex_coords = vertex;\n"
+"	vec2 pos = (vertex.xy * 2) - vec2(1, 1);\n"
+"	gl_Position = vec4(pos, 0, 1);\n"
+"}\n";
+
+static const char multisample_texture_fs_source[] =
+"#version 130\n"
+"#extension GL_ARB_sample_shading : enable\n"
+"in vec2 tex_coords;\n"
+"uniform sampler2DArray tex;\n"
+"uniform int tex_depth;\n"
+"uniform int z;\n"
+"void main()\n"
+"{\n"
+"	int layer = (gl_SampleID * tex_depth) + z;\n"
+"	gl_FragColor = texture(tex, vec3(tex_coords, layer));\n"
+"}\n";
+
+/**
+ * Uploads an arbitrary multisample texture.
+ *
+ * This function acts like glTexImage for multisample textures.  If the
+ * input texture is zero, it will create one.  Otherwise, it will use the
+ * texture given and assumes that glTexImage[23]DMultisample has already
+ * been called to establish the storage.
+ *
+ * When this function returns, multisample texture will be bound to the
+ * currently active texture.
+ *
+ * \param target         either GL_TEXTURE_2D_MULTISAMPLE or
+ *                       GL_TEXTURE2D_MULTISAMPLE_ARRAY
+ * \param internalformat a renderable color format accepted by
+ *                       glTexImage2DMultisample
+ * \param width          texture width
+ * \param height         texture height
+ * \param depth          texture depth.  If target is
+ *                       GL_TEXTURE_2D_MULTISAMPLE, this must be 1.
+ * \param samples        the number of samples
+ * \param format         format of the pixel data
+ * \param type           type of the pixel data
+ * \param data           pixel data with whitch to fill the texture
+ *
+ * \return the new texture object id
+ */
+GLuint
+piglit_multisample_texture(GLenum target, GLenum tex, GLenum internalFormat,
+			   unsigned width, unsigned height,
+			   unsigned depth, unsigned samples,
+			   GLenum format, GLenum type, void *data)
+{
+	static GLuint prog = 0;
+	static GLint tex_loc, tex_depth_loc, z_loc;
+	static GLuint fbo, array_tex, ms_tex;
+	static const float verts[] = {
+		0.0, 0.0,
+		0.0, 1.0,
+		1.0, 1.0,
+		1.0, 1.0,
+		1.0, 0.0,
+		0.0, 0.0
+	};
+	unsigned z;
+
+	struct {
+		GLint active_tex;
+		GLint draw_fbo;
+		GLint prog;
+		GLint viewport[4];
+		GLboolean arb_sample_shading;
+		GLfloat min_sample_shading;
+		GLint clamp_fragment_color;
+	} backup;
+
+	piglit_require_extension("GL_ARB_texture_multisample");
+	piglit_require_extension("GL_ARB_sample_shading");
+
+	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
+		assert(depth == 1);
+	} else if (target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
+	} else {
+		assert(!"Invalid texture target");
+		return 0;
+	}
+
+	if (prog == 0) {
+		/* First-run setup */
+		prog = piglit_build_simple_program_unlinked(
+			multisample_texture_vs_source,
+			multisample_texture_fs_source);
+		glBindAttribLocation(prog, 0, "vertex");
+		glLinkProgram(prog);
+		if (!piglit_link_check_status(prog)) {
+			prog = 0;
+			return 0;
+		}
+
+		tex_loc = glGetUniformLocation(prog, "tex");
+		tex_depth_loc = glGetUniformLocation(prog, "tex_depth");
+		z_loc = glGetUniformLocation(prog, "z");
+
+		glGenFramebuffers(1, &fbo);
+		glGenTextures(1, &array_tex);
+	}
+
+	/* Backup client values so we can restore them later */
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &backup.active_tex);
+	glGetIntegerv(GL_CURRENT_PROGRAM, &backup.prog);
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &backup.draw_fbo);
+	glGetIntegerv(GL_CLAMP_FRAGMENT_COLOR, &backup.clamp_fragment_color);
+	glGetIntegerv(GL_VIEWPORT, backup.viewport);
+	glGetBooleanv(GL_SAMPLE_SHADING_ARB, &backup.arb_sample_shading);
+	glGetFloatv(GL_MIN_SAMPLE_SHADING_VALUE_ARB, &backup.min_sample_shading);
+
+	glEnable(GL_SAMPLE_SHADING_ARB);
+	glMinSampleShadingARB(1.0f);
+
+	if (tex) {
+		ms_tex = tex;
+	} else {
+		glGenTextures(1, &ms_tex);
+		glBindTexture(target, ms_tex);
+		if (target == GL_TEXTURE_2D_MULTISAMPLE) {
+			assert(depth == 1);
+			glTexImage2DMultisample(target, samples, internalFormat,
+						width, height, GL_TRUE);
+		} else {
+			glTexImage3DMultisample(target, samples, internalFormat,
+						width, height, depth, GL_TRUE);
+		}
+	}
+
+	glBindTexture(GL_TEXTURE_2D_ARRAY, array_tex);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, width, height,
+		     depth * samples, 0, format, type, data);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	glViewport(0, 0, width, height);
+
+	glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
+
+	glUseProgram(prog);
+	glUniform1i(tex_loc, backup.active_tex - GL_TEXTURE0);
+	glUniform1i(tex_depth_loc, depth);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
+
+	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
+		glUniform1i(z_loc, 0);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
+				       GL_COLOR_ATTACHMENT0,
+				       target, ms_tex, 0);
+		if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) !=
+		    GL_FRAMEBUFFER_COMPLETE)
+			goto error;
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	} else {
+		for (z = 0; z < depth; ++z) {
+			glUniform1i(z_loc, z);
+			glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER,
+						  GL_COLOR_ATTACHMENT0,
+						  ms_tex, 0, z);
+			if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) !=
+			    GL_FRAMEBUFFER_COMPLETE)
+				goto error;
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+	}
+
+	glDisableVertexAttribArray(0);
+
+	/* Restore values for the client */
+	if (!backup.arb_sample_shading)
+		glDisable(GL_SAMPLE_SHADING_ARB);
+	glMinSampleShadingARB(backup.min_sample_shading);
+
+	glUseProgram(backup.prog);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, backup.draw_fbo);
+	glViewport(backup.viewport[0], backup.viewport[1],
+		   backup.viewport[2], backup.viewport[3]);
+	glBindTexture(target, ms_tex);
+	glClampColor(GL_CLAMP_FRAGMENT_COLOR, backup.clamp_fragment_color);
+
+	return ms_tex;
+
+error:
+	if (tex == 0) /* We created it, clean it up */
+		glDeleteTextures(1, &ms_tex);
+
+	return 0;
+}
+
 /**
  * Require transform feedback.
  *
