@@ -114,6 +114,7 @@ decode_type(const char *type)
 		{ "int",     GL_INT            },
 		{ "uint",    GL_UNSIGNED_INT   },
 		{ "float",   GL_FLOAT          },
+		{ "double",  GL_DOUBLE         },
 		{ NULL,      0                 }
 	};
 
@@ -246,6 +247,15 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 		*((GLfloat *) data) = (float) value;
 		break;
 	}
+	case GL_DOUBLE: {
+		double value = strtod(*text, &endptr);
+		if (errno == ERANGE) {
+			printf("Could not parse as double\n");
+			return false;
+		}
+		*((GLdouble *) data) = value;
+		break;
+	}
 	case GL_INT: {
 		long value = strtol(*text, &endptr, 0);
 		if (errno == ERANGE) {
@@ -280,16 +290,30 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 void
 vertex_attrib_description::setup(size_t *offset, size_t stride) const
 {
-	if (this->data_type == GL_FLOAT) {
+	switch (this->data_type) {
+	case GL_FLOAT:
 		glVertexAttribPointer(this->index, this->count,
 				      this->data_type, GL_FALSE, stride,
 				      (void *) *offset);
-	} else if (piglit_is_gles() && piglit_get_gl_version() < 30) {
-		fprintf(stderr,"vertex_attrib_description fail. no int support\n");
-	} else {
+		break;
+	case GL_DOUBLE:
+		if (!piglit_is_extension_supported("GL_ARB_vertex_attrib_64bit")) {
+			fprintf(stderr,"vertex_attrib_description fail. no 64-bit float support\n");
+			return;
+		}
+		glVertexAttribLPointer(this->index, this->count,
+				      this->data_type, stride,
+				      (void *) *offset);
+		break;
+	default:
+		if (piglit_is_gles() && piglit_get_gl_version() < 30) {
+			fprintf(stderr,"vertex_attrib_description fail. no int support\n");
+			return;
+		}
 		glVertexAttribIPointer(this->index, this->count,
 				       this->data_type, stride,
 				       (void *) *offset);
+		break;
 	}
 	glEnableVertexAttribArray(index);
 	*offset += ATTRIBUTE_SIZE * this->count;
@@ -368,6 +392,7 @@ vbo_data::parse_header_line(const std::string &line, GLuint prog)
 			++pos;
 		} else {
 			size_t column_header_end = pos;
+			int mul;
 			while (column_header_end < line.size() &&
 			       !isspace(line[column_header_end]))
 				++column_header_end;
@@ -376,7 +401,8 @@ vbo_data::parse_header_line(const std::string &line, GLuint prog)
 			vertex_attrib_description desc(
 				prog, column_header.c_str());
 			attribs.push_back(desc);
-			this->stride += ATTRIBUTE_SIZE * desc.count;
+			mul = (desc.data_type == GL_DOUBLE) ? 2 : 1;
+			this->stride += ATTRIBUTE_SIZE * desc.count * mul;
 			pos = column_header_end + 1;
 		}
 	}
@@ -400,6 +426,7 @@ vbo_data::parse_data_line(const std::string &line, unsigned int line_num)
 	const char *line_ptr = line.c_str();
 	for (size_t i = 0; i < this->attribs.size(); ++i) {
 		for (size_t j = 0; j < this->attribs[i].count; ++j) {
+			int mul = (this->attribs[i].data_type == GL_DOUBLE) ? 2 : 1;
 			if (!this->attribs[i].parse_datum(&line_ptr,
 							  data_ptr)) {
 				printf("At line %u of [vertex data] section\n",
@@ -407,7 +434,7 @@ vbo_data::parse_data_line(const std::string &line, unsigned int line_num)
 				printf("Offending text: %s\n", line_ptr);
 				piglit_report_result(PIGLIT_FAIL);
 			}
-			data_ptr += ATTRIBUTE_SIZE;
+			data_ptr += ATTRIBUTE_SIZE * mul;
 		}
 	}
 
