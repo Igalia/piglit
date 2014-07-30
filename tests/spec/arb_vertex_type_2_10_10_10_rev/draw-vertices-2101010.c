@@ -209,6 +209,10 @@ piglit_display(void)
     GLboolean pass = GL_TRUE;
     unsigned i;
     float x = 0, y = 0;
+    /* To know what this is all about, see:
+     * http://lists.freedesktop.org/archives/mesa-dev/2013-August/042680.html
+     */
+    GLboolean snorm_equation_23 = piglit_get_gl_version() >= 42;
 
     glClear(GL_COLOR_BUFFER_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -216,6 +220,9 @@ piglit_display(void)
 
     for (i = 0; tests[i].test; i++) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	if (snorm_equation_23 && fabs(tests[i].expected_color[3] - 0.333) < 0.0001)
+	    tests[i].expected_color[3] = 0;
 
         printf("%s\n", tests[i].name);
         tests[i].test(x, y, x+20, y+20, tests[i].index);
