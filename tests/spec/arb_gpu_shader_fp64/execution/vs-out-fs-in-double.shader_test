@@ -1,0 +1,44 @@
+# test truncating a double holds precision
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+uniform double arg0;
+in vec4 vertex;
+out dvec4 dout1;
+void main()
+{
+        gl_Position = vertex;
+	dout1 = dvec4(arg0);
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#
+in dvec4 dout1;
+uniform double tolerance;
+uniform double expected;
+
+void main()
+{
+  dvec4 result = trunc(dout1);
+  gl_FragColor = distance(result, dvec4(expected)) <= tolerance ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform double arg0 1.7976931348623157E+308
+uniform double expected 1.7976931348623157E+308
+uniform double tolerance 2.0000000000000002e-05
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
