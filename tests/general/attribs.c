@@ -42,6 +42,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+static GLboolean snorm_equation_23;
+
 enum {
 	R,
 	RG,
@@ -183,11 +185,19 @@ static GLboolean test(int x, int y, const char *shaderfunc,
 	}
 
 	if (strstr(info, "GL_INT_2_10_10_10_REV-norm")) {
-		for (i = 0; i < 3; i++) {
-			if (color[i][3] < 0.333)
-				color[i][3] = 0;
-			else if (color[i][3] < 1)
-				color[i][3] = 0.333;
+		if (snorm_equation_23) {
+			for (i = 0; i < 3; i++) {
+				if (color[i][3] < 1)
+					color[i][3] = 0;
+			}
+		}
+		else {
+			for (i = 0; i < 3; i++) {
+				if (color[i][3] < 0.333)
+					color[i][3] = 0;
+				else if (color[i][3] < 1)
+					color[i][3] = 0.333;
+			}
 		}
 	} else if (strstr(info, "GL_INT_2_10_10_10_REV")) {
 		for (i = 0; i < 3; i++) {
@@ -333,9 +343,16 @@ static test_func tests_GL3[] = {
 };
 
 /* ARB_vertex_type_2_10_10_10_rev */
+/* Packing functions for a signed normalized 2-bit component.
+ * These are based on equation 2.2 and 2.3 from the opengl specification, see:
+ * http://lists.freedesktop.org/archives/mesa-dev/2013-August/042680.html
+ */
+#define PN2_22(f) ((int)((f) < 0.333 ? 3 /* = -0.333 */ : (f) < 1 ? 0 /* = 0.333 */ : 1))
+#define PN2_23(f) ((int)((f) < 1 ? 0 : 1))
+#define PN2(f) (snorm_equation_23 ? PN2_23(f) : PN2_22(f))
+/* other packing functions */
 #define P10(f) ((int)((f) * 0x1FF))
 #define UP10(f) ((int)((f) * 0x3FF))
-#define PN2(f) ((int)((f) < 0.333 ? 3 /* = -0.333 */ : (f) < 1 ? 0 /* = 0.333 */ : 1)) /* normalized */
 #define P2(f) ((int)(f)) /* unnormalized */
 #define UP2(f) ((int)((f) * 0x3))
 #define P1010102(x,y,z,w) (P10(x) | (P10(y) << 10) | (P10(z) << 20) | (P2(w) << 30))
@@ -524,6 +541,8 @@ void piglit_init(int argc, char **argv)
 	piglit_require_gl_version(20);
 	piglit_require_extension("GL_ARB_explicit_attrib_location");
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+
+	snorm_equation_23 = piglit_get_gl_version() >= 42;
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 
