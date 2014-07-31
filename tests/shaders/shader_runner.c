@@ -2368,8 +2368,19 @@ piglit_display(void)
 			glBindTexture(GL_TEXTURE_2D_ARRAY, texobj);
 			glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA,
 				     w, h, l, 0, GL_RGBA, GL_FLOAT, 0);
-			if (!piglit_is_core_profile)
-				glEnable(GL_TEXTURE_2D_ARRAY);
+		} else if (sscanf(line,
+				  "texture rgbw 2DArray %d ( %d , %d , %d )",
+				  &tex, &w, &h, &l) == 4) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+			piglit_array_texture(GL_TEXTURE_2D_ARRAY, GL_RGBA,
+                                             w, h, l, GL_FALSE);
+		} else if (sscanf(line,
+				  "texture rgbw 1DArray %d ( %d , %d )",
+				  &tex, &w, &l) == 3) {
+			glActiveTexture(GL_TEXTURE0 + tex);
+                        h = 1;
+			piglit_array_texture(GL_TEXTURE_1D_ARRAY, GL_RGBA,
+                                             w, h, l, GL_FALSE);
 		} else if (sscanf(line,
 				  "texture shadow2D %d ( %d , %d )",
 				  &tex, &w, &h) == 3) {
