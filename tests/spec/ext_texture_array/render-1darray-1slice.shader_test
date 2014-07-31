@@ -1,0 +1,35 @@
+# Test GL_TEXTURE_1D_ARRAY texture with just one layer
+[require]
+GLSL >= 1.10
+GL_EXT_texture_array
+
+[vertex shader]
+#version 110
+varying vec4 texcoords;
+void main() {
+	gl_Position = gl_Vertex;
+	texcoords = (gl_Vertex + 1.0) / 2.0;
+}
+
+[fragment shader]
+#version 110
+#extension GL_EXT_texture_array : enable
+varying vec4 texcoords;
+uniform sampler1DArray tex;
+uniform float layer;
+
+void main()
+{
+	vec2 p = vec2(texcoords.x, layer);
+	gl_FragColor = texture1DArray(tex, p);
+}
+
+[test]
+uniform int tex 0
+texture rgbw 1DArray 0 ( 64 , 1 )
+
+# layer=12 should get clamped to zero
+uniform float layer 12
+draw rect -1 -1 2 2
+relative probe rgba (0.5, 0.5) (1.0, 0.0, 0.0, 1.0)
+
