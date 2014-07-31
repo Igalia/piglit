@@ -31,42 +31,79 @@ capture -h/--help and the results will not be useful.
 
 """
 
+from __future__ import print_function
+
 import os
 import os.path as path
 import sys
 import argparse
 
-# Setting sys.path is actually pretty complicated, since there are three
-# seperate uses we need to detect:
-# 1) piglit is being run in the source directory, built in tree
-# 2) piglit is being run from the source directory outside of it, built in tree
-# 3) piglit has been built out of tree and installed, and is being run in or
-#    out of the install directory
+def setup_module_search_path():
+    """Add Piglit's data directory to Python's module search path.
 
-# Case one is the implicit case. In this event nothing needs to be set, it
-# should "just work" (tm)
+    This enables Python to import Piglit's framework module.
 
-# It is critical that this block be run before importing anything from
-# framework (as there is no gaurantee that framework will be in python's path
-# before this blck is run)
+    CAUTION: This script must import the framework that *belongs to this
+    script*. Mayhem occurs if this script accidentally imports a framework
+    module that belongs to a different Piglit source tree or belongs to
+    a different Piglit installation.
 
-if not path.exists('framework/exectest.py'):
-    dirpath = path.dirname(path.abspath(__file__))
-    # Case 2
-    if path.exists(path.join(dirpath, 'framework/exectest.py')):
-        sys.path.append(dirpath)
-    # Case 3
-    else:
-        # In the case of windows piglit is called
-        # piglit${the_date_of_install}.py, and the .py needs to be thrown away
-        piglit = path.splitext(path.basename(__file__))[0]
+    CAUTION: This script file must be located in the Piglit source tree or in
+    an installed location.  Otherwise this function may fail to find the
+    framework module or, worse, it may succeed in finding a different Piglit's
+    framework module.
+    """
 
-        # In the install case we have another problem, one could have multiple
-        # piglits installed as piglit${the_date_of_install}, and we need to
-        # detect that.
-        install_path = path.abspath(path.join(dirpath, '..', 'lib', piglit))
-        sys.path.append(install_path)
+    # To avoid accidentally importing a framework module that belongs to
+    # a different Piglit, base the search for Piglit's data directory on the
+    # absolute path of the this script and *not* on the process's working
+    # directory.
+    abs_script_dir = os.path.abspath(os.path.dirname(__file__))
 
+    tested_piglit_data_dirs = []
+
+    def is_piglit_data_dir(dirpath):
+        tested_piglit_data_dirs.append(dirpath)
+        return path.exists(path.join(dirpath, 'framework', 'exectest.py'))
+
+    # This script may be in two valid locations:
+    #
+    #   - At the top of a Piglit source tree, as below.  In this case, Piglit's
+    #     data directory is the source directory itself.
+    #
+    #       ${piglit_source_dir}/${script_name}     -> This script.
+    #       ${piglit_source_dir}/                   -> Piglit's data directory.
+    #       ${piglit_source_dir}/framework          -> Piglit's framework module
+    #
+    if is_piglit_data_dir(abs_script_dir):
+        sys.path.append(abs_script_dir)
+        return
+
+    # Or...
+    #
+    #   - In an installed location.  Piglit's installation layout looks like
+    #     this, where ${ext} may be empty or ".py":
+    #
+    #       ${prefix}/${bindir}/${script_name}${ext}     -> This script.
+    #       ${prefix}/${libdir}/${script_name}/          -> Piglit's data directory.
+    #       ${prefix}/${libdir}/${script_name}/framework -> Piglit framework module.
+    #
+    abs_bindir = abs_script_dir
+    script_basename_noext = os.path.splitext(os.path.basename(__file__))[0]
+    for libdir in ('lib64', 'lib32', 'lib'):
+        abs_libdir = path.join(abs_bindir, '..', libdir)
+        abs_data_dir = path.join(abs_libdir, script_basename_noext)
+        if is_piglit_data_dir(abs_data_dir):
+            sys.path.append(abs_data_dir)
+            return
+
+    print('error: failed to find piglit data directory. exiting...', file=sys.stderr)
+    for test_dir in tested_piglit_data_dirs:
+        print('error: tested directory {0!r}'.format(test_dir), file=sys.stderr)
+    sys.exit(1)
+
+
+setup_module_search_path()
 import framework.programs.run as run
 import framework.programs.summary as summary
 
