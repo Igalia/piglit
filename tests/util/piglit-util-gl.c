@@ -35,6 +35,13 @@
  */
 static const char **gl_extensions = NULL;
 
+static const float color_wheel[4][4] = {
+	{1, 0, 0, 1}, /* red */
+	{0, 1, 0, 1}, /* green */
+	{0, 0, 1, 1}, /* blue */
+	{1, 1, 1, 1}, /* white */
+};
+
 bool piglit_is_core_profile;
 
 bool piglit_is_gles(void)
@@ -2012,12 +2019,6 @@ piglit_miptree_texture()
 	GLfloat *data;
 	int size, i, level;
 	GLuint tex;
-	const float color_wheel[4][4] = {
-		{1, 0, 0, 1}, /* red */
-		{0, 1, 0, 1}, /* green */
-		{0, 0, 1, 1}, /* blue */
-		{1, 1, 1, 1}, /* white */
-	};
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
@@ -2361,6 +2362,90 @@ piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, 
 
 		default:
 			assert(0);
+		}
+
+		if (!mip)
+			break;
+
+		if (w > 1)
+			w >>= 1;
+		if (h > 1)
+			h >>= 1;
+	}
+	free(data);
+	return tex;
+}
+
+/**
+ * Create 1D or 2D array texture in which each slice is a different color.
+ * the color pattern is red, green, blue, white, red, green, ...
+ */
+GLuint
+piglit_array_texture(GLenum target, GLenum internalformat,
+		     int w, int h, int d, GLboolean mip)
+{
+	float *data;
+	int size, i, level, layer;
+	GLuint tex;
+	GLenum type = GL_FLOAT, format = GL_RGBA;
+
+	if (target == GL_TEXTURE_1D_ARRAY) {
+		assert(h == 1);
+	}
+	else {
+		assert(target == GL_TEXTURE_2D_ARRAY);
+	}
+
+	glGenTextures(1, &tex);
+	glBindTexture(target, tex);
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (mip) {
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR);
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR_MIPMAP_NEAREST);
+	} else {
+		glTexParameteri(target, GL_TEXTURE_MAG_FILTER,
+				GL_NEAREST);
+		glTexParameteri(target, GL_TEXTURE_MIN_FILTER,
+				GL_NEAREST);
+	}
+	data = malloc(w * h * 4 * sizeof(GLfloat));
+
+	size = w > h ? w : h;
+
+	for (level = 0; size > 0; level++, size >>= 1) {
+
+		/* Create mipmap level */
+		if (target == GL_TEXTURE_1D_ARRAY) {
+			glTexImage2D(target, level, internalformat,
+				     w, d, 0, format, type, NULL);
+		}
+		else {
+			glTexImage3D(target, level, internalformat,
+				     w, h, d, 0, format, type, NULL);
+		}
+
+		for (layer = 0; layer < d; layer++) {
+			/* Set whole layer to one color */
+			for (i = 0; i < w * h; i++) {
+				memcpy(data + 4 * i,
+				       color_wheel[layer %
+						   ARRAY_SIZE(color_wheel)],
+				       sizeof(color_wheel[0]));
+			}
+
+			if (target == GL_TEXTURE_1D_ARRAY) {
+				glTexSubImage2D(target, level,
+						0, layer, w, 1,
+						format, type, data);
+			}
+			else {
+				glTexSubImage3D(target, level,
+						0, 0, layer, w, h, 1,
+						format, type, data);
+			}
 		}
 
 		if (!mip)
