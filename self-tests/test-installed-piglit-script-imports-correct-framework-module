@@ -1,0 +1,151 @@
+#!/usr/bin/env python2
+
+import argparse
+import os
+import shutil
+import sys
+import tempfile
+
+from subprocess import check_call
+from textwrap import dedent
+
+CMAKE_INSTALL_LIBDIR_CHOICES = [None, 'lib', 'lib32', 'lib64']
+PIGLIT_INSTALL_VERSION_CHOICES = [None, '1234']
+
+DESCRIPTION = dedent("""\
+    Test that the main piglit script, when installed, successfully imports
+    the corrrect framework module.
+
+    Failure modes
+        1. The script fails to find any framework module and dies.
+        2. The script finds and imports a framework module that belongs to
+            a different Piglit.
+
+    This test installs and verifies the piglit script with all combinations
+    of the following CMake configuration variables:
+
+        CMAKE_INSTALL_LIBDIR in {CMAKE_INSTALL_LIBDIR_CHOICES}
+        PIGLIT_INSTALL_VERSION in {PIGLIT_INSTALL_VERSION_CHOICES}
+
+    This test must be run from a git work tree. Due to the warned behavior below,
+    the test will run only if given the '--force' option.
+
+    WARNING
+        - This test may remove any changes not committed to git, including ignored
+            and untracked files.
+    
+        - This test may make changes to files in the git work tree (but it won't
+            make any changes to the git directory itself).
+    
+        - This test will build and install Piglit multiple times to multiple
+            temporary directories named 'tmp/piglit.XXXXXX'.  This test will not
+            clean up its temporary directories. That's your responsibility.
+    """.format(
+        CMAKE_INSTALL_LIBDIR_CHOICES=CMAKE_INSTALL_LIBDIR_CHOICES,
+        PIGLIT_INSTALL_VERSION_CHOICES=PIGLIT_INSTALL_VERSION_CHOICES))
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.formatter_class = argparse.RawDescriptionHelpFormatter
+    parser.description = DESCRIPTION
+    parser.add_argument('-f', '--force',
+                        action='store_true',
+                        help='really run the test')
+    parser.add_argument('srcdir',
+                        help='top of piglit source tree')
+    return (parser.prog, parser.parse_args())
+
+def main():
+    prog, args = parse_args()
+    if not args.force:
+        parser.error("skipping test because '--force' option is missing")
+
+    for piglit_install_version in PIGLIT_INSTALL_VERSION_CHOICES:
+        for libdir in CMAKE_INSTALL_LIBDIR_CHOICES:
+            test_once(args.srcdir, piglit_install_version, libdir)
+
+    print('{0}: all tests passed'.format(prog))
+
+def shell(command, cwd=None):
+    check_call(command, shell=True, cwd=cwd)
+
+def test_once(srcdir, piglit_install_version, libdir):
+    test_result = False
+
+    srcdir = os.path.abspath(srcdir)
+    build_dir = tempfile.mkdtemp(prefix='piglit-build.')
+    prefix = tempfile.mkdtemp(prefix='piglit-prefix.')
+
+    def print_test_info():
+        print('    srcdir: {0!r}'.format(srcdir))
+        print('    libdir: {0!r}'.format(libdir))
+        print('    piglit_install_version: {0!r}'.format(piglit_install_version))
+        print('    build_dir: {0!r}'.format(build_dir))
+        print('    prefix: {0!r}'.format(prefix))
+
+    def print_test_result():
+        if test_result:
+            print('test passed:')
+        else:
+            print('test failed:')
+
+        print_test_info()
+
+    print('test start:')
+    print_test_info()
+
+    try:
+        # Scrub the source tree.
+        shell('git reset --hard', cwd=srcdir)
+        shell('git clean -xfd', cwd=srcdir)
+
+        # Make it build fast. We want to test the Python, not the C.
+        shell("sed -i '/add_subdirectory/d' CMakeLists.txt", cwd=srcdir)
+
+        cmake_args = [
+            'cmake',
+            '-GNinja',
+            '-DCMAKE_INSTALL_PREFIX=' + prefix,
+        ]
+
+        if libdir is not None:
+            cmake_args.append('-DCMAKE_INSTALL_LIBDIR=' + libdir)
+        if piglit_install_version is not None:
+            cmake_args.append('-DPIGLIT_INSTALL_VERSION=' + piglit_install_version)
+
+        cmake_args.append(srcdir)
+
+        check_call(cmake_args, cwd=build_dir)
+        shell('ninja install', cwd=build_dir)
+
+        # To prevent the false positive case when the installed script
+        # accidentally imports the framework module located in git work tree,
+        # execute the installed script with cwd=srcdir and fill the framework
+        # module in srcdir with garbage. If the installed piglit script tries
+        # to import it, then script will raise a Python exception and fail.
+        shell("find framework -type f -exec echo GARBAGE '>' '{}' ';'", cwd=srcdir)
+
+        # Append install version, if any, onto script name.
+        script_name = 'piglit'
+        if piglit_install_version is not None:
+            script_name += '-' + piglit_install_version
+
+        # Check script works when called with explicit filepath.
+        bindir = os.path.join(prefix, 'bin')
+        script_path = os.path.join(bindir, script_name)
+        check_call([script_path, '--help'], cwd=srcdir)
+
+        # Check script works when called through a PATH search.
+        new_env = os.environ.copy()
+        new_env['PATH'] = '{0}:{1}'.format(bindir, new_env['PATH'])
+        check_call([script_name, '--help'], env=new_env, cwd=srcdir)
+
+        test_result = True
+
+    finally:
+        print_test_result()
+        shell('git reset --hard', cwd=srcdir)
+        shutil.rmtree(build_dir)
+        shutil.rmtree(prefix)
+
+main()
