@@ -2369,7 +2369,9 @@ piglit_depth_texture(GLenum target, GLenum internalformat, int w, int h, int d, 
 
 		if (w > 1)
 			w >>= 1;
-		if (h > 1)
+		if (target != GL_TEXTURE_1D &&
+		    target != GL_TEXTURE_1D_ARRAY &&
+		    h > 1)
 			h >>= 1;
 	}
 	free(data);
