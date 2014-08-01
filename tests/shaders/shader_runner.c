@@ -2425,7 +2425,7 @@ piglit_display(void)
 				  &tex, &w, &l) == 3) {
 			glActiveTexture(GL_TEXTURE0 + tex);
 			piglit_depth_texture(GL_TEXTURE_1D_ARRAY, GL_DEPTH_COMPONENT,
-					     w, 1, l, GL_FALSE);
+					     w, l, 1, GL_FALSE);
 			glTexParameteri(GL_TEXTURE_1D_ARRAY,
 					GL_TEXTURE_COMPARE_MODE,
 					GL_COMPARE_R_TO_TEXTURE);
