@@ -2966,6 +2966,24 @@ add_texwrap_format_tests(arb_texture_float, 'GL_ARB_texture_float')
 add_plain_test(arb_texture_float, 'arb_texture_float-texture-float-formats')
 add_msaa_formats_tests(arb_texture_float, 'GL_ARB_texture_float')
 
+
+oes_texture_float = {}
+spec['OES_texture_float'] = oes_texture_float
+oes_texture_float['OES_texture_float'] = concurrent_test('oes_texture_float')
+
+oes_texture_half_float = {}
+spec['OES_texture_half_float'] = oes_texture_half_float
+oes_texture_half_float['OES_texture_half_float'] = concurrent_test('oes_texture_float half')
+
+oes_texture_float_linear = {}
+spec['OES_texture_float_linear'] = oes_texture_float_linear
+oes_texture_float_linear['OES_texture_float_linear'] = concurrent_test('oes_texture_float linear')
+
+oes_texture_half_float_linear = {}
+spec['OES_texture_half_float_linear'] = oes_texture_half_float_linear
+oes_texture_half_float_linear['OES_texture_half_float_linear'] = concurrent_test('oes_texture_float half linear')
+
+
 ext_texture_integer = {}
 spec['EXT_texture_integer'] = ext_texture_integer
 # unsupported for int yet
