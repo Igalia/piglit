@@ -60,6 +60,8 @@ static GLuint prog;
 static GLuint compressed_tex;
 static GLuint decompressed_tex;
 
+static GLboolean draw_red_only;
+
 /**
  * The \a filename is relative to the current test's source directory.
  *
@@ -203,7 +205,7 @@ piglit_init(int argc, char **argv)
 		 * To workaround this issue use internalFormat = GL_RGBA and
 		 * mask all the color channels except Red.
 		 */
-		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+		draw_red_only = GL_TRUE;
 		compressed_filename =
 			"waffles-compressed-etc2-r11-64x32-miptree.ktx";
 		decompressed_filename =
@@ -241,7 +243,10 @@ piglit_init(int argc, char **argv)
 	load_texture(compressed_filename, &compressed_tex);
 	load_texture(decompressed_filename, &decompressed_tex);
 
-	glClearColor(0.3, 0.5, 1.0, 1.0);
+	if (draw_red_only)
+		glClearColor(0.3, 0, 0, 0);
+	else
+		glClearColor(0.3, 0.5, 1.0, 1.0);
 
 	prog = piglit_build_simple_program(vs_source, fs_source);
 	glUseProgram(prog);
@@ -290,6 +295,10 @@ piglit_display(void)
 	glViewport(0, 0, window_width, window_height);
 
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	if (draw_red_only)
+		glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+
 	for (level = 0; level < num_levels; ++level) {
 		glUniform2f(level_pixel_size_loc,
 		            (float) level_width,
@@ -309,6 +318,9 @@ piglit_display(void)
 		minify(&level_width);
 		minify(&level_height);
 	}
+
+	if (draw_red_only)
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
 	pass = piglit_probe_rect_halves_equal_rgba(0, 0, window_width, window_height);
 	piglit_present_results();
