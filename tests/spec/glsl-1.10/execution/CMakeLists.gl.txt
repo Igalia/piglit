@@ -12,3 +12,4 @@ link_libraries (
 )
 
 piglit_add_executable (glsl-render-after-bad-attach glsl-render-after-bad-attach.c)
+piglit_add_executable (glsl-1.10-fragdepth fragdepth.c)

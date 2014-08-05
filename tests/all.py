@@ -1002,6 +1002,7 @@ add_shader_test_dir(spec['glsl-1.10']['execution'],
                     os.path.join(testsDir, 'spec', 'glsl-1.10', 'execution'),
                     recursive=True)
 add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-render-after-bad-attach')
+add_concurrent_test(spec['glsl-1.10']['execution'], 'glsl-1.10-fragdepth')
 spec['glsl-1.10']['execution']['clipping'] = {}
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
     cmdline = 'clip-plane-transformation ' + mode
