@@ -981,6 +981,10 @@ piglit_init(int argc, char **argv)
 
 	set_sampler_parameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	set_sampler_parameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	/* need to set this for rect targets, otherwise default GL_REPEAT
+	 * in sampler obj should trigger incomplete tex behavior */
+	set_sampler_parameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	set_sampler_parameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	if (IS_SHADOW(target)) {
 		glActiveTexture(GL_TEXTURE1);
