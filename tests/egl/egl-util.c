@@ -190,7 +190,7 @@ check_extensions(struct egl_state *state, const struct egl_test *test)
 enum piglit_result
 egl_util_run(const struct egl_test *test, int argc, char *argv[])
 {
-	struct egl_state state;
+	struct egl_state state = { 0 };
 	EGLint count;
 	enum piglit_result result = PIGLIT_PASS;
 	int i, dispatch_api, api_bit = EGL_OPENGL_BIT;
