@@ -41,6 +41,7 @@ import sys
 import subprocess
 import warnings
 import abc
+import gzip
 
 __all__ = [
     'BaseDmesg',
@@ -163,6 +164,17 @@ class LinuxDmesg(BaseDmesg):
         # on Linux because each entry is guaranteed unique by timestamps.
         self._last_message = None
         super(LinuxDmesg, self).__init__()
+
+        # First check to see if we can find the live kernel config.
+        try:
+            with gzip.open("/proc/config.gz", 'r') as f:
+                    for line in f:
+                            if line.startswith("CONFIG_PRINTK_TIME=y"):
+                                    return
+        # If there is a malformed or missing file, just ignore it and try the
+        # regex match (which may not exist if dmesg ringbuffer was cleared).
+        except Exception:
+            pass
 
         if not self._last_message:
             # We need to ensure that there is something in dmesg to check
