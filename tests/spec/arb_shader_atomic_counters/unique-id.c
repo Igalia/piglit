@@ -63,6 +63,7 @@ check(int dx, int dy, uint32_t start_value, uint32_t end_value)
                                 printf("Probe value at (%d, %d)\n", x, y);
                                 printf("  Observed: 0x%08x\n", v);
                                 printf("  Value outside expected window.\n");
+                                free(frequency);
                                 return false;
                         }
 
@@ -70,6 +71,7 @@ check(int dx, int dy, uint32_t start_value, uint32_t end_value)
                                 printf("Probe value at (%d, %d)\n", x, y);
                                 printf("  Observed: 0x%08x\n", v);
                                 printf("  Value not unique.\n");
+                                free(frequency);
                                 return false;
                         }
                 }
