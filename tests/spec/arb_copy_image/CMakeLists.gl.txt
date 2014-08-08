@@ -9,6 +9,7 @@ link_libraries (
 )
 
 piglit_add_executable (arb_copy_image-simple simple.c)
+piglit_add_executable (arb_copy_image-api_errors api_errors.c)
 piglit_add_executable (arb_copy_image-targets targets.c)
 piglit_add_executable (arb_copy_image-formats formats.c)
 
