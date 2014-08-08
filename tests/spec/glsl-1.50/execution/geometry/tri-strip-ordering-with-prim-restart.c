@@ -193,7 +193,7 @@ piglit_init(int argc, char **argv)
 			break;
 		}
 	}
-	if (tests == NULL)
+	if (test == NULL)
 		print_usage_and_exit(argv[0]);
 	if (strcmp(argv[2], "ffs") == 0)
 		prim_restart_index = 0xff;
