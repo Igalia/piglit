@@ -1874,6 +1874,9 @@ spec['ARB_gpu_shader_fp64'] = arb_gpu_shader_fp64
 add_shader_test_dir(arb_gpu_shader_fp64,
                     os.path.join(testsDir, 'spec', 'arb_gpu_shader_fp64'),
                     recursive=True)
+import_glsl_parser_tests(arb_gpu_shader_fp64,
+                    os.path.join(testsDir, 'spec', 'arb_gpu_shader_fp64'),
+                    [''])
 
 arb_texture_query_levels = {}
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
