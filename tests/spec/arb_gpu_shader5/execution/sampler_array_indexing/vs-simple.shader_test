@@ -1,0 +1,80 @@
+# This test verifies that dynamically uniform indexing of sampler arrays
+# in the vertex shader behaves correctly.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader5: require
+
+uniform sampler2D s[4];
+
+uniform int n;
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+	color = texture(s[n], vec2(0.5, 0.5));
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader5: require
+
+in vec4 color;
+out vec4 out_color;
+
+void main()
+{
+	out_color = color;
+}
+
+[test]
+clear color 0.2 0.2 0.2 0.2
+clear
+
+uniform int s[0] 0
+uniform int s[1] 1
+uniform int s[2] 2
+uniform int s[3] 3
+
+texture checkerboard 0 0 (32, 32) (1.0, 0.0, 0.0, 0.0) (1.0, 0.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 1 0 (32, 32) (0.0, 1.0, 0.0, 0.0) (0.0, 1.0, 0.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 2 0 (32, 32) (0.0, 0.0, 1.0, 0.0) (0.0, 0.0, 1.0, 0.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+texture checkerboard 3 0 (32, 32) (1.0, 1.0, 1.0, 1.0) (1.0, 1.0, 1.0, 1.0)
+texparameter 2D min nearest
+texparameter 2D mag nearest
+
+uniform int n 0
+draw rect -1 -1 1 1
+
+relative probe rect rgb (0.0, 0.0, 0.5, 0.5) (1.0, 0.0, 0.0)
+
+uniform int n 1
+draw rect 0 -1 1 1
+
+relative probe rect rgb (0.5, 0.0, 0.5, 0.5) (0.0, 1.0, 0.0)
+
+uniform int n 2
+draw rect -1 0 1 1
+
+relative probe rect rgb (0.0, 0.5, 0.5, 0.5) (0.0, 0.0, 1.0)
+
+uniform int n 3
+draw rect 0 0 1 1
+
+relative probe rect rgb (0.5, 0.5, 0.5, 0.5) (1.0, 1.0, 1.0)
