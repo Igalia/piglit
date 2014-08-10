@@ -61,7 +61,7 @@ if(PIGLIT_USE_WAFFLE)
 	# validates the required version at most once for the lifetime of the
 	# source tree.  If someone changes the required version by editing the
 	# CMakeLists, CMake fails to detect the new requirement.
-	set(WAFFLE_REQUIRED_VERSION "1.3.0")
+	set(WAFFLE_REQUIRED_VERSION "1.5.0")
 	if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
 		message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
 		"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
@@ -128,6 +128,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	pkg_check_modules(LIBDRM_INTEL QUIET libdrm_intel)
 	pkg_check_modules(XCB_DRI2 QUIET xcb-dri2)
 	pkg_check_modules(GLPROTO QUIET glproto)
+ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	if (PIGLIT_USE_WAFFLE)
+		set(PIGLIT_HAS_WGL True)
+		add_definitions(-DPIGLIT_HAS_WGL)
+	endif()
 ENDIF()
 
 IF(PIGLIT_HAS_GLX)

@@ -31,6 +31,7 @@
 
 #include "piglit_gbm_framework.h"
 #include "piglit_gl_framework.h"
+#include "piglit_wgl_framework.h"
 #include "piglit_winsys_framework.h"
 #include "piglit_wl_framework.h"
 #include "piglit_x11_framework.h"
@@ -177,6 +178,12 @@ piglit_winsys_framework_factory(const struct piglit_gl_test_config *test_config)
 	case WAFFLE_PLATFORM_WAYLAND:
 		return piglit_wl_framework_create(test_config);
 #endif
+
+#ifdef PIGLIT_HAS_WGL
+	case WAFFLE_PLATFORM_WGL:
+		return piglit_wgl_framework_create(test_config);
+#endif
+
 	default:
 		assert(0);
 		return NULL;

@@ -109,6 +109,16 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 #endif
 	}
 
+	else if (strcmp(env, "wgl") == 0) {
+#ifdef PIGLIT_HAS_WGL
+		return WAFFLE_PLATFORM_WGL;
+#else
+		fprintf(stderr, "environment var PIGLIT_PLATFORM=wgl, "
+		        "but piglit was built without WGL support\n");
+		piglit_report_result(PIGLIT_FAIL);
+#endif
+	}
+
 	else {
 		fprintf(stderr, "environment var PIGLIT_PLATFORM has bad "
 			"value \"%s\"\n", env);

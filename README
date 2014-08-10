@@ -144,14 +144,18 @@ http://www.opengl.org/registry/#headers
 Copy header files to MSVC.
 C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL
 
-Download freeglut for MSVC.
-http://www.transmissionzero.co.uk/software/freeglut-devel
-
 Install pip.
 http://www.pip-installer.org/en/latest/installing.html
 
 Install python mako.
   > c:\Python27\Scripts\pip.exe install mako
+
+
+2.5.1 GLUT
+----------
+
+Download freeglut for MSVC.
+http://www.transmissionzero.co.uk/software/freeglut-devel
 
 Open Visual Studio Command Prompt.
 Start Menu->All Programs->Visual Studio 2013->Visual Studio Tools->VS2013 x86 Native Tools Command Prompt
@@ -172,6 +176,34 @@ File->Exit
 Build from the Visual Studio Command Prompt.
   > nmake
 
+2.5.2 Waffle
+------------
+
+Download waffle for MSVC.
+http://www.waffle-gl.org/
+
+Open the Command Prompt.
+CD to piglit directory.
+
+Run CMake GUI.
+  > C:\Program Files\CMake 2.8\bin\cmake-gui.exe .
+Configure
+  - 'Visual Studio 12 2013', or
+  - 'Visual Studio 12 2013 Win64'
+  - Use default native compilers
+Set these variables in the Advanced view.
+Note that the values provided are for reference purposed and may differ on your system.
+  - PIGLIT_USE_WAFFLE, BOOL, TRUE
+  - WAFFLE_VERSION, STRING, "1.5.0"
+  - WAFFLE_INCLUDE_DIRS, PATH, ${waffle_root}\include\waffle
+  - WAFFLE_LDFLAGS, FILEPATH, ${waffle_root}\lib\waffle-1.lib
+  - GLEXT_INCLUDE_DIR, PATH, C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL
+Configure
+Generate
+File->Exit
+
+Build from the Command Prompt.
+  > cmake --build .
 
 3. How to run tests
 -------------------

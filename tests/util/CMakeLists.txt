@@ -64,6 +64,11 @@ if(PIGLIT_USE_WAFFLE)
 		piglit-util-waffle.c
 	)
 
+	if(PIGLIT_HAS_WGL)
+		list(APPEND UTIL_GL_SOURCES
+			piglit-framework-gl/piglit_wgl_framework.c
+		)
+	endif()
 	if(PIGLIT_HAS_GBM)
 		list(APPEND UTIL_GL_SOURCES
 			piglit-framework-gl/piglit_gbm_framework.c
