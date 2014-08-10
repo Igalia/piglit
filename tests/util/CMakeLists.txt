@@ -49,14 +49,22 @@ set(UTIL_GL_SOURCES
 
 if(PIGLIT_USE_WAFFLE)
 	list(APPEND UTIL_GL_SOURCES
-		piglit-framework-gl/piglit_gbm_framework.c
 		piglit-framework-gl/piglit_fbo_framework.c
 		piglit-framework-gl/piglit_wfl_framework.c
 		piglit-framework-gl/piglit_winsys_framework.c
-		piglit-framework-gl/piglit_wl_framework.c
 		piglit-util-waffle.c
 	)
 
+	if(PIGLIT_HAS_GBM)
+		list(APPEND UTIL_GL_SOURCES
+			piglit-framework-gl/piglit_gbm_framework.c
+		)
+	endif()
+	if(PIGLIT_HAS_WAYLAND)
+		list(APPEND UTIL_GL_SOURCES
+			piglit-framework-gl/piglit_wl_framework.c
+		)
+	endif()
 	if(PIGLIT_HAS_X11)
 		list(APPEND UTIL_GL_SOURCES
 			piglit-framework-gl/piglit_x11_framework.c
