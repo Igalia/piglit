@@ -1869,6 +1869,15 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocation-id')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocations_count_too_large')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-xfb-streams')
 
+arb_shader_subroutine = {}
+spec['ARB_shader_subroutine'] = arb_shader_subroutine
+add_shader_test_dir(arb_shader_subroutine,
+                    os.path.join(testsDir, 'spec', 'arb_shader_subroutine'),
+                    recursive=True)
+import_glsl_parser_tests(arb_shader_subroutine,
+                         testsDir + '/spec/arb_shader_subroutine', [''])
+add_concurrent_test(arb_shader_subroutine, 'arb_shader_subroutine-minmax')
+
 arb_gpu_shader_fp64 = {}
 spec['ARB_gpu_shader_fp64'] = arb_gpu_shader_fp64
 add_shader_test_dir(arb_gpu_shader_fp64,
