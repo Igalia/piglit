@@ -170,11 +170,10 @@ piglit_winsys_framework_factory(const struct piglit_gl_test_config *test_config)
 		return piglit_gbm_framework_create(test_config);
 #endif
 
-/* There is no need to #ifdef out Piglit support for Wayland yet
- * because Piglit calls no Wayland functions.
- */
+#ifdef PIGLIT_HAS_WAYLAND
 	case WAFFLE_PLATFORM_WAYLAND:
 		return piglit_wl_framework_create(test_config);
+#endif
 	default:
 		assert(0);
 		return NULL;
