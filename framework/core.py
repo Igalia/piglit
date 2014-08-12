@@ -56,12 +56,7 @@ def get_config(arg=None):
                 break
             except IOError:
                 pass
-        else:
-            if __debug__:
-                print('Warning: piglit.conf not found!\n'
-                      '(searching current dir, $HOME/.config, '
-                      '$XDG_CONFIG_HOME, and piglit source dir)',
-                      file=sys.stderr)
+
 
 # Ensure the given directory exists
 def checkDir(dirname, failifexists):
