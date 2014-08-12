@@ -114,11 +114,5 @@ bool
 valid_for_gl_version(const struct required_format *format, int target_version);
 
 void
-piglit_init(int argc, char **argv);
-
-enum piglit_result
-piglit_display(void);
-
-void
 setup_required_size_test(int argc, char **argv,
 			 struct piglit_gl_test_config *config);
