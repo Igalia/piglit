@@ -37,14 +37,16 @@ else()
 endif()
 
 if(PIGLIT_USE_WAFFLE)
-	pkg_check_modules(WAFFLE REQUIRED waffle-1)
+	if (NOT MSVC)
+		pkg_check_modules(WAFFLE REQUIRED waffle-1)
 
-	if(NOT WAFFLE_FOUND)
-		message(FATAL_ERROR "Failed to find Waffle. If Waffle is not "
-		"packaged for your distribution, you can get it at "
-		"http://www.waffle-gl.org."
-	)
-	endif()
+		if(NOT WAFFLE_FOUND)
+			message(FATAL_ERROR "Failed to find Waffle. If Waffle"
+			"is not packaged for your distribution, you can get "
+			"it at http://www.waffle-gl.org."
+		)
+		endif()
+	}
 
 	# Check the installed waffle version.
 	#
@@ -62,8 +64,6 @@ if(PIGLIT_USE_WAFFLE)
 
 	add_definitions(-DPIGLIT_USE_WAFFLE)
 	add_definitions(-DWAFFLE_API_VERSION=0x0103)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WAFFLE_CFLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WAFFLE_CFLAGS}")
 else()
 	find_package(GLUT REQUIRED)
 

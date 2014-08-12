@@ -25,6 +25,7 @@ set(UTIL_GL_INCLUDES
 	${UTIL_INCLUDES}
 	${GLEXT_INCLUDE_DIR}
 	${OPENGL_INCLUDE_PATH}
+	${WAFFLE_INCLUDE_DIRS}
 	)
 
 set(UTIL_GL_SOURCES
@@ -45,6 +46,10 @@ set(UTIL_GL_SOURCES
 	r11g11b10f.c
 	sized-internalformats.c
 	${CMAKE_BINARY_DIR}/tests/util/piglit-util-gl-enum-gen.c
+	)
+
+set(UTIL_GL_LIBS
+	piglitutil
 	)
 
 if(PIGLIT_USE_WAFFLE)
@@ -70,16 +75,15 @@ if(PIGLIT_USE_WAFFLE)
 			piglit-framework-gl/piglit_x11_framework.c
 		)
 	endif()
+
+	list(APPEND UTIL_GL_LIBS
+		${WAFFLE_LIBRARIES}
+	)
 else()
 	list(APPEND UTIL_GL_SOURCES
 		piglit-framework-gl/piglit_glut_framework.c
 	)
 endif()
-
-set(UTIL_GL_LIBS
-	piglitutil
-	${WAFFLE_LDFLAGS}
-	)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# One needs to have at least one hardware driver present, otherwise
