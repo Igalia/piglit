@@ -22,7 +22,9 @@
  */
 
 #include <assert.h>
+#if !defined(_WIN32)
 #include <unistd.h>
+#endif
 
 #include "piglit-util-gl.h"
 #include "piglit-util-waffle.h"
