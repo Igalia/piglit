@@ -458,12 +458,12 @@ special_case_gl31(struct piglit_wfl_framework *wfl_fw,
 		    "profile if context creation succeeds.",
 		    context_description, error_verb);
 
-	waffle_config_destroy(wfl_fw->config);
-	waffle_context_destroy(wfl_fw->context);
 	waffle_window_destroy(wfl_fw->window);
-	wfl_fw->config = NULL;
-	wfl_fw->context = NULL;
+	waffle_context_destroy(wfl_fw->context);
+	waffle_config_destroy(wfl_fw->config);
 	wfl_fw->window = NULL;
+	wfl_fw->context = NULL;
+	wfl_fw->config = NULL;
 
 	return make_context_current_singlepass(
 			wfl_fw, &fallback_config, flavor,
