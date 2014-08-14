@@ -129,7 +129,12 @@ test_fbo(const struct format_info *info)
 	GLenum status;
 	GLboolean intMode;
 	GLint buf;
-	static const GLint clr[4] = { 300000005, 7, 6, 5 };
+	/* The last value is chosen because if it were to be
+	 * interpreted as a float value then it would be a signalling
+	 * NaN value. If this passes through an x87 floating-point
+	 * register then it will be corrupted by the fst
+	 * instruction. */
+	static const GLint clr[4] = { 300000005, 7, 6, 0x7f817f81 };
 	GLint pix[4], i;
 	bool pass = true;
 
