@@ -32,8 +32,9 @@
  *
  * "3. Does ownership of the file descriptor pass to the EGL library?
  *
- *   ANSWER: If eglCreateImageKHR is successful, EGL assumes ownership of the
- *   file descriptors and is responsible for closing them."
+ *   ANSWER: No, EGL does not take ownership of the file descriptors. It is the
+ *   responsibility of the application to close the file descriptors on success
+ *   and failure.
  *
  *
  * Here one checks that the creator of the buffer can drop its reference once
@@ -99,8 +100,11 @@ test_create_and_destroy(unsigned w, unsigned h, void *buf, int fd,
 		return PIGLIT_FAIL;
 	}
 
-	/* EGL stack should have closed the importing file descriptor by now */
-	return close(fd) && errno == EBADF ? PIGLIT_PASS : PIGLIT_FAIL;
+	/*
+	 * Our own file descriptor must still be valid, and therefore
+	 * closing it must succeed.
+	 */
+	return close(fd) == 0 ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 enum piglit_result
