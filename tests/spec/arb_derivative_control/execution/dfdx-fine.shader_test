@@ -1,0 +1,26 @@
+[require]
+GLSL >= 1.50
+GL_ARB_derivative_control
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_derivative_control: require
+
+void main()
+{
+	float x = gl_FragCoord.x;
+	bool alt = bool(int(gl_FragCoord.y) % 2);
+	float altx = alt ? -x : x;
+	float dx = dFdxFine(altx);
+	// Alternating rows are now descending, so check the direction
+	// of the derivative based on the row we're in.
+	if (alt && dx >= 0 || !alt && dx <= 0)
+		gl_FragColor = vec4(1, 0, 0, 1);
+	else
+		gl_FragColor = vec4(0, 1, 0, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

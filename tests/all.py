@@ -4098,6 +4098,15 @@ arb_shader_atomic_counters['semantics'] = concurrent_test('arb_shader_atomic_cou
 arb_shader_atomic_counters['unique-id'] = concurrent_test('arb_shader_atomic_counters-unique-id')
 arb_shader_atomic_counters['unused-result'] = concurrent_test('arb_shader_atomic_counters-unused-result')
 
+arb_derivative_control = {}
+spec['ARB_derivative_control'] = arb_derivative_control
+add_shader_test_dir(arb_derivative_control,
+                    os.path.join(testsDir, 'spec', 'arb_derivative_control'),
+                    recursive=True)
+import_glsl_parser_tests(arb_derivative_control,
+                         testsDir + '/spec/arb_derivative_control', [''])
+
+
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
 profile.tests['glean'] = glean

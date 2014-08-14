@@ -1,0 +1,22 @@
+[require]
+GLSL >= 1.50
+GL_ARB_derivative_control
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_derivative_control: require
+
+void main()
+{
+	float xy = gl_FragCoord.x * gl_FragCoord.y;
+	float dxdy = dFdxFine(dFdyFine(xy));
+	if (dxdy == 1)
+		gl_FragColor = vec4(0, 1, 0, 1);
+	else
+		gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
