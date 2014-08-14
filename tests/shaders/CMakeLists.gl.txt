@@ -168,5 +168,6 @@ piglit_add_executable (useshaderprogram-bad-type useshaderprogram-bad-type.c)
 piglit_add_executable (useshaderprogram-bad-program useshaderprogram-bad-program.c)
 piglit_add_executable (useshaderprogram-flushverts-1 useshaderprogram-flushverts-1.c)
 piglit_add_executable (version-mixing version-mixing.c)
+piglit_add_executable (glsl-vs-int-attrib glsl-vs-int-attrib.c)
 
 # vim: ft=cmake:

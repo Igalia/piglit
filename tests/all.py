@@ -496,6 +496,7 @@ add_concurrent_test(shaders, 'useshaderprogram-bad-type')
 add_concurrent_test(shaders, 'useshaderprogram-bad-program')
 add_concurrent_test(shaders, 'useshaderprogram-flushverts-1')
 add_concurrent_test(shaders, 'point-vertex-id')
+add_concurrent_test(shaders, 'glsl-vs-int-attrib')
 for subtest in ('interstage', 'intrastage', 'vs-gs'):
     cmdline = 'version-mixing {0}'.format(subtest)
     shaders[cmdline] = PiglitGLTest(cmdline, run_concurrent=True)
