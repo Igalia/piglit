@@ -1043,6 +1043,19 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	/* explicit derivative */
 	float deriv = 1.0 / (TEX_SIZE >> fetch_level);
 
+	/* Explicit derivatives for cubemaps.
+	 *
+	 * Each of these vectors should be a difference between (x,y,z)
+	 * coordinates from one pixel and its neighbor. The Y coordinate is
+	 * always -1 (negative Y face).
+	 *
+	 * The range for X and Z is [-1,1] for cubemaps as opposed
+	 * to [0,1] for 2D textures, therefore multiply the 2D derivative
+	 * by 2. The result is 2 vectors on the -Y surface of the cube.
+	 */
+	float cube_deriv_x[3] = {deriv*2, 0,       0};
+	float cube_deriv_y[3] = {      0, 0, deriv*2};
+
 	switch (test) {
 	case ARB_TEXTURE_LOD:
 	case ARB_TEXTURE_PROJ_LOD:
@@ -1079,7 +1092,12 @@ draw_quad(int x, int y, int w, int h, int expected_level, int fetch_level,
 	case ARB_TEXTURE_PROJ_GRAD:
 	case GL3_TEXTURE_GRAD:
 	case GL3_TEXTURE_PROJ_GRAD:
-		if (gltarget == GL_TEXTURE_3D) {
+		if (gltarget == GL_TEXTURE_CUBE_MAP ||
+		    gltarget == GL_TEXTURE_CUBE_MAP_ARRAY) {
+			glUniform3fv(loc_dx, 1, cube_deriv_x);
+			glUniform3fv(loc_dy, 1, cube_deriv_y);
+		}
+		else if (gltarget == GL_TEXTURE_3D) {
 			glUniform3f(loc_dx, 0, 0, deriv);
 			glUniform3f(loc_dy, 0, 0, deriv);
 		}
