@@ -1009,6 +1009,7 @@ spec['!OpenGL 3.3/required-texture-attachment-formats'] = concurrent_test('gl-3.
 spec['!OpenGL 4.2/required-renderbuffer-attachment-formats'] = concurrent_test('gl-3.0-required-renderbuffer-attachment-formats 42')
 spec['!OpenGL 4.2/required-sized-texture-formats'] = concurrent_test('gl-3.0-required-sized-texture-formats 42')
 spec['!OpenGL 4.2/required-texture-attachment-formats'] = concurrent_test('gl-3.0-required-texture-attachment-formats 42')
+spec['!OpenGL 4.4/gl-max-vertex-attrib-stride'] = concurrent_test('gl-4.4-max_vertex_attrib_stride')
 
 # Group spec/glsl-es-1.00
 spec['glsl-es-1.00'] = {}
