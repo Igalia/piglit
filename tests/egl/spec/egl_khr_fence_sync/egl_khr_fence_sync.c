@@ -1063,7 +1063,7 @@ test_eglCreateSyncKHR_wrong_display_same_thread(void *test_data)
 	piglit_require_egl_extension(wrong_dpy, "EGL_KHR_fence_sync");
 
 	piglit_logi("try to create sync with second display");
-	sync = eglCreateSyncKHR(wrong_dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(wrong_dpy, EGL_SYNC_FENCE_KHR, NULL);
 	if (sync) {
 		piglit_loge("eglCreateSyncKHR() incorrectly succeeded");
 		result = PIGLIT_FAIL;
@@ -1103,14 +1103,14 @@ check_sync_in_current_context(void)
 
 	piglit_logi("verify that syncs can be created and waited on in "
 		 "this thread");
-	sync = eglCreateSyncKHR(dpy, EGL_SYNC_FENCE_KHR, NULL);
+	sync = peglCreateSyncKHR(dpy, EGL_SYNC_FENCE_KHR, NULL);
 	if (!sync) {
 		piglit_loge("eglCreateSyncKHR failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
 	}
 
-	wait_status = eglClientWaitSyncKHR(dpy, sync, 0, 0);
+	wait_status = peglClientWaitSyncKHR(dpy, sync, 0, 0);
 	if (wait_status == EGL_FALSE) {
 		piglit_loge("eglClientWaitSyncKHR failed");
 		result = PIGLIT_FAIL;
@@ -1119,7 +1119,7 @@ check_sync_in_current_context(void)
 
 cleanup:
 	if (sync) {
-		eglDestroySyncKHR(dpy, sync);
+		peglDestroySyncKHR(dpy, sync);
 	}
 	return result;
 }
