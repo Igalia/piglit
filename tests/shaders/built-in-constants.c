@@ -72,7 +72,7 @@ static const char *const vertex_shader_body =
 
 static const char *const tessellation_control_shader_body =
 	"layout(vertices = 1) out;\n"
-	"void main() { gl_TessLevelInner[0] = vec4(f[0]); }\n"
+	"void main() { gl_TessLevelInner[0] = f[0]; }\n"
 	;
 
 static const char *const tessellation_evaluation_shader_body =
