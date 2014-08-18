@@ -41,60 +41,7 @@ dir = foo
 """
 
 
-# Helpers
-class _TestWithEnvClean(object):
-    """ Class that does cleanup with saved state
-
-    This could be done with test fixtures, but this should be cleaner in the
-    specific case of cleaning up environment variables
-
-    Nose will run a method (bound or unbound) at the start of the test called
-    setup() and one at the end called teardown(), we have added a teardown
-    method.
-
-    Using this gives us the assurance that we're not relying on settings from
-    other tests, making ours pass or fail, and that os.enviorn is the same
-    going in as it is going out.
-
-    This is modeled after Go's defer keyword.
-
-    """
-    def __init__(self):
-        self._saved = set()
-        self._teardown_calls = []
-
-    def add_teardown(self, var, restore=True):
-        """ Add os.environ values to remove in teardown """
-        if var in os.environ:
-            self._saved.add((var, os.environ.get(var), restore))
-            del os.environ[var]
-
-    def defer(self, func, *args):
-        """ Add a function (with arguments) to be run durring cleanup """
-        self._teardown_calls.append((func, args))
-
-    def teardown(self):
-        """ Teardown the test
-
-        Restore any variables that were unset at the begining of the test, and
-        run any differed methods.
-
-        """
-        for key, value, restore in self._saved:
-            # If value is None the value was unset previously, put it back
-            if value is None:
-                del os.environ[key]
-            elif restore:
-                os.environ[key] = value
-
-        # Teardown calls is a FIFO stack, the defered calls must be run in
-        # reversed order to make any sense
-        for call, args in reversed(self._teardown_calls):
-            call(*args)
-
-
-# Tests
-class TestGetConfigEnv(_TestWithEnvClean):
+class TestGetConfigEnv(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
@@ -113,7 +60,7 @@ class TestGetConfigEnv(_TestWithEnvClean):
                msg='$XDG_CONFIG_HOME not found')
 
 
-class TestGetConfigHomeFallback(_TestWithEnvClean):
+class TestGetConfigHomeFallback(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds $HOME/.config/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
@@ -133,7 +80,7 @@ class TestGetConfigHomeFallback(_TestWithEnvClean):
                msg='$HOME/.config not found')
 
 
-class TestGetConfigLocal(_TestWithEnvClean):
+class TestGetConfigLocal(utils.TestWithEnvClean):
     # These need to be empty to force '.' to be used
     def test(self):
         """ get_config() finds ./piglit.conf """
@@ -157,7 +104,7 @@ class TestGetConfigLocal(_TestWithEnvClean):
                msg='./piglit.conf not found')
 
 
-class TestGetConfigRoot(_TestWithEnvClean):
+class TestGetConfigRoot(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds "piglit root"/piglit.conf """
         self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
