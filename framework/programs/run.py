@@ -253,5 +253,3 @@ def resume(input_):
 
     print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))
-
-
