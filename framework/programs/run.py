@@ -35,7 +35,8 @@ __all__ = ['run',
            'resume']
 
 
-def run(input_):
+def _run_parser(input_):
+    """ Parser for piglit run command """
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name",
                         metavar="<test name>",
@@ -106,7 +107,17 @@ def run(input_):
                         type=path.realpath,
                         metavar="<Results Path>",
                         help="Path to results folder")
-    args = parser.parse_args(input_)
+    return parser.parse_args(input_)
+
+
+def run(input_):
+    """ Function for piglit run command
+
+    This is a function because it allows it to be shared between piglit-run.py
+    and piglit run
+
+    """
+    args = _run_parser(input_)
 
     # Disable Windows error message boxes for this and all child processes.
     if sys.platform == 'win32':
