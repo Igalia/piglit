@@ -37,7 +37,7 @@ __all__ = ['PIGLIT_CONFIG',
            'parse_listfile']
 
 
-PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
+PIGLIT_CONFIG = ConfigParser.SafeConfigParser(allow_no_value=True)
 
 def get_config(arg=None):
     if arg:
