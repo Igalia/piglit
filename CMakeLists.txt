@@ -46,7 +46,7 @@ if(PIGLIT_USE_WAFFLE)
 			"it at http://www.waffle-gl.org."
 		)
 		endif()
-	}
+	endif ()
 
 	# Check the installed waffle version.
 	#
