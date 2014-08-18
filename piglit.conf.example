@@ -14,3 +14,37 @@
 [oglconform]
 ; Set bindir equal to the absolute root of the oglconform directory
 ;path=/home/usr/src/oglconform
+
+[oclconform]
+; bindir is the directory that the commands to run tests and list subtests
+; will be executed in.
+bindir=/home/usr/oclconform
+; List the tests you want to run
+testA
+testB
+
+; Section for specific oclconform test.  One of these sections is required for
+; each test list in the oclconform section and must be called:
+; oclconform-$testname
+[oclconform-testA]
+test_name=testA
+; Add concurrent to this section if the test can be run concurrently
+; concurrent
+
+; For tests with subtests:
+
+; The value of list_subtests is a command that will list all the subtest for
+; this test
+; list_subtest=./%(test_name)s --list-tests
+
+; The value of subtest_regex should be a regular expression used to select
+; which subtests to run.
+; subtest_regex=fast.+
+
+; run_subtest is a command to execute a subtest.  Anywhere <subtest> is found
+; in the command, it will be replaced with the name of the subtest.
+; run_subtest=./%(test_name)s --test=<subtest>
+
+; For regular tests:
+; run_test is the command used for running the test
+run_test=./%(test_name)s
