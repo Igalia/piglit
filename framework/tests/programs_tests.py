@@ -57,11 +57,12 @@ class TestGetConfig(utils.TestWithEnvClean):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
 
-    def test_xdg_config_home(self):
-        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+    def setup(self):
         self.__unset_config()
         self.__move_local()
 
+    def test_xdg_config_home(self):
+        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
         with utils.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
@@ -73,9 +74,6 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_config_home_fallback(self):
         """ get_config() finds $HOME/.config/piglit.conf """
-        self.__unset_config()
-        self.__move_local()
-
         with utils.tempdir() as tdir:
             os.environ['HOME'] = tdir
             os.mkdir(os.path.join(tdir, '.config'))
@@ -88,9 +86,6 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_local(self):
         """ get_config() finds ./piglit.conf """
-        self.__unset_config()
-        self.__move_local()
-
         with utils.tempdir() as tdir:
             self.defer(os.chdir, os.getcwd())
             os.chdir(tdir)
@@ -105,9 +100,6 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_piglit_root(self):
         """ get_config() finds "piglit root"/piglit.conf """
-        self.__unset_config()
-        self.__move_local()
-
         with open('piglit.conf', 'w') as f:
             f.write(CONF_FILE)
         self.defer(os.unlink, 'piglit.conf')
