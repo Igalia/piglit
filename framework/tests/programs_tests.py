@@ -45,8 +45,8 @@ def _reset_piglit_config():
     core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
 
 
-class TestGetConfigEnv(utils.TestWithEnvClean):
-    def test(self):
+class TestGetConfig(utils.TestWithEnvClean):
+    def test_xdg_config_home(self):
         """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
         self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
@@ -63,9 +63,7 @@ class TestGetConfigEnv(utils.TestWithEnvClean):
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='$XDG_CONFIG_HOME not found')
 
-
-class TestGetConfigHomeFallback(utils.TestWithEnvClean):
-    def test(self):
+    def test_config_home_fallback(self):
         """ get_config() finds $HOME/.config/piglit.conf """
         self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
@@ -85,10 +83,7 @@ class TestGetConfigHomeFallback(utils.TestWithEnvClean):
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='$HOME/.config/piglit.conf not found')
 
-
-class TestGetConfigLocal(utils.TestWithEnvClean):
-    # These need to be empty to force '.' to be used
-    def test(self):
+    def test_local(self):
         """ get_config() finds ./piglit.conf """
         self.defer(_reset_piglit_config)
         self.add_teardown('HOME')
@@ -109,9 +104,7 @@ class TestGetConfigLocal(utils.TestWithEnvClean):
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
                msg='./piglit.conf not found')
 
-
-class TestGetConfigRoot(utils.TestWithEnvClean):
-    def test(self):
+    def test_piglit_root(self):
         """ get_config() finds "piglit root"/piglit.conf """
         self.defer(_reset_piglit_config)
         self.add_teardown('HOME')
