@@ -30,7 +30,6 @@ import os
 import shutil
 import ConfigParser
 import framework.core as core
-import framework.programs.run as run
 import framework.tests.utils as utils
 import nose.tools as nt
 
