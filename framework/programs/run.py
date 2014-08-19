@@ -37,6 +37,21 @@ __all__ = ['run',
 
 def _run_parser(input_):
     """ Parser for piglit run command """
+    # Parse the config file before any other options, this allows the config
+    # file to be used to sete default values for the parser.
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--config",
+                        dest="config_file",
+                        type=argparse.FileType("r"),
+                        help="Optionally specify a piglit config file to use. "
+                             "Default is piglit.conf")
+    known, unparsed = parser.parse_known_args(input_)
+
+    # Read the config file
+    # We want to read this before we finish parsing since some default options
+    # are set in the config file.
+    core.get_config(known.config_file)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--name",
                         metavar="<test name>",
@@ -80,11 +95,6 @@ def _run_parser(input_):
                         default=os.environ.get("PIGLIT_PLATFORM",
                                                "mixed_glx_egl"),
                         help="Name of windows system passed to waffle")
-    parser.add_argument("-f", "--config",
-                        dest="config_file",
-                        type=argparse.FileType("r"),
-                        help="Optionally specify a piglit config file to use. "
-                             "Default is piglit.conf")
     parser.add_argument("--valgrind",
                         action="store_true",
                         help="Run tests in valgrind's memcheck")
@@ -107,7 +117,7 @@ def _run_parser(input_):
                         type=path.realpath,
                         metavar="<Results Path>",
                         help="Path to results folder")
-    return parser.parse_args(input_)
+    return parser.parse_args(unparsed)
 
 
 def run(input_):
@@ -141,9 +151,6 @@ def run(input_):
     # isn't reliable with threaded run
     if args.dmesg:
         args.concurrency = "none"
-
-    # Read the config file
-    core.get_config(args.config_file)
 
     # Pass arguments into Options
     opts = core.Options(concurrent=args.concurrency,
