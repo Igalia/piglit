@@ -29,15 +29,10 @@ having a single test module seems appropriate
 import os
 import shutil
 import ConfigParser
+import textwrap
 import framework.core as core
 import framework.tests.utils as utils
 import nose.tools as nt
-
-CONF_FILE = """
-[nose-test]
-; a section for testing behavior
-dir = foo
-"""
 
 
 def _reset_piglit_config():
@@ -46,6 +41,12 @@ def _reset_piglit_config():
 
 
 class TestGetConfig(utils.TestWithEnvClean):
+    CONF_FILE = textwrap.dedent("""
+    [nose-test]
+    ; a section for testing behavior
+    dir = foo
+    """)
+
     def __unset_config(self):
         self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
@@ -66,7 +67,7 @@ class TestGetConfig(utils.TestWithEnvClean):
         with utils.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-                f.write(CONF_FILE)
+                f.write(TestGetConfig.CONF_FILE)
             core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
@@ -78,7 +79,7 @@ class TestGetConfig(utils.TestWithEnvClean):
             os.environ['HOME'] = tdir
             os.mkdir(os.path.join(tdir, '.config'))
             with open(os.path.join(tdir, '.config/piglit.conf'), 'w') as f:
-                f.write(CONF_FILE)
+                f.write(TestGetConfig.CONF_FILE)
             core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
@@ -91,7 +92,7 @@ class TestGetConfig(utils.TestWithEnvClean):
             os.chdir(tdir)
 
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-                f.write(CONF_FILE)
+                f.write(TestGetConfig.CONF_FILE)
 
             core.get_config()
 
@@ -101,7 +102,7 @@ class TestGetConfig(utils.TestWithEnvClean):
     def test_piglit_root(self):
         """ get_config() finds "piglit root"/piglit.conf """
         with open('piglit.conf', 'w') as f:
-            f.write(CONF_FILE)
+            f.write(TestGetConfig.CONF_FILE)
         self.defer(os.unlink, 'piglit.conf')
         self.defer(os.chdir, os.getcwd())
         os.chdir('..')
