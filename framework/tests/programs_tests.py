@@ -80,9 +80,10 @@ class TestGetConfigHomeFallback(utils.TestWithEnvClean):
             os.mkdir(os.path.join(tdir, '.config'))
             with open(os.path.join(tdir, '.config/piglit.conf'), 'w') as f:
                 f.write(CONF_FILE)
+            core.get_config()
 
         nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-               msg='$HOME/.config not found')
+               msg='$HOME/.config/piglit.conf not found')
 
 
 class TestGetConfigLocal(utils.TestWithEnvClean):
