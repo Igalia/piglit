@@ -49,7 +49,7 @@ def get_config(arg=None):
         for d in ['.',
                   os.environ.get('XDG_CONFIG_HOME',
                                  os.path.expandvars('$HOME/.config')),
-                  os.path.join(os.path.dirname(__file__), '..', '..')]:
+                  os.path.join(os.path.dirname(__file__), '..')]:
             try:
                 with open(os.path.join(d, 'piglit.conf'), 'r') as f:
                     PIGLIT_CONFIG.readfp(f)
