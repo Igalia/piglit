@@ -40,10 +40,15 @@ dir = foo
 """
 
 
+def _reset_piglit_config():
+    """ Set core.PIGLIT_CONFIG back to pristine """
+    core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
+
+
 class TestGetConfigEnv(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
-        self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
+        self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
@@ -62,7 +67,8 @@ class TestGetConfigEnv(utils.TestWithEnvClean):
 class TestGetConfigHomeFallback(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds $HOME/.config/piglit.conf """
-        self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
+        self.defer(_reset_piglit_config)
+        self.add_teardown('XDG_CONFIG_HOME')
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
         if os.path.exists('piglit.conf'):
@@ -83,7 +89,7 @@ class TestGetConfigLocal(utils.TestWithEnvClean):
     # These need to be empty to force '.' to be used
     def test(self):
         """ get_config() finds ./piglit.conf """
-        self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
+        self.defer(_reset_piglit_config)
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
         if os.path.exists('piglit.conf'):
@@ -106,7 +112,7 @@ class TestGetConfigLocal(utils.TestWithEnvClean):
 class TestGetConfigRoot(utils.TestWithEnvClean):
     def test(self):
         """ get_config() finds "piglit root"/piglit.conf """
-        self.defer(lambda: core.PIGLIT_CONFIG == ConfigParser.SafeConfigParser)
+        self.defer(_reset_piglit_config)
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
 
