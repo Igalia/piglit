@@ -68,7 +68,6 @@ class TestGetConfig(utils.TestWithEnvClean):
         self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
         self.add_teardown('HOME')
-        self.add_teardown('XDG_CONFIG_HOME')
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
