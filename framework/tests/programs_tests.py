@@ -46,10 +46,14 @@ def _reset_piglit_config():
 
 
 class TestGetConfig(utils.TestWithEnvClean):
-    def test_xdg_config_home(self):
-        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+    def __unset_config(self):
         self.defer(_reset_piglit_config)
         self.add_teardown('XDG_CONFIG_HOME')
+        self.add_teardown('HOME')
+
+    def test_xdg_config_home(self):
+        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+        self.__unset_config()
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
@@ -65,9 +69,7 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_config_home_fallback(self):
         """ get_config() finds $HOME/.config/piglit.conf """
-        self.defer(_reset_piglit_config)
-        self.add_teardown('XDG_CONFIG_HOME')
-        self.add_teardown('HOME')
+        self.__unset_config()
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
@@ -84,9 +86,7 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_local(self):
         """ get_config() finds ./piglit.conf """
-        self.defer(_reset_piglit_config)
-        self.add_teardown('HOME')
-        self.add_teardown('XDG_CONFIG_HOME')
+        self.__unset_config()
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
@@ -105,10 +105,7 @@ class TestGetConfig(utils.TestWithEnvClean):
 
     def test_piglit_root(self):
         """ get_config() finds "piglit root"/piglit.conf """
-        self.defer(_reset_piglit_config)
-        self.add_teardown('HOME')
-        self.add_teardown('XDG_CONFIG_HOME')
-
+        self.__unset_config()
         if os.path.exists('piglit.conf'):
             shutil.move('piglit.conf', 'piglit.conf.restore')
             self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
