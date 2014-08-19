@@ -48,3 +48,11 @@ test_name=testA
 ; For regular tests:
 ; run_test is the command used for running the test
 run_test=./%(test_name)s
+
+[core]
+; Set the default platform to use.
+; Options can be found by running piglit -h and reading the section
+; for -p/--platform
+;
+; The default on Linux will be mixed_glx_egl
+;platform=gbm

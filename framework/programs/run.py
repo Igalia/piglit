@@ -26,6 +26,7 @@ import sys
 import os
 import os.path as path
 import time
+import ConfigParser
 
 import framework.core as core
 import framework.results
@@ -33,6 +34,40 @@ import framework.profile
 
 __all__ = ['run',
            'resume']
+
+
+_PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
+
+
+def _default_platform():
+    """ Logic to determine the default platform to use
+
+    This assumes that the platform can only be set on Linux, it probably works
+    on BSD. This is only relevant if piglit is built with waffle support. When
+    waffle support lands for Windows and if it ever happens for OSX, this will
+    need to be extended.
+
+    On Linux this will try in order,
+    1) An option provided via the -p/--platform option (this is handled in
+       argparse, not in this function)
+    2) PIGLIT_PLATFORM from the environment
+    3) [core]:platform from the config file
+    4) mixed_glx_egl
+
+    """
+    if os.environ.get('PIGLIT_PLATFORM'):
+        return os.environ.get('PIGLIT_PLATFORM')
+    else:
+        try:
+            plat = core.PIGLIT_CONFIG.get('core', 'platform')
+            if plat not in _PLATFORMS:
+                print('Platform is not valid\n'
+                      'valid platforms are: {}'.format(_PLATFORMS),
+                      file=sys.stderr)
+                sys.exit(1)
+            return plat
+        except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+            return 'mixed_glx_egl'
 
 
 def _run_parser(input_):
@@ -87,13 +122,8 @@ def _run_parser(input_):
                              dest="concurrency",
                              help="Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
-                        choices=["glx", "x11_egl", "wayland", "gbm",
-                                 "mixed_glx_egl"],
-                        # If an explicit choice isn't made check the
-                        # environment, and if that fails select the glx/x11_egl
-                        # mixed profile
-                        default=os.environ.get("PIGLIT_PLATFORM",
-                                               "mixed_glx_egl"),
+                        choices=_PLATFORMS,
+                        default=_default_platform(),
                         help="Name of windows system passed to waffle")
     parser.add_argument("--valgrind",
                         action="store_true",
