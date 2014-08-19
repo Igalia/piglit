@@ -39,7 +39,7 @@ def _import(name):
     """ Helper for importing modules """
     try:
         return importlib.import_module(name)
-    except (ConfigParser.NoOptionError, SystemExit):
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError, SystemExit):
         raise SkipTest('No config section for {}'.format(name))
 
 
