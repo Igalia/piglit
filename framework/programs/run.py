@@ -211,7 +211,9 @@ def run(input_):
     # Begin json.
     result_filepath = path.join(args.results_path, 'results.json')
     result_file = open(result_filepath, 'w')
-    json_writer = framework.results.JSONWriter(result_file, opts.sync)
+    json_writer = framework.results.JSONWriter(
+        result_file,
+        file_fsync=opts.sync)
 
     # Create a dictionary to pass to initialize json, it needs the contents of
     # the env dictionary and profile and platform information
@@ -270,7 +272,7 @@ def resume(input_):
 
     results_path = path.join(args.results_path, 'results.json')
     json_writer = framework.results.JSONWriter(open(results_path, 'w+'),
-                                               opts.sync)
+                                               file_fsync=opts.sync)
     results.options['env'] = core.collect_system_info()
     json_writer.initialize_json(results.options)
 

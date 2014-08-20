@@ -63,7 +63,7 @@ def test_initialize_jsonwriter():
 
     """
     with tempfile.TemporaryFile() as tfile:
-        func = results.JSONWriter(tfile, False)
+        func = results.JSONWriter(tfile, file_fsync=False)
         assert isinstance(func, results.JSONWriter)
 
 
