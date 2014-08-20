@@ -1,0 +1,54 @@
+# ARB_gpu_shader5 spec says:
+#   "Geometry shaders that emit vertices to multiple vertex streams are
+#    currently limited to using only the "points" output primitive
+#    type. A program will fail to link if it includes a geometry shader
+#    that calls the EmitStreamVertex() built-in function and has any
+#    other output primitive type parameter."
+#
+# This test verifies that a link error occurs if EmitStreamVertex()
+# is called with a output primitive type different than "points" and
+# stream value bigger than zero.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[geometry shader]
+
+#extension GL_ARB_gpu_shader5 : enable
+
+layout(points) in;
+layout(triangle_strip, max_vertices=3) out;
+
+layout (stream=1) out vec4 var1;
+
+void main()
+{
+	var1 = vec4(0.0, 0.0, 0.0, 1.0);
+	gl_Position = var1;
+	EmitStreamVertex(1);
+
+	var1 = vec4(0.0, 1.0, 0.0, 1.0);
+	gl_Position = var1;
+	EmitStreamVertex(1);
+
+	var1 = vec4(1.0, 1.0, 0.0, 1.0);
+	gl_Position = var1;
+	EmitStreamVertex(1);
+
+	EndStreamPrimitive(1);
+}
+
+[fragment shader]
+
+out vec4 color;
+
+void main()
+{
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error

@@ -1,0 +1,50 @@
+# ARB_gpu_shader5 spec says:
+#   "The primitives emitted to all streams but stream zero are
+#   discarded after transform feedback. Primitives emitted to
+#   stream zero are passed to subsequent pipeline stages for clipping,
+#   rasterization, and subsequent fragment processing."
+#
+# This test verifies that a link error occurs if an input FS variable
+# has assigned a stream > 0 in the Geometry shader.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[geometry shader]
+
+#extension GL_ARB_gpu_shader5 : enable
+
+layout(points) in;
+layout(points, max_vertices=3) out;
+
+layout(stream=1) out vec4 var1;
+
+void main()
+{
+	var1 = vec4 (0.0, 0.0, 0.0, 0.0);
+	gl_Position = vec4(1.0, 1.0, 1.0, 1.0);
+	EmitStreamVertex(0);
+	EndStreamPrimitive(0);
+
+	var1 = vec4 (0.0, 0.0, 0.0, 0.0);
+	gl_Position = vec4(1.0, 1.0, 1.0, 1.0);
+	EmitStreamVertex(1);
+	EndStreamPrimitive(1);
+}
+
+[fragment shader]
+
+in vec4 var1;
+
+out vec4 color;
+
+void main()
+{
+  color = var1;
+}
+
+[test]
+link error

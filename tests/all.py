@@ -1907,6 +1907,8 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocation-id')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-invocations_count_too_large')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-xfb-streams')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-stream_value_too_large')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-emitstreamvertex_stream_too_large')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-tf-wrong-stream-value')
 
 arb_shader_subroutine = {}
 spec['ARB_shader_subroutine'] = arb_shader_subroutine

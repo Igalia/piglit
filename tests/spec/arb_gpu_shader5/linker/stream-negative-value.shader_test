@@ -1,0 +1,38 @@
+# ARB_gpu_shader5 spec says:
+#   "If an implementation supports <N> vertex streams, the individual
+#   streams are numbered 0 through <N>-1"
+#
+# This test verifies that a link error occurs if EmitStreamVertex()
+# is called with a stream value which is negative.
+
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[geometry shader]
+
+#extension GL_ARB_gpu_shader5 : enable
+
+layout(points) in;
+layout(points, max_vertices=3) out;
+
+void main()
+{
+	gl_Position = vec4(1.0, 1.0, 1.0, 1.0);
+	EmitStreamVertex(-1);
+	EndStreamPrimitive(-1);
+}
+
+[fragment shader]
+
+out vec4 color;
+
+void main()
+{
+  color = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+link error
