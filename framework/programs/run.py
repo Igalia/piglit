@@ -208,12 +208,6 @@ def run(input_):
     else:
         results.name = path.basename(args.results_path)
 
-    # Begin json.
-    result_filepath = path.join(args.results_path, 'results.json')
-    json_writer = framework.results.JSONWriter(
-        result_filepath,
-        file_fsync=opts.sync)
-
     # Create a dictionary to pass to initialize json, it needs the contents of
     # the env dictionary and profile and platform information
     options = {'profile': args.test_profile}
@@ -223,7 +217,13 @@ def run(input_):
         options['platform'] = args.platform
     options['name'] = results.name
     options['env'] = core.collect_system_info()
-    json_writer.initialize_json(options)
+
+    # Begin json.
+    result_filepath = path.join(args.results_path, 'results.json')
+    json_writer = framework.results.JSONWriter(
+        result_filepath,
+        options,
+        file_fsync=opts.sync)
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
@@ -269,11 +269,11 @@ def resume(input_):
 
     opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
+    results.options['env'] = core.collect_system_info()
     results_path = path.join(args.results_path, 'results.json')
     json_writer = framework.results.JSONWriter(results_path,
+                                               results.options,
                                                file_fsync=opts.sync)
-    results.options['env'] = core.collect_system_info()
-    json_writer.initialize_json(results.options)
 
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)

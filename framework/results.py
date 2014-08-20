@@ -176,7 +176,7 @@ class JSONWriter(object):
 
     INDENT = 4
 
-    def __init__(self, f, file_fsync=False):
+    def __init__(self, f, metadata, file_fsync=False):
         self.file = open(f, 'w')
         self.fsync = file_fsync
         self.__indent_level = 0
@@ -207,7 +207,10 @@ class JSONWriter(object):
         # is popped and written into the json
         self._open_containers = []
 
-    def initialize_json(self, metadata):
+        # Write initial metadata into the backend store
+        self._initialize(metadata)
+
+    def _initialize(self, metadata):
         """ Write boilerplate json code
 
         This writes all of the json except the actual tests.

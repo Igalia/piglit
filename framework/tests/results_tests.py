@@ -29,6 +29,12 @@ import framework.results as results
 import framework.status as status
 
 
+BACKEND_INITIAL_META = {
+    'name': 'name',
+    'env': {},
+}
+
+
 def check_initialize(target):
     """ Check that a class initializes without error """
     func = target()
@@ -62,7 +68,7 @@ def test_initialize_jsonwriter():
 
     """
     with utils.with_tempfile('') as tfile:
-        func = results.JSONWriter(tfile, file_fsync=False)
+        func = results.JSONWriter(tfile, BACKEND_INITIAL_META)
         assert isinstance(func, results.JSONWriter)
 
 
