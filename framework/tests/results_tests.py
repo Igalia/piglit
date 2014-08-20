@@ -22,7 +22,6 @@
 
 
 import os
-import tempfile
 import json
 import nose.tools as nt
 import framework.tests.utils as utils
@@ -62,7 +61,7 @@ def test_initialize_jsonwriter():
     arguments
 
     """
-    with tempfile.TemporaryFile() as tfile:
+    with utils.with_tempfile('') as tfile:
         func = results.JSONWriter(tfile, file_fsync=False)
         assert isinstance(func, results.JSONWriter)
 

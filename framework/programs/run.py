@@ -210,9 +210,8 @@ def run(input_):
 
     # Begin json.
     result_filepath = path.join(args.results_path, 'results.json')
-    result_file = open(result_filepath, 'w')
     json_writer = framework.results.JSONWriter(
-        result_file,
+        result_filepath,
         file_fsync=opts.sync)
 
     # Create a dictionary to pass to initialize json, it needs the contents of
@@ -271,7 +270,7 @@ def resume(input_):
     opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results_path = path.join(args.results_path, 'results.json')
-    json_writer = framework.results.JSONWriter(open(results_path, 'w+'),
+    json_writer = framework.results.JSONWriter(results_path,
                                                file_fsync=opts.sync)
     results.options['env'] = core.collect_system_info()
     json_writer.initialize_json(results.options)

@@ -177,7 +177,7 @@ class JSONWriter(object):
     INDENT = 4
 
     def __init__(self, f, file_fsync=False):
-        self.file = f
+        self.file = open(f, 'w')
         self.fsync = file_fsync
         self.__indent_level = 0
         self.__inhibit_next_indent = False
