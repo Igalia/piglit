@@ -1,7 +1,7 @@
 // [config]
 // expect_result: fail
 // glsl_version: 1.20
-// require_extensions: GL_ARB_explicit_attrib_location GL_ARB_blend_func_extended
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 //
 // test that layout with just an index specified is rejected

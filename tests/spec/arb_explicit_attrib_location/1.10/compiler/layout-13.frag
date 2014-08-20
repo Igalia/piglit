@@ -1,7 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.10
-// require_extensions: GL_ARB_explicit_attrib_location GL_ARB_blend_func_extended
+// require_extensions: GL_ARB_explicit_attrib_location
 // [end config]
 //
 // Even though the specified locations overlap, the spec says that a *link*
