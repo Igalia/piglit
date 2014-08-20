@@ -131,7 +131,7 @@ class Backend(object):
         """
 
 
-class JSONWriter(object):
+class JSONWriter(Backend):
     '''
     Writes to a JSON file stream
 
