@@ -207,7 +207,7 @@ class JSONWriter(object):
         # is popped and written into the json
         self._open_containers = []
 
-    def initialize_json(self, options, name, env):
+    def initialize_json(self, metadata):
         """ Write boilerplate json code
 
         This writes all of the json except the actual tests.
@@ -222,17 +222,21 @@ class JSONWriter(object):
         """
         self.open_dict()
         self.write_dict_item('results_version', CURRENT_JSON_VERSION)
-        self.write_dict_item('name', name)
+        self.write_dict_item('name', metadata['name'])
 
         self.write_dict_key('options')
         self.open_dict()
-        for key, value in options.iteritems():
+        for key, value in metadata.iteritems():
+            # Dont' write env or name into the options dictionary
+            if key in ['env', 'name']:
+                continue
+
             # Loading a NoneType will break resume, and are a bug
             assert value is not None, "Value {} is NoneType".format(key)
             self.write_dict_item(key, value)
         self.close_dict()
 
-        for key, value in env.iteritems():
+        for key, value in metadata['env'].iteritems():
             self.write_dict_item(key, value)
 
         # Open the tests dictinoary so that tests can be written
