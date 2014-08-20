@@ -342,6 +342,11 @@ class JSONWriter(object):
 
         self.__file_sync()
 
+    @synchronized_self
+    def write_test(self, name, data):
+        """ Write a test into the JSON tests dictionary """
+        self.write_dict_item(name, data)
+
 
 class TestResult(dict):
     def __init__(self, *args):

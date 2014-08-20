@@ -276,7 +276,7 @@ def resume(input_):
                                                file_fsync=opts.sync)
 
     for key, value in results.tests.iteritems():
-        json_writer.write_dict_item(key, value)
+        json_writer.write_test(key, value)
         opts.exclude_tests.add(key)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])

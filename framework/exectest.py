@@ -123,7 +123,7 @@ class Test(object):
             log.log(path, self.result['result'])
             log.post_log(log_current, self.result['result'])
 
-            json_writer.write_dict_item(path, self.result)
+            json_writer.write_test(path, self.result)
         else:
             log.log(path, 'dry-run')
             log.post_log(log_current, 'dry-run')
