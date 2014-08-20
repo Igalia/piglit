@@ -25,6 +25,7 @@ from __future__ import print_function
 import os
 import sys
 import abc
+import threading
 from cStringIO import StringIO
 try:
     import simplejson as json
@@ -32,7 +33,6 @@ except ImportError:
     import json
 
 import framework.status as status
-from framework.threads import synchronized_self
 
 __all__ = [
     'TestrunResult',
@@ -175,6 +175,7 @@ class JSONWriter(object):
     '''
 
     INDENT = 4
+    _LOCK = threading.RLock()
 
     def __init__(self, f, metadata, file_fsync=False):
         self.file = open(f, 'w')
@@ -223,28 +224,29 @@ class JSONWriter(object):
                be a dict-like object
 
         """
-        self._open_dict()
-        self._write_dict_item('results_version', CURRENT_JSON_VERSION)
-        self._write_dict_item('name', metadata['name'])
+        with self._LOCK:
+            self._open_dict()
+            self._write_dict_item('results_version', CURRENT_JSON_VERSION)
+            self._write_dict_item('name', metadata['name'])
 
-        self._write_dict_key('options')
-        self._open_dict()
-        for key, value in metadata.iteritems():
-            # Dont' write env or name into the options dictionary
-            if key in ['env', 'name']:
-                continue
+            self._write_dict_key('options')
+            self._open_dict()
+            for key, value in metadata.iteritems():
+                # Dont' write env or name into the options dictionary
+                if key in ['env', 'name']:
+                    continue
 
-            # Loading a NoneType will break resume, and are a bug
-            assert value is not None, "Value {} is NoneType".format(key)
-            self._write_dict_item(key, value)
-        self._close_dict()
+                # Loading a NoneType will break resume, and are a bug
+                assert value is not None, "Value {} is NoneType".format(key)
+                self._write_dict_item(key, value)
+            self._close_dict()
 
-        for key, value in metadata['env'].iteritems():
-            self._write_dict_item(key, value)
+            for key, value in metadata['env'].iteritems():
+                self._write_dict_item(key, value)
 
-        # Open the tests dictinoary so that tests can be written
-        self._write_dict_key('tests')
-        self._open_dict()
+            # Open the tests dictinoary so that tests can be written
+            self._write_dict_key('tests')
+            self._open_dict()
 
     def finalize(self, metadata=None):
         """ End json serialization and cleanup
@@ -253,29 +255,29 @@ class JSONWriter(object):
         containers that are still open and closes the file
 
         """
-        # Close the tests dictionary
-        self._close_dict()
+        # Ensure that there are no tests still writing by taking the lock here
+        with self._LOCK:
+            # Close the tests dictionary
+            self._close_dict()
 
-        # Write closing metadata
-        if metadata:
-            for key, value in metadata.iteritems():
-                self._write_dict_item(key, value)
+            # Write closing metadata
+            if metadata:
+                for key, value in metadata.iteritems():
+                    self._write_dict_item(key, value)
 
-        # Close the root dictionary object
-        self._close_dict()
+            # Close the root dictionary object
+            self._close_dict()
 
-        # Close the file.
-        assert self._open_containers == [], \
-            "containers stack: {0}".format(self._open_containers)
-        self.file.close()
+            # Close the file.
+            assert self._open_containers == [], \
+                "containers stack: {0}".format(self._open_containers)
+            self.file.close()
 
-    @synchronized_self
     def __file_sync(self):
         if self.fsync:
             self.file.flush()
             os.fsync(self.file.fileno())
 
-    @synchronized_self
     def __write_indent(self):
         if self.__inhibit_next_indent:
             self.__inhibit_next_indent = False
@@ -284,7 +286,6 @@ class JSONWriter(object):
             i = ' ' * self.__indent_level * self.INDENT
             self.file.write(i)
 
-    @synchronized_self
     def __write(self, obj):
         lines = list(self.__encoder.encode(obj).split('\n'))
         n = len(lines)
@@ -294,7 +295,6 @@ class JSONWriter(object):
             if i != n - 1:
                 self.file.write('\n')
 
-    @synchronized_self
     def _open_dict(self):
         self.__write_indent()
         self.file.write('{')
@@ -304,7 +304,6 @@ class JSONWriter(object):
         self._open_containers.append('dict')
         self.__file_sync()
 
-    @synchronized_self
     def _close_dict(self):
         self.__indent_level -= 1
         self.__is_collection_empty.pop()
@@ -316,7 +315,6 @@ class JSONWriter(object):
         self._open_containers.pop()
         self.__file_sync()
 
-    @synchronized_self
     def _write_dict_item(self, key, value):
         # Write key.
         self._write_dict_key(key)
@@ -326,7 +324,6 @@ class JSONWriter(object):
 
         self.__file_sync()
 
-    @synchronized_self
     def _write_dict_key(self, key):
         # Write comma if this is not the initial item in the dict.
         if self.__is_collection_empty[-1]:
@@ -342,10 +339,10 @@ class JSONWriter(object):
 
         self.__file_sync()
 
-    @synchronized_self
     def write_test(self, name, data):
         """ Write a test into the JSON tests dictionary """
-        self._write_dict_item(name, data)
+        with self._LOCK:
+            self._write_dict_item(name, data)
 
 
 class TestResult(dict):
