@@ -246,7 +246,7 @@ class JSONWriter(object):
         self._write_dict_key('tests')
         self._open_dict()
 
-    def close_json(self, metadata=None):
+    def finalize(self, metadata=None):
         """ End json serialization and cleanup
 
         This method is called after all of tests are written, it closes any

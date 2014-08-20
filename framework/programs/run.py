@@ -236,7 +236,7 @@ def run(input_):
     time_end = time.time()
 
     results.time_elapsed = time_end - time_start
-    json_writer.close_json({'time_elapsed': results.time_elapsed})
+    json_writer.finalize({'time_elapsed': results.time_elapsed})
 
     print('Thank you for running Piglit!\n'
           'Results have been written to ' + result_filepath)
@@ -287,7 +287,7 @@ def resume(input_):
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(opts, json_writer)
 
-    json_writer.close_json()
+    json_writer.finalize()
 
     print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))
