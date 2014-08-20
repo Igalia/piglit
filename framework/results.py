@@ -154,24 +154,24 @@ class JSONWriter(object):
 
     is equivalent to::
         w = JSONWriter(file)
-        w.open_dict()
-        w.write_dict_item('a', [1, 2, 3])
-        w.write_dict_item('b', 4)
-        w.write_dict_item('c', {'x': 100})
-        w.close_dict()
+        w._open_dict()
+        w._write_dict_item('a', [1, 2, 3])
+        w._write_dict_item('b', 4)
+        w._write_dict_item('c', {'x': 100})
+        w._close_dict()
 
     which is also equivalent to::
         w = JSONWriter(file)
-        w.open_dict()
-        w.write_dict_item('a', [1, 2, 3])
-        w.write_dict_item('b', 4)
+        w._open_dict()
+        w._write_dict_item('a', [1, 2, 3])
+        w._write_dict_item('b', 4)
 
-        w.write_dict_key('c')
-        w.open_dict()
-        w.write_dict_item('x', 100)
-        w.close_dict()
+        w._write_dict_key('c')
+        w._open_dict()
+        w._write_dict_item('x', 100)
+        w._close_dict()
 
-        w.close_dict()
+        w._close_dict()
     '''
 
     INDENT = 4
@@ -188,10 +188,10 @@ class JSONWriter(object):
         #
         # A stack that indicates if the currect collection is empty
         #
-        # When open_dict is called, True is pushed onto the
+        # When _open_dict is called, True is pushed onto the
         # stack. When the first element is written to the newly
         # opened dict, the top of the stack is set to False.
-        # When the close_dict is called, the stack is popped.
+        # When the _close_dict is called, the stack is popped.
         #
         # The top of the stack is element -1.
         #
@@ -200,9 +200,9 @@ class JSONWriter(object):
         # self._open_containers
         #
         # A FILO stack that stores container information, each time
-        # self.open_dict() 'dict' is added to the stack, (other elements like
+        # self._open_dict() 'dict' is added to the stack, (other elements like
         # 'list' could be added if support was added to JSONWriter for handling
-        # them), each to time self.close_dict() is called an element is
+        # them), each to time self._close_dict() is called an element is
         # removed. When self.close_json() is called each element of the stack
         # is popped and written into the json
         self._open_containers = []
@@ -223,12 +223,12 @@ class JSONWriter(object):
                be a dict-like object
 
         """
-        self.open_dict()
-        self.write_dict_item('results_version', CURRENT_JSON_VERSION)
-        self.write_dict_item('name', metadata['name'])
+        self._open_dict()
+        self._write_dict_item('results_version', CURRENT_JSON_VERSION)
+        self._write_dict_item('name', metadata['name'])
 
-        self.write_dict_key('options')
-        self.open_dict()
+        self._write_dict_key('options')
+        self._open_dict()
         for key, value in metadata.iteritems():
             # Dont' write env or name into the options dictionary
             if key in ['env', 'name']:
@@ -236,15 +236,15 @@ class JSONWriter(object):
 
             # Loading a NoneType will break resume, and are a bug
             assert value is not None, "Value {} is NoneType".format(key)
-            self.write_dict_item(key, value)
-        self.close_dict()
+            self._write_dict_item(key, value)
+        self._close_dict()
 
         for key, value in metadata['env'].iteritems():
-            self.write_dict_item(key, value)
+            self._write_dict_item(key, value)
 
         # Open the tests dictinoary so that tests can be written
-        self.write_dict_key('tests')
-        self.open_dict()
+        self._write_dict_key('tests')
+        self._open_dict()
 
     def close_json(self, metadata=None):
         """ End json serialization and cleanup
@@ -254,15 +254,15 @@ class JSONWriter(object):
 
         """
         # Close the tests dictionary
-        self.close_dict()
+        self._close_dict()
 
         # Write closing metadata
         if metadata:
             for key, value in metadata.iteritems():
-                self.write_dict_item(key, value)
+                self._write_dict_item(key, value)
 
         # Close the root dictionary object
-        self.close_dict()
+        self._close_dict()
 
         # Close the file.
         assert self._open_containers == [], \
@@ -295,7 +295,7 @@ class JSONWriter(object):
                 self.file.write('\n')
 
     @synchronized_self
-    def open_dict(self):
+    def _open_dict(self):
         self.__write_indent()
         self.file.write('{')
 
@@ -305,7 +305,7 @@ class JSONWriter(object):
         self.__file_sync()
 
     @synchronized_self
-    def close_dict(self):
+    def _close_dict(self):
         self.__indent_level -= 1
         self.__is_collection_empty.pop()
 
@@ -317,9 +317,9 @@ class JSONWriter(object):
         self.__file_sync()
 
     @synchronized_self
-    def write_dict_item(self, key, value):
+    def _write_dict_item(self, key, value):
         # Write key.
-        self.write_dict_key(key)
+        self._write_dict_key(key)
 
         # Write value.
         self.__write(value)
@@ -327,7 +327,7 @@ class JSONWriter(object):
         self.__file_sync()
 
     @synchronized_self
-    def write_dict_key(self, key):
+    def _write_dict_key(self, key):
         # Write comma if this is not the initial item in the dict.
         if self.__is_collection_empty[-1]:
             self.__is_collection_empty[-1] = False
@@ -345,7 +345,7 @@ class JSONWriter(object):
     @synchronized_self
     def write_test(self, name, data):
         """ Write a test into the JSON tests dictionary """
-        self.write_dict_item(name, data)
+        self._write_dict_item(name, data)
 
 
 class TestResult(dict):
