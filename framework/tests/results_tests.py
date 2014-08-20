@@ -61,16 +61,16 @@ def test_generate_initialize():
         yield yieldable, target
 
 
-def test_initialize_jsonwriter():
-    """ Test that JSONWriter initializes
+def test_initialize_jsonbackend():
+    """ Test that JSONBackend initializes
 
     This needs to be handled separately from the others because it requires
     arguments
 
     """
     with utils.tempdir() as tdir:
-        func = results.JSONWriter(tdir, BACKEND_INITIAL_META)
-        assert isinstance(func, results.JSONWriter)
+        func = results.JSONBackend(tdir, BACKEND_INITIAL_META)
+        assert isinstance(func, results.JSONBackend)
 
 
 def test_load_results_folder_as_main():
@@ -173,7 +173,7 @@ def test_get_backend():
     # We use a hand generated list here to ensure that we are getting what we
     # expect
     backends = {
-        'json': results.JSONWriter,
+        'json': results.JSONBackend,
     }
 
     check = lambda n, i: nt.assert_is(results.get_backend(n), i)

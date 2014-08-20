@@ -135,7 +135,7 @@ class Backend(object):
         """
 
 
-class JSONWriter(Backend):
+class JSONBackend(Backend):
     '''
     Writes to a JSON file stream
 
@@ -469,7 +469,7 @@ class TestrunResult(object):
         #   5. Return a file object containing the repaired JSON.
 
         # Each non-terminal test result ends with this line:
-        safe_line = 2 * JSONWriter.INDENT * ' ' + '},\n'
+        safe_line = 2 * JSONBackend.INDENT * ' ' + '},\n'
 
         # Search for the last occurence of safe_line.
         safe_line_num = None
@@ -486,10 +486,10 @@ class TestrunResult(object):
         lines = lines[0:(safe_line_num + 1)]
 
         # Remove trailing comma.
-        lines[-1] = 2 * JSONWriter.INDENT * ' ' + '}\n'
+        lines[-1] = 2 * JSONBackend.INDENT * ' ' + '}\n'
 
         # Close json object.
-        lines.append(JSONWriter.INDENT * ' ' + '}\n')
+        lines.append(JSONBackend.INDENT * ' ' + '}\n')
         lines.append('}')
 
         # Return new file object containing the repaired JSON.
@@ -504,7 +504,7 @@ class TestrunResult(object):
         with open(file_, 'w') as f:
             json.dump(dict((k, v) for k, v in self.__dict__.iteritems()
                            if k in self.serialized_keys),
-                      f, default=_piglit_encoder, indent=JSONWriter.INDENT)
+                      f, default=_piglit_encoder, indent=JSONBackend.INDENT)
 
 
 def load_results(filename):
@@ -586,7 +586,7 @@ def update_results(results, filepath):
 def get_backend(backend):
     """ Returns a BackendInstance based on the string passed """
     backends = {
-        'json': JSONWriter,
+        'json': JSONBackend,
     }
 
     # Be sure that we're exporting the same list of backends that we actually
