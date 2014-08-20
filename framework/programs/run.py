@@ -220,7 +220,7 @@ def run(input_):
 
     # Begin json.
     result_filepath = path.join(args.results_path, 'results.json')
-    json_writer = framework.results.JSONWriter(
+    backend = framework.results.JSONWriter(
         result_filepath,
         options,
         file_fsync=opts.sync)
@@ -232,11 +232,11 @@ def run(input_):
     # Set the dmesg type
     if args.dmesg:
         profile.dmesg = args.dmesg
-    profile.run(opts, json_writer)
+    profile.run(opts, backend)
     time_end = time.time()
 
     results.time_elapsed = time_end - time_start
-    json_writer.finalize({'time_elapsed': results.time_elapsed})
+    backend.finalize({'time_elapsed': results.time_elapsed})
 
     print('Thank you for running Piglit!\n'
           'Results have been written to ' + result_filepath)
@@ -271,12 +271,12 @@ def resume(input_):
 
     results.options['env'] = core.collect_system_info()
     results_path = path.join(args.results_path, 'results.json')
-    json_writer = framework.results.JSONWriter(results_path,
-                                               results.options,
-                                               file_fsync=opts.sync)
+    backend = framework.results.JSONWriter(results_path,
+                                           results.options,
+                                           file_fsync=opts.sync)
 
     for key, value in results.tests.iteritems():
-        json_writer.write_test(key, value)
+        backend.write_test(key, value)
         opts.exclude_tests.add(key)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
@@ -285,9 +285,9 @@ def resume(input_):
         profile.dmesg = opts.dmesg
 
     # This is resumed, don't bother with time since it wont be accurate anyway
-    profile.run(opts, json_writer)
+    profile.run(opts, backend)
 
-    json_writer.finalize()
+    backend.finalize()
 
     print("Thank you for running Piglit!\n"
           "Results have ben wrriten to {0}".format(results_path))

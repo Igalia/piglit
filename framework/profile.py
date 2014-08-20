@@ -167,7 +167,7 @@ class TestProfile(object):
         """
         pass
 
-    def run(self, opts, json_writer):
+    def run(self, opts, backend):
         """ Runs all tests using Thread pool
 
         When called this method will flatten out self.tests into
@@ -182,7 +182,8 @@ class TestProfile(object):
 
         Arguments:
         opts -- a core.Options instance
-        json_writer -- a core.JSONWriter instance
+        backend -- a results.Backend derived instance
+        
 
         """
 
@@ -197,12 +198,12 @@ class TestProfile(object):
         def test(pair):
             """ Function to call test.execute from .map
 
-            Adds opts and json_writer which are needed by Test.execute()
+            Adds opts which are needed by Test.execute()
 
             """
             name, test = pair
             test.execute(name, log, self.dmesg)
-            json_writer.write_test(name, test.result)
+            backend.write_test(name, test.result)
 
         def run_threads(pool, testlist):
             """ Open a pool, close it, and join it """
