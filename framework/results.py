@@ -37,9 +37,13 @@ import framework.status as status
 __all__ = [
     'TestrunResult',
     'TestResult',
-    'JSONWriter',
     'load_results',
+    'get_backend',
+    'BACKENDS',
 ]
+
+# A list of available backends
+BACKENDS = ['json']
 
 # The current version of the JSON results
 CURRENT_JSON_VERSION = 1
@@ -178,7 +182,7 @@ class JSONWriter(Backend):
     _LOCK = threading.RLock()
 
     def __init__(self, f, metadata, file_fsync=False):
-        self.file = open(f, 'w')
+        self.file = open(os.path.join(f, 'results.json'), 'w')
         self.fsync = file_fsync
         self.__indent_level = 0
         self.__inhibit_next_indent = False
@@ -577,6 +581,18 @@ def update_results(results, filepath):
               file=sys.stderr)
 
     return results
+
+
+def get_backend(backend):
+    """ Returns a BackendInstance based on the string passed """
+    backends = {
+        'json': JSONWriter,
+    }
+
+    # Be sure that we're exporting the same list of backends that we actually
+    # have available
+    assert backends.keys() == BACKENDS
+    return backends[backend]
 
 
 def _update_zero_to_one(results):

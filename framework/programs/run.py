@@ -108,6 +108,10 @@ def _run_parser(input_):
                         metavar="<regex>",
                         help="Exclude matching tests "
                              "(can be used more than once)")
+    parser.add_argument('-b', '--backend',
+                        default='json',
+                        choices=framework.results.BACKENDS,
+                        help='select a results backend to use')
     conc_parser = parser.add_mutually_exclusive_group()
     conc_parser.add_argument('-c', '--all-concurrent',
                              action="store_const",
@@ -219,9 +223,8 @@ def run(input_):
     options['env'] = core.collect_system_info()
 
     # Begin json.
-    result_filepath = path.join(args.results_path, 'results.json')
-    backend = framework.results.JSONWriter(
-        result_filepath,
+    backend = framework.results.get_backend(args.backend)(
+        args.results_path,
         options,
         file_fsync=opts.sync)
 
@@ -239,7 +242,7 @@ def run(input_):
     backend.finalize({'time_elapsed': results.time_elapsed})
 
     print('Thank you for running Piglit!\n'
-          'Results have been written to ' + result_filepath)
+          'Results have been written to ' + args.results_path)
 
 
 def resume(input_):
@@ -270,10 +273,12 @@ def resume(input_):
     opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results.options['env'] = core.collect_system_info()
-    results_path = path.join(args.results_path, 'results.json')
-    backend = framework.results.JSONWriter(results_path,
-                                           results.options,
-                                           file_fsync=opts.sync)
+
+    # Resume only works with the JSON backend
+    backend = framework.results.get_backend('json')(
+        args.results_path,
+        results.options,
+        file_fsync=opts.sync)
 
     for key, value in results.tests.iteritems():
         backend.write_test(key, value)
@@ -290,4 +295,4 @@ def resume(input_):
     backend.finalize()
 
     print("Thank you for running Piglit!\n"
-          "Results have ben wrriten to {0}".format(results_path))
+          "Results have ben wrriten to {0}".format(args.results_path))

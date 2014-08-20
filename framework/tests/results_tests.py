@@ -68,8 +68,8 @@ def test_initialize_jsonwriter():
     arguments
 
     """
-    with utils.with_tempfile('') as tfile:
-        func = results.JSONWriter(tfile, BACKEND_INITIAL_META)
+    with utils.tempdir() as tdir:
+        func = results.JSONWriter(tdir, BACKEND_INITIAL_META)
         assert isinstance(func, results.JSONWriter)
 
 
@@ -165,3 +165,19 @@ def test_update_results_old():
         res = results.update_results(base, f.name)
 
     nt.assert_equal(res.results_version, results.CURRENT_JSON_VERSION)
+
+
+@utils.nose_generator
+def test_get_backend():
+    """ Generate tests to get various backends """
+    # We use a hand generated list here to ensure that we are getting what we
+    # expect
+    backends = {
+        'json': results.JSONWriter,
+    }
+
+    check = lambda n, i: nt.assert_is(results.get_backend(n), i)
+
+    for name, inst in backends.iteritems():
+        check.description = 'get_backend({0}) returns {0} backend'.format(name)
+        yield check, name, inst
