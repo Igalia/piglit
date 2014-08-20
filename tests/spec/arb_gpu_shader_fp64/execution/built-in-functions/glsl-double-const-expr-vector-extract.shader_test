@@ -1,0 +1,21 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : enable
+void main()
+{
+	const dvec4 a = dvec4(0.1, 0.0, 0.0, 1.0);
+	const dvec4 b = dvec4(0.0, 0.0, 0.2, 1.0);
+	const dvec4 c = dvec4(0.9, 1.0, 0.0, 1.0);
+	const dmat4 dm = dmat4(a, b, c, c);
+	gl_FragColor = vec4(dm[0][0], dm[1][2], dm[2][0], 1.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgb 0.1 0.2 0.9
