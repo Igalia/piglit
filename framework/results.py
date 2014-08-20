@@ -24,6 +24,7 @@
 from __future__ import print_function
 import os
 import sys
+import abc
 from cStringIO import StringIO
 try:
     import simplejson as json
@@ -55,6 +56,79 @@ def _piglit_encoder(obj):
     elif isinstance(obj, set):
         return list(obj)
     return obj
+
+
+class Backend(object):
+    """ Abstract base class for summary backends
+
+    This class provides an abstract ancestor for classes implementing backends,
+    providing a light public API. The goal of this API is to be "just enough",
+    not a generic writing solution. To that end it provides two public methods,
+    'finalize', and 'write_test'. These two methods are designed to be just
+    enough to write a backend without needing format specific options.
+
+    Any locking that is necessary should be done in the child classes, as not
+    all potential backends need locking (for example, a SQL based backend might
+    be thread safe and not need to be locked during write)
+
+    """
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def __init__(self, dest, metadata, **options):
+        """ Generic constructor
+
+        The backend storage container should be created and made ready to write
+        into in the constructor, along with any other setup.
+
+        This method also write any initial metadata as appropriate. No backend
+        is required to write all metadata, but each should write as much as
+        possible.
+
+        In addition it takes keyword arguments that define options for the
+        backends. options should be prefixed to identify which backends they
+        apply to. For example, a json specific value should be passed as
+        json_*, while a file specific value should be passed as file_*)
+
+        Arguments:
+        dest -- the place to write the results to. This should be correctly
+                handled based on the backend, the example is calls open() on a
+                file, but other backends might want different options
+        metadata -- a dict or dict-like object that contains metadata to be
+                    written into the backend
+
+        """
+        self.dest = open(dest, 'w+')
+
+    @abc.abstractmethod
+    def finalize(self, metadata=None):
+        """ Write final metadata into to the store and close it
+
+        This method writes any final metadata into the store, what can be
+        written is implementation specific, backends are free to ignore any
+        data that is not applicable.
+
+        metadata is not required, and Backend derived classes need to handle
+        being passed None correctly.
+
+        Keyword Arguments:
+        metadata -- Any metadata to be written in after the tests, should be a
+                    dict or dict-like object
+
+
+        """
+
+    @abc.abstractmethod
+    def write_test(self, name, data):
+        """ Write a test into the backend store
+
+        This method writes an actual test into the backend store.
+
+        Arguments:
+        name -- the name of the test to be written
+        data -- a TestResult object representing the test data
+
+        """
 
 
 class JSONWriter(object):
