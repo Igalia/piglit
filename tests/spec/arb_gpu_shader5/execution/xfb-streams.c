@@ -134,13 +134,13 @@ probe_buffers(const GLuint *xfb, const GLuint *queries, unsigned primitive_n)
 	for (i = 0; i < STREAMS; i++) {
 		glGetQueryObjectuiv(queries[i], GL_QUERY_RESULT, &query_result);
 		if (query_result != primitive_n) {
-			printf("Expected %u primitives written, got %u\n",
+			printf("Expected %u primitives generated, got %u\n",
 			       primitive_n, query_result);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 		glGetQueryObjectuiv(queries[STREAMS+i], GL_QUERY_RESULT, &query_result);
 		if (query_result != primitive_n) {
-			printf("Expected %u primitives generated, got %u\n",
+			printf("Expected %u TF primitives written, got %u\n",
 			       primitive_n, query_result);
 			piglit_report_result(PIGLIT_FAIL);
 		}
