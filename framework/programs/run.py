@@ -223,9 +223,6 @@ def run(input_):
     json_writer.initialize_json(options, results.name,
                                 core.collect_system_info())
 
-    json_writer.write_dict_key('tests')
-    json_writer.open_dict()
-
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
 
@@ -236,13 +233,8 @@ def run(input_):
     profile.run(opts, json_writer)
     time_end = time.time()
 
-    json_writer.close_dict()
-
     results.time_elapsed = time_end - time_start
-    json_writer.write_dict_item('time_elapsed', results.time_elapsed)
-
-    # End json.
-    json_writer.close_json()
+    json_writer.close_json({'time_elapsed': results.time_elapsed})
 
     print('Thank you for running Piglit!\n'
           'Results have been written to ' + result_filepath)
@@ -281,9 +273,6 @@ def resume(input_):
     json_writer.initialize_json(results.options, results.name,
                                 core.collect_system_info())
 
-    json_writer.write_dict_key('tests')
-    json_writer.open_dict()
-
     for key, value in results.tests.iteritems():
         json_writer.write_dict_item(key, value)
         opts.exclude_tests.add(key)
@@ -296,7 +285,6 @@ def resume(input_):
     # This is resumed, don't bother with time since it wont be accurate anyway
     profile.run(opts, json_writer)
 
-    json_writer.close_dict()
     json_writer.close_json()
 
     print("Thank you for running Piglit!\n"

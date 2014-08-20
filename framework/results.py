@@ -235,18 +235,31 @@ class JSONWriter(object):
         for key, value in env.iteritems():
             self.write_dict_item(key, value)
 
-    def close_json(self):
+        # Open the tests dictinoary so that tests can be written
+        self.write_dict_key('tests')
+        self.open_dict()
+
+    def close_json(self, metadata=None):
         """ End json serialization and cleanup
 
         This method is called after all of tests are written, it closes any
         containers that are still open and closes the file
 
         """
+        # Close the tests dictionary
         self.close_dict()
-        # Parens make this evaluate differently?
+
+        # Write closing metadata
+        if metadata:
+            for key, value in metadata.iteritems():
+                self.write_dict_item(key, value)
+
+        # Close the root dictionary object
+        self.close_dict()
+
+        # Close the file.
         assert self._open_containers == [], \
             "containers stack: {0}".format(self._open_containers)
-
         self.file.close()
 
     @synchronized_self
