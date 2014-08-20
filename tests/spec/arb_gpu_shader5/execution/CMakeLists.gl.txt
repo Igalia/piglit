@@ -11,3 +11,4 @@ link_libraries (
 
 piglit_add_executable (arb_gpu_shader5-invocation-id invocation-id.c)
 piglit_add_executable (arb_gpu_shader5-xfb-streams xfb-streams.c)
+piglit_add_executable (arb_gpu_shader5-xfb-streams-without-invocations xfb-streams-without-invocations.c)
