@@ -201,7 +201,8 @@ class TestProfile(object):
 
             """
             name, test = pair
-            test.execute(name, log, json_writer, self.dmesg)
+            test.execute(name, log, self.dmesg)
+            json_writer.write_test(name, test.result)
 
         def run_threads(pool, testlist):
             """ Open a pool, close it, and join it """

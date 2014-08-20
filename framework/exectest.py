@@ -87,7 +87,7 @@ class Test(object):
         # self.run is called.
         self._test_hook_execute_run = lambda: None
 
-    def execute(self, path, log, json_writer, dmesg):
+    def execute(self, path, log, dmesg):
         """ Run a test
 
         Run a test, but with features. This times the test, uses dmesg checking
@@ -96,7 +96,6 @@ class Test(object):
         Arguments:
         path -- the name of the test
         log -- a log.Log instance
-        json_writer -- a results.JSONWriter instance
         dmesg -- a dmesg.BaseDmesg derived class
 
         """
@@ -122,8 +121,6 @@ class Test(object):
 
             log.log(path, self.result['result'])
             log.post_log(log_current, self.result['result'])
-
-            json_writer.write_test(path, self.result)
         else:
             log.log(path, 'dry-run')
             log.post_log(log_current, 'dry-run')
