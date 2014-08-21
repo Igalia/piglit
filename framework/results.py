@@ -68,6 +68,29 @@ def _piglit_encoder(obj):
     return obj
 
 
+class FSyncMixin(object):
+    """ Mixin class that adds fsync support
+
+    This class provides an init method that sets self._file_sync from a keyword
+    arugment file_fsync, and then provides an _fsync() method that does an
+    fsync if self._file_sync is truthy
+
+    """
+    def __init__(self, file_fsync=False, **options):
+        self._file_sync = file_fsync
+        assert self._file
+
+    def _fsync(self):
+        """ Sync the file to disk
+
+        If self._fsync is truthy this will sync self._file to disk
+
+        """
+        if self._file_sync:
+            self._file.flush()
+            os.fsync(self._file.fileno())
+
+
 class Backend(object):
     """ Abstract base class for summary backends
 
@@ -141,7 +164,7 @@ class Backend(object):
         """
 
 
-class JSONBackend(Backend):
+class JSONBackend(FSyncMixin, Backend):
     '''
     Writes to a JSON file stream
 
@@ -187,9 +210,9 @@ class JSONBackend(Backend):
     INDENT = 4
     _LOCK = threading.RLock()
 
-    def __init__(self, f, metadata, file_fsync=False):
-        self.file = open(os.path.join(f, 'results.json'), 'w')
-        self.fsync = file_fsync
+    def __init__(self, f, metadata, **options):
+        self._file = open(os.path.join(f, 'results.json'), 'w')
+        FSyncMixin.__init__(self, **options)
         self.__indent_level = 0
         self.__inhibit_next_indent = False
         self.__encoder = json.JSONEncoder(indent=self.INDENT,
@@ -281,12 +304,7 @@ class JSONBackend(Backend):
             # Close the file.
             assert self._open_containers == [], \
                 "containers stack: {0}".format(self._open_containers)
-            self.file.close()
-
-    def __file_sync(self):
-        if self.fsync:
-            self.file.flush()
-            os.fsync(self.file.fileno())
+            self._file.close()
 
     def __write_indent(self):
         if self.__inhibit_next_indent:
@@ -294,36 +312,36 @@ class JSONBackend(Backend):
             return
         else:
             i = ' ' * self.__indent_level * self.INDENT
-            self.file.write(i)
+            self._file.write(i)
 
     def __write(self, obj):
         lines = list(self.__encoder.encode(obj).split('\n'))
         n = len(lines)
         for i in range(n):
             self.__write_indent()
-            self.file.write(lines[i])
+            self._file.write(lines[i])
             if i != n - 1:
-                self.file.write('\n')
+                self._file.write('\n')
 
     def _open_dict(self):
         self.__write_indent()
-        self.file.write('{')
+        self._file.write('{')
 
         self.__indent_level += 1
         self.__is_collection_empty.append(True)
         self._open_containers.append('dict')
-        self.__file_sync()
+        self._fsync()
 
     def _close_dict(self):
         self.__indent_level -= 1
         self.__is_collection_empty.pop()
 
-        self.file.write('\n')
+        self._file.write('\n')
         self.__write_indent()
-        self.file.write('}')
+        self._file.write('}')
         assert self._open_containers[-1] == 'dict'
         self._open_containers.pop()
-        self.__file_sync()
+        self._fsync()
 
     def _write_dict_item(self, key, value):
         # Write key.
@@ -332,22 +350,21 @@ class JSONBackend(Backend):
         # Write value.
         self.__write(value)
 
-        self.__file_sync()
+        self._fsync()
 
     def _write_dict_key(self, key):
         # Write comma if this is not the initial item in the dict.
         if self.__is_collection_empty[-1]:
             self.__is_collection_empty[-1] = False
         else:
-            self.file.write(',')
+            self._file.write(',')
 
-        self.file.write('\n')
+        self._file.write('\n')
         self.__write(key)
-        self.file.write(': ')
+        self._file.write(': ')
 
         self.__inhibit_next_indent = True
-
-        self.__file_sync()
+        self._fsync()
 
     def write_test(self, name, data):
         """ Write a test into the JSON tests dictionary """
@@ -355,18 +372,18 @@ class JSONBackend(Backend):
             self._write_dict_item(name, data)
 
 
-class JUnitBackend(Backend):
+class JUnitBackend(FSyncMixin, Backend):
     """ Backend that produces ANT JUnit XML
 
     Based on the following schema:
     https://svn.jenkins-ci.org/trunk/hudson/dtkit/dtkit-format/dtkit-junit-model/src/main/resources/com/thalesgroup/dtkit/junit/model/xsd/junit-7.xsd
 
     """
-    # TODO: add fsync support
     _REPLACE = re.compile(r'[/\\]')
 
     def __init__(self, dest, metadata, **options):
         self._file = open(os.path.join(dest, 'results.xml'), 'w')
+        FSyncMixin.__init__(self, **options)
 
         # Write initial headers and other data that etree cannot write for us
         self._file.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
