@@ -221,6 +221,10 @@ def run(input_):
         options['platform'] = args.platform
     options['name'] = results.name
     options['env'] = core.collect_system_info()
+    # FIXME: this should be the actual count, but profile needs to be
+    # refactored to make that possible because of the flattening pass that is
+    # part of profile.run
+    options['test_count'] = 0
 
     # Begin json.
     backend = framework.results.get_backend(args.backend)(

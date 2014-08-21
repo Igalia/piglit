@@ -23,14 +23,20 @@
 
 from __future__ import print_function
 import os
+import re
 import sys
 import abc
 import threading
+import posixpath
 from cStringIO import StringIO
 try:
     import simplejson as json
 except ImportError:
     import json
+try:
+    from lxml import etree
+except ImportError:
+    import xml.etree.cElementTree as etree
 
 import framework.status as status
 
@@ -43,7 +49,7 @@ __all__ = [
 ]
 
 # A list of available backends
-BACKENDS = ['json']
+BACKENDS = ['json', 'junit']
 
 # The current version of the JSON results
 CURRENT_JSON_VERSION = 1
@@ -349,6 +355,65 @@ class JSONBackend(Backend):
             self._write_dict_item(name, data)
 
 
+class JUnitBackend(Backend):
+    """ Backend that produces ANT JUnit XML
+
+    Based on the following schema:
+    https://svn.jenkins-ci.org/trunk/hudson/dtkit/dtkit-format/dtkit-junit-model/src/main/resources/com/thalesgroup/dtkit/junit/model/xsd/junit-7.xsd
+
+    """
+    # TODO: add fsync support
+    _REPLACE = re.compile(r'[/\\]')
+
+    def __init__(self, dest, metadata, **options):
+        self._file = open(os.path.join(dest, 'results.xml'), 'w')
+
+        # Write initial headers and other data that etree cannot write for us
+        self._file.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
+        self._file.write('<testsuites>\n')
+        self._file.write(
+            '<testsuite name="piglit" tests="{}">\n'.format(
+                metadata['test_count']))
+
+    def finalize(self, metadata=None):
+        self._file.write('</testsuite>\n')
+        self._file.write('</testsuites>\n')
+        self._file.close()
+
+    def write_test(self, name, data):
+        # Split the name of the test and the group (what junit refers to as
+        # classname), and replace piglits '/' separated groups with '.', after
+        # replacing any '.' with '_' (so we don't get false groups). Also
+        # remove any '\\' that has been inserted on windows accidentally
+        classname, testname = posixpath.split(name)
+        classname = classname.replace('.', '_')
+        classname = JUnitBackend._REPLACE.sub('.', classname)
+        element = etree.Element('testcase', name=testname,
+                                classname=classname,
+                                time=str(data['time']),
+                                status=str(data['result']))
+
+        # Add stdout
+        out = etree.SubElement(element, 'system-out')
+        out.text = data['out']
+
+        # Add stderr
+        err = etree.SubElement(element, 'system-err')
+        err.text = data['err']
+
+        # Add relevant result value, if the result is pass then it doesn't need
+        # one of these statuses
+        if data['result'] == 'skip':
+            etree.SubElement(element, 'skipped')
+        elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
+            etree.SubElement(element, 'failure')
+        elif data['result'] == 'crash':
+            etree.SubElement(element, 'error')
+
+        self._file.write(etree.tostring(element))
+        self._file.write('\n')
+
+
 class TestResult(dict):
     def __init__(self, *args):
         super(TestResult, self).__init__(*args)
@@ -587,6 +652,7 @@ def get_backend(backend):
     """ Returns a BackendInstance based on the string passed """
     backends = {
         'json': JSONBackend,
+        'junit': JUnitBackend,
     }
 
     # Be sure that we're exporting the same list of backends that we actually

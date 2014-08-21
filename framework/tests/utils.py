@@ -230,3 +230,25 @@ class TestWithEnvClean(object):
         # reversed order to make any sense
         for call, args in reversed(self._teardown_calls):
             call(*args)
+
+
+class StaticDirectory(object):
+    """ Helper class providing shared files creation and cleanup
+
+    One should override the setup_class method in a child class, call super(),
+    and then add files to cls.dir.
+
+    Tests in this class should NOT modify the contents of tidr, if you want
+    that functionality you want a different class
+
+    """
+    @classmethod
+    def setup_class(cls):
+        """ Create a temperary directory that will be removed in teardown_class
+        """
+        cls.tdir = tempfile.mkdtemp()
+
+    @classmethod
+    def teardown_class(cls):
+        """ Remove the temporary directory """
+        shutil.rmtree(cls.tdir)
