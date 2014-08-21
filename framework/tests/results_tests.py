@@ -43,6 +43,7 @@ def check_initialize(target):
     assert isinstance(func, target)
 
 
+@utils.nose_generator
 def test_generate_initialize():
     """ Generator that creates tests to initialize all of the classes in core
 
