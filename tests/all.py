@@ -2206,6 +2206,7 @@ arb_texture_view['clear-into-view-2d-array'] = concurrent_test('arb_texture_view
 arb_texture_view['clear-into-view-layered'] = concurrent_test('arb_texture_view-clear-into-view-layered')
 arb_texture_view['copytexsubimage-layers'] = concurrent_test('arb_texture_view-copytexsubimage-layers')
 arb_texture_view['sampling-2d-array-as-cubemap'] = concurrent_test('arb_texture_view-sampling-2d-array-as-cubemap')
+arb_texture_view['sampling-2d-array-as-cubemap-array'] = concurrent_test('arb_texture_view-sampling-2d-array-as-cubemap-array')
 
 tdfx_texture_compression_fxt1 = {}
 spec['3DFX_texture_compression_FXT1'] = tdfx_texture_compression_fxt1

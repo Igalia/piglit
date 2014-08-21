@@ -27,5 +27,6 @@ piglit_add_executable(arb_texture_view-clear-into-view-layered clear-into-view-l
 piglit_add_executable(arb_texture_view-rendering-formats rendering-formats.c)
 piglit_add_executable(arb_texture_view-copytexsubimage-layers copytexsubimage-layers.c common.c)
 piglit_add_executable(arb_texture_view-sampling-2d-array-as-cubemap sampling-2d-array-as-cubemap.c)
+piglit_add_executable(arb_texture_view-sampling-2d-array-as-cubemap-array sampling-2d-array-as-cubemap-array.c)
 
 # vim: ft=cmake:
