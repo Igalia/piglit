@@ -1,0 +1,30 @@
+[require]
+GLSL >= 1.30
+GL_EXT_shader_integer_mix
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_EXT_shader_integer_mix: enable
+
+uniform bool a;
+uniform bool b;
+uniform bool selector;
+
+void main()
+{
+    if (mix(a, b, selector)) {
+        gl_FragColor = vec4(0, 1, 0, 1);
+    } else {
+        gl_FragColor = vec4(1, 0, 0, 1);
+    }
+}
+
+[test]
+uniform int a 1
+uniform int b 0
+uniform int selector 0
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
+

@@ -1,0 +1,38 @@
+[require]
+GLSL >= 1.30
+GL_EXT_shader_integer_mix
+
+[vertex shader]
+#extension GL_EXT_shader_integer_mix: enable
+out vec4 color;
+
+uniform bool a;
+uniform bool b;
+uniform bool selector;
+
+void main()
+{
+    if (mix(a, b, selector)) {
+        color = vec4(0, 1, 0, 1);
+    } else {
+        color = vec4(1, 0, 0, 1);
+    }
+    gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+in vec4 color;
+
+void main()
+{
+    gl_FragColor = color;
+}
+
+[test]
+uniform int a 1
+uniform int b 0
+uniform int selector 0
+
+draw rect -1 -1 2 2
+probe all rgba 0 1 0 1
+
