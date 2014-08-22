@@ -498,10 +498,3 @@ piglit_glx_get_all_proc_addresses(const struct piglit_glx_proc_reference *proced
 		}
 	}
 }
-
-/* Creates a GLX context for rendering into an FBO */
-void
-piglit_framework_fbo_init_glx()
-{
-
-}
