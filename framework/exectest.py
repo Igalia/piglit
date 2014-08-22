@@ -29,6 +29,9 @@ import shlex
 import time
 import sys
 import traceback
+from datetime import datetime
+import threading
+import signal
 import itertools
 import abc
 try:
@@ -49,6 +52,56 @@ if 'PIGLIT_BUILD_DIR' in os.environ:
 else:
     TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                  '../bin'))
+
+
+class ProcessTimeout(threading.Thread):
+    """ Timeout class for test processes
+
+    This class is for terminating tests that run for longer than a certain
+    amount of time. Create an instance by passing it a timeout in seconds
+    and the Popen object that is running your test. Then call the start
+    method (inherited from Thread) to start the timer. The Popen object is
+    killed if the timeout is reached and it has not completed. Wait for the
+    outcome by calling the join() method from the parent.
+
+    """
+
+    def __init__(self, timeout, proc):
+        threading.Thread.__init__(self)
+        self.proc = proc
+        self.timeout = timeout
+        self.status = 0
+
+    def run(self):
+        start_time = datetime.now()
+        delta = 0
+
+        # poll() returns the returncode attribute, which is either the return
+        # code of the child process (which could be zero), or None if the
+        # process has not yet terminated.
+
+        while delta < self.timeout and self.proc.poll() is None:
+            time.sleep(1)
+            delta = (datetime.now() - start_time).total_seconds()
+
+        # if the test is not finished after timeout, first try to terminate it
+        # and if that fails, send SIGKILL to all processes in the test's
+        # process group
+
+        if self.proc.poll() is None:
+            self.status = 1
+            self.proc.terminate()
+            time.sleep(5)
+
+        if self.proc.poll() is None:
+            self.status = 2
+            if hasattr(os, 'killpg'):
+                os.killpg(self.proc.pid, signal.SIGKILL)
+            self.proc.wait()
+
+    def join(self):
+        threading.Thread.join(self)
+        return self.status
 
 
 class Test(object):
@@ -73,7 +126,8 @@ class Test(object):
     OPTS = Options()
     __metaclass__ = abc.ABCMeta
     __slots__ = ['run_concurrent', 'env', 'result', 'cwd', '_command',
-                 '_test_hook_execute_run']
+                 '_test_hook_execute_run', '__proc_timeout']
+    timeout = 0
 
     def __init__(self, command, run_concurrent=False):
         self._command = None
@@ -82,6 +136,7 @@ class Test(object):
         self.env = {}
         self.result = TestResult({'result': 'fail'})
         self.cwd = None
+        self.__proc_timeout = None
 
         # This is a hook for doing some testing on execute right before
         # self.run is called.
@@ -180,7 +235,11 @@ class Test(object):
         self.interpret_result()
 
         if self.result['returncode'] < 0:
-            self.result['result'] = 'crash'
+            # check if the process was terminated by the timeout
+            if self.timeout > 0 and self.__proc_timeout.join() > 0:
+                self.result['result'] = 'timeout'
+            else:
+                self.result['result'] = 'crash'
         elif self.result['returncode'] != 0 and self.result['result'] == 'pass':
             self.result['result'] = 'warn'
 
@@ -204,6 +263,10 @@ class Test(object):
 
         """
         return False
+
+    def __set_process_group(self):
+        if hasattr(os, 'setpgrp'):
+            os.setpgrp()
 
     def __run_command(self):
         """ Run the test command and get the result
@@ -237,7 +300,16 @@ class Test(object):
                                     stderr=subprocess.PIPE,
                                     cwd=self.cwd,
                                     env=fullenv,
-                                    universal_newlines=True)
+                                    universal_newlines=True,
+                                    preexec_fn=self.__set_process_group)
+            # create a ProcessTimeout object to watch out for test hang if the
+            # process is still going after the timeout, then it will be killed
+            # forcing the communicate function (which is a blocking call) to
+            # return
+            if self.timeout > 0:
+                self.__proc_timeout = ProcessTimeout(self.timeout, proc)
+                self.__proc_timeout.start()
+
             out, err = proc.communicate()
             returncode = proc.returncode
         except OSError as e:
