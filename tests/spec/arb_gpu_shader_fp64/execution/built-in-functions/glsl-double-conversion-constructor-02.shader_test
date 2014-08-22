@@ -1,0 +1,22 @@
+#
+# Test that we can construct vec4 from dmat4 (1st column)
+#
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : enable
+void main()
+{
+	double one = 1.0lf;
+	dmat4 mat = dmat4(one);
+	gl_FragColor = vec4(mat);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 1.0 0.0 0.0 0.0
