@@ -115,7 +115,7 @@ enum piglit_result {
 };
 
 /**
- * An idividual subtest that makes up part of a test group.
+ * An individual subtest that makes up part of a test group.
  */
 struct piglit_subtest {
 	/** Name of the subtest as it will appear in the log. */
