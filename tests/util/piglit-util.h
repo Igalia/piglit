@@ -172,6 +172,7 @@ piglit_run_selected_subtests(const struct piglit_subtest *all_subtests,
 #define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define ALIGN(value, alignment) (((value) + alignment - 1) & ~(alignment - 1))
 
 
 /**

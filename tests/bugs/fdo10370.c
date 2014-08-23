@@ -15,6 +15,7 @@ PIGLIT_GL_TEST_CONFIG_END
 
 #define BITMAP_WIDTH 1
 #define BITMAP_HEIGHT 1
+#undef ALIGN
 #define ALIGN 1
 GLfloat read_buf[4 * BITMAP_WIDTH * BITMAP_HEIGHT];
 static GLfloat r_map[] = { 0, 1 };
