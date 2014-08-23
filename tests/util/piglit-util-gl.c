@@ -1145,6 +1145,38 @@ piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 	return 1;
 }
 
+/* More efficient variant if you don't know need floats and GBA channels. */
+int
+piglit_probe_rect_r_ubyte(int x, int y, int w, int h, GLubyte expected)
+{
+	int i, j, w_aligned;
+	GLubyte *pixels;
+	GLubyte tolerance = ceil(piglit_tolerance[0] * 255);
+
+	w_aligned = ALIGN(w, 4);
+	pixels = malloc(w_aligned * h);
+
+	glReadPixels(x, y, w, h, GL_RED, GL_UNSIGNED_BYTE, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			GLubyte probe = pixels[j*w_aligned+i];
+
+			if (abs((int)probe - (int)expected) >= tolerance) {
+				printf("Probe color at (%i,%i)\n", x+i, y+j);
+				printf("  Expected: %u\n", expected);
+				printf("  Observed: %u\n", probe);
+
+				free(pixels);
+				return 0;
+			}
+		}
+	}
+
+	free(pixels);
+	return 1;
+}
+
 int
 piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 {

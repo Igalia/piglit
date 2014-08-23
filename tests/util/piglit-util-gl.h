@@ -126,6 +126,7 @@ int piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *ou
 int piglit_probe_pixel_rgba_silent(int x, int y, const float* expected, float *out_probe);
 int piglit_probe_pixel_rgb(int x, int y, const float* expected);
 int piglit_probe_pixel_rgba(int x, int y, const float* expected);
+int piglit_probe_rect_r_ubyte(int x, int y, int w, int h, GLubyte expected);
 int piglit_probe_rect_rgb(int x, int y, int w, int h, const float* expected);
 int piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected);
 int piglit_probe_rect_rgba(int x, int y, int w, int h, const float* expected);
