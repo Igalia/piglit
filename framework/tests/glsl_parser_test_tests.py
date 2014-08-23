@@ -20,11 +20,17 @@
 
 """ Provides tests for the shader_test module """
 
+import sys
 import os
 import nose.tools as nt
 import framework.glsl_parser_test as glsl
 import framework.tests.utils as utils
 from framework.exectest import TEST_BIN_DIR
+
+# Nose does not capture stderr, so all of the error catching tetss will spam
+# the console, however, it does capture stdout, so redirecting stderr to stdout
+# will cause it to be captured in the event that something is wrong.
+sys.stderr = sys.stdout
 
 
 def _check_config(content):
@@ -39,7 +45,7 @@ def test_no_config_start():
                '// glsl_version: 1.00\n'
                '// [end config]\n')
     with utils.with_tempfile(content) as tfile:
-        with nt.assert_raises(glsl.GLSLParserException) as exc:
+        with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception, 'No [config] section found!',
@@ -52,7 +58,7 @@ def test_find_config_start():
                '// glsl_version: 1.00\n'
                '//\n')
     with utils.with_tempfile(content) as tfile:
-        with nt.assert_raises(glsl.GLSLParserException) as exc:
+        with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_not_equal(
                 exc.exception, 'No [config] section found!',
@@ -62,7 +68,7 @@ def test_find_config_start():
 def test_no_config_end():
     """ GLSLParserTest requires [end config] """
     with utils.with_tempfile('// [config]\n') as tfile:
-        with nt.assert_raises(glsl.GLSLParserException) as exc:
+        with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception, 'No [end config] section found!',
@@ -75,7 +81,7 @@ def test_no_expect_result():
                '// glsl_version: 1.00\n'
                '//\n')
     with utils.with_tempfile(content) as tfile:
-        with nt.assert_raises(glsl.GLSLParserException) as exc:
+        with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception,
@@ -89,7 +95,7 @@ def test_no_glsl_version():
                '// expect_result: pass\n'
                '// [end config]\n')
     with utils.with_tempfile(content) as tfile:
-        with nt.assert_raises(glsl.GLSLParserException) as exc:
+        with nt.assert_raises(SystemExit) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception,
@@ -205,7 +211,7 @@ def test_bad_section_name():
                '// new_awesome_key: foo\n'
                '// [end config]\n')
 
-    with nt.assert_raises(glsl.GLSLParserException) as e:
+    with nt.assert_raises(SystemExit) as e:
         _, name = _check_config(content)
 
         nt.eq_(e.exception.message,
@@ -230,7 +236,7 @@ def test_good_section_names():
 
 def check_no_duplicates(content, dup):
     """ Ensure that duplicate entries raise an error """
-    with nt.assert_raises(glsl.GLSLParserException) as e:
+    with nt.assert_raises(SystemExit) as e:
         with utils.with_tempfile(content) as tfile:
             glsl.GLSLParserTest(tfile)
 
@@ -259,7 +265,7 @@ def test_duplicate_entries():
 
 def check_bad_character(tfile):
     """ Check for bad characters """
-    with nt.assert_raises(glsl.GLSLParserException) as e:
+    with nt.assert_raises(SystemExit) as e:
         glsl.GLSLParserTest(tfile)
 
         # Obviously this isn't a perfect check, but it should be close enough

@@ -21,9 +21,11 @@
 
 """ This module enables the running of GLSL parser tests. """
 
+from __future__ import print_function
 import os
 import os.path as path
 import re
+import sys
 
 from .exectest import PiglitTest
 
@@ -90,7 +92,11 @@ class GLSLParserTest(PiglitTest):
         # Parse the config file and get the config section, then write this
         # section to a StringIO and pass that to ConfigParser
         with open(filepath, 'r') as testfile:
-            config = self.__parser(testfile, filepath)
+            try:
+                config = self.__parser(testfile, filepath)
+            except GLSLParserException as e:
+                print(e.message, file=sys.stderr)
+                sys.exit(1)
 
         command = self.__get_command(config, filepath)
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
