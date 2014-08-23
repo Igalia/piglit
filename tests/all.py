@@ -2791,7 +2791,9 @@ add_shader_test_dir(ext_texture_array,
 add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 1D_ARRAY')
 add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 2D_ARRAY')
 add_plain_test(ext_texture_array, 'fbo-array')
-add_plain_test(ext_texture_array, 'fbo-depth-array')
+for test in ('depth-clear', 'depth-layered-clear', 'depth-draw', 'fs-writes-depth',
+             'stencil-clear', 'stencil-layered-clear', 'stencil-draw', 'fs-writes-stencil'):
+    add_concurrent_test(ext_texture_array, 'fbo-depth-array ' + test)
 add_plain_test(ext_texture_array, 'array-texture')
 add_concurrent_test(ext_texture_array, 'getteximage-targets 1D_ARRAY')
 add_concurrent_test(ext_texture_array, 'getteximage-targets 2D_ARRAY')

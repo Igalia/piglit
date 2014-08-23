@@ -2,6 +2,7 @@
  * Copyright © 2009 Intel Corporation
  * Copyright (c) 2010 VMware, Inc.
  * Copyright © 2011 Red Hat Inc.
+ * Copyright © 2014 Advanced Micro Devices, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,136 +26,328 @@
  * Authors:
  *     Dave Airlie
  *     Christoph Bumiller
- *
+ *     Marek Olšák <maraeo@gmail.com>
  */
 
 /** @file fbo-depth-array.c
  *
- * Tests that drawing to each level of a depth-only array texture FBO and then
- * drawing views of those individual depths to the window system framebuffer
- * succeeds.
+ * Tests that drawing to or clearing each layer of a depth-stencil array
+ * texture FBO and then drawing views of those individual layers
+ * to the window system framebuffer succeeds.
  * based on fbo-array.c
  */
 
 #include "piglit-util-gl.h"
 
-#define BUF_WIDTH 32
-#define BUF_HEIGHT 32
+/* GL3 requirement. */
+#define MAX_DIM 8192
+#define MAX_MEM (2048*1024)
+
+enum {
+	CLEAR,
+	LAYERED_CLEAR,
+	DRAW,
+	FS_WRITES_VALUE,
+};
+
+static bool test_stencil;
+static bool test_single_size;
+static unsigned width = 32, height = 32, layers = 6;
+static unsigned test;
+
+static void parse_args(int argc, char **argv);
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
+	piglit_gl_process_args(&argc, argv, &config);
+	parse_args(argc, argv);
 
-	config.window_width = 200;
-	config.window_height = 100;
+	config.supports_gl_compat_version = 33;
+	config.supports_gl_core_version = 33;
+
+	if (piglit_use_fbo && !test_single_size) {
+		config.window_width = MAX_DIM;
+		config.window_height = MAX_DIM;
+	}
+	else {
+		config.window_width = (width + 2) * MIN2(layers, 3);
+		config.window_height = (height + 2) * ((layers + 2) / 3);
+	}
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
 
-#define NUM_LAYERS	6
+static const char *vs_text =
+	"#version 330 \n"
+	"layout(location = 0) in vec4 piglit_vertex; \n"
+	"layout(location = 1) in vec4 piglit_texcoord; \n"
+	"out vec4 texcoord; \n"
+	"void main() { \n"
+	"  gl_Position = piglit_vertex; \n"
+	"  texcoord = piglit_texcoord; \n"
+	"}\n";
 
-float layer_depth[NUM_LAYERS][4] = {
-	{0.1, 0.1, 0.1, 0.0},
-	{0.2, 0.2, 0.2, 0.0},
-	{0.4, 0.4, 0.4, 0.0},
-	{0.6, 0.6, 0.6, 0.0},
-	{0.8, 0.8, 0.8, 0.0},
-	{1.0, 1.0, 1.0, 0.0},
-};
+static const char *frag_shader_empty_text =
+	"#version 330 \n"
+	"void main() {} \n";
 
-static int num_layers = NUM_LAYERS;
+static const char *fs_depth_output_text =
+	"#version 330 \n"
+	"uniform float z; \n"
+	"void main() \n"
+	"{ \n"
+	"   gl_FragDepth = z; \n"
+	"} \n";
 
-static const char *prog = "fbo-depth-array";
-/* debug aid */
-static void
-check_error(int line)
+static const char *fs_stencil_output_text =
+	"#version 330 \n"
+	"#extension GL_ARB_shader_stencil_export : require \n"
+	"uniform int ref; \n"
+	"void main() \n"
+	"{ \n"
+	"   gl_FragStencilRefARB = ref; \n"
+	"} \n";
+
+
+static const char *fs_texdepth_text =
+	"#version 330 \n"
+	"uniform sampler2DArray tex; \n"
+	"uniform float z; \n"
+	"in vec4 texcoord; \n"
+	"void main() \n"
+	"{ \n"
+	"   gl_FragColor = texture(tex, vec3(texcoord.xy, z)).xxxx; \n"
+	"} \n";
+
+static const char *fs_texstencil_text =
+	"#version 330 \n"
+	"uniform usampler2DArray tex; \n"
+	"uniform float z; \n"
+	"in vec4 texcoord; \n"
+	"void main() \n"
+	"{ \n"
+	"   gl_FragColor = vec4(float(texture(tex, vec3(texcoord.xy, z)))) / 255.0; \n"
+	"} \n";
+
+static GLuint program_fs_empty;
+static GLuint program_depth_output;
+static GLuint program_stencil_output;
+static GLuint program_texdepth;
+static GLuint program_texstencil;
+
+
+static float
+get_depth_value(unsigned layer)
 {
-   GLenum err = glGetError();
-   if (err) {
-      printf("%s: GL error 0x%x at line %d\n", prog, err, line);
-   }
+	if (test == LAYERED_CLEAR)
+		return 0.4; /* constant */
+	else
+		return (double)(layer+1) / (layers+1);
 }
 
-static const char *frag_shader_depth_output_text =
-   "void main() \n"
-   "{ \n"
-   "   gl_FragDepth = gl_Color.r;\n"
-   "} \n";
+static unsigned
+get_stencil_value(unsigned layer) {
+	if (test == LAYERED_CLEAR)
+		return 0x53;
+	else
+		return (layer+1) * 255 / (layers+1);
+}
 
-static GLuint frag_shader_depth_output;
-static GLuint program_depth_output;
+static float
+get_stencil_value_float(unsigned layer)
+{
+	return get_stencil_value(layer) / 255.0;
+}
 
-static const char *frag_shader_2d_array_text =
-   "#extension GL_EXT_texture_array : enable \n"
-   "uniform sampler2DArray tex; \n"
-   "void main() \n"
-   "{ \n"
-   "   gl_FragColor = texture2DArray(tex, gl_TexCoord[0].xyz).rrrr; \n"
-   "} \n";
+static void
+parse_args(int argc, char **argv)
+{
+	unsigned lwidth, lheight, llayers;
+	int i;
 
-static GLuint frag_shader_2d_array;
-static GLuint program_2d_array;
+	for (i = 1; i < argc; i++) {
+		if (sscanf(argv[i], "%ux%ux%u", &lwidth, &lheight, &llayers) == 3 &&
+		    lwidth && lheight && llayers) {
+			width = lwidth;
+			height = lheight;
+			layers = llayers;
+			test_single_size = true;
+		}
+		else if (!strcmp(argv[i], "depth-clear")) {
+			test = CLEAR;
+			puts("Testing glClear");
+		}
+		else if (!strcmp(argv[i], "depth-layered-clear")) {
+			test = LAYERED_CLEAR;
+			puts("Testing layered glClear");
+		}
+		else if (!strcmp(argv[i], "depth-draw")) {
+			test = DRAW;
+			puts("Testing drawing");
+		}
+		else if (!strcmp(argv[i], "fs-writes-depth")) {
+			test = FS_WRITES_VALUE;
+			puts("Testing gl_FragDepth");
+		}
+		else if (!strcmp(argv[i], "stencil-clear")) {
+			test = CLEAR;
+			test_stencil = true;
+			puts("Testing stencil glClear");
+		}
+		else if (!strcmp(argv[i], "stencil-layered-clear")) {
+			test = LAYERED_CLEAR;
+			test_stencil = true;
+			puts("Testing stencil layered glClear");
+		}
+		else if (!strcmp(argv[i], "stencil-draw")) {
+			test = DRAW;
+			test_stencil = true;
+			puts("Testing stencil drawing");
+		}
+		else if (!strcmp(argv[i], "fs-writes-stencil")) {
+			test = FS_WRITES_VALUE;
+			test_stencil = true;
+			puts("Testing gl_FragStencilRef");
+		}
+		else {
+			puts("Invalid parameter.");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+}
 
-
-static int
+static GLuint
 create_array_fbo(void)
 {
-	GLuint tex, fb;
+	GLuint tex, fb, z, ref;
 	GLenum status;
 	int layer;
 
-	glUseProgram(program_depth_output);
-
 	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D_ARRAY_EXT, tex);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
 	assert(glGetError() == 0);
 
 	/* allocate empty array texture */
-	glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, 0, GL_DEPTH_COMPONENT24,
-		     BUF_WIDTH, BUF_HEIGHT, num_layers,
-		     0,
-		     GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH24_STENCIL8,
+		     width, height, layers, 0,
+		     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 	assert(glGetError() == 0);
 
-	glGenFramebuffersEXT(1, &fb);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	glGenFramebuffers(1, &fb);
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 
 	/* draw something into each layer of the array texture */
-	for (layer = 0; layer < NUM_LAYERS; layer++) {
-		glFramebufferTextureLayer(GL_FRAMEBUFFER_EXT,
-					  GL_DEPTH_ATTACHMENT,
+	for (layer = 0; layer < layers; layer++) {
+		if (test == LAYERED_CLEAR) {
+			glFramebufferTexture(GL_FRAMEBUFFER,
+					     test_stencil ? GL_STENCIL_ATTACHMENT :
+							    GL_DEPTH_ATTACHMENT,
+					     tex, 0);
+
+			status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE) {
+				fprintf(stderr, "FBO incomplete\n");
+				goto done;
+			}
+
+			glViewport(0, 0, width, height);
+			if (test_stencil) {
+				glClearStencil(get_stencil_value(0));
+				glClear(GL_STENCIL_BUFFER_BIT);
+			}
+			else {
+				glClearDepth(get_depth_value(0));
+				glClear(GL_DEPTH_BUFFER_BIT);
+			}
+			break;
+		}
+		glFramebufferTextureLayer(GL_FRAMEBUFFER,
+					  test_stencil ? GL_STENCIL_ATTACHMENT :
+						         GL_DEPTH_ATTACHMENT,
 					  tex,
 					  0,
 					  layer);
 
 		assert(glGetError() == 0);
 
-		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
-		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE) {
 			fprintf(stderr, "FBO incomplete\n");
 			goto done;
 		}
 
-		glViewport(0, 0, BUF_WIDTH, BUF_HEIGHT);
-		piglit_ortho_projection(BUF_WIDTH, BUF_HEIGHT, GL_FALSE);
+		glViewport(0, 0, width, height);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_ALWAYS);
+		switch (test) {
+		case CLEAR:
+			if (test_stencil) {
+				glClearStencil(get_stencil_value(layer));
+				glClear(GL_STENCIL_BUFFER_BIT);
+			}
+			else {
+				glClearDepth(get_depth_value(layer));
+				glClear(GL_DEPTH_BUFFER_BIT);
+			}
+			break;
+		case DRAW:
+			glUseProgram(program_fs_empty);
+			if (test_stencil) {
+				glEnable(GL_STENCIL_TEST);
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+				glStencilFunc(GL_ALWAYS, get_stencil_value(layer), 0xff);
 
-		/* solid color quad */
-		glColor4fv(layer_depth[layer]);
-		piglit_draw_rect(-2, -2, BUF_WIDTH + 2, BUF_HEIGHT + 2);
+				piglit_draw_rect(-1, -1, 2, 2);
 
-		glDisable(GL_DEPTH_TEST);
+				glDisable(GL_STENCIL_TEST);
+			}
+			else {
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_ALWAYS);
+
+				piglit_draw_rect_z(get_depth_value(layer) * 2 - 1,
+						   -1, -1, 2, 2);
+
+				glDisable(GL_DEPTH_TEST);
+			}
+			glUseProgram(0);
+			break;
+		case FS_WRITES_VALUE:
+			if (test_stencil) {
+				glUseProgram(program_stencil_output);
+				ref = glGetUniformLocation(program_stencil_output, "ref");
+				glUniform1i(ref, get_stencil_value(layer));
+
+				glEnable(GL_STENCIL_TEST);
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+				glStencilFunc(GL_ALWAYS, 0, 0xff);
+
+				piglit_draw_rect(-1, -1, 2, 2);
+
+				glDisable(GL_STENCIL_TEST);
+			}
+			else {
+				glUseProgram(program_depth_output);
+				z = glGetUniformLocation(program_depth_output, "z");
+				glUniform1f(z, get_depth_value(layer));
+
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_ALWAYS);
+
+				piglit_draw_rect(-1, -1, 2, 2);
+
+				glDisable(GL_DEPTH_TEST);
+			}
+			glUseProgram(0);
+			break;
+		}
 	}
 
-	glUseProgram(0);
-
 done:
-	glDeleteFramebuffersEXT(1, &fb);
+	glDeleteFramebuffers(1, &fb);
+	assert(glGetError() == 0);
 	return tex;
 }
 
@@ -165,73 +358,117 @@ static void
 draw_layer(int x, int y, int depth)
 {
 	GLfloat depth_coord = (GLfloat)depth;
-	GLint loc;
+	GLuint prog = test_stencil ? program_texstencil : program_texdepth;
+	GLint loc, z;
 
-	glUseProgram(program_2d_array);
-	loc = glGetUniformLocation(program_2d_array, "tex");
+	glUseProgram(prog);
+	loc = glGetUniformLocation(prog, "tex");
+	z = glGetUniformLocation(prog, "z");
 	glUniform1i(loc, 0); /* texture unit p */
+	glUniform1f(z, depth_coord);
 
 	glViewport(0, 0, piglit_width, piglit_height);
-	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	glBindFramebuffer(GL_FRAMEBUFFER, piglit_winsys_fbo);
 
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+	if (test_stencil)
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_DEPTH_STENCIL_TEXTURE_MODE,
+				GL_STENCIL_INDEX);
 
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY_EXT, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glBegin(GL_QUADS);
-
-	glTexCoord3f(0, 0, depth_coord);
-	glVertex2f(x, y);
-
-	glTexCoord3f(1, 0, depth_coord);
-	glVertex2f(x + BUF_WIDTH, y);
-
-	glTexCoord3f(1, 1, depth_coord);
-	glVertex2f(x + BUF_WIDTH, y + BUF_HEIGHT);
-
-	glTexCoord3f(0, 1, depth_coord);
-	glVertex2f(x, y + BUF_HEIGHT);
-
-	glEnd();
-
+	piglit_draw_rect_tex((double)x / piglit_width * 2 - 1,
+			     (double)y / piglit_height * 2 - 1,
+			     (double)width / piglit_width * 2,
+			     (double)height / piglit_height * 2,
+			     0, 0, 1, 1);
 	glUseProgram(0);
+	assert(glGetError() == 0);
 }
 
-static GLboolean test_layer_drawing(int start_x, int start_y, float *expected)
+static GLboolean test_layer_drawing(int start_x, int start_y, float expected)
 {
-	return piglit_probe_rect_rgb(start_x, start_y, BUF_WIDTH, BUF_HEIGHT,
-				     expected);
+	return piglit_probe_rect_r_ubyte(start_x, start_y, width, height,
+					 expected * 255.0);
+}
+
+static bool
+test_once(void)
+{
+	bool pass = true;
+	int layer;
+	GLuint tex;
+
+	printf("Testing %ix%ix%i\n", width, height, layers);
+
+	glClearColor(0.2, 0.1, 0.1, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	tex = create_array_fbo();
+
+	for (layer = 0; layer < layers; layer++) {
+		int x,y;
+
+		if (piglit_use_fbo && !test_single_size) {
+			x = 0;
+			y = 0;
+		}
+		else {
+			x = 1 + (layer % 3) * (width + 1);
+			y = 1 + (layer / 3) * (height + 1);
+		}
+		draw_layer(x, y, layer);
+
+		pass &= test_layer_drawing(x, y,
+					   test_stencil ?
+					   get_stencil_value_float(layer) :
+					   get_depth_value(layer));
+
+		if (piglit_use_fbo && !test_single_size && layer < layers-1) {
+			glClearColor(0.2, 0.1, 0.1, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+	}
+
+	glDeleteTextures(1, &tex);
+	assert(glGetError() == 0);
+	return pass;
 }
 
 enum piglit_result
 piglit_display(void)
 {
-	GLboolean pass = GL_TRUE;
-	int layer;
-	GLuint tex;
+	bool pass = true;
+	int i,j;
 
-	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	if (piglit_use_fbo && !test_single_size) {
+		static int dims[] = {1, 4, 16, 64, 256, 1024, 4096, MAX_DIM};
 
-	tex = create_array_fbo();
+		for (i = 0; i < ARRAY_SIZE(dims); i++) {
+			for (j = 0; j < ARRAY_SIZE(dims); j++) {
+				width = dims[i];
+				height = dims[j];
 
-	for (layer = 0; layer < NUM_LAYERS; layer++) {
-		int x = 1 + layer * (BUF_WIDTH + 1);
-		int y = 1;
-		draw_layer(x, y, layer);
+				/* Don't allocate too much texture memory. */
+				if (width*height > MAX_MEM) {
+					if (width > height && height/2 > dims[j-1])
+						height /= 2;
+					else if (height > width && width/2 > dims[i-1])
+						width /= 2;
+
+					if (width*height > MAX_MEM)
+						continue;
+				}
+
+				pass = test_once() && pass;
+			}
+		}
 	}
-
-	for (layer = 0; layer < NUM_LAYERS; layer++) {
-		int x = 1 + layer * (BUF_WIDTH + 1);
-		int y = 1;
-		pass &= test_layer_drawing(x, y, layer_depth[layer]);
+	else {
+		pass = test_once() && pass;
 	}
-
-	glDeleteTextures(1, &tex);
 
 	piglit_present_results();
 
@@ -240,24 +477,34 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
-	piglit_require_extension("GL_EXT_framebuffer_object");
-	piglit_require_extension("GL_EXT_texture_array");
+	if (piglit_get_gl_version() < 33) {
+		piglit_report_result(PIGLIT_SKIP);
+	}
 
-	/* Make shader programs */
-	frag_shader_2d_array =
-		piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-					   frag_shader_2d_array_text);
-	check_error(__LINE__);
+	if (test_stencil) {
+		piglit_require_extension("GL_ARB_stencil_texturing");
+		if (test == FS_WRITES_VALUE)
+			piglit_require_extension("GL_ARB_shader_stencil_export");
+	}
 
-	frag_shader_depth_output =
-		piglit_compile_shader_text(GL_FRAGMENT_SHADER,
-					   frag_shader_depth_output_text);
-	check_error(__LINE__);
+	if (test_stencil) {
+		program_texstencil = piglit_build_simple_program(vs_text,
+						fs_texstencil_text);
 
-	program_2d_array = piglit_link_simple_program(0, frag_shader_2d_array);
-	check_error(__LINE__);
+		if (test == FS_WRITES_VALUE)
+			program_stencil_output = piglit_build_simple_program(vs_text,
+							fs_stencil_output_text);
+	}
+	else {
+		program_texdepth = piglit_build_simple_program(vs_text,
+						fs_texdepth_text);
 
-	program_depth_output = piglit_link_simple_program(0,
-						  frag_shader_depth_output);
-	check_error(__LINE__);
+		if (test == FS_WRITES_VALUE)
+			program_depth_output = piglit_build_simple_program(vs_text,
+							fs_depth_output_text);
+	}
+
+	program_fs_empty = piglit_build_simple_program(vs_text,
+					frag_shader_empty_text);
+	assert(glGetError() == 0);
 }
