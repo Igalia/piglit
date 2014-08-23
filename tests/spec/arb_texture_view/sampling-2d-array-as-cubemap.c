@@ -52,7 +52,7 @@ piglit_display(void)
 
 	piglit_draw_rect(-1, -1, 2, 2);
 
-	pass = piglit_probe_rect_rgba(-1, -1, 2, 2, green);
+	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 
 	piglit_present_results();
 
