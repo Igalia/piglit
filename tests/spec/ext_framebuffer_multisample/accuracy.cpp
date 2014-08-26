@@ -56,12 +56,20 @@ PIGLIT_GL_TEST_CONFIG_END
 
 const int pattern_width = 256; const int pattern_height = 256;
 const int supersample_factor = 16;
+int num_samples, max_samples;
+bool small = false, combine_depth_stencil = false;
+bool all_samples = false;
+GLenum filter_mode = GL_NEAREST;
+test_type_enum test_type;
 Test *test = NULL;
 
 NORETURN void
 print_usage_and_exit(char *prog_name)
 {
-	printf("Usage: %s <num_samples> <test_type> [options]\n"
+	printf("Usage: %s <sample_arg> <test_type> [options]\n"
+	       "  where <sample_arg> is one of:\n"
+	       "    <num_samples>: test supplied sample count\n"
+	       "    all_samples: test all power of 2 samples\n"
 	       "  where <test_type> is one of:\n"
 	       "    color: test downsampling of color buffer\n"
 	       "    srgb: test downsampling of srgb color buffer\n"
@@ -80,19 +88,19 @@ print_usage_and_exit(char *prog_name)
 void
 piglit_init(int argc, char **argv)
 {
-	GLint max_samples;
-	int i, num_samples;
-	bool small = false;
-	bool combine_depth_stencil = false;
-	GLenum filter_mode = GL_NEAREST;
+	int i;
 
 	if (argc < 3)
 		print_usage_and_exit(argv[0]);
 	{
 		char *endptr = NULL;
-		num_samples = strtol(argv[1], &endptr, 0);
-		if (endptr != argv[1] + strlen(argv[1]))
-			print_usage_and_exit(argv[0]);
+		if (streq(argv[1], "all_samples"))
+			all_samples = true;
+		else {
+			num_samples = strtol(argv[1], &endptr, 0);
+			if (endptr != argv[1] + strlen(argv[1]))
+				print_usage_and_exit(argv[0]);
+		}
 	}
 
 	for (i = 3; i < argc; ++i) {
@@ -116,7 +124,6 @@ piglit_init(int argc, char **argv)
 	if (num_samples > max_samples)
 		piglit_report_result(PIGLIT_SKIP);
 
-	test_type_enum test_type;
 	if (strcmp(argv[2], "color") == 0) {
 		test_type = TEST_TYPE_COLOR;
 	} else if (strcmp(argv[2], "srgb") == 0) {
@@ -132,18 +139,40 @@ piglit_init(int argc, char **argv)
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
+}
+
+bool
+test_create_and_execute()
+{
 	test = create_test(test_type, num_samples, small,
 			   combine_depth_stencil,
 			   pattern_width, pattern_height, supersample_factor,
 			   filter_mode);
+	return test->run();
 }
 
 enum piglit_result
 piglit_display()
 {
-	enum piglit_result result = test->run() ? PIGLIT_PASS : PIGLIT_FAIL;
+	bool pass = true, result = pass;
 
-	piglit_present_results();
+	if (!all_samples) {
+		pass = test_create_and_execute() && pass;
+		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
+		piglit_present_results();
+		return pass ? PIGLIT_PASS : PIGLIT_FAIL;
+	}
 
-	return result;
+	for (num_samples = 0; num_samples <= max_samples; ) {
+		result = test_create_and_execute();
+		result = piglit_check_gl_error(GL_NO_ERROR) && result;
+		printf("Samples = %d, Result = %s\n\n",
+		       num_samples, result ? "pass" : "fail");
+		pass = result && pass;
+		/* Test only power of 2 samples */
+		num_samples = num_samples ? num_samples << 1: num_samples + 2;
+		piglit_present_results();
+	}
+
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

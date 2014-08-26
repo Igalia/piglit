@@ -2551,7 +2551,7 @@ for num_samples in MSAA_SAMPLE_COUNTS:
     ext_framebuffer_multisample[test_name] = PiglitGLTest(
         'ext_framebuffer_multisample-' + test_name, run_concurrent=True)
 
-for num_samples in MSAA_SAMPLE_COUNTS:
+for num_samples in ('all_samples', ) + MSAA_SAMPLE_COUNTS:
     for test_type in ('color', 'srgb', 'stencil_draw', 'stencil_resolve',
                       'depth_draw', 'depth_resolve'):
         sensible_options = ['small', 'depthstencil']
