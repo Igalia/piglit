@@ -1718,12 +1718,14 @@ struct string_to_enum hint_target_table[] = {
 	ENUM_STRING(GL_POLYGON_SMOOTH_HINT),
 	ENUM_STRING(GL_TEXTURE_COMPRESSION_HINT),
 	ENUM_STRING(GL_FRAGMENT_SHADER_DERIVATIVE_HINT),
+	{ NULL, 0 }
 };
 
 struct string_to_enum hint_param_table[] = {
 	ENUM_STRING(GL_FASTEST),
 	ENUM_STRING(GL_NICEST),
 	ENUM_STRING(GL_DONT_CARE),
+	{ NULL, 0 }
 };
 
 void do_hint(const char *line)
@@ -1838,6 +1840,7 @@ handle_texparameter(const char *line)
 		{ "green", GL_GREEN },
 		{ "blue", GL_BLUE },
 		{ "alpha", GL_ALPHA },
+		{ NULL, 0 }
 	};
 	GLenum target = 0;
 	GLenum parameter = GL_NONE;
