@@ -1687,7 +1687,7 @@ set_patch_parameter(const char *line)
 #endif
 }
 
-struct string_to_enum enable_table[] = {
+static const struct string_to_enum enable_table[] = {
 	{ "GL_CLIP_PLANE0", GL_CLIP_PLANE0 },
 	{ "GL_CLIP_PLANE1", GL_CLIP_PLANE1 },
 	{ "GL_CLIP_PLANE2", GL_CLIP_PLANE2 },
@@ -1713,7 +1713,7 @@ do_enable_disable(const char *line, bool enable_flag)
 }
 
 #define ENUM_STRING(e) { #e, e }
-struct string_to_enum hint_target_table[] = {
+static const struct string_to_enum hint_target_table[] = {
 	ENUM_STRING(GL_LINE_SMOOTH_HINT),
 	ENUM_STRING(GL_POLYGON_SMOOTH_HINT),
 	ENUM_STRING(GL_TEXTURE_COMPRESSION_HINT),
@@ -1721,7 +1721,7 @@ struct string_to_enum hint_target_table[] = {
 	{ NULL, 0 }
 };
 
-struct string_to_enum hint_param_table[] = {
+static const struct string_to_enum hint_param_table[] = {
 	ENUM_STRING(GL_FASTEST),
 	ENUM_STRING(GL_NICEST),
 	ENUM_STRING(GL_DONT_CARE),
@@ -1791,7 +1791,7 @@ decode_drawing_mode(const char *mode_str)
 static void
 handle_texparameter(const char *line)
 {
-	const struct string_to_enum texture_target[] = {
+	static const struct string_to_enum texture_target[] = {
 		{ "1D",        GL_TEXTURE_1D             },
 		{ "2D",        GL_TEXTURE_2D             },
 		{ "3D",        GL_TEXTURE_3D             },
@@ -1803,7 +1803,7 @@ handle_texparameter(const char *line)
 		{ NULL, 0 }
 	};
 
-	const struct string_to_enum compare_funcs[] = {
+	static const struct string_to_enum compare_funcs[] = {
 		{ "greater", GL_GREATER },
 		{ "gequal", GL_GEQUAL },
 		{ "less", GL_LESS },
@@ -1814,14 +1814,14 @@ handle_texparameter(const char *line)
 		{ "always", GL_ALWAYS },
 		{ NULL, 0 },
 	};
-	const struct string_to_enum depth_modes[] = {
+	static const struct string_to_enum depth_modes[] = {
 		{ "intensity", GL_INTENSITY },
 		{ "luminance", GL_LUMINANCE },
 		{ "alpha", GL_ALPHA },
 		{ "red", GL_RED }, /* Requires GL 3.0 or GL_ARB_texture_rg */
 		{ NULL, 0 },
 	};
-	const struct string_to_enum min_filter_modes[] = {
+	static const struct string_to_enum min_filter_modes[] = {
 		{ "nearest_mipmap_nearest", GL_NEAREST_MIPMAP_NEAREST },
 		{ "linear_mipmap_nearest",  GL_LINEAR_MIPMAP_NEAREST  },
 		{ "nearest_mipmap_linear",  GL_NEAREST_MIPMAP_LINEAR  },
@@ -1830,12 +1830,12 @@ handle_texparameter(const char *line)
 		{ "linear",                 GL_LINEAR                 },
 		{ NULL, 0 }
 	};
-	const struct string_to_enum mag_filter_modes[] = {
+	static const struct string_to_enum mag_filter_modes[] = {
 		{ "nearest",                GL_NEAREST                },
 		{ "linear",                 GL_LINEAR                 },
 		{ NULL, 0 }
 	};
-	const struct string_to_enum swizzle_modes[] = {
+	static const struct string_to_enum swizzle_modes[] = {
 		{ "red", GL_RED },
 		{ "green", GL_GREEN },
 		{ "blue", GL_BLUE },
