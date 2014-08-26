@@ -806,8 +806,8 @@ ManifestStencil::compile()
 	float vertex_data[4][2] = {
 		{ -1, -1 },
 		{ -1,  1 },
-		{  1,  1 },
-		{  1, -1 }
+		{  1, -1 },
+		{  1,  1 }
 	};
 	glGenVertexArrays(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
@@ -816,16 +816,6 @@ ManifestStencil::compile()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
 			      (void *) 0);
-
-	/* Set up element input buffer to tessellate a quad into
-	 * triangles
-	 */
-	unsigned int indices[6] = { 0, 1, 2, 0, 2, 3 };
-	GLuint element_buf;
-	glGenBuffers(1, &element_buf);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buf);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-		     GL_STATIC_DRAW);
 }
 
 void
@@ -856,7 +846,7 @@ ManifestStencil::run()
 	for (int i = 0; i < 8; ++i) {
 		glStencilFunc(GL_EQUAL, i, 0xff);
 		glUniform4fv(color_loc, 1, colors[i]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 	}
 
 	glDisable(GL_STENCIL_TEST);
@@ -907,8 +897,8 @@ ManifestDepth::compile()
 	float vertex_data[4][2] = {
 		{ -1, -1 },
 		{ -1,  1 },
-		{  1,  1 },
-		{  1, -1 }
+		{  1, -1 },
+		{  1,  1 }
 	};
 	glGenVertexArrays(1, &vertex_buf);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
@@ -917,16 +907,6 @@ ManifestDepth::compile()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex_data[0]),
 			      (void *) 0);
-
-	/* Set up element input buffer to tessellate a quad into
-	 * triangles
-	 */
-	unsigned int indices[6] = { 0, 1, 2, 0, 2, 3 };
-	GLuint element_buf;
-	glGenBuffers(1, &element_buf);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buf);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-		     GL_STATIC_DRAW);
 }
 
 void
@@ -960,7 +940,7 @@ ManifestDepth::run()
 	for (int i = 0; i < 8; ++i) {
 		glUniform4fv(color_loc, 1, colors[i]);
 		glUniform1f(depth_loc, float(7 - 2*i)/8);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void *) 0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 	}
 
 	glDisable(GL_STENCIL_TEST);
