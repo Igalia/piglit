@@ -80,6 +80,8 @@ struct component_version {
 	char _string[100];
 };
 
+#define ENUM_STRING(e) { #e, e }
+
 struct string_to_enum {
 	const char *name;
 	GLenum token;
@@ -1614,6 +1616,219 @@ set_uniform(const char *line, int ubo_array_index)
 	return;
 }
 
+/**
+ * Query a uniform using glGetActiveUniformsiv
+ *
+ * Format of the command:
+ *
+ *     active uniform uniform_name GL_PNAME_ENUM integer
+ *
+ * or
+ *
+ *     active uniform uniform_name GL_PNAME_ENUM GL_TYPE_ENUM
+ */
+void
+active_uniform(const char *line)
+{
+	static const struct string_to_enum all_pnames[] = {
+		ENUM_STRING(GL_UNIFORM_TYPE),
+		ENUM_STRING(GL_UNIFORM_SIZE),
+		ENUM_STRING(GL_UNIFORM_NAME_LENGTH),
+		ENUM_STRING(GL_UNIFORM_BLOCK_INDEX),
+		ENUM_STRING(GL_UNIFORM_OFFSET),
+		ENUM_STRING(GL_UNIFORM_ARRAY_STRIDE),
+		ENUM_STRING(GL_UNIFORM_MATRIX_STRIDE),
+		ENUM_STRING(GL_UNIFORM_IS_ROW_MAJOR),
+		ENUM_STRING(GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX),
+		{ NULL, 0 }
+	};
+
+	static const struct string_to_enum all_types[] = {
+		ENUM_STRING(GL_FLOAT),
+		ENUM_STRING(GL_FLOAT_VEC2),
+		ENUM_STRING(GL_FLOAT_VEC3),
+		ENUM_STRING(GL_FLOAT_VEC4),
+		ENUM_STRING(GL_DOUBLE),
+		ENUM_STRING(GL_DOUBLE_VEC2),
+		ENUM_STRING(GL_DOUBLE_VEC3),
+		ENUM_STRING(GL_DOUBLE_VEC4),
+		ENUM_STRING(GL_INT),
+		ENUM_STRING(GL_INT_VEC2),
+		ENUM_STRING(GL_INT_VEC3),
+		ENUM_STRING(GL_INT_VEC4),
+		ENUM_STRING(GL_UNSIGNED_INT),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC2),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC3),
+		ENUM_STRING(GL_UNSIGNED_INT_VEC4),
+		ENUM_STRING(GL_BOOL),
+		ENUM_STRING(GL_BOOL_VEC2),
+		ENUM_STRING(GL_BOOL_VEC3),
+		ENUM_STRING(GL_BOOL_VEC4),
+		ENUM_STRING(GL_FLOAT_MAT2),
+		ENUM_STRING(GL_FLOAT_MAT3),
+		ENUM_STRING(GL_FLOAT_MAT4),
+		ENUM_STRING(GL_FLOAT_MAT2x3),
+		ENUM_STRING(GL_FLOAT_MAT2x4),
+		ENUM_STRING(GL_FLOAT_MAT3x2),
+		ENUM_STRING(GL_FLOAT_MAT3x4),
+		ENUM_STRING(GL_FLOAT_MAT4x2),
+		ENUM_STRING(GL_FLOAT_MAT4x3),
+		ENUM_STRING(GL_DOUBLE_MAT2),
+		ENUM_STRING(GL_DOUBLE_MAT3),
+		ENUM_STRING(GL_DOUBLE_MAT4),
+		ENUM_STRING(GL_DOUBLE_MAT2x3),
+		ENUM_STRING(GL_DOUBLE_MAT2x4),
+		ENUM_STRING(GL_DOUBLE_MAT3x2),
+		ENUM_STRING(GL_DOUBLE_MAT3x4),
+		ENUM_STRING(GL_DOUBLE_MAT4x2),
+		ENUM_STRING(GL_DOUBLE_MAT4x3),
+		ENUM_STRING(GL_SAMPLER_1D),
+		ENUM_STRING(GL_SAMPLER_2D),
+		ENUM_STRING(GL_SAMPLER_3D),
+		ENUM_STRING(GL_SAMPLER_CUBE),
+		ENUM_STRING(GL_SAMPLER_1D_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_SHADOW),
+		ENUM_STRING(GL_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_SAMPLER_1D_ARRAY_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_ARRAY_SHADOW),
+		ENUM_STRING(GL_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_SAMPLER_CUBE_SHADOW),
+		ENUM_STRING(GL_SAMPLER_BUFFER),
+		ENUM_STRING(GL_SAMPLER_2D_RECT),
+		ENUM_STRING(GL_SAMPLER_2D_RECT_SHADOW),
+		ENUM_STRING(GL_INT_SAMPLER_1D),
+		ENUM_STRING(GL_INT_SAMPLER_2D),
+		ENUM_STRING(GL_INT_SAMPLER_3D),
+		ENUM_STRING(GL_INT_SAMPLER_CUBE),
+		ENUM_STRING(GL_INT_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_INT_SAMPLER_BUFFER),
+		ENUM_STRING(GL_INT_SAMPLER_2D_RECT),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_1D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_3D),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_CUBE),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_1D_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_BUFFER),
+		ENUM_STRING(GL_UNSIGNED_INT_SAMPLER_2D_RECT),
+		{ NULL, 0 }
+	};
+
+	char name[512];
+	char name_buf[512];
+	char pname_string[512];
+	GLenum pname;
+	GLint expected;
+	int i;
+	int num_active_uniforms;
+
+	line = strcpy_to_space(name, eat_whitespace(line));
+
+	strcpy_to_space(pname_string, eat_whitespace(line));
+	pname = lookup_enum_string(all_pnames, &line, "glGetUniformsiv pname");
+
+	line = eat_whitespace(line);
+	if (isdigit(line[0])) {
+		expected = strtol(line, NULL, 0);
+	} else {
+		expected = lookup_enum_string(all_types, &line, "type enum");
+	}
+
+	glGetProgramiv(prog, GL_ACTIVE_UNIFORMS, &num_active_uniforms);
+	for (i = 0; i < num_active_uniforms; i++) {
+		GLint got;
+		GLint size;
+		GLenum type;
+		GLsizei name_len;
+		bool pass = true;
+
+		glGetActiveUniform(prog, i, sizeof(name_buf), &name_len,
+				   &size, &type, name_buf);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetActiveUniform error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (strcmp(name, name_buf) != 0)
+			continue;
+
+		/* If the requested pname is one of the values that
+		 * glGetActiveUniform happens to return, check the value
+		 * returned by that function too.
+		 */
+		switch (pname) {
+		case GL_UNIFORM_TYPE:
+			got = (GLint) type;
+			break;
+
+		case GL_UNIFORM_SIZE:
+			got = size;
+			break;
+
+		case GL_UNIFORM_NAME_LENGTH:
+			got = name_len;
+			break;
+
+		default:
+			/* This ensures the check below will pass when the
+			 * requested enum is not one of the values already
+			 * returned by glGetActiveUniform.
+			 */
+			got = expected;
+			break;
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetActiveUniform(%s, %s): "
+				"expected %d (0x%04x), got %d (0x%04x)\n",
+				name, pname_string,
+				expected, expected, got, got);
+			pass = false;
+		}
+
+		/* Set 'got' to some value in case glGetActiveUniformsiv
+		 * doesn't write to it.  That should only be able to occur
+		 * when the function raises a GL error, but "should" is kind
+		 * of a funny word.
+		 */
+		got = ~expected;
+		glGetActiveUniformsiv(prog, 1, (GLuint *) &i, pname, &got);
+
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "glGetActiveUniformsiv error\n");
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (got != expected) {
+			fprintf(stderr,
+				"glGetActiveUniformsiv(%s, %s): "
+				"expected %d, got %d\n",
+				name, pname_string,
+				expected, got);
+			pass = false;
+		}
+
+		if (!pass)
+			piglit_report_result(PIGLIT_FAIL);
+
+		return;
+	}
+
+
+	fprintf(stderr, "No active uniform named \"%s\"\n", name);
+	piglit_report_result(PIGLIT_FAIL);
+	return;
+}
+
 void
 set_parameter(const char *line)
 {
@@ -1712,7 +1927,6 @@ do_enable_disable(const char *line, bool enable_flag)
 		glDisable(value);
 }
 
-#define ENUM_STRING(e) { #e, e }
 static const struct string_to_enum hint_target_table[] = {
 	ENUM_STRING(GL_LINE_SMOOTH_HINT),
 	ENUM_STRING(GL_POLYGON_SMOOTH_HINT),
@@ -2375,6 +2589,8 @@ piglit_display(void)
 			program_must_be_in_use();
 		} else if (string_match("ubo array index ", line)) {
 			get_ints(line + strlen("ubo array index "), &ubo_array_index, 1);
+		} else if (string_match("active uniform ", line)) {
+			active_uniform(line + strlen("active uniform "));
 		} else if ((line[0] != '\n') && (line[0] != '\0')
 			   && (line[0] != '#')) {
 			printf("unknown command \"%s\"\n", line);
