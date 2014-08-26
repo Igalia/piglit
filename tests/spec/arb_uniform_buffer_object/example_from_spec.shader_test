@@ -1,0 +1,218 @@
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader]
+#extension GL_ARB_uniform_buffer_object : require
+
+struct f_struct {
+	int d;
+	bvec2 e;
+};
+
+struct o_struct {
+	uvec3 j;
+	vec2 k;
+	float l[2];
+	vec2 m;
+	mat3 n[2];
+};
+
+layout(std140) uniform Example { 
+		      // Base types below consume 4 basic machine units
+		      //
+		      //       base   base  align
+		      // rule  align  off.  off.  bytes used
+		      // ----  ------ ----  ----  -----------------------
+	float a;      //  1       4     0    0    0..3
+	vec2 b;       //  2       8     4    8    8..15
+	vec3 c;       //  3      16    16   16    16..27
+	f_struct      //  9      16    28   32    (align begin)
+//	int d;        //  1       4    32   32    32..35
+//	bvec2 e;      //  2       8    36   40    40..47
+	f;            //  9      16    48   48    (pad end)
+	float g;      //  1       4    48   48    48..51
+	float h[2];   //  4      16    52   64    64..67 (h[0])
+		      //                          80    80..83 (h[1])
+		      //  4      16    84   96    (pad end of h)
+	mat2x3 i;     // 5/4     16    96   96    96..107 (i, column 0)
+		      //                          112    112..123 (i, column 1)
+		      // 5/4     16   124  128    (pad end of i)
+	o_struct      //  10     16   128  128    (align begin)
+//	uvec3 j;      //  3      16   128  128    128..139 (o[0].j)
+//	vec2 k;       //  2       8   140  144    144..151 (o[0].k)
+//	float l[2];   //  4      16   152  160    160..163 (o[0].l[0])
+		      //                   176    176..179 (o[0].l[1])
+		      //  4      16   180  192    (pad end of o[0].l)
+//	vec2 m;       //  2       8   192  192    192..199 (o[0].m)
+//	mat3 n[2];    // 6/4     16   200  208    208..219 (o[0].n[0], column 0)
+		      //                   224    224..235 (o[0].n[0], column 1)
+		      //                   240    240..251 (o[0].n[0], column 2)
+		      //                   256    256..267 (o[0].n[1], column 0)
+		      //                   272    272..283 (o[0].n[1], column 1)
+		      //                   288    288..299 (o[0].n[1], column 2)
+		      // 6/4     16   300  304    (pad end of o[0].n)
+		      //  9      16   304  304    (pad end of o[0])
+		      //  3      16   304  304    304..315 (o[1].j)
+		      //  2       8   316  320    320..327 (o[1].k)
+		      //  4      16   328  336    336..347 (o[1].l[0])
+		      //                   352    352..355 (o[1].l[1])
+		      //  4      16   356  368    (pad end of o[1].l)
+		      //  2       8   368  368    368..375 (o[1].m)
+		      // 6/4     16   376  384    384..395 (o[1].n[0], column 0)
+		      //                   400    400..411 (o[1].n[0], column 1)
+		      //                   416    416..427 (o[1].n[0], column 2)
+		      //                   432    432..443 (o[1].n[1], column 0)
+		      //                   448    448..459 (o[1].n[1], column 1)
+		      //                   464    464..475 (o[1].n[1], column 2)
+		      // 6/4     16   476  480    (pad end of o[1].n)
+		      //  9      16   480  480    (pad end of o[1])
+	o[2];
+};
+
+void main()
+{
+	/* std140 (or shared) layout prevents any fields or blocks from being
+	 * eliminted.  Section 2.11.6 of the OpenGL ES 3.0 spec makes this
+	 * explicit, but desktop GL specs only say it implicitly.  Either way,
+	 * there is no need to reference any field of the std140 block.
+	 */
+	gl_Position = vec4(0);
+}
+
+[fragment shader]
+out vec4 piglit_fragcolor;
+
+void main()
+{
+	piglit_fragcolor = vec4(0);
+}
+
+[test]
+link success
+
+active uniform a GL_UNIFORM_TYPE GL_FLOAT
+active uniform a GL_UNIFORM_SIZE 1
+active uniform a GL_UNIFORM_OFFSET 0
+active uniform a GL_UNIFORM_ARRAY_STRIDE 0
+active uniform a GL_UNIFORM_MATRIX_STRIDE 0
+active uniform a GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform b GL_UNIFORM_TYPE GL_FLOAT_VEC2
+active uniform b GL_UNIFORM_SIZE 1
+active uniform b GL_UNIFORM_OFFSET 8
+active uniform b GL_UNIFORM_ARRAY_STRIDE 0
+active uniform b GL_UNIFORM_MATRIX_STRIDE 0
+active uniform b GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform c GL_UNIFORM_TYPE GL_FLOAT_VEC3
+active uniform c GL_UNIFORM_SIZE 1
+active uniform c GL_UNIFORM_OFFSET 16
+active uniform c GL_UNIFORM_ARRAY_STRIDE 0
+active uniform c GL_UNIFORM_MATRIX_STRIDE 0
+active uniform c GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform f.d GL_UNIFORM_TYPE GL_INT
+active uniform f.d GL_UNIFORM_SIZE 1
+active uniform f.d GL_UNIFORM_OFFSET 32
+active uniform f.d GL_UNIFORM_ARRAY_STRIDE 0
+active uniform f.d GL_UNIFORM_MATRIX_STRIDE 0
+active uniform f.d GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform f.e GL_UNIFORM_TYPE GL_BOOL_VEC2
+active uniform f.e GL_UNIFORM_SIZE 1
+active uniform f.e GL_UNIFORM_OFFSET 40
+active uniform f.e GL_UNIFORM_ARRAY_STRIDE 0
+active uniform f.e GL_UNIFORM_MATRIX_STRIDE 0
+active uniform f.e GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform g GL_UNIFORM_TYPE GL_FLOAT
+active uniform g GL_UNIFORM_SIZE 1
+active uniform g GL_UNIFORM_OFFSET 48
+active uniform g GL_UNIFORM_ARRAY_STRIDE 0
+active uniform g GL_UNIFORM_MATRIX_STRIDE 0
+active uniform g GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform h[0] GL_UNIFORM_TYPE GL_FLOAT
+active uniform h[0] GL_UNIFORM_SIZE 2
+active uniform h[0] GL_UNIFORM_OFFSET 64
+active uniform h[0] GL_UNIFORM_ARRAY_STRIDE 16
+active uniform h[0] GL_UNIFORM_MATRIX_STRIDE 0
+active uniform h[0] GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform i GL_UNIFORM_TYPE GL_FLOAT_MAT2x3
+active uniform i GL_UNIFORM_SIZE 1
+active uniform i GL_UNIFORM_OFFSET 96
+active uniform i GL_UNIFORM_ARRAY_STRIDE 0
+active uniform i GL_UNIFORM_MATRIX_STRIDE 16
+active uniform i GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[0].j GL_UNIFORM_TYPE GL_UNSIGNED_INT_VEC3
+active uniform o[0].j GL_UNIFORM_SIZE 1
+active uniform o[0].j GL_UNIFORM_OFFSET 128
+active uniform o[0].j GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[0].j GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[0].j GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[0].k GL_UNIFORM_TYPE GL_FLOAT_VEC2
+active uniform o[0].k GL_UNIFORM_SIZE 1
+active uniform o[0].k GL_UNIFORM_OFFSET 144
+active uniform o[0].k GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[0].k GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[0].k GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[0].l[0] GL_UNIFORM_TYPE GL_FLOAT
+active uniform o[0].l[0] GL_UNIFORM_SIZE 2
+active uniform o[0].l[0] GL_UNIFORM_OFFSET 160
+active uniform o[0].l[0] GL_UNIFORM_ARRAY_STRIDE 16
+active uniform o[0].l[0] GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[0].l[0] GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[0].m GL_UNIFORM_TYPE GL_FLOAT_VEC2
+active uniform o[0].m GL_UNIFORM_SIZE 1
+active uniform o[0].m GL_UNIFORM_OFFSET 192
+active uniform o[0].m GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[0].m GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[0].m GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[0].n[0] GL_UNIFORM_TYPE GL_FLOAT_MAT3
+active uniform o[0].n[0] GL_UNIFORM_SIZE 2
+active uniform o[0].n[0] GL_UNIFORM_OFFSET 208
+active uniform o[0].n[0] GL_UNIFORM_ARRAY_STRIDE 48
+active uniform o[0].n[0] GL_UNIFORM_MATRIX_STRIDE 16
+active uniform o[0].n[0] GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[1].j GL_UNIFORM_TYPE GL_UNSIGNED_INT_VEC3
+active uniform o[1].j GL_UNIFORM_SIZE 1
+active uniform o[1].j GL_UNIFORM_OFFSET 304
+active uniform o[1].j GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[1].j GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[1].j GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[1].k GL_UNIFORM_TYPE GL_FLOAT_VEC2
+active uniform o[1].k GL_UNIFORM_SIZE 1
+active uniform o[1].k GL_UNIFORM_OFFSET 320
+active uniform o[1].k GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[1].k GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[1].k GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[1].l[0] GL_UNIFORM_TYPE GL_FLOAT
+active uniform o[1].l[0] GL_UNIFORM_SIZE 2
+active uniform o[1].l[0] GL_UNIFORM_OFFSET 336
+active uniform o[1].l[0] GL_UNIFORM_ARRAY_STRIDE 16
+active uniform o[1].l[0] GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[1].l[0] GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[1].m GL_UNIFORM_TYPE GL_FLOAT_VEC2
+active uniform o[1].m GL_UNIFORM_SIZE 1
+active uniform o[1].m GL_UNIFORM_OFFSET 368
+active uniform o[1].m GL_UNIFORM_ARRAY_STRIDE 0
+active uniform o[1].m GL_UNIFORM_MATRIX_STRIDE 0
+active uniform o[1].m GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform o[1].n[0] GL_UNIFORM_TYPE GL_FLOAT_MAT3
+active uniform o[1].n[0] GL_UNIFORM_SIZE 2
+active uniform o[1].n[0] GL_UNIFORM_OFFSET 384
+active uniform o[1].n[0] GL_UNIFORM_ARRAY_STRIDE 48
+active uniform o[1].n[0] GL_UNIFORM_MATRIX_STRIDE 16
+active uniform o[1].n[0] GL_UNIFORM_IS_ROW_MAJOR 0
