@@ -3239,7 +3239,6 @@ arb_uniform_buffer_object['getprogramiv'] = concurrent_test('arb_uniform_buffer_
 arb_uniform_buffer_object['getuniformblockindex'] = concurrent_test('arb_uniform_buffer_object-getuniformblockindex')
 arb_uniform_buffer_object['getuniformindices'] = concurrent_test('arb_uniform_buffer_object-getuniformindices')
 arb_uniform_buffer_object['getuniformlocation'] = concurrent_test('arb_uniform_buffer_object-getuniformlocation')
-arb_uniform_buffer_object['layout-std140'] = concurrent_test('arb_uniform_buffer_object-layout-std140')
 arb_uniform_buffer_object['layout-std140-base-size-and-alignment'] = concurrent_test('arb_uniform_buffer_object-layout-std140-base-size-and-alignment')
 arb_uniform_buffer_object['link-mismatch-blocks'] = concurrent_test('arb_uniform_buffer_object-link-mismatch-blocks')
 arb_uniform_buffer_object['maxblocks'] = concurrent_test('arb_uniform_buffer_object-maxblocks')
