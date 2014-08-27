@@ -376,9 +376,13 @@ class ShaderTest(object):
         test.
         """
 
-    @abc.abstractmethod
     def make_vertex_shader(self):
-        """Return the vertex shader for this test."""
+        """Return the vertex shader for this test (or None if this
+        test doesn't require a vertex shader).  No need to
+        reimplement this function in classes that don't use vertex
+        shaders.
+        """
+        return None
 
     def make_geometry_shader(self):
         """Return the geometry shader for this test (or None if this
@@ -396,9 +400,13 @@ class ShaderTest(object):
         """
         return None
 
-    @abc.abstractmethod
     def make_fragment_shader(self):
-        """Return the fragment shader for this test."""
+        """Return the fragment shader for this test (or None if this
+        test doesn't require a fragment shader).  No need to
+        reimplement this function in classes that don't use fragment
+        shaders.
+        """
+        return None
 
     def make_test_shader(self, additional_declarations, prefix_statements,
                          output_var, suffix_statements):
@@ -486,9 +494,11 @@ class ShaderTest(object):
             float(self.glsl_version()) / 100)
         shader_test += self.make_additional_requirements()
         shader_test += '\n'
-        shader_test += '[vertex shader]\n'
-        shader_test += self.make_vertex_shader()
-        shader_test += '\n'
+        vs = self.make_vertex_shader()
+        if vs:
+            shader_test += '[vertex shader]\n'
+            shader_test += vs
+            shader_test += '\n'
         gs = self.make_geometry_shader()
         if gs:
             shader_test += '[geometry shader]\n'
@@ -499,10 +509,13 @@ class ShaderTest(object):
             shader_test += '[geometry layout]\n'
             shader_test += gl
             shader_test += '\n'
-        shader_test += '[fragment shader]\n'
-        shader_test += self.make_fragment_shader()
-        shader_test += '\n'
-        shader_test += self.make_vbo_data()
+        fs = self.make_fragment_shader()
+        if fs:
+            shader_test += '[fragment shader]\n'
+            shader_test += fs
+            shader_test += '\n'
+        if vs:
+            shader_test += self.make_vbo_data()
         shader_test += '[test]\n'
         shader_test += self.make_test()
         filename = self.filename()
