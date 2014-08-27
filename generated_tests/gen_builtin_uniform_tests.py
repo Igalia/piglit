@@ -442,11 +442,16 @@ class ShaderTest(object):
         shader += '}\n'
         return shader
 
+    def make_test_init(self):
+        """Generate initialization for the test.
+        """
+        return ''
+
     def make_test(self):
         """Make the complete shader_runner test file, and return it as
         a string.
         """
-        test = ''
+        test = self.make_test_init()
         for test_num, test_vector in enumerate(self._test_vectors):
             for i in xrange(len(test_vector.arguments)):
                 test += 'uniform {0} arg{1} {2}\n'.format(
