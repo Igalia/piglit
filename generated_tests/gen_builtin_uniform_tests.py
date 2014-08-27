@@ -408,6 +408,13 @@ class ShaderTest(object):
         """
         return None
 
+    def make_compute_shader(self):
+        """Return the compute shader for this test (or None if this test
+        doesn't require a compute shader).  No need to reimplement
+        this function in classes that don't use compute shaders.
+        """
+        return None
+
     def make_test_shader(self, additional_declarations, prefix_statements,
                          output_var, suffix_statements):
         """Generate the shader code necessary to test the built-in.
@@ -518,6 +525,11 @@ class ShaderTest(object):
         if fs:
             shader_test += '[fragment shader]\n'
             shader_test += fs
+            shader_test += '\n'
+        cs = self.make_compute_shader()
+        if cs:
+            shader_test += '[compute shader]\n'
+            shader_test += cs
             shader_test += '\n'
         if vs:
             shader_test += self.make_vbo_data()
@@ -638,6 +650,37 @@ class FragmentShaderTest(ShaderTest):
         return self.make_test_shader('', '', 'gl_FragColor', '')
 
 
+class ComputeShaderTest(ShaderTest):
+    """Derived class for tests that exercise the built-in in a
+    compute shader.
+    """
+    def test_prefix(self):
+        return 'cs'
+
+    def glsl_version(self):
+        return max(430, ShaderTest.glsl_version(self))
+
+    def make_compute_shader(self):
+        additional_declarations = 'writeonly uniform image2D tex;\n'
+        additional_declarations += 'layout(local_size_x = 16, local_size_y = 16) in;\n'
+        return self.make_test_shader(
+            additional_declarations,
+            '  vec4 tmp_color;\n',
+            'tmp_color',
+            '  ivec2 coord = ivec2(gl_GlobalInvocationID.xy);\n'
+            '  imageStore(tex, coord, tmp_color);\n')
+
+    def make_test_init(self):
+        return '''uniform int tex 0
+texture rgbw 0 (16, 16)
+image texture 0
+fb tex 2d 0
+'''
+
+
+    def draw_command(self):
+        return 'compute 1 1 1\n'
+
 def all_tests():
     for use_if in [False, True]:
         for signature, test_vectors in sorted(test_suite.items()):
@@ -646,6 +689,7 @@ def all_tests():
             yield VertexShaderTest(signature, test_vectors, use_if)
             yield GeometryShaderTest(signature, test_vectors, use_if)
             yield FragmentShaderTest(signature, test_vectors, use_if)
+            yield ComputeShaderTest(signature, test_vectors, use_if)
 
 
 def main():
