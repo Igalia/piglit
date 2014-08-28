@@ -30,16 +30,14 @@ import framework.programs.run as run
 import framework.core as core
 
 
-class TestPlatform(utils.TestWithEnvClean):
-    """ Test piglitrun -p/--platform options """
-    _CONF = '[core]\nplatform=gbm'
-
-    def __unset_config(self):
+class _Helpers(utils.TestWithEnvClean):
+    """ Some helpers to be shared between tests """
+    def _unset_config(self):
         """ Ensure that no config files are being accidently loaded """
         self.add_teardown('HOME')
         self.add_teardown('XDG_CONFIG_HOME')
 
-    def __move_piglit_conf(self):
+    def _move_piglit_conf(self):
         """ Move piglit.conf from local and from piglit root
 
         They are moved and put back so they aren't accidentally loaded
@@ -54,19 +52,83 @@ class TestPlatform(utils.TestWithEnvClean):
             shutil.move(root, root + '.restore')
             self.defer(shutil.move, root + '.restore', root)
 
+    def setup(self):
+        # Set core.PIGLIT_CONFIG back to pristine between tests
+        core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
+
+
+class TestBackend(_Helpers):
+    """ Test piglit run -b/--backend option """
+    _CONF = '[core]\nbackend=junit'
+
+    def test_default(self):
+        """ run parser: backend final fallback path """
+        self._unset_config()
+        self._move_piglit_conf()
+
+        args = run._run_parser(['quick.py', 'foo'])
+        nt.assert_equal(args.backend, 'json')
+
+    def test_option_default(self):
+        """ Run parser: backend replaces default """
+        args = run._run_parser(['-b', 'json', 'quick.py', 'foo'])
+        nt.assert_equal(args.backend, 'json')
+
+    def test_option_conf(self):
+        """ Run parser: backend option replaces conf """
+        with utils.tempdir() as tdir:
+            os.environ['XDG_CONFIG_HOME'] = tdir
+            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+                f.write(self._CONF)
+
+            args = run._run_parser(['-b', 'json', 'quick.py', 'foo'])
+            nt.assert_equal(args.backend, 'json')
+
+    def test_conf_default(self):
+        """ Run parser platform: conf is used as a default when applicable """
+        self._unset_config()
+        self._move_piglit_conf()
+
+        with utils.tempdir() as tdir:
+            os.environ['XDG_CONFIG_HOME'] = tdir
+            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+                f.write(self._CONF)
+
+            args = run._run_parser(['quick.py', 'foo'])
+            nt.assert_equal(args.backend, 'junit')
+
+    @nt.raises(SystemExit)
+    def test_bad_value_in_conf(self):
+        """ run parser: an error is raised when the platform in conf is bad """
+        self._unset_config()
+        self._move_piglit_conf()
+
+        # This has sideffects, it shouldn't effect anything in this module, but
+        # it may cause later problems. But without this we get ugly error spew
+        # from this test.
+        sys.stderr = open(os.devnull, 'w')
+
+        with utils.tempdir() as tdir:
+            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+                f.write('[core]\nbackend=foobar')
+
+            run._run_parser(['-f', os.path.join(tdir, 'piglit.conf'),
+                             'quick.py', 'foo'])
+
+
+class TestPlatform(_Helpers):
+    """ Test piglitrun -p/--platform options """
+    _CONF = '[core]\nplatform=gbm'
+
     def __set_env(self):
         """ Set PIGLIT_PLATFORM """
         self.add_teardown('PIGLIT_PLATFORM')
         os.environ['PIGLIT_PLATFORM'] = 'glx'
 
-    def setup(self):
-        # Set core.PIGLIT_CONFIG back to pristine between tests
-        core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser()
-
     def test_default(self):
         """ run parser: platform final fallback path """
-        self.__unset_config()
-        self.__move_piglit_conf()
+        self._unset_config()
+        self._move_piglit_conf()
 
         args = run._run_parser(['quick.py', 'foo'])
         nt.assert_equal(args.platform, 'mixed_glx_egl')
@@ -103,8 +165,8 @@ class TestPlatform(utils.TestWithEnvClean):
 
     def test_conf_default(self):
         """ Run parser platform: conf is used as a default when applicable """
-        self.__unset_config()
-        self.__move_piglit_conf()
+        self._unset_config()
+        self._move_piglit_conf()
 
         with utils.tempdir() as tdir:
             os.environ['XDG_CONFIG_HOME'] = tdir
@@ -116,8 +178,8 @@ class TestPlatform(utils.TestWithEnvClean):
 
     def test_env_conf(self):
         """ Run parser: env overwrides a conf value """
-        self.__unset_config()
-        self.__move_piglit_conf()
+        self._unset_config()
+        self._move_piglit_conf()
         self.__set_env()
 
         with utils.tempdir() as tdir:
@@ -131,8 +193,8 @@ class TestPlatform(utils.TestWithEnvClean):
     @nt.raises(SystemExit)
     def test_bad_value_in_conf(self):
         """ run parser: an error is raised when the platform in conf is bad """
-        self.__unset_config()
-        self.__move_piglit_conf()
+        self._unset_config()
+        self._move_piglit_conf()
 
         # This has sideffects, it shouldn't effect anything in this module, but
         # it may cause later problems. But without this we get ugly error spew

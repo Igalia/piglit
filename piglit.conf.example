@@ -51,8 +51,13 @@ run_test=./%(test_name)s
 
 [core]
 ; Set the default platform to use.
-; Options can be found by running piglit -h and reading the section
+; Options can be found by running piglit run -h and reading the section
 ; for -p/--platform
 ;
 ; The default on Linux will be mixed_glx_egl
 ;platform=gbm
+
+; Set the default backend to use
+; Options can be found running piglit run -h and reading the section for
+; -b/--backend
+;backend=json

@@ -37,6 +37,7 @@ __all__ = ['run',
 
 
 _PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
+_BACKENDS = ['json', 'junit']
 
 
 def _default_platform():
@@ -68,6 +69,25 @@ def _default_platform():
             return plat
         except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
             return 'mixed_glx_egl'
+
+
+def _default_backend():
+    """ Logic to se the default backend to use
+
+    There are two options, either the one set via the -b/--backend option, or
+    the one in the config file. The default if that fails is to use json
+
+    """
+    try:
+        backend = core.PIGLIT_CONFIG.get('core', 'backend')
+        if backend not in _BACKENDS:
+            print('Backend is not valid\n',
+                  'valid backends are: {}'.format(' '.join(_BACKENDS)),
+                  file=sys.stderr)
+            sys.exit(1)
+        return backend
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+        return 'json'
 
 
 def _run_parser(input_):
@@ -109,7 +129,7 @@ def _run_parser(input_):
                         help="Exclude matching tests "
                              "(can be used more than once)")
     parser.add_argument('-b', '--backend',
-                        default='json',
+                        default=_default_backend(),
                         choices=framework.results.BACKENDS,
                         help='select a results backend to use')
     conc_parser = parser.add_mutually_exclusive_group()
