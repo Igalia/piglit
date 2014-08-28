@@ -362,10 +362,7 @@ class ShaderTest(object):
         return self._signature.version_introduced
 
     def draw_command(self):
-        if self.glsl_version() >= 140:
-            return 'draw arrays GL_TRIANGLE_FAN 0 4\n'
-        else:
-            return 'draw rect -1 -1 2 2\n'
+        return 'draw rect -1 -1 2 2\n'
 
     def make_additional_requirements(self):
         """Return a string that should be included in the test's
@@ -475,21 +472,6 @@ class ShaderTest(object):
                 test_num % 250, test_vector, self.draw_command())
         return test
 
-    def make_vbo_data(self):
-        # Starting with GLSL 1.40/GL 3.1, we need to use VBOs and
-        # vertex shader input bindings for our vertex data instead of
-        # the piglit drawing utilities and gl_Vertex.
-        if self.glsl_version() < 140:
-            return ""
-        vbo = '[vertex data]\n'
-        vbo += 'vertex/float/2\n'
-        vbo += '-1.0 -1.0\n'
-        vbo += ' 1.0 -1.0\n'
-        vbo += ' 1.0  1.0\n'
-        vbo += '-1.0  1.0\n'
-        vbo += '\n'
-        return vbo
-
     def filename(self):
         argtype_names = '-'.join(
             str(argtype) for argtype in self._signature.argtypes)
@@ -535,8 +517,6 @@ class ShaderTest(object):
             shader_test += '[compute shader]\n'
             shader_test += cs
             shader_test += '\n'
-        if vs:
-            shader_test += self.make_vbo_data()
         shader_test += '[test]\n'
         shader_test += 'clear color 0.0 0.0 1.0 0.0\n'
         shader_test += 'clear\n'
@@ -558,9 +538,9 @@ class VertexShaderTest(ShaderTest):
     def make_vertex_shader(self):
         if self.glsl_version() >= 140:
             return self.make_test_shader(
-                'in vec4 vertex;\n' +
+                'in vec4 piglit_vertex;\n' +
                 'out vec4 color;\n',
-                '  gl_Position = vertex;\n',
+                '  gl_Position = piglit_vertex;\n',
                 'color', '')
         else:
             return self.make_test_shader(
@@ -591,12 +571,12 @@ class GeometryShaderTest(ShaderTest):
 
     def make_vertex_shader(self):
         shader = ''
-        shader += "in vec4 vertex;\n"
+        shader += "in vec4 piglit_vertex;\n"
         shader += "out vec4 vertex_to_gs;\n"
 
         shader += "void main()\n"
         shader += "{\n"
-        shader += "     vertex_to_gs = vertex;\n"
+        shader += "     vertex_to_gs = piglit_vertex;\n"
         shader += "}\n"
 
         return shader
@@ -639,12 +619,12 @@ class FragmentShaderTest(ShaderTest):
     def make_vertex_shader(self):
         shader = ""
         if self.glsl_version() >= 140:
-            shader += "in vec4 vertex;\n"
+            shader += "in vec4 piglit_vertex;\n"
 
         shader += "void main()\n"
         shader += "{\n"
         if self.glsl_version() >= 140:
-            shader += "        gl_Position = vertex;\n"
+            shader += "        gl_Position = piglit_vertex;\n"
         else:
             shader += "        gl_Position = gl_Vertex;\n"
         shader += "}\n"
