@@ -129,10 +129,14 @@ class Comparator(object):
         """
 
     @abc.abstractmethod
-    def make_result_test(self, test_num, test_vector):
-        """Return the shader_runner test code that is needed to test a
+    def draw_test(self, test_vector, draw_command):
+        """Return the shader_runner test code that is needed to run a
         single test vector.
         """
+
+    @abc.abstractmethod
+    def result_vector(self, test_vector):
+        """Return the expected result color as a list of floats."""
 
     def testname_suffix(self):
         """Return a string to be used as a suffix on the test name to
@@ -170,12 +174,11 @@ class BoolComparator(Comparator):
         value += [0.0] * self.__padding
         return value
 
-    def make_result_test(self, test_num, test_vector, draw):
-        test = draw
-        test += 'probe rgba {0} 0 {1}\n'.format(
-            test_num,
-            shader_runner_format(self.convert_to_float(test_vector.result)))
-        return test
+    def draw_test(self, test_vector, draw_command):
+        return draw_command
+
+    def result_vector(self, test_vector):
+        return self.convert_to_float(test_vector.result)
 
 
 class BoolIfComparator(Comparator):
@@ -211,12 +214,11 @@ class BoolIfComparator(Comparator):
         else:
             return [0.0, 0.0, 1.0, 1.0]
 
-    def make_result_test(self, test_num, test_vector, draw):
-        test = draw
-        test += 'probe rgba {0} 0 {1}\n'.format(
-            test_num,
-            shader_runner_format(self.convert_to_float(test_vector.result)))
-        return test
+    def draw_test(self, test_vector, draw_command):
+        return draw_command
+
+    def result_vector(self, test_vector):
+        return self.convert_to_float(test_vector.result)
 
     def testname_suffix(self):
         return '-using-if'
@@ -247,13 +249,15 @@ class IntComparator(Comparator):
             red='vec4(1.0, 0.0, 0.0, 1.0)')
         return statements
 
-    def make_result_test(self, test_num, test_vector, draw):
+    def draw_test(self, test_vector, draw_command):
         test = 'uniform {0} expected {1}\n'.format(
             shader_runner_type(self.__signature.rettype),
             shader_runner_format(column_major_values(test_vector.result)))
-        test += draw
-        test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+        test += draw_command
         return test
+
+    def result_vector(self, test_vector):
+        return [0.0, 1.0, 0.0, 1.0]
 
 
 class FloatComparator(Comparator):
@@ -314,15 +318,17 @@ class FloatComparator(Comparator):
             red='vec4(1.0, 0.0, 0.0, 1.0)')
         return statements
 
-    def make_result_test(self, test_num, test_vector, draw):
+    def draw_test(self, test_vector, draw_command):
         test = 'uniform {0} expected {1}\n'.format(
             shader_runner_type(self.__signature.rettype),
             shader_runner_format(column_major_values(test_vector.result)))
         test += 'uniform float tolerance {0}\n'.format(
             shader_runner_format([test_vector.tolerance]))
-        test += draw
-        test += 'probe rgba {0} 0 0.0 1.0 0.0 1.0\n'.format(test_num)
+        test += draw_command
         return test
+
+    def result_vector(self, test_vector):
+        return [0.0, 1.0, 0.0, 1.0]
 
 
 class ShaderTest(object):
@@ -363,6 +369,15 @@ class ShaderTest(object):
 
     def draw_command(self):
         return 'draw rect -1 -1 2 2\n'
+
+    def probe_command(self, test_num, probe_vector):
+        # Note: shader_runner uses a 250x250 window so we must
+        # ensure that test_num <= 250.
+        return 'probe rgb {0} 0 {1} {2} {3} {4}\n'.format(test_num % 250,
+                                                          probe_vector[0],
+                                                          probe_vector[1],
+                                                          probe_vector[2],
+                                                          probe_vector[3])
 
     def make_additional_requirements(self):
         """Return a string that should be included in the test's
@@ -466,10 +481,10 @@ class ShaderTest(object):
                     shader_runner_type(self._signature.argtypes[i]),
                     i, shader_runner_format(
                         column_major_values(test_vector.arguments[i])))
-            # Note: shader_runner uses a 250x250 window so we must
-            # ensure that test_num <= 250.
-            test += self._comparator.make_result_test(
-                test_num % 250, test_vector, self.draw_command())
+            test += self._comparator.draw_test(test_vector,
+                                               self.draw_command())
+            test += self.probe_command(test_num,
+                                       self._comparator.result_vector(test_vector))
         return test
 
     def filename(self):
