@@ -1514,7 +1514,7 @@ add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-minmax')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-get-program-params')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-patch-vertices-range')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-invalid-primitive')
-add_concurrent_test(arb_tessellation_shader, 'built-in-constants tests/spec/arb_tessellation_shader/minimum-maximums.txt')
+arb_tessellation_shader['built-in-constants'] = concurrent_test('built-in-constants tests/spec/arb_tessellation_shader/minimum-maximums.txt')
 add_concurrent_test(arb_tessellation_shader, 'arb_tessellation_shader-minmax')
 import_glsl_parser_tests(arb_tessellation_shader,
                          os.path.join(testsDir, 'spec',
