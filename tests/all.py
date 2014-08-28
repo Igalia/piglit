@@ -2130,6 +2130,7 @@ add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-min
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-boundaries')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-array-elements')
 add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-inactive-uniform')
+add_plain_test(arb_explicit_uniform_location, 'arb_explicit_uniform_location-use-of-unused-loc')
 
 arb_texture_buffer_object = {}
 spec['ARB_texture_buffer_object'] = arb_texture_buffer_object
