@@ -37,6 +37,7 @@ def add_single_param_test_set(group, name, *params):
         group[name + '-' + param] = plain_test(name + ' ' + param)
 
 def add_plain_test(group, args):
+    assert '/' not in args, args
     group[args] = plain_test(args)
 
 def concurrent_test(args):
@@ -45,6 +46,7 @@ def concurrent_test(args):
     return test
 
 def add_concurrent_test(group, args):
+    assert '/' not in args, args
     group[args] = concurrent_test(args)
 
 # Generate all possible subsets of the given set, including the empty set.
