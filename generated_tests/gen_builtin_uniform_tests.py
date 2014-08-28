@@ -353,6 +353,20 @@ class ShaderTest(object):
         """
         self._signature = signature
         self._test_vectors = test_vectors
+
+        # Size of the rectangles drawn by the test.
+        self.rect_width = 4
+        self.rect_height = 4
+        # shader_runner currently defaults to a 250x250 window.  We
+        # could reduce window size to cut test time, but there are
+        # platform-dependent limits we haven't really characterized
+        # (smaller on Linux than Windows, but still present in some
+        # window managers).
+        self.win_width = 250
+        self.win_height = 250
+        self.tests_per_row = (self.win_width // self.rect_width)
+        self.test_rows = (self.win_height // self.rect_height)
+
         if use_if:
             self._comparator = BoolIfComparator(signature)
         elif signature.rettype.base_type == glsl_bool:
@@ -367,17 +381,21 @@ class ShaderTest(object):
     def glsl_version(self):
         return self._signature.version_introduced
 
-    def draw_command(self):
-        return 'draw rect -1 -1 2 2\n'
+    def draw_command(self, test_num):
+        x = (test_num % self.tests_per_row) * self.rect_width
+        y = (test_num // self.tests_per_row) * self.rect_height
+        assert(y < self.test_rows)
+        return 'draw rect ortho {0} {1} {2} {3}\n'.format(x, y,
+                                                          self.rect_width,
+                                                          self.rect_height)
 
     def probe_command(self, test_num, probe_vector):
-        # Note: shader_runner uses a 250x250 window so we must
-        # ensure that test_num <= 250.
-        return 'probe rgb {0} 0 {1} {2} {3} {4}\n'.format(test_num % 250,
-                                                          probe_vector[0],
-                                                          probe_vector[1],
-                                                          probe_vector[2],
-                                                          probe_vector[3])
+        return 'probe rect rgba ({0}, {1}, {2}, {3}) ({4}, {5}, {6}, {7})\n'.format(
+            (test_num % self.tests_per_row) * self.rect_width,
+            (test_num // self.tests_per_row) * self.rect_height,
+            self.rect_width,
+            self.rect_height,
+            probe_vector[0], probe_vector[1], probe_vector[2], probe_vector[3])
 
     def make_additional_requirements(self):
         """Return a string that should be included in the test's
@@ -431,6 +449,13 @@ class ShaderTest(object):
         """
         return None
 
+    def needs_probe_per_draw(self):
+        """Returns whether the test needs the probe to be immediately after each
+
+        draw call.
+        """
+        return False
+
     def make_test_shader(self, additional_declarations, prefix_statements,
                          output_var, suffix_statements):
         """Generate the shader code necessary to test the built-in.
@@ -482,9 +507,15 @@ class ShaderTest(object):
                     i, shader_runner_format(
                         column_major_values(test_vector.arguments[i])))
             test += self._comparator.draw_test(test_vector,
-                                               self.draw_command())
-            test += self.probe_command(test_num,
-                                       self._comparator.result_vector(test_vector))
+                                               self.draw_command(test_num))
+            if self.needs_probe_per_draw():
+                result_color = self._comparator.result_vector(test_vector)
+                test += self.probe_command(test_num, result_color)
+
+        if not self.needs_probe_per_draw():
+            for test_num, test_vector in enumerate(self._test_vectors):
+                result_color = self._comparator.result_vector(test_vector)
+                test += self.probe_command(test_num, result_color)
         return test
 
     def filename(self):
@@ -680,8 +711,19 @@ fb tex 2d 0
 '''.format(len(self._test_vectors))
 
 
-    def draw_command(self):
+    def draw_command(self, test_num):
         return 'compute 1 1 1\n'
+
+    def probe_command(self, test_num, probe_vector):
+        # Note: shader_runner uses a 250x250 window so we must
+        # ensure that test_num <= 250.
+        return 'probe rgb {0} 0 {1} {2} {3} {4}\n'.format(test_num % 250,
+                                                          probe_vector[0],
+                                                          probe_vector[1],
+                                                          probe_vector[2],
+                                                          probe_vector[3])
+    def needs_probe_per_draw(self):
+        return True
 
 def all_tests():
     for use_if in [False, True]:
