@@ -2303,6 +2303,14 @@ piglit_display(void)
 			get_floats(line + 13, c, 8);
 			piglit_draw_rect_tex(c[0], c[1], c[2], c[3],
 					     c[4], c[5], c[6], c[7]);
+		} else if (string_match("draw rect ortho", line)) {
+			program_must_be_in_use();
+			get_floats(line + 15, c, 4);
+
+			piglit_draw_rect(-1.0 + 2.0 * (c[0] / piglit_width),
+					 -1.0 + 2.0 * (c[1] / piglit_height),
+					 2.0 * (c[2] / piglit_width),
+					 2.0 * (c[3] / piglit_height));
 		} else if (string_match("draw rect", line)) {
 			program_must_be_in_use();
 			get_floats(line + 9, c, 4);
