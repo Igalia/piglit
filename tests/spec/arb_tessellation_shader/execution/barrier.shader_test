@@ -1,0 +1,86 @@
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+layout(vertices = 6) out;
+
+out int val[];
+patch out vec4 pcolor;
+
+void main() {
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+        if (gl_InvocationID < val.length())
+                val[gl_InvocationID] = gl_InvocationID;
+
+        pcolor = vec4(0, 1, 0, 1);
+
+        barrier();
+
+        for (int i = 0; i < val.length(); i++) {
+                 // Switch things up so that each invocation checks
+                 // different locations
+                 int index = (i + gl_InvocationID) % val.length();
+                 if (val[index] != index)
+                         pcolor = vec4(1, 0, 0, 1);
+        }
+
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+}
+
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+layout(triangles) in;
+
+patch in vec4 pcolor;
+out vec4 color;
+
+void main() {
+	gl_Position = gl_in[0].gl_Position * gl_TessCoord[0]
+	            + gl_in[1].gl_Position * gl_TessCoord[1]
+	            + gl_in[2].gl_Position * gl_TessCoord[2];
+        color = pcolor;
+}
+
+
+[fragment shader]
+in vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+ 1.0 -1.0
+ 1.0  1.0
+
+[test]
+clear color 0.0 0.0 0.0 1.0
+clear
+
+patch parameter vertices 3
+draw arrays GL_PATCHES 0 6
+probe all rgba 0.0 1.0 0.0 1.0
+
+clear color 0.0 0.0 0.0 1.0
+clear
+
+patch parameter vertices 6
+draw arrays GL_PATCHES 0 12
+probe all rgba 0.0 1.0 0.0 1.0
