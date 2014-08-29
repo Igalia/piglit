@@ -25,9 +25,10 @@
 import os
 
 from genclbuiltins import gen
-from math import atan, pi, sin, sqrt, cos
+from math import acos, atan, pi, sin, sqrt, cos
 
 CLC_VERSION_MIN = {
+    'acos' : 10,
     'atan' : 10,
     'ceil' : 10,
     'cos' : 10,
@@ -48,6 +49,15 @@ F = {
 }
 
 tests = {
+    'acos' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [ pi,  pi/2, 0.0, acos(0.12345), float("nan")], # Result
+            [-1.0, 0.0,  1.0,      0.12345,  float("nan")]  # Arg0
+        ],
+        'tolerance' : 4
+     },
     'atan' : {
         'arg_types' : [F, F],
         'function_type': 'ttt',
