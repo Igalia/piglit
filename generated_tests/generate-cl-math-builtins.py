@@ -25,7 +25,7 @@
 import os
 
 from genclbuiltins import gen
-from math import atan, pi, sin, cos
+from math import atan, pi, sin, sqrt, cos
 
 CLC_VERSION_MIN = {
     'atan' : 10,
@@ -37,6 +37,7 @@ CLC_VERSION_MIN = {
     'round' : 10,
     'sign' : 10,
     'sin' : 10,
+    'sqrt' : 10,
     'trunc' : 10
 }
 
@@ -125,6 +126,15 @@ tests = {
             [0.0, pi / 2, pi, 3 * pi / 2, 2 * pi, 2.234567] # Arg0
         ],
         'tolerance': 2
+    },
+    'sqrt' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [1.0, 2.0,  6.0, 2.5 , float("nan"), 4.0,  sqrt(0.0), sqrt(7.0), sqrt(pi)], # Result
+            [1.0, 4.0, 36.0, 6.25, float("nan"), 16.0, 0.0, 7.0, pi], # Arg1
+        ],
+        'tolerance': 3
     },
     'trunc' : {
         'arg_types': [F, F],
