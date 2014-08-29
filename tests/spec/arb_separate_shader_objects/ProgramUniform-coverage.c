@@ -299,7 +299,7 @@ test_float(const char *version_string)
 		common_body
 	};
 
-	BUILD_SHADER(true);
+	BUILD_SHADER(false);
 
 	/* Try float
 	 */
@@ -414,7 +414,7 @@ test_square_mat(const char *version_string)
 		square_mat_code,
 	};
 
-	BUILD_SHADER(true);
+	BUILD_SHADER(false);
 
 	/* Try mat2
 	 */
