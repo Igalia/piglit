@@ -25,11 +25,12 @@
 import os
 
 from genclbuiltins import gen
-from math import acos, atan, pi, sin, sqrt, cos
+from math import acos, atan, atan2, pi, sin, sqrt, cos
 
 CLC_VERSION_MIN = {
     'acos' : 10,
     'atan' : 10,
+    'atan2' : 10,
     'ceil' : 10,
     'cos' : 10,
     'floor' : 10,
@@ -66,6 +67,16 @@ tests = {
             [0.0,       0.12345,       3567147.0]# Arg0
         ],
         'tolerance' : 2
+     },
+    'atan2' : {
+        'arg_types' : [F, F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [atan2(0.0, 0.0), atan2(1.2345, 10.0), atan2(35671470.0, 0.1)], # Result
+            [0.0,             1.2345,              35671470.0            ], # Arg0
+            [0.0,             10.0,                0.1                   ]  # Arg1
+        ],
+        'tolerance' : 6
      },
     'ceil' : {
         'arg_types': [F, F],
