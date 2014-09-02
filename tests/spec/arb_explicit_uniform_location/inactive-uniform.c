@@ -47,7 +47,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_core_version = 33;
+	config.supports_gl_compat_version = 30;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
@@ -65,7 +65,8 @@ static const char vs_text[] =
 	"}";
 
 static const char fs_text[] =
-	"#version 330\n"
+	"#version 130\n"
+	"#extension GL_ARB_explicit_attrib_location: require\n"
 	"#extension GL_ARB_explicit_uniform_location: require\n"
 	"layout(location = 7) uniform float var;\n"
 	"void main() {\n"
@@ -77,6 +78,7 @@ piglit_init(int argc, char **argv)
 {
 	GLuint prog;
 
+	piglit_require_extension("GL_ARB_explicit_attrib_location");
 	piglit_require_extension("GL_ARB_explicit_uniform_location");
 
 	prog = piglit_build_simple_program(vs_text, fs_text);

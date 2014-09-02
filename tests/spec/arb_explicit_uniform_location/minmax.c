@@ -30,7 +30,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 20;
+	config.supports_gl_compat_version = 30;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB;
 
 PIGLIT_GL_TEST_CONFIG_END
