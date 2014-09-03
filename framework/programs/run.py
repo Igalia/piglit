@@ -31,13 +31,13 @@ import ConfigParser
 import framework.core as core
 import framework.results
 import framework.profile
+import framework.backends as backends
 
 __all__ = ['run',
            'resume']
 
 
 _PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
-_BACKENDS = ['json', 'junit']
 
 
 def _default_platform():
@@ -80,9 +80,9 @@ def _default_backend():
     """
     try:
         backend = core.PIGLIT_CONFIG.get('core', 'backend')
-        if backend not in _BACKENDS:
+        if backend not in backends.BACKENDS:
             print('Backend is not valid\n',
-                  'valid backends are: {}'.format(' '.join(_BACKENDS)),
+                  'valid backends are: {}'.format(' '.join(backends.BACKENDS)),
                   file=sys.stderr)
             sys.exit(1)
         return backend
@@ -129,7 +129,7 @@ def _run_parser(input_):
                              "(can be used more than once)")
     parser.add_argument('-b', '--backend',
                         default=_default_backend(),
-                        choices=framework.results.BACKENDS,
+                        choices=backends.BACKENDS,
                         help='select a results backend to use')
     conc_parser = parser.add_mutually_exclusive_group()
     conc_parser.add_argument('-c', '--all-concurrent',
@@ -267,7 +267,7 @@ def run(input_):
     options['log_level'] = args.log_level
 
     # Begin json.
-    backend = framework.results.get_backend(args.backend)(
+    backend = backends.get_backend(args.backend)(
         args.results_path,
         options,
         file_fsync=opts.sync)
@@ -319,7 +319,7 @@ def resume(input_):
     results.options['name'] = results.name
 
     # Resume only works with the JSON backend
-    backend = framework.results.get_backend('json')(
+    backend = backends.get_backend('json')(
         args.results_path,
         results.options,
         file_fsync=opts.sync)

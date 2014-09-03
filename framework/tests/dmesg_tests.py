@@ -38,6 +38,7 @@ import framework.exectest
 import framework.gleantest
 import framework.shader_test
 import framework.glsl_parser_test
+import framework.backends
 import framework.tests.utils as utils
 
 
@@ -324,7 +325,7 @@ def test_json_serialize_updated_result():
     test._new_messages = ['some', 'new', 'messages']
     result = test.update_result(result)
 
-    encoder = json.JSONEncoder(default=framework.results._piglit_encoder)
+    encoder = json.JSONEncoder(default=framework.backends.piglit_encoder)
     encoder.encode(result)
 
 
