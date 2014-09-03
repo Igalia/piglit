@@ -33,6 +33,8 @@
 #include "piglit-util-gl.h"
 
 #define TEX_SIZE 32
+#define DEFAULT_SRC_LEVEL 1
+#define DEFAULT_DST_LEVEL 3
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -683,8 +685,8 @@ run_multisample_test(struct texture_format *src_format,
 }
 
 static bool
-check_texture(GLuint texture, const struct texture_format *format,
-	      const unsigned char *data)
+check_texture(GLuint texture, unsigned level,
+	      const struct texture_format *format, const unsigned char *data)
 {
 	int i, j, k;
 	bool pass = true;
@@ -696,9 +698,9 @@ check_texture(GLuint texture, const struct texture_format *format,
 	glBindTexture(GL_TEXTURE_2D, texture);
 	if (format->block_width != 1 || format->block_height != 1) {
 		/* Compressed */
-		glGetCompressedTexImage(GL_TEXTURE_2D, 0, tex_data);
+		glGetCompressedTexImage(GL_TEXTURE_2D, level, tex_data);
 	} else {
-		glGetTexImage(GL_TEXTURE_2D, 0, format->format,
+		glGetTexImage(GL_TEXTURE_2D, level, format->format,
 			      format->data_type, tex_data);
 	}
 
@@ -737,6 +739,7 @@ run_test(struct texture_format *src_format, struct texture_format *dst_format)
 {
 	bool pass = true, warn = false;
 	unsigned src_width, src_height, dst_width, dst_height;
+	unsigned src_level, dst_level;
 	GLuint texture[2];
 
 	glEnable(GL_TEXTURE_2D);
@@ -747,61 +750,89 @@ run_test(struct texture_format *src_format, struct texture_format *dst_format)
 	src_height = TEX_SIZE * src_format->block_height;
 
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	if (src_format->block_width != 1 || src_format->block_height != 1) {
-		/* Compressed */
-		glCompressedTexImage2D(GL_TEXTURE_2D, 0,
-				       src_format->internal_format,
-				       src_width, src_height, 0,
-				       TEX_SIZE * TEX_SIZE * src_format->bytes,
-				       src_data);
+	if (src_format->can_be_reinterpreted) {
+		src_level = DEFAULT_SRC_LEVEL;
+		glTexStorage2D(GL_TEXTURE_2D, src_level + 2,
+			       src_format->internal_format,
+			       src_width << src_level, src_height << src_level);
+		if (src_format->block_width != 1 ||
+		    src_format->block_height != 1) {
+			/* Compressed */
+			glCompressedTexSubImage2D(GL_TEXTURE_2D, src_level,
+						  0, 0,
+						  src_width, src_height,
+						  src_format->internal_format,
+						  TEX_SIZE * TEX_SIZE * src_format->bytes,
+						  src_data);
+		} else {
+			glTexSubImage2D(GL_TEXTURE_2D, src_level, 0, 0,
+				     src_width, src_height, src_format->format,
+				     src_format->data_type, src_data);
+		}
 	} else {
+		src_level = 0;
+		/* All non-reintepretable textures are uncompressed */
 		glTexImage2D(GL_TEXTURE_2D, 0, src_format->internal_format,
 			     src_width, src_height, 0, src_format->format,
 			     src_format->data_type, src_data);
 	}
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 	if (!pass) goto cleanup;
-	warn |= !check_texture(texture[0], src_format, src_data);
+	warn |= !check_texture(texture[0], src_level, src_format, src_data);
 
 	dst_width = TEX_SIZE * dst_format->block_width;
 	dst_height = TEX_SIZE * dst_format->block_height;
 
 	glBindTexture(GL_TEXTURE_2D, texture[1]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	if (dst_format->block_width != 1 || dst_format->block_height != 1) {
-		/* Compressed */
-		glCompressedTexImage2D(GL_TEXTURE_2D, 0,
-				       dst_format->internal_format,
-				       dst_width, dst_height, 0,
-				       TEX_SIZE * TEX_SIZE * dst_format->bytes,
-				       dst_data);
+	if (dst_format->can_be_reinterpreted) {
+		dst_level = DEFAULT_DST_LEVEL;
+		glTexStorage2D(GL_TEXTURE_2D, dst_level + 2,
+			       dst_format->internal_format,
+			       dst_width << dst_level, dst_height << dst_level);
+		if (dst_format->block_width != 1 ||
+		    dst_format->block_height != 1) {
+			/* Compressed */
+			glCompressedTexSubImage2D(GL_TEXTURE_2D, dst_level,
+						  0, 0,
+						  dst_width, dst_height,
+						  dst_format->internal_format,
+						  TEX_SIZE * TEX_SIZE * dst_format->bytes,
+						  dst_data);
+		} else {
+			glTexSubImage2D(GL_TEXTURE_2D, dst_level, 0, 0,
+				     dst_width, dst_height, dst_format->format,
+				     dst_format->data_type, dst_data);
+		}
 	} else {
+		dst_level = 0;
+		/* All non-reintepritable textures are uncompressed */
 		glTexImage2D(GL_TEXTURE_2D, 0, dst_format->internal_format,
 			     dst_width, dst_height, 0, dst_format->format,
 			     dst_format->data_type, dst_data);
 	}
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 	if (!pass) goto cleanup;
-	warn |= !check_texture(texture[1], dst_format, dst_data);
+	warn |= !check_texture(texture[1], dst_level, dst_format, dst_data);
 
-	glCopyImageSubData(texture[0], GL_TEXTURE_2D, 0,
+	glCopyImageSubData(texture[0], GL_TEXTURE_2D, src_level,
 			   src_width / 4, src_height / 4, 0,
-			   texture[1], GL_TEXTURE_2D, 0,
+			   texture[1], GL_TEXTURE_2D, dst_level,
 			   dst_width / 4, dst_height / 4, 0,
 			   src_width / 2, src_height / 2, 1);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-	glCopyImageSubData(texture[1], GL_TEXTURE_2D, 0,
+	glCopyImageSubData(texture[1], GL_TEXTURE_2D, dst_level,
 			   0, dst_height / 2, 0,
-			   texture[1], GL_TEXTURE_2D, 0,
+			   texture[1], GL_TEXTURE_2D, dst_level,
 			   dst_width / 2, 0, 0,
 			   dst_width / 2, dst_height / 2, 1);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-	pass &= check_texture(texture[1], dst_format, res_data);
+	pass &= check_texture(texture[1], dst_level, dst_format, res_data);
 
 cleanup:
 	glDeleteTextures(2, texture);
