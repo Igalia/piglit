@@ -18,10 +18,11 @@ from framework.exectest import PiglitTest
 def add_plain_test(group, name, args):
         group[name] = PiglitTest(args)
 
+# TODO: Use concurrent tests for everything once kernels with render nodes
+# enabled by default (3.16 or newer) are more widely used.
 def add_concurrent_test(group, name, args):
-        test = PiglitTest(args)
-        test.run_concurrent = true;
-        group[name] = PiglitTest(args)
+        test = PiglitTest(args, run_concurrent=True)
+        group[name] = test
 
 def add_plain_program_tester_test(group, name, path):
         add_plain_test(group, name, ['cl-program-tester', path])
