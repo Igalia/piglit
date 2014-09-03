@@ -61,11 +61,11 @@
           <pre>${value.get('err', 'None') | h}</pre>
         </td>
       </tr>
-    % if value.get('env') is not None:
+    % if value.get('environment') is not None:
       <tr>
         <td>Environment</td>
         <td>
-          <pre>${value.get('env') | h}</pre>
+          <pre>${value.get('environment') | h}</pre>
         </td>
       </tr>
     % endif
