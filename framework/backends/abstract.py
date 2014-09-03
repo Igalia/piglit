@@ -92,7 +92,6 @@ class Backend(object):
                     written into the backend
 
         """
-        self.dest = open(dest, 'w+')
 
     @abc.abstractmethod
     def finalize(self, metadata=None):
