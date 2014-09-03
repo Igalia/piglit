@@ -44,7 +44,7 @@ __all__ = [
 
 def escape_filename(key):
     """Avoid reserved characters in filenames."""
-    return re.sub(r'[<>:"|?*]', '_', key)
+    return re.sub(r'[<>:"|?*#]', '_', key)
 
 
 def normalize_href(href):
