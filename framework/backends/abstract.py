@@ -39,17 +39,17 @@ class FSyncMixin(object):
     """
     def __init__(self, file_fsync=False, **options):
         self._file_sync = file_fsync
-        assert self._file
 
-    def _fsync(self):
+    def _fsync(self, file_):
         """ Sync the file to disk
 
         If self._fsync is truthy this will sync self._file to disk
 
         """
+        file_.flush()
+
         if self._file_sync:
-            self._file.flush()
-            os.fsync(self._file.fileno())
+            os.fsync(file_.fileno())
 
 
 class Backend(object):

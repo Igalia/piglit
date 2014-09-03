@@ -67,10 +67,12 @@ class JUnitBackend(FSyncMixin, Backend):
             '<testsuite name="piglit" tests="{}">\n'.format(
                 metadata['test_count']))
         self._test_suffix = metadata["test_suffix"]
+        self._fsync(self._file)
 
     def finalize(self, metadata=None):
         self._file.write('</testsuite>\n')
         self._file.write('</testsuites>\n')
+        self._fsync(self._file)
         self._file.close()
 
     def write_test(self, name, data):
@@ -142,3 +144,4 @@ class JUnitBackend(FSyncMixin, Backend):
 
         self._file.write(etree.tostring(element))
         self._file.write('\n')
+        self._fsync(self._file)

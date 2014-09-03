@@ -219,7 +219,7 @@ class JSONBackend(FSyncMixin, Backend):
         self.__indent_level += 1
         self.__is_collection_empty.append(True)
         self._open_containers.append('dict')
-        self._fsync()
+        self._fsync(self._file)
 
     def _close_dict(self):
         self.__indent_level -= 1
@@ -230,7 +230,7 @@ class JSONBackend(FSyncMixin, Backend):
         self._file.write('}')
         assert self._open_containers[-1] == 'dict'
         self._open_containers.pop()
-        self._fsync()
+        self._fsync(self._file)
 
     def _write_dict_item(self, key, value):
         # Write key.
@@ -239,7 +239,7 @@ class JSONBackend(FSyncMixin, Backend):
         # Write value.
         self.__write(value)
 
-        self._fsync()
+        self._fsync(self._file)
 
     def _write_dict_key(self, key):
         # Write comma if this is not the initial item in the dict.
@@ -253,7 +253,7 @@ class JSONBackend(FSyncMixin, Backend):
         self._file.write(': ')
 
         self.__inhibit_next_indent = True
-        self._fsync()
+        self._fsync(self._file)
 
     def write_test(self, name, data):
         """ Write a test into the JSON tests dictionary """
