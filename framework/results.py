@@ -405,6 +405,15 @@ class JUnitBackend(FSyncMixin, Backend):
         classname, testname = posixpath.split(name)
         classname = classname.replace('.', '_')
         classname = JUnitBackend._REPLACE.sub('.', classname)
+
+        # Add the test to the piglit group rather than directly to the root
+        # group, this allows piglit junit to be used in conjunction with other
+        # piglit
+        # TODO: It would be nice if other suites integrating with piglit could
+        # set different root names.
+        classname = 'piglit.' + classname
+
+        # Create the root element
         element = etree.Element('testcase', name=testname,
                                 classname=classname,
                                 time=str(data['time']),
