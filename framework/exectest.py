@@ -180,7 +180,6 @@ class Test(object):
         if self.result['result'] == 'skip':
             return
 
-        self.result['result'] = 'fail'
         self.interpret_result()
 
         if self.result['returncode'] < 0:
