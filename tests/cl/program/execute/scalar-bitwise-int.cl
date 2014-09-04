@@ -48,7 +48,7 @@ arg_in:  2 int 0
 arg_out: 0 buffer int[1] 3456732
 
 [test]
-name: num|num
+name: num^num
 kernel_name: xor
 arg_in:  1 uint 0XFFFFFFFF
 arg_in:  2 uint 0XAAAAAAAA
