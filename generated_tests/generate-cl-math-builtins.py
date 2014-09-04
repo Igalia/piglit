@@ -25,7 +25,7 @@
 import os
 
 from genclbuiltins import gen
-from math import acos, asin, atan, atan2, pi, sin, sqrt, cos, fabs
+from math import acos, asin, atan, atan2, pi, sin, sqrt, cos, fabs, tan, pow
 
 CLC_VERSION_MIN = {
     'acos' : 10,
@@ -41,6 +41,7 @@ CLC_VERSION_MIN = {
     'round' : 10,
     'sign' : 10,
     'sin' : 10,
+    'tan' : 10,
     'sqrt' : 10,
     'trunc' : 10
 }
@@ -101,8 +102,8 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345)], # Result
-            [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345] # Arg0
+            [1.0, 0.0,    -1.0, 0.0,        1.0,    cos(1.12345), -0.9258790228548379], # Result
+            [0.0, pi / 2, pi,   3 * pi / 2, 2 * pi, 1.12345, pow(2,120)] # Arg0
         ],
         'tolerance' : 2
     },
@@ -176,6 +177,15 @@ tests = {
             [1.0, 4.0, 36.0, 6.25, float("nan"), 16.0, 0.0, 7.0, pi], # Arg1
         ],
         'tolerance': 3
+    },
+    'tan' : {
+        'arg_types': [F, F],
+        'function_type': 'ttt',
+        'values': [
+            [0.0, 1.0,  0.0, sqrt(3), -1.0,   tan(2.234567), float("nan") ], # Result
+            [0.0, pi/4, pi,  pi/3,    3*pi/4, 2.234567 ,     float("nan") ], # Arg1
+        ],
+        'tolerance': 5
     },
     'trunc' : {
         'arg_types': [F, F],
