@@ -113,10 +113,10 @@ def gen_kernel(f, fnName, inTypes, outType, vecSizes, typePrefix):
 
     suffix = ';'
     if (vecSizes[0] == 1):
-        f.write('  *out = ')
+        f.write('  out[get_global_id(0)] = ')
     else:
         f.write('  vstore'+str(vecSizes[0])+'(')
-        suffix = ', 0, out)' + suffix
+        suffix = ', get_global_id(0), out)' + suffix
 
     f.write(fnName+'(')
     suffix = ')' + suffix
@@ -126,9 +126,9 @@ def gen_kernel(f, fnName, inTypes, outType, vecSizes, typePrefix):
             f.write(', ')
         # if scalar, don't print vload/vstore
         if (vecSizes[arg] == 1):
-            f.write('*in'+str(arg))
+            f.write('in'+str(arg)+'[get_global_id(0)]')
         else:
-            f.write('vload'+str(vecSizes[arg])+'(0, in'+str(arg)+')')
+            f.write('vload'+str(vecSizes[arg])+'(get_global_id(0), in'+str(arg)+')')
 
     f.write(suffix+'\n}\n\n')
 
@@ -247,16 +247,19 @@ def getValue(type, val, isVector):
 
         # Evaluate the value of the requested function and arguments
         # TODO: Change to varargs calls after unshifting the first list element
-        if (len(val) == 2):
-            return (val[0])(getValue(type, val[1], isVector))
-        elif (len(val) == 3):
-            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector))
-        elif (len(val) == 4):
-            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
+        if (callable(val[0])):
+            if (len(val) == 2):
+                return (val[0])(getValue(type, val[1], isVector))
+            elif (len(val) == 3):
+                return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector))
+            elif (len(val) == 4):
+                return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
                             getValue(type, val[3], isVector))
-        else:
-            return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
+            else:
+                return (val[0])(getValue(type, val[1], isVector), getValue(type, val[2], isVector),
                             getValue(type, val[3], isVector), getValue(type, val[4], isVector))
+        else:
+             return map(lambda x: getValue(type, x, isVector), val);
 
     # At this point, we should have been passed a number
     if (isinstance(val, (int, long, float))):
@@ -267,7 +270,7 @@ def getValue(type, val, isVector):
 
 
 def getStrVal(type, val, isVector):
-    return str(getValue(type, val, isVector))
+    return " ".join(map(str, getValue(type, val, isVector)))
 
 
 def getArgType(baseType, argType):
@@ -288,11 +291,11 @@ def isFloatType(t):
     return t not in U
 
 # Print a test with all-vector inputs/outputs and/or mixed vector/scalar args
-def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
+def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, tss):
     # If the test allows mixed vector/scalar arguments, handle the case with
     # only vector arguments through a recursive call.
     if (tss):
-        print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize,
+        print_test(f, fnName, argType, functionDef, tests, numTests, vecSize,
                    False)
 
     # The tss && vecSize==1 case is handled in the non-tss case.
@@ -305,20 +308,21 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
     if (not tss):
         tssStr = ''
 
-    # Write the test header
-    f.write('[test]\n' + 'name: ' + fnName + ' ' + argType + str(vecSize) +
-            '\n' + 'kernel_name: test_' + tssStr + str(vecSize) + '_' + fnName
-            + '_' + argType + '\n'
-    )
-
     argTypes = getArgTypes(argType, functionDef['arg_types'])
     argCount = len(argTypes)
     tolerance = functionDef['tolerance'] if 'tolerance' in functionDef else 0
 
+    # Write the test header
+    f.write('[test]\n' + 'name: ' + tssStr + fnName + ' ' + argType
+            + str(vecSize) + '\n' + 'kernel_name: test_' + tssStr + str(vecSize)
+            + '_' + fnName + '_' + argType + '\n' + 'global_size: '
+            + str(numTests) + ' 0 0\n\n'
+    )
+
     # For each argument, write a line containing its type, index, and values
     for arg in range(0, argCount):
         argInOut = ''
-        argVal = getStrVal(argType, tests[arg][testIdx], (vecSize > 1))
+        argVal = getStrVal(argType, tests[arg], (vecSize > 1))
         if arg == 0:
             argInOut = 'arg_out: '
         else:
@@ -329,7 +333,8 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
         # width
         if (arg < 2 or not tss):
             f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] +
-                    '[' + str(vecSize) + '] ' + ' '.join([argVal]*vecSize)
+                    '[' + str(numTests * vecSize) + '] ' +
+                    ''.join(map(lambda x: (x + ' ') * vecSize, argVal.split()))
             )
             if arg == 0:
                 f.write(' tolerance {0} '.format(tolerance))
@@ -339,8 +344,8 @@ def print_test(f, fnName, argType, functionDef, tests, testIdx, vecSize, tss):
             f.write('\n')
         else:
             argInOut = 'arg_in: '
-            f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] + '[1] ' +
-                    argVal + '\n'
+            f.write(argInOut + str(arg) + ' buffer ' + argTypes[arg] + '[' +
+                    str(numTests) + '] ' + argVal + '\n'
             )
 
     # Blank line between tests for formatting reasons
@@ -379,8 +384,7 @@ def gen(types, minVersions, functions, testDefs, dirName):
                     '[config]\n' +
                     'name: Test '+dataType+' '+fnName+' built-in on CL 1.1\n' +
                     'clc_version_min: '+str(clcVersionMin)+'\n' +
-                    'dimensions: 1\n' +
-                    'global_size: 1 0 0\n\n'
+                    'dimensions: 1\n\n'
             )
 
             # Write all tests for the built-in function
@@ -395,9 +399,8 @@ def gen(types, minVersions, functions, testDefs, dirName):
             sizes = sorted(VEC_WIDTHS)
             sizes.insert(0, 1)  # Add 1-wide scalar to the vector widths
             for vecSize in sizes:
-                for testIdx in range(0, numTests):
-                    print_test(f, fnName, dataType, functionDef, tests,
-                               testIdx, vecSize, (fnType is 'tss'))
+                print_test(f, fnName, dataType, functionDef, tests,
+                           numTests, vecSize, (fnType is 'tss'))
 
             # Terminate the header section
             f.write('!*/\n\n')
@@ -406,5 +409,3 @@ def gen(types, minVersions, functions, testDefs, dirName):
             generate_kernels(f, dataType, fnName, functionDef)
 
         f.close()
-
-
