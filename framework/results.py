@@ -474,15 +474,17 @@ class TestResult(dict):
         dictionary -- a dictionary instance to update the TestResult with
 
         """
-        def update(d, u):
+        def update(d, u, check):
             for k, v in u.iteritems():
                 if isinstance(v, dict):
-                    d[k] = update(d.get(k, {}), v)
+                    d[k] = update(d.get(k, {}), v, True)
                 else:
+                    if check and k in d:
+                        print("Warning: duplicate subtest: {} value: {} old value: {}".format(k, v, d[k]))
                     d[k] = v
             return d
 
-        update(self, dictionary)
+        update(self, dictionary, False)
 
 
 class TestrunResult(object):
