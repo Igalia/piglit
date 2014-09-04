@@ -1175,8 +1175,21 @@ get_floats(const char *line, float *f, unsigned count)
 {
 	unsigned i;
 
-	for (i = 0; i < count; i++)
-		f[i] = strtod_inf(line, (char **) &line);
+	for (i = 0; i < count; i++) {
+		line = eat_whitespace(line);
+
+		if (strncmp(line, "0x", 2) == 0) {
+			union {
+				int32_t i;
+				float f;
+			} x;
+
+			x.i = strtol(line, (char **) &line, 16);
+			f[i] = x.f;
+		} else {
+			f[i] = strtod_inf(line, (char **) &line);
+		}
+	}
 }
 
 void
@@ -1184,8 +1197,21 @@ get_doubles(const char *line, double *d, unsigned count)
 {
 	unsigned i;
 
-	for (i = 0; i < count; i++)
-		d[i] = strtod_inf(line, (char **) &line);
+	for (i = 0; i < count; i++) {
+		line = eat_whitespace(line);
+
+		if (strncmp(line, "0x", 2) == 0) {
+			union {
+				int64_t i64;
+				double d;
+			} x;
+
+			x.i64 = strtoll(line, (char **) &line, 16);
+			d[i] = x.d;
+		} else {
+			d[i] = strtod_inf(line, (char **) &line);
+		}
+	}
 }
 
 
