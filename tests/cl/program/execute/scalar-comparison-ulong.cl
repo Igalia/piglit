@@ -128,7 +128,7 @@ arg_in:  2 ulong 7
 arg_out: 0 buffer int[1] 0
 
 [test]
-name: small_num<big_num
+name: small_num<=big_num
 kernel_name: lte
 arg_in:  1 ulong 3
 arg_in:  2 ulong 4
