@@ -29,7 +29,9 @@
  * Test TIME_ELAPSED and TIMESTAMP queries.
  */
 
+#if !defined(_WIN32) && !defined(WIN32)
 #include <sys/time.h>
+#endif
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -87,6 +89,31 @@ static float
 get_time(void)
 {
 	static bool inited = false;
+
+#if defined(_WIN32) || defined(WIN32)
+	static LARGE_INTEGER frequency;
+	LARGE_INTEGER counter;
+	static GLint64 base_usec = 0;
+	GLint64 usec;
+	
+	if(!frequency.QuadPart)
+		QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&counter);
+	
+	usec = (GLint64)(counter.QuadPart * INT64_C(1000000)/frequency.QuadPart);
+	
+	/* Return a value that is roughly microseconds since program
+	 * startup, to avoid large usec reducing precision of the
+	 * return value.
+	 */
+	if (!inited) {
+		inited = true;
+		base_usec = usec;
+	}
+	usec -= base_usec;
+	
+	return (double)usec/1000000.0;
+#else
 	static time_t base_sec = 0;
 	struct timeval tv;
 
@@ -103,6 +130,7 @@ get_time(void)
 	tv.tv_sec -= base_sec;
 
 	return (double)tv.tv_sec + tv.tv_usec / 1000000.0;
+#endif
 }
 
 static float
@@ -161,10 +189,10 @@ piglit_display(void)
 	float green[4] = {0.0, 1.0, 0.0, 0.0};
 	GLuint q[2];
 	int iters;
-	int num_results = 5;
-	float cpu_time[num_results];
-	float gpu_time[num_results];
-	float delta[num_results];
+#define	NUM_RESULTS 5
+	float cpu_time[NUM_RESULTS];
+	float gpu_time[NUM_RESULTS];
+	float delta[NUM_RESULTS];
 	float cpu_time_mean;
 	float delta_mean, delta_stddev;
 	float cpu_overhead;
@@ -195,13 +223,13 @@ piglit_display(void)
 	 * some time-consuming shader with a single draw call instead.
 	 */
 	cpu_overhead = 0;
-	for (i = 0; i < num_results; i++) {
+	for (i = 0; i < NUM_RESULTS; i++) {
 		cpu_time[i] = draw(q, 1);
 		gpu_time[i] = get_gpu_time(q);
 
 		cpu_overhead += cpu_time[i] - gpu_time[i];
 	}
-	cpu_overhead /= num_results;
+	cpu_overhead /= NUM_RESULTS;
 
 	/* Find a number of draw calls that takes about 1/10th of a
 	 * second.
@@ -219,20 +247,20 @@ retry:
 	/* Now, do several runs like this so we can determine if the
 	 * timer matches up with wall time.
 	 */
-	for (i = 0; i < num_results; i++) {
+	for (i = 0; i < NUM_RESULTS; i++) {
 		cpu_time[i] = draw(q, iters);
 		gpu_time[i] = get_gpu_time(q);
 	}
 
 	cpu_time_mean = 0;
 	delta_mean = 0;
-	for (i = 0; i < num_results; i++) {
+	for (i = 0; i < NUM_RESULTS; i++) {
 		delta[i] = cpu_time[i] - cpu_overhead - gpu_time[i];
 		cpu_time_mean += cpu_time[i];
 		delta_mean += delta[i];
 	}
-	cpu_time_mean /= num_results;
-	delta_mean /= num_results;
+	cpu_time_mean /= NUM_RESULTS;
+	delta_mean /= NUM_RESULTS;
 
 	/* There's some risk of our "get to 0.1 seconds" loop deciding
 	 * that a small number of iters was sufficient if we got
@@ -246,9 +274,9 @@ retry:
 
 	/* Calculate stddevs. */
 	delta_stddev = 0;
-	for (i = 0; i < num_results; i++) {
+	for (i = 0; i < NUM_RESULTS; i++) {
 		float d = delta[i] - delta_mean;
-		delta_stddev += d * d / (num_results - 1);
+		delta_stddev += d * d / (NUM_RESULTS - 1);
 	}
 	delta_stddev = sqrt(delta_stddev);
 
@@ -263,10 +291,10 @@ retry:
 	 * in our CPU (wall) time, while scheduling other tasks
 	 * doesn't end up counted toward our GPU time.
 	 */
-	t = delta_mean / (delta_stddev / sqrt(num_results));
+	t = delta_mean / (delta_stddev / sqrt(NUM_RESULTS));
 
 	/* Integral of Student's t distribution for 4 degrees of
-	 * freedom (num_results = 5), two-tailed (we care about
+	 * freedom (NUM_RESULTS = 5), two-tailed (we care about
 	 * difference above or below 0, not just one direction), at
 	 * p = .05.
 	 */
@@ -290,7 +318,7 @@ retry:
 
 		printf("%20s %20s %20s\n",
 		       "gpu_time", "cpu_time", "delta");
-		for (i = 0; i < num_results; i++) {
+		for (i = 0; i < NUM_RESULTS; i++) {
 			printf("%20f %20f %20f\n",
 			       gpu_time[i], cpu_time[i], delta[i]);
 		}
