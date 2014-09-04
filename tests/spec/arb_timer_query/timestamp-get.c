@@ -22,8 +22,12 @@
  */
 
 #include "piglit-util-gl.h"
+
+#include <inttypes.h>  /* for PRIu64 macro */
+#if !defined(_WIN32) && !defined(WIN32)
 #include <unistd.h>
 #include <sys/time.h>
+#endif
 
 /**
  * @file timestamp-get.c
@@ -59,28 +63,38 @@ get_gpu_time_via_get(GLuint q)
 }
 
 static GLint64
-get_cpu_time()
+get_cpu_time(void)
 {
+#if defined(_WIN32) || defined(WIN32)
+	static LARGE_INTEGER frequency;
+	LARGE_INTEGER counter;
+
+	if(!frequency.QuadPart)
+		QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&counter);
+	return (GLint64)(counter.QuadPart * INT64_C(1000000000)/frequency.QuadPart);
+#else
 	struct timeval tv;
 
 	gettimeofday(&tv, 0);
 	return (GLint64)tv.tv_sec * 1000000000 + (GLint64)tv.tv_usec * 1000;
+#endif
 }
 
 static void
 validate_times(GLint64 t1, GLint64 t2, GLint64 tolerance)
 {
 	if (t1 > t2) {
-		printf("old time = %llu us\n", (unsigned long long) t1 / 1000);
-		printf("new time = %llu us\n", (unsigned long long) t2 / 1000);
+		printf("old time = %" PRIu64 " us\n", (uint64_t) t1 / 1000);
+		printf("new time = %" PRIu64 " us\n", (uint64_t) t2 / 1000);
 		puts("old time > new time");
 		piglit_report_result(PIGLIT_FAIL);
 	}
 
 	/* the tolerance of 1 milisecond seems to be sufficient */
 	if (t2 - t1 > tolerance) {
-		printf("time 1 = %llu us\n", (unsigned long long) t1 / 1000);
-		printf("time 2 = %llu us\n", (unsigned long long) t2 / 1000);
+		printf("time 1 = %" PRIu64 " us\n", (uint64_t) t1 / 1000);
+		printf("time 2 = %" PRIu64 " us\n", (uint64_t) t2 / 1000);
 		puts("too big difference");
 		piglit_report_result(PIGLIT_FAIL);
 	}
@@ -107,8 +121,8 @@ piglit_display(void)
 	get_gpu_time_via_get(q);
 	get_overhead = get_cpu_time() - t1;
 
-	printf("glGet overhead: %llu us\n", (unsigned long long) get_overhead / 1000);
-	printf("glQuery overhead: %llu us\n", (unsigned long long) query_overhead / 1000);
+	printf("glGet overhead: %" PRIu64 " us\n", (uint64_t) get_overhead / 1000);
+	printf("glQuery overhead: %" PRIu64 " us\n", (uint64_t) query_overhead / 1000);
 
 	/* minimum tolerance is 3 ms */
 	tolerance = query_overhead + get_overhead + 3000000;
@@ -119,8 +133,12 @@ piglit_display(void)
 	t2 = get_gpu_time_via_get(q);
 	validate_times(t1, t2, tolerance);
 
+#if defined(_WIN32) || defined(WIN32)
+	Sleep(10);
+#else
 	usleep(10000);
-
+#endif
+		
 	puts("Test: first glGet, then glQuery");
 	t1 = get_gpu_time_via_get(q);
 	t2 = get_gpu_time_via_query(q);

@@ -9,6 +9,4 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
-IF (UNIX)
-	piglit_add_executable (arb_timer_query-timestamp-get timestamp-get.c)
-ENDIF (UNIX)
+piglit_add_executable (arb_timer_query-timestamp-get timestamp-get.c)
