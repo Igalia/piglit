@@ -27,6 +27,8 @@ import nose.tools as nt
 import framework.tests.utils as utils
 import framework.results as results
 import framework.status as status
+import framework.backends as backends
+from framework.tests.backends_tests import BACKEND_INITIAL_META
 
 
 def check_initialize(target):
@@ -147,3 +149,61 @@ def test_update_results_old():
         res = results.update_results(base, f.name)
 
     nt.assert_equal(res.results_version, results.CURRENT_JSON_VERSION)
+
+
+@nt.raises(AssertionError)
+def test_resume_non_folder():
+    """ TestrunResult.resume doesn't accept a file """
+    with utils.with_tempfile('') as f:
+        results.TestrunResult.resume(f)
+
+
+def test_resume_load():
+    """ TestrunResult.resume loads with good results """
+    with utils.tempdir() as f:
+        backend = backends.JSONBackend(f)
+        backend.initialize(BACKEND_INITIAL_META)
+        backend.write_test("group1/test1", {'result': 'fail'})
+        backend.write_test("group1/test2", {'result': 'pass'})
+        backend.write_test("group2/test3", {'result': 'fail'})
+
+        try:
+            results.TestrunResult.resume(f)
+        except Exception as e:
+            raise AssertionError(e)
+
+
+def test_resume_load_valid():
+    """ TestrunResult.resume loads valid results """
+    with utils.tempdir() as f:
+        backend = backends.JSONBackend(f)
+        backend.initialize(BACKEND_INITIAL_META)
+        backend.write_test("group1/test1", {'result': 'fail'})
+        backend.write_test("group1/test2", {'result': 'pass'})
+        backend.write_test("group2/test3", {'result': 'fail'})
+
+        test = results.TestrunResult.resume(f)
+
+        nt.assert_set_equal(
+            set(test.tests.keys()),
+            set(['group1/test1', 'group1/test2', 'group2/test3']),
+        )
+
+
+def test_resume_load_invalid():
+    """ TestrunResult.resume ignores invalid results """
+    with utils.tempdir() as f:
+        backend = backends.JSONBackend(f)
+        backend.initialize(BACKEND_INITIAL_META)
+        backend.write_test("group1/test1", {'result': 'fail'})
+        backend.write_test("group1/test2", {'result': 'pass'})
+        backend.write_test("group2/test3", {'result': 'fail'})
+        with open(os.path.join(f, 'tests', 'x.json'), 'w') as w:
+            w.write('foo')
+
+        test = results.TestrunResult.resume(f)
+
+        nt.assert_set_equal(
+            set(test.tests.keys()),
+            set(['group1/test1', 'group1/test2', 'group2/test3']),
+        )

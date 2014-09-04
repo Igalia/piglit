@@ -27,6 +27,10 @@ try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import nose.tools as nt
 import framework.results as results
 import framework.backends as backends
@@ -37,7 +41,6 @@ BACKEND_INITIAL_META = {
     'name': 'name',
     'env': {},
     'test_count': 0,
-    'test_suffix': '',
 }
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'
@@ -157,3 +160,115 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
     def test_xml_valid(self):
         """ JUnitBackend.write_test() (twice) produces valid xml """
         super(TestJUnitMultiTest, self).test_xml_valid()
+
+
+def test_json_initialize_metadata():
+    """ JSONBackend.initialize() produces a metadata.json file """
+    baseline = {
+        'name': BACKEND_INITIAL_META['name'],
+        'results_version': backends.CURRENT_JSON_VERSION,
+        'options': {
+            'test_count': BACKEND_INITIAL_META['test_count'],
+            'env': BACKEND_INITIAL_META['env'],
+        }
+    }
+
+    with utils.tempdir() as f:
+        test = backends.JSONBackend(f)
+        test.initialize(BACKEND_INITIAL_META)
+
+        with open(os.path.join(f, 'metadata.json'), 'r') as t:
+            test = json.load(t)
+
+    nt.assert_dict_equal(baseline, test)
+
+
+class TestJSONTestMethod(utils.StaticDirectory):
+    @classmethod
+    def setup_class(cls):
+        cls.test_name = 'a/test/group/test1'
+        cls.result = results.TestResult({
+            'time': 1.2345,
+            'result': 'pass',
+            'out': 'this is stdout',
+            'err': 'this is stderr',
+        })
+        super(TestJSONTestMethod, cls).setup_class()
+        test = backends.JSONBackend(cls.tdir)
+        test.initialize(BACKEND_INITIAL_META)
+        test.write_test(cls.test_name, cls.result)
+
+    def test_write_test(self):
+        """ JSONBackend.write_test() adds tests to a 'tests' directory """
+        assert os.path.exists(os.path.join(self.tdir, 'tests', '0.json'))
+
+    def test_json_is_valid(self):
+        """ JSONBackend.write_test() produces valid json """
+        with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
+            try:
+                json.load(f)
+            except Exception as e:
+                raise AssertionError(e)
+
+    def test_json_is_correct(self):
+        """ JSONBackend.write_test() produces correct json """
+        with open(os.path.join(self.tdir, 'tests', '0.json'), 'r') as f:
+            test = json.load(f)
+
+        nt.assert_dict_equal({self.test_name: self.result}, test)
+
+
+class TestJSONTestFinalize(utils.StaticDirectory):
+    @classmethod
+    def setup_class(cls):
+        cls.test_name = 'a/test/group/test1'
+        cls.result = results.TestResult({
+            'time': 1.2345,
+            'result': 'pass',
+            'out': 'this is stdout',
+            'err': 'this is stderr',
+        })
+        super(TestJSONTestFinalize, cls).setup_class()
+        test = backends.JSONBackend(cls.tdir)
+        test.initialize(BACKEND_INITIAL_META)
+        test.write_test(cls.test_name, cls.result)
+        test.finalize()
+
+    def test_remove_metadata(self):
+        """ JSONBackend.finalize() removes metadata.json """
+        assert not os.path.exists(os.path.join(self.tdir, 'metadata.json'))
+
+    def test_remove_tests(self):
+        """ JSONBackend.finalize() removes tests directory """
+        assert not os.path.exists(os.path.join(self.tdir, 'tests'))
+
+    def test_create_results(self):
+        """ JSONBackend.finalize() creates a results.json file """
+        assert os.path.exists(os.path.join(self.tdir, 'results.json'))
+
+    def test_results_valid(self):
+        """ JSONBackend.finalize() results.json is valid """
+        with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
+            try:
+                json.load(f)
+            except Exception as e:
+                raise AssertionError(e)
+
+    def test_results_correct(self):
+        """ JSONBackend.finalize() results are expected """
+        baseline = {
+            'name': BACKEND_INITIAL_META['name'],
+            'results_version': backends.CURRENT_JSON_VERSION,
+            'options': {
+                'test_count': BACKEND_INITIAL_META['test_count'],
+                'env': BACKEND_INITIAL_META['env'],
+            },
+            'tests': {
+                self.test_name: dict(self.result)
+            }
+        }
+
+        with open(os.path.join(self.tdir, 'results.json'), 'r') as f:
+            test = json.load(f)
+
+        nt.assert_equal(baseline, test)

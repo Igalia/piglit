@@ -201,6 +201,48 @@ class TestrunResult(object):
                            if k in self.serialized_keys),
                       f, default=piglit_encoder, indent=JSONBackend.INDENT)
 
+    @classmethod
+    def resume(cls, results_dir):
+        """ Create a TestrunResult from an interupted run
+
+        This class method creates and returns a TestrunResult from a partial
+        result file. This does not load old streaminmg results by design, one
+        should not resume a run with a different piglit, it leads to all kinds
+        of problems.
+
+        """
+        # Pylint can't infer that the json being loaded is a dict
+        # pylint: disable=maybe-no-member
+        assert os.path.isdir(results_dir), \
+            "TestrunResult.resume() requires a directory"
+
+        # Load the metadata
+        with open(os.path.join(results_dir, 'metadata.json'), 'r') as f:
+            meta = json.load(f)
+        assert meta['results_version'] == CURRENT_JSON_VERSION, \
+            "Old results version, resume impossible"
+
+        testrun = TestrunResult()
+        testrun.name = meta['name']
+        testrun.options = meta['options']
+        testrun.uname = meta.get('uname')
+        testrun.glxinfo = meta.get('glxinfo')
+        testrun.lspci = meta.get('lspci')
+
+        # Load all of the test names and added them to the test list
+        for file_ in os.listdir(os.path.join(results_dir, 'tests')):
+            with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
+                try:
+                    test = json.load(f)
+                except json.JSONDecodeError:
+                    continue
+            # XXX: There has to be a better way to get a single key: value out
+            # of a dict even when the key name isn't known
+            for key, value in test.iteritems():
+                testrun.tests[key] = TestResult(value)
+
+        return testrun
+
 
 def load_results(filename):
     """ Loader function for TestrunResult class

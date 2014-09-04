@@ -264,7 +264,6 @@ def run(input_):
     # part of profile.run
     options['test_count'] = 0
 
-    # Begin json.
     backend = backends.get_backend(args.backend)(
         args.results_path,
         file_fsync=opts.sync,
@@ -301,7 +300,7 @@ def resume(input_):
                              "Default is piglit.conf")
     args = parser.parse_args(input_)
 
-    results = framework.results.load_results(args.results_path)
+    results = framework.results.TestrunResult.resume(args.results_path)
     opts = core.Options(concurrent=results.options['concurrent'],
                         exclude_filter=results.options['exclude_filter'],
                         include_filter=results.options['filter'],
@@ -320,12 +319,12 @@ def resume(input_):
     # Resume only works with the JSON backend
     backend = backends.get_backend('json')(
         args.results_path,
-        file_fsync=opts.sync)
-    backend.initialize(results.options)
+        file_fsync=opts.sync,
+        start_count=len(results.tests) + 1)
+    # Specifically do not initialize again, everything initialize does is done.
 
-    for key, value in results.tests.iteritems():
-        backend.write_test(key, value)
-        opts.exclude_tests.add(key)
+    for name in results.tests.iterkeys():
+        opts.exclude_tests.add(name)
 
     profile = framework.profile.merge_test_profiles(results.options['profile'])
     profile.results_dir = args.results_path

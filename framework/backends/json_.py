@@ -21,7 +21,8 @@
 """ Module providing json backend for piglit """
 
 import os
-import threading
+import shutil
+import itertools
 try:
     import simplejson as json
 except ImportError:
@@ -54,81 +55,26 @@ def piglit_encoder(obj):
 
 
 class JSONBackend(FSyncMixin, Backend):
-    '''
-    Writes to a JSON file stream
+    """ Piglit's native JSON backend
 
-    JSONWriter is threadsafe.
+    This writes out to piglit's native json backend. This class uses the python
+    json module or the simplejson.
 
-    Example
-    -------
+    This class is atomic, writes either completely fail or completley succeed.
+    To achieve this it writes individual files for each test and for the
+    metadata, and composes them at the end into a single file and removes the
+    intermediate files. When it tries to compose these files if it cannot read
+    a file it just ignores it, making the result atomic.
 
-    This call to ``json.dump``::
-        json.dump(
-            {
-                'a': [1, 2, 3],
-                'b': 4,
-                'c': {
-                    'x': 100,
-                },
-            }
-            file,
-            indent=JSONWriter.INDENT)
-
-    is equivalent to::
-        w = JSONWriter(file)
-        w._open_dict()
-        w._write_dict_item('a', [1, 2, 3])
-        w._write_dict_item('b', 4)
-        w._write_dict_item('c', {'x': 100})
-        w._close_dict()
-
-    which is also equivalent to::
-        w = JSONWriter(file)
-        w._open_dict()
-        w._write_dict_item('a', [1, 2, 3])
-        w._write_dict_item('b', 4)
-
-        w._write_dict_key('c')
-        w._open_dict()
-        w._write_dict_item('x', 100)
-        w._close_dict()
-
-        w._close_dict()
-    '''
-
+    """
     INDENT = 4
-    _LOCK = threading.RLock()
 
-    def __init__(self, f, **options):
-        self._file = open(os.path.join(f, 'results.json'), 'w')
+    def __init__(self, dest, start_count=0, **options):
+        self._dest = dest
         FSyncMixin.__init__(self, **options)
-        self.__indent_level = 0
-        self.__inhibit_next_indent = False
-        self.__encoder = json.JSONEncoder(indent=self.INDENT,
-                                          default=piglit_encoder)
 
-        # self.__is_collection_empty
-        #
-        # A stack that indicates if the currect collection is empty
-        #
-        # When _open_dict is called, True is pushed onto the
-        # stack. When the first element is written to the newly
-        # opened dict, the top of the stack is set to False.
-        # When the _close_dict is called, the stack is popped.
-        #
-        # The top of the stack is element -1.
-        #
-        self.__is_collection_empty = []
-
-        # self._open_containers
-        #
-        # A FILO stack that stores container information, each time
-        # self._open_dict() 'dict' is added to the stack, (other elements like
-        # 'list' could be added if support was added to JSONWriter for handling
-        # them), each to time self._close_dict() is called an element is
-        # removed. When self.close_json() is called each element of the stack
-        # is popped and written into the json
-        self._open_containers = []
+        # A counter the ensures each test gets a unique name
+        self._counter = itertools.count(start_count)
 
     def initialize(self, metadata):
         """ Write boilerplate json code
@@ -136,36 +82,25 @@ class JSONBackend(FSyncMixin, Backend):
         This writes all of the json except the actual tests.
 
         Arguments:
-        options -- any values to be put in the options dictionary, must be a
-                   dict-like object
-        name -- the name of the test
-        env -- any environment information to be written into the results, must
-               be a dict-like object
+        metadata -- a dictionary of values to be written
 
         """
-        with self._LOCK:
-            self._open_dict()
-            self._write_dict_item('results_version', CURRENT_JSON_VERSION)
-            self._write_dict_item('name', metadata['name'])
+        # If metadata is None then this is a loaded result and there is no need
+        # to initialize
+        out = {
+            'results_version': CURRENT_JSON_VERSION,
+            'name': metadata['name'],
+            'options': {k: v for k, v in metadata.iteritems() if k != 'name'},
+        }
 
-            self._write_dict_key('options')
-            self._open_dict()
-            for key, value in metadata.iteritems():
-                # Dont' write env or name into the options dictionary
-                if key in ['env', 'name']:
-                    continue
+        with open(os.path.join(self._dest, 'metadata.json'), 'w') as f:
+            json.dump(out, f, default=piglit_encoder)
 
-                # Loading a NoneType will break resume, and are a bug
-                assert value is not None, "Value {} is NoneType".format(key)
-                self._write_dict_item(key, value)
-            self._close_dict()
-
-            for key, value in metadata['env'].iteritems():
-                self._write_dict_item(key, value)
-
-            # Open the tests dictinoary so that tests can be written
-            self._write_dict_key('tests')
-            self._open_dict()
+        # make the directory for the tests
+        try:
+            os.mkdir(os.path.join(self._dest, 'tests'))
+        except OSError:
+            pass
 
     def finalize(self, metadata=None):
         """ End json serialization and cleanup
@@ -174,85 +109,48 @@ class JSONBackend(FSyncMixin, Backend):
         containers that are still open and closes the file
 
         """
-        # Ensure that there are no tests still writing by taking the lock here
-        with self._LOCK:
-            # Close the tests dictionary
-            self._close_dict()
+        # Create a dictionary that is full of data to be written to a single
+        # file
+        data = {}
 
-            # Write closing metadata
-            if metadata:
-                for key, value in metadata.iteritems():
-                    self._write_dict_item(key, value)
+        # Load the metadata and put it into a dictionary
+        with open(os.path.join(self._dest, 'metadata.json'), 'r') as f:
+            data.update(json.load(f))
 
-            # Close the root dictionary object
-            self._close_dict()
+        # If there is more metadata add it the dictionary
+        if metadata:
+            data.update(metadata)
 
-            # Close the file.
-            assert self._open_containers == [], \
-                "containers stack: {0}".format(self._open_containers)
-            self._file.close()
+        # Add the tests to the dictionary
+        data['tests'] = {}
 
-    def __write_indent(self):
-        if self.__inhibit_next_indent:
-            self.__inhibit_next_indent = False
-            return
-        else:
-            i = ' ' * self.__indent_level * self.INDENT
-            self._file.write(i)
+        test_dir = os.path.join(self._dest, 'tests')
+        for test in os.listdir(test_dir):
+            test = os.path.join(test_dir, test)
+            if os.path.isfile(test):
+                # Try to open the json snippets. If we fail to open a test then
+                # throw the whole thing out. This gives us atomic writes, the
+                # writing worked and is valid or it didn't work.
+                try:
+                    with open(test, 'r') as f:
+                        data['tests'].update(json.load(f))
+                except ValueError:
+                    pass
+        assert data['tests']
 
-    def __write(self, obj):
-        lines = list(self.__encoder.encode(obj).split('\n'))
-        n = len(lines)
-        for i in range(n):
-            self.__write_indent()
-            self._file.write(lines[i])
-            if i != n - 1:
-                self._file.write('\n')
+        # write out the combined file.
+        with open(os.path.join(self._dest, 'results.json'), 'w') as f:
+            json.dump(data, f, default=piglit_encoder,
+                      indent=JSONBackend.INDENT)
 
-    def _open_dict(self):
-        self.__write_indent()
-        self._file.write('{')
-
-        self.__indent_level += 1
-        self.__is_collection_empty.append(True)
-        self._open_containers.append('dict')
-        self._fsync(self._file)
-
-    def _close_dict(self):
-        self.__indent_level -= 1
-        self.__is_collection_empty.pop()
-
-        self._file.write('\n')
-        self.__write_indent()
-        self._file.write('}')
-        assert self._open_containers[-1] == 'dict'
-        self._open_containers.pop()
-        self._fsync(self._file)
-
-    def _write_dict_item(self, key, value):
-        # Write key.
-        self._write_dict_key(key)
-
-        # Write value.
-        self.__write(value)
-
-        self._fsync(self._file)
-
-    def _write_dict_key(self, key):
-        # Write comma if this is not the initial item in the dict.
-        if self.__is_collection_empty[-1]:
-            self.__is_collection_empty[-1] = False
-        else:
-            self._file.write(',')
-
-        self._file.write('\n')
-        self.__write(key)
-        self._file.write(': ')
-
-        self.__inhibit_next_indent = True
-        self._fsync(self._file)
+        # Delete the temporary files
+        os.unlink(os.path.join(self._dest, 'metadata.json'))
+        shutil.rmtree(os.path.join(self._dest, 'tests'))
 
     def write_test(self, name, data):
         """ Write a test into the JSON tests dictionary """
-        with self._LOCK:
-            self._write_dict_item(name, data)
+        t = os.path.join(self._dest, 'tests',
+                         '{}.json'.format(self._counter.next()))
+        with open(t, 'w') as f:
+            json.dump({name: data}, f, default=piglit_encoder)
+            self._fsync(f)
