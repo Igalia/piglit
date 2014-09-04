@@ -47,6 +47,11 @@ def escape_filename(key):
     return re.sub(r'[<>:"|?*#]', '_', key)
 
 
+def escape_pathname(key):
+    """ Remove / and \\ from names """
+    return re.sub(r'[/\\]', '_', key)
+
+
 def normalize_href(href):
     """Force backward slashes in URLs."""
     return href.replace('\\', '/')
@@ -113,7 +118,7 @@ class HTMLIndex(list):
         self._newRow()
         self.append({'type': 'other', 'text': '<td />'})
         for each in summary.results:
-            href = posixpath.join(each.name, "index.html")
+            href = posixpath.join(escape_pathname(each.name), "index.html")
             href = normalize_href(href)
             self.append({'type': 'other',
                          'text': '<td class="head"><b>%(name)s</b><br />'
@@ -188,7 +193,7 @@ class HTMLIndex(list):
                 href = escape_filename(href)
 
                 try:
-                    self._testResult(each.name, href,
+                    self._testResult(escape_pathname(each.name), href,
                                      summary.status[each.name][key])
                 except KeyError:
                     self.append({'type': 'other',
@@ -454,7 +459,8 @@ class Summary:
 
         # Iterate across the tests creating the various test specific files
         for each in self.results:
-            os.mkdir(path.join(destination, each.name))
+            name = escape_pathname(each.name)
+            os.mkdir(path.join(destination, name))
 
             if each.time_elapsed is not None:
                 time = datetime.timedelta(0, each.time_elapsed)
@@ -463,7 +469,7 @@ class Summary:
 
             self.__find_totals(each)
 
-            with open(path.join(destination, each.name, "index.html"), 'w') as out:
+            with open(path.join(destination, name, "index.html"), 'w') as out:
                 out.write(testindex.render(name=each.name,
                                            totals=self.totals,
                                            time=time,
@@ -474,7 +480,7 @@ class Summary:
 
             # Then build the individual test results
             for key, value in each.tests.iteritems():
-                html_path = path.join(destination, each.name, escape_filename(key + ".html"))
+                html_path = path.join(destination, name, escape_filename(key + ".html"))
                 temp_path = path.dirname(html_path)
 
                 if value['result'] not in exclude:
