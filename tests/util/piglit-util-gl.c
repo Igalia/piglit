@@ -1060,6 +1060,23 @@ piglit_read_pixels_float(GLint x, GLint y, GLsizei width, GLsizei height,
 	return pixels;
 }
 
+static bool
+piglit_can_probe_ubyte()
+{
+	int r,g,b,a;
+
+	glGetIntegerv(GL_RED_BITS, &r);
+	glGetIntegerv(GL_GREEN_BITS, &g);
+	glGetIntegerv(GL_BLUE_BITS, &b);
+	glGetIntegerv(GL_ALPHA_BITS, &a);
+
+	/* it could be LUMINANCE32F, etc. */
+	if (!r && !g && !b && !a)
+		return false;
+
+	return r <= 8 && g <= 8 && b <= 8 && a <= 8;
+}
+
 int
 piglit_probe_pixel_rgb_silent(int x, int y, const float* expected, float *out_probe)
 {
@@ -1158,12 +1175,83 @@ piglit_probe_pixel_rgba(int x, int y, const float* expected)
 	return 0;
 }
 
+static void
+piglit_array_float_to_ubyte(int n, const float *f, GLubyte *b)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+		b[i] = f[i] * 255;
+}
+
+static void
+piglit_array_float_to_ubyte_roundup(int n, const float *f, GLubyte *b)
+{
+	int i;
+
+	for (i = 0; i < n; i++)
+		b[i] = ceil(f[i] * 255);
+}
+
+static bool
+piglit_probe_rect_ubyte(int x, int y, int w, int h, int num_components,
+			const float *fexpected, bool silent)
+{
+	int i, j, p;
+	GLubyte *probe;
+	GLubyte *pixels;
+	GLubyte tolerance[4];
+	GLubyte expected[4];
+
+	piglit_array_float_to_ubyte_roundup(num_components, piglit_tolerance, tolerance);
+	piglit_array_float_to_ubyte(num_components, fexpected, expected);
+
+	/* RGBA readbacks are likely to be faster */
+	pixels = malloc(w*h*4);
+	glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	for (j = 0; j < h; j++) {
+		for (i = 0; i < w; i++) {
+			probe = &pixels[(j*w+i)*4];
+
+			for (p = 0; p < num_components; ++p) {
+				if (abs((int)probe[p] - (int)expected[p]) >= tolerance[p]) {
+					if (!silent) {
+						printf("Probe color at (%i,%i)\n", x+i, y+j);
+						if (num_components == 4) {
+							printf("  Expected: %u %u %u %u\n",
+							       expected[0], expected[1],
+							       expected[2], expected[3]);
+							printf("  Observed: %u %u %u %u\n",
+							       probe[0], probe[1], probe[2], probe[3]);
+						} else {
+							printf("  Expected: %u %u %u\n",
+							       expected[0], expected[1],
+							       expected[2]);
+							printf("  Observed: %u %u %u\n",
+							       probe[0], probe[1], probe[2]);
+						}
+					}
+					free(pixels);
+					return false;
+				}
+			}
+		}
+	}
+
+	free(pixels);
+	return true;
+}
+
 int
 piglit_probe_rect_rgb_silent(int x, int y, int w, int h, const float *expected)
 {
 	int i, j, p;
 	GLfloat *probe;
 	GLfloat *pixels;
+
+	if (piglit_can_probe_ubyte())
+		return piglit_probe_rect_ubyte(x, y, w, h, 3, expected, true);
 
 	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGB, NULL);
 
@@ -1222,6 +1310,9 @@ piglit_probe_rect_rgb(int x, int y, int w, int h, const float *expected)
 	int i, j, p;
 	GLfloat *probe;
 	GLfloat *pixels;
+
+	if (piglit_can_probe_ubyte())
+		return piglit_probe_rect_ubyte(x, y, w, h, 3, expected, false);
 
 	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
@@ -1289,6 +1380,9 @@ piglit_probe_rect_rgba(int x, int y, int w, int h, const float *expected)
 	int i, j, p;
 	GLfloat *probe;
 	GLfloat *pixels;
+
+	if (piglit_can_probe_ubyte())
+		return piglit_probe_rect_ubyte(x, y, w, h, 4, expected, false);
 
 	pixels = piglit_read_pixels_float(x, y, w, h, GL_RGBA, NULL);
 
