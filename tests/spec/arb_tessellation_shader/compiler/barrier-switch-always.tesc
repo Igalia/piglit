@@ -20,6 +20,11 @@
  *   a switch statement, in either sub-statement of an if statement, inside a
  *   do, for, or while loop, or at any point after a return statement in the
  *   function main().
+ *
+ * Technically, we should disallow this usage of barrier() inside the always-taken
+ * default case -- but this is an interesting edge case for Mesa's compiler, which
+ * at this time does not express switch statements in the IR, and so an always-taken
+ * default case is indistinguishable from code outside the switch.
  */
 
 #version 150
@@ -30,8 +35,6 @@ uniform int val;
 void main() {
     gl_out[gl_InvocationID].gl_Position = vec4(0.0);
     switch (val) {
-    case 1:
-        break;
     default:
         barrier();
     }
