@@ -1,0 +1,96 @@
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader]
+#extension GL_ARB_uniform_buffer_object : require
+
+struct S1 {
+	float r;
+};
+
+/* Section 2.11.4 (Uniform Variables), subsection Standard Uniform
+ * Block Layout, of the OpenGL 3.1 spec says (emphasis mine):
+ *
+ *     "(9) If the member is a structure, the base alignment of the
+ *     structure is <N>, where <N> is the largest base alignment value
+ *     of any of its members, and *rounded up to the base alignment of
+ *     a vec4*. The individual members of this sub-structure are then
+ *     assigned offsets by applying this set of rules recursively,
+ *     where the base offset of the first member of the sub-structure
+ *     is equal to the aligned offset of the structure. The structure
+ *     may have padding at the end; the base offset of the member
+ *     following the sub-structure is rounded up to the next multiple
+ *     of the base alignment of the structure."
+ */
+struct S {
+	S1 s1;
+	float g;
+	float b;
+	float a;
+};
+
+layout(std140) uniform ubo1 {
+	S s;
+};
+
+in vec4 piglit_vertex;
+flat out int pass;
+
+void main()
+{
+	/* std140 (or shared) layout prevents any fields or blocks from being
+	 * eliminted.  Section 2.11.6 of the OpenGL ES 3.0 spec makes this
+	 * explicit, but desktop GL specs only say it implicitly.  Either way,
+	 * there is no need to reference any field of the std140 block.
+	 */
+	gl_Position = piglit_vertex;
+
+	pass = int(s.g == 3.3);
+
+}
+
+[fragment shader]
+out vec4 piglit_fragcolor;
+flat in int pass;
+
+void main()
+{
+	piglit_fragcolor = bool(pass) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[test]
+link success
+
+active uniform s.s1.r GL_UNIFORM_TYPE GL_FLOAT
+active uniform s.s1.r GL_UNIFORM_SIZE 1
+active uniform s.s1.r GL_UNIFORM_OFFSET 0
+active uniform s.s1.r GL_UNIFORM_ARRAY_STRIDE 0
+active uniform s.s1.r GL_UNIFORM_MATRIX_STRIDE 0
+active uniform s.s1.r GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform s.g GL_UNIFORM_TYPE GL_FLOAT
+active uniform s.g GL_UNIFORM_SIZE 1
+active uniform s.g GL_UNIFORM_OFFSET 16
+active uniform s.g GL_UNIFORM_ARRAY_STRIDE 0
+active uniform s.g GL_UNIFORM_MATRIX_STRIDE 0
+active uniform s.g GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform s.b GL_UNIFORM_TYPE GL_FLOAT
+active uniform s.b GL_UNIFORM_SIZE 1
+active uniform s.b GL_UNIFORM_OFFSET 20
+active uniform s.b GL_UNIFORM_ARRAY_STRIDE 0
+active uniform s.b GL_UNIFORM_MATRIX_STRIDE 0
+active uniform s.b GL_UNIFORM_IS_ROW_MAJOR 0
+
+active uniform s.a GL_UNIFORM_TYPE GL_FLOAT
+active uniform s.a GL_UNIFORM_SIZE 1
+active uniform s.a GL_UNIFORM_OFFSET 24
+active uniform s.a GL_UNIFORM_ARRAY_STRIDE 0
+active uniform s.a GL_UNIFORM_MATRIX_STRIDE 0
+active uniform s.a GL_UNIFORM_IS_ROW_MAJOR 0
+
+uniform float s.g 3.3
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
