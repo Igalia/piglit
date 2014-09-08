@@ -25,7 +25,7 @@
 import os
 
 from genclbuiltins import gen
-from math import acos, asin, atan, atan2, pi, sin, sqrt, cos, fabs, tan, pow
+from math import acos, asin, atan, atan2, fmod, pi, sin, sqrt, cos, fabs, tan, pow
 
 CLC_VERSION_MIN = {
     'acos' : 10,
@@ -36,6 +36,7 @@ CLC_VERSION_MIN = {
     'cos' : 10,
     'fabs' : 10,
     'floor' : 10,
+    'fmod' : 10,
     'mix' : 10,
     'nextafter' : 10,
     'round' : 10,
@@ -123,6 +124,16 @@ tests = {
             [0.0, -1.0, 0.0, -0.0, float("nan"), -4.0,  1.0],
             [0.5, -0.5, 0.0, -0.0, float("nan"), -3.99, 1.5]
         ]
+    },
+    'fmod' : {
+        'arg_types': [F, F, F],
+        'function_type': 'ttt',
+        'values': [
+            [float.fromhex("0x1.99998p-4"),  float("nan"), float.fromhex("-0x1.47aep-7"),   1.0, float("-nan"), float("nan")],
+            [float.fromhex("0x1.466666p+2"), 0.0,          float.fromhex("-0x1p+2"),        1.0, 5.1,           3.0         ],
+            [float.fromhex("0x1p-1"),        float("nan"), float.fromhex("-0x1.feb852p+1"), 1.5, 0.0,           float("inf")]
+        ],
+        'tolerance' : 0
     },
     'mix' : { #x + (y - x) * a
         'arg_types': [F, F, F, F],
