@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_shading_language_420pack
+
+[vertex shader passthrough]
+
+[fragment shader]
+#version 150
+#extension GL_ARB_shading_language_420pack : require
+#extension GL_ARB_gpu_shader_fp64 : require
+uniform dvec4 color = { 0, 1, 0, 1 };
+void main()
+{
+	gl_FragColor = vec4(color);
+}
+
+[test]
+# green rectangle on left side
+draw rect -1 -1 1 2
+relative probe rgb (0.25, 0.5) (0.0, 1.0, 0.0)
+# blue rectangle on right side
+uniform dvec4 color 0.0 0.0 1.0 1.0
+draw rect 0 -1 1 2
+relative probe rgb (0.75, 0.5) (0.0, 0.0, 1.0)
