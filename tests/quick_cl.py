@@ -25,6 +25,8 @@
 #
 
 from tests.cl import profile
+from framework.oclconform import add_oclconform_tests
 from framework.opencv import add_opencv_tests
 
 add_opencv_tests(profile)
+add_oclconform_tests(profile)
