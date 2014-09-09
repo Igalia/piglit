@@ -191,6 +191,11 @@ parse_file(const char *filename)
 	char *end_of_line;
 	ptrdiff_t len;
 
+	if (line == NULL) {
+		fprintf(stderr, "could not read file \"%s\"\n", filename);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
 	/* The format of the test file is:
 	 *
 	 * major.minor
