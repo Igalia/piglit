@@ -1,0 +1,54 @@
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader]
+#extension GL_ARB_uniform_buffer_object: require
+
+/* Setting the COLUMN_MAJOR define will cause the test to pass.  The problem
+ * appears to be that the i965 backend generates the load of s[1].bv2.x from
+ * offset 80 even when m41_1 is row-major.  When m41_1 is row-major,
+ * s[1].bv2.x should be at offset 64.  This is correctly reported via the GL
+ * API.
+ */
+//#define COLUMN_MAJOR
+
+struct S {
+    bvec2       bv2;
+    mat4x2      m42_1;
+};
+
+layout(std140
+#ifndef COLUMN_MAJOR
+       , row_major
+#endif
+      ) uniform UB1 {
+    S[2] s;
+};
+
+flat out int vertex_pass;
+in vec4 piglit_vertex;
+
+void main()
+{
+    vertex_pass = int(s[1].bv2.x);
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+out vec4 piglit_fragcolor;
+flat in int vertex_pass;
+
+void main()
+{
+    piglit_fragcolor = vec4(1 - vertex_pass, vertex_pass, 0, 1);
+}
+
+[test]
+active uniform s[1].m42_1 GL_UNIFORM_OFFSET 64
+active uniform s[1].m42_1 GL_UNIFORM_IS_ROW_MAJOR 1
+
+uniform ivec2 s[1].bv2 1 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
