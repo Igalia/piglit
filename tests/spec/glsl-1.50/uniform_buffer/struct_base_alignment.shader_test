@@ -1,0 +1,86 @@
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#extension GL_ARB_shader_bit_encoding: enable
+#extension GL_ARB_gpu_shader5: enable
+
+// To reproduce the Mesa bug, S1 must be larger than 16 bytes and not
+// 16-byte aligned.  In addition, the uniform block must have an instance
+// name.
+
+struct S1 {
+    bvec2       bv1;
+    float       f1;
+    uvec2       uv1;
+};
+
+struct S2 {
+    mat4x2      m42_1;
+};
+
+struct S3 {
+    S2          s2_1;
+};
+
+layout(std140)
+uniform UB {
+                          // base   base  align  padded  row-   array   matrix
+                          // align  off.  off.   size    major  stride  stride
+    S1[2]      s1_1;      //    16     0      0      64    -        32       -
+//    [0]
+//    bvec2       bv1            8     0      0       8    -         -       -
+//    float       f1             4     8      8       4    -         -       -
+//    uvec2       uv1            8    12     16       8    -         -       -
+//    [1]
+//    bvec2       bv1            8    32     32       8    -         -       -
+//    float       f1             4    40     40       4    -         -       -
+//    uvec2       uv1            8    44     48       8    -         -       -
+    S3[1]      s3_1;      //    16    64     64      64    -        64       -
+//    [0]
+//    S2          s2_1          16    64     64      64    -         -       -
+//      mat4x2      m42_1       16    64     64      64   no         -      16
+} ub;
+
+flat out int vertex_pass;
+in vec4 piglit_vertex;
+
+#if defined(GL_ARB_shader_bit_encoding) || defined(GL_ARB_gpu_shader5) || __VERSION__ >= 430
+bool float_match(float u, float f, uint bits) { return floatBitsToUint(u) == bits; }
+#else
+bool float_match(float u, float f, uint bits) { return u == f; }
+#endif
+
+void main()
+{
+    bool pass;
+
+    pass = float_match(ub.s3_1[0].s2_1.m42_1[0].y, 32703.5333028, 0x46ff7f11u);
+
+    vertex_pass = int(pass);
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+out vec4 piglit_fragcolor;
+flat in int vertex_pass;
+
+void main()
+{
+    piglit_fragcolor = bool(vertex_pass) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[test]
+link success
+
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_TYPE GL_FLOAT_MAT4x2
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_SIZE 1
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_OFFSET 64
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_ARRAY_STRIDE 0
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_MATRIX_STRIDE 16
+active uniform UB.s3_1[0].s2_1.m42_1 GL_UNIFORM_IS_ROW_MAJOR 0
+
+uniform mat4x2 UB.s3_1[0].s2_1.m42_1 0x4680c6b6 0x46ff7f11 0x462085c4 0x46cefb3e 0xc6b24e67 0x469e776a 0xc6e2d23a 0xc64833be
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
