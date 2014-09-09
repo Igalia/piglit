@@ -2,6 +2,16 @@
 ; Set the opencv_test_ocl_bindir variable to run the OpenCV OpenCL tests.
 ;opencv_test_ocl_bindir=/home/user/opencv/build/bin
 ;opencv_workdir=/home/user/opencv/samples/c/
+; Run each subtest individiually to so a result is recored for each subtest.
+; For example, default behavior:
+; opencv/OCL_ML/Kmeans -> Pass
+;
+; With 'individual' option:
+; OCL_ML/Kmeans.Mat/0 -> Pass
+; OCL_ML/Kmeans.Mat/1 -> Pass
+; OCL_ML/Kmeans.Mat/2 -> Pass
+;
+;individual
 ;
 [xts]
 ; Set bindir equal to the root of the xts directory

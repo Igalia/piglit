@@ -38,12 +38,13 @@ class OpenCVTest(GTest):
         GTest.__init__(self, options)
 
 
-def add_opencv_tests(profile, individual = False):
+def add_opencv_tests(profile):
     if not PIGLIT_CONFIG.has_option('opencv', 'opencv_test_ocl_bindir'):
         return
 
     opencv_test_ocl = path.join(PIGLIT_CONFIG.get('opencv',
         'opencv_test_ocl_bindir'), 'opencv_test_ocl')
+    individual = PIGLIT_CONFIG.has_option('opencv', 'individual')
     if not path.isfile(opencv_test_ocl):
         print('Warning: {} does not exist.\nSkipping OpenCV '
               'tests...'.format(opencv_test_ocl))
