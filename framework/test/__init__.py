@@ -20,8 +20,13 @@
 
 """ Module that provides test classes and helpers """
 
+# By importing every exported function from each module in the package we
+# create a general use API, but allow it to be controlled by setting the
+# __all__ in each module
+
 from __future__ import absolute_import
-from .exectest import *
+from .base import *
+from .piglit_test import *
 from .gleantest import *
 from .glsl_parser_test import *
 from .shader_test import *

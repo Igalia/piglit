@@ -23,7 +23,7 @@
 #
 
 import re
-from .exectest import Test
+from .base import Test
 
 __all__ = [
     'GTest',

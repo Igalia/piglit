@@ -25,11 +25,10 @@ import os
 import re
 import sys
 import subprocess
+from os import path
 
 import framework.core
-from framework.profile import TestProfile
-from framework.test import Test
-from os import path
+from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 

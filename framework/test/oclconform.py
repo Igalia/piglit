@@ -30,7 +30,7 @@ from os.path import join
 from sys import stderr
 
 from framework.core import PIGLIT_CONFIG
-from .exectest import Test
+from .base import Test
 
 __all__ = [
     'OCLConform',

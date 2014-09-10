@@ -23,7 +23,8 @@
 """ Glean support """
 
 import os
-from .exectest import Test, TEST_BIN_DIR
+from .base import Test
+from .piglit_test import TEST_BIN_DIR
 
 __all__ = [
     'GleanTest',

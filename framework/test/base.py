@@ -34,24 +34,14 @@ import threading
 import signal
 import itertools
 import abc
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 from framework.core import Options
 from framework.results import TestResult
 
 
-__all__ = ['Test',
-           'PiglitTest',
-           'TEST_BIN_DIR']
-
-if 'PIGLIT_BUILD_DIR' in os.environ:
-    TEST_BIN_DIR = os.path.join(os.environ['PIGLIT_BUILD_DIR'], 'bin')
-else:
-    TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                                 '../bin'))
+__all__ = [
+    'Test',
+]
 
 
 class ProcessTimeout(threading.Thread):
@@ -343,40 +333,3 @@ class Test(object):
         self.result['out'] = out.decode('utf-8', 'replace')
         self.result['err'] = err.decode('utf-8', 'replace')
         self.result['returncode'] = returncode
-
-
-class PiglitTest(Test):
-    """
-    PiglitTest: Run a "native" piglit test executable
-
-    Expect one line prefixed PIGLIT: in the output, which contains a result
-    dictionary. The plain output is appended to this dictionary
-    """
-    def __init__(self, *args, **kwargs):
-        super(PiglitTest, self).__init__(*args, **kwargs)
-
-        # Prepend TEST_BIN_DIR to the path.
-        self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
-
-    def is_skip(self):
-        """ Native Piglit-test specific skip checking
-
-        If the platform for the run doesn't suppoprt glx (either directly as
-        glx or through the hybrid glx/x11_egl setup that is default), then skip
-        any glx specific tests.
-
-        """
-        if self.OPTS.env['PIGLIT_PLATFORM'] not in ['glx', 'mixed_glx_egl']:
-            split_command = os.path.split(self._command[0])[1]
-            if split_command.startswith('glx-'):
-                return True
-        return False
-
-    def interpret_result(self):
-        outlines = self.result['out'].split('\n')
-        outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
-
-        for piglit in outpiglit:
-            self.result.recursive_update(json.loads(piglit))
-        self.result['out'] = '\n'.join(
-            s for s in outlines if not s.startswith('PIGLIT:'))

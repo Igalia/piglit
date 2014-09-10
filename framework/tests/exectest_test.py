@@ -25,7 +25,8 @@ import nose.tools as nt
 import framework.tests.utils as utils
 from framework.log import LogManager
 from framework.dmesg import DummyDmesg
-from framework.test import PiglitTest, Test
+from framework.test import PiglitTest
+from framework.test.base import Test
 
 
 # Helpers

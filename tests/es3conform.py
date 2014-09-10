@@ -27,7 +27,7 @@ import sys
 from os import path
 from glob import glob
 from framework.profile import TestProfile
-from framework.test import Test, TEST_BIN_DIR
+from framework.test import TEST_BIN_DIR, Test
 
 __all__ = ['profile']
 

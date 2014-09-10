@@ -27,7 +27,7 @@ import os.path as path
 import re
 import sys
 
-from .exectest import PiglitTest
+from .piglit_test import PiglitTest
 
 __all__ = [
     'GLSLParserTest',
