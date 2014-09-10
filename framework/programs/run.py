@@ -37,9 +37,6 @@ __all__ = ['run',
            'resume']
 
 
-_PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
-
-
 def _default_platform():
     """ Logic to determine the default platform to use
 
@@ -61,9 +58,9 @@ def _default_platform():
     else:
         try:
             plat = core.PIGLIT_CONFIG.get('core', 'platform')
-            if plat not in _PLATFORMS:
+            if plat not in core.PLATFORMS:
                 print('Platform is not valid\n'
-                      'valid platforms are: {}'.format(_PLATFORMS),
+                      'valid platforms are: {}'.format(core.PLATFORMS),
                       file=sys.stderr)
                 sys.exit(1)
             return plat
@@ -145,7 +142,7 @@ def _run_parser(input_):
                              dest="concurrency",
                              help="Disable concurrent test runs")
     parser.add_argument("-p", "--platform",
-                        choices=_PLATFORMS,
+                        choices=core.PLATFORMS,
                         default=_default_platform(),
                         help="Name of windows system passed to waffle")
     parser.add_argument("--valgrind",

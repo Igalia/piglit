@@ -31,12 +31,16 @@ import sys
 # TODO: ConfigParser is known as configparser in python3
 import ConfigParser
 
-__all__ = ['PIGLIT_CONFIG',
-           'Options',
-           'collect_system_info',
-           'parse_listfile']
+__all__ = [
+    'PIGLIT_CONFIG',
+    'PLATFORMS',
+    'Options',
+    'collect_system_info',
+    'parse_listfile',
+]
 
 
+PLATFORMS = ["glx", "x11_egl", "wayland", "gbm", "mixed_glx_egl"]
 PIGLIT_CONFIG = ConfigParser.SafeConfigParser(allow_no_value=True)
 
 def get_config(arg=None):
