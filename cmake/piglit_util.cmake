@@ -84,5 +84,6 @@ function(piglit_add_library name)
         install(TARGETS ${name} DESTINATION ${PIGLIT_INSTALL_LIBDIR}/lib)
     endif(WIN32)
     add_dependencies(${name} piglit_dispatch_gen)
+    set_target_properties(${name} PROPERTIES SOVERSION "0")
 
 endfunction(piglit_add_library)
