@@ -1,0 +1,81 @@
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader]
+#extension GL_ARB_uniform_buffer_object: require
+#extension GL_ARB_shader_bit_encoding: enable
+#extension GL_ARB_gpu_shader5: enable
+
+struct S2 {
+    mat2x3      m23;
+    mat2x4      m24;
+};
+
+struct S1 {
+    S2[1]       s2;
+    int         i1;
+};
+
+
+layout(std140, row_major)
+uniform UB1 {
+                          // base   base  align  padded  row-   array   matrix
+                          // align  off.  off.   size    major  stride  stride
+    S1         s1;        //    16     0      0     128    -         -       -
+//    S2[1]       s2            16     0      0     112    -       112       -
+//      [0]
+//      mat2x3      m23         16     0      0      48   yes        -      16
+//      mat2x4      m24         16    48     48      64   yes        -      16
+//    int      i1                4   112    112       4    -         -       -
+} ;
+
+flat out int vertex_pass;
+in vec4 piglit_vertex;
+
+#if defined(GL_ARB_shader_bit_encoding) || defined(GL_ARB_gpu_shader5) || __VERSION__ >= 430
+bool float_match(float u, float f, uint bits) { return floatBitsToUint(u) == bits; }
+#else
+bool float_match(float u, float f, uint bits) { return u == f; }
+#endif
+
+void main()
+{
+    /* std140 (or shared) layout prevents any fields or blocks from being
+     * eliminated.  Section 2.11.6 of the OpenGL ES 3.0 spec makes this
+     * explicit, but desktop GL specs only imply it.
+     */
+    bool pass = true;
+
+    if (s1.i1 != 111)
+        pass = false;
+
+    vertex_pass = int(pass);
+    gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+precision highp float;
+
+out vec4 piglit_fragcolor;
+flat in int vertex_pass;
+
+void main()
+{
+    piglit_fragcolor = bool(vertex_pass) ? vec4(0, 1, 0, 1) : vec4(1, 0, 0, 1);
+}
+
+[test]
+link success
+
+active uniform s1.i1 GL_UNIFORM_TYPE GL_INT
+active uniform s1.i1 GL_UNIFORM_SIZE 1
+active uniform s1.i1 GL_UNIFORM_OFFSET 112
+active uniform s1.i1 GL_UNIFORM_ARRAY_STRIDE 0
+active uniform s1.i1 GL_UNIFORM_MATRIX_STRIDE 0
+active uniform s1.i1 GL_UNIFORM_IS_ROW_MAJOR 0
+
+uniform int s1.i1 111
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
