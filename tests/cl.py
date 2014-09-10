@@ -11,7 +11,7 @@ import platform
 import glob
 
 from framework.profile import TestProfile
-from framework.test import PiglitTest
+from framework.test import PiglitCLTest
 
 ######
 # Helper functions
@@ -19,7 +19,7 @@ from framework.test import PiglitTest
 can_do_concurrent = platform.system().lower()[0:5] != 'linux' or glob.glob('/dev/dri/render*')
 
 def add_plain_test(group, name, args):
-        group[name] = PiglitTest(args, run_concurrent=can_do_concurrent)
+        group[name] = PiglitCLTest(args, run_concurrent=can_do_concurrent)
 
 def add_plain_program_tester_test(group, name, path):
         add_plain_test(group, name, ['cl-program-tester', path])

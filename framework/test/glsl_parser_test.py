@@ -27,7 +27,7 @@ import os.path as path
 import re
 import sys
 
-from .piglit_test import PiglitTest
+from .piglit_test import PiglitGLTest
 
 __all__ = [
     'GLSLParserTest',
@@ -73,7 +73,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
                     add_glsl_parser_test(group, filepath, testname)
 
 
-class GLSLParserTest(PiglitTest):
+class GLSLParserTest(PiglitGLTest):
     """ Read the options in a glsl parser test and create a Test object
 
     Specifically it is necessary to parse a glsl_parser_test to get information

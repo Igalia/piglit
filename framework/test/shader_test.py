@@ -27,7 +27,7 @@ import os
 import os.path as path
 import re
 
-from .piglit_test import PiglitTest
+from .piglit_test import PiglitGLTest
 
 __all__ = [
     'ShaderTest',
@@ -37,7 +37,7 @@ __all__ = [
 ]
 
 
-class ShaderTest(PiglitTest):
+class ShaderTest(PiglitGLTest):
     """ Parse a shader test file and return a PiglitTest instance
 
     This function parses a shader test to determine if it's a GL, GLES2 or

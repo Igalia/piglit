@@ -209,12 +209,7 @@ class Test(object):
             self.result['returncode'] = None
             return
 
-        # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
-        # developers. If we catch it happening, try just re-running the test.
-        for _ in xrange(5):
-            self.__run_command()
-            if "Got spurious window resize" not in self.result['out']:
-                break
+        self._run_command()
 
         # If the result is skip then the test wasn't run, return early
         # This usually is triggered when a test is not built for a specific
@@ -258,7 +253,7 @@ class Test(object):
         if hasattr(os, 'setpgrp'):
             os.setpgrp()
 
-    def __run_command(self):
+    def _run_command(self):
         """ Run the test command and get the result
 
         This method sets environment options, then runs the executable. If the

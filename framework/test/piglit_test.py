@@ -32,7 +32,8 @@ from .base import Test
 
 
 __all__ = [
-    'PiglitTest',
+    'PiglitGLTest',
+    'PiglitCLTest',
     'TEST_BIN_DIR'
 ]
 
@@ -43,7 +44,7 @@ else:
                                                  '../../bin'))
 
 
-class PiglitTest(Test):
+class PiglitBaseTest(Test):
     """
     PiglitTest: Run a "native" piglit test executable
 
@@ -51,11 +52,30 @@ class PiglitTest(Test):
     dictionary. The plain output is appended to this dictionary
     """
     def __init__(self, *args, **kwargs):
-        super(PiglitTest, self).__init__(*args, **kwargs)
+        super(PiglitBaseTest, self).__init__(*args, **kwargs)
 
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])
 
+    def interpret_result(self):
+        outlines = self.result['out'].split('\n')
+        outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
+
+        for piglit in outpiglit:
+            self.result.recursive_update(json.loads(piglit))
+        self.result['out'] = '\n'.join(
+            s for s in outlines if not s.startswith('PIGLIT:'))
+
+
+class PiglitGLTest(PiglitBaseTest):
+    """ OpenGL specific Piglit test class
+
+    This Subclass provides two methods that differ from PiglitBaseTest, first
+    it provides an is_skip() method that skips glx tests on non-glx platforms,
+    and it provides a _run_command() method that repeats tests if they fail due
+    to window manager resizing bug
+
+    """
     def is_skip(self):
         """ Native Piglit-test specific skip checking
 
@@ -70,11 +90,15 @@ class PiglitTest(Test):
                 return True
         return False
 
-    def interpret_result(self):
-        outlines = self.result['out'].split('\n')
-        outpiglit = (s[7:] for s in outlines if s.startswith('PIGLIT:'))
+    def _run_command(self):
+        # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
+        # developers. If we catch it happening, try just re-running the test.
+        for _ in xrange(5):
+            super(PiglitGLTest, self)._run_command()
+            if "Got spurious window resize" not in self.result['out']:
+                break
 
-        for piglit in outpiglit:
-            self.result.recursive_update(json.loads(piglit))
-        self.result['out'] = '\n'.join(
-            s for s in outlines if not s.startswith('PIGLIT:'))
+
+class PiglitCLTest(PiglitBaseTest):
+    """ OpenCL specific Test class """
+    pass
