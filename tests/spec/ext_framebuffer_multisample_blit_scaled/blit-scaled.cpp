@@ -53,7 +53,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
-static int  num_samples;
+static int samples;
 static TestPattern *test_pattern;
 static unsigned prog, vao, vertex_buf;
 const float srcX0 = 6, srcY0 = 7, dstX0 = 0, dstY0 = 0;
@@ -72,94 +72,127 @@ compile_shader(void)
 {
 	static const char *vert =
 		"#version 130\n"
-		"uniform mat4 proj;\n"
 		"in vec2 pos;\n"
 		"in vec2 texCoord;\n"
 		"out vec2 textureCoord;\n"
 		"void main()\n"
 		"{\n"
-		"  gl_Position = proj * vec4(pos, 0.0, 1.0);\n"
+		"  gl_Position = vec4(pos, 0.0, 1.0);\n"
 		"  textureCoord = texCoord;\n"
 		"}\n";
 	/* Bilinear filtering of samples using shader program */
-	static const char *frag =
+	static const char *frag_template =
 		"#version 130\n"
 		"#extension GL_ARB_texture_multisample : require\n"
 		"in vec2 textureCoord;\n"
-		"uniform sampler2DMS ms_tex;\n"
-		"uniform int samples;\n"
-		"uniform float xmin;\n"
-		"uniform float ymin;\n"
-		"uniform float xmax;\n"
-		"uniform float ymax;\n"
+		"uniform sampler2DMS texSampler;\n"
+		"uniform float src_width;\n"
+		"uniform float src_height;\n"
 		"out vec4 out_color;\n"
 		"void main()\n"
 		"{\n"
+		"%s"
 		"  float x_f, y_f;\n"
-		"  vec4 s_0, s_1, s_2, s_3;\n"
+		"  const float x_scale = 2.0f, x_scale_inv = 0.5f;\n"
+		"  const float y_scale = %ff, y_scale_inv = %ff;\n"
+		"  const float x_offset = 0.25f, y_offset = %ff;\n"
 		"  vec2 s_0_coord, s_1_coord, s_2_coord, s_3_coord;\n"
-		"  float x_scale = 2.0;\n"
-		"  float y_scale = samples / 2.0;\n"
-		"  int sample_map[8] = int[8](5 , 2, 4, 6, 0, 3, 7, 1);\n"
+		"  vec4 s_0_color, s_1_color, s_2_color, s_3_color;\n"
+		"  vec4 x_0_color, x_1_color;\n"
 		"\n"
-		"  vec2 tex_coord = vec2(textureCoord.x - 1.0 / 4,\n"
-		"                        textureCoord.y - 1.0 / samples);\n"
-		"  tex_coord = vec2(x_scale * tex_coord.x,\n"
-		"                   y_scale * tex_coord.y);\n"
+		"  vec2 tex_coord = vec2(textureCoord.x - x_offset,\n"
+		"                        textureCoord.y - y_offset);\n"
+		"  tex_coord = vec2(x_scale * tex_coord.x, y_scale * tex_coord.y);\n"
 		"\n"
-		"  if((tex_coord.x) < x_scale * xmin)\n"
-		"    tex_coord.x = x_scale * xmin;\n"
-		"  if(tex_coord.x >= x_scale * xmax - 1.0)\n"
-		"    tex_coord.x = x_scale * xmax - 1.0;\n"
-		"\n"
-		"  if(tex_coord.y < y_scale * ymin)\n"
-		"    tex_coord.y = y_scale * ymin;\n"
-		"  if(tex_coord.y >= y_scale * ymax - 1.0)\n"
-		"    tex_coord.y = y_scale * ymax - 1.0;\n"
+		"  clamp(tex_coord.x, 0.0f, x_scale * src_width - 1.0f);\n"
+		"  clamp(tex_coord.y, 0.0f, y_scale * src_height - 1.0f);\n"
 		"\n"
 		"  x_f = fract(tex_coord.x);\n"
 		"  y_f = fract(tex_coord.y);\n"
 		"\n"
-		"  tex_coord.x = int(tex_coord.x) / x_scale;\n"
-		"  tex_coord.y = int(tex_coord.y) / y_scale;\n"
+		"  tex_coord.x = int(tex_coord.x) * x_scale_inv;\n"
+		"  tex_coord.y = int(tex_coord.y) * y_scale_inv;\n"
 		"\n"
+		"\n"
+		"  /* Compute the sample coordinates used for filtering. */\n"
 		"  s_0_coord = tex_coord;\n"
-		"  s_1_coord = s_0_coord + vec2(1 / x_scale, 0 / y_scale);\n"
-		"  s_2_coord = s_0_coord + vec2(0 / x_scale, 1 / y_scale);\n"
-		"  s_3_coord = s_0_coord + vec2(1 / x_scale, 1 / y_scale);\n"
+		"  s_1_coord = tex_coord + vec2(x_scale_inv, 0.0f);\n"
+		"  s_2_coord = tex_coord + vec2(0.0f, y_scale_inv);\n"
+		"  s_3_coord = tex_coord + vec2(x_scale_inv, y_scale_inv);\n"
 		"\n"
-		"  if (samples == 4) {\n"
-		"    s_0 = texelFetch(ms_tex, ivec2(s_0_coord),\n"
-		"                     int(2 * fract(s_0_coord.x) +\n"
-		"                     samples * fract(s_0_coord.y)));\n"
-		"    s_1 = texelFetch(ms_tex, ivec2(s_1_coord),\n"
-		"                     int(2 * fract(s_1_coord.x) +\n"
-		"                     samples * fract(s_1_coord.y)));\n"
-		"    s_2 = texelFetch(ms_tex, ivec2(s_2_coord),\n"
-		"                     int(2 * fract(s_2_coord.x) +\n"
-		"                     samples * fract(s_2_coord.y)));\n"
-		"    s_3 = texelFetch(ms_tex, ivec2(s_3_coord),\n"
-                "                     int(2 * fract(s_3_coord.x) +\n"
-		"                     samples * fract(s_3_coord.y)));\n"
-		"  } else {\n"
-		"    s_0 = texelFetch(ms_tex, ivec2(s_0_coord),\n"
-		"                     sample_map[int(2 * fract(s_0_coord.x) +\n"
-		"                     samples * fract(s_0_coord.y))]);\n"
-		"    s_1 = texelFetch(ms_tex, ivec2(s_1_coord),\n"
-		"                     sample_map[int(2 * fract(s_1_coord.x) +\n"
-		"                     samples * fract(s_1_coord.y))]);\n"
-		"    s_2 = texelFetch(ms_tex, ivec2(s_2_coord),\n"
-		"                     sample_map[int(2 * fract(s_2_coord.x) +\n"
-		"                     samples * fract(s_2_coord.y))]);\n"
-		"    s_3 = texelFetch(ms_tex, ivec2(s_3_coord),\n"
-		"                     sample_map[int(2 * fract(s_3_coord.x) +\n"
-		"                     samples * fract(s_3_coord.y))]);\n"
-		"  }\n"
+		"  /* Fetch sample color values. */\n"
+		"%s"
+		"  s_0_color = TEXEL_FETCH(s_0_coord)\n"
+		"  s_1_color = TEXEL_FETCH(s_1_coord)\n"
+		"  s_2_color = TEXEL_FETCH(s_2_coord)\n"
+		"  s_3_color = TEXEL_FETCH(s_3_coord)\n"
+		"#undef TEXEL_FETCH\n"
 		"\n"
-		"  vec4 color_x1 =  mix(s_0, s_1, x_f);\n"
-		"  vec4 color_x2 =  mix(s_2, s_3, x_f);\n"
-		"  out_color = mix(color_x1, color_x2, y_f);\n"
+		"  /* Do bilinear filtering on sample colors. */\n"
+		"  x_0_color =  mix(s_0_color, s_1_color, x_f);\n"
+		"  x_1_color =  mix(s_2_color, s_3_color, x_f);\n"
+		"  out_color = mix(x_0_color, x_1_color, y_f);\n"
 		"}\n";
+
+	char* frag, *texel_fetch_macro;
+	const char*sample_number, *sample_map = "";
+	const float y_scale = samples * 0.5;
+
+	/* Below switch is used to setup the shader expression, which computes
+	 * sample index and map it to to a sample number on Intel hardware.
+	 * Sample index layout shows the numbering of slots in a rectangular
+	 * grid of samples with in a pixel. Sample number layout shows the
+	 * rectangular grid of samples roughly corresponding to the real sample
+	 * locations with in a pixel. Sample number layout matches the sample
+	 * index layout in case of 2X and 4x MSAA, but they are different in
+	 * case of 8X MSAA.
+	 *
+	 * 2X MSAA sample index / number layout
+	 *           ---------
+	 *           | 0 | 1 |
+	 *           ---------
+	 *
+	 * 4X MSAA sample index / number layout
+	 *           ---------
+	 *           | 0 | 1 |
+	 *           ---------
+	 *           | 2 | 3 |
+	 *           ---------
+	 *
+	 * 8X MSAA sample index layout    8x MSAA sample number layout
+	 *           ---------                      ---------
+	 *           | 0 | 1 |                      | 5 | 2 |
+	 *           ---------                      ---------
+	 *           | 2 | 3 |                      | 4 | 6 |
+	 *           ---------                      ---------
+	 *           | 4 | 5 |                      | 0 | 3 |
+	 *           ---------                      ---------
+	 *           | 6 | 7 |                      | 7 | 1 |
+	 *           ---------                      ---------
+	 */
+	switch(samples) {
+	case 2:
+		sample_number =  "int(2 * fract(coord.x))";
+		break;
+	case 4:
+		sample_number =  "int(2 * fract(coord.x) + 4 * fract(coord.y))";
+	break;
+	case 8:
+		sample_map = "  const int sample_map[8] = int[8](5 , 2, 4, 6, 0, 3, 7, 1);\n";
+		sample_number =  "sample_map[int(2 * fract(coord.x) + 8 * fract(coord.y))]";
+		break;
+	default:
+		printf("Unsupported sample count %d\n", samples);
+		piglit_report_result(PIGLIT_SKIP);
+	}
+
+	asprintf(&texel_fetch_macro,
+		 "#define TEXEL_FETCH(coord) texelFetch(texSampler, ivec2(coord), %s);\n",
+		 sample_number);
+
+	asprintf(&frag, frag_template, sample_map, y_scale, 1.0f / y_scale,
+		 1.0f / samples, texel_fetch_macro);
+
 	/* Compile program */
 	prog = glCreateProgram();
 	GLint vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vert);
@@ -200,14 +233,8 @@ compile_shader(void)
 }
 
 void
-ms_blit_scaled_glsl(const Fbo *src_fbo, GLint samples)
+ms_blit_scaled_glsl(const Fbo *src_fbo)
 {
-	const float proj[4][4] = {
-		{ 1, 0, 0, 0 },
-		{ 0, 1, 0, 0 },
-		{ 0, 0, 1, 0 },
-		{ 0, 0, 0, 1 }};
-
 	float vertex_data[4][4] = {
 		{ -1, -1, srcX0, srcY0 },
 		{ -1,  1, srcX0, srcY1 },
@@ -221,16 +248,11 @@ ms_blit_scaled_glsl(const Fbo *src_fbo, GLint samples)
 
 	/* Set up uniforms */
 	glUseProgram(prog);
-	glUniform1i(glGetUniformLocation(prog, "ms_tex"), 0);
-	glUniform1i(glGetUniformLocation(prog, "samples"), samples);
-	glUniform1f(glGetUniformLocation(prog, "xmin"), 0);
-	glUniform1f(glGetUniformLocation(prog, "ymin"), 0);
-	glUniform1f(glGetUniformLocation(prog, "xmax"),
+	glUniform1i(glGetUniformLocation(prog, "texSampler"), 0);
+	glUniform1f(glGetUniformLocation(prog, "src_width"),
 		    multisampled_fbo.config.width);
-	glUniform1f(glGetUniformLocation(prog, "ymax"),
+	glUniform1f(glGetUniformLocation(prog, "src_height"),
 		    multisampled_fbo.config.height);
-	glUniformMatrix4fv(glGetUniformLocation(prog, "proj"), 1,
-                           GL_TRUE, &proj[0][0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data,
@@ -246,7 +268,7 @@ piglit_init(int argc, char **argv)
 
 	/* 1st arg: num_samples */
 	char *endptr = NULL;
-	num_samples = strtol(argv[1], &endptr, 0);
+	int num_samples = strtol(argv[1], &endptr, 0);
 	if (endptr != argv[1] + strlen(argv[1]))
 		print_usage_and_exit(argv[0]);
 
@@ -272,6 +294,12 @@ piglit_init(int argc, char **argv)
 	msConfig.num_rb_attachments = 0; /* default value is 1 */
 	multisampled_tex.setup(msConfig);
 
+	/* Implementation might not create a buffer with requested sample
+	 * count. So, query the actual sample count of buffer.
+	 */
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_tex.handle);
+	glGetIntegerv(GL_SAMPLES, &samples);
+
 	test_pattern = new Triangles();
 	test_pattern->compile();
 
@@ -284,7 +312,6 @@ piglit_init(int argc, char **argv)
 bool test_ms_blit_scaled(Fbo ms_fbo)
 {
 	GLfloat scale;
-	GLint samples;
 	bool pass = true, result = true;
 
 	/* Draw the test pattern into the framebuffer with texture
@@ -292,7 +319,6 @@ bool test_ms_blit_scaled(Fbo ms_fbo)
 	 */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multisampled_tex.handle);
 	glViewport(0, 0, srcX1, srcY1);
-	glGetIntegerv(GL_SAMPLES, &samples);
 	glClear(GL_COLOR_BUFFER_BIT);
 	test_pattern->draw(TestPattern::no_projection);
 
@@ -340,7 +366,7 @@ bool test_ms_blit_scaled(Fbo ms_fbo)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampled_tex.handle);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, singlesampled_fbo.handle);
 		glViewport(pattern_width + dstX0, dstY0, srcX1 * scale, srcY1 * scale);
-		ms_blit_scaled_glsl(&multisampled_tex, samples);
+		ms_blit_scaled_glsl(&multisampled_tex);
 
 		pass = piglit_check_gl_error(GL_NO_ERROR) && pass;
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, singlesampled_fbo.handle);
@@ -355,10 +381,10 @@ bool test_ms_blit_scaled(Fbo ms_fbo)
 				  0, 0, 2 * pattern_width, piglit_height,
 				  GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		piglit_present_results();
-		printf("MS attachment = %24s, scale = %f, result = %s\n",
+		printf("MS attachment = %12s, scale = %f, result = %s\n",
 		       ms_fbo.config.num_tex_attachments > 0 ?
-		       "MULTISAMPLE_TEXTURE" :
-		       "MULTISAMPLE_RENDERBUFFER",
+		       "TEXTURE" :
+		       "RENDERBUFFER",
 		       scale, result ? "pass" : "fail");
 	}
 	return pass;
