@@ -10,10 +10,9 @@ import subprocess
 import sys
 
 from framework.profile import TestProfile
-from framework.exectest import PiglitTest
-from framework.gleantest import GleanTest
-from framework.glsl_parser_test import GLSLParserTest, add_glsl_parser_test, import_glsl_parser_tests
-from framework.shader_test import add_shader_test_dir
+from framework.test import (PiglitTest, GleanTest,
+                            add_glsl_parser_test, import_glsl_parser_tests,
+                            add_shader_test_dir)
 
 # Path to tests dir, correct even when not running from the top directory.
 testsDir = os.path.dirname(__file__)

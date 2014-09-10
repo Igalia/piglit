@@ -26,8 +26,13 @@ from __future__ import print_function
 import re
 import subprocess
 from os import path
-from framework.gtest import GTest
+from .gtest import GTest
 from framework.core import PIGLIT_CONFIG
+
+__all__ = [
+    'OpenCVTest',
+    'add_opencv_tests',
+]
 
 
 class OpenCVTest(GTest):

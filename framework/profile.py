@@ -35,7 +35,7 @@ import importlib
 
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
-import framework.exectest
+import framework.test
 
 __all__ = [
     'TestProfile',
@@ -188,7 +188,7 @@ class TestProfile(object):
         """
 
         self._pre_run_hook()
-        framework.exectest.Test.OPTS = opts
+        framework.test.Test.OPTS = opts
 
         chunksize = 1
 

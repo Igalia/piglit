@@ -3,7 +3,7 @@
 #
 
 from framework.profile import TestProfile
-from framework.gleantest import GleanTest
+from framework.test import GleanTest
 
 __all__ = ['profile']
 

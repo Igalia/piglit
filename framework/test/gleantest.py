@@ -23,8 +23,11 @@
 """ Glean support """
 
 import os
-
 from .exectest import Test, TEST_BIN_DIR
+
+__all__ = [
+    'GleanTest',
+]
 
 
 # GleanTest: Execute a sub-test of Glean

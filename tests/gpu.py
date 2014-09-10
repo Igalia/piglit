@@ -3,7 +3,7 @@
 # quick.tests minus compiler tests.
 
 from tests.quick import profile
-from framework.glsl_parser_test import GLSLParserTest
+from framework.test import GLSLParserTest
 
 __all__ = ['profile']
 

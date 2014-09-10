@@ -21,9 +21,7 @@
 """ Tests for the glean class. Requires Nose """
 
 from __future__ import print_function
-import os
-from nose.plugins.skip import SkipTest
-from framework.gleantest import GleanTest
+from framework.test import GleanTest
 
 
 def test_initialize_gleantest():

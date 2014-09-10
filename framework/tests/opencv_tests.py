@@ -20,7 +20,7 @@
 
 """ Module for testing opencv """
 
-from framework.opencv import OpenCVTest
+from framework.test import OpenCVTest
 
 
 def test_initialize_opencvtest():

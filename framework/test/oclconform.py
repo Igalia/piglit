@@ -30,7 +30,13 @@ from os.path import join
 from sys import stderr
 
 from framework.core import PIGLIT_CONFIG
-from framework.exectest import Test
+from .exectest import Test
+
+__all__ = [
+    'OCLConform',
+    'add_oclconform_tests',
+]
+
 
 def get_test_section_name(test):
     return 'oclconform-{}'.format(test)

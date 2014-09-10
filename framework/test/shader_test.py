@@ -29,7 +29,12 @@ import re
 
 from .exectest import PiglitTest
 
-__all__ = ['add_shader_test', 'add_shader_test_dir']
+__all__ = [
+    'ShaderTest',
+    'ShaderTestParserException',
+    'add_shader_test',
+    'add_shader_test_dir'
+]
 
 
 class ShaderTest(PiglitTest):

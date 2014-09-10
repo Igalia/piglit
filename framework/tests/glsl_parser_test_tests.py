@@ -23,9 +23,9 @@
 import sys
 import os
 import nose.tools as nt
-import framework.glsl_parser_test as glsl
+import framework.test as glsl
 import framework.tests.utils as utils
-from framework.exectest import TEST_BIN_DIR
+from framework.test import TEST_BIN_DIR
 
 # Nose does not capture stderr, so all of the error catching tetss will spam
 # the console, however, it does capture stdout, so redirecting stderr to stdout

@@ -34,10 +34,7 @@ import nose.tools as nt
 from nose.plugins.skip import SkipTest
 import framework.dmesg as dmesg
 import framework.core
-import framework.exectest
-import framework.gleantest
-import framework.shader_test
-import framework.glsl_parser_test
+import framework.test
 import framework.backends
 import framework.tests.utils as utils
 
@@ -333,12 +330,12 @@ def test_json_serialize_updated_result():
 @utils.nose_generator
 def test_testclasses_dmesg():
     """ Generator that creates tests for """
-    lists = [(framework.exectest.PiglitTest,
+    lists = [(framework.test.PiglitTest,
               ['attribs', '-auto', '-fbo'], 'PiglitTest'),
-             (framework.gleantest.GleanTest, 'basic', "GleanTest"),
-             (framework.shader_test.ShaderTest,
+             (framework.test.GleanTest, 'basic', "GleanTest"),
+             (framework.test.ShaderTest,
               'tests/shaders/loopfunc.shader_test', 'ShaderTest'),
-             (framework.glsl_parser_test.GLSLParserTest,
+             (framework.test.GLSLParserTest,
               'tests/glslparsertest/shaders/main1.vert', 'GLSLParserTest')]
 
     for tclass, tfile, desc in lists:

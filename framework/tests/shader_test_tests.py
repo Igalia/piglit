@@ -22,13 +22,13 @@
 
 import os
 import nose.tools as nt
-import framework.shader_test as shader_test
+import framework.test as testm
 import framework.tests.utils as utils
 
 
 def test_initialize_shader_test():
     """ Test that ShaderTest initializes """
-    shader_test.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
+    testm.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
 
 
 def test_parse_gl_test_no_decimal():
@@ -36,8 +36,8 @@ def test_parse_gl_test_no_decimal():
     data = ('[require]\n'
             'GL = 2\n')
     with utils.with_tempfile(data) as temp:
-        with nt.assert_raises(shader_test.ShaderTestParserException) as exc:
-            shader_test.ShaderTest(temp)
+        with nt.assert_raises(testm.ShaderTestParserException) as exc:
+            testm.ShaderTest(temp)
             nt.assert_equal(exc.exception, "No GL version set",
                             msg="A GL version was passed without a decimal, "
                                 "which should have raised an exception, but "
@@ -50,7 +50,7 @@ def test_parse_gles2_test():
             'GL ES >= 2.0\n'
             'GLSL ES >= 1.00\n')
     with utils.with_tempfile(data) as temp:
-        test = shader_test.ShaderTest(temp)
+        test = testm.ShaderTest(temp)
 
     nt.assert_equal(
         os.path.basename(test.command[0]), "shader_runner_gles2",
@@ -64,7 +64,7 @@ def test_parse_gles3_test():
             'GL ES >= 3.0\n'
             'GLSL ES >= 3.00\n')
     with utils.with_tempfile(data) as temp:
-        test = shader_test.ShaderTest(temp)
+        test = testm.ShaderTest(temp)
 
     nt.assert_equal(
         os.path.basename(test.command[0]), "shader_runner_gles3",
@@ -74,10 +74,10 @@ def test_parse_gles3_test():
 
 def test_add_shader_test():
     """ Test that add_shader_test works """
-    shader_test.add_shader_test(
+    testm.add_shader_test(
         {}, 'test', 'tests/spec/glsl-es-3.00/execution/sanity.shader_test')
 
 
 def test_add_shader_test_dir():
     """ Test that add_shader_test_dir works """
-    shader_test.add_shader_test_dir({}, 'tests/spec/glsl-es-3.00/execution')
+    testm.add_shader_test_dir({}, 'tests/spec/glsl-es-3.00/execution')

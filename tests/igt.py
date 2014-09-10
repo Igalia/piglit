@@ -35,7 +35,7 @@ from datetime import datetime
 from os import path
 import framework.core
 from framework.profile import TestProfile
-from framework.exectest import Test
+from framework.test import Test
 
 __all__ = ['profile']
 

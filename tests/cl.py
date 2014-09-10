@@ -10,10 +10,8 @@ import os.path as path
 import platform
 import glob
 
-from framework.opencv import add_opencv_tests
-
 from framework.profile import TestProfile
-from framework.exectest import PiglitTest
+from framework.test import PiglitTest
 
 ######
 # Helper functions

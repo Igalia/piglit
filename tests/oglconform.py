@@ -28,7 +28,7 @@ import subprocess
 
 import framework.core
 from framework.profile import TestProfile
-from framework.exectest import Test
+from framework.test import Test
 from os import path
 
 __all__ = ['profile']

@@ -22,10 +22,10 @@
 
 import nose.tools as nt
 
-from framework.exectest import PiglitTest, Test
+import framework.tests.utils as utils
 from framework.log import LogManager
 from framework.dmesg import DummyDmesg
-import framework.tests.utils as utils
+from framework.test import PiglitTest, Test
 
 
 # Helpers

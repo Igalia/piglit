@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from framework.gleantest import GleanTest
+from framework.test import GleanTest
 from tests.all import profile
 
 __all__ = ['profile']

@@ -64,7 +64,7 @@ def setup_module_search_path():
 
     def is_piglit_data_dir(dirpath):
         tested_piglit_data_dirs.append(dirpath)
-        return path.exists(path.join(dirpath, 'framework', 'exectest.py'))
+        return path.exists(path.join(dirpath, 'framework'))
 
     # This script may be in two valid locations:
     #

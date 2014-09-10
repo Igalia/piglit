@@ -29,6 +29,12 @@ import sys
 
 from .exectest import PiglitTest
 
+__all__ = [
+    'GLSLParserTest',
+    'add_glsl_parser_test',
+    'import_glsl_parser_tests',
+]
+
 
 def add_glsl_parser_test(group, filepath, test_name):
     """Add an instance of GLSLParserTest to the given group."""

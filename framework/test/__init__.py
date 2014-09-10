@@ -18,13 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-""" Module providing tests for gtest """
+""" Module that provides test classes and helpers """
 
-
-from framework.test import GTest
-
-
-def test_initialize_gtest():
-    """ Test that GTest successfully initializes correctly """
-    test = GTest('/bin/true')
-    assert test
+from __future__ import absolute_import
+from .exectest import *
+from .gleantest import *
+from .glsl_parser_test import *
+from .shader_test import *
+from .gtest import *
+from .opencv import *
+from .oclconform import *

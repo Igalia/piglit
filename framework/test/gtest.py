@@ -23,8 +23,12 @@
 #
 
 import re
+from .exectest import Test
 
-from framework.exectest import Test
+__all__ = [
+    'GTest',
+]
+
 
 class GTest(Test):
     def interpret_result(self):
