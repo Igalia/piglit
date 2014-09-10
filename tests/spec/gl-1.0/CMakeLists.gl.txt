@@ -19,5 +19,6 @@ piglit_add_executable (gl-1.0-front-invalidate-back front-invalidate-back.c)
 piglit_add_executable (gl-1.0-long-dlist long-dlist.c)
 piglit_add_executable (gl-1.0-rendermode-feedback rendermode-feedback.c)
 piglit_add_executable (gl-1.0-swapbuffers-behavior swapbuffers-behavior.c)
+piglit_add_executable (gl-1.0-polygon-line-aa polygon-line-aa.c)
 
 # vim: ft=cmake:
