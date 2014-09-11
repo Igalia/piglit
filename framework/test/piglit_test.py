@@ -88,6 +88,14 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
                 return True
         return False
 
+    @PiglitBaseTest.command.getter
+    def command(self):
+        """ Automatically add -auto and -fbo as appropriate """
+        if not self.run_concurrent:
+            return super(PiglitGLTest, self).command + ['-auto']
+        else:
+            return super(PiglitGLTest, self).command + ['-auto', '-fbo']
+
 
 class PiglitCLTest(PiglitBaseTest):
     """ OpenCL specific Test class """

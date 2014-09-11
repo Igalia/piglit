@@ -111,9 +111,9 @@ def test_cpp_comments():
                '// [end config]\n')
     test, name = _check_config(content)
 
-    nt.assert_equal(test.command, [os.path.join(TEST_BIN_DIR, 'glslparsertest'),
-                                   name, 'pass', '1.00'],
-                    msg="C++ style comments were not properly parsed")
+    nt.assert_equal(
+        test.command,
+        [os.path.join(TEST_BIN_DIR, 'glslparsertest'), name, 'pass', '1.00'])
 
 
 def test_c_comments():

@@ -27,7 +27,7 @@ import os
 import os.path as path
 import re
 
-from .piglit_test import PiglitGLTest
+from .piglit_test import PiglitBaseTest
 
 __all__ = [
     'ShaderTest',
@@ -37,7 +37,7 @@ __all__ = [
 ]
 
 
-class ShaderTest(PiglitGLTest):
+class ShaderTest(PiglitBaseTest):
     """ Parse a shader test file and return a PiglitTest instance
 
     This function parses a shader test to determine if it's a GL, GLES2 or
@@ -87,8 +87,12 @@ class ShaderTest(PiglitGLTest):
             else:
                 raise ShaderTestParserException("No GL version set")
 
-        super(ShaderTest, self).__init__([prog, arguments, '-auto'],
-                                         run_concurrent=True)
+        super(ShaderTest, self).__init__([prog, arguments], run_concurrent=True)
+
+    @PiglitBaseTest.command.getter
+    def command(self):
+        """ Add -auto to the test command """
+        return self._command + ['-auto']
 
 
 class ShaderTestParserException(Exception):

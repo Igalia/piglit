@@ -70,3 +70,16 @@ def test_piglitest_no_clobber():
 
     nt.assert_dict_equal(test.result['subtest'],
                          {'test1': 'pass', 'test2': 'pass'})
+
+
+def test_piglittest_command_getter_serial():
+    """ PiglitGLTest.command adds -auto to serial tests """
+    test = PiglitGLTest('foo')
+    nt.assert_in('-auto', test.command)
+
+
+def test_piglittest_command_getter_concurrent():
+    """ PiglitGLTest.command adds -fbo and -auto to concurrent tests """
+    test = PiglitGLTest('foo', run_concurrent=True)
+    nt.assert_in('-auto', test.command)
+    nt.assert_in('-fbo', test.command)

@@ -81,3 +81,9 @@ def test_add_shader_test():
 def test_add_shader_test_dir():
     """ Test that add_shader_test_dir works """
     testm.add_shader_test_dir({}, 'tests/spec/glsl-es-3.00/execution')
+
+
+def test_add_fbo():
+    """ ShaderTest.command adds -auto """
+    test = testm.ShaderTest('tests/spec/glsl-es-1.00/execution/sanity.shader_test')
+    nt.assert_in('-auto', test.command)
