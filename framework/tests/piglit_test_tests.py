@@ -21,6 +21,8 @@
 """ Tests for the exectest module """
 
 import nose.tools as nt
+
+import framework.tests.utils as utils
 from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
                                         PiglitCLTest)
 
@@ -83,3 +85,39 @@ def test_piglittest_command_getter_concurrent():
     test = PiglitGLTest('foo', run_concurrent=True)
     nt.assert_in('-auto', test.command)
     nt.assert_in('-fbo', test.command)
+
+
+def test_PiglitGLTest_include_and_exclude():
+    """PiglitGLTest.is_skip() raises if include and exclude are given."""
+    with nt.assert_raises(AssertionError):
+        PiglitGLTest('foo',
+                     require_platforms=['glx'],
+                     exclude_platforms=['gbm'])
+
+
+def test_PiglitGLTest_platform_in_require():
+    """PiglitGLTest.is_skip() does not skip if platform is in require_platforms."""
+    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    test = PiglitGLTest('foo', require_platforms=['glx'])
+    nt.assert_false(test.is_skip())
+
+
+def test_PiglitGLTest_platform_not_in_require():
+    """PiglitGLTest.is_skip() skips if platform is not in require_platforms."""
+    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    test = PiglitGLTest('foo', require_platforms=['glx'])
+    nt.assert_true(test.is_skip())
+
+
+def test_PiglitGLTest_platform_in_exclude():
+    """PiglitGLTest.is_skip() skips if platform is in exclude_platforms.."""
+    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
+    test = PiglitGLTest('foo', exclude_platforms=['glx'])
+    nt.assert_true(test.is_skip())
+
+
+def test_PiglitGLTest_platform_not_in_exclude():
+    """PiglitGLTest.is_skip() does not skip if platform is in exclude_platforms."""
+    PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
+    test = PiglitGLTest('foo', exclude_platforms=['glx'])
+    nt.assert_false(test.is_skip())

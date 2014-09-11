@@ -29,6 +29,7 @@ except ImportError:
     import json
 
 from .base import Test, WindowResizeMixin
+import framework.core as core
 
 
 __all__ = [
@@ -73,19 +74,56 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
     This Subclass provides provides an is_skip() implementation that skips glx
     tests on non-glx platforms
 
+    This class also provides two additional keyword arguments, require_platform
+    and exclude_platforms. require_platforms may be set to a list of platforms
+    which the test requires to run. This should be resereved for platform
+    specific tests, such as GLX specific tests, or EGL specific tests. Multiple
+    platforms are allowed because EGL can be fulfilled by multiple platforms.
+    exclude_platforms is a list of platforms a test should not be run on, this
+    is useful for tests that are valid on more than one platform, but not on
+    all of them. This will probably be mainly used to exclude gbm. These
+    options are mutually exclusive.
+
     """
+    def __init__(self, command, require_platforms=None, exclude_platforms=None,
+                 **kwargs):
+        # TODO: There is a design flaw in python2, keyword args can be
+        # fulfilled as positional arguments. This sounds really great, until
+        # you realize that because of it you cannot use the splat operator with
+        # args and create new keyword arguments.
+        # What we really want is __init__(self, *args, new_arg=None, **kwargs),
+        # but this doesn't work in python2. In python3 thanks to PEP3102, you
+        # can in fact do just that
+        # The work around is to explicitely pass the arguments down.
+        super(PiglitGLTest, self).__init__(command, **kwargs)
+
+        assert not (require_platforms and exclude_platforms)
+
+        if not require_platforms or set(require_platforms).issubset(
+                set(core.PLATFORMS)):
+            self.__require_platforms = require_platforms or []
+        else:
+            raise Exception("Error: require_platform is not valid")
+
+        if (not exclude_platforms or
+                set(exclude_platforms).issubset(set(core.PLATFORMS))):
+            self.__exclude_platforms = exclude_platforms or []
+        else:
+            raise Exception("Error: exclude_platforms is not valid")
+
     def is_skip(self):
         """ Native Piglit-test specific skip checking
 
-        If the platform for the run doesn't suppoprt glx (either directly as
+        If the platform for the run doesn't support glx (either directly as
         glx or through the hybrid glx/x11_egl setup that is default), then skip
         any glx specific tests.
 
         """
-        if self.OPTS.env['PIGLIT_PLATFORM'] not in ['glx', 'mixed_glx_egl']:
-            split_command = os.path.split(self._command[0])[1]
-            if split_command.startswith('glx-'):
-                return True
+        platform = self.OPTS.env['PIGLIT_PLATFORM']
+        if self.__require_platforms and platform not in self.__require_platforms:
+            return True
+        elif self.__exclude_platforms and platform in self.__exclude_platforms:
+            return True
         return False
 
     @PiglitBaseTest.command.getter
