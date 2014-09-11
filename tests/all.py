@@ -2619,7 +2619,7 @@ for num_samples in MSAA_SAMPLE_COUNTS:
             test_name)
     ext_framebuffer_multisample[test_name] = PiglitGLTest(executable, run_concurrent=True)
 
-for num_samples in MSAA_SAMPLE_COUNTS:
+for num_samples in ('all_samples', ) + MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['formats', str(num_samples)])
     executable = 'ext_framebuffer_multisample-{0}'.format(
             test_name)

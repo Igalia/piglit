@@ -62,7 +62,9 @@ namespace {
 
 const int pattern_width = 256; const int pattern_height = 256;
 
+bool all_samples = false;
 int num_samples;
+GLint max_samples;
 
 ColorGradientSunburst *test_pattern_vec4;
 ColorGradientSunburst *test_pattern_ivec4;
@@ -571,7 +573,10 @@ test_format(const struct format_desc *format)
 void
 print_usage_and_exit(char *prog_name)
 {
-	printf("Usage: %s <num_samples> [test_set]\n", prog_name);
+	printf("Usage: %s <sample_arg> [test_set]\n"
+	       "  where <sample_arg> is one of:\n"
+	       "    <num_samples>: test supplied sample count\n"
+	       "    all_samples: test all power of 2 samples\n" , prog_name);
 	piglit_report_result(PIGLIT_FAIL);
 }
 
@@ -584,9 +589,13 @@ piglit_init(int argc, char **argv)
 
 	/* First argument (required): num_samples */
 	char *endptr = NULL;
-	num_samples = strtol(argv[1], &endptr, 0);
-	if (endptr != argv[1] + strlen(argv[1]))
-		print_usage_and_exit(argv[0]);
+	if (streq(argv[1], "all_samples"))
+		all_samples = true;
+	else {
+		num_samples = strtol(argv[1], &endptr, 0);
+		if (endptr != argv[1] + strlen(argv[1]))
+			print_usage_and_exit(argv[0]);
+	}
 
 	/* Second argument (optional): test_set */
 	int test_set = 0; /* Default to core */
@@ -598,7 +607,6 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_ARB_vertex_array_object");
 
 	/* Skip the test if num_samples > GL_MAX_SAMPLES */
-	GLint max_samples;
 	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
 	if (num_samples > max_samples)
 		piglit_report_result(PIGLIT_SKIP);
@@ -618,7 +626,26 @@ piglit_init(int argc, char **argv)
 extern "C" enum piglit_result
 piglit_display()
 {
-	return fbo_formats_display(test_format);
+	piglit_result result = PIGLIT_PASS;
+	bool pass = true;
+
+	if (!all_samples) {
+		return fbo_formats_display(test_format);
+	}
+
+	for (num_samples = 0; num_samples <= max_samples; ) {
+		result = fbo_formats_display(test_format);
+		printf("Samples = %d, Result = %s\n", num_samples,
+		       piglit_result_to_string(result));
+
+		num_samples = num_samples ? num_samples << 1 : num_samples + 2;
+
+		if (result == PIGLIT_SKIP)
+			return result;
+
+		pass = (result == PIGLIT_PASS) && pass;
+	}
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 };
