@@ -391,6 +391,7 @@ class JUnitBackend(FSyncMixin, Backend):
         self._file.write(
             '<testsuite name="piglit" tests="{}">\n'.format(
                 metadata['test_count']))
+        self._test_suffix = metadata["test_suffix"]
 
     def finalize(self, metadata=None):
         self._file.write('</testsuite>\n')
@@ -414,7 +415,7 @@ class JUnitBackend(FSyncMixin, Backend):
         classname = 'piglit.' + classname
 
         # Create the root element
-        element = etree.Element('testcase', name=testname,
+        element = etree.Element('testcase', name=testname + self._test_suffix,
                                 classname=classname,
                                 time=str(data['time']),
                                 status=str(data['result']))

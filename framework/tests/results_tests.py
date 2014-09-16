@@ -37,6 +37,7 @@ BACKEND_INITIAL_META = {
     'name': 'name',
     'env': {},
     'test_count': 0,
+    'test_suffix': '',
 }
 
 JUNIT_SCHEMA = 'framework/tests/schema/junit-7.xsd'

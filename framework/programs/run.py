@@ -163,6 +163,10 @@ def _run_parser(input_):
     parser.add_argument("-s", "--sync",
                         action="store_true",
                         help="Sync results to disk after every test")
+    parser.add_argument("--junit_suffix",
+                        type=str,
+                        default="",
+                        help="suffix string to append to each test name in junit")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -245,6 +249,7 @@ def run(input_):
     # refactored to make that possible because of the flattening pass that is
     # part of profile.run
     options['test_count'] = 0
+    options['test_suffix'] = args.junit_suffix
 
     # Begin json.
     backend = framework.results.get_backend(args.backend)(
