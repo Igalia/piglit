@@ -94,12 +94,11 @@ def _run_parser(input_):
     """ Parser for piglit run command """
     # Parse the config file before any other options, this allows the config
     # file to be used to sete default values for the parser.
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("-f", "--config",
                         dest="config_file",
                         type=argparse.FileType("r"),
-                        help="Optionally specify a piglit config file to use. "
-                             "Default is piglit.conf")
+                        help="override piglit.conf search path")
     known, unparsed = parser.parse_known_args(input_)
 
     # Read the config file
@@ -167,6 +166,12 @@ def _run_parser(input_):
                         type=str,
                         default="",
                         help="suffix string to append to each test name in junit")
+    # -f/--config is a duplicate that cannot be hit, but is needed for help
+    # generation
+    parser.add_argument("-f", "--config",
+                        metavar="config_file",
+                        dest="__unused",
+                        help="override piglit.conf search path")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
