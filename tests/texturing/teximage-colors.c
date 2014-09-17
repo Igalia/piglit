@@ -189,7 +189,7 @@ valid_combination(GLenum format, GLenum type)
 static float
 un_to_float(unsigned char bits, unsigned int color)
 {
-	unsigned int max = ~(~0ul << bits);
+	unsigned int max = ~0u >> (sizeof(max) * 8 - bits);
 	return (float)color / (float)max;
 }
 
