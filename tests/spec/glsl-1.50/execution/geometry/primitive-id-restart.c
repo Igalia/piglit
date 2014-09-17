@@ -218,11 +218,22 @@ piglit_init(int argc, char **argv)
 	num_elements = 0;
 	for (i = 1; i <= LONGEST_INPUT_SEQUENCE; i++) {
 		for (j = 0; j < i; j++) {
-			/* Every element that isn't the primitive
-			 * restart index can just be element 0, since
-			 * we don't care about the actual vertex data.
+			/* Every element that isn't the primitive restart index
+			 * can have any value as far as it is not the primitive
+			 * restart index since we don't care about the actual
+			 * vertex data.
+			 *
+			 * NOTE: repeating the indices for all elements but the
+			 * primitive restart index causes a GPU hang in Intel's
+			 * Sandy Bridge platform, likely due to a hardware bug,
+			 * so make sure that we do not repeat the indices.
+			 *
+			 * More information:
+			 *
+			 * http://lists.freedesktop.org/archives/mesa-dev/2014-July/064221.html
 			 */
-			elements[num_elements++] = 0;
+			elements[num_elements++] =
+				j != prim_restart_index ? j : j + 1;
 		}
 		elements[num_elements++] = prim_restart_index;
 	}
