@@ -1,0 +1,52 @@
+# Not all shaders linked together are required to declare the output
+# vertex count -- but those shaders which do not, must not call .length()
+# or do anything else which requires the length of an unsized output array to
+# be known.
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+
+void main() {
+}
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+layout(vertices = 3) out;
+
+void f();
+
+void main() {
+	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 0.0);
+	gl_TessLevelInner = float[2](0.0, 0.0);
+
+	f();
+}
+
+[tessellation control shader]
+#extension GL_ARB_tessellation_shader: require
+
+void f() {
+	gl_out[gl_InvocationID].gl_Position = vec4(0);
+}
+
+[tessellation evaluation shader]
+#extension GL_ARB_tessellation_shader: require
+
+layout (triangles) in;
+
+void main() {
+	gl_Position = vec4(0);
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0);
+}
+
+
+[test]
+link success
