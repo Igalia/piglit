@@ -80,11 +80,7 @@ static const char *varyings[] = {
 void
 piglit_init(int argc, char **argv)
 {
-	bool pass;
-	unsigned primitive_n;
-	GLint gs_invocation_n;
 	GLuint prog;
-
 
 	piglit_require_extension("GL_ARB_gpu_shader5");
 	piglit_require_extension("GL_ARB_transform_feedback3");
