@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# pylint: disable=missing-docstring
+
 """ Tests for the backend package """
 
 import os
@@ -49,7 +51,7 @@ def test_initialize_jsonbackend():
 
     """
     with utils.tempdir() as tdir:
-        func = results.JSONBackend(tdir, BACKEND_INITIAL_META)
+        func = results.JSONBackend(tdir)
         assert isinstance(func, results.JSONBackend)
 
 
@@ -74,7 +76,8 @@ class TestJunitNoTests(utils.StaticDirectory):
     @classmethod
     def setup_class(cls):
         super(TestJunitNoTests, cls).setup_class()
-        test = backends.JUnitBackend(cls.tdir, BACKEND_INITIAL_META)
+        test = backends.JUnitBackend(cls.tdir)
+        test.initialize(BACKEND_INITIAL_META)
         test.finalize()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
 
@@ -96,7 +99,8 @@ class TestJUnitSingleTest(TestJunitNoTests):
     def setup_class(cls):
         super(TestJUnitSingleTest, cls).setup_class()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
-        test = backends.JUnitBackend(cls.tdir, BACKEND_INITIAL_META)
+        test = backends.JUnitBackend(cls.tdir)
+        test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             'a/test/group/test1',
             results.TestResult({
@@ -124,7 +128,8 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
     def setup_class(cls):
         super(TestJUnitMultiTest, cls).setup_class()
         cls.test_file = os.path.join(cls.tdir, 'results.xml')
-        test = backends.JUnitBackend(cls.tdir, BACKEND_INITIAL_META)
+        test = backends.JUnitBackend(cls.tdir)
+        test.initialize(BACKEND_INITIAL_META)
         test.write_test(
             'a/test/group/test1',
             results.TestResult({

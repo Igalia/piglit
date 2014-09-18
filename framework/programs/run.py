@@ -263,14 +263,13 @@ def run(input_):
     # refactored to make that possible because of the flattening pass that is
     # part of profile.run
     options['test_count'] = 0
-    options['test_suffix'] = args.junit_suffix
-    options['log_level'] = args.log_level
 
     # Begin json.
     backend = backends.get_backend(args.backend)(
         args.results_path,
-        options,
-        file_fsync=opts.sync)
+        file_fsync=opts.sync,
+        junit_suffix=args.junit_suffix)
+    backend.initialize(options)
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
@@ -321,8 +320,8 @@ def resume(input_):
     # Resume only works with the JSON backend
     backend = backends.get_backend('json')(
         args.results_path,
-        results.options,
         file_fsync=opts.sync)
+    backend.initialize(results.options)
 
     for key, value in results.tests.iteritems():
         backend.write_test(key, value)

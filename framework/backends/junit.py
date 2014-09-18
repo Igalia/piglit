@@ -44,9 +44,10 @@ class JUnitBackend(FSyncMixin, Backend):
     """
     _REPLACE = re.compile(r'[/\\]')
 
-    def __init__(self, dest, metadata, **options):
+    def __init__(self, dest, junit_test_suffix='', **options):
         self._file = open(os.path.join(dest, 'results.xml'), 'w')
         FSyncMixin.__init__(self, **options)
+        self._test_suffix = junit_test_suffix
 
         # make dictionaries of all test names expected to crash/fail
         # for quick lookup when writing results.  Use lower-case to
@@ -60,13 +61,13 @@ class JUnitBackend(FSyncMixin, Backend):
             for (fail, _) in PIGLIT_CONFIG.items("expected-crashes"):
                 self._expected_crashes[fail.lower()] = True
 
+    def initialize(self, metadata):
         # Write initial headers and other data that etree cannot write for us
         self._file.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
         self._file.write('<testsuites>\n')
         self._file.write(
             '<testsuite name="piglit" tests="{}">\n'.format(
                 metadata['test_count']))
-        self._test_suffix = metadata["test_suffix"]
         self._fsync(self._file)
 
     def finalize(self, metadata=None):

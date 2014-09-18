@@ -99,7 +99,7 @@ class JSONBackend(FSyncMixin, Backend):
     INDENT = 4
     _LOCK = threading.RLock()
 
-    def __init__(self, f, metadata, **options):
+    def __init__(self, f, **options):
         self._file = open(os.path.join(f, 'results.json'), 'w')
         FSyncMixin.__init__(self, **options)
         self.__indent_level = 0
@@ -130,10 +130,7 @@ class JSONBackend(FSyncMixin, Backend):
         # is popped and written into the json
         self._open_containers = []
 
-        # Write initial metadata into the backend store
-        self._initialize(metadata)
-
-    def _initialize(self, metadata):
+    def initialize(self, metadata):
         """ Write boilerplate json code
 
         This writes all of the json except the actual tests.

@@ -72,12 +72,9 @@ class Backend(object):
     def __init__(self, dest, metadata, **options):
         """ Generic constructor
 
-        The backend storage container should be created and made ready to write
-        into in the constructor, along with any other setup.
-
-        This method also write any initial metadata as appropriate. No backend
-        is required to write all metadata, but each should write as much as
-        possible.
+        This method should setup the container and open any files or conections
+        as necissary. It should not however, write anything into the backend
+        store, that job is for the iniitalize method.
 
         In addition it takes keyword arguments that define options for the
         backends. options should be prefixed to identify which backends they
@@ -88,6 +85,18 @@ class Backend(object):
         dest -- the place to write the results to. This should be correctly
                 handled based on the backend, the example is calls open() on a
                 file, but other backends might want different options
+
+        """
+
+    @abc.abstractmethod
+    def initialize(self, metadata):
+        """ Write initial metadata and setup
+
+        This method is used to write metadata into the backend store and do any
+        other initial backend writing that is required. This method and the
+        finalize() method are bookends, one starts, the other finishes.
+
+        Arguments:
         metadata -- a dict or dict-like object that contains metadata to be
                     written into the backend
 
