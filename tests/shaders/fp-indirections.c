@@ -187,12 +187,14 @@ GLboolean test_temporary_dest_indirections(void)
 	GLboolean pass = GL_TRUE;
 	GLuint progname;
 	char *prog;
-	GLint indirections_limit;
+	GLint indirections_limit, use_limit;
 	GLint count;
 
 	indirections_limit = get_program_i(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB);
 
-	count = indirections_limit - 1;
+	use_limit = MIN2(indirections_limit, 1024);
+
+	count = use_limit - 1;
 	printf("testing program with %d indirections from temporary dests\n",
 	       count);
 	prog = gen_temporary_dest_indirections(count, &progname);
@@ -206,11 +208,11 @@ GLboolean test_temporary_dest_indirections(void)
 		free(prog);
 	}
 
-	count = indirections_limit + 1;
+	count = use_limit + 1;
 	printf("testing program with %d indirections from temporary dests\n",
 	       count);
 	prog = gen_temporary_dest_indirections(count, &progname);
-	if (prog != NULL) {
+	if (prog != NULL && count > indirections_limit) {
 		if (get_program_i(GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB)) {
 			printf("Program with %d indirections unexpectedly "
 			       "met native limits.\n", count);
@@ -231,12 +233,14 @@ GLboolean test_temporary_source_indirections(void)
 	GLboolean pass = GL_TRUE;
 	GLuint progname;
 	char *prog;
-	GLint indirections_limit;
+	GLint indirections_limit, use_limit;
 	GLint count;
 
 	indirections_limit = get_program_i(GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB);
 
-	count = indirections_limit - 1;
+	use_limit = MIN2(indirections_limit, 1024);
+
+	count = use_limit - 1;
 	printf("testing program with %d indirections from temporary sources\n",
 	       count);
 	prog = gen_temporary_source_indirections(count, &progname);
@@ -250,11 +254,11 @@ GLboolean test_temporary_source_indirections(void)
 		free(prog);
 	}
 
-	count = indirections_limit + 1;
+	count = use_limit + 1;
 	printf("testing program with %d indirections from temporary sources\n",
 	       count);
 	prog = gen_temporary_source_indirections(count, &progname);
-	if (prog != NULL) {
+	if (prog != NULL && count > indirections_limit) {
 		if (get_program_i(GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB)) {
 			printf("Program with %d indirections unexpectedly "
 			       "met native limits.\n", count);
