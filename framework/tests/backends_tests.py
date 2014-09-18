@@ -60,6 +60,7 @@ def test_get_backend():
     # expect
     backends_ = {
         'json': backends.JSONBackend,
+        'junit': backends.JUnitBackend,
     }
 
     check = lambda n, i: nt.assert_is(backends.get_backend(n), i)
