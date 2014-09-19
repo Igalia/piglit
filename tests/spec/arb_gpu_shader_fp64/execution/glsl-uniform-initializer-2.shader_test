@@ -15,11 +15,11 @@ void main()
 }
 
 [test]
+# green rectangle on the left side
 draw rect -1 -1 1 2
 uniform dvec2 color[0] 0.0 0.0
 uniform dvec2 color[1] 1.0 0.0
+# blue rectangle on the right side
 draw rect 0 -1 1 2
-uniform dvec2 color[0] 0.0 1.0
-uniform dvec2 color[1] 0.0 0.0
 relative probe rgb (0.25, 0.5) (0.0, 1.0, 0.0)
 relative probe rgb (0.75, 0.5) (0.0, 0.0, 1.0)
