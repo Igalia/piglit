@@ -1,6 +1,6 @@
 /*!
 [config]
-name: i32 stack array read
+name: i32 stack array
 clc_version_min: 10
 
 dimensions: 1
@@ -15,25 +15,25 @@ global_size: 1 0 0
 
 [test]
 kernel_name: stack_array_read
-name: i32 stack array read
+name: i32 stack array read up
 arg_out: 0 buffer int[5] 4 5 6 7 8
 arg_in:  1 buffer int[5] 0 1 2 3 4
 
 [test]
 kernel_name: stack_array_read
-name: i32 stack array read
+name: i32 stack array read const
 arg_out: 0 buffer int[5] 5 5 5 5 5
 arg_in:  1 buffer int[5] 1 1 1 1 1
 
 [test]
 kernel_name: stack_array_read
-name: i32 stack array read
+name: i32 stack array read down
 arg_out: 0 buffer int[5] 8 7 5 6 4
 arg_in:  1 buffer int[5] 4 3 1 2 0
 
 [test]
 kernel_name: stack_array_read
-name: i32 stack array read
+name: i32 stack array read rand
 arg_out: 0 buffer int[5] 7 5 8 4 6
 arg_in:  1 buffer int[5] 3 1 4 0 2
 
@@ -72,21 +72,21 @@ arg_in:  1 buffer int[1] 1
 ##===----------------------------------------------------------------------===##
 [test]
 kernel_name: stack_array_write_if_else_indirect_read
-name: i32 stack array direct write (IF and ELSE) indirect read
+name: i32 stack array direct write (IF and ELSE) indirect read up
 arg_out: 0 buffer int[5] 4 5 6 7 8
 arg_in:  1 buffer int[6] 1 \
                          0 1 2 3 4
 
 [test]
 kernel_name: stack_array_write_if_else_indirect_read
-name: i32 stack array direct write (IF and ELSE) indirect read
+name: i32 stack array direct write (IF and ELSE) indirect read const
 arg_out: 0 buffer int[5] 0 0 0 0 0
 arg_in:  1 buffer int[6] 0 \
                          0 1 2 3 4
 
 [test]
 kernel_name: stack_array_write_if_else_indirect_read
-name: i32 stack array direct write (IF and ELSE) indirect read
+name: i32 stack array direct write (IF and ELSE) indirect read down
 arg_out: 0 buffer int[5] 8 7 6 5 4
 arg_in:  1 buffer int[6] 1 \
                          4 3 2 1 0
@@ -106,14 +106,14 @@ arg_in:  1 buffer int[6] 1 \
 ##===----------------------------------------------------------------------===##
 [test]
 kernel_name: stack_array_indirect_write_if_else_indirect_read
-name: i32 stack array indirect write (IF and ELSE) indirect read
+name: i32 stack array indirect write (IF and ELSE) indirect read up
 arg_out: 0 buffer int[5] 4 5 6 7 8
 arg_in:  1 buffer int[11] 1 \
                           0 1 2 3 4 \
                           0 1 2 3 4
 [test]
 kernel_name: stack_array_indirect_write_if_else_indirect_read
-name: i32 stack array indirect write (IF and ELSE) indirect read
+name: i32 stack array indirect write (IF and ELSE) indirect read up-down
 arg_out: 0 buffer int[5] 8 7 6 5 4
 arg_in:  1 buffer int[11] 1 \
                           0 1 2 3 4 \
