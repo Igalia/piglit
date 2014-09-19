@@ -8,7 +8,7 @@ GL_ARB_gpu_shader_fp64
 #extension GL_ARB_gpu_shader_fp64 : require
 uniform double arg0;
 in vec4 vertex;
-out dvec4 dout1;
+flat out dvec4 dout1;
 void main()
 {
         gl_Position = vertex;
@@ -19,10 +19,9 @@ void main()
 #version 150
 #extension GL_ARB_gpu_shader_fp64 : require
 #
-in dvec4 dout1;
+flat in dvec4 dout1;
 uniform double tolerance;
 uniform double expected;
-
 void main()
 {
   dvec4 result = trunc(dout1);
