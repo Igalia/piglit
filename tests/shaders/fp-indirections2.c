@@ -216,6 +216,7 @@ piglit_display(void)
 	for(dim = 1; dim <= 3; ++dim) {
 		samples = 0;
 		for(;;) {
+                   printf("Test dim %d samples %d\n", dim, samples);
 			result = test(dim, samples);
 			if (result != PIGLIT_PASS)
 				return result;
@@ -265,8 +266,8 @@ void piglit_init(int argc, char ** argv)
 		max_samples = max_native_tex_instructions;
 	}
 
-	if (max_samples > 1024)
-		max_samples = 1024;
+	if (max_samples > 256)
+		max_samples = 256;
 
 	texture_init();
 }
