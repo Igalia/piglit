@@ -48,11 +48,11 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 64;
-	config.window_height = 64;
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
+
+#define SIZE 64
 
 static int coord1_location, coord2_location;
 
@@ -90,7 +90,12 @@ piglit_display(void)
 {
 	int x, y;
 	bool pass = true;
-	float expected[64 * 64 * 4];
+	float expected[SIZE * SIZE * 4];
+
+	assert(piglit_width >= SIZE);
+	assert(piglit_height >= SIZE);
+
+	glViewport(0, 0, SIZE, SIZE);
 
 	glClearColor(0.0, 1.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -106,8 +111,8 @@ piglit_display(void)
 		}
 	}
 
-	for (x = 0; x < 64; x++) {
-		for (y = 0; y < 64; y++) {
+	for (x = 0; x < SIZE; x++) {
+		for (y = 0; y < SIZE; y++) {
 			int sx = x % 8;
 			int sy = y % 8;
 			int dx = fabs(sx - x / 8);
@@ -131,11 +136,11 @@ piglit_display(void)
 					pixel[2] += 0.1;
 			}
 
-			memcpy(expected + (y * 64 + x) * 4, pixel, 4 * 4);
+			memcpy(expected + (y * SIZE + x) * 4, pixel, 4 * 4);
 		}
 	}
 
-	pass = piglit_probe_image_rgba(0, 0, 64, 64, expected);
+	pass = piglit_probe_image_rgba(0, 0, SIZE, SIZE, expected);
 
 	piglit_present_results();
 
