@@ -3347,10 +3347,6 @@ nv_conditional_render['drawpixels'] = PiglitTest(['nv_conditional_render-drawpix
 nv_conditional_render['generatemipmap'] = PiglitTest(['nv_conditional_render-generatemipmap', '-auto'])
 nv_conditional_render['vertex_array'] = PiglitTest(['nv_conditional_render-vertex_array', '-auto'])
 
-oes_compressed_paletted_texture = {}
-spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
-oes_compressed_paletted_texture['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats paletted')
-
 oes_matrix_get = {}
 spec['OES_matrix_get'] = oes_matrix_get
 oes_matrix_get['All queries'] = concurrent_test('oes_matrix_get-api')
@@ -4127,6 +4123,7 @@ oes_compressed_etc1_rgb8_texture['miptree'] = concurrent_test('oes_compressed_et
 oes_compressed_paletted_texture = {}
 spec['OES_compressed_paletted_texture'] = oes_compressed_paletted_texture
 oes_compressed_paletted_texture['basic API'] = concurrent_test('oes_compressed_paletted_texture-api')
+oes_compressed_paletted_texture['invalid formats'] = concurrent_test('arb_texture_compression-invalid-formats paletted')
 
 egl14 = {}
 spec['EGL 1.4'] = egl14
