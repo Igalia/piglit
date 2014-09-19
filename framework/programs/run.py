@@ -339,4 +339,4 @@ def resume(input_):
     backend.finalize()
 
     print("Thank you for running Piglit!\n"
-          "Results have ben wrriten to {0}".format(args.results_path))
+          "Results have been written to {0}".format(args.results_path))
