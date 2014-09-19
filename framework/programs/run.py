@@ -316,6 +316,7 @@ def resume(input_):
     opts.env['PIGLIT_PLATFORM'] = results.options['platform']
 
     results.options['env'] = core.collect_system_info()
+    results.options['name'] = results.name
 
     # Resume only works with the JSON backend
     backend = framework.results.get_backend('json')(
