@@ -303,8 +303,16 @@ piglit_init(int argc, char **argv)
 	piglit_require_extension("GL_EXT_framebuffer_object");
 	piglit_require_extension("GL_EXT_texture_integer");
 	if (samples > 1) {
+		int max_samples;
+
 		piglit_require_extension("GL_ARB_texture_multisample");
 		piglit_require_extension("GL_ARB_sample_shading");
+
+		glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+		if (samples > max_samples) {
+			printf("%d samples not supported\n", samples);
+			piglit_report_result(PIGLIT_SKIP);
+		}
 	}
 
 	if (argc > 1) {
