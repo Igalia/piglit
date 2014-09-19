@@ -272,3 +272,26 @@ class TestJSONTestFinalize(utils.StaticDirectory):
             test = json.load(f)
 
         nt.assert_equal(baseline, test)
+
+
+def test_junit_skips_bad_tests():
+    """ backends.JUnitBackend skips illformed tests """
+    with utils.tempdir() as tdir:
+        test = backends.JUnitBackend(tdir)
+        test.initialize(BACKEND_INITIAL_META)
+        test.write_test(
+            'a/test/group/test1',
+            results.TestResult({
+                'time': 1.2345,
+                'result': 'pass',
+                'out': 'this is stdout',
+                'err': 'this is stderr',
+            })
+        )
+        with open(os.path.join(tdir, 'tests', '1.xml'), 'w') as f:
+            f.write('bad data')
+
+        try:
+            test.finalize()
+        except etree.XMLSyntaxError as e:
+            raise AssertionError(e)

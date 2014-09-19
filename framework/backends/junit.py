@@ -23,6 +23,8 @@
 import os
 import re
 import posixpath
+import itertools
+import shutil
 try:
     from lxml import etree
 except ImportError:
@@ -44,10 +46,11 @@ class JUnitBackend(FSyncMixin, Backend):
     """
     _REPLACE = re.compile(r'[/\\]')
 
-    def __init__(self, dest, junit_test_suffix='', **options):
-        self._file = open(os.path.join(dest, 'results.xml'), 'w')
+    def __init__(self, dest, junit_test_suffix='', start_count=0, **options):
         FSyncMixin.__init__(self, **options)
+        self._dest = dest
         self._test_suffix = junit_test_suffix
+        self._counter = itertools.count(start_count)
 
         # make dictionaries of all test names expected to crash/fail
         # for quick lookup when writing results.  Use lower-case to
@@ -62,19 +65,46 @@ class JUnitBackend(FSyncMixin, Backend):
                 self._expected_crashes[fail.lower()] = True
 
     def initialize(self, metadata):
-        # Write initial headers and other data that etree cannot write for us
-        self._file.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
-        self._file.write('<testsuites>\n')
-        self._file.write(
-            '<testsuite name="piglit" tests="{}">\n'.format(
-                metadata['test_count']))
-        self._fsync(self._file)
+        """ Do nothing
+
+        Junit doesn't support restore, and doesn't have an initial metadata
+        block to write, so all this method does is create the tests directory
+
+        """
+        tests = os.path.join(self._dest, 'tests')
+        if os.path.exists(tests):
+            shutil.rmtree(tests)
+        os.mkdir(tests)
 
     def finalize(self, metadata=None):
-        self._file.write('</testsuite>\n')
-        self._file.write('</testsuites>\n')
-        self._fsync(self._file)
-        self._file.close()
+        """ Scoop up all of the individual peices and put them together """
+        root = etree.Element('testsuites')
+        piglit = etree.Element('testsuite', name='piglit')
+        root.append(piglit)
+        for each in os.listdir(os.path.join(self._dest, 'tests')):
+            with open(os.path.join(self._dest, 'tests', each), 'r') as f:
+                # parse returns an element tree, and that's not what we want,
+                # we want the first (and only) Element node
+                # If the element cannot be properly parsed then consider it a
+                # failed transaction and ignore it.
+                try:
+                    piglit.append(etree.parse(f).getroot())
+                except etree.XMLSyntaxError:
+                    continue
+
+        # set the test count by counting the number of tests.
+        # This must be bytes or unicode
+        piglit.attrib['tests'] = str(len(piglit))
+
+        with open(os.path.join(self._dest, 'results.xml'), 'w') as f:
+            f.write("<?xml version='1.0' encoding='utf-8'?>\n")
+            # lxml has a pretty print we want to use
+            if etree.__name__ == 'lxml.etree':
+                f.write(etree.tostring(root, pretty_print=True))
+            else:
+                f.write(etree.tostring(root))
+
+        shutil.rmtree(os.path.join(self._dest, 'tests'))
 
     def write_test(self, name, data):
         # Split the name of the test and the group (what junit refers to as
@@ -143,6 +173,8 @@ class JUnitBackend(FSyncMixin, Backend):
                         "expected {0}".format(expected_result)
             etree.SubElement(element, 'failure')
 
-        self._file.write(etree.tostring(element))
-        self._file.write('\n')
-        self._fsync(self._file)
+        t = os.path.join(self._dest, 'tests',
+                         '{}.xml'.format(self._counter.next()))
+        with open(t, 'w') as f:
+            f.write(etree.tostring(element))
+            self._fsync(f)
