@@ -3,13 +3,13 @@
 
 [test]
 kernel_name: direct_write_indirect_read
-name: direct write - indirect read
+name: direct write - indirect read 0
 arg_out: 0 buffer int2[1] 0 1
 arg_in:  1 int 0
 
 [test]
 kernel_name: direct_write_indirect_read
-name: direct write - indirect read
+name: direct write - indirect read 1
 arg_out: 0 buffer int2[1] 2 3
 arg_in:  1 int 1
 
