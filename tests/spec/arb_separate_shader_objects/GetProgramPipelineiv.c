@@ -150,6 +150,7 @@ piglit_init(int argc, char **argv)
 		"    EndPrimitive();\n"
 		"}\n";
 	static const char tc_source[] =
+		"#extension GL_ARB_tessellation_shader: require\n"
 		"/* At least some versions of AMD's closed-source driver\n"
 		" * contain a bug that requires redeclaration of gl_PerVertex\n"
 		" * interface block in core profile shaders.\n"
@@ -177,6 +178,7 @@ piglit_init(int argc, char **argv)
 		"    gl_TessLevelInner[1] = 1.0;\n"
 		"}\n";
 	static const char te_source[] =
+		"#extension GL_ARB_tessellation_shader: require\n"
 		"/* At least some versions of AMD's closed-source driver\n"
 		" * contain a bug that requires redeclaration of gl_PerVertex\n"
 		" * interface block in core profile shaders.\n"
