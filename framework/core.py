@@ -107,11 +107,10 @@ class Options(object):
         self.sync = sync
         # env is used to set some base environment variables that are not going
         # to change across runs, without sending them to os.environ which is
-        # fickle as easy to break
+        # fickle and easy to break
         self.env = {
-            'PIGLIT_SOURCE_DIR': os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..')),
-            'MESA_DEBUG': 'silent',
+            'PIGLIT_SOURCE_DIR': os.environ.get('PIGLIT_SOURCE_DIR',
+                 os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
         }
 
     def __iter__(self):
