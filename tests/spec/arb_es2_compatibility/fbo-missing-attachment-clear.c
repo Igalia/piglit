@@ -51,6 +51,8 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 PIGLIT_GL_TEST_CONFIG_END
 
+#define BUF_SIZE 32
+
 enum piglit_result
 piglit_display(void)
 {
@@ -72,7 +74,7 @@ piglit_init(int argc, char **argv)
 	 */
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 32, 32, 0,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, BUF_SIZE, BUF_SIZE, 0,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glGenFramebuffers(1, &fb);
@@ -95,14 +97,14 @@ piglit_init(int argc, char **argv)
 	printf("Clearing depth buffer to 0.0...\n");
 	glClearDepth(0.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	pass = piglit_probe_rect_depth(0, 0, piglit_width, piglit_height, 0.0);
+	pass = piglit_probe_rect_depth(0, 0, BUF_SIZE, BUF_SIZE, 0.0);
 
 	/* Clear the depth buffer and the color buffer to different values.
 	 */
 	printf("Clearing depth buffer to 0.5...\n");
 	glClearDepth(0.5);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	pass = piglit_probe_rect_depth(0, 0, piglit_width, piglit_height, 0.5)
+	pass = piglit_probe_rect_depth(0, 0, BUF_SIZE, BUF_SIZE, 0.5)
 		&& pass;
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
