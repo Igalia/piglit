@@ -1,0 +1,32 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+/* Verify that out-of-bounds access to an array does not result in any sort of
+ * program interruption.
+ *
+ * In this test case the array index will not be constant folded.
+ */
+#version 120
+
+float array[5];
+uniform int idx;
+
+void main()
+{
+   gl_FrontColor = vec4(0.0, 1.0, 0.0, array[idx]);
+   gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = gl_Color;
+}
+
+[test]
+uniform int idx -2
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0

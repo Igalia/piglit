@@ -1,0 +1,25 @@
+[require]
+GLSL >= 1.20
+
+[vertex shader passthrough]
+
+[fragment shader]
+/* Verify that out-of-bounds access to an array does not result in any sort of
+ * program interruption.
+ */
+#version 120
+
+uniform int idx;
+float array[5];
+
+void main()
+{
+   gl_FragColor = vec4(0.0, 1.0, 0.0, array[idx]);
+}
+
+[test]
+uniform int idx -2
+clear color 0.0 0.0 0.0 0.0
+clear
+draw rect -1 -1 2 2
+probe all rgb 0.0 1.0 0.0
