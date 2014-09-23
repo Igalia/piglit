@@ -29,6 +29,7 @@ import abc
 import threading
 import posixpath
 from cStringIO import StringIO
+
 try:
     import simplejson as json
 except ImportError:
@@ -38,6 +39,7 @@ try:
 except ImportError:
     import xml.etree.cElementTree as etree
 
+from framework.core import PIGLIT_CONFIG
 import framework.status as status
 
 __all__ = [
@@ -385,6 +387,18 @@ class JUnitBackend(FSyncMixin, Backend):
         self._file = open(os.path.join(dest, 'results.xml'), 'w')
         FSyncMixin.__init__(self, **options)
 
+        # make dictionaries of all test names expected to crash/fail
+        # for quick lookup when writing results.  Use lower-case to
+        # provide case insensitive matches.
+        self._expected_failures = {}
+        if PIGLIT_CONFIG.has_section("expected-failures"):
+            for (fail, _) in PIGLIT_CONFIG.items("expected-failures"):
+                self._expected_failures[fail.lower()] = True
+        self._expected_crashes = {}
+        if PIGLIT_CONFIG.has_section("expected-crashes"):
+            for (fail, _) in PIGLIT_CONFIG.items("expected-crashes"):
+                self._expected_crashes[fail.lower()] = True
+
         # Write initial headers and other data that etree cannot write for us
         self._file.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
         self._file.write('<testsuites>\n')
@@ -414,6 +428,21 @@ class JUnitBackend(FSyncMixin, Backend):
         # set different root names.
         classname = 'piglit.' + classname
 
+        expected_result = "pass"
+
+        # replace special characters and make case insensitive
+        lname = (classname + "." + testname).lower()
+        lname = lname.replace("=", ".")
+        lname = lname.replace(":", ".")
+
+        if lname in self._expected_failures:
+            expected_result = "failure"
+            # a test can either fail or crash, but not both
+            assert( lname not in self._expected_crashes )
+
+        if lname in self._expected_crashes:
+            expected_result = "error"
+
         # Create the root element
         element = etree.Element('testcase', name=testname + self._test_suffix,
                                 classname=classname,
@@ -432,10 +461,23 @@ class JUnitBackend(FSyncMixin, Backend):
         # one of these statuses
         if data['result'] == 'skip':
             etree.SubElement(element, 'skipped')
+
         elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
-            etree.SubElement(element, 'failure')
+            if expected_result == "failure":
+                err.text += "\n\nWARN: passing test as an expected failure"
+            else:
+                etree.SubElement(element, 'failure')
+
         elif data['result'] == 'crash':
-            etree.SubElement(element, 'error')
+            if expected_result == "error":
+                err.text += "\n\nWARN: passing test as an expected crash"
+            else:
+                etree.SubElement(element, 'error')
+
+        elif expected_result != "pass":
+            err.text += "\n\nERROR: This test passed when it "\
+                        "expected {0}".format(expected_result)
+            etree.SubElement(element, 'failure')
 
         self._file.write(etree.tostring(element))
         self._file.write('\n')

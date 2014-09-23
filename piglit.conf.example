@@ -71,3 +71,15 @@ run_test=./%(test_name)s
 ; Options can be found running piglit run -h and reading the section for
 ; -b/--backend
 ;backend=json
+
+[expected-failures]
+; Provide a list of test names that are expected to fail.  These tests
+; will be listed as passing in JUnit output when they fail.  Any
+; unexpected result (pass/crash) will be listed as a failure.  The
+; test name must be written in the JUnit format ('.' instead of '/').
+; Special characters for config file format ('=' and ':') must be
+; replaced with '.'
+
+[expected-crashes]
+; Like expected-failures, but specifies that a test is expected to
+; crash.
