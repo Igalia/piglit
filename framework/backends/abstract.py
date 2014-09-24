@@ -27,29 +27,7 @@ This module provides mixins and base classes for backend modules.
 
 import os
 import abc
-
-
-class FSyncMixin(object):
-    """ Mixin class that adds fsync support
-
-    This class provides an init method that sets self._file_sync from a keyword
-    arugment file_fsync, and then provides an _fsync() method that does an
-    fsync if self._file_sync is truthy
-
-    """
-    def __init__(self, file_fsync=False, **options):
-        self._file_sync = file_fsync
-
-    def _fsync(self, file_):
-        """ Sync the file to disk
-
-        If self._fsync is truthy this will sync self._file to disk
-
-        """
-        file_.flush()
-
-        if self._file_sync:
-            os.fsync(file_.fileno())
+import itertools
 
 
 class Backend(object):
@@ -131,3 +109,38 @@ class Backend(object):
         data -- a TestResult object representing the test data
 
         """
+
+
+class FileBackend(Backend):
+    """ A baseclass for file based backends
+
+    This class provides a few methods and setup required for a file based
+    backend.
+
+    Arguments:
+    dest -- a folder to store files in
+
+    Keyword Arguments:
+    file_start_count -- controls the counter for the test result files.
+                        Whatever this is set to will be the first name of the
+                        tests. It is important for resumes that this is not
+                        overlapping as the Inheriting classes assume they are
+                        not. Default: 0
+    file_sync -- If file_sync is truthy then the _fsync method will flush and
+                 sync files to disk, otherwise it will pass. Defualt: False
+
+    """
+    def __init__(self, dest, file_start_count=0, file_fsync=False, **kwargs):
+        self._dest = dest
+        self._counter = itertools.count(file_start_count)
+        self._file_sync = file_fsync
+
+    def _fsync(self, file_):
+        """ Sync the file to disk
+
+        If self._file_sync is truthy this will sync self._file to disk
+
+        """
+        file_.flush()
+        if self._file_sync:
+            os.fsync(file_.fileno())

@@ -316,7 +316,7 @@ def resume(input_):
     backend = backends.get_backend('json')(
         args.results_path,
         file_fsync=opts.sync,
-        start_count=len(results.tests) + 1)
+        file_start_count=len(results.tests) + 1)
     # Specifically do not initialize again, everything initialize does is done.
 
     for name in results.tests.iterkeys():

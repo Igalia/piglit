@@ -22,13 +22,12 @@
 
 import os
 import shutil
-import itertools
 try:
     import simplejson as json
 except ImportError:
     import json
 import framework.status as status
-from .abstract import Backend, FSyncMixin
+from .abstract import FileBackend
 
 __all__ = [
     'CURRENT_JSON_VERSION',
@@ -54,7 +53,7 @@ def piglit_encoder(obj):
     return obj
 
 
-class JSONBackend(FSyncMixin, Backend):
+class JSONBackend(FileBackend):
     """ Piglit's native JSON backend
 
     This writes out to piglit's native json backend. This class uses the python
@@ -68,13 +67,6 @@ class JSONBackend(FSyncMixin, Backend):
 
     """
     INDENT = 4
-
-    def __init__(self, dest, start_count=0, **options):
-        self._dest = dest
-        FSyncMixin.__init__(self, **options)
-
-        # A counter the ensures each test gets a unique name
-        self._counter = itertools.count(start_count)
 
     def initialize(self, metadata):
         """ Write boilerplate json code

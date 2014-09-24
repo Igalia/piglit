@@ -23,21 +23,20 @@
 import os
 import re
 import posixpath
-import itertools
 import shutil
 try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
-from .abstract import Backend, FSyncMixin
 from framework.core import PIGLIT_CONFIG
+from .abstract import FileBackend
 
 __all__ = [
     'JUnitBackend',
 ]
 
 
-class JUnitBackend(FSyncMixin, Backend):
+class JUnitBackend(FileBackend):
     """ Backend that produces ANT JUnit XML
 
     Based on the following schema:
@@ -46,11 +45,9 @@ class JUnitBackend(FSyncMixin, Backend):
     """
     _REPLACE = re.compile(r'[/\\]')
 
-    def __init__(self, dest, junit_test_suffix='', start_count=0, **options):
-        FSyncMixin.__init__(self, **options)
-        self._dest = dest
+    def __init__(self, dest, junit_test_suffix='', **options):
+        super(JUnitBackend, self).__init__(dest, **options)
         self._test_suffix = junit_test_suffix
-        self._counter = itertools.count(start_count)
 
         # make dictionaries of all test names expected to crash/fail
         # for quick lookup when writing results.  Use lower-case to
