@@ -708,13 +708,21 @@ computeExpected(GLenum format, GLenum type, GLuint index,
 	}
 }
 
+static void
+report_failure(GLenum format, GLenum type)
+{
+	printf("  Failed with format %s, type %s\n",
+	       piglit_get_gl_enum_name(format),
+	       piglit_get_gl_enum_name(type));
+}
+
 enum piglit_result
 piglit_display(void)
 {
 	int i, j, k;
 	GLenum format, type;
 	GLvoid *pixels = NULL;
-	GLboolean pass = true;
+	bool pass = true, p;
 	GLfloat black[4] = {0.0, 0.0, 0.0, 1.0};
 	GLfloat red[4] = {1.0, 0.0, 0.0, 1.0};
 
@@ -784,10 +792,13 @@ piglit_display(void)
 
 					pass = piglit_check_gl_error(GL_NO_ERROR)
 					       && pass;
-					pass = piglit_probe_rect_rgba(0, 0,
+					p = piglit_probe_rect_rgba(0, 0,
 					       piglit_width, piglit_height,
-					       expected[j])
-					       && pass;
+					       expected[j]);
+					if (!p) {
+						report_failure(format, type);
+						pass = GL_FALSE;
+					}
 					break;
 
 				case GL_DEPTH_COMPONENT:
@@ -800,10 +811,13 @@ piglit_display(void)
 
 					pass = piglit_check_gl_error(GL_NO_ERROR)
 					       && pass;
-					pass = piglit_probe_rect_depth(0, 0,
+					p = piglit_probe_rect_depth(0, 0,
 					       piglit_width, piglit_height,
-					       expected[j][0])
-					       && pass;
+					       expected[j][0]);
+					if (!p) {
+						report_failure(format, type);
+						pass = GL_FALSE;
+					}
 					glDisable(GL_DEPTH_TEST);
 					break;
 
@@ -816,11 +830,14 @@ piglit_display(void)
 					pass = piglit_check_gl_error(GL_NO_ERROR)
 					       && pass;
 					/* Probe stencil buffer */
-					pass = piglit_probe_rect_stencil(0, 0,
+					p = piglit_probe_rect_stencil(0, 0,
 								piglit_width,
 								piglit_height,
-								expected[j][0])
-					       && pass;
+								expected[j][0]);
+					if (!p) {
+						report_failure(format, type);
+						pass = GL_FALSE;
+					}
 
 					glEnable(GL_STENCIL_TEST);
 					glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -832,18 +849,25 @@ piglit_display(void)
 					/* Probe color buffer. Color buffer will
 					 * stay unaffected by piglit_draw_rect()
 					 */
-					pass = piglit_probe_rect_rgba(0, 0,
+					p = piglit_probe_rect_rgba(0, 0,
 					       piglit_width, piglit_height,
-					       black)
-					       && pass;
+					       black);
+					if (!p) {
+						report_failure(format, type);
+						pass = GL_FALSE;
+					}
 
 					glStencilFunc(GL_EQUAL, expected[j][0], ~0);
 					piglit_draw_rect(0, 0, piglit_width,
 							 piglit_height);
-					pass = piglit_probe_rect_rgba(0, 0,
+					p = piglit_probe_rect_rgba(0, 0,
 					       piglit_width, piglit_height,
-					       red)
-					       && pass;
+					       red);
+					if (!p) {
+						report_failure(format, type);
+						pass = GL_FALSE;
+					}
+
 					glDisable(GL_STENCIL_TEST);
 					break;
 				}
