@@ -37,7 +37,7 @@
 #define UBYTE_TO_FLOAT(u) ((float) u / 255.0F)
 
 /** Convert GLbyte in [-128,127] to GLfloat in [-1.0,1.0] */
-#define BYTE_TO_FLOAT(B)    ((2.0F * (B) + 1.0F) * (1.0F/255.0F))
+#define BYTE_TO_FLOAT(B)    ((B) == -128 ? -1.0F : (B) * (1.0F/127.0F))
 
 /** Convert GLushort in [0,65535] to GLfloat in [0.0,1.0] */
 #define USHORT_TO_FLOAT(S)  ((GLfloat) (S) * (1.0F / 65535.0F))
