@@ -22,6 +22,7 @@
 import argparse
 import shutil
 import os.path as path
+import sys
 
 import framework.summary as summary
 import framework.status as status
@@ -31,7 +32,8 @@ import framework.junit
 
 __all__ = ['html',
            'junit',
-           'console']
+           'console',
+           'csv']
 
 
 def html(input_):
@@ -244,3 +246,31 @@ def console(input_):
     # Generate the output
     output = summary.Summary(args.results)
     output.generate_text(args.diff, args.summary)
+
+
+def csv(input_):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--output",
+                        metavar="<Output File>",
+                        action="store",
+                        dest="output",
+                        default="stdout",
+                        help="Output filename")
+    parser.add_argument("testResults",
+                        metavar="<Input Files>",
+                        help="JSON results file to be converted")
+    args = parser.parse_args(input_)
+
+    testrun = framework.results.load_results(args.testResults)
+
+    def write_results(output):
+        for name, result in testrun.tests.iteritems():
+            output.write("{},{},{},{}\n".format(name, result['time'],
+                                                result['returncode'],
+                                                result['result']))
+
+    if args.output != "stdout":
+        with open(args.output, 'w') as output:
+            write_results(output)
+    else:
+        write_results(sys.stdout)

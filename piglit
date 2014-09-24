@@ -135,6 +135,10 @@ def main():
                                       add_help=False,
                                       help='generate junit xml from results')
     junit.set_defaults(func=summary.junit)
+    csv = summary_parser.add_parser('csv',
+                                    add_help=False,
+                                    help='generate csv from results')
+    csv.set_defaults(func=summary.csv)
 
     # Parse the known arguments (piglit run or piglit summary html for
     # example), and then pass the arguments that this parser doesn't know about
