@@ -4156,58 +4156,58 @@ oes_compressed_paletted_texture['basic API'] = PiglitGLTest('oes_compressed_pale
 
 egl14 = {}
 spec['EGL 1.4'] = egl14
-egl14['eglCreateSurface'] = PiglitGLTest('egl-create-surface')
-egl14['eglQuerySurface EGL_BAD_ATTRIBUTE'] = PiglitGLTest('egl-query-surface --bad-attr')
-egl14['eglQuerySurface EGL_BAD_SURFACE'] = PiglitGLTest('egl-query-surface --bad-surface')
-egl14['eglQuerySurface EGL_HEIGHT'] = PiglitGLTest('egl-query-surface --attr=EGL_HEIGHT')
-egl14['eglQuerySurface EGL_WIDTH'] = PiglitGLTest('egl-query-surface --attr=EGL_WIDTH')
-egl14['eglTerminate then unbind context'] = PiglitGLTest('egl-terminate-then-unbind-context')
-egl14['eglCreatePbufferSurface and then glClear'] = PiglitGLTest('egl-create-pbuffer-surface')
+egl14['eglCreateSurface'] = PiglitGLTest('egl-create-surface', exclude_platforms=['glx'])
+egl14['eglQuerySurface EGL_BAD_ATTRIBUTE'] = PiglitGLTest('egl-query-surface --bad-attr', exclude_platforms=['glx'])
+egl14['eglQuerySurface EGL_BAD_SURFACE'] = PiglitGLTest('egl-query-surface --bad-surface', exclude_platforms=['glx'])
+egl14['eglQuerySurface EGL_HEIGHT'] = PiglitGLTest('egl-query-surface --attr=EGL_HEIGHT', exclude_platforms=['glx'])
+egl14['eglQuerySurface EGL_WIDTH'] = PiglitGLTest('egl-query-surface --attr=EGL_WIDTH', exclude_platforms=['glx'])
+egl14['eglTerminate then unbind context'] = PiglitGLTest('egl-terminate-then-unbind-context', exclude_platforms=['glx'])
+egl14['eglCreatePbufferSurface and then glClear'] = PiglitGLTest('egl-create-pbuffer-surface', exclude_platforms=['glx'])
 
 egl_nok_swap_region = {}
 spec['EGL_NOK_swap_region'] = egl_nok_swap_region
-egl_nok_swap_region['basic'] = PiglitGLTest('egl-nok-swap-region')
+egl_nok_swap_region['basic'] = PiglitGLTest('egl-nok-swap-region', exclude_platforms=['glx'])
 
 egl_nok_texture_from_pixmap = {}
 spec['EGL_NOK_texture_from_pixmap'] = egl_nok_texture_from_pixmap
-egl_nok_texture_from_pixmap['basic'] = PiglitGLTest('egl-nok-texture-from-pixmap')
+egl_nok_texture_from_pixmap['basic'] = PiglitGLTest('egl-nok-texture-from-pixmap', exclude_platforms=['glx'])
 
 egl_khr_create_context = {};
 spec['EGL_KHR_create_context'] = egl_khr_create_context
-egl_khr_create_context['default major version GLES'] = PiglitGLTest('egl-create-context-default-major-version-gles')
-egl_khr_create_context['default major version GL'] = PiglitGLTest('egl-create-context-default-major-version-gl')
-egl_khr_create_context['default minor version GLES'] = PiglitGLTest('egl-create-context-default-minor-version-gles')
-egl_khr_create_context['default minor version GL'] = PiglitGLTest('egl-create-context-default-minor-version-gl')
-egl_khr_create_context['valid attribute empty GLES'] = PiglitGLTest('egl-create-context-valid-attribute-empty-gles')
-egl_khr_create_context['valid attribute empty GL'] = PiglitGLTest('egl-create-context-valid-attribute-empty-gl')
-egl_khr_create_context['NULL valid attribute GLES'] = PiglitGLTest('egl-create-context-valid-attribute-null-gles')
-egl_khr_create_context['NULL valid attribute GL'] = PiglitGLTest('egl-create-context-valid-attribute-null-gl')
-egl_khr_create_context['invalid OpenGL version'] = PiglitGLTest('egl-create-context-invalid-gl-version')
-egl_khr_create_context['invalid attribute GLES'] = PiglitGLTest('egl-create-context-invalid-attribute-gles')
-egl_khr_create_context['invalid attribute GL'] = PiglitGLTest('egl-create-context-invalid-attribute-gl')
-egl_khr_create_context['invalid flag GLES'] = PiglitGLTest('egl-create-context-invalid-flag-gles')
-egl_khr_create_context['invalid flag GL'] = PiglitGLTest('egl-create-context-invalid-flag-gl')
-egl_khr_create_context['valid forward-compatible flag GL'] = PiglitGLTest('egl-create-context-valid-flag-forward-compatible-gl')
-egl_khr_create_context['invalid profile'] = PiglitGLTest('egl-create-context-invalid-profile')
-egl_khr_create_context['3.2 core profile required'] = PiglitGLTest('egl-create-context-core-profile')
-egl_khr_create_context['pre-GL3.2 profile'] = PiglitGLTest('egl-create-context-pre-GL32-profile')
-egl_khr_create_context['verify GL flavor'] = PiglitGLTest('egl-create-context-verify-gl-flavor')
-egl_khr_create_context['valid debug flag GL'] = PiglitGLTest('egl-create-context-valid-flag-debug-gl gl')
+egl_khr_create_context['default major version GLES'] = PiglitGLTest('egl-create-context-default-major-version-gles', exclude_platforms=['glx'])
+egl_khr_create_context['default major version GL'] = PiglitGLTest('egl-create-context-default-major-version-gl', exclude_platforms=['glx'])
+egl_khr_create_context['default minor version GLES'] = PiglitGLTest('egl-create-context-default-minor-version-gles', exclude_platforms=['glx'])
+egl_khr_create_context['default minor version GL'] = PiglitGLTest('egl-create-context-default-minor-version-gl', exclude_platforms=['glx'])
+egl_khr_create_context['valid attribute empty GLES'] = PiglitGLTest('egl-create-context-valid-attribute-empty-gles', exclude_platforms=['glx'])
+egl_khr_create_context['valid attribute empty GL'] = PiglitGLTest('egl-create-context-valid-attribute-empty-gl', exclude_platforms=['glx'])
+egl_khr_create_context['NULL valid attribute GLES'] = PiglitGLTest('egl-create-context-valid-attribute-null-gles', exclude_platforms=['glx'])
+egl_khr_create_context['NULL valid attribute GL'] = PiglitGLTest('egl-create-context-valid-attribute-null-gl', exclude_platforms=['glx'])
+egl_khr_create_context['invalid OpenGL version'] = PiglitGLTest('egl-create-context-invalid-gl-version', exclude_platforms=['glx'])
+egl_khr_create_context['invalid attribute GLES'] = PiglitGLTest('egl-create-context-invalid-attribute-gles', exclude_platforms=['glx'])
+egl_khr_create_context['invalid attribute GL'] = PiglitGLTest('egl-create-context-invalid-attribute-gl', exclude_platforms=['glx'])
+egl_khr_create_context['invalid flag GLES'] = PiglitGLTest('egl-create-context-invalid-flag-gles', exclude_platforms=['glx'])
+egl_khr_create_context['invalid flag GL'] = PiglitGLTest('egl-create-context-invalid-flag-gl', exclude_platforms=['glx'])
+egl_khr_create_context['valid forward-compatible flag GL'] = PiglitGLTest('egl-create-context-valid-flag-forward-compatible-gl', exclude_platforms=['glx'])
+egl_khr_create_context['invalid profile'] = PiglitGLTest('egl-create-context-invalid-profile', exclude_platforms=['glx'])
+egl_khr_create_context['3.2 core profile required'] = PiglitGLTest('egl-create-context-core-profile', exclude_platforms=['glx'])
+egl_khr_create_context['pre-GL3.2 profile'] = PiglitGLTest('egl-create-context-pre-GL32-profile', exclude_platforms=['glx'])
+egl_khr_create_context['verify GL flavor'] = PiglitGLTest('egl-create-context-verify-gl-flavor', exclude_platforms=['glx'])
+egl_khr_create_context['valid debug flag GL'] = PiglitGLTest('egl-create-context-valid-flag-debug-gl gl', exclude_platforms=['glx'])
 for api in ('gles1', 'gles2', 'gles3'):
-    egl_khr_create_context['valid debug flag ' + api] = PiglitGLTest('egl-create-context-valid-flag-debug-gles ' + api)
+    egl_khr_create_context['valid debug flag ' + api] = PiglitGLTest('egl-create-context-valid-flag-debug-gles ' + api, exclude_platforms=['glx'])
 
 egl_ext_client_extensions = {}
 spec['EGL_EXT_client_extensions'] = egl_ext_client_extensions
 for i in [1, 2, 3]:
-    egl_ext_client_extensions['conformance test {0}'.format(i)] = PiglitGLTest('egl_ext_client_extensions {0}'.format(i), run_concurrent=True)
+    egl_ext_client_extensions['conformance test {0}'.format(i)] = PiglitGLTest('egl_ext_client_extensions {0}'.format(i), run_concurrent=True, exclude_platforms=['glx'])
 
 egl_khr_fence_sync = {}
 spec['EGL_KHR_fence_sync'] = egl_khr_fence_sync
-egl_khr_fence_sync['conformance'] = PiglitGLTest('egl_khr_fence_sync', run_concurrent=True)
+egl_khr_fence_sync['conformance'] = PiglitGLTest('egl_khr_fence_sync', run_concurrent=True, exclude_platforms=['glx'])
 
 egl_chromium_sync_control = {}
 spec['EGL_CHROMIUM_sync_control'] = egl_chromium_sync_control
-egl_chromium_sync_control['conformance'] = PiglitGLTest('egl_chromium_sync_control', run_concurrent=True)
+egl_chromium_sync_control['conformance'] = PiglitGLTest('egl_chromium_sync_control', run_concurrent=True, exclude_platforms=['glx'])
 
 gles20 = {}
 spec['!OpenGL ES 2.0'] = gles20
