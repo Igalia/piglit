@@ -1244,6 +1244,7 @@ with profile.group_manager(
     g(['gl-3.2-layered-rendering-gl-layer-not-layered'],
       'gl-layer-not-layered')
     g(['gl-3.2-layered-rendering-gl-layer-render'], 'gl-layer-render')
+    g(['gl-3.2-layered-rendering-gl-layer-render-storage'], 'gl-layer-render-storage')
 
     for texture_type in ['3d', '2d_array', '2d_multisample_array', '1d_array',
                          'cube_map', 'cube_map_array']:
