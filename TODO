@@ -1,0 +1,28 @@
+
+Piglit To-Do items
+
+
+Port remaining Glean tests to Piglit (discard Glean tests which are
+already covered by Piglit).
+See https://bugs.freedesktop.org/show_bug.cgi?id=65676 for more details.
+
+
+Move/rename tests in the bugs/ directory to proper places under tests/spec/
+
+
+Replace calls such as assert(glGetError() == 0) with piglit_check_gl_error().
+
+
+Quite a few tests have GL enum names encoded in tables.  For example, in
+tests/texturing/texture-rg.c:
+
+static const struct format_info IntFormats[] = {
+   { "GL_R8", GL_R8, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
+   { "GL_R16", GL_R16, GL_RED, GL_FALSE, GL_FALSE, GL_FALSE },
+   { "GL_RG8", GL_RG8, GL_RG, GL_FALSE, GL_FALSE, GL_FALSE },
+[...]
+
+There's no reason to do this.  The program could use piglit_get_gl_enum_name()
+instead to convert GL enums to string names.
+
+
