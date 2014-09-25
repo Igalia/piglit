@@ -1,0 +1,61 @@
+# Simple test that verifies gl_LocalInvocationID values are
+# functioning. Atomic counters are used as outputs.
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_compute_shader
+GL_ARB_shader_atomic_counters
+
+[compute shader]
+#version 330
+#extension GL_ARB_compute_shader: enable
+#extension GL_ARB_shader_atomic_counters: require
+
+layout(binding = 0) uniform atomic_uint a0;
+layout(binding = 0) uniform atomic_uint a1;
+layout(binding = 0) uniform atomic_uint a2;
+layout(binding = 0) uniform atomic_uint a3;
+layout(binding = 0) uniform atomic_uint a4;
+layout(binding = 0) uniform atomic_uint a5;
+layout(binding = 0) uniform atomic_uint a6;
+layout(binding = 0) uniform atomic_uint a7;
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+void main()
+{
+    uint x = gl_LocalInvocationID.x;
+    uint y = gl_LocalInvocationID.y;
+    uint z = gl_LocalInvocationID.z;
+
+    if (((x & y) & z) == 0u)
+        atomicCounterIncrement(a0);
+    if (((x | y) | z) == 7u)
+        atomicCounterIncrement(a1);
+    if (x == y && y == z)
+        atomicCounterIncrement(a2);
+    if (x != y && y != z && x != z)
+        atomicCounterIncrement(a3);
+    if (((x & y) & z) == 2u)
+        atomicCounterIncrement(a4);
+    if (((x | y) | z) == 5u)
+        atomicCounterIncrement(a5);
+    if (x < 4u && y < 4u && z < 4u)
+        atomicCounterIncrement(a6);
+    if (x >= 4u || y >= 4u || z >= 4u)
+        atomicCounterIncrement(a7);
+}
+
+[test]
+atomic counters 8
+
+compute 1 1 1
+probe atomic counter 0 == 343
+probe atomic counter 1 == 343
+probe atomic counter 2 == 8
+probe atomic counter 3 == 336
+probe atomic counter 4 == 49
+probe atomic counter 5 == 49
+probe atomic counter 6 == 64
+probe atomic counter 7 == 448
