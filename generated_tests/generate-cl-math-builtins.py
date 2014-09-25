@@ -20,15 +20,18 @@
 # SOFTWARE.
 #
 # Authors: Tom Stellard <thomas.stellard@amd.com>
+#          Aaron Watry  <awatry@gmail.com>
 #
 
 import os
 
 from genclbuiltins import gen, NEGNAN
-from math import acos, asin, atan, atan2, fmod, pi, sin, sqrt, cos, fabs, tan, pow
+from math import acos, acosh, asin, atan, atan2, fmod, pi, sin, sqrt, cos, fabs
+from math import tan, pow
 
 CLC_VERSION_MIN = {
     'acos' : 10,
+    'acosh' : 10,
     'asin' : 10,
     'atan' : 10,
     'atan2' : 10,
@@ -61,6 +64,15 @@ tests = {
         'values' : [
             [ pi,  pi/2, 0.0, acos(0.12345), float("nan")], # Result
             [-1.0, 0.0,  1.0,      0.12345,  float("nan")]  # Arg0
+        ],
+        'tolerance' : 4
+     },
+    'acosh' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, acosh(1.12345), float("nan"), acosh(123456789.01234)], #Result
+            [1.0,       1.12345,  float("nan"),       123456789.01234 ]  #Arg0
         ],
         'tolerance' : 4
      },
