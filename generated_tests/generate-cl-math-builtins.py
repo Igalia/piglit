@@ -27,7 +27,7 @@ import os
 
 from genclbuiltins import gen, NEGNAN
 from math import acos, acosh, asin, asinh, atan, atan2, atanh, cos, cosh
-from math import fabs, fmod, pi, pow, sin, sinh, sqrt, tan
+from math import fabs, fmod, pi, pow, sin, sinh, sqrt, tan, tanh
 
 CLC_VERSION_MIN = {
     'acos' : 10,
@@ -52,6 +52,7 @@ CLC_VERSION_MIN = {
     'sin' : 10,
     'sinh' : 10,
     'tan' : 10,
+    'tanh' : 10,
     'sqrt' : 10,
     'trunc' : 10
 }
@@ -267,6 +268,15 @@ tests = {
         'values': [
             [0.0, 1.0,  0.0, sqrt(3), -1.0,   tan(2.234567), float("nan") ], # Result
             [0.0, pi/4, pi,  pi/3,    3*pi/4, 2.234567 ,     float("nan") ], # Arg1
+        ],
+        'tolerance': 5
+    },
+    'tanh' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, tanh(0.123456789), tanh(15.123456789), 1.0,          -1.0         , float("nan")],# Result
+            [0.0, 0.123456789,       15.123456789,       float("inf"), float("-inf"), float("nan")] # Arg0
         ],
         'tolerance': 5
     },
