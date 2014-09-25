@@ -37,7 +37,7 @@ arg_in:  2 float           4.0
 arg_in:  3 float           5.0
 
 [test]
-name: threads
+name: threads int
 kernel_name: threads_int
 dimensions: 1
 global_size: 8 0 0
@@ -46,7 +46,7 @@ arg_out: 0 buffer int[1] 7
 arg_in:  1 buffer int[1] NULL
 
 [test]
-name: threads
+name: threads uint
 kernel_name: threads_uint
 dimensions: 1
 global_size: 8 0 0
