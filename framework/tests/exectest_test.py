@@ -56,6 +56,33 @@ def test_run_return_early():
     test.run()
 
 
+def test_timeout():
+    """ Test that Test.timeout works correctly """
+
+    def helper():
+        if (test.result['returncode'] == 0):
+            test.result['result'] = "pass"
+
+    test = TestTest("/usr/bin/sleep 60")
+    test.test_interpret_result = helper
+    test.timeout = 1
+    test.run()
+    assert test.result['result'] == 'timeout'
+
+def test_timeout_pass():
+    """ Test that the correct result is returned if a test does not timeout """
+
+    def helper():
+        if (test.result['returncode'] == 0):
+            test.result['result'] = "pass"
+
+    test = TestTest("/usr/bin/true")
+    test.test_interpret_result = helper
+    test.timeout = 1
+    test.run()
+    assert test.result['result'] == 'pass'
+
+
 def test_piglittest_interpret_result():
     """ PiglitTest.interpret_result() works no subtests """
     test = PiglitTest('foo')
