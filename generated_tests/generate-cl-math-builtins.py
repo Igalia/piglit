@@ -52,6 +52,7 @@ CLC_VERSION_MIN = {
     'sign' : 10,
     'sin' : 10,
     'sinh' : 10,
+    'sinpi' : 10,
     'tan' : 10,
     'tanh' : 10,
     'sqrt' : 10,
@@ -262,6 +263,15 @@ tests = {
             [0.0, 0.123456789,       float("inf"), float("-inf"), float("nan")] # Arg0
         ],
         'tolerance': 4
+    },
+    'sinpi' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [0.0, 0.0, sin(pi*pi/2), sin(pi*3*pi/2), sin(2*pi*pi), sin(pi*1.12345)], # Result
+            [0.0, 1.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        ]  # Arg0
+        ],
+        'tolerance' : 4
     },
     'sqrt' : {
         'arg_types': [F, F],
