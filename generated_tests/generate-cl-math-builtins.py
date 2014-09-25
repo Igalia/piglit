@@ -42,6 +42,7 @@ CLC_VERSION_MIN = {
     'copysign' : 10,
     'cos' : 10,
     'cosh' : 10,
+    'cospi' : 10,
     'fabs' : 10,
     'floor' : 10,
     'fmod' : 10,
@@ -169,6 +170,15 @@ tests = {
         'values' : [
             [1.0, cosh(0.123456789), float("inf"), float("inf"),  float("nan")],# Result
             [0.0, 0.123456789,       float("inf"), float("-inf"), float("nan")] # Arg0
+        ],
+        'tolerance' : 4
+    },
+    'cospi' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [1.0, cos(pi*pi/2), cos(pi*3*pi/2), cos(2*pi*pi), cos(pi*1.12345)], # Result
+            [0.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        ]  # Arg0
         ],
         'tolerance' : 4
     },
