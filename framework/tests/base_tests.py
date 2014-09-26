@@ -109,3 +109,17 @@ def test_WindowResizeMixin_rerun():
     test = Test_('foo')
     test.run()
     nt.assert_equal(test.result['out'], 'all good')
+
+
+def test_run_command_early():
+    """Test.run() returns early if there is an error in _run_command()."""
+
+    class Test_(Test):
+        def interpret_result(self):
+            raise AssertionError('Test.run() did not return early')
+
+        def _run_command(self):
+            return True
+
+    test = Test_('foo')
+    test.run()

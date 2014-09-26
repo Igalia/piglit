@@ -210,12 +210,10 @@ class Test(object):
             self.result['returncode'] = None
             return
 
-        self._run_command()
-
-        # If the result is skip then the test wasn't run, return early
-        # This usually is triggered when a test is not built for a specific
-        # platform
-        if self.result['result'] == 'skip':
+        run_error = self._run_command()
+        if run_error:
+            # If there was an error self.result should already have been set,
+            # return early
             return
 
         self.interpret_result()
@@ -261,6 +259,11 @@ class Test(object):
         executable isn't found it sets the result to skip.
 
         """
+        # if there is an error in run command this will be set to True, if this
+        # is True then the run test method will return early. If this is set to
+        # True then self.result should be properly filled out
+        error = False
+
         # Setup the environment for the test. Environment variables are taken
         # from the following sources, listed in order of increasing precedence:
         #
@@ -309,6 +312,7 @@ class Test(object):
                 out = "Test executable not found.\n"
                 err = ""
                 returncode = None
+                error = True
             else:
                 raise e
 
@@ -329,6 +333,8 @@ class Test(object):
         self.result['out'] = out.decode('utf-8', 'replace')
         self.result['err'] = err.decode('utf-8', 'replace')
         self.result['returncode'] = returncode
+
+        return error
 
 
 class WindowResizeMixin(object):
