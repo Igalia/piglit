@@ -124,7 +124,7 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
             return True
         elif self.__exclude_platforms and platform in self.__exclude_platforms:
             return True
-        return False
+        return super(PiglitGLTest, self).is_skip()
 
     @PiglitBaseTest.command.getter
     def command(self):
