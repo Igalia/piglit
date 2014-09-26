@@ -350,8 +350,26 @@ class WindowResizeMixin(object):
 
     """
     def _run_command(self):
-        """Run a test up 5 times when window resize is detected."""
+        """Run a test up 5 times when window resize is detected.
+
+        Rerun the command up to 5 times if the window size changes, if it
+        changes 6 times mark the test as fail and return True, which will cause
+        Test.run() to return early.
+
+        """
         for _ in xrange(5):
-            super(WindowResizeMixin, self)._run_command()
-            if "Got spurious window resize" not in self.result['out']:
-                break
+            err = super(WindowResizeMixin, self)._run_command()
+            if err:
+                return err
+            elif "Got spurious window resize" not in self.result['out']:
+                return False
+
+        # If we reach this point then there has been no error, but spurious
+        # resize was detected more than 5 times. Set the result to fail, and
+        # add a message about why, and return True so that the test will exit
+        # early
+        self.result['result'] = 'fail'
+        self.result['err'] = unicode()
+        self.result['out'] = unicode('Got spurious resize more than 5 times')
+        self.result['returncode'] = None
+        return True
