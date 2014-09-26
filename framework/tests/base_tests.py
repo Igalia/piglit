@@ -20,8 +20,10 @@
 
 """ Tests for the exectest module """
 
+import nose.tools as nt
+
 import framework.tests.utils as utils
-from framework.test.base import Test
+from framework.test.base import Test, WindowResizeMixin
 
 
 # Helpers
@@ -79,3 +81,31 @@ def test_timeout_pass():
     test.timeout = 1
     test.run()
     assert test.result['result'] == 'pass'
+
+
+def test_WindowResizeMixin_rerun():
+    """base.WindowResizeMixin runs multiple when spurious resize detected."""
+
+    # Because of Python's inheritance strucutre we need the mixin here.
+
+    class Mixin(object):
+        def __init__(self, *args, **kwargs):
+            super(Mixin, self).__init__(*args, **kwargs)
+            self.__return_spurious = True
+
+        def _run_command(self):
+            self.result['returncode'] = None
+
+            if self.__return_spurious:
+                self.result['out'] = "Got spurious window resize"
+                self.__return_spurious = False
+            else:
+                self.result['out'] = 'all good'
+
+    class Test_(WindowResizeMixin, Mixin, Test):
+        def interpret_result(self):
+            pass
+
+    test = Test_('foo')
+    test.run()
+    nt.assert_equal(test.result['out'], 'all good')

@@ -41,6 +41,7 @@ from framework.results import TestResult
 
 __all__ = [
     'Test',
+    'WindowResizeMixin',
 ]
 
 
@@ -328,3 +329,23 @@ class Test(object):
         self.result['out'] = out.decode('utf-8', 'replace')
         self.result['err'] = err.decode('utf-8', 'replace')
         self.result['returncode'] = returncode
+
+
+class WindowResizeMixin(object):
+    """ Mixin class that deals with spurious window resizes
+
+    On gnome (and possible other DE's) the window manager may decide to resize
+    a window. This causes the test to fail even though otherwise would not.
+    This Mixin overides the _run_command method to run the test 5 times, each
+    time searching for the string 'Got suprious window resize' in the output,
+    if it fails to find it it will break the loop and continue.
+
+    see: https://bugzilla.gnome.org/show_bug.cgi?id=680214
+
+    """
+    def _run_command(self):
+        """Run a test up 5 times when window resize is detected."""
+        for _ in xrange(5):
+            super(WindowResizeMixin, self)._run_command()
+            if "Got spurious window resize" not in self.result['out']:
+                break

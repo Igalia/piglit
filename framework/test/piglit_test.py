@@ -28,7 +28,7 @@ try:
 except ImportError:
     import json
 
-from .base import Test
+from .base import Test, WindowResizeMixin
 
 
 __all__ = [
@@ -67,13 +67,11 @@ class PiglitBaseTest(Test):
             s for s in outlines if not s.startswith('PIGLIT:'))
 
 
-class PiglitGLTest(PiglitBaseTest):
+class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
     """ OpenGL specific Piglit test class
 
-    This Subclass provides two methods that differ from PiglitBaseTest, first
-    it provides an is_skip() method that skips glx tests on non-glx platforms,
-    and it provides a _run_command() method that repeats tests if they fail due
-    to window manager resizing bug
+    This Subclass provides provides an is_skip() implementation that skips glx
+    tests on non-glx platforms
 
     """
     def is_skip(self):
@@ -89,14 +87,6 @@ class PiglitGLTest(PiglitBaseTest):
             if split_command.startswith('glx-'):
                 return True
         return False
-
-    def _run_command(self):
-        # https://bugzilla.gnome.org/show_bug.cgi?id=680214 is affecting many
-        # developers. If we catch it happening, try just re-running the test.
-        for _ in xrange(5):
-            super(PiglitGLTest, self)._run_command()
-            if "Got spurious window resize" not in self.result['out']:
-                break
 
 
 class PiglitCLTest(PiglitBaseTest):
