@@ -13,3 +13,4 @@ link_libraries (
 piglit_add_executable (arb_texture_buffer_range-dlist dlist.c)
 piglit_add_executable (arb_texture_buffer_range-errors errors.c)
 piglit_add_executable (arb_texture_buffer_range-ranges ranges.c)
+piglit_add_executable (arb_texture_buffer_range-ranges-2 ranges-2.c)

@@ -2194,6 +2194,7 @@ spec['ARB_texture_buffer_range'] = arb_texture_buffer_range
 arb_texture_buffer_range['dlist'] = concurrent_test('arb_texture_buffer_range-dlist')
 arb_texture_buffer_range['errors'] = concurrent_test('arb_texture_buffer_range-errors')
 arb_texture_buffer_range['ranges'] = concurrent_test('arb_texture_buffer_range-ranges')
+arb_texture_buffer_range['ranges-2'] = concurrent_test('arb_texture_buffer_range-ranges-2')
 
 arb_texture_query_lod = {}
 spec['ARB_texture_query_lod'] = arb_texture_query_lod
