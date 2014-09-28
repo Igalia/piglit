@@ -7,6 +7,9 @@ __all__ = ['profile']
 import os
 import os.path as path
 
+import platform
+import glob
+
 from framework.opencv import add_opencv_tests
 
 from framework.profile import TestProfile
@@ -15,14 +18,10 @@ from framework.exectest import PiglitTest
 ######
 # Helper functions
 
-def add_plain_test(group, name, args):
-        group[name] = PiglitTest(args)
+can_do_concurrent = platform.system().lower()[0:5] != 'linux' or glob.glob('/dev/dri/render*')
 
-# TODO: Use concurrent tests for everything once kernels with render nodes
-# enabled by default (3.16 or newer) are more widely used.
-def add_concurrent_test(group, name, args):
-        test = PiglitTest(args, run_concurrent=True)
-        group[name] = test
+def add_plain_test(group, name, args):
+        group[name] = PiglitTest(args, run_concurrent=can_do_concurrent)
 
 def add_plain_program_tester_test(group, name, path):
         add_plain_test(group, name, ['cl-program-tester', path])
