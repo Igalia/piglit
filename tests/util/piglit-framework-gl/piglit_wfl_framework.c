@@ -458,6 +458,7 @@ special_case_gl31(struct piglit_wfl_framework *wfl_fw,
 		    "profile if context creation succeeds.",
 		    context_description, error_verb);
 
+	waffle_make_current(wfl_fw->display, NULL, NULL);
 	waffle_window_destroy(wfl_fw->window);
 	waffle_context_destroy(wfl_fw->context);
 	waffle_config_destroy(wfl_fw->config);
@@ -536,6 +537,7 @@ make_context_current_singlepass(struct piglit_wfl_framework *wfl_fw,
 	return true;
 
 fail:
+	waffle_make_current(wfl_fw->display, NULL, NULL);
 	waffle_window_destroy(wfl_fw->window);
 	waffle_context_destroy(wfl_fw->context);
 	waffle_config_destroy(wfl_fw->config);
@@ -645,6 +647,7 @@ fail:
 void
 piglit_wfl_framework_teardown(struct piglit_wfl_framework *wfl_fw)
 {
+	waffle_make_current(wfl_fw->display, NULL, NULL);
 	waffle_window_destroy(wfl_fw->window);
 	waffle_context_destroy(wfl_fw->context);
 	waffle_config_destroy(wfl_fw->config);
