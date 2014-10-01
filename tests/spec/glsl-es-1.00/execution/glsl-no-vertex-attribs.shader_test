@@ -1,0 +1,25 @@
+#
+# Tests that we can succesfully render a point with OpenGL ES 2.0
+# without having any vertex attributes enabled.
+#
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+SIZE 1 1
+
+[vertex shader]
+void main()
+{
+	gl_PointSize = 1.0;
+	gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+draw arrays GL_POINTS 0 1
+relative probe rgba (0.0, 0.0) (0.0, 1.0, 0.0, 1.0)
