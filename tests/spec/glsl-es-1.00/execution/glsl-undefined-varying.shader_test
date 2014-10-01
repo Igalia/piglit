@@ -1,0 +1,24 @@
+#
+# Tests that we can link a shader program on OpenGL ES 2.0 where
+# vertex shader does not write to varying but fragment shader reads from it
+#
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader]
+varying highp vec4 color;
+void main()
+{
+	gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+[fragment shader]
+varying highp vec4 color;
+void main()
+{
+	gl_FragColor = color;
+}
+
+[test]
+link success
