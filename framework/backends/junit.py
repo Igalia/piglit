@@ -123,6 +123,7 @@ class JUnitBackend(FileBackend):
             if lname in self._expected_crashes:
                 expected_result = "error"
 
+            res = None
             # Add relevant result value, if the result is pass then it doesn't
             # need one of these statuses
             if data['result'] == 'skip':
@@ -132,18 +133,22 @@ class JUnitBackend(FileBackend):
                 if expected_result == "failure":
                     err.text += "\n\nWARN: passing test as an expected failure"
                 else:
-                    etree.SubElement(element, 'failure')
+                    res = etree.SubElement(element, 'failure')
 
             elif data['result'] == 'crash':
                 if expected_result == "error":
                     err.text += "\n\nWARN: passing test as an expected crash"
                 else:
-                    etree.SubElement(element, 'error')
+                    res = etree.SubElement(element, 'error')
 
             elif expected_result != "pass":
                 err.text += "\n\nERROR: This test passed when it "\
                             "expected {0}".format(expected_result)
-                etree.SubElement(element, 'failure')
+                res = etree.SubElement(element, 'failure')
+
+            # Add the piglit type to the failure result
+            if res is not None:
+                res.attrib['type'] = str(data['result'])
 
         # Split the name of the test and the group (what junit refers to as
         # classname), and replace piglits '/' separated groups with '.', after
