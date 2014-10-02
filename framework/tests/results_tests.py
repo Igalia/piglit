@@ -151,11 +151,11 @@ def test_update_results_old():
     nt.assert_equal(res.results_version, results.CURRENT_JSON_VERSION)
 
 
-@nt.raises(AssertionError)
 def test_resume_non_folder():
     """ TestrunResult.resume doesn't accept a file """
     with utils.with_tempfile('') as f:
-        results.TestrunResult.resume(f)
+        with nt.assert_raises(AssertionError):
+            results.TestrunResult.resume(f)
 
 
 def test_resume_load():

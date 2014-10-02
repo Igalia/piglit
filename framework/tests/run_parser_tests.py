@@ -97,7 +97,6 @@ class TestBackend(_Helpers):
             args = run._run_parser(['quick.py', 'foo'])
             nt.assert_equal(args.backend, 'junit')
 
-    @nt.raises(SystemExit)
     def test_bad_value_in_conf(self):
         """ run parser: an error is raised when the platform in conf is bad """
         self._unset_config()
@@ -112,8 +111,9 @@ class TestBackend(_Helpers):
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write('[core]\nbackend=foobar')
 
-            run._run_parser(['-f', os.path.join(tdir, 'piglit.conf'),
-                             'quick.py', 'foo'])
+            with nt.assert_raises(SystemExit):
+                run._run_parser(['-f', os.path.join(tdir, 'piglit.conf'),
+                                 'quick.py', 'foo'])
 
 
 class TestPlatform(_Helpers):
@@ -190,7 +190,6 @@ class TestPlatform(_Helpers):
             args = run._run_parser(['quick.py', 'foo'])
             nt.assert_equal(args.platform, 'glx')
 
-    @nt.raises(SystemExit)
     def test_bad_value_in_conf(self):
         """ run parser: an error is raised when the platform in conf is bad """
         self._unset_config()
@@ -205,5 +204,6 @@ class TestPlatform(_Helpers):
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
                 f.write('[core]\nplatform=foobar')
 
-            run._run_parser(['-f', os.path.join(tdir, 'piglit.conf'),
-                             'quick.py', 'foo'])
+            with nt.assert_raises(SystemExit):
+                run._run_parser(['-f', os.path.join(tdir, 'piglit.conf'),
+                                 'quick.py', 'foo'])

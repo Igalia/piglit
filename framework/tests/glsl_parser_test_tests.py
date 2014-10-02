@@ -211,12 +211,13 @@ def test_bad_section_name():
                '// new_awesome_key: foo\n'
                '// [end config]\n')
 
-    with nt.assert_raises(SystemExit) as e:
-        _, name = _check_config(content)
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(SystemExit) as e:
+            glsl.GLSLParserTest(tfile)
 
-        nt.eq_(e.exception.message,
-               'Key new_awesome_key in file {0 is not a valid key for a '
-               'glslparser test config block'.format(name))
+            nt.eq_(e.exception.message,
+                   'Key new_awesome_key in file {0 is not a valid key for a '
+                   'glslparser test config block'.format(tfile))
 
 
 def test_good_section_names():
@@ -236,8 +237,8 @@ def test_good_section_names():
 
 def check_no_duplicates(content, dup):
     """ Ensure that duplicate entries raise an error """
-    with nt.assert_raises(SystemExit) as e:
-        with utils.with_tempfile(content) as tfile:
+    with utils.with_tempfile(content) as tfile:
+        with nt.assert_raises(SystemExit) as e:
             glsl.GLSLParserTest(tfile)
 
             nt.eq_(
