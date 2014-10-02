@@ -105,6 +105,46 @@ class JUnitBackend(FileBackend):
         shutil.rmtree(os.path.join(self._dest, 'tests'))
 
     def write_test(self, name, data):
+
+        def calculate_result():
+            """Set the result."""
+            expected_result = "pass"
+
+            # replace special characters and make case insensitive
+            lname = (classname + "." + testname).lower()
+            lname = lname.replace("=", ".")
+            lname = lname.replace(":", ".")
+
+            if lname in self._expected_failures:
+                expected_result = "failure"
+                # a test can either fail or crash, but not both
+                assert( lname not in self._expected_crashes )
+
+            if lname in self._expected_crashes:
+                expected_result = "error"
+
+            # Add relevant result value, if the result is pass then it doesn't
+            # need one of these statuses
+            if data['result'] == 'skip':
+                etree.SubElement(element, 'skipped')
+
+            elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
+                if expected_result == "failure":
+                    err.text += "\n\nWARN: passing test as an expected failure"
+                else:
+                    etree.SubElement(element, 'failure')
+
+            elif data['result'] == 'crash':
+                if expected_result == "error":
+                    err.text += "\n\nWARN: passing test as an expected crash"
+                else:
+                    etree.SubElement(element, 'error')
+
+            elif expected_result != "pass":
+                err.text += "\n\nERROR: This test passed when it "\
+                            "expected {0}".format(expected_result)
+                etree.SubElement(element, 'failure')
+
         # Split the name of the test and the group (what junit refers to as
         # classname), and replace piglits '/' separated groups with '.', after
         # replacing any '.' with '_' (so we don't get false groups).
@@ -118,21 +158,6 @@ class JUnitBackend(FileBackend):
         # TODO: It would be nice if other suites integrating with piglit could
         # set different root names.
         classname = 'piglit.' + classname
-
-        expected_result = "pass"
-
-        # replace special characters and make case insensitive
-        lname = (classname + "." + testname).lower()
-        lname = lname.replace("=", ".")
-        lname = lname.replace(":", ".")
-
-        if lname in self._expected_failures:
-            expected_result = "failure"
-            # a test can either fail or crash, but not both
-            assert( lname not in self._expected_crashes )
-
-        if lname in self._expected_crashes:
-            expected_result = "error"
 
         # Create the root element
         element = etree.Element('testcase', name=testname + self._test_suffix,
@@ -151,27 +176,7 @@ class JUnitBackend(FileBackend):
         err = etree.SubElement(element, 'system-err')
         err.text = data['err']
 
-        # Add relevant result value, if the result is pass then it doesn't need
-        # one of these statuses
-        if data['result'] == 'skip':
-            etree.SubElement(element, 'skipped')
-
-        elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
-            if expected_result == "failure":
-                err.text += "\n\nWARN: passing test as an expected failure"
-            else:
-                etree.SubElement(element, 'failure')
-
-        elif data['result'] == 'crash':
-            if expected_result == "error":
-                err.text += "\n\nWARN: passing test as an expected crash"
-            else:
-                etree.SubElement(element, 'error')
-
-        elif expected_result != "pass":
-            err.text += "\n\nERROR: This test passed when it "\
-                        "expected {0}".format(expected_result)
-            etree.SubElement(element, 'failure')
+        calculate_result()
 
         t = os.path.join(self._dest, 'tests',
                          '{}.xml'.format(self._counter.next()))
