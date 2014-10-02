@@ -97,7 +97,7 @@ class TestResult(dict):
 
 
 class TestrunResult(object):
-    def __init__(self, resultfile=None):
+    def __init__(self):
         self.serialized_keys = ['options',
                                 'name',
                                 'tests',
@@ -116,97 +116,23 @@ class TestrunResult(object):
         self.results_version = CURRENT_JSON_VERSION
         self.tests = {}
 
-        if resultfile:
-            # Attempt to open the json file normally, if it fails then attempt
-            # to repair it.
-            try:
-                raw_dict = json.load(resultfile)
-            except ValueError:
-                raw_dict = json.load(self.__repair_file(resultfile))
-
-            # If there is no results version in the json, put set it to zero
-            self.results_version = getattr(raw_dict, 'results_version', 0)
-
-            # Check that only expected keys were unserialized.
-            for key in raw_dict:
-                if key not in self.serialized_keys:
-                    raise Exception('unexpected key in results file: ',
-                                    str(key))
-
-            self.__dict__.update(raw_dict)
-
-            # Replace each raw dict in self.tests with a TestResult.
-            for (path, result) in self.tests.items():
-                self.tests[path] = TestResult.load(result)
-
-    def __repair_file(self, file_):
-        '''
-        Reapair JSON file if necessary
-
-        If the JSON file is not closed properly, perhaps due a system
-        crash during a test run, then the JSON is repaired by
-        discarding the trailing, incomplete item and appending braces
-        to the file to close the JSON object.
-
-        The repair is performed on a string buffer, and the given file
-        is never written to. This allows the file to be safely read
-        during a test run.
-
-        :return: If no repair occured, then ``file`` is returned.
-                Otherwise, a new file object containing the repaired JSON
-                is returned.
-        '''
-
-        file_.seek(0)
-        lines = file_.readlines()
-
-        # JSON object was not closed properly.
-        #
-        # To repair the file, we execute these steps:
-        #   1. Find the closing brace of the last, properly written
-        #      test result.
-        #   2. Discard all subsequent lines.
-        #   3. Remove the trailing comma of that test result.
-        #   4. Append enough closing braces to close the json object.
-        #   5. Return a file object containing the repaired JSON.
-
-        # Each non-terminal test result ends with this line:
-        safe_line = 2 * JSONBackend.INDENT * ' ' + '},\n'
-
-        # Search for the last occurence of safe_line.
-        safe_line_num = None
-        for i in range(-1, - len(lines), -1):
-            if lines[i] == safe_line:
-                safe_line_num = i
-                break
-
-        if safe_line_num is None:
-            raise Exception('failed to repair corrupt result file: ' +
-                            file_.name)
-
-        # Remove corrupt lines.
-        lines = lines[0:(safe_line_num + 1)]
-
-        # Remove trailing comma.
-        lines[-1] = 2 * JSONBackend.INDENT * ' ' + '}\n'
-
-        # Close json object.
-        lines.append(JSONBackend.INDENT * ' ' + '}\n')
-        lines.append('}')
-
-        # Return new file object containing the repaired JSON.
-        new_file = StringIO()
-        new_file.writelines(lines)
-        new_file.flush()
-        new_file.seek(0)
-        return new_file
-
     def write(self, file_):
         """ Write only values of the serialized_keys out to file """
         with open(file_, 'w') as f:
             json.dump(dict((k, v) for k, v in self.__dict__.iteritems()
                            if k in self.serialized_keys),
                       f, default=piglit_encoder, indent=JSONBackend.INDENT)
+
+    @classmethod
+    def load(cls, results_file):
+        """Create a TestrunResult from a completed file."""
+        result = cls()
+        result.__dict__.update(json.load(results_file))
+
+        for key, value in result.tests.iteritems():
+            result.tests[key] = TestResult.load(value)
+
+        return result
 
     @classmethod
     def resume(cls, results_dir):
@@ -229,7 +155,7 @@ class TestrunResult(object):
         assert meta['results_version'] == CURRENT_JSON_VERSION, \
             "Old results version, resume impossible"
 
-        testrun = TestrunResult()
+        testrun = cls()
         testrun.name = meta['name']
         testrun.options = meta['options']
         testrun.uname = meta.get('uname')
@@ -277,7 +203,7 @@ def load_results(filename):
             raise Exception("No results found")
 
     with open(filepath, 'r') as f:
-        testrun = TestrunResult(f)
+        testrun = TestrunResult.load(f)
 
     return update_results(testrun, filepath)
 

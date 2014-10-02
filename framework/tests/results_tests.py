@@ -116,7 +116,7 @@ def test_update_results_current():
             json.dump(data, f)
 
         with open(os.path.join(d, 'main'), 'r') as f:
-            base = results.TestrunResult(f)
+            base = results.TestrunResult.load(f)
 
         res = results.update_results(base, f.name)
 
@@ -144,7 +144,7 @@ def test_update_results_old():
             json.dump(data, f)
 
         with open(os.path.join(d, 'main'), 'r') as f:
-            base = results.TestrunResult(f)
+            base = results.TestrunResult.load(f)
 
         res = results.update_results(base, f.name)
 
