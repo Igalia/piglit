@@ -81,10 +81,10 @@ def test_load_results_file():
         results.load_results(tfile.name)
 
 
-def test_testresult_to_status():
+def test_testresult_load_to_status():
     """ TestResult initialized with result key converts the value to a Status
     """
-    result = results.TestResult({'result': 'pass'})
+    result = results.TestResult.load({'result': 'pass'})
     assert isinstance(result['result'], status.Status), \
         "Result key not converted to a status object"
 

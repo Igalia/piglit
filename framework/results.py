@@ -43,17 +43,6 @@ __all__ = [
 
 
 class TestResult(dict):
-    def __init__(self, *args):
-        super(TestResult, self).__init__(*args)
-
-        # Replace the result with a status object
-        try:
-            self['result'] = status.status_lookup(self['result'])
-        except KeyError:
-            # If there isn't a result (like when used by piglit-run), go on
-            # normally
-            pass
-
     def recursive_update(self, dictionary):
         """ Recursively update the TestResult
 
@@ -87,6 +76,24 @@ class TestResult(dict):
             return d
 
         update(self, dictionary, False)
+
+    @classmethod
+    def load(cls, res):
+        """Load an already generated result.
+
+        This is used as an alternate constructor which converts an existing
+        dictionary into a TestResult object. It converts a key 'result' into a
+        status.Status object
+
+        """
+        result = cls(res)
+
+        # Replace the result with a status object. 'result' is a required key
+        # for results, so don't do any checking. This should fail if it doesn't
+        # exist.
+        result['result'] = status.status_lookup(result['result'])
+
+        return result
 
 
 class TestrunResult(object):
@@ -130,7 +137,7 @@ class TestrunResult(object):
 
             # Replace each raw dict in self.tests with a TestResult.
             for (path, result) in self.tests.items():
-                self.tests[path] = TestResult(result)
+                self.tests[path] = TestResult.load(result)
 
     def __repair_file(self, file_):
         '''
@@ -239,7 +246,7 @@ class TestrunResult(object):
             # XXX: There has to be a better way to get a single key: value out
             # of a dict even when the key name isn't known
             for key, value in test.iteritems():
-                testrun.tests[key] = TestResult(value)
+                testrun.tests[key] = TestResult.load(value)
 
         return testrun
 
