@@ -21,7 +21,10 @@
 """ Tests for the exectest module """
 
 import nose.tools as nt
+
 from framework.exectest import PiglitTest, Test
+from framework.log import LogManager
+from framework.dmesg import DummyDmesg
 
 
 # Helpers
@@ -112,3 +115,27 @@ def test_piglitest_no_clobber():
 
     nt.assert_dict_equal(test.result['subtest'],
                          {'test1': 'pass', 'test2': 'pass'})
+
+
+def test_log_expanding_running():
+    """Test.execute(): When a test fails the default value is valid.
+
+    This exercises a bug where the default value is a status.Status object,
+    which causes a failure in the logger. Because of the way that python
+    handles thread exceptions the thread dies, and the number is left in the
+    running tests.
+
+    """
+    class _Test(Test):
+        """Class for testing execute() default value."""
+        def run(self):
+            pass
+
+        def interpret_result(self):
+            raise AssertionError('run did not return')
+
+    manager = LogManager('quiet', 5)
+
+    test = _Test('foo')
+    test.execute('foo', manager.get(), DummyDmesg())
+    nt.assert_list_equal(manager._state['running'], [])
