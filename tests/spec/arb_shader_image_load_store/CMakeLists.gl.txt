@@ -12,4 +12,6 @@ link_libraries (
 
 set(depends image.c grid.c common.c)
 
+piglit_add_executable(arb_shader_image_load_store-atomicity atomicity.c ${depends})
+
 # vim: ft=cmake:

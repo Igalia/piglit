@@ -4431,6 +4431,7 @@ spec['ARB_shader_image_load_store'] = arb_shader_image_load_store
 import_glsl_parser_tests(spec['ARB_shader_image_load_store'],
                          os.path.join(TESTS_DIR, 'spec', 'arb_shader_image_load_store'),
                          [''])
+arb_shader_image_load_store['atomicity'] = PiglitGLTest(['arb_shader_image_load_store-atomicity'], run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
