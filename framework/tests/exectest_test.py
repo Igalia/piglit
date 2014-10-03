@@ -25,6 +25,7 @@ import nose.tools as nt
 from framework.exectest import PiglitTest, Test
 from framework.log import LogManager
 from framework.dmesg import DummyDmesg
+import framework.tests.utils as utils
 
 
 # Helpers
@@ -61,25 +62,28 @@ def test_run_return_early():
 
 def test_timeout():
     """ Test that Test.timeout works correctly """
+    utils.binary_check('sleep')
 
     def helper():
         if (test.result['returncode'] == 0):
             test.result['result'] = "pass"
 
-    test = TestTest("/usr/bin/sleep 60")
+    test = TestTest("sleep 60")
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()
     assert test.result['result'] == 'timeout'
 
+
 def test_timeout_pass():
     """ Test that the correct result is returned if a test does not timeout """
+    utils.binary_check('true')
 
     def helper():
         if (test.result['returncode'] == 0):
             test.result['result'] = "pass"
 
-    test = TestTest("/usr/bin/true")
+    test = TestTest("true")
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()

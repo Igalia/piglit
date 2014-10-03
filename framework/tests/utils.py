@@ -29,11 +29,13 @@ import os
 import shutil
 import tempfile
 import functools
+import subprocess
 from contextlib import contextmanager
 try:
     import simplejson as json
 except ImportError:
     import json
+from nose.plugins.skip import SkipTest
 import nose.tools as nt
 import framework.results
 
@@ -252,3 +254,12 @@ class StaticDirectory(object):
     def teardown_class(cls):
         """ Remove the temporary directory """
         shutil.rmtree(cls.tdir)
+
+
+def binary_check(bin_):
+    """Check for the existance of a binary or raise SkipTest."""
+    with open(os.devnull, 'w') as null:
+        try:
+            subprocess.check_call(['which', bin_], stdout=null, stderr=null)
+        except subprocess.CalledProcessError:
+            raise SkipTest('Binary {} not available'.format(bin_))
