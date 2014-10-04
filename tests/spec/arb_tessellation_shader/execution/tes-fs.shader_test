@@ -49,6 +49,8 @@ piglit_vertex/float/2
  1.0  1.0
 
 [test]
+clear color 0.1 0.1 0.1 0.1
+clear
 patch parameter vertices 3
 draw arrays GL_PATCHES 0 6
 probe all rgba 0.0 1.0 0.0 1.0
