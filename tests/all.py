@@ -4135,6 +4135,7 @@ egl14['eglQuerySurface EGL_BAD_SURFACE'] = plain_test('egl-query-surface --bad-s
 egl14['eglQuerySurface EGL_HEIGHT'] = plain_test('egl-query-surface --attr=EGL_HEIGHT')
 egl14['eglQuerySurface EGL_WIDTH'] = plain_test('egl-query-surface --attr=EGL_WIDTH')
 egl14['eglTerminate then unbind context'] = plain_test('egl-terminate-then-unbind-context')
+egl14['eglCreatePbufferSurface and then glClear'] = plain_test('egl-create-pbuffer-surface')
 
 egl_nok_swap_region = {}
 spec['EGL_NOK_swap_region'] = egl_nok_swap_region
