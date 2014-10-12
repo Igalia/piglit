@@ -22,5 +22,6 @@ piglit_add_executable (arb_shader_atomic_counters-multiple-defs multiple-defs.c 
 piglit_add_executable (arb_shader_atomic_counters-semantics semantics.c common.c)
 piglit_add_executable (arb_shader_atomic_counters-unique-id unique-id.c common.c)
 piglit_add_executable (arb_shader_atomic_counters-unused-result unused-result.c common.c)
+piglit_add_executable (arb_shader_atomic_counters-respecify-buffer respecify-buffer.c)
 
 # vim: ft=cmake:

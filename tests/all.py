@@ -4242,6 +4242,7 @@ arb_shader_atomic_counters['multiple-defs'] = concurrent_test('arb_shader_atomic
 arb_shader_atomic_counters['semantics'] = concurrent_test('arb_shader_atomic_counters-semantics')
 arb_shader_atomic_counters['unique-id'] = concurrent_test('arb_shader_atomic_counters-unique-id')
 arb_shader_atomic_counters['unused-result'] = concurrent_test('arb_shader_atomic_counters-unused-result')
+arb_shader_atomic_counters['respecify-buffer'] = concurrent_test('arb_shader_atomic_counters-respecify-buffer')
 
 arb_derivative_control = {}
 spec['ARB_derivative_control'] = arb_derivative_control
