@@ -1,0 +1,13 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+piglit_add_executable (arb_direct_state_access-dsa-textures dsa-textures.c dsa-utils.c)
+# vim: ft=cmake:

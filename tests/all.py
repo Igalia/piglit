@@ -4308,6 +4308,8 @@ add_shader_test_dir(arb_derivative_control,
 import_glsl_parser_tests(arb_derivative_control,
                          testsDir + '/spec/arb_derivative_control', [''])
 
+spec['ARB_direct_state_access'] = {}
+spec['ARB_direct_state_access']['dsa-textures'] = PiglitGLTest('arb_direct_state_access-dsa-textures', run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
