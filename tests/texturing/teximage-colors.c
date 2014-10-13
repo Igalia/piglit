@@ -60,12 +60,12 @@ struct texture_format formats[] = {
 
 	FORMAT(GL_RGB, GL_RGB, GL_NONE),
 	FORMAT(GL_R3_G3_B2, GL_RGB, GL_UNSIGNED_BYTE_3_3_2),
-	FORMAT(GL_RGB4, GL_RGB, GL_UNSIGNED_SHORT_5_6_5),
-	FORMAT(GL_RGB5, GL_RGB, GL_UNSIGNED_SHORT_5_6_5),
+	FORMAT(GL_RGB4, GL_RGB, GL_NONE),
+	FORMAT(GL_RGB5, GL_RGB, GL_NONE),
 	FORMAT(GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE),
 	FORMAT(GL_RGB8_SNORM, GL_RGB, GL_BYTE),
-	FORMAT(GL_SRGB8, GL_RGB, GL_BYTE),
-	FORMAT(GL_RGB10, GL_RGB, GL_UNSIGNED_SHORT),
+	FORMAT(GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE),
+	FORMAT(GL_RGB10, GL_RGB, GL_NONE),
 	FORMAT(GL_R11F_G11F_B10F, GL_RGB, GL_NONE),
 	FORMAT(GL_RGB12, GL_RGB, GL_NONE),
 	FORMAT(GL_RGB9_E5, GL_RGB, GL_NONE),
@@ -81,7 +81,7 @@ struct texture_format formats[] = {
 	FORMAT(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE),
 	FORMAT(GL_RGB10_A2, GL_RGBA, GL_UNSIGNED_INT_10_10_10_2),
 	FORMAT(GL_RGBA8_SNORM, GL_RGBA, GL_BYTE),
-	FORMAT(GL_SRGB8_ALPHA8, GL_RGBA, GL_BYTE),
+	FORMAT(GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE),
 	FORMAT(GL_RGBA12, GL_RGBA, GL_NONE),
 	FORMAT(GL_RGBA16, GL_RGBA, GL_UNSIGNED_SHORT),
 	FORMAT(GL_RGBA16_SNORM, GL_RGBA, GL_SHORT),
@@ -541,6 +541,41 @@ piglit_init(int argc, char **argv)
 	case GL_UNSIGNED_INT_10_10_10_2:
 	case GL_UNSIGNED_INT_2_10_10_10_REV:
 		tolerance[3] = 0.3;
+		break;
+	}
+
+	/*
+	 * The tolerance lowering above only works for formats which have
+	 * explicit data types associated with them and even then it's fishy
+	 * for some.
+	 * The default sort of assumes at least 7 bits which doesn't make
+	 * much sense in any case (for the specific formats with more bits).
+	 * But just fix the cases which cannot pass (unless the driver encodes
+	 * them with more bits).
+	 */
+	switch (format->internal_format) {
+	case GL_RGB4:
+		tolerance[0] = 0.1;
+		tolerance[1] = 0.1;
+		tolerance[2] = 0.1;
+		tolerance[3] = 0.1;
+		break;
+	case GL_RGB5:
+		tolerance[0] = 0.05;
+		tolerance[1] = 0.05;
+		tolerance[2] = 0.05;
+		break;
+	case GL_LUMINANCE4_ALPHA4:
+		tolerance[0] = 0.1;
+		tolerance[1] = 0.1;
+		tolerance[2] = 0.1;
+		tolerance[3] = 0.1;
+		break;
+	case GL_LUMINANCE6_ALPHA2: /* broken but everybody uses 8+8 bits */
+	case GL_LUMINANCE4: /* broken but presumably noone uses just 4 bits */
+	case GL_ALPHA4: /* broken but presumably noone uses just 4 bits */
+	case GL_RGBA2: /* broken (4444) but everybody uses more bits anyway */
+	default:
 		break;
 	}
 }
