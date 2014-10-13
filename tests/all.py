@@ -533,6 +533,7 @@ glx['glx-swap-pixmap-bad'] = PiglitGLTest('glx-swap-pixmap-bad', require_platfor
 glx['glx-swap-singlebuffer'] = PiglitGLTest('glx-swap-singlebuffer', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-make-current'] = PiglitGLTest('glx-make-current', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-make-glxdrawable-current'] = PiglitGLTest('glx-make-glxdrawable-current', require_platforms=['glx', 'mixed_glx_egl'])
+glx['glx-context-flush-control'] = PiglitGLTest('glx-context-flush-control', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-buffer-age'] = PiglitGLTest('glx-buffer-age', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-buffer-age vblank_mode=0'] = PiglitGLTest('glx-buffer-age', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-buffer-age vblank_mode=0'].env['vblank_mode'] = '0'
