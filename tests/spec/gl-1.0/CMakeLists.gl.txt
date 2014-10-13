@@ -21,6 +21,7 @@ piglit_add_executable (gl-1.0-rendermode-feedback rendermode-feedback.c)
 piglit_add_executable (gl-1.0-swapbuffers-behavior swapbuffers-behavior.c)
 piglit_add_executable (gl-1.0-polygon-line-aa polygon-line-aa.c)
 piglit_add_executable (gl-1.0-blend-func blend.c)
+piglit_add_executable (gl-1.0-ortho-pos orthpos.c)
 piglit_add_executable (gl-1.0-fpexceptions fpexceptions.c)
 
 # vim: ft=cmake:
