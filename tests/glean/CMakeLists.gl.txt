@@ -36,7 +36,6 @@ piglit_add_executable (glean
 	tlogicop.cpp
 	tmultitest.cpp
 	toccluqry.cpp
-	torthpos.cpp
 	tpaths.cpp
 	tpbo.cpp
 	tpgos.cpp
