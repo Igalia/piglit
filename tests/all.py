@@ -103,7 +103,6 @@ glean = {}
 glean['basic'] = GleanTest('basic')
 glean['api2'] = GleanTest('api2')
 glean['makeCurrent'] = GleanTest('makeCurrent')
-glean['blendFunc'] = GleanTest('blendFunc')
 glean['bufferObject'] = GleanTest('bufferObject')
 glean['depthStencil'] = GleanTest('depthStencil')
 glean['fbo'] = GleanTest('fbo')
