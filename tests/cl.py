@@ -71,6 +71,7 @@ add_plain_test(api, 'clGetMemObjectInfo', ['cl-api-get-mem-object-info'])
 add_plain_test(api, 'clGetImageInfo', ['cl-api-get-image-info'])
 add_plain_test(api, 'clRetainMemObject and clReleaseMemObject', ['cl-api-retain_release-mem-object'])
 #  Program
+add_plain_test(api, 'clCreateProgramWithBinary', ['cl-api-create-program-with-binary'])
 add_plain_test(api, 'clCreateProgramWithSource', ['cl-api-create-program-with-source'])
 add_plain_test(api, 'clBuildProgram', ['cl-api-build-program'])
 add_plain_test(api, 'clCreateKernelsInProgram', ['cl-api-create-kernels-in-program'])

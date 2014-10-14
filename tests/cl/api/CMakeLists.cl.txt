@@ -26,6 +26,7 @@ piglit_cl_add_api_test (get-mem-object-info get-mem-object-info.c)
 piglit_cl_add_api_test (get-image-info get-image-info.c)
 
 # Programs
+piglit_cl_add_api_test (create-program-with-binary create-program-with-binary.c)
 piglit_cl_add_api_test (create-program-with-source create-program-with-source.c)
 piglit_cl_add_api_test (retain_release-program retain_release-program.c)
 piglit_cl_add_api_test (build-program build-program.c)
