@@ -137,6 +137,16 @@ piglit_is_egl_extension_supported(EGLDisplay egl_dpy, const char *name)
 	const char *const egl_extension_list =
 		eglQueryString(egl_dpy, EGL_EXTENSIONS);
 
+	/*
+	 * If EGL does not support EGL_EXT_client_extensions, then
+	 * eglQueryString(EGL_NO_DISPLAY, EGL_EXTENSIONS) returns NULL and
+	 * generates EGL_BAD_DISPLAY.  In this case, just report that the
+	 * requested (client) extension is not supported.
+	 */
+	if (!egl_extension_list && egl_dpy == EGL_NO_DISPLAY &&
+			piglit_check_egl_error(EGL_BAD_DISPLAY))
+		return false;
+
 	return piglit_is_extension_in_string(egl_extension_list, name);
 }
 
