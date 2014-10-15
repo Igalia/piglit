@@ -1238,7 +1238,8 @@ test_eglCreateSyncKHR_with_display_bound_in_other_thread(void *test_data)
 	if (t2_result) {
 		piglit_merge_result(&result, *t2_result);
 	} else {
-		piglit_loge("thread %"PRIuMAX" returned no piglit_result");
+		piglit_loge("thread %"PRIuMAX" returned no piglit_result",
+			    (uintmax_t) thread2);
 		result = PIGLIT_FAIL;
 	}
 
