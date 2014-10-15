@@ -1,0 +1,24 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+
+uniform sampler2D tex0;
+uniform sampler2D tex1;
+
+void main()
+{
+	// 2 samples using same unit but different uniform
+	vec4 a = texture2D(tex0, vec2(0.0, 0.0));
+	vec4 b = texture2D(tex1, vec2(0.0, 0.5));
+	gl_FragColor = mix(a, b, 0.5);
+}
+
+[test]
+uniform int tex0 0
+uniform int tex1 0
+texture rgbw 0 (8, 8)
+draw rect -1 -1 2 2
+relative probe rgb (0.25, 0.25) (0.5, 0.0, 0.5)
