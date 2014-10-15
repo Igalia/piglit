@@ -378,12 +378,6 @@ test_eglCreateSyncKHR_default_attributes(void *test_data)
 			  "an error");
 		result = PIGLIT_FAIL;
 	}
-	if (sync_status != EGL_UNSIGNALED_KHR) {
-		piglit_loge("eglGetSyncAttribKHR(EGL_SYNC_STATUS_KHR) returned "
-			  "0x%x but expected EGL_UNSIGNALED_KHR(0x%x)",
-			  sync_status, EGL_UNSIGNALED_KHR);
-		result = PIGLIT_FAIL;
-	}
 
 	ok = peglGetSyncAttribKHR(g_dpy, sync, EGL_SYNC_CONDITION_KHR, &sync_condition);
 	if (!ok) {
