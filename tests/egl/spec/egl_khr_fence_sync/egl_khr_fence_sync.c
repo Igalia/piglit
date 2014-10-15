@@ -352,7 +352,7 @@ test_eglCreateSyncKHR_default_attributes(void *test_data)
 	}
 
 	ok = peglGetSyncAttribKHR(g_dpy, sync, EGL_SYNC_TYPE_KHR, &sync_type);
-	if (ok) {
+	if (!ok) {
 		piglit_loge("eglGetSyncAttribKHR(EGL_SYNC_TYPE_KHR) failed");
 		result = PIGLIT_FAIL;
 	}
