@@ -345,7 +345,7 @@ test_eglCreateSyncKHR_default_attributes(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -424,7 +424,7 @@ test_eglCreateSyncKHR_invalid_display(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(EGL_NO_DISPLAY, EGL_SYNC_FENCE_KHR, NULL);
-	if (sync) {
+	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_NO_DISPLAY) succeeded");
 		result = PIGLIT_FAIL;
 	}
@@ -463,7 +463,7 @@ test_eglCreateSyncKHR_invalid_attrib_list(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, attrib_list);
-	if (sync) {
+	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded with invalid "
 			  "attrib list");
 		result = PIGLIT_FAIL;
@@ -504,7 +504,7 @@ test_eglCreateSyncKHR_invalid_sync_type(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, bad_sync_type, NULL);
-	if (sync) {
+	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded with invalid "
 			  "sync type");
 		result = PIGLIT_FAIL;
@@ -541,7 +541,7 @@ test_eglCreateSyncKHR_no_current_context(void *test_data)
 	eglMakeCurrent(g_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_TYPE_KHR, NULL);
-	if (sync) {
+	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded when no context was "
 			  "current");
 		peglDestroySyncKHR(g_dpy, sync);
@@ -644,7 +644,7 @@ test_eglGetSyncAttribKHR_invalid_attrib(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -694,7 +694,7 @@ test_eglClientWaitSyncKHR_invalid_flag(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -751,7 +751,7 @@ test_eglClientWaitSyncKHR_zero_timeout(void *test_data)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -804,7 +804,7 @@ test_eglClientWaitSyncKHR_flag_sync_flush(void *test_data)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -845,7 +845,7 @@ test_eglGetSyncAttribKHR_sync_status(void *test_data)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -952,7 +952,7 @@ test_eglClientWaitSyncKHR_nonzero_timeout(void *test_data)
 	}
 
 	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -1058,7 +1058,7 @@ test_eglCreateSyncKHR_wrong_display_same_thread(void *test_data)
 
 	piglit_logi("try to create sync with second display");
 	sync = peglCreateSyncKHR(wrong_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (sync) {
+	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() incorrectly succeeded");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -1098,7 +1098,7 @@ check_sync_in_current_context(void)
 	piglit_logi("verify that syncs can be created and waited on in "
 		 "this thread");
 	sync = peglCreateSyncKHR(dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (!sync) {
+	if (sync == EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR failed");
 		result = PIGLIT_FAIL;
 		goto cleanup;
@@ -1156,7 +1156,7 @@ thread2_create_sync_with_display_bound_in_other_thread(void *arg)
 	piglit_logi("try to create sync on first display, which is "
 		 "bound on thread1");
 	t2_sync = peglCreateSyncKHR(t2_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (t2_sync) {
+	if (t2_sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR incorrectly succeeded");
 		*result = PIGLIT_FAIL;
 		goto cleanup;
