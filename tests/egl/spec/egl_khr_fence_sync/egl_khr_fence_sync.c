@@ -1199,7 +1199,7 @@ cleanup:
 static enum piglit_result
 test_eglCreateSyncKHR_with_display_bound_in_other_thread(void *test_data)
 {
-	enum piglit_result result = PIGLIT_PASS;
+	enum piglit_result result;
 	enum piglit_result *t2_result = NULL;
 	bool orig_print_tid;
 	pthread_t thread2;
@@ -1236,7 +1236,15 @@ test_eglCreateSyncKHR_with_display_bound_in_other_thread(void *test_data)
 	}
 
 	if (t2_result) {
-		piglit_merge_result(&result, *t2_result);
+		/*
+		 * If either thread SKIPs, then SKIP the test.
+		 * Otherwise do a merge to return possible ERROR/WARN.
+		 */
+		if ((result == PIGLIT_PASS && *t2_result == PIGLIT_SKIP) ||
+		    (result == PIGLIT_SKIP && *t2_result == PIGLIT_PASS))
+			result = PIGLIT_SKIP;
+		else
+			piglit_merge_result(&result, *t2_result);
 	} else {
 		piglit_loge("thread %"PRIuMAX" returned no piglit_result",
 			    (uintmax_t) thread2);
