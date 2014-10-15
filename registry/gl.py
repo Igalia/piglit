@@ -76,8 +76,6 @@ def _repair_xml(xml_registry):
     fixes = set((
         'GL_ALL_ATTRIB_BITS',
         'glOcclusionQueryEventMaskAMD',
-        'enums_SGI_0x8000_0x80BF',
-        'enums_ARB_0x80000_0x80BF',
         'gles2_GL_ACTIVE_PROGRAM_EXT',
     ))
 
@@ -110,28 +108,6 @@ def _repair_xml(xml_registry):
                 enums.set('type', 'bitmask')
 
                 fixes.remove('glOcclusionQueryEventMaskAMD')
-                continue
-
-        if ('enums_SGI_0x8000_0x80BF' in fixes
-            and enums.get('vendor') == 'SGI'
-            and enums.get('start') == '0x8000'
-            and enums.get('end') == '0x80BF'):
-                # This element is empty garbage that overlaps an ARB enum group
-                # with the same range.
-                defer_removal(xml_registry, enums)
-
-                fixes.remove('enums_SGI_0x8000_0x80BF')
-                continue
-
-        if ('enums_ARB_0x80000_0x80BF' in fixes
-            and enums.get('vendor') == 'ARB'
-            and enums.get('group', None) is None
-            and enums.get('start', None) is None):
-                # This tag lacks 'start' and 'end' attributes.
-                enums.set('start', '0x8000')
-                enums.set('end', '0x80BF')
-
-                fixes.remove('enums_ARB_0x80000_0x80BF')
                 continue
 
         if ('gles2_GL_ACTIVE_PROGRAM_EXT' in fixes
@@ -682,6 +658,7 @@ class CommandParam(object):
     Attributes:
         name
         c_type
+        array_suffix
     """
 
     __PARAM_NAME_FIXES = {'near': 'hither', 'far': 'yon'}
@@ -696,6 +673,7 @@ class CommandParam(object):
         #    <param len="bufSize"><ptype>GLint</ptype> *<name>values</name></param>
         #    <param><ptype>GLenum</ptype> <name>shadertype</name></param>
         #    <param group="sync"><ptype>GLsync</ptype> <name>sync</name></param>
+        #    <param><ptype>GLuint</ptype> <name>baseAndCount</name>[2]</param>
 
         assert(xml_param.tag == 'param')
 
@@ -704,9 +682,15 @@ class CommandParam(object):
         # Rename the parameter if its name is a reserved keyword in MSVC.
         self.name = self.__PARAM_NAME_FIXES.get(self.name, self.name)
 
-        # Pare the C type.
+        # Parse the C type.
         c_type_text = list(xml_param.itertext())
-        c_type_text.pop(-1)  # Pop off the text from the <name> subelement.
+        c_type_text_end = c_type_text.pop(-1)  # Could be <name> or <array_suffix>
+        if c_type_text_end.startswith('['): # We popped off <array_suffix>
+            # This is an array variable.
+            self.array_suffix = c_type_text_end
+            c_type_text.pop(-1) # Pop off the next one (<name>)
+        else:
+            self.array_suffix = ''
         c_type_text = (t.strip() for t in c_type_text)
         self.c_type = ' '.join(c_type_text).strip()
 
@@ -714,7 +698,8 @@ class CommandParam(object):
 
     def __repr__(self):
         templ = ('{self.__class__.__name__}'
-                 '(name={self.name!r}, type={self.c_type!r})')
+                 '(name={self.name!r}, type={self.c_type!r}, '
+                 'suffix={self.array_suffix!r})')
         return templ.format(self=self)
 
 
@@ -828,7 +813,7 @@ class Command(object):
     def c_named_param_list(self):
         """For example, "GLenum op, GLfloat value" for glAccum."""
         return ', '.join(
-            '{param.c_type} {param.name}'.format(param=param)
+            '{param.c_type} {param.name}{param.array_suffix}'.format(param=param)
             for param in self.param_list
         )
 
@@ -836,7 +821,7 @@ class Command(object):
     def c_unnamed_param_list(self):
         """For example, "GLenum, GLfloat" for glAccum."""
         return ', '.join(
-            param.c_type
+            '{param.c_type}{param.array_suffix}'.format(param=param)
             for param in self.param_list
         )
 
