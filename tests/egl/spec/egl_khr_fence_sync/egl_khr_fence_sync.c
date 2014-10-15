@@ -672,52 +672,6 @@ cleanup:
 }
 
 /**
- * Verify that glClientWaitSyncKHR emits correct error when given invalid flag.
- *
- * From the EGL_KHR_fence_sync spec:
- *
- *    Accepted in the <flags> parameter of eglClientWaitSyncKHR:
- *
- *    EGL_SYNC_FLUSH_COMMANDS_BIT_KHR         0x0001
- */
-static enum piglit_result
-test_eglClientWaitSyncKHR_invalid_flag(void *test_data)
-{
-	enum piglit_result result = PIGLIT_PASS;
-	EGLSyncKHR sync = 0;
-	EGLint wait_status = 0;
-	EGLint invalid_flag = 0x8000;
-
-	result = test_setup();
-	if (result != PIGLIT_PASS) {
-		return result;
-	}
-
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
-	if (sync == EGL_NO_SYNC_KHR) {
-		piglit_loge("eglCreateSyncKHR(EGL_SYNC_FENCE_KHR) failed");
-		result = PIGLIT_FAIL;
-		goto cleanup;
-	}
-
-	/* Use timeout=0 so that eglClientWaitSyncKHR immediately returns. */
-	wait_status = peglClientWaitSyncKHR(g_dpy, sync, invalid_flag, 0);
-	if (wait_status != EGL_FALSE) {
-		piglit_loge("eglClientWaitSyncKHR succeeded when given invalid "
-			  "flag 0x%x", invalid_flag);
-		result = PIGLIT_FAIL;
-	}
-	if (!piglit_check_egl_error(EGL_BAD_PARAMETER)) {
-		piglit_loge("eglClientWaitSyncKHR emitted wrong error");
-		result = PIGLIT_FAIL;
-	}
-
-cleanup:
-	test_cleanup(sync, &result);
-	return result;
-}
-
-/**
  * Verify that eglClientWaitSyncKHR() correctly handles zero timeout before and
  * after glFinish().
  *
@@ -1348,11 +1302,6 @@ static const struct piglit_subtest subtests[] = {
 		"eglGetSyncAttribKHR_sync_status",
 		"eglGetSyncAttribKHR_sync_status",
 		test_eglGetSyncAttribKHR_sync_status,
-	},
-	{
-		"eglClientWaitSyncKHR_invalid_flag",
-		"eglClientWaitSyncKHR_invalid_flag",
-		test_eglClientWaitSyncKHR_invalid_flag,
 	},
 	{
 		"eglClientWaitSyncKHR_zero_timeout",
