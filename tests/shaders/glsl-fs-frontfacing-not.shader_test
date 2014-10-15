@@ -1,0 +1,31 @@
+[require]
+GL >= 2.0
+GLSL >= 1.20
+
+[vertex shader]
+void main()
+{
+	gl_Position = gl_Vertex;
+}
+
+[fragment shader]
+void main()
+{
+	/* st_glsl_to_tgsi.cpp would return a bool value of 0.0 or
+	 * 1.0, instead of 0 or ~0 like it should with NativeIntegers
+	 * set.  Then the NOT operation would give a still-nonzero
+	 * value.
+	 */
+	if (!gl_FrontFacing)
+		gl_FragColor = vec4(0.0, 0.0, 1.0, 0.0);
+	else
+		gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+draw rect -1 -1 2 1
+draw rect 1 0 -2 1
+relative probe rgba (0, 0) (0.0, 1.0, 0.0, 0.0)
+relative probe rgba (1, 0) (0.0, 1.0, 0.0, 0.0)
+relative probe rgba (0, 1) (0.0, 0.0, 1.0, 0.0)
+relative probe rgba (1, 1) (0.0, 0.0, 1.0, 0.0)
