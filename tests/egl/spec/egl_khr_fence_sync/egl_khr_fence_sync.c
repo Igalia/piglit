@@ -540,7 +540,7 @@ test_eglCreateSyncKHR_no_current_context(void *test_data)
 	}
 	eglMakeCurrent(g_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
-	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_TYPE_KHR, NULL);
+	sync = peglCreateSyncKHR(g_dpy, EGL_SYNC_FENCE_KHR, NULL);
 	if (sync != EGL_NO_SYNC_KHR) {
 		piglit_loge("eglCreateSyncKHR() succeeded when no context was "
 			  "current");
