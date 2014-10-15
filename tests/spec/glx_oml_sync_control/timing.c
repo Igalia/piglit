@@ -340,6 +340,8 @@ main(int argc, char **argv)
 		} else if (!strcmp(argv[j], "-msc-delta")) {
 			j++;
 			target_msc_delta = parse_num_arg(argc, argv, j);
+		} else if (!strcmp(argv[j], "-auto")) {
+			piglit_automatic = true;
 		} else {
 			fprintf(stderr, "unsupported option %s\n", argv[j]);
 			piglit_report_result(PIGLIT_FAIL);
