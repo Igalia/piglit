@@ -120,12 +120,7 @@ try_debug_flag(EGLenum context_api, EGLenum context_bit)
 		dispatch_api = PIGLIT_DISPATCH_GL;
 		break;
 	case EGL_OPENGL_ES_BIT:
-		/* Piglit doesn't yet have ES1 dispatch, so just initialize
-		 * with ES2 dispatch. This should be safe because the only
-		 * GL functions called by this test are glGetString() and
-		 * glGetIntegerv().
-		 */
-		dispatch_api = PIGLIT_DISPATCH_ES2;
+		dispatch_api = PIGLIT_DISPATCH_ES1;
 		break;
 	case EGL_OPENGL_ES2_BIT:
 	case EGL_OPENGL_ES3_BIT_KHR:

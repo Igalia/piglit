@@ -65,8 +65,7 @@ int main(int argc, char **argv)
 	}
 
 	if (attribs[1] == 1) {
-		/* FINISHME: Use PIGLIT_DISPATCH_ES1 when implemented. */
-		piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+		piglit_dispatch_default_init(PIGLIT_DISPATCH_ES1);
 	} else if (attribs[1] == 2) {
 		piglit_dispatch_default_init(PIGLIT_DISPATCH_ES2);
 	}
