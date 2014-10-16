@@ -126,16 +126,26 @@ objpos_to_winpos(const float obj[2], int win[2])
 static bool
 test_instancing(GLuint divisor, GLuint baseInstance)
 {
+	GLuint verts_bo, colors_bo;
+
 	static const GLfloat verts[4][2] = {
 		{-1, -1}, {1, -1}, {1, 1}, {-1, 1}
 	};
 	const GLuint numPrims = PRIMS - baseInstance;
         GLint i, pos[2];
 
-	glVertexAttribPointer(VertexAttrib, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	glGenBuffers(1, &verts_bo);
+	glBindBuffer(GL_ARRAY_BUFFER, verts_bo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(VertexAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(VertexAttrib);
 
-	glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, Colors);
+	glGenBuffers(1, &colors_bo);
+	glBindBuffer(GL_ARRAY_BUFFER, colors_bo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(ColorAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(ColorAttrib);
 	/* advance color once every 'n' instances */
 	glVertexAttribDivisorARB(ColorAttrib, divisor);
@@ -168,6 +178,9 @@ test_instancing(GLuint divisor, GLuint baseInstance)
 	glDisableVertexAttribArray(VertexAttrib);
 	glDisableVertexAttribArray(ColorAttrib);
 
+	glDeleteBuffers(1, &verts_bo);
+	glDeleteBuffers(1, &colors_bo);
+
 	piglit_present_results();
 
 	return true;
@@ -193,6 +206,8 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	GLuint vao;
+
 	piglit_require_extension("GL_ARB_draw_instanced");
 	piglit_require_extension("GL_ARB_instanced_arrays");
 	piglit_require_extension("GL_ARB_base_instance");
@@ -223,4 +238,7 @@ piglit_init(int argc, char **argv)
 	piglit_matrix_mul_matrix(modelviewproj, modelview, projection);
 
 	glUniformMatrix4fv(MVPUniform, 1, GL_FALSE, modelviewproj);
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 }
