@@ -103,7 +103,8 @@ piglit_display(void)
 	pass = GL_TRUE;
 
 	extension_supported =
-		piglit_is_extension_supported("GL_EXT_unpack_subimage");
+		piglit_is_extension_supported("GL_EXT_unpack_subimage") ||
+		(piglit_is_gles() && piglit_get_gl_version() >= 3);
 
 	expected_error = extension_supported ? GL_NO_ERROR : GL_INVALID_ENUM;
 
