@@ -802,6 +802,7 @@ add_concurrent_test(gl10, 'gl-1.0-polygon-line-aa')
 add_concurrent_test(gl10, 'gl-1.0-blend-func')
 add_concurrent_test(gl10, 'gl-1.0-fpexceptions')
 add_concurrent_test(gl10, 'gl-1.0-ortho-pos')
+add_concurrent_test(gl10, 'gl-1.0-readpixsanity')
 
 gl12 = {}
 spec['!OpenGL 1.2'] = gl12

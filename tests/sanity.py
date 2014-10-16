@@ -3,10 +3,11 @@
 #
 
 from framework.profile import TestProfile
-from framework.test import GleanTest
+from framework.test import PiglitGLTest
 
 __all__ = ['profile']
 
 profile = TestProfile()
-profile.tests['glean/basic'] = GleanTest('basic')
-profile.tests['glean/readPixSanity'] = GleanTest('readPixSanity')
+
+profile.tests['spec/!OpenGL 1.0/gl-1.0-readpixsanity'] = \
+        PiglitGLTest('gl-1.0-readpixsanity', run_concurrent=True)
