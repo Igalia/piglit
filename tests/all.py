@@ -956,6 +956,7 @@ spec['!OpenGL 3.1'] = gl31
 gl31['draw-buffers-errors'] = PiglitGLTest('gl-3.1-draw-buffers-errors', run_concurrent=True)
 gl31['genned-names'] = PiglitGLTest('gl-3.1-genned-names', run_concurrent=True)
 gl31['minmax'] = PiglitGLTest('gl-3.1-minmax', run_concurrent=True)
+gl31['vao-broken-attrib'] = PiglitGLTest('gl-3.1-vao-broken-attrib', run_concurrent=True)
 for subtest in ['generated', 'written', 'flush']:
     cmdline = 'primitive-restart-xfb {0}'.format(subtest)
     gl31[cmdline] = PiglitGLTest('gl-3.1-' + cmdline, run_concurrent=True)

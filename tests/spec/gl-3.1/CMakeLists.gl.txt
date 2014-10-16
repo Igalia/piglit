@@ -13,5 +13,6 @@ piglit_add_executable (gl-3.1-draw-buffers-errors draw-buffers-errors.c)
 piglit_add_executable (gl-3.1-genned-names genned-names.c)
 piglit_add_executable (gl-3.1-minmax minmax.c)
 piglit_add_executable (gl-3.1-primitive-restart-xfb primitive-restart-xfb.c)
+piglit_add_executable (gl-3.1-vao-broken-attrib vao-broken-attrib.c)
 
 # vim: ft=cmake:
