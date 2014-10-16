@@ -100,8 +100,18 @@ piglit_init(int argc, char **argv)
 			     16, 16, 0,
 			     t[i].internal_format, t[i].type, buffer);
 #if defined(PIGLIT_USE_OPENGL_ES1) || defined(PIGLIT_USE_OPENGL_ES2)
-		if (!piglit_check_gl_error(GL_INVALID_VALUE))
-			piglit_report_result(PIGLIT_FAIL);
+		{
+			GLenum error = glGetError();
+			if (error != GL_INVALID_VALUE && error != GL_INVALID_OPERATION) {
+				printf("Unexpected GL error: %s 0x%x\n",
+				       piglit_get_gl_error_name(error), error);
+				printf("(Error at %s:%u)\n", __func__, __LINE__);
+				printf("Expected GL error: %s 0x%x or %s 0x%x\n",
+				       piglit_get_gl_error_name(GL_INVALID_VALUE), GL_INVALID_VALUE,
+				       piglit_get_gl_error_name(GL_INVALID_OPERATION), GL_INVALID_OPERATION);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+		}
 #else
 		if (!piglit_check_gl_error(GL_INVALID_OPERATION))
 			piglit_report_result(PIGLIT_FAIL);
