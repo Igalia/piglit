@@ -33,6 +33,8 @@
 
 #else /* Linux */
 
+#include <dlfcn.h>
+
 #if defined(PIGLIT_HAS_GLX)
 #	include "glxew.h"
 #elif defined(PIGLIT_HAS_EGL)
@@ -154,6 +156,42 @@ get_core_proc_address(const char *function_name, int gl_10x_version)
 
 #else /* Linux */
 
+#if defined(PIGLIT_HAS_EGL)
+#define GLX_LIB "libGL.so.1"
+#define GLES1_LIB "libGLESv1_CM.so.1"
+#define GLES2_LIB "libGLESv2.so.2"
+
+/** dlopen() return value for libGL.so.1 */
+static void *glx_handle;
+
+/** dlopen() return value for libGLESv1_CM.so.1 */
+static void *gles1_handle;
+
+/** dlopen() return value for libGLESv2.so.2 */
+static void *gles2_handle;
+
+static void *
+do_dlsym(void **handle, const char *lib_name, const char *function_name)
+{
+    void *result;
+
+    if (!*handle)
+        *handle = dlopen(lib_name, RTLD_LAZY | RTLD_LOCAL);
+
+    if (!*handle) {
+        fprintf(stderr, "Could not open %s: %s\n", lib_name, dlerror());
+        return NULL;
+    }
+
+    result = dlsym(*handle, function_name);
+    if (!result)
+        fprintf(stderr, "%s() not found in %s: %s\n", function_name, lib_name,
+                dlerror());
+
+    return result;
+}
+#endif
+
 /**
  * This function is used to retrieve the address of all GL functions
  * on Linux.
@@ -174,16 +212,34 @@ get_ext_proc_address(const char *function_name)
 /**
  * This function is used to retrieve the address of core GL functions
  * on Linux.
+ *
+ * eglGetProcAddress supports querying core functions only if EGL >= 1.5
+ * or if EGL_KHR_get_all_proc_addresses or
+ * EGL_KHR_client_get_all_proc_addresses is supported. Rather than worry
+ * about such details, when using EGL we consistently use dlsym() on the
+ * client library to lookup core functions.
  */
 static piglit_dispatch_function_ptr
 get_core_proc_address(const char *function_name, int gl_10x_version)
 {
-	/* We don't need to worry about the GL version, since on Apple
+#if defined(PIGLIT_HAS_EGL)
+	switch (gl_10x_version) {
+	case 11:
+		return do_dlsym(&gles1_handle, GLES1_LIB, function_name);
+	case 20:
+		return do_dlsym(&gles2_handle, GLES2_LIB, function_name);
+	case 10:
+	default:
+		/* GL does not have its own library, so use GLX */
+		return do_dlsym(&glx_handle, GLX_LIB, function_name);
+	}
+#else
+	/* We don't need to worry about the GL version, since when using GLX
 	 * we retrieve all proc addresses in the same way.
 	 */
 	(void) gl_10x_version;
-
 	return get_ext_proc_address(function_name);
+#endif
 }
 
 #endif
