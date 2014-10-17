@@ -178,17 +178,16 @@ Build from the Visual Studio Command Prompt.
 
 Make sure that everything is set up correctly:
 
-  $ ./piglit-run.py tests/sanity.tests results/sanity.results
+  $ ./piglit run tests/sanity results/sanity.results
 
-This will run some minimal tests.  If you built Piglit out-of-source, then the
-environment variable PIGLIT_BUILD_DIR must be set:
-
-  $ env PIGLIT_BUILD_DIR=/path/to/piglit/build/dir \
-    ./piglit-run.py tests/sanity.tests results/sanity.results
+You may include '.py' on the profile, or you may exclude it (sanity vs sanity.py),
+both are equally valid.
 
 Use
 
-  $ ./piglit-run.py
+  $ ./piglit run
+  or
+  $ ./piglit run -h
 
 To learn more about the command's syntax. Have a look into the tests/
 directory to see what test profiles are available:
@@ -199,14 +198,14 @@ See also section 4.
 
 To create some nice formatted test summaries, run
 
-  $ ./piglit-summary-html.py summary/sanity results/sanity.results
+  $ ./piglit summary html summary/sanity results/sanity.results
 
 Hint: You can combine multiple test results into a single summary.
       During development, you can use this to watch for regressions:
 
-  $ ./piglit-summary-html.py summary/compare results/baseline.results results/current.results
+  $ ./piglit summary html summary/compare results/baseline.results results/current.results
 
-      You can combine as many testruns as you want this way(in theory;
+      You can combine as many testruns as you want this way (in theory;
       the HTML layout becomes awkward when the number of testruns increases)
 
 Have a look at the results with a browser:
