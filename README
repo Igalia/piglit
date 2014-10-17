@@ -343,19 +343,3 @@ python framework:
 
    It is generally unecissary to call this class directly as it uses a helper
    function to search directories for tests
-
-
-6. Todo
--------
-
- Get automated tests into widespread use ;)
-
- Automate and integrate tests and demos from Mesa
-   Add code that automatically tests whether the test has rendered correctly
-
- Performance regression tests
-   Ideally, this should be done by summarizing / comparing a history of
-   test results
-   Note that while some small artificial micro-benchmark could be added to
-   Piglit, the Phoronix test suite is probably a better place for
-   realistic performance testing.
