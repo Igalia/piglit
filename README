@@ -214,21 +214,22 @@ Have a look at the results with a browser:
 
 The summary shows the 'status' of a test:
 
- pass  This test has completed successfully.
+ pass   This test has completed successfully.
 
- warn  The test completed successfully, but something unexpected happened.
-       Look at the details for more information.
+ warn   The test completed successfully, but something unexpected happened.
+        Look at the details for more information.
 
- fail  The test failed.
+ fail   The test failed.
 
- skip  The test was skipped.
+ crash  The test binary exited with a non-zero exit code
 
-[Note: Once performance tests are implemented, 'fail' will mean that the test
-       rendered incorrectly or didn't complete, while 'warn' will indicate a
-       performance regression]
-[Note: For performance tests, result and status will be different concepts.
-       While status is always restricted to one of the four values above,
-       the result can contain a performance number like frames per second]
+ skip   The test was skipped.
+
+ timeout  The test ran longer than its allotted time and was forcibly killed.
+         
+
+There are also dmesg-* statuses. These have the same meaning as above, but are
+triggered by dmesg related messages.
 
 
 4. Available test sets
