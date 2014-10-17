@@ -117,7 +117,6 @@ glean['pointAtten'] = GleanTest('pointAtten')
 glean['pointSprite'] = GleanTest('pointSprite')
 # exactRGBA is not included intentionally, because it's too strict and
 # the equivalent functionality is covered by other tests
-glean['readPixSanity'] = GleanTest('readPixSanity')
 glean['shaderAPI'] = GleanTest('shaderAPI')
 glean['stencil2'] = GleanTest('stencil2')
 glean['texCombine'] = GleanTest('texCombine')

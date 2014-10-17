@@ -42,7 +42,6 @@ piglit_add_executable (glean
 	tpixelformats.cpp
 	tpointatten.cpp
 	tpointsprite.cpp
-	treadpix.cpp
 	tshaderapi.cpp
 	tstencil2.cpp
 	ttexcombine.cpp
