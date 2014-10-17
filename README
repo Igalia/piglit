@@ -36,8 +36,14 @@ First of all, you need to make sure that the following are installed:
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
   - waffle (http://www.waffle-gl.org)
-  - nose. Only needed for python framework tests
-    (https://nose.readthedocs.org/en/latest/)
+
+Optionally, you can install the following:
+
+  - nose. A python test framework, used for running the python framework
+    test suite. (https://nose.readthedocs.org/en/latest/)
+  - lxml. An accelerated python xml library using libxml2 (http://lxml.de/)
+  - simplejson. A fast C based implementation of the python json library.
+    (https://simplejson.readthedocs.org/en/latest/)
 
 Now configure the build system:
 
