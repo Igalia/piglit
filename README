@@ -238,15 +238,16 @@ triggered by dmesg related messages.
 Test sets are specified as Python scripts in the tests directory.
 The following test sets are currently available:
 
+
+4.1 OpenGL Tests 
+----------------
+
 sanity.py
-    This suite contains minimal sanity tests. These tests must
+    This suite contains minimal OpenGL sanity tests. These tests must
     pass, otherwise the other tests will not generate reliable results.
 
 all.py
     This suite contains all OpenGL tests.
-
-all_cl.py
-    This suite contains all OpenCL tests.
 
 quick.py
     Run all tests, but cut down significantly on their runtime
@@ -254,11 +255,36 @@ quick.py
     In particular, this runs Glean with the --quick option, which
     reduces the number of visuals and state combinations tested.
 
+gpu.py
+	A further reduced set of tests from quick.py, this runs tests only
+	for hardware functionality and not tests for the software stack.
+
 radeon.py
 r300.py
 r500.py
     These test suites are adaptations of all.tests, with some tweaks
     to account for hardware limitations in Radeon chips.
+
+
+4.2 OpenCL Tests
+----------------
+
+cl.py
+    This suite contains all OpenCL tests.
+
+quick_cl.py
+    This runs all of the tests from cl.py as well as tests from opencv
+	and oclconform.
+
+
+4.3 External Integration
+------------------------
+
+xts.py
+	Support for running the X Test Suite using piglit.
+
+igt.py
+	Support for running Intel-gpu-tools test suite using piglit.
 
 
 5. How to write tests
