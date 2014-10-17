@@ -294,28 +294,55 @@ Every test is run as a separate process. This minimizes the impact that
 severe bugs like memory corruption have on the testing process.
 
 Therefore, tests can be implemented in an arbitrary standalone language.
-I recommend C, C++ and Python, as these are the languages that are already
-used in Piglit.
+C is the prefered language for compiled tests, piglit also supports its own
+simple formats for test shaders and glsl parser input.
 
-All new tests must be added to the all.py profile. The test profiles
-are simply Python scripts. There are currently two supported test types:
-
- PlainExecTest
-   This test starts a new process and watches the process output (stdout and
-   stderr). Lines that start with "PIGLIT:" are collected and interpreted as
-   a Python dictionary that contains test result details.
+All new tests must be added to the appropriate profile, all.py profile for
+OpenGL and cl.py for OpenCL. There are a few basic test classes supported by the
+python framework:
 
  GleanTest
    This is a test that is only used to integrate Glean tests
 
-Additional test types (e.g. for automatic image comparison) would have to
-be added to core.py.
+ PiglitBaseTest
+   A shared base class for all native piglit tests.
 
-Rules of thumb:
-  Test process that exit with a nonzero returncode are considered to have
-  failed.
+   It starts each test as a subprocess, captures stdout and stderr, and waits
+   for the test to return.
+   
+   It provides test timeouts by setting the instances 'timeout' attribute to an
+   integer > 0 which is the number of seconds the test should run.
 
-  Output on stderr causes a warning.
+   It interprets output by reading stdout and looking for 'PIGLIT: ' in the
+   output, and then reading any trailing characters as well formed json
+   returning the test result.
+
+   This is a base clas and shouldn't be used directly, but provides an
+   explination of the bahvior of the following classes
+
+ PiglitGLTest
+   A test class for native piglit OpenGL tests.
+
+   In addition to the properties of PiglitBaseTest it provides a mechanism for
+   detecting test window resizes and rerunning tests as well as keyword
+   arguments for platform requirements.
+
+ PiglitCLTest
+   A test class for native piglit OpenCL tests.
+
+   It currently provides no specail features
+
+ GLSLParserTest
+   A class for testing a glsl parser.
+
+   It is generally unecissary to call this class directly as it uses a helper
+   function to search directories for tests
+
+ ShaderTest
+   A class for testing using OpenGL shaders
+
+   It is generally unecissary to call this class directly as it uses a helper
+   function to search directories for tests
 
 
 6. Todo
