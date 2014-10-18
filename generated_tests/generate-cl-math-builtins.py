@@ -186,8 +186,8 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [1.0, cos(pi*pi/2), cos(pi*3*pi/2), cos(2*pi*pi), cos(pi*1.12345)], # Result
-            [0.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        ]  # Arg0
+            [1.0, cos(pi*pi/2), cos(pi*3*pi/2), cos(2*pi*pi), cos(pi*1.12345), cos(pi*pow(2,20)), cos(pi*pow(2,24)), cos(pi*pow(2,120)), float("nan")], # Result
+            [0.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        , pow(2,20),         pow(2,24),         pow(2,120),         float("nan")]  # Arg0
         ],
         'tolerance' : 4
     },
@@ -313,8 +313,12 @@ tests = {
         'arg_types' : [F, F],
         'function_type': 'ttt',
         'values' : [
-            [0.0, 0.0, sin(pi*pi/2), sin(pi*3*pi/2), sin(2*pi*pi), sin(pi*1.12345)], # Result
-            [0.0, 1.0, pi / 2,       3 * pi / 2,     2 * pi,       1.12345        ]  # Arg0
+            [0.0, 0.0, sin(pi*pi/2), sin(pi*3*pi/2), sin(2*pi*pi),
+             sin(pi*1.12345), sin(pi*7), sin(pi*8), sin(pi*pow(2,20)),
+             sin(pi*pow(2,24)), sin(pi*pow(2,120)), float("nan")],#Result
+            [0.0, 1.0, pi / 2,       3 * pi / 2,     2 * pi,
+             1.12345        , 7,         8,         pow(2,20),
+             pow(2,24),         pow(2,120),         float("nan")] #Arg0
         ],
         'tolerance' : 4
     },
