@@ -99,7 +99,7 @@ scrambling_blit(const int *permutation)
 }
 
 void
-print_usage_and_exit(char *prog_name)
+NORETURN print_usage_and_exit(char *prog_name)
 {
 	printf("Usage: %s <num_samples> <buffer_type> <blit_type>\n"
 	       "  where <buffer_type> is one of:\n"
