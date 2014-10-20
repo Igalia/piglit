@@ -1,0 +1,48 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+
+varying vec4 c;
+uniform bool b;
+
+void good(void)
+{
+    c = vec4(0, 1, 0, 1);
+}
+
+void bad(void)
+{
+    c = vec4(1, 0, 0, 1);
+}
+
+void main()
+{
+    b ? good() : bad();
+}
+
+[fragment shader]
+
+varying vec4 c;
+uniform bool b;
+
+void good(void)
+{
+    gl_FragColor = c;
+}
+
+void bad(void)
+{
+    gl_FragColor = c + vec4(0, 0, 1, 0);
+}
+
+void main()
+{
+    b ? good() : bad();
+}
+
+[test]
+uniform int b 1
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
