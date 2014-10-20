@@ -98,7 +98,8 @@ void piglit_init(int argc, char **argv)
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -178,7 +179,8 @@ enum piglit_result piglit_display(void)
 	glEndTransformFeedback();
 	glDisable(GL_RASTERIZER_DISCARD);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	ptr = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, GL_READ_ONLY);
 	for (i = 0; i < BUF_FLOATS; i++) {
@@ -193,7 +195,8 @@ enum piglit_result piglit_display(void)
 	//puts("");
 	glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_present_results();
 

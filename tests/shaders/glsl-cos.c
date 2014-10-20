@@ -86,7 +86,8 @@ static GLboolean test()
         glUniform1f(location, (i - 25) * DEGREES_30);
         piglit_draw_rect((i % 10) * 10, (i / 10) * 10, 10, 10);
     }
-    assert(glGetError() == 0);
+    if (!piglit_check_gl_error(GL_NO_ERROR))
+	     piglit_report_result(PIGLIT_FAIL);
 
     for (i = 0; i <= 50; i++) {
         color[0] = color[1] = cos((i - 25) * DEGREES_30) * 0.5 + 0.5;

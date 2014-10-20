@@ -353,7 +353,8 @@ run_test(const TestCase &test)
 			       GL_TEXTURE_2D,
 			       tex,
 			       0);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {

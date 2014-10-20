@@ -99,7 +99,8 @@ void piglit_init(int argc, char **argv)
 			     0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
@@ -126,7 +127,8 @@ void piglit_init(int argc, char **argv)
 			     0.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 	}
 	glDeleteFramebuffersEXT(1, &fb);
 	glBindTexture(GL_TEXTURE_2D, tex);

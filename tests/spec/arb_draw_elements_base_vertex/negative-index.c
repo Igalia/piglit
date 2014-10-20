@@ -124,7 +124,8 @@ enum piglit_result piglit_display(void)
 
 		printf("BaseVertex = -%i\n", index);
 		test_negative_index_offset(x, y, x+20, y+20, index);
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 		pass = piglit_probe_pixel_rgb(x+5, y+5, expected) && pass;
 
 		x += 20;

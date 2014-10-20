@@ -72,7 +72,8 @@ void piglit_init(int argc, char **argv)
 				  GL_TEXTURE_2D,
 				  tex,
 				  0);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);

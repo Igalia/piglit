@@ -1146,7 +1146,8 @@ enum piglit_result piglit_display()
 			}
 		}
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
@@ -1635,7 +1636,8 @@ static void init_texture(const struct format_desc *format, GLboolean npot)
 					baseformat, type, (void *) data);
 		break;
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (data != image) {
 		free(data);
@@ -1803,7 +1805,8 @@ outer_continue:;
 	default:;
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (!piglit_automatic) {
 		piglit_set_keyboard_func(key_func);

@@ -81,7 +81,8 @@ make_fbo(int w, int h)
 
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -229,7 +230,8 @@ run_test(void)
 	     GL_DEPTH_BUFFER_BIT);
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	printf("Verify 1\n");
 	pass = verify_depth_rect(PAD, y0, SIZE, SIZE) && pass;
@@ -243,7 +245,8 @@ run_test(void)
 	printf("Verify 5 (FBO)\n");
 	pass = verify_depth_rect(PAD, y1, SIZE, SIZE) && pass;
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_present_results();
 

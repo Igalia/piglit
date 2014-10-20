@@ -94,7 +94,8 @@ static enum piglit_result test_format(void)
 				  GL_TEXTURE_2D,
 				  texfb,
 				  0);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 	printf("Testing using fb float format");
@@ -162,7 +163,8 @@ static enum piglit_result test_format(void)
 				  texfb,
 				  0);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glEnable(GL_FRAMEBUFFER_SRGB_EXT);
 	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);

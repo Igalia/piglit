@@ -82,7 +82,8 @@ create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 	if ((baseformat == GL_DEPTH_COMPONENT) || (baseformat == GL_DEPTH_STENCIL)) {
 		tex = piglit_depth_texture(GL_TEXTURE_2D, internalformat,
 					   tex_width, tex_height, 1, GL_FALSE);
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 		if (internalformat == GL_DEPTH32F_STENCIL8) {
 			format = GL_DEPTH_STENCIL;
 			type = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
@@ -117,7 +118,8 @@ create_tex(GLenum internalformat, GLenum baseformat, GLenum basetype)
 			     0,
 			     format, type, NULL);
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenerateMipmapEXT(GL_TEXTURE_2D);
 
@@ -226,7 +228,8 @@ draw_mipmap(int x, int y, int level, GLenum basetype)
 				    b||l||i||d ? 0.5 : 1,
 				    a||i       ? 0.5 : 1);
 		}
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 		break;
 
 	default:

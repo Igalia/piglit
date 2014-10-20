@@ -55,7 +55,8 @@ piglit_init(int argc, char**argv)
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, buf);
 	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 4, &data, GL_STATIC_DRAW_ARB);
 	glDeleteBuffersARB(1, &buf);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Then, another normal path: create, map, write, unmap, delete */
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, buf);
@@ -64,7 +65,8 @@ piglit_init(int argc, char**argv)
 	*v = data;
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
 	glDeleteBuffersARB(1, &buf);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Then, do the failing path: create, map, delete */
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, buf);
@@ -72,7 +74,8 @@ piglit_init(int argc, char**argv)
 	v = (GLfloat *) glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	*v = data;
 	glDeleteBuffersARB(1, &buf);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_report_result(PIGLIT_PASS);
 }

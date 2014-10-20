@@ -211,7 +211,8 @@ static GLboolean test(unsigned vsbitmask, unsigned fsbitmask, int line)
             draw_rect(5 + (i*(BOX_SIZE+5)) % 240, 5 + height, i, attrib);
         }
     }
-    assert(glGetError() == 0);
+    if (!piglit_check_gl_error(GL_NO_ERROR))
+	     piglit_report_result(PIGLIT_FAIL);
 
     for (i = 0; i < ATTRIBS; i++) {
         if (((1 << i) & vsbitmask) && ((1 << i) & fsbitmask)) {

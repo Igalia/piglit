@@ -80,7 +80,8 @@ test()
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER, fb);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenRenderbuffersEXT(1, &rb);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, rb);

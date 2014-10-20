@@ -224,7 +224,8 @@ static GLboolean test()
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    assert(glGetError() == 0);
+    if (!piglit_check_gl_error(GL_NO_ERROR))
+	     piglit_report_result(PIGLIT_FAIL);
 
     /* Test the sides */
     for (i = 0; i < 26; i++) {

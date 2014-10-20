@@ -225,13 +225,15 @@ create_array_fbo(void)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* allocate empty array texture */
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH24_STENCIL8,
 		     width, height, layers, 0,
 		     GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenFramebuffers(1, &fb);
 	glBindFramebuffer(GL_FRAMEBUFFER, fb);
@@ -271,7 +273,8 @@ create_array_fbo(void)
 					  0,
 					  layer);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -347,7 +350,8 @@ create_array_fbo(void)
 
 done:
 	glDeleteFramebuffers(1, &fb);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	return tex;
 }
 
@@ -385,7 +389,8 @@ draw_layer(int x, int y, int depth)
 			     (double)height / piglit_height * 2,
 			     0, 0, 1, 1);
 	glUseProgram(0);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 static GLboolean test_layer_drawing(int start_x, int start_y, float expected)
@@ -433,7 +438,8 @@ test_once(void)
 	}
 
 	glDeleteTextures(1, &tex);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	return pass;
 }
 
@@ -506,5 +512,6 @@ void piglit_init(int argc, char **argv)
 
 	program_fs_empty = piglit_build_simple_program(vs_text,
 					frag_shader_empty_text);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 }

@@ -76,7 +76,8 @@ create_3d_fbo(void)
 		     BUF_WIDTH, BUF_HEIGHT, pot_depth,
 		     0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -90,7 +91,8 @@ create_3d_fbo(void)
 					  0,
 					  depth);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+			piglit_report_result(PIGLIT_FAIL);
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {

@@ -1525,11 +1525,13 @@ test_ready:
 			     test->num_elements[j]*NUM_VERTICES*sizeof(float),
 			     data, GL_STREAM_READ);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, j, buf[j]);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 
 		free(data);
 	}
@@ -1562,7 +1564,8 @@ enum piglit_result piglit_display(void)
 	glDrawArrays(GL_TRIANGLES, 0, NUM_VERTICES);
 	glEndTransformFeedback();
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	for (j = 0; j < MAX_BUFFERS; j++) {
 		if (!test->num_elements[j]) {
@@ -1594,7 +1597,8 @@ enum piglit_result piglit_display(void)
 			}
 		}
 		glUnmapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER_EXT);
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 	}
 
 	piglit_present_results();

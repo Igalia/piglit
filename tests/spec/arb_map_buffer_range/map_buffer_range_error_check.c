@@ -104,7 +104,8 @@ piglit_init(int argc, char *argv[])
 	 *   (d) GL_MAP_FLUSH_EXPLICIT_BIT is set and GL_MAP_WRITE_BIT is not set.
 	 */
 	glMapBufferRange(target, 0, 10, access);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* (a) map again */
 	glMapBufferRange(target, 0, 10, access);

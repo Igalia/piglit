@@ -100,7 +100,8 @@ void piglit_init(int argc, char **argv)
 				     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		}
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glDisable(GL_TEXTURE_CUBE_MAP);
@@ -128,7 +129,8 @@ void piglit_init(int argc, char **argv)
 				     0.0);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			assert(glGetError() == 0);
+			if (!piglit_check_gl_error(GL_NO_ERROR))
+		                piglit_report_result(PIGLIT_FAIL);
 		}
 	}
 

@@ -281,7 +281,8 @@ piglit_display(void)
 		piglit_present_results();
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 

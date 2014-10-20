@@ -541,7 +541,8 @@ piglit_display(void)
 					  tex,
 					  0);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 		assert(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -621,7 +622,8 @@ piglit_display(void)
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }

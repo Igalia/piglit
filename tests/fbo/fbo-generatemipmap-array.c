@@ -135,14 +135,16 @@ create_array_fbo_1d(void)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_1D_ARRAY_EXT, tex);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
 		glTexImage2D(GL_TEXTURE_1D_ARRAY_EXT, i, format,
 			     dim, num_layers, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -153,7 +155,8 @@ create_array_fbo_1d(void)
 					  tex,
 					  0,
 					  layer);
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -222,14 +225,16 @@ create_array_fbo_2d(void)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_ARRAY_EXT, tex);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	for (i = 0, dim = TEX_WIDTH; dim >0; i++, dim /= 2) {
 		glTexImage3D(GL_TEXTURE_2D_ARRAY_EXT, i, format,
 			     dim, dim, num_layers, 0,
 			     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -240,7 +245,8 @@ create_array_fbo_2d(void)
 					  tex,
 					  0,
 					  layer);
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {

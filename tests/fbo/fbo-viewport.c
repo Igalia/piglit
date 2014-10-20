@@ -127,7 +127,8 @@ piglit_display(void)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				  GL_RENDERBUFFER, rb);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	assert(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) ==
 			 GL_FRAMEBUFFER_COMPLETE_EXT);

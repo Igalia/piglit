@@ -84,13 +84,15 @@ static void create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 		     BUF_WIDTH,
 		     0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Create the depth-stencil buffer. */
 	glGenTextures(1, &ds);
 	glBindTexture(GL_TEXTURE_1D, ds);
 	glTexImage1D(GL_TEXTURE_1D, 0, f.iformat, BUF_WIDTH, 0, f.format, f.type, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Create the FBO. */
 	glGenFramebuffersEXT(1, &fb);
@@ -116,7 +118,8 @@ static void create_1d_fbo(GLuint *out_tex, GLuint *out_ds)
 					  0);
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {

@@ -83,7 +83,8 @@ create_fbo(void)
    glTexImage2D(TexTarget, 0, depthIntFormat,
                 SIZE, SIZE, 0,
                 GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-   assert(glGetError() == 0);
+   if (!piglit_check_gl_error(GL_NO_ERROR))
+           piglit_report_result(PIGLIT_FAIL);
    glGetTexLevelParameteriv(TexTarget, 0, GL_TEXTURE_DEPTH_SIZE, &Zbits);
 
    /* color texture */
@@ -94,7 +95,8 @@ create_fbo(void)
    glTexImage2D(TexTarget, 0, GL_RGBA,
                 SIZE, SIZE, 0,
                 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-   assert(glGetError() == 0);
+   if (!piglit_check_gl_error(GL_NO_ERROR))
+	    piglit_report_result(PIGLIT_FAIL);
 
    /* Create FBO */
    glGenFramebuffersEXT(1, &FBO);
@@ -112,7 +114,8 @@ create_fbo(void)
                              DepthTex,
                              0);
 
-   assert(glGetError() == 0);
+   if (!piglit_check_gl_error(GL_NO_ERROR))
+	    piglit_report_result(PIGLIT_FAIL);
 
    status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
    if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -315,7 +318,8 @@ show_depth_fbo(void)
 
    glWindowPos2i(SIZE, 0);
    glDrawPixels(SIZE, SIZE, GL_LUMINANCE, GL_FLOAT, zf);
-   assert(glGetError() == 0);
+   if (!piglit_check_gl_error(GL_NO_ERROR))
+	    piglit_report_result(PIGLIT_FAIL);
 
 #if DEBUG
    {

@@ -226,7 +226,8 @@ piglit_display(void)
 
         printf("%s\n", tests[i].name);
         tests[i].test(x, y, x+20, y+20, tests[i].index);
-        assert(glGetError() == 0);
+        if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
         pass = piglit_probe_pixel_rgba(x+5, y+5, tests[i].expected_color) && pass;
 
         x += 20;

@@ -99,14 +99,16 @@ create_array_fbo(void)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY_ARB, tex);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* allocate empty array texture */
 	glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY_ARB, 0, GL_RGBA,
 		     BUF_WIDTH, BUF_HEIGHT, num_layers,
 		     0,
 		     GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glGenFramebuffersEXT(1, &fb);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
@@ -119,7 +121,8 @@ create_array_fbo(void)
 					     0,
 					     layer);
 
-		assert(glGetError() == 0);
+		if (!piglit_check_gl_error(GL_NO_ERROR))
+		        piglit_report_result(PIGLIT_FAIL);
 
 		status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {

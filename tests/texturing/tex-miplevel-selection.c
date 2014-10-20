@@ -860,7 +860,8 @@ piglit_init(int argc, char **argv)
 	default:
 		assert(0);
 	}
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (test == FIXED_FUNCTION)
 		glDisable(gltarget);
@@ -900,7 +901,8 @@ piglit_init(int argc, char **argv)
 							  tex, level, layer);
 				break;
 			}
-			assert(glGetError() == 0);
+			if (!piglit_check_gl_error(GL_NO_ERROR))
+				piglit_report_result(PIGLIT_FAIL);
 
 			status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER);
 			if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -960,7 +962,8 @@ piglit_init(int argc, char **argv)
 				glClear(clearbits);
 			}
 
-			assert(glGetError() == 0);
+			if (!piglit_check_gl_error(GL_NO_ERROR))
+				piglit_report_result(PIGLIT_FAIL);
 		}
 
 		if (gltarget == GL_TEXTURE_RECTANGLE)
@@ -998,7 +1001,8 @@ piglit_init(int argc, char **argv)
 		glSamplerParameteri(samp[1], GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 }
 
 #define SET_VEC(c, x, y, z, w) do { c[0] = x; c[1] = y; c[2] = z; c[3] = w; } while (0)
@@ -1529,7 +1533,8 @@ piglit_display(void)
 	}
 
 end:
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 	printf("Summary: %i/%i passed\n", total-failed, total);
 
 	piglit_present_results();

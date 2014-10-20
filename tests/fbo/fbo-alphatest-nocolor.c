@@ -66,7 +66,8 @@ static void create_fbo(GLuint *out_tex)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
 		     BUF_WIDTH, BUF_WIDTH, 0,
 		     GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	/* Create the FBO. */
 	glGenFramebuffersEXT(1, &fb);
@@ -91,7 +92,8 @@ static void create_fbo(GLuint *out_tex)
 	glClearDepth(0.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);

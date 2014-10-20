@@ -119,7 +119,8 @@ void piglit_init(int argc, char **argv)
 	glBindBufferBaseEXT(GL_TRANSFORM_FEEDBACK_BUFFER_EXT, 0, buf);
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -166,7 +167,8 @@ enum piglit_result piglit_display(void)
 	glEndTransformFeedbackEXT();
 	glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glUseProgram(instanced ? prog_notransform_instanced : prog_notransform);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
@@ -181,7 +183,8 @@ enum piglit_result piglit_display(void)
 	glDisableClientState(GL_COLOR_ARRAY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	pass = piglit_probe_pixel_rgb(15, 15, red) && pass;
 	pass = piglit_probe_pixel_rgb(35, 15, green) && pass;

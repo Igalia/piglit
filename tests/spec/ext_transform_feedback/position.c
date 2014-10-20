@@ -133,7 +133,8 @@ void piglit_init(int argc, char **argv)
 	glBufferData(GL_TRANSFORM_FEEDBACK_BUFFER_EXT,
 		     BUF_FLOATS*sizeof(float), data, GL_STREAM_READ);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	if (range) {
 		puts("Testing BindBufferRange.");
@@ -154,7 +155,8 @@ void piglit_init(int argc, char **argv)
 		range = MAX_RANGE/2; /* just one primitive is going to be written */
 	}
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -225,7 +227,8 @@ enum piglit_result piglit_display(void)
 	if (discard)
 		glDisable(GL_RASTERIZER_DISCARD_EXT);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	switch (test) {
 	case READBACK:
@@ -287,7 +290,8 @@ enum piglit_result piglit_display(void)
 	pass = piglit_probe_pixel_rgb(5, 5, clearcolor) && pass;
 	pass = piglit_probe_pixel_rgb(15, 15, discard ? clearcolor : white) && pass;
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	piglit_present_results();
 

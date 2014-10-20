@@ -72,7 +72,8 @@ make_fbo(int w, int h, int srgb_format, GLuint *tex_p)
 				  GL_TEXTURE_2D,
 				  tex,
 				  0);
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	status = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
 	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
@@ -123,7 +124,8 @@ framebuffer_srgb_fbo(int srgb_format)
 	fbo = make_fbo(fbo_width, fbo_height, srgb_format, &tex);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	glViewport(0, 0, fbo_width, fbo_height);
 	piglit_ortho_projection(fbo_width, fbo_height, GL_FALSE);

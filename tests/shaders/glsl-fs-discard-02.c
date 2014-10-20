@@ -95,7 +95,8 @@ static GLboolean test()
 	piglit_draw_rect_z(0.0, -1, -1, 2, 2); // discard
 	piglit_draw_rect_z(0.5, -1, -1, 2, 2); // green
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	pass = pass && piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green);
 

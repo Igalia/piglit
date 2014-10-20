@@ -91,7 +91,8 @@ piglit_display(void)
 	glColor4fv(blue);
 	piglit_draw_rect(0, 0, piglit_width, piglit_height);
 
-	assert(glGetError() == 0);
+	if (!piglit_check_gl_error(GL_NO_ERROR))
+		piglit_report_result(PIGLIT_FAIL);
 
 	pass &= piglit_probe_rect_rgb(0, 0, piglit_width, 10, red);
 
