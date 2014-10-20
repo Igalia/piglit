@@ -10,5 +10,6 @@ link_libraries (
 )
 
 piglit_add_executable (gl-1.4-dlist-multidrawarrays dlist-multidrawarrays.c)
+piglit_add_executable (gl-1.4-polygon-offset polygon-offset.c)
 
 # vim: ft=cmake:
