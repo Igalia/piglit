@@ -3281,6 +3281,7 @@ arb_uniform_buffer_object['negative-getactiveuniformblockiv'] = PiglitGLTest('ar
 arb_uniform_buffer_object['negative-getactiveuniformsiv'] = PiglitGLTest('arb_uniform_buffer_object-negative-getactiveuniformsiv', run_concurrent=True)
 arb_uniform_buffer_object['referenced-by-shader'] = PiglitGLTest('arb_uniform_buffer_object-referenced-by-shader', run_concurrent=True)
 arb_uniform_buffer_object['rendering'] = PiglitGLTest('arb_uniform_buffer_object-rendering', run_concurrent=True)
+arb_uniform_buffer_object['rendering-offset'] = PiglitGLTest('arb_uniform_buffer_object-rendering offset', run_concurrent=True)
 arb_uniform_buffer_object['row-major'] = PiglitGLTest('arb_uniform_buffer_object-row-major', run_concurrent=True)
 arb_uniform_buffer_object['uniformblockbinding'] = PiglitGLTest('arb_uniform_buffer_object-uniformblockbinding', run_concurrent=True)
 

@@ -92,6 +92,8 @@ static const float rotation[NUM_SQUARES] = {
 
 static GLuint prog;
 static GLuint buffers[NUM_UBOS];
+static GLint alignment;
+static bool test_buffer_offset = false;
 
 
 static void
@@ -104,6 +106,17 @@ setup_ubos(void)
 	};
 	static GLubyte zeros[1000] = {0};
 	int i;
+
+	glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment);
+	printf("GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT = %d\n", alignment);
+
+	if (test_buffer_offset) {
+		printf("Testing buffer offset %d\n", alignment);
+	}
+	else {
+		/* we use alignment as the offset */
+		alignment = 0;
+	}
 
 	glGenBuffers(NUM_UBOS, buffers);
 
@@ -127,10 +140,13 @@ setup_ubos(void)
 		 * really shouldn't matter.
 		 */
 		glBindBuffer(GL_UNIFORM_BUFFER, buffers[i]);
-		glBufferData(GL_UNIFORM_BUFFER, size, zeros, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, size + alignment,
+                             zeros, GL_DYNAMIC_DRAW);
 
 		/* Attach UBO */
-		glBindBufferBase(GL_UNIFORM_BUFFER, i, buffers[i]);
+		glBindBufferRange(GL_UNIFORM_BUFFER, i, buffers[i],
+				  alignment,  /* offset */
+				  size);
 		glUniformBlockBinding(prog, index, i);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR))
@@ -143,6 +159,10 @@ void
 piglit_init(int argc, char **argv)
 {
 	piglit_require_extension("GL_ARB_uniform_buffer_object");
+
+	if (argc > 1 && strcmp(argv[1], "offset") == 0) {
+		test_buffer_offset = true;
+	}
 
 	prog = piglit_build_simple_program(vert_shader_text, frag_shader_text);
 	assert(prog);
@@ -184,15 +204,15 @@ piglit_display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	for (i = 0; i < NUM_SQUARES; i++) {
-		/* Load UBO data */
+		/* Load UBO data, at offset=alignment */
 		glBindBuffer(GL_UNIFORM_BUFFER, buffers[0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(pos_size[0]),
+		glBufferSubData(GL_UNIFORM_BUFFER, alignment, sizeof(pos_size[0]),
 				pos_size[i]);
 		glBindBuffer(GL_UNIFORM_BUFFER, buffers[1]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(color[0]),
+		glBufferSubData(GL_UNIFORM_BUFFER, alignment, sizeof(color[0]),
 				color[i]);
 		glBindBuffer(GL_UNIFORM_BUFFER, buffers[2]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(rotation[0]),
+		glBufferSubData(GL_UNIFORM_BUFFER, alignment, sizeof(rotation[0]),
 				&rotation[i]);
 
 		if (!piglit_check_gl_error(GL_NO_ERROR))
