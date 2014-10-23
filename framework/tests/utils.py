@@ -26,6 +26,7 @@ in a single place.
 """
 
 import os
+import sys
 import shutil
 import tempfile
 import functools
@@ -263,3 +264,9 @@ def binary_check(bin_):
             subprocess.check_call(['which', bin_], stdout=null, stderr=null)
         except subprocess.CalledProcessError:
             raise SkipTest('Binary {} not available'.format(bin_))
+
+
+def platform_check(plat):
+    """If the platform is not in the list specified skip the test."""
+    if not sys.platform.startswith(plat):
+        raise SkipTest('Platform {} is not supported'.format(sys.platform))

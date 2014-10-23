@@ -191,6 +191,19 @@ def _run_parser(input_):
     return parser.parse_args(unparsed)
 
 
+def _create_metadata(args, name, opts):
+    """Create and return a metadata dict for Backend.initialize()."""
+    options = {'profile': args.test_profile}
+    for key, value in opts:
+        options[key] = value
+    if args.platform:
+        options['platform'] = args.platform
+    options['name'] = name
+    options['env'] = core.collect_system_info()
+
+    return options
+
+
 def _disable_windows_exception_messages():
     """Disable Windows error message boxes for this and all child processes."""
     if sys.platform == 'win32':
@@ -250,21 +263,11 @@ def run(input_):
     else:
         results.name = path.basename(args.results_path)
 
-    # Create a dictionary to pass to initialize json, it needs the contents of
-    # the env dictionary and profile and platform information
-    options = {'profile': args.test_profile}
-    for key, value in opts:
-        options[key] = value
-    if args.platform:
-        options['platform'] = args.platform
-    options['name'] = results.name
-    options['env'] = core.collect_system_info()
-
     backend = backends.get_backend(args.backend)(
         args.results_path,
         file_fsync=opts.sync,
         junit_suffix=args.junit_suffix)
-    backend.initialize(options)
+    backend.initialize(_create_metadata(args, results.name, opts))
 
     profile = framework.profile.merge_test_profiles(args.test_profile)
     profile.results_dir = args.results_path
