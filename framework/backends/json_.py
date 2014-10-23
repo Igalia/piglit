@@ -79,14 +79,10 @@ class JSONBackend(FileBackend):
         """
         # If metadata is None then this is a loaded result and there is no need
         # to initialize
-        out = {
-            'results_version': CURRENT_JSON_VERSION,
-            'name': metadata['name'],
-            'options': {k: v for k, v in metadata.iteritems() if k != 'name'},
-        }
+        metadata['results_version'] = CURRENT_JSON_VERSION
 
         with open(os.path.join(self._dest, 'metadata.json'), 'w') as f:
-            json.dump(out, f, default=piglit_encoder)
+            json.dump(metadata, f, default=piglit_encoder)
 
         # make the directory for the tests
         try:
