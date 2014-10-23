@@ -195,6 +195,7 @@ def _create_metadata(args, name, opts):
     """Create and return a metadata dict for Backend.initialize()."""
     options = {}
     options['profile'] = args.test_profile
+    options['log_level'] = args.log_level
     for key, value in opts:
         options[key] = value
     if args.platform:
