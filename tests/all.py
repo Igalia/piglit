@@ -4071,6 +4071,7 @@ with profile.group_manager(
       'built-in constants')
     g(['arb_compute_shader-work_group_size_too_large'],
       grouptools.join('compiler', 'work_group_size_too_large'))
+    g(['arb_compute_shader-local-id'], 'local-id' + '-explosion')
 
 with profile.group_manager(
         PiglitGLTest,
