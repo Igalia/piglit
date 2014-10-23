@@ -1,0 +1,29 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+uniform int early_return;
+varying vec2 foo1;
+void main()
+{
+	gl_Position = gl_Vertex;
+	foo1 = vec2(0.5);
+	if (early_return != 0)
+		return;
+	foo1 = vec2(0.2);
+}
+
+[fragment shader]
+varying vec2 foo1;
+void main()
+{
+	gl_FragColor.xy = foo1;
+	gl_FragColor.zw = foo1;
+}
+
+[test]
+
+uniform int early_return 1
+draw rect -1 -1 2 2
+probe all rgba 0.5 0.5 0.5 0.5
+
