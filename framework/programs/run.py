@@ -27,6 +27,7 @@ import os
 import os.path as path
 import time
 import ConfigParser
+import ctypes
 
 import framework.core as core
 import framework.results
@@ -190,22 +191,13 @@ def _run_parser(input_):
     return parser.parse_args(unparsed)
 
 
-def run(input_):
-    """ Function for piglit run command
-
-    This is a function because it allows it to be shared between piglit-run.py
-    and piglit run
-
-    """
-    args = _run_parser(input_)
-
-    # Disable Windows error message boxes for this and all child processes.
+def _disable_windows_exception_messages():
+    """Disable Windows error message boxes for this and all child processes."""
     if sys.platform == 'win32':
         # This disables messages boxes for uncaught exceptions, but it will not
         # disable the message boxes for assertion failures or abort().  Those
         # are created not by the system but by the CRT itself, and must be
         # disabled by the child processes themselves.
-        import ctypes
         SEM_FAILCRITICALERRORS     = 0x0001
         SEM_NOALIGNMENTFAULTEXCEPT = 0x0004
         SEM_NOGPFAULTERRORBOX      = 0x0002
@@ -216,6 +208,17 @@ def run(input_):
               |  SEM_NOGPFAULTERRORBOX \
               |  SEM_NOOPENFILEERRORBOX
         ctypes.windll.kernel32.SetErrorMode(uMode)
+
+
+def run(input_):
+    """ Function for piglit run command
+
+    This is a function because it allows it to be shared between piglit-run.py
+    and piglit run
+
+    """
+    args = _run_parser(input_)
+    _disable_windows_exception_messages()
 
     # If dmesg is requested we must have serial run, this is becasue dmesg
     # isn't reliable with threaded run
@@ -292,6 +295,7 @@ def resume(input_):
                         help="Optionally specify a piglit config file to use. "
                              "Default is piglit.conf")
     args = parser.parse_args(input_)
+    _disable_windows_exception_messages()
 
     results = framework.results.TestrunResult.resume(args.results_path)
     opts = core.Options(concurrent=results.options['concurrent'],
