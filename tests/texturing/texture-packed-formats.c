@@ -229,19 +229,6 @@ MakeTexture(GLuint dims, const struct pixel_format *format,
 	}
 }
 
-
-static void
-Reshape(int width, int height)
-{
-	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, width, 0, height, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-
 /**
  * Test a particular internal texture format.  2D or 3D texture.
  */
@@ -250,11 +237,12 @@ Test(GLuint intFmt, GLuint dims)
 {
 	static const float red[4] = {1, 0, 0, 1};
 	static const float green[4] = {0, 1, 0, 1};
-	int w = 350, h = 20;
+	int w = 4, h = 4;
 	int i, swap;
 	GLboolean pass = GL_TRUE;
 
-	Reshape(piglit_width, piglit_height);
+	piglit_ortho_projection(piglit_width, piglit_height, false);
+	assert(NUM_FORMATS * 5 < piglit_height);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -262,11 +250,8 @@ Test(GLuint intFmt, GLuint dims)
 	for (swap = 0; swap < 2; swap++) {
 		/* Loop over texture formats */
 		for (i = 0; i < NUM_FORMATS; i++) {
-			int x = swap * (w + 2);
-			int y = i * (h + 2);
-
-			glPushMatrix();
-			glTranslatef(x, y, 0);
+			int x = 5 * swap;
+			int y = 5 * i;
 
 			MakeTexture(dims, Formats + i, IntFormats[intFmt].format,
 				    swap);
@@ -283,10 +268,10 @@ Test(GLuint intFmt, GLuint dims)
 				glEnable(GL_TEXTURE_2D);
 
 			glBegin(GL_POLYGON);
-			glTexCoord3f(0, 0, 0.5);  glVertex2f(0, 0);
-			glTexCoord3f(1, 0, 0.5);  glVertex2f(w, 0);
-			glTexCoord3f(1, 1, 0.5);  glVertex2f(w, h);
-			glTexCoord3f(0, 1, 0.5);  glVertex2f(0, h);
+			glTexCoord3f(0, 0, 0.5);  glVertex2f(x + 0, y + 0);
+			glTexCoord3f(1, 0, 0.5);  glVertex2f(x + w, y + 0);
+			glTexCoord3f(1, 1, 0.5);  glVertex2f(x + w, y + h);
+			glTexCoord3f(0, 1, 0.5);  glVertex2f(x + 0, y + h);
 			glEnd();
 
 			if (dims == 3)
@@ -294,17 +279,15 @@ Test(GLuint intFmt, GLuint dims)
 			else
 				glDisable(GL_TEXTURE_2D);
 
-			glPopMatrix();
-
 			/* test rendering */
-			if (!piglit_probe_pixel_rgb(x+2, y+2, red)) {
+			if (!piglit_probe_rect_rgb(x, y, w, 2, red)) {
 				printf("Failure for format=%s, swap=%u, "
 				       "textureDims=%u\n",
 				       Formats[i].name, swap, dims);
 				pass = GL_FALSE;
 			}
 
-			if (!piglit_probe_pixel_rgb(x+2, y+12, green)) {
+			if (!piglit_probe_rect_rgb(x, y + 2, w, 2, green)) {
 				printf("Failure for format=%s, swap=%u, "
 				       "textureDims=%u\n",
 				       Formats[i].name, swap, dims);
