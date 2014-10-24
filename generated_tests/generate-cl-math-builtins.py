@@ -44,6 +44,7 @@ CLC_VERSION_MIN = {
     'cosh' : 10,
     'cospi' : 10,
     'erf' : 10,
+    'erfc' : 10,
     'fabs' : 10,
     'floor' : 10,
     'fmod' : 10,
@@ -190,6 +191,15 @@ tests = {
         'function_type': 'ttt',
         'values' : [
             [0.0, 0.950004,        0.990005,        -0.994999475,  0.27219439321703e-29, 1, -1], # Result
+            [0.0, 1.960/sqrt(2.0), 2.576/sqrt(2.0), -2.807/sqrt(2.0), 11.1, float("inf"), float("-inf")]  # Arg0
+        ],
+        'tolerance' : 16
+    },
+    'erfc' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [1.0, 0.95, 0.009995, 1.994999, 0.0, 0.0, 2.0], # Result
             [0.0, 1.960/sqrt(2.0), 2.576/sqrt(2.0), -2.807/sqrt(2.0), 11.1, float("inf"), float("-inf")]  # Arg0
         ],
         'tolerance' : 16
