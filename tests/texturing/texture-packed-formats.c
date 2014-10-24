@@ -273,7 +273,20 @@ Test(GLuint intFmt, GLuint dims)
 			glTexCoord3f(1, 1, 0.5);  glVertex2f(x + w, y + h);
 			glTexCoord3f(0, 1, 0.5);  glVertex2f(x + 0, y + h);
 			glEnd();
+		}
+	}
 
+	if (dims == 3)
+		glDisable(GL_TEXTURE_3D);
+	else
+		glDisable(GL_TEXTURE_2D);
+
+	/* Loop over byteswapping */
+	for (swap = 0; swap < 2; swap++) {
+		/* Loop over texture formats */
+		for (i = 0; i < NUM_FORMATS; i++) {
+			int x = 5 * swap;
+			int y = 5 * i;
 			/* test rendering */
 			if (!piglit_probe_rect_rgb(x, y, w, 2, red)) {
 				printf("Failure for format=%s, swap=%u, "
@@ -290,11 +303,6 @@ Test(GLuint intFmt, GLuint dims)
 			}
 		}
 	}
-
-	if (dims == 3)
-		glDisable(GL_TEXTURE_3D);
-	else
-		glDisable(GL_TEXTURE_2D);
 
 	piglit_present_results();
 
