@@ -246,6 +246,11 @@ Test(GLuint intFmt, GLuint dims)
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	if (dims == 3)
+		glEnable(GL_TEXTURE_3D);
+	else
+		glEnable(GL_TEXTURE_2D);
+
 	/* Loop over byteswapping */
 	for (swap = 0; swap < 2; swap++) {
 		/* Loop over texture formats */
@@ -262,22 +267,12 @@ Test(GLuint intFmt, GLuint dims)
 				return GL_FALSE;
 			}
 
-			if (dims == 3)
-				glEnable(GL_TEXTURE_3D);
-			else
-				glEnable(GL_TEXTURE_2D);
-
 			glBegin(GL_POLYGON);
 			glTexCoord3f(0, 0, 0.5);  glVertex2f(x + 0, y + 0);
 			glTexCoord3f(1, 0, 0.5);  glVertex2f(x + w, y + 0);
 			glTexCoord3f(1, 1, 0.5);  glVertex2f(x + w, y + h);
 			glTexCoord3f(0, 1, 0.5);  glVertex2f(x + 0, y + h);
 			glEnd();
-
-			if (dims == 3)
-				glDisable(GL_TEXTURE_3D);
-			else
-				glDisable(GL_TEXTURE_2D);
 
 			/* test rendering */
 			if (!piglit_probe_rect_rgb(x, y, w, 2, red)) {
@@ -295,6 +290,11 @@ Test(GLuint intFmt, GLuint dims)
 			}
 		}
 	}
+
+	if (dims == 3)
+		glDisable(GL_TEXTURE_3D);
+	else
+		glDisable(GL_TEXTURE_2D);
 
 	piglit_present_results();
 
