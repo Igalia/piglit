@@ -142,9 +142,6 @@ static const struct name_format IntFormats[] = {
 
 #define NUM_INT_FORMATS (sizeof(IntFormats) / sizeof(IntFormats[0]))
 
-static GLboolean Blend = GL_FALSE;  /* XXX not used at this time */
-
-
 static void
 MakeTexture(GLuint dims, const struct pixel_format *format,
             GLenum intFormat, GLboolean swap)
@@ -283,9 +280,6 @@ Test(GLuint intFmt, GLuint dims)
          else
             glEnable(GL_TEXTURE_2D);
 
-         if (Blend)
-            glEnable(GL_BLEND);
-
          glBegin(GL_POLYGON);
          glTexCoord3f(0, 0, 0.5);  glVertex2f(0, 0);
          glTexCoord3f(1, 0, 0.5);  glVertex2f(w, 0);
@@ -298,7 +292,6 @@ Test(GLuint intFmt, GLuint dims)
          else
             glDisable(GL_TEXTURE_2D);
 
-         glDisable(GL_BLEND);
          glPopMatrix();
 
          /* test rendering */
@@ -357,6 +350,5 @@ piglit_init(int argc, char **argv)
    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
