@@ -104,10 +104,16 @@ int
 main(int argc, char *argv[])
 {
 	struct egl_test test;
+	const EGLint test_attribs[] =
+	{
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
+		EGL_NONE
+	};
 
 	egl_init_test(&test);
 	test.extensions = extensions;
 	test.draw = draw;
+	test.config_attribs = test_attribs;
 
 	if (egl_util_run(&test, argc, argv) != PIGLIT_PASS)
 		return EXIT_FAILURE;
