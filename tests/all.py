@@ -1066,6 +1066,8 @@ add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
 
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = {}
+add_concurrent_test(spec['glsl-1.20'], 'glsl-1.20-getactiveuniform-constant')
+
 import_glsl_parser_tests(spec['glsl-1.20'],
                          os.path.join(testsDir, 'spec', 'glsl-1.20'),
                          ['preprocessor', 'compiler'])
