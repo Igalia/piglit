@@ -168,7 +168,7 @@ bptc_float_modes[] = {
        { -1 } }
    },
    /* 10011 */
-   { /* reserved */ },
+   { 0 /* reserved */ },
    /* 10110 */
    { 5, 3,
      { { 0, 0, 0, 8, false }, { 3, 2, 0, 1, false }, { 2, 2, 4, 1, false },
@@ -181,7 +181,7 @@ bptc_float_modes[] = {
        { -1 } }
    },
    /* 10111 */
-   { /* reserved */ },
+   { 0 /* reserved */ },
    /* 11010 */
    { 5, 3,
      { { 0, 0, 0, 8, false }, { 3, 2, 1, 1, false }, { 2, 2, 4, 1, false },
@@ -194,7 +194,7 @@ bptc_float_modes[] = {
        { -1 } }
    },
    /* 11011 */
-   { /* reserved */ },
+   { 0 /* reserved */ },
    /* 11110 */
    { 5, 3,
      { { 0, 0, 0, 6, false }, { 3, 1, 4, 1, false }, { 3, 2, 0, 1, false },
@@ -208,7 +208,7 @@ bptc_float_modes[] = {
        { -1 } }
    },
    /* 11111 */
-   { /* reserved */ },
+   { 0 /* reserved */ },
 };
 
 static const uint8_t
