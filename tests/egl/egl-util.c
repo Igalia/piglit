@@ -241,6 +241,7 @@ egl_util_run(const struct egl_test *test, int argc, char *argv[])
 		ctxAttribsES[1] = 2;
 		break;
 	default:
+		fprintf(stderr, "Note: No EGL_RENDERABLE_TYPE defined in test attributes, defaulted to gl\n");
 		dispatch_api = PIGLIT_DISPATCH_GL;
 	}
 
