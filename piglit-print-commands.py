@@ -31,8 +31,7 @@ import os.path as path
 sys.path.append(path.dirname(path.realpath(sys.argv[0])))
 import framework.core as core
 import framework.profile
-from framework.exectest import Test
-from framework.gleantest import GleanTest
+from framework.test import Test, GleanTest
 
 
 def main():
