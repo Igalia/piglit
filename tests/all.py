@@ -1003,6 +1003,7 @@ spec['!OpenGL 3.2/layered-rendering/gl-layer'] = PiglitGLTest('gl-3.2-layered-re
 spec['!OpenGL 3.2/layered-rendering/gl-layer-cube-map'] = PiglitGLTest('gl-3.2-layered-rendering-gl-layer-cube-map', run_concurrent=True)
 spec['!OpenGL 3.2/layered-rendering/gl-layer-not-layered'] = PiglitGLTest('gl-3.2-layered-rendering-gl-layer-not-layered', run_concurrent=True)
 spec['!OpenGL 3.2/layered-rendering/gl-layer-render'] = PiglitGLTest('gl-3.2-layered-rendering-gl-layer-render', run_concurrent=True)
+spec['!OpenGL 3.2/pointsprite-coord'] = PiglitGLTest('gl-3.2-pointsprite-coord', run_concurrent=True)
 spec['!OpenGL/coord-replace-doesnt-eliminate-frag-tex-coords'] = PiglitGLTest('gl-coord-replace-doesnt-eliminate-frag-tex-coords', run_concurrent=True)
 spec['!OpenGL/get-active-attrib-returns-all-inputs'] = PiglitGLTest('gl-get-active-attrib-returns-all-inputs', run_concurrent=True)
 spec['!OpenGL 3.2/texture-border-deprecated'] = PiglitGLTest('gl-3.2-texture-border-deprecated', run_concurrent=True)
