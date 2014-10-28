@@ -11,5 +11,6 @@ link_libraries (
 
 piglit_add_executable (arb_framebuffer_srgb-pushpop pushpop.c)
 piglit_add_executable (arb_framebuffer_srgb-blit blit.c)
+piglit_add_executable (arb_framebuffer_srgb-clear clear.c)
 piglit_add_executable (arb_framebuffer_srgb-srgb_conformance srgb_conformance.c)
 

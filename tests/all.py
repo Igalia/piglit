@@ -1868,6 +1868,7 @@ for backing_type in ('texture', 'renderbuffer'):
                         'arb_framebuffer_srgb-' + test_name,
                         run_concurrent=True)
 add_plain_test(arb_framebuffer_srgb, 'framebuffer-srgb') # must not be concurrent
+add_concurrent_test(arb_framebuffer_srgb, 'arb_framebuffer_srgb-clear')
 
 arb_gpu_shader5 = {}
 spec['ARB_gpu_shader5'] = arb_gpu_shader5
