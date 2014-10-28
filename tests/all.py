@@ -3433,7 +3433,7 @@ spec['ARB_copy_image'] = arb_copy_image
 add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --tex-to-tex')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --rb-to-tex')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-simple --rb-to-rb')
-
+add_concurrent_test(arb_copy_image, 'arb_copy_image-srgb-copy')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_1D 32 1 1 GL_TEXTURE_1D 32 1 1 11 0 0 5 0 0 14 1 1')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_1D 32 1 1 GL_TEXTURE_1D_ARRAY 32 1 12 11 0 0 5 0 9 14 1 1')
 add_concurrent_test(arb_copy_image, 'arb_copy_image-targets GL_TEXTURE_1D 32 1 1 GL_TEXTURE_2D 32 32 1 11 0 0 5 13 0 14 1 1')
