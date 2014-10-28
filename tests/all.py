@@ -2246,6 +2246,7 @@ arb_texture_storage_multisample['tex-param'] = PiglitGLTest('arb_texture_storage
 arb_texture_view = {}
 spec['ARB_texture_view'] = arb_texture_view
 arb_texture_view['immutable_levels'] = PiglitGLTest('arb_texture_view-texture-immutable-levels', run_concurrent=True)
+arb_texture_view['max-level'] = PiglitGLTest('arb_texture_view-max-level', run_concurrent=True)
 arb_texture_view['params'] = PiglitGLTest('arb_texture_view-params', run_concurrent=True)
 arb_texture_view['formats'] = PiglitGLTest('arb_texture_view-formats', run_concurrent=True)
 arb_texture_view['targets'] = PiglitGLTest('arb_texture_view-targets', run_concurrent=True)

@@ -11,6 +11,7 @@ link_libraries(
 
 piglit_add_executable(arb_texture_view-getteximage-srgb getteximage-srgb.c)
 piglit_add_executable(arb_texture_view-texture-immutable-levels texture-immutable-levels.c)
+piglit_add_executable(arb_texture_view-max-level max-level.c)
 piglit_add_executable(arb_texture_view-params params.c)
 piglit_add_executable(arb_texture_view-formats formats.c common.c)
 piglit_add_executable(arb_texture_view-targets targets.c common.c)
