@@ -335,7 +335,7 @@ choose_varyings(struct varying_desc *varyings,
 }
 
 void
-print_usage_and_exit(const char *prog_name)
+NORETURN print_usage_and_exit(const char *prog_name)
 {
 	unsigned i;
 	printf("Usage: %s <type> <arrayspec>\n"
