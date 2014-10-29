@@ -45,9 +45,9 @@ class JUnitBackend(FileBackend):
     """
     _REPLACE = re.compile(r'[/\\]')
 
-    def __init__(self, dest, junit_test_suffix='', **options):
+    def __init__(self, dest, junit_suffix='', **options):
         super(JUnitBackend, self).__init__(dest, **options)
-        self._test_suffix = junit_test_suffix
+        self._test_suffix = junit_suffix
 
         # make dictionaries of all test names expected to crash/fail
         # for quick lookup when writing results.  Use lower-case to
