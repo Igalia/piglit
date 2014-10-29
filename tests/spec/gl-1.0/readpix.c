@@ -100,7 +100,9 @@ check_rgba(void)
 	double err;
 	int xerr, yerr;
 	float expected[4], expected_rgba[4], actual_rgba[4];
-	GLfloat buf[piglit_width][piglit_height][4];
+	const int w = piglit_width;
+	const int h = piglit_height;
+	GLfloat *buf = (GLfloat *)malloc(h * w * 4 * sizeof *buf);
 	GLfloat dr, dg, db, da;
 	GLint rbits, gbits, bbits, abits;
 	glGetIntegerv(GL_RED_BITS, &rbits);
@@ -119,19 +121,18 @@ check_rgba(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		/* Read the buffer: */
-		glReadPixels(0, 0, piglit_width,
-			piglit_height, GL_RGBA, GL_FLOAT, buf);
+		glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, buf);
 
 		/*
 		 * Now compute the error for each pixel, and record the
 		 * worst one we find:
 		 */
-		for (y = 0; y < piglit_height; ++y) {
-			for (x = 0; x < piglit_width; ++x) {
-				dr = fabs(buf[y][x][0] - expected[0]);
-				dg = fabs(buf[y][x][1] - expected[1]);
-				db = fabs(buf[y][x][2] - expected[2]);
-				da = fabs(buf[y][x][3] - expected[3]);
+		for (y = 0; y < h; ++y) {
+			for (x = 0; x < w; ++x) {
+				dr = fabs(buf[y*w*4 + x*4 + 0] - expected[0]);
+				dg = fabs(buf[y*w*4 + x*4 + 1] - expected[1]);
+				db = fabs(buf[y*w*4 + x*4 + 2] - expected[2]);
+				da = fabs(buf[y*w*4 + x*4 + 3] - expected[3]);
 				err =
 				    fmax(error_bits(dr, rbits),
 				    fmax(error_bits(dg, gbits),
@@ -156,7 +157,7 @@ check_rgba(void)
 						expected_rgba[j] = 
 							expected[j];
 						actual_rgba[j] = 
-							buf[y][x][j];
+							buf[y*w*4 + x*4 + j];
 					}
 				}
 			}
@@ -187,6 +188,8 @@ check_rgba(void)
 			
 	}
 
+	free(buf);
+
 	return pass;
 } /* check_rgba */
 
@@ -196,8 +199,10 @@ check_depth(void)
 	int i, x, y;
 	int thresh = 1;
 	bool pass = true;
-	GLdouble expected, expected_depth, actual_depth;
-	GLuint buf[piglit_width][piglit_height];
+	GLdouble expected, expected_depth, actual, actual_depth;
+	const int w = piglit_width;
+	const int h = piglit_height;
+	GLuint *buf = (GLuint *)malloc(h * w * sizeof *buf);
 	double current_error = 0.0;
 	GLfloat dd;
 	double err;
@@ -219,25 +224,25 @@ check_depth(void)
 		 * than a GLfloat.  Since this is just a sanity check, we'll
 		 * use integer readback and settle for 32 bits at best.
 		 */
-		glReadPixels(0, 0, piglit_width,
-			piglit_height, GL_DEPTH_COMPONENT,
+		glReadPixels(0, 0, w, h,
+			GL_DEPTH_COMPONENT,
 			GL_UNSIGNED_INT, buf);
 
 		/*
 		 * Now compute the error for each pixel, and record the
 		 * worst one we find:
 		 */
-		for (y = 0; y < piglit_height; ++y) {
-			for (x = 0; x < piglit_width; ++x) {
-				dd = abs(buf[y][x]/4294967295.0
-					- expected);
+		for (y = 0; y < h; ++y) {
+			for (x = 0; x < w; ++x) {
+				actual = buf[y*w + x]/(double)0xffffffffU;
+				dd = abs(actual - expected);
 				err = error_bits(dd, dbits);
 				if (err > current_error) {
 					current_error = err;
 					xerr = x;
 					yerr = y;
 					expected_depth = expected;
-					actual_depth = buf[y][x]/4294967295.0;
+					actual_depth = actual;
 				}
 			}
 		}
@@ -257,6 +262,8 @@ check_depth(void)
 		printf("\t\texpected %f; got %f.\n", expected_depth, 
 			actual_depth);
 	}
+
+	free(buf);
 
 	return pass;
 } /* check_depth */
@@ -278,7 +285,9 @@ check_stencil(void)
 {
 	int i, x, y;
 	bool pass = true;
-	GLuint buf[piglit_width][piglit_height];
+	const int w = piglit_width;
+	const int h = piglit_height;
+	GLuint *buf = (GLuint *)malloc(h * w * sizeof *buf);
 	GLuint expected;
 	GLint sbits;
 	glGetIntegerv(GL_STENCIL_BITS, &sbits);
@@ -291,14 +300,13 @@ check_stencil(void)
 		glClear(GL_STENCIL_BUFFER_BIT);
 		pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-		glReadPixels(0, 0, piglit_width,
-			piglit_height, GL_STENCIL_INDEX,
-			GL_UNSIGNED_INT, buf);
+		glReadPixels(0, 0, w, h,
+			GL_STENCIL_INDEX, GL_UNSIGNED_INT, buf);
 		pass &= piglit_check_gl_error(GL_NO_ERROR);
 
-		for (y = 0; y < piglit_height && pass; ++y) {
-			for (x = 0; x < piglit_width; ++x) {
-				if (buf[y][x] != expected) {
+		for (y = 0; y < h && pass; ++y) {
+			for (x = 0; x < w; ++x) {
+				if (buf[y*w + x] != expected) {
 					pass = false;
 					break;
 				}
@@ -315,9 +323,11 @@ check_stencil(void)
 		printf("\tStencil failed at (%i, %i).\n",
 			x, y);
 		printf("\t\tExpected %i; got %i.\n",
-			expected, buf[y][x]);
+			expected, buf[y*w + x]);
 	}
 	
+	free(buf);
+
 	return pass;
 } /* check_stencil */
 
