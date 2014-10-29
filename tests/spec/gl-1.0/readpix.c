@@ -102,7 +102,7 @@ check_rgba(void)
 	float expected[4], expected_rgba[4], actual_rgba[4];
 	const int w = piglit_width;
 	const int h = piglit_height;
-	GLfloat *buf = (GLfloat *)malloc(h * w * 4 * sizeof *buf);
+	GLfloat *buf = malloc(h * w * 4 * sizeof *buf);
 	GLfloat dr, dg, db, da;
 	GLint rbits, gbits, bbits, abits;
 	glGetIntegerv(GL_RED_BITS, &rbits);
@@ -202,7 +202,7 @@ check_depth(void)
 	GLdouble expected, expected_depth, actual, actual_depth;
 	const int w = piglit_width;
 	const int h = piglit_height;
-	GLuint *buf = (GLuint *)malloc(h * w * sizeof *buf);
+	GLuint *buf = malloc(h * w * sizeof *buf);
 	double current_error = 0.0;
 	GLfloat dd;
 	double err;
@@ -287,7 +287,7 @@ check_stencil(void)
 	bool pass = true;
 	const int w = piglit_width;
 	const int h = piglit_height;
-	GLuint *buf = (GLuint *)malloc(h * w * sizeof *buf);
+	GLuint *buf = malloc(h * w * sizeof *buf);
 	GLuint expected;
 	GLint sbits;
 	glGetIntegerv(GL_STENCIL_BITS, &sbits);
