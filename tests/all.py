@@ -4310,6 +4310,7 @@ import_glsl_parser_tests(arb_derivative_control,
 
 spec['ARB_direct_state_access'] = {}
 spec['ARB_direct_state_access']['dsa-textures'] = PiglitGLTest('arb_direct_state_access-dsa-textures', run_concurrent=True)
+spec['ARB_direct_state_access']['texturesubimage'] = PiglitGLTest('arb_direct_state_access-texturesubimage', run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear

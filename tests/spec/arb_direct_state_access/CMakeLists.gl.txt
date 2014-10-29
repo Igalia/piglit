@@ -10,4 +10,5 @@ link_libraries (
 )
 
 piglit_add_executable (arb_direct_state_access-dsa-textures dsa-textures.c dsa-utils.c)
+piglit_add_executable (arb_direct_state_access-texturesubimage texturesubimage.c)
 # vim: ft=cmake:
