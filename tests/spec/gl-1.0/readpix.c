@@ -75,13 +75,6 @@ random_float(void)
 	return (float) rand() / RAND_MAX;
 }
 
-/** Computes log base 2 (copied from Glean's misc.cpp) */
-double
-log2(double x) 
-{
-	return 1.4426950408889634 * log(x);
-}
-
 /**
  * (Copied from Glean's misc.cpp.)
  * Utility routine to compute error, expressed in bits
