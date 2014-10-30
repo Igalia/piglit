@@ -29,6 +29,7 @@ import collections
 import tempfile
 import datetime
 import re
+import getpass
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
@@ -275,7 +276,9 @@ class Summary:
     uses methods to generate various kinds of output. The reference
     implementation is HTML output through mako, aptly named generateHTML().
     """
-    TEMP_DIR = path.join(tempfile.gettempdir(), "piglit/html-summary")
+    TEMP_DIR = path.join(tempfile.gettempdir(),
+                         "piglit-{}".format(getpass.getuser()),
+                         "html-summary")
     TEMPLATE_DIR = path.abspath(
         path.join(path.dirname(__file__), '..', 'templates'))
 
@@ -437,7 +440,6 @@ class Summary:
         heavy lifting, this method just passes it a bunch of dicts and lists
         of dicts, which mako turns into pretty HTML.
         """
-
         # Copy static files
         shutil.copy(path.join(self.TEMPLATE_DIR, "index.css"),
                     path.join(destination, "index.css"))
