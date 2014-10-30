@@ -227,6 +227,7 @@ def update_results(results, filepath):
         # dictionary
         updates = {
             0: _update_zero_to_one,
+            1: _update_one_to_two,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -361,5 +362,33 @@ def _update_zero_to_one(results):
 
     # set the results version
     results.results_version = 1
+
+    return results
+
+
+def _update_one_to_two(results):
+    """Update version 1 results to version 2.
+
+    Version two results are actually identical to version one results, however,
+    there was an error in version 1 at the end causing metadata in the options
+    dictionary to be incorrect. Version 2 corrects that.
+
+    Namely uname, glxinfo, wglinfo, and lspci were put in the options['env']
+    instead of in the root.
+
+    """
+    if 'env' in results.options:
+        env = results.options['env']
+        if env.get('glxinfo'):
+            results.glxinfo = env['glxinfo']
+        if env.get('lspci'):
+            results.lspci = env['lspci']
+        if env.get('uname'):
+            results.uname = env['uname']
+        if env.get('wglinfo'):
+            results.wglinfo = env['wglinfo']
+        del results.options['env']
+
+    results.results_version = 2
 
     return results

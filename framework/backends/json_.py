@@ -37,7 +37,7 @@ __all__ = [
 
 
 # The current version of the JSON results
-CURRENT_JSON_VERSION = 1
+CURRENT_JSON_VERSION = 2
 
 
 def piglit_encoder(obj):
