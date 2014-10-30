@@ -138,6 +138,7 @@ class QuietLog(BaseLog):
     def summary(self):
         with self._LOCK:
             self._print_summary()
+            self._print('\n')
 
     def _print_summary(self):
         """ Print the summary result
