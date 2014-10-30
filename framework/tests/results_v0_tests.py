@@ -100,8 +100,9 @@ DATA['tests'].update({
     },
 })
 
-with utils.with_tempfile(json.dumps(DATA)) as f:
-    RESULT = results._update_zero_to_one(results.load_results(f))
+with utils.with_tempfile(json.dumps(DATA)) as t:
+    with open(t, 'r') as f:
+        RESULT = results._update_zero_to_one(results.TestrunResult.load(f))
 
 
 def test_dmesg():
@@ -188,8 +189,9 @@ def test_info_split():
     data['tests']['sometest']['info'] = \
         'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n\nmore\n\nstuff'
 
-    with utils.with_tempfile(json.dumps(data)) as f:
-        results._update_zero_to_one(results.load_results(f))
+    with utils.with_tempfile(json.dumps(data)) as t:
+        with open(t, 'r') as f:
+            results._update_zero_to_one(results.TestrunResult.load(f))
 
 
 def test_subtests_with_slash():
