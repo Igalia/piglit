@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright © 2011 Intel Corporation
+# Copyright © 2011, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -64,6 +64,86 @@
 # This program outputs, to stdout, the name of each file it generates.
 
 import os
+import textwrap
+
+from mako.template import Template
+
+TEMPLATE = Template(textwrap.dedent("""\
+%if args.builtin_variable:
+# Test proper interpolation of ${args.vs_variable}
+%else:
+# Test proper interpolation of a non-built-in variable
+%endif
+%if args.interpolation_qualifier:
+# When qualified with ${args.interpolation_qualifier}
+%else:
+# When no interpolation qualifier present
+%endif
+# And ShadeModel is ${args.shade_model}
+%if args.clipping == 'fixed':
+# And clipping via fixed planes
+%elif args.clipping == 'vertex':
+# And clipping via gl_ClipVertex
+%elif args.clipping == 'distance':
+# And clipping via gl_ClipDistance
+%endif
+
+[require]
+GLSL >= ${args.glsl_version}
+
+[vertex shader]
+${args.vs_input} vec4 vertex;
+${args.vs_input} vec4 input_data;
+% if args.interpolation_qualifier or not args.builtin_variable:
+${args.interpolation_qualifier} ${args.vs_output} vec4 ${args.vs_variable};
+% endif
+
+void main()
+{
+    gl_Position = gl_ModelViewProjectionMatrix * vertex;
+    ${args.vs_variable} = input_data;
+  %if args.clipping == 'distance':
+    gl_ClipDistance[0] = -1.75 - vertex.z;
+  %elif args.clipping == 'vertex':
+    gl_ClipVertex = vertex;
+  %endif
+}
+
+[fragment shader]
+% if args.interpolation_qualifier or not args.builtin_variable:
+${args.interpolation_qualifier} ${args.fs_input} vec4 ${args.fs_variable};
+% endif
+
+void main()
+{
+    gl_FragColor = ${args.fs_variable};
+}
+
+[vertex data]
+% for v in args.vertex_data():
+${v}
+% endfor
+
+[test]
+frustum -${args.frustum_near} ${args.frustum_near} -${args.frustum_near} ${args.frustum_near} ${args.frustum_near} ${args.frustum_far}
+clear color 0.0 0.0 0.0 0.0
+clear
+enable GL_VERTEX_PROGRAM_TWO_SIDE
+shade model ${args.shade_model}
+
+% if args.clipping == 'distance':
+enable GL_CLIP_PLANE0
+% elif args.clipping == 'vertex':
+enable GL_CLIP_PLANE0
+clip plane 0 0.0 0.0 -1.0 -1.75
+% endif
+
+draw arrays GL_TRIANGLES 0 3
+
+% for x, y, r, g, b, a in args.probe_data():
+relative probe rgba (${x}, ${y}) (${r}, ${g}, ${b}, ${a})
+% endfor
+"""))
 
 
 class Test(object):
@@ -255,88 +335,21 @@ class Test(object):
                     yield x2d, y2d, b3d_0, b3d_1, b3d_2, 1.0
 
     def generate(self):
-        if self.builtin_variable:
-            test = '# Test proper interpolation of {0}\n'.format(
-                self.vs_variable)
-        else:
-            test = '# Test proper interpolation of a non-built-in variable\n'
-        if self.interpolation_qualifier:
-            test += '# When qualified with {0!r}\n'.format(
-                self.interpolation_qualifier)
-        else:
-            test += '# When no interpolation qualifier present\n'
-        test += '# And ShadeModel is {0!r}\n'.format(self.shade_model)
-        if self.clipping == 'fixed':
-            test += '# And clipping via fixed planes\n'
-        elif self.clipping == 'vertex':
-            test += '# And clipping via gl_ClipVertex\n'
-        elif self.clipping == 'distance':
-            test += '# And clipping via gl_ClipDistance\n'
-        else:
-            assert self.clipping is None
-        test += '[require]\n'
-        test += 'GLSL >= {0}\n'.format(self.glsl_version)
-        test += '\n'
-        test += '[vertex shader]\n'
-        test += '{0} vec4 vertex;\n'.format(self.vs_input)
-        test += '{0} vec4 input_data;\n'.format(self.vs_input)
-        if self.interpolation_qualifier or not self.builtin_variable:
-            test += '{0} {1} vec4 {2};'.format(
-                self.interpolation_qualifier or '',
-                self.vs_output, self.vs_variable).strip() + '\n'
-        test += 'void main()\n'
-        test += '{\n'
-        test += '  gl_Position = gl_ModelViewProjectionMatrix * vertex;\n'
-        test += '  {0} = input_data;\n'.format(self.vs_variable)
-        if self.clipping == 'distance':
-            test += '  gl_ClipDistance[0] = -1.75 - vertex.z;\n'
-        elif self.clipping == 'vertex':
-            test += '  gl_ClipVertex = vertex;\n'
-        test += '}\n'
-        test += '\n'
-        test += '[fragment shader]\n'
-        if self.interpolation_qualifier or not self.builtin_variable:
-            test += '{0} {1} vec4 {2};'.format(
-                self.interpolation_qualifier or '',
-                self.fs_input, self.fs_variable).strip() + '\n'
-        test += 'void main()\n'
-        test += '{\n'
-        test += '  gl_FragColor = {0};\n'.format(self.fs_variable)
-        test += '}\n'
-        test += '\n'
-        test += '[vertex data]\n'
-        test += ''.join(s + '\n' for s in self.vertex_data())
-        test += '\n'
-        test += '[test]\n'
-        test += 'frustum -{0} {0} -{0} {0} {0} {1}\n'.format(
-            self.frustum_near, self.frustum_far)
-        test += 'clear color 0.0 0.0 0.0 0.0\n'
-        test += 'clear\n'
-        test += 'enable GL_VERTEX_PROGRAM_TWO_SIDE\n'
-        test += 'shade model {0}\n'.format(self.shade_model)
-        if self.clipping == 'distance' or self.clipping == 'vertex':
-            test += 'enable GL_CLIP_PLANE0\n'
-        if self.clipping == 'vertex':
-            test += 'clip plane 0 0.0 0.0 -1.0 -1.75\n'
-        test += 'draw arrays GL_TRIANGLES 0 3\n'
-        for x, y, r, g, b, a in self.probe_data():
-            test += ('relative probe rgba ({0}, {1}) ({2}, {3}, {4}, {5})\n'
-                     .format(x, y, r, g, b, a))
         filename = self.filename()
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         with open(filename, 'w') as f:
-            f.write(test)
+            f.write(TEMPLATE.render(args=self))
 
 
 def all_tests():
-    for interpolation_qualifier in ['flat', 'smooth', 'noperspective', None]:
+    for interpolation_qualifier in ['flat', 'smooth', 'noperspective', '']:
         for variable in ['gl_FrontColor', 'gl_BackColor',
                          'gl_FrontSecondaryColor', 'gl_BackSecondaryColor',
                          'other']:
             for shade_model in ['smooth', 'flat']:
-                for clipping in ['vertex', 'distance', 'fixed', None]:
+                for clipping in ['vertex', 'distance', 'fixed', '']:
                     yield Test(interpolation_qualifier, variable, shade_model,
                                clipping)
 
