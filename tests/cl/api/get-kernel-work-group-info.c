@@ -61,6 +61,7 @@ piglit_cl_test(const int argc,
 	int i;
 	cl_int errNo;
 	cl_kernel kernel;
+	cl_uint* dev_count_ptr;
 
 	size_t param_value_size;
 	void* param_value;
@@ -168,24 +169,37 @@ piglit_cl_test(const int argc,
 		        piglit_cl_get_error_name(errNo));
 		piglit_merge_result(&result, PIGLIT_FAIL);
 	}
-	
+
 	/*
 	 * CL_INVALID_DEVICE if device is not in the list of devices associated with
 	 * kernel or if device is NULL but there is more than one device associated
-	 * with kernel.
+	 * with kernel
+	 * or
+	 * CL_SUCCESS if device is NULL but there is only one device associated with kernel.
 	 */
+	dev_count_ptr = piglit_cl_get_program_info(env->program, CL_PROGRAM_NUM_DEVICES);
 	errNo = clGetKernelWorkGroupInfo(kernel,
 	                                 NULL,
 	                                 CL_KERNEL_WORK_GROUP_SIZE,
 	                                 0,
 	                                 NULL,
 	                                 &param_value_size);
-	if(!piglit_cl_check_error(errNo, CL_INVALID_DEVICE)) {
-		fprintf(stderr,
-		        "Failed (error code: %s): Trigger CL_INVALID_DEVICE if device is NULL but there is more than one device associated with kernel.\n",
-		        piglit_cl_get_error_name(errNo));
-		piglit_merge_result(&result, PIGLIT_FAIL);
+	if (*dev_count_ptr == 1) {
+		if(!piglit_cl_check_error(errNo, CL_SUCCESS)) {
+			fprintf(stderr,
+			        "Failed (error code: %s): Trigger CL_SUCCESS if device is NULL but there is only one device associated with kernel.\n",
+			        piglit_cl_get_error_name(errNo));
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+	} else {
+		if(!piglit_cl_check_error(errNo, CL_INVALID_DEVICE)) {
+			fprintf(stderr,
+			        "Failed (error code: %s): Trigger CL_INVALID_DEVICE if device is NULL but there is more than one device associated with kernel.\n",
+			        piglit_cl_get_error_name(errNo));
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
 	}
+	free(dev_count_ptr);
 
 	clReleaseKernel(kernel);
 
