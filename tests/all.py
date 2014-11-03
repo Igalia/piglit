@@ -3109,6 +3109,8 @@ ext_transform_feedback['max-varyings'] = PiglitGLTest('ext_transform_feedback-ma
 ext_transform_feedback['nonflat-integral'] = PiglitGLTest('ext_transform_feedback-nonflat-integral', run_concurrent=True)
 ext_transform_feedback['overflow-edge-cases'] = PiglitGLTest('ext_transform_feedback-overflow-edge-cases', run_concurrent=True)
 ext_transform_feedback['overflow-edge-cases use_gs'] = PiglitGLTest('ext_transform_feedback-overflow-edge-cases use_gs', run_concurrent=True)
+ext_transform_feedback['points'] = PiglitGLTest('ext_transform_feedback-points', run_concurrent=True)
+ext_transform_feedback['points-large'] = PiglitGLTest('ext_transform_feedback-points large', run_concurrent=True)
 ext_transform_feedback['position-readback-bufferbase'] = PiglitGLTest('ext_transform_feedback-position', run_concurrent=True)
 ext_transform_feedback['position-readback-bufferbase-discard'] = PiglitGLTest('ext_transform_feedback-position discard', run_concurrent=True)
 ext_transform_feedback['position-readback-bufferoffset'] = PiglitGLTest('ext_transform_feedback-position offset', run_concurrent=True)
