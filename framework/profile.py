@@ -149,6 +149,11 @@ class TestProfile(object):
         self.test_list = dict(item for item in self.test_list.iteritems()
                               if check_all(item))
 
+        if not self.test_list:
+            print('Error: There are no tests scheduled to run. Aborting run.',
+                  file=sys.stderr)
+            sys.exit(1)
+
     def _pre_run_hook(self):
         """ Hook executed at the start of TestProfile.run
 
