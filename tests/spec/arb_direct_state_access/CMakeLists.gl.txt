@@ -14,4 +14,5 @@ piglit_add_executable (arb_direct_state_access-texturesubimage texturesubimage.c
 piglit_add_executable (arb_direct_state_access-bind-texture-unit bind-texture-unit.c)
 piglit_add_executable (arb_direct_state_access-create-textures create-textures.c)
 piglit_add_executable (arb_direct_state_access-texture-storage texture-storage.c)
+piglit_add_executable (arb_direct_state_access-texunits texunits.c)
 # vim: ft=cmake:
