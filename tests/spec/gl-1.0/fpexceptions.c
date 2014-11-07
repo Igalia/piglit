@@ -145,11 +145,13 @@ make_quiet_nan_float(float *dest)
 	make_float(dest, 0, 255, 1 << 22);
 }
 
+#if 0
 static void
 make_denorm_double(double *dest, int sign, int mantissa)
 {
 	/* XXX to do */
 }
+#endif
 
 static void
 make_pos_inf_double(double *dest)
@@ -163,6 +165,7 @@ make_neg_inf_double(double *dest)
 	*dest = -HUGE_VAL;
 }
 
+#if 0
 static void
 make_signaling_nan_double(double *dest)
 {
@@ -174,6 +177,7 @@ make_quiet_nan_double(double *dest)
 {
 	/* XXX to do */
 }
+#endif
 
 
 /* Uncomment to test float production */
