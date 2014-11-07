@@ -325,6 +325,7 @@ test_2d_mipmap_rendering(void)
 	GLuint tex;
 	GLint width = 128, height = 64, levels = 8;
 	GLint v, l;
+	GLfloat vfloat;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
 	glBindTextureUnit(0, tex);
@@ -357,6 +358,27 @@ test_2d_mipmap_rendering(void)
 					 TestName, l, v, height);
 			return false;
 		}
+
+
+		/* Added to test glGetTextureLevelParameterfv */
+		glGetTextureLevelParameterfv(tex, l, GL_TEXTURE_WIDTH,
+					     &vfloat);
+		if (vfloat != (GLfloat) width) {
+			printf("%s: level %d: bad width: %.2f, "
+			       "should be %.2f\n",
+				TestName, l, vfloat, (GLfloat) width);
+			return false;
+		}
+
+		glGetTextureLevelParameterfv(tex, l, GL_TEXTURE_HEIGHT,
+					     &vfloat);
+		if (vfloat != (GLfloat) height) {
+			printf("%s: level %d: bad height: %.2f, "
+			       "should be %.2f\n",
+				TestName, l, vfloat, (GLfloat) height);
+			return false;
+		}
+
 
 		if (width > 1)
 			width /= 2;
