@@ -551,6 +551,7 @@ load_compare_program(struct texture_format *format)
 			gtype = "i";
 		} else {
 			assert(!"Invalid comparison fucntion");
+			gtype = "";
 		}
 
 		/* The generated source will be shorter because we replace
