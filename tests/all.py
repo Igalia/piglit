@@ -4315,6 +4315,7 @@ spec['ARB_direct_state_access']['bind-texture-unit'] = PiglitGLTest('arb_direct_
 spec['ARB_direct_state_access']['create-textures'] = PiglitGLTest('arb_direct_state_access-create-textures', run_concurrent=True)
 spec['ARB_direct_state_access']['texture-storage'] = PiglitGLTest('arb_direct_state_access-texture-storage', run_concurrent=True)
 spec['ARB_direct_state_access']['texunits'] = PiglitGLTest('arb_direct_state_access-texunits', run_concurrent=True)
+spec['ARB_direct_state_access']['texture-params'] = PiglitGLTest('arb_direct_state_access-texture-params', run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
