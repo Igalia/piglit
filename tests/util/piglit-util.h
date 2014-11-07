@@ -91,9 +91,29 @@ int asprintf(char **strp, const char *fmt, ...) PRINTFLIKE(2, 3);
 #ifndef HAVE_FFS
 #ifdef __MINGW32__
 #define ffs __builtin_ffs
-#endif
-#endif
+#else /* !__MINGW32__ */
 
+/**
+ * Find the first bit set in i and return the index set of that bit.
+ */
+static inline int
+ffs(int i)
+{
+	int bit;
+
+	if (i == 0) {
+		return 0;
+	}
+
+	for (bit = 1; !(i & 1); bit++) {
+		i = i >> 1;
+	}
+
+	return bit;
+}
+
+#endif /* !__MINGW32__ */
+#endif /* !HAVE_FFS*/
 
 enum piglit_result {
 	PIGLIT_PASS,

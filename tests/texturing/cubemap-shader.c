@@ -94,27 +94,6 @@ static const char *frag_shader_lod =
 static GLuint frag_shader_cube;
 static GLuint program_cube;
 
-#if defined(_MSC_VER)
-/**
- * Find the first bit set in i and return the index set of that bit.
- */
-static int
-ffs(int i)
-{
-	int bit;
-
-	if (i == 0) {
-		return 0;
-	}
-
-	for (bit = 1; !(i & 1); bit++) {
-		i = i >> 1;
-	}
-
-	return bit;
-}
-#endif
-
 static void
 set_face_image(int level, GLenum face, int size, int color)
 {

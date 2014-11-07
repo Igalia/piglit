@@ -90,27 +90,6 @@ static const char *frag_shader =
 
 static GLuint program_cube_array;
 
-#if defined(_MSC_VER)
-/**
- * Find the first bit set in i and return the index set of that bit.
- */
-static int
-ffs(int i)
-{
-	int bit;
-
-	if (i == 0) {
-		return 0;
-	}
-
-	for (bit = 1; !(i & 1); bit++) {
-		i = i >> 1;
-	}
-
-	return bit;
-}
-#endif
-
 static void
 set_image(int level, int size, int *color)
 {
