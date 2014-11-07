@@ -1,0 +1,23 @@
+#
+# OpenGL ES 1.00 specification "Invariance and linkage":
+#
+#    "For the built-in special variables, gl_FragCoord can
+#    only be declared invariant if and only if gl_Position is
+#    declared invariant. Similarly gl_PointCoord can only be
+#    declared invariant if and only if gl_PointSize is declared
+#    invariant. It is an error to declare gl_FrontFacing as invariant."
+#
+[require]
+GL ES >= 2.0
+GLSL ES >= 1.00
+
+[vertex shader passthrough]
+
+[fragment shader]
+invariant gl_FrontFacing;
+void main() {
+	gl_FragColor = vec4(gl_FrontFacing);
+}
+
+[test]
+link error
