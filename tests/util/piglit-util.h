@@ -94,13 +94,6 @@ int asprintf(char **strp, const char *fmt, ...) PRINTFLIKE(2, 3);
 #endif
 #endif
 
-// Trick from http://tdistler.com/2011/03/24/how-to-define-nan-not-a-number-on-windows
-#ifndef INFINITY
-#  define INFINITY (FLT_MAX + FLT_MAX)
-#endif
-#ifndef NAN
-#  define NAN (INFINITY - INFINITY)
-#endif
 
 enum piglit_result {
 	PIGLIT_PASS,
