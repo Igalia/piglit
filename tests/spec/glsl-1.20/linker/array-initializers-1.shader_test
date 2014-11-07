@@ -1,0 +1,20 @@
+# Demonstrates a crash in mesa.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+const int xs[] = int[](1,2,3);
+const int ys[] = int[](1,2);
+
+uniform int n;
+
+void main()
+{
+  gl_Position = vec4(xs[n]+ys[n], 0, 0, 1);
+}
+
+[test]
+link success

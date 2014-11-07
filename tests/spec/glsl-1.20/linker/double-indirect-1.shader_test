@@ -1,0 +1,21 @@
+# Demonstrates a crash in i965. The double indirection via const arrays
+# is required to trigger this.
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+#version 120
+
+const float a[] = float[](0);
+const int b[] = int[](0);
+
+uniform int n;
+
+void main()
+{
+  gl_Position = vec4(a[b[n]], 0, 0, 1);
+}
+
+[test]
+link success

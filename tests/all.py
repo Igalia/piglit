@@ -1076,6 +1076,10 @@ spec['glsl-1.20']['execution'] = {}
 add_shader_test_dir(spec['glsl-1.20']['execution'],
                     os.path.join(testsDir, 'spec', 'glsl-1.20', 'execution'),
                     recursive=True)
+spec['glsl-1.20']['linker'] = {}
+add_shader_test_dir(spec['glsl-1.20']['linker'],
+                    os.path.join(testsDir, 'spec', 'glsl-1.20', 'linker'),
+                    recursive=True)
 add_shader_test_dir(spec['glsl-1.20']['execution'],
                     os.path.join(generatedTestDir, 'spec', 'glsl-1.20', 'execution'),
                     recursive=True)
