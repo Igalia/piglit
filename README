@@ -136,13 +136,13 @@ Install CMake.
 http://cmake.org/cmake/resources/software.html
 Download and install 'Windows' platform.
 
-Install Microsoft Visual Studio.
+Install Microsoft Visual Studio 2013 or later.
 Install 'Visual C++' feature.
 
 Download OpenGL Core API and Extension Header Files.
 http://www.opengl.org/registry/#headers
 Copy header files to MSVC.
-C:\Program Files\Microsoft Visual Studio 10.0\VC\include\GL
+C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL
 
 Download freeglut for MSVC.
 http://www.transmissionzero.co.uk/software/freeglut-devel
@@ -154,7 +154,7 @@ Install python mako.
   > c:\Python27\Scripts\pip.exe install mako
 
 Open Visual Studio Command Prompt.
-Start Menu->All Programs->Microsoft Visual Studio 2010->Visual Studio Tools->Visual Studio Command Prompt (2010)
+Start Menu->All Programs->Visual Studio 2013->Visual Studio Tools->VS2013 x86 Native Tools Command Prompt
 CD to piglit directory.
 
 Run CMake GUI.

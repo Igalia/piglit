@@ -55,35 +55,6 @@ extern "C" {
 
 #define snprintf sprintf_s
 
-#if _MSC_VER < 1800
-
-static __inline double
-log2(double x) {
-	return log(x) * M_LOG2E;
-}
-
-static __inline float
-log2f(float x) {
-	return (float) log2(x);
-}
-
-static __inline double
-round(double x) {
-	return x >= 0.0 ? floor(x + 0.5) : ceil(x - 0.5);
-}
-
-static __inline float
-roundf(float x) {
-	return x >= 0.0f ? floorf(x + 0.5f) : ceilf(x - 0.5f);
-}
-
-static __inline long
-lround(double x) {
-	return (long)round(x);
-}
-
-#endif /* _MSC_VER < 1800 */
-
 #ifndef va_copy
 #ifdef __va_copy
 #define va_copy(dest, src) __va_copy((dest), (src))
