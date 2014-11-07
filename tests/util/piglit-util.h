@@ -58,7 +58,7 @@ extern "C" {
 #define inline __inline
 #endif
 
-#define snprintf sprintf_s
+#define snprintf _snprintf
 
 #endif /* defined(_MSC_VER) */
 
