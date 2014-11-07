@@ -1,0 +1,41 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+out vec4 frag_color;
+
+uniform uint zero;
+uniform uvec4 x, y;
+uniform uvec4 expected_msb;
+
+void main()
+{
+	frag_color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	uvec4 xx = x + zero;
+	uvec4 yy = y + zero;
+	uvec4 msb, lsb;
+	umulExtended(xx, yy, msb, lsb);
+
+	if (msb != expected_msb)
+		frag_color.r = 1.0;
+}
+
+[test]
+uniform uint zero 0
+uniform uvec4 x 1 1 1 1
+uniform uvec4 y 1 2 3 4
+uniform uvec4 expected_msb 0 0 0 0
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform uvec4 x 0x10000000 0x10000000 0xFFFFFFFF 0xFFFFFFFF
+uniform uvec4 y 0x10 0x11 0x2 0xFFFFFFFF
+uniform uvec4 expected_msb 0x1 0x1 0x1 0xFFFFFFFE
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,51 @@
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader5
+
+[vertex shader]
+#extension GL_ARB_gpu_shader5 : enable
+
+in vec4 piglit_vertex;
+out vec4 color;
+
+uniform int zero;
+uniform ivec4 x, y;
+uniform ivec4 expected_lsb;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+
+	color = vec4(0.0, 1.0, 0.0, 1.0);
+
+	ivec4 xx = x + zero;
+	ivec4 yy = y + zero;
+	ivec4 msb, lsb;
+	imulExtended(xx, yy, msb, lsb);
+
+	if (lsb != expected_lsb)
+		color.b = 1.0;
+}
+
+[fragment shader]
+in vec4 color;
+out vec4 frag_color;
+
+void main()
+{
+	frag_color = color;
+}
+
+[test]
+uniform int zero 0
+uniform ivec4 x 1 1 1 1
+uniform ivec4 y 1 2 3 4
+uniform ivec4 expected_lsb 1 2 3 4
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
+
+uniform ivec4 x -1 2 -131072 -131073
+uniform ivec4 y 1 -2 131072 131073
+uniform ivec4 expected_lsb -1 -4 0 4294705151
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
