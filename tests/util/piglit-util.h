@@ -49,6 +49,11 @@ extern "C" {
 
 #if defined(_MSC_VER)
 
+/* windows.h won't define min/max macros if NOMINMAX is defined, however
+ * stdlib.h will still define them for C files regardless... */
+#undef max
+#undef min
+
 #if !defined(__cplusplus) && !defined(inline)
 #define inline __inline
 #endif

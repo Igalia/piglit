@@ -64,9 +64,6 @@ static const char fragtexlodoffset[] =
 "	gl_FragColor = texel;\n"
 "}\n";
 
-#ifdef _MSC_VER
-#undef max
-#endif
 static float max(float x, float y) { return (x > y) ? x : y; }
 
 enum piglit_result
