@@ -31,7 +31,7 @@
 
 PIGLIT_CL_API_TEST_CONFIG_BEGIN
 
-	config.name = "clEnqueueCopyBuffer";
+	config.name = "clEnqueueMapBuffer";
 	config.version_min = 10;
 
 	config.run_per_platform = true;
