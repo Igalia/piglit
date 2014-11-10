@@ -22,7 +22,7 @@
  */
 
 /**
- * @file create-context.c
+ * @file create-buffer.c
  *
  * Test API function:
  *
@@ -270,7 +270,7 @@ piglit_cl_test(const int argc,
 	 */
 	for(mask = 1; mask < (1 << num_mem_flags); mask++) {
 		mixed_mem_flags = get_mixed_mem_flags(mask, mem_flags);
-		
+
 		/* only invalid mixes */
 		if(!mem_flags_valid(mixed_mem_flags, num_mutexes, mutexes)) {
 			sprintf(test_str,
