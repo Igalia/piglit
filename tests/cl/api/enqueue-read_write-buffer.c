@@ -514,16 +514,61 @@ piglit_cl_test(const int argc,
 	 * Version: 1.1
 	 * TODO
 	 */
+
+	clReleaseMemObject(mem);
+
+#if defined(CL_VERSION_1_2)
 	/*
 	 * CL_INVALID_OPERATION if clEnqueueReadBuffer is called on
 	 * buffer which has been created with CL_MEM_HOST_WRITE_ONLY
 	 * or CL_MEM_HOST_NO_ACCESS.
 	 *
+	 * CL_INVALID_OPERATION if clEnqueueWriteBuffer is called on
+	 * buffer which has been created with CL_MEM_HOST_READ_ONLY
+	 * or CL_MEM_HOST_NO_ACCESS.
+	 *
 	 * Version: 1.2
-	 * TODO
 	 */
+	if(env->version >= 12) {
+		/* create host write only buffer */
+		mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_WRITE_ONLY, alloc_size,
+		                     NULL, NULL);
 
-	clReleaseMemObject(mem);
+		test_read(env->context->command_queues[0], mem, true, 0,
+		          BUFFER_SIZE, host_buffer_read, 0, NULL, NULL,
+		          CL_INVALID_OPERATION, &result,
+		          "Trigger CL_INVALID_OPERATION when clEnqueueReadBuffer is called on buffer which has been created with CL_MEM_HOST_WRITE_ONLY");
+
+		clReleaseMemObject(mem);
+
+		/* create host no access buffer */
+		mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_NO_ACCESS, alloc_size,
+		                     NULL, NULL);
+
+		test_read(env->context->command_queues[0], mem, true, 0,
+		          BUFFER_SIZE, host_buffer_read, 0, NULL, NULL,
+		          CL_INVALID_OPERATION, &result,
+		          "Trigger CL_INVALID_OPERATION when clEnqueueReadBuffer is called on buffer which has been created with CL_MEM_HOST_NO_ACCESS");
+
+		test_write(env->context->command_queues[0], mem, true, 0,
+		           BUFFER_SIZE, host_buffer_write, 0, NULL, NULL,
+		           CL_INVALID_OPERATION, &result,
+		           "Trigger CL_INVALID_OPERATION when clEnqueueWriteBuffer is called on buffer which has been created with CL_MEM_HOST_NO_ACCESS");
+
+		clReleaseMemObject(mem);
+
+		/* create host read only buffer */
+		mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_READ_ONLY, alloc_size,
+		                     NULL, NULL);
+
+		test_write(env->context->command_queues[0], mem, true, 0,
+		           BUFFER_SIZE, host_buffer_write, 0, NULL, NULL,
+		           CL_INVALID_OPERATION, &result,
+		           "Trigger CL_INVALID_OPERATION when clEnqueueWriteBuffer is called on buffer which has been created with CL_MEM_HOST_READ_ONLY");
+
+		clReleaseMemObject(mem);
+	}
+#endif //CL_VERSION_1_2
 
 	return result;
 }

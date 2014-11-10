@@ -118,5 +118,116 @@ piglit_cl_test(const int argc,
 		return PIGLIT_FAIL;
 	}
 
+#if defined(CL_VERSION_1_2)
+	/*
+	 * CL_INVALID_OPERATION if buffer has been created with
+	 * CL_MEM_HOST_WRITE_ONLY or CL_MEM_HOST_NO_ACCESS
+	 * and CL_MAP_READ is set in map_flags
+	 *
+	 * CL_INVALID_OPERATION if buffer has been created with
+	 * CL_MEM_HOST_READ_ONLY or CL_MEM_HOST_NO_ACCESS
+	 * and CL_MAP_WRITE or CL_MAP_WRITE_INVALIDATE_REGION is set in map_flags.
+	 *
+	 * Version: 1.2
+	 */
+	if(env->version >= 12) {
+		enum piglit_result result;
+		cl_mem device_mem;
+		cl_ulong alloc_size = 64;
+		cl_int *host_mem;
+
+		/* host write only buffer */
+
+		device_mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_WRITE_ONLY,
+		                            alloc_size, NULL, NULL);
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_READ, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_READ: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_READ_ONLY");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		clReleaseMemObject(device_mem);
+
+		/* host no access buffer */
+
+		device_mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_NO_ACCESS,
+		                            alloc_size, NULL, NULL);
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_READ, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_READ: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_NO_ACCESS");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_WRITE, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_WRITE: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_NO_ACCESS");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_WRITE_INVALIDATE_REGION, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_WRITE_INVALIDATE_REGION: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_NO_ACCESS");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		clReleaseMemObject(device_mem);
+
+		/* host read only buffer */
+
+		device_mem = clCreateBuffer(env->context->cl_ctx, CL_MEM_HOST_READ_ONLY,
+		                            alloc_size, NULL, NULL);
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_WRITE, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_WRITE: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_NO_ACCESS");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		host_mem = clEnqueueMapBuffer(queue, device_mem, CL_TRUE,
+		                              CL_MAP_WRITE_INVALIDATE_REGION, 0, alloc_size,
+		                              0, NULL, NULL, &err);
+
+		if (!piglit_cl_check_error(err, CL_INVALID_OPERATION)) {
+			fprintf(stderr, "clEnqueueMapBuffer CL_MAP_WRITE_INVALIDATE_REGION: Failed (error code: %s): %s.\n",
+			        piglit_cl_get_error_name(err),
+			        "Trigger CL_INVALID_OPERATION when buffer has been created with CL_MEM_HOST_NO_ACCESS");
+			piglit_merge_result(&result, PIGLIT_FAIL);
+		}
+
+		(void)host_mem;
+		clReleaseMemObject(device_mem);
+
+		if (result == PIGLIT_FAIL)
+			return PIGLIT_FAIL;
+	}
+#endif //CL_VERSION_1_2
+
 	return PIGLIT_PASS;
 }
