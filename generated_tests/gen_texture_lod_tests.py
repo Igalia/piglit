@@ -22,9 +22,11 @@
 
 from __future__ import print_function
 import os
-import textwrap
 import collections
-import mako.template
+
+from templates import template_dir
+
+TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
 Parameters = collections.namedtuple(
     'Parameters', ['coord', 'grad', 'dimensions', 'mode'])
@@ -55,91 +57,15 @@ GRAD_TESTS = LOD_TESTS + [
 
 
 def get_extensions(mode):
-    """ If this test uses GL_ARB_texture_rectangle add it"""
+    """ If this test uses GL_ARB_texture_rectangle add it
+
+    GL_ARB_texture_rectangle is an odd extension, it is on by default, so don't
+    generate a #extension in the shader, just in the config block.
+
+    """
     if 'Rect' in mode:
         return 'GL_ARB_shader_texture_lod GL_ARB_texture_rectangle'
     return 'GL_ARB_shader_texture_lod'
-
-
-def gen_frag_lod_test(parameter, filename):
-    """ Generate fragment shader LOD tests """
-    template = mako.template.Template(textwrap.dedent("""
-    /* [config]
-     * expect_result: pass
-     * glsl_version: 1.10
-     * require_extensions: GL_ARB_shader_texture_lod
-     * [end config]
-     */
-    #extension GL_ARB_shader_texture_lod: require
-
-    uniform sampler${param.dimensions} s;
-    varying ${param.coord} coord;
-    varying float lod;
-
-    void main()
-    {
-      gl_FragColor = ${param.mode}Lod(s, coord, lod);
-    }
-    """))
-    with open(filename, 'w+') as f:
-        f.write(template.render_unicode(param=parameter))
-
-
-def gen_frag_grad_test(parameter, filename):
-    """ Generate fragment shader gradient tests """
-    template = mako.template.Template(textwrap.dedent("""
-    /* [config]
-     * expect_result: pass
-     * glsl_version: 1.10
-     * require_extensions: ${extensions}
-     * [end config]
-     */
-    #extension GL_ARB_shader_texture_lod: require
-
-    uniform sampler${param.dimensions} s;
-    varying ${param.coord} coord;
-    varying ${param.grad} dPdx;
-    varying ${param.grad} dPdy;
-
-    void main()
-    {
-      gl_FragColor = ${param.mode}GradARB(s, coord, dPdx, dPdy);
-    }
-    """))
-    with open(filename, 'w+') as f:
-        f.write(template.render_unicode(
-            param=parameter,
-            extensions=get_extensions(parameter.mode)))
-
-
-def gen_vert_grad_test(parameter, filename):
-    """ Generate vertex shader gradient tests """
-    template = mako.template.Template(textwrap.dedent("""
-    /* [config]
-     * expect_result: pass
-     * glsl_version: 1.10
-     * require_extensions: ${extensions}
-     * [end config]
-     */
-    #extension GL_ARB_shader_texture_lod: require
-
-    uniform sampler${param.dimensions} s;
-    attribute vec4 pos;
-    attribute ${param.coord} coord;
-    attribute ${param.grad} dPdx;
-    attribute ${param.grad} dPdy;
-    varying vec4 color;
-
-    void main()
-    {
-      gl_Position = pos;
-      color = ${param.mode}GradARB(s, coord, dPdx, dPdy);
-    }
-    """))
-    with open(filename, 'w+') as f:
-        f.write(template.render_unicode(
-            param=parameter,
-            extensions=get_extensions(parameter.mode)))
 
 
 def main():
@@ -148,38 +74,38 @@ def main():
     Writes tests to generated_tests/spec/arb_shader_texture_lod/ directory
 
     """
-    try:
-        os.makedirs('spec/arb_shader_texture_lod/compiler')
-    except OSError:
-        pass
+    dirname = 'spec/arb_shader_texture_lod/compiler'
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
     for params in LOD_TESTS:
-        name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_lod-{mode}-{dimensions}-{coord}.frag".format(
-                    mode=params.mode,
-                    dimensions=params.dimensions,
-                    coord=params.coord))
+        name = os.path.join(
+            dirname,
+            "tex_lod-{mode}-{dimensions}-{coord}.frag".format(
+                mode=params.mode,
+                dimensions=params.dimensions,
+                coord=params.coord))
         print(name)
-        gen_frag_lod_test(params, name)
+        with open(name, 'w+') as f:
+            f.write(TEMPLATES.get_template(
+                'frag_lod.glsl_parser_test.mako').render_unicode(param=params))
 
     for params in GRAD_TESTS:
         # Generate fragment shader test
-        name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_grad-{mode}-{dimensions}-{coord}.frag".format(
-                    mode=params.mode,
-                    dimensions=params.dimensions,
-                    coord=params.coord))
-        print(name)
-        gen_frag_grad_test(params, name)
+        name = os.path.join(
+            dirname,
+            "tex_grad-{mode}-{dimensions}-{coord}".format(
+                mode=params.mode,
+                dimensions=params.dimensions,
+                coord=params.coord))
 
-        # Generate vertex shader test
-        name = ("spec/arb_shader_texture_lod/compiler/"
-                "tex_grad-{mode}-{dimensions}-{coord}.vert".format(
-                    mode=params.mode,
-                    dimensions=params.dimensions,
-                    coord=params.coord))
-        print(name)
-        gen_vert_grad_test(params, name)
+        for stage in ['frag', 'vert']:
+            print('{}.{}'.format(name, stage))
+            with open('{}.{}'.format(name, stage), 'w+') as f:
+                f.write(TEMPLATES.get_template(
+                    'tex_grad.{}.mako'.format(stage)).render_unicode(
+                        param=params,
+                        extensions=get_extensions(params.mode)))
 
 
 if __name__ == '__main__':

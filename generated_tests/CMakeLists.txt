@@ -76,7 +76,11 @@ piglit_make_generated_tests(
 	interpolation-qualifier-built-in-variable.py)
 piglit_make_generated_tests(
 	texture_lod_tests.list
-	gen_texture_lod_tests.py)
+	gen_texture_lod_tests.py
+	templates/gen_texture_lod_tests/tex_grad.vert.mako
+	templates/gen_texture_lod_tests/tex_grad.frag.mako
+	templates/gen_texture_lod_tests/frag_lod.glsl_parser_test.mako
+	)
 piglit_make_generated_tests(
 	outerproduct_invalid_params.list
 	gen_outerproduct_invalid_params.py)
