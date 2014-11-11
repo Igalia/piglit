@@ -105,43 +105,50 @@ TEMPLATE = Template(dedent("""\
     void main()
     {
         % if execution_stage == 'fs':
-        gl_FragColor.xy = textureQuery${Lod}(s, coord);
+        gl_FragColor.xy = textureQuery${lod}(s, coord);
         % else:
-        gl_Position.xy = textureQuery${Lod}(s, coord);
+        gl_Position.xy = textureQuery${lod}(s, coord);
         % endif
     }
 """))
 
-for api, requirement in REQUIREMENTS.iteritems():
-    Lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
 
-    for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
-        for execution_stage in ("vs", "fs"):
-            file_extension = 'frag' if execution_stage == 'fs' else 'vert'
-            filename = os.path.join(
-                "spec", api.lower(), "compiler", "built-in-functions",
-                "textureQuery{0}-{1}.{2}".format(Lod, sampler_type,
-                                                 file_extension))
-            print(filename)
+def main():
+    """Main function."""
+    for api, requirement in REQUIREMENTS.iteritems():
+        lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
 
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+        for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
+            for execution_stage in ("vs", "fs"):
+                file_extension = 'frag' if execution_stage == 'fs' else 'vert'
+                filename = os.path.join(
+                    "spec", api.lower(), "compiler", "built-in-functions",
+                    "textureQuery{0}-{1}.{2}".format(lod, sampler_type,
+                                                     file_extension))
+                print(filename)
 
-            version = requirement['version']
-            extensions = [requirement['extension']] if requirement['extension'] else []
+                dirname = os.path.dirname(filename)
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
 
-            # samplerCubeArray types are part GLSL 4.00
-            # or GL_ARB_texture_cube_map_array.
-            if api == "ARB_texture_query_lod" and sampler_type in [
-                    'samplerCubeArray', 'isamplerCubeArray',
-                    'usamplerCubeArray', 'samplerCubeArrayShadow']:
-                extensions += ['GL_ARB_texture_cube_map_array']
+                version = requirement['version']
+                extensions = [requirement['extension']] if requirement['extension'] else []
 
-            with open(filename, "w") as f:
-                f.write(TEMPLATE.render(version=version,
-                                        extensions=extensions,
-                                        execution_stage=execution_stage,
-                                        sampler_type=sampler_type,
-                                        coord_type=coord_type,
-                                        Lod=Lod))
+                # samplerCubeArray types are part GLSL 4.00
+                # or GL_ARB_texture_cube_map_array.
+                if api == "ARB_texture_query_lod" and sampler_type in [
+                        'samplerCubeArray', 'isamplerCubeArray',
+                        'usamplerCubeArray', 'samplerCubeArrayShadow']:
+                    extensions += ['GL_ARB_texture_cube_map_array']
+
+                with open(filename, "w") as f:
+                    f.write(TEMPLATE.render(version=version,
+                                            extensions=extensions,
+                                            execution_stage=execution_stage,
+                                            sampler_type=sampler_type,
+                                            coord_type=coord_type,
+                                            lod=lod))
+
+
+if __name__ == '__main__':
+    main()
