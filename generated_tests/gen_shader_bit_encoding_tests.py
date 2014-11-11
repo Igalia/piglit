@@ -21,6 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function
 import struct
 import os
 from operator import neg
@@ -148,7 +149,7 @@ def main():
                         'built-in-functions',
                         "{0}-{1}{2}.shader_test".format(execution_stage, func,
                                                         modifier_name))
-                    print filename
+                    print(filename)
 
                     dirname = os.path.dirname(filename)
                     if not os.path.exists(dirname):
@@ -159,19 +160,19 @@ def main():
                     elif in_modifier_func == 'neg_abs':
                         in_modifier_func = '-abs'
 
-                    f = open(filename, 'w')
-                    f.write(TEMPLATE.render(version=version,
-                                            extensions=extensions,
-                                            execution_stage=execution_stage,
-                                            func=func,
-                                            modifier_func=modifier_func,
-                                            in_modifier_func=in_modifier_func,
-                                            in_func=in_func,
-                                            out_func=out_func,
-                                            input_type=input_type,
-                                            output_type=output_type,
-                                            test_data=test_data))
-                    f.close()
+                    with open(filename, 'w') as f:
+                        f.write(TEMPLATE.render(
+                            version=version,
+                            extensions=extensions,
+                            execution_stage=execution_stage,
+                            func=func,
+                            modifier_func=modifier_func,
+                            in_modifier_func=in_modifier_func,
+                            in_func=in_func,
+                            out_func=out_func,
+                            input_type=input_type,
+                            output_type=output_type,
+                            test_data=test_data))
 
 
 if __name__ == '__main__':
