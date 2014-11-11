@@ -90,15 +90,17 @@ TEST_VECTORS = [
 
 def main():
     """ Main function """
-    try:
-        os.makedirs('spec/glsl-1.20/execution/built-in-functions')
-    except OSError:
-        pass
+    dirname = os.path.join('spec', 'glsl-1.20', 'execution',
+                           'built-in-functions')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
     for test_id, x in enumerate(TEST_VECTORS, start=2):
         # make equal tests
-        name = ("spec/glsl-1.20/execution/built-in-functions/"
-                "glsl-const-builtin-equal-{0:02d}.shader_test".format(test_id))
+        name = os.path.join(
+            dirname,
+            "glsl-const-builtin-equal-{0:02d}.shader_test".format(test_id))
+
         print(name)
 
         with open(name, 'w') as f:
@@ -106,9 +108,9 @@ def main():
                 func='equal', input=x[0:2], expected=x[2]))
 
         # make notEqual tests
-        name = ("spec/glsl-1.20/execution/built-in-functions/"
-                "glsl-const-builtin-notEqual-{0:02d}.shader_test".format(
-                    test_id))
+        name = os.path.join(
+            dirname,
+            "glsl-const-builtin-notEqual-{0:02d}.shader_test".format(test_id))
 
         # When generating the notEqual tests, each of the values in the
         # expected result vector need to be inverted
@@ -121,6 +123,7 @@ def main():
         with open(name, 'w') as f:
             f.write(TEMPLATE.render_unicode(
                 func='notEqual', input=x[0:2], expected=expected))
+
 
 if __name__ == "__main__":
     main()
