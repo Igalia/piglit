@@ -1,16 +1,16 @@
 [require]
-GLSL >= ${"{0}.{1}".format(major, minor)}
+GLSL >= ${major}.${minor}
 
 [vertex shader]
 varying vec4 color;
 
-% for (type, name, value) in type_list:
-uniform ${type} ${name};
+% for type_, name, _ in type_list:
+uniform ${type_} ${name};
 % endfor
 
 void main()
 {
-  if (${"\n      && ".join('{0} == {1}'.format(name, value) for type, name, value in type_list)}) {
+  if (${" && ".join('{0} == {1}'.format(name, value) for _, name, value in type_list)}) {
     color = vec4(0, 1, 0, 1);
   } else {
     color = vec4(1, 0, 0, 1);
@@ -22,8 +22,8 @@ void main()
 [fragment shader]
 varying vec4 color;
 
-% for (type, name, value) in type_list:
-uniform ${type} ${name} = ${value};
+% for type_, name, value in type_list:
+uniform ${type_} ${name} = ${value};
 % endfor
 
 void main()
