@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright © 2012 Intel Corporation
+# Copyright © 2012, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,143 +21,79 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function
 import os
+import itertools
+
+from templates import template_dir
+
+TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
+
+_NAMES = {
+    "++t": "preincrement",
+    "--t": "predecrement",
+    "t++": "postincrement",
+    "t--": "postdecrement",
+}
 
 
-class Test(object):
-    def __init__(self, type_name, op, usage, shader_target):
-        self.type_name = type_name
-        self.op = op
-        self.usage = usage
-        self.shader_target = shader_target
+def generate(dirname, type_name, op, usage, shader_target):
+    """Generate glsl parser tests."""
+    if type_name.endswith('2'):
+        var_as_vec4 = 'vec4(t.xyxy)'
+        components = '.xy'
+    elif type_name.endswith('3'):
+        var_as_vec4 = 'vec4(t.xyzx)'
+        components = '.xyz'
+    elif type_name.endswith('4'):
+        var_as_vec4 = 'vec4(t)'
+        components = ''
+    else:
+        var_as_vec4 = 'vec4(t)'
+        components = '.x'
 
-    def filename(self):
-        if self.op == "++t":
-            name_base = "preincrement"
-        elif self.op == "--t":
-            name_base = "predecrement"
-        elif self.op == "t++":
-            name_base = "postincrement"
-        elif self.op == "t--":
-            name_base = "postdecrement"
+    if shader_target == 'vert':
+        dest = "gl_Position"
+        mode = 'attribute'
+    else:
+        mode = 'varying'
+        dest = "gl_FragColor"
 
-        return os.path.join('spec',
-                            'glsl-1.10',
-                            'compiler',
-                            'expressions',
-                            '{0}-{1}-non-lvalue-for-{2}.{3}'.format(
-                                name_base, self.type_name, self.usage,
-                                self.shader_target))
+    filename = os.path.join(
+        dirname,
+        '{0}-{1}-non-lvalue-for-{2}.{3}'.format(
+            _NAMES[op], type_name, usage, shader_target))
 
-    def generate(self):
-        if self.usage == 'assignment':
-            test = """/* [config]
- * expect_result: fail
- * glsl_version: 1.10
- * [end config]
- *
- * Page 32 (page 38 of the PDF) of the GLSL 1.10 spec says:
- *
- *     "Variables that are built-in types, entire structures, structure
- *     fields, l-values with the field selector ( . ) applied to select
- *     components or swizzles without repeated fields, and l-values
- *     dereferenced with the array subscript operator ( [ ] ) are all
- *     l-values. Other binary or unary expressions, non-dereferenced arrays,
- *     function names, swizzles with repeated fields, and constants cannot be
- *     l-values.  The ternary operator (?:) is also not allowed as an
- *     l-value."
- */
-uniform {self.type_name} u;
-{mode} vec4 v;
-
-void main()
-{{
-    {self.type_name} t = u;
-
-    {self.op} = {self.type_name}(v{components});
-    {dest} = {var_as_vec4};
-}}
-"""
-        else:
-            test = """/* [config]
- * expect_result: fail
- * glsl_version: 1.10
- * [end config]
- *
- * Page 32 (page 38 of the PDF) of the GLSL 1.10 spec says:
- *
- *     "Variables that are built-in types, entire structures, structure
- *     fields, l-values with the field selector ( . ) applied to select
- *     components or swizzles without repeated fields, and l-values
- *     dereferenced with the array subscript operator ( [ ] ) are all
- *     l-values. Other binary or unary expressions, non-dereferenced arrays,
- *     function names, swizzles with repeated fields, and constants cannot be
- *     l-values.  The ternary operator (?:) is also not allowed as an
- *     l-value."
- */
-uniform {self.type_name} u;
-{mode} vec4 v;
-
-void f(out {self.type_name} p)
-{{
-    p = {self.type_name}(v{components});
-}}
-
-void main()
-{{
-    {self.type_name} t = u;
-
-    f({self.op});
-    {dest} = {var_as_vec4};
-}}
-"""
-        if '2' in self.type_name:
-            var_as_vec4 = 'vec4(t.xyxy)'
-            components = '.xy'
-        elif '3' in self.type_name:
-            var_as_vec4 = 'vec4(t.xyzx)'
-            components = '.xyz'
-        elif '4' in self.type_name:
-            var_as_vec4 = 'vec4(t)'
-            components = ''
-        else:
-            var_as_vec4 = 'vec4(t)'
-            components = '.x'
-
-        if self.shader_target == 'vert':
-            dest = "gl_Position"
-            mode = 'attribute'
-        else:
-            mode = 'varying'
-            dest = "gl_FragColor"
-
-        test = test.format(self=self,
-                           components=components,
-                           dest=dest,
-                           var_as_vec4=var_as_vec4,
-                           mode=mode)
-
-        filename = self.filename()
-        dirname = os.path.dirname(filename)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-        with open(filename, 'w') as f:
-            f.write(test)
+    print(filename)
+    with open(filename, 'w') as f:
+        f.write(TEMPLATES.get_template(
+            '{}.glsl_parser_test.mako'.format(usage)).render(
+                type_name=type_name,
+                mode=mode,
+                dest=dest,
+                components=components,
+                var_as_vec4=var_as_vec4,
+                op=op))
 
 
 def all_tests():
-    for type_name in ['float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2', 'ivec3',
-                      'ivec4']:
-        for op in ["++t", "--t", "t++", "t--"]:
-            for usage in ['assignment', 'out-parameter']:
-                for shader_target in ['vert', 'frag']:
-                    yield Test(type_name, op, usage, shader_target)
+    type_name = ['float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2', 'ivec3',
+                 'ivec4']
+    op = ["++t", "--t", "t++", "t--"]
+    usage = ['assignment', 'out-parameter']
+    shader_target = ['vert', 'frag']
+
+    for t, o, u, s in itertools.product(type_name, op, usage, shader_target):
+        yield t, o, u, s
 
 
 def main():
-    for test in all_tests():
-        test.generate()
-        print test.filename()
+    dirname = os.path.join('spec', 'glsl-1.10', 'compiler', 'expressions')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    for args in all_tests():
+        generate(dirname, *args)
 
 
 if __name__ == '__main__':

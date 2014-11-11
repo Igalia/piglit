@@ -47,7 +47,10 @@ piglit_make_generated_tests(
 	gen_interpolation_tests.py)
 piglit_make_generated_tests(
 	non-lvalue_tests.list
-	gen_non-lvalue_tests.py)
+	gen_non-lvalue_tests.py
+	templates/gen_non-lvalue_tests/assignment.glsl_parser_test.mako
+	templates/gen_non-lvalue_tests/out-parameter.glsl_parser_test.mako
+	)
 piglit_make_generated_tests(
 	texture_query_lod_tests.list
 	gen_texture_query_lod_tests.py
