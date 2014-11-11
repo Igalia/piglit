@@ -23,6 +23,7 @@
 
 import struct
 import os
+from operator import neg
 
 from templates import template_file
 
@@ -42,14 +43,8 @@ def intBitsToFloat(i):
 def uintBitsToFloat(u):
     return struct.unpack('f', struct.pack('I', u))[0]
 
-def passthrough(f):
-    return f
-
-def neg(num):
-    return -num
-
 def neg_abs(num):
-    return -abs(num)
+    return neg(abs(num))
 
 def vec4(f):
     return [f, f, f, f]
@@ -79,13 +74,13 @@ test_data = {
 
 funcs = {
     'floatBitsToInt': {
-        'in_func':  passthrough,
+        'in_func':  lambda x: x,
         'out_func': floatBitsToInt,
         'input':    'vec4',
         'output':   'ivec4'
     },
     'floatBitsToUint': {
-        'in_func':  passthrough,
+        'in_func':  lambda x: x,
         'out_func': floatBitsToUint,
         'input':    'vec4',
         'output':   'uvec4'
@@ -105,10 +100,10 @@ funcs = {
 }
 
 modifier_funcs = {
-    '':            passthrough,
+    '':            lambda x: x,
     'abs':         abs,
     'neg':         neg,
-    'neg_abs':     neg_abs
+    'neg_abs':     neg_abs,
 }
 
 requirements = {
