@@ -54,17 +54,10 @@ ALL_TEMPLATES = ("",
                  "-set-by-other-stage")
 
 
-def open_src_file(filename):
-    """Open a file relative to the source directory"""
-    local_dir = os.path.dirname(__file__)
-    return open(os.path.join(local_dir, filename))
-
-
 def get_value(type_, idx):
     """Get a string representing a number in the specified GLSL type"""
 
-    idx = idx % len(RANDOM_NUMBERS)
-    value = RANDOM_NUMBERS[idx]
+    value = RANDOM_NUMBERS[idx % len(RANDOM_NUMBERS)]
 
     if type_[0] == 'b':
         if (value * 10) > 5:
@@ -80,22 +73,22 @@ def get_value(type_, idx):
 
 
 def generate_tests(type_list, base_name, major, minor):
+    dirname = os.path.join('spec',
+                           'glsl-{0}.{1}'.format(major, minor),
+                           'execution',
+                           'uniform-initializer')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
     for target in ("vs", "fs"):
         for t in ALL_TEMPLATES:
             template = TEMPLATES.get_template(
                 "{0}-initializer{1}.shader_test.mako".format(target, t))
 
             test_file_name = os.path.join(
-                'spec',
-                'glsl-{0}.{1}'.format(major, minor),
-                'execution',
-                'uniform-initializer',
+                dirname,
                 '{0}-{1}{2}.shader_test'.format(target, base_name, t))
             print(test_file_name)
-
-            dirname = os.path.dirname(test_file_name)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
 
             # Generate the test vectors.  This is a list of tuples.  Each
             # tuple is a type name paired with a value.  The value is
@@ -105,11 +98,10 @@ def generate_tests(type_list, base_name, major, minor):
             # the OpenGL API.  Some of the tests use this information.
             test_vectors = []
             api_vectors = []
-            j = 0
-            for type_, num_values in type_list:
+            for i, (type_, num_values) in enumerate(type_list):
                 numbers = []
                 alt_numbers = []
-                for i in xrange(num_values):
+                for j in xrange(num_values):
                     numbers.append(get_value(type_, i + j))
                     alt_numbers.append(get_value(type_, i + j + 7))
 
@@ -122,67 +114,64 @@ def generate_tests(type_list, base_name, major, minor):
                     api_type = "ivec{0}".format(type_[-1])
 
                 if type_[-1] in ["2", "3", "4"]:
-                    name = "".join(["u", type_[0], type_[-1]])
+                    name = 'u{}{}'.format(type_[0], type_[-1])
                 else:
-                    name = "".join(["u", type_[0]])
+                    name = 'u{}'.format(type_[0])
 
                 test_vectors.append((type_, name, value))
                 api_vectors.append((api_type, name, alt_numbers))
-                j = j + 1
 
-            f = open(test_file_name, "w")
-            f.write(template.render(type_list=test_vectors,
-                                    api_types=api_vectors,
-                                    major=major,
-                                    minor=minor))
-            f.close()
+            with open(test_file_name, "w") as f:
+                f.write(template.render(type_list=test_vectors,
+                                        api_types=api_vectors,
+                                        major=major,
+                                        minor=minor))
 
 
 def generate_array_tests(type_list, base_name, major, minor):
+    dirname = os.path.join('spec',
+                           'glsl-{0}.{1}'.format(major, minor),
+                           'execution',
+                           'uniform-initializer')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
+
+    def parts():
+        """Generate parts."""
+        # pylint: disable=undefined-loop-variable
+        for j in xrange(2):
+            numbers = []
+            for k in xrange(num_values):
+                numbers.append(get_value(type_, i + j + k))
+
+            yield '{}({})'.format(type_, ', '.join(numbers))
+        # pylint: enable=undefined-loop-variable
+
+    vecs = []
+    for i, (type_, num_values) in enumerate(type_list):
+        if type_[-1] in ["2", "3", "4"]:
+            name = 'u{}{}'.format(type_[0], type_[-1])
+        else:
+            name = 'u{}'.format(type_[0])
+
+        array_type = '{}[2]'.format(type_)
+        value = "{0}({1})".format(array_type, ", ".join(parts()))
+
+        vecs.append((array_type, name, value))
+
     for target in ("vs", "fs"):
         template = TEMPLATES.get_template(
             '{0}-initializer.shader_test.mako'.format(target))
 
         test_file_name = os.path.join(
-            'spec',
-            'glsl-{0}.{1}'.format(major, minor),
-            'execution',
-            'uniform-initializer',
+            dirname,
             '{0}-{1}-array.shader_test'.format(target, base_name))
         print(test_file_name)
 
-        dirname = os.path.dirname(test_file_name)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
-        test_vectors = []
-        j = 0
-        for type_, num_values in type_list:
-
-            constructor_parts = []
-            for element in range(2):
-                numbers = []
-                for i in range(num_values):
-                    numbers.append(get_value(type_, i + element + j))
-
-                constructor_parts.append("{0}({1})".format(type_,
-                                                           ", ".join(numbers)))
-
-            if type_[-1] in ["2", "3", "4"]:
-                name = "".join(["u", type_[0], type_[-1]])
-            else:
-                name = "".join(["u", type_[0]])
-
-            array_type = "".join([format(type_), "[2]"])
-            value = "{0}({1})".format(array_type, ", ".join(constructor_parts))
-            test_vectors.append((array_type, name, value))
-            j = j + 1
-
-        f = open(test_file_name, "w")
-        f.write(template.render(type_list=test_vectors,
-                                major=major,
-                                minor=minor))
-        f.close()
+        with open(test_file_name, "w") as f:
+            f.write(template.render(type_list=vecs,
+                                    major=major,
+                                    minor=minor))
 
 
 def main():
