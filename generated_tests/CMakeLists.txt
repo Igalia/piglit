@@ -84,7 +84,13 @@ piglit_make_generated_tests(
 	generate-cl-relational-builtins.py)
 piglit_make_generated_tests(
 	interpolation-qualifier-built-in-variable.list
-	interpolation-qualifier-built-in-variable.py)
+	interpolation-qualifier-built-in-variable.py
+	templates/interpolation-qualifier-built-in-variable/fs-vs-unused.shader_test.mako
+	templates/interpolation-qualifier-built-in-variable/vs-unused.shader_test.mako
+	templates/interpolation-qualifier-built-in-variable/fs-unused.shader_test.mako
+	templates/interpolation-qualifier-built-in-variable/vs-fs-flip.shader_test.mako
+	templates/interpolation-qualifier-built-in-variable/vs-fs.shader_test.mako
+	)
 piglit_make_generated_tests(
 	texture_lod_tests.list
 	gen_texture_lod_tests.py
