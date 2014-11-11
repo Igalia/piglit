@@ -41,7 +41,9 @@ piglit_make_generated_tests(
 	gen_non-lvalue_tests.py)
 piglit_make_generated_tests(
 	texture_query_lod_tests.list
-	gen_texture_query_lod_tests.py)
+	gen_texture_query_lod_tests.py
+	templates/gen_texture_query_lod_tests/template.glsl_parser_test.mako
+	)
 piglit_make_generated_tests(
 	shader_bit_encoding_tests.list
 	gen_shader_bit_encoding_tests.py
