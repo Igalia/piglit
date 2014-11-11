@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright © 2013 Intel Corporation
+# Copyright © 2013, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,11 +21,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-import struct
+from __future__ import print_function
 import os
-import os.path
-from mako.template import Template
 from textwrap import dedent
+
+from mako.template import Template
 
 interpolation_modes = [
     'flat',
@@ -103,26 +103,26 @@ for fs_mode in interpolation_modes:
             continue
 
         for var in vertex_shader_variables:
-            filename = os.path.join('spec',
-                                    'glsl-1.30',
-                                    'linker',
-                                    'interpolation-qualifiers',
-                                    '{0}-{1}-{2}-{3}.shader_test'.format(vs_mode,
-                                                                         var,
-                                                                         fs_mode,
-                                                                         vertex_shader_to_fragment_shader_variable_map[var]))
-            print filename
+            filename = os.path.join(
+                'spec',
+                'glsl-1.30',
+                'linker',
+                'interpolation-qualifiers',
+                '{0}-{1}-{2}-{3}.shader_test'.format(
+                    vs_mode, var, fs_mode,
+                    vertex_shader_to_fragment_shader_variable_map[var]))
+            print(filename)
 
             dirname = os.path.dirname(filename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
 
-            f = open(filename, 'w')
-            f.write(template.render(vs_mode=vs_mode,
-                                    vs_variable=var,
-                                    fs_mode=fs_mode,
-                                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
-            f.close()
+            with open(filename, 'w') as f:
+                f.write(template.render(
+                    vs_mode=vs_mode,
+                    vs_variable=var,
+                    fs_mode=fs_mode,
+                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
 
 template = Template(dedent("""\
     # Section 4.3.7 (Interpolation) of the GLSL 1.30 spec says:
@@ -167,23 +167,22 @@ for vs_mode in interpolation_modes:
         continue
 
     for var in vertex_shader_variables:
-        filename = os.path.join('spec',
-                                'glsl-1.30',
-                                'linker',
-                                'interpolation-qualifiers',
-                                '{0}-{1}-unused-{2}.shader_test'.format(vs_mode,
-                                                                        var,
-                                                                        vertex_shader_to_fragment_shader_variable_map[var]))
-        print filename
+        filename = os.path.join(
+            'spec',
+            'glsl-1.30',
+            'linker',
+            'interpolation-qualifiers',
+            '{0}-{1}-unused-{2}.shader_test'.format(vs_mode, var,
+                vertex_shader_to_fragment_shader_variable_map[var]))
+        print(filename)
 
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        f = open(filename, 'w')
-        f.write(template.render(vs_mode=vs_mode,
-                                vs_variable=var))
-        f.close()
+        with open(filename, 'w') as f:
+            f.write(template.render(vs_mode=vs_mode,
+                                    vs_variable=var))
 
 template = Template(dedent("""\
     # Section 4.3.7 (Interpolation) of the GLSL 1.30 spec says:
@@ -228,25 +227,26 @@ for fs_mode in interpolation_modes:
         continue
 
     for var in vertex_shader_variables_front_only:
-        filename = os.path.join('spec',
-                                'glsl-1.30',
-                                'linker',
-                                'interpolation-qualifiers',
-                                'unused-{0}-{1}-{2}.shader_test'.format(var,
-                                                                        fs_mode,
-                                                                        vertex_shader_to_fragment_shader_variable_map[var]))
-        print filename
+        filename = os.path.join(
+            'spec',
+            'glsl-1.30',
+            'linker',
+            'interpolation-qualifiers',
+            'unused-{0}-{1}-{2}.shader_test'.format(
+                var, fs_mode,
+                vertex_shader_to_fragment_shader_variable_map[var]))
+        print(filename)
 
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        f = open(filename, 'w')
-        f.write(template.render(vs_mode=vs_mode,
-                                vs_variable=var,
-                                fs_mode=fs_mode,
-                                fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
-        f.close()
+        with open(filename, 'w') as f:
+            f.write(template.render(
+                vs_mode=vs_mode,
+                vs_variable=var,
+                fs_mode=fs_mode,
+                fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
 
 
 template = Template(dedent("""\
@@ -298,26 +298,26 @@ for fs_mode in interpolation_modes:
             continue
 
         for var in vertex_shader_variables:
-            filename = os.path.join('spec',
-                                    'glsl-1.30',
-                                    'linker',
-                                    'interpolation-qualifiers',
-                                    'unused-{0}-{1}-unused-{2}-{3}.shader_test'.format(vs_mode,
-                                                                                       var,
-                                                                                       fs_mode,
-                                                                                       vertex_shader_to_fragment_shader_variable_map[var]))
-            print filename
+            filename = os.path.join(
+                'spec',
+                'glsl-1.30',
+                'linker',
+                'interpolation-qualifiers',
+                'unused-{0}-{1}-unused-{2}-{3}.shader_test'.format(
+                    vs_mode, var, fs_mode,
+                    vertex_shader_to_fragment_shader_variable_map[var]))
+            print(filename)
 
             dirname = os.path.dirname(filename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
 
-            f = open(filename, 'w')
-            f.write(template.render(vs_mode=vs_mode,
-                                    vs_variable=var,
-                                    fs_mode=fs_mode,
-                                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
-            f.close()
+            with open(filename, 'w') as f:
+                f.write(template.render(
+                    vs_mode=vs_mode,
+                    vs_variable=var,
+                    fs_mode=fs_mode,
+                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
 
 
 template = Template(dedent("""\
@@ -367,24 +367,23 @@ for fs_mode in interpolation_modes:
 
         for this_side in vertex_shader_variables:
             other_side = other_side_map[this_side]
-            filename = os.path.join('spec',
-                                    'glsl-1.30',
-                                    'linker',
-                                    'interpolation-qualifiers',
-                                    '{0}-{1}-{2}-{3}.shader_test'.format(vs_mode,
-                                                                         this_side,
-                                                                         fs_mode,
-                                                                         other_side))
-            print filename
+            filename = os.path.join(
+                'spec',
+                'glsl-1.30',
+                'linker',
+                'interpolation-qualifiers',
+                '{0}-{1}-{2}-{3}.shader_test'.format(
+                    vs_mode, this_side, fs_mode, other_side))
+            print(filename)
 
             dirname = os.path.dirname(filename)
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
 
-            f = open(filename, 'w')
-            f.write(template.render(vs_mode=vs_mode,
-                                    this_side_variable=this_side,
-                                    other_side_variable=other_side,
-                                    fs_mode=fs_mode,
-                                    fs_variable=vertex_shader_to_fragment_shader_variable_map[this_side]))
-            f.close()
+            with open(filename, 'w') as f:
+                f.write(template.render(
+                    vs_mode=vs_mode,
+                    this_side_variable=this_side,
+                    other_side_variable=other_side,
+                    fs_mode=fs_mode,
+                    fs_variable=vertex_shader_to_fragment_shader_variable_map[this_side]))
