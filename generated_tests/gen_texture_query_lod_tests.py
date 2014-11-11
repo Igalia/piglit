@@ -68,11 +68,11 @@ SAMPLER_TYPE_TO_COORD_TYPE = {
 REQUIREMENTS = {
     'ARB_texture_query_lod': {
         'version': '1.30',
-        'extension': 'GL_ARB_texture_query_lod'
+        'extensions': 'GL_ARB_texture_query_lod'
     },
     'glsl-4.00': {
         'version': '4.00',
-        'extension': ''
+        'extensions': None
     }
 }
 
@@ -123,6 +123,15 @@ def main():
             os.makedirs(dirname)
 
         for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
+            requirements = [requirement['extensions']] if requirement['extensions'] else []
+
+            # samplerCubeArray types are part GLSL 4.00
+            # or GL_ARB_texture_cube_map_array.
+            if api == "ARB_texture_query_lod" and sampler_type in [
+                    'samplerCubeArray', 'isamplerCubeArray',
+                    'usamplerCubeArray', 'samplerCubeArrayShadow']:
+                requirements.append('GL_ARB_texture_cube_map_array')
+
             for execution_stage in ("vs", "fs"):
                 file_extension = 'frag' if execution_stage == 'fs' else 'vert'
                 filename = os.path.join(
@@ -131,23 +140,14 @@ def main():
                                                      file_extension))
                 print(filename)
 
-                version = requirement['version']
-                extensions = [requirement['extension']] if requirement['extension'] else []
-
-                # samplerCubeArray types are part GLSL 4.00
-                # or GL_ARB_texture_cube_map_array.
-                if api == "ARB_texture_query_lod" and sampler_type in [
-                        'samplerCubeArray', 'isamplerCubeArray',
-                        'usamplerCubeArray', 'samplerCubeArrayShadow']:
-                    extensions += ['GL_ARB_texture_cube_map_array']
-
                 with open(filename, "w") as f:
-                    f.write(TEMPLATE.render(version=version,
-                                            extensions=extensions,
-                                            execution_stage=execution_stage,
-                                            sampler_type=sampler_type,
-                                            coord_type=coord_type,
-                                            lod=lod))
+                    f.write(TEMPLATE.render(
+                        version=requirement['version'],
+                        extensions=requirements,
+                        execution_stage=execution_stage,
+                        sampler_type=sampler_type,
+                        coord_type=coord_type,
+                        lod=lod))
 
 
 if __name__ == '__main__':
