@@ -24,7 +24,11 @@ from __future__ import print_function
 import os
 import itertools
 import collections
-import mako.template
+
+from templates import template_file
+
+TEMPLATE = template_file(os.path.splitext(os.path.basename(__file__))[0],
+                         'template.shader_test.mako')
 
 Parameters = collections.namedtuple(
     'Paramters', ['columns', 'rows', 'vec_type', 'matrix'])
@@ -39,10 +43,6 @@ def main():
 
     name = ('spec/glsl-1.20/execution/'
             '{shader}-outerProduct-{type}{mat}{vec}.shader_test')
-
-    template = mako.template.Template(filename=
-        os.path.join(os.path.dirname(__file__),
-                     'gen_outerproduct_template.mako'))
 
     for c, r in itertools.product(xrange(2, 5), repeat=2):
         vecs = [
@@ -67,9 +67,10 @@ def main():
                     print(_name)
 
                     with open(_name, 'w+') as f:
-                        f.write(template.render_unicode(params=params,
+                        f.write(TEMPLATE.render_unicode(params=params,
                                                         type=type,
                                                         shader=shader))
+
 
 if __name__ == '__main__':
     main()

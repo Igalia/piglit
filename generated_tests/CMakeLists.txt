@@ -98,7 +98,8 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	outerproduct_tests.list
 	gen_outerproduct_tests.py
-	gen_outerproduct_template.mako)
+	templates/gen_outerproduct_tests/template.shader_test.mako
+	)
 
 piglit_make_generated_tests(
 	builtin_uniform_tests_fp64.list
