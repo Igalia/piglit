@@ -21,6 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function
 import os
 import os.path
 from textwrap import dedent
@@ -121,7 +122,7 @@ for api, requirement in REQUIREMENTS.iteritems():
                 "spec", api.lower(), "compiler", "built-in-functions",
                 "textureQuery{0}-{1}.{2}".format(Lod, sampler_type,
                                                  file_extension))
-            print filename
+            print(filename)
 
             dirname = os.path.dirname(filename)
             if not os.path.exists(dirname):
@@ -137,11 +138,10 @@ for api, requirement in REQUIREMENTS.iteritems():
                     'usamplerCubeArray', 'samplerCubeArrayShadow']:
                 extensions += ['GL_ARB_texture_cube_map_array']
 
-            f = open(filename, "w")
-            f.write(TEMPLATE.render(version=version,
-                                    extensions=extensions,
-                                    execution_stage=execution_stage,
-                                    sampler_type=sampler_type,
-                                    coord_type=coord_type,
-                                    Lod=Lod))
-            f.close()
+            with open(filename, "w") as f:
+                f.write(TEMPLATE.render(version=version,
+                                        extensions=extensions,
+                                        execution_stage=execution_stage,
+                                        sampler_type=sampler_type,
+                                        coord_type=coord_type,
+                                        Lod=Lod))
