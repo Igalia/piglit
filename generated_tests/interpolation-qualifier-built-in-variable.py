@@ -62,142 +62,114 @@ vertex_shader_to_fragment_shader_variable_map = {
 }
 
 
-for fs_mode in interpolation_modes:
-    for vs_mode in interpolation_modes:
-        if vs_mode == fs_mode:
-            continue
+def main():
+    """main function."""
+    dirname = os.path.join('spec', 'glsl-1.30', 'linker',
+                           'interpolation-qualifiers')
 
-        for var in vertex_shader_variables:
-            filename = os.path.join(
-                'spec',
-                'glsl-1.30',
-                'linker',
-                'interpolation-qualifiers',
-                '{0}-{1}-{2}-{3}.shader_test'.format(
-                    vs_mode, var, fs_mode,
-                    vertex_shader_to_fragment_shader_variable_map[var]))
-            print(filename)
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+    for fs_mode in interpolation_modes:
+        for vs_mode in interpolation_modes:
+            if vs_mode == fs_mode:
+                continue
 
-            with open(filename, 'w') as f:
-                f.write(TEMPLATES.get_template('vs-fs.shader_test.mako').render(
-                    vs_mode=vs_mode,
-                    vs_variable=var,
-                    fs_mode=fs_mode,
-                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+            for var in vertex_shader_variables:
+                filename = os.path.join(
+                    dirname,
+                    '{0}-{1}-{2}-{3}.shader_test'.format(
+                        vs_mode, var, fs_mode,
+                        vertex_shader_to_fragment_shader_variable_map[var]))
+                print(filename)
 
-
-for vs_mode in interpolation_modes:
-    if vs_mode == 'default':
-        continue
-
-    for var in vertex_shader_variables:
-        filename = os.path.join(
-            'spec',
-            'glsl-1.30',
-            'linker',
-            'interpolation-qualifiers',
-            '{0}-{1}-unused-{2}.shader_test'.format(vs_mode, var,
-                vertex_shader_to_fragment_shader_variable_map[var]))
-        print(filename)
-
-        dirname = os.path.dirname(filename)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
-        with open(filename, 'w') as f:
-            f.write(
-                TEMPLATES.get_template('vs-unused.shader_test.mako').render(
-                    vs_mode=vs_mode,
-                    vs_variable=var))
-
-
-for fs_mode in interpolation_modes:
-    if fs_mode == 'default':
-        continue
-
-    for var in vertex_shader_variables_front_only:
-        filename = os.path.join(
-            'spec',
-            'glsl-1.30',
-            'linker',
-            'interpolation-qualifiers',
-            'unused-{0}-{1}-{2}.shader_test'.format(
-                var, fs_mode,
-                vertex_shader_to_fragment_shader_variable_map[var]))
-        print(filename)
-
-        dirname = os.path.dirname(filename)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
-
-        with open(filename, 'w') as f:
-            f.write(TEMPLATES.get_template('fs-unused.shader_test.mako').render(
-                vs_mode=vs_mode,
-                vs_variable=var,
-                fs_mode=fs_mode,
-                fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
-
-
-
-for fs_mode in interpolation_modes:
-    for vs_mode in interpolation_modes:
-        if vs_mode == fs_mode:
-            continue
-
-        for var in vertex_shader_variables:
-            filename = os.path.join(
-                'spec',
-                'glsl-1.30',
-                'linker',
-                'interpolation-qualifiers',
-                'unused-{0}-{1}-unused-{2}-{3}.shader_test'.format(
-                    vs_mode, var, fs_mode,
-                    vertex_shader_to_fragment_shader_variable_map[var]))
-            print(filename)
-
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
-
-            with open(filename, 'w') as f:
-                f.write(TEMPLATES.get_template(
-                    'fs-vs-unused.shader_test.mako').render(
+                with open(filename, 'w') as f:
+                    f.write(TEMPLATES.get_template('vs-fs.shader_test.mako').render(
                         vs_mode=vs_mode,
                         vs_variable=var,
                         fs_mode=fs_mode,
                         fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
 
 
-
-for fs_mode in interpolation_modes:
     for vs_mode in interpolation_modes:
-        if vs_mode == fs_mode:
+        if vs_mode == 'default':
             continue
 
-        for this_side in vertex_shader_variables:
-            other_side = other_side_map[this_side]
+        for var in vertex_shader_variables:
             filename = os.path.join(
-                'spec',
-                'glsl-1.30',
-                'linker',
-                'interpolation-qualifiers',
-                '{0}-{1}-{2}-{3}.shader_test'.format(
-                    vs_mode, this_side, fs_mode, other_side))
+                dirname,
+                '{0}-{1}-unused-{2}.shader_test'.format(vs_mode, var,
+                    vertex_shader_to_fragment_shader_variable_map[var]))
             print(filename)
 
-            dirname = os.path.dirname(filename)
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+            with open(filename, 'w') as f:
+                f.write(
+                    TEMPLATES.get_template('vs-unused.shader_test.mako').render(
+                        vs_mode=vs_mode,
+                        vs_variable=var))
+
+    for fs_mode in interpolation_modes:
+        if fs_mode == 'default':
+            continue
+
+        for var in vertex_shader_variables_front_only:
+            filename = os.path.join(
+                dirname,
+                'unused-{0}-{1}-{2}.shader_test'.format(
+                    var, fs_mode,
+                    vertex_shader_to_fragment_shader_variable_map[var]))
+            print(filename)
 
             with open(filename, 'w') as f:
-                f.write(TEMPLATES.get_template(
-                    'vs-fs-flip.shader_test.mako').render(
-                        vs_mode=vs_mode,
-                        this_side_variable=this_side,
-                        other_side_variable=other_side,
-                        fs_mode=fs_mode,
-                        fs_variable=vertex_shader_to_fragment_shader_variable_map[this_side]))
+                f.write(TEMPLATES.get_template('fs-unused.shader_test.mako').render(
+                    vs_mode=vs_mode,
+                    vs_variable=var,
+                    fs_mode=fs_mode,
+                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+
+    for fs_mode in interpolation_modes:
+        for vs_mode in interpolation_modes:
+            if vs_mode == fs_mode:
+                continue
+
+            for var in vertex_shader_variables:
+                filename = os.path.join(
+                    dirname,
+                    'unused-{0}-{1}-unused-{2}-{3}.shader_test'.format(
+                        vs_mode, var, fs_mode,
+                        vertex_shader_to_fragment_shader_variable_map[var]))
+                print(filename)
+
+                with open(filename, 'w') as f:
+                    f.write(TEMPLATES.get_template(
+                        'fs-vs-unused.shader_test.mako').render(
+                            vs_mode=vs_mode,
+                            vs_variable=var,
+                            fs_mode=fs_mode,
+                            fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+
+    for fs_mode in interpolation_modes:
+        for vs_mode in interpolation_modes:
+            if vs_mode == fs_mode:
+                continue
+
+            for this_side in vertex_shader_variables:
+                other_side = other_side_map[this_side]
+                filename = os.path.join(
+                    dirname,
+                    '{0}-{1}-{2}-{3}.shader_test'.format(
+                        vs_mode, this_side, fs_mode, other_side))
+                print(filename)
+
+                with open(filename, 'w') as f:
+                    f.write(TEMPLATES.get_template(
+                        'vs-fs-flip.shader_test.mako').render(
+                            vs_mode=vs_mode,
+                            this_side_variable=this_side,
+                            other_side_variable=other_side,
+                            fs_mode=fs_mode,
+                            fs_variable=vertex_shader_to_fragment_shader_variable_map[this_side]))
+
+
+if __name__ == '__main__':
+    main()
