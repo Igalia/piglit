@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright © 2012 Intel Corporation
+# Copyright © 2012, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,10 @@
 
 import os
 import os.path
-from mako.template import Template
+
+from templates import template_dir
+
+TEMPLATES = template_dir(os.path.splitext(os.path.basename(__file__))[0])
 
 
 def open_src_file(filename):
@@ -54,12 +57,8 @@ def get_value(type, idx):
 def generate_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
         for t in all_templates:
-            template_file_name = (
-                "uniform-initializer-templates/"
-                "{0}-initializer{1}.template".format(target, t))
-            f = open_src_file(template_file_name)
-            template = f.read()
-            f.close()
+            template = TEMPLATES.get_template(
+                "{0}-initializer{1}.shader_test.mako".format(target, t))
 
             test_file_name = os.path.join(
                 'spec',
@@ -107,20 +106,17 @@ def generate_tests(type_list, base_name, major, minor):
                 j = j + 1
 
             f = open(test_file_name, "w")
-            f.write(Template(template).render(type_list=test_vectors,
-                                              api_types=api_vectors,
-                                              major=major,
-                                              minor=minor))
+            f.write(template.render(type_list=test_vectors,
+                                    api_types=api_vectors,
+                                    major=major,
+                                    minor=minor))
             f.close()
 
 
 def generate_array_tests(type_list, base_name, major, minor):
     for target in ("vs", "fs"):
-        template_file_name = \
-            "uniform-initializer-templates/{0}-initializer.template".format(target)
-        f = open_src_file(template_file_name)
-        template = f.read()
-        f.close()
+        template = TEMPLATES.get_template(
+            '{0}-initializer.shader_test.mako'.format(target))
 
         test_file_name = os.path.join(
             'spec',
@@ -158,9 +154,9 @@ def generate_array_tests(type_list, base_name, major, minor):
             j = j + 1
 
         f = open(test_file_name, "w")
-        f.write(Template(template).render(type_list=test_vectors,
-                                          major=major,
-                                          minor=minor))
+        f.write(template.render(type_list=test_vectors,
+                                major=major,
+                                minor=minor))
         f.close()
 
 # These are a set of pseudo random values used by the number sequence

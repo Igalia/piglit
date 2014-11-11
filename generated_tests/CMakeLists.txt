@@ -61,14 +61,14 @@ piglit_make_generated_tests(
 piglit_make_generated_tests(
 	uniform-initializer_tests.list
 	gen_uniform_initializer_tests.py
-	uniform-initializer-templates/fs-initializer.template
-	uniform-initializer-templates/vs-initializer.template
-	uniform-initializer-templates/fs-initializer-from-const.template
-	uniform-initializer-templates/vs-initializer-from-const.template
-	uniform-initializer-templates/fs-initializer-set-by-API.template
-	uniform-initializer-templates/vs-initializer-set-by-API.template
-	uniform-initializer-templates/fs-initializer-set-by-other-stage.template
-	uniform-initializer-templates/vs-initializer-set-by-other-stage.template
+	templates/gen_uniform_initializer_tests/fs-initializer.shader_test.mako
+	templates/gen_uniform_initializer_tests/vs-initializer.shader_test.mako
+	templates/gen_uniform_initializer_tests/fs-initializer-from-const.shader_test.mako
+	templates/gen_uniform_initializer_tests/vs-initializer-from-const.shader_test.mako
+	templates/gen_uniform_initializer_tests/fs-initializer-set-by-API.shader_test.mako
+	templates/gen_uniform_initializer_tests/vs-initializer-set-by-API.shader_test.mako
+	templates/gen_uniform_initializer_tests/fs-initializer-set-by-other-stage.shader_test.mako
+	templates/gen_uniform_initializer_tests/vs-initializer-set-by-other-stage.shader_test.mako
 	)
 piglit_make_generated_tests(
 	builtin_cl_int_tests.list
