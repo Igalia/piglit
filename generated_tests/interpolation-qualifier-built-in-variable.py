@@ -21,6 +21,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+"""Generate interpolation-qualifier tests."""
+
 from __future__ import print_function
 import os
 import itertools
@@ -29,33 +31,33 @@ from templates import template_dir
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
-interpolation_modes = [
+INTERPOLATION_MODES = [
     'flat',
     'noperspective',
     'smooth',
     'default'
 ]
 
-vertex_shader_variables = [
+VS_VARIABLES = [
     'gl_FrontColor',
     'gl_BackColor',
     'gl_FrontSecondaryColor',
     'gl_BackSecondaryColor'
 ]
 
-vertex_shader_variables_front_only = [
+VS_VARIABLES_FRONT_ONLY = [
     'gl_FrontColor',
     'gl_FrontSecondaryColor',
 ]
 
-other_side_map = {
+OTHER_SIDE_MAP = {
     'gl_FrontColor': 'gl_BackColor',
     'gl_BackColor': 'gl_FrontColor',
     'gl_FrontSecondaryColor': 'gl_BackSecondaryColor',
     'gl_BackSecondaryColor': 'gl_FrontSecondaryColor'
 }
 
-vertex_shader_to_fragment_shader_variable_map = {
+VS_TO_FS_VARIABLE_MAP = {
     'gl_FrontColor': 'gl_Color',
     'gl_BackColor': 'gl_Color',
     'gl_FrontSecondaryColor': 'gl_SecondaryColor',
@@ -67,12 +69,12 @@ def make_fs_vs_tests(fs_mode, vs_mode, dirname):
     if vs_mode == fs_mode:
         return
 
-    for var in vertex_shader_variables:
+    for var in VS_VARIABLES:
         filename = os.path.join(
             dirname,
             '{0}-{1}-{2}-{3}.shader_test'.format(
                 vs_mode, var, fs_mode,
-                vertex_shader_to_fragment_shader_variable_map[var]))
+                VS_TO_FS_VARIABLE_MAP[var]))
         print(filename)
 
         with open(filename, 'w') as f:
@@ -80,18 +82,19 @@ def make_fs_vs_tests(fs_mode, vs_mode, dirname):
                 vs_mode=vs_mode,
                 vs_variable=var,
                 fs_mode=fs_mode,
-                fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+                fs_variable=VS_TO_FS_VARIABLE_MAP[var]))
 
 
 def make_vs_unused_tests(vs_mode, dirname):
     if vs_mode == 'default':
         return
 
-    for var in vertex_shader_variables:
+    for var in VS_VARIABLES:
         filename = os.path.join(
             dirname,
-            '{0}-{1}-unused-{2}.shader_test'.format(vs_mode, var,
-                vertex_shader_to_fragment_shader_variable_map[var]))
+            '{0}-{1}-unused-{2}.shader_test'.format(
+                vs_mode, var,
+                VS_TO_FS_VARIABLE_MAP[var]))
         print(filename)
 
         with open(filename, 'w') as f:
@@ -105,12 +108,12 @@ def make_fs_unused_tests(fs_mode, vs_mode, dirname):
     if fs_mode == 'default':
         return
 
-    for var in vertex_shader_variables_front_only:
+    for var in VS_VARIABLES_FRONT_ONLY:
         filename = os.path.join(
             dirname,
             'unused-{0}-{1}-{2}.shader_test'.format(
                 var, fs_mode,
-                vertex_shader_to_fragment_shader_variable_map[var]))
+                VS_TO_FS_VARIABLE_MAP[var]))
         print(filename)
 
         with open(filename, 'w') as f:
@@ -118,19 +121,19 @@ def make_fs_unused_tests(fs_mode, vs_mode, dirname):
                 vs_mode=vs_mode,
                 vs_variable=var,
                 fs_mode=fs_mode,
-                fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+                fs_variable=VS_TO_FS_VARIABLE_MAP[var]))
 
 
 def make_vs_fs_unused_tests(fs_mode, vs_mode, dirname):
     if vs_mode == fs_mode:
         return
 
-    for var in vertex_shader_variables:
+    for var in VS_VARIABLES:
         filename = os.path.join(
             dirname,
             'unused-{0}-{1}-unused-{2}-{3}.shader_test'.format(
                 vs_mode, var, fs_mode,
-                vertex_shader_to_fragment_shader_variable_map[var]))
+                VS_TO_FS_VARIABLE_MAP[var]))
         print(filename)
 
         with open(filename, 'w') as f:
@@ -139,15 +142,15 @@ def make_vs_fs_unused_tests(fs_mode, vs_mode, dirname):
                     vs_mode=vs_mode,
                     vs_variable=var,
                     fs_mode=fs_mode,
-                    fs_variable=vertex_shader_to_fragment_shader_variable_map[var]))
+                    fs_variable=VS_TO_FS_VARIABLE_MAP[var]))
 
 
 def make_vs_fs_flip_tests(fs_mode, vs_mode, dirname):
     if vs_mode == fs_mode:
         return
 
-    for this_side in vertex_shader_variables:
-        other_side = other_side_map[this_side]
+    for this_side in VS_VARIABLES:
+        other_side = OTHER_SIDE_MAP[this_side]
         filename = os.path.join(
             dirname,
             '{0}-{1}-{2}-{3}.shader_test'.format(
@@ -161,7 +164,7 @@ def make_vs_fs_flip_tests(fs_mode, vs_mode, dirname):
                     this_side_variable=this_side,
                     other_side_variable=other_side,
                     fs_mode=fs_mode,
-                    fs_variable=vertex_shader_to_fragment_shader_variable_map[this_side]))
+                    fs_variable=VS_TO_FS_VARIABLE_MAP[this_side]))
 
 
 def main():
@@ -172,7 +175,7 @@ def main():
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-    for fs_mode, vs_mode in itertools.product(interpolation_modes, repeat=2):
+    for fs_mode, vs_mode in itertools.product(INTERPOLATION_MODES, repeat=2):
         make_fs_vs_tests(fs_mode, vs_mode, dirname)
         make_vs_unused_tests(vs_mode, dirname)
         make_fs_unused_tests(fs_mode, vs_mode, dirname)
