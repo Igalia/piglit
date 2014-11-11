@@ -1,6 +1,6 @@
 # coding=utf-8
 #
-# Copyright © 2013 Intel Corporation
+# Copyright © 2013, 2014 Intel Corporation
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,10 +23,11 @@
 
 import os
 import os.path
-from mako.template import Template
 from textwrap import dedent
 
-sampler_type_to_coord_type = {
+from mako.template import Template
+
+SAMPLER_TYPE_TO_COORD_TYPE = {
     'sampler1D':              'float',
     'isampler1D':             'float',
     'usampler1D':             'float',
@@ -63,7 +64,7 @@ sampler_type_to_coord_type = {
     'samplerCubeArrayShadow': 'vec3',
 }
 
-requirements = {
+REQUIREMENTS = {
     'ARB_texture_query_lod': {
         'version': '1.30',
         'extension': 'GL_ARB_texture_query_lod'
@@ -74,7 +75,7 @@ requirements = {
     }
 }
 
-template = Template(dedent("""\
+TEMPLATE = Template(dedent("""\
     /* [config]
     % if execution_stage == 'fs':
      * expect_result: pass
@@ -110,19 +111,16 @@ template = Template(dedent("""\
     }
 """))
 
-for api, requirement in requirements.iteritems():
+for api, requirement in REQUIREMENTS.iteritems():
     Lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
 
-    for sampler_type, coord_type in sampler_type_to_coord_type.iteritems():
+    for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
         for execution_stage in ("vs", "fs"):
             file_extension = 'frag' if execution_stage == 'fs' else 'vert'
-            filename = os.path.join("spec",
-                                    api.lower(),
-                                    "compiler",
-                                    "built-in-functions",
-                                    "textureQuery{0}-{1}.{2}".format(Lod,
-                                                                     sampler_type,
-                                                                     file_extension))
+            filename = os.path.join(
+                "spec", api.lower(), "compiler", "built-in-functions",
+                "textureQuery{0}-{1}.{2}".format(Lod, sampler_type,
+                                                 file_extension))
             print filename
 
             dirname = os.path.dirname(filename)
@@ -140,7 +138,7 @@ for api, requirement in requirements.iteritems():
                 extensions += ['GL_ARB_texture_cube_map_array']
 
             f = open(filename, "w")
-            f.write(template.render(version=version,
+            f.write(TEMPLATE.render(version=version,
                                     extensions=extensions,
                                     execution_stage=execution_stage,
                                     sampler_type=sampler_type,
