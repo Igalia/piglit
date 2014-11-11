@@ -20,25 +20,15 @@
 
 from __future__ import print_function
 import os
-import textwrap
-import mako.template
+
+from templates import template_file
+
+TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
+                         'template.vert.mako')
 
 
 def main():
     """ Generate tests """
-    template = mako.template.Template(textwrap.dedent("""
-    /* [config]
-     * expect_result: fail
-     * glsl_version: 1.20
-     * [end config]
-     */
-    #version 120
-    void main() {
-        gl_Position = vec4(0);
-        outerProduct(${type}(0), ${type}(0));
-    }
-    """))
-
     dirname = os.path.join('spec', 'glsl-1.20', 'compiler',
                            'built-in-functions')
     if not os.path.exists(dirname):
@@ -50,7 +40,7 @@ def main():
         name = os.path.join(dirname, 'outerProduct-{0}.vert'.format(type_))
         print(name)
         with open(name, 'w+') as f:
-            f.write(template.render_unicode(type=type_))
+            f.write(TEMPLATE.render_unicode(type=type_))
 
 
 if __name__ == '__main__':

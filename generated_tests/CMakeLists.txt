@@ -103,7 +103,9 @@ piglit_make_generated_tests(
 	)
 piglit_make_generated_tests(
 	outerproduct_invalid_params.list
-	gen_outerproduct_invalid_params.py)
+	gen_outerproduct_invalid_params.py
+	templates/gen_outerproduct_invalid_params/template.vert.mako
+	)
 piglit_make_generated_tests(
 	outerproduct_tests.list
 	gen_outerproduct_tests.py
