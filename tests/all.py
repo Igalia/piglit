@@ -1147,6 +1147,7 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', '!opengl 3.1')) as g:
+    g(['gl-3.1-default-vao'], 'default-vao')
     g(['gl-3.1-draw-buffers-errors'], 'draw-buffers-errors')
     g(['gl-3.1-genned-names'], 'genned-names')
     g(['gl-3.1-minmax'], 'minmax')
