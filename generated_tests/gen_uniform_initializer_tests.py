@@ -21,6 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+from __future__ import print_function
 import os
 
 from templates import template_dir
@@ -90,7 +91,7 @@ def generate_tests(type_list, base_name, major, minor):
                 'execution',
                 'uniform-initializer',
                 '{0}-{1}{2}.shader_test'.format(target, base_name, t))
-            print test_file_name
+            print(test_file_name)
 
             dirname = os.path.dirname(test_file_name)
             if not os.path.exists(dirname):
@@ -108,7 +109,7 @@ def generate_tests(type_list, base_name, major, minor):
             for type_, num_values in type_list:
                 numbers = []
                 alt_numbers = []
-                for i in range(num_values):
+                for i in xrange(num_values):
                     numbers.append(get_value(type_, i + j))
                     alt_numbers.append(get_value(type_, i + j + 7))
 
@@ -148,7 +149,7 @@ def generate_array_tests(type_list, base_name, major, minor):
             'execution',
             'uniform-initializer',
             '{0}-{1}-array.shader_test'.format(target, base_name))
-        print test_file_name
+        print(test_file_name)
 
         dirname = os.path.dirname(test_file_name)
         if not os.path.exists(dirname):
