@@ -117,19 +117,19 @@ def main():
     """Main function."""
     for api, requirement in REQUIREMENTS.iteritems():
         lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
+        dirname = os.path.join("spec", api.lower(), "compiler",
+                               "built-in-functions")
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
 
         for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
             for execution_stage in ("vs", "fs"):
                 file_extension = 'frag' if execution_stage == 'fs' else 'vert'
                 filename = os.path.join(
-                    "spec", api.lower(), "compiler", "built-in-functions",
+                    dirname,
                     "textureQuery{0}-{1}.{2}".format(lod, sampler_type,
                                                      file_extension))
                 print(filename)
-
-                dirname = os.path.dirname(filename)
-                if not os.path.exists(dirname):
-                    os.makedirs(dirname)
 
                 version = requirement['version']
                 extensions = [requirement['extension']] if requirement['extension'] else []
