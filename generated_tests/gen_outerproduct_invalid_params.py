@@ -26,7 +26,6 @@ import mako.template
 
 def main():
     """ Generate tests """
-
     template = mako.template.Template(textwrap.dedent("""
     /* [config]
      * expect_result: fail
@@ -40,16 +39,15 @@ def main():
     }
     """))
 
-    try:
-        os.makedirs('spec/glsl-1.20/compiler/built-in-functions')
-    except OSError:
-        pass
+    dirname = os.path.join('spec', 'glsl-1.20', 'compiler',
+                           'built-in-functions')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
     for type_ in ['int', 'float', 'bool', 'bvec2', 'bvec3', 'bvec4', 'mat2',
                   'mat2x2', 'mat2x3', 'mat2x4', 'mat3', 'mat3x2', 'mat3x3',
                   'mat3x4', 'mat4', 'mat4x2', 'mat4x3', 'mat4x4']:
-        name = ('spec/glsl-1.20/compiler/built-in-functions/'
-                'outerProduct-{0}.vert'.format(type_))
+        name = os.path.join(dirname, 'outerProduct-{0}.vert'.format(type_))
         print(name)
         with open(name, 'w+') as f:
             f.write(template.render_unicode(type=type_))
