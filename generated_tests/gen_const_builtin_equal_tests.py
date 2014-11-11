@@ -23,30 +23,11 @@
 from __future__ import print_function
 import re
 import os
-import textwrap
-import mako.template
 
-TEMPLATE = mako.template.Template(textwrap.dedent("""
-    [require]
-    GLSL >= 1.20
+from templates import template_file
 
-    [vertex shader]
-    void main()
-    {
-      gl_Position = gl_Vertex;
-    }
-
-    [fragment shader]
-    void main()
-    {
-      const ${expected.split('(')[0]} res = ${func}(${input[0]}, ${input[1]});
-      gl_FragColor = (res == ${expected})
-        ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
-    }
-
-    [test]
-    draw rect -1 -1 2 2
-    probe all rgb 0.0 1.0 0.0"""))
+TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
+                         'template.shader_test.mako')
 
 TEST_VECTORS = [
     ["vec2(3.0, 3.14)",

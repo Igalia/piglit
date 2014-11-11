@@ -32,7 +32,9 @@ piglit_make_generated_tests(
 	builtin_function.py)
 piglit_make_generated_tests(
 	const_builtin_equal_tests.list
-	gen_const_builtin_equal_tests.py)
+	gen_const_builtin_equal_tests.py
+	templates/gen_const_builtin_equal_tests/template.shader_test.mako
+	)
 piglit_make_generated_tests(
 	interpolation_tests.list
 	gen_interpolation_tests.py)
