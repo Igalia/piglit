@@ -44,7 +44,9 @@ piglit_make_generated_tests(
 	gen_texture_query_lod_tests.py)
 piglit_make_generated_tests(
 	shader_bit_encoding_tests.list
-	gen_shader_bit_encoding_tests.py)
+	gen_shader_bit_encoding_tests.py
+	templates/gen_shader_bit_encoding_tests/template.shader_test.mako
+	)
 piglit_make_generated_tests(
 	uniform-initializer_tests.list
 	gen_uniform_initializer_tests.py
