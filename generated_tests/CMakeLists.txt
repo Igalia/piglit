@@ -44,7 +44,9 @@ piglit_make_generated_tests(
 	)
 piglit_make_generated_tests(
 	interpolation_tests.list
-	gen_interpolation_tests.py)
+	gen_interpolation_tests.py
+	templates/gen_interpolation_tests/template.shader_test.mako
+	)
 piglit_make_generated_tests(
 	non-lvalue_tests.list
 	gen_non-lvalue_tests.py
