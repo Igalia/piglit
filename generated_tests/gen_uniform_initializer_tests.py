@@ -61,7 +61,7 @@ def generate_tests(type_list, base_name, major, minor):
             template = f.read()
             f.close()
 
-            test_file_name = dirname = os.path.join(
+            test_file_name = os.path.join(
                 'spec',
                 'glsl-{0}.{1}'.format(major, minor),
                 'execution',
@@ -122,7 +122,7 @@ def generate_array_tests(type_list, base_name, major, minor):
         template = f.read()
         f.close()
 
-        test_file_name = dirname = os.path.join(
+        test_file_name = os.path.join(
             'spec',
             'glsl-{0}.{1}'.format(major, minor),
             'execution',
