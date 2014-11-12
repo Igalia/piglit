@@ -32,6 +32,7 @@ denormalized) floating point numbers.
 
 """
 
+from __future__ import print_function
 import math
 import optparse
 import os
@@ -45,7 +46,8 @@ from templates import template_dir
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
-template_table = {
+# pylint: disable=bad-whitespace,line-too-long
+TEMPLATE_TABLE = {
     ("const", "p", "2x16"): TEMPLATES.get_template('const_pack.shader_test.mako'),
     ("const", "p",  "4x8"): TEMPLATES.get_template('const_pack.shader_test.mako'),
     ("const", "u", "2x16"): TEMPLATES.get_template('const_unpack.shader_test.mako'),
@@ -54,18 +56,19 @@ template_table = {
     ("vs",    "p",  "4x8"): TEMPLATES.get_template('vs_pack.shader_test.mako'),
     ("vs",    "u", "2x16"): TEMPLATES.get_template('vs_unpack.shader_test.mako'),
     ("vs",    "u",  "4x8"): TEMPLATES.get_template('vs_unpack.shader_test.mako'),
-    ("fs",    "p", "2x16"): TEMPLATES.get_template('fs_pack.shader_test.mako'), 
+    ("fs",    "p", "2x16"): TEMPLATES.get_template('fs_pack.shader_test.mako'),
     ("fs",    "p",  "4x8"): TEMPLATES.get_template('fs_pack.shader_test.mako'),
     ("fs",    "u", "2x16"): TEMPLATES.get_template('fs_unpack.shader_test.mako'),
     ("fs",    "u",  "4x8"): TEMPLATES.get_template('fs_unpack.shader_test.mako'),
 }
+# pylint: enable=bad-whitespace,line-too-long
 
-# ----------------------------------------------------------------------------
-# Math for pack/unpack functions
-# ----------------------------------------------------------------------------
+# TODO: all of the invalid names should be fixed (mostly one and two letter
+# variable names), but there are lots of them, and they get in the way.
+# TODO: Docstrings...
+# pylint: disable=invalid-name,missing-docstring
 
-
-class FuncOpts:
+class FuncOpts(object):  # pylint: disable=too-few-public-methods
     """Options that modify the evaluation of the GLSL pack/unpack functions.
 
     Given an input and a pack/unpack function, there exist multiple valid
@@ -100,11 +103,12 @@ class FuncOpts:
         elif round_mode == FuncOpts.ROUND_TO_NEAREST:
             self.__round_func = round_to_nearest
         else:
-            assert(False)
+            raise Exception('Must round to even or nearest.\n'
+                            'round function: {}'.format(round_mode))
 
     def round(self, x):
         """Round a float according to the requested rounding mode."""
-        assert(any(isinstance(x, T) for T in [float, float32]))
+        assert any(isinstance(x, T) for T in [float, float32])
 
         # Drop the floating-point precision from 64 to 32 bits before
         # rounding.  The loss of precision may shift the float's fractional
@@ -113,11 +117,11 @@ class FuncOpts:
         return self.__round_func(x)
 
 
-def clamp(x, min, max):
-    if x < min:
-        return min
-    elif x > max:
-        return max
+def clamp(x, min_, max_):
+    if x < min_:
+        return min_
+    elif x > max_:
+        return max_
     else:
         return x
 
@@ -152,19 +156,20 @@ def pack_2x16(pack_1x16_func, x, y, func_opts):
     :param x,y: each a float32
     :return: a uint32
     """
-    assert(isinstance(x, float32))
-    assert(isinstance(y, float32))
+    assert isinstance(x, float32)
+    assert isinstance(y, float32)
 
     ux = pack_1x16_func(x, func_opts)
     uy = pack_1x16_func(y, func_opts)
 
-    assert(isinstance(ux, uint16))
-    assert(isinstance(uy, uint16))
+    assert isinstance(ux, uint16)
+    assert isinstance(uy, uint16)
 
     return uint32((uy << 16) | ux)
 
 
 def pack_4x8(pack_1x8_func, x, y, z, w, func_opts):
+    # pylint: disable=too-many-arguments
     """Evaluate a GLSL pack4x8 function.
 
     :param pack_1x8_func: the component-wise function of the GLSL pack4x8
@@ -172,25 +177,25 @@ def pack_4x8(pack_1x8_func, x, y, z, w, func_opts):
     :param x,y,z,w: each a float32
     :return: a uint32
     """
-    assert(isinstance(x, float32))
-    assert(isinstance(y, float32))
-    assert(isinstance(z, float32))
-    assert(isinstance(w, float32))
+    assert isinstance(x, float32)
+    assert isinstance(y, float32)
+    assert isinstance(z, float32)
+    assert isinstance(w, float32)
 
     ux = pack_1x8_func(x, func_opts)
     uy = pack_1x8_func(y, func_opts)
     uz = pack_1x8_func(z, func_opts)
     uw = pack_1x8_func(w, func_opts)
 
-    assert(isinstance(ux, uint8))
-    assert(isinstance(uy, uint8))
-    assert(isinstance(uz, uint8))
-    assert(isinstance(uw, uint8))
+    assert isinstance(ux, uint8)
+    assert isinstance(uy, uint8)
+    assert isinstance(uz, uint8)
+    assert isinstance(uw, uint8)
 
     return uint32((uw << 24) | (uz << 16) | (uy << 8) | ux)
 
 
-def unpack_2x16(unpack_1x16_func, u, func_opts):
+def unpack_2x16(unpack_1x16_func, u, _):
     """Evaluate a GLSL unpack2x16 function.
 
     :param unpack_1x16_func: the component-wise function of the GLSL
@@ -198,7 +203,7 @@ def unpack_2x16(unpack_1x16_func, u, func_opts):
     :param u: a uint32
     :return: a 2-tuple of float32
     """
-    assert(isinstance(u, uint32))
+    assert isinstance(u, uint32)
 
     ux = uint16(u & 0xffff)
     uy = uint16(u >> 16)
@@ -206,13 +211,13 @@ def unpack_2x16(unpack_1x16_func, u, func_opts):
     x = unpack_1x16_func(ux)
     y = unpack_1x16_func(uy)
 
-    assert(isinstance(x, float32))
-    assert(isinstance(y, float32))
+    assert isinstance(x, float32)
+    assert isinstance(y, float32)
 
     return (x, y)
 
 
-def unpack_4x8(unpack_1x8_func, u, func_opts):
+def unpack_4x8(unpack_1x8_func, u, _):
     """Evaluate a GLSL unpack4x8 function.
 
     :param unpack_1x8_func: the component-wise function of the GLSL
@@ -220,7 +225,7 @@ def unpack_4x8(unpack_1x8_func, u, func_opts):
     :param u: a uint32
     :return: a 4-tuple of float32
     """
-    assert(isinstance(u, uint32))
+    assert isinstance(u, uint32)
 
     ux = uint8(u & 0xff)
     uy = uint8((u >> 8) & 0xff)
@@ -232,65 +237,65 @@ def unpack_4x8(unpack_1x8_func, u, func_opts):
     z = unpack_1x8_func(uz)
     w = unpack_1x8_func(uw)
 
-    assert(isinstance(x, float32))
-    assert(isinstance(y, float32))
-    assert(isinstance(z, float32))
-    assert(isinstance(w, float32))
+    assert isinstance(x, float32)
+    assert isinstance(y, float32)
+    assert isinstance(z, float32)
+    assert isinstance(w, float32)
 
     return (x, y, z, w)
 
 
 def pack_snorm_1x8(f32, func_opts):
     """Component-wise function of packSnorm4x8."""
-    assert(isinstance(f32, float32))
+    assert isinstance(f32, float32)
     return uint8(int8(func_opts.round(clamp(f32, -1.0, +1.0) * 127.0)))
 
 
 def pack_snorm_1x16(f32, func_opts):
     """Component-wise function of packSnorm2x16."""
-    assert(isinstance(f32, float32))
+    assert isinstance(f32, float32)
     return uint16(int16(func_opts.round(clamp(f32, -1.0, +1.0) * 32767.0)))
 
 
 def unpack_snorm_1x8(u8):
     """Component-wise function of unpackSnorm4x8."""
-    assert(isinstance(u8, uint8))
+    assert isinstance(u8, uint8)
     return float32(clamp(int8(u8) / 127.0, -1.0, +1.0))
 
 
 def unpack_snorm_1x16(u16):
     """Component-wise function of unpackSnorm2x16."""
-    assert(isinstance(u16, uint16))
+    assert isinstance(u16, uint16)
     return float32(clamp(int16(u16) / 32767.0, -1.0, +1.0))
 
 
 def pack_unorm_1x8(f32, func_opts):
     """Component-wise function of packUnorm4x8."""
-    assert(isinstance(f32, float32))
+    assert isinstance(f32, float32)
     return uint8(func_opts.round(clamp(f32, 0.0, 1.0) * 255.0))
 
 
 def pack_unorm_1x16(f32, func_opts):
     """Component-wise function of packUnorm2x16."""
-    assert(isinstance(f32, float32))
+    assert isinstance(f32, float32)
     return uint16(func_opts.round(clamp(f32, 0.0, 1.0) * 65535.0))
 
 
 def unpack_unorm_1x8(u8):
     """Component-wise function of unpackUnorm4x8."""
-    assert(isinstance(u8, uint8))
+    assert isinstance(u8, uint8)
     return float32(u8 / 255.0)
 
 
 def unpack_unorm_1x16(u16):
     """Component-wise function of unpackUnorm2x16."""
-    assert(isinstance(u16, uint16))
+    assert isinstance(u16, uint16)
     return float32(u16 / 65535.0)
 
 
 def pack_half_1x16(f32, func_opts):
     """Component-wise function of packHalf2x16."""
-    assert(isinstance(f32, float32))
+    assert isinstance(f32, float32)
 
     # The bit layout of a float16 is:
     #
@@ -378,23 +383,23 @@ def pack_half_1x16(f32, func_opts):
         e = 31
         m = 0
 
-    if (m == 1024):
+    if m == 1024:
         # f32 was rounded upwards into the range of the next exponent.  This
         # correctly handles the case where f32 should be rounded up to float16
         # infinity.
         e += 1
         m = 0
 
-    assert(s == 0 or s == 1)
-    assert(0 <= e and e <= 31)
-    assert(0 <= m and m <= 1023)
+    assert s == 0 or s == 1
+    assert 0 <= e and e <= 31
+    assert 0 <= m and m <= 1023
 
     return uint16((s << 15) | (e << 10) | m)
 
 
 def unpack_half_1x16(u16):
     """Component-wise function of unpackHalf2x16."""
-    assert(isinstance(u16, uint16))
+    assert isinstance(u16, uint16)
 
     # The bit layout of a float16 is:
     #
@@ -430,7 +435,7 @@ def unpack_half_1x16(u16):
     elif e == 31 and m != 0:
         return float32("NaN")
     else:
-        assert(False)
+        raise Exception('invalid inputs')
 
 # ----------------------------------------------------------------------------
 # Inputs for GLSL functions
@@ -627,6 +632,7 @@ def make_inputs_for_unpack_half_2x16():
     # For each of the two classes of float16 values, subnormal and normalized,
     # below are listed the exponent and mantissa of the class's boundary
     # values and some values slightly inside the bounds.
+    # pylint: disable=bad-whitespace
     bounds = (
         (0,     0),  # zero
         (0,     1),  # subnormal_min
@@ -639,6 +645,7 @@ def make_inputs_for_unpack_half_2x16():
         (30, 1023),  # normal_max
         (31,    0)   # inf
     )
+    # pylint: enable=bad-whitespace
 
     def make_uint16(s, e, m):
         return uint16((s << 15) | (e << 10) | m)
@@ -681,7 +688,7 @@ def glsl_literal(x):
         if math.isnan(x):
             # GLSL ES 3.00 and GLSL 4.10 do not require implementations to
             # support NaN, so we do not test it.
-            assert(False)
+            raise Exception('NaN is not tested.')
         elif math.isinf(x):
             # GLSL ES 3.00 lacks a literal for infinity. However, ±1.0e256
             # suffices because it lies sufficientlyoutside the range of finite
@@ -702,7 +709,7 @@ def glsl_literal(x):
         else:
             return repr(x)
     else:
-        assert(False)
+        raise Exception('Unsupported GLSL litteral')
 
 
 def make_inouts_for_pack_2x16(pack_1x16_func,
@@ -732,13 +739,13 @@ def make_inouts_for_pack_2x16(pack_1x16_func,
         reduced_inputs = all_float32_inputs
 
     def add_vec2_input(x, y):
-        assert(isinstance(x, float32))
-        assert(isinstance(y, float32))
+        assert isinstance(x, float32)
+        assert isinstance(y, float32)
 
         valid_outputs = []
         for func_opts in func_opt_seq:
             u32 = pack_2x16(pack_1x16_func, x, y, func_opts)
-            assert(isinstance(u32, uint32))
+            assert isinstance(u32, uint32)
             valid_outputs.append(glsl_literal(u32))
 
         inout_seq.append(
@@ -768,15 +775,15 @@ def make_inouts_for_pack_4x8(pack_1x8_func, float32_inputs):
 
     for y in float32_inputs:
         for x in float32_inputs:
-            assert(isinstance(x, float32))
+            assert isinstance(x, float32)
 
             valid_outputs_0 = []
             valid_outputs_1 = []
             for func_opts in func_opt_seq:
                 u32_0 = pack_4x8(pack_1x8_func, x, y, x, y, func_opts)
                 u32_1 = pack_4x8(pack_1x8_func, x, x, y, y, func_opts)
-                assert(isinstance(u32_0, uint32))
-                assert(isinstance(u32_1, uint32))
+                assert isinstance(u32_0, uint32)
+                assert isinstance(u32_1, uint32)
                 valid_outputs_0.append(glsl_literal(u32_0))
                 valid_outputs_1.append(glsl_literal(u32_1))
 
@@ -804,11 +811,11 @@ def make_inouts_for_unpack_2x16(unpack_1x16_func, uint16_inputs):
 
     for y in uint16_inputs:
         for x in uint16_inputs:
-            assert(isinstance(x, uint16))
+            assert isinstance(x, uint16)
             u32 = uint32((y << 16) | x)
             vec2 = unpack_2x16(unpack_1x16_func, u32, func_opts)
-            assert(isinstance(vec2[0], float32))
-            assert(isinstance(vec2[1], float32))
+            assert isinstance(vec2[0], float32)
+            assert isinstance(vec2[1], float32)
             inout_seq.append(
                 InOutTuple(input=glsl_literal(u32),
                            valid_outputs=[(glsl_literal(vec2[0]),
@@ -831,7 +838,7 @@ def make_inouts_for_unpack_4x8(unpack_1x8_func, uint8_inputs):
 
     for y in uint8_inputs:
         for x in uint8_inputs:
-            assert(isinstance(x, uint8))
+            assert isinstance(x, uint8)
             u32_0 = uint32((y << 24) | (x << 16) | (y << 8) | x)
             u32_1 = uint32((y << 24) | (y << 16) | (x << 8) | x)
 
@@ -839,14 +846,14 @@ def make_inouts_for_unpack_4x8(unpack_1x8_func, uint8_inputs):
             valid_outputs_1 = []
             vec4_0 = unpack_4x8(unpack_1x8_func, u32_0, func_opts)
             vec4_1 = unpack_4x8(unpack_1x8_func, u32_1, func_opts)
-            assert(isinstance(vec4_0[0], float32))
-            assert(isinstance(vec4_0[1], float32))
-            assert(isinstance(vec4_0[2], float32))
-            assert(isinstance(vec4_0[3], float32))
-            assert(isinstance(vec4_1[0], float32))
-            assert(isinstance(vec4_1[1], float32))
-            assert(isinstance(vec4_1[2], float32))
-            assert(isinstance(vec4_1[3], float32))
+            assert isinstance(vec4_0[0], float32)
+            assert isinstance(vec4_0[1], float32)
+            assert isinstance(vec4_0[2], float32)
+            assert isinstance(vec4_0[3], float32)
+            assert isinstance(vec4_1[0], float32)
+            assert isinstance(vec4_1[1], float32)
+            assert isinstance(vec4_1[2], float32)
+            assert isinstance(vec4_1[3], float32)
             valid_outputs_0.append((glsl_literal(vec4_0[0]),
                                     glsl_literal(vec4_0[1]),
                                     glsl_literal(vec4_0[2]),
@@ -911,8 +918,12 @@ inout_table = {
 # ----------------------------------------------------------------------------
 
 
-class FuncInfo:
-    """Information for a GLSL pack/unpack function.
+FuncInfo = namedtuple('FuncInfo', ['name', 'dimension', 'result_precision',
+                                   'inout_seq', 'num_valid_outputs',
+                                   'vector_type', 'requirements', 'exact'])
+
+def func_info(name, requirements):
+    """Factory function for information for a GLSL pack/unpack function.
 
     Properties
     ----------
@@ -938,53 +949,52 @@ class FuncInfo:
 
     - exact: Whether the generated results must be exact (e.g., 0.0 and 1.0
       should always be converted exactly).
+
     """
 
-    def __init__(self, name, requirements):
-        self.name = name
-        self.result_precision = result_precision_table[name]
-        self.inout_seq = inout_table[name]
-        self.num_valid_outputs = len(self.inout_seq[0].valid_outputs)
-        self.requirements = requirements
-        self.exact = name.endswith("unpackHalf2x16")
+    if name.endswith("2x16"):
+        dimension = "2x16"
+        vector_type = "vec2"
+    elif name.endswith("4x8"):
+        dimension = "4x8"
+        vector_type = "vec4"
+    else:
+        raise Exception('Invalid pack type {}'.format(name))
 
-        if name.endswith("2x16"):
-            self.dimension = "2x16"
-            self.vector_type = "vec2"
-        elif name.endswith("4x8"):
-            self.dimension = "4x8"
-            self.vector_type = "vec4"
-        else:
-            assert(False)
+    inout_seq = inout_table[name]
+
+    return FuncInfo(name, dimension, result_precision_table[name],
+                    inout_seq, len(inout_seq[0].valid_outputs), vector_type,
+                    requirements, name.endswith("unpackHalf2x16"))
 
 
-class ShaderTest:
+class ShaderTest(object):
     """A .shader_test file."""
 
     @staticmethod
     def all_tests():
         requirements = "GLSL >= 1.30\nGL_ARB_shading_language_packing"
         ARB_shading_language_packing_funcs = (
-            FuncInfo("packSnorm2x16", requirements),
-            FuncInfo("packSnorm4x8", requirements),
-            FuncInfo("packUnorm2x16", requirements),
-            FuncInfo("packUnorm4x8", requirements),
-            FuncInfo("packHalf2x16", requirements),
-            FuncInfo("unpackSnorm2x16", requirements),
-            FuncInfo("unpackSnorm4x8", requirements),
-            FuncInfo("unpackUnorm2x16", requirements),
-            FuncInfo("unpackUnorm4x8", requirements),
-            FuncInfo("unpackHalf2x16", requirements)
+            func_info("packSnorm2x16", requirements),
+            func_info("packSnorm4x8", requirements),
+            func_info("packUnorm2x16", requirements),
+            func_info("packUnorm4x8", requirements),
+            func_info("packHalf2x16", requirements),
+            func_info("unpackSnorm2x16", requirements),
+            func_info("unpackSnorm4x8", requirements),
+            func_info("unpackUnorm2x16", requirements),
+            func_info("unpackUnorm4x8", requirements),
+            func_info("unpackHalf2x16", requirements)
             )
 
         requirements = "GL ES >= 3.0\nGLSL ES >= 3.00"
         glsl_es_300_funcs = (
-            FuncInfo("packSnorm2x16", requirements),
-            FuncInfo("packUnorm2x16", requirements),
-            FuncInfo("packHalf2x16", requirements),
-            FuncInfo("unpackSnorm2x16", requirements),
-            FuncInfo("unpackUnorm2x16", requirements),
-            FuncInfo("unpackHalf2x16", requirements)
+            func_info("packSnorm2x16", requirements),
+            func_info("packUnorm2x16", requirements),
+            func_info("packHalf2x16", requirements),
+            func_info("unpackSnorm2x16", requirements),
+            func_info("unpackUnorm2x16", requirements),
+            func_info("unpackHalf2x16", requirements)
             )
 
         execution_stages = ("const", "vs", "fs")
@@ -995,21 +1005,21 @@ class ShaderTest:
             for f in ARB_shading_language_packing_funcs:
                 yield ShaderTest(f, s, "ARB_shading_language_packing")
 
-    def __init__(self, func_info, execution_stage, api):
-        assert(isinstance(func_info, FuncInfo))
-        assert(execution_stage in ("const", "vs", "fs"))
-        assert(api in ("glsl-es-3.00", "ARB_shading_language_packing"))
+    def __init__(self, funcinfo, execution_stage, api):
+        assert isinstance(funcinfo, FuncInfo)
+        assert execution_stage in ("const", "vs", "fs")
+        assert api in ("glsl-es-3.00", "ARB_shading_language_packing")
 
-        self.__template = template_table[(execution_stage,
-                                          func_info.name[0],
-                                          func_info.dimension)]
-        self.__func_info = func_info
+        self.__template = TEMPLATE_TABLE[(execution_stage,
+                                          funcinfo.name[0],
+                                          funcinfo.dimension)]
+        self.__func_info = funcinfo
         self.__filename = os.path.join(
             "spec",
             api.lower(),
             "execution",
             "built-in-functions",
-            "{0}-{1}.shader_test".format(execution_stage, func_info.name))
+            "{0}-{1}.shader_test".format(execution_stage, funcinfo.name))
 
     @property
     def filename(self):
