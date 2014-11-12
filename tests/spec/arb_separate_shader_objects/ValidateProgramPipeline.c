@@ -235,8 +235,8 @@ piglit_init(int argc, char **argv)
 {
 	GLint vs, fs, gs, tes, tcs;
 	GLuint pipe;
-	GLint prog_vs, prog_fs, prog_gs, prog_tcs, prog_tes, prog_tess;
-	GLint prog_vs_fs, prog_vs_gs;
+	GLint prog_vs, prog_fs, prog_gs = 0, prog_tcs = 0, prog_tes = 0, prog_tess;
+	GLint prog_vs_fs, prog_vs_gs = 0;
 	GLint separable;
 	int version;
 
