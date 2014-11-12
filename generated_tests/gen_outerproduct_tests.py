@@ -36,13 +36,10 @@ Parameters = collections.namedtuple(
 
 def main():
     """ Generate tests """
-    try:
-        os.makedirs('spec/glsl-1.20/execution')
-    except OSError:
-        pass
+    dirname = os.path.join('spec', 'glsl-1.20', 'execution')
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
-    name = ('spec/glsl-1.20/execution/'
-            '{shader}-outerProduct-{type}{mat}{vec}.shader_test')
 
     for c, r in itertools.product(xrange(2, 5), repeat=2):
         vecs = [
@@ -55,21 +52,22 @@ def main():
                 Parameters(c, r, 'ivec', 'mat{0}'.format(r))
             ])
 
-        for shader in ['vs', 'fs']:
-            for type in ['const', 'uniform']:
-                for params in vecs:
-                    _name = name.format(
-                        shader=shader,
-                        type='const-' if type == 'const' else '',
-                        mat=params.matrix,
-                        vec='-ivec' if params.vec_type == 'ivec' else '')
+        stages = ['vs', 'fs']
+        types = ['const', 'uniform']
+        for shader, type_, params in itertools.product(stages, types, vecs):
+            name = os.path.join(
+                dirname,
+                '{shader}-outerProduct-{type}{mat}{vec}.shader_test'.format(
+                    shader=shader,
+                    type='const-' if type_ == 'const' else '',
+                    mat=params.matrix,
+                    vec='-ivec' if params.vec_type == 'ivec' else ''))
 
-                    print(_name)
-
-                    with open(_name, 'w+') as f:
-                        f.write(TEMPLATE.render_unicode(params=params,
-                                                        type=type,
-                                                        shader=shader))
+            print(name)
+            with open(name, 'w+') as f:
+                f.write(TEMPLATE.render_unicode(params=params,
+                                                type=type_,
+                                                shader=shader))
 
 
 if __name__ == '__main__':
