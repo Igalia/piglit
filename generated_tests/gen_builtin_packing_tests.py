@@ -31,24 +31,18 @@ import mako.runtime
 from mako.template import Template
 from numpy import int8, int16, uint8, uint16, uint32, float32
 
-# ----------------------------------------------------------------------------
-# Overview
-# ----------------------------------------------------------------------------
-#
-# This scripts generates tests for the GLSL packing functions, such as
-# packSnorm2x16.
-#
-# In the test templates below, observe that the GLSL function's actual output
-# is compared against multiple expected outputs.  Given an input and
-# a pack/unpackfunction, there exist multiple valid outputs because the GLSL
-# specs permit variation in the implementation of the function. The actual
-# output is dependent on the GLSL compiler's and hardware's choice of rounding
-# mode (for example, to even or to nearest) and handling of subnormal (also
-# called denormalized) floating point numbers.
+"""This scripts generates tests for the GLSL packing functions, such as
+packSnorm2x16.
 
-# ----------------------------------------------------------------------------
-# Templates for test files
-# ----------------------------------------------------------------------------
+In the test templates below, observe that the GLSL function's actual output is
+compared against multiple expected outputs.  Given an input and a
+pack/unpackfunction, there exist multiple valid outputs because the GLSL specs
+permit variation in the implementation of the function. The actual output is
+dependent on the GLSL compiler's and hardware's choice of rounding mode (for
+example, to even or to nearest) and handling of subnormal (also called
+denormalized) floating point numbers.
+
+"""
 
 # Test evaluation of constant pack2x16 expressions.
 const_pack_template = Template(dedent("""\
