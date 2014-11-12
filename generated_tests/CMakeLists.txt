@@ -21,7 +21,14 @@ endfunction(piglit_make_generated_tests custom_target generator_script)
 # Create custom commands and targets to build generated tests.
 piglit_make_generated_tests(
 	builtin_packing_tests.list
-	gen_builtin_packing_tests.py)
+	gen_builtin_packing_tests.py
+	templates/gen_builtin_packing_tests/vs_unpack.shader_test.mako
+	templates/gen_builtin_packing_tests/vs_pack.shader_test.mako
+	templates/gen_builtin_packing_tests/fs_unpack.shader_test.mako
+	templates/gen_builtin_packing_tests/fs_pack.shader_test.mako
+	templates/gen_builtin_packing_tests/const_pack.shader_test.mako
+	templates/gen_builtin_packing_tests/const_unpack.shader_test.mako
+	)
 piglit_make_generated_tests(
 	builtin_uniform_tests.list
 	gen_builtin_uniform_tests.py

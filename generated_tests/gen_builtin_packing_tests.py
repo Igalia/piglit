@@ -19,18 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import math
-import optparse
-import os
-import sys
-from collections import namedtuple
-from math import copysign, fabs, fmod, frexp, isinf, isnan, modf
-from textwrap import dedent
-
-import mako.runtime
-from mako.template import Template
-from numpy import int8, int16, uint8, uint16, uint32, float32
-
 """This scripts generates tests for the GLSL packing functions, such as
 packSnorm2x16.
 
@@ -44,433 +32,32 @@ denormalized) floating point numbers.
 
 """
 
-# Test evaluation of constant pack2x16 expressions.
-const_pack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
+import math
+import optparse
+import os
+import sys
+from collections import namedtuple
+from math import copysign, fabs, fmod, frexp, isinf, isnan, modf
 
-    [vertex shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #endif
+from numpy import int8, int16, uint8, uint16, uint32, float32
 
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
+from templates import template_dir
 
-    in vec4 vertex;
-    out vec4 vert_color;
-
-    void main()
-    {
-        ${func.result_precision} uint actual;
-
-        gl_Position = vertex;
-        vert_color = green;
-
-        % for io in func.inout_seq:
-        actual = ${func.name}(${func.vector_type}(${', '.join(io.input)}));
-
-        if (true
-            % for u in sorted(set(io.valid_outputs)):
-            && actual != ${u}
-            % endfor
-           ) {
-            vert_color = red;
-        }
-
-        % endfor
-    }
-
-    [fragment shader]
-    #ifdef GL_ES
-    precision highp float;
-    #endif
-
-    in vec4 vert_color;
-    out vec4 frag_color;
-
-    void main()
-    {
-        frag_color = vert_color;
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-"""))
-
-# Test evaluation of constant unpack2x16 expressions.
-const_unpack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
-
-    [vertex shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #endif
-
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
-
-    in vec4 vertex;
-    out vec4 vert_color;
-
-    void main()
-    {
-        ${func.result_precision} ${func.vector_type} actual;
-
-        gl_Position = vertex;
-        vert_color = green;
-
-        % for io in func.inout_seq:
-        actual = ${func.name}(${io.input});
-
-        if (true
-            % for v in io.valid_outputs:
-            && actual != ${func.vector_type}(${', '.join(v)})
-            % endfor
-           ) {
-            vert_color = red;
-        }
-
-        % endfor
-    }
-
-    [fragment shader]
-    #ifdef GL_ES
-    precision highp float;
-    #endif
-
-    in vec4 vert_color;
-    out vec4 frag_color;
-
-    void main()
-    {
-        frag_color = vert_color;
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-"""))
-
-# Test execution of pack2x16 functions in the vertex shader.
-vs_pack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
-
-    [vertex shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #endif
-
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
-
-    uniform ${func.vector_type} func_input;
-
-    % for j in range(func.num_valid_outputs):
-    uniform ${func.result_precision} uint expect${j};
-    % endfor
-
-    in vec4 vertex;
-    out vec4 vert_color;
-
-    void main()
-    {
-        gl_Position = vertex;
-        ${func.result_precision} uint actual = ${func.name}(func_input);
-
-        if (false
-            % for j in range(func.num_valid_outputs):
-            || actual == expect${j}
-            % endfor
-           ) {
-           vert_color = green;
-        } else {
-            vert_color = red;
-        }
-    }
-
-    [fragment shader]
-    #ifdef GL_ES
-    precision highp float;
-    #endif
-
-    in vec4 vert_color;
-    out vec4 frag_color;
-
-    void main()
-    {
-        frag_color = vert_color;
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    % for io in func.inout_seq:
-    uniform ${func.vector_type} func_input ${" ".join(io.input)}
-    % for j in range(func.num_valid_outputs):
-    uniform uint expect${j} ${io.valid_outputs[j]}
-    % endfor
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-
-    % endfor
-"""))
-
-# Test execution of unpack2x16 functions in the vertex shader.
-vs_unpack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
-
-    [vertex shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #endif
-
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
-
-    uniform highp uint func_input;
-
-    uniform bool exact;
-
-    % for j in range(func.num_valid_outputs):
-    uniform ${func.result_precision} ${func.vector_type} expect${j};
-    % endfor
-
-    in vec4 vertex;
-    out vec4 vert_color;
-
-    void main()
-    {
-        gl_Position = vertex;
-
-        ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
-
-        if (false
-            % for i in range(func.num_valid_outputs):
-            || (exact ? actual == expect${i}
-                      : distance(actual, expect${i}) < 0.00001)
-            % endfor
-           ) {
-            vert_color = green;
-        } else {
-            vert_color = red;
-        }
-    }
-
-    [fragment shader]
-    #ifdef GL_ES
-    precision highp float;
-    #endif
-
-    in vec4 vert_color;
-    out vec4 frag_color;
-
-    void main()
-    {
-        frag_color = vert_color;
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    % for io in func.inout_seq:
-    uniform uint func_input ${io.input}
-    % if func.exact:
-    uniform int exact 1
-    % else:
-    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
-                                                   0x81818181))}
-    % endif
-    % for j in range(func.num_valid_outputs):
-    uniform ${func.vector_type} expect${j} ${" ".join(io.valid_outputs[j])}
-    % endfor
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-
-    % endfor
-"""))
-
-
-# Test execution of pack2x16 functions in the fragment shader.
-fs_pack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
-
-    [vertex shader]
-    in vec4 vertex;
-
-    void main()
-    {
-        gl_Position = vertex;
-    }
-
-    [fragment shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #else
-    precision highp float;
-    #endif
-
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
-
-    uniform ${func.vector_type} func_input;
-
-    % for i in range(func.num_valid_outputs):
-    uniform ${func.result_precision} uint expect${i};
-    % endfor
-
-    out vec4 frag_color;
-
-    void main()
-    {
-        ${func.result_precision} uint actual = ${func.name}(func_input);
-
-        if (false
-            % for i in range(func.num_valid_outputs):
-            || actual == expect${i}
-            % endfor
-           ) {
-            frag_color = green;
-        } else {
-            frag_color = red;
-        }
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    % for io in func.inout_seq:
-    uniform ${func.vector_type} func_input ${" ".join(io.input)}
-    % for i in range(func.num_valid_outputs):
-    uniform uint expect${i} ${io.valid_outputs[i]}
-    % endfor
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-
-    % endfor
-"""))
-
-# Test execution of unpack2x16 functions in the fragment shader.
-fs_unpack_template = Template(dedent("""\
-    [require]
-    ${func.requirements}
-
-    [vertex shader]
-    in vec4 vertex;
-
-    void main()
-    {
-        gl_Position = vertex;
-    }
-
-    [fragment shader]
-    #ifndef GL_ES
-    #extension GL_ARB_shading_language_packing : require
-    #else
-    precision highp float;
-    #endif
-
-    const vec4 red = vec4(1, 0, 0, 1);
-    const vec4 green = vec4(0, 1, 0, 1);
-
-    uniform highp uint func_input;
-
-    uniform bool exact;
-
-    % for i in range(func.num_valid_outputs):
-    uniform ${func.result_precision} ${func.vector_type} expect${i};
-    % endfor
-
-    out vec4 frag_color;
-
-    void main()
-    {
-        ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
-
-        if (false
-            % for i in range(func.num_valid_outputs):
-            || (exact ? actual == expect${i}
-                      : distance(actual, expect${i}) < 0.00001)
-            % endfor
-           ) {
-            frag_color = green;
-        } else {
-            frag_color = red;
-        }
-    }
-
-    [vertex data]
-    vertex/float/2
-    -1.0 -1.0
-     1.0 -1.0
-     1.0  1.0
-    -1.0  1.0
-
-    [test]
-    % for io in func.inout_seq:
-    uniform uint func_input ${io.input}
-    % if func.exact:
-    uniform int exact 1
-    % else:
-    uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
-                                                   0x81818181))}
-    % endif
-    % for i in range(func.num_valid_outputs):
-    uniform ${func.vector_type} expect${i} ${" ".join(io.valid_outputs[i])}
-    % endfor
-    draw arrays GL_TRIANGLE_FAN 0 4
-    probe all rgba 0.0 1.0 0.0 1.0
-
-    % endfor
-"""))
+TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
 template_table = {
-    ("const", "p", "2x16"): const_pack_template,
-    ("const", "p",  "4x8"): const_pack_template,
-    ("const", "u", "2x16"): const_unpack_template,
-    ("const", "u",  "4x8"): const_unpack_template,
-    ("vs",    "p", "2x16"): vs_pack_template,
-    ("vs",    "p",  "4x8"): vs_pack_template,
-    ("vs",    "u", "2x16"): vs_unpack_template,
-    ("vs",    "u",  "4x8"): vs_unpack_template,
-    ("fs",    "p", "2x16"): fs_pack_template,
-    ("fs",    "p",  "4x8"): fs_pack_template,
-    ("fs",    "u", "2x16"): fs_unpack_template,
-    ("fs",    "u",  "4x8"): fs_unpack_template
+    ("const", "p", "2x16"): TEMPLATES.get_template('const_pack.shader_test.mako'),
+    ("const", "p",  "4x8"): TEMPLATES.get_template('const_pack.shader_test.mako'),
+    ("const", "u", "2x16"): TEMPLATES.get_template('const_unpack.shader_test.mako'),
+    ("const", "u",  "4x8"): TEMPLATES.get_template('const_unpack.shader_test.mako'),
+    ("vs",    "p", "2x16"): TEMPLATES.get_template('vs_pack.shader_test.mako'),
+    ("vs",    "p",  "4x8"): TEMPLATES.get_template('vs_pack.shader_test.mako'),
+    ("vs",    "u", "2x16"): TEMPLATES.get_template('vs_unpack.shader_test.mako'),
+    ("vs",    "u",  "4x8"): TEMPLATES.get_template('vs_unpack.shader_test.mako'),
+    ("fs",    "p", "2x16"): TEMPLATES.get_template('fs_pack.shader_test.mako'), 
+    ("fs",    "p",  "4x8"): TEMPLATES.get_template('fs_pack.shader_test.mako'),
+    ("fs",    "u", "2x16"): TEMPLATES.get_template('fs_unpack.shader_test.mako'),
+    ("fs",    "u",  "4x8"): TEMPLATES.get_template('fs_unpack.shader_test.mako'),
 }
 
 # ----------------------------------------------------------------------------
@@ -1434,9 +1021,8 @@ class ShaderTest:
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
-        with open(self.filename, "w") as buffer:
-            ctx = mako.runtime.Context(buffer, func=self.__func_info)
-            self.__template.render_context(ctx)
+        with open(self.filename, "w") as f:
+            f.write(self.__template.render(func=self.__func_info))
 
 
 def main():
