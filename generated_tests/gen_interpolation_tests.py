@@ -67,6 +67,7 @@ This program outputs, to stdout, the name of each file it generates.
 
 """
 
+from __future__ import print_function
 import os
 import textwrap
 
@@ -361,7 +362,7 @@ def all_tests():
 def main():
     for test in all_tests():
         test.generate()
-        print test.filename()
+        print(test.filename())
 
 
 if __name__ == '__main__':
