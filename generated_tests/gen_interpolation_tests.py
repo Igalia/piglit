@@ -21,47 +21,51 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# Correct interpolation of vertex shader outputs depends on (a)
-# whether an interpolation qualifier is present in the shader source,
-# and if so which qualifier is used, (b) if no interpolation qualifier
-# is present, whether the output is a user-defined variable or a
-# built-in color, and (c) if the output is a built-in color, the
-# setting of the ShadeModel() setting.  In addition, we would like to
-# test correct interpolation under various clipping scenarios.
-#
-# To verify that all the combinations of these possibilities work
-# correctly, this script generates a shader_runner test to check
-# proper interpolation for every combination of the following
-# variables:
-#
-# - which interpolation qualifier is used ("flat", "noperspective",
-#   "smooth", or no qualifier)
-#
-# - which variable is used (gl_FrontColor, gl_BackColor,
-#   gl_FrontSecondaryColor, gl_BackSecondaryColor, or a non-built-in
-#   variable)
-#
-# - the setting of ShadeModel() (either GL_SMOOTH or GL_FLAT)
-#
-# - whether the triangle in question is clipped using gl_ClipVertex,
-#   clipped using gl_ClipDistance, clipped against the fixed viewing
-#   volume, or unclipped.
-#
-# The tests operate by drawing a triangle with a different value of
-# the variable at each vertex, and then probing within the interior of
-# the triangle to verify that interpolation was performed correctly.
-# The triangle is drawn in a frustum projection, with a different z
-# value for each vertex, so that there will be a detectable difference
-# in behavior between noperspective and smooth interpolation.
-#
-# When testing clipping, we clip off the frontmost corner of the
-# triangle; this ensures that the proportion of the triangle's screen
-# real estate that is clipped is significantly larger than the
-# proportion of the triangle's 3D coordinate space that is clipped.
-# So if the GL implementation doesn't perform perspective-correct
-# interpolation generating clipped vertices, we will notice.
-#
-# This program outputs, to stdout, the name of each file it generates.
+"""Generate Interpopation tests.
+
+Correct interpolation of vertex shader outputs depends on (a)
+whether an interpolation qualifier is present in the shader source,
+and if so which qualifier is used, (b) if no interpolation qualifier
+is present, whether the output is a user-defined variable or a
+built-in color, and (c) if the output is a built-in color, the
+setting of the ShadeModel() setting.  In addition, we would like to
+test correct interpolation under various clipping scenarios.
+
+To verify that all the combinations of these possibilities work
+correctly, this script generates a shader_runner test to check
+proper interpolation for every combination of the following
+variables:
+
+- which interpolation qualifier is used ("flat", "noperspective",
+  "smooth", or no qualifier)
+
+- which variable is used (gl_FrontColor, gl_BackColor,
+  gl_FrontSecondaryColor, gl_BackSecondaryColor, or a non-built-in
+  variable)
+
+- the setting of ShadeModel() (either GL_SMOOTH or GL_FLAT)
+
+- whether the triangle in question is clipped using gl_ClipVertex,
+  clipped using gl_ClipDistance, clipped against the fixed viewing
+  volume, or unclipped.
+
+The tests operate by drawing a triangle with a different value of
+the variable at each vertex, and then probing within the interior of
+the triangle to verify that interpolation was performed correctly.
+The triangle is drawn in a frustum projection, with a different z
+value for each vertex, so that there will be a detectable difference
+in behavior between noperspective and smooth interpolation.
+
+When testing clipping, we clip off the frontmost corner of the
+triangle; this ensures that the proportion of the triangle's screen
+real estate that is clipped is significantly larger than the
+proportion of the triangle's 3D coordinate space that is clipped.
+So if the GL implementation doesn't perform perspective-correct
+interpolation generating clipped vertices, we will notice.
+
+This program outputs, to stdout, the name of each file it generates.
+
+"""
 
 import os
 import textwrap
