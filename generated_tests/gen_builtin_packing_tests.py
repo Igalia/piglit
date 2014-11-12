@@ -524,7 +524,6 @@ def make_inputs_for_pack_half_2x16():
     # handling of zero.
 
     subnormal_min = 2.0**(-14) * (1.0 / 2.0**10)
-    subnormal_max = 2.0**(-14) * (1023.0 / 2.0**10)
     normal_min = 2.0**(-14) * (1.0 + 0.0 / 2.0**10)
     normal_max = 2.0**15 * (1.0 + 1023.0 / 2.0**10)
     min_step = 2.0**(-24)
