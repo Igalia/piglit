@@ -14,7 +14,7 @@ uniform highp uint func_input;
 
 uniform bool exact;
 
-% for j in range(func.num_valid_outputs):
+% for j in xrange(func.num_valid_outputs):
 uniform ${func.result_precision} ${func.vector_type} expect${j};
 % endfor
 
@@ -28,7 +28,7 @@ void main()
     ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
 
     if (false
-        % for i in range(func.num_valid_outputs):
+        % for i in xrange(func.num_valid_outputs):
         || (exact ? actual == expect${i} : distance(actual, expect${i}) < 0.00001)
         % endfor
        ) {
@@ -67,7 +67,7 @@ uniform int exact 1
 uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
                                                0x81818181))}
 % endif
-% for j in range(func.num_valid_outputs):
+% for j in xrange(func.num_valid_outputs):
 uniform ${func.vector_type} expect${j} ${" ".join(io.valid_outputs[j])}
 % endfor
 draw arrays GL_TRIANGLE_FAN 0 4
