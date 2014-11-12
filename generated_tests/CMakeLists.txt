@@ -18,7 +18,7 @@ function(piglit_make_generated_tests file_list generator_script)
 		VERBATIM)
 endfunction(piglit_make_generated_tests custom_target generator_script)
 
-# Create custom commands and targets to build generated tests.
+# Generators for OpenGL tests
 piglit_make_generated_tests(
 	builtin_packing_tests.list
 	gen_builtin_packing_tests.py
@@ -76,18 +76,6 @@ piglit_make_generated_tests(
 	templates/gen_uniform_initializer_tests/vs-initializer-set-by-other-stage.shader_test.mako
 	)
 piglit_make_generated_tests(
-	builtin_cl_int_tests.list
-	generate-cl-int-builtins.py)
-piglit_make_generated_tests(
-	cl_store_tests.list
-	generate-cl-store-tests.py)
-piglit_make_generated_tests(
-	builtin_cl_math_tests.list
-	generate-cl-math-builtins.py)
-piglit_make_generated_tests(
-	builtin_cl_relational_tests.list
-	generate-cl-relational-builtins.py)
-piglit_make_generated_tests(
 	interpolation-qualifier-built-in-variable.list
 	interpolation-qualifier-built-in-variable.py
 	templates/interpolation-qualifier-built-in-variable/fs-vs-unused.shader_test.mako
@@ -123,25 +111,64 @@ piglit_make_generated_tests(
 	gen_constant_array_size_tests_fp64.py
 	builtin_function_fp64.py)
 
+# OpenCL Test generators
+piglit_make_generated_tests(
+	builtin_cl_int_tests.list
+	generate-cl-int-builtins.py)
+piglit_make_generated_tests(
+	cl_store_tests.list
+	generate-cl-store-tests.py)
+piglit_make_generated_tests(
+	builtin_cl_math_tests.list
+	generate-cl-math-builtins.py)
+piglit_make_generated_tests(
+	builtin_cl_relational_tests.list
+	generate-cl-relational-builtins.py)
+
+# Create a custom target for generating OpenGL tests
+# This is not added to the default target, instead it is added
+# as a dependency of gen-tests if OpenGL or OpenGLES{2,3} tests
+# are enabled
+add_custom_target(gen-gl-tests
+	DEPENDS builtin_packing_tests.list
+			outerproduct_tests.list
+			outerproduct_invalid_params.list
+			builtin_uniform_tests.list
+			constant_array_size_tests.list
+			const_builtin_equal_tests.list
+			builtin_packing_tests.list
+			interpolation_tests.list
+			non-lvalue_tests.list
+			texture_query_lod_tests.list
+			texture_lod_tests.list
+			shader_bit_encoding_tests.list
+			uniform-initializer_tests.list
+			interpolation-qualifier-built-in-variable.list
+			builtin_uniform_tests_fp64.list
+			constant_array_size_tests_fp64.list
+)
+
+# Create a custom target for generating OpenCL tests
+# This is not added to the default target, instead it is added
+# as a dependency of gen-etsts if OpenCL tests are enabled
+add_custom_target(gen-cl-tests
+	DEPENDS builtin_cl_int_tests.list
+			builtin_cl_math_tests.list
+			builtin_cl_relational_tests.list
+			cl_store_tests.list
+)
+
 # Add a "gen-tests" target that can be used to generate all the
 # tests without doing any other compilation.
-add_custom_target(gen-tests ALL
-	DEPENDS builtin_packing_tests.list
-		outerproduct_tests.list
-		outerproduct_invalid_params.list
-		builtin_uniform_tests.list
-		constant_array_size_tests.list
-		const_builtin_equal_tests.list
-		builtin_cl_int_tests.list
-		builtin_cl_math_tests.list
-		builtin_cl_relational_tests.list
-		cl_store_tests.list
-		interpolation_tests.list
-		non-lvalue_tests.list
-		texture_query_lod_tests.list
-		texture_lod_tests.list
-		shader_bit_encoding_tests.list
-		uniform-initializer_tests.list
-		interpolation-qualifier-built-in-variable.list
-		builtin_uniform_tests_fp64.list
-		constant_array_size_tests_fp64.list)
+add_custom_target(gen-tests ALL COMMENT "meta-target for other test generators")
+
+# Add gen-gl-tests as a dependency of the gen-tests if OpenGL or OpenGL ES {2,3}
+# are requested. there are no GLES1 tests to generate
+if(${PIGLIT_BUILD_GL_TESTS} OR ${PIGLIT_BUILD_GLES2_TESTS} OR ${PIGLIT_BUILD_GLES3_TESTS})
+	add_dependencies(gen-tests gen-gl-tests)
+endif(${PIGLIT_BUILD_GL_TESTS} OR ${PIGLIT_BUILD_GLES2_TESTS} OR ${PIGLIT_BUILD_GLES3_TESTS})
+
+# Add gen-cl-tests as a dependency of the gen-tests if OpenCL is requested
+if(${PIGLIT_BUILD_CL_TESTS})
+	add_dependencies(gen-tests gen-cl-tests)
+endif(${PIGLIT_BUILD_CL_TESTS})
