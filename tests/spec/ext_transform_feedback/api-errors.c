@@ -211,7 +211,7 @@ static GLboolean
 do_test(const struct test_desc *test)
 {
 	GLuint vs;
-	GLuint progs[2];
+	GLuint progs[2] = { 0 };
 	GLuint pipes[2];
 	GLuint bufs[NUM_BUFFERS];
 	float initial_xfb_buffer_contents[XFB_BUFFER_SIZE];
