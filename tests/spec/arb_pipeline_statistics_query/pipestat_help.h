@@ -28,3 +28,5 @@ end_query(const struct query *q)
 
 void do_query_init(struct query *queries, const int count);
 enum piglit_result do_query(const struct query *queries, const int count);
+enum piglit_result do_query_func(const struct query *queries,
+		     const int count, void (*draw)(void));

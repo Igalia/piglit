@@ -59,7 +59,8 @@ do_query_init(struct query *queries, const int count)
 }
 
 enum piglit_result
-do_query(const struct query *queries, const int count)
+do_query_func(const struct query *queries, const int count,
+	      void (*draw)(void))
 {
 	const float green[] = {0, 1, 0, 0};
 	int i;
@@ -71,7 +72,7 @@ do_query(const struct query *queries, const int count)
 	for (i = 0; i < count; i++)
 		begin_query(&queries[i]);
 
-	piglit_draw_rect(-1, -1, 2, 2);
+	draw();
 
 	for (i = 0; i < count; i++)
 		end_query(&queries[i]);
@@ -91,4 +92,16 @@ do_query(const struct query *queries, const int count)
 	}
 
 	return PIGLIT_PASS;
+}
+
+static void
+default_draw(void)
+{
+	piglit_draw_rect(-1, -1, 2, 2);
+}
+
+enum piglit_result
+do_query(const struct query *queries, const int count)
+{
+	return do_query_func(queries, count, default_draw);
 }
