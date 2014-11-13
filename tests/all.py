@@ -3769,6 +3769,7 @@ arb_pipeline_statistics_query = {}
 spec['ARB_pipeline_statistics_query'] = arb_pipeline_statistics_query
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-vert'])
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-vert_adj'])
+add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-clip'])
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
