@@ -1,0 +1,22 @@
+include_directories(
+    ${GLEXT_INCLUDE_DIR}
+    ${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+    piglitutil_${piglit_target_api}
+    ${OPENGL_gl_LIBRARY}
+)
+
+# Display stuff in the tests
+#add_definitions (-DDISPLAY)
+
+# Don't bother with the piglit helper functions since we just need a simple
+# static link that won't be installed. (We'll actually anger newer cmake if we
+# use piglit helpers).
+add_library (pipestat_help STATIC pipestat_help.c)
+
+piglit_add_executable (arb_pipeline_statistics_query-vert pipeline_stats_vert.c)
+target_link_libraries (arb_pipeline_statistics_query-vert pipestat_help)
+
+# vim: ft=cmake
