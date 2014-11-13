@@ -67,7 +67,8 @@ do_query_func(const struct query *queries, const int count,
 
 	glClearColor(1.0, 0.0, 0.0, 0.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor4fv(green);
+	if (piglit_get_gl_version() <= 30)
+		glColor4fv(green);
 
 	for (i = 0; i < count; i++)
 		begin_query(&queries[i]);

@@ -22,5 +22,7 @@ piglit_add_executable (arb_pipeline_statistics_query-vert_adj pipeline_stats_ver
 target_link_libraries (arb_pipeline_statistics_query-vert_adj pipestat_help)
 piglit_add_executable (arb_pipeline_statistics_query-clip pipeline_stats_clip.c)
 target_link_libraries (arb_pipeline_statistics_query-clip pipestat_help)
+piglit_add_executable (arb_pipeline_statistics_query-geom pipeline_stats_geom.c)
+target_link_libraries (arb_pipeline_statistics_query-geom pipestat_help)
 
 # vim: ft=cmake
