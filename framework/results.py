@@ -190,6 +190,19 @@ def load_results(filename):
     # file descriptors
     if not os.path.isdir(filename):
         filepath = filename
+    elif os.path.exists(os.path.join(filename, 'metadata.json')):
+        # If the test is still running we need to use the resume code, since
+        # there will not be a results.json file.
+        # We want to return here since the results are known current (there's
+        # an assert in TestrunResult.load), and there is no filepath
+        # to pass to update_results
+        # XXX: This needs to be run before searching for a results.json file so
+        #      that if the new run is overwriting an old one we load the
+        #      partial and not the original. It might be better to just delete
+        #      the contents of the folder if there is anything in it.
+        # XXX: What happens if the tests folder gets deleted in the middle of
+        #      this?
+        return TestrunResult.resume(filename)
     else:
         # If there are both old and new results in a directory pick the new
         # ones first
