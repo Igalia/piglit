@@ -127,53 +127,57 @@ requirements = {
 }
 
 
-for api, requirement in requirements.iteritems():
-    version = requirement['version']
-    extensions = [requirement['extension']] if requirement['extension'] else []
+def main():
+    """main function."""
+    for api, requirement in requirements.iteritems():
+        version = requirement['version']
+        extensions = [requirement['extension']] if requirement['extension'] else []
 
-    for func, attrib in funcs.iteritems():
-        in_func = attrib['in_func']
-        out_func = attrib['out_func']
-        input_type = attrib['input']
-        output_type = attrib['output']
+        for func, attrib in funcs.iteritems():
+            in_func = attrib['in_func']
+            out_func = attrib['out_func']
+            input_type = attrib['input']
+            output_type = attrib['output']
 
-        for execution_stage in ('vs', 'fs'):
-            file_extension = 'frag' if execution_stage == 'fs' else 'vert'
+            for execution_stage in ('vs', 'fs'):
+                for in_modifier_func, modifier_func in modifier_funcs.iteritems():
+                    # Modifying the sign of an unsigned number doesn't make sense.
+                    if func == 'uintBitsToFloat' and in_modifier_func != '':
+                        continue
 
-            for in_modifier_func, modifier_func in modifier_funcs.iteritems():
-                # Modifying the sign of an unsigned number doesn't make sense.
-                if func == 'uintBitsToFloat' and in_modifier_func != '':
-                    continue
+                    modifier_name = '-' + in_modifier_func if in_modifier_func != '' else ''
+                    filename = os.path.join(
+                        'spec',
+                        api.lower(),
+                        'execution',
+                        'built-in-functions',
+                        "{0}-{1}{2}.shader_test".format(execution_stage, func,
+                                                        modifier_name))
+                    print filename
 
-                modifier_name = '-' + in_modifier_func if in_modifier_func != '' else ''
-                filename = os.path.join('spec',
-                                        api.lower(),
-                                        'execution',
-                                        'built-in-functions',
-                                        "{0}-{1}{2}.shader_test".format(execution_stage,
-                                                                        func,
-                                                                        modifier_name))
-                print filename
+                    dirname = os.path.dirname(filename)
+                    if not os.path.exists(dirname):
+                        os.makedirs(dirname)
 
-                dirname = os.path.dirname(filename)
-                if not os.path.exists(dirname):
-                    os.makedirs(dirname)
+                    if in_modifier_func == 'neg':
+                        in_modifier_func = '-'
+                    elif in_modifier_func == 'neg_abs':
+                        in_modifier_func = '-abs'
 
-                if in_modifier_func == 'neg':
-                    in_modifier_func = '-'
-                elif in_modifier_func == 'neg_abs':
-                    in_modifier_func = '-abs'
+                    f = open(filename, 'w')
+                    f.write(TEMPLATE.render(version=version,
+                                            extensions=extensions,
+                                            execution_stage=execution_stage,
+                                            func=func,
+                                            modifier_func=modifier_func,
+                                            in_modifier_func=in_modifier_func,
+                                            in_func=in_func,
+                                            out_func=out_func,
+                                            input_type=input_type,
+                                            output_type=output_type,
+                                            test_data=test_data))
+                    f.close()
 
-                f = open(filename, 'w')
-                f.write(TEMPLATE.render(version=version,
-                                        extensions=extensions,
-                                        execution_stage=execution_stage,
-                                        func=func,
-                                        modifier_func=modifier_func,
-                                        in_modifier_func=in_modifier_func,
-                                        in_func=in_func,
-                                        out_func=out_func,
-                                        input_type=input_type,
-                                        output_type=output_type,
-                                        test_data=test_data))
-                f.close()
+
+if __name__ == '__main__':
+    main()
