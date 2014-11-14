@@ -48,7 +48,7 @@ isDirectRendering(void)
 	int attribList[] = {
 		GLX_DRAWABLE_TYPE, GLX_USE_GL,
 		GLX_RENDER_TYPE, GLX_USE_GL,
-		GLX_DOUBLEBUFFER,
+		GLX_DOUBLEBUFFER, True,
 		0
 	};
 	int nitems = 0;
