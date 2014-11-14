@@ -216,6 +216,7 @@ piglit_init(int argc, char **argv)
 		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext_gs);
 	} else {
 		vs = piglit_compile_shader_text(GL_VERTEX_SHADER, vstext_nogs);
+		gs = 0;
 		fs = piglit_compile_shader_text(GL_FRAGMENT_SHADER,
 						fstext_nogs);
 	}
