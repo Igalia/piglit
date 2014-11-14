@@ -81,28 +81,19 @@ int main(int argc, char **argv)
 	piglit_require_glx_extension(dpy, "GLX_ARB_create_context_profile");
 	piglit_require_glx_extension(dpy, "GLX_EXT_create_context_es2_profile");
 
-	/* The GLX_EXT_create_context_es2_profile spec says:
+	/* The latest version of GLX_EXT_create_context_es2_profile spec says:
 	 *
-	 *     "... If the version requested is 2.0, and the
-	 *     GLX_CONTEXT_ES2_PROFILE_BIT_EXT bit is set in the
-	 *     GLX_CONTEXT_PROFILE_MASK_ARB attribute (see below),
-	 *     then the context returned will implement OpenGL ES
-	 *     2.0. This is the only way in which an implementation
-	 *     may request an OpenGL ES 2.0 context."
+	 *     "If the version requested is a valid and supported OpenGL-ES
+	 *     version, and the GLX_CONTEXT_ES_PROFILE_BIT_EXT bit is set in
+	 *     the GLX_CONTEXT_PROFILE_MASK_ARB attribute (see below), then the
+	 *     context returned will implement the OpenGL ES version
+	 *     requested."
 	 *
 	 * Try a bunch of OpenGL ES versions that don't exist.
 	 */
 	pass = try_version(1, 2) && pass;
 	pass = try_version(2, 1) && pass;
-	pass = try_version(3, 0) && pass;
-
-	/* These versions of ES exist, but future versions of the GLX
-	 * extension may add the ability to create contexts with these
-	 * versions.  When that happens, these checks will need to be
-	 * predicated by the non-existence of that extension.
-	 */
-	pass = try_version(1, 0) && pass;
-	pass = try_version(1, 1) && pass;
+	pass = try_version(3, 2) && pass;
 
 	GLX_ARB_create_context_teardown();
 
