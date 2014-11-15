@@ -132,6 +132,7 @@ REQUIREMENTS = {
 
 def main():
     """main function."""
+    # pylint: disable=line-too-long
     for api, requirement in REQUIREMENTS.iteritems():
         version = requirement['version']
         extensions = [requirement['extension']] if requirement['extension'] else []
