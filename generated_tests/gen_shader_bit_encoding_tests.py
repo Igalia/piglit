@@ -142,11 +142,6 @@ def main():
             os.makedirs(dirname)
 
         for func, attrib in FUNCS.iteritems():
-            in_func = attrib['in_func']
-            out_func = attrib['out_func']
-            input_type = attrib['input']
-            output_type = attrib['output']
-
             for execution_stage in ('vs', 'fs'):
                 for in_modifier_func, modifier_func in MODIFIER_FUNCS.iteritems():
                     # Modifying the sign of an unsigned number doesn't make sense.
@@ -173,10 +168,10 @@ def main():
                             func=func,
                             modifier_func=modifier_func,
                             in_modifier_func=in_modifier_func,
-                            in_func=in_func,
-                            out_func=out_func,
-                            input_type=input_type,
-                            output_type=output_type,
+                            in_func=attrib['in_func'],
+                            out_func=attrib['out_func'],
+                            input_type=attrib['input'],
+                            output_type=attrib['output'],
                             test_data=TEST_DATA))
 
 
