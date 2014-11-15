@@ -4318,6 +4318,12 @@ spec['ARB_direct_state_access']['texunits'] = PiglitGLTest('arb_direct_state_acc
 spec['ARB_direct_state_access']['texture-params'] = PiglitGLTest('arb_direct_state_access-texture-params', run_concurrent=True)
 spec['ARB_direct_state_access']['copytexturesubimage'] = PiglitGLTest('arb_direct_state_access-copytexturesubimage', run_concurrent=True)
 spec['ARB_direct_state_access']['texture-errors'] = PiglitGLTest('arb_direct_state_access-texture-errors', run_concurrent=True)
+spec['ARB_direct_state_access']['get-textures'] = PiglitGLTest('arb_direct_state_access-get-textures', run_concurrent=True)
+spec['ARB_direct_state_access']['gettextureimage-formats'] = PiglitGLTest('arb_direct_state_access-gettextureimage-formats', run_concurrent=True)
+spec['ARB_direct_state_access']['gettextureimage-luminance'] = PiglitGLTest('arb_direct_state_access-gettextureimage-luminance', run_concurrent=True)
+spec['ARB_direct_state_access']['gettextureimage-simple'] = PiglitGLTest('arb_direct_state_access-gettextureimage-simple', run_concurrent=True)
+spec['ARB_direct_state_access']['gettextureimage-targets'] = PiglitGLTest('arb_direct_state_access-gettextureimage-targets', run_concurrent=True)
+
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
