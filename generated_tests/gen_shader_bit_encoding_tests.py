@@ -136,6 +136,11 @@ def main():
         version = requirement['version']
         extensions = [requirement['extension']] if requirement['extension'] else []
 
+        dirname = os.path.join('spec', api.lower(), 'execution',
+                               'built-in-functions')
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+
         for func, attrib in FUNCS.iteritems():
             in_func = attrib['in_func']
             out_func = attrib['out_func']
@@ -150,17 +155,10 @@ def main():
 
                     modifier_name = '-' + in_modifier_func if in_modifier_func != '' else ''
                     filename = os.path.join(
-                        'spec',
-                        api.lower(),
-                        'execution',
-                        'built-in-functions',
+                        dirname,
                         "{0}-{1}{2}.shader_test".format(execution_stage, func,
                                                         modifier_name))
                     print(filename)
-
-                    dirname = os.path.dirname(filename)
-                    if not os.path.exists(dirname):
-                        os.makedirs(dirname)
 
                     if in_modifier_func == 'neg':
                         in_modifier_func = '-'
