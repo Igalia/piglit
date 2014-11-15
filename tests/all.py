@@ -2386,6 +2386,11 @@ with profile.group_manager(
       'fbo-generatemipmap-formats')
 
 with profile.group_manager(
+        PiglitGLTest, grouptools.join('spec', 'arb_clip_control')) as g:
+    g(['clip-control'])
+    g(['clip-control-depth-precision'])
+
+with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', 'arb_color_buffer_float')) as g:
 
     def f(name, format, p1=None, p2=None):

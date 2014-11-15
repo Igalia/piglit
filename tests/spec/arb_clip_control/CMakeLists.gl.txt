@@ -1,0 +1,15 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+piglit_add_executable (clip-control clip-control.c)
+piglit_add_executable (clip-control-depth-precision clip-control-depth-precision.c)
+
+# vim: ft=cmake:
