@@ -32,48 +32,55 @@ TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
                          'template.shader_test.mako')
 
 
-def floatBitsToInt(f):
+def floatBitsToInt(f):  # pylint: disable=invalid-name
     return struct.unpack('i', struct.pack('f', f))[0]
 
-def floatBitsToUint(f):
+
+def floatBitsToUint(f):  # pylint: disable=invalid-name
     return struct.unpack('I', struct.pack('f', f))[0]
 
-def intBitsToFloat(i):
+
+def intBitsToFloat(i):  # pylint: disable=invalid-name
     return struct.unpack('f', struct.pack('i', i))[0]
 
-def uintBitsToFloat(u):
+
+def uintBitsToFloat(u):  # pylint: disable=invalid-name
     return struct.unpack('f', struct.pack('I', u))[0]
+
 
 def neg_abs(num):
     return neg(abs(num))
 
+
 def vec4(f):
     return [f, f, f, f]
 
-test_data = {
+# pylint: disable=bad-whitespace
+TEST_DATA = {
     # Interesting floating-point inputs
     'mixed':                        (2.0, 9.5, -4.5, -25.0),
-    '0.0':                          vec4( 0.0), # int 0
-    '-0.0':                         vec4(-0.0), # INT_MIN
+    '0.0':                          vec4( 0.0),  # int 0
+    '-0.0':                         vec4(-0.0),  # INT_MIN
     '1.0':                          vec4( 1.0),
     '-1.0':                         vec4(-1.0),
     'normalized smallest':          vec4( 1.1754944e-38),
     'normalized smallest negative': vec4(-1.1754944e-38),
     'normalized largest':           vec4( 3.4028235e+38),
-    'normalized largest negative':  vec4(-3.4028235e+38)
+    'normalized largest negative':  vec4(-3.4028235e+38),
 
     # Don't test +inf or -inf, since we don't have a way to pass them via
     # shader_runner [test] sections. Don't test NaN, since it has many
     # representations. Don't test subnormal values, since hardware might
     # flush them to zero.
 }
+# pylint: enable=bad-whitespace
 
 # in_func: Function to convert floating-point data in test_data (above) into
 #          input (given) data to pass the shader.
 # out_func: Function to convert floating-point data in test_data (above) into
 #           output (expected) data to pass the shader.
 
-funcs = {
+FUNCS = {
     'floatBitsToInt': {
         'in_func':  lambda x: x,
         'out_func': floatBitsToInt,
@@ -100,14 +107,14 @@ funcs = {
     }
 }
 
-modifier_funcs = {
+MODIFIER_FUNCS = {
     '':            lambda x: x,
     'abs':         abs,
     'neg':         neg,
     'neg_abs':     neg_abs,
 }
 
-requirements = {
+REQUIREMENTS = {
     'ARB_shader_bit_encoding': {
         'version': '1.30',
         'extension': 'GL_ARB_shader_bit_encoding'
@@ -125,18 +132,18 @@ requirements = {
 
 def main():
     """main function."""
-    for api, requirement in requirements.iteritems():
+    for api, requirement in REQUIREMENTS.iteritems():
         version = requirement['version']
         extensions = [requirement['extension']] if requirement['extension'] else []
 
-        for func, attrib in funcs.iteritems():
+        for func, attrib in FUNCS.iteritems():
             in_func = attrib['in_func']
             out_func = attrib['out_func']
             input_type = attrib['input']
             output_type = attrib['output']
 
             for execution_stage in ('vs', 'fs'):
-                for in_modifier_func, modifier_func in modifier_funcs.iteritems():
+                for in_modifier_func, modifier_func in MODIFIER_FUNCS.iteritems():
                     # Modifying the sign of an unsigned number doesn't make sense.
                     if func == 'uintBitsToFloat' and in_modifier_func != '':
                         continue
@@ -172,7 +179,7 @@ def main():
                             out_func=out_func,
                             input_type=input_type,
                             output_type=output_type,
-                            test_data=test_data))
+                            test_data=TEST_DATA))
 
 
 if __name__ == '__main__':
