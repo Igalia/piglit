@@ -302,7 +302,7 @@ int main(int argc, char **argv) {
 				   XCreatePixmap(display,
 						 DefaultRootWindow(display),
 						 piglit_width, piglit_height,
-						 32),
+						 visual->depth),
 				   NULL);
 	    break;
 	case GLXPBUFFER: {
