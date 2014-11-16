@@ -1,0 +1,23 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough]
+
+[fragment shader]
+uniform ivec2 arg0;
+uniform ivec2 arg1;
+uniform ivec2 expected;
+
+void main()
+{
+  ivec2 result = arg0 * arg1;
+  result = result.xx * ivec2(2, 3);
+  gl_FragColor = result == expected ? vec4(0.0, 1.0, 0.0, 1.0) : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+uniform ivec2 arg0 38 35
+uniform ivec2 arg1 1 1
+uniform ivec2 expected 76 114
+draw rect -1 -1 2 2
+probe rgba 0 0 0.0 1.0 0.0 1.0
