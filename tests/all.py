@@ -664,8 +664,8 @@ spec['!OpenGL 1.1'] = gl11
 add_texwrap_target_tests(gl11, '1D')
 add_texwrap_target_tests(gl11, '2D')
 add_texwrap_format_tests(gl11)
-gl11['copyteximage 1D'] = PiglitGLTest(['copyteximage', '-auto', '1D'])
-gl11['copyteximage 2D'] = PiglitGLTest(['copyteximage', '-auto', '2D'])
+gl11['copyteximage 1D'] = PiglitGLTest(['copyteximage', '1D'])
+gl11['copyteximage 2D'] = PiglitGLTest(['copyteximage', '2D'])
 add_plain_test(gl11, 'drawbuffer-modes')
 add_plain_test(gl11, 'fdo10370')
 add_plain_test(gl11, 'fdo23489')
@@ -742,7 +742,7 @@ add_plain_test(gl11, 'copytexsubimage')
 add_plain_test(gl11, 'getteximage-formats')
 add_plain_test(gl11, 'getteximage-luminance')
 add_plain_test(gl11, 'getteximage-simple')
-gl11['incomplete-texture-fixed'] = PiglitGLTest('incomplete-texture -auto fixed', run_concurrent=True)
+gl11['incomplete-texture-fixed'] = PiglitGLTest('incomplete-texture fixed', run_concurrent=True)
 add_plain_test(gl11, 'max-texture-size')
 add_concurrent_test(gl11, 'max-texture-size-level')
 add_concurrent_test(gl11, 'proxy-texture')
@@ -841,7 +841,7 @@ add_msaa_visual_plain_tests(gl14, 'copy-pixels')
 add_plain_test(gl14, 'draw-batch')
 add_plain_test(gl14, 'stencil-wrap')
 add_plain_test(gl14, 'triangle-rasterization')
-gl14['triangle-rasterization-fbo'] = PiglitGLTest(['triangle-rasterization', '-auto', '-use_fbo'])
+gl14['triangle-rasterization-fbo'] = PiglitGLTest(['triangle-rasterization', '-use_fbo'])
 add_plain_test(gl14, 'triangle-rasterization-overdraw')
 gl14['tex-miplevel-selection'] = PiglitGLTest('tex-miplevel-selection -nobias -nolod', run_concurrent=True)
 gl14['tex-miplevel-selection-lod'] = PiglitGLTest('tex-miplevel-selection -nobias', run_concurrent=True)
@@ -850,13 +850,13 @@ gl14['tex-miplevel-selection-lod-bias'] = PiglitGLTest('tex-miplevel-selection',
 gl15 = {}
 spec['!OpenGL 1.5'] = gl15
 add_plain_test(gl15, 'draw-elements')
-gl15['draw-elements-user'] = PiglitGLTest(['draw-elements', '-auto', 'user'])
+gl15['draw-elements-user'] = PiglitGLTest(['draw-elements', 'user'])
 add_plain_test(gl15, 'draw-vertices')
-gl15['draw-vertices-user'] = PiglitGLTest(['draw-vertices', '-auto', 'user'])
+gl15['draw-vertices-user'] = PiglitGLTest(['draw-vertices', 'user'])
 add_plain_test(gl15, 'isbufferobj')
 add_plain_test(gl15, 'depth-tex-compare')
-gl15['normal3b3s-invariance-byte'] = PiglitGLTest(['gl-1.5-normal3b3s-invariance', 'GL_BYTE', '-auto'])
-gl15['normal3b3s-invariance-short'] = PiglitGLTest(['gl-1.5-normal3b3s-invariance', 'GL_SHORT', '-auto'])
+gl15['normal3b3s-invariance-byte'] = PiglitGLTest(['gl-1.5-normal3b3s-invariance', 'GL_BYTE'])
+gl15['normal3b3s-invariance-short'] = PiglitGLTest(['gl-1.5-normal3b3s-invariance', 'GL_SHORT'])
 
 gl20 = {}
 spec['!OpenGL 2.0'] = gl20
@@ -906,7 +906,7 @@ add_plain_test(gl20, 'stencil-twoside')
 add_plain_test(gl20, 'vs-point_size-zero')
 add_plain_test(gl20, 'depth-tex-modes-glsl')
 add_plain_test(gl20, 'fragment-and-vertex-texturing')
-gl20['incomplete-texture-glsl'] = PiglitGLTest('incomplete-texture -auto glsl', run_concurrent=True)
+gl20['incomplete-texture-glsl'] = PiglitGLTest('incomplete-texture glsl', run_concurrent=True)
 add_plain_test(gl20, 'tex3d-npot')
 add_concurrent_test(gl20, 'max-samplers')
 add_concurrent_test(gl20, 'max-samplers border')
@@ -1095,7 +1095,7 @@ def add_recursion_test(group, name):
     # This may cause false negatives on systems that map the framebuffer
     # into the processes address space.  This happens on X with DRI1 based
     # drivers, for example.
-    group[name] = PiglitGLTest(['recursion', '-auto', '-rlimit', '268435456', name])
+    group[name] = PiglitGLTest(['recursion', '-rlimit', '268435456', name])
 
 rec = {}
 spec['glsl-1.20']['recursion'] = rec
@@ -1206,7 +1206,7 @@ add_plain_test(spec['glsl-1.30']['linker']['clipping'], 'mixing-clip-distance-an
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], 'max-clip-distances')
 for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
     test_name = 'isinf-and-isnan ' + arg
-    spec['glsl-1.30']['execution'][test_name] = PiglitGLTest(test_name + ' -auto')
+    spec['glsl-1.30']['execution'][test_name] = PiglitGLTest(test_name)
 spec['glsl-1.30']['execution']['clipping']['clip-plane-transformation pos'] = \
     PiglitGLTest('clip-plane-transformation pos', run_concurrent=True)
 spec['glsl-1.30']['texel-offset-limits'] = PiglitGLTest('glsl-1.30-texel-offset-limits', run_concurrent=True)
@@ -1526,8 +1526,8 @@ add_concurrent_test(spec['glsl-es-3.00']['execution'], 'varying-struct-centroid_
 spec['glsl-es-3.00']['built-in constants'] = PiglitGLTest('built-in-constants_gles3 ' + os.path.join(testsDir, 'spec/glsl-es-3.00/minimum-maximums.txt'), run_concurrent=True)
 
 # AMD_performance_monitor
-profile.test_list['spec/AMD_performance_monitor/api'] = PiglitGLTest('amd_performance_monitor_api -auto')
-profile.test_list['spec/AMD_performance_monitor/measure'] = PiglitGLTest('amd_performance_monitor_measure -auto')
+profile.test_list['spec/AMD_performance_monitor/api'] = PiglitGLTest('amd_performance_monitor_api')
+profile.test_list['spec/AMD_performance_monitor/measure'] = PiglitGLTest('amd_performance_monitor_measure')
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = {}
@@ -1706,10 +1706,10 @@ arb_draw_elements_base_vertex = {}
 spec['ARB_draw_elements_base_vertex'] = arb_draw_elements_base_vertex
 arb_draw_elements_base_vertex['dlist'] = PiglitGLTest('arb_draw_elements_base_vertex-dlist', run_concurrent=True)
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements')
-arb_draw_elements_base_vertex['arb_draw_elements_base_vertex-drawelements-user_varrays'] = PiglitGLTest(['arb_draw_elements_base_vertex-drawelements', '-auto', 'user_varrays'])
+arb_draw_elements_base_vertex['arb_draw_elements_base_vertex-drawelements-user_varrays'] = PiglitGLTest(['arb_draw_elements_base_vertex-drawelements', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-negative-index')
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-bounds')
-arb_draw_elements_base_vertex['arb_draw_elements_base_vertex-negative-index-user_varrays'] = PiglitGLTest(['arb_draw_elements_base_vertex-negative-index', '-auto', 'user_varrays'])
+arb_draw_elements_base_vertex['arb_draw_elements_base_vertex-negative-index-user_varrays'] = PiglitGLTest(['arb_draw_elements_base_vertex-negative-index', 'user_varrays'])
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawelements-instanced')
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-drawrangeelements')
 add_plain_test(arb_draw_elements_base_vertex, 'arb_draw_elements_base_vertex-multidrawelements')
@@ -1773,7 +1773,7 @@ add_plain_test(arb_fragment_program, 'fp-long-alu')
 add_plain_test(arb_fragment_program, 'fp-set-01')
 arb_fragment_program['sparse-samplers'] = PiglitGLTest('arb_fragment_program-sparse-samplers', run_concurrent=True)
 add_plain_test(arb_fragment_program, 'trinity-fp1')
-arb_fragment_program['incomplete-texture-arb_fp'] = PiglitGLTest('incomplete-texture -auto arb_fp', run_concurrent=True)
+arb_fragment_program['incomplete-texture-arb_fp'] = PiglitGLTest('incomplete-texture arb_fp', run_concurrent=True)
 
 # Group ARB_fragment_program_shadow
 arb_fragment_program_shadow = {}
@@ -2000,17 +2000,17 @@ add_plain_test(arb_sample_shading, 'arb_sample_shading-api')
 TEST_SAMPLE_COUNTS = (0,) + MSAA_SAMPLE_COUNTS
 for num_samples in TEST_SAMPLE_COUNTS:
     test_name = 'builtin-gl-num-samples {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 for num_samples in TEST_SAMPLE_COUNTS:
     test_name = 'builtin-gl-sample-id {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 for num_samples in TEST_SAMPLE_COUNTS:
     test_name = 'builtin-gl-sample-mask {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 for num_samples in (0,2,4,6,8):
@@ -2020,17 +2020,17 @@ for num_samples in (0,2,4,6,8):
 
 for num_samples in TEST_SAMPLE_COUNTS:
     test_name = 'builtin-gl-sample-position {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = 'interpolate-at-sample-position {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = 'ignore-centroid-qualifier {0}'.format(num_samples)
-    executable = 'arb_sample_shading-{0} -auto'.format(test_name)
+    executable = 'arb_sample_shading-{0}'.format(test_name)
     arb_sample_shading[test_name] = PiglitGLTest(executable)
 
 import_glsl_parser_tests(spec['ARB_sample_shading'],
@@ -2176,8 +2176,7 @@ add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-04')
 add_plain_test(arb_explicit_attrib_location, 'glsl-explicit-location-05')
 for test_type in ('shader', 'api'):
     test_name = 'overlapping-locations-input-attribs {0}'.format(test_type)
-    executable = '{0} -auto'.format(test_name)
-    arb_explicit_attrib_location[test_name] = PiglitGLTest(executable)
+    arb_explicit_attrib_location[test_name] = PiglitGLTest(test_name)
 
 # Group ARB_explicit_uniform_location
 arb_explicit_uniform_location = {}
@@ -2399,8 +2398,8 @@ add_plain_test(apple_vertex_array_object, 'vao-01')
 add_plain_test(apple_vertex_array_object, 'vao-02')
 apple_vertex_array_object['isvertexarray'] = PiglitGLTest('arb_vertex_array-isvertexarray apple', run_concurrent=True)
 
-profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PiglitGLTest('arb_vertex_array_bgra-api-errors -auto')
-profile.test_list['spec/ARB_vertex_array_bgra/get'] = PiglitGLTest('arb_vertex_array_bgra-get -auto')
+profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PiglitGLTest('arb_vertex_array_bgra-api-errors')
+profile.test_list['spec/ARB_vertex_array_bgra/get'] = PiglitGLTest('arb_vertex_array_bgra-get')
 
 arb_vertex_array_object = {}
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
@@ -2409,8 +2408,8 @@ arb_vertex_array_object['isvertexarray'] = PiglitGLTest('arb_vertex_array-isvert
 
 arb_vertex_buffer_object = {}
 spec['ARB_vertex_buffer_object'] = arb_vertex_buffer_object
-arb_vertex_buffer_object['elements-negative-offset'] = PiglitGLTest(['arb_vertex_buffer_object-elements-negative-offset', '-auto'])
-arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PiglitGLTest(['arb_vertex_buffer_object-mixed-immediate-and-vbo', '-auto'])
+arb_vertex_buffer_object['elements-negative-offset'] = PiglitGLTest(['arb_vertex_buffer_object-elements-negative-offset'])
+arb_vertex_buffer_object['mixed-immediate-and-vbo'] = PiglitGLTest(['arb_vertex_buffer_object-mixed-immediate-and-vbo'])
 add_plain_test(arb_vertex_buffer_object, 'fdo14575')
 add_plain_test(arb_vertex_buffer_object, 'fdo22540')
 add_plain_test(arb_vertex_buffer_object, 'fdo31934')
@@ -2428,8 +2427,8 @@ add_plain_test(arb_vertex_buffer_object, 'vbo-subdata-zero')
 
 arb_vertex_program = {}
 spec['ARB_vertex_program'] = arb_vertex_program
-arb_vertex_program['getenv4d-with-error'] = PiglitGLTest(['arb_vertex_program-getenv4d-with-error', '-auto'])
-arb_vertex_program['getlocal4d-with-error'] = PiglitGLTest(['arb_vertex_program-getlocal4d-with-error', '-auto'])
+arb_vertex_program['getenv4d-with-error'] = PiglitGLTest(['arb_vertex_program-getenv4d-with-error'])
+arb_vertex_program['getlocal4d-with-error'] = PiglitGLTest(['arb_vertex_program-getlocal4d-with-error'])
 arb_vertex_program['getlocal4f-max'] = PiglitGLTest('arb_vertex_program-getlocal4f-max', run_concurrent=True)
 arb_vertex_program['getlocal4-errors'] = PiglitGLTest('arb_vertex_program-getlocal4-errors', run_concurrent=True)
 arb_vertex_program['clip-plane-transformation arb'] = PiglitGLTest('clip-plane-transformation arb', run_concurrent=True)
@@ -2555,7 +2554,7 @@ for num_samples in MSAA_SAMPLE_COUNTS:
 
 for num_samples in MSAA_SAMPLE_COUNTS:
     test_name = ' '.join(['turn-on-off', str(num_samples)])
-    executable = 'ext_framebuffer_multisample-{0} -auto'.format(test_name)
+    executable = 'ext_framebuffer_multisample-{0}'.format(test_name)
     ext_framebuffer_multisample[test_name] = PiglitGLTest(executable)
 
 for num_samples in MSAA_SAMPLE_COUNTS:
@@ -2812,8 +2811,8 @@ add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_hints
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-invalid_attributes')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-missing_attributes')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-ownership_transfer')
-ext_image_dma_buf_import['ext_image_dma_buf_import-sample_argb8888'] = PiglitGLTest(['ext_image_dma_buf_import-sample_rgb', '-fmt=AR24', '-auto'])
-ext_image_dma_buf_import['ext_image_dma_buf_import-sample_xrgb8888'] = PiglitGLTest(['ext_image_dma_buf_import-sample_rgb', '-auto', '-fmt=XR24', '-alpha-one'])
+ext_image_dma_buf_import['ext_image_dma_buf_import-sample_argb8888'] = PiglitGLTest(['ext_image_dma_buf_import-sample_rgb', '-fmt=AR24'])
+ext_image_dma_buf_import['ext_image_dma_buf_import-sample_xrgb8888'] = PiglitGLTest(['ext_image_dma_buf_import-sample_rgb', '-fmt=XR24', '-alpha-one'])
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_unsupported_format')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_external_sampler_only')
 add_plain_test(ext_image_dma_buf_import, 'ext_image_dma_buf_import-intel_external_sampler_with_dma_only')
@@ -2825,7 +2824,7 @@ add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8', 0)
 add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_stencil')
 add_texwrap_format_tests(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil')
-ext_packed_depth_stencil['readpixels-24_8'] = PiglitGLTest(['ext_packed_depth_stencil-readpixels-24_8', '-auto'])
+ext_packed_depth_stencil['readpixels-24_8'] = PiglitGLTest(['ext_packed_depth_stencil-readpixels-24_8'])
 add_plain_test(ext_packed_depth_stencil, 'fbo-blit-d24s8')
 add_depthstencil_render_miplevels_tests(
         ext_packed_depth_stencil,
@@ -2865,7 +2864,7 @@ add_concurrent_test(ext_texture_array, 'getteximage-targets 1D_ARRAY')
 add_concurrent_test(ext_texture_array, 'getteximage-targets 2D_ARRAY')
 for test_mode in ['teximage', 'texsubimage']:
     test_name = 'compressed {0}'.format(test_mode)
-    ext_texture_array[test_name] = PiglitGLTest('ext_texture_array-' + test_name + ' -auto -fbo')
+    ext_texture_array[test_name] = PiglitGLTest(['ext_texture_array-{}'.format(test_name), '-fbo'])
 
 arb_texture_cube_map = {}
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
@@ -2873,10 +2872,10 @@ add_msaa_visual_plain_tests(arb_texture_cube_map, 'copyteximage CUBE')
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 add_plain_test(arb_texture_cube_map, 'cubemap')
 add_concurrent_test(arb_texture_cube_map, 'cubemap-getteximage-pbo')
-arb_texture_cube_map['cubemap npot'] = PiglitGLTest(['cubemap', '-auto', 'npot'])
+arb_texture_cube_map['cubemap npot'] = PiglitGLTest(['cubemap', 'npot'])
 add_plain_test(arb_texture_cube_map, 'cubemap-shader')
-arb_texture_cube_map['cubemap-shader lod'] = PiglitGLTest(['cubemap-shader', '-auto', 'lod'])
-arb_texture_cube_map['cubemap-shader bias'] = PiglitGLTest(['cubemap-shader', '-auto', 'bias'])
+arb_texture_cube_map['cubemap-shader lod'] = PiglitGLTest(['cubemap-shader', 'lod'])
+arb_texture_cube_map['cubemap-shader bias'] = PiglitGLTest(['cubemap-shader', 'bias'])
 add_concurrent_test(arb_texture_cube_map, 'getteximage-targets CUBE')
 
 arb_texture_cube_map_array = {}
@@ -3213,10 +3212,10 @@ ext_transform_feedback['geometry-shaders-basic'] = PiglitGLTest(
 
 arb_transform_feedback2 = {}
 spec['ARB_transform_feedback2'] = arb_transform_feedback2
-arb_transform_feedback2['Change objects while paused'] = PiglitGLTest(['arb_transform_feedback2-change-objects-while-paused', '-auto'])
-arb_transform_feedback2['Change objects while paused (GLES3)'] = PiglitGLTest(['arb_transform_feedback2-change-objects-while-paused_gles3', '-auto'])
-arb_transform_feedback2['draw-auto'] = PiglitGLTest(['arb_transform_feedback2-draw-auto', '-auto'])
-arb_transform_feedback2['istranformfeedback'] = PiglitGLTest(['arb_transform_feedback2-istransformfeedback', '-auto'])
+arb_transform_feedback2['Change objects while paused'] = PiglitGLTest(['arb_transform_feedback2-change-objects-while-paused'])
+arb_transform_feedback2['Change objects while paused (GLES3)'] = PiglitGLTest(['arb_transform_feedback2-change-objects-while-paused_gles3'])
+arb_transform_feedback2['draw-auto'] = PiglitGLTest(['arb_transform_feedback2-draw-auto'])
+arb_transform_feedback2['istranformfeedback'] = PiglitGLTest(['arb_transform_feedback2-istransformfeedback'])
 arb_transform_feedback2['glGenTransformFeedbacks names only'] = PiglitGLTest('arb_transform_feedback2-gen-names-only', run_concurrent=True)
 arb_transform_feedback2['cannot bind when another object is active'] = PiglitGLTest('arb_transform_feedback2-cannot-bind-when-active', run_concurrent=True)
 arb_transform_feedback2['misc. API queries'] = PiglitGLTest('arb_transform_feedback2-api-queries', run_concurrent=True)
@@ -3224,7 +3223,7 @@ arb_transform_feedback2['counting with pause'] = PiglitGLTest('arb_transform_fee
 
 arb_transform_feedback_instanced = {}
 spec['ARB_transform_feedback_instanced'] = arb_transform_feedback_instanced
-arb_transform_feedback_instanced['draw-auto instanced'] = PiglitGLTest(['arb_transform_feedback2-draw-auto', '-auto', 'instanced'])
+arb_transform_feedback_instanced['draw-auto instanced'] = PiglitGLTest(['arb_transform_feedback2-draw-auto', 'instanced'])
 
 arb_transform_feedback3 = {}
 spec['ARB_transform_feedback3'] = arb_transform_feedback3
@@ -3238,16 +3237,16 @@ for param in ['gl_NextBuffer-1', 'gl_NextBuffer-2', 'gl_SkipComponents1-1',
         'ext_transform_feedback-output-type {0}'.format(param),
         run_concurrent=True)
 
-arb_transform_feedback3['arb_transform_feedback3-bind_buffer_invalid_index'] = PiglitGLTest(['arb_transform_feedback3-bind_buffer_invalid_index', '-auto'])
-arb_transform_feedback3['arb_transform_feedback3-query_with_invalid_index'] = PiglitGLTest(['arb_transform_feedback3-query_with_invalid_index', '-auto'])
-arb_transform_feedback3['arb_transform_feedback3-end_query_with_name_zero'] = PiglitGLTest(['arb_transform_feedback3-end_query_with_name_zero', '-auto'])
-arb_transform_feedback3['arb_transform_feedback3-draw_using_invalid_stream_index'] = PiglitGLTest(['arb_transform_feedback3-draw_using_invalid_stream_index', '-auto'])
-arb_transform_feedback3['arb_transform_feedback3-set_varyings_with_invalid_args'] = PiglitGLTest(['arb_transform_feedback3-set_varyings_with_invalid_args', '-auto'])
-arb_transform_feedback3['arb_transform_feedback3-set_invalid_varyings'] = PiglitGLTest(['arb_transform_feedback3-set_invalid_varyings', '-auto'])
+arb_transform_feedback3['arb_transform_feedback3-bind_buffer_invalid_index'] = PiglitGLTest(['arb_transform_feedback3-bind_buffer_invalid_index'])
+arb_transform_feedback3['arb_transform_feedback3-query_with_invalid_index'] = PiglitGLTest(['arb_transform_feedback3-query_with_invalid_index'])
+arb_transform_feedback3['arb_transform_feedback3-end_query_with_name_zero'] = PiglitGLTest(['arb_transform_feedback3-end_query_with_name_zero'])
+arb_transform_feedback3['arb_transform_feedback3-draw_using_invalid_stream_index'] = PiglitGLTest(['arb_transform_feedback3-draw_using_invalid_stream_index'])
+arb_transform_feedback3['arb_transform_feedback3-set_varyings_with_invalid_args'] = PiglitGLTest(['arb_transform_feedback3-set_varyings_with_invalid_args'])
+arb_transform_feedback3['arb_transform_feedback3-set_invalid_varyings'] = PiglitGLTest(['arb_transform_feedback3-set_invalid_varyings'])
 
-arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_vs'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'vs'])
-arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs'])
-arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs_max'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', '-auto', 'gs_max'])
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_vs'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', 'vs'])
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', 'gs'])
+arb_transform_feedback3['arb_transform_feedback3-ext_interleaved_two_bufs_gs_max'] = PiglitGLTest(['arb_transform_feedback3-ext_interleaved_two_bufs', 'gs_max'])
 
 arb_uniform_buffer_object = {}
 spec['ARB_uniform_buffer_object'] = arb_uniform_buffer_object
@@ -3297,8 +3296,8 @@ arb_uniform_buffer_object['uniformblockbinding'] = PiglitGLTest('arb_uniform_buf
 ati_draw_buffers = {}
 spec['ATI_draw_buffers'] = ati_draw_buffers
 add_plain_test(ati_draw_buffers, 'ati_draw_buffers-arbfp')
-ati_draw_buffers['arbfp-no-index'] = PiglitGLTest(['ati_draw_buffers-arbfp-no-index', '-auto'])
-ati_draw_buffers['arbfp-no-option'] = PiglitGLTest(['ati_draw_buffers-arbfp-no-option', '-auto'])
+ati_draw_buffers['arbfp-no-index'] = PiglitGLTest(['ati_draw_buffers-arbfp-no-index'])
+ati_draw_buffers['arbfp-no-option'] = PiglitGLTest(['ati_draw_buffers-arbfp-no-option'])
 
 ati_envmap_bumpmap = {}
 spec['ATI_envmap_bumpmap'] = ati_envmap_bumpmap
@@ -3373,16 +3372,16 @@ nv_conditional_render = {}
 spec['NV_conditional_render'] = nv_conditional_render
 nv_conditional_render['begin-while-active'] = PiglitGLTest('nv_conditional_render-begin-while-active', run_concurrent=True)
 nv_conditional_render['begin-zero'] = PiglitGLTest('nv_conditional_render-begin-zero', run_concurrent=True)
-nv_conditional_render['bitmap'] = PiglitGLTest(['nv_conditional_render-bitmap', '-auto'])
-nv_conditional_render['blitframebuffer'] = PiglitGLTest(['nv_conditional_render-blitframebuffer', '-auto'])
-nv_conditional_render['clear'] = PiglitGLTest(['nv_conditional_render-clear', '-auto'])
-nv_conditional_render['copypixels'] = PiglitGLTest(['nv_conditional_render-copypixels', '-auto'])
-nv_conditional_render['copyteximage'] = PiglitGLTest(['nv_conditional_render-copyteximage', '-auto'])
-nv_conditional_render['copytexsubimage'] = PiglitGLTest(['nv_conditional_render-copytexsubimage', '-auto'])
-nv_conditional_render['dlist'] = PiglitGLTest(['nv_conditional_render-dlist', '-auto'])
-nv_conditional_render['drawpixels'] = PiglitGLTest(['nv_conditional_render-drawpixels', '-auto'])
-nv_conditional_render['generatemipmap'] = PiglitGLTest(['nv_conditional_render-generatemipmap', '-auto'])
-nv_conditional_render['vertex_array'] = PiglitGLTest(['nv_conditional_render-vertex_array', '-auto'])
+nv_conditional_render['bitmap'] = PiglitGLTest(['nv_conditional_render-bitmap'])
+nv_conditional_render['blitframebuffer'] = PiglitGLTest(['nv_conditional_render-blitframebuffer'])
+nv_conditional_render['clear'] = PiglitGLTest(['nv_conditional_render-clear'])
+nv_conditional_render['copypixels'] = PiglitGLTest(['nv_conditional_render-copypixels'])
+nv_conditional_render['copyteximage'] = PiglitGLTest(['nv_conditional_render-copyteximage'])
+nv_conditional_render['copytexsubimage'] = PiglitGLTest(['nv_conditional_render-copytexsubimage'])
+nv_conditional_render['dlist'] = PiglitGLTest(['nv_conditional_render-dlist'])
+nv_conditional_render['drawpixels'] = PiglitGLTest(['nv_conditional_render-drawpixels'])
+nv_conditional_render['generatemipmap'] = PiglitGLTest(['nv_conditional_render-generatemipmap'])
+nv_conditional_render['vertex_array'] = PiglitGLTest(['nv_conditional_render-vertex_array'])
 
 oes_matrix_get = {}
 spec['OES_matrix_get'] = oes_matrix_get
@@ -3526,7 +3525,7 @@ add_concurrent_test(arb_copy_image, 'arb_copy_image-formats --samples=8')
 arb_half_float_vertex = {}
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
 add_plain_test(arb_half_float_vertex, 'draw-vertices-half-float')
-arb_half_float_vertex['draw-vertices-half-float-user'] = PiglitGLTest(['draw-vertices-half-float', '-auto', 'user'])
+arb_half_float_vertex['draw-vertices-half-float-user'] = PiglitGLTest(['draw-vertices-half-float', 'user'])
 
 arb_vertex_type_2_10_10_10_rev = {}
 spec['ARB_vertex_type_2_10_10_10_rev'] = arb_vertex_type_2_10_10_10_rev
@@ -4237,12 +4236,11 @@ gles30 = {}
 spec['!OpenGL ES 3.0'] = gles30
 for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb8-punchthrough-alpha1', 'srgb8-punchthrough-alpha1'):
     test_name = ' ' .join(['oes_compressed_etc2_texture-miptree_gles3', tex_format])
-    executable = '{0} -auto'.format(test_name)
-    gles30[test_name] = PiglitGLTest(executable, run_concurrent=True)
+    gles30[test_name] = PiglitGLTest(test_name, run_concurrent=True)
 gles30['minmax'] = PiglitGLTest('minmax_gles3', run_concurrent=True)
 for test_mode in ['teximage', 'texsubimage']:
     test_name = 'ext_texture_array-compressed_gles3 {0}'.format(test_mode)
-    gles30[test_name] = PiglitGLTest(test_name + ' -auto -fbo')
+    gles30[test_name] = PiglitGLTest(['ext_texture_array-compressed_gles3', test_mode, '-fbo'])
 gles30['texture-immutable-levels'] = PiglitGLTest('texture-immutable-levels_gles3', run_concurrent=True)
 gles30['gl_VertexID used with glDrawArrays'] = PiglitGLTest('gles-3.0-drawarrays-vertexid', run_concurrent=True)
 
