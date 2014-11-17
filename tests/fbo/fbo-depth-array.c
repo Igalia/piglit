@@ -70,7 +70,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 		config.window_height = MAX_DIM;
 	}
 	else {
-		config.window_width = (width + 2) * MIN2(layers, 3);
+		config.window_width = (width + 2) * MIN2(layers, 4);
 		config.window_height = (height + 2) * ((layers + 2) / 3);
 	}
 	config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGB;
