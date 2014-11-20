@@ -24,5 +24,6 @@ piglit_add_executable (gl-1.0-blend-func blend.c)
 piglit_add_executable (gl-1.0-ortho-pos orthpos.c)
 piglit_add_executable (gl-1.0-fpexceptions fpexceptions.c)
 piglit_add_executable (gl-1.0-readpixsanity readpix.c)
+piglit_add_executable (gl-1.0-logicop logicop.c)
 
 # vim: ft=cmake:
