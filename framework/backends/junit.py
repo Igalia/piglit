@@ -143,6 +143,9 @@ class JUnitBackend(FileBackend):
         out = etree.SubElement(element, 'system-out')
         out.text = data['out']
 
+        # Prepend command line to stdout
+        out.text = data['command'] + '\n' + out.text
+
         # Add stderr
         err = etree.SubElement(element, 'system-err')
         err.text = data['err']
