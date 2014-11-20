@@ -283,6 +283,12 @@ class Test(object):
                                           self.env.iteritems()):
             fullenv[key] = str(value)
 
+        # preexec_fn is not supported on Windows platforms
+        if sys.platform == 'win32':
+            preexec_fn = None
+        else:
+            preexec_fn = self.__set_process_group
+
         try:
             proc = subprocess.Popen(self.command,
                                     stdout=subprocess.PIPE,
@@ -290,7 +296,7 @@ class Test(object):
                                     cwd=self.cwd,
                                     env=fullenv,
                                     universal_newlines=True,
-                                    preexec_fn=self.__set_process_group)
+                                    preexec_fn=preexec_fn)
             # create a ProcessTimeout object to watch out for test hang if the
             # process is still going after the timeout, then it will be killed
             # forcing the communicate function (which is a blocking call) to
