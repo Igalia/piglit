@@ -612,6 +612,14 @@ PixelFormatsTest::CompatibleFormatAndType(GLenum format, GLenum datatype) const
 	if (format == GL_ABGR_EXT && !haveABGR)
 		return false;
 
+	// Special case: GL_ABGR_EXT can't be used with packed types
+	// because the packed formats specs (which were all written after the
+	// GL_EXT_abgr) explicitly say that the packed formats can only be used
+	// with GL_RGB, GL_BGR, GL_RGBA, or GL_BGRA and do not mention
+	// GL_ABGR_EXT.
+	if (format == GL_ABGR_EXT && IsPackedType(datatype))
+		return false;
+
 	if (format == GL_RG && !haveRG)
 		return false;
 
