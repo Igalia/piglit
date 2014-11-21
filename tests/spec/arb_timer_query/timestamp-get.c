@@ -24,10 +24,6 @@
 #include "piglit-util-gl.h"
 
 #include <inttypes.h>  /* for PRIu64 macro */
-#if !defined(_WIN32) && !defined(WIN32)
-#include <unistd.h>
-#include <sys/time.h>
-#endif
 
 /**
  * @file timestamp-get.c
@@ -62,25 +58,6 @@ get_gpu_time_via_get(GLuint q)
 	return time;
 }
 
-static GLint64
-get_cpu_time(void)
-{
-#if defined(_WIN32) || defined(WIN32)
-	static LARGE_INTEGER frequency;
-	LARGE_INTEGER counter;
-
-	if(!frequency.QuadPart)
-		QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&counter);
-	return (GLint64)(counter.QuadPart * INT64_C(1000000000)/frequency.QuadPart);
-#else
-	struct timeval tv;
-
-	gettimeofday(&tv, 0);
-	return (GLint64)tv.tv_sec * 1000000000 + (GLint64)tv.tv_usec * 1000;
-#endif
-}
-
 static void
 validate_times(GLint64 t1, GLint64 t2, GLint64 tolerance)
 {
@@ -113,13 +90,13 @@ piglit_display(void)
 	get_gpu_time_via_query(q);
 
 	/* compute a reasonable tolerance based on driver overhead */
-	t1 = get_cpu_time();
+	t1 = piglit_time_get_nano();
 	get_gpu_time_via_query(q);
-	query_overhead = get_cpu_time() - t1;
+	query_overhead = piglit_time_get_nano() - t1;
 
-	t1 = get_cpu_time();
+	t1 = piglit_time_get_nano();
 	get_gpu_time_via_get(q);
-	get_overhead = get_cpu_time() - t1;
+	get_overhead = piglit_time_get_nano() - t1;
 
 	printf("glGet overhead: %" PRIu64 " us\n", (uint64_t) get_overhead / 1000);
 	printf("glQuery overhead: %" PRIu64 " us\n", (uint64_t) query_overhead / 1000);
