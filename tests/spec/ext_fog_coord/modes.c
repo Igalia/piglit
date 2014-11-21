@@ -28,11 +28,6 @@
 
 #include "piglit-util-gl.h"
 
-#if defined(_WIN32)
-#undef near
-#undef far
-#endif
-
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;

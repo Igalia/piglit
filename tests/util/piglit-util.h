@@ -54,6 +54,10 @@ extern "C" {
 #undef max
 #undef min
 
+/* Another two macros provided by windows.h which conflict with piglit */
+#undef near
+#undef far
+
 #if !defined(__cplusplus) && !defined(inline)
 #define inline __inline
 #endif
