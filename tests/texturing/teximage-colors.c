@@ -732,13 +732,13 @@ run_test(GLenum test_format, GLenum test_type, float *time_out)
 			    expected + 4 * i);
 
 	if (benchmark) {
-		time = piglit_get_microseconds();
+		time = piglit_time_get_nano();
 		for (i = 0; i < BENCHMARK_ITERATIONS; ++i)
 			glTexImage2D(GL_TEXTURE_2D, 0, format->internal_format,
 				     texture_size, texture_size, 0,
 				     test_format, test_type, data);
-		time = piglit_get_microseconds() - time;
-		*time_out = (double)time / (double)BENCHMARK_ITERATIONS;
+		time = piglit_time_get_nano() - time;
+		*time_out = (double)time / (double)(BENCHMARK_ITERATIONS*1000);
 	} else {
 		glTexImage2D(GL_TEXTURE_2D, 0, format->internal_format,
 			     texture_size, texture_size, 0,

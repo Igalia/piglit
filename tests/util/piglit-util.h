@@ -247,14 +247,16 @@ bool
 piglit_time_is_monotonic();
 
 /**
- * \brief Get a monotonically increasing time in microseconds
+ * \brief Get the time in nanoseconds
  *
  * This time can be used for relative time measurements.
  *
  * A negative return value indicates an error.
+ *
+ * \sa piglit_time_is_monotonic
  */
 int64_t
-piglit_get_microseconds(void);
+piglit_time_get_nano(void);
 
 const char**
 piglit_split_string_to_array(const char *string, const char *separators);

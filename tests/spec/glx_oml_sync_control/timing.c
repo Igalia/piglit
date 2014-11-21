@@ -64,7 +64,7 @@ draw(Display *dpy)
 {
 	enum piglit_result result = PIGLIT_PASS;
 	int64_t last_ust = 0xd0, last_msc = 0xd0, last_sbc = 0xd0;
-	int64_t last_timestamp = -1;
+	int64_t last_timestamp = -1; /* in nano seconds */
 	struct stats msc_wallclock_duration_stats = {};
 	struct stats msc_ust_duration_stats = {};
 	double expected_msc_wallclock_duration = 0.0;
@@ -98,7 +98,7 @@ draw(Display *dpy)
 	for (i = 0; i < loops; i++) {
 		int64_t new_ust = 0xd0, new_msc = 0xd0, new_sbc = 0xd0;
 		int64_t check_ust = 0xd0, check_msc = 0xd0, check_sbc = 0xd0;
-		int64_t new_timestamp;
+		int64_t new_timestamp; /* in nano seconds */
 		int64_t expected_msc, target_sbc;
 		int64_t target_msc = 0;
 
@@ -143,7 +143,7 @@ draw(Display *dpy)
 				result = PIGLIT_FAIL;
 			}
 		}
-		new_timestamp = piglit_get_microseconds();
+		new_timestamp = piglit_time_get_nano();
 
 		if (!glXGetSyncValuesOML(dpy, win,
 				&check_ust, &check_msc, &check_sbc))
@@ -219,7 +219,7 @@ draw(Display *dpy)
 					update_stats(
 						&msc_wallclock_duration_stats,
 						(new_timestamp - last_timestamp)
-							/ delta_msc);
+							/ (delta_msc*1000));
 				}
 			}
 		}

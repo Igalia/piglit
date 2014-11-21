@@ -660,13 +660,13 @@ piglit_time_is_monotonic(void)
 }
 
 int64_t
-piglit_get_microseconds(void)
+piglit_time_get_nano(void)
 {
 #ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
 	struct timespec t;
 	int r = clock_gettime(CLOCK_MONOTONIC, &t);
 	if (r >= 0)
-		return (t.tv_sec * 1000000) + (t.tv_nsec / 1000);
+		return (t.tv_sec * INT64_C(1000000000)) + t.tv_nsec;
 	else
 		return -1LL;
 #else
