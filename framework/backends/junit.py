@@ -20,9 +20,8 @@
 
 """ Module implementing a JUnitBackend for piglit """
 
-import os
+import os.path
 import re
-import posixpath
 import shutil
 try:
     from lxml import etree
@@ -108,7 +107,7 @@ class JUnitBackend(FileBackend):
         # classname), and replace piglits '/' separated groups with '.', after
         # replacing any '.' with '_' (so we don't get false groups). Also
         # remove any '\\' that has been inserted on windows accidentally
-        classname, testname = posixpath.split(name)
+        classname, testname = os.path.split(os.path.normpath(name))
         classname = classname.replace('.', '_')
         classname = JUnitBackend._REPLACE.sub('.', classname)
 
