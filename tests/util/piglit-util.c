@@ -646,6 +646,19 @@ write_null:
 	return size_written;
 }
 
+bool
+piglit_time_is_monotonic(void)
+{
+#ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
+	struct timespec t;
+	int r = clock_gettime(CLOCK_MONOTONIC, &t);
+
+	return r == 0 || (r == -1 && errno != EINVAL);
+#else
+	return false;
+#endif
+}
+
 int64_t
 piglit_get_microseconds(void)
 {

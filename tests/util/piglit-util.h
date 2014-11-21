@@ -238,6 +238,15 @@ size_t
 piglit_join_paths(char buf[], size_t buf_size, int n, ...);
 
 /**
+ * \brief Whether piglit_time_get* return monotonically increasing time.
+ *
+ * Can be used to determine how accurate/reliable the time returned by the
+ * function(s) is.
+ */
+bool
+piglit_time_is_monotonic();
+
+/**
  * \brief Get a monotonically increasing time in microseconds
  *
  * This time can be used for relative time measurements.

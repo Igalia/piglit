@@ -210,7 +210,7 @@ draw(Display *dpy)
 					(new_ust - last_ust) / delta_msc);
 
 			if (last_timestamp >= 0) {
-				if (new_timestamp < 0) {
+				if (!piglit_time_is_monotonic()) {
 					fprintf(stderr,
 						"no monotonic clock\n");
 					piglit_merge_result(&result,
