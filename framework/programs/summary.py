@@ -28,10 +28,8 @@ import framework.summary as summary
 import framework.status as status
 import framework.core as core
 import framework.results
-import framework.junit 
 
 __all__ = ['html',
-           'junit',
            'console',
            'csv']
 
@@ -98,115 +96,6 @@ def html(input_):
     # Create the HTML output
     output = summary.Summary(args.resultsFiles)
     output.generate_html(args.summaryDir, args.exclude_details)
-
-
-class _Writer:
-
-    def __init__(self, filename):
-        self.report = framework.junit.Report(filename)
-        self.path = []
-
-    def write(self, arg):
-        testrun = framework.results.load_results(arg)
-
-        self.report.start()
-        self.report.startSuite('piglit')
-        try:
-            for name, result in testrun.tests.iteritems():
-                self.write_test(testrun, name, result)
-        finally:
-            self.enter_path([])
-            self.report.stopSuite()
-            self.report.stop()
-
-    def write_test(self, testrun, test_path, result):
-        test_path = test_path.replace('\\', '/').split('/')
-        test_name = test_path.pop()
-        self.enter_path(test_path)
-
-        self.report.startCase(test_name)
-        duration = None
-        try:
-            try:
-                command = result['command']
-            except KeyError:
-                pass
-            else:
-                self.report.addStdout(command + '\n')
-
-            try:
-                stdout = result['out']
-            except KeyError:
-                pass
-            else:
-                if stdout:
-                    self.report.addStdout(stdout + '\n')
-
-            try:
-                stderr = result['err']
-            except KeyError:
-                pass
-            else:
-                if stderr:
-                    self.report.addStderr(stderr + '\n')
-
-            try:
-                returncode = result['returncode']
-            except KeyError:
-                pass
-            else:
-                if returncode:
-                    self.report.addStderr('returncode = %s\n' % returncode)
-
-            success = result.get('result')
-            if success in (status.PASS, status.WARN):
-                pass
-            elif success == status.SKIP:
-                self.report.addSkipped()
-            elif success == status.CRASH:
-                self.report.addError(success.name)
-            else:
-                self.report.addFailure(success.name)
-
-            try:
-                duration = float(result['time'])
-            except KeyError:
-                pass
-        finally:
-            self.report.stopCase(duration)
-
-    def enter_path(self, path):
-        ancestor = 0
-        try:
-            while self.path[ancestor] == path[ancestor]:
-                ancestor += 1
-        except IndexError:
-            pass
-
-        for dirname in self.path[ancestor:]:
-            self.report.stopSuite()
-
-        for dirname in path[ancestor:]:
-            self.report.startSuite(dirname)
-
-        self.path = path
-
-
-def junit(input_):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--output",
-                        metavar="<Output File>",
-                        action="store",
-                        dest="output",
-                        default="piglit.xml",
-                        help="Output filename")
-    parser.add_argument("testResults",
-                        metavar="<Input Files>",
-                        help="JSON results file to be converted")
-    args = parser.parse_args(input_)
-
-    writer = _Writer(args.output)
-    writer.write(args.testResults)
 
 
 def console(input_):

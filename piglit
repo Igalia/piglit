@@ -131,10 +131,6 @@ def main():
                                         add_help=False,
                                         help='print results to terminal')
     console.set_defaults(func=summary.console)
-    junit = summary_parser.add_parser('junit',
-                                      add_help=False,
-                                      help='generate junit xml from results')
-    junit.set_defaults(func=summary.junit)
     csv = summary_parser.add_parser('csv',
                                     add_help=False,
                                     help='generate csv from results')
