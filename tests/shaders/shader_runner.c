@@ -25,12 +25,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#if defined(_WIN32)
-#include <stdlib.h>
-#else
-#include <libgen.h>
-#endif
-
 #include "piglit-util-gl.h"
 #include "piglit-vbo.h"
 
