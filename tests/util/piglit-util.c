@@ -662,15 +662,26 @@ piglit_time_is_monotonic(void)
 int64_t
 piglit_time_get_nano(void)
 {
+#if !defined(_WIN32)
 #ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
 	struct timespec t;
 	int r = clock_gettime(CLOCK_MONOTONIC, &t);
-	if (r >= 0)
+
+	if (r == 0 || (r == -1 && errno != EINVAL))
 		return (t.tv_sec * INT64_C(1000000000)) + t.tv_nsec;
-	else
-		return -1LL;
+#endif
+	struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+	return tv.tv_usec * INT64_C(1000) + tv.tv_sec * INT64_C(1000000000);
 #else
-	return -1LL;
+	static LARGE_INTEGER frequency;
+	LARGE_INTEGER counter;
+
+	if (!frequency.QuadPart)
+		QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&counter);
+	return counter.QuadPart * INT64_C(1000000000)/frequency.QuadPart;
 #endif
 }
 
