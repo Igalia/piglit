@@ -28,6 +28,8 @@ import re
 import sys
 import subprocess
 import itertools
+
+import framework.grouptools as grouptools
 import framework.core
 from framework.profile import TestProfile, Test
 
@@ -71,7 +73,7 @@ class XTSTest(Test):
 
     def __init__(self, name, testname, testnum):
         super(XTSTest, self).__init__(
-            ['./' + os.path.basename(name), '-i', str(testnum)])
+            ['./' + grouptools.groupname(name), '-i', str(testnum)])
         self.testname = '{0}-{1}'.format(testname, testnum)
         self.cwd = os.path.dirname(os.path.realpath(name))
         self.test_results_file = os.path.join(self.cwd, self.testname)
@@ -114,10 +116,12 @@ class XTSTest(Test):
                 # error logs with numbers sequentially starting from 0, each
                 # subtest with an error would overwrite the previous test's
                 # images).
-                ref_path = '{0}/images/{1}-{2}-ref.png'.format(
-                    XTSTest.RESULTS_PATH, self.testname, match.group(1))
-                render_path = '{0}/images/{1}-{2}-render.png'.format(
-                    XTSTest.RESULTS_PATH, self.testname, match.group(1))
+                ref_path = os.path.join(
+                    self.RESULTS_PATH, 'images', '{1}-{2}-ref.png'.format(
+                        self.testname, match.group(1)))
+                render_path = os.path.join(
+                    self.RESULTS_PATH, 'images', '{1}-{2}-render.png'.format(
+                        self.testname, match.group(1)))
 
                 split = out.splitlines()
                 os.rename(os.path.join(self.cwd, split[0]), render_path)
@@ -180,11 +184,11 @@ def populate_profile():
                 for line in rfile:
                     if line.startswith('>>ASSERTION'):
                         num = next(counts)
-                        group = '{0}/{1}/{2}'.format(
-                            os.path.relpath(dirpath, X_TEST_SUITE),
+                        group = grouptools.join(
+                            grouptools.relgroup(dirpath, X_TEST_SUITE),
                             testname, num)
 
-                        profile.tests[group] = XTSTest(
+                        profile.test_list[group] = XTSTest(
                             os.path.join(dirpath, testname),
                             testname,
                             num)
