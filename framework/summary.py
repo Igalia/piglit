@@ -22,7 +22,6 @@
 from __future__ import print_function
 import os
 import os.path as path
-import posixpath
 import itertools
 import shutil
 import collections
@@ -30,12 +29,14 @@ import tempfile
 import datetime
 import re
 import getpass
+
 from mako.template import Template
 
 # a local variable status exists, prevent accidental overloading by renaming
 # the module
 import framework.status as so
 import framework.results
+import framework.grouptools as grouptools
 
 
 __all__ = [
@@ -119,8 +120,8 @@ class HTMLIndex(list):
         self._newRow()
         self.append({'type': 'other', 'text': '<td />'})
         for each in summary.results:
-            href = posixpath.join(escape_pathname(each.name), "index.html")
-            href = normalize_href(href)
+            href = normalize_href(os.path.join(
+                escape_pathname(each.name), "index.html"))
             self.append({'type': 'other',
                          'text': '<td class="head"><b>%(name)s</b><br />'
                                  '(<a href="%(href)s">info</a>)'
@@ -166,8 +167,8 @@ class HTMLIndex(list):
                 for each in summary.results:
                     # Decide which fields need to be updated
                     self._groupResult(
-                        summary.fractions[each.name][path.join(*currentDir)],
-                        summary.status[each.name][path.join(*currentDir)])
+                        summary.fractions[each.name][grouptools.join(*currentDir)],
+                        summary.status[each.name][grouptools.join(*currentDir)])
 
                 # After each group increase the depth by one
                 depth += 1
@@ -186,8 +187,8 @@ class HTMLIndex(list):
                 # If the "group" at the top of the key heirachy contains
                 # 'subtest' then it is really not a group, link to that page
                 try:
-                    if each.tests[path.dirname(key)]['subtest']:
-                        href = path.dirname(key)
+                    if each.tests[grouptools.groupname(key)]['subtest']:
+                        href = grouptools.groupname(key)
                 except KeyError:
                     href = key
 
@@ -260,7 +261,7 @@ class HTMLIndex(list):
             href = None
         else:
             css = text
-            href = posixpath.join(group, href + ".html")
+            href = grouptools.join(group, href + ".html")
             href = normalize_href(href)
 
         self.append({'type': 'testResult',
@@ -346,7 +347,7 @@ class Summary:
                 # proceed like normal.
                 if 'subtest' in value:
                     for (subt, subv) in value['subtest'].iteritems():
-                        subt = path.join(key, subt)
+                        subt = grouptools.join(key, subt)
                         subv = so.status_lookup(subv)
 
                         # Add the subtest to the fractions and status lists
@@ -357,7 +358,7 @@ class Summary:
                         self.tests['all'].add(subt)
                         while subt != '':
                             fgh(subt, subv)
-                            subt = path.dirname(subt)
+                            subt = grouptools.groupname(subt)
                         fgh('all', subv)
 
                     # remove the test from the 'all' list, this will cause to
@@ -371,7 +372,7 @@ class Summary:
                     # skip
                     while key != '':
                         fgh(key, value['result'])
-                        key = path.dirname(key)
+                        key = grouptools.groupname(key)
 
                     # when we hit the root update the 'all' group and stop
                     fgh('all', value['result'])
