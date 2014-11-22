@@ -1544,6 +1544,9 @@ spec['ARB_arrays_of_arrays'] = arb_arrays_of_arrays
 import_glsl_parser_tests(arb_arrays_of_arrays,
                          os.path.join(testsDir, 'spec', 'arb_arrays_of_arrays'),
                          ['compiler'])
+add_shader_test_dir(arb_arrays_of_arrays,
+                    os.path.join(testsDir, 'spec', 'arb_arrays_of_arrays'),
+                    recursive=True)
 
 # Group AMD_shader_trinary_minmax
 spec['AMD_shader_trinary_minmax'] = {}
