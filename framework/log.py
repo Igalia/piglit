@@ -149,12 +149,12 @@ class QuietLog(BaseLog):
         """
         assert self._LOCK.locked()
 
-        out = '[{done}/{total}] {status} Running Test(s): {running}'.format(
+        out = '[{done}/{total}] {status} {running}'.format(
             done=str(self._state['complete']).zfill(self._pad),
             total=str(self._state['total']).zfill(self._pad),
             status=', '.join('{0}: {1}'.format(k, v) for k, v in
                              sorted(self._state['summary'].iteritems())),
-            running=" ".join(str(x) for x in self._state['running'])
+            running=''.join('|/-\\'[x % 4] for x in self._state['running'])
         )
 
         self._print(out)
