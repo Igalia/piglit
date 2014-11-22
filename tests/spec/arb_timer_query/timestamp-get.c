@@ -110,12 +110,8 @@ piglit_display(void)
 	t2 = get_gpu_time_via_get(q);
 	validate_times(t1, t2, tolerance);
 
-#if defined(_WIN32) || defined(WIN32)
-	Sleep(10);
-#else
 	usleep(10000);
-#endif
-		
+
 	puts("Test: first glGet, then glQuery");
 	t1 = get_gpu_time_via_get(q);
 	t2 = get_gpu_time_via_query(q);
