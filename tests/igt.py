@@ -26,13 +26,8 @@ import os
 import re
 import sys
 import subprocess
-import threading
-import time
-import signal
-import errno
-from datetime import datetime
 
-from os import path
+import framework.grouptools as grouptools
 import framework.core
 from framework.profile import TestProfile, Test
 
@@ -88,7 +83,7 @@ class IGTTest(Test):
         if arguments is None:
             arguments = []
         super(IGTTest, self).__init__(
-            [path.join(igtTestRoot, binary)] + arguments)
+            [os.path.join(igtTestRoot, binary)] + arguments)
         self.timeout = 600
 
     def interpret_result(self):
@@ -113,7 +108,7 @@ class IGTTest(Test):
         super(IGTTest, self).run()
 
 def listTests(listname):
-    with open(path.join(igtTestRoot, listname + '.txt'), 'r') as f:
+    with open(os.path.join(igtTestRoot, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
     found_header = False
@@ -134,7 +129,7 @@ tests.extend(listTests("multi-tests"))
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
-            [path.join(igtTestRoot, test), '--list-subtests'],
+            [os.path.join(igtTestRoot, test), '--list-subtests'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=os.environ.copy(),
@@ -144,7 +139,7 @@ def addSubTestCases(test):
 
     # a return code of 79 indicates there are no subtests
     if proc.returncode == 79:
-         profile.test_list[path.join('igt', test)] = IGTTest(test)
+         profile.test_list[grouptools.join('igt', test)] = IGTTest(test)
          return
 
     if proc.returncode != 0:
@@ -156,7 +151,7 @@ def addSubTestCases(test):
     for subtest in subtests:
         if subtest == "":
             continue
-        profile.test_list[path.join('igt', test, subtest)] = \
+        profile.test_list[grouptools.join('igt', test, subtest)] = \
             IGTTest(test, ['--run-subtest', subtest])
 
 for test in tests:
