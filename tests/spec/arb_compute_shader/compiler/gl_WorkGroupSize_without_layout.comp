@@ -14,5 +14,5 @@
 
 void main()
 {
-  ivec3 size = gl_WorkGroupSize;
+  uvec3 size = gl_WorkGroupSize;
 }

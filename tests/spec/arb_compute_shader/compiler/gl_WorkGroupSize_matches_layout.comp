@@ -23,7 +23,7 @@ layout(local_size_x = 3, local_size_y = 5, local_size_z = 7) in;
 
 void main()
 {
-  int x[gl_WorkGroupSize.x == 3 ? 1 : -1];
-  int y[gl_WorkGroupSize.y == 5 ? 1 : -1];
-  int z[gl_WorkGroupSize.z == 7 ? 1 : -1];
+  int x[gl_WorkGroupSize.x == 3u ? 1 : -1];
+  int y[gl_WorkGroupSize.y == 5u ? 1 : -1];
+  int z[gl_WorkGroupSize.z == 7u ? 1 : -1];
 }

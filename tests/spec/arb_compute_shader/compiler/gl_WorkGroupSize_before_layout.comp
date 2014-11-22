@@ -16,7 +16,7 @@
 
 void main()
 {
-  ivec3 size = gl_WorkGroupSize;
+  uvec3 size = gl_WorkGroupSize;
 }
 
 layout(local_size_x = 3, local_size_y = 5, local_size_z = 7) in;
