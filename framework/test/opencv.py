@@ -26,8 +26,10 @@ from __future__ import print_function
 import re
 import subprocess
 from os import path
+
 from .gtest import GTest
 from framework.core import PIGLIT_CONFIG
+import framework.grouptools as grouptools
 
 __all__ = [
     'OpenCVTest',
@@ -77,5 +79,5 @@ def add_opencv_tests(profile):
         m = re.match('  ([^ ]+)', line)
         if m:
             test_name = m.group(1)
-            profile.tests['{}/{}'.format(full_test_name,test_name)] = \
+            profile.tests[grouptools.join(full_test_name, test_name)] = \
                 OpenCVTest(opencv_test_ocl, '{}{}'.format(group_name ,test_name))
