@@ -200,6 +200,34 @@ strtod_inf(const char *nptr, char **endptr)
 	return strtod(nptr, endptr);
 }
 
+#ifndef HAVE_STRCHRNUL
+static inline char *
+strchrnul(const char *s, int c)
+{
+	char *t = strchr(s, c);
+
+	return (t == NULL) ? ((char *) s + strlen(s)) : t;
+}
+#endif
+
+
+#ifndef HAVE_STRNDUP
+static inline char *
+strndup(const char *s, size_t n)
+{
+	const size_t len = strlen(s);
+	const size_t size_to_copy = MIN2(n, len);
+
+	char *const copy = (char *const) malloc(size_to_copy + 1);
+	if (copy != NULL) {
+		memcpy(copy, s, size_to_copy);
+		copy[size_to_copy] = '\0';
+	}
+
+	return copy;
+}
+#endif
+
 /**
  * Determine if an extension is listed in an extension string
  *
@@ -231,14 +259,6 @@ NORETURN void piglit_report_result(enum piglit_result result);
 void piglit_set_timeout(double seconds, enum piglit_result timeout_result);
 void piglit_report_subtest_result(enum piglit_result result,
 				  const char *format, ...) PRINTFLIKE(2, 3);
-
-#ifndef HAVE_STRCHRNUL
-char *strchrnul(const char *s, int c);
-#endif
-
-#ifndef HAVE_STRNDUP
-char *strndup(const char *s, size_t n);
-#endif
 
 void piglit_disable_error_message_boxes(void);
 

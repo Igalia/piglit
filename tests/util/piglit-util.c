@@ -289,33 +289,6 @@ piglit_report_subtest_result(enum piglit_result result, const char *format, ...)
 	va_end(ap);
 }
 
-#ifndef HAVE_STRCHRNUL
-char *strchrnul(const char *s, int c)
-{
-	char *t = strchr(s, c);
-
-	return (t == NULL) ? ((char *) s + strlen(s)) : t;
-}
-#endif
-
-
-#ifndef HAVE_STRNDUP
-char *strndup(const char *s, size_t n)
-{
-	const size_t len = strlen(s);
-	const size_t size_to_copy = MIN2(n, len);
-
-	char *const copy = malloc(size_to_copy + 1);
-	if (copy != NULL) {
-		memcpy(copy, s, size_to_copy);
-		copy[size_to_copy] = '\0';
-	}
-
-	return copy;
-}
-#endif
-
-
 #ifdef _WIN32
 
 #ifndef DBG_PRINTEXCEPTION_C
