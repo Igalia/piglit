@@ -27,6 +27,8 @@ try:
     from lxml import etree
 except ImportError:
     import xml.etree.cElementTree as etree
+
+import framework.grouptools as grouptools
 from framework.core import PIGLIT_CONFIG
 from .abstract import FileBackend
 
@@ -105,9 +107,8 @@ class JUnitBackend(FileBackend):
     def write_test(self, name, data):
         # Split the name of the test and the group (what junit refers to as
         # classname), and replace piglits '/' separated groups with '.', after
-        # replacing any '.' with '_' (so we don't get false groups). Also
-        # remove any '\\' that has been inserted on windows accidentally
-        classname, testname = os.path.split(os.path.normpath(name))
+        # replacing any '.' with '_' (so we don't get false groups).
+        classname, testname = grouptools.splitname(name)
         classname = classname.replace('.', '_')
         classname = JUnitBackend._REPLACE.sub('.', classname)
 
