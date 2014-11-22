@@ -21,12 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(_WIN32)
-#include <windows.h>
-#endif
-
 #include "piglit-util-cl.h"
-
 
 const char *
 piglit_cl_get_enum_name(cl_uint param)
