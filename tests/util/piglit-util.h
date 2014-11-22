@@ -174,6 +174,33 @@ streq(const char *a, const char *b)
 }
 
 /**
+ * Wrapper for strtod() which also handles +/-inf with MSVC.
+ * Note: we only check for "inf" and not "INF".
+ */
+static inline double
+strtod_inf(const char *nptr, char **endptr)
+{
+#if defined(_MSC_VER)
+	/* skip spaces and tabs */
+	while (*nptr == ' ' || *nptr == '\t')
+		nptr++;
+
+	if (nptr[0] == 'i' && nptr[1] == 'n' && nptr[2] == 'f') {
+		/* +infinity */
+		*endptr = (char *) (nptr + 3);
+		return INFINITY;
+	}
+	else if (nptr[0] == '-' && nptr[1] == 'i' && nptr[2] == 'n' && nptr[3] == 'f') {
+		/* -infinity */
+		*endptr = (char *) (nptr + 4);
+		return -INFINITY;
+	}
+	/* fall-through */
+#endif
+	return strtod(nptr, endptr);
+}
+
+/**
  * Determine if an extension is listed in an extension string
  *
  * \param haystack   List of all extensions to be searched
