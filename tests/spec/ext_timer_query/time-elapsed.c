@@ -29,10 +29,6 @@
  * Test TIME_ELAPSED and TIMESTAMP queries.
  */
 
-#if !defined(_WIN32) && !defined(WIN32)
-#include <sys/time.h>
-#endif
-
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
@@ -86,62 +82,14 @@ GLuint prog;
 GLint iters_loc;
 
 static float
-get_time(void)
-{
-	static bool inited = false;
-
-#if defined(_WIN32) || defined(WIN32)
-	static LARGE_INTEGER frequency;
-	LARGE_INTEGER counter;
-	static GLint64 base_usec = 0;
-	GLint64 usec;
-	
-	if(!frequency.QuadPart)
-		QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&counter);
-	
-	usec = (GLint64)(counter.QuadPart * INT64_C(1000000)/frequency.QuadPart);
-	
-	/* Return a value that is roughly microseconds since program
-	 * startup, to avoid large usec reducing precision of the
-	 * return value.
-	 */
-	if (!inited) {
-		inited = true;
-		base_usec = usec;
-	}
-	usec -= base_usec;
-	
-	return (double)usec/1000000.0;
-#else
-	static time_t base_sec = 0;
-	struct timeval tv;
-
-	gettimeofday(&tv, NULL);
-
-	/* Return a value that is roughly seconds since program
-	 * startup, to avoid large tv_sec reducing precision of the
-	 * return value.
-	 */
-	if (!inited) {
-		inited = true;
-		base_sec = tv.tv_sec;
-	}
-	tv.tv_sec -= base_sec;
-
-	return (double)tv.tv_sec + tv.tv_usec / 1000000.0;
-#endif
-}
-
-static float
 draw(GLuint *q, int iters)
 {
-	float start_time, end_time;
+	int64_t start_time, end_time;
 
 	glUseProgram(prog);
 	glUniform1i(iters_loc, iters);
 
-	start_time = get_time();
+	start_time = piglit_time_get_nano();
 
 	if (test == TIMESTAMP) {
 		glQueryCounter(q[0], GL_TIMESTAMP);
@@ -160,9 +108,9 @@ draw(GLuint *q, int iters)
 	 */
 	glFinish();
 
-	end_time = get_time();
+	end_time = piglit_time_get_nano();
 
-	return end_time - start_time;
+	return (end_time - start_time)/ 1000.0 / 1000.0 / 1000.0;
 }
 
 static float
