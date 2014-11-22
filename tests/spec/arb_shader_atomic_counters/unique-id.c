@@ -57,11 +57,12 @@ check(int dx, int dy, uint32_t start_value, uint32_t end_value)
 
         for (y = 0; y < L; y += dy) {
                 for (x = 0; x < L; x += dx) {
-                        uint32_t v = pixels[y][x] - base;
+                        uint32_t p = pixels[y][x];
+                        uint32_t v = p - base;
 
                         if (v >= size) {
                                 printf("Probe value at (%d, %d)\n", x, y);
-                                printf("  Observed: 0x%08x\n", v);
+                                printf("  Observed: 0x%08x\n", p);
                                 printf("  Value outside expected window.\n");
                                 free(frequency);
                                 return false;
@@ -69,7 +70,7 @@ check(int dx, int dy, uint32_t start_value, uint32_t end_value)
 
                         if (size > 1 && frequency[v]++) {
                                 printf("Probe value at (%d, %d)\n", x, y);
-                                printf("  Observed: 0x%08x\n", v);
+                                printf("  Observed: 0x%08x\n", p);
                                 printf("  Value not unique.\n");
                                 free(frequency);
                                 return false;
