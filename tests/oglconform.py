@@ -25,8 +25,8 @@ import os
 import re
 import sys
 import subprocess
-from os import path
 
+import framework.grouptools as grouptools
 import framework.core
 from framework.profile import TestProfile, Test
 
@@ -72,6 +72,6 @@ with open(testlist_file) as f:
     for l in testlist:
         try:
             category, test = l.split()
-            profile.test_list[path.join('oglconform', category, test)] = OGLCTest(category, test)
+            profile.test_list[grouptools.join('oglconform', category, test)] = OGLCTest(category, test)
         except:
             continue
