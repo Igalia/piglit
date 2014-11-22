@@ -92,6 +92,10 @@ else()
 	list(APPEND UTIL_GL_SOURCES
 		piglit-framework-gl/piglit_glut_framework.c
 	)
+
+	list(APPEND UTIL_GL_LIBS
+		${OPENGL_gl_LIBRARY}
+	)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
