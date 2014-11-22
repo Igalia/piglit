@@ -29,6 +29,7 @@ import subprocess
 from os.path import join
 from sys import stderr
 
+import framework.grouptools as grouptools
 from framework.core import PIGLIT_CONFIG
 from .base import Test
 
@@ -50,10 +51,10 @@ class OCLConform(Test):
             self.result['result'] = 'pass'
 
 def add_sub_test(profile, test_name, subtest_name, subtest):
-    profile.tests['oclconform/{}/{}'.format(test_name, subtest_name)] = subtest
+    profile.tests[grouptools.join('oclconform', test_name, subtest_name)] = subtest
 
 def add_test(profile, test_name, test):
-    profile.tests['oclconform/{}'.format(test_name)] = test
+    profile.tests[grouptools.join('oclconform', test_name)] = test
 
 def add_oclconform_tests(profile):
     section_name = 'oclconform'
@@ -74,7 +75,6 @@ def add_oclconform_tests(profile):
         test_name = PIGLIT_CONFIG.get(test_section_name, 'test_name')
         should_run_concurrent = PIGLIT_CONFIG.has_option(test_section_name, 'concurrent')
         if PIGLIT_CONFIG.has_option(test_section_name, 'list_subtests'):
-            # Test with subtests
             list_tests = PIGLIT_CONFIG.get(test_section_name, 'list_subtests')
             subtest_regex = PIGLIT_CONFIG.get(test_section_name, 'subtest_regex')
             subtest_regex.encode('string_escape')
