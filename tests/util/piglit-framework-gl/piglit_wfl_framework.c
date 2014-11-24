@@ -60,8 +60,10 @@ piglit_wfl_framework_choose_platform(const struct piglit_gl_test_config *test_co
 			return WAFFLE_PLATFORM_X11_EGL;
 		}
 #endif
-#ifdef PIGLIT_HAS_GLX
+#if defined(PIGLIT_HAS_GLX)
 		return WAFFLE_PLATFORM_GLX;
+#elif defined(PIGLIT_HAS_WGL)
+		return WAFFLE_PLATFORM_WGL;
 #else
 		fprintf(stderr, "environment var PIGLIT_PLATFORM must be set "
 		        "when piglit is built without GLX support\n");
