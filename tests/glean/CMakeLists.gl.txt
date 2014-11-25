@@ -36,7 +36,6 @@ piglit_add_executable (glean
 	tmultitest.cpp
 	toccluqry.cpp
 	tpaths.cpp
-	tpbo.cpp
 	tpixelformats.cpp
 	tpointatten.cpp
 	tpointsprite.cpp
