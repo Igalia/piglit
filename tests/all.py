@@ -1981,6 +1981,7 @@ add_concurrent_test(arb_occlusion_query, 'occlusion_query')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_lifetime')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_meta_fragments')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_meta_no_fragments')
+add_concurrent_test(arb_occlusion_query, 'occlusion_query_meta_save')
 add_concurrent_test(arb_occlusion_query, 'occlusion_query_order')
 add_concurrent_test(arb_occlusion_query, 'gen_delete_while_active')
 
