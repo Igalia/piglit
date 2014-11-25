@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 VMware, Inc.
+ * Copyright (c) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -117,11 +118,50 @@ test_pos_and_sizes(void)
    return GL_TRUE;
 }
 
+/* 
+ * The texture parameter must be an existing texture object as returned
+ * by glCreateTextures
+ */
+static GLboolean
+test_sizes(void)
+{
+   const GLuint badname = 250;
+   const GLfloat fvec[] = {1.0, 1.0};
+   const GLint ivec[] = {-1, 1};
+   const GLuint uvec[] = {1, 1};
+
+   glTextureParameteri(badname, GL_TEXTURE_MAX_LEVEL, 4);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   glTextureParameterf(badname, GL_TEXTURE_MAX_LEVEL, 4.0);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   glTextureParameterfv(badname, GL_TEXTURE_MAX_LEVEL, fvec);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   glTextureParameteriv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   glTextureParameterIiv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   glTextureParameterIuiv(badname, GL_TEXTURE_MAX_LEVEL, uvec);
+   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+	   return GL_FALSE;
+
+   return GL_TRUE;
+}
+
 enum piglit_result
 piglit_display(void)
 {
    bool pass = true;
-   pass = test_pos_and_sizes() && pass;
+   pass = test_pos_and_sizes() && test_sizes() && pass;
 
    return pass ? PIGLIT_PASS: PIGLIT_FAIL;
 }
