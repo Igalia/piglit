@@ -916,6 +916,7 @@ add_concurrent_test(gl20, "gl-2.0-active-sampler-conflict")
 gl21 = {}
 spec['!OpenGL 2.1'] = gl21
 gl21['minmax'] = PiglitGLTest('gl-2.1-minmax', run_concurrent=True)
+gl21['pbo'] = PiglitGLTest('gl-2.1-pbo', run_concurrent=True)
 
 gl30 = {}
 spec['!OpenGL 3.0'] = gl30
