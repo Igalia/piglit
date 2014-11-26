@@ -12,12 +12,14 @@ void main()
 
 void main()
 {
-	float f1 = 1f;
-	float f2 = 0.5F;
+	float f1 = 1.0f;
+	float f2 = 0.F;
+	float f3 = .2f;
+	float f4 = 5e-1F;
 
-	gl_FragColor = vec4(f2, f1, 0.0, 0.0);
+	gl_FragColor = vec4(f1, f2, f3, f4);
 }
 
 [test]
 draw rect -1 -1 2 2
-probe rgba 1 1 0.5 1.0 0.0 0.0
+probe rgba 1 1 1.0 0.0 0.2 0.5
