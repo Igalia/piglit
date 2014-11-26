@@ -41,129 +41,203 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 PIGLIT_GL_TEST_CONFIG_END
 
 /** Test texture size errors and subtexture position errors */
-static GLboolean
+static bool
 test_pos_and_sizes(void)
 {
-   GLuint name;
+	bool pass = true;
+	GLuint name;
 
-   /* all of these should generate GL_INVALID_VALUE */
+	/* all of these should generate GL_INVALID_VALUE */
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, -16, 0, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, -16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, -6, -5, 0, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, -6, -5, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	glTexImage2D(GL_TEXTURE_2D, -2, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTexImage2D(GL_TEXTURE_2D, -2, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	glTexImage2D(GL_TEXTURE_2D, 2000, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTexImage2D(GL_TEXTURE_2D, 2000, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	/* Setup dsa. */
+	glCreateTextures(GL_TEXTURE_2D, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
 
-   /* Setup dsa. */
-   glCreateTextures(GL_TEXTURE_2D, 1, &name);
-   glBindTextureUnit(0, name); /* Since next command isn't bindless. */
+	/* setup valid 2D texture for subsequent TexSubImage calls */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
 
-   /* setup valid 2D texture for subsequent TexSubImage calls */
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTextureSubImage2D(name, 0, 6, 6, 100, 100, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTextureSubImage2D(name, 0, 6, 6, 100, 100, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	glTextureSubImage2D(name, 0, -6, -6, 10, 10, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glTextureSubImage2D(name, 0, -6, -6, 10, 10, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	glCopyTextureSubImage2D(name, 0, -6, -6, 2, 2, 10, 10);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
+	glCopyTextureSubImage2D(name, 0, 6, 6, 2, 2, 200, 200);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
 
-   glCopyTextureSubImage2D(name, 0, -6, -6, 2, 2, 10, 10);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	/* mipmap level 1 doesn't exist */
+	glTextureSubImage2D(name, 1, 0, 0, 8, 8, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glCopyTextureSubImage2D(name, 0, 6, 6, 2, 2, 200, 200);
-   if (!piglit_check_gl_error(GL_INVALID_VALUE))
-      return GL_FALSE;
+	/* mipmap level 2 doesn't exist */
+	glCopyTextureSubImage2D(name, 2, 0, 0, 0, 0, 4, 4);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   /* mipmap level 1 doesn't exist */
-   glTextureSubImage2D(name, 1, 0, 0, 8, 8, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-      return GL_FALSE;
+	/* To test 1D and 3D entry points, let's try using the wrong functions. */
+	glTextureSubImage1D(name, 0, 0, 4, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
 
-   /* mipmap level 2 doesn't exist */
-   glCopyTextureSubImage2D(name, 2, 0, 0, 0, 0, 4, 4);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-      return GL_FALSE;
+	glTextureSubImage3D(name, 0, 0, 0, 0, 4, 4, 4, GL_RGBA, GL_FLOAT, NULL);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
 
-   /* To test 1D and 3D entry points, let's try using the wrong functions. */
-   glTextureSubImage1D(name, 0, 0, 4, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_ENUM))
-      return GL_FALSE;
+	glCopyTextureSubImage1D(name, 0, 0, 0, 0, 4);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
 
-   glTextureSubImage3D(name, 0, 0, 0, 0, 4, 4, 4, GL_RGBA, GL_FLOAT, NULL);
-   if (!piglit_check_gl_error(GL_INVALID_ENUM))
-      return GL_FALSE;
+	glCopyTextureSubImage3D(name, 0, 0, 0, 0, 0, 0, 4, 4);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
 
-   glCopyTextureSubImage1D(name, 0, 0, 0, 0, 4);
-   if (!piglit_check_gl_error(GL_INVALID_ENUM))
-      return GL_FALSE;
-
-   glCopyTextureSubImage3D(name, 0, 0, 0, 0, 0, 0, 4, 4);
-   if (!piglit_check_gl_error(GL_INVALID_ENUM))
-      return GL_FALSE;
-
-   return GL_TRUE;
+	return pass;
 }
 
 /* 
  * The texture parameter must be an existing texture object as returned
  * by glCreateTextures
  */
-static GLboolean
-test_sizes(void)
+static bool
+test_target_name(void)
 {
-   const GLuint badname = 250;
-   const GLfloat fvec[] = {1.0, 1.0};
-   const GLint ivec[] = {-1, 1};
-   const GLuint uvec[] = {1, 1};
+	static const GLuint badname = 250;
+	static const GLfloat fvec[2] = { 1.0, 1.0 };
+	static const GLint ivec[2] = { -1, 1 };
+	static const GLuint uvec[2] = { 1, 1 };
+	bool pass = true;
 
-   glTextureParameteri(badname, GL_TEXTURE_MAX_LEVEL, 4);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameteri(badname, GL_TEXTURE_MAX_LEVEL, 4);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glTextureParameterf(badname, GL_TEXTURE_MAX_LEVEL, 4.0);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameterf(badname, GL_TEXTURE_MAX_LEVEL, 4.0);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glTextureParameterfv(badname, GL_TEXTURE_MAX_LEVEL, fvec);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameterfv(badname, GL_TEXTURE_MAX_LEVEL, fvec);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glTextureParameteriv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameteriv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glTextureParameterIiv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameterIiv(badname, GL_TEXTURE_MAX_LEVEL, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   glTextureParameterIuiv(badname, GL_TEXTURE_MAX_LEVEL, uvec);
-   if (!piglit_check_gl_error(GL_INVALID_OPERATION))
-	   return GL_FALSE;
+	glTextureParameterIuiv(badname, GL_TEXTURE_MAX_LEVEL, uvec);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
-   return GL_TRUE;
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_OPERATION on bad texture");
+	return pass;
 }
+
+/* same as test_target_name, but for the getter functions */
+static bool
+test_getter_target_name(void)
+{
+	static const GLuint badname = 250;
+	static GLfloat f = 1.0;
+	static GLuint u = 1;
+	static GLint i = -5;
+	bool pass = true;
+
+	glGetTextureParameterfv(badname, GL_TEXTURE_MAX_LEVEL, &f);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	glGetTextureParameteriv(badname, GL_TEXTURE_MAX_LEVEL, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	glGetTextureParameterIiv(badname, GL_TEXTURE_MAX_LEVEL, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	glGetTextureParameterIuiv(badname, GL_TEXTURE_MAX_LEVEL, &u);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glGetTextureParameter: GL_INVALID_OPERATION on bad texture");
+	return pass;
+}
+
+static bool
+test_getter_pname(void)
+{
+	static GLuint name;
+	static GLfloat f = 1.0;
+	static GLuint u = 1;
+	static GLint i = -5;
+	bool pass = true;
+
+	/* Setup dsa. */
+	glCreateTextures(GL_TEXTURE_2D, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glGetTextureParameterfv(name, GL_TEXTURE_1D, &f);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glGetTextureParameteriv(name, GL_TEXTURE_1D, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glGetTextureParameterIiv(name, GL_TEXTURE_1D, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glGetTextureParameterIuiv(name, GL_TEXTURE_1D, &u);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glGetTextureParameter: GL_INVALID_ENUM on bad pname");
+	return pass;
+}
+
+static bool
+test_pname(void)
+{
+	static GLuint name;
+	const static GLfloat f = 1.0;
+	const static GLuint u = 1;
+	const static GLint i = -5;
+	bool pass = true;
+
+	/* Setup dsa. */
+	glCreateTextures(GL_TEXTURE_2D, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameterfv(name, GL_TEXTURE_1D, &f);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteriv(name, GL_TEXTURE_1D, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIiv(name, GL_TEXTURE_1D, &i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIuiv(name, GL_TEXTURE_1D, &u);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_ENUM on bad pname");
+	return pass;
+}
+
 
 enum piglit_result
 piglit_display(void)
 {
-   bool pass = true;
-   pass = test_pos_and_sizes() && test_sizes() && pass;
+	bool pass = true;
+	pass &= test_pos_and_sizes();
+	pass &= test_target_name();
+	pass &= test_pname();
+	pass &= test_getter_target_name();
+	pass &= test_getter_pname();
 
-   return pass ? PIGLIT_PASS: PIGLIT_FAIL;
+	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
 
