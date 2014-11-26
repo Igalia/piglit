@@ -83,6 +83,11 @@ if(PIGLIT_USE_WAFFLE)
 	list(APPEND UTIL_GL_LIBS
 		${WAFFLE_LDFLAGS}
 	)
+	IF(PIGLIT_BUILD_GLX_TESTS)
+		list(APPEND UTIL_GL_LIBS
+			${OPENGL_gl_LIBRARY}
+		)
+	ENDIF(PIGLIT_BUILD_GLX_TESTS)
 else()
 	list(APPEND UTIL_GL_SOURCES
 		piglit-framework-gl/piglit_glut_framework.c
