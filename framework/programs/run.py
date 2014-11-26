@@ -180,6 +180,8 @@ def _run_parser(input_):
                             choices=['quiet', 'verbose', 'dummy'],
                             default='quiet',
                             help="Set the logger verbosity level")
+    parser.add_argument("--test-list",
+                        help="A file containing a list of tests to run")
     parser.add_argument("test_profile",
                         metavar="<Path to one or more test profile(s)>",
                         nargs='+',
@@ -241,6 +243,12 @@ def run(input_):
     # isn't reliable with threaded run
     if args.dmesg:
         args.concurrency = "none"
+
+    # build up the include filter based on test_list
+    if args.test_list:
+        with open(args.test_list) as test_list:
+            for line in test_list.readlines():
+                args.include_tests.append(line.rstrip())
 
     # Pass arguments into Options
     opts = core.Options(concurrent=args.concurrency,
