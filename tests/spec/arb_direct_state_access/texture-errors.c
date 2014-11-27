@@ -27,7 +27,7 @@
  * @file
  * Adapted from teximage-errors.c to test ARB_direct_state_access by
  * Laura Ekstrand <laura@jlekstrand.net>.
- * Tests glTextureSubImage functions for invalid values, error reporting.
+ * Tests gl*Texture* functions for error reporting.
  */
 
 #include "piglit-util-gl.h"
@@ -103,7 +103,7 @@ test_pos_and_sizes(void)
 	return pass;
 }
 
-/* 
+/*
  * The texture parameter must be an existing texture object as returned
  * by glCreateTextures
  */
@@ -226,16 +226,243 @@ test_pname(void)
 	return pass;
 }
 
+/* GL_INVALID_ENUM is generated if glTextureParamter{if} is called for a
+ * non-scalar parameter
+ */
+static bool
+test_scalar_vector(void)
+{
+	bool pass = true;
+	const static GLfloat f = 1.0;
+	const static GLint i = -1;
+	static GLuint name;
+
+	/* Setup dsa. */
+	glCreateTextures(GL_TEXTURE_2D, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_BORDER_COLOR, i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterf(name, GL_TEXTURE_BORDER_COLOR, f);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter{if}: GL_INVALID_ENUM for non-scalars");
+	return pass;
+}
+
+/* GL_INVALID_ENUM is generated if the effective target is either
+ * GL_TEXTURE_2D_MULTISAMPLE or GL_TEXTURE_2D_MULTISAMPLE_ARRAY, and pname is
+ * any of the sampler states.
+ */
+/* XXX: Is this actually a valid implementation? */
+static bool
+test_multisample(void)
+{
+	bool pass = true;
+	static GLfloat f = 1.0;
+	static GLint i = -1;
+	static const GLfloat fvec[2] = { 1.0, -1.0 };
+	static const GLint ivec[2] = { 1, -1 };
+	static const GLuint uvec[2] = { 1, 4 };
+	static GLuint name;
+
+	/* GL_TEXTURE_2D_MULTISAMPLE_ARRAY */
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_R, i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterf(name, GL_TEXTURE_WRAP_R, f);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterfv(name, GL_TEXTURE_WRAP_R, fvec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteriv(name, GL_TEXTURE_WRAP_R, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIiv(name, GL_TEXTURE_WRAP_R, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIuiv(name, GL_TEXTURE_WRAP_R, uvec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	/* GL_TEXTURE_2D_MULTISAMPLE */
+	glDeleteTextures(1, &name);
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_R, i);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterf(name, GL_TEXTURE_WRAP_R, f);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterfv(name, GL_TEXTURE_WRAP_R, fvec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteriv(name, GL_TEXTURE_WRAP_R, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIiv(name, GL_TEXTURE_WRAP_R, ivec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameterIuiv(name, GL_TEXTURE_WRAP_R, uvec);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_ENUM if multisample+sampler state");
+	return pass;
+}
+
+/* GL_INVALID_ENUM is generated if the effective target is GL_TEXTURE_RECTANGLE
+ * and either of pnames GL_TEXTURE_WRAP_S or GL_TEXTURE_WRAP_T is set to either
+ * GL_MIRROR_CLAMP_TO_EDGE, GL_MIRRORED_REPEAT or GL_REPEAT.
+ */
+static bool
+test_texture_rec(void)
+{
+	bool pass = true;
+	static GLuint name;
+
+	/* GL_TEXTURE_2D_MULTISAMPLE_ARRAY */
+	glCreateTextures(GL_TEXTURE_RECTANGLE, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_EDGE);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_EDGE);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	glTextureParameteri(name, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_ENUM in texture_rectangle case");
+	return pass;
+}
+
+/* GL_INVALID_ENUM is generated if the effective target is GL_TEXTURE_RECTANGLE
+ * and pname GL_TEXTURE_MIN_FILTER is set to a value other than GL_NEAREST or
+ * GL_LINEAR (no mipmap filtering is permitted).
+ */
+static bool
+test_texture_rec_min_filter(void)
+{
+	bool pass = true;
+	static GLuint name;
+
+	glCreateTextures(GL_TEXTURE_RECTANGLE, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_MIN_FILTER, 0);
+	pass &= piglit_check_gl_error(GL_INVALID_ENUM);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_ENUM for texture_rectangle+min_filter");
+	return pass;
+}
+
+/* GL_INVALID_OPERATION is generated if the effective target is either
+ * GL_TEXTURE_2D_MULTISAMPLE or GL_TEXTURE_2D_MULTISAMPLE_ARRAY, and pname
+ * GL_TEXTURE_BASE_LEVEL is set to a value other than zero.
+ */
+static bool
+test_multisample_texture_base(void)
+{
+	bool pass = true;
+	static GLuint name;
+
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_BASE_LEVEL, 1);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_BASE_LEVEL, 1);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_OPERATION for multisample+texture_base");
+	return pass;
+}
+
+/* GL_INVALID_OPERATION is generated if the effective target is
+ * GL_TEXTURE_RECTANGLE and pname GL_TEXTURE_BASE_LEVEL is set to any value
+ * other than zero.
+ */
+static bool
+test_texture_rec_texture_base(void)
+{
+	bool pass = true;
+	static GLuint name;
+
+	glCreateTextures(GL_TEXTURE_RECTANGLE, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_BASE_LEVEL, 1);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_OPERATION for texture_rectangle+min_filter");
+	return pass;
+}
+
+/* GL_INVALID_VALUE is generated if pname is GL_TEXTURE_BASE_LEVEL or
+ * GL_TEXTURE_MAX_LEVEL, and param or params is negative.
+ */
+static bool
+test_texture_level_negative(void)
+{
+	bool pass = true;
+	static GLuint name;
+
+	glCreateTextures(GL_TEXTURE_2D, 1, &name);
+	glBindTextureUnit(0, name);	/* Since next command isn't bindless. */
+
+	glTextureParameteri(name, GL_TEXTURE_BASE_LEVEL, -1);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+
+	glTextureParameteri(name, GL_TEXTURE_MAX_LEVEL, -1);
+	pass &= piglit_check_gl_error(GL_INVALID_VALUE);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+		"glTextureParameter: GL_INVALID_VALUE for negative tex_*_level");
+	return pass;
+}
 
 enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
 	pass &= test_pos_and_sizes();
-	pass &= test_target_name();
+	pass &= test_target_name();        /* segfaults on mesa */
+	pass &= test_getter_target_name(); /* segfaults on mesa */
 	pass &= test_pname();
-	pass &= test_getter_target_name();
 	pass &= test_getter_pname();
+	pass &= test_scalar_vector();
+	pass &= test_multisample();
+	pass &= test_texture_rec();
+	pass &= test_texture_rec_min_filter();
+	pass &= test_multisample_texture_base();
+	pass &= test_texture_rec_texture_base();
+	pass &= test_texture_level_negative();
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
