@@ -70,6 +70,7 @@ const char* empty_strings[] = {
 	""
 };
 
+#if defined(CL_VERSION_1_2)
 static bool
 test(cl_program program,
      cl_uint num_devices, const cl_device_id *device_list,
@@ -96,6 +97,7 @@ test(cl_program program,
 
 	return true;
 }
+#endif
 
 enum piglit_result
 piglit_cl_test(const int argc,
@@ -103,6 +105,7 @@ piglit_cl_test(const int argc,
                const struct piglit_cl_api_test_config* config,
                const struct piglit_cl_api_test_env* env)
 {
+#if defined(CL_VERSION_1_2)
 	enum piglit_result result = PIGLIT_PASS;
 
 	int i;
@@ -363,4 +366,7 @@ piglit_cl_test(const int argc,
 	clReleaseProgram(program);
 
 	return result;
+#else
+	return PIGLIT_SKIP;
+#endif
 }
