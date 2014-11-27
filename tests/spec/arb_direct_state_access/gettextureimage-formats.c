@@ -110,7 +110,7 @@ make_texture_image(GLenum intFormat, GLubyte upperRightTexel[4])
 
 		glWindowPos2iARB(0, 0);
 		glDrawPixels(TEX_SIZE, TEX_SIZE, GL_RGBA, GL_UNSIGNED_BYTE, tex);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glGenerateTextureMipmap(texture_id);
 
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, piglit_winsys_fbo);
 		glDeleteFramebuffers(1, &fb);
@@ -137,7 +137,6 @@ ubyte_to_float(GLubyte b, GLint bits)
 		return b / 255.0;
 	}
 }
-
 
 
 static GLfloat
