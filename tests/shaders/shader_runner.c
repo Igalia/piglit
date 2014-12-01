@@ -1924,6 +1924,19 @@ set_patch_parameter(const char *line)
 #endif
 }
 
+void
+set_provoking_vertex(const char *line)
+{
+	if (string_match("first", line)) {
+		glProvokingVertexEXT(GL_FIRST_VERTEX_CONVENTION_EXT);
+	} else if (string_match("last", line)) {
+		glProvokingVertexEXT(GL_LAST_VERTEX_CONVENTION_EXT);
+	} else {
+		fprintf(stderr, "Unknown provoking vertex parameter `%s'\n", line);
+		piglit_report_result(PIGLIT_FAIL);
+	}
+}
+
 static const struct string_to_enum enable_table[] = {
 	{ "GL_CLIP_PLANE0", GL_CLIP_PLANE0 },
 	{ "GL_CLIP_PLANE1", GL_CLIP_PLANE1 },
@@ -2601,6 +2614,8 @@ piglit_display(void)
 			set_parameter(line + strlen("parameter "));
 		} else if (string_match("patch parameter ", line)) {
 			set_patch_parameter(line + strlen("patch parameter "));
+		} else if (string_match("provoking vertex ", line)) {
+			set_provoking_vertex(line + strlen("provoking vertex "));
 		} else if (string_match("link error", line)) {
 			link_error_expected = true;
 			if (link_ok) {
