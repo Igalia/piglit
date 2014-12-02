@@ -9,6 +9,7 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (ext_texture_array-errors errors.c)
 piglit_add_executable (ext_texture_array-maxlayers maxlayers.c)
 piglit_add_executable (ext_texture_array-compressed compressed.c)
 piglit_add_executable (ext_texture_array-gen-mipmap gen-mipmap.c)
