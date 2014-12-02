@@ -2969,19 +2969,10 @@ add_msaa_formats_tests(arb_texture_float, 'GL_ARB_texture_float')
 
 oes_texture_float = {}
 spec['OES_texture_float'] = oes_texture_float
-oes_texture_float['OES_texture_float'] = concurrent_test('oes_texture_float')
-
-oes_texture_half_float = {}
-spec['OES_texture_half_float'] = oes_texture_half_float
-oes_texture_half_float['OES_texture_half_float'] = concurrent_test('oes_texture_float half')
-
-oes_texture_float_linear = {}
-spec['OES_texture_float_linear'] = oes_texture_float_linear
-oes_texture_float_linear['OES_texture_float_linear'] = concurrent_test('oes_texture_float linear')
-
-oes_texture_half_float_linear = {}
-spec['OES_texture_half_float_linear'] = oes_texture_half_float_linear
-oes_texture_half_float_linear['OES_texture_half_float_linear'] = concurrent_test('oes_texture_float half linear')
+add_concurrent_test(oes_texture_float, 'oes_texture_float')
+add_concurrent_test(oes_texture_float, 'oes_texture_float half')
+add_concurrent_test(oes_texture_float, 'oes_texture_float linear')
+add_concurrent_test(oes_texture_float, 'oes_texture_float half linear')
 
 
 ext_texture_integer = {}
