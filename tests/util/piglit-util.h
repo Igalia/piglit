@@ -53,6 +53,10 @@ extern "C" {
 
 #include "piglit-log.h"
 
+#ifndef __has_attribute
+#define __has_attribute(x) 0
+#endif
+
 #if defined(_MSC_VER)
 
 /* windows.h won't define min/max macros if NOMINMAX is defined, however
@@ -78,7 +82,7 @@ extern "C" {
 #define PRINTFLIKE(f, a)
 #endif
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || __has_attribute(noreturn)
 #define NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
 #define NORETURN __declspec(noreturn)
