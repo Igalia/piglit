@@ -32,7 +32,13 @@ extern "C" {
 #include "config.h"
 
 #if defined(_WIN32)
+
 #include <windows.h>
+
+/* Another two macros provided by windows.h which conflict with piglit */
+#undef near
+#undef far
+
 #endif
 
 #include <assert.h>
@@ -53,10 +59,6 @@ extern "C" {
  * stdlib.h will still define them for C files regardless... */
 #undef max
 #undef min
-
-/* Another two macros provided by windows.h which conflict with piglit */
-#undef near
-#undef far
 
 #if !defined(__cplusplus) && !defined(inline)
 #define inline __inline
