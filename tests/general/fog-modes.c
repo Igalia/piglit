@@ -41,7 +41,7 @@ piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	int i, mode;
-	float near = 0.0, far = 1.0;
+	float zNear = 0.0, zFar = 1.0;
 	GLfloat fogcolor[4] = {1, 1, 1, 1};
 
 	glEnable(GL_FOG);
@@ -50,7 +50,7 @@ piglit_display(void)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, 1, 0, 1, -near, -far);
+	glOrtho(0, 1, 0, 1, -zNear, -zFar);
 
 	for (mode = 0; mode < 3; mode++) {
 		float y = mode / 3.0;
@@ -59,8 +59,8 @@ piglit_display(void)
 		switch (mode) {
 		case 0:
 			glFogi(GL_FOG_MODE, GL_LINEAR);
-			glFogf(GL_FOG_START, near);
-			glFogf(GL_FOG_END, far);
+			glFogf(GL_FOG_START, zNear);
+			glFogf(GL_FOG_END, zFar);
 			break;
 		case 1:
 			glFogi(GL_FOG_MODE, GL_EXP);
@@ -75,7 +75,7 @@ piglit_display(void)
 		for (i = 0; i < 5; i++) {
 			float x = i / 5.0;
 			float w = 1.0 / 5.0;
-			float z = near + (far - near) * i / 5.0;
+			float z = zNear + (zFar - zNear) * i / 5.0;
 
 			piglit_draw_rect_z(z, x, y, w, h);
 		}
@@ -85,13 +85,13 @@ piglit_display(void)
 		float y = (mode + 0.5) / 3.0 * piglit_height;
 		for (i = 0; i < 5; i++) {
 			float x = (i + 0.5) / 5.0 * piglit_width;
-			float z = near + (far - near) * i / 5.0;
+			float z = zNear + (zFar - zNear) * i / 5.0;
 			float f;
 			float color[4];
 
 			switch (mode) {
 			case 0:
-				f = (far - z) / (far - near);
+				f = (zFar - z) / (zFar - zNear);
 				break;
 			case 1:
 				f = expf(-(2.0 * z));
