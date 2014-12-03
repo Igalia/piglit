@@ -251,5 +251,5 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
-	piglit_dispatch_default_init(PIGLIT_DISPATCH_GL);
+	/* empty */
 }
