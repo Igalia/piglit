@@ -26,4 +26,5 @@ piglit_add_executable (arb_direct_state_access-gettextureimage-targets gettextur
 piglit_add_executable (arb_direct_state_access-compressedtextureimage compressedtextureimage.c)
 piglit_add_executable (arb_direct_state_access-getcompressedtextureimage getcompressedtextureimage.c)
 piglit_add_executable (arb_direct_state_access-texture-storage-multisample texture-storage-multisample.c)
+piglit_add_executable (arb_direct_state_access-texture-buffer texture-buffer.c)
 # vim: ft=cmake:
