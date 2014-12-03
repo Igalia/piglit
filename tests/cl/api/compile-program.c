@@ -111,7 +111,7 @@ piglit_cl_test(const int argc,
 	cl_program header_invalid;
 	cl_program program;
 	cl_program temp_program;
-	cl_kernel kernel;
+	cl_kernel kernel = NULL;
 
 	/*** Normal usage ***/
 
