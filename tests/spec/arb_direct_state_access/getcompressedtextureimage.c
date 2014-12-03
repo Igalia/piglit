@@ -412,6 +412,21 @@ piglit_display(void)
 			result = PIGLIT_FAIL;
 	}
 
+	/* 1D targets can't be compressed in Mesa right now,
+	 * but here is a trivial test for the entry point. */
+	glCompressedTextureSubImage1D(250, 0, 0, 60,
+				      internalformat, 60*4*8,
+				      NULL);
+
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION)) /* Bad texture */
+		subtest = PIGLIT_FAIL;
+	else
+		subtest = PIGLIT_PASS;
+	piglit_report_subtest_result(subtest, "Compressed Texture"
+				     " Sub Image 1D");
+	if (subtest == PIGLIT_FAIL)
+		result = PIGLIT_FAIL;
+
 	free(data);
 
 	return result;
