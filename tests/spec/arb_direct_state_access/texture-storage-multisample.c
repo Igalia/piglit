@@ -246,6 +246,8 @@ check_non_generated_texture(void)
 	 */
 	glTextureStorage2DMultisample(250, 4, GL_RGBA8, 64, 64, GL_TRUE);
 	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+	glTextureStorage3DMultisample(250, 4, GL_RGBA8, 64, 64, 3, GL_TRUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
 
 	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
 		"non-generated texture name");
@@ -383,6 +385,7 @@ draw_multisampled(void)
 			  0, 0, piglit_width, piglit_height,
 			  GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	/* TODO: Add a Piglit probe call to check the output */
 	if (!piglit_automatic) {
 		piglit_present_results();
 	}
@@ -392,6 +395,58 @@ draw_multisampled(void)
 
 
 	free(data);
+	return pass;
+}
+
+static bool
+trivial_but_should_work(void)
+{
+	bool pass = true;
+	GLuint texture;
+
+	/* 2D case */
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &texture);
+	glTextureStorage2DMultisample(texture, 4, GL_RGBA8, 64, 64, GL_TRUE);
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	/* 3D case */
+	glDeleteTextures(1, &texture);
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &texture);
+	glTextureStorage3DMultisample(texture, 4, GL_RGBA8, 64, 64, 3,
+				      GL_TRUE);
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "trivial, but should work");
+	return pass;
+}
+
+static bool
+check_improper_effective_target(void)
+{
+	bool pass = true;
+	GLuint texture;
+
+	/* 3D case with 2D target */
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &texture);
+	glTextureStorage3DMultisample(texture, 4, GL_RGBA8, 64, 64, 3,
+				      GL_TRUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	/* 2D case with 3D target */
+	glDeleteTextures(1, &texture);
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &texture);
+	glTextureStorage2DMultisample(texture, 4, GL_RGBA8, 64, 64, GL_TRUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	/* 2D case with non-multisampled target */
+	glDeleteTextures(1, &texture);
+	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+	glTextureStorage2DMultisample(texture, 4, GL_RGBA8, 64, 64, GL_TRUE);
+	pass &= piglit_check_gl_error(GL_INVALID_OPERATION);
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "improper effective target");
 	return pass;
 }
 
@@ -414,6 +469,10 @@ piglit_display(void)
 	if (!check_immutable())
 		result = PIGLIT_FAIL;
 	if (!check_unsized_format())
+		result = PIGLIT_FAIL;
+	if (!check_improper_effective_target())
+		result = PIGLIT_FAIL;
+	if (!trivial_but_should_work())
 		result = PIGLIT_FAIL;
 	if (!draw_multisampled())
 		result = PIGLIT_FAIL;
