@@ -310,7 +310,7 @@ add_test(struct test t)
 bool
 add_test_arg(struct test* t, struct test_arg ta, bool arg_in)
 {
-	int i;
+	unsigned i;
 	struct test_arg* this_args;
 	size_t num_this_args;
 	struct test_arg* other_args;
@@ -392,7 +392,7 @@ add_test_arg_out(struct test* t, struct test_arg ta)
 void
 free_tests()
 {
-	int i,j;
+	unsigned i,j;
 
 	for(i = 0; i < num_tests; i++) {
 		for(j = 0; j < tests[i].num_args_in; j++) {
@@ -431,7 +431,7 @@ void
 free_dynamic_strs()
 {
 	if(dynamic_strs != NULL) {
-		int i;
+		unsigned i;
 
 		for(i = 0; i < num_dynamic_strs; i++) {
 			free(dynamic_strs[i]);
@@ -1626,7 +1626,7 @@ struct buffer_arg {
 void
 free_buffer_args(struct buffer_arg** buffer_args, unsigned int* num_buffer_args)
 {
-	int i;
+	unsigned i;
 
 	for(i = 0; i < *num_buffer_args; i++) {
 		clReleaseMemObject((*buffer_args)[i].buffer);
@@ -1720,7 +1720,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	enum piglit_result result = PIGLIT_PASS;
 
 	// all
-	int j;
+	unsigned j;
 	char* kernel_name;
 	cl_kernel kernel;
 
@@ -1826,7 +1826,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 			// not accepted by parser
 			break;
 		case TEST_ARG_BUFFER: {
-			int k;
+			unsigned k;
 			struct buffer_arg buffer_arg;
 			buffer_arg.index = test_arg.index;
 
@@ -1894,7 +1894,7 @@ test_kernel(const struct piglit_cl_program_test_config* config,
 	printf("Validating results...\n");
 
 	for(j = 0; j < test.num_args_out; j++) {
-		int k;
+		unsigned k;
 		bool arg_valid = false;
 		struct test_arg test_arg = test.args_out[j];
 
@@ -1969,7 +1969,7 @@ piglit_cl_test(const int argc,
 {
 	enum piglit_result result = PIGLIT_SKIP;
 
-	int i;
+	unsigned i;
 
 	/* Print building status */
 	if(!config->expect_build_fail) {
