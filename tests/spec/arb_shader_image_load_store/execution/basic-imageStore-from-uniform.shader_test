@@ -1,0 +1,56 @@
+# Verify simple reading of a uniform and output to an image
+
+[require]
+GL >= 3.3
+GLSL >= 3.30
+GL_ARB_shader_image_load_store
+
+[vertex shader]
+#version 130
+in vec4 piglit_vertex;
+
+void main()
+{
+	gl_Position = piglit_vertex;
+}
+
+[fragment shader]
+#version 330
+#extension GL_ARB_shader_image_load_store: enable
+
+uniform vec4 color;
+writeonly uniform image2D tex;
+out vec4 outcolor;
+
+void main()
+{
+	imageStore(tex, ivec2(gl_FragCoord.xy), color);
+	outcolor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+# Texture 0 is the imageStore output.
+uniform int tex 0
+texture rgbw 0 (16, 16)
+image texture 0
+
+# Texture 1 is the rendering output. We don't care about this.
+texture rgbw 1 (16, 16)
+
+# Store red using imageStore
+uniform vec4 color 1.0 0.0 0.0 1.0
+fb tex 2d 1
+draw rect -1 -1 2 2
+
+# Test the result of imageStore
+fb tex 2d 0
+probe all rgba 1.0 0.0 0.0 1.0
+
+# Store green using imageStore
+uniform vec4 color 0.0 1.0 0.0 1.0
+fb tex 2d 1
+draw rect -1 -1 2 2
+
+# Test the result of imageStore
+fb tex 2d 0
+probe all rgba 0.0 1.0 0.0 1.0
