@@ -187,6 +187,9 @@ strtod_inf(const char *nptr, char **endptr)
 	while (*nptr == ' ' || *nptr == '\t')
 		nptr++;
 
+#pragma warning( push )
+#pragma warning( disable : 4056 ) // overflow in floating-point constant arithmetic
+#pragma warning( disable : 4756 ) // overflow in constant arithmetic
 	if (nptr[0] == 'i' && nptr[1] == 'n' && nptr[2] == 'f') {
 		/* +infinity */
 		*endptr = (char *) (nptr + 3);
@@ -197,6 +200,8 @@ strtod_inf(const char *nptr, char **endptr)
 		*endptr = (char *) (nptr + 4);
 		return -INFINITY;
 	}
+#pragma warning( pop )
+
 	/* fall-through */
 #endif
 	return strtod(nptr, endptr);
