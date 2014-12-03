@@ -636,6 +636,8 @@ int64_t
 piglit_time_get_nano(void)
 {
 #if !defined(_WIN32)
+	struct timeval tv;
+
 #ifdef PIGLIT_HAS_POSIX_CLOCK_MONOTONIC
 	struct timespec t;
 	int r = clock_gettime(CLOCK_MONOTONIC, &t);
@@ -643,7 +645,6 @@ piglit_time_get_nano(void)
 	if (r == 0 || (r == -1 && errno != EINVAL))
 		return (t.tv_sec * INT64_C(1000000000)) + t.tv_nsec;
 #endif
-	struct timeval tv;
 
 	gettimeofday(&tv, NULL);
 	return tv.tv_usec * INT64_C(1000) + tv.tv_sec * INT64_C(1000000000);
