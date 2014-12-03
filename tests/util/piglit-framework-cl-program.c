@@ -218,7 +218,8 @@ piglit_cl_program_test_run(const int argc,
 		sprintf(build_options+strlen(old), "%s", config->build_options);
 		free(old);
 	}
-	if(version > 10) {
+
+	if(env.clc_version > 10) {
 		//If -cl-std was already in config->build_options, use what the test requested
 		if (!strstr(build_options, "-cl-std")){
 			char* template = " -cl-std=CL%d.%d";
