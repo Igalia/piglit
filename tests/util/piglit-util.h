@@ -211,7 +211,11 @@ strtod_inf(const char *nptr, char **endptr)
 static inline char *
 strchrnul(const char *s, int c)
 {
+#if defined(_MSC_VER) && defined(__cplusplus)
+	char *t = strchr((char *)s, c);
+#else
 	char *t = strchr(s, c);
+#endif
 
 	return (t == NULL) ? ((char *) s + strlen(s)) : t;
 }
