@@ -34,13 +34,14 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 30;
+	config.supports_gl_compat_version = 13;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 			       PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
+/* This has the modelview matrix built in. */
 static const char multisample_texture_vs_source[] =
 "#version 130\n"
 "in vec2 vertex;\n"
@@ -67,10 +68,11 @@ static const char multisample_texture_fs_source[] =
 
 /**
  * Uploads an arbitrary multisample texture.
+ * TODO: Make this part of Mesa meta?
  *
  * This function acts like glTexSub*Image for multisample textures.
  * For the texture given, it assumes that glTexImage[23]DMultisample or
- * glTex*Storage[23]DMultisample has already been called to establish the 
+ * glTex*Storage[23]DMultisample has already been called to establish the
  * storage.
  *
  * When this function returns, multisample texture will be bound to the
@@ -89,6 +91,8 @@ static const char multisample_texture_fs_source[] =
  * \param format         format of the pixel data
  * \param type           type of the pixel data
  * \param data           pixel data with which to fill the texture
+ *			 You need data for each sample.  The samples should be
+ *			 specified in depth.
  *
  */
 void
@@ -101,7 +105,7 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	static GLuint prog = 0;
 	static GLint tex_loc, tex_depth_loc, z_loc;
 	static GLuint fbo, array_tex;
-	static const float verts[] = {
+	static const float verts[] = { /* Two triangles for the texture */
 		0.0, 0.0,
 		0.0, 1.0,
 		1.0, 1.0,
@@ -126,8 +130,10 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 
 	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
 		assert(depth == 1);
-	} else if (target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
-	} else {
+	}
+	else if (target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY) {
+	}
+	else {
 		assert(!"Invalid texture target");
 		return;
 	}
@@ -161,15 +167,19 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	glGetBooleanv(GL_SAMPLE_SHADING_ARB, &backup.arb_sample_shading);
 	glGetFloatv(GL_MIN_SAMPLE_SHADING_VALUE_ARB, &backup.min_sample_shading);
 
+	/* This ensures that copying is done on a per-sample basis rather than
+	 * the default per-pixel basis. */
 	glEnable(GL_SAMPLE_SHADING_ARB);
 	glMinSampleShadingARB(1.0f);
 
+	/* Load the data into a texture for drawing. */
 	glBindTexture(GL_TEXTURE_2D_ARRAY, array_tex);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, width, height,
 		     depth * samples, 0, format, type, data);
 
+	/* Bind the special FBO and attach our texture to it. */
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 	glViewport(0, 0, width, height);
 
@@ -182,6 +192,9 @@ texture_sub_image_multisample(GLenum tex, GLenum target,
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
 
+	/* When we call draw arrays, the data (in array_tex) will get drawn
+	 * into our texture (in tex) because it's attached to
+	 * the framebuffer. */
 	if (target == GL_TEXTURE_2D_MULTISAMPLE) {
 		glUniform1i(z_loc, 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER,
@@ -311,12 +324,85 @@ check_immutable(void)
 	return pass;
 }
 
+static bool
+draw_multisampled(void)
+{
+	bool pass = true;
+	GLuint texture, fbo;
+	int x, y, z, idx;
+	int samples = 2;
+	float sample_mult;
+
+	/* Make a texture of size piglit_width x piglit_height that is divided
+	 * into two triangles by a diagonal (\) line. (Use \ rather than /
+	 * because texture_sub_image_multisample uses /.) */
+	/* TODO: Do spatial anti-aliasing rather than blending. */
+	GLubyte* data = malloc(4 * samples * piglit_width * piglit_height *
+			       sizeof(GLubyte));
+	float m = ((float) piglit_height / piglit_width);
+	for (z = 0; z < samples; ++z) {
+		for (y = 0; y < piglit_height; ++y) {
+			for (x = 0; x < piglit_width; ++x) {
+				idx = 4 * ((z * piglit_height + y) *
+					  piglit_width + x);
+				sample_mult = ((float) z)/samples;
+				if (y <= ((int) piglit_height - (m * x))) {
+					/* Green below or on the line. */
+					data[idx + 0] =   0 * sample_mult;
+					data[idx + 1] = 255 * sample_mult;
+					data[idx + 2] =   0 * sample_mult;
+				}
+				else {
+					/* White above the line. */
+					data[idx + 0] = 255 * sample_mult;
+					data[idx + 1] = 255 * sample_mult;
+					data[idx + 2] = 255 * sample_mult;
+				}
+				data[idx + 3] = 255;
+			}
+		}
+	}
+
+	/* Set up the image. */
+	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &texture);
+	glTextureStorage2DMultisample(texture, samples, GL_RGBA8,
+				      piglit_width, piglit_height, GL_FALSE);
+	texture_sub_image_multisample(texture, GL_TEXTURE_2D_MULTISAMPLE,
+				      GL_RGBA8, piglit_width, piglit_height,
+				      1, samples, GL_RGBA, GL_UNSIGNED_BYTE,
+				      data);
+
+	/* Draw the image. Can't use piglit_draw_rect_tex because the OpenGL
+	 * 1.0 pipeline doesn't handle multisample textures. */
+	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			       GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
+	glBlitFramebuffer(0, 0, piglit_width, piglit_height,
+			  0, 0, piglit_width, piglit_height,
+			  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	pass &= piglit_check_gl_error(GL_NO_ERROR);
+	if (!piglit_automatic) {
+		piglit_present_results();
+	}
+
+	piglit_report_subtest_result(pass ? PIGLIT_PASS : PIGLIT_FAIL,
+				     "multisampled drawing");
+
+
+	free(data);
+	return pass;
+}
 
 void
 piglit_init(int argc, char **argv)
 {
+	int max_samples;
 	piglit_require_extension("GL_ARB_direct_state_access");
 	piglit_require_extension("GL_ARB_texture_storage_multisample");
+	glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+	printf("Max samples = %d\n", max_samples);
 }
 
 enum piglit_result
@@ -328,6 +414,8 @@ piglit_display(void)
 	if (!check_immutable())
 		result = PIGLIT_FAIL;
 	if (!check_unsized_format())
+		result = PIGLIT_FAIL;
+	if (!draw_multisampled())
 		result = PIGLIT_FAIL;
 
 	return result;
