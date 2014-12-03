@@ -559,27 +559,37 @@ bool piglit_cl_framework_check_local_work_size(
 {
 	unsigned i;
 	size_t workgroup_size = 1;
-	size_t max_workgroup_size = piglit_cl_get_device_info(device_id,
+	size_t *max_workgroup_size = piglit_cl_get_device_info(device_id,
 						CL_DEVICE_MAX_WORK_GROUP_SIZE);
 	size_t *max_workitem_sizes = piglit_cl_get_device_info(device_id,
 						CL_DEVICE_MAX_WORK_ITEM_SIZES);
+	bool ret = true;
 
 	if (!local_work_size) {
-		return true;
+		goto out;
+	}
+
+	if (!max_workgroup_size || !max_workitem_sizes) {
+		ret = false;
+		goto out;
 	}
 
 	for (i = 0; i < 3; i++) {
 		size_t local_size = local_work_size[i];
 		if (local_size > max_workitem_sizes[i]) {
-			return false;
+			ret = false;
+			goto out;
 		}
 		if (local_size > 0) {
 			workgroup_size *= local_size;
 		}
 	}
 
-	if (workgroup_size > max_workgroup_size) {
-		return false;
+	if (workgroup_size > *max_workgroup_size) {
+		ret = false;
 	}
-	return true;
+out:
+	free(max_workgroup_size);
+	free(max_workitem_sizes);
+	return ret;
 }
