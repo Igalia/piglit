@@ -17,3 +17,5 @@ profile.tests['spec']['ARB_shader_image_load_store']['coherency'] = PiglitGLTest
     ['arb_shader_image_load_store-coherency', '--quick'], run_concurrent=True)
 profile.tests['spec']['ARB_shader_image_load_store']['host-mem-barrier'] = PiglitGLTest(
     ['arb_shader_image_load_store-host-mem-barrier', '--quick'], run_concurrent=True)
+profile.tests['spec']['ARB_shader_image_load_store']['max-size'] = PiglitGLTest(
+    ['arb_shader_image_load_store-max-size', '--quick'], run_concurrent=True)
