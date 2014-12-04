@@ -4439,6 +4439,7 @@ arb_shader_image_load_store['early-z'] = PiglitGLTest(['arb_shader_image_load_st
 arb_shader_image_load_store['host-mem-barrier'] = PiglitGLTest(['arb_shader_image_load_store-host-mem-barrier'], run_concurrent=True)
 arb_shader_image_load_store['indexing'] = PiglitGLTest(['arb_shader_image_load_store-indexing'], run_concurrent=True)
 arb_shader_image_load_store['invalid'] = PiglitGLTest(['arb_shader_image_load_store-invalid'], run_concurrent=True)
+arb_shader_image_load_store['layer'] = PiglitGLTest(['arb_shader_image_load_store-layer'], run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear

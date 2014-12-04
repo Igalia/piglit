@@ -20,5 +20,6 @@ piglit_add_executable(arb_shader_image_load_store-early-z early-z.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-host-mem-barrier host-mem-barrier.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-indexing indexing.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-invalid invalid.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-layer layer.c ${depends})
 
 # vim: ft=cmake:
