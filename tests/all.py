@@ -4434,6 +4434,7 @@ import_glsl_parser_tests(spec['ARB_shader_image_load_store'],
 arb_shader_image_load_store['atomicity'] = PiglitGLTest(['arb_shader_image_load_store-atomicity'], run_concurrent=True)
 arb_shader_image_load_store['bitcast'] = PiglitGLTest(['arb_shader_image_load_store-bitcast'], run_concurrent=True)
 arb_shader_image_load_store['coherency'] = PiglitGLTest(['arb_shader_image_load_store-coherency'], run_concurrent=True)
+arb_shader_image_load_store['dead-fragments'] = PiglitGLTest(['arb_shader_image_load_store-dead-fragments'], run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
