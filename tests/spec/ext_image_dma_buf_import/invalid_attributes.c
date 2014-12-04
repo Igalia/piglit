@@ -209,7 +209,7 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 4;
-	const unsigned char pixels[w * h * cpp];
+	const unsigned char *pixels = alloca(w * h * cpp);
 	struct piglit_dma_buf *buf;
 	unsigned stride;
 	unsigned offset;

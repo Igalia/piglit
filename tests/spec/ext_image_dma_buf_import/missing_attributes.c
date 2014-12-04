@@ -105,7 +105,7 @@ piglit_display(void)
 	const unsigned w = 2;
 	const unsigned h = 2;
 	const unsigned cpp = 2;
-	const unsigned char pixels[w * h * cpp];
+	const unsigned char *pixels = alloca(w * h * cpp);
 	EGLint all[2 * NUM_MANDATORY_ATTRS];
 	EGLint missing[2 * (NUM_MANDATORY_ATTRS - 1) + 1];
 	struct piglit_dma_buf *buf;

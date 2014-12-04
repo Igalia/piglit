@@ -70,6 +70,8 @@ extern "C" {
 
 #define snprintf _snprintf
 
+#define alloca _alloca
+
 #define usleep(__usec) Sleep(((__usec) + 999)/1000)
 
 #endif /* defined(_MSC_VER) */
