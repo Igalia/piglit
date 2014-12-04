@@ -17,5 +17,6 @@ piglit_add_executable(arb_shader_image_load_store-bitcast bitcast.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-coherency coherency.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-dead-fragments dead-fragments.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-early-z early-z.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-host-mem-barrier host-mem-barrier.c ${depends})
 
 # vim: ft=cmake:
