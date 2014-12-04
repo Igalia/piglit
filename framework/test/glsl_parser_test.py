@@ -27,6 +27,7 @@ import os.path as path
 import re
 import sys
 
+import framework.grouptools as grouptools
 from .piglit_test import PiglitBaseTest
 
 __all__ = [
@@ -66,10 +67,8 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
                     filepath = path.join(dirpath, f)
                     # testname := filepath relative to
                     # basepath.
-                    testname = os.path.relpath(filepath, basepath)
-                    if os.path.sep != '/':
-                        testname = testname.replace(os.path.sep, '/', -1)
-                    assert isinstance(testname, basestring)
+                    testname = grouptools.from_path(
+                        os.path.relpath(filepath, basepath))
                     add_glsl_parser_test(group, filepath, testname)
 
 
