@@ -22,5 +22,6 @@ piglit_add_executable(arb_shader_image_load_store-indexing indexing.c ${depends}
 piglit_add_executable(arb_shader_image_load_store-invalid invalid.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-layer layer.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-level level.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-max-images max-images.c ${depends})
 
 # vim: ft=cmake:
