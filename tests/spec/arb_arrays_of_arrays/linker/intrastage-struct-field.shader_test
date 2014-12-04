@@ -1,0 +1,42 @@
+# This test verifies that linking is successful if intrastage
+# array sizes match.
+
+[require]
+GLSL >= 1.20
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 120
+#extension GL_ARB_arrays_of_arrays: enable
+struct S {
+  vec4 [2] x[2];
+};
+
+uniform S s;
+varying vec4 color;
+
+void f()
+{
+  color = s.x[1][0];
+}
+
+[vertex shader]
+#version 120
+#extension GL_ARB_arrays_of_arrays: enable
+struct S {
+  vec4 [2] x[2];
+};
+
+uniform S s;
+varying vec4 color;
+
+void f();
+
+void main()
+{
+  f();
+  gl_Position = s.x[1][1];
+}
+
+[test]
+link success

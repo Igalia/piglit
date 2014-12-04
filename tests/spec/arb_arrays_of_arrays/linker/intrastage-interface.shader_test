@@ -1,0 +1,38 @@
+# This test verifies that linking is successful if intrastage
+# array sizes match.
+
+[require]
+GLSL >= 1.50
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: enable
+
+out blk {
+  vec4 foo;
+} inst[2][5];
+
+void f()
+{
+  inst[1][4].foo = vec4(1.0);
+}
+
+[vertex shader]
+#version 150
+#extension GL_ARB_arrays_of_arrays: enable
+
+out blk {
+  vec4 foo;
+} inst[2][5];
+
+void f();
+
+void main()
+{
+  f();
+  inst[0][4].foo = vec4(1.0);
+}
+
+[test]
+link success

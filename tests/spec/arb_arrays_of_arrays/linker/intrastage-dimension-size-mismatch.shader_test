@@ -1,0 +1,36 @@
+# This test verifies that a link error is generated if intrastage
+# array sizes don't match.
+
+[require]
+GLSL >= 1.20
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#version 120
+#extension GL_ARB_arrays_of_arrays: enable
+
+varying vec4 color[4][2];
+
+void f()
+{
+  color[2][1] = vec4(1, 0, 0, 1);
+}
+
+[vertex shader]
+#version 120
+#extension GL_ARB_arrays_of_arrays: enable
+
+varying vec4 color[3][2];
+
+void f();
+
+void main()
+{
+  f();
+  color[1][1] = vec4(1, 0, 0, 1);
+
+  gl_Position = gl_Vertex;
+}
+
+[test]
+link error
