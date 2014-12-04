@@ -517,13 +517,15 @@ regex_get_str(char** dst,
               unsigned int index,
               int cflags)
 {
-	regmatch_t pmatch[index+1];
+	regmatch_t *pmatch = calloc(index+1, sizeof(*pmatch));
+	bool ret = false;
 
 	if(regex_get_matches(src, pattern, pmatch, index+1, cflags)) {
-		return regex_get_match_str(dst, src, pmatch, index);
+		ret = regex_get_match_str(dst, src, pmatch, index);
 	}
 
-	return false;
+	free(pmatch);
+	return ret;
 }
 
 bool
