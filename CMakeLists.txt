@@ -210,9 +210,9 @@ if (NOT MSVC)
 	ENDIF (CXX_COMPILER_FLAG_WALL)
 
 	# MSVC does not support C99 variable length arrays
-	CHECK_C_COMPILER_FLAG("-Wvla" C_COMPILER_FLAG_WVLA)
-	IF (C_COMPILER_FLAG_WVLA)
-		SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
+	CHECK_C_COMPILER_FLAG("-Werror=vla" C_COMPILER_FLAG_WEVLA)
+	IF (C_COMPILER_FLAG_WEVLA)
+		SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=vla")
 	ENDIF ()
 	# MSVC only supports C99 variadic macros.  It doesn't support the
 	# non-standard GNU named variadic macro syntax that's documented in
