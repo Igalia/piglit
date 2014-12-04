@@ -26,5 +26,6 @@ piglit_add_executable(arb_shader_image_load_store-max-images max-images.c ${depe
 piglit_add_executable(arb_shader_image_load_store-max-size max-size.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-minmax minmax.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-qualifiers qualifiers.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-restrict restrict.c ${depends})
 
 # vim: ft=cmake:
