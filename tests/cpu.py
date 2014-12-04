@@ -18,16 +18,8 @@ __all__ = ['profile']
 
 def filter_gpu(name, test):
     """Remove all tests that are run on the GPU."""
-    if isinstance(test, GLSLParserTest):
+    if isinstance(test, GLSLParserTest) or name.startswith('asmparsertest'):
         return True
-
-    if name.startswith('spec/ARB_vertex_program'):
-        return True
-    if name.startswith('spec/ARB_fragment_program'):
-        return True
-    if name.startswith('asmparsertest'):
-        return True
-
     return False
 
 
