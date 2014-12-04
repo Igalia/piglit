@@ -113,6 +113,7 @@ class TestJUnitSingleTest(TestJunitNoTests):
                 'result': 'pass',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
+                'command': 'foo',
             })
         )
         test.finalize()
@@ -142,6 +143,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
                 'result': 'pass',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
+                'command': 'foo',
             })
         )
         test.write_test(
@@ -151,6 +153,7 @@ class TestJUnitMultiTest(TestJUnitSingleTest):
                 'result': 'fail',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
+                'command': 'foo',
             })
         )
         test.finalize()
@@ -257,6 +260,7 @@ def test_junit_skips_bad_tests():
                 'result': 'pass',
                 'out': 'this is stdout',
                 'err': 'this is stderr',
+                'command': 'foo',
             })
         )
         with open(os.path.join(tdir, 'tests', '1.xml'), 'w') as f:
