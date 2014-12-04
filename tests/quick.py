@@ -19,3 +19,5 @@ profile.tests['spec']['ARB_shader_image_load_store']['host-mem-barrier'] = Pigli
     ['arb_shader_image_load_store-host-mem-barrier', '--quick'], run_concurrent=True)
 profile.tests['spec']['ARB_shader_image_load_store']['max-size'] = PiglitGLTest(
     ['arb_shader_image_load_store-max-size', '--quick'], run_concurrent=True)
+profile.tests['spec']['ARB_shader_image_load_store']['semantics'] = PiglitGLTest(
+    ['arb_shader_image_load_store-semantics', '--quick'], run_concurrent=True)
