@@ -109,6 +109,8 @@ shader_name(GLenum target)
       return "geometry";
    case GL_FRAGMENT_SHADER:
       return "fragment";
+   case GL_COMPUTE_SHADER:
+      return "compute";
    default:
       assert(!"Unexpected shader target in shader_name()");
    }
