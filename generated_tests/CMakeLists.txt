@@ -110,6 +110,9 @@ piglit_make_generated_tests(
 	constant_array_size_tests_fp64.list
 	gen_constant_array_size_tests_fp64.py
 	builtin_function_fp64.py)
+piglit_make_generated_tests(
+	shader_image_load_store_tests.list
+	gen_shader_image_load_store_tests.py)
 
 # OpenCL Test generators
 piglit_make_generated_tests(
@@ -146,6 +149,7 @@ add_custom_target(gen-gl-tests
 			interpolation-qualifier-built-in-variable.list
 			builtin_uniform_tests_fp64.list
 			constant_array_size_tests_fp64.list
+			shader_image_load_store_tests.list
 )
 
 # Create a custom target for generating OpenCL tests
