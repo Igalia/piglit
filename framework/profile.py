@@ -36,6 +36,7 @@ import importlib
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
 from framework.test.base import Test
+import framework.grouptools as grouptools
 
 __all__ = [
     'TestProfile',
@@ -104,7 +105,7 @@ class TestProfile(object):
         def f(prefix, group, test_dict):
             """ Recursively flatter nested dictionary tree """
             for key, value in group.iteritems():
-                fullkey = os.path.join(prefix, key)
+                fullkey = grouptools.join(prefix, key)
                 if isinstance(value, dict):
                     f(fullkey, value, test_dict)
                 else:
