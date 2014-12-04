@@ -4444,6 +4444,7 @@ arb_shader_image_load_store['level'] = PiglitGLTest(['arb_shader_image_load_stor
 arb_shader_image_load_store['max-images'] = PiglitGLTest(['arb_shader_image_load_store-max-images'], run_concurrent=True)
 arb_shader_image_load_store['max-size'] = PiglitGLTest(['arb_shader_image_load_store-max-size'], run_concurrent=True)
 arb_shader_image_load_store['minmax'] = PiglitGLTest(['arb_shader_image_load_store-minmax'], run_concurrent=True)
+arb_shader_image_load_store['qualifiers'] = PiglitGLTest(['arb_shader_image_load_store-qualifiers'], run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
