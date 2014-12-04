@@ -28,5 +28,6 @@ piglit_add_executable(arb_shader_image_load_store-minmax minmax.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-qualifiers qualifiers.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-restrict restrict.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-semantics semantics.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-shader-mem-barrier shader-mem-barrier.c ${depends})
 
 # vim: ft=cmake:
