@@ -4449,6 +4449,7 @@ arb_shader_image_load_store['restrict'] = PiglitGLTest(['arb_shader_image_load_s
 arb_shader_image_load_store['semantics'] = PiglitGLTest(['arb_shader_image_load_store-semantics'], run_concurrent=True)
 arb_shader_image_load_store['shader-mem-barrier'] = PiglitGLTest(['arb_shader_image_load_store-shader-mem-barrier'], run_concurrent=True)
 arb_shader_image_load_store['state'] = PiglitGLTest(['arb_shader_image_load_store-state'], run_concurrent=True)
+arb_shader_image_load_store['unused'] = PiglitGLTest(['arb_shader_image_load_store-unused'], run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear

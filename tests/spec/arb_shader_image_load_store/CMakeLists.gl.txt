@@ -30,5 +30,6 @@ piglit_add_executable(arb_shader_image_load_store-restrict restrict.c ${depends}
 piglit_add_executable(arb_shader_image_load_store-semantics semantics.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-shader-mem-barrier shader-mem-barrier.c ${depends})
 piglit_add_executable(arb_shader_image_load_store-state state.c ${depends})
+piglit_add_executable(arb_shader_image_load_store-unused unused.c ${depends})
 
 # vim: ft=cmake:
