@@ -1,0 +1,60 @@
+# Check proper functioning of the gl_PrimitiveID fragment shader
+# input, in the case where there is no geometry shader.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+in vec4 piglit_vertex;
+flat out int vertex_id;
+
+void main()
+{
+  gl_Position = piglit_vertex;
+  vertex_id = gl_VertexID;
+}
+
+[fragment shader]
+#version 150
+
+flat in int vertex_id;
+
+void main()
+{
+  /* We draw a triangle strip containing 6 vertices, so the relationship between
+   * the primitive ID and the input vertex ID's should be:
+   *
+   * Primitive ID  Vertex ID's  Provoking vertex ID
+   *  0             0 1 2        2
+   *  1             2 1 3        3
+   *  2             2 3 4        4
+   *  3             4 3 5        5
+   *
+   * Since vertex_id uses interpolation qualifier "flat", it should
+   * always receive the value from the provoking vertex.  Therefore,
+   * by the table above, it should always be 2 greater than the
+   * expected value of gl_PrimitiveID.
+   */
+  int expected_primitive_id = vertex_id - 2;
+  if (expected_primitive_id == gl_PrimitiveID)
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  else
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+-1.0  0.0
+ 1.0  0.0
+-1.0  1.0
+ 1.0  1.0
+
+[test]
+clear color 0.0 0.0 0.0 0.0
+clear
+draw arrays GL_TRIANGLE_STRIP 0 6
+probe all rgba 0.0 1.0 0.0 1.0
