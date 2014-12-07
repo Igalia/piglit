@@ -1938,6 +1938,7 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-tf-wrong-stream-value')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-xfb-streams-without-invocations')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-emitstreamvertex_nodraw')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtCentroid')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtCentroid-packing')
 
 arb_shader_subroutine = {}
 spec['ARB_shader_subroutine'] = arb_shader_subroutine

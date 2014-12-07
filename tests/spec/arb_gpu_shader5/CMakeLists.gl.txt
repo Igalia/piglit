@@ -11,3 +11,4 @@ link_libraries (
 
 piglit_add_executable (arb_gpu_shader5-minmax minmax.c)
 piglit_add_executable (arb_gpu_shader5-interpolateAtCentroid interpolateAtCentroid.c)
+piglit_add_executable (arb_gpu_shader5-interpolateAtCentroid-packing interpolateAtCentroid-packing.c)
