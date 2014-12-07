@@ -1941,6 +1941,8 @@ add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtCentroid')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtCentroid-packing')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtSample')
 add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtSample-nonconst')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtOffset')
+add_concurrent_test(arb_gpu_shader5, 'arb_gpu_shader5-interpolateAtOffset-nonconst')
 
 arb_shader_subroutine = {}
 spec['ARB_shader_subroutine'] = arb_shader_subroutine
