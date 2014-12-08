@@ -663,7 +663,9 @@ class ComputeShaderTest(ShaderTest):
 
     def make_compute_shader(self):
         additional_declarations = 'writeonly uniform image2D tex;\n'
-        additional_declarations += 'layout(local_size_x = 16, local_size_y = 16) in;\n'
+        num_tests = len(self._test_vectors)
+        layout_tmpl = 'layout(local_size_x = {0}) in;\n'
+        additional_declarations += layout_tmpl.format(num_tests)
         return self.make_test_shader(
             additional_declarations,
             '  vec4 tmp_color;\n',
@@ -673,10 +675,10 @@ class ComputeShaderTest(ShaderTest):
 
     def make_test_init(self):
         return '''uniform int tex 0
-texture rgbw 0 (16, 16)
+texture rgbw 0 ({0}, 1)
 image texture 0
 fb tex 2d 0
-'''
+'''.format(len(self._test_vectors))
 
 
     def draw_command(self):
