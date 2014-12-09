@@ -114,9 +114,9 @@ def generate_tests(type_list, base_name, major, minor):
                     api_type = "ivec{0}".format(type_[-1])
 
                 if type_[-1] in ["2", "3", "4"]:
-                    name = 'u{}{}'.format(type_[0], type_[-1])
+                    name = 'u{0}{1}'.format(type_[0], type_[-1])
                 else:
-                    name = 'u{}'.format(type_[0])
+                    name = 'u{0}'.format(type_[0])
 
                 test_vectors.append((type_, name, value))
                 api_vectors.append((api_type, name, alt_numbers))
@@ -144,17 +144,17 @@ def generate_array_tests(type_list, base_name, major, minor):
             for k in xrange(num_values):
                 numbers.append(get_value(type_, i + j + k))
 
-            yield '{}({})'.format(type_, ', '.join(numbers))
+            yield '{0}({1})'.format(type_, ', '.join(numbers))
         # pylint: enable=undefined-loop-variable
 
     vecs = []
     for i, (type_, num_values) in enumerate(type_list):
         if type_[-1] in ["2", "3", "4"]:
-            name = 'u{}{}'.format(type_[0], type_[-1])
+            name = 'u{0}{1}'.format(type_[0], type_[-1])
         else:
-            name = 'u{}'.format(type_[0])
+            name = 'u{0}'.format(type_[0])
 
-        array_type = '{}[2]'.format(type_)
+        array_type = '{0}[2]'.format(type_)
         value = "{0}({1})".format(array_type, ", ".join(parts()))
 
         vecs.append((array_type, name, value))

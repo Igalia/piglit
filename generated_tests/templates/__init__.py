@@ -31,7 +31,7 @@ from mako.lookup import TemplateLookup
 
 # Based on a similar setup in framework/summary
 MAKO_TEMP_DIR = os.path.join(tempfile.gettempdir(),
-                             'piglit-{}'.format(getpass.getuser()),
+                             'piglit-{0}'.format(getpass.getuser()),
                              'generators', 'templates')
 
 TEMPLATE_DIR = os.path.abspath(os.path.dirname(__file__))

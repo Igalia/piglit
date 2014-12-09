@@ -67,7 +67,7 @@ def generate(dirname, type_name, op, usage, shader_target):
     print(filename)
     with open(filename, 'w') as f:
         f.write(TEMPLATES.get_template(
-            '{}.glsl_parser_test.mako'.format(usage)).render(
+            '{0}.glsl_parser_test.mako'.format(usage)).render(
                 type_name=type_name,
                 mode=mode,
                 dest=dest,

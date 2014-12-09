@@ -100,10 +100,10 @@ def main():
                 coord=params.coord))
 
         for stage in ['frag', 'vert']:
-            print('{}.{}'.format(name, stage))
-            with open('{}.{}'.format(name, stage), 'w+') as f:
+            print('{0}.{1}'.format(name, stage))
+            with open('{0}.{1}'.format(name, stage), 'w+') as f:
                 f.write(TEMPLATES.get_template(
-                    'tex_grad.{}.mako'.format(stage)).render_unicode(
+                    'tex_grad.{0}.mako'.format(stage)).render_unicode(
                         param=params,
                         extensions=get_extensions(params.mode)))
 
