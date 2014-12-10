@@ -37,7 +37,7 @@ except ImportError:
 
 import framework.core as core
 import framework.tests.utils as utils
-from framework.backends.json_ import JSONBackend
+from framework.backends.json import JSONBackend
 from framework.programs.run import _create_metadata
 
 

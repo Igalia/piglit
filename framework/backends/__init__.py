@@ -20,7 +20,8 @@
 
 """ Import public backend classes into one place """
 
-from .json_ import *
+# pylint: disable=wildcard-import
+from .json import *
 from .junit import *
 
 
