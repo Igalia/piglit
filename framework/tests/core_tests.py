@@ -20,13 +20,15 @@
 
 """ Module providing tests for the core module """
 
-
+from __future__ import print_function, absolute_import
 import os
 import collections
 import shutil
 import ConfigParser
 import textwrap
+
 import nose.tools as nt
+
 import framework.tests.utils as utils
 import framework.core as core
 

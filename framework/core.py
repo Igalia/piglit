@@ -22,13 +22,12 @@
 
 # Piglit core
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import errno
 import os
 import re
 import subprocess
 import sys
-# TODO: ConfigParser is known as configparser in python3
 import ConfigParser
 
 __all__ = [

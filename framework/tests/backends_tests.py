@@ -22,7 +22,9 @@
 
 """ Tests for the backend package """
 
+from __future__ import print_function, absolute_import
 import os
+
 try:
     from lxml import etree
 except ImportError:
@@ -32,6 +34,7 @@ try:
 except ImportError:
     import json
 import nose.tools as nt
+
 import framework.core as core
 import framework.results as results
 import framework.backends as backends

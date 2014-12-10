@@ -22,6 +22,7 @@
 
 """ Glean support """
 
+from __future__ import print_function, absolute_import
 import os
 from .base import Test
 from .piglit_test import TEST_BIN_DIR

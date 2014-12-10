@@ -25,6 +25,7 @@ in a single place.
 
 """
 
+from __future__ import print_function, absolute_import
 import os
 import sys
 import shutil
@@ -32,12 +33,14 @@ import tempfile
 import functools
 import subprocess
 from contextlib import contextmanager
+
 try:
     import simplejson as json
 except ImportError:
     import json
 from nose.plugins.skip import SkipTest
 import nose.tools as nt
+
 import framework.results
 
 

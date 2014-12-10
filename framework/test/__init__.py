@@ -24,7 +24,7 @@
 # create a general use API, but allow it to be controlled by setting the
 # __all__ in each module
 
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import
 from .base import *
 from .piglit_test import *
 from .gleantest import *

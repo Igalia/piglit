@@ -22,8 +22,7 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
-from __future__ import print_function
-
+from __future__ import print_function, print_function
 import re
 import subprocess
 from os.path import join

@@ -22,7 +22,7 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import re
 import subprocess
 from os import path

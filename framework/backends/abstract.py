@@ -25,6 +25,7 @@ This module provides mixins and base classes for backend modules.
 
 """
 
+from __future__ import print_function, absolute_import
 import os
 import abc
 import itertools

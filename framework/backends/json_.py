@@ -20,12 +20,15 @@
 
 """ Module providing json backend for piglit """
 
+from __future__ import print_function, absolute_import
 import os
 import shutil
+
 try:
     import simplejson as json
 except ImportError:
     import json
+
 import framework.status as status
 from .abstract import FileBackend
 

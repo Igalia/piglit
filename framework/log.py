@@ -26,6 +26,7 @@ returning BaseLog derived instances to individual tests.
 
 """
 
+from __future__ import print_function, absolute_import
 import sys
 import abc
 import itertools

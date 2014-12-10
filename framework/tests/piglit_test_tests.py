@@ -20,9 +20,10 @@
 
 """ Tests for the exectest module """
 
+from __future__ import print_function, absolute_import
+
 import nose.tools as nt
 
-import framework.tests.utils as utils
 from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
                                         PiglitCLTest)
 

@@ -20,8 +20,11 @@
 
 """ Provides tests for the shader_test module """
 
+from __future__ import print_function, absolute_import
 import os
+
 import nose.tools as nt
+
 import framework.test as testm
 import framework.tests.utils as utils
 

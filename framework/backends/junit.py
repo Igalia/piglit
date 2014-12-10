@@ -20,9 +20,11 @@
 
 """ Module implementing a JUnitBackend for piglit """
 
+from __future__ import print_function, absolute_import
 import os.path
 import re
 import shutil
+
 try:
     from lxml import etree
 except ImportError:

@@ -55,6 +55,8 @@ The formula for determining fixes is:
 
 """
 
+from __future__ import print_function, absolute_import
+
 __all__ = ['NOTRUN',
            'PASS',
            'FAIL',

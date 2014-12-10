@@ -35,6 +35,7 @@ dmesg implementation for their OS.
 
 """
 
+from __future__ import print_function, absolute_import
 import re
 import sys
 import subprocess

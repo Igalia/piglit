@@ -22,7 +22,9 @@
 # Authors: Tom Stellard <thomas.stellard@amd.com>
 #
 
+from __future__ import print_function, absolute_import 
 import re
+
 from .base import Test
 
 __all__ = [

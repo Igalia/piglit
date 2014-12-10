@@ -26,7 +26,7 @@ tests and they will change with each version of the json output.
 
 """
 
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import
 import os
 
 import nose.tools as nt

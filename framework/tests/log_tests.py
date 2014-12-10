@@ -20,10 +20,12 @@
 
 """ Module provides tests for log.py module """
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import sys
 import collections
+
 import nose.tools as nt
+
 import framework.log as log
 import framework.tests.utils as utils
 

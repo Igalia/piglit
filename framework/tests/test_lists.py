@@ -26,9 +26,12 @@ es3conform, etc)
 
 """
 
+from __future__ import print_function, absolute_import
 import importlib
 import os.path as path
+
 from nose.plugins.skip import SkipTest
+
 import framework.tests.utils as utils
 
 

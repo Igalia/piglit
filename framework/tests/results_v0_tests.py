@@ -20,9 +20,12 @@
 
 """ Module provides tests for converting version zero results to version 1 """
 
+from __future__ import print_function, absolute_import
 import json
 import copy
+
 import nose.tools as nt
+
 import framework.results as results
 import framework.tests.utils as utils
 

@@ -21,7 +21,7 @@
 
 """ This module enables the running of GLSL parser tests. """
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import os
 import os.path as path
 import re

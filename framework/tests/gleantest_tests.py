@@ -20,7 +20,8 @@
 
 """ Tests for the glean class. Requires Nose """
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
+
 from framework.test import GleanTest
 
 

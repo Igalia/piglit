@@ -21,9 +21,12 @@
 """ Module providing tests for the core module """
 
 
+from __future__ import print_function, absolute_import
 import os
 import json
+
 import nose.tools as nt
+
 import framework.tests.utils as utils
 import framework.results as results
 import framework.status as status

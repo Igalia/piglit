@@ -20,8 +20,12 @@
 
 """Tests for version 1 to version 2."""
 
-import json
+from __future__ import print_function, absolute_import
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import nose.tools as nt
 
 import framework.results as results

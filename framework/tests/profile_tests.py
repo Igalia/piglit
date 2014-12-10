@@ -20,10 +20,13 @@
 
 """ Provides test for the framework.profile modules """
 
+from __future__ import print_function, absolute_import
 import copy
 import platform
+
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
+
 import framework.core as core
 import framework.dmesg as dmesg
 import framework.profile as profile

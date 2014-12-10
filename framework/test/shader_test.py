@@ -23,6 +23,7 @@
 
 """ This module enables running shader tests. """
 
+from __future__ import print_function, absolute_import
 import os
 import os.path as path
 import re

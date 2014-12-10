@@ -26,9 +26,12 @@ errors and to ensure that the API hasn't changed without fixing these modules
 
 """
 
+from __future__ import print_function, absolute_import
 import importlib
 import ConfigParser
+
 from nose.plugins.skip import SkipTest
+
 import framework.core
 
 

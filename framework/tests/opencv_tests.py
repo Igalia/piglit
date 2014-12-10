@@ -20,6 +20,8 @@
 
 """ Module for testing opencv """
 
+from __future__ import print_function, absolute_import
+
 from framework.test import OpenCVTest
 
 

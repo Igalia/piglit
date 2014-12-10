@@ -21,10 +21,15 @@
 
 """ Module providing tests for the summary module """
 
-from __future__ import print_function
-import json
+from __future__ import print_function, absolute_import
 import copy
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
 import nose.tools as nt
+
 import framework.summary as summary
 import framework.tests.utils as utils
 

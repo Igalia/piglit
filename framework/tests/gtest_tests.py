@@ -20,6 +20,7 @@
 
 """ Module providing tests for gtest """
 
+from __future__ import print_function, absolute_import
 
 from framework.test import GTest
 

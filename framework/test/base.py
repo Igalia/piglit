@@ -22,6 +22,7 @@
 
 """ Module provides a base class for Tests """
 
+from __future__ import print_function, absolute_import
 import errno
 import os
 import subprocess

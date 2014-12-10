@@ -20,11 +20,14 @@
 
 """ Module of tests for the run commandline parser """
 
+from __future__ import print_function, absolute_import
 import sys
 import os
 import shutil
 import ConfigParser
+
 import nose.tools as nt
+
 import framework.tests.utils as utils
 import framework.programs.run as run
 import framework.core as core

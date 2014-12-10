@@ -25,13 +25,16 @@ don't want to run them use '-e sudo' with nosetests
 
 """
 
+from __future__ import print_function, absolute_import
 import os
 import sys
 import subprocess
 import re
 import json
+
 import nose.tools as nt
 from nose.plugins.skip import SkipTest
+
 import framework.dmesg as dmesg
 import framework.core
 import framework.test

@@ -25,8 +25,11 @@ etc
 
 """
 
+from __future__ import print_function, absolute_import
 import itertools
+
 import nose.tools as nt
+
 import framework.status as status
 import framework.tests.utils as utils
 
