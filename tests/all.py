@@ -3772,6 +3772,7 @@ add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_que
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-clip'])
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-geom'])
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-frag'])
+add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-comp'])
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
