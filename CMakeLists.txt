@@ -187,18 +187,9 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 
-FIND_PACKAGE(PythonInterp 2.7 REQUIRED)
-include(PiglitFindMako)
-
-# Require numpy
-execute_process(
-	COMMAND ${PYTHON_EXECUTABLE} -c "import numpy"
-	OUTPUT_QUIET
-	ERROR_QUIET
-	RESULT_VARIABLE import_numpy_error_code)
-if(NOT import_numpy_error_code EQUAL 0)
-	message(FATAL_ERROR "numpy python module not found")
-endif(NOT import_numpy_error_code EQUAL 0)
+find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonNumpy REQUIRED)
+find_package(PythonMako 0.7.3 REQUIRED)
 
 # Default to compiling with debug information (`gcc -g`):
 if(NOT CMAKE_BUILD_TYPE)
