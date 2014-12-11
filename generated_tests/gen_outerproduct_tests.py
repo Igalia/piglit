@@ -38,8 +38,12 @@ def main():
     """ Generate tests """
     dirname = os.path.join('spec', 'glsl-1.20', 'execution')
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
-
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for c, r in itertools.product(xrange(2, 5), repeat=2):
         vecs = [

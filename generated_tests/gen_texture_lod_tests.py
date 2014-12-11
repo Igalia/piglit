@@ -76,7 +76,12 @@ def main():
     """
     dirname = 'spec/arb_shader_texture_lod/compiler'
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for params in LOD_TESTS:
         name = os.path.join(

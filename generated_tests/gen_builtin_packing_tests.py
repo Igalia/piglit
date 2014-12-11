@@ -1028,7 +1028,12 @@ class ShaderTest(object):
     def write_file(self):
         dirname = os.path.dirname(self.filename)
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
+            try:
+                os.makedirs(dirname)
+            except OSError as e:
+                if e.errno == 17:  # file exists
+                    pass
+                raise
 
         with open(self.filename, "w") as f:
             f.write(self.__template.render(func=self.__func_info))

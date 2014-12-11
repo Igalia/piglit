@@ -78,7 +78,12 @@ def generate_tests(type_list, base_name, major, minor):
                            'execution',
                            'uniform-initializer')
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for target in ("vs", "fs"):
         for t in ALL_TEMPLATES:

@@ -355,7 +355,12 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, tss):
 def gen(types, minVersions, functions, testDefs, dirName):
     # Create the output directory if required
     if not os.path.exists(dirName):
-        os.makedirs(dirName)
+        try:
+            os.makedirs(dirName)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     # Loop over all data types being tested. Create one output file per data
     # type

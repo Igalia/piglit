@@ -32,7 +32,12 @@ def main():
     dirname = os.path.join('spec', 'glsl-1.20', 'compiler',
                            'built-in-functions')
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for type_ in ['int', 'float', 'bool', 'bvec2', 'bvec3', 'bvec4', 'mat2',
                   'mat2x2', 'mat2x3', 'mat2x4', 'mat3', 'mat3x2', 'mat3x3',

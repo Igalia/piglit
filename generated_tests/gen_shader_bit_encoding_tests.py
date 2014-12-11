@@ -140,7 +140,12 @@ def main():
         dirname = os.path.join('spec', api.lower(), 'execution',
                                'built-in-functions')
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
+            try:
+                os.makedirs(dirname)
+            except OSError as e:
+                if e.errno == 17:  # file exists
+                    pass
+                raise
 
         for func, attrib in FUNCS.iteritems():
             for execution_stage in ('vs', 'fs'):

@@ -31,7 +31,12 @@ VEC_SIZES = ['', '2', '4', '8', '16']
 
 dirName = os.path.join("cl", "store")
 if not os.path.exists(dirName):
-    os.makedirs(dirName)
+    try:
+        os.makedirs(dirName)
+    except OSError as e:
+        if e.errno == 17:  # file exists
+            pass
+        raise
 
 
 def gen_array(size):

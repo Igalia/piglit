@@ -198,8 +198,15 @@ class ParserTest(object):
         parser_test += self.make_shader()
         filename = self.filename()
         dirname = os.path.dirname(filename)
+
         if not os.path.exists(dirname):
-            os.makedirs(dirname)
+            try:
+                os.makedirs(dirname)
+            except OSError as e:
+                if e.errno == 17:  # file exists
+                    pass
+                raise
+
         with open(filename, 'w') as f:
             f.write(parser_test)
 

@@ -74,7 +74,12 @@ def main():
     dirname = os.path.join('spec', 'glsl-1.20', 'execution',
                            'built-in-functions')
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for test_id, x in enumerate(TEST_VECTORS, start=2):
         # make equal tests

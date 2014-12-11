@@ -171,9 +171,13 @@ def main():
     """main function."""
     dirname = os.path.join('spec', 'glsl-1.30', 'linker',
                            'interpolation-qualifiers')
-
     if not os.path.exists(dirname):
-        os.makedirs(dirname)
+        try:
+            os.makedirs(dirname)
+        except OSError as e:
+            if e.errno == 17:  # file exists
+                pass
+            raise
 
     for fs_mode, vs_mode in itertools.product(INTERPOLATION_MODES, repeat=2):
         make_fs_vs_tests(fs_mode, vs_mode, dirname)
