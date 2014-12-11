@@ -13,7 +13,7 @@ function(piglit_make_generated_tests file_list generator_script)
 	# during the build.
 	add_custom_command(
 		OUTPUT ${file_list}
-		COMMAND ${python} ${CMAKE_CURRENT_SOURCE_DIR}/${generator_script} > ${file_list}
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${generator_script} > ${file_list}
 		DEPENDS ${generator_script} ${ARGN}
 		VERBATIM)
 endfunction(piglit_make_generated_tests custom_target generator_script)

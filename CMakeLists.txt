@@ -187,28 +187,12 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 
-# Check for presence of Python 2.7 or greater.
-foreach(python_cmd python2 python)
-	execute_process(
-		COMMAND ${python_cmd} -c "import sys; assert '2.7' <= sys.version < '3'"
-		OUTPUT_QUIET
-		ERROR_QUIET
-		RESULT_VARIABLE python_version_check_error_code)
-	if(python_version_check_error_code EQUAL 0)
-		set(python ${python_cmd})
-		break()
-	endif(python_version_check_error_code EQUAL 0)
-endforeach(python_cmd)
-
-if(NOT DEFINED python)
-	message(FATAL_ERROR "python version 2.7 required")
-endif(NOT DEFINED python)
-
+FIND_PACKAGE(PythonInterp 2.7 REQUIRED)
 include(PiglitFindMako)
 
 # Require numpy
 execute_process(
-	COMMAND ${python} -c "import numpy"
+	COMMAND ${PYTHON_EXECUTABLE} -c "import numpy"
 	OUTPUT_QUIET
 	ERROR_QUIET
 	RESULT_VARIABLE import_numpy_error_code)
@@ -507,7 +491,7 @@ set (CPACK_PACKAGE_VERSION_MINOR "0")
 
 # Use current date in YYYYMMDD format as patch number
 execute_process (
-	COMMAND ${python} -c "import time, sys; sys.stdout.write(time.strftime('%Y%m%d'))"
+	COMMAND ${PYTHON_EXECUTABLE} -c "import time, sys; sys.stdout.write(time.strftime('%Y%m%d'))"
 	OUTPUT_VARIABLE CPACK_PACKAGE_VERSION_PATCH
 )
 

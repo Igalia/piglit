@@ -43,7 +43,7 @@ set(piglit_dispatch_gen_depends
 add_custom_command(
 	OUTPUT ${piglit_dispatch_gen_outputs}
 	DEPENDS ${piglit_dispatch_gen_depends}
-	COMMAND ${python} ${piglit_dispatch_gen_script} --out-dir ${piglit_dispatch_gen_output_dir}
+	COMMAND ${PYTHON_EXECUTABLE} ${piglit_dispatch_gen_script} --out-dir ${piglit_dispatch_gen_output_dir}
 	)
 
 add_custom_target(piglit_dispatch_gen
