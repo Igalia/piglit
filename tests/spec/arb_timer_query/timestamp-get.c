@@ -24,6 +24,9 @@
 #include "piglit-util-gl.h"
 
 #include <inttypes.h>  /* for PRIu64 macro */
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>    /* for usleep */
+#endif
 
 /**
  * @file timestamp-get.c
