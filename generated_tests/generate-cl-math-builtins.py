@@ -48,6 +48,7 @@ CLC_VERSION_MIN = {
     'fabs' : 10,
     'floor' : 10,
     'fmod' : 10,
+    'ldexp' : 10,
     'log1p' : 10,
     'mix' : 10,
     'nextafter' : 10,
@@ -66,6 +67,10 @@ DATA_TYPES = ['float']
 
 F = {
     'float' : 'float'
+}
+
+I = {
+    'float' : 'int'
 }
 
 tests = {
@@ -228,6 +233,16 @@ tests = {
             [float.fromhex("0x1.99998p-4"),  float("nan"), float.fromhex("-0x1.47aep-7"),   1.0, float("-nan"), float("nan")],
             [float.fromhex("0x1.466666p+2"), 0.0,          float.fromhex("-0x1p+2"),        1.0, 5.1,           3.0         ],
             [float.fromhex("0x1p-1"),        float("nan"), float.fromhex("-0x1.feb852p+1"), 1.5, 0.0,           float("inf")]
+        ],
+        'tolerance' : 0
+    },
+    'ldexp' : {
+        'arg_types': [F, F, I],
+        'function_type': 'tss',
+        'values': [
+            [0.0, 4.0, 15.2, 1.75, float("nan"), float("inf")],
+            [0.0, 1.0, 0.95, 3.5,  float("nan"), 1.12312312],
+            [0,   2,   4,    -1,   1,            2031231231]
         ],
         'tolerance' : 0
     },
