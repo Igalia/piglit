@@ -139,44 +139,44 @@ def gen_kernel_1_arg(f, fnName, inType, outType):
         gen_kernel(f, fnName, [inType], outType, [vecSize], '')
 
 
-#  2 argument kernel with input types that match
-def gen_kernel_2_arg_same_type(f, fnName, inType, outType):
+#  2 argument kernel with input types that match their vector size
+def gen_kernel_2_arg_same_size(f, fnName, inTypes, outType):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, [inType, inType], outType, [vecSize, vecSize],
+        gen_kernel(f, fnName, inTypes, outType, [vecSize, vecSize],
                    '')
 
 
 #  2 argument kernel with 1 vector and one scalar input argument
-def gen_kernel_2_arg_mixed_size(f, fnName, inType, outType):
+def gen_kernel_2_arg_mixed_size(f, fnName, inTypes, outType):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, [inType, inType], outType, [vecSize, 1], 'tss_')
+        gen_kernel(f, fnName, inTypes, outType, [vecSize, 1], 'tss_')
 
 
 #  2 argument kernel with 1 vector and one scalar input argument with multiple
 #    input data types
-def gen_kernel_2_arg_mixed_sign(f, fnName, inType1, inType2, outType):
+def gen_kernel_2_arg_mixed_sign(f, fnName, inTypes, outType):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, [inType1, inType2], outType, [vecSize, vecSize],
+        gen_kernel(f, fnName, inTypes, outType, [vecSize, vecSize],
                    '')
 
 
 #  3-argument built-in functions
 
 
-def gen_kernel_3_arg_same_type(f, fnName, inType, outType):
+def gen_kernel_3_arg_same_type(f, fnName, inTypes, outType):
     for vecSize in ALL_WIDTHS:
-        gen_kernel(f, fnName, [inType, inType, inType], outType,
+        gen_kernel(f, fnName, inTypes, outType,
                    [vecSize, vecSize, vecSize], ''
         )
 
-def gen_kernel_3_arg_mixed_size_tss(f, fnName, inType, outType):
+def gen_kernel_3_arg_mixed_size_tss(f, fnName, inTypes, outType):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, [inType, inType, inType], outType,
+        gen_kernel(f, fnName, inTypes, outType,
                    [vecSize, 1, 1], 'tss_')
 
-def gen_kernel_3_arg_mixed_size_tts(f, fnName, inType, outType):
+def gen_kernel_3_arg_mixed_size_tts(f, fnName, inTypes, outType):
     for vecSize in VEC_WIDTHS:
-        gen_kernel(f, fnName, [inType, inType, inType], outType,
+        gen_kernel(f, fnName, inTypes, outType,
                    [vecSize, vecSize, 1], 'tts_')
 
 
@@ -189,21 +189,27 @@ def generate_kernels(f, dataType, fnName, fnDef):
         return
 
     if (len(argTypes) == 3 and not fnName is 'upsample'):
-        gen_kernel_2_arg_same_type(f, fnName, argTypes[1], argTypes[0])
+        gen_kernel_2_arg_same_size(f, fnName,
+                                [argTypes[1], argTypes[2]], argTypes[0])
         if (fnDef['function_type'] is 'tss'):
-            gen_kernel_2_arg_mixed_size(f, fnName, argTypes[1], argTypes[0])
+            gen_kernel_2_arg_mixed_size(f, fnName,
+                                [argTypes[1], argTypes[2]], argTypes[0])
         return
 
     if (len(argTypes) == 4):
-        gen_kernel_3_arg_same_type(f, fnName, argTypes[1], argTypes[0])
+        gen_kernel_3_arg_same_type(f, fnName,
+                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
         if (fnDef['function_type'] is 'tss'):
-            gen_kernel_3_arg_mixed_size_tss(f, fnName, argTypes[1], argTypes[0])
+            gen_kernel_3_arg_mixed_size_tss(f, fnName,
+                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
         if (fnDef['function_type'] is 'tts'):
-            gen_kernel_3_arg_mixed_size_tts(f, fnName, argTypes[1], argTypes[0])
+            gen_kernel_3_arg_mixed_size_tts(f, fnName,
+                   [argTypes[1], argTypes[2], argTypes[3]], argTypes[0])
         return
 
     if (fnName is 'upsample'):
-        gen_kernel_2_arg_mixed_sign(f, fnName, argTypes[1], argTypes[2],
+        gen_kernel_2_arg_mixed_sign(f, fnName,
+                                    [argTypes[1], argTypes[2]],
                                     argTypes[0])
         return
 
