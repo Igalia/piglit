@@ -37,7 +37,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
 
-	config.window_width = 400;
+	config.window_width = 600;
 	config.window_height = 300;
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
 
@@ -49,6 +49,12 @@ static GLint vs1;
 static GLint fs1;
 static GLint prog2;
 static GLint fs2;
+static GLint prog3;
+static GLint fs3;
+static GLint prog4;
+static GLint fs4;
+static GLint prog5;
+static GLint fs5;
 
 
 static GLfloat verts[12] = {175.0, 125.0, 0.0,
@@ -89,6 +95,36 @@ static const char *fragShaderText2 =
 	"			    0.0, 1.0);\n"
 	"} \n";
 
+static const char *fragShaderText3 =
+	"uniform sampler2D tex2d;\n"
+	"varying vec2 texCoords;\n"
+	"void main()\n"
+	"{ \n"
+	"	gl_FragColor = vec4(dFdx(-texCoords.x) * -40.0,\n"
+	"			    dFdy(-texCoords.y) * -40.0,\n"
+	"			    0.0, 1.0);\n"
+	"} \n";
+
+static const char *fragShaderText4 =
+	"uniform sampler2D tex2d;\n"
+	"varying vec2 texCoords;\n"
+	"void main()\n"
+	"{ \n"
+	"	gl_FragColor = vec4(dFdx(abs(-texCoords.x)) * 40.0,\n"
+	"			    dFdy(abs(-texCoords.y)) * 40.0,\n"
+	"			    0.0, 1.0);\n"
+	"} \n";
+
+static const char *fragShaderText5 =
+	"uniform sampler2D tex2d;\n"
+	"varying vec2 texCoords;\n"
+	"void main()\n"
+	"{ \n"
+	"	gl_FragColor = vec4(dFdx(-abs(texCoords.x)) * -40.0,\n"
+	"			    dFdy(-abs(texCoords.y) * -40.0,\n"
+	"			    0.0, 1.0);\n"
+	"} \n";
+
 
 
 void
@@ -116,9 +152,18 @@ compileLinkProg(void)
 
 	fs2 = glCreateShader(GL_FRAGMENT_SHADER);
 
+	fs3 = glCreateShader(GL_FRAGMENT_SHADER);
+
+	fs4 = glCreateShader(GL_FRAGMENT_SHADER);
+
+	fs5 = glCreateShader(GL_FRAGMENT_SHADER);
+
 	glShaderSource(vs1, 1, (const GLchar **) &vertShaderText, NULL);
 	glShaderSource(fs1, 1, (const GLchar **) &fragShaderText, NULL);
 	glShaderSource(fs2, 1, (const GLchar **) &fragShaderText2, NULL);
+	glShaderSource(fs3, 1, (const GLchar **) &fragShaderText3, NULL);
+	glShaderSource(fs4, 1, (const GLchar **) &fragShaderText3, NULL);
+	glShaderSource(fs5, 1, (const GLchar **) &fragShaderText3, NULL);
 
 	glCompileShader(vs1);
 	glGetShaderiv(vs1, GL_COMPILE_STATUS, &stat);
@@ -138,6 +183,27 @@ compileLinkProg(void)
 	glGetShaderiv(fs2, GL_COMPILE_STATUS, &stat);
 	if (!stat) {
 		printf("error compiling fragment shader2!\n");
+		exit(1);
+	}
+
+	glCompileShader(fs3);
+	glGetShaderiv(fs3, GL_COMPILE_STATUS, &stat);
+	if (!stat) {
+		printf("error compiling fragment shader3!\n");
+		exit(1);
+	}
+
+	glCompileShader(fs4);
+	glGetShaderiv(fs4, GL_COMPILE_STATUS, &stat);
+	if (!stat) {
+		printf("error compiling fragment shader4!\n");
+		exit(1);
+	}
+
+	glCompileShader(fs5);
+	glGetShaderiv(fs5, GL_COMPILE_STATUS, &stat);
+	if (!stat) {
+		printf("error compiling fragment shader5!\n");
 		exit(1);
 	}
 
@@ -163,6 +229,51 @@ compileLinkProg(void)
 	glBindAttribLocation(prog2, 1, "textureCoords");
 	glLinkProgram(prog2);
 	glUseProgram(prog2);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
+                               verts);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),
+				texCoords);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+
+	prog3 = glCreateProgram();
+	glAttachShader(prog3, vs1);
+	glAttachShader(prog3, fs3);
+	glBindAttribLocation(prog3, 1, "textureCoords");
+	glLinkProgram(prog3);
+	glUseProgram(prog3);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
+                               verts);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),
+				texCoords);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+
+	prog4 = glCreateProgram();
+	glAttachShader(prog4, vs1);
+	glAttachShader(prog4, fs4);
+	glBindAttribLocation(prog4, 1, "textureCoords");
+	glLinkProgram(prog4);
+	glUseProgram(prog4);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
+                               verts);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),
+				texCoords);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+
+	prog5 = glCreateProgram();
+	glAttachShader(prog5, vs1);
+	glAttachShader(prog5, fs5);
+	glBindAttribLocation(prog5, 1, "textureCoords");
+	glLinkProgram(prog5);
+	glUseProgram(prog5);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat),
                                verts);
@@ -233,10 +344,28 @@ piglit_display(void)
 	glUseProgram(prog2);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+	glTranslatef(75.0, 0.0, 0.0);
+
+	glUseProgram(prog3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glTranslatef(75.0, 0.0, 0.0);
+
+	glUseProgram(prog4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glTranslatef(75.0, 0.0, 0.0);
+
+	glUseProgram(prog5);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 	glPopMatrix();
 
 	pass = pass && piglit_probe_pixel_rgb(132, 125, green);
 	pass = pass && piglit_probe_pixel_rgb(205, 125, deriv);
+	pass = pass && piglit_probe_pixel_rgb(280, 125, deriv);
+	pass = pass && piglit_probe_pixel_rgb(355, 125, deriv);
+	pass = pass && piglit_probe_pixel_rgb(430, 125, deriv);
 
 	glFinish();
 	piglit_present_results();
