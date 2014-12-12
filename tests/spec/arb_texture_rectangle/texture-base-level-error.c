@@ -1,5 +1,5 @@
 /**
- * Copyright © 2013 Intel Corporation
+ * Copyright © 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -25,6 +25,22 @@
  * Test that when target is TEXTURE_RECTANGLE, the correct error messages are
  * generated when certain texture parameter values are specified.
  *
+ * Section 8.10 (Texture Parameters) of the OpenGL 4.5 Core spec (30.10.2014)
+ * says:
+ *	"An INVALID_ENUM error is generated if the effective target is
+ *	TEXTURE_RECTANGLE and either of pnames TEXTURE_WRAP_S or
+ *	TEXTURE_WRAP_T is set to either MIRROR_CLAMP_TO_EDGE , MIRRORED_REPEAT
+ *	or REPEAT."
+ *
+ *	"An INVALID_ENUM error is generated if the effective target is
+ *	TEXTURE_RECTANGLE and pname TEXTURE_MIN_FILTER is set to a value other
+ *	than NEAREST or LINEAR (no mipmap filtering is permitted)."
+ *
+ *	"An INVALID_OPERATION error is generated if the effective target is
+ *	TEXTURE_RECTANGLE and pname TEXTURE_BASE_LEVEL is set to any value
+ *	other than zero."
+ *
+ * Note that the third error condition above directly conflicts with what
  * Section 3.8.8(Texture Parameters) of OpenGL 3.3 Core says:
  *
  *     "When target is TEXTURE_RECTANGLE, certain texture parameter values may
@@ -34,6 +50,17 @@
  *     TEXTURE_MIN_FILTER is set to a value other than NEAREST or LINEAR (no
  *     mipmap filtering is permitted). The error INVALID_VALUE is generated if
  *     TEXTURE_BASE_LEVEL is set to any value other than zero."
+ *
+ * This conflict is resolved in favor of the GL 4.5 spec because the OpenGL ES
+ * 3.1 spec (Section 8.10, Texture Queries, 29.10.2014) says:
+ *
+ *	"An INVALID_OPERATION error is generated if target is
+ *	TEXTURE_2D_MULTISAMPLE, and pname TEXTURE_BASE_LEVEL is set to a
+ *	value other than zero."
+ *
+ * Therefore, the change from INVALID_VALUE to INVALID_OPERATION moves OpenGL
+ * toward improved consistency.
+ *
  *
  * The GL_ATI_texture_mirror_repeat_once spec is silent on the topic of
  * rectangle textures, but GL_ARB_texture_mirror_clamp_to_edge says:
@@ -120,11 +147,11 @@ piglit_init(int argc, char **argv)
 		pass = piglit_check_gl_error(GL_INVALID_ENUM) && pass;
 	}
 
-	/* "The error INVALID_VALUE is generated if TEXTURE_BASE_LEVEL is set
-	 * to any value other than zero."
+	/* "The error INVALID_OPERATION is generated if TEXTURE_BASE_LEVEL is
+	 * set to any value other than zero."
 	 */
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BASE_LEVEL, 37);
-	pass = piglit_check_gl_error(GL_INVALID_VALUE) && pass;
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
 
 	piglit_report_result(pass ? PIGLIT_PASS : PIGLIT_FAIL);
 }
