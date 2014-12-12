@@ -4,7 +4,6 @@ include_directories(
 
 link_libraries(
 	${UTIL_GL_LIBS}
-	piglitutil_${piglit_target_api}
 	)
 
 piglit_add_library(piglitutil_${piglit_target_api}
