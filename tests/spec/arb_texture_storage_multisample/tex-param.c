@@ -1,5 +1,6 @@
 /*
  * Copyright © 2013 Chris Forbes
+ * Copyright 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -26,17 +27,34 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 30;
 
-	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
+	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
+			       PIGLIT_GL_VISUAL_DOUBLE;
 
 PIGLIT_GL_TEST_CONFIG_END
 
 /* Exercises GetTexParameter/TexParameter with multisample textures */
 
-enum piglit_result
-piglit_display(void)
-{
-	return PIGLIT_FAIL;
-}
+/* In Section 8.11 Texture Queries, the OpenGL 4.5 core spec (30.10.2014)
+ * says:
+ *	"An INVALID_ENUM error is generated if the effective target is either
+ *	TEXTURE_2D_MULTISAMPLE or TEXTURE_2D_MULTISAMPLE_ARRAY, and pname is
+ *	any sampler state from table 23.18."
+ *
+ *	"An INVALID_OPERATION error is generated if the effective target is
+ *	either TEXTURE_2D_MULTISAMPLE or TEXTURE_2D_MULTISAMPLE_ARRAY, and
+ *	pname TEXTURE_BASE_LEVEL is set to a value other than zero."
+ *
+ * Likewise, Section 8.10 Texture Queries of the OpenGL ES 3.1 spec
+ * (29.10.2014) says:
+ *
+ *	"An INVALID_ENUM error is generated if target is
+ *	TEXTURE_2D_MULTISAMPLE, and pname is any sampler state from table
+ *	20.11."
+ *
+ *	"An INVALID_OPERATION error is generated if target is
+ *	TEXTURE_2D_MULTISAMPLE, and pname TEXTURE_BASE_LEVEL is set to a
+ *	value other than zero."
+ */
 
 struct subtest
 {
@@ -50,29 +68,23 @@ struct subtest
 	/* readonly */
 	{ GL_TEXTURE_IMMUTABLE_FORMAT, GL_FALSE, GL_TRUE, GL_INVALID_ENUM },
 
-	/* sampler state from GL4.2 core spec, table 6.18 -- readonly, and generate
-	 * INVALID_OPERATION
-	 */
-	{ GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_LINEAR, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_MIN_FILTER, GL_NEAREST, GL_LINEAR, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_COMPARE_MODE, GL_NONE, GL_COMPARE_REF_TO_TEXTURE, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL, GL_ALWAYS, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_MIN_LOD, -1000, 0, GL_INVALID_OPERATION },
-	{ GL_TEXTURE_MAX_LOD, 1000, 0, GL_INVALID_OPERATION },
+	{ GL_TEXTURE_MAG_FILTER, GL_NEAREST, GL_LINEAR, GL_INVALID_ENUM },
+	{ GL_TEXTURE_MIN_FILTER, GL_NEAREST, GL_LINEAR, GL_INVALID_ENUM },
+	{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_ENUM },
+	{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_ENUM },
+	{ GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE, GL_REPEAT, GL_INVALID_ENUM },
+	{ GL_TEXTURE_COMPARE_MODE, GL_NONE, GL_COMPARE_REF_TO_TEXTURE, GL_INVALID_ENUM },
+	{ GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL, GL_ALWAYS, GL_INVALID_ENUM },
+	{ GL_TEXTURE_MIN_LOD, -1000, 0, GL_INVALID_ENUM },
+	{ GL_TEXTURE_MAX_LOD, 1000, 0, GL_INVALID_ENUM },
 
-	/* setting TEXTURE_BASE_LEVEL to a nonzero value produces INVALID_OPERATION;
-	 * setting to a zero value is allowed
-	 */
 	{ GL_TEXTURE_BASE_LEVEL, 0, 0, GL_NO_ERROR, "GL_TEXTURE_BASE_LEVEL zero" },
 	{ GL_TEXTURE_BASE_LEVEL, 0, 1, GL_INVALID_OPERATION, "GL_TEXTURE_BASE_LEVEL nonzero" },
 
 	{ 0 } /* sentinel */
 };
 
-void
+enum piglit_result
 check_subtest(struct subtest *t)
 {
 	GLint val;
@@ -84,7 +96,7 @@ check_subtest(struct subtest *t)
 	if (!piglit_check_gl_error(GL_NO_ERROR)) {
 		printf("GetTexParameteriv failed\n");
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
-		return;
+		return PIGLIT_FAIL;
 	}
 
 	if (t->initial_value != val) {
@@ -93,7 +105,7 @@ check_subtest(struct subtest *t)
 		       t->initial_value,
 		       val);
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
-		return;
+		return PIGLIT_FAIL;
 	}
 
 	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, t->param, t->value);
@@ -102,7 +114,7 @@ check_subtest(struct subtest *t)
 		printf("error setting parameter %s\n",
 		       piglit_get_gl_enum_name(t->param));
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
-		return;
+		return PIGLIT_FAIL;
 	}
 
 	/* verify that the new value stuck (or didnt, if we expected failure) */
@@ -115,26 +127,38 @@ check_subtest(struct subtest *t)
 		       expected_val,
 		       val);
 		piglit_report_subtest_result(PIGLIT_FAIL, "%s", test_name);
+		return PIGLIT_FAIL;
 	}
 
 	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
+	return PIGLIT_PASS;
 }
 
 void
 piglit_init(int argc, char **argv)
 {
+	piglit_require_extension("GL_ARB_texture_storage_multisample");
+}
+
+enum piglit_result
+piglit_display(void)
+{
 	GLuint tex;
 	struct subtest *t;
-
-	piglit_require_extension("GL_ARB_texture_storage_multisample");
+	enum piglit_result result = PIGLIT_PASS;
+	enum piglit_result subtest_result;
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
 				4, GL_RGBA, 64, 64, GL_TRUE);
 
-	for (t = subtests; t->param; t++)
-		check_subtest(t);
+	for (t = subtests; t->param; t++) {
+		subtest_result = check_subtest(t);
+		if (subtest_result != PIGLIT_PASS)
+			result = PIGLIT_FAIL;
+	}
 
-	piglit_report_result(PIGLIT_PASS);
+	return result;
 }
+
