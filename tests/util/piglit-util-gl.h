@@ -201,6 +201,7 @@ GLuint piglit_checkerboard_texture(GLuint tex, unsigned level,
 GLuint piglit_miptree_texture(void);
 GLfloat *piglit_rgbw_image(GLenum internalFormat, int w, int h,
                            GLboolean alpha, GLenum basetype);
+GLubyte *piglit_rgbw_image_ubyte(int w, int h, GLboolean alpha);
 GLuint piglit_rgbw_texture(GLenum internalFormat, int w, int h, GLboolean mip,
 		    GLboolean alpha, GLenum basetype);
 GLuint piglit_depth_texture(GLenum target, GLenum format, int w, int h, int d, GLboolean mip);

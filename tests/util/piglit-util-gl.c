@@ -2191,7 +2191,7 @@ piglit_rgbw_image(GLenum internalFormat, int w, int h,
 	return data;
 }
 
-static GLubyte *
+GLubyte *
 piglit_rgbw_image_ubyte(int w, int h, GLboolean alpha)
 {
 	GLubyte red[4]   = {255, 0, 0, 0};

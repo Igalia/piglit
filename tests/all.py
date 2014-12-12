@@ -4323,7 +4323,8 @@ spec['ARB_direct_state_access']['gettextureimage-formats'] = PiglitGLTest('arb_d
 spec['ARB_direct_state_access']['gettextureimage-luminance'] = PiglitGLTest('arb_direct_state_access-gettextureimage-luminance', run_concurrent=True)
 spec['ARB_direct_state_access']['gettextureimage-simple'] = PiglitGLTest('arb_direct_state_access-gettextureimage-simple', run_concurrent=True)
 spec['ARB_direct_state_access']['gettextureimage-targets'] = PiglitGLTest('arb_direct_state_access-gettextureimage-targets', run_concurrent=True)
-
+spec['ARB_direct_state_access']['compressedtextureimage'] = PiglitGLTest('arb_direct_state_access-compressedtextureimage GL_COMPRESSED_RGBA_FXT1_3DFX', run_concurrent=True)
+spec['ARB_direct_state_access']['getcompressedtextureimage'] = PiglitGLTest('arb_direct_state_access-getcompressedtextureimage', run_concurrent=True)
 
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
