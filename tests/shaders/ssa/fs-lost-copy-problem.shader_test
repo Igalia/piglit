@@ -1,0 +1,23 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform int count;
+
+void main()
+{
+    int j = 0;
+    for (int i = 0; i <= count; ++i)
+        j = i;
+
+    if (j == 6)
+        gl_FragColor = vec4(0, 1, 0, 1);
+    else
+        gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+[test]
+uniform int count 6
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
