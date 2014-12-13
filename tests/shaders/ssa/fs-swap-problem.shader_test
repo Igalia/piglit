@@ -1,0 +1,19 @@
+[require]
+GLSL >= 1.10
+
+[fragment shader]
+uniform bool f;
+
+void main()
+{
+    gl_FragColor = vec4(1, 0, 0, 1);
+    do {
+        gl_FragColor.xy = gl_FragColor.yx;
+    } while (f);
+}
+
+[test]
+uniform int f = 0
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
