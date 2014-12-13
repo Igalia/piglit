@@ -70,11 +70,9 @@ extern "C" {
 
 #define snprintf _snprintf
 
-#endif /* defined(_MSC_VER) */
-
-#ifdef _WIN32
 #define usleep(__usec) Sleep(((__usec) + 999)/1000)
-#endif
+
+#endif /* defined(_MSC_VER) */
 
 #if (__GNUC__ >= 3)
 #define PRINTFLIKE(f, a) __attribute__ ((format(__printf__, f, a)))
