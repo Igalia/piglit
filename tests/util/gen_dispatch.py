@@ -27,12 +27,13 @@ Generate C source code from Khronos XML.
 from __future__ import print_function
 
 import argparse
-import mako.runtime
-import mako.template
 import os.path
 import re
 import sys
 from collections import namedtuple
+
+import mako.runtime
+import mako.template
 
 PIGLIT_TOP_DIR = os.path.join(os.path.dirname(__file__), '..', '..')
 sys.path.append(PIGLIT_TOP_DIR)
