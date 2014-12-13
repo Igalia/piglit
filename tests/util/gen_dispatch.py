@@ -27,21 +27,18 @@ Generate C source code from Khronos XML.
 from __future__ import print_function
 
 import argparse
-import functools
 import mako.runtime
 import mako.template
 import os.path
 import re
 import sys
-
 from collections import namedtuple
-from textwrap import dedent
 
 PIGLIT_TOP_DIR = os.path.join(os.path.dirname(__file__), '..', '..')
 sys.path.append(PIGLIT_TOP_DIR)
 
 import registry.gl
-from registry.gl import Extension, OrderedKeyedSet, ImmutableOrderedKeyedSet
+from registry.gl import Extension
 
 
 debug = False
