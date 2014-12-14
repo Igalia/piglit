@@ -131,7 +131,7 @@ piglit_cl_test(const int argc,
 	 * Version: 1.2
 	 */
 	if(env->version >= 12) {
-		enum piglit_result result;
+		enum piglit_result result = PIGLIT_PASS;
 		cl_mem device_mem;
 		cl_ulong alloc_size = 64;
 		cl_int *host_mem;
