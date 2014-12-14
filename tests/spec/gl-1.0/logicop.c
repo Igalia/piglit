@@ -270,6 +270,8 @@ test_logicop(GLenum logicop)
 	if (!piglit_automatic)
 		piglit_present_results();
 
+	free(exp_data);
+
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 
 } /* test_logicop */
