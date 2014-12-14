@@ -525,6 +525,7 @@ piglit_init(int argc, char **argv)
 	case GL_UNSIGNED_SHORT_5_5_5_1:
 	case GL_UNSIGNED_SHORT_1_5_5_5_REV:
 		tolerance[3] = 0.6;
+		/* Fall through. */
 	case GL_UNSIGNED_SHORT_5_6_5:
 	case GL_UNSIGNED_SHORT_5_6_5_REV:
 		tolerance[0] = 0.05;
