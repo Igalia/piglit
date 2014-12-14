@@ -98,8 +98,8 @@ check_rgba(void)
 	bool pass = true;
 	double current_error = 0.0;
 	double err;
-	int xerr, yerr;
-	float expected[4], expected_rgba[4], actual_rgba[4];
+	int xerr = 0, yerr = 0;
+	float expected[4], expected_rgba[4] = { 0 }, actual_rgba[4] = { 0 };
 	const int w = piglit_width;
 	const int h = piglit_height;
 	GLfloat *buf = malloc(h * w * 4 * sizeof *buf);
@@ -199,14 +199,14 @@ check_depth(void)
 	int i, x, y;
 	int thresh = 1;
 	bool pass = true;
-	GLdouble expected, expected_depth, actual, actual_depth;
+	GLdouble expected, expected_depth = 0.0, actual, actual_depth = 0.0;
 	const int w = piglit_width;
 	const int h = piglit_height;
 	GLuint *buf = malloc(h * w * sizeof *buf);
 	double current_error = 0.0;
 	GLfloat dd;
 	double err;
-	int xerr, yerr;
+	int xerr = 0, yerr = 0;
 	GLint dbits;
 	glGetIntegerv(GL_DEPTH_BITS, &dbits);
 
