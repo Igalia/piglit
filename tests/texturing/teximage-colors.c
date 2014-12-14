@@ -669,7 +669,6 @@ to_expected(GLenum test_format, GLenum test_type, void *up_raw, float *expected)
 	case GL_LUMINANCE:
 		expected[3] = 1.0f;
 	case GL_LUMINANCE_ALPHA:
-		expected[0] = expected[0];
 		expected[1] = expected[0];
 		expected[2] = expected[0];
 		break;
