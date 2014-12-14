@@ -349,8 +349,8 @@ python framework:
    output, and then reading any trailing characters as well formed json
    returning the test result.
 
-   This is a base clas and shouldn't be used directly, but provides an
-   explination of the bahvior of the following classes
+   This is a base class and should not be used directly, but provides an
+   explanation of the behavior of the following classes.
 
  PiglitGLTest
    A test class for native piglit OpenGL tests.
@@ -362,16 +362,16 @@ python framework:
  PiglitCLTest
    A test class for native piglit OpenCL tests.
 
-   It currently provides no specail features
+   It currently provides no special features.
 
  GLSLParserTest
    A class for testing a glsl parser.
 
-   It is generally unecissary to call this class directly as it uses a helper
-   function to search directories for tests
+   It is generally unnecessary to call this class directly as it uses a helper
+   function to search directories for tests.
 
  ShaderTest
-   A class for testing using OpenGL shaders
+   A class for testing using OpenGL shaders.
 
-   It is generally unecissary to call this class directly as it uses a helper
-   function to search directories for tests
+   It is generally unnecessary to call this class directly as it uses a helper
+   function to search directories for tests.
