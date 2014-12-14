@@ -162,5 +162,7 @@ piglit_cl_test(const int argc,
 		piglit_merge_result(&result, PIGLIT_FAIL);
 	}
 
+	free(int_value);
+
 	return result;
 }
