@@ -194,7 +194,6 @@ Configure
 Set these variables in the Advanced view.
 Note that the values provided are for reference purposed and may differ on your system.
   - PIGLIT_USE_WAFFLE, BOOL, TRUE
-  - WAFFLE_VERSION, STRING, "1.5.0"
   - WAFFLE_INCLUDE_DIRS, PATH, ${waffle_root}\include\waffle
   - WAFFLE_LDFLAGS, FILEPATH, ${waffle_root}\lib\waffle-1.lib
   - GLEXT_INCLUDE_DIR, PATH, C:\Program Files\Microsoft Visual Studio 12.0\VC\include\GL

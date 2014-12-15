@@ -51,21 +51,21 @@ if(PIGLIT_USE_WAFFLE)
 			"it at http://www.waffle-gl.org."
 		)
 		endif()
-	endif ()
 
-	# Check the installed waffle version.
-	#
-	# We cannot reliably check the version with pkg_check_modules(), but
-	# instead must check the version manually as below. The problem is that,
-	# if one passes a required version to pkg_check_modules(), CMake
-	# validates the required version at most once for the lifetime of the
-	# source tree.  If someone changes the required version by editing the
-	# CMakeLists, CMake fails to detect the new requirement.
-	set(WAFFLE_REQUIRED_VERSION "1.5.0")
-	if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
-		message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
-		"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
-	endif()
+		# Check the installed waffle version.
+		#
+		# We cannot reliably check the version with pkg_check_modules(), but
+		# instead must check the version manually as below. The problem is that,
+		# if one passes a required version to pkg_check_modules(), CMake
+		# validates the required version at most once for the lifetime of the
+		# source tree.  If someone changes the required version by editing the
+		# CMakeLists, CMake fails to detect the new requirement.
+		set(WAFFLE_REQUIRED_VERSION "1.5.0")
+		if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
+			message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
+			"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
+		endif()
+	endif ()
 
 	add_definitions(-DPIGLIT_USE_WAFFLE)
 	add_definitions(-DWAFFLE_API_VERSION=0x0103)
