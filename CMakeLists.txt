@@ -42,7 +42,7 @@ else()
 endif()
 
 if(PIGLIT_USE_WAFFLE)
-	if (NOT MSVC)
+	if (NOT WIN32)
 		pkg_check_modules(WAFFLE REQUIRED waffle-1)
 
 		if(NOT WAFFLE_FOUND)
