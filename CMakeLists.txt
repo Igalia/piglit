@@ -65,6 +65,17 @@ if(PIGLIT_USE_WAFFLE)
 			message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
 			"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
 		endif()
+	else ()
+		find_path(WAFFLE_INCLUDE_DIRS waffle.h)
+		find_library(WAFFLE_LDFLAGS waffle-1)
+		if(WAFFLE_INCLUDE_DIRS AND WAFFLE_LDFLAGS)
+			set(WAFFLE_FOUND TRUE)
+		else()
+			message(FATAL_ERROR "Failed to find Waffle. Get and build Waffle from "
+				"http://www.waffle-gl.org and set WAFFLE_INCLUDE_DIRS and "
+				"WAFFLE_LDFLAGS variables accordingly."
+			)
+		endif()
 	endif ()
 
 	add_definitions(-DPIGLIT_USE_WAFFLE)
