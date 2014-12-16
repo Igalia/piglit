@@ -121,7 +121,7 @@ static const char *fragShaderText5 =
 	"void main()\n"
 	"{ \n"
 	"	gl_FragColor = vec4(dFdx(-abs(texCoords.x)) * -40.0,\n"
-	"			    dFdy(-abs(texCoords.y) * -40.0,\n"
+	"			    dFdy(-abs(texCoords.y)) * -40.0,\n"
 	"			    0.0, 1.0);\n"
 	"} \n";
 
@@ -162,8 +162,8 @@ compileLinkProg(void)
 	glShaderSource(fs1, 1, (const GLchar **) &fragShaderText, NULL);
 	glShaderSource(fs2, 1, (const GLchar **) &fragShaderText2, NULL);
 	glShaderSource(fs3, 1, (const GLchar **) &fragShaderText3, NULL);
-	glShaderSource(fs4, 1, (const GLchar **) &fragShaderText3, NULL);
-	glShaderSource(fs5, 1, (const GLchar **) &fragShaderText3, NULL);
+	glShaderSource(fs4, 1, (const GLchar **) &fragShaderText4, NULL);
+	glShaderSource(fs5, 1, (const GLchar **) &fragShaderText5, NULL);
 
 	glCompileShader(vs1);
 	glGetShaderiv(vs1, GL_COMPILE_STATUS, &stat);
