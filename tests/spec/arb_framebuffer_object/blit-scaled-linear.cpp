@@ -203,7 +203,7 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-bool test_blit_scaled_linear(Fbo fbo_test)
+bool test_blit_scaled_linear(const Fbo& fbo_test)
 {
 	GLfloat scale;
 	GLint samples;
