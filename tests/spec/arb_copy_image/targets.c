@@ -65,12 +65,14 @@ image_init(struct image *image, GLenum target, int width, int height, int depth)
 	switch (target) {
 	case GL_TEXTURE_CUBE_MAP:
 		assert(depth == 6);
+		/* Fall through. */
 	case GL_TEXTURE_CUBE_MAP_ARRAY_ARB:
 		assert(width == height);
 		assert(depth % 6 == 0);
 		break;
 	case GL_TEXTURE_1D:
 		assert(height == 1);
+		/* Fall through. */
 	case GL_TEXTURE_2D:
 	case GL_TEXTURE_RECTANGLE:
 		assert(depth == 1);
