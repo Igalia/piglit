@@ -68,21 +68,32 @@ def add_fbo_depthstencil_tests(group, format, num_samples):
     else:
         prefix = 'fbo-'
         create_test = lambda a: PiglitGLTest(a, run_concurrent=True)
+
     if num_samples > 1:
         suffix = ' samples=' + str(num_samples)
-        psamples = ' -samples=' + str(num_samples)
+        psamples = '-samples=' + str(num_samples)
     else:
         suffix = ''
         psamples = ''
-    group[prefix + 'depthstencil-' + format + '-clear' + suffix] = create_test('fbo-depthstencil clear ' + format + psamples)
-    group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = create_test('fbo-depthstencil readpixels ' + format + ' FLOAT-and-USHORT' + psamples)
-    group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = create_test('fbo-depthstencil readpixels ' + format + ' 24_8' + psamples)
-    group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = create_test('fbo-depthstencil readpixels ' + format + ' 32F_24_8_REV' + psamples)
-    group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = create_test('fbo-depthstencil drawpixels ' + format + ' FLOAT-and-USHORT' + psamples)
-    group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = create_test('fbo-depthstencil drawpixels ' + format + ' 24_8' + psamples)
-    group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = create_test('fbo-depthstencil drawpixels ' + format + ' 32F_24_8_REV' + psamples)
-    group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = create_test('fbo-depthstencil copypixels ' + format + psamples)
-    group[prefix + 'depthstencil-' + format + '-blit' + suffix] = create_test('fbo-depthstencil blit ' + format + psamples)
+
+    group[prefix + 'depthstencil-' + format + '-clear' + suffix] = \
+        create_test(['fbo-depthstencil', 'clear', format, psamples])
+    group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = \
+        create_test(['fbo-depthstencil', 'readpixels', format, 'FLOAT-and-USHORT', psamples])
+    group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = \
+        create_test(['fbo-depthstencil', 'readpixels', format, '24_8', psamples])
+    group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = \
+        create_test(['fbo-depthstencil', 'readpixels', format, '32F_24_8_REV', psamples])
+    group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = \
+        create_test(['fbo-depthstencil', 'drawpixels', format, 'FLOAT-and-USHORT', psamples])
+    group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = \
+        create_test(['fbo-depthstencil', 'drawpixels', format, '24_8', psamples])
+    group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = \
+        create_test(['fbo-depthstencil', 'drawpixels', format, '32F_24_8_REV', psamples])
+    group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = \
+        create_test(['fbo-depthstencil', 'copypixels', format, psamples])
+    group[prefix + 'depthstencil-' + format + '-blit' + suffix] = \
+        create_test(['fbo-depthstencil', 'blit', format, psamples])
 
 def add_fbo_depthstencil_msaa_visual_tests(group, format):
     add_fbo_depthstencil_tests(group, format, 0)
