@@ -103,11 +103,11 @@ def add_fbo_depthstencil_msaa_visual_tests(group, format):
 def add_depthstencil_render_miplevels_tests(group, test_types):
     # Note: the buffer sizes below have been chosen to exercise
     # many possible combinations of buffer alignments on i965.
-    for texture_size in (146, 273, 292, 585, 1024):
+    for texture_size in ['146', '273', '292', '585', '1024']:
         for test_type in test_types:
-            test_name = 'depthstencil-render-miplevels {0} {1}'.format(
-                    texture_size, test_type)
-            add_concurrent_test(group, test_name)
+            add_concurrent_test(
+                group,
+                ['depthstencil-render-miplevels', texture_size, test_type])
 
 def add_msaa_visual_plain_tests(group, args, **kwargs):
     add_plain_test(group, args)
