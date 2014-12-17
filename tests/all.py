@@ -110,10 +110,12 @@ def add_depthstencil_render_miplevels_tests(group, test_types):
                 ['depthstencil-render-miplevels', texture_size, test_type])
 
 def add_msaa_visual_plain_tests(group, args, **kwargs):
-    add_plain_test(group, args)
-    group[args] = PiglitGLTest(args, **kwargs)
+    assert isinstance(args, list)
+
+    group[' '.join(args)] = PiglitGLTest(args, **kwargs)
     for num_samples in MSAA_SAMPLE_COUNTS:
-        group[args + ' samples=' + str(num_samples)] = PiglitGLTest(args + ' -samples=' + str(num_samples), **kwargs)
+        group[' '.join(args + ['samples={}'.format(num_samples)])] = \
+            PiglitGLTest(args + ['-samples={}'.format(num_samples)], **kwargs)
 
 glean = {}
 glean['basic'] = GleanTest('basic')
@@ -522,7 +524,7 @@ def add_vpfpgeneric(group, name):
         run_concurrent=True)
 
 glx = {}
-add_msaa_visual_plain_tests(glx, 'glx-copy-sub-buffer', require_platforms=['glx', 'mixed_glx_egl'])
+add_msaa_visual_plain_tests(glx, ['glx-copy-sub-buffer'], require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-destroycontext-1'] = PiglitGLTest('glx-destroycontext-1', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-destroycontext-2'] = PiglitGLTest('glx-destroycontext-2', require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-dont-care-mask'] = PiglitGLTest('glx-dont-care-mask', require_platforms=['glx', 'mixed_glx_egl'])
@@ -706,7 +708,7 @@ add_plain_test(gl11, 'dlist-fdo31590')
 add_plain_test(gl11, 'draw-arrays-colormaterial')
 add_plain_test(gl11, 'draw-copypixels-sync')
 add_concurrent_test(gl11, 'draw-pixel-with-texture')
-add_msaa_visual_plain_tests(gl11, 'draw-pixels')
+add_msaa_visual_plain_tests(gl11, ['draw-pixels'])
 add_concurrent_test(gl11, 'drawpix-z')
 add_plain_test(gl11, 'fog-modes')
 add_plain_test(gl11, 'fragment-center')
@@ -728,8 +730,8 @@ add_concurrent_test(gl11, 'polygon-mode-offset')
 add_plain_test(gl11, 'polygon-offset')
 add_concurrent_test(gl11, 'push-pop-texture-state')
 add_concurrent_test(gl11, 'quad-invariance')
-add_msaa_visual_plain_tests(gl11, 'read-front')
-add_msaa_visual_plain_tests(gl11, 'read-front clear-front-first')
+add_msaa_visual_plain_tests(gl11, ['read-front'])
+add_msaa_visual_plain_tests(gl11, ['read-front', 'clear-front-first'])
 add_concurrent_test(gl11, 'readpix-z')
 add_plain_test(gl11, 'roundmode-getintegerv')
 add_plain_test(gl11, 'roundmode-pixelstore')
@@ -823,7 +825,7 @@ add_concurrent_test(gl10, 'gl-1.0-logicop')
 gl12 = {}
 spec['!OpenGL 1.2'] = gl12
 add_texwrap_target_tests(gl12, '3D')
-add_msaa_visual_plain_tests(gl12, 'copyteximage 3D')
+add_msaa_visual_plain_tests(gl12, ['copyteximage', '3D'])
 add_plain_test(gl12, 'crash-texparameter-before-teximage')
 add_plain_test(gl12, 'draw-elements-vs-inputs')
 add_plain_test(gl12, 'two-sided-lighting-separate-specular')
@@ -853,7 +855,7 @@ add_plain_test(gl14, 'blendminmax')
 add_plain_test(gl14, 'blendsquare')
 add_concurrent_test(gl14, "gl-1.4-dlist-multidrawarrays")
 add_concurrent_test(gl14, "gl-1.4-polygon-offset")
-add_msaa_visual_plain_tests(gl14, 'copy-pixels')
+add_msaa_visual_plain_tests(gl14, ['copy-pixels'])
 add_plain_test(gl14, 'draw-batch')
 add_plain_test(gl14, 'stencil-wrap')
 add_plain_test(gl14, 'triangle-rasterization')
@@ -2260,7 +2262,7 @@ add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
 add_shader_test_dir(arb_texture_rectangle,
                     testsDir + '/spec/arb_texture_rectangle',
                     recursive=True)
-add_msaa_visual_plain_tests(arb_texture_rectangle, 'copyteximage RECT')
+add_msaa_visual_plain_tests(arb_texture_rectangle, ['copyteximage', 'RECT'])
 add_concurrent_test(arb_texture_rectangle, '1-1-linear-texture')
 add_plain_test(arb_texture_rectangle, 'texrect-many')
 add_concurrent_test(arb_texture_rectangle, 'getteximage-targets RECT')
@@ -2883,8 +2885,8 @@ spec['EXT_texture_array']['gen-mipmap'] = PiglitGLTest('ext_texture_array-gen-mi
 add_shader_test_dir(ext_texture_array,
                     testsDir + '/spec/ext_texture_array',
                     recursive=True)
-add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 1D_ARRAY')
-add_msaa_visual_plain_tests(ext_texture_array, 'copyteximage 2D_ARRAY')
+add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '1D_ARRAY'])
+add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '2D_ARRAY'])
 add_plain_test(ext_texture_array, 'fbo-array')
 for test in ('depth-clear', 'depth-layered-clear', 'depth-draw', 'fs-writes-depth',
              'stencil-clear', 'stencil-layered-clear', 'stencil-draw', 'fs-writes-stencil'):
@@ -2900,7 +2902,7 @@ add_concurrent_test(ext_texture_array, 'texsubimage array')
 
 arb_texture_cube_map = {}
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
-add_msaa_visual_plain_tests(arb_texture_cube_map, 'copyteximage CUBE')
+add_msaa_visual_plain_tests(arb_texture_cube_map, ['copyteximage', 'CUBE'])
 add_plain_test(arb_texture_cube_map, 'crash-cubemap-order')
 add_plain_test(arb_texture_cube_map, 'cubemap')
 add_concurrent_test(arb_texture_cube_map, 'cubemap-getteximage-pbo')
