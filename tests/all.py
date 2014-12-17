@@ -364,25 +364,25 @@ def add_msaa_formats_tests(group, extension):
                 run_concurrent=True)
 
 def add_fbo_generatemipmap_extension(group, extension, name):
-    group[name] = PiglitGLTest('fbo-generatemipmap-formats ' + extension,
+    group[name] = PiglitGLTest(['fbo-generatemipmap-formats', extension],
                                run_concurrent=True)
 
 def add_fbo_clear_extension(group, extension, name):
-    group[name] = PiglitGLTest('fbo-clear-formats ' + extension,
+    group[name] = PiglitGLTest(['fbo-clear-formats', extension],
                                run_concurrent=True)
 
 def add_fbo_blending_extension(group, extension, name):
-    group[name] = PiglitGLTest('fbo-blending-formats ' + extension,
+    group[name] = PiglitGLTest(['fbo-blending-formats', extension],
                                run_concurrent=True)
 
 def add_fbo_alphatest_extension(group, extension, name):
-    group[name] = PiglitGLTest('fbo-alphatest-formats ' + extension,
+    group[name] = PiglitGLTest(['fbo-alphatest-formats', extension],
                                run_concurrent=True)
 
 
 def add_fbo_rg(group, format):
     name = "fbo-rg-" + format
-    group[name] = PiglitGLTest('fbo-rg ' + format, run_concurrent=True)
+    group[name] = PiglitGLTest(['fbo-rg', format], run_concurrent=True)
 
 security = {}
 add_plain_test(security, 'initialized-texmemory')
