@@ -298,7 +298,7 @@ test_format(GLenum target, GLenum intFormat)
 			glTexSubImage2D(target, 0, tx, ty, tw, th,
 					srcFormat, GL_UNSIGNED_BYTE, img);
 		}
-		else if (target == GL_TEXTURE_2D) {
+		else if (target == GL_TEXTURE_3D) {
 			glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
 					srcFormat, GL_UNSIGNED_BYTE, img);
 		}
