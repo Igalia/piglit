@@ -287,7 +287,7 @@ piglit_cl_program_test_run(const int argc,
 	} else if(config->program_binary_file != NULL) {
 		unsigned int length;
 		size_t* lengths = malloc(sizeof(size_t) * env.context->num_devices);
-		unsigned char** program_binaries = malloc(sizeof(unsigned char**) * env.context->num_devices);
+		unsigned char** program_binaries = malloc(sizeof(unsigned char*) * env.context->num_devices);
 
 		((char**)program_binaries)[0] =
 			piglit_load_text_file(config->program_binary_file, &length);
