@@ -3732,8 +3732,8 @@ add_plain_test(fast_color_clear, 'fcc-read-to-pbo-after-clear')
 asmparsertest = {}
 def add_asmparsertest(group, shader):
     asmparsertest[group + '/' + shader] = PiglitGLTest(
-        'asmparsertest ' + group + ' ' +
-        os.path.join(testsDir, 'asmparsertest', 'shaders', group, shader),
+        ['asmparsertest', group,
+         os.path.join(testsDir, 'asmparsertest', 'shaders', group, shader)],
         run_concurrent=True)
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
