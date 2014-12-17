@@ -40,6 +40,7 @@ import optparse
 import os
 import os.path
 
+from modules import utils
 
 class ParserTest(object):
     """Class used to build a test of a single built-in.  This is an
@@ -199,15 +200,7 @@ class ParserTest(object):
         parser_test += self.make_shader()
         filename = self.filename()
         dirname = os.path.dirname(filename)
-
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
-
+        utils.safe_makedirs(dirname)
         with open(filename, 'w') as f:
             f.write(parser_test)
 

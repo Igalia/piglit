@@ -27,6 +27,7 @@ import os
 from operator import neg
 
 from templates import template_file
+from modules import utils
 
 TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
                          'template.shader_test.mako')
@@ -139,13 +140,7 @@ def main():
 
         dirname = os.path.join('spec', api.lower(), 'execution',
                                'built-in-functions')
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
+        utils.safe_makedirs(dirname)
 
         for func, attrib in FUNCS.iteritems():
             for execution_stage in ('vs', 'fs'):

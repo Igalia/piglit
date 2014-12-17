@@ -43,6 +43,7 @@ from math import copysign, fabs, fmod, frexp, isinf, isnan, modf
 from numpy import int8, int16, uint8, uint16, uint32, float32
 
 from templates import template_dir
+from modules import utils
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
@@ -1027,13 +1028,7 @@ class ShaderTest(object):
 
     def write_file(self):
         dirname = os.path.dirname(self.filename)
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
+        utils.safe_makedirs(dirname)
 
         with open(self.filename, "w") as f:
             f.write(self.__template.render(func=self.__func_info))

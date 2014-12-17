@@ -26,17 +26,13 @@
 import os
 import textwrap
 
+from modules import utils
+
 TYPES = ['char', 'uchar', 'short', 'ushort', 'int', 'uint', 'long', 'ulong', 'float', 'double']
 VEC_SIZES = ['', '2', '4', '8', '16']
 
 dirName = os.path.join("cl", "store")
-if not os.path.exists(dirName):
-    try:
-        os.makedirs(dirName)
-    except OSError as e:
-        if e.errno == 17:  # file exists
-            pass
-        raise
+utils.safe_makedirs(dirname)
 
 
 def gen_array(size):

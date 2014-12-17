@@ -26,6 +26,8 @@ import os.path
 from mako.template import Template
 from textwrap import dedent
 
+from modules import utils
+
 
 def gen_header(status):
     """
@@ -143,13 +145,7 @@ def gen(name, src, tests):
         print(filename)
 
         dirname = os.path.dirname(filename)
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
+        utils.safe_makedirs(dirname)
 
         with open(filename, 'w') as f:
             f.write(template.render(header = gen_header, **t))

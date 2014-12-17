@@ -25,6 +25,7 @@ from __future__ import print_function
 import os
 
 from templates import template_dir
+from modules import utils
 
 TEMPLATES = template_dir(os.path.splitext(os.path.basename(__file__))[0])
 
@@ -77,13 +78,7 @@ def generate_tests(type_list, base_name, major, minor):
                            'glsl-{0}.{1}'.format(major, minor),
                            'execution',
                            'uniform-initializer')
-    if not os.path.exists(dirname):
-        try:
-            os.makedirs(dirname)
-        except OSError as e:
-            if e.errno == 17:  # file exists
-                pass
-            raise
+    utils.safe_makedirs(dirname)
 
     for target in ("vs", "fs"):
         for t in ALL_TEMPLATES:
@@ -138,8 +133,7 @@ def generate_array_tests(type_list, base_name, major, minor):
                            'glsl-{0}.{1}'.format(major, minor),
                            'execution',
                            'uniform-initializer')
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
+    utils.safe_makedirs(dirname)
 
     def parts():
         """Generate parts."""

@@ -28,6 +28,7 @@ import os
 import itertools
 
 from templates import template_dir
+from modules import utils
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
@@ -171,13 +172,7 @@ def main():
     """main function."""
     dirname = os.path.join('spec', 'glsl-1.30', 'linker',
                            'interpolation-qualifiers')
-    if not os.path.exists(dirname):
-        try:
-            os.makedirs(dirname)
-        except OSError as e:
-            if e.errno == 17:  # file exists
-                pass
-            raise
+    utils.safe_makedirs(dirname)
 
     for fs_mode, vs_mode in itertools.product(INTERPOLATION_MODES, repeat=2):
         make_fs_vs_tests(fs_mode, vs_mode, dirname)

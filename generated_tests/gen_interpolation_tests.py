@@ -71,6 +71,7 @@ from __future__ import print_function
 import os
 
 from templates import template_file
+from modules import utils
 
 TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
                          'template.shader_test.mako')
@@ -267,15 +268,7 @@ class Test(object):
     def generate(self):
         filename = self.filename()
         dirname = os.path.dirname(filename)
-
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
-
+        utils.safe_makedirs(dirname)
         with open(filename, 'w') as f:
             f.write(TEMPLATE.render(args=self))
 

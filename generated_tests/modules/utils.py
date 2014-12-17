@@ -18,30 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import print_function
+"""Helper functions for test generators."""
+
+from __future__ import print_function, absolute_import
 import os
-
-from templates import template_file
-from modules import utils
-
-TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
-                         'template.vert.mako')
+import errno
 
 
-def main():
-    """ Generate tests """
-    dirname = os.path.join('spec', 'glsl-1.20', 'compiler',
-                           'built-in-functions')
-    utils.safe_makedirs(dirname)
+def safe_makedirs(dirs):
+    """A safe function for creating a directory tree.
 
-    for type_ in ['int', 'float', 'bool', 'bvec2', 'bvec3', 'bvec4', 'mat2',
-                  'mat2x2', 'mat2x3', 'mat2x4', 'mat3', 'mat3x2', 'mat3x3',
-                  'mat3x4', 'mat4', 'mat4x2', 'mat4x3', 'mat4x4']:
-        name = os.path.join(dirname, 'outerProduct-{0}.vert'.format(type_))
-        print(name)
-        with open(name, 'w+') as f:
-            f.write(TEMPLATE.render_unicode(type=type_))
+    This function wraps os.makedirs, and provides a couple of sanity checks,
+    first, if the directory already exists it doesn't try to create it, and
+    second if the directory comes into existence between the check and creation
+    time (like if another generator creates it) then the exception will be
+    caught.
 
-
-if __name__ == '__main__':
-    main()
+    """
+    if not os.path.exists(dirs):
+        try:
+            os.makedirs(dirs)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise

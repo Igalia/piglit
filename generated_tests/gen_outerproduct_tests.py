@@ -26,6 +26,7 @@ import itertools
 import collections
 
 from templates import template_file
+from modules import utils
 
 TEMPLATE = template_file(os.path.splitext(os.path.basename(__file__))[0],
                          'template.shader_test.mako')
@@ -37,13 +38,8 @@ Parameters = collections.namedtuple(
 def main():
     """ Generate tests """
     dirname = os.path.join('spec', 'glsl-1.20', 'execution')
-    if not os.path.exists(dirname):
-        try:
-            os.makedirs(dirname)
-        except OSError as e:
-            if e.errno == 17:  # file exists
-                pass
-            raise
+    utils.safe_makedirs(dirname)
+
 
     for c, r in itertools.product(xrange(2, 5), repeat=2):
         vecs = [

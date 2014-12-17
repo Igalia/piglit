@@ -25,6 +25,7 @@ import os
 import collections
 
 from templates import template_dir
+from modules import utils
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
@@ -75,13 +76,7 @@ def main():
 
     """
     dirname = 'spec/arb_shader_texture_lod/compiler'
-    if not os.path.exists(dirname):
-        try:
-            os.makedirs(dirname)
-        except OSError as e:
-            if e.errno == 17:  # file exists
-                pass
-            raise
+    utils.safe_makedirs(dirname)
 
     for params in LOD_TESTS:
         name = os.path.join(

@@ -26,6 +26,7 @@ import os
 import os.path
 
 from templates import template_file
+from modules import utils
 
 TEMPLATE = template_file(os.path.basename(os.path.splitext(__file__)[0]),
                          'template.glsl_parser_test.mako')
@@ -85,13 +86,7 @@ def main():
         lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
         dirname = os.path.join("spec", api.lower(), "compiler",
                                "built-in-functions")
-        if not os.path.exists(dirname):
-            try:
-                os.makedirs(dirname)
-            except OSError as e:
-                if e.errno == 17:  # file exists
-                    pass
-                raise
+        utils.safe_makedirs(dirname)
 
         for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
             requirements = [requirement['extensions']] if requirement['extensions'] else []

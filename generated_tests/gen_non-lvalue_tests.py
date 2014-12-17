@@ -26,6 +26,7 @@ import os
 import itertools
 
 from templates import template_dir
+from modules import utils
 
 TEMPLATES = template_dir(os.path.basename(os.path.splitext(__file__)[0]))
 
@@ -89,8 +90,7 @@ def all_tests():
 
 def main():
     dirname = os.path.join('spec', 'glsl-1.10', 'compiler', 'expressions')
-    if not os.path.exists(dirname):
-        os.makedirs(dirname)
+    utils.safe_makedirs(dirname)
 
     for args in all_tests():
         generate(dirname, *args)
