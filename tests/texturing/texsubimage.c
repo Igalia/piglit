@@ -141,14 +141,51 @@ piglit_draw_rect_tex3d(float x, float y, float w, float h,
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-
 static GLboolean
-equal_images(const GLubyte *img1, const GLubyte *img2,
-             GLuint w, GLuint h, GLuint d)
+equal_images(GLenum target,
+	     const GLubyte *original_ref,
+	     const GLubyte *updated_ref,
+	     const GLubyte *testImg,
+	     GLuint w, GLuint h, GLuint d,
+	     GLuint tx, GLuint ty, GLuint tz,
+	     GLuint tw, GLuint th, GLuint td)
 {
-	return memcmp(img1, img2, w*h*d*4) == 0;
-}
+	const GLubyte *ref;
+	GLuint z, y, x;
 
+	switch (target) {
+	case GL_TEXTURE_1D:
+		ty = 0;
+		th = 1;
+		/* flow through */
+	case GL_TEXTURE_2D:
+		tz = 0;
+		td = 1;
+		break;
+	}
+
+	for (z = 0; z < d; z++) {
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+				if (x >= tx && x < tx + tw &&
+				    y >= ty && y < ty + th &&
+				    z >= tz && z < tz + td)
+					ref = updated_ref;
+				else
+					ref = original_ref;
+
+				if (memcmp(ref, testImg, 4))
+					return GL_FALSE;
+
+				testImg += 4;
+				original_ref += 4;
+				updated_ref += 4;
+			}
+		}
+	}
+
+	return GL_TRUE;
+}
 
 /**
  * Get block size for compressed format.
@@ -214,52 +251,14 @@ draw_and_read_texture(GLuint w, GLuint h, GLuint d, GLubyte *ref)
 	glReadPixels(0, 0, w, h * d, GL_RGBA, GL_UNSIGNED_BYTE, ref);
 }
 
-/**
- * Create a texture image with reference values.  Draw a textured quad.
- * Save reference image with glReadPixels().
- * Loop:
- *    replace a sub-region of the texture image with same values
- *    draw test textured quad
- *    read test image with glReadPixels
- *    compare reference image to test image
- * \param target  GL_TEXTURE_1D/2D/3D
- * \param intFormat  the internal texture format
- */
-static GLboolean
-test_format(GLenum target, GLenum intFormat)
+static GLuint
+create_texture(GLenum target,
+	       GLenum intFormat,
+	       GLsizei w, GLsizei h, GLsizei d,
+	       GLenum srcFormat,
+	       const GLubyte *img)
 {
-	const GLenum srcFormat = GL_RGBA;
-	GLuint w = 128, h = 64, d = 8;
-	GLuint tex, i, j, k, n, t;
-	GLubyte *img, *ref, *testImg;
-	GLboolean pass = GL_TRUE;
-	GLuint bw, bh, wMask, hMask, dMask;
-	get_format_block_size(intFormat, &bw, &bh);
-	wMask = ~(bw-1);
-	hMask = ~(bh-1);
-	dMask = ~0;
-
-	if (target != GL_TEXTURE_3D)
-		d = 1;
-	if (target == GL_TEXTURE_1D)
-		h = 1;
-
-	img = (GLubyte *) malloc(w * h * d * 4);
-	ref = (GLubyte *) malloc(w * h * d * 4);
-	testImg = (GLubyte *) malloc(w * h * d * 4);
-
-	/* fill source tex image */
-	n = 0;
-	for (i = 0; i < d; i++) {
-		for (j = 0; j < h; j++) {
-			for (k = 0; k < w; k++) {
-				img[n++] = j * 4;
-				img[n++] = k * 2;
-				img[n++] = i * 16;
-				img[n++] = 255;
-			}
-		}
-	}
+	GLuint tex;
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, w);
 	glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, h);
@@ -284,13 +283,94 @@ test_format(GLenum target, GLenum intFormat)
 			     srcFormat, GL_UNSIGNED_BYTE, img);
 	}
 
+	return tex;
+}
+
+/**
+ * Create two textures with different reference values. Draw both of
+ * the textures to the framebuffer and save the reference images with
+ * glReadPixels.
+ *
+ * Loop:
+ *  - Create another texture with the same initial values as the first
+ *    texture
+ *  - replace a random sub-region of the texture image with values from
+ *    the 2nd texture
+ *  - draw the texture to the framebuffer and read back with glReadPixels
+ *  - compare reference images to test image choosing either the first
+ *    or second reference image for each pixel depending on whether it
+ *    is within the updated region
+ * \param target  GL_TEXTURE_1D/2D/3D
+ * \param intFormat  the internal texture format
+ */
+static GLboolean
+test_format(GLenum target, GLenum intFormat)
+{
+	const GLenum srcFormat = GL_RGBA;
+	GLuint w = 128, h = 64, d = 8;
+	GLuint tex, i, j, k, n, t;
+	GLubyte *original_img, *original_ref;
+	GLubyte *updated_img, *updated_ref;
+	GLubyte *testImg;
+	GLboolean pass = GL_TRUE;
+	GLuint bw, bh, wMask, hMask, dMask;
+	get_format_block_size(intFormat, &bw, &bh);
+	wMask = ~(bw-1);
+	hMask = ~(bh-1);
+	dMask = ~0;
+
+	if (target != GL_TEXTURE_3D)
+		d = 1;
+	if (target == GL_TEXTURE_1D)
+		h = 1;
+
+	original_img = (GLubyte *) malloc(w * h * d * 4);
+	original_ref = (GLubyte *) malloc(w * h * d * 4);
+	updated_img = (GLubyte *) malloc(w * h * d * 4);
+	updated_ref = (GLubyte *) malloc(w * h * d * 4);
+	testImg = (GLubyte *) malloc(w * h * d * 4);
+
+	/* fill source tex images */
+	n = 0;
+	for (i = 0; i < d; i++) {
+		for (j = 0; j < h; j++) {
+			for (k = 0; k < w; k++) {
+				original_img[n + 0] = j * 4;
+				original_img[n + 1] = k * 2;
+				original_img[n + 2] = i * 16;
+				original_img[n + 3] = 255;
+
+				/* Swizzle the components in the
+				 * updated image
+				 */
+				updated_img[n + 0] = original_img[n + 1];
+				updated_img[n + 1] = original_img[n + 2];
+				updated_img[n + 2] = original_img[n + 0];
+				updated_img[n + 3] = original_img[n + 3];
+
+				n += 4;
+			}
+		}
+	}
+
 	glEnable(target);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-	/* draw reference image */
+
+	/* draw original reference image */
+	tex = create_texture(target, intFormat, w, h, d,
+			     srcFormat, original_img);
 	glClear(GL_COLOR_BUFFER_BIT);
-	draw_and_read_texture(w, h, d, ref);
+	draw_and_read_texture(w, h, d, original_ref);
+	glDeleteTextures(1, &tex);
+
+	/* draw updated reference image */
+	tex = create_texture(target, intFormat, w, h, d,
+			     srcFormat, updated_img);
+	glClear(GL_COLOR_BUFFER_BIT);
+	draw_and_read_texture(w, h, d, updated_ref);
+	glDeleteTextures(1, &tex);
 
 	for (t = 0; t < 10; t++) {
 		/* Choose random region of texture to update.
@@ -304,34 +384,46 @@ test_format(GLenum target, GLenum intFormat)
 		GLint ty = (rand() % (h - th)) & hMask;
 		GLint tz = (rand() % (d - td)) & dMask;
 
+		/* Recreate the original texture */
+		tex = create_texture(target, intFormat, w, h, d,
+				     srcFormat, original_img);
+
 		assert(tx + tw <= w);
 		assert(ty + th <= h);
 		assert(tz + td <= d);
 
-		/* replace texture region (with same data) */
+		/* replace texture region with data from updated image */
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
 		glPixelStorei(GL_UNPACK_SKIP_IMAGES, tz);
 		if (target == GL_TEXTURE_1D) {
 			glTexSubImage1D(target, 0, tx, tw,
-					srcFormat, GL_UNSIGNED_BYTE, img);
+					srcFormat, GL_UNSIGNED_BYTE,
+					updated_img);
 		}
 		else if (target == GL_TEXTURE_2D) {
 			glTexSubImage2D(target, 0, tx, ty, tw, th,
-					srcFormat, GL_UNSIGNED_BYTE, img);
+					srcFormat, GL_UNSIGNED_BYTE,
+					updated_img);
 		}
 		else if (target == GL_TEXTURE_3D) {
 			glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
-					srcFormat, GL_UNSIGNED_BYTE, img);
+					srcFormat, GL_UNSIGNED_BYTE,
+					updated_img);
 		}
 
 		/* draw test image */
 		glClear(GL_COLOR_BUFFER_BIT);
 		draw_and_read_texture(w, h, d, testImg);
 
+		glDeleteTextures(1, &tex);
+
 		piglit_present_results();
 
-		if (!equal_images(ref, testImg, w, h, d)) {
+		if (!equal_images(target,
+				  original_ref, updated_ref, testImg,
+				  w, h, d,
+				  tx, ty, tz, tw, th, td)) {
 			printf("texsubimage failed\n");
 			printf("  target: %s\n", piglit_get_gl_enum_name(target));
 			printf("  internal format: %s\n", piglit_get_gl_enum_name(intFormat));
@@ -343,11 +435,12 @@ test_format(GLenum target, GLenum intFormat)
 
 	glDisable(target);
 
-	free(img);
-	free(ref);
+	free(original_img);
+	free(original_ref);
+	free(updated_img);
+	free(updated_ref);
 	free(testImg);
 
-	glDeleteTextures(1, &tex);
 	return pass;
 }
 
