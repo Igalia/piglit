@@ -652,7 +652,7 @@ glx['GLX_MESA_query_renderer'] = mesa_query_renderer
 mesa_query_renderer['coverage'] = PiglitGLTest('glx-query-renderer-coverage', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
 def texwrap_test(args):
-    return PiglitGLTest('texwrap ' + ' '.join(args), run_concurrent=True)
+    return PiglitGLTest(['texwrap'] + args, run_concurrent=True)
 
 def add_texwrap_target_tests(group, target):
     group['texwrap ' + target] = texwrap_test([target, 'GL_RGBA8'])
