@@ -667,19 +667,19 @@ def add_texwrap_format_tests(group, ext = '', suffix = ''):
     group['texwrap formats' + suffix + ' bordercolor-swizzled'] = texwrap_test(args + ['bordercolor', 'swizzled'])
 
 def add_fbo_depth_tests(group, format):
-    group['fbo-depth-' + format + '-tex1d'] = PiglitGLTest('fbo-depth-tex1d ' + format, run_concurrent=True)
-    group['fbo-depth-' + format + '-clear'] = PiglitGLTest('fbo-depth clear ' + format, run_concurrent=True)
-    group['fbo-depth-' + format + '-readpixels'] = PiglitGLTest('fbo-depth readpixels ' + format, run_concurrent=True)
-    group['fbo-depth-' + format + '-drawpixels'] = PiglitGLTest('fbo-depth drawpixels ' + format, run_concurrent=True)
-    group['fbo-depth-' + format + '-copypixels'] = PiglitGLTest('fbo-depth copypixels ' + format, run_concurrent=True)
-    group['fbo-depth-' + format + '-blit'] = PiglitGLTest('fbo-depth blit ' + format, run_concurrent=True)
+    group['fbo-depth-' + format + '-tex1d'] = PiglitGLTest(['fbo-depth-tex1d', format], run_concurrent=True)
+    group['fbo-depth-' + format + '-clear'] = PiglitGLTest(['fbo-depth', 'clear', format], run_concurrent=True)
+    group['fbo-depth-' + format + '-readpixels'] = PiglitGLTest(['fbo-depth', 'readpixels', format], run_concurrent=True)
+    group['fbo-depth-' + format + '-drawpixels'] = PiglitGLTest(['fbo-depth', 'drawpixels', format], run_concurrent=True)
+    group['fbo-depth-' + format + '-copypixels'] = PiglitGLTest(['fbo-depth', 'copypixels', format], run_concurrent=True)
+    group['fbo-depth-' + format + '-blit'] = PiglitGLTest(['fbo-depth', 'blit', format], run_concurrent=True)
 
 def add_fbo_stencil_tests(group, format):
-    group['fbo-stencil-' + format + '-clear'] = PiglitGLTest('fbo-stencil clear ' + format, run_concurrent=True)
-    group['fbo-stencil-' + format + '-readpixels'] = PiglitGLTest('fbo-stencil readpixels ' + format, run_concurrent=True)
-    group['fbo-stencil-' + format + '-drawpixels'] = PiglitGLTest('fbo-stencil drawpixels ' + format, run_concurrent=True)
-    group['fbo-stencil-' + format + '-copypixels'] = PiglitGLTest('fbo-stencil copypixels ' + format, run_concurrent=True)
-    group['fbo-stencil-' + format + '-blit'] = PiglitGLTest('fbo-stencil blit ' + format, run_concurrent=True)
+    group['fbo-stencil-' + format + '-clear'] = PiglitGLTest(['fbo-stencil', 'clear', format], run_concurrent=True)
+    group['fbo-stencil-' + format + '-readpixels'] = PiglitGLTest(['fbo-stencil', 'readpixels', format], run_concurrent=True)
+    group['fbo-stencil-' + format + '-drawpixels'] = PiglitGLTest(['fbo-stencil', 'drawpixels', format], run_concurrent=True)
+    group['fbo-stencil-' + format + '-copypixels'] = PiglitGLTest(['fbo-stencil', 'copypixels', format], run_concurrent=True)
+    group['fbo-stencil-' + format + '-blit'] = PiglitGLTest(['fbo-stencil', 'blit', format], run_concurrent=True)
 
 spec = {}
 
