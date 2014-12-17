@@ -341,13 +341,19 @@ for pairs in [(['glsl1'], glean_glsl_tests),
         profile.tests[groupname].env['PIGLIT_TEST'] = name
 
 def add_fbo_formats_tests(path, extension, suffix=''):
-    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = PiglitGLTest('fbo-generatemipmap-formats ' + extension, run_concurrent=True)
-    profile.tests[path + '/fbo-clear-formats' + suffix] = PiglitGLTest('fbo-clear-formats ' + extension, run_concurrent=True)
-    profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = PiglitGLTest('get-renderbuffer-internalformat ' + extension, run_concurrent=True)
+    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = \
+        PiglitGLTest(['fbo-generatemipmap-formats', extension], run_concurrent=True)
+    profile.tests[path + '/fbo-clear-formats' + suffix] = \
+        PiglitGLTest(['fbo-clear-formats', extension], run_concurrent=True)
+    profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = \
+        PiglitGLTest(['get-renderbuffer-internalformat', extension], run_concurrent=True)
     if 'depth' not in extension:
-        profile.tests[path + '/fbo-blending-formats' + suffix] = PiglitGLTest('fbo-blending-formats ' + extension, run_concurrent=True)
-        profile.tests[path + '/fbo-alphatest-formats' + suffix] = PiglitGLTest('fbo-alphatest-formats ' + extension, run_concurrent=True)
-        profile.tests[path + '/fbo-colormask-formats' + suffix] = PiglitGLTest('fbo-colormask-formats ' + extension, run_concurrent=True)
+        profile.tests[path + '/fbo-blending-formats' + suffix] = \
+            PiglitGLTest(['fbo-blending-formats', extension], run_concurrent=True)
+        profile.tests[path + '/fbo-alphatest-formats' + suffix] = \
+            PiglitGLTest(['fbo-alphatest-formats', extension], run_concurrent=True)
+        profile.tests[path + '/fbo-colormask-formats' + suffix] = \
+            PiglitGLTest(['fbo-colormask-formats', extension], run_concurrent=True)
 
 def add_msaa_formats_tests(group, extension):
     for num_samples in MSAA_SAMPLE_COUNTS:
