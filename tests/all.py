@@ -1680,6 +1680,7 @@ arb_texture_multisample = {}
 spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, ['arb_texture_multisample-minmax'])
 for sample_count in MSAA_SAMPLE_COUNTS:
+    sample_count = str(sample_count)
     # fb-completeness
     spec[grouptools.join('ARB_texture_multisample', 'fb-completeness', sample_count)] = \
         PiglitGLTest(['arb_texture_multisample-fb-completeness', sample_count], run_concurrent=True)

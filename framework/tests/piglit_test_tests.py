@@ -31,7 +31,7 @@ from framework.test.piglit_test import (PiglitBaseTest, PiglitGLTest,
 def test_initialize_piglitgltest():
     """ Test that PiglitGLTest initializes correctly """
     try:
-        PiglitGLTest('/bin/true')
+        PiglitGLTest(['/bin/true'])
     except Exception as e:
         raise AssertionError(e)
 
@@ -39,14 +39,14 @@ def test_initialize_piglitgltest():
 def test_initialize_piglitcltest():
     """ Test that PiglitCLTest initializes correctly """
     try:
-        PiglitCLTest('/bin/true')
+        PiglitCLTest(['/bin/true'])
     except Exception as e:
         raise AssertionError(e)
 
 
 def test_piglittest_interpret_result():
     """ PiglitBaseTest.interpret_result() works no subtests """
-    test = PiglitBaseTest('foo')
+    test = PiglitBaseTest(['foo'])
     test.result['out'] = 'PIGLIT: {"result": "pass"}\n'
     test.interpret_result()
     assert test.result['result'] == 'pass'
@@ -54,7 +54,7 @@ def test_piglittest_interpret_result():
 
 def test_piglittest_interpret_result_subtest():
     """ PiglitBaseTest.interpret_result() works with subtests """
-    test = PiglitBaseTest('foo')
+    test = PiglitBaseTest(['foo'])
     test.result['out'] = ('PIGLIT: {"result": "pass"}\n'
                           'PIGLIT: {"subtest": {"subtest": "pass"}}\n')
     test.interpret_result()
@@ -77,13 +77,13 @@ def test_piglitest_no_clobber():
 
 def test_piglittest_command_getter_serial():
     """ PiglitGLTest.command adds -auto to serial tests """
-    test = PiglitGLTest('foo')
+    test = PiglitGLTest(['foo'])
     nt.assert_in('-auto', test.command)
 
 
 def test_piglittest_command_getter_concurrent():
     """ PiglitGLTest.command adds -fbo and -auto to concurrent tests """
-    test = PiglitGLTest('foo', run_concurrent=True)
+    test = PiglitGLTest(['foo'], run_concurrent=True)
     nt.assert_in('-auto', test.command)
     nt.assert_in('-fbo', test.command)
 
@@ -91,7 +91,7 @@ def test_piglittest_command_getter_concurrent():
 def test_PiglitGLTest_include_and_exclude():
     """PiglitGLTest.is_skip() raises if include and exclude are given."""
     with nt.assert_raises(AssertionError):
-        PiglitGLTest('foo',
+        PiglitGLTest(['foo'],
                      require_platforms=['glx'],
                      exclude_platforms=['gbm'])
 
@@ -99,26 +99,26 @@ def test_PiglitGLTest_include_and_exclude():
 def test_PiglitGLTest_platform_in_require():
     """PiglitGLTest.is_skip() does not skip if platform is in require_platforms."""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
-    test = PiglitGLTest('foo', require_platforms=['glx'])
+    test = PiglitGLTest(['foo'], require_platforms=['glx'])
     nt.assert_false(test.is_skip())
 
 
 def test_PiglitGLTest_platform_not_in_require():
     """PiglitGLTest.is_skip() skips if platform is not in require_platforms."""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
-    test = PiglitGLTest('foo', require_platforms=['glx'])
+    test = PiglitGLTest(['foo'], require_platforms=['glx'])
     nt.assert_true(test.is_skip())
 
 
 def test_PiglitGLTest_platform_in_exclude():
     """PiglitGLTest.is_skip() skips if platform is in exclude_platforms.."""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'glx'
-    test = PiglitGLTest('foo', exclude_platforms=['glx'])
+    test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
     nt.assert_true(test.is_skip())
 
 
 def test_PiglitGLTest_platform_not_in_exclude():
     """PiglitGLTest.is_skip() does not skip if platform is in exclude_platforms."""
     PiglitGLTest.OPTS.env['PIGLIT_PLATFORM'] = 'gbm'
-    test = PiglitGLTest('foo', exclude_platforms=['glx'])
+    test = PiglitGLTest(['foo'], exclude_platforms=['glx'])
     nt.assert_false(test.is_skip())

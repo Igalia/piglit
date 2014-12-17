@@ -26,7 +26,6 @@ from __future__ import print_function, absolute_import
 import errno
 import os
 import subprocess
-import shlex
 import time
 import sys
 import traceback
@@ -123,7 +122,8 @@ class Test(object):
     timeout = 0
 
     def __init__(self, command, run_concurrent=False):
-        self._command = None
+        assert isinstance(command, list), command
+
         self.run_concurrent = run_concurrent
         self._command = copy.copy(command)
         self.env = {}
@@ -177,13 +177,6 @@ class Test(object):
             return ['valgrind', '--quiet', '--error-exitcode=1',
                     '--tool=memcheck'] + self._command
         return self._command
-
-    @command.setter
-    def command(self, value):
-        if isinstance(value, basestring):
-            self._command = shlex.split(str(value))
-            return
-        self._command = value
 
     @abc.abstractmethod
     def interpret_result(self):

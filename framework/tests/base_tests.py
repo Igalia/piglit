@@ -63,7 +63,7 @@ def test_timeout():
         if (test.result['returncode'] == 0):
             test.result['result'] = "pass"
 
-    test = TestTest("sleep 60")
+    test = TestTest(['sleep', '60'])
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()
@@ -78,7 +78,7 @@ def test_timeout_pass():
         if (test.result['returncode'] == 0):
             test.result['result'] = "pass"
 
-    test = TestTest("true")
+    test = TestTest(['true'])
     test.test_interpret_result = helper
     test.timeout = 1
     test.run()
@@ -108,7 +108,7 @@ def test_WindowResizeMixin_rerun():
         def interpret_result(self):
             pass
 
-    test = Test_('foo')
+    test = Test_(['foo'])
     test.run()
     nt.assert_equal(test.result['out'], 'all good')
 
@@ -123,7 +123,7 @@ def test_run_command_early():
         def _run_command(self):
             return True
 
-    test = Test_('foo')
+    test = Test_(['foo'])
     test.run()
 
 

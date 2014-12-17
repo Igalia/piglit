@@ -27,5 +27,5 @@ from framework.test import GTest
 
 def test_initialize_gtest():
     """ Test that GTest successfully initializes correctly """
-    test = GTest('/bin/true')
+    test = GTest(['/bin/true'])
     assert test
