@@ -169,7 +169,7 @@ piglit_init(int argc, char **argv)
 }
 
 bool
-test_builtin_sample_mask(Fbo ms_fbo)
+test_builtin_sample_mask(const Fbo& ms_fbo)
 {
 	int samples;
 	bool result = true;
