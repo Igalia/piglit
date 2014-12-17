@@ -360,7 +360,7 @@ def add_msaa_formats_tests(group, extension):
         args = [str(num_samples), extension]
         test_name = ' '.join(['multisample-formats'] + args)
         group[test_name] = PiglitGLTest(
-                'ext_framebuffer_multisample-formats ' + ' '.join(args),
+                ['ext_framebuffer_multisample-formats'] + args,
                 run_concurrent=True)
 
 def add_fbo_generatemipmap_extension(group, extension, name):
