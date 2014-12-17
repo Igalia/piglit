@@ -395,7 +395,7 @@ shaders = {}
 def add_getactiveuniform_count(group, name, expected):
     path = 'shaders/'
     group['glsl-getactiveuniform-count: ' + name] = PiglitGLTest(
-        'glsl-getactiveuniform-count ' + path + name + '.vert ' + expected,
+        ['glsl-getactiveuniform-count', path + name + '.vert', expected],
         run_concurrent=True)
 
 add_shader_test_dir(shaders,
