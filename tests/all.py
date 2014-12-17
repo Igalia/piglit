@@ -29,7 +29,7 @@ generatedTestDir = os.path.normpath(os.path.join(
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
-        group[name + '-' + param] = PiglitGLTest(name + ' ' + param)
+        group[name + '-' + param] = PiglitGLTest([name, param])
 
 def add_plain_test(group, args, **kwargs):
     for a in args:
