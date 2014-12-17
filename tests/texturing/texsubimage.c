@@ -41,6 +41,9 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA | PIGLIT_GL_VISUAL_DOUBLE;
 
+	config.window_width = 512;
+	config.window_height = 512;
+
 PIGLIT_GL_TEST_CONFIG_END
 
 /**
@@ -141,9 +144,9 @@ piglit_draw_rect_tex3d(float x, float y, float w, float h,
 
 static GLboolean
 equal_images(const GLubyte *img1, const GLubyte *img2,
-             GLuint w, GLuint h)
+             GLuint w, GLuint h, GLuint d)
 {
-	return memcmp(img1, img2, w*h*4) == 0;
+	return memcmp(img1, img2, w*h*d*4) == 0;
 }
 
 
@@ -190,6 +193,26 @@ get_format_block_size(GLenum format, GLuint *bw, GLuint *bh)
 	}
 }
 
+/**
+ * Draw each image of the texture to the framebuffer and then save the
+ * entire thing to a buffer with glReadPixels().
+ */
+static void
+draw_and_read_texture(GLuint w, GLuint h, GLuint d, GLubyte *ref)
+{
+	int i;
+
+	for (i = 0; i < d; i++) {
+		float tz = (i + 0.5f) / d;
+		piglit_draw_rect_tex3d(0, i * h, /* x/y */
+				       w, h,
+				       0.0, 0.0, /* tx/ty */
+				       1.0, 1.0, /* tw/th */
+				       tz, tz /* tz0/tz1 */);
+	}
+
+	glReadPixels(0, 0, w, h * d, GL_RGBA, GL_UNSIGNED_BYTE, ref);
+}
 
 /**
  * Create a texture image with reference values.  Draw a textured quad.
@@ -267,8 +290,7 @@ test_format(GLenum target, GLenum intFormat)
 
 	/* draw reference image */
 	glClear(GL_COLOR_BUFFER_BIT);
-	piglit_draw_rect_tex3d(0, 0, w, h, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0);
-	glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, ref);
+	draw_and_read_texture(w, h, d, ref);
 
 	for (t = 0; t < 10; t++) {
 		/* Choose random region of texture to update.
@@ -305,12 +327,11 @@ test_format(GLenum target, GLenum intFormat)
 
 		/* draw test image */
 		glClear(GL_COLOR_BUFFER_BIT);
-		piglit_draw_rect_tex3d(0, 0, w, h, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0);
-		glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, testImg);
+		draw_and_read_texture(w, h, d, testImg);
 
 		piglit_present_results();
 
-		if (!equal_images(ref, testImg, w, h)) {
+		if (!equal_images(ref, testImg, w, h, d)) {
 			printf("texsubimage failed\n");
 			printf("  target: %s\n", piglit_get_gl_enum_name(target));
 			printf("  internal format: %s\n", piglit_get_gl_enum_name(intFormat));
