@@ -2323,7 +2323,10 @@ tdfx_texture_compression_fxt1['invalid formats'] = PiglitGLTest('arb_texture_com
 add_plain_test(tdfx_texture_compression_fxt1, 'fxt1-teximage')
 
 def add_color_buffer_float_test(name, format, p1, p2):
-    arb_color_buffer_float[format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')] = PiglitGLTest(' '.join(['arb_color_buffer_float-' + name, format, p1, p2]), run_concurrent=True)
+    group = format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')
+    arb_color_buffer_float[group] = PiglitGLTest(
+        ['arb_color_buffer_float-' + name, format, p1, p2],
+        run_concurrent=True)
 
 arb_color_buffer_float = {}
 spec['ARB_color_buffer_float'] = arb_color_buffer_float
