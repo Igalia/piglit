@@ -44,8 +44,11 @@ static bool context_has_image_support(const piglit_cl_context ctx)
 			piglit_cl_get_device_info(ctx->device_ids[i],
 						CL_DEVICE_IMAGE_SUPPORT);
 		if (*image_support) {
+			free(image_support);
 			return true;
 		}
+
+		free(image_support);
 	}
 	return false;
 }
