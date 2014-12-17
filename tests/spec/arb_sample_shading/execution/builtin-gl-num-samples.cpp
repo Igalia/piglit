@@ -118,7 +118,7 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-bool test_builtin_num_samples(Fbo ms_fbo)
+bool test_builtin_num_samples(const Fbo& ms_fbo)
 {
 	GLint samples;
         GLfloat expected[4] = {0.0, 1.0, 0.0, 1.0};
