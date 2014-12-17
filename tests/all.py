@@ -501,8 +501,8 @@ for subtest in ('interstage', 'intrastage', 'vs-gs'):
     shaders[cmdline] = PiglitGLTest(cmdline, run_concurrent=True)
 
 def add_vpfpgeneric(group, name):
-    group[name] = PiglitGLTest('vpfp-generic ' +
-        os.path.join(testsDir, 'shaders', 'generic', name + '.vpfp'),
+    group[name] = PiglitGLTest(['vpfp-generic',
+        os.path.join(testsDir, 'shaders', 'generic', name + '.vpfp')],
         run_concurrent=True)
 
 glx = {}
