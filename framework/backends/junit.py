@@ -87,7 +87,7 @@ class JUnitBackend(FileBackend):
                 # failed transaction and ignore it.
                 try:
                     piglit.append(etree.parse(f).getroot())
-                except etree.XMLSyntaxError:
+                except etree.ParseError:
                     continue
 
         # set the test count by counting the number of tests.

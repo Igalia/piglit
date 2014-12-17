@@ -268,5 +268,5 @@ def test_junit_skips_bad_tests():
 
         try:
             test.finalize()
-        except etree.XMLSyntaxError as e:
+        except etree.ParseError as e:
             raise AssertionError(e)
