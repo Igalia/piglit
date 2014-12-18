@@ -32,7 +32,6 @@
 #include <stdlib.h>
 
 static const char* glversion;
-static bool nv340_23; /* Are we using the NVIDIA 340.23 driver? */
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -64,10 +63,6 @@ piglit_init(int argc, char **argv)
 
 	glversion = (const char*) glGetString(GL_VERSION);
 	printf("Using driver %s.\n", glversion);
-	if (strcmp("2.1.2 NVIDIA 340.23.03", glversion) == 0)
-		nv340_23 = true;
-	else
-		nv340_23 = false;
 
 	dsa_init_program();
 
@@ -82,26 +77,11 @@ piglit_display(void)
 	int texunit = 3;
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &name);
-	if (nv340_23) {
-		printf("Working around bugs in NVIDIA 340.23.03.\n");
-		glBindTexture(GL_TEXTURE_2D, name);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
-			piglit_width, piglit_height, 0, GL_RGBA,
-			GL_FLOAT, data);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			GL_NEAREST);
-	}
-	else {
-		/* These do not appear to work on nv340_23. */
-		glTextureStorage2D(name, 1, GL_RGBA32F, piglit_width,
-			piglit_height);
-		glTextureSubImage2D(name, 0, 0, 0,
-			piglit_width, piglit_height, GL_RGBA, GL_FLOAT, data);
-		glTextureParameteri(name, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(name, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	}
+	glTextureStorage2D(name, 1, GL_RGBA32F, piglit_width, piglit_height);
+	glTextureSubImage2D(name, 0, 0, 0, piglit_width, piglit_height,
+			    GL_RGBA, GL_FLOAT, data);
+	glTextureParameteri(name, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTextureParameteri(name, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	/* Draw the image */
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);
@@ -116,9 +96,8 @@ piglit_display(void)
 	pass &= piglit_probe_image_rgba(0, 0, piglit_width, piglit_height,
 		data);
 
-	if (!piglit_automatic) {
+	if (!piglit_automatic)
 		piglit_present_results();
-	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 } /* piglit_display */
