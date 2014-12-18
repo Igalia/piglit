@@ -395,8 +395,13 @@ def gen(types, minVersions, functions, testDefs, dirName):
                     '[config]\n' +
                     'name: Test '+dataType+' '+fnName+' built-in on CL 1.1\n' +
                     'clc_version_min: '+str(clcVersionMin)+'\n' +
-                    'dimensions: 1\n\n'
+                    'dimensions: 1\n'
             )
+            if (dataType == 'double'):
+                f.write('require_device_extensions: cl_khr_fp64\n')
+
+            # Blank line  to provide separation between config header and tests
+            f.write('\n')
 
             # Write all tests for the built-in function
             tests = functionDef['values']
@@ -415,6 +420,9 @@ def gen(types, minVersions, functions, testDefs, dirName):
 
             # Terminate the header section
             f.write('!*/\n\n')
+
+            if (dataType == 'double'):
+                f.write('#pragma OPENCL EXTENSION cl_khr_fp64 : enable\n\n')
 
             # Generate the actual kernels
             generate_kernels(f, dataType, fnName, functionDef)
