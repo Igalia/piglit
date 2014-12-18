@@ -125,6 +125,45 @@ static const char fragment_2d_array[] =
 	"                                                layer));\n"
 	"}\n";
 
+static const char vertex_cube_map_array[] =
+	"const float N_SIDES = 6.0;\n"
+	"const float TEX_DEPTH = " STRINGIFY(DEFAULT_TEX_DEPTH) ".0 *\n"
+	"                        N_SIDES;\n"
+	"void\n"
+	"main()\n"
+	"{\n"
+	"        vec2 face_coord;\n"
+	"        vec3 res;\n"
+	"        float slice = gl_MultiTexCoord0.p * TEX_DEPTH - 0.5;\n"
+	"        float layer = floor(slice / N_SIDES);\n"
+	"        int face = int(floor(mod(slice, N_SIDES)));\n"
+	"\n"
+	"        face_coord = gl_MultiTexCoord0.st * 2.0 - 1.0;\n"
+	"        if (face == 0)\n"
+	"                res = vec3(1.0, -face_coord.ts);\n"
+	"        else if (face == 1)\n"
+	"                res = vec3(-1.0, face_coord.ts * vec2(-1.0, 1.0));\n"
+	"        else if (face == 2)\n"
+	"                res = vec3(face_coord.s, 1.0, face_coord.t);\n"
+	"        else if (face == 3)\n"
+	"                res = vec3(face_coord.s, -1.0, -face_coord.t);\n"
+	"        else if (face == 4)\n"
+	"                res = vec3(face_coord.st * vec2(1.0, -1.0), 1.0);\n"
+	"        else\n"
+	"                res = vec3(-face_coord.st, -1.0);\n"
+	"        gl_TexCoord[0] = vec4(res, layer);\n"
+	"        gl_Position = ftransform();\n"
+	"}\n";
+
+static const char fragment_cube_map_array[] =
+	"#extension GL_ARB_texture_cube_map_array : require\n"
+	"uniform samplerCubeArray tex;\n"
+	"void\n"
+	"main()\n"
+	"{\n"
+	"        gl_FragColor = texture(tex, gl_TexCoord[0]);\n"
+	"}\n";
+
 /**
  * XXX add this to piglit-util if useful elsewhere.
  */
@@ -277,14 +316,20 @@ draw_and_read_texture(GLuint w, GLuint h, GLuint d, GLubyte *ref)
 
 	for (i = 0; i < d; i++) {
 		float tz = (i + 0.5f) / d;
-		piglit_draw_rect_tex3d(0, i * h, /* x/y */
+		piglit_draw_rect_tex3d(i / 8 * w, i % 8 * h, /* x/y */
 				       w, h,
 				       0.0, 0.0, /* tx/ty */
 				       1.0, 1.0, /* tw/th */
 				       tz, tz /* tz0/tz1 */);
 	}
 
-	glReadPixels(0, 0, w, h * d, GL_RGBA, GL_UNSIGNED_BYTE, ref);
+	for (i = 0; i < d; i += 8) {
+		glReadPixels(i / 8 * w, i % 8 * h,
+			     w, h * MIN2(8, d - i),
+			     GL_RGBA, GL_UNSIGNED_BYTE,
+			     ref);
+		ref += 8 * w * h * 4;
+	}
 }
 
 static GLuint
@@ -359,8 +404,13 @@ test_format(GLenum target, GLenum intFormat)
 	hMask = ~(bh-1);
 	dMask = ~0;
 
-	if (target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY)
+	if (target == GL_TEXTURE_CUBE_MAP_ARRAY_ARB) {
+		w = h;
+		d *= 6;
+	} else if (target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY) {
 		d = 1;
+	}
+
 	if (target == GL_TEXTURE_1D)
 		h = 1;
 
@@ -377,7 +427,7 @@ test_format(GLenum target, GLenum intFormat)
 			for (k = 0; k < w; k++) {
 				original_img[n + 0] = j * 4;
 				original_img[n + 1] = k * 2;
-				original_img[n + 2] = i * 16;
+				original_img[n + 2] = i * 128 / d;
 				original_img[n + 3] = 255;
 
 				/* Swizzle the components in the
@@ -499,6 +549,10 @@ test_formats(GLenum target)
 	case GL_TEXTURE_2D_ARRAY:
 		program = piglit_build_simple_program(NULL, fragment_2d_array);
 		break;
+	case GL_TEXTURE_CUBE_MAP_ARRAY:
+		program = piglit_build_simple_program(vertex_cube_map_array,
+						      fragment_cube_map_array);
+		break;
 	default:
 		glEnable(target);
 		break;
@@ -582,6 +636,10 @@ piglit_init(int argc, char **argv)
 		GL_TEXTURE_2D_ARRAY_EXT,
 		GL_NONE
 	};
+	static const GLenum cube_map_array_targets[] = {
+		GL_TEXTURE_CUBE_MAP_ARRAY_ARB,
+		GL_NONE
+	};
 
 	test_targets = core_targets;
 
@@ -590,6 +648,11 @@ piglit_init(int argc, char **argv)
 			piglit_require_extension("GL_EXT_texture_array");
 			piglit_require_GLSL();
 			test_targets = array_targets;
+		} else if (!strcmp(argv[1], "cube_map_array")) {
+			piglit_require_extension
+				("GL_ARB_texture_cube_map_array");
+			piglit_require_GLSL();
+			test_targets = cube_map_array_targets;
 		} else {
 			goto handled_targets;
 		}

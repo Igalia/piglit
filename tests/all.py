@@ -2978,6 +2978,7 @@ textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usampler
 add_concurrent_test(arb_texture_cube_map_array, ['fbo-generatemipmap-cubemap', 'array'])
 add_concurrent_test(arb_texture_cube_map_array, ['fbo-generatemipmap-cubemap', 'array', 'RGB9_E5'])
 add_concurrent_test(arb_texture_cube_map_array, ['fbo-generatemipmap-cubemap', 'array', 'S3TC_DXT1'])
+add_concurrent_test(arb_texture_cube_map_array, ['texsubimage', 'cube_map_array'])
 
 import_glsl_parser_tests(arb_texture_cube_map_array,
                          os.path.join(testsDir, 'spec', 'arb_texture_cube_map_array'),
