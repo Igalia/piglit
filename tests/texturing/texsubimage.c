@@ -35,6 +35,9 @@
 #include "piglit-util-gl.h"
 #include "../fbo/fbo-formats.h"
 
+#define STR(x) #x
+#define STRINGIFY(x) STR(x)
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
 	config.supports_gl_compat_version = 10;
@@ -89,6 +92,38 @@ static const struct test_desc texsubimage_test_sets[] = {
 	}
 };
 
+/* Default texture size. Other values might be used if the texture has
+ * less dimensions or other restrictions */
+#define DEFAULT_TEX_WIDTH 128
+#define DEFAULT_TEX_HEIGHT 64
+#define DEFAULT_TEX_DEPTH 8
+
+/* List of texture targets to test, terminated by GL_NONE */
+static const GLenum *test_targets;
+
+static const char fragment_1d_array[] =
+	"#extension GL_EXT_texture_array : require\n"
+	"uniform sampler1DArray tex;\n"
+	"const float TEX_HEIGHT = " STRINGIFY(DEFAULT_TEX_HEIGHT) ".0;\n"
+	"void\n"
+	"main()\n"
+	"{\n"
+	"        float layer = gl_TexCoord[0].t * TEX_HEIGHT - 0.5;\n"
+	"        gl_FragColor = texture1DArray(tex, vec2(gl_TexCoord[0].s,\n"
+	"                                                layer));\n"
+	"}\n";
+
+static const char fragment_2d_array[] =
+	"#extension GL_EXT_texture_array : require\n"
+	"uniform sampler2DArray tex;\n"
+	"const float TEX_DEPTH = " STRINGIFY(DEFAULT_TEX_DEPTH) ".0;\n"
+	"void\n"
+	"main()\n"
+	"{\n"
+	"        float layer = gl_TexCoord[0].p * TEX_DEPTH - 0.5;\n"
+	"        gl_FragColor = texture2DArray(tex, vec3(gl_TexCoord[0].st,\n"
+	"                                                layer));\n"
+	"}\n";
 
 /**
  * XXX add this to piglit-util if useful elsewhere.
@@ -159,6 +194,7 @@ equal_images(GLenum target,
 		th = 1;
 		/* flow through */
 	case GL_TEXTURE_2D:
+	case GL_TEXTURE_1D_ARRAY:
 		tz = 0;
 		td = 1;
 		break;
@@ -270,17 +306,19 @@ create_texture(GLenum target,
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_IMAGES, 0);
-	if (target == GL_TEXTURE_1D) {
-		glTexImage1D(target, 0, intFormat, w, 0,
+	if (d > 1) {
+		glTexImage3D(target, 0, intFormat, w, h, d, 0,
 			     srcFormat, GL_UNSIGNED_BYTE, img);
 	}
-	else if (target == GL_TEXTURE_2D) {
+	else if (h > 1) {
 		glTexImage2D(target, 0, intFormat, w, h, 0,
 			     srcFormat, GL_UNSIGNED_BYTE, img);
 	}
-	else if (target == GL_TEXTURE_3D) {
-		glTexImage3D(target, 0, intFormat, w, h, d, 0,
+	else if (w > 1) {
+		glTexImage1D(target, 0, intFormat, w, 0,
 			     srcFormat, GL_UNSIGNED_BYTE, img);
+	} else {
+		assert(!"Unknown texture dimensions");
 	}
 
 	return tex;
@@ -307,7 +345,9 @@ static GLboolean
 test_format(GLenum target, GLenum intFormat)
 {
 	const GLenum srcFormat = GL_RGBA;
-	GLuint w = 128, h = 64, d = 8;
+	GLuint w = DEFAULT_TEX_WIDTH;
+	GLuint h = DEFAULT_TEX_HEIGHT;
+	GLuint d = DEFAULT_TEX_DEPTH;
 	GLuint tex, i, j, k, n, t;
 	GLubyte *original_img, *original_ref;
 	GLubyte *updated_img, *updated_ref;
@@ -319,7 +359,7 @@ test_format(GLenum target, GLenum intFormat)
 	hMask = ~(bh-1);
 	dMask = ~0;
 
-	if (target != GL_TEXTURE_3D)
+	if (target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY)
 		d = 1;
 	if (target == GL_TEXTURE_1D)
 		h = 1;
@@ -352,8 +392,6 @@ test_format(GLenum target, GLenum intFormat)
 			}
 		}
 	}
-
-	glEnable(target);
 
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
@@ -396,20 +434,20 @@ test_format(GLenum target, GLenum intFormat)
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
 		glPixelStorei(GL_UNPACK_SKIP_IMAGES, tz);
-		if (target == GL_TEXTURE_1D) {
-			glTexSubImage1D(target, 0, tx, tw,
-					srcFormat, GL_UNSIGNED_BYTE,
-					updated_img);
-		}
-		else if (target == GL_TEXTURE_2D) {
-			glTexSubImage2D(target, 0, tx, ty, tw, th,
-					srcFormat, GL_UNSIGNED_BYTE,
-					updated_img);
-		}
-		else if (target == GL_TEXTURE_3D) {
+		if (d > 1) {
 			glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
 					srcFormat, GL_UNSIGNED_BYTE,
 					updated_img);
+		} else if (h > 1) {
+			glTexSubImage2D(target, 0, tx, ty, tw, th,
+					srcFormat, GL_UNSIGNED_BYTE,
+					updated_img);
+		} else if (w > 1) {
+			glTexSubImage1D(target, 0, tx, tw,
+					srcFormat, GL_UNSIGNED_BYTE,
+					updated_img);
+		} else {
+			assert(!"Unknown image dimensions");
 		}
 
 		/* draw test image */
@@ -433,8 +471,6 @@ test_format(GLenum target, GLenum intFormat)
 		}
 	}
 
-	glDisable(target);
-
 	free(original_img);
 	free(original_ref);
 	free(updated_img);
@@ -453,7 +489,28 @@ static GLboolean
 test_formats(GLenum target)
 {
 	GLboolean pass = GL_TRUE;
+	GLuint program = 0;
 	int i, j;
+
+	switch (target) {
+	case GL_TEXTURE_1D_ARRAY:
+		program = piglit_build_simple_program(NULL, fragment_1d_array);
+		break;
+	case GL_TEXTURE_2D_ARRAY:
+		program = piglit_build_simple_program(NULL, fragment_2d_array);
+		break;
+	default:
+		glEnable(target);
+		break;
+	}
+
+	if (program != 0) {
+		GLuint tex_location;
+
+		glUseProgram(program);
+		tex_location = glGetUniformLocation(program, "tex");
+		glUniform1i(tex_location, 0);
+	}
 
 	/* loop over the format groups */
 	for (i = 0; i < ARRAY_SIZE(texsubimage_test_sets); i++) {
@@ -485,6 +542,13 @@ test_formats(GLenum target)
 		}
 	}
 
+	if (program == 0) {
+		glDisable(target);
+	} else {
+		glUseProgram(0);
+		glDeleteProgram(program);
+	}
+
 	return pass;
 }
 
@@ -492,17 +556,12 @@ test_formats(GLenum target)
 enum piglit_result
 piglit_display(void)
 {
-	static const GLenum targets[] = {
-		GL_TEXTURE_1D,
-		GL_TEXTURE_2D,
-		GL_TEXTURE_3D
-	};
 	GLboolean pass = GL_TRUE;
 	int i;
 
 	/* Loop over 1/2/3D texture targets */
-	for (i = 0; i < ARRAY_SIZE(targets); i++) {
-		pass = test_formats(targets[i]) && pass;
+	for (i = 0; test_targets[i] != GL_NONE; i++) {
+		pass = test_formats(test_targets[i]) && pass;
 	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
@@ -512,6 +571,34 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	static const GLenum core_targets[] = {
+		GL_TEXTURE_1D,
+		GL_TEXTURE_2D,
+		GL_TEXTURE_3D,
+		GL_NONE
+	};
+	static const GLenum array_targets[] = {
+		GL_TEXTURE_1D_ARRAY_EXT,
+		GL_TEXTURE_2D_ARRAY_EXT,
+		GL_NONE
+	};
+
+	test_targets = core_targets;
+
+	if (argc > 1) {
+		if (!strcmp(argv[1], "array")) {
+			piglit_require_extension("GL_EXT_texture_array");
+			piglit_require_GLSL();
+			test_targets = array_targets;
+		} else {
+			goto handled_targets;
+		}
+
+		argc--;
+		argv++;
+	}
+ handled_targets:
+
 	fbo_formats_init(argc, argv, 0);
 	(void) fbo_formats_display;
 

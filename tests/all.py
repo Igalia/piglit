@@ -2880,6 +2880,7 @@ add_concurrent_test(ext_texture_array, 'getteximage-targets 2D_ARRAY')
 for test_mode in ['teximage', 'texsubimage']:
     test_name = 'compressed {0}'.format(test_mode)
     ext_texture_array[test_name] = PiglitGLTest(['ext_texture_array-{}'.format(test_name), '-fbo'])
+add_concurrent_test(ext_texture_array, 'texsubimage array')
 
 arb_texture_cube_map = {}
 spec['ARB_texture_cube_map'] = arb_texture_cube_map
