@@ -452,17 +452,21 @@ piglit_display(void)
 {
 	bool pass = true;
 	pass &= test_pos_and_sizes();
-	pass &= test_target_name();        /* segfaults on mesa */
-	pass &= test_getter_target_name(); /* segfaults on mesa */
+	pass &= test_target_name();
+	pass &= test_getter_target_name();
 	pass &= test_pname();
 	pass &= test_getter_pname();
 	pass &= test_scalar_vector();
-	pass &= test_multisample();
-	pass &= test_texture_rec();
-	pass &= test_texture_rec_min_filter();
-	pass &= test_multisample_texture_base();
-	pass &= test_texture_rec_texture_base();
 	pass &= test_texture_level_negative();
+	if (piglit_is_extension_supported("GL_ARB_texture_multisample")){
+		pass &= test_multisample();
+		pass &= test_multisample_texture_base();
+	}
+	if (piglit_is_extension_supported("GL_ARB_texture_rectangle")) {
+		pass &= test_texture_rec();
+		pass &= test_texture_rec_min_filter();
+		pass &= test_texture_rec_texture_base();
+	}
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
