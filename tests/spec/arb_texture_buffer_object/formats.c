@@ -275,7 +275,7 @@ get_expected_f(const struct format *format, int sample, float *expected)
 static bool
 get_expected_i(const struct format *format, int sample, uint32_t *expected)
 {
-	uint32_t chans[4];
+	uint32_t chans[4] = { 0 };
 	int i;
 
 	for (i = 0; i < format->components; i++) {
