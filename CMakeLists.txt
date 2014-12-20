@@ -43,9 +43,9 @@ endif()
 
 if(PIGLIT_USE_WAFFLE)
 	if (NOT WIN32)
-		pkg_check_modules(WAFFLE REQUIRED waffle-1)
+		pkg_check_modules(Waffle REQUIRED waffle-1)
 
-		if(NOT WAFFLE_FOUND)
+		if(NOT Waffle_FOUND)
 			message(FATAL_ERROR "Failed to find Waffle. If Waffle"
 			"is not packaged for your distribution, you can get "
 			"it at http://www.waffle-gl.org."
@@ -60,20 +60,20 @@ if(PIGLIT_USE_WAFFLE)
 		# validates the required version at most once for the lifetime of the
 		# source tree.  If someone changes the required version by editing the
 		# CMakeLists, CMake fails to detect the new requirement.
-		set(WAFFLE_REQUIRED_VERSION "1.5.0")
-		if(WAFFLE_VERSION VERSION_LESS WAFFLE_REQUIRED_VERSION)
-			message(FATAL_ERROR "Found waffle-${WAFFLE_VERSION}, but "
-			"piglit requires waffle-${WAFFLE_REQUIRED_VERSION}")
+		set(Waffle_REQUIRED_VERSION "1.5.0")
+		if(Waffle_VERSION VERSION_LESS Waffle_REQUIRED_VERSION)
+			message(FATAL_ERROR "Found waffle-${Waffle_VERSION}, but "
+			"piglit requires waffle-${Waffle_REQUIRED_VERSION}")
 		endif()
 	else ()
-		find_path(WAFFLE_INCLUDE_DIRS waffle.h)
-		find_library(WAFFLE_LDFLAGS waffle-1)
-		if(WAFFLE_INCLUDE_DIRS AND WAFFLE_LDFLAGS)
-			set(WAFFLE_FOUND TRUE)
+		find_path(Waffle_INCLUDE_DIRS waffle.h)
+        find_library(Waffle_LIBRARIES waffle-1)
+		if(Waffle_INCLUDE_DIRS AND Waffle_LIBRARIES)
+			set(Waffle_FOUND TRUE)
 		else()
 			message(FATAL_ERROR "Failed to find Waffle. Get and build Waffle from "
-				"http://www.waffle-gl.org and set WAFFLE_INCLUDE_DIRS and "
-				"WAFFLE_LDFLAGS variables accordingly."
+				"http://www.waffle-gl.org and set Waffle_INCLUDE_DIRS and "
+				"Waffle_LIBRARIES variables accordingly."
 			)
 		endif()
 	endif ()
