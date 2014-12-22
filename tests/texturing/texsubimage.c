@@ -101,6 +101,10 @@ static const struct test_desc texsubimage_test_sets[] = {
 /* List of texture targets to test, terminated by GL_NONE */
 static const GLenum *test_targets;
 
+/* If set to GL_TRUE then the texture sub image upload will be read
+ * from a PBO */
+static GLboolean use_pbo = GL_FALSE;
+
 static const char fragment_1d_array[] =
 	"#extension GL_EXT_texture_array : require\n"
 	"uniform sampler1DArray tex;\n"
@@ -399,6 +403,7 @@ test_format(GLenum target, GLenum intFormat)
 	GLubyte *testImg;
 	GLboolean pass = GL_TRUE;
 	GLuint bw, bh, wMask, hMask, dMask;
+	GLuint pbo = 0;
 	get_format_block_size(intFormat, &bw, &bh);
 	wMask = ~(bw-1);
 	hMask = ~(bh-1);
@@ -443,6 +448,16 @@ test_format(GLenum target, GLenum intFormat)
 		}
 	}
 
+	if (use_pbo) {
+		glGenBuffers(1, &pbo);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER,
+			     w * h * d * 4,
+			     updated_img,
+			     GL_STATIC_DRAW);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	}
+
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
 
@@ -480,6 +495,9 @@ test_format(GLenum target, GLenum intFormat)
 		assert(ty + th <= h);
 		assert(tz + td <= d);
 
+		if (use_pbo)
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
+
 		/* replace texture region with data from updated image */
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, tx);
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, ty);
@@ -487,18 +505,21 @@ test_format(GLenum target, GLenum intFormat)
 		if (d > 1) {
 			glTexSubImage3D(target, 0, tx, ty, tz, tw, th, td,
 					srcFormat, GL_UNSIGNED_BYTE,
-					updated_img);
+					use_pbo ? NULL : updated_img);
 		} else if (h > 1) {
 			glTexSubImage2D(target, 0, tx, ty, tw, th,
 					srcFormat, GL_UNSIGNED_BYTE,
-					updated_img);
+					use_pbo ? NULL : updated_img);
 		} else if (w > 1) {
 			glTexSubImage1D(target, 0, tx, tw,
 					srcFormat, GL_UNSIGNED_BYTE,
-					updated_img);
+					use_pbo ? NULL : updated_img);
 		} else {
 			assert(!"Unknown image dimensions");
 		}
+
+		if (use_pbo)
+			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 		/* draw test image */
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -526,6 +547,8 @@ test_format(GLenum target, GLenum intFormat)
 	free(updated_img);
 	free(updated_ref);
 	free(testImg);
+	if (use_pbo)
+		glDeleteBuffers(1, &pbo);
 
 	return pass;
 }
@@ -640,29 +663,30 @@ piglit_init(int argc, char **argv)
 		GL_TEXTURE_CUBE_MAP_ARRAY_ARB,
 		GL_NONE
 	};
+	int remaining_argc = 1;
+	int i;
 
 	test_targets = core_targets;
 
-	if (argc > 1) {
-		if (!strcmp(argv[1], "array")) {
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "array")) {
 			piglit_require_extension("GL_EXT_texture_array");
 			piglit_require_GLSL();
 			test_targets = array_targets;
-		} else if (!strcmp(argv[1], "cube_map_array")) {
+		} else if (!strcmp(argv[i], "cube_map_array")) {
 			piglit_require_extension
 				("GL_ARB_texture_cube_map_array");
 			piglit_require_GLSL();
 			test_targets = cube_map_array_targets;
+		} else if (!strcmp(argv[i], "pbo")) {
+			piglit_require_extension("GL_ARB_pixel_buffer_object");
+			use_pbo = GL_TRUE;
 		} else {
-			goto handled_targets;
+			argv[remaining_argc++] = argv[i];
 		}
-
-		argc--;
-		argv++;
 	}
- handled_targets:
 
-	fbo_formats_init(argc, argv, 0);
+	fbo_formats_init(remaining_argc, argv, 0);
 	(void) fbo_formats_display;
 
 	piglit_ortho_projection(piglit_width, piglit_height, GL_FALSE);

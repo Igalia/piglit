@@ -2172,6 +2172,9 @@ add_plain_test(arb_pixel_buffer_object, ['pbo-readpixels-small'])
 add_plain_test(arb_pixel_buffer_object, ['pbo-teximage'])
 add_plain_test(arb_pixel_buffer_object, ['pbo-teximage-tiling'])
 add_plain_test(arb_pixel_buffer_object, ['pbo-teximage-tiling-2'])
+add_concurrent_test(arb_pixel_buffer_object, ['texsubimage', 'pbo'])
+add_concurrent_test(arb_pixel_buffer_object, ['texsubimage', 'array', 'pbo'])
+add_concurrent_test(arb_pixel_buffer_object, ['texsubimage', 'cube_map_array', 'pbo'])
 
 # Group ARB_provoking_vertex
 arb_provoking_vertex = {}
