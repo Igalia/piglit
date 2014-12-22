@@ -1,0 +1,55 @@
+# Test implicitly sized arrays match explicitly sized arrays
+# across the same stage.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+#version 150
+
+out ArrayInterfaceBlock
+{
+  vec4 a;
+} i;
+
+void main()
+{
+  gl_Position = vec4(1.0);
+}
+
+[geometry shader]
+#version 150
+
+layout(lines_adjacency) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in ArrayInterfaceBlock
+{
+  vec4 a;
+} i[4];
+
+void f()
+{
+  i[1].a = vec4(1, 0, 0, 1);
+}
+
+[geometry shader]
+#version 150
+
+in ArrayInterfaceBlock
+{
+  vec4 a;
+} i[];
+
+void f();
+
+void main()
+{
+  f();
+  i[3].a = vec4(1, 0, 0, 1);
+
+  gl_Position = i[3].a;
+}
+
+[test]
+link success
