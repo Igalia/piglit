@@ -31,13 +31,18 @@ def add_single_param_test_set(group, name, *params):
     for param in params:
         group[name + '-' + param] = PiglitGLTest(name + ' ' + param)
 
-def add_plain_test(group, args):
-    assert '/' not in args, args
-    group[args] = PiglitGLTest(args)
+def add_plain_test(group, args, **kwargs):
+    for a in args:
+        if isinstance(a, basestring):
+            assert '/' not in a, args
+
+    gname = ' '.join(args) 
+    assert not gname.startswith('/')
+
+    group[gname] = PiglitGLTest(args, **kwargs)
 
 def add_concurrent_test(group, args):
-    assert '/' not in args, args
-    group[args] = PiglitGLTest(args, run_concurrent=True)
+    add_plain_test(group, args, run_concurrent=True)
 
 # Generate all possible subsets of the given set, including the empty set.
 def power_set(s):
