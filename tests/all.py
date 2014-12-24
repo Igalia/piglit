@@ -428,7 +428,7 @@ add_concurrent_test(shaders, 'glsl-fs-texturecube-2')
 shaders['glsl-fs-texturecube-2-bias'] = PiglitGLTest('glsl-fs-texturecube-2 -bias',
                                                      run_concurrent=True)
 add_concurrent_test(shaders, 'glsl-fs-textureenvcolor-statechange')
-add_concurrent_test(shaders, 'glsl-fs-texture2drect');
+add_concurrent_test(shaders, 'glsl-fs-texture2drect')
 shaders['glsl-fs-texture2drect-proj3'] = PiglitGLTest('glsl-fs-texture2drect -proj3', run_concurrent=True)
 shaders['glsl-fs-texture2drect-proj4'] = PiglitGLTest('glsl-fs-texture2drect -proj4', run_concurrent=True)
 add_concurrent_test(shaders, 'glsl-fs-user-varying-ff')
@@ -562,7 +562,7 @@ glx['glx-query-drawable-GLX_PRESERVED_CONTENTS'] = PiglitGLTest('glx-query-drawa
 glx['glx-query-drawable-GLXBadDrawable'] = PiglitGLTest('glx-query-drawable --bad-drawable', require_platforms=['glx', 'mixed_glx_egl'])
 glx['extension string sanity'] = PiglitGLTest('glx-string-sanity', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
-import_context = {};
+import_context = {}
 glx['GLX_EXT_import_context'] = import_context
 import_context['free context'] = PiglitGLTest(['glx-free-context'], require_platforms=['glx', 'mixed_glx_egl'])
 import_context['get context ID'] = PiglitGLTest(['glx-get-context-id'], require_platforms=['glx', 'mixed_glx_egl'])
@@ -574,7 +574,7 @@ import_context['make current, multi process'] = PiglitGLTest(['glx-make-current-
 import_context['make current, single process'] = PiglitGLTest(['glx-make-current-single-process'], require_platforms=['glx', 'mixed_glx_egl'])
 import_context['query context info'] = PiglitGLTest(['glx-query-context-info-ext'], require_platforms=['glx', 'mixed_glx_egl'])
 
-create_context = {};
+create_context = {}
 glx['GLX_ARB_create_context'] = create_context
 create_context['current with no framebuffer'] = PiglitGLTest('glx-create-context-current-no-framebuffer', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context['default major version'] = PiglitGLTest('glx-create-context-default-major-version', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
@@ -589,23 +589,23 @@ create_context['empty attribute list'] = PiglitGLTest('glx-create-context-valid-
 create_context['NULL attribute list'] = PiglitGLTest('glx-create-context-valid-attribute-null', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context['forward-compatible flag with 3.0'] = PiglitGLTest('glx-create-context-valid-flag-forward-compatible', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
-create_context_profile = {};
+create_context_profile = {}
 glx['GLX_ARB_create_context_profile'] = create_context_profile
 create_context_profile['3.2 core profile required'] = PiglitGLTest('glx-create-context-core-profile', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context_profile['invalid profile'] = PiglitGLTest('glx-create-context-invalid-profile', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context_profile['pre-GL3.2 profile'] = PiglitGLTest('glx-create-context-pre-GL32-profile', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
-create_context_robustness = {};
+create_context_robustness = {}
 glx['GLX_ARB_create_context_robustness'] = create_context_robustness
 create_context_robustness['invalid reset notification strategy'] = PiglitGLTest('glx-create-context-invalid-reset-strategy', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context_robustness['require GL_ARB_robustness'] = PiglitGLTest('glx-create-context-require-robustness', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
-create_context_es2_profile = {};
+create_context_es2_profile = {}
 glx['GLX_EXT_create_context_es2_profile'] = create_context_es2_profile
 create_context_es2_profile['indirect rendering ES2 profile'] = PiglitGLTest('glx-create-context-indirect-es2-profile', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 create_context_es2_profile['invalid OpenGL ES version'] = PiglitGLTest('glx-create-context-invalid-es-version', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 
-oml_sync_control = {};
+oml_sync_control = {}
 glx['GLX_OML_sync_control'] = oml_sync_control
 oml_sync_control['glXGetMscRateOML'] = PiglitGLTest('glx-oml-sync-control-getmscrate', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
 oml_sync_control['swapbuffersmsc-divisor-zero'] = PiglitGLTest('glx-oml-sync-control-swapbuffersmsc-divisor-zero', run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
@@ -1064,7 +1064,7 @@ for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
 spec['glsl-1.10']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.10/minimum-maximums.txt')], run_concurrent=True)
 
 spec['glsl-1.10']['api'] = {}
-add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110');
+add_concurrent_test(spec['glsl-1.10']['api'], 'getactiveattrib 110')
 
 # Group spec/glsl-1.20
 spec['glsl-1.20'] = {}
@@ -1113,7 +1113,7 @@ add_recursion_test(rec, 'indirect-complex-separate')
 
 spec['glsl-1.20']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.20/minimum-maximums.txt')], run_concurrent=True)
 spec['glsl-1.20']['api'] = {}
-add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120');
+add_concurrent_test(spec['glsl-1.20']['api'], 'getactiveattrib 120')
 
 add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 1D')
 add_concurrent_test(spec['glsl-1.20']['execution'], 'tex-miplevel-selection GL2:texture() 2D')
@@ -1222,7 +1222,7 @@ add_concurrent_test(spec['glsl-1.30']['execution'], 'fs-execution-ordering')
 
 spec['glsl-1.30']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.30/minimum-maximums.txt')], run_concurrent=True)
 spec['glsl-1.30']['api'] = {}
-add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130');
+add_concurrent_test(spec['glsl-1.30']['api'], 'getactiveattrib 130')
 
 add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 1D')
 add_concurrent_test(spec['glsl-1.30']['execution'], 'tex-miplevel-selection textureLod 2D')
@@ -2087,7 +2087,7 @@ add_plain_test(arb_pixel_buffer_object, 'pbo-teximage-tiling-2')
 
 # Group ARB_provoking_vertex
 arb_provoking_vertex = {}
-spec['ARB_provoking_vertex'] = arb_provoking_vertex;
+spec['ARB_provoking_vertex'] = arb_provoking_vertex
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-control')
 add_plain_test(arb_provoking_vertex, 'arb-provoking-vertex-initial')
 add_plain_test(arb_provoking_vertex, 'arb-quads-follow-provoking-vertex')
@@ -2904,7 +2904,7 @@ add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-fbo-cubem
 add_plain_test(arb_texture_cube_map_array, 'arb_texture_cube_map_array-sampler-cube-array-shadow')
 add_concurrent_test(arb_texture_cube_map_array, 'getteximage-targets CUBE_ARRAY')
 add_concurrent_test(arb_texture_cube_map_array, 'glsl-resource-not-bound CubeArray')
-textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray', 'samplerCubeArrayShadow' ];
+textureSize_samplers_atcma = ['samplerCubeArray', 'isamplerCubeArray', 'usamplerCubeArray', 'samplerCubeArrayShadow' ]
 add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array')
 add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array RGB9_E5')
 add_concurrent_test(arb_texture_cube_map_array, 'fbo-generatemipmap-cubemap array S3TC_DXT1')
@@ -4210,7 +4210,7 @@ egl_nok_texture_from_pixmap = {}
 spec['EGL_NOK_texture_from_pixmap'] = egl_nok_texture_from_pixmap
 egl_nok_texture_from_pixmap['basic'] = PiglitGLTest('egl-nok-texture-from-pixmap', exclude_platforms=['glx'])
 
-egl_khr_create_context = {};
+egl_khr_create_context = {}
 spec['EGL_KHR_create_context'] = egl_khr_create_context
 egl_khr_create_context['default major version GLES'] = PiglitGLTest('egl-create-context-default-major-version-gles', exclude_platforms=['glx'])
 egl_khr_create_context['default major version GL'] = PiglitGLTest('egl-create-context-default-major-version-gl', exclude_platforms=['glx'])
