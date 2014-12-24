@@ -14,6 +14,7 @@ out ArrayInterfaceBlock
 
 void main()
 {
+  i.a = vec4(1.0);
   gl_Position = vec4(1.0);
 }
 
@@ -28,9 +29,9 @@ in ArrayInterfaceBlock
   vec4 a;
 } i[4];
 
-void f()
+vec4 f()
 {
-  i[1].a = vec4(1, 0, 0, 1);
+  return i[1].a;
 }
 
 [geometry shader]
@@ -41,14 +42,11 @@ in ArrayInterfaceBlock
   vec4 a;
 } i[];
 
-void f();
+vec4 f();
 
 void main()
 {
-  f();
-  i[3].a = vec4(1, 0, 0, 1);
-
-  gl_Position = i[3].a;
+  gl_Position = i[3].a + f();
 }
 
 [test]
