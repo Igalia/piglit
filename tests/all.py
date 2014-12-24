@@ -9,6 +9,7 @@ import platform
 import subprocess
 import sys
 
+from framework import grouptools
 from framework.profile import TestProfile
 from framework.test import (PiglitGLTest, GleanTest,
                             add_glsl_parser_test, import_glsl_parser_tests,
@@ -336,23 +337,24 @@ for pairs in [(['glsl1'], glean_glsl_tests),
               (['fragProg1'], glean_fp_tests),
               (['vertProg1'], glean_vp_tests)]:
     for prefix, name in itertools.product(*pairs):
-        groupname = "glean/{0}-{1}".format(prefix, name)
+        groupname = grouptools.join('glean', '{0}-{1}'.format(prefix, name))
         profile.tests[groupname] = GleanTest(prefix)
         profile.tests[groupname].env['PIGLIT_TEST'] = name
 
 def add_fbo_formats_tests(path, extension, suffix=''):
-    profile.tests[path + '/fbo-generatemipmap-formats' + suffix] = \
+    path = grouptools.from_path(path)
+    profile.tests[grouptools.join(path, 'fbo-generatemipmap-formats' + suffix)] = \
         PiglitGLTest(['fbo-generatemipmap-formats', extension], run_concurrent=True)
-    profile.tests[path + '/fbo-clear-formats' + suffix] = \
+    profile.tests[grouptools.join(path, 'fbo-clear-formats' + suffix)] = \
         PiglitGLTest(['fbo-clear-formats', extension], run_concurrent=True)
-    profile.tests[path + '/get-renderbuffer-internalformat' + suffix] = \
+    profile.tests[grouptools.join(path, 'get-renderbuffer-internalformat' + suffix)] = \
         PiglitGLTest(['get-renderbuffer-internalformat', extension], run_concurrent=True)
     if 'depth' not in extension:
-        profile.tests[path + '/fbo-blending-formats' + suffix] = \
+        profile.tests[grouptools.join(path, 'fbo-blending-formats' + suffix)] = \
             PiglitGLTest(['fbo-blending-formats', extension], run_concurrent=True)
-        profile.tests[path + '/fbo-alphatest-formats' + suffix] = \
+        profile.tests[grouptools.join(path, 'fbo-alphatest-formats' + suffix)] = \
             PiglitGLTest(['fbo-alphatest-formats', extension], run_concurrent=True)
-        profile.tests[path + '/fbo-colormask-formats' + suffix] = \
+        profile.tests[grouptools.join(path, 'fbo-colormask-formats' + suffix)] = \
             PiglitGLTest(['fbo-colormask-formats', extension], run_concurrent=True)
 
 def add_msaa_formats_tests(group, extension):
@@ -1038,54 +1040,52 @@ add_concurrent_test(gl32, ['glsl-resource-not-bound', '2DMS'])
 add_concurrent_test(gl32, ['glsl-resource-not-bound', '2DMSArray'])
 add_concurrent_test(gl32, ['glsl-resource-not-bound', 'Buffer'])
 add_concurrent_test(gl32, ['glsl-resource-not-bound', 'Cube'])
-spec['!OpenGL 3.2/gl_VertexID used with glMultiDrawElementsBaseVertex'] = PiglitGLTest(['gl-3.2-basevertex-vertexid'], run_concurrent=True)
-spec['!OpenGL 3.2/minmax'] = PiglitGLTest(['gl-3.2-minmax'], run_concurrent=True)
-spec['!OpenGL 3.2/clear-no-buffers'] = PiglitGLTest(['gl-3.2-clear-no-buffers'], run_concurrent=True)
-spec['!OpenGL 3.2/depth-tex-sampling'] = PiglitGLTest(['gl-3.2-depth-tex-sampling'], run_concurrent=True)
-spec['!OpenGL 3.2/get-buffer-parameter-i64v'] = PiglitGLTest(['gl-3.2-get-buffer-parameter-i64v'], run_concurrent=True)
-spec['!OpenGL 3.2/get-integer-64iv'] = PiglitGLTest(['gl-3.2-get-integer-64iv'], run_concurrent=True)
-spec['!OpenGL 3.2/get-integer-64v'] = PiglitGLTest(['gl-3.2-get-integer-64v'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/blit'] = PiglitGLTest(['gl-3.2-layered-rendering-blit'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/clear-color'] = PiglitGLTest(['gl-3.2-layered-rendering-clear-color'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'gl_VertexID used with glMultiDrawElementsBaseVertex')] = PiglitGLTest(['gl-3.2-basevertex-vertexid'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'minmax')] = PiglitGLTest(['gl-3.2-minmax'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'clear-no-buffers')] = PiglitGLTest(['gl-3.2-clear-no-buffers'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'depth-tex-sampling')] = PiglitGLTest(['gl-3.2-depth-tex-sampling'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'get-buffer-parameter-i64v')] = PiglitGLTest(['gl-3.2-get-buffer-parameter-i64v'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'get-integer-64iv')] = PiglitGLTest(['gl-3.2-get-integer-64iv'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'get-integer-64v')] = PiglitGLTest(['gl-3.2-get-integer-64v'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'blit')] = PiglitGLTest(['gl-3.2-layered-rendering-blit'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'clear-color')] = PiglitGLTest(['gl-3.2-layered-rendering-clear-color'], run_concurrent=True)
 for texture_type in ['3d', '2d_array', '2d_multisample_array', '1d_array',
                      'cube_map', 'cube_map_array']:
     for test_type in ['single_level', 'mipmapped']:
         if texture_type == '2d_multisample_array' and test_type == 'mipmapped':
             continue
-        cmdline = 'clear-color-all-types {0} {1}'.format(
-            texture_type, test_type)
-        spec['!OpenGL 3.2/layered-rendering/' + cmdline] = \
+        spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'clear-color-all-types {} {}'.format(texture_type, test_type))] = \
             PiglitGLTest(['gl-3.2-layered-rendering-clear-color-all-types', texture_type, test_type], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/clear-color-mismatched-layer-count'] = PiglitGLTest(['gl-3.2-layered-rendering-clear-color-mismatched-layer-count'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/clear-depth'] = PiglitGLTest(['gl-3.2-layered-rendering-clear-depth'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffertexture'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffertexture-buffer-textures'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture-buffer-textures'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffertexture-defaults'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture-defaults'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/readpixels'] = PiglitGLTest(['gl-3.2-layered-rendering-readpixels'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-attachment-mismatch'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-attachment-mismatch'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-complete'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-complete'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffer-layer-count-mismatch'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-count-mismatch'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/framebuffer-layered-attachments'] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layered-attachments'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/gl-layer'] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/gl-layer-cube-map'] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-cube-map'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/gl-layer-not-layered'] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-not-layered'], run_concurrent=True)
-spec['!OpenGL 3.2/layered-rendering/gl-layer-render'] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-render'], run_concurrent=True)
-spec['!OpenGL 3.2/pointsprite-coord'] = PiglitGLTest(['gl-3.2-pointsprite-coord'], run_concurrent=True)
-spec['!OpenGL 3.2/pointsprite-origin'] = PiglitGLTest(['gl-3.2-pointsprite-origin'], run_concurrent=True)
-spec['!OpenGL/coord-replace-doesnt-eliminate-frag-tex-coords'] = PiglitGLTest(['gl-coord-replace-doesnt-eliminate-frag-tex-coords'], run_concurrent=True)
-spec['!OpenGL/get-active-attrib-returns-all-inputs'] = PiglitGLTest(['gl-get-active-attrib-returns-all-inputs'], run_concurrent=True)
-spec['!OpenGL 3.2/texture-border-deprecated'] = PiglitGLTest(['gl-3.2-texture-border-deprecated'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'clear-color-mismatched-layer-count')] = PiglitGLTest(['gl-3.2-layered-rendering-clear-color-mismatched-layer-count'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'clear-depth')] = PiglitGLTest(['gl-3.2-layered-rendering-clear-depth'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffertexture')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffertexture-buffer-textures')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture-buffer-textures'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffertexture-defaults')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffertexture-defaults'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'readpixels')] = PiglitGLTest(['gl-3.2-layered-rendering-readpixels'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffer-layer-attachment-mismatch')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-attachment-mismatch'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffer-layer-complete')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-complete'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffer-layer-count-mismatch')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layer-count-mismatch'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'framebuffer-layered-attachments')] = PiglitGLTest(['gl-3.2-layered-rendering-framebuffer-layered-attachments'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'gl-layer')] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'gl-layer-cube-map')] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-cube-map'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'gl-layer-not-layered')] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-not-layered'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'layered-rendering', 'gl-layer-render')] = PiglitGLTest(['gl-3.2-layered-rendering-gl-layer-render'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'pointsprite-coord')] = PiglitGLTest(['gl-3.2-pointsprite-coord'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'pointsprite-origin')] = PiglitGLTest(['gl-3.2-pointsprite-origin'], run_concurrent=True)
+spec[grouptools.join('!OpenGL', 'coord-replace-doesnt-eliminate-frag-tex-coords')] = PiglitGLTest(['gl-coord-replace-doesnt-eliminate-frag-tex-coords'], run_concurrent=True)
+spec[grouptools.join('!OpenGL', 'get-active-attrib-returns-all-inputs')] = PiglitGLTest(['gl-get-active-attrib-returns-all-inputs'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.2', 'texture-border-deprecated')] = PiglitGLTest(['gl-3.2-texture-border-deprecated'], run_concurrent=True)
 
-spec['!OpenGL 3.3/minmax'] = PiglitGLTest(['gl-3.3-minmax'], run_concurrent=True)
-spec['!OpenGL 3.3/required-renderbuffer-attachment-formats'] = PiglitGLTest(['gl-3.0-required-renderbuffer-attachment-formats', '33'], run_concurrent=True)
-spec['!OpenGL 3.3/required-sized-texture-formats'] = PiglitGLTest(['gl-3.0-required-sized-texture-formats', '33'], run_concurrent=True)
-spec['!OpenGL 3.3/required-texture-attachment-formats'] = PiglitGLTest(['gl-3.0-required-texture-attachment-formats', '33'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.3', 'minmax')] = PiglitGLTest(['gl-3.3-minmax'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.3', 'required-renderbuffer-attachment-formats')] = PiglitGLTest(['gl-3.0-required-renderbuffer-attachment-formats', '33'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.3', 'required-sized-texture-formats')] = PiglitGLTest(['gl-3.0-required-sized-texture-formats', '33'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 3.3', 'required-texture-attachment-formats')] = PiglitGLTest(['gl-3.0-required-texture-attachment-formats', '33'], run_concurrent=True)
 
-spec['!OpenGL 4.2/required-renderbuffer-attachment-formats'] = PiglitGLTest(['gl-3.0-required-renderbuffer-attachment-formats', '42'], run_concurrent=True)
-spec['!OpenGL 4.2/required-sized-texture-formats'] = PiglitGLTest(['gl-3.0-required-sized-texture-formats', '42'], run_concurrent=True)
-spec['!OpenGL 4.2/required-texture-attachment-formats'] = PiglitGLTest(['gl-3.0-required-texture-attachment-formats', '42'], run_concurrent=True)
-spec['!OpenGL 4.4/gl-max-vertex-attrib-stride'] = PiglitGLTest(['gl-4.4-max_vertex_attrib_stride'], run_concurrent=True)
-spec['!OpenGL 4.4/tex-errors'] = PiglitGLTest(['tex-errors'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 4.2', 'required-renderbuffer-attachment-formats')] = PiglitGLTest(['gl-3.0-required-renderbuffer-attachment-formats', '42'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 4.2', 'required-sized-texture-formats')] = PiglitGLTest(['gl-3.0-required-sized-texture-formats', '42'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 4.2', 'required-texture-attachment-formats')] = PiglitGLTest(['gl-3.0-required-texture-attachment-formats', '42'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 4.4', 'gl-max-vertex-attrib-stride')] = PiglitGLTest(['gl-4.4-max_vertex_attrib_stride'], run_concurrent=True)
+spec[grouptools.join('!OpenGL 4.4', 'tex-errors')] = PiglitGLTest(['tex-errors'], run_concurrent=True)
 
 # Group spec/glsl-es-1.00
 spec['glsl-es-1.00'] = {}
@@ -1233,26 +1233,30 @@ for stage in ['vs', 'gs', 'fs']:
         version = '1.30'
     # textureSize():
     for sampler in textureSize_samplers_130:
-        spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
-                version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'textureSize',
+            '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['textureSize', stage, sampler],
                 run_concurrent=True)
     # texelFetch():
     for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray', 'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D', 'isampler1DArray', 'isampler2DArray', 'usampler1D', 'usampler2D', 'usampler3D', 'usampler1DArray', 'usampler2DArray']:
-        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
-                version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'texelFetch',
+            '{}-texelFetch-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', stage, sampler],
                 run_concurrent=True)
-        spec['glsl-{0}/execution/texelFetchOffset/{1}-texelFetch-{2}'.format(
-                version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'texelFetchOffset',
+            '{}-texelFetch-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', 'offset', stage, sampler],
                 run_concurrent=True)
     # texelFetch() with EXT_texture_swizzle mode "b0r1":
     for type in ['i', 'u', '']:
-        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}sampler2Darray-swizzle'.format(
-                version, stage, type)] = PiglitGLTest(
-                    ['texelFetch', stage, '{}sampler2DArray'.format(type), 'b0r1'],
-                    run_concurrent=True)
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'texelFetch',
+            '{}-texelFetch-{}sampler2Darray-swizzle'.format(stage, type))] = PiglitGLTest(
+                ['texelFetch', stage, '{}sampler2DArray'.format(type), 'b0r1'],
+                run_concurrent=True)
 
 add_concurrent_test(spec['glsl-1.30']['execution'], ['texelFetch', 'fs', 'sampler1D', '1-513'])
 add_concurrent_test(spec['glsl-1.30']['execution'], ['texelFetch', 'fs', 'sampler1DArray', '1x71-501x71'])
@@ -1492,18 +1496,21 @@ for stage in ['vs', 'gs', 'fs']:
         version = '1.40'
     # textureSize():
     for sampler in textureSize_samplers_140:
-        spec['glsl-{0}/execution/textureSize/{1}-textureSize-{2}'.format(
-            version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'textureSize',
+            '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['textureSize', '140', stage, sampler],
                 run_concurrent=True)
     # texelFetch():
     for sampler in ['sampler2DRect', 'usampler2DRect', 'isampler2DRect']:
-        spec['glsl-{0}/execution/texelFetch/{1}-texelFetch-{2}'.format(
-            version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'texelFetch',
+            '{}-texelFetch-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', '140', stage, sampler],
                 run_concurrent=True)
-        spec['glsl-{0}/execution/texelFetchOffset/{1}-{2}'.format(
-            version, stage, sampler)] = PiglitGLTest(
+        spec[grouptools.join(
+            'glsl-{}'.format(version), 'execution', 'texelFetchOffset',
+            '{}-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', 'offset,' '140', stage, sampler],
                 run_concurrent=True)
 
@@ -1608,8 +1615,8 @@ spec['glsl-es-3.00']['built-in constants'] = PiglitGLTest(
      os.path.join(testsDir, 'spec', 'glsl-es-3.00', 'minimum-maximums.txt')], run_concurrent=True)
 
 # AMD_performance_monitor
-profile.test_list['spec/AMD_performance_monitor/api'] = PiglitGLTest(['amd_performance_monitor_api'])
-profile.test_list['spec/AMD_performance_monitor/measure'] = PiglitGLTest(['amd_performance_monitor_measure'])
+profile.test_list[grouptools.join('spec', 'AMD_performance_monitor', 'api')] = PiglitGLTest(['amd_performance_monitor_api'])
+profile.test_list[grouptools.join('spec', 'AMD_performance_monitor', 'measure')] = PiglitGLTest(['amd_performance_monitor_measure'])
 
 # Group AMD_conservative_depth
 spec['AMD_conservative_depth'] = {}
@@ -1672,16 +1679,17 @@ spec['ARB_texture_multisample'] = arb_texture_multisample
 add_concurrent_test(arb_texture_multisample, ['arb_texture_multisample-minmax'])
 for sample_count in MSAA_SAMPLE_COUNTS:
     # fb-completeness
-    spec['ARB_texture_multisample/fb-completeness/%d' % (sample_count,)] = \
+    spec[grouptools.join('ARB_texture_multisample', 'fb-completeness', sample_count)] = \
         PiglitGLTest(['arb_texture_multisample-fb-completeness', sample_count], run_concurrent=True)
     # texel-fetch execution
     for stage in ['vs', 'gs', 'fs']:
         for sampler in samplers_atm:
-            spec['ARB_texture_multisample/texelFetch/%d-%s-%s' % (
-                sample_count, stage, sampler)] = \
-                PiglitGLTest(['texelFetch', stage, sampler, sample_count], run_concurrent=True)
+            spec[grouptools.join(
+                'ARB_texture_multisample', 'texelFetch',
+                '{}-{}-{}'.format(sample_count, stage, sampler))] = \
+                    PiglitGLTest(['texelFetch', stage, sampler, sample_count], run_concurrent=True)
     # sample positions
-    spec['ARB_texture_multisample/sample-position/%d' % (sample_count,)] = \
+    spec[grouptools.join('ARB_texture_multisample', 'sample-position', sample_count)] = \
         PiglitGLTest(['arb_texture_multisample-sample-position', sample_count], run_concurrent=True)
 add_concurrent_test(arb_texture_multisample, ['texelFetch', 'fs', 'sampler2DMS', '4', '1x71-501x71'])
 add_concurrent_test(arb_texture_multisample, ['texelFetch', 'fs', 'sampler2DMS', '4', '1x130-501x130'])
@@ -1707,7 +1715,7 @@ add_concurrent_test(arb_texture_multisample, ['arb_texture_multisample-sample-de
 for stage in ['vs', 'gs', 'fs']:
     # textureSize():
     for sampler in samplers_atm:
-        spec['ARB_texture_multisample/textureSize/' + stage + '-textureSize-' + sampler] = \
+        spec[grouptools.join('ARB_texture_multisample', 'textureSize', '{}-textureSize-{}'.format(stage, sampler))] = \
             PiglitGLTest(['textureSize', stage, sampler], run_concurrent=True)
 
 # Group ARB_texture_gather
@@ -1719,16 +1727,16 @@ for stage in ['vs', 'fs']:
             for type in ['unorm', 'float', 'int', 'uint']:
                 for sampler in ['2D', '2DArray', 'Cube', 'CubeArray']:
                     for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset']:
-                        testname = '%s/%s-%s-%s-%s-%s' % (
-                            func, stage, comps,
-                            swiz if len(swiz) else 'none',
-                            type, sampler)
-                        cmd = 'textureGather %s %s %s %s %s %s' % (
-                            stage,
+                        testname = grouptools.join(
+                            func,
+                            '{}-{}-{}-{}-{}'.format(
+                                stage, comps,
+                                swiz if len(swiz) else 'none',
+                                type, sampler))
+                        cmd = ['textureGather', stage,
                             'offset' if func == 'textureGatherOffset' else '',
-                            comps, swiz, type, sampler
-                            )
-                        arb_texture_gather[testname] = PiglitGLTest(cmd.split(), run_concurrent=True)
+                            comps, swiz, type, sampler]
+                        arb_texture_gather[testname] = PiglitGLTest(cmd, run_concurrent=True)
 
 # Group AMD_shader_stencil_export
 spec['AMD_shader_stencil_export'] = {}
@@ -1742,7 +1750,7 @@ import_glsl_parser_tests(spec['ARB_shader_stencil_export'],
                          os.path.join(testsDir, 'spec', 'arb_shader_stencil_export'),
                          [''])
 
-profile.test_list['spec/ARB_stencil_texturing/draw'] = PiglitGLTest(['arb_stencil_texturing-draw'], run_concurrent=True)
+profile.test_list[grouptools.join('spec', 'ARB_stencil_texturing', 'draw')] = PiglitGLTest(['arb_stencil_texturing-draw'], run_concurrent=True)
 
 # Group ARB_sync
 arb_sync = {}
@@ -1771,7 +1779,7 @@ add_plain_test(arb_es2_compatibility, ['arb_es2_compatibility-fixed-type'])
 add_plain_test(arb_es2_compatibility, ['fbo-missing-attachment-clear'])
 arb_es2_compatibility['FBO blit to missing attachment (ES2 completeness rules)'] = PiglitGLTest(['fbo-missing-attachment-blit', 'es2', 'to'], run_concurrent=True)
 arb_es2_compatibility['FBO blit from missing attachment (ES2 completeness rules)'] = PiglitGLTest(['fbo-missing-attachment-blit', 'es2', 'from'], run_concurrent=True)
-add_fbo_formats_tests('spec/ARB_ES2_compatibility', 'GL_ARB_ES2_compatibility')
+add_fbo_formats_tests(os.path.join('spec', 'ARB_ES2_compatibility'), 'GL_ARB_ES2_compatibility')
 add_texwrap_format_tests(arb_es2_compatibility, 'GL_ARB_ES2_compatibility')
 arb_es2_compatibility['NUM_SHADER_BINARY_FORMATS over-run check'] = PiglitGLTest(['arb_get_program_binary-overrun', 'shader'], run_concurrent=True)
 
@@ -1980,10 +1988,9 @@ for stage in ['vs', 'fs']:
             for cs in [0, 1, 2, 3][:len(comps)]:
                 for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
                     for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
-                        testname = '%s/%s-%s-%s-%s-%s' % (
-                                func, stage, comps,
-                                cs,
-                                type, sampler)
+                        testname = grouptools.join(
+                            func, '{}-{}-{}-{}-{}'.format(
+                                stage, comps, cs, type, sampler))
                         address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
                         cmd = ['textureGather', stage,
                                 'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
@@ -1992,17 +1999,17 @@ for stage in ['vs', 'fs']:
 
                         if func == 'textureGatherOffset':
                             # also add a constant offset version.
-                            testname = '%s/%s-%s-%s-%s-%s-const' % (
-                                    func, stage, comps,
-                                    cs,
-                                    type, sampler)
+                            testname = grouptools.join(
+                                func, '{}-{}-{}-{}-{}-const'.format(
+                                    stage, comps, cs, type, sampler))
                             cmd = ['textureGather', stage, 'offset',
                                     comps, str(cs), type, sampler, address_mode]
                             arb_gpu_shader5[testname] = PiglitGLTest(cmd, run_concurrent=True)
     # test shadow samplers
     for sampler in ['2D', '2DArray', 'Cube', 'CubeArray', '2DRect']:
         for func in ['textureGather'] if 'Cube' in sampler else ['textureGather', 'textureGatherOffset', 'textureGatherOffsets' ]:
-            testname = '%s/%s-r-none-shadow-%s' % (func, stage, sampler)
+            testname = grouptools.join(func, '{}-r-none-shadow-{}'.format(
+                stage, sampler))
             address_mode = 'clamp' if sampler == '2DRect' else 'repeat'
             cmd = ['textureGather', stage, 'shadow', 'r',
                     'offsets' if func == 'textureGatherOffsets' else 'nonconst' if func == 'textureGatherOffset' else '',
@@ -2436,7 +2443,7 @@ add_color_buffer_float_test('render', 'GL_RGBA32F', 'sanity', 'fog')
 
 arb_depth_texture = {}
 spec['ARB_depth_texture'] = arb_depth_texture
-add_fbo_formats_tests('spec/ARB_depth_texture', 'GL_ARB_depth_texture')
+add_fbo_formats_tests(grouptools.join('spec', 'ARB_depth_texture'), 'GL_ARB_depth_texture')
 add_texwrap_format_tests(arb_depth_texture, 'GL_ARB_depth_texture')
 add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT16')
 add_fbo_depth_tests(arb_depth_texture, 'GL_DEPTH_COMPONENT24')
@@ -2452,7 +2459,7 @@ add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH_COMPONENT32F')
 add_fbo_depth_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_stencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8')
 add_fbo_depthstencil_tests(arb_depth_buffer_float, 'GL_DEPTH32F_STENCIL8', 0)
-add_fbo_formats_tests('spec/ARB_depth_buffer_float', 'GL_ARB_depth_buffer_float')
+add_fbo_formats_tests(grouptools.join('spec', 'ARB_depth_buffer_float'), 'GL_ARB_depth_buffer_float')
 add_texwrap_format_tests(arb_depth_buffer_float, 'GL_ARB_depth_buffer_float')
 add_depthstencil_render_miplevels_tests(
         arb_depth_buffer_float,
@@ -2496,8 +2503,8 @@ add_plain_test(apple_vertex_array_object, ['vao-01'])
 add_plain_test(apple_vertex_array_object, ['vao-02'])
 apple_vertex_array_object['isvertexarray'] = PiglitGLTest(['arb_vertex_array-isvertexarray', 'apple'], run_concurrent=True)
 
-profile.test_list['spec/ARB_vertex_array_bgra/api-errors'] = PiglitGLTest(['arb_vertex_array_bgra-api-errors'])
-profile.test_list['spec/ARB_vertex_array_bgra/get'] = PiglitGLTest(['arb_vertex_array_bgra-get'])
+profile.test_list[grouptools.join('spec', 'ARB_vertex_array_bgra', 'api-errors')] = PiglitGLTest(['arb_vertex_array_bgra-api-errors'])
+profile.test_list[grouptools.join('spec', 'ARB_vertex_array_bgra', 'get')] = PiglitGLTest(['arb_vertex_array_bgra-get'])
 
 arb_vertex_array_object = {}
 spec['ARB_vertex_array_object'] = arb_vertex_array_object
@@ -2893,7 +2900,7 @@ spec['EXT_packed_depth_stencil'] = ext_packed_depth_stencil
 add_fbo_depth_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_stencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8')
 add_fbo_depthstencil_tests(ext_packed_depth_stencil, 'GL_DEPTH24_STENCIL8', 0)
-add_fbo_formats_tests('spec/EXT_packed_depth_stencil', 'GL_EXT_packed_depth_stencil')
+add_fbo_formats_tests(grouptools.join('spec', 'EXT_packed_depth_stencil'), 'GL_EXT_packed_depth_stencil')
 add_texwrap_format_tests(ext_packed_depth_stencil, 'GL_EXT_packed_depth_stencil')
 ext_packed_depth_stencil['readpixels-24_8'] = PiglitGLTest(['ext_packed_depth_stencil-readpixels-24_8'])
 add_plain_test(ext_packed_depth_stencil, ['fbo-blit-d24s8'])
@@ -2972,7 +2979,9 @@ import_glsl_parser_tests(arb_texture_cube_map_array,
 for stage in ['vs', 'gs', 'fs']:
     # textureSize():
     for sampler in textureSize_samplers_atcma:
-        spec['ARB_texture_cube_map_array/textureSize/' + stage + '-textureSize-' + sampler] = \
+        spec[grouptools.join('ARB_texture_cube_map_array',
+                             'textureSize',
+                             '{}-textureSize-{}'.format(stage, sampler))] = \
             PiglitGLTest(['textureSize', stage, sampler], run_concurrent=True)
 
 ext_texture_swizzle = {}
@@ -3027,7 +3036,7 @@ ati_texture_compression_3dc['invalid formats'] = PiglitGLTest(['arb_texture_comp
 
 ext_packed_float = {}
 spec['EXT_packed_float'] = ext_packed_float
-add_fbo_formats_tests('spec/EXT_packed_float', 'GL_EXT_packed_float')
+add_fbo_formats_tests(grouptools.join('spec', 'EXT_packed_float'), 'GL_EXT_packed_float')
 add_texwrap_format_tests(ext_packed_float, 'GL_EXT_packed_float')
 ext_packed_float['pack'] = PiglitGLTest(['ext_packed_float-pack'], run_concurrent=True)
 ext_packed_float['getteximage-invalid-format-for-packed-type'] = PiglitGLTest(['getteximage-invalid-format-for-packed-type'], run_concurrent=True)
@@ -3035,7 +3044,7 @@ add_msaa_formats_tests(ext_packed_float, 'GL_EXT_packed_float')
 
 arb_texture_float = {}
 spec['ARB_texture_float'] = arb_texture_float
-add_fbo_formats_tests('spec/ARB_texture_float', 'GL_ARB_texture_float')
+add_fbo_formats_tests(grouptools.join('spec', 'ARB_texture_float'), 'GL_ARB_texture_float')
 add_texwrap_format_tests(arb_texture_float, 'GL_ARB_texture_float')
 add_plain_test(arb_texture_float, ['arb_texture_float-texture-float-formats'])
 add_msaa_formats_tests(arb_texture_float, 'GL_ARB_texture_float')
@@ -3072,8 +3081,8 @@ spec['ARB_texture_rg'] = arb_texture_rg
 add_shader_test_dir(arb_texture_rg,
                     os.path.join(testsDir, 'spec', 'arb_texture_rg', 'execution'),
                     recursive=True)
-add_fbo_formats_tests('spec/ARB_texture_rg', 'GL_ARB_texture_rg')
-add_fbo_formats_tests('spec/ARB_texture_rg', 'GL_ARB_texture_rg-float', '-float')
+add_fbo_formats_tests(grouptools.join('spec', 'ARB_texture_rg'), 'GL_ARB_texture_rg')
+add_fbo_formats_tests(grouptools.join('spec', 'ARB_texture_rg'), 'GL_ARB_texture_rg-float', '-float')
 # unsupported for int yet
 #add_fbo_clear_extension(arb_texture_rg, 'GL_ARB_texture_rg-int', 'fbo-clear-formats-int')
 add_msaa_formats_tests(arb_texture_rg, 'GL_ARB_texture_rg')
@@ -3106,7 +3115,7 @@ add_texwrap_format_tests(ext_texture_shared_exponent, 'GL_EXT_texture_shared_exp
 
 ext_texture_snorm = {}
 spec['EXT_texture_snorm'] = ext_texture_snorm
-add_fbo_formats_tests('spec/EXT_texture_snorm', 'GL_EXT_texture_snorm')
+add_fbo_formats_tests(grouptools.join('spec', 'EXT_texture_snorm'), 'GL_EXT_texture_snorm')
 add_msaa_formats_tests(ext_texture_snorm, 'GL_EXT_texture_snorm')
 add_texwrap_format_tests(ext_texture_snorm, 'GL_EXT_texture_snorm')
 
@@ -3363,10 +3372,10 @@ arb_uniform_buffer_object['layout-std140'] = PiglitGLTest(['arb_uniform_buffer_o
 arb_uniform_buffer_object['layout-std140-base-size-and-alignment'] = PiglitGLTest(['arb_uniform_buffer_object-layout-std140-base-size-and-alignment'], run_concurrent=True)
 arb_uniform_buffer_object['link-mismatch-blocks'] = PiglitGLTest(['arb_uniform_buffer_object-link-mismatch-blocks'], run_concurrent=True)
 arb_uniform_buffer_object['maxblocks'] = PiglitGLTest(['arb_uniform_buffer_object-maxblocks'], run_concurrent=True)
-arb_uniform_buffer_object['maxuniformblocksize/vs'] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'vs'], run_concurrent=True)
-arb_uniform_buffer_object['maxuniformblocksize/vsexceed'] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'vsexceed'], run_concurrent=True)
-arb_uniform_buffer_object['maxuniformblocksize/fs'] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'fs'], run_concurrent=True)
-arb_uniform_buffer_object['maxuniformblocksize/fsexceed'] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'fsexceed'], run_concurrent=True)
+arb_uniform_buffer_object[grouptools.join('maxuniformblocksize', 'vs')] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'vs'], run_concurrent=True)
+arb_uniform_buffer_object[grouptools.join('maxuniformblocksize', 'vsexceed')] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'vsexceed'], run_concurrent=True)
+arb_uniform_buffer_object[grouptools.join('maxuniformblocksize', 'fs')] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'fs'], run_concurrent=True)
+arb_uniform_buffer_object[grouptools.join('maxuniformblocksize', 'fsexceed')] = PiglitGLTest(['arb_uniform_buffer_object-maxuniformblocksize', 'fsexceed'], run_concurrent=True)
 arb_uniform_buffer_object['minmax'] = PiglitGLTest(['arb_uniform_buffer_object-minmax'], run_concurrent=True)
 arb_uniform_buffer_object['negative-bindbuffer-index'] = PiglitGLTest(['arb_uniform_buffer_object-negative-bindbuffer-index'], run_concurrent=True)
 arb_uniform_buffer_object['negative-bindbuffer-target'] = PiglitGLTest(['arb_uniform_buffer_object-negative-bindbuffer-target'], run_concurrent=True)
@@ -3728,7 +3737,7 @@ arb_compute_shader = {}
 spec['ARB_compute_shader'] = arb_compute_shader
 arb_compute_shader['api_errors'] = PiglitGLTest(['arb_compute_shader-api_errors'], run_concurrent=True)
 arb_compute_shader['minmax'] = PiglitGLTest(['arb_compute_shader-minmax'], run_concurrent=True)
-arb_compute_shader['compiler/work_group_size_too_large'] = \
+arb_compute_shader[grouptools.join('compiler', 'work_group_size_too_large')] = \
     PiglitGLTest(['arb_compute_shader-work_group_size_too_large'], run_concurrent=True)
 add_shader_test_dir(spec['ARB_compute_shader'],
                     os.path.join(testsDir, 'spec', 'arb_compute_shader'),
@@ -3757,7 +3766,7 @@ for filename in os.listdir(os.path.join(testsDir, 'glslparsertest', 'glsl2')):
         add_glsl_parser_test(
             glslparsertest,
             os.path.join(testsDir, 'glslparsertest', 'glsl2', filename), 
-            'glsl2/' + filename)  # this is the name of the test
+            grouptools.join('glsl2', filename))
 # end group glslparsertest ---------------------------------------------------
 
 hiz = {}
@@ -3801,7 +3810,7 @@ add_plain_test(fast_color_clear, ['fcc-read-to-pbo-after-clear'])
 
 asmparsertest = {}
 def add_asmparsertest(group, shader):
-    asmparsertest[group + '/' + shader] = PiglitGLTest(
+    asmparsertest[grouptools.join(group, shader)] = PiglitGLTest(
         ['asmparsertest', group,
          os.path.join(testsDir, 'asmparsertest', 'shaders', group, shader)],
         run_concurrent=True)
