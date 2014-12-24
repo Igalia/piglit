@@ -393,13 +393,13 @@ add_plain_test(security, ['initialized-vbo'])
 shaders = {}
 
 def add_getactiveuniform_count(group, name, expected):
-    path = 'shaders/'
     group['glsl-getactiveuniform-count: ' + name] = PiglitGLTest(
-        ['glsl-getactiveuniform-count', path + name + '.vert', expected],
+        ['glsl-getactiveuniform-count',
+         os.path.join('shaders',  name + '.vert'), expected],
         run_concurrent=True)
 
 add_shader_test_dir(shaders,
-                    testsDir + '/shaders',
+                    os.path.join(testsDir, 'shaders'),
                     recursive=True)
 add_concurrent_test(shaders, ['activeprogram-bad-program'])
 add_concurrent_test(shaders, ['activeprogram-get'])
@@ -490,17 +490,57 @@ add_concurrent_test(shaders, ['glsl-link-bug30552'])
 add_concurrent_test(shaders, ['glsl-link-bug38015'])
 add_concurrent_test(shaders, ['glsl-link-empty-prog-01'])
 add_concurrent_test(shaders, ['glsl-link-empty-prog-02'])
-shaders['GLSL link single global initializer, 2 shaders'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-01a.vert', 'shaders/glsl-link-initializer-01b.vert', 'pass'], run_concurrent=True)
-shaders['GLSL link matched global initializer, 2 shaders'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-01c.vert', 'shaders/glsl-link-initializer-01d.vert', 'pass'], run_concurrent=True)
-shaders['GLSL link mismatched global initializer, 2 shaders'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-01b.vert', 'shaders/glsl-link-initializer-01d.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link mismatched global initializer, 3 shaders'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-01a.vert', 'shaders/glsl-link-initializer-01b.vert', 'shaders/glsl-link-initializer-01c.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link mismatched global const initializer'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-02a.vert', 'shaders/glsl-link-initializer-02b.vert', 'fail'], run_concurrent=True)
+shaders['GLSL link single global initializer, 2 shaders'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
+                  'pass'], run_concurrent=True)
+shaders['GLSL link matched global initializer, 2 shaders'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-01c.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-01d.vert'),
+                  'pass'], run_concurrent=True)
+shaders['GLSL link mismatched global initializer, 2 shaders'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-01d.vert'),
+                  'fail'], run_concurrent=True)
+shaders['GLSL link mismatched global initializer, 3 shaders'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-01b.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-01c.vert'),
+                  'fail'], run_concurrent=True)
+shaders['GLSL link mismatched global const initializer'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-02a.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-02b.vert'),
+                  'fail'], run_concurrent=True)
 shaders['GLSL link two programs, global initializer'] = PiglitGLTest(['glsl-link-initializer-03'], run_concurrent=True)
-shaders['GLSL link matched global initializer expression'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-05a.vert', 'shaders/glsl-link-initializer-05b.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link mismatched global initializer expression'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-initializer-06a.vert', 'shaders/glsl-link-initializer-06b.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link mismatched invariant'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-invariant-01a.vert', 'shaders/glsl-link-invariant-01b.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link mismatched centroid'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-centroid-01a.vert', 'shaders/glsl-link-centroid-01b.vert', 'fail'], run_concurrent=True)
-shaders['GLSL link array-of-struct-of-array'] = PiglitGLTest(['glsl-link-test', 'shaders/glsl-link-struct-array.frag', 'pass'], run_concurrent=True)
+shaders['GLSL link matched global initializer expression'] = \
+    PiglitGLTest(['glsl-link-test',
+                 os.path.join('shaders', 'glsl-link-initializer-05a.vert'),
+                 os.path.join('shaders', 'glsl-link-initializer-05b.vert'),
+                 'fail'], run_concurrent=True)
+shaders['GLSL link mismatched global initializer expression'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-initializer-06a.vert'),
+                  os.path.join('shaders', 'glsl-link-initializer-06b.vert'),
+                  'fail'], run_concurrent=True)
+shaders['GLSL link mismatched invariant'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-invariant-01a.vert'),
+                  os.path.join('shaders', 'glsl-link-invariant-01b.vert'),
+                  'fail'], run_concurrent=True)
+shaders['GLSL link mismatched centroid'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-centroid-01a.vert'),
+                  os.path.join('shaders', 'glsl-link-centroid-01b.vert'),
+                  'fail'], run_concurrent=True)
+shaders['GLSL link array-of-struct-of-array'] = \
+    PiglitGLTest(['glsl-link-test',
+                  os.path.join('shaders', 'glsl-link-struct-array.frag'),
+                  'pass'], run_concurrent=True)
 add_concurrent_test(shaders, ['glsl-max-vertex-attrib'])
 add_concurrent_test(shaders, ['glsl-kwin-blur-1'])
 add_concurrent_test(shaders, ['glsl-kwin-blur-2'])
@@ -1056,7 +1096,10 @@ spec['glsl-es-1.00']['execution'] = {}
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
                     os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'execution'),
                     recursive=True)
-spec['glsl-es-1.00']['built-in constants'] = PiglitGLTest(['built-in-constants_gles2', os.path.join(testsDir, 'spec/glsl-es-1.00/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-es-1.00']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants_gles2',
+     os.path.join(testsDir, 'spec', 'glsl-es-1.00', 'minimum-maximums.txt')],
+    run_concurrent=True)
 
 # Group spec/glsl-1.10
 spec['glsl-1.10'] = {}
@@ -1085,7 +1128,10 @@ for type in ['int', 'uint', 'float', 'vec2', 'vec3', 'vec4', 'ivec2', 'ivec3',
         cmdline = 'simple {0} {1}'.format(type, arrayspec)
         spec['glsl-1.10']['execution']['varying-packing'][cmdline] = \
             PiglitGLTest(['varying-packing-simple', type, arrayspec], run_concurrent=True)
-spec['glsl-1.10']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.10/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-1.10']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-1.10', 'minimum-maximums.txt')],
+    run_concurrent=True)
 
 spec['glsl-1.10']['api'] = {}
 add_concurrent_test(spec['glsl-1.10']['api'], ['getactiveattrib', '110'])
@@ -1135,7 +1181,9 @@ add_recursion_test(rec, 'indirect-separate')
 add_recursion_test(rec, 'indirect-complex')
 add_recursion_test(rec, 'indirect-complex-separate')
 
-spec['glsl-1.20']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.20/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-1.20']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-1.20', 'minimum-maximums.txt')], run_concurrent=True)
 spec['glsl-1.20']['api'] = {}
 add_concurrent_test(spec['glsl-1.20']['api'], ['getactiveattrib', '120'])
 
@@ -1243,7 +1291,10 @@ add_concurrent_test(spec['glsl-1.30']['execution'], ['vertexid-drawarrays'])
 add_concurrent_test(spec['glsl-1.30']['execution'], ['vertexid-drawelements'])
 add_concurrent_test(spec['glsl-1.30']['execution'], ['fs-execution-ordering'])
 
-spec['glsl-1.30']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.30/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-1.30']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-1.30', 'minimum-maximums.txt')],
+    run_concurrent=True)
 spec['glsl-1.30']['api'] = {}
 add_concurrent_test(spec['glsl-1.30']['api'], ['getactiveattrib', '130'])
 
@@ -1428,7 +1479,10 @@ add_shader_test_dir(spec['glsl-1.40'],
                     os.path.join(testsDir, 'spec', 'glsl-1.40'),
                     recursive=True)
 spec['glsl-1.40']['execution']['tf-no-position'] = PiglitGLTest(['glsl-1.40-tf-no-position'], run_concurrent=True)
-spec['glsl-1.40']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.40/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-1.40']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-1.40', 'minimum-maximums.txt')],
+    run_concurrent=True)
 
 textureSize_samplers_140 = textureSize_samplers_130 + ['sampler2DRect', 'isampler2DRect', 'sampler2DRectShadow', 'samplerBuffer', 'isamplerBuffer', 'usamplerBuffer']
 for stage in ['vs', 'gs', 'fs']:
@@ -1470,7 +1524,10 @@ for draw in ['', 'indexed']:
         add_concurrent_test(spec['glsl-1.50'],
                             ['arb_geometry_shader4-ignore-adjacent-vertices',
                              'core', draw, prim])
-spec['glsl-1.50']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-1.50/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-1.50']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-1.50', 'minimum-maximums.txt')],
+    run_concurrent=True)
 spec['glsl-1.50']['gs-emits-too-few-verts'] = PiglitGLTest(['glsl-1.50-gs-emits-too-few-verts'], run_concurrent=True)
 spec['glsl-1.50']['gs-end-primitive-optional-with-points-out'] = PiglitGLTest(['glsl-1.50-geometry-end-primitive-optional-with-points-out'], run_concurrent=True)
 spec['glsl-1.50']['getshaderiv-may-return-GS'] = PiglitGLTest(['glsl-1.50-getshaderiv-may-return-GS'], run_concurrent=True)
@@ -1526,7 +1583,9 @@ for output_layout in ['points', 'lines', 'lines_adjacency', 'triangles',
                         ['glsl-1.50-gs-output-layout-qualifiers', output_layout])
 
 spec['glsl-3.30'] = {}
-spec['glsl-3.30']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/glsl-3.30/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-3.30']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'glsl-3.30', 'minimum-maximums.txt')], run_concurrent=True)
 
 import_glsl_parser_tests(spec['glsl-3.30'],
                          os.path.join(testsDir, 'spec', 'glsl-3.30'),
@@ -1544,7 +1603,9 @@ add_shader_test_dir(spec['glsl-es-3.00'],
                     os.path.join(testsDir, 'spec', 'glsl-es-3.00'),
                     recursive=True)
 add_concurrent_test(spec['glsl-es-3.00']['execution'], ['varying-struct-centroid_gles3'])
-spec['glsl-es-3.00']['built-in constants'] = PiglitGLTest(['built-in-constants_gles3', os.path.join(testsDir, 'spec/glsl-es-3.00/minimum-maximums.txt')], run_concurrent=True)
+spec['glsl-es-3.00']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants_gles3',
+     os.path.join(testsDir, 'spec', 'glsl-es-3.00', 'minimum-maximums.txt')], run_concurrent=True)
 
 # AMD_performance_monitor
 profile.test_list['spec/AMD_performance_monitor/api'] = PiglitGLTest(['amd_performance_monitor_api'])
@@ -1911,7 +1972,8 @@ add_shader_test_dir(arb_gpu_shader5,
                     os.path.join(testsDir, 'spec', 'arb_gpu_shader5'),
                     recursive=True)
 import_glsl_parser_tests(arb_gpu_shader5,
-                         testsDir + '/spec/arb_gpu_shader5', [''])
+                         os.path.join(testsDir, 'spec', 'arb_gpu_shader5'),
+                         [''])
 for stage in ['vs', 'fs']:
     for type in ['unorm', 'float', 'int', 'uint']:
         for comps in ['r', 'rg', 'rgb', 'rgba']:
@@ -1971,7 +2033,8 @@ add_shader_test_dir(arb_shader_subroutine,
                     os.path.join(testsDir, 'spec', 'arb_shader_subroutine'),
                     recursive=True)
 import_glsl_parser_tests(arb_shader_subroutine,
-                         testsDir + '/spec/arb_shader_subroutine', [''])
+                         os.path.join(testsDir, 'spec', 'arb_shader_subroutine'),
+                         [''])
 add_concurrent_test(arb_shader_subroutine, ['arb_shader_subroutine-minmax'])
 
 arb_gpu_shader_fp64 = {}
@@ -1986,10 +2049,11 @@ import_glsl_parser_tests(arb_gpu_shader_fp64,
 arb_texture_query_levels = {}
 spec['ARB_texture_query_levels'] = arb_texture_query_levels
 add_shader_test_dir(arb_texture_query_levels,
-                    testsDir + '/spec/arb_texture_query_levels',
+                    os.path.join(testsDir, 'spec', 'arb_texture_query_levels'),
                     recursive=True)
 import_glsl_parser_tests(arb_texture_query_levels,
-                         testsDir + '/spec/arb_texture_query_levels', [''])
+                         os.path.join(testsDir, 'spec', 'arb_texture_query_levels'),
+                         [''])
 
 arb_occlusion_query = {}
 spec['ARB_occlusion_query'] = arb_occlusion_query
@@ -2187,7 +2251,10 @@ arb_shading_language_420pack['execution'] = {}
 add_shader_test_dir(arb_shading_language_420pack['execution'],
                     os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'execution'),
                     recursive=True)
-spec['ARB_shading_language_420pack']['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/arb_shading_language_420pack/minimum-maximums.txt')], run_concurrent=True)
+spec['ARB_shading_language_420pack']['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'arb_shading_language_420pack', 'minimum-maximums.txt')],
+    run_concurrent=True)
 spec['ARB_shading_language_420pack']['multiple layout qualifiers'] = PiglitGLTest(['arb_shading_language_420pack-multiple-layout-qualifiers'], run_concurrent=True)
 
 # Group ARB_explicit_attrib_location
@@ -2249,14 +2316,14 @@ arb_texture_buffer_range['ranges-2'] = PiglitGLTest(['arb_texture_buffer_range-r
 arb_texture_query_lod = {}
 spec['ARB_texture_query_lod'] = arb_texture_query_lod
 add_shader_test_dir(arb_texture_query_lod,
-                    testsDir + '/spec/arb_texture_query_lod',
+                    os.path.join(testsDir, 'spec', 'arb_texture_query_lod'),
                     recursive=True)
 
 arb_texture_rectangle = {}
 spec['ARB_texture_rectangle'] = arb_texture_rectangle
 add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
 add_shader_test_dir(arb_texture_rectangle,
-                    testsDir + '/spec/arb_texture_rectangle',
+                    os.path.join(testsDir, 'spec', 'arb_texture_rectangle'),
                     recursive=True)
 add_msaa_visual_plain_tests(arb_texture_rectangle, ['copyteximage', 'RECT'])
 add_concurrent_test(arb_texture_rectangle, ['1-1-linear-texture'])
@@ -2855,7 +2922,7 @@ add_concurrent_test(ext_texture_array, ['fbo-generatemipmap-array', 'S3TC_DXT1']
 spec['EXT_texture_array']['maxlayers'] = PiglitGLTest(['ext_texture_array-maxlayers'], run_concurrent=True)
 spec['EXT_texture_array']['gen-mipmap'] = PiglitGLTest(['ext_texture_array-gen-mipmap'], run_concurrent=True)
 add_shader_test_dir(ext_texture_array,
-                    testsDir + '/spec/ext_texture_array',
+                    os.path.join(testsDir, 'spec', 'ext_texture_array'),
                     recursive=True)
 add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '1D_ARRAY'])
 add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '2D_ARRAY'])
@@ -3003,7 +3070,7 @@ add_plain_test(ext_texture_integer, ['fbo-integer'])
 arb_texture_rg = {}
 spec['ARB_texture_rg'] = arb_texture_rg
 add_shader_test_dir(arb_texture_rg,
-                    testsDir + '/spec/arb_texture_rg/execution',
+                    os.path.join(testsDir, 'spec', 'arb_texture_rg', 'execution'),
                     recursive=True)
 add_fbo_formats_tests('spec/ARB_texture_rg', 'GL_ARB_texture_rg')
 add_fbo_formats_tests('spec/ARB_texture_rg', 'GL_ARB_texture_rg-float', '-float')
@@ -3669,19 +3736,28 @@ add_shader_test_dir(spec['ARB_compute_shader'],
 import_glsl_parser_tests(spec['ARB_compute_shader'],
                          os.path.join(testsDir, 'spec', 'arb_compute_shader'),
                          ['compiler'])
-arb_compute_shader['built-in constants'] = PiglitGLTest(['built-in-constants', os.path.join(testsDir, 'spec/arb_compute_shader/minimum-maximums.txt')], run_concurrent=True)
+arb_compute_shader['built-in constants'] = PiglitGLTest(
+    ['built-in-constants',
+     os.path.join(testsDir, 'spec', 'arb_compute_shader', 'minimum-maximums.txt')],
+    run_concurrent=True)
 
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
 # Add all shader source files in the directories below.
-for filename in os.listdir(testsDir + '/glslparsertest/shaders'):
+for filename in os.listdir(os.path.join(testsDir, 'glslparsertest', 'shaders')):
     ext = filename.rsplit('.')[-1]
     if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(glslparsertest, os.path.join(testsDir, 'glslparsertest/shaders', filename), filename)
-for filename in os.listdir(testsDir + '/glslparsertest/glsl2'):
+        add_glsl_parser_test(
+            glslparsertest,
+            os.path.join(testsDir, 'glslparsertest', 'shaders', filename),
+            filename)
+for filename in os.listdir(os.path.join(testsDir, 'glslparsertest', 'glsl2')):
     ext = filename.rsplit('.')[-1]
     if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(glslparsertest, os.path.join(testsDir, 'glslparsertest/glsl2', filename), 'glsl2/' + filename)
+        add_glsl_parser_test(
+            glslparsertest,
+            os.path.join(testsDir, 'glslparsertest', 'glsl2', filename), 
+            'glsl2/' + filename)  # this is the name of the test
 # end group glslparsertest ---------------------------------------------------
 
 hiz = {}
@@ -3711,7 +3787,8 @@ add_plain_test(hiz, ['hiz-stencil-test-window-depth0'])
 add_plain_test(hiz, ['hiz-stencil-test-window-depth1'])
 
 fast_color_clear = {}
-add_shader_test_dir(fast_color_clear, testsDir + '/fast_color_clear',
+add_shader_test_dir(fast_color_clear,
+                    os.path.join(testsDir, 'fast_color_clear'),
                     recursive=True)
 for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
     for buffer_type in ('rb', 'tex'):
@@ -4299,7 +4376,8 @@ add_shader_test_dir(arb_derivative_control,
                     os.path.join(testsDir, 'spec', 'arb_derivative_control'),
                     recursive=True)
 import_glsl_parser_tests(arb_derivative_control,
-                         testsDir + '/spec/arb_derivative_control', [''])
+                         os.path.join(testsDir, 'spec', 'arb_derivative_control'),
+                         [''])
 
 spec['ARB_direct_state_access'] = {}
 spec['ARB_direct_state_access']['dsa-textures'] = PiglitGLTest(['arb_direct_state_access-dsa-textures'], run_concurrent=True)
