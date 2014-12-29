@@ -73,7 +73,7 @@ class XTSTest(Test):
 
     def __init__(self, name, testname, testnum):
         super(XTSTest, self).__init__(
-            ['./' + grouptools.groupname(name), '-i', str(testnum)])
+            ['./' + os.path.basename(name), '-i', str(testnum)])
         self.testname = '{0}-{1}'.format(testname, testnum)
         self.cwd = os.path.dirname(os.path.realpath(name))
         self.test_results_file = os.path.join(self.cwd, self.testname)
@@ -185,8 +185,9 @@ def populate_profile():
                     if line.startswith('>>ASSERTION'):
                         num = next(counts)
                         group = grouptools.join(
-                            grouptools.relgroup(dirpath, X_TEST_SUITE),
-                            testname, num)
+                            grouptools.from_path(
+                                os.path.relpath(dirpath, X_TEST_SUITE)),
+                            testname, str(num))
 
                         profile.test_list[group] = XTSTest(
                             os.path.join(dirpath, testname),
