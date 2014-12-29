@@ -30,7 +30,7 @@ generatedTestDir = os.path.normpath(os.path.join(
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
-        group[name + '-' + param] = PiglitGLTest([name, param])
+        group['{}-{}'.format(name, param)] = PiglitGLTest([name, param])
 
 def add_plain_test(group, args, **kwargs):
     for a in args:
@@ -63,6 +63,8 @@ profile = TestProfile()
 MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
 def add_fbo_depthstencil_tests(group, format, num_samples):
+    assert format, 'add_fbo_depthstencil_tests argument "format" cannot be empty'
+
     if format == 'default_fb':
         prefix = ''
         create_test = PiglitGLTest
@@ -77,23 +79,23 @@ def add_fbo_depthstencil_tests(group, format, num_samples):
         suffix = ''
         psamples = ''
 
-    group[prefix + 'depthstencil-' + format + '-clear' + suffix] = \
+    group['{}depthstencil-{}-clear{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'clear', format, psamples])
-    group[prefix + 'depthstencil-' + format + '-readpixels-FLOAT-and-USHORT' + suffix] = \
+    group['{}depthstencil-{}-readpixels-FLOAT-and-USHORT{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'readpixels', format, 'FLOAT-and-USHORT', psamples])
-    group[prefix + 'depthstencil-' + format + '-readpixels-24_8' + suffix] = \
+    group['{}depthstencil-{}-readpixels-24_8{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'readpixels', format, '24_8', psamples])
-    group[prefix + 'depthstencil-' + format + '-readpixels-32F_24_8_REV' + suffix] = \
+    group['{}depthstencil-{}-readpixels-32F_24_8_REV{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'readpixels', format, '32F_24_8_REV', psamples])
-    group[prefix + 'depthstencil-' + format + '-drawpixels-FLOAT-and-USHORT' + suffix] = \
+    group['{}depthstencil-{}-drawpixels-FLOAT-and-USHORT{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'drawpixels', format, 'FLOAT-and-USHORT', psamples])
-    group[prefix + 'depthstencil-' + format + '-drawpixels-24_8' + suffix] = \
+    group['{}depthstencil-{}-drawpixels-24_8{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'drawpixels', format, '24_8', psamples])
-    group[prefix + 'depthstencil-' + format + '-drawpixels-32F_24_8_REV' + suffix] = \
+    group['{}depthstencil-{}-drawpixels-32F_24_8_REV{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'drawpixels', format, '32F_24_8_REV', psamples])
-    group[prefix + 'depthstencil-' + format + '-copypixels' + suffix] = \
+    group['{}depthstencil-{}-copypixels{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'copypixels', format, psamples])
-    group[prefix + 'depthstencil-' + format + '-blit' + suffix] = \
+    group['{}depthstencil-{}-blit{}'.format(prefix, format, suffix)] = \
         create_test(['fbo-depthstencil', 'blit', format, psamples])
 
 def add_fbo_depthstencil_msaa_visual_tests(group, format):
@@ -697,31 +699,31 @@ def texwrap_test(args):
     return PiglitGLTest(['texwrap'] + args, run_concurrent=True)
 
 def add_texwrap_target_tests(group, target):
-    group['texwrap ' + target] = texwrap_test([target, 'GL_RGBA8'])
-    group['texwrap ' + target + ' bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
-    group['texwrap ' + target + ' proj'] = texwrap_test([target, 'GL_RGBA8', 'proj'])
-    group['texwrap ' + target + ' proj bordercolor'] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
+    group['texwrap {}'.format(target)] = texwrap_test([target, 'GL_RGBA8'])
+    group['texwrap {} bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
+    group['texwrap {} proj'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj'])
+    group['texwrap {} proj bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
 
 def add_texwrap_format_tests(group, ext = '', suffix = ''):
     args = [] if ext == '' else [ext]
     group['texwrap formats' + suffix] = texwrap_test(args)
-    group['texwrap formats' + suffix + ' bordercolor'] = texwrap_test(args + ['bordercolor'])
-    group['texwrap formats' + suffix + ' bordercolor-swizzled'] = texwrap_test(args + ['bordercolor', 'swizzled'])
+    group['texwrap formats{} bordercolor'.format(suffix)] = texwrap_test(args + ['bordercolor'])
+    group['texwrap formats{} bordercolor-swizzled'.format(suffix)] = texwrap_test(args + ['bordercolor', 'swizzled'])
 
 def add_fbo_depth_tests(group, format):
-    group['fbo-depth-' + format + '-tex1d'] = PiglitGLTest(['fbo-depth-tex1d', format], run_concurrent=True)
-    group['fbo-depth-' + format + '-clear'] = PiglitGLTest(['fbo-depth', 'clear', format], run_concurrent=True)
-    group['fbo-depth-' + format + '-readpixels'] = PiglitGLTest(['fbo-depth', 'readpixels', format], run_concurrent=True)
-    group['fbo-depth-' + format + '-drawpixels'] = PiglitGLTest(['fbo-depth', 'drawpixels', format], run_concurrent=True)
-    group['fbo-depth-' + format + '-copypixels'] = PiglitGLTest(['fbo-depth', 'copypixels', format], run_concurrent=True)
-    group['fbo-depth-' + format + '-blit'] = PiglitGLTest(['fbo-depth', 'blit', format], run_concurrent=True)
+    group['fbo-depth-{}-tex1d'.format(format)] = PiglitGLTest(['fbo-depth-tex1d', format], run_concurrent=True)
+    group['fbo-depth-{}-clear'.format(format)] = PiglitGLTest(['fbo-depth', 'clear', format], run_concurrent=True)
+    group['fbo-depth-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'readpixels', format], run_concurrent=True)
+    group['fbo-depth-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'drawpixels', format], run_concurrent=True)
+    group['fbo-depth-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-depth', 'copypixels', format], run_concurrent=True)
+    group['fbo-depth-{}-blit'.format(format)] = PiglitGLTest(['fbo-depth', 'blit', format], run_concurrent=True)
 
 def add_fbo_stencil_tests(group, format):
-    group['fbo-stencil-' + format + '-clear'] = PiglitGLTest(['fbo-stencil', 'clear', format], run_concurrent=True)
-    group['fbo-stencil-' + format + '-readpixels'] = PiglitGLTest(['fbo-stencil', 'readpixels', format], run_concurrent=True)
-    group['fbo-stencil-' + format + '-drawpixels'] = PiglitGLTest(['fbo-stencil', 'drawpixels', format], run_concurrent=True)
-    group['fbo-stencil-' + format + '-copypixels'] = PiglitGLTest(['fbo-stencil', 'copypixels', format], run_concurrent=True)
-    group['fbo-stencil-' + format + '-blit'] = PiglitGLTest(['fbo-stencil', 'blit', format], run_concurrent=True)
+    group['fbo-stencil-{}-clear'.format(format)] = PiglitGLTest(['fbo-stencil', 'clear', format], run_concurrent=True)
+    group['fbo-stencil-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'readpixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'drawpixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'copypixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-blit'.format(format)] = PiglitGLTest(['fbo-stencil', 'blit', format], run_concurrent=True)
 
 spec = {}
 
@@ -2387,7 +2389,10 @@ tdfx_texture_compression_fxt1['invalid formats'] = PiglitGLTest(['arb_texture_co
 add_plain_test(tdfx_texture_compression_fxt1, ['fxt1-teximage'])
 
 def add_color_buffer_float_test(name, format, p1, p2):
-    group = format + '-' + name + ('-' + p1 if len(p1) else '') + ('-' + p2 if len(p2) else '')
+    group = '{}-{}{}{}'.format(
+        format, name,
+        '-{}'.format(p1) if p1 else '',
+        '-{}'.format(p2) if p2 else '')
     arb_color_buffer_float[group] = PiglitGLTest(
         ['arb_color_buffer_float-' + name, format, p1, p2],
         run_concurrent=True)
