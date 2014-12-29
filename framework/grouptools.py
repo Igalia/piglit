@@ -42,6 +42,13 @@ __all__ = [
     'from_path'
 ]
 
+def _assert_illegal(group):
+    """Helper that checks for illegal characters in input."""
+    assert '\\' not in group, \
+        'Groups are not paths and cannot contain \\.  ({})'.format(group)
+    assert not group.startswith('/'), \
+        'Groups cannot start with /. ({})' .format(group)
+
 
 def testname(group):
     """Return the last element of a group name.
@@ -53,8 +60,7 @@ def testname(group):
     Analogous to os.path.basename
 
     """
-    assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-    assert not group.startswith('/'), 'Groups cannot start with /'
+    _assert_illegal(group)
 
     return posixpath.basename(group)
 
@@ -69,16 +75,14 @@ def groupname(group):
     Analogous to os.path.dirname
 
     """
-    assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-    assert not group.startswith('/'), 'Groups cannot start with /'
+    _assert_illegal(group)
 
     return posixpath.dirname(group)
 
 
 def splitname(group):
     """Split a group name, Returns tuple "(group, test)"."""
-    assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-    assert not group.startswith('/'), 'Groups cannot start with /'
+    _assert_illegal(group)
 
     return posixpath.split(group)
 
@@ -86,8 +90,7 @@ def splitname(group):
 def commonprefix(args):
     """Given a list of groups, returns the longest common leading component."""
     for group in args:
-        assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-        assert not group.startswith('/'), 'Groups cannot start with /'
+        _assert_illegal(group)
 
     return posixpath.commonprefix(args)
 
@@ -100,8 +103,10 @@ def join(*args):
 
     """
     for group in args:
-        assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-    assert not args[0].startswith('/'), 'Groups cannot start with /'
+        assert '\\' not in group, \
+            'Groups are not paths and cannot contain \\.  ({})'.format(group)
+    assert not args[0].startswith('/'), \
+        'Groups cannot start with /. ({})' .format(args[0])
 
     return posixpath.join(*args)
 
@@ -114,8 +119,7 @@ def relgroup(large, small):
 
     """
     for element in {large, small}:
-        assert '\\' not in element, 'Groups are not paths and cannot contain \\'
-        assert not element.startswith('/'), 'Groups cannot start with /'
+        _assert_illegal(element)
 
     if len(small) > len(large):
         return ''
@@ -131,8 +135,7 @@ def split(group):
     If input is '' return an empty list
 
     """
-    assert '\\' not in group, 'Groups are not paths and cannot contain \\'
-    assert not group.startswith('/'), 'Groups cannot start with /'
+    _assert_illegal(group)
     if group == '':
         return []
     return group.split('/')
@@ -146,6 +149,9 @@ def from_path(path):
     This safely handles both Windows and Unix style paths.
 
     """
+    assert not path.startswith('/'), \
+        'Groups cannot start with /. ({})' .format(path)
+
     if '\\' in path:
         return path.replace('\\', '/')
     return path
