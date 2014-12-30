@@ -44,6 +44,7 @@ __all__ = [
 
 def _assert_illegal(group):
     """Helper that checks for illegal characters in input."""
+    assert isinstance(group, (str, unicode)), 'Type must be string or unicode'
     assert '\\' not in group, \
         'Groups are not paths and cannot contain \\.  ({})'.format(group)
     assert not group.startswith('/'), \
@@ -103,6 +104,8 @@ def join(*args):
 
     """
     for group in args:
+        assert isinstance(group, (str, unicode)), \
+            'Type must be string or unicode'
         assert '\\' not in group, \
             'Groups are not paths and cannot contain \\.  ({})'.format(group)
     assert not args[0].startswith('/'), \
@@ -149,6 +152,7 @@ def from_path(path):
     This safely handles both Windows and Unix style paths.
 
     """
+    assert isinstance(path, (str, unicode)), 'Type must be string or unicode'
     assert not path.startswith('/'), \
         'Groups cannot start with /. ({})' .format(path)
 
