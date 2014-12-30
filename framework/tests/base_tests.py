@@ -125,3 +125,33 @@ def test_run_command_early():
 
     test = Test_('foo')
     test.run()
+
+
+@nt.raises(AssertionError)
+def test_no_string():
+    TestTest('foo')
+
+
+def test_mutation():
+    """Test.command does not mutate the value it was provided
+
+    There is a very subtle bug in all.py that causes the key values to be
+    changed before they are assigned in some cases. This is because the right
+    side of an assignment is evalated before the left side, so
+
+    >>> profile = {}
+    >>> args = ['a', 'b']
+    >>> profile[' '.join(args)] = PiglitGLTest(args)
+    >>> profile.keys()
+    ['bin/a b']
+
+    """
+    class _Test(TestTest):
+        def __init__(self, *args, **kwargs):
+            super(_Test, self).__init__(*args, **kwargs)
+            self._command[0] = 'bin/' + self._command[0]
+
+    args = ['a', 'b']
+    _Test(args)
+
+    nt.assert_list_equal(args, ['a', 'b'])

@@ -35,6 +35,7 @@ import threading
 import signal
 import itertools
 import abc
+import copy
 
 from framework.core import Options
 from framework.results import TestResult
@@ -124,7 +125,7 @@ class Test(object):
     def __init__(self, command, run_concurrent=False):
         self._command = None
         self.run_concurrent = run_concurrent
-        self.command = command
+        self._command = copy.copy(command)
         self.env = {}
         self.result = TestResult({'result': 'fail'})
         self.cwd = None
