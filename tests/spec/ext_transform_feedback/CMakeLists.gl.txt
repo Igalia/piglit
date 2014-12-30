@@ -26,6 +26,7 @@ piglit_add_executable (ext_transform_feedback-get-buffer-state get-buffer-state.
 piglit_add_executable (ext_transform_feedback-position position.c)
 piglit_add_executable (ext_transform_feedback-points points.c)
 piglit_add_executable (ext_transform_feedback-immediate-reuse immediate-reuse.c)
+piglit_add_executable (ext_transform_feedback-immediate-reuse-index-buffer immediate-reuse-index-buffer.c)
 piglit_add_executable (ext_transform_feedback-interleaved interleaved.c)
 piglit_add_executable (ext_transform_feedback-intervening-read intervening-read.c)
 piglit_add_executable (ext_transform_feedback-max-varyings max-varyings.c)

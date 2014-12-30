@@ -3126,6 +3126,7 @@ for mode in ['main_binding', 'indexed_binding', 'buffer_start', 'buffer_size']:
     ext_transform_feedback[test_name] = PiglitGLTest(
         'ext_transform_feedback-{0}'.format(test_name), run_concurrent=True)
 ext_transform_feedback['immediate-reuse'] = PiglitGLTest('ext_transform_feedback-immediate-reuse', run_concurrent=True)
+ext_transform_feedback['immediate-reuse-index-buffer'] = PiglitGLTest('ext_transform_feedback-immediate-reuse-index-buffer', run_concurrent=True)
 for mode in ['output', 'prims_generated', 'prims_written']:
     for use_gs in ['', ' use_gs']:
         test_name = 'intervening-read {0}{1}'.format(mode, use_gs)
