@@ -126,6 +126,7 @@ class TestrunResult(object):
     def load(cls, results_file):
         """Create a TestrunResult from a completed file."""
         result = cls()
+        result.results_version = 0
         result.__dict__.update(json.load(results_file))
 
         for key, value in result.tests.iteritems():
