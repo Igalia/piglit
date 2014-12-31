@@ -175,7 +175,7 @@ def populate_profile():
                 continue
 
             # incrementing number generator
-            counts = (x for x in itertools.count(1, 1))
+            counts = itertools.count(start=1)
 
             # Walk the file looking for >>ASSERTION, each of these corresponds
             # to a generated subtest, there can be multiple subtests per .m
