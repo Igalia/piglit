@@ -30,11 +30,23 @@ import framework.results as results
 import framework.tests.utils as utils
 
 
-DATA = copy.deepcopy(utils.JSON_DATA)
-DATA['tests']['sometest']['dmesg'] = ['this', 'is', 'dmesg']
-DATA['tests']['sometest']['info'] = \
-    'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n'
+DATA = {}
+DATA['options'] = {
+    'profile': "tests/fake.py",
+    'filter': [],
+    'exclude_filter': [],
+}
+DATA['name'] = 'fake-tests'
+DATA['lspci'] = 'fake'
+DATA['glxinfo'] = 'fake'
+DATA['tests'] = {}
 DATA['tests'].update({
+    'sometest': {
+        'result': 'pass',
+        'time': 0.01,
+        'dmesg': ['this', 'is', 'dmesg'],
+        'info': 'Returncode: 1\n\nErrors:stderr\n\nOutput: stdout\n',
+    },
     'group1/groupA/test/subtest 1': {
         'info': 'Returncode: 1\n\nErrors:stderr\n\nOutput:stdout\n',
         'subtest': {
