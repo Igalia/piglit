@@ -21,8 +21,10 @@
 """ Module provides tests for converting version zero results to version 1 """
 
 from __future__ import print_function, absolute_import
+import os
 import json
 import copy
+import tempfile
 
 import nose.tools as nt
 
@@ -221,3 +223,47 @@ def test_subtests_with_slash():
 def test_handle_fixed_subtests():
     """ Version 1: Correctly handle new single entry subtests correctly """
     assert 'group3/groupA/test' in RESULT.tests.iterkeys()
+
+
+def _load_with_update(data):
+    """If the file is not results.json, it will be renamed.
+
+    This ensures that the right file is removed.
+
+    """
+    try:
+        with utils.with_tempfile(json.dumps(data)) as t:
+            result = results.load_results(t)
+    except OSError as e:
+        # There is the potential that the file will be renamed. In that event
+        # remove the renamed files
+        if e.errno == 2:
+            os.unlink(os.path.join(tempfile.tempdir, 'results.json'))
+            os.unlink(os.path.join(tempfile.tempdir, 'results.json.old'))
+        else:
+            raise
+
+    return result
+
+
+def test_load_results_unversioned():
+    """results.load_results: Loads unversioned results and updates correctly.
+
+    This is just a random change to show that the update path is being hit.
+
+    """
+    result = _load_with_update(DATA)
+    nt.assert_equal(result.tests['sometest']['dmesg'], 'this\nis\ndmesg')
+
+
+def test_load_results_v0():
+    """results.load_results: Loads results v0 and updates correctly.
+
+    This is just a random change to show that the update path is being hit.
+
+    """
+    data = copy.deepcopy(DATA)
+    data['results_version'] = 0
+
+    result = _load_with_update(data)
+    nt.assert_equal(result.tests['sometest']['dmesg'], 'this\nis\ndmesg')
