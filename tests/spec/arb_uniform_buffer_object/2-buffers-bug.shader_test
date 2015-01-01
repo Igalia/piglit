@@ -1,0 +1,58 @@
+[require]
+GLSL >= 1.30
+GL_ARB_uniform_buffer_object
+
+[vertex shader]
+#extension GL_ARB_uniform_buffer_object : require
+
+uniform test_unif1
+{
+	float test1;
+	float test2;
+};
+
+uniform test_unif2
+{
+	float test3;
+	float test4;
+};
+
+in vec4 piglit_vertex;
+out vec4 fcolor;
+
+void main(void)
+{
+	gl_Position = piglit_vertex;
+
+	// The GLSL compiler has a bug that compiles this expression as:
+	//    vec4(test1, test2, test1, test2)
+	//
+	// In other words, it only fetches from the first uniform block.
+	//
+	// This bug can be avoided by doing:
+	//    vec4(test1, test2, test3, 0.4)
+	//
+	// In this case, the GLSL compiler correctly generates a fetch
+	// from the second uniform block.
+
+	fcolor = vec4(test1, test2, test3, test4);
+}
+
+[fragment shader]
+in vec4 fcolor;
+
+void main()
+{
+	gl_FragColor = fcolor;
+}
+
+[test]
+link success
+
+uniform float test1 0.1
+uniform float test2 0.2
+uniform float test3 0.3
+uniform float test4 0.4
+
+draw rect -1 -1 2 2
+probe all rgba 0.1 0.2 0.3 0.4
