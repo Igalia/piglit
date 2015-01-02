@@ -3759,6 +3759,11 @@ arb_compute_shader['built-in constants'] = PiglitGLTest(
      os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader', 'minimum-maximums.txt')],
     run_concurrent=True)
 
+ext_polygon_offset_clamp = {}
+spec['EXT_polygon_offset_clamp'] = ext_polygon_offset_clamp
+add_concurrent_test(ext_polygon_offset_clamp, ['ext_polygon_offset_clamp-draw'])
+add_concurrent_test(ext_polygon_offset_clamp, ['ext_polygon_offset_clamp-dlist'])
+
 # group glslparsertest ------------------------------------------------------
 glslparsertest = {}
 # Add all shader source files in the directories below.
