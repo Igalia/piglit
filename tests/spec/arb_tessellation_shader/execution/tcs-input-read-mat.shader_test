@@ -1,0 +1,68 @@
+# Test a single per-vertex input read in a TCS.
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader]
+#version 150
+
+out mat4 v;
+
+void main()
+{
+	v[2][2] = 42.0;
+}
+
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+in mat4 v[];
+layout(vertices = 1) out;
+
+void main()
+{
+	if (v[0][2][2] == 42.0) {	/* constant index case */
+		gl_TessLevelInner[0] = 1.0;
+		gl_TessLevelInner[1] = 1.0;
+
+		gl_TessLevelOuter[0] = 1.0;
+		gl_TessLevelOuter[1] = 1.0;
+		gl_TessLevelOuter[2] = 1.0;
+		gl_TessLevelOuter[3] = 1.0;
+	} else {
+		gl_TessLevelInner[0] = 0.0;
+		gl_TessLevelInner[1] = 0.0;
+
+		gl_TessLevelOuter[0] = 0.0;
+		gl_TessLevelOuter[1] = 0.0;
+		gl_TessLevelOuter[2] = 0.0;
+		gl_TessLevelOuter[3] = 0.0;
+	}
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(quads, equal_spacing) in;
+
+void main()
+{
+	gl_Position = vec4(gl_TessCoord.xy * 2 - 1, 0, 1);
+}
+
+[fragment shader]
+#version 150
+
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+[test]
+patch parameter vertices 1
+draw arrays GL_PATCHES 0 1
+probe all rgba 0.0 1.0 0.0 1.0
