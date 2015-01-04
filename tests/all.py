@@ -1834,6 +1834,7 @@ arb_draw_indirect = {}
 spec['ARB_draw_indirect'] = arb_draw_indirect
 add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-api-errors'])
 add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-draw-arrays'])
+add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-draw-arrays-prim-restart'])
 add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-draw-elements'])
 add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-draw-arrays-base-instance'])
 add_concurrent_test(arb_draw_indirect, ['arb_draw_indirect-draw-elements-base-instance'])

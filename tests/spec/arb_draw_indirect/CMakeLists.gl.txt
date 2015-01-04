@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (arb_draw_indirect-api-errors api-errors.c)
 piglit_add_executable (arb_draw_indirect-draw-arrays draw-arrays.c)
+piglit_add_executable (arb_draw_indirect-draw-arrays-prim-restart draw-arrays-prim-restart.c)
 piglit_add_executable (arb_draw_indirect-draw-elements draw-elements.c)
 piglit_add_executable (arb_draw_indirect-draw-arrays-base-instance draw-arrays-base-instance.c)
 piglit_add_executable (arb_draw_indirect-draw-elements-base-instance draw-elements-base-instance.c)
