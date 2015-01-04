@@ -26,7 +26,7 @@
 import os
 
 from genclbuiltins import gen, NEGNAN
-from math import acos, acosh, asin, asinh, atan, atan2, atanh, cos, cosh
+from math import acos, acosh, asin, asinh, atan, atan2, atanh, cos, cosh, exp
 from math import fabs, fmod, log10, log1p, pi, pow, sin, sinh, sqrt, tan, tanh
 
 CLC_VERSION_MIN = {
@@ -46,6 +46,7 @@ CLC_VERSION_MIN = {
     'cospi' : 10,
     'erf' : 10,
     'erfc' : 10,
+    'exp' : 10,
     'fabs' : 10,
     'floor' : 10,
     'fmod' : 10,
@@ -219,6 +220,15 @@ tests = {
             [0.0, 1.960/sqrt(2.0), 2.576/sqrt(2.0), -2.807/sqrt(2.0), 11.1, float("inf"), float("-inf")]  # Arg0
         ],
         'tolerance' : 16
+    },
+    'exp' : {
+        'arg_types' : [F, F],
+        'function_type': 'ttt',
+        'values' : [
+            [1.0, exp(0.95), exp(pi), exp(-pi), float("inf") ], # Result
+            [0.0, 0.95, pi, -pi, float("inf")]  # Arg0
+        ],
+        'tolerance' : 3
     },
     'fabs' : {
         'arg_types' : [F, F],
