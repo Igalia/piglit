@@ -9,4 +9,5 @@ link_libraries (
 	${OPENGL_glu_LIBRARY}
 )
 
+piglit_add_executable (es3-primrestart-fixedindex es3-primrestart-fixedindex.c)
 piglit_add_executable (es3-drawarrays-primrestart-fixedindex es3-drawarrays-primrestart-fixedindex.c)
