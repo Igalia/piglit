@@ -37,7 +37,7 @@ def add_plain_test(group, args, **kwargs):
         if isinstance(a, basestring):
             assert '/' not in a, args
 
-    gname = ' '.join(args) 
+    gname = ' '.join(args)
     assert not gname.startswith('/')
 
     group[gname] = PiglitGLTest(args, **kwargs)
@@ -3777,7 +3777,7 @@ for filename in os.listdir(os.path.join(testsDir, 'glslparsertest', 'glsl2')):
     if ext in ['vert', 'geo', 'frag']:
         add_glsl_parser_test(
             glslparsertest,
-            os.path.join(testsDir, 'glslparsertest', 'glsl2', filename), 
+            os.path.join(testsDir, 'glslparsertest', 'glsl2', filename),
             grouptools.join('glsl2', filename))
 # end group glslparsertest ---------------------------------------------------
 
@@ -4367,6 +4367,7 @@ for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb
     for context in ('core', 'compat'):
         test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format, context])
         arb_es3_compatibility[test_name] = PiglitGLTest(test_name.split(), run_concurrent=True)
+add_concurrent_test(arb_es3_compatibility, 'es3-drawarrays-primrestart-fixedindex')
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
                     recursive=True)

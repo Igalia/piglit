@@ -1,0 +1,12 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+piglit_add_executable (es3-drawarrays-primrestart-fixedindex es3-drawarrays-primrestart-fixedindex.c)
