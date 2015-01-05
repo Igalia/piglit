@@ -88,6 +88,7 @@ static struct component_version glsl_version;
 static struct component_version glsl_req_version;
 static int gl_max_fragment_uniform_components;
 static int gl_max_vertex_uniform_components;
+static int gl_max_varying_components;
 static int gl_max_clip_planes;
 
 const char *path = NULL;
@@ -566,6 +567,11 @@ process_requirement(const char *line)
 			"GL_MAX_VERTEX_UNIFORM_COMPONENTS",
 			&gl_max_vertex_uniform_components,
 			"vertex uniform components",
+		},
+		{
+			"GL_MAX_VARYING_COMPONENTS",
+			&gl_max_varying_components,
+			"varying components",
 		},
 	};
 	unsigned i;
@@ -2676,14 +2682,19 @@ piglit_init(int argc, char **argv)
 		      &gl_max_fragment_uniform_components);
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS,
 		      &gl_max_vertex_uniform_components);
+	glGetIntegerv(GL_MAX_VARYING_COMPONENTS,
+		      &gl_max_varying_components);
 	glGetIntegerv(GL_MAX_CLIP_PLANES, &gl_max_clip_planes);
 #else
 	glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS,
 		      &gl_max_fragment_uniform_components);
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS,
 		      &gl_max_vertex_uniform_components);
+	glGetIntegerv(GL_MAX_VARYING_VECTORS,
+		      &gl_max_varying_components);
 	gl_max_fragment_uniform_components *= 4;
 	gl_max_vertex_uniform_components *= 4;
+	gl_max_varying_components *= 4;
 	gl_max_clip_planes = 0;
 #endif
 	if (argc < 2) {
