@@ -3,6 +3,7 @@
 
 [require]
 GLSL >= 1.10
+GL_MAX_VARYING_COMPONENTS >= 20
 
 [vertex shader]
 uniform int row;

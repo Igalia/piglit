@@ -3,6 +3,7 @@
 
 [require]
 GLSL >= 1.20
+GL_MAX_VARYING_COMPONENTS >= 12
 
 [vertex shader]
 uniform mat2x2 src_matrix;
