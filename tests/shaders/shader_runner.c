@@ -552,6 +552,23 @@ void
 process_requirement(const char *line)
 {
 	char buffer[4096];
+	static const struct {
+		const char *name;
+		int *val;
+		const char *desc;
+	} getint_limits[] = {
+		{
+			"GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
+			&gl_max_fragment_uniform_components,
+			"fragment uniform components",
+		},
+		{
+			"GL_MAX_VERTEX_UNIFORM_COMPONENTS",
+			&gl_max_vertex_uniform_components,
+			"vertex uniform components",
+		},
+	};
+	unsigned i;
 
 	/* There are four types of requirements that a test can currently
 	 * have:
@@ -566,41 +583,31 @@ process_requirement(const char *line)
 	 * can also require that a particular extension not be supported by
 	 * prepending ! to the extension name.
 	 */
-	if (string_match("GL_MAX_FRAGMENT_UNIFORM_COMPONENTS", line)) {
+	for (i = 0; i < ARRAY_SIZE(getint_limits); i++) {
 		enum comparison cmp;
 		int maxcomp;
 
-		line = eat_whitespace(line + 34);
+		if (!string_match(getint_limits[i].name, line))
+			continue;
+
+		line = eat_whitespace(line + strlen(getint_limits[i].name));
 
 		line = process_comparison(line, &cmp);
 
 		maxcomp = atoi(line);
-		if (!compare(maxcomp, gl_max_fragment_uniform_components, cmp)) {
-			printf("Test requires max fragment uniform components %s %i.  "
+		if (!compare(maxcomp, *getint_limits[i].val, cmp)) {
+			printf("Test requires %s %s %i.  "
 			       "The driver supports %i.\n",
+			       getint_limits[i].desc,
 			       comparison_string(cmp),
 			       maxcomp,
-			       gl_max_fragment_uniform_components);
+			       *getint_limits[i].val);
 			piglit_report_result(PIGLIT_SKIP);
 		}
-	} else if (string_match("GL_MAX_VERTEX_UNIFORM_COMPONENTS", line)) {
-		enum comparison cmp;
-		int maxcomp;
+		return;
+	}
 
-		line = eat_whitespace(line + 32);
-
-		line = process_comparison(line, &cmp);
-
-		maxcomp = atoi(line);
-		if (!compare(maxcomp, gl_max_vertex_uniform_components, cmp)) {
-			printf("Test requires max vertex uniform components %s %i.  "
-			       "The driver supports %i.\n",
-			       comparison_string(cmp),
-			       maxcomp,
-			       gl_max_vertex_uniform_components);
-			piglit_report_result(PIGLIT_SKIP);
-		}
-	} else if (string_match("GL_", line)) {
+	if (string_match("GL_", line)) {
 		strcpy_to_space(buffer, line);
 		piglit_require_extension(buffer);
 	} else if (string_match("!GL_", line)) {
