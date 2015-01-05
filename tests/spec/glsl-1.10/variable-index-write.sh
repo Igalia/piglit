@@ -356,6 +356,9 @@ function emit_vs_wr_test
     echo
     echo "[require]"
     echo "GLSL >= ${version}"
+    if [ "x$mode" = "xvarying" ]; then
+       echo "GL_MAX_VARYING_COMPONENTS >= $varying_comps"
+    fi
     echo
 
     echo "[vertex shader]"
@@ -419,6 +422,12 @@ for mode in temp varying; do
 	fi
 
 	for matrix_dim in 2 3 4; do
+	    if [ $array_dim -ne 0 ]; then
+		varying_comps=$((matrix_dim * matrix_dim * array_dim))
+	    else
+		varying_comps=$((matrix_dim * matrix_dim))
+	    fi
+
 	    # Fragment shaders cannot write varyings
 	    if [ "x$mode" != "xvarying" ]; then
 		name="fs-${mode}-${arr}mat${matrix_dim}-${idx_txt}col-row-wr.shader_test"

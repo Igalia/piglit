@@ -376,6 +376,9 @@ function emit_fs_rd_test
     echo
     echo "[require]"
     echo "GLSL >= $version"
+    if [ "x$mode" = "xvarying" ]; then
+       echo "GL_MAX_VARYING_COMPONENTS >= $varying_comps"
+    fi
     echo
 
     emit_vs $* 0
@@ -394,6 +397,9 @@ function emit_vs_rd_test
     echo
     echo "[require]"
     echo "GLSL >= $version"
+    if [ "x$mode" = "xvarying" ]; then
+       echo "GL_MAX_VARYING_COMPONENTS >= $varying_comps"
+    fi
     echo
 
     emit_vs $* 1
@@ -422,6 +428,7 @@ for mode in temp uniform varying; do
     for array_dim in 0 3; do
 	for matrix_dim in 2 3 4; do
 	    if [ $array_dim -ne 0 ]; then
+		varying_comps=$((4 + matrix_dim * matrix_dim * array_dim))
 		arr="array-"
 		idx_txt="index-"
 
@@ -465,6 +472,7 @@ for mode in temp uniform varying; do
 		    > $name
 		echo $name
 	    else
+		varying_comps=$((4 + matrix_dim * matrix_dim))
 		arr=""
 		idx_txt=""
 	    fi
