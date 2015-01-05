@@ -110,7 +110,6 @@ piglit_gbm_console_display(void)
 	uint32_t *pixels;
 	size_t export_size;
 	int width = 40, height = 20;
-	int i;
 
 	canvas = caca_create_canvas(width, height);
 	if (!canvas) {
@@ -130,8 +129,7 @@ piglit_gbm_console_display(void)
 		return;
 	}
 
-	/* Note: we allocate memory for 1 extra row */
-	pixels = malloc(4 * piglit_width * (piglit_height + 1));
+	pixels = malloc(4 * piglit_width * piglit_height);
 
 	while (!piglit_check_gl_error(GL_NO_ERROR)) {
 		/* Clear any OpenGL errors */
@@ -146,22 +144,8 @@ piglit_gbm_console_display(void)
 		return;
 	}
 
-	/* Swap the image's pixels vertically using the extra
-	 * row of pixels that we allocated as swap space.
-	 */
-	for (i = 0; i < (piglit_height / 2); i++) {
-		memcpy(&pixels[piglit_width * piglit_height],
-		       &pixels[piglit_width * i],
-		       4 * piglit_width);
-		memcpy(&pixels[piglit_width * i],
-		       &pixels[piglit_width * (piglit_height - 1 - i)],
-		       4 * piglit_width);
-		memcpy(&pixels[piglit_width * (piglit_height - 1 - i)],
-		       &pixels[piglit_width * piglit_height],
-		       4 * piglit_width);
-	}
-
 	caca_dither_bitmap(canvas, 0, 0, width, height, dither, pixels);
+	caca_flop(canvas);
 	caca_free_dither(dither);
 	free(pixels);
 
