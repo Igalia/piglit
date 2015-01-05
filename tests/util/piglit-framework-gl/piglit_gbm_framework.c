@@ -154,9 +154,9 @@ piglit_gbm_console_display(void)
 		       &pixels[piglit_width * i],
 		       4 * piglit_width);
 		memcpy(&pixels[piglit_width * i],
-		       &pixels[piglit_width * (piglit_height - i)],
+		       &pixels[piglit_width * (piglit_height - 1 - i)],
 		       4 * piglit_width);
-		memcpy(&pixels[piglit_width * (piglit_height - i)],
+		memcpy(&pixels[piglit_width * (piglit_height - 1 - i)],
 		       &pixels[piglit_width * piglit_height],
 		       4 * piglit_width);
 	}
