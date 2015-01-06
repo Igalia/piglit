@@ -91,10 +91,10 @@ def setup_module_search_path():
     abs_bindir = abs_script_dir
     script_basename_noext = os.path.splitext(os.path.basename(__file__))[0]
     for libdir in ('lib64', 'lib32', 'lib'):
-        abs_libdir = path.join(abs_bindir, '..', libdir)
+        abs_libdir = path.normpath(path.join(abs_bindir, '..', libdir))
         abs_data_dir = path.join(abs_libdir, script_basename_noext)
         if is_piglit_data_dir(abs_data_dir):
-            sys.path.append(abs_data_dir)
+            sys.path.insert(0, abs_data_dir)
             return
 
     print('error: failed to find piglit data directory. exiting...', file=sys.stderr)
