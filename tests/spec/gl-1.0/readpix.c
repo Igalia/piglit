@@ -283,12 +283,12 @@ random_bits(unsigned int bits)
 bool
 check_stencil(void) 
 {
-	int i, x, y;
+	int i, x = 0, y = 0;
 	bool pass = true;
 	const int w = piglit_width;
 	const int h = piglit_height;
 	GLuint *buf = malloc(h * w * sizeof *buf);
-	GLuint expected;
+	GLuint expected = 0;
 	GLint sbits;
 	glGetIntegerv(GL_STENCIL_BITS, &sbits);
 	pass &= piglit_check_gl_error(GL_NO_ERROR);
