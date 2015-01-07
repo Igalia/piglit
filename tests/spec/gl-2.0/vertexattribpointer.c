@@ -153,6 +153,7 @@ test_array(GLenum type, GLuint size, GLboolean normalized)
 		assert(0);
 		maxVal = 1.0;
 		typeSize = sizeof(GLfloat);
+		data = NULL;
 	}
 
 	if (normalized) {
