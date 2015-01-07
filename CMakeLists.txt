@@ -187,7 +187,7 @@ IF(PIGLIT_BUILD_GLX_TESTS)
 	pkg_check_modules(GLPROTO REQUIRED glproto)
 ENDIF()
 
-# Check for presence of Python 2.6 or greater.
+# Check for presence of Python 2.7 or greater.
 foreach(python_cmd python2 python)
 	execute_process(
 		COMMAND ${python_cmd} -c "import sys; assert '2.7' <= sys.version < '3'"
@@ -201,7 +201,7 @@ foreach(python_cmd python2 python)
 endforeach(python_cmd)
 
 if(NOT DEFINED python)
-	message(FATAL_ERROR "python version 2.x (where x >= 6) required")
+	message(FATAL_ERROR "python version 2.7 required")
 endif(NOT DEFINED python)
 
 include(PiglitFindMako)
