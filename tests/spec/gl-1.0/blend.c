@@ -252,7 +252,8 @@ apply_blend(GLenum src_factor_rgb, GLenum src_factor_a,
 	    float* dst, const float* src,
 	    const GLfloat constant_color[4])
 {
-	float sf[4], df[4];
+	float sf[4] = { 0 };
+	float df[4] = { 0 };
 
 	if (op_rgb != GL_MIN && op_rgb != GL_MAX) {
 		/* Src RGB term */
