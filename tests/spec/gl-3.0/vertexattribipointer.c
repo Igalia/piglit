@@ -135,6 +135,7 @@ test_array(GLenum type, GLuint size)
 	default:
 		assert(0);
 		typeSize = sizeof(GLint);
+		data = NULL;
 	}
 
 	/* set unused components to defaults */
