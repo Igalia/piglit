@@ -1,0 +1,20 @@
+[require]
+GLSL >= 1.10
+
+[vertex shader passthrough
+
+[fragment shader]
+void main()
+{
+	float f = gl_FrontFacing ? 0.0 : -1.0;
+	f = f * 0.5 + 0.75; // Remap (0.0, -1.0) -> (0.75, 0.25)
+	gl_FragColor = vec4(0.0, f, 0.0, 1.0);
+}
+
+[test]
+draw rect -1 -1 2 1
+draw rect 1 0 -2 1
+relative probe rgba (0, 0) (0.0, 0.75, 0.0, 1.0)
+relative probe rgba (1, 0) (0.0, 0.75, 0.0, 1.0)
+relative probe rgba (0, 1) (0.0, 0.25, 0.0, 1.0)
+relative probe rgba (1, 1) (0.0, 0.25, 0.0, 1.0)
