@@ -207,7 +207,7 @@ piglit_init(int argc, char **argv)
 	GLuint tex, fb, prog;
 	GLenum status;
 	int i, level, layer, dim, num_layers;
-	const char *target_str, *type_str, *compare_value_mask = "";
+	const char *target_str = "", *type_str = "", *compare_value_mask = "";
 	const char *offset_type_str = "", *declaration = "", *instruction;
 	const char *version = "130", *other_params = "", *deriv_type = "";
 	GLenum format, attachment, clearbits;
@@ -859,6 +859,7 @@ piglit_init(int argc, char **argv)
 		break;
 	default:
 		assert(0);
+		num_layers = 0;
 	}
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
