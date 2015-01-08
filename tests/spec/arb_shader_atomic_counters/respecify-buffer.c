@@ -50,7 +50,7 @@ float white[] = { 1, 1, 1 };
 enum piglit_result
 piglit_display(void)
 {
-	bool pass = true;
+	bool pass;
 	int i;
 
 	glViewport(0, 0, piglit_width, piglit_height);
@@ -69,11 +69,11 @@ piglit_display(void)
 	pass = piglit_probe_pixel_rgb(piglit_width / 4,
 				      piglit_height / 4, red);
 	pass = piglit_probe_pixel_rgb(3 * piglit_width / 4,
-				      piglit_height / 4, green);
+				      piglit_height / 4, green) && pass;
 	pass = piglit_probe_pixel_rgb(piglit_width / 4,
-				      3 * piglit_height / 4, blue);
+				      3 * piglit_height / 4, blue) && pass;
 	pass = piglit_probe_pixel_rgb(3 * piglit_width / 4,
-				      3 * piglit_height / 4, white);
+				      3 * piglit_height / 4, white) && pass;
 
 	piglit_present_results();
 
