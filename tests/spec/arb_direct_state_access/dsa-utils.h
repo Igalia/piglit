@@ -38,7 +38,6 @@ extern "C" {
 #endif
 
 #include "piglit-util-gl.h"
-#include "piglit-glx-util.h"
 
 void dsa_init_program(void);
 
