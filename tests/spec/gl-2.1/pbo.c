@@ -481,13 +481,11 @@ test_bitmap(void)
 						expected[idx + 0] = black[0];
 						expected[idx + 1] = black[1];
 						expected[idx + 2] = black[2];
-						expected[idx + 3] = black[3];
 					}
 					else {
 						expected[idx + 0] = white[0];
 						expected[idx + 1] = white[1];
 						expected[idx + 2] = white[2];
-						expected[idx + 3] = white[3];
 					}
 				}
 			}
@@ -513,6 +511,8 @@ test_bitmap(void)
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
+#define TEXTURE_SIZE TEXSIZE * TEXSIZE * 3
+#define WINDOW_SIZE WINSIZE * WINSIZE * 3
 
 enum piglit_result
 test_tex_image(void)
@@ -525,17 +525,15 @@ test_tex_image(void)
 	GLuint pack_pb[1];
 	GLenum pack = GL_PIXEL_PACK_BUFFER_ARB;
 	GLenum unpack = GL_PIXEL_UNPACK_BUFFER_ARB;
-	int texture_size = TEXSIZE * TEXSIZE * 3;
-	GLfloat t1[texture_size];
-	GLfloat t2[texture_size];
+	GLfloat t1[TEXTURE_SIZE];
+	GLfloat t2[TEXTURE_SIZE];
 	GLfloat *pbo_mem = NULL;
 	int i, j;
 	GLfloat green[3] = { 1.0, 1.0, 0.0 };
 	GLfloat black[3] = { 0.0, 0.0, 0.0 };
-	int window_size = WINSIZE * WINSIZE * 3;
-	GLfloat buf[window_size];
-	GLfloat exp_tex[texture_size];
-	GLfloat exp_win[window_size];
+	GLfloat buf[WINDOW_SIZE];
+	GLfloat exp_tex[TEXTURE_SIZE];
+	GLfloat exp_win[WINDOW_SIZE];
 	GLfloat tolerance[4];
 
 	piglit_compute_probe_tolerance(GL_RGB, tolerance);
@@ -559,7 +557,7 @@ test_tex_image(void)
 						glBindBufferARB(unpack,
 						   unpack_pb[0]);
 						glBufferDataARB(unpack,
-							texture_size *
+							TEXTURE_SIZE *
 							sizeof(GLfloat),
 							NULL, GL_STREAM_DRAW);
 					}
@@ -580,7 +578,7 @@ test_tex_image(void)
 						pbo_mem = t1;
 					}
 
-					for (i = 0; i < texture_size/3; i++) {
+					for (i = 0; i < TEXTURE_SIZE/3; i++) {
 						pbo_mem[3 * i] = 1.0;
 						pbo_mem[3 * i + 1] = 1.0;
 						pbo_mem[3 * i + 2] = 0.0;
@@ -609,7 +607,7 @@ test_tex_image(void)
 							 glMapBufferARB(
 							    unpack,
 							    GL_WRITE_ONLY);
-						for (i = 0; i < texture_size; i++)
+						for (i = 0; i < TEXTURE_SIZE; i++)
 							pbo_mem[i] = 0.2;
 						glUnmapBufferARB(unpack);
 						glBindBufferARB(unpack, 0);
@@ -634,8 +632,8 @@ test_tex_image(void)
 							 glMapBuffer(unpack,
 							 GL_READ_ONLY);
 						if (break_pbo_cow) {
-							for (i = 0; i < texture_size; i++)
-								if (fabsf(pbo_mem[i] - 0.2) > tolerance[0]) {
+							for (i = 0; i < TEXTURE_SIZE; i++)
+								if (fabsf(pbo_mem[i] - 0.2f) > tolerance[0]) {
 									REPORT_FAILURE
 										("PBO modified by someone else, "
 										 "there must be something wrong");
@@ -652,7 +650,7 @@ test_tex_image(void)
 						glGenBuffersARB(1, pack_pb);
 						glBindBufferARB(pack, pack_pb[0]);
 						glBufferDataARB(pack,
-								texture_size *
+								TEXTURE_SIZE *
 								sizeof(GLfloat),
 								NULL, GL_STREAM_DRAW);
 						glGetTexImage(GL_TEXTURE_2D,
@@ -670,7 +668,7 @@ test_tex_image(void)
 					}
 
 					/* Check texture image */
-					for (i = 0; i < texture_size/3; i++) {
+					for (i = 0; i < TEXTURE_SIZE/3; i++) {
 						int idx = i * 3;
 						if (i == 0 && break_tex_cow
 						   && use_unpack) {
