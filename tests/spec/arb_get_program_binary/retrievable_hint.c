@@ -111,10 +111,10 @@ piglit_init(int argc, char **argv)
 	 */
 
 	glProgramParameteri(prog, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE);
-	got_error = piglit_check_gl_error(0);
+	pass = piglit_check_gl_error(0) && pass;
 
 	glGetProgramiv(prog, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, &value);
-	got_error = piglit_check_gl_error(0);
+	pass = piglit_check_gl_error(0) && pass;
 
 	if (value != 0) {
 		fprintf(stderr,
@@ -124,10 +124,10 @@ piglit_init(int argc, char **argv)
 	}
 
 	glLinkProgram(prog);
-	got_error = piglit_check_gl_error(0);
+	pass = piglit_check_gl_error(0) && pass;
 
 	glGetProgramiv(prog, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, &value);
-	got_error = piglit_check_gl_error(0);
+	pass = piglit_check_gl_error(0) && pass;
 
 	if (value != GL_TRUE) {
 		fprintf(stderr,
