@@ -99,7 +99,7 @@ framebuffer_srgb_api_ext(void)
 		pass = GL_FALSE;
 	}
 
-	is_enabled = glIsEnabled(GL_FRAMEBUFFER_SRGB_EXT);
+	(void) glIsEnabled(GL_FRAMEBUFFER_SRGB_EXT); /* ignore return value */
 	ret = glGetError();
 	if (ret != 0) {
 		printf("unexpected error getting IsEnabled %d\n", ret);
