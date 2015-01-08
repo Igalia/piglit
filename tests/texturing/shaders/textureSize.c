@@ -247,7 +247,7 @@ has_lod(void)
 int
 generate_GLSL(enum shader_target test_stage)
 {
-	int vs, gs, fs;
+	int vs, gs = 0, fs;
 	int prog;
 
 	static char *vs_code;
