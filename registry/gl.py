@@ -30,7 +30,6 @@ import os.path
 import re
 import sys
 
-from collections import namedtuple
 from copy import copy, deepcopy
 
 
