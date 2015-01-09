@@ -1513,7 +1513,7 @@ for stage in ['vs', 'gs', 'fs']:
         spec[grouptools.join(
             'glsl-{}'.format(version), 'execution', 'texelFetchOffset',
             '{}-{}'.format(stage, sampler))] = PiglitGLTest(
-                ['texelFetch', 'offset,' '140', stage, sampler],
+                ['texelFetch', 'offset', '140', stage, sampler],
                 run_concurrent=True)
 
 spec['glsl-1.50'] = {}
