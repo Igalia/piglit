@@ -785,7 +785,7 @@ class Command(object):
     @property
     def vendor_namespace(self):
         if self.__vendor_namespace is None:
-            for req in self.__requirements:
+            for req in self.requirements:
                 ext = req.extension
                 if ext is None:
                     continue
