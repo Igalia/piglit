@@ -96,12 +96,14 @@ make_layer_data(int num_layers)
 	int z;
 	GLubyte *layer_data =
 		malloc(num_layers * IMAGE_SIZE * sizeof(GLubyte));
+	GLubyte *data = piglit_rgbw_image_ubyte(IMAGE_WIDTH,
+						IMAGE_HEIGHT, true);
 
 	for (z = 0; z < num_layers; z++) {
-		GLubyte *data = piglit_rgbw_image_ubyte(IMAGE_WIDTH,
-							IMAGE_HEIGHT, true);
 		memcpy(layer_data + IMAGE_SIZE * z, data, IMAGE_SIZE);
 	}
+
+	free(data);
 
 	/* Show the first layer of the completed layer data. */
 	show_image(layer_data, num_layers, "Test Data");
