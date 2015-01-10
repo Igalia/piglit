@@ -38,10 +38,11 @@ def main():
     core.get_config()
     parser = argparse.ArgumentParser(sys.argv)
     parser.add_argument("-t", "--include-tests",
-                        default = [],
-                        action  = "append",
-                        metavar = "<regex>",
-                        help    = "Run only matching tests (can be used more than once)")
+                        default=[],
+                        action="append",
+                        metavar="<regex>",
+                        help="Run only matching tests "
+                             "(can be used more than once)")
     parser.add_argument("-x", "--exclude-tests",
                         default=[],
                         action="append",
@@ -54,7 +55,7 @@ def main():
     args = parser.parse_args()
 
     opts = core.Options(exclude_filter=args.exclude_tests,
-                       include_filter=args.include_tests)
+                        include_filter=args.include_tests)
 
     # Change to the piglit's path
     piglit_dir = path.dirname(path.realpath(sys.argv[0]))
