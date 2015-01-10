@@ -315,6 +315,9 @@ int main(int argc, char **argv) {
 	case WINDOW:
 	    draw = piglit_get_glx_window(display, visual);
 	    break;
+	default:
+	    assert(0);
+	    draw = 0;
 	}
 
 	glXMakeCurrent(display, draw, ctx);
