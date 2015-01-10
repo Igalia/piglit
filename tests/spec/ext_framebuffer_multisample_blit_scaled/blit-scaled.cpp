@@ -309,7 +309,7 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-bool test_ms_blit_scaled(Fbo ms_fbo)
+bool test_ms_blit_scaled(const Fbo& ms_fbo)
 {
 	GLfloat scale;
 	bool pass = true, result = true;
