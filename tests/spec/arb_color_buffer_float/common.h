@@ -172,17 +172,21 @@ static GLboolean run_test()
 	}
 	else
 	{
-		unsigned mrt_modes = piglit_is_extension_supported("GL_ARB_draw_buffers") ? (piglit_is_extension_supported("GL_ARB_texture_float") ? 3 : 2) : 1;
-		unsigned first_mrt_mode = (test_mode == TEST_MRT) ? 1 : 0;
+		enum test_mode_type mrt_modes = (piglit_is_extension_supported("GL_ARB_draw_buffers") ?
+						 (piglit_is_extension_supported("GL_ARB_texture_float") ?
+						  TEST_SRT_MRT :
+						  TEST_MRT) :
+						 TEST_SRT);
+		enum test_mode_type first_mrt_mode = (test_mode == TEST_MRT) ? TEST_SRT : TEST_NO_RT;
 
 		for (mrt_mode = first_mrt_mode; mrt_mode < mrt_modes; ++mrt_mode)
 		{
 			fixed1 = fixed;
-			if (mrt_mode)
+			if (mrt_mode != TEST_NO_RT)
 			{
 				GLenum bufs[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
 				unsigned format1;
-				if (mrt_mode == 1)
+				if (mrt_mode == TEST_SRT)
 					format1 = format;
 				else
 				{
@@ -213,7 +217,7 @@ static GLboolean run_test()
 
 				status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 				if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-					if (mrt_mode == 2)
+					if (mrt_mode == TEST_MRT)
 						printf("Dishomogeneous framebuffer is incomplete, skipping dishomogeneous tests (status = 0x%04x)\n", status);
 					else
 					{
@@ -238,7 +242,7 @@ static GLboolean run_test()
 			pass = test() && pass;
 
 	skip_mrt:
-			if (mrt_mode)
+			if (mrt_mode != TEST_NO_RT)
 			{
 				glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
