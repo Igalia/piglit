@@ -172,12 +172,20 @@ static GLboolean run_test()
 	}
 	else
 	{
-		enum test_mode_type mrt_modes = (piglit_is_extension_supported("GL_ARB_draw_buffers") ?
-						 (piglit_is_extension_supported("GL_ARB_texture_float") ?
-						  TEST_SRT_MRT :
-						  TEST_MRT) :
-						 TEST_SRT);
+		enum test_mode_type mrt_modes;
 		enum test_mode_type first_mrt_mode = (test_mode == TEST_MRT) ? TEST_SRT : TEST_NO_RT;
+
+		mrt_modes = TEST_SRT_MRT;
+		if (!piglit_is_extension_supported("GL_ARB_texture_float"))
+			mrt_modes = TEST_MRT;
+		if (!piglit_is_extension_supported("GL_ARB_draw_buffers"))
+			mrt_modes = TEST_SRT;
+		else {
+			GLint val;
+			glGetIntegerv(GL_MAX_DRAW_BUFFERS, &val);
+			if (val < 2)
+				mrt_modes = TEST_SRT;
+		}
 
 		for (mrt_mode = first_mrt_mode; mrt_mode < mrt_modes; ++mrt_mode)
 		{
