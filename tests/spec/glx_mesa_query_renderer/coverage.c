@@ -111,6 +111,30 @@ verify_integer_values(const char *name, Bool success,
 		}
 	}
 
+	/* value sanity check */
+	switch (test->attribute) {
+	case GLX_RENDERER_PREFERRED_PROFILE_MESA:
+	    unsigned legal = GLX_CONTEXT_CORE_PROFILE_BIT_ARB |
+			     GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB |
+			     GLX_CONTEXT_ES_PROFILE_BIT_EXT |
+			     GLX_CONTEXT_ES2_PROFILE_BIT_EXT;
+	    if (buffer[0] & ~legal) {
+		fprintf(stderr, "Unknown bits set in preferred profile "
+			"bitmask: 0x%x\n", buffer[0] & ~legal);
+		pass = false;
+	    }
+            if (!buffer[0]) {
+                fprintf(stderr, "No preferred API profile!\n");
+                pass = false;
+            } else if (buffer[0] & (buffer[0] - 1)) {
+                fprintf(stderr, "More than one preferred API profile\n");
+                pass = false;
+            }
+	    break;
+	default:
+	    break;
+	}
+
 	return pass;
 }
 
