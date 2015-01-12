@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 """All OpenCL tests that come with piglit, using default settings."""
 
+# Because these profiles put all of the names in the global scope and rely on
+# __all__ to hide private names there will be a lot errors from pylint about
+# invalid constant names, they're not really fixable, so just hide them.
+# pylint: disable=invalid-name
+
 from __future__ import division, absolute_import, print_function
 
 import os
