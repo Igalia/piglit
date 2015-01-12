@@ -29,6 +29,7 @@ from __future__ import print_function
 import os.path
 import re
 import sys
+import functools
 
 from copy import copy, deepcopy
 
@@ -271,8 +272,7 @@ class OrderedKeyedSet(object):
         return node[3]
 
     def sort_by_key(self):
-        sorted_items = sorted(self.__map.iteritems(),
-                              cmp=lambda x, y: cmp(x[0], y[0]))
+        sorted_items = sorted(self.__map.iteritems())
         self.clear()
         for item in sorted_items:
             self.add(item[1])
@@ -391,6 +391,7 @@ class Registry(object):
         self.vendor_namespaces.remove(None)
 
 
+@functools.total_ordering
 class Feature(object):
     """A <feature> XML element.
 
@@ -451,20 +452,25 @@ class Feature(object):
         assert(self.api in VALID_APIS)
         assert(len(self.requirements) > 0)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if self is other:
-            return 0
+            return True
+        elif isinstance(other, Extension):
+            return False
+        elif self.is_gles != other.is_gles:
+            return False
+        return self.name == other.name
 
-        # Sort features before extensions.
+    def __lt__(self, other):
         if isinstance(other, Extension):
-            return -1
-
-        # Sort GL before GLES.
-        diff = cmp(self.is_gles, other.is_gles)
-        if diff != 0:
-            return diff
-
-        return cmp(self.name, other.name)
+            return True
+        # Desktop GL before GLES
+        elif self.is_gles != other.is_gles:
+            if self.is_gles:
+                return False
+            else:
+                return True
+        return self.name < other.name
 
     def __repr__(self):
         templ = '{self.__class__.__name__}({self.name!r})'
@@ -490,6 +496,7 @@ class Feature(object):
             link(enum)
 
 
+@functools.total_ordering
 class Extension(object):
     """An <extension> XML element.
 
@@ -539,26 +546,33 @@ class Extension(object):
 
         self.__parse_requirements(xml_extension, command_map, enum_map)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if self is other:
-            return 0
+            return True
+        elif isinstance(other, Feature):
+            return False
+        elif self.is_ratified != other.is_ratified:
+            return False
+        elif self.vendor_namespace == 'EXT' != other.vendor_namespace == 'EXT':
+            return False
+        return self.name == other.name
 
-        # Sort features before extensions.
+    def __lt__(self, other):
         if isinstance(other, Feature):
-            return 1
-
-        # Sort ratified before unratified.
-        diff = cmp(other.is_ratified, self.is_ratified)
-        if diff != 0:
-            return diff
-
-        # Sort EXT before others.
-        diff = cmp(other.vendor_namespace == 'EXT',
-                   self.vendor_namespace == 'EXT')
-        if diff != 0:
-            return diff
-
-        return cmp(self.name, other.name)
+            return False
+        elif self.is_ratified != other.is_ratified:
+            # sort ratified before unratified
+            if self.is_ratified:
+                return True
+            else:
+                return False
+        elif (other.vendor_namespace == 'EXT') != (self.vendor_namespace == 'EXT'):
+            # Sort EXT before others
+            if self.vendor_namespace == 'EXT':
+                return True
+            else:
+                return False
+        return self.name < other.name
 
     def __repr__(self):
         templ = '{self.__class__.__name__}(name={self.name!r})'
@@ -598,6 +612,7 @@ class Extension(object):
                 link(xml_req, enum)
 
 
+@functools.total_ordering
 class Requirement(object):
     """A <require> XML element, which links a provider (Feature or Extension)
     to a provided (Command or Enum) for a set of apis.
@@ -630,18 +645,19 @@ class Requirement(object):
 
         _log_debug('created {0}'.format(self))
 
-    def __cmp__(self, other):
-        """Sort by 'provider', then by 'provided'."""
+    def __eq__(self, other):
+        if self.provider != other.provider:
+            return False
+        elif self.provided != other.provided:
+            return False
+        return True
 
-        diff = cmp(self.provider, other.provider)
-        if diff != 0:
-            return diff
-
-        diff = cmp(self.provided, other.provided)
-        if diff != 0:
-            return diff
-
-        return 0
+    def __lt__(self, other):
+        if self.provider < other.provider:
+            return True
+        elif self.provided < other.provided:
+            return True
+        return False
 
     def __repr__(self):
         templ = ('{self.__class__.__name__}'
@@ -702,6 +718,7 @@ class CommandParam(object):
         return templ.format(self=self)
 
 
+@functools.total_ordering
 class Command(object):
     """A <command> XML element.
 
@@ -775,8 +792,11 @@ class Command(object):
                     'alias={self.alias!r}, '
                     'prototype={self.c_prototype!r})').format(self=self))
 
-    def __cmp__(self, other):
-        return cmp(self.name, other.name)
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __lt__(self, other):
+        return self.name < other.name
 
     def __repr__(self):
         templ = '{self.__class__.__name__}({self.name!r})'
@@ -833,6 +853,7 @@ class Command(object):
         )
 
 
+@functools.total_ordering
 class CommandAliasSet(ImmutableOrderedKeyedSet):
 
     def __init__(self, commands):
@@ -841,8 +862,11 @@ class CommandAliasSet(ImmutableOrderedKeyedSet):
         self.__primary_command = None
         self.__requirements = None
 
-    def __cmp__(self, other):
-        return cmp(self.name, other.name)
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __lt__(self, other):
+        return self.name < other.name
 
     def __repr__(self):
         templ = '{self.__class__.__name__}({self.name!r})'
