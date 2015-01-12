@@ -30,6 +30,7 @@ from nose.plugins.skip import SkipTest
 import framework.core as core
 import framework.dmesg as dmesg
 import framework.profile as profile
+from framework.tests import utils
 
 
 def test_initialize_testprofile():
@@ -82,21 +83,22 @@ def test_testprofile_set_dmesg_false():
 
 def test_testprofile_flatten():
     """ TestProfile.flatten_group_hierarchy flattens and empties self.tests """
+    test1 = utils.Test(['thing'])
+    test2 = utils.Test(['thing'])
+    test3 = utils.Test(['thing'])
+
     profile_ = profile.TestProfile()
-    profile_.tests['group1'] = {}
-    profile_.tests['group1']['group2'] = {}
-    profile_.tests['group1']['group2']['group3'] = {}
-    profile_.tests['group1']['test1'] = 'thing'
-    profile_.tests['group1']['group2']['test2'] = 'thing'
-    profile_.tests['group1']['group2']['group3']['test3'] = 'thing'
+    profile_.tests['group1']['test1'] = test1
+    profile_.tests['group1']['group2']['test2'] = test2
+    profile_.tests['group1']['group2']['group3']['test3'] = test3
 
     profile_._flatten_group_hierarchy()
 
-    baseline = {
-        'group1/test1': 'thing',
-        'group1/group2/test2': 'thing',
-        'group1/group2/group3/test3': 'thing'
-    }
+    baseline = profile.Tree({
+        'group1/test1': test1,
+        'group1/group2/test2': test2,
+        'group1/group2/group3/test3': test3,
+    })
 
     # profile_.tests should have been emptied
     nt.assert_dict_equal(profile_.tests, {})
@@ -111,15 +113,12 @@ def test_testprofile_update_tests():
 
     """
     profile1 = profile.TestProfile()
-    profile1.tests['group1'] = {}
-    profile1.tests['group1']['test1'] = 'test1'
+    profile1.tests['group1']['test1'] = utils.Test(['test1'])
 
     profile2 = profile.TestProfile()
-    baseline = {}
-    baseline['group2'] = {}
-    baseline['group2']['test2'] = 'test2'
-    baseline['group1'] = {}
-    baseline['group1']['test1'] = 'test3'
+    baseline = profile.Tree()
+    baseline['group2']['test2'] = utils.Test(['test2'])
+    baseline['group1']['test1'] = utils.Test(['test3'])
     profile2.tests = baseline
 
     profile1.update(profile2)
@@ -144,10 +143,20 @@ def test_testprofile_update_test_list():
 
 def generate_prepare_test_list_flatten():
     """ Generate tests for TestProfile.prepare_test_list() """
-    tests = {'group1': {'test1': 'thingy', 'group3': {'test2': 'thing'}},
-             'group3': {'test5': 'other'}}
-    test_list = {'group1/test1': 'thingy', 'group1/group3/test2': 'thing',
-                 'group3/test5': 'other'}
+    test1 = utils.Test(['thingy'])
+    test2 = utils.Test(['thingy'])
+    test3 = utils.Test(['thingy'])
+
+    tests = profile.Tree()
+    tests['group1']['test1'] = test1
+    tests['group1']['group3']['test2'] = test2
+    tests['group3']['test5'] = test3
+
+    test_list = {
+        'group1/test1': test1,
+        'group1/group3/test2': test2,
+        'group3/test5': test3,
+    }
 
     check_flatten.description = \
         "TestProfile.prepare_test_list flattens TestProfile.tests"

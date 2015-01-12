@@ -32,6 +32,7 @@ import sys
 import multiprocessing
 import multiprocessing.dummy
 import importlib
+import types
 
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
@@ -43,6 +44,36 @@ __all__ = [
     'load_test_profile',
     'merge_test_profiles'
 ]
+
+
+class Tree(dict):
+    """A tree-like object built with python dictionaries.
+
+    When a node that doesn't exist is requested it is automatically created
+    with a new Tree node.
+
+    """
+    def __missing__(self, key):
+        """Automatically create new Tree nodes."""
+        self[key] = Tree()
+        return self[key]
+
+    def __setitem__(self, key, value):
+        """Enforce types on set operations.
+        
+        Keys should only be strings, and values should only be more Trees
+        or Tests.
+
+        """
+        assert isinstance(key, basestring), \
+               "Keys must be strings, but was {}".format(type(key))
+        # None is required to make empty assignment work:
+        # foo = Tree['a']
+        assert isinstance(value, (Tree, Test, types.NoneType)), \
+               "Values must be either a Tree or a Test, but was {}".format(
+                   type(value))
+
+        super(Tree, self).__setitem__(key, value)
 
 
 class TestProfile(object):
@@ -65,7 +96,7 @@ class TestProfile(object):
     """
     def __init__(self):
         # Self.tests is deprecated, see above
-        self.tests = {}
+        self.tests = Tree()
         self.test_list = {}
         self.filters = []
         # Sets a default of a Dummy
@@ -106,13 +137,16 @@ class TestProfile(object):
             """ Recursively flatter nested dictionary tree """
             for key, value in group.iteritems():
                 fullkey = grouptools.join(prefix, key)
-                if isinstance(value, dict):
+                if isinstance(value, Tree):
                     f(fullkey, value, test_dict)
                 else:
                     test_dict[fullkey] = value
         f('', self.tests, self.test_list)
-        # Clear out the old Group()
-        self.tests = {}
+
+        # Empty the nested structure. Do not use clear(), since it will
+        # actually remove all of the objects in the Tree, which will also
+        # remove them from self.test_list
+        self.tests = Tree()
 
     def _prepare_test_list(self, opts):
         """ Prepare tests for running

@@ -38,12 +38,9 @@ def add_plain_program_tester_test(group, name, path):
 # Collecting all tests
 profile = TestProfile()
 
-custom = {}
-api = {}
-program = {}
-profile.tests['Custom'] = custom
-profile.tests['API'] = api
-profile.tests['Program'] = program
+custom = profile.tests['Custom']
+api = profile.tests['API']
+program = profile.tests['Program']
 
 ######
 # Tests
@@ -133,12 +130,9 @@ def add_program_test_dir(group, dirpath):
         add_plain_program_tester_test(group, testname, filepath)
 
 
-program_build = {}
-program_build_fail = {}
-program_execute = {}
-program["Build"] = program_build
-program["Build"]["Fail"] = program_build_fail
-program["Execute"] = program_execute
+program_build = program["Build"]
+program_build_fail = program["Build"]["Fail"]
+program_execute = program["Execute"]
 
 add_program_test_dir(program_build,
                      os.path.join(TESTS_DIR, 'cl', 'program', 'build'))
@@ -154,8 +148,7 @@ add_program_test_dir(program_execute,
                                   'builtin', 'convert'))
 
 # Run generated built-in tests
-program_execute_builtin = {}
-program["Execute"]["Builtin"] = program_execute_builtin
+program_execute_builtin = program["Execute"]["Builtin"]
 add_program_test_dir(program_execute_builtin,
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'int'))
 add_program_test_dir(program_execute_builtin,
@@ -163,9 +156,7 @@ add_program_test_dir(program_execute_builtin,
 add_program_test_dir(program_execute_builtin,
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
                                   'relational'))
-program_execute_store = {}
-program["Execute"]["Store"] = program_execute_store
-add_program_test_dir(program_execute_store,
+add_program_test_dir(program["Execute"]["Store"],
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
-add_program_test_dir(program_execute_store,
+add_program_test_dir(program["Execute"]["Store"],
                      os.path.join(TESTS_DIR, 'cl', 'store'))

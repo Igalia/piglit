@@ -120,8 +120,6 @@ def add_shader_test_dir(group, dirpath, recursive=False):
         if path.isdir(filepath):
             if not recursive:
                 continue
-            if not filename in group:
-                group[filename] = {}
             add_shader_test_dir(group[filename], filepath, recursive)
         else:
             ext = filename.rsplit('.')[-1]
