@@ -1780,6 +1780,7 @@ with profile.group_manager(
     g(['arb_sync-sync-initialize'], 'sync-initialize')
     g(['arb_sync-timeout-zero'], 'timeout-zero')
     g(['arb_sync-WaitSync-errors'], 'WaitSync-errors')
+    g(['arb_sync-ClientWaitSync-timeout'], 'ClientWaitSync-timeout')
     g(['sync_api'], run_concurrent=False)
 
 # Group ARB_ES2_compatibility
