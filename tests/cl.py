@@ -6,7 +6,7 @@ from __future__ import division, absolute_import, print_function
 
 import os
 import os.path as path
-import platform
+import sys
 import glob
 
 from framework.profile import TestProfile
@@ -18,7 +18,8 @@ __all__ = ['profile']
 ######
 # Helper functions
 
-can_do_concurrent = platform.system().lower()[0:5] != 'linux' or glob.glob('/dev/dri/render*')
+can_do_concurrent = (not sys.platform.startswith('linux') or
+                     glob.glob('/dev/dri/render*'))
 
 def add_plain_test(group, name, args):
         group[name] = PiglitCLTest(args, run_concurrent=can_do_concurrent)
