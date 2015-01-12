@@ -45,7 +45,7 @@ typedef ${f.c_return_type} (APIENTRY *PFN${f.name.upper()}PROC)(${f.c_named_para
 <% f0 = alias_set.primary_command %>\
 % for command in alias_set:
 /* ${command.name}
-% for requirement in command.requirements:
+% for requirement in sorted(command.requirements):
 .................. (${requirement.provider.name})
 % endfor
 ................................................. */
