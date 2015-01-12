@@ -113,18 +113,30 @@ program["Build"] = program_build
 program["Build"]["Fail"] = program_build_fail
 program["Execute"] = program_execute
 
-add_program_test_dir(program_build, 'tests/cl/program/build')
-add_program_test_dir(program_build_fail, 'tests/cl/program/build/fail')
-add_program_test_dir(program_execute, 'tests/cl/program/execute')
-add_program_test_dir(program_execute, 'tests/cl/program/execute/builtin/atomic')
-add_program_test_dir(program_execute, 'tests/cl/program/execute/builtin/convert')
+add_program_test_dir(program_build,
+                     os.path.join('tests', 'cl', 'program', 'build'))
+add_program_test_dir(program_build_fail,
+                     os.path.join('tests', 'cl', 'program', 'build', 'fail'))
+add_program_test_dir(program_execute,
+                     os.path.join('tests', 'cl', 'program', 'execute'))
+add_program_test_dir(program_execute,
+                     os.path.join('tests', 'cl', 'program', 'execute',
+                                  'builtin', 'atomic'))
+add_program_test_dir(program_execute,
+                     os.path.join('tests', 'cl', 'program', 'execute',
+                                  'builtin', 'convert'))
 
 #Run generated built-in tests
 program_execute_builtin = {}
 program["Execute"]["Builtin"] = program_execute_builtin
-add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/int')
-add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/math')
-add_program_test_dir(program_execute_builtin, 'generated_tests/cl/builtin/relational')
+add_program_test_dir(program_execute_builtin,
+                     os.path.join('generated_tests', 'cl', 'builtin', 'int'))
+add_program_test_dir(program_execute_builtin,
+                     os.path.join('generated_tests', 'cl', 'builtin', 'math'))
+add_program_test_dir(program_execute_builtin,
+                     os.path.join('generated_tests', 'cl', 'builtin',
+                                  'relational'))
 program_execute_store = {}
 program["Execute"]["Store"] = program_execute_store
-add_program_test_dir(program_execute_store, 'generated_tests/cl/store')
+add_program_test_dir(program_execute_store,
+                     os.path.join('generated_tests', 'cl', 'store'))
