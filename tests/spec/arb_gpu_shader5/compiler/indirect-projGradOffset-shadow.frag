@@ -1,6 +1,7 @@
 // [config]
 // expect_result: pass
 // glsl_version: 1.30
+// require_extensions: GL_ARB_gpu_shader5
 // [end config]
 #version 130
 #extension GL_ARB_gpu_shader5: require
