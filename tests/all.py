@@ -14,19 +14,8 @@ from framework.profile import TestProfile
 from framework.test import (PiglitGLTest, GleanTest,
                             add_glsl_parser_test, import_glsl_parser_tests,
                             add_shader_test_dir)
+from py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
-# Path to tests dir, correct even when not running from the top directory.
-TESTS_DIR = os.path.dirname(__file__)
-if sys.platform == "cygwin":
-    # convert the path to DOS style so it's parsable by shader_runner, etc.
-    TESTS_DIR = subprocess.check_output(['cygpath', '-d', TESTS_DIR]).rstrip()
-
-# Find the generated_tests directory, by looking either in
-# $PIGLIT_BUILD_DIR (if that environment variable exists) or in the
-# parent directory of the directory containing this file.
-GENERATED_TESTS_DIR = os.path.normpath(os.path.join(
-    os.environ.get('PIGLIT_BUILD_DIR', os.path.join(TESTS_DIR, '..')),
-    'generated_tests'))
 
 def add_single_param_test_set(group, name, *params):
     for param in params:
