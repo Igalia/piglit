@@ -11,6 +11,7 @@ link_libraries (
 
 piglit_add_executable (arb-provoking-vertex-control provoking-vertex-control.c)
 piglit_add_executable (arb-provoking-vertex-initial provoking-vertex-initial.c)
+piglit_add_executable (arb-provoking-vertex-render render.c)
 piglit_add_executable (arb-quads-follow-provoking-vertex quads-follow-provoking-vertex.c)
 piglit_add_executable (arb-xfb-before-flatshading xfb-before-flatshading.c)
 

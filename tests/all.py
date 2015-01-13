@@ -2181,6 +2181,7 @@ arb_provoking_vertex = {}
 spec['ARB_provoking_vertex'] = arb_provoking_vertex
 add_plain_test(arb_provoking_vertex, ['arb-provoking-vertex-control'])
 add_plain_test(arb_provoking_vertex, ['arb-provoking-vertex-initial'])
+add_plain_test(arb_provoking_vertex, ['arb-provoking-vertex-render'])
 add_plain_test(arb_provoking_vertex, ['arb-quads-follow-provoking-vertex'])
 add_plain_test(arb_provoking_vertex, ['arb-xfb-before-flatshading'])
 
