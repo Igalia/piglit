@@ -926,7 +926,6 @@ class CommandAliasMap(object):
         name_set = self.get(name, None)
         assert self.__is_set_mapping_complete(name_set)
 
-        alias = command.alias
         alias_set = self.get(command.alias, None)
         assert self.__is_set_mapping_complete(alias_set)
 
