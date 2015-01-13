@@ -147,15 +147,15 @@ class OrderedKeyedSet(object):
         cheeses.add(Cheese(name='romano', flavor='awesome'))
 
         # Elements are retrievable by key.
-        assert(cheeses['gouda'].flavor == 'smells like feet')
+        assert cheeses['gouda'].flavor == 'smells like feet'
 
         # On key collision, the old element is removed.
         cheeses.add(Cheese(name='gouda', flavor='ok i guess'))
-        assert(cheeses['gouda'].flavor == 'ok i guess')
+        assert cheeses['gouda'].flavor == 'ok i guess'
 
         # The set preserves order of insertion. Replacement does not alter
         # order.
-        assert(list(cheeses)[2].name == 'romano')
+        assert list(cheeses)[2].name == 'romano'
 
         # The set is iterable.
         for cheese in cheeses:
@@ -169,7 +169,7 @@ class OrderedKeyedSet(object):
 
         # The set supports some common set operations, such as union.
         breads_and_cheeses = breads | cheeses
-        assert(len(breads_and_cheeses) == len(breads) + len(cheeses))
+        assert len(breads_and_cheeses) == len(breads) + len(cheeses)
     """
 
     def __init__(self, key, elems=()):
@@ -355,7 +355,7 @@ class Registry(object):
     def __init__(self, xml_registry):
         """Parse the <registry> element."""
 
-        assert(xml_registry.tag == 'registry')
+        assert xml_registry.tag == 'registry'
 
         self.command_alias_map = CommandAliasMap()
         self.commands = OrderedKeyedSet(key='name')
@@ -436,7 +436,7 @@ class Feature(object):
         #        ...
         #    </feature>
 
-        assert(xml_feature.tag == 'feature')
+        assert xml_feature.tag == 'feature'
 
         # Parse the <feature> tag's attributes.
         self.name = xml_feature.get('name')
@@ -449,8 +449,8 @@ class Feature(object):
 
         self.__parse_requirements(xml_feature, command_map, enum_map)
 
-        assert(self.api in VALID_APIS)
-        assert(len(self.requirements) > 0)
+        assert self.api in VALID_APIS
+        assert len(self.requirements) > 0
 
     def __eq__(self, other):
         if self is other:
@@ -530,7 +530,7 @@ class Extension(object):
         #         </require>
         #     </extension>
 
-        assert(xml_extension.tag == 'extension')
+        assert xml_extension.tag == 'extension'
 
         self.name = xml_extension.get('name')
 
@@ -542,7 +542,7 @@ class Extension(object):
 
         self.supported_apis = xml_extension.get('supported').split('|')
         self.supported_apis = frozenset(self.supported_apis)
-        assert(self.supported_apis <= VALID_APIS)
+        assert self.supported_apis <= VALID_APIS
 
         self.__parse_requirements(xml_extension, command_map, enum_map)
 
@@ -594,7 +594,7 @@ class Extension(object):
         def link(xml_require, x):
             api = xml_require.get('api', None)
             if api is not None:
-                assert(api in self.supported_apis)
+                assert api in self.supported_apis
                 apis = frozenset((api,))
             else:
                 apis = frozenset(self.supported_apis)
@@ -639,9 +639,9 @@ class Requirement(object):
         self.command = choose_if(self.has_command, self.provided)
         self.enum = choose_if(self.has_enum, self.provided)
 
-        assert(self.has_feature + self.has_extension == 1)
-        assert(self.has_command + self.has_enum == 1)
-        assert(self.apis <= VALID_APIS)
+        assert self.has_feature + self.has_extension == 1
+        assert self.has_command + self.has_enum == 1
+        assert self.apis <= VALID_APIS
 
         _log_debug('created {0}'.format(self))
 
@@ -690,7 +690,7 @@ class CommandParam(object):
         #    <param group="sync"><ptype>GLsync</ptype> <name>sync</name></param>
         #    <param><ptype>GLuint</ptype> <name>baseAndCount</name>[2]</param>
 
-        assert(xml_param.tag == 'param')
+        assert xml_param.tag == 'param'
 
         self.name = xml_param.find('./name').text
 
@@ -758,7 +758,7 @@ class Command(object):
         #    </command>
         #
 
-        assert(xml_command.tag == 'command')
+        assert xml_command.tag == 'command'
         xml_proto = xml_command.find('./proto')
         self.name = xml_proto.find('./name').text
         _log_debug('start parsing Command(name={0!r})'.format(self.name))
@@ -919,16 +919,16 @@ class CommandAliasMap(object):
         return self.__map.get(command_name, default)
 
     def add(self, command):
-        assert(isinstance(command, Command))
+        assert isinstance(command, Command)
         _log_debug('adding command {0!r} to CommandAliasMap'.format(command.name))
 
         name = command.name
         name_set = self.get(name, None)
-        assert(self.__is_set_mapping_complete(name_set))
+        assert self.__is_set_mapping_complete(name_set)
 
         alias = command.alias
         alias_set = self.get(command.alias, None)
-        assert(self.__is_set_mapping_complete(alias_set))
+        assert self.__is_set_mapping_complete(alias_set)
 
         if name_set is alias_set and name_set is not None:
             return
@@ -1049,8 +1049,8 @@ class EnumGroup(object):
         self.enums = []
 
         self.__invent_name_and_type()
-        assert(self.name is not None)
-        assert(self.type in self.TYPES)
+        assert self.name is not None
+        assert self.type in self.TYPES
 
         _log_debug('start parsing <enum> subelements of {0}'.format(self))
         self.enums = OrderedKeyedSet(key='name')
@@ -1065,15 +1065,15 @@ class EnumGroup(object):
     def __invent_name_and_type(self):
         """If the XML didn't define a name or type, invent one."""
         if self.name is None:
-            assert(self.type is None)
-            assert(self.start is not None)
-            assert(self.end is not None)
+            assert self.type is None
+            assert self.start is not None
+            assert self.end is not None
             self.name = 'range_{self.start}_{self.end}'.format(self=self)
             self.type = 'default_namespace'
         elif self.type is None:
             self.type = 'small_index'
         elif self.name == 'SpecialNumbers':
-            assert(self.type is None)
+            assert self.type is None
             self.type = 'special'
 
 
@@ -1097,8 +1097,8 @@ class Enum(object):
         # Example <enum> element:
         #     <enum value="0x0000" name="GL_POINTS"/>
 
-        assert(isinstance(enum_group, EnumGroup))
-        assert(xml_enum.tag == 'enum')
+        assert isinstance(enum_group, EnumGroup)
+        assert xml_enum.tag == 'enum'
 
         self.requirements = set()
         self.__vendor_namespace = None
