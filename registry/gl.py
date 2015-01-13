@@ -318,7 +318,7 @@ class ImmutableOrderedKeyedSet(OrderedKeyedSet):
         raise ImmutableError
 
 
-class ImmutableError:
+class ImmutableError(Exception):
     pass
 
 
