@@ -33,7 +33,6 @@ from .piglit_test import PiglitBaseTest
 __all__ = [
     'ShaderTest',
     'ShaderTestParserException',
-    'add_shader_test',
     'add_shader_test_dir'
 ]
 
@@ -101,18 +100,6 @@ class ShaderTestParserException(Exception):
     pass
 
 
-def add_shader_test(group, testname, filepath):
-    """ Add a shader test to a group
-
-    Arguments:
-    group -- a dictionary-like object to add the test to
-    testname -- the key to use in the group
-    filepath -- the argument to pass to ShaderTest
-
-    """
-    group[testname] = ShaderTest(filepath)
-
-
 def add_shader_test_dir(group, dirpath):
     """Add all shader tests in a directory to the given group."""
     for filename in os.listdir(dirpath):
@@ -124,4 +111,4 @@ def add_shader_test_dir(group, dirpath):
             if ext != 'shader_test':
                 continue
             testname = filename[0:-(len(ext) + 1)]  # +1 for '.'
-            add_shader_test(group, testname, filepath)
+            group[testname] = ShaderTest(filepath)
