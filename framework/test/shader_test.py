@@ -107,8 +107,7 @@ def add_shader_test_dir(group, dirpath):
         if path.isdir(filepath):
             add_shader_test_dir(group[filename], filepath)
         else:
-            ext = filename.rsplit('.')[-1]
-            if ext != 'shader_test':
+            testname, ext = os.path.splitext(filename)
+            if ext != '.shader_test':
                 continue
-            testname = filename[0:-(len(ext) + 1)]  # +1 for '.'
             group[testname] = ShaderTest(filepath)
