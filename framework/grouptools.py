@@ -158,4 +158,8 @@ def from_path(path):
 
     if '\\' in path:
         return path.replace('\\', '/')
+
+    if '.' == path:
+        return ''
+
     return path

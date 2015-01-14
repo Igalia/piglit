@@ -172,3 +172,8 @@ def test_from_path_posix():
 def test_from_path_nt():
     """grouptools.from_path: converts \\ to / in nt paths."""
     nt.assert_equal(grouptools.from_path('foo\\bar'), 'foo/bar')
+
+
+def test_from_path_dot():
+    """grouptools.from_path: should convert '.' into ''."""
+    nt.assert_equal(grouptools.from_path('.'), '')
