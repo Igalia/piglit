@@ -25,10 +25,10 @@
 
 from __future__ import print_function, absolute_import
 import os
-import os.path as path
 import re
 
 from .piglit_test import PiglitBaseTest
+from framework import grouptools
 
 __all__ = [
     'ShaderTest',
@@ -100,14 +100,15 @@ class ShaderTestParserException(Exception):
     pass
 
 
-def add_shader_test_dir(group, dirpath):
+def add_shader_test_dir(group, startdir):
     """Add all shader tests in a directory to the given group."""
-    for filename in os.listdir(dirpath):
-        filepath = path.join(dirpath, filename)
-        if path.isdir(filepath):
-            add_shader_test_dir(group[filename], filepath)
-        else:
+    for dirpath, _, filenames in os.walk(startdir):
+        for filename in filenames:
             testname, ext = os.path.splitext(filename)
             if ext != '.shader_test':
                 continue
-            group[testname] = ShaderTest(filepath)
+
+            lgroup = grouptools.join(
+                grouptools.from_path(os.path.relpath(dirpath, startdir)),
+                testname)
+            group[lgroup] = ShaderTest(os.path.join(dirpath, filename))
