@@ -38,7 +38,7 @@ import mako.template
 PIGLIT_TOP_DIR = os.path.join(os.path.dirname(__file__), '..', '..')
 sys.path.append(PIGLIT_TOP_DIR)
 
-import registry.gl
+import registry.gl  # pylint: disable=import-error
 
 
 debug = False
