@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # All tests that come with piglit, using default settings
-#
+
 __all__ = ['profile']
 
 import itertools
@@ -3312,7 +3312,7 @@ oes_matrix_get['All queries'] = PiglitGLTest(['oes_matrix_get-api'], run_concurr
 oes_fixed_point = spec['OES_fixed_point']
 oes_fixed_point['attribute-arrays'] = PiglitGLTest(['oes_fixed_point-attribute-arrays'], run_concurrent=True)
 
-spec['OES_standard_derivatives'] = import_glsl_parser_tests(spec['OES_standard_derivatives'],
+import_glsl_parser_tests(spec['OES_standard_derivatives'],
                          os.path.join(TESTS_DIR, 'spec', 'oes_standard_derivatives'),
                          ['compiler'])
 
@@ -3569,24 +3569,12 @@ add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_que
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-frag'])
 add_concurrent_test(arb_pipeline_statistics_query, ['arb_pipeline_statistics_query-comp'])
 
-# group glslparsertest ------------------------------------------------------
-glslparsertest = profile.tests['glslparsertest']
-# Add all shader source files in the directories below.
-for filename in os.listdir(os.path.join(TESTS_DIR, 'glslparsertest', 'shaders')):
-    ext = filename.rsplit('.')[-1]
-    if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(
-            glslparsertest,
-            os.path.join(TESTS_DIR, 'glslparsertest', 'shaders', filename),
-            filename)
-for filename in os.listdir(os.path.join(TESTS_DIR, 'glslparsertest', 'glsl2')):
-    ext = filename.rsplit('.')[-1]
-    if ext in ['vert', 'geo', 'frag']:
-        add_glsl_parser_test(
-            glslparsertest,
-            os.path.join(TESTS_DIR, 'glslparsertest', 'glsl2', filename), 
-            grouptools.join('glsl2', filename))
-# end group glslparsertest ---------------------------------------------------
+import_glsl_parser_tests(profile.tests['glslparsertest']['glsl2'],
+                         os.path.join(TESTS_DIR, 'glslparsertest', 'glsl2'),
+                         [''])
+import_glsl_parser_tests(profile.tests['glslparsertest'],
+                         os.path.join(TESTS_DIR, 'glslparsertest', 'shaders'),
+                         [''])
 
 hiz = profile.tests['hiz']
 add_plain_test(hiz, ['hiz-depth-stencil-test-fbo-d0-s8'])
@@ -4238,7 +4226,6 @@ arb_shader_image_load_store['unused'] = PiglitGLTest(['arb_shader_image_load_sto
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
 profile.tests['glean'] = glean
-profile.tests['glslparsertest'] = glslparsertest
 profile.tests['shaders'] = shaders
 profile.tests['security'] = security
 profile.tests['spec'] = spec
