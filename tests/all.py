@@ -391,8 +391,7 @@ def add_getactiveuniform_count(group, name, expected):
 
 shaders = profile.tests['shaders']
 add_shader_test_dir(shaders,
-                    os.path.join(TESTS_DIR, 'shaders'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'shaders'))
 add_concurrent_test(shaders, ['activeprogram-bad-program'])
 add_concurrent_test(shaders, ['activeprogram-get'])
 add_concurrent_test(shaders, ['attribute0'])
@@ -1065,8 +1064,7 @@ import_glsl_parser_tests(spec['glsl-es-1.00'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-es-1.00']['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00', 'execution'))
 spec['glsl-es-1.00']['built-in constants'] = PiglitGLTest(
     ['built-in-constants_gles2',
      os.path.join(TESTS_DIR, 'spec', 'glsl-es-1.00', 'minimum-maximums.txt')],
@@ -1077,11 +1075,9 @@ import_glsl_parser_tests(spec['glsl-1.10'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-1.10'),
                          ['preprocessor', 'compiler'])
 add_shader_test_dir(spec['glsl-1.10']['linker'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'linker'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'linker'))
 add_shader_test_dir(spec['glsl-1.10']['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.10', 'execution'))
 add_concurrent_test(spec['glsl-1.10']['execution'], ['glsl-render-after-bad-attach'])
 add_concurrent_test(spec['glsl-1.10']['execution'], ['glsl-1.10-fragdepth'])
 for mode in ['fixed', 'pos_clipvert', 'clipvert_pos']:
@@ -1111,11 +1107,9 @@ import_glsl_parser_tests(spec['glsl-1.20'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-1.20'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-1.20']['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'execution'))
 add_shader_test_dir(spec['glsl-1.20']['linker'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'linker'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.20', 'linker'))
 
 def add_recursion_test(group, name):
     # When the recursion tests fail it is usually because the GLSL
@@ -1232,8 +1226,7 @@ add_concurrent_test(spec['glsl-1.30']['execution'], ['fs-texelFetch-2D'])
 add_concurrent_test(spec['glsl-1.30']['execution'], ['fs-texelFetchOffset-2D'])
 add_concurrent_test(spec['glsl-1.30']['execution'], ['fs-textureOffset-2D'])
 add_shader_test_dir(spec['glsl-1.30']['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.30', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.30', 'execution'))
 add_plain_test(spec['glsl-1.30']['linker']['clipping'], ['mixing-clip-distance-and-clip-vertex-disallowed'])
 add_plain_test(spec['glsl-1.30']['execution']['clipping'], ['max-clip-distances'])
 for arg in ['vs_basic', 'vs_xfb', 'vs_fbo', 'fs_basic', 'fs_fbo']:
@@ -1431,8 +1424,7 @@ import_glsl_parser_tests(spec['glsl-1.40'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-1.40'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-1.40'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.40'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.40'))
 spec['glsl-1.40']['execution']['tf-no-position'] = PiglitGLTest(['glsl-1.40-tf-no-position'], run_concurrent=True)
 spec['glsl-1.40']['built-in constants'] = PiglitGLTest(
     ['built-in-constants',
@@ -1469,8 +1461,7 @@ import_glsl_parser_tests(spec['glsl-1.50'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-1.50'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-1.50'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.50'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-1.50'))
 spec['glsl-1.50']['execution']['interface-blocks-api-access-members'] = PiglitGLTest(['glsl-1.50-interface-blocks-api-access-members'], run_concurrent=True)
 spec['glsl-1.50']['execution']['get-active-attrib-array'] = PiglitGLTest(['glsl-1.50-get-active-attrib-array'], run_concurrent=True)
 spec['glsl-1.50']['execution']['vs-input-arrays'] = PiglitGLTest(['glsl-1.50-vs-input-arrays'], run_concurrent=True)
@@ -1547,16 +1538,14 @@ import_glsl_parser_tests(spec['glsl-3.30'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-3.30'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-3.30'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-3.30'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-3.30'))
 
 # Group spec/glsl-es-3.00
 import_glsl_parser_tests(spec['glsl-es-3.00'],
                          os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00'),
                          ['compiler'])
 add_shader_test_dir(spec['glsl-es-3.00'],
-                    os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'glsl-es-3.00'))
 add_concurrent_test(spec['glsl-es-3.00']['execution'], ['varying-struct-centroid_gles3'])
 spec['glsl-es-3.00']['built-in constants'] = PiglitGLTest(
     ['built-in-constants_gles3',
@@ -1571,8 +1560,7 @@ import_glsl_parser_tests(spec['AMD_conservative_depth'],
                          os.path.join(TESTS_DIR, 'spec', 'amd_conservative_depth'),
                          [''])
 add_shader_test_dir(spec['AMD_conservative_depth'],
-                    os.path.join(TESTS_DIR, 'spec', 'amd_conservative_depth'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'amd_conservative_depth'))
 
 # Group ARB_arrays_of_arrays
 arb_arrays_of_arrays = spec['ARB_arrays_of_arrays']
@@ -1580,16 +1568,14 @@ import_glsl_parser_tests(arb_arrays_of_arrays,
                          os.path.join(TESTS_DIR, 'spec', 'arb_arrays_of_arrays'),
                          ['compiler'])
 add_shader_test_dir(arb_arrays_of_arrays,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_arrays_of_arrays'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_arrays_of_arrays'))
 
 # Group AMD_shader_trinary_minmax
 import_glsl_parser_tests(spec['AMD_shader_trinary_minmax'],
                          os.path.join(TESTS_DIR, 'spec', 'amd_shader_trinary_minmax'),
                          [''])
 add_shader_test_dir(spec['AMD_shader_trinary_minmax'],
-                    os.path.join(TESTS_DIR, 'spec', 'amd_shader_trinary_minmax'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'amd_shader_trinary_minmax'))
 
 # Group ARB_point_sprite
 arb_point_sprite = spec['ARB_point_sprite']
@@ -1611,8 +1597,7 @@ import_glsl_parser_tests(arb_tessellation_shader,
                          os.path.join(TESTS_DIR, 'spec',
                          'arb_tessellation_shader'), ['compiler'])
 add_shader_test_dir(arb_tessellation_shader,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_tessellation_shader'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_tessellation_shader'))
 
 # Group ARB_texture_multisample
 samplers_atm = ['sampler2DMS', 'isampler2DMS', 'usampler2DMS',
@@ -1752,8 +1737,7 @@ import_glsl_parser_tests(arb_draw_instanced,
                         [''])
 
 add_shader_test_dir(arb_draw_instanced,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_draw_instanced', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_draw_instanced', 'execution'))
 arb_draw_instanced['dlist'] = PiglitGLTest(['arb_draw_instanced-dlist'], run_concurrent=True)
 arb_draw_instanced['elements'] = PiglitGLTest(['arb_draw_instanced-elements'], run_concurrent=True)
 arb_draw_instanced['negative-arrays-first-negative'] = PiglitGLTest(['arb_draw_instanced-negative-arrays-first-negative'], run_concurrent=True)
@@ -1777,8 +1761,7 @@ arb_draw_indirect['gl_VertexID used with glDrawElementsIndirect'] = PiglitGLTest
 # Group ARB_fragment_program
 arb_fragment_program = spec['ARB_fragment_program']
 add_shader_test_dir(spec['ARB_fragment_program'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_program'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_program'))
 arb_fragment_program['minmax'] = PiglitGLTest(['arb_fragment_program-minmax'], run_concurrent=True)
 add_vpfpgeneric(arb_fragment_program, 'fdo30337a')
 add_vpfpgeneric(arb_fragment_program, 'fdo30337b')
@@ -1807,8 +1790,7 @@ arb_fragment_program['incomplete-texture-arb_fp'] = PiglitGLTest(['incomplete-te
 # Group ARB_fragment_program_shadow
 arb_fragment_program_shadow = spec['ARB_fragment_program_shadow']
 add_shader_test_dir(spec['ARB_fragment_program_shadow'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_program_shadow'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_program_shadow'))
 
 nv_fragment_program_option = spec['NV_fragment_program_option']
 add_plain_test(nv_fragment_program_option, ['fp-abs-02'])
@@ -1827,8 +1809,7 @@ import_glsl_parser_tests(arb_fragment_coord_conventions,
 
 arb_fragment_layer_viewport = spec['ARB_fragment_layer_viewport']
 add_shader_test_dir(arb_fragment_layer_viewport,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_layer_viewport'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_fragment_layer_viewport'))
 
 ati_fragment_shader = spec['ATI_fragment_shader']
 add_plain_test(ati_fragment_shader, ['ati-fs-bad-delete'])
@@ -1902,8 +1883,7 @@ add_concurrent_test(arb_framebuffer_srgb, ['arb_framebuffer_srgb-clear'])
 
 arb_gpu_shader5 = spec['ARB_gpu_shader5']
 add_shader_test_dir(arb_gpu_shader5,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader5'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader5'))
 import_glsl_parser_tests(arb_gpu_shader5,
                          os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader5'),
                          [''])
@@ -1961,8 +1941,7 @@ add_concurrent_test(arb_gpu_shader5, ['arb_gpu_shader5-interpolateAtOffset-nonco
 
 arb_shader_subroutine = spec['ARB_shader_subroutine']
 add_shader_test_dir(arb_shader_subroutine,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_subroutine'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_subroutine'))
 import_glsl_parser_tests(arb_shader_subroutine,
                          os.path.join(TESTS_DIR, 'spec', 'arb_shader_subroutine'),
                          [''])
@@ -1970,8 +1949,7 @@ add_concurrent_test(arb_shader_subroutine, ['arb_shader_subroutine-minmax'])
 
 arb_gpu_shader_fp64 = spec['ARB_gpu_shader_fp64']
 add_shader_test_dir(arb_gpu_shader_fp64,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader_fp64'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader_fp64'))
 import_glsl_parser_tests(arb_gpu_shader_fp64,
                     os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader_fp64'),
                     [''])
@@ -1984,8 +1962,7 @@ for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3', 'dmat4',
 
 arb_texture_query_levels = spec['ARB_texture_query_levels']
 add_shader_test_dir(arb_texture_query_levels,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_query_levels'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_query_levels'))
 import_glsl_parser_tests(arb_texture_query_levels,
                          os.path.join(TESTS_DIR, 'spec', 'arb_texture_query_levels'),
                          [''])
@@ -2110,14 +2087,12 @@ add_plain_test(arb_robustness, ['arb_robustness_client-mem-bounds'])
 # Group ARB_shader_bit_encoding
 arb_shader_bit_encoding = spec['ARB_shader_bit_encoding']
 add_shader_test_dir(arb_shader_bit_encoding['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_bit_encoding', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_bit_encoding', 'execution'))
 
 # Group ARB_shader_texture_lod
 arb_shader_texture_lod = spec['ARB_shader_texture_lod']
 add_shader_test_dir(arb_shader_texture_lod['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_texture_lod', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_shader_texture_lod', 'execution'))
 add_plain_test(arb_shader_texture_lod['execution'], ['arb_shader_texture_lod-texgrad'])
 add_plain_test(arb_shader_texture_lod['execution'], ['arb_shader_texture_lod-texgradcube'])
 
@@ -2171,8 +2146,7 @@ import_glsl_parser_tests(arb_shading_language_420pack,
                          os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack'),
                          ['compiler'])
 add_shader_test_dir(arb_shading_language_420pack['execution'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack', 'execution'))
 spec['ARB_shading_language_420pack']['built-in constants'] = PiglitGLTest(
     ['built-in-constants',
      os.path.join(TESTS_DIR, 'spec', 'arb_shading_language_420pack', 'minimum-maximums.txt')],
@@ -2201,8 +2175,7 @@ import_glsl_parser_tests(arb_explicit_uniform_location,
                          os.path.join(TESTS_DIR, 'spec', 'arb_explicit_uniform_location'),
                          [''])
 add_shader_test_dir(arb_explicit_uniform_location,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_explicit_uniform_location'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_explicit_uniform_location'))
 add_plain_test(arb_explicit_uniform_location, ['arb_explicit_uniform_location-minmax'])
 add_plain_test(arb_explicit_uniform_location, ['arb_explicit_uniform_location-boundaries'])
 add_plain_test(arb_explicit_uniform_location, ['arb_explicit_uniform_location-array-elements'])
@@ -2234,14 +2207,12 @@ arb_texture_buffer_range['ranges-2'] = PiglitGLTest(['arb_texture_buffer_range-r
 
 arb_texture_query_lod = spec['ARB_texture_query_lod']
 add_shader_test_dir(arb_texture_query_lod,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_query_lod'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_query_lod'))
 
 arb_texture_rectangle = spec['ARB_texture_rectangle']
 add_texwrap_target_tests(arb_texture_rectangle, 'RECT')
 add_shader_test_dir(arb_texture_rectangle,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_rectangle'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_rectangle'))
 add_msaa_visual_plain_tests(arb_texture_rectangle, ['copyteximage', 'RECT'])
 add_concurrent_test(arb_texture_rectangle, ['1-1-linear-texture'])
 add_plain_test(arb_texture_rectangle, ['texrect-many'])
@@ -2816,8 +2787,7 @@ add_concurrent_test(ext_texture_array, ['fbo-generatemipmap-array', 'S3TC_DXT1']
 spec['EXT_texture_array']['maxlayers'] = PiglitGLTest(['ext_texture_array-maxlayers'], run_concurrent=True)
 spec['EXT_texture_array']['gen-mipmap'] = PiglitGLTest(['ext_texture_array-gen-mipmap'], run_concurrent=True)
 add_shader_test_dir(ext_texture_array,
-                    os.path.join(TESTS_DIR, 'spec', 'ext_texture_array'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'ext_texture_array'))
 add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '1D_ARRAY'])
 add_msaa_visual_plain_tests(ext_texture_array, ['copyteximage', '2D_ARRAY'])
 add_plain_test(ext_texture_array, ['fbo-array'])
@@ -2956,8 +2926,7 @@ add_plain_test(ext_texture_integer, ['fbo-integer'])
 
 arb_texture_rg = spec['ARB_texture_rg']
 add_shader_test_dir(arb_texture_rg,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_rg', 'execution'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_texture_rg', 'execution'))
 add_fbo_formats_tests(grouptools.join('spec', 'ARB_texture_rg'), 'GL_ARB_texture_rg')
 add_fbo_formats_tests(grouptools.join('spec', 'ARB_texture_rg'), 'GL_ARB_texture_rg-float', '-float')
 # unsupported for int yet
@@ -3215,8 +3184,7 @@ import_glsl_parser_tests(spec['ARB_uniform_buffer_object'],
                          os.path.join(TESTS_DIR, 'spec', 'arb_uniform_buffer_object'),
                          [''])
 add_shader_test_dir(spec['ARB_uniform_buffer_object'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_uniform_buffer_object'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_uniform_buffer_object'))
 arb_uniform_buffer_object['bindbuffer-general-point'] = PiglitGLTest(['arb_uniform_buffer_object-bindbuffer-general-point'], run_concurrent=True)
 arb_uniform_buffer_object['buffer-targets'] = PiglitGLTest(['arb_uniform_buffer_object-buffer-targets'], run_concurrent=True)
 arb_uniform_buffer_object['bufferstorage'] = PiglitGLTest(['arb_uniform_buffer_object-bufferstorage'], run_concurrent=True)
@@ -3318,8 +3286,7 @@ add_plain_test(ext_fog_coord, ['ext_fog_coord-modes'])
 
 ext_shader_integer_mix = spec['EXT_shader_integer_mix']
 add_shader_test_dir(spec['EXT_shader_integer_mix'],
-                    os.path.join(TESTS_DIR, 'spec', 'ext_shader_integer_mix'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'ext_shader_integer_mix'))
 
 nv_texture_barrier = spec['NV_texture_barrier']
 add_plain_test(nv_texture_barrier, ['blending-in-shader'])
@@ -3473,8 +3440,7 @@ add_concurrent_test(arb_copy_image, ['arb_copy_image-formats', '--samples=8'])
 arb_cull_distance = spec['arb_cull_distance']
 add_concurrent_test(arb_cull_distance, ['arb_cull_distance-max-distances'])
 add_shader_test_dir(arb_cull_distance,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_cull_distance'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_cull_distance'))
 
 arb_half_float_vertex = spec['ARB_half_float_vertex']
 add_plain_test(arb_half_float_vertex, ['draw-vertices-half-float'])
@@ -3570,8 +3536,7 @@ add_concurrent_test(arb_geometry_shader4, ['arb_geometry_shader4-vertices-in'])
 for mode in ['1', 'tf 1', 'max', 'tf max']:
     add_concurrent_test(arb_geometry_shader4, ['arb_geometry_shader4-program-parameter-vertices-out', mode])
 add_shader_test_dir(spec['ARB_geometry_shader4'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_geometry_shader4'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_geometry_shader4'))
 import_glsl_parser_tests(spec['ARB_geometry_shader4'],
                          os.path.join(TESTS_DIR, 'spec', 'arb_geometry_shader4'),
                          ['compiler'])
@@ -3582,8 +3547,7 @@ arb_compute_shader['minmax'] = PiglitGLTest(['arb_compute_shader-minmax'], run_c
 arb_compute_shader[grouptools.join('compiler', 'work_group_size_too_large')] = \
     PiglitGLTest(['arb_compute_shader-work_group_size_too_large'], run_concurrent=True)
 add_shader_test_dir(spec['ARB_compute_shader'],
-                    os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader'))
 import_glsl_parser_tests(spec['ARB_compute_shader'],
                          os.path.join(TESTS_DIR, 'spec', 'arb_compute_shader'),
                          ['compiler'])
@@ -3651,8 +3615,7 @@ add_plain_test(hiz, ['hiz-stencil-test-window-depth1'])
 
 fast_color_clear = profile.tests['fast_color_clear']
 add_shader_test_dir(fast_color_clear,
-                    os.path.join(TESTS_DIR, 'fast_color_clear'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'fast_color_clear'))
 for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
     for buffer_type in ('rb', 'tex'):
         if subtest == 'sample' and buffer_type == 'rb':
@@ -4198,8 +4161,7 @@ for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb
 add_concurrent_test(arb_es3_compatibility, ['es3-primrestart-fixedindex'])
 add_concurrent_test(arb_es3_compatibility, ['es3-drawarrays-primrestart-fixedindex'])
 
-add_shader_test_dir(spec, os.path.join(GENERATED_TESTS_DIR, 'spec'),
-                    recursive=True)
+add_shader_test_dir(spec, os.path.join(GENERATED_TESTS_DIR, 'spec'))
 import_glsl_parser_tests(profile.tests, GENERATED_TESTS_DIR, ['spec'])
 
 arb_shader_atomic_counters = spec['ARB_shader_atomic_counters']
@@ -4222,8 +4184,7 @@ arb_shader_atomic_counters['respecify-buffer'] = PiglitGLTest(['arb_shader_atomi
 
 arb_derivative_control = spec['ARB_derivative_control']
 add_shader_test_dir(arb_derivative_control,
-                    os.path.join(TESTS_DIR, 'spec', 'arb_derivative_control'),
-                    recursive=True)
+                    os.path.join(TESTS_DIR, 'spec', 'arb_derivative_control'))
 import_glsl_parser_tests(arb_derivative_control,
                          os.path.join(TESTS_DIR, 'spec', 'arb_derivative_control'),
                          [''])

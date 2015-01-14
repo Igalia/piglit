@@ -113,14 +113,12 @@ def add_shader_test(group, testname, filepath):
     group[testname] = ShaderTest(filepath)
 
 
-def add_shader_test_dir(group, dirpath, recursive=False):
+def add_shader_test_dir(group, dirpath):
     """Add all shader tests in a directory to the given group."""
     for filename in os.listdir(dirpath):
         filepath = path.join(dirpath, filename)
         if path.isdir(filepath):
-            if not recursive:
-                continue
-            add_shader_test_dir(group[filename], filepath, recursive)
+            add_shader_test_dir(group[filename], filepath)
         else:
             ext = filename.rsplit('.')[-1]
             if ext != 'shader_test':
