@@ -1,9 +1,9 @@
 // [config]
 // expect_result: pass
-// glsl_version: 1.30
+// glsl_version: 1.50
 // require_extensions: GL_ARB_gpu_shader5
 // [end config]
-#version 130
+#version 150
 #extension GL_ARB_gpu_shader5: require
 
 uniform int i;
