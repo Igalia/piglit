@@ -81,18 +81,18 @@ class DispatchCode(object):
     }
     APIS['glcore'] = APIS['gl']
 
-    assert(set(APIS.keys()) == set(registry.gl.VALID_APIS))
+    assert set(APIS.keys()) == set(registry.gl.VALID_APIS)
 
     @classmethod
     def emit(cls, out_dir, gl_registry):
-        assert(isinstance(gl_registry, registry.gl.Registry))
+        assert isinstance(gl_registry, registry.gl.Registry)
         context_vars = dict(dispatch=cls, gl_registry=gl_registry)
         render_template(cls.H_TEMPLATE, out_dir, **context_vars)
         render_template(cls.C_TEMPLATE, out_dir, **context_vars)
 
 
 def render_template(filename, out_dir, **context_vars):
-    assert(filename.endswith('.mako'))
+    assert filename.endswith('.mako')
     template_filepath = os.path.join(os.path.dirname(__file__), filename)
     out_filepath = os.path.join(out_dir, os.path.splitext(filename)[0])
 
@@ -130,7 +130,7 @@ class EnumCode(object):
 
     @classmethod
     def emit(cls, out_dir, gl_registry):
-        assert(isinstance(gl_registry, registry.gl.Registry))
+        assert isinstance(gl_registry, registry.gl.Registry)
         enums = cls.get_unique_enums_in_default_namespace(gl_registry)
         render_template(
             cls.C_TEMPLATE,
