@@ -32,14 +32,8 @@ from .piglit_test import PiglitBaseTest
 
 __all__ = [
     'GLSLParserTest',
-    'add_glsl_parser_test',
     'import_glsl_parser_tests',
 ]
-
-
-def add_glsl_parser_test(group, filepath, test_name):
-    """Add an instance of GLSLParserTest to the given group."""
-    group[test_name] = GLSLParserTest(filepath)
 
 
 def import_glsl_parser_tests(group, basepath, subdirectories):
@@ -69,7 +63,7 @@ def import_glsl_parser_tests(group, basepath, subdirectories):
                     # basepath.
                     testname = grouptools.from_path(
                         os.path.relpath(filepath, basepath))
-                    add_glsl_parser_test(group, filepath, testname)
+                    group[testname] = GLSLParserTest(filepath)
 
 
 class GLSLParserTest(PiglitBaseTest):

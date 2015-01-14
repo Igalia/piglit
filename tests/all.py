@@ -11,8 +11,7 @@ import sys
 
 from framework import grouptools
 from framework.profile import TestProfile
-from framework.test import (PiglitGLTest, GleanTest,
-                            add_glsl_parser_test, import_glsl_parser_tests,
+from framework.test import (PiglitGLTest, GleanTest, import_glsl_parser_tests,
                             add_shader_test_dir)
 from py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
