@@ -39,7 +39,6 @@ PIGLIT_TOP_DIR = os.path.join(os.path.dirname(__file__), '..', '..')
 sys.path.append(PIGLIT_TOP_DIR)
 
 import registry.gl
-from registry.gl import Extension
 
 
 debug = False
@@ -141,45 +140,8 @@ class EnumCode(object):
 
     @classmethod
     def get_unique_enums_in_default_namespace(cls, gl_registry):
-        def cmp_enums(x, y):
-            # Sort enums by numerical value, then by vendor namespace, then by
-            # full name. Given a set of synonymous names for a given enum
-            # value, this sort order ensures that names provided by core
-            # specifications precede those provided by ratified extensions,
-            # which precede thos provided by unratified extensions.
-            #
-            # For example, GL_RED will precede GL_RED_EXT will precede
-            # GL_RED_INTEL.
-            #
-            c = cmp(x.num_value, y.num_value)
-            if c != 0:
-                return c
-
-            c = cmp(y.vendor_namespace is None,
-                    x.vendor_namespace is None)
-            if c != 0:
-                return c
-
-            c = cmp(y.vendor_namespace in Extension.RATIFIED_NAMESPACES,
-                    x.vendor_namespace in Extension.RATIFIED_NAMESPACES)
-            if c != 0:
-                return c
-
-            c = cmp(y.vendor_namespace == 'EXT',
-                    x.vendor_namespace == 'EXT')
-            if c != 0:
-                return c
-
-            c = cmp(x.name, y.name)
-            if c != 0:
-                return c
-
-            return cmp(x.api, y.api)
-
         def append_enum_if_new_value(enum_list, enum):
-            diff = cmp(enum_list[-1].num_value, enum.num_value)
-            assert(diff <= 0)
-            if diff < 0:
+            if enum_list[-1].num_value < enum.num_value:
                 enum_list.append(enum)
             return enum_list
 
@@ -189,7 +151,7 @@ class EnumCode(object):
             if enum_group.type == 'default_namespace'
             for enum in enum_group.enums
         )
-        enums = sorted(enums, cmp=cmp_enums)
+        enums = sorted(enums)
         enums = reduce(append_enum_if_new_value, enums[1:], [enums[0]])
         return enums
 

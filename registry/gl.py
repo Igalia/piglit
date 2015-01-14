@@ -1076,6 +1076,7 @@ class EnumGroup(object):
             self.type = 'special'
 
 
+@functools.total_ordering
 class Enum(object):
     """An <enum> XML element.
 
@@ -1121,6 +1122,67 @@ class Enum(object):
                  '(name={self.name!r},'
                  ' value={self.str_value!r})')
         return templ.format(self=self)
+
+    def __eq__(self, other):
+        if self.num_value != other.num_value:
+            return False
+        elif (self.vendor_namespace is None) != (other.vendor_namespace is None):
+            return False
+        elif (self.vendor_namespace in Extension.RATIFIED_NAMESPACES) != \
+                 (other.vendor_namespace in Extension.RATIFIED_NAMESPACES):
+            return False
+        elif (self.vendor_namespace == 'EXT') != \
+                 (other.vendor_namespace == 'EXT'):
+            return False
+        elif self.name != other.name:
+            return False
+        return self.api == other.api
+
+    def __lt__(self, other):  # pylint: disable=too-many-return-statements
+        """Less than.
+
+        Sort by numerical value, then vendor_namspace (ratified first, then
+        EXT), then by full name, and finally by api.
+
+        This sort order ensures that names provided by core specifications
+        precede those provided by ratified extensions, which proceed those
+        provided by unratified extensions.
+
+        For example: GL_RED < GL_RED_EXT < GL_RED_INTEL
+
+        """
+        if self.num_value != other.num_value:
+            if self.num_value < other.num_value:
+                return True
+            return False
+
+        x = self.vendor_namespace is None
+        y = other.vendor_namespace is None
+        if x != y:
+            if x and not y:
+                return True
+            return False
+
+        x = self.vendor_namespace in Extension.RATIFIED_NAMESPACES
+        y = other.vendor_namespace in Extension.RATIFIED_NAMESPACES
+        if x != y:
+            if x and not y:
+                return True
+            return False
+
+        x = self.vendor_namespace == 'EXT'
+        y = other.vendor_namespace == 'EXT'
+        if x != y:
+            if x and not y:
+                return True
+            return False
+
+        if self.name != other.name:
+            if self.name < other.name:
+                return True
+            return False
+
+        return self.api < other.api
 
     @property
     def vendor_namespace(self):
