@@ -77,7 +77,12 @@ def test_parse_gles3_test():
 
 def test_add_shader_test_dir():
     """ Test that add_shader_test_dir works """
-    testm.add_shader_test_dir({}, 'tests/spec/glsl-es-3.00/execution')
+    class Profile(object):  # pylint: disable=too-few-public-methods
+        def __init__(self):
+            self.test_list = {}
+
+    testm.add_shader_test_dir(Profile(), 'tests/spec/glsl-es-3.00',
+                              'tests/spec/glsl-es-3.00/execution')
 
 
 def test_add_fbo():

@@ -100,8 +100,10 @@ class ShaderTestParserException(Exception):
     pass
 
 
-def add_shader_test_dir(group, startdir):
+def add_shader_test_dir(profile, group, startdir):
     """Add all shader tests in a directory to the given group."""
+    assert isinstance(group, basestring)
+
     for dirpath, _, filenames in os.walk(startdir):
         for filename in filenames:
             testname, ext = os.path.splitext(filename)
@@ -109,6 +111,9 @@ def add_shader_test_dir(group, startdir):
                 continue
 
             lgroup = grouptools.join(
+                group,
                 grouptools.from_path(os.path.relpath(dirpath, startdir)),
                 testname)
-            group[lgroup] = ShaderTest(os.path.join(dirpath, filename))
+
+            profile.test_list[lgroup] = \
+                ShaderTest(os.path.join(dirpath, filename))
