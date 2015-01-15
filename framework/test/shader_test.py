@@ -24,16 +24,13 @@
 """ This module enables running shader tests. """
 
 from __future__ import print_function, absolute_import
-import os
 import re
 
 from .piglit_test import PiglitBaseTest
-from framework import grouptools
 
 __all__ = [
     'ShaderTest',
     'ShaderTestParserException',
-    'add_shader_test_dir'
 ]
 
 
@@ -98,22 +95,3 @@ class ShaderTest(PiglitBaseTest):
 class ShaderTestParserException(Exception):
     """ An excpetion to be raised for errors in the ShaderTest parser """
     pass
-
-
-def add_shader_test_dir(profile, group, startdir):
-    """Add all shader tests in a directory to the given group."""
-    assert isinstance(group, basestring)
-
-    for dirpath, _, filenames in os.walk(startdir):
-        for filename in filenames:
-            testname, ext = os.path.splitext(filename)
-            if ext != '.shader_test':
-                continue
-
-            lgroup = grouptools.join(
-                group,
-                grouptools.from_path(os.path.relpath(dirpath, startdir)),
-                testname)
-
-            profile.test_list[lgroup] = \
-                ShaderTest(os.path.join(dirpath, filename))
