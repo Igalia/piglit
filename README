@@ -307,6 +307,12 @@ cpu.py
 	This profile runs tests that don't touch the gpu, in other words all of
 	the tests in quick.py that are not run by gpu.py
 
+glslparser.py
+	A subset of all.py which runs only glslparser tests
+
+shader.py
+	A subset of all.py which runs only shader tests
+
 
 4.2 OpenCL Tests
 ----------------
