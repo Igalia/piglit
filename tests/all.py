@@ -4368,8 +4368,8 @@ for tex_format in ('rgb8', 'srgb8', 'rgba8', 'srgb8-alpha8', 'r11', 'rg11', 'rgb
     for context in ('core', 'compat'):
         test_name = ' ' .join(['oes_compressed_etc2_texture-miptree', tex_format, context])
         arb_es3_compatibility[test_name] = PiglitGLTest(test_name.split(), run_concurrent=True)
-add_concurrent_test(arb_es3_compatibility, 'es3-primrestart-fixedindex')
-add_concurrent_test(arb_es3_compatibility, 'es3-drawarrays-primrestart-fixedindex')
+add_concurrent_test(arb_es3_compatibility, ['es3-primrestart-fixedindex'])
+add_concurrent_test(arb_es3_compatibility, ['es3-drawarrays-primrestart-fixedindex'])
 
 add_shader_test_dir(spec, os.path.join(generatedTestDir, 'spec'),
                     recursive=True)
