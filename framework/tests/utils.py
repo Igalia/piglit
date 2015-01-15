@@ -72,6 +72,10 @@ JSON_DATA = {
 }
 
 
+class TestFailure(AssertionError):
+    pass
+
+
 class UtilsError(Exception):
     """ An exception to be raised by utils """
     pass
@@ -238,3 +242,47 @@ class Test(framework.test.Test):
     """
     def interpret_result(self):
         pass
+
+
+def fail_if(function, values, exceptions, except_error=False):
+    """function fails if any of the exceptions are raised.
+
+    Arguments:
+    function -- a callable to test. If it raises an exception caught by the
+                values of exceptions it will cause the test to fail.
+    values -- arguments to pass to function as an explodable collection (a
+              list-like object). The will be exploded.
+    exceptions -- any value that can be passed to the except keyword such that
+                  any exception that causes the test to fail will be caught.
+
+    Keyword Arguments:
+    except_error -- If false any other exception will cause the test to raise
+                    an error, if set to true any errors other than those of
+                    exceptions will cause be passed. Default: False
+
+    Tests can be catch a single exception:
+    >>> a = {}
+    >>> fail_if(lambda x: a[x], ['foo'], KeyError)
+    Traceback (most recent call last):
+    TestFailure
+
+    They can also catch multiple exceptions:
+    >>> a = {}
+    >>> fail_if(lambda x: a[x], ['foo'], (KeyError, ValueError))
+    Traceback (most recent call last):
+    TestFailure
+
+    If except_error is True and an error is raised that isn't caught by
+    exceptions the test will pass:
+    >>> a = {}
+    >>> fail_if(lambda x: a[x], ['foo'], AssertionError, except_error=True)
+
+    """
+    try:
+        return function(*values)
+    except exceptions:
+        raise TestFailure
+    except Exception:  # pylint: disable=broad-except
+        if not except_error:
+            raise
+        return None

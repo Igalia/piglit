@@ -242,6 +242,7 @@ def update_results(results, filepath):
             0: _update_zero_to_one,
             1: _update_one_to_two,
             2: _update_two_to_three,
+            3: _update_three_to_four,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -417,5 +418,37 @@ def _update_two_to_three(results):
             del results.tests[key]
 
     results.results_version = 3
+
+    return results
+
+
+def _update_three_to_four(results):
+    """Update results v3 to v4.
+
+    This update requires renaming a few tests. The complete lists can be found
+    in framework/data/results_v3_to_v4.json, a json file containing a list of
+    lists (They would be tuples if json has tuples), the first element being
+    the original name, and the second being a new name to update to
+
+    """
+    mapped_updates = [
+        ("spec/arb_texture_rg/fs-shadow2d-red-01",
+         "spec/arb_texture_rg/execution/fs-shadow2d-red-01"),
+        ("spec/arb_texture_rg/fs-shadow2d-red-02",
+         "spec/arb_texture_rg/execution/fs-shadow2d-red-02"),
+        ("spec/arb_texture_rg/fs-shadow2d-red-03",
+         "spec/arb_texture_rg/execution/fs-shadow2d-red-03"),
+        ("spec/arb_draw_instanced/draw-non-instanced",
+         "spec/arb_draw_instanced/execution/draw-non-instanced"),
+        ("spec/arb_draw_instanced/instance-array-dereference",
+         "spec/arb_draw_instanced/execution/instance-array-dereference"),
+    ]
+
+    for original, new in mapped_updates:
+        if original in results.tests:
+            results.tests[new] = results.tests[original]
+            del results.tests[original]
+
+    results.results_version = 4
 
     return results

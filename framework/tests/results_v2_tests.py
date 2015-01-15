@@ -90,14 +90,3 @@ def test_unchanged():
 def test_lower():
     """Version 2: results with aps are lowered."""
     nt.ok_('test/is/some/other1/test' in RESULT.tests)
-
-
-def test_load_results():
-    """Version 2: load_results properly updates."""
-    with utils.tempdir() as d:
-        tempfile = os.path.join(d, 'results.json')
-        with open(tempfile, 'w') as f:
-            json.dump(DATA, f)
-        with open(tempfile, 'r') as f:
-            result = results.load_results(tempfile)
-            nt.assert_equal(result.results_version, 3)
