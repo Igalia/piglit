@@ -3630,6 +3630,13 @@ add_concurrent_test(arb_copy_image, ['arb_copy_image-formats', '--samples=2'])
 add_concurrent_test(arb_copy_image, ['arb_copy_image-formats', '--samples=4'])
 add_concurrent_test(arb_copy_image, ['arb_copy_image-formats', '--samples=8'])
 
+arb_cull_distance = {}
+spec['arb_cull_distance'] = arb_cull_distance
+add_concurrent_test(arb_cull_distance, ['arb_cull_distance-max-distances'])
+add_shader_test_dir(arb_cull_distance,
+                    os.path.join(testsDir, 'spec', 'arb_cull_distance'),
+                    recursive=True)
+
 arb_half_float_vertex = {}
 spec['ARB_half_float_vertex'] = arb_half_float_vertex
 add_plain_test(arb_half_float_vertex, ['draw-vertices-half-float'])

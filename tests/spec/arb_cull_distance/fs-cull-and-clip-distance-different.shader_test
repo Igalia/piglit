@@ -1,0 +1,47 @@
+# From the ARB_cull_distance spec:
+#
+#   The built-in output variables gl_ClipDistance and glCullDistance hold the
+#   clip distance(s) and cull distance(s), respectively, used in the culling
+#   stage, as described in section 13.5.
+#
+# This test checks that the arrays gl_ClipDistance and gl_CullDistance only
+# interfer by gl_MaxCombinedClipAndCullDistances and not by its entrys.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+out float gl_ClipDistance[4];
+out float gl_CullDistance[4];
+
+void main()
+{
+  gl_Position = gl_Vertex;
+  for (int i = 1; i <= 4; ++i) {
+    gl_ClipDistance[i-1] = i;
+    gl_CullDistance[i-1] = i*5;
+  }
+}
+
+[fragment shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+in float gl_ClipDistance[4];
+in float gl_CullDistance[4];
+
+void main()
+{
+  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+  for (int i = 1; i <= 4; ++i) {
+    if (gl_ClipDistance[i-1] != i)
+      gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    if (gl_CullDistance[i-1] != (i*5))
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+  }
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0

@@ -1,0 +1,77 @@
+# From the ARB_cull_distance spec:
+#
+#   In the fragment language, gl_CullDistance array contains linearly
+#   interpolated values for the vertex values written by a shader to the
+#   gl_CullDistance vertex output variable.
+#
+# This test checks proper operation of gl_CullDistance in fragment
+# shaders by setting each element of gl_CullDistance to simple linear
+# function of gl_Vertex (computed by taking the dot product of
+# gl_Vertex with a uniform vector, and dividing the result by
+# gl_Vertex's homogeneous coordinate).  gl_Vertex is also passed
+# through to the fragment shader, which uses the same dot product to
+# verify that gl_CullDistance has been properly interpolated.
+
+[require]
+GLSL >= 1.30
+
+[vertex shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+uniform vec4 transform[6];
+out vec4 vertex;
+out float gl_CullDistance[6];
+
+void main()
+{
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+  // Set each value of gl_CullDistance to a linear transformation of
+  // gl_Vertex.
+  for (int i = 0; i < 6; ++i) {
+    gl_CullDistance[i] = dot(transform[i], gl_Vertex) / gl_Vertex.w;
+  }
+
+  // Pass through gl_Vertex to the fragment shader so that it can
+  // verify the interpolated values of gl_CullDistance.
+  vertex = gl_Vertex;
+}
+
+[fragment shader]
+#version 130
+#extension GL_ARB_cull_distance: enable
+uniform vec4 transform[6];
+in vec4 vertex;
+in float gl_CullDistance[6];
+
+void main()
+{
+  bool test_passed = true;
+
+  // Check that each value of gl_CullDistance matches the value
+  // computed in the vertex shader.
+  for (int i = 0; i < 6; ++i) {
+    float expected_distance = dot(transform[i], vertex) / vertex.w;
+    float deviation = distance(gl_CullDistance[i], expected_distance);
+    if (deviation > 1.0e-5) {
+      test_passed = false;
+    }
+  }
+
+  // Report pass/fail as a red or green pixel.
+  gl_FragColor = test_passed ? vec4(0.0, 1.0, 0.0, 1.0)
+                             : vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[test]
+ortho 0 1 0 1
+
+uniform vec4 transform[0]  1.0  1.0 0.0 0.0 # cullDistance[0] = x + y
+uniform vec4 transform[1]  1.0  2.0 0.0 0.0 # cullDistance[1] = x + 2*y
+uniform vec4 transform[2]  2.0  1.0 0.0 0.0 # cullDistance[2] = 2*x + y
+uniform vec4 transform[3]  2.0  2.0 0.0 0.0 # cullDistance[3] = 2*x + 2*y
+uniform vec4 transform[4] -1.0 -1.0 0.0 2.0 # cullDistance[4] = 2.0 - x - y
+uniform vec4 transform[5] -1.0  1.0 0.0 1.0 # cullDistance[5] = 1.0 - x + y
+
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 1.0
