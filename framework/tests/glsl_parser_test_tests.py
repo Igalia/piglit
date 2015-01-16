@@ -48,7 +48,7 @@ def test_no_config_start():
                '// glsl_version: 1.00\n'
                '// [end config]\n')
     with utils.with_tempfile(content) as tfile:
-        with nt.assert_raises(SystemExit) as exc:
+        with nt.assert_raises(glsl.GLSLParserNoConfigError) as exc:
             glsl.GLSLParserTest(tfile)
             nt.assert_equal(
                 exc.exception, 'No [config] section found!',
@@ -94,7 +94,7 @@ def test_no_expect_result():
 
 def test_no_glsl_version():
     """ glsl_version section is required """
-    content = ('//\n'
+    content = ('// [config]\n'
                '// expect_result: pass\n'
                '// [end config]\n')
     with utils.with_tempfile(content) as tfile:

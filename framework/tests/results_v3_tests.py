@@ -71,6 +71,7 @@ DATA = {
         "spec/arb_texture_rg/fs-shadow2d-red-03": TEST_DATA,
         "spec/arb_draw_instanced/draw-non-instanced": TEST_DATA,
         "spec/arb_draw_instanced/instance-array-dereference": TEST_DATA,
+        "glslparsertest/foo": TEST_DATA,
     }
 }
 
@@ -94,7 +95,7 @@ class TestV4(object):
             "spec/arb_texture_rg/execution/fs-shadow2d-red-02",
             "spec/arb_texture_rg/execution/fs-shadow2d-red-03",
             "spec/arb_draw_instanced/execution/draw-non-instanced",
-            "spec/arb_draw_instanced/execution/instance-array-dereference"
+            "spec/arb_draw_instanced/execution/instance-array-dereference",
         ]
         cls.result = make_result(DATA)
 

@@ -31,6 +31,7 @@ except ImportError:
     import json
 
 import framework.status as status
+from framework import grouptools
 from framework.backends import (CURRENT_JSON_VERSION, piglit_encoder,
                                 JSONBackend)
 
@@ -448,6 +449,13 @@ def _update_three_to_four(results):
         if original in results.tests:
             results.tests[new] = results.tests[original]
             del results.tests[original]
+
+    for test, result in results.tests.items():
+        if grouptools.groupname(test) == 'glslparsertest':
+            group = grouptools.join('glslparsertest/shaders',
+                                    grouptools.testname(test))
+            results.tests[group] = result
+            del results.tests[test]
 
     results.results_version = 4
 

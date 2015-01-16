@@ -23,47 +23,28 @@
 
 from __future__ import print_function, absolute_import
 import os
-import os.path as path
 import re
 import sys
 
-import framework.grouptools as grouptools
 from .piglit_test import PiglitBaseTest
 
 __all__ = [
     'GLSLParserTest',
-    'import_glsl_parser_tests',
+    'GLSLParserError',
+    'GLSLParserNoConfigError',
 ]
 
 
-def import_glsl_parser_tests(group, basepath, subdirectories):
-    """
-    Recursively register each shader source file in the given
-    ``subdirectories`` as a GLSLParserTest .
+class GLSLParserError(Exception):
+    pass
 
-    :subdirectories: A list of subdirectories under the basepath.
 
-    The name with which each test is registered into the given group is
-    the shader source file's path relative to ``basepath``. For example,
-    if::
-            import_glsl_parser_tests(group, 'a', ['b1', 'b2'])
-    is called and the file 'a/b1/c/d.frag' exists, then the test is
-    registered into the group as ``group['b1/c/d.frag']``.
-    """
-    for d in subdirectories:
-        walk_dir = path.join(basepath, d)
-        for (dirpath, dirnames, filenames) in os.walk(walk_dir):
-            # Ignore dirnames.
-            for f in filenames:
-                # Add f as a test if its file extension is good.
-                ext = f.rsplit('.')[-1]
-                if ext in ['vert', 'tesc', 'tese', 'geom', 'frag', 'comp']:
-                    filepath = path.join(dirpath, f)
-                    # testname := filepath relative to
-                    # basepath.
-                    testname = grouptools.from_path(
-                        os.path.relpath(filepath, basepath))
-                    group[testname] = GLSLParserTest(filepath)
+class GLSLParserNoConfigError(GLSLParserError):
+    pass
+
+
+class GLSLParserInternalError(GLSLParserError):
+    pass
 
 
 class GLSLParserTest(PiglitBaseTest):
@@ -92,12 +73,12 @@ class GLSLParserTest(PiglitBaseTest):
         # section to a StringIO and pass that to ConfigParser
         with open(filepath, 'r') as testfile:
             try:
-                config = self.__parser(testfile, filepath)
-            except GLSLParserException as e:
+                command = self.__get_command(self.__parser(testfile, filepath),
+                                             filepath)
+            except GLSLParserInternalError as e:
                 print(e.message, file=sys.stderr)
                 sys.exit(1)
 
-        command = self.__get_command(config, filepath)
         super(GLSLParserTest, self).__init__(command, run_concurrent=True)
 
     def __get_command(self, config, filepath):
@@ -112,8 +93,8 @@ class GLSLParserTest(PiglitBaseTest):
         """
         for opt in ['expect_result', 'glsl_version']:
             if not config.get(opt):
-                raise GLSLParserException("Missing required section {} "
-                                          "from config".format(opt))
+                raise GLSLParserInternalError("Missing required section {} "
+                                              "from config".format(opt))
 
         # Create the command and pass it into a PiglitTest()
         command = [
@@ -135,7 +116,7 @@ class GLSLParserTest(PiglitBaseTest):
         This method parses the lines of text file, and then returns a
         StrinIO instance suitable to be parsed by a configparser class.
 
-        It will raise GLSLParserExceptions if any part of the parsing
+        It will raise GLSLParserInternalError if any part of the parsing
         fails.
 
         """
@@ -153,7 +134,7 @@ class GLSLParserTest(PiglitBaseTest):
             if is_header.match(line):
                 break
         else:
-            raise GLSLParserException("No [config] section found!")
+            raise GLSLParserNoConfigError("No [config] section found!")
 
         is_header = re.compile(r'(//|/\*|\*)\s*\[end config\]')
         is_metadata = re.compile(
@@ -172,14 +153,14 @@ class GLSLParserTest(PiglitBaseTest):
             match = is_metadata.match(line)
             if match:
                 if match.group('key') not in GLSLParserTest._CONFIG_KEYS:
-                    raise GLSLParserException(
+                    raise GLSLParserInternalError(
                         "Key {0} in file {1} is not a valid key for a "
                         "glslparser test config block".format(
                             match.group('key'), filepath))
                 elif match.group('key') in self.__found_keys:
                     # If this key has already been encountered throw an error,
                     # there are no duplicate keys allows
-                    raise GLSLParserException(
+                    raise GLSLParserInternalError(
                         'Duplicate entry for key {0} in file {1}'.format(
                             match.group('key'), filepath))
                 else:
@@ -187,7 +168,7 @@ class GLSLParserTest(PiglitBaseTest):
                     # XXX: this always seems to return a match object, even
                     # when the match is ''
                     if bad.group():
-                        raise GLSLParserException(
+                        raise GLSLParserInternalError(
                             'Bad character "{0}" in file: "{1}", '
                             'line: "{2}". Only alphanumerics, _, and space '
                             'are allowed'.format(
@@ -198,14 +179,10 @@ class GLSLParserTest(PiglitBaseTest):
                     self.__found_keys.add(match.group('key'))
                     keys[match.group('key')] = match.group('value')
             else:
-                raise GLSLParserException(
+                raise GLSLParserInternalError(
                     "The config section is malformed."
                     "Check file {0} for line {1}".format(filepath, line))
         else:
-            raise GLSLParserException("No [end config] section found!")
+            raise GLSLParserInternalError("No [end config] section found!")
 
         return keys
-
-
-class GLSLParserException(Exception):
-    pass
