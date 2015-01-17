@@ -9,6 +9,7 @@
 
 [require]
 GLSL >= 1.30
+GL_ARB_cull_distance
 
 [vertex shader]
 #version 130
