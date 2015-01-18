@@ -22,6 +22,16 @@
 # OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+"""Integration for running intel-gpu-tools with the piglit framework.
+
+To use this either configure piglit.conf's [igt] section, or set IGT_TEST_ROOT
+to the root of a built igt directory.
+
+This will stop if you are not running as root, or if there are other users of
+drm. Even if you have rendernode support enabled.
+
+"""
+
 import os
 import re
 import sys
@@ -33,16 +43,13 @@ from framework.profile import TestProfile, Test
 
 __all__ = ['profile']
 
-#############################################################################
-##### IGTTest: Execute an intel-gpu-tools test
-#####
-##### To use this, create an igt symlink in piglit/bin which points to the root
-##### of the intel-gpu-tools sources with the compiled tests. Piglit will
-##### automatically add all tests into the 'igt' category.
-#############################################################################
-
 
 def check_environment():
+    """Check that the environment that piglit is running in is appropriate.
+
+    IGT requires root, debugfs to be mounted, and to be the only drm client.
+
+    """
     debugfs_path = "/sys/kernel/debug/dri"
     if os.getuid() != 0:
         print "Test Environment check: not root!"
@@ -78,15 +85,17 @@ if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt'))
 
 
 class IGTTestProfile(TestProfile):
-    """ Test profile for intel-gpu-tools tests. """
+    """Test profile for intel-gpu-tools tests."""
     def _pre_run_hook(self):
         if not check_environment():
             sys.exit(1)
+
 
 profile = IGTTestProfile()  # pylint: disable=invalid-name
 
 
 class IGTTest(Test):
+    """Test class for running libdrm."""
     def __init__(self, binary, arguments=None):
         if arguments is None:
             arguments = []
@@ -107,6 +116,7 @@ class IGTTest(Test):
 
 
 def list_tests(listname):
+    """Parse igt test list and return them as a list."""
     with open(os.path.join(IGT_TEST_ROOT, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
@@ -123,6 +133,7 @@ def list_tests(listname):
 
 
 def add_subtest_cases(test):
+    """Get subtest instances."""
     proc = subprocess.Popen(
         [os.path.join(IGT_TEST_ROOT, test), '--list-subtests'],
         stdout=subprocess.PIPE,
