@@ -163,8 +163,7 @@ glean['texUnits'] = GleanTest('texUnits')
 glean['vertArrayBGRA'] = GleanTest('vertArrayBGRA')
 glean['vertattrib'] = GleanTest('vertattrib')
 
-glean_glsl_tests = [
-                    'Primary plus secondary color',
+glean_glsl_tests = ['Primary plus secondary color',
                     'Global vars and initializers',
                     'Global vars and initializers (2)',
                     'Swizzle',
