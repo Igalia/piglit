@@ -355,8 +355,8 @@ for pairs in [(['glsl1'], glean_glsl_tests),
               (['vertProg1'], glean_vp_tests)]:
     for prefix, name in itertools.product(*pairs):
         groupname = grouptools.join('glean', '{0}-{1}'.format(prefix, name))
-        profile.tests[groupname] = GleanTest(prefix)
-        profile.tests[groupname].env['PIGLIT_TEST'] = name
+        profile.test_list[groupname] = GleanTest(prefix)
+        profile.test_list[groupname].env['PIGLIT_TEST'] = name
 
 def add_fbo_formats_tests(path, extension, suffix=''):
     path = grouptools.from_path(path)
