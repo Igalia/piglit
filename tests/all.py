@@ -41,43 +41,6 @@ def power_set(s):
         result.append(p + [s[-1]])
     return result
 
-######
-# Collecting all tests
-profile = TestProfile()
-
-# Find and add all shader tests.
-for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
-    for dirpath, _, filenames in os.walk(basedir):
-        for filename in filenames:
-            testname, ext = os.path.splitext(filename)
-            if ext == '.shader_test':
-                test = ShaderTest(os.path.join(dirpath, filename))
-            elif ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
-                try:
-                    test = GLSLParserTest(os.path.join(dirpath, filename))
-                except GLSLParserNoConfigError:
-                    # In the event that there is no config assume that it is a
-                    # legacy test, and continue
-                    continue
-
-                # For glslparser tests you can have multiple tests with the
-                # same name, but a different stage, so keep the extension.
-                testname = filename
-            else:
-                continue
-
-            group = grouptools.join(
-                grouptools.from_path(os.path.relpath(dirpath, basedir)),
-                testname)
-            assert group not in profile.test_list, group
-
-            profile.test_list[group] = test
-
-
-
-# List of all of the MSAA sample counts we wish to test
-MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
-
 def add_fbo_depthstencil_tests(group, format, num_samples):
     assert format, 'add_fbo_depthstencil_tests argument "format" cannot be empty'
 
@@ -135,6 +98,155 @@ def add_msaa_visual_plain_tests(group, args, **kwargs):
     for num_samples in MSAA_SAMPLE_COUNTS:
         group[' '.join(args + ['samples={}'.format(num_samples)])] = \
             PiglitGLTest(args + ['-samples={}'.format(num_samples)], **kwargs)
+
+def add_fbo_formats_tests(path, extension, suffix=''):
+    path = grouptools.from_path(path)
+    profile.tests[grouptools.join(path, 'fbo-generatemipmap-formats' + suffix)] = \
+        PiglitGLTest(['fbo-generatemipmap-formats', extension], run_concurrent=True)
+    profile.tests[grouptools.join(path, 'fbo-clear-formats' + suffix)] = \
+        PiglitGLTest(['fbo-clear-formats', extension], run_concurrent=True)
+    profile.tests[grouptools.join(path, 'get-renderbuffer-internalformat' + suffix)] = \
+        PiglitGLTest(['get-renderbuffer-internalformat', extension], run_concurrent=True)
+    if 'depth' not in extension:
+        profile.tests[grouptools.join(path, 'fbo-blending-formats' + suffix)] = \
+            PiglitGLTest(['fbo-blending-formats', extension], run_concurrent=True)
+        profile.tests[grouptools.join(path, 'fbo-alphatest-formats' + suffix)] = \
+            PiglitGLTest(['fbo-alphatest-formats', extension], run_concurrent=True)
+        profile.tests[grouptools.join(path, 'fbo-colormask-formats' + suffix)] = \
+            PiglitGLTest(['fbo-colormask-formats', extension], run_concurrent=True)
+
+def add_msaa_formats_tests(group, extension):
+    for num_samples in MSAA_SAMPLE_COUNTS:
+        args = [str(num_samples), extension]
+        test_name = ' '.join(['multisample-formats'] + args)
+        group[test_name] = PiglitGLTest(
+                ['ext_framebuffer_multisample-formats'] + args,
+                run_concurrent=True)
+
+def add_fbo_generatemipmap_extension(group, extension, name):
+    group[name] = PiglitGLTest(['fbo-generatemipmap-formats', extension],
+                               run_concurrent=True)
+
+def add_fbo_clear_extension(group, extension, name):
+    group[name] = PiglitGLTest(['fbo-clear-formats', extension],
+                               run_concurrent=True)
+
+def add_fbo_blending_extension(group, extension, name):
+    group[name] = PiglitGLTest(['fbo-blending-formats', extension],
+                               run_concurrent=True)
+
+def add_fbo_alphatest_extension(group, extension, name):
+    group[name] = PiglitGLTest(['fbo-alphatest-formats', extension],
+                               run_concurrent=True)
+
+def add_fbo_rg(group, format):
+    name = "fbo-rg-" + format
+    group[name] = PiglitGLTest(['fbo-rg', format], run_concurrent=True)
+
+def add_getactiveuniform_count(group, name, expected):
+    group['glsl-getactiveuniform-count: ' + name] = PiglitGLTest(
+        ['glsl-getactiveuniform-count',
+         os.path.join('shaders',  name + '.vert'), expected],
+        run_concurrent=True)
+
+def add_vpfpgeneric(group, name):
+    group[name] = PiglitGLTest(['vpfp-generic',
+        os.path.join(TESTS_DIR, 'shaders', 'generic', name + '.vpfp')],
+        run_concurrent=True)
+
+def texwrap_test(args):
+    return PiglitGLTest(['texwrap'] + args, run_concurrent=True)
+
+def add_texwrap_target_tests(group, target):
+    group['texwrap {}'.format(target)] = texwrap_test([target, 'GL_RGBA8'])
+    group['texwrap {} bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
+    group['texwrap {} proj'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj'])
+    group['texwrap {} proj bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
+
+def add_texwrap_format_tests(group, ext = '', suffix = ''):
+    args = [] if ext == '' else [ext]
+    group['texwrap formats' + suffix] = texwrap_test(args)
+    group['texwrap formats{} bordercolor'.format(suffix)] = texwrap_test(args + ['bordercolor'])
+    group['texwrap formats{} bordercolor-swizzled'.format(suffix)] = texwrap_test(args + ['bordercolor', 'swizzled'])
+
+def add_fbo_depth_tests(group, format):
+    group['fbo-depth-{}-tex1d'.format(format)] = PiglitGLTest(['fbo-depth-tex1d', format], run_concurrent=True)
+    group['fbo-depth-{}-clear'.format(format)] = PiglitGLTest(['fbo-depth', 'clear', format], run_concurrent=True)
+    group['fbo-depth-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'readpixels', format], run_concurrent=True)
+    group['fbo-depth-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'drawpixels', format], run_concurrent=True)
+    group['fbo-depth-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-depth', 'copypixels', format], run_concurrent=True)
+    group['fbo-depth-{}-blit'.format(format)] = PiglitGLTest(['fbo-depth', 'blit', format], run_concurrent=True)
+
+def add_fbo_stencil_tests(group, format):
+    group['fbo-stencil-{}-clear'.format(format)] = PiglitGLTest(['fbo-stencil', 'clear', format], run_concurrent=True)
+    group['fbo-stencil-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'readpixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'drawpixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'copypixels', format], run_concurrent=True)
+    group['fbo-stencil-{}-blit'.format(format)] = PiglitGLTest(['fbo-stencil', 'blit', format], run_concurrent=True)
+
+def add_recursion_test(group, name):
+    # When the recursion tests fail it is usually because the GLSL
+    # compiler tries to recursively inline the function until the process
+    # runs out of stack or the system runs out of memory.  Run the test
+    # with a low rlimit to (hopefully) avoid having the test adversely
+    # affect the rest of the system.  This is especially important since
+    # there may be other tests running in parallel.
+    #
+    # This may cause false negatives on systems that map the framebuffer
+    # into the processes address space.  This happens on X with DRI1 based
+    # drivers, for example.
+    group[name] = PiglitGLTest(['recursion', '-rlimit', '268435456', name])
+
+def add_color_buffer_float_test(name, format, p1, p2):
+    group = '{}-{}{}{}'.format(
+        format, name,
+        '-{}'.format(p1) if p1 else '',
+        '-{}'.format(p2) if p2 else '')
+    arb_color_buffer_float[group] = PiglitGLTest(
+        ['arb_color_buffer_float-' + name, format, p1, p2],
+        run_concurrent=True)
+
+def add_asmparsertest(group, shader):
+    profile.test_list[grouptools.join('asmparsertest', group, shader)] = \
+        PiglitGLTest(
+            ['asmparsertest', group,
+             os.path.join(TESTS_DIR, 'asmparsertest', 'shaders', group, shader)],
+            run_concurrent=True)
+
+######
+# Collecting all tests
+profile = TestProfile()
+
+# Find and add all shader tests.
+for basedir in [TESTS_DIR, GENERATED_TESTS_DIR]:
+    for dirpath, _, filenames in os.walk(basedir):
+        for filename in filenames:
+            testname, ext = os.path.splitext(filename)
+            if ext == '.shader_test':
+                test = ShaderTest(os.path.join(dirpath, filename))
+            elif ext in ['.vert', '.tesc', '.tese', '.geom', '.frag', '.comp']:
+                try:
+                    test = GLSLParserTest(os.path.join(dirpath, filename))
+                except GLSLParserNoConfigError:
+                    # In the event that there is no config assume that it is a
+                    # legacy test, and continue
+                    continue
+
+                # For glslparser tests you can have multiple tests with the
+                # same name, but a different stage, so keep the extension.
+                testname = filename
+            else:
+                continue
+
+            group = grouptools.join(
+                grouptools.from_path(os.path.relpath(dirpath, basedir)),
+                testname)
+            assert group not in profile.test_list, group
+
+            profile.test_list[group] = test
+
+# List of all of the MSAA sample counts we wish to test
+MSAA_SAMPLE_COUNTS = (2, 4, 6, 8, 16, 32)
 
 glean = profile.tests['glean']
 glean['basic'] = GleanTest('basic')
@@ -358,62 +470,10 @@ for pairs in [(['glsl1'], glean_glsl_tests),
         profile.test_list[groupname] = GleanTest(prefix)
         profile.test_list[groupname].env['PIGLIT_TEST'] = name
 
-def add_fbo_formats_tests(path, extension, suffix=''):
-    path = grouptools.from_path(path)
-    profile.tests[grouptools.join(path, 'fbo-generatemipmap-formats' + suffix)] = \
-        PiglitGLTest(['fbo-generatemipmap-formats', extension], run_concurrent=True)
-    profile.tests[grouptools.join(path, 'fbo-clear-formats' + suffix)] = \
-        PiglitGLTest(['fbo-clear-formats', extension], run_concurrent=True)
-    profile.tests[grouptools.join(path, 'get-renderbuffer-internalformat' + suffix)] = \
-        PiglitGLTest(['get-renderbuffer-internalformat', extension], run_concurrent=True)
-    if 'depth' not in extension:
-        profile.tests[grouptools.join(path, 'fbo-blending-formats' + suffix)] = \
-            PiglitGLTest(['fbo-blending-formats', extension], run_concurrent=True)
-        profile.tests[grouptools.join(path, 'fbo-alphatest-formats' + suffix)] = \
-            PiglitGLTest(['fbo-alphatest-formats', extension], run_concurrent=True)
-        profile.tests[grouptools.join(path, 'fbo-colormask-formats' + suffix)] = \
-            PiglitGLTest(['fbo-colormask-formats', extension], run_concurrent=True)
-
-def add_msaa_formats_tests(group, extension):
-    for num_samples in MSAA_SAMPLE_COUNTS:
-        args = [str(num_samples), extension]
-        test_name = ' '.join(['multisample-formats'] + args)
-        group[test_name] = PiglitGLTest(
-                ['ext_framebuffer_multisample-formats'] + args,
-                run_concurrent=True)
-
-def add_fbo_generatemipmap_extension(group, extension, name):
-    group[name] = PiglitGLTest(['fbo-generatemipmap-formats', extension],
-                               run_concurrent=True)
-
-def add_fbo_clear_extension(group, extension, name):
-    group[name] = PiglitGLTest(['fbo-clear-formats', extension],
-                               run_concurrent=True)
-
-def add_fbo_blending_extension(group, extension, name):
-    group[name] = PiglitGLTest(['fbo-blending-formats', extension],
-                               run_concurrent=True)
-
-def add_fbo_alphatest_extension(group, extension, name):
-    group[name] = PiglitGLTest(['fbo-alphatest-formats', extension],
-                               run_concurrent=True)
-
-
-def add_fbo_rg(group, format):
-    name = "fbo-rg-" + format
-    group[name] = PiglitGLTest(['fbo-rg', format], run_concurrent=True)
-
 security = profile.tests['security']
 add_plain_test(security, ['initialized-texmemory'])
 add_plain_test(security, ['initialized-fbo'])
 add_plain_test(security, ['initialized-vbo'])
-
-
-def add_getactiveuniform_count(group, name, expected):
-    group['glsl-getactiveuniform-count: ' + name] = PiglitGLTest(
-        ['glsl-getactiveuniform-count',
-         os.path.join('shaders',  name + '.vert'), expected],
-        run_concurrent=True)
 
 shaders = profile.tests['shaders']
 add_concurrent_test(shaders, ['activeprogram-bad-program'])
@@ -579,11 +639,6 @@ for subtest in ('interstage', 'intrastage', 'vs-gs'):
     cmdline = 'version-mixing {0}'.format(subtest)
     shaders[cmdline] = PiglitGLTest(cmdline.split(), run_concurrent=True)
 
-def add_vpfpgeneric(group, name):
-    group[name] = PiglitGLTest(['vpfp-generic',
-        os.path.join(TESTS_DIR, 'shaders', 'generic', name + '.vpfp')],
-        run_concurrent=True)
-
 glx = profile.tests['glx']
 add_msaa_visual_plain_tests(glx, ['glx-copy-sub-buffer'], require_platforms=['glx', 'mixed_glx_egl'])
 glx['glx-destroycontext-1'] = PiglitGLTest(['glx-destroycontext-1'], require_platforms=['glx', 'mixed_glx_egl'])
@@ -698,36 +753,6 @@ for arg in oml_sync_control_nonzeros:
 
 mesa_query_renderer = glx['GLX_MESA_query_renderer']
 mesa_query_renderer['coverage'] = PiglitGLTest(['glx-query-renderer-coverage'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-
-def texwrap_test(args):
-    return PiglitGLTest(['texwrap'] + args, run_concurrent=True)
-
-def add_texwrap_target_tests(group, target):
-    group['texwrap {}'.format(target)] = texwrap_test([target, 'GL_RGBA8'])
-    group['texwrap {} bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'bordercolor'])
-    group['texwrap {} proj'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj'])
-    group['texwrap {} proj bordercolor'.format(target)] = texwrap_test([target, 'GL_RGBA8', 'proj', 'bordercolor'])
-
-def add_texwrap_format_tests(group, ext = '', suffix = ''):
-    args = [] if ext == '' else [ext]
-    group['texwrap formats' + suffix] = texwrap_test(args)
-    group['texwrap formats{} bordercolor'.format(suffix)] = texwrap_test(args + ['bordercolor'])
-    group['texwrap formats{} bordercolor-swizzled'.format(suffix)] = texwrap_test(args + ['bordercolor', 'swizzled'])
-
-def add_fbo_depth_tests(group, format):
-    group['fbo-depth-{}-tex1d'.format(format)] = PiglitGLTest(['fbo-depth-tex1d', format], run_concurrent=True)
-    group['fbo-depth-{}-clear'.format(format)] = PiglitGLTest(['fbo-depth', 'clear', format], run_concurrent=True)
-    group['fbo-depth-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'readpixels', format], run_concurrent=True)
-    group['fbo-depth-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-depth', 'drawpixels', format], run_concurrent=True)
-    group['fbo-depth-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-depth', 'copypixels', format], run_concurrent=True)
-    group['fbo-depth-{}-blit'.format(format)] = PiglitGLTest(['fbo-depth', 'blit', format], run_concurrent=True)
-
-def add_fbo_stencil_tests(group, format):
-    group['fbo-stencil-{}-clear'.format(format)] = PiglitGLTest(['fbo-stencil', 'clear', format], run_concurrent=True)
-    group['fbo-stencil-{}-readpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'readpixels', format], run_concurrent=True)
-    group['fbo-stencil-{}-drawpixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'drawpixels', format], run_concurrent=True)
-    group['fbo-stencil-{}-copypixels'.format(format)] = PiglitGLTest(['fbo-stencil', 'copypixels', format], run_concurrent=True)
-    group['fbo-stencil-{}-blit'.format(format)] = PiglitGLTest(['fbo-stencil', 'blit', format], run_concurrent=True)
 
 spec = profile.tests['spec']
 
@@ -1111,19 +1136,6 @@ add_concurrent_test(spec['glsl-1.10']['api'], ['getactiveattrib', '110'])
 
 # Group spec/glsl-1.20
 add_concurrent_test(spec['glsl-1.20'], ['glsl-1.20-getactiveuniform-constant'])
-
-def add_recursion_test(group, name):
-    # When the recursion tests fail it is usually because the GLSL
-    # compiler tries to recursively inline the function until the process
-    # runs out of stack or the system runs out of memory.  Run the test
-    # with a low rlimit to (hopefully) avoid having the test adversely
-    # affect the rest of the system.  This is especially important since
-    # there may be other tests running in parallel.
-    #
-    # This may cause false negatives on systems that map the framebuffer
-    # into the processes address space.  This happens on X with DRI1 based
-    # drivers, for example.
-    group[name] = PiglitGLTest(['recursion', '-rlimit', '268435456', name])
 
 rec = spec['glsl-1.20']['recursion']
 add_recursion_test(rec, 'simple')
@@ -2133,15 +2145,6 @@ add_concurrent_test(tdfx_texture_compression_fxt1, ['compressedteximage', 'GL_CO
 add_fbo_generatemipmap_extension(tdfx_texture_compression_fxt1, 'GL_3DFX_texture_compression_FXT1', 'fbo-generatemipmap-formats')
 tdfx_texture_compression_fxt1['invalid formats'] = PiglitGLTest(['arb_texture_compression-invalid-formats', 'fxt1'], run_concurrent=True)
 add_plain_test(tdfx_texture_compression_fxt1, ['fxt1-teximage'])
-
-def add_color_buffer_float_test(name, format, p1, p2):
-    group = '{}-{}{}{}'.format(
-        format, name,
-        '-{}'.format(p1) if p1 else '',
-        '-{}'.format(p2) if p2 else '')
-    arb_color_buffer_float[group] = PiglitGLTest(
-        ['arb_color_buffer_float-' + name, format, p1, p2],
-        run_concurrent=True)
 
 arb_color_buffer_float = spec['ARB_color_buffer_float']
 add_color_buffer_float_test('mrt', 'mixed', '', '')
@@ -3444,13 +3447,6 @@ for subtest in ('sample', 'read_pixels', 'blit', 'copy'):
         add_concurrent_test(fast_color_clear, test_name)
 add_concurrent_test(fast_color_clear, ['fcc-blit-between-clears'])
 add_plain_test(fast_color_clear, ['fcc-read-to-pbo-after-clear'])
-
-def add_asmparsertest(group, shader):
-    profile.test_list[grouptools.join('asmparsertest', group, shader)] = \
-        PiglitGLTest(
-            ['asmparsertest', group,
-             os.path.join(TESTS_DIR, 'asmparsertest', 'shaders', group, shader)],
-            run_concurrent=True)
 
 add_asmparsertest('ARBfp1.0', 'abs-01.txt')
 add_asmparsertest('ARBfp1.0', 'abs-02.txt')
