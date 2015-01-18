@@ -32,6 +32,7 @@ import framework.core as core
 import framework.dmesg as dmesg
 import framework.profile as profile
 from framework.tests import utils
+from framework import grouptools
 
 # Don't print sys.stderr to the console
 sys.stderr = sys.stdout
@@ -274,3 +275,37 @@ class TestPrepareTestListMatches(object):
         profile_._prepare_test_list(env)
 
         nt.assert_not_in('group4/Test9', profile_.test_list)
+
+
+@utils.no_error
+def test_testprofile_group_manager_no_name_args_eq_one():
+    """TestProfile.group_manager: no name and len(args) == 1 is valid"""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo') as g:
+        g(['a'])
+
+
+def test_testprofile_group_manager_no_name_args_gt_one():
+    """TestProfile.group_manager: no name and len(args) > 1 is valid"""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo') as g:
+        g(['a', 'b'])
+
+    nt.assert_in(grouptools.join('foo', 'a b'), prof.test_list)
+
+
+@utils.no_error
+def test_testprofile_group_manager_name():
+    """TestProfile.group_manager: name plus len(args) > 1 is valid"""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo') as g:
+        g(['a', 'b'], 'a')
+
+
+def test_testprofile_group_manager_is_added():
+    """TestProfile.group_manager: Tests are added to the profile"""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo') as g:
+        g(['a', 'b'], 'a')
+
+    nt.assert_in(grouptools.join('foo', 'a'), prof.test_list)

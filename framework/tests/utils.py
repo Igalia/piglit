@@ -286,3 +286,19 @@ def fail_if(function, values, exceptions, except_error=False):
         if not except_error:
             raise
         return None
+
+
+def no_error(func):
+    """Decorator for tests that should not raise an error.
+
+    If any error is raised then it will be converted into a TestFailure.
+
+    """
+    @functools.wraps(func)
+    def test_wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            raise TestFailure(e.message)
+
+    return test_wrapper

@@ -33,6 +33,7 @@ import multiprocessing
 import multiprocessing.dummy
 import importlib
 import types
+import contextlib
 
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
@@ -317,6 +318,61 @@ class TestProfile(object):
         for profile in profiles:
             self.tests.update(profile.tests)
             self.test_list.update(profile.test_list)
+
+    @contextlib.contextmanager
+    def group_manager(self, test_class, group):
+        """A context manager to make working with flat groups simple.
+
+        This provides a simple way to replace add_plain_test,
+        add_concurrent_test, etc. Basic usage would be to use the with
+        statement to yield and adder instance, and then add tests.
+
+        This does not provide for a couple of cases.
+        1) When you need to alter the test after initialization. If you need to
+           set instance.env, for example, you will need to do so manually. It
+           is recommended to not use this function for that case, but to
+           manually assign the test and set env together, for code clearness.
+        2) When you need to use a function that modifies profile.
+
+        Arguments:
+        test_class -- a Test derived class that. Instances of this class will
+                      be added to the profile.
+        group -- a string or unicode that will be used as the key for the test
+                 in profile.
+
+        >>> from framework.test import PiglitGLTest
+        >>> p = TestProfile()
+        >>> with p.group_manager(PiglitGLTest, 'a') as g:
+        ...     g(['test'])
+        ...     g(['power', 'test'], 'powertest')
+
+        """
+        assert isinstance(group, basestring), type(group)
+
+        def adder(args, name=None, **kwargs):
+            """Helper function that actually adds the tests.
+
+            Arguments:
+            args -- arguments to be passed to the test_class constructor.
+                    This must be appropriate for the underlying class
+
+            Keyword Arguments:
+            name -- If this is a a truthy value that value will be used as the
+                    key for the test. If name is falsy then args will be
+                    ' '.join'd and used as name. Default: None
+            kwargs -- Any additional args will be passed directly to the test
+                      constructor as keyword args.
+
+            """
+            if not name:
+                lgroup = grouptools.join(group, ' '.join(args))
+            else:
+                assert isinstance(name, basestring)
+                lgroup = grouptools.join(group, name)
+
+            self.test_list[lgroup] = test_class(args, **kwargs)
+
+        yield adder
 
 
 def load_test_profile(filename):
