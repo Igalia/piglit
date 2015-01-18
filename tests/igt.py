@@ -107,17 +107,15 @@ def listTests(listname):
         lines = (line.rstrip() for line in f.readlines())
 
     found_header = False
-    progs = ""
 
     for line in lines:
         if found_header:
-            progs = line.split(" ")
-            break
+            return line.split(" ")
 
         if "TESTLIST" in line:
             found_header = True
 
-    return progs
+    return []
 
 tests = listTests("single-tests")
 tests.extend(listTests("multi-tests"))
