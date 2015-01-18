@@ -41,7 +41,7 @@ __all__ = ['profile']
 ##### automatically add all tests into the 'igt' category.
 #############################################################################
 
-def checkEnvironment():
+def check_environment():
     debugfs_path = "/sys/kernel/debug/dri"
     if os.getuid() != 0:
         print "Test Environment check: not root!"
@@ -78,10 +78,10 @@ if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt'))
 class IGTTestProfile(TestProfile):
     """ Test profile for intel-gpu-tools tests. """
     def _pre_run_hook(self):
-        if not checkEnvironment():
+        if not check_environment():
             sys.exit(1)
 
-profile = IGTTestProfile()
+profile = IGTTestProfile()  # pylint: disable=invalid-name
 
 class IGTTest(Test):
     def __init__(self, binary, arguments=None):
@@ -102,7 +102,7 @@ class IGTTest(Test):
             self.result['result'] = 'fail'
 
 
-def listTests(listname):
+def list_tests(listname):
     with open(os.path.join(IGT_TEST_ROOT, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
@@ -117,10 +117,7 @@ def listTests(listname):
 
     return []
 
-tests = listTests("single-tests")
-tests.extend(listTests("multi-tests"))
-
-def addSubTestCases(test):
+def add_subtest_cases(test):
     proc = subprocess.Popen(
         [os.path.join(IGT_TEST_ROOT, test), '--list-subtests'],
         stdout=subprocess.PIPE,
@@ -145,9 +142,16 @@ def addSubTestCases(test):
         profile.test_list[grouptools.join('igt', test, subtest)] = \
             IGTTest(test, ['--run-subtest', subtest])
 
-for test in tests:
-    addSubTestCases(test)
 
+def populate_profile():
+    tests = list_tests("single-tests")
+    tests.extend(list_tests("multi-tests"))
+
+    for test in tests:
+        add_subtest_cases(test)
+
+
+populate_profile()
 profile.dmesg = True
 
 # the dmesg property of TestProfile returns a Dmesg object
