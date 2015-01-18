@@ -124,22 +124,20 @@ tests.extend(listTests("multi-tests"))
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
-            [os.path.join(igtTestRoot, test), '--list-subtests'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=os.environ.copy(),
-            universal_newlines=True
-            )
-    out, err = proc.communicate()
+        [os.path.join(igtTestRoot, test), '--list-subtests'],
+        stdout=subprocess.PIPE,
+        env=os.environ.copy(),
+        universal_newlines=True)
+    out, _ = proc.communicate()
 
     # a return code of 79 indicates there are no subtests
     if proc.returncode == 79:
-         profile.test_list[grouptools.join('igt', test)] = IGTTest(test)
-         return
+        profile.test_list[grouptools.join('igt', test)] = IGTTest(test)
+        return
 
     if proc.returncode != 0:
-         print "Error: Could not list subtests for " + test
-         return
+        print "Error: Could not list subtests for " + test
+        return
 
     subtests = out.split("\n")
 
