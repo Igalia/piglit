@@ -85,9 +85,12 @@ if(PIGLIT_USE_WAFFLE)
 		)
 	endif()
 
+	list(APPEND UTIL_GL_LIBS
+		${Waffle_LIBRARIES}
+	)
 	IF(PIGLIT_BUILD_GLX_TESTS)
-        list(APPEND UTIL_GL_LIBS
-            ${Waffle_LIBRARIES} ${OPENGL_gl_LIBRARY}
+		list(APPEND UTIL_GL_LIBS
+			${OPENGL_gl_LIBRARY}
 		)
 	ENDIF(PIGLIT_BUILD_GLX_TESTS)
 else()
