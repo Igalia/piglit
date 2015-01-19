@@ -86,7 +86,7 @@ if(PIGLIT_USE_WAFFLE)
 	endif()
 
 	list(APPEND UTIL_GL_LIBS
-		${Waffle_LIBRARIES}
+		${Waffle_LDFLAGS}
 	)
 	IF(PIGLIT_BUILD_GLX_TESTS)
 		list(APPEND UTIL_GL_LIBS

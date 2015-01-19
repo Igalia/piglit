@@ -67,13 +67,13 @@ if(PIGLIT_USE_WAFFLE)
 		endif()
 	else ()
 		find_path(Waffle_INCLUDE_DIRS waffle.h)
-        find_library(Waffle_LIBRARIES waffle-1)
-		if(Waffle_INCLUDE_DIRS AND Waffle_LIBRARIES)
+		find_library(Waffle_LDFLAGS waffle-1)
+		if(Waffle_INCLUDE_DIRS AND Waffle_LDFLAGS)
 			set(Waffle_FOUND TRUE)
 		else()
 			message(FATAL_ERROR "Failed to find Waffle. Get and build Waffle from "
 				"http://www.waffle-gl.org and set Waffle_INCLUDE_DIRS and "
-				"Waffle_LIBRARIES variables accordingly."
+				"Waffle_LDFLAGS variables accordingly."
 			)
 		endif()
 	endif ()
