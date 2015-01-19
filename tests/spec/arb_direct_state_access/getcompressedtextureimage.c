@@ -83,7 +83,7 @@ show_image(GLubyte *data, int num_layers, const char *title)
 
 		/* Pause. */
 		printf("Enter any char to continue.\n>>>>>>");
-		scanf("%s", junk);
+		(void) scanf("%s", junk);
 		printf("\n");
 
 		glDeleteTextures(1, &name);
