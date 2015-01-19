@@ -157,7 +157,7 @@ piglit_init(int argc, char **argv)
 	}
 }
 
-bool test_builtin_sample_id(Fbo ms_fbo)
+bool test_builtin_sample_id(const Fbo& ms_fbo)
 {
 	int samples;
 	bool result = true;
