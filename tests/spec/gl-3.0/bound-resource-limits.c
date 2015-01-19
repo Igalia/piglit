@@ -595,7 +595,7 @@ build_reduce_glsl_shader(const PackedDesc *packedInput,
                 return false;
         }
 
-        shaderTextFree = MAX_SHADER_TEXT_CHARS;
+        shaderTextFree = MAX_SHADER_TEXT_CHARS - 1;
 
         snprintf(shaderTempText[0], MAX_SHADER_LINE_CHARS,
         "%s\n", GLSL_VERSION);
