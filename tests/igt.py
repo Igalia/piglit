@@ -32,6 +32,7 @@ drm. Even if you have rendernode support enabled.
 
 """
 
+from __future__ import print_function, division, absolute_import
 import os
 import re
 import sys
@@ -52,10 +53,10 @@ def check_environment():
     """
     debugfs_path = "/sys/kernel/debug/dri"
     if os.getuid() != 0:
-        print "Test Environment check: not root!"
+        print("Test Environment check: not root!")
         return False
     if not os.path.isdir(debugfs_path):
-        print "Test Environment check: debugfs not mounted properly!"
+        print("Test Environment check: debugfs not mounted properly!")
         return False
     for subdir in os.listdir(debugfs_path):
         if not os.path.isdir(os.path.join(debugfs_path, subdir)):
@@ -63,10 +64,10 @@ def check_environment():
         clients = open(os.path.join(debugfs_path, subdir, "clients"), 'r')
         lines = clients.readlines()
         if len(lines) > 2:
-            print "Test Environment check: other drm clients running!"
+            print("Test Environment check: other drm clients running!")
             return False
 
-    print "Test Environment check: Succeeded."
+    print("Test Environment check: Succeeded.")
     return True
 
 
@@ -80,7 +81,7 @@ else:
 # check for the test lists
 if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt'))
         and os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
-    print "intel-gpu-tools test lists not found."
+    print("intel-gpu-tools test lists not found.")
     sys.exit(0)
 
 
@@ -147,7 +148,7 @@ def add_subtest_cases(test):
         return
 
     if proc.returncode != 0:
-        print "Error: Could not list subtests for " + test
+        print("Error: Could not list subtests for " + test)
         return
 
     subtests = out.split("\n")
