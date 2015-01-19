@@ -8,5 +8,6 @@ piglit_add_executable(link-no-vsfs_gles2 link-no-vsfs.c)
 piglit_add_executable(minmax_gles2 minmax.c)
 piglit_add_executable(multiple-shader-objects_gles2 multiple-shader-objects.c)
 piglit_add_executable(fbo_discard_gles2 fbo-discard.c)
+piglit_add_executable(draw_buffers_gles2 draw-buffers.c)
 
 # vim: ft=cmake:

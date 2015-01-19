@@ -4356,6 +4356,7 @@ gles20['link-no-vsfs'] = PiglitGLTest(['link-no-vsfs_gles2'], run_concurrent=Tru
 add_concurrent_test(gles20, ['minmax_gles2'])
 add_concurrent_test(gles20, ['multiple-shader-objects_gles2'])
 add_concurrent_test(gles20, ['fbo_discard_gles2'])
+add_concurrent_test(gles20, ['draw_buffers_gles2'])
 
 gles30 = {}
 spec['!OpenGL ES 3.0'] = gles30
