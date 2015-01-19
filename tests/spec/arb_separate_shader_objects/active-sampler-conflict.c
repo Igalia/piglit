@@ -174,6 +174,8 @@ void piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
+	pass = piglit_check_gl_error(GL_INVALID_OPERATION) && pass;
+
 	/* Switch back to the valid configuration.  Without first calling
 	 * glValidateProgramPipeline, try to draw something.  Verify that
 	 * no error is generated.
