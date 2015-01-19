@@ -33,13 +33,13 @@ void main()
     ## build an array of bit-level representations of the floating point results calculated above
     ##
   int resultbits[${num_elements}] = int[${num_elements}](\
-${', '.join('floatBitsToInt(result{})'.format(i) for i in indexers)}\
+${', '.join('floatBitsToInt(result{0})'.format(i) for i in indexers)}\
 );
     ##
     ## build an array of bit-level representations of the passed-in floating point expected results
     ##
   int expectedbits[${num_elements}] = int[${num_elements}](\
-${', '.join('floatBitsToInt(expected{})'.format(i) for i in indexers)}\
+${', '.join('floatBitsToInt(expected{0})'.format(i) for i in indexers)}\
 );
   ##
   ## check for differences in the sign bit for each result
