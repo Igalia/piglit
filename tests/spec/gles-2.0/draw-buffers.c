@@ -159,6 +159,8 @@ run_test(void)
 	GLuint fbo;
 	GLint max_buffers;
 
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 	/* Error cases when default framebuffer is bound. */
 	glDrawBuffersEXT(0, &back);
 	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
