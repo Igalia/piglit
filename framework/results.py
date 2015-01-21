@@ -167,7 +167,7 @@ class TestrunResult(object):
             with open(os.path.join(results_dir, 'tests', file_), 'r') as f:
                 try:
                     test = json.load(f)
-                except json.JSONDecodeError:
+                except ValueError:
                     continue
             # XXX: There has to be a better way to get a single key: value out
             # of a dict even when the key name isn't known
