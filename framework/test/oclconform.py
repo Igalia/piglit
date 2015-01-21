@@ -88,10 +88,10 @@ def add_oclconform_tests(profile):
                 subtest = m.group(1)
                 subtest_command = join(bindir, run_subtests.replace('<subtest>', subtest))
                 add_sub_test(profile, test_name, subtest,
-		             OCLConform(command=subtest_command,
+		             OCLConform(command=subtest_command.split(),
 			                run_concurrent=should_run_concurrent))
         else:
             run_test = PIGLIT_CONFIG.get(test_section_name, 'run_test')
-            add_test(profile, test_name, OCLConform(command=run_test,
+            add_test(profile, test_name, OCLConform(command=run_test.split(),
 	                                            run_concurrent=should_run_concurrent))
 
