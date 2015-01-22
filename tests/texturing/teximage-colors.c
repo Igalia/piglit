@@ -479,8 +479,8 @@ piglit_init(int argc, char **argv)
 		}
 	}
 
-	if (argc < 1) {
-		printf("usage: texstore-colors [--seed=seed] [--benchmark] format");
+	if (argc < 2) {
+		printf("usage: teximage-colors [--seed=seed] [--benchmark] format\n");
 		exit(1);
 	}
 
