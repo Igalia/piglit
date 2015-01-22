@@ -3998,6 +3998,7 @@ arb_shader_atomic_counters['respecify-buffer'] = PiglitGLTest(['arb_shader_atomi
 
 spec['ARB_direct_state_access']['create-transformfeedbacks'] = PiglitGLTest(['arb_direct_state_access-create-transformfeedbacks'], run_concurrent=True)
 spec['ARB_direct_state_access']['transformfeedback-bufferbase'] = PiglitGLTest(['arb_direct_state_access-transformfeedback-bufferbase'], run_concurrent=True)
+spec['ARB_direct_state_access']['transformfeedback-bufferrange'] = PiglitGLTest(['arb_direct_state_access-transformfeedback-bufferrange'], run_concurrent=True)
 spec['ARB_direct_state_access']['dsa-textures'] = PiglitGLTest(['arb_direct_state_access-dsa-textures'], run_concurrent=True)
 spec['ARB_direct_state_access']['texturesubimage'] = PiglitGLTest(['arb_direct_state_access-texturesubimage'], run_concurrent=True)
 spec['ARB_direct_state_access']['bind-texture-unit'] = PiglitGLTest(['arb_direct_state_access-bind-texture-unit'], run_concurrent=True)
