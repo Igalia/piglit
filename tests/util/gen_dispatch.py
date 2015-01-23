@@ -78,7 +78,7 @@ class DispatchCode(object):
                      ('name', 'base_version_int', 'c_piglit_token'))
 
     APIS = {
-        'gl':    Api('gl',    10, 'PIGLIT_DISPATCH_GL'),
+        'gl': Api('gl', 10, 'PIGLIT_DISPATCH_GL'),
         'gles1': Api('gles1', 11, 'PIGLIT_DISPATCH_ES1'),
         'gles2': Api('gles2', 20, 'PIGLIT_DISPATCH_ES2'),
     }
@@ -140,7 +140,6 @@ class EnumCode(object):
             out_dir,
             gl_registry=gl_registry,
             sorted_unique_enums_in_default_namespace=enums)
-
 
     @classmethod
     def get_unique_enums_in_default_namespace(cls, gl_registry):
