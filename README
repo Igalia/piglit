@@ -219,7 +219,7 @@ which may be useful for shell tab completion.
 
 You may provide multiple profiles to be run at the same time:
   
-  $ ./piglit run quick_cl gpu deqp-gles3 results/gl-cl-combined
+  $ ./piglit run quick_cl gpu deqp_gles3 results/gl-cl-combined
 
 Use
 
@@ -298,11 +298,13 @@ gpu.py
 	A further reduced set of tests from quick.py, this runs tests only
 	for hardware functionality and not tests for the software stack.
 
-radeon.py
-r300.py
-r500.py
-    These test suites are adaptations of all.tests, with some tweaks
-    to account for hardware limitations in Radeon chips.
+llvmpipe.py
+	A reduced set of tests from gpu.py removing tests that are problematic
+	using llvmpipe
+
+cpu.py
+	This profile runs tests that don't touch the gpu, in other words all of
+	the tests in quick.py that are not run by gpu.py
 
 
 4.2 OpenCL Tests
@@ -312,7 +314,7 @@ cl.py
     This suite contains all OpenCL tests.
 
 quick_cl.py
-    This runs all of the tests from cl.py as well as tests from opencv
+	This runs all of the tests from cl.py as well as tests from opencv
 	and oclconform.
 
 
@@ -324,6 +326,9 @@ xts.py
 
 igt.py
 	Support for running Intel-gpu-tools test suite using piglit.
+
+deqp_gles3.py
+	Support for running deQP's gles3 profile with piglit.
 
 
 5. How to write tests
