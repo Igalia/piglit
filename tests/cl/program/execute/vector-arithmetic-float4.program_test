@@ -91,21 +91,21 @@ name: pos div pos, neg div neg, pos div neg, neg div pos
 kernel_name: div
 arg_in:  1 float4             8.5 -21.25 11.25  -21
 arg_in:  2 float4            4.25     -5    -3 5.25
-arg_out: 0 buffer float4[1]     2   4.25 -3.75   -4
+arg_out: 0 buffer float4[1]     2   4.25 -3.75   -4 tolerance 2
 
 [test]
 name: 0 div pos, 0 div neg, pos div 0, neg div 0
 kernel_name: div
 arg_in:  1 float4               0  0 11.25  -21
 arg_in:  2 float4            4.25 -5     0    0
-arg_out: 0 buffer float4[1]     0  0   inf -inf
+arg_out: 0 buffer float4[1]     0  0   inf -inf tolerance 2
 
 [test]
 name: 0 div inf, inf div 0, inf div inf, nan div 0
 kernel_name: div
 arg_in:  1 float4               0  inf inf nan
 arg_in:  2 float4             inf    0 inf   0
-arg_out: 0 buffer float4[1]     0  inf nan nan
+arg_out: 0 buffer float4[1]     0  inf nan nan tolerance 2
 
 ## Unary plus ##
 
