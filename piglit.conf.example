@@ -44,6 +44,12 @@ testB
 ; option is not required. The environment variable PIGLIT_DEQP_GLES3_EXTRA_ARGS
 ; overrides the value set here.
 ;extra_args=--deqp-visibility hidden
+;
+; Path to the test case list of CTS for deqp-gles3. You can also set this with
+; the environment variable PIGLIT_DEQP_MUSTPASS. Piglit will run the subset of
+; dEQP-GLES3 tests if and only if this option is set.
+;mustpasslist= \
+; /android/platform/external/deqp/android/cts/com.drawelements.deqp.gles3.xml
 
 ; Section for specific oclconform test.  One of these sections is required for
 ; each test list in the oclconform section and must be called:

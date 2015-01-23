@@ -21,12 +21,41 @@
 import ConfigParser
 import os
 import subprocess
+import xml.etree.cElementTree as ET
 
 # Piglit modules
 import framework
 from framework.profile import Test, TestProfile
 
 __all__ = ['profile']
+
+
+def get_test_case(root, root_group, outputfile):
+    """Parser the test case list of Google Android CTS,
+    and store the test case list to dEQP-GLES3-cases.txt
+    """
+    for child in root:
+        root_group.append(child.get('name'))
+        if child.tag == "Test":
+            outputfile.write('TEST: {}\n'.format('.'.join(root_group)))
+            del root_group[-1]
+        else:
+            get_test_case(child, root_group, outputfile)
+            del root_group[-1]
+
+
+def load_test_hierarchy(input, output):
+    """Google have added a subset of dEQP to CTS test, the case list is stored
+    at some xml files. Such as: com.drawelements.deqp.gles3.xml This function
+    is used to parser the file, and generate a new dEQP-GLES3-cases.txt which
+    only contain the subset of dEQP.
+    """
+    tree = ET.parse(input)
+    root = tree.getroot()
+    root_group = []
+    with open(output, 'w') as f:
+        get_test_case(root, root_group, f)
+
 
 def get_option(env_varname, config_option):
     """Query the given environment variable and then piglit.conf for the
@@ -50,6 +79,10 @@ def get_option(env_varname, config_option):
 # Path to the deqp-gles3 executable.
 DEQP_GLES3_EXE = get_option('PIGLIT_DEQP_GLES3_EXE', ('deqp-gles3', 'exe'))
 
+# Path to the xml file which contained the case list of the subset of dEQP
+# and marked as must pass in CTS.
+DEQP_MUSTPASS = get_option('PIGLIT_DEQP_MUSTPASS', ('deqp-gles3', 'mustpasslist'))
+
 DEQP_GLES3_EXTRA_ARGS = get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                                    ('deqp-gles3', 'extra_args'))
 
@@ -72,6 +105,8 @@ def gen_caselist_txt():
     subprocess.check_call(
         [DEQP_GLES3_EXE, '--deqp-runmode=txt-caselist'],
         cwd=basedir)
+    if DEQP_MUSTPASS is not None:
+        load_test_hierarchy(DEQP_MUSTPASS, caselist_path)
     assert os.path.exists(caselist_path)
     return caselist_path
 
