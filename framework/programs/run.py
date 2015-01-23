@@ -183,9 +183,11 @@ def _run_parser(input_):
     parser.add_argument("--test-list",
                         help="A file containing a list of tests to run")
     parser.add_argument("test_profile",
-                        metavar="<Path to one or more test profile(s)>",
+                        metavar="<Profile path(s)>",
                         nargs='+',
-                        help="Path to testfile to run")
+                        help="Path to one or more test profiles to run. "
+                             "If more than one profile is provided then they "
+                             "will be merged.")
     parser.add_argument("results_path",
                         type=path.realpath,
                         metavar="<Results Path>",

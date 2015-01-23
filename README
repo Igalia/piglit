@@ -209,10 +209,14 @@ Build from the Command Prompt.
 
 Make sure that everything is set up correctly:
 
-  $ ./piglit run tests/sanity results/sanity.results
+  $ ./piglit run tests/sanity results/sanity
 
 You may include '.py' on the profile, or you may exclude it (sanity vs sanity.py),
 both are equally valid.
+
+You may provide multiple profiles to be run at the same time:
+  
+  $ ./piglit run quick_cl gpu deqp-gles3 results/gl-cl-combined
 
 Use
 
