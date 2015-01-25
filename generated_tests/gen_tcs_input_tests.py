@@ -210,12 +210,13 @@ out int pass[];
 void main()
 {{
 	const int vertices_in = 3;
-	pass[gl_InvocationID] = 1;
+	int local_pass = 1;
 	for (int i = 0; i < vertices_in; ++i) {{
 		int vertex_ID = gl_PrimitiveID * vertices_in + i;
 		if ({self.interface_tcs_instance}[i]{self.tcs_var_ref} != reference[vertex_ID].v)
-			pass[gl_InvocationID] = 0;
+			local_pass = 0;
 	}}
+	pass[gl_InvocationID] = local_pass;
 	gl_TessLevelOuter = float[4](1.0, 1.0, 1.0, 1.0);
 	gl_TessLevelInner = float[2](1.0, 1.0);
 }}
@@ -230,7 +231,6 @@ out vec4 vert_color;
 
 void main()
 {{
-	const int vertices_in = 3;
 	const vec4 red = vec4(1, 0, 0, 1);
 	const vec4 green = vec4(0, 1, 0, 1);
 	vec2[3] position = vec2[3](
@@ -242,9 +242,8 @@ void main()
 	            + (position[1] - position[0]) * gl_TessCoord[0]
 	            + (position[2] - position[0]) * gl_TessCoord[1], 0.0, 1.0);
 	vert_color = green;
-	for (int i = 0; i < vertices_in; ++i) {{
-		if (pass[i] == 0)
-			vert_color = red;
+	if (pass[0] == 0 || pass[1] == 0 || pass[2] == 0) {{
+		vert_color = red;
 	}}
 }}
 
