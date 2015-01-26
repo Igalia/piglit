@@ -41,6 +41,7 @@ __all__ = ['profile']
 ##### automatically add all tests into the 'igt' category.
 #############################################################################
 
+
 def check_environment():
     debugfs_path = "/sys/kernel/debug/dri"
     if os.getuid() != 0:
@@ -60,6 +61,7 @@ def check_environment():
 
     print "Test Environment check: Succeeded."
     return True
+
 
 if 'IGT_TEST_ROOT' in os.environ:
     IGT_TEST_ROOT = os.environ['IGT_TEST_ROOT']
@@ -83,6 +85,7 @@ class IGTTestProfile(TestProfile):
 
 profile = IGTTestProfile()  # pylint: disable=invalid-name
 
+
 class IGTTest(Test):
     def __init__(self, binary, arguments=None):
         if arguments is None:
@@ -102,6 +105,7 @@ class IGTTest(Test):
             self.result['result'] = 'fail'
 
 
+
 def list_tests(listname):
     with open(os.path.join(IGT_TEST_ROOT, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
@@ -116,6 +120,7 @@ def list_tests(listname):
             found_header = True
 
     return []
+
 
 def add_subtest_cases(test):
     proc = subprocess.Popen(
