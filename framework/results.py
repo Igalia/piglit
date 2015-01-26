@@ -241,6 +241,7 @@ def update_results(results, filepath):
         updates = {
             0: _update_zero_to_one,
             1: _update_one_to_two,
+            2: _update_two_to_three,
         }
 
         while results.results_version < CURRENT_JSON_VERSION:
@@ -403,5 +404,18 @@ def _update_one_to_two(results):
         del results.options['env']
 
     results.results_version = 2
+
+    return results
+
+
+def _update_two_to_three(results):
+    """Lower key names."""
+    for key, value in results.tests.items():
+        lowered = key.lower()
+        if not key == lowered:
+            results.tests[lowered] = value
+            del results.tests[key]
+
+    results.results_version = 3
 
     return results

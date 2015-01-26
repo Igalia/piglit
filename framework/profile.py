@@ -46,23 +46,23 @@ __all__ = [
 ]
 
 
-class Tree(dict):
-    """A tree-like object built with python dictionaries.
+class TestDict(dict):  # pylint: disable=too-few-public-methods
+    """A special kind of dict for tests.
 
-    When a node that doesn't exist is requested it is automatically created
-    with a new Tree node.
+    This dict lowers the names of keys by default
 
     """
-    def __missing__(self, key):
-        """Automatically create new Tree nodes."""
-        self[key] = Tree()
-        return self[key]
-
     def __setitem__(self, key, value):
         """Enforce types on set operations.
-        
+
         Keys should only be strings, and values should only be more Trees
         or Tests.
+
+        This method makes one additional requirement, it lowers the key before
+        adding it. This solves a couple of problems, namely that we want to be
+        able to use filesystem heirarchies as groups in some cases, and those
+        are assumed to be all lowercase to avoid problems on case insensitive
+        filesystems.
 
         """
         assert isinstance(key, basestring), \
@@ -73,7 +73,26 @@ class Tree(dict):
                "Values must be either a Tree or a Test, but was {}".format(
                    type(value))
 
-        super(Tree, self).__setitem__(key, value)
+        super(TestDict, self).__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        """Lower the value before returning."""
+        return super(TestDict, self).__getitem__(key.lower())
+
+
+class Tree(TestDict):  # pylint: disable=too-few-public-methods
+    """A tree-like object built with python dictionaries.
+
+    When a node that doesn't exist is requested it is automatically created
+    with a new Tree node.
+
+    This also enforces lowering of keys, both for getting and setting.
+
+    """
+    def __missing__(self, key):
+        """Automatically create new Tree nodes."""
+        self[key] = Tree()
+        return self[key]
 
 
 class TestProfile(object):
@@ -97,7 +116,7 @@ class TestProfile(object):
     def __init__(self):
         # Self.tests is deprecated, see above
         self.tests = Tree()
-        self.test_list = {}
+        self.test_list = TestDict()
         self.filters = []
         # Sets a default of a Dummy
         self._dmesg = None

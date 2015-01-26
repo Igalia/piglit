@@ -100,6 +100,10 @@ def test_testprofile_flatten():
         'group1/group2/group3/test3': test3,
     })
 
+    # Do not flatten until after baseline, since we want to use the same
+    # isntances and tests should be emptied by flattening
+    profile_._flatten_group_hierarchy()
+
     # profile_.tests should have been emptied
     nt.assert_dict_equal(profile_.tests, {})
 
@@ -116,10 +120,9 @@ def test_testprofile_update_tests():
     profile1.tests['group1']['test1'] = utils.Test(['test1'])
 
     profile2 = profile.TestProfile()
-    baseline = profile.Tree()
+    baseline = profile2.tests
     baseline['group2']['test2'] = utils.Test(['test2'])
     baseline['group1']['test1'] = utils.Test(['test3'])
-    profile2.tests = baseline
 
     profile1.update(profile2)
 
@@ -129,16 +132,16 @@ def test_testprofile_update_tests():
 def test_testprofile_update_test_list():
     """ TestProfile.update() updates TestProfile.test_list """
     profile1 = profile.TestProfile()
-    profile1.test_list['group1/test1'] = 'test1'
+    profile1.test_list['group1/test1'] = utils.Test(['test1'])
 
-    baseline = {'group1/test1': 'test3', 'group2/test2': 'test2'}
 
     profile2 = profile.TestProfile()
-    profile2.test_list = baseline
+    profile2.test_list['group1/test1'] = utils.Test(['test3'])
+    profile2.test_list['group2/test2'] = utils.Test(['test2'])
 
     profile1.update(profile2)
 
-    nt.assert_dict_equal(profile1.test_list, baseline)
+    nt.assert_dict_equal(profile1.test_list, profile2.test_list)
 
 
 def generate_prepare_test_list_flatten():
@@ -182,10 +185,10 @@ def check_mixed_flatten(tests, testlist):
     """ flattening is correct when tests and test_list are defined """
     profile_ = profile.TestProfile()
     profile_.tests = tests
-    profile_.test_list['test8'] = 'other'
+    profile_.test_list['test8'] = utils.Test(['other'])
     profile_._flatten_group_hierarchy()
 
-    baseline = {'test8': 'other'}
+    baseline = {'test8': profile_.test_list['test8']}
     baseline.update(testlist)
 
     nt.assert_dict_equal(profile_.test_list, baseline)
