@@ -18,8 +18,8 @@ def remove(key):
 # These take too long or too much memory
 remove(join('glean', 'pointAtten'))
 remove(join('glean', 'texCombine'))
-profile.tests['spec']['!OpenGL 1.1'].pop('streaming-texture-leak', None)
-profile.tests['spec']['!OpenGL 1.1'].pop('max-texture-size', None)
+remove(join('spec', '!OpenGL 1.1', 'streaming-texture-leak'))
+remove(join('spec', '!OpenGL 1.1', 'max-texture-size'))
 
 if platform.system() != 'Windows':
-    profile.tests['glx'].pop('glx-multithread-shader-compile', None)
+    remove(join('glx', 'glx-multithread-shader-compile'))
