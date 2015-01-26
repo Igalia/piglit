@@ -15,6 +15,7 @@ import glob
 
 from framework.profile import TestProfile
 from framework.test import PiglitCLTest
+from framework import grouptools
 from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
@@ -116,30 +117,30 @@ def add_program_test_dir(group, dirpath):
         if ext not in ['.cl', '.program_test']:
             continue
 
-        group[testname] = cl_test(
+        profile.test_list[grouptools.join(group, testname)] = cl_test(
             ['cl-program-tester', os.path.join(dirpath, filename)])
 
 
-add_program_test_dir(profile.tests['Program']["Build"],
+add_program_test_dir(grouptools.join('program', 'build'),
                      os.path.join(TESTS_DIR, 'cl', 'program', 'build'))
-add_program_test_dir(profile.tests['Program']["Build"]['fail'],
+add_program_test_dir(grouptools.join('program', 'build', 'fail'),
                      os.path.join(TESTS_DIR, 'cl', 'program', 'build', 'fail'))
-add_program_test_dir(profile.tests['Program']["execute"],
+add_program_test_dir(grouptools.join('program', 'execute'),
                      os.path.join(TESTS_DIR, 'cl', 'program', 'execute'))
-add_program_test_dir(profile.tests['Program']["execute"],
+add_program_test_dir(grouptools.join('program', 'execute'),
                      os.path.join(TESTS_DIR, 'cl', 'program', 'execute',
                                   'builtin', 'atomic'))
-add_program_test_dir(profile.tests['Program']["execute"],
+add_program_test_dir(grouptools.join('program', 'execute'),
                      os.path.join(TESTS_DIR, 'cl', 'program', 'execute',
                                   'builtin', 'convert'))
 
 # Run generated built-in tests
-add_program_test_dir(profile.tests['Program']["execute"]["Builtin"],
+add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'int'))
-add_program_test_dir(profile.tests['Program']["execute"]["Builtin"],
+add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'math'))
-add_program_test_dir(profile.tests['Program']["execute"]["Builtin"],
+add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
                                   'relational'))
-add_program_test_dir(profile.tests['program']["Execute"]["Store"],
+add_program_test_dir(grouptools.join('program', 'execute', 'store'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
