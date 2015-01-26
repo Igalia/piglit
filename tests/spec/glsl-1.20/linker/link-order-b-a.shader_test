@@ -1,0 +1,44 @@
+# Test linking two vertex shaders.
+# The GLSL and GL specs don't say anything about the order of
+# shaders attached to program objects being significant.
+# So attaching shader 'A' and then attaching shader 'B' should be the
+# same as attaching 'B' then 'A'.
+#
+# Derived from tests/shaders/glsl-link-array-01.shader_test
+#
+# See also link-order-a-b.shader_test
+
+[require]
+GLSL >= 1.20
+
+[vertex shader]
+// Shader B
+vec4 vals[2];
+
+void set_position();
+
+void main()
+{
+	vals[1] = gl_Vertex;
+	set_position();
+}
+
+[vertex shader]
+// Shader A
+vec4 vals[];
+
+void set_position()
+{
+	gl_Position = vals[1];
+}
+
+
+[fragment shader]
+void main()
+{
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 0.0);
+}
+
+[test]
+draw rect -1 -1 2 2
+probe all rgba 0.0 1.0 0.0 0.0
