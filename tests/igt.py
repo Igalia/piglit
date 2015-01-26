@@ -74,9 +74,14 @@ if not (os.path.exists(os.path.join(igtTestRoot, 'single-tests.txt'))
     print "intel-gpu-tools test lists not found."
     sys.exit(0)
 
-igtEnvironmentOk = checkEnvironment()
 
-profile = TestProfile()
+class IGTTestProfile(TestProfile):
+    """ Test profile for intel-gpu-tools tests. """
+    def _pre_run_hook(self):
+        if not checkEnvironment():
+            sys.exit(1)
+
+profile = IGTTestProfile()
 
 class IGTTest(Test):
     def __init__(self, binary, arguments=None):
@@ -87,9 +92,6 @@ class IGTTest(Test):
         self.timeout = 600
 
     def interpret_result(self):
-        if not igtEnvironmentOk:
-            return
-
         if self.result['returncode'] == 0:
             self.result['result'] = 'pass'
         elif self.result['returncode'] == 77:
@@ -99,13 +101,6 @@ class IGTTest(Test):
         else:
             self.result['result'] = 'fail'
 
-    def run(self):
-        if not igtEnvironmentOk:
-            self.result['result'] = 'fail'
-            self.result['info'] = unicode("Test Environment isn't OK")
-            return
-
-        super(IGTTest, self).run()
 
 def listTests(listname):
     with open(os.path.join(igtTestRoot, listname + '.txt'), 'r') as f:
