@@ -62,15 +62,15 @@ def checkEnvironment():
     return True
 
 if 'IGT_TEST_ROOT' in os.environ:
-    igtTestRoot = os.environ['IGT_TEST_ROOT']
+    IGT_TEST_ROOT = os.environ['IGT_TEST_ROOT']
 else:
-    igtTestRoot = os.path.join(framework.core.PIGLIT_CONFIG.get('igt', 'path'),
-                               'tests')
-    assert os.path.exists(igtTestRoot)
+    IGT_TEST_ROOT = os.path.join(
+        framework.core.PIGLIT_CONFIG.get('igt', 'path'), 'tests')
+    assert os.path.exists(IGT_TEST_ROOT)
 
 # check for the test lists
-if not (os.path.exists(os.path.join(igtTestRoot, 'single-tests.txt'))
-        and os.path.exists(os.path.join(igtTestRoot, 'multi-tests.txt'))):
+if not (os.path.exists(os.path.join(IGT_TEST_ROOT, 'single-tests.txt'))
+        and os.path.exists(os.path.join(IGT_TEST_ROOT, 'multi-tests.txt'))):
     print "intel-gpu-tools test lists not found."
     sys.exit(0)
 
@@ -88,7 +88,7 @@ class IGTTest(Test):
         if arguments is None:
             arguments = []
         super(IGTTest, self).__init__(
-            [os.path.join(igtTestRoot, binary)] + arguments)
+            [os.path.join(IGT_TEST_ROOT, binary)] + arguments)
         self.timeout = 600
 
     def interpret_result(self):
@@ -103,7 +103,7 @@ class IGTTest(Test):
 
 
 def listTests(listname):
-    with open(os.path.join(igtTestRoot, listname + '.txt'), 'r') as f:
+    with open(os.path.join(IGT_TEST_ROOT, listname + '.txt'), 'r') as f:
         lines = (line.rstrip() for line in f.readlines())
 
     found_header = False
@@ -122,7 +122,7 @@ tests.extend(listTests("multi-tests"))
 
 def addSubTestCases(test):
     proc = subprocess.Popen(
-        [os.path.join(igtTestRoot, test), '--list-subtests'],
+        [os.path.join(IGT_TEST_ROOT, test), '--list-subtests'],
         stdout=subprocess.PIPE,
         env=os.environ.copy(),
         universal_newlines=True)
