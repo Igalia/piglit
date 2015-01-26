@@ -68,7 +68,7 @@ def add_opencv_tests(profile):
             group_desc = group_name[:-1]
             full_test_name = 'opencv/{}'.format(group_desc)
             if not individual:
-                profile.tests[full_test_name] = OpenCVTest(opencv_test_ocl,
+                profile.test_list[full_test_name] = OpenCVTest(opencv_test_ocl,
                     '{}*'.format(group_name))
             continue
 
@@ -79,5 +79,5 @@ def add_opencv_tests(profile):
         m = re.match('  ([^ ]+)', line)
         if m:
             test_name = m.group(1)
-            profile.tests[grouptools.join(full_test_name, test_name)] = \
+            profile.test_list[grouptools.join(full_test_name, test_name)] = \
                 OpenCVTest(opencv_test_ocl, '{}{}'.format(group_name ,test_name))
