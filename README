@@ -209,10 +209,13 @@ Build from the Command Prompt.
 
 Make sure that everything is set up correctly:
 
-  $ ./piglit run tests/sanity results/sanity
+  $ ./piglit run sanity results/sanity
 
 You may include '.py' on the profile, or you may exclude it (sanity vs sanity.py),
 both are equally valid.
+
+You may also preface test profiles with tests/ (or any other path you like),
+which may be useful for shell tab completion.
 
 You may provide multiple profiles to be run at the same time:
   
@@ -224,8 +227,9 @@ Use
   or
   $ ./piglit run -h
 
-To learn more about the command's syntax. Have a look into the tests/
-directory to see what test profiles are available:
+To learn more about the command's syntax.
+
+Have a look into the tests/ directory to see what test profiles are available:
 
   $ ls tests/*.py
 
