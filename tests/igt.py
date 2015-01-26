@@ -135,27 +135,24 @@ def list_tests(listname):
 
 def add_subtest_cases(test):
     """Get subtest instances."""
-    proc = subprocess.Popen(
-        [os.path.join(IGT_TEST_ROOT, test), '--list-subtests'],
-        stdout=subprocess.PIPE,
-        env=os.environ.copy(),
-        universal_newlines=True)
-    out, _ = proc.communicate()
+    try:
+        out = subprocess.check_output(
+            [os.path.join(IGT_TEST_ROOT, test), '--list-subtests'],
+            env=os.environ.copy(),
+            universal_newlines=True)
+    except subprocess.CalledProcessError as e:
+        # a return code of 79 indicates there are no subtests
+        if e.returncode == 79:
+            profile.test_list[grouptools.join('igt', test)] = IGTTest(test)
+        elif e.returncode != 0:
+            print("Error: Could not list subtests for " + test)
+        else:
+            raise
 
-    # a return code of 79 indicates there are no subtests
-    if proc.returncode == 79:
-        profile.test_list[grouptools.join('igt', test)] = IGTTest(test)
+        # If we reach here there are no subtests.
         return
 
-    if proc.returncode != 0:
-        print("Error: Could not list subtests for " + test)
-        return
-
-    subtests = out.split("\n")
-
-    for subtest in subtests:
-        if subtest == "":
-            continue
+    for subtest in (s for s in out.splitlines() if s):
         profile.test_list[grouptools.join('igt', test, subtest)] = \
             IGTTest(test, ['--run-subtest', subtest])
 
