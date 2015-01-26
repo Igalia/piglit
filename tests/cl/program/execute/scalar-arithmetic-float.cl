@@ -178,42 +178,42 @@ name: pos div pos
 kernel_name: div
 arg_in:  1 float 8.5
 arg_in:  2 float 4.25
-arg_out: 0 buffer float[1] 2
+arg_out: 0 buffer float[1] 2 tolerance 2
 
 [test]
 name: pos div neg
 kernel_name: div
 arg_in:  1 float 11.25
 arg_in:  2 float -3
-arg_out: 0 buffer float[1] -3.75
+arg_out: 0 buffer float[1] -3.75 tolerance 2
 
 [test]
 name: neg div pos
 kernel_name: div
 arg_in:  1 float -21
 arg_in:  2 float 5.25
-arg_out: 0 buffer float[1] -4
+arg_out: 0 buffer float[1] -4 tolerance 2
 
 [test]
 name: neg div neg
 kernel_name: div
 arg_in:  1 float -21.25
 arg_in:  2 float -5
-arg_out: 0 buffer float[1] 4.25
+arg_out: 0 buffer float[1] 4.25 tolerance 2
 
 [test]
 name: 0 div pos
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float 3.7
-arg_out: 0 buffer float[1] 0
+arg_out: 0 buffer float[1] 0 tolerance 2
 
 [test]
 name: 0 div neg
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float -3.7
-arg_out: 0 buffer float[1] -0
+arg_out: 0 buffer float[1] -0 tolerance 2
 
 [test]
 name: num div 0
@@ -234,7 +234,7 @@ name: 0 div inf
 kernel_name: div
 arg_in:  1 float 0
 arg_in:  2 float inf
-arg_out: 0 buffer float[1] 0
+arg_out: 0 buffer float[1] 0 tolerance 2
 
 [test]
 name: inf div 0
