@@ -42,6 +42,7 @@ from nose.plugins.skip import SkipTest
 import nose.tools as nt
 
 import framework.results
+import framework.test
 
 
 __all__ = [
@@ -273,3 +274,18 @@ def platform_check(plat):
     """If the platform is not in the list specified skip the test."""
     if not sys.platform.startswith(plat):
         raise SkipTest('Platform {} is not supported'.format(sys.platform))
+
+
+class Test(framework.test.Test):
+    """A basic dmmmy Test class that can be used in places a test is required.
+
+    This provides dummy version of abstract methods in
+    framework.test.base.Test, which allows it to be initialized and run, but is
+    unlikely to be useful for running.
+
+    This is mainly intended for testing where a Test class is required, but
+    doesn't need to be run.
+
+    """
+    def interpret_result(self):
+        pass
