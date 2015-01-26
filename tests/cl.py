@@ -110,23 +110,14 @@ with profile.group_manager(cl_test, 'program') as g:
     g(['cl-program-bitcoin-phatk'], 'Bitcoin: phatk kernel')
 
 
-def add_plain_test(group, name, args):
-    group[name] = PiglitCLTest(args, run_concurrent=can_do_concurrent)
-
-
-def add_plain_program_tester_test(group, name, path):
-    add_plain_test(group, name, ['cl-program-tester', path])
-
-
 def add_program_test_dir(group, dirpath):
     for filename in os.listdir(dirpath):
-        filepath = os.path.join(dirpath, filename)
-        ext = filename.rsplit('.')[-1]
-        if ext != 'cl' and ext != 'program_test':
+        testname, ext = os.path.splitext(filename)
+        if ext not in ['.cl', '.program_test']:
             continue
-        testname = filename[0:-(len(ext) + 1)]
-        add_plain_program_tester_test(group, testname, filepath)
 
+        group[testname] = cl_test(
+            ['cl-program-tester', os.path.join(dirpath, filename)])
 
 
 add_program_test_dir(profile.tests['Program']["Build"],
