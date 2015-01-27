@@ -70,30 +70,14 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
                "Keys must be strings, but was {}".format(type(key))
         # None is required to make empty assignment work:
         # foo = Tree['a']
-        assert isinstance(value, (Tree, Test, types.NoneType)), \
-               "Values must be either a Tree or a Test, but was {}".format(
-                   type(value))
+        assert isinstance(value, (Test, types.NoneType)), \
+               "Values must be either a Test, but was {}".format(type(value))
 
         super(TestDict, self).__setitem__(key.lower(), value)
 
     def __getitem__(self, key):
         """Lower the value before returning."""
         return super(TestDict, self).__getitem__(key.lower())
-
-
-class Tree(TestDict):  # pylint: disable=too-few-public-methods
-    """A tree-like object built with python dictionaries.
-
-    When a node that doesn't exist is requested it is automatically created
-    with a new Tree node.
-
-    This also enforces lowering of keys, both for getting and setting.
-
-    """
-    def __missing__(self, key):
-        """Automatically create new Tree nodes."""
-        self[key] = Tree()
-        return self[key]
 
 
 class TestProfile(object):
@@ -115,8 +99,6 @@ class TestProfile(object):
 
     """
     def __init__(self):
-        # Self.tests is deprecated, see above
-        self.tests = Tree()
         self.test_list = TestDict()
         self.filters = []
         # Sets a default of a Dummy
@@ -140,34 +122,6 @@ class TestProfile(object):
         """
         self._dmesg = get_dmesg(not_dummy)
 
-    def _flatten_group_hierarchy(self):
-        """ Flatten nested dictionary structure
-
-        Convert Piglit's old hierarchical Group() structure into a flat
-        dictionary mapping from fully qualified test names to "Test" objects.
-
-        For example,
-        self.tests['spec']['glsl-1.30']['preprocessor']['compiler']['void.frag']
-        would become:
-        self.test_list['spec/glsl-1.30/preprocessor/compiler/void.frag']
-
-        """
-
-        def f(prefix, group, test_dict):
-            """ Recursively flatter nested dictionary tree """
-            for key, value in group.iteritems():
-                fullkey = grouptools.join(prefix, key)
-                if isinstance(value, Tree):
-                    f(fullkey, value, test_dict)
-                else:
-                    test_dict[fullkey] = value
-        f('', self.tests, self.test_list)
-
-        # Empty the nested structure. Do not use clear(), since it will
-        # actually remove all of the objects in the Tree, which will also
-        # remove them from self.test_list
-        self.tests = Tree()
-
     def _prepare_test_list(self, opts):
         """ Prepare tests for running
 
@@ -179,8 +133,6 @@ class TestProfile(object):
         opts - a core.Options instance
 
         """
-        self._flatten_group_hierarchy()
-
         def matches_any_regexp(x, re_list):
             return any(r.search(x) for r in re_list)
 
@@ -316,7 +268,6 @@ class TestProfile(object):
 
         """
         for profile in profiles:
-            self.tests.update(profile.tests)
             self.test_list.update(profile.test_list)
 
     @contextlib.contextmanager

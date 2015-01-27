@@ -86,54 +86,6 @@ def test_testprofile_set_dmesg_false():
     assert isinstance(profile_.dmesg, dmesg.DummyDmesg)
 
 
-def test_testprofile_flatten():
-    """ TestProfile.flatten_group_hierarchy flattens and empties self.tests """
-    test1 = utils.Test(['thing'])
-    test2 = utils.Test(['thing'])
-    test3 = utils.Test(['thing'])
-
-    profile_ = profile.TestProfile()
-    profile_.tests['group1']['test1'] = test1
-    profile_.tests['group1']['group2']['test2'] = test2
-    profile_.tests['group1']['group2']['group3']['test3'] = test3
-
-    profile_._flatten_group_hierarchy()
-
-    baseline = profile.Tree({
-        'group1/test1': test1,
-        'group1/group2/test2': test2,
-        'group1/group2/group3/test3': test3,
-    })
-
-    # Do not flatten until after baseline, since we want to use the same
-    # isntances and tests should be emptied by flattening
-    profile_._flatten_group_hierarchy()
-
-    # profile_.tests should have been emptied
-    nt.assert_dict_equal(profile_.tests, {})
-
-    nt.assert_dict_equal(profile_.test_list, baseline)
-
-
-def test_testprofile_update_tests():
-    """ TestProfile.update() updates TestProfile.tests
-
-    TestProfile.tests is deprecated, and this test should be removed eventually
-
-    """
-    profile1 = profile.TestProfile()
-    profile1.tests['group1']['test1'] = utils.Test(['test1'])
-
-    profile2 = profile.TestProfile()
-    baseline = profile2.tests
-    baseline['group2']['test2'] = utils.Test(['test2'])
-    baseline['group1']['test1'] = utils.Test(['test3'])
-
-    profile1.update(profile2)
-
-    nt.assert_dict_equal(profile1.tests, baseline)
-
-
 def test_testprofile_update_test_list():
     """ TestProfile.update() updates TestProfile.test_list """
     profile1 = profile.TestProfile()
@@ -147,56 +99,6 @@ def test_testprofile_update_test_list():
     profile1.update(profile2)
 
     nt.assert_dict_equal(profile1.test_list, profile2.test_list)
-
-
-def generate_prepare_test_list_flatten():
-    """ Generate tests for TestProfile.prepare_test_list() """
-    test1 = utils.Test(['thingy'])
-    test2 = utils.Test(['thingy'])
-    test3 = utils.Test(['thingy'])
-
-    tests = profile.Tree()
-    tests['group1']['test1'] = test1
-    tests['group1']['group3']['test2'] = test2
-    tests['group3']['test5'] = test3
-
-    test_list = {
-        'group1/test1': test1,
-        'group1/group3/test2': test2,
-        'group3/test5': test3,
-    }
-
-    check_flatten.description = \
-        "TestProfile.prepare_test_list flattens TestProfile.tests"
-    yield check_flatten, tests, test_list
-
-    check_mixed_flatten.description = \
-        "TestProfile flattening is correct when tess and test_list are set"
-    yield check_mixed_flatten, tests, test_list
-
-
-@nt.nottest
-def check_flatten(tests, testlist):
-    """ TestProfile.prepare_test_list flattens TestProfile.tests """
-    profile_ = profile.TestProfile()
-    profile_.tests = tests
-    profile_._flatten_group_hierarchy()
-
-    nt.assert_dict_equal(profile_.test_list, testlist)
-
-
-@nt.nottest
-def check_mixed_flatten(tests, testlist):
-    """ flattening is correct when tests and test_list are defined """
-    profile_ = profile.TestProfile()
-    profile_.tests = tests
-    profile_.test_list['test8'] = utils.Test(['other'])
-    profile_._flatten_group_hierarchy()
-
-    baseline = {'test8': profile_.test_list['test8']}
-    baseline.update(testlist)
-
-    nt.assert_dict_equal(profile_.test_list, baseline)
 
 
 class TestPrepareTestListMatches(object):
