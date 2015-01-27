@@ -39,7 +39,7 @@ import framework.tests.utils as utils
 def gen_test_import():
     """ Generates a bunch of tests to import the various test modules """
     # Test the various OpenGL modules
-    for module in ['all', 'quick', 'gpu', 'sanity']:
+    for module in ['all', 'quick', 'gpu', 'sanity', 'cpu', 'llvmpipe']:
         check_import.description = "Test import of tests.{}".format(module)
         yield check_import, "tests." + module
 
