@@ -649,226 +649,170 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     for subtest in ('interstage', 'intrastage', 'vs-gs'):
         g(['version-mixing', subtest], run_concurrent=True)
 
-with profile.group_manager(PiglitGLTest, 'glx') as g:
-    g(['glx-destroycontext-1'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-destroycontext-2'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-dont-care-mask'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-close-display'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-fbconfig-sanity'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-fbconfig-compliance'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-fbo-binding'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multi-context-ib-1'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-texture'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-makecurrent-1'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-makecurrent-2'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-makecurrent-3'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-makecurrent-4'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-multithread-shader-compile'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-shader-sharing'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-exchange'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-event', '--event'],
-      'glx-swap-event_event',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-event', '--async'],
-      'glx-swap-event_async',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-event', '--interval'],
-      'glx-swap-event_interval',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-pixmap'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-pixmap-bad'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-swap-singlebuffer'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-make-current'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-make-glxdrawable-current'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-context-flush-control'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-buffer-age'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-pixmap-life'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-pixmap13-life'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-pixmap-multi'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-tfp'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-visuals-depth'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-visuals-depth'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-visuals-stencil'], require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-visuals-stencil'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-window-life'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-pixmap-crosscheck'], run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+with profile.group_manager(
+        PiglitGLTest, 'glx',
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-destroycontext-1'])
+    g(['glx-destroycontext-2'])
+    g(['glx-dont-care-mask'])
+    g(['glx-close-display'])
+    g(['glx-fbconfig-sanity'])
+    g(['glx-fbconfig-compliance'])
+    g(['glx-fbo-binding'])
+    g(['glx-multi-context-ib-1'])
+    g(['glx-multithread'])
+    g(['glx-multithread-texture'])
+    g(['glx-multithread-makecurrent-1'])
+    g(['glx-multithread-makecurrent-2'])
+    g(['glx-multithread-makecurrent-3'])
+    g(['glx-multithread-makecurrent-4'])
+    g(['glx-multithread-shader-compile'])
+    g(['glx-shader-sharing'])
+    g(['glx-swap-exchange'])
+    g(['glx-swap-event', '--event'], 'glx-swap-event_event')
+    g(['glx-swap-event', '--async'], 'glx-swap-event_async')
+    g(['glx-swap-event', '--interval'], 'glx-swap-event_interval')
+    g(['glx-swap-pixmap'])
+    g(['glx-swap-pixmap-bad'])
+    g(['glx-swap-singlebuffer'])
+    g(['glx-make-current'])
+    g(['glx-make-glxdrawable-current'])
+    g(['glx-context-flush-control'])
+    g(['glx-buffer-age'])
+    g(['glx-pixmap-life'], run_concurrent=True)
+    g(['glx-pixmap13-life'], run_concurrent=True)
+    g(['glx-pixmap-multi'], run_concurrent=True)
+    g(['glx-tfp'])
+    g(['glx-visuals-depth'])
+    g(['glx-visuals-depth'], run_concurrent=True)
+    g(['glx-visuals-stencil'])
+    g(['glx-visuals-stencil'], run_concurrent=True)
+    g(['glx-window-life'], run_concurrent=True)
+    g(['glx-pixmap-crosscheck'], run_concurrent=True)
     g(['glx-query-drawable', '--attr=GLX_WIDTH', '--type=GLXWINDOW'],
-      'glx-query-drawable-GLXWINDOW-GLX_WIDTH',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXWINDOW-GLX_WIDTH')
     g(['glx-query-drawable', '--attr=GLX_HEIGHT', '--type=GLXWINDOW'],
-      'glx-query-drawable-GLXWINDOW-GLX_HEIGHT',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXWINDOW-GLX_HEIGHT')
     g(['glx-query-drawable', '--attr=GLX_WIDTH', '--type=GLXPIXMAP'],
-      'glx-query-drawable-GLXPIXMAP-GLX_WIDTH',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXPIXMAP-GLX_WIDTH')
     g(['glx-query-drawable', '--attr=GLX_HEIGHT', '--type=GLXPIXMAP'],
-      'glx-query-drawable-GLXPIXMAP-GLX_HEIGHT',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXPIXMAP-GLX_HEIGHT')
     g(['glx-query-drawable', '--attr=GLX_WIDTH', '--type=GLXPBUFFER'],
-      'glx-query-drawable-GLXPBUFFER-GLX_WIDTH',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXPBUFFER-GLX_WIDTH')
     g(['glx-query-drawable', '--attr=GLX_HEIGHT', '--type=GLXPBUFFER'],
-      'glx-query-drawable-GLXPBUFFER-GLX_HEIGHT',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXPBUFFER-GLX_HEIGHT')
     g(['glx-query-drawable', '--attr=GLX_WIDTH', '--type=WINDOW'],
-      'glx-query-drawable-GLX_WIDTH',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_WIDTH'(
     g(['glx-query-drawable', '--attr=GLX_HEIGHT', '--type=WINDOW'],
-      'glx-query-drawable-GLX_HEIGHT',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_HEIGHT')
     g(['glx-query-drawable', '--attr=GLX_FBCONFIG_ID', '--type=WINDOW'],
-      'glx-query-drawable-GLX_FBCONFIG_ID-WINDOW',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_FBCONFIG_ID-WINDOW')
     g(['glx-query-drawable', '--attr=GLX_FBCONFIG_ID', '--type=GLXWINDOW'],
-      'glx-query-drawable-GLX_FBCONFIG_ID-GLXWINDOW',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_FBCONFIG_ID-GLXWINDOW')
     g(['glx-query-drawable', '--attr=GLX_FBCONFIG_ID', '--type=GLXPIXMAP'],
-      'glx-query-drawable-GLX_FBCONFIG_ID-GLXPIXMAP',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_FBCONFIG_ID-GLXPIXMAP')
     g(['glx-query-drawable', '--attr=GLX_FBCONFIG_ID', '--type=GLXPBUFFER'],
-      'glx-query-drawable-GLX_FBCONFIG_ID-GLXPBUFFER',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_FBCONFIG_ID-GLXPBUFFER')
     g(['glx-query-drawable', '--attr=GLX_FBCONFIG_ID', '--type=GLXPBUFFER'],
-      'glx-query-drawable-GLX_PRESERVED_CONTENTS',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLX_PRESERVED_CONTENTS')
     g(['glx-query-drawable', '--bad-drawable'],
-      'glx-query-drawable-GLXBadDrawable',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-string-sanity'],
-      'extension string sanity',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    add_msaa_visual_plain_tests(g, ['glx-copy-sub-buffer'],
-                                require_platforms=['glx', 'mixed_glx_egl'])
+      'glx-query-drawable-GLXBadDrawable')
+    g(['glx-string-sanity'], 'extension string sanity', run_concurrent=True)
+    add_msaa_visual_plain_tests(g, ['glx-copy-sub-buffer'])
 profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')] = \
     PiglitGLTest(['glx-buffer-age'], require_platforms=['glx', 'mixed_glx_egl'])
 profile.test_list[os.path.join('glx', 'glx-buffer-age vblank_mode=0')].env['vblank_mode'] = '0'
 
 with profile.group_manager(
         PiglitGLTest,
-        os.path.join('glx', 'glx_ext_import_context')) as g:
-    g(['glx-free-context'],
-      'free context',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-get-context-id'],
-      'get context ID',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-get-current-display-ext'],
-      'get current display',
-      require_platforms=['glx', 'mixed_glx_egl'])
+        os.path.join('glx', 'glx_ext_import_context'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-free-context'], 'free context')
+    g(['glx-get-context-id'], 'get context ID')
+    g(['glx-get-current-display-ext'], 'get current display')
     g(['glx-import-context-has-same-context-id'],
-      'imported context has same context ID',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-import-context-multi-process'],
-      'import context, multi process',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-import-context-single-process'],
-      'import context, single process',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-make-current-multi-process'],
-      'make current, multi process',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-make-current-single-process'],
-      'make current, single process',
-      require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-query-context-info-ext'],
-      'query context info',
-      require_platforms=['glx', 'mixed_glx_egl'])
+      'imported context has same context ID')
+    g(['glx-import-context-multi-process'], 'import context, multi process')
+    g(['glx-import-context-single-process'], 'import context, single process')
+    g(['glx-make-current-multi-process'], 'make current, multi process')
+    g(['glx-make-current-single-process'], 'make current, single process')
+    g(['glx-query-context-info-ext'], 'query context info')
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_ARB_create_context')) as g:
+        grouptools.join('glx', 'GLX_ARB_create_context'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-create-context-current-no-framebuffer'],
-      'current with no framebuffer',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'current with no framebuffer', run_concurrent=True)
     g(['glx-create-context-default-major-version'],
-      'default major version',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'default major version', run_concurrent=True)
     g(['glx-create-context-default-minor-version'],
-      'default minor version',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-invalid-attribute'],
-      'invalid attribute',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-invalid-flag'],
-      'invalid flag',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'default minor version', run_concurrent=True)
+    g(['glx-create-context-invalid-attribute'], 'invalid attribute',
+      run_concurrent=True)
+    g(['glx-create-context-invalid-flag'], 'invalid flag',
+      run_concurrent=True)
     g(['glx-create-context-invalid-flag-forward-compatible'],
       'forward-compatible flag with pre-3.0',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-invalid-gl-version'],
-      'invalid OpenGL version',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-invalid-render-type'],
-      'invalid render type',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      run_concurrent=True)
+    g(['glx-create-context-invalid-gl-version'], 'invalid OpenGL version',
+      run_concurrent=True)
+    g(['glx-create-context-invalid-render-type'], 'invalid render type',
+      run_concurrent=True)
     g(['glx-create-context-invalid-render-type-color-index'],
-      'color-index render type with 3.0',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-valid-attribute-empty'],
-      'empty attribute list',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-valid-attribute-null'],
-      'NULL attribute list',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'color-index render type with 3.0', run_concurrent=True)
+    g(['glx-create-context-valid-attribute-empty'], 'empty attribute list',
+      run_concurrent=True)
+    g(['glx-create-context-valid-attribute-null'], 'NULL attribute list',
+      run_concurrent=True)
     g(['glx-create-context-valid-flag-forward-compatible'],
-      'forward-compatible flag with 3.0',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'forward-compatible flag with 3.0', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_ARB_create_context_profile')) as g:
+        grouptools.join('glx', 'GLX_ARB_create_context_profile'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-create-context-core-profile'],
-      '3.2 core profile required',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      '3.2 core profile required', run_concurrent=True)
     g(['glx-create-context-invalid-profile'],
-      'invalid profile',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'invalid profile', run_concurrent=True)
     g(['glx-create-context-pre-GL32-profile'],
-      'pre-GL3.2 profile',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'pre-GL3.2 profile', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_ARB_create_context_robustness')) as g:
+        grouptools.join('glx', 'GLX_ARB_create_context_robustness'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-create-context-invalid-reset-strategy'],
-      'invalid reset notification strategy',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-create-context-require-robustness'],
-      'require GL_ARB_robustness',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'invalid reset notification strategy', run_concurrent=True)
+    g(['glx-create-context-require-robustness'], 'require GL_ARB_robustness'
+      run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_ARB_create_context_es2_profile')) as g:
+        grouptools.join('glx', 'GLX_ARB_create_context_es2_profile'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
     g(['glx-create-context-indirect-es2-profile'],
-      'indirect rendering ES2 profile',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'indirect rendering ES2 profile', run_concurrent=True)
     g(['glx-create-context-invalid-es-version'],
-      'invalid OpenGL ES version',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'invalid OpenGL ES version', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_ARB_sync_control')) as g:
-    g(['glx-oml-sync-control-getmscrate'],
-      'glXGetMscRateOML',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+        grouptools.join('glx', 'GLX_ARB_sync_control'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-oml-sync-control-getmscrate'], 'glXGetMscRateOML',
+      run_concurrent=True)
     g(['glx-oml-sync-control-swapbuffersmsc-divisor-zero'],
-      'swapbuffersmsc-divisor-zero',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-oml-sync-control-swapbuffersmsc-return'],
-      'swapbuffersmsc-return',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'swapbuffersmsc-divisor-zero', run_concurrent=True)
+    g(['glx-oml-sync-control-swapbuffersmsc-return'], 'swapbuffersmsc-return',
+      run_concurrent=True)
     g(['glx-oml-sync-control-swapbuffersmsc-return', '0'],
-      'swapbuffersmsc-return swap_interval 0',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'swapbuffersmsc-return swap_interval 0', run_concurrent=True)
     g(['glx-oml-sync-control-swapbuffersmsc-return', '1'],
-      'swapbuffersmsc-return swap_interval 1',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
-    g(['glx-oml-sync-control-waitformsc'],
-      'waitformsc',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+      'swapbuffersmsc-return swap_interval 1', run_concurrent=True)
+    g(['glx-oml-sync-control-waitformsc'], 'waitformsc',
+      run_concurrent=True)
 
 oml_sync_control_nonzeros = [
     mode + [kind, period]
@@ -885,10 +829,9 @@ for args in oml_sync_control_nonzeros:
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('glx', 'GLX_MESA_query_renderer')) as g:
-    g(['glx-query-renderer-coverage'],
-      'coverage',
-      run_concurrent=True, require_platforms=['glx', 'mixed_glx_egl'])
+        grouptools.join('glx', 'GLX_MESA_query_renderer'),
+        require_platforms=['glx', 'mixed_glx_egl']) as g:
+    g(['glx-query-renderer-coverage'], 'coverage', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
