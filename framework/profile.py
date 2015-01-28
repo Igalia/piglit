@@ -34,6 +34,7 @@ import multiprocessing.dummy
 import importlib
 import types
 import contextlib
+import itertools
 
 from framework.dmesg import get_dmesg
 from framework.log import LogManager
@@ -271,7 +272,7 @@ class TestProfile(object):
             self.test_list.update(profile.test_list)
 
     @contextlib.contextmanager
-    def group_manager(self, test_class, group):
+    def group_manager(self, test_class, group, prefix=None, **default_args):
         """A context manager to make working with flat groups simple.
 
         This provides a simple way to replace add_plain_test,
@@ -290,6 +291,12 @@ class TestProfile(object):
                       be added to the profile.
         group -- a string or unicode that will be used as the key for the test
                  in profile.
+
+        Keyword Arguments:
+        **default_args -- any additional keyword arguments will be considered
+                          default arguments to all tests added by the adder.
+                          They will always be overwritten by **kwargs passed to
+                          the adder function
 
         >>> from framework.test import PiglitGLTest
         >>> p = TestProfile()
@@ -321,7 +328,10 @@ class TestProfile(object):
                 assert isinstance(name, basestring)
                 lgroup = grouptools.join(group, name)
 
-            self.test_list[lgroup] = test_class(args, **kwargs)
+            self.test_list[lgroup] = test_class(
+                args,
+                **{k:v for k, v in itertools.chain(default_args.iteritems(),
+                                                   kwargs.iteritems())})
 
         yield adder
 

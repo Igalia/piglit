@@ -211,3 +211,33 @@ def test_testprofile_group_manager_is_added():
         g(['a', 'b'], 'a')
 
     nt.assert_in(grouptools.join('foo', 'a'), prof.test_list)
+
+
+def test_testprofile_groupmanager_kwargs():
+    """TestProfile.group_manager: Extra kwargs are passed to the Test."""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo') as g:
+        g(['a'], run_concurrent=True)
+
+    test = prof.test_list[grouptools.join('foo', 'a')]
+    nt.assert_equal(test.run_concurrent, True)
+
+
+def test_testprofile_groupmanager_default_args():
+    """TestProfile.group_manager: group_manater kwargs are passed to the Test."""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
+        g(['a'])
+
+    test = prof.test_list[grouptools.join('foo', 'a')]
+    nt.assert_equal(test.run_concurrent, True)
+
+
+def test_testprofile_groupmanager_kwargs_overwrite():
+    """TestProfile.group_manager: default_args are overwritten by kwargs."""
+    prof = profile.TestProfile()
+    with prof.group_manager(utils.Test, 'foo', run_concurrent=True) as g:
+        g(['a'], run_concurrent=False)
+
+    test = prof.test_list[grouptools.join('foo', 'a')]
+    nt.assert_equal(test.run_concurrent, False)
