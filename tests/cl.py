@@ -10,8 +10,6 @@
 from __future__ import division, absolute_import, print_function
 
 import os
-import sys
-import glob
 
 from framework.profile import TestProfile
 from framework.test import PiglitCLTest
@@ -20,35 +18,17 @@ from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
 
-
-can_do_concurrent = (not sys.platform.startswith('linux') or
-                     glob.glob('/dev/dri/render*'))
-
-
-def cl_test(*args, **kwargs):
-    """Wrapper for PiglitCLTest that sets run_concurrent.
-
-    Always set concurrent to can_do_concurrent, but allow it to be turned off
-    explicitely.
-
-    """
-    if kwargs.get('run_concurrent') is not False:
-        kwargs['run_concurrent'] = can_do_concurrent
-    return PiglitCLTest(*args, **kwargs)
-
-
 profile = TestProfile()
 
-
 # Custom
-with profile.group_manager(cl_test, 'custom') as g:
+with profile.group_manager(PiglitCLTest, 'custom') as g:
     g(['cl-custom-run-simple-kernel'], 'Run simple kernel')
     g(['cl-custom-flush-after-enqueue-kernel'], 'Flush after enqueue kernel')
     g(['cl-custom-r600-create-release-buffer-bug'],
       'r600 create release buffer bug')
     g(['cl-custom-buffer-flags'], 'Buffer flags')
 
-with profile.group_manager(cl_test, 'api') as g:
+with profile.group_manager(PiglitCLTest, 'api') as g:
     # Platform
     g(['cl-api-get-platform-ids'], 'clGetPlatformIDs')
     g(['cl-api-get-platform-info'], 'clGetPlatformInfo')
@@ -105,7 +85,7 @@ with profile.group_manager(cl_test, 'api') as g:
     g(['cl-api-get-event-info'], 'clGetEventInfo')
     g(['cl-api-retain_release-event'], 'clRetainEvent and clReleaseEvent')
 
-with profile.group_manager(cl_test, 'program') as g:
+with profile.group_manager(PiglitCLTest, 'program') as g:
     g(['cl-program-max-work-item-sizes'],
       'Run kernel with max work item sizes')
     g(['cl-program-bitcoin-phatk'], 'Bitcoin: phatk kernel')
@@ -117,7 +97,7 @@ def add_program_test_dir(group, dirpath):
         if ext not in ['.cl', '.program_test']:
             continue
 
-        profile.test_list[grouptools.join(group, testname)] = cl_test(
+        profile.test_list[grouptools.join(group, testname)] = PiglitCLTest(
             ['cl-program-tester', os.path.join(dirpath, filename)])
 
 

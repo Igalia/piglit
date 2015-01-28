@@ -29,6 +29,7 @@ from os import path
 
 from .gtest import GTest
 from framework.core import PIGLIT_CONFIG
+from framework.test import CL_CONCURRENT
 import framework.grouptools as grouptools
 
 __all__ = [
@@ -42,7 +43,7 @@ class OpenCVTest(GTest):
         options = [test_prog, '--gtest_filter=' + testname, '--gtest_color=no']
         if PIGLIT_CONFIG.has_option('opencv', 'workdir'):
             options.append('-w {}'.format(PIGLIT_CONFIG.get('opencv', 'workdir')))
-        GTest.__init__(self, options)
+        GTest.__init__(self, options, run_concurrent=CL_CONCURRENT)
 
 
 def add_opencv_tests(profile):

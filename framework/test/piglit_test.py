@@ -24,6 +24,8 @@
 
 from __future__ import print_function, absolute_import
 import os
+import sys
+import glob
 try:
     import simplejson as json
 except ImportError:
@@ -34,9 +36,10 @@ import framework.core as core
 
 
 __all__ = [
-    'PiglitGLTest',
     'PiglitCLTest',
-    'TEST_BIN_DIR'
+    'PiglitGLTest',
+    'CL_CONCURRENT',
+    'TEST_BIN_DIR',
 ]
 
 if 'PIGLIT_BUILD_DIR' in os.environ:
@@ -44,6 +47,9 @@ if 'PIGLIT_BUILD_DIR' in os.environ:
 else:
     TEST_BIN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                  '../../bin'))
+
+CL_CONCURRENT = (not sys.platform.startswith('linux') or
+                 glob.glob('/dev/dri/render*'))
 
 
 class PiglitBaseTest(Test):
@@ -136,6 +142,11 @@ class PiglitGLTest(WindowResizeMixin, PiglitBaseTest):
             return super(PiglitGLTest, self).command + ['-auto', '-fbo']
 
 
-class PiglitCLTest(PiglitBaseTest):
-    """ OpenCL specific Test class """
-    pass
+class PiglitCLTest(PiglitBaseTest):  # pylint: disable=too-few-public-methods
+    """ OpenCL specific Test class.
+
+    Set concurrency based on CL requirements.
+
+    """
+    def __init__(self, command, run_concurrent=CL_CONCURRENT, **kwargs):
+        super(PiglitCLTest, self).__init__(command, run_concurrent, **kwargs)
