@@ -72,7 +72,7 @@ JSON_DATA = {
 }
 
 
-class UtilsException(Exception):
+class UtilsError(Exception):
     """ An exception to be raised by utils """
     pass
 
