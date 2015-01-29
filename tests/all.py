@@ -4318,101 +4318,92 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl 1.4')) as g:
-    g(['egl-create-surface'], 'eglCreateSurface', exclude_platforms=['glx'])
-    g(['egl-query-surface', '--bad-attr'], 'eglQuerySurface EGL_BAD_ATTRIBUTE',
-      exclude_platforms=['glx'])
-    g(['egl-query-surface', '--bad-surface'],
-      'eglQuerySurface EGL_BAD_SURFACE', exclude_platforms=['glx'])
-    g(['egl-query-surface', '--attr=EGL_HEIGHT'], 'eglQuerySurface EGL_HEIGHT',
-      exclude_platforms=['glx'])
-    g(['egl-query-surface', '--attr=EGL_WIDTH'], 'eglQuerySurface EGL_WIDTH',
-      exclude_platforms=['glx'])
-    g(['egl-terminate-then-unbind-context'],
-      'eglTerminate then unbind context', exclude_platforms=['glx'])
+        grouptools.join('spec', 'egl 1.4'),
+        exclude_platforms=['glx']) as g:
+    g(['egl-create-surface'], 'eglCreateSurface')
+    g(['egl-query-surface', '--bad-attr'], 'eglQuerySurface EGL_BAD_ATTRIBUTE')
+    g(['egl-query-surface', '--bad-surface'], 'eglQuerySurface EGL_BAD_SURFACE')
+    g(['egl-query-surface', '--attr=EGL_HEIGHT'], 'eglQuerySurface EGL_HEIGHT')
+    g(['egl-query-surface', '--attr=EGL_WIDTH'], 'eglQuerySurface EGL_WIDTH')
+    g(['egl-terminate-then-unbind-context'], 'eglTerminate then unbind context')
     g(['egl-create-pbuffer-surface'],
-      'eglCreatePbufferSurface and then glClear', exclude_platforms=['glx'])
+      'eglCreatePbufferSurface and then glClear')
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_nok_swap_region')) as g:
-    g(['egl-nok-swap-region'], 'basic', exclude_platforms=['glx'])
+        grouptools.join('spec', 'egl_nok_swap_region'),
+        exclude_platforms=['glx']) as g:
+    g(['egl-nok-swap-region'], 'basic')
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_nok_texture_from_pixmap')) as g:
-    g(['egl-nok-texture-from-pixmap'], 'basic', exclude_platforms=['glx'])
+        grouptools.join('spec', 'egl_nok_texture_from_pixmap'),
+        exclude_platforms=['glx']) as g:
+    g(['egl-nok-texture-from-pixmap'], 'basic')
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_khr_create_context')) as g:
+        grouptools.join('spec', 'egl_khr_create_context'),
+        exclude_platforms=['glx']) as g:
     g(['egl-create-context-default-major-version-gles'],
-      'default major version GLES', exclude_platforms=['glx'])
+      'default major version GLES')
     g(['egl-create-context-default-major-version-gl'],
-      'default major version GL', exclude_platforms=['glx'])
+      'default major version GL')
     g(['egl-create-context-default-minor-version-gles'],
-      'default minor version GLES', exclude_platforms=['glx'])
+      'default minor version GLES')
     g(['egl-create-context-default-minor-version-gl'],
-      'default minor version GL', exclude_platforms=['glx'])
+      'default minor version GL')
     g(['egl-create-context-valid-attribute-empty-gles'],
-      'valid attribute empty GLES', exclude_platforms=['glx'])
+      'valid attribute empty GLES')
     g(['egl-create-context-valid-attribute-empty-gl'],
-      'valid attribute empty GL', exclude_platforms=['glx'])
+      'valid attribute empty GL')
     g(['egl-create-context-valid-attribute-null-gles'],
-      'NULL valid attribute GLES', exclude_platforms=['glx'])
+      'NULL valid attribute GLES')
     g(['egl-create-context-valid-attribute-null-gl'],
-      'NULL valid attribute GL', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-gl-version'],
-      'invalid OpenGL version', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-attribute-gles'],
-      'invalid attribute GLES', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-attribute-gl'],
-      'invalid attribute GL', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-flag-gles'],
-      'invalid flag GLES', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-flag-gl'],
-      'invalid flag GL', exclude_platforms=['glx'])
+      'NULL valid attribute GL')
+    g(['egl-create-context-invalid-gl-version'], 'invalid OpenGL version')
+    g(['egl-create-context-invalid-attribute-gles'], 'invalid attribute GLES')
+    g(['egl-create-context-invalid-attribute-gl'], 'invalid attribute GL')
+    g(['egl-create-context-invalid-flag-gles'], 'invalid flag GLES')
+    g(['egl-create-context-invalid-flag-gl'], 'invalid flag GL')
     g(['egl-create-context-valid-flag-forward-compatible-gl'],
-      'valid forward-compatible flag GL', exclude_platforms=['glx'])
-    g(['egl-create-context-invalid-profile'], 'invalid profile',
-      exclude_platforms=['glx'])
-    g(['egl-create-context-core-profile'], '3.2 core profile required',
-      exclude_platforms=['glx'])
-    g(['egl-create-context-pre-GL32-profile'], 'pre-GL3.2 profile',
-      exclude_platforms=['glx'])
-    g(['egl-create-context-verify-gl-flavor'], 'verify GL flavor',
-      exclude_platforms=['glx'])
-    g(['egl-create-context-valid-flag-debug-gl', 'gl'], 'valid debug flag GL',
-      exclude_platforms=['glx'])
+      'valid forward-compatible flag GL')
+    g(['egl-create-context-invalid-profile'], 'invalid profile')
+    g(['egl-create-context-core-profile'], '3.2 core profile required')
+    g(['egl-create-context-pre-GL32-profile'], 'pre-GL3.2 profile')
+    g(['egl-create-context-verify-gl-flavor'], 'verify GL flavor')
+    g(['egl-create-context-valid-flag-debug-gl', 'gl'], 'valid debug flag GL')
 
     for api in ('gles1', 'gles2', 'gles3'):
         g(['egl-create-context-valid-flag-debug-gles', api],
-          'valid debug flag {}'.format(api), exclude_platforms=['glx'])
+          'valid debug flag {}'.format(api))
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_mesa_configless_context')) as g:
-    g(['egl-configless-context'], 'basic', run_concurrent=True,
-      exclude_platforms=['glx'])
+        grouptools.join('spec', 'egl_mesa_configless_context'),
+        exclude_platforms=['glx']) as g:
+    g(['egl-configless-context'], 'basic', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_ext_client_extensions')) as g:
+        grouptools.join('spec', 'egl_ext_client_extensions'),
+        exclude_platforms=['glx']) as g:
     for i in [1, 2, 3]:
         g(['egl_ext_client_extensions', str(i)],
           'conformance test {0}'.format(i),
-          run_concurrent=True, exclude_platforms=['glx'])
-
-with profile.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'egl_khr_fence_sync')) as g:
-    g(['egl_khr_fence_sync'], 'conformance',
-      run_concurrent=True, exclude_platforms=['glx'])
+          run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest,
-        grouptools.join('spec', 'egl_chromium_sync_control')) as g:
-    g(['egl_chromium_sync_control'], 'conformance',
-      run_concurrent=True, exclude_platforms=['glx'])
+        grouptools.join('spec', 'egl_khr_fence_sync'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_khr_fence_sync'], 'conformance', run_concurrent=True)
+
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'egl_chromium_sync_control'),
+        exclude_platforms=['glx']) as g:
+    g(['egl_chromium_sync_control'], 'conformance', run_concurrent=True)
 
 with profile.group_manager(
         PiglitGLTest, grouptools.join('spec', '!opengl ES 2.0')) as g:
