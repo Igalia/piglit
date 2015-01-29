@@ -197,9 +197,8 @@ def _populate_profile():
     return profile
 
 
-# If the symlink for the XTS has not been created exit
 if not os.path.exists(X_TEST_SUITE):
-    print("xtest symlink not found!")
-    sys.exit(0)
+    print("Error: xtest not found.", file=sys.stderr)
+    sys.exit(1)
 
 profile = _populate_profile()  # pylint: disable=invalid-name
