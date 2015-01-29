@@ -39,7 +39,7 @@ __all__ = ['profile']
 X_TEST_SUITE = framework.core.PIGLIT_CONFIG.get('xts', 'path')
 
 
-class XTSProfile(TestProfile):
+class XTSProfile(TestProfile):  # pylint: disable=too-few-public-methods
     """ A subclass of TestProfile that provides a setup hook for XTS """
     def _pre_run_hook(self):
         """ This hook sets the XTSTest.results_path variable
@@ -59,7 +59,7 @@ class XTSProfile(TestProfile):
                 raise
 
 
-class XTSTest(Test):
+class XTSTest(Test):  # pylint: disable=too-few-public-methods
     """ X Test Suite class
 
     Runs a single test or subtest from XTS.
@@ -83,7 +83,7 @@ class XTSTest(Test):
              "XT_RESET_DELAY": '0',
              "XT_FONTPATH_GOOD": '/usr/share/fonts/X11/misc',
              "XT_FONTPATH": os.path.join(X_TEST_SUITE, 'xts5', 'fonts'),
-             #XXX: Are the next 3 necissary
+             # XXX: Are the next 3 necissary?
              "XT_LOCAL": 'Yes',
              "XT_TCP": 'No',
              "XT_DISPLAYHOST": ''})
@@ -166,7 +166,7 @@ class XTSTest(Test):
 def populate_profile():
     """ Populate the profile attribute """
     # Add all tests to the profile
-    profile = XTSProfile()
+    profile = XTSProfile()  # pylint: disable=redefined-outer-name
     fpath = os.path.join(X_TEST_SUITE, 'xts5')
     for dirpath, _, filenames in os.walk(fpath):
         for fname in filenames:
@@ -202,4 +202,4 @@ if not os.path.exists(X_TEST_SUITE):
     print("xtest symlink not found!")
     sys.exit(0)
 
-profile = populate_profile()
+profile = populate_profile()  # pylint: disable=invalid-name
