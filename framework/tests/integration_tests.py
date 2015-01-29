@@ -39,11 +39,23 @@ framework.core.get_config()
 
 
 def _import(name):
-    """ Helper for importing modules """
+    """Helper for importing modules.
+
+    It is very important that we use import_module to get the module, since we
+    need more than just the profile, since we want to ensure that the Test
+    derived class is importable.
+
+    """
     try:
         return importlib.import_module(name)
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError, SystemExit):
+    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
         raise SkipTest('No config section for {}'.format(name))
+    except SystemExit as e:
+        if e.code == 0:
+            # This means that it's a normal operation, but not that it's a pass
+            raise SkipTest('Profile exited normally.')
+        else:
+            raise Exception('Profile exited. code: {}.'.format(e.code))
 
 
 def test_xts_import():
