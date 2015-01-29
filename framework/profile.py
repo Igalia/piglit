@@ -288,8 +288,9 @@ def load_test_profile(filename):
         return mod.profile
     except AttributeError:
         print("Error: There is not profile attribute in module {0}."
-              "Did you specify the right file?".format(filename))
-        sys.exit(1)
+              "Did you specify the right file?".format(filename),
+              file=sys.stderr)
+        sys.exit(2)
 
 
 def merge_test_profiles(profiles):
