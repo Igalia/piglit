@@ -59,8 +59,8 @@ class PiglitBaseTest(Test):
     Expect one line prefixed PIGLIT: in the output, which contains a result
     dictionary. The plain output is appended to this dictionary
     """
-    def __init__(self, *args, **kwargs):
-        super(PiglitBaseTest, self).__init__(*args, **kwargs)
+    def __init__(self, command, run_concurrent=True, **kwargs):
+        super(PiglitBaseTest, self).__init__(command, run_concurrent, **kwargs)
 
         # Prepend TEST_BIN_DIR to the path.
         self._command[0] = os.path.join(TEST_BIN_DIR, self._command[0])

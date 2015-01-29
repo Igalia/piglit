@@ -2399,8 +2399,8 @@ with profile.group_manager(
 with profile.group_manager(
         PiglitGLTest,
         grouptools.join('spec', 'ARB_program_interface_query')) as g:
-    g(['arb_program_interface_query-resource-location'])
-    g(['arb_program_interface_query-resource-index'])
+    g(['arb_program_interface_query-resource-location'], run_concurrent=False)
+    g(['arb_program_interface_query-resource-index'], run_concurrent=False)
 
 # Group ARB_explicit_uniform_location
 with profile.group_manager(
