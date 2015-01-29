@@ -163,7 +163,7 @@ class XTSTest(Test):  # pylint: disable=too-few-public-methods
         self.result['images'] = self._process_log_for_images(log)
 
 
-def populate_profile():
+def _populate_profile():
     """ Populate the profile attribute """
     # Add all tests to the profile
     profile = XTSProfile()  # pylint: disable=redefined-outer-name
@@ -202,4 +202,4 @@ if not os.path.exists(X_TEST_SUITE):
     print("xtest symlink not found!")
     sys.exit(0)
 
-profile = populate_profile()  # pylint: disable=invalid-name
+profile = _populate_profile()  # pylint: disable=invalid-name
