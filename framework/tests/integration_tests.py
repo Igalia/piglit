@@ -35,7 +35,10 @@ from nose.plugins.skip import SkipTest
 import framework.core
 
 
-framework.core.get_config()
+def setup_module():
+    framework.core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser(
+        allow_no_value=True)
+    framework.core.get_config()
 
 
 def _import(name):
