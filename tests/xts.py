@@ -23,6 +23,7 @@
 
 """ Test integreation for the X Test Suite """
 
+from __future__ import print_function, division, absolute_import
 import os
 import re
 import sys
@@ -198,7 +199,7 @@ def populate_profile():
 
 # If the symlink for the XTS has not been created exit
 if not os.path.exists(X_TEST_SUITE):
-    print "xtest symlink not found!"
+    print("xtest symlink not found!")
     sys.exit(0)
 
 profile = populate_profile()
