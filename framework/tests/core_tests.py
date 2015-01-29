@@ -32,6 +32,61 @@ import nose.tools as nt
 import framework.tests.utils as utils
 import framework.core as core
 
+_CONF_FILE = textwrap.dedent("""\
+[nose-test]
+; a section for testing behavior
+dir = foo
+""")
+
+
+class GetConfigFixture(object):
+    """A class that provides setup and teardown for core.get_env() tests.
+
+    This class provides a method to save state before the test executes, and
+    then restore it afterwards. This is the reason this is a class that returns
+    two methods and not a function.
+
+    """
+    def __init__(self):
+        self.env = {}
+        self.restore = False
+
+    @classmethod
+    def make(cls):
+        new = cls()
+        return new.setup, new.teardown
+
+    def setup(self):
+        """Gather environment to preserve."""
+        try:
+            for env in ['XDG_CONFIG_HOME', 'HOME']:
+                if env in os.environ:
+                    self.env[env] = os.environ.pop(env)
+
+            if os.path.exists('piglit.conf'):
+                shutil.move('piglit.conf', 'piglit.conf.restore')
+                self.restore = True
+            core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser(
+                allow_no_value=True)
+        except Exception as e:
+            raise utils.UtilsError(e)
+
+    def teardown(self):
+        """Restore that environment."""
+        try:
+            for env in ['XDG_CONFIG_HOME', 'HOME']:
+                if env in self.env:
+                    os.environ[env] = self.env[env]
+                elif env in os.environ:
+                    del os.environ[env]
+
+            if self.restore:
+                shutil.move('piglit.conf.restore', 'piglit.conf')
+            core.PIGLIT_CONFIG = ConfigParser.SafeConfigParser(
+                allow_no_value=True)
+        except Exception as e:
+            raise utils.UtilsError(e)
+
 
 def _reset_piglit_config():
     """ Set core.PIGLIT_CONFIG back to pristine """
@@ -124,74 +179,64 @@ def test_parse_listfile_tilde():
     assert results[0] == os.path.expandvars("$HOME/foo")
 
 
-class TestGetConfig(utils.TestWithEnvClean):
-    CONF_FILE = textwrap.dedent("""
-    [nose-test]
-    ; a section for testing behavior
-    dir = foo
-    """)
+@nt.with_setup(*GetConfigFixture.make())
+def test_xdg_config_home():
+    """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
+    with utils.tempdir() as tdir:
+        os.environ['XDG_CONFIG_HOME'] = tdir
+        with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
+            f.write(_CONF_FILE)
+        core.get_config()
 
-    def __unset_config(self):
-        self.defer(_reset_piglit_config)
-        self.add_teardown('XDG_CONFIG_HOME')
-        self.add_teardown('HOME')
+    nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
+           msg='$XDG_CONFIG_HOME not found')
 
-    def __move_local(self):
-        """ Move a local piglit.conf so it isn't overwritten """
-        if os.path.exists('piglit.conf'):
-            shutil.move('piglit.conf', 'piglit.conf.restore')
-            self.defer(shutil.move, 'piglit.conf.restore', 'piglit.conf')
 
-    def setup(self):
-        self.__unset_config()
-        self.__move_local()
+@nt.with_setup(*GetConfigFixture.make())
+def test_config_home_fallback():
+    """ get_config() finds $HOME/.config/piglit.conf """
+    with utils.tempdir() as tdir:
+        os.environ['HOME'] = tdir
+        os.mkdir(os.path.join(tdir, '.config'))
+        with open(os.path.join(tdir, '.config/piglit.conf'), 'w') as f:
+            f.write(_CONF_FILE)
+        core.get_config()
 
-    def test_xdg_config_home(self):
-        """ get_config() finds $XDG_CONFIG_HOME/piglit.conf """
-        with utils.tempdir() as tdir:
-            os.environ['XDG_CONFIG_HOME'] = tdir
-            with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-                f.write(TestGetConfig.CONF_FILE)
-            core.get_config()
+    nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
+           msg='$HOME/.config/piglit.conf not found')
 
-        nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-               msg='$XDG_CONFIG_HOME not found')
 
-    def test_config_home_fallback(self):
-        """ get_config() finds $HOME/.config/piglit.conf """
-        with utils.tempdir() as tdir:
-            os.environ['HOME'] = tdir
-            os.mkdir(os.path.join(tdir, '.config'))
-            with open(os.path.join(tdir, '.config/piglit.conf'), 'w') as f:
-                f.write(TestGetConfig.CONF_FILE)
-            core.get_config()
-
-        nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-               msg='$HOME/.config/piglit.conf not found')
-
-    def test_local(self):
-        """ get_config() finds ./piglit.conf """
-        with utils.tempdir() as tdir:
-            self.defer(os.chdir, os.getcwd())
+@nt.with_setup(*GetConfigFixture.make())
+def test_local():
+    """ get_config() finds ./piglit.conf """
+    with utils.tempdir() as tdir:
+        try:
+            return_dir = os.getcwd()
             os.chdir(tdir)
 
             with open(os.path.join(tdir, 'piglit.conf'), 'w') as f:
-                f.write(TestGetConfig.CONF_FILE)
+                f.write(_CONF_FILE)
 
             core.get_config()
+        finally:
+            os.chdir(return_dir)
 
-        nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-               msg='./piglit.conf not found')
+    nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
+           msg='./piglit.conf not found')
 
-    def test_piglit_root(self):
-        """ get_config() finds "piglit root"/piglit.conf """
-        with open('piglit.conf', 'w') as f:
-            f.write(TestGetConfig.CONF_FILE)
-        self.defer(os.unlink, 'piglit.conf')
-        self.defer(os.chdir, os.getcwd())
+
+@nt.with_setup(*GetConfigFixture.make())
+def test_piglit_root():
+    """ get_config() finds "piglit root"/piglit.conf """
+    with open('piglit.conf', 'w') as f:
+        f.write(_CONF_FILE)
+    return_dir = os.getcwd()
+    try:
         os.chdir('..')
-
         core.get_config()
+    finally:
+        os.chdir(return_dir)
+        os.unlink('piglit.conf')
 
-        nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
-               msg='$PIGLIT_ROOT not found')
+    nt.ok_(core.PIGLIT_CONFIG.has_section('nose-test'),
+           msg='$PIGLIT_ROOT not found')
