@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # All tests that come with piglit, using default settings
 
-__all__ = ['profile']
-
+from __future__ import print_function, division, absolute_import
 import itertools
 import os
 import platform
@@ -11,7 +10,9 @@ from framework import grouptools
 from framework.profile import TestProfile
 from framework.test import (PiglitGLTest, GleanTest, ShaderTest,
                             GLSLParserTest, GLSLParserNoConfigError)
-from py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
+from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
+
+__all__ = ['profile']
 
 
 def add_single_param_test_set(adder, name, *params):
