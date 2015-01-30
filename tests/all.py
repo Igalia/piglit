@@ -14,6 +14,12 @@ from .py_modules.constants import TESTS_DIR, GENERATED_TESTS_DIR
 
 __all__ = ['profile']
 
+# Disable bad hanging indent errors in pylint
+# There is a bug in pyling which causes the profile.group_manager to be tagged
+# as bad hanging indent, even though it seems to be correct (and similar syntax
+# doesn't trigger an error)
+# pylint: disable=bad-continuation
+
 
 def add_single_param_test_set(adder, name, *params):
     for param in params:

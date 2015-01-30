@@ -6,6 +6,9 @@ from tests.all import profile
 
 __all__ = ['profile']
 
+# See the note in all.py about this warning
+# pylint: disable=bad-continuation
+
 GleanTest.GLOBAL_PARAMS += ["--quick"]
 
 # Set the --quick flag on a few image_load_store_tests
