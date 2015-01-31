@@ -4426,6 +4426,12 @@ spec['ARB_direct_state_access']['getcompressedtextureimage'] = PiglitGLTest(['ar
 spec['ARB_direct_state_access']['texture-storage-multisample'] = PiglitGLTest(['arb_direct_state_access-texture-storage-multisample'], run_concurrent=True)
 spec['ARB_direct_state_access']['texture-buffer'] = PiglitGLTest(['arb_direct_state_access-texture-buffer'], run_concurrent=True)
 
+arb_shader_image_load_store = {}
+spec['ARB_shader_image_load_store'] = arb_shader_image_load_store
+import_glsl_parser_tests(spec['ARB_shader_image_load_store'],
+                         os.path.join(TESTS_DIR, 'spec', 'arb_shader_image_load_store'),
+                         [''])
+
 profile.tests['hiz'] = hiz
 profile.tests['fast_color_clear'] = fast_color_clear
 profile.tests['glean'] = glean

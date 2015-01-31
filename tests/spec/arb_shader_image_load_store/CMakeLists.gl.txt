@@ -1,0 +1,15 @@
+include_directories(
+	${GLEXT_INCLUDE_DIR}
+	${OPENGL_INCLUDE_PATH}
+	${piglit_SOURCE_DIR}/tests/util
+)
+
+link_libraries (
+	piglitutil_${piglit_target_api}
+	${OPENGL_gl_LIBRARY}
+	${OPENGL_glu_LIBRARY}
+)
+
+set(depends image.c grid.c common.c)
+
+# vim: ft=cmake:
