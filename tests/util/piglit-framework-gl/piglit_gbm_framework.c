@@ -129,8 +129,14 @@ determine_canvas_size(int *width, int *height)
 				 ((float)rows / piglit_height / font_aspect));
 	}
 
-	*width = MAX2(1, columns);
-	*height = MAX2(1, rows);
+	if (columns >= (piglit_width / font_aspect) && rows >= piglit_height) {
+		/* Yep, the console resolution is too high */
+		*width = MAX2(1, piglit_width / font_aspect);
+		*height = MAX2(1, piglit_height);
+	} else {
+		*width = MAX2(1, columns);
+		*height = MAX2(1, rows);
+	}
 }
 
 static void
