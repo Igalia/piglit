@@ -105,6 +105,15 @@ determine_canvas_size(int *width, int *height)
 	int columns = 80, rows = 24;
 	float test_aspect, console_aspect;
 	const float font_aspect = 0.5;
+	caca_display_t *display;
+
+	display = caca_create_display(NULL);
+	if (display) {
+		caca_canvas_t *canvas = caca_get_canvas(display);
+		columns = caca_get_canvas_width(canvas);
+		rows = caca_get_canvas_height(canvas);
+		caca_free_display(display);
+	}
 
 	/* Don't fill the entire window. */
 	columns--;
