@@ -98,18 +98,43 @@ fail:
 
 #ifdef PIGLIT_HAS_LIBCACA
 #include <caca.h>
-#endif
+
+static void
+determine_canvas_size(int *width, int *height)
+{
+	int columns = 80, rows = 24;
+	float test_aspect, console_aspect;
+	const float font_aspect = 0.5;
+
+	/* Don't fill the entire window. */
+	columns--;
+	rows--;
+
+	test_aspect = (float)piglit_width / (float)piglit_height;
+	console_aspect = (float)(columns) / (float)(2 * (rows));
+	if (console_aspect < test_aspect) {
+		rows = (int) (font_aspect * piglit_height *
+			      ((float)columns / piglit_width));
+	} else {
+		columns = (int) ((float)piglit_width *
+				 ((float)rows / piglit_height / font_aspect));
+	}
+
+	*width = MAX2(1, columns);
+	*height = MAX2(1, rows);
+}
 
 static void
 piglit_gbm_console_display(void)
 {
-#ifdef PIGLIT_HAS_LIBCACA
 	caca_canvas_t *canvas;
 	caca_dither_t *dither;
 	void *export;
 	uint32_t *pixels;
 	size_t export_size;
-	int width = 40, height = 20;
+	int width, height;
+
+	determine_canvas_size(&width, &height);
 
 	canvas = caca_create_canvas(width, height);
 	if (!canvas) {
@@ -157,5 +182,13 @@ piglit_gbm_console_display(void)
 		fwrite(export, export_size, 1, stdout);
 		free(export);
 	}
-#endif
 }
+
+#else // PIGLIT_HAS_LIBCACA
+
+static void
+piglit_gbm_console_display(void)
+{
+}
+
+#endif
