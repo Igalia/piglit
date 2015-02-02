@@ -58,7 +58,10 @@ tolerances = {'pow': 16.0,
               'log': 3.0,
               'log2': 3.0,
               'sqrt': 3.0,
-              'inversesqrt': 2.0}
+              'inversesqrt': 2.0,
+              'op-div': 2.5,
+              'op-assign-div': 2.5,
+              }
 
 trig_builtins = ('sin', 'cos', 'tan', 
                  'asin', 'acos', 'atan', 
