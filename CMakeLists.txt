@@ -46,7 +46,7 @@ if(PIGLIT_USE_WAFFLE)
 		pkg_check_modules(Waffle REQUIRED waffle-1)
 
 		if(NOT Waffle_FOUND)
-			message(FATAL_ERROR "Failed to find Waffle. If Waffle"
+			message(FATAL_ERROR "Failed to find Waffle. If Waffle "
 			"is not packaged for your distribution, you can get "
 			"it at http://www.waffle-gl.org."
 		)
