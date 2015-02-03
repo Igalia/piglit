@@ -80,16 +80,20 @@ static bool
 run_test(const struct image_target_info *target,
          const struct image_extent size)
 {
-        const struct grid_info grid = {
-                GL_FRAGMENT_SHADER_BIT,
-                get_image_format(GL_RGBA32F),
-                image_optimal_extent(size)
-        };
-        const struct image_info img = {
-                target, grid.format, size,
-                image_format_epsilon(grid.format)
-        };
-        GLuint prog = generate_program(
+        struct grid_info grid;
+        struct image_info img;
+        GLuint prog;
+
+        grid.stages = GL_FRAGMENT_SHADER_BIT;
+        grid.format = get_image_format(GL_RGBA32F);
+        grid.size = image_optimal_extent(size);
+
+        img.target = target;
+        img.format = grid.format;
+        img.size = size;
+        img.epsilon = image_format_epsilon(grid.format);
+
+        prog = generate_program(
                 grid, GL_FRAGMENT_SHADER,
                 concat(image_hunk(img, ""),
                        hunk("readonly uniform IMAGE_T src_img;\n"
