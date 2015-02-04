@@ -316,11 +316,11 @@ image_info(GLenum target, GLenum format, unsigned w, unsigned h)
 {
         const struct image_target_info *t = get_image_target(target);
         const struct image_format_info *f = get_image_format(format);
-        struct image_info img;
-        img.target = t;
-        img.format = f;
-        img.size = image_extent_for_target(t, w, h);
-        img.epsilon = image_format_epsilon(f);
+        const struct image_info img = {
+                t, f,
+                image_extent_for_target(t, w, h),
+                image_format_epsilon(f)
+        };
 
         return img;
 }
@@ -374,11 +374,11 @@ image_level_offset(const struct image_info img, unsigned l)
 static inline struct image_info
 image_info_for_level(struct image_info img, unsigned l)
 {
-        struct image_info level_img;
-        level_img.target = img.target;
-        level_img.format = img.format;
-        level_img.size = image_level_size(img, l);
-        level_img.epsilon = img.epsilon;
+        const struct image_info level_img = {
+                img.target, img.format,
+                image_level_size(img, l),
+                img.epsilon
+        };
 
         return level_img;
 }
