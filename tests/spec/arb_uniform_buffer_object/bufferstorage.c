@@ -43,7 +43,6 @@ static const char vert_shader_text[] =
 	"\n"
 	"layout(std140) uniform;\n"
 	"uniform ub_pos_size { vec2 pos; float size; };\n"
-	"uniform ub_color { vec4 color; float color_scale; };\n"
 	"uniform ub_rot {float rotation; };\n"
 	"\n"
 	"void main()\n"
@@ -54,15 +53,17 @@ static const char vert_shader_text[] =
 	"   m[1][0] = -m[0][1]; \n"
 	"   gl_Position.xy = m * gl_Vertex.xy * vec2(size) + pos;\n"
 	"   gl_Position.zw = vec2(0, 1);\n"
-	"   gl_FrontColor = color * color_scale;\n"
 	"}\n";
 
 static const char frag_shader_text[] =
 	"#extension GL_ARB_uniform_buffer_object : require\n"
 	"\n"
+	"layout(std140) uniform;\n"
+	"uniform ub_color { vec4 color; float color_scale; };\n"
+	"\n"
 	"void main()\n"
 	"{\n"
-	"	gl_FragColor = gl_Color;\n"
+	"   gl_FragColor = color * color_scale;\n"
 	"}\n";
 
 #define NUM_SQUARES 4
