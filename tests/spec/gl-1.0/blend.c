@@ -530,7 +530,7 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 	       const GLfloat constant_color[4])
 {
 	int i, j;
-	bool pass = true;
+	bool pass = true, p;
 
 	glDisable(GL_DITHER);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -610,9 +610,25 @@ run_factor_set(GLenum src_factor_rgb, GLenum src_factor_a,
 	 * computed image (``expected'') to see if any pixels are
 	 * outside the expected tolerance range. 
 	 */
-	pass &= piglit_probe_image_rgba(0, 0, img_width, img_height, 
+	p = piglit_probe_image_rgba(0, 0, img_width, img_height,
 		exp_img.data);
+	if (!p) {
+		printf("  Blend src factors: %s, %s\n",
+		       piglit_get_gl_enum_name(src_factor_rgb),
+		       piglit_get_gl_enum_name(src_factor_a));
+		printf("  Blend dst factors: %s, %s\n",
+		       piglit_get_gl_enum_name(dst_factor_rgb),
+		       piglit_get_gl_enum_name(dst_factor_a));
+		printf("  Blend ops: %s, %s\n",
+		       piglit_get_gl_enum_name(op_rgb),
+		       piglit_get_gl_enum_name(op_a));
+		printf("  Blend color: %.3f, %.3f, %.3f, %.3f\n",
+		       constant_color[0], constant_color[1],
+		       constant_color[2], constant_color[3]);
+		fflush(stdout);
+	}
 
+	pass &= p;
 
 	return pass;
 } /* run_factor_set */
