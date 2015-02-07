@@ -47,6 +47,7 @@ static bool context_has_image_support(const piglit_cl_context ctx)
 			free(image_support);
 			return true;
 		}
+		free(image_support);
 	}
 	return false;
 }
