@@ -763,8 +763,8 @@ def scalar_derp(type, name, offset, data):
         # 0xHHHHHHHHLLLLLLLL
         # 012345678901234567
 
-        hi = "0x" + bits[2:9]
-        lo = "0x" + bits[10:17]
+        hi = "0x" + bits[2:10]
+        lo = "0x" + bits[10:18]
 
         return "!double_match({}, uvec2({}, {}))".format(name, lo, hi)
     else:
