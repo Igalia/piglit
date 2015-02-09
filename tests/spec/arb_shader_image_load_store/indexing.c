@@ -75,6 +75,7 @@ init_images(const struct image_info img, GLuint prog)
 
                 asprintf(&name, "imgs[%d]", unit);
                 set_uniform_int(prog, name, unit);
+                free(name);
         }
 
         return true;
