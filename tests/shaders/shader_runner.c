@@ -1143,11 +1143,11 @@ get_floats(const char *line, float *f, unsigned count)
 
 		if (strncmp(line, "0x", 2) == 0) {
 			union {
-				int32_t i;
+				uint32_t u;
 				float f;
 			} x;
 
-			x.i = strtol(line, (char **) &line, 16);
+			x.u = strtoul(line, (char **) &line, 16);
 			f[i] = x.f;
 		} else {
 			f[i] = strtod_inf(line, (char **) &line);
@@ -1165,11 +1165,11 @@ get_doubles(const char *line, double *d, unsigned count)
 
 		if (strncmp(line, "0x", 2) == 0) {
 			union {
-				int64_t i64;
+				uint64_t u64;
 				double d;
 			} x;
 
-			x.i64 = strtoll(line, (char **) &line, 16);
+			x.u64 = strtoull(line, (char **) &line, 16);
 			d[i] = x.d;
 		} else {
 			d[i] = strtod_inf(line, (char **) &line);
