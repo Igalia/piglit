@@ -1305,7 +1305,7 @@ set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_ar
 		get_uints(line, uints, elements);
 		memcpy(data, uints, elements * sizeof(unsigned));
 	} else if (string_match("dvec", type)) {
-		int elements = type[3] - '0';
+		int elements = type[4] - '0';
 		get_doubles(line, d, elements);
 		memcpy(data, d, elements * sizeof(double));
 	} else if (string_match("mat", type)) {
