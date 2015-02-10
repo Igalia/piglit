@@ -3440,6 +3440,15 @@ add_plain_test(arb_seamless_cube_map, ['arb_seamless_cubemap'])
 add_plain_test(arb_seamless_cube_map, ['arb_seamless_cubemap-initially-disabled'])
 add_plain_test(arb_seamless_cube_map, ['arb_seamless_cubemap-three-faces-average'])
 
+amd_pinned_memory = {}
+spec['AMD_pinned_memory'] = amd_pinned_memory
+amd_pinned_memory['offset=0'] = PiglitGLTest(['amd_pinned_memory', 'offset=0'], run_concurrent=True)
+amd_pinned_memory['increment-offset'] = PiglitGLTest(['amd_pinned_memory', 'increment-offset'], run_concurrent=True)
+amd_pinned_memory['decrement-offset'] = PiglitGLTest(['amd_pinned_memory', 'decrement-offset'], run_concurrent=True)
+amd_pinned_memory['map-buffer offset=0'] = PiglitGLTest(['amd_pinned_memory', 'offset=0', 'map-buffer'], run_concurrent=True)
+amd_pinned_memory['map-buffer increment-offset'] = PiglitGLTest(['amd_pinned_memory', 'increment-offset', 'map-buffer'], run_concurrent=True)
+amd_pinned_memory['map-buffer decrement-offset'] = PiglitGLTest(['amd_pinned_memory', 'decrement-offset', 'map-buffer'], run_concurrent=True)
+
 amd_seamless_cubemap_per_texture = {}
 spec['AMD_seamless_cubemap_per_texture'] = amd_seamless_cubemap_per_texture
 add_plain_test(amd_seamless_cubemap_per_texture, ['amd_seamless_cubemap_per_texture'])
