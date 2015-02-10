@@ -4019,6 +4019,7 @@ spec['ARB_direct_state_access']['compressedtextureimage'] = PiglitGLTest(['arb_d
 spec['ARB_direct_state_access']['getcompressedtextureimage'] = PiglitGLTest(['arb_direct_state_access-getcompressedtextureimage'], run_concurrent=True)
 spec['ARB_direct_state_access']['texture-storage-multisample'] = PiglitGLTest(['arb_direct_state_access-texture-storage-multisample'], run_concurrent=True)
 spec['ARB_direct_state_access']['texture-buffer'] = PiglitGLTest(['arb_direct_state_access-texture-buffer'], run_concurrent=True)
+spec['ARB_direct_state_access']['create-queries'] = PiglitGLTest(['arb_direct_state_access-create-queries'], run_concurrent=True)
 
 arb_shader_image_load_store = spec['ARB_shader_image_load_store']
 arb_shader_image_load_store['atomicity'] = PiglitGLTest(['arb_shader_image_load_store-atomicity'], run_concurrent=True)
