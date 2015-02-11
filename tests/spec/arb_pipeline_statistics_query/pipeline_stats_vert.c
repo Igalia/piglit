@@ -81,15 +81,15 @@ static struct query queries[] = {
 	{
 	 .query = GL_PRIMITIVES_SUBMITTED_ARB,
 	 .name = "GL_PRIMITIVES_SUBMITTED_ARB",
-	 .expected = NUM_PRIMS},
+	 .min = NUM_PRIMS},
 	{
 	 .query = GL_VERTICES_SUBMITTED_ARB,
 	 .name = "GL_VERTICES_SUBMITTED_ARB",
-	 .expected = NUM_VERTS},
+	 .min = NUM_VERTS},
 	{
 	 .query = GL_VERTEX_SHADER_INVOCATIONS_ARB,
 	 .name = "GL_VERTEX_SHADER_INVOCATIONS_ARB",
-	 .expected = NUM_VERTS}
+	 .min = NUM_VERTS}
 };
 
 /* Use DISPLAY for debug */

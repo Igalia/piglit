@@ -77,11 +77,15 @@ do_query(const struct query *queries, const int count)
 		end_query(&queries[i]);
 
 	for (i = 0; i < count; i++) {
+		const struct query *q = &queries[i];
+		GLuint64 max = q->max != 0 ? q->max : q->min;
 		GLuint64 params;
+
 		glGetQueryObjectui64v(queries[i].obj, GL_QUERY_RESULT, &params);
-		if (params != queries[i].expected) {
-			fprintf(stderr, "%s was %" PRIu64 "Expected %" PRIu64 "\n",
-				queries[i].name, params, queries[i].expected);
+		if (q->min > params || max < params) {
+			fprintf(stderr,
+					"%s value was invalid.\n  Expected: %" PRIu64 " - %" PRIu64 "\n  Observed: %" PRIu64 "\n",
+					q->name, q->min, max, params);
 			piglit_report_result(PIGLIT_FAIL);
 		}
 	}
