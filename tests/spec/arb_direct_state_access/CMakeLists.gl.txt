@@ -14,6 +14,7 @@ piglit_add_executable (arb_direct_state_access-transformfeedback-bufferbase tran
 piglit_add_executable (arb_direct_state_access-transformfeedback-bufferrange transformfeedback-bufferrange.c)
 piglit_add_executable (arb_direct_state_access-gettransformfeedback gettransformfeedback.c)
 piglit_add_executable (arb_direct_state_access-create-renderbuffers create-renderbuffers.c)
+piglit_add_executable (arb_direct_state_access-namedrenderbuffer namedrenderbuffer.c)
 piglit_add_executable (arb_direct_state_access-dsa-textures dsa-textures.c dsa-utils.c)
 piglit_add_executable (arb_direct_state_access-texturesubimage texturesubimage.c)
 piglit_add_executable (arb_direct_state_access-bind-texture-unit bind-texture-unit.c)
