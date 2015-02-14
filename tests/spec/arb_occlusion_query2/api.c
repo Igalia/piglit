@@ -59,6 +59,10 @@ test_error_begin_while_other_active(void)
 	glEndQuery(GL_SAMPLES_PASSED);
 	piglit_reset_gl_error();
 
+	glDeleteQueries(2, oq);
+
+	glGenQueries(2, oq);
+
 	glBeginQuery(GL_ANY_SAMPLES_PASSED, oq[0]);
 	if (!piglit_check_gl_error(0))
 		pass = false;
@@ -123,6 +127,10 @@ test_error_end_wrong_target(void)
 		pass = false;
 	glEndQuery(GL_SAMPLES_PASSED);
 	piglit_reset_gl_error();
+
+	glDeleteQueries(1, &oq);
+
+	glGenQueries(1, &oq);
 
 	glBeginQuery(GL_ANY_SAMPLES_PASSED, oq);
 	if (!piglit_check_gl_error(0))
@@ -191,6 +199,9 @@ test_current_query(void)
 		pass = false;
 	}
 	glEndQuery(GL_ANY_SAMPLES_PASSED);
+	glDeleteQueries(1, &oq);
+
+	glGenQueries(1, &oq);
 
 	/* Test the result for GL_SAMPLES_PASSED active */
 	glBeginQuery(GL_SAMPLES_PASSED, oq);
