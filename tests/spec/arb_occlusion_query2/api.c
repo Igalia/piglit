@@ -106,6 +106,38 @@ test_counter_bits(void)
 }
 
 static bool
+test_error_begin_wrong_target(void)
+{
+	bool pass = true;
+	GLuint oq;
+
+	glGenQueries(1, &oq);
+
+	glBeginQuery(GL_SAMPLES_PASSED, oq);
+	if (!piglit_check_gl_error(0))
+		pass = false;
+	glEndQuery(GL_SAMPLES_PASSED);
+
+	/* From the OpenGL 3.3 spec, section "2.14. ASYNCHRONOUS QUERIES", page 94:
+	 *
+	 *    "[...] if id is the name of an existing query object whose type does not
+	 *     match target, [...] the error INVALID_OPERATION is generated."
+	 *
+	 * Similar wording exists in the OpenGL ES 3.0.0 spec, section "2.13.
+	 * ASYNCHRONOUS QUERIES", page 82.
+	 */
+	glBeginQuery(GL_ANY_SAMPLES_PASSED, oq);
+	if (!piglit_check_gl_error(GL_INVALID_OPERATION))
+		pass = false;
+	glEndQuery(GL_ANY_SAMPLES_PASSED);
+	piglit_reset_gl_error();
+
+	glDeleteQueries(1, &oq);
+
+	return pass;
+}
+
+static bool
 test_error_end_wrong_target(void)
 {
 	bool pass = true;
@@ -237,6 +269,7 @@ piglit_display(void)
 
 	pass = test_counter_bits() && pass;
 	pass = test_current_query() && pass;
+	pass = test_error_begin_wrong_target() && pass;
 	pass = test_error_end_wrong_target() && pass;
 	pass = test_error_begin_while_other_active() && pass;
 
