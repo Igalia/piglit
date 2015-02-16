@@ -137,5 +137,6 @@ piglit_add_executable (quad-invariance quad-invariance.c)
 piglit_add_executable (clear-accum clear-accum.c)
 piglit_add_executable (vs-point_size-zero vs-point_size-zero.c)
 piglit_add_executable (triangle-guardband-viewport triangle-guardband-viewport.c)
+piglit_add_executable (teximage-scale-bias teximage-scale-bias.c)
 
 # vim: ft=cmake:

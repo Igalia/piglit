@@ -812,6 +812,7 @@ add_plain_test(gl11, ['texture-al'])
 add_concurrent_test(gl11, ['triangle-guardband-viewport'])
 add_concurrent_test(gl11, ['getteximage-targets', '1D'])
 add_concurrent_test(gl11, ['getteximage-targets', '2D'])
+add_concurrent_test(gl11, ['teximage-scale-bias'])
 
 color_formats = [
     'GL_RED', 'GL_R8', 'GL_R8_SNORM', 'GL_R16', 'GL_R16_SNORM',
