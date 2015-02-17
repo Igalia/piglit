@@ -49,6 +49,7 @@
 from __future__ import print_function, division, absolute_import
 from builtin_function import *
 import os 
+import numpy
 
 import six
 from six.moves import range
@@ -70,6 +71,9 @@ trig_builtins = ('sin', 'cos', 'tan',
                  'asin', 'acos', 'atan', 
                  'sinh', 'cosh', 'tanh', 
                  'asinh', 'acosh', 'atanh')
+
+def _is_sequence(arg):
+    return isinstance(arg, (collections.Sequence, numpy.ndarray))
 
 def make_indexers(signature):
    """Build a list of strings which index into every possible
@@ -105,22 +109,20 @@ def shader_runner_type(glsl_type):
 
 def shader_runner_format(values):
     """Format the given values for use in a shader_runner "uniform" or
-    "probe rgba" command.  Bools are converted to 0's and 1's, and
-    values are separated by spaces.
+    "probe rgba" command.  Sequences of values are separated by spaces.
     """
-    transformed_values = []
-    retval = ''
-    for value in values:
-        if isinstance(value, (bool, np.bool_)):
-            transformed_values.append(int(value))
-        else:
-            transformed_values.append(value)
-    for x in transformed_values:
-        if isinstance(x,np.float32):
-            retval+=' {0}'.format('{0:1.8e}'.format(x))
-        else:
-            retval+=' {0}'.format(repr(x))
+
+    if _is_sequence(values):
+        retval = ''
+        for x in values:
+            assert isinstance(x, (float, np.float32))
+            retval+=' {0:1.8e}'.format(x)
+    else:
+        assert isinstance(values, (float, np.float32))
+        retval = '{0:1.8e}'.format(values)
+
     return retval
+
 
 def main():
     """ Main function """
