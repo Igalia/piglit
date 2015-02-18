@@ -214,6 +214,17 @@ if (NOT MSVC)
 	IF (C_COMPILER_FLAG_WVLA)
 		SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
 	ENDIF ()
+	# MSVC only supports C99 variadic macros.  It doesn't support the
+	# non-standard GNU named variadic macro syntax that's documented in
+	# https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
+	#
+	# XXX: on older GCC version this option has no effect unless -Wpedantic
+	# is set, but this should be fixed on future GCC versions, per
+	# https://gcc.gnu.org/ml/gcc-patches/2014-04/msg01459.html
+	check_c_compiler_flag ("-Werror=variadic-macros" C_COMPILER_FLAG_WVARIADIC_MACROS)
+	if (C_COMPILER_FLAG_WVARIADIC_MACROS)
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=variadic-macros")
+	endif ()
 
 	CHECK_CXX_COMPILER_FLAG("-Wno-narrowing" CXX_COMPILER_FLAG_WNO_NARROWING)
 	IF (CXX_COMPILER_FLAG_WNO_NARROWING)
