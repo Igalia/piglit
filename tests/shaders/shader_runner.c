@@ -582,6 +582,43 @@ process_requirement(const char *line)
 	};
 	unsigned i;
 
+	/* The INT keyword in the requirements section causes
+	 * shader_runner to read the specified integer value and
+	 * processes the given requirement.
+	 */
+	if (string_match("INT ", line)) {
+		enum comparison cmp;
+		const char *enum_name = eat_whitespace(line+3);
+		const char *int_string;
+		int comparison_value, gl_int_value;
+		GLenum int_enum;
+
+		strcpy_to_space(buffer, enum_name);
+
+		int_enum = piglit_get_gl_enum_from_name(buffer);
+
+		int_string = process_comparison(eat_whitespace(enum_name + strlen(buffer)), &cmp);
+		comparison_value = atoi(int_string);
+
+		glGetIntegerv(int_enum, &gl_int_value);
+		if (!piglit_check_gl_error(GL_NO_ERROR)) {
+			fprintf(stderr, "Error reading %s\n", buffer);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+
+		if (!compare(comparison_value, gl_int_value, cmp)) {
+			printf("Test requires %s %s %i.  "
+			       "The driver supports %i.\n",
+			       buffer,
+			       comparison_string(cmp),
+			       comparison_value,
+			       gl_int_value);
+			piglit_report_result(PIGLIT_SKIP);
+		}
+
+		return;
+	}
+
 	/* There are four types of requirements that a test can currently
 	 * have:
 	 *
