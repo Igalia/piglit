@@ -39,20 +39,20 @@ extern "C" {
 
 #include "piglit-util-gl.h"
 
-#define SUBTEST(error, global, format, args...) \
+#define SUBTEST(error, global, ...) \
 do { \
 	bool local = piglit_check_gl_error((error)); \
 	global = global && local; \
 	piglit_report_subtest_result(local ? PIGLIT_PASS : PIGLIT_FAIL, \
-	                             (format), ##args); \
+	                             __VA_ARGS__); \
 } while (0)
 
-#define SUBTESTCONDITION(condition, global, format, args...) \
+#define SUBTESTCONDITION(condition, global, ...) \
 do { \
 	bool cond = (condition); \
 	global = global && cond; \
 	piglit_report_subtest_result(cond ? PIGLIT_PASS : PIGLIT_FAIL, \
-	                             (format), ##args); \
+	                             __VA_ARGS__); \
 } while (0)
 
 void dsa_init_program(void);
