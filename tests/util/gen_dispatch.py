@@ -141,28 +141,39 @@ class EnumCode(object):
     @classmethod
     def emit(cls, out_dir, gl_registry):
         assert isinstance(gl_registry, registry.gl.Registry)
-        enums = cls.get_unique_enums_in_default_namespace(gl_registry)
+        enums = cls.get_enums_in_default_namespace(gl_registry)
+        unique_enums = cls.get_unique_enums(enums)
+        enums_by_name = cls.get_enums_by_name(enums)
         render_template(
             cls.C_TEMPLATE,
             out_dir,
             gl_registry=gl_registry,
-            sorted_unique_enums_in_default_namespace=enums)
+            sorted_unique_enums_in_default_namespace=unique_enums,
+            sorted_enums_by_name=enums_by_name)
 
     @classmethod
-    def get_unique_enums_in_default_namespace(cls, gl_registry):
+    def get_enums_in_default_namespace(cls, gl_registry):
+        enums = []
+        for enum_group in gl_registry.enum_groups:
+            if enum_group.type == 'default_namespace':
+                for enum in enum_group.enums:
+                    enums.append(enum)
+        return enums
+
+    @classmethod
+    def get_unique_enums(cls, enums):
         def append_enum_if_new_value(enum_list, enum):
             if enum_list[-1].num_value < enum.num_value:
                 enum_list.append(enum)
             return enum_list
 
-        enums = (
-            enum
-            for enum_group in gl_registry.enum_groups
-            if enum_group.type == 'default_namespace'
-            for enum in enum_group.enums
-        )
         enums = sorted(enums)
         enums = functools.reduce(append_enum_if_new_value, enums[1:], [enums[0]])
+        return enums
+
+    @classmethod
+    def get_enums_by_name(cls, enums):
+        enums = sorted(enums, key=lambda enum: enum.name)
         return enums
 
 

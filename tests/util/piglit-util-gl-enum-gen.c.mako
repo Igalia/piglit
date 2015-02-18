@@ -50,4 +50,41 @@ piglit_get_prim_name(GLenum prim)
 >-------default: return "(unrecognized enum)";
 >-------}
 }
+
+struct gl_name_to_enum {
+>-------const char *name;
+>-------GLenum _enum;
+};
+
+static int
+compare_enum_name(const void *a, const void *b)
+{
+>-------return strcmp(((struct gl_name_to_enum*)a)->name,
+>-------              ((struct gl_name_to_enum*)b)->name);
+}
+
+GLenum
+piglit_get_gl_enum_from_name(const char *name)
+{
+>-------static const struct gl_name_to_enum names[] = {
+% for enum in sorted_enums_by_name:
+>------->-------{ "${enum.name}", ${enum.c_num_literal} },
+% endfor
+>-------};
+>-------struct gl_name_to_enum key = { name, 0 };
+>-------struct gl_name_to_enum *result;
+
+>-------result = (struct gl_name_to_enum*)
+>------->-------bsearch(&key,
+>------->-------        names, ARRAY_SIZE(names), sizeof names[0],
+>------->-------        compare_enum_name);
+
+>-------if (result == NULL) {
+>------->-------fprintf(stderr, "No known enum named %s!\n", name);
+>------->-------abort();
+>-------}
+
+>-------return result->_enum;
+}
+
 </%block>\

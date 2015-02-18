@@ -87,6 +87,15 @@ const char* piglit_get_gl_error_name(GLenum error);
 const char *piglit_get_gl_enum_name(GLenum param);
 
 /**
+ * \brief Convert a string to a GL enum.
+ *
+ * For example, given "GL_INVALID_ENUM", return GL_INVALID_ENUM.
+ *
+ * abort() if the string is not recognized.
+ */
+GLenum piglit_get_gl_enum_from_name(const char *name);
+
+/**
  * \brief Convert a GL primitive type enum value to a string.
  *
  * For example, given GL_POLYGON, return "GL_POLYGON".
