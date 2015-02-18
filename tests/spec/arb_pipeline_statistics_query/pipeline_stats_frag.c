@@ -54,7 +54,7 @@ PIGLIT_GL_TEST_CONFIG_BEGIN
     config.supports_gl_compat_version = 30;
     config.window_visual = PIGLIT_GL_VISUAL_DOUBLE | PIGLIT_GL_VISUAL_RGBA;
     config.window_width = TEST_WIDTH;
-    config.window_width = TEST_HEIGHT;
+    config.window_height = TEST_HEIGHT;
 PIGLIT_GL_TEST_CONFIG_END
 
 static const char *vs_src =
