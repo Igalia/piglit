@@ -209,13 +209,7 @@ if (NOT MSVC)
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 	ENDIF (CXX_COMPILER_FLAG_WALL)
 
-	# Unfortunately MSVC does not support C99.  Among all features enabled
-	# by C99, declarations after statements is the most frequently used.
-	# For portability sake, we request gcc to warn when this is used.
-	CHECK_C_COMPILER_FLAG("-Wdeclaration-after-statement" C_COMPILER_FLAG_WDECL_AFTER_STMT)
-	IF (C_COMPILER_FLAG_WDECL_AFTER_STMT)
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wdeclaration-after-statement")
-	ENDIF ()
+	# MSVC does not support C99 variable length arrays
 	CHECK_C_COMPILER_FLAG("-Wvla" C_COMPILER_FLAG_WVLA)
 	IF (C_COMPILER_FLAG_WVLA)
 		SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
