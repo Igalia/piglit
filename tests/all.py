@@ -961,6 +961,7 @@ with profile.group_manager(
     g(['gl-1.0-beginend-coverage'])
     g(['gl-1.0-dlist-beginend'])
     g(['gl-1.0-dlist-shademodel'])
+    g(['gl-1.0-drawpixels-color-index'])
     g(['gl-1.0-edgeflag'])
     g(['gl-1.0-edgeflag-const'])
     g(['gl-1.0-edgeflag-quads'])
