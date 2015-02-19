@@ -34,6 +34,7 @@
 # With the optional argument --names-only, it only outputs the names
 # of the files; it doesn't generate them.
 
+from __future__ import print_function
 from builtin_function_fp64 import *
 import abc
 import optparse
@@ -263,7 +264,7 @@ def main():
     for test in all_tests():
         if not options.names_only:
             test.generate_parser_test()
-        print test.filename()
+        print(test.filename())
 
 
 if __name__ == '__main__':
