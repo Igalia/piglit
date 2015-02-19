@@ -468,7 +468,7 @@ test_target_and_format(GLint x, GLint y, GLenum target, GLenum format,
 		glEnable(target);
 
 		for (k = 0; k < 4; k++) {
-			const float tz = k * 0.25;
+			const float tz = (k + 0.5) * 0.25;
 			draw_rect_tex_3d(x, y, IMAGE_SIZE, IMAGE_SIZE,
 					 0, 0, tz, 1, 1);
 			pass = probe_rect(x, y, IMAGE_SIZE, IMAGE_SIZE,
