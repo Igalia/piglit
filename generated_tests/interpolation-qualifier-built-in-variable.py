@@ -79,7 +79,7 @@ def make_fs_vs_tests(fs_mode, vs_mode, dirname):
         print(filename)
 
         with open(filename, 'w') as f:
-            f.write(TEMPLATES.get_template('vs-fs.shader_test.mako').render(
+            f.write(TEMPLATES.get_template('vs-fs.shader_test.mako').render_unicode(
                 vs_mode=vs_mode,
                 vs_variable=var,
                 fs_mode=fs_mode,
@@ -100,7 +100,7 @@ def make_vs_unused_tests(vs_mode, dirname):
 
         with open(filename, 'w') as f:
             f.write(
-                TEMPLATES.get_template('vs-unused.shader_test.mako').render(
+                TEMPLATES.get_template('vs-unused.shader_test.mako').render_unicode(
                     vs_mode=vs_mode,
                     vs_variable=var))
 
@@ -118,7 +118,7 @@ def make_fs_unused_tests(fs_mode, vs_mode, dirname):
         print(filename)
 
         with open(filename, 'w') as f:
-            f.write(TEMPLATES.get_template('fs-unused.shader_test.mako').render(
+            f.write(TEMPLATES.get_template('fs-unused.shader_test.mako').render_unicode(
                 vs_mode=vs_mode,
                 vs_variable=var,
                 fs_mode=fs_mode,
@@ -139,7 +139,7 @@ def make_vs_fs_unused_tests(fs_mode, vs_mode, dirname):
 
         with open(filename, 'w') as f:
             f.write(TEMPLATES.get_template(
-                'fs-vs-unused.shader_test.mako').render(
+                'fs-vs-unused.shader_test.mako').render_unicode(
                     vs_mode=vs_mode,
                     vs_variable=var,
                     fs_mode=fs_mode,
@@ -160,7 +160,7 @@ def make_vs_fs_flip_tests(fs_mode, vs_mode, dirname):
 
         with open(filename, 'w') as f:
             f.write(TEMPLATES.get_template(
-                'vs-fs-flip.shader_test.mako').render(
+                'vs-fs-flip.shader_test.mako').render_unicode(
                     vs_mode=vs_mode,
                     this_side_variable=this_side,
                     other_side_variable=other_side,
