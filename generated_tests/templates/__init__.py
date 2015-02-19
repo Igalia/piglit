@@ -36,6 +36,9 @@ MAKO_TEMP_DIR = os.path.join(tempfile.gettempdir(),
 
 TEMPLATE_DIR = os.path.abspath(os.path.dirname(__file__))
 
+# Future functions to be used in all templates
+_FUTURES = ['division']
+
 
 def template_file(generator, template):
     """Get a single template file from the templates directory.
@@ -57,6 +60,7 @@ def template_file(generator, template):
 
     return Template(filename=os.path.join(TEMPLATE_DIR, generator, template),
                     module_directory=os.path.join(MAKO_TEMP_DIR, generator),
+                    future_imports=_FUTURES,
                     output_encoding='utf-8')
 
 
@@ -78,4 +82,5 @@ def template_dir(generator):
     return TemplateLookup(
         directories=[os.path.join(TEMPLATE_DIR, generator)],
         module_directory=os.path.join(MAKO_TEMP_DIR, generator),
+        future_imports=_FUTURES,
         output_encoding='utf-8')
