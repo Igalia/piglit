@@ -32,6 +32,7 @@ First of all, you need to make sure that the following are installed:
   - Python 2.7.x
   - Python Mako module
   - numpy (http://www.numpy.org)
+  - six (https://pypi.python.org/pypi/six)
   - cmake (http://www.cmake.org)
   - GL, glu and glut libraries and development packages (i.e. headers)
   - X11 libraries and development packages (i.e. headers)
