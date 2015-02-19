@@ -25,6 +25,8 @@ import os
 import itertools
 import collections
 
+from six.moves import range
+
 from templates import template_file
 from modules import utils
 
@@ -41,7 +43,7 @@ def main():
     utils.safe_makedirs(dirname)
 
 
-    for c, r in itertools.product(xrange(2, 5), repeat=2):
+    for c, r in itertools.product(range(2, 5), repeat=2):
         vecs = [
             Parameters(c, r, 'vec', 'mat{0}x{1}'.format(r, c)),
             Parameters(c, r, 'ivec', 'mat{0}x{1}'.format(r, c))

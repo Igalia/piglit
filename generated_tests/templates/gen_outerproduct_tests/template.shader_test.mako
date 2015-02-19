@@ -18,6 +18,10 @@
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
 
+<%!
+  from six.moves import range
+%>
+
 <%def name="spec()">
 /* From page 43 (page 49 of the PDF) of the GLSL 1.20 spec:
  *
@@ -42,9 +46,9 @@
 </%def>
 
 <%def name="const_shader_data()">
-const ${params.vec_type}${params.columns} c = ${params.vec_type}${params.columns}(${", ".join(str(i + 1) for i in xrange(1, params.columns + 1))});
-const ${params.vec_type}${params.rows} r = ${params.vec_type}${params.rows}(${", ".join(str(i + 1 + params.columns) for i in xrange(1, params.rows + 1))});
-uniform ${params.matrix} expected = ${params.matrix}(${", ".join(str((i + 1 + params.columns) * (j + 1)) for i in xrange(1, params.rows + 1) for j in xrange(1, params.columns + 1))});
+const ${params.vec_type}${params.columns} c = ${params.vec_type}${params.columns}(${", ".join(str(i + 1) for i in range(1, params.columns + 1))});
+const ${params.vec_type}${params.rows} r = ${params.vec_type}${params.rows}(${", ".join(str(i + 1 + params.columns) for i in range(1, params.rows + 1))});
+uniform ${params.matrix} expected = ${params.matrix}(${", ".join(str((i + 1 + params.columns) * (j + 1)) for i in range(1, params.rows + 1) for j in range(1, params.columns + 1))});
 </%def>
 
 <%def name="uniform_shader_data()">
@@ -109,10 +113,10 @@ clear
 ortho
 
 %if type == 'uniform':
-% for x in xrange(1, 5):
-uniform ${params.vec_type}${params.columns} c ${" ".join(str(i + x) for i in xrange(1, params.columns + 1))}
-uniform ${params.vec_type}${params.rows} r ${" ".join(str(i + x + params.columns) for i in xrange(1, params.rows + 1))}
-uniform mat${params.rows}x${params.columns} expected ${" ".join(str((i + x + params.columns) * (j + x)) for i in xrange(1, params.rows + 1) for j in xrange(1, params.columns + 1))}
+% for x in range(1, 5):
+uniform ${params.vec_type}${params.columns} c ${" ".join(str(i + x) for i in range(1, params.columns + 1))}
+uniform ${params.vec_type}${params.rows} r ${" ".join(str(i + x + params.columns) for i in range(1, params.rows + 1))}
+uniform mat${params.rows}x${params.columns} expected ${" ".join(str((i + x + params.columns) * (j + x)) for i in range(1, params.rows + 1) for j in range(1, params.columns + 1))}
 draw rect ${20 * x - 10} 10 10 10
 probe rgb ${20 * x - 5} 15 0.0 1.0 0.0
 
