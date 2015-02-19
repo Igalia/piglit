@@ -46,7 +46,7 @@ PIGLIT_GL_TEST_CONFIG_END
 GLenum buffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 GLuint fbos[3];
 GLint prog0, prog1;
-GLuint textures[4];
+GLuint textures[5];
 
 void
 piglit_init(int argc, char **argv)
