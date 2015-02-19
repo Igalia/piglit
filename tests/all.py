@@ -3923,6 +3923,7 @@ with profile.group_manager(
     g(['arb_blend_func_extended-blend-api'], run_concurrent=False)
     g(['arb_blend_func_extended-error-at-begin'], run_concurrent=False)
     g(['arb_blend_func_extended-getfragdataindex'], run_concurrent=False)
+    g(['arb_blend_func_extended-output-location'], run_concurrent=False)
     g(['arb_blend_func_extended-fbo-extended-blend'], run_concurrent=False)
     g(['arb_blend_func_extended-fbo-extended-blend-explicit'],
       run_concurrent=False)
