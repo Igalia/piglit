@@ -25,6 +25,8 @@ from __future__ import print_function
 import os
 import os.path
 
+import six
+
 from templates import template_file
 from modules import utils
 
@@ -82,13 +84,13 @@ REQUIREMENTS = {
 
 def main():
     """Main function."""
-    for api, requirement in REQUIREMENTS.iteritems():
+    for api, requirement in six.iteritems(REQUIREMENTS):
         lod = 'Lod' if api == 'glsl-4.00' else 'LOD'
         dirname = os.path.join("spec", api.lower(), "compiler",
                                "built-in-functions")
         utils.safe_makedirs(dirname)
 
-        for sampler_type, coord_type in SAMPLER_TYPE_TO_COORD_TYPE.iteritems():
+        for sampler_type, coord_type in six.iteritems(SAMPLER_TYPE_TO_COORD_TYPE):
             requirements = [requirement['extensions']] if requirement['extensions'] else []
 
             # samplerCubeArray types are part GLSL 4.00
@@ -107,7 +109,7 @@ def main():
                 print(filename)
 
                 with open(filename, "w") as f:
-                    f.write(TEMPLATE.render(
+                    f.write(TEMPLATE.render_unicode(
                         version=requirement['version'],
                         extensions=requirements,
                         execution_stage=execution_stage,

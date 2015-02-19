@@ -11,7 +11,7 @@
  * [end config]
  */
 
-#version ${version.translate(None, '.')}
+#version ${int(float(version) * 100)}
 % for extension in extensions:
 #extension ${extension} : enable
 % endfor
