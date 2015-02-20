@@ -30,8 +30,10 @@ import argparse
 import os.path
 import re
 import sys
+import functools
 from collections import namedtuple
 
+import six
 import mako.runtime
 import mako.template
 
@@ -105,7 +107,15 @@ def render_template(filename, out_dir, **context_vars):
     def fake_whitespace(proto_text):
         if debug:
             print('fake whitespace: before: {0!r}'.format(proto_text))
-        text = unicode(proto_text)
+
+        if six.PY2:
+            # the unicode function was removed in python3, this will raise a
+            # pylint error, but not in python2
+            # pylint: disable=undefined-variable
+            text = unicode(proto_text)
+        elif six.PY3:
+            text = proto_text
+
         text = fake_alignment.sub('', text)
         text = fake_tab.sub('\t', text)
         if debug:
@@ -152,7 +162,7 @@ class EnumCode(object):
             for enum in enum_group.enums
         )
         enums = sorted(enums)
-        enums = reduce(append_enum_if_new_value, enums[1:], [enums[0]])
+        enums = functools.reduce(append_enum_if_new_value, enums[1:], [enums[0]])
         return enums
 
 

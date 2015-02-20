@@ -30,9 +30,9 @@ import os.path
 import re
 import sys
 import functools
-
 from copy import copy, deepcopy
 
+import six
 
 # Export 'debug' so other Piglit modules can easily enable it.
 debug = False
@@ -261,13 +261,13 @@ class OrderedKeyedSet(object):
         return node[3]
 
     def sort_by_key(self):
-        sorted_items = sorted(self.__map.iteritems())
+        sorted_items = sorted(six.iteritems(self.__map))
         self.clear()
         for item in sorted_items:
             self.add(item[1])
 
     def sort_by_value(self):
-        sorted_values = sorted(self.__map.itervalues())
+        sorted_values = sorted(six.itervalues(self.__map))
         self.clear()
         for value in sorted_values:
             self.add(value)
@@ -909,7 +909,7 @@ class CommandAliasMap(object):
     def __iter__(self):
         """A sorted iterator over the map's unique CommandAliasSet values."""
         if self.__sorted_unique_values is None:
-            self.__sorted_unique_values = sorted(set(self.__map.itervalues()))
+            self.__sorted_unique_values = sorted(set(six.itervalues(self.__map)))
 
         return iter(self.__sorted_unique_values)
 
@@ -1111,7 +1111,14 @@ class Enum(object):
             base = 16
         else:
             base = 10
-        self.num_value = long(self.str_value, base)
+
+        if six.PY2:
+            # long is undefined in python3, and we are aware of that
+            # pylint: disable=undefined-variable
+            self.num_value = long(self.str_value, base)
+        else:
+            assert six.PY3
+            self.num_value = int(self.str_value, base)
 
         _log_debug('parsed {0}'.format(self))
 
