@@ -2046,6 +2046,13 @@ add_shader_test_dir(arb_gpu_shader_fp64,
 import_glsl_parser_tests(arb_gpu_shader_fp64,
                     os.path.join(TESTS_DIR, 'spec', 'arb_gpu_shader_fp64'),
                     [''])
+arb_gpu_shader_fp64['varying-packing'] = {}
+for type in ['double', 'dvec2', 'dvec3', 'dvec4', 'dmat2', 'dmat3', 'dmat4',
+             'dmat2x3', 'dmat2x4', 'dmat3x2', 'dmat3x4', 'dmat4x2', 'dmat4x3']:
+    for arrayspec in ['array', 'separate']:
+        cmdline = 'simple {0} {1}'.format(type, arrayspec)
+        arb_gpu_shader_fp64['varying-packing'][cmdline] = \
+            PiglitGLTest(['varying-packing-simple', type, arrayspec], run_concurrent=True)
 
 arb_texture_query_levels = {}
 spec['ARB_texture_query_levels'] = arb_texture_query_levels

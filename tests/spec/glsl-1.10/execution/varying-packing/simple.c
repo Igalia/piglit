@@ -97,11 +97,13 @@
  */
 #include "piglit-util-gl.h"
 
+static void
+parse_args(int argc, char *argv[], struct piglit_gl_test_config *config);
+
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 10;
-
 	config.window_visual = PIGLIT_GL_VISUAL_RGB | PIGLIT_GL_VISUAL_DOUBLE;
+	parse_args(argc, argv, &config);
 
 PIGLIT_GL_TEST_CONFIG_END
 
@@ -113,6 +115,7 @@ enum base_type
 	BASE_TYPE_FLOAT,
 	BASE_TYPE_UINT,
 	BASE_TYPE_INT,
+	BASE_TYPE_DOUBLE,
 };
 
 static const char *
@@ -122,6 +125,7 @@ get_base_type_name(enum base_type t)
 	case BASE_TYPE_FLOAT: return "float";
 	case BASE_TYPE_UINT:  return "uint";
 	case BASE_TYPE_INT:   return "int";
+	case BASE_TYPE_DOUBLE:return "double";
 	default:              return "???";
 	}
 }
@@ -135,32 +139,46 @@ struct type_desc
 	unsigned glsl_version_required;
 };
 
-struct type_desc int_type    = { "int",    BASE_TYPE_INT,   1, 1, 130 };
-struct type_desc uint_type   = { "uint",   BASE_TYPE_UINT,  1, 1, 130 };
-struct type_desc float_type  = { "float",  BASE_TYPE_FLOAT, 1, 1, 110 };
-struct type_desc vec2_type   = { "vec2",   BASE_TYPE_FLOAT, 1, 2, 110 };
-struct type_desc vec3_type   = { "vec3",   BASE_TYPE_FLOAT, 1, 3, 110 };
-struct type_desc vec4_type   = { "vec4",   BASE_TYPE_FLOAT, 1, 4, 110 };
-struct type_desc ivec2_type  = { "ivec2",  BASE_TYPE_INT,   1, 2, 130 };
-struct type_desc ivec3_type  = { "ivec3",  BASE_TYPE_INT,   1, 3, 130 };
-struct type_desc ivec4_type  = { "ivec4",  BASE_TYPE_INT,   1, 4, 130 };
-struct type_desc uvec2_type  = { "uvec2",  BASE_TYPE_UINT,  1, 2, 130 };
-struct type_desc uvec3_type  = { "uvec3",  BASE_TYPE_UINT,  1, 3, 130 };
-struct type_desc uvec4_type  = { "uvec4",  BASE_TYPE_UINT,  1, 4, 130 };
-struct type_desc mat2_type   = { "mat2",   BASE_TYPE_FLOAT, 2, 2, 110 };
-struct type_desc mat3_type   = { "mat3",   BASE_TYPE_FLOAT, 3, 3, 110 };
-struct type_desc mat4_type   = { "mat4",   BASE_TYPE_FLOAT, 4, 4, 110 };
-struct type_desc mat2x3_type = { "mat2x3", BASE_TYPE_FLOAT, 2, 3, 120 };
-struct type_desc mat2x4_type = { "mat2x4", BASE_TYPE_FLOAT, 2, 4, 120 };
-struct type_desc mat3x2_type = { "mat3x2", BASE_TYPE_FLOAT, 3, 2, 120 };
-struct type_desc mat3x4_type = { "mat3x4", BASE_TYPE_FLOAT, 3, 4, 120 };
-struct type_desc mat4x2_type = { "mat4x2", BASE_TYPE_FLOAT, 4, 2, 120 };
-struct type_desc mat4x3_type = { "mat4x3", BASE_TYPE_FLOAT, 4, 3, 120 };
+struct type_desc int_type     = { "int",     BASE_TYPE_INT,    1, 1, 130 };
+struct type_desc uint_type    = { "uint",    BASE_TYPE_UINT,   1, 1, 130 };
+struct type_desc float_type   = { "float",   BASE_TYPE_FLOAT,  1, 1, 110 };
+struct type_desc double_type  = { "double",  BASE_TYPE_DOUBLE, 1, 1, 150 };
+struct type_desc vec2_type    = { "vec2",    BASE_TYPE_FLOAT,  1, 2, 110 };
+struct type_desc vec3_type    = { "vec3",    BASE_TYPE_FLOAT,  1, 3, 110 };
+struct type_desc vec4_type    = { "vec4",    BASE_TYPE_FLOAT,  1, 4, 110 };
+struct type_desc ivec2_type   = { "ivec2",   BASE_TYPE_INT,    1, 2, 130 };
+struct type_desc ivec3_type   = { "ivec3",   BASE_TYPE_INT,    1, 3, 130 };
+struct type_desc ivec4_type   = { "ivec4",   BASE_TYPE_INT,    1, 4, 130 };
+struct type_desc uvec2_type   = { "uvec2",   BASE_TYPE_UINT,   1, 2, 130 };
+struct type_desc uvec3_type   = { "uvec3",   BASE_TYPE_UINT,   1, 3, 130 };
+struct type_desc uvec4_type   = { "uvec4",   BASE_TYPE_UINT,   1, 4, 130 };
+struct type_desc dvec2_type   = { "dvec2",   BASE_TYPE_DOUBLE, 1, 2, 150 };
+struct type_desc dvec3_type   = { "dvec3",   BASE_TYPE_DOUBLE, 1, 3, 150 };
+struct type_desc dvec4_type   = { "dvec4",   BASE_TYPE_DOUBLE, 1, 4, 150 };
+struct type_desc mat2_type    = { "mat2",    BASE_TYPE_FLOAT,  2, 2, 110 };
+struct type_desc mat3_type    = { "mat3",    BASE_TYPE_FLOAT,  3, 3, 110 };
+struct type_desc mat4_type    = { "mat4",    BASE_TYPE_FLOAT,  4, 4, 110 };
+struct type_desc mat2x3_type  = { "mat2x3",  BASE_TYPE_FLOAT,  2, 3, 120 };
+struct type_desc mat2x4_type  = { "mat2x4",  BASE_TYPE_FLOAT,  2, 4, 120 };
+struct type_desc mat3x2_type  = { "mat3x2",  BASE_TYPE_FLOAT,  3, 2, 120 };
+struct type_desc mat3x4_type  = { "mat3x4",  BASE_TYPE_FLOAT,  3, 4, 120 };
+struct type_desc mat4x2_type  = { "mat4x2",  BASE_TYPE_FLOAT,  4, 2, 120 };
+struct type_desc mat4x3_type  = { "mat4x3",  BASE_TYPE_FLOAT,  4, 3, 120 };
+struct type_desc dmat2_type   = { "dmat2",   BASE_TYPE_DOUBLE, 2, 2, 150 };
+struct type_desc dmat3_type   = { "dmat3",   BASE_TYPE_DOUBLE, 3, 3, 150 };
+struct type_desc dmat4_type   = { "dmat4",   BASE_TYPE_DOUBLE, 4, 4, 150 };
+struct type_desc dmat2x3_type = { "dmat2x3", BASE_TYPE_DOUBLE, 2, 3, 150 };
+struct type_desc dmat2x4_type = { "dmat2x4", BASE_TYPE_DOUBLE, 2, 4, 150 };
+struct type_desc dmat3x2_type = { "dmat3x2", BASE_TYPE_DOUBLE, 3, 2, 150 };
+struct type_desc dmat3x4_type = { "dmat3x4", BASE_TYPE_DOUBLE, 3, 4, 150 };
+struct type_desc dmat4x2_type = { "dmat4x2", BASE_TYPE_DOUBLE, 4, 2, 150 };
+struct type_desc dmat4x3_type = { "dmat4x3", BASE_TYPE_DOUBLE, 4, 3, 150 };
 
 const struct type_desc *all_types[] = {
 	&int_type,
 	&uint_type,
 	&float_type,
+	&double_type,
 	&vec2_type,
 	&vec3_type,
 	&vec4_type,
@@ -170,6 +188,9 @@ const struct type_desc *all_types[] = {
 	&uvec2_type,
 	&uvec3_type,
 	&uvec4_type,
+	&dvec2_type,
+	&dvec3_type,
+	&dvec4_type,
 	&mat2_type,
 	&mat3_type,
 	&mat4_type,
@@ -179,6 +200,15 @@ const struct type_desc *all_types[] = {
 	&mat3x4_type,
 	&mat4x2_type,
 	&mat4x3_type,
+	&dmat2_type,
+	&dmat3_type,
+	&dmat4_type,
+	&dmat2x3_type,
+	&dmat2x4_type,
+	&dmat3x2_type,
+	&dmat3x4_type,
+	&dmat4x2_type,
+	&dmat4x3_type,
 	NULL,
 };
 
@@ -207,6 +237,7 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 	const char *varying_keyword;
 	unsigned offset = 0;
 	GLenum shader_type = is_vs ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
+	bool fp64 = false;
 
 	if (glsl_version >= 130) {
 		if (is_vs)
@@ -218,9 +249,12 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 	}
 
 	text += sprintf(text, "#version %u\n", glsl_version);
-	text += sprintf(text, "uniform int i;\n");
 	for (i = 0; i < num_varyings; ++i) {
 		const char *opt_flat_keyword = "";
+		if (!fp64 && varyings[i].type->base == BASE_TYPE_DOUBLE) {
+			text += sprintf(text, "#extension GL_ARB_gpu_shader_fp64: enable\n");
+			fp64 = true;
+		}
 		if (varyings[i].type->base != BASE_TYPE_FLOAT)
 			opt_flat_keyword = "flat ";
 		if (varyings[i].array_elems != 0) {
@@ -234,6 +268,11 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 					varyings[i].type->name, i);
 		}
 	}
+	if (glsl_version >= 150 && is_vs) {
+		text += sprintf(text, "in vec4 piglit_vertex;\n");
+		text += sprintf(text, "#define gl_Vertex piglit_vertex\n");
+	}
+	text += sprintf(text, "uniform int i;\n");
 	text += sprintf(text,
 			"\n"
 			"void main()\n"
@@ -306,8 +345,9 @@ choose_varyings(struct varying_desc *varyings,
 		unsigned max_varying_floats)
 {
 	unsigned num_varyings = 0;
+	unsigned element_size = test_type->base == BASE_TYPE_DOUBLE ? 2 : 1;
 	unsigned components_in_test_type
-		= test_type->num_cols * test_type->num_rows;
+		= test_type->num_cols * test_type->num_rows * element_size;
 	unsigned num_test_varyings
 		= max_varying_floats / components_in_test_type;
 	unsigned num_extra_varyings
@@ -348,18 +388,14 @@ NORETURN print_usage_and_exit(const char *prog_name)
 	piglit_report_result(PIGLIT_FAIL);
 }
 
-void
-piglit_init(int argc, char **argv)
+static const struct type_desc *test_type;
+
+static void
+parse_args(int argc, char *argv[], struct piglit_gl_test_config *config)
 {
 	unsigned i;
-	const struct type_desc *test_type;
-	GLboolean test_array;
-	GLint max_varying_floats;
-	struct varying_desc *varyings;
-	unsigned num_varyings;
-	GLuint vs, fs;
 
-	if (argc != 3)
+	if (argc < 3)
 		print_usage_and_exit(argv[0]);
 	for (i = 0; all_types[i]; ++i) {
 		if (strcmp(argv[1], all_types[i]->name) == 0)
@@ -369,6 +405,31 @@ piglit_init(int argc, char **argv)
 		test_type = all_types[i];
 	else
 		print_usage_and_exit(argv[0]);
+
+	if (test_type->glsl_version_required <= 110)
+		config->supports_gl_compat_version = 20;
+	else if (test_type->glsl_version_required <= 120)
+		config->supports_gl_compat_version = 21;
+	else if (test_type->glsl_version_required <= 130)
+		config->supports_gl_compat_version = 30;
+	else if (test_type->glsl_version_required <= 150)
+		config->supports_gl_core_version = 32;
+	else
+		piglit_report_result(PIGLIT_FAIL);
+}
+
+void
+piglit_init(int argc, char **argv)
+{
+	GLboolean test_array;
+	GLint max_varying_floats;
+	struct varying_desc *varyings;
+	unsigned num_varyings;
+	GLuint vs, fs;
+
+	if (argc != 3)
+		print_usage_and_exit(argv[0]);
+
 	if (strcmp(argv[2], "array") == 0)
 		test_array = GL_TRUE;
 	else if (strcmp(argv[2], "separate") == 0)
@@ -378,6 +439,8 @@ piglit_init(int argc, char **argv)
 
 	piglit_require_gl_version(20);
 	piglit_require_GLSL_version(test_type->glsl_version_required);
+	if (test_type->base == BASE_TYPE_DOUBLE)
+		piglit_require_extension("GL_ARB_gpu_shader_fp64");
 	glGetIntegerv(GL_MAX_VARYING_FLOATS, &max_varying_floats);
 
 	varyings = malloc(sizeof(*varyings) * max_varying_floats);
@@ -397,11 +460,16 @@ enum piglit_result
 piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
+	GLuint vao;
 	float green[] = { 0.0, 1.0, 0.0, 1.0 };
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glUseProgram(prog);
 	glUniform1i(i_location, 0);
+	if (piglit_is_core_profile) {
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+	}
 	piglit_draw_rect(-1, -1, 2, 2);
 	pass = piglit_probe_rect_rgba(0, 0, piglit_width, piglit_height, green)
 		&& pass;
