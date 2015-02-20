@@ -290,6 +290,7 @@ vertex_attrib_description::parse_datum(const char **text, void *data) const
 void
 vertex_attrib_description::setup(size_t *offset, size_t stride) const
 {
+	int attribute_size = ATTRIBUTE_SIZE;
 	switch (this->data_type) {
 	case GL_FLOAT:
 		glVertexAttribPointer(this->index, this->count,
@@ -304,6 +305,7 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 		glVertexAttribLPointer(this->index, this->count,
 				      this->data_type, stride,
 				      (void *) *offset);
+		attribute_size *= 2;
 		break;
 	default:
 		if (piglit_is_gles() && piglit_get_gl_version() < 30) {
@@ -316,7 +318,7 @@ vertex_attrib_description::setup(size_t *offset, size_t stride) const
 		break;
 	}
 	glEnableVertexAttribArray(index);
-	*offset += ATTRIBUTE_SIZE * this->count;
+	*offset += attribute_size * this->count;
 }
 
 
