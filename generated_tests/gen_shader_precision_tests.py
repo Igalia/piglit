@@ -46,9 +46,11 @@
  This program outputs, to stdout, the name of each file it generates.
 """
 
-from builtin_function import * 
-import mako.template 
+from builtin_function import *
 import os 
+
+import six
+from six.moves import range
 
 from templates import template_file
 
@@ -76,11 +78,11 @@ def make_indexers(signature):
    if signature.rettype.num_cols == 1:
       col_indexers = ['']
    else:
-      col_indexers = ['[{0}]'.format(i) for i in xrange(signature.rettype.num_cols)]
+      col_indexers = ['[{0}]'.format(i) for i in range(signature.rettype.num_cols)]
    if signature.rettype.num_rows == 1:
       row_indexers = ['']
    else:
-      row_indexers = ['[{0}]'.format(i) for i in xrange(signature.rettype.num_rows)]
+      row_indexers = ['[{0}]'.format(i) for i in range(signature.rettype.num_rows)]
    return [col_indexer + row_indexer 
            for col_indexer in col_indexers for row_indexer in row_indexers]
 
@@ -122,7 +124,7 @@ def shader_runner_format(values):
 def main():
     """ Main function """
 
-    for signature, test_vectors in sorted(test_suite.iteritems()):
+    for signature, test_vectors in sorted(six.iteritems(test_suite)):
         arg_float_check = tuple(
                         arg.base_type == glsl_float for arg in signature.argtypes)
         # Filter the test vectors down to only those which deal exclusively in float types
@@ -130,7 +132,7 @@ def main():
         indexers = make_indexers(signature)
         num_elements = signature.rettype.num_cols*signature.rettype.num_rows
         invocation = signature.template.format( *['arg{0}'.format(i) 
-                                                for i in xrange(len(signature.argtypes))])
+                                                for i in range(len(signature.argtypes))])
         if (signature.rettype.base_type == glsl_float and
             arg_float_check and
             all(arg_float_check) and

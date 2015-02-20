@@ -1,3 +1,6 @@
+<%!
+  from six.moves import range
+%>
 [require]
 GLSL >= 4.00
 
@@ -41,13 +44,13 @@ ${', '.join('floatBitsToInt(expected{0})'.format(i) for i in indexers)}\
   ## check for differences in the sign bit for each result
   ##
   bool signerr = \
-${' || '.join('(resultbits[{0}]>>31 != expectedbits[{0}]>>31)'.format(i) for i in xrange(0, num_elements))}\
+${' || '.join('(resultbits[{0}]>>31 != expectedbits[{0}]>>31)'.format(i) for i in range(0, num_elements))}\
 ;
   ##
   ## calculate the difference between the generated value and the expected value in ulps
   ##
   ${signature.rettype} ulps = ${signature.rettype}(\
-${', '.join('abs(resultbits[{0}] - expectedbits[{0}])'.format(i) for i in xrange(0, num_elements))}\
+${', '.join('abs(resultbits[{0}] - expectedbits[{0}])'.format(i) for i in range(0, num_elements))}\
 );
   ##
   ## find the maximum error in ulps of all the calculations using a nested max() sort
@@ -68,7 +71,7 @@ max(\
     % endfor
 max(ulps${indexers[len(indexers)-2]}, ulps${indexers[len(indexers)-1]})\
     ## fill in completing parens
-    % for i in xrange(0, num_elements-2):
+    % for i in range(0, num_elements-2):
 )\
     % endfor
 ;
@@ -114,7 +117,7 @@ piglit_vertex/float/2
 
 [test]
 % for test_num, test_vector in enumerate(test_vectors):
-  % for i in xrange(len(test_vector.arguments)):
+  % for i in range(len(test_vector.arguments)):
 uniform ${shader_runner_type(signature.argtypes[i])} arg${i} ${shader_runner_format( column_major_values(test_vector.arguments[i]))}
   % endfor
 uniform ${shader_runner_type(signature.rettype)} expected ${shader_runner_format(column_major_values(test_vector.result))}
