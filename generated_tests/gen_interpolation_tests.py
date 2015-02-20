@@ -70,6 +70,8 @@ This program outputs, to stdout, the name of each file it generates.
 from __future__ import print_function
 import os
 
+from six.moves import range
+
 from templates import template_file
 from modules import utils
 
@@ -207,8 +209,8 @@ class Test(object):
         # corners so that rounding does not cause us to accidentally
         # probe a pixel that's outside the triangle.
         num_subdivisions = 6
-        for i in xrange(1, num_subdivisions - 1):
-            for j in xrange(1, num_subdivisions - i):
+        for i in range(1, num_subdivisions - 1):
+            for j in range(1, num_subdivisions - i):
                 # Compute 3D barycentric coordinates--these will be
                 # used to compute the expected interpolated values
                 # when using smooth (perspective-correct)
@@ -270,7 +272,7 @@ class Test(object):
         dirname = os.path.dirname(filename)
         utils.safe_makedirs(dirname)
         with open(filename, 'w') as f:
-            f.write(TEMPLATE.render(args=self))
+            f.write(TEMPLATE.render_unicode(args=self))
 
 
 def all_tests():
