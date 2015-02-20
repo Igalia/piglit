@@ -124,16 +124,16 @@ piglit_make_generated_tests(
 # OpenCL Test generators
 piglit_make_generated_tests(
 	builtin_cl_int_tests.list
-	generate-cl-int-builtins.py)
+	gen_cl_int_builtins.py)
 piglit_make_generated_tests(
 	cl_store_tests.list
-	generate-cl-store-tests.py)
+	gen_cl_store_tests.py)
 piglit_make_generated_tests(
 	builtin_cl_math_tests.list
-	generate-cl-math-builtins.py)
+	gen_cl_math_builtins.py)
 piglit_make_generated_tests(
 	builtin_cl_relational_tests.list
-	generate-cl-relational-builtins.py)
+	gen_cl_relational_builtins.py)
 
 # Create a custom target for generating OpenGL tests
 # This is not added to the default target, instead it is added
