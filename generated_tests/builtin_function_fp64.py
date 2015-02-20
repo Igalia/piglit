@@ -50,6 +50,9 @@
 
 import collections
 import itertools
+import functools
+
+from six.moves import range
 import numpy as np
 
 
@@ -113,6 +116,28 @@ class GlslBuiltinType(object):
         a string, e.g. 110).
         """
         return self.__version_introduced
+
+    def __eq__(self, other):
+        if isinstance(other, GlslBuiltinType):
+            return self.name == other.name
+
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, GlslBuiltinType):
+            return self.name < other.name
+
+        return NotImplemented
+
+    def __hash__(self):
+        """Hash the object.
+
+        This hash isn't super awesome, but it isn't prone to change since you
+        have to muck with private (__prefixed values) and some unlikely text in
+        addition.
+
+        """
+        return hash('__GLslBuiltinType_{}__'.format(self.name))
 
     def __str__(self):
         return self.__name
@@ -580,9 +605,9 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
         vectors, wrap around as necessary to ensure that every input
         test vector is included.
         """
-        for i in xrange(0, len(test_vectors), partition_size):
+        for i in range(0, len(test_vectors), partition_size):
             partition = []
-            for j in xrange(partition_size):
+            for j in range(partition_size):
                 partition.append(test_vectors[(i + j) % len(test_vectors)])
             yield partition
 
@@ -594,7 +619,7 @@ def _vectorize_test_vectors(test_vectors, scalar_arg_indices, vector_length):
         """
         arity = len(test_vectors[0].arguments)
         arguments = []
-        for j in xrange(arity):
+        for j in range(arity):
             if j in scalar_arg_indices:
                 arguments.append(test_vectors[0].arguments[j])
             else:
@@ -628,7 +653,7 @@ def _store_test_vector(test_suite_dict, name, glsl_version, extension, test_vect
     Signature objects generated.
     """
     if template is None:
-        arg_indices = xrange(len(test_vector.arguments))
+        arg_indices = range(len(test_vector.arguments))
         template = '{0}({1})'.format(
             name, ', '.join('{{{0}}}'.format(i) for i in arg_indices))
     rettype = glsl_type_of(test_vector.result)
