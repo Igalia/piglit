@@ -24,6 +24,8 @@
 from __future__ import print_function
 import os
 
+from six.moves import range
+
 from templates import template_dir
 from modules import utils
 
@@ -101,7 +103,7 @@ def generate_tests(type_list, base_name, major, minor):
             for i, (type_, num_values) in enumerate(type_list):
                 numbers = []
                 alt_numbers = []
-                for j in xrange(num_values):
+                for j in range(num_values):
                     numbers.append(get_value(type_, i + j))
                     alt_numbers.append(get_value(type_, i + j + 7))
 
@@ -122,10 +124,10 @@ def generate_tests(type_list, base_name, major, minor):
                 api_vectors.append((api_type, name, alt_numbers))
 
             with open(test_file_name, "w") as f:
-                f.write(template.render(type_list=test_vectors,
-                                        api_types=api_vectors,
-                                        major=major,
-                                        minor=minor))
+                f.write(template.render_unicode(type_list=test_vectors,
+                                                api_types=api_vectors,
+                                                major=major,
+                                                minor=minor))
 
 
 def generate_array_tests(type_list, base_name, major, minor):
@@ -138,9 +140,9 @@ def generate_array_tests(type_list, base_name, major, minor):
     def parts():
         """Generate parts."""
         # pylint: disable=undefined-loop-variable
-        for j in xrange(2):
+        for j in range(2):
             numbers = []
-            for k in xrange(num_values):
+            for k in range(num_values):
                 numbers.append(get_value(type_, i + j + k))
 
             yield '{0}({1})'.format(type_, ', '.join(numbers))
@@ -168,9 +170,9 @@ def generate_array_tests(type_list, base_name, major, minor):
         print(test_file_name)
 
         with open(test_file_name, "w") as f:
-            f.write(template.render(type_list=vecs,
-                                    major=major,
-                                    minor=minor))
+            f.write(template.render_unicode(type_list=vecs,
+                                            major=major,
+                                            minor=minor))
 
 
 def main():
