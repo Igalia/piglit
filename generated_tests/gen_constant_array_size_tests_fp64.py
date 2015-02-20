@@ -41,6 +41,8 @@ import optparse
 import os
 import os.path
 
+from six.moves import range
+
 from modules import utils
 
 class ParserTest(object):
@@ -118,7 +120,7 @@ class ParserTest(object):
                 # is safe to use pow() here because its behavior is
                 # verified in the pow() tests.
                 terms = []
-                for col in xrange(self.__signature.rettype.num_cols):
+                for col in range(self.__signature.rettype.num_cols):
                     terms.append('(distance({0}[{1}], {2}) * distance({0}[{1}], {2}))'.format(
                         invocation, col,
                         glsl_constant(test_vector.result[:, col])))
@@ -137,7 +139,7 @@ class ParserTest(object):
                 # Don't use the equal() function to test itself.
                 assert self.__signature.rettype.is_vector
                 terms = []
-                for row in xrange(self.__signature.rettype.num_rows):
+                for row in range(self.__signature.rettype.num_rows):
                     terms.append('{0}[{1}] == {2}'.format(
                         invocation, row,
                         glsl_constant(test_vector.result[row])))
@@ -222,7 +224,7 @@ class GeometryParserTest(ParserTest):
     shader.
     """
     def glsl_version(self):
-	return max(150, ParserTest.glsl_version(self))
+        return max(150, ParserTest.glsl_version(self))
 
     def test_suffix(self):
         return 'geom'
