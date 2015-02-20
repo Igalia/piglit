@@ -31,7 +31,6 @@
  */
 
 #include "piglit-util-gl.h"
-#include <unistd.h>
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
@@ -136,13 +135,15 @@ enum piglit_result piglit_display(void)
 {
 	GLboolean pass = GL_TRUE;
 	float white[] = {1, 1, 1, 1};
-	unsigned i, vbo, size, page_size;
+	unsigned i, vbo, size;
+	size_t page_size;
 	GLsync fence = 0;
 	float x, y, *mem;
 
-	page_size = sysconf(_SC_PAGESIZE);
+	page_size = piglit_get_page_size();
+
 	size = ALIGN(NUM_PRIMS * TRI_SIZE, page_size);
-	mem = aligned_alloc(page_size, size);
+	mem = piglit_alloc_aligned(page_size, size);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnableClientState(GL_VERTEX_ARRAY);
