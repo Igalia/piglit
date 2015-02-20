@@ -26,6 +26,8 @@ import struct
 import os
 from operator import neg
 
+import six
+
 from templates import template_file
 from modules import utils
 
@@ -134,7 +136,7 @@ REQUIREMENTS = {
 def main():
     """main function."""
     # pylint: disable=line-too-long
-    for api, requirement in REQUIREMENTS.iteritems():
+    for api, requirement in six.iteritems(REQUIREMENTS):
         version = requirement['version']
         extensions = [requirement['extension']] if requirement['extension'] else []
 
@@ -142,9 +144,9 @@ def main():
                                'built-in-functions')
         utils.safe_makedirs(dirname)
 
-        for func, attrib in FUNCS.iteritems():
+        for func, attrib in six.iteritems(FUNCS):
             for execution_stage in ('vs', 'fs'):
-                for in_modifier_func, modifier_func in MODIFIER_FUNCS.iteritems():
+                for in_modifier_func, modifier_func in six.iteritems(MODIFIER_FUNCS):
                     # Modifying the sign of an unsigned number doesn't make sense.
                     if func == 'uintBitsToFloat' and in_modifier_func != '':
                         continue
@@ -162,7 +164,7 @@ def main():
                         in_modifier_func = '-abs'
 
                     with open(filename, 'w') as f:
-                        f.write(TEMPLATE.render(
+                        f.write(TEMPLATE.render_unicode(
                             version=version,
                             extensions=extensions,
                             execution_stage=execution_stage,

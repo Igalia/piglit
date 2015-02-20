@@ -1,3 +1,4 @@
+<%! import six %>
 [require]
 GLSL >= ${version}
 % for extension in extensions:
@@ -73,7 +74,7 @@ vertex/float/2
 -1.0  1.0
 
 [test]
-% for name, data in sorted(test_data.iteritems()):
+% for name, data in sorted(six.iteritems(test_data)):
 % if name == '-0.0' and in_modifier_func != '' and func == 'intBitsToFloat':
 # ${in_modifier_func}(INT_MIN) doesn't fit in a 32-bit int. Cannot test.
 % else:
