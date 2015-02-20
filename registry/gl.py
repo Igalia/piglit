@@ -100,9 +100,9 @@ def _repair_xml(xml_registry):
                 continue
 
         if ('gles2_GL_ACTIVE_PROGRAM_EXT' in fixes
-            and enums.get('vendor') == 'ARB'
-            and enums.get('start') <= '0x8259'
-            and enums.get('end') >= '0x8259'):
+            and enums.get('vendor') is not None and enums.get('vendor') == 'ARB'
+            and enums.get('start') is not None and enums.get('start') <= '0x8259'
+            and enums.get('end') is not None and enums.get('end') >= '0x8259'):
                 # GL_ACTIVE_PROGRAM_EXT has different numerical values in GL
                 # (0x8B8D) and in GLES (0x8259). Remove the GLES value to avoid
                 # redefinition collisions.
