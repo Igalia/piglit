@@ -1,7 +1,11 @@
+import os
+
+import six
+
 __all__ = ['gen', 'DATA_SIZES', 'MAX_VALUES', 'MAX', 'MIN', 'BMIN', 'BMAX',
            'SMIN', 'SMAX', 'UMIN', 'UMAX', 'TYPE', 'T', 'U', 'B']
 
-import os
+_NUMERIC_TYPES = tuple(list(six.integer_types) + [float])
 
 
 DATA_SIZES = {
@@ -268,7 +272,7 @@ def getValue(type, val, isVector):
              return map(lambda x: getValue(type, x, isVector), val);
 
     # At this point, we should have been passed a number
-    if (isinstance(val, (int, long, float))):
+    if (isinstance(val, _NUMERIC_TYPES)):
         return val
 
     print('Invalid value '+repr(val)+' encountered in getValue\n')
@@ -373,7 +377,7 @@ def gen(types, minVersions, functions, testDefs, dirName):
     for dataType in types:
         for fnName in functions:
             # Merge all of the generic/signed/unsigned/custom test definitions
-            if not testDefs.has_key((dataType, fnName)):
+            if (dataType, fnName) not in testDefs:
                 continue
             functionDef = testDefs[(dataType, fnName)]
 
