@@ -122,15 +122,15 @@ test_all_sizes_for_query(void)
 	uint32_t xi, yi, zi;
 	uint32_t x, y, z;
 
-	for (zi = 0; zi <= ARRAY_SIZE(sizes); zi++) {
+	for (zi = 0; zi < ARRAY_SIZE(sizes); zi++) {
 		z = sizes[zi];
 		if (z > 64)
 			break;
-		for (yi = 0; yi <= ARRAY_SIZE(sizes); yi++) {
+		for (yi = 0; yi < ARRAY_SIZE(sizes); yi++) {
 			y = sizes[yi];
 			if ((y * z) > 1024)
 				break;
-			for (xi = 0; xi <= ARRAY_SIZE(sizes); xi++) {
+			for (xi = 0; xi < ARRAY_SIZE(sizes); xi++) {
 				x = sizes[xi];
 				if ((x * y * z) > 1024)
 					break;
