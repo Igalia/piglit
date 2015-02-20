@@ -51,7 +51,8 @@ import numpy
 import optparse
 import os
 import os.path
-import sys
+
+from six.moves import range
 
 from modules import utils
 
@@ -282,12 +283,12 @@ class FloatComparator(Comparator):
             col_indexers = ['']
         else:
             col_indexers = ['[{0}]'.format(i)
-                            for i in xrange(self.__signature.rettype.num_cols)]
+                            for i in range(self.__signature.rettype.num_cols)]
         if self.__signature.rettype.num_rows == 1:
             row_indexers = ['']
         else:
             row_indexers = ['[{0}]'.format(i)
-                            for i in xrange(self.__signature.rettype.num_rows)]
+                            for i in range(self.__signature.rettype.num_rows)]
         return [col_indexer + row_indexer
                 for col_indexer in col_indexers
                 for row_indexer in row_indexers]
@@ -368,9 +369,9 @@ class ShaderTest(object):
         """Return a string that should be included in the test's
         [require] section.
         """
-	if self._signature.extension:
-		return 'GL_{0}\n'.format(self._signature.extension)
-	return ""
+        if self._signature.extension:
+            return 'GL_{0}\n'.format(self._signature.extension)
+        return ""
 
     @abc.abstractmethod
     def test_prefix(self):
@@ -421,7 +422,7 @@ class ShaderTest(object):
         if self._signature.extension:
             shader += '#extension GL_{0} : require\n'.format(self._signature.extension)
         shader += additional_declarations
-        for i in xrange(len(self._signature.argtypes)):
+        for i in range(len(self._signature.argtypes)):
             shader += 'uniform {0} arg{1};\n'.format(
                 self._signature.argtypes[i], i)
         shader += self._comparator.make_additional_declarations()
@@ -431,7 +432,7 @@ class ShaderTest(object):
         shader += prefix_statements
         invocation = self._signature.template.format(
             *['arg{0}'.format(i)
-              for i in xrange(len(self._signature.argtypes))])
+              for i in range(len(self._signature.argtypes))])
         shader += self._comparator.make_result_handler(invocation, output_var)
         shader += suffix_statements
         shader += '}\n'
@@ -443,7 +444,7 @@ class ShaderTest(object):
         """
         test = ''
         for test_num, test_vector in enumerate(self._test_vectors):
-            for i in xrange(len(test_vector.arguments)):
+            for i in range(len(test_vector.arguments)):
                 test += 'uniform {0} arg{1} {2}\n'.format(
                     shader_runner_type(self._signature.argtypes[i]),
                     i, shader_runner_format(
