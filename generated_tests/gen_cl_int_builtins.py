@@ -114,7 +114,7 @@ def pow(val, pow):
 
 def rotate_right(x, n, bits):
     # Find all bits that will wrap
-    mask = (2L**n) - 1
+    mask = (1 << n) - 1
     wrapped_bits = x & mask
 
     # sign extension needs to be masked out
