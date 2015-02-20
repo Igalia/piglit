@@ -633,6 +633,10 @@ class Requirement(object):
 
         _log_debug('created {0}'.format(self))
 
+    def __hash__(self):
+        return hash('__Requirement_class_{}_{}_'.format(
+            self.provider, self.provided))
+
     def __eq__(self, other):
         if self.provider != other.provider:
             return False
@@ -780,6 +784,9 @@ class Command(object):
                     'alias={self.alias!r}, '
                     'prototype={self.c_prototype!r})').format(self=self))
 
+    def __hash__(self):
+        return hash('__Command_class_{}_'.format(self.name))
+
     def __eq__(self, other):
         return self.name == other.name
 
@@ -859,6 +866,9 @@ class CommandAliasSet(ImmutableOrderedKeyedSet):
     def __repr__(self):
         templ = '{self.__class__.__name__}({self.name!r})'
         return templ.format(self=self)
+
+    def __hash__(self):
+        return hash(repr(self))
 
     @property
     def name(self):
