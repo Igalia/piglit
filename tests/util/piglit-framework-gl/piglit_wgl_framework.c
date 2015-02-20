@@ -29,16 +29,72 @@
 #include "piglit_wl_framework.h"
 
 static void
+process_next_event(struct piglit_winsys_framework *winsys_fw)
+{
+	const struct piglit_gl_test_config *test_config = winsys_fw->wfl_fw.gl_fw.test_config;
+
+	BOOL bRet;
+	MSG msg;
+
+	bRet = GetMessage(&msg, NULL, 0, 0 );
+	if (bRet <= 0) {
+		return;
+	}
+
+	switch (msg.message) {
+	case WM_PAINT:
+		winsys_fw->need_redisplay = true;
+		break;
+	case WM_SIZE:
+		if (winsys_fw->user_reshape_func) {
+			RECT rect;
+			if (GetClientRect(msg.hwnd, &rect)) {
+				int width  = rect.right  - rect.left;
+				int height = rect.bottom - rect.top;
+				winsys_fw->user_reshape_func(width, height);
+			}
+		}
+		winsys_fw->need_redisplay = true;
+		break;
+	case WM_KEYDOWN:
+		switch (msg.wParam) {
+		case VK_ESCAPE:
+			PostMessage(msg.hwnd, WM_CLOSE, 0, 0);
+			break;
+		}
+		break;
+	case WM_CHAR:
+		if (winsys_fw->user_keyboard_func) {
+			winsys_fw->user_keyboard_func(msg.wParam, 0, 0);
+		}
+		winsys_fw->need_redisplay = true;
+		break;
+	case WM_CLOSE:
+	case WM_QUIT:
+		/* TODO: cleanup/teardown things */
+		exit(0);
+	default:
+		break;
+	}
+
+	TranslateMessage(&msg);
+	DispatchMessage(&msg);
+
+	if (winsys_fw->need_redisplay) {
+		enum piglit_result result = PIGLIT_PASS;
+		if (test_config->display)
+			result = test_config->display();
+		if (piglit_automatic)
+			piglit_report_result(result);
+		winsys_fw->need_redisplay = false;
+	}
+}
+
+static void
 enter_event_loop(struct piglit_winsys_framework *winsys_fw)
 {
-
-	/* FINISHME: Write event loop for Windows.
-	 *
-	 * Until we have proper Windows/WGL support, give the user enough
-	 * time to view the window by sleeping.
-	 */
-	fprintf(stderr, "Press any key when done.\n");
-	getchar();
+	while (true)
+		process_next_event(winsys_fw);
 }
 
 static void
