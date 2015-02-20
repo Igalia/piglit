@@ -77,8 +77,6 @@ static const char *frag150_source =
 	"void main() { o = (u[0].a + u[1].a) / 5.0; }\n"
 	;
 
-static const float a[] = { 0.f, 1.f, 0.f, 1.f };
-
 static GLuint prog140 = 0;
 static GLuint prog150 = 0;
 
