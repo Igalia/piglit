@@ -1031,7 +1031,7 @@ class ShaderTest(object):
         utils.safe_makedirs(dirname)
 
         with open(self.filename, "w") as f:
-            f.write(self.__template.render(func=self.__func_info))
+            f.write(self.__template.render_unicode(func=self.__func_info))
 
 
 def main():

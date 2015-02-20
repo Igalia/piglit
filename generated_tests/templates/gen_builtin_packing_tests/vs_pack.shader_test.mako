@@ -1,3 +1,4 @@
+<%! from six.moves import range %>
 ## Test execution of pack2x16 functions in the vertex shader.
 [require]
 ${func.requirements}
@@ -12,7 +13,7 @@ const vec4 green = vec4(0, 1, 0, 1);
 
 uniform ${func.vector_type} func_input;
 
-% for j in xrange(func.num_valid_outputs):
+% for j in range(func.num_valid_outputs):
 uniform ${func.result_precision} uint expect${j};
 % endfor
 
@@ -25,7 +26,7 @@ void main()
     ${func.result_precision} uint actual = ${func.name}(func_input);
 
     if (false
-        % for j in xrange(func.num_valid_outputs):
+        % for j in range(func.num_valid_outputs):
         || actual == expect${j}
         % endfor
        ) {
@@ -58,7 +59,7 @@ vertex/float/2
 [test]
 % for io in func.inout_seq:
 uniform ${func.vector_type} func_input ${" ".join(io.input)}
-% for j in xrange(func.num_valid_outputs):
+% for j in range(func.num_valid_outputs):
 uniform uint expect${j} ${io.valid_outputs[j]}
 % endfor
 draw arrays GL_TRIANGLE_FAN 0 4

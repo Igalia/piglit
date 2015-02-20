@@ -1,3 +1,4 @@
+<%! from six.moves import range %>
 ## Test execution of unpack2x16 functions in the fragment shader.
 [require]
 ${func.requirements}
@@ -24,7 +25,7 @@ uniform highp uint func_input;
 
 uniform bool exact;
 
-% for i in xrange(func.num_valid_outputs):
+% for i in range(func.num_valid_outputs):
 uniform ${func.result_precision} ${func.vector_type} expect${i};
 % endfor
 
@@ -35,7 +36,7 @@ void main()
     ${func.result_precision} ${func.vector_type} actual = ${func.name}(func_input);
 
     if (false
-        % for i in xrange(func.num_valid_outputs):
+        % for i in range(func.num_valid_outputs):
         || (exact ? actual == expect${i}
                   : distance(actual, expect${i}) < 0.00001)
         % endfor
@@ -62,7 +63,7 @@ uniform int exact 1
 uniform int exact ${int(int(io.input[:-1]) in (0x0, 0xffffffff, 0x80808080,
                                                0x81818181))}
 % endif
-% for i in xrange(func.num_valid_outputs):
+% for i in range(func.num_valid_outputs):
 uniform ${func.vector_type} expect${i} ${" ".join(io.valid_outputs[i])}
 % endfor
 draw arrays GL_TRIANGLE_FAN 0 4
