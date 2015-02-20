@@ -191,4 +191,5 @@ def main():
     gen(DATA_TYPES, CLC_VERSION_MIN, functions, testDefs, dirName)
 
 
-main()
+if __name__ == '__main__':
+    main()

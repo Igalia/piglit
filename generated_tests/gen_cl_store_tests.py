@@ -63,40 +63,45 @@ def begin_test(type_name, addr_space):
     return f
 
 
-for t in TYPES:
-    for s in VEC_SIZES:
-        if s == '':
-            size = 1
-        else:
-            size = int(s)
-        type_name = t + s
-        f = begin_test(type_name, 'global')
-        f.write(textwrap.dedent("""
-        [test]
-        name: global address space
-        global_size: 1 0 0
-        kernel_name: store_global
-        arg_out: 0 buffer {type_name}[8] {gen_array}
-        arg_in:  1 buffer {type_name}[8] {gen_array}
-        [test]
-        name: global address space work items
-        global_size: 8 0 0
-        kernel_name: store_global_wi
-        arg_out: 0 buffer {type_name}[8] {gen_array}
-        arg_in:  1 buffer {type_name}[8] {gen_array}
-        """.format(type_name=type_name, gen_array=gen_array(size))))
+def main():
+    for t in TYPES:
+        for s in VEC_SIZES:
+            if s == '':
+                size = 1
+            else:
+                size = int(s)
+            type_name = t + s
+            f = begin_test(type_name, 'global')
+            f.write(textwrap.dedent("""
+            [test]
+            name: global address space
+            global_size: 1 0 0
+            kernel_name: store_global
+            arg_out: 0 buffer {type_name}[8] {gen_array}
+            arg_in:  1 buffer {type_name}[8] {gen_array}
+            [test]
+            name: global address space work items
+            global_size: 8 0 0
+            kernel_name: store_global_wi
+            arg_out: 0 buffer {type_name}[8] {gen_array}
+            arg_in:  1 buffer {type_name}[8] {gen_array}
+            """.format(type_name=type_name, gen_array=gen_array(size))))
 
-        f.close()
+            f.close()
 
-        f = begin_test(type_name, 'local')
-        f.write(textwrap.dedent("""
-        [test]
-        name: local address space
-        global_size: 8 0 0
-        local_size:  8 0 0
-        kernel_name: store_local
-        arg_out: 0 buffer {type_name}[8] {gen_array}
-        arg_in:  1 buffer {type_name}[8] {gen_array}
-        """.format(type_name=type_name, gen_array=gen_array(size))))
+            f = begin_test(type_name, 'local')
+            f.write(textwrap.dedent("""
+            [test]
+            name: local address space
+            global_size: 8 0 0
+            local_size:  8 0 0
+            kernel_name: store_local
+            arg_out: 0 buffer {type_name}[8] {gen_array}
+            arg_in:  1 buffer {type_name}[8] {gen_array}
+            """.format(type_name=type_name, gen_array=gen_array(size))))
 
-        f.close()
+            f.close()
+
+
+if __name__ == '__main__':
+    main()
