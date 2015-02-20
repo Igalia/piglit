@@ -1,3 +1,4 @@
+from __future__ import division
 import os
 from genclbuiltins import gen, DATA_SIZES, MAX_VALUES, MAX, MIN, BMIN, BMAX, \
                           SMIN, SMAX, UMIN, UMAX, TYPE, SIZE, T, U, B
@@ -84,7 +85,7 @@ def clz(type, val):
 
 
 def div(val1, val2):
-    return val1 / val2
+    return val1 // val2
 
 
 def mad_hi(x, y, z, type):
