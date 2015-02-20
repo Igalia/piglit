@@ -167,3 +167,5 @@ program_execute_store = {}
 program["Execute"]["Store"] = program_execute_store
 add_program_test_dir(program_execute_store,
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
+add_program_test_dir(program_execute_store,
+                     os.path.join(TESTS_DIR, 'cl', 'store'))
