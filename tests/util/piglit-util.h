@@ -345,6 +345,16 @@ piglit_parse_subtest_args(int *argc, char *argv[],
 uint64_t
 piglit_gettid(void);
 
+size_t
+piglit_get_page_size(void);
+
+void *
+piglit_alloc_aligned(size_t size, size_t alignment);
+
+void
+piglit_free_aligned(void *p);
+
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

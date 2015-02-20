@@ -809,3 +809,38 @@ piglit_gettid(void)
 	return 0;
 #endif
 }
+
+
+size_t
+piglit_get_page_size(void)
+{
+#if defined(_WIN32)
+	SYSTEM_INFO system_info;
+	GetSystemInfo (&system_info);
+	return system_info.dwPageSize;
+#else
+	return sysconf(_SC_PAGESIZE);
+#endif
+}
+
+
+void *
+piglit_alloc_aligned(size_t size, size_t alignment)
+{
+#if defined(_WIN32)
+   return _aligned_malloc(size, alignment);
+#else
+   return aligned_alloc(alignment, size);
+#endif
+}
+
+
+void
+piglit_free_aligned(void *p)
+{
+#if defined(_WIN32)
+   _aligned_free(p);
+#else
+   free(p);
+#endif
+}
