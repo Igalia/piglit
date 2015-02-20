@@ -26,6 +26,8 @@
 import os
 import textwrap
 
+from six.moves import range
+
 from modules import utils
 
 TYPES = ['char', 'uchar', 'short', 'ushort', 'int', 'uint', 'long', 'ulong', 'float', 'double']
@@ -36,7 +38,8 @@ utils.safe_makedirs(dirName)
 
 
 def gen_array(size):
-    return ' '.join([str(i) for i in xrange(size * 8)])
+    return ' '.join([str(i) for i in range(size * 8)])
+
 
 def ext_req(type_name):
     if type_name[:6] == "double":
