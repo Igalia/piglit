@@ -53,17 +53,6 @@ except ImportError:
     _log_debug('etree is xml.etree.cElementTree')
 
 
-# Define a Python 2.6 compatibility wrapper for ElementTree.iterfind.
-_etree_iterfind = None
-if hasattr(etree.ElementTree(), 'iterfind'):
-    _etree_iterfind = lambda elem, match: elem.iterfind(match)
-    _log_debug('_etree_iterfind wraps ElementTree.iterfind')
-else:
-    _etree_iterfind = lambda elem, match: iter(elem.findall(match))
-    _log_debug(('_etree_iterfind wraps ElementTree.findall for '
-                'Python 2.6 compatibility'))
-
-
 def parse():
     """Parse gl.xml and return a Registry object."""
     filename = os.path.join(os.path.dirname(__file__), 'gl.xml')
@@ -84,7 +73,7 @@ def _repair_xml(xml_registry):
     def defer_removal(parent, child):
         remove_queue.append((parent, child))
 
-    for enums in _etree_iterfind(xml_registry, './enums'):
+    for enums in xml_registry.iterfind('./enums'):
         if ('GL_ALL_ATTRIB_BITS' in fixes
             and enums.get('group') == 'AttribMask'):
                 # The XML defines GL_ALL_ATTRIB_BITS incorrectly with all bits
@@ -365,24 +354,23 @@ class Registry(object):
         self.features = OrderedKeyedSet(key='name')
         self.vendor_namespaces = set()
 
-        for xml_command in _etree_iterfind(xml_registry,
-                                           './commands/command'):
+        for xml_command in xml_registry.iterfind('./commands/command'):
             command = Command(xml_command)
             self.commands.add(command)
             self.command_alias_map.add(command)
 
-        for xml_enums in _etree_iterfind(xml_registry, './enums'):
+        for xml_enums in xml_registry.iterfind('./enums'):
             enum_group = EnumGroup(xml_enums)
             self.enum_groups.append(enum_group)
             for enum in enum_group.enums:
                 self.enums.add(enum)
 
-        for xml_feature in _etree_iterfind(xml_registry, './feature'):
+        for xml_feature in xml_registry.iterfind('./feature'):
             feature = Feature(xml_feature, command_map=self.commands,
                               enum_map=self.enums)
             self.features.add(feature)
 
-        for xml_ext in _etree_iterfind(xml_registry, './extensions/extension'):
+        for xml_ext in xml_registry.iterfind('./extensions/extension'):
             ext = Extension(xml_ext, command_map=self.commands,
                             enum_map=self.enums)
             self.extensions.add(ext)
@@ -488,10 +476,10 @@ class Feature(object):
             self.requirements.add(req)
             x.requirements.add(req)
 
-        for xml_cmd in _etree_iterfind(xml_feature, './require/command'):
+        for xml_cmd in xml_feature.iterfind('./require/command'):
             cmd = command_map[xml_cmd.get('name')]
             link(cmd)
-        for xml_enum in _etree_iterfind(xml_feature, './require/enum'):
+        for xml_enum in xml_feature.iterfind('./require/enum'):
             enum = enum_map[xml_enum.get('name')]
             link(enum)
 
@@ -603,11 +591,11 @@ class Extension(object):
             self.requirements.add(req)
             x.requirements.add(req)
 
-        for xml_req in _etree_iterfind(xml_extension, './require'):
-            for xml_cmd in _etree_iterfind(xml_req, './command'):
+        for xml_req in xml_extension.iterfind('./require'):
+            for xml_cmd in xml_req.iterfind('./command'):
                 cmd = command_map[xml_cmd.get('name')]
                 link(xml_req, cmd)
-            for xml_enum in _etree_iterfind(xml_req, './enum'):
+            for xml_enum in xml_req.iterfind('./enum'):
                 enum = enum_map[xml_enum.get('name')]
                 link(xml_req, enum)
 
@@ -784,7 +772,7 @@ class Command(object):
 
         self.param_list = [
             CommandParam(xml_param)
-            for xml_param in _etree_iterfind(xml_command, './param')
+            for xml_param in xml_command.iterfind('./param')
         ]
 
         _log_debug(('parsed {self.__class__.__name__}('
@@ -1053,7 +1041,7 @@ class EnumGroup(object):
 
         _log_debug('start parsing <enum> subelements of {0}'.format(self))
         self.enums = OrderedKeyedSet(key='name')
-        for xml_enum in _etree_iterfind(xml_enums, './enum'):
+        for xml_enum in xml_enums.iterfind('./enum'):
             self.enums.add(Enum(self, xml_enum))
         _log_debug('parsed {0}'.format(self))
 
