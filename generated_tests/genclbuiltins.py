@@ -344,8 +344,8 @@ def print_test(f, fnName, argType, functionDef, tests, numTests, vecSize, tss):
             )
             if arg == 0:
                 f.write(' tolerance {0} '.format(tolerance))
-	        # Use ulp tolerance for float types
-	        if isFloatType(argTypes[arg]):
+                # Use ulp tolerance for float types
+                if isFloatType(argTypes[arg]):
                     f.write('ulp')
             f.write('\n')
         else:
