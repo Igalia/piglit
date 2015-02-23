@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import print_function, division
 import os
 from genclbuiltins import gen, DATA_SIZES, MAX_VALUES, MAX, MIN, BMIN, BMAX, \
                           SMIN, SMAX, UMIN, UMAX, TYPE, SIZE, T, U, B

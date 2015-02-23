@@ -23,6 +23,7 @@
 #          Aaron Watry  <awatry@gmail.com>
 #
 
+from __future__ import print_function
 import os
 
 from genclbuiltins import gen, NEGNAN

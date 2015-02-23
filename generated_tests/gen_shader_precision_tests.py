@@ -46,6 +46,7 @@
  This program outputs, to stdout, the name of each file it generates.
 """
 
+from __future__ import print_function
 from builtin_function import *
 import os 
 

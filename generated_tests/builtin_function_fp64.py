@@ -48,6 +48,7 @@
 # swizzling, the function call operator, assignment, and the sequence
 # operator.
 
+from __future__ import print_function
 import collections
 import itertools
 import functools
