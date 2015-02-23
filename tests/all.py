@@ -2082,6 +2082,11 @@ with profile.group_manager(
 
 with profile.group_manager(
         PiglitGLTest,
+        grouptools.join('spec', 'ARB_gpu_shader_fp64', 'execution')) as g:
+     g(['arb_gpu_shader_fp64-tf-separate'])
+
+with profile.group_manager(
+        PiglitGLTest,
         grouptools.join('spec', 'ARB_shader_subroutine')) as g:
     g(['arb_shader_subroutine-minmax'])
 
