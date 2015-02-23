@@ -34,7 +34,7 @@
 # With the optional argument --names-only, it only outputs the names
 # of the files; it doesn't generate them.
 
-from __future__ import print_function
+from __future__ import print_function, division
 from builtin_function import *
 import abc
 import optparse

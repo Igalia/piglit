@@ -32,7 +32,7 @@ denormalized) floating point numbers.
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division
 import math
 import optparse
 import os

@@ -67,7 +67,7 @@ This program outputs, to stdout, the name of each file it generates.
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division
 import os
 
 from six.moves import range
