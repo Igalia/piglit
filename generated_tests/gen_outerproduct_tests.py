@@ -20,7 +20,7 @@
 
 """ Generate glsl 1.20 outerproduct tests """
 
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
 import os
 import itertools
 import collections

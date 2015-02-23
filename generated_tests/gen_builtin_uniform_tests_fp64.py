@@ -44,7 +44,7 @@
 # With the optional argument --names-only, it only outputs the names
 # of the files; it doesn't generate them.
 
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
 from builtin_function_fp64 import *
 import abc
 import numpy

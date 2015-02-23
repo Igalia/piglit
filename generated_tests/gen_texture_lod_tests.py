@@ -20,7 +20,7 @@
 
 """ Generate spec/ARB_shader_texture_lod tests """
 
-from __future__ import print_function, division
+from __future__ import print_function, division, absolute_import
 import os
 import collections
 
