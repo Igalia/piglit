@@ -11,4 +11,5 @@ link_libraries (
 )
 
 piglit_add_executable (arb_gpu_shader_fp64-tf-separate tf-separate.c)
+piglit_add_executable (arb_gpu_shader_fp64-tf-interleaved tf-interleaved.c)
 piglit_add_executable (arb_gpu_shader_fp64-double-gettransformfeedbackvarying double-gettransformfeedbackvarying.c)
