@@ -349,7 +349,7 @@ size_t
 piglit_get_page_size(void);
 
 void *
-piglit_alloc_aligned(size_t size, size_t alignment);
+piglit_alloc_aligned(size_t alignment, size_t size);
 
 void
 piglit_free_aligned(void *p);
