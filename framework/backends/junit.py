@@ -166,16 +166,18 @@ class JUnitBackend(FileBackend):
         # set different root names.
         classname = 'piglit.' + classname
 
-        testname += self._test_suffix
-
         # Jenkins will display special pages when the test has certain names.
         # https://jenkins-ci.org/issue/18062
         # https://jenkins-ci.org/issue/19810
-        if testname in ('api', 'search'):
+        # The testname variable is used in the calculate_result
+        # closure, and must not have the suffix appended.
+        full_test_name = testname + self._test_suffix
+        if full_test_name in ('api', 'search'):
             testname += '_'
+            full_test_name = testname + self._test_suffix
 
         # Create the root element
-        element = etree.Element('testcase', name=testname,
+        element = etree.Element('testcase', name=full_test_name,
                                 classname=classname,
                                 time=str(data['time']),
                                 status=str(data['result']))
