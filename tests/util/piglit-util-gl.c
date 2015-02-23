@@ -1844,6 +1844,29 @@ bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
 	return status;
 }
 
+bool piglit_probe_buffer_doubles(GLuint buf, GLenum target, const char *label,
+				 unsigned n, unsigned num_components,
+				 const double *expected)
+{
+	double *ptr;
+	unsigned i;
+	bool status = true;
+
+	glBindBuffer(target, buf);
+	ptr = glMapBuffer(target, GL_READ_ONLY);
+
+	for (i = 0; i < n * num_components; i++) {
+		if (fabs(ptr[i] - expected[i % num_components]) > 0.01) {
+			printf("%s[%i]: %f, Expected: %f\n", label, i, ptr[i],
+				expected[i % num_components]);
+			status = false;
+		}
+	}
+
+	glUnmapBuffer(target);
+
+	return status;
+}
 GLint piglit_ARBfp_pass_through = 0;
 
 int piglit_use_fragment_program(void)

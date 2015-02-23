@@ -174,7 +174,9 @@ int piglit_probe_rect_halves_equal_rgba(int x, int y, int w, int h);
 bool piglit_probe_buffer(GLuint buf, GLenum target, const char *label,
 			 unsigned n, unsigned num_components,
 			 const float *expected);
-
+bool piglit_probe_buffer_doubles(GLuint buf, GLenum target, const char *label,
+				 unsigned n, unsigned num_components,
+				 const double *expected);
 int piglit_use_fragment_program(void);
 int piglit_use_vertex_program(void);
 void piglit_require_fragment_program(void);
