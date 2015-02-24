@@ -1,0 +1,50 @@
+# test sending a double vertex attrib
+# through the pipeline unpacks correctly
+#
+[require]
+GLSL >= 1.50
+GL_ARB_gpu_shader_fp64
+GL_ARB_vertex_attrib_64bit
+
+[vertex shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+#extension GL_ARB_vertex_attrib_64bit : require
+in dvec2 vertex;
+in double value;
+flat out double val_to_fs;
+void main()
+{
+	gl_Position = vec4(vertex, 0.0, 1.0);
+	val_to_fs = value;
+}
+
+[fragment shader]
+#version 150
+#extension GL_ARB_gpu_shader_fp64 : require
+flat in double val_to_fs;
+uniform double expected;
+out vec4 color;
+
+void main()
+{
+	if (val_to_fs == expected)
+		color = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+vertex/double/2 value/double/1
+-1.0 -1.0 1.5
+ 1.0 -1.0 1.5
+ 1.0  1.0 1.5
+-1.0  1.0 1.5
+
+[test]
+clear color 0.0 0.0 1.0 0.0
+clear
+uniform double expected 1.5
+draw arrays GL_TRIANGLE_FAN 0 4
+probe rgba 0 0 0.0 1.0 0.0 1.0
+
