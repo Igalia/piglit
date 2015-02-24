@@ -158,5 +158,3 @@ add_program_test_dir(program_execute_builtin,
                                   'relational'))
 add_program_test_dir(program["Execute"]["Store"],
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'store'))
-add_program_test_dir(program["Execute"]["Store"],
-                     os.path.join(TESTS_DIR, 'cl', 'store'))
