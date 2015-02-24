@@ -21,6 +21,7 @@
 """ Provides test for the framework.profile modules """
 
 from __future__ import print_function, absolute_import
+import sys
 import copy
 import platform
 
@@ -31,6 +32,9 @@ import framework.core as core
 import framework.dmesg as dmesg
 import framework.profile as profile
 from framework.tests import utils
+
+# Don't print sys.stderr to the console
+sys.stderr = sys.stdout
 
 
 def test_initialize_testprofile():
@@ -194,87 +198,68 @@ def check_mixed_flatten(tests, testlist):
     nt.assert_dict_equal(profile_.test_list, baseline)
 
 
-def generate_prepare_test_list_test_test_matches():
-    """ Generate tests for TestProfile.perpare_test_list filtering """
-    data = {'group1/test1': 'thingy', 'group1/group3/test2': 'thing',
-            'group3/test5': 'other'}
+class TestPrepareTestListMatches(object):
+    """Create tests for TestProfile.prepare_test_list filtering"""
+    def __init__(self):
+        self.data = {
+            'group1/test1': 'thingy',
+            'group1/group3/test2': 'thing',
+            'group3/test5': 'other'
+        }
 
-    test_matches_filter_mar_1.description = (
-        "TestProfile.prepare_test_list: "
-        "'not env.filter or matches_any_regex() env.filter is False")
-    yield test_matches_filter_mar_1, data
+    def test_matches_filter_mar_1(self):
+        """TestProfile.prepare_test_list: 'not env.filter or
+        matches_any_regex() env.filter is False
 
-    test_matches_filter_mar_2.description = (
-        "TestProfile.prepare_test_list: "
-        "Tests 'not env.filter or matches_any_regex() mar is False")
-    yield test_matches_filter_mar_2, data
+        Nothing should be filtered.
 
-    test_matches_env_exclude.description = (
-        "TestProfile.prepare_test_list: "
-        "Tests 'not path in env.exclude_tests' is True")
-    yield test_matches_env_exclude, data
+        """
+        env = core.Options()
 
-    test_matches_exclude_mar.description = \
-        "TestProfile.prepare_test_list: Tests 'not matches_any_regex"
-    yield test_matches_exclude_mar, data
+        profile_ = profile.TestProfile()
+        profile_.test_list = self.data
+        profile_._prepare_test_list(env)
 
+        nt.assert_dict_equal(profile_.test_list, self.data)
 
-@nt.nottest
-def test_matches_filter_mar_1(data):
-    """ Tests 'not env.filter or matches_any_regex() env.filter is False
+    def test_matches_filter_mar_2(self):
+        """TestProfile.prepare_test_list: 'not env.filter or matches_any_regex()
+        mar is False
 
-    Nothing should be filtered.
+        """
+        env = core.Options(include_filter=['test5'])
 
-    """
-    env = core.Options()
+        profile_ = profile.TestProfile()
+        profile_.test_list = self.data
+        profile_._prepare_test_list(env)
 
-    profile_ = profile.TestProfile()
-    profile_.test_list = data
-    profile_._prepare_test_list(env)
+        baseline = {'group3/test5': 'other'}
 
-    nt.assert_dict_equal(profile_.test_list, data)
+        nt.assert_dict_equal(profile_.test_list, baseline)
 
+    def test_matches_env_exclude(self):
+        """TestProfile.prepare_test_list: 'not path in env.exclude_tests"""
+        env = core.Options()
+        env.exclude_tests.add('group3/test5')
 
-@nt.nottest
-def test_matches_filter_mar_2(data):
-    """ Tests 'not env.filter or matches_any_regex() mar is False"""
-    env = core.Options(include_filter=['test5'])
+        profile_ = profile.TestProfile()
+        profile_.test_list = self.data
+        profile_._prepare_test_list(env)
 
-    profile_ = profile.TestProfile()
-    profile_.test_list = data
-    profile_._prepare_test_list(env)
+        baseline = copy.deepcopy(self.data)
+        del baseline['group3/test5']
 
-    baseline = {'group3/test5': 'other'}
+        nt.assert_dict_equal(profile_.test_list, baseline)
 
-    nt.assert_dict_equal(profile_.test_list, baseline)
+    def test_matches_exclude_mar(self):
+        """TestProfile.prepare_test_list: 'not matches_any_regexp()"""
+        env = core.Options(exclude_filter=['test5'])
 
+        profile_ = profile.TestProfile()
+        profile_.test_list = self.data
+        profile_._prepare_test_list(env)
 
-@nt.nottest
-def test_matches_env_exclude(data):
-    """ Tests 'not path in env.exclude_tests  """
-    env = core.Options()
-    env.exclude_tests.add('group3/test5')
+        baseline = copy.deepcopy(self.data)
+        del baseline['group3/test5']
 
-    profile_ = profile.TestProfile()
-    profile_.test_list = data
-    profile_._prepare_test_list(env)
-
-    baseline = copy.deepcopy(data)
-    del baseline['group3/test5']
-
-    nt.assert_dict_equal(profile_.test_list, baseline)
-
-
-@nt.nottest
-def test_matches_exclude_mar(data):
-    """ Tests 'not matches_any_regexp() """
-    env = core.Options(exclude_filter=['test5'])
-
-    profile_ = profile.TestProfile()
-    profile_.test_list = data
-    profile_._prepare_test_list(env)
-
-    baseline = copy.deepcopy(data)
-    del baseline['group3/test5']
-
-    nt.assert_dict_equal(profile_.test_list, baseline)
+        nt.assert_dict_equal(profile_.test_list, baseline)
