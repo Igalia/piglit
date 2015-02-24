@@ -204,7 +204,8 @@ class TestPrepareTestListMatches(object):
         self.data = {
             'group1/test1': 'thingy',
             'group1/group3/test2': 'thing',
-            'group3/test5': 'other'
+            'group3/test5': 'other',
+            'group4/Test9': 'is_caps',
         }
 
     def test_matches_filter_mar_1(self):
@@ -263,3 +264,13 @@ class TestPrepareTestListMatches(object):
         del baseline['group3/test5']
 
         nt.assert_dict_equal(profile_.test_list, baseline)
+
+    def test_matches_include_caps(self):
+        """TestProfile.prepare_test_list: matches capitalized tests."""
+        env = core.Options(exclude_filter=['test9'])
+
+        profile_ = profile.TestProfile()
+        profile_.test_list = self.data
+        profile_._prepare_test_list(env)
+
+        nt.assert_not_in('group4/Test9', profile_.test_list)

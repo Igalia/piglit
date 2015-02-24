@@ -99,8 +99,10 @@ class Options(object):
                  exclude_filter=None, valgrind=False, dmesg=False, sync=False):
         self.concurrent = concurrent
         self.execute = execute
-        self.filter = [re.compile(x) for x in include_filter or []]
-        self.exclude_filter = [re.compile(x) for x in exclude_filter or []]
+        self.filter = \
+            [re.compile(x, re.IGNORECASE) for x in include_filter or []]
+        self.exclude_filter = \
+            [re.compile(x, re.IGNORECASE) for x in exclude_filter or []]
         self.exclude_tests = set()
         self.valgrind = valgrind
         self.dmesg = dmesg
