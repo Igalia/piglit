@@ -1,0 +1,36 @@
+// From the GLSL 1.50 spec, section 4.3.7 (Interface Blocks):
+//
+//     Furthermore, if a matching block is declared as an array, then
+//     the array sizes must also match (or follow array matching rules
+//     for the interface between a vertex and a geometry shader).
+//
+// In this test, we create a uniform block array in both
+// the vertex and fragment shaders, using different array sizes. The
+// instance name of the interface differs across shaders. Then we
+// check that the implementation correctly reported an error.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+uniform Foo {
+  vec4 x;
+} foo[3];
+
+void main()
+{
+  gl_Position = vec4(foo[0].x);
+}
+
+[fragment shader]
+uniform Foo {
+  vec4 x;
+} bar[2];
+
+void main()
+{
+  gl_FragColor = bar[0].x;
+}
+
+[test]
+link error

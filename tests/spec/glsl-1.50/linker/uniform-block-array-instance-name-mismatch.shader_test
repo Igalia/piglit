@@ -1,0 +1,28 @@
+// Instance names for uniforms can differ. Check
+// that the shaders link successfully.
+
+[require]
+GLSL >= 1.50
+
+[vertex shader]
+uniform Foo {
+  vec4 x;
+} foo[3];
+
+void main()
+{
+  gl_Position = vec4(foo[0].x);
+}
+
+[fragment shader]
+uniform Foo {
+  vec4 x;
+} bar[3];
+
+void main()
+{
+  gl_FragColor = bar[0].x;
+}
+
+[test]
+link success
