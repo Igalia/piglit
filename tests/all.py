@@ -2047,6 +2047,9 @@ for test_type in ('shader', 'api'):
     test_name = ['overlapping-locations-input-attribs', test_type]
     arb_explicit_attrib_location[' '.join(test_name)] = PiglitGLTest(test_name)
 
+arb_program_interface_query = spec['ARB_program_interface_query']
+add_plain_test(arb_program_interface_query, ['arb_program_interface_query-resource-location'])
+
 # Group ARB_explicit_uniform_location
 arb_explicit_uniform_location = spec['ARB_explicit_uniform_location']
 add_plain_test(arb_explicit_uniform_location, ['arb_explicit_uniform_location-minmax'])
