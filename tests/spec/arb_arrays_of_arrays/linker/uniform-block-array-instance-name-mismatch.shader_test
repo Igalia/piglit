@@ -1,0 +1,33 @@
+// Instance names for uniforms can differ check
+// that the shaders link successfully.
+
+[require]
+GLSL >= 1.50
+GL_ARB_arrays_of_arrays
+
+[vertex shader]
+#extension GL_ARB_arrays_of_arrays: enable
+
+uniform Foo {
+  vec4 x;
+} foo[3][4];
+
+void main()
+{
+  gl_Position = vec4(foo[0][1].x);
+}
+
+[fragment shader]
+#extension GL_ARB_arrays_of_arrays: enable
+
+uniform Foo {
+  vec4 x;
+} bar[3][4];
+
+void main()
+{
+  gl_FragColor = bar[0][2].x;
+}
+
+[test]
+link success
