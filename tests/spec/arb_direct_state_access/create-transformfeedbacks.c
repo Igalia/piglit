@@ -25,6 +25,14 @@
  *
  * Tests glCreateTransformFeedbacks to see if it behaves in the expected way,
  * throwing the correct errors, etc.
+ *
+ * From OpenGL 4.5, section 13.2.1 "Transform Feedback Objects", page 420:
+ *
+ * "CreateTransformFeedbacks returns n previously unused transform feedback
+ * object names in ids, each representing a new state vector, comprising the
+ * state and with all the same initial values listed in table 23.48.
+ * Errors
+ *   An INVALID_VALUE error is generated if n is negative."
  */
 
 #include "piglit-util-gl.h"
@@ -32,7 +40,7 @@
 
 PIGLIT_GL_TEST_CONFIG_BEGIN
 
-	config.supports_gl_compat_version = 13;
+	config.supports_gl_core_version = 31;
 
 	config.window_visual = PIGLIT_GL_VISUAL_RGBA |
 		PIGLIT_GL_VISUAL_DOUBLE;
@@ -70,6 +78,10 @@ piglit_display(void)
 
 	SUBTESTCONDITION(glIsTransformFeedback(ids[2]), pass,
 			"IsTransformFeedback()");
+
+	/* the default state is tested in the following piglit test:
+	 *	arb_direct_state_access-gettransformfeedback
+	 */
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
