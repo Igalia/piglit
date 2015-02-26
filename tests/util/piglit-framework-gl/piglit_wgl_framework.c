@@ -56,13 +56,6 @@ process_next_event(struct piglit_winsys_framework *winsys_fw)
 		}
 		winsys_fw->need_redisplay = true;
 		break;
-	case WM_KEYDOWN:
-		switch (msg.wParam) {
-		case VK_ESCAPE:
-			PostMessage(msg.hwnd, WM_CLOSE, 0, 0);
-			break;
-		}
-		break;
 	case WM_CHAR:
 		if (winsys_fw->user_keyboard_func) {
 			winsys_fw->user_keyboard_func(msg.wParam, 0, 0);
