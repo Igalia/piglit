@@ -829,14 +829,12 @@ piglit_alloc_aligned(size_t alignment, size_t size)
 {
 #if defined(_WIN32)
 	return _aligned_malloc(size, alignment);
-#elif defined(__APPLE__)
+#else
 	void *p;
 	if (posix_memalign(&p, alignment, size) != 0) {
 		return NULL;
 	}
 	return p;
-#else
-	return aligned_alloc(alignment, size);
 #endif
 }
 
