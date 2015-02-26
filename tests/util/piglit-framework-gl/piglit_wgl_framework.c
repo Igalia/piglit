@@ -36,9 +36,14 @@ process_next_event(struct piglit_winsys_framework *winsys_fw)
 	BOOL bRet;
 	MSG msg;
 
-	bRet = GetMessage(&msg, NULL, 0, 0 );
-	if (bRet <= 0) {
-		return;
+	bRet = GetMessage(&msg, NULL, 0, 0);
+	/* bRet will be negative on error, zero on WM_QUIT, positive for other messages */
+	if (bRet < 0) {
+		exit(EXIT_FAILURE);
+	}
+
+	if (0) {
+		fprintf(stderr, "message = 0x%04x, wParam = 0x%04x\n", msg.message, msg.wParam);
 	}
 
 	switch (msg.message) {
@@ -62,10 +67,18 @@ process_next_event(struct piglit_winsys_framework *winsys_fw)
 		}
 		winsys_fw->need_redisplay = true;
 		break;
+	case WM_SYSCOMMAND:
+		if (msg.wParam == SC_CLOSE) {
+			PostQuitMessage(EXIT_SUCCESS);
+		}
+		break;
 	case WM_CLOSE:
+		/* XXX: we never see this message here in practice, only WM_SYSCOMMAND::SC_CLOSE above */
+		PostQuitMessage(EXIT_SUCCESS);
+		break;
 	case WM_QUIT:
 		/* TODO: cleanup/teardown things */
-		exit(0);
+		exit(msg.wParam);
 	default:
 		break;
 	}
