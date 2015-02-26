@@ -68,6 +68,10 @@ extern "C" {
 #define inline __inline
 #endif
 
+#if !defined(__func__)
+#define __func__ __FUNCTION__
+#endif
+
 #define snprintf _snprintf
 
 #define alloca _alloca
