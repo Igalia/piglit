@@ -1,0 +1,33 @@
+/* Test (x+y cmp 0) optimization. */
+
+[require]
+GLSL >= 1.10
+
+[vertex shader]
+
+void main()
+{
+	gl_Position = ftransform();
+}
+
+[fragment shader]
+
+uniform float a;
+
+void main()
+{
+	if ((a - 1.0) >= 0.0)
+	    gl_FragColor = vec4(0, 1, 0, 1);
+	else
+	    gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+[test]
+clear color 0.5 0.5 0.5 0.5
+clear
+uniform float a 0
+draw rect -1 -1 1 2
+uniform float a 2
+draw rect 0 -1 1 2
+probe rgb 125 0 0.0 1.0 0.0
+probe rgb 0 0 1.0 0.0 0.0
