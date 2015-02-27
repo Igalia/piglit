@@ -275,7 +275,7 @@ piglit_init(int argc, char **argv)
 	if (strcmp(argv[4], "enabled") == 0) {
 		enable_srgb_framebuffer = true;
 	} else if (strcmp(argv[4], "disabled") == 0) {
-		enable_srgb_framebuffer = true;
+		enable_srgb_framebuffer = false;
 	} else {
 		print_usage_and_exit(argv[0]);
 	}
