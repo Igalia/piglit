@@ -103,11 +103,12 @@ static const char fs_text[] =
 	"#extension GL_ARB_explicit_attrib_location  : require\n"
 	"#extension GL_ARB_explicit_uniform_location : require\n"
 	"layout (location = 9) uniform vec4 color;\n"
+	"layout (location = 1) uniform float array[4];\n"
 	"layout (location = 1) out vec4 output0;\n"
 	"layout (location = 0) out vec4 output1;\n"
 	"void main() {\n"
-		"output0 = color;\n"
-		"output1 = color;\n"
+		"output0 = color * array[2];\n"
+		"output1 = color * array[3];\n"
 	"}";
 
 static const char vs_subroutine_text[] =
@@ -415,12 +416,33 @@ piglit_init(int argc, char **argv)
 		pass = false;
 	}
 
+	/* Test 3 illegal array cases referenced in the spec as 'bug 9254'. */
+	if (glGetProgramResourceLocation(prog, GL_UNIFORM, "array[+1]") != -1) {
+		piglit_report_subtest_result(PIGLIT_FAIL, "array case 1");
+		pass = false;
+	}
+
+	if (glGetProgramResourceLocation(prog, GL_UNIFORM, "array[01]") != -1) {
+		piglit_report_subtest_result(PIGLIT_FAIL, "array case 2");
+		pass = false;
+	}
+
+	if (glGetProgramResourceLocation(prog, GL_UNIFORM, "array[ 0]") != -1) {
+		piglit_report_subtest_result(PIGLIT_FAIL, "array case 3");
+		pass = false;
+	}
+
 	/* Valid inputs. */
-	validate_location(prog, GL_UNIFORM,        "color",   9);
-	validate_location(prog, GL_PROGRAM_INPUT,  "input0",  3);
-	validate_location(prog, GL_PROGRAM_INPUT,  "input1",  6);
-	validate_location(prog, GL_PROGRAM_OUTPUT, "output0", 1);
-	validate_location(prog, GL_PROGRAM_OUTPUT, "output1", 0);
+	validate_location(prog, GL_UNIFORM,        "color",    9);
+	validate_location(prog, GL_PROGRAM_INPUT,  "input0",   3);
+	validate_location(prog, GL_PROGRAM_INPUT,  "input1",   6);
+	validate_location(prog, GL_PROGRAM_OUTPUT, "output0",  1);
+	validate_location(prog, GL_PROGRAM_OUTPUT, "output1",  0);
+
+	/* Array indexing cases. */
+	validate_location(prog, GL_UNIFORM,        "array",    1);
+	validate_location(prog, GL_UNIFORM,        "array[0]", 1);
+	validate_location(prog, GL_UNIFORM,        "array[1]", 2);
 
 	if (!piglit_check_gl_error(GL_NO_ERROR))
 		piglit_report_result(PIGLIT_FAIL);
