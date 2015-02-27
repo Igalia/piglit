@@ -191,7 +191,7 @@ ENDIF()
 
 find_package(PythonInterp 2.7 REQUIRED)
 find_package(PythonNumpy 1.6.2 REQUIRED)
-find_package(PythonMako 0.7.3 REQUIRED)
+find_package(PythonMako 0.8.0 REQUIRED)
 find_package(PythonSix 1.4.0 REQUIRED)
 
 # Default to compiling with debug information (`gcc -g`):
