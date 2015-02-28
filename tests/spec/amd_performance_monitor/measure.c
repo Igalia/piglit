@@ -244,6 +244,8 @@ test_basic_measurement(unsigned group)
 	}
 	verify(result_size == ((char *) p - (char *) data));
 
+	piglit_report_subtest_result(PIGLIT_PASS, "%s", test_name);
+
 	free(data);
 
 	/**
