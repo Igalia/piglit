@@ -1,0 +1,64 @@
+#
+# Test that partial writes of patch outputs work in the control shader
+#
+
+[require]
+GLSL >= 1.50
+GL_ARB_tessellation_shader
+
+[vertex shader passthrough]
+
+[tessellation control shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(vertices = 2) out;
+patch out vec4 c;
+uniform int x;
+
+void main()
+{
+	gl_TessLevelInner[0] = 1.0;
+	gl_TessLevelInner[1] = 1.0;
+
+	gl_TessLevelOuter[0] = 1.0;
+	gl_TessLevelOuter[1] = 1.0;
+	gl_TessLevelOuter[2] = 1.0;
+	gl_TessLevelOuter[3] = 1.0;
+
+	c = vec4(1.0);
+	if (x == 0) {	/* true, but the compiler cannot see it */
+		c.xz = vec2(0);
+	}
+}
+
+[tessellation evaluation shader]
+#version 150
+#extension GL_ARB_tessellation_shader : require
+
+layout(quads, equal_spacing) in;
+patch in vec4 c;
+out vec4 fs_c;
+
+void main()
+{
+	gl_Position = vec4(gl_TessCoord.xy * 2 - 1, 0, 1);
+	fs_c = c;
+}
+
+[fragment shader]
+#version 150
+
+in vec4 fs_c;
+
+void main()
+{
+	gl_FragColor = fs_c;
+}
+
+[test]
+clear color 0.1 0.1 0.1 0.1
+clear
+patch parameter vertices 1
+draw arrays GL_PATCHES 0 1
+probe all rgba 0.0 1.0 0.0 1.0
