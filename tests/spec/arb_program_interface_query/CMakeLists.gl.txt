@@ -10,3 +10,4 @@ link_libraries (
 )
 
 piglit_add_executable (arb_program_interface_query-resource-location resource-location.c)
+piglit_add_executable (arb_program_interface_query-resource-index resource-index.c)

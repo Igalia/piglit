@@ -2049,6 +2049,7 @@ for test_type in ('shader', 'api'):
 
 arb_program_interface_query = spec['ARB_program_interface_query']
 add_concurrent_test(arb_program_interface_query, ['arb_program_interface_query-resource-location'])
+add_concurrent_test(arb_program_interface_query, ['arb_program_interface_query-resource-index'])
 
 # Group ARB_explicit_uniform_location
 arb_explicit_uniform_location = spec['ARB_explicit_uniform_location']
