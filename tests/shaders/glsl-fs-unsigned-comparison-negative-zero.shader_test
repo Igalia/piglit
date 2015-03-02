@@ -1,0 +1,37 @@
+[require]
+GLSL >= 1.30
+GL_ARB_shader_bit_encoding
+
+[vertex shader passthrough]
+
+[fragment shader]
+#extension GL_ARB_shader_bit_encoding: require
+
+out vec4 frag_color;
+
+uniform uint a, b;
+
+void main()
+{
+	/* Adding a + b yields 0x80000000, which when reinterpreted as a float
+	 * is -0.0. -0.0 == +0.0 is true, but if we did the comparison against
+	 * the unsigned value it would incorrectly be false.
+	 */
+	if (uintBitsToFloat(a + b) == 0.0)
+		frag_color = vec4(0.0, 1.0, 0.0, 1.0);
+	else
+		frag_color = vec4(1.0, 0.0, 0.0, 1.0);
+}
+
+[vertex data]
+piglit_vertex/float/2
+-1.0 -1.0
+ 1.0 -1.0
+ 1.0  1.0
+-1.0  1.0
+
+[test]
+uniform uint a 0x40000000
+uniform uint b 0x40000000
+draw arrays GL_TRIANGLE_FAN 0 4
+probe all rgba 0.0 1.0 0.0 1.0
