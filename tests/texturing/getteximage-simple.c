@@ -71,11 +71,14 @@ piglit_display(void)
 
 void piglit_init(int argc, char **argv)
 {
+	GLuint tex;
 	int i;
 
 	for(i = 0; i < 4096; ++i)
 		data[i] = rand() & 0xff;
 
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 64, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
