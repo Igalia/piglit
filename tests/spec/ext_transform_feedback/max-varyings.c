@@ -99,13 +99,11 @@ get_fs(int num_varyings)
 		"\n"
 		"void main()\n"
 		"{\n"
-		"  int i;\n"
-		"  gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-		"  for(i = 0; i < v.length(); ++i) {\n"
-		"    if (v[i] != 4.0*i + vec4(0.0, 1.0, 2.0, 3.0)) {\n"
-		"      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
-		"    }\n"
+		"  bool failed = false;\n"
+		"  for(int i = 0; i < v.length(); ++i) {\n"
+		"     failed = failed || (v[i] != 4.0*i + vec4(0.0, 1.0, 2.0, 3.0));\n"
 		"  }\n"
+		"  gl_FragColor = vec4(float(failed), 1.0 - float(failed), 0.0, 1.0);\n"
 		"}\n", num_varyings);
 
 	shader = piglit_compile_shader_text(GL_FRAGMENT_SHADER, fstext);
