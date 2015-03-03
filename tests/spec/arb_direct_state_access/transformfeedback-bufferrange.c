@@ -213,10 +213,10 @@ piglit_display(void)
 
 	/* check the result */
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf[0]);
-	v = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY) + offset;
+	v = (GLfloat *)((GLbyte *)glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY) + offset);
 	piglit_check_gl_error(GL_NO_ERROR);
 	glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, xfb_buf[1]);
-	w = glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY) + offset;
+	w = (GLfloat *)((GLbyte *)glMapBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, GL_READ_ONLY) + offset);
 	piglit_check_gl_error(GL_NO_ERROR);
 
 	for (i = 0; i < num_prims; i++) {
