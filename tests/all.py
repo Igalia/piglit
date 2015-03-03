@@ -676,9 +676,9 @@ with profile.group_manager(
     g(['glx-pixmap-multi'])
     g(['glx-tfp'], run_concurrent=False)
     g(['glx-visuals-depth'], run_concurrent=False)
-    g(['glx-visuals-depth'])
+    g(['glx-visuals-depth', '-pixmap'])
     g(['glx-visuals-stencil'], run_concurrent=False)
-    g(['glx-visuals-stencil'])
+    g(['glx-visuals-stencil', '-pixmap'])
     g(['glx-window-life'])
     g(['glx-pixmap-crosscheck'])
     g(['glx-query-drawable', '--attr=GLX_WIDTH', '--type=GLXWINDOW'],
