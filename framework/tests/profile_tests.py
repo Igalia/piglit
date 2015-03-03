@@ -255,3 +255,99 @@ def test_testprofile_groupmanager_name_str():
         g('abc')
 
     nt.ok_(grouptools.join('foo', 'abc') in prof.test_list)
+
+
+@nt.raises(profile.TestDictError)
+def test_testdict_key_not_string():
+    """TestDict: If key value isn't a string an exception is raised.
+
+    This throws a few different things at the key value and expects an error to
+    be raised. It isn't a perfect test, but it was the best I could come up
+    with.
+
+    """
+    test = profile.TestDict()
+
+    for x in [None, utils.Test(['foo']), ['a'], {'a': 1}]:
+        test[x] = utils.Test(['foo'])
+
+
+@nt.raises(profile.TestDictError)
+def test_testdict_value_not_valid():
+    """TestDict: If the value isn't a Tree, Test, or None an exception is raised.
+
+    Like the key test this isn't perfect, but it does try the common mistakes.
+
+    """
+    test = profile.TestDict()
+
+    for x in [{}, 'a']:
+        test['foo'] = x
+
+
+@nt.raises(profile.TestDictError)
+def test_testdict_reassignment():
+    """TestDict: reassigning a key raises an exception."""
+    test = profile.TestDict()
+    test['foo'] = utils.Test(['foo'])
+    test['foo'] = utils.Test(['foo', 'bar'])
+
+
+@nt.raises(profile.TestDictError)
+def test_testdict_reassignment_lower():
+    """TestDict: reassigning a key raises an exception (capitalization is ignored)."""
+    test = profile.TestDict()
+    test['foo'] = utils.Test(['foo'])
+    test['Foo'] = utils.Test(['foo', 'bar'])
+
+
+def test_testdict_allow_reassignment():
+    """TestDict: allow_reassignment works."""
+    test = profile.TestDict()
+    test['a'] = utils.Test(['foo'])
+    with test.allow_reassignment:
+        test['a'] = utils.Test(['bar'])
+
+    nt.ok_(test['a'].command == ['bar'])
+
+
+def test_testprofile_allow_reassignment():
+    """TestProfile: allow_reassignment wrapper works."""
+    prof = profile.TestProfile()
+    prof.test_list['a'] = utils.Test(['foo'])
+    with prof.allow_reassignment:
+        prof.test_list['a'] = utils.Test(['bar'])
+
+    nt.ok_(prof.test_list['a'].command == ['bar'])
+
+
+def test_testprofile_allow_reassignment_with_groupmanager():
+    """TestProfile: allow_reassignment wrapper works with groupmanager."""
+    testname = grouptools.join('a', 'b')
+    prof = profile.TestProfile()
+    prof.test_list[testname] = utils.Test(['foo'])
+    with prof.allow_reassignment:
+        with prof.group_manager(utils.Test, 'a') as g:
+            g(['bar'], 'b')
+
+    nt.ok_(prof.test_list[testname].command == ['bar'])
+
+
+@utils.no_error
+def test_testprofile_allow_reassignemnt_stacked():
+    """profile.TestDict.allow_reassignment: check stacking cornercase.
+
+    There is an odd corner case in the original (obvious) implmentation of this
+    function, If one opens two context managers and then returns from the inner
+    one assignment will not be allowed, even though one is still inside the
+    first context manager.
+
+    """
+    test = profile.TestDict()
+    test['a'] = utils.Test(['foo'])
+    with test.allow_reassignment:
+        with test.allow_reassignment:
+            pass
+        test['a'] = utils.Test(['bar'])
+
+    nt.ok_(test['a'].command == ['bar'])

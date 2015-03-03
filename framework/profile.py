@@ -32,7 +32,6 @@ import sys
 import multiprocessing
 import multiprocessing.dummy
 import importlib
-import types
 import contextlib
 import itertools
 
@@ -48,12 +47,23 @@ __all__ = [
 ]
 
 
+class TestDictError(Exception):
+    pass
+
+
 class TestDict(dict):  # pylint: disable=too-few-public-methods
     """A special kind of dict for tests.
 
     This dict lowers the names of keys by default
 
     """
+    def __init__(self, *args, **kwargs):
+        # This counter is incremented once when the allow_reassignment context
+        # manager is opened, and decremented each time it is closed. This
+        # allows stacking of the context manager
+        self.__allow_reassignment = 0
+        super(TestDict, self).__init__(*args, **kwargs)
+
     def __setitem__(self, key, value):
         """Enforce types on set operations.
 
@@ -67,14 +77,37 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
         filesystems.
 
         """
-        assert isinstance(key, basestring), \
-            "Keys must be strings, but was {}".format(type(key))
-        # None is required to make empty assignment work:
-        # foo = Tree['a']
-        assert isinstance(value, (Test, types.NoneType)), \
-            "Values must be either a Test, but was {}".format(type(value))
+        # keys should be strings
+        if not isinstance(key, basestring):
+            raise TestDictError("Keys must be strings, but was {}".format(
+                type(key)))
 
-        super(TestDict, self).__setitem__(key.lower(), value)
+        # Values should either be more Tests
+        if not isinstance(value, Test):
+            raise TestDictError(
+                "Values must be a Test, but was a {}".format(type(value)))
+
+        # This must be lowered before the following test, or the test can pass
+        # in error if the key has capitals in it.
+        key = key.lower()
+
+        # If there is already a test of that value in the tree it is an error
+        if not self.__allow_reassignment and key in self:
+            if self[key] != value:
+                error = (
+                    'Further, the two tests are not the same,\n'
+                    'The original test has this command:   "{0}"\n'
+                    'The new test has this command:        "{1}"'.format(
+                        ' '.join(self[key].command), ' '.join(value.command))
+                )
+            else:
+                error = "and both tests are the same."
+
+            raise TestDictError(
+                "A test has already been asigned the name: {}\n{}".format(
+                    key, error))
+
+        super(TestDict, self).__setitem__(key, value)
 
     def __getitem__(self, key):
         """Lower the value before returning."""
@@ -83,6 +116,25 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
     def __delitem__(self, key):
         """Lower the value before returning."""
         return super(TestDict, self).__delitem__(key.lower())
+
+    @property
+    @contextlib.contextmanager
+    def allow_reassignment(self):
+        """Context manager that allows keys to be reassigned.
+
+        Normally reassignment happens in error, but sometimes one actually
+        wants to do reassignment, say to add extra options in a reduced
+        profile. This method allows reassignment, but only within its context,
+        making it an explict choice to do so.
+
+        It is safe to nest this contextmanager.
+
+        It is not safe to use this context manager in a threaded application
+
+        """
+        self.__allow_reassignment += 1
+        yield
+        self.__allow_reassignment -= 1
 
 
 class TestProfile(object):
@@ -354,6 +406,13 @@ class TestProfile(object):
 
         yield adder
 
+    @property
+    @contextlib.contextmanager
+    def allow_reassignment(self):
+        """A convenience wrapper around self.test_list.allow_reassignment."""
+        with self.test_list.allow_reassignment:
+            yield
+
 
 def load_test_profile(filename):
     """ Load a python module and return it's profile attribute
@@ -370,16 +429,18 @@ def load_test_profile(filename):
     filename -- the name of a python module to get a 'profile' from
 
     """
-    mod = importlib.import_module('tests.{0}'.format(
-        os.path.splitext(os.path.basename(filename))[0]))
-
     try:
+        mod = importlib.import_module('tests.{0}'.format(
+            os.path.splitext(os.path.basename(filename))[0]))
         return mod.profile
     except AttributeError:
         print("Error: There is not profile attribute in module {0}."
               "Did you specify the right file?".format(filename),
               file=sys.stderr)
         sys.exit(2)
+    except TestDictError as e:
+        print("Error: {}".format(e.message), file=sys.stderr)
+        sys.exit(1)
 
 
 def merge_test_profiles(profiles):

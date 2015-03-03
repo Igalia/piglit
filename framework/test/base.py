@@ -337,6 +337,12 @@ class Test(object):
 
         return error
 
+    def __eq__(self, other):
+        return self.command == other.command
+
+    def __ne__(self, other):
+        return not self == other
+
 
 class WindowResizeMixin(object):
     """ Mixin class that deals with spurious window resizes
