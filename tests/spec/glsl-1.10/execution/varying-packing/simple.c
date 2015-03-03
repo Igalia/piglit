@@ -258,12 +258,12 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 		if (varyings[i].type->base != BASE_TYPE_FLOAT)
 			opt_flat_keyword = "flat ";
 		if (varyings[i].array_elems != 0) {
-			text += sprintf(text, "%s%s %s var%u[%u];\n",
+			text += sprintf(text, "%s%s %s var%03u[%u];\n",
 					opt_flat_keyword, varying_keyword,
 					varyings[i].type->name, i,
 					varyings[i].array_elems);
 		} else {
-			text += sprintf(text, "%s%s %s var%u;\n",
+			text += sprintf(text, "%s%s %s var%03u;\n",
 					opt_flat_keyword, varying_keyword,
 					varyings[i].type->name, i);
 		}
@@ -292,8 +292,8 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 				for (l = 0; l < varyings[i].type->num_rows; ++l) {
 					text += sprintf(text, "  ");
 					if (!is_vs)
-						text += sprintf(text, "if (");
-					text += sprintf(text, "var%u", i);
+						text += sprintf(text, "failed = failed || ");
+					text += sprintf(text, "var%03u", i);
 					if (varyings[i].array_elems)
 						text += sprintf(text, "[%u]", j);
 					if (varyings[i].type->num_cols > 1)
@@ -304,16 +304,9 @@ get_shader(bool is_vs, unsigned glsl_version, int num_varyings,
 						text += sprintf(text, " = ");
 					else
 						text += sprintf(text, " != ");
-					text += sprintf(text, "%s(i + %u)",
+					text += sprintf(text, "%s(i + %u);\n",
 							base_type_name,
 							offset++);
-					if (is_vs) {
-						text += sprintf(text, ";\n");
-					} else {
-						text += sprintf(text,
-								")\n"
-								"    failed = true;\n");
-					}
 				}
 			}
 		}
