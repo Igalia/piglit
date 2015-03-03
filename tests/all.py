@@ -4074,7 +4074,6 @@ with profile.group_manager(
     g(['oes_compressed_paletted_texture-api'], 'basic API')
     g(['arb_texture_compression-invalid-formats', 'paletted'],
       'invalid formats')
-    g(['oes_compressed_paletted_texture-api'], 'basic API')
 
 with profile.group_manager(
         PiglitGLTest,
