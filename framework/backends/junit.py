@@ -129,17 +129,19 @@ class JUnitBackend(FileBackend):
             # Add relevant result value, if the result is pass then it doesn't
             # need one of these statuses
             if data['result'] == 'skip':
-                etree.SubElement(element, 'skipped')
+                res = etree.SubElement(element, 'skipped')
 
             elif data['result'] in ['warn', 'fail', 'dmesg-warn', 'dmesg-fail']:
                 if expected_result == "failure":
                     err.text += "\n\nWARN: passing test as an expected failure"
+                    res = etree.SubElement(element, 'skipped', message='expected failure')
                 else:
                     res = etree.SubElement(element, 'failure')
 
             elif data['result'] == 'crash':
                 if expected_result == "error":
                     err.text += "\n\nWARN: passing test as an expected crash"
+                    res = etree.SubElement(element, 'skipped', message='expected crash')
                 else:
                     res = etree.SubElement(element, 'error')
 
