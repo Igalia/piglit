@@ -1979,8 +1979,8 @@ with profile.group_manager(
                       'blit {} {} {} {}'.format(
                           backing_type, srgb_types, blit_type,
                           framebuffer_srgb_setting))
-        g(['framebuffer-srgb'], run_concurrent=False)
-        g(['arb_framebuffer_srgb-clear'])
+    g(['framebuffer-srgb'], run_concurrent=False)
+    g(['arb_framebuffer_srgb-clear'])
 
 with profile.group_manager(
         PiglitGLTest,
