@@ -4269,8 +4269,8 @@ with profile.group_manager(
       'gettextureimage-simple')
     g(['arb_direct_state_access-gettextureimage-targets'],
       'gettextureimage-targets')
-    g(['arb_direct_state_access-compressedtextureimage GL_COMPRESSED_RGBA_FXT1_3DFX'],
-      'compressedtextureimage GL_COMPRESSED_RGBA_FXT1_3DFX')
+    g(['arb_direct_state_access-compressedtextureimage GL_COMPRESSED_RGBA_S3TC_DXT5_EXT'],
+      'compressedtextureimage GL_COMPRESSED_RGBA_S3TC_DXT5_EXT')
     g(['arb_direct_state_access-getcompressedtextureimage'],
       'getcompressedtextureimage')
     g(['arb_direct_state_access-texture-storage-multisample'],
