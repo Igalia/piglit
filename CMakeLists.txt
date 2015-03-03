@@ -215,6 +215,12 @@ if (NOT MSVC)
 	IF (C_COMPILER_FLAG_WEVLA)
 		SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=vla")
 	ENDIF ()
+	# GCC allows void pointer arithmetic, but it is not part of ISO C and
+	# in particular MSVC will throw `C2036: 'void *' : unknown size`
+	check_c_compiler_flag ("-Werror=pointer-arith" C_COMPILER_FLAG_WEPOINTER_ARITH)
+	if (C_COMPILER_FLAG_WEPOINTER_ARITH)
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror=pointer-arith")
+	endif ()
 	# MSVC only supports C99 variadic macros.  It doesn't support the
 	# non-standard GNU named variadic macro syntax that's documented in
 	# https://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
