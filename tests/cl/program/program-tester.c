@@ -188,7 +188,7 @@ add_dynamic_array(void** array,
 		free(old_array);
 	}
 
-	memcpy((*array) + ((*count)*element_size), data, element_size);
+	memcpy((char *)(*array) + ((*count)*element_size), data, element_size);
 	(*count)++;
 #undef GROW_SIZE
 }
