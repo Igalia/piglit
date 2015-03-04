@@ -81,8 +81,6 @@ static const char *vstext = {
 
 #define NUM_INPUTS 4
 static const GLfloat inputs[NUM_INPUTS] =   {-1.0, 0.0, 1.0, 3.0};
-static const GLfloat out1_ret[NUM_INPUTS] = { 0.0, 1.0, 2.0, 4.0};
-static const GLfloat out2_ret[NUM_INPUTS] = {-2.0, 0.0, 2.0, 6.0};
 
 struct context_t {
 	struct tbo_state_t {
