@@ -4354,5 +4354,10 @@ with profile.group_manager(
     add_fbo_formats_tests(g, 'GL_ARB_texture_stencil8')
     add_texwrap_format_tests(g, 'GL_ARB_texture_stencil8')
 
+with profile.group_manager(
+        PiglitGLTest,
+        grouptools.join('spec', 'arb_vertex_attrib_64bit')) as g:
+    g(['arb_vertex_attrib_64bit-double_attribs'], 'double_attribs')
+
 if platform.system() is 'Windows':
     profile.filter_tests(lambda p, _: not p.startswith('glx'))
