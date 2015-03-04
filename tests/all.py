@@ -1360,12 +1360,19 @@ for stage in ['vs', 'gs', 'fs']:
         version = '1.50'
     else:
         version = '1.30'
+
     # textureSize():
-    for sampler in textureSize_samplers_130:
-        profile.test_list[grouptools.join(
-            'spec', 'glsl-{}'.format(version), 'execution', 'textureSize',
-            '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
-                ['textureSize', stage, sampler])
+    # These will be added in the textureSize_samplers_140 loop for gs, because
+    # it is a special case and is actually 1.50 feature.
+    # Despite the differences in the commands lines of the two lists (this one
+    # does not add '140', the two tests are equivalent.
+    if stage is not 'gs':
+        for sampler in textureSize_samplers_130:
+            profile.test_list[grouptools.join(
+                'spec', 'glsl-{}'.format(version), 'execution', 'textureSize',
+                '{}-textureSize-{}'.format(stage, sampler))] = PiglitGLTest(
+                    ['textureSize', stage, sampler])
+
     # texelFetch():
     for sampler in ['sampler1D', 'sampler2D', 'sampler3D', 'sampler1DArray',
                     'sampler2DArray', 'isampler1D', 'isampler2D', 'isampler3D',
@@ -1380,6 +1387,7 @@ for stage in ['vs', 'gs', 'fs']:
             'spec', 'glsl-{}'.format(version), 'execution', 'texelFetchOffset',
             '{}-texelFetch-{}'.format(stage, sampler))] = PiglitGLTest(
                 ['texelFetch', 'offset', stage, sampler])
+
     # texelFetch() with EXT_texture_swizzle mode "b0r1":
     for type in ['i', 'u', '']:
         profile.test_list[grouptools.join(
