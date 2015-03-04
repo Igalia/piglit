@@ -1227,11 +1227,12 @@ check_double_support(void)
  * the data.  If the uniform is not in a uniform block, returns false.
  */
 bool
-set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_array_index)
+set_ubo_uniform(char *name, const char *type, const char *line, int ubo_array_index)
 {
 	GLuint uniform_index;
 	GLint block_index;
 	GLint offset;
+	GLint array_index;
 	char *data;
 	float f[16];
 	double d[16];
@@ -1242,7 +1243,29 @@ set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_ar
 	if (!num_uniform_blocks)
 		return false;
 
-	glGetUniformIndices(prog, 1, &name, &uniform_index);
+	/* if the uniform is an array, strip the index, as GL
+	   prevents non-zero indexes from matching a name */
+	if (name[name_len - 1] == ']') {
+		int i;
+
+		for (i = name_len - 1; (i > 0) && isdigit(name[i-1]); --i)
+			/* empty */;
+
+		array_index = strtol(&name[i], NULL, 0);
+
+		if (i) {
+			i--;
+			if (name[i] != '[') {
+				printf("cannot parse uniform \"%s\"\n", name);
+				piglit_report_result(PIGLIT_FAIL);
+			}
+			name[i] = 0;
+		}
+
+	}
+
+
+	glGetUniformIndices(prog, 1, (const char **)&name, &uniform_index);
 	if (uniform_index == GL_INVALID_INDEX) {
 		printf("cannot get index of uniform \"%s\"\n", name);
 		piglit_report_result(PIGLIT_FAIL);
@@ -1265,14 +1288,10 @@ set_ubo_uniform(const char *name, const char *type, const char *line, int ubo_ar
 
 	if (name[name_len - 1] == ']') {
 		GLint stride;
-		int i;
-
-		for (i = name_len - 1; (i > 0) && isdigit(name[i-1]); --i)
-			/* empty */;
 
 		glGetActiveUniformsiv(prog, 1, &uniform_index,
 				      GL_UNIFORM_ARRAY_STRIDE, &stride);
-		offset += stride * strtol(&name[i], NULL, 0);
+		offset += stride * array_index;
 	}
 
 	glBindBuffer(GL_UNIFORM_BUFFER,
