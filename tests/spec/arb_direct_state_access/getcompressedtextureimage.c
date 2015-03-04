@@ -118,7 +118,7 @@ compare_layer(int layer, int num_elements, int tolerance,
 	int i;
 
 	for (i = 0; i < num_elements; ++i) {
-		if (fabs((int)data[i] - (int)expected[i]) > tolerance) {
+		if (abs((int)data[i] - (int)expected[i]) > tolerance) {
 			printf("GetCompressedTextureImage() returns incorrect"
 			       " data in byte %i for layer %i\n",
 			       i, layer);
