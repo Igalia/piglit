@@ -18,10 +18,8 @@ endif()
 project (piglit)
 
 # Require MSVC 2013 U4
-if (MSVC)
-	if (${CMAKE_C_COMPILER_VERSION} VERSION_LESS 18.00.31101.0)
-		message (FATAL_ERROR "Visual Studio 2013 Update 4 or later required")
-	endif ()
+if (MSVC AND CMAKE_C_COMPILER_VERSION VERSION_LESS 18.00.31101.0)
+	message (FATAL_ERROR "Visual Studio 2013 Update 4 or later required")
 endif ()
 
 find_package(Threads)
