@@ -115,8 +115,8 @@ piglit_display(void)
 		for (y = 0; y < SIZE; y++) {
 			int sx = x % 8;
 			int sy = y % 8;
-			int dx = fabs(sx - x / 8);
-			int dy = fabs(sy - y / 8);
+			int dx = abs(sx - x / 8);
+			int dy = abs(sy - y / 8);
 			float pixel[4];
 
 			if (dx == 0 && dy == 0) {
