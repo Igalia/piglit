@@ -378,10 +378,14 @@ piglit_build_simple_program_unlinked_multiple_shaders_v(GLenum target1,
 	target = target1;
 
 	while (target != 0) {
-		GLuint shader = piglit_compile_shader_text(target, source);
+		/* do not compile/attach a NULL shader */
+		if (source) {
+			GLuint shader = piglit_compile_shader_text(target,
+								   source);
 
-		glAttachShader(prog, shader);
-		glDeleteShader(shader);
+			glAttachShader(prog, shader);
+			glDeleteShader(shader);
+		}
 
 		target  = va_arg(ap, GLenum);
 		if (target != 0)
