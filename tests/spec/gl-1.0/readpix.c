@@ -235,7 +235,7 @@ check_depth(void)
 		for (y = 0; y < h; ++y) {
 			for (x = 0; x < w; ++x) {
 				actual = buf[y*w + x]/(double)0xffffffffU;
-				dd = abs(actual - expected);
+				dd = fabs(actual - expected);
 				err = error_bits(dd, dbits);
 				if (err > current_error) {
 					current_error = err;
