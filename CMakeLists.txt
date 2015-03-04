@@ -469,7 +469,7 @@ install (
 install (
 	DIRECTORY tests
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
-	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|tesc|tese|ktx|cl|txt|vpfp)$"
+	FILES_MATCHING REGEX ".*\\.(py|program_test|shader_test|frag|vert|geom|tesc|tese|ktx|cl|txt|vpfp|inc)$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 
@@ -477,6 +477,13 @@ install (
 	DIRECTORY ${CMAKE_BINARY_DIR}/generated_tests
 	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
 	FILES_MATCHING REGEX ".*\\.(shader_test|program_test|frag|vert|geom|tesc|tese|cl|txt)$"
+	REGEX "CMakeFiles|CMakeLists" EXCLUDE
+)
+
+install (
+	DIRECTORY generated_tests
+	DESTINATION ${PIGLIT_INSTALL_LIBDIR}
+	FILES_MATCHING REGEX ".*\\.inc$"
 	REGEX "CMakeFiles|CMakeLists" EXCLUDE
 )
 
