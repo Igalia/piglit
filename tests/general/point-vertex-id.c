@@ -26,7 +26,13 @@
 /**
  * @file point-vertex-id.c
  *
- * Tests glPolygonMode(GL_POINT) used in combination with gl_VertexID.
+ * Tests glPolygonMode(GL_POINT) used in combination with gl_VertexID
+ * or gl_InstanceID or both.
+ *
+ * Specify gl_VertexID or gl_InstanceID as an argument to specify
+ * which to test. Alternatively you can specify both in order to test
+ * a combination of both.
+ *
  * See bug #84677
  */
 
@@ -40,14 +46,26 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static const char
 vertex_shader[] =
-	"#version 130\n"
+	"uniform vec2 viewport_size;\n"
 	"\n"
-	"uniform vec2 pos[6];\n"
+	"#ifdef USE_VERTEX_ID\n"
+	"uniform vec2 pos_array[12];\n"
+	"#else\n"
+	"in vec2 pos;\n"
+	"#endif"
 	"\n"
 	"void\n"
 	"main()\n"
 	"{\n"
-	"        gl_Position = vec4(pos[gl_VertexID], 0.0, 1.0);\n"
+	"#ifdef USE_VERTEX_ID\n"
+	"        vec2 pos = pos_array[gl_VertexID];\n"
+	"#endif\n"
+	"        gl_Position = vec4(pos, 0.0, 1.0);\n"
+	"#ifdef USE_INSTANCE_ID\n"
+	"        gl_Position.t += float(gl_InstanceID) * 20.0;\n"
+	"#endif\n"
+	"        gl_Position.st = ((gl_Position.st + 0.5) * 2.0 /\n"
+	"                          viewport_size - 1.0);\n"
 	"        gl_FrontColor = vec4(1.0);\n"
 	"}\n";
 
@@ -55,6 +73,13 @@ struct vertex {
 	int x, y;
 	GLubyte edge_flag;
 };
+
+enum test_mode_flags {
+	TEST_MODE_VERTEX_ID = (1 << 0),
+	TEST_MODE_INSTANCE_ID = (1 << 1),
+};
+
+static enum test_mode_flags test_modes;
 
 static const struct vertex
 vertices[] = {
@@ -66,77 +91,107 @@ vertices[] = {
 	{ 30, 10, GL_FALSE },
 	{ 40, 10, GL_FALSE },
 	{ 30, 20, GL_FALSE },
+	/* Copy of the above two triangles but shifted up by 20. If
+	 * instanced rendering is used these will be generated based
+	 * on the gl_InstanceID instead.
+	 */
+	{ 10, 30, GL_TRUE },
+	{ 20, 30, GL_TRUE },
+	{ 10, 40, GL_TRUE },
+	{ 30, 30, GL_FALSE },
+	{ 40, 30, GL_FALSE },
+	{ 30, 40, GL_FALSE },
 };
 
 enum piglit_result
 piglit_display(void)
 {
 	bool pass = true;
-	float black[4] = {0.0, 0.0, 0.0, 0.0};
-	float white[4] = {1.0, 1.0, 1.0, 1.0};
-	GLint pos_location;
+	char shader_buf[sizeof vertex_shader + 512];
+	GLint pos_location = 0, viewport_size_location;
 	GLuint program;
+	float *ref_image, *p;
 	int i;
 
-	program = piglit_build_simple_program(vertex_shader, NULL);
+	strcpy(shader_buf, "#version 130\n");
+	if (test_modes & TEST_MODE_INSTANCE_ID) {
+		strcat(shader_buf,
+		       "#extension GL_ARB_draw_instanced : require\n"
+		       "#define USE_INSTANCE_ID\n");
+	}
+	if (test_modes & TEST_MODE_VERTEX_ID)
+		strcat(shader_buf, "#define USE_VERTEX_ID\n");
+	strcat(shader_buf, vertex_shader);
+
+	program = piglit_build_simple_program(shader_buf, NULL);
 
 	glUseProgram(program);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	pos_location = glGetUniformLocation(program, "pos");
+	viewport_size_location = glGetUniformLocation(program, "viewport_size");
+	glUniform2f(viewport_size_location,
+		    piglit_width,
+		    piglit_height);
 
-	for (i = 0; i < ARRAY_SIZE(vertices); i++) {
-		glUniform2f(pos_location + i,
-			    (vertices[i].x + 0.5f) * 2.0f /
-			    piglit_width - 1.0f,
-			    (vertices[i].y + 0.5f) * 2.0f /
-			    piglit_height - 1.0f);
+	if (test_modes & TEST_MODE_VERTEX_ID) {
+		pos_location = glGetUniformLocation(program, "pos_array");
+
+		for (i = 0; i < ARRAY_SIZE(vertices); i++) {
+			glUniform2f(pos_location + i,
+				    vertices[i].x,
+				    vertices[i].y);
+		}
 	}
 
 	glEnableClientState(GL_EDGE_FLAG_ARRAY);
 	glEdgeFlagPointer(sizeof (struct vertex),
 			  &vertices[0].edge_flag);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-	glDrawArrays(GL_TRIANGLES, 0, ARRAY_SIZE(vertices));
-
-	/* Area below the dots */
-	pass = pass && piglit_probe_rect_rgba(0, 0,
-					      piglit_width,
-					      vertices[0].y,
-					      black);
-	/* Left of the dots */
-	pass = pass && piglit_probe_rect_rgba(0, vertices[0].y,
-					      vertices[0].x,
-					      vertices[1].y - vertices[0].y + 1,
-					      black);
-	/* In-between the dots */
-	pass = pass && piglit_probe_rect_rgba(vertices[0].x + 1,
-					      vertices[0].y,
-					      vertices[1].x - vertices[0].x - 1,
-					      vertices[1].y - vertices[0].y + 1,
-					      black);
-	/* Right of the dots */
-	pass = pass && piglit_probe_rect_rgba(vertices[1].x + 1,
-					      vertices[0].y,
-					      piglit_width - vertices[1].x - 1,
-					      vertices[1].y - vertices[0].y + 1,
-					      black);
-	/* Above the dots */
-	pass = pass && piglit_probe_rect_rgba(0, vertices[2].y + 1,
-					      piglit_width,
-					      piglit_height - vertices[2].y - 1,
-					      black);
-
-	/* At the dots */
-	for (i = 0; i < ARRAY_SIZE(vertices); i++) {
-		if (vertices[i].edge_flag) {
-			pass = pass && piglit_probe_pixel_rgba(vertices[i].x,
-							       vertices[i].y,
-							       white);
-		}
+	if (!(test_modes & TEST_MODE_VERTEX_ID)) {
+		pos_location = glGetAttribLocation(program, "pos");
+		if (pos_location == -1)
+			piglit_report_result(PIGLIT_FAIL);
+		glEnableVertexAttribArray(pos_location);
+		glVertexAttribPointer(pos_location,
+				      2, /* size */
+				      GL_INT,
+				      GL_FALSE, /* normalized */
+				      sizeof (struct vertex),
+				      &vertices[0].x);
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+
+	if ((test_modes & TEST_MODE_INSTANCE_ID)) {
+		glDrawArraysInstanced(GL_TRIANGLES,
+				      0, /* first */
+				      ARRAY_SIZE(vertices) / 2,
+				      2 /* primcount */);
+	} else {
+		glDrawArrays(GL_TRIANGLES,
+			     0, /* first */
+			     ARRAY_SIZE(vertices));
+	}
+
+	if (!(test_modes & TEST_MODE_VERTEX_ID))
+		glDisableVertexAttribArray(pos_location);
+
+	ref_image = malloc(piglit_width * piglit_height * 3 *
+			   sizeof (float));
+	memset(ref_image, 0, piglit_width * piglit_height * 3 * sizeof (float));
+	for (i = 0; i < ARRAY_SIZE(vertices); i++) {
+		if (!vertices[i].edge_flag)
+			continue;
+
+		p = (ref_image +
+		     (vertices[i].x + vertices[i].y * piglit_width) * 3);
+		p[0] = p[1] = p[2] = 1.0f;
+	}
+	pass = piglit_probe_image_color(0, 0,
+					piglit_width, piglit_height,
+					GL_RGB,
+					ref_image);
 
 	glUseProgram(0);
 	glDeleteProgram(program);
@@ -149,5 +204,29 @@ piglit_display(void)
 void
 piglit_init(int argc, char **argv)
 {
+	int i;
+
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "gl_VertexID")) {
+			test_modes |= TEST_MODE_VERTEX_ID;
+		} else if (!strcmp(argv[i], "gl_InstanceID")) {
+			test_modes |= TEST_MODE_INSTANCE_ID;
+		} else {
+			fprintf(stderr, "Unknown argument: %s\n", argv[i]);
+			piglit_report_result(PIGLIT_FAIL);
+		}
+	}
+
+	if (test_modes == 0) {
+		fprintf(stderr,
+			"usage: point-vertex-id [gl_VertexID] [gl_InstanceID]\n"
+			"Either one or both of the arguments must be "
+			"specified\n");
+		piglit_report_result(PIGLIT_FAIL);
+	}
+
+	if ((test_modes & TEST_MODE_INSTANCE_ID))
+		piglit_require_extension("GL_ARB_draw_instanced");
+
 	piglit_require_GLSL_version(130);
 }

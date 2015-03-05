@@ -577,7 +577,9 @@ with profile.group_manager(PiglitGLTest, 'shaders') as g:
     g(['useshaderprogram-bad-type'])
     g(['useshaderprogram-bad-program'])
     g(['useshaderprogram-flushverts-1'])
-    g(['point-vertex-id'])
+    g(['point-vertex-id', 'gl_VertexID'])
+    g(['point-vertex-id', 'gl_InstanceID'])
+    g(['point-vertex-id', 'gl_VertexID', 'gl_InstanceID'])
     g(['glsl-vs-int-attrib'])
     g(['glsl-link-test',
        os.path.join('shaders', 'glsl-link-initializer-01a.vert'),
