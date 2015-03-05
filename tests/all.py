@@ -3316,7 +3316,7 @@ with profile.group_manager(
       'draw-auto instanced', run_concurrent=False)
 
 with profile.group_manager(
-        PiglitGLTest, grouptools.join('spec', 'ext_transform_feedback3')) as g:
+        PiglitGLTest, grouptools.join('spec', 'arb_transform_feedback3')) as g:
     g(['arb_transform_feedback3-bind_buffer_invalid_index'],
       'arb_transform_feedback3-bind_buffer_invalid_index', run_concurrent=False)
     g(['arb_transform_feedback3-query_with_invalid_index'],
