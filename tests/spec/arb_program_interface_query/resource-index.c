@@ -208,7 +208,7 @@ atomic_counter_index_test()
 void
 piglit_init(int argc, char **argv)
 {
-	GLuint prog, shader, i;
+	GLuint prog, shader;
 	bool pass = true;
 	const char **marker = xfb_markers;
 
