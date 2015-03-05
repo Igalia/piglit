@@ -2084,7 +2084,7 @@ with profile.group_manager(
         g(['arb_sample_shading-builtin-gl-num-samples', str(num_samples)],
           'builtin-gl-num-samples {0}'.format(num_samples),
           run_concurrent=False)
-        g(['arb_sample_shading-builtin-gl-sample-mask', str(num_samples)],
+        g(['arb_sample_shading-builtin-gl-sample-id', str(num_samples)],
           'builtin-gl-sample-id {}'.format(num_samples),run_concurrent=False)
         g(['arb_sample_shading-builtin-gl-sample-mask', str(num_samples)],
           'builtin-gl-sample-mask {}'.format(num_samples),
