@@ -80,6 +80,10 @@ class TestDict(dict):  # pylint: disable=too-few-public-methods
         """Lower the value before returning."""
         return super(TestDict, self).__getitem__(key.lower())
 
+    def __delitem__(self, key):
+        """Lower the value before returning."""
+        return super(TestDict, self).__delitem__(key.lower())
+
 
 class TestProfile(object):
     """ Class that holds a list of tests for execution

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import platform
+import sys
 
 from framework.grouptools import join
 from tests.gpu import profile
@@ -12,7 +13,8 @@ def remove(key):
     try:
         del profile.test_list[key]
     except KeyError:
-        pass
+        sys.stderr.write('warning: test %s does not exist\n' % key)
+        sys.stderr.flush()
 
 
 # These take too long or too much memory
