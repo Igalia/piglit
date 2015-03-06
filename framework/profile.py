@@ -326,11 +326,20 @@ class TestProfile(object):
                       constructor as keyword args.
 
             """
+            # If there is no name, then either
+            # a) join the arguments list together to make the name
+            # b) use the argument string as the name
+            # The former is used by the Piglit{G,C}LTest classes, the latter by
+            # GleanTest
             if not name:
-                lgroup = grouptools.join(group, ' '.join(args))
-            else:
-                assert isinstance(name, basestring)
-                lgroup = grouptools.join(group, name)
+                if isinstance(args, list):
+                    name = ' '.join(args)
+                else:
+                    assert isinstance(args, basestring)
+                    name = args
+
+            assert isinstance(name, basestring)
+            lgroup = grouptools.join(group, name)
 
             self.test_list[lgroup] = test_class(
                 args,

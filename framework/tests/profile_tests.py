@@ -33,6 +33,7 @@ import framework.dmesg as dmesg
 import framework.profile as profile
 from framework.tests import utils
 from framework import grouptools
+from framework.test import GleanTest
 
 # Don't print sys.stderr to the console
 sys.stderr = sys.stdout
@@ -241,3 +242,13 @@ def test_testprofile_groupmanager_kwargs_overwrite():
 
     test = prof.test_list[grouptools.join('foo', 'a')]
     nt.assert_equal(test.run_concurrent, False)
+
+
+def test_testprofile_groupmanager_name_str():
+    """TestProfile.group_manager: if args is a string it is not joined."""
+    prof = profile.TestProfile()
+    # Yes, this is really about supporting gleantest anyway.
+    with prof.group_manager(GleanTest, 'foo') as g:
+        g('abc')
+
+    nt.ok_('foo/abc' in prof.test_list)
