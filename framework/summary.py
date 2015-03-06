@@ -29,6 +29,7 @@ import tempfile
 import datetime
 import re
 import getpass
+import sys
 
 from mako.template import Template
 
@@ -279,6 +280,7 @@ class Summary:
     """
     TEMP_DIR = path.join(tempfile.gettempdir(),
                          "piglit-{}".format(getpass.getuser()),
+                         'version-{}'.format(sys.version.split()[0]),
                          "html-summary")
     TEMPLATE_DIR = path.abspath(
         path.join(path.dirname(__file__), '..', 'templates'))
