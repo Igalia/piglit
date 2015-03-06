@@ -3862,6 +3862,8 @@ with profile.group_manager(
     g(['arb_blend_func_extended-fbo-extended-blend'], run_concurrent=False)
     g(['arb_blend_func_extended-fbo-extended-blend-explicit'],
       run_concurrent=False)
+    g(['arb_blend_func_extended-fbo-extended-blend-pattern'],
+      run_concurrent=False)
 
 with profile.group_manager(
         PiglitGLTest,
