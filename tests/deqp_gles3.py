@@ -81,7 +81,8 @@ DEQP_GLES3_EXE = get_option('PIGLIT_DEQP_GLES3_EXE', ('deqp-gles3', 'exe'))
 
 # Path to the xml file which contained the case list of the subset of dEQP
 # and marked as must pass in CTS.
-DEQP_MUSTPASS = get_option('PIGLIT_DEQP_MUSTPASS', ('deqp-gles3', 'mustpasslist'))
+DEQP_MUSTPASS = get_option('PIGLIT_DEQP_MUSTPASS',
+                           ('deqp-gles3', 'mustpasslist'))
 
 DEQP_GLES3_EXTRA_ARGS = get_option('PIGLIT_DEQP_GLES3_EXTRA_ARGS',
                                    ('deqp-gles3', 'extra_args'))
@@ -121,17 +122,18 @@ def iter_deqp_test_cases():
             elif line.startswith('TEST:'):
                 yield line[len('TEST:'):].strip()
             else:
-                raise Exception('{0}:{1}: ill-formed line'.format(caselist_path, i))
+                raise Exception(
+                    '{0}:{1}: ill-formed line'.format(caselist_path, i))
 
 
 class DEQPTest(Test):
 
-    __RESULT_MAP = {"Pass"           : "pass",
-                    "Fail"           : "fail",
-                    "QualityWarning" : "warn",
-                    "InternalError"  : "fail",
-                    "Crash"          : "crash",
-                    "NotSupported"   : "skip"}
+    __RESULT_MAP = {"Pass": "pass",
+                    "Fail": "fail",
+                    "QualityWarning": "warn",
+                    "InternalError": "fail",
+                    "Crash": "crash",
+                    "NotSupported": "skip"}
 
     def __init__(self, case_name):
         command = [DEQP_GLES3_EXE, '--deqp-case=' + case_name]
@@ -157,6 +159,7 @@ class DEQPTest(Test):
 
         # We failed to parse the test output. Fallback to 'fail'.
         self.result['result'] = 'fail'
+
 
 def add_tests():
     if DEQP_GLES3_EXE is None:
