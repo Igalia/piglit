@@ -70,7 +70,8 @@ with profile.group_manager(PiglitCLTest, 'api') as g:
     g(['cl-api-create-kernels-in-program'], 'clCreateKernelsInProgram')
     g(['cl-api-get-program-info'], 'clGetProgramInfo')
     g(['cl-api-get-program-build-info'], 'clGetProgramBuildInfo')
-    g(['cl-api-retain_release-program'], 'clRetainProgram and clReleaseProgram')
+    g(['cl-api-retain_release-program'],
+      'clRetainProgram and clReleaseProgram')
     g(['cl-api-unload-compiler'], 'clUnloadCompiler')
 
     # Kernel
@@ -118,7 +119,8 @@ add_program_test_dir(grouptools.join('program', 'execute'),
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'int'))
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
-                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin', 'math'))
+                     os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
+                                  'math'))
 add_program_test_dir(grouptools.join('program', 'execute', 'builtin'),
                      os.path.join(GENERATED_TESTS_DIR, 'cl', 'builtin',
                                   'relational'))
